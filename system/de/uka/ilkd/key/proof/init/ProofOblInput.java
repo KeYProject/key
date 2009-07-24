@@ -30,7 +30,7 @@ public interface ProofOblInput {
     
     void readActivatedChoices() throws ProofInputException;
 
-    void readProblem(ModStrategy mod) throws ProofInputException;
+    void readProblem() throws ProofInputException;
 
     /** 
      * Returns the proof obligation term as result of the proof obligation

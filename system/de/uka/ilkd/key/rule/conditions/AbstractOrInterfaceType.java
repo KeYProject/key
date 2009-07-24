@@ -12,7 +12,6 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.sort.ArraySort;
-import de.uka.ilkd.key.logic.sort.ClassInstanceSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.VariableConditionAdapter;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
@@ -36,9 +35,7 @@ public class AbstractOrInterfaceType extends VariableConditionAdapter {
             SVInstantiations instMap, Services services) {
         final Sort sort = 
             resolver.resolveSort(var, instCandidate, instMap, services);
-        
-        final boolean isClassType  =  sort instanceof ClassInstanceSort;
-                
+                        
         final boolean isAbstractOrInterface = sort.isAbstract();
         
         return negated ? !isAbstractOrInterface : isAbstractOrInterface;

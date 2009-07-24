@@ -19,7 +19,7 @@ import junit.framework.TestCase;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.sort.PrimitiveSort;
+import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.parser.KeYLexer;
 import de.uka.ilkd.key.parser.KeYParser;
@@ -305,9 +305,9 @@ public class CreateTacletForTests extends TestCase {
 	nss.functions().add(func_p);
 
 	//nat problem:
-	Function const_c=new Function(new Name("c"),nat,new PrimitiveSort[0]);
+	Function const_c=new Function(new Name("c"),nat,new SortImpl[0]);
 	nss.functions().add(const_c);
-	Function const_d=new Function(new Name("d"),nat,new PrimitiveSort[0]);
+	Function const_d=new Function(new Name("d"),nat,new SortImpl[0]);
 	nss.functions().add(const_d);
 
 	Term t_c=tf.createFunctionTerm(const_c,new Term[]{});

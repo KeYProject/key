@@ -24,8 +24,7 @@ import de.uka.ilkd.key.java.reference.TypeRef;
 import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.sort.ClassInstanceSort;
-import de.uka.ilkd.key.logic.sort.PrimitiveSort;
+import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.logic.sort.SetAsListOfSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.IHTacletFilter;
@@ -539,9 +538,9 @@ public class TestMatchTaclet extends TestCase {
     //a term of sort B. (assertNotNull)
     public void testWithSubSortsTermSV() {
 	Sort osort1=(Sort)TacletForTests.getSorts().lookup(new Name("Obj"));
-	Sort osort2=new ClassInstanceSort(new Name("os2"), osort1, false);
-	Sort osort3=new ClassInstanceSort(new Name("os3"), osort1, false);
-	Sort osort4=new ClassInstanceSort(new Name("os4"), 
+	Sort osort2=new SortImpl(new Name("os2"), osort1);
+	Sort osort3=new SortImpl(new Name("os3"), osort1);
+	Sort osort4=new SortImpl(new Name("os4"), 
 					      SetAsListOfSort.EMPTY_SET
 					      .add(osort2).add(osort3), false);
 	Function v4=new Function(new Name("v4"), osort4, new Sort[0]);	
@@ -559,9 +558,9 @@ public class TestMatchTaclet extends TestCase {
     //match a logic variable of sort B. (assertNull)
     public void testWithSubSortsVariableSV() {
 	Sort osort1=(Sort)TacletForTests.getSorts().lookup(new Name("Obj"));
-	Sort osort2=new ClassInstanceSort(new Name("os2"), osort1, false);
-	Sort osort3=new ClassInstanceSort(new Name("os3"), osort1, false);
-	Sort osort4=new ClassInstanceSort(new Name("os4"), 
+	Sort osort2=new SortImpl(new Name("os2"), osort1);
+	Sort osort3=new SortImpl(new Name("os3"), osort1);
+	Sort osort4=new SortImpl(new Name("os4"), 
 					      SetAsListOfSort.EMPTY_SET
 					      .add(osort2).add(osort3), false);	
 	TermFactory tf=TermFactory.DEFAULT;
@@ -595,9 +594,9 @@ public class TestMatchTaclet extends TestCase {
 	ExecutionContext ec = new ExecutionContext
 	    (new TypeRef(new KeYJavaType
 		(PrimitiveType.JAVA_BYTE, 
-		 new PrimitiveSort(new Name("byte")))),
+		 new SortImpl(new Name("byte")))),
 	     new LocationVariable(new ProgramElementName("testVar"),
-				 new PrimitiveSort(new Name("testSort"))));
+				 new SortImpl(new Name("testSort"))));
 	MethodFrame mframe = new MethodFrame(null, ec, prg);
 	match = tf.createDiamondTerm
 	    (JavaBlock.createJavaBlock(new StatementBlock(mframe)), 

@@ -202,8 +202,7 @@ public class RewriteTaclet extends FindTaclet {
         if (maxSort instanceof AbstractSort) {
             final boolean noCastNecessary = with.sort().extendsTrans(maxSort);            
             if (!noCastNecessary) {
-                with = TermFactory.DEFAULT.
-                    createCastTerm((AbstractSort)maxSort, with);
+                with = TermBuilder.DF.cast(services, (Sort)maxSort, with);
            }
 
         } else {

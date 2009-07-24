@@ -34,7 +34,7 @@ import de.uka.ilkd.key.java.visitor.JavaASTWalker;
 import de.uka.ilkd.key.java.visitor.ProgramReplaceVisitor;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.ArraySort;
-import de.uka.ilkd.key.logic.sort.PrimitiveSort;
+import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
@@ -370,7 +370,7 @@ public abstract class VariableNamer implements InstantiationProposer {
     private String getBaseNameProposal(Sort sort) {
 	String result;
         String name = sort.name().toString();
-        if(sort instanceof PrimitiveSort) {
+        if(sort instanceof SortImpl) {
             result = name.substring(0, 1);
         } else if(sort instanceof ArraySort) {
 	    result = DEFAULT_BASENAME;

@@ -317,7 +317,7 @@ public abstract class EnsuresPO extends AbstractPO {
     //public interface
     //-------------------------------------------------------------------------        
     
-    public void readProblem(ModStrategy mod) throws ProofInputException {
+    public void readProblem() throws ProofInputException {
         //prepare variables, program method and container for @pre-functions
         ListOfProgramVariable paramVars = buildParamVars(programMethod);
         ProgramVariable selfVar = null;

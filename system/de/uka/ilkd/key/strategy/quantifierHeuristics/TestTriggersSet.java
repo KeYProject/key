@@ -98,9 +98,9 @@ public class TestTriggersSet extends TestCase {
 
 	public void setUp() {
 		//sort
-		r = new PrimitiveSort(new Name("r"));
-		s = new PrimitiveSort(new Name("s"));
-		t = new PrimitiveSort(new Name("t"));
+		r = new SortImpl(new Name("r"));
+		s = new SortImpl(new Name("s"));
+		t = new SortImpl(new Name("t"));
 		//ints = ProofSettings.DEFAULT_SETTINGS.getLDTSettings().getIntegerSemantics().getIntSort();
 		sorts.add(r);
 		sorts.add(s);

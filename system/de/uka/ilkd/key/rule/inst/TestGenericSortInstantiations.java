@@ -77,20 +77,25 @@ public class TestGenericSortInstantiations extends TestCase {
     Sort        objectArray = ArraySort.getArraySort ( object,
                                                            object, cloneable, serializable );    
     // these sorts are supposed to have no relations to other (object) sorts;
-    // probably in this place primitive sorts should be used, but these sorts
-    // do currently not support sort hierarchies
-    Sort A4 = new ClassInstanceSort ( new Name ( "A4" ), emptySortSet, false );
-    Sort A3 = new ClassInstanceSort ( new Name ( "A3" ), emptySortSet.add ( A4 ), false );
-    Sort A1 = new ClassInstanceSort ( new Name ( "A1" ), emptySortSet.add ( A3 ), false );
-    Sort A2 = new ClassInstanceSort ( new Name ( "A2" ), emptySortSet.add ( A3 ), false );
-    Sort A6 = new ClassInstanceSort ( new Name ( "A6" ), emptySortSet, false );
-    Sort A5 = new ClassInstanceSort ( new Name ( "A5" ), emptySortSet.add ( A1 ).add ( A6 ), false );
+    Sort A4 = new SortImpl ( new Name ( "A4" ), emptySortSet, false );
+    Sort A3 = new SortImpl ( new Name ( "A3" ), emptySortSet.add ( A4 ), false );
+    Sort A1 = new SortImpl ( new Name ( "A1" ), emptySortSet.add ( A3 ), false );
+    Sort A2 = new SortImpl ( new Name ( "A2" ), emptySortSet.add ( A3 ), false );
+    Sort A6 = new SortImpl ( new Name ( "A6" ), emptySortSet, false );
+    Sort A5 = new SortImpl ( new Name ( "A5" ), emptySortSet.add ( A1 ).add ( A6 ), false );
+    
+    Sort A4OBJ = new SortImpl ( new Name ( "A4OBJ" ), emptySortSet.add(object), false );
+    Sort A3OBJ = new SortImpl ( new Name ( "A3OBJ" ), emptySortSet.add ( A4OBJ ), false );
+    Sort A1OBJ = new SortImpl ( new Name ( "A1OBJ" ), emptySortSet.add ( A3OBJ ), false );
+    Sort A2OBJ = new SortImpl ( new Name ( "A2OBJ" ), emptySortSet.add ( A3OBJ ), false );
+    Sort A6OBJ = new SortImpl ( new Name ( "A6OBJ" ), emptySortSet, false );
+    Sort A5OBJ = new SortImpl ( new Name ( "A5OBJ" ), emptySortSet.add ( A1OBJ ).add ( A6OBJ ), false );    
 
-    Sort B4 = new ClassInstanceSort ( new Name ( "B4" ), emptySortSet.add ( object ), false );
-    Sort B2 = new ClassInstanceSort ( new Name ( "B2" ), emptySortSet.add ( B4 ), false );
-    Sort B3 = new ClassInstanceSort ( new Name ( "B3" ), emptySortSet.add ( B4 ), false );
-    Sort B1 = new ClassInstanceSort ( new Name ( "B1" ), emptySortSet.add ( B2 ).add ( B3 ), false );
-    Sort B5 = new ClassInstanceSort ( new Name ( "B5" ), emptySortSet.add ( B2 ), false );
+    Sort B4 = new SortImpl ( new Name ( "B4" ), emptySortSet.add ( object ), false );
+    Sort B2 = new SortImpl ( new Name ( "B2" ), emptySortSet.add ( B4 ), false );
+    Sort B3 = new SortImpl ( new Name ( "B3" ), emptySortSet.add ( B4 ), false );
+    Sort B1 = new SortImpl ( new Name ( "B1" ), emptySortSet.add ( B2 ).add ( B3 ), false );
+    Sort B5 = new SortImpl ( new Name ( "B5" ), emptySortSet.add ( B2 ), false );
 
     // This setup resembles the code of <code>Recoder2KeY</code>
     Sort  D4 = ArraySort.getArraySort ( B4, object, cloneable, serializable );
@@ -99,7 +104,7 @@ public class TestGenericSortInstantiations extends TestCase {
     Sort  D1 = ArraySort.getArraySort ( B1, object, cloneable, serializable );
     Sort  D5 = ArraySort.getArraySort ( B5, object, cloneable, serializable );
     
-    Sort       C1 = new PrimitiveSort         ( new Name ( "C1" ) );
+    Sort       C1 = new SortImpl         ( new Name ( "C1" ) );
 
     GenericSort G3;
     GenericSort G1;
@@ -660,31 +665,31 @@ public class TestGenericSortInstantiations extends TestCase {
 	GenericSortInstantiations gsi;
 
 	cs = SLListOfGenericSortCondition.EMPTY_LIST;
-	cs = cs.prepend ( GenericSortCondition.createSupersortCondition ( G1, A1 ) );
+	cs = cs.prepend ( GenericSortCondition.createSupersortCondition ( G1, A1OBJ ) );
 	cs = cs.prepend ( GenericSortCondition.createSupersortCondition ( G1, Sort.NULL ) );
 	
 	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs );
 	assertEquals ( "Instantiations should be equal",
 	               ((MapFromGenericSortToSort)MapAsListFromGenericSortToSort.EMPTY_MAP)
-	               .put ( G1, A1 ),
+	               .put ( G1, A1OBJ ),
 	               gsi.getAllInstantiations () );
 
-	cs = cs.prepend ( GenericSortCondition.createSupersortCondition ( G1, A2 ) );
+	cs = cs.prepend ( GenericSortCondition.createSupersortCondition ( G1, A2OBJ ) );
 
 	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs );
 	assertEquals ( "Instantiations should be equal",
 	               ((MapFromGenericSortToSort)MapAsListFromGenericSortToSort.EMPTY_MAP)
-	               .put ( G1, A3 ),
+	               .put ( G1, A3OBJ ),
 	               gsi.getAllInstantiations () );
 
 	cs = SLListOfGenericSortCondition.EMPTY_LIST;
 	cs = cs.prepend ( GenericSortCondition.createSupersortCondition ( G1, Sort.NULL ) );
-	cs = cs.prepend ( GenericSortCondition.createSupersortCondition ( G1, A1 ) );
+	cs = cs.prepend ( GenericSortCondition.createSupersortCondition ( G1, A1OBJ ) );
 	
 	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs );
 	assertEquals ( "Instantiations should be equal",
 	               ((MapFromGenericSortToSort)MapAsListFromGenericSortToSort.EMPTY_MAP)
-	               .put ( G1, A1 ),
+	               .put ( G1, A1OBJ ),
 	               gsi.getAllInstantiations () );
 	
 	cs = SLListOfGenericSortCondition.EMPTY_LIST;

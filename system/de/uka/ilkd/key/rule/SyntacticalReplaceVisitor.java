@@ -26,7 +26,6 @@ import de.uka.ilkd.key.java.visitor.ProgramReplaceVisitor;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.logic.sort.SortDefiningSymbols;
 import de.uka.ilkd.key.rule.inst.ContextInstantiationEntry;
 import de.uka.ilkd.key.rule.inst.ContextStatementBlockInstantiation;
 import de.uka.ilkd.key.rule.inst.IllegalInstantiationException;
@@ -375,8 +374,8 @@ public final class SyntacticalReplaceVisitor extends Visitor {
     private Operator instantiateOperator(Operator op) {	
 	if (op instanceof ModalOperatorSV){	 
             return instantiateOperatorSV((ModalOperatorSV) op);
-        } else if (op instanceof SortDependingSymbol) {
-            return handleSortDependingSymbol(op);
+        } else if (op instanceof SortDependingFunction) {
+            return handleSortDependingSymbol((SortDependingFunction)op);
         } else if (op instanceof ElementaryUpdate) {        
 	    return instantiateElementaryUpdate((ElementaryUpdate)op);       
 	}  else if (op instanceof ProgramSV && ((ProgramSV)op).isListSV()){
@@ -517,21 +516,20 @@ public final class SyntacticalReplaceVisitor extends Visitor {
         return v;
     }
 
-    private Operator handleSortDependingSymbol (Operator op) {
-        final SortDependingSymbol depOp = (SortDependingSymbol)op;
+    private Operator handleSortDependingSymbol (SortDependingFunction depOp) {
         final Sort depSort = depOp.getSortDependingOn ();
         
         
         
-        final SortDefiningSymbols realDepSort =
-            (SortDefiningSymbols)svInst.getGenericSortInstantiations ()
+        final Sort realDepSort =
+            svInst.getGenericSortInstantiations ()
                                        .getRealSort ( depSort, getServices() );
         
         
-        final Operator res = (Operator)depOp.getInstanceFor ( realDepSort, services );
+        final Operator res = depOp.getInstanceFor ( realDepSort, services );
         Debug.assertFalse ( res == null,
                             "Did not find instance of symbol "
-                            + op + " for sort " + realDepSort );
+                            + depOp + " for sort " + realDepSort );
         return res;
     }
 

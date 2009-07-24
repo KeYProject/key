@@ -36,26 +36,15 @@ public final class GenericSort extends AbstractSort {
      * - if "oneOf" is not empty, the instantiation must be an element
          of "oneOf"
      */
-    private static final SetOfSort EMPTY_SORT_SET 
-	= SetAsListOfSort.EMPTY_SET;
 
-    /** direct supersorts */
-    private SetOfSort        ext        = EMPTY_SORT_SET;
+    
     /**
      * list of sorts this generic sort may be instantiated with;
      * EMPTY_SORT_SORT means that every sort may be used
      */
-    private SetOfSort        oneOf      = EMPTY_SORT_SET;
-
-    /**
-     * creates a generic sort (with a new equality symbol for this
-     * sort)   
-     */
-    public GenericSort(Name name) {
-        super ( name );
-    }
-
-    /**
+    private final SetOfSort oneOf;
+    
+   /**
      * creates a generic sort
      * @param ext supersorts of this sort, which have to be either
      * concrete sorts or plain generic sorts (i.e. not collection
@@ -65,14 +54,19 @@ public final class GenericSort extends AbstractSort {
             Name             name,
             SetOfSort        ext,
 	    SetOfSort        oneOf)
-	throws GenericSupersortException {
-	
-        this ( name );
-	this.ext        = ext;
-	this.oneOf      = oneOf;
-	checkSupersorts ();
+		throws GenericSupersortException {
+        super(name, ext, false);
+	this.oneOf = oneOf;
+	checkSupersorts();
     }
 
+ 
+    public GenericSort(Name name) {
+	super(name, SetAsListOfSort.EMPTY_SET, false);
+	this.oneOf = SetAsListOfSort.EMPTY_SET;
+    }
+
+ 
     private void checkSupersorts ()
 	throws GenericSupersortException {
 	IteratorOfSort it = extendsSorts ().iterator ();
@@ -92,15 +86,10 @@ public final class GenericSort extends AbstractSort {
 	}
     }
 
-    /**
-     * @return direct supersorts
-     */
-    public SetOfSort extendsSorts () {
-	return ext;
-    }
 
+    
     /**
-     * @return possible instantiations or "EMPTY_SORT_SET"
+     * @return possible instantiations
      */
     public SetOfSort getOneOf () {
 	return oneOf;
@@ -126,7 +115,7 @@ public final class GenericSort extends AbstractSort {
      * supersort of this sort
      */
     protected boolean checkNonGenericSupersorts ( Sort p_s ) {
-	IteratorOfSort it = ext.iterator ();
+	IteratorOfSort it = extendsSorts().iterator ();
 	Sort           ss;
 
 	while ( it.hasNext () ) {
@@ -141,10 +130,5 @@ public final class GenericSort extends AbstractSort {
 	}
 
 	return true;
-    }
-    
-    
-    public boolean isAbstract() {
-	return false;
     }
 }

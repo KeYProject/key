@@ -14,25 +14,29 @@ import java.util.Iterator;
 
 public class NamespaceSet {
 
-    private Namespace varNS=new Namespace();
-    private Namespace progVarNS=new Namespace();
-    private Namespace funcNS=new Namespace();
-    private Namespace ruleSetNS=new Namespace();
-    private Namespace sortNS=new Namespace();
-    private Namespace choiceNS=new Namespace();
+    private Namespace varNS          = new Namespace();
+    private Namespace progVarNS      = new Namespace();
+    private Namespace funcNS         = new Namespace();
+    private Namespace ruleSetNS      = new Namespace();
+    private Namespace sortNS         = new Namespace();
+    private Namespace choiceNS       = new Namespace();
 
+    
     public NamespaceSet() {
     }
 
-    public NamespaceSet(Namespace varNS, Namespace funcNS, 
-                        Namespace sortNS, Namespace ruleSetNS,
-			Namespace choiceNS, Namespace programVarNS) {
-	this.varNS=varNS;
+    public NamespaceSet(Namespace varNS, 
+	    		Namespace funcNS, 
+                        Namespace sortNS, 
+                        Namespace ruleSetNS,
+			Namespace choiceNS, 
+			Namespace programVarNS) {
+	this.varNS     = varNS;
 	this.progVarNS = programVarNS;
-	this.funcNS=funcNS;
-	this.sortNS=sortNS;
-	this.ruleSetNS=ruleSetNS;
-	this.choiceNS=choiceNS;
+	this.funcNS    = funcNS;
+	this.sortNS    = sortNS;
+	this.ruleSetNS = ruleSetNS;
+	this.choiceNS  = choiceNS;
     }
 
     public Namespace variables() {
@@ -40,7 +44,7 @@ public class NamespaceSet {
     }
 
     public void setVariables(Namespace varNS) {
-	this.varNS=varNS;
+	this.varNS = varNS;
     }
 
     public Namespace programVariables() {
@@ -59,22 +63,20 @@ public class NamespaceSet {
 	this.funcNS=funcNS;
     }
 
-
     public Namespace ruleSets() {
 	return ruleSetNS;
     }
 
     public void setRuleSets(Namespace ruleSetNS) {
-	this.ruleSetNS=ruleSetNS;
+	this.ruleSetNS = ruleSetNS;
     }
-
 
     public Namespace sorts() {
 	return sortNS;
     }
 
     public void setSorts(Namespace sortNS) {
-	this.sortNS=sortNS;
+	this.sortNS=  sortNS;
     }
 
     public Namespace choices() {
@@ -82,9 +84,9 @@ public class NamespaceSet {
     }
 
     public void setChoices(Namespace choiceNS) {
-	this.choiceNS=choiceNS;
+	this.choiceNS = choiceNS;
     }
-
+    
     public void add(NamespaceSet ns) {
 	variables().add(ns.variables());
 	programVariables().add(ns.programVariables());
@@ -105,7 +107,6 @@ public class NamespaceSet {
 	return c;
     }
     
-    
     /**
      * starts the protocol of all contained namespaces
      */
@@ -115,17 +116,19 @@ public class NamespaceSet {
 	sorts().startProtocol();
 	ruleSets().startProtocol();
 	functions().startProtocol();
-	choices().startProtocol();        
+	choices().startProtocol();
     }
        
     /**
      * returns all namespaces in an array     
      */
     private Namespace[] asArray() {
-        return new Namespace[]{
-                variables(), programVariables(), 
-                sorts(), ruleSets(), functions(),
-                choices()
+        return new Namespace[]{variables(), 
+        		       programVariables(), 
+        		       sorts(), 
+        		       ruleSets(), 
+        		       functions(),
+        		       choices()
         };
     }
     
@@ -188,15 +191,14 @@ public class NamespaceSet {
         return null;
     }
 
+    
+    @Override
     public String toString() {
-	return "Sorts: "+sorts()+"\n"+
-	    "Functions: "+functions()+"\n"+
-	    "Variables: "+variables()+"\n"+
-	    "ProgramVariables: "+programVariables()+"\n"+
-	    "Heuristics: "+ruleSets()+"\n"+
-	    "Taclet Options: "+choices()+"\n";
+	return "Sorts: " + sorts() + "\n" +
+	    "Functions: " + functions() + "\n" +
+	    "Variables: " + variables() + "\n" +
+	    "ProgramVariables: " + programVariables() + "\n" +
+	    "Heuristics: " + ruleSets() + "\n" +
+	    "Taclet Options: " + choices() + "\n";
     }
-
-  
-
 }

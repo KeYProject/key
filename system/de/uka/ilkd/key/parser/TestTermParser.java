@@ -19,13 +19,11 @@ import de.uka.ilkd.key.java.Recoder2KeY;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.sort.AbstractSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.rule.SetAsListOfTaclet;
 import de.uka.ilkd.key.rule.TacletForTests;
 import de.uka.ilkd.key.util.DefaultExceptionHandler;
-import de.uka.ilkd.key.util.ExceptionHandlerException;
 
 
 public class TestTermParser extends TestCase {
@@ -57,7 +55,7 @@ public class TestTermParser extends TestCase {
 	    return;
 	}
 	serv = TacletForTests.services ();
-	nss = serv.getNamespaces().copy();
+	nss = serv.getNamespaces();
 	nss.sorts().add(Sort.NULL);
 	r2k = new Recoder2KeY(serv, nss);
 	r2k.parseSpecialClasses();	
@@ -102,8 +100,6 @@ public class TestTermParser extends TestCase {
 		   );
 
         int_sort = lookup_sort("int");       
-        ((AbstractSort)int_sort).addDefinedSymbols(serv.getNamespaces().functions(), 
-                serv.getNamespaces().sorts());
         elem = lookup_sort("elem");
 	list = lookup_sort("list");
 
@@ -182,12 +178,14 @@ public class TestTermParser extends TestCase {
 
     private KeYParser stringTermParser(String s) {
 	return new KeYParser
-	    (ParserMode.TERM, new KeYLexer(new StringReader(s),new DefaultExceptionHandler()), 
+	    (ParserMode.TERM, 
+	     new KeYLexer(new StringReader(s), new DefaultExceptionHandler()), 
 	     "No file. Call of parser from parser/TestTermParser.java",
 	     tf, 
-	     r2k = new Recoder2KeY(TacletForTests.services(), nss),
-	                           TacletForTests.services(), nss, 
-	                           new AbbrevMap());
+	     r2k,
+	     serv, 
+	     nss, 
+	     new AbbrevMap());
 
     }
 
@@ -640,15 +638,4 @@ public class TestTermParser extends TestCase {
         assertEquals("cast stronger than plus", parseTerm("(int)3+2"), 
                 parseTerm("((int)3)+2"));
      }
-    
-    public void testIntersectionSort() {
-        // AZ is a subsort of Z, 
-        TacletForTests.getJavaInfo().readJavaBlock("{}");        
-        nss = TacletForTests.getNamespaces();
-        r2k = new Recoder2KeY(
-                        TacletForTests.getJavaInfo().getKeYProgModelInfo().getServConf(),
-                        TacletForTests.getJavaInfo().rec2key(),
-                        nss,
-                        TacletForTests.services().getTypeConverter());                     
-    }
 }

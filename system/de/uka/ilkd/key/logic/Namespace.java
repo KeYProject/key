@@ -255,5 +255,4 @@ public class Namespace implements java.io.Serializable {
 	localSym=null;
 	numLocalSyms=0;
     }
-
 }

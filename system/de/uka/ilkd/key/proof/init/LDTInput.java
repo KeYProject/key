@@ -45,13 +45,15 @@ public class LDTInput implements EnvInput {
 	this.keyFiles = keyFiles;
 	this.main=main;
     }
+        
     
-    
+    @Override
     public String name() {
 	return NAME;
     }
     
     
+    @Override
     public int getNumberOfChars() {
 	int sum=0;
 	for (int i=0; i<keyFiles.length; i++) {
@@ -61,6 +63,7 @@ public class LDTInput implements EnvInput {
     }
 
 
+    @Override
     public void setInitConfig(InitConfig conf) {
 	this.initConfig=conf;	
 	for(int i = 0; i < keyFiles.length; i++) {
@@ -69,6 +72,7 @@ public class LDTInput implements EnvInput {
     }
 
     
+    @Override
     public Includes readIncludes() throws ProofInputException {
 	Includes result = new Includes();
 	for(int i = 0; i < keyFiles.length; i++) {
@@ -78,11 +82,13 @@ public class LDTInput implements EnvInput {
     }
     
         
+    @Override
     public String readJavaPath() throws ProofInputException {
 	return "";
     }
     
     
+    @Override
     public List<File> readClassPath() throws ProofInputException {
         return null;
     }
@@ -94,28 +100,27 @@ public class LDTInput implements EnvInput {
      * third the rules. This procedure makes it possible to use all declared
      * sorts in all rules, e.g.
      */
-    public void read(ModStrategy mod) throws ProofInputException {
+    @Override
+    public void read() throws ProofInputException {
 	if (initConfig==null) {
 	    throw new IllegalStateException("LDTInput: InitConfig not set.");
 	}
-	
-	mod = ModStrategy.NO_VARS;
-	
+		
 	for (int i=0; i<keyFiles.length; i++) {
-	    keyFiles[i].readSorts(mod);
+	    keyFiles[i].readSorts();	    
 	}
 	for (int i=0; i<keyFiles.length; i++) {
-	    keyFiles[i].readFuncAndPred(mod);
+	    keyFiles[i].readFuncAndPred();
 	}
 	for (int i=0; i<keyFiles.length; i++) {
 	    if (main != null) {
 		main.setStatusLine("Reading "+keyFiles[i].name(), 
 				   keyFiles[i].getNumberOfChars());
 	    }
-	    keyFiles[i].readRulesAndProblem(mod);
+	    keyFiles[i].readRulesAndProblem();
 	}
-	
-	//create LDTs
+		
+	//create LDT objects
         Namespace sorts     = initConfig.sortNS();
         Namespace functions = new Namespace(initConfig.funcNS());
         IteratorOfNamed it  = initConfig.choiceNS().allElements().iterator();
@@ -141,6 +146,7 @@ public class LDTInput implements EnvInput {
     }
   
     
+    @Override
     public boolean equals(Object o){
 	if(!(o instanceof LDTInput)) {
 	    return false;
@@ -168,6 +174,7 @@ public class LDTInput implements EnvInput {
     }
     
     
+    @Override
     public int hashCode() {
 	int result = 0;
 	for(int i = 0; i < keyFiles.length; i++) {

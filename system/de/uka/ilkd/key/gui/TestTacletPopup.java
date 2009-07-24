@@ -13,7 +13,7 @@ import java.io.StringReader;
 
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.sort.PrimitiveSort;
+import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.parser.KeYLexer;
 import de.uka.ilkd.key.parser.KeYParser;
@@ -56,7 +56,7 @@ public class TestTacletPopup {
     static SchemaVariable t0;
     static LogicVariable z;
 
-    static Sort nat = new PrimitiveSort(new Name("Nat"));
+    static Sort nat = new SortImpl(new Name("Nat"));
 
     static TermFactory tf=TermFactory.DEFAULT;
 

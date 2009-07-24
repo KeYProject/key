@@ -13,8 +13,10 @@ package de.uka.ilkd.key.pp;
 import java.util.HashMap;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.TypeConverter;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.util.Service;
 
 
@@ -105,13 +107,15 @@ public final class NotationInfo {
 					   NotationInfo.class.getName());
     }
     
+    private Services services;
+    
     
     /** This maps operators and classes of operators to {@link
      * Notation}s.  The idea is that we first look wether the operator has
      * a Notation registered.  Otherwise, we see if there is one for the
      * <em>class</em> of the operator.
      */
-    private HashMap tbl;
+    private HashMap<Object, Notation> tbl;
 
     /**
      * Maps terms to abbreviations and reverse.
@@ -136,17 +140,9 @@ public final class NotationInfo {
      * which corresponds to the parser syntax. 
      */
     private void createDefaultNotationTable() {
-	tbl=new HashMap();
-	createDefaultOpNotation();
-	createDefaultTermSymbolNotation();
 	scm = new AbbrevMap();
-    }
-
-    /**
-     * Registers notations for the built-in operators.  The priorities
-     * and associativities correspond to the parser syntax.  
-     */
-    protected void createDefaultOpNotation() {
+	tbl = new HashMap<Object,Notation>();
+	
 	tbl.put(Junctor.TRUE ,new Notation.Constant("true", 130));
 	tbl.put(Junctor.FALSE,new Notation.Constant("false", 130));
 	tbl.put(Junctor.NOT,new Notation.Prefix("!" ,60,60));
@@ -155,7 +151,6 @@ public final class NotationInfo {
 	tbl.put(Junctor.IMP,new Notation.Infix("->" ,30,40,30));
 	tbl.put(Equality.EQV,new Notation.Infix("<->",20,20,30));
 	tbl.put(UpdateJunctor.PARALLEL_UPDATE, new Notation.Infix("||",100,10,10));
-
 	tbl.put(Quantifier.ALL,new Notation.Quantifier("\\forall", 60, 60));
 	tbl.put(Quantifier.EX, new Notation.Quantifier("\\exists", 60, 60));
 	tbl.put(NumericalQuantifier.SUM, new Notation.NumericalQuantifier("\\sum", 60, 60, 70));
@@ -165,19 +160,9 @@ public final class NotationInfo {
 	tbl.put(Modality.BOX,new Notation.ModalityNotation("\\[","\\]", 60, 60));
 	tbl.put(IfThenElse.IF_THEN_ELSE, new Notation.IfThenElse(130, "\\if"));
 	tbl.put(IfExThenElse.IF_EX_THEN_ELSE, new Notation.IfThenElse(130, "\\ifEx"));
-
-	//createNumLitNotation(IntegerLDT.getStaticNumberSymbol());
-
 	tbl.put(WarySubstOp.SUBST,new Notation.Subst());
 	tbl.put(UpdateApplication.UPDATE_APPLICATION, new Notation.UpdateApplicationNotation());
-    }    
-
-
-    /** 
-     * Register notations for standard classes of operators.  This
-     * includes Function operators, all kinds of variables, etc.
-     */
-   protected void createDefaultTermSymbolNotation() {
+	
 	tbl.put(Function.class, new Notation.Function());               
 	tbl.put(LogicVariable.class, new Notation.VariableNotation());
 	tbl.put(Metavariable.class, new Notation.MetavariableNotation());
@@ -186,11 +171,13 @@ public final class NotationInfo {
 	tbl.put(ProgramMethod.class, new Notation.ProgramMethod(121));
 	tbl.put(Equality.class, new Notation.Infix("=", 70, 80, 80)); 
 	tbl.put(ElementaryUpdate.class, new Notation.ElementaryUpdateNotation());
-	tbl.put(CastFunctionSymbol.class, new Notation.CastFunction("(",")",120, 140));
 	tbl.put(ModalOperatorSV.class, new Notation.ModalSVNotation(60, 60));
 	tbl.put(SchemaVariable.class, new Notation.SchemaVariableNotation());
+	
+	tbl.put(Sort.CAST_NAME, new Notation.CastFunction("(",")",120, 140));		
     }
 
+    
     public AbbrevMap getAbbrevMap(){
 	return scm;
     }
@@ -203,29 +190,41 @@ public final class NotationInfo {
      * If no notation is registered, a Function notation is returned.
      */
     public Notation getNotation(Operator op, Services services) {
-	if(services != null) {
+	if(services != this.services 
+	   && services != null 
+	   && services.getTypeConverter().getIntegerLDT() != null) {
+	    this.services = services;
 	    IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();
-	    if(integerLDT != null) {
-		createNumLitNotation(integerLDT.getNumberSymbol());
-		createCharLitNotation(integerLDT.getCharSymbol());
+	    tbl.put(integerLDT.getNumberSymbol(), new Notation.NumLiteral());
+	    tbl.put(integerLDT.getCharSymbol(), new Notation.CharLiteral());
+	    tbl.put(TypeConverter.stringConverter.getStringSymbol(), new Notation.StringLiteral());
+	}
+	
+	Notation result = tbl.get(op);
+	if(result != null) {
+	    return result;
+	}
+	
+	result = tbl.get(op.getClass());
+	if(result != null) {
+	    return result;
+	}
+	
+	if(op instanceof SchemaVariable) {
+	    result = tbl.get(SchemaVariable.class);
+	    if(result != null) {
+		return result;
 	    }
 	}
-	createStringLitNotation(de.uka.ilkd.key.java.TypeConverter.stringConverter.getStringSymbol(),null);
-
-	//For OCL Simplification
-	if (tbl.containsKey(op.name().toString())) {
-	    return (Notation) tbl.get(op.name().toString());
+	
+	if(op instanceof SortDependingFunction) {
+	    result = tbl.get(((SortDependingFunction)op).getKind());
+	    if(result != null) {
+		return result;
+	    }
 	}
-	//
-	else if (tbl.containsKey(op)) {
-	    return (Notation) tbl.get(op);
-	} else if (tbl.containsKey(op.getClass())) {
-	    return (Notation) tbl.get(op.getClass());
-	} else if (op instanceof SchemaVariable){
-		return (Notation) tbl.get(SchemaVariable.class);
-	} else {
-	    return new Notation.Function();
-	}
+	
+	return new Notation.Function();
     }
 
     /** Registers an infix notation for a given operator
@@ -251,32 +250,5 @@ public final class NotationInfo {
      */
     public void createPrefixNotation(Operator op, String token) {
 	tbl.put(op, new Notation.Prefix(token, 140, 130));
-    }
-
-    /** Registers a number literal notation for a given operator.
-     * This is done for the `Z' operator which marks number literals.
-     * A term <code>Z(3(2(#)))</code> gets printed simply as
-     * <code>23</code>.
-     * @param op the operator */
-    public void createNumLitNotation(Operator op) {
-	tbl.put(op, new Notation.NumLiteral());
-    }
-
-
-    /** Registers a character literal notation for a given operator.
-     * This is done for the `C' operator which marks character literals.
-     * A term <code>C(3(2(#)))</code> gets printed simply as
-     * the character corresponding to the unicode value 23 (really 23
-     * and not 32, see integer literals)
-     * @param op the operator */
-    public void createCharLitNotation(Operator op) {
-	tbl.put(op, new Notation.CharLiteral());
-    }
-
-
-    public void createStringLitNotation(Operator op, Operator eps) {
-	Notation.StringLiteral stringLiteral =  new Notation.StringLiteral();
-	tbl.put(op, stringLiteral);
-	tbl.put(eps, stringLiteral);
     }
 }

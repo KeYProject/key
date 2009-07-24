@@ -103,9 +103,9 @@ public final class TacletIndex  {
 	    } 
 	} else {
 	    indexObj = indexTerm.op();
-	    if(indexObj instanceof SortDependingSymbol) {
+	    if(indexObj instanceof SortDependingFunction) {
 		// indexed independently of sort
-		indexObj=((SortDependingSymbol)indexObj).getKind ();
+		indexObj=((SortDependingFunction)indexObj).getKind ();
 	    }
 	}
 	
@@ -422,8 +422,8 @@ public final class TacletIndex  {
 
 	final ListOfNoPosTacletApp inMap;
 
-	if (term.op () instanceof SortDependingSymbol)
-	    inMap = map.get(((SortDependingSymbol)term.op()).getKind ());
+	if (term.op () instanceof SortDependingFunction)
+	    inMap = map.get(((SortDependingFunction)term.op()).getKind ());
 	else {
 	    inMap = map.get(term.op());
 	}

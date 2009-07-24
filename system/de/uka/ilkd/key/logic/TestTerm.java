@@ -12,7 +12,7 @@ package de.uka.ilkd.key.logic;
 
 import junit.framework.TestCase;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.sort.PrimitiveSort;
+import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.TacletForTests;
 
@@ -25,16 +25,16 @@ public class TestTerm extends TestCase {
 
     private TermFactory tf=TermFactory.DEFAULT;
 
-    private Sort sort1=new PrimitiveSort(new Name("S1"));
-    private Sort sort2=new PrimitiveSort(new Name("S2"));
-    private Sort sort3=new PrimitiveSort(new Name("S3"));
+    private Sort sort1=new SortImpl(new Name("S1"));
+    private Sort sort2=new SortImpl(new Name("S2"));
+    private Sort sort3=new SortImpl(new Name("S3"));
     	
 
     Function p=new Function(new Name("p"),Sort.FORMULA,new Sort[]{sort1});  
         //p(:S1):BOOL
     LogicVariable x=new LogicVariable(new Name("x"),sort1);  //x:S1
     Function q=new Function(new Name("q"),Sort.FORMULA,
-			    new Sort[]{new PrimitiveSort(new Name("Whatever"))}); 
+			    new Sort[]{new SortImpl(new Name("Whatever"))}); 
         //q(:Whatever):BOOL
     LogicVariable z=new LogicVariable(new Name("z"),sort1); //z:S1
     LogicVariable zz=new LogicVariable(new Name("zz"),sort1); //zz:S1

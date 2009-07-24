@@ -101,10 +101,6 @@ public class LogicPrinter {
     protected SVInstantiations instantiations = 
         SVInstantiations.EMPTY_SVINSTANTIATIONS;
 
-    /** For OCL Simplification. So that OCL/UML properties
-        are pretty-printed the right way. */
-    private boolean oclPrettyPrinting = false;
-
     protected static Logger logger = Logger.getLogger(LogicPrinter.class.getName());
 
 
@@ -1110,9 +1106,11 @@ public class LogicPrinter {
         }
     }
 
-    public void printCast(String pre, String post,
-            Term t, int ass) throws IOException {
-        final CastFunctionSymbol cast = (CastFunctionSymbol)t.op();
+    public void printCast(String pre, 
+	    		  String post,
+	    		  Term t, 
+	    		  int ass) throws IOException {
+        final SortDependingFunction cast = (SortDependingFunction)t.op();
         
         startTerm(t.arity());
         layouter.print(pre);

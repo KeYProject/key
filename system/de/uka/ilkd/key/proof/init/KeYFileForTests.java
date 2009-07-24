@@ -12,18 +12,20 @@ package de.uka.ilkd.key.proof.init;
 import java.io.File;
 import java.io.FileNotFoundException;
 
+import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.parser.KeYLexer;
 import de.uka.ilkd.key.parser.KeYParser;
 import de.uka.ilkd.key.parser.ParserConfig;
 import de.uka.ilkd.key.parser.ParserMode;
 import de.uka.ilkd.key.proof.CountingBufferedInputStream;
-import de.uka.ilkd.key.proof.RuleSource;
 
 /**
  * Used for TESTS ONLY as we allow there to declare program variables global 
  * in rule files .
  */
 public class KeYFileForTests extends KeYFile {
+    
+    private Namespace variables;
 
     /** creates a new representation for a given file by indicating a name
      * and a file representing the physical source of the .key file.
@@ -36,7 +38,7 @@ public class KeYFileForTests extends KeYFile {
      * assigned to this object according to the given modification strategy. 
      * Throws an exception if no initial configuration has been set yet.
      */
-    public void read(ModStrategy mod) throws ProofInputException {
+    public void read() throws ProofInputException {
 	if (initConfig==null) {
 	    throw new IllegalStateException("KeYFile: InitConfig not set.");
 	}
@@ -45,14 +47,14 @@ public class KeYFileForTests extends KeYFile {
 		new CountingBufferedInputStream
 		    (getNewStream(),monitor,getNumberOfChars()/100);
 	    final ParserConfig pc = 
-		new ParserConfig(initConfig.getServices().copy(), 
-				 initConfig.namespaces().copy());
+		new ParserConfig(initConfig.getServices(), 
+				 initConfig.namespaces());
 	    KeYParser problemParser = new KeYParser
 		(ParserMode.PROBLEM,new KeYLexer(cinp,null), file.toString(), pc, pc,initConfig.
 		 getTaclet2Builder(), initConfig.getTaclets(),initConfig.getActivatedChoices()); 
             problemParser.problem(); 
 	    initConfig.setTaclets(problemParser.getTaclets()); 
-	    initConfig.add(problemParser.namespaces(), ModStrategy.MOD_ALL);
+	    variables = problemParser.namespaces().variables().copy();
 	} catch (antlr.ANTLRException e) {
 	    throw new ProofInputException(e);
 	} catch (FileNotFoundException ioe) {
@@ -60,15 +62,19 @@ public class KeYFileForTests extends KeYFile {
         }
     }
     
-    public Includes readIncludes() throws ProofInputException {
-	Includes result = super.readIncludes();
-        		      
-	//add test LDTs
-        if(result.getLDTIncludes().isEmpty()) {
-            result.put("ldtsForTests", 
-        	       RuleSource.initRuleFile("LDTsForTestsOnly.key"));
-        }
-        
-        return result;
+//    public Includes readIncludes() throws ProofInputException {
+//	Includes result = super.readIncludes();
+//        		      
+//	//add test LDTs
+//        if(result.getLDTIncludes().isEmpty()) {
+//            result.put("ldtsForTests", 
+//        	       RuleSource.initRuleFile("LDTsForTestsOnly.key"));
+//        }
+//        
+//        return result;
+//    }
+    
+    public Namespace variables() {
+	return variables;
     }
 }

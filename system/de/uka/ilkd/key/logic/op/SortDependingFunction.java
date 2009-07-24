@@ -11,6 +11,9 @@
 
 package de.uka.ilkd.key.logic.op;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.sort.*;
@@ -21,123 +24,77 @@ import de.uka.ilkd.key.util.Debug;
 
 /**
  * A sort depending function is a function symbol. 
- * The following invariant has to hold:<br>
- *   given two sort depending functions f1 and f2 then</br> 
- *     from f1.isSimilar(f2) and f1.getSortDependingOn() == f2.getSortDependingOn() <br/>
- *     follows f1 == f2 
+ * The following invariant has to hold:
+ * Given two sort depending functions f1 and f2 then
+ * from f1.isSimilar(f2) and f1.getSortDependingOn() == f2.getSortDependingOn()
+ * follows f1 == f2 
  */
-public class SortDependingFunction extends Function 
-	implements SortDependingSymbol {
+public final class SortDependingFunction extends Function {
     
-    private final Name kind;
-    private final Sort sortDependingOn;
+    private final SortDependingFunctionTemplate template;
+    private final Sort sortDependingOn;    
 
+       
+    //-------------------------------------------------------------------------
+    //constructors
+    //-------------------------------------------------------------------------     
     
-    /** 
-     * @param name String with name of the function
-     * @param sort the Sort of the function (result type)
-     * @param kind name of the kind this object belongs to
-     * @param sortDependingOn sort this object is depending on, this
-     * is the difference between various objects of the same kind
-     */   
-    public SortDependingFunction ( Name   name,
-				   Sort   sort,
-				   Sort[] argSorts,
-				   Name   kind,
-				   Sort   sortDependingOn ) {
-	super ( name, sort, argSorts );
-	this.kind            = kind;
-	this.sortDependingOn = sortDependingOn;
+    private SortDependingFunction(SortDependingFunctionTemplate template,
+	    			  Sort sortDependingOn) {
+	super(instantiateName(template.kind, sortDependingOn), 
+	      instantiateResultSort(template, sortDependingOn),
+	      instantiateArgSorts(template, sortDependingOn));
+	this.template = template;
+	this.sortDependingOn = sortDependingOn;	
     }
-
-    public SortDependingFunction ( Name        name,
-				   Sort        sort,
-				   ArrayOfSort argSorts,
-				   Name        kind,
-				   Sort        sortDependingOn ) {
-	super ( name, sort, argSorts );
-	this.kind            = kind;
-	this.sortDependingOn = sortDependingOn;
-    }
-
+	    
     
-    @Override
-    public Sort getSortDependingOn() {
-	return sortDependingOn;
+    //-------------------------------------------------------------------------
+    //internal methods
+    //------------------------------------------------------------------------- 
+    
+    private static Name instantiateName(Name kind,
+	    				Sort sortDependingOn) {
+	return new Name(sortDependingOn + "::" + kind);
     }
-
-
-    @Override
-    public boolean isSimilar(SortDependingSymbol p) {
-	return getKind().equals(p.getKind());
+    
+    
+    private static Sort instantiateResultSort(
+	    			SortDependingFunctionTemplate template,
+	    			Sort sortDependingOn) {
+	return template.sort == template.sortDependingOn
+	       ? sortDependingOn
+	       : template.sort;
     }
-
-    @Override
-    public Name getKind() {
-	return kind;
-    }
-
-
-    @Override
-    public SortDependingSymbol getInstanceFor(Sort instanceSort, 
-	    				      Services services) {
-	Name instanceName = new Name(instanceSort.name() + "::" + kind);
-	
-	SortDependingSymbol result 
-	      = (SortDependingSymbol) services.getNamespaces()
-	                                      .lookup(instanceName);
-	
-	if(result == null 
-	   && instanceSort instanceof SortDefiningSymbols) {
-            result = ((SortDefiningSymbols) instanceSort).lookupSymbol ( getKind () );
+    
+    
+    private static ArrayOfSort instantiateArgSorts(
+	    			SortDependingFunctionTemplate template,
+	    			Sort sortDependingOn) {
+	Sort[] result = new Sort[template.argSorts.size()];
+	for(int i = 0; i < result.length; i++) {
+	    result[i] 
+	           = (template.argSorts.getSort(i) == template.sortDependingOn
+		      ? sortDependingOn
+		      : template.argSorts.getSort(i));
 	}
-		
-	
-	if(result == null) {
-	    Sort instanceResultSort = (sort() == sortDependingOn
-		                       ? instanceSort
-		                       : sort());
-	    Sort[] instanceArgSorts = new Sort[arity()];
-	    for(int i = 0; i < instanceArgSorts.length; i++) {
-		instanceArgSorts[i] = (argSort(i) == sortDependingOn
-		                       ? instanceSort
-		                       : argSort(i));
-	    }
-	    result = new SortDependingFunction(instanceName,
-		    			       instanceResultSort,
-		                               instanceArgSorts,
-		                               kind,
-		                               instanceSort);
-	    services.getNamespaces().functions().add(result);
-	}
-	
-        if(result != null) {
-            assert this.isSimilar(result) 
-                   : result + " should be similar to " + this; 
-            assert result.getSortDependingOn() == instanceSort 
-                   : result + " depends on " + result.getSortDependingOn() 
-                     + " but should depend on " + instanceSort;
-        }
-
-	return result;
+	return new ArrayOfSort(result);
     }
-
     
+    
+
     /**
      * tries to match sort <code>s1</code> to fit sort <code>s2</code>
      * @param s1 Sort tried to matched (maybe concrete or (contain) generic)
      * @param s2 concrete Sort 
      * @param mc the MatchConditions up to now
-     * @return <code>null</code> if failed the resulting match conditions otherwise 
+     * @return <code>null</code> if failed the resulting match conditions 
+     * otherwise 
      */
-    private MatchConditions matchSorts(Sort s1, Sort s2, MatchConditions mc) {                
-        Debug.assertFalse(s2 instanceof GenericSort,
-                         "Internal Error. Sort s2 is not allowed to be of type generic.");
+    private static MatchConditions matchSorts(Sort s1, Sort s2, MatchConditions mc) {                
+        assert !(s2 instanceof GenericSort)
+               : "Sort s2 is not allowed to be of type generic.";
         if (!(s1 instanceof GenericSort)) {
-            if (s1.getClass() != s2.getClass()) {
-                Debug.out("Not unifiable sorts.", s1, s2);
-                return null;
-            }
             if (s1 == s2) {
                 return mc;
             } else {
@@ -146,25 +103,107 @@ public class SortDependingFunction extends Function
             }
         } else {        
             final GenericSort gs = (GenericSort)s1;
-            final GenericSortCondition c = 
-                GenericSortCondition.createIdentityCondition(gs, s2);                                               
-            if ( c == null ) {
+            final GenericSortCondition c 
+            	= GenericSortCondition.createIdentityCondition(gs, s2);                                               
+            if(c == null) {
                 Debug.out("FAILED. Generic sort condition");
-                return null; //FAILED;
+                return null;
             } else {
                 try {                   
-                    mc = mc
-                    .setInstantiations ( mc.getInstantiations ().
-                            add ( c ) );
-                } catch ( SortException e ) {
+                    mc = mc.setInstantiations(mc.getInstantiations().add(c));
+                } catch(SortException e) {
                     Debug.out("FAILED. Sort mismatch.", s1, s2);
-                    return null; //FAILED;
+                    return null;
                 }
             }                  
         }               
         return mc;
     }
+        
     
+ 
+    
+    //-------------------------------------------------------------------------
+    //public interface
+    //------------------------------------------------------------------------- 
+    
+    public static SortDependingFunction createFirstInstance(
+	    			GenericSort sortDependingOn,
+	    			Name kind, 
+	    		        Sort sort, 
+	    		        Sort[] argSorts) {
+	SortDependingFunctionTemplate template 
+		= new SortDependingFunctionTemplate(sortDependingOn, 
+						    kind, 
+						    sort, 
+						    new ArrayOfSort(argSorts));
+	return new SortDependingFunction(template, Sort.ANY);
+    }
+    
+    
+    public static SortDependingFunction getFirstInstance(Name kind,
+	    					         Services services) {
+	return (SortDependingFunction) 
+			services.getNamespaces()
+			        .functions()
+	                        .lookup(instantiateName(kind, Sort.ANY));
+    }
+        
+
+    public SortDependingFunction getInstanceFor(Sort sortDependingOn, 
+	    				        Services services) {
+	if(sortDependingOn == this.sortDependingOn) {
+	    return this;
+	}
+	
+	SortDependingFunction result 
+		= (SortDependingFunction) 
+		      services.getNamespaces()
+	                      .lookup(instantiateName(getKind(), 
+	                	      		      sortDependingOn));
+	
+	//ugly: multiple generic sorts with the same name may exist over time 
+	if(result != null 
+	   && sortDependingOn instanceof GenericSort
+	   && result.getSortDependingOn() != sortDependingOn) {
+	    result = new SortDependingFunction(template,
+		    			       sortDependingOn);
+	    services.getNamespaces().functions().add(result);	    
+	}
+
+	if(result == null) {
+	    result = new SortDependingFunction(template,
+		    			       sortDependingOn);
+	    services.getNamespaces().functions().addSafely(result);
+	}
+
+        assert result.getSortDependingOn() == sortDependingOn 
+               : result + " depends on " + result.getSortDependingOn() 
+                 + " (hash " + result.hashCode() + ")" 
+                 + " but should depend on " + sortDependingOn
+                 + " (hash " + sortDependingOn.hashCode() + ")";
+        assert this.isSimilar(result) 
+               : result + " should be similar to " + this;
+	
+	return result;	
+    }
+    
+    
+    public Sort getSortDependingOn() {
+	return sortDependingOn;
+    }
+
+
+    public boolean isSimilar(SortDependingFunction p) {
+	return getKind().equals(p.getKind());
+    }
+
+    
+    public Name getKind() {
+	return template.kind;
+    }
+
+
     
     /**
      * Taking this sortdepending function as template to be matched against <code>op</code>, 
@@ -176,20 +215,49 @@ public class SortDependingFunction extends Function
     public MatchConditions match(SVSubstitute subst, 
                                  MatchConditions mc,
                                  Services services) {      
-        if (this.getClass() != subst.getClass()) {
+        if(!(subst instanceof SortDependingFunction)) {
             Debug.out("FAILED. Given operator cannot be matched by a sort" +
             		"depending function (template, orig)", this, subst);
             return null;
-        }         
+        }
         final SortDependingFunction sdp = (SortDependingFunction)subst;
-        final MatchConditions result = 
-            matchSorts(getSortDependingOn(), sdp.getSortDependingOn(), mc);
         
-        if (result == null) {
-            Debug.out("Failed. Sorts of depending function not unifiable.", this, subst);
+        if(!isSimilar(sdp)) {
+            Debug.out("FAILED. Sort depending symbols not similar.", this, subst);            
             return null;
         }
         
-        return isSimilar(sdp) ? result : null;        
+        final MatchConditions result =  matchSorts(getSortDependingOn(), 
+        		      	                   sdp.getSortDependingOn(), 
+        		      	                   mc);        
+        if (result == null) {
+            Debug.out("FAILED. Depending sorts not unifiable.", this, subst);
+            return null;
+        }
+        
+        return result;        
+    }
+    
+    
+    
+    //-------------------------------------------------------------------------
+    //inner classes
+    //-------------------------------------------------------------------------     
+    
+    private static final class SortDependingFunctionTemplate {
+	public final GenericSort sortDependingOn;
+	public final Name kind;	
+	public final Sort sort;
+	public final ArrayOfSort argSorts; 
+	
+	public SortDependingFunctionTemplate(GenericSort sortDependingOn,
+		                             Name kind,
+		                             Sort sort,
+		                             ArrayOfSort argSorts) {
+	    this.sortDependingOn = sortDependingOn;
+	    this.kind = kind;
+	    this.sort = sort;
+	    this.argSorts = argSorts;
+	}
     }
 }

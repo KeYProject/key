@@ -11,16 +11,13 @@
 
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.ClashFreeSubst;
 import de.uka.ilkd.key.logic.IteratorOfTerm;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermCreationException;
-import de.uka.ilkd.key.logic.op.CastFunctionSymbol;
-import de.uka.ilkd.key.logic.op.IteratorOfQuantifiableVariable;
-import de.uka.ilkd.key.logic.op.MapFromQuantifiableVariableToTerm;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.logic.op.SetOfQuantifiableVariable;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.AbstractSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 
@@ -68,15 +65,15 @@ class Substitution {
     }   
   
     
-    public Term apply(Term t) {
+    public Term apply(Term t, Services services) {
         assert isGround() :
             "non-ground substitutions are not yet implemented";
         final IteratorOfQuantifiableVariable it = varMap.keyIterator ();
         while ( it.hasNext () ) {
             final QuantifiableVariable var = it.next ();
             final Sort quantifiedVarSort = var.sort ();
-            final CastFunctionSymbol quantifiedVarSortCast =
-                ( (AbstractSort)quantifiedVarSort ).getCastSymbol ();
+            final Function quantifiedVarSortCast =
+                quantifiedVarSort.getCastSymbol (services);
             Term instance = getSubstitutedTerm( var );
             if ( !instance.sort ().extendsTrans ( quantifiedVarSort ) )
             	instance = tb.func ( quantifiedVarSortCast, instance );
@@ -94,7 +91,7 @@ class Substitution {
      * Try to apply the substitution to a term, widening by removing casts to
      * jbyte, jint whenever possible 
      */
-    public Term applyWithoutCasts(Term t) {
+    public Term applyWithoutCasts(Term t, Services services) {
         assert isGround() :
             "non-ground substitutions are not yet implemented";
         final IteratorOfQuantifiableVariable it = varMap.keyIterator ();
@@ -107,8 +104,8 @@ class Substitution {
             } catch (TermCreationException e) {
                 final Sort quantifiedVarSort = var.sort ();
                 if ( !instance.sort ().extendsTrans ( quantifiedVarSort ) ) {
-                    final CastFunctionSymbol quantifiedVarSortCast =
-                        ( (AbstractSort)quantifiedVarSort ).getCastSymbol ();
+                    final Function quantifiedVarSortCast =
+                        quantifiedVarSort.getCastSymbol (services);
                     instance = tb.func ( quantifiedVarSortCast, instance );
                     t = applySubst ( var, instance, t );
                 } else {

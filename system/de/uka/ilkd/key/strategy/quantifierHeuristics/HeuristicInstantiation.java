@@ -5,22 +5,16 @@
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
-//This file is part of KeY - Integrated Deductive Software Design
-//Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
-//                      Universitaet Koblenz-Landau, Germany
-//                      Chalmers University of Technology, Sweden
-//
-//The KeY system is protected by the GNU General Public License. 
-//See LICENSE.TXT for details.
 //
 //
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.IteratorOfTerm;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.op.CastFunctionSymbol;
+import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.sort.AbstractSort;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -47,25 +41,26 @@ public class HeuristicInstantiation implements TermGenerator {
                 goal.proof().getServices() );
         final QuantifiableVariable var =
             qf.varsBoundHere ( 0 ).lastQuantifiableVariable ();
-        return new Iterator ( ia.getSubstitution ().iterator (), var );
+        return new Iterator ( ia.getSubstitution ().iterator (), var, goal.proof().getServices() );
     }
 
 
     private class Iterator implements IteratorOfTerm {
         private final IteratorOfTerm       instances;
-
         private final QuantifiableVariable quantifiedVar;
 
         private final Sort                 quantifiedVarSort;
-        private final CastFunctionSymbol   quantifiedVarSortCast;
+        private final Function             quantifiedVarSortCast;
 
         private Term                       nextInst = null;
 
-        private Iterator(IteratorOfTerm it, QuantifiableVariable var) {
+        private Iterator(IteratorOfTerm it, 
+        	         QuantifiableVariable var, 
+        	         Services services) {
             this.instances = it;
             this.quantifiedVar = var;
             quantifiedVarSort = quantifiedVar.sort ();
-            quantifiedVarSortCast = ( (AbstractSort)quantifiedVarSort ).getCastSymbol ();
+            quantifiedVarSortCast = quantifiedVarSort.getCastSymbol (services);
             findNextInst ();
         }
 

@@ -62,7 +62,7 @@ class PredictCostProver {
         
         
 		final PredictCostProver prover = 
-			new PredictCostProver ( sub.applyWithoutCasts(matrix), 
+			new PredictCostProver ( sub.applyWithoutCasts(matrix, services), 
 			        assertList, services );
 		return prover.cost();
 	}

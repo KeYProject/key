@@ -120,6 +120,11 @@ public final class TermBuilder {
     }
     
     
+    public Term cast(Services services, Sort s, Term t) {
+	return func(s.getCastSymbol(services), t);
+    }
+    
+    
     //-------------------------------------------------------------------------
     //logical operators    
     //-------------------------------------------------------------------------

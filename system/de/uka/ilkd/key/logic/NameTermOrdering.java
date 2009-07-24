@@ -145,7 +145,7 @@ public class NameTermOrdering implements TermOrdering {
 	if ( "TRUE".equals ( p_op.name ().toString () )
              || "FALSE".equals ( p_op.name ().toString () ) )
 	    return Integer.valueOf ( 3 );
-	if ( p_op instanceof SortDependingSymbol )
+	if ( p_op instanceof SortDependingFunction )
 	    return Integer.valueOf ( 10 );
 
 	return null;

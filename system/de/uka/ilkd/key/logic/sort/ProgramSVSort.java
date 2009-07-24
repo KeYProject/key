@@ -32,7 +32,7 @@ import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.util.ExtList;
 
-public abstract class ProgramSVSort extends PrimitiveSort {
+public abstract class ProgramSVSort extends AbstractSort {
 
     // Keeps the mapping of ProgramSVSort names to
     // ProgramSVSort instances (helpful in parsing
@@ -360,7 +360,7 @@ public abstract class ProgramSVSort extends PrimitiveSort {
     //--------------------------------------------------------------------------
     
     public ProgramSVSort(Name name) {
-	super(name);
+	super(name, SetAsListOfSort.EMPTY_SET, false);
 	name2sort.put(name, this);
     }
 
@@ -686,7 +686,7 @@ public abstract class ProgramSVSort extends PrimitiveSort {
      * This sort represents a type of program schema variables that
      * match only on Array Initializers.
      */
-    private static class ArrayInitializerSVSort extends ProgramSVSort{
+    private static final class ArrayInitializerSVSort extends ProgramSVSort{
 
 	public ArrayInitializerSVSort() {
 	    super(new Name("ArrayInitializer"));
@@ -745,7 +745,7 @@ public abstract class ProgramSVSort extends PrimitiveSort {
      * This sort represents a type of program schema variables that
      * match only on catch branches of try-catch-finally blocks
      */    
-    private static class CatchSort extends ProgramSVSort{
+    private static final class CatchSort extends ProgramSVSort{
 
 	public CatchSort() {
 	    super(new Name("Catch"));
@@ -760,7 +760,7 @@ public abstract class ProgramSVSort extends PrimitiveSort {
      * This sort represents a type of program schema variables that
      * match only on method body statements
      */    
-    private static class MethodBodySort extends ProgramSVSort{
+    private static final class MethodBodySort extends ProgramSVSort{
 
 	public MethodBodySort() {
 	    super(new Name("MethodBody"));
@@ -777,7 +777,7 @@ public abstract class ProgramSVSort extends PrimitiveSort {
      * 
      * TODO: Maybe further checks in canStandFor? (i.e. is the resultvariable available?)
      */    
-    private static class PureMethodBodySort extends ProgramSVSort{
+    private static final class PureMethodBodySort extends ProgramSVSort{
 
         public PureMethodBodySort() {
             super(new Name("PureMethodBody"));
@@ -795,7 +795,7 @@ public abstract class ProgramSVSort extends PrimitiveSort {
      * match only on method body statements for nonmodel methods for which
      * an implementation is present.
      */    
-    private static class NonModelMethodBodySort extends ProgramSVSort{
+    private static final class NonModelMethodBodySort extends ProgramSVSort{
 
 	public NonModelMethodBodySort() {
 	    super(new Name("NonModelMethodBody"));
@@ -825,7 +825,7 @@ public abstract class ProgramSVSort extends PrimitiveSort {
      * match on a method call with SIMPLE PREFIX and AT LEAST a
      * NONSIMPLE expression in the ARGUMENTS.
      */    
-    private static class NonSimpleMethodReferenceSort extends ProgramSVSort{
+    private static final class NonSimpleMethodReferenceSort extends ProgramSVSort{
 
 	public NonSimpleMethodReferenceSort() {
 	    super(new Name("NonSimpleMethodReference"));
@@ -872,7 +872,7 @@ public abstract class ProgramSVSort extends PrimitiveSort {
      * This sort represents a type of program schema variables that
      * match only on type references.
      */    
-    private static class TypeReferenceSort extends ProgramSVSort {
+    private static final class TypeReferenceSort extends ProgramSVSort {
 
 	public TypeReferenceSort() {
 	    super(new Name("Type"));
@@ -888,7 +888,7 @@ public abstract class ProgramSVSort extends PrimitiveSort {
      * This sort represents a type of program schema variables that
      * match only on type references.
      */    
-    private static class DebuggerTypeReferenceSort extends ProgramSVSort {
+    private static final class DebuggerTypeReferenceSort extends ProgramSVSort {
 
         public DebuggerTypeReferenceSort() {
             super(new Name("DebuggerType"));
@@ -909,7 +909,7 @@ public abstract class ProgramSVSort extends PrimitiveSort {
      * This sort represents a type of program schema variables that
      * match anything except byte, char, short, int, and long.
      */    
-    private static class TypeReferenceNotPrimitiveSort extends ProgramSVSort {
+    private static final class TypeReferenceNotPrimitiveSort extends ProgramSVSort {
 
 	public TypeReferenceNotPrimitiveSort() {
 	    super(new Name("NonPrimitiveType"));
@@ -956,7 +956,7 @@ public abstract class ProgramSVSort extends PrimitiveSort {
     /**
      * allows to match on a specific method name 
      */
-    private static class SpecificMethodNameSort extends MethodNameSort{
+    private static final class SpecificMethodNameSort extends MethodNameSort{
 
         private ProgramElementName methodName; 
         
@@ -987,7 +987,7 @@ public abstract class ProgramSVSort extends PrimitiveSort {
      * This sort represents a type of program schema variables that match
      * on labels.
      */
-    private static class LabelSort extends ProgramSVSort{
+    private static final class LabelSort extends ProgramSVSort{
 
 	public LabelSort() {
 	    super(new Name("Label"));
@@ -1006,7 +1006,7 @@ public abstract class ProgramSVSort extends PrimitiveSort {
      * This sort represents a type of program schema variables that match
      * on string literals and string variables.
      */
-    public static class SimpleExpressionStringSort 
+    public static final class SimpleExpressionStringSort 
 	extends SimpleExpressionSort{
 
 	public SimpleExpressionStringSort(String name) {
@@ -1036,7 +1036,7 @@ public abstract class ProgramSVSort extends PrimitiveSort {
      * This sort represents a type of program schema variables that match
      * on simple expressions which have a special primitive type.
      */
-    private static class SimpleExpressionSpecialPrimitiveTypeSort 
+    private static final class SimpleExpressionSpecialPrimitiveTypeSort 
 	extends SimpleExpressionSort{
 
 	private final PrimitiveType[] allowed_types;
@@ -1070,7 +1070,7 @@ public abstract class ProgramSVSort extends PrimitiveSort {
      * This sort represents a type of program schema variables that match
      * on simple expressions which have a special primitive type.
      */
-    private static class ExpressionSpecialPrimitiveTypeSort 
+    private static final class ExpressionSpecialPrimitiveTypeSort 
 	extends ExpressionSort{
 
 	private PrimitiveType[] allowed_types;
@@ -1105,7 +1105,7 @@ public abstract class ProgramSVSort extends PrimitiveSort {
     //-----------Specials (unnecessary?)--------------------------------------
     
 
-    private static class LoopInitSort extends ProgramSVSort{
+    private static final class LoopInitSort extends ProgramSVSort{
 
 	public LoopInitSort() {
 	    super(new Name("LoopInit"));
@@ -1116,7 +1116,7 @@ public abstract class ProgramSVSort extends PrimitiveSort {
 	}
     }
 
-    private static class GuardSort extends ProgramSVSort{
+    private static final class GuardSort extends ProgramSVSort{
 	public GuardSort() {
 	    super(new Name("Guard"));
 	}
@@ -1126,7 +1126,7 @@ public abstract class ProgramSVSort extends PrimitiveSort {
 	}
     }
 
-    private static class ForUpdatesSort extends ProgramSVSort{
+    private static final class ForUpdatesSort extends ProgramSVSort{
 	public ForUpdatesSort() {
 	    super(new Name("ForUpdates"));
 	}
@@ -1136,7 +1136,7 @@ public abstract class ProgramSVSort extends PrimitiveSort {
 	}
     }
     
-    private static class ForLoopSort extends ProgramSVSort {
+    private static final class ForLoopSort extends ProgramSVSort {
         public ForLoopSort() {
             super(new Name("ForLoop"));
         }
@@ -1145,7 +1145,7 @@ public abstract class ProgramSVSort extends PrimitiveSort {
         }
     }
         
-    private static class SwitchSVSort extends ProgramSVSort{
+    private static final class SwitchSVSort extends ProgramSVSort{
 	public SwitchSVSort(){
 	    super(new Name("Switch"));
 	}
@@ -1156,7 +1156,7 @@ public abstract class ProgramSVSort extends PrimitiveSort {
 	}
     }
 
-    private static class MultipleVariableDeclarationSort extends ProgramSVSort{
+    private static final class MultipleVariableDeclarationSort extends ProgramSVSort{
 
 	public MultipleVariableDeclarationSort() {
 	    super(new Name("MultipleVariableDeclaration"));
@@ -1172,7 +1172,7 @@ public abstract class ProgramSVSort extends PrimitiveSort {
 
     }
 
-    private static class ArrayPostDeclarationSort extends ProgramSVSort{
+    private static final class ArrayPostDeclarationSort extends ProgramSVSort{
 
 	public ArrayPostDeclarationSort() {
 	    super(new Name("ArrayPostDeclaration"));
@@ -1195,7 +1195,7 @@ public abstract class ProgramSVSort extends PrimitiveSort {
 
     //------------------ stuff concerned with explicit and implicit elements----
     
-    private static class ExplicitProgramVariableSort
+    private static final class ExplicitProgramVariableSort
 	extends LeftHandSideSort {
 
 	public ExplicitProgramVariableSort() {
@@ -1212,7 +1212,7 @@ public abstract class ProgramSVSort extends PrimitiveSort {
 	}
     }
 
-    private static class ImplicitProgramVariableSort
+    private static final class ImplicitProgramVariableSort
 	extends LeftHandSideSort {
 
 	public ImplicitProgramVariableSort() {
@@ -1232,7 +1232,7 @@ public abstract class ProgramSVSort extends PrimitiveSort {
 
 
 
-    private static class ConstantProgramVariableSort 
+    private static final class ConstantProgramVariableSort 
 	extends ProgramSVSort {
 
 	public ConstantProgramVariableSort() {
@@ -1325,7 +1325,7 @@ public abstract class ProgramSVSort extends PrimitiveSort {
     }
 
 
-    private static class MethodNameReferenceSort 
+    private static final class MethodNameReferenceSort 
 	extends NameMatchingSort {
 
 	private ListOfName reverseSignature = SLListOfName.EMPTY_LIST;
@@ -1513,7 +1513,7 @@ public abstract class ProgramSVSort extends PrimitiveSort {
 	}
     }
 
-    private static class ArrayLengthSort extends ProgramSVSort {
+    private static final class ArrayLengthSort extends ProgramSVSort {
 
         public ArrayLengthSort() {
             super(new Name("ArrayLength"));            
@@ -1528,7 +1528,7 @@ public abstract class ProgramSVSort extends PrimitiveSort {
         }
     }
     
-    private static class ExecutionContextSort extends ProgramSVSort {
+    private static final class ExecutionContextSort extends ProgramSVSort {
 
 	public ExecutionContextSort() {
 	    super(new Name("ExecutionContext"));

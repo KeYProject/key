@@ -102,8 +102,8 @@ public class KeYFile implements EnvInput {
                              new KeYLexer(getNewStream(),
                                           initConfig.getServices().getExceptionHandler()),
                              file.toString(), 
-                             initConfig.getServices().copy(),
-                             initConfig.namespaces().copy());
+                             initConfig.getServices(),
+                             initConfig.namespaces());
     }
 
 
@@ -139,26 +139,6 @@ public class KeYFile implements EnvInput {
             }
         }
         return settings;
-    }
-
-
-    /**
-     * when reading in rules modal schema operators and schemavariables are
-     * added to the namespace, but shall not occur in the normal function 
-     * namespaces. Therefore we take the given namespaces and use copies of 
-     * the normal function and variables namespace 
-     * TODO: extend the normal namespace by a generic sort and schema function
-     * namespace and get rid of the schemaConfig...
-     * @param normal the Namespace containing the concrete symbols 
-     * @return namespace for reading in rules etc.
-     */
-    protected NamespaceSet setupSchemaNamespace(final NamespaceSet normal) {
-        return new NamespaceSet(normal.variables().copy(), 
-                normal.functions().copy(),
-                normal.sorts(), 
-                normal.ruleSets(),
-                normal.choices(),
-                normal.programVariables());
     }
     
     
@@ -295,7 +275,7 @@ public class KeYFile implements EnvInput {
     }
     
 
-    public void read(ModStrategy mod) throws ProofInputException {
+    public void read() throws ProofInputException {
 	if (initConfig==null) {
 	    throw new IllegalStateException("KeYFile: InitConfig not set.");
 	}	
@@ -306,14 +286,11 @@ public class KeYFile implements EnvInput {
 	    CountingBufferedInputStream cinp = 
 		new CountingBufferedInputStream
 		    (getNewStream(),monitor,getNumberOfChars()/100);
-            
-	    final NamespaceSet normal = initConfig.namespaces().copy();
-	    final NamespaceSet schema = setupSchemaNamespace(normal);
-       
+                   
             final ParserConfig normalConfig 
-                    = new ParserConfig(initConfig.getServices(), normal);                       
+                    = new ParserConfig(initConfig.getServices(), initConfig.namespaces());                       
             final ParserConfig schemaConfig 
-                    = new ParserConfig(initConfig.getServices(), schema);
+                    = new ParserConfig(initConfig.getServices(), initConfig.namespaces());
             
             KeYParser problemParser 
                 = new KeYParser(ParserMode.PROBLEM, 
@@ -331,7 +308,6 @@ public class KeYFile implements EnvInput {
 						  getCategory2Default());
 	    SetOfTaclet st = problemParser.getTaclets();
 	    initConfig.setTaclets(st);
-	    initConfig.add(normalConfig.namespaces(), mod);
             
 	    SpecificationRepository specRepos 
 	        = initConfig.getServices().getSpecificationRepository();
@@ -350,7 +326,7 @@ public class KeYFile implements EnvInput {
         if(javaPath != null && !javaPath.equals("")) {            
             SLEnvInput slEnvInput = new SLEnvInput(javaPath);
             slEnvInput.setInitConfig(initConfig);
-            slEnvInput.read(mod);
+            slEnvInput.read();
         }               
     }
 
@@ -360,12 +336,11 @@ public class KeYFile implements EnvInput {
      * of the initial configuration if allowed in the given 
      * modification strategy.
      */
-    public void readSorts(ModStrategy mod) throws ProofInputException {
+    public void readSorts() throws ProofInputException {
 	try {
 	    KeYParser p=createDeclParser();
 	    p.parseSorts();
-	    initConfig.addCategory2DefaultChoices(p.getCategory2Default());
-	    initConfig.add(p.namespaces(), mod);            
+	    initConfig.addCategory2DefaultChoices(p.getCategory2Default());            
 	} catch (antlr.ANTLRException e) {
 	    throw new ProofInputException(e);
 	} catch (FileNotFoundException fnfe) {
@@ -377,12 +352,11 @@ public class KeYFile implements EnvInput {
     /** reads the functions and predicates declared in the .key file only, 
      * modifying the function namespaces of the respective taclet options. 
      */
-    public void readFuncAndPred(ModStrategy mod) throws ProofInputException {	
+    public void readFuncAndPred() throws ProofInputException {	
 	if(file == null) return;
 	try {
 	    KeYParser p=createDeclParser();
 	    p.parseFuncAndPred();
-	    initConfig.add(p.namespaces(), mod);
 	} catch (antlr.ANTLRException e) {
 	    throw new ProofInputException(e);
 	} catch (FileNotFoundException fnfe) {
@@ -396,15 +370,12 @@ public class KeYFile implements EnvInput {
      * of the initial configuration if allowed in the given 
      * modification strategy.
      */
-    public void readRulesAndProblem(ModStrategy mod) 
+    public void readRulesAndProblem() 
             throws ProofInputException {
-        final NamespaceSet normal = initConfig.namespaces().copy();
-	final NamespaceSet schema = setupSchemaNamespace(normal);
-	
         final ParserConfig schemaConfig = 
-	    new ParserConfig(initConfig.getServices(), schema);
+	    new ParserConfig(initConfig.getServices(), initConfig.namespaces());
         final ParserConfig normalConfig = 
-	    new ParserConfig(initConfig.getServices(), normal);
+	    new ParserConfig(initConfig.getServices(), initConfig.namespaces());
         
 	try {
 	    final CountingBufferedInputStream cinp = new CountingBufferedInputStream
@@ -421,7 +392,6 @@ public class KeYFile implements EnvInput {
                                 initConfig.getTaclets(), 
                                 initConfig.getActivatedChoices());                  
             problemParser.parseTacletsAndProblem();
-	    initConfig.add(normalConfig.namespaces(), mod);	   
 	    initConfig.setTaclets(problemParser.getTaclets());
 	} catch (antlr.ANTLRException e) {
 	    throw new ProofInputException(e);

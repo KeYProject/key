@@ -759,7 +759,7 @@ public class InReachableStatePOBuilder {
     }
 
     private Function rep(Sort os) {
-        return (Function) ((SortDefiningSymbols) os).lookupSymbol(AbstractSort.OBJECT_REPOSITORY_NAME);
+        return os.getObjectRepository(services);
     }
 
     /** creates an attribute term and takes care of shadowed attributes as well */

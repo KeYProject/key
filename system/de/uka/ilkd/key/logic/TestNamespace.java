@@ -13,7 +13,7 @@ package de.uka.ilkd.key.logic;
 
 import junit.framework.TestCase;
 import de.uka.ilkd.key.logic.op.LogicVariable;
-import de.uka.ilkd.key.logic.sort.PrimitiveSort;
+import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.logic.sort.Sort;
 
 
@@ -39,7 +39,7 @@ public class TestNamespace extends TestCase {
     }
 
     public void setUp() {
-        this.s1 = new PrimitiveSort(new Name("S1"));
+        this.s1 = new SortImpl(new Name("S1"));
         this.va = new LogicVariable(new Name("A"),s1);
         this.vb = new LogicVariable(new Name("B"),s1);
         this.vc = new LogicVariable(new Name("C"),s1);

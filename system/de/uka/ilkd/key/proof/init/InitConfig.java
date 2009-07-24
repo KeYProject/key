@@ -112,21 +112,6 @@ public class InitConfig {
     //internal methods
     //-------------------------------------------------------------------------
     
-    /**
-     * Helper for add().
-     */
-    private void addSorts (NamespaceSet ns, ModStrategy mod) {
-        final IteratorOfNamed sortsIt = ns.sorts ().elements ().iterator ();
-        while ( sortsIt.hasNext () ) {
-            final Named named = sortsIt.next ();
-            if ( named instanceof GenericSort ) {
-                if ( mod.modifyGenericSorts () ) sortNS ().add ( named );
-            } else {
-                if ( mod.modifySorts () ) sortNS ().add ( named );
-            }
-        }
-    }
-    
     
     
     //-------------------------------------------------------------------------
@@ -386,18 +371,6 @@ public class InitConfig {
         }
     }
 
-    
-    /** adds namespaces to the namespaces of this initial configuration
-     */
-    public void add(NamespaceSet ns, ModStrategy mod) {
-        if (mod.modifyFunctions()) funcNS().add(ns.functions());
-        addSorts ( ns, mod );
-        if (mod.modifyVariables()) varNS().add(ns.variables());
-        if (mod.modifyProgramVariables()) progVarNS().add(ns.programVariables());
-        if (mod.modifyHeuristics()) ruleSetNS().add(ns.ruleSets());
-        if (mod.modifyChoices()) choiceNS().add(ns.choices());
-    }
-    
     
     public void setOriginalKeYFileName(String name) {
         originalKeYFileName = name;

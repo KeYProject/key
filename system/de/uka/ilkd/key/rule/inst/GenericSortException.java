@@ -10,8 +10,10 @@
 
 package de.uka.ilkd.key.rule.inst;
 
-/** this exception thrown if there is no appropriate instantiation of
- * the generic sorts occurring within an "SVInstantiations"-object */
+/** 
+ * This exception thrown if there is no appropriate instantiation of
+ * the generic sorts occurring within an "SVInstantiations"-object 
+ */
 public class GenericSortException extends SortException {
 
     /**
@@ -25,6 +27,4 @@ public class GenericSortException extends SortException {
     public GenericSortException(String description) {
 	super(description);
     } 
-
-
 }

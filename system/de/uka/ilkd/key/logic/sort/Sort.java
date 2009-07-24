@@ -11,29 +11,23 @@
 
 package de.uka.ilkd.key.logic.sort;
 
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Named;
+import de.uka.ilkd.key.logic.op.SortDependingFunction;
 
 
 public interface Sort extends Named {
     
-    final Sort FORMULA  = new PrimitiveSort(new Name("Formula"));
-    final Sort UPDATE   = new PrimitiveSort(new Name("Update"));
+    final Sort FORMULA  = new SortImpl(new Name("Formula"));
+    final Sort UPDATE   = new SortImpl(new Name("Update"));
+    final Sort ANY      = new SortImpl(new Name("any"));    
     final Sort NULL     = new NullSort(new Name("Null"));
-
-    final Sort ANY      = new AbstractSort(new Name("any")) {
-	public SetOfSort extendsSorts() {            
-	    return SetAsListOfSort.EMPTY_SET;
-	}
-
-	public boolean extendsTrans(Sort s) {        
-	    return s == this;
-	}
-	
-	public boolean isAbstract() {
-	    return false;
-	}
-    };
+    
+    final Name OBJECT_REPOSITORY_NAME = new Name("<get>");
+    final Name CAST_NAME = new Name("cast");
+    final Name INSTANCE_NAME = new Name("instance");
+    final Name EXACT_INSTANCE_NAME = new Name("exactInstance");    
     
     
     /**
@@ -51,4 +45,25 @@ public interface Sort extends Named {
      * Tells whether this sort has no exact elements.
      */
     boolean isAbstract();
+    
+    /**
+     * returns the cast symbol of this Sort
+     */
+    SortDependingFunction getCastSymbol(Services services);
+    
+    /**
+     * returns the instanceof symbol of this Sort
+     */
+    SortDependingFunction getInstanceofSymbol(Services services);
+    
+    /**
+     * returns the exactinstanceof symbol of this Sort
+     */
+    SortDependingFunction getExactInstanceofSymbol(Services services);
+    
+
+    /**
+     * returns the object repository of this sort
+     */    
+    SortDependingFunction getObjectRepository(Services services);        
 }

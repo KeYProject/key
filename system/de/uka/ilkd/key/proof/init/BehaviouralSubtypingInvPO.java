@@ -54,7 +54,7 @@ public class BehaviouralSubtypingInvPO extends AbstractPO {
     //methods of ProofOblInput interface
     //-------------------------------------------------------------------------    
         
-    public void readProblem(ModStrategy mod) throws ProofInputException {
+    public void readProblem() throws ProofInputException {
         //prepare self variable
         LogicVariable selfVar = buildSelfVarAsLogicVar();
            

@@ -27,7 +27,6 @@ import de.uka.ilkd.key.ldt.ListOfLDT;
 import de.uka.ilkd.key.ldt.SLListOfLDT;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.logic.sort.SortDefiningSymbols;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.ExtList;
 
@@ -325,9 +324,8 @@ public final class TypeConverter {
 	final KeYJavaType type = ((TypeReference)io.getChildAt(1)).
 	    getKeYJavaType();
 	final Term obj = convertToLogicElement(io.getChildAt(0), ec);
-	final SortDefiningSymbols s = (SortDefiningSymbols) type.getSort();
-	final InstanceofSymbol instanceOfSymbol = 
-	    (InstanceofSymbol)s.lookupSymbol(InstanceofSymbol.NAME);
+	final Sort s = type.getSort();
+	final Function instanceOfSymbol = s.getInstanceofSymbol(services); 
 	
 	// in JavaDL S::instance(o) is also true if o (for reference types S)
 	// is null in opposite to Java

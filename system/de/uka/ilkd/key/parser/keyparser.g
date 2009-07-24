@@ -1041,17 +1041,18 @@ options {
             return v;
         }
         
-        // case 4: instantiation of generic function which has to be created on 
-        // demand
+        // case 4: instantiation of sort depending function
         int separatorIndex = varfunc_name.indexOf("::"); 
         if (separatorIndex > 0) {
             String sortName = varfunc_name.substring(0, separatorIndex);
             String baseName = varfunc_name.substring(separatorIndex + 2);
             Sort sort = lookupSort(sortName);
-            Operator baseSymbol = lookupVarfuncId(Sort.ANY + "::" + baseName, args);
+            SortDependingFunction firstInstance 
+            	= SortDependingFunction.getFirstInstance(new Name(baseName), 
+            					         getServices());
                         
-            if(sort != null && baseSymbol instanceof SortDependingFunction) {
-                v = (Function) ((SortDependingFunction) baseSymbol).getInstanceFor(sort, getServices());
+            if(sort != null && firstInstance != null) {
+                v = firstInstance.getInstanceFor(sort, getServices());
                 if(v != null) {
                     return v;
                 }
@@ -1308,11 +1309,6 @@ options {
         return pm;
     }
 
-    public static void addSortAdditionals(Sort s, Namespace functions, Namespace sorts) {
-        if ( s instanceof SortDefiningSymbols ) {                        
-           ((SortDefiningSymbols)s).addDefinedSymbols(functions, sorts);
-        }
-    }
 
     public void addFunction(Function f) {
         functions().add(f);
@@ -1494,18 +1490,10 @@ sort_decls
 : SORTS LBRACE 
        ( multipleSorts = one_sort_decl { lsorts = lsorts.prepend(multipleSorts); })* 
   RBRACE 
-     {
-        final IteratorOfSort it = lsorts.iterator();
-        while (it.hasNext()) {                   
-             addSortAdditionals ( it.next(), defaultChoice.funcNS(), sorts() ); 
-         }
-      }
-
 ;
 
 one_sort_decl returns [ListOfSort createdSorts = SLListOfSort.EMPTY_LIST] 
 {
-    boolean isObjectSort  = false;
     boolean isGenericSort = false;
     boolean isSubSort = false;
     Sort[] sortExt=new Sort [0];
@@ -1530,14 +1518,7 @@ one_sort_decl returns [ListOfSort createdSorts = SLListOfSort.EMPTY_LIST]
                         // attention: no expand to java.lang here!       
                         if (sorts().lookup(sort_name) == null) {
                             Sort s;
-                            if (isObjectSort) {
-                                if (sort_name.toString().equals("java.lang.Object")) {
-				    s = new ClassInstanceSort(sort_name, false);
-                                } else {
-                                    s = new ClassInstanceSort(sort_name,
-                                        (Sort)sorts().lookup(new Name("java.lang.Object")), false);
-                                }	
-                            } else if (isGenericSort) {
+			    if (isGenericSort) {
                                 int i;
                                 SetOfSort  ext   = SetAsListOfSort.EMPTY_SET;
                                 SetOfSort  oneOf = SetAsListOfSort.EMPTY_SET;
@@ -1562,9 +1543,9 @@ one_sort_decl returns [ListOfSort createdSorts = SLListOfSort.EMPTY_LIST]
                                 for ( int i = 0; i != sortExt.length; ++i )
                                 ext = ext.add ( sortExt[i] );
 
-                                s = new PrimitiveSort(sort_name, ext);
+                                s = new SortImpl(sort_name, ext);
                             } else {
-                                s = new PrimitiveSort(sort_name);
+                                s = new SortImpl(sort_name);
                             }
                             assert s != null;
                             sorts().add ( s ); 
@@ -1868,15 +1849,36 @@ pred_decl
         argSorts = arg_sorts[!skip_predicates]
         {
             if (!skip_predicates) {
-                Name predicate = new Name(pred_name);		    		                        
-                Function p = null;
-                if (lookup(predicate) != null) {
-                    throw new AmbigiousDeclException
-                    (pred_name, getFilename(), getLine(), getColumn());
-                } else {
-                   p = new Function(predicate, Sort.FORMULA, argSorts);
+                Function p = null;            
+            
+            	int separatorIndex = pred_name.indexOf("::"); 
+	        if (separatorIndex > 0) {
+	            String sortName = pred_name.substring(0, separatorIndex);
+	            String baseName = pred_name.substring(separatorIndex + 2);
+		    Sort genSort = lookupSort(sortName);
+		    
+		    if(genSort instanceof GenericSort) {	        	            	
+		    	p = SortDependingFunction.createFirstInstance(
+		    	    		(GenericSort)genSort,
+		    	    		new Name(baseName),
+		    	    		Sort.FORMULA,
+		    	    		argSorts);
+		    }
+	        }
+            
+                if(p == null) {	                        
+                    p = new Function(new Name(pred_name), 
+                    		     Sort.FORMULA, 
+                    		     argSorts);
                 }
-                assert p != null;
+                
+		if (lookup(p.name()) != null) {
+		    throw new AmbigiousDeclException(p.name().toString(), 
+		                                     getFilename(), 
+		                                     getLine(), 
+		                                     getColumn());
+		}
+		
                 addFunction(p);         
             } 
         }
@@ -1951,13 +1953,11 @@ func_decl
 		    if(genSort instanceof GenericSort) {	        
 	            	assert !unique : "not implemented; " + func_name;
 	            	
-		    	SortDependingFunction temp 
-		    	    = new SortDependingFunction(new Name(baseName),
-		                                                retSort,
-		                                                argSorts,
-		                                                new Name(baseName),
-		                                                genSort);
-			f = (Function)temp.getInstanceFor(Sort.ANY, getServices());
+		    	f = SortDependingFunction.createFirstInstance(
+		    	    		(GenericSort)genSort,
+		    	    		new Name(baseName),
+		    	    		retSort,
+		    	    		argSorts);
 		    }
 	        }
 	        
@@ -2784,7 +2784,7 @@ accessterm returns [Term result = null]
                     " to sort " + s +
                     ". Casts between primitive and reference types are not allowed. ");
          }
-         result = tf.createFunctionTerm(((AbstractSort)s).getCastSymbol(), result);
+         result = tf.createFunctionTerm(s.getCastSymbol(getServices()), result);
 	  } |
       ( {isStaticQuery()}? // look for package1.package2.Class.query(
         result = static_query
@@ -3407,20 +3407,6 @@ funcpredvarterm returns [Term a = null]
 	        a = TB.inReachableState(getServices());
 	    } else {
 	            Operator op = lookupVarfuncId(varfuncid, argsWithBoundVars);     
-	            
-	            //sanity check: if signature of function symbol is base
-	            //sort depending function, then we must be in schema mode
-	            if(!inSchemaMode()
-	               && op instanceof SortDependingFunction 
-	               && ((SortDependingFunction)op).getSortDependingOn() instanceof GenericSort) {
-			throw new GenericSortException ( "sort",
-	   		     			        "Unexpected generic sort for symbol " + op, 
-	   		     			         ((SortDependingFunction)op).getSortDependingOn(),
-	   					         getFilename (), 
-	   					         getLine (), 
-	   					         getColumn () );
-		    }
-	            
 	                   
 	            if (op instanceof ParsableVariable) {
 	                a = termForParsedVariable((ParsableVariable)op);

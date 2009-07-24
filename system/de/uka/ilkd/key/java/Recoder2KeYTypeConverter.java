@@ -47,7 +47,6 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.sort.*;
-import de.uka.ilkd.key.parser.KeYParser;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.ExtList;
 
@@ -203,7 +202,7 @@ public class Recoder2KeYTypeConverter {
         	StackTraceElement[] elements = stack.getStackTrace(); 
         	for (int i = 0; i<elements.length;i++) {
         	    if (elements[i] != null && elements[i].getClassName().equals("junit.textui.TestRunner")) {
-        		s = new PrimitiveSort(new Name(t.getFullName()));
+        		s = new SortImpl(new Name(t.getFullName()));
         		throwError = false; 
         		break;
         	    }
@@ -292,16 +291,17 @@ public class Recoder2KeYTypeConverter {
                 }
             } else if (t instanceof recoder.abstraction.NullType) {
                 type = NullType.JAVA_NULL;
-                if (namespaces.sorts().lookup(s.name()) == null) {
-                    setUpSort(s);
-                }
                 result = new KeYJavaType(type, s);
+                if(namespaces.sorts().lookup(s.name()) == null) {
+                    namespaces.sorts().add(s);
+                }
             } else if (t instanceof recoder.abstraction.ArrayType) {
-                setUpSort(s);
                 result = new KeYJavaType(s);
+                if(namespaces.sorts().lookup(s.name()) == null) {
+                    namespaces.sorts().add(s);
+                }                
             } else if (t == recoder2key.getServiceConfiguration().
                     getNameInfo().getUnknownClassType()) {
-//              setUpSort(s);
 //              result = makeSimpleKeYType((ClassType)t,s);
 //              //TEMP!
 //              assert result.getJavaType() != null;
@@ -314,7 +314,9 @@ public class Recoder2KeYTypeConverter {
                 result = new KeYJavaType();
             }
         } else {
-            setUpSort(s);
+            if(namespaces.sorts().lookup(s.name()) == null) {
+        	namespaces.sorts().add(s);
+            }            
             result = new KeYJavaType(s);
         }
         storeInCache(t, result);
@@ -333,15 +335,6 @@ public class Recoder2KeYTypeConverter {
         // which has priority
     }
 
-    /**
-     * Insert sorts into the namespace, add symbols that may have been defined
-     * by a sort to the function namespace (e.g. functions for collection sorts)
-     */
-    protected void setUpSort(Sort s) {
-	namespaces.sorts().add(s);
-        KeYParser.addSortAdditionals(s, 
-        	namespaces.functions(), namespaces.sorts());
-    }
 
     /**
      * get all direct super sorts of a class type (not transitive)
@@ -394,8 +387,9 @@ public class Recoder2KeYTypeConverter {
      */
     private Sort createObjectSort(ClassType ct, SetOfSort supers) {
         final boolean abstractOrInterface = ct.isAbstract() || ct.isInterface();
-        return new ClassInstanceSort(new Name(Recoder2KeYConverter.makeAdmissibleName(ct.getFullName())), 
+        Sort result = new SortImpl(new Name(Recoder2KeYConverter.makeAdmissibleName(ct.getFullName())), 
                 supers,	abstractOrInterface);
+	return result;
     }
 
     /**

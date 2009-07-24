@@ -15,11 +15,10 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.AbstractMetaOperator;
-import de.uka.ilkd.key.logic.op.ExactInstanceSymbol;
 import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.logic.sort.ArraySort;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.logic.sort.SortDefiningSymbols;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.Debug;
 
@@ -44,9 +43,9 @@ public final class ArrayBaseInstanceOf extends AbstractMetaOperator {
         final Term element = term.sub(1);
 
         final Sort arraySort;
-        if (array.op() instanceof ExactInstanceSymbol) {
-            arraySort = ((ExactInstanceSymbol) array.op()).
-            getSortDependingOn();
+        if(array.op() instanceof SortDependingFunction
+           && ((SortDependingFunction)array.op()).getKind().equals(Sort.EXACT_INSTANCE_NAME)) {
+            arraySort = ((SortDependingFunction) array.op()).getSortDependingOn();
         } else {
             arraySort = array.sort();
         }
@@ -55,12 +54,8 @@ public final class ArrayBaseInstanceOf extends AbstractMetaOperator {
 
         final Sort arrayElementSort = ((ArraySort) arraySort).elementSort();
 
-        Function instanceofSymbol = null;
-        if (arrayElementSort instanceof SortDefiningSymbols) {
-            assert arrayElementSort.extendsTrans(services.getJavaInfo().objectSort());
-            instanceofSymbol = (Function) ((SortDefiningSymbols) arrayElementSort)
-                    .lookupSymbol(new Name("instance"));
-        }
+        Function instanceofSymbol
+            =  arrayElementSort.getInstanceofSymbol(services);
         Debug.assertTrue(instanceofSymbol != null,
                 "Instanceof symbol not found for ", arrayElementSort);
         

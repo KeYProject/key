@@ -27,15 +27,12 @@ import de.uka.ilkd.key.gui.IMain;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.Recoder2KeY;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.ConstrainedFormula;
-import de.uka.ilkd.key.logic.IteratorOfConstrainedFormula;
-import de.uka.ilkd.key.logic.IteratorOfNamed;
-import de.uka.ilkd.key.logic.NamespaceSet;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.SortDependingFunction;
+import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.logic.sort.SortDefiningSymbols;
 import de.uka.ilkd.key.proof.JavaModel;
 import de.uka.ilkd.key.proof.ProblemLoader;
 import de.uka.ilkd.key.proof.Proof;
@@ -52,7 +49,7 @@ import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.util.ProgressMonitor;
 
 
-public class ProblemInitializer {
+public final class ProblemInitializer {
     
     private static JavaModel lastModel;
     private static InitConfig lastBaseConfig;
@@ -140,23 +137,6 @@ public class ProblemInitializer {
     
     
     /**
-     * Delayed setup of symbols defined by sorts (e.g. functions for
-     * collection sorts). This may not have been done for previously
-     * defined sorts, as the integer sort was not available.
-     */
-    private void setUpSorts(InitConfig initConfig) {
-	IteratorOfNamed it = initConfig.sortNS().allElements().iterator();
-        while(it.hasNext()) {
-            Sort sort = (Sort)it.next ();
-            if(sort instanceof SortDefiningSymbols) {
-                ((SortDefiningSymbols)sort).addDefinedSymbols (initConfig.funcNS(),
-                                                               initConfig.sortNS());
-            }
-        }
-    }
-    
-    
-    /**
      * Helper for readIncludes().
      */
     private void readLDTIncludes(Includes in, 
@@ -179,8 +159,6 @@ public class ProblemInitializer {
 	
 	//read the LDTInput
 	readEnvInput(ldtInp, initConfig);
-	
-        setUpSorts(initConfig);
     }
     
     
@@ -319,11 +297,36 @@ public class ProblemInitializer {
             }
                        
             reportReady();
-            
-            setUpSorts(initConfig);
 	} else {
 	    initConfig.getProofEnv().setJavaModel(JavaModel.NO_MODEL);
 	}
+    }
+    
+    
+    /**
+     * Removes all schema variables, all generic sorts and all sort
+     * depending symbols for a generic sort out of the namespaces.
+     * Helper for readEnvInput().
+     */
+    private void cleanupNamespaces(InitConfig initConfig) {
+	Namespace newVarNS = new Namespace();	    
+	Namespace newSortNS = new Namespace();
+	Namespace newFuncNS = new Namespace();	    
+	for(Named n : initConfig.sortNS().allElements()) {
+	    if(!(n instanceof GenericSort)) {
+		newSortNS.addSafely(n);
+	    }	
+	}
+	for(Named n : initConfig.funcNS().allElements()) {
+	    if(!(n instanceof SortDependingFunction 
+		    && ((SortDependingFunction)n).getSortDependingOn() 
+		    instanceof GenericSort)) {
+		newFuncNS.addSafely(n);
+	    }
+	}
+	initConfig.getServices().getNamespaces().setVariables(newVarNS);
+	initConfig.getServices().getNamespaces().setSorts(newSortNS);
+	initConfig.getServices().getNamespaces().setFunctions(newFuncNS);
     }
     
     
@@ -337,14 +340,23 @@ public class ProblemInitializer {
 		readJava(envInput, initConfig);	
 	    }
 	    
+	    //sanity check
+	    assert initConfig.varNS().allElements().size() == 0;
+	    for(Named n : initConfig.sortNS().allElements()) {
+		assert n instanceof Sort && !(n instanceof GenericSort);
+	    }	    
+	    
 	    //read envInput itself
 	    reportStatus("Reading "+envInput.name(), 
 		    	 envInput.getNumberOfChars());
 	    envInput.setInitConfig(initConfig);
-	    envInput.read(ModStrategy.NO_VARS_GENSORTS);	    
+	    envInput.read();
+
+	    //clean namespaces
+	    cleanupNamespaces(initConfig);
+	    	    
+	    //done
 	    reportReady();
-	    
-	    setUpSorts(initConfig);
 	}
     }
 
@@ -485,7 +497,7 @@ public class ProblemInitializer {
            
             //read problem
     	    reportStatus("Loading problem \""+po.name()+"\"");
-    	    po.readProblem(ModStrategy.NO_FUNCS);
+    	    po.readProblem();
     	    reportReady();
     	    
     	    //final work

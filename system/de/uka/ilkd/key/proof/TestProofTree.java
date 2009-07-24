@@ -16,7 +16,7 @@ import junit.framework.TestCase;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.LogicVariable;
-import de.uka.ilkd.key.logic.sort.PrimitiveSort;
+import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.logic.sort.Sort;
 
 /** class tests the tree of proof
@@ -40,7 +40,7 @@ public class TestProofTree extends TestCase {
     }
 
     public void setUp() {
-	Sort s = new PrimitiveSort(new Name("s"));
+	Sort s = new SortImpl(new Name("s"));
 	LogicVariable b1=new LogicVariable(new Name("b1"),s);
 	LogicVariable b2=new LogicVariable(new Name("b2"),s);
 	LogicVariable b3=new LogicVariable(new Name("b3"),s);

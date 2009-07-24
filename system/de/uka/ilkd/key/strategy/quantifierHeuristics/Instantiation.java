@@ -5,13 +5,6 @@
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
-//This file is part of KeY - Integrated Deductive Software Design
-//Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
-//                Universitaet Koblenz-Landau, Germany
-//                Chalmers University of Technology, Sweden
-//
-//The KeY system is protected by the GNU General Public License. 
-//See LICENSE.TXT for details.
 //
 //
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
@@ -22,7 +15,7 @@ import java.util.Map;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.sort.AbstractSort;
+import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.strategy.LongRuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.TopRuleAppCost;
@@ -121,7 +114,7 @@ class Instantiation {
 
     private Term createArbitraryInstantiation(QuantifiableVariable var,
                                               Services services) {
-        return tb.func ( ( (AbstractSort)var.sort () ).getCastSymbol (),
+        return tb.func (var.sort().getCastSymbol (services),
                 tb.zero(services) );
     }
 
@@ -179,7 +172,8 @@ class Instantiation {
 
     private RuleAppCost computeCostHelp(Term inst) {
         Long cost = instancesWithCosts.get ( inst );
-        if ( cost == null && ( inst.op () instanceof CastFunctionSymbol ) )
+        if ( cost == null && ( inst.op () instanceof SortDependingFunction
+        	                && ((SortDependingFunction)inst.op()).getKind().equals(Sort.CAST_NAME)) )
             cost = instancesWithCosts.get ( inst.sub ( 0 ) );
 
         if ( cost == null ) {

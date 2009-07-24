@@ -600,13 +600,6 @@ public class TermFactory {
         } 
         return varTerm;
     }
-
-
-    /** creates a cast of term with to the given sort */    
-    public Term createCastTerm(AbstractSort sort, Term with) {        
-        return createFunctionTerm(sort.getCastSymbol(), with);
-    }
-    
     
     public static void clearCache(){
         cache.clear();

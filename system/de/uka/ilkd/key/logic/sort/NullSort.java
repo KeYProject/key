@@ -13,20 +13,14 @@ package de.uka.ilkd.key.logic.sort;
 import de.uka.ilkd.key.logic.Name;
 
 
-public class NullSort extends ClassInstanceSort  {
+public final class NullSort extends AbstractSort  {
 
     public NullSort(Name name) {
-	super(name, false);
-    }
-    
-    
-    @Override
-    public SetOfSort extendsSorts() {
-	assert false : "not supported by NullSort";
-    	return null;
+	super(name, null, false);
     }
     
 
+    //HACK
     @Override
     public boolean extendsTrans(Sort s) {
 	if(s == this || s == Sort.ANY) {
@@ -37,8 +31,7 @@ public class NullSort extends ClassInstanceSort  {
 	    final SetOfSort oldSups = sups;
 	    sups = SetAsListOfSort.EMPTY_SET;
 	    for(Sort sup : oldSups) {
-		if(sup.name().toString().equals("java.lang.Object")
-			|| sup.name().toString().equals("Object")) { //HACK
+		if(sup.name().toString().equals("java.lang.Object")) { 
 		    return true;
 		} else {
 		    sups = sups.union(sup.extendsSorts());

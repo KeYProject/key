@@ -29,7 +29,8 @@ import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.sort.SortDefiningSymbols;
+import de.uka.ilkd.key.logic.sort.AbstractSort;
+import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.ProofSaver;
 import de.uka.ilkd.key.speclang.FormulaWithAxioms;
 import de.uka.ilkd.key.speclang.PositionedString;
@@ -536,8 +537,8 @@ public class TestJMLTranslator extends TestCase {
 
         assertTrue(result != null);
 
-        SortDefiningSymbols sds = (SortDefiningSymbols) javaInfo.objectSort();
-        Function ioFunc = (Function) sds.lookupSymbol(InstanceofSymbol.NAME);
+        Sort sds = javaInfo.objectSort();
+        Function ioFunc = sds.getInstanceofSymbol(services);
         assertTrue(termContains(result.getFormula(), ioFunc));
     }
     

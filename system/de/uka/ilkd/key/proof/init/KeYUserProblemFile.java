@@ -92,7 +92,7 @@ public class KeYUserProblemFile extends KeYFile implements ProofOblInput{
     }
 
 
-    public void readProblem(ModStrategy mod) throws ProofInputException {
+    public void readProblem() throws ProofInputException {
         if (initConfig==null) {
             throw new IllegalStateException("KeYUserProblemFile: InitConfig not set.");
         }
@@ -102,14 +102,11 @@ public class KeYUserProblemFile extends KeYFile implements ProofOblInput{
                 new CountingBufferedInputStream
                     (getNewStream(),monitor,getNumberOfChars()/100);
             DeclPicker lexer = new DeclPicker(new KeYLexer(cinp,initConfig.getServices().getExceptionHandler()));
-
-            final NamespaceSet normal = initConfig.namespaces().copy();
-            final NamespaceSet schema = setupSchemaNamespace(normal);
             
             final ParserConfig normalConfig 
-                = new ParserConfig(initConfig.getServices(), normal);
+                = new ParserConfig(initConfig.getServices(), initConfig.namespaces());
             final ParserConfig schemaConfig 
-                = new ParserConfig(initConfig.getServices(), schema);
+                = new ParserConfig(initConfig.getServices(), initConfig.namespaces());
             
             KeYParser problemParser 
                     = new KeYParser(ParserMode.PROBLEM, 
@@ -139,7 +136,6 @@ public class KeYUserProblemFile extends KeYFile implements ProofOblInput{
                     0, problemHeader.lastIndexOf(searchS));
             }
             initConfig.setTaclets(problemParser.getTaclets());
-            initConfig.add(normalConfig.namespaces(), mod);
             lastParser = problemParser;
         } catch (antlr.ANTLRException e) {
             throw new ProofInputException(e);

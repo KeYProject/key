@@ -47,12 +47,14 @@ public class TacletForTests {
     public static TacletIndex rules= null;
     public static Services services;
     public static File lastFile=null;
+    
+    public static Namespace variables = null;
 
     public static Profile profile = new JavaProfile() {
             //we do not want normal standard rules, but ruleSetsDeclarations is needed for string library (HACK)
             public RuleCollection getStandardRules() {
                 return new RuleCollection(
-                                RuleSource.initRuleFile("ruleSetsDeclarations.key"), 
+                                RuleSource.initRuleFile("LDTsForTestsOnly.key"), 
                                 SLListOfBuiltInRule.EMPTY_LIST);
             }
         };
@@ -67,13 +69,14 @@ public class TacletForTests {
     public static void parse(File file) {
 	try {	    
 	    if (!file.equals(lastFile)) {
-		EnvInput envInput = new KeYFileForTests("Test", file);	
+		KeYFileForTests envInput = new KeYFileForTests("Test", file);	
 		ProblemInitializer pi = new ProblemInitializer(profile); 
 		InitConfig ic = pi.prepare(envInput);
               	nss      = ic.namespaces(); 
                 rules    = ic.createTacletIndex();
                 services = ic.getServices();
 		lastFile = file;
+		variables = envInput.variables();
 	    }
 	} catch (Exception e) {
 	    System.err.println("Exception occurred while parsing "+file+"\n");
@@ -138,7 +141,7 @@ public class TacletForTests {
 
 
     public static Namespace getVariables() {
-	return nss.variables();
+	return variables;
     }
 
     public static Namespace getProgramVariables() {

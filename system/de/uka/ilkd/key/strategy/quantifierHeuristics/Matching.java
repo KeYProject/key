@@ -37,7 +37,7 @@ class Matching {
     public static SetOfSubstitution twoSidedMatching(UniTrigger trigger,
                                                      Term targetTerm, 
                                                      Services services) {
-        TwoSidedMatching tsm = new TwoSidedMatching ( trigger, targetTerm );
+        TwoSidedMatching tsm = new TwoSidedMatching ( trigger, targetTerm, services );
         return tsm.getSubstitutions (services);
     }      
     

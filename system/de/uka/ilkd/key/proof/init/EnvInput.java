@@ -12,8 +12,6 @@ package de.uka.ilkd.key.proof.init;
 import java.io.File;
 import java.util.List;
 
-import de.uka.ilkd.key.collection.ListOfString;
-
 
 /** 
  * Represents an entity read to produce an environment to read a proof
@@ -58,5 +56,5 @@ public interface EnvInput {
      * parts of the input do not modify the initial configuration while
      * others do.
      */
-    void read(ModStrategy mod) throws ProofInputException;
+    void read() throws ProofInputException;
 }

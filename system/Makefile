@@ -176,7 +176,6 @@ GENERATED_LISTS=logic/SLListOfTerm \
 	proof/SLListOfProof \
 	logic/sort/SLListOfGenericSort \
 	rule/inst/SLListOfGenericSortCondition \
-	logic/op/SLListOfSortDependingSymbol \
 	logic/SLListOfName \
 	logic/op/SLListOfIProgramVariable \
 	logic/SLListOfSequentChangeInfo \
@@ -247,7 +246,6 @@ GENERATED_MAPS=	collection/MapAsListFromIntegerToString \
 	logic/op/MapAsListFromLogicVariableToTerm \
 	logic/op/MapAsListFromSchemaVariableToTacletPrefix \
 	logic/sort/MapAsListFromGenericSortToSort \
-	logic/op/MapAsListFromNameToSortDependingSymbol \
 	logic/op/MapAsListFromSchemaVariableToSchemaVariable \
 	proof/MapAsListFromConstrainedFormulaToTermTacletAppIndex \
 	proof/proofevent/MapAsListFromNodeToNodeChangesHolder \

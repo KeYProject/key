@@ -11,7 +11,7 @@
 package de.uka.ilkd.key.rule.inst;
 
 import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.op.SortDependingSymbol;
+import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.logic.op.TermSV;
 import de.uka.ilkd.key.logic.sort.ArraySort;
 import de.uka.ilkd.key.logic.sort.GenericSort;
@@ -59,8 +59,8 @@ public abstract class GenericSortCondition {
      * incompatible or equal
      */
     public static GenericSortCondition createCondition
-	( SortDependingSymbol p0,
-	  SortDependingSymbol p1 ) {
+	( SortDependingFunction p0,
+	  SortDependingFunction p1 ) {
 
 	if ( !p0.isSimilar ( p1 ) )
 	    return null;

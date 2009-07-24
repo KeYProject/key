@@ -12,7 +12,7 @@ package de.uka.ilkd.key.logic;
 
 import junit.framework.TestCase;
 import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.sort.PrimitiveSort;
+import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.logic.sort.Sort;
 
 public class TestSemisequent extends TestCase {
@@ -54,7 +54,7 @@ public class TestSemisequent extends TestCase {
 	con[5]=new ConstrainedFormula(t_b, Constraint.BOTTOM);
 	con[6]=new ConstrainedFormula(t_c, Constraint.BOTTOM);
 
-	Sort s = new PrimitiveSort(new Name("test"));
+	Sort s = new SortImpl(new Name("test"));
 	Function f = new Function(new Name("f"), s, new Sort[]{});
  	Term t_f = tf.createFunctionTerm(f, new Term[]{});
     }

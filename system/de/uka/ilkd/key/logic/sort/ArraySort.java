@@ -22,10 +22,9 @@ public final class ArraySort extends AbstractSort {
     	= new WeakHashMap<SortKey, WeakReference<ArraySort>>();
     
     /** keeping this key is important to prevent for too early hashmap removal*/
-    protected final SortKey sk;    
+    private final SortKey sk;    
     
-    protected final ArrayOfSort commonJavaSorts;
-    protected final SetOfSort extendsSorts;
+    private final ArrayOfSort commonJavaSorts;
     
 
 
@@ -34,7 +33,7 @@ public final class ArraySort extends AbstractSort {
     //------------------------------------------------------------------------- 
         
     private ArraySort(SetOfSort extendsSorts, SortKey sk) {
-	super(new Name(sk.elemSort.name()+"[]"));
+	super(new Name(sk.elemSort.name()+"[]"), extendsSorts, false);
 	assert(!extendsSorts.isEmpty());	
 
 	this.sk = sk;
@@ -44,8 +43,6 @@ public final class ArraySort extends AbstractSort {
 	commons[1] = this.sk.javaLangCloneable;
 	commons[2] = this.sk.javaLangSerializable;
 	commonJavaSorts = new ArrayOfSort(commons);
-	
-	this.extendsSorts = extendsSorts;
     }    
 
 
@@ -56,38 +53,27 @@ public final class ArraySort extends AbstractSort {
     //------------------------------------------------------------------------- 
 
 
-    private static SetOfSort getArraySuperSorts(Sort elem, 
+    private static SetOfSort getArraySuperSorts(Sort elemSort, 
 	    					Sort objectSort, 
 	    					Sort cloneableSort,
 	    					Sort serializableSort) {
-	int i = 1;
-	while(elem instanceof ArraySort){
-	    elem = ((ArraySort) elem).elementSort();
-	    i++;
-	}
-	SetOfSort superSorts = elem.extendsSorts();
-
-	if (elem instanceof PrimitiveSort || elem == objectSort){
-	    i--;
-	    superSorts = 
-		superSorts.add(objectSort).add(cloneableSort).add(serializableSort);
-	}
-
-	if(i>0){
-	    final IteratorOfSort it = superSorts.iterator();
-	    superSorts = SetAsListOfSort.EMPTY_SET;
-	    while(it.hasNext()){
-		Sort s = it.next();
-		superSorts = 
-		    superSorts.add(getArraySortForDim(s, 
-			    			      i, 
-			    			      objectSort, 
-			    			      cloneableSort, 
-			    			      serializableSort));
+	SetOfSort result = SetAsListOfSort.EMPTY_SET;
+	
+	SetOfSort elemDirectSuperSorts = elemSort.extendsSorts();
+	if(elemDirectSuperSorts.isEmpty()) {
+	    result = result.add(objectSort)
+	                   .add(cloneableSort)
+	                   .add(serializableSort);    
+	} else {
+	    for(Sort s : elemDirectSuperSorts) {
+		result = result.add(getArraySort(s,
+						 objectSort,
+						 cloneableSort,
+						 serializableSort));
 	    }
 	}
 
-	return superSorts;
+	return result;
     }
     
     
@@ -96,20 +82,15 @@ public final class ArraySort extends AbstractSort {
     //public interface
     //------------------------------------------------------------------------- 
 
-    @Override
-    public SetOfSort extendsSorts() {
-        return extendsSorts;
-    }
-    
     
     /** 
      * returns elemSort([])^n.
      */
     public static Sort getArraySortForDim(Sort elemSort, 
-	    				   int n,
-	    				   Sort objectSort, 
-	    				   Sort cloneableSort, 
-	    				   Sort serializableSort) {
+	    				  int n,
+	    				  Sort objectSort, 
+	    				  Sort cloneableSort, 
+	    				  Sort serializableSort) {
 	Sort result = elemSort;
 	while(n > 0){
 	    result = getArraySort(result, 
@@ -150,7 +131,7 @@ public final class ArraySort extends AbstractSort {
 		    serializableSort);
 	    as = new ArraySort(localExtendsSorts, sortKey);
 	    aSH.put(sortKey, new WeakReference<ArraySort>(as));
-	} 
+	}
 	return as;
     }
 
@@ -175,13 +156,7 @@ public final class ArraySort extends AbstractSort {
     public Sort elementSort() {
         return sk.elemSort;
     }
-    
-    
-    @Override
-    public boolean isAbstract() {
-	return false;
-    }
-    
+       
     
     private static final class SortKey {
 	final Sort elemSort;

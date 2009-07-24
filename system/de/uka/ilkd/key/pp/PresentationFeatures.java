@@ -54,8 +54,6 @@ public class PresentationFeatures {
 	    putInfixNotation(notInfo, functions, "div", "/", 100, 100, 101);
 	    putInfixNotation(notInfo, functions, "mod", "%", 100, 100, 101);
 	    putPrefixNotation(notInfo, functions, "neg", "-");
-	    notInfo.createNumLitNotation
-		((Function)functions.lookup(new Name("Z")));
 	    putPrefixNotation(notInfo, functions, "neglit", "-");
 	}
     }

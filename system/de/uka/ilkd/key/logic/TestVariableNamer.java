@@ -17,7 +17,7 @@ import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.expression.operator.PostIncrement;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.sort.PrimitiveSort;
+import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.rule.*;
@@ -51,7 +51,7 @@ public class TestVariableNamer extends TestCase {
 
     private ProgramVariable constructProgramVariable(ProgramElementName name) {
 	KeYJavaType myKeyJavaType
-	    = new KeYJavaType(new PrimitiveSort(new Name("mysort")));
+	    = new KeYJavaType(new SortImpl(new Name("mysort")));
     	return new LocationVariable(name, myKeyJavaType);
     }
 

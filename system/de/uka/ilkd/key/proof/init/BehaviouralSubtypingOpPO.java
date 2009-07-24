@@ -69,7 +69,7 @@ public class BehaviouralSubtypingOpPO extends AbstractPO {
     //methods of ProofOblInput interface
     //-------------------------------------------------------------------------      
   
-    public void readProblem(ModStrategy mod) throws ProofInputException {
+    public void readProblem() throws ProofInputException {
         int numPOs = pairPOs.size() * 2;
         poTerms = new Term[numPOs];
         poNames = new String[numPOs];
@@ -79,7 +79,7 @@ public class BehaviouralSubtypingOpPO extends AbstractPO {
         while(it.hasNext()) {
             BehaviouralSubtypingOpPairPO pairPO 
                 = (BehaviouralSubtypingOpPairPO)(it.next());
-            pairPO.readProblem(mod);
+            pairPO.readProblem();
             poTerms[i]   = pairPO.getTerm1();
             poNames[i++] = pairPO.name() + " - Pre";
             poTerms[i]   = pairPO.getTerm2();

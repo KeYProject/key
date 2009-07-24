@@ -38,7 +38,7 @@ public abstract class Notation {
      * The priority of this operator in the given concrete syntax. This is
      * used to determine whether parentheses are required around a subterm.
      */
-    protected int priority;
+    private final int priority;
 
     /** Create a Notation with a given priority. */
     protected Notation(int priority) {
@@ -79,8 +79,8 @@ public abstract class Notation {
     /**
      * The standard concrete syntax for constants like true and false.
      */
-    public static class Constant extends Notation {
-	String name;
+    public static final class Constant extends Notation {
+	private final String name;
 
 	public Constant(String name, int prio) {
 	    super(prio);
@@ -95,10 +95,9 @@ public abstract class Notation {
     /**
      * The standard concrete syntax for prefix operators.
      */
-    public static class Prefix extends Notation {
-	String name;
-
-	int ass;
+    public static final class Prefix extends Notation {
+	private final String name;
+	private final int ass;
 
 	public Prefix(String name, int prio, int ass) {
 	    super(prio);
@@ -119,10 +118,9 @@ public abstract class Notation {
     /**
      * The standard concrete syntax for infix operators.
      */
-    public static class Infix extends Notation {
-	String name;
-
-	int assLeft, assRight;
+    public static final class Infix extends Notation {
+	private final String name;
+	private final int assLeft, assRight;
 
 	public Infix(String name, int prio, int assLeft, int assRight) {
 	    super(prio);
@@ -156,12 +154,10 @@ public abstract class Notation {
     }
 
     /**
-         * The standard concrete syntax for arrays.
-         */
-    public static class ArrayNot extends Notation {
-
-	final private String[] arraySeparators;
-
+     * The standard concrete syntax for arrays.
+     */
+    public static final class ArrayNot extends Notation {
+	private final String[] arraySeparators;
 	private final int[] ass;
 
 	public ArrayNot(String[] arraySeparators, int prio, int[] ass) {
@@ -180,12 +176,11 @@ public abstract class Notation {
     }
 
     /**
-         * The standard concrete syntax for quantifiers.
-         */
-    public static class Quantifier extends Notation {
-	String name;
-
-	int ass;
+     * The standard concrete syntax for quantifiers.
+     */
+    public static final class Quantifier extends Notation {
+	private final String name;
+	private final int ass;
 
 	public Quantifier(String name, int prio, int ass) {
 	    super(prio);
@@ -206,10 +201,9 @@ public abstract class Notation {
     /**
      * The standard concrete syntax for numerical quantifiers.
      */
-    public static class NumericalQuantifier extends Notation {
-        String name;
-
-        int ass1, ass2;
+    public static final class NumericalQuantifier extends Notation {
+        private final String name;
+        private final int ass1, ass2;
 
         public NumericalQuantifier(String name, int prio, int ass1, int ass2) {
             super(prio);
@@ -232,10 +226,9 @@ public abstract class Notation {
     /**
      * The standard concrete syntax for bounded numerical quantifiers.
      */
-    public static class BoundedNumericalQuantifier extends Notation {
-        String name;
-
-        int ass1, ass2;
+    public static final class BoundedNumericalQuantifier extends Notation {
+        private final String name;
+        private final  int ass1, ass2;
 
         public BoundedNumericalQuantifier(String name, int prio, int ass1, int ass2) {
             super(prio);
@@ -258,10 +251,10 @@ public abstract class Notation {
     /**
      * The standard concrete syntax for DL modalities box and diamond.
      */
-    public static class ModalityNotation extends Notation {
-	String left, right;
+    public static final class ModalityNotation extends Notation {
+	private final String left, right;
 
-	int ass;
+	private final int ass;
 
 	public ModalityNotation(String left, String right, int prio, int ass) {
 	    super(prio);
@@ -285,8 +278,8 @@ public abstract class Notation {
      * The concrete syntax for DL modalities represented with a
      * SchemaVariable.
      */
-    public static class ModalSVNotation extends Notation {
-	int ass;
+    public static final class ModalSVNotation extends Notation {
+	private final int ass;
 
 	public ModalSVNotation(int prio, int ass) {
 	    super(prio);
@@ -307,7 +300,7 @@ public abstract class Notation {
     /**
      * The standard concrete syntax for update application.
      */
-    public static class UpdateApplicationNotation extends Notation {
+    public static final class UpdateApplicationNotation extends Notation {
 
 	public UpdateApplicationNotation() {
 	    super(115);
@@ -318,8 +311,7 @@ public abstract class Notation {
 		sp.printTerm(t);
 	    } else {
 		assert t.op() == UpdateApplication.UPDATE_APPLICATION;
-		final Operator targetOp 
-		    = UpdateApplication.UPDATE_APPLICATION.getTarget(t).op();
+		final Operator targetOp = UpdateApplication.getTarget(t).op();
 		final int assTarget 
 		    = (t.sort() == Sort.FORMULA 
 		       ? (targetOp.arity() == 1 ? 60 : 85) 
@@ -334,7 +326,7 @@ public abstract class Notation {
     /**
      * The standard concrete syntax for elementary updates.
      */
-    public static class ElementaryUpdateNotation extends Notation {
+    public static final class ElementaryUpdateNotation extends Notation {
 
 	public ElementaryUpdateNotation() {
 	    super(150);
@@ -354,7 +346,7 @@ public abstract class Notation {
     /**
       * The standard concrete syntax for substitution terms.
       */
-    public static class Subst extends Notation {
+    public static final class Subst extends Notation {
 	public Subst() {
 	    super(120);
 	}
@@ -370,12 +362,29 @@ public abstract class Notation {
 			assTarget);
 	    }
 	}
+	
+	private QuantifiableVariable instQV(Term t, LogicPrinter sp, int subTerm) {
+	    QuantifiableVariable v = t.varsBoundHere(subTerm)
+	    .getQuantifiableVariable(0);
+
+	    if (v instanceof SchemaVariable) {
+		Object object = (sp.getInstantiations()
+			.getInstantiation((SchemaVariable) v));
+		if (object != null) {
+		    Debug.assertTrue(object instanceof Term);
+		    Debug
+		    .assertTrue(((Term) object).op() instanceof QuantifiableVariable);
+		    v = (QuantifiableVariable) (((Term) object).op());
+		}
+	    }
+	    return v;
+	}
     }
 
     /**
      * The standard concrete syntax for function and predicate terms.
      */
-    public static class Function extends Notation {
+    public static final class Function extends Notation {
 
 	public Function() {
 	    super(130);
@@ -393,7 +402,7 @@ public abstract class Notation {
     /**
      * The standard concrete syntax for arrays.
      */
-    public static class CastFunction extends Notation {
+    public static final class CastFunction extends Notation {
 
 	final String pre, post;
 
@@ -418,7 +427,7 @@ public abstract class Notation {
     /**
      * The standard concrete syntax for query terms <code>o.q(x)</code>.
      */
-    static class ProgramMethod extends Notation {
+    static final class ProgramMethod extends Notation {
 	private final int ass;
 
 	public ProgramMethod(int ass) {
@@ -448,7 +457,7 @@ public abstract class Notation {
      * The standard concrete syntax for conditional terms
      * <code>if (phi) (t1) (t2)</code>.
      */
-    public static class IfThenElse extends Notation {
+    public static final class IfThenElse extends Notation {
 
 	private final String keyword;
 
@@ -486,7 +495,7 @@ public abstract class Notation {
 	}
     }
 
-    public static class SchemaVariableNotation extends VariableNotation {
+    public static final class SchemaVariableNotation extends VariableNotation {
 	static Logger logger = Logger.getLogger(Notation.class.getName());
 
 	public void print(Term t, LogicPrinter sp) throws IOException {
@@ -531,7 +540,7 @@ public abstract class Notation {
 	}
     }
 
-    public static class MetavariableNotation extends Notation {
+    public static final class MetavariableNotation extends Notation {
 	public MetavariableNotation() {
 	    super(1000);
 	}
@@ -547,7 +556,7 @@ public abstract class Notation {
      * The standard concrete syntax for the number literal indicator `Z'.
      * This is only used in the `Pretty&amp;Untrue' syntax.
      */
-    static class NumLiteral extends Notation {
+    static final class NumLiteral extends Notation {
 	public NumLiteral() {
 	    super(120);
 	}
@@ -601,7 +610,7 @@ public abstract class Notation {
     /**
      * The standard concrete syntax for the character literal indicator `C'.
      */
-    static class CharLiteral extends Notation {
+    static final class CharLiteral extends Notation {
 	public CharLiteral() {
 	    super(1000);
 	}
@@ -645,7 +654,7 @@ public abstract class Notation {
      * The standard concrete syntax for the string literal indicator `cat'
      * or `epsilon'.
      */
-    static class StringLiteral extends Notation {
+    static final class StringLiteral extends Notation {
 
 	public StringLiteral() {
 	    super(1000);
@@ -665,24 +674,5 @@ public abstract class Notation {
 	public void print(Term t, LogicPrinter sp) throws IOException {
 	    sp.printConstant(printStringTerm(t));
 	}
-    }
-
-
-
-    protected QuantifiableVariable instQV(Term t, LogicPrinter sp, int subTerm) {
-	QuantifiableVariable v = t.varsBoundHere(subTerm)
-		.getQuantifiableVariable(0);
-
-	if (v instanceof SchemaVariable) {
-	    Object object = (sp.getInstantiations()
-		    .getInstantiation((SchemaVariable) v));
-	    if (object != null) {
-		Debug.assertTrue(object instanceof Term);
-		Debug
-			.assertTrue(((Term) object).op() instanceof QuantifiableVariable);
-		v = (QuantifiableVariable) (((Term) object).op());
-	    }
-	}
-	return v;
     }
 }

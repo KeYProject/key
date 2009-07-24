@@ -16,7 +16,7 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.ldt.AbstractIntegerLDT;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.sort.AbstractSort;
+import de.uka.ilkd.key.logic.sort.Sort;
 
 
 /**
@@ -97,8 +97,7 @@ public class JavaIntegerSemanticsHelper {
             throws SLTranslationException {
         assert intTerm != null;
         try {
-            return TB.tf().createCastTerm((AbstractSort) ldt.targetSort(), 
-                                           intTerm);
+            return TB.cast(tc.getServices(), (Sort) ldt.targetSort(), intTerm);
         } catch(RuntimeException e) {
             raiseError("Error casting " + intTerm + " to an ldt sort.");
             return null; //unreachable

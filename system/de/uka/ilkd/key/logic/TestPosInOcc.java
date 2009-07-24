@@ -14,7 +14,7 @@ import junit.framework.TestCase;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.Metavariable;
-import de.uka.ilkd.key.logic.sort.PrimitiveSort;
+import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.logic.sort.Sort;
 
 /** class tests the PosInOccurrence
@@ -29,7 +29,7 @@ public class TestPosInOcc extends TestCase {
 
     public void testIterator () {
 	TermFactory tf=TermFactory.DEFAULT;
-	Sort sort1=new PrimitiveSort(new Name("S1"));
+	Sort sort1=new SortImpl(new Name("S1"));
 	LogicVariable x=new LogicVariable(new Name("x"),sort1);  
 	Function f=new Function(new Name("f"),sort1,new Sort[]{sort1});
 	Function p=new Function(new Name("p"),Sort.FORMULA,new Sort[]{sort1});
@@ -83,7 +83,7 @@ public class TestPosInOcc extends TestCase {
     
     public void testReplaceConstrainedFormula () {
         TermFactory tf = TermFactory.DEFAULT;
-        Sort sort1 = new PrimitiveSort ( new Name ( "S1" ) );
+        Sort sort1 = new SortImpl ( new Name ( "S1" ) );
         LogicVariable x = new LogicVariable ( new Name ( "x" ), sort1 );        
         Function c = new Function ( new Name ( "c" ), sort1, new Sort[] {} );
         Function f = new Function ( new Name ( "f" ),

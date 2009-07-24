@@ -225,9 +225,8 @@ options {
 	IteratorOfKeYJavaType it = signalsonly.iterator();
 	while (it.hasNext()) {
 	    KeYJavaType kjt = it.next();
-	    SortDefiningSymbols os = (SortDefiningSymbols)(kjt.getSort());
 		Function instance
-			= (InstanceofSymbol) os.lookupSymbol(InstanceofSymbol.NAME);
+			= kjt.getSort().getInstanceofSymbol(services);
 	    result = TB.or( result,
 		TB.equals(
 		    TB.func(instance, TB.var(this.excVar)),
@@ -455,8 +454,8 @@ options {
 		typeExpr = a;
 	    }
 	    
-	    SortDefiningSymbols os = (SortDefiningSymbols)(typeExpr.getType().getSort());
-	    Function ioFunc = (Function) os.lookupSymbol(ExactInstanceSymbol.NAME);
+	    Sort os = typeExpr.getType().getSort();
+	    Function ioFunc = os.getExactInstanceofSymbol(services);
 	     
 	    return TB.equals(
 		TB.func(ioFunc, typeofExpr.getTypeofTerm()),
@@ -578,9 +577,7 @@ options {
         LogicVariable lv 
         	= new LogicVariable(new Name("x"), integerSort);
 	Term lvTerm = TB.var(lv);
-	Function repos
-		= (Function) ((SortDefiningSymbols) kjt.getSort())
-		             .lookupSymbol(AbstractSort.OBJECT_REPOSITORY_NAME);
+	Function repos = kjt.getSort().getObjectRepository();
 	Term objectTerm = TB.func(repos, lvTerm); 
 	Term guardFma = TB.leq(TB.dot(null, nextToCreate), lvTerm, services); 
 	
@@ -874,9 +871,8 @@ signalsclause returns [Term result=null] throws SLTranslationException
 		replaceMap.put(eVar, excVar);
 		OpReplacer excVarReplacer = new OpReplacer(replaceMap);
 		
-		SortDefiningSymbols os = (SortDefiningSymbols)(excType.getSort());
-		Function instance
-		    = (InstanceofSymbol) os.lookupSymbol(InstanceofSymbol.NAME);
+		Sort os = excType.getSort();
+		Function instance = os.getInstanceofSymbol(services);
 		
 		result = TB.imp(
 		    TB.equals(TB.func(instance, TB.var(excVar)), trueLitTerm),
@@ -1166,8 +1162,7 @@ relationalexpr returns [JMLExpression result=null] throws SLTranslationException
 	|
 	    io:INSTANCEOF type=typespec 
 	    {
-		SortDefiningSymbols os = (SortDefiningSymbols)(type.getSort());
-		f = (InstanceofSymbol) os.lookupSymbol(InstanceofSymbol.NAME);
+		f = type.getSort().getInstanceofSymbol(services);
 		opToken = io;
 	    }
 	|
@@ -1184,8 +1179,8 @@ relationalexpr returns [JMLExpression result=null] throws SLTranslationException
 			" \\typeof() arguments on the left side.", st);
 		}
 		
-		SortDefiningSymbols os = (SortDefiningSymbols)(right.getType().getSort());
-		Function ioFunc = (InstanceofSymbol) os.lookupSymbol(InstanceofSymbol.NAME);
+		Sort os = right.getType().getSort();
+		Function ioFunc = os.getInstanceofSymbol(services);
 		
 		result = new JMLExpression(
 		    TB.equals(
@@ -1446,7 +1441,7 @@ unaryexpr returns [JMLExpression result=null] throws SLTranslationException
 		    resultTerm = TB.func(castFunction, resultTerm);
 		 } 
 		 
-		 castFunction = ((AbstractSort) type.getSort()).getCastSymbol();
+		 castFunction = ((AbstractSort) type.getSort()).getCastSymbol(services);
 		 
 		 
 		 result = new JMLExpression(

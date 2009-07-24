@@ -13,8 +13,7 @@ package de.uka.ilkd.key.logic;
 import junit.framework.Assert;
 import junit.framework.TestCase;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.sort.ClassInstanceSort;
-import de.uka.ilkd.key.logic.sort.PrimitiveSort;
+import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.logic.sort.SetAsListOfSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 
@@ -25,13 +24,13 @@ public class TestTermFactory extends TestCase {
 
     private static final TermFactory tf = TermFactory.DEFAULT;
     private Term et1;
-    private Sort sort1=new PrimitiveSort(new Name("S1"));
-    private Sort sort2=new PrimitiveSort(new Name("S2"));
-    private Sort sort3=new PrimitiveSort(new Name("S3"));
-    private Sort osort1=new ClassInstanceSort(new Name("os1"), false);
-    private Sort osort2=new ClassInstanceSort(new Name("os2"), osort1, false);
-    private Sort osort3=new ClassInstanceSort(new Name("os3"), osort1, false);
-    private Sort osort4=new ClassInstanceSort(new Name("os4"), 
+    private Sort sort1=new SortImpl(new Name("S1"));
+    private Sort sort2=new SortImpl(new Name("S2"));
+    private Sort sort3=new SortImpl(new Name("S3"));
+    private Sort osort1=new SortImpl(new Name("os1"));
+    private Sort osort2=new SortImpl(new Name("os2"), osort1);
+    private Sort osort3=new SortImpl(new Name("os3"), osort1);
+    private Sort osort4=new SortImpl(new Name("os4"), 
 						  SetAsListOfSort.EMPTY_SET
 						  .add(osort2).add(osort3), false);
     
@@ -39,7 +38,7 @@ public class TestTermFactory extends TestCase {
         //p(:S1):BOOL
     LogicVariable x=new LogicVariable(new Name("x"),sort1);  //x:S1
     Function q=new Function(new Name("q"),Sort.FORMULA,
-			    new Sort[]{new PrimitiveSort(new Name("Whatever"))}); 
+			    new Sort[]{new SortImpl(new Name("Whatever"))}); 
         //q(:Whatever):BOOL
     LogicVariable z=new LogicVariable(new Name("z"),sort1); //z:S1
     Function r=new Function(new Name("r"),Sort.FORMULA,new Sort[]{sort1, sort2});

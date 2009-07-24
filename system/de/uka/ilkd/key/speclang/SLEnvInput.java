@@ -33,7 +33,6 @@ import de.uka.ilkd.key.java.visitor.JavaASTCollector;
 import de.uka.ilkd.key.logic.op.ListOfProgramMethod;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.proof.init.AbstractEnvInput;
-import de.uka.ilkd.key.proof.init.ModStrategy;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.speclang.LoopInvariant;
@@ -208,7 +207,7 @@ public class SLEnvInput extends AbstractEnvInput {
     //-------------------------------------------------------------------------
 
     @Override
-    public void read(ModStrategy mod) throws ProofInputException {
+    public void read() throws ProofInputException {
         if(initConfig == null) {
             throw new IllegalStateException("InitConfig not set.");
         }

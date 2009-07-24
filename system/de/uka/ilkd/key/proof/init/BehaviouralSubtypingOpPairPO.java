@@ -55,7 +55,7 @@ public class BehaviouralSubtypingOpPairPO extends AbstractPO {
     //methods of ProofOblInput interface
     //-------------------------------------------------------------------------      
   
-    public void readProblem(ModStrategy mod) throws ProofInputException {
+    public void readProblem() throws ProofInputException {
         poTerms = new Term[2];
         poNames = new String[2];
         

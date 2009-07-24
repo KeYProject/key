@@ -20,8 +20,9 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.AbstractMetaOperator;
-import de.uka.ilkd.key.logic.op.CastFunctionSymbol;
 import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.op.SortDependingFunction;
+import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.util.LRUCache;
 
 /**
@@ -254,7 +255,8 @@ public class Polynomial {
                     new BigInteger ( AbstractMetaOperator
                                      .convertToDecimalString ( polynomial, services ) );
                 constantPart = constantPart.add ( c );
-            } else if ( op instanceof CastFunctionSymbol
+            } else if ( op instanceof SortDependingFunction
+        	        && ((SortDependingFunction)op).getKind().equals(Sort.CAST_NAME)
                         && polynomial.sub ( 0 ).sort ().extendsTrans (
                                              tc.getIntegerLDT ().targetSort () )
                         &&

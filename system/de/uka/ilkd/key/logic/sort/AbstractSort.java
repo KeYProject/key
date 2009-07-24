@@ -10,39 +10,28 @@
 
 package de.uka.ilkd.key.logic.sort;
 
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.util.Debug;
 
-public abstract class AbstractSort implements Sort, SortDefiningSymbols {
-
-    public static final Name OBJECT_REPOSITORY_NAME = new Name("<get>");
-
-    /** name of the Sort */
+public abstract class AbstractSort implements Sort {
+    
     private final Name name;
-
-
-    /**
-     * cast symbol casting any sort to <em>this</em> one  
-     */
-    private CastFunctionSymbol castSymbol;
-            
-    
-    private MapFromNameToSortDependingSymbol definedSymbols = 
-        MapAsListFromNameToSortDependingSymbol.EMPTY_MAP;
-
-    private boolean symbolsCreated = false;
+    private final SetOfSort ext;    
+    private final boolean isAbstract;
 
     
-    public AbstractSort(Name name) {
+    public AbstractSort(Name name, SetOfSort ext, boolean isAbstract) {
         this.name = name;
+        this.ext = ext;
+        this.isAbstract = isAbstract;
     }
-
-    
+   
 
     @Override    
-    public abstract SetOfSort extendsSorts();
+    public final SetOfSort extendsSorts() {
+	return ext;
+    }
 
     
     /**
@@ -69,118 +58,58 @@ public abstract class AbstractSort implements Sort, SortDefiningSymbols {
     }
     
 
-
     @Override
     public final Name name() {
         return name;
     }
-
-    /**
-     * returns the cast symbol of this Sort
-     * 
-     * @return the cast function of this sort
-     * @throws IllegalStateException
-     *             if the symbols have not been created yet
-     */
-    public final CastFunctionSymbol getCastSymbol() {
-        if (castSymbol == null) {
-            throw new IllegalStateException(this+":"+
-                    "Symbols have to be created before "
-                            + "trying to access a sort depending function.");
-        }
-        return castSymbol;
+    
+    
+    @Override
+    public final boolean isAbstract() {
+	return isAbstract;
     }
     
-    /**
-     * This method returns a cast into this sort.
-     */
-    private SortDependingSymbol createCastSymbol() {
-        Debug.assertTrue(castSymbol == null);
-        castSymbol = new CastFunctionSymbol(Sort.ANY, this);
-        return castSymbol;
+
+    @Override
+    public final SortDependingFunction getCastSymbol(Services services) {
+        SortDependingFunction result
+            = SortDependingFunction.getFirstInstance(CAST_NAME, services)
+        			   .getInstanceFor(this, services);
+        assert result.getSortDependingOn() == this && result.sort() == this;
+        return result;
     }
     
     
-    /**
-     * Creates the functions depening on this sort and adds them to the functions
-     * namespace. If the functions have been already created nothing is done.   
-     */
-    private void createSymbols(Namespace p_func_ns, Namespace sort_ns) {
-        if (!symbolsCreated) {
-            final Sort booleanSort = (Sort)sort_ns.lookup(new Name("boolean"));
-            final Sort intSort     = (Sort)sort_ns.lookup(new Name("int"));
-            if ( booleanSort == null || intSort == null ) {              
-                return; //create symbols later
-            }
-            ListOfSortDependingSymbol l0 = 
-                SLListOfSortDependingSymbol.EMPTY_LIST;
-            l0 = l0.prepend(createCastSymbol()).prepend 
-            ( new InstanceofSymbol (this, booleanSort)).prepend
-            ( new ExactInstanceSymbol (this, booleanSort)).prepend
-            ( new InstanceofSymbol(new Name("contains"), this));
-            
-            
-            /**
-             * this is a hack. Solution: Create a class Signature which is repsobsible to
-             * build the required sort depending functions after all sorts have been read.
-             */
-            if (!(this instanceof NullSort) && 
-                    (this instanceof ArraySort || 
-                            this instanceof GenericSort ||             
-                    (this instanceof ClassInstanceSort &&  
-                	    !this.isAbstract()))) {
-                l0 = l0.prepend(createInstanceRepository(intSort));
-            } 
-            
-            addSymbols(l0);
-            symbolsCreated = true;
-        }
-    }
-
-    private SortDependingFunction createInstanceRepository(Sort integerSort) {
-        return new SortDependingFunction
-        (new Name(this.name.toString() + "::" + OBJECT_REPOSITORY_NAME.toString()), 
-                this, new Sort[]{integerSort}, OBJECT_REPOSITORY_NAME, this);
-    }
-
-    /**
-     * Lookup the symbol of kind "p_name", which is a sort independent
-     * identifier for this symbol
-     * 
-     * @return Symbol with (kind) name "p_name"
-     *         ("ret.getKind().equals(p_name)"), null if no such object exists
-     */
-    public final SortDependingSymbol lookupSymbol(Name p_name) {
-        return definedSymbols.get(p_name);
-    }
-
+    @Override    
+    public final SortDependingFunction getInstanceofSymbol(Services services) {
+	SortDependingFunction result
+	    = SortDependingFunction.getFirstInstance(INSTANCE_NAME, services)
+                                   .getInstanceFor(this, services);
+	assert result.getSortDependingOn() == this; 
+	return result;
+    }    
     
-    private void addSymbols(ListOfSortDependingSymbol p) {
-        final IteratorOfSortDependingSymbol it = p.iterator();        
-        while (it.hasNext()) {
-            final SortDependingSymbol s = it.next();
-            definedSymbols = definedSymbols.put(s.getKind(), s);
-        }
-    }
-
-    /** 
-     * Adds the sort depending functions to the given function namespace if
-     * possible. Functions are created if not already done 
-     */
-    public final void addDefinedSymbols(Namespace functions, Namespace sorts) {
-        if (!symbolsCreated) {
-            createSymbols(functions, sorts);            
-        } 
-        final IteratorOfSortDependingSymbol it = 
-            definedSymbols.valueIterator();        
-        while (it.hasNext()) {                  
-            final SortDependingSymbol sds = it.next();
-            //if (functions.lookup(sds.name()) == null) {
-                functions.add(sds);
-            //}
-        }
+    
+    @Override
+    public final SortDependingFunction getExactInstanceofSymbol(Services services) {
+	SortDependingFunction result
+            = SortDependingFunction.getFirstInstance(EXACT_INSTANCE_NAME, services)
+                                   .getInstanceFor(this, services);
+	assert result.getSortDependingOn() == this;
+	return result;
     }
     
+    
+    @Override
+    public final SortDependingFunction getObjectRepository(Services services) {
+	SortDependingFunction result
+	    = SortDependingFunction.getFirstInstance(OBJECT_REPOSITORY_NAME, services)
+                                   .getInstanceFor(this, services);
+	assert result.getSortDependingOn() == this && result.sort() == this;
+	return result;
+    }         
+    
+
     
     @Override
     public final String toString() {

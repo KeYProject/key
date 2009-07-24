@@ -40,16 +40,16 @@ class TwoSidedMatching {
     private final Substitution triggerSubstWithMVs;
     private final Term targetWithMVs;
     
-    TwoSidedMatching(UniTrigger trigger, Term targetTerm) {
+    TwoSidedMatching(UniTrigger trigger, Term targetTerm, Services services) {
         this.trigger = trigger;
         this.targetSubstWithMVs =
             ReplacerOfQuanVariablesWithMetavariables.createSubstitutionForVars ( targetTerm );
         this.triggerSubstWithMVs =
             trigger.getTriggerSetThisBelongsTo().getReplacementWithMVs ();
         this.targetWithMVs =
-            targetSubstWithMVs.apply ( TriggerUtils.discardQuantifiers ( targetTerm ) );
+            targetSubstWithMVs.apply ( TriggerUtils.discardQuantifiers ( targetTerm ), services );
         this.triggerWithMVs =
-            triggerSubstWithMVs.apply ( trigger.getTriggerTerm () );
+            triggerSubstWithMVs.apply ( trigger.getTriggerTerm (), services );
     }
     
     SetOfSubstitution getSubstitutions(Services services) {
