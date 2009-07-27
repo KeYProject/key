@@ -690,7 +690,7 @@ public class ProblemLoader implements Runnable {
     public static Term parseTerm(String value, Proof proof,
             Namespace varNS, Namespace progVar_ns) {
         try {
-            return TermParserFactory.createInstance().
+            return new DefaultTermParser().
                 parse(new StringReader(value), null,
                       proof.getServices(),
                       varNS,
@@ -706,7 +706,7 @@ public class ProblemLoader implements Runnable {
     public static Term parseTerm(String value, Services services,
             Namespace varNS, Namespace progVar_ns) {
         try { 
-            return TermParserFactory.createInstance().
+            return new DefaultTermParser().
                 parse(new StringReader(value), null,
                       services,
                       varNS,

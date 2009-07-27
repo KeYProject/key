@@ -5,12 +5,6 @@
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
-// Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General Public License.
-// See LICENSE.TXT for details.
 //
 //
 
@@ -25,7 +19,6 @@ import org.apache.log4j.Logger;
 import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.*;
@@ -58,7 +51,7 @@ import de.uka.ilkd.key.util.pp.UnbalancedBlocksException;
  *
  *
  */
-public class LogicPrinter {
+public final class LogicPrinter {
 
     /**
      * The default and minimal value o fthe
@@ -67,51 +60,42 @@ public class LogicPrinter {
     public static final int DEFAULT_LINE_WIDTH = 55;
 
     /** The max. number of characters to put in one line */
-    protected int lineWidth = DEFAULT_LINE_WIDTH;
+    private int lineWidth = DEFAULT_LINE_WIDTH;
 
     /**
      * The ProgramPrinter used to pretty-print Java blocks in
      * formulae.
      */
-    protected ProgramPrinter prgPrinter;
+    private ProgramPrinter prgPrinter;
 
     /** Contains information on the concrete syntax of operators. */
     private final NotationInfo notationInfo;
 
     /** the services object */
-    protected final Services services;
-
-    /** The sequent we are pretty-printing */
-    //private Sequent            seq;
-    //private SequentPrintFilter filter;
+    private final Services services;
 
     /** This chooses the layout. */
-    protected Layouter layouter;
+    private Layouter layouter;
 
     /** The backend <code>layouter</code> will write to. */
-    protected Backend backend;
-
-    /** The constraint used for metavariable instantiations of the
-     * current formula */
-    Constraint formulaConstraint = null;
+    private Backend backend;
 
     /**If pure is true the PositionTable will not be calculated */
     private boolean pure = false;
 
-    protected SVInstantiations instantiations = 
-        SVInstantiations.EMPTY_SVINSTANTIATIONS;
+    private SVInstantiations instantiations
+    	= SVInstantiations.EMPTY_SVINSTANTIATIONS;
 
-    protected static Logger logger = Logger.getLogger(LogicPrinter.class.getName());
+    private static Logger logger = Logger.getLogger(LogicPrinter.class.getName());
 
 
     public static String quickPrintLocationDescriptors(
                                         SetOfLocationDescriptor locations,
                                         Services services) {
         
-        final NotationInfo ni = NotationInfo.createInstance();
+        final NotationInfo ni = new NotationInfo();
         if (services != null) {
-            PresentationFeatures.modifyNotationInfo(ni,
-                    services.getNamespaces().functions());
+            ni.refresh(services);
         }
         LogicPrinter p = new LogicPrinter(null, 
         				  ni, 
@@ -126,10 +110,9 @@ public class LogicPrinter {
     
     
     public static String quickPrintTerm(Term t, Services services) {
-        final NotationInfo ni = NotationInfo.createInstance();
+        final NotationInfo ni = new NotationInfo();
         if (services != null) {
-            PresentationFeatures.modifyNotationInfo(ni,
-                    services.getNamespaces().functions());
+            ni.refresh(services);
         }
         LogicPrinter p = new LogicPrinter(null, 
                                           ni, 
@@ -156,28 +139,6 @@ public class LogicPrinter {
                         NotationInfo notationInfo,
                         Services services) {
 	backend           = new PosTableStringBackend(lineWidth);
-	layouter          = new Layouter(backend,2);
-	this.prgPrinter   = prgPrinter;
-	this.notationInfo = notationInfo;
-	this.services     = services;
-    }
-
-    /**
-     * Creates a LogicPrinter.  Sets the sequent to be printed, as
-     * well as a ProgramPrinter to print Java programs and a
-     * NotationInfo which determines the concrete syntax.
-     *
-     * @param prgPrinter   the ProgramPrinter that pretty-prints Java programs
-     * @param notationInfo the NotationInfo for the concrete syntax
-     * @param backend      the Backend for the output
-     * @param services     the Services object
-     */
-
-    public LogicPrinter(ProgramPrinter prgPrinter,
-                        NotationInfo notationInfo,
-                        Backend backend,
-                        Services services) {
-	this.backend      = backend;
 	layouter          = new Layouter(backend,2);
 	this.prgPrinter   = prgPrinter;
 	this.notationInfo = notationInfo;
@@ -273,8 +234,9 @@ public class LogicPrinter {
      *   (the actual taken linewidth is the max of
      *   {@link LogicPrinter#DEFAULT_LINE_WIDTH} and the given value
      */
-    public void update(Sequent seq, SequentPrintFilter filter,
-            int lineWidth) {
+    public void update(Sequent seq, 
+	    	       SequentPrintFilter filter,
+	    	       int lineWidth) {
         setLineWidth(lineWidth);
         reset();
         printSequent(seq, filter);
@@ -774,14 +736,12 @@ public class LogicPrinter {
         while ( size-- != 0 ) {
             entry = it.next ();
             markStartSub();
-            formulaConstraint = entry.getDisplayConstraint ();
             printConstrainedFormula( entry.getFilteredFormula () );
             markEndSub();
             if ( size != 0 ) {
                 layouter.print(",").brk(1);
             }
         }
-        formulaConstraint = null;
     }
 
     /**
@@ -792,16 +752,8 @@ public class LogicPrinter {
      */
     public void printConstrainedFormula(ConstrainedFormula cfma)
         throws IOException {
-                if ( cfma.constraint().isBottom() ) {
-                    printTerm(cfma.formula());
-                } else {
-                    layouter.beginC(0);
-                    layouter.ind();
-                    printTerm(cfma.formula());
-                    layouter.brk(1,3).print("<<").ind(1,6);
-                    printConstraint(cfma.constraint());
-                    layouter.end();
-                }
+	assert cfma.constraint().isBottom() : "metavariables are disabled";
+	printTerm(cfma.formula());
     }
 
     /**
@@ -870,76 +822,12 @@ public class LogicPrinter {
 
 
     /**
-     * Pretty-print a constraint
-     *
-     * This does currently only work well for "EqualityConstraint"s,
-     * which are printed as a list of unifications. The bottom
-     * constraint doesn't get special handling in here, i.e. this
-     * method should not be called for p == Constraint.BOTTOM
-     */
-    public void printConstraint(Constraint p)
-        throws IOException
-    {
-        createPositionTable = false;
-        if ( p instanceof EqualityConstraint ) {
-
-            // Within the constraint metavariables should not be
-            // instantiated
-            Constraint frmC   = formulaConstraint;
-            formulaConstraint = null;
-
-            EqualityConstraint eqc = (EqualityConstraint)p;
-            List<Metavariable> vars = new ArrayList<Metavariable> ();
-            {
-                Iterator<Metavariable>it =
-                    eqc.restrictedMetavariables ();
-
-                while ( it.hasNext () )
-                    vars.add ( it.next () );
-            }
-
-            startTerm ( vars.size () );
-            layouter.print("[ ").beginI(0);
-
-            ListIterator<Metavariable> it = vars.listIterator ();
-            Metavariable mv;
-            Term         inst;
-            while ( it.hasNext () ) {
-                mv   = it.next ();
-                inst = eqc.getDirectInstantiation ( mv );
-                if ( inst == null )
-                    inst = TermFactory.DEFAULT.createFunctionTerm ( mv );
-
-                markStartSub();
-                printInfixTerm ( TermFactory.DEFAULT.createFunctionTerm ( mv ), 15,
-                                 "=",
-                                 inst, 10);
-                markEndSub();
-
-                if ( it.hasNext () ) {
-                    layouter.print(",").brk(1,0);
-                }
-            }
-            layouter.print(" ]").end();
-
-            formulaConstraint = frmC;
-
-        } else {
-            // Don't know how to pretty-print this constraint class
-            layouter.print ( p.toString () );
-        }
-        createPositionTable = true;
-    }
-
-
-    /**
      * Pretty-prints a term or formula.  How it is rendered depends on
      * the NotationInfo given to the constructor.
      *
      * @param t the Term to be printed
      */
-    public void printTerm(Term t)
-        throws IOException {
+    public void printTerm(Term t) throws IOException {
         if(notationInfo.getAbbrevMap().isEnabled(t)){
             startTerm(0);
             layouter.print(notationInfo.getAbbrevMap().getAbbrev(t));
@@ -952,8 +840,7 @@ public class LogicPrinter {
      * Pretty-prints a set of terms.
      * @param terms the terms to be printed
      */
-    public void printTerm(SetOfTerm terms)
-        throws IOException {
+    public void printTerm(SetOfTerm terms) throws IOException {
         getLayouter().print("{");
         IteratorOfTerm it = terms.iterator();
         while (it.hasNext()) {
@@ -988,9 +875,7 @@ public class LogicPrinter {
      *
      *
      * @param t the Term to be printed */
-    public void printTermContinuingBlock(Term t)
-        throws IOException
-    {
+    public void printTermContinuingBlock(Term t) throws IOException {
         notationInfo.getNotation(t.op(), services).printContinuingBlock(t,this);
     }
 
@@ -1003,15 +888,59 @@ public class LogicPrinter {
      *
      * @param name the name to be printed before the parentheses.
      * @param t the term to be printed.  */
-    public void printFunctionTerm(String name,
-                                  Term t)
-        throws IOException
-    {
-        //XXX
+    public void printFunctionTerm(String name, Term t) throws IOException {
+	//XXX
+	if(NotationInfo.PRETTY_SYNTAX
+                  && services != null
+                  && t.sort() == services.getTypeConverter().getHeapLDT().getFieldSort() 
+                  && t.arity() == 0) {
+            startTerm(0);
+            
+            final String fieldOpName = t.op().name().toString();
+            final String shortFieldName
+                    =  fieldOpName.contains("::")
+                       ? fieldOpName.substring(fieldOpName.indexOf("::") + 2)
+                       : fieldOpName;            
+            layouter.print(shortFieldName);
+        }
+        
+        else {
+            startTerm(t.arity());
+            layouter.print(name);
+            if(t.arity()>0 || t.op() instanceof ProgramMethod) {
+                layouter.print("(").beginC(0);
+                for (int i=0;i<t.arity();i++) {
+                    markStartSub();
+                    printTerm(t.sub(i));
+                    markEndSub();
+
+                    if (i<t.arity()-1) {
+                        layouter.print(",").brk(1,0);
+                    }
+                }
+                layouter.print(")").end();
+            }
+        }
+    }
+
+    public void printCast(String pre, 
+	    		  String post,
+	    		  Term t, 
+	    		  int ass) throws IOException {
+        final SortDependingFunction cast = (SortDependingFunction)t.op();
+        
+        startTerm(t.arity());
+        layouter.print(pre);
+        layouter.print(cast.getSortDependingOn().toString());
+        layouter.print(post);
+        maybeParens(t.sub(0), ass);
+    }
+    
+    
+    public void printSelect(Term t) throws IOException {
 	HeapLDT heapLDT = services == null ? null : services.getTypeConverter().getHeapLDT();
-        if(PresentationFeatures.ENABLED
+        if(NotationInfo.PRETTY_SYNTAX
             && heapLDT != null
-            && t.op() == heapLDT.getSelect(Sort.ANY, services)
             && t.sub(0).op() == heapLDT.getHeap()) {
             assert t.arity() == 3;
             startTerm(3);
@@ -1072,51 +1001,10 @@ public class LogicPrinter {
                 layouter.print("]");
             } else {
                  assert false;
-            }
-        } else if(PresentationFeatures.ENABLED
-                  && services != null
-                  && t.sort() == heapLDT.getFieldSort() 
-                  && t.arity() == 0) {
-            startTerm(0);
-            
-            final String fieldOpName = t.op().name().toString();
-            final String shortFieldName
-                    =  fieldOpName.contains("::")
-                       ? fieldOpName.substring(fieldOpName.indexOf("::") + 2)
-                       : fieldOpName;            
-            layouter.print(shortFieldName);
+            }	
+        } else {
+            printFunctionTerm(t.op().name().toString(), t);
         }
-        
-        else {
-            startTerm(t.arity());
-            layouter.print(name);
-            if(t.arity()>0 || t.op() instanceof ProgramMethod) {
-                layouter.print("(").beginC(0);
-                for (int i=0;i<t.arity();i++) {
-                    markStartSub();
-                    printTerm(t.sub(i));
-                    markEndSub();
-
-                    if (i<t.arity()-1) {
-                        layouter.print(",").brk(1,0);
-                    }
-                }
-                layouter.print(")").end();
-            }
-        }
-    }
-
-    public void printCast(String pre, 
-	    		  String post,
-	    		  Term t, 
-	    		  int ass) throws IOException {
-        final SortDependingFunction cast = (SortDependingFunction)t.op();
-        
-        startTerm(t.arity());
-        layouter.print(pre);
-        layouter.print(cast.getSortDependingOn().toString());
-        layouter.print(post);
-        maybeParens(t.sub(0), ass);
     }
 
 
@@ -1192,23 +1080,6 @@ public class LogicPrinter {
         maybeParens(t, ass);
         layouter.print(name);
     }
-
-    /**
-     * Pretty-prints a shadowed attribute
-     * @param t1 the attribute prefix
-     * @param ass1  the associativity for the reference prefix
-     * @param name the attribute name
-     * @param t2 the shadow number term
-     */
-    public void printShadowedAttribute(Term t1, int ass1, String name,
-                                       Term t2)
-        throws java.io.IOException {
-        startTerm(2);
-        maybeParens(t1, ass1);
-        layouter.print(name);
-        printTransactionNumber(t2);
-    }
-
 
 
     /** Print a binary term in infix style.  For instance <code>p
@@ -1345,31 +1216,6 @@ public class LogicPrinter {
 	maybeParens(t.sub(0), ass2);
     }
 
-    /**
-     * @param sub
-     * @throws IOException
-     */
-    private void printTransactionNumber(final Term sub) throws IOException {
-        final int primes =  asPrimes ( sub );
-        if ( primes == -1 ) {
-            layouter.print ( "^(" );
-            markStartSub ();
-            printTerm ( sub );
-            markEndSub ();
-            layouter.print ( ")" );
-        } else {
-            final StringBuffer s_primes = new StringBuffer();
-            for (int p = 0; p<primes; p++) {
-                s_primes.append("\'");
-            }
-            markStartSub ();
-            markEndSub ();
-            layouter.print(s_primes.toString());
-
-        }
-    }
-
-
     protected void printVariables (ArrayOfQuantifiableVariable vars)
                                             throws IOException {
         int size = vars.size ();
@@ -1398,31 +1244,6 @@ public class LogicPrinter {
           layouter.print ( "; " );
     }
 
-
-    private int asPrimes(Term shadowNum) {
-        int result = 0;
-        Term t = shadowNum;        
-        if (services == null || t.op() != services.getTypeConverter()
-        					  .getIntegerLDT()
-        					  .getNumberSymbol()) {
-            return -1;
-        }
-
-
-        final String numberString =
-            Notation.NumLiteral.printNumberTerm(t);
-        if (numberString == null) {
-            result = -1;
-        } else {
-            try {
-                result = Integer.parseInt(numberString);
-            } catch (NumberFormatException nfe) {
-                result = -1;
-            }
-        }
-        return result>0 ? result : -1;
-
-    }
     
     /**
      * setup the separators to be printed between the sub-terms of an update
@@ -1614,29 +1435,6 @@ public class LogicPrinter {
 
         startTerm(0);
         layouter.print(s);
-    }
-
-
-    /** 
-     * Prints a metavariable. If the  {@link #formulaConstraint} 
-     * contains an instantiation for the metavariable the instantiation
-     * is printed rather than the metavariable itself.
-     * 
-     * @param p_mv the Metavariable to be printed
-     *  
-     */
-    public void printMetavariable ( Metavariable p_mv )
-    throws IOException
-        {
-        if ( formulaConstraint != null ) {
-                Term t = formulaConstraint.getInstantiation ( p_mv );
-                if ( t.op () != p_mv ) {
-                        printTerm ( t );
-                        return;
-                }
-        }
-
-        printConstant ( p_mv.name().toString() );
     }
 
 
@@ -1906,9 +1704,6 @@ public class LogicPrinter {
     private static final Object MARK_START_SUB = new Object();
     /** Mark the end of a subterm.  Needed for PositionTable construction.*/
     private static final Object MARK_END_SUB = new Object();
-    /** Mark the start of a term with a number of subterms.
-     * Needed for PositionTable construction.*/
-    private static final Object MARK_START_TERM = new Object();
     /** Mark the start of the first executable statement.
      * Needed for PositionTable construction.*/
     private static final Object MARK_START_FIRST_STMT = new Object();
@@ -1983,17 +1778,7 @@ public class LogicPrinter {
     public boolean printInShortForm(String attributeProgramName,
                                     Term t) {
         final Sort prefixSort;
-        if (t.op() instanceof Metavariable) {
-            Metavariable mv = (Metavariable)t.op();
-            if ( formulaConstraint != null ) {
-                    prefixSort =
-                        formulaConstraint.getInstantiation (mv).sort();
-            } else {
-                prefixSort = t.sort();
-            }
-        } else {
-            prefixSort = t.sort();
-        }
+        prefixSort = t.sort();
         return printInShortForm(attributeProgramName, prefixSort);
     }
 
@@ -2122,11 +1907,11 @@ public class LogicPrinter {
     private static class PosTableStringBackend extends StringBackend {
 
         /** The top PositionTable */
-        private InitialPositionTable initPosTbl =
-            new InitialPositionTable();
+        private final InitialPositionTable initPosTbl 
+        	= new InitialPositionTable();
 
         /** The resulting position table or an intermediate result */
-        private PositionTable posTbl= initPosTbl;
+        private  PositionTable posTbl = initPosTbl;
 
         /** The position in result where the current subterm starts */
         private int pos = 0;
@@ -2157,18 +1942,6 @@ public class LogicPrinter {
          */
         public InitialPositionTable getPositionTable() {
             return initPosTbl;
-        }
-
-
-        private void setupModalityPositionTable(StatementBlock block) {
-            int count = block.getStatementCount();
-            int position=0;
-            for (int i=0; i<count; i++){
-                posTbl.setStart(position);
-                position += block.getStatementAt(i).
-                    toString().length();
-                posTbl.setEnd(position-1, null);
-            }
         }
 
         /** Receive a mark and act appropriately.

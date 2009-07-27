@@ -49,7 +49,7 @@ public class RuleJustificationByAddRules implements RuleJustification{
 	if(motherTaclet().rule() instanceof Taclet) {
             LogicPrinter tacPrinter = new LogicPrinter 
                 (new ProgramPrinter(null),                       
-                 NotationInfo.createInstance(),   
+                 new NotationInfo(),   
                  node.proof().getServices(),
                  true);      
             tacPrinter.printTaclet((Taclet)(motherTaclet().rule()));

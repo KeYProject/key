@@ -22,21 +22,20 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
  * and that the instantiation of the sv is the predicate 
  * <tt>inReachableState</tt> maybe preceeded by one Update
  */
-public class InReachableStateCondition extends VariableConditionAdapter {
+public final class InReachableStateCondition extends VariableConditionAdapter {
 
-    final private SchemaVariable inReachableState;
+    private final SchemaVariable inReachableState;
     
     public InReachableStateCondition(SchemaVariable sv) {
         inReachableState = sv;
     }
     
     
-    /**
-     * true if the predicate <tt>inReachableState</tt> is preceeded by one or 
-     * no updates
-     */
-    public boolean check(SchemaVariable var, SVSubstitute subst,
-            SVInstantiations svInst, Services services) {
+    @Override
+    public boolean check(SchemaVariable var, 
+	    		 SVSubstitute subst,
+	    		 SVInstantiations svInst, 
+	    		 Services services) {
 
         if (var != inReachableState) return true;
         
@@ -55,6 +54,8 @@ public class InReachableStateCondition extends VariableConditionAdapter {
           svInst.getUpdateContext().isEmpty();
     }
 
+    
+    @Override
     public String toString() {
         return "\\isInReachableState(" + inReachableState + ")";
     }

@@ -119,6 +119,5 @@ public class PosInSequent {
 	if (isSequent()) return "Whole Sequent";
 	return ""+posInOcc;
     }
-	
 }
 

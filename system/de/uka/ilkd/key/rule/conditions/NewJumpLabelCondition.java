@@ -25,7 +25,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
  * same name exists in the context program or one of the schemavariable
  * instantiations.
  */
-public class NewJumpLabelCondition implements VariableCondition {
+public final class NewJumpLabelCondition implements VariableCondition {
 
     private final ProgramSV labelSV;
     
@@ -40,6 +40,7 @@ public class NewJumpLabelCondition implements VariableCondition {
         labelSV = (ProgramSV) sv;
     }
     
+    @Override
     public MatchConditions check(SchemaVariable var,
             SVSubstitute instCandidate, MatchConditions matchCond,
             Services services) {
@@ -91,6 +92,8 @@ public class NewJumpLabelCondition implements VariableCondition {
         return true;       
     }
 
+    
+    @Override    
     public String toString() {
         return "\\newLabel (" +labelSV+ ")";
     }

@@ -34,7 +34,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
  * a static method. For determining the method the callee and the
  * arguments of the method are needed as arguments.
  */
-public class StaticMethodCondition extends VariableConditionAdapter {
+public final class StaticMethodCondition extends VariableConditionAdapter {
 
     private final boolean negation;
     private final SchemaVariable caller;
@@ -57,6 +57,7 @@ public class StaticMethodCondition extends VariableConditionAdapter {
 	this.args = args;
     }
 
+    
     private static ArrayOfExpression toArrayOfExpression
 	(ArrayOfProgramElement a) {
 	Expression[] result = new Expression[a.size()];
@@ -66,15 +67,8 @@ public class StaticMethodCondition extends VariableConditionAdapter {
 	return new ArrayOfExpression(result);
     }
 
-    /**
-     * tests if the instantiation suggestions goes along with the static
-     * condition
-     * @param var the template Variable to be instantiated
-     * @param subst the SVSubstitute to be mapped to var
-     * @param svInst the SVInstantiations that are already known to be
-     * needed
-     * @return true iff condition is fulfilled
-     */
+    
+    @Override
     public boolean check(SchemaVariable var, 
 			 SVSubstitute subst, 
 			 SVInstantiations svInst,
@@ -121,8 +115,10 @@ public class StaticMethodCondition extends VariableConditionAdapter {
 	return true;
     }
 
+    
+    @Override    
     public String toString () {
-	return (negation ? "\\not " : "") + "\\staticMethodReference(" + caller + ", " + methname + ", " + args + ")";
+	return (negation ? "\\not " : "") + "\\staticMethodReference(" + caller 
+	       + ", " + methname + ", " + args + ")";
     }
-
 }

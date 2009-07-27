@@ -43,7 +43,7 @@ public final class UpdateApplication extends AbstractOperator {
     
     @Override
     public boolean isRigid() {
-	return true;
+	return false;
     }
     
     

@@ -116,7 +116,7 @@ public class DependsClauseDialog extends JDialog {
         //print default clause to text area
         LogicPrinter printer 
             = new LogicPrinter(null, 
-        	    	       NotationInfo.createInstance(), 
+        	    	       new NotationInfo(), 
         	    	       initConfig.getServices());
         printer.setLineWidth(LINE_WIDTH);
         try {

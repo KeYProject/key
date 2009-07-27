@@ -75,7 +75,7 @@ public class KeYMediator {
     */
     public KeYMediator(IMain mainFrame) {
 	this.mainFrame = mainFrame;
-	notationInfo = NotationInfo.createInstance();
+	notationInfo        = new NotationInfo();
 	proofListener       = new KeYMediatorProofListener();
 	proofTreeListener   = new KeYMediatorProofTreeListener();
 	keySelectionModel   = new KeYSelectionModel();

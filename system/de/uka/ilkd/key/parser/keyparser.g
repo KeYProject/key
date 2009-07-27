@@ -153,8 +153,6 @@ options {
     private ParserConfig parserConfig;
 
     private Term quantifiedArrayGuard = null;
-    private boolean parsingContracts = false;
-    private boolean parsingFind      = false;
     
     private TokenStreamSelector selector;
 
@@ -1170,13 +1168,6 @@ options {
     return result;
     }
 
-    private boolean emptyBraces(int lookahead) {
-        try {        
-            return LA(lookahead) == LBRACE && LA(lookahead+1) == RBRACE;
-        } catch (antlr.TokenStreamException tse) {
-            return false;
-        }
-    }
 
     private TacletBuilder createTacletBuilderFor
         (Object find, int stateRestriction) 
@@ -2255,8 +2246,48 @@ formula returns [Term a = null]
 
 term returns [Term a = null] 
     :
-        a=term20 
+        a=term10 
     ;
+
+
+term10 returns [Term result = null]
+{
+    Term a = null;
+}
+    :
+        result=term10_2
+        (
+           PARALLEL a=term10_2
+           {
+               result = TB.parallel(result, a);
+           }
+            
+        )*
+    ; exception
+        catch [TermCreationException ex] {
+              keh.reportException
+		(new KeYSemanticException
+			(ex.getMessage(), getFilename(), getLine(), getColumn()));
+        }
+        
+        
+term10_2 returns[Term result=null]
+{
+    Term a = null;
+}  :
+        result=term20 
+        (
+            ASSIGN a=term20
+            {
+                result = TB.elementary(getServices(), result, a);
+            }
+        )?
+   ; exception
+        catch [TermCreationException ex] {
+              keh.reportException
+		(new KeYSemanticException
+			(ex.getMessage(), getFilename(), getLine(), getColumn()));
+        }
 
     
 location_list returns [SetOfLocationDescriptor set = SetAsListOfLocationDescriptor.EMPTY_SET;]
@@ -2357,6 +2388,7 @@ term50 returns [Term a = null]
     :   a=term60 
         (AND a1=term60
             { a = tf.createJunctorTerm(Junctor.AND, new Term[]{a, a1});} )*
+            
 ; exception
         catch [TermCreationException ex] {
               keh.reportException
@@ -2539,7 +2571,7 @@ term100 returns [Term a = null]
 term110 returns [Term result = null]
     :
         (
-            result = accessterm |
+            result = accessterm  |
             result = update_or_substitution
         ) 
         {
@@ -2858,8 +2890,8 @@ term130 returns [Term a = null]
         {isMetaOperator()}? a = specialTerm
     |   a = funcpredvarterm
     |   LPAREN a = term RPAREN 
-    |   "true"  { a = tf.createJunctorTerm(Junctor.TRUE); }
-    |   "false" { a = tf.createJunctorTerm(Junctor.FALSE); }
+    |   TRUE  { a = TB.tt(); }
+    |   FALSE { a = TB.ff(); }
     |   a = ifThenElseTerm
     |   a = ifExThenElseTerm
     |   a = sum_or_product_term
@@ -3054,13 +3086,8 @@ quantifierterm returns [Term a = null]
 //term120_2
 update_or_substitution returns [Term result = null]
 :
-      (LBRACE SUBST) => 
-	 result = substitutionterm
-      |  (
-           {isGlobalDeclTermParser()}? result = simple_updateterm
-	 |
-           result = updateterm
-       )
+      (LBRACE SUBST) => result = substitutionterm
+      |  result = updateterm
     ; 
 
 substitutionterm returns [Term result = null] 
@@ -3098,24 +3125,13 @@ substitutionterm returns [Term result = null]
 			(ex.getMessage(), getFilename(), getLine(), getColumn()));
         }
 
-simple_updateterm returns [Term a = null]
-{
-  ParsableVariable v;
-  Term a1, a2;
-}
-:
-  LBRACE v = varId ASSIGN a1=term RBRACE ( a2 = term110 | a2 = unary_formula )
-  { 
-	a = TB.apply(TB.elementary((LocationVariable) v, a1), a2);
-  }
-;
 
 updateterm returns [Term result = null] 
 {
     Term u = null; 
     Term a2 = null;
 } :
-        LBRACE u=update RBRACE 
+        LBRACE u=term RBRACE 
         ( 
             a2=term110 
             | 
@@ -3129,90 +3145,7 @@ updateterm returns [Term result = null]
               keh.reportException
 		(new KeYSemanticException
 			(ex.getMessage(), getFilename(), getLine(), getColumn()));
-        }
-        
-update returns[Term result=null]
-{ 
-   Term u = null;
-}  :
-       result=non_parallel_update
-       (
-           PARALLEL u=non_parallel_update
-           {
-               result = TB.parallel(result, u);
-           }
-       )*
-   ;
-   
-non_parallel_update returns[Term result=null]
-   :
-       | (elementary_update) => result=elementary_update
-       | result=skip_or_schema_update          
-       | result=updated_update
-       | LPAREN result=update RPAREN
-   ;   
-        
-elementary_update returns[Term result=null]
-{
-    Term a0 = null;
-    Term a1 = null;
-    String id = null;
-}  :
-        a0=lhsSingle ASSIGN a1=rhsSingle 
-        {
-            result = TB.elementary(getServices(), a0, a1);
-        }
-   ; exception
-        catch [TermCreationException ex] {
-              keh.reportException
-		(new KeYSemanticException
-			(ex.getMessage(), getFilename(), getLine(), getColumn()));
-        }
-
-       
-skip_or_schema_update returns[Term result=null]
-{
-    String id = null;
-}  :
-         id=simple_ident
-         {
-              if(id.equals("skip")) {
-                  result = TB.skip();
-              } else if(inSchemaMode()) {
-                  Operator op = (Operator) variables().lookup(new Name(id));
-                  if(! (op instanceof UpdateSV)) {
-                       semanticError(id + " is not allowed in an update.");
-                  }
-              	  result = TB.func(op);                  
-              } else {
-                  semanticError("Illegal update: " + id);
-              }
-         }
-   ; exception
-        catch [TermCreationException ex] {
-              keh.reportException
-		(new KeYSemanticException
-			(ex.getMessage(), getFilename(), getLine(), getColumn()));
-        }
-        
-updated_update returns[Term result = null] 
-{
-    Term u1 = null; 
-    Term u2 = null;
-} :
-        LBRACE u1=update RBRACE 
-        ( 
-            u2=non_parallel_update
-        )
-        {   
-	    result = TB.apply(u1, u2);
-        }
-   ; exception
-        catch [TermCreationException ex] {
-              keh.reportException
-		(new KeYSemanticException
-			(ex.getMessage(), getFilename(), getLine(), getColumn()));
-        }          
+        }           
         
 bound_variables returns[ListOfQuantifiableVariable list = SLListOfQuantifiableVariable.EMPTY_LIST]
 {
@@ -3271,24 +3204,6 @@ one_logic_bound_variable_nosort returns[QuantifiableVariable v=null]
     v = (LogicVariable)variables().lookup(new Name(id));
   }
 ;
-
-rhsSingle returns[Term result = null]
-{} :
-        result = logicTermReEntry
-    ;
-
-lhsSingle returns[Term result = null]
- :
-        result = logicTermReEntry
-        { 
-            if (!(result.op() instanceof de.uka.ilkd.key.logic.op.UpdateableOperator
-                  || getServices().getTypeConverter().getHeapLDT().getSortOfSelect(result.op()) != null))  {
-                semanticError("Only updateable operators and select-terms can be updated, but " + 
-                	result.op() + " is a " + 
-                	result.op().getClass().getName());
-            }
-        }
-    ;
 
 modality_dl_term returns [Term a = null]
 {
@@ -3405,6 +3320,8 @@ funcpredvarterm returns [Term a = null]
         {  
             if(varfuncid.equals("inReachableState") && argsWithBoundVars == null) {
 	        a = TB.inReachableState(getServices());
+	    } else if(varfuncid.equals("skip") && argsWithBoundVars == null) {
+	        a = TB.skip();
 	    } else {
 	            Operator op = lookupVarfuncId(varfuncid, argsWithBoundVars);     
 	                   
@@ -3497,7 +3414,7 @@ taclet[SetOfChoice choices] returns [Taclet r]
         } 
 	( SCHEMAVAR one_schema_var_decl ) *
         ( ASSUMES LPAREN ifSeq=seq RPAREN ) ?
-        ( FIND {parsingFind = true; } LPAREN find = termorseq RPAREN {parsingFind = false;}
+        ( FIND LPAREN find = termorseq RPAREN 
             ( SAMEUPDATELEVEL { stateRestriction = RewriteTaclet.SAME_UPDATE_LEVEL; } |
               INSEQUENTSTATE { stateRestriction = RewriteTaclet.IN_SEQUENT_STATE; } 
             ) ? ) ?
@@ -3557,6 +3474,7 @@ exception
 	 betterEx.setStackTrace(ex.getStackTrace());	
 	 keh.reportException(betterEx);			
      }
+     
 termorseq returns [Object o]
 {
     Term head = null;
@@ -3611,28 +3529,64 @@ varexp[TacletBuilder b]
   boolean negated = false;
 }
 :
-  (   varcond_new[b]  | varcond_newlabel[b]
-    | varcond_free[b] | varcond_literal[b]
-    | varcond_hassort[b] | varcond_query[b]
-    | varcond_non_implicit[b] | varcond_non_implicit_query[b]
-    | varcond_enum_const[b]
-    | varcond_inReachableState[b] 
-    | varcond_isUnique[b]    
+  ( varcond_applyUpdateOnRigid[b]
+    | varcond_dropEffectlessElementaries[b]  
+    | varcond_enum_const[b] 
+    | varcond_free[b]  
+    | varcond_hassort[b]
+    | varcond_inReachableState[b]
+    | varcond_isUnique[b]
+    | varcond_new[b]
+    | varcond_newlabel[b]
+    | varcond_query[b] 
   ) 
   | 
   ( (NOT {negated = true;} )? 
-      ( varcond_reference[b, negated] 
-      | varcond_enumtype[b, negated]
-      | varcond_staticmethod[b,negated]  
-      | varcond_referencearray[b, negated]
-      | varcond_array[b, negated]
-      | varcond_abstractOrInterface[b, negated]
-      | varcond_static[b,negated] 
-      | varcond_typecheck[b, negated]
-      | varcond_localvariable[b, negated]
-      | varcond_freeLabelIn[b,negated] )
+      (   varcond_abstractOrInterface[b, negated]
+	| varcond_array[b, negated]
+        | varcond_enumtype[b, negated]
+        | varcond_freeLabelIn[b,negated]         
+        | varcond_localvariable[b, negated]        
+        | varcond_reference[b, negated]        
+        | varcond_referencearray[b, negated]
+        | varcond_static[b,negated]
+        | varcond_staticmethod[b,negated]  
+        | varcond_typecheck[b, negated]
+      )
   )
 ;
+
+
+varcond_applyUpdateOnRigid [TacletBuilder b]
+{
+  ParsableVariable u = null;
+  ParsableVariable x = null;
+  ParsableVariable x2 = null;
+}
+:
+   APPLY_UPDATE_ON_RIGID LPAREN u=varId COMMA x=varId COMMA x2=varId RPAREN 
+   {
+      b.addVariableCondition(new ApplyUpdateOnRigidCondition((UpdateSV)u, 
+                                                             (SchemaVariable)x, 
+                                                             (SchemaVariable)x2));
+   }
+;
+
+varcond_dropEffectlessElementaries[TacletBuilder b]
+{
+  ParsableVariable u = null;
+  ParsableVariable x = null;
+  ParsableVariable u2 = null;
+}
+:
+   DROP_EFFECTLESS_ELEMENTARIES LPAREN u=varId COMMA x=varId COMMA u2=varId RPAREN 
+   {
+      b.addVariableCondition(new DropEffectlessElementariesCondition((UpdateSV)u, 
+                                                                     (SchemaVariable)x, 
+                                                                     (UpdateSV)u2));
+   }
+;
+
 
 type_resolver returns [TypeResolver tr = null] 
 {
@@ -3668,10 +3622,6 @@ varcond_new [TacletBuilder b]
       (
           TYPEOF LPAREN y=varId RPAREN {
 	    b.addVarsNew((SchemaVariable) x, (SchemaVariable) y, false);
-	  }
-      |
-          ELEMTYPEOF LPAREN y=varId RPAREN {
- 	    b.addVarsNew((SchemaVariable) x, (SchemaVariable) y, true);
 	  }
       |
          DEPENDINGON LPAREN y=varId RPAREN {
@@ -3737,18 +3687,6 @@ varcond_free [TacletBuilder b]
    }
 ;
 
-varcond_literal [TacletBuilder b]
-{
-  ParsableVariable x = null, y = null;
-}
-:
-   NOTSAMELITERAL LPAREN x=varId COMMA y=varId RPAREN {
-     b.addVariableCondition(new TestLiteral(
-       (SchemaVariable) x, (SchemaVariable) y));          
-   }
-;
-
-
 
 varcond_hassort [TacletBuilder b]
 {
@@ -3804,15 +3742,6 @@ varcond_reference [TacletBuilder b, boolean isPrimitive]
    { b.addVariableCondition(new TypeCondition(tr, !isPrimitive, nonNull)); }
 ;
 
-varcond_non_implicit [TacletBuilder b]
-{
-  ParsableVariable x = null;
-}
-:
-   ISNONIMPLICIT LPAREN x=varId RPAREN {
-     b.addVariableCondition(new NonImplicitTypeCondition((SchemaVariable) x));
-   } 
-;
 
 varcond_query [TacletBuilder b]
 {
@@ -3834,18 +3763,6 @@ varcond_inReachableState [TacletBuilder b]
       b.addVariableCondition(new InReachableStateCondition((SchemaVariable)x));
    }
 ;
-
-varcond_non_implicit_query [TacletBuilder b]
-{
-  ParsableVariable x = null;
-}
-:
-   ISNONIMPLICITQUERY LPAREN x=varId RPAREN 
-        {
-            b.addVariableCondition(new TestNonImplicitQuery((SchemaVariable)x));
-        }
-    ;
-
          
 varcond_staticmethod [TacletBuilder b, boolean negated]
 {
@@ -4126,12 +4043,9 @@ contracts[SetOfChoice choices, Namespace funcNSForSelectedChoices]
 		    funcNSForRules.extended(c.funcNS().allElements());
 	    }
 	    namespaces().setFunctions(funcNSForRules); 
-	    parsingContracts = true;
        }
        ( one_contract )*
-       RBRACE {
-            parsingContracts = false;
-       }
+       RBRACE 
 ;
 
 invariants[SetOfChoice choices, Namespace funcNSForSelectedChoices]

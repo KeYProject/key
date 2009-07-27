@@ -18,7 +18,7 @@ import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.VariableConditionAdapter;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
-public class TestQuery extends VariableConditionAdapter {
+public final class TestQuery extends VariableConditionAdapter {
 
     private SchemaVariable sv;
 
@@ -26,10 +26,13 @@ public class TestQuery extends VariableConditionAdapter {
 	this.sv = sv;
     }
 
+    
     public SchemaVariable schemaVariable() {
 	return sv;
     }
 
+    
+    @Override
     public boolean check(SchemaVariable var, SVSubstitute instCandidate, 
 			 SVInstantiations instMap, 
 			 Services services) {
@@ -42,14 +45,19 @@ public class TestQuery extends VariableConditionAdapter {
 	return checkTerm((Term) instCandidate);
     }
 
+    
     private boolean checkTerm(Term t){
 	return t.op() instanceof ProgramMethod;
     }
+    
 
+    @Override
     public String toString() {
 	return "\\isQuery(" +schemaVariable()+ ")";
     }
 
+    
+    @Override    
     public boolean equals(Object o) {
 	if (!(o instanceof TestQuery)) {
 	    return false;
@@ -58,10 +66,11 @@ public class TestQuery extends VariableConditionAdapter {
 	return (tq.schemaVariable() == schemaVariable());
     }
     
+    
+    @Override
     public int hashCode(){
     	int result = 17;
     	result = 37 * result + schemaVariable().hashCode();
     	return result;
     }
-
 }

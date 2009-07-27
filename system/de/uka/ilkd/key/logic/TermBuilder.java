@@ -351,10 +351,13 @@ public final class TermBuilder {
     public Term apply(Term update, Term target) {
 	if(update.sort() != Sort.UPDATE) {
 	    throw new TermCreationException("Not an update: " + update);
+	} else if(update.op() == UpdateJunctor.SKIP) {
+	    return target;
+	} else {
+	    return tf.createFunctionTerm(UpdateApplication.UPDATE_APPLICATION,
+		                         update, 
+		                         target);
 	}
-	return tf.createFunctionTerm(UpdateApplication.UPDATE_APPLICATION,
-		                     update, 
-		                     target);
     }
     
     

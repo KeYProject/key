@@ -37,7 +37,9 @@ public interface VariableCondition {
      * @return modified match results if the condition can be satisfied,
      * or <code>null</code> otherwise
      */
-    MatchConditions check(SchemaVariable var, SVSubstitute instCandidate, 
-		     MatchConditions matchCond, Services services);
+    MatchConditions check(SchemaVariable var, 
+	    		  SVSubstitute instCandidate, 
+	    		  MatchConditions matchCond, 
+	    		  Services services);
 
 }

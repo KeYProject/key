@@ -16,8 +16,6 @@ import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.op.SkolemTermSV;
-import de.uka.ilkd.key.logic.op.TermSV;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -35,7 +33,7 @@ import de.uka.ilkd.key.util.Debug;
  * (currently only schema variables <code>ProgramSVSort.EXPRESSION</code> are
  * supported)
  */
-public class JavaTypeToSortCondition implements VariableCondition {
+public final class JavaTypeToSortCondition implements VariableCondition {
 
     private final SchemaVariable exprOrTypeSV;
     private final GenericSort    sort;
@@ -65,20 +63,7 @@ public class JavaTypeToSortCondition implements VariableCondition {
     }
   
     
-    /**
-     * checks if the condition for a correct instantiation is fulfilled
-     * 
-     * @param var
-     *            the template Variable to be instantiated
-     * @param matchCond
-     *            the MatchCondition with the current matching state and in
-     *            particular the SVInstantiations that are already known to be
-     *            needed
-     * @param services
-     *            the program information object
-     * @return modified match results if the condition can be satisfied, or
-     *         <code>null</code> otherwise
-     */
+    @Override
     public MatchConditions check (SchemaVariable var,
                                   SVSubstitute svSubst,
                                   MatchConditions matchCond,
@@ -110,6 +95,8 @@ public class JavaTypeToSortCondition implements VariableCondition {
         }        
     }
 
+    
+    @Override
     public String toString () {
         return "\\hasSort(" + exprOrTypeSV + ", " + sort + ")";
     }

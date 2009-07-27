@@ -16,28 +16,18 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.visitor.ProgramVariableCollector;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.Visitor;
-import de.uka.ilkd.key.logic.op.UpdateableOperator;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 
 public class TermProgramVariableCollector extends Visitor {
 
-    private final HashSet<UpdateableOperator> result = new HashSet<UpdateableOperator> ();
+    private final HashSet<LocationVariable> result = new HashSet<LocationVariable> ();
     private final Services services;
-    private final boolean collectFunctionLocations;
 
     
-    public TermProgramVariableCollector(Services services, 
-                                        boolean collectFunctionLocations) {
+    public TermProgramVariableCollector(Services services) {
         this.services = services;
-        this.collectFunctionLocations = collectFunctionLocations;
     }
         
-    
-    
-    public TermProgramVariableCollector(Services services) {
-        this(services, false);        
-    }
-    
     
 
     /** is called by the execPostOrder-method of a term 
@@ -46,18 +36,18 @@ public class TermProgramVariableCollector extends Visitor {
      */  
     public void visit(Term t) {
 	if ( t.op() instanceof LocationVariable ) {
-	    result.add ( (UpdateableOperator) t.op() );
+	    result.add ( (LocationVariable) t.op() );
 	} 
 	
 	if ( !t.javaBlock ().isEmpty() ) {
 	    ProgramVariableCollector pvc
-		= new ProgramVariableCollector ( t.javaBlock ().program (), services, collectFunctionLocations );
+		= new ProgramVariableCollector ( t.javaBlock ().program (), services );
 	    pvc.start();
 	    result.addAll ( pvc.result () );
 	}
     }
 
-    public HashSet<UpdateableOperator> result() { 
+    public HashSet<LocationVariable> result() { 
 	return result;
     }    
 }

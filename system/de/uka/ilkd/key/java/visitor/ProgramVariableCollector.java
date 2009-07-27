@@ -29,10 +29,10 @@ import de.uka.ilkd.key.speclang.LoopInvariant;
  * Walks through a java AST in depth-left-fist-order. 
  * This walker is used collect all LocationVariables and optional function locations.
  */
-public class ProgramVariableCollector extends JavaASTVisitor {
+public final class ProgramVariableCollector extends JavaASTVisitor {
 
-    private final HashSet<UpdateableOperator> result = new HashSet<UpdateableOperator>();
-    private final boolean collectFunctionLocations;
+    private final HashSet<LocationVariable> result 
+    	= new HashSet<LocationVariable>();
 
     /**
      * collects all program variables occuring in the AST <tt>root</tt>
@@ -41,38 +41,39 @@ public class ProgramVariableCollector extends JavaASTVisitor {
      * @param services the Services object
      */
     public ProgramVariableCollector(ProgramElement root, 
-                                    Services services, 
-                                    boolean collectFunctionLocations) {
+                                    Services services) {
 	super(root, services);
         assert services != null;
-        this.collectFunctionLocations = collectFunctionLocations;
     }
     
-    public ProgramVariableCollector(ProgramElement root, 
-                                    Services services) {
-        this(root, services, false);
-    }
     
-    /** starts the walker*/
+    @Override
     public void start() {	
 	walk(root());	
     }
 
-    public HashSet<UpdateableOperator> result() { 
+    
+    public HashSet<LocationVariable> result() { 
 	return result;
     }    
 
+    @Override
     public String toString() {
 	return result.toString();
     }
 
-    protected void doDefaultAction(SourceElement x) {
+    @Override
+        protected void doDefaultAction(SourceElement x) {
     }
 
-    public void performActionOnLocationVariable(LocationVariable x) {
+
+    @Override
+        public void performActionOnLocationVariable(LocationVariable x) {
         result.add(x);
     }
     
+    
+    @Override
     public void performActionOnLoopInvariant(LoopInvariant x) {
         TermProgramVariableCollector tpvc = 
             new TermProgramVariableCollector(services);

@@ -619,14 +619,6 @@ public class Proof implements Named {
 	return true;
     }
 
-    // ?? seems to be required for presentation uses
-    // I think there is a mismatch between what the method does and the method's
-    // name. Can the one who implemented this method check the name and write a
-    // short comment about its purpose %%RB
-    public void updateProof() {
-	fireProofGoalsChanged();
-    }
-
 
     /** fires the event that the proof has been expanded at the given node */
     protected void fireProofExpanded(Node node) {
@@ -686,7 +678,7 @@ public class Proof implements Named {
     }
 
     /** fires the event that the proof has been restructured */
-    protected void fireProofGoalsChanged() {
+    public void fireProofGoalsChanged() {
 	ProofTreeEvent e = new ProofTreeEvent(this, openGoals());
 	for (int i = 0; i<listenerList.size(); i++) {
 	    listenerList.get(i).proofGoalsChanged(e);

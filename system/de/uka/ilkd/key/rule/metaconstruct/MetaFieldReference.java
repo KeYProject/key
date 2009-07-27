@@ -34,8 +34,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
  *  
  * @author mulbrich
  */
-public final class MetaFieldReference extends AbstractMetaOperator implements
-        UpdateableOperator {
+public final class MetaFieldReference extends AbstractMetaOperator {
 
     private static final Logger logger =
             Logger.getLogger(MetaFieldReference.class);

@@ -46,7 +46,7 @@ public abstract class Notation {
     }
 
     /** get the priority of the term */
-    public int getPriority() {
+    public final int getPriority() {
 	return priority;
     }
 
@@ -55,15 +55,7 @@ public abstract class Notation {
      * this to call one of the <code>printXYZTerm</code> of
      * {@link LogicPrinter}, which do the layout.
      */
-    public void print(Term t, LogicPrinter sp) throws IOException {
-	if (sp.getNotationInfo().getAbbrevMap().isEnabled(t)) {
-	    sp.printTerm(t);
-	} else {
-	    sp.printConstant(t.toString());
-	    System.err.println("There is no registered Notation "
-		    + "for the operator\n" + t.op());
-	}
-    }
+    public abstract void print(Term t, LogicPrinter sp) throws IOException;
 
     /**
      * Print a term without beginning a new block. See
@@ -76,6 +68,8 @@ public abstract class Notation {
 	print(t, sp);
     }
 
+    
+    
     /**
      * The standard concrete syntax for constants like true and false.
      */
@@ -106,11 +100,7 @@ public abstract class Notation {
 	}
 
 	public void print(Term t, LogicPrinter sp) throws IOException {
-	    if (sp.getNotationInfo().getAbbrevMap().isEnabled(t)) {
-		sp.printTerm(t);
-	    } else {
-		sp.printPrefixTerm(name, t.sub(0), ass);
-	    }
+	    sp.printPrefixTerm(name, t.sub(0), ass);
 	}
 
     }
@@ -130,11 +120,7 @@ public abstract class Notation {
 	}
 
 	public void print(Term t, LogicPrinter sp) throws IOException {
-	    if (sp.getNotationInfo().getAbbrevMap().isEnabled(t)) {
-		sp.printTerm(t);
-	    } else {
-		sp.printInfixTerm(t.sub(0), assLeft, name, t.sub(1), assRight);
-	    }
+	    sp.printInfixTerm(t.sub(0), assLeft, name, t.sub(1), assRight);
 	}
 
 	/**
@@ -143,15 +129,11 @@ public abstract class Notation {
          */
 	public void printContinuingBlock(Term t, LogicPrinter sp)
 		throws IOException {
-	    if (sp.getNotationInfo().getAbbrevMap().isEnabled(t)) {
-		sp.printTerm(t);
-	    } else {
-		sp.printInfixTermContinuingBlock(t.sub(0), assLeft, name, t
-			.sub(1), assRight);
-	    }
+	    sp.printInfixTermContinuingBlock(t.sub(0), assLeft, name, t.sub(1), assRight);
 	}
 
     }
+    
 
     /**
      * The standard concrete syntax for arrays.
@@ -167,14 +149,11 @@ public abstract class Notation {
 	}
 
 	public void print(Term t, LogicPrinter sp) throws IOException {
-	    if (sp.getNotationInfo().getAbbrevMap().isEnabled(t)) {
-		sp.printTerm(t);
-	    } else {
-		sp.printArray(arraySeparators, t, ass);
-	    }
+	    sp.printArray(arraySeparators, t, ass);
 	}
     }
 
+    
     /**
      * The standard concrete syntax for quantifiers.
      */
@@ -189,14 +168,11 @@ public abstract class Notation {
 	}
 
 	public void print(Term t, LogicPrinter sp) throws IOException {
-	    if (sp.getNotationInfo().getAbbrevMap().isEnabled(t)) {
-		sp.printTerm(t);
-	    } else {
-		sp.printQuantifierTerm(name, t.varsBoundHere(0), t.sub(0), ass);
-	    }
+	    sp.printQuantifierTerm(name, t.varsBoundHere(0), t.sub(0), ass);
 	}
 
     }
+    
 
     /**
      * The standard concrete syntax for numerical quantifiers.
@@ -213,15 +189,12 @@ public abstract class Notation {
         }
 
         public void print(Term t, LogicPrinter sp) throws IOException {
-            if (sp.getNotationInfo().getAbbrevMap().isEnabled(t)) {
-                sp.printTerm(t);
-            } else {
-                sp.printNumericalQuantifierTerm(name, t.varsBoundHere(0), t.sub(0), 
+            sp.printNumericalQuantifierTerm(name, t.varsBoundHere(0), t.sub(0), 
                         t.sub(1), ass1, ass2);
-            }
         }
 
     }       
+    
 
     /**
      * The standard concrete syntax for bounded numerical quantifiers.
@@ -238,15 +211,12 @@ public abstract class Notation {
         }
 
         public void print(Term t, LogicPrinter sp) throws IOException {
-            if (sp.getNotationInfo().getAbbrevMap().isEnabled(t)) {
-                sp.printTerm(t);
-            } else {
-                sp.printBoundedNumericalQuantifierTerm(name, t.varsBoundHere(2), t.sub(0), 
+            sp.printBoundedNumericalQuantifierTerm(name, t.varsBoundHere(2), t.sub(0), 
                         t.sub(1), t.sub(2), ass1, ass2);
-            }
         }
 
     }
+    
 
     /**
      * The standard concrete syntax for DL modalities box and diamond.
@@ -264,15 +234,12 @@ public abstract class Notation {
 	}
 
 	public void print(Term t, LogicPrinter sp) throws IOException {
-	    if (sp.getNotationInfo().getAbbrevMap().isEnabled(t)) {
-		sp.printTerm(t);
-	    } else {
-		assert t.op() instanceof Modality;
-		assert t.javaBlock() != null;
-		sp.printModalityTerm(left, t.javaBlock(), right, t, ass);
-	    }
+	    assert t.op() instanceof Modality;
+	    assert t.javaBlock() != null;
+	    sp.printModalityTerm(left, t.javaBlock(), right, t, ass);
 	}
     }
+    
 
     /**
      * The concrete syntax for DL modalities represented with a
@@ -287,12 +254,8 @@ public abstract class Notation {
 	}
 
 	public void print(Term t, LogicPrinter sp) throws IOException {
-	    if (sp.getNotationInfo().getAbbrevMap().isEnabled(t)) {
-		sp.printTerm(t);
-	    } else {
-		sp.printModalityTerm("\\modality{" + t.op().name().toString()
+	    sp.printModalityTerm("\\modality{" + t.op().name().toString()
 			+ "}", t.javaBlock(), "\\endmodality", t, ass);
-	    }
 	}
     }
 
@@ -307,18 +270,14 @@ public abstract class Notation {
 	}
 
 	public void print(Term t, LogicPrinter sp) throws IOException {
-	    if(sp.getNotationInfo().getAbbrevMap().isEnabled(t)) {
-		sp.printTerm(t);
-	    } else {
-		assert t.op() == UpdateApplication.UPDATE_APPLICATION;
-		final Operator targetOp = UpdateApplication.getTarget(t).op();
-		final int assTarget 
-		    = (t.sort() == Sort.FORMULA 
-		       ? (targetOp.arity() == 1 ? 60 : 85) 
-		       : 110);
-		
-		sp.printUpdateApplicationTerm("{", "}", t, assTarget);
-	    }
+	    assert t.op() == UpdateApplication.UPDATE_APPLICATION;
+	    final Operator targetOp = UpdateApplication.getTarget(t).op();
+	    final int assTarget 
+	    = (t.sort() == Sort.FORMULA 
+		    ? (targetOp.arity() == 1 ? 60 : 85) 
+			    : 110);
+
+	    sp.printUpdateApplicationTerm("{", "}", t, assTarget);
 	}
     }    
 
@@ -333,12 +292,7 @@ public abstract class Notation {
 	}
 
 	public void print(Term t, LogicPrinter sp) throws IOException {
-	    if(sp.getNotationInfo().getAbbrevMap().isEnabled(t)) {
-		sp.printTerm(t);
-	    } else {
-		ElementaryUpdate op = (ElementaryUpdate) t.op();
-		sp.printElementaryUpdate(":=", t, 0);
-	    }
+	    sp.printElementaryUpdate(":=", t, 0);
 	}
     }    
     
@@ -352,15 +306,11 @@ public abstract class Notation {
 	}
 
 	public void print(Term t, LogicPrinter sp) throws IOException {
-	    if (sp.getNotationInfo().getAbbrevMap().isEnabled(t)) {
-		sp.printTerm(t);
-	    } else {
-		QuantifiableVariable v = instQV(t, sp, 1);
-		final int assTarget = (t.sort() == Sort.FORMULA ? (t.sub(1)
-			.op() == Equality.EQUALS ? 75 : 60) : 110);
-		sp.printSubstTerm("{\\subst ", v, t.sub(0), 0, "}", t.sub(1),
-			assTarget);
-	    }
+	    QuantifiableVariable v = instQV(t, sp, 1);
+	    final int assTarget = (t.sort() == Sort.FORMULA ? (t.sub(1)
+		    .op() == Equality.EQUALS ? 75 : 60) : 110);
+	    sp.printSubstTerm("{\\subst ", v, t.sub(0), 0, "}", t.sub(1),
+		    assTarget);
 	}
 	
 	private QuantifiableVariable instQV(Term t, LogicPrinter sp, int subTerm) {
@@ -381,6 +331,7 @@ public abstract class Notation {
 	}
     }
 
+    
     /**
      * The standard concrete syntax for function and predicate terms.
      */
@@ -391,16 +342,13 @@ public abstract class Notation {
 	}
 
 	public void print(Term t, LogicPrinter sp) throws IOException {
-	    if (sp.getNotationInfo().getAbbrevMap().isEnabled(t)) {
-		sp.printTerm(t);
-	    } else {
-		sp.printFunctionTerm(t.op().name().toString(), t);
-	    }
+	    sp.printFunctionTerm(t.op().name().toString(), t);
 	}
     }
 
+    
     /**
-     * The standard concrete syntax for arrays.
+     * The standard concrete syntax for casts.
      */
     public static final class CastFunction extends Notation {
 
@@ -416,14 +364,25 @@ public abstract class Notation {
 	}
 
 	public void print(Term t, LogicPrinter sp) throws IOException {
-	    if (sp.getNotationInfo().getAbbrevMap().isEnabled(t)) {
-		sp.printTerm(t);
-	    } else {
-		sp.printCast(pre, post, t, ass);
-	    }
+	    sp.printCast(pre, post, t, ass);
 	}
     }
+    
+    
+    /**
+     * The standard concrete syntax for select.
+     */
+    public static final class SelectNotation extends Notation {
+	public SelectNotation() {
+	    super(140);
+	}
 
+	public void print(Term t, LogicPrinter sp) throws IOException {
+	    sp.printSelect(t);
+	}
+    }    
+
+    
     /**
      * The standard concrete syntax for query terms <code>o.q(x)</code>.
      */
@@ -436,9 +395,7 @@ public abstract class Notation {
 	}
 
 	public void print(Term t, LogicPrinter sp) throws IOException {
-	    if (sp.getNotationInfo().getAbbrevMap().isEnabled(t)) {
-		sp.printTerm(t);
-	    } else if (((de.uka.ilkd.key.logic.op.ProgramMethod) t.op())
+	    if (((de.uka.ilkd.key.logic.op.ProgramMethod) t.op())
 		    .isStatic()) {
 
 		sp.printFunctionTerm(t.op().name().toString().replaceAll("::",
@@ -467,14 +424,11 @@ public abstract class Notation {
 	}
 
 	public void print(Term t, LogicPrinter sp) throws IOException {
-	    if (sp.getNotationInfo().getAbbrevMap().isEnabled(t)) {
-		sp.printTerm(t);
-	    } else {
-		sp.printIfThenElseTerm(t, keyword);
-	    }
+	    sp.printIfThenElseTerm(t, keyword);
 	}
     }
 
+    
     /**
      * The standard concrete syntax for all kinds of variables.
      */
@@ -495,6 +449,7 @@ public abstract class Notation {
 	}
     }
 
+    
     public static final class SchemaVariableNotation extends VariableNotation {
 	static Logger logger = Logger.getLogger(Notation.class.getName());
 
@@ -540,18 +495,7 @@ public abstract class Notation {
 	}
     }
 
-    public static final class MetavariableNotation extends Notation {
-	public MetavariableNotation() {
-	    super(1000);
-	}
-
-	public void print(Term t, LogicPrinter sp) throws IOException {
-	    sp
-		    .printMetavariable((de.uka.ilkd.key.logic.op.Metavariable) t
-			    .op());
-	}
-    }
-
+    
     /**
      * The standard concrete syntax for the number literal indicator `Z'.
      * This is only used in the `Pretty&amp;Untrue' syntax.
@@ -606,6 +550,7 @@ public abstract class Notation {
 	    }
 	}
     }
+    
 
     /**
      * The standard concrete syntax for the character literal indicator `C'.
@@ -649,6 +594,7 @@ public abstract class Notation {
 	    }
 	}
     }
+    
 
     /**
      * The standard concrete syntax for the string literal indicator `cat'

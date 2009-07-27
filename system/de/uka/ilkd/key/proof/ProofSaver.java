@@ -29,7 +29,6 @@ import de.uka.ilkd.key.logic.op.Metavariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
-import de.uka.ilkd.key.pp.PresentationFeatures;
 import de.uka.ilkd.key.pp.ProgramPrinter;
 import de.uka.ilkd.key.proof.mgt.RuleJustificationBySpec;
 import de.uka.ilkd.key.rule.*;
@@ -473,16 +472,10 @@ public class ProofSaver {
     private static LogicPrinter createLogicPrinter(Services serv, 
             boolean shortAttrNotation) {
 
-        NotationInfo ni = NotationInfo.createInstance();
+        NotationInfo ni = new NotationInfo();
         LogicPrinter p = null;
 
-        if (serv != null) {
-            PresentationFeatures.modifyNotationInfo(ni,
-                    serv.getNamespaces().functions());
-        }
         p =  new LogicPrinter(new ProgramPrinter(null), ni, (shortAttrNotation ? serv : null), true);
         return p;
     }
-
-
 }

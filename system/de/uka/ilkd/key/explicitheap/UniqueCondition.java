@@ -18,22 +18,17 @@ import de.uka.ilkd.key.rule.VariableConditionAdapter;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 
-public class UniqueCondition extends VariableConditionAdapter {
+public final class UniqueCondition extends VariableConditionAdapter {
     
     private final SchemaVariable var;
+    
     
     public UniqueCondition(SchemaVariable var) {
         this.var = var;
     }
 
-    /**
-     * checks if the condition for a correct instantiation is fulfilled
-     * @param var the template Variable to be instantiated
-     * @param candidate the SVSubstitute which is a candidate for an
-     * instantiation of var
-     * @param svInst the SVInstantiations that are already known to be needed 
-     * @return true iff condition is fulfilled
-     */
+    
+    @Override
     public boolean check(SchemaVariable var, 
                          SVSubstitute candidate, 
                          SVInstantiations svInst,
@@ -50,6 +45,7 @@ public class UniqueCondition extends VariableConditionAdapter {
     }
     
 
+    @Override
     public String toString () {
         return "\\isUnique (" + var+ ")";
     }

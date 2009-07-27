@@ -26,6 +26,7 @@ import org.apache.log4j.Logger;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.logic.ListOfNamed;
 import de.uka.ilkd.key.pp.LogicPrinter;
+import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.ProgramPrinter;
 import de.uka.ilkd.key.proof.ApplyTacletDialogModel;
 import de.uka.ilkd.key.rule.Taclet;
@@ -117,7 +118,7 @@ public abstract class ApplyTacletDialog extends JDialog {
         //WriterBackend backend = new WriterBackend(w, 68);
         
         LogicPrinter tp = new LogicPrinter(new ProgramPrinter(w), 
-                de.uka.ilkd.key.pp.NotationInfo.createInstance(), backend, mediator.getServices(), true);
+                new NotationInfo(), backend, mediator.getServices(), true);
         
 //        tp.printTaclet(taclet, model[0].tacletApp().instantiations(),
         tp.printTaclet(taclet, SVInstantiations.EMPTY_SVINSTANTIATIONS,

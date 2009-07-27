@@ -30,7 +30,7 @@ import de.uka.ilkd.key.util.Debug;
 /**
  * ensures that the types where the variables are declared are not the same
  */
-public class TypeComparisonCondition extends VariableConditionAdapter {
+public final class TypeComparisonCondition extends VariableConditionAdapter {
     
     /** checks if sorts are not same */
     public final static int NOT_SAME = 0;
@@ -68,15 +68,7 @@ public class TypeComparisonCondition extends VariableConditionAdapter {
     }
     
 
-    /**
-     * tests if the instantiations for both schema variables have a
-     * different type
-     * @param var the template Variable to be instantiated
-     * @param subst the SVSubstitute to be mapped to var
-     * @param svInst the SVInstantiations that are already known to be
-     * needed
-     * @return true iff condition is fulfilled
-     */
+    @Override
     public boolean check(SchemaVariable var, 
 			 SVSubstitute subst, 
 			 SVInstantiations svInst,
@@ -93,6 +85,7 @@ public class TypeComparisonCondition extends VariableConditionAdapter {
                 snd.resolveSort(var, subst, svInst, services), services);
     }
 
+    
     private boolean checkSorts(final Sort fstSort, final Sort sndSort, Services services) {
         switch (mode) {
         case SAME:
@@ -150,6 +143,8 @@ public class TypeComparisonCondition extends VariableConditionAdapter {
 	return result;
     }
 
+    
+    @Override    
     public String toString () {
 	switch (mode) {
         case SAME:

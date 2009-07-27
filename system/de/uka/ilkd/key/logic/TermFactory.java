@@ -15,7 +15,6 @@ import java.util.*;
 
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.*;
-import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.LRUCache;
 
 /** 
@@ -502,6 +501,9 @@ public class TermFactory {
    public Term createTerm(Operator op, Term[] subTerms, 
 			  ArrayOfQuantifiableVariable[] bv,
 			  JavaBlock javaBlock) {
+       if(op instanceof UpdateApplication) {
+	   return TermBuilder.DF.apply(subTerms[UpdateApplication.updatePos()], subTerms[UpdateApplication.targetPos()]);//XXX
+       }
 	if (op==null) {
 	    throw new IllegalArgumentException("null-Operator at TermFactory");
 	} else if (op instanceof Modality || op instanceof ModalOperatorSV) {

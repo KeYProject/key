@@ -98,9 +98,7 @@ public abstract class AbstractMetaOperator extends AbstractSortedOperator
         new CreateInReachableStatePO ();
     
     public static final AbstractMetaOperator INTRODUCE_ATPRE_DEFINITIONS = new IntroAtPreDefsOp();
-    
-    public static final AbstractMetaOperator AT_PRE_EQUATIONS = new AtPreEquations();
-            
+                
     public static final AbstractMetaOperator META_METHOD_CALL_TO_UPDATE= new MethodCallToUpdate();
     
     public static final AbstractMetaOperator SAME_FIELD = new SameField();

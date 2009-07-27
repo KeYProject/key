@@ -22,10 +22,10 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 /**
  *  Ensures the given ProgramElement denotes a local variable
  */
-public class LocalVariableCondition extends VariableConditionAdapter {
+public final class LocalVariableCondition extends VariableConditionAdapter {
 
-    private SchemaVariable var;
-    private boolean neg;
+    private final SchemaVariable var;
+    private final boolean neg;
     
     public LocalVariableCondition(SchemaVariable var, boolean neg) {
         this.var = var;
@@ -35,18 +35,12 @@ public class LocalVariableCondition extends VariableConditionAdapter {
         }
     }
 
-    /**
-     * checks if the condition for a correct instantiation is fulfilled
-     * @param var the template Variable to be instantiated
-     * @param candidate the SVSubstitute which is a candidate for an
-     * instantiation of var
-     * @param svInst the SVInstantiations that are already known to be needed 
-     * @return true iff condition is fulfilled
-     */
+    
+    @Override    
     public boolean check(SchemaVariable var, 
-            SVSubstitute candidate, 
-            SVInstantiations svInst,
-            Services services) {
+            		 SVSubstitute candidate, 
+            		 SVInstantiations svInst,
+            		 Services services) {
 
         if (var != this.var) { 
             return true; 
@@ -56,6 +50,8 @@ public class LocalVariableCondition extends VariableConditionAdapter {
         return neg ? !isLocalVar : isLocalVar;
     }
 
+    
+    @Override
     public String toString () {
         return "\\isLocalVariable (" + var+ ")";
     }

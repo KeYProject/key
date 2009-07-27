@@ -58,35 +58,30 @@ tokens {
 
         // Keywords for varcond and related stuff
 	VARCOND = "\\varcond";
-	TYPEOF = "\\typeof";
-	ELEMTYPEOF = "\\elemTypeof";
+	APPLY_UPDATE_ON_RIGID = "\\applyUpdateOnRigid";
+        DEPENDINGON = "\\dependingOn";
+	DISJOINTMODULONULL  = "\\disjointModuloNull";
+	DROP_EFFECTLESS_ELEMENTARIES = "\\dropEffectlessElementaries";	
+	ENUM_CONST = "\\enumConstant";	
+        FREELABELIN = "\\freeLabelIn";
+	HASSORT = "\\hasSort";        
+	ISARRAY="\\isArray";
+        ISENUMTYPE="\\isEnumType";
+	ISLOCALVARIABLE = "\\isLocalVariable";        	
+	ISQUERY = "\\isQuery";		
+	ISREFERENCE="\\isReference";	        
+	ISREFERENCEARRAY="\\isReferenceArray";
+	ISSUBTYPE = "\\sub";	
+	ISUNIQUE = "\\isUnique";
         NEW = "\\new";
         NEWLABEL = "\\newLabel";
 	NOT = "\\not";
-	SAME = "\\same";
-	ISSUBTYPE = "\\sub";
-	STRICT    = "\\strict";
-	DISJOINTMODULONULL  = "\\disjointModuloNull";
-	
-        STATICMETHODREFERENCE = "\\staticMethodReference";
         NOTFREEIN = "\\notFreeIn";
-        FREELABELIN = "\\freeLabelIn";
+	SAME = "\\same";
 	STATIC = "\\static";
-	ENUM_CONST = "\\enumConstant";
-	NOTSAMELITERAL="\\notSameLiteral";
-	ISREFERENCEARRAY="\\isReferenceArray";
-	ISARRAY="\\isArray";
-	ISREFERENCE="\\isReference";
-	ISNONIMPLICIT="\\isNonImplicit";
-        ISENUMTYPE="\\isEnumType";
-        DEPENDINGON = "\\dependingOn";
-	ISQUERY = "\\isQuery";
-	ISNONIMPLICITQUERY = "\\isNonImplicitQuery";
-	HASSORT = "\\hasSort";
-	ISLOCALVARIABLE = "\\isLocalVariable";
-	NOTISLOCALVARIABLE = "\\notIsLocalVariable";
-	ISUNIQUE = "\\isUnique";
-
+        STATICMETHODREFERENCE = "\\staticMethodReference";	
+	STRICT    = "\\strict";	
+	TYPEOF = "\\typeof";
 
 	// Quantifiers, binding, substitution
 	BIND   = "\\bind";

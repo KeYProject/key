@@ -213,7 +213,4 @@ public class InitialPositionTable extends PositionTable{
     public Range[] getUpdateRanges() {
         return updateRanges.toArray();
     }
-
 }
-
-

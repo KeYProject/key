@@ -27,6 +27,9 @@ import de.uka.ilkd.key.util.ExtList;
 
 public final class HeapLDT extends LDT {
     
+    public static final Name SELECT_NAME = new Name("select");
+    public static final Name STORE_NAME = new Name("store");
+    
     private static final Name NAME = new Name("Heap");
     
     private final LocationVariable heap;
@@ -44,7 +47,7 @@ public final class HeapLDT extends LDT {
     public HeapLDT(Namespace sorts, Namespace functions, Namespace progVars) {
 	super((Sort)sorts.lookup(NAME), null);
         heap	          = (LocationVariable) progVars.lookup(new Name("heap"));
-        select            = (SortDependingFunction) addFunction(functions, Sort.ANY + "::select");
+        select            = (SortDependingFunction) addFunction(functions, Sort.ANY + "::" + SELECT_NAME);
         store             = addFunction(functions, "store");
         arr               = addFunction(functions, "arr");
         length            = addFunction(functions, "Array::length");

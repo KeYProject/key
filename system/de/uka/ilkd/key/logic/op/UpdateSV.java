@@ -42,6 +42,6 @@ public final class UpdateSV extends AbstractSV {
     
     @Override
     public String toString() {
-        return toString(sort().toString()+" term");
+        return toString("update");
     }
 }

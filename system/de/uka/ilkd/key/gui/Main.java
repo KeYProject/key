@@ -75,7 +75,7 @@ public class Main extends JFrame implements IMain {
     
     static {
         // @xxx preliminary: better store along with other settings.
-        PresentationFeatures.ENABLED = true;
+        NotationInfo.PRETTY_SYNTAX = true;
     }
     
     /** the tab bar at the left */
@@ -825,15 +825,9 @@ public class Main extends JFrame implements IMain {
     
     protected void makePrettyView() {
         if (mediator().ensureProofLoadedSilent()) {
-            if (!PresentationFeatures.ENABLED) {
-                mediator().getNotationInfo().setBackToDefault();
-            } else {
-                PresentationFeatures.modifyNotationInfo(mediator.getNotationInfo(), mediator
-                        .func_ns());
-            }
-            mediator().getSelectedProof().updateProof();
-        }
-        
+            mediator().getNotationInfo().refresh(mediator.getServices());
+            mediator().getProof().fireProofGoalsChanged();
+        }        
     }
     
     public void showLicense() {
@@ -1045,10 +1039,10 @@ public class Main extends JFrame implements IMain {
         pretty.setAccelerator(KeyStroke.getKeyStroke
                             (KeyEvent.VK_P, ActionEvent.CTRL_MASK));        
         pretty.setToolTipText("If ticked, infix notations are used.");
-        pretty.setSelected(PresentationFeatures.ENABLED);
+        pretty.setSelected(NotationInfo.PRETTY_SYNTAX);
 	pretty.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
-		    PresentationFeatures.ENABLED=((JCheckBoxMenuItem)e.getSource()).
+		    NotationInfo.PRETTY_SYNTAX=((JCheckBoxMenuItem)e.getSource()).
 			isSelected();
 		    makePrettyView();
 		}});
@@ -2058,8 +2052,9 @@ public class Main extends JFrame implements IMain {
             final MainStatusLine sl = getStatusLine();
             sl.reset();
             if (info.getSource() instanceof ApplyStrategy) {
-                displayResults(info.getTime(), info.getAppliedRules(), 
-                        info.getClosedGoals());                
+                displayResults(info.getTime(), 
+                	       info.getAppliedRules(), 
+                	       info.getClosedGoals());                
             } else if (info.getSource() instanceof ProblemLoader) {
                 if (!"".equals(info.getResult())) {
                     final KeYExceptionHandler exceptionHandler = 
@@ -2068,10 +2063,7 @@ public class Main extends JFrame implements IMain {
                                     exceptionHandler.getExceptions());
                             exceptionHandler.clear();
                 } else {
-                    PresentationFeatures.
-                    initialize(mediator.func_ns(), 
-                            mediator.getNotationInfo(),
-                            mediator.getSelectedProof());
+                    mediator.getNotationInfo().refresh(mediator.getServices());
                 }
             }
         }

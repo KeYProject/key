@@ -23,12 +23,10 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
  *  This variable condition checks if a schemavariable is instantiated 
  *  with a reference or primitive type
  */
-public class TypeCondition extends VariableConditionAdapter {
+public final class TypeCondition extends VariableConditionAdapter {
 
     private final TypeResolver resolver;
-   
     private final boolean nonNull;
-
     private final boolean isReference;
 
     /**
@@ -44,14 +42,8 @@ public class TypeCondition extends VariableConditionAdapter {
         this.nonNull = nonNull;
     }
     
-    /**
-     * checks if the condition for a correct instantiation is fulfilled
-     * @param p_var the template Variable to be instantiated
-     * @param candidate the SVSubstitute which is a candidate for an
-     * instantiation of var
-     * @param svInst the SVInstantiations that are already known to be needed 
-     * @return true iff condition is fulfilled
-     */
+    
+    @Override
     public boolean check(SchemaVariable p_var, 
 			 SVSubstitute candidate, 
 			 SVInstantiations svInst,
@@ -70,6 +62,8 @@ public class TypeCondition extends VariableConditionAdapter {
         }
     }
 
+    
+    @Override
     public String toString () {
         String prefix = "\\isReference";
         if (isReference && nonNull) {
@@ -77,5 +71,4 @@ public class TypeCondition extends VariableConditionAdapter {
         }               
         return (isReference ? "" : "\\not" ) + prefix + "( " + resolver + " )";            
     }
-
 }

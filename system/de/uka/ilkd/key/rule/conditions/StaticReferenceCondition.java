@@ -25,7 +25,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
  * ensures that the given instantiation for the schemavariable denotes a
  * static field
  */
-public class StaticReferenceCondition extends VariableConditionAdapter {
+public final class StaticReferenceCondition extends VariableConditionAdapter {
 
     private final SchemaVariable reference;
     private final boolean negation;
@@ -42,15 +42,8 @@ public class StaticReferenceCondition extends VariableConditionAdapter {
 	this.negation  = negation;
     }
 
-    /**
-     * tests if the instantiation suggestions goes along with the static
-     * condition
-     * @param var the template Variable to be instantiated
-     * @param subst the SVSubstitute to be mapped to var
-     * @param svInst the SVInstantiations that are already known to be
-     * needed
-     * @return true iff condition is fulfilled
-     */
+
+    @Override
     public boolean check(SchemaVariable var, 
 			 SVSubstitute subst, 
 			 SVInstantiations svInst,
@@ -69,8 +62,9 @@ public class StaticReferenceCondition extends VariableConditionAdapter {
 	return true;
     }
 
+    
+    @Override
     public String toString () {
 	return (negation ? " \\not " : "" ) + "\\static(" + reference + ")";
     }
-
 }

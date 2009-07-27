@@ -14,10 +14,10 @@ import java.util.HashMap;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.TypeConverter;
+import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.util.Service;
 
 
 /** 
@@ -30,10 +30,6 @@ import de.uka.ilkd.key.util.Service;
  * The Notation associated with an operator might change.  New Notations can
  * be added.
  * 
- * Support for infix notations in case of function symbols like 
- * <code>+, -, *, /, <, >, </code> 
- * etc. is added by class {@link de.uka.ilkd.key.pp.PresentationFeatures} (that has 
- * historical reasons)
  * <p>
  * The next lines describe a general rule how to determine priorities and 
  * associativities:
@@ -98,17 +94,9 @@ import de.uka.ilkd.key.util.Service;
  * </ul>
  */
 public final class NotationInfo {
-
-    /** Factory method: creates a new NotationInfo instance. The
-     * actual implementation depends on system properties or service
-     * entries. */
-    public static final NotationInfo createInstance() {
-	return (NotationInfo) Service.find(NotationInfo.class.getName(),
-					   NotationInfo.class.getName());
-    }
     
-    private Services services;
-    
+    public static boolean PRETTY_SYNTAX = false;
+        
     
     /** This maps operators and classes of operators to {@link
      * Notation}s.  The idea is that we first look wether the operator has
@@ -121,19 +109,23 @@ public final class NotationInfo {
      * Maps terms to abbreviations and reverse.
      */
     private AbbrevMap scm;
+    
+    
+
+    //-------------------------------------------------------------------------
+    //constructors
+    //-------------------------------------------------------------------------    
 
 
-    /** Create a new NotationInfo. Do not call this constructor
-     * directly. Use the factory method {@link #createInstance()}
-     * instead. */
     public NotationInfo() {
     	createDefaultNotationTable();
     }
-
-    /** Set all notations back to default. */
-    public void setBackToDefault() {
-    	createDefaultNotationTable();
-    }
+    
+    
+    //-------------------------------------------------------------------------
+    //internal methods
+    //-------------------------------------------------------------------------     
+        
     
     /** Register the standard set of notations.  This means no
      * abbreviations, and a set of Notations for the built-in operators
@@ -165,7 +157,6 @@ public final class NotationInfo {
 	
 	tbl.put(Function.class, new Notation.Function());               
 	tbl.put(LogicVariable.class, new Notation.VariableNotation());
-	tbl.put(Metavariable.class, new Notation.MetavariableNotation());
 	tbl.put(LocationVariable.class, new Notation.VariableNotation());
         tbl.put(ProgramConstant.class, new Notation.VariableNotation());
 	tbl.put(ProgramMethod.class, new Notation.ProgramMethod(121));
@@ -174,9 +165,49 @@ public final class NotationInfo {
 	tbl.put(ModalOperatorSV.class, new Notation.ModalSVNotation(60, 60));
 	tbl.put(SchemaVariable.class, new Notation.SchemaVariableNotation());
 	
-	tbl.put(Sort.CAST_NAME, new Notation.CastFunction("(",")",120, 140));		
+	tbl.put(Sort.CAST_NAME, new Notation.CastFunction("(",")",120, 140));
     }
+        
+    
+    private void addFancyNotations(Services services) {
+	//arithmetic operators
+	IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();	
+	if(integerLDT != null) {
+	    tbl.put(integerLDT.getNumberSymbol(), new Notation.NumLiteral());
+	    tbl.put(integerLDT.getCharSymbol(), new Notation.CharLiteral());
+	    tbl.put(integerLDT.getLessThan(), new Notation.Infix("<", 80, 90, 90));
+	    tbl.put(integerLDT.getGreaterThan(), new Notation.Infix("> ", 80, 90, 90));
+	    tbl.put(integerLDT.getLessOrEquals(), new Notation.Infix("<=", 80, 90, 90));
+	    tbl.put(integerLDT.getGreaterOrEquals(), new Notation.Infix(">=", 80, 90, 90));
+	    tbl.put(integerLDT.getSub(), new Notation.Infix("-", 90, 90, 91));
+	    tbl.put(integerLDT.getAdd(), new Notation.Infix("+", 90, 90, 91));
+	    tbl.put(integerLDT.getMul(), new Notation.Infix("*", 100, 100, 101));
+	    tbl.put(integerLDT.getDiv(), new Notation.Infix("/", 100, 100, 101));
+	    tbl.put(integerLDT.getMod(), new Notation.Infix("%", 100, 100, 101));
+	    tbl.put(integerLDT.getNeg(),new Notation.Prefix("-", 140, 130));
+	    tbl.put(integerLDT.getNegativeNumberSign(), new Notation.Prefix("-", 140, 130));
+	}
+        
+        //string operators
+	tbl.put(TypeConverter.stringConverter.getStringSymbol(), new Notation.StringLiteral());
+	
+	//heap operators
+	tbl.put(HeapLDT.SELECT_NAME, new Notation.SelectNotation());
+    }
+    
 
+
+    //-------------------------------------------------------------------------
+    //public interface
+    //-------------------------------------------------------------------------
+    
+    public void refresh(Services services) {
+	createDefaultNotationTable();
+	if(PRETTY_SYNTAX && services != null) {
+	    addFancyNotations(services);
+	}
+    }    
+        
     
     public AbbrevMap getAbbrevMap(){
 	return scm;
@@ -190,16 +221,6 @@ public final class NotationInfo {
      * If no notation is registered, a Function notation is returned.
      */
     public Notation getNotation(Operator op, Services services) {
-	if(services != this.services 
-	   && services != null 
-	   && services.getTypeConverter().getIntegerLDT() != null) {
-	    this.services = services;
-	    IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();
-	    tbl.put(integerLDT.getNumberSymbol(), new Notation.NumLiteral());
-	    tbl.put(integerLDT.getCharSymbol(), new Notation.CharLiteral());
-	    tbl.put(TypeConverter.stringConverter.getStringSymbol(), new Notation.StringLiteral());
-	}
-	
 	Notation result = tbl.get(op);
 	if(result != null) {
 	    return result;
@@ -225,30 +246,5 @@ public final class NotationInfo {
 	}
 	
 	return new Notation.Function();
-    }
-
-    /** Registers an infix notation for a given operator
-     * @param op    the operator
-     * @param token the string representing the operator
-     */
-    public void createInfixNotation(Operator op, String token) {
-	tbl.put(op, new Notation.Infix(token,120,130,130));
-    }
-
-    /** Registers an infix notation for a given operator
-     * with given priority and associativity
-     * @param op    the operator
-     * @param token the string representing the operator
-     */
-    public void createInfixNotation(Operator op, String token, int prio, int lass, int rass) {
-	tbl.put(op, new Notation.Infix(token,prio,lass,rass));
-    }
-
-    /** Registers a prefix notation for a given operator 
-     * @param op    the operator
-     * @param token the string representing the operator
-     */
-    public void createPrefixNotation(Operator op, String token) {
-	tbl.put(op, new Notation.Prefix(token, 140, 130));
     }
 }
