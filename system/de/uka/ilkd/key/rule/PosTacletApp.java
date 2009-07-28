@@ -35,19 +35,6 @@ public class PosTacletApp extends TacletApp {
      */
     private PosInOccurrence pos;
 
-    /** creates a PosTacletApp for the given taclet 
-     * and a position information and CHECKS variable conditions as well as it
-     * resolves collisions
-     * @param taclet the FindTaclet 
-     * @param pos the PosInOccurrence storing the position where to apply the 
-     * Taclet
-     * @return new PosTacletApp or null if conditions (assertions) have been hurted
-     */
-    public static PosTacletApp createPosTacletApp(FindTaclet taclet, PosInOccurrence pos) { 
-	// no instantiations no checks are needed
-	return new PosTacletApp(taclet, pos);
-    }
-    
     /** creates a PosTacletApp for the given taclet with some known instantiations
      * and a position information 
      * and CHECKS variable conditions as well as it resolves

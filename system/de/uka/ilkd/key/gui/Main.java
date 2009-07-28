@@ -272,7 +272,7 @@ public class Main extends JFrame implements IMain {
      */
     public static Main getInstance(final boolean visible) {
         if (instance == null) {
-            instance = new Main("KeYHeap -- Prover");
+            instance = new Main("KeYHeap");
         }
         if (!instance.isVisible()) {
             if (SwingUtilities.isEventDispatchThread()) {
@@ -1187,7 +1187,6 @@ public class Main extends JFrame implements IMain {
                 ProofSettings.DEFAULT_SETTINGS.
                 getGeneralSettings().setStupidMode(b);
             }});
-        
         registerAtMenu(options, stupidModeOption);
         
 	// dnd direction sensitive		
@@ -1201,8 +1200,21 @@ public class Main extends JFrame implements IMain {
                 ProofSettings.DEFAULT_SETTINGS.
                 getGeneralSettings().setDnDDirectionSensitivity(b);           
         }});
+        registerAtMenu(options, dndDirectionSensitivityOption);
         
-        registerAtMenu(options, dndDirectionSensitivityOption);        
+        
+        // one step simplification
+        final boolean oneStepSimplificationOn = 
+            ProofSettings.DEFAULT_SETTINGS.getGeneralSettings().oneStepSimplification();
+        final JMenuItem oneStepSimplificationOption =
+            new JCheckBoxMenuItem("One Step Simplification", oneStepSimplificationOn);
+        oneStepSimplificationOption.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                boolean b = ((JCheckBoxMenuItem)e.getSource()).isSelected();           
+                ProofSettings.DEFAULT_SETTINGS.
+                getGeneralSettings().setOneStepSimplification(b);           
+        }});
+        registerAtMenu(options, oneStepSimplificationOption);
         
         return options;
     }

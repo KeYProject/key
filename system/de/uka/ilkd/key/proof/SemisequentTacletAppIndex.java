@@ -64,7 +64,6 @@ public class SemisequentTacletAppIndex {
                                 NewRuleListener    listener ) {
         final PosInOccurrence pos =
             new PosInOccurrence ( cfma, PosInTerm.TOP_LEVEL, antec );
-//HIER
         termIndices =
             termIndices.put ( cfma, TermTacletAppIndex.create ( pos,
                                                                 services,

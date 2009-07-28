@@ -19,8 +19,10 @@ import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.UseOperationContractRuleFilter;
+import de.uka.ilkd.key.proof.SetRuleFilter;
+import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.rule.UseOperationContractRule;
 import de.uka.ilkd.key.strategy.feature.*;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.*;
 import de.uka.ilkd.key.strategy.termProjection.*;
@@ -89,33 +91,48 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                            ifZero ( ConstraintStrengthenFeatureUC.create ( p_proof ),
                                     inftyConst () ) );
     
-        String methProp = strategyProperties.getProperty(
-                StrategyProperties.METHOD_OPTIONS_KEY);
             
         final Feature methodSpecF;
+        final String methProp 
+        	= strategyProperties.getProperty(
+        		StrategyProperties.METHOD_OPTIONS_KEY);        
         if (methProp.equals(StrategyProperties.METHOD_CONTRACT)) {   
             methodSpecF = methodSpecFeature(longConst(-20));
         } else if (methProp.equals(StrategyProperties.METHOD_EXPAND)) {  
             methodSpecF = methodSpecFeature(inftyConst());
         } else if (methProp.equals(StrategyProperties.METHOD_NONE)) {   
             methodSpecF = methodSpecFeature(inftyConst());
-        } else throw new RuntimeException("Unexpected strategy property "+
-            methProp);
+        } else {
+            methodSpecF = null;
+            assert false;
+        }
+            
         
+        final Feature oneStepSimplificationF 
+        	= oneStepSimplificationFeature(longConst(-10000));
+
         return SumFeature.createSum ( new Feature [] {
               AutomatedRuleFeature.INSTANCE,
 //              splitF,
               dispatcher,
               NonDuplicateAppFeature.INSTANCE,
               strengthenConstraints, AgeFeature.INSTANCE,
-              /*simplifierF, */methodSpecF, ifMatchedF,
+              oneStepSimplificationF, methodSpecF, ifMatchedF,
               ifThenElseF } );
     }
 
     private Feature methodSpecFeature(Feature cost) {
-        return ConditionalFeature.createConditional(
-            UseOperationContractRuleFilter.INSTANCE, cost );        
+	SetRuleFilter filter = new SetRuleFilter();
+	filter.addRuleToSet(UseOperationContractRule.INSTANCE);
+        return ConditionalFeature.createConditional(filter, cost);        
+    }
+    
+    private Feature oneStepSimplificationFeature(Feature cost) {
+	SetRuleFilter filter = new SetRuleFilter();
+	filter.addRuleToSet(OneStepSimplifier.INSTANCE);
+        return ConditionalFeature.createConditional(filter, cost);        
     }    
+    
 
     
     

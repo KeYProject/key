@@ -160,7 +160,7 @@ public class NodeInfo {
     }
 
     /**
-     * sets the branch label of a node. Schema variables occuring
+     * sets the branch label of a node. Schema variables occurring
      * in string <tt>s</tt> are replaced by their instantiations if
      * possible
      * @param s the String to be set

@@ -27,8 +27,10 @@ public class GeneralSettings implements Settings {
     private static final String PROOF_ASSISTANT_MODE_KEY = "[General]ProofAssistant";
 
     private static final String SOUND_NOTIFICATION_KEY = "[General]SoundNotification";
-    private static final String DND_DIRECTION_SENSITIVE_KEY = 
-        "[General]DnDDirectionSensitive";
+    private static final String DND_DIRECTION_SENSITIVE_KEY 
+        = "[General]DnDDirectionSensitive";
+    private static final String ONE_STEP_SIMPLIFICATION_KEY 
+    	= "[General]OneStepSimplification";    
     private static final String USE_JML_KEY = "[General]UseJML";
     private static final String USE_OCL_KEY = "[General]UseOCL";
     
@@ -51,6 +53,9 @@ public class GeneralSettings implements Settings {
 
     /** is drag and drop instantiation direction sensitive */
     private boolean dndDirectionSensitive = true;
+    
+    /** is one-step simplification enabled */
+    private boolean oneStepSimplification = true;
     
     /** JML is active by default */
     private boolean useJML = true;
@@ -85,6 +90,11 @@ public class GeneralSettings implements Settings {
 
     public boolean isDndDirectionSensitive() {        
         return dndDirectionSensitive;
+    }
+    
+    
+    public boolean oneStepSimplification() {
+	return oneStepSimplification;
     }
     
     
@@ -128,6 +138,14 @@ public class GeneralSettings implements Settings {
           dndDirectionSensitive = b;
           fireSettingsChanged();
         }
+    }
+    
+    
+    public void setOneStepSimplification(boolean b) {
+	if (oneStepSimplification != b) {
+	    oneStepSimplification = b;
+	    fireSettingsChanged();
+	}
     }
 
     
@@ -173,6 +191,11 @@ public class GeneralSettings implements Settings {
             dndDirectionSensitive = Boolean.valueOf(val).booleanValue();
         }         
         
+        val = props.getProperty(ONE_STEP_SIMPLIFICATION_KEY);
+        if (val != null) {
+            oneStepSimplification = Boolean.valueOf(val).booleanValue();
+        }
+        
         val = props.getProperty(USE_JML_KEY);
         if (val != null) {
             useJML = Boolean.valueOf(val).booleanValue();
@@ -195,6 +218,7 @@ public class GeneralSettings implements Settings {
 	props.setProperty(PROOF_ASSISTANT_MODE_KEY, "" + proofAssistantMode);
         props.setProperty(SOUND_NOTIFICATION_KEY, "" + soundNotification);
         props.setProperty(DND_DIRECTION_SENSITIVE_KEY, "" + dndDirectionSensitive);
+        props.setProperty(ONE_STEP_SIMPLIFICATION_KEY, "" + oneStepSimplification);        
         props.setProperty(USE_JML_KEY, "" + useJML);
         props.setProperty(USE_OCL_KEY, "" + useOCL);
     }

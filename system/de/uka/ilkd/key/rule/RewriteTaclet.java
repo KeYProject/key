@@ -25,7 +25,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
  * fulfilled is that the term matches the structure described by the term of the
  * find-part.
  */
-public class RewriteTaclet extends FindTaclet {
+public final class RewriteTaclet extends FindTaclet {
 
     /** does not pose state restrictions on valid matchings */
     public static final int NONE = 0;
@@ -222,6 +222,7 @@ public class RewriteTaclet extends FindTaclet {
     private PosInOccurrence flatten ( PosInOccurrence p_pos,
 				      Services        p_services) {
 	if ( p_pos.termBelowMetavariable () != null ) {
+	    assert false : "metavariables are disabled";
 	    Term flatTerm = replace ( p_pos.constrainedFormula ().formula (),
 				      p_pos.termBelowMetavariable (),
 				      p_pos.posInTerm ().iterator (),
@@ -244,6 +245,43 @@ public class RewriteTaclet extends FindTaclet {
 
 	return p_pos;
     }
+    
+
+    private ConstrainedFormula applyReplacewithHelper(
+	    				RewriteTacletGoalTemplate gt, 
+				 	PosInOccurrence    posOfFind,
+				 	Services           services,
+				 	MatchConditions    matchCond) {
+	PosInOccurrence flatPos = flatten ( posOfFind, services );
+
+	Term term = flatPos.constrainedFormula().formula();
+	IntIterator it = flatPos.posInTerm().iterator();
+	Term rwTemplate=((RewriteTacletGoalTemplate)gt).replaceWith();
+
+	Term formula = replace(term, 
+		       	       rwTemplate, 
+		       	       it, 
+		       	       services, 
+		       	       matchCond, 
+		       	       term.sort());
+	return new ConstrainedFormula(formula);
+    }
+    
+    
+    //XXX
+    public ConstrainedFormula getRewriteResult(Services services, 
+	    				       TacletApp app) {
+	assert goalTemplates().size() == 1;
+	assert ifSequent().isEmpty();
+	assert getStateRestriction() == NONE;
+	assert app.complete();
+	RewriteTacletGoalTemplate gt 
+		= (RewriteTacletGoalTemplate) goalTemplates().head();
+	return applyReplacewithHelper(gt, 
+				      app.posInOccurrence(), 
+				      services, 
+				      app.matchConditions());
+    }
 
 
     /** CONSTRAINT NOT USED 
@@ -260,21 +298,17 @@ public class RewriteTaclet extends FindTaclet {
 				    Services           services,
 				    MatchConditions    matchCond) {
 	if ( gt instanceof RewriteTacletGoalTemplate ) {
-	    PosInOccurrence flatPos = flatten ( posOfFind, services );
-
-	    Term term = flatPos.constrainedFormula().formula();
-	    IntIterator it = flatPos.posInTerm().iterator();
-	    Term rwTemplate=((RewriteTacletGoalTemplate)gt).replaceWith();
-	                           
-            Term result = replace(term, rwTemplate, it, services, 
-                    matchCond, term.sort());
-	    Constraint c = matchCond.getConstraint ();
-	    if ( createCopies ( goal, posOfFind, matchCond ) )
-                goal.addFormula ( new ConstrainedFormula ( result, c ),
-                                  posOfFind );
-            else
-                goal.changeFormula ( new ConstrainedFormula ( result, c ),
-                                     posOfFind );
+            ConstrainedFormula cf 
+            	= applyReplacewithHelper((RewriteTacletGoalTemplate)gt, 
+        	    			         posOfFind, 
+        	    			         services, 
+        	    			         matchCond);
+	    assert matchCond.getConstraint () == Constraint.BOTTOM : "metavariables are disabled";
+	    if ( createCopies ( goal, posOfFind, matchCond ) ) {
+                goal.addFormula ( cf, posOfFind );
+	    } else {
+                goal.changeFormula ( cf, posOfFind );
+	    }
 	} else {
 	    // Then there was no replacewith...
 	    // This is strange in a RewriteTaclet, but who knows...

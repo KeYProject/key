@@ -15,6 +15,7 @@ import de.uka.ilkd.key.proof.mgt.ComplexRuleJustification;
 import de.uka.ilkd.key.proof.mgt.ComplexRuleJustificationBySpec;
 import de.uka.ilkd.key.proof.mgt.RuleJustification;
 import de.uka.ilkd.key.rule.ListOfBuiltInRule;
+import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.UseOperationContractRule;
 import de.uka.ilkd.key.strategy.JavaCardDLStrategy;
@@ -62,8 +63,8 @@ public class JavaProfile extends AbstractProfile {
     protected ListOfBuiltInRule initBuiltInRules() {       
         ListOfBuiltInRule builtInRules = super.initBuiltInRules();
         
-        //XXX
-        builtInRules = builtInRules.prepend(WhileInvariantRule.INSTANCE);
+        builtInRules = builtInRules.prepend(WhileInvariantRule.INSTANCE)
+                                   .prepend(OneStepSimplifier.INSTANCE);
   
         //contract insertion rule, ATTENTION: ProofMgt relies on the fact 
         // that Contract insertion rule is the FIRST element of this list!

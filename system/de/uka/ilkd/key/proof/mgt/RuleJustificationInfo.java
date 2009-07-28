@@ -11,7 +11,6 @@ package de.uka.ilkd.key.proof.mgt;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.WeakHashMap;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.rule.Rule;
@@ -20,7 +19,8 @@ import de.uka.ilkd.key.rule.RuleApp;
 
 public class RuleJustificationInfo {
 
-    private Map rule2justif = new HashMap();
+    private Map<Rule, RuleJustification> rule2justif 
+    	= new HashMap<Rule, RuleJustification>();
 
     public void addJustification(Rule r, RuleJustification j) {
 	rule2justif.put(r, j);

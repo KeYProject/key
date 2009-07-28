@@ -435,15 +435,5 @@ public class Sequent implements Iterable<ConstrainedFormula> {
         public void remove() {
             throw new UnsupportedOperationException();
         }
-	
-    }
-    
-    
+    }    
 }
-
-
-
-
-
-
-
