@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- JNLP file for KeY -->
-<jnlp spec="1.0+" codebase="http://i12www.ira.uka.de/~bubel/nightly/webstart/" href="KeY.jnlp">
+<jnlp spec="1.0+" codebase="http://i12www.ira.uka.de/~bweiss/key-heap" href="KeY.jnlp">
 <information> 
-<title>KeY 1.5 Nightly Build</title>
-<vendor>KeY-Project, Universität Karlsruhe, Chalmers University, Universität Koblenz</vendor> 
+<title>KeYHeap</title>
+<vendor>KeY-Project, Universitaet Karlsruhe, Chalmers University, Universitaet Koblenz</vendor> 
 <homepage href="http://www.key-project.org"/> 
 <description>
-  The standalone version of the KeY-Tool.
+  The KeYHeap tool.
 </description> 
 <icon href="http://www.key-project.org/keylogo.gif"/> 
 <offline-allowed/> 
@@ -19,10 +19,10 @@
 <j2se version="1.5+" initial-heap-size="128m" max-heap-size="1024m"/> 
 
 <jar href="key.jar"/> 
-<jar href="lib/antlr.jar" /> 
-<jar href="lib/recoderKey.jar" /> 
-<jar href="lib/log4j.jar" /> 
+<jar href="antlr.jar" /> 
+<jar href="recoderKey.jar" /> 
+<jar href="log4j.jar" /> 
 </resources> 
 
-<application-desc main-class="de.uka.ilkd.key.gui.Main"/> 
+<application-desc main-class="de.uka.ilkd.key.gui.WebstartMain"/> 
 </jnlp> 

@@ -106,8 +106,6 @@ JAVADOC_OPTIONS=-use -quiet -breakiterator -linksource -J-Xmx512m
 ## KeY config
 PLUG_IN_FILTER?="(none)"
 export PLUG_IN_FILTER
-COMPILE_GF?=--with-gf
-export COMPILE_GF
 
 # this part creates .java-files from .gjava files
 #	rule/SLListOfRule rule/SLListOfRuleApp \

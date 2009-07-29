@@ -43,7 +43,7 @@ public class KeYFileChooser {
 		}
 		
 		public String getDescription() {
-		    return "KeY and JML files";
+		    return "KeY and Java files";
 		}
 	    });
     }
