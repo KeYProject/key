@@ -110,19 +110,22 @@ public final class OneStepSimplifier implements BuiltInRule {
 						    TacletFilter.TRUE, 
 						    services, 
 						    Constraint.BOTTOM);
-	for(TacletApp app : apps) {
+	for(TacletApp app : apps) {	    
 	    app = ((NoPosTacletApp)app).matchFind(pos, 
 		                                  Constraint.BOTTOM, 
 		                                  services, 
 		                                  Constraint.BOTTOM);
 	    if(app != null) {
 		app = app.setPosInOccurrence(pos);
-		if(app.complete()) {
+		if(!app.complete()) {
+		    app = app.tryToInstantiate(services);
+		}
+		if(app != null) {
 		    RewriteTaclet taclet = (RewriteTaclet) app.rule();
 		    ConstrainedFormula result 
 		    	= taclet.getRewriteResult(services, app);
 		    return result;
-		}
+		} 
 	    }
 	}
 	
@@ -179,6 +182,8 @@ public final class OneStepSimplifier implements BuiltInRule {
 			                               numAppliedRules);
 		cache.put(originalCf, inst);
 		cache.put(currentCF, Instantiation.EMPTY_INSTANTIATION);
+	    } else {
+		cache.put(originalCf, Instantiation.EMPTY_INSTANTIATION);
 	    }
 	}	
     }

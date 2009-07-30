@@ -45,7 +45,7 @@ public final class ProgramSV extends AbstractSV
      * allowed to match a list of program constructs
      */    
     ProgramSV(Name name, ProgramSVSort s, boolean isListSV) {
-	super(name, EMPTY_ARG_SORTS, s, false, false);
+	super(name, s, false, false);
 	this.isListSV = isListSV;
     }
     
@@ -63,13 +63,7 @@ public final class ProgramSV extends AbstractSV
 				     NameAbstractionTable nat) {
 	return se == this;
     }    
-    
-
-    @Override
-    public boolean mayBeAliasedBy(UpdateableOperator loc) {
-        return true;
-    }
-    
+        
     
     /** @return comments if the schemavariable stands for programm
      * construct and has comments attached to it (not supported yet)

@@ -10,104 +10,98 @@
 package de.uka.ilkd.key.explicitheap;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.sort.ArraySort;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.rule.conditions.TypeResolver;
-import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 
-/** 
- * Called in:
- *   - ProblemInitializer::setUpProofHelper()
- *   - Goal::apply() 
- */
 public class ExplicitHeapConverter {
 
-    public static final ExplicitHeapConverter INSTANCE = new ExplicitHeapConverter();
-    
-    private static final TermBuilder TB = TermBuilder.DF;
-    private static final String ARRAY_LENGTH_FIELD_NAME = "Array::length";
-
-    
-    private ExplicitHeapConverter() {
-    }
-    
-    
-    
-    //-------------------------------------------------------------------------
-    //internal methods
-    //-------------------------------------------------------------------------
-    
-    private void warn(String s) {
-        System.out.println("ExplicitHeapConverter WARNING: " + s);
-    }
-    
-    
-    //-------------------------------------------------------------------------
-    //public interface
-    //-------------------------------------------------------------------------
-    
-    public Function getFieldSymbol(ProgramVariable fieldPV, Services services) {
-	final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
-	final Name name;
-	if(fieldPV == services.getJavaInfo().getArrayLength()) {
-	    name = new Name(ARRAY_LENGTH_FIELD_NAME);
-	} else if(fieldPV.isStatic()) {
-	    name = new Name(fieldPV.getContainerType().getSort().toString() 
-		    	    + "::" 
-		    	    + fieldPV.toString());
-	} else {
-	    name = new Name(fieldPV.toString());
-	}
-        Function result 
-            = (Function) services.getNamespaces().functions().lookup(name); 
-        if(result == null) {
-            result = new Function(name, 
-                     	          heapLDT.getFieldSort(), 
-                		  new Sort[0], 
-                		  true);
-            services.getNamespaces().functions().add(result);
-        } else {
-            if(!result.isUnique()) {
-                warn("field symbol \"" + name + "\" is not unique!");
-            }
-        }
-        return result;
-    }
-    
-    
-    public Sort getFieldTargetSort(Term objectTerm, 
-	    			   Term fieldTerm, 
-	    			   Services services) {
-	final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();	
-	assert fieldTerm.op() instanceof Function
-	       && ((Function)fieldTerm.op()).isUnique();
-	
-	final Function fieldSymbol = (Function) fieldTerm.op();
-	final String fieldSymbolName = fieldSymbol.name().toString();
-	
-	if(fieldSymbolName.equals(ARRAY_LENGTH_FIELD_NAME)) {
-	    return services.getTypeConverter().getIntLDT().targetSort();
-	} else if(fieldSymbol.arity() == 0) {
-	    ProgramVariable fieldPV
-	    	= services.getJavaInfo().getAttribute(fieldSymbol.name().toString());
-	    assert fieldPV != null;
-	    return fieldPV.sort();
-	} else if(fieldSymbol == heapLDT.getArr()){
-	    assert objectTerm.sort() instanceof ArraySort;
-	    return ((ArraySort) objectTerm.sort()).elementSort();
-	} else {
-	    assert false;
-	    return null;
-	}
-    }
-    
-        
-    
+//    public static final ExplicitHeapConverter INSTANCE = new ExplicitHeapConverter();
+//    
+//
+//    private static final Name ARRAY_LENGTH_FIELD_NAME 
+//    		= new Name("Array::length");
+//
+//    
+//    private ExplicitHeapConverter() {
+//    }
+//    
+//    
+//    
+//    //-------------------------------------------------------------------------
+//    //internal methods
+//    //-------------------------------------------------------------------------
+//    
+//    private void warn(String s) {
+//        System.out.println("ExplicitHeapConverter WARNING: " + s);
+//    }
+//    
+//    
+//    //-------------------------------------------------------------------------
+//    //public interface
+//    //-------------------------------------------------------------------------
+//    
+//    public Function getFieldSymbol(ProgramVariable fieldPV, Services services) {
+//	assert fieldPV.isMember();
+//	final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+//	
+//	final Name name;
+//	if(fieldPV == services.getJavaInfo().getArrayLength()) {
+//	    name = ARRAY_LENGTH_FIELD_NAME;
+//	} else if(fieldPV.isStatic()) {
+//	    name = new Name(fieldPV.getContainerType().getSort().toString() 
+//		    	    + "::" 
+//		    	    + fieldPV.toString());
+//	} else {
+//	    name = new Name(fieldPV.toString());
+//	}
+//	
+//        Function result 
+//            = (Function) services.getNamespaces().functions().lookup(name); 
+//        if(result == null) {
+//            result = new Function(name, 
+//                     	          heapLDT.getFieldSort(), 
+//                		  new Sort[0], 
+//                		  null,
+//                		  true);
+//            services.getNamespaces().functions().add(result);
+//        } 
+//        
+//        assert result.isUnique();        
+//        return result;
+//    }
+//    
+//    
+//    public Sort getFieldTargetSort(Term objectTerm, 
+//	    			   Term fieldTerm, 
+//	    			   Services services) {
+//	final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();	
+//	assert fieldTerm.op() instanceof Function
+//	       && ((Function)fieldTerm.op()).isUnique();
+//	
+//	final Function fieldSymbol = (Function) fieldTerm.op();
+//	final String fieldSymbolName = fieldSymbol.name().toString();
+//	
+//	if(fieldSymbolName.equals(ARRAY_LENGTH_FIELD_NAME)) {
+//	    return services.getTypeConverter().getIntLDT().targetSort();
+//	} else if(fieldSymbol.arity() == 0) {
+//	    ProgramVariable fieldPV
+//	    	= services.getJavaInfo().getAttribute(fieldSymbol.name().toString());
+//	    assert fieldPV != null;
+//	    return fieldPV.sort();
+//	} else if(fieldSymbol == heapLDT.getArr()){
+//	    assert objectTerm.sort() instanceof ArraySort;
+//	    return ((ArraySort) objectTerm.sort()).elementSort();
+//	} else {
+//	    assert false;
+//	    return null;
+//	}
+//    }
+//    
+//        
+//    
 //    public Update convert(Update u, Services services) {
 //	final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();	
 //        final ArrayOfAssignmentPair pairs = u.getAllAssignmentPairs();
@@ -306,74 +300,76 @@ public class ExplicitHeapConverter {
 //        }
 //    }
 //    
-    //only converts heap locs
-    public Term convert(LocationDescriptor loc, Services services) {
-        HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
-	if(loc instanceof BasicLocationDescriptor) {
-            BasicLocationDescriptor bloc = (BasicLocationDescriptor) loc;
-            Term locTerm = bloc.getLocTerm();
-            if(!bloc.getFormula().equals(TB.tt())) {
-        	warn("ignoring location descriptor guard: " + bloc.getFormula());
-            }            
-            assert locTerm.op() instanceof ProgramVariable;
-            return TB.empty(services);
-	} else {
-	    assert loc instanceof EverythingLocationDescriptor;
-	    return TB.everything(services);
-	}
-    }
-    
-    
-    public Term convert(SetOfLocationDescriptor locs, Services services) {
-	Term result = TB.empty(services);
-	for(LocationDescriptor loc : locs) {
-	    result = TB.union(services, result, convert(loc, services));
-	}
-	return result;
-    }
-    
-    
-    //-------------------------------------------------------------------------
-    //inner classes
-    //-------------------------------------------------------------------------
-    
-    public static final class FieldTargetTypeResolver extends TypeResolver {
-                
-	private final SchemaVariable objectSV;
-        private final SchemaVariable fieldSV;
-
-        public FieldTargetTypeResolver(SchemaVariable objectSV,
-        			       SchemaVariable fieldSV) {
-            this.objectSV = objectSV;
-            this.fieldSV  = fieldSV;
-        }
-
-        public boolean isComplete(SchemaVariable sv,
-                SVSubstitute instCandidate, SVInstantiations instMap,
-                Services services) {            
-            return sv == fieldSV || instMap.getInstantiation(fieldSV) != null;
-        }
-
-        public Sort resolveSort(SchemaVariable sv, SVSubstitute instCandidate,
-                SVInstantiations instMap, Services services) {
-            Term objectTerm = (Term) instMap.getInstantiation(objectSV);
-            Term fieldTerm  = (Term) instMap.getInstantiation(fieldSV);
-
-            return ExplicitHeapConverter.INSTANCE.getFieldTargetSort(objectTerm, 
-        	    						     fieldTerm, 
-        	    						     services);
-        }
-
-        public KeYJavaType resolveType(SchemaVariable sv,
-                SVSubstitute instCandidate, SVInstantiations instMap,
-                Services services) {
-            Sort s = resolveSort(sv, instCandidate, instMap, services);
-            return services.getJavaInfo().getKeYJavaType(s);
-        }
-
-        
-        public String toString() {
-            return "\\fieldTargetType(" + fieldSV  + ")";
-        }
-    }
+//    //only converts heap locs
+//    public Term convert(LocationDescriptor loc, Services services) {
+//        HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+//	if(loc instanceof BasicLocationDescriptor) {
+//            BasicLocationDescriptor bloc = (BasicLocationDescriptor) loc;
+//            Term locTerm = bloc.getLocTerm();
+//            if(!bloc.getFormula().equals(TB.tt())) {
+//        	warn("ignoring location descriptor guard: " + bloc.getFormula());
+//            }            
+//            assert locTerm.op() instanceof ProgramVariable;
+//            return TB.empty(services);
+//	} else {
+//	    assert loc instanceof EverythingLocationDescriptor;
+//	    assert false : "not implemented";
+//	    return null;
+//	    //return TB.everything(services);
+//	}
+//    }
+//    
+//    
+//    public Term convert(SetOfLocationDescriptor locs, Services services) {
+//	Term result = TB.empty(services);
+//	for(LocationDescriptor loc : locs) {
+//	    result = TB.union(services, result, convert(loc, services));
+//	}
+//	return result;
+//    }
+//    
+//    
+//    //-------------------------------------------------------------------------
+//    //inner classes
+//    //-------------------------------------------------------------------------
+//    
+//    public static final class FieldTargetTypeResolver extends TypeResolver {
+//                
+//	private final SchemaVariable objectSV;
+//        private final SchemaVariable fieldSV;
+//
+//        public FieldTargetTypeResolver(SchemaVariable objectSV,
+//        			       SchemaVariable fieldSV) {
+//            this.objectSV = objectSV;
+//            this.fieldSV  = fieldSV;
+//        }
+//
+//        public boolean isComplete(SchemaVariable sv,
+//                SVSubstitute instCandidate, SVInstantiations instMap,
+//                Services services) {            
+//            return sv == fieldSV || instMap.getInstantiation(fieldSV) != null;
+//        }
+//
+//        public Sort resolveSort(SchemaVariable sv, SVSubstitute instCandidate,
+//                SVInstantiations instMap, Services services) {
+//            Term objectTerm = (Term) instMap.getInstantiation(objectSV);
+//            Term fieldTerm  = (Term) instMap.getInstantiation(fieldSV);
+//
+//            return ExplicitHeapConverter.INSTANCE.getFieldTargetSort(objectTerm, 
+//        	    						     fieldTerm, 
+//        	    						     services);
+//        }
+//
+//        public KeYJavaType resolveType(SchemaVariable sv,
+//                SVSubstitute instCandidate, SVInstantiations instMap,
+//                Services services) {
+//            Sort s = resolveSort(sv, instCandidate, instMap, services);
+//            return services.getJavaInfo().getKeYJavaType(s);
+//        }
+//
+//        
+//        public String toString() {
+//            return "\\fieldTargetType(" + fieldSV  + ")";
+//        }
+//    }
 }

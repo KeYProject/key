@@ -99,6 +99,10 @@ public final class TermBuilder {
         return tf.createFunctionTerm(op, s);
     }
     
+    public Term func(Operator op, Term[] s, ArrayOfQuantifiableVariable boundVars) {
+        return tf.createTerm(op, s, new ArrayOfQuantifiableVariable[]{boundVars}, null);//TODO
+    }    
+    
     
     public Term box(JavaBlock jb, Term t) {
         return tf.createBoxTerm(jb, t);
@@ -539,17 +543,6 @@ public final class TermBuilder {
 		    s2);
     }
     
-    
-    public Term complement(Services services, Term s) {
-	return func(services.getTypeConverter().getSetLDT().getComplement(), s);
-    }
-    
-    
-    public Term everything(Services services) {
-	return func(services.getTypeConverter().getSetLDT().getEverything());
-    }
-    
-    
     public Term elementOf(Services services, Term e, Term s) {
 	return func(services.getTypeConverter().getSetLDT().getElementOf(), 
 		    e,
@@ -603,8 +596,8 @@ public final class TermBuilder {
     
     public Term select(Services services, Sort asSort, Term h, Term o, Term f) {
 	return func(services.getTypeConverter().getHeapLDT().getSelect(
-			asSort, 
-			services), 
+		    asSort, 
+		    services), 
 		    new Term[]{h, o, f});
     }
 
@@ -655,7 +648,7 @@ public final class TermBuilder {
 		                 .getNextToCreateFor(sort, services));
     }
     
-    private static GenericSort urghSort; //XXX
+
     public Term array(Services services, Term ref, Term idx) {
         if (ref == null || idx == null) {
             throw new TermCreationException("Tried to build an array access "+
@@ -671,16 +664,7 @@ public final class TermBuilder {
         } else if(ref.sort() instanceof GenericSort 
         	  || ref.sort() instanceof ProgramSVSort
         	  || ref.sort() == AbstractMetaOperator.METASORT) {
-            if(urghSort == null) {
-        	try {
-        	    urghSort = new GenericSort(new Name("urgh"),
-        		    		       SetAsListOfSort.EMPTY_SET.add(services.getJavaInfo().objectSort()),
-                                               SetAsListOfSort.EMPTY_SET);
-                } catch(GenericSupersortException e) {
-                    assert false;
-                }
-            }
-            elementSort = urghSort;//ProgramSVSort.NONSIMPLEEXPRESSION;
+            elementSort = ref.sort();//XXX
         } else {
             throw new TermCreationException("Tried to build an array access "+
                     "on an inacceptable sort: " + ref.sort().getClass() + "\n" +

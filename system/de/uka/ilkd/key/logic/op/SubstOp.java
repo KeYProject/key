@@ -26,7 +26,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
 public abstract class SubstOp extends AbstractOperator {
     
     protected SubstOp(Name name) {
-	super(name, 2);
+	super(name, 2, new Boolean[]{false, true}, true);
     }
     
 
@@ -34,13 +34,14 @@ public abstract class SubstOp extends AbstractOperator {
      * @return sort of the second subterm or throws an
      * IllegalArgumentException if the given term has no correct (2=) arity
      */
+    @Override
     public Sort sort(ArrayOfTerm terms) {
 	if(terms.size() == 2) {
 	    return terms.getTerm(1).sort();
 	}
 	else throw new IllegalArgumentException("Cannot determine sort of "+
 						"invalid term (Wrong arity).");
-    }    
+    }
     
 
     /**
@@ -50,13 +51,8 @@ public abstract class SubstOp extends AbstractOperator {
      * term's arity is 2 and the numer of variables bound there is 0
      * for the 0th subterm and 1 for the 1st subterm.
      */
-    public boolean validTopLevel(Term term){
-	if(term.arity() != arity()) {
-	    return false;
-	}
-	if(term.varsBoundHere(0).size() != 0) {
-	    return false;
-	}
+    @Override    
+    protected boolean additionalValidTopLevel(Term term){
 	if(term.varsBoundHere(1).size() != 1) { 
 	    return false;
 	}

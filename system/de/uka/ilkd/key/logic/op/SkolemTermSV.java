@@ -26,7 +26,7 @@ public final class SkolemTermSV extends AbstractSV {
      * allowed to match a list of program constructs
      */    
     SkolemTermSV(Name name, Sort sort) {
-	super(name, EMPTY_ARG_SORTS, sort, true, false);	
+	super(name, sort, true, false);	
 	assert sort != Sort.FORMULA;
 	assert sort != Sort.UPDATE;
     }

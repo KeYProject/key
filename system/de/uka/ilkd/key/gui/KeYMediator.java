@@ -381,7 +381,7 @@ public class KeYMediator {
                     firstApp = ifSeqCandidates.head();
                 }               
                 TacletApp tmpApp = 
-                    firstApp.tryToInstantiate(goal, getServices());                
+                    firstApp.tryToInstantiate(getServices());                
                 if (tmpApp != null) firstApp = tmpApp;
                 
                

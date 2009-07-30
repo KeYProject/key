@@ -24,7 +24,7 @@ public final class UpdateSV extends AbstractSV {
      * Creates a new SchemaVariable that is used as placeholder for updates.
      */    
     UpdateSV(Name name) {	
-        super(name, EMPTY_ARG_SORTS, Sort.UPDATE, false, true);
+        super(name, Sort.UPDATE, false, true);
     }
     
     

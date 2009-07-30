@@ -28,7 +28,6 @@ import de.uka.ilkd.key.logic.SetOfTerm;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Equality;
-import de.uka.ilkd.key.logic.op.IfExThenElse;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.Operator;
 
@@ -85,29 +84,15 @@ class PredictCostProver {
 		if (i >= terms.length)
 			return res;
 		Term self = terms[i];
-		boolean ifthen = terms[i].op() == IfExThenElse.IF_EX_THEN_ELSE;
 		Set<SetOfTerm> next = createClause(terms, i+1);
 		if(next.size()==0){
-		     if(ifthen){res.add(SetAsListOfTerm.EMPTY_SET
-				.add(tb.not(self.sub(0))).add(self.sub(1)));
-		                 res.add(SetAsListOfTerm.EMPTY_SET
-                                .add(self.sub(0)).add(self.sub(2)));
-		     }
-		     else res.add(SetAsListOfTerm.EMPTY_SET.add(self));
+		     res.add(SetAsListOfTerm.EMPTY_SET.add(self));
 		}
 		else {
 			Iterator<SetOfTerm>  it = next.iterator();
 			while (it.hasNext()) {
 				SetOfTerm ts = it.next();
-				if (ifthen) {
-					res.add(ts.add(tb.not(self.sub(0)))
-							    .add(self.sub(1)));
-					res.add(ts.add(self.sub(0))
-							.add(self.sub(2)));
-				}
-				else {
-					res.add(ts.add(self));
-				}
+				res.add(ts.add(self));
 			}
 		}
 		return res;

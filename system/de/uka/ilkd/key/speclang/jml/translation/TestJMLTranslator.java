@@ -15,21 +15,18 @@ import java.io.File;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import de.uka.ilkd.key.explicitheap.ExplicitHeapConverter;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.ListOfKeYJavaType;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.abstraction.SLListOfKeYJavaType;
-import de.uka.ilkd.key.java.expression.literal.BooleanLiteral;
 import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.sort.AbstractSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.ProofSaver;
 import de.uka.ilkd.key.speclang.FormulaWithAxioms;
@@ -565,7 +562,7 @@ public class TestJMLTranslator extends TestCase {
 
         assertTrue(result != null);
         final LogicVariable qv = new LogicVariable(new Name("a"),selfVar.sort());
-        final Function fieldSymbol = ExplicitHeapConverter.INSTANCE.getFieldSymbol(array, services);
+        final Function fieldSymbol = services.getTypeConverter().getHeapLDT().getFieldSymbolForPV(array, services);
         Term expected = tb.all(qv,
                 tb.imp(tb.and(
                         tb.equals(tb.dot(services, array.sort(), tb.var(qv), fieldSymbol),

@@ -9,51 +9,56 @@
 
 package de.uka.ilkd.key.speclang.translation;
 
-import de.uka.ilkd.key.explicitheap.ExplicitHeapConverter;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
+import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 
 public class SLAttributeResolver extends SLExpressionResolver {
-
-    private static final ExplicitHeapConverter EHC = ExplicitHeapConverter.INSTANCE;
 
     
     public SLAttributeResolver(JavaInfo javaInfo, SLResolverManager manager) {
         super(javaInfo, manager);
     }
     
-    protected SLExpression doResolving(SLExpression receiver, String name,
-            SLParameters parameters) throws SLTranslationException {
-
-        if (parameters != null) {
+    protected SLExpression doResolving(SLExpression receiver, 
+	    			       String name,
+	    			       SLParameters parameters) 
+    		throws SLTranslationException {
+	
+        if(parameters != null) {
             return null;
         }
+        
+        final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT(); 
+        
         Term recTerm = receiver.getTerm();        
-        ProgramVariable attribute=null;
+        ProgramVariable attribute = null;
         try {
             //try as fully qualified name
             attribute = javaInfo.getAttribute(name);
         } catch(IllegalArgumentException e){
             //try as short name and in enclosing classes
             KeYJavaType containingType = receiver.getKeYJavaType(javaInfo);
-            while(attribute==null){
-                attribute = javaInfo.lookupVisibleAttribute(name, containingType);
-                if(attribute==null){
-                    attribute = javaInfo.lookupVisibleAttribute(
-                            ImplicitFieldAdder.FINAL_VAR_PREFIX+name, containingType);
+            while(attribute == null){
+                attribute = javaInfo.lookupVisibleAttribute(name, 
+                	                                    containingType);
+                if(attribute == null){
+                    attribute 
+                    	= javaInfo.lookupVisibleAttribute(ImplicitFieldAdder.FINAL_VAR_PREFIX+name, containingType);
                 }
-                ProgramVariable et = javaInfo.getAttribute(
-                        ImplicitFieldAdder.IMPLICIT_ENCLOSING_THIS, containingType);
-                if(et!=null && attribute==null){
+                ProgramVariable et 
+                	= javaInfo.getAttribute(ImplicitFieldAdder.IMPLICIT_ENCLOSING_THIS, containingType);
+                if(et != null && attribute == null){
                     containingType = et.getKeYJavaType();
-                    if(recTerm!=null){
-                	final Function fieldSymbol = EHC.getFieldSymbol(et, services);
+                    if(recTerm != null){
+                	final Function fieldSymbol 
+                		= heapLDT.getFieldSymbolForPV(et, services);
                         recTerm = TB.dot(services, et.sort(), recTerm, fieldSymbol);
                     }
-                }else{
+                } else {
                     break;
                 }
             }
@@ -66,7 +71,8 @@ public class SLAttributeResolver extends SLExpressionResolver {
                         attribute.name());
             }
             try {
-        	final Function fieldSymbol = EHC.getFieldSymbol(attribute, services);
+        	final Function fieldSymbol 
+        		= heapLDT.getFieldSymbolForPV(attribute, services);
         	Term attributeTerm;
         	if(attribute.isStatic()) {
         	    attributeTerm = TB.staticDot(services, attribute.sort(), fieldSymbol);
@@ -91,5 +97,4 @@ public class SLAttributeResolver extends SLExpressionResolver {
     public boolean needVarDeclaration(String name) {
         return false;
     }
-
 }

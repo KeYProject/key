@@ -166,8 +166,7 @@ public class TestTermFactory extends TestCase {
 	Term t_x_subst_fy_in_px=tf.createSubstitutionTerm(WarySubstOp.SUBST, x, t3(),
 							  t1());
 	Assert.assertEquals(new TermImpl(WarySubstOp.SUBST, new ArrayOfTerm(new Term[]{ t3(),t1() }),
-				    	 null, new ArrayOfQuantifiableVariable[]{new ArrayOfQuantifiableVariable(),
-	                                                                         new ArrayOfQuantifiableVariable(x)}), 
+				    	 null, new ArrayOfQuantifiableVariable(x)), 
 			    t_x_subst_fy_in_px);
     }
 

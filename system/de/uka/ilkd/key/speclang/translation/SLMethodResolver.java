@@ -56,7 +56,8 @@ public class SLMethodResolver extends SLExpressionResolver {
             if(et!=null && pm==null){
                 containingType = et.getKeYJavaType();
                 if(recTerm!=null){
-                    final Function fieldSymbol = ExplicitHeapConverter.INSTANCE.getFieldSymbol(et, services);
+                    final Function fieldSymbol 
+                    	= services.getTypeConverter().getHeapLDT().getFieldSymbolForPV(et, services);
                     recTerm = TB.dot(services, et.sort(), recTerm, fieldSymbol);
                 }
             }else{

@@ -52,7 +52,8 @@ public final class ProgramMethod extends AbstractSortedOperator
         super(new ProgramElementName(method.getProgramElementName().toString(), 
                 		     contKJT.getSort().toString()), 
               getArgumentSorts(method, contKJT), 
-              kjt == null ? Sort.ANY : kjt.getSort()); 
+              kjt == null ? Sort.ANY : kjt.getSort(),
+              false); 
                         
 	this.method  = method;
 	this.contKJT = contKJT;
@@ -362,10 +363,5 @@ public final class ProgramMethod extends AbstractSortedOperator
             Debug.out("Program match failed (pattern, source)", this, src);
             return null;
         }        
-    }
-    
-    @Override
-    public boolean isRigid () {
-	return false;
     }
 }

@@ -27,19 +27,18 @@ public final class Metavariable extends AbstractSortedOperator
     }
 
     private Metavariable(Name name, Sort sort, boolean isTemporaryVariable) {
-	super(name, EMPTY_ARG_SORTS, sort);
+	super(name, sort, true);
 	if ( sort == Sort.FORMULA ) {
 	    throw new RuntimeException(
 		 "Attempt to create metavariable of type formula");
 	}
 	this.isTemporaryVariable = isTemporaryVariable;
 	setSerial ();
-	assert false : "metavariables are disabled";
+	//assert false : "metavariables are disabled";
     }
 
     public Metavariable (Name name, Sort sort) {
-        this ( name, sort, false );
-	assert false : "metavariables are disabled";        
+        this ( name, sort, false );        
     }
 
     public static Metavariable createTemporaryVariable (Name name, Sort sort) {
@@ -47,13 +46,9 @@ public final class Metavariable extends AbstractSortedOperator
     }
     
 
+    @Override
     public String toString() {
 	return name()+":"+sort();
-    }
-
-    @Override
-    public boolean isRigid() {
-	return true;
     }
 
     

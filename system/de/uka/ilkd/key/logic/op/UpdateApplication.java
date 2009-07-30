@@ -22,7 +22,7 @@ public final class UpdateApplication extends AbstractOperator {
 
 
     private UpdateApplication () {
-        super(new Name("update-application" ), 2);
+        super(new Name("update-application" ), 2, false);
     }
 
     
@@ -33,17 +33,8 @@ public final class UpdateApplication extends AbstractOperator {
     
     
     @Override
-    public boolean validTopLevel (Term term) {
-        return term.arity() == arity() 
-               && term.sub(0).sort() == Sort.UPDATE
-               && term.varsBoundHere(0).size() == 0
-               && term.varsBoundHere(1).size() == 0;
-    }
-    
-    
-    @Override
-    public boolean isRigid() {
-	return false;
+    public boolean additionalValidTopLevel (Term term) {
+        return term.sub(0).sort() == Sort.UPDATE;
     }
     
     

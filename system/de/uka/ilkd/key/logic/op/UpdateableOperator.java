@@ -15,11 +15,5 @@ package de.uka.ilkd.key.logic.op;
  * left side of an assignment pair of an update. 
  */
 public interface UpdateableOperator extends SortedOperator {
-    /**
-     * Checks if location <code>loc</code> may be an alias of the current
-     * location.
-     * The <code>mayBeAliasOf</code> relation is <strong>not</strong> necessary 
-     * symmetric as e.g. for attributes and their shadowed variant. 
-     */
-    boolean mayBeAliasedBy(UpdateableOperator loc);
+
 }

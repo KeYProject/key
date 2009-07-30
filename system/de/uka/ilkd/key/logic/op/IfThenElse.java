@@ -21,7 +21,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
 /**
  * This implements a general conditional operator <tt>if (phi) (t1) (t2)</tt>
  */
-public class IfThenElse extends AbstractOperator {
+public final class IfThenElse extends AbstractOperator {
     
     public static final IfThenElse IF_THEN_ELSE = new IfThenElse ();
     
@@ -30,7 +30,7 @@ public class IfThenElse extends AbstractOperator {
      * creates an if-else operator of the given name
      */
     protected IfThenElse(Name name) {
-        super ( name, 3 );
+        super(name, 3, true);
     }
         
     
@@ -39,7 +39,6 @@ public class IfThenElse extends AbstractOperator {
     }
     
     
-
     private Sort getCommonSuperSort(Sort s1, Sort s2) {
         if (s1 == Sort.FORMULA) {
             assert s2 == Sort.FORMULA;
@@ -70,14 +69,14 @@ public class IfThenElse extends AbstractOperator {
 
     
     @Override
-    public Sort sort (ArrayOfTerm terms) {
+    public Sort sort(ArrayOfTerm terms) {
         final Sort s2 = terms.getTerm(1).sort ();
         final Sort s3 = terms.getTerm(2).sort ();
         if (s2 instanceof ProgramSVSort
-             || s2 == AbstractMetaOperator.METASORT )
-            { return s3; }
-        if (s3 instanceof ProgramSVSort
-             || s3 == AbstractMetaOperator.METASORT ) {
+             || s2 == AbstractMetaOperator.METASORT ) { 
+            return s3; 
+        } else if (s3 instanceof ProgramSVSort
+        	    || s3 == AbstractMetaOperator.METASORT ) {
             return s2;
         } else {           
             // still a mess but a better one
@@ -87,20 +86,13 @@ public class IfThenElse extends AbstractOperator {
     
 
     @Override
-    public boolean validTopLevel (Term term) {
+    protected boolean additionalValidTopLevel(Term term) {
         final Sort s0 = term.sub(0).sort();
         final Sort s1 = term.sub(1).sort();
         final Sort s2 = term.sub(2).sort();
         
         // TODO: like in <code>ConjCond</code>, but this is really bad!!! /PR
-        return term.arity() == arity()
-               && s0 == Sort.FORMULA
+        return s0 == Sort.FORMULA
                && (s1 == Sort.FORMULA) == (s2 == Sort.FORMULA);
     }
-    
-    
-    @Override
-    public boolean isRigid() {
-	return true;
-    }   
 }

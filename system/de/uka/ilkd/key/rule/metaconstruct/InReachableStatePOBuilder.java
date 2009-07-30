@@ -9,7 +9,6 @@
 
 package de.uka.ilkd.key.rule.metaconstruct;
 
-import de.uka.ilkd.key.explicitheap.ExplicitHeapConverter;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.IteratorOfKeYJavaType;
@@ -32,7 +31,6 @@ import de.uka.ilkd.key.util.Debug;
 public class InReachableStatePOBuilder {
     
     private static final TermBuilder TB = TermBuilder.DF;
-    private static final ExplicitHeapConverter EHC = ExplicitHeapConverter.INSTANCE;
 
     private final Services services;
     private final Sort intSort;

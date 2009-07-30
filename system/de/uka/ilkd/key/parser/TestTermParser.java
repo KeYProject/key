@@ -36,14 +36,14 @@ public class TestTermParser extends TestCase {
 
     private static Recoder2KeY r2k;
 
-    private static Sort elem,list,int_sort;
+    private static Sort elem,list;
 
     private static Function head,tail,nil,cons,isempty,p; 
 
     private static LogicVariable x,y,z,xs,ys,zs;
 
-    private static Term t_x,t_y,t_z,t_xs,t_ys,t_zs;
-    private static Term t_headxs,t_tailxs,t_tailys,t_nil;
+    private static Term t_x,t_y,t_z,t_xs,t_ys;
+    private static Term t_headxs,t_tailys,t_nil;
 
     public TestTermParser(String name) {
 	super(name);
@@ -95,11 +95,11 @@ public class TestTermParser extends TestCase {
 //                   "  leq(int,int);\n" +
 		   "  isempty(list);\n" +
 //		   "  p(elem,list);\n" +
-		   "}\n"
+		   "}\n"+
+		   "\\programVariables {int globalIntPV;}"
 
 		   );
-
-        int_sort = lookup_sort("int");       
+       
         elem = lookup_sort("elem");
 	list = lookup_sort("list");
 
@@ -115,10 +115,8 @@ public class TestTermParser extends TestCase {
 	z = declareVar("z",elem);   t_z = tf.createVariableTerm(z);  
 	xs = declareVar("xs",list); t_xs = tf.createVariableTerm(xs);
 	ys = declareVar("ys",list); t_ys = tf.createVariableTerm(ys);
-	zs = declareVar("zs",list); t_zs = tf.createVariableTerm(zs);
 	
 	t_headxs = tf.createFunctionTerm(head,t_xs);
-	t_tailxs = tf.createFunctionTerm(tail,t_xs);
 	t_tailys = tf.createFunctionTerm(tail,t_ys);
 	t_nil = tf.createFunctionTerm(nil);
     }
@@ -398,54 +396,54 @@ public class TestTermParser extends TestCase {
                                         +" cons(y,xs))");
         Term t3 = parseTerm("\\exists int_sort bi; (\\<{ int p_x = 1;"
                             +" {int s = 2;} }\\>"
-                            +" p_x=p_x ->"
+                            +" true ->"
                             +"\\<{ int p_x = 1;boolean p_y=2<1;"
                             +" while(p_y){ int s=3 ;} }\\>"
-                            +" p_x=p_x)");
+                            +" true)");
         Term t4 = parseTerm("\\exists int_sort ci; (\\<{ int p_y = 1;"
                             +" {int s = 2;} }\\>"
-                            +" p_y=p_y ->"
+                            +" true ->"
                             +"\\<{ int p_y = 1;boolean p_x = 2<1;"
                             +"while(p_x){ int s=3 ;} }\\>"
-                            +" p_y=p_y)");
+                            +" true)");
         assertTrue("Terms should be equalModRenaming", t3.equalsModRenaming(t4));
      }
 
     public void test14() {
-	    String s="\\<{int[] i;i=new int[5];}\\>i[3]=i[2]";
-	    Term t=parseTerm(s);
-	    s="\\<{int[] i;}\\>\\<{}\\>true";
-	    t=parseTerm(s);
+	String s="\\<{int[] i;i=new int[5];}\\>true";
+	Term t=parseTerm(s);
+	s="\\<{int[] i;}\\>\\<{}\\>true";
+	t=parseTerm(s);
     }
 
     public void xtestBindingUpdateTermOldBindingAlternative() {
-	    String s="\\<{int i,j;}\\> {i:=j} i = j";
-	    Term t = parseTerm(s);
-	    assertTrue("expected {i:=j}(i=j) but is ({i:=j}i)=j)", 
-		       t.sub(0).op() instanceof UpdateApplication);
+	String s="\\<{int i,j;}\\> {i:=j} i = j";
+	Term t = parseTerm(s);
+	assertTrue("expected {i:=j}(i=j) but is ({i:=j}i)=j)", 
+		t.sub(0).op() instanceof UpdateApplication);
     }
 
     public void testBindingUpdateTerm() {
-	    String s="\\<{int i,j;}\\> {i:=j} i = j";
-	    Term t = parseTerm(s);
-	    assertFalse("expected ({i:=j}i)=j) but is {i:=j}(i=j)", 
-		       t.sub(0).op() instanceof UpdateApplication);
+	String s="\\forall jint j; {globalIntPV:=j} globalIntPV = j";
+	Term t = parseTerm(s);
+	assertFalse("expected ({globalIntPV:=j}globalIntPV)=j) but is {globalIntPV:=j}(globalIntPV=j)", 
+		t.sub(0).op() instanceof UpdateApplication);
     }
 
     public void testParsingArray() {
-	    String s="\\<{int[][] i; int j;}\\> i[j][j] = j";
-	    Term t = parseTerm(s);
+	String s="\\forall int[][] i; \\forall int j; i[j][j] = j";
+	Term t = parseTerm(s);
     }
 
-    // fails because of lexer matching blocks with braces
+
     public void xtestParsingArrayWithSpaces() {
 	String s="\\<{int[][] i; int j;}\\> i[ j ][ j ] = j";
 	Term t = parseTerm(s);
     }
 
     public void testParsingArrayCombination() {
-	    String s="\\<{int[][] i; int j;}\\> i [i[i[j][j]][i[j][j]]][i[j][i[j][j]]] = j";
-	    Term t = parseTerm(s);
+	String s="\\forall int[][] i; \\forall int j; i [i[i[j][j]][i[j][j]]][i[j][i[j][j]]] = j";
+	Term t = parseTerm(s);
     }
 
     
@@ -480,8 +478,8 @@ public class TestTermParser extends TestCase {
 				+"public T query(){} "
 				+"public static T staticQ(T p){} "
 				+"public static T staticQ() {}}");
-	String s = "\\<{T t;}\\> (t.query()=t & t.query@(T)()=t & T.staticQ()=t "
-	    +"& T.staticQ(t)=t & T.b=t.a@(T) & T.d=t.c@(T) & t.e@(T)=T.f & t.g@(T)=t.h@(T))";
+	String s = "\\forall T t;( (t.query()=t & t.query@(T)()=t & T.staticQ()=t "
+	    +"& T.staticQ(t)=t & T.b=t.a@(T) & T.d=t.c@(T) & t.e@(T)=T.f & t.g@(T)=t.h@(T)))";
 	parseTerm(s);
     }
 
@@ -568,51 +566,7 @@ public class TestTermParser extends TestCase {
                      && t.sub ( 2 ).equals ( parseTerm ( "2=3" ) ) );
 
     }
-    
-    public void testIfExThenElse () {
-        Term t=null, t2=null;
-        
-        String s1 = "\\ifEx int x; (3=4) \\then (1) \\else (2)";
-        try {
-            t = parseTerm ( s1 );
-        } catch ( Exception e ) {
-            fail ();
-        }
-        assertTrue ( "Failed parsing integer ifEx-then-else term",
-                     t.op () == IfExThenElse.IF_EX_THEN_ELSE
-                     && t.varsBoundHere(0).size() == 1
-                     && t.sub ( 0 ).equals ( parseTerm ( "3=4" ) )
-                     && t.sub ( 1 ).equals ( parseTerm ( "1" ) )
-                     && t.sub ( 2 ).equals ( parseTerm ( "2" ) ) );
-
-        String s2 = "\\ifEx int x; (3=4 & 1=1) \\then (\\if (3=4) \\then (1) \\else (2)) \\else (2)";
-        try {
-            t2 = parseTerm ( s2 );
-        } catch ( Exception e ) {
-            fail ();
-        }
-        assertTrue ( "Failed parsing nested integer ifEx-then-else term",
-                     t2.op () == IfExThenElse.IF_EX_THEN_ELSE
-                     && t.varsBoundHere ( 0 ).size () == 1
-                     && t2.sub ( 0 ).equals ( parseTerm ( "3=4 & 1=1" ) )
-                     && t2.sub ( 1 ).equals ( parseTerm ( "\\if (3=4) \\then (1) \\else (2)" ) )
-                     && t2.sub ( 2 ).equals ( parseTerm ( "2" ) ) );
-
-        String s3 = "\\ifEx (int x; int y) (x=y) \\then (1=2) \\else (2=3)";
-        try {
-            t = parseTerm ( s3 );
-        } catch ( Exception e ) {
-            fail ();
-        }
-        assertTrue ( "Failed parsing propositional ifEx-then-else term",
-                     t.op () == IfExThenElse.IF_EX_THEN_ELSE
-                     && t.sub ( 0 ).op() == Equality.EQUALS
-                     && t.sub ( 0 ).sub ( 0 ).op () == t.varsBoundHere ( 0 ).getQuantifiableVariable ( 0 )
-                     && t.sub ( 0 ).sub ( 1 ).op () == t.varsBoundHere ( 0 ).getQuantifiableVariable ( 1 )
-                     && t.sub ( 1 ).equals ( parseTerm ( "1=2" ) )
-                     && t.sub ( 2 ).equals ( parseTerm ( "2=3" ) ) );
-
-    }
+   
 
     public void testInfix1() {
 	assertEquals("infix1",parseTerm("aa + bb"),

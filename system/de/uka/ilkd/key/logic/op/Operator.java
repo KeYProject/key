@@ -26,7 +26,6 @@ public interface Operator extends Named, SVSubstitute {
     
     /**
      * the arity of this operator  
-     * @return arity of the Operator as int 
      */
     int arity();
     
@@ -40,9 +39,18 @@ public interface Operator extends Named, SVSubstitute {
      * @return sort of the term with this operator as top level operator of the
      * given substerms
      */
-    Sort sort(Term[] terms);
-    
     Sort sort(ArrayOfTerm terms);
+    
+    /**
+     * Tells whether the operator binds variables at the n-th subterm
+     */
+    boolean bindVarsAt(int n);
+    
+    
+    /**
+     * Tells whether the operator is rigid
+     */
+    boolean isRigid();      
     
     
     /**
@@ -56,12 +64,6 @@ public interface Operator extends Named, SVSubstitute {
      */
     boolean validTopLevel(Term term);
     
-    
-    /**
-     * @return true if the operator is rigid
-     */
-    boolean isRigid();  
-
     
     /**
      * tests if this operator (plays role of a template) matches 

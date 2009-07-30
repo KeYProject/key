@@ -17,10 +17,7 @@ import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.SortDependingFunction;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.util.ExtList;
 
@@ -29,6 +26,9 @@ public final class HeapLDT extends LDT {
     
     public static final Name SELECT_NAME = new Name("select");
     public static final Name STORE_NAME = new Name("store");
+    public static final Name ARRAY_LENGTH_FIELD_NAME 
+    					= new Name("Array::length");
+    
     
     private static final Name NAME = new Name("Heap");
     
@@ -117,6 +117,37 @@ public final class HeapLDT extends LDT {
     public Sort getFieldSort() {
 	return fieldSort;
     }
+    
+    
+    public Function getFieldSymbolForPV(ProgramVariable fieldPV, 
+	    				Services services) {
+	assert fieldPV.isMember();
+	
+	final Name name;
+	if(fieldPV == services.getJavaInfo().getArrayLength()) {
+	    name = ARRAY_LENGTH_FIELD_NAME;
+	} else if(fieldPV.isStatic()) {
+	    name = new Name(fieldPV.getContainerType().getSort().toString() 
+		    	    + "::" 
+		    	    + fieldPV.toString());
+	} else {
+	    name = new Name(fieldPV.toString());
+	}
+	
+        Function result 
+            = (Function) services.getNamespaces().functions().lookup(name); 
+        if(result == null) {
+            result = new Function(name, 
+                     	          fieldSort, 
+                		  new Sort[0], 
+                		  null,
+                		  true);
+            services.getNamespaces().functions().add(result);
+        } 
+        
+        assert result.isUnique();        
+        return result;
+    }    
     
     
     @Override

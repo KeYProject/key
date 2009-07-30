@@ -13,6 +13,7 @@ package de.uka.ilkd.key.logic.op;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.MatchConditions;
 
@@ -21,17 +22,12 @@ public final class LogicVariable extends AbstractSortedOperator
     implements QuantifiableVariable, ParsableVariable {
 
     public LogicVariable(Name name, Sort sort) {
-	super(name, EMPTY_ARG_SORTS, sort);
+	super(name, sort, true);
 	assert sort != Sort.FORMULA;
+	assert sort != Sort.UPDATE;
     }
     
     
-    @Override
-    public boolean isRigid() {
-	return true;
-    }
-    
-        
     /** 
      * a match between two logic variables is possible if they have been assigned
      * they are same or have been assigned to the same abstract name and the sorts

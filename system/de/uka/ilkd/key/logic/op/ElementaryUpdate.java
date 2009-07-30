@@ -14,6 +14,7 @@ import java.util.WeakHashMap;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.util.Debug;
@@ -32,7 +33,8 @@ public final class ElementaryUpdate extends AbstractSortedOperator {
     private ElementaryUpdate(UpdateableOperator lhs) {
 	super(new Name("elem-update(" + lhs + ")"), 
 	      new Sort[]{lhs.sort()}, 
-	      Sort.UPDATE);
+	      Sort.UPDATE,
+	      false);
 	this.lhs = lhs;
 	assert lhs.arity() == 0;
     }
@@ -67,12 +69,6 @@ public final class ElementaryUpdate extends AbstractSortedOperator {
 		      + "(template, operator)", this, eu);
 	}
 	return result;
-    }
-
-
-    @Override
-    public boolean isRigid () {
-	return true;
     }
     
     

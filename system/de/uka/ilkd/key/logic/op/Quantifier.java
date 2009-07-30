@@ -10,7 +10,6 @@
 package de.uka.ilkd.key.logic.op;
 
 import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.sort.Sort;
 
 public final class Quantifier extends AbstractSortedOperator {
@@ -31,21 +30,10 @@ public final class Quantifier extends AbstractSortedOperator {
 
 
     private Quantifier(Name name) {
-	super(name, new Sort[]{Sort.FORMULA}, Sort.FORMULA);
-    }
-
-    
-    /** @return true iff the subterm at postion 0 has Sort.FORMULA and the
-     * arity of the term is 1 and at least one variable is bound.
-     */
-    @Override
-    protected boolean additionalValidTopLevel(Term term){
-	return (term.varsBoundHere(0).size() > 0);
-    }
-    
-    
-    @Override
-    public boolean isRigid() {
-	return true;
+	super(name, 
+              new Sort[]{Sort.FORMULA}, 
+              Sort.FORMULA, 
+              new Boolean[]{true}, 
+              true);
     }    
 }

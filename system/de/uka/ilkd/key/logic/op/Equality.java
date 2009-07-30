@@ -39,12 +39,6 @@ public final class Equality extends AbstractSortedOperator {
     
     
     private Equality(Name name, Sort targetSort){
-	super(name, new Sort[]{targetSort, targetSort}, Sort.FORMULA);
-	assert targetSort != null : "creating " + name + " failed";
+	super(name, new Sort[]{targetSort, targetSort}, Sort.FORMULA, true);
     }
-    
-    @Override
-    public boolean isRigid() {
-	return true;
-    }    
 }

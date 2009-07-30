@@ -57,25 +57,31 @@ public interface Term extends SVSubstitute {
     public ArrayOfTerm subs();
         
     /** 
-     * The <code>nr</code>-th direct subterm.
+     * The <code>n</code>-th direct subterm.
      */
-    public Term sub(int nr);
+    public Term sub(int n);
         
     /**
      * The (possibly indirect) subterm specified by a PosInTerm.
      */
     public Term subAt(PosInTerm pos);
-    
-    /**
-     * The Java block at top level.
+        
+     /**
+     * The logical variables bound by the top level operator.
      */
-    public JavaBlock javaBlock();    
+    public ArrayOfQuantifiableVariable boundVars();
 
     /**
      * The logical variables bound by the top level operator for the nth 
      * subterm.
      */
     public ArrayOfQuantifiableVariable varsBoundHere(int n);
+    
+    /**
+     * The Java block at top level.
+     */
+    public JavaBlock javaBlock();
+    
         
     /**
      * Checks whether the Term is valid on the top level. If this is

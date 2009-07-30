@@ -60,12 +60,6 @@ public final class Junctor extends AbstractSortedOperator {
     
     
     private Junctor(Name name, int arity) {
-	super(name, createFormulaSortArray(arity), Sort.FORMULA);
+	super(name, createFormulaSortArray(arity), Sort.FORMULA, true);
     }
-    
-    
-    @Override
-    public boolean isRigid() {
-	return true;
-    }    
 }

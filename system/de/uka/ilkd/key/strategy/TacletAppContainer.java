@@ -313,7 +313,7 @@ public abstract class TacletAppContainer extends RuleAppContainer {
         }
     
         if ( !app.complete() )
-            app = app.tryToInstantiate ( p_goal, p_goal.proof().getServices() );
+            app = app.tryToInstantiate ( p_goal.proof().getServices() );
     
         return app;
     }

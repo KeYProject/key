@@ -9,11 +9,10 @@
 
 package de.uka.ilkd.key.logic.op;
 
+import de.uka.ilkd.key.collection.ArrayOfBoolean;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.ArrayOfTerm;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.util.Debug;
 
@@ -21,17 +20,38 @@ import de.uka.ilkd.key.util.Debug;
 /** 
  * Abstract operator class offering some common functionality.
  */
-public abstract class AbstractOperator implements Operator {
+abstract class AbstractOperator implements Operator {
     
     private final Name name;
-    
     private final int arity;
+    private final ArrayOfBoolean whereToBind;
+    private final boolean isRigid;
     
-   	
     
-    protected AbstractOperator(Name name, int arity) {
+    protected AbstractOperator(Name name, 
+	    		       int arity, 
+	    		       ArrayOfBoolean whereToBind,
+	    		       boolean isRigid) {
+	assert name != null;
+	assert arity >= 0;
+	assert whereToBind == null || whereToBind.size() == arity;	
 	this.name = name;
 	this.arity = arity;
+	this.whereToBind = whereToBind;
+	this.isRigid = isRigid;
+    }
+    
+    
+    protected AbstractOperator(Name name, 
+	    		       int arity, 
+	    		       Boolean[] whereToBind,
+	    		       boolean isRigid) {
+	this(name, arity, new ArrayOfBoolean(whereToBind), isRigid);
+    }        
+    
+    
+    protected AbstractOperator(Name name, int arity, boolean isRigid) {
+	this(name, arity, (ArrayOfBoolean) null, isRigid);
     }
     
     
@@ -48,9 +68,37 @@ public abstract class AbstractOperator implements Operator {
     
     
     @Override
-    public final Sort sort(Term[] terms) {
-	return sort(new ArrayOfTerm(terms));
+    public final boolean bindVarsAt(int n) {
+	return whereToBind != null && whereToBind.getBoolean(n);
     }
+    
+    
+    @Override
+    public final boolean isRigid() {
+	return isRigid;
+    }
+    
+    
+    protected abstract boolean additionalValidTopLevel(Term term);
+    
+    
+    @Override
+    public final boolean validTopLevel(Term term) {
+	if(arity != term.arity()
+	   || arity != term.subs().size()
+	   || (whereToBind == null) != term.boundVars().isEmpty()) {
+	    return false;
+	}
+	
+	for(int i = 0, n = arity; i < n; i++) {
+	    if(term.sub(i) == null) {
+		return false;
+	    }
+	}
+	
+	return additionalValidTopLevel(term);
+    }
+    
     
     
     /** 

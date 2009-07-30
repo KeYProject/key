@@ -9,6 +9,7 @@
 
 package de.uka.ilkd.key.logic.op;
 
+import de.uka.ilkd.key.collection.ArrayOfBoolean;
 import de.uka.ilkd.key.logic.ArrayOfTerm;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
@@ -20,31 +21,64 @@ import de.uka.ilkd.key.logic.sort.Sort;
 /** 
  * Abstract sorted operator class offering some common functionality.
  */
-public abstract class AbstractSortedOperator extends AbstractOperator 
-                                             implements SortedOperator {
+abstract class AbstractSortedOperator extends AbstractOperator 
+                                      implements SortedOperator {
     
-    protected static final ArrayOfSort EMPTY_ARG_SORTS = new ArrayOfSort();
+    private static final ArrayOfSort EMPTY_SORT_LIST = new ArrayOfSort();
     
     private final Sort sort;
     private final ArrayOfSort argSorts;
-   	
+
     
     protected AbstractSortedOperator(Name name,
 	    			     ArrayOfSort argSorts,
-	    		             Sort sort) {
-	super(name, argSorts.size());
-	assert argSorts != null;
+	    		             Sort sort,
+	    		             ArrayOfBoolean whereToBind,
+	    		             boolean isRigid) {
+	super(name, 
+	      argSorts == null ? 0 : argSorts.size(), 
+              whereToBind, 
+              isRigid);
 	assert sort != null;
-	this.argSorts = argSorts;	
+	this.argSorts = argSorts == null ? EMPTY_SORT_LIST : argSorts;
 	this.sort = sort;
     }
     
     
-    protected AbstractSortedOperator(Name name, 
-	    			     Sort[] argSorts, 
-	    			     Sort sort) {
-	this(name, new ArrayOfSort(argSorts), sort);
+    protected AbstractSortedOperator(Name name,
+	    			     Sort[] argSorts,
+	    		             Sort sort,
+	    		             Boolean[] whereToBind,
+	    		             boolean isRigid) {
+	this(name, 
+             new ArrayOfSort(argSorts), 
+             sort, 
+             new ArrayOfBoolean(whereToBind), 
+             isRigid);
+    }    
+    
+    
+    protected AbstractSortedOperator(Name name,
+	    			     ArrayOfSort argSorts,
+	    		             Sort sort,
+	    		             boolean isRigid) {
+	this(name, argSorts, sort, null, isRigid);
+    }    
+    
+    
+    protected AbstractSortedOperator(Name name,
+	    			     Sort[] argSorts,
+	    		             Sort sort,
+	    		             boolean isRigid) {
+	this(name, new ArrayOfSort(argSorts), sort, null, isRigid);
     }
+    
+    
+    protected AbstractSortedOperator(Name name,
+	    		             Sort sort,
+	    		             boolean isRigid) {
+	this(name, (ArrayOfSort) null, sort, null, isRigid);
+    }    
     
 
     @Override
@@ -74,23 +108,19 @@ public abstract class AbstractSortedOperator extends AbstractOperator
     }
     
     
-    protected boolean additionalValidTopLevel(Term term) {
+    protected boolean additionalValidTopLevel2(Term term) {
 	return true;
     }
     
     
     @Override
-    public final boolean validTopLevel(Term term) {
-	if(term.arity() != arity() || term.subs().size() != arity()) {
-	    return false;
-	}
+    protected final boolean additionalValidTopLevel(Term term) {
 	for(int i = 0, n = arity(); i < n; i++) {
-            if(term.sub(i) == null 
-               || !possibleSub(i, term.sub(i))) { 
+            if(!possibleSub(i, term.sub(i))) { 
 		return false;
 	    }
 	}
-	return additionalValidTopLevel(term);
+	return additionalValidTopLevel2(term);
     }
     
     

@@ -52,7 +52,7 @@ public abstract class ProgramVariable extends AbstractSortedOperator
 			    boolean            isModel,
 			    boolean            isGhost,
 			    boolean            isFinal) {
-	super(name, EMPTY_ARG_SORTS, s == null ?  t.getSort() : s);
+	super(name, s == null ?  t.getSort() : s, false);
 	this.type = t;
 	this.containingType = containingType;	
 	this.isStatic = isStatic;
@@ -62,6 +62,9 @@ public abstract class ProgramVariable extends AbstractSortedOperator
 	// remove this as soon as possible %%%
 	id = COUNTER;
 	COUNTER++;
+	
+	assert sort() != Sort.FORMULA;
+	assert sort() != Sort.UPDATE;
     }
     
     protected ProgramVariable(ProgramElementName name, 
@@ -252,14 +255,8 @@ public abstract class ProgramVariable extends AbstractSortedOperator
 	return getProgramElementName().getProgramName().startsWith("<");
     }
 
-    /* (non-Javadoc)
-     * @see de.uka.ilkd.key.logic.op.Location#mayBeAliasedBy(de.uka.ilkd.key.logic.op.Location)
-     */
-    public boolean mayBeAliasedBy(UpdateableOperator loc) {
-        return loc instanceof SchemaVariable || loc == this; 
-    }
 
-
+    @Override
     public MatchConditions match(SourceData source, MatchConditions matchCond) {        
         final ProgramElement src = source.getSource();
         source.next();
@@ -269,10 +266,5 @@ public abstract class ProgramVariable extends AbstractSortedOperator
             Debug.out("Program match failed. Not same program variable (pattern, source)", this, src);
             return null;
         }     
-    }
-    
-    @Override
-    public boolean isRigid() {
-	return false;
     }
 }

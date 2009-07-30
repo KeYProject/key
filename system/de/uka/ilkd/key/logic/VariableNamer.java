@@ -640,7 +640,6 @@ public abstract class VariableNamer implements InstantiationProposer {
     public String getSuggestiveNameProposalForProgramVariable(
                                                 SchemaVariable sv,
                                                 TacletApp app,
-						Goal goal,
 						Services services,
 						ListOfString previousProposals){
 	if(suggestive_off) {

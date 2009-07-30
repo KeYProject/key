@@ -33,12 +33,6 @@ public final class UpdateJunctor extends AbstractSortedOperator {
     
     
     private UpdateJunctor(Name name, int arity) {
-	super(name, createUpdateSortArray(arity), Sort.UPDATE);
-    }
-    
-    
-    @Override
-    public boolean isRigid() {
-	return true;
-    }    
+	super(name, createUpdateSortArray(arity), Sort.UPDATE, false);
+    } 
 }

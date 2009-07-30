@@ -11,26 +11,23 @@ public final class BoundedNumericalQuantifier extends AbstractOperator {
     public static final BoundedNumericalQuantifier BSUM = new BoundedNumericalQuantifier(new Name("\\bSum"));
 
     private BoundedNumericalQuantifier(Name name) {
-        super(name, 3);
+        super(name, 3, new Boolean[]{false, false, true}, true);
     }
+    
     
     @Override    
     public Sort sort(ArrayOfTerm terms) {
         return terms.getTerm(2).sort();
     }
     
-
+    
     @Override
-    public boolean validTopLevel(Term term) {
-        return term.arity()==arity();
+    public boolean additionalValidTopLevel(Term term) {
+        return true;
     }
-
+ 
+    
     public Sort argSort(int i) {
 	return Sort.ANY;
     }
-    
-    @Override
-    public boolean isRigid() {
-	return true;
-    }    
 }

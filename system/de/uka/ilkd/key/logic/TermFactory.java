@@ -201,35 +201,6 @@ public class TermFactory {
 	
 	return new TermImpl(op, subTerms).checked();
     }
-
-
-    //For OCL simplification
-
-    /** creates a term representing an OCL expression with a
-      * collection operation as top operator that 
-      * takes an OclExpression as argument (not "iterate")
-      * @param op the OCL collection operation
-      * @param subs subs[0] is the collection and subs[1] is the 
-      *        expression in which the iterator variable is bound
-      */
-
-    public Term createFunctionWithBoundVarsTerm(Operator op,
-						PairOfTermArrayAndBoundVarsArray subs) {
-	return createFunctionWithBoundVarsTerm(op, subs.getTerms(), subs.getBoundVars());
-    }
-
-    public Term createFunctionWithBoundVarsTerm(Operator op,
-						Term[] subTerms,
-						ArrayOfQuantifiableVariable[] boundVars) {
-	if (boundVars != null && boundVars.length > 0) {
-	   return new TermImpl(op, 
-		   	       new ArrayOfTerm(subTerms), 
-		   	       null, 
-		   	       boundVars[0]).checked(); 
-	} else {
-	    return createFunctionTerm(op, subTerms);
-	}
-     }
     
     
     /**
@@ -239,21 +210,6 @@ public class TermFactory {
         return new TermImpl(IfThenElse.IF_THEN_ELSE, new Term [] { condF, thenT, elseT });
     }
     
-
-    /**
-     * Create an 'ifEx-then-else' term (or formula)
-     */
-    public Term createIfExThenElseTerm(ArrayOfQuantifiableVariable exVars,
-                                       Term condF, Term thenT, Term elseT) {
-        return new TermImpl ( IfExThenElse.IF_EX_THEN_ELSE,
-                               new ArrayOfTerm( new Term [] { condF, thenT, elseT }),
-                               null,
-                               new ArrayOfQuantifiableVariable[]{exVars,
-                                                                 exVars,
-                                                                 new ArrayOfQuantifiableVariable()} ).checked();
-    }
-    
-
 
     /** some methods to handle the equality for formulas (equiv - operator) ... */
     public Term createJunctorTerm(Equality op, Term t1, Term t2) {
@@ -475,8 +431,7 @@ public class TermFactory {
 	    (op, 
 	     new ArrayOfTerm(new Term[]{substTerm, origTerm}), 
 	     null, 
-	     new ArrayOfQuantifiableVariable[]{new ArrayOfQuantifiableVariable(), 
-		                               new ArrayOfQuantifiableVariable(substVar)}).checked();
+	     new ArrayOfQuantifiableVariable(substVar)).checked();
     }
     
 
@@ -492,10 +447,26 @@ public class TermFactory {
 	    (op, 
              new ArrayOfTerm(subs), 
              null, 
-             new ArrayOfQuantifiableVariable[]{new ArrayOfQuantifiableVariable(), 
-		                               new ArrayOfQuantifiableVariable(substVar)}).checked();
+             new ArrayOfQuantifiableVariable(substVar)).checked();
     }
 
+    //XXX
+    public static ArrayOfQuantifiableVariable getSingleArray(ArrayOfQuantifiableVariable[] bv) {
+	if(bv == null) {
+	    return null;
+	}
+	ArrayOfQuantifiableVariable result = null;
+	for(ArrayOfQuantifiableVariable arr : bv) {
+	    if(arr != null) {
+		if(result == null) {
+		    result = arr;
+		} else {
+		    assert arr.equals(result);
+		}
+	    }
+	}
+	return result;
+    }
 
 
    public Term createTerm(Operator op, Term[] subTerms, 
@@ -528,22 +499,13 @@ public class TermFactory {
             return createBoundedNumericalQuantifierTerm(
 		    (BoundedNumericalQuantifier) op, subTerms[0], 
                     subTerms[1], subTerms[2], bv[2]);
-        } else if (op instanceof IfExThenElse) {
-	    final Term[] resTerms = new Term [3];
-            System.arraycopy ( subTerms, 0, resTerms, 0, 3 );
-	    final ArrayOfQuantifiableVariable exVars =
-	        BoundVariableTools.DEFAULT.unifyBoundVariables ( bv, resTerms,
-	                                                         0, 2 );
-	    return createIfExThenElseTerm ( exVars,
-                                            resTerms[0],
-                                            resTerms[1],
-                                            resTerms[2] );
-	} else if (op instanceof SubstOp) {	    
+        } else if (op instanceof SubstOp) {	    
 	    return createSubstitutionTerm((SubstOp)op, 
 					  bv[1].getQuantifiableVariable(0),
 					  subTerms);
 	}  else {
-	    return createFunctionWithBoundVarsTerm(op, subTerms, bv);	 	    
+	    return new TermImpl(op, new ArrayOfTerm(subTerms), javaBlock, getSingleArray(bv));
+	    //return createFunctionWithBoundVarsTerm(op, subTerms, bv);	 	    
 	}       
    }
 
@@ -557,9 +519,7 @@ public class TermFactory {
         return new TermImpl(op, 
         		    new ArrayOfTerm(new Term[]{a, b, t}), 
         		    null, 
-        		    new ArrayOfQuantifiableVariable[]{new ArrayOfQuantifiableVariable(),
-            						      new ArrayOfQuantifiableVariable(),
-            						      va}).checked();
+        		    va).checked();
     } 
 
     /** 

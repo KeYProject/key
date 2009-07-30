@@ -43,12 +43,6 @@ public final class LocationVariable extends ProgramVariable implements Updateabl
     
 
     @Override
-    public boolean isRigid () {
-        return false;
-    }
-    
-
-    @Override
     public void visit(de.uka.ilkd.key.java.visitor.Visitor v) {
         v.performActionOnLocationVariable(this);
     }

@@ -12,7 +12,6 @@ package de.uka.ilkd.key.logic.op;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.Term;
 
 /**
  * This class represents currently only static final fields initialised with 
@@ -43,13 +42,7 @@ public final class ProgramConstant extends ProgramVariable {
     public Literal getCompileTimeConstant () {
         return compileTimeConstant;
     }
-        
-    
-    @Override
-    public boolean isRigid() {
-        return true;
-    }
-    
+
 
     @Override
     public void visit(de.uka.ilkd.key.java.visitor.Visitor v) {

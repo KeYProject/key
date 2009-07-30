@@ -12,7 +12,6 @@ package de.uka.ilkd.key.logic.op;
 
 import java.util.HashMap;
 
-import de.uka.ilkd.key.explicitheap.SameField;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.sort.SortImpl;
@@ -32,8 +31,6 @@ public abstract class AbstractMetaOperator extends AbstractSortedOperator
     //must be first
     public static final Sort METASORT = new SortImpl(new Name("Meta"));    
     
-    public static final AbstractMetaOperator META_FIELDREF = new MetaFieldReference(); 
-
     public static final AbstractMetaOperator META_ADD = new MetaAdd();
 
     public static final AbstractMetaOperator META_SUB = new MetaSub();
@@ -100,8 +97,6 @@ public abstract class AbstractMetaOperator extends AbstractSortedOperator
     public static final AbstractMetaOperator INTRODUCE_ATPRE_DEFINITIONS = new IntroAtPreDefsOp();
                 
     public static final AbstractMetaOperator META_METHOD_CALL_TO_UPDATE= new MethodCallToUpdate();
-    
-    public static final AbstractMetaOperator SAME_FIELD = new SameField();
 
     
     protected static final TermFactory termFactory = TermFactory.DEFAULT;
@@ -118,7 +113,7 @@ public abstract class AbstractMetaOperator extends AbstractSortedOperator
     
     
     protected AbstractMetaOperator(Name name, int arity, Sort sort) {
-	super(name, createMetaSortArray(arity), sort);
+	super(name, createMetaSortArray(arity), sort, false);
 	name2metaop.put(name.toString(), this);	
     }
     
@@ -178,12 +173,7 @@ public abstract class AbstractMetaOperator extends AbstractSortedOperator
     }
     
     
-    @Override
-    public boolean isRigid() {
-	return false;
-    }
     
-
     /** (non-Javadoc)
      * by default meta operators do not match anything 
      * @see de.uka.ilkd.key.logic.op.Operator#match(SVSubstitute, de.uka.ilkd.key.rule.MatchConditions, de.uka.ilkd.key.java.Services)

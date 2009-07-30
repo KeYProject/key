@@ -24,15 +24,14 @@ final class TermImpl implements Term {
     //content
     private final Operator op;
     private final ArrayOfTerm subs;
+    private final ArrayOfQuantifiableVariable boundVars;
     private final JavaBlock javaBlock;
-    private final ArrayOfQuantifiableVariable[] boundVars;
     
     //caches
     private static enum ThreeValuedTruth { TRUE, FALSE, UNKNOWN }
     private int depth = -1;
     private ThreeValuedTruth rigid = ThreeValuedTruth.UNKNOWN; 
     private SetOfQuantifiableVariable freeVars = null; 
-    private SetOfMetavariable metaVars = null;
     private int hashcode = -1;
     
     
@@ -43,58 +42,30 @@ final class TermImpl implements Term {
     public TermImpl(Operator op, 
 	    	    ArrayOfTerm subs, 
 	    	    JavaBlock javaBlock, 
-	    	    ArrayOfQuantifiableVariable[] boundVars) {
-	assert op != null;
-	assert subs != null;
-	this.op   = op;
-	this.subs = subs.size() == 0 ? EMPTY_TERM_LIST : subs;
-	this.javaBlock = javaBlock == null ? JavaBlock.EMPTY_JAVABLOCK : javaBlock;
-	if(boundVars != null) {
-	    this.boundVars = new ArrayOfQuantifiableVariable[boundVars.length];
-	    for(int i = 0; i < boundVars.length; i++) {
-		this.boundVars[i] = boundVars[i];
-	    }
-	} else {
-	    this.boundVars = null;
-	}
-	assert this.boundVars == null || this.boundVars.length == arity();
-    }
-    
-    
-    public TermImpl(Operator op, 
-	    	    ArrayOfTerm subs, 
-	    	    JavaBlock javaBlock, 
 	    	    ArrayOfQuantifiableVariable boundVars) {
 	assert op != null;
 	assert subs != null;
 	this.op   = op;
 	this.subs = subs.size() == 0 ? EMPTY_TERM_LIST : subs;
 	this.javaBlock = javaBlock == null ? JavaBlock.EMPTY_JAVABLOCK : javaBlock;
-	if(boundVars != null) {
-	    this.boundVars = new ArrayOfQuantifiableVariable[subs.size()];
-	    for(int i = 0; i < subs.size(); i++) {
-		this.boundVars[i] = boundVars;
-	    }
-	} else {
-	    this.boundVars = null;
-	}
-    }    
+	this.boundVars = boundVars == null ? EMPTY_VAR_LIST : boundVars;
+    }
     
     
     public TermImpl(Operator op, 
 	    	    ArrayOfTerm subs, 
 	    	    JavaBlock javaBlock) {
-	this(op, subs, javaBlock, (ArrayOfQuantifiableVariable[])null);
+	this(op, subs, javaBlock, null);
     }    
 
     
     public TermImpl(Operator op, ArrayOfTerm subs) {
-	this(op, subs, null);
+	this(op, subs, null, null);
     }
 
 
     public TermImpl(Operator op, Term[] subs) {
-	this(op, new ArrayOfTerm(subs), null);
+	this(op, new ArrayOfTerm(subs), null, null);
     }
     
     
@@ -107,27 +78,22 @@ final class TermImpl implements Term {
     //internal methods
     //------------------------------------------------------------------------- 
 
-    private void determineFreeVarsAndMetaVars() {
+    private void determineFreeVars() {
 	freeVars = SetAsListOfQuantifiableVariable.EMPTY_SET;
-        metaVars = SetAsListOfMetavariable.EMPTY_SET;
         
         if(op instanceof QuantifiableVariable) {
             freeVars = freeVars.add((QuantifiableVariable) op);
-        }else if ( op instanceof Metavariable ) {
-            metaVars = metaVars.add ( (Metavariable)op );
         }
         
         for(int i = 0, ar = arity(); i < ar; i++) {
             Term subTerm = sub(i);
 	    SetOfQuantifiableVariable subFreeVars = subTerm.freeVars();
-	    SetOfMetavariable subMetaVars = subTerm.metaVars();
 	    for(int j = 0, sz = varsBoundHere(i).size(); j < sz; j++) {
 		subFreeVars 
 		    = subFreeVars.remove(varsBoundHere(i)
 			         .getQuantifiableVariable(j));
 	    }
 	    freeVars = freeVars.union(subFreeVars);
-	    metaVars = metaVars.union(subMetaVars);
 	}
     }
     
@@ -137,21 +103,25 @@ final class TermImpl implements Term {
     //public interface
     //------------------------------------------------------------------------- 
     
+    @Override
     public Operator op() {
         return op;
     }
     
     
+    @Override
     public ArrayOfTerm subs() {
 	return subs;
     }
     
     
+    @Override
     public Term sub(int nr) {
 	return subs.getTerm(nr);
     }
     
     
+    @Override
     public Term subAt(PosInTerm pos) {
         Term sub = this;
         for (final IntIterator it = pos.iterator(); it.hasNext(); ) {	
@@ -159,22 +129,27 @@ final class TermImpl implements Term {
         }
         return sub;
     }
-   
     
-    public JavaBlock javaBlock() {
-	return javaBlock;
+    
+    @Override
+    public ArrayOfQuantifiableVariable boundVars() {
+	return boundVars;
     }
     
         
+    @Override
     public ArrayOfQuantifiableVariable varsBoundHere(int n) {
-	if(boundVars == null) {
-	    return EMPTY_VAR_LIST;
-	} else {
-	    return boundVars[n];
-	}
+	return op.bindVarsAt(n) ? boundVars : EMPTY_VAR_LIST;
     }
     
     
+    @Override
+    public JavaBlock javaBlock() {
+	return javaBlock;
+    }    
+    
+    
+    @Override
     public Term checked() {
 	if(op().validTopLevel(this)) {
 	    return this;	    
@@ -184,19 +159,22 @@ final class TermImpl implements Term {
     }
 
     
+    @Override
     public int arity() {
 	return op.arity();
     }
     
     
+    @Override
     public Sort sort() {
 	return op.sort(subs);
     }
     
 
+    @Override
     public int depth() {
 	if(depth == -1) {
-            for (int i = 0, sz = arity(); i < sz; i++) {
+            for (int i = 0, n = arity(); i < n; i++) {
                 final int subTermDepth = sub(i).depth();
                 if(subTermDepth > depth) {
                     depth = subTermDepth;   
@@ -208,14 +186,15 @@ final class TermImpl implements Term {
     }
     
     
+    @Override
     public boolean isRigid() {
 	if(rigid == ThreeValuedTruth.UNKNOWN) {
             if(!op.isRigid()) {
         	rigid = ThreeValuedTruth.FALSE;
             } else {
         	rigid = ThreeValuedTruth.TRUE;
-        	for(int i = 0, ar = arity(); i < ar; i++) {
-            	    if(!sub(i).isRigid ()) {
+        	for(int i = 0, n = arity(); i < n; i++) {
+            	    if(!sub(i).isRigid()) {
             		rigid = ThreeValuedTruth.FALSE;
             		break;
             	    }
@@ -227,22 +206,22 @@ final class TermImpl implements Term {
     }
     
 
+    @Override
     public SetOfQuantifiableVariable freeVars() {
         if(freeVars == null) {
-            determineFreeVarsAndMetaVars();
+            determineFreeVars();
         }
         return freeVars;
     }
     
 
+    @Override
     public SetOfMetavariable metaVars () {
-        if (metaVars == null) {
-            determineFreeVarsAndMetaVars();
-        }
-        return metaVars;
+	return SetAsListOfMetavariable.EMPTY_SET;
     }
     
     
+    @Override
     public void execPostOrder(Visitor visitor) {
 	visitor.subtreeEntered(this);
 	for(int i = 0, ar = arity(); i < ar; i++) {
@@ -253,6 +232,7 @@ final class TermImpl implements Term {
     }
 
 
+    @Override
     public void execPreOrder(Visitor visitor) {
 	visitor.subtreeEntered(this);
 	visitor.visit(this);
@@ -263,6 +243,7 @@ final class TermImpl implements Term {
     }
     
 
+    @Override
     public boolean equalsModRenaming(Object o) {
         if(o == this) {
             return true;
@@ -281,6 +262,7 @@ final class TermImpl implements Term {
     /**
      * true if <code>o</code> is syntactically equal to this term
      */
+    @Override
     public boolean equals(Object o) {
 	if(o == this) {
 	    return true;
@@ -289,40 +271,26 @@ final class TermImpl implements Term {
 	if(!(o instanceof Term)) {
 	    return false;	
 	}
-	final Term t = (Term) o;	
-
-	if(!(sort().equals(t.sort()) 
-	     && arity() == t.arity()
-	     && op().equals(t.op())
-	     && subs().equals(t.subs())
-	     && javaBlock().equals(t.javaBlock()))) {
-	    return false;
-	}
+	final Term t = (Term) o;
 	
-	for(int i = 0, n = arity(); i < n; i++) {
-	    if(!varsBoundHere(i).equals(t.varsBoundHere(i))) {
-		return false;
-	    }
-	}
-	
-	return true;
+	return op().equals(t.op())
+	       && subs().equals(t.subs())
+	       && boundVars().equals(t.boundVars())
+	       && javaBlock().equals(t.javaBlock());
     }
 
 
+    @Override
     public final int hashCode(){
         if(hashcode == -1) {
             hashcode = 5;
-            hashcode = hashcode*17 + sort().hashCode();
-            hashcode = hashcode*17 + arity();            
             hashcode = hashcode*17 + op().hashCode();
-            hashcode = hashcode*17 + subs().hashCode();            
+            hashcode = hashcode*17 + subs().hashCode();
+            hashcode = hashcode*17 + boundVars().hashCode();            
             hashcode = hashcode*17 + javaBlock().hashCode();
-            for(int i = 0, n = arity(); i < n; i++) {
-        	hashcode = hashcode*17 + varsBoundHere(i).hashCode();
-            }
             
-            if(hashcode == 0) {
-        	hashcode = 1;
+            if(hashcode == -1) {
+        	hashcode = 0;
             }
         }
         return hashcode;
@@ -332,6 +300,7 @@ final class TermImpl implements Term {
     /**
      * returns a linearized textual representation of this term 
      */
+    @Override    
     public String toString() {
 	StringBuffer sb = new StringBuffer();
 	if(!javaBlock.isEmpty()) {

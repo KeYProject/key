@@ -11,6 +11,7 @@
 
 package de.uka.ilkd.key.logic.op;
 
+import de.uka.ilkd.key.collection.ArrayOfBoolean;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.sort.ArrayOfSort;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -29,54 +30,53 @@ public class Function extends AbstractSortedOperator {
     public Function(Name name, 
 	            Sort sort, 
 	            ArrayOfSort argSorts, 
+	            ArrayOfBoolean whereToBind,
 	            boolean unique) {
-	super(name, argSorts, sort);
+	super(name, argSorts, sort, whereToBind, true);
 	this.unique = unique;
+	assert sort != Sort.UPDATE;
+	assert !(unique && sort == Sort.FORMULA);
     }
+    
     
     public Function(Name name, 
 	    	    Sort sort, 
 	    	    Sort[] argSorts, 
+	    	    Boolean[] whereToBind,
 	    	    boolean unique) {
-	this(name, sort, new ArrayOfSort(argSorts), unique);
-    }    
+	this(name, 
+             sort, 
+             new ArrayOfSort(argSorts), 
+             whereToBind == null ? null : new ArrayOfBoolean(whereToBind), 
+             unique);
+    }
     
 
     public Function(Name name, Sort sort, ArrayOfSort argSorts) {
-	this(name, sort, argSorts, false);
+	this(name, sort, argSorts, null, false);
     }    
     
     
     public Function(Name name, Sort sort, Sort[] argSorts) {
-	this(name, sort, argSorts, false);
+	this(name, sort, argSorts, null, false);
     }
     
     
-    @Override
-    public boolean isRigid() {
-	return true;
+    public boolean isUnique() {
+	return unique;
     }
-
+    
 
     @Override
     public String toString() {
 	return (name()+((sort()==Sort.FORMULA)? "" : ":"+sort()));
     }
     
-    
-    public boolean isUnique() {
-	return unique;
-    }    
-    
 
     public String proofToString() {
-       String s = null;
-       if (sort() != null) {
-	   s = (sort() == Sort.FORMULA ? "" : sort().toString()) + " ";
-	   s += name();
-       } else {
-	   s = "NO_SORT"+" "+name();
-       }
+       String s =
+	   (sort() == Sort.FORMULA ? "" : sort().toString()) + " ";
+       s += name();
        if (arity()>0) {
           int i = 0;
           s+="(";

@@ -26,7 +26,7 @@ public final class FormulaSV extends AbstractSV {
      * @param isRigid true iff this SV may only match rigid formulas
      */    
     FormulaSV(Name name, boolean isRigid) {
-	super(name, EMPTY_ARG_SORTS, Sort.FORMULA, isRigid, true);
+	super(name, Sort.FORMULA, isRigid, true);
     }
     
 

@@ -597,7 +597,7 @@ public class ProblemLoader implements Runnable {
                                                    services, userC);
 
         if (!ourApp.sufficientlyComplete()) {
-            ourApp = ourApp.tryToInstantiate(currGoal, proof.getServices());
+            ourApp = ourApp.tryToInstantiate(proof.getServices());
         }
 
         return ourApp;

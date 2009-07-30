@@ -1437,10 +1437,7 @@ public class Main extends JFrame implements IMain {
     
     protected void saveProof(File proofFile) {
         String filename = proofFile.getAbsolutePath();    
-        ProofSaver saver;
-        if (filename.endsWith(".tex"))
-            saver = new ProofSaverLatex(this, filename);
-        else saver = new ProofSaver(this, filename);
+        ProofSaver saver = new ProofSaver(this, filename);
         String errorMsg = saver.save();
         
         if (errorMsg != null) {

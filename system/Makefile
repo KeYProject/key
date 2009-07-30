@@ -142,7 +142,8 @@ GENERATED_LISTS=logic/SLListOfTerm \
 	rule/SLListOfVariableCondition  \
 	rule/SLListOfTacletPrefix  \
 	rule/SLListOfObject \
-	logic/SLListOfInteger proof/SLListOfGoal \
+	logic/SLListOfInteger \
+        proof/SLListOfGoal \
 	proof/SLListOfNode \
 	rule/inst/SLListOfTacletInstantiations \
 	rule/inst/SLListOfSVInstantiations \
@@ -271,7 +272,8 @@ GENERATED_ARRAYS=java/ArrayOfProgramElementExtnullInnull \
 	logic/ArrayOfTermExtnullInnull \
 	logic/sort/ArrayOfSortExtnullInnull \
 	java/abstraction/ArrayOfKeYJavaTypeExtnullInde.uka.ilkd.key.java.abstraction \
-	strategy/feature/ArrayOfFeatureExtnullInnull
+	strategy/feature/ArrayOfFeatureExtnullInnull \
+        collection/ArrayOfBooleanExtnullInnull
 
 GENERATED_HEAPS= logic/LeftistHeapOfInteger \
 	strategy/LeftistHeapOfRuleAppContainer

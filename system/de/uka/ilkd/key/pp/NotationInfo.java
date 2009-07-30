@@ -151,7 +151,6 @@ public final class NotationInfo {
 	tbl.put(Modality.DIA,new Notation.ModalityNotation("\\<","\\>", 60, 60));
 	tbl.put(Modality.BOX,new Notation.ModalityNotation("\\[","\\]", 60, 60));
 	tbl.put(IfThenElse.IF_THEN_ELSE, new Notation.IfThenElse(130, "\\if"));
-	tbl.put(IfExThenElse.IF_EX_THEN_ELSE, new Notation.IfThenElse(130, "\\ifEx"));
 	tbl.put(WarySubstOp.SUBST,new Notation.Subst());
 	tbl.put(UpdateApplication.UPDATE_APPLICATION, new Notation.UpdateApplicationNotation());
 	

@@ -490,7 +490,11 @@ public class TestMatchTaclet extends TestCase {
     
     // test match of update terms
     public void testUpdateMatch() {           
-	Term match = TacletForTests.parseTerm("\\<{int i;}\\>{i:=(jint)2}(\\forall nat z; (q1(z)))");
+	LocationVariable i 
+	   = new LocationVariable(new ProgramElementName("i"), 
+	        	          services.getJavaInfo().getKeYJavaType("int"));
+	services.getNamespaces().programVariables().add(i);
+	Term match = TacletForTests.parseTerm("\\<{}\\>{i:=(jint)2}(\\forall nat z; (q1(z)))");
 	match = match.sub(0);
 	assertTrue("Instantiations should be found as updates can be ignored if "+
 		   "only the term that is matched has an update and the "+

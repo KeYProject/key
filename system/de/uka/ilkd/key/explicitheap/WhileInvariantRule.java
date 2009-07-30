@@ -46,8 +46,6 @@ public final class WhileInvariantRule implements BuiltInRule {
 
     private static final AtPreFactory APF = AtPreFactory.INSTANCE;
 
-    private static final ExplicitHeapConverter EHC = ExplicitHeapConverter.INSTANCE;
-
     private Term lastFocusTerm;
 
     private Instantiation lastInstantiation;

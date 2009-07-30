@@ -26,12 +26,7 @@ public final class WarySubstOp extends SubstOp {
     private WarySubstOp(Name name) {
 	super(name);
     }
-
     
-    @Override
-    public boolean isRigid() {
-	return true;
-    }
     
     @Override
     public Term apply ( Term term ) {

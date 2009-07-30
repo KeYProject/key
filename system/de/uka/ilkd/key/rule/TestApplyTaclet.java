@@ -205,7 +205,7 @@ public class TestApplyTaclet extends TestCase{
 		    getTacletAppAt(TacletFilter.TRUE, applyPos, null, Constraint.BOTTOM);
 	assertTrue("Too many or zero rule applications.", rApplist.size()==1);
 	RuleApp rApp=rApplist.head();
-	rApp = ((TacletApp)rApp).tryToInstantiate ( goal, TacletForTests.services() );
+	rApp = ((TacletApp)rApp).tryToInstantiate ( TacletForTests.services() );
 	rApp = ((TacletApp)rApp).createSkolemFunctions ( new Namespace (), TacletForTests.services() );
 	assertTrue("Rule App should be complete", rApp.complete());
 	ListOfGoal goals = rApp.execute(goal, TacletForTests.services());

@@ -55,9 +55,6 @@ header {
   import de.uka.ilkd.key.java.recoderext.*;
   import de.uka.ilkd.key.pp.AbbrevMap;
   import de.uka.ilkd.key.pp.LogicPrinter;
-  
-  import de.uka.ilkd.key.explicitheap.ExplicitHeapConverter;
-  import de.uka.ilkd.key.explicitheap.UniqueCondition;
 }
 
 /** 
@@ -777,7 +774,6 @@ options {
     }
 
    
-    private static GenericSort wahSort;
     public Term createAttributeTerm(Term prefix, 
     				    Operator attribute) throws SemanticException {
         Term result = prefix;
@@ -786,20 +782,11 @@ options {
             if (!inSchemaMode()) {
                 semanticError("Schemavariables may only occur inside taclets.");
             }
-            //XXX
-            if(wahSort == null) {
-               try {
-                wahSort = new GenericSort(new Name("WAH!"),
-                			  SetAsListOfSort.EMPTY_SET.add(getServices().getJavaInfo().objectSort()),
-                                          SetAsListOfSort.EMPTY_SET);
-                } catch(GenericSupersortException e) {
-                    assert false;
-                }
-            }
-            result = TB.select(getServices(), wahSort, TB.heap(getServices()), prefix, TB.func(attribute));
+            SchemaVariable sv = (SchemaVariable) attribute;
+            result = TB.select(getServices(), sv.sort(), TB.heap(getServices()), prefix, TB.func(attribute));//XXX
         } else {
             ProgramVariable pv = (ProgramVariable) attribute;
-            Function fieldSymbol = ExplicitHeapConverter.INSTANCE.getFieldSymbol(pv, getServices());        
+            Function fieldSymbol = getServices().getTypeConverter().getHeapLDT().getFieldSymbolForPV(pv, getServices());        
             if (pv.isStatic()){
                 result = TB.staticDot(getServices(), pv.sort(), fieldSymbol);
             } else {            
@@ -861,22 +848,6 @@ options {
         namespaces().setVariables(variables().parent());
     }
 
-    private void bindProgVars(Set progVars) {
-	namespaces().setProgramVariables(new Namespace(programVariables()));
-	Iterator it=progVars.iterator();
-	while (it.hasNext()) {
-  	      programVariables().add((Named)it.next());
-	}
-    }
-
-    private void unbindProgVars() {
-	if(isGlobalDeclTermParser()) {
-   	   namespaces().setVariables(variables().parent());
-	} else
-	   if(!isDeclParser()) {
-             namespaces().setProgramVariables(programVariables().parent());
-        }
-    }
 
     private Set progVars(JavaBlock jb) {
 	if(isGlobalDeclTermParser()) {
@@ -984,15 +955,6 @@ options {
             throw new JavaParserException(e, t, getFilename());
         } 
         return sjb;
-    }
-
-    private Operator lookupVarfuncId(String varfunc_name, 
-                    PairOfTermArrayAndBoundVarsArray args) throws NotDeclException {
-        Term[] argTerms = null;
-        if (args != null) {
-            argTerms = args.getTerms();
-        }
-        return lookupVarfuncId(varfunc_name, argTerms);
     }
 
     /**
@@ -1547,24 +1509,6 @@ one_sort_decl returns [ListOfSort createdSorts = SLListOfSort.EMPTY_LIST]
             }
         };
 
-intersectionSortIdentifier returns [ListOfString composites = SLListOfString.EMPTY_LIST] 
-{
-  ListOfString rightComposites;
-  String left = ""; 
-  String right = "";   
-}
-:     
-     INTERSECTIONSORT LPAREN 
-        (left  = simple_ident_dots) COMMA 
-        (rightComposites = intersectionSortIdentifier {            
-            final IteratorOfString it = rightComposites.iterator();
-            right = "\\inter(" + it.next() + "," + it.next() +")";
-        } | right = simple_ident_dots) RPAREN 
-     {
-         composites = composites.prepend(right).prepend(left);
-     }
-;
-
 
 simple_ident_dots returns [ String ident = ""; ] 
 {
@@ -1915,10 +1859,10 @@ location_ident returns [int kind = NORMAL_NONRIGID]
 func_decl
 {
     Sort[] argSorts;
+    Boolean[] whereToBind = null;
     Sort retSort;
     String func_name;
     boolean unique = false;
-    String id = null;
 }
     :
         (
@@ -1928,11 +1872,22 @@ func_decl
         retSort = any_sortId_check[!skip_functions]
         
         func_name = funcpred_name 
+        
+	(
+	    whereToBind = where_to_bind
+	)?        
 
         argSorts = arg_sorts[!skip_functions]
                 
         {
             if (!skip_functions) {
+            
+	 	if(whereToBind != null 
+	 	   && whereToBind.length != argSorts.length) {
+                    semanticError("Where-to-bind list must have same length "
+                                  + "as argument list");
+                } 
+            
                 Function f = null;
                 
 	        int separatorIndex = func_name.indexOf("::"); 
@@ -1955,7 +1910,8 @@ func_decl
 	        if(f == null) {
 	            f = new Function(new Name(func_name), 
 	                             retSort, 
-	                             argSorts, 
+	                             argSorts,
+	                             whereToBind,
 	                             unique);                    
 	        }
 	        
@@ -1991,7 +1947,6 @@ func_decls
     }
     ;
 
-
 arrayopid returns [KeYJavaType componentType = null]
     :
         EMPTYBRACKETS
@@ -2018,6 +1973,27 @@ arg_sorts[boolean checkSort] returns [Sort[] argSorts = null]
             argSorts = (Sort[])args.toArray(AN_ARRAY_OF_SORTS);
         }
     ;
+    
+where_to_bind returns [Boolean[] result = null]
+{
+    List<Boolean> list = new ArrayList<Boolean>();
+}   
+    : 
+        LBRACE
+        (  
+            TRUE {list.add(true);} | FALSE {list.add(false);}  
+        )
+        (  
+           COMMA
+           (
+               TRUE {list.add(true);} | FALSE {list.add(false);}
+           )
+        )*
+        RBRACE    
+        {
+            result = list.toArray(new Boolean[0]);
+        }
+   ;
 
 ruleset_decls
 {
@@ -2209,10 +2185,6 @@ simple_sort_name returns [String name = ""]
 { String id = ""; }
     :
         id = simple_ident_dots  { name = id; } 
-        | inter:INTERSECTIONSORT {name += inter.getText();} LPAREN 
-             id = simple_ident_dots { name += "(" + id;  } COMMA 
-             id = simple_sort_name  { name +=  "," + id + ")"; }          
-          RPAREN
     ;
 
 
@@ -2714,12 +2686,11 @@ attribute_or_query_suffix[Term prefix] returns [Term result = null]
 query [Term prefix] returns [Term result = null] 
 {
     String classRef = "";
-    Term[] args = null;
-    PairOfTermArrayAndBoundVarsArray argsWithBoundVars = null; 
+    Term[] args = null; 
     boolean brackets = false;
 }
     :
-    mid:IDENT (AT LPAREN classRef = simple_ident_dots (EMPTYBRACKETS {brackets = true;} )? RPAREN)? argsWithBoundVars = argument_list
+    mid:IDENT (AT LPAREN classRef = simple_ident_dots (EMPTYBRACKETS {brackets = true;} )? RPAREN)? args = argument_list
     { 
        if("".equals(classRef)){
           classRef = prefix.sort().name().toString();
@@ -2732,9 +2703,6 @@ query [Term prefix] returns [Term result = null]
               classRef, getFilename(), getLine(), 
               getColumn());
          classRef = kjt.getFullName();
-       }
-       if (argsWithBoundVars != null) {
-         args = argsWithBoundVars.getTerms();
        }
        result = getServices().getJavaInfo().getProgramMethodTerm
                 (prefix, mid.getText(), args, classRef);
@@ -2751,16 +2719,11 @@ static_query returns [Term result = null]
 {
     String queryRef = "";
     Term[] args = null;
-    PairOfTermArrayAndBoundVarsArray argsWithBoundVars = null; 
     Operator ts = null;
 }
     :
-    queryRef =  staticAttributeOrQueryReference argsWithBoundVars = argument_list
+    queryRef =  staticAttributeOrQueryReference args = argument_list
     { 
-       if (argsWithBoundVars != null) {
-         args = argsWithBoundVars.getTerms();
-       }
-
        int index = queryRef.indexOf(':');
        String className = queryRef.substring(0, index); 
        String qname = queryRef.substring(index+2); 
@@ -2844,7 +2807,7 @@ array_access_suffix [Term arrayReference] returns [Term result = arrayReference]
   	LBRACKET 
 	(   STAR {
            	rangeFrom = toZNotation("0", functions(), tf);
-           	Term lt = createAttributeTerm(result, getAttribute(result.sort(), "length"));
+           	Term lt = TB.dotLength(getServices(), arrayReference);
            	Term one = toZNotation("1", functions(), tf);
   	   		rangeTo = tf.createFunctionTerm
            		((Function) functions().lookup(new Name("sub")), lt, one); 
@@ -2893,7 +2856,6 @@ term130 returns [Term a = null]
     |   TRUE  { a = TB.tt(); }
     |   FALSE { a = TB.ff(); }
     |   a = ifThenElseTerm
-    |   a = ifExThenElseTerm
     |   a = sum_or_product_term
     |   a = bounded_sum_term
    ; exception
@@ -2992,78 +2954,22 @@ ifThenElseTerm returns [Term result = null]
 			(ex.getMessage(), getFilename(), getLine(), getColumn()));
         }
 
-ifExThenElseTerm returns [Term result = null]
-{
-    Term condF, thenT, elseT;
-    ListOfQuantifiableVariable exVars = SLListOfQuantifiableVariable.EMPTY_LIST;
-    ArrayOfQuantifiableVariable exVarsAr = null;
-}
-    :
-        IFEX exVars = bound_variables
-               {
-                    exVarsAr = new ArrayOfQuantifiableVariable
-                                           ( exVars.toArray () );
-               }
-        LPAREN condF = term RPAREN
-        {
-            if (condF.sort() != Sort.FORMULA) {
-                semanticError
-		  ("Condition of an \\if-then-else term has to be a formula.");
-            }
-        }
-        THEN LPAREN thenT = term RPAREN
-        {
-            while ( !exVars.isEmpty () ) {
-                if(!isGlobalDeclTermParser())
-                    unbindVars ();
-                exVars = exVars.tail ();
-            }
-        }
-        ELSE LPAREN elseT = term RPAREN
-        {
-            result = tf.createIfExThenElseTerm ( exVarsAr, condF, thenT, elseT );
-        }
- ; exception
-        catch [TermCreationException ex] {
-              keh.reportException
-		(new KeYSemanticException
-			(ex.getMessage(), getFilename(), getLine(), getColumn()));
-        }
 
-
-//"TermWithBoundVars" is used here instead of "Term" to allow for
-//syntax needed for OCL simplification.
-
-argument returns [TermWithBoundVars p = null]
+argument returns [Term result = null]
 {
     ArrayOfQuantifiableVariable vars = null;
     Term a;
 }
 :
- (vars = ocl_bound_variables)? 
  (
    // WATCHOUT Woj: can (should) this be unified to term60?
    {isTermParser() || isGlobalDeclTermParser()}? 
-     a = term 
+     result = term 
   |  
-     a = term60 
+     result = term60 
  )
- {
-   p = new TermWithBoundVars(vars, a);
-    if(vars != null && !isGlobalDeclTermParser() )
-       unbindVars();
- }
  ;
   
-ocl_bound_variables returns [ArrayOfQuantifiableVariable vars = null] 
-{
-   ListOfQuantifiableVariable vs = null;
-}
-:
-  BIND vs = bound_variables {
-     vars = new ArrayOfQuantifiableVariable(vs.toArray());
-  }
- ;
 
 quantifierterm returns [Term a = null]
 {
@@ -3152,11 +3058,11 @@ bound_variables returns[ListOfQuantifiableVariable list = SLListOfQuantifiableVa
   QuantifiableVariable var = null;
 }
 :
-      LPAREN
-        var = one_bound_variable { list = list.append(var); }
-       (SEMI var = one_bound_variable { list = list.append(var); })*
-      RPAREN
-   | var = one_bound_variable { list = list.append(var); } SEMI 
+      var = one_bound_variable { list = list.append(var); }
+      (
+          COMMA var = one_bound_variable { list = list.append(var); }
+      )*
+      SEMI
 ;
 
 one_bound_variable returns[QuantifiableVariable v=null]
@@ -3208,7 +3114,7 @@ one_logic_bound_variable_nosort returns[QuantifiableVariable v=null]
 modality_dl_term returns [Term a = null]
 {
     Term a1;
-    PairOfTermArrayAndBoundVarsArray argsWithBoundVars = null;
+    Term[] args = null;
     Term[] terms = null;
     Operator op = null;
     PairOfStringAndJavaBlock sjb = null;
@@ -3231,7 +3137,6 @@ modality_dl_term returns [Term a = null]
        if(op == null) {
          semanticError("Unknown modal operator: "+sjb.opName);
        }
-       bindProgVars(progVars(sjb.javaBlock));
      }
    // CAREFUL here, op can be null during guessing stage (use lazy &&)
    ({op != null && op.arity() == 1}? a1=term60
@@ -3241,21 +3146,6 @@ modality_dl_term returns [Term a = null]
      // A term "(post)" seems to be parsed as "post" anyway
       {
             a = tf.createProgramTerm(op, sjb.javaBlock, new Term[]{a1});
-            unbindProgVars();
-      }
-    |
-    argsWithBoundVars = argument_list
-      {
-        Debug.fail("We don't have modalities with arity > 1, so this should not	be executed.");
-        unbindProgVars();
-        if (argsWithBoundVars != null) {
-          terms = argsWithBoundVars.getTerms();
-        }
-        if(op.arity() != terms.length) {
-            semanticError("The arity of " + op.name() +
-                " is "+op.arity() + ", but you provided " + terms.length + " arguments");
-        }
-        a = tf.createProgramTerm(op, sjb.javaBlock, terms);
       }
    )
    ; exception
@@ -3265,12 +3155,11 @@ modality_dl_term returns [Term a = null]
 			(ex.getMessage(), getFilename(), getLine(), getColumn()));
         }
 
-//"PairOfTermArrayAndBoundVarsArray" is used here instead of "Term" to allow for
-//syntax needed for OCL simplification.
-argument_list returns [PairOfTermArrayAndBoundVarsArray ts = null]
+
+argument_list returns [Term[] result = null]
 {
-    List args = new LinkedList();
-    TermWithBoundVars p1, p2;
+    List<Term> args = new LinkedList<Term>();
+    Term p1, p2;
 }
     :
         LPAREN 
@@ -3280,14 +3169,15 @@ argument_list returns [PairOfTermArrayAndBoundVarsArray ts = null]
 
         RPAREN
         {
-            ts = new PairOfTermArrayAndBoundVarsArray(args);
+            result = args.toArray(new Term[0]);
         }
 
     ;
 
 funcpredvarterm returns [Term a = null]
 {
-    PairOfTermArrayAndBoundVarsArray argsWithBoundVars = null;
+    ListOfQuantifiableVariable boundVars = null;
+    Term[] args = null;
     String varfuncid;
     String neg = "";
     boolean opSV = false;
@@ -3312,28 +3202,39 @@ funcpredvarterm returns [Term a = null]
         ((MINUS)? NUM_LITERAL) => (MINUS {neg = "-";})? number:NUM_LITERAL
         { a = toZNotation(neg+number.getText(), functions(), tf);}    
     | AT a = abbreviation
-    | varfuncid = funcpred_name 
+    | varfuncid = funcpred_name
+    
+        (LBRACE boundVars = bound_variables RBRACE)?     
         
-	((LPAREN)=>argsWithBoundVars = argument_list)? 
-        //argsWithBoundVars==null indicates no argument list
-        //argsWithBoundVars.size()==0 indicates open-close-parens ()
+	(args = argument_list)?
+        //args==null indicates no argument list
+        //args.size()==0 indicates open-close-parens ()
+                
         {  
-            if(varfuncid.equals("inReachableState") && argsWithBoundVars == null) {
+            if(varfuncid.equals("inReachableState") && args == null) {
 	        a = TB.inReachableState(getServices());
-	    } else if(varfuncid.equals("skip") && argsWithBoundVars == null) {
+	    } else if(varfuncid.equals("skip") && args == null) {
 	        a = TB.skip();
 	    } else {
-	            Operator op = lookupVarfuncId(varfuncid, argsWithBoundVars);     
+	            Operator op = lookupVarfuncId(varfuncid, args);     
 	                   
 	            if (op instanceof ParsableVariable) {
 	                a = termForParsedVariable((ParsableVariable)op);
-	            } else  if (op instanceof Operator) {
-	                if (argsWithBoundVars==null) {
-	                    argsWithBoundVars = new PairOfTermArrayAndBoundVarsArray(new LinkedList());
+	            } else {
+	                if (args==null) {
+	                    args = new Term[0];
 	                }
 	
-	                a = tf.createFunctionWithBoundVarsTerm((Operator)op, argsWithBoundVars);
+	                if(boundVars == null) {
+	                    a = TB.func(op, args);
+	                } else {
+	                    a = TB.func(op, args, new ArrayOfQuantifiableVariable(boundVars.toArray()));
+	                }
 	            }
+	    }
+	    
+	    if(boundVars != null) {
+	        unbindVars();
 	    }
         }
 ; exception
@@ -3535,7 +3436,7 @@ varexp[TacletBuilder b]
     | varcond_free[b]  
     | varcond_hassort[b]
     | varcond_inReachableState[b]
-    | varcond_isUnique[b]
+    | varcond_equalUnique[b]
     | varcond_new[b]
     | varcond_newlabel[b]
     | varcond_query[b] 
@@ -3607,9 +3508,6 @@ type_resolver returns [TypeResolver tr = null]
     |
     ( CONTAINERTYPE LPAREN y = varId RPAREN  
         {  tr = TypeResolver.createContainerTypeResolver((SchemaVariable)y); } )
-    |
-    ( FIELDTARGETTYPE LPAREN y = varId COMMA z = varId RPAREN
-        {  tr = new ExplicitHeapConverter.FieldTargetTypeResolver((SchemaVariable)y, (SchemaVariable)z); } ) 
 ;
 
 varcond_new [TacletBuilder b]
@@ -3841,14 +3739,18 @@ varcond_localvariable [TacletBuilder b, boolean negated]
         } 
 ;
 
-varcond_isUnique [TacletBuilder b]
+varcond_equalUnique [TacletBuilder b]
 {
-  ParsableVariable x = null;
+  ParsableVariable t = null;
+  ParsableVariable t2 = null;
+  ParsableVariable phi = null;
 }
 :
-   ISUNIQUE 
-	LPAREN x=varId RPAREN {
-     	   b.addVariableCondition(new UniqueCondition((SchemaVariable) x));
+   EQUAL_UNIQUE 
+	LPAREN t=varId COMMA t2=varId COMMA phi=varId RPAREN {
+     	   b.addVariableCondition(new EqualUniqueCondition((TermSV) t, 
+     	                                                   (TermSV) t2, 
+     	                                                   (FormulaSV) phi));
         } 
 ;
 

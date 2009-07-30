@@ -26,7 +26,6 @@ import de.uka.ilkd.key.util.Debug;
 abstract class AbstractSV extends AbstractSortedOperator 
                           implements SchemaVariable {   
     
-    private final boolean isRigid;
     private final boolean isStrict;
     
     
@@ -35,8 +34,7 @@ abstract class AbstractSV extends AbstractSortedOperator
 	                 Sort sort,
 	                 boolean isRigid,
 	                 boolean isStrict) {
-	super(name, argSorts, sort);
-	this.isRigid = isRigid;
+	super(name, argSorts, sort, isRigid);
 	this.isStrict = isStrict;
     }
     
@@ -47,7 +45,17 @@ abstract class AbstractSV extends AbstractSortedOperator
 	                 boolean isRigid,
 	                 boolean isStrict) {
 	this(name, new ArrayOfSort(argSorts), sort, isRigid, isStrict);
+    }
+    
+    
+    protected AbstractSV(Name name,  
+	                 Sort sort,
+	                 boolean isRigid,
+	                 boolean isStrict) {
+	this(name,(ArrayOfSort) null, sort, isRigid, isStrict);
     }    
+        
+    
     
     /**
      * tries to add the pair <tt>(this,pe)</tt> to the match conditions. If
@@ -143,13 +151,7 @@ abstract class AbstractSV extends AbstractSortedOperator
     protected String toString(String sortSpec) {
 	return name() +" ("+sortSpec+")"; 
     }    
-    
-    
-    @Override
-    public final boolean isRigid() {
-	return isRigid;
-    }
-    
+
     
     @Override
     public final boolean isStrict() {

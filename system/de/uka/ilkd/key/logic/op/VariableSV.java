@@ -28,7 +28,7 @@ public final class VariableSV extends AbstractSV implements QuantifiableVariable
      * @param sort the Sort of the SchemaVariable and the matched type     
      */
     VariableSV(Name name, Sort sort) {
-	super(name, EMPTY_ARG_SORTS, sort, true, false); 	
+	super(name, sort, true, false); 	
     }
 
     

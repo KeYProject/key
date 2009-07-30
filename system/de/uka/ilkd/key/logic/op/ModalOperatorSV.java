@@ -12,7 +12,6 @@ package de.uka.ilkd.key.logic.op;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.util.Debug;
@@ -36,15 +35,6 @@ public final class ModalOperatorSV extends AbstractSV  {
     }
     
 
-    @Override
-    public boolean additionalValidTopLevel(Term term){
-	boolean result = true;
-	for(int i=0;i<term.arity(); i++)
-	    result = result && term.sub(i).sort().equals(Sort.FORMULA);
-	return result;
-    }
-
-    
     @Override
     public MatchConditions match(SVSubstitute subst, 
 	    			 MatchConditions mc,

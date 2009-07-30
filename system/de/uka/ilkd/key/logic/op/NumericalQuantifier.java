@@ -18,21 +18,17 @@ public final class NumericalQuantifier extends AbstractOperator {
     public static final NumericalQuantifier SUM = new NumericalQuantifier(new Name("\\sum"));
 
     private NumericalQuantifier(Name name) {
-        super(name, 2);
+        super(name, 2, new Boolean[]{true, true}, true);
     }
 
     @Override
     public Sort sort(ArrayOfTerm terms) {
         return terms.getTerm(1).sort ();
     }
-
-    @Override
-    public boolean validTopLevel(Term term) {
-        return term.arity () == arity () && term.sub(0).sort() == Sort.FORMULA;
-    }
+    
     
     @Override
-    public boolean isRigid() {
-	return true;
+    protected boolean additionalValidTopLevel(Term term) {
+        return term.sub(0).sort() == Sort.FORMULA; //TODO
     }
 }

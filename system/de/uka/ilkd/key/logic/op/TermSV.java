@@ -28,7 +28,7 @@ public final class TermSV extends AbstractSV {
      * strict forcing exact type match
      */    
     TermSV(Name name, Sort sort, boolean isRigid, boolean isStrict) {	
-        super(name, EMPTY_ARG_SORTS, sort, isRigid, isStrict);
+        super(name, sort, isRigid, isStrict);
         assert sort != Sort.FORMULA;
         assert sort != Sort.UPDATE;
     }

@@ -72,7 +72,7 @@ tokens {
 	ISREFERENCE="\\isReference";	        
 	ISREFERENCEARRAY="\\isReferenceArray";
 	ISSUBTYPE = "\\sub";	
-	ISUNIQUE = "\\isUnique";
+	EQUAL_UNIQUE = "\\equalUnique";
         NEW = "\\new";
         NEWLABEL = "\\newLabel";
 	NOT = "\\not";
@@ -84,11 +84,9 @@ tokens {
 	TYPEOF = "\\typeof";
 
 	// Quantifiers, binding, substitution
-	BIND   = "\\bind";
 	FORALL = "\\forall";
 	EXISTS = "\\exists";
         SUBST  = "\\subst";
-	IFEX = "\\ifEx";
 	FOR  = "\\for";
 	IF   = "\\if";
 	THEN = "\\then";

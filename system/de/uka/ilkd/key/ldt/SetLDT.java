@@ -31,8 +31,6 @@ public final class SetLDT extends LDT {
     private final Function union;
     private final Function intersect;
     private final Function setMinus;
-    private final Function complement;
-    private final Function everything;
     private final Function elementOf;
     private final Function subset;
     private final Function disjoint;    
@@ -44,8 +42,6 @@ public final class SetLDT extends LDT {
         union      = addFunction(functions, "union");
         intersect  = addFunction(functions, "intersect");
         setMinus   = addFunction(functions, "setMinus");
-        complement = addFunction(functions, "complement");
-        everything = addFunction(functions, "everything");
         elementOf  = addFunction(functions, "elementOf");
         subset     = addFunction(functions, "subset");
         disjoint   = addFunction(functions, "disjoint");
@@ -74,16 +70,6 @@ public final class SetLDT extends LDT {
     
     public Function getSetMinus() {
 	return setMinus;
-    }
-    
-    
-    public Function getComplement() {
-	return complement;
-    }
-    
-    
-    public Function getEverything() {
-	return everything;
     }
     
     

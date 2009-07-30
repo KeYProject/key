@@ -14,9 +14,7 @@ import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.SortedOperator;
 import de.uka.ilkd.key.logic.sort.*;
 
-/**
- * 
- */
+
 public class TermCreationException extends RuntimeException {
 
     private final String errorMessage;

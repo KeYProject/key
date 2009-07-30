@@ -565,7 +565,7 @@ public abstract class TacletApp implements RuleApp {
     /**
      * @return A TacletApp with this.sufficientlyComplete() or null
      */
-    public TacletApp tryToInstantiate(Goal goal, Services services) {
+    public final TacletApp tryToInstantiate(Services services) {
         final VariableNamer varNamer = services.getVariableNamer();
         final TermBuilder tb = TermBuilder.DF;
         
@@ -579,7 +579,7 @@ public abstract class TacletApp implements RuleApp {
             
             if (sv.sort() == ProgramSVSort.VARIABLE) {
         	String proposal = varNamer.getSuggestiveNameProposalForProgramVariable
-        	(sv, this, goal, services, proposals);
+        	(sv, this, services, proposals);
         	ProgramElement pe = 
         	    TacletInstantiationsTableModel.getProgramElement(app, proposal, sv, services);
         	app = app.addCheckedInstantiation(sv, pe, services, true);
@@ -588,7 +588,7 @@ public abstract class TacletApp implements RuleApp {
         	boolean nameclash;
         	do {
         	    String proposal = VariableNameProposer.DEFAULT.
-        	    getProposal(this, sv, services, goal.node(), proposals);
+        	    getProposal(this, sv, services, null, proposals);
         	    ProgramElement pe = TacletInstantiationsTableModel.
         	    getProgramElement(app, proposal, sv, services);
         	    proposals = proposals.prepend(proposal);
@@ -607,7 +607,7 @@ public abstract class TacletApp implements RuleApp {
         	if ( app == null ) return null;
 
         	String proposal = VariableNameProposer.DEFAULT
-        	.getProposal(app, sv, services, goal.node(), proposals);
+        	.getProposal(app, sv, services, null, proposals);
 
         	proposals = proposals.append(proposal);
 
@@ -622,7 +622,7 @@ public abstract class TacletApp implements RuleApp {
         	if ( app == null ) return null;
 
         	String proposal = VariableNameProposer.DEFAULT
-        	.getProposal( this, sv, services, goal.node(), null );
+        	.getProposal( this, sv, services, null, null );
         	final LogicVariable v = new LogicVariable ( new Name ( proposal ),
         		getRealSort ( sv, services ) );                
         	app = app.addCheckedInstantiation ( sv, tb.var(v), services, true );

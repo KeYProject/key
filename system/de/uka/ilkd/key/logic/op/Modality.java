@@ -45,14 +45,8 @@ public final class Modality extends AbstractSortedOperator {
      * @param name the Name of the modality 
      */
     private Modality(Name name) {
-	super(name, new Sort[]{Sort.FORMULA}, Sort.FORMULA);
+	super(name, new Sort[]{Sort.FORMULA}, Sort.FORMULA, false);
 	nameMap.put(name.toString(), this);
-    }
-
-
-    @Override
-    public boolean isRigid () {
-	return false;
     }
 
 

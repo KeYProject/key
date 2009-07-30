@@ -10,7 +10,6 @@
 
 package de.uka.ilkd.key.proof.init;
 
-import de.uka.ilkd.key.explicitheap.ExplicitHeapConverter;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.Type;
@@ -20,7 +19,6 @@ import de.uka.ilkd.key.ldt.LDT;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.sort.SortImpl;
 
 
 /**
@@ -94,7 +92,7 @@ public class CreatedAttributeTermFactory {
         ProgramVariable createdAttribute
                 = javaInfo.getAttribute(ImplicitFieldAdder.IMPLICIT_CREATED, 
                                         javaInfo.getJavaLangObject());
-        final Function fieldSymbol = ExplicitHeapConverter.INSTANCE.getFieldSymbol(createdAttribute, services);
+        final Function fieldSymbol = services.getTypeConverter().getHeapLDT().getFieldSymbolForPV(createdAttribute, services);
         Term createdTerm = TB.dot(services, createdAttribute.sort(), objectTerm, fieldSymbol);
         
         return TB.equals(createdTerm, TB.TRUE(services));

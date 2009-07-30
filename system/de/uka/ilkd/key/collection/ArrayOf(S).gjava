@@ -132,5 +132,10 @@ public class ArrayOf<S> <E> implements java.io.Serializable {
         }
         return result;
     }
+    
+    
+    public boolean isEmpty() {
+        return size() == 0;
+    }
 }
 END_OF_CLASS
