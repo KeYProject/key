@@ -13,15 +13,13 @@ package de.uka.ilkd.key.rule.conditions;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.WeakHashMap;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.sort.NullSort;
-import de.uka.ilkd.key.logic.sort.SetAsListOfSort;
-import de.uka.ilkd.key.logic.sort.SetOfSort;
-import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.logic.sort.*;
 import de.uka.ilkd.key.rule.VariableConditionAdapter;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.Debug;
@@ -44,7 +42,7 @@ public final class TypeComparisonCondition extends VariableConditionAdapter {
     /** checks if sorts are same */
     public final static int SAME = 5;
     /** checks if sorts are disjoint */
-    public final static int DISJOINTMODULONULL = 6; //XXX
+    public final static int DISJOINTMODULONULL = 6; 
 
   
     private final int mode;
@@ -108,8 +106,37 @@ public final class TypeComparisonCondition extends VariableConditionAdapter {
     }
     
     
-    private Map<SetOfSort,Boolean> disjointnessCache 
-    	= new HashMap<SetOfSort,Boolean>();
+    private static Map<Sort,Map<Sort,Boolean>> disjointnessCache 
+    	= new WeakHashMap<Sort,Map<Sort,Boolean>>();
+    
+    
+    private static Boolean lookupInCache(Sort s1, Sort s2) {
+	Boolean result = null;
+	
+	Map<Sort,Boolean> map = disjointnessCache.get(s1);
+	if(map != null) {
+	    result = map.get(s2);
+	}
+	
+	if(result == null) {
+	    map = disjointnessCache.get(s2);
+	    if(map != null) {
+		result = map.get(s1);
+	    }	    
+	}
+	
+	return result;
+    }
+    
+    private static void putIntoCache(Sort s1, Sort s2, boolean b) {
+	Map<Sort,Boolean> map = disjointnessCache.get(s1);
+	if(map == null) {
+	    map = new WeakHashMap<Sort,Boolean>();
+	}
+	map.put(s2, b);
+	disjointnessCache.put(s1, map);
+    }
+    
     
     /**
      * Checks for disjointness modulo "null".
@@ -123,21 +150,45 @@ public final class TypeComparisonCondition extends VariableConditionAdapter {
 	}
 	
 	//result cached?
-	SetOfSort sorts = SetAsListOfSort.EMPTY_SET.add(fstSort).add(sndSort);	
-	Boolean result = disjointnessCache.get(sorts);
+	Boolean result = lookupInCache(fstSort, sndSort);
+	
+	//if not, compute it 
 	if(result == null) {
-	    //compute result
-	    result = true;
-    	    for(Named n : services.getNamespaces().sorts().allElements()) {
-    		Sort s = (Sort) n;
-    		if(!(s instanceof NullSort) 
-    			&& s.extendsTrans(fstSort) 
-    			&& s.extendsTrans(sndSort)) {
-    		    result = false;
-    		    break;
-    		}
-    	    }
-    	    disjointnessCache.put(sorts, result);
+	    //array sorts are disjoint iff their element sorts are disjoint
+	    while(fstSort instanceof ArraySort 
+	          && sndSort instanceof ArraySort) {
+		fstSort = ((ArraySort)fstSort).elementSort();
+		sndSort = ((ArraySort)sndSort).elementSort();
+	    }
+	    
+	    //object sorts?
+	    final Sort objectSort = services.getJavaInfo().objectSort();	    
+	    boolean fstIsObject = fstSort.extendsTrans(objectSort);
+	    boolean sndIsObject = sndSort.extendsTrans(objectSort);
+	    
+	    if(fstIsObject
+	       && sndIsObject 
+	       && fstSort instanceof ArraySort == sndSort instanceof ArraySort){
+		//be conservative wrt. modularity: program extensions may add 
+		//new subtypes between object sorts (but never between an array 
+		//sort and a non-array sort)	
+		result = false;
+	    } else {
+		//otherwise, we just check whether *currently* there are is 
+		//some common subsort
+		result = true;
+		for(Named n : services.getNamespaces().sorts().allElements()) {
+		    Sort s = (Sort) n;
+		    if(!(s instanceof NullSort)
+			    && s.extendsTrans(fstSort)
+			    && s.extendsTrans(sndSort)) {
+			result = false;
+			break;
+		    }
+		}
+	    }
+	    
+    	    putIntoCache(fstSort, sndSort, result);
     	}
 	
 	return result;

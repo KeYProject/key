@@ -207,7 +207,7 @@ public class TermFactory {
      * Create an 'if-then-else' term (or formula)
      */
     public Term createIfThenElseTerm(Term condF, Term thenT, Term elseT) {
-        return new TermImpl(IfThenElse.IF_THEN_ELSE, new Term [] { condF, thenT, elseT });
+        return new TermImpl(IfThenElse.IF_THEN_ELSE, new Term [] { condF, thenT, elseT }).checked();
     }
     
 
@@ -457,11 +457,11 @@ public class TermFactory {
 	}
 	ArrayOfQuantifiableVariable result = null;
 	for(ArrayOfQuantifiableVariable arr : bv) {
-	    if(arr != null) {
+	    if(arr != null && !arr.isEmpty()) {
 		if(result == null) {
 		    result = arr;
 		} else {
-		    assert arr.equals(result);
+		    assert arr.equals(result) : "expected: " + result + "\nfound: " + arr;
 		}
 	    }
 	}
@@ -504,7 +504,7 @@ public class TermFactory {
 					  bv[1].getQuantifiableVariable(0),
 					  subTerms);
 	}  else {
-	    return new TermImpl(op, new ArrayOfTerm(subTerms), javaBlock, getSingleArray(bv));
+	    return new TermImpl(op, new ArrayOfTerm(subTerms), javaBlock, getSingleArray(bv)).checked();
 	    //return createFunctionWithBoundVarsTerm(op, subTerms, bv);	 	    
 	}       
    }

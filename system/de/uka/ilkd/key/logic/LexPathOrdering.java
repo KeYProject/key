@@ -303,16 +303,18 @@ public class LexPathOrdering implements TermOrdering {
             if ( p_op.name ().equals ( AbstractIntegerLDT.CHAR_ID_NAME ) )
                 return Integer.valueOf ( 1 );
             if ( p_op instanceof Function
-                 && ( opStr.equals("null"))) 
-                return new Integer ( 2 );
+                 && ( (Function)p_op ).sort () == Sort.NULL )
+                return Integer.valueOf ( 2 );
             if ( p_op instanceof Function
-                 && ( opStr.equals ( "TRUE" ) || opStr.equals ( "FALSE" ) ) )
-                return new Integer ( 3 );
+                 && ( opStr.equals ( "TRUE" ) | opStr.equals ( "FALSE" ) ) )
+                return Integer.valueOf ( 3 );
 
             if ( opStr.equals ( "add" ) ) return Integer.valueOf ( 6 );
             if ( opStr.equals ( "mul" ) ) return Integer.valueOf ( 7 );
             if ( opStr.equals ( "div" ) ) return Integer.valueOf ( 8 );
             if ( opStr.equals ( "jdiv" ) ) return Integer.valueOf ( 9 );
+            
+            if ( opStr.equals ( "empty" ) ) return Integer.valueOf ( 0 );
 
             return null;
         }
@@ -326,8 +328,10 @@ public class LexPathOrdering implements TermOrdering {
         protected Integer getWeight(Operator p_op) {
             final String opStr = p_op.name ().toString ();
 
+            if ( p_op instanceof Function && ((Function)p_op).isUnique()) return Integer.valueOf(5);            
             if ( opStr.endsWith ( "::<get>" ) ) return Integer.valueOf ( 10 );
             if ( opStr.endsWith ( "<nextToCreate>" ) ) return Integer.valueOf ( 20 );
+            
 
 /*            if ( p_op instanceof SortDependingSymbol ) return new Integer ( 10 );
 

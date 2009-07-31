@@ -24,43 +24,56 @@ import de.uka.ilkd.key.util.ExtList;
 
 public final class HeapLDT extends LDT {
     
+    private static final Name NAME = new Name("Heap");    
+    
     public static final Name SELECT_NAME = new Name("select");
     public static final Name STORE_NAME = new Name("store");
-    public static final Name ARRAY_LENGTH_FIELD_NAME 
-    					= new Name("Array::length");
     
+    //additional sorts
+    private final Sort fieldSort;    
     
-    private static final Name NAME = new Name("Heap");
-    
-    private final LocationVariable heap;
+    //select/store
     private final SortDependingFunction select;
     private final Function store;
+    private final Function changeHeapAtLocs;    
+
+    //location sets
+    private final Function allLocs;
+    private final Function allFields;
+    
+    //fields
     private final Function arr;
     private final Function length;
     private final Function created;
     private final SortDependingFunction nextToCreate;
+    
+    //predicates
     private final Function wellFormed;
-    private final Function changeHeapAtLocs;
-    private final Sort fieldSort;
+    
+    //heap pv
+    private final LocationVariable heap;
+    
     
     
     public HeapLDT(Namespace sorts, Namespace functions, Namespace progVars) {
 	super((Sort)sorts.lookup(NAME), null);
-        heap	          = (LocationVariable) progVars.lookup(new Name("heap"));
+        fieldSort         = (Sort) sorts.lookup(new Name("Field"));	
         select            = (SortDependingFunction) addFunction(functions, Sort.ANY + "::" + SELECT_NAME);
         store             = addFunction(functions, "store");
+        changeHeapAtLocs  = addFunction(functions, "changeHeapAtLocs");
+        allLocs           = addFunction(functions, "allLocs");
+        allFields         = addFunction(functions, "allFields");        
         arr               = addFunction(functions, "arr");
         length            = addFunction(functions, "Array::length");
         created           = addFunction(functions, "java.lang.Object::<created>");
         nextToCreate      = (SortDependingFunction) addFunction(functions, Sort.ANY + "::<nextToCreate>");
         wellFormed        = addFunction(functions, "wellFormed");
-        changeHeapAtLocs  = addFunction(functions, "changeHeapAtLocs");
-        fieldSort         = (Sort) sorts.lookup(new Name("Field"));
+        heap	          = (LocationVariable) progVars.lookup(new Name("heap"));        
     }
     
     
-    public LocationVariable getHeap() {
-	return heap;
+    public Sort getFieldSort() {
+	return fieldSort;
     }
     
     
@@ -81,6 +94,21 @@ public final class HeapLDT extends LDT {
     
     public Function getStore() {
 	return store;
+    }
+    
+
+    public Function getChangeHeapAtLocs() {
+	return changeHeapAtLocs;
+    }    
+    
+    
+    public Function allLocs() {
+	return allLocs;
+    }
+    
+    
+    public Function allFields() {
+	return allFields;
     }
     
     
@@ -108,15 +136,10 @@ public final class HeapLDT extends LDT {
 	return wellFormed;
     }
     
-    
-    public Function getChangeHeapAtLocs() {
-	return changeHeapAtLocs;
-    }
-    
-    
-    public Sort getFieldSort() {
-	return fieldSort;
-    }
+
+    public LocationVariable getHeap() {
+	return heap;
+    }    
     
     
     public Function getFieldSymbolForPV(ProgramVariable fieldPV, 
@@ -125,7 +148,7 @@ public final class HeapLDT extends LDT {
 	
 	final Name name;
 	if(fieldPV == services.getJavaInfo().getArrayLength()) {
-	    name = ARRAY_LENGTH_FIELD_NAME;
+	    return getLength();
 	} else if(fieldPV.isStatic()) {
 	    name = new Name(fieldPV.getContainerType().getSort().toString() 
 		    	    + "::" 

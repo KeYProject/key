@@ -99,7 +99,6 @@ options {
    }
 
     private NamespaceSet nss;
-    private Choice defaultChoice = null;
     private HashMap<String, String> category2Default = new HashMap<String, String>();
     private boolean onlyWith=false;
     private SetOfChoice activatedChoices = SetAsListOfChoice.EMPTY_SET;
@@ -182,12 +181,7 @@ options {
 	if(services != null)
           this.keh = services.getExceptionHandler();
 	this.nss = nss;
-	
-        this.defaultChoice = new Choice(new Name("Default"));
-        if(nss != null) {
-            this.defaultChoice.setFuncNS(nss.functions());
-        }
-                
+	                
 	this.tf = tf;
         switchToNormalMode();
     }
@@ -303,7 +297,6 @@ options {
 	   this.selectedChoices = selectedChoices;
         if(normalConfig != null){
             this.keh = normalConfig.services().getExceptionHandler();
-           	this.defaultChoice.setFuncNS(parserConfig.namespaces().functions());
         }else{
             this.keh = new KeYRecoderExcHandler();
         }
@@ -1295,18 +1288,6 @@ options {
        return modalities;
     }
 
-    private void setChoiceHelper(SetOfChoice choices, String section){
-        if(choices.size() > 1) {
-	   Debug.fail("Don't know what to do with multiple"+
-		      "option declarations for "+section+".");
-	}
-        if(choices.size() == 1) {
-             namespaces().setFunctions(choices.iterator().next().funcNS());
-        }else{
-             namespaces().setFunctions(defaultChoice.funcNS());
-	}
-    }
-
     private void semanticError(String message) throws KeYSemanticException {
       throw new KeYSemanticException
         (message, getFilename(), getLine(), getColumn());
@@ -1821,22 +1802,13 @@ pred_decl
     ;
 
 pred_decls 
-{
-    SetOfChoice choices = SetAsListOfChoice.EMPTY_SET;
-}
     :
-        PREDICATES (choices=option_list[choices])? 
-	{
-           setChoiceHelper(choices,"predicates");
-	}
+        PREDICATES 
         LBRACE
         (
             pred_decl
         ) *
         RBRACE
-    {
-           setChoiceHelper(SetAsListOfChoice.EMPTY_SET, "predicates");
-    }
     ;
 
 
@@ -1929,22 +1901,13 @@ func_decl
     ;
 
 func_decls 
-{
-    SetOfChoice choices = SetAsListOfChoice.EMPTY_SET;
-}
     :
-        FUNCTIONS (choices=option_list[choices])? 
-	{
-           setChoiceHelper(choices,"functions");
-	}
+        FUNCTIONS 
         LBRACE 
         (
             func_decl
         ) *
         RBRACE
-    {
-           setChoiceHelper(SetAsListOfChoice.EMPTY_SET, "functions");
-    }
     ;
 
 arrayopid returns [KeYJavaType componentType = null]
@@ -3203,10 +3166,17 @@ funcpredvarterm returns [Term a = null]
         { a = toZNotation(neg+number.getText(), functions(), tf);}    
     | AT a = abbreviation
     | varfuncid = funcpred_name
-    
-        (LBRACE boundVars = bound_variables RBRACE)?     
+        (
+            (
+               LBRACE 
+               boundVars = bound_variables 
+               RBRACE 
+               args = argument_list
+            )
+            |
+            args = argument_list
+        )?     
         
-	(args = argument_list)?
         //args==null indicates no argument list
         //args.size()==0 indicates open-close-parens ()
                 
@@ -3228,6 +3198,20 @@ funcpredvarterm returns [Term a = null]
 	                if(boundVars == null) {
 	                    a = TB.func(op, args);
 	                } else {
+	                    //sanity check
+	                    assert op instanceof Function;
+	                    for(int i = 0; i < args.length; i++) {
+	                        if(i < op.arity() && !op.bindVarsAt(i)) {
+	                            for(QuantifiableVariable qv : args[i].freeVars()) {
+	                                if(boundVars.contains(qv)) {
+	                                    semanticError("Building a function term with bound variables failed: "
+	                                                   + "Variable " + qv + " must not occur free in subterm " + i);
+	                                } 
+	                            }	                            
+	                        }
+	                    }
+	                    
+	                    //create term
 	                    a = TB.func(op, args, new ArrayOfQuantifiableVariable(boundVars.toArray()));
 	                }
 	            }
@@ -3929,44 +3913,24 @@ metaTerm returns [Term result = null]
 			(ex.getMessage(), getFilename(), getLine(), getColumn()));
         }
 
-contracts[SetOfChoice choices, Namespace funcNSForSelectedChoices]
-{
-  Choice c = null;
-}
+contracts
 :
    CONTRACTS
        LBRACE {
 	    switchToNormalMode();
-	    IteratorOfChoice it = choices.iterator();
-	    Namespace funcNSForRules = funcNSForSelectedChoices;
-	    while(it.hasNext()){
-		c=it.next();
-		funcNSForRules = 
-		    funcNSForRules.extended(c.funcNS().allElements());
-	    }
-	    namespaces().setFunctions(funcNSForRules); 
        }
        ( one_contract )*
        RBRACE 
 ;
 
-invariants[SetOfChoice choices, Namespace funcNSForSelectedChoices]
+invariants
 {
-  Choice c = null;
   QuantifiableVariable selfVar;
 }
 :
    INVARIANTS LPAREN selfVar=one_logic_bound_variable RPAREN
        LBRACE {
 	    switchToNormalMode();
-	    IteratorOfChoice it = choices.iterator();
-	    Namespace funcNSForRules = funcNSForSelectedChoices;
-	    while(it.hasNext()){
-		c=it.next();
-		funcNSForRules = 
-		    funcNSForRules.extended(c.funcNS().allElements());
-	    }
-	    namespaces().setFunctions(funcNSForRules); 
        }
        ( one_invariant[(ParsableVariable)selfVar] )*
        RBRACE  {
@@ -4045,7 +4009,6 @@ problem returns [ Term a = null ]
     SetOfChoice choices=SetAsListOfChoice.EMPTY_SET;
     Choice c = null;
     ListOfString stlist = null;
-    Namespace funcNSForSelectedChoices = new Namespace();
     String pref = null;
 }
     :
@@ -4065,34 +4028,15 @@ problem returns [ Term a = null ]
         { 
             if(parse_includes || onlyWith) return null;
             switchToNormalMode();
-            IteratorOfChoice it = selectedChoices.iterator(); 
-            while(it.hasNext()){
-	         Choice choice = (Choice)choices().lookup(it.next().name());
-		 if(choice != null) {
-                   funcNSForSelectedChoices=funcNSForSelectedChoices.
-                      extended(choice.funcNS().allElements());
-	         }
-             } 
-             funcNSForSelectedChoices=funcNSForSelectedChoices.
-                 extended(defaultChoice.
-                          funcNS().allElements()); 
         }
         // WATCHOUT: choices is always going to be an empty set here,
 	// isn't it?
-	( contracts[choices, funcNSForSelectedChoices] )*
-	( invariants[choices, funcNSForSelectedChoices] )*
+	( contracts )*
+	( invariants )*
         (  RULES (choices = option_list[choices])?
 	    LBRACE
             { 
                 switchToSchemaMode(); 
-                 IteratorOfChoice it = choices.iterator();
-                 Namespace funcNSForRules = funcNSForSelectedChoices;
-                 while(it.hasNext()){
-                     c=it.next();
-                     funcNSForRules = 
-                         funcNSForRules.extended(c.funcNS().allElements());
-                 }
-                 namespaces().setFunctions(funcNSForRules); 
             }
             ( 
                 s = taclet[choices] SEMI
@@ -4113,16 +4057,12 @@ problem returns [ Term a = null ]
         ) *
         ((PROBLEM LBRACE 
             {switchToNormalMode(); 
-	     namespaces().setFunctions(funcNSForSelectedChoices);
 	     if (capturer != null) capturer.capture();}
                 a = formula 
             RBRACE) | CHOOSECONTRACT {
 	                if (capturer != null) capturer.capture();
 	                chooseContract = true;
 		      })?
-        {
-			setChoiceHelper(SetAsListOfChoice.EMPTY_SET, "");
-        }
    ;
    
 classPaths returns [ListOfString ids = SLListOfString.EMPTY_LIST]

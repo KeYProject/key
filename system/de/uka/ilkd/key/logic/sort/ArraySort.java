@@ -123,12 +123,11 @@ public final class ArraySort extends AbstractSort {
 	               : null;          
 
 	if(as == null) { 
-	    // HACK: this simple handling of sort creation does not treat
-	    // depending symbols (i.e. ArrayOfS::instance)
-	    SetOfSort localExtendsSorts = getArraySuperSorts(elemSort, 
-		    objectSort,
-		    cloneableSort, 
-		    serializableSort);
+	    SetOfSort localExtendsSorts 
+	    	= getArraySuperSorts(elemSort, 
+	    		             objectSort,
+	    		             cloneableSort, 
+	    		             serializableSort);
 	    as = new ArraySort(localExtendsSorts, sortKey);
 	    aSH.put(sortKey, new WeakReference<ArraySort>(as));
 	}

@@ -10,6 +10,7 @@
 
 package de.uka.ilkd.key.strategy;
 
+import de.uka.ilkd.key.gui.Main;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -17,12 +18,14 @@ import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.proof.ClassRuleFilter;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.SetRuleFilter;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.UseOperationContractRule;
+import de.uka.ilkd.key.smt.SMTRule;
 import de.uka.ilkd.key.strategy.feature.*;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.*;
 import de.uka.ilkd.key.strategy.termProjection.*;
@@ -110,14 +113,21 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         
         final Feature oneStepSimplificationF 
         	= oneStepSimplificationFeature(longConst(-10000));
+        
+        
+        final Feature smtF = smtFeature(inftyConst());
 
         return SumFeature.createSum ( new Feature [] {
               AutomatedRuleFeature.INSTANCE,
 //              splitF,
               dispatcher,
               NonDuplicateAppFeature.INSTANCE,
-              strengthenConstraints, AgeFeature.INSTANCE,
-              oneStepSimplificationF, methodSpecF, ifMatchedF,
+              strengthenConstraints, 
+              AgeFeature.INSTANCE,
+              oneStepSimplificationF,
+              smtF,
+              methodSpecF, 
+              ifMatchedF,
               ifThenElseF } );
     }
 
@@ -131,7 +141,12 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 	SetRuleFilter filter = new SetRuleFilter();
 	filter.addRuleToSet(OneStepSimplifier.INSTANCE);
         return ConditionalFeature.createConditional(filter, cost);        
-    }    
+    } 
+    
+    private Feature smtFeature(Feature cost) {
+	ClassRuleFilter filter = new ClassRuleFilter(SMTRule.class);
+        return ConditionalFeature.createConditional(filter, cost);        
+    }       
     
 
     

@@ -26,10 +26,7 @@ public class BuiltInRuleApp implements RuleApp {
     private PosInOccurrence pio;
     private Constraint userConstraint;
 
-    
-    /** 
-     * 
-     */
+   
     public BuiltInRuleApp(BuiltInRule builtInRule, 
 			  PosInOccurrence pio,
 			  Constraint userConstraint) {
@@ -41,7 +38,8 @@ public class BuiltInRuleApp implements RuleApp {
     /**
      * returns the rule of this rule application
      */
-    public Rule rule() {
+    @Override
+    public BuiltInRule rule() {
 	return builtInRule;
     }
 
@@ -49,6 +47,7 @@ public class BuiltInRuleApp implements RuleApp {
      * returns the PositionInOccurrence (representing a ConstrainedFormula and
      * a position in the corresponding formula) of this rule application
      */
+    @Override
     public PosInOccurrence posInOccurrence() {
 	return pio;
     }
@@ -59,6 +58,7 @@ public class BuiltInRuleApp implements RuleApp {
      * @param services the Services encapsulating all java information
      * @return list of new created goals 
      */
+    @Override    
     public ListOfGoal execute(Goal goal, Services services) {
 	goal.addAppliedRuleApp(this);	
 	ListOfGoal result = builtInRule.apply(goal, services, this);
@@ -70,6 +70,7 @@ public class BuiltInRuleApp implements RuleApp {
     /**
      * returns the constraint under which a rule is applicable
      */
+    @Override    
     public Constraint constraint () {
 	return Constraint.BOTTOM;
     }
@@ -84,15 +85,13 @@ public class BuiltInRuleApp implements RuleApp {
     /** returns true if all variables are instantiated 
      * @return true if all variables are instantiated 
      */
+    @Override    
     public boolean complete() {
 	return true;
     }
     
-    /**
-     * toString
-     */
+    @Override    
     public String toString() {
 	return ""+rule().name();
     }
-
 }

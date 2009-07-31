@@ -279,8 +279,8 @@ public abstract class Notation {
 
 	    sp.printUpdateApplicationTerm("{", "}", t, assTarget);
 	}
-    }    
-
+    }
+    
     
     /**
      * The standard concrete syntax for elementary updates.
@@ -296,7 +296,24 @@ public abstract class Notation {
 	}
     }    
     
+    
+    /**
+     * The standard concrete syntax for parallel updates 
+     */
+    public static final class ParallelUpdateNotation extends Notation {
 
+	public ParallelUpdateNotation() {
+	    super(100);
+	}
+
+	public void print(Term t, LogicPrinter sp) throws IOException {
+	    assert t.op() == UpdateJunctor.PARALLEL_UPDATE;
+	    
+	    sp.printParallelUpdate("||", t, 10);
+	}
+    }    
+    
+    
     /**
       * The standard concrete syntax for substitution terms.
       */
@@ -335,9 +352,9 @@ public abstract class Notation {
     /**
      * The standard concrete syntax for function and predicate terms.
      */
-    public static final class Function extends Notation {
+    public static final class FunctionNotation extends Notation {
 
-	public Function() {
+	public FunctionNotation() {
 	    super(130);
 	}
 
@@ -380,8 +397,53 @@ public abstract class Notation {
 	public void print(Term t, LogicPrinter sp) throws IOException {
 	    sp.printSelect(t);
 	}
-    }    
+    }   
+    
+    
+    /**
+     * The standard concrete syntax for singleton sets.
+     */
+    public static final class SingletonNotation extends Notation {
 
+	public SingletonNotation() {
+	    super(130);
+	}
+
+	public void print(Term t, LogicPrinter sp) throws IOException {
+	    sp.printSingleton(t);
+	}
+    }      
+    
+    
+    /**
+     * The standard concrete syntax for set comprehension.
+     */
+    public static final class SetComprehensionNotation extends Notation {
+
+	public SetComprehensionNotation() {
+	    super(130);
+	}
+
+	public void print(Term t, LogicPrinter sp) throws IOException {
+	    sp.printSetComprehension(t);
+	}
+    }          
+    
+    
+    /**
+     * The standard concrete syntax for pairs.
+     */
+    public static final class PairNotation extends Notation {
+
+	public PairNotation() {
+	    super(130);
+	}
+
+	public void print(Term t, LogicPrinter sp) throws IOException {
+	    sp.printPair(t);
+	}
+    }        
+        
     
     /**
      * The standard concrete syntax for query terms <code>o.q(x)</code>.

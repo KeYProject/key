@@ -278,7 +278,7 @@ public class KeYFile implements EnvInput {
     public void read() throws ProofInputException {
 	if (initConfig==null) {
 	    throw new IllegalStateException("KeYFile: InitConfig not set.");
-	}	
+	}
         
         //read .key file
 	try {
@@ -417,7 +417,7 @@ public class KeYFile implements EnvInput {
 
     
     public String toString() {
-	return name()+" "+file.toString();
+	return name() + " " + file.toString();
     }
     
     

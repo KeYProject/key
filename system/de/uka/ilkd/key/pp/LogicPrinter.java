@@ -893,7 +893,8 @@ public final class LogicPrinter {
 	if(NotationInfo.PRETTY_SYNTAX
                   && services != null
                   && t.sort() == services.getTypeConverter().getHeapLDT().getFieldSort() 
-                  && t.arity() == 0) {
+                  && t.arity() == 0
+                  && t.boundVars().isEmpty()) {
             startTerm(0);
             
             final String fieldOpName = t.op().name().toString();
@@ -907,14 +908,19 @@ public final class LogicPrinter {
         else {
             startTerm(t.arity());
             layouter.print(name);
+            if(!t.boundVars().isEmpty()) {
+        	layouter.print("{").beginC(0);
+        	printVariables(t.boundVars());
+        	layouter.print("}").end();
+            }
             if(t.arity()>0 || t.op() instanceof ProgramMethod) {
                 layouter.print("(").beginC(0);
-                for (int i=0;i<t.arity();i++) {
+                for(int i = 0, n = t.arity(); i < n; i++) {
                     markStartSub();
                     printTerm(t.sub(i));
                     markEndSub();
 
-                    if (i<t.arity()-1) {
+                    if(i < n - 1) {
                         layouter.print(",").brk(1,0);
                     }
                 }
@@ -974,7 +980,7 @@ public final class LogicPrinter {
         	
                 markStartSub();
                 startTerm(0);                    
-                layouter.print(shortFieldName);
+                printTerm(fieldTerm);
                 markEndSub();                    
             } else if(fieldTerm.arity() == 0) {
         	markStartSub();
@@ -985,7 +991,7 @@ public final class LogicPrinter {
                 
                 markStartSub();
                 startTerm(0);                    
-                layouter.print(shortFieldName);
+                printTerm(fieldTerm);
                 markEndSub();                    
             } else if(fieldTerm.op() == heapLDT.getArr()) {
         	markStartSub();
@@ -1006,6 +1012,62 @@ public final class LogicPrinter {
             printFunctionTerm(t.op().name().toString(), t);
         }
     }
+    
+    
+    public void printSingleton(Term t) throws IOException {
+	assert t.arity() == 1;
+	startTerm(1);	 
+	layouter.print("{");
+
+	markStartSub();	 
+	printTerm(t.sub(0));
+	markEndSub();
+
+	layouter.print("}");
+    }  
+    
+    
+    public void printSetComprehension(Term t) throws IOException {
+	assert t.arity() == 2;
+	startTerm(2);
+	layouter.print("{");
+
+	markStartSub();	 
+	printTerm(t.sub(0));
+	markEndSub();
+	
+	layouter.print(" \\in ");
+	
+	markStartSub();	 
+	printTerm(t.sub(1));
+	markEndSub();	
+	
+	layouter.print(" | ");
+	
+	printVariables(t.boundVars());
+
+	layouter.print("}");
+    }        
+
+    
+    public void printPair(Term t) throws IOException {
+	assert t.arity() == 2;
+	startTerm(2);	 
+	layouter.print("(");
+
+	markStartSub();	 
+	printTerm(t.sub(0));
+	markEndSub();
+
+	layouter.print(",");
+
+	markStartSub();
+	printTerm(t.sub(1));
+	markEndSub();
+
+	layouter.print(")");
+    }
+       
 
 
     /** Print a term in <code>f(t1,...tn)</code> style.  If it doesn't
@@ -1137,22 +1199,6 @@ public final class LogicPrinter {
         maybeParens(r, assRight);
     }
 
-    /**
-     * prints an anonymous update
-     */
-    public void printAnonymousUpdate(Term t, int ass)
-    throws IOException {
-        mark(MARK_START_UPDATE);
-        layouter.beginC(2).print("{");
-        startTerm(1);
-        layouter.print(t.op().name().toString());
-        layouter.print("}");
-        mark(MARK_END_UPDATE);
-        layouter.brk(1);
-        maybeParens(t.sub(t.arity()-1), ass);
-        layouter.end();
-    }
-
 
     /**
      * Print a term with an update. This looks like
@@ -1174,7 +1220,7 @@ public final class LogicPrinter {
                                             Term t,
                                             int ass3) throws IOException {
 	assert t.op() instanceof UpdateApplication && t.arity() == 2;
-
+		
 	mark(MARK_START_UPDATE);
         layouter.beginC(2).print(l);
         startTerm(t.arity());
@@ -1200,48 +1246,74 @@ public final class LogicPrinter {
      * @param asgn    the assignment operator (including spaces)
      * @param ass2    associativity for the new values
      */
-
     public void printElementaryUpdate(String asgn,
                                       Term t,
                                       int ass2) throws IOException {
-	assert t.op() instanceof ElementaryUpdate && t.arity() == 1;
 	ElementaryUpdate op = (ElementaryUpdate)t.op();
 	
-	startTerm(t.arity());
+	assert t.arity() == 1;
+	startTerm(1);
 	
 	layouter.print(op.lhs().name().toString());
 	
-	layouter.print(asgn)/*.brk(0,0)*/;
+	layouter.print(asgn);
 	
 	maybeParens(t.sub(0), ass2);
     }
+    
+    
+    private void printParallelUpdateHelper(String separator, Term t, int ass)
+    					    throws IOException {
+	assert t.arity() == 2;
+	startTerm(2);
+	
+	if(t.sub(0).op() == UpdateJunctor.PARALLEL_UPDATE) {
+	    markStartSub();
+	    printParallelUpdateHelper(separator, t.sub(0), ass);
+	    markEndSub();
+	} else {
+	    maybeParens(t.sub(0), ass);
+	}
+	
+	layouter.brk(1).print(separator + " ");
+	
+	if(t.sub(1).op() == UpdateJunctor.PARALLEL_UPDATE) {
+	    markStartSub();
+	    printParallelUpdateHelper(separator, t.sub(1), ass);
+	    markEndSub();
+	} else {
+	    maybeParens(t.sub(1), ass);
+	}	
+    }
+    
+    
+    public void printParallelUpdate(String separator, Term t, int ass) 
+    					    throws IOException {
+	layouter.beginC(0);
+	printParallelUpdateHelper(separator, t, ass);
+	layouter.end();
+    }
+    
 
-    protected void printVariables (ArrayOfQuantifiableVariable vars)
+    protected void printVariables(ArrayOfQuantifiableVariable vars)
                                             throws IOException {
         int size = vars.size ();
-        if(size != 1)
-          layouter.print ( "(" );
-        for ( int j = 0; j != vars.size (); ) {
-            final QuantifiableVariable v = vars.getQuantifiableVariable ( j );
+        for(int j = 0; j != size; j++) {
+            final QuantifiableVariable v = vars.getQuantifiableVariable (j);
             if(v instanceof LogicVariable){
                 Term t =
                     TermFactory.DEFAULT.createVariableTerm((LogicVariable) v);
-                if(notationInfo.getAbbrevMap().containsTerm(t)){
+                if(notationInfo.getAbbrevMap().containsTerm(t)) {
                     layouter.print (v.sort().name().toString() + " " +
                                     notationInfo.getAbbrevMap().getAbbrev(t));
-                }else{
-                    layouter.print ( v.sort().name() + " " + v.name ());
+                } else {
+                    layouter.print (v.sort().name() + " " + v.name ());
                 }
-            }else{
-                layouter.print ( v.name ().toString());
+            } else {
+                layouter.print (v.name().toString());
             }
-            ++j;
-            if ( j != vars.size () ) layouter.print ( "; " );
+            layouter.print(";");
         }
-        if(size != 1)
-          layouter.print ( ") " );
-        else
-          layouter.print ( "; " );
     }
 
     
@@ -1283,10 +1355,8 @@ public final class LogicPrinter {
 
         layouter.print ( keyword );
 
-        if ( t.varsBoundHere ( 0 ).size () > 0 ) {
-            layouter.print ( " " );
-            printVariables ( t.varsBoundHere ( 0 ) );
-        }
+        assert t.boundVars().isEmpty();
+
         layouter.print( " (" );
         markStartSub ();
         printTerm ( t.sub ( 0 ) );
@@ -1918,7 +1988,7 @@ public final class LogicPrinter {
 
         /** The stack of StackEntry representing the nodes above
          * the current subterm */
-        private Stack<StackEntry> stack = new Stack<StackEntry>();
+        private final Stack<StackEntry> stack = new Stack<StackEntry>();
 
         /** If this is set, a ModalityPositionTable will
          * be built next.
@@ -1931,7 +2001,8 @@ public final class LogicPrinter {
         private Range firstStmtRange;
 
         /** Remembers the start of an update to create a range */
-        private int updateStart;
+        private final Stack<Integer> updateStarts = new Stack<Integer>();
+        
 
         PosTableStringBackend(int lineWidth) {
             super(lineWidth);
@@ -1990,8 +2061,9 @@ public final class LogicPrinter {
                 ((ModalityPositionTable)posTbl)
                     .setFirstStatementRange(firstStmtRange);
             } else if ( o==MARK_START_UPDATE ) {
-                updateStart = count();
+        	updateStarts.push(count());
             } else if ( o==MARK_END_UPDATE ) {
+        	int updateStart = updateStarts.pop();
                 initPosTbl.addUpdateRange(new Range(updateStart, count()));
             }
         }

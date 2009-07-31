@@ -73,17 +73,15 @@ public class BuiltInRuleAppContainer extends RuleAppContainer {
         final BuiltInRuleApp app = getBuiltInRuleApp();
 	final PosInOccurrence pio = app.posInOccurrence();
 	if(pio == null){
-	    return true;
+	    return app.rule().isApplicable(p_goal, null, app.userConstraint());
+	} else {
+            final ConstrainedFormula cfma = pio.constrainedFormula();
+            final boolean antec = pio.isInAntec();
+            final Sequent seq = p_goal.sequent();
+            final Semisequent semiseq = antec ? seq.antecedent() : seq.succedent();
+            
+            return semiseq.contains(cfma);
 	}
-        final ConstrainedFormula cfma = pio.constrainedFormula();
-        final boolean antec = pio.isInAntec();
-        final Sequent seq = p_goal.sequent();
-        final Semisequent semiseq = antec ? seq.antecedent() : seq.succedent();
-
-        if (!semiseq.contains(cfma))
-            return false;
-
-        return true;
     }
 
     /**

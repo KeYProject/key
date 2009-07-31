@@ -5,15 +5,9 @@
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
-//This file is part of KeY - Integrated Deductive Software Design
-//Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
-//                  Universitaet Koblenz-Landau, Germany
-//                  Chalmers University of Technology, Sweden
-//
-//The KeY system is protected by the GNU General Public License. 
-//See LICENSE.TXT for details.
 //
 //
+
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
 import java.util.*;
@@ -28,7 +22,7 @@ import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.util.LRUCache;
 
 /**
- * This classe is used to select and store <code>Trigger</code>s 
+ * This class is used to select and store <code>Trigger</code>s 
  * for a quantified formula in Prenex CNF(PCNF).
  */
 class TriggersSet {

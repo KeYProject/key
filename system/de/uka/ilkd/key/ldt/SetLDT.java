@@ -31,20 +31,22 @@ public final class SetLDT extends LDT {
     private final Function union;
     private final Function intersect;
     private final Function setMinus;
+    private final Function setComprehension;
     private final Function elementOf;
     private final Function subset;
     private final Function disjoint;    
     
     public SetLDT(Namespace sorts, Namespace functions) {
 	super((Sort)sorts.lookup(NAME), null);
-        empty	   = addFunction(functions, "empty");
-        singleton  = addFunction(functions, "singleton");
-        union      = addFunction(functions, "union");
-        intersect  = addFunction(functions, "intersect");
-        setMinus   = addFunction(functions, "setMinus");
-        elementOf  = addFunction(functions, "elementOf");
-        subset     = addFunction(functions, "subset");
-        disjoint   = addFunction(functions, "disjoint");
+        empty	         = addFunction(functions, "empty");
+        singleton        = addFunction(functions, "singleton");
+        union            = addFunction(functions, "union");
+        intersect        = addFunction(functions, "intersect");
+        setMinus         = addFunction(functions, "setMinus");
+        setComprehension = addFunction(functions, "setComprehension");
+        elementOf        = addFunction(functions, "elementOf");
+        subset           = addFunction(functions, "subset");
+        disjoint         = addFunction(functions, "disjoint");
     }
     
     
@@ -70,6 +72,11 @@ public final class SetLDT extends LDT {
     
     public Function getSetMinus() {
 	return setMinus;
+    }
+    
+    
+    public Function getSetComprehension() {
+	return setComprehension;
     }
     
     

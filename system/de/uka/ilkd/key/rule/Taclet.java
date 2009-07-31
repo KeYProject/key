@@ -338,13 +338,11 @@ public abstract class Taclet implements Rule, Named {
 				    MatchConditions matchCond,
 				    Services        services,
 				    Constraint      userConstraint) {
-if(name.toString().equals("unsoundlyKillUpdate")) Debug.ENABLE_DEBUG = true;
 	Debug.out("Start Matching rule: ", name);
 	matchCond = matchHelp(term, template, ignoreUpdates, matchCond, 
 		 services, userConstraint);	
 	Debug.out(matchCond == null ? "Failed: " : "Succeeded: ", name);
 //if(matchCond != null) Debug.out("insts: ", matchCond.getInstantiations());	
-if(name.toString().equals("unsoundlyKillUpdate")) Debug.ENABLE_DEBUG = false;
 	return matchCond == null ? null : checkConditions(matchCond, services);
     }
 

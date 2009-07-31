@@ -85,6 +85,13 @@ public class BuiltInRuleAppIndex implements java.io.Serializable {
         final IteratorOfBuiltInRule ruleIt = index.rules().iterator();
         while (ruleIt.hasNext()) {
             final BuiltInRule bir = ruleIt.next();
+            
+            if(bir.isApplicable(goal, null, userConstraint)) {
+                BuiltInRuleApp app = new BuiltInRuleApp(bir, null, userConstraint );                            
+                listener.ruleAdded ( app, null );
+            }
+            
+            
             scanSimplificationRule ( bir, goal, false, userConstraint, listener );
             scanSimplificationRule ( bir, goal, true,  userConstraint, listener );
         }

@@ -114,7 +114,7 @@ public class LDTInput implements EnvInput {
 	}
 	for (int i=0; i<keyFiles.length; i++) {
 	    if (main != null) {
-		main.setStatusLine("Reading "+keyFiles[i].name(), 
+		main.setStatusLine("Reading " + keyFiles[i].name(), 
 				   keyFiles[i].getNumberOfChars());
 	    }
 	    keyFiles[i].readRulesAndProblem();
@@ -122,12 +122,7 @@ public class LDTInput implements EnvInput {
 		
 	//create LDT objects
         Namespace sorts     = initConfig.sortNS();
-        Namespace functions = new Namespace(initConfig.funcNS());
-        IteratorOfNamed it  = initConfig.choiceNS().allElements().iterator();
-        while(it.hasNext()) {
-            Choice c = (Choice) it.next();
-            functions.add(c.funcNS());
-        }
+        Namespace functions = initConfig.funcNS();
         ListOfLDT ldts = SLListOfLDT.EMPTY_LIST
                         	.prepend(new ByteLDT(sorts, functions))
                         	.prepend(new ShortLDT(sorts, functions))
@@ -181,5 +176,11 @@ public class LDTInput implements EnvInput {
 	    result += keyFiles[i].hashCode();
 	}
 	return result;
+    }
+    
+    
+    @Override
+    public String toString() {
+	return name();
     }
 }

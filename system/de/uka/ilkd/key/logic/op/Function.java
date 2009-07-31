@@ -36,6 +36,7 @@ public class Function extends AbstractSortedOperator {
 	this.unique = unique;
 	assert sort != Sort.UPDATE;
 	assert !(unique && sort == Sort.FORMULA);
+	assert sort != Sort.NULL || name.toString().equals("null");
     }
     
     
@@ -69,7 +70,9 @@ public class Function extends AbstractSortedOperator {
 
     @Override
     public String toString() {
-	return (name()+((sort()==Sort.FORMULA)? "" : ":"+sort()));
+	return (name() + (whereToBind() == null 
+		          ? "" 
+		          : "{" + whereToBind() + "}"));
     }
     
 

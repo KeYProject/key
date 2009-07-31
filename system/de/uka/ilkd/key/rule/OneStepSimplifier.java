@@ -27,7 +27,7 @@ public final class OneStepSimplifier implements BuiltInRule {
     
     private static final Name NAME = new Name("One Step Simplification");
   
-    private static final Map<ConstrainedFormula, Instantiation> cache 
+    private final Map<ConstrainedFormula, Instantiation> cache 
     		= new WeakHashMap<ConstrainedFormula, Instantiation>();
     
     private TacletIndex[] indices;
@@ -159,13 +159,12 @@ public final class OneStepSimplifier implements BuiltInRule {
     }
     
     
-    private void fillCacheForSequent(Services services, Sequent seq) {
-	for(final ConstrainedFormula originalCf : seq) {
-	    if(cache.containsKey(originalCf)) {
-		continue;
-	    }
-	    
-	    ConstrainedFormula currentCF = originalCf;
+    private Instantiation getInstantiation(Services services, 
+	                                   ConstrainedFormula cf) {
+	Instantiation result = cache.get(cf);
+	
+	if(result == null) {
+	    ConstrainedFormula currentCF = cf;
 	    ConstrainedFormula simplifiedCF;
 	    int numAppliedRules = 0;
 	    do {
@@ -176,16 +175,17 @@ public final class OneStepSimplifier implements BuiltInRule {
 		    numAppliedRules++;
 		}
 	    } while(simplifiedCF != null);
-	    
-	    if(currentCF != originalCf) {
-		Instantiation inst = new Instantiation(currentCF, 
-			                               numAppliedRules);
-		cache.put(originalCf, inst);
+
+	    if(numAppliedRules > 0) {
+		result = new Instantiation(currentCF, numAppliedRules);
 		cache.put(currentCF, Instantiation.EMPTY_INSTANTIATION);
 	    } else {
-		cache.put(originalCf, Instantiation.EMPTY_INSTANTIATION);
+		result = Instantiation.EMPTY_INSTANTIATION;
 	    }
-	}	
+	    cache.put(cf, result);
+	}
+	
+	return result;
     }
     
     
@@ -205,22 +205,21 @@ public final class OneStepSimplifier implements BuiltInRule {
 	    return false;
 	}
 	
+	//abort if not top level constrained formula
+	if(pio == null || !pio.isTopLevel()) {
+	    return false;
+	}
+	
 	//initialize if needed
 	initIndices(goal);
 	
-	//instantiate if needed
+	//get instantiation
 	Services services = goal.proof().getServices();	
-	Sequent seq = goal.sequent();	
-	fillCacheForSequent(services, seq);
+	Instantiation inst = getInstantiation(services, 
+					      pio.constrainedFormula());
 
-	//tell whether one of the instantiations is interesting
-	for(ConstrainedFormula cf : seq) {
-	    Instantiation inst = cache.get(cf);
-	    if(inst.getNumAppliedRules() > 0) {
-		return true;
-	    }
-	}
-	return false;
+	//tell whether the instantiation is interesting
+	return inst.getNumAppliedRules() > 0;
     }
 
     
@@ -228,24 +227,16 @@ public final class OneStepSimplifier implements BuiltInRule {
     public ListOfGoal apply(Goal goal, Services services, RuleApp ruleApp) {
 	final ListOfGoal result = goal.split(1);
 	final Goal resultGoal = result.head();
+	final PosInOccurrence pos = ruleApp.posInOccurrence();
+	assert pos != null && pos.isTopLevel();
 	
-	int numAppliedRules = 0;
-	for(ConstrainedFormula cf : goal.sequent().antecedent()) {
-	    Instantiation inst = cache.get(cf);
-	    if(inst.getNumAppliedRules() > 0) {
-		numAppliedRules += inst.getNumAppliedRules();
-		resultGoal.changeFormula(inst.getCf(), new PosInOccurrence(cf, PosInTerm.TOP_LEVEL, true));
-	    }
-	}
-	for(ConstrainedFormula cf : goal.sequent().succedent()) {
-	    Instantiation inst = cache.get(cf);
-	    if(inst.getNumAppliedRules() > 0) {
-		numAppliedRules += inst.getNumAppliedRules();
-		resultGoal.changeFormula(inst.getCf(), new PosInOccurrence(cf, PosInTerm.TOP_LEVEL, false));
-	    }
-	}	
+	Instantiation inst = getInstantiation(services, 
+					      pos.constrainedFormula());
+	assert inst.getNumAppliedRules() > 0;
 	
-	goal.setBranchLabel(numAppliedRules + " rules");
+	resultGoal.changeFormula(inst.getCf(), pos);
+	goal.setBranchLabel(inst.getNumAppliedRules() + " rules");
+	
 	return result;
     }
     
@@ -281,6 +272,7 @@ public final class OneStepSimplifier implements BuiltInRule {
 	private final int numAppliedRules;
 	
 	public Instantiation(ConstrainedFormula cf, int numAppliedRules) {
+	    assert numAppliedRules >= 0;
 	    this.cf = cf;
 	    this.numAppliedRules = numAppliedRules;
 	}
@@ -291,6 +283,10 @@ public final class OneStepSimplifier implements BuiltInRule {
 	
 	public int getNumAppliedRules() {
 	    return numAppliedRules;
+	}
+	
+	public String toString() {
+	    return cf + " (" + numAppliedRules + " rules)";
 	}
     }
 }

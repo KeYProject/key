@@ -137,5 +137,15 @@ public class ArrayOf<S> <E> implements java.io.Serializable {
     public boolean isEmpty() {
         return size() == 0;
     }
+    
+    
+    public boolean contains(<S> el) {
+        for(int i = 0, n = size(); i < n; i++) {
+            if(get<S>(i).equals(el)) {
+                return true;
+            }
+        } 
+        return false;
+    }    
 }
 END_OF_CLASS

@@ -16,6 +16,8 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.TypeConverter;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.IntegerLDT;
+import de.uka.ilkd.key.ldt.PairLDT;
+import de.uka.ilkd.key.ldt.SetLDT;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 
@@ -142,7 +144,6 @@ public final class NotationInfo {
 	tbl.put(Junctor.OR, new Notation.Infix("|"  ,40,40,50));
 	tbl.put(Junctor.IMP,new Notation.Infix("->" ,30,40,30));
 	tbl.put(Equality.EQV,new Notation.Infix("<->",20,20,30));
-	tbl.put(UpdateJunctor.PARALLEL_UPDATE, new Notation.Infix("||",100,10,10));
 	tbl.put(Quantifier.ALL,new Notation.Quantifier("\\forall", 60, 60));
 	tbl.put(Quantifier.EX, new Notation.Quantifier("\\exists", 60, 60));
 	tbl.put(NumericalQuantifier.SUM, new Notation.NumericalQuantifier("\\sum", 60, 60, 70));
@@ -153,8 +154,9 @@ public final class NotationInfo {
 	tbl.put(IfThenElse.IF_THEN_ELSE, new Notation.IfThenElse(130, "\\if"));
 	tbl.put(WarySubstOp.SUBST,new Notation.Subst());
 	tbl.put(UpdateApplication.UPDATE_APPLICATION, new Notation.UpdateApplicationNotation());
+	tbl.put(UpdateJunctor.PARALLEL_UPDATE, new Notation.ParallelUpdateNotation());	
 	
-	tbl.put(Function.class, new Notation.Function());               
+	tbl.put(Function.class, new Notation.FunctionNotation());               
 	tbl.put(LogicVariable.class, new Notation.VariableNotation());
 	tbl.put(LocationVariable.class, new Notation.VariableNotation());
         tbl.put(ProgramConstant.class, new Notation.VariableNotation());
@@ -192,6 +194,20 @@ public final class NotationInfo {
 	
 	//heap operators
 	tbl.put(HeapLDT.SELECT_NAME, new Notation.SelectNotation());
+	
+	//set operators
+	SetLDT setLDT = services.getTypeConverter().getSetLDT();
+	tbl.put(setLDT.getSingleton(), new Notation.SingletonNotation());
+	tbl.put(setLDT.getUnion(), new Notation.Infix("\\cup", 130, 0, 0));
+	tbl.put(setLDT.getIntersect(), new Notation.Infix("\\cap", 130, 0, 0));
+	tbl.put(setLDT.getSetMinus(), new Notation.Infix("\\setMinus", 130, 0, 0));
+	tbl.put(setLDT.getSetComprehension(), new Notation.SetComprehensionNotation());
+	tbl.put(setLDT.getElementOf(), new Notation.Infix("\\in", 130, 0, 0));	
+	tbl.put(setLDT.getSubset(), new Notation.Infix("\\subset", 130, 0, 0));
+	
+	//pair operators
+	PairLDT pairLDT = services.getTypeConverter().getPairLDT();
+	tbl.put(pairLDT.getPair(), new Notation.PairNotation());
     }
     
 
@@ -244,6 +260,6 @@ public final class NotationInfo {
 	    }
 	}
 	
-	return new Notation.Function();
+	return new Notation.FunctionNotation();
     }
 }

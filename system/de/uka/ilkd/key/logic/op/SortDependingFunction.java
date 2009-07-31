@@ -29,7 +29,7 @@ import de.uka.ilkd.key.util.Debug;
 public final class SortDependingFunction extends Function {
     
     private final SortDependingFunctionTemplate template;
-    private final Sort sortDependingOn;    
+    private final Sort sortDependingOn;
 
        
     //-------------------------------------------------------------------------
@@ -42,7 +42,7 @@ public final class SortDependingFunction extends Function {
 	      instantiateResultSort(template, sortDependingOn),
 	      instantiateArgSorts(template, sortDependingOn));
 	this.template = template;
-	this.sortDependingOn = sortDependingOn;	
+	this.sortDependingOn = sortDependingOn;
     }
 	    
     
@@ -88,7 +88,9 @@ public final class SortDependingFunction extends Function {
      * @return <code>null</code> if failed the resulting match conditions 
      * otherwise 
      */
-    private static MatchConditions matchSorts(Sort s1, Sort s2, MatchConditions mc) {                
+    private static MatchConditions matchSorts(Sort s1, 
+	    			              Sort s2, 
+	    			              MatchConditions mc) {
         assert !(s2 instanceof GenericSort)
                : "Sort s2 is not allowed to be of type generic.";
         if (!(s1 instanceof GenericSort)) {
@@ -179,8 +181,11 @@ public final class SortDependingFunction extends Function {
                  + " (hash " + result.hashCode() + ")" 
                  + " but should depend on " + sortDependingOn
                  + " (hash " + sortDependingOn.hashCode() + ")";
-        assert this.isSimilar(result) 
+        assert isSimilar(result) 
                : result + " should be similar to " + this;
+        assert services.getNamespaces()
+	                      .lookup(instantiateName(getKind(), 
+	                	      		      sortDependingOn)) == result;
 	
 	return result;	
     }
@@ -211,14 +216,14 @@ public final class SortDependingFunction extends Function {
     @Override    
     public MatchConditions match(SVSubstitute subst, 
                                  MatchConditions mc,
-                                 Services services) {      
+                                 Services services) {  
         if(!(subst instanceof SortDependingFunction)) {
             Debug.out("FAILED. Given operator cannot be matched by a sort" +
             		"depending function (template, orig)", this, subst);
             return null;
         }
-        final SortDependingFunction sdp = (SortDependingFunction)subst;
-        
+
+        final SortDependingFunction sdp = (SortDependingFunction)subst;   
         if(!isSimilar(sdp)) {
             Debug.out("FAILED. Sort depending symbols not similar.", this, subst);            
             return null;

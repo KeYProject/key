@@ -55,6 +55,11 @@ abstract class AbstractOperator implements Operator {
     }
     
     
+    protected final ArrayOfBoolean whereToBind() {
+	return whereToBind;
+    }
+    
+    
     @Override
     public final Name name() {
 	return name;

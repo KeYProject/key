@@ -345,31 +345,6 @@ public class InitConfig {
         return namespaces().choices();
     }
 
-    
-    public void createNamespacesForActivatedChoices(){
-        IteratorOfChoice it = activatedChoices.iterator();
-        while(it.hasNext()){
-	    Choice c = it.next();
-            funcNS().add(c.funcNS());
-        }
-    }
-
-    
-    public ProofSettings mergedProofSettings() {
-        ProofSettings defaultSettings = ProofSettings.DEFAULT_SETTINGS;
-        ProofAggregate someProof = null;
-	try {
-            someProof = ((ProofAggregate)getProofEnv().getProofs().iterator().next());
-	}catch(NoSuchElementException ne){
-	    throw new RuntimeException(ne);
-	}
-        if (someProof!=null) {
-            return defaultSettings.setChoiceSettings(
-                someProof.getFirstProof().getSettings().getChoiceSettings());
-        } else {
-            return defaultSettings;
-        }
-    }
 
     
     public void setOriginalKeYFileName(String name) {

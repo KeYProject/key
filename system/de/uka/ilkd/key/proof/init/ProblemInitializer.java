@@ -324,6 +324,7 @@ public final class ProblemInitializer {
 		newFuncNS.addSafely(n);
 	    }
 	}
+	//System.out.println(initConfig.funcNS().hashCode() + " ---> " + newFuncNS.hashCode());
 	initConfig.getServices().getNamespaces().setVariables(newVarNS);
 	initConfig.getServices().getNamespaces().setSorts(newSortNS);
 	initConfig.getServices().getNamespaces().setFunctions(newFuncNS);
@@ -349,8 +350,8 @@ public final class ProblemInitializer {
 	    //read envInput itself
 	    reportStatus("Reading "+envInput.name(), 
 		    	 envInput.getNumberOfChars());
-	    envInput.setInitConfig(initConfig);
-	    envInput.read();
+	    envInput.setInitConfig(initConfig);	    
+	    envInput.read();	    
 
 	    //clean namespaces
 	    cleanupNamespaces(initConfig);
@@ -398,7 +399,6 @@ public final class ProblemInitializer {
 	
 	//read activated choices
 	po.readActivatedChoices();
-    	initConfig.createNamespacesForActivatedChoices();
         
         //TODO: what does this actually do?
         ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().updateChoices(initConfig.choiceNS(), false);

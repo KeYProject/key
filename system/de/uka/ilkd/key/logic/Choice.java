@@ -11,10 +11,9 @@
 package de.uka.ilkd.key.logic;
 
 
-public class Choice implements Named{
+public class Choice implements Named {
 
     private final Name name;
-    private Namespace funcNS = new Namespace();
     private final String category;
 
     /** 
@@ -23,6 +22,7 @@ public class Choice implements Named{
     public Choice(String choice, String category){
 	this(new Name(category+":"+choice), category);
     }
+    
 
     public Choice(Name name, String category){
 	this.name = name;
@@ -30,11 +30,14 @@ public class Choice implements Named{
 	this.category = category.intern();       
     }
 
+    
     public Choice(Name name){
 	this.name = name;
 	category  = null;
     }
 
+    
+    @Override
     public Name name(){
 	return name;
     }
@@ -43,14 +46,8 @@ public class Choice implements Named{
 	return category;
     }
 
-    public Namespace funcNS(){
-	return funcNS;
-    }
-
-    public void setFuncNS(Namespace funcNS){
-	this.funcNS = funcNS;
-    }
-
+    
+    @Override
     public boolean equals(Object o) {
 	if (!(o instanceof Choice)) {
 	    return false;
@@ -60,24 +57,16 @@ public class Choice implements Named{
 	    
     }
 
+    
+    @Override
     public int hashCode() {
 	return name.hashCode()*37 + 
 	    (category == null ? 13 : category.hashCode()*1369);
     }
 
-    public Choice copy(){
-	Choice c; 
-	if(category==null){
-	    c = new Choice(name);
-	}else{
-	    c = new Choice(name, category);
-	}
-	c.setFuncNS(funcNS.copy());
-	return c;
-    }
 
+    @Override
     public String toString(){
 	return name.toString();
     }
-
 }

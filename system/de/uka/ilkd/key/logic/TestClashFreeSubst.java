@@ -382,17 +382,4 @@ public class TestClashFreeSubst extends TestCase {
 		     cfs.apply(t));
 	nss.setVariables(nss.variables().parent());
     }
-
-    public void testClashInIfEx() {
-	Term ifEx = parseTerm("\\ifEx x; (x=v) \\then (v=x) \\else (false)");
-	assertEquals(ifEx.freeVars().size(), 1);
-	assertSame(ifEx.freeVars().iterator().next(), v);
-	
-	Term subst = parseTerm("x");
-	ClashFreeSubst cfs = new ClashFreeSubst(v,subst);
-	Term res = cfs.apply(ifEx);
-
-	assertEquals(res.freeVars().size(), 1);
-	assertSame(res.freeVars().iterator().next(), x);
-    }
 }
