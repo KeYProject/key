@@ -1506,7 +1506,7 @@ public class Main extends JFrame implements IMain {
 	int targetIndex = 0;
 	for (RuleDescriptor r : dps.getAvailableRules()) {
 	    final JRadioButtonMenuItem b = new JRadioButtonMenuItem();
-	    b.setAction(new DPSelectionAction(r, b));
+	    b.setAction(new DPSelectionAction(r, b, showndecProcRadioItems));
 	    decProcOptions.add(b, targetIndex);
 	    targetIndex++;
 	    showndecProcRadioItems.add(b);
@@ -2966,16 +2966,20 @@ public class Main extends JFrame implements IMain {
 	private final RuleDescriptor decisionProcedure;
 	// currently necessary as property SELECTED_KEY support first since JDK >= 1.6
 	private final JRadioButtonMenuItem radioButton;
-	
+	private final ArrayList<JRadioButtonMenuItem> allRadios;
 
-	public DPSelectionAction(RuleDescriptor decisionProcedure, JRadioButtonMenuItem radioButton) {	    
+	public DPSelectionAction(RuleDescriptor decisionProcedure, JRadioButtonMenuItem radioButton
+		, ArrayList<JRadioButtonMenuItem> allbutt) {	    
 	    this.decisionProcedure = decisionProcedure;
-	    this.radioButton = radioButton;
-	   	  
+	    this.radioButton = radioButton;  
+	    this.allRadios = allbutt;
+	    
 	    final RuleDescriptor activeRule = getCurrentDPSettings().getActiveRule();
 	    
 	    if (activeRule.equals(decisionProcedure)) {
 		radioButton.setSelected(true);
+	    } else {
+		radioButton.setSelected(false);
 	    }
 
 	    putValue(SMALL_ICON, IconFactory.simplifyLogo(TOOLBAR_ICON_SIZE));	    
@@ -2995,8 +2999,11 @@ public class Main extends JFrame implements IMain {
 	
 	public void actionPerformed(ActionEvent e) {
 	    getCurrentDPSettings().setActiveRule(decisionProcedure.getRuleName());
+	    //set all radiobutton as unselected. so in the end, only one is selected.
+	    for (JRadioButtonMenuItem rbmi : allRadios) {
+		rbmi.setSelected(false);
+	    }
 	    radioButton.setSelected(true); // if we change to Java 6 delete radioButton and add here putValue(SELECTED_KEY, true)
-
 	}
 
 	private DecisionProcedureSettings getCurrentDPSettings() {
