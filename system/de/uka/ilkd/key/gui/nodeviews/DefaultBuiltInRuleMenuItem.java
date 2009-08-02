@@ -10,6 +10,7 @@ package de.uka.ilkd.key.gui.nodeviews;
 import javax.swing.JMenuItem;
 
 import de.uka.ilkd.key.rule.BuiltInRule;
+import de.uka.ilkd.key.smt.SMTRule;
 
 /** 
  * equal to TacletMenuItem but for BuiltInRules
@@ -20,7 +21,13 @@ class DefaultBuiltInRuleMenuItem extends JMenuItem implements BuiltInRuleMenuIte
     
     public DefaultBuiltInRuleMenuItem(BuiltInRule connectedTo) {
         super(connectedTo.name().toString());
-        this.connectedTo = connectedTo;	    	    
+        this.connectedTo = connectedTo;
+        //if the rule is not installed, don't make it useable.
+        if (connectedTo instanceof SMTRule) {
+            if (!((SMTRule)connectedTo).isInstalled(false)) {
+        	this.setEnabled(false);
+            }
+        }
     } 
 
     public BuiltInRule connectedTo() {
