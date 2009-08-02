@@ -162,19 +162,17 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 
     }
 
-    protected static final int ASSUMPTION_FUNCTION_DEFINTION = 0;
-    protected static final int ASSUMPTION_TYPE_HIERARCHY = 1;
-    protected static final int ASSUMPTION_SORT_PREDICATES = 2;
-    protected static final int ASSUMPTION_DUMMY_IMPLEMENTATION = 3;
+
     
     
     
     /**
      * get the assumptions made by the logic.
      * @param services the services object to be used.
+     * @param assumptionTypes  
      * @return ArrayList of Formulas, that are assumed to be true.
      */
-    private ArrayList<StringBuffer> getAssumptions(Services services, ArrayList<int[]> assumptionTypes) throws IllegalFormulaException {
+    private ArrayList<StringBuffer> getAssumptions(Services services, ArrayList<ContextualBlock> assumptionTypes) throws IllegalFormulaException {
 	ArrayList<StringBuffer> toReturn = new ArrayList<StringBuffer>();
 	
 	if (!this.isMultiSorted()) {
@@ -182,38 +180,28 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 	    // add the type definitions
 	    //this means all predicates that are needed for functions to define
 	    //their result type, all predicates for constants (like number symbols)
-	    int [] values = new int[2];
+
 	    int start = toReturn.size();
 	    toReturn.addAll(this.getTypeDefinitions());
-	    values[0] = start;
-	    values[1] = toReturn.size()-1;
-	    assumptionTypes.add(values);
+	    assumptionTypes.add(new ContextualBlock(start,toReturn.size()-1,ContextualBlock.ASSUMPTION_FUNCTION_DEFINTION));
+	    
 	    // add the type hierarchy
 	    //this means, add the typepredicates, that are needed to define
 	    //for every type, what type they are (direct) subtype of
 	    start = toReturn.size();
 	    toReturn.addAll(this.getSortHierarchyPredicates());
-	    values = new int[2];
-	    values[0] = start;
-	    values[1] = toReturn.size()-1;
-	    assumptionTypes.add(values);
+	    assumptionTypes.add(new ContextualBlock(start,toReturn.size()-1,ContextualBlock.ASSUMPTION_TYPE_HIERARCHY));
 	    //add the formulas, that make sure, type correctness is kept, also
 	    //for interpreted functions
 	    start = toReturn.size();
 	    toReturn.addAll(this.getSpecialSortPredicates(services));
-	    values = new int[2];
-	    values[0] = start;
-	    values[1] = toReturn.size()-1;
-	    assumptionTypes.add(values);
+	    assumptionTypes.add(new ContextualBlock(start,toReturn.size()-1,ContextualBlock.ASSUMPTION_SORT_PREDICATES));
 	    
 	    //add the assumptions created during translation
 	    //for example while translating term if then else
 	    start = toReturn.size();
 	    toReturn.addAll(this.assumptions);
-	    values = new int[2];
-	    values[0] = start;
-	    values[1] = toReturn.size()-1;
-	    assumptionTypes.add(values);
+	    assumptionTypes.add(new ContextualBlock(start,toReturn.size()-1,ContextualBlock.ASSUMPTION_DUMMY_IMPLEMENTATION));
 	}
 	
 	return toReturn;
@@ -302,8 +290,8 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
     }
     
     private StringBuffer buildComplText(Services serv, StringBuffer formula) throws IllegalFormulaException {
-	ArrayList<int[]> assumptionTypes = new ArrayList<int[]>();
-	ArrayList<int[]> predicateTypes = new ArrayList<int[]>();
+	ArrayList<ContextualBlock> assumptionTypes = new ArrayList<ContextualBlock>();
+	ArrayList<ContextualBlock> predicateTypes = new ArrayList<ContextualBlock>();
 	return buildCompleteText(formula, this.getAssumptions(serv, assumptionTypes),assumptionTypes, this.buildTranslatedFuncDecls(), this
 		    .buildTranslatedPredDecls(predicateTypes),predicateTypes, this.buildTranslatedSorts(), this
 		    .buildSortHierarchy());
@@ -473,9 +461,9 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
     }
 
     
-    protected static final int PREDICATE_FORMULA = 0;
+    /*protected static final int PREDICATE_FORMULA = 0;
     protected static final int PREDICATE_TYPE = 1;
-    
+    */
     
     /**
      * Build the translated predicate declarations. Each element in the
@@ -483,7 +471,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
      * 
      * @return structured List of declaration.
      */
-    private ArrayList<ArrayList<StringBuffer>> buildTranslatedPredDecls(ArrayList<int[]> predicateTypes) {
+    private ArrayList<ArrayList<StringBuffer>> buildTranslatedPredDecls(ArrayList<ContextualBlock> predicateTypes) {
 	ArrayList<ArrayList<StringBuffer>> toReturn = new ArrayList<ArrayList<StringBuffer>>();
 	
 	
@@ -491,8 +479,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 	   
 	    
 	    
-	   
-	int [] values = new int[2];
+	
 	int start = toReturn.size();
 	// add the predicates
 	
@@ -505,13 +492,12 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 	    toReturn.add(element);
 	}
 	
-	values[0] = start;
-	values[1] = toReturn.size()-1;
-        predicateTypes.add(values);
+	
+        predicateTypes.add(new ContextualBlock(start,toReturn.size()-1,ContextualBlock.PREDICATE_FORMULA));
 	
 
 	// add the typePredicates
-        values = new  int[2];
+        
         start = toReturn.size();
 	if (!this.isMultiSorted()) {
 	    for (Sort s : this.typePredicates.keySet()) {
@@ -521,10 +507,8 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 		toReturn.add(element);
 	    }
 	}
-	values[0] = start;
-	values[1] = toReturn.size()-1;
-        predicateTypes.add(values);
-	
+
+        predicateTypes.add(new ContextualBlock(start,toReturn.size()-1,ContextualBlock.PREDICATE_TYPE));	
 	return toReturn;
     }
 
@@ -563,32 +547,32 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
      * @param assumptions
      * 		      Assumptions made in this logic. Set of formulas, that
      * 		      are assumed to be true.      
-     * @param assumptionTypes
-     * 		      List of start- and endvalues of the position of different
-     * 		      types of assumptions.Use these values to make detailed 
-     * 		      comments in the translations.       
+     * @param assumptionBlocks
+     * 		      List of ContextualBlocks, which refer to the position of different
+     * 		      types of assumptions in the container <code>assumptions</code>.
+     *                Use these objects to make detailed 
+     * 		      comments in the translations. For more information see the class <code>ContextualBlock</code>.  
      * @param functions
      *                List of functions. Each Listelement is built up like
      *                (name | sort1 | ... | sortn | resultsort)
      * @param predicates
      *                List of predicates. Each Listelement is built up like
      *                (name | sort1 | ... | sortn)
-     * @param predicateTypes
-     * 		      List of start- and endvalue of the types of the predicates
-     * 		      (position in the predicates argument).
-     * 		      Use offered constants or offered methods to get for the 
-     *                values for a certain type. This argument offers the possibility
-     * 		      to make use of detailed comments.
+     * @param predicateBlocks
+     * 		      List of ContextualBlocks, which refer to the position of different
+     * 		      types of predicate in the container <code>predicates</code>.
+     *                Use these objects to make detailed 
+     * 		      comments in the translations. For more information see the class <code>ContextualBlock</code>.  
      * @param types
      *                List of the used types.
      * @return The Stringbuffer that can be read by the decider
      */
     protected abstract StringBuffer buildCompleteText(StringBuffer formula,
 	    ArrayList<StringBuffer> assumptions,
-	    ArrayList<int[]> assumptionTypes,
+	    ArrayList<ContextualBlock> assumptionBlocks,
 	    ArrayList<ArrayList<StringBuffer>> functions,
 	    ArrayList<ArrayList<StringBuffer>> predicates,
-	    ArrayList<int[]> predicateTypes,
+	    ArrayList<ContextualBlock> predicateBlocks,
 	    ArrayList<StringBuffer> types, SortHierarchy sortHierarchy);
 
    /* protected final StringBuffer translate(Semisequent ss, SMTTranslator.TERMPOSITION skolemization,
