@@ -135,4 +135,12 @@ public class SMTRule implements BuiltInRule {
 	    return 0;
 	}
     }
+    
+    /**
+     * Interrupt the running rule.
+     *
+     */
+    public void interrupt() {
+	this.solver.interrupt();
+    }
 }

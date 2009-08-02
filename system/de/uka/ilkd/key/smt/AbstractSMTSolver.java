@@ -308,6 +308,10 @@ public abstract class AbstractSMTSolver implements SMTSolver {
 		boolean finished = false;
 		synchronized (p) {
 		while (!finished) {
+		    if (this.toBeInterrupted) {
+			this.toBeInterrupted = false;
+			execWatch.interrupt();
+		    }
 		    try {
 			p.wait(300);
 			p.exitValue();
@@ -322,10 +326,14 @@ public abstract class AbstractSMTSolver implements SMTSolver {
 		    }
 		}
 		}
-		if (execWatch.wasInterrupted()) {
+		if (execWatch.wasInterruptedByTimeout()) {
 		    interruptedByWatchdog = true;
 		    logger.debug(
 		    "Process for smt formula proving interrupted because of timeout.");
+		} else if (execWatch.wasInterruptedByUser()) {
+		    interruptedByWatchdog = true;
+		    logger.debug(
+		    "Process for smt formula proving interrupted because of user interaction.");
 		}
 	    } catch (InterruptedException f) {
 		logger.debug(
@@ -381,6 +389,12 @@ public abstract class AbstractSMTSolver implements SMTSolver {
 	} 
 
 	return toReturn;
+    }
+    
+    private boolean toBeInterrupted = false;
+    
+    public void interrupt() {
+	this.toBeInterrupted = true;
     }
     
     /**

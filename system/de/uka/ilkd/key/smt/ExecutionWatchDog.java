@@ -27,9 +27,14 @@ public final class ExecutionWatchDog extends TimerTask {
     @Override
     public void run() {
 	if (starttime < 0) {
+	    this.toBeInterrupted = false;
 	    this.starttime = System.currentTimeMillis();
 	}
 
+	if (this.toBeInterrupted) {
+	    proc.destroy();
+	}
+	
 	if (System.currentTimeMillis() - this.starttime > timeout) {
 	    this.wasInterrupted = true;
 	    proc.destroy();
@@ -37,8 +42,18 @@ public final class ExecutionWatchDog extends TimerTask {
 
     }
     
-    public boolean wasInterrupted() {
+    public boolean wasInterruptedByTimeout() {
 	return this.wasInterrupted;
+    }
+    
+    public boolean wasInterruptedByUser() {
+	return this.toBeInterrupted;
+    }
+    
+    private boolean toBeInterrupted = false;
+    
+    public void interrupt() {
+	this.toBeInterrupted = true;
     }
     
     /**

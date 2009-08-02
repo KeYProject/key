@@ -108,4 +108,9 @@ public interface SMTSolver {
      * @return the progress made on the current task. Value 0..99
      */
     public int getProgress();
+    
+    /**
+     * interrupt a running SMT solver.
+     */
+    public void interrupt();
 }

@@ -13,6 +13,8 @@ package de.uka.ilkd.key.gui;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Point;
+import java.awt.event.ActionEvent;
+import java.util.ArrayList;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -77,6 +79,8 @@ public class KeYMediator {
 
     private boolean autoMode; // autoModeStarted has been fired
     
+    private ArrayList<InterruptListener> interruptListener = new ArrayList<InterruptListener>();
+    
     /** creates the KeYMediator with a reference to the application's
      * main frame and the current proof settings
     */
@@ -94,6 +98,20 @@ public class KeYMediator {
 	defaultExceptionHandler = new KeYRecoderExcHandler();
     }
 
+    public void addinterruptListener(InterruptListener il) {
+	this.interruptListener.add(il);
+    }
+    
+    public void removeInterruptListener(InterruptListener il) {
+	this.interruptListener.remove(il);
+    }
+    
+    public void interrupted(ActionEvent e) {
+	for (InterruptListener il : interruptListener) {
+	    il.interruptionPerformed(e);
+	}
+    }
+    
     /** returns the used NotationInfo
      * @return the used NotationInfo
      */

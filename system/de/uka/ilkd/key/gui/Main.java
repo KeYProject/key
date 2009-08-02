@@ -2953,7 +2953,7 @@ public class Main extends JFrame implements IMain {
 	    if (!mediator.ensureProofLoaded()) return;
 	    final Proof proof = mediator.getProof();
 	    new DecProcRunner(Main.this, proof, 
-			proof.getUserConstraint().getConstraint()).run();
+			proof.getUserConstraint().getConstraint()).start();
 	}	
     }
     
@@ -3129,8 +3129,10 @@ public class Main extends JFrame implements IMain {
             // we make a second check (which is a %%%HACK)
             if (!frozen)
                 mediator().startAutoMode();
-            else
+            else {
+        	mediator().interrupted(e);
                 mediator().stopAutoMode();
+            }
         }
         
     }

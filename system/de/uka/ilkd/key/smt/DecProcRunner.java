@@ -18,6 +18,10 @@
 package de.uka.ilkd.key.smt;
 
 
+import java.awt.event.ActionEvent;
+import java.util.Timer;
+import java.util.TimerTask;
+
 import de.uka.ilkd.key.gui.*;
 import de.uka.ilkd.key.gui.notification.events.GeneralInformationEvent;
 import de.uka.ilkd.key.logic.Constraint;
@@ -31,7 +35,7 @@ import de.uka.ilkd.key.util.*;
  * Runs the currently active decision procedure on 
  * each open goal of a given proof.
  */
-public class DecProcRunner implements Runnable {
+public class DecProcRunner extends SwingWorker {
 
     private final IMain main;
     
@@ -58,7 +62,7 @@ public class DecProcRunner implements Runnable {
          * the worker is interrupted because we catch the
          * InterruptedException in doWork().
          */
-        main.mediator().stopInterface(true);
+        //main.mediator().stopInterface(true);
         Object res = construct();
         finished(res);
     }
@@ -99,76 +103,95 @@ public class DecProcRunner implements Runnable {
     
     private Object doWork() {
         String status = "";
-        
+        main.mediator().stopInterface(true);
         final KeYMediator mediator = main.mediator();        
         mediator.resetNrGoalsClosedByHeuristics();
-        try {
-            try {
-                totalGoals = proof.openGoals().size();
-                int cnt = 0;
-                
-                proof.env().registerRule(simpRule,
-                        de.uka.ilkd.key.proof.mgt.AxiomJustification.INSTANCE);
+        InterruptListener il = null;
+        	try {
+                    try {
+                        totalGoals = proof.openGoals().size();
+                        int cnt = 0;
+                        
+                        proof.env().registerRule(simpRule,
+                                de.uka.ilkd.key.proof.mgt.AxiomJustification.INSTANCE);
 
-                main.setStatusLine("Running external decision procedure: " +
-                        simpRule.displayName(), 99*totalGoals); 
-                
-                final IteratorOfGoal goals = proof.openGoals().iterator();
+                        main.setStatusLine("Running external decision procedure: " +
+                                simpRule.displayName(), 99*totalGoals); 
+                        
+                        final IteratorOfGoal goals = proof.openGoals().iterator();
 
-                while (goals.hasNext()) {      
-                    BuiltInRuleApp birApp = new BuiltInRuleApp(simpRule, null, 
-                            userConstraint);                    						
-                    
-                    Goal g = goals.next();
-                    
-                    cnt++;
-                    final int temp = cnt;
+                        while (goals.hasNext()) {    
+                            BuiltInRuleApp birApp = new BuiltInRuleApp(simpRule, null, 
+                                    userConstraint);                    						
+                            
+                            Goal g = goals.next();
+                            
+                            cnt++;
+                            final int temp = cnt;
 
-                    //start a task to update the progressbar according to the timeprogress.
-                    BaseProgressMonitor pm = null;
-                    
-                    //add a progress monitor to disply up to date progress.
-                    if (simpRule instanceof SMTRule) {
-                	SMTRule rule = (SMTRule) simpRule;
-                	int step = 99;
-        		int base = (cnt-1) * step;
-        		pm = new BaseProgressMonitor(base, main.getProgressMonitor());
-                	rule.addProgressMonitor(pm);
+                            //start a task to update the progressbar according to the timeprogress.
+                            BaseProgressMonitor pm = null;
+                            
+                            //add a progress monitor to disply up to date progress.
+                            if (simpRule instanceof SMTRule) {
+                        	final SMTRule rule = (SMTRule) simpRule;
+                        	il = new InterruptListener() {
+                                    public void interruptionPerformed(ActionEvent e) {
+                                        rule.interrupt();
+                                        main.setStatusLine("External decision procedure interrupted by user");
+                                    }
+                                 };
+                                main.mediator().addinterruptListener(il);
+                        	int step = 99;
+                		int base = (cnt-1) * step;
+                		pm = new BaseProgressMonitor(base, main.getProgressMonitor());
+                        	rule.addProgressMonitor(pm);
+                            }
+                            ProofTreeListener ptl = new ProofTreeListener() {
+                        	
+                        	public void proofGoalRemoved(ProofTreeEvent e) {
+                        	    int step = 99;
+                        	    main.getProgressMonitor().setProgress(step*temp);
+                        	}
+                        	
+                        	public void proofIsBeingPruned(ProofTreeEvent e) {}
+                        	public void proofPruned(ProofTreeEvent e) {}
+                        	public void proofClosed(ProofTreeEvent e) {}
+                        	public void proofStructureChanged(ProofTreeEvent e) {}
+                        	public void proofGoalsAdded(ProofTreeEvent e) {}
+                        	public void proofGoalsChanged(ProofTreeEvent e) {}
+                        	public void proofExpanded(ProofTreeEvent e) {}
+                            };
+                            proof.addProofTreeListener(ptl);
+                            g.apply(birApp);
+                            if (il != null) {
+                        	mediator.removeInterruptListener(il);
+                        	il = null;
+                            }
+                            //remove the progress monitor again
+                            if (pm != null) {
+                        	((SMTRule)simpRule).removeProgressMonitor(pm);
+                            }
+
+                            proof.removeProofTreeListener(ptl);
+                            
+                        }
+                    } catch (ExceptionHandlerException e) {
+                        throw e;
+                    } catch (Throwable thr) {
+                        exceptionHandler.reportException(thr);
                     }
-                    ProofTreeListener ptl = new ProofTreeListener() {
-                	
-                	public void proofGoalRemoved(ProofTreeEvent e) {
-                	    int step = 99;
-                	    main.getProgressMonitor().setProgress(step*temp);
-                	}
-                	
-                	public void proofIsBeingPruned(ProofTreeEvent e) {}
-                	public void proofPruned(ProofTreeEvent e) {}
-                	public void proofClosed(ProofTreeEvent e) {}
-                	public void proofStructureChanged(ProofTreeEvent e) {}
-                	public void proofGoalsAdded(ProofTreeEvent e) {}
-                	public void proofGoalsChanged(ProofTreeEvent e) {}
-                	public void proofExpanded(ProofTreeEvent e) {}
-                    };
-                    proof.addProofTreeListener(ptl);
-                    g.apply(birApp);
-                    //remove the progress monitor again
-                    if (pm != null) {
-                	((SMTRule)simpRule).removeProgressMonitor(pm);
+                } catch (ExceptionHandlerException ex){
+                    main.setStatusLine("Running external decision procedure failed");
+                    //status =  ex.toString();
+                } finally {
+                    if (il != null) {
+                	mediator.removeInterruptListener(il);
+                	il = null;
                     }
-
-                    proof.removeProofTreeListener(ptl);
-                    
+                    mediator.startInterface(true);
                 }
-            } catch (ExceptionHandlerException e) {
-                throw e;
-            } catch (Throwable thr) {
-                exceptionHandler.reportException(thr);
-            }
-        } catch (ExceptionHandlerException ex){
-            main.setStatusLine("Running external decision procedure failed");
-            status =  ex.toString();
-        }
+        
         return status;
     }
 
