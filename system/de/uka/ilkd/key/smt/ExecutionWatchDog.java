@@ -1,12 +1,13 @@
 package de.uka.ilkd.key.smt;
 
+import java.util.ArrayList;
 import java.util.TimerTask;
 
 public final class ExecutionWatchDog extends TimerTask {
 
     private int timeout;
 
-    private Process proc;
+    private ArrayList<Process> procList = new ArrayList<Process>();
 
     private long starttime = -1;
     
@@ -14,29 +15,45 @@ public final class ExecutionWatchDog extends TimerTask {
 
     /**
      * Construct a new Watch dog.
-     * @param timeout after this amount of seconds, p is cancelled.
+     * @param timeout after this amount of seconds, p is canceled.
      * @param p The Process that should be watched.
      */
     public ExecutionWatchDog(int timeout, Process p) {
 	super();
 	this.timeout = timeout;
-	this.proc = p;
+	this.procList.add(p);
+	this.wasInterrupted = false;
+    }
+    
+    /**
+     * Construct a new Watch dog.
+     * @param timeout after this amount of seconds, the processes are canceled.
+     * @param pl the list of processes that should be watched.
+     */
+    public ExecutionWatchDog(int timeout, ArrayList<Process> pl)
+    {
+	super();
+	this.timeout = timeout;
+	this.procList.addAll(pl);
 	this.wasInterrupted = false;
     }
 
     @Override
     public void run() {
+	
 	if (starttime < 0) {
 	    this.toBeInterrupted = false;
 	    this.starttime = System.currentTimeMillis();
 	}
 
 	if (this.toBeInterrupted) {
+	    for(Process proc: procList)
 	    proc.destroy();
 	}
 	
 	if (System.currentTimeMillis() - this.starttime > timeout) {
 	    this.wasInterrupted = true;
+	    for(Process proc: procList)
 	    proc.destroy();
 	}
 

@@ -18,6 +18,8 @@ import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.smt.AbstractSMTSolver;
 import de.uka.ilkd.key.smt.SMTRule;
+import de.uka.ilkd.key.smt.SMTRuleMulti;
+import de.uka.ilkd.key.smt.SMTSolver;
 
 /** This class encapsulates the information which 
  *  decision procedure should be used.
@@ -82,6 +84,10 @@ public class DecisionProcedureSettings implements Settings {
     
     private HashMap<RuleDescriptor, SMTRule> descriptorToRule = new HashMap<RuleDescriptor, SMTRule>();
     
+    
+    /** stores a reference on the 'MultipleProverRule'*/
+    private SMTRuleMulti ruleMultipleProvers = null;
+    
     /** the list of all ruledescriptors of all rules that are installed */
     private ArrayList<RuleDescriptor> installedrules = new ArrayList<RuleDescriptor>();
     
@@ -96,6 +102,9 @@ public class DecisionProcedureSettings implements Settings {
     private static String EXECSTR = "[DecisionProcedure]Exec";
     /** mapping of rule name (key) to execution string (value) */
     private HashMap<String, String> execCommands = new HashMap<String, String>();
+    
+    ///**mapping of rule name (key) to multiple use*/
+   // private HashMap<String,Boolean> multipleUse = new HashMap<String,Boolean>();
     
     /** the string separating different solver-command values. */
     private static final String execSeperator1 = ":"; 
@@ -314,6 +323,8 @@ public class DecisionProcedureSettings implements Settings {
     public String getExecutionCommand(AbstractSMTSolver r) {
 	return this.execCommands.get(this.findRuleByName(r.name()).ruleName.toString());
     }
+    
+
 
     /**
      * recheck, if the rule is installed
@@ -342,6 +353,19 @@ public class DecisionProcedureSettings implements Settings {
 	    toReturn = this.descriptorToRule.get(rd).defaultExecutionCommand();
 	}
 	return toReturn;
+    }
+    
+    
+    public boolean getMultipleUse(RuleDescriptor rd)  {
+	SMTRule rule = descriptorToRule.get(rd);
+	SMTSolver s = rule.getSolver();
+	return this.ruleMultipleProvers.SMTSolverIsUsed(s);
+    }
+    
+    public void setMultipleUse(RuleDescriptor rd, boolean multipleuse) {
+	SMTRule rule = descriptorToRule.get(rd);
+	SMTSolver s = rule.getSolver();
+	ruleMultipleProvers.useSMTSolver(s, multipleuse);
     }
     
     
@@ -397,7 +421,12 @@ public class DecisionProcedureSettings implements Settings {
 		    installedrules.add(rd);
 		}
 	    }
+	    if(r instanceof SMTRuleMulti){
+		
+		ruleMultipleProvers = (SMTRuleMulti) r;
+	    }
 	}
+	
     }
     
     private boolean saveFile = false;
@@ -435,6 +464,7 @@ public class DecisionProcedureSettings implements Settings {
     public void writeSettings(Properties props) {	
         props.setProperty(ACTIVE_RULE, "" + activeRule);
         props.setProperty(TIMEOUT, "" + this.timeout);
+      
         if (this.saveFile)
             props.setProperty(SAVEFILE, "true");
         else {
@@ -450,5 +480,7 @@ public class DecisionProcedureSettings implements Settings {
 	
 	return instance;
     }
+
+ 
 
 }

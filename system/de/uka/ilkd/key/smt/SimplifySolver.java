@@ -35,8 +35,8 @@ public final class SimplifySolver extends AbstractSMTSolver {
     }
 
     
-    @Override
-    protected SMTSolverResult interpretAnswer(String text, String error, int val) {	
+
+    public SMTSolverResult interpretAnswer(String text, String error, int val) {	
 	
 	if (val == 0) {
 	    //no error occured

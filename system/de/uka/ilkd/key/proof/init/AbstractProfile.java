@@ -7,6 +7,8 @@
 // See LICENSE.TXT for details.
 package de.uka.ilkd.key.proof.init;
 
+import java.util.ArrayList;
+
 import de.uka.ilkd.key.collection.SetAsListOfString;
 import de.uka.ilkd.key.collection.SetOfString;
 import de.uka.ilkd.key.gui.IMain;
@@ -83,11 +85,19 @@ public abstract class AbstractProfile implements Profile {
 
     protected ListOfBuiltInRule initBuiltInRules() {
         ListOfBuiltInRule builtInRules = SLListOfBuiltInRule.EMPTY_LIST;
+        ArrayList<SMTSolver> solverList = new ArrayList<SMTSolver>();
+        solverList.add(new Z3Solver());
+        solverList.add(new YicesSolver());
+        solverList.add(new SimplifySolver());
+        solverList.add(new CVC3Solver());
         
-        builtInRules = builtInRules.prepend(new SMTRule(new Z3Solver()));        
-        builtInRules = builtInRules.prepend(new SMTRule(new YicesSolver()));
-        builtInRules = builtInRules.prepend(new SMTRule(new SimplifySolver()));        
-        builtInRules = builtInRules.prepend(new SMTRule(new CVC3Solver()));
+        // builtInRules for single use of provers
+        for(SMTSolver s : solverList)
+          builtInRules = builtInRules.prepend(new SMTRule(s));        
+
+        // init builtIRule for using several provers at the same time
+        builtInRules = builtInRules.prepend(new SMTRuleMulti(solverList));
+        
         
         return builtInRules;
     }

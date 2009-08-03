@@ -85,7 +85,7 @@ public abstract class AbstractSMTSolver implements SMTSolver {
 	return toReturn;
     }
     
-    /**
+  /*  /**
      * Interpret the answer of the program.
      * This is very solverdepending. Usually, an exitcode of 0 inicates no error.
      * But not every solver returns 0 if successfull termination was reached.
@@ -95,7 +95,7 @@ public abstract class AbstractSMTSolver implements SMTSolver {
      * @return A SMTSolverResult containing all information of the interpretation.
      * @throws IllegalArgumentException If the solver caused an error.
      */
-    protected abstract SMTSolverResult interpretAnswer(String output, String error, int exitstatus) throws IllegalArgumentException;
+   // public abstract SMTSolverResult interpretAnswer(String output, String error, int exitstatus) throws IllegalArgumentException;
 
     private static String toStringLeadingZeros(int n, int width) {
 	String rv = "" + n;
@@ -172,7 +172,7 @@ public abstract class AbstractSMTSolver implements SMTSolver {
 
     /** Read the input until end of file and return contents in a
      * single string containing all line breaks. */
-    private static String read(InputStream in) throws IOException {
+    static String read(InputStream in) throws IOException {
 	BufferedReader reader = new BufferedReader(new InputStreamReader(in));
 	StringBuffer sb = new StringBuffer();
 	int x = reader.read();
@@ -207,6 +207,68 @@ public abstract class AbstractSMTSolver implements SMTSolver {
 	}
     	
     	return toReturn;
+    }
+    
+    
+    
+    public Process run(Goal goal, Services services) throws IOException,IllegalFormulaException{
+	Process toReturn;
+	
+	SMTTranslator trans = this.getTranslator(services);
+	
+	String formula = trans.translate(goal.sequent(), services).toString();
+	
+	
+
+	
+	final File loc;
+	try {
+	    //store the translation to a file                                
+	    loc = this.storeToFile(formula);
+	} catch (IOException e) {
+	    logger.error("The file with the formula could not be written.", e);
+	    final IOException io = new IOException("Could not create or write the input file " +
+		    "for the external prover. Received error message:\n" + e.getMessage());
+	    io.initCause(e);
+	    throw io;
+	} 
+	
+	
+
+	//get the commands for execution
+	String execCommand = this.getFinalExecutionCommand(loc.getAbsolutePath(), formula);
+
+	
+	try {
+	    //execute the external solver
+	    toReturn = Runtime.getRuntime().exec(execCommand);
+	    } catch (IOException e) {
+		    String cmdStr = execCommand;
+		    //for (String cmd : execCommand) {
+			//cmdStr += cmd + " ";
+		    //}
+		    IOException ioe = new IOException("Invocation of decision procedure\n\t\t" +
+			    this.name() + "\n with command \n\t\t" + cmdStr + "\n" +  
+			    "failed. The most common (but not all) reasons for this error are:\n" +
+			    "\n 1. the directory where you put the executable of the decision procedure is not in your PATH.\n " +
+			    "\t    Solution: Add the directory to your PATH environment variable." +
+			    "\n 2. we expect a different name than your executable " +
+			    "(prior to KeY 1.5 and later we expected 'Simplify' instead of 'simplify')" +
+			    "\n\t Solution: Change the name to " + (execCommand != null ? 
+			        	execCommand : "expected name") +
+			    "\n 3. you have not the permission to execute the decision procedure." +
+			    "\n\t Solution: *nix-like systems: try 'chmod u+x <path_to_executable>/<executable_filename>" +
+			    "\n 4. you use a too new or too old version of the decision procedure and the command " +
+			        "line parameters changed." +
+			    "\n\t Solution: Install a supported version (see http://www.key-project.org)\n" +
+			    "\n Original Error-Message: " + e.getMessage());
+		    ioe.initCause(e);
+		    throw ioe;
+		}
+	
+	
+	
+	 return toReturn;
     }
 
 

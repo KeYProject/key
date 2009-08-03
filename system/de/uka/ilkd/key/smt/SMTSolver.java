@@ -72,6 +72,32 @@ public interface SMTSolver {
     public SMTSolverResult run(Term formula, int timeout, Services services) throws IOException;
     
     /**
+     * Check if the valid formula is valid. This method is used for using multiple provers. 
+     * Instead of returning the SMTSolverResult directly, the method returns a reference to the process of the external solver.
+     * @param goal The goal to be proven
+     * @param services 
+     * @return the service object belonging to this goal.
+     * @throws IOException if the external prover could not be found, executed or if the SMT translation
+     * could not be written to a file
+     */
+    public Process run(Goal goal, Services services) throws IOException, IllegalFormulaException;
+    
+    
+    /**
+     * Interpret the answer of the program.
+     * This is very solverdepending. Usually, an exitcode of 0 inicates no error.
+     * But not every solver returns 0 if successfull termination was reached.
+     * @param output the String answered by the external programm.
+     * @param error the String answered as error
+     * @param exitstatus the status of the exit
+     * @return A SMTSolverResult containing all information of the interpretation.
+     * @throws IllegalArgumentException If the solver caused an error.
+     */
+    public SMTSolverResult interpretAnswer(String output, String error, int exitstatus) throws IllegalArgumentException;
+    
+    
+    
+    /**
      * check, if this solver is installed and can be used.
      * @param recheck if false, the solver is not checked again, if a cached value for this exists.
      * @return true, if it is installed.

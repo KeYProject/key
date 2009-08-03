@@ -3,6 +3,7 @@ package de.uka.ilkd.key.gui;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
@@ -41,6 +42,8 @@ public class DecissionProcedureSettingsDialog extends JDialog {
     private JTextField availableField;
     private JTextField executionField;
     private JList ruleDisplayList;
+    private JCheckBox multiuseBox;
+    
     
     /**
      * private constructor
@@ -60,13 +63,17 @@ public class DecissionProcedureSettingsDialog extends JDialog {
     
     public static void resetInstance() {
 	instance.setSize(400, 300);
-	instance.setPreferredSize(new Dimension(490, 300));
-	instance.setMaximumSize(new Dimension(490, 300));
-	instance.setMinimumSize(new Dimension(490, 300));
+	instance.setPreferredSize(new Dimension(490, 340));
+	instance.setMaximumSize(new Dimension(490, 340));
+	instance.setMinimumSize(new Dimension(490, 340));
 	instance.setVisible(true);
     }
     
     private void init() {
+	final int labelWidth = 110;
+	final int fieldWidth = 270;
+	final int labelHeight = 30;
+	final int fieldHeight = 30;
 	JSplitPane tp = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
 	//add the components to the panel
 	JComponent lc = new JPanel();
@@ -112,14 +119,14 @@ public class DecissionProcedureSettingsDialog extends JDialog {
 	JLabel nameLabel = new JLabel("name");
 	nameLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
 	//nameLabel.setSize(90, 30);
-	nameLabel.setMaximumSize(new Dimension(80, 30));
-	nameLabel.setMinimumSize(new Dimension(80, 30));
-	nameLabel.setPreferredSize(new Dimension(80, 30));
+	nameLabel.setMaximumSize(new Dimension(labelWidth, labelHeight));
+	nameLabel.setMinimumSize(new Dimension(labelWidth, labelHeight));
+	nameLabel.setPreferredSize(new Dimension(labelWidth, labelHeight));
 	//rc.add(nameLabel);
 	nameField = new JTextField();
-	nameField.setMaximumSize(new Dimension(270, 30));
-	nameField.setMinimumSize(new Dimension(270, 30));
-	nameField.setPreferredSize(new Dimension(270, 30));
+	nameField.setMaximumSize(new Dimension(fieldWidth, fieldHeight));
+	nameField.setMinimumSize(new Dimension(fieldWidth, fieldHeight));
+	nameField.setPreferredSize(new Dimension(fieldWidth, fieldHeight));
 	nameField.setEditable(false);
 	//rc.add(nameField);
 	Box b = Box.createHorizontalBox();
@@ -131,14 +138,14 @@ public class DecissionProcedureSettingsDialog extends JDialog {
 	
 	//rc.add(Box.createHorizontalGlue());
 	JLabel availableLabel = new JLabel("installed");
-	availableLabel.setMaximumSize(new Dimension(80, 30));
-	availableLabel.setMinimumSize(new Dimension(80, 30));
-	availableLabel.setPreferredSize(new Dimension(80, 30));
+	availableLabel.setMaximumSize(new Dimension(labelWidth, labelHeight));
+	availableLabel.setMinimumSize(new Dimension(labelWidth, labelHeight));
+	availableLabel.setPreferredSize(new Dimension(labelWidth, labelHeight));
 	//rc.add(availableLabel);
 	availableField = new JTextField();
-	availableField.setMaximumSize(new Dimension(270, 30));
-	availableField.setMinimumSize(new Dimension(270, 30));
-	availableField.setPreferredSize(new Dimension(270, 30));
+	availableField.setMaximumSize(new Dimension(fieldWidth, fieldHeight));
+	availableField.setMinimumSize(new Dimension(fieldWidth, fieldHeight));
+	availableField.setPreferredSize(new Dimension(fieldWidth, fieldHeight));
 	availableField.setEditable(false);
 	//rc.add(availableField);
 	
@@ -149,24 +156,49 @@ public class DecissionProcedureSettingsDialog extends JDialog {
 	globalBox.add(b);
 	
 	JLabel execLabel = new JLabel("Command");
-	execLabel.setMaximumSize(new Dimension(80, 30));
-	execLabel.setMinimumSize(new Dimension(80, 30));
-	execLabel.setPreferredSize(new Dimension(80, 30));
+	execLabel.setMaximumSize(new Dimension(labelWidth, labelHeight));
+	execLabel.setMinimumSize(new Dimension(labelWidth, labelHeight));
+	execLabel.setPreferredSize(new Dimension(labelWidth, labelHeight));
 	
 	//rc.add(execLabel);
 	this.executionField = new JTextField();
-	this.executionField.setMaximumSize(new Dimension(270, 30));
-	this.executionField.setMinimumSize(new Dimension(270, 30));
-	this.executionField.setPreferredSize(new Dimension(270, 30));
+	this.executionField.setMaximumSize(new Dimension(fieldWidth, fieldHeight));
+	this.executionField.setMinimumSize(new Dimension(fieldWidth, fieldHeight));
+	this.executionField.setPreferredSize(new Dimension(fieldWidth, fieldHeight));
 	//rc.add(executionField);
 	
-	this.setRuleVals();
+
 	
 	b = Box.createHorizontalBox();
 	b.add(execLabel);
 	b.add(executionField);
 	b.add(Box.createHorizontalGlue());
+	
 	globalBox.add(b);
+	
+	
+	
+	this.multiuseBox = new JCheckBox();
+	this.multiuseBox.setMaximumSize(new Dimension(fieldWidth, fieldHeight));
+	this.multiuseBox.setMinimumSize(new Dimension(fieldWidth, fieldHeight));
+	this.multiuseBox.setPreferredSize(new Dimension(fieldWidth, fieldHeight));
+	
+	
+	JLabel multiuseLabel = new JLabel("Multiple prover");
+	multiuseLabel.setMaximumSize(new Dimension(labelWidth, labelHeight));
+	multiuseLabel.setMinimumSize(new Dimension(labelWidth, labelHeight));
+	multiuseLabel.setPreferredSize(new Dimension(labelWidth, labelHeight));
+	
+	
+	b = Box.createHorizontalBox();
+	b.add(multiuseLabel);
+	b.add(multiuseBox);
+	b.add(Box.createHorizontalGlue());
+	
+	globalBox.add(b);
+	
+	this.setRuleVals();
+	
 	
 	//add the description
 	JTextArea c = new JTextArea("Edit the start command here.\n" +
@@ -213,7 +245,9 @@ public class DecissionProcedureSettingsDialog extends JDialog {
     private void storeCommand() {
 	RuleDescriptor rd = allrules.get(ruleDisplayList.getSelectedIndex());
 	String command = this.executionField.getText();
+	boolean multipleuse = this.multiuseBox.isSelected();
 	ProofSettings.DEFAULT_SETTINGS.getDecisionProcedureSettings().setExecutionCommand(rd, command);
+	ProofSettings.DEFAULT_SETTINGS.getDecisionProcedureSettings().setMultipleUse(rd,multipleuse);
 	Main.instance.updateDecisionProcedureSelectMenu();
 	this.setRuleVals();
     }
@@ -243,6 +277,7 @@ public class DecissionProcedureSettingsDialog extends JDialog {
 	    this.availableField.setText("No");
 	}
 	this.executionField.setText(ProofSettings.DEFAULT_SETTINGS.getDecisionProcedureSettings().getExecutionCommand(rd));
+	this.multiuseBox.setSelected(ProofSettings.DEFAULT_SETTINGS.getDecisionProcedureSettings().getMultipleUse(rd));
     }
     
     /**

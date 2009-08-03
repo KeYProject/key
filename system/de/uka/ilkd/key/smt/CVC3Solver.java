@@ -27,8 +27,8 @@ public class CVC3Solver extends AbstractSMTSolver {
     }
 
     
-    @Override
-    protected SMTSolverResult interpretAnswer(String text, String error, int val) {
+
+    public SMTSolverResult interpretAnswer(String text, String error, int val) {
 	if (val == 0) {
 	    //normal termination, no error
 	    if (text.equals("unsat\n")) {

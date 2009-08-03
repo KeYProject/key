@@ -37,8 +37,7 @@ public final class Z3Solver extends AbstractSMTSolver {
     }
     
     
-    @Override
-    protected SMTSolverResult interpretAnswer(String text, String error, int val) {
+    public SMTSolverResult interpretAnswer(String text, String error, int val) {
 	if (val == 0) {
 	    //no error occured
 	    if (text.contains("unsat")) {

@@ -28,9 +28,17 @@ public class SMTRule implements BuiltInRule {
 
     private final SMTSolver solver;
 
+
     
     public SMTRule(SMTSolver arg1) {
 	this.solver = arg1;
+    }
+    
+    /** 
+     * @return solver associated with the instance.
+     */
+    public SMTSolver getSolver(){
+	return solver;
     }
 
     /**
