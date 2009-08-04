@@ -25,6 +25,8 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 
 public class TestVariableNamer extends TestCase {
+    
+    private static final TermBuilder TB = TermBuilder.DF;
 
     private final Proof proof = new Proof(new Services());
     private final Services services = proof.getServices();
@@ -66,9 +68,7 @@ public class TestVariableNamer extends TestCase {
     	StatementBlock statementBlock = new StatementBlock(statement);
     	JavaBlock javaBlock = JavaBlock.createJavaBlock(statementBlock);
 
-	TermFactory termFactory = TermFactory.DEFAULT;
-	Term subterm = termFactory.createJunctorTerm(Junctor.TRUE);
-	Term term = termFactory.createDiamondTerm(javaBlock, subterm);
+	Term term = TB.dia(javaBlock, TB.tt());
 
 	return new ConstrainedFormula(term);
     }
@@ -113,7 +113,7 @@ public class TestVariableNamer extends TestCase {
     }
     
     private void addTacletApp(Goal goal, ProgramVariable containedVar) {
-	Term findTerm = TermFactory.DEFAULT.createJunctorTerm(Junctor.TRUE);
+	Term findTerm = TB.tt();
    	AntecTacletBuilder builder = new AntecTacletBuilder();
 	builder.setFind(findTerm);
     	AntecTaclet taclet = builder.getAntecTaclet();

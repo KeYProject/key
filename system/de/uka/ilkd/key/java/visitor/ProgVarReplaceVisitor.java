@@ -162,10 +162,10 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
 	    if(replaceMap.containsKey(t.op())) {
 		Object o = replaceMap.get(t.op());
 		if(o instanceof ProgramVariable){
-		    return TermFactory.DEFAULT.createVariableTerm
+		    return TermFactory.DEFAULT.createTerm
 			((ProgramVariable) replaceMap.get(t.op()));
 		}else{
-		    return TermFactory.DEFAULT.createVariableTerm
+		    return TermFactory.DEFAULT.createTerm
 			((SchemaVariable) replaceMap.get(t.op()));
 		}
 	    } else {
@@ -173,10 +173,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
 	    }
 	} else {
 	    Term subTerms[] = new Term[t.arity()];
-	    final ArrayOfQuantifiableVariable[] vars = 
-	        new ArrayOfQuantifiableVariable[t.arity()]; 
-	    for ( int i = 0; i<t.arity(); i++ ) {
-		vars[i] = t.varsBoundHere(i);
+	    for(int i = 0, n = t.arity(); i < n; i++) {
 		subTerms[i] = replaceVariablesInTerm(t.sub(i));
 	    }
 	    Operator op = t.op();
@@ -188,7 +185,10 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
 		    op = ElementaryUpdate.getInstance(replacedLhs);
 		}
 	    }
-	    return TermFactory.DEFAULT.createTerm(op, subTerms, vars, t.javaBlock());
+	    return TermFactory.DEFAULT.createTerm(op, 
+		    				  subTerms, 
+		    				  t.boundVars(), 
+		    				  t.javaBlock());
 	}
     }
 

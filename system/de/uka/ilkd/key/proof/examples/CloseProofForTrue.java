@@ -64,8 +64,7 @@ public class CloseProofForTrue {
     }
 
     public Term buildFormula() {
-	TermFactory tf = TermFactory.DEFAULT;
-	return tf.createJunctorTerm(Junctor.TRUE, new Term[0]);
+	return TermBuilder.DF.tt();
     }
 
     /** return a sequent containing the formula true. */

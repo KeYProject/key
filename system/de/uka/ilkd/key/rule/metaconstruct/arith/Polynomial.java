@@ -205,7 +205,7 @@ public class Polynomial {
         if ( it.hasNext () ) {
             res = it.next ().toTerm ( services );
             while ( it.hasNext () )
-                res = TermFactory.DEFAULT.createFunctionTerm
+                res = TermFactory.DEFAULT.createTerm
                               ( add, res, it.next ().toTerm ( services ) );
         }
         
@@ -214,7 +214,7 @@ public class Polynomial {
         if ( res == null )
             res = cTerm;
         else if ( !BigInteger.ZERO.equals ( constantPart ) )
-            res = TermFactory.DEFAULT.createFunctionTerm ( add, cTerm, res );
+            res = TermFactory.DEFAULT.createTerm ( add, cTerm, res );
         
         return res;        
     }
@@ -317,5 +317,4 @@ public class Polynomial {
     public ListOfMonomial getParts() {
         return parts;
     }
-    
 }

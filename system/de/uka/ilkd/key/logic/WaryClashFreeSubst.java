@@ -88,7 +88,7 @@ public class WaryClashFreeSubst extends ClashFreeSubst {
 	        newVar = newVarFor ( getVariable (), warysvars );
 	    else
 	        newVar = getVariable ();
-	    newVarTerm = tf.createVariableTerm ( (LogicVariable)newVar );
+	    newVarTerm = TB.var ( newVar );
 	}	
     }
 
@@ -155,10 +155,10 @@ public class WaryClashFreeSubst extends ClashFreeSubst {
         newSubterms[updOp.targetPos ()] = addSubst ? substWithNewVar ( target )
                                                    : target;
 
-        return tf.createTerm ( t.op (),
-                               newSubterms,
-                               newBoundVars,
-                               t.javaBlock ());
+        return TB.tf().createTerm ( t.op (),
+                               	    newSubterms,
+                               	    getSingleArray(newBoundVars),
+                               	    t.javaBlock ());
     }
 
     /**
@@ -174,10 +174,10 @@ public class WaryClashFreeSubst extends ClashFreeSubst {
      */
     private Term addWarySubst (Term t) {
         createVariable ();
-        return tf.createSubstitutionTerm ( WarySubstOp.SUBST,
-                                           newVar,
-                                           getSubstitutedTerm (),
-                                           t );
+        return TB.subst(WarySubstOp.SUBST,
+        	        newVar,
+        	        getSubstitutedTerm (),
+        	        t );
     }
 
     /**

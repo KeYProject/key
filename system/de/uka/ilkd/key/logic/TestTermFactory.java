@@ -60,26 +60,26 @@ public class TestTermFactory extends TestCase {
     }
 
     public void setUp() {
-	Term et_x=new TermImpl(x, new Term[0]);
-	Term et_px=new TermImpl(p, new Term[]{et_x});
+	Term et_x=new TermImpl(x, new ArrayOfTerm(), null, null);
+	Term et_px=new TermImpl(p, new ArrayOfTerm(new Term[]{et_x}), null, null);
 	et1=et_px;       
     }
 
     private Term t1(){
-	Term t_x=tf.createFunctionTerm(x, new Term[0]);
-	Term t_px=tf.createFunctionTerm(p, new Term[]{t_x});
+	Term t_x=tf.createTerm(x, new Term[0]);
+	Term t_px=tf.createTerm(p, new Term[]{t_x});
 	return t_px;
     }
   
     private Term t2(){
-	Term t_x=tf.createFunctionTerm(x, new Term[]{});
-	Term t_w=tf.createFunctionTerm(w, new Term[]{});
-	return tf.createFunctionTerm(r, new Term[]{t_x,t_w});
+	Term t_x=tf.createTerm(x, new Term[]{});
+	Term t_w=tf.createTerm(w, new Term[]{});
+	return tf.createTerm(r, new Term[]{t_x,t_w});
     }
 
     private Term t3() {
-	Term t_y=tf.createFunctionTerm(y, new Term[]{});
-	return tf.createFunctionTerm(f, new Term[]{t_y});
+	Term t_y=tf.createTerm(y, new Term[]{});
+	return tf.createTerm(f, new Term[]{t_y});
     }
 
 
@@ -87,8 +87,8 @@ public class TestTermFactory extends TestCase {
       
 	Exception exc=new Exception();
 	try {
-	    Term t_z  = tf.createFunctionTerm(z, new Term[0]);
-	    Term t_pz = tf.createFunctionTerm(q, new Term[]{t_z});
+	    Term t_z  = tf.createTerm(z, new Term[0]);
+	    Term t_pz = tf.createTerm(q, new Term[]{t_z});
 	} catch (TermCreationException e) {
 	    exc=e;
 	    
@@ -104,8 +104,8 @@ public class TestTermFactory extends TestCase {
 
 	Exception exc = null;
 	try {
-	    Term t_x=tf.createFunctionTerm(x, new Term[0]);
-	    tf.createFunctionTerm(r, new Term[]{t_x});
+	    Term t_x=tf.createTerm(x, new Term[0]);
+	    tf.createTerm(r, new Term[]{t_x});
 	} catch (TermCreationException e) {
 	    exc=e;	   
 	}
@@ -118,9 +118,9 @@ public class TestTermFactory extends TestCase {
      * constructed anyway, as subformulae are not checked
      */
     public void testWithInvalidSubformulae() { 
-	Term invalidBuilt=new TermImpl(p, new Term[]{ new TermImpl(y, new Term[0])});
+	Term invalidBuilt=new TermImpl(p, new ArrayOfTerm(new TermImpl(y, new ArrayOfTerm(), null, null)), null, null);
 	try {
-	    Term t_px_or_py=tf.createJunctorTerm(Junctor.OR,
+	    Term t_px_or_py=tf.createTerm(Junctor.OR,
 						 new Term[]{invalidBuilt, 
 							    t1()});
 	} catch (Exception e) {
@@ -129,44 +129,43 @@ public class TestTermFactory extends TestCase {
     }  
 
     public void testConstantTrue() {
-        Term t_true=tf.createJunctorTerm(Junctor.TRUE,new Term[0]);
-	Assert.assertEquals(t_true,new TermImpl(Junctor.TRUE, new Term[0]));
+        Term t_true=tf.createTerm(Junctor.TRUE);
+	Assert.assertEquals(t_true,new TermImpl(Junctor.TRUE, new ArrayOfTerm(), null, null));
     }
 
     public void testQuantifierTerm() {
-	Term t_forallx_px=tf.createQuantifierTerm(Quantifier.ALL,
-						  new LogicVariable[]{x},t1());
+	Term t_forallx_px=TermBuilder.DF.all(new LogicVariable[]{x},t1());
 	Assert.assertEquals(t_forallx_px,
-			    new TermImpl(Quantifier.ALL,new ArrayOfTerm(t1()), null, new ArrayOfQuantifiableVariable(x)));
+			    new TermImpl(Quantifier.ALL,new ArrayOfTerm(t1()), new ArrayOfQuantifiableVariable(x), null));
     }
 
     public void testJunctorTerm() {
-	Term  t_px_imp_ryw= tf.createJunctorTerm(Junctor.IMP, t1(), t2());
-	Assert.assertEquals(t_px_imp_ryw, new TermImpl(Junctor.IMP, new Term[]{ t1(), t2()}));
+	Term  t_px_imp_ryw= tf.createTerm(Junctor.IMP, t1(), t2());
+	Assert.assertEquals(t_px_imp_ryw, new TermImpl(Junctor.IMP, new ArrayOfTerm(new Term[]{ t1(), t2()}), null, null));
     }
 
     public void testNegationTerm() {
-	Term t_not_ryw=tf.createJunctorTerm(Junctor.NOT, t2());
-	Assert.assertEquals(t_not_ryw, new TermImpl(Junctor.NOT, new Term[]{ t2()}));
+	Term t_not_ryw=tf.createTerm(Junctor.NOT, t2());
+	Assert.assertEquals(t_not_ryw, new TermImpl(Junctor.NOT, new ArrayOfTerm( t2()), null, null));
     }
 
     public void testDiamondTerm() {
 	JavaBlock jb=JavaBlock.EMPTY_JAVABLOCK;
-	Term t_dia_ryw=tf.createDiamondTerm(jb, t2());
-	Assert.assertEquals(t_dia_ryw, new TermImpl(Modality.DIA, new ArrayOfTerm(t2()), jb));
+	Term t_dia_ryw=tf.createTerm(Modality.DIA, new Term[]{t2()}, null, jb);
+	Assert.assertEquals(t_dia_ryw, new TermImpl(Modality.DIA, new ArrayOfTerm(t2()), null, jb));
     }
 
     public void testBoxTerm() {
 	JavaBlock jb=JavaBlock.EMPTY_JAVABLOCK;
-	Term t_dia_ryw=tf.createBoxTerm(jb, t2());
-	Assert.assertEquals(t_dia_ryw, new TermImpl(Modality.BOX, new ArrayOfTerm(t2()), jb));
+	Term t_dia_ryw=tf.createTerm(Modality.BOX, new ArrayOfTerm(t2()), null, jb);
+	Assert.assertEquals(t_dia_ryw, new TermImpl(Modality.BOX, new ArrayOfTerm(t2()), null, jb));
     }
 
     public void testSubstitutionTerm() {
-	Term t_x_subst_fy_in_px=tf.createSubstitutionTerm(WarySubstOp.SUBST, x, t3(),
+	Term t_x_subst_fy_in_px=TermBuilder.DF.subst(WarySubstOp.SUBST, x, t3(),
 							  t1());
 	Assert.assertEquals(new TermImpl(WarySubstOp.SUBST, new ArrayOfTerm(new Term[]{ t3(),t1() }),
-				    	 null, new ArrayOfQuantifiableVariable(x)), 
+				    	 new ArrayOfQuantifiableVariable(x), null), 
 			    t_x_subst_fy_in_px);
     }
 
@@ -174,8 +173,10 @@ public class TestTermFactory extends TestCase {
     public void testWrongSubstTermForLogicVariable(){
 	Exception exc=new Exception();
 	try {
-	    tf.createSubstitutionTerm(WarySubstOp.SUBST, 
-							      x, new Term[]{ t2(), t1()});
+	    tf.createTerm(WarySubstOp.SUBST, 
+		    	  new Term[]{ t2(), t1()},
+		    	  new ArrayOfQuantifiableVariable(x),
+		    	  null);
 	} catch (TermCreationException e) {
 	    exc=e;	    
 	}
@@ -185,7 +186,7 @@ public class TestTermFactory extends TestCase {
     public void testSubtermsForLogicVariable() {
 	Exception exc=new Exception();
 	try {
-	    tf.createFunctionTerm(x,new Term[]{t3()});
+	    tf.createTerm(x,new Term[]{t3()});
 	} catch (TermCreationException e) {
 	    exc=e;	    
 	}
@@ -196,7 +197,7 @@ public class TestTermFactory extends TestCase {
     public void testQuantifierWithNoBoundSubTerms() {
 	Exception exc=new Exception();
 	try {
-	    tf.createQuantifierTerm(Quantifier.ALL,new LogicVariable[]{}, t1());
+	    TermBuilder.DF.all(new LogicVariable[]{}, t1());
 	} catch (TermCreationException e) {
 	    exc=e;	    
 	}
@@ -207,7 +208,7 @@ public class TestTermFactory extends TestCase {
     public void testJunctorTermWithWrongArity() {
 	Exception exc=new Exception();
 	try {
-	    tf.createJunctorTerm(Junctor.NOT,new Term[] {t1(), t2()});
+	    tf.createTerm(Junctor.NOT, new Term[] {t1(), t2()});
 	} catch (TermCreationException e) {
 	    exc=e;	    
 	}
@@ -216,24 +217,19 @@ public class TestTermFactory extends TestCase {
 
 
     public void testSubSorts1() {
-	tf.createFunctionTerm(g, tf.createVariableTerm(v4), 
-			      tf.createVariableTerm(v1));
-	tf.createFunctionTerm(g, tf.createVariableTerm(v4), 
-			      tf.createVariableTerm(v4));
-	tf.createFunctionTerm(g, tf.createVariableTerm(v2), 
-			      tf.createVariableTerm(v3));
+	tf.createTerm(g, new Term[]{tf.createTerm(v4), tf.createTerm(v1)});
+	tf.createTerm(g, new Term[]{tf.createTerm(v4), tf.createTerm(v4)});
+	tf.createTerm(g, new Term[]{tf.createTerm(v2), tf.createTerm(v3)});
 	Exception exc=new Exception();
 	try {
-	    tf.createFunctionTerm(g, tf.createVariableTerm(v1), 
-				  tf.createVariableTerm(v1));
+	    tf.createTerm(g, new Term[]{tf.createTerm(v1), tf.createTerm(v1)});
 	} catch (TermCreationException e) {
 	    exc=e;	    
 	}
 	assertTrue(exc instanceof TermCreationException);
 	exc=new Exception();
 	try {
-	    tf.createFunctionTerm(g, tf.createVariableTerm(y), 
-				  tf.createVariableTerm(y));
+	    tf.createTerm(g, new Term[]{tf.createTerm(y), tf.createTerm(y)});
 	} catch (TermCreationException e) {
 	    exc=e;	    
 	}
@@ -241,15 +237,11 @@ public class TestTermFactory extends TestCase {
     }
 
     public void testSubSortsEquals() {
-	tf.createEqualityTerm(tf.createVariableTerm(v4), 
-			      tf.createVariableTerm(v1));
-	tf.createEqualityTerm(tf.createVariableTerm(v4), 
-			      tf.createVariableTerm(v4));
-	tf.createEqualityTerm(tf.createVariableTerm(v2), 
-			      tf.createVariableTerm(v3));
-	tf.createEqualityTerm(tf.createVariableTerm(x), 
-			      tf.createVariableTerm(z));
-	Exception exc = null;
+	tf.createTerm(Equality.EQUALS, tf.createTerm(v4), tf.createTerm(v1));
+	tf.createTerm(Equality.EQUALS, tf.createTerm(v4), tf.createTerm(v4));
+	tf.createTerm(Equality.EQUALS, tf.createTerm(v2), tf.createTerm(v3));
+	tf.createTerm(Equality.EQUALS, tf.createTerm(x), tf.createTerm(z));
+//	Exception exc = null;
 //	try { XXX
 //	    tf.createEqualityTerm(tf.createVariableTerm(v1), 
 //				  TermBuilder.DF.skip());
@@ -270,22 +262,22 @@ public class TestTermFactory extends TestCase {
     }
 
     public void testSubSortsSubst() {
-	Term t = tf.createFunctionTerm(g, tf.createVariableTerm(v2), 
-				       tf.createVariableTerm(v1));
+	Term t = tf.createTerm(g, new Term[]{tf.createTerm(v2), 
+				             tf.createTerm(v1)});
 	Function c=new Function(new Name("c"), osort2, new Sort[0]);
-	Term st = tf.createSubstitutionTerm(WarySubstOp.SUBST, v2, 
-					    tf.createFunctionTerm(c), t);
+	Term st = TermBuilder.DF.subst(WarySubstOp.SUBST, v2, 
+					    tf.createTerm(c), t);
 	c=new Function(new Name("c"), osort4, new Sort[0]);
-	st = tf.createSubstitutionTerm(WarySubstOp.SUBST, v2, 
-					    tf.createFunctionTerm(c), t);
+	st = TermBuilder.DF.subst(WarySubstOp.SUBST, v2, 
+					    tf.createTerm(c), t);
 	c=new Function(new Name("c"), osort3, new Sort[0]);
-	st = tf.createSubstitutionTerm(WarySubstOp.SUBST, v1, 
-					    tf.createFunctionTerm(c), t);
+	st = TermBuilder.DF.subst(WarySubstOp.SUBST, v1, 
+					    tf.createTerm(c), t);
 	Exception exc=new Exception();
 	try {
 	    c=new Function(new Name("c"), osort1, new Sort[0]);
-	    st = tf.createSubstitutionTerm(WarySubstOp.SUBST, v2, 
-					    tf.createFunctionTerm(c), t);
+	    st = TermBuilder.DF.subst(WarySubstOp.SUBST, v2, 
+					    tf.createTerm(c), t);
 	} catch (TermCreationException e) {
 	    exc=e;	    
 	}
@@ -293,8 +285,8 @@ public class TestTermFactory extends TestCase {
 	exc=new Exception();
 	try {
 	    c=new Function(new Name("c"), osort3, new Sort[0]);
-	    st = tf.createSubstitutionTerm(WarySubstOp.SUBST, v2, 
-					   tf.createFunctionTerm(c), t);
+	    st = TermBuilder.DF.subst(WarySubstOp.SUBST, v2, 
+					   tf.createTerm(c), t);
 	    
 	} catch (TermCreationException e) {
 	    exc=e;	    

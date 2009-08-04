@@ -602,7 +602,7 @@ public class ProblemLoader implements Runnable {
                                      String value, Services services) {
         LogicVariable lv=new LogicVariable(new Name(value),
                                            app.getRealSort(sv, services));
-        Term instance = TermFactory.DEFAULT.createVariableTerm(lv);
+        Term instance = TermFactory.DEFAULT.createTerm(lv);
         return app.addCheckedInstantiation(sv, instance, services,true);
     }
 

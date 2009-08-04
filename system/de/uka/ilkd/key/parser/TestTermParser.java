@@ -110,15 +110,15 @@ public class TestTermParser extends TestCase {
 	// The declaration parser cannot parse LogicVariables; these
 	// are normally declared in quantifiers, so we introduce them
 	// ourselves!
-	x = declareVar("x",elem);   t_x = tf.createVariableTerm(x);  
-	y = declareVar("y",elem);   t_y = tf.createVariableTerm(y);  
-	z = declareVar("z",elem);   t_z = tf.createVariableTerm(z);  
-	xs = declareVar("xs",list); t_xs = tf.createVariableTerm(xs);
-	ys = declareVar("ys",list); t_ys = tf.createVariableTerm(ys);
+	x = declareVar("x",elem);   t_x = tf.createTerm(x);  
+	y = declareVar("y",elem);   t_y = tf.createTerm(y);  
+	z = declareVar("z",elem);   t_z = tf.createTerm(z);  
+	xs = declareVar("xs",list); t_xs = tf.createTerm(xs);
+	ys = declareVar("ys",list); t_ys = tf.createTerm(ys);
 	
-	t_headxs = tf.createFunctionTerm(head,t_xs);
-	t_tailys = tf.createFunctionTerm(tail,t_ys);
-	t_nil = tf.createFunctionTerm(nil);
+	t_headxs = tf.createTerm(head,new Term[]{t_xs}, null, null);
+	t_tailys = tf.createTerm(tail,new Term[]{t_ys}, null, null);
+	t_nil = tf.createTerm(nil);
     }
 
     Sort lookup_sort(String name) {
@@ -161,11 +161,13 @@ public class TestTermParser extends TestCase {
 	    new Recoder2KeY(TacletForTests.services (), 
 	                    nss).parseSpecialClasses();	   
 	    return new KeYParser
-		(ParserMode.PROBLEM, new KeYLexer(new StringReader(s),null),
+		(ParserMode.PROBLEM, 
+	         new KeYLexer(new StringReader(s),null),
 		 "No file. Call of parser from parser/TestTermParser.java",
 		 new ParserConfig(serv, nss),
 		 new ParserConfig(serv, nss),
-		 null, SetAsListOfTaclet.EMPTY_SET,null).problem();	    
+		 null, 
+		 SetAsListOfTaclet.EMPTY_SET).problem();	    
 	} catch (Exception e) {
 	    StringWriter sw = new StringWriter();
 	    PrintWriter pw = new PrintWriter(sw);
@@ -179,7 +181,6 @@ public class TestTermParser extends TestCase {
 	    (ParserMode.TERM, 
 	     new KeYLexer(new StringReader(s), new DefaultExceptionHandler()), 
 	     "No file. Call of parser from parser/TestTermParser.java",
-	     tf, 
 	     r2k,
 	     serv, 
 	     nss, 
@@ -225,20 +226,20 @@ public class TestTermParser extends TestCase {
     }
 
     public void test3() {
-	Term t = tf.createFunctionTerm(cons,t_headxs,t_tailys);
+	Term t = tf.createTerm(cons,t_headxs,t_tailys);
 	
 	assertEquals("parse cons(head(xs),tail(ys))",
 		     t,parseTerm("cons(head(xs),tail(ys))"));
     }
 
     public void test5() {
-	Term t = tf.createEqualityTerm
-	    (tf.createFunctionTerm
+	Term t = tf.createTerm(Equality.EQUALS,
+	    tf.createTerm
 	     (head,
-	      tf.createFunctionTerm(cons, t_x, t_xs)),
-	     tf.createFunctionTerm
+	      tf.createTerm(cons, t_x, t_xs)),
+	     tf.createTerm
 	     (head,
-	      tf.createFunctionTerm (cons,t_x,t_nil)));
+	      tf.createTerm (cons,t_x,t_nil)));
 	     
 	assertEquals("parse head(cons(x,xs))=head(cons(x,nil))",
 		     t,parseFma("head(cons(x,xs))=head(cons(x,nil))"));
@@ -247,14 +248,14 @@ public class TestTermParser extends TestCase {
     }
 
     public void testNotEqual() {
-	Term t = tf.createJunctorTerm(Junctor.NOT,
-	    tf.createEqualityTerm
-	    (tf.createFunctionTerm
+	Term t = tf.createTerm(Junctor.NOT,
+	    tf.createTerm(Equality.EQUALS,
+	    tf.createTerm
 	     (head,
-	      tf.createFunctionTerm(cons, t_x, t_xs)),
-	     tf.createFunctionTerm
+	      tf.createTerm(cons, t_x, t_xs)),
+	     tf.createTerm
 	     (head,
-	      tf.createFunctionTerm (cons,t_x,t_nil))));
+	      tf.createTerm (cons,t_x,t_nil))));
 	     
 	assertEquals("parse head(cons(x,xs))!=head(cons(x,nil))",
 		     t,parseFma("head(cons(x,xs))!=head(cons(x,nil))"));
@@ -262,21 +263,17 @@ public class TestTermParser extends TestCase {
 
 
     public void test6() {
-	Term t = tf.createJunctorTerm
+	Term t = tf.createTerm
 	    (Equality.EQV,
-	     tf.createJunctorTerm
-	     (Junctor.IMP,
-	      tf.createJunctorTerm
-	      (Junctor.OR,
-	       tf.createEqualityTerm(t_x,t_x),
-	       tf.createEqualityTerm(t_y,t_y)),
-	      tf.createJunctorTerm
-	      (Junctor.AND,
-	       tf.createEqualityTerm(t_z,t_z),
-	       tf.createEqualityTerm(t_xs,t_xs))),
-	     tf.createJunctorTerm
-	     (Junctor.NOT,
-	      tf.createEqualityTerm(t_ys,t_ys)));
+	     new Term[]{tf.createTerm(Junctor.IMP,
+		     			     tf.createTerm(Junctor.OR,
+		     				     		  tf.createTerm(Equality.EQUALS, t_x, t_x),
+		     				     		  tf.createTerm(Equality.EQUALS, t_y,t_y)),
+		     		             tf.createTerm(Junctor.AND,
+		     		        	     	          tf.createTerm(Equality.EQUALS, t_z,t_z),
+		     		        	     	          tf.createTerm(Equality.EQUALS, t_xs,t_xs))),
+                         tf.createTerm(Junctor.NOT,
+                         tf.createTerm(Equality.EQUALS, t_ys,t_ys))}, null, null);
 
 	     
 	assertEquals("parse x=x | y=y -> z=z & xs =xs <-> ! ys = ys",
@@ -296,14 +293,13 @@ public class TestTermParser extends TestCase {
 	LogicVariable l1 = (LogicVariable) t.sub(0).varsBoundHere(0)
 	    .getQuantifiableVariable(0);
 
-	Term t1 = tf.createQuantifierTerm
-	    (Quantifier.ALL,thisx,
-	     tf.createQuantifierTerm
-	     (Quantifier.ALL,l1,
-	      tf.createJunctorTerm
+	Term t1 = TermBuilder.DF.all(thisx,
+	     TermBuilder.DF.all(l1,
+	      tf.createTerm
 	      (Junctor.NOT,
-	       tf.createEqualityTerm(tf.createVariableTerm(thisx),
-				     tf.createVariableTerm(l1)))));
+	       tf.createTerm(Equality.EQUALS,
+		             tf.createTerm(thisx),
+		             tf.createTerm(l1)))));
 	
 	assertTrue("new variable in quantifier", thisx != x);
 	assertEquals("parse \\forall list x; \\forall list l1; ! x = l1", t1,t);
@@ -320,13 +316,15 @@ public class TestTermParser extends TestCase {
 	    LogicVariable thisxs = (LogicVariable) t.varsBoundHere(1)
 		.getQuantifiableVariable(0);
 	
-	    Term t1 = tf.createSubstitutionTerm
+	    Term t1 = tf.createTerm
 		(WarySubstOp.SUBST,
-		 thisxs, t_headxs,
-		 tf.createFunctionTerm
-		 (cons, 
-		  tf.createVariableTerm(thisxs), 
-		  t_ys));
+		 new Term[]{t_headxs, tf.createTerm
+        		 (cons, 
+        		  new Term[]{tf.createTerm(thisxs), t_ys},
+        		  	     null,
+        		  	     null)},
+		new ArrayOfQuantifiableVariable(thisxs),
+		null);
 
 	    assertTrue("new variable in subst term", thisxs != xs);
 	    assertEquals("parse {xs:elem head(xs)} cons(xs,ys)",t1,t);
@@ -342,11 +340,10 @@ public class TestTermParser extends TestCase {
 	LogicVariable thisx = (LogicVariable) t.varsBoundHere(0)
 	    .getQuantifiableVariable(0);
 
-	Term t1 = tf.createQuantifierTerm
-	    (Quantifier.EX,thisx,
-	     tf.createJunctorTerm
+	Term t1 = TermBuilder.DF.ex(thisx,
+	     tf.createTerm
 	     (Junctor.NOT,
-	      tf.createFunctionTerm(isempty,tf.createVariableTerm(thisx))));
+	      tf.createTerm(isempty,new Term[]{tf.createTerm(thisx)}, null, null)));
 	      
 	assertTrue("new variable in quantifier", thisx != x);
 	assertEquals("parse \\forall list x; \\forall list l1; ! x = l1", t1,t);

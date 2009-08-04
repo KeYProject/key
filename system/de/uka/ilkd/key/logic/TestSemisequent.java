@@ -16,6 +16,8 @@ import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.logic.sort.Sort;
 
 public class TestSemisequent extends TestCase {
+    
+    private static final TermBuilder TB = TermBuilder.DF;
  
     private ConstrainedFormula[] con;
 
@@ -25,8 +27,6 @@ public class TestSemisequent extends TestCase {
 
 
     public void setUp() { 
-	TermFactory tf=TermFactory.DEFAULT;
-	
        	Function p=new Function(new Name("p"),Sort.FORMULA,new Sort[]{});  
 	Function q=new Function(new Name("q"),Sort.FORMULA,new Sort[]{});
 	Function r=new Function(new Name("r"),Sort.FORMULA,new Sort[]{});
@@ -36,13 +36,13 @@ public class TestSemisequent extends TestCase {
 	Function c=new Function(new Name("c"),Sort.FORMULA,new Sort[]{});
 
 
-	Term t_p=tf.createFunctionTerm(p, new Term[]{});
-	Term t_q=tf.createFunctionTerm(q, new Term[]{});
-	Term t_r=tf.createFunctionTerm(r, new Term[]{});
+	Term t_p=TB.func(p, new Term[]{});
+	Term t_q=TB.func(q, new Term[]{});
+	Term t_r=TB.func(r, new Term[]{});
 
- 	Term t_a=tf.createFunctionTerm(a, new Term[]{});
-	Term t_b=tf.createFunctionTerm(b, new Term[]{});
-	Term t_c=tf.createFunctionTerm(c, new Term[]{});
+ 	Term t_a=TB.func(a, new Term[]{});
+	Term t_b=TB.func(b, new Term[]{});
+	Term t_c=TB.func(c, new Term[]{});
 
 	
 	con=new ConstrainedFormula[7];
@@ -56,7 +56,7 @@ public class TestSemisequent extends TestCase {
 
 	Sort s = new SortImpl(new Name("test"));
 	Function f = new Function(new Name("f"), s, new Sort[]{});
- 	Term t_f = tf.createFunctionTerm(f, new Term[]{});
+ 	Term t_f = TB.func(f, new Term[]{});
     }
        
     public void tearDown() {

@@ -27,13 +27,14 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 
 public class ResolveQuery extends AbstractMetaOperator {
+    
+    private static final TermBuilder TB = TermBuilder.DF;
 
     private Term[] addUpdatesLoc = null;
     private Term[] addUpdatesVal = null;
     private Term addUpdatesTarget;
     private JavaBlock addJavaBlock = null;
     private JavaBlock addDecls = null;
-    private TermFactory tf = TermFactory.DEFAULT;
 //    private boolean stop = false;    
 
     
@@ -81,7 +82,7 @@ public class ResolveQuery extends AbstractMetaOperator {
 	ProgramMethod pm = (ProgramMethod) t.op();
 	if(t.arity() > 0 && !pm.isStatic() && !pm.isConstructor() && 
 	   t.sub(0).sort() instanceof NullSort){
-	    return tf.createJunctorTerm(Junctor.TRUE);
+	    return TB.tt();
 	}
 	addUpdatesLoc = new Term[t.arity()];
 	addUpdatesVal = new Term[t.arity()];
@@ -94,13 +95,13 @@ public class ResolveQuery extends AbstractMetaOperator {
                 createPV("queryReceiver", t.sub(0).sort(), services);
 	// create updates
 	for (int i = 0; i<argPVs.size(); i++) {
-	    addUpdatesLoc[i] = tf.createVariableTerm
+	    addUpdatesLoc[i] = TB.var
 		((ProgramVariable)argPVs.getExpression(i));
 	    addUpdatesVal[i] = 
 		t.sub(i + (pm.isStatic() || pm.isConstructor() ? 0 : 1));
 	}
 	if (!pm.isStatic() || pm.isConstructor()) {
-	    addUpdatesLoc[addUpdatesLoc.length-1] = tf.createVariableTerm(callerPV);
+	    addUpdatesLoc[addUpdatesLoc.length-1] = TB.var(callerPV);
 	    addUpdatesVal[addUpdatesVal.length-1] = t.sub(0);
 	}	
 	// create java block
@@ -144,20 +145,20 @@ public class ResolveQuery extends AbstractMetaOperator {
 		 new VariableSpecification(callerPV));
 	}
 	addDecls = JavaBlock.createJavaBlock(new StatementBlock(vardecls));
-	Term resTerm = tf.createVariableTerm(res);
-	Term eq1 = tf.createEqualityTerm(resTerm, rigidResTerm);
-	Term result = tf.createBoxTerm(addJavaBlock, eq1);
+	Term resTerm = TB.var(res);
+	Term eq1 = TB.equals(resTerm, rigidResTerm);
+	Term result = TB.box(addJavaBlock, eq1);
 	if (addUpdatesLoc!=null && addUpdatesLoc.length>0) {
 	    addUpdatesTarget = result;
 	    result = TB.applyParallel(services, addUpdatesLoc, 
                 addUpdatesVal, addUpdatesTarget);
 	}
 	if (addDecls!=null) {
-	    result = tf.createDiamondTerm(addDecls, result);
+	    result = TB.dia(addDecls, result);
 	}
 	ArrayOfQuantifiableVariable qvs = collectFreeVariables(t);
 	if(qvs.size() > 0){
-	    result = tf.createQuantifierTerm(Quantifier.ALL, qvs, result);
+	    result = TB.all(qvs, result);
 	}
 	return result;
     }

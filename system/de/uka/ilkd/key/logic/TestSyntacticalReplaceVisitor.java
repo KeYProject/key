@@ -22,12 +22,13 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 public class TestSyntacticalReplaceVisitor extends TestCase {
     
+    private static final TermBuilder TB = TermBuilder.DF;    
     
     SVInstantiations insts=null;
 
     Term rw;
     Term t_allxpxpx;
-    private final static TermFactory tf=TermFactory.DEFAULT;
+
 
     public TestSyntacticalReplaceVisitor(String s) {
 	super(s);
@@ -59,16 +60,15 @@ public class TestSyntacticalReplaceVisitor extends TestCase {
 	LogicVariable y=new LogicVariable(new Name("y"), s);
 	Function p=new Function(new Name("p"), Sort.FORMULA, new Sort[]{s});
 
-	Term t_x=tf.createVariableTerm(x);
-	Term t_px=tf.createFunctionTerm(p, t_x);
-	Term t_y=tf.createVariableTerm(y);
-	Term t_py=tf.createFunctionTerm(p, t_y);
+	Term t_x=TB.tf().createTerm(x);
+	Term t_px=TB.tf().createTerm(p, new Term[]{t_x}, null, null);
+	Term t_y=TB.tf().createTerm(y);
+	Term t_py=TB.tf().createTerm(p, new Term[]{t_y}, null, null);
 
 	insts=SVInstantiations.EMPTY_SVINSTANTIATIONS.add(b, t_px).add(v, t_y)
 	    .add(u, t_x).add(c, t_py);
 	
-	t_allxpxpx=tf.createQuantifierTerm(Quantifier.ALL, x, tf.createJunctorTerm
-					   (Junctor.AND, t_px, t_px));
+	t_allxpxpx=TB.all(x, TB.and(t_px, t_px));
 
     }
     

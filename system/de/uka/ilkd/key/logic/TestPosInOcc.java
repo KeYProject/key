@@ -13,31 +13,28 @@ package de.uka.ilkd.key.logic;
 import junit.framework.TestCase;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.LogicVariable;
-import de.uka.ilkd.key.logic.op.Metavariable;
 import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.logic.sort.Sort;
 
-/** class tests the PosInOccurrence
-*/
-
 
 public class TestPosInOcc extends TestCase {
+    
+    private static final TermBuilder TB = TermBuilder.DF;
 
     public TestPosInOcc(String name) {
 	super(name);
     }
 
     public void testIterator () {
-	TermFactory tf=TermFactory.DEFAULT;
 	Sort sort1=new SortImpl(new Name("S1"));
 	LogicVariable x=new LogicVariable(new Name("x"),sort1);  
 	Function f=new Function(new Name("f"),sort1,new Sort[]{sort1});
 	Function p=new Function(new Name("p"),Sort.FORMULA,new Sort[]{sort1});
 
 	Term terms[] = new Term [ 3 ];
-	terms[0]     = tf.createFunctionTerm ( x );
-	terms[1]     = tf.createFunctionTerm ( f, new Term[] { terms[0] } );
-	terms[2]     = tf.createFunctionTerm ( p, new Term[] { terms[1] } );
+	terms[0]     = TB.var ( x );
+	terms[1]     = TB.func ( f, new Term[] { terms[0] } );
+	terms[2]     = TB.func ( p, new Term[] { terms[1] } );
 
 	PosInOccurrence pio = new PosInOccurrence
 	    ( new ConstrainedFormula ( terms[2], Constraint.BOTTOM ),
@@ -82,7 +79,6 @@ public class TestPosInOcc extends TestCase {
 
     
     public void testReplaceConstrainedFormula () {
-        TermFactory tf = TermFactory.DEFAULT;
         Sort sort1 = new SortImpl ( new Name ( "S1" ) );
         LogicVariable x = new LogicVariable ( new Name ( "x" ), sort1 );        
         Function c = new Function ( new Name ( "c" ), sort1, new Sort[] {} );
@@ -94,23 +90,21 @@ public class TestPosInOcc extends TestCase {
                                     new Sort[] { sort1 } );
 
         Term terms[] = new Term[3];
-        terms[0] = tf.createFunctionTerm ( x );
-        terms[1] = tf.createFunctionTerm ( f, new Term[] { terms[0] } );
-        terms[2] = tf.createFunctionTerm ( p, new Term[] { terms[1] } );
+        terms[0] = TB.var( x );
+        terms[1] = TB.func ( f, new Term[] { terms[0] } );
+        terms[2] = TB.func ( p, new Term[] { terms[1] } );
         ConstrainedFormula cfma = new ConstrainedFormula ( terms[2] );
 
         Term terms2[] = new Term[4];
-        terms2[0] = tf.createFunctionTerm ( c );
-        terms2[1] = tf.createFunctionTerm ( f, new Term[] { terms2[0] } );
-        terms2[2] = tf.createFunctionTerm ( f, new Term[] { terms2[1] } );
-        terms2[3] = tf.createFunctionTerm ( p, new Term[] { terms2[2] } );
+        terms2[0] = TB.func ( c );
+        terms2[1] = TB.func ( f, new Term[] { terms2[0] } );
+        terms2[2] = TB.func ( f, new Term[] { terms2[1] } );
+        terms2[3] = TB.func ( p, new Term[] { terms2[2] } );
         ConstrainedFormula cfma2 = new ConstrainedFormula ( terms2[3] );
 
         final PosInOccurrence topPIO = new PosInOccurrence ( cfma,
                                                              PosInTerm.TOP_LEVEL,
                                                              true );
-
-
 
 
         // Test without metavariables involved

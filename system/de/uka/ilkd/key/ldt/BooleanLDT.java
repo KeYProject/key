@@ -15,10 +15,7 @@ import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.expression.literal.BooleanLiteral;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Namespace;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermFactory;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.util.Debug;
@@ -43,9 +40,9 @@ public final class BooleanLDT extends LDT {
         super((Sort)sorts.lookup(NAME), PrimitiveType.JAVA_BOOLEAN);
         
         bool_true       = addFunction((Function)functions.lookup(new Name("TRUE")));
-	term_bool_true  = TermFactory.DEFAULT.createFunctionTerm(bool_true);
+	term_bool_true  = TermBuilder.DF.func(bool_true);
 	bool_false      = addFunction((Function)functions.lookup(new Name("FALSE")));
-	term_bool_false = TermFactory.DEFAULT.createFunctionTerm(bool_false);
+	term_bool_false = TermBuilder.DF.func(bool_false);
     }
     
     

@@ -59,18 +59,18 @@ public class TestTermOrdering extends TestCase {
     }
     
     private Term term_const(Operator op){
-	return tf.createFunctionTerm(op);
+	return tf.createTerm(op);
     }
 
     // f(t)
     private Term term_f(Term t){
-	Term t_ft=tf.createFunctionTerm(f, t);
+	Term t_ft=tf.createTerm(f, t);
 	return t_ft;
     }
     
     // g(t, t2)
     private Term term_g(Term t, Term t2){
-	Term t_g=tf.createFunctionTerm(g, new Term[] {t, t2});
+	Term t_g=tf.createTerm(g, new Term[] {t, t2});
 	return t_g;
     }    
 

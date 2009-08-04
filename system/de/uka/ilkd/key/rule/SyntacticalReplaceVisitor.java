@@ -57,9 +57,6 @@ public final class SyntacticalReplaceVisitor extends Visitor {
     private final TermFactory tf = TermFactory.DEFAULT;
     private final Boolean newMarker = new Boolean(true);
     
-    /** used to indicate if variables have changed */
-    private final BooleanContainer varsChanged = new BooleanContainer();
-    
     /** an empty array for resource optimisation*/
     private static final 
       QuantifiableVariable[] EMPTY_QUANTIFIABLE_VARS = new QuantifiableVariable[0];
@@ -386,50 +383,39 @@ public final class SyntacticalReplaceVisitor extends Visitor {
 	return op;
     }
     
-    private ArrayOfQuantifiableVariable[] instantiateBoundVariables(Term visited) {
-        boolean containsBoundVars = false;
-        ArrayOfQuantifiableVariable[] boundVars = 
-            new ArrayOfQuantifiableVariable[visited.arity()];
+    private ArrayOfQuantifiableVariable instantiateBoundVariables(Term visited) {
+        final ArrayOfQuantifiableVariable vBoundVars = visited.boundVars();
+        final QuantifiableVariable[] newVars = (vBoundVars.size() > 0)? 
+        	new QuantifiableVariable[vBoundVars.size()]
+        	                         : EMPTY_QUANTIFIABLE_VARS;
+        boolean varsChanged = false;
 
-        for (int i = 0, arity = visited.arity(); i < arity; i++) {
-            final ArrayOfQuantifiableVariable vBoundVars =
-                visited.varsBoundHere(i);
-        
-            final QuantifiableVariable[] newVars = (vBoundVars.size() > 0)? 
-                    new QuantifiableVariable[vBoundVars.size()]
-                    : EMPTY_QUANTIFIABLE_VARS;
-                    
-            for (int j = 0, size = vBoundVars.size(); j < size; j++) {                 
-                containsBoundVars = true;
-                QuantifiableVariable boundVar = vBoundVars.getQuantifiableVariable(j);
-                if (boundVar instanceof SchemaVariable) {
-                    final SchemaVariable boundSchemaVariable = 
-                        (SchemaVariable) boundVar;
-                    if (svInst.isInstantiated(boundSchemaVariable)) {
-                        boundVar = ((QuantifiableVariable) ((Term) svInst
-                                .getInstantiation(boundSchemaVariable))
-                                .op());
-                    } else {
-                        if (forceSVInst) {
-                            boundVar = createTemporaryLV(boundSchemaVariable);
-                        } else {
-                            // this case may happen for PO generation of
-                            // taclets
-                            boundVar = (QuantifiableVariable)boundSchemaVariable;
-                        }
-                    }
-                    varsChanged.setVal(true);
-                } 
-                newVars[j] = boundVar;                    
-            }
-            boundVars[i] =  varsChanged.val() ?                     
-                    new ArrayOfQuantifiableVariable(newVars) : vBoundVars;                
-        }           
-        
-        if (!containsBoundVars) {
-            boundVars = null;
+        for(int j = 0, size = vBoundVars.size(); j < size; j++) {                 
+            QuantifiableVariable boundVar = vBoundVars.getQuantifiableVariable(j);
+            if (boundVar instanceof SchemaVariable) {
+        	final SchemaVariable boundSchemaVariable = 
+        	    (SchemaVariable) boundVar;
+        	if (svInst.isInstantiated(boundSchemaVariable)) {
+        	    boundVar = ((QuantifiableVariable) ((Term) svInst
+        		    .getInstantiation(boundSchemaVariable))
+        		    .op());
+        	} else {
+        	    if (forceSVInst) {
+        		boundVar = createTemporaryLV(boundSchemaVariable);
+        	    } else {
+        		// this case may happen for PO generation of
+        		// taclets
+        		boundVar = (QuantifiableVariable)boundSchemaVariable;
+        	    }
+        	}
+        	varsChanged = true;
+            } 
+            newVars[j] = boundVar;                    
         }
-        return boundVars;
+        
+        return  varsChanged                     
+        	? new ArrayOfQuantifiableVariable(newVars) 
+                : vBoundVars;                
     }
     
 
@@ -479,13 +465,14 @@ public final class SyntacticalReplaceVisitor extends Visitor {
             }
             
            // instantiate bound variables            
-           varsChanged.setVal(false); // reset variable change flag
-           final ArrayOfQuantifiableVariable[] boundVars = 
+           final ArrayOfQuantifiableVariable boundVars = 
                instantiateBoundVariables(visited);
             
             Term[] neededsubs = neededSubs(newOp.arity());
-            if (varsChanged.val() || jblockChanged || operatorInst
-                    || (!subStack.empty() && subStack.peek() == newMarker)) {
+            if (boundVars != visited.boundVars() 
+        	 || jblockChanged 
+        	 || operatorInst
+                 || (!subStack.empty() && subStack.peek() == newMarker)) {
         	Term newTerm;
         	if(newOp instanceof ElementaryUpdate) { //XXX, weird integers
         	    newTerm = TermBuilder.DF.elementary(services, ((ElementaryUpdate)newOp).lhs(), neededsubs[0]);
@@ -518,7 +505,7 @@ public final class SyntacticalReplaceVisitor extends Visitor {
                                                     realSort );
         
         newInstantiations = newInstantiations.put ( boundSchemaVariable,
-                                                    tf.createVariableTerm ( v ) );
+                                                    tf.createTerm ( v ) );
         return v;
     }
 
@@ -569,7 +556,7 @@ public final class SyntacticalReplaceVisitor extends Visitor {
                 newInstantiations = null;
                 return false;
             } else {
-                t = tf.createFunctionTerm ( mv );
+                t = tf.createTerm ( mv );
                 newInstantiations = newInstantiations.put ( sv, t );
             }
         }

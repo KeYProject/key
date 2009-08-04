@@ -36,7 +36,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
  */
 class ReplacerOfQuanVariablesWithMetavariables {
 
-	final private static TermBuilder tb = TermBuilder.DF;
+    final private static TermBuilder tb = TermBuilder.DF;
 
     private ReplacerOfQuanVariablesWithMetavariables () {}
     
@@ -51,7 +51,7 @@ class ReplacerOfQuanVariablesWithMetavariables {
             Term m;
             if ( op == Quantifier.ALL ) {
                 Metavariable mv = new Metavariable ( ARBITRARY_NAME, q.sort () );
-                m = tb.func ( mv );
+                m = tb.var ( mv );
             } else {
                 Function f = new Function ( ARBITRARY_NAME, q.sort (),
                                             new Sort [0] );

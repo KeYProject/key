@@ -26,6 +26,8 @@ import org.apache.log4j.Logger;
 public abstract class AbstractSMTTranslator implements SMTTranslator {
     static Logger logger = Logger.getLogger(AbstractSMTTranslator.class
 	    .getName());
+    
+    private static final TermBuilder TB = TermBuilder.DF;
 
     private Sort jbyteSort;
 
@@ -1024,7 +1026,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 	    //invent a new constant
 	    LogicVariable c = new LogicVariable(new Name("iteConst"), iteTerm.sort());
 	    //translate the constant
-	    Term t = new TermFactory().createVariableTerm(c);
+	    Term t = TermBuilder.DF.var(c);
 	    StringBuffer cstr = this.translateTerm(t, quantifiedVars, services);
 	    //build an assumption used to specify how c can be used
 	    StringBuffer assump = this.translateObjectEqual(cstr, ifterm);
@@ -1367,8 +1369,6 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 
 	//if the program comes here, term has to be translated.
 	
-	TermFactory tf = new TermFactory();
-
 	//Collect all free Variable in the term
 	QuantifiableVariable[] args = t.freeVars().toArray();
 	Term[] subs = new Term[args.length];
@@ -1377,7 +1377,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 	    QuantifiableVariable qv = args[i];
 	    if (qv instanceof LogicVariable) {
 		LogicVariable lv = (LogicVariable)qv;
-		subs[i] = tf.createVariableTerm(lv);
+		subs[i] = TB.var(lv);
 		argsorts[i] = lv.sort();
 	    } else {
 		logger.error("Schema variable found in formula.");
@@ -1387,7 +1387,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 	Function fun = new Function(new Name("modConst"), t.sort(), argsorts);
 	
 	//Build the final predicate
-	Term temp = tf.createFunctionTerm(fun, subs);
+	Term temp = TB.func(fun, subs);
 	
 	//translate the predicate
 	StringBuffer cstr = this.translateTerm(temp, quantifiedVars, services);

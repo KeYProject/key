@@ -176,8 +176,6 @@ public final class RewriteTaclet extends FindTaclet {
 	if (it.hasNext()) {	    
 	    int sub = it.next();
 	    
-	    ArrayOfQuantifiableVariable[] origvars = 
-	        new ArrayOfQuantifiableVariable[term.arity()];
 	    final Term[] subs = new Term[term.arity()];
 	    
 	    for (int i=0, arity = term.arity(); i<arity; i++) {
@@ -189,26 +187,18 @@ public final class RewriteTaclet extends FindTaclet {
 		    subs[i] = replace(term.sub(i), with, it, services, 
 		            mc, newMaxSort);
 		}
-		origvars[i] = term.varsBoundHere(i);
 	    }	    	    	    	    	    
  	    
 	    return TermFactory.DEFAULT.createTerm(term.op(), 
-	            subs, origvars, term.javaBlock());
+	            subs, term.boundVars(), term.javaBlock());
 	} 
                                       
 	with = syntacticalReplace(with, services, mc);   
 
-        
-        if (maxSort instanceof AbstractSort) {
-            final boolean noCastNecessary = with.sort().extendsTrans(maxSort);            
-            if (!noCastNecessary) {
-                with = TermBuilder.DF.cast(services, (Sort)maxSort, with);
-           }
-
-        } else {
-            // maybe move getCastSymbol to sort interface 
-            // in the meantime no casts are inserted
-        }
+               
+	if (!with.sort().extendsTrans(maxSort)) {
+	    with = TermBuilder.DF.cast(services, maxSort, with);
+	}
         
 	return with;
     }

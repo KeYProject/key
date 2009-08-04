@@ -107,7 +107,7 @@ public class TestTacletParser extends TestCase {
 	return new KeYParser
 	    (ParserMode.TACLET,new KeYLexer(new StringReader(s), null), 
 	     "No file. parser/TestTacletParser.stringTacletParser("+s+")",  
-	     tf, services, nss);
+	     services, nss);
     }
 
     public Term parseTerm(String s) {

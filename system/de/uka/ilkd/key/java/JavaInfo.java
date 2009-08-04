@@ -559,7 +559,7 @@ public class JavaInfo {
 					       +" in "+className+" must have"
 					       +" a non-void type.");
 	}
-	return TermFactory.DEFAULT.createFunctionTerm(pm, subs);
+	return TermBuilder.DF.tf().createTerm(pm, subs);
     }
 
 
@@ -1104,7 +1104,7 @@ public class JavaInfo {
      */
     public Term getNullConst() {
 	if (nullConst==null) {
-	    nullConst=TermFactory.DEFAULT.createFunctionTerm(Function.NULL);
+	    nullConst=TermBuilder.DF.func(Function.NULL);
 	}
 	return nullConst;
     }

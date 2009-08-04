@@ -75,7 +75,7 @@ public class KeYUserProblemFile extends KeYFile implements ProofOblInput{
             KeYParser problemParser = new KeYParser
                 (ParserMode.PROBLEM, new KeYLexer(getNewStream(),
                         initConfig.getServices().getExceptionHandler()), 
-                        file.toString(), pc, pc, null, null, null);    
+                        file.toString(), pc, pc, null, null);    
             problemParser.parseWith();            
         
             settings.getChoiceSettings().
@@ -115,8 +115,7 @@ public class KeYUserProblemFile extends KeYFile implements ProofOblInput{
                                     schemaConfig, 
                                     normalConfig,
                                     initConfig.getTaclet2Builder(),
-                                    initConfig.getTaclets(), 
-                                    initConfig.getActivatedChoices()); 
+                                    initConfig.getTaclets()); 
             problemTerm = problemParser.parseProblem();
             String searchS = "\\problem";            
 

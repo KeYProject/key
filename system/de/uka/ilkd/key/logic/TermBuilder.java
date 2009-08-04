@@ -30,8 +30,8 @@ public final class TermBuilder {
     public static final TermBuilder DF = new TermBuilder();
     
     private static final TermFactory tf = TermFactory.DEFAULT;    
-    private static final Term tt = TermFactory.DEFAULT.createJunctorTerm(Junctor.TRUE); 
-    private static final Term ff = TermFactory.DEFAULT.createJunctorTerm(Junctor.FALSE); 
+    private static final Term tt = TermFactory.DEFAULT.createTerm(Junctor.TRUE); 
+    private static final Term ff = TermFactory.DEFAULT.createTerm(Junctor.FALSE); 
 
     
     private TermBuilder() {
@@ -45,93 +45,86 @@ public final class TermBuilder {
     
     
     //-------------------------------------------------------------------------
-    //general term constructors
+    //constructors for special classes of term operators
     //-------------------------------------------------------------------------
     
     public Term var(LogicVariable v) {
-        return tf.createVariableTerm(v);
+        return tf.createTerm(v);
     }
     
     
     public Term var(ProgramVariable v) { 
-	if(v.isMember()) {
-	    throw new TermCreationException("Cannot create term for \"member\" program variables. Use field symbols!");
-	}
-        return tf.createVariableTerm(v);
+//	if(v.isMember()) {
+//	    throw new TermCreationException(
+//		    "Cannot create term for \"member\" "
+//		    + "program variable \"" + v + "\". Use field symbols "
+//		    + "like your mother told you!");
+//	}
+        return tf.createTerm(v);
     }
     
     
     public Term var(SchemaVariable v) {
-	return tf.createVariableTerm(v);
+	return tf.createTerm(v);
     }
     
     
     public Term var(ParsableVariable v) {
-	if(v instanceof ProgramVariable) {
-	    return var((ProgramVariable) v);
-	} else if(v instanceof LogicVariable) {
-	    return var((LogicVariable) v);
-	} else if(v instanceof SchemaVariable) {
-	    return var((SchemaVariable) v); 
-	} else {
-	    throw new TermCreationException("Wrong parsablevariable kind: " 
-	                                    + v.getClass());
-	}
+	return tf.createTerm(v);
     }
 
     
-    public Term func(Operator op) {
-        return tf.createFunctionTerm(op);
+    public Term func(Function f) {
+        return tf.createTerm(f);
     }
     
     
-    public Term func(Operator op, Term s) {
-        return tf.createFunctionTerm(op, s);
+    public Term func(Function f, Term s) {
+        return tf.createTerm(f, s);
     }
     
     
-    public Term func(Operator op, Term s1, Term s2) {
-        return tf.createFunctionTerm(op, s1, s2);
+    public Term func(Function f, Term s1, Term s2) {
+        return tf.createTerm(f, s1, s2);
     }
     
     
-    public Term func(Operator op, Term[] s) {
-        return tf.createFunctionTerm(op, s);
+    public Term func(Function f, Term[] s) {
+        return tf.createTerm(f, s, null, null);
     }
     
-    public Term func(Operator op, Term[] s, ArrayOfQuantifiableVariable boundVars) {
-        return tf.createTerm(op, s, new ArrayOfQuantifiableVariable[]{boundVars}, null);//TODO
-    }    
+    public Term func(Function f, 
+	    	     Term[] s, 
+	    	     ArrayOfQuantifiableVariable boundVars) {
+        return tf.createTerm(f, s, boundVars, null);
+    }
+    
+    
+    public Term mod(Modality mod, JavaBlock jb, Term t) {
+	return tf.createTerm(mod, new Term[]{t}, null, jb);
+    }
     
     
     public Term box(JavaBlock jb, Term t) {
-        return tf.createBoxTerm(jb, t);
+        return mod(Modality.BOX, jb, t);
     }
     
     
     public Term dia(JavaBlock jb, Term t) {
-        return tf.createDiamondTerm(jb, t);
+        return mod(Modality.DIA, jb, t);
     }
     
-    
-    public Term prog(Modality mod, JavaBlock jb, Term t) {
-        return tf.createProgramTerm(mod, jb, t);
-    }
-
     
     public Term ife(Term cond, Term _then, Term _else) {        
-        return tf.createIfThenElseTerm(cond, _then, _else);
+        return tf.createTerm(IfThenElse.IF_THEN_ELSE, 
+        	             new Term[]{cond, _then, _else});
     }
     
     
     public Term cast(Services services, Sort s, Term t) {
-	return func(s.getCastSymbol(services), t);
+	return tf.createTerm(s.getCastSymbol(services), t);
     }
     
-    
-    //-------------------------------------------------------------------------
-    //logical operators    
-    //-------------------------------------------------------------------------
     
     public Term tt() {
         return tt;
@@ -143,50 +136,86 @@ public final class TermBuilder {
     }
     
 
-    public Term all(QuantifiableVariable qv, Term t2) {
-        if ( !t2.freeVars().contains ( qv ) ) return t2;
-        return tf.createQuantifierTerm ( Quantifier.ALL, qv, t2 );
+    public Term all(QuantifiableVariable qv, Term t) {
+        return tf.createTerm(Quantifier.ALL, 
+    	                     new ArrayOfTerm(t), 
+    	                     new ArrayOfQuantifiableVariable(qv), 
+    	                     null);
     }
+    
+    
+    public Term all(ArrayOfQuantifiableVariable qv, Term t2) {
+	if(qv.size() == 0) {
+	    throw new TermCreationException("Cannot quantify over 0 variables");
+	}
+        Term result = t2;
+        for (int i = qv.size() - 1; i >= 0; i--) {
+            result = all(qv.getQuantifiableVariable(i), result); 
+        }
+        return result;
+    }    
     
     
     public Term all(QuantifiableVariable[] qv, Term t2) {
+	return all(new ArrayOfQuantifiableVariable(qv), t2);
+    }
+    
+    
+    public Term ex(QuantifiableVariable qv, Term t) {
+	return tf.createTerm(Quantifier.EX, 
+			     new ArrayOfTerm(t),
+			     new ArrayOfQuantifiableVariable(qv),
+			     null);
+    }
+    
+    
+    public Term ex(ArrayOfQuantifiableVariable qv, Term t2) {
+	if(qv.size() == 0) {
+	    throw new TermCreationException("Cannot quantify over 0 variables");
+	}	
         Term result = t2;
-        for (int i = qv.length-1; i>=0; i--) {
-            result = all(qv[i], result); 
+        for (int i = qv.size() - 1; i >= 0; i--) {
+            result = ex(qv.getQuantifiableVariable(i), result); 
         }
         return result;
-    }
-    
-    
-    public Term ex(QuantifiableVariable qv, Term t2) {
-        if ( !t2.freeVars().contains ( qv ) ) return t2;
-        return tf.createQuantifierTerm(Quantifier.EX, qv, t2);
-    }
+    }        
     
     
     public Term ex(QuantifiableVariable[] qv, Term t2) {
-        Term result = t2;
-        for (int i=qv.length-1; i>=0; i--) {
-            result = ex(qv[i], result);
-        }
-        return result;
+        return ex(new ArrayOfQuantifiableVariable(qv), t2);
     }
     
     
     public Term not(Term t) {
-        return tf.createJunctorTermAndSimplify(Junctor.NOT, t);
+	if(t.op() == Junctor.TRUE) {
+	    return ff();
+	} else if(t.op() == Junctor.FALSE) {
+	    return tt();
+	} else if(t.op() == Junctor.NOT) {
+	    return t.sub(0);
+	} else {
+	    return tf.createTerm(Junctor.NOT, t);
+	}
     }
     
     
     public Term and(Term t1, Term t2) {
-        return tf.createJunctorTermAndSimplify(Junctor.AND, t1, t2);
+	if(t1.op() == Junctor.FALSE || t2.op() == Junctor.FALSE) {
+	    return ff();
+	} else if(t1.op() == Junctor.TRUE) {
+	    return t2;
+	} else if(t2.op() == Junctor.TRUE) {
+	    return t1;
+	} else {
+	    return tf.createTerm(Junctor.AND, t1, t2);
+	}
     }
 
     
     public Term and(Term[] subTerms) {
         Term result = tt();
-        for (int i=0; i<subTerms.length; i++) {
-            result = and( result, subTerms[i]);
+        for(int i = 0; i < subTerms.length; i++) {
+            result = and(result, subTerms[i]);
         }
 
         return result;
@@ -195,62 +224,94 @@ public final class TermBuilder {
     
     public Term and(ListOfTerm subTerms) {
 	Term result = tt();
-	IteratorOfTerm it = subTerms.iterator();
-	while(it.hasNext()) {
-	    result = and(result, it.next());
+	for(Term sub : subTerms) {
+	    result = and(result, sub);
 	}
 	return result;
     }
     
     
     public Term or(Term t1, Term t2) {
-        return tf.createJunctorTermAndSimplify(Junctor.OR, t1, t2);
+	if(t1.op() == Junctor.TRUE || t2.op() == Junctor.TRUE) {
+	    return tt();
+	} else if(t1.op() == Junctor.FALSE) {
+	    return t2;
+	} else if(t2.op() == Junctor.FALSE) {
+	    return t1;
+	} else {
+	    return tf.createTerm(Junctor.OR, t1, t2);
+	}
     }
     
     
     public Term or(Term[] subTerms) {
         Term result = ff();
-        for (int i=0; i<subTerms.length; i++) {
-            result = or( result, subTerms[i]);
+        for(int i = 0; i < subTerms.length; i++) {
+            result = or(result, subTerms[i]);
         }
-
         return result;
     }
     
     
     public Term or(ListOfTerm subTerms) {
 	Term result = ff();
-	IteratorOfTerm it = subTerms.iterator();
-	while(it.hasNext()) {
-	    result = or(result, it.next());
+	for(Term sub : subTerms) {
+	    result = or(result, sub);
 	}
 	return result;
     }
 
     
     public Term imp(Term t1, Term t2) {
-        return tf.createJunctorTermAndSimplify(Junctor.IMP, t1, t2);
+	if(t1.op() == Junctor.FALSE || t2.op() == Junctor.TRUE) {
+	    return tt();
+	} else if(t1.op() == Junctor.TRUE) {
+	    return t2;
+	} else if(t2.op() == Junctor.FALSE) {
+	    return not(t1);
+	} else {
+	    return tf.createTerm(Junctor.IMP, t1, t2);
+	}
     }
     
     
+    /** 
+     * Creates a term with the correct equality symbol for
+     * the sorts involved
+     */
     public Term equals(Term t1, Term t2) {
-        if (t1.sort() == Sort.FORMULA ||
-                t2.sort() == Sort.FORMULA) {
-            throw new TermCreationException("Equals is defined betweens terms, not forumulas: " + 
-                    t1 + ", " + t2);
-        }
-        if ( t1.equals ( t2 ) ) return tt ();
-        return tf.createEqualityTerm ( t1, t2 );
+	if(t1.sort() == Sort.FORMULA) {
+            if(t1.op() == Junctor.TRUE) {
+        	return t2;
+            } else if(t2.op() == Junctor.TRUE) {
+        	return t1;
+            } else if(t1.op() == Junctor.FALSE) {
+                return not(t2);
+            } else if(t2.op() == Junctor.FALSE) {
+                return not(t1);
+            } else {
+        	return tf.createTerm(Equality.EQV, t1, t2);
+            }
+	} else {
+	    return tf.createTerm(Equality.EQUALS, t1, t2);
+	} 
     }
     
     
-    public Term equiv(Term t1, Term t2) {
-        if (t1.sort() != Sort.FORMULA ||
-                t2.sort() != Sort.FORMULA) {
-            throw new TermCreationException("Equivalence is defined on formulas not terms: " + 
-                    t1 + ", " + t2);
-        }
-        return tf.createJunctorTermAndSimplify(Equality.EQV, t1, t2);
+    /** 
+     * Creates a substitution term
+     * @param substVar the QuantifiableVariable to be substituted
+     * @param substTerm the Term that replaces substVar
+     * @param origTerm the Term that is substituted
+     */
+    public Term subst(SubstOp op, 
+	              QuantifiableVariable substVar, 
+	              Term substTerm, 
+	              Term origTerm) {
+	return tf.createTerm(op, 
+		             new ArrayOfTerm(new Term[]{substTerm, origTerm}), 
+		             new ArrayOfQuantifiableVariable(substVar), 
+		             null);
     }
     
     
@@ -262,19 +323,19 @@ public final class TermBuilder {
     public Term elementary(Services services, 
 	                   UpdateableOperator lhs, 
 	                   Term rhs) {
-	SortedOperator op = ElementaryUpdate.getInstance(lhs);
+	ElementaryUpdate eu = ElementaryUpdate.getInstance(lhs);
 	
 	//XXX, weird integers
 	if(services.getTypeConverter().getIntegerLDT() != null) {
 	    Sort intSort = services.getTypeConverter().getIntegerLDT().targetSort();	
-	    if(!rhs.sort().extendsTrans(op.argSort(0))
-	        && op.argSort(0).extendsTrans(intSort)
+	    if(!rhs.sort().extendsTrans(eu.argSort(0))
+	        && eu.argSort(0).extendsTrans(intSort)
 	        && rhs.sort().extendsTrans(intSort)) {
-		rhs = cast(services, op.argSort(0), rhs);
+		rhs = cast(services, eu.argSort(0), rhs);
 	    }
 	}
 	
-	return func(op, rhs);
+	return tf.createTerm(eu, rhs);
     }
     
     
@@ -302,7 +363,7 @@ public final class TermBuilder {
     
     
     public Term skip() {
-	return func(UpdateJunctor.SKIP);
+	return tf.createTerm(UpdateJunctor.SKIP);
     }
     
     
@@ -317,7 +378,7 @@ public final class TermBuilder {
 	} else if(u2.op() == UpdateJunctor.SKIP) {
 	    return u1;
 	}
-	return func(UpdateJunctor.PARALLEL_UPDATE, u1, u2);
+	return tf.createTerm(UpdateJunctor.PARALLEL_UPDATE, u1, u2);
     }
     
     
@@ -371,9 +432,9 @@ public final class TermBuilder {
 	} else if(update.op() == UpdateJunctor.SKIP) {
 	    return target;
 	} else {
-	    return tf.createFunctionTerm(UpdateApplication.UPDATE_APPLICATION,
-		                         update, 
-		                         target);
+	    return tf.createTerm(UpdateApplication.UPDATE_APPLICATION,
+		        	 update, 
+		        	 target);
 	}
     }
     
@@ -442,25 +503,25 @@ public final class TermBuilder {
     
     public Term geq(Term t1, Term t2, Services services) {
         final IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();
-        return tf.createFunctionTerm(integerLDT.getGreaterOrEquals(), t1, t2);
+        return func(integerLDT.getGreaterOrEquals(), t1, t2);
     }
     
     
     public Term gt(Term t1, Term t2, Services services) {
         final IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();
-        return tf.createFunctionTerm(integerLDT.getGreaterThan(), t1, t2);
+        return func(integerLDT.getGreaterThan(), t1, t2);
     }
     
     
     public Term lt(Term t1, Term t2, Services services) {
         final IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();
-        return tf.createFunctionTerm(integerLDT.getLessThan(), t1, t2);
+        return func(integerLDT.getLessThan(), t1, t2);
     }    
     
     
     public Term leq(Term t1, Term t2, Services services) {
         final IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();
-        return tf.createFunctionTerm(integerLDT.getLessOrEquals(), t1, t2);
+        return func(integerLDT.getLessOrEquals(), t1, t2);
     }    
     
     
@@ -571,7 +632,7 @@ public final class TermBuilder {
 		= services.getTypeConverter()
 		          .getSetLDT()
 		          .getSetComprehension();
-	return tf.createTerm(f, new Term[]{a,s}, new ArrayOfQuantifiableVariable[]{new ArrayOfQuantifiableVariable(qv)}, null);
+	return tf.createTerm(f, new Term[]{a,s}, new ArrayOfQuantifiableVariable(qv), null);
     }
     
     
@@ -692,10 +753,6 @@ public final class TermBuilder {
         final Sort elementSort;
         if(ref.sort() instanceof ArraySort) {
             elementSort = ((ArraySort) ref.sort()).elementSort();
-        } else if(ref.sort() instanceof GenericSort 
-        	  || ref.sort() instanceof ProgramSVSort
-        	  || ref.sort() == AbstractMetaOperator.METASORT) {
-            elementSort = ref.sort();//XXX
         } else {
             throw new TermCreationException("Tried to build an array access "+
                     "on an inacceptable sort: " + ref.sort().getClass() + "\n" +
@@ -767,6 +824,5 @@ public final class TermBuilder {
 		                qv, 
 		                ife(cond, pair(services, o, f), empty(services)),
 		                allLocs(services));
-    }
-    
+    }    
 }

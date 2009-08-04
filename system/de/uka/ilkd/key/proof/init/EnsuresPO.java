@@ -297,7 +297,7 @@ public abstract class EnsuresPO extends AbstractPO {
                                       exceptionVar);
         
         //create program term
-        Term programTerm = TF.createProgramTerm(modality, jb, postTerm);
+        Term programTerm = TB.mod(modality, jb, postTerm);
         
         //add updates
         Term[] locs   = new Term[parVars.length];

@@ -14,10 +14,7 @@ import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.expression.literal.IntLiteral;
 import de.uka.ilkd.key.java.expression.literal.StringLiteral;
 import de.uka.ilkd.key.ldt.LDT;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Namespace;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermFactory;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.util.ExtList;
 
@@ -45,7 +42,7 @@ public  class StringConverter{
 	    assert epsilon != null;
 	    assert cat != null;
 	    ppCat = cat;
-	    Term  term_epsilon=TermFactory.DEFAULT.createFunctionTerm(epsilon);
+	    Term  term_epsilon=TermBuilder.DF.func(epsilon);
 
 	    char[] charArray;
 	    Term result = term_epsilon;
@@ -55,7 +52,7 @@ public  class StringConverter{
 	    else return null;
 	    if (intLDT==null) throw new IllegalArgumentException("IntLDT is needed for StringLiteral translation");//return term_epsilon;
 	    for (int i= charArray.length-2;i>=1;i--){
-		result = TermFactory.DEFAULT.createFunctionTerm(cat,
+		result = TermBuilder.DF.func(cat,
 		    intLDT.translateLiteral(new IntLiteral(charArray[i])),result);
 	    }
 	    return result;

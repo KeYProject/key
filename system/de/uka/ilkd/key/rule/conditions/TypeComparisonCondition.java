@@ -87,6 +87,10 @@ public final class TypeComparisonCondition extends VariableConditionAdapter {
     private boolean checkSorts(final Sort fstSort, final Sort sndSort, Services services) {
         switch (mode) {
         case SAME:
+            if(fstSort instanceof GenericSort || sndSort instanceof GenericSort) {
+        	System.out.println("COMPARING: " + fstSort + " and " + sndSort);
+        	System.out.println(fstSort == sndSort);
+            }
             return fstSort == sndSort;
         case NOT_SAME:
             return fstSort != sndSort;

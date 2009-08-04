@@ -155,6 +155,9 @@ public final class SortDependingFunction extends Function {
 	    return this;
 	}
 	
+	assert !(sortDependingOn instanceof ProgramSVSort);
+	assert sortDependingOn != AbstractMetaOperator.METASORT;
+	
 	SortDependingFunction result 
 		= (SortDependingFunction) 
 		      services.getNamespaces()

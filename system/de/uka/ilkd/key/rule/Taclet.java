@@ -1290,8 +1290,8 @@ public abstract class Taclet implements Rule, Named {
 	    p_numberOfNewGoals = 1;
 
 	if ( p_list != null ) {
-	    int                              i      = ifSequent ().antecedent ().size ();
-	    Term                             ifPart;
+	    int i = ifSequent ().antecedent ().size ();
+	    Term ifPart;
 
 	    for (final IfFormulaInstantiation inst : p_list) {
 		if ( !( inst instanceof IfFormulaInstSeq ) ) {
@@ -1300,14 +1300,13 @@ public abstract class Taclet implements Rule, Named {
 
 		    // negate formulas of the if succedent
 		    if ( i <= 0 )
-			ifPart = TermFactory.DEFAULT.createJunctorTerm
-			    ( Junctor.NOT, ifPart );		    
+			ifPart = TB.not(ifPart);		    
 
 		    if ( res == null ) {
 			res   = p_goal.split( p_numberOfNewGoals + 1 );
 			ifObl = ifPart;
 		    } else
-			ifObl = TermFactory.DEFAULT.createJunctorTerm
+			ifObl = TermFactory.DEFAULT.createTerm
 			    ( Junctor.AND, ifObl, ifPart );
 		    
 		    // UGLY: We create a flat structure of the new

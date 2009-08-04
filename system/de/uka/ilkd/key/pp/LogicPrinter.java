@@ -885,11 +885,6 @@ public final class LogicPrinter {
             
             final Term objectTerm = t.sub(1);
             final Term fieldTerm  = t.sub(2);
-            final String fieldOpName = fieldTerm.op().name().toString();            
-            final String shortFieldName
-                    =  fieldOpName.contains("::")
-                       ? fieldOpName.substring(fieldOpName.indexOf("::") + 2)
-                       : fieldOpName;            
                 
             markStartSub();
             //heap not printed
@@ -938,7 +933,7 @@ public final class LogicPrinter {
                 
                 layouter.print("]");
             } else {
-                 assert false;
+        	printFunctionTerm(t.op().name().toString(), t);
             }	
         } else {
             printFunctionTerm(t.op().name().toString(), t);
@@ -1234,7 +1229,7 @@ public final class LogicPrinter {
             final QuantifiableVariable v = vars.getQuantifiableVariable (j);
             if(v instanceof LogicVariable){
                 Term t =
-                    TermFactory.DEFAULT.createVariableTerm((LogicVariable) v);
+                    TermFactory.DEFAULT.createTerm((LogicVariable) v);
                 if(notationInfo.getAbbrevMap().containsTerm(t)) {
                     layouter.print (v.sort().name().toString() + " " +
                                     notationInfo.getAbbrevMap().getAbbrev(t));
@@ -1553,12 +1548,8 @@ public final class LogicPrinter {
                     for (int i = 0; i < phi.arity(); i++) {
                         ta[i] = phi.sub(i);
                     }
-                    ArrayOfQuantifiableVariable[] aa = new ArrayOfQuantifiableVariable[phi.arity()];
-                    for (int i = 0; i < phi.arity(); i++) {
-                        aa[i] = phi.varsBoundHere(i);
-                    }
                     Term term = TermFactory.DEFAULT.
-			createTerm((Modality)o, ta, aa, phi.javaBlock());
+			createTerm((Modality)o, ta, phi.boundVars(), phi.javaBlock());
                     notationInfo.getNotation((Modality)o, services).print(term, this);
                     return;
                 }

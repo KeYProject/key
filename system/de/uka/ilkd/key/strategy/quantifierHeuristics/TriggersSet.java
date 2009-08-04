@@ -244,21 +244,15 @@ class TriggersSet {
             }
 
             final Term[] chosenSubs = new Term[t.arity()];
-            final ArrayOfQuantifiableVariable[] boundVars =
-                    new ArrayOfQuantifiableVariable[t.arity()];
-            for (int i = 0; i != t.arity(); ++i) {
-                boundVars[i] = t.varsBoundHere(i);
-            }
-
             res.addAll(combineSubterms(t, possibleSubs, chosenSubs,
-                    boundVars, 0));
+                    t.boundVars(), 0));
             return res;
         }
 
         private Set<Term> combineSubterms(Term oriTerm,
                 Set<Term>[] possibleSubs,
                 Term[] chosenSubs,
-                ArrayOfQuantifiableVariable[] boundVars,
+                ArrayOfQuantifiableVariable boundVars,
                 int i) {
             final HashSet<Term> set = new HashSet<Term>();
             if (i >= possibleSubs.length) {

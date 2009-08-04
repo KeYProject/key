@@ -240,7 +240,6 @@ public class KeYMediator {
     
     private void finishSetBack(){
         TermTacletAppIndexCacheSet.clearCache();
-        TermFactory.clearCache();
         AbstractBetaFeature.clearCache();
         IfThenElseMalusFeature.clearCache();
     }

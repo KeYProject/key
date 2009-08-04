@@ -124,16 +124,16 @@ public class CreateTacletForTests extends TestCase {
 	SchemaVariable var_rn = SchemaVariableFactory.createTermSV(new Name("rn"),nat);
 	SchemaVariable var_rm = SchemaVariableFactory.createTermSV(new Name("rm"),nat);
 
-	Term t_rn = tf.createFunctionTerm(var_rn,new Term[]{});
-	Term t_rm = tf.createFunctionTerm(var_rm,new Term[]{});
-	Term t_0 = tf.createFunctionTerm(func_0,new Term[]{});	
-	Term t_rnminus1=tf.createFunctionTerm(func_min1,new Term[]{t_rn});
-	Term t_rnminus1plus1=tf.createFunctionTerm(func_plus1,
+	Term t_rn = tf.createTerm(var_rn,new Term[]{});
+	Term t_rm = tf.createTerm(var_rm,new Term[]{});
+	Term t_0 = tf.createTerm(func_0,new Term[]{});	
+	Term t_rnminus1=tf.createTerm(func_min1,new Term[]{t_rn});
+	Term t_rnminus1plus1=tf.createTerm(func_plus1,
 						   new Term[]{t_rnminus1});
-	Term t_rneq0=tf.createFunctionTerm(func_eq,new Term[]{t_rn,t_0});
-	//	Term t_0minus1=tf.createFunctionTerm(func_min1,
+	Term t_rneq0=tf.createTerm(func_eq,new Term[]{t_rn,t_0});
+	//	Term t_0minus1=tf.createTerm(func_min1,
 	//		     new Term[]{t_0});
-	Term t_0plus1=tf.createFunctionTerm(func_plus1,
+	Term t_0plus1=tf.createTerm(func_plus1,
 						new Term[]{t_0});
 
 	// help rule r1: find(rn) replacewith(0) replacewith(0)
@@ -166,7 +166,7 @@ public class CreateTacletForTests extends TestCase {
 	//plus-zero-elim
 	// find(rn + 0) replacewith(rn)
 	rwbuilder=new RewriteTacletBuilder();
-	rwbuilder.setFind(tf.createFunctionTerm(func_plus,
+	rwbuilder.setFind(tf.createTerm(func_plus,
 						new Term[]{t_rn, t_0}));
 	rwbuilder.addTacletGoalTemplate(new
 	    RewriteTacletGoalTemplate(Sequent.EMPTY_SEQUENT,
@@ -178,7 +178,7 @@ public class CreateTacletForTests extends TestCase {
 	//zero-plus-elim
 	// find(0 + rn) replacewith(rn)
 	rwbuilder=new RewriteTacletBuilder();
-	rwbuilder.setFind(tf.createFunctionTerm(func_plus,
+	rwbuilder.setFind(tf.createTerm(func_plus,
 						new Term[]{t_0, t_rn}));
 	rwbuilder.addTacletGoalTemplate(new
 	    RewriteTacletGoalTemplate(Sequent.EMPTY_SEQUENT,
@@ -191,7 +191,7 @@ public class CreateTacletForTests extends TestCase {
 	//closewitheq
 	// find(=> rn=rn)
 	SuccTacletBuilder sbuilder=new SuccTacletBuilder();
-	Term t_rneqrn=tf.createFunctionTerm(func_eq,
+	Term t_rneqrn=tf.createTerm(func_eq,
 					    new Term[]{t_rn, t_rn});
 	sbuilder.setFind( t_rneqrn);
 	sbuilder.setName(new Name("close-with-eq"));
@@ -200,14 +200,14 @@ public class CreateTacletForTests extends TestCase {
 
 	//switch first succ
 	// find((rn +1) + rm) replacewith((rn + rm) +1)
-	Term t_rnplus1=tf.createFunctionTerm(func_plus1, 
+	Term t_rnplus1=tf.createTerm(func_plus1, 
 					   new Term[]{t_rn});
-	Term t_rnplus1plusrm=tf.createFunctionTerm(func_plus, 
+	Term t_rnplus1plusrm=tf.createTerm(func_plus, 
 					   new Term[]{t_rnplus1, t_rm});
 
-	Term t_rnplusrm=tf.createFunctionTerm(func_plus, 
+	Term t_rnplusrm=tf.createTerm(func_plus, 
 					   new Term[]{t_rn, t_rm});
-	Term t_rnplusrmplus1=tf.createFunctionTerm(func_plus1, 
+	Term t_rnplusrmplus1=tf.createTerm(func_plus1, 
 					   new Term[]{t_rnplusrm});
 
 	rwbuilder=new RewriteTacletBuilder();
@@ -223,9 +223,9 @@ public class CreateTacletForTests extends TestCase {
 
 	//switch second succ
 	// find(rn + (rm +1)) replacewith((rn + rm) +1)
-	Term t_rmplus1=tf.createFunctionTerm(func_plus1, 
+	Term t_rmplus1=tf.createTerm(func_plus1, 
 					   new Term[]{t_rm});
-	Term t_rnplus_rmplus1=tf.createFunctionTerm(func_plus, 
+	Term t_rnplus_rmplus1=tf.createTerm(func_plus, 
 					   new Term[]{t_rn, t_rmplus1});
 	rwbuilder=new RewriteTacletBuilder();
 	rwbuilder.setFind(t_rnplus_rmplus1);
@@ -238,10 +238,10 @@ public class CreateTacletForTests extends TestCase {
 
 	//elim-succ
 	// find(rn +1 = rm +1) replacewith(rn=rm)
-	Term t_rneqrm=tf.createFunctionTerm(func_eq,
+	Term t_rneqrm=tf.createTerm(func_eq,
 					    new Term[]{t_rn, t_rm});
 	rwbuilder=new RewriteTacletBuilder();
-	rwbuilder.setFind(tf.createFunctionTerm(func_eq,
+	rwbuilder.setFind(tf.createTerm(func_eq,
 						new Term[]{t_rnplus1,
 							   t_rmplus1}));
 	rwbuilder.addTacletGoalTemplate(new
@@ -310,27 +310,27 @@ public class CreateTacletForTests extends TestCase {
 	Function const_d=new Function(new Name("d"),nat,new SortImpl[0]);
 	nss.functions().add(const_d);
 
-	Term t_c=tf.createFunctionTerm(const_c,new Term[]{});
-	Term t_d=tf.createFunctionTerm(const_d,new Term[]{});
-	Term t_cplusd=tf.createFunctionTerm(func_plus,new Term[]{t_c,t_d});	
-	Term t_dminus1=tf.createFunctionTerm(func_min1,new Term[]{t_d});
-	Term t_dminus1plus1=tf.createFunctionTerm(func_plus1,
+	Term t_c=tf.createTerm(const_c,new Term[]{});
+	Term t_d=tf.createTerm(const_d,new Term[]{});
+	Term t_cplusd=tf.createTerm(func_plus,new Term[]{t_c,t_d});	
+	Term t_dminus1=tf.createTerm(func_min1,new Term[]{t_d});
+	Term t_dminus1plus1=tf.createTerm(func_plus1,
 						  new Term[]{t_dminus1});	
-	Term t_dminus1plus1plusc=tf.createFunctionTerm
+	Term t_dminus1plus1plusc=tf.createTerm
 	    (func_plus,new Term[]{t_dminus1plus1,t_c});
-	Term t_eq1=tf.createFunctionTerm
+	Term t_eq1=tf.createTerm
 	    (func_eq,new Term[]{t_cplusd, t_dminus1plus1plusc});
 	
 
-	Term t_cplus1=tf.createFunctionTerm(func_plus1,new Term[]{t_c});
-	Term t_cplus1plusd=tf.createFunctionTerm(func_plus,
+	Term t_cplus1=tf.createTerm(func_plus1,new Term[]{t_c});
+	Term t_cplus1plusd=tf.createTerm(func_plus,
 						 new Term[]{t_cplus1,
 							    t_d});
-	Term t_dpluscplus1=tf.createFunctionTerm(func_plus,
+	Term t_dpluscplus1=tf.createTerm(func_plus,
 						 new Term[]{t_d,t_cplus1});
-	Term t_eq2=tf.createFunctionTerm
+	Term t_eq2=tf.createTerm
 	    (func_eq,new Term[]{ t_cplus1plusd, t_dpluscplus1});
-	Term tnat=tf.createJunctorTerm(Junctor.IMP, t_eq1, t_eq2);
+	Term tnat=tf.createTerm(Junctor.IMP, t_eq1, t_eq2);
 
 	// => (c+d) = ((d -1 +1) +c) -> (c +1)+d = (d+c) +1
 	seq_testNat=Sequent.createSequent
@@ -340,9 +340,8 @@ public class CreateTacletForTests extends TestCase {
 
 
 	z = new LogicVariable(new Name("z"),sort1);
-       	Term t_z=tf.createFunctionTerm(z,new Term[0]);
-	Term t_allzpz=tf.createQuantifierTerm(Quantifier.ALL,new
-	    LogicVariable[]{z}, tf.createFunctionTerm(func_p,new Term[]{t_z}));
+       	Term t_z=tf.createTerm(z,new Term[0]);
+	Term t_allzpz=TermBuilder.DF.all(z, tf.createTerm(func_p,new Term[]{t_z}));
  	ConstrainedFormula cf3=new ConstrainedFormula(t_allzpz, 
 						    Constraint.BOTTOM);
  	seq_testAll=Sequent.createSequent(Semisequent.EMPTY_SEMISEQUENT, 
@@ -372,9 +371,11 @@ public class CreateTacletForTests extends TestCase {
     }
      
     private KeYParser stringTacletParser(String s) {
-	return new KeYParser(ParserMode.TACLET, new KeYLexer(new StringReader(s),null),
-			      "No file. CreateTacletForTests.stringParser("+s+")",
-			      tf, services, nss);
+	return new KeYParser(ParserMode.TACLET, 
+		             new KeYLexer(new StringReader(s),null),
+			     "No file. CreateTacletForTests.stringParser("+s+")",
+			     services, 
+			     nss);
     }
     
     Taclet parseTaclet(String s) {

@@ -45,10 +45,10 @@ public class TestTacletBuild extends TestCase {
 	    TacletForTests.getVariables().lookup(new Name("u"));
 	SchemaVariable v=(SchemaVariable) 
 	    TacletForTests.getVariables().lookup(new Name("v"));
-	Term b=tf.createFunctionTerm((SchemaVariable) 
+	Term b=tf.createTerm((SchemaVariable) 
 	    TacletForTests.getVariables().lookup(new Name("b")), NO_SUBTERMS);
-	Term t1=tf.createQuantifierTerm(Quantifier.EX, (QuantifiableVariable)u, b);
-	Term t2=tf.createQuantifierTerm(Quantifier.EX, (QuantifiableVariable)v, b);
+	Term t1=TermBuilder.DF.ex((QuantifiableVariable)u, b);
+	Term t2=TermBuilder.DF.ex((QuantifiableVariable)v, b);
 	RewriteTacletBuilder sb=new RewriteTacletBuilder();
 	sb.setFind(t1);
 	sb.addTacletGoalTemplate
@@ -74,14 +74,14 @@ public class TestTacletBuild extends TestCase {
 	boolean thrown=false;
 	SchemaVariable u=(SchemaVariable) 
 	    TacletForTests.getVariables().lookup(new Name("u"));
-	Term A=tf.createFunctionTerm
+	Term A=tf.createTerm
 	    ((Function)TacletForTests.getFunctions().lookup(new Name("A")), 
 	     NO_SUBTERMS);
-	Term t1=tf.createQuantifierTerm(Quantifier.ALL, (QuantifiableVariable)u, A);
+	Term t1=TermBuilder.DF.all((QuantifiableVariable)u, A);
 	Sequent seq = Sequent.createSuccSequent
 	    (Semisequent.EMPTY_SEMISEQUENT.insert
 	     (0, new ConstrainedFormula(t1)).semisequent());
-	Term t2=tf.createQuantifierTerm(Quantifier.EX, (QuantifiableVariable)u, A);
+	Term t2=TermBuilder.DF.ex((QuantifiableVariable)u, A);
 	SuccTacletBuilder sb=new SuccTacletBuilder();
 	sb.setIfSequent(seq);
 	sb.setFind(t2);
@@ -99,11 +99,11 @@ public class TestTacletBuild extends TestCase {
 	boolean thrown=false;
 	SchemaVariable u=(SchemaVariable) 
 	    TacletForTests.getVariables().lookup(new Name("u"));
-	Term A=tf.createFunctionTerm
+	Term A=tf.createTerm
 	    ((Function)TacletForTests.getFunctions().lookup(new Name("A")), 
 	     NO_SUBTERMS);
-	Term t1=tf.createQuantifierTerm(Quantifier.ALL, (QuantifiableVariable)u, A);
-	Term t2=tf.createQuantifierTerm(Quantifier.EX, (QuantifiableVariable)u, A);
+	Term t1=TermBuilder.DF.all( (QuantifiableVariable)u, A);
+	Term t2=TermBuilder.DF.ex((QuantifiableVariable)u, A);
 	Sequent seq = Sequent.createSuccSequent
 	    (Semisequent.EMPTY_SEMISEQUENT
 	     .insert(0, new ConstrainedFormula(t1)).semisequent()
@@ -126,12 +126,12 @@ public class TestTacletBuild extends TestCase {
 	boolean thrown=false;
 	SchemaVariable u=(SchemaVariable) 
 	    TacletForTests.getVariables().lookup(new Name("u"));
-	Term A=tf.createFunctionTerm
+	Term A=tf.createTerm
 	    ((Function)TacletForTests.getFunctions().lookup(new Name("A")), 
 	     NO_SUBTERMS);
-	Term t1=tf.createQuantifierTerm(Quantifier.ALL, (QuantifiableVariable)u, A);
+	Term t1=TermBuilder.DF.all((QuantifiableVariable)u, A);
 	SuccTacletBuilder sb=new SuccTacletBuilder();
-	sb.setFind(tf.createJunctorTerm(Junctor.AND,t1,t1));
+	sb.setFind(tf.createTerm(Junctor.AND,t1,t1));
 	try {
 	    sb.getTaclet();
 	} catch (IllegalArgumentException e) {
@@ -161,6 +161,4 @@ public class TestTacletBuild extends TestCase {
         		"a schemavariable with wrong prefix.");
         
     }
-    
-
 }

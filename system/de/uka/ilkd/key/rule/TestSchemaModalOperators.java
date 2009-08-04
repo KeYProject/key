@@ -118,17 +118,19 @@ public class TestSchemaModalOperators extends TestCase {
 	modalities = modalities.add(Modality.DIA).add(Modality.BOX);
 	SchemaVariable osv = SchemaVariableFactory.createModalOperatorSV(
 	      new Name("diabox"), Sort.FORMULA, modalities);
-	Term tpost = tf.createFunctionTerm(fsv, new Term[0]);
+	Term tpost = tf.createTerm(fsv, new Term[0]);
 
-	Term find = tf.createProgramTerm(
+	Term find = tf.createTerm(
 	    osv,
-            JavaBlock.EMPTY_JAVABLOCK,
-            new Term[]{tpost});
+	    new Term[]{tpost},
+	    null,
+            JavaBlock.EMPTY_JAVABLOCK);
 
-	Term replace = tf.createProgramTerm(
+	Term replace = tf.createTerm(
 	    osv,
-            JavaBlock.EMPTY_JAVABLOCK,
-            new Term[]{tf.createJunctorTerm(Junctor.TRUE)});
+	    new Term[]{TermBuilder.DF.tt()},
+	    null,
+            JavaBlock.EMPTY_JAVABLOCK);
 
 	rtb.setName(new Name("test_schema_modal1"));
 	rtb.setFind(find); 
@@ -139,10 +141,10 @@ public class TestSchemaModalOperators extends TestCase {
 
 	RewriteTaclet t = rtb.getRewriteTaclet();
 
-	Term goal = tf.createProgramTerm(
+	Term goal = TermBuilder.DF.mod(
 	    Modality.DIA, 
             JavaBlock.EMPTY_JAVABLOCK,
-            tf.createJunctorTerm(Junctor.FALSE));
+            TermBuilder.DF.ff());
          MatchConditions mc=(t.match                                                   
                             (goal,                                                        
                              find,                                                

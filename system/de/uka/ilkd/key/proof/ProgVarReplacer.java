@@ -283,7 +283,7 @@ public final class ProgVarReplacer {
         final ProgramVariable pv = (ProgramVariable) t.op();
         Object o = map.get(pv);
         if (o instanceof ProgramVariable) {
-            return TermFactory.DEFAULT.createVariableTerm((ProgramVariable)o);
+            return TermFactory.DEFAULT.createTerm((ProgramVariable)o);
         } else if (o instanceof Term) {
             return (Term) o;
         }
@@ -295,8 +295,6 @@ public final class ProgVarReplacer {
         Term result = t;
         
         final Term newSubTerms[] = new Term[t.arity()];
-        final ArrayOfQuantifiableVariable[] boundVars =
-            new ArrayOfQuantifiableVariable [t.arity ()];
 
         boolean changedSubTerm = false;
         
@@ -306,7 +304,6 @@ public final class ProgVarReplacer {
             if(newSubTerms[i] != subTerm) {
                 changedSubTerm = true;
             }
-            boundVars[i] = t.varsBoundHere(i);
         }
 
         final JavaBlock jb = t.javaBlock();
@@ -322,7 +319,7 @@ public final class ProgVarReplacer {
         if(changedSubTerm || newJb != jb) {                               
             result = TermFactory.DEFAULT.createTerm(t.op(),
                     newSubTerms,
-                    boundVars,
+                    t.boundVars(),
                     newJb);
         }
         return result;

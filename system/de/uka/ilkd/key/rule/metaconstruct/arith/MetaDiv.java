@@ -70,7 +70,7 @@ public final class MetaDiv extends AbstractMetaOperator {
 				     new Sort[0]);
 		services.getNamespaces().functions().add(undef);
 	    }
-	    return termFactory.createFunctionTerm(undef);
+	    return termFactory.createTerm(undef);
 	}
 	BigInteger remainder = bigIntArg1.remainder(bigIntArg2);
 	BigInteger bigIntResult = bigIntArg1.divide(bigIntArg2);

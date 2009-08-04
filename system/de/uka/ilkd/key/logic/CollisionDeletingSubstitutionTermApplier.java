@@ -95,16 +95,11 @@ public class CollisionDeletingSubstitutionTermApplier extends Visitor {
 	    }  
 	} else {	 
 	    Term[] neededsubs=neededSubs(visited.arity());
-	    final ArrayOfQuantifiableVariable[] boundVars = 
-	        new ArrayOfQuantifiableVariable[neededsubs.length];
-	    for (int i = 0; i<visited.arity(); i++) {
-	        boundVars[i] = visited.varsBoundHere(i);
-	    }
 	    if (!subStack.empty() && subStack.peek()==newMarker) {
 		subStack.pop(); // delete new marker ...		
 		subStack.push(tf.createTerm(visited.op(), 
 					    neededsubs,
-					    boundVars,
+					    visited.boundVars(),
 					    visited.javaBlock()));
 		subStack.push(newMarker); // add new marker ...
 		

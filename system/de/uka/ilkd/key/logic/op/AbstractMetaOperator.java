@@ -95,6 +95,8 @@ public abstract class AbstractMetaOperator extends AbstractSortedOperator
     public static final AbstractMetaOperator INTRODUCE_ATPRE_DEFINITIONS = new IntroAtPreDefsOp();
                 
     public static final AbstractMetaOperator META_METHOD_CALL_TO_UPDATE= new MethodCallToUpdate();
+    
+    public static final AbstractMetaOperator MEMBER_PV_TO_FIELD = new MemberPVToField();
 
     
     protected static final TermFactory termFactory = TermFactory.DEFAULT;

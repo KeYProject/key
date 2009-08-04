@@ -20,6 +20,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.ArrayOfQuantifiableVariable;
 import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.speclang.FormulaWithAxioms;
 
 
@@ -65,42 +66,43 @@ public class OpReplacer {
             return null;
         }
         
-        Term newTerm = (Term) map.get(term); 
+        final Term newTerm = (Term) map.get(term); 
         if(newTerm != null) {
             return newTerm;
         }
 
-        Operator newOp = replace(term.op());
+        final Operator newOp = replace(term.op());
         
-        int arity = term.arity();
-        Term newSubTerms[] = new Term[arity];
-        ArrayOfQuantifiableVariable[] boundVars =
-                new ArrayOfQuantifiableVariable[arity];
-    
+        final int arity = term.arity();
+        final Term newSubTerms[] = new Term[arity];    
         boolean changedSubTerm = false;
         for(int i = 0; i < arity; i++) {
             Term subTerm = term.sub(i);
             newSubTerms[i] = replace(subTerm);
-            
-            // Is it guaranteed that no variables are renamed in the replaced term?
-            boundVars[i] = term.varsBoundHere(i);
     
             if(newSubTerms[i] != subTerm) {
                 changedSubTerm = true;
             }
         }
-    
-        Term result = term;
         
-        if(newOp != term.op() || changedSubTerm) {
+        final ArrayOfQuantifiableVariable newBoundVars 
+        	= replace(term.boundVars());
+    
+        final Term result;
+        if(newOp != term.op()  
+           || changedSubTerm
+           || newBoundVars != term.boundVars()) {
             result = TF.createTerm(newOp,
                                    newSubTerms,
-                                   boundVars,
+                                   newBoundVars,
                                    term.javaBlock());
+        } else {
+            result = term;
         }
     
         return result;
     }  
+    
     
     /**
      * Replaces in a set of terms.
@@ -136,5 +138,24 @@ public class OpReplacer {
     public FormulaWithAxioms replace(FormulaWithAxioms fwa) {
         return new FormulaWithAxioms(replace(fwa.getFormula()), 
                                      replace(fwa.getAxioms()));
+    }
+    
+    
+    /**
+     * Replaces in an ArrayOfQuantifiableVariable.
+     */
+    public ArrayOfQuantifiableVariable replace(
+	    			ArrayOfQuantifiableVariable vars) {
+	QuantifiableVariable[] result = new QuantifiableVariable[vars.size()];
+	boolean changed = false;
+	for(int i = 0, n = vars.size(); i < n; i++) {
+	    QuantifiableVariable qv = vars.getQuantifiableVariable(i);
+	    QuantifiableVariable newQv = (QuantifiableVariable)replace(qv);
+	    result[i++] = newQv;
+	    if(newQv != qv) {
+		changed = true;
+	    }
+	}
+	return changed ? new ArrayOfQuantifiableVariable(result) : vars;
     }
 }

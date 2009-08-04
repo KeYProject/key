@@ -145,7 +145,6 @@ tokens {
 	ISINREACHABLESTATE = "\\isInReachableState";
         IS_ABSTRACT_OR_INTERFACE = "\\isAbstractOrInterface";
         CONTAINERTYPE = "\\containerType";
-        FIELDTARGETTYPE = "\\fieldTargetType";
 }
 
 {

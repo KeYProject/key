@@ -120,7 +120,7 @@ public class EqualityConstraint implements Constraint {
         if ( t == null ) {
             t = map.get ( p_mv );
             if ( t == null )
-                t = TermFactory.DEFAULT.createFunctionTerm ( p_mv );
+                t = TermBuilder.DF.var ( p_mv );
             else
                 t = instantiate ( t );
 
@@ -736,7 +736,7 @@ public class EqualityConstraint implements Constraint {
 			( (entry.getValue ()).op () ) ) ) {
 		    removeConstraint.map.put
 			( (Metavariable)(entry.getValue ()).op (),
-			  TermFactory.DEFAULT.createFunctionTerm
+			  TermBuilder.DF.var
 			  ( entry.getKey () ) );
 		    it.remove ();
 		}

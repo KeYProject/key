@@ -99,7 +99,7 @@ public class SLMethodResolver extends SLExpressionResolver {
             		"method \"" + methodName + "\" in specification expression.");
         }
         
-        return manager.createSLExpression(TB.func(pm,subs));
+        return manager.createSLExpression(TB.tf().createTerm(pm, subs));
     }
 
 

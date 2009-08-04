@@ -312,19 +312,15 @@ options {
 	    newOp = term.op();
 	}
 	
-	final ArrayOfQuantifiableVariable[] vars = 
-		new ArrayOfQuantifiableVariable[term.arity()];
-	
 	Term[] subTerms = getSubTerms(term);
 	Term[] newSubTerms = new Term[subTerms.length];
 	for(int i = 0; i < subTerms.length; i++) {
 	    newSubTerms[i] = convertToOld(subTerms[i]);
-	    vars[i] = term.varsBoundHere(i);
 	}
 	
 	return TB.tf().createTerm(newOp, 
 		  		  newSubTerms, 
-				  vars, 
+				  term.boundVars(), 
 				  term.javaBlock());
     }
 
@@ -470,11 +466,7 @@ options {
 	Term result = null;
 
 	try {
-	    if(a.sort() != Sort.FORMULA && b.sort() != Sort.FORMULA) {
-		result = TB.equals(a,b);
-	    } else {
-		result = TB.equiv(convertToFormula(a), convertToFormula(b));
-	    }
+	    result = TB.equals(a, b);
 	} catch (IllegalArgumentException e) {
 	    try {
 		raiseError("Illegal Arguments in equality expression near " + LT(0));
@@ -1928,7 +1920,7 @@ specquantifiedexpression returns [Term result = null] throws SLTranslationExcept
 	    	    }
 	    	}
 	    }	    
-	    	    
+
 	    if (q.getText().equals("\\forall")) {
 		if (p != null) {
 		    t = TB.imp(p, t);
@@ -1943,44 +1935,31 @@ specquantifiedexpression returns [Term result = null] throws SLTranslationExcept
 	    }
 	    else if (q.getText().equals("\\min")) {
 	    	raiseNotSupported("\\min");
-//		Function y = new RigidFunction(
-//		    new Name("_jml_ymin"+(varCounter++)),
-//		    declVars.head().sort(),
-//		    new Sort[] {});
-//		axiomCollector.collectAxiom(y,
-//		    buildMaxMinAxiom(false, y, declVars, p, t));
-//		result = TB.func(y);
-//		services.getNamespaces().functions().addSafely(y);
 	    }
 	    else if (q.getText().equals("\\max")) {
 	        raiseNotSupported("\\max");
-//		Function y = new RigidFunction(
-//		    new Name("_jml_ymax"+(varCounter++)),
-//		    declVars.head().sort(),
-//		    new Sort[] {});
-//		axiomCollector.collectAxiom(y,
-//		    buildMaxMinAxiom(true, y, declVars, p, t));
-//		result = TB.func(y);
-//		services.getNamespaces().functions().addSafely(y);
 	    }
+	    /*XXX
 	    else if (q.getText().equals("\\num_of")) {
-            LogicVariable lv = declVars.head();
-            p=p.sub(0);
-            if(p!=null && isBoundedSum(p, lv) && p.sub(0).op()!=Junctor.AND){
-                result = TermFactory.DEFAULT.createBoundedNumericalQuantifierTerm(BoundedNumericalQuantifier.BSUM, 
-                        lowerBound(p, lv), upperBound(p, lv), TB.ife(
-                                t, TB.zTerm(services, "1"), TB.zTerm(services, "0")),
-                                new ArrayOfQuantifiableVariable(lv));                          
-            }else{
-                raiseError("only \\num_of expressions of form (\\sum int i; l<=i && i<u; t) are permitted");
-            }
-	    }
+            	LogicVariable lv = declVars.head();
+            	p=p.sub(0);
+            	if(p!=null && isBoundedSum(p, lv) && p.sub(0).op()!=Junctor.AND){
+	                result = TermFactory.DEFAULT.createBoundedNumericalQuantifierTerm(BoundedNumericalQuantifier.BSUM, 
+        	                lowerBound(p, lv), upperBound(p, lv), TB.ife(
+                	                t, TB.zTerm(services, "1"), TB.zTerm(services, "0")),
+                        	        new ArrayOfQuantifiableVariable(lv));
+                                       
+                } else {
+                    raiseError("only \\num_of expressions of form (\\sum int i; l<=i && i<u; t) are permitted");
+            	}
+	    }*/
 	    else if (q.getText().equals("\\product")) {
 		raiseNotSupported("\\product");
 	    }
 	    else if (q.getText().equals("\\sum")) {
             LogicVariable lv = declVars.head();
             p=p.sub(0);
+            /*XXX
             if(isBoundedSum(p, lv)){
                 if(p.arity()>0 && p.sub(0).op()==Junctor.AND){
                     t = TB.ife(p.sub(1), t, TB.zTerm(services, "0"));
@@ -1990,9 +1969,8 @@ specquantifiedexpression returns [Term result = null] throws SLTranslationExcept
             }else{
                 raiseError("only \\sum expressions of form (\\sum int i; l<=i && i<u; t) are permitted");
             }
-
-	    }
-	    else {
+	   */
+	    } else {
 		raiseError("Unknown quantifier: " + q.getText() + "!");
 	    }
 	}
@@ -2014,11 +1992,11 @@ bsumterm returns [Term t=null] throws SLTranslationException
         (
             a=specexpression SEMI  b=specexpression SEMI t=specexpression
         )
-        {
+        {/*XXX
             LogicVariable lv = (LogicVariable) decls.head();
             t = TermFactory.DEFAULT.createBoundedNumericalQuantifierTerm(BoundedNumericalQuantifier.BSUM, 
                         a, b, t, new ArrayOfQuantifiableVariable(lv));
-            resolverManager.popLocalVariablesNamespace();
+            resolverManager.popLocalVariablesNamespace();*/
         }
         RPAREN
 ;

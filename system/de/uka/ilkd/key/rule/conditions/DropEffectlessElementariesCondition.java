@@ -29,14 +29,14 @@ public final class DropEffectlessElementariesCondition
     
     private final UpdateSV u;
     private final SchemaVariable x;
-    private final UpdateSV u2;
+    private final SchemaVariable result;
     
     public DropEffectlessElementariesCondition(UpdateSV u,
 	                               	       SchemaVariable x,
-	                               	       UpdateSV u2) {
+	                               	       SchemaVariable x2) {
 	this.u = u;
 	this.x = x;
-	this.u2 = u2;
+	this.result = x2;
     }
     
     
@@ -77,7 +77,11 @@ public final class DropEffectlessElementariesCondition
 		= new TermProgramVariableCollector(services);
 	target.execPostOrder(collector);
 	Set<LocationVariable> varsInTarget = collector.result();
-	return dropEffectlessElementariesHelper(update, varsInTarget);
+	Term simplifiedUpdate = dropEffectlessElementariesHelper(update, 
+							         varsInTarget); 
+	return simplifiedUpdate == null 
+	       ? null 
+	       : TB.apply(simplifiedUpdate, target); 
     }
     
     
@@ -87,22 +91,22 @@ public final class DropEffectlessElementariesCondition
 	    		  	 MatchConditions mc, 
 	    		  	 Services services) {
 	SVInstantiations svInst = mc.getInstantiations();
-	Term uInst  = (Term) svInst.getInstantiation(u);
-	Term xInst  = (Term) svInst.getInstantiation(x);
-	Term u2Inst = (Term) svInst.getInstantiation(u2);
+	Term uInst      = (Term) svInst.getInstantiation(u);
+	Term xInst      = (Term) svInst.getInstantiation(x);
+	Term resultInst = (Term) svInst.getInstantiation(result);
 	if(uInst == null || xInst == null) {
 	    return mc;
 	}
 	
-	Term properU2Inst = dropEffectlessElementaries(uInst, 
-						       xInst, 
-						       services);
-	if(properU2Inst == null) {
+	Term properResultInst = dropEffectlessElementaries(uInst, 
+						           xInst, 
+						           services);
+	if(properResultInst == null) {
 	    return null;
-	} else if(u2Inst == null) {
-	    svInst = svInst.add(u2, properU2Inst);
+	} else if(resultInst == null) {
+	    svInst = svInst.add(result, properResultInst);
 	    return mc.setInstantiations(svInst);
-	} else if(u2Inst.equals(properU2Inst)) {
+	} else if(resultInst.equals(properResultInst)) {
 	    return mc;
 	} else {
 	    return null;
@@ -112,6 +116,6 @@ public final class DropEffectlessElementariesCondition
     
     @Override
     public String toString () {
-        return "\\dropEffectlessElementaries(" + u + ", " + x + ", " + u2 + ")";
+        return "\\dropEffectlessElementaries(" + u + ", " + x + ", " + result + ")";
     }
 }

@@ -41,38 +41,17 @@ final class TermImpl implements Term {
     
     public TermImpl(Operator op, 
 	    	    ArrayOfTerm subs, 
-	    	    JavaBlock javaBlock, 
-	    	    ArrayOfQuantifiableVariable boundVars) {
+	    	    ArrayOfQuantifiableVariable boundVars, 
+	    	    JavaBlock javaBlock) {
 	assert op != null;
 	assert subs != null;
 	this.op   = op;
 	this.subs = subs.size() == 0 ? EMPTY_TERM_LIST : subs;
+	this.boundVars = boundVars == null ? EMPTY_VAR_LIST : boundVars;	
 	this.javaBlock = javaBlock == null ? JavaBlock.EMPTY_JAVABLOCK : javaBlock;
-	this.boundVars = boundVars == null ? EMPTY_VAR_LIST : boundVars;
     }
     
-    
-    public TermImpl(Operator op, 
-	    	    ArrayOfTerm subs, 
-	    	    JavaBlock javaBlock) {
-	this(op, subs, javaBlock, null);
-    }    
 
-    
-    public TermImpl(Operator op, ArrayOfTerm subs) {
-	this(op, subs, null, null);
-    }
-
-
-    public TermImpl(Operator op, Term[] subs) {
-	this(op, new ArrayOfTerm(subs), null, null);
-    }
-    
-    
-    public TermImpl(Operator op) {
-	this(op, EMPTY_TERM_LIST);
-    }    
-    
         
     //-------------------------------------------------------------------------
     //internal methods
@@ -268,7 +247,8 @@ final class TermImpl implements Term {
 	    return true;
 	}
 	
-	if(!(o instanceof Term)) {
+	if(!(o instanceof Term)
+	    || hashCode() != o.hashCode()) {
 	    return false;	
 	}
 	final Term t = (Term) o;
@@ -281,7 +261,7 @@ final class TermImpl implements Term {
 
 
     @Override
-    public final int hashCode(){
+    public int hashCode(){
         if(hashcode == -1) {
             hashcode = 5;
             hashcode = hashcode*17 + op().hashCode();

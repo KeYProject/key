@@ -32,7 +32,6 @@ header {
 
   import de.uka.ilkd.key.rule.*;
   import de.uka.ilkd.key.rule.conditions.*;
-  import de.uka.ilkd.key.rule.metaconstruct.*;
  
   import de.uka.ilkd.key.speclang.SetAsListOfClassInvariant;
   import de.uka.ilkd.key.speclang.SetAsListOfOperationContract;
@@ -68,7 +67,8 @@ options {
 }
 
 {
-    private static final TermBuilder TB = TermBuilder.DF;
+    private static final TermFactory tf = TermFactory.DEFAULT;
+
     private static final Sort[] AN_ARRAY_OF_SORTS = new Sort[0];
     private static final Term[] AN_ARRAY_OF_TERMS = new Term[0];
 
@@ -102,7 +102,6 @@ options {
     private HashMap<String, String> category2Default = new HashMap<String, String>();
     private boolean onlyWith=false;
     private SetOfChoice activatedChoices = SetAsListOfChoice.EMPTY_SET;
-    private SetOfChoice selectedChoices = SetAsListOfChoice.EMPTY_SET;
     private HashSet usedChoiceCategories = new HashSet();
     private HashMap taclet2Builder;
     private AbbrevMap scm;
@@ -131,7 +130,6 @@ options {
     private int stringLiteralLine=0; // HACK!
 
     private Services services;
-    private TermFactory tf;
     private JavaReader javaReader;
 
     // if this is used then we can capture parts of the input for later use
@@ -161,6 +159,9 @@ options {
 	this((lexer instanceof KeYLexer)? ((KeYLexer)lexer).getSelector() : ((DeclPicker)lexer).getSelector(), 2);
         this.selector = (lexer instanceof KeYLexer)? ((KeYLexer)lexer).getSelector() : ((DeclPicker)lexer).getSelector();
 	this.parserMode = mode;
+	if(isTacletParser()) {
+	    switchToSchemaMode();
+	}
     }
 
     public KeYParser(ParserMode mode, TokenStream lexer, Services services) {
@@ -173,7 +174,6 @@ options {
 		     String filename,
                      Services services,
 		     NamespaceSet nss,
-		     TermFactory tf,
 		     ParserMode mode) {
         this(mode, lexer);
         setFilename(filename);
@@ -181,35 +181,39 @@ options {
 	if(services != null)
           this.keh = services.getExceptionHandler();
 	this.nss = nss;
-	                
-	this.tf = tf;
         switchToNormalMode();
     }
-
-    /** 
-     * Used to construct Declaration parser - for signature declarations,
-     * i.e. sorts, schema variabls, predicates, functions and rule sets.
-     */  
-    public KeYParser(ParserMode mode, TokenStream lexer,
-                     String filename, Services services,
-                     NamespaceSet nss) {
-        this(lexer, filename, services, nss, null, mode);
-	resetSkips();
-    }
-
 
     /** 
      * Used to construct Term parser - for first-order terms
      * and formulae.
      */  
-    public KeYParser(ParserMode mode, TokenStream lexer,                   
-                     String filename, TermFactory  tf,
-                     JavaReader jr, Services services,
-                     NamespaceSet nss, AbbrevMap scm) {
-        this(lexer, filename, services, nss, tf, mode);
+    public KeYParser(ParserMode mode, 
+                     TokenStream lexer,                   
+                     String filename, 
+                     JavaReader jr, 
+                     Services services,
+                     NamespaceSet nss, 
+                     AbbrevMap scm) {
+        this(lexer, filename, services, nss, mode);
         this.javaReader = jr;
         this.scm = scm;
     }
+
+    public KeYParser(ParserMode mode, 
+                     TokenStream lexer,
+                     String filename,
+                     Services services, 
+                     NamespaceSet nss) {
+        this(mode, 
+             lexer, 
+             filename,
+             new SchemaRecoder2KeY(services, nss),
+	     services, 
+	     nss, 
+	     new HashMap());
+    }
+
 
 
     /** ONLY FOR TEST CASES.
@@ -219,18 +223,20 @@ options {
      * for test cases, where you want to know in advance which objects
      * will represent bound variables.
      */  
-    public KeYParser(ParserMode mode, TokenStream lexer,
-		     TermFactory tf, JavaReader jr,
+    public KeYParser(ParserMode mode, 
+                     TokenStream lexer,
+		     JavaReader jr,
 		     NamespaceSet nss) {
-        this(lexer, null, new Services(), nss, tf, mode);
+        this(lexer, null, new Services(), nss, mode);
         this.scm = new AbbrevMap();
         this.javaReader = jr;
     }
 
-    public KeYParser(ParserMode mode, TokenStream lexer,
-		     TermFactory tf, Services services,
+    public KeYParser(ParserMode mode, 
+                     TokenStream lexer,
+		     Services services,
 		     NamespaceSet nss) {
-	this(mode, lexer, tf, 
+	this(mode, lexer, 
 	     new Recoder2KeY(
 		new KeYCrossReferenceServiceConfiguration(
 		   services.getExceptionHandler()), 
@@ -239,62 +245,45 @@ options {
    	     nss);
     }
 
-    public KeYParser(ParserMode mode, TokenStream lexer,
-		     Services services, NamespaceSet nss) {
-	this(mode, lexer, TermFactory.DEFAULT,
-	     new Recoder2KeY(
-	       new KeYCrossReferenceServiceConfiguration(
-	         services.getExceptionHandler()),
-	       services.getJavaInfo().rec2key(), new NamespaceSet(),
-	       services.getTypeConverter()),
-	     nss);
-    }
-
-
     /**
      * Used to construct Taclet parser
      */  
-    public KeYParser(ParserMode mode, TokenStream lexer,
-                     String filename, TermFactory tf,
-                     SchemaJavaReader jr, Services services,  
-                     NamespaceSet nss, HashMap taclet2Builder) {
-        this(lexer, filename, services, nss, tf, mode);
+    public KeYParser(ParserMode mode, 
+                     TokenStream lexer,
+                     String filename, 
+                     SchemaJavaReader jr, 
+                     Services services,  
+                     NamespaceSet nss, 
+                     HashMap taclet2Builder) {
+        this(lexer, filename, services, nss, mode);
         switchToSchemaMode();
         this.scm = new AbbrevMap();
         this.javaReader = jr;
         this.taclet2Builder = taclet2Builder;
     }
 
-    public KeYParser(ParserMode mode, TokenStream lexer,
-                     String filename, TermFactory tf,
-                     Services services, NamespaceSet nss) {
-        this(mode, lexer, filename, tf,
-             new SchemaRecoder2KeY(services, nss),
-	     services, nss, new HashMap());
-    }
-
 
     /** 
      * Used to construct Problem parser
      */  
-    public KeYParser(ParserMode mode, TokenStream lexer, 
-                     String filename, ParserConfig schemaConfig,
-                     ParserConfig normalConfig, HashMap taclet2Builder,
-                     SetOfTaclet taclets, SetOfChoice selectedChoices) { 
-        this(lexer, filename, null, null, null, mode);
+    public KeYParser(ParserMode mode, 
+    		     TokenStream lexer, 
+                     String filename, 
+                     ParserConfig schemaConfig,
+                     ParserConfig normalConfig, 
+                     HashMap taclet2Builder,
+                     SetOfTaclet taclets) { 
+        this(lexer, filename, null, null, mode);
         if (lexer instanceof DeclPicker) {
             this.capturer = (DeclPicker) lexer;
         }
         if (normalConfig!=null)
         scm = new AbbrevMap();
-        tf = TermFactory.DEFAULT;
         this.schemaConfig = schemaConfig;
         this.normalConfig = normalConfig;       
 	switchToNormalMode();
         this.taclet2Builder = taclet2Builder;
         this.taclets = taclets;
-	if(selectedChoices != null)
-	   this.selectedChoices = selectedChoices;
         if(normalConfig != null){
             this.keh = normalConfig.services().getExceptionHandler();
         }else{
@@ -303,12 +292,11 @@ options {
     }
 
     public KeYParser(ParserMode mode, TokenStream lexer, String filename) { 
-        this(lexer, filename, null, null, null, mode);
+        this(lexer, filename, null, null, mode);
         if (lexer instanceof DeclPicker) {
             this.capturer = (DeclPicker) lexer;
         }
         scm = new AbbrevMap();
-        tf = TermFactory.DEFAULT;
         this.schemaConfig = null;
         this.normalConfig = null;       
 	switchToNormalMode();
@@ -382,27 +370,27 @@ options {
         return nss;
     }
 
-    public Namespace sorts() {
+    private Namespace sorts() {
         return namespaces().sorts();
     }
 
-    public Namespace functions() {
+    private Namespace functions() {
         return namespaces().functions();
     }
 
-    public Namespace ruleSets() {
+    private Namespace ruleSets() {
         return namespaces().ruleSets();
     }
 
-    public Namespace variables() {
+    private Namespace variables() {
         return namespaces().variables();
     }
 
-    public Namespace programVariables() {
+    private Namespace programVariables() {
         return namespaces().programVariables();
     }
 
-    public Namespace choices(){
+    private Namespace choices(){
         return namespaces().choices();
     }
 
@@ -663,7 +651,7 @@ options {
         
     }
 
-    public static Term toZNotation(String number, Namespace functions, TermFactory tf){    
+    public static Term toZNotation(String number, Namespace functions){    
 	String s = number;
         final boolean negative = (s.charAt(0) == '-');
 	if (negative) {
@@ -677,18 +665,16 @@ options {
 	    Debug.fail("Not a hexadecimal constant (BTW, this should not have happened).");
 	  }
 	}
-        Term result = tf.createFunctionTerm((Function) functions.lookup(new Name("#")));
+        Term result = tf.createTerm((Function)functions.lookup(new Name("#")));
 
         for(int i = 0; i<s.length(); i++){
-            result = tf.createFunctionTerm((Function)functions.lookup
-                 (new Name(s.substring(i,i+1))), result);
+            result = tf.createTerm((Function)functions.lookup(new Name(s.substring(i,i+1))), result);
         }
 
        	if (negative) {
-  	    result = tf.createFunctionTerm
-		((Function) functions.lookup(new Name("neglit")), result);
+  	    result = tf.createTerm((Function) functions.lookup(new Name("neglit")), result);
         }
-	return tf.createFunctionTerm
+	return tf.createTerm
             ((Function) functions.lookup(new Name("Z")), result); 
     }
 
@@ -775,15 +761,23 @@ options {
             if (!inSchemaMode()) {
                 semanticError("Schemavariables may only occur inside taclets.");
             }
-            SchemaVariable sv = (SchemaVariable) attribute;
-            result = TB.select(getServices(), sv.sort(), TB.heap(getServices()), prefix, TB.func(attribute));//XXX
+	    SchemaVariable sv = (SchemaVariable) attribute;            
+            if(sv.sort() instanceof ProgramSVSort 
+                || sv.sort() == AbstractMetaOperator.METASORT) {
+                semanticError("Cannot use schema variable " + sv + " as an attribute"); 
+            }
+            result = TermBuilder.DF.select(getServices(), 
+                                           sv.sort(), 
+                                           TermBuilder.DF.heap(getServices()), 
+                                           prefix, 
+                                           tf.createTerm(attribute));
         } else {
             ProgramVariable pv = (ProgramVariable) attribute;
             Function fieldSymbol = getServices().getTypeConverter().getHeapLDT().getFieldSymbolForPV(pv, getServices());        
             if (pv.isStatic()){
-                result = TB.staticDot(getServices(), pv.sort(), fieldSymbol);
+                result = TermBuilder.DF.staticDot(getServices(), pv.sort(), fieldSymbol);
             } else {            
-                result = TB.dot(getServices(), pv.sort(), result, fieldSymbol);                
+                result = TermBuilder.DF.dot(getServices(), pv.sort(), result, fieldSymbol);                
             }
         }
         return result;
@@ -864,20 +858,18 @@ options {
 
     private Term termForParsedVariable(ParsableVariable v) 
         throws antlr.SemanticException {
-        if ( v instanceof LogicVariable ) {
-            return tf.createVariableTerm((LogicVariable)v);
-        } else if ( v instanceof ProgramVariable ) {
-            return tf.createVariableTerm((ProgramVariable)v);
+        if ( v instanceof LogicVariable || v instanceof ProgramVariable) {
+            return tf.createTerm(v);
         } else {
 	  if(isGlobalDeclTermParser())
 		semanticError(v + " is not a logic variable");
           if ((!isProblemParser()) && (v instanceof Metavariable)) {
-             return tf.createFunctionTerm((Metavariable)v);
+             return tf.createTerm(v);
           } else {
   	     if(isTermParser())
                semanticError(v + " is an unknown kind of variable.");
 	    if (inSchemaMode() && v instanceof SchemaVariable ) {
-               return tf.createVariableTerm((SchemaVariable)v);
+               return tf.createTerm(v);
             } else {
 	    	String errorMessage = "";
                 if ( inSchemaMode() ) {
@@ -2194,7 +2186,7 @@ term10 returns [Term result = null]
         (
            PARALLEL a=term10_2
            {
-               result = TB.parallel(result, a);
+               result = tf.createTerm(UpdateJunctor.PARALLEL_UPDATE, result, a);
            }
             
         )*
@@ -2214,7 +2206,7 @@ term10_2 returns[Term result=null]
         (
             ASSIGN a=term20
             {
-                result = TB.elementary(getServices(), result, a);
+                result = TermBuilder.DF.elementary(getServices(), result, a);
             }
         )?
    ; exception
@@ -2231,7 +2223,7 @@ term20 returns [Term a = null]
 }
     :   a=term30 
         (EQV a1=term30 
-            { a = tf.createJunctorTerm(Equality.EQV, new Term[]{a, a1});} )*
+            { a = tf.createTerm(Equality.EQV, new Term[]{a, a1});} )*
 ; exception
         catch [TermCreationException ex] {
               keh.reportException
@@ -2245,7 +2237,7 @@ term30 returns [Term a = null]
 }
     :   a=term40 
         (IMP a1=term30 
-            { a = tf.createJunctorTerm(Junctor.IMP, new Term[]{a, a1});} )?
+            { a = tf.createTerm(Junctor.IMP, new Term[]{a, a1});} )?
 ; exception
         catch [TermCreationException ex] {
               keh.reportException
@@ -2259,7 +2251,7 @@ term40 returns [Term a = null]
 }
     :   a=term50 
         (OR a1=term50 
-            { a = tf.createJunctorTerm(Junctor.OR, new Term[]{a, a1});} )*
+            { a = tf.createTerm(Junctor.OR, new Term[]{a, a1});} )*
 ; exception
         catch [TermCreationException ex] {
               keh.reportException
@@ -2273,7 +2265,7 @@ term50 returns [Term a = null]
 }
     :   a=term60 
         (AND a1=term60
-            { a = tf.createJunctorTerm(Junctor.AND, new Term[]{a, a1});} )*
+            { a = tf.createTerm(Junctor.AND, new Term[]{a, a1});} )*
             
 ; exception
         catch [TermCreationException ex] {
@@ -2296,7 +2288,7 @@ term60 returns [Term a = null]
 unary_formula returns [Term a = null] 
 { Term a1; }
     :  
-        NOT a1  = term60 { a = tf.createJunctorTerm(Junctor.NOT,new Term[]{a1}); }
+        NOT a1  = term60 { a = tf.createTerm(Junctor.NOT,new Term[]{a1}); }
     |	a = quantifierterm 
     |   a = modality_dl_term
 ; exception
@@ -2332,10 +2324,10 @@ term70 returns [Term a = null]
                 }
                 semanticError(errorMessage);
             }
-            a = tf.createEqualityTerm(a, a1);
+            a = tf.createTerm(Equality.EQUALS, a, a1);
 
             if (negated) {
-              a = tf.createJunctorTerm(Junctor.NOT, a);
+              a = tf.createTerm(Junctor.NOT, a);
             }
         })?
  ; exception
@@ -2405,7 +2397,7 @@ logicTermReEntry returns [Term a = null]
 }
 :
    a = term90 ((relation_op)=> op = relation_op a1=term90 {
-                 a = tf.createFunctionTerm(op, a, a1);
+                 a = tf.createTerm(op, a, a1);
               })?
 ; exception
         catch [TermCreationException ex] {
@@ -2422,7 +2414,7 @@ term90 returns [Term a = null]
 }
 :
    a = term100 ( op = weak_arith_op a1=term100 {
-                  a = tf.createFunctionTerm(op, a, a1);
+                  a = tf.createTerm(op, a, a1);
                 })*
 ; exception
         catch [TermCreationException ex] {
@@ -2438,7 +2430,7 @@ term100 returns [Term a = null]
 }
 :
    a = term110 ( op = strong_arith_op a1=term110 {
-                  a = tf.createFunctionTerm(op, a, a1);
+                  a = tf.createTerm(op, a, a1);
                 })*
 ; exception
         catch [TermCreationException ex] {
@@ -2673,7 +2665,7 @@ accessterm returns [Term result = null]
       (MINUS ~NUM_LITERAL) => MINUS result = term110
         {
             if (result.sort() != Sort.FORMULA) {
-                result = tf.createFunctionTerm
+                result = tf.createTerm
                 ((Function) functions().lookup(new Name("neg")), result);
             } else {
                 semanticError("Formula cannot be prefixed with '-'");
@@ -2693,7 +2685,7 @@ accessterm returns [Term result = null]
                     " to sort " + s +
                     ". Casts between primitive and reference types are not allowed. ");
          }
-         result = tf.createFunctionTerm(s.getCastSymbol(getServices()), result);
+         result = tf.createTerm(s.getCastSymbol(getServices()), result);
 	  } |
       ( {isStaticQuery()}? // look for package1.package2.Class.query(
         result = static_query
@@ -2720,10 +2712,10 @@ array_access_suffix [Term arrayReference] returns [Term result = arrayReference]
 	:
   	LBRACKET 
 	(   STAR {
-           	rangeFrom = toZNotation("0", functions(), tf);
-           	Term lt = TB.dotLength(getServices(), arrayReference);
-           	Term one = toZNotation("1", functions(), tf);
-  	   		rangeTo = tf.createFunctionTerm
+           	rangeFrom = toZNotation("0", functions());
+           	Term lt = TermBuilder.DF.dotLength(getServices(), arrayReference);
+           	Term one = toZNotation("1", functions());
+  	   		rangeTo = tf.createTerm
            		((Function) functions().lookup(new Name("sub")), lt, one); 
         } 
         | indexTerm = logicTermReEntry 
@@ -2739,17 +2731,15 @@ array_access_suffix [Term arrayReference] returns [Term result = arrayReference]
 		}
 		LogicVariable indexVar = new LogicVariable(new Name("i"), 
 		   	   		   (Sort) sorts().lookup(new Name("int")));
-		indexTerm = tf.createVariableTerm(indexVar);
+		indexTerm = tf.createTerm(indexVar);
 		   	
 		Function leq = (Function) functions().lookup(new Name("leq"));
-		Term fromTerm = tf.createFunctionTerm(leq, rangeFrom, indexTerm);
-		Term toTerm = tf.createFunctionTerm(leq, indexTerm, rangeTo);
-		Term guardTerm = tf.createJunctorTerm(Junctor.AND, fromTerm, toTerm);
-		quantifiedArrayGuard = tf.createJunctorTermAndSimplify(Junctor.AND, 
-		   						  quantifiedArrayGuard, 
-		   						  guardTerm);
+		Term fromTerm = tf.createTerm(leq, rangeFrom, indexTerm);
+		Term toTerm = tf.createTerm(leq, indexTerm, rangeTo);
+		Term guardTerm = tf.createTerm(Junctor.AND, fromTerm, toTerm);
+		quantifiedArrayGuard = tf.createTerm(Junctor.AND, quantifiedArrayGuard, guardTerm);
 		}
-            result = TB.dotArr(getServices(), result, indexTerm); 
+            result = TermBuilder.DF.dotArr(getServices(), result, indexTerm); 
     }            
     ;exception
         catch [TermCreationException ex] {
@@ -2767,11 +2757,11 @@ term130 returns [Term a = null]
         {isMetaOperator()}? a = specialTerm
     |   a = funcpredvarterm
     |   LPAREN a = term RPAREN 
-    |   TRUE  { a = TB.tt(); }
-    |   FALSE { a = TB.ff(); }
+    |   TRUE  { a = tf.createTerm(Junctor.TRUE); }
+    |   FALSE { a = tf.createTerm(Junctor.FALSE); }
     |   a = ifThenElseTerm
-    |   a = sum_or_product_term
-    |   a = bounded_sum_term
+    //|   a = sum_or_product_term
+    //|   a = bounded_sum_term
    ; exception
         catch [TermCreationException ex] {
               keh.reportException
@@ -2797,6 +2787,7 @@ abbreviation returns [Term a=null]
         )
     ;
 
+/*XXX
 sum_or_product_term returns [Term result=null]
 {
     Term cond, t;
@@ -2843,6 +2834,7 @@ bounded_sum_term returns [Term result=null]
         }
         RPAREN
     ;
+*/
 
 ifThenElseTerm returns [Term result = null]
 {
@@ -2859,7 +2851,7 @@ ifThenElseTerm returns [Term result = null]
         THEN LPAREN thenT = term RPAREN
         ELSE LPAREN elseT = term RPAREN
         {
-            result = tf.createIfThenElseTerm ( condF, thenT, elseT );
+            result = tf.createTerm ( IfThenElse.IF_THEN_ELSE, new Term[]{condF, thenT, elseT} );
         }
  ; exception
         catch [TermCreationException ex] {
@@ -2896,8 +2888,10 @@ quantifierterm returns [Term a = null]
           | EXISTS  { op = Quantifier.EX;  })
         vs = bound_variables a1 = term60
         {
-            a = tf.createQuantifierTerm((Quantifier)op,
-	       new ArrayOfQuantifiableVariable(vs.toArray()),a1);
+            a = tf.createTerm((Quantifier)op,
+                              new ArrayOfTerm(a1),
+	       		      new ArrayOfQuantifiableVariable(vs.toArray()),
+	       		      null);
             if(!isGlobalDeclTermParser())
               unbindVars();
         }
@@ -2934,7 +2928,7 @@ substitutionterm returns [Term result = null]
      }
    RBRACE
    ( a2 = term110 | a2 = unary_formula ) {
-      result = tf.createSubstitutionTerm ( op, v, a1, a2 );
+      result = TermBuilder.DF.subst ( op, v, a1, a2 );
       if(!isGlobalDeclTermParser())
         unbindVars();
    }
@@ -2958,7 +2952,7 @@ updateterm returns [Term result = null]
             a2=unary_formula 
         )
         {   
-	    result = TB.apply(u, a2);
+	    result = tf.createTerm(UpdateApplication.UPDATE_APPLICATION, u, a2);
         }
    ; exception
         catch [TermCreationException ex] {
@@ -3059,7 +3053,7 @@ modality_dl_term returns [Term a = null]
      // so that it is consistent with pretty printer that prints (1).
      // A term "(post)" seems to be parsed as "post" anyway
       {
-            a = tf.createProgramTerm(op, sjb.javaBlock, new Term[]{a1});
+            a = tf.createTerm(op, new Term[]{a1}, null, sjb.javaBlock);
       }
    )
    ; exception
@@ -3109,12 +3103,12 @@ funcpredvarterm returns [Term a = null]
                     semanticError("'"+s+"' is not a valid character.");
                 }       
             }
-            a = tf.createFunctionTerm((Function) functions().lookup(new Name("C")), 
-                                      toZNotation(""+intVal, functions(), tf).sub(0));
+            a = tf.createTerm((Function) functions().lookup(new Name("C")), 
+                                      toZNotation(""+intVal, functions()).sub(0));
         }
     | 
         ((MINUS)? NUM_LITERAL) => (MINUS {neg = "-";})? number:NUM_LITERAL
-        { a = toZNotation(neg+number.getText(), functions(), tf);}    
+        { a = toZNotation(neg+number.getText(), functions());}    
     | AT a = abbreviation
     | varfuncid = funcpred_name
         (
@@ -3133,9 +3127,9 @@ funcpredvarterm returns [Term a = null]
                 
         {  
             if(varfuncid.equals("inReachableState") && args == null) {
-	        a = TB.inReachableState(getServices());
+	        a = TermBuilder.DF.inReachableState(getServices());
 	    } else if(varfuncid.equals("skip") && args == null) {
-	        a = TB.skip();
+	        a = tf.createTerm(UpdateJunctor.SKIP);
 	    } else {
 	            Operator op = lookupVarfuncId(varfuncid, args);     
 	                   
@@ -3147,7 +3141,7 @@ funcpredvarterm returns [Term a = null]
 	                }
 	
 	                if(boundVars == null) {
-	                    a = TB.func(op, args);
+	                    a = tf.createTerm(op, args);
 	                } else {
 	                    //sanity check
 	                    assert op instanceof Function;
@@ -3163,7 +3157,7 @@ funcpredvarterm returns [Term a = null]
 	                    }
 	                    
 	                    //create term
-	                    a = TB.func(op, args, new ArrayOfQuantifiableVariable(boundVars.toArray()));
+	                    a = tf.createTerm(op, args, new ArrayOfQuantifiableVariable(boundVars.toArray()), null);
 	                }
 	            }
 	    }
@@ -3412,14 +3406,14 @@ varcond_dropEffectlessElementaries[TacletBuilder b]
 {
   ParsableVariable u = null;
   ParsableVariable x = null;
-  ParsableVariable u2 = null;
+  ParsableVariable result = null;
 }
 :
-   DROP_EFFECTLESS_ELEMENTARIES LPAREN u=varId COMMA x=varId COMMA u2=varId RPAREN 
+   DROP_EFFECTLESS_ELEMENTARIES LPAREN u=varId COMMA x=varId COMMA result=varId RPAREN 
    {
       b.addVariableCondition(new DropEffectlessElementariesCondition((UpdateSV)u, 
                                                                      (SchemaVariable)x, 
-                                                                     (UpdateSV)u2));
+                                                                     (SchemaVariable)result));
    }
 ;
 
@@ -3853,8 +3847,7 @@ metaTerm returns [Term result = null]
 		    vf = nvf;
 		  }
 		}
-                result = tf.createMetaTerm(vf,
-                                           (Term[])al.toArray(AN_ARRAY_OF_TERMS));
+                result = tf.createTerm(vf, (Term[])al.toArray(AN_ARRAY_OF_TERMS));
             }         
         ) 
  ; exception

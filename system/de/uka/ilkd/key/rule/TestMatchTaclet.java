@@ -33,6 +33,9 @@ import de.uka.ilkd.key.util.Debug;
 
 
 public class TestMatchTaclet extends TestCase {
+    
+    private static final TermBuilder TB = TermBuilder.DF;
+    
     FindTaclet if_addrule_conflict;
     FindTaclet find_addrule_conflict;
     FindTaclet if_find_clash;
@@ -259,8 +262,7 @@ public class TestMatchTaclet extends TestCase {
 		    })));
 
 
-	Term match = TermFactory.DEFAULT.createDiamondTerm
-	    (javaBlock, TermFactory.DEFAULT.createJunctorTerm(Junctor.TRUE));
+	Term match = TB.dia(javaBlock, TB.tt());
 	
 	FindTaclet taclet=(FindTaclet)TacletForTests
 	    .getTaclet("TestMatchTaclet_preincrement").taclet();   
@@ -549,7 +551,7 @@ public class TestMatchTaclet extends TestCase {
 					      .add(osort2).add(osort3), false);
 	Function v4=new Function(new Name("v4"), osort4, new Sort[0]);	
 	TermFactory tf=TermFactory.DEFAULT;
-	Term match=tf.createFunctionTerm(v4);
+	Term match=tf.createTerm(v4);
 	FindTaclet taclet=(FindTaclet)TacletForTests.getTaclet
 	    ("TestMatchTaclet_subsort_termSV").taclet();   
 	MatchConditions mc=taclet.match(match, 
@@ -569,9 +571,8 @@ public class TestMatchTaclet extends TestCase {
 					      .add(osort2).add(osort3), false);	
 	TermFactory tf=TermFactory.DEFAULT;
 	Function aPred = (Function)TacletForTests.getFunctions().lookup(new Name("A"));
-	Term sub = tf.createFunctionTerm(aPred);
-	Term match=tf.createQuantifierTerm(Quantifier.ALL, 
-					   new LogicVariable(new Name("lv"), osort4), 
+	Term sub = tf.createTerm(aPred);
+	Term match=TermBuilder.DF.all(new LogicVariable(new Name("lv"), osort4), 
 					   sub);
 	FindTaclet taclet=(FindTaclet)TacletForTests.getTaclet
 	    ("TestMatchTaclet_subsort_variableSV").taclet();   
@@ -602,7 +603,7 @@ public class TestMatchTaclet extends TestCase {
 	     new LocationVariable(new ProgramElementName("testVar"),
 				 new SortImpl(new Name("testSort"))));
 	MethodFrame mframe = new MethodFrame(null, ec, prg);
-	match = tf.createDiamondTerm
+	match = TB.dia
 	    (JavaBlock.createJavaBlock(new StatementBlock(mframe)), 
 	     match.sub(0));
 	FindTaclet taclet=(FindTaclet)TacletForTests.getTaclet
@@ -618,7 +619,7 @@ public class TestMatchTaclet extends TestCase {
 	prg = (StatementBlock)match.javaBlock().program();
 	mframe = new MethodFrame((IProgramVariable)termWithPV.sub(0).sub(0).op(),
 				  ec, prg);
-	match = tf.createDiamondTerm(JavaBlock.createJavaBlock(new StatementBlock(mframe)), match.sub(0));
+	match = TB.dia(JavaBlock.createJavaBlock(new StatementBlock(mframe)), match.sub(0));
 	taclet=(FindTaclet)TacletForTests.getTaclet
 	    ("TestMatchTaclet_methodframe_value").taclet();	
 	mc=(taclet.match(match, 

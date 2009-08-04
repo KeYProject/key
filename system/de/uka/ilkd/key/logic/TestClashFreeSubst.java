@@ -69,10 +69,10 @@ public class TestClashFreeSubst extends TestCase {
 	// The declaration parser cannot parse LogicVariables; these
 	// are normally declared in quantifiers, so we introduce them
 	// ourselves!
-	v = declareVar("v",srt);   t_v = tf.createVariableTerm(v);
-	x = declareVar("x",srt);   t_x = tf.createVariableTerm(x);
-	y = declareVar("y",srt);   t_y = tf.createVariableTerm(y);
-	z = declareVar("z",srt);   t_z = tf.createVariableTerm(z);
+	v = declareVar("v",srt);   t_v = tf.createTerm(v);
+	x = declareVar("x",srt);   t_x = tf.createTerm(x);
+	y = declareVar("y",srt);   t_y = tf.createTerm(y);
+	z = declareVar("z",srt);   t_z = tf.createTerm(z);
     }
 
     Sort lookup_sort(String name) {
@@ -121,8 +121,9 @@ public class TestClashFreeSubst extends TestCase {
 
     private KeYParser stringTermParser(String s) {
 	return new KeYParser(ParserMode.GLOBALDECL,
-				   new KeYLexer(new StringReader(s),null),
-				   tf, new Services (), nss);
+			     new KeYLexer(new StringReader(s),null),
+			     new Services (), 
+			     nss);
     }
 
     public Term parseTerm(String s) {
@@ -185,19 +186,15 @@ public class TestClashFreeSubst extends TestCase {
 			    top.varsBoundHere(0).getQuantifiableVariable(i);
 		    }
 		    subStack.pop();
-		    subStack.push(tf.createQuantifierTerm(
-                                      Quantifier.ALL, bv, top.sub(0)));
+		    subStack.push(TermBuilder.DF.all(bv, top.sub(0)));
 		    return;
 		}
 	    }
-	    ArrayOfQuantifiableVariable[] bv 
-		= new ArrayOfQuantifiableVariable[arity];
 	    Term[] sub = new Term[arity];
 	    for ( int i = arity-1; i>=0; i-- ) {
 		sub[i] = (Term) (subStack.pop());
-		bv[i] = visited.varsBoundHere(i);
 	    }
-	    subStack.push(tf.createTerm(op, sub, bv, null));
+	    subStack.push(tf.createTerm(op, sub, visited.boundVars(), null));
 	}
 
 	Term getResult() {

@@ -15,6 +15,7 @@ import java.util.Iterator;
 import junit.framework.TestCase;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -49,20 +50,27 @@ public class TestProofTree extends TestCase {
 	LogicVariable b6=new LogicVariable(new Name("b6"),s);
 	LogicVariable b7=new LogicVariable(new Name("b7"),s);
 
-	Term t_b1=tf.createEqualityTerm(tf.createVariableTerm(b1),
-					tf.createVariableTerm(b1));
-	Term t_b2=tf.createEqualityTerm(tf.createVariableTerm(b2),
-					tf.createVariableTerm(b2));
-	Term t_b3=tf.createEqualityTerm(tf.createVariableTerm(b3),
-					tf.createVariableTerm(b3));
-	Term t_b4=tf.createEqualityTerm(tf.createVariableTerm(b4),
-					tf.createVariableTerm(b4));
-	Term t_b5=tf.createEqualityTerm(tf.createVariableTerm(b5),
-					tf.createVariableTerm(b5));
-	Term t_b6=tf.createEqualityTerm(tf.createVariableTerm(b6),
-					tf.createVariableTerm(b6));
-	Term t_b7=tf.createEqualityTerm(tf.createVariableTerm(b7),
-					tf.createVariableTerm(b7));
+	Term t_b1=tf.createTerm(Equality.EQUALS,
+		                tf.createTerm(b1),
+		                tf.createTerm(b1));
+	Term t_b2=tf.createTerm(Equality.EQUALS,
+		                tf.createTerm(b2),
+		                tf.createTerm(b2));
+	Term t_b3=tf.createTerm(Equality.EQUALS,
+		                tf.createTerm(b3),
+		                tf.createTerm(b3));
+	Term t_b4=tf.createTerm(Equality.EQUALS,
+		                tf.createTerm(b4),
+		                tf.createTerm(b4));
+	Term t_b5=tf.createTerm(Equality.EQUALS,
+		                tf.createTerm(b5),
+		                tf.createTerm(b5));
+	Term t_b6=tf.createTerm(Equality.EQUALS,
+		                tf.createTerm(b6),
+		                tf.createTerm(b6));
+	Term t_b7=tf.createTerm(Equality.EQUALS,
+		                tf.createTerm(b7),
+		                tf.createTerm(b7));
 
 	Sequent s1=Sequent.createSequent
 	    (Semisequent.EMPTY_SEMISEQUENT.insert(0, new

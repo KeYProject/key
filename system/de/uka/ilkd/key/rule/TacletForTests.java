@@ -173,7 +173,6 @@ public class TacletForTests {
 					     "No file. " +
 					     "TacletForTests.parseTerm("
 					     +termstr+")",
-					     TermFactory.DEFAULT, 
 					     new Recoder2KeY(services, nss),
 					     services, nss,
 					     TacletForTests.getAbbrevs());
@@ -196,7 +195,6 @@ public class TacletForTests {
 					     "No file. " +
 					     "TacletForTests.parseTerm("
 					     +termstr+")",
-					     TermFactory.DEFAULT, 
 					     new Recoder2KeY(services(), set),
 					     services(),
 					     set,

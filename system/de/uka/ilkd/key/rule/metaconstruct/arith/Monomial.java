@@ -204,7 +204,7 @@ public class Monomial {
         if ( it.hasNext () ) {
             res = it.next ();
             while ( it.hasNext () )
-                res = TermFactory.DEFAULT.createFunctionTerm ( mul, res,
+                res = TermFactory.DEFAULT.createTerm ( mul, res,
                                                                it.next () );
         }
         
@@ -214,7 +214,7 @@ public class Monomial {
         if ( res == null )
             res = cTerm;
         else if ( !BigInteger.ONE.equals ( coefficient ) )
-            res = TermFactory.DEFAULT.createFunctionTerm ( mul, res, cTerm );
+            res = TermFactory.DEFAULT.createTerm ( mul, res, cTerm );
         
         return res;        
     }

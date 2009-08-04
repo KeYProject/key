@@ -59,7 +59,7 @@ public final class ArrayBaseInstanceOf extends AbstractMetaOperator {
         Debug.assertTrue(instanceofSymbol != null,
                 "Instanceof symbol not found for ", arrayElementSort);
         
-        return TermFactory.DEFAULT.createFunctionTerm(instanceofSymbol, 
+        return TermFactory.DEFAULT.createTerm(instanceofSymbol, 
                 element);
     }
 

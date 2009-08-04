@@ -22,7 +22,7 @@ import de.uka.ilkd.key.gui.Main;
 
 public class WebstartMain {
     
-    private static final String DEFAULT_EXAMPLE = "test.key";
+    private static final String DEFAULT_EXAMPLE = "select_store.key";
         
 
     private static void delete(File f){

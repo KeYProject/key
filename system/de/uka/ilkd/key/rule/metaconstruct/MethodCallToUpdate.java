@@ -5,6 +5,7 @@
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
+
 package de.uka.ilkd.key.rule.metaconstruct;
 
 import de.uka.ilkd.key.java.Services;
@@ -89,7 +90,7 @@ public class MethodCallToUpdate extends AbstractMetaOperator {
         }
         
         // generate a new function
-        Term location_value = TermFactory.DEFAULT.createFunctionTerm(
+        Term location_value = TermFactory.DEFAULT.createTerm(
                 spmbs.getProgramMethod(services), param );
         
         return TB.applyElementary(services, location, location_value, term.sub(1));

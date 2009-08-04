@@ -14,8 +14,8 @@ import java.math.BigInteger;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.AbstractMetaOperator;
-import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 
@@ -41,9 +41,9 @@ public final class MetaEqual extends AbstractMetaOperator {
 	boolean result = bigIntArg1.compareTo(bigIntArg2) == 0;
 	
 	if (result)
-	    return termFactory.createJunctorTerm(Junctor.TRUE);
+	    return TermBuilder.DF.tt();
 	else
-	    return termFactory.createJunctorTerm(Junctor.FALSE);
+	    return TermBuilder.DF.ff();
 
     }
 }

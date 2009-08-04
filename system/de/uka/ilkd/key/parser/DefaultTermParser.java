@@ -78,10 +78,13 @@ public final class DefaultTermParser {
         try{
             KeYParser parser
                 = new KeYParser(ParserMode.TERM, new KeYLexer(
-		                in,services.getExceptionHandler()), "",
-				TermFactory.DEFAULT,
+		                in,
+		                services.getExceptionHandler()), 
+		                "",
 				new Recoder2KeY (services, nss),
-                                services, nss, scm);
+                                services, 
+                                nss, 
+                                scm);
 
 	    return parser.term();
         } catch (RecognitionException re) {
