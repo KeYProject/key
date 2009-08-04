@@ -5,14 +5,6 @@
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General Public License.
-// See LICENSE.TXT for details.
-//
 //
 
 package de.uka.ilkd.key.proof;
@@ -719,34 +711,6 @@ public class ProblemLoader implements Runnable {
                                        "\nVar namespace is: "+varNS+"\n", e);
         }
     }
-
-    public static SetOfLocationDescriptor parseLocationList(String value, Goal targetGoal) {
-        SetOfLocationDescriptor result = null;
-        Proof p = targetGoal.proof();
-        Namespace varNS = p.getNamespaces().variables();
-        NamespaceSet nss = new NamespaceSet(
-            varNS,
-            p.getNamespaces().functions(),
-            p.getNamespaces().sorts(),
-            new Namespace(),
-            new Namespace(),
-            targetGoal.getVariableNamespace(varNS));
-        Services services = p.getServices();
-        try{
-            result = (new KeYParser(ParserMode.TERM,new KeYLexer(new StringReader(value),
-                                             services.getExceptionHandler()),
-                                null, TermFactory.DEFAULT, null, services,
-                                nss, new AbbrevMap())).
-                location_list();
-        } catch (antlr.RecognitionException re) {
-            throw new RuntimeException("Cannot parse location list "+value, re);
-        } catch (antlr.TokenStreamException tse) {
-            throw new RuntimeException("Cannot parse location list "+value, tse);
-        }
-        return result;
-    }
-
-
 
     public static Term parseTerm(String value, Proof proof) {
         return parseTerm(value, proof, proof.getNamespaces().variables(),

@@ -134,20 +134,7 @@ public class UseOperationContractRule implements BuiltInRule {
                                           .getOperationContracts(pm, Modality.DIA));
         }
         
-        //prevent application of contracts with "everything" modifier sets 
-        //if metavariables are involved (hackish, see Bug 810)
-        if(getAllMetavariables(pio.topLevel().subTerm()).size() > 0) {
-            ProgramVariable dummySelfVar 
-                = SVF.createSelfVar(services, pm, true);
-            ListOfParsableVariable dummyParamVars 
-                = SVF.createParamVars(services, pm, true);
-            for(OperationContract contract : result) {
-                if(contract.getModifies(dummySelfVar, dummyParamVars, services)
-                           .contains(EverythingLocationDescriptor.INSTANCE)) {
-                    result = result.remove(contract);
-                }
-            }
-        }
+        assert getAllMetavariables(pio.topLevel().subTerm()).isEmpty() : "metavariables are disabled";
         
         return result;
     }

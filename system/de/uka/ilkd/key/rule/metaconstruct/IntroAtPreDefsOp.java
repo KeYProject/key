@@ -25,7 +25,6 @@ import de.uka.ilkd.key.java.statement.SetAsListOfLoopStatement;
 import de.uka.ilkd.key.java.statement.SetOfLoopStatement;
 import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
 import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.SetOfLocationDescriptor;
 import de.uka.ilkd.key.logic.SetOfTerm;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.AbstractMetaOperator;
@@ -101,7 +100,7 @@ public final class IntroAtPreDefsOp extends AbstractMetaOperator {
                     = inv.getInvariant(selfTerm, atPreFunctions, services);
                 SetOfTerm newPredicates
                     = inv.getPredicates(selfTerm, atPreFunctions, services);
-                SetOfLocationDescriptor newModifies
+                Term newModifies
                     = inv.getModifies(selfTerm, atPreFunctions, services);
                 Term newVariant
                     = inv.getVariant(selfTerm, atPreFunctions, services);

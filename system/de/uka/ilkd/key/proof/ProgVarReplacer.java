@@ -341,17 +341,6 @@ public final class ProgVarReplacer {
         }    
     }
 
-    
-    public LocationDescriptor replace(LocationDescriptor loc) {
-        if(loc instanceof BasicLocationDescriptor) {
-            BasicLocationDescriptor bloc = (BasicLocationDescriptor) loc;
-            return new BasicLocationDescriptor(replace(bloc.getFormula()), 
-                                               replace(bloc.getLocTerm()));
-        } else {
-            return loc;
-        }
-    }
-    
 
     /**
      * replaces in a statement

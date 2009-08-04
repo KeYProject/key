@@ -259,8 +259,21 @@ public final class TermBuilder {
     //updates    
     //-------------------------------------------------------------------------
     
-    public Term elementary(UpdateableOperator lhs, Term rhs) {
-	Operator op = ElementaryUpdate.getInstance(lhs);
+    public Term elementary(Services services, 
+	                   UpdateableOperator lhs, 
+	                   Term rhs) {
+	SortedOperator op = ElementaryUpdate.getInstance(lhs);
+	
+	//XXX, weird integers
+	if(services.getTypeConverter().getIntegerLDT() != null) {
+	    Sort intSort = services.getTypeConverter().getIntegerLDT().targetSort();	
+	    if(!rhs.sort().extendsTrans(op.argSort(0))
+	        && op.argSort(0).extendsTrans(intSort)
+	        && rhs.sort().extendsTrans(intSort)) {
+		rhs = cast(services, op.argSort(0), rhs);
+	    }
+	}
+	
 	return func(op, rhs);
     }
     
@@ -269,7 +282,7 @@ public final class TermBuilder {
 	HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
 	if(lhs.op() instanceof UpdateableOperator) {
 	    assert lhs.arity() == 0 : "uh oh: " + lhs;
-	    return elementary((UpdateableOperator)lhs.op(), rhs);
+	    return elementary(services, (UpdateableOperator)lhs.op(), rhs);
 	} else if(heapLDT.getSortOfSelect(lhs.op()) != null
 		  && lhs.sub(0).op().equals(heapLDT.getHeap())) {
 	    final Term heapTerm   = lhs.sub(0);
@@ -281,7 +294,7 @@ public final class TermBuilder {
                 		       objectTerm, 
                 		       fieldTerm, 
                 		       rhs);
-	    return elementary(heapLDT.getHeap(), fullRhs);
+	    return elementary(services, heapLDT.getHeap(), fullRhs);
 	} else {
 	    throw new TermCreationException("Not a legal lhs: " + lhs);
 	}
@@ -506,6 +519,16 @@ public final class TermBuilder {
     }
     
     
+    public Term pairSingleton(Services services, Term t1, Term t2) {
+	return singleton(services, pair(services, t1, t2));
+    }
+        
+    
+    public Term pairElementOf(Services services, Term t1, Term t2, Term s) {
+	return elementOf(services, pair(services, t1, t2), s);
+    }    
+    
+    
     
     //-------------------------------------------------------------------------
     //set operators    
@@ -520,11 +543,6 @@ public final class TermBuilder {
 	return func(services.getTypeConverter().getSetLDT().getSingleton(), e);
     }
     
-   
-    public Term pairSingleton(Services services, Term t1, Term t2) {
-	return singleton(services, pair(services, t1, t2));
-    }
-    
     
     public Term union(Services services, Term s1, Term s2) {
 	return func(services.getTypeConverter().getSetLDT().getUnion(), s1, s2);
@@ -537,21 +555,30 @@ public final class TermBuilder {
 		    s2);
     }
     
+    
     public Term setMinus(Services services, Term s1, Term s2) {
 	return func(services.getTypeConverter().getSetLDT().getSetMinus(), 
 		    s1, 
 		    s2);
     }
     
+    
+    public Term setComprehension(Services services, 
+	                         QuantifiableVariable qv, 
+	                         Term a, 
+	                         Term s) {
+	Function f 
+		= services.getTypeConverter()
+		          .getSetLDT()
+		          .getSetComprehension();
+	return tf.createTerm(f, new Term[]{a,s}, new ArrayOfQuantifiableVariable[]{new ArrayOfQuantifiableVariable(qv)}, null);
+    }
+    
+    
     public Term elementOf(Services services, Term e, Term s) {
 	return func(services.getTypeConverter().getSetLDT().getElementOf(), 
 		    e,
 		    s);
-    }
-    
-    
-    public Term pairElementOf(Services services, Term t1, Term t2, Term s) {
-	return elementOf(services, pair(services, t1, t2), s);
     }
     
     
@@ -648,16 +675,20 @@ public final class TermBuilder {
 		                 .getNextToCreateFor(sort, services));
     }
     
+    
+    public Term arr(Services services, Term idx) {
+	return func(services.getTypeConverter().getHeapLDT().getArr(), idx);
+    }
+    
 
-    public Term array(Services services, Term ref, Term idx) {
+    public Term dotArr(Services services, Term ref, Term idx) {
         if (ref == null || idx == null) {
             throw new TermCreationException("Tried to build an array access "+
                     "term without providing an " +
                     (ref==null ? "array reference." : "index.") + 
                     "("+ref+"["+idx+"])");
         }   
-        
-        final Function arr = services.getTypeConverter().getHeapLDT().getArr();        
+                
         final Sort elementSort;
         if(ref.sort() instanceof ArraySort) {
             elementSort = ((ArraySort) ref.sort()).elementSort();
@@ -675,7 +706,7 @@ public final class TermBuilder {
         	      elementSort, 
         	      heap(services), 
         	      ref, 
-        	      func(arr, idx));
+        	      arr(services, idx));
     }
     
     
@@ -696,11 +727,46 @@ public final class TermBuilder {
         return store(services, heap(services), o, func(f), v);
     }
     
+    
     public Term staticFieldStore(Services services, Function f, Term v) {
 	return fieldStore(services, NULL(services), f, v);
     }
     
+    
     public Term arrayStore(Services services, Term o, Term i, Term v) {
         return store(services, heap(services), o, func(services.getTypeConverter().getHeapLDT().getArr(), i), v);
     }        
+    
+    
+    public Term allLocs(Services services) {
+	return func(services.getTypeConverter().getHeapLDT().allLocs());
+    }
+    
+    
+    public Term allFields(Services services, Term o) {
+	return func(services.getTypeConverter().getHeapLDT().allFields(), o);
+    }
+    
+    
+    public Term locComprehension(Services services, 
+	                         QuantifiableVariable qv, 
+	                         Term o, 
+	                         Term f) {
+	return setComprehension(services, 
+		                qv, 
+		                pair(services, o, f), 
+		                allLocs(services));
+    }
+    
+    public Term guardedLocComprehension(Services services, 
+	                         	QuantifiableVariable qv,
+	                         	Term cond,
+	                         	Term o, 
+	                         	Term f) {
+	return setComprehension(services, 
+		                qv, 
+		                ife(cond, pair(services, o, f), empty(services)),
+		                allLocs(services));
+    }
+    
 }

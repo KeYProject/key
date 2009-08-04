@@ -13,14 +13,14 @@ package de.uka.ilkd.key.strategy.termgenerator;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.IntegerLDT;
-import de.uka.ilkd.key.logic.IteratorOfTerm;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.op.SVSubstitute;
+import de.uka.ilkd.key.logic.op.SortedOperator;
+import de.uka.ilkd.key.logic.sort.ArrayOfSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.TopRuleAppCost;
 import de.uka.ilkd.key.strategy.termfeature.TermFeature;
@@ -65,7 +65,7 @@ public abstract class SuperTermGenerator implements TermGenerator {
 
     abstract static class SuperTermWithIndexGenerator extends SuperTermGenerator {
         private Services services;
-        private Function binFunc;
+        private Operator binFunc;
 
         protected SuperTermWithIndexGenerator(TermFeature cond) {
             super ( cond );
@@ -76,9 +76,55 @@ public abstract class SuperTermGenerator implements TermGenerator {
                 services = goal.proof ().getServices ();
                 final IntegerLDT numbers = services.getTypeConverter ().getIntegerLDT ();
                 
-                binFunc = new Function
-                     ( new Name ( "SuperTermGenerated" ), Sort.ANY,
-                       new Sort[] { Sort.ANY, numbers.getNumberSymbol ().sort () } );
+                binFunc = new SortedOperator() {
+                    private final Name NAME = new Name("SuperTermGenerated");
+                    public Name name() {
+                	return NAME;
+                    }
+                    
+                    public int arity() {
+                	return 2;
+                    }
+
+                    public Sort sort(ArrayOfTerm terms) {
+                	return Sort.ANY;
+                    }
+                    
+                    public Sort sort() {
+                	return Sort.ANY;
+                    }
+                    
+                    public Sort argSort(int i) {
+                	return Sort.ANY;
+                    }
+                    
+                    public ArrayOfSort argSorts () {
+                	return null;
+                    }
+
+                    public boolean bindVarsAt(int n) {
+                	return false;
+                    }
+
+                    public boolean isRigid() {
+                	return true;
+                    }
+
+                    public boolean validTopLevel(Term term) {
+                	return term.arity() == 2
+                	       && term.sub(1).sort().extendsTrans(numbers.getNumberSymbol ().sort ());
+                    }
+
+                    public MatchConditions match(SVSubstitute subst, 
+                	    			 MatchConditions mc, 
+                	    			 Services services) {
+                	return subst == this ? mc : null;
+                    }    
+                };
+                
+//                binFunc = new Function
+//                     ( new Name ( "SuperTermGenerated" ), Sort.ANY,
+//                       new Sort[] { Sort.ANY, numbers.getNumberSymbol ().sort () } );
             }
             
             return createIterator ( pos );
@@ -116,5 +162,4 @@ public abstract class SuperTermGenerator implements TermGenerator {
             throw new UnsupportedOperationException();
         }
     }
-
 }

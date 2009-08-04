@@ -374,7 +374,7 @@ public final class EnhancedForInvRule extends AbstractMetaOperator {
         } else {
             // OR add the formal parameter declaration as an update
 
-            Term arrayAccess = TB.array(services, arrayvar, counter);
+            Term arrayAccess = TB.dotArr(services, arrayvar, counter);
             ProgramVariable var =
                     (ProgramVariable) formalParam.getProgramVariable();
             return TB.applyElementary(services, TB.var(var), arrayAccess, resultTerm);

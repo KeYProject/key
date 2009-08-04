@@ -164,27 +164,30 @@ public final class OneStepSimplifier implements BuiltInRule {
 	Instantiation result = cache.get(cf);
 	
 	if(result == null) {
-	    ConstrainedFormula currentCF = cf;
-	    ConstrainedFormula simplifiedCF;
-	    int numAppliedRules = 0;
-	    do {
-		simplifiedCF = simplifyConstrainedFormula(services, 
-							  currentCF);
-		if(simplifiedCF != null) {
-		    currentCF = simplifiedCF;
-		    numAppliedRules++;
+	    ListOfConstrainedFormula list 
+	    	= SLListOfConstrainedFormula.EMPTY_LIST.prepend(cf);
+	    while(true) {
+		ConstrainedFormula nextCF 
+			= simplifyConstrainedFormula(services, 
+					             list.head());
+		if(nextCF != null && !list.contains(nextCF)) {
+		    list = list.prepend(nextCF);
+		} else {
+		    break;
 		}
-	    } while(simplifiedCF != null);
-
-	    if(numAppliedRules > 0) {
-		result = new Instantiation(currentCF, numAppliedRules);
-		cache.put(currentCF, Instantiation.EMPTY_INSTANTIATION);
-	    } else {
-		result = Instantiation.EMPTY_INSTANTIATION;
 	    }
-	    cache.put(cf, result);
+	    
+	    cache.put(list.head(), Instantiation.EMPTY_INSTANTIATION);
+	    int i = 1;
+	    for(ConstrainedFormula listEntry : list.tail()) {
+		Instantiation inst = new Instantiation(list.head(), i++);
+		cache.put(listEntry, inst);
+	    }
+	    
+	    result = cache.get(cf);
 	}
 	
+	assert result != null;
 	return result;
     }
     

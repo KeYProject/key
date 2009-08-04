@@ -322,11 +322,6 @@ public class ProofSaver {
 	     singleInstantiation += ((NameInstantiationEntry) value).getInstantiation();
 	 }
          else 
-         if (value instanceof ListInstantiation) {
-             ListOfObject l = (ListOfObject) ((ListInstantiation) value).getInstantiation();
-             singleInstantiation += printListInstantiation(l, proof.getServices());
-         }
-         else
              throw new RuntimeException("Saving failed.\n"+
            "FIXME: Unhandled instantiation type: " +  value.getClass());
 	 
@@ -338,25 +333,6 @@ public class ProofSaver {
       return s;
    }
    
-   
-
-   public static String printListInstantiation(ListOfObject l, Services serv) {
-       final StringBuffer sb = new StringBuffer("{");
-       final IteratorOfObject it = l.iterator();
-       while (it.hasNext()) {
-           final Object next = it.next();
-           if (next instanceof LocationDescriptor) {
-               sb.append(printLocationDescriptor(
-	           (LocationDescriptor)next, serv));
-           } else {
-               throw new RuntimeException("Unexpected entry in " +
-                        "ListInstantiation");               
-           }
-           if (it.hasNext()) sb.append(",");
-       }
-       sb.append("}");
-       return sb.toString();
-   }
 
    public String ifFormulaInsts(Node node, ListOfIfFormulaInstantiation l) {
       String s ="";
@@ -423,22 +399,6 @@ public class ProofSaver {
         LogicPrinter logicPrinter = createLogicPrinter(serv, shortAttrNotation);
         try {
             logicPrinter.printTerm(t);
-        } catch(IOException ioe) {
-            System.err.println(ioe);
-        }
-        result = logicPrinter.result();
-        if (result.charAt(result.length()-1) == '\n')
-            result.deleteCharAt(result.length()-1);
-        return result;
-    }
-
-
-    public static StringBuffer printLocationDescriptor(LocationDescriptor loc,
-            Services serv) {
-        StringBuffer result;
-        LogicPrinter logicPrinter = createLogicPrinter(serv, false);
-        try {
-            logicPrinter.printLocationDescriptor(loc);
         } catch(IOException ioe) {
             System.err.println(ioe);
         }

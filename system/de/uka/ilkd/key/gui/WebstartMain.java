@@ -8,47 +8,104 @@
 //
 //
 
-// Adapted from keymaera, original author jdq
-
-
 package de.uka.ilkd.key.gui;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
+import java.net.JarURLConnection;
+import java.net.URL;
+import java.util.Enumeration;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 
 import de.uka.ilkd.key.gui.Main;
 
 
 public class WebstartMain {
+    
+    private static final String DEFAULT_EXAMPLE = "test.key";
+        
 
-    public static void main(String[] args) {
-	InputStream resourceAsStream 
-		= WebstartMain.class
-		              .getResourceAsStream("/examples/heap/test.key");
-	
-	if(resourceAsStream != null) {
-	    try {
-		File tempFile = File.createTempFile("test", ".key");
-		tempFile.deleteOnExit();
-		System.out.println(tempFile.getCanonicalPath());
-		FileOutputStream fileOutputStream = new FileOutputStream(tempFile);
-		int i;
-		while ((i = resourceAsStream.read()) != -1) {
-		    fileOutputStream.write((char) i);
-		}
-		resourceAsStream.close();
-		fileOutputStream.close();
-		
-		String[] newArgs = new String[args.length + 1];
-		System.arraycopy(args, 0, newArgs, 0, args.length);
-		newArgs[args.length] = tempFile.getCanonicalPath();
-		args = newArgs;
-	    } catch (IOException e) {
-		assert false;
+    private static void delete(File f){
+	if(f.isDirectory()) {
+	    for(File c : f.listFiles()) {
+		delete(c);
 	    }
 	}
+	f.delete();
+    } 
+
+        
+    private static String setupExamples() {
+	try {
+	    final File tempDir = File.createTempFile("keyheap-examples-", null);
+	    tempDir.delete();
+	    if(!tempDir.mkdir()) {
+		return null;
+	    }
+	    Runtime.getRuntime().addShutdownHook(new Thread() {
+		public void run() {
+		    delete(tempDir);
+		}
+	    });
+
+	    //get jar file
+	    URL examplesURL = WebstartMain.class.getResource("/examples/heap/");	
+	    JarURLConnection conn 
+	    	= (JarURLConnection)examplesURL.openConnection();
+	    JarFile jarFile = conn.getJarFile();
+
+	    //read relevant entries
+	    Enumeration<JarEntry> entries = jarFile.entries();
+	    while(entries.hasMoreElements()) {
+		JarEntry entry = entries.nextElement();
+		if(entry.getName().startsWith("examples/heap/")) {
+		    String relativeName 
+		    	= entry.getName().substring("examples/heap/".length());
+		    if(relativeName.length() == 0) {
+			continue;
+		    }
+		    
+		    File localFile 
+		    	= new File(tempDir.getAbsolutePath(), relativeName);
+		    if(entry.isDirectory()) {
+			if(!localFile.mkdir()) {
+			    return null;
+			}
+		    } else {
+			if(!localFile.createNewFile()) {
+			    return null;
+			}
+
+			InputStream inputStream = jarFile.getInputStream(entry);
+			FileOutputStream outputStream 
+				= new FileOutputStream(localFile);
+			int i;
+			while ((i = inputStream.read()) != -1) {
+			    outputStream.write((char) i);
+			}
+			inputStream.close();
+			outputStream.close();
+		    }
+		}
+	    }
+
+	    return tempDir.getCanonicalPath();
+	} catch(IOException e) {
+	    return null;
+	}
+    }
+    
+    
+    public static void main(String[] args) {
+	String path = setupExamples();
+
+	if(path != null) {
+	    String[] newArgs = new String[args.length + 1];
+	    System.arraycopy(args, 0, newArgs, 0, args.length);
+	    newArgs[args.length] = path + File.separator + DEFAULT_EXAMPLE;
+	    args = newArgs;
+	}
+
 	Main.main(args);
     }
 }

@@ -418,7 +418,7 @@ public class SpecificationRepository {
         	= svf.createParamVars(services, pm, false);
 	for(OperationContract c : getOperationContracts(pm, Modality.DIA)) {
 	    if(c.getPre(selfVar, paramVars, services).getFormula().equals(tt)	   
-	       && c.getModifies(selfVar, paramVars, services).size() == 0) {
+	       && c.getModifies(selfVar, paramVars, services).equals(TermBuilder.DF.empty(services))) {
 		result = true;
 		break;
 	    }

@@ -160,10 +160,10 @@ public final class WhileInvariantRule implements BuiltInRule {
 	return result;
     }
 
-    private AnonymisationInfo getAnonymisation(Term u,
-	    SetOfLocationDescriptor mod,
-	    ListOfProgramVariable relevantLocalVars, Services services,
-	    Goal goal) {
+//    private AnonymisationInfo getAnonymisation(Term u,
+//	    SetOfLocationDescriptor mod,
+//	    ListOfProgramVariable relevantLocalVars, Services services,
+//	    Goal goal) {
 	// final Term heapTerm = TB.heap(services);
 	// assert u.sort() == Sort.UPDATE;
 	//	
@@ -272,8 +272,8 @@ public final class WhileInvariantRule implements BuiltInRule {
 	// frameCondition,
 	// localFrameCondition,
 	// atPreDef);
-	return null;
-    }
+//	return null;
+//    }
 
     // -------------------------------------------------------------------------
     // public interface
@@ -293,106 +293,108 @@ public final class WhileInvariantRule implements BuiltInRule {
     }
 
     public ListOfGoal apply(Goal goal, Services services, RuleApp ruleApp) {
-	Instantiation inst = instantiate(ruleApp.posInOccurrence().subTerm(),
-		services);
-	assert inst != null;
-
-	// get invariant formula, modifies clause
-	Map<Operator, Function> atPreFunctions = inst.inv
-		.getInternalAtPreFunctions();
-	Term invTerm = inst.inv.getInvariant(inst.selfTerm, atPreFunctions,
-		services);
-	SetOfLocationDescriptor mod = inst.inv.getModifies(inst.selfTerm,
-		atPreFunctions, services);
-
-	// get anonymising update, frame condition
-	FreePVCollector pc = new FreePVCollector(inst.loop, services);
-	pc.start();
-	AnonymisationInfo anon = getAnonymisation(inst.u, mod, pc.result(),
-		services, goal);
-
-	// split goal into three branches
-	ListOfGoal result = goal.split(3);
-	Goal initGoal = result.tail().tail().head();
-	Goal bodyGoal = result.tail().head();
-	Goal useGoal = result.head();
-	initGoal.setBranchLabel("Invariant Initially Valid");
-	bodyGoal.setBranchLabel("Body Preserves Invariant");
-	useGoal.setBranchLabel("Use Case");
-
-	// prepare common stuff for the three branches
-	BooleanLDT booleanLDT = services.getTypeConverter().getBooleanLDT();
-	KeYJavaType booleanKJT = services.getTypeConverter().getBooleanType();
-	LocationVariable guardVar = new LocationVariable(
-		new ProgramElementName("b"), booleanKJT);
-	VariableSpecification guardVarSpec = new VariableSpecification(
-		guardVar, inst.loop.getGuardExpression(), booleanKJT);
-	LocalVariableDeclaration guardVarDecl = new LocalVariableDeclaration(
-		new TypeRef(booleanKJT), guardVarSpec);
-	Statement guardVarMethodFrame = inst.innermostExecutionContext == null ? guardVarDecl
-		: new MethodFrame(null, inst.innermostExecutionContext,
-			new StatementBlock(guardVarDecl));
-	JavaBlock guardJb = JavaBlock.createJavaBlock(new StatementBlock(
-		guardVarMethodFrame));
-	Term guardTrueTerm = TB.equals(TB.var(guardVar), booleanLDT
-		.getTrueTerm());
-	Term guardFalseTerm = TB.equals(TB.var(guardVar), booleanLDT
-		.getFalseTerm());
-	Term uAndAnonUpdate = TB.sequential(inst.u, anon.anonUpdate);
-	Term invAndFrameAndWellFormedAssumption = TB.and(new Term[] { invTerm,
-		anon.localFrameCondition, TB.wellFormedHeap(services) });
-
-	// "Invariant Initially Valid":
-	// \replacewith (==> inv );
-	initGoal.changeFormula(new ConstrainedFormula(TB.prepend(inst.u,
-		invTerm)), ruleApp.posInOccurrence());
-
-	// "Body Preserves Invariant":
-	// \replacewith (==> #atPreEqs(anon1) -> #introNewAnonUpdate(#modifies,
-	// #locDepFunc(anon1, \[{.. while (#e) #s ...}\]post) & inv ->
-	// (\[{ method-frame(#ex):{#typeof(#e) #v1 = #e;} }\]#v1=TRUE ->
-	// #whileInvRule(\[{.. while (#e) #s ...}\]post,
-	// #locDepFunc(anon1, \[{.. while (#e) #s ...}\]post) & inv)),anon1));
-	bodyGoal.addFormula(new ConstrainedFormula(TB.prepend(inst.u,
-		anon.atPreDef)), true, false);
-	bodyGoal.addFormula(new ConstrainedFormula(TB.prepend(uAndAnonUpdate,
-		invAndFrameAndWellFormedAssumption)), true, false);
-
-	WhileInvRule wir = (WhileInvRule) AbstractMetaOperator.WHILE_INV_RULE;
-	SVInstantiations svInst = SVInstantiations.EMPTY_SVINSTANTIATIONS
-		.replace(null, null, inst.innermostExecutionContext, null);
-	for (SchemaVariable sv : wir.neededInstantiations(inst.loop, svInst)) {
-	    assert sv instanceof ProgramSV;
-	    svInst = svInst.add(sv, (Name) new ProgramElementName(sv.name()
-		    .toString()));
-	}
-	Term bodyTerm = TB.tf().createTerm(
-		wir,
-		new Term[] { inst.progPost,
-			TB.and(invTerm, anon.frameCondition) }, null, null);
-	bodyTerm = AbstractMetaOperator.WHILE_INV_RULE.calculate(bodyTerm,
-		svInst, services);
-	Term guardTrueBody = TB.box(guardJb, TB.imp(guardTrueTerm, bodyTerm));
-
-	bodyGoal.changeFormula(new ConstrainedFormula(TB.prepend(
-		uAndAnonUpdate, guardTrueBody)), ruleApp.posInOccurrence());
-
-	// "Use Case":
-	// \replacewith (==> #introNewAnonUpdate(#modifies, inv ->
-	// (\[{ method-frame(#ex):{#typeof(#e) #v1 = #e;} }\]
-	// (#v1=FALSE -> \[{.. ...}\]post)),anon2))
-	useGoal.addFormula(new ConstrainedFormula(TB.prepend(inst.u,
-		anon.atPreDef)), true, false);
-	useGoal.addFormula(new ConstrainedFormula(TB.prepend(uAndAnonUpdate,
-		invAndFrameAndWellFormedAssumption)), true, false);
-	Term restPsi = TB.box(IIT.removeActiveStatement(inst.progPost
-		.javaBlock(), services), inst.progPost.sub(0));
-	Term guardFalseRestPsi = TB.box(guardJb, TB
-		.imp(guardFalseTerm, restPsi));
-	useGoal.changeFormula(new ConstrainedFormula(TB.prepend(uAndAnonUpdate,
-		guardFalseRestPsi)), ruleApp.posInOccurrence());
-
-	return result;
+	return null;
+//	
+//	Instantiation inst = instantiate(ruleApp.posInOccurrence().subTerm(),
+//		services);
+//	assert inst != null;
+//
+//	// get invariant formula, modifies clause
+//	Map<Operator, Function> atPreFunctions = inst.inv
+//		.getInternalAtPreFunctions();
+//	Term invTerm = inst.inv.getInvariant(inst.selfTerm, atPreFunctions,
+//		services);
+//	SetOfLocationDescriptor mod = inst.inv.getModifies(inst.selfTerm,
+//		atPreFunctions, services);
+//
+//	// get anonymising update, frame condition
+//	FreePVCollector pc = new FreePVCollector(inst.loop, services);
+//	pc.start();
+//	AnonymisationInfo anon = getAnonymisation(inst.u, mod, pc.result(),
+//		services, goal);
+//
+//	// split goal into three branches
+//	ListOfGoal result = goal.split(3);
+//	Goal initGoal = result.tail().tail().head();
+//	Goal bodyGoal = result.tail().head();
+//	Goal useGoal = result.head();
+//	initGoal.setBranchLabel("Invariant Initially Valid");
+//	bodyGoal.setBranchLabel("Body Preserves Invariant");
+//	useGoal.setBranchLabel("Use Case");
+//
+//	// prepare common stuff for the three branches
+//	BooleanLDT booleanLDT = services.getTypeConverter().getBooleanLDT();
+//	KeYJavaType booleanKJT = services.getTypeConverter().getBooleanType();
+//	LocationVariable guardVar = new LocationVariable(
+//		new ProgramElementName("b"), booleanKJT);
+//	VariableSpecification guardVarSpec = new VariableSpecification(
+//		guardVar, inst.loop.getGuardExpression(), booleanKJT);
+//	LocalVariableDeclaration guardVarDecl = new LocalVariableDeclaration(
+//		new TypeRef(booleanKJT), guardVarSpec);
+//	Statement guardVarMethodFrame = inst.innermostExecutionContext == null ? guardVarDecl
+//		: new MethodFrame(null, inst.innermostExecutionContext,
+//			new StatementBlock(guardVarDecl));
+//	JavaBlock guardJb = JavaBlock.createJavaBlock(new StatementBlock(
+//		guardVarMethodFrame));
+//	Term guardTrueTerm = TB.equals(TB.var(guardVar), booleanLDT
+//		.getTrueTerm());
+//	Term guardFalseTerm = TB.equals(TB.var(guardVar), booleanLDT
+//		.getFalseTerm());
+//	Term uAndAnonUpdate = TB.sequential(inst.u, anon.anonUpdate);
+//	Term invAndFrameAndWellFormedAssumption = TB.and(new Term[] { invTerm,
+//		anon.localFrameCondition, TB.wellFormedHeap(services) });
+//
+//	// "Invariant Initially Valid":
+//	// \replacewith (==> inv );
+//	initGoal.changeFormula(new ConstrainedFormula(TB.prepend(inst.u,
+//		invTerm)), ruleApp.posInOccurrence());
+//
+//	// "Body Preserves Invariant":
+//	// \replacewith (==> #atPreEqs(anon1) -> #introNewAnonUpdate(#modifies,
+//	// #locDepFunc(anon1, \[{.. while (#e) #s ...}\]post) & inv ->
+//	// (\[{ method-frame(#ex):{#typeof(#e) #v1 = #e;} }\]#v1=TRUE ->
+//	// #whileInvRule(\[{.. while (#e) #s ...}\]post,
+//	// #locDepFunc(anon1, \[{.. while (#e) #s ...}\]post) & inv)),anon1));
+//	bodyGoal.addFormula(new ConstrainedFormula(TB.prepend(inst.u,
+//		anon.atPreDef)), true, false);
+//	bodyGoal.addFormula(new ConstrainedFormula(TB.prepend(uAndAnonUpdate,
+//		invAndFrameAndWellFormedAssumption)), true, false);
+//
+//	WhileInvRule wir = (WhileInvRule) AbstractMetaOperator.WHILE_INV_RULE;
+//	SVInstantiations svInst = SVInstantiations.EMPTY_SVINSTANTIATIONS
+//		.replace(null, null, inst.innermostExecutionContext, null);
+//	for (SchemaVariable sv : wir.neededInstantiations(inst.loop, svInst)) {
+//	    assert sv instanceof ProgramSV;
+//	    svInst = svInst.add(sv, (Name) new ProgramElementName(sv.name()
+//		    .toString()));
+//	}
+//	Term bodyTerm = TB.tf().createTerm(
+//		wir,
+//		new Term[] { inst.progPost,
+//			TB.and(invTerm, anon.frameCondition) }, null, null);
+//	bodyTerm = AbstractMetaOperator.WHILE_INV_RULE.calculate(bodyTerm,
+//		svInst, services);
+//	Term guardTrueBody = TB.box(guardJb, TB.imp(guardTrueTerm, bodyTerm));
+//
+//	bodyGoal.changeFormula(new ConstrainedFormula(TB.prepend(
+//		uAndAnonUpdate, guardTrueBody)), ruleApp.posInOccurrence());
+//
+//	// "Use Case":
+//	// \replacewith (==> #introNewAnonUpdate(#modifies, inv ->
+//	// (\[{ method-frame(#ex):{#typeof(#e) #v1 = #e;} }\]
+//	// (#v1=FALSE -> \[{.. ...}\]post)),anon2))
+//	useGoal.addFormula(new ConstrainedFormula(TB.prepend(inst.u,
+//		anon.atPreDef)), true, false);
+//	useGoal.addFormula(new ConstrainedFormula(TB.prepend(uAndAnonUpdate,
+//		invAndFrameAndWellFormedAssumption)), true, false);
+//	Term restPsi = TB.box(IIT.removeActiveStatement(inst.progPost
+//		.javaBlock(), services), inst.progPost.sub(0));
+//	Term guardFalseRestPsi = TB.box(guardJb, TB
+//		.imp(guardFalseTerm, restPsi));
+//	useGoal.changeFormula(new ConstrainedFormula(TB.prepend(uAndAnonUpdate,
+//		guardFalseRestPsi)), ruleApp.posInOccurrence());
+//
+//	return result;
     }
 
     public Name name() {

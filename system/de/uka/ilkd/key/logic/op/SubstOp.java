@@ -66,10 +66,10 @@ public abstract class SubstOp extends AbstractOperator {
      * Apply this substitution operator to <code>term</code>, which
      * has this operator as top-level operator
      */
-    public Term apply(Term term) {
-	QuantifiableVariable v = term.varsBoundHere(1).getQuantifiableVariable(0);
-	ClashFreeSubst cfSubst = new ClashFreeSubst(v, term.sub(0));
-	Term res = cfSubst.apply(term.sub(1));
-	return res;
-    }
+    public abstract Term apply(Term term);// {
+//	QuantifiableVariable v = term.varsBoundHere(1).getQuantifiableVariable(0);
+//	ClashFreeSubst cfSubst = new ClashFreeSubst(v, term.sub(0));
+//	Term res = cfSubst.apply(term.sub(1));
+//	return res;
+//    }
 }

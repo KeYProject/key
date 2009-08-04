@@ -5,13 +5,6 @@
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
-//This file is part of KeY - Integrated Deductive Software Design
-//Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
-//                      Universitaet Koblenz-Landau, Germany
-//                      Chalmers University of Technology, Sweden
-//
-//The KeY system is protected by the GNU General Public License. 
-//See LICENSE.TXT for details.
 //
 //
 
@@ -21,8 +14,7 @@ import java.util.Map;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.logic.SetAsListOfLocationDescriptor;
-import de.uka.ilkd.key.logic.SetOfLocationDescriptor;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.speclang.FormulaWithAxioms;
 import de.uka.ilkd.key.speclang.PositionedString;
@@ -161,7 +153,7 @@ class JMLTranslator {
     /**
      * Translates an expression as it occurs in JML assignable-clauses.
      */
-    public SetOfLocationDescriptor translateAssignableExpression(
+    public Term translateAssignableExpression(
                                     	PositionedString assignableExpr,
                                         KeYJavaType specInClass,
                                         ParsableVariable selfVar, 
@@ -179,11 +171,9 @@ class JMLTranslator {
                                                null,
                                                null);
         
-        SetOfLocationDescriptor result = SetAsListOfLocationDescriptor.EMPTY_SET;
-        
 //      System.out.println("JMLTranslator.translateAssignableExpression("+assignableExpr+") results: ");
 
-        result = parser.parseAssignable();
+        Term result = parser.parseAssignable();
         
 //      System.out.println(result);
 //      System.out.println();

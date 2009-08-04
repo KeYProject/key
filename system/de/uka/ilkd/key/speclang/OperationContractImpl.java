@@ -5,13 +5,6 @@
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
-//This file is part of KeY - Integrated Deductive Software Design
-//Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
-//                      Universitaet Koblenz-Landau, Germany
-//                      Chalmers University of Technology, Sweden
-//
-//The KeY system is protected by the GNU General Public License. 
-//See LICENSE.TXT for details.
 //
 //
 
@@ -22,11 +15,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.BasicLocationDescriptor;
-import de.uka.ilkd.key.logic.EverythingLocationDescriptor;
-import de.uka.ilkd.key.logic.LocationDescriptor;
-import de.uka.ilkd.key.logic.SetAsListOfLocationDescriptor;
-import de.uka.ilkd.key.logic.SetOfLocationDescriptor;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Function;
@@ -57,7 +45,7 @@ public class OperationContractImpl implements OperationContract {
     private final Modality modality;
     private final FormulaWithAxioms originalPre;
     private final FormulaWithAxioms originalPost;
-    private final SetOfLocationDescriptor originalModifies;
+    private final Term originalModifies;
     private final ParsableVariable originalSelfVar;
     private final ListOfParsableVariable originalParamVars;
     private final ParsableVariable originalResultVar;
@@ -77,7 +65,7 @@ public class OperationContractImpl implements OperationContract {
      * @param modality the modality of the contract
      * @param pre the precondition of the contract
      * @param post the postcondition of the contract
-     * @param modifies the modifier set of the contract
+     * @param modifies the modifies clause of the contract
      * @param selfVar the variable used for the receiver object
      * @param paramVars the variables used for the operation parameters
      * @param resultVar the variables used for the operation result
@@ -90,7 +78,7 @@ public class OperationContractImpl implements OperationContract {
             		         Modality modality,
             		         FormulaWithAxioms pre,
             		         FormulaWithAxioms post,
-            		         SetOfLocationDescriptor modifies,
+            		         Term modifies,
             		         ParsableVariable selfVar,
             		         ListOfParsableVariable paramVars,
             		         ParsableVariable resultVar,
@@ -202,24 +190,24 @@ public class OperationContractImpl implements OperationContract {
     }
     
     
-    private SetOfLocationDescriptor addGuard(SetOfLocationDescriptor modifies, 
-                                             Term formula) {
-        SetOfLocationDescriptor result 
-            = SetAsListOfLocationDescriptor.EMPTY_SET;
-        for(LocationDescriptor loc : modifies) {
-            if(loc instanceof EverythingLocationDescriptor) {
-                return EverythingLocationDescriptor.INSTANCE_AS_SET;
-            } else {
-                BasicLocationDescriptor bloc = (BasicLocationDescriptor) loc;
-                Term newGuard = TB.and(bloc.getFormula(), formula);
-                result = result.add(new BasicLocationDescriptor(
-                        newGuard, 
-                        bloc.getLocTerm()));
-            }
-        }
-        return result;
-    }
-    
+//    private SetOfLocationDescriptor addGuard(SetOfLocationDescriptor modifies, 
+//                                             Term formula) {
+//        SetOfLocationDescriptor result 
+//            = SetAsListOfLocationDescriptor.EMPTY_SET;
+//        for(LocationDescriptor loc : modifies) {
+//            if(loc instanceof EverythingLocationDescriptor) {
+//                return EverythingLocationDescriptor.INSTANCE_AS_SET;
+//            } else {
+//                BasicLocationDescriptor bloc = (BasicLocationDescriptor) loc;
+//                Term newGuard = TB.and(bloc.getFormula(), formula);
+//                result = result.add(new BasicLocationDescriptor(
+//                        newGuard, 
+//                        bloc.getLocTerm()));
+//            }
+//        }
+//        return result;
+//    }
+//    
     
     private FormulaWithAxioms atPreify(
                 FormulaWithAxioms fwa, 
@@ -237,26 +225,31 @@ public class OperationContractImpl implements OperationContract {
     //public interface
     //------------------------------------------------------------------------- 
     
+    @Override
     public String getName() {
         return name;
     }
     
     
+    @Override
     public String getDisplayName() {
         return displayName;
     }
     
     
+    @Override
     public ProgramMethod getProgramMethod() {
         return programMethod;
     }
     
     
+    @Override
     public Modality getModality() {
         return modality;
     }
     
     
+    @Override
     public FormulaWithAxioms getPre(ParsableVariable selfVar, 
 	    			    ListOfParsableVariable paramVars,
                                     Services services) {
@@ -275,6 +268,7 @@ public class OperationContractImpl implements OperationContract {
     }
 
   
+    @Override
     public FormulaWithAxioms getPost(ParsableVariable selfVar, 
                                      ListOfParsableVariable paramVars, 
                                      ParsableVariable resultVar, 
@@ -299,9 +293,10 @@ public class OperationContractImpl implements OperationContract {
     }
 
   
-    public SetOfLocationDescriptor getModifies(ParsableVariable selfVar, 
-                                               ListOfParsableVariable paramVars,
-                                               Services services) {
+    @Override
+    public Term getModifies(ParsableVariable selfVar, 
+                            ListOfParsableVariable paramVars,
+                            Services services) {
         assert (selfVar == null) == (originalSelfVar == null);
         assert paramVars != null;
         assert paramVars.size() == originalParamVars.size();
@@ -317,6 +312,7 @@ public class OperationContractImpl implements OperationContract {
     }
     
     
+    @Override
     public OperationContract union(OperationContract[] others, 
                                    String name, 
                                    String displayName, 
@@ -339,8 +335,9 @@ public class OperationContractImpl implements OperationContract {
         FormulaWithAxioms post = atPreify(originalPre, 
                                           newAtPreFunctions, 
                                           services).imply(originalPost);
-        SetOfLocationDescriptor modifies = addGuard(originalModifies, 
-                                                    originalPre.getFormula());
+//        SetOfLocationDescriptor modifies = addGuard(originalModifies, 
+//                                                    originalPre.getFormula());
+        Term modifies = originalModifies;
         for(OperationContract other : others) {
             FormulaWithAxioms otherPre = other.getPre(originalSelfVar, 
                                                       originalParamVars, 
@@ -351,7 +348,7 @@ public class OperationContractImpl implements OperationContract {
                                                         originalExcVar, 
                                                         newAtPreFunctions, 
                                                         services);
-            SetOfLocationDescriptor otherModifies 
+            Term otherModifies 
                     = other.getModifies(originalSelfVar, 
                                         originalParamVars, 
                                         services);
@@ -360,8 +357,9 @@ public class OperationContractImpl implements OperationContract {
             post = post.conjoin(atPreify(otherPre, 
                                          newAtPreFunctions, 
                                          services).imply(otherPost));
-            modifies = modifies.union(addGuard(otherModifies, 
-                                      otherPre.getFormula()));
+//            modifies = modifies.union(addGuard(otherModifies, 
+//                                      otherPre.getFormula()));
+            modifies = TB.union(services, modifies, otherModifies);
         }
 
         return new OperationContractImpl(name,
@@ -379,26 +377,28 @@ public class OperationContractImpl implements OperationContract {
     }
 
     
+    @Override
     public String getHTMLText(Services services) {
         final String pre = LogicPrinter.quickPrintTerm(originalPre.getFormula(), 
                 services);
         final String post = LogicPrinter.quickPrintTerm(originalPost.getFormula(), 
                 services);
-        final String locDesc = LogicPrinter.quickPrintLocationDescriptors(originalModifies, 
-                services);
+        final String mod = LogicPrinter.quickPrintTerm(originalModifies, 
+        	services);
                       
         return "<html><b>pre</b> "
                 + LogicPrinter.escapeHTML(pre)
                 + "<br><b>post</b> "
                 + LogicPrinter.escapeHTML(post)
                 + "<br><b>modifies</b> "
-                + LogicPrinter.escapeHTML(locDesc)
+                + LogicPrinter.escapeHTML(mod)
                 + "<br><b>termination</b> "
                 + getModality()
                 + "</html>";
     }
     
     
+    @Override
     public String toString() {
 	return "pre: " 
 		+ originalPre 
@@ -408,16 +408,5 @@ public class OperationContractImpl implements OperationContract {
 		+ originalModifies
 		+ "; termination: "
 		+ getModality();
-    }
-    
-    
-//    mbender
-    public FormulaWithAxioms getOriginalPre() {
-        return originalPre;
-    }
-
-    
-    public FormulaWithAxioms getOriginalPost() {
-        return originalPost;
     }
 }

@@ -251,28 +251,6 @@ public class TacletInstantiationsTableModel extends AbstractTableModel {
         return getValueAt(irow, 1) != null && ((String)getValueAt(irow,1)).length() != 0;
     }
 
-    private SetOfLocationDescriptor parseLocationList(int irow) throws ParserException{
-        String instantiation = (String) getValueAt(irow, 1);
-        if (instantiation == null) {
-            instantiation = "";
-        }
-        SetOfLocationDescriptor result = null;
-        try{
-            result = (new KeYParser(ParserMode.TERM, new KeYLexer(new StringReader(instantiation),
-                                             services.getExceptionHandler()),
-                                null, TermFactory.DEFAULT, null, services, nss, scm)).
-                location_list();
-        } catch (antlr.RecognitionException re) {
-            throw new ParserException(re.getMessage(),
-                                      new Location(re.getFilename(),
-                                                   re.getLine(),
-                                                   re.getColumn()));
-        } catch (antlr.TokenStreamException tse) {
-            throw new ParserException(tse.getMessage(), null);
-        }
-        return result;
-    }
-
     /**
      * parses the indicated row and returns a Term corresponding to the
      * entry in the row

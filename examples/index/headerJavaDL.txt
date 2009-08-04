@@ -1,0 +1,29 @@
+\settings {
+"#Proof-Settings-Config-File
+#Mon Aug 03 16:58:18 CEST 2009
+[StrategyProperty]GOALCHOOSER_OPTIONS_KEY=GOALCHOOSER_DEFAULT
+[StrategyProperty]METHOD_OPTIONS_KEY=METHOD_EXPAND
+[StrategyProperty]USER_TACLETS_OPTIONS_KEY3=USER_TACLETS_OFF
+[StrategyProperty]LOOP_OPTIONS_KEY=LOOP_INVARIANT
+[StrategyProperty]USER_TACLETS_OPTIONS_KEY2=USER_TACLETS_OFF
+[StrategyProperty]USER_TACLETS_OPTIONS_KEY1=USER_TACLETS_OFF
+[StrategyProperty]QUANTIFIERS_OPTIONS_KEY=QUANTIFIERS_NON_SPLITTING
+[StrategyProperty]NON_LIN_ARITH_OPTIONS_KEY=NON_LIN_ARITH_DEF_OPS
+[DecisionProcedure]Timeout=60
+[View]ShowWholeTaclet=false
+[View]MaxTooltipLines=40
+[General]DnDDirectionSensitive=true
+[General]StupidMode=true
+[Strategy]Timeout=-1
+[Strategy]MaximumNumberOfAutomaticApplications=10000
+[StrategyProperty]QUERY_OPTIONS_KEY=QUERY_NONE
+[Choice]DefaultChoices=assertions-assertions\:on , programRules-programRules\:Java , intRules-intRules\:arithmeticSemanticsIgnoringOF , initialisation-initialisation\:disableStaticInitialisation , nullPointerPolicy-nullPointerPolicy\:nullCheck
+[StrategyProperty]STOPMODE_OPTIONS_KEY=STOPMODE_DEFAULT
+[DecisionProcedure]ActiveRule=_noname_
+[General]UseJML=false
+[View]HideClosedSubtrees=false
+[View]HideIntermediateProofsteps=false
+[Strategy]ActiveStrategy=JavaCardDLStrategy
+[StrategyProperty]SPLITTING_OPTIONS_KEY=SPLITTING_NORMAL
+"
+}

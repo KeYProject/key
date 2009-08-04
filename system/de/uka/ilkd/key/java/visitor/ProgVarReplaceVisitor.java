@@ -192,30 +192,6 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
 	}
     }
 
-    
-    private SetOfLocationDescriptor replaceVariablesInLocs(
-                                                SetOfLocationDescriptor locs) {
-        SetOfLocationDescriptor res 
-            = SetAsListOfLocationDescriptor.EMPTY_SET;
-        for (final LocationDescriptor loc : locs) {
-            LocationDescriptor newLoc;
-            
-            if(loc instanceof BasicLocationDescriptor) {
-                BasicLocationDescriptor bloc = (BasicLocationDescriptor) loc;
-                Term newFormula = replaceVariablesInTerm(bloc.getFormula());
-                Term newLocTerm = replaceVariablesInTerm(bloc.getLocTerm());
-                newLoc = new BasicLocationDescriptor(newFormula, newLocTerm);
-            } else {
-                Debug.assertTrue(loc instanceof EverythingLocationDescriptor);
-                newLoc = loc;
-            }
-            
-            res = res.add(newLoc);
-        }
-        
-        return res;
-    }
-    
         
     private SetOfTerm replaceVariablesInTerms(SetOfTerm terms) {
         SetOfTerm res = SetAsListOfTerm.EMPTY_SET;        
@@ -279,10 +255,10 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
                                                         services));
         
         //modifies
-        SetOfLocationDescriptor newModifies
-            = replaceVariablesInLocs(inv.getModifies(selfTerm, 
-                                                     atPreFunctions, 
-                                                     services));
+        Term newModifies
+            = replaceVariablesInTerm(inv.getModifies(selfTerm, 
+                                     atPreFunctions, 
+                                     services));
         
         //variant
         Term newVariant

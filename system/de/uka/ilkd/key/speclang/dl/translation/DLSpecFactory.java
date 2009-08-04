@@ -26,12 +26,8 @@ import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.statement.CatchAllStatement;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
-import de.uka.ilkd.key.logic.BasicLocationDescriptor;
-import de.uka.ilkd.key.logic.IteratorOfLocationDescriptor;
-import de.uka.ilkd.key.logic.LocationDescriptor;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.SetOfLocationDescriptor;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Function;
@@ -227,7 +223,7 @@ assert false : "not implemented";
                                             String name, 
                                             String displayName, 
                                             Term fma, 
-                                            SetOfLocationDescriptor modifies) 
+                                            Term modifies) 
             throws ProofInputException {
         assert name != null;
         if(displayName == null) {
@@ -253,31 +249,19 @@ assert false : "not implemented";
         ParsableVariable excVar          = extractExcVar(fma);
         Map<Operator, Function> atPreFunctions = extractAtPreFunctions(post.getFormula());
         
-        //atPre-functions may not occur in precondition
-        Map<Operator, Function> forbiddenAtPreFunctions = extractAtPreFunctions(pre.getFormula());
+        //atPre-functions may not occur in precondition or modifies clause
+        Map<Operator, Function> forbiddenAtPreFunctions 
+        	= extractAtPreFunctions(pre.getFormula());
         if(!forbiddenAtPreFunctions.isEmpty()) {
             throw new ProofInputException(
                 "@pre-function not allowed in precondition: " 
                 + forbiddenAtPreFunctions.values().iterator().next());
         }
-        
-        //atPre-functions may not occur in modifier set
-        IteratorOfLocationDescriptor it = modifies.iterator();
-        while(it.hasNext()) {
-            LocationDescriptor loc = it.next();
-            if(loc instanceof BasicLocationDescriptor) {
-                BasicLocationDescriptor bloc = (BasicLocationDescriptor) loc;
-                Term formula = bloc.getFormula();
-                Term locTerm = bloc.getLocTerm();
-                forbiddenAtPreFunctions = new LinkedHashMap<Operator, Function>(); 
-                forbiddenAtPreFunctions.putAll(extractAtPreFunctions(formula));
-                forbiddenAtPreFunctions.putAll(extractAtPreFunctions(locTerm));
-                if(!forbiddenAtPreFunctions.isEmpty()) {
-                    throw new ProofInputException(
-                       "@pre-function not allowed in modifier set: " 
-                       + forbiddenAtPreFunctions.values().iterator().next());
-                }
-            }
+        forbiddenAtPreFunctions = extractAtPreFunctions(modifies);
+        if(!forbiddenAtPreFunctions.isEmpty()) {
+            throw new ProofInputException(
+                "@pre-function not allowed in modifies clause: " 
+                + forbiddenAtPreFunctions.values().iterator().next());
         }
         
         //result variable may be omitted

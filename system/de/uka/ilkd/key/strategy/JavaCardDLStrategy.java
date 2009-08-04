@@ -10,7 +10,6 @@
 
 package de.uka.ilkd.key.strategy;
 
-import de.uka.ilkd.key.gui.Main;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -2211,7 +2210,8 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                 add ( notContainsExecutable,
                       tf.notContainsProduct,
                       or ( tf.eqF,
-                           OperatorClassTF.create ( SortedOperator.class ) ) );
+                           OperatorClassTF.create ( Function.class ),
+                           OperatorClassTF.create ( ParsableVariable.class )) ); //XXX
             cutAllowedBelowQuantifier = add ( not ( propJunctor ),
                                               notContainsExecutable );
             cutPriority = add ( ifZero ( tf.intInEquation,

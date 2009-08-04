@@ -15,10 +15,6 @@ import java.util.Map;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.logic.BasicLocationDescriptor;
-import de.uka.ilkd.key.logic.EverythingLocationDescriptor;
-import de.uka.ilkd.key.logic.LocationDescriptor;
-import de.uka.ilkd.key.logic.SetOfLocationDescriptor;
 import de.uka.ilkd.key.logic.SetOfTerm;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.*;
@@ -93,16 +89,9 @@ public final class ProgramVariableCollector extends JavaASTVisitor {
         }
         
         //modifies
-        SetOfLocationDescriptor mod 
-            = x.getModifies(selfTerm, atPreFunctions, services);
-        for(LocationDescriptor loc : mod) {
-            if(loc instanceof BasicLocationDescriptor) {
-                BasicLocationDescriptor bloc = (BasicLocationDescriptor) loc;
-                bloc.getFormula().execPostOrder(tpvc);
-                bloc.getLocTerm().execPostOrder(tpvc);
-            } else {
-                assert loc instanceof EverythingLocationDescriptor;
-            }
+        Term mod = x.getModifies(selfTerm, atPreFunctions, services);
+        if(mod != null) {
+            mod.execPostOrder(tpvc);
         }
         
         //variant

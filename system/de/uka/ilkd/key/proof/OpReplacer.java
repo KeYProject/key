@@ -14,12 +14,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import de.uka.ilkd.key.logic.BasicLocationDescriptor;
-import de.uka.ilkd.key.logic.EverythingLocationDescriptor;
-import de.uka.ilkd.key.logic.LocationDescriptor;
-import de.uka.ilkd.key.logic.SetAsListOfLocationDescriptor;
 import de.uka.ilkd.key.logic.SetAsListOfTerm;
-import de.uka.ilkd.key.logic.SetOfLocationDescriptor;
 import de.uka.ilkd.key.logic.SetOfTerm;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermFactory;
@@ -118,35 +113,6 @@ public class OpReplacer {
         return result;
     }
 
-    /**
-     * Replaces in a location descriptor.
-     */
-    public LocationDescriptor replace(LocationDescriptor loc) {
-        if(loc == null) {
-            return null;
-        } else if(loc instanceof BasicLocationDescriptor) {
-            BasicLocationDescriptor bloc = (BasicLocationDescriptor) loc;
-            return new BasicLocationDescriptor(replace(bloc.getFormula()), 
-                                               replace(bloc.getLocTerm()));
-        } else {
-            assert loc instanceof EverythingLocationDescriptor;
-            return loc;
-        }
-    }
-    
-    
-    /**
-     * Replaces in a set of location descriptors.
-     */
-    public SetOfLocationDescriptor replace(SetOfLocationDescriptor locs) {
-	SetOfLocationDescriptor result 
-		= SetAsListOfLocationDescriptor.EMPTY_SET;
-	for (final LocationDescriptor loc : locs) {
-	    result = result.add(replace(loc));
-	}
-	return result;
-    }
-    
     
     /**
      * Replaces in a map from Operator to Term.

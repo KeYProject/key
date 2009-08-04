@@ -318,7 +318,7 @@ public final class TypeConverter {
                 convertToLogicElement(ar.getDimensionExpressions().getExpression(i), ec);
         }
         assert index.length == 1 : "multi-dimensional arrays not implemented";
-        return TB.array(services, t, index[0]);
+        return TB.dotArr(services, t, index[0]);
     }
 
     private Term convertToInstanceofTerm(Instanceof io, 

@@ -220,7 +220,6 @@ GENERATED_SETS=logic/SetAsListOfTerm collection/SetAsListOfString \
 	logic/op/SetAsListOfMetavariable \
 	logic/SetAsListOfChoice \
 	logic/SetAsListOfNamed \
-	logic/SetAsListOfLocationDescriptor \
         logic/op/SetAsListOfLogicVariable \
         proof/SetAsListOfGoalChooserBuilder \
 	speclang/SetAsListOfClassInvariant \
@@ -407,6 +406,9 @@ clean:
 	@/bin/rm -rf $(GENERATED_SRC_PATH)
 	@echo [deleting binaries]
 	@/bin/rm -rf $(BINARYPATH)
+	@echo [deleting distribution]
+	@/bin/rm -rf ../dist
+	@/bin/rm -rf proofExamples/statistics.csv
 
 #help files of the makefile (without the GenMakefile)
 

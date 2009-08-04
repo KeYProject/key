@@ -21,8 +21,8 @@ public class KeYFileChooser {
 
     private boolean saveDialog;
 
-    public KeYFileChooser() {
-	fileChooser = new JFileChooser(new File(System.getProperty("user.dir"))) {
+    public KeYFileChooser(String initDir) {
+	fileChooser = new JFileChooser(new File(initDir)) {
                 public void approveSelection() {
                     File file = getSelectedFile();
                     if (saveDialog && file.exists() &&

@@ -33,12 +33,7 @@ import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
 import de.uka.ilkd.key.gui.notification.events.GeneralInformationEvent;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 import de.uka.ilkd.key.gui.prooftree.ProofTreeView;
-import de.uka.ilkd.key.java.NonTerminalProgramElement;
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.Statement;
-import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.pp.*;
 import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.init.*;
@@ -1415,7 +1410,10 @@ public class Main extends JFrame implements IMain {
     
     public static KeYFileChooser getFileChooser(String title) {
         if (fileChooser == null) {
-            fileChooser = new KeYFileChooser();
+            String initDir = fileNameOnStartUp == null 
+                             ? System.getProperty("user.dir")
+                             : fileNameOnStartUp;
+            fileChooser = new KeYFileChooser(initDir);
         }
         fileChooser.setDialogTitle(title);
         fileChooser.prepare();
@@ -1940,7 +1938,7 @@ public class Main extends JFrame implements IMain {
             final FileWriter statistics = new FileWriter ( file, true );
             final PrintWriter statPrinter = new PrintWriter ( statistics );
             
-            String fileName = Main.fileNameOnStartUp;
+            String fileName = fileNameOnStartUp;
             final int slashIndex = fileName.lastIndexOf ( "examples/" );
             if ( slashIndex >= 0 )
                 fileName = fileName.substring ( slashIndex );

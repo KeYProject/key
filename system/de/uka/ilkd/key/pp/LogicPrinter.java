@@ -87,26 +87,6 @@ public final class LogicPrinter {
     	= SVInstantiations.EMPTY_SVINSTANTIATIONS;
 
     private static Logger logger = Logger.getLogger(LogicPrinter.class.getName());
-
-
-    public static String quickPrintLocationDescriptors(
-                                        SetOfLocationDescriptor locations,
-                                        Services services) {
-        
-        final NotationInfo ni = new NotationInfo();
-        if (services != null) {
-            ni.refresh(services);
-        }
-        LogicPrinter p = new LogicPrinter(null, 
-        				  ni, 
-        				  services);
-        try {
-            p.printLocationDescriptors(locations);
-        } catch (IOException ioe) {
-            return locations.toString();
-        }
-        return p.result().toString();
-    }
     
     
     public static String quickPrintTerm(Term t, Services services) {
@@ -770,54 +750,6 @@ public final class LogicPrinter {
             maybeParens(t.sub(i), ass[i]);
             layouter.print(arraySep[i]);
         }
-    }
-
-
-    /**
-     * Pretty-prints a location descriptor.
-     */
-    public void printLocationDescriptor(LocationDescriptor loc)
-        throws java.io.IOException {
-        
-        if(loc instanceof BasicLocationDescriptor) {
-            BasicLocationDescriptor bloc = (BasicLocationDescriptor) loc;
-            SetOfQuantifiableVariable boundVars = bloc.getLocTerm().freeVars();
-
-            if(boundVars.size() > 0) {
-                layouter.print("\\for ").beginC();
-                printVariables(new ArrayOfQuantifiableVariable(boundVars.toArray()));
-                layouter.end();
-            }
-
-            if(bloc.getFormula().op() != Junctor.TRUE) {
-                layouter.print("\\if (").beginC();
-                printTerm(bloc.getFormula());
-                layouter.print(") ").end();
-            }
-            
-            printTerm(bloc.getLocTerm());
-
-        } else {
-            Debug.assertTrue(loc instanceof EverythingLocationDescriptor);
-            layouter.print("*");
-        }
-    }
-    
-    
-    /**
-     * Pretty-prints a set of location descriptors.
-     */
-    public void printLocationDescriptors(SetOfLocationDescriptor locations)
-        throws java.io.IOException {
-        layouter.print("{").beginC();
-        IteratorOfLocationDescriptor it = locations.iterator();
-        while(it.hasNext()) {
-            printLocationDescriptor(it.next());
-            if(it.hasNext()) {
-                layouter.print(", ").brk();
-            }
-        }
-        layouter.print("}").end();
     }
 
 

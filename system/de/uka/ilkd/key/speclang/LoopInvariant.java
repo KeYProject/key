@@ -15,7 +15,6 @@ import java.util.Map;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.visitor.Visitor;
-import de.uka.ilkd.key.logic.SetOfLocationDescriptor;
 import de.uka.ilkd.key.logic.SetOfTerm;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Function;
@@ -24,7 +23,7 @@ import de.uka.ilkd.key.logic.op.Operator;
 
 /**
  * A loop invariant, consisting of an invariant formula, a set of loop 
- * predicates, a modifier set, and a variant term.
+ * predicates, a modifies clause, and a variant term.
  */
 public interface LoopInvariant {
     
@@ -48,9 +47,9 @@ public interface LoopInvariant {
             Services services);
     
     /**
-     * Returns the modifier set.
+     * Returns the modifies clause.
      */
-    public SetOfLocationDescriptor getModifies(
+    public Term getModifies(
             Term selfTerm, 
             /*inout*/ Map <Operator, Function/* (atPre)*/> atPreFunctions,
             Services services);

@@ -237,19 +237,18 @@ options {
     }
 
 
-    public SetOfLocationDescriptor parseAssignable() throws SLTranslationException {
-
-	SetOfLocationDescriptor assignableClause = SetAsListOfLocationDescriptor.EMPTY_SET;
+    public Term parseAssignable() throws SLTranslationException {
+    	Term result = null;
 
 	this.currentlyParsing = true;
 	try {
-	    assignableClause = assignableclause();
+	    result = assignableclause();
 	} catch (antlr.ANTLRException e) {
 	    throw excManager.convertException(e);
 	}
 	this.currentlyParsing = false;
 
-	return assignableClause;
+	return result;
     }
 
 
@@ -648,7 +647,7 @@ options {
 	    LogicVariable idxLv 
 	    	= new LogicVariable(new Name("idx"), integerSort);
 	    Term arrTerm 
-	    	= TB.array(services, objectTerm, TB.var(idxLv));
+	    	= TB.dotArr(services, objectTerm, TB.var(idxLv));
 	    BasicLocationDescriptor arrLd
 	    	= new BasicLocationDescriptor(guardFma, arrTerm);
 	    result = result.add(arrLd);
@@ -683,51 +682,54 @@ top throws SLTranslationException
     ;
     
 
-assignableclause returns [SetOfLocationDescriptor result=SetAsListOfLocationDescriptor.EMPTY_SET] throws SLTranslationException
+assignableclause returns [Term result = null] throws SLTranslationException
 :
     result=storereflist
     ;
     
 
-storereflist returns [SetOfLocationDescriptor result=SetAsListOfLocationDescriptor.EMPTY_SET] throws SLTranslationException
+storereflist returns [Term result = null] throws SLTranslationException
 {
-    SetOfLocationDescriptor mod = null;
+    Term mod = null;
 }
 :
-    mod=storeref { result = result.union(mod); } 
-	(COMMA mod=storeref { result = result.union(mod); } )*
+    result=storeref 
+	(COMMA mod=storeref { result = TB.union(services, result, mod); } )*
     ;
 
 
-storeref returns [SetOfLocationDescriptor result = SetAsListOfLocationDescriptor.EMPTY_SET] throws SLTranslationException
+storeref returns [Term result = null] throws SLTranslationException
 :
 	result=storerefexpression
     |   LPAREN MULT { raiseNotSupported("informal descriptions"); }
     |   result=storerefkeyword
     ;
 
-storerefexpression returns [SetOfLocationDescriptor result = SetAsListOfLocationDescriptor.EMPTY_SET] throws SLTranslationException
+storerefexpression returns [Term result = null] throws SLTranslationException
 {
     JMLExpression expr;
-    LocationDescriptor ld = null;
 }
 :
     expr=storerefname 
     (
-	ld=storerefnamesuffix[expr]   { expr = new JMLExpression(((BasicLocationDescriptor)ld).getLocTerm()); }
+	result=storerefnamesuffix[expr]   { expr = new JMLExpression(result); }
     )*
     {
-	if(ld == null) {
-	    try {
-		//ld = new BasicLocationDescriptor(expr.getTerm()); //XXX
-		ld = EverythingLocationDescriptor.INSTANCE;
-	    } catch(IllegalArgumentException e) {
-		raiseError(e.getMessage());
+	if(result == null) {
+	    if(services.getTypeConverter().getHeapLDT().getSortOfSelect(expr.getTerm().op()) == null) {
+	        raiseError("Something is wrong: " + expr.getTerm());
+	    } else {
+	        Term objTerm = expr.getTerm().sub(1);
+	        Term fieldTerm = expr.getTerm().sub(2);
+	    	result = TB.pairSingleton(services, objTerm, fieldTerm);
 	    }
 	}
-	result = result.add(ld);
     }
-    ;
+    ;exception
+        catch [TermCreationException ex] {
+              raiseError(ex.getMessage());
+        }
+    
 
 
 storerefname returns [JMLExpression result = null] throws SLTranslationException
@@ -750,10 +752,7 @@ storerefname returns [JMLExpression result = null] throws SLTranslationException
     ;
     
 
-storerefnamesuffix[JMLExpression receiver] returns [BasicLocationDescriptor ld=null] throws SLTranslationException
-{
-    Term refTerm=null;
-}
+storerefnamesuffix[JMLExpression receiver] returns [Term result = null] throws SLTranslationException
 :
     DOT id:IDENT
     {
@@ -761,24 +760,26 @@ storerefnamesuffix[JMLExpression receiver] returns [BasicLocationDescriptor ld=n
 	if (!expr.isTerm()) {
 	    raiseError("Error in store-ref-suffix");
 	}
-	try {
-	    ld = new BasicLocationDescriptor(expr.getTerm());
-	} catch (IllegalArgumentException e) {
-	    raiseError(e.getMessage());
+	if(services.getTypeConverter().getHeapLDT().getSortOfSelect(expr.getTerm().op()) == null) {
+	    raiseError("Something is wrong.");
+	} else {
+	    Term objTerm = expr.getTerm().sub(1);
+	    Term fieldTerm = expr.getTerm().sub(2);
+	    result = TB.pairSingleton(services, objTerm, fieldTerm);
 	}
     }
     | DOT THIS
     {
 	raiseNotSupported("location \"this\" as store-ref-suffix");
     }
-    | LBRACKET ld=specarrayrefexpr[receiver] RBRACKET
+    | LBRACKET result = specarrayrefexpr[receiver] RBRACKET
     | DOT MULT
     {
-	raiseNotSupported("location \"*\" as store-ref-suffix");
+	result = TB.allFields(services, receiver.getTerm());
     }
     ;
 
-specarrayrefexpr[JMLExpression receiver] returns [BasicLocationDescriptor result=null] throws SLTranslationException
+specarrayrefexpr[JMLExpression receiver] returns [Term result = null] throws SLTranslationException
 {
     Term rangeFrom=null;
     Term rangeTo=null;
@@ -789,48 +790,51 @@ specarrayrefexpr[JMLExpression receiver] returns [BasicLocationDescriptor result
 	| MULT
     )
     {
-	Term indexTerm;
-	Term guardTerm;
+        LogicVariable indexVar 
+	    = new LogicVariable(
+	              new Name("i"), 
+		      services.getTypeConverter().getIntegerLDT().targetSort());
+	Term arrIndex = TB.arr(services, TB.var(indexVar));
 
-	   if (rangeFrom == null) {
+	if (rangeFrom == null) {
 	    // We have a star. A star includes all components of an array even
 	    // those out of bound. This makes proving easier.	    
-	    LogicVariable indexVar = new LogicVariable(new Name("i"), 
-			     services.getTypeConverter().getIntegerLDT().targetSort());
-	    indexTerm = TB.var(indexVar);	
-	    guardTerm = TB.tt();	    
+	    result = TB.locComprehension(services,
+	    				 indexVar, 
+	                                 receiver.getTerm(), 
+	                                 arrIndex);
 	} else if (rangeTo != null) {
-	    LogicVariable indexVar = new LogicVariable(new Name("i"), 
-			     services.getTypeConverter().getIntegerLDT().targetSort());
-	    indexTerm = TB.var(indexVar);
-	    guardTerm = TB.and(
-		TB.leq(rangeFrom, indexTerm, services),
-		TB.leq(indexTerm, rangeTo, services)
-		);
+	    // We have "rangeFrom .. rangeTo"
+	    Term guardFormula 
+	    	= TB.and(TB.leq(rangeFrom, TB.var(indexVar), services),
+		         TB.leq(TB.var(indexVar), rangeTo, services));
+            result = TB.guardedLocComprehension(
+	    			services, 
+	                        indexVar,
+	                        guardFormula,
+	                        receiver.getTerm(),
+				arrIndex);
 	} else {
-	    indexTerm = rangeFrom;
-	    guardTerm = TB.tt();
-	}
- 
-	try {
-	    Term resTerm = TB.array(services, receiver.getTerm(), indexTerm);
-	    result = new BasicLocationDescriptor(guardTerm, resTerm);
-	} catch (TermCreationException e) {
-	    raiseError(e.getMessage());
-	} catch (IllegalArgumentException e) {
-	    raiseError(e.getMessage());
+	    // We have a regular array access
+	    result = TB.pairSingleton(services, 
+	                              receiver.getTerm(),
+	                              TB.arr(services, rangeFrom));
 	}
     }
-    ;
+    ;exception
+        catch [TermCreationException ex] {
+              raiseError(ex.getMessage());
+        }
 
-storerefkeyword returns [SetOfLocationDescriptor result = SetAsListOfLocationDescriptor.EMPTY_SET] throws SLTranslationException
+
+storerefkeyword returns [Term result = null] throws SLTranslationException
 {
     KeYJavaType t = null;
 }
 :
-    NOTHING
-    | EVERYTHING { result = EverythingLocationDescriptor.INSTANCE_AS_SET; }
-    | NOT_SPECIFIED { result = EverythingLocationDescriptor.INSTANCE_AS_SET; }
+    NOTHING { result = TB.empty(services); }
+    | EVERYTHING { result = TB.allLocs(services); }
+    | NOT_SPECIFIED { result = TB.allLocs(services); }
 ;
 
 
@@ -1602,7 +1606,7 @@ primarysuffix[JMLExpression receiver, String fullyQualifiedName] returns [JMLExp
 	    }
 	    
 	    try {
-		    result = new JMLExpression(TB.array(services, receiver.getTerm(),t));
+		    result = new JMLExpression(TB.dotArr(services, receiver.getTerm(),t));
 	    } catch (TermCreationException e) {
 		raiseError(e.getMessage());
 	    } catch (IllegalArgumentException e) {
@@ -1756,7 +1760,7 @@ jmlprimary returns [JMLExpression result=null] throws SLTranslationException
 		    TB.leq(TB.zero(services), TB.var(i), services),
 		    TB.leq(TB.var(i), TB.dotLength(services, t), services));
 		Term body = TB.equals(
-		    TB.array(services, t, TB.var(i)),
+		    TB.dotArr(services, t, TB.var(i)),
 		    TB.NULL(services));
 		body = TB.not(body);
 		body = TB.imp(range, body);

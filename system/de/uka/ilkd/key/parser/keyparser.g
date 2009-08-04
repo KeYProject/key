@@ -2224,55 +2224,6 @@ term10_2 returns[Term result=null]
 			(ex.getMessage(), getFilename(), getLine(), getColumn()));
         }
 
-    
-location_list returns [SetOfLocationDescriptor set = SetAsListOfLocationDescriptor.EMPTY_SET;]
-{
-	LocationDescriptor loc;
-}
-:
-	LBRACE
-	(
-      	loc=location_descriptor {set = set.add(loc);}
-      	(
-      		COMMA loc=location_descriptor {set = set.add(loc);}
-      	)*
-    )?
-    RBRACE
-;
-
-
-location_descriptor returns [LocationDescriptor loc = null]
-{
-	ListOfQuantifiableVariable boundVars = null;
-	Term f = tf.createJunctorTerm(Junctor.TRUE);
-	Term t;
-}
-:
-   {
-		quantifiedArrayGuard = tf.createJunctorTerm(Junctor.TRUE);
-   }
-   (
-	STAR {loc = EverythingLocationDescriptor.INSTANCE;}
-    | (
-	(FOR boundVars=bound_variables)?
-    	((IF) => IF LPAREN f=formula RPAREN)?
-       	t=accessterm {
-          if(boundVars != null) {	  
-             while(!boundVars.isEmpty()) {
-    	        unbindVars();
-        	    boundVars = boundVars.tail();
-             }
-	  }	  
-     	  quantifiedArrayGuard = tf.createJunctorTermAndSimplify(Junctor.AND, f, quantifiedArrayGuard);       
-	  loc = new BasicLocationDescriptor(quantifiedArrayGuard, t);
-	}
-      )
-   )
-   {
-		quantifiedArrayGuard = null;
-   }
-;
-
 
 term20 returns [Term a = null] 
 {
@@ -2798,7 +2749,7 @@ array_access_suffix [Term arrayReference] returns [Term result = arrayReference]
 		   						  quantifiedArrayGuard, 
 		   						  guardTerm);
 		}
-            result = TB.array(getServices(), result, indexTerm); 
+            result = TB.dotArr(getServices(), result, indexTerm); 
     }            
     ;exception
         catch [TermCreationException ex] {
@@ -3942,7 +3893,7 @@ invariants
 one_contract 
 {
   Term fma = null;
-  SetOfLocationDescriptor modifiesClause = SetAsListOfLocationDescriptor.EMPTY_SET;
+  Term modifiesClause = null;
   String displayName = null;
   String contractName = null;
   Vector rs = null;
@@ -3959,7 +3910,7 @@ one_contract
         getServices().setNamespaces(namespaces());
      }
      (prog_var_decls)? 
-     fma = formula MODIFIES (modifiesClause = location_list)?
+     fma = formula MODIFIES (modifiesClause = term)?
      (rs=rulesets)?   // for backward compatibility
      (DISPLAYNAME displayName = string_literal)?
      {

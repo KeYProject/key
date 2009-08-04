@@ -5,13 +5,6 @@
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
-//This file is part of KeY - Integrated Deductive Software Design
-//Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
-//                      Universitaet Koblenz-Landau, Germany
-//                      Chalmers University of Technology, Sweden
-//
-//The KeY system is protected by the GNU General Public License. 
-//See LICENSE.TXT for details.
 //
 //
 
@@ -20,13 +13,13 @@ package de.uka.ilkd.key.speclang;
 import java.util.Map;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.SetOfLocationDescriptor;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.*;
 
 
 /**
  * A contract about an operation, consisting of a precondition, a 
- * postcondition, a modifier set, and a modality.
+ * postcondition, a modifies clause, and a modality.
  */
 public interface OperationContract {
     
@@ -73,11 +66,11 @@ public interface OperationContract {
                                      Services services);
 
     /**
-     * Returns the modifier set of the contract.
+     * Returns the modifies clause of the contract.
      */
-    public SetOfLocationDescriptor getModifies(ParsableVariable selfVar, 
-                                               ListOfParsableVariable paramVars,
-                                               Services services);
+    public Term getModifies(ParsableVariable selfVar, 
+                            ListOfParsableVariable paramVars,
+                            Services services);
     
 
     /**

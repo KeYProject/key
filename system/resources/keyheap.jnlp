@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- JNLP file for KeY -->
-<jnlp spec="1.0+" codebase="http://i12www.ira.uka.de/~bweiss/key-heap" href="KeY.jnlp">
+<jnlp spec="1.0+" codebase="http://i12www.ira.uka.de/~bweiss/keyheap" href="keyheap.jnlp">
 <information> 
 <title>KeYHeap</title>
 <vendor>KeY-Project, Universitaet Karlsruhe, Chalmers University, Universitaet Koblenz</vendor> 

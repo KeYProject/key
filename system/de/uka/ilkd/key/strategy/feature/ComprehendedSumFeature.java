@@ -63,6 +63,7 @@ public class ComprehendedSumFeature implements Feature {
         RuleAppCost res = LongRuleAppCost.ZERO_COST;
         while ( it.hasNext () && ! ( res instanceof TopRuleAppCost ) ) {
             var.setContent ( it.next () );
+            
             res = res.add ( body.compute ( app, pos, goal ) );
         }
         

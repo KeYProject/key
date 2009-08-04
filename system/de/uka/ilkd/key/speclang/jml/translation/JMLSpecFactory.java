@@ -5,13 +5,6 @@
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
-//This file is part of KeY - Integrated Deductive Software Design
-//Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
-//                      Universitaet Koblenz-Landau, Germany
-//                      Chalmers University of Technology, Sweden
-//
-//The KeY system is protected by the GNU General Public License. 
-//See LICENSE.TXT for details.
 //
 //
 
@@ -32,11 +25,8 @@ import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.statement.BranchStatement;
 import de.uka.ilkd.key.java.statement.For;
 import de.uka.ilkd.key.java.statement.LoopStatement;
-import de.uka.ilkd.key.logic.EverythingLocationDescriptor;
 import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.SetAsListOfLocationDescriptor;
 import de.uka.ilkd.key.logic.SetAsListOfTerm;
-import de.uka.ilkd.key.logic.SetOfLocationDescriptor;
 import de.uka.ilkd.key.logic.SetOfTerm;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -248,20 +238,15 @@ public class JMLSpecFactory {
         }
 
         //translate assignable
-        SetOfLocationDescriptor assignable;
-        if(originalAssignable.isEmpty()) {
-            assignable = EverythingLocationDescriptor.INSTANCE_AS_SET;
-        } else {
-            assignable = SetAsListOfLocationDescriptor.EMPTY_SET;
-            for(PositionedString expr : originalAssignable) {
-                SetOfLocationDescriptor translated 
-                    = translator.translateAssignableExpression(
-                        expr, 
-                        programMethod.getContainerType(),
-                        selfVar, 
-                        paramVars);
-                assignable = assignable.union(translated);        
-            }
+        Term assignable = TB.empty(services);
+        for(PositionedString expr : originalAssignable) {
+            Term translated 
+                = translator.translateAssignableExpression(
+                    expr, 
+                    programMethod.getContainerType(),
+                    selfVar, 
+                    paramVars);
+            assignable = TB.union(services, assignable, translated);        
         }
 
         //translate ensures
@@ -632,20 +617,15 @@ public class JMLSpecFactory {
         }
         
         //translate assignable
-        SetOfLocationDescriptor assignable;
-        if(originalAssignable.isEmpty()) {
-            assignable = EverythingLocationDescriptor.INSTANCE_AS_SET;
-        } else {
-            assignable = SetAsListOfLocationDescriptor.EMPTY_SET;
-            for(PositionedString expr : originalAssignable) {
-                SetOfLocationDescriptor translated 
-                    = translator.translateAssignableExpression(
-                                        expr, 
-                                        programMethod.getContainerType(),
-                                        selfVar, 
-                                        paramVars);
-                assignable = assignable.union(translated);        
-            }
+        Term assignable = TB.empty(services);
+        for(PositionedString expr : originalAssignable) {
+            Term translated 
+                = translator.translateAssignableExpression(
+                    expr, 
+                    programMethod.getContainerType(),
+                    selfVar, 
+                    paramVars);
+            assignable = TB.union(services, assignable, translated);        
         }
         
         //translate variant

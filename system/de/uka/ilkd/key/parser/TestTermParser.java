@@ -198,17 +198,6 @@ public class TestTermParser extends TestCase {
 	}
     }
     
-    public SetOfLocationDescriptor parseModifies(String s) {
-    	try {     
-            return stringTermParser(s).location_list();
-        } catch (Exception e) {
-            StringWriter sw = new StringWriter();
-            PrintWriter pw = new PrintWriter(sw);
-            e.printStackTrace(pw);
-            throw new RuntimeException("Exc while Parsing:\n" + sw );
-        }
-    }
-
 
     public Term parseFma(String s) {
 	try {	    	    
