@@ -22,6 +22,7 @@ import de.uka.ilkd.key.proof.ListOfGoal;
 import de.uka.ilkd.key.proof.SLListOfGoal;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.smt.SMTSolverResult.ThreeValuedTruth;
 import de.uka.ilkd.key.util.ProgressMonitor;
 
 
@@ -39,7 +40,54 @@ class SolverWrapper
   /**If true, the solver is used for proving*/
   private boolean 	   UsedForProving=false;
   
-  /**
+  private String Text="";
+  private String ErrorText="";
+  private int    exitValue =0; 
+  
+  
+
+  
+  private boolean        Finished=false;
+
+  
+  public boolean hasFinished() {
+    return Finished;
+  }
+
+
+  public void setFinished(boolean finished) throws IOException {
+      
+    Finished = finished;
+    
+    if(Finished == true){
+	
+	    InputStream in = Proc.getInputStream();
+	    Text = AbstractSMTSolver.read(in);
+	    in.close();
+		
+	    in = Proc.getErrorStream();
+	    ErrorText = AbstractSMTSolver.read(in);
+	    in.close();
+	    exitValue = Proc.exitValue();
+	    
+	    Result = interpretAnswer();
+	
+
+    }
+    else {
+	Text = "";
+	ErrorText = "";
+	exitValue =0;
+	
+	
+    }
+    
+  }
+
+
+
+
+/**
    * 
    * @param solver The solver which should be wrapped.
    */
@@ -82,21 +130,16 @@ class SolverWrapper
   }
   
   /** Interprets the result of the process.  
-   * @return 
+   * @return A instance of SMTSolverResult.
    * @throws IOException
    */
   public SMTSolverResult interpretAnswer() throws IOException
   {
       SMTSolverResult toReturn;
-      InputStream in = Proc.getInputStream();
-      String text = AbstractSMTSolver.read(in);
-      in.close();
-	
-      in = Proc.getErrorStream();
-      String error = AbstractSMTSolver.read(in);
-      in.close();
+
+      
 	try {
-	    toReturn = Solver.interpretAnswer(text, error, Proc.exitValue());
+	    toReturn = Solver.interpretAnswer(Text, ErrorText, exitValue);
 	} catch (IllegalArgumentException e) {
 	    //the interpretation found an error.
 	    throw new RuntimeException("Error while executing solver:\n" + e.getMessage());
@@ -111,7 +154,8 @@ public class SMTRuleMulti implements BuiltInRule {
     
     private static final Logger logger = Logger
     .getLogger(AbstractSMTSolver.class.getName());
-    
+    /**If true, all provers must stop or the timeout must be reached, before the results are interpreted*/
+    private boolean        waitForAllProvers=false;
     
 
     /**List of all possibles solvers that can be used, not installed solvers are also stored in <code>Solvers</code>*/
@@ -121,9 +165,11 @@ public class SMTRuleMulti implements BuiltInRule {
     /**List of all solvers that has been started while executing the rule*/
     private ArrayList<SolverWrapper> runningSolvers = new ArrayList<SolverWrapper>(); 
     
+    
+    
     /** Searches for the given <code>SMTSolver s</code> in <code>Solvers</code>  
-     * @param s  
-     * @return 
+     * @param s  SMTSolver to look for.
+     * @return SolverWrapper that is associated with the given SMTSolver, or null when not found.
      */
     private SolverWrapper find(SMTSolver s)
     {
@@ -131,6 +177,16 @@ public class SMTRuleMulti implements BuiltInRule {
 	   if(s.name().equals(sw.getSolver().name())) return sw;
 	return null;
     }
+    
+    
+    private SolverWrapper find(Process p)
+    {
+	for(SolverWrapper sw : Solvers)
+	    if(sw.getProc() == p) return sw;
+	return null;
+    }
+    
+    
     
     /**
      * This method sets, whether the SMTSolver s is executed by the rule or not.
@@ -143,6 +199,8 @@ public class SMTRuleMulti implements BuiltInRule {
 	if(sw == null) throw new IllegalArgumentException("Solver can not be found.");
 	sw.setUsedForProving(use);
     }
+    
+    
     
     /**
      * returns whether the SMTSolver s is used by the rule.
@@ -158,8 +216,6 @@ public class SMTRuleMulti implements BuiltInRule {
     }
     
  
-
-
     
     /**
      * Constructor for the rule SMTRuleMulti
@@ -171,6 +227,18 @@ public class SMTRuleMulti implements BuiltInRule {
 	for(SMTSolver s : sl)
 	   Solvers.add(new SolverWrapper(s));
     }
+    
+    
+
+    public boolean isWaitingForAllProvers() {
+	    return waitForAllProvers;
+	  }
+
+        
+    
+    public void setWaitForAllProvers(boolean waitForAllProvers) {
+	    this.waitForAllProvers = waitForAllProvers;
+	  }
 
     
     
@@ -179,90 +247,133 @@ public class SMTRuleMulti implements BuiltInRule {
 	//only make applicable, if the complete goal should be proved
 	return pio == null;
     }
+    
+    private void killProcesses()
+    {
+	for(Process p : runningProcesses)
+	    p.destroy();
+	
+    }
+    
+    private void handleException(Services services,Exception e)
+    {
+        if (services.getExceptionHandler() != null) {
+	    services.getExceptionHandler().reportException(e);
+		} else {
+		    RuntimeException re = new RuntimeException(e.getMessage());
+		    re.initCause(e);
+		    throw re;
+			}
+	
+    }
 
     
+    /** 
+     * @return returns null, when all provers have failed<br>
+     *          returns <code>SLListOfGoal.EMPTY_LIST</code>, when one prover succeeded and the other provers haven't finished yet. 
+     * 
+     */
     public ListOfGoal apply(Goal goal, Services services, RuleApp ruleApp) {
 	int timeout = ProofSettings.DEFAULT_SETTINGS.getDecisionProcedureSettings().getTimeout()*100;
-	SMTSolverResult result = SMTSolverResult.NO_IDEA;
+
 	runningProcesses.clear();
-	runningProcesses.clear();
+	runningSolvers.clear();
 	
+	
+	// Start the provers
 	for(SolverWrapper sw : Solvers){
 		try {
 		    if(sw.isUsedForProving() && sw.getSolver().isInstalled(false)){
 			sw.run(goal, services);
 			runningProcesses.add(sw.getProc());
 			runningSolvers.add(sw);
+			sw.setFinished(false);
+			
 		    }
 		    
 		    
 		} 
-		catch (IllegalFormulaException ife)
-		{
-		    //TODO handle exception 
+		catch (IllegalFormulaException ife){
+		   handleException(services,ife);
 		}
 		
 		catch (IOException ioe) {	    	    
-		if (services.getExceptionHandler() != null) {
-		    services.getExceptionHandler().reportException(ioe);
-		} else {
-		    RuntimeException re = new RuntimeException(ioe.getMessage());
-		    re.initCause(ioe);
-		    throw re;
-			}	    
+		    handleException(services,ioe);	    
 		}
 	  
 	}
 	
 	 
+	 // initialize the ExecutionWatchDog and start the Timer
 	 ExecutionWatchDog execWatch = new ExecutionWatchDog(timeout,runningProcesses);
-	 
 	 Timer t = new Timer();
 	 t.schedule(execWatch, new Date(System.currentTimeMillis()), 300);
 
 
 	 
+	 int count = 0;
+	 int startedProcesses = runningProcesses.size();
 	
-	 boolean interruptedByWatchdog = false;
 	 try {
 		//wait for the SMTSolver Thread and make popagate progress
 		boolean finished = false;
 		
-		//synchronized (p) {
+		
 		while (!finished) {
 		   /* if (this.toBeInterrupted) {
 			this.toBeInterrupted = false;
 			execWatch.interrupt();
 			
 		    }*/
-		    try {
+		        ArrayList<Process> toRemove = new ArrayList<Process>();
 			for(Process p : runningProcesses){
 			    synchronized(p) {
-				p.wait(300);
-				p.exitValue();
+				try{
+				   
+				   p.wait(300);
+				   p.exitValue();
+				   SolverWrapper sw = find(p);
+				   if(sw.hasFinished()) continue;
+				   toRemove.add(p);
+				
+				   try{
+				       if(!execWatch.wasInterruptedByTimeout() && 
+					   !execWatch.wasInterruptedByUser())
+				       sw.setFinished(true);
+				       count++;
+				   }
+				   catch(IOException ioe)
+				   {
+				       handleException(services,ioe);
+				   }
+				if((!this.waitForAllProvers && sw.getResult().isValid() != ThreeValuedTruth.UNKNOWN) || 
+				   (this.waitForAllProvers && count == startedProcesses)){
+				    	finished =true;
+				    	break;
+				   }
+				}catch (IllegalThreadStateException e) {}
+				
+				//}
 			    }		
 			}
-			 			 
+			runningProcesses.removeAll(toRemove);
+			
 			//if the program comes here, p has been finished.
-			finished = true;
-		    } catch (IllegalThreadStateException e) {
+			//finished = true;
+		    //} catch (IllegalThreadStateException e) {
 			//if program comes here, p has not been finished yet.
 			//update the progress.
 			//for (ProgressMonitor pm : this.progressMonitors) {
 			  //  pm.setProgress(execWatch.getProgress());
 			//}
-		    }
+		    //}
 		}
 		//}
-		if (execWatch.wasInterruptedByTimeout()) {
-		    interruptedByWatchdog = true;
-		    logger.debug(
-		    "Process for smt formula proving interrupted because of timeout.");
-		} else if (execWatch.wasInterruptedByUser()) {
-		    interruptedByWatchdog = true;
-		    logger.debug(
-		    "Process for smt formula proving interrupted because of user interaction.");
-		}
+		
+		killProcesses();
+		
+		
+		
 	    } catch (InterruptedException f) {
 		logger.debug(
 			"Process for smt formula proving interrupted.",
@@ -272,32 +383,34 @@ public class SMTRuleMulti implements BuiltInRule {
 		execWatch = null;
 	    }
 	    
-	    if (interruptedByWatchdog) {
+	    if (count == 0) {
 		
-		//the solving was interrupted. So return unknown
+		//the solving was interrupted and no prover has finished. So return unknown
 		return null;
 	    } else {
 		
 		boolean notValid = false;
 		boolean valid    = false;
-		for(SolverWrapper sw : runningSolvers)
-		{
+		for(SolverWrapper sw : runningSolvers){
 		    SMTSolverResult res;
-		    try{
-			res = sw.interpretAnswer();
-			if(res.isValid() == SMTSolverResult.ThreeValuedTruth.FALSE) notValid = true;
+		    if(sw.hasFinished()){
+		      	res = sw.getResult();
+		      	if(res.isValid() == SMTSolverResult.ThreeValuedTruth.FALSE) notValid = true;
 			if(res.isValid() == SMTSolverResult.ThreeValuedTruth.TRUE) valid = true;
+			
+			    
 		    }
-		    catch(IOException ioe) {}
 		    
 	
 		}
 		
-		if(notValid && valid) { /*TODO insert exception */}
+		
+		if(notValid && valid) { throw new RuntimeException("One prover says true, the other prover says false!");}
 		
 		if(valid && !notValid) return SLListOfGoal.EMPTY_LIST;
 		
 	    }
+	
 	return null;
 
     }

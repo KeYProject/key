@@ -184,7 +184,7 @@ public class DecissionProcedureSettingsDialog extends JDialog {
 	this.multiuseBox.setPreferredSize(new Dimension(fieldWidth, fieldHeight));
 	
 	
-	JLabel multiuseLabel = new JLabel("Multiple prover");
+	JLabel multiuseLabel = new JLabel("Multiple provers");
 	multiuseLabel.setMaximumSize(new Dimension(labelWidth, labelHeight));
 	multiuseLabel.setMinimumSize(new Dimension(labelWidth, labelHeight));
 	multiuseLabel.setPreferredSize(new Dimension(labelWidth, labelHeight));

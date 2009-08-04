@@ -11,7 +11,7 @@
 
 package de.uka.ilkd.key.smt;
 
-import java.util.ArrayList;
+
 
 /**
  * The class <code>ContextualBlock</code> is used to integrate comments to translations of AbstractSMTtranslator. A concrete instance of <code>ContexualBlock</code>
