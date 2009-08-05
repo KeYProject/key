@@ -439,12 +439,6 @@ public final class TermBuilder {
     }
     
     
-    //intention: does not simplify, unlike apply()
-    public Term prepend(Term update, Term target) {
-	return apply(update, target);
-    }
-    
-    
     public Term applyElementary(Services services,
 	                        Term loc,
 	                        Term value,
@@ -726,14 +720,14 @@ public final class TermBuilder {
     }
     
     
-    public Term nextToCreate(Services services, Sort sort) {
+    public Term nextToCreate(Services services) {
 	return staticDot(services, 
 		         services.getTypeConverter()
 		                 .getIntegerLDT()
 		                 .targetSort(),
 		         services.getTypeConverter()
 		                 .getHeapLDT()
-		                 .getNextToCreateFor(sort, services));
+		                 .getNextToCreate());
     }
     
     

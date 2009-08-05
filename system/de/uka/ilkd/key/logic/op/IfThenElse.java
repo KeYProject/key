@@ -12,7 +12,6 @@ package de.uka.ilkd.key.logic.op;
 import de.uka.ilkd.key.logic.ArrayOfTerm;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.sort.IteratorOfSort;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.logic.sort.SetOfSort;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -25,46 +24,42 @@ public final class IfThenElse extends AbstractOperator {
     
     public static final IfThenElse IF_THEN_ELSE = new IfThenElse ();
     
-    
-    /**
-     * creates an if-else operator of the given name
-     */
-    protected IfThenElse(Name name) {
-        super(name, 3, true);
-    }
         
-    
     private IfThenElse () {
-        this(new Name("if-then-else"));
+	super(new Name("if-then-else"), 3, true);
     }
     
     
     private Sort getCommonSuperSort(Sort s1, Sort s2) {
-        if (s1 == Sort.FORMULA) {
+        if(s1 == Sort.FORMULA) {
             assert s2 == Sort.FORMULA;
             return Sort.FORMULA;
+        } else if(s1.extendsTrans(s2)) {
+            return s2;
+        } else if(s2.extendsTrans(s1)) {
+            return s1;
+        } else if(s1 == Sort.NULL || s2 == Sort.NULL) {
+            return Sort.ANY;
+        } else {
+            Sort result = Sort.ANY;
+            final SetOfSort set1 = s1.extendsSorts();
+            final SetOfSort set2 = s2.extendsSorts();
+            assert set1 != null : "null for sort: " + s1;
+            assert set2 != null : "null for sort: " + s2;
+            
+            for(final Sort sort1 : set1) {
+                if(set2.contains(sort1)) {
+                    if(result == Sort.ANY) {
+                        result = sort1;
+                    } else {
+                        // not uniquely determinable
+                        return Sort.ANY;
+                    }
+                } 
+            }
+            
+            return result;
         }
-               
-        if (s1.extendsTrans(s2)) return s2;
-        else if (s2.extendsTrans(s1)) return s1;
-        
-        Sort result = Sort.ANY;
-        final SetOfSort set1 = s1.extendsSorts();
-        final SetOfSort set2 = s2.extendsSorts();
-        
-        final IteratorOfSort sort1It = set1.iterator();
-        while (sort1It.hasNext()) {
-            final Sort sort1 = sort1It.next();
-            if (set2.contains(sort1)) {
-                if (result == Sort.ANY) {
-                    result = sort1;
-                } else {
-                    // not uniquely determinable
-                    return Sort.ANY;
-                }
-            } 
-        }        
-        return result;
     }        
 
     
@@ -72,14 +67,13 @@ public final class IfThenElse extends AbstractOperator {
     public Sort sort(ArrayOfTerm terms) {
         final Sort s2 = terms.getTerm(1).sort ();
         final Sort s3 = terms.getTerm(2).sort ();
-        if (s2 instanceof ProgramSVSort
+        if(s2 instanceof ProgramSVSort
              || s2 == AbstractMetaOperator.METASORT ) { 
             return s3; 
-        } else if (s3 instanceof ProgramSVSort
-        	    || s3 == AbstractMetaOperator.METASORT ) {
+        } else if(s3 instanceof ProgramSVSort
+        	  || s3 == AbstractMetaOperator.METASORT ) {
             return s2;
         } else {           
-            // still a mess but a better one
             return getCommonSuperSort(s2, s3);
         }
     }
@@ -91,8 +85,9 @@ public final class IfThenElse extends AbstractOperator {
         final Sort s1 = term.sub(1).sort();
         final Sort s2 = term.sub(2).sort();
         
-        // TODO: like in <code>ConjCond</code>, but this is really bad!!! /PR
         return s0 == Sort.FORMULA
-               && (s1 == Sort.FORMULA) == (s2 == Sort.FORMULA);
+               && (s1 == Sort.FORMULA) == (s2 == Sort.FORMULA)
+               && s1 != Sort.UPDATE 
+               && s2 != Sort.UPDATE;
     }
 }

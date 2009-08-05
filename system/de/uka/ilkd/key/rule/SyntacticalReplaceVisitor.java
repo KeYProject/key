@@ -333,6 +333,8 @@ public final class SyntacticalReplaceVisitor extends Visitor {
 		} else {                
 //		    final int posInStack = op.arity() - op.locationSubtermsEnd(i);
 		    Term instantiation = toTerm(inst);
+		    assert instantiation.op() instanceof UpdateableOperator 
+		           : "not updateable: " + instantiation;
 		    newLhs = (UpdateableOperator)instantiation.op();
 //		    updateLocation(newLhs, instantiation, 
 //			    posInStack, 0, false);

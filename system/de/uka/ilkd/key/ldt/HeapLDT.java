@@ -45,7 +45,7 @@ public final class HeapLDT extends LDT {
     private final Function arr;
     private final Function length;
     private final Function created;
-    private final SortDependingFunction nextToCreate;
+    private final Function nextToCreate;
     
     //predicates
     private final Function wellFormed;
@@ -66,7 +66,7 @@ public final class HeapLDT extends LDT {
         arr               = addFunction(functions, "arr");
         length            = addFunction(functions, "Array::length");
         created           = addFunction(functions, "java.lang.Object::<created>");
-        nextToCreate      = (SortDependingFunction) addFunction(functions, Sort.ANY + "::<nextToCreate>");
+        nextToCreate      = addFunction(functions, "java.lang.Object::<nextToCreate>");
         wellFormed        = addFunction(functions, "wellFormed");
         heap	          = (LocationVariable) progVars.lookup(new Name("heap"));        
     }
@@ -127,8 +127,8 @@ public final class HeapLDT extends LDT {
     }
     
     
-    public Function getNextToCreateFor(Sort instanceSort, Services services) {
-	return (Function) nextToCreate.getInstanceFor(instanceSort, services);
+    public Function getNextToCreate() {
+	return nextToCreate;
     }
     
     
@@ -144,15 +144,13 @@ public final class HeapLDT extends LDT {
     
     public Function getFieldSymbolForPV(ProgramVariable fieldPV, 
 	    				Services services) {
-	assert fieldPV.isMember();
-	
+	assert fieldPV.isMember();	
 	final Name name;
 	if(fieldPV == services.getJavaInfo().getArrayLength()) {
 	    return getLength();
 	} else if(fieldPV.isStatic()) {
-	    name = new Name(fieldPV.getContainerType().getSort().toString() 
-		    	    + "::" 
-		    	    + fieldPV.toString());
+	    assert fieldPV.toString().contains("::");
+	    name = new Name(fieldPV.toString());
 	} else {
 	    name = new Name(fieldPV.toString());
 	}
@@ -165,7 +163,7 @@ public final class HeapLDT extends LDT {
                 		  new Sort[0], 
                 		  null,
                 		  true);
-            services.getNamespaces().functions().add(result);
+            services.getNamespaces().functions().addSafely(result);
         } 
         
         assert result.isUnique();        

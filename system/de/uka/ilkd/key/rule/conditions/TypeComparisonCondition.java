@@ -11,7 +11,6 @@
 package de.uka.ilkd.key.rule.conditions;
 
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.WeakHashMap;
 
@@ -22,7 +21,6 @@ import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.sort.*;
 import de.uka.ilkd.key.rule.VariableConditionAdapter;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
-import de.uka.ilkd.key.util.Debug;
 
 
 /**
@@ -30,22 +28,15 @@ import de.uka.ilkd.key.util.Debug;
  */
 public final class TypeComparisonCondition extends VariableConditionAdapter {
     
-    /** checks if sorts are not same */
-    public final static int NOT_SAME = 0;
-
-    /** checks subtype relationship */
-    public final static int IS_SUBTYPE = 2;
-    /** checks subtype relationship */
-    public final static int NOT_IS_SUBTYPE = 3;
-    /** check for strict subtype */
-    public static final int STRICT_SUBTYPE = 4;
-    /** checks if sorts are same */
-    public final static int SAME = 5;
-    /** checks if sorts are disjoint */
-    public final static int DISJOINTMODULONULL = 6; 
-
-  
-    private final int mode;
+    public static enum Mode 
+                {NOT_SAME,           /* checks if sorts are not same */
+	         SAME,               /* checks if sorts are same */ 
+	         IS_SUBTYPE,         /* checks subtype relationship */
+	         NOT_IS_SUBTYPE,     /* checks subtype relationship */
+	         STRICT_SUBTYPE,     /* checks for strict subtype */
+	         DISJOINTMODULONULL} /* checks if sorts are disjoint */
+    
+    private final Mode mode;
     private final TypeResolver fst;
     private final TypeResolver snd;
 
@@ -57,9 +48,9 @@ public final class TypeComparisonCondition extends VariableConditionAdapter {
      * @param snd one of the SchemaVariable whose type is checked
      * @param mode an int encoding if testing of not same or not compatible
      */
-    public TypeComparisonCondition (TypeResolver fst, 
-				     TypeResolver snd,
-				     int mode) {
+    public TypeComparisonCondition(TypeResolver fst, 
+				   TypeResolver snd,
+				   Mode mode) {
 	this.fst = fst;
 	this.snd = snd;
 	this.mode = mode;
@@ -72,25 +63,23 @@ public final class TypeComparisonCondition extends VariableConditionAdapter {
 			 SVInstantiations svInst,
 			 Services services) {
         
-        if (!fst.isComplete(var, subst, svInst, services) ||
-                !snd.isComplete(var, subst, svInst, services)) {
+        if (!fst.isComplete(var, subst, svInst, services) 
+             || !snd.isComplete(var, subst, svInst, services)) {
             // not yet complete
             return true;
         }
         
-        
 	return checkSorts(fst.resolveSort(var, subst, svInst, services), 
-                snd.resolveSort(var, subst, svInst, services), services);
+                          snd.resolveSort(var, subst, svInst, services), 
+                          services);
     }
 
     
-    private boolean checkSorts(final Sort fstSort, final Sort sndSort, Services services) {
+    private boolean checkSorts(final Sort fstSort, 
+	                       final Sort sndSort, 
+	                       final Services services) {
         switch (mode) {
         case SAME:
-            if(fstSort instanceof GenericSort || sndSort instanceof GenericSort) {
-        	System.out.println("COMPARING: " + fstSort + " and " + sndSort);
-        	System.out.println(fstSort == sndSort);
-            }
             return fstSort == sndSort;
         case NOT_SAME:
             return fstSort != sndSort;
@@ -103,8 +92,7 @@ public final class TypeComparisonCondition extends VariableConditionAdapter {
         case DISJOINTMODULONULL:
             return checkDisjointness(fstSort, sndSort, services);
         default:
-            Debug.fail("TypeComparisionCondition: " + 
-        	       "Unknown mode.");
+            assert false;
             return false;
         }
     }

@@ -126,7 +126,8 @@ public class ImplicitFieldAdder extends RecoderModelTransformer {
 	// instance
         attach(createImplicitRecoderField("byte", IMPLICIT_TRANSIENT, false, false), td, 0);
 	attach(createImplicitRecoderField("boolean", IMPLICIT_INITIALIZED, false, false), td, 0);
-        attach(createImplicitRecoderField("boolean", IMPLICIT_CREATED, false, false), td, 0);
+        attach(createImplicitRecoderField("boolean", IMPLICIT_CREATED, false, false), td, 0);	  
+        attach(createImplicitRecoderField("int", IMPLICIT_NEXT_TO_CREATE, true, false), td, 0);
     }
     
 
@@ -166,12 +167,6 @@ public class ImplicitFieldAdder extends RecoderModelTransformer {
                         new ImplicitIdentifier(IMPLICIT_ENCLOSING_THIS), null);
             fd.makeAllParentRolesValid();
 	    attach(fd, td, 0);
-	}
-	  
-        
-	if (!td.isInterface() && !td.isAbstract()) {	  
-	    attach(createImplicitRecoderField("int", 
-					      IMPLICIT_NEXT_TO_CREATE, true, true), td, 0);
 	}
     }
     

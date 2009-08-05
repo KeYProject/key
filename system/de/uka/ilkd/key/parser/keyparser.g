@@ -3474,29 +3474,40 @@ varcond_newlabel [TacletBuilder b]
 varcond_typecheck [TacletBuilder b, boolean negated]
 {
   TypeResolver fst = null, snd = null;
-  int typecheckType = -1;
+  TypeComparisonCondition.Mode mode = null;
 }
 :
-   (  SAME  { 	
-	typecheckType = negated ? TypeComparisonCondition.NOT_SAME : TypeComparisonCondition.SAME;
-	} 
-    | ISSUBTYPE { typecheckType = negated ?  
-	  TypeComparisonCondition.NOT_IS_SUBTYPE: TypeComparisonCondition.IS_SUBTYPE; 
+   (  SAME  
+      { 	
+	  mode = negated 
+	         ? TypeComparisonCondition.Mode.NOT_SAME 
+	         : TypeComparisonCondition.Mode.SAME;
+      } 
+    | ISSUBTYPE 
+      { 
+          mode = negated 
+                 ? TypeComparisonCondition.Mode.NOT_IS_SUBTYPE
+                 : TypeComparisonCondition.Mode.IS_SUBTYPE; 
       }
-    | STRICT ISSUBTYPE {
-         if (negated) {  
-	  semanticError("A negated strict subtype check does not make sense.");
-	} 
-	typecheckType = TypeComparisonCondition.STRICT_SUBTYPE;
+    | STRICT ISSUBTYPE 
+      {
+          if(negated) {  
+	      semanticError("A negated strict subtype check does not make sense.");
+	  } 
+	  mode = TypeComparisonCondition.Mode.STRICT_SUBTYPE;
       }
-    | DISJOINTMODULONULL {
-        typecheckType = TypeComparisonCondition.DISJOINTMODULONULL;
+    | DISJOINTMODULONULL 
+      {
+          if(negated) {
+              semanticError("Negation not supported");
+          }
+          mode = TypeComparisonCondition.Mode.DISJOINTMODULONULL;
       }
    ) 
-   LPAREN fst = type_resolver COMMA snd = type_resolver RPAREN {
-               b.addVariableCondition
-                 (new TypeComparisonCondition(fst, snd, typecheckType));
-            }
+   LPAREN fst = type_resolver COMMA snd = type_resolver RPAREN 
+   {
+	b.addVariableCondition(new TypeComparisonCondition(fst, snd, mode));
+   }
 ;
 
 

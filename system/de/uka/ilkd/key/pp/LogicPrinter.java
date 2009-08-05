@@ -827,8 +827,7 @@ public final class LogicPrinter {
                   && t.sort() == services.getTypeConverter().getHeapLDT().getFieldSort() 
                   && t.arity() == 0
                   && t.boundVars().isEmpty()) {
-            startTerm(0);
-            
+            startTerm(0);            
             final String fieldOpName = t.op().name().toString();
             final String shortFieldName
                     =  fieldOpName.contains("::")
@@ -904,6 +903,8 @@ public final class LogicPrinter {
         	markStartSub();
         	//"null" not printed
         	markEndSub();
+        	
+        	layouter.print(fieldPV.getContainerType().getName() + ".");
         	
                 markStartSub();
                 startTerm(0);                    

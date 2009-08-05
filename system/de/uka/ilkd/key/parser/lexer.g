@@ -82,6 +82,7 @@ tokens {
         STATICMETHODREFERENCE = "\\staticMethodReference";	
 	STRICT    = "\\strict";	
 	TYPEOF = "\\typeof";
+	INSTANTIATE_GENERIC = "\\instantiateGeneric";
 
 	// Quantifiers, binding, substitution
 	FORALL = "\\forall";

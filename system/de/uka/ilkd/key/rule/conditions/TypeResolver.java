@@ -5,6 +5,7 @@
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
+
 package de.uka.ilkd.key.rule.conditions;
 
 import de.uka.ilkd.key.java.Expression;
@@ -22,11 +23,9 @@ import de.uka.ilkd.key.util.Debug;
 /**
  * Several variable conditions deal with types. The type resolver provides a 
  * unique interface to access types, e.g. the type of a schemavariable instantiation,
- * the instantiated type of a generic sort or the type an attribut eis declared in. 
- *
+ * the instantiated type of a generic sort or the type an attribute is declared in. 
  */
 public abstract class TypeResolver {
-    
     
     public static TypeResolver createContainerTypeResolver(SchemaVariable s) {
         return new ContainerTypeResolver(s);
@@ -43,6 +42,17 @@ public abstract class TypeResolver {
     public static TypeResolver createNonGenericSortResolver(Sort s) {
 	return new NonGenericSortResolver(s);
     }
+    
+    
+    public abstract boolean isComplete(SchemaVariable sv, 
+            SVSubstitute instCandidate, SVInstantiations instMap, Services services);
+    
+    public abstract Sort resolveSort(SchemaVariable sv, 
+            SVSubstitute instCandidate, SVInstantiations instMap, Services services);
+    
+    public abstract KeYJavaType resolveType(SchemaVariable sv, 
+            SVSubstitute instCandidate, SVInstantiations instMap, Services services);
+    
     
     
     public static class GenericSortResolver extends TypeResolver {
@@ -212,17 +222,4 @@ public abstract class TypeResolver {
             return "\\containerType(" + memberSV  + ")";
         }
     }
-    
-    
-    public abstract boolean isComplete(SchemaVariable sv, 
-            SVSubstitute instCandidate, SVInstantiations instMap, Services services);
-    
-    public abstract Sort resolveSort(SchemaVariable sv, 
-            SVSubstitute instCandidate, SVInstantiations instMap, Services services);
-    
-    public abstract KeYJavaType resolveType(SchemaVariable sv, 
-            SVSubstitute instCandidate, SVInstantiations instMap, Services services);
-    
-    
-    
 }
