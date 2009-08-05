@@ -410,7 +410,7 @@ public class TestTermParser extends TestCase {
     }
 
     public void testBindingUpdateTerm() {
-	String s="\\forall jint j; {globalIntPV:=j} globalIntPV = j";
+	String s="\\forall int j; {globalIntPV:=j} globalIntPV = j";
 	Term t = parseTerm(s);
 	assertFalse("expected ({globalIntPV:=j}globalIntPV)=j) but is {globalIntPV:=j}(globalIntPV=j)", 
 		t.sub(0).op() instanceof UpdateApplication);

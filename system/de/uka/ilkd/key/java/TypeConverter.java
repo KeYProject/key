@@ -36,13 +36,7 @@ public final class TypeConverter {
 
     private final Services services;
       
-    private ByteLDT byteLDT;
-    private ShortLDT shortLDT;
-    private IntLDT intLDT;
-    private LongLDT longLDT;
-    private CharLDT charLDT;
     private IntegerLDT integerLDT;
-    private IntegerDomainLDT integerDomainLDT;
     private BooleanLDT booleanLDT;
     private PairLDT pairLDT;
     private SetLDT setLDT;
@@ -62,20 +56,8 @@ public final class TypeConverter {
      * initializes the type converter with an LDT
      */
     public void init(LDT ldt) {	
-        if (ldt instanceof ByteLDT) {
-            this.byteLDT = (ByteLDT)ldt;
-        } else if (ldt instanceof ShortLDT) {
-            this.shortLDT = (ShortLDT)ldt;
-        } else if (ldt instanceof IntLDT) {
-            this.intLDT = (IntLDT)ldt;
-        } else if (ldt instanceof LongLDT) {
-            this.longLDT = (LongLDT)ldt;
-        } else if (ldt instanceof CharLDT) {
-            this.charLDT = (CharLDT)ldt;
-        } else if (ldt instanceof IntegerLDT) {
+        if (ldt instanceof IntegerLDT) {
             this.integerLDT = (IntegerLDT)ldt;
-        } else if (ldt instanceof IntegerDomainLDT) {
-            this.integerDomainLDT = (IntegerDomainLDT)ldt;
         } else if (ldt instanceof BooleanLDT) {
             this.booleanLDT = (BooleanLDT)ldt;
         } else if (ldt instanceof PairLDT) {
@@ -108,17 +90,6 @@ public final class TypeConverter {
     }
     
 
-    public LDT getModelFor(Type t) {	
-	for(LDT ldt : models) {	    
-	    if(t.equals(ldt.javaType())) {
-		return ldt;		
-	    }
-	}
-        Debug.out("typeconverter: No LDT found for ", t);
-        return null;
-    }
-    
-
     public LDT getModelFor(Sort s) {
 	for(LDT ldt : models) {
 	    if(s.equals(ldt.targetSort())) {
@@ -133,38 +104,8 @@ public final class TypeConverter {
     public IntegerLDT getIntegerLDT() {
         return integerLDT;
     }
+        
     
-    
-    public IntegerDomainLDT getIntegerDomainLDT() {
-        return integerDomainLDT;
-    }
-    
-    
-    public ByteLDT getByteLDT() {
-        return  byteLDT;
-    }
-    
-    
-    public ShortLDT getShortLDT() {
-        return  shortLDT;
-    }
-    
-    
-    public IntLDT getIntLDT() {
-        return  intLDT;
-    }
-    
-    
-    public LongLDT getLongLDT() {
-        return  longLDT;
-    }
-    
-    
-    public CharLDT getCharLDT() {
-        return  charLDT;
-    }
-    
-
     public BooleanLDT getBooleanLDT() {
 	return booleanLDT;
     }
@@ -359,10 +300,10 @@ public final class TypeConverter {
 	        && ((Negative)pe).getChildAt(0) instanceof IntLiteral) {
 	    String val = ((IntLiteral)((Negative)pe).getChildAt(0)).getValue();
 	    if (val.charAt(0)=='-') {
-		return intLDT.translateLiteral
+		return integerLDT.translateLiteral
 		    (new IntLiteral(val.substring(1)));
 	    } else {
-		return intLDT.translateLiteral
+		return integerLDT.translateLiteral
 		    (new IntLiteral("-"+val));
 	    }
 	} else if (pe instanceof Negative 
@@ -370,10 +311,10 @@ public final class TypeConverter {
 	    String val = ((LongLiteral)
 			  ((Negative)pe).getChildAt(0)).getValue();
 	    if (val.charAt(0)=='-') {
-		return intLDT.translateLiteral
+		return integerLDT.translateLiteral
 		    (new LongLiteral(val.substring(1)));
 	    } else {
-		return intLDT.translateLiteral
+		return integerLDT.translateLiteral
 		    (new LongLiteral("-"+val));
 	    }
 	} else if (pe instanceof ThisReference) {
@@ -386,7 +327,7 @@ public final class TypeConverter {
 	} else if (pe instanceof de.uka.ilkd.key.java.expression.Operator) {
 	    return translateOperator
 		((de.uka.ilkd.key.java.expression.Operator)pe,
-		 intLDT, booleanLDT, ec);
+		 integerLDT, booleanLDT, ec);
 	} else if (pe instanceof PrimitiveType) {
 	    throw new IllegalArgumentException("TypeConverter could not handle"
 					       +" this primitive type");
@@ -410,13 +351,13 @@ public final class TypeConverter {
         } else if (lit instanceof NullLiteral) {
             return services.getJavaInfo().getNullConst();
         } else if (lit instanceof IntLiteral) {
-            return intLDT.translateLiteral(lit);
+            return integerLDT.translateLiteral(lit);
         } else if (lit instanceof CharLiteral) {
-            return intLDT.translateLiteral(lit);
+            return integerLDT.translateLiteral(lit);
         } else if (lit instanceof LongLiteral) {
-            return intLDT.translateLiteral(lit);
+            return integerLDT.translateLiteral(lit);
         } else if (lit instanceof StringLiteral) {
-            return stringConverter.translateLiteral(lit,intLDT,services);
+            return stringConverter.translateLiteral(lit,integerLDT,services);
         } else {
             Debug.fail("Unknown literal type", lit);                 
             return null;
@@ -498,13 +439,13 @@ public final class TypeConverter {
 
 
     public KeYJavaType getBooleanType() {
-	return booleanLDT.getKeYJavaType();
+	return services.getJavaInfo()
+	               .getKeYJavaType(PrimitiveType.JAVA_BOOLEAN);
     }
 
     
     public Sort getPrimitiveSort(Type t) {
-	LDT result = getModelFor(t);
-        return (result == null ? null : result.targetSort());
+	return services.getJavaInfo().getKeYJavaType(t).getSort();
     }
 
     
@@ -576,7 +517,10 @@ public final class TypeConverter {
 
     
     public KeYJavaType getKeYJavaType(Term t) {
-        KeYJavaType result = services.getJavaInfo().getKeYJavaType(t.sort());        
+	KeYJavaType result = null;
+	if(t.sort().extendsTrans(services.getJavaInfo().objectSort())) {
+	    result = services.getJavaInfo().getKeYJavaType(t.sort());
+	}
         if (result == null) {
            result = getKeYJavaType(convertToProgramElement(t));
         }
@@ -585,16 +529,8 @@ public final class TypeConverter {
     }
 
     
-    public KeYJavaType getKeYJavaType(Type t) {        
-	if ( t instanceof KeYJavaType )
-	    return (KeYJavaType)t;
-	final LDT model = getModelFor(t);
-	if (model != null) {
-	    return model.getKeYJavaType();
-	} else {
-	    Debug.out("javainfo: no predefined model for type ",t);
-	    return null;
-	}	
+    public KeYJavaType getKeYJavaType(Type t) { 
+	return services.getJavaInfo().getKeYJavaType(t);
     }
 
 

@@ -24,8 +24,8 @@ import de.uka.ilkd.key.util.ExtList;
 
 public final class HeapLDT extends LDT {
     
-    private static final Name NAME = new Name("Heap");    
-    
+    public static final Name NAME = new Name("Heap");    
+        
     public static final Name SELECT_NAME = new Name("select");
     public static final Name STORE_NAME = new Name("store");
     
@@ -56,7 +56,7 @@ public final class HeapLDT extends LDT {
     
     
     public HeapLDT(Namespace sorts, Namespace functions, Namespace progVars) {
-	super((Sort)sorts.lookup(NAME), null);
+	super(NAME, sorts);
         fieldSort         = (Sort) sorts.lookup(new Name("Field"));	
         select            = (SortDependingFunction) addFunction(functions, Sort.ANY + "::" + SELECT_NAME);
         store             = addFunction(functions, "store");
@@ -172,13 +172,6 @@ public final class HeapLDT extends LDT {
     
     
     @Override
-    public Name name() {
-	return NAME;
-    }
-    
-    
-    
-    @Override
     public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, 
                                  Term[] subs, 
                                  Services services, 
@@ -234,4 +227,3 @@ public final class HeapLDT extends LDT {
 	return null;
     }
 }
-

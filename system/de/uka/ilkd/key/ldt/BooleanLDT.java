@@ -11,13 +11,11 @@ package de.uka.ilkd.key.ldt;
 
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.expression.literal.BooleanLiteral;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.ExtList;
 
@@ -27,7 +25,7 @@ import de.uka.ilkd.key.util.ExtList;
  */
 public final class BooleanLDT extends LDT {
     
-    private static final Name NAME = new Name("boolean");
+    public static final Name NAME = new Name("boolean");
     
     /** the boolean literals as function symbols and terms */
     private final Function bool_true;
@@ -37,7 +35,7 @@ public final class BooleanLDT extends LDT {
     
 
     public BooleanLDT(Namespace sorts, Namespace functions) {
-        super((Sort)sorts.lookup(NAME), PrimitiveType.JAVA_BOOLEAN);
+        super(NAME, sorts);
         
         bool_true       = addFunction((Function)functions.lookup(new Name("TRUE")));
 	term_bool_true  = TermBuilder.DF.func(bool_true);
@@ -69,12 +67,6 @@ public final class BooleanLDT extends LDT {
      */
     public Function getTrueConst() {
         return bool_true;
-    }
-
-        
-    @Override
-    public Name name() {
-	return NAME;
     }
 
     

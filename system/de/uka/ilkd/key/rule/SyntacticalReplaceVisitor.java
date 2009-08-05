@@ -475,13 +475,7 @@ public final class SyntacticalReplaceVisitor extends Visitor {
         	 || jblockChanged 
         	 || operatorInst
                  || (!subStack.empty() && subStack.peek() == newMarker)) {
-        	Term newTerm;
-        	if(newOp instanceof ElementaryUpdate) { //XXX, weird integers
-        	    newTerm = TermBuilder.DF.elementary(services, ((ElementaryUpdate)newOp).lhs(), neededsubs[0]);
-        	} else {
-        	    newTerm 
-        		= tf.createTerm(newOp, neededsubs, boundVars, jb);
-        	}
+        	Term newTerm = tf.createTerm(newOp, neededsubs, boundVars, jb);
                 pushNew(resolveSubst(newTerm));
             } else {
                 final Term t = resolveSubst(visited);

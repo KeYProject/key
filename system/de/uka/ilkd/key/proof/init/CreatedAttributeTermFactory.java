@@ -14,7 +14,7 @@ import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
-import de.uka.ilkd.key.ldt.AbstractIntegerLDT;
+import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.ldt.LDT;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -190,11 +190,10 @@ public class CreatedAttributeTermFactory {
             return createCreatedOrNullTerm(services, TB.var(var)); 
         } else {
             Type varType = var.getKeYJavaType().getJavaType();
-            LDT ldt = services.getTypeConverter().getModelFor(varType);
-            if(ldt instanceof AbstractIntegerLDT) {
-                Function inBoundsPred 
-                    = ((AbstractIntegerLDT) ldt).getInBounds();
-                return TB.func(inBoundsPred, TB.var(var));
+            IntegerLDT ldt = services.getTypeConverter().getIntegerLDT();
+            Function inBoundsPred = ldt.getInBounds(varType);
+            if(inBoundsPred != null) {
+        	return TB.func(inBoundsPred, TB.var(var));
             }
         }
         return TB.tt();

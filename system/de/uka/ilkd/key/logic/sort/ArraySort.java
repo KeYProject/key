@@ -13,6 +13,7 @@ package de.uka.ilkd.key.logic.sort;
 import java.lang.ref.WeakReference;
 import java.util.WeakHashMap;
 
+import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.logic.Name;
 
 
@@ -23,9 +24,6 @@ public final class ArraySort extends AbstractSort {
     
     /** keeping this key is important to prevent for too early hashmap removal*/
     private final SortKey sk;    
-    
-    private final ArrayOfSort commonJavaSorts;
-    
 
 
     //-------------------------------------------------------------------------
@@ -33,16 +31,14 @@ public final class ArraySort extends AbstractSort {
     //------------------------------------------------------------------------- 
         
     private ArraySort(SetOfSort extendsSorts, SortKey sk) {
-	super(new Name(sk.elemSort.name()+"[]"), extendsSorts, false);
+	super(new Name((sk.elemType != null 
+		        ? sk.elemType.getName() 
+		        : sk.elemSort.name()) + "[]"), 
+              extendsSorts, 
+              false);
 	assert(!extendsSorts.isEmpty());	
 
 	this.sk = sk;
-
-	final Sort[] commons = new Sort[3];
-	commons[0] = this.sk.javaLangObjectSort;
-	commons[1] = this.sk.javaLangCloneable;
-	commons[2] = this.sk.javaLangSerializable;
-	commonJavaSorts = new ArrayOfSort(commons);
     }    
 
 
@@ -82,7 +78,50 @@ public final class ArraySort extends AbstractSort {
     //public interface
     //------------------------------------------------------------------------- 
 
+    /**
+     * returns the ArraySort to the given elementsort. This method ensures that
+     * only one ArraySort-object exists for each Arraysort.
+     */
+    public static ArraySort getArraySort(Sort elemSort, 
+	                                 Type elemType,
+	    				 Sort objectSort, 
+	    				 Sort cloneableSort,
+	    				 Sort serializableSort) {
+	// this wrapper is required as some element sorts are shared among 
+	// several environments (int, boolean)
+	final SortKey sortKey = new SortKey(elemSort, 
+		                            elemType,
+					    objectSort, 
+					    cloneableSort, 
+					    serializableSort);
+	WeakReference<ArraySort> ref = aSH.get(sortKey);
+	ArraySort as = ref != null ? ref.get() : null;          
+
+	if(as == null) { 
+	    SetOfSort localExtendsSorts 
+	    	= getArraySuperSorts(elemSort, 
+	    		             objectSort,
+	    		             cloneableSort, 
+	    		             serializableSort);
+	    as = new ArraySort(localExtendsSorts, sortKey);
+	    aSH.put(sortKey, new WeakReference<ArraySort>(as));
+	}
+	return as;
+    }
     
+    
+    public static ArraySort getArraySort(Sort elemSort,
+	    				 Sort objectSort, 
+	    				 Sort cloneableSort,
+	    				 Sort serializableSort) {
+	return getArraySort(elemSort, 
+		            null, 
+		            objectSort, 
+		            cloneableSort, 
+		            serializableSort);
+    }
+    
+
     /** 
      * returns elemSort([])^n.
      */
@@ -101,39 +140,7 @@ public final class ArraySort extends AbstractSort {
 	}
 	return result;
     }    
-    
-
-
-    /**
-     * returns the ArraySort to the given elementsort. This method ensures that
-     * only one ArraySort-object exists for each Arraysort.
-     */
-    public static ArraySort getArraySort(Sort elemSort, 
-	    				 Sort objectSort, 
-	    				 Sort cloneableSort,
-	    				 Sort serializableSort) {
-	// this wrapper is required as some element sorts are shared among 
-	// several environments (int, boolean)
-	final SortKey sortKey = new SortKey(elemSort, 
-					    objectSort, 
-					    cloneableSort, 
-					    serializableSort);
-	ArraySort as = aSH.containsKey(sortKey) 
-	               ? aSH.get(sortKey).get()
-	               : null;          
-
-	if(as == null) { 
-	    SetOfSort localExtendsSorts 
-	    	= getArraySuperSorts(elemSort, 
-	    		             objectSort,
-	    		             cloneableSort, 
-	    		             serializableSort);
-	    as = new ArraySort(localExtendsSorts, sortKey);
-	    aSH.put(sortKey, new WeakReference<ArraySort>(as));
-	}
-	return as;
-    }
-
+        
 
 
     /**
@@ -143,9 +150,9 @@ public final class ArraySort extends AbstractSort {
      */
     public Sort cloneFor(Sort p) {
         return getArraySort ( p, 
-        		      commonJavaSorts.getSort(0), 
-        		      commonJavaSorts.getSort(1), 
-        		      commonJavaSorts.getSort(2));
+        		      sk.javaLangObjectSort, 
+        		      sk.javaLangCloneable, 
+        		      sk.javaLangSerializable);
     }
 
 
@@ -159,15 +166,18 @@ public final class ArraySort extends AbstractSort {
     
     private static final class SortKey {
 	final Sort elemSort;
+	final Type elemType;
 	final Sort javaLangObjectSort;
 	final Sort javaLangSerializable;
 	final Sort javaLangCloneable;
 
 	public SortKey(Sort elemSort, 
+		       Type elemType,
 		       Sort javaLangObjectSort, 
 		       Sort javaLangCloneable, 
 		       Sort javaLangSerializable) {         
 	    this.elemSort = elemSort;
+	    this.elemType = elemType;
 	    this.javaLangObjectSort = javaLangObjectSort;            
 	    this.javaLangCloneable = javaLangCloneable;
 	    this.javaLangSerializable = javaLangSerializable;
@@ -179,7 +189,8 @@ public final class ArraySort extends AbstractSort {
 		return false;
 	    }
 	    final SortKey sk = (SortKey) o;
-	    return elemSort == sk.elemSort 
+	    return elemSort == sk.elemSort
+	           && elemType == sk.elemType
 	           && javaLangObjectSort == sk.javaLangObjectSort 
 	           && javaLangSerializable == sk.javaLangSerializable 
 	           && javaLangCloneable    == sk.javaLangCloneable;                
@@ -188,6 +199,7 @@ public final class ArraySort extends AbstractSort {
 	
 	public int hashCode() {
 	    return elemSort.hashCode() 
+	           + (elemType == null ? 0 : 31*elemType.hashCode())
 	           + (javaLangCloneable == null ? 0 : 31*javaLangCloneable.hashCode()) 
 	           + (javaLangObjectSort == null ? 0 : 17*javaLangObjectSort.hashCode()) 
 	           + (javaLangSerializable == null ? 0 : 3*javaLangSerializable.hashCode());

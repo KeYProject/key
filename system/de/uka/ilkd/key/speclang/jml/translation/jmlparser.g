@@ -22,7 +22,7 @@ header {
     import de.uka.ilkd.key.java.declaration.ClassDeclaration;
     import de.uka.ilkd.key.java.expression.literal.BooleanLiteral;
     import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
-    import de.uka.ilkd.key.ldt.AbstractIntegerLDT;
+    import de.uka.ilkd.key.ldt.IntegerLDT;
     import de.uka.ilkd.key.ldt.LDT;
     import de.uka.ilkd.key.logic.*;
     import de.uka.ilkd.key.logic.op.*;
@@ -482,63 +482,6 @@ options {
     }
 
 
-//    /**
-//     * @param maxmin <code>true</code> for max-Axiom, <code>false</code> for min-Axiom
-//     *
-//     * See minor thesis "A translation from JML to Java DL" by Christian Engel, p. 40
-//     */
-//    private Term buildMaxMinAxiom(boolean maxmin, Function y, ListOfLogicVariable qVars, Term pred, Term body) {
-//
-//	Term result = TB.not(TB.ex(qVars.toArray(), pred));
-//
-//	ProgramVariable n;
-//	String progVarName;
-//	String className;
-//	if (maxmin) {
-//	    progVarName = "MIN_VALUE";
-//	} else {
-//	    progVarName = "MAX_VALUE";
-//	}
-//
-//	System.out.println();
-//	System.out.println(qVars.head().sort().toString());
-//	System.out.println();
-//
-//	if (qVars.head().sort().toString().equals("jlong")) {
-//	    className = "java.lang.Long";
-//	} else {
-//	    className = "java.lang.Integer";
-//	}
-//
-//	n = javaInfo.getAttribute(progVarName, className);
-//
-//	result = TB.and(result,
-//	    TB.equals(
-//		TB.func(y),
-//		TB.var(n)));
-//
-//	Term t = TB.func(y);
-//
-//	if (maxmin) {
-//	    t = TB.geq(t,body, services);
-//	} else {
-//	    t = TB.leq(t,body, services);
-//	}
-//
-//	t = TB.all(qVars.toArray(), TB.imp(pred,t));
-//	t = TB.and(
-//	    t,
-//	    TB.ex(qVars.toArray(),
-//		TB.and(
-//		    pred,
-//		    TB.equals(
-//			body,
-//			TB.func(y)))));
-//
-//	result = TB.or(result, t);
-//
-//	return result;
-//  }
     
 /*    
     private SetOfLocationDescriptor getObjectCreationModSet(KeYJavaType kjt) {
@@ -930,11 +873,6 @@ conditionalexpr returns [Term result=null] throws SLTranslationException
 	    QUESTIONMARK a=conditionalexpr COLON b=conditionalexpr
 	    {
 		result = TB.ife(convertToFormula(result),a,b);
-		if(intHelper.isIntegerTerm(result)) {
-		    result = intHelper.castToLDTSort(result, 
-					             services.getTypeConverter()
-					                     .getIntLDT());
-		}
 	    }
 	)?
     ;
@@ -1424,24 +1362,7 @@ unaryexpr returns [JMLExpression result=null] throws SLTranslationException
 		 }
 		 assert result.isTerm();
 
-		 if (!(type.getSort() instanceof AbstractSort)) {
-		     raiseError("Wrong type argument in cast expression.");
-		 }
-		 
-		 Term resultTerm = result.getTerm(); 
-		 Function castFunction;
-		 if (type.getSort().extendsTrans(services.getTypeConverter().
-		    getIntegerLDT().targetSort())) {
-		      castFunction = ((AbstractIntegerLDT)services.getTypeConverter().
-			getModelFor(type.getSort())).getCast();	
-		    resultTerm = TB.func(castFunction, resultTerm);
-		 } 
-		 
-		 castFunction = ((AbstractSort) type.getSort()).getCastSymbol(services);
-		 
-		 
-		 result = new JMLExpression(
-		     TB.func(castFunction, resultTerm));
+		 result = new JMLExpression(TB.cast(services, type.getSort(), result.getTerm()));
 	     }
 	}
 ;
@@ -1666,11 +1587,8 @@ hexintegerliteral returns [Term result=null] throws SLTranslationException
 :
     n:HEXNUMERAL
     {
-	BigInteger decInteger = new BigInteger(n.getText(),16);
-	Term intTerm = TB.zTerm(services,decInteger.toString());
-	result = intHelper.castToLDTSort(intTerm, 
-					 services.getTypeConverter()
-					         .getIntLDT());
+	BigInteger decInteger = new BigInteger(n.getText(), 16);
+	result = TB.zTerm(services, decInteger.toString());
     }
 ;
 
@@ -1683,10 +1601,7 @@ decimalnumeral returns [Term result=null] throws SLTranslationException
 :
     n:DIGITS
     {
-	Term intTerm = TB.zTerm(services,n.getText());
-	result = intHelper.castToLDTSort(intTerm, 
-					 services.getTypeConverter()
-					     	 .getIntLDT());
+	result = TB.zTerm(services,n.getText());
     }
 ;
 
@@ -1911,13 +1826,13 @@ specquantifiedexpression returns [Term result = null] throws SLTranslationExcept
 	    	if(lv.sort().extendsTrans(services.getJavaInfo().objectSort()) && !nullable) {
 		    p = TB.and(p, TB.not(TB.equals(TB.var(lv), nullTerm)));
 		} else {
-	    	    LDT ldt 
-	    	    	= services.getTypeConverter().getModelFor(lv.sort());
-		    if(ldt instanceof AbstractIntegerLDT) {
+		    assert false : "not implemented";
+	    	    /*XXX
+	    	     IntegerLDT ldt = services.getTypeConverter().getIntegerLDT();
 	    		Function inBounds 
-	    			= ((AbstractIntegerLDT) ldt).getInBounds();
+	    			= ldt.getInBounds();
 	    	    	p = TB.and(p, TB.func(inBounds, TB.var(lv)));
-	    	    }
+	    	    }*/
 	    	}
 	    }	    
 

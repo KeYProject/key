@@ -53,7 +53,7 @@ public class TestSchemaModalOperators extends TestCase {
 	    Semisequent antec = parseTermForSemisequent(strs[2*i]);
 	    Semisequent succ = parseTermForSemisequent(strs[2*i+1]);
 	    Sequent s = Sequent.createSequent(antec, succ);	    
-	    proof[i]=new Proof(new Services());
+	    proof[i]=new Proof(TacletForTests.services());
 	    proof[i].setRoot(new Node(proof[i], s));
 	}
 

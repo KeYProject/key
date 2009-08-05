@@ -808,10 +808,7 @@ options {
     throws KeYSemanticException {
         KeYJavaType kjt = null;              
         try {
-            final Sort sort = lookupSort(s);
-            if (sort != null) {
-                kjt=getJavaInfo().getKeYJavaType(sort);
-            }
+	    kjt=getJavaInfo().getKeYJavaTypeByClassName(s);
         } catch(RuntimeException e){
             return null;
         }
@@ -2642,8 +2639,7 @@ static_query returns [Term result = null]
           KeYJavaType kjt = getServices().getJavaInfo().getKeYJavaType(sort);
           if (kjt == null) {
 		semanticError("Found logic sort for " + className + 
-		 " but no corresponding java type (e.g. int is only " +
-		 " available as logic sort not as java type use (jint, jbyte, jshort etc. instead)");
+		 " but no corresponding java type!");
           }          
        }
 	    

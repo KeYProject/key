@@ -34,8 +34,19 @@ public class TestDeclParser extends TestCase {
     }
 
     public void setUp() {
-	nss = new NamespaceSet();
 	serv = new Services ();
+	nss = serv.getNamespaces();
+	
+	String sorts = "\\sorts{boolean;int;}";
+	KeYParser basicSortsParser = new KeYParser(ParserMode.DECLARATION, new KeYLexer(new StringReader(sorts),null),
+			      "No file. Call of parser from logic/TestClashFreeSubst.java",
+			      serv, nss);
+	try {
+	    basicSortsParser.parseSorts();
+	} catch(Exception e) {
+	    throw new RuntimeException(e);
+	}	
+	
 	Recoder2KeY r2k = new Recoder2KeY(serv, nss);
 	r2k.parseSpecialClasses();
     }

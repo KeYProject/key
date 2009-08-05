@@ -496,7 +496,7 @@ public class TestMatchTaclet extends TestCase {
 	   = new LocationVariable(new ProgramElementName("i"), 
 	        	          services.getJavaInfo().getKeYJavaType("int"));
 	services.getNamespaces().programVariables().add(i);
-	Term match = TacletForTests.parseTerm("\\<{}\\>{i:=(jint)2}(\\forall nat z; (q1(z)))");
+	Term match = TacletForTests.parseTerm("\\<{}\\>{i:=2}(\\forall nat z; (q1(z)))");
 	match = match.sub(0);
 	assertTrue("Instantiations should be found as updates can be ignored if "+
 		   "only the term that is matched has an update and the "+
@@ -504,7 +504,7 @@ public class TestMatchTaclet extends TestCase {
 		   all_left.match(match, ((FindTaclet)all_left).find(), 
 				  true, MatchConditions.EMPTY_MATCHCONDITIONS, services, Constraint.BOTTOM)!=null);
 		
-	Term match2 = TacletForTests.parseTerm("\\<{int i;}\\>{i:=(jint)Z(2(#))} true");
+	Term match2 = TacletForTests.parseTerm("\\<{int i;}\\>{i:=Z(2(#))} true");
 	match2 = match2.sub(0);
 	assertTrue("Instantiations should be found.",
 		   assign_n.match(match2, ((FindTaclet)assign_n).find(), 

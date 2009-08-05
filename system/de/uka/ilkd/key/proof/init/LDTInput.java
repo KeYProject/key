@@ -124,15 +124,7 @@ public class LDTInput implements EnvInput {
         Namespace sorts     = initConfig.sortNS();
         Namespace functions = initConfig.funcNS();
         ListOfLDT ldts = SLListOfLDT.EMPTY_LIST
-                        	.prepend(new ByteLDT(sorts, functions))
-                        	.prepend(new ShortLDT(sorts, functions))
-                        	.prepend(new IntLDT(sorts, functions))
-                        	.prepend(new LongLDT(sorts, functions))
-                        	.prepend(new CharLDT(sorts, functions))
                         	.prepend(new IntegerLDT(sorts, functions))
-                        	.prepend(new IntegerDomainLDT(sorts, functions))
-                        	.prepend(new FloatLDT(sorts, functions))
-                        	.prepend(new DoubleLDT(sorts, functions))
                         	.prepend(new BooleanLDT(sorts, functions))
                         	.prepend(new PairLDT(sorts, functions))
                         	.prepend(new SetLDT(sorts, functions))

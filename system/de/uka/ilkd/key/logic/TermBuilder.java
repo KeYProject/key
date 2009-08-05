@@ -323,18 +323,7 @@ public final class TermBuilder {
     public Term elementary(Services services, 
 	                   UpdateableOperator lhs, 
 	                   Term rhs) {
-	ElementaryUpdate eu = ElementaryUpdate.getInstance(lhs);
-	
-	//XXX, weird integers
-	if(services.getTypeConverter().getIntegerLDT() != null) {
-	    Sort intSort = services.getTypeConverter().getIntegerLDT().targetSort();	
-	    if(!rhs.sort().extendsTrans(eu.argSort(0))
-	        && eu.argSort(0).extendsTrans(intSort)
-	        && rhs.sort().extendsTrans(intSort)) {
-		rhs = cast(services, eu.argSort(0), rhs);
-	    }
-	}
-	
+	ElementaryUpdate eu = ElementaryUpdate.getInstance(lhs);	
 	return tf.createTerm(eu, rhs);
     }
     

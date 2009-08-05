@@ -146,24 +146,26 @@ public final class TypeComparisonCondition extends VariableConditionAdapter {
 	
 	//if not, compute it 
 	if(result == null) {
-	    //array sorts are disjoint iff their element sorts are disjoint
-	    while(fstSort instanceof ArraySort 
-	          && sndSort instanceof ArraySort) {
-		fstSort = ((ArraySort)fstSort).elementSort();
-		sndSort = ((ArraySort)sndSort).elementSort();
+	    //array sorts are disjoint if their element sorts are disjoint
+	    Sort fstElemSort = fstSort;
+	    Sort sndElemSort = sndSort;
+	    while(fstElemSort instanceof ArraySort 
+	          && sndElemSort instanceof ArraySort) {
+		fstElemSort = ((ArraySort)fstElemSort).elementSort();
+		sndElemSort = ((ArraySort)sndElemSort).elementSort();
 	    }
 	    
 	    //object sorts?
 	    final Sort objectSort = services.getJavaInfo().objectSort();	    
-	    boolean fstIsObject = fstSort.extendsTrans(objectSort);
-	    boolean sndIsObject = sndSort.extendsTrans(objectSort);
+	    boolean fstElemIsObject = fstElemSort.extendsTrans(objectSort);
+	    boolean sndElemIsObject = sndElemSort.extendsTrans(objectSort);
 	    
-	    if(fstIsObject
-	       && sndIsObject 
-	       && fstSort instanceof ArraySort == sndSort instanceof ArraySort){
+	    if(fstElemIsObject 
+	       && sndElemIsObject
+	       && !(fstElemSort instanceof ArraySort)
+	       && !(sndElemSort instanceof ArraySort)) {
 		//be conservative wrt. modularity: program extensions may add 
-		//new subtypes between object sorts (but never between an array 
-		//sort and a non-array sort)	
+		//new subtypes between non-array object sorts
 		result = false;
 	    } else {
 		//otherwise, we just check whether *currently* there are is 
@@ -172,8 +174,8 @@ public final class TypeComparisonCondition extends VariableConditionAdapter {
 		for(Named n : services.getNamespaces().sorts().allElements()) {
 		    Sort s = (Sort) n;
 		    if(!(s instanceof NullSort)
-			    && s.extendsTrans(fstSort)
-			    && s.extendsTrans(sndSort)) {
+		         && s.extendsTrans(fstSort)
+			 && s.extendsTrans(sndSort)) {
 			result = false;
 			break;
 		    }

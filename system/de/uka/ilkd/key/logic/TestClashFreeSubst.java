@@ -28,6 +28,7 @@ public class TestClashFreeSubst extends TestCase {
  
     TermFactory tf=TermFactory.DEFAULT;
 
+    Services services;
     NamespaceSet nss;
 
     Sort srt;
@@ -45,7 +46,22 @@ public class TestClashFreeSubst extends TestCase {
     }
 
     public void setUp() {
-	nss = new NamespaceSet();
+	services = new Services();
+	nss = services.getNamespaces();
+	
+	String sorts = "\\sorts{boolean;int;}";
+	KeYParser basicSortsParser = new KeYParser(ParserMode.DECLARATION, new KeYLexer(new StringReader(sorts),null),
+			      "No file. Call of parser from logic/TestClashFreeSubst.java",
+			      services, nss);
+	try {
+	    basicSortsParser.parseSorts();
+	} catch(Exception e) {
+	    throw new RuntimeException(e);
+	}
+	
+	Recoder2KeY r2k = new Recoder2KeY(services, nss);
+	r2k.parseSpecialClasses();
+	
 
 	parseDecls("\\sorts { srt; }\n" +
 		   "\\functions {\n" +
@@ -99,12 +115,10 @@ public class TestClashFreeSubst extends TestCase {
     
 
     private KeYParser stringDeclParser(String s) {
-	Services serv = new Services ();
-	Recoder2KeY r2k = new Recoder2KeY(serv, nss);
-	r2k.parseSpecialClasses();
+
 	return new KeYParser(ParserMode.DECLARATION, new KeYLexer(new StringReader(s),null),
 			      "No file. Call of parser from logic/TestClashFreeSubst.java",
-			      serv, nss);
+			      services, nss);
     }
 
     public void parseDecls(String s) {
@@ -122,7 +136,7 @@ public class TestClashFreeSubst extends TestCase {
     private KeYParser stringTermParser(String s) {
 	return new KeYParser(ParserMode.GLOBALDECL,
 			     new KeYLexer(new StringReader(s),null),
-			     new Services (), 
+			     services, 
 			     nss);
     }
 

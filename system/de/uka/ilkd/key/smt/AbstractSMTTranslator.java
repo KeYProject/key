@@ -15,9 +15,6 @@ import java.util.*;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.rule.MatchConditions;
-import de.uka.ilkd.key.rule.RewriteTaclet;
-import de.uka.ilkd.key.rule.RewriteTacletBuilder;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.java.Services;
 
@@ -28,16 +25,6 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 	    .getName());
     
     private static final TermBuilder TB = TermBuilder.DF;
-
-    private Sort jbyteSort;
-
-    private Sort jshortSort;
-
-    private Sort jintSort;
-
-    private Sort jlongSort;
-
-    private Sort jcharSort;
 
     private Sort integerSort;
 
@@ -109,11 +96,6 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
      * 		      The services object belonging to sequent.
      */
     public AbstractSMTTranslator(Sequent sequent, Services services) {
-	jbyteSort = services.getTypeConverter().getByteLDT().targetSort();
-	jshortSort = services.getTypeConverter().getShortLDT().targetSort();
-	jintSort = services.getTypeConverter().getIntLDT().targetSort();
-	jlongSort = services.getTypeConverter().getLongLDT().targetSort();
-	jcharSort = services.getTypeConverter().getCharLDT().targetSort();
 	integerSort = services.getTypeConverter().getIntegerLDT().targetSort();
     }
 
@@ -1606,10 +1588,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
     }
 
     private boolean isSomeIntegerSort(Sort s) {
-	if (s == jbyteSort || s == jshortSort || s == jintSort
-		|| s == jlongSort || s == jcharSort || s == integerSort)
-	    return true;
-	return false;
+	return s == integerSort;
     }
 
 }

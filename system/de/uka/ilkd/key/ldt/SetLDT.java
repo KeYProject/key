@@ -18,14 +18,13 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.util.ExtList;
 
 
 public final class SetLDT extends LDT {
     
-    private static final Name NAME = new Name("Set");
-    
+    public static final Name NAME = new Name("Set");    
+       
     private final Function empty;
     private final Function singleton;
     private final Function union;
@@ -37,7 +36,7 @@ public final class SetLDT extends LDT {
     private final Function disjoint;    
     
     public SetLDT(Namespace sorts, Namespace functions) {
-	super((Sort)sorts.lookup(NAME), null);
+	super(NAME, sorts);
         empty	         = addFunction(functions, "empty");
         singleton        = addFunction(functions, "singleton");
         union            = addFunction(functions, "union");
@@ -93,13 +92,6 @@ public final class SetLDT extends LDT {
     public Function getDisjoint() {
 	return disjoint;
     }
-    
-    
-    @Override
-    public Name name() {
-	return NAME;
-    }
-    
     
     
     @Override

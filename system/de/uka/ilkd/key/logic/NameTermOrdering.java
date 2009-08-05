@@ -12,7 +12,7 @@ package de.uka.ilkd.key.logic;
 
 import java.util.Iterator;
 
-import de.uka.ilkd.key.ldt.AbstractIntegerLDT;
+import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 
@@ -135,9 +135,9 @@ public class NameTermOrdering implements TermOrdering {
      * symbols are ordered according to their weight
      */
     private Integer getWeight ( Operator p_op ) {
-	if ( p_op.name().equals(AbstractIntegerLDT.NUMBERS_NAME) )
+	if ( p_op.name().equals(IntegerLDT.NUMBERS_NAME) )
 	    return Integer.valueOf ( 0 );
-	if ( p_op.name().equals(AbstractIntegerLDT.CHAR_ID_NAME) )
+	if ( p_op.name().equals(IntegerLDT.CHAR_ID_NAME) )
 	    return Integer.valueOf ( 1 );
 	if ( p_op instanceof Function && 
 	     ((Function) p_op).sort() == Sort.NULL)

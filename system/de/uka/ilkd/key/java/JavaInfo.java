@@ -20,7 +20,8 @@ import de.uka.ilkd.key.java.expression.literal.NullLiteral;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.reference.TypeRef;
 import de.uka.ilkd.key.java.reference.TypeReference;
-import de.uka.ilkd.key.ldt.*;
+import de.uka.ilkd.key.ldt.BooleanLDT;
+import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.IteratorOfSort;
@@ -114,9 +115,6 @@ public class JavaInfo {
      */
     private Term nullConst=null;
     private boolean commonTypesCacheValid;
-    
-    /** caches the predicate used to express a lega java state */
-    private Function inReachableState;
     
     /** caches the arrays' length attribute*/
     private ProgramVariable length;
@@ -263,18 +261,18 @@ public class JavaInfo {
     }
 
     /**
-     * Translates things like int[], jint[] into [I, etc.
+     * Translates things like int[] into [I, etc.
      */
     private String translateArrayType(String s) {
-        if ("jbyte[]".equals(s) || "byte[]".equals(s))
+        if ("byte[]".equals(s))
             return "[B";
-        else if ("jint[]".equals(s) || "int[]".equals(s))
+        else if ("int[]".equals(s))
             return "[I";
-        else if ("jlong[]".equals(s) || "long[]".equals(s))
+        else if ("long[]".equals(s))
             return "[J";
-        else if ("jshort[]".equals(s) || "short[]".equals(s))
+        else if ("short[]".equals(s))
             return "[S";
-        else if ("jchar[]".equals(s) || "char[]".equals(s))
+        else if ("char[]".equals(s))
             return "[C";
 // Strangely, this one is not n
 //        else if ("boolean[]".equals(s))
@@ -376,19 +374,54 @@ public class JavaInfo {
 	}
 	return result;
     }
+    
+    
+    public KeYJavaType getPrimitiveKeYJavaType(PrimitiveType type) {
+	assert type != null;
+	KeYJavaType result = null;
+	if(type2KJTCache != null) {
+	    result = type2KJTCache.get(type);
+	}
+	
+	if(result == null) {
+	    final Namespace sorts = services.getNamespaces().sorts();
+	    final Sort boolSort = (Sort) sorts.lookup(BooleanLDT.NAME);
+	    final Sort intSort  = (Sort) sorts.lookup(IntegerLDT.NAME);
+	    final Sort sort;
+	    if(type == PrimitiveType.JAVA_BOOLEAN) {
+		sort = boolSort;
+	    } else if(type == PrimitiveType.JAVA_BYTE
+	              || type == PrimitiveType.JAVA_CHAR 
+	              || type == PrimitiveType.JAVA_INT 
+                      || type == PrimitiveType.JAVA_LONG 
+		      || type == PrimitiveType.JAVA_SHORT) { 
+		 sort = intSort;
+	    } else {
+		assert false : "unexpected primitive type: " + type;
+	    	sort = null;
+	    }
+	    
+	    assert sort != null : "could not find sort for type: " + type;
+	    result = new KeYJavaType(type, sort);
+	    if(type2KJTCache != null) {
+		type2KJTCache.put(type, result);
+	    }
+	}
+	
+	return result;
+    }
+    
 
     /**
-     * returns a primitive KeYJavaType matching the given typename making use
-     * of the LDTs of the current type converter in the services.
+     * returns a primitive KeYJavaType matching the given typename.
      */
     public KeYJavaType getPrimitiveKeYJavaType(String typename) {
-        for (final LDT model : getTypeConverter().getModels()) {           
-            if (model.javaType() != null && 
-                    model.javaType().getFullName().equals(typename)) {
-                return model.getKeYJavaType();
-            }
-        }
-        return null;
+	PrimitiveType type = PrimitiveType.getPrimitiveType(typename);
+	if(type != null) {
+	    return getPrimitiveKeYJavaType(type);
+	} else {
+	    return null;
+	}
     }
 
     /**
@@ -430,37 +463,34 @@ public class JavaInfo {
 	     for (final Object o : kpmi.allElements()) {
 		 if (o instanceof KeYJavaType){
                      final KeYJavaType oKJT = (KeYJavaType)o;
-                     sort2KJTCache.put((oKJT).getSort(), oKJT);
+                     if(sort2KJTCache.containsKey(oKJT.getSort())) {
+                	 sort2KJTCache.remove(oKJT.getSort()); //XXX
+                     } else {
+                	 sort2KJTCache.put((oKJT).getSort(), oKJT);
+                     }
 		 }
 	     }
 	 }	
 	 return sort2KJTCache.get(sort);
      }
 
-    /** returns the KeYJavaType of the expression if it can be
-     * determined else null is returned
-     */
-    public KeYJavaType getPrimitiveKeYJavaType(Expression e) {
-        return getTypeConverter().getKeYJavaType(e);
-    }
-
 
     /**
      * returns the KeYJavaType belonging to the given Type t
      */
     public KeYJavaType getKeYJavaType(Type t) {
-        if (t instanceof PrimitiveType) {
-	    return getTypeConverter().getKeYJavaType(t);
-        } else {
-	    if(type2KJTCache == null){
-		type2KJTCache = new HashMap<Type, KeYJavaType>();
-		for (final Object o : kpmi.allElements()) {
-		    if (o instanceof KeYJavaType) {
-		        final KeYJavaType oKJT = (KeYJavaType)o;
-			type2KJTCache.put(oKJT.getJavaType(), oKJT);
-		    }
+	if(type2KJTCache == null) {
+	    type2KJTCache = new HashMap<Type, KeYJavaType>();
+	    for (final Object o : kpmi.allElements()) {
+		if (o instanceof KeYJavaType) {
+		    final KeYJavaType oKJT = (KeYJavaType)o;
+		    type2KJTCache.put(oKJT.getJavaType(), oKJT);
 		}
 	    }
+	}
+	if(t instanceof PrimitiveType) {
+	    return getPrimitiveKeYJavaType((PrimitiveType)t);
+	} else {
 	    return type2KJTCache.get(t);
 	}
     }
@@ -959,14 +989,14 @@ public class JavaInfo {
         
         // the assert statements below are not for fun, some methods rely 
         // on the correct order
-        ListOfKeYJavaType hierarchie = kpmi.getAllSubtypes(type);                
-        assert !hierarchie.contains(type);
+        ListOfKeYJavaType hierarchy = kpmi.getAllSubtypes(type);                
+        assert !hierarchy.contains(type);
         
-        hierarchie = hierarchie.prepend(kpmi.getAllSupertypes(type));        
-        assert hierarchie.head() == type;
+        hierarchy = hierarchy.prepend(kpmi.getAllSupertypes(type));        
+        assert hierarchy.head() == type;
         
         
-        final IteratorOfKeYJavaType it = hierarchie.iterator();
+        final IteratorOfKeYJavaType it = hierarchy.iterator();
         while (it.hasNext()) {
 	    KeYJavaType st = it.next();
 	    if(st != null){

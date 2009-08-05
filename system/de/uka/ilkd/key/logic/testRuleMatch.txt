@@ -140,7 +140,7 @@
             \replacewith (\<{ #slist }\>post) };
 
   TestMatchTaclet_assign_n {
-       \find ({#var := (jint)2} true) 
+       \find ({#var := 2} true) 
        \replacewith(true)
   };
 

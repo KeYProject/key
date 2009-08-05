@@ -95,7 +95,7 @@ public final class OneStepSimplifier implements BuiltInRule {
 	    indices[1] = new TacletIndex(tacletsForRuleSet(
 		    		goal, 
 		    		"simplify", 
-		    		SLListOfString.EMPTY_LIST.prepend("concrete").prepend("cast_deletion"))); //XXX, weird integers
+		    		SLListOfString.EMPTY_LIST.prepend("concrete")));
 	    lastProof = goal.proof();
 	}
     }

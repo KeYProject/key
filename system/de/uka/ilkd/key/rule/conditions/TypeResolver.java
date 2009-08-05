@@ -49,10 +49,7 @@ public abstract class TypeResolver {
     
     public abstract Sort resolveSort(SchemaVariable sv, 
             SVSubstitute instCandidate, SVInstantiations instMap, Services services);
-    
-    public abstract KeYJavaType resolveType(SchemaVariable sv, 
-            SVSubstitute instCandidate, SVInstantiations instMap, Services services);
-    
+        
     
     
     public static class GenericSortResolver extends TypeResolver {
@@ -63,22 +60,19 @@ public abstract class TypeResolver {
             this.gs = gs;
         }
 
+        @Override
         public boolean isComplete(SchemaVariable sv, SVSubstitute instCandidate, 
                 SVInstantiations instMap, Services services) {            
             return instMap.getGenericSortInstantiations().getInstantiation(gs) != null;
         }
 
+        @Override
         public Sort resolveSort(SchemaVariable sv, SVSubstitute instCandidate, 
                 SVInstantiations instMap, Services services) {
             return instMap.getGenericSortInstantiations().getInstantiation(gs);
         }
-
-        public KeYJavaType resolveType(SchemaVariable sv, SVSubstitute instCandidate, 
-                SVInstantiations instMap, Services services) {            
-            final Sort s = resolveSort(sv, instCandidate, instMap, services);
-            return services.getJavaInfo().getKeYJavaType(s);
-        }
         
+        @Override
         public String toString() {
             return gs.toString();
         }
@@ -92,21 +86,19 @@ public abstract class TypeResolver {
             this.s = s;
         }
 
+        @Override
         public boolean isComplete(SchemaVariable sv, SVSubstitute instCandidate, 
                 SVInstantiations instMap, Services services) {            
             return true;
         }
 
+        @Override
         public Sort resolveSort(SchemaVariable sv, SVSubstitute instCandidate, 
                 SVInstantiations instMap, Services services) {
             return s;
         }
-
-        public KeYJavaType resolveType(SchemaVariable sv, SVSubstitute instCandidate, 
-                SVInstantiations instMap, Services services) {            
-            return services.getJavaInfo().getKeYJavaType(s);
-        }
         
+        @Override
         public String toString() {
             return s.toString();
         }
@@ -120,11 +112,13 @@ public abstract class TypeResolver {
             this.resolveSV = sv;
         }
         
+        @Override
         public boolean isComplete(SchemaVariable sv, SVSubstitute instCandidate, 
                 SVInstantiations instMap, Services services) {       
             return resolveSV == sv || instMap.getInstantiation(resolveSV) != null;
         }
 
+        @Override
         public Sort resolveSort(SchemaVariable sv, SVSubstitute instCandidate, 
                 SVInstantiations instMap, Services services) {
             
@@ -151,12 +145,7 @@ public abstract class TypeResolver {
             return s;
         }
 
-        public KeYJavaType resolveType(SchemaVariable sv, SVSubstitute instCandidate, 
-                SVInstantiations instMap, Services services) {            
-            final Sort s = resolveSort(sv, instCandidate, instMap, services);
-            return services.getJavaInfo().getKeYJavaType(s);
-        }
-       
+        @Override
         public String toString() {
             return "\\typeof(" + resolveSV  + ")";
         }
@@ -170,6 +159,7 @@ public abstract class TypeResolver {
             this.memberSV = sv;
         }
 
+        @Override
         public boolean isComplete(SchemaVariable sv,
                 SVSubstitute instCandidate, SVInstantiations instMap,
                 Services services) {
@@ -177,12 +167,13 @@ public abstract class TypeResolver {
             return sv == memberSV || instMap.getInstantiation(memberSV) != null;
         }
 
+        @Override
         public Sort resolveSort(SchemaVariable sv, SVSubstitute instCandidate,
                 SVInstantiations instMap, Services services) {            
             return resolveType(sv, instCandidate, instMap, services).getSort();
         }
 
-        public KeYJavaType resolveType(SchemaVariable sv,
+        private KeYJavaType resolveType(SchemaVariable sv,
                 SVSubstitute instCandidate, SVInstantiations instMap,
                 Services services) {
             
@@ -218,6 +209,7 @@ public abstract class TypeResolver {
             return resolvedType;
         }
         
+        @Override
         public String toString() {
             return "\\containerType(" + memberSV  + ")";
         }

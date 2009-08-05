@@ -260,12 +260,12 @@ public class Polynomial {
                         && polynomial.sub ( 0 ).sort ().extendsTrans (
                                              tc.getIntegerLDT ().targetSort () )
                         &&
-                        ( polynomial.sort () == tc.getByteLDT ().targetSort ()
+                        ( /*polynomial.sort () == tc.getByteLDT ().targetSort ()
                           || polynomial.sort () == tc.getShortLDT ().targetSort ()
                           || polynomial.sort () == tc.getCharLDT ().targetSort ()
                           || polynomial.sort () == tc.getIntLDT ().targetSort ()
                           || polynomial.sort () == tc.getLongLDT ().targetSort ()
-                          || polynomial.sort () == tc.getIntegerLDT ().targetSort () ) ) {
+                          || */polynomial.sort () == tc.getIntegerLDT ().targetSort () ) ) {
                 // HACK: work around the hackish integer type hierarchy
                 analyse ( polynomial.sub ( 0 ) );
             } else {

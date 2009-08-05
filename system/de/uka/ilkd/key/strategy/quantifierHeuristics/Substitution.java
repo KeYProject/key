@@ -87,8 +87,8 @@ class Substitution {
     }
     
     /**
-     * Try to apply the substitution to a term, widening by removing casts to
-     * jbyte, jint whenever possible 
+     * Try to apply the substitution to a term, introducing casts if
+     * necessary (may never be the case any more, XXX)
      */
     public Term applyWithoutCasts(Term t, Services services) {
         assert isGround() :

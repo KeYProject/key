@@ -15,7 +15,7 @@ import java.io.IOException;
 import org.apache.log4j.Logger;
 
 import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.ldt.AbstractIntegerLDT;
+import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
@@ -573,7 +573,7 @@ public abstract class Notation {
 	    // skip number symbol /as this method may be called
 	    // e.g. by char literal we do not fail if the first is
 	    // not the number symbol
-	    if (t.op().name().equals(AbstractIntegerLDT.NUMBERS_NAME)) {
+	    if (t.op().name().equals(IntegerLDT.NUMBERS_NAME)) {
 		t = t.sub(0);
 	    }
 

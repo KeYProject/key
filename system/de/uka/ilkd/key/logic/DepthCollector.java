@@ -14,7 +14,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 
-import de.uka.ilkd.key.ldt.AbstractIntegerLDT;
+import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.op.*;
 
 /** 
@@ -87,8 +87,8 @@ public class DepthCollector extends Visitor {
      */
     private boolean isFlat ( Operator p_op ) {
 	return
-	    p_op.name().equals(AbstractIntegerLDT.NUMBERS_NAME) ||
-	    p_op.name().equals(AbstractIntegerLDT.CHAR_ID_NAME);
+	    p_op.name().equals(IntegerLDT.NUMBERS_NAME) ||
+	    p_op.name().equals(IntegerLDT.CHAR_ID_NAME);
     }
 
     /**

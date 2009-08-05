@@ -13,10 +13,11 @@ package de.uka.ilkd.key.speclang.translation;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.TypeConverter;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.ldt.AbstractIntegerLDT;
+import de.uka.ilkd.key.java.abstraction.PrimitiveType;
+import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.logic.op.Function;
 
 
 /**
@@ -28,6 +29,7 @@ public class JavaIntegerSemanticsHelper {
 
     private final SLTranslationExceptionManager excManager;
     private final TypeConverter tc;
+    private final IntegerLDT integerLDT;
 
 
     //-------------------------------------------------------------------------
@@ -41,6 +43,7 @@ public class JavaIntegerSemanticsHelper {
 
 	this.excManager = excManager;
 	this.tc = services.getTypeConverter();
+	this.integerLDT = services.getTypeConverter().getIntegerLDT();
     }
     
     
@@ -69,39 +72,13 @@ public class JavaIntegerSemanticsHelper {
     }
     
     
-    private AbstractIntegerLDT getResponsibleIntegerLDT(KeYJavaType kjt) {
-        AbstractIntegerLDT result 
-            = (AbstractIntegerLDT) tc.getModelFor(kjt.getSort());
-        assert result != null;
-        return result;
-    }
-    
-    
     
     //-------------------------------------------------------------------------
     //public interface
     //-------------------------------------------------------------------------
 
     public boolean isIntegerTerm(Term a) throws SLTranslationException {
-        assert a != null;
-        try {
-            return a.sort().extendsTrans(tc.getIntegerLDT().targetSort());
-        } catch(RuntimeException e) {
-            raiseError("Cannot check whether " + a + " is an integer term.");
-            return false; //unreachable
-        }
-    }
-
-   
-    public Term castToLDTSort(Term intTerm, AbstractIntegerLDT ldt) 
-            throws SLTranslationException {
-        assert intTerm != null;
-        try {
-            return TB.cast(tc.getServices(), (Sort) ldt.targetSort(), intTerm);
-        } catch(RuntimeException e) {
-            raiseError("Error casting " + intTerm + " to an ldt sort.");
-            return null; //unreachable
-        }
+	return a.sort() == integerLDT.targetSort();
     }
 
 
@@ -111,8 +88,10 @@ public class JavaIntegerSemanticsHelper {
         assert b != null;
 	try {
 	    KeYJavaType resultType = getPromotedType(a, b);
-	    AbstractIntegerLDT ldt = getResponsibleIntegerLDT(resultType);
-	    return castToLDTSort(TB.func(ldt.getBitwiseOr(), a, b), ldt);
+	    Function or = resultType.getJavaType() == PrimitiveType.JAVA_LONG
+	                  ? integerLDT.getJavaBitwiseOrLong()
+	                  : integerLDT.getJavaBitwiseOrInt();
+	    return TB.func(or, a, b);
 	} catch (RuntimeException e) {
             raiseError("Error in or-expression " + a + " | " + b + ".");
             return null; //unreachable
@@ -126,8 +105,10 @@ public class JavaIntegerSemanticsHelper {
         assert b != null;
 	try {
 	    KeYJavaType resultType = getPromotedType(a, b);
-	    AbstractIntegerLDT ldt = getResponsibleIntegerLDT(resultType);
-	    return castToLDTSort(TB.func(ldt.getBitwiseAnd(), a, b), ldt);
+	    Function and = resultType.getJavaType() == PrimitiveType.JAVA_LONG
+	                  ? integerLDT.getJavaBitwiseAndLong()
+	                  : integerLDT.getJavaBitwiseAndInt();
+	    return TB.func(and, a, b);
 	} catch (RuntimeException e) {
             raiseError("Error in and-expression " + a + " & " + b + ".");
             return null; //unreachable
@@ -141,8 +122,10 @@ public class JavaIntegerSemanticsHelper {
         assert b != null;
 	try {
 	    KeYJavaType resultType = getPromotedType(a, b);
-	    AbstractIntegerLDT ldt = getResponsibleIntegerLDT(resultType);
-	    return castToLDTSort(TB.func(ldt.getBitwiseXor(), a, b), ldt);
+	    Function xor = resultType.getJavaType() == PrimitiveType.JAVA_LONG
+	                   ? integerLDT.getJavaBitwiseXOrLong()
+	                   : integerLDT.getJavaBitwiseXOrInt();
+	    return TB.func(xor, a, b);
 	} catch (RuntimeException e) {
             raiseError("Error in xor-expression " + a + " ^ " + b + ".");
             return null; //unreachable
@@ -154,9 +137,8 @@ public class JavaIntegerSemanticsHelper {
 	    throws SLTranslationException {
         assert a != null;
 	try {
-	    KeYJavaType resultType = getPromotedType(a);
-	    AbstractIntegerLDT ldt = getResponsibleIntegerLDT(resultType);
-	    return castToLDTSort(TB.func(ldt.getBitwiseNegation(), a), ldt);
+	    Function neg = integerLDT.getJavaBitwiseNegation();
+	    return TB.func(neg, a);
 	} catch (RuntimeException e) {
             raiseError("Error in neg-expression " + a + ".");
             return null; //unreachable
@@ -169,9 +151,11 @@ public class JavaIntegerSemanticsHelper {
         assert a != null;
         assert b != null;
         try {
-            KeYJavaType resultType = getPromotedType(a, b); 
-            AbstractIntegerLDT ldt = getResponsibleIntegerLDT(resultType);
-            return castToLDTSort(TB.func(ldt.getAdd(), a, b), ldt);
+            KeYJavaType resultType = getPromotedType(a, b);
+            Function add = resultType.getJavaType() == PrimitiveType.JAVA_LONG
+                           ? integerLDT.getJavaAddLong()
+                           : integerLDT.getJavaAddInt();
+            return TB.func(add, a, b);
         } catch (RuntimeException e) {
             raiseError("Error in additive expression " + a + " + " + b + ".");
             return null; //unreachable
@@ -185,8 +169,10 @@ public class JavaIntegerSemanticsHelper {
         assert b != null;
         try {
             KeYJavaType resultType = getPromotedType(a, b);
-            AbstractIntegerLDT ldt = getResponsibleIntegerLDT(resultType); 
-            return castToLDTSort(TB.func(ldt.getSub(), a, b), ldt);
+            Function sub = resultType.getJavaType() == PrimitiveType.JAVA_LONG
+                           ? integerLDT.getJavaSubLong()
+                           : integerLDT.getJavaSubInt();
+            return TB.func(sub, a, b);
         } catch (RuntimeException e) {
             raiseError("Error in subtract expression " + a + " - " + b + ".");
             return null; //unreachable            
@@ -200,8 +186,10 @@ public class JavaIntegerSemanticsHelper {
         assert b != null;
         try {
             KeYJavaType resultType = getPromotedType(a, b);
-            AbstractIntegerLDT ldt = getResponsibleIntegerLDT(resultType); 
-            return castToLDTSort(TB.func(ldt.getMul(), a, b), ldt);
+	    Function mul = resultType.getJavaType() == PrimitiveType.JAVA_LONG
+	                   ? integerLDT.getJavaMulLong()
+	                   : integerLDT.getJavaMulInt();
+            return TB.func(mul, a, b);
         } catch (RuntimeException e) {
             raiseError("Error in multiplicative expression " + a + " * "
                        + b + ".");
@@ -214,8 +202,11 @@ public class JavaIntegerSemanticsHelper {
             throws SLTranslationException {
         try {
             KeYJavaType resultType = getPromotedType(a, b);
-            AbstractIntegerLDT ldt = getResponsibleIntegerLDT(resultType); 
-            return castToLDTSort(TB.func(ldt.getDiv(), a, b), ldt);         
+	    Function div = resultType.getJavaType() == PrimitiveType.JAVA_LONG
+	                   ? integerLDT.getJavaDivLong()
+	                   : integerLDT.getJavaDivInt();
+ 
+            return TB.func(div, a, b);         
         } catch (RuntimeException e) {
             raiseError("Error in division expression " + a + " / " + b + ".");
             return null; //unreachable            
@@ -228,9 +219,8 @@ public class JavaIntegerSemanticsHelper {
         assert a != null;
         assert b != null;
         try {
-            KeYJavaType resultType = getPromotedType(a, b);
-            AbstractIntegerLDT ldt = getResponsibleIntegerLDT(resultType);
-            return castToLDTSort(TB.func(ldt.getMod(), a, b), ldt);
+	    Function mod = integerLDT.getJavaMod();
+            return TB.func(mod, a, b);
         } catch (RuntimeException e) {
             raiseError("Error in modulo expression " + a + " % " + b + ".");
             return null; //unreachable            
@@ -244,8 +234,10 @@ public class JavaIntegerSemanticsHelper {
         assert b != null;
         try {
             KeYJavaType resultType = getPromotedType(a, b);
-            AbstractIntegerLDT ldt = getResponsibleIntegerLDT(resultType);
-            return castToLDTSort(TB.func(ldt.getShiftRight(), a, b), ldt);
+	    Function shift = resultType.getJavaType() == PrimitiveType.JAVA_LONG
+	                     ? integerLDT.getJavaShiftRightLong()
+	                     : integerLDT.getJavaShiftRightInt();
+            return TB.func(shift, a, b);
         } catch (RuntimeException e) {
             raiseError("Error in shift-right expression " + a + " >> " 
                        + b + ".");
@@ -260,8 +252,10 @@ public class JavaIntegerSemanticsHelper {
         assert b != null;
         try {
             KeYJavaType resultType = getPromotedType(a, b);
-            AbstractIntegerLDT ldt = getResponsibleIntegerLDT(resultType);
-            return castToLDTSort(TB.func(ldt.getShiftLeft(), a, b), ldt);
+	    Function shift = resultType.getJavaType() == PrimitiveType.JAVA_LONG
+	                     ? integerLDT.getJavaShiftLeftLong()
+	                     : integerLDT.getJavaShiftLeftInt();
+            return TB.func(shift, a, b);
         } catch (RuntimeException e) {
             raiseError("Error in shift-left expression " + a + " << " 
                        + b + ".");
@@ -276,9 +270,10 @@ public class JavaIntegerSemanticsHelper {
         assert b != null;
         try {
             KeYJavaType resultType = getPromotedType(a, b);
-            AbstractIntegerLDT ldt = getResponsibleIntegerLDT(resultType);
-            return castToLDTSort(TB.func(ldt.getUnsignedShiftRight(), a, b), 
-                                 ldt);
+	    Function shift = resultType.getJavaType() == PrimitiveType.JAVA_LONG
+	                     ? integerLDT.getJavaUnsignedShiftRightLong()
+	                     : integerLDT.getJavaUnsignedShiftRightInt();
+            return TB.func(shift, a, b);
         } catch (RuntimeException e) {
             raiseError("Error in unsigned shift-right expression " + a + " >>> "
                        + b + ".");
@@ -292,8 +287,10 @@ public class JavaIntegerSemanticsHelper {
         assert a != null;
         try {
             KeYJavaType resultType = getPromotedType(a);
-            AbstractIntegerLDT ldt = getResponsibleIntegerLDT(resultType);
-            return castToLDTSort(TB.func(ldt.getNeg(), a), ldt);
+	    Function minus = resultType.getJavaType() == PrimitiveType.JAVA_LONG
+	                     ? integerLDT.getJavaUnaryMinusLong()
+	                     : integerLDT.getJavaUnaryMinusInt();
+            return TB.func(minus, a);
         } catch (RuntimeException e) {
             raiseError("Error in unary minus expression -" + a + ".");
             return null; //unreachable            
@@ -303,14 +300,6 @@ public class JavaIntegerSemanticsHelper {
 
     public Term buildPromotedUnaryPlusExpression(Term a)
             throws SLTranslationException {
-        assert a != null;
-        try {
-            KeYJavaType resultType = getPromotedType(a);
-            AbstractIntegerLDT ldt = getResponsibleIntegerLDT(resultType);
-            return castToLDTSort(a, ldt);
-        } catch (RuntimeException e) {
-            raiseError("Error in unary plus expression +" + a + ".");
-            return null; //unreachable                        
-        }
+	return a;
     }
 }

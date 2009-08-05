@@ -99,14 +99,13 @@ public class TestApplyTaclet extends TestCase{
 	TacletForTests.parse();
 	assert TacletForTests.services().getNamespaces().programVariables().lookup(new Name("i")) != null;
 	
-	Services services = new Services();
 	proof = new Proof[strs.length/2];
                         
         for (int i=0; i<proof.length; i++) {
 	    Semisequent antec = parseTermForSemisequent(strs[2*i]);
 	    Semisequent succ = parseTermForSemisequent(strs[2*i+1]);
 	    Sequent s = Sequent.createSequent(antec, succ);	    
-	    proof[i]=new Proof(services);
+	    proof[i]=new Proof(TacletForTests.services());
 	    proof[i].setRoot(new Node(proof[i], s));
 	}
     }
@@ -219,7 +218,6 @@ public class TestApplyTaclet extends TestCase{
     }
     
     public void testTacletWithIf() {
-	Services services = new Services();
         NoPosTacletApp close = TacletForTests.getRules().lookup("close_goal");
 	TacletIndex tacletIndex = new TacletIndex ();
 	tacletIndex.add ( close );
@@ -236,12 +234,12 @@ public class TestApplyTaclet extends TestCase{
  	TacletApp rApp=rApplist.head();
 	ListOfTacletApp appList = 
 	    rApp.findIfFormulaInstantiations ( goal.sequent (), 
-	                                       services, Constraint.BOTTOM );
+	                                       TacletForTests.services(), Constraint.BOTTOM );
 	assertTrue("Match Failed.", !appList.isEmpty());
 	assertTrue("Too many matches.", appList.size()==1);
 	assertTrue("Wrong match found.", appList.head().instantiations()==rApp.instantiations());
 	assertTrue("Rule App should be complete", appList.head().complete());
- 	ListOfGoal goals=appList.head ().execute(goal, TacletForTests.services);
+ 	ListOfGoal goals=appList.head ().execute(goal, TacletForTests.services());
 	assertTrue("Wrong number of goals for close.", goals.size()==1);		
 	proof[2].closeGoal ( goals.head (), appList.head ().constraint () );
 	assertTrue("Proof should be closed.", proof[2].closed ());		

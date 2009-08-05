@@ -18,31 +18,24 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.util.ExtList;
 
 
 public final class PairLDT extends LDT {
     
-    private static final Name NAME = new Name("Pair");
-    
+    public static final Name NAME = new Name("Pair");    
+       
     private final Function pair;
 
     
     public PairLDT(Namespace sorts, Namespace functions) {
-	super((Sort)sorts.lookup(NAME), null);
+	super(NAME, sorts);
         pair	   = addFunction(functions, "pair");
     }
     
     
     public Function getPair() {
 	return pair;
-    }
-    
-    
-    @Override
-    public Name name() {
-	return NAME;
     }
     
     

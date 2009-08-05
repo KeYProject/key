@@ -12,7 +12,6 @@ package de.uka.ilkd.key.ldt;
 
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.*;
 import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.Name;
@@ -24,15 +23,15 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.util.ExtList;
 
 
-public abstract class LDT {
+public abstract class LDT implements Named {
     
-    /** the sort, type and kjt represented by the LDT */
+    private final Name name;
+    
+    /** the main sort associated with the LDT */
     private final Sort sort;   
-    private final Type type;
-    private final KeYJavaType kjt;
     
     /** the namespace of functions this LDT feels responsible for */
-    private Namespace functions = new Namespace();
+    private final Namespace functions = new Namespace();
 
     
     
@@ -40,11 +39,10 @@ public abstract class LDT {
     //constructors
     //-------------------------------------------------------------------------
     
-    public LDT(Sort sort, Type type) {
+    protected LDT(Name name, Namespace sorts) {
+	sort = (Sort) sorts.lookup(name);
 	assert sort != null;
-        this.sort = sort;
-        this.type = type;
-	this.kjt  = new KeYJavaType(type, sort);	
+        this.name = name;
     }
     
     
@@ -57,7 +55,7 @@ public abstract class LDT {
      * adds a function to the LDT 
      * @return the added function (for convenience reasons)
      */
-    protected Function addFunction(Function f) {
+    protected final Function addFunction(Function f) {
 	functions.add(f);
 	return f;
     }
@@ -69,7 +67,7 @@ public abstract class LDT {
      * @param funcName the String with the name of the function to look up
      * @return the added function (for convenience reasons)
      */
-    protected Function addFunction(Namespace funcNS, String funcName) {
+    protected final Function addFunction(Namespace funcNS, String funcName) {
         final Function f = (Function)funcNS.lookup(new Name(funcName));
         assert f != null : "LDT: Function " + funcName + " not found";
         return addFunction(f);
@@ -79,7 +77,7 @@ public abstract class LDT {
     /** returns the basic functions of the model
      * @return the basic functions of the model
      */
-    protected Namespace functions() {
+    protected final Namespace functions() {
 	return functions;
     }
 
@@ -91,44 +89,32 @@ public abstract class LDT {
     //-------------------------------------------------------------------------
     
 
+    @Override
+    public final Name name() {
+	return name;
+    }
+
+
+    @Override
+    public final String toString() {
+	return "LDT "+name()+" ("+targetSort() + ")";
+    }
+
+    
     /** 
      * Returns the sort associated with the LDT.
      */
-    public Sort targetSort() {
+    public final Sort targetSort() {
 	return sort;
     }
 
     
-    /** 
-     * Returns the Java type associated with the LDT (may be null!).
-     */
-    public Type javaType() {
-	return type;
-    }
-
-    
-    /** 
-     * Returns the KeYJavaType associated with the LDT.
-     */
-    public KeYJavaType getKeYJavaType() {
-	return kjt;
-    }
-    
-    
-    public String toString() {
-	return "LDT "+name()+" ("+targetSort()+"<->"+javaType()+")";
-    }
-    
-    
-    public boolean containsFunction(Function op) {
+    public final boolean containsFunction(Function op) {
 	Named n=functions.lookup(op.name());
 	return (n==op);
     }    
     
-    
-    public abstract Name name();
-    
-    
+        
     /** returns true if the LDT offers an operation for the given java
      * operator and the logic subterms 
      * @param op the de.uka.ilkd.key.java.expression.Operator to
