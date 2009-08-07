@@ -13,7 +13,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
-import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.parser.*;
 import de.uka.ilkd.key.proof.CountingBufferedInputStream;
@@ -27,7 +26,7 @@ import de.uka.ilkd.key.util.ProgressMonitor;
  * Represents an input from a .key user problem file producing an environment
  * as well as a proof obligation.
  */
-public class KeYUserProblemFile extends KeYFile implements ProofOblInput{
+public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
 
     private Term problemTerm = null;
     private String problemHeader = "";
@@ -57,11 +56,7 @@ public class KeYUserProblemFile extends KeYFile implements ProofOblInput{
     //public interface
     //-------------------------------------------------------------------------
         
-    public boolean askUserForEnvironment() {
-        return true;
-    }
-    
-    
+    @Override
     public void readActivatedChoices() throws ProofInputException{
         if (initConfig==null) {
             throw new IllegalStateException("KeYFile: InitConfig not set.");
@@ -92,6 +87,7 @@ public class KeYUserProblemFile extends KeYFile implements ProofOblInput{
     }
 
 
+    @Override
     public void readProblem() throws ProofInputException {
         if (initConfig==null) {
             throw new IllegalStateException("KeYUserProblemFile: InitConfig not set.");
@@ -144,6 +140,7 @@ public class KeYUserProblemFile extends KeYFile implements ProofOblInput{
     }
 
     
+    @Override
     public ProofAggregate getPO() throws ProofInputException {
         assert problemTerm != null;
 	String name = name();
@@ -160,6 +157,7 @@ public class KeYUserProblemFile extends KeYFile implements ProofOblInput{
     }
     
     
+    @Override
     public boolean implies(ProofOblInput po) {
         return equals(po);
     }
@@ -177,6 +175,7 @@ public class KeYUserProblemFile extends KeYFile implements ProofOblInput{
     }
         
     
+    @Override
     public boolean equals(Object o){
         if(!(o instanceof KeYUserProblemFile)) {
             return false;
@@ -186,17 +185,8 @@ public class KeYUserProblemFile extends KeYFile implements ProofOblInput{
                              .equals(file.file().getAbsolutePath());
     }
     
-/*    private ListOfType getInnerClasses(TypeDeclaration td){
-        ListOfType result = SLListOfType.EMPTY_LIST;
-        for(int i=0; i<td.getTypeDeclarationCount(); i++){
-            if (td.getTypeDeclarationAt(i) instanceof InterfaceDeclaration
-                    || td.getTypeDeclarationAt(i) instanceof ClassDeclaration) {
-                result = result.append(td.getTypeDeclarationAt(i));
-                result = result.append(getInnerClasses(td.getTypeDeclarationAt(i)));
-            }      
-    }*/
-
     
+    @Override
     public int hashCode() {
         return file.file().getAbsolutePath().hashCode();
     }

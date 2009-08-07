@@ -200,7 +200,7 @@ public class TacletAppIndex  {
         ListOfNoPosTacletApp tacletInsts = getFindTaclet ( pos, filter,
                                                            services,
                                                            userConstraint );
-        return createTacletApps ( tacletInsts, pos );
+        return createTacletApps ( tacletInsts, pos, services );
     }
 
      
@@ -225,13 +225,14 @@ public class TacletAppIndex  {
      * @return list of all created TacletApps
      */
     static ListOfTacletApp createTacletApps(ListOfNoPosTacletApp tacletInsts,
-                                            PosInOccurrence pos) {
+                                            PosInOccurrence pos,
+                                            Services services) {
         ListOfTacletApp result = SLListOfTacletApp.EMPTY_LIST;
         IteratorOfNoPosTacletApp it = tacletInsts.iterator ();
         while ( it.hasNext () ) {
             NoPosTacletApp tacletApp = it.next ();
             if ( tacletApp.taclet () instanceof FindTaclet ) {
-                PosTacletApp newTacletApp = tacletApp.setPosInOccurrence ( pos );
+                PosTacletApp newTacletApp = tacletApp.setPosInOccurrence ( pos, services );
                 if ( newTacletApp != null ) {
                     result = result.prepend ( newTacletApp );
                 }
@@ -243,9 +244,10 @@ public class TacletAppIndex  {
     }
     
     static TacletApp createTacletApp(NoPosTacletApp tacletApp,
-                                     PosInOccurrence pos) {
+                                     PosInOccurrence pos,
+                                     Services services) {
         if ( tacletApp.taclet () instanceof FindTaclet ) {
-            PosTacletApp newTacletApp = tacletApp.setPosInOccurrence ( pos );
+            PosTacletApp newTacletApp = tacletApp.setPosInOccurrence ( pos, services );
             if ( newTacletApp != null ) {
                 return newTacletApp;
             } else {
@@ -327,7 +329,7 @@ public class TacletAppIndex  {
                                                   Services        services,
                                                   Constraint      userConstraint) {
         final ListOfTacletApp findTaclets =
-            getIndex ( pos ).getTacletAppAtAndBelow ( pos, filter );
+            getIndex ( pos ).getTacletAppAtAndBelow ( pos, filter, services );
         return prepend ( findTaclets,
                          getNoFindTaclet ( filter, services, userConstraint ) );
     }

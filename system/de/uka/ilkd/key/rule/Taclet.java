@@ -469,7 +469,7 @@ public abstract class Taclet implements Rule, Named {
 	
 	try {
 	    return result.setInstantiations ( result.getInstantiations ()
-					      .add(sv, term) );
+					      .add(sv, term, services) );
 	} catch ( IllegalInstantiationException e ) 
 	    {Debug.out("Exception thrown by class Taclet at setInstantiations");}
 	Debug.out("FAILED. 14: Illegal Instantiation");	    
@@ -1209,8 +1209,10 @@ public abstract class Taclet implements Rule, Named {
 	    while (svIt.hasNext()) {
 		SchemaVariable sv = svIt.next();
 		if (matchCond.getInstantiations ().isInstantiated(sv)) {
-		    neededInstances = neededInstances.add
-			(sv, matchCond.getInstantiations ().getInstantiationEntry(sv));
+		    neededInstances = neededInstances.add(
+			    	sv, 
+			    	matchCond.getInstantiations ().getInstantiationEntry(sv), 
+				services);
 		} 
 	    }
 
@@ -1221,7 +1223,8 @@ public abstract class Taclet implements Rule, Named {
 		final IteratorOfGenericSortCondition cit = cs.iterator ();
 
 		while ( cit.hasNext () )
-		    neededInstances = neededInstances.add ( cit.next () );
+		    neededInstances = neededInstances.add(cit.next (), 
+			    				  services );
 	    }
 
 	    goal.addTaclet(tacletToAdd, neededInstances, matchCond.getConstraint (), true);

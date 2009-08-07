@@ -31,7 +31,7 @@ import de.uka.ilkd.key.logic.sort.*;
  * this class is immutable
  */
 
-public class GenericSortInstantiations {
+public final class GenericSortInstantiations {
 
     public static final GenericSortInstantiations EMPTY_INSTANTIATIONS =
 	new GenericSortInstantiations ( MapAsListFromGenericSortToSort.EMPTY_MAP );
@@ -56,7 +56,8 @@ public class GenericSortInstantiations {
      */
     public static GenericSortInstantiations create
 	( IteratorOfEntryOfSchemaVariableAndInstantiationEntry p_instantiations,
-	  ListOfGenericSortCondition                           p_conditions ) {
+	  ListOfGenericSortCondition                           p_conditions,
+	  Services                                             services) {
 
 	ListOfGenericSort                          sorts      =
 	    SLListOfGenericSort.EMPTY_LIST;
@@ -78,7 +79,7 @@ public class GenericSortInstantiations {
 		sorts        = sorts       .prepend ( c.getGenericSort () );
 	    }
 	}
-	return create ( sorts, p_conditions );
+	return create ( sorts, p_conditions, services );
     }
 
 
@@ -93,13 +94,15 @@ public class GenericSortInstantiations {
      */
     public static GenericSortInstantiations create
 	( ListOfGenericSort          p_sorts,
-	  ListOfGenericSortCondition p_conditions ) {
+	  ListOfGenericSortCondition p_conditions,
+	  Services                   services) {
 
 	if ( p_sorts.isEmpty() )
 	    return EMPTY_INSTANTIATIONS;
 
 	return new GenericSortInstantiations ( solve ( p_sorts,
-						       p_conditions ) );
+						       p_conditions,
+						       services) );
     }
 
 
@@ -211,8 +214,6 @@ public class GenericSortInstantiations {
 	    return s;
 	}
 
-        
-        
 	return p_s;
     }
 
@@ -226,7 +227,8 @@ public class GenericSortInstantiations {
      */
     private static MapFromGenericSortToSort solve
 	( ListOfGenericSort          p_sorts,
-	  ListOfGenericSortCondition p_conditions ) {
+	  ListOfGenericSortCondition p_conditions,
+	  Services services) {
 
 	MapFromGenericSortToSort res;
 
@@ -238,7 +240,8 @@ public class GenericSortInstantiations {
 	res = solveHelp ( topologicalSorts,
 			  MapAsListFromGenericSortToSort.EMPTY_MAP,
 			  p_conditions,
-			  SLListOfGenericSort.EMPTY_LIST );
+			  SLListOfGenericSort.EMPTY_LIST,
+			  services);
 
 	if ( res == null )
 	    throw new GenericSortException
@@ -268,10 +271,14 @@ public class GenericSortInstantiations {
 	( ListOfGenericSort          p_remainingSorts,
 	  MapFromGenericSortToSort   p_curRes,
 	  ListOfGenericSortCondition p_conditions,
-	  ListOfGenericSort          p_pushedBack ) {
+	  ListOfGenericSort          p_pushedBack,
+	  Services                   services) {
 
 	if ( p_remainingSorts.isEmpty() )
-	    return solveForcedInst ( p_pushedBack, p_curRes, p_conditions );
+	    return solveForcedInst(p_pushedBack, 
+		    		   p_curRes, 
+		    		   p_conditions,
+		    		   services);
 
 	// next generic sort to seek an instantiation for
 	final GenericSort gs = p_remainingSorts.head ();
@@ -319,11 +326,13 @@ public class GenericSortInstantiations {
                               p_pushedBack,
                               gs,
                               subsorts,
-                              chosenList );
+                              chosenList,
+                              services);
         } else if ( !subsorts.isEmpty() ) {
             // if anything else has failed, construct minimal
             // supersorts of the found subsorts and try them
-            final ListOfSort superSorts = minimalSupersorts ( subsorts );
+            final ListOfSort superSorts = minimalSupersorts(subsorts, 
+        	    					    services );
 
             return descend ( p_remainingSorts,
                               p_curRes,
@@ -331,14 +340,16 @@ public class GenericSortInstantiations {
                               p_pushedBack,
                               gs,
                               subsorts,
-                              superSorts );
+                              superSorts,
+                              services);
         } else {
             // and if even that did not work, remove the generic
             // sort from the list and try again later
             return solveHelp ( p_remainingSorts,
                                p_curRes,
                                p_conditions,
-                               p_pushedBack.prepend ( gs ) );
+                               p_pushedBack.prepend ( gs ),
+                               services);
         }
     }
 
@@ -350,7 +361,8 @@ public class GenericSortInstantiations {
                                          ListOfGenericSort p_pushedBack,
                                          GenericSort p_gs,
                                          ListOfSort p_subsorts,
-                                         ListOfSort p_chosenList) {
+                                         ListOfSort p_chosenList,
+                                         Services services) {
         final IteratorOfSort itChosen = p_chosenList.iterator ();
         while ( itChosen.hasNext () ) {
             final Sort chosen = itChosen.next ();
@@ -361,7 +373,8 @@ public class GenericSortInstantiations {
                                                              p_curRes.put ( p_gs,
                                                                             chosen ),
                                                              p_conditions,
-                                                             p_pushedBack );
+                                                             p_pushedBack,
+                                                             services);
             if ( res != null ) return res;
         }
         return null;
@@ -433,7 +446,8 @@ public class GenericSortInstantiations {
     private static MapFromGenericSortToSort solveForcedInst
 	( ListOfGenericSort          p_remainingSorts,
 	  MapFromGenericSortToSort   p_curRes,
-	  ListOfGenericSortCondition p_conditions ) {
+	  ListOfGenericSortCondition p_conditions,
+	  Services                   services) {
 
 	if ( p_remainingSorts.isEmpty() )
 	    return p_curRes; // nothing further to be done
@@ -447,7 +461,8 @@ public class GenericSortInstantiations {
 	    p_remainingSorts = p_remainingSorts.prepend ( it.next () );
 
 	return solveForcedInstHelp ( p_remainingSorts,
-				     p_curRes );
+				     p_curRes,
+				     services);
     }
 
 
@@ -462,7 +477,8 @@ public class GenericSortInstantiations {
      */
     private static MapFromGenericSortToSort solveForcedInstHelp
 	( ListOfGenericSort        p_remainingSorts,
-	  MapFromGenericSortToSort p_curRes ) {
+	  MapFromGenericSortToSort p_curRes,
+	  Services services) {
 	if ( p_remainingSorts.isEmpty() ) {
 	    // we're done
 	    return p_curRes;
@@ -483,7 +499,7 @@ public class GenericSortInstantiations {
 	    // solution for relevant situations)
 
 	    // insert into the working list (set)
-	    it = gs.extendsSorts ().iterator ();
+	    it = gs.extendsSorts (services).iterator ();
 	    while ( it.hasNext () )
 		todo.add ( it.next () );
 
@@ -496,16 +512,17 @@ public class GenericSortInstantiations {
 		if ( cur instanceof GenericSort ) {
 		    cand = p_curRes.get ( (GenericSort)cur );
 		    if ( cand == null )
-			it = cur.extendsSorts ().iterator ();
+			it = cur.extendsSorts(services).iterator();
 		} else {
-		    it   = cur.extendsSorts ().iterator ();
+		    it   = cur.extendsSorts(services).iterator();
 		    cand = cur;
 		}
 
 		if ( cand != null &&
 		     isPossibleInstantiation ( gs, cand, p_curRes ) ) {
 		    res = solveForcedInstHelp ( p_remainingSorts,
-						p_curRes.put ( gs, cand ) );
+						p_curRes.put ( gs, cand ),
+						services);
 		    if ( res != null )
 			return res;
 		}
@@ -571,7 +588,8 @@ public class GenericSortInstantiations {
      *
      * PRECONDITION: !p_sorts.isEmpty ()
      */
-    private static ListOfSort minimalSupersorts ( ListOfSort p_sorts ) {
+    private static ListOfSort minimalSupersorts ( ListOfSort p_sorts, 
+	    					  Services services ) {
         // if the list only consists of a single sort, return this sort
         if ( p_sorts.size () == 1 ) return p_sorts;
             
@@ -580,9 +598,7 @@ public class GenericSortInstantiations {
 	HashSet<Sort>        outside   = new HashSet<Sort> ();
 	HashSet<Sort>        todo      = new HashSet<Sort> ();
 
-	// the null sort has to be handled separately, as it doesn't
-	// provide a list of direct supersorts
-	final boolean checkNULL = insertFirstSort ( p_itSorts, inside );
+	inside.add(p_itSorts.next());
 
 	// Find a set "inside" of common supersorts of "p_itSorts"
 	// that contains all minimal common supersorts
@@ -603,16 +619,10 @@ public class GenericSortInstantiations {
 			inside .add ( nextTodo );
 		    else {
 			outside.add ( nextTodo );			
-			addSortsToSet ( todo, nextTodo.extendsSorts () );
+			addSortsToSet ( todo, nextTodo.extendsSorts (services) );
 		    }
 		}
 	    }
-	}
-
-	if ( checkNULL ) {
-	    // At this point todo.isEmpty ()
-	    treatNullSorts ( inside, todo );
-	    inside = todo;
 	}
 
 	// Find the minimal elements of "inside"
@@ -652,20 +662,6 @@ public class GenericSortInstantiations {
     }
 
 
-    /**
-     * Remove all sorts that are not supersorts of the null sort, add the found
-     * sorts to the set <code>p_emptySet</code>
-     */
-    private static void treatNullSorts (HashSet<Sort> p_inside, HashSet<Sort> p_emptySet) {
-        final Iterator<Sort> it = p_inside.iterator ();
-
-        while ( it.hasNext () ) {
-            final Sort sort = it.next ();
-            if ( Sort.NULL.extendsTrans ( sort ) ) p_emptySet.add ( sort );
-        }
-    }
-
-
     private static Sort getOneOf (Set<Sort> p_set) {
         final Sort nextTodo = p_set.iterator ().next ();
         p_set.remove ( nextTodo );
@@ -679,24 +675,6 @@ public class GenericSortInstantiations {
             p_set.add ( itSort.next () );
     }
 
-
-    /**
-     * Add the first non-NULL sort given by the iterator <code>p_itSorts</code>
-     * to the set <code>inside</code>, return true iff NULL sorts have been
-     * found and omitted doing this. If <code>p_itSorts</code> does only
-     * deliver the sort NULL, add NULL to the set <code>inside</code>
-     */
-    private static boolean insertFirstSort (IteratorOfSort p_itSorts,
-                                            HashSet<Sort> inside) {
-        boolean checkNULL = false;
-        Sort cand = p_itSorts.next ();
-        while ( cand == Sort.NULL && p_itSorts.hasNext () ) {
-            cand = p_itSorts.next ();
-            checkNULL = true;
-        }
-        inside.add ( cand );
-        return checkNULL;
-    }
 
 
     /**
@@ -745,7 +723,7 @@ public class GenericSortInstantiations {
     }
 
 
-    /** toString */
+    @Override
     public String toString () {
 	IteratorOfEntryOfGenericSortAndSort it  = insts.entryIterator ();
 	EntryOfGenericSortAndSort           entry;
@@ -769,5 +747,4 @@ public class GenericSortInstantiations {
     public MapFromGenericSortToSort getAllInstantiations () {
 	return insts;
     }
-
 }

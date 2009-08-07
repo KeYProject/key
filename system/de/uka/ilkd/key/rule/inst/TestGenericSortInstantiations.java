@@ -12,6 +12,7 @@
 package de.uka.ilkd.key.rule.inst;
 
 import junit.framework.TestCase;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.sort.*;
@@ -208,8 +209,10 @@ public class TestGenericSortInstantiations extends TestCase {
 
 	cs = SLListOfGenericSortCondition.EMPTY_LIST;
 	cs = cs.prepend ( GenericSortCondition.createSupersortCondition ( G1, A4 ) );
+	
+	Services services = TacletForTests.services();
 
-	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs );
+	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs, services );
 	assertEquals ( "Instantiations should be equal",
 	               ((MapFromGenericSortToSort)MapAsListFromGenericSortToSort.EMPTY_MAP)
 	               .put ( G1, A4 ),
@@ -217,7 +220,7 @@ public class TestGenericSortInstantiations extends TestCase {
 
 	cs = cs.prepend ( GenericSortCondition.createSupersortCondition ( G1, A3 ) );
 	
-	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs );
+	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs, services );
 	assertEquals ( "Instantiations should be equal",
 	               ((MapFromGenericSortToSort)MapAsListFromGenericSortToSort.EMPTY_MAP)
 	               .put ( G1, A4 ),
@@ -227,7 +230,7 @@ public class TestGenericSortInstantiations extends TestCase {
 	cs = cs.prepend ( GenericSortCondition.createSupersortCondition ( G1, A1 ) );
 	cs = cs.prepend ( GenericSortCondition.createSupersortCondition ( G1, A2 ) );
 
-	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs );
+	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs, services );
 	assertEquals ( "Instantiations should be equal",
 	               ((MapFromGenericSortToSort)MapAsListFromGenericSortToSort.EMPTY_MAP)
 	               .put ( G1, A3 ),
@@ -235,7 +238,7 @@ public class TestGenericSortInstantiations extends TestCase {
 
 	cs = cs.prepend ( GenericSortCondition.createSupersortCondition ( G1, A4 ) );
 
-	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs );
+	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs, services );
 	assertEquals ( "Instantiations should be equal",
 	               ((MapFromGenericSortToSort)MapAsListFromGenericSortToSort.EMPTY_MAP)
 	               .put ( G1, A4 ),
@@ -246,7 +249,7 @@ public class TestGenericSortInstantiations extends TestCase {
 	cs = cs.prepend ( GenericSortCondition.createSupersortCondition ( G1, A6 ) );
 
 	try {
-	    gsi = GenericSortInstantiations.create ( sorts ( cs ), cs );
+	    gsi = GenericSortInstantiations.create ( sorts ( cs ), cs, services );
 	    fail ( "Expected GenericSortException" );
 	} catch ( GenericSortException e ) {}
 
@@ -254,7 +257,7 @@ public class TestGenericSortInstantiations extends TestCase {
 	cs = cs.prepend ( GenericSortCondition.createSupersortCondition ( G1, B1 ) );
 	cs = cs.prepend ( GenericSortCondition.createSupersortCondition ( G1, B5 ) );
 
-	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs );
+	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs, services );
 	assertEquals ( "Instantiations should be equal",
 	               ((MapFromGenericSortToSort)MapAsListFromGenericSortToSort.EMPTY_MAP)
 	               .put ( G1, B2 ),
@@ -265,12 +268,14 @@ public class TestGenericSortInstantiations extends TestCase {
     public void testGeneric2 () {
 	ListOfGenericSortCondition cs;
 	GenericSortInstantiations gsi;
+	
+	Services services = TacletForTests.services();
 
 	cs = SLListOfGenericSortCondition.EMPTY_LIST;
 	cs = cs.prepend ( GenericSortCondition.createSupersortCondition ( G1, A1 ) );
 	cs = cs.prepend ( GenericSortCondition.createSupersortCondition ( G2, A2 ) );
 	
-	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs );
+	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs, services );
 	assertEquals ( "Instantiations should be equal",
 	               ((MapFromGenericSortToSort)MapAsListFromGenericSortToSort.EMPTY_MAP)
 	               .put ( G1, A1 ).put ( G2, A2 ),
@@ -280,7 +285,7 @@ public class TestGenericSortInstantiations extends TestCase {
 	cs = cs.prepend ( GenericSortCondition.createSupersortCondition ( G1, A1 ) );
 	cs = cs.prepend ( GenericSortCondition.createSupersortCondition ( G2, B3 ) );
 
-	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs );
+	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs, services );
 	assertEquals ( "Instantiations should be equal",
 	               ((MapFromGenericSortToSort)MapAsListFromGenericSortToSort.EMPTY_MAP)
 	               .put ( G1, A1 ).put ( G2, B3 ),
@@ -292,7 +297,7 @@ public class TestGenericSortInstantiations extends TestCase {
 	cs = cs.prepend ( GenericSortCondition.createSupersortCondition ( G2, B3 ) );
 	cs = cs.prepend ( GenericSortCondition.createSupersortCondition ( G2, B5 ) );
 
-	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs );
+	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs, services );
 	assertEquals ( "Instantiations should be equal",
 	               ((MapFromGenericSortToSort)MapAsListFromGenericSortToSort.EMPTY_MAP)
 	               .put ( G1, A3 ).put ( G2, B4 ),
@@ -300,7 +305,7 @@ public class TestGenericSortInstantiations extends TestCase {
 
 	cs = cs.prepend ( GenericSortCondition.createSupersortCondition ( G4, A5 ) );
 
-	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs );
+	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs, services );
 	assertEquals ( "Instantiations should be equal",
 	               ((MapFromGenericSortToSort)MapAsListFromGenericSortToSort.EMPTY_MAP)
 	               .put ( G1, A3 ).put ( G2, B4 ).put ( G4, A5 ),
@@ -309,7 +314,7 @@ public class TestGenericSortInstantiations extends TestCase {
 	cs = cs.tail ();
 	cs = cs.prepend ( GenericSortCondition.createSupersortCondition ( G4, A4 ) );
 
-	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs );
+	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs, services );
 	assertEquals ( "Instantiations should be equal",
 	               ((MapFromGenericSortToSort)MapAsListFromGenericSortToSort.EMPTY_MAP)
 	               .put ( G1, A4 ).put ( G2, B4 ).put ( G4, A4 ),
@@ -319,7 +324,7 @@ public class TestGenericSortInstantiations extends TestCase {
 	cs = cs.prepend ( GenericSortCondition.createSupersortCondition ( G4, B1 ) );
 
 	try {
-	    gsi = GenericSortInstantiations.create ( sorts ( cs ), cs );
+	    gsi = GenericSortInstantiations.create ( sorts ( cs ), cs, services );
 	    fail ( "Expected GenericSortException" );
 	} catch ( GenericSortException e ) {}
     }
@@ -328,12 +333,14 @@ public class TestGenericSortInstantiations extends TestCase {
     public void testGeneric2Array () {
 	ListOfGenericSortCondition cs;
 	GenericSortInstantiations gsi;
+	
+	Services services = TacletForTests.services();
 
 	cs = SLListOfGenericSortCondition.EMPTY_LIST;
 	cs = cs.prepend ( GenericSortCondition.createSupersortCondition ( G1, A1 ) );
 	cs = cs.prepend ( GenericSortCondition.createSupersortCondition ( G2, A2 ) );
 	
-	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs );
+	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs, services );
 	assertEquals ( "Instantiations should be equal",
 	               ((MapFromGenericSortToSort)MapAsListFromGenericSortToSort.EMPTY_MAP)
 	               .put ( G1, A1 ).put ( G2, A2 ),
@@ -343,7 +350,7 @@ public class TestGenericSortInstantiations extends TestCase {
 	cs = cs.prepend ( GenericSortCondition.createSupersortCondition ( G1, A1 ) );
 	cs = cs.prepend ( GenericSortCondition.createSupersortCondition ( G2, D3 ) );
 
-	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs );
+	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs, services );
 	assertEquals ( "Instantiations should be equal",
 	               ((MapFromGenericSortToSort)MapAsListFromGenericSortToSort.EMPTY_MAP)
 	               .put ( G1, A1 ).put ( G2, D3 ),
@@ -355,7 +362,7 @@ public class TestGenericSortInstantiations extends TestCase {
 	cs = cs.prepend ( GenericSortCondition.createSupersortCondition ( G2, D3 ) );
 	cs = cs.prepend ( GenericSortCondition.createSupersortCondition ( G2, D5 ) );
 
-	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs );
+	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs, services );
 	assertEquals ( "Instantiations should be equal",
 	               ((MapFromGenericSortToSort)MapAsListFromGenericSortToSort.EMPTY_MAP)
 	               .put ( G1, A3 ).put ( G2, D4 ),
@@ -363,7 +370,7 @@ public class TestGenericSortInstantiations extends TestCase {
 
 	cs = cs.prepend ( GenericSortCondition.createSupersortCondition ( G4, A5 ) );
 
-	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs );
+	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs, services );
 	assertEquals ( "Instantiations should be equal",
 	               ((MapFromGenericSortToSort)MapAsListFromGenericSortToSort.EMPTY_MAP)
 	               .put ( G1, A3 ).put ( G2, D4 ).put ( G4, A5 ),
@@ -372,7 +379,7 @@ public class TestGenericSortInstantiations extends TestCase {
 	cs = cs.tail ();
 	cs = cs.prepend ( GenericSortCondition.createSupersortCondition ( G4, A4 ) );
 
-	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs );
+	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs, services );
 	assertEquals ( "Instantiations should be equal",
 	               ((MapFromGenericSortToSort)MapAsListFromGenericSortToSort.EMPTY_MAP)
 	               .put ( G1, A4 ).put ( G2, D4 ).put ( G4, A4 ),
@@ -382,7 +389,7 @@ public class TestGenericSortInstantiations extends TestCase {
 	cs = cs.prepend ( GenericSortCondition.createSupersortCondition ( G4, D1 ) );
 
 	try {
-	    gsi = GenericSortInstantiations.create ( sorts ( cs ), cs );
+	    gsi = GenericSortInstantiations.create ( sorts ( cs ), cs, services );
 	    fail ( "Expected GenericSortException" );
 	} catch ( GenericSortException e ) {}
     }
@@ -391,13 +398,15 @@ public class TestGenericSortInstantiations extends TestCase {
     public void testGeneric3 () {
 	ListOfGenericSortCondition cs;
 	GenericSortInstantiations gsi;
+	
+	Services services = TacletForTests.services();
 
 	cs = SLListOfGenericSortCondition.EMPTY_LIST;
 	cs = cs.prepend ( GenericSortCondition.createSupersortCondition ( G1, A1 ) );
 	cs = cs.prepend ( GenericSortCondition.createSupersortCondition ( G2, A2 ) );
 	cs = cs.prepend ( GenericSortCondition.createSupersortCondition ( G3, A5 ) );
 
-	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs );
+	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs, services );
 	assertEquals ( "Instantiations should be equal",
 	               ((MapFromGenericSortToSort)MapAsListFromGenericSortToSort.EMPTY_MAP)
 	               .put ( G1, A1 ).put ( G2, A2 ).put ( G3, A3 ),
@@ -408,7 +417,7 @@ public class TestGenericSortInstantiations extends TestCase {
 	cs = cs.prepend ( GenericSortCondition.createSupersortCondition ( G2, A2 ) );
 	cs = cs.prepend ( GenericSortCondition.createSupersortCondition ( G3, A5 ) );
 
-	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs );
+	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs, services );
 	assertEquals ( "Instantiations should be equal",
 	               ((MapFromGenericSortToSort)MapAsListFromGenericSortToSort.EMPTY_MAP)
 	               .put ( G1, A5 ).put ( G2, A2 ).put ( G3, A3 ),
@@ -420,7 +429,7 @@ public class TestGenericSortInstantiations extends TestCase {
 	cs = cs.prepend ( GenericSortCondition.createSupersortCondition ( G3, A5 ) );
 	cs = cs.prepend ( GenericSortCondition.createSupersortCondition ( G4, A1 ) );
 
-	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs );
+	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs, services );
 	assertEquals ( "Instantiations should be equal",
 	               ((MapFromGenericSortToSort)MapAsListFromGenericSortToSort.EMPTY_MAP)
 	               .put ( G1, A1 ).put ( G2, A2 ).put ( G3, A3 ).put ( G4, A1 ),
@@ -433,7 +442,7 @@ public class TestGenericSortInstantiations extends TestCase {
 	cs = cs.prepend ( GenericSortCondition.createSupersortCondition ( G4, B1 ) );
 
 	try {
-	    gsi = GenericSortInstantiations.create ( sorts ( cs ), cs );	
+	    gsi = GenericSortInstantiations.create ( sorts ( cs ), cs, services );	
 	    fail ( "Expected GenericSortException" );
 	} catch ( GenericSortException e ) {}
 
@@ -442,7 +451,7 @@ public class TestGenericSortInstantiations extends TestCase {
 	cs = cs.prepend ( GenericSortCondition.createSupersortCondition ( G2, B2 ) );
 	cs = cs.prepend ( GenericSortCondition.createSupersortCondition ( G4, A5 ) );
 	
-	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs );
+	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs, services );
 	assertEquals ( "Instantiations should be equal",
 	               ((MapFromGenericSortToSort)MapAsListFromGenericSortToSort.EMPTY_MAP)
 	               .put ( G1, A3 ).put ( G2, B2 ).put ( G4, A5 ),
@@ -453,11 +462,13 @@ public class TestGenericSortInstantiations extends TestCase {
     public void testGeneric4 () {
 	ListOfGenericSortCondition cs;
 	GenericSortInstantiations gsi;
+	
+	Services services = TacletForTests.services();
 
 	cs = SLListOfGenericSortCondition.EMPTY_LIST;
 	cs = cs.prepend ( GenericSortCondition.createIdentityCondition ( G1, A4 ) );
 
-	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs );
+	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs, services );
 	assertEquals ( "Instantiations should be equal",
 	               ((MapFromGenericSortToSort)MapAsListFromGenericSortToSort.EMPTY_MAP)
 	               .put ( G1, A4 ),
@@ -465,7 +476,7 @@ public class TestGenericSortInstantiations extends TestCase {
 
 	cs = cs.prepend ( GenericSortCondition.createSupersortCondition ( G1, A3 ) );
 	
-	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs );
+	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs, services );
 	assertEquals ( "Instantiations should be equal",
 	               ((MapFromGenericSortToSort)MapAsListFromGenericSortToSort.EMPTY_MAP)
 	               .put ( G1, A4 ),
@@ -476,7 +487,7 @@ public class TestGenericSortInstantiations extends TestCase {
 	cs = cs.prepend ( GenericSortCondition.createIdentityCondition ( G1, A2 ) );
 
 	try {
-	    gsi = GenericSortInstantiations.create ( sorts ( cs ), cs );
+	    gsi = GenericSortInstantiations.create ( sorts ( cs ), cs, services );
 	    fail ( "Expected GenericSortException" );
 	} catch ( GenericSortException e ) {}
 
@@ -485,14 +496,14 @@ public class TestGenericSortInstantiations extends TestCase {
 	cs = cs.prepend ( GenericSortCondition.createIdentityCondition ( G1, A2 ) );
 
 	try {
-	    gsi = GenericSortInstantiations.create ( sorts ( cs ), cs );
+	    gsi = GenericSortInstantiations.create ( sorts ( cs ), cs, services );
 	    fail ( "Expected GenericSortException" );
 	} catch ( GenericSortException e ) {}
 
 	cs = SLListOfGenericSortCondition.EMPTY_LIST;
 	cs = cs.prepend ( GenericSortCondition.createIdentityCondition ( H2, A3 ) );
 
-	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs );
+	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs, services );
 	assertEquals ( "Instantiations should be equal",
 	               ((MapFromGenericSortToSort)MapAsListFromGenericSortToSort.EMPTY_MAP)
 	               .put ( H2, A3 ),
@@ -501,7 +512,7 @@ public class TestGenericSortInstantiations extends TestCase {
 	cs = SLListOfGenericSortCondition.EMPTY_LIST;
 	cs = cs.prepend ( GenericSortCondition.createSupersortCondition ( H2, A5 ) );
 
-	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs );
+	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs, services );
 	assertEquals ( "Instantiations should be equal",
 	               ((MapFromGenericSortToSort)MapAsListFromGenericSortToSort.EMPTY_MAP)
 	               .put ( H2, A3 ),
@@ -511,14 +522,14 @@ public class TestGenericSortInstantiations extends TestCase {
 	cs = cs.prepend ( GenericSortCondition.createIdentityCondition ( H2, A4 ) );
 
 	try {
-	    gsi = GenericSortInstantiations.create ( sorts ( cs ), cs );
+	    gsi = GenericSortInstantiations.create ( sorts ( cs ), cs, services );
 	    fail ( "Expected GenericSortException" );
 	} catch ( GenericSortException e ) {}
 
 	cs = SLListOfGenericSortCondition.EMPTY_LIST;
 	cs = cs.prepend ( GenericSortCondition.createIdentityCondition ( H3, A1 ) );
 
-	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs );
+	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs, services );
 	assertEquals ( "Instantiations should be equal",
 	               ((MapFromGenericSortToSort)MapAsListFromGenericSortToSort.EMPTY_MAP)
 	               .put ( H3, A1 ),
@@ -527,7 +538,7 @@ public class TestGenericSortInstantiations extends TestCase {
 	cs = SLListOfGenericSortCondition.EMPTY_LIST;
 	cs = cs.prepend ( GenericSortCondition.createSupersortCondition ( H3, A1 ) );
 
-	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs );
+	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs, services );
 	assertEquals ( "Instantiations should be equal",
 	               ((MapFromGenericSortToSort)MapAsListFromGenericSortToSort.EMPTY_MAP)
 	               .put ( H3, A1 ),
@@ -537,7 +548,7 @@ public class TestGenericSortInstantiations extends TestCase {
 	cs = cs.prepend ( GenericSortCondition.createIdentityCondition ( H3, A6 ) );
 
 	try {
-	    gsi = GenericSortInstantiations.create ( sorts ( cs ), cs );
+	    gsi = GenericSortInstantiations.create ( sorts ( cs ), cs, services );
 	    fail ( "Expected GenericSortException" );
 	} catch ( GenericSortException e ) {}
 
@@ -547,12 +558,14 @@ public class TestGenericSortInstantiations extends TestCase {
     public void testGeneric5 () {
 	ListOfGenericSortCondition cs;
 	GenericSortInstantiations gsi;
+	
+	Services services = TacletForTests.services();
 
 	cs = SLListOfGenericSortCondition.EMPTY_LIST;
 	cs = cs.prepend ( GenericSortCondition.createIdentityCondition ( H1, A4 ) );
 	cs = cs.prepend ( GenericSortCondition.createIdentityCondition ( H2, A3 ) );
 
-	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs );
+	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs, services );
 	assertEquals ( "Instantiations should be equal",
 	               ((MapFromGenericSortToSort)MapAsListFromGenericSortToSort.EMPTY_MAP)
 	               .put ( H1, A4 ).put ( H2, A3 ),
@@ -563,7 +576,7 @@ public class TestGenericSortInstantiations extends TestCase {
 	cs = cs.prepend ( GenericSortCondition.createSupersortCondition ( H2, A5 ) );
 
 	try {
-	    gsi = GenericSortInstantiations.create ( sorts ( cs ), cs );
+	    gsi = GenericSortInstantiations.create ( sorts ( cs ), cs, services );
 	    fail ( "Expected GenericSortException" );
 	} catch ( GenericSortException e ) {}
 
@@ -571,7 +584,7 @@ public class TestGenericSortInstantiations extends TestCase {
 	cs = cs.prepend ( GenericSortCondition.createSupersortCondition ( H1, A2 ) );
 	cs = cs.prepend ( GenericSortCondition.createSupersortCondition ( H2, A5 ) );
 
-	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs );
+	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs, services );
 	assertEquals ( "Instantiations should be equal",
 	               ((MapFromGenericSortToSort)MapAsListFromGenericSortToSort.EMPTY_MAP)
 	               .put ( H1, A3 ).put ( H2, A3 ),
@@ -581,7 +594,7 @@ public class TestGenericSortInstantiations extends TestCase {
 	cs = cs.prepend ( GenericSortCondition.createSupersortCondition ( H1, A2 ) );
 	cs = cs.prepend ( GenericSortCondition.createIdentityCondition ( H3, A5 ) );
 
-	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs );
+	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs, services );
 	assertEquals ( "Instantiations should be equal",
 	               ((MapFromGenericSortToSort)MapAsListFromGenericSortToSort.EMPTY_MAP)
 	               .put ( H1, A3 ).put ( H3, A5 ),
@@ -592,7 +605,7 @@ public class TestGenericSortInstantiations extends TestCase {
 	cs = cs.prepend ( GenericSortCondition.createIdentityCondition ( H3, A5 ) );
 
 	try {
-	    gsi = GenericSortInstantiations.create ( sorts ( cs ), cs );
+	    gsi = GenericSortInstantiations.create ( sorts ( cs ), cs, services );
 	    fail ( "Expected GenericSortException" );
 	} catch ( GenericSortException e ) {}
 
@@ -600,7 +613,7 @@ public class TestGenericSortInstantiations extends TestCase {
 	cs = cs.prepend ( GenericSortCondition.createIdentityCondition ( H4, A6 ) );
 
 	try {
-	    gsi = GenericSortInstantiations.create ( sorts ( cs ), cs );
+	    gsi = GenericSortInstantiations.create ( sorts ( cs ), cs, services );
 	    fail ( "Expected GenericSortException" );
 	} catch ( GenericSortException e ) {}
 
@@ -610,13 +623,15 @@ public class TestGenericSortInstantiations extends TestCase {
     public void testGeneric6 () {
 	ListOfGenericSortCondition cs;
 	GenericSortInstantiations gsi;
+	
+	Services services = TacletForTests.services();
 
 	cs = SLListOfGenericSortCondition.EMPTY_LIST;
 	cs = cs.prepend ( GenericSortCondition.createIdentityCondition ( G1, A4 ) );
 	cs = cs.prepend ( GenericSortCondition.createForceInstantiationCondition ( G4, true ) );
 	cs = cs.prepend ( GenericSortCondition.createForceInstantiationCondition ( G3, false ) );
 
-	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs );
+	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs, services );
 	assertEquals ( "Instantiations should be equal",
 	               ((MapFromGenericSortToSort)MapAsListFromGenericSortToSort.EMPTY_MAP)
 	               .put ( G1, A4 ).put ( G4, A4 ).put ( G3, A4 ),
@@ -624,7 +639,7 @@ public class TestGenericSortInstantiations extends TestCase {
 
 	cs = cs.prepend ( GenericSortCondition.createSupersortCondition ( G1, A3 ) );
 	
-	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs );
+	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs, services );
 	assertEquals ( "Instantiations should be equal",
 	               ((MapFromGenericSortToSort)MapAsListFromGenericSortToSort.EMPTY_MAP)
 	               .put ( G1, A4 ).put ( G4, A4 ).put ( G3, A4 ),
@@ -635,7 +650,7 @@ public class TestGenericSortInstantiations extends TestCase {
 	cs = cs.prepend ( GenericSortCondition.createSupersortCondition ( G2, A2 ) );
 	cs = cs.prepend ( GenericSortCondition.createForceInstantiationCondition ( G3, false ) );
 
-	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs );
+	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs, services );
 	assertEquals ( "Instantiations should be equal",
 	               ((MapFromGenericSortToSort)MapAsListFromGenericSortToSort.EMPTY_MAP)
 	               .put ( G1, A5 ).put ( G2, A2 ).put ( G3, A3 ),
@@ -643,7 +658,7 @@ public class TestGenericSortInstantiations extends TestCase {
 
 	cs = cs.prepend ( GenericSortCondition.createForceInstantiationCondition ( G4, true ) );
 
-	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs );
+	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs, services );
 	assertEquals ( "Instantiations should be equal",
 	               ((MapFromGenericSortToSort)MapAsListFromGenericSortToSort.EMPTY_MAP)
 	               .put ( G1, A5 ).put ( G2, A2 ).put ( G3, A3 ).put ( G4, A5 ),
@@ -652,7 +667,7 @@ public class TestGenericSortInstantiations extends TestCase {
 	cs = SLListOfGenericSortCondition.EMPTY_LIST;
 	cs = cs.prepend ( GenericSortCondition.createForceInstantiationCondition ( H3, true ) );
 
-	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs );
+	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs, services );
 	assertEquals ( "Instantiations should be equal",
 	               ((MapFromGenericSortToSort)MapAsListFromGenericSortToSort.EMPTY_MAP)
 	               .put ( H3, A3 ),
@@ -663,12 +678,15 @@ public class TestGenericSortInstantiations extends TestCase {
     public void testNullsort () {
 	ListOfGenericSortCondition cs;
 	GenericSortInstantiations gsi;
-
+	
+	Services services = TacletForTests.services();
+	Sort nullSort = services.getJavaInfo().nullSort();
+	
 	cs = SLListOfGenericSortCondition.EMPTY_LIST;
 	cs = cs.prepend ( GenericSortCondition.createSupersortCondition ( G1, A1OBJ ) );
-	cs = cs.prepend ( GenericSortCondition.createSupersortCondition ( G1, Sort.NULL ) );
+	cs = cs.prepend ( GenericSortCondition.createSupersortCondition ( G1, nullSort ) );
 	
-	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs );
+	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs, services );
 	assertEquals ( "Instantiations should be equal",
 	               ((MapFromGenericSortToSort)MapAsListFromGenericSortToSort.EMPTY_MAP)
 	               .put ( G1, A1OBJ ),
@@ -676,17 +694,17 @@ public class TestGenericSortInstantiations extends TestCase {
 
 	cs = cs.prepend ( GenericSortCondition.createSupersortCondition ( G1, A2OBJ ) );
 
-	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs );
+	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs, services );
 	assertEquals ( "Instantiations should be equal",
 	               ((MapFromGenericSortToSort)MapAsListFromGenericSortToSort.EMPTY_MAP)
 	               .put ( G1, A3OBJ ),
 	               gsi.getAllInstantiations () );
 
 	cs = SLListOfGenericSortCondition.EMPTY_LIST;
-	cs = cs.prepend ( GenericSortCondition.createSupersortCondition ( G1, Sort.NULL ) );
+	cs = cs.prepend ( GenericSortCondition.createSupersortCondition ( G1, nullSort ) );
 	cs = cs.prepend ( GenericSortCondition.createSupersortCondition ( G1, A1OBJ ) );
 	
-	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs );
+	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs, services );
 	assertEquals ( "Instantiations should be equal",
 	               ((MapFromGenericSortToSort)MapAsListFromGenericSortToSort.EMPTY_MAP)
 	               .put ( G1, A1OBJ ),
@@ -694,19 +712,19 @@ public class TestGenericSortInstantiations extends TestCase {
 	
 	cs = SLListOfGenericSortCondition.EMPTY_LIST;
 	cs = cs.prepend ( GenericSortCondition.createSupersortCondition ( G1, C1 ) );
-	cs = cs.prepend ( GenericSortCondition.createSupersortCondition ( G1, Sort.NULL ) );
+	cs = cs.prepend ( GenericSortCondition.createSupersortCondition ( G1, nullSort ) );
 
 	try {
-	    gsi = GenericSortInstantiations.create ( sorts ( cs ), cs );
+	    gsi = GenericSortInstantiations.create ( sorts ( cs ), cs, services );
 	    fail ( "Expected GenericSortException" );
 	} catch ( GenericSortException e ) {}
 
 	cs = SLListOfGenericSortCondition.EMPTY_LIST;
-	cs = cs.prepend ( GenericSortCondition.createSupersortCondition ( G1, Sort.NULL ) );
+	cs = cs.prepend ( GenericSortCondition.createSupersortCondition ( G1, nullSort ) );
 	cs = cs.prepend ( GenericSortCondition.createSupersortCondition ( G1, C1 ) );
 
 	try {
-	    gsi = GenericSortInstantiations.create ( sorts ( cs ), cs );
+	    gsi = GenericSortInstantiations.create ( sorts ( cs ), cs, services );
 	    fail ( "Expected GenericSortException" );
 	} catch ( GenericSortException e ) {}
     }

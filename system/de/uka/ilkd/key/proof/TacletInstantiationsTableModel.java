@@ -233,7 +233,7 @@ public class TacletInstantiationsTableModel extends AbstractTableModel {
 
         if ( ( getValueAt(irow, icol) == null  ||
                ((String)getValueAt(irow, icol)).length() == 0 ) &&
-               !originalApp.sufficientlyComplete() &&
+               !originalApp.sufficientlyComplete(services) &&
              !originalApp.canUseMVAPriori ( (SchemaVariable)getValueAt(irow, 0) ) 
          ) {
             throw new MissingInstantiationException
@@ -473,7 +473,7 @@ public class TacletInstantiationsTableModel extends AbstractTableModel {
                             lookupLogicSymbol(new Name(idd.getName()));
                         if (n == null) { 
                             result = result.createSkolemConstant
-                            ( idd.getName (), sv, sort, true );
+                            ( idd.getName (), sv, sort, true, services );
                         } else {
                             throw 
                                 new SVInstantiationParserException(idd.getName(), irow, 1, 

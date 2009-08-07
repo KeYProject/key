@@ -53,6 +53,7 @@ public class PreservesInvPO extends EnsuresPO {
     }
     
     
+    @Override
     protected Term getPreTerm(ProgramVariable selfVar, 
                               ListOfProgramVariable paramVars, 
                               ProgramVariable resultVar,
@@ -62,6 +63,7 @@ public class PreservesInvPO extends EnsuresPO {
     }
     
     
+    @Override
     protected Term getPostTerm(ProgramVariable selfVar, 
                                ListOfProgramVariable paramVars, 
                                ProgramVariable resultVar,
@@ -71,6 +73,7 @@ public class PreservesInvPO extends EnsuresPO {
     }
     
     
+    @Override
     public boolean implies(ProofOblInput po) {
         if(!(po instanceof PreservesInvPO)) {
             return false;
@@ -83,6 +86,7 @@ public class PreservesInvPO extends EnsuresPO {
     }
     
     
+    @Override
     public boolean equals(Object o) {
         if(!(o instanceof PreservesInvPO)) {
             return false;
@@ -93,6 +97,7 @@ public class PreservesInvPO extends EnsuresPO {
     }
     
     
+    @Override
     public int hashCode() {
         return super.hashCode() + ensuredInvs.hashCode();
     }

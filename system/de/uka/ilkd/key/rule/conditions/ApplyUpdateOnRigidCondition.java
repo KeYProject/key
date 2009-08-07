@@ -71,7 +71,7 @@ public final class ApplyUpdateOnRigidCondition implements VariableCondition {
 	
 	Term properX2Inst = applyUpdateOnRigid(uInst, xInst);
 	if(x2Inst == null) {
-	    svInst = svInst.add(x2, properX2Inst);
+	    svInst = svInst.add(x2, properX2Inst, services);
 	    return mc.setInstantiations(svInst);
 	} else if(x2Inst.equals(properX2Inst)) {
 	    return mc;

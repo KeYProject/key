@@ -14,16 +14,12 @@ package de.uka.ilkd.key.logic.op;
 import de.uka.ilkd.key.collection.ArrayOfBoolean;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.sort.ArrayOfSort;
+import de.uka.ilkd.key.logic.sort.NullSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 
 
 public class Function extends AbstractSortedOperator {
-        
-    /** the null pointer */
-    public static final Function NULL = new Function(new Name("null"),
-        					     Sort.NULL, 
-        					     new Sort[0]);
-    
+            
     private final boolean unique;
     
 
@@ -36,7 +32,8 @@ public class Function extends AbstractSortedOperator {
 	this.unique = unique;
 	assert sort != Sort.UPDATE;
 	assert !(unique && sort == Sort.FORMULA);
-	assert sort != Sort.NULL || name.toString().equals("null");
+	assert !(sort instanceof NullSort) || name.toString().equals("null")
+	       : "Functions with sort \"null\" are not allowed: " + this;
     }
     
     

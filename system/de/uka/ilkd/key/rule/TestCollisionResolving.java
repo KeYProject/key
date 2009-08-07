@@ -86,7 +86,8 @@ public class TestCollisionResolving extends TestCase {
 	     (term, 
 	      coll_varSV.find(),
 	      MatchConditions.EMPTY_MATCHCONDITIONS,
-	      null, Constraint.BOTTOM));
+	      null, Constraint.BOTTOM),
+	      services);
 
 	SchemaVariable b 
 	    = (SchemaVariable) TacletForTests.getVariables().lookup(new Name("b"));
@@ -139,7 +140,7 @@ public class TestCollisionResolving extends TestCase {
 					      (term.sub(0), 
 					       coll_varSV.find(),
 					       MatchConditions.EMPTY_MATCHCONDITIONS,
-					       null, Constraint.BOTTOM),pos);
+					       null, Constraint.BOTTOM),pos, services);
 
 	SchemaVariable b 
 	    = (SchemaVariable) TacletForTests.getVariables().lookup(new Name("b"));
@@ -168,8 +169,10 @@ public class TestCollisionResolving extends TestCase {
 	    = PosTacletApp.createPosTacletApp(taclet, 
 					      taclet.match(term.sub(0), taclet.find(),
 							   MatchConditions.EMPTY_MATCHCONDITIONS,
-							   null, Constraint.BOTTOM),pos);
-	TacletApp app1=app.prepareUserInstantiation();
+							   null, Constraint.BOTTOM),
+			                      pos,
+			                      services);
+	TacletApp app1=app.prepareUserInstantiation(services);
 	assertSame(app, app1);
 	TacletInstantiationsTableModel instModel
 	    = new TacletInstantiationsTableModel(app, TacletForTests.services(),
@@ -202,7 +205,7 @@ public class TestCollisionResolving extends TestCase {
     public void testVarNamespaceCreationWithPrefix() {
         TacletApp app = (NoPosTacletApp) TacletForTests.getTaclet
         ("TestCollisionResolving_ns2");
-        TacletApp app1=app.prepareUserInstantiation();
+        TacletApp app1=app.prepareUserInstantiation(services);
         assertSame(app, app1);
 
         TacletInstantiationsTableModel instModel
@@ -263,7 +266,7 @@ public class TestCollisionResolving extends TestCase {
 				       Constraint.BOTTOM);
 	app0 = (NoPosTacletApp)app0.findIfFormulaInstantiations 
 	( seq, services, Constraint.BOTTOM ).head ();
-	TacletApp app = app0.setPosInOccurrence ( pos );
+	TacletApp app = app0.setPosInOccurrence ( pos, services );
 	/*
 	ListOfSVInstantiations sviList=taclet.matchIf
 	    (seq, taclet.match(semiseq.get(0).formula(), taclet.find(),
@@ -272,7 +275,7 @@ public class TestCollisionResolving extends TestCase {
 	TacletApp app 
 	    = PosTacletApp.createPosTacletApp(taclet, sviList.head(), pos);
 	*/
-	TacletApp app1=app.prepareUserInstantiation();
+	TacletApp app1=app.prepareUserInstantiation(services);
 	assertTrue("A different TacletApp should have been created to resolve"
 		   +" name conflicts", app!=app1);
 	
@@ -285,7 +288,7 @@ public class TestCollisionResolving extends TestCase {
 
 	TacletApp app = (NoPosTacletApp) TacletForTests.getTaclet
 	    ("TestCollisionResolving_name_conflict2");
-	TacletApp app1=app.prepareUserInstantiation();
+	TacletApp app1=app.prepareUserInstantiation(services);
 	assertSame(app, app1);
 
 	TacletInstantiationsTableModel instModel
@@ -395,8 +398,8 @@ public class TestCollisionResolving extends TestCase {
 					MatchConditions.EMPTY_MATCHCONDITIONS,
 					null, Constraint.BOTTOM);
 	TacletApp app 
-	    = PosTacletApp.createPosTacletApp(taclet, mc, pos);
-	TacletApp app1=app.prepareUserInstantiation();
+	    = PosTacletApp.createPosTacletApp(taclet, mc, pos, services);
+	TacletApp app1=app.prepareUserInstantiation(services);
 	assertSame("Actually there are no conflicts yet.", app, app1);
 	TacletInstantiationsTableModel instModel
 	    = new TacletInstantiationsTableModel(app, services,

@@ -429,7 +429,10 @@ public class Goal  {
 			  Constraint       constraint,
                           boolean          isAxiom) {		
 	NoPosTacletApp tacletApp =
-	    NoPosTacletApp.createFixedNoPosTacletApp(rule, insts, constraint);
+	    NoPosTacletApp.createFixedNoPosTacletApp(rule, 
+		    				     insts, 
+		    				     constraint,
+		    				     proof().getServices());
 	if (tacletApp != null) {
 	    addNoPosTacletApp(tacletApp);
  	    if (proof().env()!=null) { // do not break everything

@@ -19,6 +19,7 @@ import java.util.WeakHashMap;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.IteratorOfSort;
+import de.uka.ilkd.key.logic.sort.NullSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 
 
@@ -303,7 +304,7 @@ public class LexPathOrdering implements TermOrdering {
             if ( p_op.name ().equals ( IntegerLDT.CHAR_ID_NAME ) )
                 return Integer.valueOf ( 1 );
             if ( p_op instanceof Function
-                 && ( (Function)p_op ).sort () == Sort.NULL )
+                 && ( (Function)p_op ).sort () instanceof NullSort )
                 return Integer.valueOf ( 2 );
             if ( p_op instanceof Function
                  && ( opStr.equals ( "TRUE" ) | opStr.equals ( "FALSE" ) ) )

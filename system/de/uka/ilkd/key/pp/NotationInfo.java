@@ -97,7 +97,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
  */
 public final class NotationInfo {
     
-    public static boolean PRETTY_SYNTAX = false;
+    public static boolean PRETTY_SYNTAX = true;
         
     
     /** This maps operators and classes of operators to {@link

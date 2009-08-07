@@ -73,7 +73,7 @@ abstract class AbstractSV extends AbstractSortedOperator
 	if (inMap == null) {            
 	    try {
 		return matchCond
-		.setInstantiations(instantiations.add(this, pe));
+		.setInstantiations(instantiations.add(this, pe, services));
 	    } catch (IllegalInstantiationException e) {
 		Debug
 		.out("Exception thrown by class Taclet at setInstantiations");
@@ -138,7 +138,7 @@ abstract class AbstractSV extends AbstractSortedOperator
         }
 
         try {           
-            return matchCond.setInstantiations(inst.add(this, term));
+            return matchCond.setInstantiations(inst.add(this, term, services));
         } catch (IllegalInstantiationException e) {
             Debug.out("FAILED. Exception thrown at sorted schema variable", e);
         }

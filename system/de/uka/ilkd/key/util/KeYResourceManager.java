@@ -224,5 +224,3 @@ public class KeYResourceManager {
 	return getResourceFile(o.getClass(), resourcename);
     }
 }
-
- 

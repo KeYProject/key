@@ -56,7 +56,6 @@ public class TestTermParser extends TestCase {
 	}
 	serv = TacletForTests.services ();
 	nss = serv.getNamespaces();
-	nss.sorts().add(Sort.NULL);
 	r2k = new Recoder2KeY(serv, nss);
 	r2k.parseSpecialClasses();	
 	parseDecls("\\sorts { boolean; elem; list; int; int_sort; numbers;  }\n" +

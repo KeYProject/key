@@ -187,35 +187,14 @@ public class Recoder2KeYTypeConverter {
             s = typeConverter.getPrimitiveSort(PrimitiveType.getPrimitiveType(t
                     .getFullName()));
             if (s == null) {
-        	// BEGIN Workaround for testcases        	
-        	// if someone (including me) has some time and motivation we should restructure the test
-        	// cases to work fine with the standard initialisation procedure.
-        	
-        	// ugly!!! To execute tests in a reasonable speed sorts for primitive types we allow sort
-        	// creation here if and only if this method has been invoked implicitly by junit.textui.TestRunner
-        	// This way the workaround stays local and no global visible static fields or similar have
-        	// to be introduced.
-        	boolean throwError = true;
-
-        	Throwable stack = new Throwable(); 
-        	stack.fillInStackTrace();
-        	StackTraceElement[] elements = stack.getStackTrace(); 
-        	for (int i = 0; i<elements.length;i++) {
-        	    if (elements[i] != null && elements[i].getClassName().equals("junit.textui.TestRunner")) {
-        		s = new SortImpl(new Name(t.getFullName()));
-        		throwError = false; 
-        		break;
-        	    }
-        	}
-        	// END Workaround
-        	
-        	if (throwError) {
-        	    throw new RuntimeException("Cannot assign " + t.getFullName() + " a primitive sort.");
-        	}
+        	throw new RuntimeException("Cannot assign " + t.getFullName() + " a primitive sort.");
             }
             addKeYJavaType(t, s);
         } else if (t instanceof recoder.abstraction.NullType) {
-            s = Sort.NULL;
+            s = (Sort) namespaces.sorts().lookup(NullSort.NAME);
+            if(s == null) {
+        	throw new RuntimeException("Null sort not found!");
+            }
             addKeYJavaType(t, s);
         } else if (t instanceof ParameterizedType) {
             ParameterizedType pt = (ParameterizedType) t;
@@ -395,8 +374,9 @@ public class Recoder2KeYTypeConverter {
      */
     private Sort createObjectSort(ClassType ct, SetOfSort supers) {
         final boolean abstractOrInterface = ct.isAbstract() || ct.isInterface();
-        Sort result = new SortImpl(new Name(Recoder2KeYConverter.makeAdmissibleName(ct.getFullName())), 
-                supers,	abstractOrInterface);
+        final Name name = new Name(
+        	Recoder2KeYConverter.makeAdmissibleName(ct.getFullName()));
+        Sort result = new SortImpl(name, supers, abstractOrInterface);
 	return result;
     }
 

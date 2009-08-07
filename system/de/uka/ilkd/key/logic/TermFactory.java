@@ -32,8 +32,8 @@ public final class TermFactory {
     /** The only instance of TermFactory */
     public static final TermFactory DEFAULT = new TermFactory();    
 
-    private static final Map<Object, Term> cache 
-    	= Collections.synchronizedMap(new LRUCache<Object, Term>(10000));
+    private static final Map<Term, Term> cache 
+    	= Collections.synchronizedMap(new LRUCache<Term, Term>(10000));
 
     private static final ArrayOfTerm NO_SUBTERMS = new ArrayOfTerm();
     

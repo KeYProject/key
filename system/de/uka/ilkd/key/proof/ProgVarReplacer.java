@@ -143,7 +143,8 @@ public final class ProgVarReplacer {
 		    		newInsts,
 				noPosTacletApp.constraint(),
 				noPosTacletApp.newMetavariables(),
-				noPosTacletApp.ifFormulaInstantiations());
+				noPosTacletApp.ifFormulaInstantiations(),
+				services);
 		appsToBeRemoved = appsToBeRemoved.add(noPosTacletApp);
 		appsToBeAdded   = appsToBeAdded.add(newNoPosTacletApp);
 	    }
@@ -176,7 +177,8 @@ public final class ProgVarReplacer {
 		    result = result.replace(cie.prefix(),
 					    cie.suffix(),
 					    cie.activeStatementContext(),
-					    newPe);
+					    newPe,
+					    services);
 		}
 	    } else if(ie instanceof OperatorInstantiation) {
 	    	/*nothing to be done (currently)*/
@@ -184,7 +186,7 @@ public final class ProgVarReplacer {
 		ProgramElement pe = (ProgramElement) inst;
 		ProgramElement newPe = replace(pe);
 		if(newPe != pe) {
-		    result = result.replace(sv, newPe);
+		    result = result.replace(sv, newPe, services);
 		}
 	    } else if(ie instanceof ProgramListInstantiation) {
 		ArrayOfProgramElement a = (ArrayOfProgramElement) inst;
@@ -202,13 +204,13 @@ public final class ProgVarReplacer {
 
 		if(changedSomething) {
 		    ArrayOfProgramElement newA = new ArrayOfProgramElement(array);
-		    result = result.replace(sv, newA);
+		    result = result.replace(sv, newA, services);
 		}
 	    } else if(ie instanceof TermInstantiation) {
 		Term t = (Term) inst;
 		Term newT = replace(t);
 		if(newT != t) {
-		    result = result.replace(sv, newT);
+		    result = result.replace(sv, newT, services);
 		}
 	    } else {
 		assert false : "unexpected subtype of InstantiationEntry";

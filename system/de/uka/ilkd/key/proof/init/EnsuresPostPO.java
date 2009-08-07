@@ -30,7 +30,7 @@ import de.uka.ilkd.key.speclang.SetOfClassInvariant;
 /**
  * The "EnsuresPost" proof obligation. 
  */
-public class EnsuresPostPO extends EnsuresPO {
+public final class EnsuresPostPO extends EnsuresPO {
     
     private final OperationContract contract;
     
@@ -59,6 +59,7 @@ public class EnsuresPostPO extends EnsuresPO {
     }
     
     
+    @Override
     protected Term getPreTerm(ProgramVariable selfVar, 
                               ListOfProgramVariable paramVars, 
                               ProgramVariable resultVar,
@@ -70,6 +71,7 @@ public class EnsuresPostPO extends EnsuresPO {
     }
     
     
+    @Override
     protected Term getPostTerm(ProgramVariable selfVar, 
                                ListOfProgramVariable paramVars, 
                                ProgramVariable resultVar,
@@ -87,6 +89,7 @@ public class EnsuresPostPO extends EnsuresPO {
     }
     
     
+    @Override
     public boolean implies(ProofOblInput po) {
         if(!(po instanceof EnsuresPostPO)) {
             return false;
@@ -98,6 +101,7 @@ public class EnsuresPostPO extends EnsuresPO {
     }
     
     
+    @Override
     public boolean equals(Object o) {
         if(!(o instanceof EnsuresPostPO)) {
             return false;
@@ -108,6 +112,7 @@ public class EnsuresPostPO extends EnsuresPO {
     }
     
     
+    @Override
     public int hashCode() {
         return super.hashCode() + contract.hashCode();
     }

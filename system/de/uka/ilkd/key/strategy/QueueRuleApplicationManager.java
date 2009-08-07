@@ -351,7 +351,7 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
             if ( !tacletApp.ifInstsComplete() ) {
                 message = message + " (unmatched if-formulas)";
             }
-            if ( !tacletApp.instsSufficientlyComplete () ) {
+            if ( !tacletApp.instsSufficientlyComplete (goal.proof().getServices()) ) {
                 message = message + " (incomplete)";
             }
         }

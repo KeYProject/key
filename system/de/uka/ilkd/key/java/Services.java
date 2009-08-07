@@ -57,7 +57,7 @@ public class Services{
     /**
      * the information object on the Java model
      */
-    private JavaInfo javainfo;
+    private final JavaInfo javainfo;
         
     /**
      * variable namer for inner renaming
@@ -120,17 +120,6 @@ public class Services{
     }
 
 
-     /** THIS CONSTRUCTOR IS ONLY FOR TESTS!
-      * creates a Services object that contains the given JavaInfo object, a
-      * type converter is created
-      * @param ji the JavaInfo to use
-      */
-     public Services(JavaInfo ji){
-         javainfo = ji;
-         typeconverter = new TypeConverter(this);	 
-	 exceptionHandler = new KeYRecoderExcHandler();
-     }
-
     public KeYExceptionHandler getExceptionHandler(){
 	return exceptionHandler;
     }
@@ -162,10 +151,6 @@ public class Services{
      */
     public JavaInfo getJavaInfo(){
         return javainfo;
-    }
-    
-    public void setJavaInfo(JavaInfo ji) {
-        javainfo = ji;
     }
     
     public NameRecorder getNameRecorder() {

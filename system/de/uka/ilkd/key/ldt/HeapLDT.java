@@ -35,7 +35,8 @@ public final class HeapLDT extends LDT {
     //select/store
     private final SortDependingFunction select;
     private final Function store;
-    private final Function changeHeapAtLocs;    
+    private final Function changeHeapAtLocs;
+    private final Function changeHeapAtLocs2;
 
     //location sets
     private final Function allLocs;
@@ -46,6 +47,9 @@ public final class HeapLDT extends LDT {
     private final Function length;
     private final Function created;
     private final Function nextToCreate;
+    
+    //null
+    private final Function nullFunc;
     
     //predicates
     private final Function wellFormed;
@@ -61,12 +65,14 @@ public final class HeapLDT extends LDT {
         select            = (SortDependingFunction) addFunction(functions, Sort.ANY + "::" + SELECT_NAME);
         store             = addFunction(functions, "store");
         changeHeapAtLocs  = addFunction(functions, "changeHeapAtLocs");
+        changeHeapAtLocs2 = addFunction(functions, "changeHeapAtLocs2");
         allLocs           = addFunction(functions, "allLocs");
         allFields         = addFunction(functions, "allFields");        
         arr               = addFunction(functions, "arr");
         length            = addFunction(functions, "Array::length");
         created           = addFunction(functions, "java.lang.Object::<created>");
         nextToCreate      = addFunction(functions, "java.lang.Object::<nextToCreate>");
+        nullFunc          = addFunction(functions, "null");
         wellFormed        = addFunction(functions, "wellFormed");
         heap	          = (LocationVariable) progVars.lookup(new Name("heap"));        
     }
@@ -102,6 +108,11 @@ public final class HeapLDT extends LDT {
     }    
     
     
+    public Function getChangeHeapAtLocs2() {
+	return changeHeapAtLocs2;
+    }     
+    
+    
     public Function allLocs() {
 	return allLocs;
     }
@@ -129,6 +140,11 @@ public final class HeapLDT extends LDT {
     
     public Function getNextToCreate() {
 	return nextToCreate;
+    }
+    
+    
+    public Function getNull() {
+	return nullFunc;
     }
     
     

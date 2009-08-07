@@ -274,17 +274,14 @@ public abstract class AbstractPO implements ProofOblInput {
     //methods of ProofOblInput interface
     //-------------------------------------------------------------------------
     
-    public String name() {
+    @Override
+    public final String name() {
         return name;
     }
     
-
-    public boolean askUserForEnvironment() {
-        return false;
-    }
-    
         
-    public void readActivatedChoices() throws ProofInputException {
+    @Override
+    public final void readActivatedChoices() throws ProofInputException {
 	initConfig.setActivatedChoices(SetAsListOfChoice.EMPTY_SET);
     }
 
@@ -411,7 +408,8 @@ public abstract class AbstractPO implements ProofOblInput {
     }
     
     
-    public ProofAggregate getPO() {
+    @Override
+    public final ProofAggregate getPO() {
         if(proofAggregate != null) {
             return proofAggregate;
         }
@@ -439,6 +437,7 @@ public abstract class AbstractPO implements ProofOblInput {
     }
     
     
+    @Override
     public boolean implies(ProofOblInput po) {
         return equals(po);
     }

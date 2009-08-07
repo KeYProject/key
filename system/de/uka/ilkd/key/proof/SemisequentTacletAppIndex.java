@@ -267,8 +267,9 @@ public class SemisequentTacletAppIndex {
      * @return all taclet apps for or below the given position
      */
     public ListOfTacletApp getTacletAppAtAndBelow(PosInOccurrence pos,
-                                                  RuleFilter filter) {
-        return getTermIndex ( pos ).getTacletAppAtAndBelow ( pos, filter );
+                                                  RuleFilter filter,
+                                                  Services services) {
+        return getTermIndex ( pos ).getTacletAppAtAndBelow ( pos, filter, services );
     }
 
     /** 

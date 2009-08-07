@@ -22,7 +22,6 @@ public interface Sort extends Named {
     final Sort FORMULA  = new SortImpl(new Name("Formula"));
     final Sort UPDATE   = new SortImpl(new Name("Update"));
     final Sort ANY      = new SortImpl(new Name("any"));    
-    final Sort NULL     = new NullSort(new Name("Null"));
     
     final Name OBJECT_REPOSITORY_NAME = new Name("<get>");
     final Name CAST_NAME = new Name("cast");
@@ -31,9 +30,14 @@ public interface Sort extends Named {
     
     
     /**
-     * Returns the direct supersorts of this sort.
+     * Returns the direct supersorts of this sort. Not supported by NullSort.
      */
     SetOfSort extendsSorts();
+    
+    /**
+     * Returns the direct supersorts of this sort.
+     */
+    SetOfSort extendsSorts(Services services); 
 
     /**
      * Tells whether the given sort is a reflexive, transitive supersort of this 

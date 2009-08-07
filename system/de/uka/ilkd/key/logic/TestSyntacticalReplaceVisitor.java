@@ -11,6 +11,7 @@
 package de.uka.ilkd.key.logic;
 
 import junit.framework.TestCase;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.TacletIndex;
@@ -22,8 +23,8 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 public class TestSyntacticalReplaceVisitor extends TestCase {
     
-    private static final TermBuilder TB = TermBuilder.DF;    
-    
+    private static final TermBuilder TB = TermBuilder.DF;
+       
     SVInstantiations insts=null;
 
     Term rw;
@@ -65,8 +66,9 @@ public class TestSyntacticalReplaceVisitor extends TestCase {
 	Term t_y=TB.tf().createTerm(y);
 	Term t_py=TB.tf().createTerm(p, new Term[]{t_y}, null, null);
 
-	insts=SVInstantiations.EMPTY_SVINSTANTIATIONS.add(b, t_px).add(v, t_y)
-	    .add(u, t_x).add(c, t_py);
+	Services services = TacletForTests.services();
+	insts=SVInstantiations.EMPTY_SVINSTANTIATIONS.add(b, t_px, services).add(v, t_y, services)
+	    .add(u, t_x, services).add(c, t_py, services);
 	
 	t_allxpxpx=TB.all(x, TB.and(t_px, t_px));
 

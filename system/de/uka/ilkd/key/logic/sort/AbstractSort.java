@@ -30,7 +30,17 @@ public abstract class AbstractSort implements Sort {
 
     @Override    
     public final SetOfSort extendsSorts() {
-	return ext;
+	return this == Sort.FORMULA || this == Sort.UPDATE || this == Sort.ANY
+	       ? SetAsListOfSort.EMPTY_SET
+	       : ext.isEmpty()
+	         ? ext.add(Sort.ANY)
+	         : ext;
+    }
+    
+    
+    @Override
+    public final SetOfSort extendsSorts(Services services) {
+	return extendsSorts();
     }
 
     
@@ -39,7 +49,7 @@ public abstract class AbstractSort implements Sort {
      * supersorts of this sort. One might optimize by hashing %%
      */
     @Override    
-    public boolean extendsTrans(Sort sort) {
+    public final boolean extendsTrans(Sort sort) {
         if(sort == this) {
             return true;
         } else if(this == Sort.FORMULA || this == Sort.UPDATE) {
@@ -108,7 +118,6 @@ public abstract class AbstractSort implements Sort {
 	assert result.getSortDependingOn() == this && result.sort() == this;
 	return result;
     }         
-    
 
     
     @Override

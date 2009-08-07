@@ -22,7 +22,6 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.speclang.OperationContract;
 import de.uka.ilkd.key.speclang.SetOfClassInvariant;
 
@@ -30,7 +29,7 @@ import de.uka.ilkd.key.speclang.SetOfClassInvariant;
 /**
  * The "RespectsModifies" proof obligation. 
  */
-public class RespectsModifiesPO extends EnsuresPO {
+public final class RespectsModifiesPO extends EnsuresPO {
     
     private final OperationContract contract;
     
@@ -52,7 +51,6 @@ public class RespectsModifiesPO extends EnsuresPO {
     }
     
         
-    
     private void buildUpdateAnonMethodTerm(ProgramVariable selfVar, 
                                            ListOfProgramVariable paramVars) 
     		throws ProofInputException {
@@ -87,6 +85,7 @@ public class RespectsModifiesPO extends EnsuresPO {
     }
         
     
+    @Override
     protected Term getPreTerm(ProgramVariable selfVar, 
                               ListOfProgramVariable paramVars, 
                               ProgramVariable resultVar,
@@ -100,6 +99,7 @@ public class RespectsModifiesPO extends EnsuresPO {
     }
     
     
+    @Override
     protected Term getPostTerm(ProgramVariable selfVar, 
                                ListOfProgramVariable paramVars, 
                                ProgramVariable resultVar,
@@ -115,6 +115,7 @@ public class RespectsModifiesPO extends EnsuresPO {
     }
     
     
+    @Override
     public boolean implies(ProofOblInput po) {
         if(!(po instanceof RespectsModifiesPO)) {
             return false;
@@ -125,6 +126,7 @@ public class RespectsModifiesPO extends EnsuresPO {
     }
     
     
+    @Override
     public boolean equals(Object o) {
         if(!(o instanceof RespectsModifiesPO)) {
             return false;
@@ -135,6 +137,7 @@ public class RespectsModifiesPO extends EnsuresPO {
     }
     
     
+    @Override
     public int hashCode() {
         return super.hashCode() + contract.hashCode();
     }

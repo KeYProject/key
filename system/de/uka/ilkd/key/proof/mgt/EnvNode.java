@@ -54,14 +54,6 @@ public class EnvNode extends DefaultMutableTreeNode implements TaskTreeNode{
 	return null;
     }
 
-    public String getDiffToLast() {
-	EnvNode lastSibl = (EnvNode) getPreviousSibling();
-	if (lastSibl==null) {
-	    return "First proof environment. Nothing to diff.";
-	}
-	return getProofEnv().getDiffUserInfo(lastSibl.getProofEnv());
-    }
-
     public void decoupleFromEnv() {
 	// do nothing
     }

@@ -44,7 +44,7 @@ import de.uka.ilkd.key.util.*;
 import de.uka.ilkd.key.util.ProgressMonitor;
 
 
-public class Main extends JFrame implements IMain {
+public final class Main extends JFrame implements IMain {
 
     public static final String INTERNAL_VERSION = 
 	KeYResourceManager.getManager().getSHA1();
@@ -68,10 +68,6 @@ public class Main extends JFrame implements IMain {
     /** Name of the config file controlling logging with log4j */
     private static final String LOGGER_CONFIGURATION = PathConfig.KEY_CONFIG_DIR + File.separator + "logger.props";
     
-    static {
-        // @xxx preliminary: better store along with other settings.
-        NotationInfo.PRETTY_SYNTAX = true;
-    }
     
     /** the tab bar at the left */
     private JTabbedPane tabbedPane;
@@ -153,9 +149,6 @@ public class Main extends JFrame implements IMain {
     /** if true then automatically start startAutoMode after the key-file is loaded*/
     public static boolean batchMode = false;
     
-    /** A push-button test generation view of KeY*/
-    public static boolean testStandalone = false;
-    
     /** Determines if the KeY prover is started in visible mode*/
     public static boolean visible = true;
 
@@ -174,10 +167,7 @@ public class Main extends JFrame implements IMain {
 
     
     protected static String fileNameOnStartUp = null;
-    
-    /** are we in stand-alone mode? (or with TCC?) */
-    public static boolean standalone = System.getProperty("key.together") == null;
-    
+        
     /** for locking of threads waiting for the prover to exit */
     public Object monitor = new Object();
     
@@ -282,11 +272,6 @@ public class Main extends JFrame implements IMain {
             }
         }
         return instance;
-    }
-    
-    
-    public static void setStandalone(boolean b) {
-        standalone = b;
     }
     
     
@@ -694,10 +679,8 @@ public class Main extends JFrame implements IMain {
         if (quit) {            
             mediator.fireShutDown(new GUIEvent(this));
 
-            if (standalone) {
-                System.out.println("Have a nice day.");
-                System.exit(-1);
-            }
+            System.out.println("Have a nice day.");
+            System.exit(-1);
         }
         // Release threads waiting for the prover to exit
         synchronized (this.monitor) {
@@ -1447,7 +1430,7 @@ public class Main extends JFrame implements IMain {
     protected void loadProblem(File file) {
 	recentFiles.addRecentFile(file.getAbsolutePath());
         final ProblemLoader pl = 
-            new ProblemLoader(file, this, false);
+            new ProblemLoader(file, this);
         pl.addTaskListener(getProverTaskListener());
         pl.run();
     }
@@ -1730,12 +1713,7 @@ public class Main extends JFrame implements IMain {
     
     class MainListener extends WindowAdapter {
         public void windowClosing(WindowEvent e) {
-            if(testStandalone){
-                visible = false;
-                setVisible(false);
-            }else{
-                exitMain();
-            }
+            exitMain();
         }
     }    
     
@@ -2057,8 +2035,8 @@ public class Main extends JFrame implements IMain {
         
         public void taskFinished(TaskFinishedInfo info) {
             final MainStatusLine sl = getStatusLine();
-            sl.reset();
             if (info.getSource() instanceof ApplyStrategy) {
+        	sl.reset();
                 displayResults(info.getTime(), 
                 	       info.getAppliedRules(), 
                 	       info.getClosedGoals());                
@@ -2070,8 +2048,11 @@ public class Main extends JFrame implements IMain {
                                     exceptionHandler.getExceptions());
                             exceptionHandler.clear();
                 } else {
+                    sl.reset();                    
                     mediator.getNotationInfo().refresh(mediator.getServices());
                 }
+            } else {
+        	sl.reset();
             }
         }
     }
@@ -2097,12 +2078,6 @@ public class Main extends JFrame implements IMain {
 		} else if (opt[index].equals("AUTO")) {
 		    batchMode = true;
                     visible = false;
-		} else if (opt[index].equals("DEPTHFIRST")) {		
-		    	System.out.println("DepthFirst GoalChooser ...");
-			Profile p = ProofSettings.DEFAULT_SETTINGS.getProfile();
-			p.setSelectedGoalChooserBuilder(DepthFirstGoalChooserBuilder.NAME);  
-			VBTStrategy.preferedGoalChooser = DepthFirstGoalChooserBuilder.NAME;
-            
 		} else if (opt[index].equals("TIMEOUT")) {
                     long timeout = -1;
                     try {
@@ -2147,14 +2122,9 @@ public class Main extends JFrame implements IMain {
         System.out.println("  no_assertion    : disables assertions");
         System.out.println("  assertion       : enables assertions (*)");
         System.out.println("  no_jmlspecs     : disables parsing JML specifications");
-        System.out.println("  unit [loop]     : unit test generation mode (optional argument loop to " +
-                            "enable balanced loop unwinding)");
-	System.out.println("  depthfirst      : constructs the proof tree in a depth first manner. Recommended for large proofs");
-        System.out.println("  auto	          : start prove procedure after initialisation");
-        System.out.println("  testing         : starts the prover with a simple test generation oriented user interface");
+        System.out.println("  auto	      : start prove procedure after initialisation");
         System.out.println("  print_statistics <filename>" );
         System.out.println("                  : in auto mode, output nr. of rule applications and time spent");
-        System.out.println("  fol             : use FOL profile (no program or update rules)");
         System.out.println("  timeout <time in ms>");
         System.out.println("                  : set maximal time for rule " +
                             "application in ms (-1 disables timeout)");

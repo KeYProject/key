@@ -56,24 +56,28 @@ public class NoPosTacletApp extends TacletApp {
      */
     public static NoPosTacletApp
 	createNoPosTacletApp(Taclet           taclet, 
-			     SVInstantiations instantiations) {
+			     SVInstantiations instantiations,
+			     Services         services) {
 	return createNoPosTacletApp ( taclet,
 				      instantiations,
 				      Constraint.BOTTOM,
 				      SetAsListOfMetavariable.EMPTY_SET,
-				      null );
+				      null,
+				      services);
     }
 
     public static NoPosTacletApp
 	createNoPosTacletApp(Taclet             taclet, 
 			     SVInstantiations   instantiations,
 			     Constraint         matchConstraint,
-			     SetOfMetavariable  matchNewMetavariables) {
+			     SetOfMetavariable  matchNewMetavariables,
+			     Services           services) {
 	return createNoPosTacletApp ( taclet,
 				      instantiations,
 				      matchConstraint,
 				      matchNewMetavariables,
-				      null );
+				      null,
+				      services);
     }
  
     public static NoPosTacletApp
@@ -81,14 +85,17 @@ public class NoPosTacletApp extends TacletApp {
 			     SVInstantiations             instantiations,
 			     Constraint                   matchConstraint,
 			     SetOfMetavariable            matchNewMetavariables,
-			     ListOfIfFormulaInstantiation ifInstantiations) {
+			     ListOfIfFormulaInstantiation ifInstantiations,
+			     Services                     services) {
 	Debug.assertTrue ( ifInstsCorrectSize ( taclet, ifInstantiations ),
 			   "If instantiations list has wrong size" );
 
 	if ( !matchConstraint.isSatisfiable () )
 	    return null;
 
-	SVInstantiations inst = resolveCollisionVarSV(taclet, instantiations);
+	SVInstantiations inst = resolveCollisionVarSV(taclet, 
+						      instantiations,
+						      services);
 	if (checkVarCondNotFreeIn(taclet, inst)) {
 	    return new NoPosTacletApp(taclet,
 				      inst,
@@ -100,12 +107,14 @@ public class NoPosTacletApp extends TacletApp {
     }
  
     public static NoPosTacletApp createNoPosTacletApp(Taclet             taclet,
-						      MatchConditions    matchCond) {
+						      MatchConditions    matchCond,
+						      Services           services) {
 	return createNoPosTacletApp ( taclet,
 				      matchCond.getInstantiations   (),
 				      matchCond.getConstraint       (),
 				      matchCond.getNewMetavariables (),
-				      null );
+				      null,
+				      services);
     }
    
     /**
@@ -119,12 +128,14 @@ public class NoPosTacletApp extends TacletApp {
     public static NoPosTacletApp
 	createFixedNoPosTacletApp( Taclet             taclet,
 				   SVInstantiations   instantiations,
-				   Constraint         constraint ) {
+				   Constraint         constraint,
+				   Services           services) {
 	NoPosTacletApp res = createNoPosTacletApp ( taclet,
 						    instantiations,
 						    constraint,
 						    SetAsListOfMetavariable.EMPTY_SET,
-						    null );
+						    null,
+						    services);
 	// Make the given SVs fixed
 	if ( res != null ) {
 	    final IteratorOfSchemaVariable it = instantiations.svIterator ();
@@ -200,63 +211,81 @@ public class NoPosTacletApp extends TacletApp {
      * @param term the Term the SchemaVariable is instantiated with
      * @return the new TacletApp
      */
-    public TacletApp addInstantiation(SchemaVariable sv, Term term,
-				      boolean interesting) {
+    public TacletApp addInstantiation(SchemaVariable sv, 
+	    			      Term term,
+				      boolean interesting,
+				      Services services) {
 	if (interesting)
 	    return createNoPosTacletApp(taclet(), 
 					instantiations()
-					.addInteresting(sv, term),
+					.addInteresting(sv, term, services),
 					constraint       (),
 					newMetavariables (),
-					ifFormulaInstantiations ());
+					ifFormulaInstantiations (),
+					services);
 	else
 	    return createNoPosTacletApp(taclet(), 
-					instantiations().add(sv, term),
+					instantiations().add(sv, term, services),
 					constraint       (),
 					newMetavariables (),
-					ifFormulaInstantiations ());
+					ifFormulaInstantiations (),
+					services);
     }
 
 
     
-    public TacletApp addInstantiation(SchemaVariable sv, Object[] list,
-			boolean interesting) {
-		if (interesting)
-			return createNoPosTacletApp(taclet(), instantiations()
-					.addInterestingList(sv, list), constraint(),
-					newMetavariables(), ifFormulaInstantiations());
-		else
-			return createNoPosTacletApp(taclet(), instantiations()
-					.addList(sv, list), constraint(), newMetavariables(),
-					ifFormulaInstantiations());
+    public TacletApp addInstantiation(SchemaVariable sv, 
+	    			      Object[] list,
+	    			      boolean interesting,
+	    			      Services services) {
+	if (interesting) {
+	    return createNoPosTacletApp(taclet(), 
+		    			instantiations().addInterestingList(sv, list, services), 
+		    			constraint(),
+		    			newMetavariables(), 
+		    			ifFormulaInstantiations(),
+		    			services);
+	} else {
+	    return createNoPosTacletApp(taclet(), 
+		    			instantiations().addList(sv, list, services), 
+		    			constraint(), 
+		    			newMetavariables(),
+		    			ifFormulaInstantiations(),
+		    			services);
 	}
+    }
     
     
 
     /**
-	 * adds a new instantiation to this TacletApp
-	 * 
-	 * @param sv
-	 *            the SchemaVariable to be instantiated
-	 * @param pe
-	 *            the ProgramElement the SV is instantiated with
-	 * @return the new TacletApp
-	 */
-    public TacletApp addInstantiation(SchemaVariable sv, ProgramElement pe,
-				      boolean interesting) {
-	if (interesting)
+     * adds a new instantiation to this TacletApp
+     * 
+     * @param sv
+     *            the SchemaVariable to be instantiated
+     * @param pe
+     *            the ProgramElement the SV is instantiated with
+     * @return the new TacletApp
+     */
+    public TacletApp addInstantiation(SchemaVariable sv, 
+	    			      ProgramElement pe,
+				      boolean interesting,
+				      Services services) {
+	if (interesting) {
 	    return createNoPosTacletApp(taclet(), 
 					instantiations()
-					.addInteresting(sv, pe),
+					.addInteresting(sv, pe, services),
 					constraint       (),
 					newMetavariables (),
-					ifFormulaInstantiations ());
-	else 
+					ifFormulaInstantiations (),
+					services);
+	} else { 
 	    return createNoPosTacletApp(taclet(), 
-					instantiations().add(sv, pe),
+					instantiations().add(sv, pe, services),
 					constraint       (),
 					newMetavariables (),
-					ifFormulaInstantiations ());
+					ifFormulaInstantiations (),
+					services);
+	}
     }
 
 
@@ -268,9 +297,10 @@ public class NoPosTacletApp extends TacletApp {
      * instantiations 
      * @return the new Taclet application
      */
-    public TacletApp addInstantiation(SVInstantiations svi) {
+    public TacletApp addInstantiation(SVInstantiations svi,
+	    			      Services services) {
 	return new NoPosTacletApp(taclet(),
-				  svi.union(instantiations()),
+				  svi.union(instantiations(), services),
 				  constraint       (),
 				  newMetavariables (),
 				  ifFormulaInstantiations ());
@@ -285,7 +315,9 @@ public class NoPosTacletApp extends TacletApp {
      * instantiations 
      * @return the new Taclet application
      */
-    protected TacletApp setInstantiation(SVInstantiations svi) {
+    @Override
+    protected TacletApp setInstantiation(SVInstantiations svi,
+	    				 Services services) {
 	return new NoPosTacletApp(taclet(), svi,
 				  constraint       (),
 				  newMetavariables (),
@@ -298,12 +330,14 @@ public class NoPosTacletApp extends TacletApp {
      * instantiations, constraints and new metavariables given 
      * by the mc object and forget the old ones
      */
-    public TacletApp setMatchConditions ( MatchConditions mc ) {
+    public TacletApp setMatchConditions(MatchConditions mc,
+	    				Services services) {
 	return createNoPosTacletApp( taclet(),
 				     mc.getInstantiations   (),
 				     mc.getConstraint       (),
 				     mc.getNewMetavariables (),
-				     ifFormulaInstantiations () );
+				     ifFormulaInstantiations (),
+				     services);
     }
 
 
@@ -313,12 +347,14 @@ public class NoPosTacletApp extends TacletApp {
      * instantiations given and forget the old ones
      */
     protected TacletApp setAllInstantiations ( MatchConditions              mc,
-					       ListOfIfFormulaInstantiation ifInstantiations ) {
+					       ListOfIfFormulaInstantiation ifInstantiations,
+					       Services                     services) {
 	return createNoPosTacletApp( taclet(),
 				     mc.getInstantiations   (),
 				     mc.getConstraint       (),
 				     mc.getNewMetavariables (),
-				     ifInstantiations );
+				     ifInstantiations,
+				     services);
     }
 
 
@@ -339,9 +375,9 @@ public class NoPosTacletApp extends TacletApp {
      * @return true iff the taclet instantiation can be made complete
      * using metavariables
      */
-    public boolean sufficientlyComplete() {
+    public boolean sufficientlyComplete(Services services) {
 	return ( taclet() instanceof NoFindTaclet ) &&
-	    instsSufficientlyComplete () &&
+	    instsSufficientlyComplete(services) &&
 	    ifInstsComplete ();
     }
 
@@ -412,10 +448,11 @@ public class NoPosTacletApp extends TacletApp {
 	    res = mc;
 	}
         
-        return evalCheckRes(res);
+        return evalCheckRes(res, services);
     }
 
-    private NoPosTacletApp evalCheckRes(MatchConditions res) {
+    private NoPosTacletApp evalCheckRes(MatchConditions res, 
+	    			        Services services) {
 	if ( res == null )
 	    return null;
 
@@ -426,7 +463,7 @@ public class NoPosTacletApp extends TacletApp {
             return null;
         }
 
-	return (NoPosTacletApp)setMatchConditions ( res );
+	return (NoPosTacletApp)setMatchConditions ( res, services );
     }
 
     
@@ -462,12 +499,16 @@ public class NoPosTacletApp extends TacletApp {
 	    .equals ( p_mc.getInstantiations ().getUpdateContext () );
     }
 
+    
+    @Override
     public boolean equals(Object o) {
     	if (o == this) return true;
     	if (!(o instanceof NoPosTacletApp)) return false;
     	return super.equals(o);
     }
     
+    
+    @Override
     public int hashCode() {
     	return super.hashCode();
     }    

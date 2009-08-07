@@ -349,7 +349,7 @@ public final class TypeConverter {
         if (lit instanceof BooleanLiteral) {   
             return booleanLDT.translateLiteral(lit);
         } else if (lit instanceof NullLiteral) {
-            return services.getJavaInfo().getNullConst();
+            return TB.NULL(services);
         } else if (lit instanceof IntLiteral) {
             return integerLDT.translateLiteral(lit);
         } else if (lit instanceof CharLiteral) {
@@ -488,7 +488,7 @@ public final class TypeConverter {
      * @throws RuntimeException iff a conversion is not possible
      */
     public Expression convertToProgramElement(Term term) {
-	if (term.op()==Function.NULL) {
+	if (term.op() == heapLDT.getNull()) {
 	    return NullLiteral.NULL;
 	} else if (term.op() instanceof Function) {
 	    for(LDT model : models) {

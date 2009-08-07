@@ -657,8 +657,11 @@ public class TermTacletAppIndex {
      * @return all taclet apps for or below the given position
      */
     public ListOfTacletApp getTacletAppAtAndBelow(PosInOccurrence pos,
-                                                  RuleFilter filter) {
-        return descend ( pos ).collectTacletApps ( pos, filter );
+                                                  RuleFilter filter,
+                                                  Services services) {
+        return descend ( pos ).collectTacletApps ( pos, 
+        					   filter,
+        					   services);
     }
     
     /**
@@ -669,9 +672,12 @@ public class TermTacletAppIndex {
     private static class CollectTacletAppListener implements NewRuleListener {
         private ListOfTacletApp res = SLListOfTacletApp.EMPTY_LIST;
         private final RuleFilter filter;
+        private final Services services;
         
-        public CollectTacletAppListener ( RuleFilter p_filter ) {
+        public CollectTacletAppListener ( RuleFilter p_filter,
+        				  Services services) {
             filter = p_filter;
+            this.services = services;
         }
         
         public ListOfTacletApp getResult () {
@@ -681,7 +687,7 @@ public class TermTacletAppIndex {
         public void ruleAdded ( RuleApp app, PosInOccurrence pos ) {
             if ( filter.filter( ( app.rule() ) ) ) {
                 final TacletApp tacletApp = 
-                    TacletAppIndex.createTacletApp( (NoPosTacletApp) app, pos );
+                    TacletAppIndex.createTacletApp( (NoPosTacletApp) app, pos, services );
                 if ( tacletApp != null ) {
                     res = res.prepend ( tacletApp );
                 }
@@ -698,11 +704,12 @@ public class TermTacletAppIndex {
      * @return a list of all taclet apps
      */
     private ListOfTacletApp collectTacletApps(PosInOccurrence pos,
-                                              RuleFilter p_filter) {
+                                              RuleFilter p_filter,
+                                              Services services) {
         pos = handleDisplayConstraint ( pos, displayConstraint );
 
         final CollectTacletAppListener listener =
-            new CollectTacletAppListener ( p_filter );
+            new CollectTacletAppListener ( p_filter, services );
 
         reportTacletApps ( pos, listener );
 

@@ -104,7 +104,7 @@ public final class DropEffectlessElementariesCondition
 	if(properResultInst == null) {
 	    return null;
 	} else if(resultInst == null) {
-	    svInst = svInst.add(result, properResultInst);
+	    svInst = svInst.add(result, properResultInst, services);
 	    return mc.setInstantiations(svInst);
 	} else if(resultInst.equals(properResultInst)) {
 	    return mc;

@@ -375,7 +375,7 @@ public class TestMatchTaclet extends TestCase {
 	                MatchConditions.EMPTY_MATCHCONDITIONS, services, 
 	                Constraint.BOTTOM).getInstantiations(),
                     new PosInOccurrence(new ConstrainedFormula(match),
-                            PosInTerm.TOP_LEVEL.down(0), true));
+                            PosInTerm.TOP_LEVEL.down(0), true), services);
         
     
 	assertTrue("A match has been found but there is a free variable in"+
@@ -391,7 +391,7 @@ public class TestMatchTaclet extends TestCase {
                     MatchConditions.EMPTY_MATCHCONDITIONS, services, 
                     Constraint.BOTTOM).getInstantiations(),
                     new PosInOccurrence(new ConstrainedFormula(match),
-                            PosInTerm.TOP_LEVEL, true));
+                            PosInTerm.TOP_LEVEL, true), services);
 	assertTrue("A match should have been found,"+
 		   " because here there formerly free variable is bound.",
 		   app != null);	           
@@ -412,7 +412,7 @@ public class TestMatchTaclet extends TestCase {
                MatchConditions.EMPTY_MATCHCONDITIONS, 
                services, Constraint.BOTTOM).getInstantiations(),
                new PosInOccurrence(new ConstrainedFormula(match.sub(0)),
-                       PosInTerm.TOP_LEVEL.down(0), true));
+                       PosInTerm.TOP_LEVEL.down(0), true), services);
         
 	assertTrue("Match found but match term contains free var and"+
 		   "matching var occurs in two instantiation areas"+
@@ -447,7 +447,7 @@ public class TestMatchTaclet extends TestCase {
 		   (not_free_conflict,
 		    not_free_conflict.match
 		    (free_in, not_free_conflict.find(), false,
-		     MatchConditions.EMPTY_MATCHCONDITIONS, services, Constraint.BOTTOM)) == null);
+		     MatchConditions.EMPTY_MATCHCONDITIONS, services, Constraint.BOTTOM), services) == null);
 
 	Term not_free_in = TacletForTests.parseTerm("\\forall testSort z; (p(z) & p(c))");
  	assertTrue("Match should be found because .. not free in.. "+
@@ -455,7 +455,7 @@ public class TestMatchTaclet extends TestCase {
 		   (not_free_conflict,
 		    not_free_conflict.match
 		    (not_free_in, not_free_conflict.find(), false,
-		     MatchConditions.EMPTY_MATCHCONDITIONS, services, Constraint.BOTTOM)) != null);
+		     MatchConditions.EMPTY_MATCHCONDITIONS, services, Constraint.BOTTOM), services) != null);
     }
 
 

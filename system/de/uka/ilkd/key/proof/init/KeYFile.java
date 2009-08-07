@@ -18,7 +18,6 @@ import java.util.*;
 import de.uka.ilkd.key.collection.ListOfString;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.recoderext.RecoderModelTransformer;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.parser.KeYLexer;
 import de.uka.ilkd.key.parser.KeYParser;
@@ -147,26 +146,25 @@ public class KeYFile implements EnvInput {
     //public interface
     //-------------------------------------------------------------------------
     
+    @Override
     public String name() {
         return name;
     }
     
     
-    public RecoderModelTransformer getTransformer() {
-        return null;
-    }
-
-    
+    @Override
     public int getNumberOfChars() {
 	return file.getNumberOfChars();
     }
     
     
-    public void setInitConfig(InitConfig conf) {
+    @Override
+        public void setInitConfig(InitConfig conf) {
         this.initConfig=conf;
     }
 
-
+    
+    @Override
     public Includes readIncludes() throws ProofInputException{
         if (includes == null) {
             try {
@@ -199,9 +197,9 @@ public class KeYFile implements EnvInput {
     }
 
         
-    public List<File> readClassPath() {
-        if(!javaPathAlreadyParsed)
-            throw new IllegalStateException("Can access this only after 'readJavaPath' has been called");
+    @Override
+    public List<File> readClassPath() throws ProofInputException {
+	readJavaPath();
         
         String parentDirectory = file.file().getParent();
         List<File> fileList = new ArrayList<File>();
@@ -219,6 +217,7 @@ public class KeYFile implements EnvInput {
         return fileList;
     }
     
+    @Override    
     public String readJavaPath() throws ProofInputException {
         if (javaPathAlreadyParsed) {
             return javaPath;       
@@ -232,20 +231,9 @@ public class KeYFile implements EnvInput {
             problemParser.preferences(); // skip preferences
             
             classPaths = problemParser.classPaths();
-            ListOfString javaPaths = problemParser.javaSource(); 
+            javaPath = problemParser.javaSource(); 
             
-            if (javaPaths == null) {
-                // no java model at all
-                javaPath = null;
-                javaPathAlreadyParsed=true;
-                return null;
-            }     
-            javaPath = (javaPaths.size() == 0 ? "" : javaPaths.head());
-            
-            if(javaPaths.size() > 1)
-                Debug.fail("Don't know what to do with multiple Java paths.");            
-            
-            if (javaPath.length() != 0) { 
+            if(javaPath != null) {
                 File cfile = new File(javaPath);
                 if (!cfile.isAbsolute()) { // test relative pathname
                     File parent=file.file().getParentFile();
@@ -259,7 +247,7 @@ public class KeYFile implements EnvInput {
                 }                      
             }
             
-            javaPathAlreadyParsed=true;
+            javaPathAlreadyParsed = true;
             
             return javaPath;
         } catch (antlr.ANTLRException e) {
@@ -273,7 +261,7 @@ public class KeYFile implements EnvInput {
         }
     }
     
-
+    @Override
     public void read() throws ProofInputException {
 	if (initConfig==null) {
 	    throw new IllegalStateException("KeYFile: InitConfig not set.");
@@ -331,8 +319,7 @@ public class KeYFile implements EnvInput {
     
     /** reads the sorts declaration of the .key file only, 
      * modifying the sort namespace
-     * of the initial configuration if allowed in the given 
-     * modification strategy.
+     * of the initial configuration 
      */
     public void readSorts() throws ProofInputException {
 	try {
@@ -365,8 +352,7 @@ public class KeYFile implements EnvInput {
     
    /** reads the rules and problems declared in the .key file only, 
      * modifying the set of rules 
-     * of the initial configuration if allowed in the given 
-     * modification strategy.
+     * of the initial configuration 
      */
     public void readRulesAndProblem() 
             throws ProofInputException {
@@ -397,6 +383,7 @@ public class KeYFile implements EnvInput {
         }
     }
 
+    
     public void close() {
         try {
             if (input != null) { 
@@ -413,11 +400,13 @@ public class KeYFile implements EnvInput {
     }
 
     
+    @Override    
     public String toString() {
 	return name() + " " + file.toString();
     }
     
     
+    @Override    
     public boolean equals(Object o){
         if(!(o instanceof KeYFile)) {
             return false;
@@ -428,6 +417,7 @@ public class KeYFile implements EnvInput {
     }
 
     
+    @Override    
     public int hashCode(){
         final String externalForm = file.getExternalForm();
         if (externalForm == null) {

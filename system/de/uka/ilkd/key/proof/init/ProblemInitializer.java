@@ -11,17 +11,13 @@
 package de.uka.ilkd.key.proof.init;
 
 import java.io.File;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Vector;
-import java.util.Map.Entry;
 
 import recoder.io.PathList;
 import recoder.io.ProjectSettings;
-
-import org.apache.log4j.Logger;
 
 import de.uka.ilkd.key.gui.IMain;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
@@ -39,20 +35,16 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.RuleSource;
 import de.uka.ilkd.key.proof.mgt.AxiomJustification;
-import de.uka.ilkd.key.proof.mgt.CvsException;
-import de.uka.ilkd.key.proof.mgt.CvsRunner;
 import de.uka.ilkd.key.proof.mgt.GlobalProofMgt;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.proof.mgt.RuleConfig;
-import de.uka.ilkd.key.rule.IteratorOfBuiltInRule;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.util.ProgressMonitor;
 
 
 public final class ProblemInitializer {
     
-    private static JavaModel lastModel;
-    private static InitConfig lastBaseConfig;
+    private static InitConfig baseConfig;
  
     private final IMain main;
     private final Profile profile;
@@ -213,42 +205,21 @@ public final class ProblemInitializer {
 	
     }
     
-    
     /**
      * Helper for readJava().
      */
     private JavaModel getJavaModel(String javaPath) throws ProofInputException {
-        JavaModel jModel = JavaModel.NO_MODEL;
-        if (javaPath != null) { 
-	    String modelTag = "KeY_" + new java.util.Date().getTime();
-	    jModel = new JavaModel(javaPath, modelTag);
-            if (javaPath.equals(System.getProperty("user.home"))) { 
-                throw new ProofInputException("You do not want to have "+
-                "your home directory as the program model.");
-            }
-	    CvsRunner cvs = new CvsRunner();
-	    try{
-		boolean importOK = 
-		    cvs.cvsImport(jModel.getCVSModule(), javaPath,
-				  System.getProperty("user.name"),
-				  modelTag);
-		if (importOK && lastModel!=null && 
-		    lastModel!=JavaModel.NO_MODEL && 
-		    javaPath.equals(lastModel.getModelDir())) {
-		    String diff = cvs.cvsDiff(jModel.getCVSModule(),
-					      lastModel.getModelTag(), 
-					      modelTag);
-		    if (diff.length()==0) {
-			jModel = lastModel;
-		    }
-		}
-	    }catch(CvsException cvse) {
-		// leave already created new Java model
-		Logger.getLogger("key.proof.mgt").error("Dumping Model into CVS failed: "+cvse);
-	    }
+	JavaModel result;
+	if(javaPath == null) {
+	    result = JavaModel.NO_MODEL;
+	} else if (javaPath.equals(System.getProperty("user.home"))) { 
+	    throw new ProofInputException("You do not want to have "+
+	    "your home directory as the program model.");
+	} else { 
+	    String modelTag = "KeY_"+new Long((new java.util.Date()).getTime());
+	    result = new JavaModel(javaPath, modelTag);
 	}
-	lastModel = jModel;
-        return jModel;
+	return result;
     }
          
     
@@ -257,51 +228,46 @@ public final class ProblemInitializer {
      */
     private void readJava(EnvInput envInput, InitConfig initConfig) 
     		throws ProofInputException {
+	assert !initConfig.getServices()
+	                  .getJavaInfo()
+	                  .rec2key()
+	                  .parsedSpecial();
+	assert initConfig.getProofEnv().getJavaModel() == null;
+	
+	//read Java source and classpath settings
 	envInput.setInitConfig(initConfig);
 	String javaPath = envInput.readJavaPath();
-	List<File> classPath = envInput.readClassPath(); 
+	List<File> classPath = envInput.readClassPath();
+	
+	//create Recoder2KeY, set classpath
+	final Recoder2KeY r2k = new Recoder2KeY(initConfig.getServices(), 
+                                                initConfig.namespaces());
+	r2k.setClassPath(classPath);
 	
 	if(javaPath != null) {
     	    //read Java	
-            reportStatus("Reading Java model");
-            ProjectSettings settings = 
-                initConfig.getServices().getJavaInfo().getKeYProgModelInfo()
-                	  .getServConf().getProjectSettings();
+            reportStatus("Reading Java source");
+            ProjectSettings settings 
+            	=  initConfig.getServices()
+            	             .getJavaInfo()
+            	             .getKeYProgModelInfo()
+                	     .getServConf()
+                	     .getProjectSettings();
             PathList searchPathList = settings.getSearchPathList();
-            
             if(searchPathList.find(javaPath) == null) {
                 searchPathList.add(javaPath);
             }
-            Recoder2KeY r2k = new Recoder2KeY(initConfig.getServices(), 
-                                              initConfig.namespaces());
-            r2k.setClassPath(classPath);
-            //r2k.setKeYFile(envInput.)
-            if (javaPath.length() == 0) {
-                r2k.parseSpecialClasses();
-                JavaModel jm = initConfig.getProofEnv().getJavaModel();
-                if(jm==null){ /*This condition is bug fix. After loading java files a model is setup. 
-                	However if later a .key file is loaded, then the existing model may be 
-                	overwritten by NO_MODEL. This check prevents this problem. The described situation
-                	may occur when using e.g. TacletLibraries from the Options menu.*/
-                    initConfig.getProofEnv().setJavaModel(JavaModel.NO_MODEL);
-                }
-            } else {                 
-                String[] cus = getClasses(javaPath).toArray(new String[]{});
-                r2k.readCompilationUnitsAsFiles(cus);
-                initConfig.getServices().getJavaInfo().setJavaSourcePath(javaPath);               
 
-                //checkin Java model to CVS
-                reportStatus("Checking Java model");
-                JavaModel jmodel = getJavaModel(javaPath);
-                initConfig.getProofEnv().setJavaModel(jmodel);
-            }
-                       
-            reportReady();
+            String[] cus = getClasses(javaPath).toArray(new String[]{});
+            r2k.readCompilationUnitsAsFiles(cus);
+            initConfig.getServices().getJavaInfo().setJavaSourcePath(javaPath);               
 	} else {
-	    initConfig.getProofEnv().setJavaModel(JavaModel.NO_MODEL);
+            reportStatus("Reading Java libraries");	    
+	    r2k.parseSpecialClasses();
 	}
+	
+        initConfig.getProofEnv().setJavaModel(getJavaModel(javaPath));
     }
-    
     
     /**
      * Removes all schema variables, all generic sorts and all sort
@@ -335,10 +301,9 @@ public final class ProblemInitializer {
 			      InitConfig initConfig) 
     		throws ProofInputException {
 	if(alreadyParsed.add(envInput)){
-	    //read includes, java
+	    //read includes
 	    if(!(envInput instanceof LDTInput)) {
 		readIncludes(envInput, initConfig);
-		readJava(envInput, initConfig);	
 	    }
 	    
 	    //sanity check
@@ -354,10 +319,7 @@ public final class ProblemInitializer {
 	    envInput.read();	    
 
 	    //clean namespaces
-	    cleanupNamespaces(initConfig);
-	    	    
-	    //done
-	    reportReady();
+	    cleanupNamespaces(initConfig);	    	    
 	}
     }
 
@@ -372,9 +334,6 @@ public final class ProblemInitializer {
 	} else if(term.op() instanceof ProgramVariable) {
 	    namespaces.programVariables().add(term.op());
 	}
-	
-	//TODO: consider Java blocks (should not be strictly necessary 
-	//for the moment, though)
     }
     
     
@@ -427,7 +386,6 @@ public final class ProblemInitializer {
         reportStatus("Registering rules");        
         initConfig.getProofEnv().registerRules(initConfig.getTaclets(), 
         				       AxiomJustification.INSTANCE);
-	reportReady();
 
 	Proof[] proofs = pl.getProofs();
 	for (int i=0; i < proofs.length; i++) {
@@ -453,36 +411,38 @@ public final class ProblemInitializer {
 	stopInterface();
 	alreadyParsed.clear();
 
-	//if the profile changed, read in standard rules
-	if(lastBaseConfig == null 
-	   || !lastBaseConfig.getProfile().equals(profile)) {
-	    lastBaseConfig = new InitConfig(services, profile);
+	//the first time, read in standard rules
+	if(baseConfig == null) {
+	    baseConfig = new InitConfig(services, profile);
+
 	    RuleSource tacletBase = profile.getStandardRules().getTacletBase();
 	    if(tacletBase != null) {
     	    	KeYFile tacletBaseFile
     	    	    = new KeYFile("taclet base", 
     	    		          profile.getStandardRules().getTacletBase(),
 			          pm);
-    	    	readEnvInput(tacletBaseFile, lastBaseConfig);
-	    }
+    	    	readEnvInput(tacletBaseFile, baseConfig);
+	    }	    
 	}
 	
 	//create initConfig
-        InitConfig initConfig = lastBaseConfig.copy();
+        InitConfig initConfig = baseConfig.copy();
 
 	//register built in rules
-	final IteratorOfBuiltInRule builtInRules =
-    	profile.getStandardRules().getStandardBuiltInRules().iterator();  
-        while (builtInRules.hasNext()) {
-            final Rule r = builtInRules.next();
+        for(Rule r : profile.getStandardRules().getStandardBuiltInRules()) {
     	    initConfig.getProofEnv().registerRule(r, 
     		    				  profile.getJustification(r));
         }
-		
+        
+	//read Java
+        readJava(envInput, initConfig);
+
         //read envInput
         readEnvInput(envInput, initConfig);
         
-	startInterface();	
+        //done
+        reportReady();
+	startInterface();
 	return initConfig;
     }
 
@@ -496,12 +456,14 @@ public final class ProblemInitializer {
             initConfig = determineEnvironment(po, initConfig);
            
             //read problem
-    	    reportStatus("Loading problem \""+po.name()+"\"");
+    	    reportStatus("Loading problem \"" + po.name() + "\"");
     	    po.readProblem();
-    	    reportReady();
     	    
     	    //final work
     	    setUpProofHelper(po, initConfig);
+    	    
+	    //done
+	    reportReady();    	    
         } catch (ProofInputException e) {           
             reportStatus(po.name() + " failed");
             throw e;            

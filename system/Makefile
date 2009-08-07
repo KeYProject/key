@@ -182,7 +182,6 @@ GENERATED_LISTS=logic/SLListOfTerm \
 	proof/SLListOfTermTacletAppIndex \
 	strategy/SLListOfRuleAppContainer \
 	logic/SLListOfProgramElementName \
-	proof/mgt/SLListOfQuantifierPrefixEntry \
 	proof/SLListOfInstantiationProposer \
         speclang/SLListOfOperationContract \
 	speclang/SLListOfClassInvariant \
@@ -289,10 +288,7 @@ ANTLR_PARSER= \
 	$(GENERATED_SRC_PATH)$(PFX)speclang/jml/pretranslation/KeYJMLPreLexer.java \
 	$(GENERATED_SRC_PATH)$(PFX)speclang/jml/pretranslation/KeYJMLPreParser.java \
 	$(GENERATED_SRC_PATH)$(PFX)speclang/jml/translation/KeYJMLLexer.java \
-	$(GENERATED_SRC_PATH)$(PFX)speclang/jml/translation/KeYJMLParser.java \
-	$(GENERATED_SRC_PATH)$(PFX)util/keydoc/parser/KeYDocLexer.java \
-	$(GENERATED_SRC_PATH)$(PFX)util/keydoc/parser/KeYDocParser.java \
-	$(GENERATED_SRC_PATH)$(PFX)util/keydoc/parser/KeYDocTreeWalker.java 
+	$(GENERATED_SRC_PATH)$(PFX)speclang/jml/translation/KeYJMLParser.java
 
 
 JAVACC_PARSER= \
@@ -310,14 +306,6 @@ PROOFJAVA_PARSER= \
 	$(GENERATED_SRC_PATH)$(PFX)parser/proofjava/ProofJavaParserTokenManager.java \
 	$(GENERATED_SRC_PATH)$(PFX)parser/proofjava/ProofJavaParser.java \
 	$(GENERATED_SRC_PATH)$(PFX)parser/proofjava/Token.java \
-
-DIFF_PARSER= \
-	$(GENERATED_SRC_PATH)$(PFX)parser/diffparser/DiffParserConstants.java \
-	$(GENERATED_SRC_PATH)$(PFX)parser/diffparser/ParseException.java \
-	$(GENERATED_SRC_PATH)$(PFX)parser/diffparser/TokenMgrError.java \
-	$(GENERATED_SRC_PATH)$(PFX)parser/diffparser/DiffParserTokenManager.java \
-	$(GENERATED_SRC_PATH)$(PFX)parser/diffparser/DiffParser.java \
-	$(GENERATED_SRC_PATH)$(PFX)parser/diffparser/Token.java
 
 
 ## generic java support
@@ -445,7 +433,7 @@ all_gen: genericMakefile
 	@$(MAKE) -s all_hlp   	
 
 .PHONY: all_hlp
-all_hlp: argfile.normal $(JAVAFILES) $(ANTLR_PARSER) $(JAVACC_PARSER) $(PROOFJAVA_PARSER) $(KEYDOC_JAVAS) $(DIFF_PARSER) copyResources
+all_hlp: argfile.normal $(JAVAFILES) $(ANTLR_PARSER) $(JAVACC_PARSER) $(PROOFJAVA_PARSER) $(DIFF_PARSER) copyResources
 ifeq "$(BRANDING)" ""
 # always update SHA1 hash in order to get useful bug reports		
 	@echo $(SHA1) > ${BINARYPATH}/de/uka/ilkd/key/util/sha1
@@ -522,13 +510,6 @@ $(PROOFJAVA_PARSER) \
 	@cp $(PFX)parser/proofjava/Token.java.source $(GENERATED_SRC_PATH)$(PFX)parser/proofjava/Token.java
 	@$(JAVA) -cp $(CLASSPATH) $(JAVACC_MAIN) -OUTPUT_DIRECTORY=$(GENERATED_SRC_PATH)$(PFX)parser/proofjava $< 
 
-$(DIFF_PARSER) \
-	: $(PFX)parser/diffparser/DiffParser.jj
-	@echo [creating unified diff parser]
-	@mkdir -p $(GENERATED_SRC_PATH)$(PFX)parser/diffparser
-	@rm -f $(GENERATED_SRC_PATH)$(PFX)parser/diffparser/*.java $@
-	@$(JAVA) -cp $(CLASSPATH) $(JAVACC_MAIN) -OUTPUT_DIRECTORY=$(GENERATED_SRC_PATH)$(PFX)parser/diffparser $< 
-
 $(GENERATED_SRC_PATH)$(PFX)parser/KeYLexer.java \
 $(GENERATED_SRC_PATH)$(PFX)parser/KeYLexerTokenTypes.txt \
 $(GENERATED_SRC_PATH)$(PFX)parser/KeYLexerTokenTypes.java \
@@ -593,31 +574,6 @@ $(GENERATED_SRC_PATH)$(PFX)speclang/jml/translation/KeYJMLParser.java \
 	@mkdir -p $(GENERATED_SRC_PATH)$(PFX)speclang/jml/translation
 	@$(JAVA) -cp $(CLASSPATH) antlr.Tool  -glib $(PFX)speclang/jml/translation/jmllexer.g \
 	                 -o $(GENERATED_SRC_PATH)$(PFX)speclang/jml/translation $<
-
-$(GENERATED_SRC_PATH)$(PFX)util/keydoc/parser/KeYDocLexer.java \
-$(GENERATED_SRC_PATH)$(PFX)util/keydoc/parser/KeYDocLexerTokenTypes.txt \
-$(GENERATED_SRC_PATH)$(PFX)util/keydoc/parser/KeYDocLexerTokenTypes.java \
-	: $(PFX)util/keydoc/parser/KeYDocLexer.g
-	@echo [creating KeYDoc Lexer]
-	@mkdir -p $(GENERATED_SRC_PATH)$(PFX)util/keydoc/parser
-	@$(ANTLR)  -o $(GENERATED_SRC_PATH)$(PFX)util/keydoc/parser $<
-
-$(GENERATED_SRC_PATH)$(PFX)util/keydoc/parser/KeYDocParser.java \
-$(GENERATED_SRC_PATH)$(PFX)util/keydoc/parser/KeYDocParserTokenTypes.txt \
-$(GENERATED_SRC_PATH)$(PFX)util/keydoc/parser/KeYDocParserTokenTypes.java \
-	: $(PFX)util/keydoc/parser/KeYDocParser.g \
-	  $(GENERATED_SRC_PATH)$(PFX)util/keydoc/parser/KeYDocLexerTokenTypes.txt 
-	@echo [creating KeYDoc Parser]
-	@mkdir -p $(GENERATED_SRC_PATH)$(PFX)util/keydoc/parser
-	@$(ANTLR)  -glib $(PFX)util/keydoc/parser/KeYDocLexer.g -o $(GENERATED_SRC_PATH)$(PFX)util/keydoc/parser $<
-
-$(GENERATED_SRC_PATH)$(PFX)util/keydoc/parser/KeYDocTreeWalker.java \
-	: $(PFX)util/keydoc/parser/KeYDocTreeWalker.g \
-	  $(GENERATED_SRC_PATH)$(PFX)util/keydoc/parser/KeYDocParserTokenTypes.txt 
-	@echo [creating KeYDoc Treewalker]
-	@mkdir -p $(GENERATED_SRC_PATH)$(PFX)util/keydoc/parser
-	@$(ANTLR)  -glib $(PFX)util/keydoc/parser/KeYDocParser.g -o $(GENERATED_SRC_PATH)$(PFX)util/keydoc/parser $<
-
 
 
 $(BINARYPATH)$(PFX)util/make/MakefileReader.class:

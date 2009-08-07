@@ -542,74 +542,98 @@ options {
         }
     }  
 
-    public void parseVariables()
-        throws RecognitionException, TokenStreamException {
+    
+    public void parseSorts() throws RecognitionException, 
+    				    TokenStreamException {
+      resetSkips(); 
+      skipFuncs(); 
+      skipPreds(); 
+      skipRuleSets();
+      skipVars();
+      skipTaclets();
+      decls();
       resetSkips();
-      skipFuncs(); skipPreds(); skipSorts(); skipRuleSets();
+    }    
+
+    public void parseFunctions() throws RecognitionException, 
+    					TokenStreamException {
+      resetSkips();
+      skipSorts();      
+      skipPreds();      
+      skipRuleSets();
+      skipVars();
+      skipTaclets(); 
       decls();
       resetSkips();
     }
 
-    public void parseFunctions()
-        throws RecognitionException, TokenStreamException {
+    public void parsePredicates() throws RecognitionException, 
+    					 TokenStreamException {
       resetSkips();
-      skipVars(); skipPreds(); skipSorts(); skipRuleSets();
+      skipSorts();
+      skipFuncs();
+      skipRuleSets();
+      skipVars();
+      skipTaclets();
       decls();
       resetSkips();
     }
 
-    public void parsePredicates()
-        throws RecognitionException, TokenStreamException {
+    public void parseFuncAndPred() throws RecognitionException, 
+    					  TokenStreamException {
       resetSkips();
-      skipVars(); skipFuncs(); skipSorts(); skipRuleSets();
+      skipSorts(); 
+      skipRuleSets();
+      skipVars();
+      skipTaclets();  
+      decls();
+      resetSkips();
+    }    
+    
+    public void parseRuleSets() throws RecognitionException, 
+    				       TokenStreamException {
+      resetSkips();
+      skipSorts();      
+      skipFuncs(); 
+      skipPreds(); 
+      skipVars();
+      skipTaclets();
       decls();
       resetSkips();
     }
+    
+    public void parseVariables() throws RecognitionException, 
+                                        TokenStreamException {
+      resetSkips();
+      skipSorts();       
+      skipFuncs(); 
+      skipPreds(); 
+      skipRuleSets();      
+      skipTaclets();
+      decls();
+      resetSkips();
+    }  
 
-    public void parseSorts() 
-        throws RecognitionException, TokenStreamException {
+    public Term parseProblem() throws RecognitionException, 
+    				      TokenStreamException {
       resetSkips();
-      skipVars(); skipFuncs(); skipPreds(); skipRuleSets();
-      decls();
-      resetSkips();
-    }
-
-    public void parseRuleSets()
-        throws RecognitionException, TokenStreamException {
-      resetSkips();
-      skipVars(); skipFuncs(); skipPreds(); skipSorts();
-      decls();
-      resetSkips();
-    }
-
-    public void parseFuncAndPred()
-        throws RecognitionException, TokenStreamException {
-      resetSkips();
-      skipVars(); skipSorts(); skipRuleSets();
-      decls();
-      resetSkips();
-    }
-  
-    /** parses a problem but without reading the declarations of
-     * sorts, functions and predicates. These have to be given
-     * explicitly.
-     * the heuristics of the current problem file will be added 
-     */ 
-    public Term parseProblem() 
-        throws RecognitionException, TokenStreamException {
-      resetSkips();
-      skipSorts(); skipFuncs(); skipPreds(); skipTaclets();
+      skipSorts(); 
+      skipFuncs(); 
+      skipPreds();
+      skipRuleSets();
+      skipVars(); 
+      skipTaclets();
       return problem();
     }
 
-    public void parseIncludes()
-        throws RecognitionException, TokenStreamException {
+    public void parseIncludes() throws RecognitionException, 
+    				        TokenStreamException {
       parse_includes=true;
       problem();
     }
 
-    public void parseWith()
-        throws RecognitionException, TokenStreamException {
+    public void parseWith() throws RecognitionException, 
+    				   TokenStreamException {
       onlyWith=true;
       problem();
     }
@@ -707,7 +731,11 @@ options {
             if (unambigousAttributeName) {     
                 result = javaInfo.getAttribute(attributeName);
             } else if(inSchemaMode() && attributeName.equals("length")) {
-                result = javaInfo.getArrayLength();
+                try {
+                    result = javaInfo.getArrayLength();
+                } catch(Throwable e) {
+                    semanticError("Getting array length failed");
+                }
             } else {
                 if (inSchemaMode()) {
                     semanticError("Either undeclared schema variable '" + 
@@ -944,10 +972,21 @@ options {
      * If the sort is not found for the first time, the name is expanded with "java.lang." 
      * and the look up restarts
      */
-     private Sort lookupSort(String name) {        
+     private Sort lookupSort(String name) throws SemanticException {        
 	Sort result = (Sort) sorts().lookup(new Name(name));
 	if (result == null) {
-  	    result = (Sort) sorts().lookup(new Name("java.lang."+name));
+	    if(name.equals(NullSort.NAME.toString())) {
+	        Sort objectSort 
+	        	= (Sort) sorts().lookup(new Name("java.lang.Object"));
+	        if(objectSort == null) {
+	            semanticError("Null sort cannot be used before "
+	                          + "java.lang.Object is declared");
+	        }
+	        result = new NullSort(objectSort);
+	        sorts().add(result);
+	    } else {
+  	    	result = (Sort) sorts().lookup(new Name("java.lang."+name));
+  	    }
 	}
 	return result;
      }
@@ -962,7 +1001,7 @@ options {
      * for instance `f()'.
      */
     private Operator lookupVarfuncId(String varfunc_name, Term[] args) 
-        throws NotDeclException{
+        throws NotDeclException, SemanticException {
         // case 1: variable
         Operator v = (Operator) variables().lookup(new Name(varfunc_name));
         if (v != null && (args == null || (inSchemaMode() && v instanceof ModalOperatorSV))) {
@@ -1418,7 +1457,6 @@ sort_decls
 one_sort_decl returns [ListOfSort createdSorts = SLListOfSort.EMPTY_LIST] 
 {
     boolean isGenericSort = false;
-    boolean isSubSort = false;
     Sort[] sortExt=new Sort [0];
     Sort[] sortOneOf=new Sort [0];
     String firstSort;
@@ -1430,7 +1468,7 @@ one_sort_decl returns [ListOfSort createdSorts = SLListOfSort.EMPTY_LIST]
             ( EXTENDS sortExt = extends_sorts )?
         | firstSort = simple_ident_dots { sortIds = sortIds.prepend(firstSort); }
           (
-              (EXTENDS sortExt = extends_sorts {  isSubSort = true ; } ) 
+              (EXTENDS sortExt = extends_sorts ) 
             | ((COMMA) sortIds = simple_ident_comma_list { sortIds = sortIds.prepend(firstSort) ; } )
           )?
         ) SEMI {   
@@ -1460,15 +1498,14 @@ one_sort_decl returns [ListOfSort createdSorts = SLListOfSort.EMPTY_LIST]
                                 }
                             } else if (new Name("any").equals(sort_name)) {
                                 s = Sort.ANY;
-                            } else if (isSubSort) {
+                            } else  {
                                 SetOfSort  ext = SetAsListOfSort.EMPTY_SET;
 
-                                for ( int i = 0; i != sortExt.length; ++i )
-                                ext = ext.add ( sortExt[i] );
+                                for ( int i = 0; i != sortExt.length; ++i ) {
+                                    ext = ext.add ( sortExt[i] );
+                                }
 
                                 s = new SortImpl(sort_name, ext);
-                            } else {
-                                s = new SortImpl(sort_name);
                             }
                             assert s != null;
                             sorts().add ( s ); 
@@ -3960,6 +3997,7 @@ problem returns [ Term a = null ]
     SetOfChoice choices=SetAsListOfChoice.EMPTY_SET;
     Choice c = null;
     ListOfString stlist = null;
+    String st = null;
     String pref = null;
 }
     :
@@ -3969,12 +4007,8 @@ problem returns [ Term a = null ]
         { if ((pref!=null) && (capturer != null)) capturer.mark(); }
         
         stlist = classPaths 
-        // the result is not of importance here, so we use it twice
 
-        stlist = javaSource {
-          if(stlist != null && stlist.size() > 1)
-            Debug.fail("Don't know what to do with multiple java source entries.");
-	    }
+        st = javaSource
         decls
         { 
             if(parse_includes || onlyWith) return null;
@@ -4038,19 +4072,12 @@ classPaths returns [ListOfString ids = SLListOfString.EMPTY_LIST]
   )*
   ;
 
-javaSource returns [ListOfString ids = SLListOfString.EMPTY_LIST]
-{ 
-  String s = null;
-}
+javaSource returns [String result = null]
 :
-   (NOJAVAMODEL SEMI{ return null; } )
-   |
    (JAVASOURCE 
-      s = oneJavaSource { ids = ids.append(s); }
-      (COMMA s = oneJavaSource { ids = ids.append(s); })*
+      result = oneJavaSource
     SEMI)?
     ;
-
 
 
 oneJavaSource returns [String s = null]

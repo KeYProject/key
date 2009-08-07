@@ -90,7 +90,8 @@ public final class SortDependingFunction extends Function {
      */
     private static MatchConditions matchSorts(Sort s1, 
 	    			              Sort s2, 
-	    			              MatchConditions mc) {
+	    			              MatchConditions mc,
+	    			              Services services) {
         assert !(s2 instanceof GenericSort)
                : "Sort s2 is not allowed to be of type generic.";
         if (!(s1 instanceof GenericSort)) {
@@ -109,7 +110,8 @@ public final class SortDependingFunction extends Function {
                 return null;
             } else {
                 try {                   
-                    mc = mc.setInstantiations(mc.getInstantiations().add(c));
+                    mc = mc.setInstantiations(mc.getInstantiations()
+                	                        .add(c, services));
                 } catch(SortException e) {
                     Debug.out("FAILED. Sort mismatch.", s1, s2);
                     return null;
@@ -234,7 +236,8 @@ public final class SortDependingFunction extends Function {
         
         final MatchConditions result =  matchSorts(getSortDependingOn(), 
         		      	                   sdp.getSortDependingOn(), 
-        		      	                   mc);        
+        		      	                   mc,
+        		      	                   services);        
         if (result == null) {
             Debug.out("FAILED. Depending sorts not unifiable.", this, subst);
             return null;

@@ -71,7 +71,7 @@ public final class EqualUniqueCondition implements VariableCondition {
 	if(properPhiInst == null) {
 	    return null;
 	} else if(phiInst == null) {
-	    svInst = svInst.add(phi, properPhiInst);
+	    svInst = svInst.add(phi, properPhiInst, services);
 	    return mc.setInstantiations(svInst);
 	} else if(phiInst.equals(properPhiInst)) {
 	    return mc;

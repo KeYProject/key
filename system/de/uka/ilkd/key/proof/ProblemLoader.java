@@ -35,27 +35,27 @@ import de.uka.ilkd.key.util.KeYExceptionHandler;
 import de.uka.ilkd.key.util.ProgressMonitor;
 
 
-public class ProblemLoader implements Runnable {
+public final class ProblemLoader implements Runnable {
 
-    File file;
+    private File file;
     private IMain main;    
-    KeYMediator mediator;
+    private KeYMediator mediator;
 
-    Proof proof = null;
-    Iterator<Node> children = null;
+    private Proof proof = null;
+    private Iterator<Node> children = null;
 
-    Node currNode = null;
-    KeYExceptionHandler exceptionHandler = null;
-    Goal currGoal = null;
-    String currTacletName = null;
-    int currFormula = 0;
-    PosInTerm currPosInTerm = PosInTerm.TOP_LEVEL;
-    ContractWithInvs currContract = null;
-    Stack stack = new Stack();
-    LinkedList loadedInsts = null;
-    ListOfIfFormulaInstantiation ifFormulaList =
+    private Node currNode = null;
+    private KeYExceptionHandler exceptionHandler = null;
+    private Goal currGoal = null;
+    private String currTacletName = null;
+    private int currFormula = 0;
+    private PosInTerm currPosInTerm = PosInTerm.TOP_LEVEL;
+    private ContractWithInvs currContract = null;
+    private Stack stack = new Stack();
+    private LinkedList loadedInsts = null;
+    private ListOfIfFormulaInstantiation ifFormulaList =
         SLListOfIfFormulaInstantiation.EMPTY_LIST;
-    Constraint matchConstraint = null;
+    private Constraint matchConstraint = null;
 
 
     /* Proofs with meta variables have a special issue.
@@ -70,19 +70,15 @@ public class ProblemLoader implements Runnable {
     ProblemInitializer init;
     InitConfig iconfig;
 
-    /** if set, uses the current problem instance instead of a new one */
-    boolean keepProblem;
-
     private SwingWorker worker;
     private ProgressMonitor pm;
     private ProverTaskListener ptl;
     
-    public ProblemLoader(File file, IMain main, boolean keepProblem) {
+    public ProblemLoader(File file, IMain main) {
         this.main = main;
         this.mediator  = main.mediator();        
         this.file = file;
         this.exceptionHandler = mediator.getExceptionHandler();
-        this.keepProblem = keepProblem;
 
         addProgressMonitor(main.getProgressMonitor());
     }    
@@ -206,31 +202,31 @@ public class ProblemLoader implements Runnable {
 
    private Object doWork() {
        String status = "";
+       EnvInput envInput = null;
        ProofOblInput po = null;
        try{
            try{
-               if (!keepProblem) {
-        	   EnvInput envInput = createEnvInput(file);
-        	   init = new ProblemInitializer(main); 
-        	   InitConfig initConfig = init.prepare(envInput);
-        	   
-        	   if(envInput instanceof ProofOblInput
-                       && !(envInput instanceof KeYFile 
-                            && ((KeYFile) envInput).chooseContract())) {
-        	       po = (ProofOblInput) envInput;
-        	   } else {
-                       if(envInput instanceof KeYFile) {
-                           initConfig.setOriginalKeYFileName(envInput.name());
-                       }
-        	       POBrowser poBrowser = POBrowser.showInstance(initConfig);        	       
-        	       po = poBrowser.getAndClearPO();
-        	       if(po == null) {
-        		   return "Aborted.";
-        	       }
+               envInput = createEnvInput(file);
+               init = new ProblemInitializer(main); 
+               InitConfig initConfig = init.prepare(envInput);
+
+               if(envInput instanceof ProofOblInput
+        	       && !(envInput instanceof KeYFile 
+        		       && ((KeYFile) envInput).chooseContract())) {
+        	   po = (ProofOblInput) envInput;
+               } else {
+        	   if(envInput instanceof KeYFile) {
+        	       initConfig.setOriginalKeYFileName(envInput.name());
         	   }
-        	   
-        	   init.startProver(initConfig, po);
+        	   POBrowser poBrowser = POBrowser.showInstance(initConfig);        	       
+        	   po = poBrowser.getAndClearPO();
+        	   if(po == null) {
+        	       return "Aborted.";
+        	   }
                }
+
+               init.startProver(initConfig, po);
+
                proof = mediator.getSelectedProof();
                mediator.stopInterface(true); // first stop (above) is not enough
                // as there is no problem at that time
@@ -238,67 +234,20 @@ public class ProblemLoader implements Runnable {
                currNode = proof.root(); // initialize loader
                children = currNode.childrenIterator(); // --"--
                iconfig = proof.env().getInitConfig();
-               try {
-                   if (!keepProblem) {
-                       init.tryReadProof(this, po);
-                   } else {
-                       setStatusLine("Loading proof", (int)file.length());
-                       CountingBufferedInputStream cinp =
-                           new CountingBufferedInputStream(
-                                   new FileInputStream(file),
-                                   pm,
-                                   (int)file.length()/100);
-                       KeYLexer lexer = new KeYLexer(cinp,
-                               proof.getServices().getExceptionHandler());
-                       KeYParser parser = new KeYParser(ParserMode.PROBLEM, lexer, 
-                               proof.getServices());
-                       antlr.Token t;
-                       do { t = lexer.getSelector().nextToken();
-                       } while (t.getType() != KeYLexer.PROOF);
-                       parser.proofBody(this);
-                   }
-               } finally {
-                    if (constraints.size() > 0) {
-                        Term left, right;
-                        for (Iterator<PairOfString> it = constraints.iterator(); it
-                                .hasNext();) {
-                            PairOfString p = it.next();
-                            left = parseTerm(p.left, proof);
-                            right = parseTerm(p.right, proof);
-
-                            if (left == null || right == null) {
-                                continue;
-                            }
-
-                            if (!(left.sort().extendsTrans(right.sort()) || right
-                                    .sort().extendsTrans(left.sort()))) {
-                                continue;
-                            }
-
-                            if (!Constraint.BOTTOM.unify(left, right, null)
-                                    .isSatisfiable()) {
-                                continue;
-                            }
-
-                            proof.getUserConstraint().addEquality(left, right);
-                        }
-                    }
-               }
+               init.tryReadProof(this, po);
 	       setStandardStatusLine();
-           
-           // Inform the decproc classes that a new problem has been loaded
-           // This is done here because all benchmarks resulting from one loaded problem should be
-           // stored in the same directory
-           //DecisionProcedureSmtAuflia.fireNewProblemLoaded( file, proof );
            
 	   } catch (ExceptionHandlerException e) {
 	       throw e;
 	   } catch (Throwable thr) {
 	       exceptionHandler.reportException(thr);
                status =  thr.getMessage();
+               System.out.println("2");
 	   }
        } catch (ExceptionHandlerException ex){
-	       setStatusLine("Failed to load problem/proof");
+	       setStatusLine("Failed to load " 
+		             + (envInput == null 
+		        	 ? "problem/proof" : envInput.name()));
 	       status =  ex.toString();
        }
        finally {
@@ -317,7 +266,6 @@ public class ProblemLoader implements Runnable {
         proofSettings.loadSettingsFromString(preferences);
     }
 
-    private Vector<PairOfString> constraints = new Vector<PairOfString>();
 
     // note: Expressions without parameters only emit the endExpr signal
     public void beginExpr(char id, String s) {
@@ -408,14 +356,7 @@ public class ProblemLoader implements Runnable {
             }
             break;
         case 'o' : //userconstraint
-            final int i = s.indexOf('=');
-
-            if (i < 0) {
-                break;
-            }
-
-            constraints.add(new PairOfString(s.substring(0, i),
-                    s.substring(i + 1)));
+            assert false : "metavariables are disabled";
             break;
         case 'm' : //matchconstraint
             final int index = s.indexOf('=');
@@ -554,15 +495,19 @@ public class ProblemLoader implements Runnable {
         } else {
             ourApp = NoPosTacletApp.createNoPosTacletApp(t);
         }
+        Services services = mediator.getServices();
+        
 
         if (matchConstraint != Constraint.BOTTOM) {
-            ourApp = ourApp.setMatchConditions(new MatchConditions(ourApp
-                    .instantiations(), matchConstraint, ourApp
-                    .newMetavariables(), RenameTable.EMPTY_TABLE));
+            ourApp = ourApp.setMatchConditions(new MatchConditions(
+        	    ourApp.instantiations(), 
+        	    matchConstraint, 
+        	    ourApp.newMetavariables(), 
+        	    RenameTable.EMPTY_TABLE),
+        	    services);
         }
 
         Constraint userC = mediator.getUserConstraint().getConstraint();
-        Services services = mediator.getServices();
 
         if (currFormula != 0) { // otherwise we have no pos
             pos = PosInOccurrence.findInSequent(currGoal.sequent(),
@@ -579,7 +524,7 @@ public class ProblemLoader implements Runnable {
                 if (!c.isSatisfiable()) return null;
             }
             ourApp = ((NoPosTacletApp)ourApp).matchFind(pos, c, services, userC);
-            ourApp = ourApp.setPosInOccurrence(pos);
+            ourApp = ourApp.setPosInOccurrence(pos, services);
         }
 
 
@@ -588,7 +533,7 @@ public class ProblemLoader implements Runnable {
         ourApp = ourApp.setIfFormulaInstantiations(ifFormulaList,
                                                    services, userC);
 
-        if (!ourApp.sufficientlyComplete()) {
+        if (!ourApp.sufficientlyComplete(services)) {
             ourApp = ourApp.tryToInstantiate(proof.getServices());
         }
 

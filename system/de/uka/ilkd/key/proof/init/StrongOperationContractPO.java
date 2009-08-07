@@ -29,7 +29,7 @@ import de.uka.ilkd.key.speclang.SetOfClassInvariant;
 /**
  * The "StrongOperationContract" proof obligation.
  */
-public class StrongOperationContractPO extends AbstractPO {
+public final class StrongOperationContractPO extends AbstractPO {
     
     private final OperationContract contract;
     private final SetOfClassInvariant assumedInvs;
@@ -59,6 +59,7 @@ public class StrongOperationContractPO extends AbstractPO {
     //methods of ProofOblInput interface
     //-------------------------------------------------------------------------     
     
+    @Override
     public void readProblem() throws ProofInputException {
         //prepare variables and container for @pre-functions
         ProgramMethod programMethod     = contract.getProgramMethod();

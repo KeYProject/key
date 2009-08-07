@@ -16,7 +16,6 @@ import java.util.Set;
 
 import de.uka.ilkd.key.java.abstraction.*;
 import de.uka.ilkd.key.java.declaration.*;
-import de.uka.ilkd.key.java.expression.literal.NullLiteral;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.reference.TypeRef;
 import de.uka.ilkd.key.java.reference.TypeReference;
@@ -108,12 +107,7 @@ public class JavaInfo {
      * valid execution context.
      */
     private ExecutionContext defaultExecutionContext;
-                
 
-    /**
-     * a term with the constant 'null'
-     */
-    private Term nullConst=null;
     private boolean commonTypesCacheValid;
     
     /** caches the arrays' length attribute*/
@@ -135,7 +129,6 @@ public class JavaInfo {
     private JavaInfo(JavaInfo proto, Services s) {
 	this ( proto.getKeYProgModelInfo().copy(), s );
 	nullType  = proto.getNullType();
-	nullConst = proto.getNullConst();
     }
 
     /**
@@ -807,14 +800,6 @@ public class JavaInfo {
     }
 
     /**
-     * returns a term representing 'null' in logic
-     */
-    public Term getNullTerm() {
-        return getTypeConverter().convertToLogicElement(NullLiteral.NULL);
-    }
-
-
-    /**
      * retrieves a field with the given name out of the list
      * @param programName a String with the name of the field to be looked for
      * @param fields the ListOfField where we have to look for the field
@@ -1080,6 +1065,10 @@ public class JavaInfo {
         return getJavaIoSerializable().getSort();        
     }
     
+    public Sort nullSort() {
+	return getNullType().getSort();
+    }
+    
     /**
      * tests if sort represents java.lang.Object, java.lang.Cloneable or 
      * java.io.Serializable
@@ -1128,17 +1117,7 @@ public class JavaInfo {
         return defaultExecutionContext;
     }
     
-    
-    /**
-     * returns a term representing the null constant in logic
-     */
-    public Term getNullConst() {
-	if (nullConst==null) {
-	    nullConst=TermBuilder.DF.func(Function.NULL);
-	}
-	return nullConst;
-    }
-    
+
     /**
      * returns all proper subtypes of a given type
      * @param type the KeYJavaType whose subtypes are returned

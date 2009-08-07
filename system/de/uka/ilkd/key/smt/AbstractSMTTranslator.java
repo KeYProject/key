@@ -1145,7 +1145,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 	    return this.translateLogicalTrue();
 	} else if (op == Junctor.FALSE) {
 	    return this.translateLogicalFalse();
-	} else if (op == Function.NULL) {
+	} else if (op == services.getTypeConverter().getHeapLDT().getNull()) {
 	    this.nullString = this.translateNull();
 	    this.nullUsed = true;
 	    return this.nullString;

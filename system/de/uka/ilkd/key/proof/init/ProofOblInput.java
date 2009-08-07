@@ -25,9 +25,7 @@ public interface ProofOblInput {
      * Returns the name of the proof obligation input.
      */
     String name();
-    
-    boolean askUserForEnvironment();
-    
+        
     void readActivatedChoices() throws ProofInputException;
 
     void readProblem() throws ProofInputException;

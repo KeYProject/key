@@ -194,38 +194,6 @@ public class ProofEnvironment {
 	}
     }
 
-    public String getPureDiff(ProofEnvironment pe) {
-	CvsRunner cvs = new CvsRunner();
-	String diff="";
-	if (!getJavaModel().isEmpty()) {
-	    try{
-		diff = cvs.cvsDiff(getJavaModel().getCVSModule(),
-				   pe.getJavaModel().getModelTag(), 
-				   getJavaModel().getModelTag());
-	    } catch(CvsException cvse) {
-		mgtLogger.error("Diffing models in CVS failed: "+cvse);
-	    }
-	}
-	return diff;
-    }
-
-    public String getRuleDiff(ProofEnvironment pe) {
-	return "Rules: \n    Earlier: " +pe.getRuleConfig().description()
-	    +"\n    Now: "+getRuleConfig().description();
-    }
-
-    public String getDiffUserInfo(ProofEnvironment pe) {
-	String base = "Comparing "+description()+" with "+pe.description()+":\n";
-	if (getJavaModel() != JavaModel.NO_MODEL && 
-	    !getJavaModel().getModelDir().equals
-	    (pe.getJavaModel().getModelDir())) {
-	    return base+"No Diff for different model directories: \n"
-		+getJavaModel().getModelDir()+" \n and "
-		+pe.getJavaModel().getModelDir();
-	}
-	return base+getPureDiff(pe) +"\n"+ getRuleDiff(pe);
-    }
-
     /** sets a number that distinguishes two proof environments
      * with equal java model and rule config from the user perspective
      */

@@ -338,7 +338,9 @@ public class TestApplyTaclet extends TestCase{
 	assertTrue("Too many or zero rule applications.",rApplist.size()==1);
 	TacletApp rApp=rApplist.head().addInstantiation
 	    ((SchemaVariable)TacletForTests.getVariables().lookup(new Name("b")), 
-             t_c, false);
+             t_c, 
+             false,
+             proof[0].getServices());
 	assertTrue("Rule App should be complete", rApp.complete());
  	ListOfGoal goals=rApp.execute(goal, TacletForTests.services());
  	assertTrue("Too many or too few goals.",goals.size()==2);	
@@ -462,6 +464,7 @@ public class TestApplyTaclet extends TestCase{
 	assertTrue("TacletApp should not be complete, as SVs are not instantiated",
 		   !orright.complete());
 
+	Services services = TacletForTests.services();
 	SchemaVariable b=(SchemaVariable)
 	    TacletForTests.getVariables().lookup(new Name("b"));
 	SchemaVariable c=(SchemaVariable)
@@ -469,17 +472,18 @@ public class TestApplyTaclet extends TestCase{
 	assertTrue("b and c should be in the set of not instantiated SVs",
 		   orright.uninstantiatedVars()
 		   .equals(SetAsListOfSchemaVariable.EMPTY_SET.add(b).add(c)));
-	orright=orright.addInstantiation(b,TacletForTests.parseTerm("A"), false);
+	orright=orright.addInstantiation(b,TacletForTests.parseTerm("A"), false, services);
 	assertTrue("TacletApp should not be complete, as B is not instantiated",
 		   !orright.complete());
-	orright=orright.addInstantiation(c,TacletForTests.parseTerm("B"), false);
+	orright=orright.addInstantiation(c,TacletForTests.parseTerm("B"), false, services);
 	assertTrue("TacletApp should not be complete, as Position unknown",
 		   !orright.complete());
 	Sequent seq=proof[0].root().sequent();
 	orright=orright.setPosInOccurrence
 	    (new PosInOccurrence(seq.succedent().get(0),
 				 PosInTerm.TOP_LEVEL,
-				 false));
+				 false),
+				 services);
 	assertTrue("TacletApp should now be complete with Position set and SVs "
 		   +"instantiated",
 		   orright.complete());

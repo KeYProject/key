@@ -31,7 +31,7 @@ public class TacletRequiringInstantiationFeature extends BinaryTacletAppFeature 
     }
     
     protected boolean filter(TacletApp app, PosInOccurrence pos, Goal goal) {
-        final SetOfSchemaVariable neededVars = app.neededUninstantiatedVars ();
+        final SetOfSchemaVariable neededVars = app.neededUninstantiatedVars (goal.proof().getServices());
         final SetOfSchemaVariable ifFindVars = app.taclet ().getIfFindVariables ();
         final IteratorOfSchemaVariable it = neededVars.iterator ();
         while ( it.hasNext () ) {

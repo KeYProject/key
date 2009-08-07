@@ -199,7 +199,7 @@ public class ApplyTacletDialogModel {
 	    e.getCause().getMessage();
 	}
        	
-	if ( rapp.sufficientlyComplete () )
+	if ( rapp.sufficientlyComplete (services) )
 	    return "Instantiation is OK.";
 	else
 	    return "Instantiations are incomplete."; 
@@ -232,7 +232,7 @@ public class ApplyTacletDialogModel {
      *
      */
     public void prepareUnmatchedInstantiation() {
-	app = app.prepareUserInstantiation();	
+	app = app.prepareUserInstantiation(services);	
     }
 
     public Namespace programVariables() {

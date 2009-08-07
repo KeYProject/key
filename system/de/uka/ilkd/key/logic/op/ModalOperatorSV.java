@@ -50,7 +50,7 @@ public final class ModalOperatorSV extends AbstractSV  {
         if(modalities.contains(m)) {
             Operator o = (Operator) mc.getInstantiations().getInstantiation(this);
             if(o == null) {
-                return mc.setInstantiations(mc.getInstantiations().add(this, m));
+                return mc.setInstantiations(mc.getInstantiations().add(this, m, services));
             } else if(o != m) {
         	Debug.out("FAILED. Already instantiated with a different operator.");
         	return null;

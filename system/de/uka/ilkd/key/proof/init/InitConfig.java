@@ -5,30 +5,18 @@
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License.
-// See LICENSE.TXT for details.
-//
-//
+
 package de.uka.ilkd.key.proof.init;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.NoSuchElementException;
 
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.sort.GenericSort;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.BuiltInRuleIndex;
-import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.TacletIndex;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.rule.*;
@@ -95,18 +83,12 @@ public class InitConfig {
 	this.services  = services;
 	this.profile   = profile; 
 	this.env       = new ProofEnvironment(this);
-	
-        sortNS().add(Sort.NULL);
-        funcNS().add(Function.NULL);
-        category2DefaultChoice = ProofSettings.DEFAULT_SETTINGS.
-            getChoiceSettings().getDefaultChoices();
+		
+        category2DefaultChoice = ProofSettings.DEFAULT_SETTINGS
+                                              .getChoiceSettings()
+        	                              .getDefaultChoices();
     }
 
-    
-    public InitConfig() {
-        this(new Services(), null);
-    }
-    
            
     //-------------------------------------------------------------------------
     //internal methods
@@ -374,9 +356,7 @@ public class InitConfig {
     }
 
     
-    /**
-     * toString
-     */
+
     public String toString() {
         return
             "Namespaces:" + namespaces() +"\n" +

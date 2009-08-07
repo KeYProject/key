@@ -116,7 +116,7 @@ public final class OneStepSimplifier implements BuiltInRule {
 		                                  services, 
 		                                  Constraint.BOTTOM);
 	    if(app != null) {
-		app = app.setPosInOccurrence(pos);
+		app = app.setPosInOccurrence(pos, services);
 		if(!app.complete()) {
 		    app = app.tryToInstantiate(services);
 		}

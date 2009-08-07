@@ -646,7 +646,7 @@ public final class TermBuilder {
     //-------------------------------------------------------------------------
     
     public Term NULL(Services services) {
-        return services.getJavaInfo().getNullTerm();
+        return func(services.getTypeConverter().getHeapLDT().getNull());
     }
 
     

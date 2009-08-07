@@ -12,6 +12,7 @@ package de.uka.ilkd.key.logic.op;
 import de.uka.ilkd.key.logic.ArrayOfTerm;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.sort.NullSort;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.logic.sort.SetOfSort;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -38,7 +39,7 @@ public final class IfThenElse extends AbstractOperator {
             return s2;
         } else if(s2.extendsTrans(s1)) {
             return s1;
-        } else if(s1 == Sort.NULL || s2 == Sort.NULL) {
+        } else if(s1 instanceof NullSort || s2 instanceof NullSort) {
             return Sort.ANY;
         } else {
             Sort result = Sort.ANY;

@@ -87,9 +87,9 @@ public final class JavaTypeToSortCondition implements VariableCondition {
             type = expr.getKeYJavaType ( services, inst.getExecutionContext () ).getSort();
         }
         try {
-            return matchCond.setInstantiations ( inst.add
-                ( GenericSortCondition.createIdentityCondition
-                                                  ( sort, type ) ) );
+            return matchCond.setInstantiations ( inst.add( 
+        	    GenericSortCondition.createIdentityCondition(sort, type),
+        	    services) );
         } catch ( SortException e ) {
             return null;
         }        

@@ -296,7 +296,7 @@ x     * @return the updated match conditions including mapping
 	    }
 	}
 
-	insts = insts.add(this, pe);
+	insts = insts.add(this, pe, services);
 	return insts == null ? null : matchCond.setInstantiations(insts);
     }
 
@@ -329,7 +329,7 @@ x     * @return the updated match conditions including mapping
 	    }
 	}
 
-        insts = insts.add(this, list);
+        insts = insts.add(this, list, services);
         return insts == null ? null : matchCond.setInstantiations(insts);
     }
     

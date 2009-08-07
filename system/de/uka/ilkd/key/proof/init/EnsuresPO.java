@@ -317,6 +317,7 @@ public abstract class EnsuresPO extends AbstractPO {
     //public interface
     //-------------------------------------------------------------------------        
     
+    @Override
     public void readProblem() throws ProofInputException {
         //prepare variables, program method and container for @pre-functions
         ListOfProgramVariable paramVars = buildParamVars(programMethod);
@@ -379,6 +380,7 @@ public abstract class EnsuresPO extends AbstractPO {
     }
     
     
+    @Override
     public boolean equals(Object o) {
         if(!(o instanceof EnsuresPO)) {
             return false;
@@ -390,6 +392,7 @@ public abstract class EnsuresPO extends AbstractPO {
     }
     
     
+    @Override
     public int hashCode() {
         return programMethod.hashCode() 
                + modality.hashCode() 

@@ -181,7 +181,7 @@ public abstract class TacletAppContainer extends RuleAppContainer {
                                                 ListOfRuleAppContainer targetList,
                                                 Goal p_goal,
                                                 RuleAppCost cost) {
-        if ( !sufficientlyCompleteApp ( app ) ) return targetList;
+        if ( !sufficientlyCompleteApp ( app, p_goal.proof().getServices() ) ) return targetList;
         return targetList.prepend ( TacletAppContainer
                                     .createContainer ( app,
                                                        getPosInOccurrence ( p_goal ),
@@ -190,8 +190,8 @@ public abstract class TacletAppContainer extends RuleAppContainer {
                                                        false ) );
     }
 
-    private boolean sufficientlyCompleteApp(TacletApp app) {
-        final SetOfSchemaVariable needed = app.neededUninstantiatedVars ();
+    private boolean sufficientlyCompleteApp(TacletApp app, Services services) {
+        final SetOfSchemaVariable needed = app.neededUninstantiatedVars (services);
         if ( needed.size () == 0 ) return true;
         final IteratorOfSchemaVariable it = needed.iterator ();
         while ( it.hasNext () ) {
@@ -308,7 +308,7 @@ public abstract class TacletAppContainer extends RuleAppContainer {
         if ( !strategy.isApprovedApp(app, pio, p_goal) ) return null;
     
         if ( pio != null ) {
-            app = app.setPosInOccurrence ( pio );
+            app = app.setPosInOccurrence ( pio, p_goal.proof().getServices() );
             if ( app == null ) return null;
         }
     
@@ -583,9 +583,13 @@ public abstract class TacletAppContainer extends RuleAppContainer {
         }
 
         private NoPosTacletApp setAllInstantiations ( MatchConditions p_matchCond, ListOfIfFormulaInstantiation p_alreadyMatched ) {
-            return NoPosTacletApp.createNoPosTacletApp(getTaclet(),
-                    p_matchCond.getInstantiations(), p_matchCond.getConstraint(),
-                    p_matchCond.getNewMetavariables(), p_alreadyMatched);
+            return NoPosTacletApp.createNoPosTacletApp(
+        	    getTaclet(),
+                    p_matchCond.getInstantiations(), 
+                    p_matchCond.getConstraint(),
+                    p_matchCond.getNewMetavariables(), 
+                    p_alreadyMatched,
+                    getServices());
         }
 
         private ListOfConstrainedFormula createSemisequentList ( Semisequent p_ss ) {

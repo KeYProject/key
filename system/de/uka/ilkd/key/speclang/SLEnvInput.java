@@ -48,6 +48,17 @@ public class SLEnvInput extends AbstractEnvInput {
     //constructors
     //-------------------------------------------------------------------------
     
+    public SLEnvInput(String javaPath) {
+        super(getLanguage() + " specifications", javaPath);
+        assert javaPath != null;
+    }
+    
+
+    
+    //-------------------------------------------------------------------------
+    //internal methods
+    //-------------------------------------------------------------------------
+    
     private static String getLanguage() {
         GeneralSettings gs 
             = ProofSettings.DEFAULT_SETTINGS.getGeneralSettings();
@@ -60,19 +71,7 @@ public class SLEnvInput extends AbstractEnvInput {
         } else {
             return "no";
         }
-    }
-    
-    
-    public SLEnvInput(String javaPath) {
-        super(getLanguage() + " specifications", javaPath);
-        assert javaPath != null;
-    }
-    
-
-    
-    //-------------------------------------------------------------------------
-    //internal methods
-    //-------------------------------------------------------------------------
+    }    
     
     private KeYJavaType[] sortKJTs(KeYJavaType[] kjts) {
         
