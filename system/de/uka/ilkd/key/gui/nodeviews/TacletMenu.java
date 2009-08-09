@@ -31,6 +31,8 @@ import de.uka.ilkd.key.pp.AbbrevException;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.rule.*;
+import de.uka.ilkd.key.smt.DecProcRunner;
+import de.uka.ilkd.key.smt.SMTRule;
 
 /**
  *  This class creates a menu with Taclets as entries. The invoker has
@@ -343,9 +345,16 @@ class TacletMenu extends JMenu {
 		    .selectedTaclet(((TacletMenuItem) e.getSource()).connectedTo(), 
 				    pos);
             } else if (e.getSource() instanceof BuiltInRuleMenuItem) {
+        	if (((BuiltInRuleMenuItem) e.getSource()).connectedTo() instanceof SMTRule) {
+        	    new DecProcRunner(Main.getInstance()
+        		, Main.getInstance().mediator().getProof()
+        		, Main.getInstance().mediator().getProof().getUserConstraint().getConstraint()
+        		, ((BuiltInRuleMenuItem) e.getSource()).connectedTo()).start();
+        	} else {
                         mediator.selectedBuiltInRule
                     (((BuiltInRuleMenuItem) e.getSource()).connectedTo(), 
                      pos.getPosInOccurrence());
+        	}
 	    } else if (e.getSource() instanceof FocussedRuleApplicationMenuItem) {
 	        mediator.getInteractiveProver ()
 	            .startFocussedAutoMode ( pos.getPosInOccurrence (),
