@@ -16,7 +16,6 @@ public class SortHierarchy {
 
     private HashMap<Sort, StringBuffer> predicateMap;
 
-    private HashMap<Sort, ArrayList<Sort>> directSuperSortList;
 
     /**
      * Create a Sort Hierarchy.
@@ -27,7 +26,6 @@ public class SortHierarchy {
 	    HashMap<Sort, StringBuffer> prednames) {
 	this.sortMap = sortnames;
 	this.predicateMap = prednames;
-	this.directSuperSortList = this.getDirectSuperSorts();
     }
 
     /**
@@ -50,7 +48,7 @@ public class SortHierarchy {
 	HashMap<Sort, ArrayList<Sort>> supersortList = new HashMap<Sort, ArrayList<Sort>>();
 
 	for (Sort s : sortMap.keySet()) {
-	    //                      get all sorts, that are supersort of s
+	    //get all sorts, that are supersort of s
 	    ArrayList<Sort> extended = new ArrayList<Sort>();
 	    for (Sort t : sortMap.keySet()) {
 		if (s != t && s.extendsTrans(t)) {
@@ -58,35 +56,6 @@ public class SortHierarchy {
 		}
 	    }
 	    supersortList.put(s, extended);
-	    /*                        for (Sort t : s.extendsSorts()) {
-	     extended.add(t);
-	     }
-	     if (s.extendsSorts().size() > 0) {
-	     
-	     //remove all sorts, that are not direct super sort
-	     for (int i = 0; i < extended.size(); ) {
-	     Sort toBeChecked1 = extended.get(i);
-	     boolean isExtended = false;
-	     for (int j = i; j < extended.size() && !isExtended; ) {
-	     Sort toBeChecked2 = extended.get(j);
-	     if (toBeChecked1.extendsTrans(toBeChecked2)) {
-	     //toBeChecked2 is supersort of toBeChecked1
-	     extended.remove(j);
-	     } else if (toBeChecked2.extendsTrans(toBeChecked1)) {
-	     isExtended = true;
-	     } else {
-	     j++;
-	     }
-	     
-	     }
-	     if (isExtended) {
-	     extended.remove(i);
-	     } else {
-	     i++;
-	     }
-	     }
-	     }*/
-
 	}
 
 	//remove sorts from toReturn, that are extended by another sort in toReturn

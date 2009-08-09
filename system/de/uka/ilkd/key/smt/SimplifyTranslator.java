@@ -206,7 +206,7 @@ public class SimplifyTranslator extends AbstractSMTTranslator {
 	
 	
 	/* CAUTION!! For some reason, the solver gives the correct result,
-	 * if this part is added. The reason, why this is, is not clear ro me yet!
+	 * if this part is added. The reason, why this is, is not clear to me yet!
 	 */
 	StringBuffer temp = new StringBuffer ();
 	temp.append("(").append(ALLSTRING).append(" () (").append(EXISTSTRING)
@@ -477,7 +477,7 @@ public class SimplifyTranslator extends AbstractSMTTranslator {
     }
     
     private StringBuffer removeIllegalChars(StringBuffer template, ArrayList<String> toReplace, ArrayList<String> replacement) {
-//	replace one String
+	//replace one String
 	for (int i = 0; i < toReplace.size(); i++) {
 	    String toRep = toReplace.get(i);
 	    String replace = replacement.get(i);

@@ -71,7 +71,6 @@ public class DecProcRunner extends SwingWorker {
          * the worker is interrupted because we catch the
          * InterruptedException in doWork().
          */
-        //main.mediator().stopInterface(true);
         Object res = construct();
         finished(res);
     }
@@ -192,7 +191,6 @@ public class DecProcRunner extends SwingWorker {
                     }
                 } catch (ExceptionHandlerException ex){
                     main.setStatusLine("Running external decision procedure failed");
-                    //status =  ex.toString();
                 } finally {
                     if (il != null) {
                 	mediator.removeInterruptListener(il);
