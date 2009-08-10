@@ -275,11 +275,11 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
      */
     public final StringBuffer translate(Term t, Services services) 
     		throws IllegalArgumentException {
-	//check, if the term is of type formula. otherwise a translation does not make sense
+	//check, if the term is of type formula. Otherwise a translation does not make sense
 	if (t.sort() != Sort.FORMULA) {
 	    throw new IllegalArgumentException("The given Term is not Type of Formula");
 	}
-//	 translate
+	 //translate
 	try {
 	    StringBuffer form;
 	    form = translateTerm(t, new Vector<QuantifiableVariable>(), services);
@@ -459,11 +459,6 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 
 	return toReturn;
     }
-
-    
-    /*protected static final int PREDICATE_FORMULA = 0;
-    protected static final int PREDICATE_TYPE = 1;
-    */
     
     /**
      * Build the translated predicate declarations. Each element in the
@@ -473,12 +468,6 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
      */
     private ArrayList<ArrayList<StringBuffer>> buildTranslatedPredDecls(ArrayList<ContextualBlock> predicateTypes) {
 	ArrayList<ArrayList<StringBuffer>> toReturn = new ArrayList<ArrayList<StringBuffer>>();
-	
-	
-	    
-	   
-	    
-	    
 	
 	int start = toReturn.size();
 	// add the predicates
@@ -492,10 +481,8 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 	    toReturn.add(element);
 	}
 	
-	
         predicateTypes.add(new ContextualBlock(start,toReturn.size()-1,ContextualBlock.PREDICATE_FORMULA));
 	
-
 	// add the typePredicates
         
         start = toReturn.size();
@@ -574,11 +561,6 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 	    ArrayList<ArrayList<StringBuffer>> predicates,
 	    ArrayList<ContextualBlock> predicateBlocks,
 	    ArrayList<StringBuffer> types, SortHierarchy sortHierarchy);
-
-   /* protected final StringBuffer translate(Semisequent ss, SMTTranslator.TERMPOSITION skolemization,
-	    Services services) throws IllegalFormulaException {
-	return translate(ss, skolemization, false, services);
-    }*/
 
     /**
      * Translates the given Semisequent into "Simplify" input syntax and
@@ -830,10 +812,9 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
      */
     protected StringBuffer translateIntegerPlus(StringBuffer arg1,
 	    StringBuffer arg2) throws IllegalFormulaException {
-	if (true) {
-	    throw new IllegalFormulaException("Integer addition is not supported by this translator.");
-	}
-	return new StringBuffer();
+
+	throw new IllegalFormulaException("Integer addition is not supported by this translator.");
+
     }
 
     /**
@@ -847,10 +828,9 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
      */
     protected StringBuffer translateIntegerMinus(StringBuffer arg1,
 	    StringBuffer arg2) throws IllegalFormulaException {
-	if (true) {
-	    throw new IllegalFormulaException("Integer subtraction is not supported by this translator.");
-	}
-	return new StringBuffer();
+	
+	throw new IllegalFormulaException("Integer subtraction is not supported by this translator.");
+
     }
 
     /**
@@ -862,10 +842,9 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
      */
     protected StringBuffer translateIntegerUnaryMinus(StringBuffer arg) 
     	throws IllegalFormulaException {
-	if (true) {
-	    throw new IllegalFormulaException("negative numbers are not supported by this translator.");
-	}
-	return new StringBuffer();
+	
+	throw new IllegalFormulaException("negative numbers are not supported by this translator.");
+
     }
 
     /**
@@ -879,10 +858,9 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
      */
     protected StringBuffer translateIntegerMult(StringBuffer arg1,
 	    StringBuffer arg2) throws IllegalFormulaException {
-	if (true) {
-	    throw new IllegalFormulaException("Integer multiplication is not supported by this translator.");
-	}
-	return new StringBuffer();
+
+	throw new IllegalFormulaException("Integer multiplication is not supported by this translator.");
+
     }
 
     /**
@@ -897,10 +875,9 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
      */
     protected StringBuffer translateIntegerDiv(StringBuffer arg1,
 	    StringBuffer arg2) throws IllegalFormulaException {
-	if (true) {
-	    throw new IllegalFormulaException("Integer division is not supported by this translator.");
-	}
-	return new StringBuffer();
+
+	throw new IllegalFormulaException("Integer division is not supported by this translator.");
+
     }
 
     /**
@@ -915,10 +892,9 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
      */
     protected StringBuffer translateIntegerMod(StringBuffer arg1,
 	    StringBuffer arg2) throws IllegalFormulaException {
-	if (true) {
-	    throw new IllegalFormulaException("Integer modulo is not supported by this translator.");
-	}
-	return new StringBuffer();
+
+	throw new IllegalFormulaException("Integer modulo is not supported by this translator.");
+
     }
 
     /**
@@ -933,10 +909,9 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
      */
     protected StringBuffer translateIntegerGt(StringBuffer arg1,
 	    StringBuffer arg2) throws IllegalFormulaException {
-	if (true) {
-	    throw new IllegalFormulaException("Integer greater is not supported by this translator.");
-	}
-	return new StringBuffer();
+	    
+	throw new IllegalFormulaException("Integer greater is not supported by this translator.");
+
     }
 
     /**
@@ -951,10 +926,9 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
      */
     protected StringBuffer translateIntegerLt(StringBuffer arg1,
 	    StringBuffer arg2) throws IllegalFormulaException {
-	if (true) {
-	    throw new IllegalFormulaException("Integer less is not supported by this translator.");
-	}
-	return new StringBuffer();
+
+	throw new IllegalFormulaException("Integer less is not supported by this translator.");
+
     }
 
     /**
@@ -969,10 +943,9 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
      */
     protected StringBuffer translateIntegerGeq(StringBuffer arg1,
 	    StringBuffer arg2) throws IllegalFormulaException {
-	if (true) {
-	    throw new IllegalFormulaException("Integer greater or equal is not supported by this translator.");
-	}
-	return new StringBuffer();
+
+	throw new IllegalFormulaException("Integer greater or equal is not supported by this translator.");
+
     }
 
     /**
@@ -987,10 +960,9 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
      */
     protected StringBuffer translateIntegerLeq(StringBuffer arg1,
 	    StringBuffer arg2) throws IllegalFormulaException {
-	if (true) {
-	    throw new IllegalFormulaException("Integer less or equal is not supported by this translator.");
-	}
-	return new StringBuffer();
+	    
+	throw new IllegalFormulaException("Integer less or equal is not supported by this translator.");
+
     }
 
     /**
@@ -1029,10 +1001,9 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
      * @return the sorts name
      */
     protected StringBuffer translateIntegerValue(long val) throws IllegalFormulaException {
-	if (true) {
-	    throw new IllegalFormulaException("Integer numbers are not supported by this translator.");
-	}
-	return new StringBuffer();
+
+	throw new IllegalFormulaException("Integer numbers are not supported by this translator.");
+
     }
 
     /**
@@ -1059,15 +1030,14 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
      */
     protected StringBuffer translateTermIfThenElse (StringBuffer cond, StringBuffer ifterm, StringBuffer elseterm) 
     	throws IllegalFormulaException {
-	if (true) {
-	    throw new IllegalFormulaException("The if then else construct for terms is not supported");
-	}
-	return new StringBuffer();
+
+	throw new IllegalFormulaException("The if then else construct for terms is not supported");
+
     }
     
     private final StringBuffer translateTermIte (Term iteTerm, Vector<QuantifiableVariable> quantifiedVars,
 	    Services services) throws IllegalFormulaException {
-	//Assert(iteTerm.op() == Op.IF_THEN_ELSE);
+
 	StringBuffer cond = translateTerm(iteTerm.sub(0), quantifiedVars, services);
 	StringBuffer ifterm = translateTerm(iteTerm.sub(1), quantifiedVars, services);
 	StringBuffer elseterm = translateTerm(iteTerm.sub(2), quantifiedVars, services);
@@ -1161,10 +1131,6 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 	    } else {
 		//a term if then else was used
 		return this.translateTermIte(term, quantifiedVars, services);
-		//StringBuffer cond = translateTerm(term.sub(0), quantifiedVars, services);
-		//StringBuffer ifterm = translateTerm(term.sub(1), quantifiedVars, services);
-		//StringBuffer elseterm = translateTerm(term.sub(2), quantifiedVars, services);
-		//return translateTermIfThenElse(cond, ifterm, elseterm);
 	    }
 	} else if (op == Op.ALL) {
 	    ArrayOfQuantifiableVariable vars = term.varsBoundHere(0);
@@ -1305,9 +1271,9 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 			    services);
 		    StringBuffer arg2 = translateTerm(term.sub(1), quantifiedVars,
 			    services);
-//		    //add the function to the used ones
+		    //add the function to the used ones
 		    this.addSpecialFunction(fun);
-//		    //return the final translation
+		    //return the final translation
 		    return this.translateIntegerMinus(arg1, arg2);
 		} else if (fun == services.getTypeConverter().getIntegerLDT()
 			.getNeg()) {
@@ -1320,9 +1286,9 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 			    services);
 		    StringBuffer arg2 = translateTerm(term.sub(1), quantifiedVars,
 			    services);
-//		  add the function to the used ones
+		  //add the function to the used ones
 		    this.addSpecialFunction(fun);
-//		    //return the final translation
+		    //return the final translation
 		    return this.translateIntegerMult(arg1, arg2);
 		} else if (fun == services.getTypeConverter().getIntegerLDT()
 			.getDiv()) {
@@ -1330,9 +1296,9 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 			    services);
 		    StringBuffer arg2 = translateTerm(term.sub(1), quantifiedVars,
 			    services);
-//		  add the function to the used ones
+		  //add the function to the used ones
 		    this.addSpecialFunction(fun);
-//		    //return the final translation
+		    //return the final translation
 		    return this.translateIntegerDiv(arg1, arg2);
 		} else if (fun == services.getTypeConverter().getIntegerLDT()
 			.getNumberSymbol()) {
@@ -1405,9 +1371,6 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 	    //it has to be valid with an uninterpreted.
 	    //Caution: Counterexamples might be affected by this.
 	    return translateUnknown(term, quantifiedVars, services);
-	    //System.out.println("Found term: " + term.getClass());
-	    //System.out.println("Found op: " + term.op().getClass());
-	    //throw new IllegalFormulaException("unknown term found");
 	}
     }
     
@@ -1423,28 +1386,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 	    Services services) throws IllegalFormulaException{
 	//check, if the modality was already translated.
 	for (Term toMatch : modalityPredicates.keySet()) {
-	    //if (checkTermsEquality(t, toMatch, services)) {
-	    if (toMatch.equalsModRenaming(t)) {
-	    //if (checkTermsEquality(t, toMatch, services) && checkTermsEquality(toMatch, t, services)) {
-		//t and toMatch are equal, so return the predicate translated for toMatch
-//		Function fun = modalityPredicates.get(toMatch);
-//		TermFactory tf = new TermFactory();
-		//Build one term for each free variable in t
-//		QuantifiableVariable[] args = t.freeVars().toArray();
-//		Term[] subs = new Term[args.length];
-//		for (int i = 0; i < args.length; i++) {
-//		    QuantifiableVariable qv = args[i];
-//		    if (qv instanceof LogicVariable) {
-//			subs[i] = tf.createVariableTerm((LogicVariable)qv);
-//		    } else {
-//			logger.error("Schema variable found in formula.");
-//		    }
-//		}
-		
-		//Build the final predicate
-//		Term temp = tf.createFunctionTerm(fun, subs);
-//		StringBuffer s = this.translateTerm(temp, quantifiedVars, services);
-		
+	    if (toMatch.equalsModRenaming(t)) {		
 		return modalityPredicates.get(toMatch);
 	    }
 	}
@@ -1480,46 +1422,6 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 	    
 	return cstr;
 	
-    }
-
-    
-    /**
-     * This method returns true, if t1 and t2 are equal.
-     * CAUTION! Only tested for Box, Diamond and Update Formulas
-     * @param t1 the first term to check
-     * @param t2 the second term to check
-     * @param services
-     * @return true, if t1 and t2 are equal.
-     */
-    private boolean checkTermsEquality(Term t1, Term t2, Services services) {
-
-	//two terms are equal, if the RewriteTaclet says, they are.
-		
-	TermFactory tf = new TermFactory();
-	//create a template, to check against
-	SchemaVariable v = SchemaVariableFactory.createFormulaSV(new Name("phi"), true);
-	Term comparator = tf.createVariableTerm(v);
-	
-	//create a RewriteTaclet that is used for checking
-	RewriteTaclet rt;
-	RewriteTacletBuilder rtb = new RewriteTacletBuilder();
-	rtb.setFind(comparator);
-	rt = rtb.getRewriteTaclet();
-	
-	//match t1 against the template
-	//returns matchcondition needed for the check of t2
-	MatchConditions m = MatchConditions.EMPTY_MATCHCONDITIONS;
-	m = rt.matchFind(t1, m, services, Constraint.BOTTOM);
-	Term found = null;
-	
-	//match t2 against t1 (by using the created matchconditions)
-	MatchConditions res = rt.matchFind(t2, m, services, Constraint.BOTTOM);
-	
-	if (res != null) {
-	    return true;
-	} else {
-	    return false;
-	}
     }
     
     /**
@@ -1595,11 +1497,6 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 
 		return translateFunc(op, subterms);
 	    }
-	    //throw new IllegalFormulaException("The formula could not be translated\n" +
-	    //		"The (sub)term\n" + term.toString() + "\n" +
-	    //				"could not be translated.");
-	
-	
     }
 
     protected final StringBuffer translateVariable(Operator op) {

@@ -536,7 +536,7 @@ public class SmtLibTranslator extends AbstractSMTTranslator {
     }
 
     private StringBuffer removeIllegalChars(StringBuffer template, ArrayList<String> toReplace, ArrayList<String> replacement) {
-//	replace one String
+	//replace one String
 	for (int i = 0; i < toReplace.size(); i++) {
 	    String toRep = toReplace.get(i);
 	    String replace = replacement.get(i);
@@ -553,7 +553,7 @@ public class SmtLibTranslator extends AbstractSMTTranslator {
     private StringBuffer makeUnique(StringBuffer name) {
 	StringBuffer toReturn = new StringBuffer(name);
 	
-//	build the replacement pairs
+	//build the replacement pairs
 	ArrayList<String> toReplace = new ArrayList<String>();
 	ArrayList<String> replacement = new ArrayList<String>();
 	

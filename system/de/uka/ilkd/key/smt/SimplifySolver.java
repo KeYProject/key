@@ -26,10 +26,8 @@ public final class SimplifySolver extends AbstractSMTSolver {
     
     @Override
     protected String getExecutionCommand(String filename, String formula) {
-	//String[] toReturn = new String[2];
 
 	String toReturn = "simplify " + filename;
-	//toReturn[1] = filename;
 
 	return toReturn;
     }

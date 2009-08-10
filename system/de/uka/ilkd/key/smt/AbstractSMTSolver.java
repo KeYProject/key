@@ -244,9 +244,7 @@ public abstract class AbstractSMTSolver implements SMTSolver {
 	    toReturn = Runtime.getRuntime().exec(execCommand);
 	    } catch (IOException e) {
 		    String cmdStr = execCommand;
-		    //for (String cmd : execCommand) {
-			//cmdStr += cmd + " ";
-		    //}
+
 		    IOException ioe = new IOException("Invocation of decision procedure\n\t\t" +
 			    this.name() + "\n with command \n\t\t" + cmdStr + "\n" +  
 			    "failed. The most common (but not all) reasons for this error are:\n" +
@@ -428,9 +426,7 @@ public abstract class AbstractSMTSolver implements SMTSolver {
 	    }
 	} catch (IOException e) {
 	    String cmdStr = execCommand;
-	    //for (String cmd : execCommand) {
-		//cmdStr += cmd + " ";
-	    //}
+
 	    IOException ioe = new IOException("Invocation of decision procedure\n\t\t" +
 		    this.name() + "\n with command \n\t\t" + cmdStr + "\n" +  
 		    "failed. The most common (but not all) reasons for this error are:\n" +
