@@ -1515,6 +1515,7 @@ public class Main extends JFrame implements IMain {
     }
     
     JCheckBoxMenuItem saveSMTFile;
+    private JCheckBoxMenuItem waitForAllProvers;
     
     /**
      * creates a menu allowing to choose the external prover to be used
@@ -1595,6 +1596,17 @@ public class Main extends JFrame implements IMain {
 	   }
 	});
 	decProcOptions.add(saveSMTFile);
+	
+	// add a checkbox for setting the 'waitForAllProvers'-Option
+	waitForAllProvers = new JCheckBoxMenuItem("Wait for all provers");
+	waitForAllProvers.setSelected(dps.isWaitingForAllProvers());
+	waitForAllProvers.addActionListener(new ActionListener() {
+		   public void actionPerformed(ActionEvent e) {
+		       dps.setWaitForAllProvers(waitForAllProvers.isSelected());
+		   }
+		});
+	decProcOptions.add(waitForAllProvers);
+	
 	
 	return decProcOptions;
     }    

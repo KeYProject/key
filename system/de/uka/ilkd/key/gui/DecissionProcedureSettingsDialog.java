@@ -15,12 +15,13 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.JTextPane;
 import javax.swing.ListSelectionModel;
+import javax.swing.border.TitledBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
+
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.*;
@@ -44,6 +45,17 @@ public class DecissionProcedureSettingsDialog extends JDialog {
     private JList ruleDisplayList;
     private JCheckBox multiuseBox;
     
+    private static final int LEFT_SIDE_WIDTH=190;
+    private static final int RIGHT_SIDE_WIDTH=410;
+    private static final int RULE_LIST_HEIGHT=345;
+    
+    
+    private void setSize(JComponent c,Dimension d){
+	c.setPreferredSize(d);
+	c.setMaximumSize(d);
+	c.setMinimumSize(d);	
+    }
+      
     
     /**
      * private constructor
@@ -63,9 +75,10 @@ public class DecissionProcedureSettingsDialog extends JDialog {
     
     public static void resetInstance() {
 	instance.setSize(400, 300);
-	instance.setPreferredSize(new Dimension(490, 340));
-	instance.setMaximumSize(new Dimension(490, 340));
-	instance.setMinimumSize(new Dimension(490, 340));
+	
+	instance.setPreferredSize(new Dimension(LEFT_SIDE_WIDTH+RIGHT_SIDE_WIDTH, 405));
+	instance.setMaximumSize(new Dimension(LEFT_SIDE_WIDTH+RIGHT_SIDE_WIDTH, 405));
+	instance.setMinimumSize(new Dimension(LEFT_SIDE_WIDTH+RIGHT_SIDE_WIDTH, 405));
 	instance.setVisible(true);
     }
     
@@ -74,61 +87,46 @@ public class DecissionProcedureSettingsDialog extends JDialog {
 	final int fieldWidth = 270;
 	final int labelHeight = 30;
 	final int fieldHeight = 30;
+	
+	this.setResizable(false);
+	
+	
 	JSplitPane tp = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
+	
 	//add the components to the panel
 	JComponent lc = new JPanel();
 	lc.setLayout(new BoxLayout(lc, BoxLayout.Y_AXIS));
-	lc.setPreferredSize(new Dimension(100, 290));
-	lc.setMinimumSize(new Dimension(100, 290));
-	lc.setMaximumSize(new Dimension(100, 290));
+
+	setSize(lc,new Dimension(LEFT_SIDE_WIDTH,RULE_LIST_HEIGHT));
+	
 	
 	JComponent rc = new JPanel();
 	rc.setLayout(new BoxLayout(rc, BoxLayout.Y_AXIS));
-	rc.setPreferredSize(new Dimension(390, 340));
-	rc.setMinimumSize(new Dimension(390, 340));
-	rc.setMaximumSize(new Dimension(390, 340));
+	setSize(rc,new Dimension(RIGHT_SIDE_WIDTH,RULE_LIST_HEIGHT));
+	
+	
+	
 	tp.setLeftComponent(lc);
 	tp.setRightComponent(rc);
-	//read the available rules from the Settings
 	this.allrules = ProofSettings.DEFAULT_SETTINGS.getDecisionProcedureSettings().getAllRules();
-	//add the available decision procedures on the left
-	Box tempbox = Box.createVerticalBox();
-	tempbox.add(Box.createRigidArea(new Dimension(15, 15)));
-	Box tempbox2 = Box.createHorizontalBox();
-	tempbox2.add(Box.createRigidArea(new Dimension(15, 15)));
-	tempbox2.add(new JLabel("available"));
-	tempbox2.add(Box.createHorizontalGlue());
-	tempbox.add(tempbox2);
-	tempbox2 = Box.createHorizontalBox();
-	tempbox2.add(Box.createRigidArea(new Dimension(15, 15)));
-	tempbox2.add(new JLabel("DecProcs"));
-	tempbox2.add(Box.createHorizontalGlue());
-	tempbox.add(tempbox2);
-	tempbox2 = Box.createHorizontalBox();
-	tempbox2.add(Box.createRigidArea(new Dimension(15, 15)));
-	tempbox2.add(buildDecprocList());
-	tempbox2.add(Box.createHorizontalGlue());
-	tempbox.add(tempbox2);
-	lc.add(tempbox);
+	
+	
+	lc.add(buildDecprocList());
 	lc.add(Box.createVerticalGlue());
 	
 	
 	//add the settings-stuff for the selected decproc on the right
 	Box globalBox = Box.createVerticalBox();
 	
-	JLabel nameLabel = new JLabel("name");
+	JLabel nameLabel = new JLabel("Name");
 	nameLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
-	//nameLabel.setSize(90, 30);
-	nameLabel.setMaximumSize(new Dimension(labelWidth, labelHeight));
-	nameLabel.setMinimumSize(new Dimension(labelWidth, labelHeight));
-	nameLabel.setPreferredSize(new Dimension(labelWidth, labelHeight));
-	//rc.add(nameLabel);
+	setSize(nameLabel,new Dimension(labelWidth,labelHeight));
+	
 	nameField = new JTextField();
-	nameField.setMaximumSize(new Dimension(fieldWidth, fieldHeight));
-	nameField.setMinimumSize(new Dimension(fieldWidth, fieldHeight));
-	nameField.setPreferredSize(new Dimension(fieldWidth, fieldHeight));
+	setSize(nameField,new Dimension(fieldWidth,fieldHeight));
 	nameField.setEditable(false);
-	//rc.add(nameField);
+	
+	
 	Box b = Box.createHorizontalBox();
 	b.add(nameLabel);
 	b.add(nameField);
@@ -136,18 +134,15 @@ public class DecissionProcedureSettingsDialog extends JDialog {
 	
 	globalBox.add(b);
 	
-	//rc.add(Box.createHorizontalGlue());
-	JLabel availableLabel = new JLabel("installed");
-	availableLabel.setMaximumSize(new Dimension(labelWidth, labelHeight));
-	availableLabel.setMinimumSize(new Dimension(labelWidth, labelHeight));
-	availableLabel.setPreferredSize(new Dimension(labelWidth, labelHeight));
-	//rc.add(availableLabel);
+	
+	JLabel availableLabel = new JLabel("Installed");
+	setSize(availableLabel,new Dimension(labelWidth,labelHeight));
+	
+	
 	availableField = new JTextField();
-	availableField.setMaximumSize(new Dimension(fieldWidth, fieldHeight));
-	availableField.setMinimumSize(new Dimension(fieldWidth, fieldHeight));
-	availableField.setPreferredSize(new Dimension(fieldWidth, fieldHeight));
+	setSize(availableField,new Dimension(fieldWidth,fieldHeight));
 	availableField.setEditable(false);
-	//rc.add(availableField);
+	
 	
 	b = Box.createHorizontalBox();
 	b.add(availableLabel);
@@ -156,16 +151,11 @@ public class DecissionProcedureSettingsDialog extends JDialog {
 	globalBox.add(b);
 	
 	JLabel execLabel = new JLabel("Command");
-	execLabel.setMaximumSize(new Dimension(labelWidth, labelHeight));
-	execLabel.setMinimumSize(new Dimension(labelWidth, labelHeight));
-	execLabel.setPreferredSize(new Dimension(labelWidth, labelHeight));
+	setSize(execLabel,new Dimension(labelWidth,labelHeight));
+
 	
-	//rc.add(execLabel);
 	this.executionField = new JTextField();
-	this.executionField.setMaximumSize(new Dimension(fieldWidth, fieldHeight));
-	this.executionField.setMinimumSize(new Dimension(fieldWidth, fieldHeight));
-	this.executionField.setPreferredSize(new Dimension(fieldWidth, fieldHeight));
-	//rc.add(executionField);
+	setSize(executionField,new Dimension(fieldWidth,fieldHeight));
 	
 
 	
@@ -179,38 +169,35 @@ public class DecissionProcedureSettingsDialog extends JDialog {
 	
 	
 	this.multiuseBox = new JCheckBox();
-	this.multiuseBox.setMaximumSize(new Dimension(fieldWidth, fieldHeight));
-	this.multiuseBox.setMinimumSize(new Dimension(fieldWidth, fieldHeight));
-	this.multiuseBox.setPreferredSize(new Dimension(fieldWidth, fieldHeight));
-	
-	
-	JLabel multiuseLabel = new JLabel("Multiple provers");
-	multiuseLabel.setMaximumSize(new Dimension(labelWidth, labelHeight));
-	multiuseLabel.setMinimumSize(new Dimension(labelWidth, labelHeight));
-	multiuseLabel.setPreferredSize(new Dimension(labelWidth, labelHeight));
+	setSize(multiuseBox,new Dimension(fieldWidth+labelWidth,fieldHeight));
+	this.multiuseBox.setText("use this prover for the rule 'multiple provers'");
+
 	
 	
 	b = Box.createHorizontalBox();
-	b.add(multiuseLabel);
 	b.add(multiuseBox);
 	b.add(Box.createHorizontalGlue());
 	
 	globalBox.add(b);
 	
+
+	
+	
 	this.setRuleVals();
 	
 	
 	//add the description
-	JTextArea c = new JTextArea("Edit the start command here.\n" +
-		"Give the starting command for an external procedure in a\nway, it can be executed " +
-		"to love a problem file.\nFeel free to use any parameter to finetune the program.\n\n" +
+	JTextArea c = new JTextArea("Editing the start command:\n" +
+		"Specify the starting command for an external procedure in\n such a way, it can be executed " +
+		"to solve a problem file.\nFeel free to use any parameter to finetune the program.\n\n" +
 		"Use %f as placeholder for the filename containing the \nproblemdescription.\n\n" +
-		"Use %p as placeholder for the problem directly.\nThis should be needed in special cases only.");
+		"Use %p as placeholder for the problem directly.\nThis should be needed in special cases only."+"\n\n (Press 'apply' after you have changed options for a single\n prover.)");
+	c.setBorder(new TitledBorder("Explanation"));
 	c.setEditable(false);
-	c.setMaximumSize(new Dimension(350, 150));
-	c.setMinimumSize(new Dimension(350, 150));
-	c.setPreferredSize(new Dimension(350, 150));
+	setSize(c,new Dimension(RIGHT_SIDE_WIDTH,RULE_LIST_HEIGHT-4*labelHeight));
 	globalBox.add(c);
+	
+	
 	
 	globalBox.add(Box.createVerticalGlue());
 	
@@ -236,9 +223,9 @@ public class DecissionProcedureSettingsDialog extends JDialog {
 	
 	rc.add(globalBox);
 	
-	//rc.add(closeButton);
-	//rc.add(applyButton);
+
 	this.add(tp);
+
 	this.setVisible(true);
     }
     
@@ -291,8 +278,12 @@ public class DecissionProcedureSettingsDialog extends JDialog {
 		rulenames.add(rd.getDisplayName());
 	}
 	ruleDisplayList = new JList(rulenames.toArray());
+	ruleDisplayList.setBorder(new TitledBorder("Decision Procedures"));
 	ruleDisplayList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 	ruleDisplayList.setSelectedIndex(0);
+	
+	setSize(ruleDisplayList,new Dimension(LEFT_SIDE_WIDTH,RULE_LIST_HEIGHT));
+
 	
 	//add the selectionListener
 	ruleDisplayList.addListSelectionListener(new ListSelectionListener () {

@@ -77,6 +77,8 @@ public class DecisionProcedureSettings implements Settings {
     private static final String SAVEFILE="[DecisionProcedure]savefile";
     
     private static final String MULTIPLEPROVERS="[DecisionProcedure]multprovers";
+    
+    private static final String WAITFORALLPROVERS = "[DecisionProcedure]WaitForAllProvers";
 
     /** the list of registered SettingListener */
     private LinkedList<SettingsListener> listenerList = new LinkedList<SettingsListener>();
@@ -121,6 +123,8 @@ public class DecisionProcedureSettings implements Settings {
     private static final String multSeparator2 = "=";
     
     private String multProversSettings=null;
+    private boolean waitForAllProvers = false;
+    
     
     /**
      * This is a singleton.
@@ -241,7 +245,12 @@ public class DecisionProcedureSettings implements Settings {
 	
 	multProversSettings = props.getProperty(MULTIPLEPROVERS);
 	
-	
+	String wfap = props.getProperty(WAITFORALLPROVERS);
+	if(wfap != null && wfap.equals("true")){
+	    waitForAllProvers = true;
+	}else {
+	    waitForAllProvers = false;
+	}
 	
 	String sf = props.getProperty(SAVEFILE);
 	if (!(sf == null) && sf.equals("true")) {
@@ -287,7 +296,7 @@ public class DecisionProcedureSettings implements Settings {
 		if(vals.length == 2){
 		    if(ruleMultipleProvers != null)
 		    {
-			if(vals[1].equals("yes")) ruleMultipleProvers.useSMTSolver(vals[0], true);
+			if(vals[1].equals("true")) ruleMultipleProvers.useSMTSolver(vals[0], true);
 			else		   ruleMultipleProvers.useSMTSolver(vals[0], false);
 		    }
 		}
@@ -329,7 +338,7 @@ public class DecisionProcedureSettings implements Settings {
 	ArrayList<String> listNames = ruleMultipleProvers.getNamesOfSolvers(); 
 	
 	for(String name : listNames){
-	    String value = ruleMultipleProvers.SMTSolverIsUsed(name) ? "yes" : "no";
+	    String value = ruleMultipleProvers.SMTSolverIsUsed(name) ? "true" : "false";
 	    toStore = toStore + name + multSeparator2 + value + multSeparator1;
 	    
 	}
@@ -484,6 +493,7 @@ public class DecisionProcedureSettings implements Settings {
 		
 		ruleMultipleProvers = (SMTRuleMulti) r;
 		this.readMultProversString();
+		this.setWaitForAllProvers(waitForAllProvers);
 
 	    }
 	}
@@ -531,6 +541,7 @@ public class DecisionProcedureSettings implements Settings {
         else {
             props.setProperty(SAVEFILE, "false");
         }
+        props.setProperty(WAITFORALLPROVERS, ruleMultipleProvers.isWaitingForAllProvers() ? "true":"false");
         this.writeExecutionString(props);
         this.writeMultipleProversString(props);
     }
@@ -541,6 +552,25 @@ public class DecisionProcedureSettings implements Settings {
 	}
 	
 	return instance;
+    }
+
+    public boolean isWaitingForAllProvers() {
+	if(ruleMultipleProvers == null)	return waitForAllProvers;
+	return ruleMultipleProvers.isWaitingForAllProvers();
+    }
+
+    public void setWaitForAllProvers(boolean selected) {
+	
+	if(ruleMultipleProvers != null)
+	{
+	    if(ruleMultipleProvers.isWaitingForAllProvers() != selected){
+		ruleMultipleProvers.setWaitForAllProvers(selected);
+		this.fireSettingsChanged();
+	    }
+	    
+	    
+	}
+	
     }
 
  

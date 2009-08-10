@@ -395,6 +395,7 @@ public class SMTRuleMulti implements BuiltInRule, MakesProgress {
 	 int count = 0;
 	 int startedProcesses = runningProcesses.size();
 	
+	
 	 try {
 		//wait for the SMTSolver Thread and make popagate progress
 		boolean finished = false;
