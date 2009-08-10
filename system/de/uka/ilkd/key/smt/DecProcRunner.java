@@ -55,11 +55,12 @@ public class DecProcRunner extends SwingWorker {
         this.main = main;
         this.proof = proof;
         this.userConstraint = userConstraint;
-        
+
         if (r == null) {
-            this.simpRule = r;
-        } else {
             this.simpRule = getIntegerDecisionProcedure();
+        } else {
+            this.simpRule = r;
+            
         }
         exceptionHandler = main.mediator().getExceptionHandler();
     }
@@ -141,11 +142,13 @@ public class DecProcRunner extends SwingWorker {
                             BaseProgressMonitor pm = null;
                             
                             //add a progress monitor to disply up to date progress.
-                            if (simpRule instanceof SMTRule) {
-                        	final SMTRule rule = (SMTRule) simpRule;
+                            if (simpRule instanceof SMTRule || simpRule instanceof SMTRuleMulti) {
+                        	final MakesProgress prog = (MakesProgress) simpRule;
+                        	//final SMTRule rule = (SMTRule) simpRule;
                         	il = new InterruptListener() {
                                     public void interruptionPerformed(ActionEvent e) {
-                                        rule.interrupt();
+                                        prog.interrupt();
+                                	//rule.interrupt();
                                         main.setStatusLine("External decision procedure interrupted by user");
                                     }
                                  };
@@ -153,7 +156,8 @@ public class DecProcRunner extends SwingWorker {
                         	int step = 99;
                 		int base = (cnt-1) * step;
                 		pm = new BaseProgressMonitor(base, main.getProgressMonitor());
-                        	rule.addProgressMonitor(pm);
+                        	prog.addProgressMonitor(pm);
+                		//rule.addProgressMonitor(pm);
                             }
                             ProofTreeListener ptl = new ProofTreeListener() {
                         	
@@ -178,7 +182,8 @@ public class DecProcRunner extends SwingWorker {
                             }
                             //remove the progress monitor again
                             if (pm != null) {
-                        	((SMTRule)simpRule).removeProgressMonitor(pm);
+                        	
+                        	((MakesProgress)simpRule).removeProgressMonitor(pm);
                             }
 
                             proof.removeProofTreeListener(ptl);
@@ -191,6 +196,7 @@ public class DecProcRunner extends SwingWorker {
                     }
                 } catch (ExceptionHandlerException ex){
                     main.setStatusLine("Running external decision procedure failed");
+                    throw(ex);
                 } finally {
                     if (il != null) {
                 	mediator.removeInterruptListener(il);

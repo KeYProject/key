@@ -36,7 +36,7 @@ class SolverWrapper
   /**The solver itself, can be changed only by the constructor */
   private SMTSolver  Solver;
   /**The result associated with the solver*/
-  private SMTSolverResult Result = null;
+  private SMTSolverResult Result = SMTSolverResult.NO_IDEA;
   /**If true, the solver is used for proving*/
   private boolean 	   UsedForProving=false;
   
@@ -149,7 +149,7 @@ class SolverWrapper
     
 }
 
-public class SMTRuleMulti implements BuiltInRule, Progress {
+public class SMTRuleMulti implements BuiltInRule, MakesProgress {
     
     
     private static final Logger logger = Logger
@@ -306,7 +306,15 @@ public class SMTRuleMulti implements BuiltInRule, Progress {
 	    this.waitForAllProvers = waitForAllProvers;
 	  }
 
-    
+    /**
+     *  @return returns true, if at least one installed solver is selected for the rule 'multiple provers' 
+     */
+    public boolean isUsable()
+    {
+	for(SolverWrapper sw : Solvers)
+	    if(sw.isUsedForProving() && sw.getSolver().isInstalled(false)) return true;
+	return false;
+    }
     
     public boolean isApplicable(Goal goal, PosInOccurrence pio,
 	    Constraint userConstraint) {
@@ -314,14 +322,19 @@ public class SMTRuleMulti implements BuiltInRule, Progress {
 	return pio == null;
     }
     
+    
     private void killProcesses()
     {
 	for(Process p : runningProcesses)
 	    p.destroy();
-	
     }
     
    
+    /**
+     * Standard procedure for handling exceptions.
+     * @param services Services object to get the exception handler
+     * @param e  Exception to handle.
+     */
     private void handleException(Services services,Exception e)
     {
         if (services.getExceptionHandler() != null) {
@@ -416,34 +429,31 @@ public class SMTRuleMulti implements BuiltInRule, Progress {
 				       handleException(services,ioe);
 				   }
 				if((!this.waitForAllProvers && sw.getResult().isValid() != ThreeValuedTruth.UNKNOWN) || 
-				   (this.waitForAllProvers && count == startedProcesses)){
+				   (this.waitForAllProvers && count == startedProcesses) ||
+				   execWatch.wasInterruptedByTimeout() ||
+				   execWatch.wasInterruptedByUser()){
 				    	finished =true;
 				    	break;
 				   }
 				}catch (IllegalThreadStateException e) {
+				  
 					for (ProgressMonitor pm : this.progressMonitors) {
+					    
 					    pm.setProgress(execWatch.getProgress());
 					}
 				}
 				
-				//}
+				
 			    }		
 			}
 			runningProcesses.removeAll(toRemove);
 			
-			//if the program comes here, p has been finished.
-			//finished = true;
-		    //} catch (IllegalThreadStateException e) {
-			//if program comes here, p has not been finished yet.
-			//update the progress.
-			//for (ProgressMonitor pm : this.progressMonitors) {
-			  //  pm.setProgress(execWatch.getProgress());
-			//}
-		    //}
+	
 		}
-		//}
+	
 		
-		killProcesses();
+		
+		
 		
 		
 		
@@ -453,6 +463,7 @@ public class SMTRuleMulti implements BuiltInRule, Progress {
 			f);
 	    } finally {
 		t.cancel();
+		killProcesses();
 		execWatch = null;
 	    }
 	    
@@ -478,6 +489,7 @@ public class SMTRuleMulti implements BuiltInRule, Progress {
 		}
 		
 		
+		// makes only sense when waitForAllProvers is true.
 		if(notValid && valid) { throw new RuntimeException("One prover says true, the other prover says false!");}
 		
 		if(valid && !notValid) return SLListOfGoal.EMPTY_LIST;
@@ -490,7 +502,17 @@ public class SMTRuleMulti implements BuiltInRule, Progress {
 
     public String displayName() {
 
-	    return "multiple provers";
+	String s = "multiple provers";
+	int count =0;
+	for(SolverWrapper sw : Solvers)
+	    if(sw.isUsedForProving() && sw.getSolver().isInstalled(false)){
+		s = s + (count==0 ? ": " : ", ");
+		s = s + sw.getSolver().name();
+		count++;
+	    }
+		
+	return s;
+	    
     }
 
     public Name name() {
