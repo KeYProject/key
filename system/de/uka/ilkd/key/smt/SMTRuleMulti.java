@@ -149,7 +149,7 @@ class SolverWrapper
     
 }
 
-public class SMTRuleMulti implements BuiltInRule {
+public class SMTRuleMulti implements BuiltInRule, Progress {
     
     
     private static final Logger logger = Logger
@@ -166,6 +166,28 @@ public class SMTRuleMulti implements BuiltInRule {
     private ArrayList<SolverWrapper> runningSolvers = new ArrayList<SolverWrapper>(); 
     
     
+    private boolean toBeInterrupted = false;
+    
+    private ArrayList<ProgressMonitor> progressMonitors = new ArrayList<ProgressMonitor>();
+    
+    public void addProgressMonitor(ProgressMonitor p) {
+	progressMonitors.add(p);
+    }
+    
+    public boolean removeProgressMonitor(ProgressMonitor p) {
+	return progressMonitors.remove(p);
+    }
+    
+    public void removeAllProgressMonitors() {
+	while (progressMonitors.size() > 0) {
+	    progressMonitors.remove(0);
+	}
+    }
+    
+    public void interrupt() {
+	this.toBeInterrupted = true;
+    }
+    
     
     /** Searches for the given <code>SMTSolver s</code> in <code>Solvers</code>  
      * @param s  SMTSolver to look for.
@@ -179,10 +201,19 @@ public class SMTRuleMulti implements BuiltInRule {
     }
     
     
+    
+    
     private SolverWrapper find(Process p)
     {
 	for(SolverWrapper sw : Solvers)
 	    if(sw.getProc() == p) return sw;
+	return null;
+    }
+    
+    private SolverWrapper find(String name)
+    {
+	for(SolverWrapper sw: Solvers)
+	    if(sw.getSolver().name().equals(name)) return sw;
 	return null;
     }
     
@@ -200,6 +231,31 @@ public class SMTRuleMulti implements BuiltInRule {
 	sw.setUsedForProving(use);
     }
     
+    /**
+     * This method sets, whether the SMTSolver s is executed by the rule or not.
+     * @param name name of the solver
+     * @param use true, if the SMTSolver should be used, when the rule is executed
+     */
+    public void useSMTSolver(String name, boolean use)
+    {
+	SolverWrapper sw = find(name);
+	if(sw == null) throw new IllegalArgumentException("There is no solver called "+ name);
+	sw.setUsedForProving(use);
+    }
+    
+    /** 
+     * @return returns a list of all possible solvers, that are implemented by the interface SMTSolver
+     */
+    
+    public ArrayList<String> getNamesOfSolvers()
+    {
+	ArrayList<String> list = new ArrayList<String>();
+	for(SolverWrapper sw : Solvers){
+	    list.add(sw.getSolver().name());
+	}
+	return list;
+	
+    }
     
     
     /**
@@ -212,9 +268,19 @@ public class SMTRuleMulti implements BuiltInRule {
 	SolverWrapper sw = find(s);
 	if(sw == null) throw new IllegalArgumentException("Solver can not be found.");
 	return sw.isUsedForProving();
-
     }
     
+    /**
+     * returns whether the SMTSolver, specified by name, is uset by the rule
+     * @param name name of the solver
+     * @return true, if the solver is used
+     */
+    public boolean SMTSolverIsUsed(String name)
+    {
+	SolverWrapper sw = find(name);
+	if(sw == null) throw new IllegalArgumentException("Solver can not be found.");
+	return sw.isUsedForProving();
+    }
  
     
     /**
@@ -255,6 +321,7 @@ public class SMTRuleMulti implements BuiltInRule {
 	
     }
     
+   
     private void handleException(Services services,Exception e)
     {
         if (services.getExceptionHandler() != null) {
@@ -278,6 +345,7 @@ public class SMTRuleMulti implements BuiltInRule {
 
 	runningProcesses.clear();
 	runningSolvers.clear();
+	toBeInterrupted = false;
 	
 	
 	// Start the provers
@@ -320,11 +388,11 @@ public class SMTRuleMulti implements BuiltInRule {
 		
 		
 		while (!finished) {
-		   /* if (this.toBeInterrupted) {
+		    if (this.toBeInterrupted) {
 			this.toBeInterrupted = false;
 			execWatch.interrupt();
 			
-		    }*/
+		    }
 		        ArrayList<Process> toRemove = new ArrayList<Process>();
 			for(Process p : runningProcesses){
 			    synchronized(p) {
@@ -344,6 +412,7 @@ public class SMTRuleMulti implements BuiltInRule {
 				   }
 				   catch(IOException ioe)
 				   {
+				       
 				       handleException(services,ioe);
 				   }
 				if((!this.waitForAllProvers && sw.getResult().isValid() != ThreeValuedTruth.UNKNOWN) || 
@@ -351,7 +420,11 @@ public class SMTRuleMulti implements BuiltInRule {
 				    	finished =true;
 				    	break;
 				   }
-				}catch (IllegalThreadStateException e) {}
+				}catch (IllegalThreadStateException e) {
+					for (ProgressMonitor pm : this.progressMonitors) {
+					    pm.setProgress(execWatch.getProgress());
+					}
+				}
 				
 				//}
 			    }		

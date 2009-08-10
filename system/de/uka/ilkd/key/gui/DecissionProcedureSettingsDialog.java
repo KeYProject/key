@@ -246,8 +246,9 @@ public class DecissionProcedureSettingsDialog extends JDialog {
 	RuleDescriptor rd = allrules.get(ruleDisplayList.getSelectedIndex());
 	String command = this.executionField.getText();
 	boolean multipleuse = this.multiuseBox.isSelected();
-	ProofSettings.DEFAULT_SETTINGS.getDecisionProcedureSettings().setExecutionCommand(rd, command);
 	ProofSettings.DEFAULT_SETTINGS.getDecisionProcedureSettings().setMultipleUse(rd,multipleuse);
+	ProofSettings.DEFAULT_SETTINGS.getDecisionProcedureSettings().setExecutionCommand(rd, command);
+	
 	Main.instance.updateDecisionProcedureSelectMenu();
 	this.setRuleVals();
     }

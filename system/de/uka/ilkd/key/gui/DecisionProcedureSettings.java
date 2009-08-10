@@ -75,6 +75,8 @@ public class DecisionProcedureSettings implements Settings {
     private static final String TIMEOUT="[DecisionProcedure]Timeout";
     
     private static final String SAVEFILE="[DecisionProcedure]savefile";
+    
+    private static final String MULTIPLEPROVERS="[DecisionProcedure]multprovers";
 
     /** the list of registered SettingListener */
     private LinkedList<SettingsListener> listenerList = new LinkedList<SettingsListener>();
@@ -110,6 +112,15 @@ public class DecisionProcedureSettings implements Settings {
     private static final String execSeperator1 = ":"; 
     /** The String separating solvernames from commands in the settingsfile */
     private static final String execSeperator2 = "="; 
+    
+    /** the string separating different solvers
+      */
+    private static final String multSeparator1 = ":";
+    
+    /**the string separating solvernames from the value */
+    private static final String multSeparator2 = "=";
+    
+    private String multProversSettings=null;
     
     /**
      * This is a singleton.
@@ -228,6 +239,10 @@ public class DecisionProcedureSettings implements Settings {
 	
 	this.readExecutionString(props);
 	
+	multProversSettings = props.getProperty(MULTIPLEPROVERS);
+	
+	
+	
 	String sf = props.getProperty(SAVEFILE);
 	if (!(sf == null) && sf.equals("true")) {
 	    this.saveFile = true;
@@ -258,6 +273,28 @@ public class DecisionProcedureSettings implements Settings {
 	}
     }
     
+    
+    /**
+     * read the multiple provers strings from the properties file, stored in multProversSettings
+     */
+    private void readMultProversString()
+    {
+	
+	if(multProversSettings != null){
+	    String[] valuepairs = multProversSettings.split(multSeparator1);
+	    for(String s : valuepairs){
+		String[] vals = s.split(multSeparator2);
+		if(vals.length == 2){
+		    if(ruleMultipleProvers != null)
+		    {
+			if(vals[1].equals("yes")) ruleMultipleProvers.useSMTSolver(vals[0], true);
+			else		   ruleMultipleProvers.useSMTSolver(vals[0], false);
+		    }
+		}
+	    }
+	}
+    }
+    
     /**
      * write the Execution Commands to the file
      * @param prop
@@ -281,6 +318,27 @@ public class DecisionProcedureSettings implements Settings {
 	    toStore = toStore.substring(0, toStore.length()-execSeperator1.length());
 	}
 	prop.setProperty(EXECSTR, toStore);
+    }
+    
+    /**
+     * Write the values, that specify whether a prover is used for the rule 'multiple provers'. 
+     */
+    private void writeMultipleProversString(Properties prop) {
+	String toStore = "";
+	
+	ArrayList<String> listNames = ruleMultipleProvers.getNamesOfSolvers(); 
+	
+	for(String name : listNames){
+	    String value = ruleMultipleProvers.SMTSolverIsUsed(name) ? "yes" : "no";
+	    toStore = toStore + name + multSeparator2 + value + multSeparator1;
+	    
+	}
+	
+
+	if (toStore.length() >= multSeparator1.length()){
+	    toStore = toStore.substring(0, toStore.length()-multSeparator1.length());
+	}
+	prop.setProperty(MULTIPLEPROVERS, toStore);
     }
     
     /**
@@ -366,6 +424,7 @@ public class DecisionProcedureSettings implements Settings {
 	SMTRule rule = descriptorToRule.get(rd);
 	SMTSolver s = rule.getSolver();
 	ruleMultipleProvers.useSMTSolver(s, multipleuse);
+	fireSettingsChanged();
     }
     
     
@@ -424,6 +483,8 @@ public class DecisionProcedureSettings implements Settings {
 	    if(r instanceof SMTRuleMulti){
 		
 		ruleMultipleProvers = (SMTRuleMulti) r;
+		this.readMultProversString();
+
 	    }
 	}
 	
@@ -471,6 +532,7 @@ public class DecisionProcedureSettings implements Settings {
             props.setProperty(SAVEFILE, "false");
         }
         this.writeExecutionString(props);
+        this.writeMultipleProversString(props);
     }
 
     public static DecisionProcedureSettings getInstance() {

@@ -91,12 +91,14 @@ public abstract class AbstractProfile implements Profile {
         solverList.add(new SimplifySolver());
         solverList.add(new CVC3Solver());
         
+        // init builtIRule for using several provers at the same time
+        builtInRules = builtInRules.prepend(new SMTRuleMulti(solverList));
+        
         // builtInRules for single use of provers
         for(SMTSolver s : solverList)
           builtInRules = builtInRules.prepend(new SMTRule(s));        
 
-        // init builtIRule for using several provers at the same time
-        builtInRules = builtInRules.prepend(new SMTRuleMulti(solverList));
+      
         
         
         return builtInRules;

@@ -24,7 +24,7 @@ import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.util.ProgressMonitor;
 
-public class SMTRule implements BuiltInRule {
+public class SMTRule implements BuiltInRule, Progress {
 
     private final SMTSolver solver;
 

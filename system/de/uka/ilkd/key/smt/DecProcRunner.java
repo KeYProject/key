@@ -47,14 +47,23 @@ public class DecProcRunner extends SwingWorker {
     private final BuiltInRule simpRule;
 
     public DecProcRunner(IMain main, Proof proof, Constraint userConstraint) {
+	//instantiate this DecProcRunner with the currently selected standard SMT solver
+        this(main, proof, userConstraint, null);
+    }
+
+    public DecProcRunner(IMain main, Proof proof, Constraint userConstraint, BuiltInRule r) {
         this.main = main;
         this.proof = proof;
         this.userConstraint = userConstraint;
         
-        this.simpRule = getIntegerDecisionProcedure();
+        if (r == null) {
+            this.simpRule = r;
+        } else {
+            this.simpRule = getIntegerDecisionProcedure();
+        }
         exceptionHandler = main.mediator().getExceptionHandler();
     }
-
+    
     public void run() {
         /* Invoking start() on the SwingWorker causes a new Thread
          * to be created that will call construct(), and then
@@ -62,7 +71,6 @@ public class DecProcRunner extends SwingWorker {
          * the worker is interrupted because we catch the
          * InterruptedException in doWork().
          */
-        //main.mediator().stopInterface(true);
         Object res = construct();
         finished(res);
     }
@@ -183,7 +191,6 @@ public class DecProcRunner extends SwingWorker {
                     }
                 } catch (ExceptionHandlerException ex){
                     main.setStatusLine("Running external decision procedure failed");
-                    //status =  ex.toString();
                 } finally {
                     if (il != null) {
                 	mediator.removeInterruptListener(il);
@@ -195,6 +202,7 @@ public class DecProcRunner extends SwingWorker {
         return status;
     }
 
+    
     private BuiltInRule getIntegerDecisionProcedure() {
 	final Name simpRuleName = proof.getSettings().getDecisionProcedureSettings().getActiveRule().getRuleName();
 	final ListOfBuiltInRule rules = proof.getSettings().getProfile().getStandardRules().getStandardBuiltInRules();
