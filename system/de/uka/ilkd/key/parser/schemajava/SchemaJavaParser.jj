@@ -177,8 +177,6 @@ public class SchemaJavaParser {
     private static boolean isLeftHandSide(Sort s) {
 	return  s == ProgramSVSort.VARIABLE ||
 	    s == ProgramSVSort.STATICVARIABLE ||
-	    s == ProgramSVSort.IMPLICITVARIABLE ||
-	    s == ProgramSVSort.EXPLICITVARIABLE ||
 	    s == ProgramSVSort.LEFTHANDSIDE  ||
 	    s == ProgramSVSort.SIMPLEEXPRESSION  ||
 	    s == ProgramSVSort.NONSIMPLEEXPRESSION;
@@ -186,11 +184,7 @@ public class SchemaJavaParser {
 
     private static boolean isLocalVariable(String svName) {
 	return  factory.lookupSchemaVariableType(svName, 
-						 ProgramSVSort.VARIABLE)
-	    || factory.lookupSchemaVariableType(svName, 
-						ProgramSVSort.EXPLICITVARIABLE)
-	    || factory.lookupSchemaVariableType(svName, 
-						ProgramSVSort.IMPLICITVARIABLE);	
+						 ProgramSVSort.VARIABLE);	
     }
 
 

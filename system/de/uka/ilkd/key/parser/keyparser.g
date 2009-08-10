@@ -1804,7 +1804,8 @@ pred_decl
 		    	    		(GenericSort)genSort,
 		    	    		new Name(baseName),
 		    	    		Sort.FORMULA,
-		    	    		argSorts);
+		    	    		argSorts,
+		    	    		false);
 		    }
 	        }
             
@@ -1894,14 +1895,13 @@ func_decl
 	            String baseName = func_name.substring(separatorIndex + 2);
 		    Sort genSort = lookupSort(sortName);
 		    
-		    if(genSort instanceof GenericSort) {	        
-	            	assert !unique : "not implemented; " + func_name;
-	            	
+		    if(genSort instanceof GenericSort) {	        	            	
 		    	f = SortDependingFunction.createFirstInstance(
 		    	    		(GenericSort)genSort,
 		    	    		new Name(baseName),
 		    	    		retSort,
-		    	    		argSorts);
+		    	    		argSorts,
+		    	    		unique);
 		    }
 	        }
 	        
@@ -3457,19 +3457,29 @@ type_resolver returns [TypeResolver tr = null]
     ParsableVariable y = null;
     ParsableVariable z = null;
 } :
-    s = any_sortId_check[true]      
-    {
-        if ( s instanceof GenericSort ) {
-            tr = TypeResolver.createGenericSortResolver((GenericSort)s);
-        } else {
-            tr = TypeResolver.createNonGenericSortResolver(s);
+    (s = any_sortId_check[true]      
+        {
+            if ( s instanceof GenericSort ) {
+                tr = TypeResolver.createGenericSortResolver((GenericSort)s);
+            } else {
+                tr = TypeResolver.createNonGenericSortResolver(s);
+            }
         }
-    } |
-    ( TYPEOF LPAREN y = varId RPAREN  
-        {  tr = TypeResolver.createElementTypeResolver((SchemaVariable)y); } )
+    ) 
     |
-    ( CONTAINERTYPE LPAREN y = varId RPAREN  
-        {  tr = TypeResolver.createContainerTypeResolver((SchemaVariable)y); } )
+    ( 
+        TYPEOF LPAREN y = varId RPAREN  
+        {  
+            tr = TypeResolver.createElementTypeResolver((SchemaVariable)y); 
+        } 
+    )
+    |
+    (
+        CONTAINERTYPE LPAREN y = varId RPAREN  
+        {  
+            tr = TypeResolver.createContainerTypeResolver((SchemaVariable)y); 
+        } 
+    )
 ;
 
 varcond_new [TacletBuilder b]

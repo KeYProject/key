@@ -23,9 +23,7 @@ import de.uka.ilkd.key.java.expression.operator.Instanceof;
 import de.uka.ilkd.key.java.expression.operator.Negative;
 import de.uka.ilkd.key.java.expression.operator.New;
 import de.uka.ilkd.key.java.expression.operator.NewArray;
-import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
 import de.uka.ilkd.key.java.recoderext.InstanceAllocationMethodBuilder;
-import de.uka.ilkd.key.java.recoderext.JVMIsTransientMethodBuilder;
 import de.uka.ilkd.key.java.reference.*;
 import de.uka.ilkd.key.java.statement.*;
 import de.uka.ilkd.key.logic.*;
@@ -41,7 +39,6 @@ public abstract class ProgramSVSort extends AbstractSort {
         new HashMap<Name, ProgramSVSort>(60);
 
     //----------- Types of Expression Program SVs ----------------------------
-   
     
     public static final ProgramSVSort LEFTHANDSIDE
 	= new LeftHandSideSort();
@@ -51,7 +48,6 @@ public abstract class ProgramSVSort extends AbstractSort {
 
     public static final ProgramSVSort STATICVARIABLE
 	= new StaticVariableSort();
-
 
     public static final ProgramSVSort SIMPLEEXPRESSION 
 	= new SimpleExpressionSort();
@@ -78,8 +74,6 @@ public abstract class ProgramSVSort extends AbstractSort {
     
     //----------- Expressions with restrictions on kind of type -------------
 
-//    public static final ModelMethodSort MODELMETHOD
-//	= new ModelMethodSort();
 
     public static final NonSimpleMethodReferenceSort NONSIMPLEMETHODREFERENCE
 	= new NonSimpleMethodReferenceSort();
@@ -230,18 +224,8 @@ public abstract class ProgramSVSort extends AbstractSort {
     public static final ProgramSVSort SWITCH
 	= new SwitchSVSort(); 
 
-    public static final ProgramSVSort IMPLICITVARIABLE
-	= new ImplicitProgramVariableSort();
-
-    public static final ProgramSVSort EXPLICITVARIABLE
-	= new ExplicitProgramVariableSort();
-
     public static final ProgramSVSort CONSTANTVARIABLE
 	= new ConstantProgramVariableSort();
-
-    // implict field match
-    public static final ProgramSVSort IMPLICITREFERENCE
-	= new ImplicitFieldReferenceSort();
 
     public static final ProgramSVSort VARIABLEINIT
 	= new ProgramSVSort(new Name("VariableInitializer")) {
@@ -255,61 +239,9 @@ public abstract class ProgramSVSort extends AbstractSort {
 
     //--------------- Specials that match on certain names-----------------
     
-    public static final ProgramSVSort IMPLICITCLINIT
-	= new ImplicitFieldSort(new Name("ImplicitClassInitialized"),
-	                        ImplicitFieldAdder.
-				IMPLICIT_CLASS_INITIALIZED, true);
-
-    public static final ProgramSVSort IMPLICITINITINPROGRESS
-	= new ImplicitFieldSort(new Name("ImplicitClassInitializationInProgress"),
-	                        ImplicitFieldAdder.
-				IMPLICIT_CLASS_INIT_IN_PROGRESS, true);
-
-    public static final ProgramSVSort IMPLICITERRONEOUS
-	= new ImplicitFieldSort(new Name("ImplicitClassErroneous"),
-	                        ImplicitFieldAdder.
-				IMPLICIT_CLASS_ERRONEOUS, true);
-
-    public static final ProgramSVSort IMPLICITPREPARED
-	= new ImplicitFieldSort(new Name("ImplicitClassPrepared"),
-	                        ImplicitFieldAdder.
-				IMPLICIT_CLASS_PREPARED, true);
-
-    public static final ProgramSVSort IMPLICITNEXTTOCREATE
-	= new ImplicitFieldSort(new Name("ImplicitNextToCreate"),
-	                        ImplicitFieldAdder.IMPLICIT_NEXT_TO_CREATE, true);
-    
-    public static final ProgramSVSort IMPLICITCREATED
-        = new ImplicitFieldSort(new Name("ImplicitCreated"),
-                                ImplicitFieldAdder.IMPLICIT_CREATED, true);
-    
-    public static final ProgramSVSort IMPLICITENLOSINGTHIS
-    = new ImplicitFieldSort(new Name("ImplicitEnclosingThis"),
-                            ImplicitFieldAdder.IMPLICIT_ENCLOSING_THIS, true);
-
-    public static final ProgramSVSort IMPLICITTRAINITIALIZED
-	= new ImplicitFieldSort(new Name("ImplicitTraInitialized"),
-	                        ImplicitFieldAdder.IMPLICT_ARRAY_TRA_INITIALIZED, 
-				true);
-
-    public static final ProgramSVSort IMPLICITTRANSACTIONCOUNTER
-	= new ImplicitFieldSort(new Name("ImplicitTransactionCounter"),
-	                        "de.uka.ilkd.key.javacard.KeYJCSystem" + "::" + 
-				JVMIsTransientMethodBuilder.IMPLICIT_TRANSACTION_COUNTER, 
-				false);
 
     public static final ProgramSVSort ARRAYLENGTH
 	= new ArrayLengthSort();
-
-    public static final ProgramSVSort JCMAKETRANSIENTARRAY
-	= new MethodNameReferenceSort(new Name("makeTransientArray"),
-	                              new String[] {"jvmMakeTransientBooleanArray",
-				        "jvmMakeTransientByteArray",
-				        "jvmMakeTransientShortArray",
-				        "jvmMakeTransientObjectArray"}, 
-				      "de.uka.ilkd.key.javacard.KeYJCSystem",
-				      SLListOfName.EMPTY_LIST.append
-				      (new Name("byte")).append(new Name("short")));
 
     public static final ProgramSVSort JCARRAYCOPY
 	= new SpecificMethodNameSort(new ProgramElementName("jvmArrayCopy"));
@@ -324,36 +256,17 @@ public abstract class ProgramSVSort extends AbstractSort {
 	= new SpecificMethodNameSort(new ProgramElementName("jvmMakeShort"));
     public static final ProgramSVSort JCSETSHORT
 	= new SpecificMethodNameSort(new ProgramElementName("jvmSetShort"));
-
-    public static final ProgramSVSort JCISTRANSIENT
-	= new SpecificMethodNameSort(new ProgramElementName("jvmIsTransient"));
-    public static final ProgramSVSort JCBEGINTRANSACTION
-	= new SpecificMethodNameSort(new ProgramElementName("jvmBeginTransaction"));
-    public static final ProgramSVSort JCCOMMITTRANSACTION
-	= new SpecificMethodNameSort(new ProgramElementName("jvmCommitTransaction"));
-    public static final ProgramSVSort JCABORTTRANSACTION
-	= new SpecificMethodNameSort(new ProgramElementName("jvmAbortTransaction"));
-    public static final ProgramSVSort JCSUSPENDTRANSACTION
-	= new SpecificMethodNameSort(new ProgramElementName("jvmSuspendTransaction"));
-    public static final ProgramSVSort JCRESUMETRANSACTION
-	= new SpecificMethodNameSort(new ProgramElementName("jvmResumeTransaction"));
     
     public static final ProgramSVSort ALLOCATE
         = new SpecificMethodNameSort(new ProgramElementName
                 (InstanceAllocationMethodBuilder.IMPLICIT_INSTANCE_ALLOCATE));
     
-    public static final ProgramSVSort SEP //TODO
-        = new SpecificMethodNameSort(new ProgramElementName("sep"));
 
-    public static final ProgramSVSort  DEBUGGERTYPEREF
-    = new  DebuggerTypeReferenceSort();
     
     //---------------REFERENCE SORTS ------------------------
     public static final ProgramSVSort EXECUTIONCONTEXT = new ExecutionContextSort();
 
     
-
-    //---------------UNNECESSARY ONES------------------------
 
 
 
@@ -884,27 +797,6 @@ public abstract class ProgramSVSort extends AbstractSort {
     }
     
     
-    /**
-     * This sort represents a type of program schema variables that
-     * match only on type references.
-     */    
-    private static final class DebuggerTypeReferenceSort extends ProgramSVSort {
-
-        public DebuggerTypeReferenceSort() {
-            super(new Name("DebuggerType"));
-        }
-
-        protected boolean canStandFor(ProgramElement check, Services services) {
-            if (check instanceof TypeReference){
-               TypeReference tr = (TypeReference)check;
-               System.out.println(tr.getReferencePrefix());
-                
-            } 
-            return false;
-        }
-    }
-
-
     /**
      * This sort represents a type of program schema variables that
      * match anything except byte, char, short, int, and long.
@@ -1448,70 +1340,6 @@ public abstract class ProgramSVSort extends AbstractSort {
 	
     }
 
-    private static class ImplicitFieldSort extends FieldSort {
-	
-	public ImplicitFieldSort(Name name, boolean ignorePrivatePrefix) {
-	    super(name, ignorePrivatePrefix);
-	}
-
-	public ImplicitFieldSort(boolean ignorePrivatePrefix) {
-	    this(new Name("ImplicitField"), ignorePrivatePrefix);
-	}
-
-	public ImplicitFieldSort(String field, boolean ignorePrivatePrefix) {
-	    super(new Name("ImplicitField"), field, ignorePrivatePrefix);
-	}
-
-	public ImplicitFieldSort(Name name, String field, boolean ignorePrivatePrefix) {
-	    super(name, field, ignorePrivatePrefix);
-	}
-	
-
-	// %%% we should move information from the variable
-	// specification to the program variable %RB
-	protected boolean allowed(ProgramElement pe, Services services) {
-	    return super.allowed(pe, services) ||  
-		(matchingNames[0] == null && pe instanceof ProgramVariable && implicit(pe));
-	}
-
-	public boolean canStandFor(Term t) {
-            boolean result = false;
-	    if (t.op() instanceof ProgramVariable) {
-		result = allowed((ProgramVariable)t.op(), null);
-	    }
-	    return result;
-	}
-
-	protected boolean canStandFor(ProgramElement pe,
-				      Services services) {
-	    ProgramElement var = pe;
-	    if (pe instanceof ImplicitFieldSpecification) {
-		var = ((ImplicitFieldSpecification)pe).getProgramVariable();
-	    } else if (pe instanceof FieldReference) {
-		var = ((FieldReference)pe).getProgramVariable();
-	    }
-	    return allowed(var, services);		
-	}
-    }
-
-
-    private static class ImplicitFieldReferenceSort 
-	extends ImplicitFieldSort {
-
-	public ImplicitFieldReferenceSort() {
-	    super(new Name("ImplicitReferenceField"), true);
-	}
-
-	// %%% we should move information from the variable
-	// specification to the program variable %RB
-	// implicit fields are not of array type so we do not check for
-	// this reference type
-	protected boolean allowed(ProgramElement pe, Services services) {
-	    return super.allowed(pe, services) &&
-		((ProgramVariable)pe).getKeYJavaType().getJavaType()
-		instanceof ClassType;
-	}
-    }
 
     private static final class ArrayLengthSort extends ProgramSVSort {
 
@@ -1570,8 +1398,6 @@ public abstract class ProgramSVSort extends AbstractSort {
     }
 
     static boolean excludedMethodName(Name name) {
-        if(((MethodNameReferenceSort)JCMAKETRANSIENTARRAY).compareNames(name) >= 0)
-	    return true;
 	return false;
     }
 

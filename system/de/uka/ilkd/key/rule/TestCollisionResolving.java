@@ -39,7 +39,7 @@ public class TestCollisionResolving extends TestCase {
 	TacletForTests.parse();
 	s = (Sort)TacletForTests.getSorts().lookup(new Name("s"));
 
-   	services = new Services();
+   	services = TacletForTests.services();
 
 	//build a goal (needed for creating TacletInstantiationsTableModel)
     	Proof proof = new Proof(services);

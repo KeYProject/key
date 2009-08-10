@@ -22,6 +22,10 @@ public class Function extends AbstractSortedOperator {
             
     private final boolean unique;
     
+    
+    //-------------------------------------------------------------------------
+    //constructors
+    //-------------------------------------------------------------------------     
 
     public Function(Name name, 
 	            Sort sort, 
@@ -59,6 +63,10 @@ public class Function extends AbstractSortedOperator {
 	this(name, sort, argSorts, null, false);
     }
     
+    
+    //-------------------------------------------------------------------------
+    //public interface
+    //-------------------------------------------------------------------------     
     
     public boolean isUnique() {
 	return unique;

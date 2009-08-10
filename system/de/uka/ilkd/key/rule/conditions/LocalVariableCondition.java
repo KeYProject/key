@@ -20,7 +20,7 @@ import de.uka.ilkd.key.rule.VariableConditionAdapter;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 /**
- *  Ensures the given ProgramElement denotes a local variable
+ * Ensures the given ProgramElement denotes a local variable
  */
 public final class LocalVariableCondition extends VariableConditionAdapter {
 
@@ -55,5 +55,4 @@ public final class LocalVariableCondition extends VariableConditionAdapter {
     public String toString () {
         return "\\isLocalVariable (" + var+ ")";
     }
-
 }

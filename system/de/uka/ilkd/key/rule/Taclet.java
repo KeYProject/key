@@ -342,7 +342,6 @@ public abstract class Taclet implements Rule, Named {
 	matchCond = matchHelp(term, template, ignoreUpdates, matchCond, 
 		 services, userConstraint);	
 	Debug.out(matchCond == null ? "Failed: " : "Succeeded: ", name);
-//if(matchCond != null) Debug.out("insts: ", matchCond.getInstantiations());	
 	return matchCond == null ? null : checkConditions(matchCond, services);
     }
 
@@ -418,8 +417,14 @@ public abstract class Taclet implements Rule, Named {
             return null;
         }
         MatchConditions result = cond;
+        
         final IteratorOfSchemaVariable svIterator = 
             cond.getInstantiations().svIterator();
+        
+        if(!svIterator.hasNext()) {
+            return checkVariableConditions(null, null, cond, services);//XXX
+        }
+        
         while (svIterator.hasNext()) {
             final SchemaVariable sv = svIterator.next();
             final Object o = result.getInstantiations().getInstantiation(sv);
@@ -433,47 +438,6 @@ public abstract class Taclet implements Rule, Named {
             }
         }
         return result;
-    }
-    
-    private MatchConditions addInstantiation(Term term, SchemaVariable sv, 
-					     MatchConditions matchCond,
-					     Services services) {   
-        MatchConditions result = matchCond;
-	Term t = null;
-	try {
-	    t = result.getInstantiations ().
-		getTermInstantiation(sv, 
-				     matchCond.
-				     getInstantiations().getExecutionContext(), 
-				     services);
-	} catch (IllegalInstantiationException e) {
-	    return null;
-	}
-	if (t != null) {
-	    Constraint c = result.getConstraint ().unify ( t, term, services );
-	    if ( !c.isSatisfiable () ) {
-		Debug.out("FAILED. 13: addInstantiation not satisfiable"); 
-		return null; //FAILED;
-	    } else {
-		return result.setConstraint ( c );
-	    }
-	}	
-
-	// no former matching found
-	result = checkVariableConditions(sv, term, result, services);
-	      
-	if (result == null) {
-	    Debug.out("FAILED. 13: Var Conds not met");	    
-	    return null; //FAILED;
-	}
-	
-	try {
-	    return result.setInstantiations ( result.getInstantiations ()
-					      .add(sv, term, services) );
-	} catch ( IllegalInstantiationException e ) 
-	    {Debug.out("Exception thrown by class Taclet at setInstantiations");}
-	Debug.out("FAILED. 14: Illegal Instantiation");	    
-	return null;
     }
     
 

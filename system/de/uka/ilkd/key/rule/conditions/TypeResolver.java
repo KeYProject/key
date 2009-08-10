@@ -11,7 +11,7 @@ package de.uka.ilkd.key.rule.conditions;
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.GenericSort;
@@ -27,10 +27,14 @@ import de.uka.ilkd.key.util.Debug;
  */
 public abstract class TypeResolver {
     
+    //-------------------------------------------------------------------------
+    //public interface
+    //-------------------------------------------------------------------------         
+    
     public static TypeResolver createContainerTypeResolver(SchemaVariable s) {
         return new ContainerTypeResolver(s);
     }
-    
+        
     public static TypeResolver createElementTypeResolver(SchemaVariable s) {
         return new ElementTypeResolverForSV(s);
     }
@@ -45,12 +49,19 @@ public abstract class TypeResolver {
     
     
     public abstract boolean isComplete(SchemaVariable sv, 
-            SVSubstitute instCandidate, SVInstantiations instMap, Services services);
+            			       SVSubstitute instCandidate, 
+            			       SVInstantiations instMap, 
+            			       Services services);
     
     public abstract Sort resolveSort(SchemaVariable sv, 
-            SVSubstitute instCandidate, SVInstantiations instMap, Services services);
-        
+            			     SVSubstitute instCandidate, 
+            			     SVInstantiations instMap, 
+            			     Services services);
     
+    
+    //-------------------------------------------------------------------------
+    //inner classes
+    //-------------------------------------------------------------------------     
     
     public static class GenericSortResolver extends TypeResolver {
 
@@ -151,6 +162,7 @@ public abstract class TypeResolver {
         }
     }
    
+    
     public static class ContainerTypeResolver extends TypeResolver {
                 
         private final SchemaVariable memberSV;
@@ -168,45 +180,49 @@ public abstract class TypeResolver {
         }
 
         @Override
-        public Sort resolveSort(SchemaVariable sv, SVSubstitute instCandidate,
-                SVInstantiations instMap, Services services) {            
-            return resolveType(sv, instCandidate, instMap, services).getSort();
-        }
-
-        private KeYJavaType resolveType(SchemaVariable sv,
-                SVSubstitute instCandidate, SVInstantiations instMap,
-                Services services) {
-            
-            final KeYJavaType resolvedType;
+        public Sort resolveSort(SchemaVariable sv, 
+        			SVSubstitute instCandidate,
+        			SVInstantiations instMap, 
+        			Services services) {     
+            final Sort result;
             
             final SVSubstitute inst = (SVSubstitute) (memberSV == sv ? instCandidate : 
                 instMap.getInstantiation(memberSV)); 
-            
+
             if (inst instanceof Operator) {
-                resolvedType = getContainerType(inst);
+                result = getContainerSort((Operator)inst, services);
             } else {
                 if (inst instanceof Expression) {
-                    resolvedType = getContainerType
+                    result = getContainerSort
                     (services.getTypeConverter().convertToLogicElement((Expression)inst, 
-                            instMap.getExecutionContext()).op());
+                            instMap.getExecutionContext()).op(), services);
                 } else if (inst instanceof Term) {
-                    resolvedType = getContainerType(((Term)inst).op());
+                    result = getContainerSort(((Term)inst).op(), services);
                 } else {
                     Debug.fail("Unexpected instantiation for SV " + memberSV + ":" + inst);
-                    resolvedType = null;
+                    result = null;
                 }
             }     
-            return resolvedType;
+            return result;
         }
     
-        private KeYJavaType getContainerType(SVSubstitute inst) {
-            KeYJavaType resolvedType = null;
-            if (inst instanceof ProgramVariable) {
-                resolvedType  = ((ProgramVariable)inst).getContainerType();
+        private Sort getContainerSort(Operator op, Services services) {
+            Sort result = null;
+            if (op instanceof ProgramVariable) {
+                result  = ((ProgramVariable)op).getContainerType().getSort();
+            } else if(op instanceof Function
+        	      && ((Function)op).isUnique()
+        	      && ((Function)op).name().toString().contains("::")) {
+        	//XXX
+        	Function func = (Function) op;
+        	String funcName = func.name().toString();
+        	String sortName = funcName.substring(0, funcName.indexOf("::"));
+        	return (Sort) 
+        	   services.getNamespaces().sorts().lookup(new Name(sortName));
             } else {
-                Debug.fail("Unknown member type: ", inst);
+                Debug.fail("Unknown member type", op);
             }
-            return resolvedType;
+            return result;
         }
         
         @Override

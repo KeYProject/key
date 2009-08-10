@@ -68,7 +68,6 @@ public final class TypeComparisonCondition extends VariableConditionAdapter {
             // not yet complete
             return true;
         }
-        
 	return checkSorts(fst.resolveSort(var, subst, svInst, services), 
                           snd.resolveSort(var, subst, svInst, services), 
                           services);

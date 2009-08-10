@@ -43,8 +43,6 @@ import de.uka.ilkd.key.util.Debug;
  */
 public class ImplicitFieldAdder extends RecoderModelTransformer {
 
-    public static final String IMPLICT_ARRAY_TRA_INITIALIZED = "<traInitialized>";
-
     public static final String IMPLICIT_CLASS_PREPARED = "<classPrepared>";
     public static final String IMPLICIT_CLASS_INITIALIZED = "<classInitialized>";
     public static final String IMPLICIT_CLASS_INIT_IN_PROGRESS = "<classInitializationInProgress>";

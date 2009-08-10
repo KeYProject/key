@@ -56,7 +56,8 @@ public final class ArraySort extends AbstractSort {
 	SetOfSort result = SetAsListOfSort.EMPTY_SET;
 	
 	SetOfSort elemDirectSuperSorts = elemSort.extendsSorts();
-	if(elemDirectSuperSorts.isEmpty()) {
+	if(elemDirectSuperSorts.equals(SetAsListOfSort.EMPTY_SET
+		                                      .add(Sort.ANY))) {
 	    result = result.add(objectSort)
 	                   .add(cloneableSort)
 	                   .add(serializableSort);    

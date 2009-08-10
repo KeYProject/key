@@ -11,7 +11,6 @@ package de.uka.ilkd.key.gui;
 
 import java.awt.*;
 import java.awt.event.*;
-import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
 

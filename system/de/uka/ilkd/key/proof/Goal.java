@@ -16,7 +16,6 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-import de.uka.ilkd.key.explicitheap.ExplicitHeapConverter;
 import de.uka.ilkd.key.gui.RuleAppListener;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.IteratorOfProgramVariable;

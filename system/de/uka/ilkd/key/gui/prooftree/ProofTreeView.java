@@ -610,13 +610,12 @@ public class ProofTreeView extends JPanel {
 	    Node node = ((GUIProofTreeNode)value).getNode();
 	    String nodeText = node.serialNr()+":"+node.name();
 	    boolean isBranch = false;
-
 	    {
                 final Node child = ((GUIProofTreeNode)value).findChild( node );
                 if ( child != null && child.getNodeInfo()
                     .getBranchLabel () != null ) {
-                    nodeText += ": " + child.getNodeInfo().getBranchLabel ();
                     isBranch = true;
+                    nodeText += ": " + child.getNodeInfo().getBranchLabel ();
                 }
             }
 
@@ -668,7 +667,7 @@ public class ProofTreeView extends JPanel {
                 } else {
                     defaultIcon = null;
                 }
-                if (isBranch) {
+                if (isBranch && node.childrenCount() > 1) {
                     defaultIcon = getOpenIcon();
                     tooltipText = "A branch node with all siblings hidden";
                 }

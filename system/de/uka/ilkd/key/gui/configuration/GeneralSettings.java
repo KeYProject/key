@@ -55,7 +55,7 @@ public class GeneralSettings implements Settings {
     private boolean dndDirectionSensitive = true;
     
     /** is one-step simplification enabled */
-    private boolean oneStepSimplification = false;
+    private boolean oneStepSimplification = true;
     
     /** JML is active by default */
     private boolean useJML = true;

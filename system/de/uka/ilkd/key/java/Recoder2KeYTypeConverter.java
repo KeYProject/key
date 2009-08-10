@@ -193,7 +193,9 @@ public class Recoder2KeYTypeConverter {
         } else if (t instanceof recoder.abstraction.NullType) {
             s = (Sort) namespaces.sorts().lookup(NullSort.NAME);
             if(s == null) {
-        	throw new RuntimeException("Null sort not found!");
+        	Sort objectSort = (Sort)namespaces.sorts().lookup(new Name("java.lang.Object"));
+        	assert objectSort != null;
+        	s = new NullSort(objectSort);
             }
             addKeYJavaType(t, s);
         } else if (t instanceof ParameterizedType) {
@@ -470,17 +472,6 @@ public class Recoder2KeYTypeConverter {
 
                 final recoder.service.NameInfo nameInfo = getServiceConfiguration()
                 .getNameInfo();
-
-                TypeReference booleanArrayTypeRef;
-                if (base == PrimitiveType.JAVA_BOOLEAN && dimension == 1) {
-                    booleanArrayTypeRef = parentReference;
-                } else {
-                    booleanArrayTypeRef = new TypeRef(getKeYJavaType(nameInfo
-                            .getArrayType(nameInfo.getBooleanType())), 1);
-                }
-                members.add(createImplicitArrayField(
-                        ImplicitFieldAdder.IMPLICT_ARRAY_TRA_INITIALIZED,
-                        booleanArrayTypeRef, false, parent));
 
                 // add methods
                 // the only situation where base can be null is in case of a

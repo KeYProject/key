@@ -116,7 +116,7 @@ public class TestDeclParser extends TestCase {
 	parseDecls("\\sorts { \\generic G; \\generic H \\extends G; }");
 
 	G = checkGenericSort ( nss.sorts().lookup(new Name("G")),
-			       SetAsListOfSort.EMPTY_SET,
+			       SetAsListOfSort.EMPTY_SET.add(Sort.ANY),
 			       SetAsListOfSort.EMPTY_SET );
 	H = checkGenericSort ( nss.sorts().lookup(new Name("H")),
 			       SetAsListOfSort.EMPTY_SET.add ( G ),
@@ -128,7 +128,7 @@ public class TestDeclParser extends TestCase {
 	
 	S = checkSort        ( nss.sorts().lookup(new Name("S")) );
 	G = checkGenericSort ( nss.sorts().lookup(new Name("G")),
-			       SetAsListOfSort.EMPTY_SET,
+			       SetAsListOfSort.EMPTY_SET.add(Sort.ANY),
 			       SetAsListOfSort.EMPTY_SET );
 	H = checkGenericSort ( nss.sorts().lookup(new Name("H")),
 			       SetAsListOfSort.EMPTY_SET.add ( S ).add ( G ),
@@ -141,7 +141,7 @@ public class TestDeclParser extends TestCase {
 	S = checkSort        ( nss.sorts().lookup(new Name("S")) );
 	T = checkSort        ( nss.sorts().lookup(new Name("T")) );
 	H = checkGenericSort ( nss.sorts().lookup(new Name("H")),
-			       SetAsListOfSort.EMPTY_SET,
+			       SetAsListOfSort.EMPTY_SET.add(Sort.ANY),
 			       SetAsListOfSort.EMPTY_SET.add ( S ).add ( T ) );
 	
 
@@ -151,7 +151,7 @@ public class TestDeclParser extends TestCase {
 	S = checkSort        ( nss.sorts().lookup(new Name("S")) );
 	T = checkSort        ( nss.sorts().lookup(new Name("T")) );
 	G = checkGenericSort ( nss.sorts().lookup(new Name("G")),
-			       SetAsListOfSort.EMPTY_SET,
+			       SetAsListOfSort.EMPTY_SET.add(Sort.ANY),
 			       SetAsListOfSort.EMPTY_SET );
 	H = checkGenericSort ( nss.sorts().lookup(new Name("H")),
 			       SetAsListOfSort.EMPTY_SET.add ( T ).add ( G ),
@@ -164,10 +164,10 @@ public class TestDeclParser extends TestCase {
 	S = checkSort        ( nss.sorts().lookup(new Name("S")) );
 	T = checkSort        ( nss.sorts().lookup(new Name("T")) );
 	G = checkGenericSort ( nss.sorts().lookup(new Name("G")),
-			       SetAsListOfSort.EMPTY_SET,
+			       SetAsListOfSort.EMPTY_SET.add(Sort.ANY),
 			       SetAsListOfSort.EMPTY_SET );
 	checkGenericSort     ( nss.sorts().lookup(new Name("G2")),
-			       SetAsListOfSort.EMPTY_SET,
+			       SetAsListOfSort.EMPTY_SET.add(Sort.ANY),
 			       SetAsListOfSort.EMPTY_SET );
 	H = checkGenericSort ( nss.sorts().lookup(new Name("H")),
 			       SetAsListOfSort.EMPTY_SET.add ( T ).add ( G ),
@@ -241,7 +241,7 @@ public class TestDeclParser extends TestCase {
         Sort serializableSort = serv.getJavaInfo().serializableSort();
 	Sort aSortArr = ArraySort.getArraySort(aSort, objectSort, cloneableSort, serializableSort);
 	Sort aSortArr2 = ArraySort.getArraySort(aSortArr, objectSort, cloneableSort, serializableSort);
-	assertTrue("aSort[] should extend Cloneable ", 
+	assertTrue("aSort[] should extend Cloneable: " + aSortArr.extendsSorts(), 
 		   aSortArr.extendsSorts().contains(cloneableSort)); 
  	assertTrue("aSort[] should transitively extend Object ", 
 		   aSortArr.extendsTrans(objectSort)); 

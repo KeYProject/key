@@ -711,7 +711,6 @@ public class Recoder2KeY implements JavaReader {
                 new PrepareObjectBuilder(servConf, cache), 
                 new CreateBuilder(servConf, cache),
                 new CreateObjectBuilder(servConf, cache),
-                new JVMIsTransientMethodBuilder(servConf, cache),
                 new LocalClassTransformation(servConf, cache)
         };
 

@@ -40,11 +40,13 @@ public final class SortDependingFunction extends Function {
 	    			  Sort sortDependingOn) {
 	super(instantiateName(template.kind, sortDependingOn), 
 	      instantiateResultSort(template, sortDependingOn),
-	      instantiateArgSorts(template, sortDependingOn));
+	      instantiateArgSorts(template, sortDependingOn),
+	      null,
+	      template.unique);
 	this.template = template;
 	this.sortDependingOn = sortDependingOn;
     }
-	    
+
     
     //-------------------------------------------------------------------------
     //internal methods
@@ -132,12 +134,14 @@ public final class SortDependingFunction extends Function {
 	    			GenericSort sortDependingOn,
 	    			Name kind, 
 	    		        Sort sort, 
-	    		        Sort[] argSorts) {
+	    		        Sort[] argSorts,
+	    		        boolean unique) {
 	SortDependingFunctionTemplate template 
 		= new SortDependingFunctionTemplate(sortDependingOn, 
 						    kind, 
 						    sort, 
-						    new ArrayOfSort(argSorts));
+						    new ArrayOfSort(argSorts),
+						    unique);
 	return new SortDependingFunction(template, Sort.ANY);
     }
     
@@ -256,16 +260,19 @@ public final class SortDependingFunction extends Function {
 	public final GenericSort sortDependingOn;
 	public final Name kind;	
 	public final Sort sort;
-	public final ArrayOfSort argSorts; 
+	public final ArrayOfSort argSorts;
+	public final boolean unique;
 	
 	public SortDependingFunctionTemplate(GenericSort sortDependingOn,
 		                             Name kind,
 		                             Sort sort,
-		                             ArrayOfSort argSorts) {
+		                             ArrayOfSort argSorts,
+		                             boolean unique) {
 	    this.sortDependingOn = sortDependingOn;
 	    this.kind = kind;
 	    this.sort = sort;
 	    this.argSorts = argSorts;
+	    this.unique = unique;
 	}
     }
 }

@@ -18,6 +18,7 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.util.ExtList;
 
@@ -161,30 +162,37 @@ public final class HeapLDT extends LDT {
     public Function getFieldSymbolForPV(ProgramVariable fieldPV, 
 	    				Services services) {
 	assert fieldPV.isMember();	
-	final Name name;
 	if(fieldPV == services.getJavaInfo().getArrayLength()) {
 	    return getLength();
-	} else if(fieldPV.isStatic()) {
-	    assert fieldPV.toString().contains("::");
-	    name = new Name(fieldPV.toString());
-	} else {
-	    name = new Name(fieldPV.toString());
 	}
 	
-        Function result 
-            = (Function) services.getNamespaces().functions().lookup(name); 
-        if(result == null) {
-            result = new Function(name, 
-                     	          fieldSort, 
-                		  new Sort[0], 
-                		  null,
-                		  true);
-            services.getNamespaces().functions().addSafely(result);
-        } 
+	Name name = new Name(fieldPV.toString());
+	Function result = (Function) services.getNamespaces()
+	                                     .functions()
+	                                     .lookup(name);
+	if(result == null) {
+	    int index = fieldPV.toString().indexOf("::");
+	    assert index > 0;
+	    Name kind = new Name(fieldPV.toString().substring(index + 2));
+	    
+	    SortDependingFunction firstInstance 
+		= SortDependingFunction.getFirstInstance(kind, services);
+	    if(firstInstance != null) {
+		Sort sortDependingOn = fieldPV.getContainerType().getSort();		
+		result = firstInstance.getInstanceFor(sortDependingOn, services);
+	    } else {
+		result = new Function(name, 
+				      fieldSort, 
+				      new Sort[0], 
+				      null,
+				      true);
+		services.getNamespaces().functions().addSafely(result);
+	    }
+	}
         
         assert result.isUnique();        
         return result;
-    }    
+    }
     
     
     @Override
