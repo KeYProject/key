@@ -6,11 +6,11 @@ import de.uka.ilkd.key.util.ProgressMonitor;
  */
 interface MakesProgress {
    
-   /** Adds a ProgressMonitor to the set of progress listener.*/
+   /** Adds a <code>ProgressMonitor</code> to the set of progress listener.*/
    public void addProgressMonitor(ProgressMonitor p);
     
     /**
-     * Removes a ProgerssMonitor from the set of progress listener.
+     * Removes a <code>ProgerssMonitor</code> from the set of progress listener.
      * @param p the ProgressMonitor to remove.
      * @return true, if the method has succeeded.
      */

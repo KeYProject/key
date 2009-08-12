@@ -107,9 +107,6 @@ public class DecisionProcedureSettings implements Settings {
     /** mapping of rule name (key) to execution string (value) */
     private HashMap<String, String> execCommands = new HashMap<String, String>();
     
-    ///**mapping of rule name (key) to multiple use*/
-   // private HashMap<String,Boolean> multipleUse = new HashMap<String,Boolean>();
-    
     /** the string separating different solver-command values. */
     private static final String execSeperator1 = ":"; 
     /** The String separating solvernames from commands in the settingsfile */
@@ -121,6 +118,7 @@ public class DecisionProcedureSettings implements Settings {
     
     /**the string separating solvernames from the value */
     private static final String multSeparator2 = "=";
+    
     
     private String multProversSettings=null;
     private boolean waitForAllProvers = false;

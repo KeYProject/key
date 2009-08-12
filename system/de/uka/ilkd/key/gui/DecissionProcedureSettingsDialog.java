@@ -10,10 +10,8 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
-import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
-import javax.swing.JTextPane;
 import javax.swing.ListSelectionModel;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.ListSelectionEvent;
@@ -50,6 +48,11 @@ public class DecissionProcedureSettingsDialog extends JDialog {
     private static final int RULE_LIST_HEIGHT=345;
     
     
+    /**
+     * Sets the preferred, maximum and minimum size of a <code>JComponent c</code> to <code>Dimension d</code>.
+     * @param c  
+     * @param d
+     */
     private void setSize(JComponent c,Dimension d){
 	c.setPreferredSize(d);
 	c.setMaximumSize(d);
@@ -73,6 +76,7 @@ public class DecissionProcedureSettingsDialog extends JDialog {
 	return instance;
     }
     
+    /** Call this method to reset the dialog to its original dimension.*/
     public static void resetInstance() {
 	instance.setSize(400, 300);
 	
@@ -188,7 +192,7 @@ public class DecissionProcedureSettingsDialog extends JDialog {
 	
 	//add the description
 	JTextArea c = new JTextArea("Editing the start command:\n" +
-		"Specify the starting command for an external procedure in\n such a way, it can be executed " +
+		"Specify the start command for an external procedure in\n such a way that it can be executed " +
 		"to solve a problem file.\nFeel free to use any parameter to finetune the program.\n\n" +
 		"Use %f as placeholder for the filename containing the \nproblemdescription.\n\n" +
 		"Use %p as placeholder for the problem directly.\nThis should be needed in special cases only."+"\n\n (Press 'apply' after you have changed options for a single\n prover.)");

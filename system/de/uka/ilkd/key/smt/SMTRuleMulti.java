@@ -1,13 +1,9 @@
 package de.uka.ilkd.key.smt;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Timer;
 
 import org.apache.log4j.Logger;
@@ -39,22 +35,30 @@ class SolverWrapper
   private SMTSolverResult Result = SMTSolverResult.NO_IDEA;
   /**If true, the solver is used for proving*/
   private boolean 	   UsedForProving=false;
-  
+  /**Stores the result of the external prover*/
   private String Text="";
+  /**Stores the error message of the external prover*/
   private String ErrorText="";
+  /**The exitValue of the external prover*/
   private int    exitValue =0; 
-  
-  
-
-  
+  /**When the external prover has finished <code>Finished</code> should be set by calling <code>setFinished(true)</code>*/  
   private boolean        Finished=false;
 
-  
+  /**Remark: Whether the variable <code>Finished</code> is set to <code>true</code> depends on whether the user of this class has called <code>setFinished(true)</code>.<br>
+   * There isn't any mechanism inside this class to check the status of the external prover.
+   * 
+   * @return true, if the variable <code>Finished</code> is set to true.
+   */
   public boolean hasFinished() {
     return Finished;
   }
 
 
+  /**
+   * If the external prover has finished, call this method, to interpret the result.
+   * @param finished
+   * @throws IOException
+   */
   public void setFinished(boolean finished) throws IOException {
       
     Finished = finished;
@@ -71,15 +75,12 @@ class SolverWrapper
 	    exitValue = Proc.exitValue();
 	    
 	    Result = interpretAnswer();
-	
-
     }
     else {
 	Text = "";
 	ErrorText = "";
 	exitValue =0;
-	
-	
+
     }
     
   }
@@ -116,10 +117,16 @@ class SolverWrapper
     UsedForProving = usedForProving;
   }
 
+  /** 
+   * @return Returns the process associated with the solver.
+   */
   public Process getProc() {
     return Proc;
   }
 
+  /**
+   * @return Returns the solver associated with this wrapper class.
+   */
   public SMTSolver getSolver() {
     return Solver;
   }
@@ -136,8 +143,6 @@ class SolverWrapper
   public SMTSolverResult interpretAnswer() throws IOException
   {
       SMTSolverResult toReturn;
-
-      
 	try {
 	    toReturn = Solver.interpretAnswer(Text, ErrorText, exitValue);
 	} catch (IllegalArgumentException e) {
@@ -149,6 +154,9 @@ class SolverWrapper
     
 }
 
+/**
+ * Implements the <code>BuildInRule</code> for the rule 'multiple provers', which allows the user for starting several external provers at the same time.
+ */
 public class SMTRuleMulti implements BuiltInRule, MakesProgress {
     
     
@@ -160,14 +168,15 @@ public class SMTRuleMulti implements BuiltInRule, MakesProgress {
 
     /**List of all possibles solvers that can be used, not installed solvers are also stored in <code>Solvers</code>*/
     private ArrayList<SolverWrapper> Solvers = new ArrayList<SolverWrapper>();
-    /**List of all processes that has been started while executing the rule*/
+    /**List of all processes that has been started while executing the rule.*/
     private ArrayList<Process> runningProcesses = new ArrayList<Process>();
-    /**List of all solvers that has been started while executing the rule*/
+    /**List of all solvers that has been started while executing the rule.*/
     private ArrayList<SolverWrapper> runningSolvers = new ArrayList<SolverWrapper>(); 
     
-    
+    /**True, if the process of proving should be interrupted immediately. */
     private boolean toBeInterrupted = false;
     
+    /**List of all listeners which watch the progress of proving.*/
     private ArrayList<ProgressMonitor> progressMonitors = new ArrayList<ProgressMonitor>();
     
     public void addProgressMonitor(ProgressMonitor p) {
@@ -202,16 +211,23 @@ public class SMTRuleMulti implements BuiltInRule, MakesProgress {
     
     
     
-    
-    private SolverWrapper find(Process p)
-    {
+    /**
+     * Finds the <code>SolverWrapper</code> associated with the process <code>p</code> 
+     * @param p
+     * 
+     */
+    private SolverWrapper find(Process p){
 	for(SolverWrapper sw : Solvers)
 	    if(sw.getProc() == p) return sw;
 	return null;
     }
     
-    private SolverWrapper find(String name)
-    {
+    /**
+     * Finds the <code>SolverWrapper</code> associated with <code>name</code> 
+     * @param name
+     * 
+     */
+    private SolverWrapper find(String name)    {
 	for(SolverWrapper sw: Solvers)
 	    if(sw.getSolver().name().equals(name)) return sw;
 	return null;
@@ -224,8 +240,7 @@ public class SMTRuleMulti implements BuiltInRule, MakesProgress {
      * @param s 
      * @param use true, if the SMTSolver s should be used, when the rule is executed
      */
-    public void useSMTSolver(SMTSolver s, boolean use)
-    {
+    public void useSMTSolver(SMTSolver s, boolean use){
 	SolverWrapper sw = find(s);
 	if(sw == null) throw new IllegalArgumentException("Solver can not be found.");
 	sw.setUsedForProving(use);
@@ -236,8 +251,7 @@ public class SMTRuleMulti implements BuiltInRule, MakesProgress {
      * @param name name of the solver
      * @param use true, if the SMTSolver should be used, when the rule is executed
      */
-    public void useSMTSolver(String name, boolean use)
-    {
+    public void useSMTSolver(String name, boolean use){
 	SolverWrapper sw = find(name);
 	if(sw == null) throw new IllegalArgumentException("There is no solver called "+ name);
 	sw.setUsedForProving(use);
@@ -247,8 +261,7 @@ public class SMTRuleMulti implements BuiltInRule, MakesProgress {
      * @return returns a list of all possible solvers, that are implemented by the interface SMTSolver
      */
     
-    public ArrayList<String> getNamesOfSolvers()
-    {
+    public ArrayList<String> getNamesOfSolvers(){
 	ArrayList<String> list = new ArrayList<String>();
 	for(SolverWrapper sw : Solvers){
 	    list.add(sw.getSolver().name());
@@ -263,8 +276,7 @@ public class SMTRuleMulti implements BuiltInRule, MakesProgress {
      * @param s
      * @return true, if the SMTSolver s is used.
      */
-    public boolean SMTSolverIsUsed(SMTSolver s)
-    {
+    public boolean SMTSolverIsUsed(SMTSolver s){
 	SolverWrapper sw = find(s);
 	if(sw == null) throw new IllegalArgumentException("Solver can not be found.");
 	return sw.isUsedForProving();
@@ -275,8 +287,7 @@ public class SMTRuleMulti implements BuiltInRule, MakesProgress {
      * @param name name of the solver
      * @return true, if the solver is used
      */
-    public boolean SMTSolverIsUsed(String name)
-    {
+    public boolean SMTSolverIsUsed(String name){
 	SolverWrapper sw = find(name);
 	if(sw == null) throw new IllegalArgumentException("Solver can not be found.");
 	return sw.isUsedForProving();
@@ -287,8 +298,7 @@ public class SMTRuleMulti implements BuiltInRule, MakesProgress {
      * Constructor for the rule SMTRuleMulti
      * @param sl ArrayList of all possible provers. Possible means also provers that are not installed yet.
      */
-    public SMTRuleMulti(ArrayList<SMTSolver> sl)
-    {
+    public SMTRuleMulti(ArrayList<SMTSolver> sl){
 	
 	for(SMTSolver s : sl)
 	   Solvers.add(new SolverWrapper(s));
@@ -309,8 +319,7 @@ public class SMTRuleMulti implements BuiltInRule, MakesProgress {
     /**
      *  @return returns true, if at least one installed solver is selected for the rule 'multiple provers' 
      */
-    public boolean isUsable()
-    {
+    public boolean isUsable() {
 	for(SolverWrapper sw : Solvers)
 	    if(sw.isUsedForProving() && sw.getSolver().isInstalled(false)) return true;
 	return false;
@@ -323,8 +332,7 @@ public class SMTRuleMulti implements BuiltInRule, MakesProgress {
     }
     
     
-    private void killProcesses()
-    {
+    private void killProcesses(){
 	for(Process p : runningProcesses)
 	    p.destroy();
     }
@@ -335,8 +343,7 @@ public class SMTRuleMulti implements BuiltInRule, MakesProgress {
      * @param services Services object to get the exception handler
      * @param e  Exception to handle.
      */
-    private void handleException(Services services,Exception e)
-    {
+    private void handleException(Services services,Exception e){
         if (services.getExceptionHandler() != null) {
 	    services.getExceptionHandler().reportException(e);
 		} else {
@@ -344,6 +351,16 @@ public class SMTRuleMulti implements BuiltInRule, MakesProgress {
 		    re.initCause(e);
 		    throw re;
 			}
+	
+    }
+    
+    /**
+     * Cleans up the leaving of a proving.
+     */
+    private void clean(){
+	runningProcesses.clear();
+	runningSolvers.clear();
+	toBeInterrupted = false;
 	
     }
 
@@ -356,10 +373,7 @@ public class SMTRuleMulti implements BuiltInRule, MakesProgress {
     public ListOfGoal apply(Goal goal, Services services, RuleApp ruleApp) {
 	int timeout = ProofSettings.DEFAULT_SETTINGS.getDecisionProcedureSettings().getTimeout()*100;
 
-	runningProcesses.clear();
-	runningSolvers.clear();
-	toBeInterrupted = false;
-	
+	clean();	
 	
 	// Start the provers
 	for(SolverWrapper sw : Solvers){
@@ -402,6 +416,7 @@ public class SMTRuleMulti implements BuiltInRule, MakesProgress {
 		
 		
 		while (!finished) {
+		    //if there is a interruption signal, interrupt execWatch, 
 		    if (this.toBeInterrupted) {
 			this.toBeInterrupted = false;
 			execWatch.interrupt();
@@ -414,6 +429,7 @@ public class SMTRuleMulti implements BuiltInRule, MakesProgress {
 				   
 				   p.wait(300);
 				   p.exitValue();
+				   // if the program comes to this point, the process p stopped.
 				   SolverWrapper sw = find(p);
 				   if(sw.hasFinished()) continue;
 				   toRemove.add(p);
@@ -437,7 +453,7 @@ public class SMTRuleMulti implements BuiltInRule, MakesProgress {
 				    	break;
 				   }
 				}catch (IllegalThreadStateException e) {
-				  
+				    	//if the program comes to this point the provers are still running
 					for (ProgressMonitor pm : this.progressMonitors) {
 					    
 					    pm.setProgress(execWatch.getProgress());
@@ -448,15 +464,8 @@ public class SMTRuleMulti implements BuiltInRule, MakesProgress {
 			    }		
 			}
 			runningProcesses.removeAll(toRemove);
-			
-	
+
 		}
-	
-		
-		
-		
-		
-		
 		
 	    } catch (InterruptedException f) {
 		logger.debug(
@@ -488,8 +497,6 @@ public class SMTRuleMulti implements BuiltInRule, MakesProgress {
 		    
 	
 		}
-		
-		
 		// makes only sense when waitForAllProvers is true.
 		if(notValid && valid) { throw new RuntimeException("One prover says true, the other prover says false!");}
 		
