@@ -10,6 +10,9 @@
 package de.uka.ilkd.key.speclang.translation;
 
 
+import java.util.HashMap;
+import java.util.Map;
+
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
@@ -26,13 +29,17 @@ public abstract class SLResolverManager {
     public final SLTranslationExceptionManager excManager;
     private static final TermBuilder TB = TermBuilder.DF;
 
-    private ListOfSLExpressionResolver resolvers = SLListOfSLExpressionResolver.EMPTY_LIST;
+    private ListOfSLExpressionResolver resolvers 
+    	= SLListOfSLExpressionResolver.EMPTY_LIST;
     private final KeYJavaType specInClass;
     private final ParsableVariable selfVar;
     private final boolean useLocalVarsAsImplicitReceivers;
         
     private ListOfNamespace /*ParsableVariable*/
         localVariablesNamespaces = SLListOfNamespace.EMPTY_LIST;
+    
+    private Map<ParsableVariable,KeYJavaType> kjts 
+    	= new HashMap<ParsableVariable,KeYJavaType>();
 
     
     
@@ -62,6 +69,7 @@ public abstract class SLResolverManager {
         resolvers = resolvers.append(resolver);
     }
     
+    
     private String getShortName(String name) {
         return name.substring(name.lastIndexOf(".") + 1);
     }
@@ -81,7 +89,7 @@ public abstract class SLResolverManager {
             ParsableVariable localVar = (ParsableVariable) ns.lookup(n);
             if(localVar != null) {
                 Term varTerm = TB.var(localVar);
-                return createSLExpression(varTerm);
+                return new SLExpression(varTerm, kjts.get(localVar));
             }
         }
         
@@ -98,23 +106,25 @@ public abstract class SLResolverManager {
         if(useLocalVarsAsImplicitReceivers) {
             for(Namespace ns : localVariablesNamespaces) {
                 for(Named n : ns.elements()) {
-                    ParsableVariable localVar = (ParsableVariable) n;              
-                    Term recTerm = TB.var(localVar);
-                    SLExpression result 
-                    	= resolveExplicit(createSLExpression(recTerm), 
-                    		          name,
-                    		          parameters);
+                    ParsableVariable localVar = (ParsableVariable) n;
+                    SLExpression receiver 
+                    	= new SLExpression(TB.var(localVar),
+                    		           kjts.get(localVar));
+                    
+                    SLExpression result = resolveExplicit(receiver, 
+                    		          	          name,
+                    		          	          parameters);
                     if(result != null) {
                 	return result;
                     }
                 }
             }
         } else if(selfVar != null) {
-            SLExpression result
-                = resolveExplicit(createSLExpression(TB.var(selfVar)), 
-                                  name,
-                                  parameters);
-
+            SLExpression receiver = new SLExpression(TB.var(selfVar), 
+                	                             specInClass);
+            SLExpression result = resolveExplicit(receiver, 
+                                  		  name,
+                                  		  parameters);
             if (result != null) {
                 return result;
             }            
@@ -123,10 +133,10 @@ public abstract class SLResolverManager {
         // the class where the specification is written can be an implicit type receiver
         // (e.g. for static attributes or static methods)
 	if(specInClass != null) {
-	    SLExpression result 
-		= resolveExplicit(createSLExpression(specInClass),
-                                  name,
-                                  parameters);
+	    SLExpression receiver = new SLExpression(specInClass);
+	    SLExpression result = resolveExplicit(receiver,
+                                  		  name,
+                                  		  parameters);
             if(result != null) {
             	return result;
             }
@@ -146,7 +156,7 @@ public abstract class SLResolverManager {
             throws SLTranslationException {
         for(SLExpressionResolver resolver : resolvers) {
             SLExpression result = resolver.resolve(receiver, name, params);
-            if (result != null) {
+            if(result != null) {
                 return result;
             }
         }
@@ -168,10 +178,10 @@ public abstract class SLResolverManager {
             result = resolveExplicit(receiver, name, parameters);
         } else {
             result = resolveLocal(name);
-            if (result == null) {
+            if(result == null) {
                 result = resolveImplicit(name, parameters);
             }
-            if (result == null) {
+            if(result == null) {
                 result = resolveExplicit(null, name, parameters); 
             }
         }
@@ -200,7 +210,7 @@ public abstract class SLResolverManager {
             throws SLTranslationException {
         String shortName = name;
         
-        if (isFullyQualified(name)) {
+        if(isFullyQualified(name)) {
             SLExpression result = resolveIt(receiver, name, parameters);
             if (result != null) {
                 return result;
@@ -225,37 +235,41 @@ public abstract class SLResolverManager {
     /**
      * Puts a local variable into the topmost namespace on the stack
      */
-    public void putIntoTopLocalVariablesNamespace(ParsableVariable pv) {
+    public void putIntoTopLocalVariablesNamespace(ParsableVariable pv,
+	    					  KeYJavaType kjt) {
         localVariablesNamespaces.head().addSafely(pv);
+        kjts.put(pv, kjt);
+    }
+    
+    
+    /**
+     * Puts a local variable into the topmost namespace on the stack
+     */
+    public void putIntoTopLocalVariablesNamespace(ProgramVariable pv) {
+        putIntoTopLocalVariablesNamespace(pv, pv.getKeYJavaType());
+    }    
+    
+    
+    /**
+     * Puts a list of local variables into the topmost namespace on the stack. 
+     */
+    public void putIntoTopLocalVariablesNamespace(ListOfLogicVariable pvs,
+	    					  KeYJavaType kjt) {
+        for(LogicVariable pv : pvs) {
+            putIntoTopLocalVariablesNamespace(pv, kjt);
+        }
     }
     
     
     /**
      * Puts a list of local variables into the topmost namespace on the stack. 
      */
-    public void putIntoTopLocalVariablesNamespace(ListOfLogicVariable pvs) {
-        for(LogicVariable pv : pvs) {
-            localVariablesNamespaces.head().addSafely(pv);
+    public void putIntoTopLocalVariablesNamespace(ListOfProgramVariable pvs) {
+        for(ProgramVariable pv : pvs) {
+            putIntoTopLocalVariablesNamespace(pv, pv.getKeYJavaType());
         }
-    }
+    }    
        
-    
-    /**
-     * Determines whether a variable has to be put into localVariableNamespace
-     * @param name2BeResolved name of the element to be resolved
-     * @return true, if name2BeResolved needs a variable to be put into
-     * localVariableNamespace
-     */
-    public boolean needVarDeclaration(String name2BeResolved) {
-        IteratorOfSLExpressionResolver it = resolvers.iterator();
-        while(it.hasNext()) {
-            if (it.next().needVarDeclaration(name2BeResolved)) {
-                return true;
-            }
-        }
-        return false;
-    }
-    
     
     /**
      * Throws away the topmost namespace on the stack.
@@ -263,9 +277,4 @@ public abstract class SLResolverManager {
     public void popLocalVariablesNamespace() {
         localVariablesNamespaces = localVariablesNamespaces.tail();
     }
-
-    
-    public abstract SLExpression createSLExpression(Term t);
-    public abstract SLExpression createSLExpression(KeYJavaType t);
-    public abstract SLExpression createSLExpression(SLCollection t);
 }

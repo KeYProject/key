@@ -5,13 +5,6 @@
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
-//This file is part of KeY - Integrated Deductive Software Design
-//Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
-//                  Universitaet Koblenz-Landau, Germany
-//                  Chalmers University of Technology, Sweden
-//
-//The KeY system is protected by the GNU General Public License. 
-//See LICENSE.TXT for details.
 //
 //
 
@@ -19,13 +12,11 @@ package de.uka.ilkd.key.speclang;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.op.ListOfParsableVariable;
-import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.ProgramMethod;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.SLListOfParsableVariable;
+import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.sort.ArrayOfSort;
 
 
 /**
@@ -102,10 +93,10 @@ public class SignatureVariablesFactory {
     /**
      * Creates program variables for the parameters.
      */
-    public ListOfParsableVariable createParamVars(Services services, 
-                                                  ProgramMethod pm,
-                                                  boolean makeNamesUnique) {
-        ListOfParsableVariable result = SLListOfParsableVariable.EMPTY_LIST;
+    public ListOfProgramVariable createParamVars(Services services, 
+                                                 ProgramMethod pm,
+                                                 boolean makeNamesUnique) {
+        ListOfProgramVariable result = SLListOfProgramVariable.EMPTY_LIST;
         for(int i = 0; i < pm.getParameterDeclarationCount(); i++) {
             KeYJavaType parType = pm.getParameterType(i);
             String parName = pm.getParameterDeclarationAt(i)
@@ -145,6 +136,14 @@ public class SignatureVariablesFactory {
                                     services.getJavaInfo().getTypeByClassName(
                                                    "java.lang.Throwable"));
         
+    }
+    
+    
+    public Function createHeapAtPreFunc(Services services,
+	    			        boolean makeNameUnique) {
+	return new Function(new Name(getNewName(services, "heapAtPre", makeNameUnique).toString()),
+		            services.getTypeConverter().getHeapLDT().targetSort(), 
+		            new ArrayOfSort());
     }
 }
     

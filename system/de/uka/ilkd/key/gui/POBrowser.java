@@ -17,7 +17,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.Iterator;
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
@@ -233,29 +232,6 @@ public class POBrowser extends JDialog {
     
     private void showPOsFor(KeYJavaType kjt) {
 	ListOfString pos = SLListOfString.EMPTY_LIST;
-
-	//BehaviouralSubtypingInv
-	if(specRepos.getClassInvariants(kjt).size() > 0
-	   && javaInfo.getDirectSuperTypes(kjt).size() > 0) {
-	    pos = pos.append("BehaviouralSubtypingInv");
-	}
-
-/*        
-	//BehaviouralSubtypingOp
-	ListOfProgramMethod pms = javaInfo.getAllProgramMethods(kjt);
-	IteratorOfProgramMethod it = pms.iterator();
-	boolean foundContract = false;
-	while(it.hasNext()) {
-	    ProgramMethod pm = it.next();
-	    if(specRepos.getOperationContracts(pm).size() > 0) {
-		foundContract = true;
-		break;
-	    }
-	}
-	if(foundContract && javaInfo.getDirectSuperTypes(kjt).size() > 0) {
-	    pos = pos.append("BehaviouralSubtypingOp");
-	}	
-*/
         
 	//show
 	poList.setListData(pos.toArray());
@@ -270,19 +246,6 @@ public class POBrowser extends JDialog {
     
     private void showPOsFor(ProgramMethod pm) {
 	ListOfString pos = SLListOfString.EMPTY_LIST;
-
-/*        
-	//BehaviouralSubtypingOpPair
-	if(specRepos.getOperationContracts(pm).size() > 0 
-	   && javaInfo.getDirectSuperTypes(pm.getContainerType()).size() > 0) {
-	    pos = pos.append("BehaviouralSubtypingOpPair");
-	}
-*/
-	
-	//StrongOperationContract
-	if(specRepos.getOperationContracts(pm).size() > 0) {
-	    pos = pos.append("StrongOperationContract");
-	}
 	
 	//PreservesInv
 	pos = pos.append("PreservesInv");
@@ -297,11 +260,6 @@ public class POBrowser extends JDialog {
 	    pos = pos.append("EnsuresPost");
 	}
 	
-	//RespectsModifies
-	if(specRepos.getOperationContracts(pm).size() > 0) {
-	    pos = pos.append("RespectsModifies");	    
-	}
-		
 
 	//show
 	poList.setListData(pos.toArray());
@@ -359,19 +317,7 @@ public class POBrowser extends JDialog {
 	ClassTree.Entry selectedEntry = classTree.getSelectedEntry();
 	String poString = (String) poList.getSelectedValue();
 	
-	if (poString.equals("BehaviouralSubtypingInv")) {
-            assert selectedEntry.kjt != null;
-            return createBehaviouralSubtypingInvPO(selectedEntry.kjt);
-        } else if (poString.equals("BehaviouralSubtypingOp")) {
-            assert selectedEntry.kjt != null;
-            return createBehaviouralSubtypingOpPO(selectedEntry.kjt);
-        } else if (poString.equals("BehaviouralSubtypingOpPair")) {
-            assert selectedEntry.pm != null;
-            return createBehaviouralSubtypingOpPairPO(selectedEntry.pm);
-        } else if (poString.equals("StrongOperationContract")) {
-            assert selectedEntry.pm != null;
-            return createStrongOperationContractPO(selectedEntry.pm);
-        } else if (poString.equals("PreservesInv")) {
+	if (poString.equals("PreservesInv")) {
             assert selectedEntry.pm != null;
             return createPreservesInvPO(selectedEntry.pm);
         } else if (poString.equals("PreservesOwnInv")) {
@@ -380,58 +326,12 @@ public class POBrowser extends JDialog {
         } else if (poString.equals("EnsuresPost")) {
             assert selectedEntry.pm != null;
             return createEnsuresPostPO(selectedEntry.pm);
-        } else if (poString.equals("RespectsModifies")) {
-            assert selectedEntry.pm != null;
-            return createRespectsModifiesPO(selectedEntry.pm);
         } else
             assert false;
         return null;
     }
 
     
-    private ProofOblInput createBehaviouralSubtypingInvPO(KeYJavaType kjt) {
-	KeYJavaType superKJT = askUserForSupertype(kjt, javaInfo);
-	if(superKJT != null) {
-	    return new BehaviouralSubtypingInvPO(initConfig, 
-		         			 kjt, 
-		         			 superKJT);
-	} else {
-	    return null;
-	}
-    }
-
-    
-    private ProofOblInput createBehaviouralSubtypingOpPO(KeYJavaType kjt) {
-	assert false;
-	return null; //TODO    
-    }
-    
-    
-    private ProofOblInput createBehaviouralSubtypingOpPairPO(ProgramMethod pm) {
-	assert false;
-	return null; //TODO
-    }
-    
-    
-    private ProofOblInput createStrongOperationContractPO(ProgramMethod pm) {
-	ContractConfigurator cc = new ContractConfigurator(this,
-						           services,
-						           pm,
-						           null,
-						           true,
-						           false,
-						           true,
-						           true);
-	if(cc.wasSuccessful()) {
-	    return new StrongOperationContractPO(initConfig, 
-		    				 cc.getContract(), 
-		    				 cc.getAssumedInvs(), 
-		    				 cc.getEnsuredInvs());
-	} else {
-	    return null;
-	}
-    }
- 
     
     private ProofOblInput createPreservesInvPO(ProgramMethod pm) {
 	ContractConfigurator cc = new ContractConfigurator(this, 
@@ -476,26 +376,7 @@ public class POBrowser extends JDialog {
 	}
     }
     
-    
-    private ProofOblInput createRespectsModifiesPO(ProgramMethod pm) {
-	ContractConfigurator cc = new ContractConfigurator(this,
-						           services,
-						           pm,
-						           null,
-						           true,
-						           false,
-						           true,
-						           false);
-	if(cc.wasSuccessful()) {
-	    return new RespectsModifiesPO(initConfig, 
-                                          cc.getContract(), 
-                                          cc.getAssumedInvs());
-	} else {
-	    return null;
-	}
-    }
-    
-    
+        
     
     //-------------------------------------------------------------------------
     //public interface

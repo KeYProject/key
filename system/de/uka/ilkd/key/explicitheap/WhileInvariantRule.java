@@ -141,7 +141,7 @@ public final class WhileInvariantRule implements BuiltInRule {
 		.getLoopInvariant((While) activeStatement);
 	if (inv == null
 		|| inv.getInvariant(inv.getInternalSelfTerm(), inv
-			.getInternalAtPreFunctions(), services) == null) {
+			.getInternalHeapAtPre(), services) == null) {
 	    return null;
 	}
 

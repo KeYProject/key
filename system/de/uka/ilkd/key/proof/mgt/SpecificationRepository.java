@@ -20,10 +20,7 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.op.ListOfParsableVariable;
-import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.ProgramMethod;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.SetAsListOfProof;
 import de.uka.ilkd.key.proof.SetOfProof;
@@ -414,7 +411,7 @@ public class SpecificationRepository {
 	Term tt = TermBuilder.DF.tt();
         ProgramVariable selfVar 
         	= svf.createSelfVar(services, pm, true);
-        ListOfParsableVariable paramVars 
+        ListOfProgramVariable paramVars 
         	= svf.createParamVars(services, pm, false);
 	for(OperationContract c : getOperationContracts(pm, Modality.DIA)) {
 	    if(c.getPre(selfVar, paramVars, services).getFormula().equals(tt)	   

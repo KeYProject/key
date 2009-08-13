@@ -25,11 +25,7 @@ import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.statement.BranchStatement;
 import de.uka.ilkd.key.java.statement.For;
 import de.uka.ilkd.key.java.statement.LoopStatement;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.SetAsListOfTerm;
-import de.uka.ilkd.key.logic.SetOfTerm;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.speclang.*;
@@ -127,9 +123,9 @@ public class JMLSpecFactory {
      * Collects local variables of the passed statement that are visible for 
      * the passed loop. Returns null if the loop has not been found.
      */
-    private ListOfParsableVariable collectLocalVariables(StatementContainer sc, 
+    private ListOfProgramVariable collectLocalVariables(StatementContainer sc, 
                                                          LoopStatement loop){
-        ListOfParsableVariable result = SLListOfParsableVariable.EMPTY_LIST;
+        ListOfProgramVariable result = SLListOfProgramVariable.EMPTY_LIST;
         for(int i = 0, m = sc.getStatementCount(); i < m; i++) {
             Statement s = sc.getStatementAt(i);
             
@@ -156,7 +152,7 @@ public class JMLSpecFactory {
                     result = result.prepend(pv);
                 }
             } else if(s instanceof StatementContainer) {
-                ListOfParsableVariable lpv 
+                ListOfProgramVariable lpv 
                     = collectLocalVariables((StatementContainer) s, loop);
                 if(lpv != null){ 
                     result = result.prepend(lpv);
@@ -165,7 +161,7 @@ public class JMLSpecFactory {
             } else if(s instanceof BranchStatement) {
                 BranchStatement bs = (BranchStatement) s;
                 for(int j = 0, n = bs.getBranchCount(); j < n; j++) {
-                    ListOfParsableVariable lpv 
+                    ListOfProgramVariable lpv 
                         = collectLocalVariables(bs.getBranchAt(j), loop);
                     if(lpv != null){ 
                         result = result.prepend(lpv);
@@ -194,7 +190,7 @@ public class JMLSpecFactory {
                                 ListOfPositionedString originalSignals,
                                 ListOfPositionedString originalSignalsOnly,
                                 ListOfPositionedString originalDiverges,
-                                ListOfParsableVariable paramVars) 
+                                ListOfProgramVariable paramVars) 
             throws SLTranslationException {
         assert programMethod != null;
         assert originalBehavior != null;
@@ -207,20 +203,20 @@ public class JMLSpecFactory {
 
         //create variables for self, parameters, result, exception,
         //and the map for atPre-Functions
-        ParsableVariable selfVar = SVF.createSelfVar(services, 
-                                                     programMethod, 
-                                                     false);
+        ProgramVariable selfVar = SVF.createSelfVar(services, 
+                                                    programMethod, 
+                                                    false);
         if(paramVars == null) {
             paramVars = SVF.createParamVars(services, programMethod, false);
         }
-        ParsableVariable resultVar = SVF.createResultVar(services, 
-                                                         programMethod, 
-                                                         false);
-        ParsableVariable excVar = SVF.createExcVar(services,
-                                                   programMethod, 
-                                                   false);
-        Map<Operator, Function> atPreFunctions 
-            = new LinkedHashMap<Operator, Function>();
+        ProgramVariable resultVar = SVF.createResultVar(services, 
+                                                        programMethod, 
+                                                        false);
+        ProgramVariable excVar = SVF.createExcVar(services,
+                                                  programMethod, 
+                                                  false);
+        
+        Term heapAtPre = TB.func(SVF.createHeapAtPreFunc(services, false));
 
         //translate requires
         FormulaWithAxioms requires = FormulaWithAxioms.TT;
@@ -260,7 +256,7 @@ public class JMLSpecFactory {
                     paramVars, 
                     resultVar, 
                     excVar,
-                    atPreFunctions);
+                    heapAtPre);
             ensures = ensures.conjoin(translated);        
         }
 
@@ -275,7 +271,7 @@ public class JMLSpecFactory {
                     paramVars, 
                     resultVar, 
                     excVar,
-                    atPreFunctions);
+                    heapAtPre);
             signals = signals.conjoin(translated);        
         }
 
@@ -349,7 +345,7 @@ public class JMLSpecFactory {
                                             paramVars,
                                             resultVar,
                                             excVar,
-                                            atPreFunctions); 
+                                            heapAtPre); 
             result = result.add(contract);
         } else if(diverges.equals(FormulaWithAxioms.TT)) {
             OperationContract contract
@@ -364,7 +360,7 @@ public class JMLSpecFactory {
                                             paramVars,
                                             resultVar,
                                             excVar,
-                                            atPreFunctions); 
+                                            heapAtPre); 
             result = result.add(contract);
         } else {
             String name2 = getContractName(originalBehavior);
@@ -383,7 +379,7 @@ public class JMLSpecFactory {
                                             paramVars,
                                             resultVar,
                                             excVar,
-                                            atPreFunctions);
+                                            heapAtPre);
             OperationContract contract2
                 = new OperationContractImpl(name2,
                                             displayName2,
@@ -396,7 +392,7 @@ public class JMLSpecFactory {
                                             paramVars,
                                             resultVar,
                                             excVar,
-                                            atPreFunctions);
+                                            heapAtPre);
             result = result.add(contract1).add(contract2);
         }
 
@@ -407,7 +403,7 @@ public class JMLSpecFactory {
     private SetOfOperationContract createJMLOperationContracts(
             ProgramMethod programMethod,
             TextualJMLSpecCase textualSpecCase,
-            ListOfParsableVariable paramVars) 
+            ListOfProgramVariable paramVars) 
             throws SLTranslationException {
         return createJMLOperationContracts(
                                     programMethod,
@@ -435,8 +431,8 @@ public class JMLSpecFactory {
         assert originalInv != null;
         
         //create variable for self
-        Sort sort = kjt.getSort();
-        ParsableVariable selfVar = new LogicVariable(new Name("self"), sort);
+        ProgramVariable selfVar 
+        	= new LocationVariable(new ProgramElementName("self"), kjt);
         
         //translate expression
         FormulaWithAxioms inv = translator.translateExpression(originalInv,
@@ -504,7 +500,7 @@ public class JMLSpecFactory {
             throws SLTranslationException {
         //parameter names of original method must be used for all inherited 
         //instances of the contract
-        ListOfParsableVariable paramVars 
+        ListOfProgramVariable paramVars 
             = SVF.createParamVars(services, programMethod, false);
         
         //create contracts for original method
@@ -547,10 +543,10 @@ public class JMLSpecFactory {
         //create variables for self, parameters, other relevant local variables 
         //(disguised as parameters to the translator) and the map for 
         //atPre-Functions
-        ParsableVariable selfVar = SVF.createSelfVar(services, 
-                                                     programMethod, 
-                                                     false);
-        ListOfParsableVariable paramVars = SLListOfParsableVariable.EMPTY_LIST;
+        ProgramVariable selfVar = SVF.createSelfVar(services, 
+                                                    programMethod, 
+                                                    false);
+        ListOfProgramVariable paramVars = SLListOfProgramVariable.EMPTY_LIST;
         int numParams = programMethod.getParameterDeclarationCount();
         for(int i = numParams - 1; i >= 0; i--) {
             ParameterDeclaration pd = programMethod.getParameterDeclarationAt(i);
@@ -559,10 +555,10 @@ public class JMLSpecFactory {
                                              .getProgramVariable());
         }
 
-        ListOfParsableVariable localVars 
+        ListOfProgramVariable localVars 
             = collectLocalVariables(programMethod.getBody(), loop);        
         paramVars = paramVars.append(localVars);
-        Map<Operator, Function> atPreFunctions = new LinkedHashMap<Operator, Function>();
+        Term heapAtPre = TB.func(SVF.createHeapAtPreFunc(services, false));
         
         //translate invariant
         Term invariant;
@@ -579,7 +575,7 @@ public class JMLSpecFactory {
                                             paramVars, 
                                             null, 
                                             null,
-                                            atPreFunctions);
+                                            heapAtPre);
                 assert translated.getAxioms().isEmpty();
                 invariant = TB.and(invariant, translated.getFormula());
             }
@@ -587,12 +583,12 @@ public class JMLSpecFactory {
 
         
         //translate skolem declarations
-        ListOfParsableVariable freeVars = SLListOfParsableVariable.EMPTY_LIST;
+        ListOfProgramVariable freeVars = SLListOfProgramVariable.EMPTY_LIST;
         for(PositionedString expr : originalSkolemDeclarations) {
-            ListOfLogicVariable translated 
+            ListOfProgramVariable translated 
                 = translator.translateVariableDeclaration(expr);
-            for(LogicVariable lv : translated) {
-                freeVars = freeVars.prepend(lv);
+            for(ProgramVariable pv : translated) {
+                freeVars = freeVars.prepend(pv);
             }
         }
         
@@ -610,7 +606,7 @@ public class JMLSpecFactory {
                             paramVars.append(freeVars), 
                             null, 
                             null,
-                            atPreFunctions);
+                            heapAtPre);
                 assert translated.getAxioms().isEmpty();
                 predicates = predicates.add(translated.getFormula());                
             }
@@ -641,7 +637,7 @@ public class JMLSpecFactory {
                                         paramVars,
                                         null,
                                         null,
-                                        atPreFunctions);
+                                        heapAtPre);
             assert translated.getAxioms().isEmpty();
             variant = translated.getFormula();
         }
@@ -654,7 +650,7 @@ public class JMLSpecFactory {
                                      assignable,
                                      variant,
                                      selfTerm,
-                                     atPreFunctions,
+                                     heapAtPre,
                                      true);
     }
     

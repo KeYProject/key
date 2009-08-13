@@ -5,13 +5,6 @@
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
-//This file is part of KeY - Integrated Deductive Software Design
-//Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
-//Universitaet Koblenz-Landau, Germany
-//Chalmers University of Technology, Sweden
-
-//The KeY system is private by the GNU General private License. 
-//See LICENSE.TXT for details.
 
 
 
@@ -46,6 +39,7 @@ import de.uka.ilkd.key.java.statement.*;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.VariableNamer;
 import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.ExtList;
 
@@ -870,9 +864,15 @@ public class Recoder2KeYConverter {
         .getCrossReferenceSourceInfo().getContainingClassType(
                 (recoder.abstraction.Member) cd);
 
-        ProgramMethod result = new ProgramMethod(consDecl,
-                getKeYJavaType(cont), getKeYJavaType(cd.getReturnType()),
-                positionInfo(cd));
+        Sort heapSort = rec2key.getTypeConverter().getTypeConverter().getHeapLDT() == null
+                            ? Sort.ANY
+                            : rec2key.getTypeConverter().getTypeConverter().getHeapLDT().targetSort();        
+        ProgramMethod result 
+        	= new ProgramMethod(consDecl,
+        			    getKeYJavaType(cont), 
+        			    getKeYJavaType(cd.getReturnType()),
+        			    positionInfo(cd),
+        			    heapSort);
         insertToMap(cd, result);
         return result;
     }
@@ -887,9 +887,13 @@ public class Recoder2KeYConverter {
         ConstructorDeclaration consDecl = new ConstructorDeclaration(children,
                 dc.getContainingClassType().isInterface());
         recoder.abstraction.ClassType cont = dc.getContainingClassType();
+        Sort heapSort = rec2key.getTypeConverter().getTypeConverter().getHeapLDT() == null
+                            ? Sort.ANY
+                            : rec2key.getTypeConverter().getTypeConverter().getHeapLDT().targetSort();        
         ProgramMethod result = new ProgramMethod(consDecl,
                 getKeYJavaType(cont), getKeYJavaType(dc.getReturnType()),
-                PositionInfo.UNDEFINED);
+                PositionInfo.UNDEFINED,
+                heapSort);
         insertToMap(dc, result);
         return result;
     }
@@ -1004,8 +1008,13 @@ public class Recoder2KeYConverter {
             .getCrossReferenceSourceInfo().getContainingClassType(
                     (recoder.abstraction.Member) md);
 
-            result = new ProgramMethod(methDecl, getKeYJavaType(cont),
-                    getKeYJavaType(md.getReturnType()), positionInfo(md));
+            Sort heapSort = rec2key.getTypeConverter().getTypeConverter().getHeapLDT() == null
+                            ? Sort.ANY
+                            : rec2key.getTypeConverter().getTypeConverter().getHeapLDT().targetSort();
+            result = new ProgramMethod(methDecl, 
+        	    		       getKeYJavaType(cont),
+                    		       getKeYJavaType(md.getReturnType()), positionInfo(md),
+                    		       heapSort);
 
             insertToMap(md, result);
         }
@@ -1819,7 +1828,4 @@ public class Recoder2KeYConverter {
     public Model convert(de.uka.ilkd.key.java.recoderext.Model m) {
         return new Model(collectComments(m));
     }
-
-
 }	
-

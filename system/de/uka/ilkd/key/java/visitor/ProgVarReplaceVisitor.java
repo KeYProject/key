@@ -202,26 +202,6 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
     }
     
     
-    private Map /*Operator -> Function*/ replaceVariablesInMap(
-                                        Map /*Operator -> Function*/ map) {
-        Map result = new LinkedHashMap();
-        Iterator it = map.entrySet().iterator();
-        while(it.hasNext()) {
-            Map.Entry entry = (Map.Entry) it.next();
-            Operator key = (Operator) entry.getKey();
-            Function value = (Function) entry.getValue();
-            
-            Operator newKey = (ProgramVariable) replaceMap.get(key);
-            if(newKey == null) {
-                newKey = key;
-            }
-            
-            result.put(newKey, value);
-        }
-        return result;
-    }
-    
-    
     public void performActionOnLocationVariable(LocationVariable x) {
        performActionOnProgramVariable(x);
     }
@@ -240,34 +220,34 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
             return;
         }
         Term selfTerm = inv.getInternalSelfTerm();
-        Map atPreFunctions = inv.getInternalAtPreFunctions();
+        Term heapAtPre = inv.getInternalHeapAtPre();
         
         //invariant
         Term newInvariant 
             = replaceVariablesInTerm(inv.getInvariant(selfTerm, 
-                                                      atPreFunctions, 
+                                                      heapAtPre, 
                                                       services));
         
         //predicates
         SetOfTerm newPredicates 
             = replaceVariablesInTerms(inv.getPredicates(selfTerm, 
-                                                        atPreFunctions, 
+                                                        heapAtPre, 
                                                         services));
         
         //modifies
         Term newModifies
             = replaceVariablesInTerm(inv.getModifies(selfTerm, 
-                                     atPreFunctions, 
+                                     heapAtPre, 
                                      services));
         
         //variant
         Term newVariant
             = replaceVariablesInTerm(inv.getVariant(selfTerm, 
-                                                    atPreFunctions, 
+                                                    heapAtPre, 
                                                     services));
         
         Term newSelfTerm = replaceVariablesInTerm(selfTerm); 
-        Map newAtPreFunctions = replaceVariablesInMap(atPreFunctions);
+        Term newHeapAtPre = replaceVariablesInTerm(heapAtPre);
         boolean newPredicateHeuristicsAllowed
             = inv.getPredicateHeuristicsAllowed();
 
@@ -278,7 +258,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
                                     newModifies, 
                                     newVariant, 
                                     newSelfTerm,
-                                    newAtPreFunctions,
+                                    newHeapAtPre,
                                     newPredicateHeuristicsAllowed);
         services.getSpecificationRepository().setLoopInvariant(newInv);
     }

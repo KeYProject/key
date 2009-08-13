@@ -17,7 +17,6 @@ import de.uka.ilkd.key.proof.init.EnsuresPostPO;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.PreservesInvPO;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
-import de.uka.ilkd.key.proof.init.RespectsModifiesPO;
 import de.uka.ilkd.key.rule.IteratorOfRuleApp;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.SetAsListOfRuleApp;
@@ -137,48 +136,48 @@ public class DefaultProofCorrectnessMgt implements ProofCorrectnessMgt {
             return;
         }
 	
-        //used, but yet unproven specifications?
-        IteratorOfRuleApp cachedRuleAppsIt = cachedRuleApps.iterator();
-        while(cachedRuleAppsIt.hasNext()) {
-            RuleApp ruleApp = cachedRuleAppsIt.next();
-            RuleJustification ruleJusti = getJustification(ruleApp);
-            if(ruleJusti instanceof RuleJustificationBySpec) {
-                ContractWithInvs cwi 
-                    = ((RuleJustificationBySpec) ruleJusti).getSpec();
-                for(OperationContract atomicContract 
-                    : proof.getServices().getSpecificationRepository()
-                                         .splitContract(cwi.contract)) {
-                
-                    InitConfig initConfig = proof.env().getInitConfig();
-                    ProofOblInput ensuresPostPO 
-                        = new EnsuresPostPO(initConfig, 
-                                            atomicContract, 
-                                            cwi.assumedInvs);
-                    SetOfProof ensuresPostProofs 
-                        = specRepos.getProofs(ensuresPostPO);
-                    ProofOblInput preservesInvPO
-                        = new PreservesInvPO(initConfig, 
-                                             atomicContract.getProgramMethod(), 
-                                             cwi.assumedInvs, 
-                                             cwi.ensuredInvs);
-                    SetOfProof preservesInvProofs 
-                        = specRepos.getProofs(preservesInvPO);
-                    ProofOblInput respectsModifiesPO
-                        = new RespectsModifiesPO(initConfig, 
-                                                 atomicContract, 
-                                                 cwi.assumedInvs);
-                    SetOfProof respectsModifiesProofs
-                        = specRepos.getProofs(respectsModifiesPO);
-                    
-                    if(!(atLeastOneClosed(ensuresPostProofs)
-                         && atLeastOneClosed(preservesInvProofs)
-                         && atLeastOneClosed(respectsModifiesProofs))) {
-                        proofStatus = ProofStatus.CLOSED_BUT_LEMMAS_LEFT;
-                        return;
-                    }
-                }
-            }
-        }
+//        //used, but yet unproven specifications?
+//        IteratorOfRuleApp cachedRuleAppsIt = cachedRuleApps.iterator();
+//        while(cachedRuleAppsIt.hasNext()) {
+//            RuleApp ruleApp = cachedRuleAppsIt.next();
+//            RuleJustification ruleJusti = getJustification(ruleApp);
+//            if(ruleJusti instanceof RuleJustificationBySpec) {
+//                ContractWithInvs cwi 
+//                    = ((RuleJustificationBySpec) ruleJusti).getSpec();
+//                for(OperationContract atomicContract 
+//                    : proof.getServices().getSpecificationRepository()
+//                                         .splitContract(cwi.contract)) {
+//                
+//                    InitConfig initConfig = proof.env().getInitConfig();
+//                    ProofOblInput ensuresPostPO 
+//                        = new EnsuresPostPO(initConfig, 
+//                                            atomicContract, 
+//                                            cwi.assumedInvs);
+//                    SetOfProof ensuresPostProofs 
+//                        = specRepos.getProofs(ensuresPostPO);
+//                    ProofOblInput preservesInvPO
+//                        = new PreservesInvPO(initConfig, 
+//                                             atomicContract.getProgramMethod(), 
+//                                             cwi.assumedInvs, 
+//                                             cwi.ensuredInvs);
+//                    SetOfProof preservesInvProofs 
+//                        = specRepos.getProofs(preservesInvPO);
+//                    ProofOblInput respectsModifiesPO
+//                        = new RespectsModifiesPO(initConfig, 
+//                                                 atomicContract, 
+//                                                 cwi.assumedInvs);
+//                    SetOfProof respectsModifiesProofs
+//                        = specRepos.getProofs(respectsModifiesPO);
+//                    
+//                    if(!(atLeastOneClosed(ensuresPostProofs)
+//                         && atLeastOneClosed(preservesInvProofs)
+//                         && atLeastOneClosed(respectsModifiesProofs))) {
+//                        proofStatus = ProofStatus.CLOSED_BUT_LEMMAS_LEFT;
+//                        return;
+//                    }
+//                }
+//            }
+//        }
         
         //no -> proof is closed
         proofStatus = ProofStatus.CLOSED;

@@ -14,76 +14,76 @@ import junit.framework.TestSuite;
 
 public class TestKey extends TestCase {
 
-     static Class[] utilityTests = new Class[] {
-   	de.uka.ilkd.key.collection.TestSetAsListOfString.class,
-   	de.uka.ilkd.key.collection.TestSLListOfString.class,
-   	de.uka.ilkd.key.collection.TestMapAsListFromIntegerToString.class,
- 	de.uka.ilkd.key.collection.TestLeftistHeapOfInteger.class,
+    static Class[] utilityTests = new Class[] {
+	de.uka.ilkd.key.collection.TestSetAsListOfString.class,
+	de.uka.ilkd.key.collection.TestSLListOfString.class,
+	de.uka.ilkd.key.collection.TestMapAsListFromIntegerToString.class,
+	de.uka.ilkd.key.collection.TestLeftistHeapOfInteger.class,
 	de.uka.ilkd.key.util.pp.TestLayouter.class,
-     }; 
+    }; 
 
-     
-     static Class[] logicModelTests = new Class[] {
-        de.uka.ilkd.key.logic.TestTermFactory.class,
-        de.uka.ilkd.key.logic.TestTerm.class,
-        de.uka.ilkd.key.logic.TestNamespace.class,
-   	de.uka.ilkd.key.logic.TestSemisequent.class,
-   	de.uka.ilkd.key.logic.TestPosInOcc.class,   	
-   	de.uka.ilkd.key.logic.TestClashFreeSubst.class,
-  	de.uka.ilkd.key.logic.TestSyntacticalReplaceVisitor.class,
- 	de.uka.ilkd.key.logic.TestTermOrdering.class,
+
+    static Class[] logicModelTests = new Class[] {
+	de.uka.ilkd.key.logic.TestTermFactory.class,
+	de.uka.ilkd.key.logic.TestTerm.class,
+	de.uka.ilkd.key.logic.TestNamespace.class,
+	de.uka.ilkd.key.logic.TestSemisequent.class,
+	de.uka.ilkd.key.logic.TestPosInOcc.class,   	
+	de.uka.ilkd.key.logic.TestClashFreeSubst.class,
+	de.uka.ilkd.key.logic.TestSyntacticalReplaceVisitor.class,
+	de.uka.ilkd.key.logic.TestTermOrdering.class,
 	de.uka.ilkd.key.logic.TestVariableNamer.class
-     };
+    };
 
-     
-     static Class[] parserTests = new Class[] {
-   	de.uka.ilkd.key.parser.TestDeclParser.class,
-   	de.uka.ilkd.key.parser.TestTermParser.class,
-  	de.uka.ilkd.key.parser.TestTacletParser.class,
-     };
 
-     
-     static Class[] ruleTests = new Class[] {
+    static Class[] parserTests = new Class[] {
+	de.uka.ilkd.key.parser.TestDeclParser.class,
+	de.uka.ilkd.key.parser.TestTermParser.class,
+	de.uka.ilkd.key.parser.TestTacletParser.class,
+    };
+
+
+    static Class[] ruleTests = new Class[] {
 	de.uka.ilkd.key.rule.TestSchemaModalOperators.class,
-  	de.uka.ilkd.key.rule.TestTacletBuild.class,
-  	de.uka.ilkd.key.rule.TestCollisionResolving.class,
-  	de.uka.ilkd.key.rule.TestMatchTaclet.class,
-        de.uka.ilkd.key.rule.TestApplyTaclet.class,
- 	de.uka.ilkd.key.rule.inst.TestGenericSortInstantiations.class,
-  	de.uka.ilkd.key.rule.metaconstruct.TestProgramMetaConstructs.class
-     };
+	de.uka.ilkd.key.rule.TestTacletBuild.class,
+	de.uka.ilkd.key.rule.TestCollisionResolving.class,
+	de.uka.ilkd.key.rule.TestMatchTaclet.class,
+	de.uka.ilkd.key.rule.TestApplyTaclet.class,
+	de.uka.ilkd.key.rule.inst.TestGenericSortInstantiations.class,
+	de.uka.ilkd.key.rule.metaconstruct.TestProgramMetaConstructs.class
+    };
 
-     
-     static Class[] proofConstructionTests = new Class[] {
-   	de.uka.ilkd.key.proof.TestTacletIndex.class,
-   	de.uka.ilkd.key.proof.TestProofTree.class,
-   	de.uka.ilkd.key.proof.TestGoal.class,
+
+    static Class[] proofConstructionTests = new Class[] {
+	de.uka.ilkd.key.proof.TestTacletIndex.class,
+	de.uka.ilkd.key.proof.TestProofTree.class,
+	de.uka.ilkd.key.proof.TestGoal.class,
 	de.uka.ilkd.key.proof.TestTermTacletAppIndex.class
-     };
+    };
 
-     
-     static Class[] javaTests = new Class[] {
-        de.uka.ilkd.key.java.TestJavaInfo.class,
-        de.uka.ilkd.key.java.TestJavaCardDLJavaExtensions.class,
-  	de.uka.ilkd.key.java.TestRecoder2KeY.class,
- 	de.uka.ilkd.key.java.TestKeYRecoderMapping.class,
+
+    static Class[] javaTests = new Class[] {
+	de.uka.ilkd.key.java.TestJavaInfo.class,
+	de.uka.ilkd.key.java.TestJavaCardDLJavaExtensions.class,
+	de.uka.ilkd.key.java.TestRecoder2KeY.class,
+	de.uka.ilkd.key.java.TestKeYRecoderMapping.class,
 	de.uka.ilkd.key.java.visitor.TestDeclarationProgramVariableCollector.class,
-        de.uka.ilkd.key.java.TestContextStatementBlock.class
-     };
+	de.uka.ilkd.key.java.TestContextStatementBlock.class
+    };
 
 
-     static Class[] speclangTests = new Class[] {
-//XXX        de.uka.ilkd.key.speclang.jml.translation.TestJMLTranslator.class,
-//        de.uka.ilkd.key.speclang.jml.pretranslation.TestJMLPreTranslator.class
-      };
+    static Class[] speclangTests = new Class[] {
+        de.uka.ilkd.key.speclang.jml.translation.TestJMLTranslator.class,
+        de.uka.ilkd.key.speclang.jml.pretranslation.TestJMLPreTranslator.class
+    };
      
-      static Class[] smtTests = new Class[] {
-	  de.uka.ilkd.key.smt.test.TestSimplify.class,
-	  de.uka.ilkd.key.smt.test.TestZ3.class,
-	  de.uka.ilkd.key.smt.test.TestYices.class,
-	  de.uka.ilkd.key.smt.test.TestCvc3.class,
-	  de.uka.ilkd.key.smt.test.TestExecutionWatchDog.class
-      };
+    static Class[] smtTests = new Class[] {
+	de.uka.ilkd.key.smt.test.TestSimplify.class,
+	de.uka.ilkd.key.smt.test.TestZ3.class,
+	de.uka.ilkd.key.smt.test.TestYices.class,
+	de.uka.ilkd.key.smt.test.TestCvc3.class,
+	de.uka.ilkd.key.smt.test.TestExecutionWatchDog.class
+    };
 
      
      public static TestSuite createSuite(Class[] testClasses, final String msg) {

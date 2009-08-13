@@ -385,7 +385,7 @@ public final class TypeConverter {
      * performs binary numeric promotion on the argument types
      */
     public KeYJavaType getPromotedType(KeYJavaType type1, 
-            KeYJavaType type2) {
+            			       KeYJavaType type2) {
         final Type t1 = type1.getJavaType();
         final Type t2 = type2.getJavaType();
 
@@ -520,8 +520,17 @@ public final class TypeConverter {
 	KeYJavaType result = null;
 	if(t.sort().extendsTrans(services.getJavaInfo().objectSort())) {
 	    result = services.getJavaInfo().getKeYJavaType(t.sort());
+	} else if(t.op() instanceof Function) {
+	    for(LDT ldt : models) {
+		if(ldt.containsFunction((Function)t.op())) {
+		    Type type = ldt.getType(t);
+		    result = services.getJavaInfo().getKeYJavaType(type);
+		    break;
+		}
+	    }
 	}
-        if (result == null) {
+	
+        if(result == null) {
            result = getKeYJavaType(convertToProgramElement(t));
         }
  

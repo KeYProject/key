@@ -12,13 +12,13 @@ package de.uka.ilkd.key.ldt;
 
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.util.ExtList;
 
@@ -60,6 +60,10 @@ public final class HeapLDT extends LDT {
     
     
     
+    //-------------------------------------------------------------------------
+    //constructors
+    //------------------------------------------------------------------------- 
+    
     public HeapLDT(Namespace sorts, Namespace functions, Namespace progVars) {
 	super(NAME, sorts);
         fieldSort         = (Sort) sorts.lookup(new Name("Field"));	
@@ -70,12 +74,47 @@ public final class HeapLDT extends LDT {
         allLocs           = addFunction(functions, "allLocs");
         allFields         = addFunction(functions, "allFields");        
         arr               = addFunction(functions, "arr");
-        length            = addFunction(functions, "Array::length");
+        length            = addFunction(functions, "length");
         created           = addFunction(functions, "java.lang.Object::<created>");
         nextToCreate      = addFunction(functions, "java.lang.Object::<nextToCreate>");
         nullFunc          = addFunction(functions, "null");
         wellFormed        = addFunction(functions, "wellFormed");
         heap	          = (LocationVariable) progVars.lookup(new Name("heap"));        
+    }
+    
+    
+    //-------------------------------------------------------------------------
+    //internal methods
+    //------------------------------------------------------------------------- 
+    
+    private String getFieldSymbolName(ProgramVariable fieldPV) {
+	if(fieldPV.isImplicit()) {
+	    return fieldPV.name().toString();
+	} else {
+	    String fieldPVName = fieldPV.name().toString();
+	    int index = fieldPV.toString().indexOf("::");
+	    assert index > 0;
+	    return fieldPVName.substring(0, index)
+	    	   + "::$" 
+	    	   + fieldPVName.substring(index + 2);
+	}
+    }
+    
+    
+    
+    //-------------------------------------------------------------------------
+    //public interface
+    //-------------------------------------------------------------------------
+    
+    public String getPrettyFieldName(Function fieldSymbol) {
+	assert fieldSymbol.sort() == fieldSort;
+	String name = fieldSymbol.name().toString();
+	int index = name.indexOf("::");
+	String result = name.substring(index + 2);
+	if(result.charAt(0) == '$') {
+	    result = result.substring(1);
+	}
+	return result;
     }
     
     
@@ -166,14 +205,14 @@ public final class HeapLDT extends LDT {
 	    return getLength();
 	}
 	
-	Name name = new Name(fieldPV.toString());
+	final Name name = new Name(getFieldSymbolName(fieldPV));
 	Function result = (Function) services.getNamespaces()
 	                                     .functions()
 	                                     .lookup(name);
 	if(result == null) {
-	    int index = fieldPV.toString().indexOf("::");
+	    int index = name.toString().indexOf("::");
 	    assert index > 0;
-	    Name kind = new Name(fieldPV.toString().substring(index + 2));
+	    Name kind = new Name(name.toString().substring(index + 2));
 	    
 	    SortDependingFunction firstInstance 
 		= SortDependingFunction.getFirstInstance(kind, services);
@@ -190,7 +229,8 @@ public final class HeapLDT extends LDT {
 	    }
 	}
         
-        assert result.isUnique();        
+	assert result.sort() == fieldSort : "symbol has wrong sort: " + result;
+        assert result.isUnique() : "symbol is not unique: " + result;        
         return result;
     }
     
@@ -250,4 +290,11 @@ public final class HeapLDT extends LDT {
 	assert false;
 	return null;
     }
+    
+    
+    @Override
+    public final Type getType(Term t) {
+	assert false;
+	return null;
+    }    
 }

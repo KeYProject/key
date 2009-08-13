@@ -18,7 +18,6 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.speclang.FormulaWithAxioms;
 import de.uka.ilkd.key.speclang.PositionedString;
-import de.uka.ilkd.key.speclang.translation.AxiomCollector;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 
 
@@ -41,26 +40,23 @@ class JMLTranslator {
     public FormulaWithAxioms translateExpression(
 	    				PositionedString expr,
                                         KeYJavaType specInClass,
-                                        ParsableVariable selfVar, 
-                                        ListOfParsableVariable paramVars,
-                                        ParsableVariable resultVar,
-                                        ParsableVariable excVar,
-                                        Map<Operator,Function/*(atPre)*/> atPreFunctions) 
+                                        ProgramVariable selfVar, 
+                                        ListOfProgramVariable paramVars,
+                                        ProgramVariable resultVar,
+                                        ProgramVariable excVar,
+                                        Term heapAtPre) 
             throws SLTranslationException {
         assert expr != null;
         assert specInClass != null;
-        
-        AxiomCollector axiomCollector = new AxiomCollector();
-        
+                
     	KeYJMLParser parser = new KeYJMLParser(expr,
     					       services,
                                                specInClass,
-                                               axiomCollector,
     					       selfVar,
     					       paramVars, 
     					       resultVar, 
     					       excVar,
-                                               atPreFunctions);
+                                               heapAtPre);
     	
     	FormulaWithAxioms result = null;
     	
@@ -85,23 +81,21 @@ class JMLTranslator {
     public FormulaWithAxioms translateSignalsExpression(
 	    				PositionedString signalsExpr,
                                         KeYJavaType specInClass,
-                                        ParsableVariable selfVar, 
-                                        ListOfParsableVariable paramVars, 
-                                        ParsableVariable resultVar, 
-                                        ParsableVariable excVar,
-                                        Map<Operator, Function/* atPre */> atPreFunctions)
+                                        ProgramVariable selfVar, 
+                                        ListOfProgramVariable paramVars, 
+                                        ProgramVariable resultVar, 
+                                        ProgramVariable excVar,
+                                        Term heapAtPre)
             throws SLTranslationException {
-        AxiomCollector axiomCollector = new AxiomCollector();
         
         KeYJMLParser parser = new KeYJMLParser(signalsExpr,
                                                services,
                                                specInClass,
-                                               axiomCollector,
                                                selfVar,
                                                paramVars, 
                                                resultVar, 
                                                excVar,
-                                               atPreFunctions);
+                                               heapAtPre);
         
         FormulaWithAxioms result = null;
         
@@ -123,14 +117,12 @@ class JMLTranslator {
     public FormulaWithAxioms translateSignalsOnlyExpression(
 	    				PositionedString signalsOnlyExpr,
                                         KeYJavaType specInClass,
-	    				ParsableVariable excVar)
+	    				ProgramVariable excVar)
             throws SLTranslationException {
-        AxiomCollector axiomCollector = new AxiomCollector();
 
         KeYJMLParser parser = new KeYJMLParser(signalsOnlyExpr,
                                                services,
                                                specInClass,
-                                               axiomCollector,
                                                null,
                                                null, 
                                                null, 
@@ -156,15 +148,13 @@ class JMLTranslator {
     public Term translateAssignableExpression(
                                     	PositionedString assignableExpr,
                                         KeYJavaType specInClass,
-                                        ParsableVariable selfVar, 
-                                        ListOfParsableVariable paramVars)
+                                        ProgramVariable selfVar, 
+                                        ListOfProgramVariable paramVars)
             throws SLTranslationException {        
-        AxiomCollector axiomCollector = new AxiomCollector();
             
         KeYJMLParser parser = new KeYJMLParser(assignableExpr,
                                                services,
                                                specInClass,
-                                               axiomCollector,
                                                selfVar,
                                                paramVars, 
                                                null, 
@@ -182,7 +172,7 @@ class JMLTranslator {
     }
     
     
-    public ListOfLogicVariable translateVariableDeclaration(PositionedString variableDecl) 
+    public ListOfProgramVariable translateVariableDeclaration(PositionedString variableDecl) 
             throws SLTranslationException {
         KeYJMLParser parser = new KeYJMLParser(variableDecl,
                                                services,
@@ -190,15 +180,10 @@ class JMLTranslator {
                                                null,
                                                null,
                                                null, 
-                                               null, 
                                                null,
                                                null);
         
-        ListOfLogicVariable result = SLListOfLogicVariable.EMPTY_LIST;
-        
-//      System.out.println("JMLTranslator.translateVariableDeclaration("+variableDecl+") results: ");
-
-        result = parser.parseVariableDeclaration();
+        ListOfProgramVariable result = parser.parseVariableDeclaration();
         
 //      System.out.println(result);
 //      System.out.println();

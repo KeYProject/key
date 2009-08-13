@@ -41,7 +41,7 @@ public class SLAttributeResolver extends SLExpressionResolver {
             attribute = javaInfo.getAttribute(name);
         } catch(IllegalArgumentException e){
             //try as short name and in enclosing classes
-            KeYJavaType containingType = receiver.getKeYJavaType(javaInfo);
+            KeYJavaType containingType = receiver.getType();
             while(attribute == null){
                 attribute = javaInfo.lookupVisibleAttribute(name, 
                 	                                    containingType);
@@ -75,11 +75,17 @@ public class SLAttributeResolver extends SLExpressionResolver {
         		= heapLDT.getFieldSymbolForPV(attribute, services);
         	Term attributeTerm;
         	if(attribute.isStatic()) {
-        	    attributeTerm = TB.staticDot(services, attribute.sort(), fieldSymbol);
+        	    attributeTerm = TB.staticDot(services, 
+        		                         attribute.sort(), 
+        		                         fieldSymbol);
         	} else {
-        	    attributeTerm = TB.dot(services, attribute.sort(), recTerm, fieldSymbol);
+        	    attributeTerm = TB.dot(services, 
+        		                   attribute.sort(), 
+        		                   recTerm, 
+        		                   fieldSymbol);
         	}
-                return manager.createSLExpression(attributeTerm);
+                return new SLExpression(attributeTerm, 
+                			attribute.getKeYJavaType());
             } catch (TermCreationException e) {
                 throw manager.excManager.createException(
                         "Wrong attribute reference " + name + ".");

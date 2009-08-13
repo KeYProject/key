@@ -12,16 +12,10 @@ package de.uka.ilkd.key.smt;
 
 import java.util.ArrayList;
 
-import org.apache.log4j.Logger;
-
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.op.SetOfMetavariable;
 
 public class SimplifyTranslator extends AbstractSMTTranslator {
-
-    private static final Logger logger = Logger
-    .getLogger(SimplifyTranslator.class.getName());
     
 //  counter used for making names unique
     private int counter = 0;
@@ -120,9 +114,6 @@ public class SimplifyTranslator extends AbstractSMTTranslator {
 	/* End of adding part */
 	
 	toReturn.append(formula);
-	
-	logger.info("Resulting formula after translation:");
-	logger.info(toReturn);
 	
 	return toReturn;
     }

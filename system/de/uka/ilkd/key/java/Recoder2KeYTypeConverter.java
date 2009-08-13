@@ -5,13 +5,6 @@
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
-//This file is part of KeY - Integrated Deductive Software Design
-//Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
-//Universitaet Koblenz-Landau, Germany
-//Chalmers University of Technology, Sweden
-
-//The KeY system is protected by the GNU General Public License. 
-//See LICENSE.TXT for details.
 
 
 
@@ -75,30 +68,23 @@ public class Recoder2KeYTypeConverter {
     private CreateArrayMethodBuilder arrayMethodBuilder;
 
     /**
-     * builder class for implicit transient array methods
-     * 
-     * @see #initArrayMethodBuilder()
-     */
-    private CreateTransientArrayMethodBuilder transientArrayMethodBuilder;
-
-    /**
      * The type converter provides methods on key types.
      * 
      * set by the constructor
      */
-    private TypeConverter typeConverter;
+    private final TypeConverter typeConverter;
 
     /**
      * the namespaces to store new types to.
      * 
      * set by the constructor
      */
-    private NamespaceSet namespaces;
+    private final NamespaceSet namespaces;
 
     /**
      * The associated Recoder<->KeY object
      */
-    private Recoder2KeY recoder2key;
+    private final Recoder2KeY recoder2key;
 
     public Recoder2KeYTypeConverter(TypeConverter typeConverter, NamespaceSet namespaces, Recoder2KeY recoder2key) {
         super();
@@ -496,11 +482,6 @@ public class Recoder2KeYTypeConverter {
                         parentReference, length, fields));
                 members.add(arrayMethodBuilder.getCreateArrayMethod(parentReference,
                         prepare, fields));
-                members.add(transientArrayMethodBuilder
-                        .getCreateTransientArrayHelperMethod(parentReference, length,
-                                fields));
-                members.add(transientArrayMethodBuilder.getCreateTransientArrayMethod(
-                        parentReference, length, prepare, fields));
     }
 
     /**
@@ -581,15 +562,22 @@ public class Recoder2KeYTypeConverter {
         final KeYJavaType byteType = getKeYJavaType(getServiceConfiguration()
                 .getNameInfo().getByteType());
         final KeYJavaType objectType = javaInfo().getJavaLangObject();
-        arrayMethodBuilder = new CreateArrayMethodBuilder(integerType,
-                objectType);
-        transientArrayMethodBuilder = new CreateTransientArrayMethodBuilder(
-                integerType, objectType, byteType);
+        Sort heapSort = typeConverter.getHeapLDT() == null
+                        ? Sort.ANY
+                        : typeConverter.getHeapLDT().targetSort();
+        arrayMethodBuilder 
+        	= new CreateArrayMethodBuilder(integerType,
+        				       objectType,
+        				       heapSort);
     }
 
     private JavaInfo javaInfo() {
         return typeConverter != null ? typeConverter.getServices()
                 .getJavaInfo() : null;
+    }
+    
+    public TypeConverter getTypeConverter() {
+	return typeConverter;
     }
 
 }

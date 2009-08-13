@@ -33,7 +33,6 @@ import de.uka.ilkd.key.proof.init.PreservesInvPO;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
-import de.uka.ilkd.key.proof.init.RespectsModifiesPO;
 import de.uka.ilkd.key.proof.mgt.ContractWithInvs;
 import de.uka.ilkd.key.proof.mgt.SetAsListOfContractWithInvs;
 import de.uka.ilkd.key.proof.mgt.SetOfContractWithInvs;
@@ -54,7 +53,7 @@ public class UsedSpecificationsDialog extends JDialog {
     private final JList contractAppList;
     private final JButton ensuresPostButton;
     private final JButton preservesInvButton;
-    private final JButton respectsModifiesButton;
+//    private final JButton respectsModifiesButton;
     private final JButton cancelButton;
 
     
@@ -201,27 +200,27 @@ public class UsedSpecificationsDialog extends JDialog {
         });
         buttonPanel.add(preservesInvButton);
         
-        //create "RespectsModifies" button
-        respectsModifiesButton = new JButton("RespectsModifies");
-        respectsModifiesButton.setPreferredSize(extraLargeButtonDim);
-        respectsModifiesButton.setMinimumSize(extraLargeButtonDim);
-        respectsModifiesButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                ContractWithInvs cwi 
-                    = (ContractWithInvs) contractAppList.getSelectedValue();
-                InitConfig initConfig = Main.getInstance().mediator()
-                                                          .getSelectedProof()
-                                                          .env()
-                                                          .getInitConfig();
-                ProofOblInput po
-                    = new RespectsModifiesPO(initConfig, 
-                                             cwi.contract, 
-                                             cwi.assumedInvs);
-                findOrStartProof(initConfig, po);
-                setVisible(false);
-            }
-        });
-        buttonPanel.add(respectsModifiesButton);
+//        //create "RespectsModifies" button
+//        respectsModifiesButton = new JButton("RespectsModifies");
+//        respectsModifiesButton.setPreferredSize(extraLargeButtonDim);
+//        respectsModifiesButton.setMinimumSize(extraLargeButtonDim);
+//        respectsModifiesButton.addActionListener(new ActionListener() {
+//            public void actionPerformed(ActionEvent e) {
+//                ContractWithInvs cwi 
+//                    = (ContractWithInvs) contractAppList.getSelectedValue();
+//                InitConfig initConfig = Main.getInstance().mediator()
+//                                                          .getSelectedProof()
+//                                                          .env()
+//                                                          .getInitConfig();
+//                ProofOblInput po
+//                    = new RespectsModifiesPO(initConfig, 
+//                                             cwi.contract, 
+//                                             cwi.assumedInvs);
+//                findOrStartProof(initConfig, po);
+//                setVisible(false);
+//            }
+//        });
+//        buttonPanel.add(respectsModifiesButton);
         
         //create "cancel" button
         cancelButton = new JButton("Cancel");
@@ -247,14 +246,14 @@ public class UsedSpecificationsDialog extends JDialog {
                             KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
                             JComponent.WHEN_IN_FOCUSED_WINDOW);
         
-        //disable PO buttons if no specifications
-        if(atomicContractApps.size() == 0) {
-            ensuresPostButton.setEnabled(false);
-            preservesInvButton.setEnabled(false);
-            respectsModifiesButton.setEnabled(false);
-        } else {
-            updatePOButtons();
-        }
+//        //disable PO buttons if no specifications
+//        if(atomicContractApps.size() == 0) {
+//            ensuresPostButton.setEnabled(false);
+//            preservesInvButton.setEnabled(false);
+//            respectsModifiesButton.setEnabled(false);
+//        } else {
+//            updatePOButtons();
+//        }
         
         //show
         getContentPane().setLayout(new BoxLayout(getContentPane(), 
@@ -337,23 +336,23 @@ public class UsedSpecificationsDialog extends JDialog {
             preservesInvButton.setIcon(keyClosedIcon);
         }
         
-        //respectsModifies
-        ProofOblInput respectsModifiesPO 
-            = new RespectsModifiesPO(initConfig, 
-                                     cwi.contract, 
-                                     cwi.assumedInvs);
-        Proof respectsModifiesProof = findPreferablyClosedProof(respectsModifiesPO);
-        if(respectsModifiesProof == null) {
-            respectsModifiesButton.setIcon(null);
-        } else if(respectsModifiesProof.mgt().getStatus().getProofOpen()) {
-            respectsModifiesButton.setIcon(keyIcon);
-        } else if(respectsModifiesProof.mgt().getStatus()
-                                        .getProofClosedButLemmasLeft()) {
-            respectsModifiesButton.setIcon(keyAlmostClosedIcon);
-        } else {
-            assert respectsModifiesProof.mgt().getStatus().getProofClosed();
-            respectsModifiesButton.setIcon(keyClosedIcon);
-        }
+//        //respectsModifies
+//        ProofOblInput respectsModifiesPO 
+//            = new RespectsModifiesPO(initConfig, 
+//                                     cwi.contract, 
+//                                     cwi.assumedInvs);
+//        Proof respectsModifiesProof = findPreferablyClosedProof(respectsModifiesPO);
+//        if(respectsModifiesProof == null) {
+//            respectsModifiesButton.setIcon(null);
+//        } else if(respectsModifiesProof.mgt().getStatus().getProofOpen()) {
+//            respectsModifiesButton.setIcon(keyIcon);
+//        } else if(respectsModifiesProof.mgt().getStatus()
+//                                        .getProofClosedButLemmasLeft()) {
+//            respectsModifiesButton.setIcon(keyAlmostClosedIcon);
+//        } else {
+//            assert respectsModifiesProof.mgt().getStatus().getProofClosed();
+//            respectsModifiesButton.setIcon(keyClosedIcon);
+//        }
     }
     
     

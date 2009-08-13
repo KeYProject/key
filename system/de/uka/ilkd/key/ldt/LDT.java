@@ -12,6 +12,7 @@ package de.uka.ilkd.key.ldt;
 
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.Name;
@@ -112,7 +113,7 @@ public abstract class LDT implements Named {
     public final boolean containsFunction(Function op) {
 	Named n=functions.lookup(op.name());
 	return (n==op);
-    }    
+    }
     
         
     /** returns true if the LDT offers an operation for the given java
@@ -185,4 +186,6 @@ public abstract class LDT implements Named {
     public abstract boolean hasLiteralFunction(Function f);
 
     public abstract Expression translateTerm(Term t, ExtList children);
+    
+    public abstract Type getType(Term t);
 }

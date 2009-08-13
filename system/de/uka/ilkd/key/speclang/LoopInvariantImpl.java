@@ -35,7 +35,7 @@ public class LoopInvariantImpl implements LoopInvariant {
     private final Term originalModifies;
     private final Term originalVariant;
     private final Term originalSelfTerm;
-    private final Map<Operator, Function /*(atPre)*/> originalAtPreFunctions;
+    private final Term originalHeapAtPre;
     private final boolean predicateHeuristicsAllowed;
     
     
@@ -51,7 +51,7 @@ public class LoopInvariantImpl implements LoopInvariant {
      * @param modifies the modifier set
      * @param variant the variant term
      * @param selfTerm the term used for the receiver object
-     * @param atPreFunctions the functions used for atPre
+     * @param heapAtPre the term used for the at pre heap
      * @param predicateHeuristicsAllowed whether heuristics for generating
      *        additional loop predicates are allowed
      */
@@ -61,12 +61,12 @@ public class LoopInvariantImpl implements LoopInvariant {
                              Term modifies,  
                              Term variant, 
                              Term selfTerm,
-                             /*in*/ Map<Operator, Function /*(atPre)*/> atPreFunctions,
+                             Term heapAtPre,
                              boolean predicateHeuristicsAllowed) {
         assert loop != null;
         assert predicates != null;
         assert modifies != null;
-        assert atPreFunctions != null;
+        assert heapAtPre != null;
         this.loop                       = loop;
 	this.originalInvariant          = invariant;
         this.originalPredicates         = predicates;
@@ -74,22 +74,23 @@ public class LoopInvariantImpl implements LoopInvariant {
         this.originalModifies           = modifies;
         this.originalSelfTerm           = selfTerm;   
         this.predicateHeuristicsAllowed = predicateHeuristicsAllowed;
-        this.originalAtPreFunctions     = new LinkedHashMap<Operator, Function>();
-        this.originalAtPreFunctions.putAll(atPreFunctions);
+        this.originalHeapAtPre          = heapAtPre;
     }
     
     
     /**
      * Creates an empty, default loop invariant for the passed loop.
      */
-    public LoopInvariantImpl(LoopStatement loop, Term selfTerm) {
+    public LoopInvariantImpl(LoopStatement loop, 
+	    		     Term selfTerm, 
+	    		     Term heapAtPre) {
         this(loop, 
              null, 
              SetAsListOfTerm.EMPTY_SET, 
              null,
              null, 
              selfTerm,
-             new LinkedHashMap<Operator, Function>(),
+             null,
              true);
     }
     
@@ -101,7 +102,7 @@ public class LoopInvariantImpl implements LoopInvariant {
     
     private Map /*Operator, Operator, Term -> Term*/ getReplaceMap(
             Term selfTerm,
-            /*inout*/ Map<Operator, Function/*atpre*/> atPreFunctions,
+            Term heapAtPre,
             Services services) {
         Map result = new LinkedHashMap();
         
@@ -114,29 +115,10 @@ public class LoopInvariantImpl implements LoopInvariant {
         //-parameters and other local variables are always kept up to
         // date by the ProgVarReplaceVisitor
 
-        //atPre-functions
-        if(atPreFunctions != null) {
-            Iterator<Map.Entry<Operator, Function>> it = 
-                originalAtPreFunctions.entrySet().iterator();
-            while(it.hasNext()) {
-                Map.Entry<Operator, Function> entry = it.next();
-                Operator originalNormalOp = entry.getKey();
-                Function originalAtPreFunc = entry.getValue();
-                Operator normalOp = (Operator) result.get(originalNormalOp);
-                if(normalOp == null) {
-                    normalOp = originalNormalOp;
-                }
-                Function atPreFunc = atPreFunctions.get(normalOp);
-                if(atPreFunc == null) {
-                    atPreFunc 
-                        = AtPreFactory.INSTANCE.createAtPreFunction(normalOp, 
-                                                                    services);
-                    atPreFunctions.put(normalOp, atPreFunc);
-                    services.getNamespaces().functions().add(atPreFunc);                    
-                }
-                assert originalAtPreFunc.sort().equals(atPreFunc.sort());
-                result.put(originalAtPreFunc, atPreFunc);
-            }
+        //atPre heap
+        if(heapAtPre != null) {
+	    assert originalHeapAtPre.sort().equals(heapAtPre.sort());
+	    result.put(originalHeapAtPre, heapAtPre);
         }
         
         return result;
@@ -145,10 +127,10 @@ public class LoopInvariantImpl implements LoopInvariant {
     
     private Map /*Term -> Term*/ getInverseReplaceMap(
             Term selfTerm,
-            /*inout*/ Map <Operator, Function/* atPre*/> atPreFunctions,
+            Term heapAtPre,
             Services services) {
        Map result = new LinkedHashMap();
-       Map replaceMap = getReplaceMap(selfTerm, atPreFunctions, services);
+       Map replaceMap = getReplaceMap(selfTerm, heapAtPre, services);
        final Iterator<Map.Entry> it = replaceMap.entrySet().iterator();
        while(it.hasNext()) {
            Map.Entry entry = it.next();
@@ -163,72 +145,77 @@ public class LoopInvariantImpl implements LoopInvariant {
     //public interface
     //-------------------------------------------------------------------------
 
+    @Override
     public LoopStatement getLoop() {
         return loop;
     }
 
     
+    @Override    
     public Term getInvariant(Term selfTerm,
-            /*inout*/Map <Operator, Function/* (atPre)*/> atPreFunctions,
-            Services services) {
+            		     Term heapAtPre,
+            		     Services services) {
         assert (selfTerm == null) == (originalSelfTerm == null);
-        Map replaceMap = getReplaceMap(selfTerm, atPreFunctions, services);
+        Map replaceMap = getReplaceMap(selfTerm, heapAtPre, services);
         OpReplacer or = new OpReplacer(replaceMap);
         return or.replace(originalInvariant);
     }
     
     
+    @Override
     public SetOfTerm getPredicates(Term selfTerm,
-            /*inout*/ Map<Operator, Function/* (atPre)*/> atPreFunctions,
-            Services services) {
+            		           Term heapAtPre,
+            		           Services services) {
         assert (selfTerm == null) == (originalSelfTerm == null);
-        Map replaceMap = getReplaceMap(selfTerm, atPreFunctions, services);
+        Map replaceMap = getReplaceMap(selfTerm, heapAtPre, services);
         OpReplacer or = new OpReplacer(replaceMap);
         return or.replace(originalPredicates);
     }
 
     
-    public Term getModifies(
-            Term selfTerm,
-            /*inout*/ Map<Operator, Function/* (atPre)*/> atPreFunctions,
-            Services services) {
+    @Override
+    public Term getModifies(Term selfTerm,
+            		    Term heapAtPre,
+            		    Services services) {
         assert (selfTerm == null) == (originalSelfTerm == null);
         Map replaceMap = 
-            getReplaceMap(selfTerm, atPreFunctions, services);
+            getReplaceMap(selfTerm, heapAtPre, services);
         OpReplacer or = new OpReplacer(replaceMap);
         return or.replace(originalModifies);
     }
     
 
+    @Override
     public Term getVariant(Term selfTerm, 
-            /*inout*/ Map <Operator, Function/* (atPre)*/> atPreFunctions,
-            Services services) {
+            		   Term heapAtPre,
+            		   Services services) {
         assert (selfTerm == null) == (originalSelfTerm == null);
         Map replaceMap = 
-            getReplaceMap(selfTerm, atPreFunctions, services);
+            getReplaceMap(selfTerm, heapAtPre, services);
         OpReplacer or = new OpReplacer(replaceMap);
         return or.replace(originalVariant);
     }
     
     
+    @Override
     public boolean getPredicateHeuristicsAllowed() {
         return predicateHeuristicsAllowed;
     }
     
     
+    @Override
     public Term getInternalSelfTerm() {
         return originalSelfTerm;
     }
     
     
-    public Map<Operator, Function> /*Operator (normal) -> Function (atPre)*/ 
-                                                getInternalAtPreFunctions() {
-        Map<Operator, Function> result = new LinkedHashMap<Operator, Function>();
-        result.putAll(originalAtPreFunctions);
-        return result;
+    @Override
+    public Term getInternalHeapAtPre() {
+        return originalHeapAtPre;
     }
     
     
+    @Override
     public LoopInvariant setLoop(LoopStatement loop) {
         return new LoopInvariantImpl(loop,
                                      originalInvariant,
@@ -236,18 +223,19 @@ public class LoopInvariantImpl implements LoopInvariant {
                                      originalModifies,
                                      originalVariant,
                                      originalSelfTerm,
-                                     originalAtPreFunctions,
+                                     originalHeapAtPre,
                                      predicateHeuristicsAllowed);
     }
     
     
+    @Override
     public LoopInvariant setInvariant(Term invariant, 
-            Term selfTerm,
-            /*inout*/ Map <Operator, Function/* (atPre)*/> atPreFunctions,
-            Services services) {
+            			      Term selfTerm,
+            			      Term heapAtPre,
+            			      Services services) {
         assert (selfTerm == null) == (originalSelfTerm == null);
         Map inverseReplaceMap 
-            = getInverseReplaceMap(selfTerm, atPreFunctions, services);
+            = getInverseReplaceMap(selfTerm, heapAtPre, services);
         OpReplacer or = new OpReplacer(inverseReplaceMap);
         return new LoopInvariantImpl(loop, 
                                      or.replace(invariant), 
@@ -255,18 +243,19 @@ public class LoopInvariantImpl implements LoopInvariant {
                                      originalModifies, 
                                      originalVariant, 
                                      originalSelfTerm,
-                                     originalAtPreFunctions,
+                                     originalHeapAtPre,
                                      predicateHeuristicsAllowed);
     }
     
 
+    @Override
     public LoopInvariant setPredicates(SetOfTerm predicates, 
-            Term selfTerm,
-            /*inout*/ Map <Operator, Function/* atPre */> atPreFunctions,
-            Services services) {
+            			       Term selfTerm,
+            			       Term heapAtPre,
+            			       Services services) {
         assert (selfTerm == null) == (originalSelfTerm == null);
         Map inverseReplaceMap 
-            = getInverseReplaceMap(selfTerm, atPreFunctions, services);
+            = getInverseReplaceMap(selfTerm, heapAtPre, services);
         OpReplacer or = new OpReplacer(inverseReplaceMap);
         return new LoopInvariantImpl(loop,
                                      originalInvariant,
@@ -274,11 +263,12 @@ public class LoopInvariantImpl implements LoopInvariant {
                                      originalModifies,
                                      originalVariant,
                                      originalSelfTerm,
-                                     originalAtPreFunctions,
+                                     originalHeapAtPre,
                                      predicateHeuristicsAllowed);
     }
     
     
+    @Override
     public LoopInvariant setPredicateHeuristicsAllowed(
                                         boolean predicateHeuristicsAllowed) {
         return new LoopInvariantImpl(loop,
@@ -287,16 +277,18 @@ public class LoopInvariantImpl implements LoopInvariant {
                                      originalModifies,
                                      originalVariant,
                                      originalSelfTerm,
-                                     originalAtPreFunctions,
+                                     originalHeapAtPre,
                                      predicateHeuristicsAllowed);
     }
     
     
+    @Override
     public void visit(Visitor v) {
         v.performActionOnLoopInvariant(this);
     }
     
     
+    @Override
     public String toString() {
         return "invariant: " 
                 + originalInvariant 

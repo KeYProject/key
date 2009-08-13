@@ -190,6 +190,7 @@ public abstract class ProgramVariable extends AbstractSortedOperator
 	return  PositionInfo.UNDEFINED;
     }
 
+    @Override
     public KeYJavaType getKeYJavaType() {
 	return type;
     }

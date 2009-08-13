@@ -8,17 +8,19 @@
 package de.uka.ilkd.key.speclang.translation;
 
 import de.uka.ilkd.key.java.Services;
+
 import de.uka.ilkd.key.java.abstraction.ListOfKeYJavaType;
 import de.uka.ilkd.key.java.abstraction.SLListOfKeYJavaType;
 
-public class SLParameters {
-
+public final class SLParameters {
     
     private final ListOfSLExpression parameters;
 
+    
     public SLParameters(ListOfSLExpression parameters) {
         this.parameters = parameters;
     }
+    
     
     public ListOfSLExpression getParameters() {
         return parameters;
@@ -26,28 +28,20 @@ public class SLParameters {
     
     
     public boolean isListOfTerm() {
-        
-        IteratorOfSLExpression it = parameters.iterator();
-        
-        while(it.hasNext()) {
-            if (!it.next().isTerm())
+	for(SLExpression expr : parameters) {
+            if(!expr.isTerm()) {
                 return false;
+            }
         }
-        
         return true;
     }
     
-    public ListOfKeYJavaType getSignature(Services services) {
-            
+    
+    public ListOfKeYJavaType getSignature(Services services) {           
         ListOfKeYJavaType result = SLListOfKeYJavaType.EMPTY_LIST;
-        IteratorOfSLExpression it = parameters.iterator();
-        
-        while(it.hasNext()) {
-            result = result.append( it.next().getKeYJavaType(services.getJavaInfo()) );
-        }
-        
+        for(SLExpression expr : parameters) {
+            result = result.append(expr.getType());
+        }        
         return result;
     }
-        
-
 }

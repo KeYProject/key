@@ -10,7 +10,6 @@
 package de.uka.ilkd.key.java.visitor;
 
 import java.util.HashSet;
-import java.util.Map;
 
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
@@ -74,28 +73,28 @@ public final class ProgramVariableCollector extends JavaASTVisitor {
         TermProgramVariableCollector tpvc = 
             new TermProgramVariableCollector(services);
         Term selfTerm = x.getInternalSelfTerm();
-        Map<Operator, Function> atPreFunctions = x.getInternalAtPreFunctions();
+        Term heapAtPre = x.getInternalHeapAtPre();
         
         //invariant
-        Term inv = x.getInvariant(selfTerm, atPreFunctions, services);
+        Term inv = x.getInvariant(selfTerm, heapAtPre, services);
         if(inv != null) {
             inv.execPostOrder(tpvc);
         }
         
         //predicates
-        SetOfTerm preds = x.getPredicates(selfTerm, atPreFunctions, services);
+        SetOfTerm preds = x.getPredicates(selfTerm, heapAtPre, services);
         for(Term pred : preds) {
             pred.execPostOrder(tpvc);
         }
         
         //modifies
-        Term mod = x.getModifies(selfTerm, atPreFunctions, services);
+        Term mod = x.getModifies(selfTerm, heapAtPre, services);
         if(mod != null) {
             mod.execPostOrder(tpvc);
         }
         
         //variant
-        Term v = x.getVariant(selfTerm, atPreFunctions, services);
+        Term v = x.getVariant(selfTerm, heapAtPre, services);
         if(v != null) {
             v.execPostOrder(tpvc);
         }

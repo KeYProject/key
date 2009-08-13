@@ -48,10 +48,11 @@ public final class ProgramMethod extends AbstractSortedOperator
     public ProgramMethod(MethodDeclaration method, 
 			 KeYJavaType contKJT, 
 			 KeYJavaType kjt,
-                         PositionInfo pi) {
+                         PositionInfo pi,
+                         Sort heapSort) {
         super(new ProgramElementName(method.getProgramElementName().toString(), 
                 		     contKJT.getSort().toString()), 
-              getArgumentSorts(method, contKJT), 
+              getArgumentSorts(method, contKJT, heapSort), 
               kjt == null ? Sort.ANY : kjt.getSort(),
               false); 
                         
@@ -68,11 +69,14 @@ public final class ProgramMethod extends AbstractSortedOperator
     * @param container the KeYJavaType of the type where this method is declared
     * @return the symbols argument sorts
     */
-   private static Sort[] getArgumentSorts(MethodDeclaration md, KeYJavaType container) {  
+   private static Sort[] getArgumentSorts(MethodDeclaration md, 
+	   			          KeYJavaType container,
+	   			          Sort heapSort) {  
        final boolean instanceMethod = !md.isStatic() && !(md instanceof Constructor);
        
-       final int arity = instanceMethod ? 
-               md.getParameterDeclarationCount() + 2 : md.getParameterDeclarationCount() + 1;       
+       final int arity = instanceMethod  
+                         ? md.getParameterDeclarationCount() + 2 
+                         : md.getParameterDeclarationCount() + 1;       
        
        final Sort[] argSorts = new Sort[arity];
  
@@ -86,7 +90,7 @@ public final class ProgramMethod extends AbstractSortedOperator
            offset = 0;
        }
        
-       argSorts[offset] = Sort.ANY; //XXX, should be heap
+       argSorts[offset] = heapSort;
        offset++;
        
        for (int i = offset; i<argSorts.length; i++) {

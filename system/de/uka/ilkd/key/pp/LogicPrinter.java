@@ -823,17 +823,17 @@ public final class LogicPrinter {
     public void printFunctionTerm(String name, Term t) throws IOException {
 	//XXX
 	if(NotationInfo.PRETTY_SYNTAX
-                  && services != null
-                  && t.sort() == services.getTypeConverter().getHeapLDT().getFieldSort() 
-                  && t.arity() == 0
-                  && t.boundVars().isEmpty()) {
+           && services != null
+           && t instanceof Function
+           && t.sort() == services.getTypeConverter().getHeapLDT().getFieldSort() 
+           && t.arity() == 0
+           && t.boundVars().isEmpty()) {
             startTerm(0);            
-            final String fieldOpName = t.op().name().toString();
-            final String shortFieldName
-                    =  fieldOpName.contains("::")
-                       ? fieldOpName.substring(fieldOpName.indexOf("::") + 2)
-                       : fieldOpName;            
-            layouter.print(shortFieldName);
+            final String prettyFieldName 
+            	= services.getTypeConverter()
+                          .getHeapLDT()
+                          .getPrettyFieldName((Function)t.op());
+            layouter.print(prettyFieldName);
         }
         
         else {

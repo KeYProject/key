@@ -18,12 +18,15 @@ import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 
-public class SLMethodResolver extends SLExpressionResolver {
+
+public final class SLMethodResolver extends SLExpressionResolver {
   
     public SLMethodResolver(JavaInfo javaInfo, SLResolverManager manager) {
         super(javaInfo, manager);
     }
 
+    
+    @Override
     protected SLExpression doResolving(SLExpression receiver,
                                        String methodName,
                                        SLParameters parameters)
@@ -33,7 +36,7 @@ public class SLMethodResolver extends SLExpressionResolver {
             return null;
         }
 
-        KeYJavaType containingType = receiver.getKeYJavaType(javaInfo);
+        KeYJavaType containingType = receiver.getType();
         if(containingType == null) {
             return null;
         }
@@ -44,7 +47,7 @@ public class SLMethodResolver extends SLExpressionResolver {
         Term recTerm = receiver.getTerm(); 
         
         
-        while(pm==null){
+        while(pm == null) {
             pm = javaInfo.getProgramMethod(
                     containingType,
                     methodName,
@@ -64,26 +67,27 @@ public class SLMethodResolver extends SLExpressionResolver {
             }
         }
         
-        if (pm == null)
-        {
+        if(pm == null) {
             return null;
         }
         
         int i;
-        Term subs[];
+        Term[] subs;
         
-        if (!pm.isStatic()) {
+        if(!pm.isStatic()) {
             if (!receiver.isTerm()) {
                 throw manager.excManager.createException(
                         "non-static method (" + methodName + ") invocation" +
                         " on Type " + receiver.getType());
             }
-            subs = new Term[parameters.getParameters().size()+1];
+            subs = new Term[parameters.getParameters().size() + 2];
             subs[0] = recTerm;
-            i = 1;
+            subs[1] = TB.heap(services);            
+            i = 2;
         } else {
-            subs = new Term[parameters.getParameters().size()];
-            i = 0;
+            subs = new Term[parameters.getParameters().size() + 1];
+            subs[0] = TB.heap(services);
+            i = 1;
         }
         
         IteratorOfSLExpression it = parameters.getParameters().iterator();
@@ -98,16 +102,20 @@ public class SLMethodResolver extends SLExpressionResolver {
             		"method \"" + methodName + "\" in specification expression.");
         }
         
-        return manager.createSLExpression(TB.tf().createTerm(pm, subs));
+        return new SLExpression(TB.tf().createTerm(pm, subs), 
+        	                pm.getKeYJavaType());
     }
 
 
+    @Override    
     public boolean canHandleReceiver(SLExpression receiver) {
-        return receiver != null && (receiver.isTerm() || receiver.isType()) && !receiver.getKeYJavaType(javaInfo).getFullName().endsWith("[]") ;
+        return receiver != null 
+               && !receiver.getType().getFullName().endsWith("[]");
     }
 
+    
+    @Override    
     public boolean needVarDeclaration(String name) {
         return false;
     }
-
 }

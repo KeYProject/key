@@ -13,7 +13,6 @@ package de.uka.ilkd.key.logic.op;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.MatchConditions;
 
@@ -42,7 +41,8 @@ public final class LogicVariable extends AbstractSortedOperator
         }
         if (subst instanceof LogicVariable) {
             final LogicVariable lv = (LogicVariable) subst;
-            if (lv.sort() == sort() && mc.renameTable().sameAbstractName(this, lv)) {
+            if(lv.sort() == sort() 
+        	&& mc.renameTable().sameAbstractName(this, lv)) {
                 return mc;
             }
         }

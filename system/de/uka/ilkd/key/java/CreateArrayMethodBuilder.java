@@ -33,6 +33,7 @@ import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.sort.Sort;
 
 /**
  * This class creates the <code>&lt;createArray&gt;</code> method for array
@@ -41,7 +42,7 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
  * recoder transformation as soon as we port our array data structures to
  * RecodeR.
  */
-public class CreateArrayMethodBuilder extends KeYJavaASTFactory {
+public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
 
     public static final String  IMPLICIT_ARRAY_CREATE                    = "<createArray>";
 
@@ -59,18 +60,25 @@ public class CreateArrayMethodBuilder extends KeYJavaASTFactory {
     /**
      * keeps the currently used integer type
      */
-    protected final KeYJavaType integerType;
+    private final KeYJavaType integerType;
 
     /**
      * stores the currently used object type
      */
-    protected final KeYJavaType objectType;
+    private final KeYJavaType objectType;
+    
+    private final Sort heapSort;
+    
+    
+    
 
     /** create the method builder for array implict creation methods */
     public CreateArrayMethodBuilder(KeYJavaType integerType,
-            KeYJavaType objectType) {
+            			    KeYJavaType objectType,
+            			    Sort heapSort) {
         this.integerType = integerType;
         this.objectType = objectType;
+        this.heapSort = heapSort;
     }
 
     /**
@@ -219,8 +227,11 @@ public class CreateArrayMethodBuilder extends KeYJavaASTFactory {
                         InstanceAllocationMethodBuilder.IMPLICIT_INSTANCE_ALLOCATE),
                 new ParameterDeclaration[0], null, null, false);
 
-        return new ProgramMethod(md, arrayType, arrayType,
-                PositionInfo.UNDEFINED);
+        return new ProgramMethod(md, 
+        			 arrayType, 
+        			 arrayType,
+        			 PositionInfo.UNDEFINED,
+        			 heapSort);
     }
 
     protected StatementBlock getCreateArrayBody(TypeReference arrayRef,
@@ -341,8 +352,11 @@ public class CreateArrayMethodBuilder extends KeYJavaASTFactory {
                 getCreateArrayHelperBody(length, paramLength, fields, false,
                         null), false);
 
-        return new ProgramMethod(md, arrayType, arrayType,
-                PositionInfo.UNDEFINED);
+        return new ProgramMethod(md, 
+        			 arrayType, 
+        			 arrayType,
+        			 PositionInfo.UNDEFINED,
+        			 heapSort);
     }
 
     /**
@@ -371,8 +385,11 @@ public class CreateArrayMethodBuilder extends KeYJavaASTFactory {
                 new ParameterDeclaration[] { param }, null,                 
                 getCreateArrayBody(arrayTypeReference, paramLength), false);
 
-        return new ProgramMethod(md, arrayType, arrayType,
-                PositionInfo.UNDEFINED);
+        return new ProgramMethod(md, 
+        			 arrayType, 
+        			 arrayType,
+        			 PositionInfo.UNDEFINED,
+        			 heapSort);
     }
 
     /**
@@ -421,10 +438,11 @@ public class CreateArrayMethodBuilder extends KeYJavaASTFactory {
                         PrepareObjectBuilder.IMPLICIT_OBJECT_PREPARE),
                 new ParameterDeclaration[0], null, body, false);
 
-        final ProgramMethod result = new ProgramMethod(md, arrayType, null,
-                PositionInfo.UNDEFINED);
-
-        return result;
+        return new ProgramMethod(md, 
+        	                 arrayType, 
+        			 null,
+        			 PositionInfo.UNDEFINED,
+        			 heapSort);
     }
 
 }

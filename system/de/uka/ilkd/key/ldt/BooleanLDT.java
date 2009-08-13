@@ -11,6 +11,8 @@ package de.uka.ilkd.key.ldt;
 
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.abstraction.PrimitiveType;
+import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.expression.literal.BooleanLiteral;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
@@ -126,9 +128,24 @@ public final class BooleanLDT extends LDT {
     
     @Override
     public Expression translateTerm(Term t, ExtList children) {
-	if (t.op()==bool_true) return BooleanLiteral.TRUE;
-	if (t.op()==bool_false) return BooleanLiteral.FALSE;
-	throw new RuntimeException("BooleanLDT: Cannot convert term to program: "
-				   +t);
+	if(t.op() == bool_true) {
+	    return BooleanLiteral.TRUE;
+	} else if(t.op() == bool_false) { 
+	    return BooleanLiteral.FALSE;
+	} else {
+	    assert false : "BooleanLDT: Cannot convert term to program: " + t;
+	    return null;
+	}
+    }
+    
+    
+    @Override
+    public final Type getType(Term t) {
+	if(t.sort() == targetSort()) {
+	    return PrimitiveType.JAVA_BOOLEAN;
+	} else {
+	    assert false : "BooleanLDT: Cannot get Java type for term: " + t;
+	    return null;
+	}
     }
 } 

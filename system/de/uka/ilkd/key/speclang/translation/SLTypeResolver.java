@@ -30,15 +30,15 @@ public class SLTypeResolver extends SLExpressionResolver {
                                    throws SLTranslationException {
         try {
             KeYJavaType type = javaInfo.getTypeByClassName(name);
-            return manager.createSLExpression(type);
+            return new SLExpression(type);
         } catch (RuntimeException e) {
             try{
                 if(receiver != null){ 
-                    KeYJavaType containingType = receiver.getKeYJavaType(javaInfo);
+                    KeYJavaType containingType = receiver.getType();
                     while(true){
                         String typeName = containingType.getSort().name().toString();
                         if(typeName.substring(typeName.lastIndexOf(".")+1).equals(name)){
-                            return manager.createSLExpression(containingType);
+                            return new SLExpression(containingType);
                         }
                         ProgramVariable et = javaInfo.getAttribute(
                                 ImplicitFieldAdder.IMPLICIT_ENCLOSING_THIS, containingType);

@@ -124,8 +124,8 @@ public abstract class AbstractPO implements ProofOblInput {
      * Translates a precondition out of an operation contract. 
      */
     protected Term translatePre(OperationContract contract,
-                                ParsableVariable selfVar,
-                                ListOfParsableVariable paramVars) 
+                                ProgramVariable selfVar,
+                                ListOfProgramVariable paramVars) 
     		throws ProofInputException {
         FormulaWithAxioms fwa = contract.getPre(selfVar, paramVars, services);
         axioms.putAll(fwa.getAxioms());
@@ -137,17 +137,17 @@ public abstract class AbstractPO implements ProofOblInput {
      * Translates a postcondition out of an operation contract. 
      */
     protected Term translatePost(OperationContract contract,
-                                 ParsableVariable selfVar,
-                                 ListOfParsableVariable paramVars,
-                                 ParsableVariable resultVar,
-                                 ParsableVariable excVar,
-                                 /*inout*/ Map<Operator, Function/*(atPre)*/> atPreFunctions) 
+                                 ProgramVariable selfVar,
+                                 ListOfProgramVariable paramVars,
+                                 ProgramVariable resultVar,
+                                 ProgramVariable excVar,
+                                 Term heapAtPre) 
     		throws ProofInputException {
         FormulaWithAxioms fwa = contract.getPost(selfVar, 
         					 paramVars, 
         					 resultVar, 
         					 excVar, 
-                                                 atPreFunctions,
+                                                 heapAtPre,
         					 services);
         axioms.putAll(fwa.getAxioms());
         return fwa.getFormula();
@@ -159,8 +159,8 @@ public abstract class AbstractPO implements ProofOblInput {
      */
     protected Term translateModifies(OperationContract contract,
                                      Term targetTerm,
-                                     ParsableVariable selfVar,
-                                     ListOfParsableVariable paramVars) 
+                                     ProgramVariable selfVar,
+                                     ListOfProgramVariable paramVars) 
     		throws ProofInputException {
 	assert false : "not implemented";
     	return null;
@@ -204,7 +204,7 @@ public abstract class AbstractPO implements ProofOblInput {
      * Translates a class invariant as an open formula. 
      */
     protected Term translateInvOpen(ClassInvariant inv, 
-	    			    ParsableVariable selfVar) 
+	    			    ProgramVariable selfVar) 
     		throws ProofInputException {
         FormulaWithAxioms fwa = inv.getOpenInv(selfVar, services);
         axioms.putAll(fwa.getAxioms());
@@ -213,7 +213,7 @@ public abstract class AbstractPO implements ProofOblInput {
     
     
     protected Term translateInvsOpen(SetOfClassInvariant invs, 
-	    			     ParsableVariable selfVar) 
+	    			     ProgramVariable selfVar) 
     		throws ProofInputException {
 	Term result = TB.tt();
 	for (final ClassInvariant inv : invs) {
@@ -222,15 +222,6 @@ public abstract class AbstractPO implements ProofOblInput {
 	return result;
     }
     
-    
-    protected ListOfParsableVariable toPV(ListOfProgramVariable vars) {
-	ListOfParsableVariable result = SLListOfParsableVariable.EMPTY_LIST;
-	for (final ProgramVariable pv : vars) {
-	    result = result.append(pv);
-	}
-	return result;
-    }
-
     
     /**
      * Replaces operators in a term by other operators with the same signature.
@@ -260,14 +251,6 @@ public abstract class AbstractPO implements ProofOblInput {
             initConfig.progVarNS().add(it.next());
         }
     }
-
-
-    protected void registerInNamespaces(/*in*/ Map<Operator, Function> atPreFunctions) {
-        for (final Function atPreF : atPreFunctions.values()) {
-            initConfig.funcNS().add(atPreF); 
-        }
-    }
-    
 
 
     //-------------------------------------------------------------------------
@@ -363,50 +346,6 @@ public abstract class AbstractPO implements ProofOblInput {
                          initConfig.getServices());
     }
 
-
-    /**
-     * Returns those axioms from the SLDL-Translation which are required for
-     * the passed term (helper for getPO()).
-     */
-    private Term getRequiredAxioms(Term t) {
-        Term result = TB.tt();
-
-        final Set<Term> axiomSet = getRequiredAxiomsAsSet(t);
-        
-        for (final Term axiom : axiomSet) {
-            result = TB.and(result, axiom);
-        }
-/*        
-        if(axioms.containsKey(t.op())) {            
-            result = TB.and(result, (Term)axioms.get(t.op()));
-        }
-    
-        for(int i = 0; i < t.arity(); i++) {
-            result = TB.and(result, getRequiredAxioms(t.sub(i)));
-        }
-*/    
-        return result;
-    }
-      
-
-    /**
-     * Returns those axioms from the SLDL-Translation which are required for
-     * the passed term (helper for getRequiredAxioms(Term t)).
-     */
-    private Set<Term> getRequiredAxiomsAsSet(Term t) {
-        Set<Term> result = new LinkedHashSet<Term>();
-        
-        if (axioms.containsKey(t.op())) {
-            result.add(axioms.get(t.op()));
-        }
-        
-        for(int i = 0; i < t.arity(); i++) {
-            result.addAll(getRequiredAxiomsAsSet(t.sub(i)));
-        }
-        
-        return result;
-    }
-    
     
     @Override
     public final ProofAggregate getPO() {
@@ -420,12 +359,8 @@ public abstract class AbstractPO implements ProofOblInput {
         
         Proof[] proofs = new Proof[poTerms.length];
         for(int i = 0; i < proofs.length; i++) {
-            Term axioms = getRequiredAxioms(poTerms[i]);
             proofs[i] = createProof(poNames != null ? poNames[i] : name,
-                                    poTerms[i].op() == Junctor.IMP
-                                    ? TB.imp(TB.and(axioms, poTerms[i].sub(0)),
-                                             poTerms[i].sub(1))
-                                    : TB.imp(axioms, poTerms[i]));
+                                    poTerms[i]);
             
             if(poTaclets != null) {
                 proofs[i].getGoal(proofs[i].root()).indexOfTaclets()

@@ -7,15 +7,14 @@
 // See LICENSE.TXT for details.
 //
 //
+
 package de.uka.ilkd.key.ldt;
 
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.expression.Literal;
-import de.uka.ilkd.key.java.expression.Operator;
 import de.uka.ilkd.key.java.expression.literal.CharLiteral;
 import de.uka.ilkd.key.java.expression.literal.IntLiteral;
 import de.uka.ilkd.key.java.expression.literal.LongLiteral;
@@ -23,6 +22,7 @@ import de.uka.ilkd.key.java.expression.operator.*;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.ExtList;
 
@@ -338,18 +338,36 @@ public final class IntegerLDT extends LDT {
 	}
     }
     
+    
+    public Function getJavaCast(Type t) {
+	if(t == PrimitiveType.JAVA_BYTE) {
+	    return javaCastByte;
+	} else if(t == PrimitiveType.JAVA_CHAR) {
+	    return javaCastChar;
+	} else if(t == PrimitiveType.JAVA_INT) {
+	    return javaCastInt;
+	} else if(t == PrimitiveType.JAVA_LONG) {
+	    return javaCastLong;
+	} else if(t == PrimitiveType.JAVA_SHORT) {
+	    return javaCastShort;
+	} else {
+	    return null;
+	}
+    }
+    
+    
 
     /** returns the function symbol for the given operation 
      * null if no function is found for the given operator
      * @return  the function symbol for the given operation 
     */
     @Override
-    public Function getFunctionFor
-        (de.uka.ilkd.key.java.expression.Operator op, 
-                Services serv, ExecutionContext ec) {
-        final KeYJavaType opReturnType = op.getKeYJavaType(serv, ec);
-        final boolean isLong 
-        	= opReturnType.getJavaType() == PrimitiveType.JAVA_LONG; 
+    public Function getFunctionFor(
+	    	de.uka.ilkd.key.java.expression.Operator op, 
+                Services serv, 
+                ExecutionContext ec) {
+        final Type opReturnType = op.getKeYJavaType(serv, ec).getJavaType();
+        final boolean isLong = opReturnType == PrimitiveType.JAVA_LONG; 
 
         if (op instanceof GreaterThan) {
             return getGreaterThan();
@@ -387,7 +405,7 @@ public final class IntegerLDT extends LDT {
         } else if (op instanceof Negative) {
             return isLong ? getJavaUnaryMinusLong() : getJavaUnaryMinusInt();
         } else if (op instanceof TypeCast) {
-            return isLong ? getJavaCastLong() : getJavaCastInt();
+            return getJavaCast(opReturnType);
         } else {
             return null;
         }
@@ -395,7 +413,10 @@ public final class IntegerLDT extends LDT {
     
 
     @Override
-    public boolean isResponsible(Operator op, Term[] subs, Services services, ExecutionContext ec) {
+    public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, 
+	                         Term[] subs, 
+	                         Services services, 
+	                         ExecutionContext ec) {
         if (subs.length == 1) {
             return isResponsible(op, subs[0], services, ec);
         } else if (subs.length == 2) {
@@ -407,11 +428,16 @@ public final class IntegerLDT extends LDT {
 
 
     @Override
-    public boolean isResponsible(Operator op, Term left, Term right, 
-            Services services, ExecutionContext ec) {
-        if (left!=null && left.sort().extendsTrans(targetSort()) 
-                && right!=null && right.sort().extendsTrans(targetSort())) {
-            if (getFunctionFor(op, services, ec) != null) {
+    public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, 
+	                         Term left, 
+	                         Term right, 
+	                         Services services, 
+	                         ExecutionContext ec) {
+        if(left != null 
+           && left.sort().extendsTrans(targetSort()) 
+           && right != null 
+           && right.sort().extendsTrans(targetSort())) {
+            if(getFunctionFor(op, services, ec) != null) {
                 return true;
             }
         }
@@ -420,9 +446,12 @@ public final class IntegerLDT extends LDT {
     
     
     @Override
-    public boolean isResponsible(Operator op, Term sub, Services services, ExecutionContext ec) {
-        if (sub != null && sub.sort().extendsTrans(targetSort())) {
-            if (op instanceof Negative) {
+    public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, 
+	                         Term sub, 
+	                         Services services, 
+	                         ExecutionContext ec) {
+        if(sub != null && sub.sort().extendsTrans(targetSort())) {
+            if(op instanceof Negative) {
                 return true;
             }
         }
@@ -521,9 +550,11 @@ public final class IntegerLDT extends LDT {
     
     @Override
     public Expression translateTerm(Term t, ExtList children) {
-        if (!containsFunction((Function) t.op())) return null;
+        if(!containsFunction((Function) t.op())) {
+            return null;
+        }
         Function f = (Function)t.op();
-        if (isNumberLiteral(f) || f == numbers || f ==charID) {     
+        if(isNumberLiteral(f) || f == numbers || f == charID) {     
             StringBuffer sb = new StringBuffer("");
             Term it = t;
             if (f == charID || f == numbers) {
@@ -543,6 +574,53 @@ public final class IntegerLDT extends LDT {
         throw new RuntimeException("IntegerLDT: Cannot convert term to program: "
                                    +t);
     }
+    
+    
+    @Override
+    public final Type getType(Term t) {
+	Operator op = t.op();
+	if(op == javaUnaryMinusInt
+           || op == javaAddInt
+           || op == javaSubInt
+           || op == javaMulInt
+           || op == javaDivInt
+           || op == javaShiftRightInt
+           || op == javaShiftLeftInt
+           || op == javaUnsignedShiftRightInt
+           || op == javaBitwiseOrInt
+           || op == javaBitwiseAndInt
+           || op == javaBitwiseXOrInt) {
+	    return PrimitiveType.JAVA_INT;
+	} else if(op == javaUnaryMinusLong
+		   || op == javaAddLong
+		   || op == javaSubLong
+		   || op == javaMulLong
+		   || op == javaDivLong
+		   || op == javaShiftRightLong
+		   || op == javaShiftLeftLong
+		   || op == javaUnsignedShiftRightLong
+		   || op == javaBitwiseOrLong
+		   || op == javaBitwiseAndLong
+		   || op == javaBitwiseXOrLong) {
+	    return PrimitiveType.JAVA_LONG;
+	} else if(op == javaBitwiseNegation || op == javaMod) {
+	    return getType(t.sub(0));
+	} else if(op == javaCastByte) {
+	    return PrimitiveType.JAVA_BYTE;
+	} else if(op == javaCastShort) {
+	    return PrimitiveType.JAVA_SHORT;
+	} else if(op == javaCastInt) {
+	    return PrimitiveType.JAVA_INT;
+	} else if(op == javaCastLong) {
+	    return PrimitiveType.JAVA_LONG;
+	} else if(op == javaCastChar) {
+	    return PrimitiveType.JAVA_CHAR;
+	} else {
+   	    assert false : "IntegerLDT: Cannot get Java type for term: " + t;
+	    return null;
+	}
+    }    
+    
     
     
     /**

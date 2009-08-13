@@ -10,8 +10,6 @@
 
 package de.uka.ilkd.key.speclang;
 
-import java.util.Map;
-
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.*;
@@ -47,29 +45,25 @@ public interface OperationContract {
     /**
      * Returns the precondition of the contract.
      */
-    public FormulaWithAxioms getPre(ParsableVariable selfVar, 
-                                    ListOfParsableVariable paramVars,
+    public FormulaWithAxioms getPre(ProgramVariable selfVar, 
+                                    ListOfProgramVariable paramVars,
                                     Services services);
 
     /**
      * Returns the postcondition of the contract.
-     * @param atPreFunctions map containing functions to use as atPre-functions.
-     *                       If the method needs an atPre-function which is not
-     *                       in this map, it creates a fresh one and adds it to 
-     *                       the map.˙
      */
-    public FormulaWithAxioms getPost(ParsableVariable selfVar, 
-                                     ListOfParsableVariable paramVars, 
-                                     ParsableVariable resultVar, 
-                                     ParsableVariable excVar,
-                                     /*inout*/ Map<Operator, Function/* at pre */> atPreFunctions,
+    public FormulaWithAxioms getPost(ProgramVariable selfVar, 
+                                     ListOfProgramVariable paramVars, 
+                                     ProgramVariable resultVar, 
+                                     ProgramVariable excVar,
+                                     Term heapAtPre,
                                      Services services);
 
     /**
      * Returns the modifies clause of the contract.
      */
-    public Term getModifies(ParsableVariable selfVar, 
-                            ListOfParsableVariable paramVars,
+    public Term getModifies(ProgramVariable selfVar, 
+                            ListOfProgramVariable paramVars,
                             Services services);
     
 

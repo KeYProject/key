@@ -32,6 +32,7 @@ import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.java.statement.Try;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.sort.ArrayOfSort;
 import de.uka.ilkd.key.proof.mgt.AxiomJustification;
 import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.speclang.*;
@@ -81,7 +82,7 @@ public abstract class EnsuresPO extends AbstractPO {
                                        ListOfProgramVariable paramVars, 
                                        ProgramVariable resultVar,
                                        ProgramVariable exceptionVar,
-                                       Map<Operator, Function/*atPre*/> atPreFunctions) 
+                                       Term heapAtPre) 
                                                     throws ProofInputException;
     
     
@@ -89,7 +90,7 @@ public abstract class EnsuresPO extends AbstractPO {
                                         ListOfProgramVariable paramVars, 
                                         ProgramVariable resultVar,
                                         ProgramVariable exceptionVar,
-                                        Map<Operator, Function/*atPre*/> atPreFunctions)
+                                        Term heapAtPre)
                                                     throws ProofInputException;
     
 
@@ -198,7 +199,7 @@ public abstract class EnsuresPO extends AbstractPO {
             if (contracts.size() > 0) {
                 Term anyPreTerm = TB.ff();
                 for(OperationContract contract : contracts) {
-                    Term term = translatePre(contract, selfVar, toPV(paramVars));
+                    Term term = translatePre(contract, selfVar, paramVars);
                     anyPreTerm = TB.or(anyPreTerm, term); 
                 }
                 result = TB.and(result, anyPreTerm);
@@ -319,7 +320,7 @@ public abstract class EnsuresPO extends AbstractPO {
     
     @Override
     public void readProblem() throws ProofInputException {
-        //prepare variables, program method and container for @pre-functions
+        //prepare variables, program method, heapAtPre
         ListOfProgramVariable paramVars = buildParamVars(programMethod);
         ProgramVariable selfVar = null;
         if(!programMethod.isStatic()) {
@@ -327,51 +328,51 @@ public abstract class EnsuresPO extends AbstractPO {
         }
         ProgramVariable resultVar = buildResultVar(programMethod);
         ProgramVariable exceptionVar = buildExcVar();
-        Map<Operator, Function/*atPre*/> atPreFunctions = 
-            new LinkedHashMap<Operator, Function/*atPre*/>();
-        
+        Function heapAtPreFunc = new Function(new Name("heapAtPre"), services.getTypeConverter().getHeapLDT().targetSort(), new ArrayOfSort());//XXX
+        Term heapAtPre = TB.func(heapAtPreFunc);
+        assert false : "not implemented";
         //build general assumption
-        Term gaTerm = buildGeneralAssumption(selfVar, paramVars);
-        //get precondition defined by subclass
-        Term preTerm = getPreTerm(selfVar, 
-                                  paramVars, 
-                                  resultVar, 
-                                  exceptionVar, 
-                                  atPreFunctions);
-        
-        //get postcondition defined by subclass
-        Term postTerm = getPostTerm(selfVar, 
-                                    paramVars, 
-                                    resultVar, 
-                                    exceptionVar, 
-                                    atPreFunctions);
-        
-        //build program term
-        Term programTerm = buildProgramTerm(paramVars.toArray(),
-                                            programMethod,
-                                            selfVar,
-                                            resultVar,
-                                            exceptionVar,
-                                            postTerm);
-        
-        //build definitions for @pre-functions
-        Term atPreDefinitions = APF.createAtPreDefinitions(atPreFunctions, 
-                                                             services);
-        
-        //put everything together
-        Term result = TB.imp(TB.and(gaTerm, TB.apply(atPreDefinitions, preTerm)), 
-                             TB.apply(atPreDefinitions, programTerm));
-        
-        //save in field
-        poTerms = new Term[]{result};
-        poTaclets = new SetOfTaclet[]{invTaclets};
-        
-        //register everything in namespaces
-        registerInNamespaces(selfVar);
-        registerInNamespaces(paramVars);
-        registerInNamespaces(resultVar);
-        registerInNamespaces(exceptionVar);
-        registerInNamespaces(atPreFunctions);
+//        Term gaTerm = buildGeneralAssumption(selfVar, paramVars);
+//        //get precondition defined by subclass
+//        Term preTerm = getPreTerm(selfVar, 
+//                                  paramVars, 
+//                                  resultVar, 
+//                                  exceptionVar, 
+//                                  heapAtPre);
+//        
+//        //get postcondition defined by subclass
+//        Term postTerm = getPostTerm(selfVar, 
+//                                    paramVars, 
+//                                    resultVar, 
+//                                    exceptionVar, 
+//                                    heapAtPre);
+//        
+//        //build program term
+//        Term programTerm = buildProgramTerm(paramVars.toArray(),
+//                                            programMethod,
+//                                            selfVar,
+//                                            resultVar,
+//                                            exceptionVar,
+//                                            postTerm);
+//        
+//        //build definitions for @pre-functions
+////        Term atPreDefinitions = APF.createAtPreDefinitions(atPreFunctions, 
+////                                                             services);
+//        
+//        //put everything together
+//        Term result = TB.imp(TB.and(gaTerm, TB.apply(atPreDefinitions, preTerm)), 
+//                             TB.apply(atPreDefinitions, programTerm));
+//        
+//        //save in field
+//        poTerms = new Term[]{result};
+//        poTaclets = new SetOfTaclet[]{invTaclets};
+//        
+//        //register everything in namespaces
+//        registerInNamespaces(selfVar);
+//        registerInNamespaces(paramVars);
+//        registerInNamespaces(resultVar);
+//        registerInNamespaces(exceptionVar);
+//        registerInNamespaces(atPreFunctions);
     }
     
     

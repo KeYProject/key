@@ -12,10 +12,8 @@ package de.uka.ilkd.key.speclang.jml.translation;
 
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.ParsableVariable;
 import de.uka.ilkd.key.speclang.translation.*;
-import de.uka.ilkd.key.util.Debug;
 
 
 class JMLResolverManager extends SLResolverManager {
@@ -28,22 +26,5 @@ class JMLResolverManager extends SLResolverManager {
         addResolver(new SLAttributeResolver(javaInfo, this));
         addResolver(new SLMethodResolver(javaInfo, this));
         addResolver(new SLTypeResolver(javaInfo, this));        
-    }
-
-    
-    public SLExpression createSLExpression(Term t) {
-        return new JMLExpression(t);
-    }
-
-    
-    public SLExpression createSLExpression(KeYJavaType t) {
-        return new JMLExpression(t);
-    }
-
-    
-    // There is no collection type in JML
-    public SLExpression createSLExpression(SLCollection t) {
-        Debug.fail();
-        return null;
     }
 }

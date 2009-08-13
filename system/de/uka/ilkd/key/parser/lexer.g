@@ -577,16 +577,10 @@ options {
 
 protected IMPLICIT_IDENT
 options {
-  paraphrase = "an implicit identifier (letters only) + possible @pre";
+  paraphrase = "an implicit identifier (letters only)";
 }
 :
   '<' (LETTER)+ '>'
-        {
-   	  while(LA(1) == '@' && LA(2) == 'p' && LA(3) == 'r' && LA(4) == 'e') {
-             match('@'); match('p'); match('r'); match('e');
-	  }
-        }
-
 ;
 
 protected EQV
@@ -733,11 +727,8 @@ protected IDCHAR
 options {
 	paraphrase = "an admissible character for identifiers";
 }
-	: LETTER | DIGIT | '_' | '#'
+	: LETTER | DIGIT | '_' | '#' | '$'
 	;
-
-// The hack below is needed to be able to use @ in context other than
-// attr@pre, e.g. attr@(...)
 
 IDENT
 options {
@@ -745,12 +736,7 @@ options {
     paraphrase = "an identifer";
 }
 
-:  ( ('$')? (LETTER | '_' | '#') (IDCHAR)* 
-        {
-   	  while(LA(1) == '@' && LA(2) == 'p' && LA(3) == 'r' && LA(4) == 'e') {
-             match('@'); match('p'); match('r'); match('e');
-	  }
-        }
+:  ( (LETTER | '_' | '#' | '$') (IDCHAR)* 
     )
 ;
 

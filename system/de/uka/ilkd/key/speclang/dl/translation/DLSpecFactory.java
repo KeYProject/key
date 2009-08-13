@@ -5,13 +5,6 @@
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
-//This file is part of KeY - Integrated Deductive Software Design
-//Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
-//                      Universitaet Koblenz-Landau, Germany
-//                      Chalmers University of Technology, Sweden
-//
-//The KeY system is protected by the GNU General Public License. 
-//See LICENSE.TXT for details.
 //
 //
 
@@ -30,15 +23,7 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.ListOfParsableVariable;
-import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.ParsableVariable;
-import de.uka.ilkd.key.logic.op.ProgramMethod;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.SLListOfParsableVariable;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.speclang.ClassInvariant;
 import de.uka.ilkd.key.speclang.ClassInvariantImpl;
@@ -98,17 +83,17 @@ public class DLSpecFactory {
     }
     
     
-    private ParsableVariable extractSelfVar(MethodBodyStatement mbs) {
+    private ProgramVariable extractSelfVar(MethodBodyStatement mbs) {
         return mbs.isStatic(services) 
                ? null 
                : (ProgramVariable) mbs.getDesignatedContext();
     }
     
     
-    private ListOfParsableVariable extractParamVars(MethodBodyStatement mbs) {
+    private ListOfProgramVariable extractParamVars(MethodBodyStatement mbs) {
         ArrayOfExpression args = mbs.getArguments();
         
-        ListOfParsableVariable result = SLListOfParsableVariable.EMPTY_LIST;
+        ListOfProgramVariable result = SLListOfProgramVariable.EMPTY_LIST;
         for(int i = args.size() - 1; i >= 0; i--) {
             result = result.prepend((ProgramVariable) args.getExpression(i));
         }
@@ -117,12 +102,12 @@ public class DLSpecFactory {
     }
     
     
-    private ParsableVariable extractResultVar(MethodBodyStatement mbs) {
+    private ProgramVariable extractResultVar(MethodBodyStatement mbs) {
         return (ProgramVariable) mbs.getResultVariable();
     }
     
     
-    private ParsableVariable extractExcVar(Term fma) {
+    private ProgramVariable extractExcVar(Term fma) {
         SourceElement se = fma.sub(1).javaBlock().program().getFirstElement();
         if(se instanceof CatchAllStatement) {
             CatchAllStatement cas = (CatchAllStatement) se;
@@ -143,45 +128,6 @@ public class DLSpecFactory {
     private FormulaWithAxioms extractPost(Term fma) {
         return new FormulaWithAxioms(fma.sub(1).sub(0));
     }
-    
-    
-    private Map<Operator, Function>
-        extractAtPreFunctions(Term term) {
-        Map<Operator, Function> result = new LinkedHashMap<Operator, Function>();
-        
-        //is the operator of the passed term an atPre function?
-        Operator op = term.op();
-        String nameString = op.name().toString();
-        if(nameString.endsWith("@pre")) {
-            assert op instanceof Function;
-assert false : "not implemented";            
-            //retrieve operator corresponding to the atPre function
-            Name normalName 
-                = new Name(nameString.substring(0, nameString.length() - 4));
-            Operator normalOp = (Operator) services.getNamespaces()
-                                                   .lookup(normalName);
-            if(normalOp == null) {
-                ProgramVariable attrPV 
-                        = services.getJavaInfo()
-                                  .getAttribute(normalName.toString());
-                assert attrPV != null;
-//                normalOp = AttributeOp.getAttributeOp(attrPV);
-            }
-            assert normalOp != null;
-            
-            //add pair to map
-            result.put(normalOp, (Function)op);
-        }
-        
-        //recurse to subterms
-        for(int i = 0; i < term.arity(); i++) {
-            Map<Operator, Function> map = extractAtPreFunctions(term.sub(i));
-            result.putAll(map);
-        }
-        
-        return result;
-    }
-    
     
     
     //-------------------------------------------------------------------------
@@ -243,59 +189,61 @@ assert false : "not implemented";
         Modality modality                = extractModality(fma);
         FormulaWithAxioms pre            = extractPre(fma);
         FormulaWithAxioms post           = extractPost(fma);
-        ParsableVariable selfVar         = extractSelfVar(mbs);
-        ListOfParsableVariable paramVars = extractParamVars(mbs);
-        ParsableVariable resultVar       = extractResultVar(mbs);
-        ParsableVariable excVar          = extractExcVar(fma);
-        Map<Operator, Function> atPreFunctions = extractAtPreFunctions(post.getFormula());
-        
-        //atPre-functions may not occur in precondition or modifies clause
-        Map<Operator, Function> forbiddenAtPreFunctions 
-        	= extractAtPreFunctions(pre.getFormula());
-        if(!forbiddenAtPreFunctions.isEmpty()) {
-            throw new ProofInputException(
-                "@pre-function not allowed in precondition: " 
-                + forbiddenAtPreFunctions.values().iterator().next());
-        }
-        forbiddenAtPreFunctions = extractAtPreFunctions(modifies);
-        if(!forbiddenAtPreFunctions.isEmpty()) {
-            throw new ProofInputException(
-                "@pre-function not allowed in modifies clause: " 
-                + forbiddenAtPreFunctions.values().iterator().next());
-        }
-        
-        //result variable may be omitted
-	if(resultVar == null && pm.getKeYJavaType() != null) {
-	    ProgramElementName resultPEN = new ProgramElementName("res");
-	    resultVar = new LocationVariable(resultPEN, pm.getKeYJavaType());
-	}
-
-        //exception variable may be omitted
-	if(excVar == null) {
-            excVar = SVF.createExcVar(services, pm, false);
-	    Term excNullTerm = TB.equals(TB.var(excVar), TB.NULL(services));
-            if(modality == Modality.DIA) {
-                post = post.conjoin(new FormulaWithAxioms(excNullTerm));
-            } else if(modality == Modality.BOX) {
-                post = post.disjoin(new FormulaWithAxioms(TB.not(excNullTerm)));
-            } else {
-                throw new ProofInputException(
-                            "unknown semantics for exceptional termination: " 
-                            + modality + "; please use #catchAll block");
-            }
-        }
-        
-        return new OperationContractImpl(name, 
-                                         displayName, 
-                                         pm,
-                                         modality,
-                                         pre,
-                                         post,
-                                         modifies,
-                                         selfVar,
-                                         paramVars,
-                                         resultVar,
-                                         excVar,
-                                         atPreFunctions); 
+        ProgramVariable selfVar          = extractSelfVar(mbs);
+        ListOfProgramVariable paramVars  = extractParamVars(mbs);
+        ProgramVariable resultVar        = extractResultVar(mbs);
+        ProgramVariable excVar           = extractExcVar(fma);
+        //Term heapAtPre                   = extractAtPreFunctions(post.getFormula());
+        assert false : "not implemented";
+        return null;
+//        
+//        //atPre-functions may not occur in precondition or modifies clause
+//        Map<Operator, Function> forbiddenAtPreFunctions 
+//        	= extractAtPreFunctions(pre.getFormula());
+//        if(!forbiddenAtPreFunctions.isEmpty()) {
+//            throw new ProofInputException(
+//                "@pre-function not allowed in precondition: " 
+//                + forbiddenAtPreFunctions.values().iterator().next());
+//        }
+//        forbiddenAtPreFunctions = extractAtPreFunctions(modifies);
+//        if(!forbiddenAtPreFunctions.isEmpty()) {
+//            throw new ProofInputException(
+//                "@pre-function not allowed in modifies clause: " 
+//                + forbiddenAtPreFunctions.values().iterator().next());
+//        }
+//        
+//        //result variable may be omitted
+//	if(resultVar == null && pm.getKeYJavaType() != null) {
+//	    ProgramElementName resultPEN = new ProgramElementName("res");
+//	    resultVar = new LocationVariable(resultPEN, pm.getKeYJavaType());
+//	}
+//
+//        //exception variable may be omitted
+//	if(excVar == null) {
+//            excVar = SVF.createExcVar(services, pm, false);
+//	    Term excNullTerm = TB.equals(TB.var(excVar), TB.NULL(services));
+//            if(modality == Modality.DIA) {
+//                post = post.conjoin(new FormulaWithAxioms(excNullTerm));
+//            } else if(modality == Modality.BOX) {
+//                post = post.disjoin(new FormulaWithAxioms(TB.not(excNullTerm)));
+//            } else {
+//                throw new ProofInputException(
+//                            "unknown semantics for exceptional termination: " 
+//                            + modality + "; please use #catchAll block");
+//            }
+//        }
+//        
+//        return new OperationContractImpl(name, 
+//                                         displayName, 
+//                                         pm,
+//                                         modality,
+//                                         pre,
+//                                         post,
+//                                         modifies,
+//                                         selfVar,
+//                                         paramVars,
+//                                         resultVar,
+//                                         excVar,
+//                                         heapAtPre); 
     }
 }

@@ -10,15 +10,13 @@
 
 package de.uka.ilkd.key.speclang;
 
-import java.util.Map;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.SetOfTerm;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.op.SortedOperator;
 
 
 /**
@@ -36,30 +34,29 @@ public interface LoopInvariant {
      * Returns the invariant formula.
      */
     public Term getInvariant(Term selfTerm, 
-            /*inout*/ Map<Operator, Function/* (atPre)*/> atPreFunctions,
-            Services services);
+            		     Term heapAtPre,
+            		     Services services);
     
     /**
      * Returns the set of loop predicates.
      */
     public SetOfTerm getPredicates(Term selfTerm, 
-            /*inout*/ Map <Operator, Function/* (atPre)*/> atPreFunctions,
-            Services services);
+            			   Term heapAtPre,
+            			   Services services);
     
     /**
      * Returns the modifies clause.
      */
-    public Term getModifies(
-            Term selfTerm, 
-            /*inout*/ Map <Operator, Function/* (atPre)*/> atPreFunctions,
-            Services services);
+    public Term getModifies(Term selfTerm, 
+            		    Term heapAtPre,
+            		    Services services);
     
     /**
      * Returns the variant term. 
      */
     public Term getVariant(Term selfTerm, 
-            /*inout*/Map<Operator, Function/* (atPre)*/> atPreFunctions,
-            Services services);
+            		   Term heapAtPre,
+            		   Services services);
     
     /**
      * Tells whether using heuristics for generating additional loop predicates 
@@ -74,9 +71,9 @@ public interface LoopInvariant {
     public Term getInternalSelfTerm();
     
     /**
-     * Returns a copy of the internal map of atPre-functions.
+     * Returns the operator internally used for the pre-heap.
      */
-    public Map<Operator, Function> getInternalAtPreFunctions();
+    public Term getInternalHeapAtPre();
     
     /**
      * Returns a new loop invariant where the loop reference has been
@@ -91,7 +88,7 @@ public interface LoopInvariant {
      */
     public LoopInvariant setInvariant(Term invariant, 
             Term selfTerm,
-            /*inout*/ Map<Operator, Function/*atPre*/> atPreFunctions,
+            Term heapAtPre,
             Services services); 
     
     /**
@@ -100,7 +97,7 @@ public interface LoopInvariant {
      */
     public LoopInvariant setPredicates(SetOfTerm predicates, 
             Term selfTerm,
-            /*inout*/ Map<Operator, Function/*atPre*/> atPreFunctions,
+            Term heapAtPre,
             Services services);
     
     /**

@@ -3948,17 +3948,11 @@ one_contract
 }
 :
    contractName = simple_ident LBRACE { 
-        //  program variable declarations and
-        // add @pre functions
-        namespaces().setProgramVariables(new AtPreNamespace(programVariables(), getJavaInfo()));    
-        namespaces().setFunctions(new AtPreNamespace(functions(), getJavaInfo()));
-        oldServicesNamespaces = getServices().getNamespaces(); //why are the Services namespaces
-                                                             //not directly updated in the parser?
-        getServices().setNamespaces(namespaces());
+        //for program variable declarations
+        namespaces().setProgramVariables(new Namespace(programVariables()));    
      }
      (prog_var_decls)? 
      fma = formula MODIFIES (modifiesClause = term)?
-     (rs=rulesets)?   // for backward compatibility
      (DISPLAYNAME displayName = string_literal)?
      {
        DLSpecFactory dsf = new DLSpecFactory(getServices());
@@ -3971,10 +3965,8 @@ one_contract
          semanticError(e.getMessage());
        }
      } RBRACE SEMI {
-     // dump local program variable declarations and @pre functions
+     // dump local program variable declarations
      namespaces().setProgramVariables(programVariables().parent());
-     namespaces().setFunctions(functions().parent());
-     getServices().setNamespaces(oldServicesNamespaces);
    }
 ;
 
