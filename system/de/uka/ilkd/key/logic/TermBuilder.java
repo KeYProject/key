@@ -13,6 +13,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.expression.literal.IntLiteral;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.IntegerLDT;
+import de.uka.ilkd.key.ldt.SetLDT;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.*;
 
@@ -589,21 +590,34 @@ public final class TermBuilder {
     
     
     public Term union(Services services, Term s1, Term s2) {
-	return func(services.getTypeConverter().getSetLDT().getUnion(), s1, s2);
+	SetLDT ldt = services.getTypeConverter().getSetLDT();
+	if(s1.op() == ldt.getEmpty()) {
+	    return s2;
+	} else if(s2.op() == ldt.getEmpty()) {
+	    return s1;
+	} else {
+	    return func(ldt.getUnion(), s1, s2);
+	}
     }
     
     
     public Term intersect(Services services, Term s1, Term s2) {
-	return func(services.getTypeConverter().getSetLDT().getIntersect(), 
-		    s1, 
-		    s2);
+	SetLDT ldt = services.getTypeConverter().getSetLDT();
+	if(s1.op() == ldt.getEmpty() || s2.op() == ldt.getEmpty()) {
+	    return empty(services);
+	} else {
+	    return func(ldt.getIntersect(), s1, s2);
+	}
     }
     
     
     public Term setMinus(Services services, Term s1, Term s2) {
-	return func(services.getTypeConverter().getSetLDT().getSetMinus(), 
-		    s1, 
-		    s2);
+	SetLDT ldt = services.getTypeConverter().getSetLDT();
+	if(s1.op() == ldt.getEmpty() || s2.op() == ldt.getEmpty()) {
+	    return s1;
+	} else {
+	    return func(ldt.getSetMinus(), s1, s2);
+	}
     }
     
     
@@ -611,32 +625,45 @@ public final class TermBuilder {
 	                         QuantifiableVariable qv, 
 	                         Term a, 
 	                         Term s) {
-	Function f 
-		= services.getTypeConverter()
-		          .getSetLDT()
-		          .getSetComprehension();
-	return tf.createTerm(f, new Term[]{a,s}, new ArrayOfQuantifiableVariable(qv), null);
+	SetLDT ldt = services.getTypeConverter().getSetLDT();
+	if(s.op() == ldt.getEmpty()) {
+	    return s;
+	} else {
+	    return tf.createTerm(ldt.getSetComprehension(), 
+		                 new Term[]{a,s}, 
+		                 new ArrayOfQuantifiableVariable(qv), 
+		                 null);
+	}
     }
     
     
     public Term elementOf(Services services, Term e, Term s) {
-	return func(services.getTypeConverter().getSetLDT().getElementOf(), 
-		    e,
-		    s);
+	SetLDT ldt = services.getTypeConverter().getSetLDT();
+	if(s.op() == ldt.getEmpty()) {
+	    return ff();
+	} else {
+	    return func(ldt.getElementOf(), e, s);
+	}
     }
     
     
     public Term subset(Services services, Term s1, Term s2) {
-	return func(services.getTypeConverter().getSetLDT().getSubset(), 
-		    s1, 
-		    s2);
+	SetLDT ldt = services.getTypeConverter().getSetLDT();
+	if(s1.op() == ldt.getEmpty()) {
+	    return tt();
+	} else {
+	    return func(ldt.getSubset(), s1, s2);
+	}
     }
     
     
     public Term disjoint(Services services, Term s1, Term s2) {
-	return func(services.getTypeConverter().getSetLDT().getDisjoint(), 
-		    s1, 
-		    s2);
+	SetLDT ldt = services.getTypeConverter().getSetLDT();
+	if(s1.op() == ldt.getEmpty() || s2.op() == ldt.getEmpty()) {
+	    return tt();
+	} else {
+	    return func(ldt.getDisjoint(), s1, s2);
+	}
     }
     
     

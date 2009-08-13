@@ -20,7 +20,7 @@ class MyClass {
       @*/
     void verySimpleLoop() {
         /*@ loop_invariant 0 <= i && i <= 3 && (i > 0 ==> attr == 27);
-          @ assignable i, attr;
+          @ assignable attr;
           @*/
         for(int i = 0; i < 3; i++) {
             attr = 27;
@@ -37,7 +37,7 @@ class MyClass {
     void slightlyMoreInterestingLoop(int[] a) {
         int j = 0;
         /*@ loop_invariant 0 <= i && i <= a.length && (\forall int x; 0 <= x && x < i; a[x] == 0);
-          @ assignable i, a[*];
+          @ assignable a[*];
           @*/
         for(int i = 0; i < a.length; i++) {
             a[i] = j;
@@ -54,14 +54,14 @@ class MyClass {
         /*@ loop_invariant 0 <= i && i <= a.length 
           @                && (\forall int x, y; 0 <= x && x < y && y < i; a[x] <= a[y])
           @                && (\forall int x, y; 0 <= x && x < i && i <= y && y < a.length; a[x] <= a[y]);
-          @ assignable i, a[*];
+          @ assignable a[*];
           @*/
         for(int i = 0; i < a.length; i++) {
             int minIndex = i;
             /*@ loop_invariant i < j && j <= a.length
               @                && i <= minIndex && minIndex < j
               @                && (\forall int x; i <= x && x < j; a[minIndex] <= a[x]);
-              @ assignable j, minIndex; 
+              @ assignable \nothing; 
               @*/
             for(int j = i + 1; j < a.length; j++) {
                 if(a[j] < a[minIndex]) minIndex = j;
@@ -88,14 +88,14 @@ class MyClass {
     /*@ normal_behavior
       @  ensures attr == \old(attr) + 1;
       @  diverges true;
-      @  assignable contents, attr;
+      @  assignable contents[*], attr;
       @*/
     void incSize(int[] contents) {
         ++attr;
         contents = new int[33];
         int i = 0;
         /*@ loop_invariant 0 <= i && i <= contents.length;
-          @ modifies i, contents[*];
+          @ assignable contents[*];
           @*/
         while ( i < contents.length ) {
             contents[i] = 33;

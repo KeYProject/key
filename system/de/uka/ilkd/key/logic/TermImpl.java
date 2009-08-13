@@ -295,22 +295,23 @@ final class TermImpl implements Term {
 	    return sb.toString();
 	} else {
             sb.append(op().name().toString());
-            if (arity() == 0) return sb.toString();
+            if(!boundVars.isEmpty()) {
+       	    	sb.append("{");
+       	    	for(int i = 0, n = boundVars.size(); i < n; i++) {
+       	    	    sb.append(boundVars.getQuantifiableVariable(i));
+       	    	    if(i < n - 1) {
+       	    		sb.append(", ");
+       	    	    }     	       	    	    
+       	    	}
+       	    	sb.append("}");
+            }
+            if(arity() == 0) {
+        	return sb.toString();
+            }
             sb.append("(");
-            for (int i = 0, ar = arity(); i<ar; i++) {
-                for (int j=0, vbSize = varsBoundHere(i).size(); j<vbSize; j++) {
-                    if (j == 0) {
-                        sb.append("{");
-                    }
-                    sb.append(varsBoundHere(i).getQuantifiableVariable(j));
-                    if (j!=varsBoundHere(i).size()-1) {
-                        sb.append(", ");
-                    } else {
-                        sb.append("}");
-                    }
-                }
+            for(int i = 0, ar = arity(); i < ar; i++) {
                 sb.append(sub(i));
-                if (i < ar-1) {
+                if(i < ar - 1) {
                     sb.append(",");
                 }
             }

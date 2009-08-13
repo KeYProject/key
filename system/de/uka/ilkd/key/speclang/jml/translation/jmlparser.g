@@ -599,17 +599,19 @@ storeref returns [Term result = null] throws SLTranslationException
 storerefexpression returns [Term result = null] throws SLTranslationException
 {
     SLExpression expr;
-    Term suffix;    
 }
 :
     expr=storerefname 
     (
-	suffix=storerefnamesuffix[expr]   { expr = new SLExpression(suffix); }
+	result=storerefnamesuffix[expr]   { expr = new SLExpression(result); }
     )*
     {
 	if(result == null) {
-	    if(services.getTypeConverter().getHeapLDT().getSortOfSelect(expr.getTerm().op()) == null) {
-	        raiseError("Something is wrong: " + expr.getTerm());
+	    if(!expr.isTerm()
+	       || services.getTypeConverter()
+	                  .getHeapLDT()
+	                  .getSortOfSelect(expr.getTerm().op()) == null) {
+	        raiseError("Not a valid store-ref expression: " + expr.getTerm());
 	    } else {
 	        Term objTerm = expr.getTerm().sub(1);
 	        Term fieldTerm = expr.getTerm().sub(2);

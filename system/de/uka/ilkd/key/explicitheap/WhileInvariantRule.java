@@ -39,28 +39,26 @@ public final class WhileInvariantRule implements BuiltInRule {
     public static final WhileInvariantRule INSTANCE = new WhileInvariantRule();
 
     private static final Name NAME = new Name("whileInvariant");
-
     private static final TermBuilder TB = TermBuilder.DF;
-
     private static final InvInferenceTools IIT = InvInferenceTools.INSTANCE;
-
     private static final AtPreFactory APF = AtPreFactory.INSTANCE;
 
     private Term lastFocusTerm;
 
     private Instantiation lastInstantiation;
 
-    // -------------------------------------------------------------------------
-    // constructors
-    // -------------------------------------------------------------------------
+    
+    //-------------------------------------------------------------------------
+    //constructors
+    //-------------------------------------------------------------------------
 
     private WhileInvariantRule() {
     }
 
-    // -------------------------------------------------------------------------
-    // internal methods
-    // -------------------------------------------------------------------------
     
+    //-------------------------------------------------------------------------
+    //internal methods
+    //-------------------------------------------------------------------------
     
     /**
      * Returns the receiver term of the innermost method frame of
@@ -104,18 +102,19 @@ public final class WhileInvariantRule implements BuiltInRule {
         return result;
     }    
 
+    
     private Instantiation instantiate(Term focusTerm, Services services) {
-	if (focusTerm == lastFocusTerm
-		&& lastInstantiation.inv == services
-			.getSpecificationRepository().getLoopInvariant(
-				lastInstantiation.loop)) {
+	if(focusTerm == lastFocusTerm
+	   && lastInstantiation.inv 
+	       == services.getSpecificationRepository()
+	                  .getLoopInvariant(lastInstantiation.loop)) {
 	    return lastInstantiation;
 	}
 
-	// leading update?
+	//leading update?
 	Term u;
 	Term progPost;
-	if (focusTerm.op() instanceof UpdateApplication) {
+	if(focusTerm.op() instanceof UpdateApplication) {
 	    u = UpdateApplication.getUpdate(focusTerm);
 	    progPost = UpdateApplication.getTarget(focusTerm);
 	} else {
@@ -123,36 +122,36 @@ public final class WhileInvariantRule implements BuiltInRule {
 	    progPost = focusTerm;
 	}
 
-	// focus (below update) must be box term
+	//focus (below update) must be box term
 	if (progPost.op() != Modality.BOX) {
 	    return null;
 	}
 
-	// active statement must be while loop
+	//active statement must be while loop
 	SourceElement activeStatement = IIT.getActiveStatement(progPost
 		.javaBlock());
-	if (!(activeStatement instanceof While)) {
+	if(!(activeStatement instanceof While)) {
 	    return null;
 	}
 	While loop = (While) activeStatement;
 
-	// an invariant must be present for the loop
+	//an invariant must be present for the loop
 	LoopInvariant inv = services.getSpecificationRepository()
 		.getLoopInvariant((While) activeStatement);
-	if (inv == null
+	if(inv == null
 		|| inv.getInvariant(inv.getInternalSelfTerm(), inv
 			.getInternalHeapAtPre(), services) == null) {
 	    return null;
 	}
 
-	// collect self, execution context
+	//collect self, execution context
 	Term selfTerm = getInnermostSelfTerm(progPost, services);
 	MethodFrame innermostMethodFrame = IIT.getInnermostMethodFrame(
 		progPost, services);
 	ExecutionContext innermostExecutionContext = innermostMethodFrame == null ? null
 		: (ExecutionContext) innermostMethodFrame.getExecutionContext();
 
-	// cache and return result
+	//cache and return result
 	Instantiation result = new Instantiation(u, progPost, loop, inv,
 		selfTerm, innermostExecutionContext);
 	lastFocusTerm = focusTerm;
@@ -275,9 +274,9 @@ public final class WhileInvariantRule implements BuiltInRule {
 //	return null;
 //    }
 
-    // -------------------------------------------------------------------------
-    // public interface
-    // -------------------------------------------------------------------------
+    //-------------------------------------------------------------------------
+    //public interface
+    //-------------------------------------------------------------------------
 
     public boolean isApplicable(Goal goal, PosInOccurrence pio,
 	    Constraint userConstraint) {
@@ -409,9 +408,9 @@ public final class WhileInvariantRule implements BuiltInRule {
 	return NAME.toString();
     }
 
-    // -------------------------------------------------------------------------
-    // inner classes
-    // -------------------------------------------------------------------------
+    //-------------------------------------------------------------------------
+    //inner classes
+    //-------------------------------------------------------------------------
 
     private static final class Instantiation {
 	public final Term u;

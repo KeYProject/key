@@ -110,11 +110,15 @@ public final class HeapLDT extends LDT {
 	assert fieldSymbol.sort() == fieldSort;
 	String name = fieldSymbol.name().toString();
 	int index = name.indexOf("::");
-	String result = name.substring(index + 2);
-	if(result.charAt(0) == '$') {
-	    result = result.substring(1);
+	if(index == -1) {
+	    return name;
+	} else {
+	    String result = name.substring(index + 2);
+	    if(result.charAt(0) == '$') {
+		result = result.substring(1);
+	    }
+	    return result;
 	}
-	return result;
     }
     
     

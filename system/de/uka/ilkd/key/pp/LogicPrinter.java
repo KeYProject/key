@@ -820,11 +820,11 @@ public final class LogicPrinter {
      *
      * @param name the name to be printed before the parentheses.
      * @param t the term to be printed.  */
-    public void printFunctionTerm(String name, Term t) throws IOException {
+    public void printFunctionTerm(String name, Term t) throws IOException {	
 	//XXX
 	if(NotationInfo.PRETTY_SYNTAX
            && services != null
-           && t instanceof Function
+           && t.op() instanceof Function
            && t.sort() == services.getTypeConverter().getHeapLDT().getFieldSort() 
            && t.arity() == 0
            && t.boundVars().isEmpty()) {
@@ -832,7 +832,7 @@ public final class LogicPrinter {
             final String prettyFieldName 
             	= services.getTypeConverter()
                           .getHeapLDT()
-                          .getPrettyFieldName((Function)t.op());
+                          .getPrettyFieldName((Function)t.op());            
             layouter.print(prettyFieldName);
         }
         
@@ -1244,38 +1244,7 @@ public final class LogicPrinter {
         }
     }
 
-    
-    /**
-     * setup the separators to be printed between the sub-terms of an update
-     * location.
-     * 
-     * The top entity of the update loc is printed by this method.
-     * 
-     * @param loc
-     *            location to write to
-     * @param t
-     *            term to assign
-     * @return an array of separating strings (elements may be "[" "]" "," ")" )
-     * @throws IOException
-     *             if thrown by layouter
-     */
-    private String[] setupUpdateSeparators (final Operator loc, final Term t)
-                                                throws IOException {
-        String[] separator = new String [loc.arity ()];
-        if ( loc.arity () == 0 ) {
-            layouter.print( loc.name ().toString ().replaceAll ( "::", "." ) );
-        } else {
-            layouter.print ( loc.name().toString() + "(" );
-            // bugfix: was "m = 1;..." which made separator[0]==null
-            for ( int m = 0; m < loc.arity () - 1; m++ ) {
-                separator[m] = ",";
-            }
-            separator[loc.arity () - 1] = ")";
-        }
-        return separator;
-    }
-
-  
+      
     public void printIfThenElseTerm(Term t, String keyword) throws IOException {
         startTerm(t.arity());
 
@@ -1801,7 +1770,7 @@ public final class LogicPrinter {
          for (int i = 0, sz = text.length(); i < sz; i++) {
              char c = text.charAt(i); 
              switch (c) {
-             case  '<':
+             case '<':
                  sb.append("&lt;");
                  break;
              case '>': 

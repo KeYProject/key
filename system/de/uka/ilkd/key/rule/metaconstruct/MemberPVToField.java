@@ -14,6 +14,7 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.AbstractMetaOperator;
 import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
@@ -34,10 +35,20 @@ public class MemberPVToField extends AbstractMetaOperator {
     public Term calculate(Term term, 
 	    		  SVInstantiations svInst, 
 	    		  Services services ) {
-        HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
-        
-        ProgramVariable fieldPV = (ProgramVariable) term.sub(0).op();        
-        Function fieldSymbol = heapLDT.getFieldSymbolForPV(fieldPV, services);
-        return TB.func(fieldSymbol);
+        HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();	
+ 	
+ 	    
+ 	Operator op = term.sub(0).op();
+	if(op instanceof ProgramVariable) {	
+	    ProgramVariable fieldPV = (ProgramVariable) term.sub(0).op();
+	    Function fieldSymbol 
+	    	= heapLDT.getFieldSymbolForPV(fieldPV, services);
+	    return TB.func(fieldSymbol);
+	} else if(heapLDT.getSortOfSelect(op) != null) {
+	    return term.sub(0).sub(2);
+	} else {
+	    assert false;
+	    return null;
+	}
     }
 }

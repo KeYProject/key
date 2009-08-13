@@ -88,7 +88,7 @@ public class OperationContractImpl implements OperationContract {
         assert paramVars != null;
         assert paramVars.size() 
                 == programMethod.getParameterDeclarationCount();
-        assert (resultVar == null) == (programMethod.sort() == null);
+        assert (resultVar == null) == (programMethod.getKeYJavaType() == null);
         assert excVar != null;
         assert heapAtPre != null;
         this.name                   = name;
@@ -354,14 +354,38 @@ public class OperationContractImpl implements OperationContract {
     
     @Override
     public String getHTMLText(Services services) {
-        final String pre = LogicPrinter.quickPrintTerm(originalPre.getFormula(), 
-                services);
-        final String post = LogicPrinter.quickPrintTerm(originalPost.getFormula(), 
-                services);
+	final StringBuffer sig = new StringBuffer();
+//	sig.append("try { ");	
+	if(originalResultVar != null) {
+	    sig.append(originalResultVar);
+	    sig.append(" = ");
+	}
+	if(originalSelfVar != null) {
+	    sig.append(originalSelfVar);
+	    sig.append(".");
+	}
+	sig.append(programMethod.getName());
+	sig.append("(");
+	for(ProgramVariable pv : originalParamVars) {
+	    sig.append(pv.name());
+	}
+	sig.append(")");
+	sig.append(" catch(");
+	sig.append(originalExcVar);
+	sig.append(")");
+	
+        final String pre 
+        	= LogicPrinter.quickPrintTerm(originalPre.getFormula(), 
+        				      services);
+        final String post 
+        	= LogicPrinter.quickPrintTerm(originalPost.getFormula(), 
+        				      services);
         final String mod = LogicPrinter.quickPrintTerm(originalModifies, 
-        	services);
+        					       services);
                       
-        return "<html><b>pre</b> "
+        return "<html>"
+                + "<i>" + LogicPrinter.escapeHTML(sig.toString()) + "</i>"
+                + "<br><b>pre</b> "
                 + LogicPrinter.escapeHTML(pre)
                 + "<br><b>post</b> "
                 + LogicPrinter.escapeHTML(post)

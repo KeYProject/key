@@ -197,6 +197,7 @@ public final class NotationInfo {
 	
 	//set operators
 	SetLDT setLDT = services.getTypeConverter().getSetLDT();
+	tbl.put(setLDT.getEmpty(), new Notation.Constant("{}", 130));
 	tbl.put(setLDT.getSingleton(), new Notation.SingletonNotation());
 	tbl.put(setLDT.getUnion(), new Notation.Infix("\\cup", 130, 0, 0));
 	tbl.put(setLDT.getIntersect(), new Notation.Infix("\\cap", 130, 0, 0));
