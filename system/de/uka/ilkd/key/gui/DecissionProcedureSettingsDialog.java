@@ -22,6 +22,7 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowEvent;
 import java.util.*;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.gui.DecisionProcedureSettings.RuleDescriptor;
@@ -45,7 +46,22 @@ public class DecissionProcedureSettingsDialog extends JDialog {
     
     private static final int LEFT_SIDE_WIDTH=190;
     private static final int RIGHT_SIDE_WIDTH=410;
-    private static final int RULE_LIST_HEIGHT=345;
+    private static final int RULE_LIST_HEIGHT=305;
+    
+    /** Used for saving the settings temporally.*/
+    class Settings{
+	public boolean multipleProver;
+	public String   executionCommand;
+	public Settings(boolean multipleProver, String executionCommand) {
+	    super();
+	    this.multipleProver = multipleProver;
+	    this.executionCommand = executionCommand;
+	}
+	    }
+    
+    private ArrayList<Settings> proverSettings=new ArrayList<Settings>();
+    /**the index of the previous selected item in the list box*/
+    private int                 previousSelectedIndex =-1;
     
     
     /**
@@ -80,13 +96,32 @@ public class DecissionProcedureSettingsDialog extends JDialog {
     public static void resetInstance() {
 	instance.setSize(400, 300);
 	
-	instance.setPreferredSize(new Dimension(LEFT_SIDE_WIDTH+RIGHT_SIDE_WIDTH, 405));
-	instance.setMaximumSize(new Dimension(LEFT_SIDE_WIDTH+RIGHT_SIDE_WIDTH, 405));
-	instance.setMinimumSize(new Dimension(LEFT_SIDE_WIDTH+RIGHT_SIDE_WIDTH, 405));
+	instance.reset();
+
+	instance.setPreferredSize(new Dimension(LEFT_SIDE_WIDTH+RIGHT_SIDE_WIDTH, 370));
+	instance.setMaximumSize(new Dimension(LEFT_SIDE_WIDTH+RIGHT_SIDE_WIDTH, 370));
+	instance.setMinimumSize(new Dimension(LEFT_SIDE_WIDTH+RIGHT_SIDE_WIDTH, 370));
 	instance.setVisible(true);
+	
+	
+    }
+    
+    private void reset(){
+	previousSelectedIndex = -1;
+	proverSettings.clear();
+	for (RuleDescriptor rd : this.allrules) {
+		String cmd = ProofSettings.DEFAULT_SETTINGS.getDecisionProcedureSettings().getExecutionCommand(rd);
+		boolean b = ProofSettings.DEFAULT_SETTINGS.getDecisionProcedureSettings().getMultipleUse(rd);
+		proverSettings.add(new Settings(b,cmd));
+	
+	}
+	this.setRuleVals();
     }
     
     private void init() {
+
+
+	
 	final int labelWidth = 110;
 	final int fieldWidth = 270;
 	final int labelHeight = 30;
@@ -186,8 +221,8 @@ public class DecissionProcedureSettingsDialog extends JDialog {
 	
 
 	
-	
-	this.setRuleVals();
+	this.reset();
+
 	
 	
 	//add the description
@@ -195,7 +230,7 @@ public class DecissionProcedureSettingsDialog extends JDialog {
 		"Specify the start command for an external procedure in\n such a way that it can be executed " +
 		"to solve a problem file.\nFeel free to use any parameter to finetune the program.\n\n" +
 		"Use %f as placeholder for the filename containing the \nproblemdescription.\n\n" +
-		"Use %p as placeholder for the problem directly.\nThis should be needed in special cases only."+"\n\n (Press 'apply' after you have changed options for a single\n prover.)");
+		"Use %p as placeholder for the problem directly.\nThis should be needed in special cases only.");
 	c.setBorder(new TitledBorder("Explanation"));
 	c.setEditable(false);
 	setSize(c,new Dimension(RIGHT_SIDE_WIDTH,RULE_LIST_HEIGHT-4*labelHeight));
@@ -217,10 +252,20 @@ public class DecissionProcedureSettingsDialog extends JDialog {
 		DecissionProcedureSettingsDialog.instance.setVisible(false);
 	    }
 	});
+	JButton okayButton = new JButton("ok");
+	okayButton.addActionListener(new ActionListener() {
+	    public void actionPerformed(ActionEvent e) {
+		storeCommand();
+		DecissionProcedureSettingsDialog.instance.setVisible(false);
+	    }
+	});
 
 	b = Box.createHorizontalBox();
 	b.add(Box.createHorizontalGlue());
 	b.add(applyButton);
+	b.add(Box.createHorizontalStrut(5));
+	b.add(okayButton);
+	b.add(Box.createHorizontalStrut(5));
 	b.add(closeButton);
 	
 	globalBox.add(b);
@@ -233,12 +278,27 @@ public class DecissionProcedureSettingsDialog extends JDialog {
 	this.setVisible(true);
     }
     
+    
+
+    
     private void storeCommand() {
-	RuleDescriptor rd = allrules.get(ruleDisplayList.getSelectedIndex());
-	String command = this.executionField.getText();
-	boolean multipleuse = this.multiuseBox.isSelected();
-	ProofSettings.DEFAULT_SETTINGS.getDecisionProcedureSettings().setMultipleUse(rd,multipleuse);
-	ProofSettings.DEFAULT_SETTINGS.getDecisionProcedureSettings().setExecutionCommand(rd, command);
+	
+	int selectedIndex = ruleDisplayList.getSelectedIndex();
+	Settings  set = proverSettings.get(selectedIndex);
+	    set.multipleProver = this.multiuseBox.isSelected();
+	    set.executionCommand = this.executionField.getText();
+		
+	for(int i=0; i<allrules.size(); i++){
+	        RuleDescriptor rd = allrules.get(i);
+		String command = proverSettings.get(i).executionCommand;
+		boolean multipleuse = proverSettings.get(i).multipleProver;
+		boolean fire = i == allrules.size()-1;
+		ProofSettings.DEFAULT_SETTINGS.getDecisionProcedureSettings().setMultipleUse(rd,multipleuse,false);
+		ProofSettings.DEFAULT_SETTINGS.getDecisionProcedureSettings().setExecutionCommand(rd, command,fire); 
+	}
+	
+	
+
 	
 	Main.instance.updateDecisionProcedureSelectMenu();
 	this.setRuleVals();
@@ -260,7 +320,15 @@ public class DecissionProcedureSettingsDialog extends JDialog {
      * @param selectedIndex the index which decproc is said to be selected.
      */
     private void setRuleVals() {
+	if(previousSelectedIndex >= 0){
+	    Settings  set = proverSettings.get(previousSelectedIndex);
+	    set.multipleProver = this.multiuseBox.isSelected();
+	    set.executionCommand = this.executionField.getText();
+	}
+	
+	
 	int selectedIndex = ruleDisplayList.getSelectedIndex();
+	previousSelectedIndex = selectedIndex;
 	RuleDescriptor rd = this.allrules.get(selectedIndex);
 	this.nameField.setText(rd.getDisplayName());
 	if (ProofSettings.DEFAULT_SETTINGS.getDecisionProcedureSettings().isInstalled(rd)) {
@@ -268,8 +336,10 @@ public class DecissionProcedureSettingsDialog extends JDialog {
 	} else {
 	    this.availableField.setText("No");
 	}
-	this.executionField.setText(ProofSettings.DEFAULT_SETTINGS.getDecisionProcedureSettings().getExecutionCommand(rd));
-	this.multiuseBox.setSelected(ProofSettings.DEFAULT_SETTINGS.getDecisionProcedureSettings().getMultipleUse(rd));
+	this.executionField.setText(proverSettings.get(selectedIndex).executionCommand);
+	this.multiuseBox.setSelected(proverSettings.get(selectedIndex).multipleProver);
+	
+
     }
     
     /**
@@ -280,6 +350,7 @@ public class DecissionProcedureSettingsDialog extends JDialog {
 	ArrayList<String> rulenames = new ArrayList<String>();
 	for (RuleDescriptor rd : this.allrules) {
 		rulenames.add(rd.getDisplayName());
+		
 	}
 	ruleDisplayList = new JList(rulenames.toArray());
 	ruleDisplayList.setBorder(new TitledBorder("Decision Procedures"));

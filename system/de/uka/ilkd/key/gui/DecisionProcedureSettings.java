@@ -353,7 +353,7 @@ public class DecisionProcedureSettings implements Settings {
      * @param rd the ruledescriptor, which uses this command.
      * @param command the command to use
      */
-    public void setExecutionCommand(RuleDescriptor rd, String command) {
+    public void setExecutionCommand(RuleDescriptor rd, String command, boolean fire) {
 	SMTRule r = this.descriptorToRule.get(rd);
 	this.execCommands.put(rd.ruleName.toString(), command);
 	if (r.isInstalled(true)) {
@@ -367,6 +367,7 @@ public class DecisionProcedureSettings implements Settings {
 		this.installedrules.remove(rd);
 	    }
 	}
+	if(fire)
 	this.fireSettingsChanged();
     }
     
@@ -377,7 +378,7 @@ public class DecisionProcedureSettings implements Settings {
      */
     public void setExecutionCommand(AbstractSMTSolver r, String command) {
 	RuleDescriptor rd = this.findRuleByName(r.name());
-	this.setExecutionCommand(rd, command);
+	this.setExecutionCommand(rd, command,true);
     }
     
     /**
@@ -427,10 +428,11 @@ public class DecisionProcedureSettings implements Settings {
 	return this.ruleMultipleProvers.SMTSolverIsUsed(s);
     }
     
-    public void setMultipleUse(RuleDescriptor rd, boolean multipleuse) {
+    public void setMultipleUse(RuleDescriptor rd, boolean multipleuse, boolean fire) {
 	SMTRule rule = descriptorToRule.get(rd);
 	SMTSolver s = rule.getSolver();
 	ruleMultipleProvers.useSMTSolver(s, multipleuse);
+	if(fire)
 	fireSettingsChanged();
     }
     

@@ -34,7 +34,7 @@ class SolverWrapper
   /**The result associated with the solver*/
   private SMTSolverResult Result = SMTSolverResult.NO_IDEA;
   /**If true, the solver is used for proving*/
-  private boolean 	   UsedForProving=false;
+  private boolean 	   UsedForProving=true;
   /**Stores the result of the external prover*/
   private String Text="";
   /**Stores the error message of the external prover*/
