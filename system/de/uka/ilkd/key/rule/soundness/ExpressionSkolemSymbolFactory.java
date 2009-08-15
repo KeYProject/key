@@ -10,8 +10,12 @@
 
 package de.uka.ilkd.key.rule.soundness;
 
-import de.uka.ilkd.key.java.*;
-import de.uka.ilkd.key.java.abstraction.ArrayOfKeYJavaType;
+import de.uka.ilkd.key.collection.ImmutableArray;
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.java.ContextStatementBlock;
+import de.uka.ilkd.key.java.Expression;
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.expression.operator.CopyAssignment;
 import de.uka.ilkd.key.logic.JavaBlock;
@@ -40,10 +44,10 @@ public class ExpressionSkolemSymbolFactory extends SkolemSymbolTacletFactory {
     public ProgramSVProxy createExpressionSymbol
 	( ProgramElementName     p_name,
 	  KeYJavaType            p_type,
-	  ListOfIProgramVariable p_influencingPVs,
-	  ArrayOfStatement       p_jumpTable ) {
+	  ImmutableList<IProgramVariable> p_influencingPVs,
+	  ImmutableArray<Statement>       p_jumpTable ) {
 	
-	final ListOfIProgramVariable influencingPVs =
+	final ImmutableList<IProgramVariable> influencingPVs =
 	    p_influencingPVs
 	    .append ( createResultVariable(p_type) )
 	    .append ( createSelectorVariable() );
@@ -62,9 +66,9 @@ public class ExpressionSkolemSymbolFactory extends SkolemSymbolTacletFactory {
     private ProgramSVProxy createExpressionSymbol
 	( ProgramElementName      p_name,
 	  KeYJavaType             p_type,
-	  ArrayOfKeYJavaType      p_influencingPVTypes,
-	  ArrayOfIProgramVariable p_influencingPVs,
-	  ArrayOfStatement        p_jumpTable ) {
+	  ImmutableArray<KeYJavaType>      p_influencingPVTypes,
+	  ImmutableArray<IProgramVariable> p_influencingPVs,
+	  ImmutableArray<Statement>        p_jumpTable ) {
 	
 	final ProgramSVSkolemExpression sk = new ProgramSVSkolemExpression
 	    ( p_name,
@@ -115,11 +119,11 @@ public class ExpressionSkolemSymbolFactory extends SkolemSymbolTacletFactory {
 						    ProgramSVSort.VARIABLE,
 						    false );
 
-	ArrayOfIProgramVariable pvs       = createSVsForInfluencingPVs ( p );
-        IProgramVariable        retVal    = pvs.getIProgramVariable(pvs.size()-2);
+	ImmutableArray<IProgramVariable> pvs       = createSVsForInfluencingPVs ( p );
+        IProgramVariable        retVal    = pvs.get(pvs.size()-2);
 
-	ArrayOfStatement        findJT    =
-	    new ArrayOfStatement ( createSVsForJumpTable ( p ) );
+	ImmutableArray<Statement>        findJT    =
+	    new ImmutableArray<Statement> ( createSVsForJumpTable ( p ) );
 
 	ProgramSVProxy          findProxy =
 	    new ProgramSVProxy ( p.op (), pvs, findJT );
@@ -148,18 +152,18 @@ public class ExpressionSkolemSymbolFactory extends SkolemSymbolTacletFactory {
 
     private ProgramSVProxy
 	createNormSymbol ( ProgramSVProxy p,
-	                   ArrayOfIProgramVariable p_influencingPVs,
-			   ArrayOfStatement        p_jumpTable ) {
+	                   ImmutableArray<IProgramVariable> p_influencingPVs,
+			   ImmutableArray<Statement>        p_jumpTable ) {
 	final String baseName = "" + p.op ().getProgramElementName () + "_expr";
 	
-	final ListOfIProgramVariable pvArgs =
+	final ImmutableList<IProgramVariable> pvArgs =
 	    getProgramVariablesAsList ( p.getInfluencingPVs() );
 	
 	final ProgramSVProxy statement =
 	    createStatementSymbol(baseName, pvArgs, p.getJumpTable());
 	
 	// Replace arguments and jump table with the given schema variables
-	final ArrayOfIProgramVariable svArgs =
+	final ImmutableArray<IProgramVariable> svArgs =
 	    getProgramVariablesAsArray
 		( getProgramVariablesAsList ( p_influencingPVs ) );
 	
@@ -172,8 +176,8 @@ public class ExpressionSkolemSymbolFactory extends SkolemSymbolTacletFactory {
      */
     private ProgramSVProxy
         createStatementSymbol ( String                 p_baseName,
-                                ListOfIProgramVariable p_influencingPVs,
-                                ArrayOfStatement       p_jumpTable) {
+                                ImmutableList<IProgramVariable> p_influencingPVs,
+                                ImmutableArray<Statement>       p_jumpTable) {
 	final StatementSkolemSymbolFactory f =
 	    new StatementSkolemSymbolFactory ( getServices() );
 

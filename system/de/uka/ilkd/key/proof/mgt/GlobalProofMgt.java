@@ -19,7 +19,10 @@ import org.apache.log4j.Logger;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.Main;
 import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
-import de.uka.ilkd.key.proof.*;
+import de.uka.ilkd.key.proof.JavaModel;
+import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.reuse.ReuseFrontend;
 
 public class GlobalProofMgt {

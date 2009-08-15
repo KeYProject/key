@@ -12,13 +12,14 @@ package de.uka.ilkd.key.jmltest;
 
 import java.io.IOException;
 
+import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.PresentationFeatures;
 import de.uka.ilkd.key.pp.ProgramPrinter;
 import de.uka.ilkd.key.proof.init.SpecExtPO;
-import de.uka.ilkd.key.rule.updatesimplifier.ArrayOfAssignmentPair;
+import de.uka.ilkd.key.rule.updatesimplifier.AssignmentPair;
 
 /**
  * The class JMLExport is used to transform given JavaDL specification to an JML
@@ -68,26 +69,26 @@ public class JMLExport {
     }
 
     /**
-     * Converts an ArrayOfAssignemtPairs into an equation in JML
+     * Converts an ArrayOf<s> into an equation in JML
      * 
      * @param pairs
-     *                The ArrayOfAssignmentPair containing an Update
+     *                The ArrayOf<r> containing an Update
      * @return a String representing the Equation x == \old(y);
      */
-    public final String translate(ArrayOfAssignmentPair pairs) {
+    public final String translate(ImmutableArray<AssignmentPair> pairs) {
         if (pairs.size() > 0) {
             final StringBuffer result = new StringBuffer(translate(pairs
-                    .getAssignmentPair(0).locationAsTerm())
+                    .get(0).locationAsTerm())
                     + " == \\old("
-                    + translate((Term) pairs.getAssignmentPair(0).value())
+                    + translate((Term) pairs.get(0).value())
                     + ")");
             for (int i = 1; i < pairs.size(); ++i) {
                 result
                         .append(" && "
-                                + translate(pairs.getAssignmentPair(i)
+                                + translate(pairs.get(i)
                                         .locationAsTerm())
                                 + " == \\old("
-                                + translate((Term) pairs.getAssignmentPair(i)
+                                + translate((Term) pairs.get(i)
                                         .value()) + ")");
             }
             return result.toString();

@@ -12,6 +12,11 @@ package de.uka.ilkd.key.smt;
 
 import java.util.*;
 
+import org.apache.log4j.Logger;
+
+import de.uka.ilkd.key.collection.ImmutableArray;
+import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -19,9 +24,6 @@ import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.RewriteTacletBuilder;
 import de.uka.ilkd.key.util.Debug;
-import de.uka.ilkd.key.java.Services;
-
-import org.apache.log4j.Logger;
 
 public abstract class AbstractSMTTranslator implements SMTTranslator {
     static Logger logger = Logger.getLogger(AbstractSMTTranslator.class
@@ -1133,38 +1135,38 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 		return this.translateTermIte(term, quantifiedVars, services);
 	    }
 	} else if (op == Op.ALL) {
-	    ArrayOfQuantifiableVariable vars = term.varsBoundHere(0);
+	    ImmutableArray<QuantifiableVariable> vars = term.varsBoundHere(0);
 	    Debug.assertTrue(vars.size() == 1);
 
-	    quantifiedVars.add(vars.getQuantifiableVariable(0));
+	    quantifiedVars.add(vars.get(0));
 
 	    StringBuffer qv = this.translateVariable(vars
-		    .getQuantifiableVariable(0));
+		    .get(0));
 	    StringBuffer sort = this.translateSort(vars
-		    .getQuantifiableVariable(0).sort());
+		    .get(0).sort());
 	    StringBuffer form = this.translateTerm(term.sub(0), quantifiedVars,
 		    services);
 
 	    if (!this.isMultiSorted()) {
 		// add the typepredicate
 		form = this.translateLogicalImply(this.getTypePredicate(vars
-			.getQuantifiableVariable(0).sort(), qv), form);
+			.get(0).sort(), qv), form);
 	    }
 
-	    quantifiedVars.remove(vars.getQuantifiableVariable(0));
+	    quantifiedVars.remove(vars.get(0));
 
 	    return this.translateLogicalAll(qv, sort, form);
 
 	} else if (op == Op.EX) {
-	    ArrayOfQuantifiableVariable vars = term.varsBoundHere(0);
+	    ImmutableArray<QuantifiableVariable> vars = term.varsBoundHere(0);
 	    Debug.assertTrue(vars.size() == 1);
 
-	    quantifiedVars.add(vars.getQuantifiableVariable(0));
+	    quantifiedVars.add(vars.get(0));
 
 	    StringBuffer qv = this.translateVariable(vars
-		    .getQuantifiableVariable(0));
+		    .get(0));
 	    StringBuffer sort = this.translateSort(vars
-		    .getQuantifiableVariable(0).sort());
+		    .get(0).sort());
 	    StringBuffer form = this.translateTerm(term.sub(0), quantifiedVars,
 		    services);
 
@@ -1172,9 +1174,9 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 		// add the typepredicate
 		//a and is needed!!
 		form = this.translateLogicalAnd(this.getTypePredicate(vars
-			.getQuantifiableVariable(0).sort(), qv), form);
+			.get(0).sort(), qv), form);
 	    }
-	    quantifiedVars.remove(vars.getQuantifiableVariable(0));
+	    quantifiedVars.remove(vars.get(0));
 
 	    return this.translateLogicalExist(qv, sort, form);
 	} else if (op == Op.TRUE) {
@@ -1396,7 +1398,8 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 	TermFactory tf = new TermFactory();
 
 	//Collect all free Variable in the term
-	QuantifiableVariable[] args = t.freeVars().toArray();
+	final ImmutableSet<QuantifiableVariable> freeVars = t.freeVars();
+	QuantifiableVariable[] args = freeVars.toArray(new QuantifiableVariable[freeVars.size()]);
 	Term[] subs = new Term[args.length];
 	Sort[] argsorts = new Sort[args.length];
 	for (int i = 0; i < args.length; i++) {

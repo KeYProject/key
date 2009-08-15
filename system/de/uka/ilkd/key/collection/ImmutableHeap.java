@@ -1,24 +1,6 @@
-#!/bin/sh
-# This file is part of KeY - Integrated Deductive Software Design
-# Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
-#                         Universitaet Koblenz-Landau, Germany
-#                         Chalmers University of Technology, Sweden
-#
-# The KeY system is protected by the GNU General Public License. 
-# See LICENSE.TXT for details.
-#
-#
-#
-#
-#!/bin/sh
-pck=$1
-outDir=$GENERATED_SRC_PATH`echo $1 | sed 's!\.!/!g;'`
-mkdir -p $outDir
-outFile=$outDir"/"HeapOf$2".java"
-sed "s/<Pck>/$pck/g;s/<T>/$2/g;" <<END_OF_CLASS >$outFile
+package de.uka.ilkd.key.collection;
 
-package <Pck>;
-
+import java.util.Iterator;
 
 
 /**
@@ -26,14 +8,14 @@ package <Pck>;
  * interface <code>Comparable</code>, and the heap is able to return
  * the minimum member regarding the relation <code>compareTo</code> of
  * T via the method <code>findMin</code>. Elements of the interface
- * <code>HeapOfT</code> are immutable. Implementations of
- * <code>HeapOfT</code> have to provide an attribute
+ * <code>Heap<T></code> are immutable. Implementations of
+ * <code>Heap<T></code> have to provide an attribute
  * <code>EMPTY_HEAP</code>, which is a singleton representing empty
  * heaps. Heaps may contain multiple references to one object, or
  * multiple objects which are <code>equal</code>.
  */
-public interface HeapOf<T> extends java.io.Serializable {
-    
+public interface ImmutableHeap<T extends Comparable<T>> extends java.io.Serializable {
+
     /**
      * @return true iff this heap is empty
      */
@@ -45,7 +27,7 @@ public interface HeapOf<T> extends java.io.Serializable {
      * @return a heap that contains all elements of this heap, and
      * additionally <code>element</code>
      */
-    HeapOf<T> insert ( <T> element );
+    ImmutableHeap<T> insert ( T element );
 
     /**
      * Add multiple elements to this heap object
@@ -53,7 +35,7 @@ public interface HeapOf<T> extends java.io.Serializable {
      * @return a heap that contains all elements of this heap, and
      * additionally all objects from <code>elements</code>
      */
-    HeapOf<T> insert ( IteratorOf<T> elements );
+    ImmutableHeap<T> insert ( Iterator<T> elements );
 
     /**
      * Add multiple elements to this heap object
@@ -61,20 +43,20 @@ public interface HeapOf<T> extends java.io.Serializable {
      * @return a heap that contains all elements of this heap, and
      * additionally all objects from <code>h</code>
      */
-    HeapOf<T> insert ( HeapOf<T> h );
+    ImmutableHeap<T> insert ( ImmutableHeap<T> h );
 
     /**
      * @return the minimum element of this heap, or null iff this heap
      * is empty (<code>isEmpty()==true</code>)
      */
-    <T> findMin ();
+    T findMin ();
 
     /**
      * Remove the minimum element from this heap
      * @return a heap that contains all elements of this heap except
      * for the minimum element
      */
-    HeapOf<T> deleteMin ();
+    ImmutableHeap<T> deleteMin ();
 
     /**
      * Remove all elements of this heap which are <code>equal</code>
@@ -82,8 +64,8 @@ public interface HeapOf<T> extends java.io.Serializable {
      * @return heap that has all occurrences of <code>element</code>
      * removed
      */
-    HeapOf<T> removeAll ( <T> element );
-    
+    ImmutableHeap<T> removeAll ( T element );
+
     /**
      * @return the number of elements this heap holds
      */
@@ -92,13 +74,12 @@ public interface HeapOf<T> extends java.io.Serializable {
     /**
      * @return an iterator that returns all elements of this heap
      */
-    IteratorOf<T> iterator ();
+    Iterator<T> iterator ();
 
     /**
      * @return an iterator that returns all elements of this heap in
      * increasing order
      */
-    IteratorOf<T> sortedIterator ();
+    Iterator<T> sortedIterator ();
 
 }
-END_OF_CLASS

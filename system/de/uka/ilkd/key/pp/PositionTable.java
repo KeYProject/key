@@ -10,7 +10,12 @@
 
 package de.uka.ilkd.key.pp;
 
-import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.logic.ConstrainedFormula;
+import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.PosInTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Metavariable;
 
 /**
@@ -105,10 +110,10 @@ public class PositionTable {
      * Returns the path to the `lowest' position table that includes
      * <code>index</code> in its range.
      */
-    protected ListOfInteger pathForIndex(int index) {
+    protected ImmutableList<Integer> pathForIndex(int index) {
 	int sub=searchEntry(index);
 	if (sub == -1) {
-	    return SLListOfInteger.EMPTY_LIST;
+	    return ImmutableSLList.<Integer>nil();
 	} else {
 	    return child[sub].pathForIndex(index-startPos[sub])
 		.prepend(new Integer(sub));
@@ -171,7 +176,7 @@ public class PositionTable {
     /** Returns the character range for the subtable indicated
      * by the given integer list.
      */
-    public Range rangeForPath(ListOfInteger path,int length) {
+    public Range rangeForPath(ImmutableList<Integer> path,int length) {
 	if (path.isEmpty()) {
 	    return new Range(0,length);
 	} else {
@@ -245,10 +250,10 @@ public class PositionTable {
      *                print the sequent
      */    
     
-    protected PosInSequent getSequentPIS(ListOfInteger posList,
+    protected PosInSequent getSequentPIS(ImmutableList<Integer> posList,
 				       SequentPrintFilter filter) {
 	int cfmaNo = posList.head().intValue();
-	ListOfInteger tail = posList.tail();
+	ImmutableList<Integer> tail = posList.tail();
 
 	SequentPrintFilterEntry filterEntry = 
 	    getFilterEntry(cfmaNo, filter);
@@ -277,7 +282,7 @@ public class PositionTable {
      * @param pio     the PosInOccurrence leading to the current term
      */
     private PosInSequent getTermPIS(SequentPrintFilterEntry filterEntry,
-				    ListOfInteger posList,
+				    ImmutableList<Integer> posList,
 				    PosInOccurrence pio) {
 	if(posList.isEmpty()) {
 	    return PosInSequent.createCfmaPos(pio);
@@ -331,7 +336,7 @@ public class PositionTable {
 	getFilterEntry(int cfmaNo, 
 		       SequentPrintFilter filter) {
 	int i = cfmaNo;
-	ListOfSequentPrintFilterEntry list =
+	ImmutableList<SequentPrintFilterEntry> list =
 	    filter.getAntec().append(filter.getSucc());
 	while ( i-- != 0 ) list = list.tail ();
 	return list.head ();

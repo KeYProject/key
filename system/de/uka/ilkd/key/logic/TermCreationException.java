@@ -16,7 +16,7 @@ package de.uka.ilkd.key.logic;
 
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.sort.*;
+import de.uka.ilkd.key.logic.sort.Sort;
 
 /**
  * 

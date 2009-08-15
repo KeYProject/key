@@ -12,9 +12,7 @@
 header {
     package de.uka.ilkd.key.speclang.ocl.translation;
 
-    import de.uka.ilkd.key.collection.IteratorOfString;
-    import de.uka.ilkd.key.collection.ListOfString;
-    import de.uka.ilkd.key.collection.SLListOfString;
+    import de.uka.ilkd.key.collection.*;
     import de.uka.ilkd.key.java.abstraction.KeYJavaType;
     import de.uka.ilkd.key.java.abstraction.PrimitiveType;
     import de.uka.ilkd.key.java.declaration.TypeDeclaration;
@@ -33,6 +31,8 @@ header {
     
     import java.lang.*;
     import java.lang.AssertionError;
+    
+    import java.util.Iterator;    
     import java.util.Map;
     import java.util.LinkedHashMap;
 }
@@ -61,7 +61,7 @@ options {
     
     //variables for variables
     private ParsableVariable selfVar;
-    private ListOfParsableVariable paramVars;
+    private ImmutableList<ParsableVariable> paramVars;
     private ParsableVariable resultVar;
     private ParsableVariable excVar;
         
@@ -83,7 +83,7 @@ options {
  			            KeYJavaType specInClass,
  			            AxiomCollector ac,
  			            ParsableVariable selfVar,
- 			            ListOfParsableVariable paramVars,
+ 			            ImmutableList<ParsableVariable> paramVars,
  			            ParsableVariable resultVar,
  			            ParsableVariable excVar,
  			            /*inout*/ Map /*operator (normal)
@@ -135,7 +135,7 @@ options {
 	        OCLResolverManager.putIntoTopLocalVariablesNamespace(selfVar);
         }
         if(paramVars != null) {
-			IteratorOfParsableVariable it = paramVars.iterator(); 
+			Iterator<ParsableVariable> it = paramVars.iterator(); 
 			while(it.hasNext()) {
 				OCLResolverManager.putIntoTopLocalVariablesNamespace(it.next());
 			}
@@ -228,8 +228,8 @@ options {
             newOp = term.op();
         }
         
-        final ArrayOfQuantifiableVariable[] vars = 
-		new ArrayOfQuantifiableVariable[term.arity()];
+        final ImmutableArray<QuantifiableVariable>[] vars = 
+		new ImmutableArray[term.arity()];
 		
 	final Term[] subTerms = getSubTerms(term);
 	
@@ -305,8 +305,8 @@ options {
      * @param initialValues the inital values to use, or an empty list to use 
      * default values
      */
-    public void setCounters(ListOfInteger initialValues) {
-    	IteratorOfInteger it = initialValues.iterator();
+    public void setCounters(ImmutableList<Integer> initialValues) {
+    	Iterator<Integer> it = initialValues.iterator();
     	if(it.hasNext()) {
     		formulaBoolConverter.setVariableCounter(it.next().intValue());
     	}
@@ -317,9 +317,9 @@ options {
      * Returns the values of the parser's counters, to be used as 
      * initial values for some other parser instance.
      */
-    public ListOfInteger getCounters() {
+    public ImmutableList<Integer> getCounters() {
     	int boolCounter = formulaBoolConverter.getVariableCounter();
-    	return SLListOfInteger.EMPTY_LIST.append(new Integer(boolCounter));
+    	return ImmutableSLList.<Integer>nil().append(new Integer(boolCounter));
     }
     
     
@@ -352,7 +352,7 @@ options {
     	
     	// Add created functions to the namespace
     	funcNS.add(funcFactory.getFunctions());
-    	IteratorOfLogicVariable it = funcFactory.getCreatedVars().iterator();
+    	Iterator<LogicVariable> it = funcFactory.getCreatedVars().iterator();
     	while(it.hasNext()) {
     		// HACK - has to be fixed!
     		Named next = it.next();
@@ -807,7 +807,7 @@ propertyCall[OCLExpression receiver] returns [OCLExpression result = null] throw
 	boolean atPre = false;
 	boolean needVarDeclaration = false;
 	OCLParameters parameters = null;
-	ListOfOCLExpression qualifier;
+	ImmutableList<OCLExpression> qualifier;
 }
 	: 
        	propertyName=pathName
@@ -855,8 +855,8 @@ propertyCall[OCLExpression receiver] returns [OCLExpression result = null] throw
 propertyCallParameters[OCLExpression receiver, boolean needVarDeclaration]
 		returns [OCLParameters result = null] throws SLTranslationException
 {
-	ListOfLogicVariable resultVars = SLListOfLogicVariable.EMPTY_LIST;
-	ListOfOCLExpression resultEntities = SLListOfOCLExpression.EMPTY_LIST;
+	ImmutableList<LogicVariable> resultVars = ImmutableSLList.<LogicVariable>nil();
+	ImmutableList<OCLExpression> resultEntities = ImmutableSLList.<OCLExpression>nil();
 	
 	Sort declaredVarsSort = (receiver == null ? null : receiver.getSort());
 }
@@ -896,9 +896,9 @@ propertyCallParameters[OCLExpression receiver, boolean needVarDeclaration]
 	;
 	
 	
-declarator[Sort expectedSort] returns [ListOfLogicVariable result = null] throws SLTranslationException
+declarator[Sort expectedSort] returns [ImmutableList<LogicVariable> result = null] throws SLTranslationException
 {	
-    ListOfString varNames=SLListOfString.EMPTY_LIST;
+    ImmutableList<String> varNames=ImmutableSLList.<String>nil();
     KeYJavaType kjt=null;
     OCLExpression t;
 }
@@ -914,8 +914,8 @@ declarator[Sort expectedSort] returns [ListOfLogicVariable result = null] throws
     	{
     		Sort sort = (kjt == null ? expectedSort : kjt.getSort());
                
-		    result = SLListOfLogicVariable.EMPTY_LIST;
-            IteratorOfString it = varNames.iterator();    
+		    result = ImmutableSLList.<LogicVariable>nil();
+            Iterator<String> it = varNames.iterator();    
             while(it.hasNext()) {
             	Name name = new Name(it.next());
             	result = result.append(new LogicVariable(name, sort));
@@ -951,7 +951,7 @@ collectionType throws SLTranslationException
   	;
   	
   	
-actualParameterList returns [ListOfOCLExpression result=SLListOfOCLExpression.EMPTY_LIST] throws SLTranslationException
+actualParameterList returns [ImmutableList<OCLExpression> result=ImmutableSLList.<OCLExpression>nil()] throws SLTranslationException
 {
 	OCLExpression t=null;
 }
@@ -961,7 +961,7 @@ actualParameterList returns [ListOfOCLExpression result=SLListOfOCLExpression.EM
 	;
 
 
-qualifiers returns [ListOfOCLExpression result=null] throws SLTranslationException
+qualifiers returns [ImmutableList<OCLExpression> result=null] throws SLTranslationException
   	:	LBRACK result=actualParameterList RBRACK
   	;
   	

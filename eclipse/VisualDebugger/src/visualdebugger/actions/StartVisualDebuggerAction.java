@@ -648,12 +648,12 @@ public class StartVisualDebuggerAction implements IObjectActionDelegate {
 
         final SpecificationRepository specRepos = services.getSpecificationRepository();
 
-        final SetOfClassInvariant assumedInvariants = 
+        final SetOf<ClassInvariant> assumedInvariants = 
             assumeClassInvariants ? specRepos.getClassInvariants(pm.getContainerType()) : 
-                SetAsListOfClassInvariant.EMPTY_SET;	   	 
+                SetAsListOf.<ClassInvariant>nil();	   	 
 
 
-            final SetOfOperationContract operationContracts = specRepos.getOperationContracts(pm);
+            final SetOf<OperationContract> operationContracts = specRepos.getOperationContracts(pm);
             
             if (operationContracts.size() == 0) {
                 throw new ProofInputException("No contract found for "+pm.getFullName());

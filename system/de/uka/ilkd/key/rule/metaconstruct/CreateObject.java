@@ -15,7 +15,8 @@
 // See LICENSE.TXT for details.
 package de.uka.ilkd.key.rule.metaconstruct;
 
-import de.uka.ilkd.key.java.ArrayOfExpression;
+import de.uka.ilkd.key.collection.ImmutableArray;
+import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
@@ -60,7 +61,7 @@ public class CreateObject extends ProgramMetaConstruct {
   	    return pe;
   	}	
  	
-        return new MethodReference(new ArrayOfExpression(), 
+        return new MethodReference(new ImmutableArray<Expression>(), 
 				   new ProgramElementName
                                    (CreateObjectBuilder.IMPLICIT_OBJECT_CREATE), 
 				   classReference);					   

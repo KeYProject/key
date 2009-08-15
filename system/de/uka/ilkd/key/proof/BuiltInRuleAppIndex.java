@@ -10,8 +10,14 @@
 
 package de.uka.ilkd.key.proof;
 
+import java.util.Iterator;
+
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.rule.*;
+import de.uka.ilkd.key.rule.BuiltInRule;
+import de.uka.ilkd.key.rule.BuiltInRuleApp;
+import de.uka.ilkd.key.rule.RuleApp;
 
 public class BuiltInRuleAppIndex implements java.io.Serializable {
 
@@ -36,12 +42,12 @@ public class BuiltInRuleAppIndex implements java.io.Serializable {
      * returns a list of built-in rules application applicable
      * for the given goal and position
      */
-    public ListOfRuleApp getBuiltInRule(Goal            goal, 
+    public ImmutableList<RuleApp> getBuiltInRule(Goal            goal, 
 					PosInOccurrence pos, 
 					Constraint      userConstraint) {
 
-	ListOfRuleApp result = SLListOfRuleApp.EMPTY_LIST;
-	IteratorOfBuiltInRule it = index.rules().iterator();
+	ImmutableList<RuleApp> result = ImmutableSLList.<RuleApp>nil();
+	Iterator<BuiltInRule> it = index.rules().iterator();
 
 	while (it.hasNext()) {
 	    BuiltInRule bir = it.next();            
@@ -82,7 +88,7 @@ public class BuiltInRuleAppIndex implements java.io.Serializable {
     private void scanSimplificationRule ( Goal       goal,
 					  Constraint userConstraint, 
 					  NewRuleListener listener ) {
-        final IteratorOfBuiltInRule ruleIt = index.rules().iterator();
+        final Iterator<BuiltInRule> ruleIt = index.rules().iterator();
         while (ruleIt.hasNext()) {
             final BuiltInRule bir = ruleIt.next();
             scanSimplificationRule ( bir, goal, false, userConstraint, listener );
@@ -100,7 +106,7 @@ public class BuiltInRuleAppIndex implements java.io.Serializable {
 	final Node                   node = goal.node ();
 	final Sequent                seq  = node.sequent ();
 
-	IteratorOfConstrainedFormula it = 
+	Iterator<ConstrainedFormula> it = 
 	    ( antec ? seq.antecedent () : seq.succedent () ).iterator ();
 
 	while ( it.hasNext () ) {
@@ -146,11 +152,11 @@ public class BuiltInRuleAppIndex implements java.io.Serializable {
     }
     
     private void scanAddedFormulas ( Goal goal, boolean antec, SequentChangeInfo sci, final Constraint userConstraint ) {
-        ListOfConstrainedFormula cfmas = sci.addedFormulas( antec );
+        ImmutableList<ConstrainedFormula> cfmas = sci.addedFormulas( antec );
         final NewRuleListener listener = getNewRulePropagator();
         while ( !cfmas.isEmpty() ) {
             final ConstrainedFormula cfma = cfmas.head();
-            final IteratorOfBuiltInRule ruleIt = index.rules().iterator();
+            final Iterator<BuiltInRule> ruleIt = index.rules().iterator();
             while (ruleIt.hasNext()) {
                 final BuiltInRule rule = ruleIt.next();            
                 scanSimplificationRule( rule, goal, antec, 
@@ -164,12 +170,12 @@ public class BuiltInRuleAppIndex implements java.io.Serializable {
     private void scanModifiedFormulas ( Goal goal, boolean antec, SequentChangeInfo sci, final Constraint userConstraint ) {
         
         final NewRuleListener listener = getNewRulePropagator();
-        ListOfFormulaChangeInfo fcis = sci.modifiedFormulas( antec );
+        ImmutableList<FormulaChangeInfo> fcis = sci.modifiedFormulas( antec );
 
         while ( !fcis.isEmpty() ) {
             final FormulaChangeInfo fci = fcis.head();               
             final ConstrainedFormula cfma = fci.getNewFormula();
-            final IteratorOfBuiltInRule ruleIt = index.rules().iterator();
+            final Iterator<BuiltInRule> ruleIt = index.rules().iterator();
             while (ruleIt.hasNext()) {
                 final BuiltInRule rule = ruleIt.next();
                 scanSimplificationRule( rule, goal, antec, userConstraint, cfma, listener );

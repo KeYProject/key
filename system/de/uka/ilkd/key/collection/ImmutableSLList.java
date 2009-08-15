@@ -1,22 +1,8 @@
-#!/bin/sh
-# This file is part of KeY - Integrated Deductive Software Design
-# Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
-#                         Universitaet Koblenz-Landau, Germany
-#                         Chalmers University of Technology, Sweden
-#
-# The KeY system is protected by the GNU General Public License. 
-# See LICENSE.TXT for details.
-#
-#
-pck=$1
-outDir=$GENERATED_SRC_PATH`echo $1 | sed 's!\.!/!g;'`
-mkdir -p $outDir
-outFile=$outDir"/"SLListOf$2".java"
-sed "s/<Pck>/$pck/g;s/<T>/$2/g;" <<END_OF_CLASS >$outFile
+package de.uka.ilkd.key.collection;
 
-package <Pck>;
-
-import de.uka.ilkd.key.logic.*;  //because the involved classes may be spread
+import java.lang.reflect.Array;
+import java.util.Collections;
+import java.util.Iterator;
 
 /** a NON-DESTRUCTIVE single linked list for elements of type <T>. The
  *    costs of the  
@@ -32,20 +18,28 @@ import de.uka.ilkd.key.logic.*;  //because the involved classes may be spread
  * amortized O(1). This will be done later (if necessary).
  */
 
-public abstract class SLListOf<T> implements ListOf<T> {
-    
+public abstract class ImmutableSLList<T> implements ImmutableList<T> {
+
+    /**
+     * generated serial id
+     */
+    private static final long serialVersionUID = 8717813038177120287L;
+
+
     /** the empty list */
-    public static final SLListOf<T> EMPTY_LIST=new NIL();
+    public static final <T> ImmutableSLList<T> nil() {
+	return (ImmutableSLList<T>) NIL.NIL;
+    }
 
     /**
      * Reverses this list (O(N))
      */
-    public ListOf<T> reverse() {
+    public ImmutableList<T> reverse() {
 	if ( size () <= 1 )
 	    return this;
 
-	ListOf<T> rest = this;
-	ListOf<T> rev  = EMPTY_LIST;
+	ImmutableList<T> rest = this;
+	ImmutableList<T> rev  = nil();
 	while (!rest.isEmpty()) {
 	    rev = rev.prepend(rest.head());
 	    rest = rest.tail();
@@ -57,23 +51,27 @@ public abstract class SLListOf<T> implements ListOf<T> {
     /**
      * Convert the list to a Java array (O(n))
      */
-    public <T>[] toArray() {
-	<T>[]     res  = new <T> [ size () ];
-	int       i    = 0;
-	ListOf<T> rest = this;
-	while ( !rest.isEmpty() ) {
-	    res[i++] = rest.head ();
-	    rest     = rest.tail ();
+    public <S> S[] toArray(S[] array) {
+	S[] result;
+	if (array.length < size()) {
+	    result = (S[]) Array.newInstance(array.getClass().getComponentType(), size());
+	} else {
+	    result = array;
 	}
-	return res;
+	ImmutableList<T> rest = this;
+	for (int i = 0; i<size(); i++) {
+	    result[i] = (S) rest.head();
+	    rest = rest.tail();
+	}
+	return result;
     }
 
 
     /** prepends array (O(n))
      * @param array the array of the elements to be prepended
-     * @return ListOf<T> the new list  
+     * @return IList<T> the new list  
      */
-    public ListOf<T> prepend(<T>[] array) {
+    public ImmutableList<T> prepend(T[] array) {
 	return prepend ( array, array.length );
     }
 
@@ -82,26 +80,26 @@ public abstract class SLListOf<T> implements ListOf<T> {
      * prepends the first <code>n</code> elements of an array (O(n))
      * @param array the array of the elements to be prepended
      * @param n an int specifying the number of elements to be prepended 
-     * @return ListOf<T> the new list  
+     * @return IList<T> the new list  
      */
-    protected ListOf<T> prepend(<T>[] array, int n) {
-	ListOf<T> res = this;
+    protected ImmutableList<T> prepend(T[] array, int n) {
+	ImmutableList<T> res = this;
 	while ( n-- != 0 )
-	    res = new Cons(array[n], (SLListOf<T>)res);
+	    res = new Cons<T>(array[n], (ImmutableSLList<T>)res);
 	return res;
     }
 
     /** 
      * first <code>n</code> elements of the list are truncated
      * @param n an int specifying the number of elements to be truncated
-     * @return ListOf<T> this list without the first <code>n</code> elements  
+     * @return IList<T> this list without the first <code>n</code> elements  
      */
-    public ListOf<T> take(int n) {
+    public ImmutableList<T> take(int n) {
 	if ( n < 0 || n > size () )
 	    throw new IndexOutOfBoundsException
 		( "Unable to take " + n + " elements from list " + this );
-	
-	ListOf<T> rest = this;
+
+	ImmutableList<T> rest = this;
 
 	while ( n-- != 0 )
 	    rest = rest.tail ();
@@ -110,12 +108,17 @@ public abstract class SLListOf<T> implements ListOf<T> {
     }
 
 
-    static class Cons extends SLListOf<T>{
+    static class Cons<S> extends ImmutableSLList<S> {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 2377644880764534935L;
 	
 	/** the first element */
-	private final <T> element;
-	/** reference to the next element (equiv.to the tail of list) */ 
-	private final SLListOf<T> cons;
+	private final S element;
+	/** reference to the next element (equiv.to the tail of list) */
+	private final ImmutableSLList<S> cons;
 	/** size of the list */
 	private final int size;
 	/** caches the hashcode */
@@ -124,9 +127,9 @@ public abstract class SLListOf<T> implements ListOf<T> {
 	/** new list with only one element
 	 * @param element the only element in list
 	 */
-	Cons(<T> element) {
+	Cons(S element) {
 	    this.element=element;
-	    cons=EMPTY_LIST;
+	    cons=nil();
 	    size=1;
 	    hashCode=(element == null ? 0 : element.hashCode()); 
 	}
@@ -135,7 +138,7 @@ public abstract class SLListOf<T> implements ListOf<T> {
 	 * @param element a <T> stored in the head element of the list
 	 * @param cons tail of the list 
 	 */
-	Cons(<T> element, SLListOf<T> cons) {
+	Cons(S element, ImmutableSLList<S> cons) {
 	    this.element=element;
 	    this.cons=cons;
 	    size=cons.size()+1;
@@ -146,51 +149,58 @@ public abstract class SLListOf<T> implements ListOf<T> {
 	/** creates a new list with element as head and the
 	 * momentan list as tail (O(1))
 	 * @param e the <T> to be prepended
-	 * @return ListOf<T> the new list  
+	 * @return IList<T> the new list  
 	 */
-	public ListOf<T> prepend(<T> e) {
-	    return new Cons(e, this);
+	public ImmutableList<S> prepend(S e) {
+	    return new Cons<S>(e, this);
 	}
 	
 	/** prepends list (O(n))
-	 * @param list the ListOf<T> to be prepended
-	 * @return ListOf<T> the new list  
+	 * @param list the IList<T> to be prepended
+	 * @return IList<T> the new list  
 	 */
-	public ListOf<T> prepend(ListOf<T> list) {
-	    return prepend ( list.toArray () );
+	public ImmutableList<S> prepend(ImmutableList<S> list) {
+	    if (list.isEmpty()) {
+		return this;
+	    }
+	    ImmutableList<S> result = this;
+	    for (S el : list.reverse()) {
+		result = result.prepend(el);
+	    }	    
+	    return result;
 	}
 
 	/** appends element at end (non-destructive) (O(n))
 	 * @param e the <T> to be prepended
-	 * @return ListOf<T> the new list  
+	 * @return IList<T> the new list  
 	 */
-	public ListOf<T> append(<T> e) {
-	    return (new Cons(e)).prepend(this);
+	public ImmutableList<S> append(S e) {
+	    return new Cons<S>(e).prepend(this);
 	}
 
 	/** appends element at end (non-destructive) (O(n))
-	 * @param list the ListOf<T> to be appended
-	 * @return ListOf<T> the new list  
-	 */    
-	public ListOf<T> append(ListOf<T> list) {
+	 * @param list the IList<T> to be appended
+	 * @return IList<T> the new list
+	 */
+	public ImmutableList<S> append(ImmutableList<S> list) {
 	    return list.prepend(this);
 	}
 
 	/** appends element at end (non-destructive) (O(n))
 	 * @param array the array to be appended
-	 * @return ListOf<T> the new list  
-	 */    
-	public ListOf<T> append(<T>[] array) {
-	    return EMPTY_LIST.prepend ( array ).prepend ( this );
+	 * @return IList<T> the new list
+	 */
+	public ImmutableList<S> append(S[] array) {
+	    return ((ImmutableList<S>) nil()).prepend ( array ).prepend ( this );
 	}
 
 	/** @return <T> first element in list */
-	public <T> head() {
+	public S head() {
 	    return element;
 	}
 	
-	/** @return ListOf<T> tail of the list */
-	public ListOf<T> tail() {
+	/** @return IList<T> tail of the list */
+	public ImmutableList<S> tail() {
 	    return cons;
 	}
 	
@@ -205,8 +215,8 @@ public abstract class SLListOf<T> implements ListOf<T> {
 
 	
 	/** @return iterator through list */
-	public IteratorOf<T> iterator() {
-	    return new SLListIterator(this);
+	public Iterator<S> iterator() {
+	    return new SLListIterator<S>(this);
 	}
 	
 	/** @return int the number of elements in list */    
@@ -215,9 +225,9 @@ public abstract class SLListOf<T> implements ListOf<T> {
 	}
 
 	/** @return boolean true iff. obj in list */
-	public boolean contains(<T> obj) {
-	    ListOf<T> list = this;
-	    <T>       t;
+	public boolean contains(S obj) {
+	    ImmutableList<S> list = this;
+	    S       t;
 	    while (!list.isEmpty()) {
 		t = list.head ();
 		if ( t == null ? obj == null : t.equals ( obj ) )
@@ -236,15 +246,15 @@ public abstract class SLListOf<T> implements ListOf<T> {
 	/** removes first occurrences of obj (O(n))
 	 * @return new list 
 	 */
-	public ListOf<T> removeFirst(<T> obj) {
-	    <T>[]       res            = new <T> [ size () ];
+	public ImmutableList<S> removeFirst(S obj) {
+	    S[]       res            = (S[]) new Object [ size () ];
 	    int         i              = 0;
-	    SLListOf<T> rest           = this;
-	    SLListOf<T> unmodifiedTail = this;
-	    <T>         t;
+	    ImmutableSLList<S> rest           = this;
+	    ImmutableSLList<S> unmodifiedTail = this;
+	    S         t;
 	    while (!rest.isEmpty()) {
 		t    = rest.head ();
-		rest = (SLListOf<T>)rest.tail();
+		rest = (ImmutableSLList<S>)rest.tail();
 		if ( !( t == null ? obj == null : t.equals ( obj ) ) )
 		    res[i++] = t;
 		else {
@@ -261,16 +271,16 @@ public abstract class SLListOf<T> implements ListOf<T> {
 	 * removes all occurrences of obj (O(n))
 	 * @return new list 
 	 */
-	public ListOf<T> removeAll(<T> obj) {
-	    <T>[]       res            = new <T> [ size () ];
+	public ImmutableList<S> removeAll(S obj) {
+	    S[]       res            = (S[]) new Object [ size () ];
 	    int         i              = 0;
-	    SLListOf<T> rest           = this;
-	    SLListOf<T> unmodifiedTail = this;
-	    <T>         t;
+	    ImmutableSLList<S> rest           = this;
+	    ImmutableSLList<S> unmodifiedTail = this;
+	    S         t;
 
 	    while (!rest.isEmpty()) {
 		t    = rest.head ();
-		rest = (SLListOf<T>)rest.tail();
+		rest = (ImmutableSLList<S>)rest.tail();
 		if ( !( t == null ? obj == null : t.equals ( obj ) ) )
 		    res[i++] = t;
 		else
@@ -283,16 +293,17 @@ public abstract class SLListOf<T> implements ListOf<T> {
 
 
 	public boolean equals(Object o) {
-	    if ( ! ( o instanceof ListOf<T> ) ) 
+	    if ( ! ( o instanceof ImmutableList ) )
 		return false;
-	    ListOf<T> o1 = (ListOf<T>) o;
-	    if ( o1.size() != size() ) 
+	    final ImmutableList<S> o1 = (ImmutableList<S>) o;
+	    if ( o1.size() != size() )
 		return false;
-	    IteratorOf<T> p = iterator();
-		IteratorOf<T> q = (o1).iterator();
+
+	    final Iterator<S> p = iterator();
+	    final Iterator<S> q = o1.iterator();
 	    while ( p.hasNext() ) {
-	        <T> ep = p.next();
-	        <T> eq = q.next();
+	        S ep = p.next();
+	        S eq = q.next();
 	        if ( ( ep == null && eq != null ) 
 		    || ( ep != null && !ep.equals(eq) ) ) 
 		  return false;
@@ -302,7 +313,7 @@ public abstract class SLListOf<T> implements ListOf<T> {
 
 
 	public String toString() {
-	    IteratorOf<T> it=this.iterator();
+	    Iterator<S> it=this.iterator();
 	    StringBuffer str=new StringBuffer("[");
 	    while (it.hasNext()) {
 		str.append(""+it.next());
@@ -313,54 +324,58 @@ public abstract class SLListOf<T> implements ListOf<T> {
 	    str.append("]");
 	    return str.toString();
 	}
+    }
 
-	/** iterates through a none destructive list */
-	private static class SLListIterator implements IteratorOf<T> {
-	
-	    /** the list of remaining elements */
-	    private ListOf<T> list;
-	
-	    /** constructs the iterator
-	     *@param list the ListOf<T> that has to be iterated 
-	     */
-	    public SLListIterator(ListOf<T> list) {
-		this.list = list;	
-	    }
-	
-	    /** @return next element in list */
-	    public <T> next() {
-		<T> element = list.head();
-		list = list.tail();
-		return element;
-	    }
-	
-	    /** @return true iff there are unseen elements in the list
-	     */ 
-	    public boolean hasNext() {
-		return !list.isEmpty();
-	    }    
+    /** iterates through a none destructive list */
+    private static class SLListIterator<T> implements Iterator<T> {
 
-	   /** 
-	    * throws an unsupported operation exception as removing elements
-	    * is not allowed on immutable lists
-	    */
-	    public void remove() {
-	    	throw new UnsupportedOperationException("Removing elements via an iterator" +
-	    	" is not supported for immutable datastructures.");
-	    } 
-	    
+	/** the list of remaining elements */
+	private ImmutableList<T> list;
+
+	/** constructs the iterator
+	 *@param list the IList<T> that has to be iterated 
+	 */
+	public SLListIterator(ImmutableList<T> list) {
+	    this.list = list;
 	}
 
+	/** @return next element in list */
+	public T next() {
+	    T element = list.head();
+	    list = list.tail();
+	    return element;
+	}
+
+	/** @return true iff there are unseen elements in the list
+	 */ 
+	public boolean hasNext() {
+	    return !list.isEmpty();
+	}    
+
+	/** 
+	 * throws an unsupported operation exception as removing elements
+	 * is not allowed on immutable lists
+	 */
+	public void remove() {
+	    throw new UnsupportedOperationException("Removing elements via an iterator" +
+	    " is not supported for immutable datastructures.");
+	} 
 
     }
 
 
-    static class NIL extends SLListOf<T>{
+    private static class NIL<S> extends ImmutableSLList<S> {
 
-	private static final SLNilListIterator iterator = 
-	    new SLNilListIterator();
+	private final static ImmutableList<?> NIL = new NIL<Object>();
+
+	/**
+	 * serial id 
+	 */
+	private static final long serialVersionUID = -4070450212306526804L;
+
+	private final Iterator<S> iterator =  new SLNilListIterator();
 	
-	NIL() {
+	private NIL() {
 	}
     
 	/** the NIL list is a singleton. Deserialization builds
@@ -368,7 +383,7 @@ public abstract class SLListOf<T> implements ListOf<T> {
          */ 
         private Object readResolve() 
             throws java.io.ObjectStreamException {
-            return SLListOf<T>.EMPTY_LIST;
+            return nil();
 	}
 	
 	public int size() {
@@ -382,28 +397,28 @@ public abstract class SLListOf<T> implements ListOf<T> {
 	public int hashCode() {
 	    return 0;
 	}
-	
-	public ListOf<T> prepend(<T> element) {
-	    return new Cons(element);
+
+	public ImmutableList<S> prepend(S element) {
+	    return new Cons<S>(element);
 	}
-	    
-	public ListOf<T> prepend(ListOf<T> list) {
-	    return list;
-	}
-	    
-	public ListOf<T> append(<T> element) {
-	    return new Cons(element);
-	}
-	    
-	public ListOf<T> append(ListOf<T> list) {
+
+	public ImmutableList<S> prepend(ImmutableList<S> list) {
 	    return list;
 	}
 
-	public ListOf<T> append(<T>[] array) {
-	    return EMPTY_LIST.prepend ( array );
+	public ImmutableList<S> append(S element) {
+	    return new Cons<S>(element);
+	}
+
+	public ImmutableList<S> append(ImmutableList<S> list) {
+	    return list;
+	}
+
+	public ImmutableList<S> append(S[] array) {
+	    return prepend ( array );
 	}
 	    
-	public boolean contains(<T> obj) {
+	public boolean contains(S obj) {
 	    return false;
 	}
 
@@ -411,24 +426,24 @@ public abstract class SLListOf<T> implements ListOf<T> {
 	    return true;
 	}
 	    
-	public IteratorOf<T> iterator() {
+	public Iterator<S> iterator() {
 	    return iterator;
 	}
 	    
-	public <T> head() {
+	public S head() {
 	    return null;
 	}
-	    
-	public ListOf<T> tail() {
+
+	public ImmutableList<S> tail() {
 	    return this;
 	}
 
-	public ListOf<T> removeAll(<T> obj) {
-	    return this;	
+	public ImmutableList<S> removeAll(S obj) {
+	    return this;
 	}
 
-	public ListOf<T> removeFirst(<T> obj) {
-	    return this;	
+	public ImmutableList<S> removeFirst(S obj) {
+	    return this;
 	}
 	    
 	public String toString() {
@@ -436,7 +451,7 @@ public abstract class SLListOf<T> implements ListOf<T> {
 	}
 
 	/** iterates through the a none destructive NIL list */
-	private static class SLNilListIterator implements IteratorOf<T> {
+	private class SLNilListIterator implements Iterator<S> {
 	    	
 	    /** 
 	     * creates the NIL list iterator
@@ -445,7 +460,7 @@ public abstract class SLListOf<T> implements ListOf<T> {
 	    }
 	    
 	    /** @return next element in list */
-	    public <T> next() {
+	    public S next() {
 		return null;
 	    }
 
@@ -467,6 +482,3 @@ public abstract class SLListOf<T> implements ListOf<T> {
 	}
     }
 }
-
-    
-END_OF_CLASS

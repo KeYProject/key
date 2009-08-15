@@ -28,13 +28,13 @@ public class ArrayObjectFigure extends ObjectFigure {
         super(sao, listener, symbState,pre);        
         this.sos = symbState.getSymbolicObjects();
         createConstr(listener);
-        SetOfTerm indexes = sao.getAllIndexTerms();
+        SetOf<Term> indexes = sao.getAllIndexTerms();
         indexes=indexes.union(sao.getAllPostIndex());
 
         indexColumns = new IndexLabel[ indexes.size()];
         final IFigure compColumns = new Figure();
         int i =0;
-        for(IteratorOfTerm it=indexes.iterator();it.hasNext();){
+        for(Iterator<Term> it=indexes.iterator();it.hasNext();){
             final Term pv = it.next();
             indexColumns[ i ] = new IndexLabel(sao,pv,sos);
             indexColumns[ i ].addMouseListener(listener);
@@ -55,9 +55,9 @@ public class ArrayObjectFigure extends ObjectFigure {
     }
 
 
-    private SetOfTerm disj(SetOfTerm s1, SetOfTerm s2){
-        SetOfTerm result = SetAsListOfTerm.EMPTY_SET;
-        for(IteratorOfTerm it=s1.iterator();it.hasNext();){
+    private SetOf<Term> disj(SetOf<Term> s1, SetOf<Term> s2){
+        SetOf<Term> result = SetAsListOf.<Term>nil();
+        for(Iterator<Term> it=s1.iterator();it.hasNext();){
             Term t = it.next();
             if(s2.contains(t))
                 result=result.add(t);
@@ -67,9 +67,9 @@ public class ArrayObjectFigure extends ObjectFigure {
     }
 
 
-    private SetOfTerm exclude(SetOfTerm s1, SetOfTerm s2){
-        SetOfTerm result = s1;
-        for(IteratorOfTerm it=s2.iterator();it.hasNext();){
+    private SetOf<Term> exclude(SetOf<Term> s1, SetOf<Term> s2){
+        SetOf<Term> result = s1;
+        for(Iterator<Term> it=s2.iterator();it.hasNext();){
             Term t = it.next();
             if(s1.contains(t))
                 result=result.remove(t);
@@ -86,7 +86,7 @@ public class ArrayObjectFigure extends ObjectFigure {
             getPossibleIndexTermConfigurations();
         if (indexTermPos.size()<=1)
             return;
-        SetOfTerm cut= SetAsListOfTerm.EMPTY_SET;
+        SetOf<Term> cut= SetAsListOf.<Term>nil();
         if (indexTermPos.size()>0){
             Iterator it = indexTermPos.iterator();
             cut = (SetOfTerm)it.next();
@@ -103,7 +103,7 @@ public class ArrayObjectFigure extends ObjectFigure {
         int i =0;
         for(Iterator it=indexTermPos.iterator();it.hasNext();){
 
-            final SetOfTerm indexConstr = (SetOfTerm)it.next();
+            final SetOf<Term> indexConstr = (SetOfTerm)it.next();
             // System.out.println("Term asfasfdagsfdasgfdsdf "+pv);
             indexConstrColumns[ i ] = new IndexConstraintLabel((SymbolicArrayObject)so,indexConstr,exclude(indexConstr, cut),sos);
             indexConstrColumns[ i ].setTextAlignment(PositionConstants.CENTER);
@@ -191,13 +191,13 @@ public class ArrayObjectFigure extends ObjectFigure {
             this.setLayoutManager(layout);
 
 
-            text = VisualDebugger.getVisualDebugger().prettyPrint(SLListOfTerm.EMPTY_LIST.append(index),sos,so);
+            text = VisualDebugger.getVisualDebugger().prettyPrint(ImmSLList.<Term>nil().append(index),sos,so);
             final Label l= new Label(text);
             l.setLabelAlignment(PositionConstants.CENTER);
             this.add(l);
             l.setBorder(new LineBorder(ColorConstants.black));
             if (so.getAllPostIndex().contains(index)){
-                this.add(new Label(" := "+VisualDebugger.getVisualDebugger().prettyPrint(SLListOfTerm.EMPTY_LIST.append(so.getValueTermForIndex(index)),sos,so)));
+                this.add(new Label(" := "+VisualDebugger.getVisualDebugger().prettyPrint(ImmSLList.<Term>nil().append(so.getValueTermForIndex(index)),sos,so)));
             }
 
 
@@ -240,10 +240,10 @@ public class ArrayObjectFigure extends ObjectFigure {
 
     public class IndexConstraintLabel extends Label{
         private final SymbolicArrayObject so;
-        private final SetOfTerm con;
+        private final SetOf<Term> con;
         private boolean selected=false;
 
-        public IndexConstraintLabel(SymbolicArrayObject so, SetOfTerm index,SetOfTerm index2,LinkedList sos){
+        public IndexConstraintLabel(SymbolicArrayObject so, SetOf<Term> index,SetOf<Term> index2,LinkedList sos){
             super();           
             this.so = so ;
             this.con = index;
@@ -253,7 +253,7 @@ public class ArrayObjectFigure extends ObjectFigure {
             setFont( Display.getCurrent().getSystemFont() );
         }
 
-        public SetOfTerm getIndexConstraints() {
+        public SetOf<Term> getIndexConstraints() {
             return con;
         }
 

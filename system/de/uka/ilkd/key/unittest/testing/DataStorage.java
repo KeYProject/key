@@ -10,12 +10,12 @@ package de.uka.ilkd.key.unittest.testing;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.SetOfProgramMethod;
-import de.uka.ilkd.key.logic.op.SetOfProgramVariable;
 import de.uka.ilkd.key.unittest.ModelGenerator;
 import de.uka.ilkd.key.unittest.TestGenerator;
 import de.uka.ilkd.key.visualization.ExecutionTraceModel;
@@ -30,7 +30,7 @@ import de.uka.ilkd.key.visualization.ExecutionTraceModel;
  */
 public class DataStorage {
 
-    private SetOfProgramMethod pms;
+    private ImmutableSet<ProgramMethod> pms;
 
     private final LinkedList<ExecutionTraceModel[]> allETM = new LinkedList<ExecutionTraceModel[]>();
 
@@ -42,7 +42,7 @@ public class DataStorage {
 
     private LinkedList<ModelGenerator> mgs;
 
-    private SetOfProgramVariable pvs;
+    private ImmutableSet<ProgramVariable> pvs;
 
     private TestGenerator tg;
 
@@ -52,11 +52,11 @@ public class DataStorage {
 
     private final ArrayList<Expression[][]> testLoc = new ArrayList<Expression[][]>();
 
-    public SetOfProgramMethod getPms() {
+    public ImmutableSet<ProgramMethod> getPms() {
 	return pms;
     }
 
-    public void setPms(SetOfProgramMethod pms) {
+    public void setPms(ImmutableSet<ProgramMethod> pms) {
 	this.pms = pms;
     }
 
@@ -100,11 +100,11 @@ public class DataStorage {
 	this.mgs = mgs;
     }
 
-    public SetOfProgramVariable getPvs() {
+    public ImmutableSet<ProgramVariable> getPvs() {
 	return pvs;
     }
 
-    public void setPvs(SetOfProgramVariable pvs) {
+    public void setPvs(ImmutableSet<ProgramVariable> pvs) {
 	this.pvs = pvs;
     }
 

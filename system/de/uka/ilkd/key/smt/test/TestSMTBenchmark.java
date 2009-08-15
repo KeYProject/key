@@ -10,15 +10,14 @@
 
 package de.uka.ilkd.key.smt.test;
 
-import junit.framework.Assert;
-import junit.framework.TestCase;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.ArrayList;
 
-
+import junit.framework.Assert;
+import junit.framework.TestCase;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.smt.*;

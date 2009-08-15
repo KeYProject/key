@@ -17,41 +17,24 @@
 
 package de.uka.ilkd.key.speclang.dl.translation;
 
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import de.uka.ilkd.key.java.ArrayOfExpression;
+import de.uka.ilkd.key.collection.ImmutableArray;
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.statement.CatchAllStatement;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
-import de.uka.ilkd.key.logic.BasicLocationDescriptor;
-import de.uka.ilkd.key.logic.IteratorOfLocationDescriptor;
-import de.uka.ilkd.key.logic.LocationDescriptor;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.SetOfLocationDescriptor;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.op.AttributeOp;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.ListOfParsableVariable;
-import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.Op;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.ParsableVariable;
-import de.uka.ilkd.key.logic.op.ProgramMethod;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.SLListOfParsableVariable;
+import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.init.ProofInputException;
-import de.uka.ilkd.key.speclang.ClassInvariant;
-import de.uka.ilkd.key.speclang.ClassInvariantImpl;
-import de.uka.ilkd.key.speclang.FormulaWithAxioms;
-import de.uka.ilkd.key.speclang.OperationContract;
-import de.uka.ilkd.key.speclang.OperationContractImpl;
-import de.uka.ilkd.key.speclang.SignatureVariablesFactory;
+import de.uka.ilkd.key.speclang.*;
 
 
 /**
@@ -111,12 +94,12 @@ public class DLSpecFactory {
     }
     
     
-    private ListOfParsableVariable extractParamVars(MethodBodyStatement mbs) {
-        ArrayOfExpression args = mbs.getArguments();
+    private ImmutableList<ParsableVariable> extractParamVars(MethodBodyStatement mbs) {
+        ImmutableArray<Expression> args = mbs.getArguments();
         
-        ListOfParsableVariable result = SLListOfParsableVariable.EMPTY_LIST;
+        ImmutableList<ParsableVariable> result = ImmutableSLList.<ParsableVariable>nil();
         for(int i = args.size() - 1; i >= 0; i--) {
-            result = result.prepend((ProgramVariable) args.getExpression(i));
+            result = result.prepend((ProgramVariable) args.get(i));
         }
         
         return result;
@@ -229,7 +212,7 @@ public class DLSpecFactory {
                                             String name, 
                                             String displayName, 
                                             Term fma, 
-                                            SetOfLocationDescriptor modifies) 
+                                            ImmutableSet<LocationDescriptor> modifies) 
             throws ProofInputException {
         assert name != null;
         if(displayName == null) {
@@ -250,7 +233,7 @@ public class DLSpecFactory {
         FormulaWithAxioms pre            = extractPre(fma);
         FormulaWithAxioms post           = extractPost(fma);
         ParsableVariable selfVar         = extractSelfVar(mbs);
-        ListOfParsableVariable paramVars = extractParamVars(mbs);
+        ImmutableList<ParsableVariable> paramVars = extractParamVars(mbs);
         ParsableVariable resultVar       = extractResultVar(mbs);
         ParsableVariable excVar          = extractExcVar(fma);
         Map<Operator, Function> atPreFunctions = extractAtPreFunctions(post.getFormula());
@@ -264,7 +247,7 @@ public class DLSpecFactory {
         }
         
         //atPre-functions may not occur in modifier set
-        IteratorOfLocationDescriptor it = modifies.iterator();
+        Iterator<LocationDescriptor> it = modifies.iterator();
         while(it.hasNext()) {
             LocationDescriptor loc = it.next();
             if(loc instanceof BasicLocationDescriptor) {

@@ -7,10 +7,10 @@
 // See LICENSE.TXT for details.
 package de.uka.ilkd.key.unittest;
 
-import de.uka.ilkd.key.java.expression.literal.*;
-import de.uka.ilkd.key.java.*;
+import java.util.Iterator;
 
-import java.util.*;
+import de.uka.ilkd.key.java.Expression;
+import de.uka.ilkd.key.java.expression.literal.IntLiteral;
 
 public class IntValueContainer extends ValueContainer{
 

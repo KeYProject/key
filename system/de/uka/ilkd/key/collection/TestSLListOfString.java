@@ -9,6 +9,9 @@
 //
 
 package de.uka.ilkd.key.collection;
+
+import java.util.Iterator;
+
 /** tests non-destructive list implementation with String */
 
 public class TestSLListOfString extends junit.framework.TestCase {
@@ -19,43 +22,41 @@ public class TestSLListOfString extends junit.framework.TestCase {
 	super(name);
     }
 
-    ListOfString a;   // "A" "B" "C"
-    ListOfString a1;  // "A" "B" "C"
-    ListOfString b;   // "A" "B"
-    ListOfString c;   // "A" "B" "C" "D"
-    ListOfString d;   // "A" "B" "A"
-    ListOfString e;   // "A" "B" null
-    ListOfString e1;   // "A" "B" null
+    ImmutableList<String> a;   // "A" "B" "C"
+    ImmutableList<String> a1;  // "A" "B" "C"
+    ImmutableList<String> b;   // "A" "B"
+    ImmutableList<String> c;   // "A" "B" "C" "D"
+    ImmutableList<String> d;   // "A" "B" "A"
+    ImmutableList<String> e;   // "A" "B" null
+    ImmutableList<String> e1;   // "A" "B" null
 
 
     public void setUp() {
-	a = SLListOfString.EMPTY_LIST
+	a = ImmutableSLList.<String>nil().prepend("C").prepend("B").prepend("A");
+	a1 = ImmutableSLList.<String>nil()
 	    .prepend("C").prepend("B").prepend("A");
-	a1 = SLListOfString.EMPTY_LIST
-	    .prepend("C").prepend("B").prepend("A");
-	b = SLListOfString.EMPTY_LIST
+	b = ImmutableSLList.<String>nil()
 	    .prepend("B").prepend("A");
-	c = SLListOfString.EMPTY_LIST
+	c = ImmutableSLList.<String>nil()
 	    .prepend("D").prepend("C").prepend("B").prepend("A");
-	d = SLListOfString.EMPTY_LIST
+	d = ImmutableSLList.<String>nil()
 	    .prepend("A").prepend("B").prepend("A");
-	e = SLListOfString.EMPTY_LIST
+	e = ImmutableSLList.<String>nil()
 	    .prepend((String)null).prepend("B").prepend("A");
-	e1 = SLListOfString.EMPTY_LIST
-	    .prepend((String)null).prepend("B").prepend("A");
+	e1 = ImmutableSLList.<String>nil().prepend((String)null).prepend("B").prepend("A");
     }
 
     // tests prepend and implicitly iterator, size 
     public void testPrepend() {
-	ListOfString[] newList=new ListOfString[str.length+1];
-	newList[0]=SLListOfString.EMPTY_LIST;
-	
+	ImmutableList<String>[] newList = new ImmutableList[str.length+1];
+	newList[0] = ImmutableSLList.nil();
+
 	for (int i=1;i<str.length+1;i++) {
 	    newList[i]=newList[i-1].prepend(str[i-1]);	    
 	}
 	// Test elements in list
 	for (int i=0;i<str.length+1;i++) {
-	    IteratorOfString it=newList[i].iterator();
+	    Iterator<String> it=newList[i].iterator();
 	    int size=newList[i].size();
 	    if (i>0) { // list should have elements 
 		assertTrue(it.hasNext());
@@ -73,7 +74,7 @@ public class TestSLListOfString extends junit.framework.TestCase {
 	    assertTrue(nr==size);
 	}
 	// prepend two lists
-	ListOfString prepList=newList[1].prepend(newList[2]);
+	ImmutableList<String> prepList=newList[1].prepend(newList[2]);
 	assertTrue(prepList.size()==3);
 	// right order
 	assertEquals(str[1],prepList.head());
@@ -83,15 +84,15 @@ public class TestSLListOfString extends junit.framework.TestCase {
 
     // tests append and implicitly iterator, size 
     public void testAppend() {
-	ListOfString[] newList=new ListOfString[str.length+1];
-	newList[0]=SLListOfString.EMPTY_LIST;
-	
+	ImmutableList<String>[] newList=new ImmutableList[str.length+1];
+	newList[0]=ImmutableSLList.nil();
+
 	for (int i=1;i<str.length+1;i++) {
 	    newList[i]=newList[i-1].append(str[i-1]);	    
 	}
 	// Test elements in list
 	for (int i=0;i<str.length+1;i++) {	    
-	    IteratorOfString it=newList[i].iterator();
+	    Iterator<String> it=newList[i].iterator();
 	    int size=newList[i].size();
 	    if (i>0) { // list should have elements 
 		assertTrue(it.hasNext());
@@ -110,7 +111,7 @@ public class TestSLListOfString extends junit.framework.TestCase {
 	}
 
 	// append two lists
-	ListOfString appList=newList[2].append(newList[1]);
+	ImmutableList<String> appList=newList[2].append(newList[1]);
 	assertTrue(appList.size()==3);
 	// right order
 	assertEquals(str[0],appList.head());
@@ -120,8 +121,8 @@ public class TestSLListOfString extends junit.framework.TestCase {
 
     // tests tail,head
     public void testHeadTail() {
-	ListOfString[] newList=new ListOfString[str.length+1];
-	newList[0]=SLListOfString.EMPTY_LIST;	
+	ImmutableList<String>[] newList=new ImmutableList[str.length+1];
+	newList[0]=ImmutableSLList.<String>nil();
 
 	for (int i=1;i<str.length+1;i++) {
 	    newList[i]=newList[i-1].prepend(str[i-1]);	    
@@ -135,7 +136,7 @@ public class TestSLListOfString extends junit.framework.TestCase {
 
    // tests contains
     public void testContains() {
-	ListOfString newList=SLListOfString.EMPTY_LIST;	
+	ImmutableList<String> newList=ImmutableSLList.<String>nil();
 
 	for (int i=1;i<str.length+1;i++) {
 	    newList=newList.append(str[i-1]);	    
@@ -149,7 +150,7 @@ public class TestSLListOfString extends junit.framework.TestCase {
 
   // tests removeAll
     public void testRemoveAll() {
-	ListOfString newList=SLListOfString.EMPTY_LIST;	
+	ImmutableList<String> newList=ImmutableSLList.<String>nil();
 
 	newList=newList.append(str[0]);
 	for (int i=1;i<str.length+1;i++) {
@@ -162,8 +163,8 @@ public class TestSLListOfString extends junit.framework.TestCase {
     }   
 
     public void testRemoveFirst() {
-	ListOfString newList=SLListOfString.EMPTY_LIST;	
-	
+	ImmutableList<String> newList=ImmutableSLList.<String>nil();
+
 	newList=newList.prepend(str[0]);
 	for (int i=1;i<str.length+1;i++) {
 	    newList=newList.prepend(str[i-1]);	    
@@ -195,7 +196,7 @@ public class TestSLListOfString extends junit.framework.TestCase {
     
 
     public void testToString() {
-	ListOfString newList=SLListOfString.EMPTY_LIST;	
+	ImmutableList<String> newList=ImmutableSLList.<String>nil();
 	for (int i=0;i<str.length;i++) {
 	    newList=newList.append(str[i]);	    
 	}	
@@ -205,7 +206,7 @@ public class TestSLListOfString extends junit.framework.TestCase {
 
     public static void performanceTest(int n) {
 	System.out.println("Performance Test for " + n + " elements");
-	ListOfString newList=SLListOfString.EMPTY_LIST;	
+	ImmutableList<String> newList=ImmutableSLList.<String>nil();
 	System.out.println("Create list with prepend.");
 	long start = System.currentTimeMillis();
 	for (int i = 0; i<n; i++) {
@@ -232,7 +233,7 @@ public class TestSLListOfString extends junit.framework.TestCase {
 
 
     public static void main(String[] args) {
-	ListOfString newList=SLListOfString.EMPTY_LIST;	
+	ImmutableList<String> newList=ImmutableSLList.<String>nil();
 	newList.prepend("a");
 	
  	performanceTest(10);

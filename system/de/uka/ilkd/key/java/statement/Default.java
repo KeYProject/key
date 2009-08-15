@@ -11,7 +11,7 @@
 
 package de.uka.ilkd.key.java.statement;
 
-import de.uka.ilkd.key.java.ArrayOfStatement;
+import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Statement;
@@ -26,7 +26,7 @@ public class Default extends BranchImp {
     /**
      *      Body.
      */
-    protected final ArrayOfStatement body;
+    protected final ImmutableArray<Statement> body;
 
     /**
      *      Default.
@@ -41,7 +41,7 @@ public class Default extends BranchImp {
      */
 
     public Default(Statement[] body) {
-	this.body=new ArrayOfStatement(body);
+	this.body=new ImmutableArray<Statement>(body);
     }
 
    /**
@@ -52,7 +52,7 @@ public class Default extends BranchImp {
     */ 
     public Default(ExtList children) {
 	super(children);
-	this.body=new ArrayOfStatement((Statement[])
+	this.body=new ImmutableArray<Statement>((Statement[])
 				       children.collect(Statement.class)); 
     }
 
@@ -79,7 +79,7 @@ public class Default extends BranchImp {
         if (body != null) {
             len = body.size();
             if (len > index) {
-                return body.getStatement(index);
+                return body.get(index);
             }
             index -= len;
         }
@@ -104,7 +104,7 @@ public class Default extends BranchImp {
     */
     public Statement getStatementAt(int index) {
         if (body != null) {
-            return body.getStatement(index);
+            return body.get(index);
         }
         throw new ArrayIndexOutOfBoundsException();
     }
@@ -113,7 +113,7 @@ public class Default extends BranchImp {
      *      The body may be empty (null), to define a fall-through.
      *      Attaching an {@link EmptyStatement} would create a single ";".
      */
-    public ArrayOfStatement getBody() {
+    public ImmutableArray<Statement> getBody() {
         return body;
     }
 

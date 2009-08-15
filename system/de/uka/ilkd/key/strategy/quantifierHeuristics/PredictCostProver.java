@@ -21,10 +21,9 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.IteratorOfTerm;
-import de.uka.ilkd.key.logic.SetAsListOfTerm;
-import de.uka.ilkd.key.logic.SetOfTerm;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Op;
@@ -39,77 +38,66 @@ class PredictCostProver {
 
 	private final static Term trueT = tb.tt(), falseT = tb.ff();
 
-	/**assume that all literal in <code>assertLiterals</code> are true*/
-	private SetOfTerm assertLiterals = SetAsListOfTerm.EMPTY_SET;
+    /** assume that all literal in <code>assertLiterals</code> are true */
+    private ImmutableSet<Term> assertLiterals;
+    
+    /** clauses from <code>instance</code> of CNF */
+    private Set<Clause> clauses = new HashSet<Clause>();
 
-	/**clauses from <code>instance</code> of CNF*/
-	private Set<Clause> clauses = new HashSet<Clause>();
+    private final Services services;
 
-	private Services services;
+    private PredictCostProver(Term instance, ImmutableSet<Term> assertList,
+	    Services services) {
+	this.assertLiterals = assertList;
+	this.services = services;
+	initClauses(instance);
+    }
 
-	private PredictCostProver(Term instance, SetOfTerm assertList, 
-                Services services) {
-		this.assertLiterals = this.assertLiterals.union(assertList);
-		this.services = services;
-                initClauses(instance);
+    public static long computerInstanceCost(Substitution sub, Term matrix,
+	    ImmutableSet<Term> assertList, Services services) {
+
+	final PredictCostProver prover = new PredictCostProver(sub
+		.applyWithoutCasts(matrix), assertList, services);
+	return prover.cost();
+    }
+
+    // init context
+    private void initClauses(Term instance) {
+	for (Term t : TriggerUtils.setByOperator(instance, Op.AND)) {
+	    // clauses.add(new Clause(literals));
+	    for (ImmutableSet<Term> lit : createClause(TriggerUtils.setByOperator(t, Op.OR).iterator())) {
+		clauses.add(new Clause(lit));
+	    }
 	}
+	}		
 
-	public static long computerInstanceCost(Substitution sub,
-	        Term matrix,
-	        SetOfTerm assertList, Services services) {
-        
-        
-		final PredictCostProver prover = 
-			new PredictCostProver ( sub.applyWithoutCasts(matrix), 
-			        assertList, services );
-		return prover.cost();
-	}
+    private Set<ImmutableSet<Term>> createClause(Iterator<Term> terms) {
+	Set<ImmutableSet<Term>> res = new HashSet<ImmutableSet<Term>>();
 
-	//init context 
-	private void initClauses(Term instance) {
-		IteratorOfTerm it = TriggerUtils.iteratorByOperator(instance, Op.AND);
-		while (it.hasNext()) {
-			SetOfTerm literals = TriggerUtils.setByOperator(it.next(),Op.OR);
-			//clauses.add(new Clause(literals));
-			Iterator<SetOfTerm> lit = createClause(literals.toArray(), 0).iterator();
-			while (lit.hasNext()) {
-			  clauses.add(new Clause(lit.next()));
-			}
+	if (terms.hasNext()) {
+	    final Term self = terms.next();	    
+	    final Set<ImmutableSet<Term>> next = createClause(terms);
+
+	    if (next.isEmpty()) {
+		createClauseHelper(res, self,  DefaultImmutableSet.<Term>nil());
+	    } else {
+		for(ImmutableSet<Term> ts : next) {
+		    createClauseHelper(res, self, ts);
 		}
+	    }
 	}
+	return res;
+    }
 
-	private Set<SetOfTerm> createClause(Term[] terms, int i) {
-		Set<SetOfTerm> res = new HashSet<SetOfTerm>();
-		if (i >= terms.length)
-			return res;
-		Term self = terms[i];
-		boolean ifthen = terms[i].op() == Op.IF_EX_THEN_ELSE;
-		Set<SetOfTerm> next = createClause(terms, i+1);
-		if(next.size()==0){
-		     if(ifthen){res.add(SetAsListOfTerm.EMPTY_SET
-				.add(tb.not(self.sub(0))).add(self.sub(1)));
-		                 res.add(SetAsListOfTerm.EMPTY_SET
-                                .add(self.sub(0)).add(self.sub(2)));
-		     }
-		     else res.add(SetAsListOfTerm.EMPTY_SET.add(self));
-		}
-		else {
-			Iterator<SetOfTerm>  it = next.iterator();
-			while (it.hasNext()) {
-				SetOfTerm ts = it.next();
-				if (ifthen) {
-					res.add(ts.add(tb.not(self.sub(0)))
-							    .add(self.sub(1)));
-					res.add(ts.add(self.sub(0))
-							.add(self.sub(2)));
-				}
-				else {
-					res.add(ts.add(self));
-				}
-			}
-		}
-		return res;
+    private void createClauseHelper(Set<ImmutableSet<Term>> res, Term self,
+	    ImmutableSet<Term> ts) {
+	if (self.op() == Op.IF_EX_THEN_ELSE) {
+	    res.add(ts.add(tb.not(self.sub(0))).add(self.sub(1)));
+	    res.add(ts.add(self.sub(0)).add(self.sub(2)));
+	} else {
+	    res.add(ts.add(self));
 	}
+    }
 
 	//end 
 	
@@ -222,7 +210,7 @@ class PredictCostProver {
 	 *         <code> falseT</code> if false, and <code>atom</code> if it
 	 *         cann't be proved.
 	 */
-	private Term proveLiteral(Term problem, SetOfTerm assertLits) {
+	private Term proveLiteral(Term problem, Iterable<? extends Term> assertLits) {
 		Term res;
 /*		res = provedFromCache(problem, cache);
 		if (res.equals(trueT) || res.equals(falseT)) {
@@ -233,7 +221,7 @@ class PredictCostProver {
 //			addToCache(problem,res,cache);
 			return res;
 		}
-		final IteratorOfTerm it = assertLits.iterator();
+		final Iterator<? extends Term> it = assertLits.iterator();
 		while (it.hasNext()) {
 			Term t = it.next();
 			res = provedByAnother(problem, t);
@@ -254,50 +242,59 @@ class PredictCostProver {
 		return firstRefine();
 	}
 
-	/**refine every clause, by assume assertList are true and
-	 * if a clause's cost is 0 which means it is refined to false, then
-	 * cost 0 returned. If every clause's cost is -1 which means every clause
-	 * is refined to true, cost -1 returned. Otherwise, multiply of every 
-	 * cost is return. Beside, if a clause is refined to a situation that 
-	 * only one literal is left, the literal will be add to assertLiterals.      
-	 */
-	private long firstRefine() {
+	   /**
+	     * refine every clause, by assume assertList are true and if a clause's cost
+	     * is 0 which means it is refined to false, then cost 0 returned. If every
+	     * clause's cost is -1 which means every clause is refined to true, cost -1
+	     * returned. Otherwise, multiply of every cost is return. Beside, if a
+	     * clause is refined to a situation that only one literal is left, the
+	     * literal will be add to assertLiterals.
+	     */
+	    private long firstRefine() {
 		long cost = 1;
 		boolean assertChanged = false;
 		Set<Clause> res = new HashSet<Clause>();
 		Iterator<Clause> it = clauses.iterator();
 		while (it.hasNext()) {
-			Clause c = (it.next());
-			c.firstRefine();
-			long cCost = c.cost();
-			if (cCost == 0) {cost = 0;res.clear();break;}
-			if (cCost == -1) {continue;}
-			if (c.literals.size() == 1) {
-				assertChanged = true;
-				assertLiterals = assertLiterals.union(c.literals);
-			} 
-			else res.add(c);
-			cost = cost * cCost;
+		    Clause c = (it.next());
+		    c.firstRefine();
+		    long cCost = c.cost();
+		    if (cCost == 0) {
+			cost = 0;
+			res.clear();
+			break;
+		    }
+		    if (cCost == -1) {
+			continue;
+		    }
+		    if (c.literals.size() == 1) {
+			assertChanged = true;
+			assertLiterals = assertLiterals.union(c.literals);
+		    } else
+			res.add(c);
+		    cost = cost * cCost;
 		}
 		clauses = res;
-		if(cost==0)return 0;
-		if (res.size() == 0 && !assertChanged)return -1;
+		if (cost == 0)
+		    return 0;
+		if (res.isEmpty() && !assertChanged)
+		    return -1;
 		return cost;
-	}
+	    }
 
 	/** A sat() procedure with back searching */
-/*    private long secondRefineX(SetOfTerm assertLits, Map cache, Object[] cls,
+/*    private long secondRefineX(SetOf<Term> assertLits, Map cache, Object[] cls,
                               int index) {
         long cost = 1;
         for ( int i = index; i < cls.length; i++ ) {
             Clause c = (Clause)cls[i];
-            final SetOfTerm ls = c.refine ( assertLits, cache );
+            final SetOf<Term> ls = c.refine ( assertLits, cache );
             if ( ls.contains ( falseT ) ) return 0;
             if ( ls.contains ( trueT ) )
                 return secondRefine ( assertLits, cache, cls, i + 1 );
-            final IteratorOfTerm it = ls.iterator ();
+            final Iterator<Term> it = ls.iterator ();
             while ( it.hasNext () ) {
-                SetOfTerm nextLits = SetAsListOfTerm.EMPTY_SET.union ( assertLits );
+                SetOf<Term> nextLits = SetAsListOf.<Term>nil().union ( assertLits );
                 nextLits = nextLits.add ( it.next () );
                 final Map nextCache = new HashMap ();
                 nextCache.putAll ( cache );
@@ -309,100 +306,117 @@ class PredictCostProver {
         return cost;
     } */
 
-	private class Clause {
 
-		/**all literals contains in this clause*/
-		public SetOfTerm literals = SetAsListOfTerm.EMPTY_SET;
+	    /*
+	     * private long secondRefineX(SetOf<Term> assertLits, Map cache, Object[]
+	     * cls, int index) { long cost = 1; for ( int i = index; i < cls.length; i++
+	     * ) { Clause c = (Clause)cls[i]; final SetOf<Term> ls = c.refine (
+	     * assertLits, cache ); if ( ls.contains ( falseT ) ) return 0; if (
+	     * ls.contains ( trueT ) ) return secondRefine ( assertLits, cache, cls, i +
+	     * 1 ); final Iterator<Term> it = ls.iterator (); while ( it.hasNext () ) {
+	     * SetOf<Term> nextLits = SetAsListOf.<Term>nil().union ( assertLits );
+	     * nextLits = nextLits.add ( it.next () ); final Map nextCache = new HashMap
+	     * (); nextCache.putAll ( cache ); long nextCost = secondRefine ( nextLits,
+	     * nextCache, cls, i + 1 ); cost = cost + nextCost;
+	     * 
+	     * } } return cost; }
+	     */
 
-		public Clause(SetOfTerm lits) {
-			literals = lits;
+	    private class Clause {
+
+		/** all literals contains in this clause */
+		public ImmutableSet<Term> literals = DefaultImmutableSet.<Term> nil();
+
+		public Clause(ImmutableSet<Term> lits) {
+		    literals = lits;
 		}
 
-		public IteratorOfTerm iterator() {
-			return literals.iterator();
+		public Iterator<Term> iterator() {
+		    return literals.iterator();
 		}
 
 		/**
-		 * @return 0 if this clause is refine to false. 1 if true. 
-		 * Otherwise,return the number of literals it left.
+		 * @return 0 if this clause is refine to false. 1 if true.
+		 *         Otherwise,return the number of literals it left.
 		 */
 		public long cost() {
-			if (literals.contains(falseT) && literals.size() == 1)
-				return 0;
-			if (literals.contains(trueT))
-				return -1;
-			int cost = literals.size();
-			return cost;
+		    if (literals.contains(falseT) && literals.size() == 1)
+			return 0;
+		    if (literals.contains(trueT))
+			return -1;
+		    int cost = literals.size();
+		    return cost;
 		}
 
-		/** Refine this clause in two process, first try to refined by 
-		 * itself, @see selfRefine. Second refine this clause by assuming
-		 * assertLiteras are true*/
-		public void firstRefine() {
-		//	if (selfRefine(literals)) {
-		//		literals = SetAsListOfTerm.EMPTY_SET.add(trueT);
-		//		return;
-		//	}
-			literals = this.refine(assertLiterals);
-		}
-             
 		/**
-		 * Refine literals in this clause, but it does not change 
-		 * literlas, only return literals that can't be removed by
-		 * refining
+		 * Refine this clause in two process, first try to refined by itself, @see
+		 * selfRefine. Second refine this clause by assuming assertLiteras are
+		 * true
 		 */
-		public SetOfTerm refine(SetOfTerm assertLits) {
-			SetOfTerm res = SetAsListOfTerm.EMPTY_SET;
-			IteratorOfTerm it = this.iterator();
-			while (it.hasNext()) {
-				Term lit = it.next();
-				Term temp = proveLiteral(lit, assertLits);
-				final Operator op = temp.op();
-                if (op == Op.TRUE) {
-					res = SetAsListOfTerm.EMPTY_SET.add(trueT);
-					break;
-				}
-				if (op == Op.FALSE) {
-					continue;
-				}
-				res = res.add(lit);
-			}
-			if (res.size() == 0)
-				res = res.add(falseT);
-			return res;
+		public void firstRefine() {
+		    // if (selfRefine(literals)) {
+		    // literals = SetAsListOf.<Term>nil().add(trueT);
+		    // return;
+		    // }
+		    literals = this.refine(assertLiterals);
 		}
 
-		
-		/**This method is used for detect where a clause can be simply 
-		 * refined to to true. And it is implemented like this. Assume
-		 * that the clause contains two literals Li and Lj. If (!Li->Lj) 
-		 * which is acturally (Li|Lj), is true, and the clasue is true.
-		 * provedByAnthoer(Lj,!Li) is used to proved (!Li->Lj). Some 
-		 * examples are (!a|a) which is (!!a->a) and (a>=1|a<=0) which is
-		 * !a>=1->a<=0      
+		/**
+		 * Refine literals in this clause, but it does not change literlas, only
+		 * return literals that can't be removed by refining
 		 */
-		public boolean selfRefine(SetOfTerm lits) {
-			if(lits.size()<=1)return false;
-			Term[] terms = lits.toArray();
-			SetOfTerm next = lits.remove(terms[0]);
-			boolean opNot    = terms[0].op()==Op.NOT;
-			Term axiom = opNot?terms[0].sub(0): tb.not(terms[0]);
-			for(int j=1;j<terms.length ;j++){
-			     Term pro = provedByAnother(terms[j],axiom);
-			     final Operator op = pro.op();
-                 if(op == Op.TRUE)return true;
-			     if(op == Op.FALSE&&terms[0].equals(terms[j])){
-				next = next.remove(terms[j]);
-			        literals = literals.remove(terms[j]);
-			     }
+		public ImmutableSet<Term> refine(Iterable<? extends Term> assertLits) {
+		    ImmutableSet<Term> res = DefaultImmutableSet.<Term> nil();
+		    Iterator<Term> it = this.iterator();
+		    while (it.hasNext()) {
+			Term lit = it.next();
+			Term temp = proveLiteral(lit, assertLits);
+			final Operator op = temp.op();
+			if (op == Op.TRUE) {
+			    res = DefaultImmutableSet.<Term> nil().add(trueT);
+			    break;
 			}
-			return selfRefine(next);
+			if (op == Op.FALSE) {
+			    continue;
+			}
+			res = res.add(lit);
+		    }
+		    if (res.size() == 0)
+			res = res.add(falseT);
+		    return res;
 		}
-		
-		
+
+		/**
+		 * This method is used for detect where a clause can be simply refined
+		 * to to true. And it is implemented like this. Assume that the clause
+		 * contains two literals Li and Lj. If (!Li->Lj) which is acturally
+		 * (Li|Lj), is true, and the clasue is true. provedByAnthoer(Lj,!Li) is
+		 * used to proved (!Li->Lj). Some examples are (!a|a) which is (!!a->a)
+		 * and (a>=1|a<=0) which is !a>=1->a<=0
+		 */
+		public boolean selfRefine(ImmutableSet<Term> lits) {
+		    if (lits.size() <= 1)
+			return false;
+		    Term[] terms = lits.toArray(new Term[lits.size()]);
+		    ImmutableSet<Term> next = lits.remove(terms[0]);
+		    boolean opNot = terms[0].op() == Op.NOT;
+		    Term axiom = opNot ? terms[0].sub(0) : tb.not(terms[0]);
+		    for (int j = 1; j < terms.length; j++) {
+			Term pro = provedByAnother(terms[j], axiom);
+			final Operator op = pro.op();
+			if (op == Op.TRUE)
+			    return true;
+			if (op == Op.FALSE && terms[0].equals(terms[j])) {
+			    next = next.remove(terms[j]);
+			    literals = literals.remove(terms[j]);
+			}
+		    }
+		    return selfRefine(next);
+		}
+
 		public String toString() {
-			return literals.toString();
+		    return literals.toString();
 		}
-    }
+	    }
 
 }

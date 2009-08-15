@@ -23,6 +23,7 @@ import javax.swing.text.JTextComponent;
 
 import org.apache.log4j.Logger;
 
+import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.gui.DecisionProcedureSettings.RuleDescriptor;
 import de.uka.ilkd.key.gui.assistant.ProofAssistant;
 import de.uka.ilkd.key.gui.assistant.ProofAssistantAI;
@@ -3064,7 +3065,7 @@ public class Main extends JFrame implements IMain {
 	    
 	    public void proofGoalsAdded(ProofTreeEvent e) {
 	        Proof p = e.getSource();
-		ListOfGoal newGoals = e.getGoals();
+		ImmutableList<Goal> newGoals = e.getGoals();
 		// Check for a closed goal ...
 		if ((newGoals.size() == 0)&&(!p.closed())){
 		    // No new goals have been generated ...

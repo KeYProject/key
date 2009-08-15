@@ -11,6 +11,8 @@
 
 package de.uka.ilkd.key.logic.sort;
 
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.logic.Name;
 
 public class ListSort extends AbstractSort{
@@ -22,8 +24,8 @@ public class ListSort extends AbstractSort{
     /**
      * @return the sorts of the successors of this sort
      */
-    public SetOfSort extendsSorts(){
-	return SetAsListOfSort.EMPTY_SET;
+    public ImmutableSet<Sort> extendsSorts(){
+	return DefaultImmutableSet.<Sort>nil();
     }
 
 }

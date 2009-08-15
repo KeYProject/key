@@ -26,12 +26,17 @@ import java.util.LinkedList;
 import java.util.Stack;
 import java.util.Vector;
 
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.*;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.op.LogicVariable;
+import de.uka.ilkd.key.logic.op.NameSV;
+import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.parser.*;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.proof.init.*;
@@ -62,8 +67,8 @@ public class ProblemLoader implements Runnable {
     ContractWithInvs currContract = null;
     Stack stack = new Stack();
     LinkedList loadedInsts = null;
-    ListOfIfFormulaInstantiation ifFormulaList =
-        SLListOfIfFormulaInstantiation.EMPTY_LIST;
+    ImmutableList<IfFormulaInstantiation> ifFormulaList =
+        ImmutableSLList.<IfFormulaInstantiation>nil();
     Constraint matchConstraint = null;
 
 
@@ -361,7 +366,7 @@ public class ProblemLoader implements Runnable {
             currFormula   = 0;
             currPosInTerm = PosInTerm.TOP_LEVEL;
             loadedInsts   = null;
-            ifFormulaList = SLListOfIfFormulaInstantiation.EMPTY_LIST;
+            ifFormulaList = ImmutableSLList.<IfFormulaInstantiation>nil();
             matchConstraint = Constraint.BOTTOM;
             break;
 
@@ -450,7 +455,7 @@ public class ProblemLoader implements Runnable {
             break;
         case 'w' : //newnames
             final String[] newNames = s.split(",");
-            ListOfName l = SLListOfName.EMPTY_LIST;
+            ImmutableList<Name> l = ImmutableSLList.<Name>nil();
             for (int in = 0; in < newNames.length; in++) {
                 l = l.append(new Name(newNames[in]));
             }
@@ -536,7 +541,7 @@ public class ProblemLoader implements Runnable {
             return ourApp;
         }
 
-        final SetOfRuleApp ruleApps =
+        final ImmutableSet<RuleApp> ruleApps =
             mediator.getBuiltInRuleApplications(currTacletName, pos);
 
         if (ruleApps.size() != 1) {
@@ -639,8 +644,8 @@ public class ProblemLoader implements Runnable {
         } else if ( sv.isSkolemTermSV() ) {
 	    result = app.createSkolemConstant ( value, sv, true, services );
         } else if (sv.isListSV()) {
-            SetOfLocationDescriptor s = parseLocationList(value, targetGoal);
-            result = app.addInstantiation(sv, Array.reverse(s.toArray()), true);
+            ImmutableSet<LocationDescriptor> s = parseLocationList(value, targetGoal);
+            result = app.addInstantiation(sv, Array.reverse(s.toArray(new LocationDescriptor[s.size()])), true);
         } else {
             Namespace varNS = p.getNamespaces().variables();
 	    varNS = app.extendVarNamespaceForSV(varNS, sv);
@@ -656,7 +661,7 @@ public class ProblemLoader implements Runnable {
 
     private TacletApp constructInsts(TacletApp app, Services services) {
         if (loadedInsts == null) return app;
-        SetOfSchemaVariable uninsts = app.uninstantiatedVars();
+        ImmutableSet<SchemaVariable> uninsts = app.uninstantiatedVars();
 
         // first pass: add variables
         Iterator it = loadedInsts.iterator();
@@ -741,8 +746,8 @@ public class ProblemLoader implements Runnable {
         }
     }
 
-    public static SetOfLocationDescriptor parseLocationList(String value, Goal targetGoal) {
-        SetOfLocationDescriptor result = null;
+    public static ImmutableSet<LocationDescriptor> parseLocationList(String value, Goal targetGoal) {
+        ImmutableSet<LocationDescriptor> result = null;
         Proof p = targetGoal.proof();
         Namespace varNS = p.getNamespaces().variables();
         NamespaceSet nss = new NamespaceSet(
@@ -775,8 +780,8 @@ public class ProblemLoader implements Runnable {
     }
 
 
-    private SchemaVariable lookupName(SetOfSchemaVariable set, String name) {
-        IteratorOfSchemaVariable it = set.iterator();
+    private SchemaVariable lookupName(ImmutableSet<SchemaVariable> set, String name) {
+        Iterator<SchemaVariable> it = set.iterator();
         while (it.hasNext()) {
             SchemaVariable v = it.next();
             if (v.name().toString().equals(name)) return v;

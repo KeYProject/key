@@ -7,17 +7,30 @@
 // See LICENSE.TXT for details.
 package de.uka.ilkd.key.unittest;
 
-import de.uka.ilkd.key.java.*;
+import java.util.*;
+
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.java.Position;
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.Statement;
+import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.reference.PackageReference;
 import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.visitor.JavaASTCollector;
-import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.proof.*;
+import de.uka.ilkd.key.logic.Constraint;
+import de.uka.ilkd.key.logic.Namespace;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.ProgramMethod;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.unittest.testing.DataStorage;
-import de.uka.ilkd.key.visualization.*;
-
-import java.util.*;
+import de.uka.ilkd.key.visualization.ExecutionTraceModel;
+import de.uka.ilkd.key.visualization.ProofVisualization;
+import de.uka.ilkd.key.visualization.TraceElement;
+import de.uka.ilkd.key.visualization.VisualizationStrategyForTesting;
 
 /**
  * Generates a unittest from a proof or a node in a proof-tree.
@@ -79,9 +92,9 @@ public class UnitTestBuilder {
      * Returns the program methods that are symbolically executed in the
      * implementation under test <code>p</code>.
      */
-    public SetOfProgramMethod getProgramMethods(Proof p) {
+    public ImmutableSet<ProgramMethod> getProgramMethods(Proof p) {
 	Iterator<Node> it = p.root().leavesIterator();
-	SetOfProgramMethod result = SetAsListOfProgramMethod.EMPTY_SET;
+	ImmutableSet<ProgramMethod> result = DefaultImmutableSet.<ProgramMethod>nil();
 	while (it.hasNext()) {
 	    Node n = it.next();
 	    ExecutionTraceModel[] tr = getTraces(n);
@@ -90,9 +103,9 @@ public class UnitTestBuilder {
 	return result;
     }
 
-    private SetOfProgramMethod getProgramMethods(ListOfNode nodes) {
-	IteratorOfNode it = nodes.iterator();
-	SetOfProgramMethod result = SetAsListOfProgramMethod.EMPTY_SET;
+    private ImmutableSet<ProgramMethod> getProgramMethods(ImmutableList<Node> nodes) {
+	Iterator<Node> it = nodes.iterator();
+	ImmutableSet<ProgramMethod> result = DefaultImmutableSet.<ProgramMethod>nil();
 	while (it.hasNext()) {
 	    Node n = it.next();
 	    ExecutionTraceModel[] tr = getTraces(n);
@@ -127,7 +140,7 @@ public class UnitTestBuilder {
      * methods in pms. Only execution traces on branches that end with one of
      * the nodes iterated by <code>it</code> are considered.
      */
-    private String createTestForNodes(Iterator<Node> it, SetOfProgramMethod pms) {
+    private String createTestForNodes(Iterator<Node> it, ImmutableSet<ProgramMethod> pms) {
 	TestGenerator tg = null;
 	String methodName = null;
 	Statement[] code = null;
@@ -142,7 +155,7 @@ public class UnitTestBuilder {
 
 	HashSet<Node> nodesAlreadyProcessed = new HashSet<Node>();
 
-	SetOfProgramVariable pvs = null;
+	ImmutableSet<ProgramVariable> pvs = null;
 
 	// the statements occuring in the considered execution traces
 	HashSet<Position> statements = new HashSet<Position>();
@@ -250,7 +263,7 @@ public class UnitTestBuilder {
 	}
 	if (methodName == null) {
 	    String pmsStr = "";
-	    IteratorOfProgramMethod pmIt = pms.iterator();
+	    Iterator<ProgramMethod> pmIt = pms.iterator();
 	    while (pmIt.hasNext()) {
 		ProgramMethod pm = pmIt.next();
 		pmsStr += pm.getName() + "\n";
@@ -293,8 +306,8 @@ public class UnitTestBuilder {
 		getProgramMethods(tr));
     }
 
-    public String createTestForNodes(ListOfNode l) {
-	return createTestForNodes(Arrays.asList(l.toArray()).iterator(),
+    public String createTestForNodes(ImmutableList<Node> l) {
+	return createTestForNodes(Arrays.asList(l.toArray(new Node[l.size()])).iterator(),
 		getProgramMethods(l));
     }
 
@@ -321,8 +334,8 @@ public class UnitTestBuilder {
 		&& (!requireCompleteExecution || tr.blockCompletelyExecuted());
     }
 
-    private SetOfProgramMethod getProgramMethods(ExecutionTraceModel[] traces) {
-	SetOfProgramMethod result = SetAsListOfProgramMethod.EMPTY_SET;
+    private ImmutableSet<ProgramMethod> getProgramMethods(ExecutionTraceModel[] traces) {
+	ImmutableSet<ProgramMethod> result = DefaultImmutableSet.<ProgramMethod>nil();
 	for (int i = 0; i < traces.length; i++) {
 	    if (isInteresting(traces[i])) {
 		result = result.union(traces[i].getProgramMethods(serv));
@@ -353,7 +366,7 @@ public class UnitTestBuilder {
      * executed. The testdata is derived from the leaves of <code>p</code>'s
      * proof tree.
      */
-    public String createTestForProof(Proof p, SetOfProgramMethod pms) {
+    public String createTestForProof(Proof p, ImmutableSet<ProgramMethod> pms) {
 	return createTestForNodes(p.root().leavesIterator(), pms);
     }
 

@@ -11,15 +11,15 @@
 
 package de.uka.ilkd.key.speclang.jml.pretranslation;
 
+import junit.framework.TestCase;
+import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
-
-import junit.framework.TestCase;
 
 
 public class TestJMLPreTranslator extends TestCase {
     
-    private ListOfTextualJMLConstruct parseMethodSpec(String ms) 
+    private ImmutableList<TextualJMLConstruct> parseMethodSpec(String ms) 
             throws SLTranslationException {
         KeYJMLPreParser preParser 
                 = new KeYJMLPreParser(ms, "no file", Position.UNDEFINED);
@@ -28,7 +28,7 @@ public class TestJMLPreTranslator extends TestCase {
 
     
     public void testSimpleSpec() throws SLTranslationException {
-        ListOfTextualJMLConstruct constructs
+        ImmutableList<TextualJMLConstruct> constructs
             = parseMethodSpec(  "/*@ normal_behavior\n"
                               + "     requires true;\n"
                               + "  */");
@@ -50,7 +50,7 @@ public class TestJMLPreTranslator extends TestCase {
     
 
     public void testComplexSpec() throws SLTranslationException {
-        ListOfTextualJMLConstruct constructs
+        ImmutableList<TextualJMLConstruct> constructs
             = parseMethodSpec(  "/*@ behaviour\n"
                               + "  @  requires true;\n"
                               + "  @  requires ((;;(;););(););\n" 
@@ -79,7 +79,7 @@ public class TestJMLPreTranslator extends TestCase {
 
     
     public void testMultipleSpecs() throws SLTranslationException {
-        ListOfTextualJMLConstruct constructs 
+        ImmutableList<TextualJMLConstruct> constructs 
             = parseMethodSpec(  "//@ normal_behaviour\n"
                               + "//@  ensures false\n"
                               + "//@          || true;\n"

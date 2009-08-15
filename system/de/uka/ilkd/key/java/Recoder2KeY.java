@@ -14,23 +14,37 @@ import java.io.*;
 import java.net.URL;
 import java.util.*;
 
-import recoder.*;
-import recoder.bytecode.*;
-import recoder.convenience.*;
-import recoder.io.*;
+import recoder.ParserException;
+import recoder.ProgramFactory;
+import recoder.bytecode.ByteCodeParser;
+import recoder.bytecode.ClassFile;
+import recoder.convenience.TreeWalker;
+import recoder.io.DataFileLocation;
+import recoder.io.DataLocation;
+import recoder.io.PropertyNames;
 import recoder.java.CompilationUnit;
 import recoder.java.ProgramElement;
 import recoder.java.declaration.ClassInitializer;
 import recoder.java.declaration.MethodDeclaration;
-import recoder.list.generic.*;
+import recoder.list.generic.ASTArrayList;
+import recoder.list.generic.ASTList;
 import recoder.parser.ParseException;
-import recoder.service.*;
+import recoder.service.ChangeHistory;
+import recoder.service.CrossReferenceSourceInfo;
+import recoder.service.KeYCrossReferenceSourceInfo;
+import recoder.service.UnresolvedReferenceException;
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.abstraction.Type;
-import de.uka.ilkd.key.java.declaration.*;
+import de.uka.ilkd.key.java.declaration.FieldSpecification;
+import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.recoderext.*;
-import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.JavaBlock;
+import de.uka.ilkd.key.logic.Named;
+import de.uka.ilkd.key.logic.Namespace;
+import de.uka.ilkd.key.logic.NamespaceSet;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.util.*;
 
 /**
@@ -825,7 +839,7 @@ public class Recoder2KeY implements JavaReader {
      * @return a newly created context.
      */
 
-    protected Context createContext(ListOfProgramVariable pvs) {
+    protected Context createContext(ImmutableList<ProgramVariable> pvs) {
         return createContext(pvs, servConf.getCrossReferenceSourceInfo());
     }
 
@@ -840,7 +854,7 @@ public class Recoder2KeY implements JavaReader {
      * 
      * @return a newly created context.
      */
-    protected Context createContext(ListOfProgramVariable vars, recoder.service.CrossReferenceSourceInfo csi) {
+    protected Context createContext(ImmutableList<ProgramVariable> vars, recoder.service.CrossReferenceSourceInfo csi) {
         recoder.java.declaration.ClassDeclaration classContext = interactClassDecl();
         addProgramVariablesToClassContext(classContext, vars, csi);
         return new Context(servConf, classContext);
@@ -854,12 +868,12 @@ public class Recoder2KeY implements JavaReader {
      * @param vars
      *            vars to add
      */
-    private void addProgramVariablesToClassContext(recoder.java.declaration.ClassDeclaration classContext, ListOfProgramVariable vars,
+    private void addProgramVariablesToClassContext(recoder.java.declaration.ClassDeclaration classContext, ImmutableList<ProgramVariable> vars,
             recoder.service.CrossReferenceSourceInfo csi) {
 
         HashMap<String, recoder.java.declaration.VariableSpecification> names2var = 
             new HashMap<String, recoder.java.declaration.VariableSpecification>();
-        IteratorOfProgramVariable it = vars.iterator();
+        Iterator<ProgramVariable> it = vars.iterator();
         java.util.HashSet<String> names = new java.util.HashSet<String>();
         ASTList<recoder.java.declaration.MemberDeclaration> list = classContext.getMembers();
 
@@ -1057,8 +1071,8 @@ public class Recoder2KeY implements JavaReader {
      * @return the parsed and resolved JavaBlock
      */
     public JavaBlock readBlockWithProgramVariables(Namespace varns, String s) {
-        IteratorOfNamed it = varns.allElements().iterator();
-        ListOfProgramVariable pvs = SLListOfProgramVariable.EMPTY_LIST;
+        Iterator<Named> it = varns.allElements().iterator();
+        ImmutableList<ProgramVariable> pvs = ImmutableSLList.<ProgramVariable>nil();
         while (it.hasNext()) {
             Named n = it.next();
             if (n instanceof ProgramVariable) {

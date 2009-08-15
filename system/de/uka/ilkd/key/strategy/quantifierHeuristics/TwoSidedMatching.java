@@ -17,6 +17,12 @@
 
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
+import java.util.Iterator;
+
+import de.uka.ilkd.key.collection.ImmutableMap;
+import de.uka.ilkd.key.collection.DefaultImmutableMap;
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Constraint;
 import de.uka.ilkd.key.logic.Term;
@@ -52,12 +58,12 @@ class TwoSidedMatching {
             triggerSubstWithMVs.apply ( trigger.getTriggerTerm () );
     }
     
-    SetOfSubstitution getSubstitutions(Services services) {
+    ImmutableSet<Substitution> getSubstitutions(Services services) {
         return getAllSubstitutions ( targetWithMVs, services );
     }
     
-    private SetOfSubstitution getAllSubstitutions(Term target, Services services) {
-        SetOfSubstitution allsubs = SetAsListOfSubstitution.EMPTY_SET;
+    private ImmutableSet<Substitution> getAllSubstitutions(Term target, Services services) {
+        ImmutableSet<Substitution> allsubs = DefaultImmutableSet.<Substitution>nil();
         Substitution sub = match ( triggerWithMVs, target, services );
         if ( sub != null
              && ( trigger.isElementOfMultitrigger() || sub.isTotalOn ( trigger.getUniVariables() )
@@ -82,9 +88,9 @@ class TwoSidedMatching {
             Constraint.BOTTOM.unify ( targetTerm, triggerTerm,
                                       services );
         if ( c.isSatisfiable () ) {
-            MapFromQuantifiableVariableToTerm sub =
-                MapAsListFromQuantifiableVariableToTerm.EMPTY_MAP;
-            IteratorOfQuantifiableVariable it = trigger.getUniVariables().iterator ();
+            ImmutableMap<QuantifiableVariable,Term> sub =
+                DefaultImmutableMap.<QuantifiableVariable,Term>nilMap();
+            Iterator<QuantifiableVariable> it = trigger.getUniVariables().iterator ();
             while ( it.hasNext () ) {
                 QuantifiableVariable q = it.next ();
                 Term mv = triggerSubstWithMVs.getSubstitutedTerm ( q );

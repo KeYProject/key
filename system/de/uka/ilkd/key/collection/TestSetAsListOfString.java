@@ -9,6 +9,9 @@
 //
 
 package de.uka.ilkd.key.collection;
+
+import java.util.Iterator;
+
 /** tests non-destructive Set implementation with String */
 
 public class TestSetAsListOfString extends junit.framework.TestCase {
@@ -32,15 +35,15 @@ public class TestSetAsListOfString extends junit.framework.TestCase {
 
     // tests add and implicitly iterator, size 
     public void testAdd() {
-	SetOfString[] newSet=new SetOfString[str.length+1];
-	newSet[0]=SetAsListOfString.EMPTY_SET;
-	
+	ImmutableSet<String>[] newSet=new ImmutableSet[str.length+1];
+	newSet[0]=DefaultImmutableSet.<String>nil();
+
 	for (int i=1;i<str.length+1;i++) {
 	    newSet[i]=newSet[i-1].add(str[i-1]);	    
 	}
 	// Test elements in set
 	for (int i=0;i<str.length+1;i++) {
-	    IteratorOfString it=newSet[i].iterator();
+	    Iterator<String> it=newSet[i].iterator();
 	    int size=newSet[i].size();
 	    if (i>0) { // set should have elements 
 		assertTrue("Set has no elements, but should have some.",it.hasNext());
@@ -64,12 +67,12 @@ public class TestSetAsListOfString extends junit.framework.TestCase {
 
     // tests unify 
     public void testUnify() {
-	SetOfString[] newSet=new SetOfString[str.length+1];
-	newSet[0]=(SetAsListOfString.EMPTY_SET.add(str[0])).add(str[1]);
-	newSet[1]=SetAsListOfString.EMPTY_SET.add(str[1]).add(str[2]);	    
+	ImmutableSet<String>[] newSet=new ImmutableSet[str.length+1];
+	newSet[0]=DefaultImmutableSet.<String>nil().add(str[0]).add(str[1]);
+	newSet[1]=DefaultImmutableSet.<String>nil().add(str[1]).add(str[2]);
 	// make the union of two sets and check if in the unions
-	// appearance of str[1] == 1   
-	SetOfString union=newSet[1].union(newSet[0]);
+	// appearance of str[1] == 1
+	ImmutableSet<String> union=newSet[1].union(newSet[0]);
 	assertTrue(union.size()==3);
 	//test if set has all elements 
 	for (int i=0;i<3;i++) {	
@@ -80,20 +83,20 @@ public class TestSetAsListOfString extends junit.framework.TestCase {
     }
 
     public void testSubset() {
-	SetOfString subSet=SetAsListOfString.EMPTY_SET;
-	SetOfString superSet=SetAsListOfString.EMPTY_SET;
+	ImmutableSet<String> subSet=DefaultImmutableSet.<String>nil();
+	ImmutableSet<String> superSet=DefaultImmutableSet.<String>nil();
 	// subSet={Dies,ist}
 	// superSet={Dies,ist,ein}
 	subSet=subSet.add(str[0]).add(str[1]);
 	superSet=subSet.add(str[2]);
 	assertTrue("Failure: in subset relation (!sub<super)",subSet.subset(superSet));
 	assertTrue("Failure: in subset relation (super<sub)",!superSet.subset(subSet));
-	assertTrue("EmptySet is not part of another Set", (SetAsListOfString.EMPTY_SET).subset(superSet));
-	assertTrue("A non empty set is subset of the empty set",!subSet.subset(SetAsListOfString.EMPTY_SET));
+	assertTrue("EmptySet is not part of another Set", DefaultImmutableSet.<String>nil().subset(superSet));
+	assertTrue("A non empty set is subset of the empty set",!subSet.subset(DefaultImmutableSet.<String>nil()));
     }
 
     public void testRemove() {
-	SetOfString set=SetAsListOfString.EMPTY_SET;
+	ImmutableSet<String> set=DefaultImmutableSet.<String>nil();
 	// set={Dies,ist}
 	set=set.add(str[0]).add(str[1]);
 	assertTrue("Did not remove "+str[0]+" from list",
@@ -102,7 +105,7 @@ public class TestSetAsListOfString extends junit.framework.TestCase {
 
 
     public void testToString() {
-	SetOfString newSet=SetAsListOfString.EMPTY_SET;	
+	ImmutableSet<String> newSet=DefaultImmutableSet.<String>nil();
 	for (int i=0;i<str.length;i++) {
  	    newSet=newSet.add(str[str.length-1-i]);	    
 	}	

@@ -16,7 +16,7 @@ import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.launching.JavaRuntime;
 
-import de.uka.ilkd.key.proof.ListOfNode;
+import de.uka.ilkd.key.proof.IList;
 import de.uka.ilkd.key.unittest.ModelGenerator;
 import de.uka.ilkd.key.unittest.UnitTestBuilder;
 import de.uka.ilkd.key.visualdebugger.VisualDebugger;
@@ -24,7 +24,7 @@ import de.uka.ilkd.key.visualdebugger.VisualDebugger;
 public class VBTBuilder {
    
     VisualDebugger vd = VisualDebugger.getVisualDebugger();
-    ListOfNode nodes;
+    IList<Node> nodes;
     private boolean error=false;
     private String file=null;
     IProject testGenProject=null;
@@ -34,7 +34,7 @@ public class VBTBuilder {
     private int modelGenerator;
     
     
-    public VBTBuilder(ListOfNode nodes,int modelGenerator){
+    public VBTBuilder(IList<Node> nodes,int modelGenerator){
         this.nodes=nodes;
         this.modelGenerator=modelGenerator;
         this.createTestCase();

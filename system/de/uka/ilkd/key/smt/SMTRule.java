@@ -12,14 +12,14 @@ package de.uka.ilkd.key.smt;
 
 import java.io.IOException;
 
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Constraint;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.ListOfGoal;
-import de.uka.ilkd.key.proof.SLListOfGoal;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.util.ProgressMonitor;
@@ -61,7 +61,7 @@ public class SMTRule implements BuiltInRule, MakesProgress {
 	return pio == null;
     }
 
-    public ListOfGoal apply(Goal goal, Services services, RuleApp ruleApp) {
+    public ImmutableList<Goal> apply(Goal goal, Services services, RuleApp ruleApp) {
 	int timeout = ProofSettings.DEFAULT_SETTINGS
 	                           .getDecisionProcedureSettings()
 	                           .getTimeout()*100;
@@ -79,7 +79,7 @@ public class SMTRule implements BuiltInRule, MakesProgress {
 	    }	    
 	}
 	if (result.isValid() == SMTSolverResult.ThreeValuedTruth.TRUE) {
-	    return SLListOfGoal.EMPTY_LIST;
+	    return ImmutableSLList.<Goal>nil();
 	} else {
 	    return null;
 	}

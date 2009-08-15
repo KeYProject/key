@@ -16,15 +16,16 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.RuleAppListener;
 import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.IteratorOfProgramVariable;
 import de.uka.ilkd.key.logic.op.Metavariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.SetAsListOfProgramVariable;
-import de.uka.ilkd.key.logic.op.SetOfProgramVariable;
 import de.uka.ilkd.key.proof.incclosure.BranchRestricter;
-import de.uka.ilkd.key.proof.incclosure.IteratorOfSink;
+import de.uka.ilkd.key.proof.incclosure.Sink;
 import de.uka.ilkd.key.proof.proofevent.NodeChangeJournal;
 import de.uka.ilkd.key.proof.proofevent.RuleAppInfo;
 import de.uka.ilkd.key.rule.*;
@@ -56,7 +57,7 @@ public class Goal  {
     private RuleAppIndex ruleAppIndex;
 
     /** list of all applied rule applications at this branch */
-    private ListOfRuleApp appliedRuleApps = SLListOfRuleApp.EMPTY_LIST;
+    private ImmutableList<RuleApp> appliedRuleApps = ImmutableSLList.<RuleApp>nil();
 
     /** this object manages the tags for all formulas of the sequent */
     private FormulaTagManager tagManager;
@@ -80,7 +81,7 @@ public class Goal  {
     /** creates a new goal referencing the given node */
     private Goal( Node                    node, 
 		  RuleAppIndex            ruleAppIndex, 
-		  ListOfRuleApp           appliedRuleApps,
+		  ImmutableList<RuleApp>           appliedRuleApps,
 		  FormulaTagManager       tagManager,
 		  AutomatedRuleApplicationManager ruleAppManager ) {  
 	this.node            = node;
@@ -98,7 +99,7 @@ public class Goal  {
     public Goal (Node node, RuleAppIndex ruleAppIndex) {
         this ( node,
                ruleAppIndex,
-               SLListOfRuleApp.EMPTY_LIST,
+               ImmutableSLList.<RuleApp>nil(),
                null,
                new QueueRuleApplicationManager () );
         tagManager = new FormulaTagManager ( this );
@@ -154,13 +155,13 @@ public class Goal  {
 	return node;
     }
 
-    public SetOfProgramVariable getGlobalProgVars() {
+    public ImmutableSet<ProgramVariable> getGlobalProgVars() {
 	return node().getGlobalProgVars();
     }
     
     public Namespace createGlobalProgVarNamespace() {
         final Namespace ns = new Namespace();
-        final IteratorOfProgramVariable it = getGlobalProgVars().iterator();
+        final Iterator<ProgramVariable> it = getGlobalProgVars().iterator();
         while (it.hasNext()) {
             ns.add(it.next());
         }
@@ -202,11 +203,9 @@ public class Goal  {
 
     protected void fireGoalReplaced(Goal       goal,
 				    Node       parent,
-				    ListOfGoal newGoals) {
+				    ImmutableList<Goal> newGoals) {
 	for (int i = 0, sz = listeners.size(); i<sz; i++) {
-	    listeners.get(i).goalReplaced(goal,
-							  parent,
-							  newGoals);
+	    listeners.get(i).goalReplaced(goal, parent, newGoals);
 	}
     }
 
@@ -216,7 +215,7 @@ public class Goal  {
      */
     public Namespace getVariableNamespace(Namespace exNS) {
 	Namespace newNS = exNS;
-	final IteratorOfProgramVariable it=getGlobalProgVars().iterator();
+	final Iterator<ProgramVariable> it=getGlobalProgVars().iterator();
 	if (it.hasNext()) {
 	    newNS=newNS.extended(it.next());
 	}
@@ -226,10 +225,10 @@ public class Goal  {
 	return newNS;
     }
 
-    public void setGlobalProgVars(SetOfProgramVariable s) {
-        SetOfProgramVariable globalProgVars = getGlobalProgVars();
+    public void setGlobalProgVars(ImmutableSet<ProgramVariable> s) {
+        ImmutableSet<ProgramVariable> globalProgVars = getGlobalProgVars();
         Namespace ns = proof().getNamespaces().programVariables();
-        IteratorOfProgramVariable it = s.iterator();
+        Iterator<ProgramVariable> it = s.iterator();
         while (it.hasNext()) {
             ProgramVariable pv = it.next();
             if (!globalProgVars.contains(pv)) {
@@ -280,10 +279,10 @@ public class Goal  {
 
     /** adds a list of formulas to the sequent before the given position
      * and informs the rule appliccation index about this change
-     * @param insertions the ListOfConstrainedFormula to be added
+     * @param insertions the IList<ConstrainedFormula> to be added
      * @param p PosInOccurrence encodes the position 
      */
-    public void addFormula(ListOfConstrainedFormula insertions, PosInOccurrence p) {
+    public void addFormula(ImmutableList<ConstrainedFormula> insertions, PosInOccurrence p) {
 	if ( !insertions.isEmpty() ) {	  
 	    setSequent(sequent().addFormula(insertions, p));
 	}
@@ -292,13 +291,13 @@ public class Goal  {
     /** adds a list of formulas to the antecedent or succedent of a  
      * sequent. Either at its front or back.
      * and informs the rule appliccation index about this change
-     * @param insertions the ListOfConstrainedFormula to be added
+     * @param insertions the IList<ConstrainedFormula> to be added
      * @param inAntec boolean true(false) if ConstrainedFormula has to be
      * added to antecedent (succedent) 
      * @param first boolean true if at the front, if false then cf is
      * added at the back
      */
-    public void addFormula ( ListOfConstrainedFormula insertions, 
+    public void addFormula ( ImmutableList<ConstrainedFormula> insertions, 
 			     boolean inAntec, boolean first ) {
 	if ( !insertions.isEmpty() ) {
 	    setSequent(sequent().
@@ -321,9 +320,9 @@ public class Goal  {
     }
 
     /** returns set of rules applied at this branch 
-     * @return ListOfRuleApp applied rule applications
+     * @return IList<RuleApp> applied rule applications
      */
-    public ListOfRuleApp appliedRuleApps() {
+    public ImmutableList<RuleApp> appliedRuleApps() {
 	return appliedRuleApps;
     }
 	
@@ -398,7 +397,7 @@ public class Goal  {
      * @param replacements the ConstrainedFormula replacing the old one
      * @param p PosInOccurrence encodes the position 
      */
-    public void changeFormula(ListOfConstrainedFormula replacements, 
+    public void changeFormula(ImmutableList<ConstrainedFormula> replacements, 
 			      PosInOccurrence p) {
 	setSequent(sequent().changeFormula(replacements, p));
     }
@@ -468,13 +467,13 @@ public class Goal  {
     }
 
     public void setProgramVariables(Namespace ns) {
-	final IteratorOfNamed it=ns.elements().iterator();
-	SetOfProgramVariable s = SetAsListOfProgramVariable.EMPTY_SET;
+	final Iterator<Named> it=ns.elements().iterator();
+	ImmutableSet<ProgramVariable> s = DefaultImmutableSet.<ProgramVariable>nil();
 	while (it.hasNext()) {
 	    s = s.add((ProgramVariable)it.next());
 	}
         proof().getNamespaces().programVariables().reset();
-        node().setGlobalProgVars(SetAsListOfProgramVariable.EMPTY_SET);
+        node().setGlobalProgVars(DefaultImmutableSet.<ProgramVariable>nil());
 	setGlobalProgVars(s);
     }
 
@@ -527,12 +526,12 @@ public class Goal  {
      * n goals that have references to these new nodes.
      * @return the list of new created goals.
      */
-    public ListOfGoal split(int n) {
-	ListOfGoal goalList=SLListOfGoal.EMPTY_LIST;
+    public ImmutableList<Goal> split(int n) {
+	ImmutableList<Goal> goalList=ImmutableSLList.<Goal>nil();
 	Node parent = node(); // has to be stored because the node
 	                      // of this goal will be replaced
         if (n>0) {
-	    IteratorOfSink itSinks = parent.reserveSinks ( n );
+	    Iterator<Sink> itSinks = parent.reserveSinks ( n );
 	    BranchRestricter br;
 	    Node newNode = null;
 	    Goal newGoal = null;
@@ -580,17 +579,17 @@ public class Goal  {
      * the parent node of the node corresponding to this goal. Goals given in
      * the goal list parameter are removed from that list, if their
      * corresponding nodes are leaves of the parent node of this goal.
-     * @param goalList the ListOfGoal with the goals to be removed 
+     * @param goalList the IList<Goal> with the goals to be removed 
      * @return the new list of goals where goals mapped to the leaves of
      * the parent to this goal are removed from compared to the given list.
      */
-    public ListOfGoal setBack(ListOfGoal goalList) {
+    public ImmutableList<Goal> setBack(ImmutableList<Goal> goalList) {
 	final Node parent = node.parent();
 	final Iterator<Node> leavesIt = parent.leavesIterator();
 	while (leavesIt.hasNext()) {
 	    Node n = leavesIt.next();
 	 
-	    final IteratorOfGoal goalIt = goalList.iterator();
+	    final Iterator<Goal> goalIt = goalList.iterator();
 	    while (goalIt.hasNext()) {
 		final Goal g = goalIt.next();
 	
@@ -636,7 +635,7 @@ public class Goal  {
     }
 
     private void removeTaclets() {
-    	final IteratorOfNoPosTacletApp it = node.getNoPosTacletApps().iterator();
+    	final Iterator<NoPosTacletApp> it = node.getNoPosTacletApps().iterator();
     	while ( it.hasNext () )
            ruleAppIndex.removeNoPosTacletApp(it.next ());
     }
@@ -670,7 +669,7 @@ public class Goal  {
     }    
     
     
-    public ListOfGoal apply( RuleApp p_ruleApp ) {
+    public ImmutableList<Goal> apply( RuleApp p_ruleApp ) {
 //System.err.println(Thread.currentThread());    
 
         final Proof proof = proof();
@@ -682,7 +681,7 @@ public class Goal  {
 
         final Node n = node;
         
-        final ListOfGoal goalList = ruleApp.execute(this,  
+        final ImmutableList<Goal> goalList = ruleApp.execute(this,  
                 proof.getServices());
 
         proof.getServices().saveNameRecorder(n);
@@ -710,8 +709,8 @@ public class Goal  {
 
 
 
-    public static void applyUpdateSimplifier( ListOfGoal goalList ) {
-        final IteratorOfGoal it = goalList.iterator();
+    public static void applyUpdateSimplifier( ImmutableList<Goal> goalList ) {
+        final Iterator<Goal> it = goalList.iterator();
         while ( it.hasNext() ) {
             it.next ().applyUpdateSimplifier();
         }
@@ -728,7 +727,7 @@ public class Goal  {
 	        proof().getUserConstraint ().getConstraint ();
 	    final BuiltInRule rule = UpdateSimplificationRule.INSTANCE;
 	    
-	    final IteratorOfConstrainedFormula it = ( antec ? sequent().antecedent()
+	    final Iterator<ConstrainedFormula> it = ( antec ? sequent().antecedent()
 	            : sequent().succedent()).iterator();
 	
 	    while ( it.hasNext () ) {

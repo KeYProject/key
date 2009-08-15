@@ -13,11 +13,12 @@ package de.uka.ilkd.key.rule;
 import java.util.LinkedList;
 import java.util.List;
 
+import de.uka.ilkd.key.collection.ImmutableArray;
+import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.ArrayOfQuantifiableVariable;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.ListOfGoal;
 
 /**
  * Built in rule that starts the update simplifier on the sequent or
@@ -77,11 +78,11 @@ public class UpdateSimplificationRule implements BuiltInRule {
      * about the java programs 
      * @param ruleApp the rule application that is executed.
      */
-    public ListOfGoal apply(Goal     goal, 
+    public ImmutableList<Goal> apply(Goal     goal, 
 			    Services services, 
 			    RuleApp  ruleApp) {
 
-	ListOfGoal result = null;
+	ImmutableList<Goal> result = null;
 	final ConstrainedFormulaContainer[] applicationResult;
 	
 	final PosInOccurrence pio = ruleApp.posInOccurrence();	    	
@@ -199,8 +200,8 @@ public class UpdateSimplificationRule implements BuiltInRule {
 	if (it.hasNext()) {	    
 	    int sub=it.next();
 	    Term[] subs=new Term[term.arity()];
-	    final ArrayOfQuantifiableVariable[] vars = 
-		new ArrayOfQuantifiableVariable[term.arity()];        
+	    final ImmutableArray<QuantifiableVariable>[] vars = 
+		new ImmutableArray[term.arity()];        
 	    for (int i=0;i<term.arity();i++) {
 		if (i!=sub) {
 		    subs[i]=term.sub(i);

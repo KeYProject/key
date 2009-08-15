@@ -15,6 +15,7 @@ package de.uka.ilkd.key.logic.op;
 
 import java.io.IOException;
 
+import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.Constructor;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -245,7 +246,7 @@ public class ProgramMethod extends NonRigidFunction
 	return method.isStrictFp();
     }
     
-    public ArrayOfModifier getModifiers(){
+    public ImmutableArray<Modifier> getModifiers(){
 	return method.getModifiers();
     }
 
@@ -341,7 +342,7 @@ public class ProgramMethod extends NonRigidFunction
     	return getMethodDeclaration().getParameterDeclarationCount();
     }
     
-    public ArrayOfParameterDeclaration getParameters() {
+    public ImmutableArray<ParameterDeclaration> getParameters() {
     	return getMethodDeclaration().getParameters();
     }
 

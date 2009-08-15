@@ -11,7 +11,6 @@ package de.uka.ilkd.key.proof.mgt;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.WeakHashMap;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.rule.Rule;

@@ -30,7 +30,7 @@ import de.uka.ilkd.key.gui.Main;
 import de.uka.ilkd.key.gui.POBrowser;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.abstraction.ListOfKeYJavaType;
+import de.uka.ilkd.key.java.abstraction.IList;
 import de.uka.ilkd.key.java.abstraction.SLListOfKeYJavaType;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.proof.init.EnvInput;
@@ -79,9 +79,9 @@ public class KeYPlugin extends AbstractUIPlugin
     /**
      * Returns the parameter types of the passed method in KeY representation.
      */
-    private ListOfKeYJavaType getParameterKJTs(IMethod method, 
+    private IList<KeYJavaType> getParameterKJTs(IMethod method, 
 	    				       JavaInfo javaInfo) {
-	ListOfKeYJavaType result = SLListOfKeYJavaType.EMPTY_LIST;
+	IList<KeYJavaType> result = ImmSLList.<KeYJavaType>nil();
 	
 	IType declaringType         = method.getDeclaringType();
 	String[] parameterTypeNames = method.getParameterTypes();
@@ -120,7 +120,7 @@ public class KeYPlugin extends AbstractUIPlugin
 	    	= javaInfo.getTypeByClassName(containerTypeName);
 
 	    //determine parameter types
-	    ListOfKeYJavaType signature = getParameterKJTs(method, javaInfo);
+	    IList<KeYJavaType> signature = getParameterKJTs(method, javaInfo);
 
 	    //determine name ("<init>" for constructors)
 	    String methodName = method.isConstructor()

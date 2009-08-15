@@ -8,19 +8,17 @@
 package de.uka.ilkd.key.visualization;
 
 
-import java.util.LinkedList;
-
+import de.uka.ilkd.key.gui.Main;
+import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.reference.IExecutionContext;
 import de.uka.ilkd.key.java.statement.MethodFrame;
-import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.ProgramPrefix;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.rule.*;
+import de.uka.ilkd.key.rule.PosTacletApp;
 import de.uka.ilkd.key.rule.inst.ContextInstantiationEntry;
-import de.uka.ilkd.key.gui.Main;
-import de.uka.ilkd.key.gui.notification.events.*;
 
 /**A visualization strategy computes execution traces. This is a useful
  * feature for test generation. In order to generate a test for a modality

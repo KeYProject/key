@@ -7,9 +7,10 @@
 // See LICENSE.TXT for details.
 package de.uka.ilkd.key.strategy.feature;
 
+import java.util.Iterator;
+
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.rule.IteratorOfRuleSet;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.rule.TacletApp;
@@ -35,7 +36,7 @@ public class BreakpointFeature extends BinaryFeature {
             if (app instanceof TacletApp) {
                 TacletApp tapp = (TacletApp) app;
                 if (bpManager.isNoEx())
-                    for(IteratorOfRuleSet it = tapp.taclet().getRuleSets().iterator();it.hasNext();){
+                    for(Iterator<RuleSet> it = tapp.taclet().getRuleSets().iterator();it.hasNext();){
                         RuleSet next = it.next();
                         if (next.name().toString().startsWith("method_expand"))
                             return true;

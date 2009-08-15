@@ -7,15 +7,19 @@
 // See LICENSE.TXT for details.
 package de.uka.ilkd.key.visualization;
 
-import de.uka.ilkd.key.java.*;
-import de.uka.ilkd.key.java.expression.*;
-import de.uka.ilkd.key.java.expression.operator.TypeCast;
+import java.util.Iterator;
+
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.java.ProgramElement;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.expression.ParenthesizedExpression;
+import de.uka.ilkd.key.java.expression.operator.TypeCast;
 import de.uka.ilkd.key.java.reference.*;
 import de.uka.ilkd.key.java.visitor.JavaASTCollector;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.SetOfProgramMethod;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.util.Debug;
 
@@ -40,16 +44,16 @@ public class ExecutionTraceModelForTesting extends ExecutionTraceModel {
      * replace by their bodies through symolic execution. 
      * This is important for black box testing.
      */
-    public SetOfProgramMethod getProgramMethods(Services serv){
-        SetOfProgramMethod result = super.getProgramMethods(serv);
+    public ImmutableSet<ProgramMethod> getProgramMethods(Services serv){
+        ImmutableSet<ProgramMethod> result = super.getProgramMethods(serv);
         TraceElement current = start;
         while(current != TraceElement.END){//modified. Originally: current != end
       
             JavaASTCollector coll = new JavaASTCollector(current.getProgram(), 
                                                             MethodReference.class);
             coll.start();
-            ListOfProgramElement l = coll.getNodes();
-            IteratorOfProgramElement it = l.iterator();
+            ImmutableList<ProgramElement> l = coll.getNodes();
+            Iterator<ProgramElement> it = l.iterator();
             while(it.hasNext()){
                 MethodReference mr = (MethodReference) it.next();
                 //I'm not sure if this is the correct way to determine the ExecutionContext, but I couldn't find a better way.

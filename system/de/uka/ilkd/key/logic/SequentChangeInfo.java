@@ -11,6 +11,9 @@
 
 package de.uka.ilkd.key.logic;
 
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
+
 /**
  * Records the changes made to a sequent. Keeps track of added and removed
  * formula to one of the semisequents. The intersection of added and removed
@@ -151,11 +154,11 @@ public class SequentChangeInfo implements java.io.Serializable {
    * of a sequent (true means antecedent; false means succedent)
    * @return list of formulas added to the selected semisequent 
    */
-  public ListOfConstrainedFormula addedFormulas(boolean antec) {
+  public ImmutableList<ConstrainedFormula> addedFormulas(boolean antec) {
     return antec ? (antecedent != null ? antecedent.addedFormulas()
-		    : SLListOfConstrainedFormula.EMPTY_LIST) :
+		    : ImmutableSLList.<ConstrainedFormula>nil()) :
       (succedent != null ? succedent.addedFormulas() : 
-       SLListOfConstrainedFormula.EMPTY_LIST);
+       ImmutableSLList.<ConstrainedFormula>nil());
   }
 
   /** 
@@ -163,7 +166,7 @@ public class SequentChangeInfo implements java.io.Serializable {
    * the formulas added to each semisequent.
    * @return list of formulas added to sequent 
    */
-  public ListOfConstrainedFormula addedFormulas() {
+  public ImmutableList<ConstrainedFormula> addedFormulas() {
     return addedFormulas(true).size() > addedFormulas(false).size() ?
 	addedFormulas(false).prepend(addedFormulas(true)) : 
 	addedFormulas(true).prepend(addedFormulas(false));
@@ -178,11 +181,11 @@ public class SequentChangeInfo implements java.io.Serializable {
    * of a sequent (true means antecedent; false means succedent)
    * @return list of formulas removed from the selected semisequent 
    */
-  public ListOfConstrainedFormula removedFormulas(boolean antec) {
+  public ImmutableList<ConstrainedFormula> removedFormulas(boolean antec) {
     return antec ? (antecedent != null ? antecedent.removedFormulas()
-		    : SLListOfConstrainedFormula.EMPTY_LIST) :
+		    : ImmutableSLList.<ConstrainedFormula>nil()) :
       (succedent != null ? succedent.removedFormulas() : 
-       SLListOfConstrainedFormula.EMPTY_LIST);
+       ImmutableSLList.<ConstrainedFormula>nil());
   }
 
   /** 
@@ -190,7 +193,7 @@ public class SequentChangeInfo implements java.io.Serializable {
    * concatenated list of the formulas removed from each semisequent.
    * @return list of formulas removed from the sequent 
    */
-  public ListOfConstrainedFormula removedFormulas() {
+  public ImmutableList<ConstrainedFormula> removedFormulas() {
     return removedFormulas(true).size() > removedFormulas(false).size() ?
 	removedFormulas(false).prepend(removedFormulas(true)) : 
 	removedFormulas(true).prepend(removedFormulas(false));
@@ -206,11 +209,11 @@ public class SequentChangeInfo implements java.io.Serializable {
    * of a sequent (true means antecedent; false means succedent)
    * @return list of formulas modified within the selected semisequent 
    */
-  public ListOfFormulaChangeInfo modifiedFormulas(boolean antec) {
+  public ImmutableList<FormulaChangeInfo> modifiedFormulas(boolean antec) {
       return antec ? (antecedent != null ? antecedent.modifiedFormulas()
-		      : SLListOfFormulaChangeInfo.EMPTY_LIST) :
+		      : ImmutableSLList.<FormulaChangeInfo>nil()) :
 	  (succedent != null ? succedent.modifiedFormulas() : 
-	   SLListOfFormulaChangeInfo.EMPTY_LIST);
+	   ImmutableSLList.<FormulaChangeInfo>nil());
   }
 
   /** 
@@ -219,7 +222,7 @@ public class SequentChangeInfo implements java.io.Serializable {
    * semisequent.
    * @return list of formulas modified to sequent 
    */
-  public ListOfFormulaChangeInfo modifiedFormulas() {
+  public ImmutableList<FormulaChangeInfo> modifiedFormulas() {
     return modifiedFormulas(true).size() > modifiedFormulas(false).size() ?
 	modifiedFormulas(false).prepend(modifiedFormulas(true)) : 
 	modifiedFormulas(true).prepend(modifiedFormulas(false));
@@ -231,18 +234,18 @@ public class SequentChangeInfo implements java.io.Serializable {
    * of a sequent (true means antecedent; false means succedent)
    * @return list of formulas rejected when trying to add to the selected semisequent
    */
-  public ListOfConstrainedFormula rejectedFormulas(boolean antec) {
+  public ImmutableList<ConstrainedFormula> rejectedFormulas(boolean antec) {
       return antec ? (antecedent != null ? antecedent.rejectedFormulas()
-                      : SLListOfConstrainedFormula.EMPTY_LIST) :
+                      : ImmutableSLList.<ConstrainedFormula>nil()) :
           (succedent != null ? succedent.rejectedFormulas() : 
-           SLListOfConstrainedFormula.EMPTY_LIST);
+           ImmutableSLList.<ConstrainedFormula>nil());
   }
 
   /** 
    * Returns the formulas that have been rejected when trying to add as being redundant.
    * @return list of rejected formulas 
    */
-  public ListOfConstrainedFormula rejectedFormulas() {
+  public ImmutableList<ConstrainedFormula> rejectedFormulas() {
     return rejectedFormulas(true).size() > rejectedFormulas(false).size() ?
         rejectedFormulas(false).prepend(rejectedFormulas(true)) : 
         rejectedFormulas(true).prepend(rejectedFormulas(false));

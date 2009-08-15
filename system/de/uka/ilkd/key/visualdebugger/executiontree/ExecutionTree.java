@@ -7,21 +7,25 @@
 // See LICENSE.TXT for details.
 package de.uka.ilkd.key.visualdebugger.executiontree;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 import javax.swing.SwingUtilities;
 
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.AutoModeListener;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.java.statement.Throw;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.proof.*;
-import de.uka.ilkd.key.rule.*;
+import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.ProofEvent;
+import de.uka.ilkd.key.rule.IfFormulaInstSeq;
+import de.uka.ilkd.key.rule.IfFormulaInstantiation;
+import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.visualdebugger.*;
 import de.uka.ilkd.key.visualdebugger.watchpoints.WatchPoint;
 import de.uka.ilkd.key.visualdebugger.watchpoints.WatchpointUtil;
@@ -101,10 +105,10 @@ public class ExecutionTree implements AutoModeListener {
         }
     }
 
-    public void buildETree(ITNode n, ListOfTerm terms, ETNode parent, String exc) {
+    public void buildETree(ITNode n, ImmutableList<Term> terms, ETNode parent, String exc) {
         ETNode branch = parent;
         String newExc = exc;
-        ListOfTerm bc = terms;
+        ImmutableList<Term> bc = terms;
         if (n.getBc() != null) {
             bc = bc.append(n.getBc());
         } else {
@@ -115,13 +119,13 @@ public class ExecutionTree implements AutoModeListener {
             branch = new ETStatementNode(bc, n.getStatementId(), parent);
             branch.addITNode(n);
             parent.addChild(branch);
-            bc = SLListOfTerm.EMPTY_LIST;
+            bc = ImmutableSLList.<Term>nil();
             newExc = null;
         } else if (n.getExprId() != null && n.getExprId().isBoolean()) {
             branch = new ETStatementNode(bc, n.getExprId(), parent);
             branch.addITNode(n);
             parent.addChild(branch);
-            bc = SLListOfTerm.EMPTY_LIST;
+            bc = ImmutableSLList.<Term>nil();
             newExc = null;
         } else if (n.isMethodInvocationForET()) {
             branch = new ETMethodInvocationNode(bc, n.getProgramMethod(), n
@@ -129,15 +133,14 @@ public class ExecutionTree implements AutoModeListener {
                     parent);
             branch.addITNode(n);
             parent.addChild(branch);
-            bc = SLListOfTerm.EMPTY_LIST;
+            bc = ImmutableSLList.<Term>nil();
             newExc = null;
         } else if (n.isMethodReturn()
                 && n.getParent().getMethodNode().isMethodInvocationForET()) {
-            branch = new ETMethodReturnNode(bc, n.getMethodReturnResult(),
-                    parent);
+            branch = new ETMethodReturnNode(bc, n.getMethodReturnResult(), parent);
             branch.addITNode(n);
             parent.addChild(branch);
-            bc = SLListOfTerm.EMPTY_LIST;
+            bc = ImmutableSLList.<Term>nil();
             newExc = null;
         } else if (n.getChildren().length > 1
                 || (n.getChildren().length == 1 && n.getChildren()[0].getBc() == null)) {// this
@@ -150,16 +153,16 @@ public class ExecutionTree implements AutoModeListener {
             if (n.isNobc())
                 branch.setNobc(true);
             parent.addChild(branch);
-            bc = SLListOfTerm.EMPTY_LIST;
+            bc = ImmutableSLList.<Term>nil();
 
         } else if (n.getChildren().length == 0) {
             branch = createLeafNode(n, bc, exc, parent);
             parent.addChild(branch);
-            bc = SLListOfTerm.EMPTY_LIST;
+            bc = ImmutableSLList.<Term>nil();
         }
 
         if (bc == null) {
-            bc = SLListOfTerm.EMPTY_LIST;
+            bc = ImmutableSLList.<Term>nil();
         }
 
         if (n.getActStatement() instanceof Throw) {
@@ -174,11 +177,11 @@ public class ExecutionTree implements AutoModeListener {
     }
     
     private void buildITTree(Node n, int currentId, boolean lookingForBC,
-            ITNode parent, ListOfTerm terms) {
+            ITNode parent, ImmutableList<Term> terms) {
         int newId = currentId;
         boolean looking = lookingForBC;
         ITNode newParent = parent;
-        ListOfTerm newTerms = terms;
+        ImmutableList<Term> newTerms = terms;
 
         int gId = greatestLabel(n.getNodeInfo().getVisualDebuggerState()
                 .getLabels().values());
@@ -187,7 +190,7 @@ public class ExecutionTree implements AutoModeListener {
             looking = true;
         }
 
-        ListOfTerm l = SLListOfTerm.EMPTY_LIST;
+        ImmutableList<Term> l = ImmutableSLList.<Term>nil();
 
         boolean atomic = true;
         if (looking) {
@@ -257,10 +260,10 @@ public class ExecutionTree implements AutoModeListener {
         }
     }
 
-    public void buildSLETWithoutExpr(ETNode n, ETNode parent, ListOfTerm bc) {
+    public void buildSLETWithoutExpr(ETNode n, ETNode parent, ImmutableList<Term> bc) {
         ETNode branch = parent;
 
-        ListOfTerm newBC = bc;
+        ImmutableList<Term> newBC = bc;
 
         if (!(n instanceof ETStatementNode) && !(n instanceof ETLeafNode)
                 && !(n instanceof ETMethodInvocationNode)
@@ -274,7 +277,7 @@ public class ExecutionTree implements AutoModeListener {
             if (n.getBC() != null)
                 branch.appendBC(bc);
             parent.addChild(branch);
-            newBC = SLListOfTerm.EMPTY_LIST;
+            newBC = ImmutableSLList.<Term>nil();
         }
 
         ETNode[] childs = n.getChildren();
@@ -305,18 +308,18 @@ public class ExecutionTree implements AutoModeListener {
         }
         ITNode root = new ITNode(mediator.getProof().root());
         buildITTree(mediator.getProof().root(), -1, false, root,
-                SLListOfTerm.EMPTY_LIST);
-        ETNode etrr = new ETNode(SLListOfTerm.EMPTY_LIST, null);
+                ImmutableSLList.<Term>nil());
+        ETNode etrr = new ETNode(ImmutableSLList.<Term>nil(), null);
         itNodeRoot = root;
 
-        buildETree(root, SLListOfTerm.EMPTY_LIST, etrr, null);
+        buildETree(root, ImmutableSLList.<Term>nil(), etrr, null);
         etTreeBeforeMerge = etrr;
         ETNode merged = mergeTree(etrr, null);
         if (hideInf)
             merged = this.hideInf(merged, null);
 
-        ETNode etrr2 = new ETNode(SLListOfTerm.EMPTY_LIST, null);
-        buildSLETWithoutExpr(merged, etrr2, SLListOfTerm.EMPTY_LIST);// mergeTree(etrr);
+        ETNode etrr2 = new ETNode(ImmutableSLList.<Term>nil(), null);
+        buildSLETWithoutExpr(merged, etrr2, ImmutableSLList.<Term>nil());// mergeTree(etrr);
 
         etNodeRoot = etrr2.getChildren()[0];
         simplifyBC(etNodeRoot);
@@ -333,7 +336,7 @@ public class ExecutionTree implements AutoModeListener {
         fireTreeChanged(root);
     }
 
-    private ETNode createLeafNode(ITNode n, ListOfTerm bc, String exc,
+    private ETNode createLeafNode(ITNode n, ImmutableList<Term> bc, String exc,
             ETNode parent) {
         ETNode branch;
         if (n.getNode().isClosed()) {
@@ -361,7 +364,7 @@ public class ExecutionTree implements AutoModeListener {
 
     public boolean exceptionThrown(Node n) {
         final Sequent s = n.sequent();
-        for (IteratorOfConstrainedFormula it = s.succedent().iterator(); it
+        for (Iterator<ConstrainedFormula> it = s.succedent().iterator(); it
                 .hasNext();) {
             ConstrainedFormula cfm = it.next();
             if (vd.modalityTopLevel(new PosInOccurrence(cfm,
@@ -374,7 +377,7 @@ public class ExecutionTree implements AutoModeListener {
 
     public boolean executionTerminatedNormal(Node n) {
         final Sequent s = n.sequent();
-        for (IteratorOfConstrainedFormula it = s.succedent().iterator(); it
+        for (Iterator<ConstrainedFormula> it = s.succedent().iterator(); it
                 .hasNext();) {
             ConstrainedFormula cfm = it.next();
             final Term f = cfm.formula();
@@ -397,8 +400,8 @@ public class ExecutionTree implements AutoModeListener {
         }
     }
 
-    private ListOfTerm getPc(HashMap<PosInOccurrence, Label> labels) {
-        ListOfTerm pc = SLListOfTerm.EMPTY_LIST;
+    private ImmutableList<Term> getPc(HashMap<PosInOccurrence, Label> labels) {
+        ImmutableList<Term> pc = ImmutableSLList.<Term>nil();
 
         for (final PosInOccurrence pio : labels.keySet()) {
             // PCLabel pcLabel = ((PCLabel)labels.get(pio));
@@ -454,14 +457,14 @@ public class ExecutionTree implements AutoModeListener {
     }
 
     private void intro_post() {
-        ListOfGoal goals = mediator.getProof().getSubtreeGoals(
+        ImmutableList<Goal> goals = mediator.getProof().getSubtreeGoals(
                 mediator.getProof().root());
 
-        IteratorOfGoal it = goals.iterator();
+        Iterator<Goal> it = goals.iterator();
         while (it.hasNext()) {
             Goal g = it.next();
             Semisequent s = g.node().sequent().succedent();
-            IteratorOfConstrainedFormula cfmIt = s.iterator();
+            Iterator<ConstrainedFormula> cfmIt = s.iterator();
 
             while (cfmIt.hasNext()) {
                 ConstrainedFormula cfm = (ConstrainedFormula) cfmIt.next();
@@ -469,10 +472,10 @@ public class ExecutionTree implements AutoModeListener {
                 PosInOccurrence pio = new PosInOccurrence(cfm,
                         PosInTerm.TOP_LEVEL, false);
 
-                SetOfTacletApp set = mediator.getTacletApplications(g,
+                ImmutableSet<TacletApp> set = mediator.getTacletApplications(g,
                         "introduce_post_predicate", pio);
 
-                // SetOfTacletApp set = m.getTacletApplications(g,
+                // SetOf<TacletApp> set = m.getTacletApplications(g,
                 // "cut", pio);
 
                 if (set.size() > 0) {
@@ -669,7 +672,7 @@ public class ExecutionTree implements AutoModeListener {
                 return false;
 
             if (tapp.ifFormulaInstantiations() != null)
-                for (IteratorOfIfFormulaInstantiation it = tapp
+                for (Iterator<IfFormulaInstantiation> it = tapp
                         .ifFormulaInstantiations().iterator(); it.hasNext();) {
                     final IfFormulaInstantiation next = it.next();
                     if (next instanceof IfFormulaInstSeq) {

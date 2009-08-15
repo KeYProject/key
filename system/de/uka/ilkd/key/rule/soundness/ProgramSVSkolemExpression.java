@@ -11,9 +11,9 @@
 
 package de.uka.ilkd.key.rule.soundness;
 
+import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.SourceData;
-import de.uka.ilkd.key.java.abstraction.ArrayOfKeYJavaType;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.rule.MatchConditions;
@@ -26,7 +26,7 @@ public class ProgramSVSkolemExpression extends ProgramSVSkolem {
 
     public ProgramSVSkolemExpression ( ProgramElementName p_name,
 				       KeYJavaType        p_type,
-				       ArrayOfKeYJavaType p_influencingPVTypes,
+				       ImmutableArray<KeYJavaType> p_influencingPVTypes,
 				       int                p_jumpCnt ) {
 	super ( p_name, p_influencingPVTypes, p_jumpCnt );
 	type = p_type;

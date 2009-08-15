@@ -11,8 +11,10 @@
 package de.uka.ilkd.key.logic;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.op.*;
@@ -246,7 +248,7 @@ public class AnonymisingUpdateFactory {
                 
                 //create quantified update
                 Update quantifiedUpdate = guardedUpdate;
-                IteratorOfQuantifiableVariable it = locTerm.freeVars().iterator();
+                Iterator<QuantifiableVariable> it = locTerm.freeVars().iterator();
                 while(it.hasNext()) {
                     quantifiedUpdate = uf.quantify(it.next(), quantifiedUpdate);
                 }
@@ -270,16 +272,16 @@ public class AnonymisingUpdateFactory {
      * Creates the anonymising update for the passed locations using new
      * uninterpreted functions.
      */
-    public Update createAnonymisingUpdate(SetOfLocationDescriptor locations,
+    public Update createAnonymisingUpdate(ImmutableSet<LocationDescriptor> locations,
                                           Services services) {
         return createAnonymisingUpdate(locations, new Term[0], services);
     }
     
     
-    public Update createAnonymisingUpdate(SetOfLocationDescriptor locations,
+    public Update createAnonymisingUpdate(ImmutableSet<LocationDescriptor> locations,
                                           Term[] commonArguments,
                                           Services services) {
-        LocationDescriptor[] locationsArray = locations.toArray();
+        LocationDescriptor[] locationsArray = locations.toArray(new LocationDescriptor[locations.size()]);
         RigidFunction[] functions 
             = createUninterpretedFunctions(locationsArray,
                                            extractSorts(commonArguments),
@@ -309,10 +311,10 @@ public class AnonymisingUpdateFactory {
      * Creates the anonymising update for the passed locations using new
      * uninterpreted functions and applies it to the passed target term.
      */
-    public Term createAnonymisingUpdateTerm(SetOfLocationDescriptor locations,
+    public Term createAnonymisingUpdateTerm(ImmutableSet<LocationDescriptor> locations,
                                             Term targetTerm,
                                             Services services) {
-        LocationDescriptor[] locationsArray = locations.toArray();
+        LocationDescriptor[] locationsArray = locations.toArray(new LocationDescriptor[locations.size()]);
         RigidFunction[] functions = createUninterpretedFunctions(locationsArray,
                                                                  services);
         return createAnonymisingUpdateTerm ( locationsArray, functions,

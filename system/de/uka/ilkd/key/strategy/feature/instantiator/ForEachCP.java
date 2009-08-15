@@ -11,7 +11,8 @@
 
 package de.uka.ilkd.key.strategy.feature.instantiator;
 
-import de.uka.ilkd.key.logic.IteratorOfTerm;
+import java.util.Iterator;
+
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
@@ -83,11 +84,11 @@ public class ForEachCP implements Feature {
     }
 
     private final class CP implements ChoicePoint {
-        private final class BranchIterator implements IteratorOfCPBranch {
-            private final IteratorOfTerm terms;
+        private final class BranchIterator implements Iterator<CPBranch> {
+            private final Iterator<Term> terms;
             private final RuleApp        oldApp;
 
-            private BranchIterator(IteratorOfTerm terms, RuleApp oldApp) {
+            private BranchIterator(Iterator<Term> terms, RuleApp oldApp) {
                 this.terms = terms;
                 this.oldApp = oldApp;
             }
@@ -123,7 +124,7 @@ public class ForEachCP implements Feature {
             this.goal = goal;
         }
     
-        public IteratorOfCPBranch getBranches(RuleApp oldApp) {
+        public Iterator<CPBranch> getBranches(RuleApp oldApp) {
             return new BranchIterator ( generator.generate ( app, pos, goal ),
                                         oldApp );
         }

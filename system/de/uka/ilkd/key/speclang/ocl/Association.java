@@ -11,10 +11,14 @@
 
 package de.uka.ilkd.key.speclang.ocl;
 
+import java.util.Iterator;
+
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.SetAsListOfTerm;
-import de.uka.ilkd.key.logic.SetOfTerm;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Function;
@@ -37,21 +41,21 @@ public class Association {
     	CreatedAttributeTermFactory.INSTANCE;
     
 	private final Name name;
-    private final ListOfAssociationEnd ends;
+    private final ImmutableList<AssociationEnd> ends;
     private Function predicate;
     private Function func1;
     private Function func2;
     
-    private SetOfTerm axioms;
+    private ImmutableSet<Term> axioms;
     
     public Association(Services services, 
                        String name, 
-                       ListOfAssociationEnd ends) {
+                       ImmutableList<AssociationEnd> ends) {
         Debug.assertTrue(ends.size() >= 2);
         
         if(name == null) {
             name = "";
-            IteratorOfAssociationEnd it = ends.iterator();
+            Iterator<AssociationEnd> it = ends.iterator();
             while(it.hasNext()) {
                 name += it.next().getRoleName() + "_";
             }
@@ -66,7 +70,7 @@ public class Association {
     }
     
     
-    public Association(Services services, ListOfAssociationEnd ends) {
+    public Association(Services services, ImmutableList<AssociationEnd> ends) {
         this(services, null, ends);
     }
     
@@ -75,7 +79,7 @@ public class Association {
                        String name, 
                        AssociationEnd end1, 
                        AssociationEnd end2) {
-        this(services, name, SLListOfAssociationEnd.EMPTY_LIST.prepend(end2)
+        this(services, name, ImmutableSLList.<AssociationEnd>nil().prepend(end2)
                                                               .prepend(end1));
     }
     
@@ -92,11 +96,11 @@ public class Association {
     }
     
     
-    public ListOfAssociationEnd getEnds() {
+    public ImmutableList<AssociationEnd> getEnds() {
         return ends;
     }
     
-    public SetOfTerm getAxioms() {
+    public ImmutableSet<Term> getAxioms() {
     	return axioms;
     }
     
@@ -115,7 +119,7 @@ public class Association {
     private void initialiseFunctions(Services services) {
 
         Sort[] argSorts = new Sort[ends.size()];
-        IteratorOfAssociationEnd it = ends.iterator();
+        Iterator<AssociationEnd> it = ends.iterator();
         int i = 0;
         while(it.hasNext()) {
             argSorts[i++] = getSort(services, it.next().getModelClass());
@@ -152,7 +156,7 @@ public class Association {
     
     
     private void buildAxioms(Services services) {
-    	axioms = SetAsListOfTerm.EMPTY_SET;
+    	axioms = DefaultImmutableSet.<Term>nil();
     	
 		Function inc1 = (Function) services.getNamespaces().functions().lookup(new Name(func1.sort()+"::includes"));
 		Function inc2 = (Function) services.getNamespaces().functions().lookup(new Name(func2.sort()+"::includes"));

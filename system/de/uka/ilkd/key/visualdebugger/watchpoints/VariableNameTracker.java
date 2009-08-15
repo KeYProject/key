@@ -10,6 +10,8 @@ package de.uka.ilkd.key.visualdebugger.watchpoints;
 import java.util.*;
 import java.util.Map.Entry;
 
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.StatementContainer;
@@ -23,11 +25,7 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.logic.op.QuanUpdateOperator;
-import de.uka.ilkd.key.proof.IteratorOfNode;
-import de.uka.ilkd.key.proof.ListOfNode;
 import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.proof.SLListOfNode;
-import de.uka.ilkd.key.rule.ListOfRuleSet;
 import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.visualdebugger.VisualDebugger;
@@ -46,8 +44,8 @@ public class VariableNameTracker {
     private Node node;
     /** The watchpoints.*/
     private List<WatchPoint> watchpoints;
-    private ListOfNode branch = null;
-    private Map<ProgramMethod, ListOfRenamingTable> nameMaps = new HashMap<ProgramMethod, ListOfRenamingTable>();
+    private ImmutableList<Node> branch = null;
+    private Map<ProgramMethod, ImmutableList<RenamingTable>> nameMaps = new HashMap<ProgramMethod, ImmutableList<RenamingTable>>();
     private Stack<ProgramMethod> methodStack = new Stack<ProgramMethod>();
     private Stack<ReferencePrefix> selfVarStack = new Stack<ReferencePrefix>();
     private ReferencePrefix selfVar = null;
@@ -74,7 +72,7 @@ public class VariableNameTracker {
     private SourceElement getStatement(Node node) {
         try {
 
-            IteratorOfConstrainedFormula iterator = node.sequent().iterator();
+            Iterator<ConstrainedFormula> iterator = node.sequent().iterator();
             ConstrainedFormula constrainedFormula;
             Term term;
             while (iterator.hasNext()) {
@@ -134,7 +132,7 @@ public class VariableNameTracker {
      * Checks if the given listOfRuleSet contains the method-expand taclet.
      * 
      * */
-    private boolean isMethodExpandRule(ListOfRuleSet listOfRuleSet) {
+    private boolean isMethodExpandRule(ImmutableList<RuleSet> listOfRuleSet) {
         return listOfRuleSet.contains(
                 new RuleSet(
                         new Name("method_expand")));
@@ -178,8 +176,8 @@ public class VariableNameTracker {
      * @param n - an arbitrary node
      * @return a list of nodes from the root the passed node
      */
-    private ListOfNode buildBranch(Node n) {
-        ListOfNode lon = SLListOfNode.EMPTY_LIST;
+    private ImmutableList<Node> buildBranch(Node n) {
+        ImmutableList<Node> lon = ImmutableSLList.<Node>nil();
         while(n.parent() != null){
             lon = lon.append(n);
             n=n.parent();
@@ -195,7 +193,7 @@ public class VariableNameTracker {
      * @param child
      * @param nameMap
      */
-    private void updateMethodStack(Node current, Node child, Map<ProgramMethod, ListOfRenamingTable> nameMap) {
+    private void updateMethodStack(Node current, Node child, Map<ProgramMethod, ImmutableList<RenamingTable>> nameMap) {
         try {
             
             int current_stacksize = VisualDebugger.getVisualDebugger()
@@ -212,7 +210,7 @@ public class VariableNameTracker {
                        selfVarStack.pop();
                        ProgramMethod key =  methodStack.pop();
                        if(nameMap.containsKey(key)){
-                       ListOfRenamingTable lort = nameMap.get(key);
+                       ImmutableList<RenamingTable> lort = nameMap.get(key);
                        lort = lort.removeFirst(lort.head());
                        nameMap.put(key, lort);
                        }
@@ -251,17 +249,17 @@ public class VariableNameTracker {
      * 
      * @return the list of renaming table
      */
-    private ListOfRenamingTable collectAllRenamings() {
+    private ImmutableList<RenamingTable> collectAllRenamings() {
 
-        ListOfRenamingTable allRenamings = SLListOfRenamingTable.EMPTY_LIST;
+        ImmutableList<RenamingTable> allRenamings = ImmutableSLList.<RenamingTable>nil();
 
-        IteratorOfNode it = branch.iterator();
+        Iterator<Node> it = branch.iterator();
         while (it.hasNext()) {
             Node currentNode = it.next();
-            ListOfRenamingTable renamingTables = currentNode.getRenamingTable();
+            ImmutableList<RenamingTable> renamingTables = currentNode.getRenamingTable();
             if (renamingTables != null && renamingTables.size() > 0) {
                 System.out.println("found renaming @node: " + currentNode.serialNr());
-                IteratorOfRenamingTable i = renamingTables.iterator();
+                Iterator<RenamingTable> i = renamingTables.iterator();
 
                 while (i.hasNext()) {
                     RenamingTable next = i.next();
@@ -299,7 +297,7 @@ public class VariableNameTracker {
             LocationVariable initiallyRenamedVar = initialRenamings.get(k);
             nameMap.put(originalVar, initiallyRenamedVar);
             System.out.println("created initial mapping");
-            IteratorOfRenamingTable i = collectAllRenamings().iterator();
+            Iterator<RenamingTable> i = collectAllRenamings().iterator();
 
             while (i.hasNext()) {
                 RenamingTable renaming = i.next();
@@ -321,7 +319,7 @@ public class VariableNameTracker {
     // it does not terminate because the values are not "disappearing" from the namemap
     private void trackHistory(HashMap<LocationVariable, SourceElement> nameMap) {
         
-        IteratorOfRenamingTable i = collectAllRenamings().iterator();
+        Iterator<RenamingTable> i = collectAllRenamings().iterator();
         boolean allNamesUpToDate = true;
         while (i.hasNext()) {
             RenamingTable renaming = i.next();
@@ -343,8 +341,8 @@ public class VariableNameTracker {
  * some helper methods 
  */
 
-    private void addRenamingTable(ProgramMethod key, Map<ProgramMethod, ListOfRenamingTable> nameMap, RenamingTable newElement){
-        ListOfRenamingTable lort = nameMap.get(key);
+    private void addRenamingTable(ProgramMethod key, Map<ProgramMethod, ImmutableList<RenamingTable>> nameMap, RenamingTable newElement){
+        ImmutableList<RenamingTable> lort = nameMap.get(key);
         lort = nameMap.get(key).prepend(newElement);
         nameMap.put(key, lort);
         }
@@ -437,7 +435,7 @@ public class VariableNameTracker {
                                     + " elements on stack after push");
                             if (!nameMaps.containsKey(programMethod)) {
                                 nameMaps.put(programMethod,
-                                        SLListOfRenamingTable.EMPTY_LIST);
+                                        ImmutableSLList.<RenamingTable>nil());
                             }
                         }
 
@@ -448,7 +446,7 @@ public class VariableNameTracker {
                         for (Integer index : parameterIndices) {
 
                             LocationVariable programVariable = (LocationVariable) mbs
-                                    .getArguments().getExpression(index);
+                                    .getArguments().get(index);
                             renamedLocalVariables.add(programVariable);
                         }
 
@@ -492,7 +490,7 @@ public class VariableNameTracker {
         }
     }
     
- public Map<ProgramMethod, ListOfRenamingTable> result (){
+ public Map<ProgramMethod, ImmutableList<RenamingTable>> result (){
      return nameMaps;
  }
 

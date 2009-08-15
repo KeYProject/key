@@ -17,7 +17,7 @@
 
 package de.uka.ilkd.key.speclang.jml.pretranslation;
 
-import de.uka.ilkd.key.collection.ListOfString;
+import de.uka.ilkd.key.collection.ImmutableList;
 
 
 /**
@@ -26,16 +26,16 @@ import de.uka.ilkd.key.collection.ListOfString;
  */
 public abstract class TextualJMLConstruct {
     
-    protected final ListOfString mods;
+    protected final ImmutableList<String> mods;
     
     
-    public TextualJMLConstruct(ListOfString mods) {
+    public TextualJMLConstruct(ImmutableList<String> mods) {
         assert mods != null;
         this.mods = mods;
     }
     
     
-    public ListOfString getMods() {
+    public ImmutableList<String> getMods() {
         return mods;
     }
 }

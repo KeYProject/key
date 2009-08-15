@@ -55,10 +55,8 @@ public class OclIterate extends TermSymbol {
 	    return false;
 	}
 	CollectionSort collSort = (CollectionSort)term.sub(0).sort();
-	Sort iterVariableSort = term.varsBoundHere(2)
-	    .getQuantifiableVariable(0).sort();
-	Sort accVariableSort = term.varsBoundHere(2)
-	    .getQuantifiableVariable(1).sort();
+	Sort iterVariableSort = term.varsBoundHere(2).get(0).sort();
+	Sort accVariableSort = term.varsBoundHere(2).get(1).sort();
 	Sort initAccValueSort = term.sub(1).sort();
 	Sort exprSort = term.sub(2).sort();
 	if (!collSort.getElemSort().extendsTrans(iterVariableSort)) {

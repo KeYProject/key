@@ -359,7 +359,7 @@ public class SymbolicStateView extends ViewPart implements DebuggerListener {
         for (Iterator ofIt = figure2node.keySet().iterator(); ofIt.hasNext();) {
             final ObjectFigure ofStart = (ObjectFigure) ofIt.next();
 
-            for (IteratorOfProgramVariable pvIt = ofStart.getSymbolicObject()
+            for (Iterator<ProgramVariable> pvIt = ofStart.getSymbolicObject()
                     .getNonPrimAttributes().iterator(); pvIt.hasNext();) {
                 ProgramVariable pv = pvIt.next();
                 final SymbolicObject soEnd = ofStart.getSymbolicObject()
@@ -387,7 +387,7 @@ public class SymbolicStateView extends ViewPart implements DebuggerListener {
                 SymbolicArrayObject saoStart = ((SymbolicArrayObject)aofStart.
                         getSymbolicObject());
 
-                for (IteratorOfTerm indexIt = saoStart.getAllIndexTerms().iterator(); indexIt
+                for (Iterator<Term> indexIt = saoStart.getAllIndexTerms().iterator(); indexIt
                         .hasNext();) {
                     Term index = indexIt.next();
                     SymbolicObject soEnd = ((SymbolicArrayObject)aofStart.getSymbolicObject())
@@ -490,7 +490,7 @@ public class SymbolicStateView extends ViewPart implements DebuggerListener {
             }
             al.setSelected(true);
             this.selectedAttr = al;
-            if (al.getSo().getConstraintsForIndex(al.getIndex()) != SLListOfTerm.EMPTY_LIST)
+            if (al.getSo().getConstraintsForIndex(al.getIndex()) != ImmSLList.<Term>nil())
                 setConstraints(al.getSo()
                         .getConstraintsForIndex(al.getIndex()), symbolicObjects,
                         al.getSo());
@@ -500,7 +500,7 @@ public class SymbolicStateView extends ViewPart implements DebuggerListener {
         }    else if (o instanceof ArrayObjectFigure.IndexConstraintLabel) {
             ArrayObjectFigure.IndexConstraintLabel al = (ArrayObjectFigure.IndexConstraintLabel) o;
             this.currentState.getIndexTerms();
-            SetOfTerm indexConstr = al.getIndexConstraints();
+            SetOf<Term> indexConstr = al.getIndexConstraints();
             for(Iterator it = this.symbolicObjects.iterator(); it.hasNext();){
                 SymbolicObject next = (SymbolicObject) it.next();
                 if (next instanceof SymbolicArrayObject){
@@ -515,7 +515,7 @@ public class SymbolicStateView extends ViewPart implements DebuggerListener {
             int result =-1; 
             int i=0;
             for(int j = 0 ; j< possibleIndexTerms.length;j++){
-                SetOfTerm next = (SetOfTerm ) possibleIndexTerms[j];
+                SetOf<Term> next = (SetOf<Term> ) possibleIndexTerms[j];
                // System.out.println("checking"+next);
                 if (next.subset(indexConstr)&& indexConstr.subset(next)){
                     result = i;
@@ -544,7 +544,7 @@ public class SymbolicStateView extends ViewPart implements DebuggerListener {
     }
     
     
-    private void setConstraints(ListOfTerm cons, LinkedList sos, SymbolicObject so){
+    private void setConstraints(IList<Term> cons, LinkedList sos, SymbolicObject so){
         if (cons!=null){            
             final Term[] conArray = cons.toArray();
             final  String[] termsString =new String[conArray.length];             

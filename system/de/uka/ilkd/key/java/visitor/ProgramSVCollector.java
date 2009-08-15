@@ -8,9 +8,9 @@
 //
 //
 package de.uka.ilkd.key.java.visitor;
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.logic.op.ListOfSchemaVariable;
-import de.uka.ilkd.key.logic.op.SLListOfSchemaVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.metaconstruct.MetaConstructWithSV;
@@ -21,8 +21,8 @@ import de.uka.ilkd.key.rule.metaconstruct.MetaConstructWithSV;
  */
 public class ProgramSVCollector extends JavaASTWalker {
 
-    private ListOfSchemaVariable result = 
-	SLListOfSchemaVariable.EMPTY_LIST; 
+    private ImmutableList<SchemaVariable> result = 
+	ImmutableSLList.<SchemaVariable>nil(); 
 
     /** the instantiations needed for unwind loop constructs */
     private SVInstantiations instantiations = 
@@ -30,24 +30,24 @@ public class ProgramSVCollector extends JavaASTWalker {
 
     /** create the ProgramSVCollector
      * @param root the ProgramElement where to begin
-     * @param vars the ListOfSchemaVariable where to add the new found
+     * @param vars the IList<SchemaVariable> where to add the new found
      * ones
      */
     public ProgramSVCollector(ProgramElement root, 
-			      ListOfSchemaVariable vars) {
+			      ImmutableList<SchemaVariable> vars) {
 	super(root);
 	result = vars;
     }
 
     /** create the ProgramSVCollector
      * @param root the ProgramElement where to begin
-     * @param vars the ListOfSchemaVariable where to add the new found
+     * @param vars the IList<SchemaVariable> where to add the new found
      * ones
      * @param svInst the SVInstantiations previously found in order to determine
      * the needed labels for the UnwindLoop construct. 
      */
     public ProgramSVCollector(ProgramElement root, 
-			      ListOfSchemaVariable vars,
+			      ImmutableList<SchemaVariable> vars,
 			      SVInstantiations svInst) {
 	super(root);
 	result = vars;
@@ -59,7 +59,7 @@ public class ProgramSVCollector extends JavaASTWalker {
 	walk(root());
     }
 
-    public ListOfSchemaVariable getSchemaVariables() {
+    public ImmutableList<SchemaVariable> getSchemaVariables() {
 	return result;
     }
 

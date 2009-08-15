@@ -10,14 +10,20 @@
 
 package de.uka.ilkd.key.logic;
 
-import de.uka.ilkd.key.logic.op.*;
+import java.util.Iterator;
+
+import de.uka.ilkd.key.collection.ImmutableArray;
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.logic.op.LogicVariable;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 
 public class ClashFreeSubst {
     protected TermFactory tf = TermFactory.DEFAULT;
 
     QuantifiableVariable v;
     Term s;
-    SetOfQuantifiableVariable svars;
+    ImmutableSet<QuantifiableVariable> svars;
 	
     public ClashFreeSubst(QuantifiableVariable v,Term s) {
 	this.v = v;
@@ -65,8 +71,8 @@ public class ClashFreeSubst {
     private Term applyOnSubterms(Term t) {
 	final int arity = t.arity();
 	final Term[] newSubterms = new Term[arity];
-	final ArrayOfQuantifiableVariable[] newBoundVars =
-	    new ArrayOfQuantifiableVariable[arity];
+	final ImmutableArray<QuantifiableVariable>[] newBoundVars =
+	    new ImmutableArray[arity];
 	for ( int i=0; i<arity; i++ ) {
 	    applyOnSubterm ( t, i, newSubterms, newBoundVars );
         }
@@ -82,7 +88,7 @@ public class ClashFreeSubst {
     protected void applyOnSubterm (Term completeTerm,
                                    int subtermIndex,
                                    Term[] newSubterms,
-                                   ArrayOfQuantifiableVariable[] newBoundVars) {
+                                   ImmutableArray<QuantifiableVariable>[] newBoundVars) {
         if ( subTermChanges ( completeTerm.varsBoundHere ( subtermIndex ),
                               completeTerm.sub ( subtermIndex ) ) ) {
             final QuantifiableVariable[] nbv =
@@ -93,7 +99,7 @@ public class ClashFreeSubst {
                              subtermIndex,
                              completeTerm.sub ( subtermIndex ),
                              newSubterms );
-            newBoundVars[subtermIndex] = new ArrayOfQuantifiableVariable ( nbv );
+            newBoundVars[subtermIndex] = new ImmutableArray<QuantifiableVariable> ( nbv );
         } else {
             newBoundVars[subtermIndex] = completeTerm.varsBoundHere ( subtermIndex );
             newSubterms[subtermIndex] = completeTerm.sub ( subtermIndex );
@@ -112,7 +118,7 @@ public class ClashFreeSubst {
      * <code>boundVars</code> from <code>varInd</code> upwards..
      */
     private void applyOnSubterm(int varInd,
-				ArrayOfQuantifiableVariable boundVars,
+				ImmutableArray<QuantifiableVariable> boundVars,
 				QuantifiableVariable[] newBoundVars,
 				int subInd,
 				Term subTerm,
@@ -121,19 +127,19 @@ public class ClashFreeSubst {
 	if ( varInd >= boundVars.size() ) {
 	    newSubterms[subInd] = apply1(subTerm);
 	} else {
-	    QuantifiableVariable qv = boundVars.getQuantifiableVariable(varInd);
+	    QuantifiableVariable qv = boundVars.get(varInd);
 	    if ( svars.contains(qv) ) {
 		/* Here is the clash case all this is about! Hurrah! */
 		
 		// Determine Variable names to avoid
 		VariableCollectVisitor vcv = new VariableCollectVisitor();
-		SetOfQuantifiableVariable usedVars;
+		ImmutableSet<QuantifiableVariable> usedVars;
 		subTerm.execPostOrder(vcv);
 		usedVars = svars;
 		usedVars = usedVars.union(vcv.vars());
 		for ( int i = varInd+1; i < boundVars.size(); i++ ) {
 		    usedVars = 
-			usedVars.add(boundVars.getQuantifiableVariable(i));
+			usedVars.add(boundVars.get(i));
 		}
 		// Get a new variable with a fitting name.
 		QuantifiableVariable qv1 = newVarFor(qv,usedVars);
@@ -145,7 +151,7 @@ public class ClashFreeSubst {
 				    subInd,subTerm,newSubterms);
 		// then continue recursively, on the result.
 		applyOnSubterm(varInd+1,
-			       new ArrayOfQuantifiableVariable(newBoundVars),
+			       new ImmutableArray<QuantifiableVariable>(newBoundVars),
 			       newBoundVars,
 			       subInd,newSubterms[subInd],newSubterms);
 	    } else {
@@ -160,7 +166,7 @@ public class ClashFreeSubst {
      * considered quantified subterm. It is however assumed that no more
      * clash can occurr. */
     private void applyOnSubterm1(int varInd,
-				 ArrayOfQuantifiableVariable boundVars,
+				 ImmutableArray<QuantifiableVariable> boundVars,
 				 QuantifiableVariable[] newBoundVars,
 				 int subInd,
 				 Term subTerm,
@@ -169,12 +175,12 @@ public class ClashFreeSubst {
 	if ( varInd >= boundVars.size() ) {
 	    newSubterms[subInd] = apply(subTerm);
 	} else {
-	    QuantifiableVariable qv = boundVars.getQuantifiableVariable(varInd);
+	    QuantifiableVariable qv = boundVars.get(varInd);
 	    newBoundVars[varInd] = qv;
 	    if ( qv == v ) {
 		newSubterms[subInd] = subTerm;
 		for( int i = varInd; i<boundVars.size(); i++) {
-		    newBoundVars[i] = boundVars.getQuantifiableVariable(varInd);
+		    newBoundVars[i] = boundVars.get(varInd);
 		}
 	    } else {
 		applyOnSubterm1(varInd+1, boundVars, newBoundVars,
@@ -191,13 +197,13 @@ public class ClashFreeSubst {
      * <code>boundVars</code> would change under application of this
      * substitution
      */
-    protected boolean subTermChanges(ArrayOfQuantifiableVariable boundVars,
+    protected boolean subTermChanges(ImmutableArray<QuantifiableVariable> boundVars,
                                      Term subTerm) {
 	if ( !subTerm.freeVars().contains(v) ) {	  
 	    return false;
 	} else {
 	    for( int i = 0; i<boundVars.size(); i++ ) {
-		if ( v == boundVars.getQuantifiableVariable(i) ) {
+		if ( v == boundVars.get(i) ) {
 		    return false;
 		}
 	    }
@@ -210,7 +216,7 @@ public class ClashFreeSubst {
      * variables in <code>usedVars</code>. 
      * <P> Assumes that <code>var</code> is a @link{LogicVariable}. */
     protected QuantifiableVariable newVarFor(QuantifiableVariable var,
-					     SetOfQuantifiableVariable usedVars) {
+					     ImmutableSet<QuantifiableVariable> usedVars) {
 	LogicVariable lv = (LogicVariable) var;
 	String stem = var.name().toString();
 	int i = 1;
@@ -222,8 +228,8 @@ public class ClashFreeSubst {
 
     /** returns true if there is no object named <code>n</code> in the
      * set <code>s</code> */
-    private boolean nameNewInSet(String n, SetOfQuantifiableVariable qvars) {
-	IteratorOfQuantifiableVariable it = qvars.iterator();
+    private boolean nameNewInSet(String n, ImmutableSet<QuantifiableVariable> qvars) {
+	Iterator<QuantifiableVariable> it = qvars.iterator();
 	while ( it.hasNext() ) {
 	    if ( it.next().name().toString().equals(n) ) {
 		return false;
@@ -237,11 +243,11 @@ public class ClashFreeSubst {
      * occurring in a term. */
     protected static class VariableCollectVisitor extends Visitor {
 	/** the collected variables */
-	private SetOfQuantifiableVariable vars;
+	private ImmutableSet<QuantifiableVariable> vars;
 
 	/** creates the Variable collector */
 	public VariableCollectVisitor() {
-	    vars = SetAsListOfQuantifiableVariable.EMPTY_SET;
+	    vars = DefaultImmutableSet.<QuantifiableVariable>nil();
 	}
 
 	public void visit(Term t) {
@@ -249,16 +255,16 @@ public class ClashFreeSubst {
 		vars=vars.add((QuantifiableVariable)t.op());
 	    } else {
 		for ( int i = 0; i<t.arity(); i++ ) {
-		    ArrayOfQuantifiableVariable vbh = t.varsBoundHere(i);
+		    ImmutableArray<QuantifiableVariable> vbh = t.varsBoundHere(i);
 		    for ( int j = 0; j<vbh.size(); j++ ) {
-			vars = vars.add(vbh.getQuantifiableVariable(j));
+			vars = vars.add(vbh.get(j));
 		    }
 		}
 	    }
 	}
 
         /** the set of all occurring variables.*/
-	public SetOfQuantifiableVariable vars() {
+	public ImmutableSet<QuantifiableVariable> vars() {
 	    return vars;
 	}
     }

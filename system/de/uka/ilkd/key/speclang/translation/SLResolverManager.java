@@ -10,9 +10,14 @@
 package de.uka.ilkd.key.speclang.translation;
 
 
+import java.util.Iterator;
+
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.op.LogicVariable;
+import de.uka.ilkd.key.logic.op.ParsableVariable;
 import de.uka.ilkd.key.logic.sort.ObjectSort;
 
 
@@ -27,13 +32,13 @@ public abstract class SLResolverManager {
     public final SLTranslationExceptionManager excManager;
     private static final TermBuilder TB = TermBuilder.DF;
 
-    private ListOfSLExpressionResolver resolvers = SLListOfSLExpressionResolver.EMPTY_LIST;
+    private ImmutableList<SLExpressionResolver> resolvers = ImmutableSLList.<SLExpressionResolver>nil();
     private final KeYJavaType specInClass;
     private final ParsableVariable selfVar;
     private final boolean useLocalVarsAsImplicitReceivers;
         
-    private ListOfNamespace /*ParsableVariable*/
-        localVariablesNamespaces = SLListOfNamespace.EMPTY_LIST;
+    private ImmutableList<Namespace> /*ParsableVariable*/
+        localVariablesNamespaces = ImmutableSLList.<Namespace>nil();
 
     
     
@@ -236,7 +241,7 @@ public abstract class SLResolverManager {
     /**
      * Puts a list of local variables into the topmost namespace on the stack. 
      */
-    public void putIntoTopLocalVariablesNamespace(ListOfLogicVariable pvs) {
+    public void putIntoTopLocalVariablesNamespace(ImmutableList<LogicVariable> pvs) {
         for(LogicVariable pv : pvs) {
             localVariablesNamespaces.head().addSafely(pv);
         }
@@ -250,7 +255,7 @@ public abstract class SLResolverManager {
      * localVariableNamespace
      */
     public boolean needVarDeclaration(String name2BeResolved) {
-        IteratorOfSLExpressionResolver it = resolvers.iterator();
+        Iterator<SLExpressionResolver> it = resolvers.iterator();
         while(it.hasNext()) {
             if (it.next().needVarDeclaration(name2BeResolved)) {
                 return true;

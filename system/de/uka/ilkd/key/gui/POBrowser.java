@@ -12,11 +12,7 @@ package de.uka.ilkd.key.gui;
 
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.awt.event.*;
 import java.util.Iterator;
 
 import javax.swing.*;
@@ -25,25 +21,15 @@ import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 
-import de.uka.ilkd.key.collection.ListOfString;
-import de.uka.ilkd.key.collection.SLListOfString;
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.IteratorOfKeYJavaType;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.abstraction.SetAsListOfKeYJavaType;
-import de.uka.ilkd.key.java.abstraction.SetOfKeYJavaType;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
-import de.uka.ilkd.key.proof.init.BehaviouralSubtypingInvPO;
-import de.uka.ilkd.key.proof.init.EnsuresPostPO;
-import de.uka.ilkd.key.proof.init.InitConfig;
-import de.uka.ilkd.key.proof.init.PreservesGuardPO;
-import de.uka.ilkd.key.proof.init.PreservesInvPO;
-import de.uka.ilkd.key.proof.init.PreservesOwnInvPO;
-import de.uka.ilkd.key.proof.init.ProofOblInput;
-import de.uka.ilkd.key.proof.init.RespectsModifiesPO;
-import de.uka.ilkd.key.proof.init.SpecExtPO;
-import de.uka.ilkd.key.proof.init.StrongOperationContractPO;
+import de.uka.ilkd.key.proof.init.*;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 
 
@@ -241,7 +227,7 @@ public class POBrowser extends JDialog {
     //-------------------------------------------------------------------------
     
     private void showPOsFor(KeYJavaType kjt) {
-	ListOfString pos = SLListOfString.EMPTY_LIST;
+	ImmutableList<String> pos = ImmutableSLList.<String>nil();
 
 	//BehaviouralSubtypingInv
 	if(specRepos.getClassInvariants(kjt).size() > 0
@@ -251,8 +237,8 @@ public class POBrowser extends JDialog {
 
 /*        
 	//BehaviouralSubtypingOp
-	ListOfProgramMethod pms = javaInfo.getAllProgramMethods(kjt);
-	IteratorOfProgramMethod it = pms.iterator();
+	IList<ProgramMethod> pms = javaInfo.getAllProgramMethods(kjt);
+	Iterator<ProgramMethod> it = pms.iterator();
 	boolean foundContract = false;
 	while(it.hasNext()) {
 	    ProgramMethod pm = it.next();
@@ -267,7 +253,7 @@ public class POBrowser extends JDialog {
 */
         
 	//show
-	poList.setListData(pos.toArray());
+	poList.setListData(pos.toArray(new String[pos.size()]));
 	if(pos.size() > 0) {
 	    poList.setSelectedIndex(0);
 	    startButton.setEnabled(true);
@@ -278,7 +264,7 @@ public class POBrowser extends JDialog {
     
     
     private void showPOsFor(ProgramMethod pm) {
-	ListOfString pos = SLListOfString.EMPTY_LIST;
+	ImmutableList<String> pos = ImmutableSLList.<String>nil();
 
 /*        
 	//BehaviouralSubtypingOpPair
@@ -321,7 +307,7 @@ public class POBrowser extends JDialog {
 	pos = pos.append("PreservesGuard");
 	
 	//show
-	poList.setListData(pos.toArray());
+	poList.setListData(pos.toArray(new String[pos.size()]));
 	if(pos.size() > 0) {
 	    poList.setSelectedValue("EnsuresPost", true);
 	    if(poList.getSelectedIndex() == -1) {
@@ -346,8 +332,8 @@ public class POBrowser extends JDialog {
     private KeYJavaType askUserForSupertype(KeYJavaType subKJT, 
 	    				    JavaInfo javaInfo) {
 	//collect supertypes
-	SetOfKeYJavaType superKJTs = SetAsListOfKeYJavaType.EMPTY_SET;
-	IteratorOfKeYJavaType it = javaInfo.getAllSupertypes(subKJT).iterator();
+	ImmutableSet<KeYJavaType> superKJTs = DefaultImmutableSet.<KeYJavaType>nil();
+	Iterator<KeYJavaType> it = javaInfo.getAllSupertypes(subKJT).iterator();
 	while(it.hasNext()) {
 	    superKJTs = superKJTs.add(it.next());
 	}
@@ -363,7 +349,7 @@ public class POBrowser extends JDialog {
         }
         
         //return selection
-        SetOfKeYJavaType selectedKJTs = dlg.getSelection();
+        ImmutableSet<KeYJavaType> selectedKJTs = dlg.getSelection();
         if(selectedKJTs.size() == 0) {
             return null;
         } else {
@@ -528,7 +514,7 @@ public class POBrowser extends JDialog {
                                         pm.getContainerType());
         if(dlg.wasSuccessful()) {
             //let the user select the guard classes
-            SetOfKeYJavaType allKJTs = SetAsListOfKeYJavaType.EMPTY_SET;
+            ImmutableSet<KeYJavaType> allKJTs = DefaultImmutableSet.<KeYJavaType>nil();
             final Iterator<KeYJavaType> it = javaInfo.getAllKeYJavaTypes().iterator();
             while(it.hasNext()) {
         	allKJTs = allKJTs.add(it.next());

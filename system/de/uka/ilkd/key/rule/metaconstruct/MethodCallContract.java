@@ -9,11 +9,16 @@
 
 package de.uka.ilkd.key.rule.metaconstruct;
 
-import de.uka.ilkd.key.java.*;
-import de.uka.ilkd.key.java.abstraction.ListOfKeYJavaType;
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.java.ProgramElement;
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.Statement;
+import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.op.ProgramMethod;
+import de.uka.ilkd.key.logic.op.ProgramSV;
+import de.uka.ilkd.key.logic.op.SchemaVariable;
 
 
 /** 
@@ -31,7 +36,7 @@ public class MethodCallContract extends MethodCall {
 	super(new Name("method-call-contract"), ec, result, body);
     }
 
-    protected Statement makeIfCascade(ListOfKeYJavaType imps, Services services) {        
+    protected Statement makeIfCascade(ImmutableList<KeYJavaType> imps, Services services) {        
         ProgramMethod meth = getMethod(staticPrefixType, methRef, services);
         return new MethodBodyStatement(meth, newContext,
                                        pvar, arguments, true); 

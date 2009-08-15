@@ -11,6 +11,7 @@
 package de.uka.ilkd.key.logic;
 
 import junit.framework.TestCase;
+import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
@@ -525,12 +526,12 @@ public class TestUpdateFactory extends TestCase {
         // different bound variables for different subterms (that have to be
         // unified by QuanUpdateOperator)
         final Term[] subTerms = new Term [] { a, var2T, bvar, nonRigidTarget };
-        final ArrayOfQuantifiableVariable[] boundVars = 
-            new ArrayOfQuantifiableVariable[4];
-        boundVars[0] = new ArrayOfQuantifiableVariable (new QuantifiableVariable[] { var });
-        boundVars[1] = new ArrayOfQuantifiableVariable (new QuantifiableVariable[] { var2 });
+        final ImmutableArray<QuantifiableVariable>[] boundVars = 
+            new ImmutableArray[4];
+        boundVars[0] = new ImmutableArray<QuantifiableVariable> (new QuantifiableVariable[] { var });
+        boundVars[1] = new ImmutableArray<QuantifiableVariable> (new QuantifiableVariable[] { var2 });
         boundVars[2] = boundVars[0];
-        boundVars[3] = new ArrayOfQuantifiableVariable ();
+        boundVars[3] = new ImmutableArray<QuantifiableVariable> ();
             
         final QuanUpdateOperator op =
             QuanUpdateOperator.createUpdateOp( new Term[] { avar2 },
@@ -552,7 +553,7 @@ public class TestUpdateFactory extends TestCase {
         final Update u1 = fac.quantify ( var, u2 );
 
         // otherwise we don't have a real collision ...
-        assertSame ( u1.getAssignmentPair ( 0 ).boundVars ().getQuantifiableVariable ( 0 ),
+        assertSame ( u1.getAssignmentPair ( 0 ).boundVars ().get ( 0 ),
                      var );
         
         assertEqualsModRenaming ( proof.simplifier ().simplify ( u1, avar, services ), bvar );

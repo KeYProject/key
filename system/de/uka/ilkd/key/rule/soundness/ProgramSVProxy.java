@@ -13,11 +13,11 @@ package de.uka.ilkd.key.rule.soundness;
 
 import java.io.IOException;
 
+import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.visitor.Visitor;
-import de.uka.ilkd.key.logic.op.ArrayOfIProgramVariable;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.util.ExtList;
@@ -38,13 +38,13 @@ public class ProgramSVProxy
 
     private final ProgramSVSkolem         op;  
 
-    private final ArrayOfIProgramVariable influencingPVs;
-    private final ArrayOfStatement        jumpTable;
+    private final ImmutableArray<IProgramVariable> influencingPVs;
+    private final ImmutableArray<Statement>        jumpTable;
 
 
     public ProgramSVProxy ( ProgramSVSkolem         p_op,
-			    ArrayOfIProgramVariable p_influencingPVs,
-			    ArrayOfStatement        p_jumpTable ) {
+			    ImmutableArray<IProgramVariable> p_influencingPVs,
+			    ImmutableArray<Statement>        p_jumpTable ) {
 	op             = p_op;
 	influencingPVs = p_influencingPVs;
 	jumpTable      = p_jumpTable;
@@ -59,9 +59,9 @@ public class ProgramSVProxy
 
     public ProgramSVProxy ( ExtList p_children ) {
 	this ( (ProgramSVSkolem)p_children.get ( ProgramSVSkolem.class ),
-	       new ArrayOfIProgramVariable ( (IProgramVariable[])p_children.collect
+	       new ImmutableArray<IProgramVariable> ( (IProgramVariable[])p_children.collect
 					    ( IProgramVariable.class ) ),
-	       new ArrayOfStatement        ( (Statement[])       p_children.collect
+	       new ImmutableArray<Statement>        ( (Statement[])       p_children.collect
 					    ( Statement.class ) ) );
     }
     
@@ -70,11 +70,11 @@ public class ProgramSVProxy
 	return op;
     }
 
-    public ArrayOfIProgramVariable getInfluencingPVs () {
+    public ImmutableArray<IProgramVariable> getInfluencingPVs () {
 	return influencingPVs;
     }
 
-    public ArrayOfStatement getJumpTable () {
+    public ImmutableArray<Statement> getJumpTable () {
 	return jumpTable;
     }
 
@@ -99,8 +99,8 @@ public class ProgramSVProxy
 	if ( index == 0 )
 	    return op;
 	else if ( index <= influencingPVs.size () )
-	    return influencingPVs.getIProgramVariable ( index - 1 );
-	return jumpTable.getStatement ( index - 1 - influencingPVs.size () );
+	    return influencingPVs.get ( index - 1 );
+	return jumpTable.get ( index - 1 - influencingPVs.size () );
     }
     
     /**

@@ -10,7 +10,10 @@
 
 package de.uka.ilkd.key.proof;
 
-import de.uka.ilkd.key.collection.ListOfString;
+import java.util.Iterator;
+
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.TacletApp;
@@ -21,8 +24,8 @@ import de.uka.ilkd.key.rule.TacletApp;
  */
 public class InstantiationProposerCollection implements InstantiationProposer {
 
-    private ListOfInstantiationProposer proposers 
-    		= SLListOfInstantiationProposer.EMPTY_LIST;
+    private ImmutableList<InstantiationProposer> proposers 
+    		= ImmutableSLList.<InstantiationProposer>nil();
 
     /**
      * adds an instantiation proposer to the collection
@@ -36,8 +39,8 @@ public class InstantiationProposerCollection implements InstantiationProposer {
     			      SchemaVariable var, 
 			      Services services,
 			      Node undoAnchor,
-			      ListOfString previousProposals) {
-	IteratorOfInstantiationProposer it = proposers.iterator();
+			      ImmutableList<String> previousProposals) {
+	Iterator<InstantiationProposer> it = proposers.iterator();
 	while(it.hasNext()) {
 	    InstantiationProposer proposer = it.next();
 	    String proposal = proposer.getProposal(app, 

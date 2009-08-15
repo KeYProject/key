@@ -10,7 +10,8 @@
 
 package de.uka.ilkd.key.strategy.feature;
 
-import de.uka.ilkd.key.logic.IteratorOfTerm;
+import java.util.Iterator;
+
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
@@ -59,7 +60,7 @@ public class ComprehendedSumFeature implements Feature {
     public RuleAppCost compute (RuleApp app, PosInOccurrence pos, Goal goal) {        
         final Term outerVarContent = var.getContent ();
         
-        final IteratorOfTerm it = generator.generate ( app, pos, goal );
+        final Iterator<Term> it = generator.generate ( app, pos, goal );
         RuleAppCost res = LongRuleAppCost.ZERO_COST;
         while ( it.hasNext () && ! ( res instanceof TopRuleAppCost ) ) {
             var.setContent ( it.next () );

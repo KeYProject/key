@@ -10,23 +10,29 @@
 
 package de.uka.ilkd.key.unittest.cogent;
 
-import java.util.*;
-import java.io.*;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
 
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.Main;
-import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.unittest.*;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.unittest.DecProdModelGenerator;
+import de.uka.ilkd.key.unittest.EquivalenceClass;
+import de.uka.ilkd.key.unittest.Model;
 
 public class CogentModelGenerator implements DecProdModelGenerator {
 
-    private SetOfTerm locations;
+    private ImmutableSet<Term> locations;
 
     private HashMap<Term, EquivalenceClass> term2class;
 
     private CogentTranslation ct;
 
     public CogentModelGenerator(CogentTranslation ct,
-	    HashMap<Term, EquivalenceClass> term2class, SetOfTerm locations) {
+	    HashMap<Term, EquivalenceClass> term2class, ImmutableSet<Term> locations) {
 	this.ct = ct;
 	this.term2class = term2class;
 	this.locations = locations;
@@ -50,7 +56,7 @@ public class CogentModelGenerator implements DecProdModelGenerator {
 		}
 		return models;
 	    }
-	    IteratorOfTerm it = locations.iterator();
+	    Iterator<Term> it = locations.iterator();
 	    while (it.hasNext()) {
 		Term t = it.next();
 		EquivalenceClass ec = term2class.get(t);

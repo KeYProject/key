@@ -11,8 +11,13 @@
 
 package de.uka.ilkd.key.rule.soundness;
 
+import java.util.Iterator;
+
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.op.SortedSchemaVariable;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.util.ExtList;
 
@@ -31,9 +36,9 @@ public class SVPartitioning {
     private final SVPartition[] expressionSVs;  // Expression SV
 
     public static SVPartitioning[]
-        findPartitionings ( ListOfSchemaVariable p_freeSVs,
-	  		    ListOfSchemaVariable p_boundSVs,
-			    ListOfSchemaVariable p_expressionSVs ) {
+        findPartitionings ( ImmutableList<SchemaVariable> p_freeSVs,
+	  		    ImmutableList<SchemaVariable> p_boundSVs,
+			    ImmutableList<SchemaVariable> p_expressionSVs ) {
 	return new SVPartitioner ( p_freeSVs,
 				   p_boundSVs,
 				   p_expressionSVs  ).findPartitionings ();
@@ -91,9 +96,9 @@ public class SVPartitioning {
 	return getType ( getPartition ( p ), p_svTypeInfos );
     }
 
-    private KeYJavaType getType ( ListOfSchemaVariable p_svs,
+    private KeYJavaType getType ( ImmutableList<SchemaVariable> p_svs,
                                   SVTypeInfos          p_svTypeInfos ) {
-	IteratorOfSchemaVariable it  = p_svs.iterator ();
+	Iterator<SchemaVariable> it  = p_svs.iterator ();
 	SVTypeInfo               res;
 	while ( it.hasNext () ) {
 	    res = p_svTypeInfos.getInfo ( it.next () );
@@ -106,7 +111,7 @@ public class SVPartitioning {
     /**
      * @return partition <code>p</code> as a list
      */
-    public ListOfSchemaVariable getPartition ( int p ) {
+    public ImmutableList<SchemaVariable> getPartition ( int p ) {
 	return getPartitionHelp(p).getVariables();
     }
 
@@ -129,16 +134,16 @@ public class SVPartitioning {
 
 
 class SVPartition {
-    private final ListOfSchemaVariable variables;
+    private final ImmutableList<SchemaVariable> variables;
     private final boolean              nativePV;
     
-    SVPartition ( ListOfSchemaVariable p_variables,
+    SVPartition ( ImmutableList<SchemaVariable> p_variables,
     	          boolean              p_nativePV ) {
 	variables = p_variables;
 	nativePV  = p_nativePV;
     }
 
-    public ListOfSchemaVariable getVariables() {
+    public ImmutableList<SchemaVariable> getVariables() {
         return variables;
     }
 
@@ -167,9 +172,9 @@ class SVPartitioner {
     // schema variable belongs
     private final int[]            partTable;
     
-    SVPartitioner ( ListOfSchemaVariable p_freeSVs, 
-		    ListOfSchemaVariable p_boundSVs,
-		    ListOfSchemaVariable p_expressionSVs  ) {
+    SVPartitioner ( ImmutableList<SchemaVariable> p_freeSVs, 
+		    ImmutableList<SchemaVariable> p_boundSVs,
+		    ImmutableList<SchemaVariable> p_expressionSVs  ) {
     	freeSVs   = toArray ( p_freeSVs );
         emptyPart =
             new SVPartitioning ( toSingletonPartitionArray ( p_boundSVs ),
@@ -214,7 +219,7 @@ class SVPartitioner {
     	}
 
 	final int                  index     = p_code - 1;
-	final ListOfSchemaVariable variables = collectVariables ( p_code );
+	final ImmutableList<SchemaVariable> variables = collectVariables ( p_code );
 
 	// For each partition the chosen program variable
 	// can be native or new
@@ -226,8 +231,8 @@ class SVPartitioner {
 	createPartitioningHelp(index, p_partitions);
     }
 
-    private ListOfSchemaVariable collectVariables ( int p_code ) {
-	ListOfSchemaVariable variables = SLListOfSchemaVariable.EMPTY_LIST;
+    private ImmutableList<SchemaVariable> collectVariables ( int p_code ) {
+	ImmutableList<SchemaVariable> variables = ImmutableSLList.<SchemaVariable>nil();
 	
 	for ( int j = 0; j != partTable.length; ++j ) {
 	    if ( partTable[j] == p_code )
@@ -288,10 +293,10 @@ class SVPartitioner {
 	return false;
     }    
 
-    private SchemaVariable[] toArray ( ListOfSchemaVariable p_list ) {
+    private SchemaVariable[] toArray ( ImmutableList<SchemaVariable> p_list ) {
 	SchemaVariable[] result = new SchemaVariable [ p_list.size () ];
 	
-	IteratorOfSchemaVariable it = p_list.iterator ();
+	Iterator<SchemaVariable> it = p_list.iterator ();
 	int                      i  = 0;
 	while ( it.hasNext () )
 	    result[i++] = it.next ();
@@ -300,15 +305,15 @@ class SVPartitioner {
     }
 
     private static SVPartition[]
-        toSingletonPartitionArray ( ListOfSchemaVariable p_svs ) {
+        toSingletonPartitionArray ( ImmutableList<SchemaVariable> p_svs ) {
 
 	SVPartition[]            result = new SVPartition [ p_svs.size () ];
 	
-	IteratorOfSchemaVariable it  = p_svs.iterator ();
+	Iterator<SchemaVariable> it  = p_svs.iterator ();
 	int                      i   = 0;
 	while ( it.hasNext () ) {
-	    final ListOfSchemaVariable singletonList =
-	        SLListOfSchemaVariable.EMPTY_LIST.prepend ( it.next () );
+	    final ImmutableList<SchemaVariable> singletonList =
+	        ImmutableSLList.<SchemaVariable>nil().prepend ( it.next () );
             result[i++] = new SVPartition ( singletonList, false );
 	}
 	

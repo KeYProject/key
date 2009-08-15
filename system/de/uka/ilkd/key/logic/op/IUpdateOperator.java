@@ -10,6 +10,7 @@
 
 package de.uka.ilkd.key.logic.op;
 
+import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.logic.Term;
 
 
@@ -28,7 +29,7 @@ public interface IUpdateOperator extends Operator, NonRigid {
     /**
      * returns the array of location operators which are updated
      */
-    ArrayOfLocation locationsAsArray();
+    ImmutableArray<Location> locationsAsArray();
 
     /**
      * returns the number of locations

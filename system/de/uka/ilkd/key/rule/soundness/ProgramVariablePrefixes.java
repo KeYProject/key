@@ -11,13 +11,14 @@
 
 package de.uka.ilkd.key.rule.soundness;
 
-import de.uka.ilkd.key.logic.op.ListOfIProgramVariable;
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 
 
 
 public interface ProgramVariablePrefixes {
 
-    ListOfIProgramVariable getPrefix ( SchemaVariable p );
+    ImmutableList<IProgramVariable> getPrefix ( SchemaVariable p );
 
 }

@@ -14,11 +14,11 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import de.uka.ilkd.key.collection.ImmutableArray;
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.*;
-import de.uka.ilkd.key.java.abstraction.IteratorOfKeYJavaType;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.abstraction.ListOfKeYJavaType;
-import de.uka.ilkd.key.java.abstraction.SLListOfKeYJavaType;
 import de.uka.ilkd.key.java.declaration.*;
 import de.uka.ilkd.key.java.expression.ArrayInitializer;
 import de.uka.ilkd.key.java.expression.ParenthesizedExpression;
@@ -75,8 +75,8 @@ public class ConstructableKeYJavaTypeCollector implements Visitor {
     /**
      * Map containing the formal result variables defined so far.
      */
-    private final Map /*MethodReference -> ProgramVariable*/ formalResultVars
-                = new HashMap();
+    private final Map<MethodReference, ProgramVariable> formalResultVars
+                = new HashMap<MethodReference, ProgramVariable>();
 
     /**
      * The services object.
@@ -86,12 +86,12 @@ public class ConstructableKeYJavaTypeCollector implements Visitor {
     /**
      * The methods covered so far.
      */
-    private ListOfProgramMethod coveredMethods;
+    private ImmutableList<ProgramMethod> coveredMethods;
 
     /**
      * The KeYJavaTypes found to be constructable
      */
-    private ListOfKeYJavaType constructableKeYJavaTypes;
+    private ImmutableList<KeYJavaType> constructableKeYJavaTypes;
      
     /**
      * The sv instantiations, including an execution context suitable for 
@@ -135,14 +135,14 @@ public class ConstructableKeYJavaTypeCollector implements Visitor {
      * @return a list of KeYJavaType containing all the types which might
      * be constructed.
      */
-    public ListOfKeYJavaType collect(ProgramElement root, 
+    public ImmutableList<KeYJavaType> collect(ProgramElement root, 
                                      SVInstantiations svInst) {
         //initialise members
         formalResultVars.clear();
-        coveredMethods             = SLListOfProgramMethod.EMPTY_LIST;
+        coveredMethods             = ImmutableSLList.<ProgramMethod>nil();
         this.svInst                = svInst;
         errorString                = null;
-        constructableKeYJavaTypes  = SLListOfKeYJavaType.EMPTY_LIST;
+        constructableKeYJavaTypes  = ImmutableSLList.<KeYJavaType>nil();
 
 
         //walk the program, thereby collecting constructable types
@@ -164,7 +164,7 @@ public class ConstructableKeYJavaTypeCollector implements Visitor {
      * Returns a list of the methods which have been analysed in the last run 
      * of extract().
      */
-    public ListOfProgramMethod getCoveredMethods() {
+    public ImmutableList<ProgramMethod> getCoveredMethods() {
         return coveredMethods;
     }
     
@@ -207,12 +207,12 @@ public class ConstructableKeYJavaTypeCollector implements Visitor {
             return false;
         }
         
-        ListOfKeYJavaType supertypes1 = javaInfo.getAllSupertypes(kjt1);
+        ImmutableList<KeYJavaType> supertypes1 = javaInfo.getAllSupertypes(kjt1);
         supertypes1 = supertypes1.prepend(kjt1);
-        ListOfKeYJavaType supertypes2 = javaInfo.getAllSupertypes(kjt2);
+        ImmutableList<KeYJavaType> supertypes2 = javaInfo.getAllSupertypes(kjt2);
         supertypes2 = supertypes2.prepend(kjt2);
         
-        IteratorOfKeYJavaType it = supertypes1.iterator();
+        Iterator<KeYJavaType> it = supertypes1.iterator();
         while(it.hasNext()) {
             if(supertypes2.contains(it.next())) {
                 return true;
@@ -235,14 +235,14 @@ public class ConstructableKeYJavaTypeCollector implements Visitor {
             return false;                                        
         }
         
-        ListOfKeYJavaType sig1 = mr1.getMethodSignature(services, ec);
-        ListOfKeYJavaType sig2 = mr2.getMethodSignature(services, ec);
+        ImmutableList<KeYJavaType> sig1 = mr1.getMethodSignature(services, ec);
+        ImmutableList<KeYJavaType> sig2 = mr2.getMethodSignature(services, ec);
         if(sig1.size() != sig2.size()) {
             return false;
         }
         
-        IteratorOfKeYJavaType it1 = sig1.iterator();
-        IteratorOfKeYJavaType it2 = sig2.iterator();
+        Iterator<KeYJavaType> it1 = sig1.iterator();
+        Iterator<KeYJavaType> it2 = sig2.iterator();
         while(it1.hasNext()) {
             if(!haveCommonSupertype(it1.next(), it2.next())) {
                 return false;
@@ -308,22 +308,21 @@ public class ConstructableKeYJavaTypeCollector implements Visitor {
     }
 
 
-    private ArrayOfExpression simplifyExpressions(
-						ArrayOfExpression expressions) {
+    private ImmutableArray<Expression> simplifyExpressions(ImmutableArray<Expression> expressions) {
 	Expression[] result = new Expression[expressions.size()];
 	for(int i = 0; i < expressions.size(); i++) {
-	    result[i] = simplifyExpression(expressions.getExpression(i));
+	    result[i] = simplifyExpression(expressions.get(i));
 	}
-	return new ArrayOfExpression(result);
+	return new ImmutableArray<Expression>(result);
     }
 
 
     private New simplifyNew(New n) {
         Debug.assertFalse(n.getReferencePrefix() instanceof Expression);
-	ArrayOfExpression simpleArgs = simplifyExpressions(n.getArguments());
+	ImmutableArray<Expression> simpleArgs = simplifyExpressions(n.getArguments());
 	Expression[] simpleArgsArray = new Expression[simpleArgs.size()];
 	for(int i = 0; i < simpleArgs.size(); i++) {
-	    simpleArgsArray[i] = simpleArgs.getExpression(i);
+	    simpleArgsArray[i] = simpleArgs.get(i);
 	}
 	return new New(simpleArgsArray, 
 		       n.getTypeReference(), 
@@ -490,11 +489,11 @@ public class ConstructableKeYJavaTypeCollector implements Visitor {
 
             //descend into prefix, parameters and expansion instead of
             //normal children
-            final ArrayOfExpression args = x.getArguments();
+            final ImmutableArray<Expression> args = x.getArguments();
             adoptedChildren = new ProgramElement[args.size() + 2];
             adoptedChildren[0] = new ThisReference();
             for(int i = 0; i < args.size(); i++) {
-                adoptedChildren[i + 1] = args.getExpression(i);
+                adoptedChildren[i + 1] = args.get(i);
             }
             adoptedChildren[args.size() + 1] = expandedPe;
 
@@ -545,13 +544,13 @@ public class ConstructableKeYJavaTypeCollector implements Visitor {
             //descend into prefix, parameters and expansion instead of
             //normal children
             final ReferencePrefix rp = x.getReferencePrefix();
-            final ArrayOfExpression args = x.getArguments();
+            final ImmutableArray<Expression> args = x.getArguments();
             adoptedChildren = new ProgramElement[args.size() + 2];
             adoptedChildren[0] = (rp instanceof Expression
                                   ? rp
                                   : new ThisReference());
             for(int i = 0; i < args.size(); i++) {
-                adoptedChildren[i + 1] = args.getExpression(i);
+                adoptedChildren[i + 1] = args.get(i);
             }
             adoptedChildren[args.size() + 1] = expandedPe;
         }

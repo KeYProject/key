@@ -11,6 +11,8 @@
 package de.uka.ilkd.key.gui;
 import java.io.StringReader;
 
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.PrimitiveSort;
@@ -91,14 +93,14 @@ public class TestTacletPopup {
 	     Semisequent.EMPTY_SEMISEQUENT); 
 	impleftbuilder.addTacletGoalTemplate(new
 	    AntecSuccTacletGoalTemplate(Sequent.EMPTY_SEQUENT,
-				      SLListOfTaclet.EMPTY_LIST,
+				      ImmutableSLList.<Taclet>nil(),
 				      ante));
 	Sequent succ=Sequent.createSequent(Semisequent.EMPTY_SEMISEQUENT,
 		    Semisequent.EMPTY_SEMISEQUENT.insert(0, new
 			ConstrainedFormula(t_b, Constraint.BOTTOM)).semisequent()); 
 	impleftbuilder.addTacletGoalTemplate(new
 	    AntecSuccTacletGoalTemplate(Sequent.EMPTY_SEQUENT,
-				      SLListOfTaclet.EMPTY_LIST,
+				      ImmutableSLList.<Taclet>nil(),
 				      succ));
 	impleft=impleftbuilder.getAntecTaclet();
 
@@ -113,7 +115,7 @@ public class TestTacletPopup {
 		 ConstrainedFormula(t_b0, Constraint.BOTTOM)).semisequent()); 
 	imprightbuilder.addTacletGoalTemplate(new
 	    AntecSuccTacletGoalTemplate(Sequent.EMPTY_SEQUENT,
-				      SLListOfTaclet.EMPTY_LIST,
+				      ImmutableSLList.<Taclet>nil(),
 				      seq));
 	imprightbuilder.setName(new Name("imp-right"));
 	impright=imprightbuilder.getSuccTaclet();
@@ -128,7 +130,7 @@ public class TestTacletPopup {
 			ConstrainedFormula(t_b, Constraint.BOTTOM)).semisequent()); 
 	notleftbuilder.addTacletGoalTemplate(new
 	    AntecSuccTacletGoalTemplate(Sequent.EMPTY_SEQUENT,
-				      SLListOfTaclet.EMPTY_LIST,
+				      ImmutableSLList.<Taclet>nil(),
 				      seq));	
 	notleftbuilder.setName(new Name("not-left"));
 	notleft=notleftbuilder.getAntecTaclet();
@@ -142,7 +144,7 @@ public class TestTacletPopup {
 		    Semisequent.EMPTY_SEMISEQUENT); 
 	notrightbuilder.addTacletGoalTemplate(new
 	    AntecSuccTacletGoalTemplate(Sequent.EMPTY_SEQUENT,
-				      SLListOfTaclet.EMPTY_LIST,
+				      ImmutableSLList.<Taclet>nil(),
 				      seq));
 	notrightbuilder.setName(new Name("not-right"));
        	notright=notrightbuilder.getSuccTaclet();
@@ -154,20 +156,20 @@ public class TestTacletPopup {
 			ConstrainedFormula(t_b, Constraint.BOTTOM)).semisequent(),
 		    Semisequent.EMPTY_SEMISEQUENT); 
 	nfbuilder.addTacletGoalTemplate(new
-	    TacletGoalTemplate(seq, SLListOfTaclet.EMPTY_LIST));
+	    TacletGoalTemplate(seq, ImmutableSLList.<Taclet>nil()));
 
 	seq=Sequent.createSequent(Semisequent.EMPTY_SEMISEQUENT,
 		    Semisequent.EMPTY_SEMISEQUENT.insert(0,new
 			ConstrainedFormula(t_b, Constraint.BOTTOM)).semisequent());
 		     
 	nfbuilder.addTacletGoalTemplate(new
-	    TacletGoalTemplate(seq, SLListOfTaclet.EMPTY_LIST));
+	    TacletGoalTemplate(seq, ImmutableSLList.<Taclet>nil()));
 	nfbuilder.setName(new Name("cut rule"));
 
        	cut=nfbuilder.getNoFindTaclet();
 
 
-	ListOfTaclet emptyTacletList=SLListOfTaclet.EMPTY_LIST;
+	ImmutableList<Taclet> emptyTacletList=ImmutableSLList.<Taclet>nil();
 	
 	// close rule
 	// if (b=>) find(=>b) 
@@ -214,7 +216,7 @@ public class TestTacletPopup {
 
 	allrightbuilder.addTacletGoalTemplate(new
 	    AntecSuccTacletGoalTemplate(seq,
-				      SLListOfTaclet.EMPTY_LIST,				      
+				      ImmutableSLList.<Taclet>nil(),				      
 				      Sequent.EMPTY_SEQUENT));
 	allrightbuilder.setName(new Name("all-right"));
        	allright=allrightbuilder.getSuccTaclet();
@@ -230,7 +232,7 @@ public class TestTacletPopup {
 
 	allleftbuilder.addTacletGoalTemplate(new
 	    AntecSuccTacletGoalTemplate(seq,
-				      SLListOfTaclet.EMPTY_LIST,				      
+				      ImmutableSLList.<Taclet>nil(),				      
 				      Sequent.EMPTY_SEQUENT));
 	allleftbuilder.setName(new Name("all-left"));
        	allleft=allleftbuilder.getAntecTaclet();
@@ -248,7 +250,7 @@ public class TestTacletPopup {
 
 	remove_and_leftbuilder.addTacletGoalTemplate(new
 	    AntecSuccTacletGoalTemplate(Sequent.EMPTY_SEQUENT,
-				      SLListOfTaclet.EMPTY_LIST,				      
+				      ImmutableSLList.<Taclet>nil(),				      
 				      seq));
 	remove_and_leftbuilder.setName(new Name("remove-and-left"));
        	remove_and_left=remove_and_leftbuilder.getAntecTaclet();
@@ -263,7 +265,7 @@ public class TestTacletPopup {
 
 	remove_or_leftbuilder.addTacletGoalTemplate(new
 	    AntecSuccTacletGoalTemplate(Sequent.EMPTY_SEQUENT,
-				      SLListOfTaclet.EMPTY_LIST,
+				      ImmutableSLList.<Taclet>nil(),
 				      seq));
 
 	seq=Sequent.createSequent(Semisequent.EMPTY_SEMISEQUENT.insert(0,new
@@ -272,7 +274,7 @@ public class TestTacletPopup {
 
 	remove_or_leftbuilder.addTacletGoalTemplate(new
 	    AntecSuccTacletGoalTemplate(Sequent.EMPTY_SEQUENT,
-				      SLListOfTaclet.EMPTY_LIST,				      
+				      ImmutableSLList.<Taclet>nil(),				      
 				      seq));
 
 	remove_or_leftbuilder.setName(new Name("remove-or-left"));
@@ -289,7 +291,7 @@ public class TestTacletPopup {
 
 	remove_and_rightbuilder.addTacletGoalTemplate(new
 	    AntecSuccTacletGoalTemplate(Sequent.EMPTY_SEQUENT,
-				      SLListOfTaclet.EMPTY_LIST,				      
+				      ImmutableSLList.<Taclet>nil(),				      
 				      seq));
 
 	seq=Sequent.createSequent
@@ -299,7 +301,7 @@ public class TestTacletPopup {
 
 	remove_and_rightbuilder.addTacletGoalTemplate(new
 	    AntecSuccTacletGoalTemplate(Sequent.EMPTY_SEQUENT,
-				      SLListOfTaclet.EMPTY_LIST,				      
+				      ImmutableSLList.<Taclet>nil(),				      
 				      seq));
 
 	remove_and_rightbuilder.setName(new Name("remove-and-right"));
@@ -318,7 +320,7 @@ public class TestTacletPopup {
 
 	remove_or_rightbuilder.addTacletGoalTemplate(new
 	    AntecSuccTacletGoalTemplate(Sequent.EMPTY_SEQUENT,
-				      SLListOfTaclet.EMPTY_LIST,				      
+				      ImmutableSLList.<Taclet>nil(),				      
 				      seq));
 	remove_or_rightbuilder.setName(new Name("remove-or-right"));
        	remove_or_right=remove_or_rightbuilder.getSuccTaclet();
@@ -357,7 +359,7 @@ public class TestTacletPopup {
 	rwb1.setFind(t_rn);
 	rwb1.addTacletGoalTemplate(new
 	    RewriteTacletGoalTemplate(Sequent.EMPTY_SEQUENT,
-				    SLListOfTaclet.EMPTY_LIST,				    
+				    ImmutableSLList.<Taclet>nil(),				    
 				    t_0));
 
 	
@@ -368,7 +370,7 @@ public class TestTacletPopup {
 	rwbuilder.setFind(t_rnminus1plus1);
 	rwbuilder.addTacletGoalTemplate(new
 	    RewriteTacletGoalTemplate(Sequent.EMPTY_SEQUENT,
-				    SLListOfTaclet.EMPTY_LIST,				    
+				    ImmutableSLList.<Taclet>nil(),				    
 				    t_rn));
 	rwbuilder.addTacletGoalTemplate(new
 	    RewriteTacletGoalTemplate(Sequent.EMPTY_SEQUENT,
@@ -385,7 +387,7 @@ public class TestTacletPopup {
 						new Term[]{t_rn, t_0}));
 	rwbuilder.addTacletGoalTemplate(new
 	    RewriteTacletGoalTemplate(Sequent.EMPTY_SEQUENT,
-				    SLListOfTaclet.EMPTY_LIST,				    
+				    ImmutableSLList.<Taclet>nil(),				    
 				    t_rn));
 	rwbuilder.setName(new Name("plus-zero-elim"));
        	predsuccelim=rwbuilder.getRewriteTaclet();
@@ -397,7 +399,7 @@ public class TestTacletPopup {
 						new Term[]{t_0, t_rn}));
 	rwbuilder.addTacletGoalTemplate(new
 	    RewriteTacletGoalTemplate(Sequent.EMPTY_SEQUENT,
-				    SLListOfTaclet.EMPTY_LIST,				    
+				    ImmutableSLList.<Taclet>nil(),				    
 				    t_rn));
 	rwbuilder.setName(new Name("zero-plus-elim"));
        	zeropluselim=rwbuilder.getRewriteTaclet();
@@ -428,7 +430,7 @@ public class TestTacletPopup {
 	rwbuilder.setFind(t_rnplus1plusrm);
 	rwbuilder.addTacletGoalTemplate(new
 	    RewriteTacletGoalTemplate(Sequent.EMPTY_SEQUENT,
-				    SLListOfTaclet.EMPTY_LIST,				    
+				    ImmutableSLList.<Taclet>nil(),				    
 				    t_rnplusrmplus1));
 	rwbuilder.setName(new Name("switch-first-succ"));
        	switchfirstsucc=rwbuilder.getRewriteTaclet();
@@ -445,7 +447,7 @@ public class TestTacletPopup {
 	rwbuilder.setFind(t_rnplus_rmplus1);
 	rwbuilder.addTacletGoalTemplate(new
 	    RewriteTacletGoalTemplate(Sequent.EMPTY_SEQUENT,
-				    SLListOfTaclet.EMPTY_LIST,			    
+				    ImmutableSLList.<Taclet>nil(),			    
 				    t_rnplusrmplus1));
 	rwbuilder.setName(new Name("switch-second-succ"));
        	switchsecondsucc=rwbuilder.getRewriteTaclet();
@@ -458,7 +460,7 @@ public class TestTacletPopup {
 						t_rmplus1));
 	rwbuilder.addTacletGoalTemplate(new
 	    RewriteTacletGoalTemplate(Sequent.EMPTY_SEQUENT,
-				    SLListOfTaclet.EMPTY_LIST,				    
+				    ImmutableSLList.<Taclet>nil(),				    
 				    t_rneqrm));
 	rwbuilder.setName(new Name("succ-elim"));
        	succelim=rwbuilder.getRewriteTaclet();

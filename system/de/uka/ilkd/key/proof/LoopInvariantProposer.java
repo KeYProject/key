@@ -11,9 +11,10 @@
 package de.uka.ilkd.key.proof;
 
 import java.io.IOException;
+import java.util.Iterator;
 import java.util.Map;
 
-import de.uka.ilkd.key.collection.ListOfString;
+import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
@@ -24,7 +25,9 @@ import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
-import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.LocationDescriptor;
+import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IUpdateOperator;
 import de.uka.ilkd.key.logic.op.Operator;
@@ -32,11 +35,13 @@ import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.ProgramPrinter;
-import de.uka.ilkd.key.rule.IteratorOfRuleSet;
 import de.uka.ilkd.key.rule.PosTacletApp;
+import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
+import de.uka.ilkd.key.speclang.LocationDescriptorSet;
 import de.uka.ilkd.key.speclang.LoopInvariant;
+import de.uka.ilkd.key.speclang.LoopPredicateSet;
 
 
 public class LoopInvariantProposer implements InstantiationProposer {
@@ -99,7 +104,7 @@ public class LoopInvariantProposer implements InstantiationProposer {
         if(taclet == null) {
             return true;
         }
-        IteratorOfRuleSet it = taclet.ruleSets();
+        Iterator<RuleSet> it = taclet.ruleSets();
         while(it.hasNext()) {
             if(it.next().name().toString().equals("loop_invariant_proposal")) {
                 return true;
@@ -208,7 +213,7 @@ public class LoopInvariantProposer implements InstantiationProposer {
     			      SchemaVariable var, 
 			      Services services, 
 			      Node undoAnchor,
-			      ListOfString previousProposals){
+			      ImmutableList<String> previousProposals){
 	
         final Object inst = tryToInstantiate(app, 
                                              var, 
@@ -222,11 +227,11 @@ public class LoopInvariantProposer implements InstantiationProposer {
 	    if (inst instanceof Term){
 		lp.printTerm((Term) inst);
 		proposal = lp.toString();
-	    }  else if (inst instanceof SetOfTerm){
-		lp.printTerm((SetOfTerm) inst);
+	    }  else if (inst instanceof LoopPredicateSet){
+		lp.printTerm(((LoopPredicateSet) inst).asSet());
 		proposal = lp.toString();
-            } else if (inst instanceof SetOfLocationDescriptor) {
-                lp.printLocationDescriptors((SetOfLocationDescriptor) inst);
+            } else if (inst instanceof LocationDescriptorSet) {
+                lp.printLocationDescriptors(((LocationDescriptorSet) inst).asSet());
                 proposal = lp.toString();
             } else { 
 		proposal = null;

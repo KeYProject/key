@@ -11,6 +11,8 @@
 
 package de.uka.ilkd.key.rule.soundness;
 
+import java.util.Iterator;
+
 
 
 /**
@@ -24,6 +26,6 @@ public interface SkolemBuilder {
      * instantiate schema variables in multiple ways to cover all
      * possible usages)
      */
-    IteratorOfSkolemSet build ();
+    Iterator<SkolemSet> build ();
 
 }

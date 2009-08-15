@@ -11,9 +11,9 @@
 
 package de.uka.ilkd.key.java.statement;
 
+import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.visitor.Visitor;
-import de.uka.ilkd.key.logic.ArrayOfProgramPrefix;
 import de.uka.ilkd.key.logic.PosInProgram;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.ProgramPrefix;
@@ -42,7 +42,7 @@ public class LabeledStatement extends JavaStatement
     protected final Statement body;
 
     
-    private final ArrayOfProgramPrefix prefixElementArray;
+    private final ImmutableArray<ProgramPrefix> prefixElementArray;
 
 
     /**
@@ -68,7 +68,7 @@ public class LabeledStatement extends JavaStatement
     public LabeledStatement(Label name) {
 	this.name=name;
 	body=new EmptyStatement();
-        prefixElementArray = new ArrayOfProgramPrefix();
+        prefixElementArray = new ImmutableArray<ProgramPrefix>();
     }
 
     /**
@@ -84,16 +84,16 @@ public class LabeledStatement extends JavaStatement
     }
 
 
-    private ArrayOfProgramPrefix computePrefix(Statement b) {
+    private ImmutableArray<ProgramPrefix> computePrefix(Statement b) {
         if (b instanceof StatementBlock) {
             return StatementBlock.computePrefixElements
             (((StatementBlock)b).getBody(), 0, this);
         } else if (b instanceof ProgramPrefix) {
             return StatementBlock.
-                computePrefixElements(new ArrayOfStatement(b), 
+                computePrefixElements(new ImmutableArray<Statement>(b), 
                         0, this);
         }        
-        return new ArrayOfProgramPrefix(this);
+        return new ImmutableArray<ProgramPrefix>(this);
     }
     
     public int getPrefixLength() {        
@@ -101,10 +101,10 @@ public class LabeledStatement extends JavaStatement
     }
 
     public ProgramPrefix getPrefixElementAt(int i) {       
-        return prefixElementArray.getProgramPrefix(i);
+        return prefixElementArray.get(i);
     }
 
-    public ArrayOfProgramPrefix getPrefixElements() {
+    public ImmutableArray<ProgramPrefix> getPrefixElements() {
         return prefixElementArray;
     }
 

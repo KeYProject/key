@@ -10,7 +10,6 @@
 
 package de.uka.ilkd.key.proof;
 
-import de.uka.ilkd.key.rule.SLListOfRuleSet;
 import de.uka.ilkd.key.rule.Taclet;
 
 /**

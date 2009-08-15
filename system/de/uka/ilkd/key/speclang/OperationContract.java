@@ -12,8 +12,10 @@ package de.uka.ilkd.key.speclang;
 
 import java.util.Map;
 
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.SetOfLocationDescriptor;
+import de.uka.ilkd.key.logic.LocationDescriptor;
 import de.uka.ilkd.key.logic.op.*;
 
 
@@ -48,7 +50,7 @@ public interface OperationContract {
      * Returns the precondition of the contract.
      */
     public FormulaWithAxioms getPre(ParsableVariable selfVar, 
-                                    ListOfParsableVariable paramVars,
+                                    ImmutableList<ParsableVariable> paramVars,
                                     Services services);
 
     /**
@@ -59,7 +61,7 @@ public interface OperationContract {
      *                       the map.˙
      */
     public FormulaWithAxioms getPost(ParsableVariable selfVar, 
-                                     ListOfParsableVariable paramVars, 
+                                     ImmutableList<ParsableVariable> paramVars, 
                                      ParsableVariable resultVar, 
                                      ParsableVariable excVar,
                                      /*inout*/ Map<Operator, Function/* at pre */> atPreFunctions,
@@ -68,8 +70,8 @@ public interface OperationContract {
     /**
      * Returns the modifier set of the contract.
      */
-    public SetOfLocationDescriptor getModifies(ParsableVariable selfVar, 
-                                               ListOfParsableVariable paramVars,
+    public ImmutableSet<LocationDescriptor> getModifies(ParsableVariable selfVar, 
+                                               ImmutableList<ParsableVariable> paramVars,
                                                Services services);
     
 
@@ -97,7 +99,7 @@ public interface OperationContract {
      */
     public OperationContract addPre(FormulaWithAxioms addedPre,
 	    			    ParsableVariable selfVar, 
-                                    ListOfParsableVariable paramVars,
+                                    ImmutableList<ParsableVariable> paramVars,
                                     Services services);
         
     /**

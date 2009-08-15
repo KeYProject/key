@@ -3,7 +3,7 @@
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
+// The KeY system is protected by the GNU General Public License.
 // See LICENSE.TXT for details.
 //
 //
@@ -12,18 +12,14 @@ package de.uka.ilkd.key.proof.init;
 
 import java.util.*;
 
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.logic.AnonymisingUpdateFactory;
-import de.uka.ilkd.key.logic.IteratorOfNamed;
-import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.SetAsListOfChoice;
-import de.uka.ilkd.key.logic.SetOfLocationDescriptor;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.TermFactory;
-import de.uka.ilkd.key.logic.UpdateFactory;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.AtPreFactory;
@@ -31,9 +27,11 @@ import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
-import de.uka.ilkd.key.rule.SetOfTaclet;
+import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.UpdateSimplifier;
-import de.uka.ilkd.key.speclang.*;
+import de.uka.ilkd.key.speclang.ClassInvariant;
+import de.uka.ilkd.key.speclang.FormulaWithAxioms;
+import de.uka.ilkd.key.speclang.OperationContract;
 
 
 
@@ -59,10 +57,10 @@ public abstract class AbstractPO implements ProofOblInput {
     private final Map<Operator, Term> axioms = new LinkedHashMap<Operator, Term>();
     private String header;
     private ProofAggregate proofAggregate;
-    
+
     protected Term[] poTerms;
     protected String[] poNames;
-    protected SetOfTaclet[] poTaclets;
+    protected ImmutableSet<NoPosTacletApp>[] poTaclets;
 
 
     //-------------------------------------------------------------------------
@@ -91,9 +89,9 @@ public abstract class AbstractPO implements ProofOblInput {
         return new LogicVariable(new ProgramElementName("self"), selfKJT.getSort());
     }
 
-    protected final ListOfProgramVariable buildParamVars(ProgramMethod programMethod) {
+    protected final ImmutableList<ProgramVariable> buildParamVars(ProgramMethod programMethod) {
         int numPars = programMethod.getParameterDeclarationCount();
-        ListOfProgramVariable result = SLListOfProgramVariable.EMPTY_LIST;
+        ImmutableList<ProgramVariable> result = ImmutableSLList.<ProgramVariable>nil();
 
         for(int i = 0; i < numPars; i++) {
             KeYJavaType parType = programMethod.getParameterType(i);
@@ -122,16 +120,16 @@ public abstract class AbstractPO implements ProofOblInput {
     protected final ProgramVariable buildExcVar() {
         final KeYJavaType excType
         	= javaInfo.getTypeByClassName("java.lang.Throwable");
-        return new LocationVariable(new ProgramElementName("exc"), excType);      
+        return new LocationVariable(new ProgramElementName("exc"), excType);
     }
-    
+
 
     /**
-     * Translates a precondition out of an operation contract. 
+     * Translates a precondition out of an operation contract.
      */
     protected final Term translatePre(OperationContract contract,
                                       ParsableVariable selfVar,
-                                      ListOfParsableVariable paramVars) 
+                                      ImmutableList<ParsableVariable> paramVars)
     		throws ProofInputException {
         FormulaWithAxioms fwa = contract.getPre(selfVar, paramVars, services);
         axioms.putAll(fwa.getAxioms());
@@ -140,19 +138,19 @@ public abstract class AbstractPO implements ProofOblInput {
 
 
     /**
-     * Translates a postcondition out of an operation contract. 
+     * Translates a postcondition out of an operation contract.
      */
     protected final Term translatePost(OperationContract contract,
                                        ParsableVariable selfVar,
-                                       ListOfParsableVariable paramVars,
+                                       ImmutableList<ParsableVariable> paramVars,
                                        ParsableVariable resultVar,
                                        ParsableVariable excVar,
-                                       /*inout*/ Map<Operator, Function/*(atPre)*/> atPreFunctions) 
+                                       /*inout*/ Map<Operator, Function/*(atPre)*/> atPreFunctions)
     		throws ProofInputException {
-        FormulaWithAxioms fwa = contract.getPost(selfVar, 
-        					 paramVars, 
-        					 resultVar, 
-        					 excVar, 
+        FormulaWithAxioms fwa = contract.getPost(selfVar,
+        					 paramVars,
+        					 resultVar,
+        					 excVar,
                                                  atPreFunctions,
         					 services);
         axioms.putAll(fwa.getAxioms());
@@ -166,9 +164,9 @@ public abstract class AbstractPO implements ProofOblInput {
     protected  final Term translateModifies(OperationContract contract,
                                             Term targetTerm,
                                             ParsableVariable selfVar,
-                                            ListOfParsableVariable paramVars) 
+                                            ImmutableList<ParsableVariable> paramVars)
     		throws ProofInputException {
-        SetOfLocationDescriptor locations = contract.getModifies(selfVar,
+        ImmutableSet<LocationDescriptor> locations = contract.getModifies(selfVar,
                                                                  paramVars,
                                                                  services);
 
@@ -178,23 +176,23 @@ public abstract class AbstractPO implements ProofOblInput {
                 targetTerm,
                 services);
     }
-    
-    
+
+
     /**
-     * Translates a class invariant. 
+     * Translates a class invariant.
      */
-    protected final Term translateInv(ClassInvariant inv) 
+    protected final Term translateInv(ClassInvariant inv)
     		throws ProofInputException {
         final FormulaWithAxioms fwa = inv.getClosedInv(services);
         axioms.putAll(fwa.getAxioms());
         return fwa.getFormula();
     }
-    
-    
+
+
     /**
-     * Translates a set of class invariants. 
+     * Translates a set of class invariants.
      */
-    protected final Term translateInvs(SetOfClassInvariant invs) 
+    protected final Term translateInvs(ImmutableSet<ClassInvariant> invs)
     		throws ProofInputException {
 	Term result = TB.tt();
 	for (final ClassInvariant inv : invs) {
@@ -202,28 +200,28 @@ public abstract class AbstractPO implements ProofOblInput {
 	}
 	return result;
     }
-    
-    
+
+
     /**
-     * Translates a class invariant such that the passed variable is excluded 
+     * Translates a class invariant such that the passed variable is excluded
      */
-    protected final Term translateInvExcludingOne(ClassInvariant inv, 
-	    			                  ParsableVariable excludedVar) 
+    protected final Term translateInvExcludingOne(ClassInvariant inv,
+	    			                  ParsableVariable excludedVar)
     		throws ProofInputException {
-        final FormulaWithAxioms fwa = inv.getClosedInvExcludingOne(excludedVar, 
+        final FormulaWithAxioms fwa = inv.getClosedInvExcludingOne(excludedVar,
         							   services);
         axioms.putAll(fwa.getAxioms());
         return fwa.getFormula();
     }
-    
-    
+
+
     /**
-     * Translates a set of class invariants such that the passed variable is 
-     * excluded 
+     * Translates a set of class invariants such that the passed variable is
+     * excluded
      */
     protected final Term translateInvsExcludingOne(
-	    				SetOfClassInvariant invs, 
-                			ParsableVariable excludedVar) 
+	    				ImmutableSet<ClassInvariant> invs,
+                			ParsableVariable excludedVar)
     		throws ProofInputException {
 	Term result = TB.tt();
 	for (final ClassInvariant inv : invs) {
@@ -231,25 +229,25 @@ public abstract class AbstractPO implements ProofOblInput {
 	}
 	return result;
     }
-    
-    
+
+
     /**
-     * Translates a class invariant as an open formula. 
+     * Translates a class invariant as an open formula.
      */
-    protected final Term translateInvOpen(ClassInvariant inv, 
-	    			          ParsableVariable selfVar) 
+    protected final Term translateInvOpen(ClassInvariant inv,
+	    			          ParsableVariable selfVar)
     		throws ProofInputException {
         FormulaWithAxioms fwa = inv.getOpenInv(selfVar, services);
         axioms.putAll(fwa.getAxioms());
         return fwa.getFormula();
     }
-    
-    
+
+
     /**
-     * Translates a set of class invariants as an open formula. 
+     * Translates a set of class invariants as an open formula.
      */
-    protected final Term translateInvsOpen(SetOfClassInvariant invs, 
-	    		                   ParsableVariable selfVar) 
+    protected final Term translateInvsOpen(ImmutableSet<ClassInvariant> invs,
+	    		                   ParsableVariable selfVar)
     		throws ProofInputException {
 	Term result = TB.tt();
 	for (final ClassInvariant inv : invs) {
@@ -257,21 +255,21 @@ public abstract class AbstractPO implements ProofOblInput {
 	}
 	return result;
     }
-    
-    
-    protected  final ListOfParsableVariable toPV(ListOfProgramVariable vars) {
-	ListOfParsableVariable result = SLListOfParsableVariable.EMPTY_LIST;
+
+
+    protected  final ImmutableList<ParsableVariable> toPV(ImmutableList<ProgramVariable> vars) {
+	ImmutableList<ParsableVariable> result = ImmutableSLList.<ParsableVariable>nil();
 	for (final ProgramVariable pv : vars) {
 	    result = result.append(pv);
 	}
 	return result;
     }
 
-    
+
     /**
      * Replaces operators in a term by other operators with the same signature.
      */
-    protected final Term replaceOps(Map<? extends Operator, ? extends Operator> map, Term term) {      
+    protected final Term replaceOps(Map<? extends Operator, ? extends Operator> map, Term term) {
         return new OpReplacer(map).replace(term);
     }
 
@@ -290,8 +288,8 @@ public abstract class AbstractPO implements ProofOblInput {
     }
 
 
-    protected final void registerInNamespaces(ListOfProgramVariable pvs) {
-        final IteratorOfProgramVariable it = pvs.iterator();
+    protected final void registerInNamespaces(ImmutableList<ProgramVariable> pvs) {
+        final Iterator<ProgramVariable> it = pvs.iterator();
         while(it.hasNext()) {
             initConfig.progVarNS().add(it.next());
         }
@@ -300,31 +298,31 @@ public abstract class AbstractPO implements ProofOblInput {
 
     protected final void registerInNamespaces(/*in*/ Map<Operator, Function> atPreFunctions) {
         for (final Function atPreF : atPreFunctions.values()) {
-            initConfig.funcNS().add(atPreF); 
+            initConfig.funcNS().add(atPreF);
         }
     }
-    
+
 
 
     //-------------------------------------------------------------------------
     //methods of ProofOblInput interface
     //-------------------------------------------------------------------------
-    
+
     public final String name() {
         return name;
     }
-    
+
 
     public boolean askUserForEnvironment() {
         return false;
     }
-    
-        
+
+
     public void readActivatedChoices() throws ProofInputException {
-	initConfig.setActivatedChoices(SetAsListOfChoice.EMPTY_SET);
+	initConfig.setActivatedChoices(DefaultImmutableSet.<Choice>nil());
     }
 
-    
+
     /**
      * Creates declarations necessary to save/load proof in textual form
      * (helper for createProof()).
@@ -333,14 +331,14 @@ public abstract class AbstractPO implements ProofOblInput {
         if(header != null) {
             return;
         }
-                
+
         if(initConfig.getOriginalKeYFileName() == null) {
             header = "\\javaSource \""+javaPath+"\";\n\n";
         } else {
             header = "\\include \"./" + initConfig.getOriginalKeYFileName() + "\";";
         }
 
-        IteratorOfNamed it;
+        Iterator<Named> it;
 
         /* program sorts need not be declared and
          * there are no user-defined sorts with this kind of PO (yes?)
@@ -362,7 +360,7 @@ public abstract class AbstractPO implements ProofOblInput {
         it = initConfig.progVarNS().allElements().iterator();
         while(it.hasNext())
         header += ((ProgramVariable)(it.next())).proofToString();
-        
+
         header += "}\n\n\\functions {\n";
         it = initConfig.funcNS().allElements().iterator();
         while(it.hasNext()) {
@@ -377,7 +375,7 @@ public abstract class AbstractPO implements ProofOblInput {
 
         it = initConfig.funcNS().allElements().iterator();
         while(it.hasNext()) {
-            Function f = (Function)it.next();            
+            Function f = (Function)it.next();
             if(f.sort() == Sort.FORMULA && services.getNameRecorder().getProposals().contains(f.name())) {
                 header += f.proofToString();
             }
@@ -411,22 +409,22 @@ public abstract class AbstractPO implements ProofOblInput {
         Term result = TB.tt();
 
         final Set<Term> axiomSet = getRequiredAxiomsAsSet(t);
-        
+
         for (final Term axiom : axiomSet) {
             result = TB.and(result, axiom);
         }
-/*        
-        if(axioms.containsKey(t.op())) {            
+/*
+        if(axioms.containsKey(t.op())) {
             result = TB.and(result, (Term)axioms.get(t.op()));
         }
-    
+
         for(int i = 0; i < t.arity(); i++) {
             result = TB.and(result, getRequiredAxioms(t.sub(i)));
         }
-*/    
+*/
         return result;
     }
-      
+
 
     /**
      * Returns those axioms from the SLDL-Translation which are required for
@@ -434,28 +432,28 @@ public abstract class AbstractPO implements ProofOblInput {
      */
     private Set<Term> getRequiredAxiomsAsSet(Term t) {
         Set<Term> result = new LinkedHashSet<Term>();
-        
+
         if (axioms.containsKey(t.op())) {
             result.add(axioms.get(t.op()));
         }
-        
+
         for(int i = 0; i < t.arity(); i++) {
             result.addAll(getRequiredAxiomsAsSet(t.sub(i)));
         }
-        
+
         return result;
     }
-    
-    
+
+
     public ProofAggregate getPO() {
         if(proofAggregate != null) {
             return proofAggregate;
         }
-        
+
         if(poTerms == null) {
             throw new IllegalStateException("No proof obligation terms.");
         }
-        
+
         Proof[] proofs = new Proof[poTerms.length];
         for(int i = 0; i < proofs.length; i++) {
             Term axioms = getRequiredAxioms(poTerms[i]);
@@ -464,17 +462,17 @@ public abstract class AbstractPO implements ProofOblInput {
                                     ? TB.imp(TB.and(axioms, poTerms[i].sub(0)),
                                              poTerms[i].sub(1))
                                     : TB.imp(axioms, poTerms[i]));
-            
+
             if(poTaclets != null) {
                 proofs[i].getGoal(proofs[i].root()).indexOfTaclets()
                                                    .addTaclets(poTaclets[i]);
             }
         }
-        
+
         return proofAggregate = ProofAggregate.createProofAggregate(proofs, name);
     }
-    
-    
+
+
     public boolean implies(ProofOblInput po) {
         return equals(po);
     }

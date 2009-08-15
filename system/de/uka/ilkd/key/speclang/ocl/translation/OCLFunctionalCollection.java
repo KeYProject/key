@@ -10,11 +10,12 @@
 
 package de.uka.ilkd.key.speclang.ocl.translation;
 
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.LogicVariable;
-import de.uka.ilkd.key.logic.op.SetOfQuantifiableVariable;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.sort.SequenceSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
@@ -204,22 +205,22 @@ class OCLFunctionalCollection {
 
         // is this right? 
         // or are there any collect-expressions which don't have the collectorVar as first subterm?
-        LogicVariable collectVar = (LogicVariable) collectTerm.sub(0).freeVars().toArray()[0];
+        LogicVariable collectVar = (LogicVariable) collectTerm.sub(0).freeVars().iterator().next();
         
         Function f = funcFactory.createCollectFunction(
                 collectVar,
                 collectTerm,
                 this.collectionType);
 
-        SetOfQuantifiableVariable vars = collectTerm.freeVars();
+        ImmutableSet<QuantifiableVariable> vars = collectTerm.freeVars();
         vars = vars.remove(collectVar);
         
         Term[] params = new Term[vars.size()+1];
         
         params[0] = this.restriction;
-        
-        for(int i=0;i<vars.size();i++) {
-            params[i+1] = tf.createVariableTerm((LogicVariable) vars.toArray()[i]);
+        int i = 1;
+        for(QuantifiableVariable qvar : vars) {
+            params[i] = tf.createVariableTerm((LogicVariable) qvar);
         }
         
         Term newRestriction = tf.createFunctionTerm(f,params);
@@ -247,15 +248,15 @@ class OCLFunctionalCollection {
                 selectTerm,
                 this.collectionType);                
 
-        SetOfQuantifiableVariable vars = selectTerm.freeVars();
+        ImmutableSet<QuantifiableVariable> vars = selectTerm.freeVars();
         vars = vars.remove(selectVar);
         
         Term[] params = new Term[vars.size()+1];
         
         params[0] = this.restriction;
-        
-        for(int i=0;i<vars.size();i++) {
-            params[i+1] = tf.createVariableTerm((LogicVariable) vars.toArray()[i]);
+        int i = 1;
+        for(QuantifiableVariable qvar : vars) {
+            params[i] = tf.createVariableTerm((LogicVariable) qvar);
         }
         
         Term newRestriction = tf.createFunctionTerm(f,params);

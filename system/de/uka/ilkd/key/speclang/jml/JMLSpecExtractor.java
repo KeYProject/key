@@ -17,7 +17,7 @@
 
 package de.uka.ilkd.key.speclang.jml;
 
-import de.uka.ilkd.key.collection.SLListOfString;
+import de.uka.ilkd.key.collection.*;
 import de.uka.ilkd.key.java.Comment;
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.java.ProgramElement;
@@ -27,12 +27,11 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.declaration.*;
 import de.uka.ilkd.key.java.recoderext.JMLTransformer;
-import de.uka.ilkd.key.java.reference.ArrayOfTypeReference;
+import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.op.NonRigidHeapDependentFunction;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
-import de.uka.ilkd.key.logic.sort.ArrayOfSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.speclang.*;
 import de.uka.ilkd.key.speclang.jml.pretranslation.*;
@@ -48,8 +47,8 @@ public class JMLSpecExtractor implements SpecExtractor {
 
     private final Services services;
     private final JMLSpecFactory jsf;
-    private SetOfPositionedString warnings 
-        = SetAsListOfPositionedString.EMPTY_SET;
+    private ImmutableSet<PositionedString> warnings 
+        = DefaultImmutableSet.<PositionedString>nil();
 
     
     //-------------------------------------------------------------------------
@@ -128,13 +127,13 @@ public class JMLSpecExtractor implements SpecExtractor {
                                                          - 1);
 
         Sort sort;
-        ArrayOfSort argSorts;
+        ImmutableArray<Sort> argSorts;
         try {
             sort 
                 = services.getJavaInfo().getTypeByClassName(typeName).getSort();
             argSorts = decl.getMods().contains("static") 
-                       ? new ArrayOfSort()
-                       : new ArrayOfSort(classKjt.getSort());
+                       ? new ImmutableArray<Sort>()
+                       : new ImmutableArray<Sort>(classKjt.getSort());
         } catch(Throwable e) {
             throw new SLTranslationException(e.getMessage() 
                                              + " ("
@@ -158,7 +157,7 @@ public class JMLSpecExtractor implements SpecExtractor {
             return "\\nothing;";
         }
 
-        ArrayOfTypeReference exceptions = pm.getThrown().getExceptions();
+        ImmutableArray<TypeReference> exceptions = pm.getThrown().getExceptions();
 
         if(exceptions == null) {
             return "\\nothing;";
@@ -170,11 +169,11 @@ public class JMLSpecExtractor implements SpecExtractor {
             //only subtypes of java.lang.Exception are in the default
             //signals-only
             if(services.getJavaInfo().isSubtype(
-                    exceptions.getTypeReference(i).getKeYJavaType(),
+                    exceptions.get(i).getKeYJavaType(),
                     services.getJavaInfo()
                             .getKeYJavaType("java.lang.Exception"))) {
                 exceptionsString 
-                    += exceptions.getTypeReference(i).getName() + ", ";
+                    += exceptions.get(i).getName() + ", ";
             }
         }
 
@@ -200,9 +199,9 @@ public class JMLSpecExtractor implements SpecExtractor {
      * @param pos the Position where to place this implicit specification
      * @return set of formulas specifying non-nullity for field/variables
      */  
-    private SetOfPositionedString createNonNullPositionedString(String varName, KeYJavaType kjt, 
+    private ImmutableSet<PositionedString> createNonNullPositionedString(String varName, KeYJavaType kjt, 
 	    boolean isImplicitVar, String fileName, Position pos) {
-	SetOfPositionedString result = SetAsListOfPositionedString.EMPTY_SET; 
+	ImmutableSet<PositionedString> result = DefaultImmutableSet.<PositionedString>nil(); 
 	final Type varType  = kjt.getJavaType(); 
 
 	if (services.getTypeConverter().isReferenceType(varType) && !isImplicitVar) {
@@ -229,9 +228,9 @@ public class JMLSpecExtractor implements SpecExtractor {
     //public interface
     //-------------------------------------------------------------------------
 
-    public SetOfClassInvariant extractClassInvariants(KeYJavaType kjt)
+    public ImmutableSet<ClassInvariant> extractClassInvariants(KeYJavaType kjt)
             throws SLTranslationException {
-        SetOfClassInvariant result = SetAsListOfClassInvariant.EMPTY_SET;
+        ImmutableSet<ClassInvariant> result = DefaultImmutableSet.<ClassInvariant>nil();
 
         //primitive types have no class invariants
         if(!(kjt.getJavaType() instanceof TypeDeclaration)) {
@@ -243,18 +242,18 @@ public class JMLSpecExtractor implements SpecExtractor {
         String fileName = td.getPositionInfo().getFileName();
 
         //add invariants for non_null fields
-        ArrayOfMemberDeclaration fds = td.getMembers();
+        ImmutableArray<MemberDeclaration> fds = td.getMembers();
         for(int i = 0, m = fds.size(); i < m; i++) {
-            if(fds.getMemberDeclaration(i) instanceof FieldDeclaration) {
+            if(fds.get(i) instanceof FieldDeclaration) {
                 FieldDeclaration fd 
-                    = (FieldDeclaration) fds.getMemberDeclaration(i);
-                ArrayOfFieldSpecification fields = fd.getFieldSpecifications();
+                    = (FieldDeclaration) fds.get(i);
+                ImmutableArray<FieldSpecification> fields = fd.getFieldSpecifications();
                 for(int j = 0, n = fields.size(); j < n; j++) {
-                    FieldSpecification field = fields.getFieldSpecification(j);
+                    FieldSpecification field = fields.get(j);
                     //add invariant only for fields of reference types
                     //and not for implicit fields.
                     if (!JMLInfoExtractor.isNullable(field.getProgramName(), kjt)) {
-                	SetOfPositionedString nonNullInvs =
+                	ImmutableSet<PositionedString> nonNullInvs =
                 	    createNonNullPositionedString(field.getProgramName(),
                 		    field.getProgramVariable().getKeYJavaType(),
                 		    field instanceof ImplicitFieldSpecification,
@@ -298,7 +297,7 @@ public class JMLSpecExtractor implements SpecExtractor {
             //call preparser
             KeYJMLPreParser preParser 
                 = new KeYJMLPreParser(concatenatedComment, fileName, pos);
-            ListOfTextualJMLConstruct constructs 
+            ImmutableList<TextualJMLConstruct> constructs 
                 = preParser.parseClasslevelComment();
             warnings = warnings.union(preParser.getWarnings());
 
@@ -323,9 +322,9 @@ public class JMLSpecExtractor implements SpecExtractor {
     }
 
     
-    public SetOfOperationContract extractOperationContracts(ProgramMethod pm)
+    public ImmutableSet<OperationContract> extractOperationContracts(ProgramMethod pm)
             throws SLTranslationException {
-        SetOfOperationContract result = SetAsListOfOperationContract.EMPTY_SET;
+        ImmutableSet<OperationContract> result = DefaultImmutableSet.<OperationContract>nil();
 
         //get type declaration, file name
         TypeDeclaration td 
@@ -336,17 +335,17 @@ public class JMLSpecExtractor implements SpecExtractor {
         final boolean isPure = JMLInfoExtractor.isPure(pm);
         if(isPure) {
             TextualJMLSpecCase sc 
-                = new TextualJMLSpecCase(SLListOfString.EMPTY_LIST, 
+                = new TextualJMLSpecCase(ImmutableSLList.<String>nil(), 
                                          Behavior.NONE);
             sc.addAssignable(new PositionedString("\\nothing"));
-            SetOfOperationContract contracts 
+            ImmutableSet<OperationContract> contracts 
                 = jsf.createJMLOperationContractsAndInherit(pm, sc);
             result = result.union(contracts);
         }
 
         //get textual JML constructs
         Comment[] comments = pm.getComments();
-        ListOfTextualJMLConstruct constructs;
+        ImmutableList<TextualJMLConstruct> constructs;
         if(comments.length != 0) {
             //concatenate comments, determine position
             String concatenatedComment = concatenate(comments);
@@ -358,11 +357,11 @@ public class JMLSpecExtractor implements SpecExtractor {
             constructs = preParser.parseClasslevelComment();
             warnings = warnings.union(preParser.getWarnings());
         } else {
-            constructs = SLListOfTextualJMLConstruct.EMPTY_LIST;
+            constructs = ImmutableSLList.<TextualJMLConstruct>nil();
         }
 
         //create JML contracts out of constructs, add them to result
-        TextualJMLConstruct[] constructsArray = constructs.toArray();
+        TextualJMLConstruct[] constructsArray = constructs.toArray(new TextualJMLConstruct[constructs.size()]);
 
         int startPos;
         if(pm.isModel()) {
@@ -392,7 +391,7 @@ public class JMLSpecExtractor implements SpecExtractor {
                 final VariableSpecification paramDecl = pm.getParameterDeclarationAt(j)
 		        .getVariableSpecification();
                 if (!JMLInfoExtractor.parameterIsNullable(pm, j)) {
-                    final SetOfPositionedString nonNullParams = 
+                    final ImmutableSet<PositionedString> nonNullParams = 
                 	createNonNullPositionedString(paramDecl.getName(),
                 		paramDecl.getProgramVariable().getKeYJavaType(),
                 		false,
@@ -408,7 +407,7 @@ public class JMLSpecExtractor implements SpecExtractor {
             if(resultType != null &&
         	    !JMLInfoExtractor.resultIsNullable(pm) &&
         	    specCase.getBehavior() != Behavior.EXCEPTIONAL_BEHAVIOR) {
-        	final SetOfPositionedString resultNonNull = 
+        	final ImmutableSet<PositionedString> resultNonNull = 
         	    createNonNullPositionedString("\\result", resultType, false, 
         		    fileName, pm.getStartPosition());
         	for (PositionedString nonNull : resultNonNull) {
@@ -425,7 +424,7 @@ public class JMLSpecExtractor implements SpecExtractor {
 
             //translate contract
             try {
-                SetOfOperationContract contracts 
+                ImmutableSet<OperationContract> contracts 
                     = jsf.createJMLOperationContractsAndInherit(pm, specCase);
                 result = result.union(contracts);
             } catch (SLWarningException e) {
@@ -460,7 +459,7 @@ public class JMLSpecExtractor implements SpecExtractor {
         //call preparser
         KeYJMLPreParser preParser 
             = new KeYJMLPreParser(concatenatedComment, fileName, pos);
-        ListOfTextualJMLConstruct constructs 
+        ImmutableList<TextualJMLConstruct> constructs 
             = preParser.parseMethodlevelComment();
         warnings = warnings.union(preParser.getWarnings());
 
@@ -481,7 +480,7 @@ public class JMLSpecExtractor implements SpecExtractor {
         return result;
     }
 
-    public SetOfPositionedString getWarnings() {
+    public ImmutableSet<PositionedString> getWarnings() {
         return JMLTransformer.getWarningsOfLastInstance().union(warnings);
     }
 }

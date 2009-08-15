@@ -11,8 +11,9 @@
 
 package de.uka.ilkd.key.logic;
 
-import de.uka.ilkd.key.logic.op.ArrayOfQuantifiableVariable;
+import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 
 /** 
@@ -96,7 +97,7 @@ abstract class OpTerm extends Term {
      * an instance of an {@link OpTerm} binds no variables on its top level
      * therefore we return the empty list here.
      */
-    public ArrayOfQuantifiableVariable varsBoundHere(int n) {
+    public ImmutableArray<QuantifiableVariable> varsBoundHere(int n) {
         return EMPTY_VAR_LIST;
     }
 
@@ -108,7 +109,7 @@ abstract class OpTerm extends Term {
     static class ArbitraryOpTerm extends OpTerm {
 
         /** the arry containing the sub terms */
-        private final ArrayOfTerm subTerm;
+        private final ImmutableArray<Term> subTerm;
 
         /** the depth of the term */
         private int depth = -1;
@@ -122,7 +123,7 @@ abstract class OpTerm extends Term {
         ArbitraryOpTerm(Operator op, Term[] subTerm) {
             super(op, op.sort(subTerm));
             
-            this.subTerm   = new ArrayOfTerm(subTerm);
+            this.subTerm   = new ImmutableArray<Term>(subTerm);
                         
             fillCaches();	
         }   
@@ -150,11 +151,11 @@ abstract class OpTerm extends Term {
 
         /** the nr-th subterm */
         public Term sub(int nr) {
-            return subTerm.getTerm(nr);        
+            return subTerm.get(nr);        
         }
 
         /** @return an empty variable list */
-        public ArrayOfQuantifiableVariable varsBoundHere(int n) {
+        public ImmutableArray<QuantifiableVariable> varsBoundHere(int n) {
             return EMPTY_VAR_LIST;
         }
 

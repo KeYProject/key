@@ -203,7 +203,7 @@ public class New
         if (children != null) {
             len = children.size();
             if (len > index) {
-                return children.getExpression(index);
+                return children.get(index);
             }
             index -= len;
         }

@@ -11,6 +11,10 @@
 
 package de.uka.ilkd.key.speclang.ocl;
 
+import java.util.Iterator;
+
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -18,10 +22,10 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 
 public class UMLInfo {
     private final Services services;
-    private final ListOfAssociation allAssociations;
+    private final ImmutableList<Association> allAssociations;
     
     
-    public UMLInfo(Services services, ListOfAssociation allAssociations) {
+    public UMLInfo(Services services, ImmutableList<Association> allAssociations) {
         this.services        = services;
         this.allAssociations = allAssociations;
     }
@@ -31,15 +35,15 @@ public class UMLInfo {
      * Returns all associations with at least one end in the passed type 
      * or one of its supertypes.
      */
-    public ListOfAssociation getAssociations(KeYJavaType kjt) {
+    public ImmutableList<Association> getAssociations(KeYJavaType kjt) {
         assert kjt != null;
-        ListOfAssociation result = SLListOfAssociation.EMPTY_LIST;
+        ImmutableList<Association> result = ImmutableSLList.<Association>nil();
         
-        IteratorOfAssociation it = allAssociations.iterator();
+        Iterator<Association> it = allAssociations.iterator();
         while(it.hasNext()) {
             Association assoc = it.next();
             
-            IteratorOfAssociationEnd it2 = assoc.getEnds().iterator();
+            Iterator<AssociationEnd> it2 = assoc.getEnds().iterator();
             while(it2.hasNext()) {
                 AssociationEnd end = it2.next();
                 String endClassName = end.getModelClass().getFullClassName();
@@ -62,17 +66,17 @@ public class UMLInfo {
      * Returns all binary associations with at least one end in the passed type,
      * and whose role name on the other side is the passed string.
      */
-    public ListOfAssociation getAssociations(KeYJavaType kjt, 
+    public ImmutableList<Association> getAssociations(KeYJavaType kjt, 
                                              String qualifier) {
-        ListOfAssociation result = SLListOfAssociation.EMPTY_LIST;
+        ImmutableList<Association> result = ImmutableSLList.<Association>nil();
         
         //iterate over all associations for the desired class
-        ListOfAssociation classAssocs = getAssociations(kjt);
-        IteratorOfAssociation it = classAssocs.iterator();
+        ImmutableList<Association> classAssocs = getAssociations(kjt);
+        Iterator<Association> it = classAssocs.iterator();
         while(it.hasNext()) {
             Association assoc = it.next();
             
-            ListOfAssociationEnd ends = assoc.getEnds();
+            ImmutableList<AssociationEnd> ends = assoc.getEnds();
             if(ends.size() != 2) {
                 continue;
             }
@@ -85,7 +89,7 @@ public class UMLInfo {
             	= ends.tail().head().getModelClass().getFullClassName();
             KeYJavaType end1Kjt = javaInfo.getTypeByClassName(end1ClassName);
             KeYJavaType end2Kjt = javaInfo.getTypeByClassName(end2ClassName);
-            ListOfAssociationEnd targetEnds = SLListOfAssociationEnd.EMPTY_LIST;
+            ImmutableList<AssociationEnd> targetEnds = ImmutableSLList.<AssociationEnd>nil();
             if(javaInfo.isSubtype(kjt, end1Kjt)) {
                 targetEnds = targetEnds.prepend(ends.tail().head());
             }
@@ -95,7 +99,7 @@ public class UMLInfo {
             assert !targetEnds.isEmpty();
             
             //check if one of those ends has the desired role name
-            IteratorOfAssociationEnd it2 = targetEnds.iterator();
+            Iterator<AssociationEnd> it2 = targetEnds.iterator();
             while(it2.hasNext()) {
                 AssociationEnd end = it2.next();                
                 if(end.getRoleName().toString().equals(qualifier)) {

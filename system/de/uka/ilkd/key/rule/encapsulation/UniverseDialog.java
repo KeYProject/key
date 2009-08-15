@@ -27,6 +27,8 @@ import java.util.List;
 
 import javax.swing.*;
 
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.util.Debug;
 
 
@@ -36,11 +38,11 @@ class UniverseDialog extends JDialog {
     private static final Color COLOR_FALSE     = Color.RED;
     private static final Color COLOR_UNDECIDED = Color.LIGHT_GRAY;
 
-    private final ListOfTypeSchemeConstraint constraints;
+    private final ImmutableList<TypeSchemeConstraint> constraints;
     private final List /*JLabel*/ constraintLabels;
     
 
-    public UniverseDialog(ListOfTypeSchemeConstraint constraints) {
+    public UniverseDialog(ImmutableList<TypeSchemeConstraint> constraints) {
     	super(new JFrame(), "Universes", true);
 
         //initialise members
@@ -58,17 +60,17 @@ class UniverseDialog extends JDialog {
         getContentPane().add(varsPane);
 
         //create variable labels and combo boxes
-        SetOfTypeSchemeVariable vars
+        ImmutableSet<TypeSchemeVariable> vars
                 = (new TypeSchemeAndConstraint(constraints)).getFreeVars();
-        IteratorOfTypeSchemeVariable it = vars.iterator();
+        Iterator<TypeSchemeVariable> it = vars.iterator();
         while(it.hasNext()) {
             TypeSchemeVariable var = it.next();
 
             //prepare values
-            SetOfTypeScheme valueRange = var.getValueRange();
+            ImmutableSet<TypeScheme> valueRange = var.getValueRange();
             Object[] values = new Object[valueRange.size() + 1];
             values[0] = var.getDefaultValue();
-            IteratorOfTypeScheme it2 = valueRange.iterator();
+            Iterator<TypeScheme> it2 = valueRange.iterator();
             int i = 1;
             while(it2.hasNext()) {
                 values[i++] = it2.next();
@@ -98,7 +100,7 @@ class UniverseDialog extends JDialog {
         getContentPane().add(constraintsPane);
 
         //create constraints labels
-        IteratorOfTypeSchemeConstraint it2 = constraints.iterator();
+        Iterator<TypeSchemeConstraint> it2 = constraints.iterator();
         while(it2.hasNext()) {
             TypeSchemeConstraint constraint = it2.next();
 
@@ -117,8 +119,8 @@ class UniverseDialog extends JDialog {
 
 
     private boolean valueIsExact(TypeSchemeConstraint constraint) {
-        SetOfTypeSchemeVariable vars = constraint.getFreeVars();
-        IteratorOfTypeSchemeVariable it = vars.iterator();
+        ImmutableSet<TypeSchemeVariable> vars = constraint.getFreeVars();
+        Iterator<TypeSchemeVariable> it = vars.iterator();
         while(it.hasNext()) {
             if(!it.next().valueIsExact()) {
                 return false;
@@ -130,7 +132,7 @@ class UniverseDialog extends JDialog {
 
 
     private void refreshConstraintColors() {
-        IteratorOfTypeSchemeConstraint constraintsIt = constraints.iterator();
+        Iterator<TypeSchemeConstraint> constraintsIt = constraints.iterator();
         Iterator labelsIt = constraintLabels.iterator();
         while(constraintsIt.hasNext()) {
             Debug.assertTrue(labelsIt.hasNext());

@@ -10,12 +10,16 @@
 
 package de.uka.ilkd.key.rule;
 
+import java.util.Iterator;
+
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableMap;
+import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.IteratorOfGoal;
-import de.uka.ilkd.key.proof.ListOfGoal;
 
 
 /** 
@@ -32,7 +36,7 @@ public abstract class FindTaclet extends Taclet {
     protected Term find;
 
     /** Set of schemavariables of the if and the (optional) find part */
-    private SetOfSchemaVariable ifFindVariables = null;
+    private ImmutableSet<SchemaVariable> ifFindVariables = null;
 
     /** this method is used to determine if top level updates are
      * allowed to be ignored. This is the case if we have an Antec or
@@ -46,10 +50,10 @@ public abstract class FindTaclet extends Taclet {
      * @param name the Name of the taclet
      * @param applPart the TacletApplPart that contains the if-sequent, the
      * not-free and new-vars conditions 
-     * @param goalTemplates a ListOfTacletGoalTemplate that contains all goaltemplates of
+     * @param goalTemplates a IList<TacletGoalTemplate> that contains all goaltemplates of
      * the taclet (these are the instructions used to create new goals when
      * applying the Taclet)
-     * @param ruleSets a ListOfRuleSet that contains all rule sets the Taclet
+     * @param ruleSets a IList<RuleSet> that contains all rule sets the Taclet
      *      is attached to
      * @param constraint the Constraint of the Taclet (has to be fulfilled in
      * order to achieve this Taclet)
@@ -57,16 +61,16 @@ public abstract class FindTaclet extends Taclet {
      * recursive or something like that
      * @param find the Term that is the pattern that has to be found in a
      * sequent and the places where it matches the Taclet can be applied
-     * @param prefixMap a MapFromSchemaVariableToTacletPrefix that contains the
+     * @param prefixMap a ImmMap<SchemaVariable,TacletPrefix> that contains the
      * prefix for each SchemaVariable in the Taclet
      */
     public FindTaclet(Name name, TacletApplPart applPart,  
-		      ListOfTacletGoalTemplate goalTemplates, 
-		      ListOfRuleSet ruleSets,
+		      ImmutableList<TacletGoalTemplate> goalTemplates, 
+		      ImmutableList<RuleSet> ruleSets,
 		      Constraint constraint, TacletAttributes attrs,
 		      Term find,
-		      MapFromSchemaVariableToTacletPrefix prefixMap,
-		      SetOfChoice choices){
+		      ImmutableMap<SchemaVariable,TacletPrefix> prefixMap,
+		      ImmutableSet<Choice> choices){
 	super(name, applPart, goalTemplates, ruleSets, constraint, attrs,
 	      prefixMap, choices);
 	this.find = find;
@@ -139,7 +143,7 @@ public abstract class FindTaclet extends Taclet {
      * @param services the Services encapsulating all java information
      * @param ruleApp the taclet application that is executed.
      */
-    public ListOfGoal apply(Goal     goal,
+    public ImmutableList<Goal> apply(Goal     goal,
 			    Services services,
 			    RuleApp  ruleApp) {
 
@@ -152,14 +156,14 @@ public abstract class FindTaclet extends Taclet {
 	// Restrict introduced metavariables to the subtree
 	setRestrictedMetavariables ( goal, mc );
 
-	ListOfGoal                   newGoals         =
+	ImmutableList<Goal>                   newGoals         =
 	    checkIfGoals ( goal,
 			   tacletApp.ifFormulaInstantiations (),
 			   mc,
 			   numberOfNewGoals );
 	
-	IteratorOfTacletGoalTemplate it               = goalTemplates().iterator();
-	IteratorOfGoal               goalIt           = newGoals.iterator();
+	Iterator<TacletGoalTemplate> it               = goalTemplates().iterator();
+	Iterator<Goal>               goalIt           = newGoals.iterator();
 
         // reklov
         // START TEMPORARY DOWNWARD COMPATIBILITY
@@ -233,13 +237,13 @@ public abstract class FindTaclet extends Taclet {
      * @return Set of schemavariables of the if and the (optional)
      * find part
      */
-    public SetOfSchemaVariable getIfFindVariables () {
+    public ImmutableSet<SchemaVariable> getIfFindVariables () {
 	if ( ifFindVariables == null ) {
 	    TacletSchemaVariableCollector svc = new TacletSchemaVariableCollector ();
 	    find ().execPostOrder ( svc );
 	    
 	    ifFindVariables             = getIfVariables ();
-	    IteratorOfSchemaVariable it = svc.varIterator ();
+	    Iterator<SchemaVariable> it = svc.varIterator ();
 	    while ( it.hasNext () )
 		ifFindVariables = ifFindVariables.add ( it.next () );
 	}
@@ -294,27 +298,25 @@ public abstract class FindTaclet extends Taclet {
     
     /** returns the variables in a Taclet with a read access
     */
-    public ListOfSchemaVariable readSet() {
+    public ImmutableList<SchemaVariable> readSet() {
 
 	//List variables have to be collected to
-	ListOfSchemaVariable readFromVarialbes = 
-            SLListOfSchemaVariable.EMPTY_LIST;
+	ImmutableList<SchemaVariable> readFromVarialbes = 
+            ImmutableSLList.<SchemaVariable>nil();
 
 	//List of Variables in find-part
 	TacletSchemaVariableCollector tvarColl1 = new TacletSchemaVariableCollector() {
             public void visit(Term t) {	
 	        if (t.op() instanceof Modality || 
                     t.op() instanceof ModalOperatorSV) {
-	            varList = collectSVInProgram(t.javaBlock(),
-					         varList);
+	            varList = collectSVInProgram(t.javaBlock(), varList);
 	        }
 	        for (int j=0; j<t.arity(); j++) {
 	            for (int i=0;i<t.varsBoundHere(j).size();i++) {
-		        if (t.varsBoundHere(j).getQuantifiableVariable(i) 
+		        if (t.varsBoundHere(j).get(i) 
 		            instanceof SchemaVariable) {
 		            varList = varList.prepend
-			        ((SchemaVariable)t.varsBoundHere(j)
-			         .getQuantifiableVariable(i)); 
+			        ((SchemaVariable)t.varsBoundHere(j).get(i)); 
 		        }
 	            }
 	        }
@@ -332,10 +334,10 @@ public abstract class FindTaclet extends Taclet {
 	tvarColl2.visitGoalTemplates(this, false); 
 	
         // build intersection
-	IteratorOfSchemaVariable it1 = tvarColl1.varIterator();
+	Iterator<SchemaVariable> it1 = tvarColl1.varIterator();
 	while(it1.hasNext()){
 	        SchemaVariable sv1 = it1.next();
-		IteratorOfSchemaVariable it2 = tvarColl2.varIterator();
+		Iterator<SchemaVariable> it2 = tvarColl2.varIterator();
 
 		while(it2.hasNext()){
 		    SchemaVariable sv2 = it2.next();
@@ -358,9 +360,9 @@ public abstract class FindTaclet extends Taclet {
     /** 
      * returns the variable in a Taclet to which is written to
      */
-    public ListOfSchemaVariable writeSet() {
-	IteratorOfTacletGoalTemplate it = goalTemplates().iterator();
-	ListOfSchemaVariable updateVar = SLListOfSchemaVariable.EMPTY_LIST; 
+    public ImmutableList<SchemaVariable> writeSet() {
+	Iterator<TacletGoalTemplate> it = goalTemplates().iterator();
+	ImmutableList<SchemaVariable> updateVar = ImmutableSLList.<SchemaVariable>nil(); 
 	Term replWith = null; 
 	
 	while (it.hasNext()){
@@ -385,7 +387,7 @@ public abstract class FindTaclet extends Taclet {
      * returns the variables that occur bound in the find part
      * @return the variables that occur bound in the find part
      */
-    protected SetOfQuantifiableVariable getBoundVariablesHelper() {
+    protected ImmutableSet<QuantifiableVariable> getBoundVariablesHelper() {
         final BoundVarsVisitor bvv = new BoundVarsVisitor();
         bvv.visit(find());
         return bvv.getBoundVariables();

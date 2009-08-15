@@ -11,12 +11,14 @@
 package de.uka.ilkd.key.proof.reuse;
 
 import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
 
-import de.uka.ilkd.key.collection.SLListOfString;
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
@@ -118,7 +120,7 @@ public class ReusePoint implements Comparable {
       return reuseApp;
    }
    
-   public ListOfName getNameProposals() {
+   public ImmutableList<Name> getNameProposals() {
        return templateNode.getNameRecorder().getProposals();
    }
 
@@ -132,7 +134,7 @@ public class ReusePoint implements Comparable {
 
          // 0th pass
          SVInstantiations insts = ((TacletApp)templateApp).instantiations();
-	 IteratorOfSchemaVariable it = insts.svIterator();
+	 Iterator<SchemaVariable> it = insts.svIterator();
          while (it.hasNext()) {
              SchemaVariable sv = it.next();
              if (sv instanceof NameSV) {
@@ -249,7 +251,7 @@ public class ReusePoint implements Comparable {
 
 
       } else if (templateApp instanceof BuiltInRuleApp) {
-         IteratorOfRuleApp it = targetGoal.ruleAppIndex().
+         Iterator<RuleApp> it = targetGoal.ruleAppIndex().
             getBuiltInRule(targetGoal, targetPos, 
                medi.getUserConstraint().getConstraint()).iterator();
          RuleApp result = null;
@@ -275,7 +277,7 @@ public class ReusePoint implements Comparable {
        if (sv.isProgramSV()) {
            text = services.
            getVariableNamer().getSuggestiveNameProposalForProgramVariable((ProgramSV)sv, app, 
-                   targetGoal, services, SLListOfString.EMPTY_LIST);
+                   targetGoal, services, ImmutableSLList.<String>nil());
        } else {
            text = VariableNameProposer.DEFAULT.getNameProposal(sv.name().toString().replaceAll("#",""), 
                    services, targetGoal.node());
@@ -470,8 +472,8 @@ public class ReusePoint implements Comparable {
    }
    
    void compareIf(TacletApp sourceApp, TacletApp targetApp) {
-      ListOfIfFormulaInstantiation ifl1 = sourceApp.ifFormulaInstantiations();
-      ListOfIfFormulaInstantiation ifl2 = targetApp.ifFormulaInstantiations();
+      ImmutableList<IfFormulaInstantiation> ifl1 = sourceApp.ifFormulaInstantiations();
+      ImmutableList<IfFormulaInstantiation> ifl2 = targetApp.ifFormulaInstantiations();
       Term if1;
       ConstrainedFormula iff2;
       Term if2;

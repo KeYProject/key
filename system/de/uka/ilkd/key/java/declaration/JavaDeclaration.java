@@ -11,6 +11,7 @@
 
 package de.uka.ilkd.key.java.declaration;
 
+import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.Declaration;
 import de.uka.ilkd.key.java.JavaNonTerminalProgramElement;
 import de.uka.ilkd.key.java.declaration.modifier.*;
@@ -28,7 +29,7 @@ public abstract class JavaDeclaration extends JavaNonTerminalProgramElement
      * Modifiers.
      * caches the wrapper for the modifiers. The wrapper is needed to get access
      * to the array without hurting immutabilitiy */
-    protected final ArrayOfModifier modArray;
+    protected final ImmutableArray<Modifier> modArray;
 
     /**
      *      Java declaration.
@@ -40,10 +41,10 @@ public abstract class JavaDeclaration extends JavaNonTerminalProgramElement
 
 
     public JavaDeclaration(Modifier[] mods) {
-	modArray=new ArrayOfModifier(mods);
+	modArray=new ImmutableArray<Modifier>(mods);
     }
 
-    public JavaDeclaration(ArrayOfModifier mods) {
+    public JavaDeclaration(ImmutableArray<Modifier> mods) {
 	modArray =  mods;
     }
 
@@ -55,7 +56,7 @@ public abstract class JavaDeclaration extends JavaNonTerminalProgramElement
      */     
     public JavaDeclaration(ExtList children) {
 	super(children);
-	modArray=new ArrayOfModifier((Modifier[])children.collect(Modifier.class));
+	modArray=new ImmutableArray<Modifier>((Modifier[])children.collect(Modifier.class));
     }
 
 
@@ -64,7 +65,7 @@ public abstract class JavaDeclaration extends JavaNonTerminalProgramElement
      *      @return the modifier array wrapper.
      */
 
-    public ArrayOfModifier getModifiers() {
+    public ImmutableArray<Modifier> getModifiers() {
         return modArray;
     }
 
@@ -79,7 +80,7 @@ public abstract class JavaDeclaration extends JavaNonTerminalProgramElement
             return null;
         }
         for (int i = modArray.size() - 1; i >= 0; i -= 1) {
-            Modifier m = modArray.getModifier(i);
+            Modifier m = modArray.get(i);
             if (m instanceof VisibilityModifier) {
                 return (VisibilityModifier)m;
             }
@@ -91,7 +92,7 @@ public abstract class JavaDeclaration extends JavaNonTerminalProgramElement
     private boolean containsModifier(Class type) {
         int s = (modArray == null) ? 0 : modArray.size();
         for (int i = 0; i < s; i += 1) {
-            if (type.isInstance(modArray.getModifier(i))) {
+            if (type.isInstance(modArray.get(i))) {
                 return true;
             }
         }

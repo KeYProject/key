@@ -4,7 +4,7 @@ import org.eclipse.draw2d.*;
 import org.eclipse.swt.graphics.Color;
 
 import de.uka.ilkd.key.logic.IteratorOfTerm;
-import de.uka.ilkd.key.logic.ListOfTerm;
+import de.uka.ilkd.key.logic.IList;
 import de.uka.ilkd.key.logic.SLListOfTerm;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IteratorOfProgramVariable;
@@ -84,9 +84,9 @@ public class MethodInvocationFigure extends Figure implements DrawableNode {
 
         // etNode.getMethod().get
         st += etNode.getMethod().getProgramElementName().toString() + "(";
-        ListOfTerm param = etNode.getValues();
+        IList<Term> param = etNode.getValues();
 
-        for (IteratorOfTerm it = param.iterator(); it.hasNext();) {
+        for (Iterator<Term> it = param.iterator(); it.hasNext();) {
             st += VisualDebugger.getVisualDebugger().prettyPrint(it.next());
             if (it.hasNext())
                 st += ", ";
@@ -112,15 +112,15 @@ public class MethodInvocationFigure extends Figure implements DrawableNode {
         toolTip += "@" + etNode.getMethod().getContainerType().getSort() + "\n";
         if (etNode.getValues().size() > 0) {
             toolTip += "Parameters: \n";
-            IteratorOfTerm termIt = etNode.getValues().iterator();
-            for (IteratorOfProgramVariable it = etNode.getParameters()
+            Iterator<Term> termIt = etNode.getValues().iterator();
+            for (Iterator<ProgramVariable> it = etNode.getParameters()
                     .iterator(); it.hasNext();) {
                 ProgramVariable p = it.next();
                 Term val = termIt.next();
                 toolTip += p.toString()
                         + " := "
                         + VisualDebugger.getVisualDebugger().prettyPrint(
-                                SLListOfTerm.EMPTY_LIST.append(val)) + "\n";
+                                ImmSLList.<Term>nil().append(val)) + "\n";
             }
         }
         this.setToolTip(new Label(toolTip));

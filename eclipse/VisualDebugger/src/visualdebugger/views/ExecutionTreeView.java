@@ -565,7 +565,7 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
                 // make sure that all information available is contained in the
                 // root node
                 currentETRootNode = null;
-                final ListOfGoal goals = getSubtreeGoalsForETNode(((SourceElementFigure) ExecutionTreeView.this.selected)
+                final IList<Goal> goals = getSubtreeGoalsForETNode(((SourceElementFigure) ExecutionTreeView.this.selected)
                         .getETNode());
                 vd.run(goals);
             }
@@ -582,7 +582,7 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
             public void widgetSelected(SelectionEvent event) {
                 ETNode node = ((SourceElementFigure) ExecutionTreeView.this.selected)
                         .getETNode();
-                final ListOfGoal goals = getSubtreeGoalsForETNode(node);
+                final IList<Goal> goals = getSubtreeGoalsForETNode(node);
                 vd.stepInto(goals);
             }
         });
@@ -595,7 +595,7 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
             }
 
             public void widgetSelected(SelectionEvent event) {
-                final ListOfGoal goals = getSubtreeGoalsForETNode(((SourceElementFigure) ExecutionTreeView.this.selected)
+                final IList<Goal> goals = getSubtreeGoalsForETNode(((SourceElementFigure) ExecutionTreeView.this.selected)
                         .getETNode());
                 vd.stepOver(goals);
             }
@@ -939,11 +939,11 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
      * 
      * @return the subtree goals for et node
      */
-    private ListOfGoal getSubtreeGoalsForETNode(ETNode etNode) {
+    private IList<Goal> getSubtreeGoalsForETNode(ETNode etNode) {
         final ITNode[] itNodes = etNode.getITNodesArray();
-        ListOfGoal goals = SLListOfGoal.EMPTY_LIST;
+        IList<Goal> goals = ImmSLList.<Goal>nil();
         for (int i = 0; i < itNodes.length; i++) {
-            final ListOfGoal g = vd.getMediator().getProof().getSubtreeGoals(
+            final IList<Goal> g = vd.getMediator().getProof().getSubtreeGoals(
                     (itNodes[i].getNode()));
             goals = goals.prepend(g);
         }
@@ -1205,7 +1205,7 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
             public void run() {
                 if (vd.getMediator().getProof() == null)
                     return;
-                ListOfNode nodes = toList(vd.getMediator().getProof().root()
+                IList<Node> nodes = toList(vd.getMediator().getProof().root()
                         .leavesIterator());
                 VBTBuilder builder = new VBTBuilder(nodes,
                         ModelGenerator.SIMPLIFY);
@@ -1608,8 +1608,8 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
      * 
      * @return the list of node
      */
-    private ListOfNode toList(IteratorOfNode it) {
-        ListOfNode result = SLListOfNode.EMPTY_LIST;
+    private IList<Node> toList(Iterator<Node> it) {
+        IList<Node> result = ImmSLList.<Node>nil();
         while (it.hasNext()) {
             result = result.append(it.next());
 

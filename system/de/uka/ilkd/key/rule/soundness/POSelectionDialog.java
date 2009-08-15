@@ -13,24 +13,24 @@ package de.uka.ilkd.key.rule.soundness;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Iterator;
 import java.util.Vector;
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
 
-import de.uka.ilkd.key.rule.IteratorOfNoPosTacletApp;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
-import de.uka.ilkd.key.rule.SetOfNoPosTacletApp;
 
 public class POSelectionDialog extends JDialog {
 
     private JList tacletList;
 
-    private final SetOfNoPosTacletApp tacs;
+    private final ImmutableSet<NoPosTacletApp> tacs;
     private boolean okPressed = false;
 
     public POSelectionDialog (Frame parent,
-			      SetOfNoPosTacletApp tacs) {  
+			      ImmutableSet<NoPosTacletApp> tacs) {  
 	super(parent, "Load Taclets", true);
 
         this.tacs=tacs;
@@ -44,7 +44,7 @@ public class POSelectionDialog extends JDialog {
 
     private Object[] createTacletListContents () {
     	Vector res = new Vector ();
-    	IteratorOfNoPosTacletApp it = tacs.iterator ();
+    	Iterator<NoPosTacletApp> it = tacs.iterator ();
     	
     	while ( it.hasNext () )
     	    res.add(it.next ());

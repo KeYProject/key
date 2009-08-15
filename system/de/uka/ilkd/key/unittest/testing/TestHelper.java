@@ -11,17 +11,14 @@ package de.uka.ilkd.key.unittest.testing;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 
-import de.uka.ilkd.key.gui.AutoModeListener;
-import de.uka.ilkd.key.gui.KeYMediator;
-import de.uka.ilkd.key.gui.ProverTaskListener;
-import de.uka.ilkd.key.gui.SimpleStarter;
-import de.uka.ilkd.key.gui.TaskFinishedInfo;
+import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.gui.*;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.Expression;
-import de.uka.ilkd.key.logic.op.IteratorOfProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.SetOfProgramMethod;
+import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.proof.ProblemLoader;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofEvent;
@@ -56,7 +53,7 @@ public class TestHelper {
 
     private final DataStorage data;
 
-    private final SetOfProgramMethod pms;
+    private final ImmutableSet<ProgramMethod> pms;
 
     private ArrayList<HashMap<String, Expression>> combLocDat = null;
 
@@ -130,7 +127,7 @@ public class TestHelper {
 
     public String methNames() {
 	String result = "";
-	IteratorOfProgramMethod iter = pms.iterator();
+	Iterator<ProgramMethod> iter = pms.iterator();
 	while (iter.hasNext()) {
 	    result = result.concat(iter.next().toString());
 	}

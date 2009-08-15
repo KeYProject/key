@@ -29,8 +29,11 @@ import recoder.abstraction.ClassType;
 import recoder.abstraction.Type;
 import recoder.java.NonTerminalProgramElement;
 import recoder.list.generic.ASTList;
-import de.uka.ilkd.key.java.statement.CatchAllStatement;
-import de.uka.ilkd.key.java.abstraction.*;
+import de.uka.ilkd.key.collection.ImmutableArray;
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.java.abstraction.Field;
+import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.*;
 import de.uka.ilkd.key.java.declaration.modifier.Ghost;
 import de.uka.ilkd.key.java.declaration.modifier.Model;
@@ -437,11 +440,11 @@ public class Recoder2KeYConverter {
      * 
      * @param list
      *            the ExtList with the members of a type declaration
-     * @return a ListOfField the includes all field specifications found int the
+     * @return a IList<Field> the includes all field specifications found int the
      *         field declaration of the given list
      */
-    private ListOfField filterField(ExtList list) {
-        ListOfField result = SLListOfField.EMPTY_LIST;
+    private ImmutableList<Field> filterField(ExtList list) {
+        ImmutableList<Field> result = ImmutableSLList.<Field>nil();
         Iterator it = list.iterator();
         while (it.hasNext()) {
             Object pe = it.next();
@@ -458,14 +461,14 @@ public class Recoder2KeYConverter {
      * @param field
      *            the FieldDeclaration of which the field specifications have to
      *            be extracted
-     * @return a ListOfField the includes all field specifications found int the
+     * @return a IList<Field> the includes all field specifications found int the
      *         field declaration of the given list
      */
-    private ListOfField filterField(FieldDeclaration field) {
-        ListOfField result = SLListOfField.EMPTY_LIST;
-        ArrayOfFieldSpecification spec = field.getFieldSpecifications();
+    private ImmutableList<Field> filterField(FieldDeclaration field) {
+        ImmutableList<Field> result = ImmutableSLList.<Field>nil();
+        ImmutableArray<FieldSpecification> spec = field.getFieldSpecifications();
         for (int i = spec.size() - 1; i >= 0; i--) {
-            result = result.prepend(spec.getFieldSpecification(i));
+            result = result.prepend(spec.get(i));
         }
         return result;
     }
@@ -476,11 +479,11 @@ public class Recoder2KeYConverter {
      * @param name
      *            a String with the name of the field to be looked for
      * @param fields
-     *            the ListOfField where we have to look for the field
+     *            the IList<Field> where we have to look for the field
      * @return the program variable of the given name or null if not found
      */
-    private ProgramVariable find(String name, ListOfField fields) {
-        IteratorOfField it = fields.iterator();
+    private ProgramVariable find(String name, ImmutableList<Field> fields) {
+        Iterator<Field> it = fields.iterator();
         while (it.hasNext()) {
             Field field = it.next();
             if (name.equals(field.getName())) {
@@ -784,7 +787,7 @@ public class Recoder2KeYConverter {
             keyArgs = new Expression[0];
         }
 
-        final MethodReference mr = new MethodReference(new ArrayOfExpression(
+        final MethodReference mr = new MethodReference(new ImmutableArray<Expression>(
                 keyArgs), methodName, invocationTarget);
 
         return new MethodBodyStatement(bodySource, resultVar, mr);

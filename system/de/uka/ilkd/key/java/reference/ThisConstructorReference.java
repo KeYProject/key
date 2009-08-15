@@ -11,7 +11,7 @@
 
 package de.uka.ilkd.key.java.reference;
 
-import de.uka.ilkd.key.java.ArrayOfExpression;
+import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.visitor.Visitor;
@@ -46,7 +46,7 @@ public class ThisConstructorReference extends SpecialConstructorReference {
      * This constructor reference.
      * @param arguments an expression mutable list.
      */
-    public ThisConstructorReference(ArrayOfExpression arguments) {
+    public ThisConstructorReference(ImmutableArray<Expression> arguments) {
         super(arguments);
     }
 

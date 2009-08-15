@@ -11,6 +11,8 @@
 
 package de.uka.ilkd.key.strategy.feature.instantiator;
 
+import java.util.Iterator;
+
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
@@ -41,7 +43,7 @@ public class OneOfCP implements Feature {
     }
     
     private final class CP implements ChoicePoint {
-        private final class BranchIterator implements IteratorOfCPBranch {
+        private final class BranchIterator implements Iterator<CPBranch> {
             private int num = 0;
             private final RuleApp oldApp;
             
@@ -73,7 +75,7 @@ public class OneOfCP implements Feature {
             }
         }
             
-        public IteratorOfCPBranch getBranches(RuleApp oldApp) {
+        public Iterator<CPBranch> getBranches(RuleApp oldApp) {
             return new BranchIterator ( oldApp );
         }
     }

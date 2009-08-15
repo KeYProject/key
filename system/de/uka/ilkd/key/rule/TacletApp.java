@@ -13,9 +13,9 @@ package de.uka.ilkd.key.rule;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 
-import de.uka.ilkd.key.collection.ListOfString;
-import de.uka.ilkd.key.collection.SLListOfString;
+import de.uka.ilkd.key.collection.*;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
@@ -25,6 +25,8 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.rule.conditions.NewDepOnAnonUpdates;
 import de.uka.ilkd.key.rule.inst.*;
+import de.uka.ilkd.key.speclang.LocationDescriptorSet;
+import de.uka.ilkd.key.speclang.LoopPredicateSet;
 import de.uka.ilkd.key.util.Debug;
 
 /** 
@@ -58,29 +60,29 @@ public abstract class TacletApp implements RuleApp {
     /**
      * metavariables that have been created during the matching
      */
-    protected SetOfMetavariable matchNewMetavariables;
+    protected ImmutableSet<Metavariable> matchNewMetavariables;
 
     /**
      * choosen instantiations for the if sequent formulas
      */
-    ListOfIfFormulaInstantiation ifInstantiations = null;
+    ImmutableList<IfFormulaInstantiation> ifInstantiations = null;
 
     /** set of schemavariables that appear in the Taclet and need to be
      * instantiated but are not instantiated yet. This means
      * SchemaVariables in addrule-sections have to be ignored
      */
-    private SetOfSchemaVariable missingVars = null;
+    private ImmutableSet<SchemaVariable> missingVars = null;
 
     /** subset of missingVars that cannot be instantiated using
      * metavariables
      */
-    private SetOfSchemaVariable neededMissingVars = null;
+    private ImmutableSet<SchemaVariable> neededMissingVars = null;
 
     /**
      * the instantiations of the following SVs must not be changed;
      * they must not be instantiated with metavariables either
      */
-    protected SetOfSchemaVariable fixedVars = SetAsListOfSchemaVariable.EMPTY_SET;
+    protected ImmutableSet<SchemaVariable> fixedVars = DefaultImmutableSet.<SchemaVariable>nil();
     /**
      * the update context given by the current instantiations must not
      * be changed
@@ -92,14 +94,14 @@ public abstract class TacletApp implements RuleApp {
      */
     TacletApp(Taclet taclet) {
 	this ( taclet, SVInstantiations.EMPTY_SVINSTANTIATIONS, Constraint.BOTTOM,
-	       SetAsListOfMetavariable.EMPTY_SET, null );
+	       DefaultImmutableSet.<Metavariable>nil(), null );
     }
 
     TacletApp ( Taclet                       taclet,
 		SVInstantiations             instantiations,
 		Constraint                   matchConstraint,
-		SetOfMetavariable            matchNewMetavariables,
-		ListOfIfFormulaInstantiation ifInstantiations ) {
+		ImmutableSet<Metavariable>            matchNewMetavariables,
+		ImmutableList<IfFormulaInstantiation> ifInstantiations ) {
 	this.taclet                = taclet;
 	this.instantiations        = instantiations;
 	this.matchConstraint       = matchConstraint;
@@ -112,7 +114,7 @@ public abstract class TacletApp implements RuleApp {
      */
     TacletApp(Taclet taclet, SVInstantiations instantiations) {
 	this ( taclet, instantiations, Constraint.BOTTOM,
-	       SetAsListOfMetavariable.EMPTY_SET, null );
+	       DefaultImmutableSet.<Metavariable>nil(), null );
     }
 
     /** collects all bound variables above the occurrence of the schemavariable
@@ -122,7 +124,7 @@ public abstract class TacletApp implements RuleApp {
      * find(if)-expression matches 
      * @return set of the bound variables 
      */
-    protected static SetOfQuantifiableVariable 
+    protected static ImmutableSet<QuantifiableVariable> 
 	boundAtOccurrenceSet(TacletPrefix prefix,
 			     SVInstantiations instantiations) {	
 	return collectPrefixInstantiations(prefix, 
@@ -139,12 +141,12 @@ public abstract class TacletApp implements RuleApp {
      * schemavariable 
      * @return set of the bound variables 
      */
-    protected static SetOfQuantifiableVariable
+    protected static ImmutableSet<QuantifiableVariable>
 	boundAtOccurrenceSet ( TacletPrefix     prefix,
 			       SVInstantiations instantiations,
 			       PosInOccurrence  pos ) {
     
-	SetOfQuantifiableVariable result =
+	ImmutableSet<QuantifiableVariable> result =
 	    boundAtOccurrenceSet(prefix, instantiations);
     
 	if ( prefix.context () )
@@ -161,11 +163,11 @@ public abstract class TacletApp implements RuleApp {
      * @return the set of the logic variables whose elements are the
      * instantiations of a bound SchemaVariable appearing in the TacletPrefix
      */ 
-    private static SetOfQuantifiableVariable collectPrefixInstantiations
+    private static ImmutableSet<QuantifiableVariable> collectPrefixInstantiations
 	(TacletPrefix pre, SVInstantiations instantiations) {
 
-	SetOfQuantifiableVariable instanceSet 
-	    = SetAsListOfQuantifiableVariable.EMPTY_SET;
+	ImmutableSet<QuantifiableVariable> instanceSet 
+	    = DefaultImmutableSet.<QuantifiableVariable>nil();
 	
 	for (final SchemaVariable var : pre.prefix() ) {
 	    instanceSet = 
@@ -205,7 +207,7 @@ public abstract class TacletApp implements RuleApp {
     }
 
 
-    public SetOfMetavariable newMetavariables () {
+    public ImmutableSet<Metavariable> newMetavariables () {
 	return matchNewMetavariables;
     }
 
@@ -218,7 +220,7 @@ public abstract class TacletApp implements RuleApp {
     }
 
 
-    public ListOfIfFormulaInstantiation ifFormulaInstantiations () {
+    public ImmutableList<IfFormulaInstantiation> ifFormulaInstantiations () {
 	return ifInstantiations;
     }
 
@@ -235,10 +237,10 @@ public abstract class TacletApp implements RuleApp {
 	HashMap<LogicVariable, SchemaVariable> collMap =
 	    new HashMap<LogicVariable, SchemaVariable>();
 	
-	final IteratorOfEntryOfSchemaVariableAndInstantiationEntry it = 
+	final Iterator<ImmutableMapEntry<SchemaVariable,InstantiationEntry>> it = 
 	    insts.pairIterator();
 	while (it.hasNext()) {
-	    EntryOfSchemaVariableAndInstantiationEntry pair = it.next();
+	    ImmutableMapEntry<SchemaVariable,InstantiationEntry> pair = it.next();
 	    if (pair.key().isVariableSV()) {
 		SchemaVariable varSV = pair.key();		
 		Term value = ((TermInstantiation)pair.value()).getTerm();
@@ -263,7 +265,7 @@ public abstract class TacletApp implements RuleApp {
     private static Term getTermBelowQuantifier(SchemaVariable varSV, Term term) {
 	for (int i=0; i<term.arity(); i++) {
 	    for (int j=0; j<term.varsBoundHere(i).size(); j++) {
-		if (term.varsBoundHere(i).getQuantifiableVariable(j)==varSV) {
+		if (term.varsBoundHere(i).get(j)==varSV) {
 		    return term.sub(i);
 		} 
 	    }
@@ -284,7 +286,7 @@ public abstract class TacletApp implements RuleApp {
      * the Taclet
      */
     private static Term getTermBelowQuantifier(Taclet taclet, SchemaVariable varSV) {
-	IteratorOfConstrainedFormula it=taclet.ifSequent().iterator();
+	Iterator<ConstrainedFormula> it=taclet.ifSequent().iterator();
 	while (it.hasNext()) {
 	    Term result=getTermBelowQuantifier(varSV, it.next().formula());
 	    if (result!=null) {
@@ -301,7 +303,7 @@ public abstract class TacletApp implements RuleApp {
 
     /** returns true iff the instantiation of a bound SchemaVariable contains the given
     * Logicvariable 
-    * @param boundVars ArrayOfQuantifiableVariable with the
+    * @param boundVars ArrayOf<QuantifiableVariable> with the
     * bound SchemaVariables
     * @param x the LogicVariable that is looked for
     * @param insts the SVInstantiations where to get the necessary
@@ -309,12 +311,12 @@ public abstract class TacletApp implements RuleApp {
     * @return true iff the instantiation of a Bound Schemavariable contains the given
     * Logicvariable 
     */
-    private static boolean contains(ArrayOfQuantifiableVariable boundVars,
+    private static boolean contains(ImmutableArray<QuantifiableVariable> boundVars,
 			     LogicVariable x,
 			     SVInstantiations insts) {
 	for (int i=0; i<boundVars.size(); i++) {
 	    Term instance = (Term) insts.getInstantiation
-		((SchemaVariable)boundVars.getQuantifiableVariable(i));
+		((SchemaVariable)boundVars.get(i));
 	    if (instance.op() == x) {
 		return true;
 	    } 
@@ -380,7 +382,7 @@ public abstract class TacletApp implements RuleApp {
      * @param services the Services encapsulating all java information
      * @return list of new created goals 
      */
-    public ListOfGoal execute(Goal goal, Services services) {
+    public ImmutableList<Goal> execute(Goal goal, Services services) {
 
 	if (!complete()) {	  
 	    throw new IllegalStateException("Tried to apply rule \n"+taclet
@@ -399,7 +401,7 @@ public abstract class TacletApp implements RuleApp {
      * @return list of new created goals 
      */
     /*
-    public ListOfGoal executeForceIf(Goal goal, Services services) {
+    public IList<Goal> executeForceIf(Goal goal, Services services) {
 	if (!complete()) {
 	    throw new IllegalStateException("Applied rule not complete.");
 	}
@@ -411,16 +413,16 @@ public abstract class TacletApp implements RuleApp {
     /** calculate needed SchemaVariables that have not been
      * instantiated yet. This means to ignore SchemaVariables that
      * appear only in addrule-sections of Taclets
-     * @return SetOfSchemaVariable that need to be instantiated but
+     * @return SetOf<SchemaVariable> that need to be instantiated but
      * are not
      */
-    protected SetOfSchemaVariable calculateNonInstantiatedSV() {
+    protected ImmutableSet<SchemaVariable> calculateNonInstantiatedSV() {
 	if (missingVars == null) {
-	    missingVars = SetAsListOfSchemaVariable.EMPTY_SET;
+	    missingVars = DefaultImmutableSet.<SchemaVariable>nil();
 	    TacletSchemaVariableCollector coll =
 		new TacletSchemaVariableCollector(instantiations());
 	    coll.visitWithoutAddrule(taclet());
-	    IteratorOfSchemaVariable it = coll.varIterator();
+	    Iterator<SchemaVariable> it = coll.varIterator();
 	    while (it.hasNext()) {
 		SchemaVariable var=it.next();
 		if (!instantiations().isInstantiated(var) &&
@@ -437,7 +439,7 @@ public abstract class TacletApp implements RuleApp {
         if ( !var.isFormulaSV () ) return null;
         
         NewDepOnAnonUpdates result = null;
-        final IteratorOfVariableCondition it = taclet.getVariableConditions ();
+        final Iterator<VariableCondition> it = taclet.getVariableConditions ();
         while ( it.hasNext () ) {
             final VariableCondition vc = it.next();
             if ( vc instanceof NewDepOnAnonUpdates
@@ -466,17 +468,17 @@ public abstract class TacletApp implements RuleApp {
      * instantiated yet and cannot be instantiated using
      * metavariables. This is a subset of
      * calculateNonInstantiatedSV();
-     * @return SetOfSchemaVariable that need to be instantiated but
+     * @return SetOf<SchemaVariable> that need to be instantiated but
      * are not
      */
-    protected SetOfSchemaVariable calculateNeededNonInstantiatedSV() {
+    protected ImmutableSet<SchemaVariable> calculateNeededNonInstantiatedSV() {
         if ( neededMissingVars == null ) {
-            IteratorOfSchemaVariable it =
+            Iterator<SchemaVariable> it =
                 calculateNonInstantiatedSV ().iterator ();
             SchemaVariable var;
             SVInstantiations svi = instantiations ();
 
-            neededMissingVars = SetAsListOfSchemaVariable.EMPTY_SET;
+            neededMissingVars = DefaultImmutableSet.<SchemaVariable>nil();
 
             while ( it.hasNext () ) {
                 var = it.next ();
@@ -559,20 +561,20 @@ public abstract class TacletApp implements RuleApp {
      * need to be instantiated to apply the Taclet. (These are not all
      * SchemaVariables like the one that appear only in the addrule
      * sections)
-     * @return SetOfSchemaVariable with SchemaVariables that have not
+     * @return SetOf<SchemaVariable> with SchemaVariables that have not
      * been instantiated yet 
      */
-    public SetOfSchemaVariable uninstantiatedVars() {
+    public ImmutableSet<SchemaVariable> uninstantiatedVars() {
 	return calculateNonInstantiatedSV();
     }
     
     /**
      * returns the variables that are currently uninstantiated and
      * cannot be instantiated automatically using metavariables
-     * @return SetOfSchemaVariable with SchemaVariables that have not
+     * @return SetOf<SchemaVariable> with SchemaVariables that have not
      * been instantiated yet 
      */
-    public SetOfSchemaVariable neededUninstantiatedVars() {
+    public ImmutableSet<SchemaVariable> neededUninstantiatedVars() {
 	return calculateNeededNonInstantiatedSV();
     }
     
@@ -586,7 +588,7 @@ public abstract class TacletApp implements RuleApp {
         final TermBuilder tb = TermBuilder.DF;
         
         TacletApp app = this;
-        ListOfString proposals = SLListOfString.EMPTY_LIST;
+        ImmutableList<String> proposals = ImmutableSLList.<String>nil();
 
         for (final SchemaVariable var : uninstantiatedVars()) {
             
@@ -594,10 +596,10 @@ public abstract class TacletApp implements RuleApp {
                 Object inv = LoopInvariantProposer.DEFAULT.tryToInstantiate(this, var, services);              
                 if (inv instanceof Term){
                     app = app.addCheckedInstantiation(var, (Term)inv, services, true);
-                } else if (inv instanceof ListOfTerm){
-                    app = app.addInstantiation(var, ((ListOfTerm)inv).toArray(), true);
-                } else if (inv instanceof SetOfLocationDescriptor) {
-                    app = app.addInstantiation(var, ((SetOfLocationDescriptor)inv).toArray(), true);
+                } else if (inv instanceof LoopPredicateSet){
+                    app = app.addInstantiation(var, ((LoopPredicateSet)inv).toArray(), true);
+                } else if (inv instanceof LocationDescriptorSet) {
+                    app = app.addInstantiation(var, ((LocationDescriptorSet)inv).toArray(), true);
                 }   
                 if (inv != null) continue;
             } 
@@ -737,15 +739,15 @@ public abstract class TacletApp implements RuleApp {
         Services services = proof.getServices();
         
 	SVInstantiations  insts   = instantiations   ();
-	SetOfMetavariable newVars = newMetavariables ();
+	ImmutableSet<Metavariable> newVars = newMetavariables ();
 	Constraint        constr = constraint ();
 
 	if ( !newVars.isEmpty() ) {
             // Replace temporary metavariables that were introduced
             // when matching the taclet with real MVs
-            final IteratorOfMetavariable mvIt = newVars.iterator ();
-            newVars = SetAsListOfMetavariable.EMPTY_SET;
-            SetOfMetavariable removeVars = SetAsListOfMetavariable.EMPTY_SET; 
+            final Iterator<Metavariable> mvIt = newVars.iterator ();
+            newVars = DefaultImmutableSet.<Metavariable>nil();
+            ImmutableSet<Metavariable> removeVars = DefaultImmutableSet.<Metavariable>nil(); 
             Constraint replaceC = Constraint.BOTTOM;            
             while ( mvIt.hasNext () ) {
                 final Metavariable mv = mvIt.next();
@@ -774,11 +776,11 @@ public abstract class TacletApp implements RuleApp {
 	
 	// Replace plain instantiations of termSV
 
-	final IteratorOfEntryOfSchemaVariableAndInstantiationEntry it    =
+	final Iterator<ImmutableMapEntry<SchemaVariable,InstantiationEntry>> it    =
 	    insts.pairIterator ();
 
 	while ( it.hasNext () ) {
-	    final EntryOfSchemaVariableAndInstantiationEntry entry = it.next ();
+	    final ImmutableMapEntry<SchemaVariable,InstantiationEntry> entry = it.next ();
 	    final SchemaVariable sv = entry.key ();
 
 	    if ( introduceMVFor ( entry, sv ) ) {
@@ -805,11 +807,11 @@ public abstract class TacletApp implements RuleApp {
     private static SVInstantiations
 	removeTemporaryMVsFromInstantiations (SVInstantiations insts,
 					      Constraint replaceC) {
-        final IteratorOfEntryOfSchemaVariableAndInstantiationEntry it =
+        final Iterator<ImmutableMapEntry<SchemaVariable,InstantiationEntry>> it =
             insts.pairIterator ();
 
         while ( it.hasNext () ) {
-            final EntryOfSchemaVariableAndInstantiationEntry entry = it.next ();
+            final ImmutableMapEntry<SchemaVariable,InstantiationEntry> entry = it.next ();
             final SchemaVariable sv = entry.key ();
 
             if ( sv.isFormulaSV() || sv.isTermSV() ) {
@@ -838,7 +840,7 @@ public abstract class TacletApp implements RuleApp {
      */
     private static Constraint
 	removeTemporaryMVsFromConstraint (Constraint constr,
-					  SetOfMetavariable removeVars,
+					  ImmutableSet<Metavariable> removeVars,
 					  Constraint replaceC,
                                           Services services) {
         // that's tricky ...
@@ -852,7 +854,7 @@ public abstract class TacletApp implements RuleApp {
      * schema variable with a metavariable instead of a term, and to
      * add the real instantiation to the user constraint
      */
-    private boolean introduceMVFor (EntryOfSchemaVariableAndInstantiationEntry entry,
+    private boolean introduceMVFor (ImmutableMapEntry<SchemaVariable,InstantiationEntry> entry,
                                     SchemaVariable sv) {
         return sv.isTermSV () && !sv.isListSV()
                && !taclet ().getIfFindVariables ().contains ( sv )
@@ -871,7 +873,7 @@ public abstract class TacletApp implements RuleApp {
                                                Goal goal,
                                                SVInstantiations insts,
                                                Constraint constr,
-                                               SetOfMetavariable newVars) {
+                                               ImmutableSet<Metavariable> newVars) {
         insts = forceGenericSortInstantiations ( insts );
 
         for (final SchemaVariable sv : uninstantiatedVars()) {
@@ -971,7 +973,7 @@ public abstract class TacletApp implements RuleApp {
     public TacletApp createSkolemFunctions ( Namespace p_func_ns, Services services ) {
         SVInstantiations insts = instantiations ();
 
-        final IteratorOfSchemaVariable svIt = insts.svIterator ();        
+        final Iterator<SchemaVariable> svIt = insts.svIterator ();        
         while ( svIt.hasNext () )
             insts = createTermSkolemFunctions ( svIt.next (), insts, p_func_ns );
         
@@ -981,7 +983,7 @@ public abstract class TacletApp implements RuleApp {
                 insts.getInstantiation(new NameSV("_NAME_ANON_UPDATES")));
         // END TEMPORARY DOWNWARD COMPATIBILITY
 
-        final IteratorOfVariableCondition vcIt = taclet.getVariableConditions ();
+        final Iterator<VariableCondition> vcIt = taclet.getVariableConditions ();
         while ( vcIt.hasNext () ) {
             final VariableCondition vc = vcIt.next();
             if ( vc instanceof NewDepOnAnonUpdates )
@@ -1026,8 +1028,8 @@ public abstract class TacletApp implements RuleApp {
             return insts;
         }
         
-        final ListOfObject locationList =
-            (ListOfObject)insts.getInstantiation ( modifies );
+        final ImmutableList<Object> locationList =
+            (ImmutableList<Object>)insts.getInstantiation ( modifies );
         final AnonymisingUpdateFactory auf =
             new AnonymisingUpdateFactory
             ( new UpdateFactory ( services, new UpdateSimplifier () ) );
@@ -1039,7 +1041,7 @@ public abstract class TacletApp implements RuleApp {
     }
     
     private static LocationDescriptor[]
-               toLocationDescriptorArray(ListOfObject locationList) {
+               toLocationDescriptorArray(ImmutableList<Object> locationList) {
         final LocationDescriptor[] locations =
             new LocationDescriptor [locationList.size ()];
 
@@ -1055,17 +1057,17 @@ public abstract class TacletApp implements RuleApp {
      * Determine the metavariables that have to be added as arguments to newly
      * created skolem symbols (as basis of the occurs check)
      */
-    private SetOfMetavariable determineArgMVs (SVInstantiations insts,
+    private ImmutableSet<Metavariable> determineArgMVs (SVInstantiations insts,
                                                SchemaVariable depSV) {
         return
             determineExplicitArgMVs ( insts, depSV )
             .union ( determineArgMVsFromUpdate ( insts ) );
     }
 
-    private SetOfMetavariable determineExplicitArgMVs(SVInstantiations insts,
+    private ImmutableSet<Metavariable> determineExplicitArgMVs(SVInstantiations insts,
                                                       SchemaVariable depSV) {
-        final IteratorOfNewDependingOn it = taclet ().varsNewDependingOn ();
-        SetOfMetavariable mvs = SetAsListOfMetavariable.EMPTY_SET;
+        final Iterator<NewDependingOn> it = taclet ().varsNewDependingOn ();
+        ImmutableSet<Metavariable> mvs = DefaultImmutableSet.<Metavariable>nil();
         while ( it.hasNext () ) {
             final NewDependingOn newDepOn = it.next ();
             if ( depSV != newDepOn.first () ) continue;
@@ -1080,9 +1082,9 @@ public abstract class TacletApp implements RuleApp {
         return mvs;
     }
 
-    private SetOfMetavariable determineArgMVsFromUpdate(SVInstantiations insts) {
-        final IteratorOfUpdatePair it = insts.getUpdateContext ().iterator ();
-        SetOfMetavariable mvs = SetAsListOfMetavariable.EMPTY_SET;
+    private ImmutableSet<Metavariable> determineArgMVsFromUpdate(SVInstantiations insts) {
+        final Iterator<UpdatePair> it = insts.getUpdateContext ().iterator ();
+        ImmutableSet<Metavariable> mvs = DefaultImmutableSet.<Metavariable>nil();
         while ( it.hasNext () ) {
             final UpdatePair pair = it.next ();
             final IUpdateOperator upOp = pair.updateOperator ();
@@ -1099,7 +1101,7 @@ public abstract class TacletApp implements RuleApp {
                                                    Namespace p_func_ns,
                                                    SchemaVariable depSV,
                                                    Term tempDepVar,
-                                                   SetOfMetavariable mvs) {
+                                                   ImmutableSet<Metavariable> mvs) {
         if ( mvs.isEmpty() ) {
             // if the term contains no metavariables, we just use the
             // (nullary) constant <code>tempDepVar</code> as skolem symbol
@@ -1118,8 +1120,8 @@ public abstract class TacletApp implements RuleApp {
         return insts.replace ( depSV, skolemTerm );
     }
 
-    private Term[] toTermArray(SetOfMetavariable mvs) {
-        final Metavariable[] mvArray = mvs.toArray ();
+    private Term[] toTermArray(ImmutableSet<Metavariable> mvs) {
+        final Metavariable[] mvArray = mvs.toArray (new Metavariable[mvs.size()]);
         Arrays.sort ( mvArray );
         
         // Create function with correct arguments
@@ -1271,7 +1273,7 @@ public abstract class TacletApp implements RuleApp {
      */
     protected abstract TacletApp
 	setAllInstantiations ( MatchConditions              mc,
-			       ListOfIfFormulaInstantiation ifInstantiations );
+			       ImmutableList<IfFormulaInstantiation> ifInstantiations );
 
 
     /**
@@ -1281,7 +1283,7 @@ public abstract class TacletApp implements RuleApp {
      * will fail if the if formulas have already been instantiated.
      */
     public TacletApp setIfFormulaInstantiations
-	( ListOfIfFormulaInstantiation p_list,
+	( ImmutableList<IfFormulaInstantiation> p_list,
 	  Services                     p_services,
 	  Constraint                   p_userConstraint ) {
 	assert p_list != null && ifInstsCorrectSize ( taclet, p_list ) &&
@@ -1304,7 +1306,7 @@ public abstract class TacletApp implements RuleApp {
      * @return a list of tacletapps with the found if formula
      * instantiations
      */
-    public ListOfTacletApp
+    public ImmutableList<TacletApp>
 	findIfFormulaInstantiations ( Sequent     p_seq,
 	                              Services    p_services,
 				      Constraint  p_userConstraint ) {
@@ -1313,7 +1315,7 @@ public abstract class TacletApp implements RuleApp {
 			   "The if formulas have already been instantiated" );
 
 	if ( taclet ().ifSequent ().isEmpty() )
-	    return SLListOfTacletApp.EMPTY_LIST.prepend ( this );        
+	    return ImmutableSLList.<TacletApp>nil().prepend ( this );        
         
 	return
 	    findIfFormulaInstantiationsHelp
@@ -1323,7 +1325,7 @@ public abstract class TacletApp implements RuleApp {
 				      .antecedent () ),
 	      IfFormulaInstSeq.createList(p_seq, false),
 	      IfFormulaInstSeq.createList(p_seq, true),
-	      SLListOfIfFormulaInstantiation.EMPTY_LIST,
+	      ImmutableSLList.<IfFormulaInstantiation>nil(),
 	      matchConditions (),
 	      p_services,
 	      p_userConstraint );
@@ -1342,12 +1344,12 @@ public abstract class TacletApp implements RuleApp {
      * @param p_matchCond match conditions until now, i.e. after
      * matching the first formulas of the if sequent
      */
-    private ListOfTacletApp findIfFormulaInstantiationsHelp
-	( ListOfConstrainedFormula      p_ifSeqTail,
-	  ListOfConstrainedFormula      p_ifSeqTail2nd,
-	  ListOfIfFormulaInstantiation  p_toMatch,
-	  ListOfIfFormulaInstantiation  p_toMatch2nd,
-	  ListOfIfFormulaInstantiation  p_alreadyMatched,
+    private ImmutableList<TacletApp> findIfFormulaInstantiationsHelp
+	( ImmutableList<ConstrainedFormula>      p_ifSeqTail,
+	  ImmutableList<ConstrainedFormula>      p_ifSeqTail2nd,
+	  ImmutableList<IfFormulaInstantiation>  p_toMatch,
+	  ImmutableList<IfFormulaInstantiation>  p_toMatch2nd,
+	  ImmutableList<IfFormulaInstantiation>  p_alreadyMatched,
 	  MatchConditions               p_matchCond,
 	  Services                      p_services,
 	  Constraint                    p_userConstraint ) {
@@ -1358,8 +1360,8 @@ public abstract class TacletApp implements RuleApp {
 		TacletApp res = setAllInstantiations ( p_matchCond,
 						       p_alreadyMatched );
 		if ( res != null )
-		    return SLListOfTacletApp.EMPTY_LIST.prepend ( res );
-		return SLListOfTacletApp.EMPTY_LIST;
+		    return ImmutableSLList.<TacletApp>nil().prepend ( res );
+		return ImmutableSLList.<TacletApp>nil();
 	    } else {
 		// Change from succedent to antecedent
 		p_ifSeqTail    = p_ifSeqTail2nd;
@@ -1377,9 +1379,9 @@ public abstract class TacletApp implements RuleApp {
 
 	// For each matching formula call the method again to match
 	// the remaining terms
-	ListOfTacletApp                  res    = SLListOfTacletApp.EMPTY_LIST;
-	IteratorOfIfFormulaInstantiation itCand = mr.getFormulas        ().iterator ();
-	IteratorOfMatchConditions        itMC   = mr.getMatchConditions ().iterator ();
+	ImmutableList<TacletApp>                  res    = ImmutableSLList.<TacletApp>nil();
+	Iterator<IfFormulaInstantiation> itCand = mr.getFormulas        ().iterator ();
+	Iterator<MatchConditions>        itMC   = mr.getMatchConditions ().iterator ();
 	p_ifSeqTail                             = p_ifSeqTail.tail ();
 	while ( itCand.hasNext () ) {
 	    res = res.prepend
@@ -1397,10 +1399,10 @@ public abstract class TacletApp implements RuleApp {
 	return res;
     }
 
-    private ListOfConstrainedFormula createSemisequentList ( Semisequent p_ss ) {
-	ListOfConstrainedFormula res = SLListOfConstrainedFormula.EMPTY_LIST;
+    private ImmutableList<ConstrainedFormula> createSemisequentList ( Semisequent p_ss ) {
+	ImmutableList<ConstrainedFormula> res = ImmutableSLList.<ConstrainedFormula>nil();
 
-	IteratorOfConstrainedFormula it  = p_ss.iterator ();
+	Iterator<ConstrainedFormula> it  = p_ss.iterator ();
 	while ( it.hasNext () )
 	    res = res.prepend ( it.next () );
 
@@ -1516,7 +1518,7 @@ public abstract class TacletApp implements RuleApp {
 	return result;
     }
 
-    protected abstract SetOfQuantifiableVariable contextVars(SchemaVariable sv);
+    protected abstract ImmutableSet<QuantifiableVariable> contextVars(SchemaVariable sv);
 
     /**
      * creates a new variable namespace by adding names of the instantiations
@@ -1531,14 +1533,14 @@ public abstract class TacletApp implements RuleApp {
     public Namespace extendVarNamespaceForSV(Namespace var_ns, 
 					     SchemaVariable sv) {
 	Namespace ns=new Namespace(var_ns);
-        IteratorOfSchemaVariable it=taclet().getPrefix(sv).prefix().iterator();
+        Iterator<SchemaVariable> it=taclet().getPrefix(sv).prefix().iterator();
 	while (it.hasNext()) {
 	    LogicVariable var = (LogicVariable) 
 		((Term)instantiations().getInstantiation(it.next())).op();
 	    ns.add(var);
 	}
 	if (taclet().getPrefix(sv).context()) {	    
-	    IteratorOfQuantifiableVariable lit
+	    Iterator<QuantifiableVariable> lit
 		= contextVars(sv).iterator();
 	    while (lit.hasNext()) {
 		ns.add(lit.next());
@@ -1557,7 +1559,7 @@ public abstract class TacletApp implements RuleApp {
      */
     public Namespace extendedFunctionNameSpace(Namespace func_ns) {
         Namespace ns = new Namespace(func_ns);
-        IteratorOfSchemaVariable it = instantiations.svIterator();
+        Iterator<SchemaVariable> it = instantiations.svIterator();
         while(it.hasNext()) {
             SchemaVariable sv = it.next();
             if(sv.isSkolemTermSV()) {            
@@ -1578,20 +1580,20 @@ public abstract class TacletApp implements RuleApp {
      * conflict-causing bound SchemaVariables
      */
     public SchemaVariable varSVNameConflict() {
-	IteratorOfSchemaVariable svIt=uninstantiatedVars().iterator();
+	Iterator<SchemaVariable> svIt=uninstantiatedVars().iterator();
 	while (svIt.hasNext()) { 
 	    SchemaVariable sv=svIt.next();
 	    if (sv.isTermSV() || sv.isFormulaSV()) {
 		TacletPrefix prefix=taclet().getPrefix(sv);
 		HashSet<Name> names=new HashSet<Name>();	    
 		if (prefix.context()) {
-		    IteratorOfQuantifiableVariable contextIt
+		    Iterator<QuantifiableVariable> contextIt
 			= contextVars(sv).iterator();
 		    while (contextIt.hasNext()) {
 			names.add(contextIt.next().name());
 		    }
 		}
-		IteratorOfSchemaVariable varSVIt=prefix.iterator();
+		Iterator<SchemaVariable> varSVIt=prefix.iterator();
 		while(varSVIt.hasNext()) {
 		    SchemaVariable varSV=varSVIt.next();
 		    Term inst = (Term)
@@ -1644,7 +1646,7 @@ public abstract class TacletApp implements RuleApp {
      * size or is null
      */
     protected static boolean ifInstsCorrectSize ( Taclet                       p_taclet,
-						  ListOfIfFormulaInstantiation p_list ) {        
+						  ImmutableList<IfFormulaInstantiation> p_list ) {        
 	return p_list == null ||
 	    p_list.size () == ( p_taclet.ifSequent ().antecedent ().size () +
 				p_taclet.ifSequent ().succedent  ().size () );
@@ -1655,7 +1657,7 @@ public abstract class TacletApp implements RuleApp {
      * given mode (interactive/non-interactive, activated rule sets)
      */
     public boolean admissible(boolean       interactive,
-			      ListOfRuleSet ruleSets) {
+			      ImmutableList<RuleSet> ruleSets) {
 	return taclet ().admissible (interactive, ruleSets);
     }
 
@@ -1672,7 +1674,7 @@ public abstract class TacletApp implements RuleApp {
     public static boolean checkVarCondNotFreeIn
 	( Taclet taclet, SVInstantiations instantiations, PosInOccurrence pos ) {
         
-        IteratorOfSchemaVariable it = instantiations.svIterator();
+        Iterator<SchemaVariable> it = instantiations.svIterator();
 	while (it.hasNext()) {
 	    SchemaVariable sv = it.next();
 	    if (sv.isTermSV() || sv.isFormulaSV()) {
@@ -1694,18 +1696,18 @@ public abstract class TacletApp implements RuleApp {
      * @return a set of logic variables that are bound above the specified
      * subterm 
      */
-    protected static SetOfQuantifiableVariable collectBoundVarsAbove
+    protected static ImmutableSet<QuantifiableVariable> collectBoundVarsAbove
 	( PosInOccurrence pos ) {
-	SetOfQuantifiableVariable result = SetAsListOfQuantifiableVariable.EMPTY_SET;
+	ImmutableSet<QuantifiableVariable> result = DefaultImmutableSet.<QuantifiableVariable>nil();
     
 	PIOPathIterator             it   = pos.iterator ();
 	int                         i;
-	ArrayOfQuantifiableVariable vars;
+	ImmutableArray<QuantifiableVariable> vars;
     
 	while ( ( i = it.next () ) != -1 ) {
 	    vars = it.getSubTerm ().varsBoundHere ( i );
 	    for ( i = 0; i < vars.size (); i++ ) 
-		result = result.add ( vars.getQuantifiableVariable ( i ) );
+		result = result.add ( vars.get ( i ) );
 	}
     
 	return result;

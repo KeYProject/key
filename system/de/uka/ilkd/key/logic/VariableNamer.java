@@ -17,11 +17,13 @@
 
 package de.uka.ilkd.key.logic;
 
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import de.uka.ilkd.key.collection.IteratorOfString;
-import de.uka.ilkd.key.collection.ListOfString;
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
@@ -32,7 +34,10 @@ import de.uka.ilkd.key.java.statement.EmptyStatement;
 import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.visitor.JavaASTWalker;
 import de.uka.ilkd.key.java.visitor.ProgramReplaceVisitor;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.op.ProgramMethod;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.op.SortedSchemaVariable;
 import de.uka.ilkd.key.logic.sort.ArraySort;
 import de.uka.ilkd.key.logic.sort.PrimitiveSort;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
@@ -41,10 +46,10 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.InstantiationProposer;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.ProofSaver;
-import de.uka.ilkd.key.rule.IteratorOfTacletGoalTemplate;
 import de.uka.ilkd.key.rule.NewVarcond;
 import de.uka.ilkd.key.rule.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.rule.TacletApp;
+import de.uka.ilkd.key.rule.TacletGoalTemplate;
 import de.uka.ilkd.key.rule.inst.ContextInstantiationEntry;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
@@ -171,7 +176,7 @@ public abstract class VariableNamer implements InstantiationProposer {
      * PosInOccurrence
      */
     protected NameCreationInfo getMethodStack(PosInOccurrence posOfFind) {
-        ListOfProgramMethod list = SLListOfProgramMethod.EMPTY_LIST;
+        ImmutableList<ProgramMethod> list = ImmutableSLList.<ProgramMethod>nil();
 
         SourceElement element = getProgramFromPIO(posOfFind);
         while(element != element.getFirstElement()) {
@@ -213,7 +218,7 @@ public abstract class VariableNamer implements InstantiationProposer {
 					 Globals globals) {
         int result = -1;
 
-        IteratorOfProgramElementName it = globals.iterator();
+        Iterator<ProgramElementName> it = globals.iterator();
         while(it.hasNext()) {
             ProgramElementName name = it.next();
     	    BasenameAndIndex bai = getBasenameAndIndex(name);
@@ -274,7 +279,7 @@ public abstract class VariableNamer implements InstantiationProposer {
      * tells whether a name is unique in the passed list of global variables
      */
     protected boolean isUniqueInGlobals(String name, Globals globals) {
-    	IteratorOfProgramElementName it = globals.iterator();
+    	Iterator<ProgramElementName> it = globals.iterator();
     	while(it.hasNext()) {
 	    ProgramElementName n = it.next();
 	    if(n.toString().equals(name)) {
@@ -327,7 +332,7 @@ public abstract class VariableNamer implements InstantiationProposer {
     /**
      * creates a Globals object for use with other internal methods
      */
-    protected Globals wrapGlobals(ListOfNamed globals) {
+    protected Globals wrapGlobals(ImmutableList<Named> globals) {
 	return new GlobalsAsListOfNamed(globals);
     }
 
@@ -335,7 +340,7 @@ public abstract class VariableNamer implements InstantiationProposer {
     /**
      * creates a Globals object for use with other internal methods
      */
-    protected Globals wrapGlobals(SetOfProgramVariable globals) {
+    protected Globals wrapGlobals(ImmutableSet<ProgramVariable> globals) {
 	return new GlobalsAsSetOfProgramVariable(globals);
     }
 
@@ -403,7 +408,7 @@ public abstract class VariableNamer implements InstantiationProposer {
                            SortedSchemaVariable sv,
                            PosInOccurrence posOfFind,
                            PosInProgram posOfDeclaration,
-                           ListOfString previousProposals) {
+                           ImmutableList<String> previousProposals) {
         ProgramElementName result = null;
 
         Sort svSort = sv.sort();
@@ -422,7 +427,7 @@ public abstract class VariableNamer implements InstantiationProposer {
                 boolean collision;
                 do {
                     collision = false;
-                    IteratorOfString it = previousProposals.iterator();
+                    Iterator<String> it = previousProposals.iterator();
                     while(it.hasNext()) {
                        String s = it.next();
                        if(s.equals(result.toString())) {
@@ -479,7 +484,7 @@ public abstract class VariableNamer implements InstantiationProposer {
     			      SchemaVariable var,
     			      Services services,
     			      Node undoAnchor,
-    			      ListOfString previousProposals) {
+    			      ImmutableList<String> previousProposals) {
 	//determine posOfDeclaration from TacletApp
         ContextInstantiationEntry cie
      		= app.instantiations().getContextInstantiation();
@@ -646,7 +651,7 @@ public abstract class VariableNamer implements InstantiationProposer {
                                                 TacletApp app,
 						Goal goal,
 						Services services,
-						ListOfString previousProposals){
+						ImmutableList<String> previousProposals){
 	if(suggestive_off) {
 	    return getProposal(app, sv, services, null, previousProposals);
 	}
@@ -654,7 +659,7 @@ public abstract class VariableNamer implements InstantiationProposer {
         String proposal;
 	boolean found = false;
 	try {
-	    IteratorOfTacletGoalTemplate templs =
+	    Iterator<TacletGoalTemplate> templs =
 	        app.taclet().goalTemplates().iterator();
             RewriteTacletGoalTemplate rwgt =null;
 	    String name = "";
@@ -666,7 +671,7 @@ public abstract class VariableNamer implements InstantiationProposer {
 		if (c.getStatementAt(0) instanceof LocalVariableDeclaration) {
 	            VariableSpecification v =
                 	((LocalVariableDeclaration) c.getStatementAt(0)).
-			getVariables().getVariableSpecification(0);
+			getVariables().get(0);
 
 	            if (v.hasInitializer()) {
 			ProgramElement rhs = instantiateExpression(
@@ -816,17 +821,17 @@ public abstract class VariableNamer implements InstantiationProposer {
 
 
     /**
-     * wrapper for global variables coming as a ListOfNamed
+     * wrapper for global variables coming as a IList<Named>
      */
     private static class GlobalsAsListOfNamed
     		   implements Globals {
-	private ListOfNamed globals;
+	private ImmutableList<Named> globals;
 
-	public GlobalsAsListOfNamed(ListOfNamed globals) {
+	public GlobalsAsListOfNamed(ImmutableList<Named> globals) {
 	    this.globals = globals;
 	}
 
-	public IteratorOfProgramElementName iterator() {
+	public Iterator<ProgramElementName> iterator() {
 	    return new AdapterOfIteratorOfNamed(globals.iterator());
 	}
     }
@@ -837,26 +842,26 @@ public abstract class VariableNamer implements InstantiationProposer {
      */
     private static class GlobalsAsSetOfProgramVariable
     		   implements Globals {
-    	private SetOfProgramVariable globals;
+    	private ImmutableSet<ProgramVariable> globals;
 
-	public GlobalsAsSetOfProgramVariable(SetOfProgramVariable globals) {
+	public GlobalsAsSetOfProgramVariable(ImmutableSet<ProgramVariable> globals) {
 	    this.globals = globals;
 	}
 
-	public IteratorOfProgramElementName iterator() {
+	public Iterator<ProgramElementName> iterator() {
 	    return new AdapterOfIteratorOfProgramVariable(globals.iterator());
 	}
     }
 
 
     /**
-     * adapter from IteratorOfNamed to IteratorOfProgramElementName
+     * adapter from Iterator<Named> to IteratorOfProgramElementName
      */
     private static class AdapterOfIteratorOfNamed
-		   implements IteratorOfProgramElementName {
-	private IteratorOfNamed it;
+		   implements Iterator<ProgramElementName> {
+	private Iterator<Named> it;
 
-	public AdapterOfIteratorOfNamed(IteratorOfNamed it) {
+	public AdapterOfIteratorOfNamed(Iterator<Named> it) {
 	    this.it = it;
 	}
 
@@ -875,13 +880,13 @@ public abstract class VariableNamer implements InstantiationProposer {
 
 
     /**
-     * adapter from IteratorOfProgramVariable to IteratorOfProgramElementName
+     * adapter from Iterator<ProgramVariable> to IteratorOfProgramElementName
      */
     private static class AdapterOfIteratorOfProgramVariable
-		   implements IteratorOfProgramElementName {
-	private IteratorOfProgramVariable it;
+		   implements Iterator<ProgramElementName> {
+	private Iterator<ProgramVariable> it;
 
-	public AdapterOfIteratorOfProgramVariable(IteratorOfProgramVariable it) {
+	public AdapterOfIteratorOfProgramVariable(Iterator<ProgramVariable> it) {
 	    this.it = it;
 	}
 
@@ -941,7 +946,7 @@ public abstract class VariableNamer implements InstantiationProposer {
      * internal representation for global variables
      */
     protected static interface Globals {
-    	public IteratorOfProgramElementName iterator();
+    	public Iterator<ProgramElementName> iterator();
     }
 
 

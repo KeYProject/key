@@ -13,13 +13,13 @@ package de.uka.ilkd.key.rule.soundness;
 
 import java.io.IOException;
 
+import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.*;
-import de.uka.ilkd.key.java.abstraction.ArrayOfKeYJavaType;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.statement.JumpStatement;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.op.ArrayOfIProgramVariable;
+import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 
 
@@ -34,7 +34,7 @@ public abstract class ProgramSVSkolem
 
     private final ProgramElementName name;
 
-    private final ArrayOfKeYJavaType influencingPVTypes;
+    private final ImmutableArray<KeYJavaType> influencingPVTypes;
     private final int                jumpCnt;
 
 
@@ -44,16 +44,16 @@ public abstract class ProgramSVSkolem
      * arguments
      * @param p_jumpCnt the size of the jump table
      */
-    public ProgramSVSkolem ( ProgramElementName p_name,
-			     ArrayOfKeYJavaType p_influencingPVTypes,
-			     int                p_jumpCnt ) {
+    public ProgramSVSkolem ( ProgramElementName   p_name,
+			     ImmutableArray<KeYJavaType> p_influencingPVTypes,
+			     int                  p_jumpCnt ) {
 	name               = p_name;
 	influencingPVTypes = p_influencingPVTypes;
 	jumpCnt            = p_jumpCnt;
     }
 
 
-    public ArrayOfKeYJavaType getInfluencingPVTypes () {
+    public ImmutableArray<KeYJavaType> getInfluencingPVTypes () {
 	return influencingPVTypes;
     }
 
@@ -61,14 +61,14 @@ public abstract class ProgramSVSkolem
 	return jumpCnt;
     }
 
-    public boolean checkJumpTable ( ArrayOfStatement p_jumpTable ) {
+    public boolean checkJumpTable ( ImmutableArray<Statement> p_jumpTable ) {
 	if ( getJumpCount () != p_jumpTable.size () )
 	    return false;
 
 	int i = getJumpCount ();
 	while ( i-- != 0 ) {
-	    if ( !( p_jumpTable.getStatement ( i ) instanceof SchemaVariable ||
-		    p_jumpTable.getStatement ( i ) instanceof JumpStatement ) )
+	    if ( !( p_jumpTable.get ( i ) instanceof SchemaVariable ||
+		    p_jumpTable.get ( i ) instanceof JumpStatement ) )
 		return false;
 	}
 
@@ -76,15 +76,15 @@ public abstract class ProgramSVSkolem
     }
 
     public boolean checkInfluencingPVs
-        ( ArrayOfIProgramVariable p_influencingPVs ) {
+        ( ImmutableArray<IProgramVariable> p_influencingPVs ) {
 	if ( getInfluencingPVTypes ().size () != p_influencingPVs.size () )
 	    return false;
 
 	int i;
 	for ( i = 0; i != p_influencingPVs.size (); ++i ) {
-	    if ( !( p_influencingPVs.getIProgramVariable ( i ) instanceof SchemaVariable ||
-		    p_influencingPVs.getIProgramVariable ( i ).getKeYJavaType () ==
-		    getInfluencingPVTypes ().getKeYJavaType ( i ) ) )
+	    if ( !( p_influencingPVs.get ( i ) instanceof SchemaVariable ||
+		    p_influencingPVs.get ( i ).getKeYJavaType () ==
+		    getInfluencingPVTypes ().get ( i ) ) )
 		return false;
 	}
 	

@@ -10,6 +10,7 @@
 
 package de.uka.ilkd.key.java.abstraction;
 
+import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.expression.Literal;
 
@@ -112,7 +113,7 @@ public class NullType implements ClassType {
 	Returns the array of locally declared supertypes of this class type.
 	@return the array of locally defined supertypes of this type.
     */
-    public ListOfKeYJavaType getSupertypes(){
+    public ImmutableList<KeYJavaType> getSupertypes(){
         return null;
     }
     
@@ -122,7 +123,7 @@ public class NullType implements ClassType {
 	The order allows to resolve member overloading or overloading.
 	@return the array of all supertypes of this type in topological order.
     */
-    public ListOfClassType getAllSupertypes(Services services){
+    public ImmutableList<ClassType> getAllSupertypes(Services services){
         return null;
     }
 
@@ -130,7 +131,7 @@ public class NullType implements ClassType {
 	Returns the fields locally defined within this class type.
 	@return the array of field members of this type.
     */
-    public ListOfField getFields(Services services){
+    public ImmutableList<Field> getFields(Services services){
         return null;
     }
 
@@ -142,7 +143,7 @@ public class NullType implements ClassType {
 	@return the array of visible field members of this type and its
 	supertypes.
     */
-    public ListOfField getAllFields(Services services){
+    public ImmutableList<Field> getAllFields(Services services){
         return null;
     }
 
@@ -150,7 +151,7 @@ public class NullType implements ClassType {
 	Returns the methods locally defined within this class type.
 	@return the array of methods of this type.
     */    
-    public ListOfMethod getMethods(Services services){
+    public ImmutableList<Method> getMethods(Services services){
         return null;
     }
 
@@ -160,7 +161,7 @@ public class NullType implements ClassType {
 	with respect to the inheritance hierarchy.
 	@return the array of visible methods of this type and its supertypes.
     */    
-    public ListOfMethod getAllMethods(Services services){
+    public ImmutableList<Method> getAllMethods(Services services){
         return null;
     }
 
@@ -168,7 +169,7 @@ public class NullType implements ClassType {
 	Returns the constructors locally defined within this class type.
 	@return the array of constructors of this type.
     */
-    public ListOfConstructor getConstructors(Services services){
+    public ImmutableList<Constructor> getConstructors(Services services){
         return null;
     }
     
@@ -179,7 +180,7 @@ public class NullType implements ClassType {
 	or any of its supertypes.
 	@see #getAllSupertypes
     */
-    public ListOfClassType getAllTypes(Services services){
+    public ImmutableList<ClassType> getAllTypes(Services services){
         return null;
     }
 

@@ -12,18 +12,24 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Set;
 
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.ClassType;
 import de.uka.ilkd.key.java.abstraction.NullType;
-import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.IProgramVariable;
+import de.uka.ilkd.key.logic.op.ProgramMethod;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.visualdebugger.VisualDebugger;
 
 public class SymbolicObject {
 
     private final HashMap<IProgramVariable, SymbolicObject> associations = new HashMap<IProgramVariable, SymbolicObject>();
 
-    private final HashMap<ProgramVariable, ListOfTerm> attr2Constraint = new HashMap<ProgramVariable, ListOfTerm>();
+    private final HashMap<ProgramVariable, ImmutableList<Term>> attr2Constraint = new HashMap<ProgramVariable, ImmutableList<Term>>();
 
     private HashMap<ProgramVariable, Term> attr2ValueTerm = new HashMap<ProgramVariable, Term>();
 
@@ -35,13 +41,13 @@ public class SymbolicObject {
 
     private ProgramMethod method = null;
 
-    private HashMap<ProgramVariable, ListOfTerm> par2constraint = new HashMap<ProgramVariable, ListOfTerm>();
+    private HashMap<ProgramVariable, ImmutableList<Term>> par2constraint = new HashMap<ProgramVariable, ImmutableList<Term>>();
 
     private HashMap<ProgramVariable, Object> par2value = new HashMap<ProgramVariable, Object>();
 
-    private ListOfProgramVariable parameter;
+    private ImmutableList<ProgramVariable> parameter;
 
-    private final SetOfTerm terms;
+    private final ImmutableSet<Term> terms;
 
     private final ClassType type;
 
@@ -51,12 +57,12 @@ public class SymbolicObject {
 
     public SymbolicObject(ClassType t, Services s) {
         this.type = t;
-        this.terms = SetAsListOfTerm.EMPTY_SET;
+        this.terms = DefaultImmutableSet.<Term>nil();
         this.isStatic = true;
         this.computeInstanceName();
     }
 
-    public SymbolicObject(SetOfTerm cl, ClassType t, Services s) {
+    public SymbolicObject(ImmutableSet<Term> cl, ClassType t, Services s) {
         this.terms = cl;
         assert cl != null && t != null && s != null;
         type = t;
@@ -64,11 +70,11 @@ public class SymbolicObject {
     }
 
     public SymbolicObject(Term cl, ClassType t, Services s) {
-        this(SetAsListOfTerm.EMPTY_SET.add(cl), t, s);
+        this(DefaultImmutableSet.<Term>nil().add(cl), t, s);
     }
 
     public SymbolicObject(Term cl, ClassType t, Services s, boolean unKnown) {
-        this(SetAsListOfTerm.EMPTY_SET.add(cl), t, s);
+        this(DefaultImmutableSet.<Term>nil().add(cl), t, s);
         this.unknownObject = unKnown;
     }
 
@@ -79,13 +85,13 @@ public class SymbolicObject {
 
     public void addAttributeConstraint(ProgramVariable f, Term o) {
         if (attr2Constraint.containsKey(f)) {
-            ListOfTerm t = attr2Constraint.get(f);
+            ImmutableList<Term> t = attr2Constraint.get(f);
             t = t.append(o);
             attr2Constraint.remove(f);
             attr2Constraint.put(f, t);
 
         } else {
-            ListOfTerm t = SLListOfTerm.EMPTY_LIST.append(o);
+            ImmutableList<Term> t = ImmutableSLList.<Term>nil().append(o);
             attr2Constraint.put(f, t);
         }
 
@@ -102,26 +108,26 @@ public class SymbolicObject {
         this.par2value.put(par, value);
     }
 
-    public void addParameterConstraint(ProgramVariable f, ListOfTerm o) {
+    public void addParameterConstraint(ProgramVariable f, ImmutableList<Term> o) {
         if (this.par2constraint.containsKey(f)) {
-            ListOfTerm t = par2constraint.get(f);
+            ImmutableList<Term> t = par2constraint.get(f);
             t = t.append(o);
             par2constraint.remove(f);
             par2constraint.put(f, t);
         } else {
-            ListOfTerm t = SLListOfTerm.EMPTY_LIST.append(o);
+            ImmutableList<Term> t = ImmutableSLList.<Term>nil().append(o);
             par2constraint.put(f, t);
         }
     }
 
     public void addParameterConstraint(ProgramVariable f, Term o) {
         if (this.par2constraint.containsKey(f)) {
-            ListOfTerm t = par2constraint.get(f);
+            ImmutableList<Term> t = par2constraint.get(f);
             t = t.append(o);
             par2constraint.remove(f);
             par2constraint.put(f, t);
         } else {
-            ListOfTerm t = SLListOfTerm.EMPTY_LIST.append(o);
+            ImmutableList<Term> t = ImmutableSLList.<Term>nil().append(o);
             par2constraint.put(f, t);
         }
     }
@@ -156,8 +162,8 @@ public class SymbolicObject {
 
     }
 
-    public SetOfProgramVariable getAllModifiedPrimitiveAttributes() {
-        SetOfProgramVariable result = SetAsListOfProgramVariable.EMPTY_SET;
+    public ImmutableSet<ProgramVariable> getAllModifiedPrimitiveAttributes() {
+        ImmutableSet<ProgramVariable> result = DefaultImmutableSet.<ProgramVariable>nil();
         Set<ProgramVariable> s = attr2ValueTerm.keySet();
         for (Iterator<ProgramVariable> it = s.iterator(); it.hasNext();) {
             result = result.add(it.next());
@@ -169,12 +175,12 @@ public class SymbolicObject {
         return associations.get(f);
     }
 
-    public ListOfTerm getAttrConstraints(ProgramVariable f) {
+    public ImmutableList<Term> getAttrConstraints(ProgramVariable f) {
         return attr2Constraint.get(f);
     }
 
-    public SetOfProgramVariable getAttributes() {
-        SetOfProgramVariable result = SetAsListOfProgramVariable.EMPTY_SET;
+    public ImmutableSet<ProgramVariable> getAttributes() {
+        ImmutableSet<ProgramVariable> result = DefaultImmutableSet.<ProgramVariable>nil();
         Set<ProgramVariable> s = attr2Constraint.keySet();
         for (Iterator<ProgramVariable> it = s.iterator(); it.hasNext();) {
             result = result.add(it.next());
@@ -194,8 +200,8 @@ public class SymbolicObject {
         return method;
     }
 
-    public SetOfProgramVariable getNonPrimAttributes() {
-        SetOfProgramVariable result = SetAsListOfProgramVariable.EMPTY_SET;
+    public ImmutableSet<ProgramVariable> getNonPrimAttributes() {
+        ImmutableSet<ProgramVariable> result = DefaultImmutableSet.<ProgramVariable>nil();
         Set<IProgramVariable> s = associations.keySet();
         for (Iterator<IProgramVariable> it = s.iterator(); it.hasNext();) {
             result = result.add((ProgramVariable) it.next());
@@ -203,18 +209,18 @@ public class SymbolicObject {
         return result;
     }
 
-    public ListOfTerm getParaConstraints(ProgramVariable f) {
+    public ImmutableList<Term> getParaConstraints(ProgramVariable f) {
         return this.par2constraint.get(f);
     }
 
-    public ListOfProgramVariable getParameter() {
+    public ImmutableList<ProgramVariable> getParameter() {
         return parameter;
     }
 
     // ------------------------------------------------------------------
     // Methods for post state
 
-    public SetOfTerm getTerms() {
+    public ImmutableSet<Term> getTerms() {
         return terms;
     }
 
@@ -261,7 +267,7 @@ public class SymbolicObject {
         this.method = method;
     }
 
-    public void setParameter(ListOfProgramVariable parameter) {
+    public void setParameter(ImmutableList<ProgramVariable> parameter) {
         this.parameter = parameter;
     }
 

@@ -22,6 +22,10 @@ import java.util.Set;
 
 import javax.swing.*;
 
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.Main;
 import de.uka.ilkd.key.gui.configuration.GeneralSettings;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
@@ -30,10 +34,6 @@ import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.Field;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.abstraction.ListOfField;
-import de.uka.ilkd.key.java.abstraction.ListOfKeYJavaType;
-import de.uka.ilkd.key.java.abstraction.SLListOfField;
-import de.uka.ilkd.key.java.abstraction.SLListOfKeYJavaType;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
 import de.uka.ilkd.key.java.declaration.InterfaceDeclaration;
 import de.uka.ilkd.key.java.recoderext.ConstructorNormalformBuilder;
@@ -42,7 +42,6 @@ import de.uka.ilkd.key.java.visitor.JavaASTCollector;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.op.ListOfProgramMethod;
 import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
@@ -50,7 +49,6 @@ import de.uka.ilkd.key.proof.init.AbstractEnvInput;
 import de.uka.ilkd.key.proof.init.ModStrategy;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
-import de.uka.ilkd.key.speclang.LoopInvariant;
 import de.uka.ilkd.key.speclang.jml.JMLSpecExtractor;
 import de.uka.ilkd.key.speclang.ocl.OCLSpecExtractor;
 
@@ -107,7 +105,7 @@ public final class SLEnvInput extends AbstractEnvInput {
     }
     
     
-    private void showWarningDialog(SetOfPositionedString warnings) {
+    private void showWarningDialog(ImmutableSet<PositionedString> warnings) {
         if(!Main.visible) {
             return;
         }
@@ -129,7 +127,7 @@ public final class SLEnvInput extends AbstractEnvInput {
         //scrollable warning list
         JScrollPane scrollpane = new JScrollPane();
         scrollpane.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-        JList list = new JList(warnings.toArray());
+        JList list = new JList(warnings.toArray(new PositionedString[warnings.size()]));
         list.setBorder(BorderFactory.createLoweredBevelBorder());
         scrollpane.setViewportView(list);
         pane.add(scrollpane, BorderLayout.CENTER);
@@ -180,7 +178,7 @@ public final class SLEnvInput extends AbstractEnvInput {
 	assert pm.isConstructor();
 
 	//determine corresponding <init> method
-	ListOfKeYJavaType sig = SLListOfKeYJavaType.EMPTY_LIST;
+	ImmutableList<KeYJavaType> sig = ImmutableSLList.<KeYJavaType>nil();
 	for(int i = 0, n = pm.getParameterDeclarationCount(); i < n; i++) {
 	    sig = sig.append(pm.getParameterType(i));
 	}
@@ -191,8 +189,8 @@ public final class SLEnvInput extends AbstractEnvInput {
 	assert initMethod != null;
 	
 	//collect all fields of current class and its superclasses
-	ListOfKeYJavaType sups = services.getJavaInfo().getAllSupertypes(kjt);
-	ListOfField fields = SLListOfField.EMPTY_LIST;	
+	ImmutableList<KeYJavaType> sups = services.getJavaInfo().getAllSupertypes(kjt);
+	ImmutableList<Field> fields = ImmutableSLList.<Field>nil();	
 	for(KeYJavaType sup : sups) {
 	    if(!(sup.getJavaType() instanceof ClassDeclaration)) {
 		continue;
@@ -228,10 +226,10 @@ public final class SLEnvInput extends AbstractEnvInput {
     
     
     
-    private SetOfOperationContract transformConstructorContracts(
-	    				SetOfOperationContract contracts,
+    private ImmutableSet<OperationContract> transformConstructorContracts(
+	    				ImmutableSet<OperationContract> contracts,
 	    				Services services) {
-	SetOfOperationContract result = SetAsListOfOperationContract.EMPTY_SET;
+	ImmutableSet<OperationContract> result = DefaultImmutableSet.<OperationContract>nil();
 	for(OperationContract contract : contracts) {
 	    result = result.add(transformConstructorContract(contract, 
 		    					     services));
@@ -264,7 +262,7 @@ public final class SLEnvInput extends AbstractEnvInput {
                         specExtractor.extractClassInvariants(kjt));
             
             //contracts, loop invariants
-            ListOfProgramMethod pms 
+            ImmutableList<ProgramMethod> pms 
                 = javaInfo.getAllProgramMethodsLocallyDeclared(kjt);
             for(ProgramMethod pm : pms) {
                 //contracts
@@ -287,10 +285,10 @@ public final class SLEnvInput extends AbstractEnvInput {
             
             //constructor contracts (add implicit preconditions, 
             //move to <init> method)
-            ListOfProgramMethod constructors = javaInfo.getConstructors(kjt);
+            ImmutableList<ProgramMethod> constructors = javaInfo.getConstructors(kjt);
             for(ProgramMethod constructor : constructors) {
         	assert constructor.isConstructor();
-        	SetOfOperationContract contracts 
+        	ImmutableSet<OperationContract> contracts 
 			= specExtractor.extractOperationContracts(constructor);
         	contracts = transformConstructorContracts(
         					contracts, 
@@ -300,7 +298,7 @@ public final class SLEnvInput extends AbstractEnvInput {
         }
         
         //show warnings to user
-        SetOfPositionedString warnings = specExtractor.getWarnings();
+        ImmutableSet<PositionedString> warnings = specExtractor.getWarnings();
         if(warnings != null && warnings.size() > 0) {
             showWarningDialog(warnings);
         }

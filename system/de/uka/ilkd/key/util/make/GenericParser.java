@@ -31,10 +31,8 @@ public class GenericParser {
      */
     public static String[][] genClass={ 
 	{"HashMapFrom","To"},
-	{"ListOf"},
-	{"SLListOf"},
 	{"SetOf"},
-	{"SetAsListOf"},
+	{"SetAsListOf<>"},
 	{"IteratorOf"},
 	{"MapFrom","To"},
 	{"EntryOf","And"},
@@ -47,20 +45,17 @@ public class GenericParser {
 
     /** dependencies as the .gjava-file (same position as above)
      * if you write <name>%<nr> the %<nr> will be replaced with the nr-th
-     * template (nr<=9) e.g. IteratorOf%1 becomes IteratorOfString if it is 
+     * template (nr<=9) e.g. IteratorOf%1 becomes Iterator<String> if it is 
      * a dependency of SetOfString
      */
     public static String[][] dep={
 	{"HashMapFrom(S)To(T).gjava","IteratorOf%1.java"},//,"IteratorOf%2.java"},
-	{"ListOf(T).gjava","IteratorOf%1.java"},
-	{"SLListOf(T).gjava","ListOf%1.java"},	
 	{"SetOf(T).gjava"},
-	{"SetAsListOf(T).gjava","SetOf%1.java","SLListOf%1.java"},
+	{"SetAsListOf<>(T).gjava","SetOf%1.java","SLListOf%1.java"},
 	{"IteratorOf(T).gjava"},
 	{"MapFrom(S)To(T).gjava"},
 	{"EntryOf(S)And(T).gjava"},
 	{"MapAsListFrom(S)To(T).gjava","MapFrom%1To%2.java",
-	 "SLListOfEntryOf%1And%2.java", 
 	 "EntryOf%1And%2.java",//"SLListOf%1.java","SLListOf%2.java", disabled 
 	                       // because of distributed packages
 	 "IteratorOfEntryOf%1And%2.java"},

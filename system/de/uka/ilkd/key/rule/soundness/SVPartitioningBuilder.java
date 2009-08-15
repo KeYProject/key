@@ -10,6 +10,10 @@
 
 package de.uka.ilkd.key.rule.soundness;
 
+import java.util.Iterator;
+
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Services;
 
 
@@ -24,8 +28,8 @@ public class SVPartitioningBuilder extends AbstractSkolemBuilder {
 	rpvp = p_rpvp;
     }
 
-    public IteratorOfSkolemSet build () {
-	ListOfSkolemSet res = SLListOfSkolemSet.EMPTY_LIST;
+    public Iterator<SkolemSet> build () {
+	ImmutableList<SkolemSet> res = ImmutableSLList.<SkolemSet>nil();
 
 	SVPartitioning[] partitionings = SVPartitioning.findPartitionings
 	    ( rpvp.getFreeSchemaVariables (),

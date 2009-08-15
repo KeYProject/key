@@ -16,13 +16,16 @@
 
 package de.uka.ilkd.key.logic;
 
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableSet;
+
 
 public class EverythingLocationDescriptor implements LocationDescriptor {
     public static final EverythingLocationDescriptor INSTANCE 
             = new EverythingLocationDescriptor();
     
-    public static final SetOfLocationDescriptor INSTANCE_AS_SET
-    	    = SetAsListOfLocationDescriptor.EMPTY_SET.add(INSTANCE);
+    public static final ImmutableSet<LocationDescriptor> INSTANCE_AS_SET
+    	    = DefaultImmutableSet.<LocationDescriptor>nil().add(INSTANCE);
     
     private EverythingLocationDescriptor() {}
     

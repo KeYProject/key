@@ -15,10 +15,12 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
+import de.uka.ilkd.key.collection.ImmutableArray;
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.sort.ArrayOfSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.util.Debug;
@@ -41,7 +43,7 @@ public class NRFunctionWithExplicitDependencies extends NonRigidFunction {
     /**
      * Pseudo-location used to separate the partitions of the dependency list.
      * (this is necessary because currently all partitions are stored in a 
-     * single ArrayOfLocation; when/if immutable lists of ArrayOfLocation 
+     * single ArrayOf; when/if immutable lists of ArrayOf<Location> 
      * become possible, one of these should be used instead)
      */
     private static final Location PARTITION_SEPARATOR 
@@ -58,11 +60,11 @@ public class NRFunctionWithExplicitDependencies extends NonRigidFunction {
      * retrieves the non-rigid function with the given name and dependencies
      * or returns null if no such function symbol exists
      * @param name the Name of the function symbol to look for
-     * @param dependencies the ArrayOfLocation with the dependencies
+     * @param dependencies the ArrayOf<Location> with the dependencies
      * @return the non-rigid function symbol 
      */
     public static NRFunctionWithExplicitDependencies
-	getSymbol(Name name, ArrayOfLocation dependencies) {
+	getSymbol(Name name, ImmutableArray<Location> dependencies) {
         HashMap mapDep2Op = (HashMap)pool.get(name);
         NRFunctionWithExplicitDependencies op = 
             (NRFunctionWithExplicitDependencies) mapDep2Op.get(dependencies);
@@ -81,7 +83,7 @@ public class NRFunctionWithExplicitDependencies extends NonRigidFunction {
     public static NRFunctionWithExplicitDependencies
         getSymbol(Name name, Sort sort, Sort[] argSorts, Location[] dependencies) {        
         return getSymbol(name, sort,
-                new ArrayOfSort(argSorts), new ArrayOfLocation(dependencies));
+                new ImmutableArray<Sort>(argSorts), new ImmutableArray<Location>(dependencies));
     }
     
     /**
@@ -89,19 +91,19 @@ public class NRFunctionWithExplicitDependencies extends NonRigidFunction {
      * and creates one if not available
      * @param name the Name of the function symbol to look for
      * @param sort the Sort of the function symbol
-     * @param argSorts the ArrayOfSort for the arguments
-     * @param depList partitioned dependencies as a list of ArrayOfLocation
+     * @param argSorts the ArrayOf<Sort> for the arguments
+     * @param depList partitioned dependencies as a list of ArrayOf<Location>
      * @return the non-rigid function symbol 
      */
     public static NRFunctionWithExplicitDependencies
-        getSymbol(Name name, Sort sort, ArrayOfSort argSorts,
-                  List /*ArrayOfLocation*/ depList) {
-        ListOfLocation deps = SLListOfLocation.EMPTY_LIST;
+        getSymbol(Name name, Sort sort, ImmutableArray<Sort> argSorts,
+                  List /*ArrayOf<Location>*/ depList) {
+        ImmutableList<Location> deps = ImmutableSLList.<Location>nil();
         Iterator it = depList.iterator();
         while(it.hasNext()) {
-            ArrayOfLocation partition = (ArrayOfLocation) it.next();
+            ImmutableArray<Location> partition = (ImmutableArray<Location>) it.next();
             for(int i = 0; i < partition.size(); i++) {
-                deps = deps.append(partition.getLocation(i));
+                deps = deps.append(partition.get(i));
             }
             if(it.hasNext()) {
                 deps = deps.append(PARTITION_SEPARATOR);
@@ -110,7 +112,7 @@ public class NRFunctionWithExplicitDependencies extends NonRigidFunction {
         return getSymbol(name, 
                          sort, 
                          argSorts, 
-                         new ArrayOfLocation(deps.toArray()));
+                         new ImmutableArray<Location>(deps.toArray(new Location[deps.size()])));
     }
         
     /**
@@ -118,13 +120,13 @@ public class NRFunctionWithExplicitDependencies extends NonRigidFunction {
      * and creates one if not available
      * @param name the Name of the function symbol to look for
      * @param sort the Sort of the function symbol
-     * @param argSorts the ArrayOfSort for the arguments
-     * @param dependencies the ArrayOfLocation with the dependencies
+     * @param argSorts the ArrayOf<Sort> for the arguments
+     * @param dependencies the ArrayOf<Location> with the dependencies
      * @return the non-rigid function symbol 
      */
     public static NRFunctionWithExplicitDependencies
         getSymbol(Name name, Sort sort, 
-    	          ArrayOfSort argSorts, ArrayOfLocation dependencies) {
+    	          ImmutableArray<Sort> argSorts, ImmutableArray<Location> dependencies) {
 
         HashMap mapDep2Op = (HashMap)pool.get(name);
         if (mapDep2Op == null) {
@@ -148,12 +150,12 @@ public class NRFunctionWithExplicitDependencies extends NonRigidFunction {
      * the meaning of this function symbol depends on the values of the
      * locations contained in this array;
      */
-    private final ArrayOfLocation dependencies;
+    private final ImmutableArray<Location> dependencies;
     
     /**
      * the list of dependencies *without* markers for partition boundaries
      */
-    private final ArrayOfLocation unpartitionedDependencies;
+    private final ImmutableArray<Location> unpartitionedDependencies;
 
     /** the common name of the class of symbols */
     private final String classifier;
@@ -162,26 +164,26 @@ public class NRFunctionWithExplicitDependencies extends NonRigidFunction {
      * creates a non rigid function with given signaturen and dependencies
      * @param name the Name of the non-rigid function symbol
      * @param sort the Sort of the symbol
-     * @param argSorts the ArrayOfSort defining the argument sorts
-     * @param dependencies the ArrayOfLocation whose values influence
+     * @param argSorts the ArrayOf<Sort> defining the argument sorts
+     * @param dependencies the ArrayOf<Location> whose values influence
      * the meaning of this symbol
      */
     private NRFunctionWithExplicitDependencies(Name name, Sort sort,
-            ArrayOfSort argSorts, ArrayOfLocation dependencies) {
+            ImmutableArray<Sort> argSorts, ImmutableArray<Location> dependencies) {
         super(name, sort, argSorts);
         this.dependencies = dependencies;
 	this.classifier   = name.toString().substring
       (0, name.toString().indexOf(DEPENDENCY_LIST_STARTER));
         
-        ListOfLocation unpartitionedDeps = SLListOfLocation.EMPTY_LIST;
+        ImmutableList<Location> unpartitionedDeps = ImmutableSLList.<Location>nil();
         for(int i = 0; i < dependencies.size(); i++) {
-            Location dep = dependencies.getLocation(i); 
+            Location dep = dependencies.get(i); 
             if(dep != PARTITION_SEPARATOR) {
                 unpartitionedDeps = unpartitionedDeps.append(dep);
             }
         }
         unpartitionedDependencies 
-                = new ArrayOfLocation(unpartitionedDeps.toArray());
+                = new ImmutableArray<Location>(unpartitionedDeps.toArray(new Location[unpartitionedDeps.size()]));
     }
 
     public String classifier() {
@@ -212,8 +214,8 @@ public class NRFunctionWithExplicitDependencies extends NonRigidFunction {
 
         if (dependencies.size() == nrFunc.dependencies.size()) {
             for (int i = 0, locs = dependencies.size(); i<locs; i++) {
-                result = dependencies.getLocation(i).
-                match(nrFunc.dependencies.getLocation(i), result, services);
+                result = dependencies.get(i).
+                match(nrFunc.dependencies.get(i), result, services);
                 if (result == null) { // fail fast
                     Debug.out
                     ("FAILED. NRFuncWithExplicitDependences mismatch " +
@@ -233,14 +235,14 @@ public class NRFunctionWithExplicitDependencies extends NonRigidFunction {
      * returns an array of all locations this function depends on
      * @return the array of locations this function depends on
      */
-    public ArrayOfLocation dependencies() {
+    public ImmutableArray<Location> dependencies() {
         return unpartitionedDependencies;
     }
     
     public int getNumPartitions() {
         int result = 1;
         for(int i = 0; i < dependencies.size(); i++) {
-            if(dependencies.getLocation(i) == PARTITION_SEPARATOR) {
+            if(dependencies.get(i) == PARTITION_SEPARATOR) {
                 result++;
             }
         }
@@ -250,11 +252,11 @@ public class NRFunctionWithExplicitDependencies extends NonRigidFunction {
     /**
      * returns the i-th partition of the locations this function depends on
      */
-    public ArrayOfLocation getDependencies(int i) {
+    public ImmutableArray<Location> getDependencies(int i) {
         Debug.assertTrue(i >= 0);
-        ListOfLocation result = SLListOfLocation.EMPTY_LIST;
+        ImmutableList<Location> result = ImmutableSLList.<Location>nil();
         for(int j = 0; j < dependencies.size(); j++) {
-            if(dependencies.getLocation(j) == PARTITION_SEPARATOR) {
+            if(dependencies.get(j) == PARTITION_SEPARATOR) {
                 if(i == 0) {
                     break;
                 } else {
@@ -263,11 +265,11 @@ public class NRFunctionWithExplicitDependencies extends NonRigidFunction {
                 }
             }
             if(i == 0) {
-                result = result.append(dependencies.getLocation(j));
+                result = result.append(dependencies.get(j));
             }
         }
         Debug.assertTrue(i == 0);
-        return new ArrayOfLocation(result.toArray());
+        return new ImmutableArray<Location>(result.toArray(new Location[result.size()]));
     }
     
     /**
@@ -278,7 +280,7 @@ public class NRFunctionWithExplicitDependencies extends NonRigidFunction {
         sb.append(name().toString());
         sb.append(DEPENDENCY_LIST_STARTER);
         for (int i = 0; i<dependencies.size(); i++) {
-            Location dep = dependencies.getLocation(i);
+            Location dep = dependencies.get(i);
             if(dep == PARTITION_SEPARATOR) {
                 sb.append(DEPENDENCY_LIST_SEPARATOR);
             } else {
@@ -289,7 +291,7 @@ public class NRFunctionWithExplicitDependencies extends NonRigidFunction {
         sb.append(DEPENDENCY_LIST_END);
         sb.append("(");
         for (int i = 0; i<argSort().size(); i++) {
-            sb.append(argSort().getSort(i));
+            sb.append(argSort().get(i));
             if (i<argSort().size()-1) {
                 sb.append(",");
             }

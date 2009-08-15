@@ -10,6 +10,7 @@
 
 package de.uka.ilkd.key.rule.metaconstruct;
 
+import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.statement.Break;
 import de.uka.ilkd.key.java.statement.LabeledStatement;
@@ -52,7 +53,7 @@ public class DoBreak extends ProgramMetaConstruct {
 	    Label blockLabel = ((LabeledStatement)block).getLabel();
 	    if (blockLabel.equals(breakLabel)) {
 		// skip this block  
-		return new StatementBlock(new ArrayOfStatement
+		return new StatementBlock(new ImmutableArray<Statement>
 					  (new Statement[0])); 
 	    } else {
 		// we assume that the doBreak is only applied in case

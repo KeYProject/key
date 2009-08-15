@@ -11,8 +11,9 @@
  */
 package de.uka.ilkd.key.rule.updatesimplifier;
 
+import de.uka.ilkd.key.collection.ImmutableArray;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.ArrayOfTerm;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.*;
@@ -88,7 +89,7 @@ public class ApplyOnAttributeAccess extends ApplyOnAccessTerm {
                                            Update update,
                                            Term target) {
         return new AttrIfExCascade ( update.getAssignmentPairs ( (Location)target.op () ),
-                                     new ArrayOfTerm ( pr.getSimplifiedSubterms () ),
+                                     new ImmutableArray<Term> ( pr.getSimplifiedSubterms () ),
                                      (Location)target.op () );
     }
 
@@ -108,11 +109,11 @@ public class ApplyOnAttributeAccess extends ApplyOnAccessTerm {
                                 extends IterateAssignmentPairsIfExCascade {
         
         private final Location targetLoc;
-        private final ArrayOfTerm targetSubs;
-        private final SetOfQuantifiableVariable criticalVars;
+        private final ImmutableArray<Term> targetSubs;
+        private final ImmutableSet<QuantifiableVariable> criticalVars;
         
-        public AttrIfExCascade (ArrayOfAssignmentPair pairs,
-                                ArrayOfTerm targetSubs,
+        public AttrIfExCascade (ImmutableArray<AssignmentPair> pairs,
+                                ImmutableArray<Term> targetSubs,
                                 Location targetLoc) {
             super ( pairs );
             this.targetSubs = targetSubs;
@@ -138,7 +139,7 @@ public class ApplyOnAttributeAccess extends ApplyOnAccessTerm {
                 if ( !(targetLoc instanceof ShadowedOperator) ||
                     getCurrentPair().location() instanceof ShadowedOperator || i != 1) {               
                     final Term eqObjects =
-                        compareObjects ( targetSubs.getTerm ( i ),
+                        compareObjects ( targetSubs.get ( i ),
                                 getCurrentPair ().locationSubs ()[i] );
                     res = tf.createJunctorTermAndSimplify ( Op.AND, res, eqObjects );
                 }
@@ -150,7 +151,7 @@ public class ApplyOnAttributeAccess extends ApplyOnAccessTerm {
             return res;
         }
 
-        protected SetOfQuantifiableVariable criticalVars () {
+        protected ImmutableSet<QuantifiableVariable> criticalVars () {
             return criticalVars;
         }
     }

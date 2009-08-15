@@ -9,18 +9,18 @@ package de.uka.ilkd.key.visualdebugger;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
 import javax.swing.SwingUtilities;
 
+import de.uka.ilkd.key.collection.*;
 import de.uka.ilkd.key.gui.*;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.ClassType;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.declaration.ArrayOfParameterDeclaration;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
 import de.uka.ilkd.key.java.declaration.MethodDeclaration;
+import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
 import de.uka.ilkd.key.java.expression.literal.IntLiteral;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.reference.MethodReference;
@@ -34,11 +34,15 @@ import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.ProgramPrinter;
-import de.uka.ilkd.key.proof.*;
+import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.InitConfig;
-import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
-import de.uka.ilkd.key.rule.*;
+import de.uka.ilkd.key.rule.PosTacletApp;
+import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.rule.RuleSet;
+import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.strategy.DebuggerStrategy;
 import de.uka.ilkd.key.strategy.StrategyFactory;
 import de.uka.ilkd.key.strategy.StrategyProperties;
@@ -143,12 +147,12 @@ public class VisualDebugger {
      */
     public static String getMethodString(MethodDeclaration md) {
         String result = md.getProgramElementName().toString() + "( ";
-        final ArrayOfParameterDeclaration paraDecl = md.getParameters();
+        final ImmutableArray<ParameterDeclaration> paraDecl = md.getParameters();
         if (paraDecl.size() > 0) {
             for (int i = 0; i < paraDecl.size() - 1; i++) {
-                result += paraDecl.getParameterDeclaration(i) + " ,";
+                result += paraDecl.get(i) + " ,";
             }
-            result += paraDecl.getParameterDeclaration(paraDecl.size() - 1);
+            result += paraDecl.get(paraDecl.size() - 1);
         }
         result += " )";
         return result;
@@ -264,7 +268,7 @@ public class VisualDebugger {
     private boolean staticMethod;
 
     /** The symbolic input values as list. */
-    private ListOfTerm symbolicInputValuesAsList = SLListOfTerm.EMPTY_LIST;
+    private ImmutableList<Term> symbolicInputValuesAsList = ImmutableSLList.<Term>nil();
 
     /** The tc2node. */
     private HashMap<TestCaseIdentifier, Node> tc2node = new HashMap<TestCaseIdentifier, Node>();
@@ -324,11 +328,11 @@ public class VisualDebugger {
      * 
      * @return the list of program variable
      */
-    public ListOfProgramVariable arrayOfExpression2ListOfProgVar(
-            ArrayOfExpression aoe, int start) {
-        ListOfProgramVariable lopv = SLListOfProgramVariable.EMPTY_LIST;
+    public ImmutableList<ProgramVariable> arrayOfExpression2ListOfProgVar(
+            ImmutableArray<Expression> aoe, int start) {
+        ImmutableList<ProgramVariable> lopv = ImmutableSLList.<ProgramVariable>nil();
         for (int i = aoe.size() - 1; i >= start ; i--) {
-            lopv = lopv.prepend((ProgramVariable) aoe.getExpression(i));
+            lopv = lopv.prepend((ProgramVariable) aoe.get(i));
         }
         return lopv;
     }
@@ -341,13 +345,13 @@ public class VisualDebugger {
      * 
      * @return the list of term
      */
-    private ListOfTerm collectResult(Sequent s) {
-        final IteratorOfConstrainedFormula itAntec = s.antecedent().iterator();
-        ListOfTerm result = SLListOfTerm.EMPTY_LIST;
+    private ImmutableList<Term> collectResult(Sequent s) {
+        final Iterator<ConstrainedFormula> itAntec = s.antecedent().iterator();
+        ImmutableList<Term> result = ImmutableSLList.<Term>nil();
         while (itAntec.hasNext()) {
             result = result.append(itAntec.next().formula());
         }
-        final IteratorOfConstrainedFormula itSucc = s.succedent().iterator();
+        final Iterator<ConstrainedFormula> itSucc = s.succedent().iterator();
         while (itSucc.hasNext()) {
             result = result.append(TermFactory.DEFAULT.createJunctorTerm(
                     Op.NOT, itSucc.next().formula()));
@@ -366,9 +370,9 @@ public class VisualDebugger {
      * 
      * @return true, if successful
      */
-    private boolean contains(ArrayOfExpression aoe, ProgramVariable pv) {
+    private boolean contains(ImmutableArray<Expression> aoe, ProgramVariable pv) {
         for (int i = 0; i < aoe.size(); i++) {
-            if (aoe.getExpression(i) == pv) {
+            if (aoe.get(i) == pv) {
                 return true;
             }
         }
@@ -436,7 +440,7 @@ public class VisualDebugger {
 
         // debuggingMethod.getVariableSpecification(index)
 
-        ArrayOfExpression args = mbs.getArguments();
+        ImmutableArray<Expression> args = mbs.getArguments();
         HashMap<Term, Term> map = new HashMap<Term, Term>();
         HashMap<Term, Term> map2 = new HashMap<Term, Term>();
         if (jb != null) {
@@ -457,9 +461,9 @@ public class VisualDebugger {
         }
 
         // set symb input values as list;
-        this.symbolicInputValuesAsList = SLListOfTerm.EMPTY_LIST;
+        this.symbolicInputValuesAsList = ImmutableSLList.<Term>nil();
         for (int i = args.size() - 1; i>=0 ; i--) {
-            ProgramVariable next = (ProgramVariable) args.getExpression(i);
+            ProgramVariable next = (ProgramVariable) args.get(i);
             final Term val = map2.get(TermFactory.DEFAULT.createVariableTerm(next));// TODO
             this.symbolicInputValuesAsList = 
                 this.symbolicInputValuesAsList.prepend(val);
@@ -531,8 +535,8 @@ public class VisualDebugger {
      * 
      * @return the array index
      */
-    public SetOfTerm getArrayIndex(PosInOccurrence pio2) {
-        SetOfTerm result = SetAsListOfTerm.EMPTY_SET;
+    public ImmutableSet<Term> getArrayIndex(PosInOccurrence pio2) {
+        ImmutableSet<Term> result = DefaultImmutableSet.<Term>nil();
         PosInOccurrence pio = pio2;
         if (pio.constrainedFormula().formula().op() instanceof QuanUpdateOperator) {
             QuanUpdateOperator op = (QuanUpdateOperator) pio
@@ -559,8 +563,8 @@ public class VisualDebugger {
      * 
      * @return the array locations
      */
-    public SetOfTerm getArrayLocations(PosInOccurrence pio2) {
-        SetOfTerm result = SetAsListOfTerm.EMPTY_SET;
+    public ImmutableSet<Term> getArrayLocations(PosInOccurrence pio2) {
+        ImmutableSet<Term> result = DefaultImmutableSet.<Term>nil();
         PosInOccurrence pio = pio2;
         if (pio.constrainedFormula().formula().op() instanceof QuanUpdateOperator) {
             QuanUpdateOperator op = (QuanUpdateOperator) pio
@@ -625,7 +629,7 @@ public class VisualDebugger {
      */
     public PosInOccurrence getExecutionTerminatedNormal(Node n) {
         final Sequent s = n.sequent();
-        for (IteratorOfConstrainedFormula it = s.succedent().iterator(); it
+        for (Iterator<ConstrainedFormula> it = s.succedent().iterator(); it
                 .hasNext();) {
             ConstrainedFormula cfm = it.next();
             final Term f = cfm.formula();
@@ -656,8 +660,8 @@ public class VisualDebugger {
      * 
      * @return the locations
      */
-    public ListOfTerm getLocations(PosInOccurrence pio2) {
-        ListOfTerm result = SLListOfTerm.EMPTY_LIST;
+    public ImmutableList<Term> getLocations(PosInOccurrence pio2) {
+        ImmutableList<Term> result = ImmutableSLList.<Term>nil();
         PosInOccurrence pio = pio2;
 
         if (pio.constrainedFormula().formula().op() instanceof QuanUpdateOperator) {
@@ -709,11 +713,11 @@ public class VisualDebugger {
     public MethodFrame getMethodFrame(SourceElement context) {
         MethodFrame frame = null;
         if (context instanceof ProgramPrefix) {
-            final ArrayOfProgramPrefix prefixElements = ((ProgramPrefix) context)
+            final ImmutableArray<ProgramPrefix> prefixElements = ((ProgramPrefix) context)
                     .getPrefixElements();
             for (int i = 0, len = prefixElements.size(); i < len; i++) {
-                if (prefixElements.getProgramPrefix(i) instanceof MethodFrame) {
-                    frame = (MethodFrame) prefixElements.getProgramPrefix(i);
+                if (prefixElements.get(i) instanceof MethodFrame) {
+                    frame = (MethodFrame) prefixElements.get(i);
                 }
             }
         }
@@ -748,10 +752,10 @@ public class VisualDebugger {
     private int getMethodStackSize(SourceElement context) {
         int size = 0;
         if (context instanceof ProgramPrefix) {
-            final ArrayOfProgramPrefix prefixElements = ((ProgramPrefix) context)
+            final ImmutableArray<ProgramPrefix> prefixElements = ((ProgramPrefix) context)
                     .getPrefixElements();
             for (int i = 0, len = prefixElements.size(); i < len; i++)
-                if (prefixElements.getProgramPrefix(i) instanceof MethodFrame) {
+                if (prefixElements.get(i) instanceof MethodFrame) {
                     size++;
                 }
         }
@@ -787,7 +791,7 @@ public class VisualDebugger {
     public HashSet<Expression> getParam(MethodBodyStatement mbs) {
         HashSet<Expression> result = new HashSet<Expression>();
         for (int i = 0; i < mbs.getArguments().size(); i++) {
-            result.add(mbs.getArguments().getExpression(i));
+            result.add(mbs.getArguments().get(i));
         }
         return result;
     }
@@ -902,7 +906,7 @@ public class VisualDebugger {
      * @return the program pio
      */
     public PosInOccurrence getProgramPIO(Sequent s) {
-        IteratorOfConstrainedFormula it = s.succedent().iterator();
+        Iterator<ConstrainedFormula> it = s.succedent().iterator();
         while (it.hasNext()) {
             PosInOccurrence pio = new PosInOccurrence(it.next(),
                     PosInTerm.TOP_LEVEL, false);
@@ -947,8 +951,8 @@ public class VisualDebugger {
      * 
      * @return the symbolic input values
      */
-    public SetOfTerm getSymbolicInputValues() {
-        SetOfTerm result = SetAsListOfTerm.EMPTY_SET;
+    public ImmutableSet<Term> getSymbolicInputValues() {
+        ImmutableSet<Term> result = DefaultImmutableSet.<Term>nil();
         for (Iterator<Term> it = this.term2InputPV.keySet().iterator(); it.hasNext();) {
             result = result.add(it.next());
         }
@@ -961,7 +965,7 @@ public class VisualDebugger {
      * 
      * @return the symbolic input values as list
      */
-    public ListOfTerm getSymbolicInputValuesAsList() {
+    public ImmutableList<Term> getSymbolicInputValuesAsList() {
         return this.symbolicInputValuesAsList;
     }
 
@@ -1033,7 +1037,7 @@ public class VisualDebugger {
         HashSet<Location> pvs = new HashSet<Location>();
         for (final KeYJavaType kjt : info.getAllKeYJavaTypes()) {
             if (kjt.getJavaType() instanceof ClassDeclaration) {
-                final ListOfProgramMethod methods = info.getAllProgramMethods(kjt);
+                final ImmutableList<ProgramMethod> methods = info.getAllProgramMethods(kjt);
                 for (final ProgramMethod m : methods) {
                     if (m != null) {
                         ProgramVariableCollector pvc = new ProgramVariableCollector(
@@ -1105,7 +1109,7 @@ public class VisualDebugger {
      * @return true, if is symbolic execution
      */
     private boolean isSymbolicExecution(Taclet t) {
-        ListOfRuleSet list = t.getRuleSets();
+        ImmutableList<RuleSet> list = t.getRuleSets();
         RuleSet rs;
         while (!list.isEmpty()) {
             rs = list.head();
@@ -1147,7 +1151,7 @@ public class VisualDebugger {
      * 
      * @return the string
      */
-    public String prettyPrint(ListOfTerm l) {
+    public String prettyPrint(ImmutableList<Term> l) {
         // KeYMediator mediator=
         // VisualDebugger.getVisualDebugger().getMediator();
         final LogicPrinter lp = new DebuggerLP(new ProgramPrinter(null),
@@ -1155,7 +1159,7 @@ public class VisualDebugger {
                 term2InputPV);
 
         String result = "";
-        IteratorOfTerm it = l.iterator();
+        Iterator<Term> it = l.iterator();
         while (it.hasNext()) {
             try {
                 lp.printTerm(it.next());
@@ -1185,7 +1189,7 @@ public class VisualDebugger {
      * 
      * @return the string
      */
-    public String prettyPrint(ListOfTerm l, List<SymbolicObject> objects,
+    public String prettyPrint(ImmutableList<Term> l, List<SymbolicObject> objects,
             SymbolicObject thisObject) {
         // KeYMediator mediator=
         // VisualDebugger.getVisualDebugger().getMediator();
@@ -1194,7 +1198,7 @@ public class VisualDebugger {
                 term2InputPV, objects, thisObject);
 
         String result = "";
-        IteratorOfTerm it = l.iterator();
+        Iterator<Term> it = l.iterator();
         while (it.hasNext()) {
             try {
                 lp.printTerm(it.next());
@@ -1224,9 +1228,9 @@ public class VisualDebugger {
      * 
      * @return the string
      */
-    public String prettyPrint(SetOfTerm l, LinkedList objects,
+    public String prettyPrint(ImmutableSet<Term> l, LinkedList objects,
             SymbolicObject thisObject) {
-        return prettyPrint(SLListOfTerm.EMPTY_LIST.append(l.toArray()),
+        return prettyPrint(ImmutableSLList.<Term>nil().append(l.toArray(new Term[l.size()])),
                 objects, thisObject);
     }
 
@@ -1304,7 +1308,7 @@ public class VisualDebugger {
      * Refresh rule apps.
      */
     private void refreshRuleApps() {
-        ListOfGoal goals = mediator.getProof().openGoals();
+        ImmutableList<Goal> goals = mediator.getProof().openGoals();
         // g.getRuleAppManager().clearCache();
         for (final Goal g : goals) {
             g.ruleAppIndex().clearIndexes();
@@ -1321,10 +1325,10 @@ public class VisualDebugger {
      * 
      * @return the list of term
      */
-    public ListOfTerm removeImplicite(ListOfTerm list) {
-        ListOfTerm result = SLListOfTerm.EMPTY_LIST;
+    public ImmutableList<Term> removeImplicite(ImmutableList<Term> list) {
+        ImmutableList<Term> result = ImmutableSLList.<Term>nil();
 
-        for (IteratorOfTerm it = list.iterator(); it.hasNext();) {
+        for (Iterator<Term> it = list.iterator(); it.hasNext();) {
             final Term n = it.next();
             if (!VisualDebugger.containsImplicitAttr(n))
                 result = result.append(n);
@@ -1351,8 +1355,8 @@ public class VisualDebugger {
      * @param goals
      *                the goals
      */
-    private void removeStepOver(ListOfGoal goals) {
-        IteratorOfGoal it = goals.iterator();
+    private void removeStepOver(ImmutableList<Goal> goals) {
+        Iterator<Goal> it = goals.iterator();
         while (it.hasNext()) {
             Node next = it.next().node();
             next.getNodeInfo().getVisualDebuggerState().setStepOver(-1);
@@ -1385,7 +1389,7 @@ public class VisualDebugger {
      * 
      * @return true, if successful
      */
-    public boolean run(ListOfGoal goals) {
+    public boolean run(ImmutableList<Goal> goals) {
         if (!mediator.autoMode()) {
             this.removeStepOver(goals);
             this.setSteps(goals, this.runLimit);
@@ -1405,7 +1409,7 @@ public class VisualDebugger {
      * @param goals
      *                the goals
      */
-    private void runProver(final ListOfGoal goals) {
+    private void runProver(final ImmutableList<Goal> goals) {
         this.refreshRuleApps();
         mediator.startAutoMode(goals);        
         // mediator.getInteractiveProver().removeProverTaskListener(proverTaskListener);
@@ -1478,8 +1482,8 @@ public class VisualDebugger {
      * @param goals
      *                the new step over
      */
-    private void setStepOver(ListOfGoal goals) {
-        IteratorOfGoal it = goals.iterator();
+    private void setStepOver(ImmutableList<Goal> goals) {
+        Iterator<Goal> it = goals.iterator();
         while (it.hasNext()) {
             Node next = it.next().node();
             final int size = this.getMethodStackSize(next);
@@ -1500,8 +1504,8 @@ public class VisualDebugger {
      * @param steps
      *                the steps
      */
-    private void setSteps(ListOfGoal goals, int steps) {
-        IteratorOfGoal it = goals.iterator();
+    private void setSteps(ImmutableList<Goal> goals, int steps) {
+        Iterator<Goal> it = goals.iterator();
         while (it.hasNext()) {
             Node next = it.next().node();
             if (!next.root())
@@ -1543,7 +1547,7 @@ public class VisualDebugger {
      * 
      * @return the list of term
      */
-    public ListOfTerm simplify(ListOfTerm terms) {
+    public ImmutableList<Term> simplify(ImmutableList<Term> terms) {
         if (terms.size() == 0)
             return terms;
         final DebuggerPO po = new DebuggerPO("DebuggerPo");
@@ -1575,7 +1579,7 @@ public class VisualDebugger {
             ps.removeProgressMonitor(etProgressMonitor);
         }
 
-        final ListOfGoal openGoals = proof.openGoals();
+        final ImmutableList<Goal> openGoals = proof.openGoals();
         assert openGoals.size() == 1;
         
         return collectResult(openGoals.head().sequent());
@@ -1622,7 +1626,7 @@ public class VisualDebugger {
      * 
      * @return true, if successful
      */
-    public boolean stepInto(ListOfGoal goals) {
+    public boolean stepInto(ImmutableList<Goal> goals) {
         return this.stepInto(goals, 1);
     }
 
@@ -1636,7 +1640,7 @@ public class VisualDebugger {
      * 
      * @return true, if successful
      */
-    public boolean stepInto(ListOfGoal goals, int steps) {
+    public boolean stepInto(ImmutableList<Goal> goals, int steps) {
         if (!mediator.autoMode()) {
             final Proof proof = mediator.getProof();
             removeStepOver(proof.openGoals());
@@ -1661,7 +1665,7 @@ public class VisualDebugger {
      * @param goals
      *                the goals
      */
-    public void stepOver(ListOfGoal goals) {
+    public void stepOver(ImmutableList<Goal> goals) {
         setStepOver(goals);
         this.setSteps(goals, runLimit);
         setProofStrategy(mediator.getProof(), true, false,

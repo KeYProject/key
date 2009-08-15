@@ -15,9 +15,9 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
+import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.visitor.ProgramVariableCollector;
-import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.*;
@@ -69,7 +69,7 @@ public class ApplyOnModality extends AbstractUpdateRule {
      */
     public Term apply(Update update, Term target, Services services) {
 
-        final ArrayOfAssignmentPair pairs = deletionEnabled ? new ArrayOfAssignmentPair(
+        final ImmutableArray<AssignmentPair> pairs = deletionEnabled ? new ImmutableArray<AssignmentPair>(
                 remove(update, target, services))
         : update.getAllAssignmentPairs();
   
@@ -83,12 +83,12 @@ public class ApplyOnModality extends AbstractUpdateRule {
      * @author bubel         
      */
     public AssignmentPair[] remove(Update up, Term target, Services services) {
-        final ArrayOfAssignmentPair pairs = up.getAllAssignmentPairs();        
+        final ImmutableArray<AssignmentPair> pairs = up.getAllAssignmentPairs();        
         final HashSet<Object> protectedProgVars = collectProgramVariables(target, services);
         final List<AssignmentPair> result = new ArrayList<AssignmentPair>(pairs.size());
 
         for (int i = 0, size=pairs.size(); i<size; i++) {
-            final AssignmentPair pair =  pairs.getAssignmentPair(i);            
+            final AssignmentPair pair =  pairs.get(i);            
             final Location loc = pair.location();
                        
             if ( protectedLocation ( loc, protectedProgVars ) )

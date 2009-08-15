@@ -9,8 +9,9 @@ package de.uka.ilkd.key.visualdebugger.executiontree;
 
 import java.util.LinkedList;
 
-import de.uka.ilkd.key.logic.ListOfTerm;
-import de.uka.ilkd.key.logic.SLListOfTerm;
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.visualdebugger.SourceElementId;
 
 public class ETLeafNode extends ETNode {
@@ -28,20 +29,20 @@ public class ETLeafNode extends ETNode {
 
     public final static int INFEASIBLE = 2;
 
-    public ETLeafNode(ListOfTerm bc, int st, ETNode parent) {
+    public ETLeafNode(ImmutableList<Term> bc, int st, ETNode parent) {
         super(bc, parent);
         this.state = st;
         assert (st == TERMINATED || st == INFEASIBLE);
     }
 
-    public ETLeafNode(ListOfTerm bc, int st, LinkedList nodes, ETNode parent) {
+    public ETLeafNode(ImmutableList<Term> bc, int st, LinkedList nodes, ETNode parent) {
         super(bc, nodes, parent);
         this.state = st;
         assert (st == TERMINATED || st == INFEASIBLE);
     }
 
     public ETLeafNode(int st, ETLeafNode parent) {
-        this(SLListOfTerm.EMPTY_LIST, st, parent);
+        this(ImmutableSLList.<Term>nil(), st, parent);
     }
 
     public String getExceptionName() {

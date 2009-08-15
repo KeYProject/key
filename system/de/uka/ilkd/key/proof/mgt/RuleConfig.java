@@ -10,17 +10,18 @@
 
 package de.uka.ilkd.key.proof.mgt;
 
-import de.uka.ilkd.key.logic.SetOfChoice;
+import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.logic.Choice;
 
 public class RuleConfig {
 
-    private SetOfChoice activatedChoices;
+    private ImmutableSet<Choice> activatedChoices;
    
-    public RuleConfig(SetOfChoice ruleOpts) {
+    public RuleConfig(ImmutableSet<Choice> ruleOpts) {
 	this.activatedChoices=ruleOpts;
     }
    
-    public SetOfChoice getChoices() {
+    public ImmutableSet<Choice> getChoices() {
 	return activatedChoices;
     }
 

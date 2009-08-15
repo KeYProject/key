@@ -9,7 +9,7 @@
 //
 package de.uka.ilkd.key.java.visitor;
 
-import de.uka.ilkd.key.java.ArrayOfProgramElement;
+import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
@@ -91,8 +91,8 @@ public class ProgramReplaceVisitor extends CreatingASTVisitor {
 	    Debug.out("ProgramReplace SV:", sv);
 	    Debug.out("ProgramReplace:", inst);
 	    addChild((ProgramElement)inst);
-	} else if (inst instanceof ArrayOfProgramElement) {
-	    addChildren((ArrayOfProgramElement)inst);
+	} else if (inst instanceof ImmutableArray/*<ProgramElement>*/) {
+	    addChildren((ImmutableArray<ProgramElement>)inst);
 	} else if (inst instanceof Term
 		   && ((Term)inst).op() instanceof ProgramInLogic) {
 	    addChild(services.getTypeConverter().convertToProgramElement((Term)inst));

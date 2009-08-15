@@ -10,9 +10,9 @@
 
 package de.uka.ilkd.key.logic.op;
 
+import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.sort.ArrayOfSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 
 
@@ -40,11 +40,11 @@ public class NonRigidFunctionLocation extends Function implements NonRigid, Loca
      * creates a non rigid function location  with given signature
      * @param name the Name of the non-rigid function symbol
      * @param sort the Sort of the symbol
-     * @param argSorts the ArrayOfSort defining the argument sorts
+     * @param argSorts the ArrayOf<Sort> defining the argument sorts
      * @param isHeap boolean indicating if the location shall be considered 
      * as part of the heap 
      */
-    public NonRigidFunctionLocation(Name name, Sort sort, ArrayOfSort argSorts, boolean isHeap) {
+    public NonRigidFunctionLocation(Name name, Sort sort, ImmutableArray<Sort> argSorts, boolean isHeap) {
         super(name, sort, argSorts);
         this.isHeap = isHeap;
     }

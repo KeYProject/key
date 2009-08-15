@@ -16,24 +16,22 @@
 
 package de.uka.ilkd.key.rule.metaconstruct;
 
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.reference.ReferencePrefix;
 import de.uka.ilkd.key.java.reference.TypeReference;
-import de.uka.ilkd.key.java.statement.IteratorOfLoopStatement;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.statement.MethodFrame;
-import de.uka.ilkd.key.java.statement.SetAsListOfLoopStatement;
-import de.uka.ilkd.key.java.statement.SetOfLoopStatement;
 import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
 import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.SetOfLocationDescriptor;
-import de.uka.ilkd.key.logic.SetOfTerm;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.UpdateFactory;
 import de.uka.ilkd.key.logic.op.AbstractMetaOperator;
@@ -42,8 +40,10 @@ import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.proof.AtPreFactory;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.updatesimplifier.Update;
+import de.uka.ilkd.key.speclang.LocationDescriptorSet;
 import de.uka.ilkd.key.speclang.LoopInvariant;
 import de.uka.ilkd.key.speclang.LoopInvariantImpl;
+import de.uka.ilkd.key.speclang.LoopPredicateSet;
 
 
 /**
@@ -68,7 +68,7 @@ public class IntroAtPreDefsOp extends AbstractMetaOperator {
         //collect all loops in the innermost method frame
         Object[] frameAndLoops = new JavaASTVisitor(pe, services) {
             private MethodFrame frame = null;
-            private SetOfLoopStatement loops = SetAsListOfLoopStatement.EMPTY_SET;
+            private ImmutableSet<LoopStatement> loops = DefaultImmutableSet.<LoopStatement>nil();
             protected void doDefaultAction(SourceElement node) {
                 if(node instanceof MethodFrame && frame == null) {
                     frame = (MethodFrame) node;
@@ -82,7 +82,7 @@ public class IntroAtPreDefsOp extends AbstractMetaOperator {
             }
         }.run();
         MethodFrame frame = (MethodFrame) frameAndLoops[0];
-        SetOfLoopStatement loops = (SetOfLoopStatement) frameAndLoops[1];
+        ImmutableSet<LoopStatement> loops = (ImmutableSet<LoopStatement>) frameAndLoops[1];
         
         //determine "self"
         Term selfTerm;
@@ -97,7 +97,7 @@ public class IntroAtPreDefsOp extends AbstractMetaOperator {
         //collect atPre-functions, update loop invariants
         Map<Operator, Function /*atPre*/> atPreFunctions = 
             new LinkedHashMap<Operator, Function>();
-        for(IteratorOfLoopStatement it = loops.iterator(); it.hasNext(); ) {
+        for(Iterator<LoopStatement> it = loops.iterator(); it.hasNext(); ) {
             LoopStatement loop = it.next();
             LoopInvariant inv 
                 = services.getSpecificationRepository().getLoopInvariant(loop);
@@ -108,9 +108,9 @@ public class IntroAtPreDefsOp extends AbstractMetaOperator {
                 }
                 Term newInvariant 
                     = inv.getInvariant(selfTerm, atPreFunctions, services);
-                SetOfTerm newPredicates
+                LoopPredicateSet newPredicates
                     = inv.getPredicates(selfTerm, atPreFunctions, services);
-                SetOfLocationDescriptor newModifies
+                LocationDescriptorSet newModifies
                     = inv.getModifies(selfTerm, atPreFunctions, services);
                 Term newVariant
                     = inv.getVariant(selfTerm, atPreFunctions, services);

@@ -13,10 +13,10 @@ package de.uka.ilkd.key.logic;
 import java.util.HashMap;
 import java.util.Map;
 
-import de.uka.ilkd.key.logic.op.ArrayOfQuantifiableVariable;
+import de.uka.ilkd.key.collection.ImmutableArray;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.logic.op.SetOfQuantifiableVariable;
 import de.uka.ilkd.key.util.Debug;
 
 
@@ -38,17 +38,17 @@ public class BoundVariableTools {
      * array (in <code>originalTerm</code>)
      */
     public Term renameVariables (Term originalTerm,
-                                 ArrayOfQuantifiableVariable oldBoundVars,
-                                 ArrayOfQuantifiableVariable newBoundVars) {
+                                 ImmutableArray<QuantifiableVariable> oldBoundVars,
+                                 ImmutableArray<QuantifiableVariable> newBoundVars) {
         Term res = originalTerm;
         for (int i = 0; i != oldBoundVars.size(); ++i) {
-            if ( oldBoundVars.getQuantifiableVariable ( i )
-                 != newBoundVars.getQuantifiableVariable ( i ) ) {
+            if ( oldBoundVars.get ( i )
+                 != newBoundVars.get ( i ) ) {
                 final Term newVarTerm =
                     tf.createVariableTerm
-                    ( (LogicVariable)newBoundVars.getQuantifiableVariable ( i ) );
+                    ( (LogicVariable)newBoundVars.get ( i ) );
                 final ClashFreeSubst subst =
-                    new ClashFreeSubst ( oldBoundVars.getQuantifiableVariable ( i ),
+                    new ClashFreeSubst ( oldBoundVars.get ( i ),
                                          newVarTerm );
                 res = subst.apply ( res );
             }
@@ -58,8 +58,8 @@ public class BoundVariableTools {
     }
 
     public Term[] renameVariables (Term[] originalTerms,
-                                   ArrayOfQuantifiableVariable oldBoundVars,
-                                   ArrayOfQuantifiableVariable newBoundVars) {
+                                   ImmutableArray<QuantifiableVariable> oldBoundVars,
+                                   ImmutableArray<QuantifiableVariable> newBoundVars) {
         final Term[] res = new Term [originalTerms.length];
         for ( int i = 0; i != res.length; ++i )
             res[i] = renameVariables ( originalTerms[i],
@@ -86,13 +86,13 @@ public class BoundVariableTools {
      * @return <code>true</code> iff it was necessary to create at least one
      *         new variable
      */
-    public boolean resolveCollisions (ArrayOfQuantifiableVariable oldVars,
+    public boolean resolveCollisions (ImmutableArray<QuantifiableVariable> oldVars,
                                       QuantifiableVariable[] newVars,
-                                      SetOfQuantifiableVariable criticalVars) {
+                                      ImmutableSet<QuantifiableVariable> criticalVars) {
         boolean changedVar = false;
 
         for ( int i = 0; i != newVars.length; ++i ) {
-            final QuantifiableVariable oldVar = oldVars.getQuantifiableVariable ( i );
+            final QuantifiableVariable oldVar = oldVars.get ( i );
             if ( criticalVars.contains ( oldVar ) ) {
                 // rename the bound variable
                 newVars[i] = new LogicVariable ( oldVar.name (), oldVar.sort () );
@@ -110,9 +110,9 @@ public class BoundVariableTools {
      * the top-level operator of <code>t</code> (by bound renaming)
      */
     public Term resolveCollisions (Term t,
-                                   SetOfQuantifiableVariable criticalVars) {
-        final ArrayOfQuantifiableVariable[] newBoundVars =
-            new ArrayOfQuantifiableVariable [t.arity ()];
+                                   ImmutableSet<QuantifiableVariable> criticalVars) {
+        final ImmutableArray<QuantifiableVariable>[] newBoundVars =
+            new ImmutableArray [t.arity ()];
         final Term[] newSubs = new Term [t.arity ()];
         
         if ( !resolveCollisions ( t, criticalVars, newBoundVars, newSubs ) )
@@ -131,20 +131,20 @@ public class BoundVariableTools {
      *         i.e. to changed anything in the term <code>originalTerm</code>
      */
     public boolean resolveCollisions (Term originalTerm,
-                                      SetOfQuantifiableVariable criticalVars,
-                                      ArrayOfQuantifiableVariable[] newBoundVars,
+                                      ImmutableSet<QuantifiableVariable> criticalVars,
+                                      ImmutableArray<QuantifiableVariable>[] newBoundVars,
                                       Term[] newSubs) {
         boolean changed = false;
 
         for ( int i = 0; i != originalTerm.arity (); ++i ) {
-            final ArrayOfQuantifiableVariable oldVars =
+            final ImmutableArray<QuantifiableVariable> oldVars =
                 originalTerm.varsBoundHere ( i );
 
             final QuantifiableVariable[] newVars =
                 new QuantifiableVariable [oldVars.size ()];
             if ( resolveCollisions ( oldVars, newVars, criticalVars ) ) {
                 changed = true;
-                newBoundVars[i] = new ArrayOfQuantifiableVariable ( newVars );
+                newBoundVars[i] = new ImmutableArray<QuantifiableVariable> ( newVars );
                 newSubs[i] = renameVariables ( originalTerm.sub ( i ),
                                                oldVars,
                                                newBoundVars[i] );
@@ -171,13 +171,13 @@ public class BoundVariableTools {
      * 
      * PRE: <code>subtermsEnd > subtermsBegin</code>
      */
-    public ArrayOfQuantifiableVariable
-                unifyBoundVariables (ArrayOfQuantifiableVariable[] boundVarsPerSub,
+    public ImmutableArray<QuantifiableVariable>
+                unifyBoundVariables (ImmutableArray<QuantifiableVariable>[] boundVarsPerSub,
                                      Term[] subs,
                                      int subtermsBegin,
                                      int subtermsEnd) {
         // at least one subterms belongs to the entry (value)
-        ArrayOfQuantifiableVariable unifiedVariable = boundVarsPerSub[subtermsBegin];
+        ImmutableArray<QuantifiableVariable> unifiedVariable = boundVarsPerSub[subtermsBegin];
 
         final Map<QuantifiableVariable, QuantifiableVariable> variableRenamings = 
             new HashMap<QuantifiableVariable, QuantifiableVariable> ();
@@ -206,12 +206,12 @@ public class BoundVariableTools {
      * @return <code>true</code> iff the two given arrays have the same size
      *         and the contained variables have the same sorts
      */
-    public boolean consistentVariableArrays (ArrayOfQuantifiableVariable ar0,
-                                             ArrayOfQuantifiableVariable ar1) {
+    public boolean consistentVariableArrays (ImmutableArray<QuantifiableVariable> ar0,
+                                             ImmutableArray<QuantifiableVariable> ar1) {
         if ( ar0.size () != ar1.size () ) return false;
         for ( int i = 0; i != ar0.size (); ++i ) {
-            if ( ar0.getQuantifiableVariable ( i ).sort () 
-                 != ar1.getQuantifiableVariable ( i ).sort () )
+            if ( ar0.get ( i ).sort () 
+                 != ar1.get ( i ).sort () )
                 return false;
         }
         return true;
@@ -223,14 +223,14 @@ public class BoundVariableTools {
      *         two given terms are equal modulo renaming after unification of
      *         the two arrays (of variables occurring free in the terms)
      */
-    public boolean equalsModRenaming (ArrayOfQuantifiableVariable vars0,
+    public boolean equalsModRenaming (ImmutableArray<QuantifiableVariable> vars0,
 				      Term term0,
-				      ArrayOfQuantifiableVariable vars1,
+				      ImmutableArray<QuantifiableVariable> vars1,
 				      Term term1) {
         if ( !consistentVariableArrays ( vars0, vars1 ) ) return false;
         if ( vars0.size () == 0 ) return term0.equalsModRenaming ( term1 );
         
-        final ArrayOfQuantifiableVariable unifiedVars =
+        final ImmutableArray<QuantifiableVariable> unifiedVars =
             unifyVariableArrays ( vars0, vars1, 
                     new HashMap<QuantifiableVariable, QuantifiableVariable> () );
 
@@ -244,17 +244,17 @@ public class BoundVariableTools {
      * Unify the given arrays be replacing variables with new ones, return the
      * unifier
      */
-    private ArrayOfQuantifiableVariable
-        unifyVariableArrays (ArrayOfQuantifiableVariable ar0,
-                             ArrayOfQuantifiableVariable ar1,
+    private ImmutableArray<QuantifiableVariable>
+        unifyVariableArrays (ImmutableArray<QuantifiableVariable> ar0,
+                             ImmutableArray<QuantifiableVariable> ar1,
                              Map<QuantifiableVariable, QuantifiableVariable> variableRenaming) {
         final QuantifiableVariable[] res = new QuantifiableVariable [ar0.size()];
         for ( int i = 0; i != ar0.size (); ++i ) {
-            QuantifiableVariable pv0 = ar0.getQuantifiableVariable ( i );            
+            QuantifiableVariable pv0 = ar0.get ( i );            
             if ( variableRenaming.containsKey ( pv0 ) )
                 pv0 = (QuantifiableVariable)variableRenaming.get ( pv0 );
                 
-            QuantifiableVariable pv1 = ar1.getQuantifiableVariable ( i );
+            QuantifiableVariable pv1 = ar1.get ( i );
             if ( variableRenaming.containsKey ( pv1 ) )
                 pv1 = (QuantifiableVariable)variableRenaming.get ( pv1 );
             
@@ -262,8 +262,8 @@ public class BoundVariableTools {
                 // introduce a new variable
                 final QuantifiableVariable newVar =
                     new LogicVariable ( pv0.name (), pv0.sort () );
-                variableRenaming.put ( ar0.getQuantifiableVariable ( i ), newVar );
-                variableRenaming.put ( ar1.getQuantifiableVariable ( i ), newVar );
+                variableRenaming.put ( ar0.get ( i ), newVar );
+                variableRenaming.put ( ar1.get ( i ), newVar );
                 variableRenaming.put ( pv0, newVar );
                 variableRenaming.put ( pv1, newVar );
                 pv0 = pv1 = newVar;
@@ -272,6 +272,6 @@ public class BoundVariableTools {
             res[i] = pv0;
         }
         
-        return new ArrayOfQuantifiableVariable ( res );
+        return new ImmutableArray<QuantifiableVariable> ( res );
     }
 }

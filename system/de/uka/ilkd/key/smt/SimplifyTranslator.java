@@ -16,7 +16,6 @@ import org.apache.log4j.Logger;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.op.SetOfMetavariable;
 
 public class SimplifyTranslator extends AbstractSMTTranslator {
 

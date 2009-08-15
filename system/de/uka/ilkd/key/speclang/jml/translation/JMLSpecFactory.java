@@ -20,26 +20,19 @@ package de.uka.ilkd.key.speclang.jml.translation;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import de.uka.ilkd.key.collection.*;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.StatementContainer;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.declaration.ArrayOfVariableSpecification;
 import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
 import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
 import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.statement.BranchStatement;
 import de.uka.ilkd.key.java.statement.For;
 import de.uka.ilkd.key.java.statement.LoopStatement;
-import de.uka.ilkd.key.logic.EverythingLocationDescriptor;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.SetAsListOfLocationDescriptor;
-import de.uka.ilkd.key.logic.SetAsListOfTerm;
-import de.uka.ilkd.key.logic.SetOfLocationDescriptor;
-import de.uka.ilkd.key.logic.SetOfTerm;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.speclang.*;
@@ -97,18 +90,18 @@ public class JMLSpecFactory {
     }
     
     
-    private SetOfProgramMethod getOverridingMethods(ProgramMethod pm) {
+    private ImmutableSet<ProgramMethod> getOverridingMethods(ProgramMethod pm) {
         JavaInfo ji = services.getJavaInfo();
         String name   = pm.getMethodDeclaration().getName();
         int numParams = pm.getParameterDeclarationCount();
-        SetOfProgramMethod result = SetAsListOfProgramMethod.EMPTY_SET;
+        ImmutableSet<ProgramMethod> result = DefaultImmutableSet.<ProgramMethod>nil();
         
         KeYJavaType kjt = pm.getContainerType();
         assert kjt != null;
         for(KeYJavaType sub : ji.getAllSubtypes(kjt)) {
             assert sub != null;
             
-            ListOfProgramMethod subPms 
+            ImmutableList<ProgramMethod> subPms 
                 = ji.getAllProgramMethodsLocallyDeclared(sub);
             for(ProgramMethod subPm : subPms) {
                 if(subPm.getMethodDeclaration().getName().equals(name) 
@@ -137,17 +130,17 @@ public class JMLSpecFactory {
      * Collects local variables of the passed statement that are visible for 
      * the passed loop. Returns null if the loop has not been found.
      */
-    private ListOfParsableVariable collectLocalVariables(StatementContainer sc, 
+    private ImmutableList<ParsableVariable> collectLocalVariables(StatementContainer sc, 
                                                          LoopStatement loop){
-        ListOfParsableVariable result = SLListOfParsableVariable.EMPTY_LIST;
+        ImmutableList<ParsableVariable> result = ImmutableSLList.<ParsableVariable>nil();
         for(int i = 0, m = sc.getStatementCount(); i < m; i++) {
             Statement s = sc.getStatementAt(i);
             
             if(s instanceof For) {
-        	ArrayOfVariableSpecification avs 
+        	ImmutableArray<VariableSpecification> avs 
         		= ((For)s).getVariablesInScope();
         	for(int j = 0, n = avs.size(); j < n; j++) {
-        	    VariableSpecification vs = avs.getVariableSpecification(j);
+        	    VariableSpecification vs = avs.get(j);
         	    ProgramVariable pv 
         	    	= (ProgramVariable) vs.getProgramVariable();
         	    result = result.prepend(pv);
@@ -157,16 +150,15 @@ public class JMLSpecFactory {
             if(s == loop) {
                 return result;
             } else if(s instanceof LocalVariableDeclaration) {
-                ArrayOfVariableSpecification vars = 
+                ImmutableArray<VariableSpecification> vars = 
                     ((LocalVariableDeclaration) s).getVariables();
                 for(int j = 0, n = vars.size(); j < n; j++) {
                     ProgramVariable pv 
-                        = (ProgramVariable) vars.getVariableSpecification(j)
-                                                .getProgramVariable();
+                        = (ProgramVariable) vars.get(j).getProgramVariable();
                     result = result.prepend(pv);
                 }
             } else if(s instanceof StatementContainer) {
-                ListOfParsableVariable lpv 
+                ImmutableList<ParsableVariable> lpv 
                     = collectLocalVariables((StatementContainer) s, loop);
                 if(lpv != null){ 
                     result = result.prepend(lpv);
@@ -175,7 +167,7 @@ public class JMLSpecFactory {
             } else if(s instanceof BranchStatement) {
                 BranchStatement bs = (BranchStatement) s;
                 for(int j = 0, n = bs.getBranchCount(); j < n; j++) {
-                    ListOfParsableVariable lpv 
+                    ImmutableList<ParsableVariable> lpv 
                         = collectLocalVariables(bs.getBranchAt(j), loop);
                     if(lpv != null){ 
                         result = result.prepend(lpv);
@@ -194,17 +186,17 @@ public class JMLSpecFactory {
      * translation. If null, appropriate variables are created out of the 
      * signature information for the programMethod. 
      */
-    private SetOfOperationContract createJMLOperationContracts(
+    private ImmutableSet<OperationContract> createJMLOperationContracts(
                                 ProgramMethod programMethod,
                                 Behavior originalBehavior,                              
                                 PositionedString customName,
-                                ListOfPositionedString originalRequires,
-                                ListOfPositionedString originalAssignable,
-                                ListOfPositionedString originalEnsures,
-                                ListOfPositionedString originalSignals,
-                                ListOfPositionedString originalSignalsOnly,
-                                ListOfPositionedString originalDiverges,
-                                ListOfParsableVariable paramVars) 
+                                ImmutableList<PositionedString> originalRequires,
+                                ImmutableList<PositionedString> originalAssignable,
+                                ImmutableList<PositionedString> originalEnsures,
+                                ImmutableList<PositionedString> originalSignals,
+                                ImmutableList<PositionedString> originalSignalsOnly,
+                                ImmutableList<PositionedString> originalDiverges,
+                                ImmutableList<ParsableVariable> paramVars) 
             throws SLTranslationException {
         assert programMethod != null;
         assert originalBehavior != null;
@@ -248,13 +240,13 @@ public class JMLSpecFactory {
         }
 
         //translate assignable
-        SetOfLocationDescriptor assignable;
+        ImmutableSet<LocationDescriptor> assignable;
         if(originalAssignable.isEmpty()) {
             assignable = EverythingLocationDescriptor.INSTANCE_AS_SET;
         } else {
-            assignable = SetAsListOfLocationDescriptor.EMPTY_SET;
+            assignable = DefaultImmutableSet.<LocationDescriptor>nil();
             for(PositionedString expr : originalAssignable) {
-                SetOfLocationDescriptor translated 
+                ImmutableSet<LocationDescriptor> translated 
                     = translator.translateAssignableExpression(
                         expr, 
                         programMethod.getContainerType(),
@@ -332,8 +324,8 @@ public class JMLSpecFactory {
         }
 
         //create contract(s)
-        SetOfOperationContract result 
-            = SetAsListOfOperationContract.EMPTY_SET;
+        ImmutableSet<OperationContract> result 
+            = DefaultImmutableSet.<OperationContract>nil();
         FormulaWithAxioms excNull 
             = new FormulaWithAxioms(TB.equals(TB.var(excVar), 
                                               TB.NULL(services)));
@@ -419,10 +411,10 @@ public class JMLSpecFactory {
     }
     
     
-    private SetOfOperationContract createJMLOperationContracts(
+    private ImmutableSet<OperationContract> createJMLOperationContracts(
             ProgramMethod programMethod,
             TextualJMLSpecCase textualSpecCase,
-            ListOfParsableVariable paramVars) 
+            ImmutableList<ParsableVariable> paramVars) 
             throws SLTranslationException {
         return createJMLOperationContracts(
                                     programMethod,
@@ -479,16 +471,16 @@ public class JMLSpecFactory {
     }
     
     
-    public SetOfOperationContract createJMLOperationContracts(
+    public ImmutableSet<OperationContract> createJMLOperationContracts(
                                 ProgramMethod programMethod,
                                 Behavior originalBehavior,				
 				PositionedString customName,
-                                ListOfPositionedString originalRequires,
-                                ListOfPositionedString originalAssignable,
-                                ListOfPositionedString originalEnsures,
-                                ListOfPositionedString originalSignals,
-                                ListOfPositionedString originalSignalsOnly,
-                                ListOfPositionedString originalDiverges) 
+                                ImmutableList<PositionedString> originalRequires,
+                                ImmutableList<PositionedString> originalAssignable,
+                                ImmutableList<PositionedString> originalEnsures,
+                                ImmutableList<PositionedString> originalSignals,
+                                ImmutableList<PositionedString> originalSignalsOnly,
+                                ImmutableList<PositionedString> originalDiverges) 
             throws SLTranslationException {
         return createJMLOperationContracts(programMethod,
                                            originalBehavior,
@@ -503,7 +495,7 @@ public class JMLSpecFactory {
     }
     
     
-    public SetOfOperationContract createJMLOperationContracts(
+    public ImmutableSet<OperationContract> createJMLOperationContracts(
                                         ProgramMethod programMethod,
                                         TextualJMLSpecCase textualSpecCase) 
             throws SLTranslationException {
@@ -513,17 +505,17 @@ public class JMLSpecFactory {
     }
     
     
-    public SetOfOperationContract createJMLOperationContractsAndInherit(
+    public ImmutableSet<OperationContract> createJMLOperationContractsAndInherit(
                                         ProgramMethod programMethod,
                                         TextualJMLSpecCase textualSpecCase) 
             throws SLTranslationException {
         //parameter names of original method must be used for all inherited 
         //instances of the contract
-        ListOfParsableVariable paramVars 
+        ImmutableList<ParsableVariable> paramVars 
             = SVF.createParamVars(services, programMethod, false);
         
         //create contracts for original method
-        SetOfOperationContract result 
+        ImmutableSet<OperationContract> result 
             = createJMLOperationContracts(programMethod, 
                                           textualSpecCase, 
                                           paramVars);
@@ -532,7 +524,7 @@ public class JMLSpecFactory {
         for(ProgramMethod subPm : getOverridingMethods(programMethod)) {
             
             
-            SetOfOperationContract subContracts 
+            ImmutableSet<OperationContract> subContracts 
                 = createJMLOperationContracts(subPm, 
                                               textualSpecCase, 
                                               paramVars);
@@ -546,10 +538,10 @@ public class JMLSpecFactory {
     public LoopInvariant createJMLLoopInvariant(
                             ProgramMethod programMethod,
                             LoopStatement loop,
-                            ListOfPositionedString originalInvariant,
-                            ListOfPositionedString originalSkolemDeclarations,
-                            ListOfPositionedString originalPredicates,
-                            ListOfPositionedString originalAssignable,
+                            ImmutableList<PositionedString> originalInvariant,
+                            ImmutableList<PositionedString> originalSkolemDeclarations,
+                            ImmutableList<PositionedString> originalPredicates,
+                            ImmutableList<PositionedString> originalAssignable,
                             PositionedString originalVariant) 
             throws SLTranslationException {                
         assert programMethod != null;
@@ -565,7 +557,7 @@ public class JMLSpecFactory {
         ParsableVariable selfVar = SVF.createSelfVar(services, 
                                                      programMethod, 
                                                      false);
-        ListOfParsableVariable paramVars = SLListOfParsableVariable.EMPTY_LIST;
+        ImmutableList<ParsableVariable> paramVars = ImmutableSLList.<ParsableVariable>nil();
         int numParams = programMethod.getParameterDeclarationCount();
         for(int i = numParams - 1; i >= 0; i--) {
             ParameterDeclaration pd = programMethod.getParameterDeclarationAt(i);
@@ -574,7 +566,7 @@ public class JMLSpecFactory {
                                              .getProgramVariable());
         }
 
-        ListOfParsableVariable localVars 
+        ImmutableList<ParsableVariable> localVars 
             = collectLocalVariables(programMethod.getBody(), loop);        
         paramVars = paramVars.append(localVars);
         Map<Operator, Function> atPreFunctions = new LinkedHashMap<Operator, Function>();
@@ -603,9 +595,9 @@ public class JMLSpecFactory {
 
         
         //translate skolem declarations
-        ListOfParsableVariable freeVars = SLListOfParsableVariable.EMPTY_LIST;
+        ImmutableList<ParsableVariable> freeVars = ImmutableSLList.<ParsableVariable>nil();
         for(PositionedString expr : originalSkolemDeclarations) {
-            ListOfLogicVariable translated 
+            ImmutableList<LogicVariable> translated 
                 = translator.translateVariableDeclaration(expr);
             for(LogicVariable lv : translated) {
                 freeVars = freeVars.prepend(lv);
@@ -613,7 +605,7 @@ public class JMLSpecFactory {
         }
         
         //translate predicates
-        SetOfTerm predicates = SetAsListOfTerm.EMPTY_SET;
+        ImmutableSet<Term> predicates = DefaultImmutableSet.<Term>nil();
         for(PositionedString ps : originalPredicates) {
             String[] exprs = ps.text.split(",", 0);
             
@@ -633,13 +625,13 @@ public class JMLSpecFactory {
         }
         
         //translate assignable
-        SetOfLocationDescriptor assignable;
+        ImmutableSet<LocationDescriptor> assignable;
         if(originalAssignable.isEmpty()) {
             assignable = EverythingLocationDescriptor.INSTANCE_AS_SET;
         } else {
-            assignable = SetAsListOfLocationDescriptor.EMPTY_SET;
+            assignable = DefaultImmutableSet.<LocationDescriptor>nil();
             for(PositionedString expr : originalAssignable) {
-                SetOfLocationDescriptor translated 
+                ImmutableSet<LocationDescriptor> translated 
                     = translator.translateAssignableExpression(
                                         expr, 
                                         programMethod.getContainerType(),
@@ -671,8 +663,8 @@ public class JMLSpecFactory {
         Term selfTerm = selfVar == null ? null : TB.var(selfVar);
         return new LoopInvariantImpl(loop,
                                      invariant,
-                                     predicates,
-                                     assignable,
+                                     new LoopPredicateSet(predicates),
+                                     new LocationDescriptorSet(assignable),
                                      variant,
                                      selfTerm,
                                      atPreFunctions,

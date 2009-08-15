@@ -13,7 +13,7 @@ package de.uka.ilkd.key.strategy;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.proof.DefaultGoalChooserBuilder;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.strategy.feature.*;
+import de.uka.ilkd.key.strategy.feature.NonDuplicateAppModPositionFeature;
 
 
 /**

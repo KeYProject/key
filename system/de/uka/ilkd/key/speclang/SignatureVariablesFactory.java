@@ -17,15 +17,16 @@
 
 package de.uka.ilkd.key.speclang;
 
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.op.ListOfParsableVariable;
 import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.ParsableVariable;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.SLListOfParsableVariable;
 
 
 /**
@@ -102,10 +103,10 @@ public class SignatureVariablesFactory {
     /**
      * Creates program variables for the parameters.
      */
-    public ListOfParsableVariable createParamVars(Services services, 
+    public ImmutableList<ParsableVariable> createParamVars(Services services, 
                                                   ProgramMethod pm,
                                                   boolean makeNamesUnique) {
-        ListOfParsableVariable result = SLListOfParsableVariable.EMPTY_LIST;
+        ImmutableList<ParsableVariable> result = ImmutableSLList.<ParsableVariable>nil();
         for(int i = 0; i < pm.getParameterDeclarationCount(); i++) {
             KeYJavaType parType = pm.getParameterType(i);
             String parName = pm.getParameterDeclarationAt(i)

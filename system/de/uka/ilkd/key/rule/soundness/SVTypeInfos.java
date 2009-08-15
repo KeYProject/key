@@ -11,6 +11,10 @@
 
 package de.uka.ilkd.key.rule.soundness;
 
+import java.util.Iterator;
+
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 
 
@@ -20,11 +24,11 @@ import de.uka.ilkd.key.logic.op.SchemaVariable;
 public class SVTypeInfos {
 
     public static final SVTypeInfos EMPTY_SVTYPEINFOS =
-	new SVTypeInfos ( SLListOfSVTypeInfo.EMPTY_LIST );
+	new SVTypeInfos ( ImmutableSLList.<SVTypeInfo>nil() );
 
-    private ListOfSVTypeInfo infos;
+    private ImmutableList<SVTypeInfo> infos;
 
-    private SVTypeInfos ( ListOfSVTypeInfo p_infos ) {
+    private SVTypeInfos ( ImmutableList<SVTypeInfo> p_infos ) {
 	infos = p_infos;
     }
 
@@ -43,7 +47,7 @@ public class SVTypeInfos {
     }
 
     public SVTypeInfo getInfo ( SchemaVariable p ) {
-	IteratorOfSVTypeInfo it   = infos.iterator ();
+	Iterator<SVTypeInfo> it   = infos.iterator ();
 	SVTypeInfo           info;
 
 	while ( it.hasNext () ) {

@@ -15,11 +15,12 @@
 
 package de.uka.ilkd.key.logic.op;
 
+import java.util.Iterator;
+
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.sort.IteratorOfSort;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
-import de.uka.ilkd.key.logic.sort.SetOfSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 
 
@@ -78,10 +79,10 @@ public class IfThenElse extends Op {
         else if (s2.extendsTrans(s1)) return s1;
         
         Sort result = Sort.ANY;
-        final SetOfSort set1 = s1.extendsSorts();
-        final SetOfSort set2 = s2.extendsSorts();
+        final ImmutableSet<Sort> set1 = s1.extendsSorts();
+        final ImmutableSet<Sort> set2 = s2.extendsSorts();
         
-        final IteratorOfSort sort1It = set1.iterator();
+        final Iterator<Sort> sort1It = set1.iterator();
         while (sort1It.hasNext()) {
             final Sort sort1 = sort1It.next();
             if (set2.contains(sort1)) {

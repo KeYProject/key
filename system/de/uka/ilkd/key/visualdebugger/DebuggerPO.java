@@ -7,6 +7,11 @@
 // See LICENSE.TXT for details.
 package de.uka.ilkd.key.visualdebugger;
 
+import java.util.Iterator;
+
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.Op;
@@ -14,7 +19,10 @@ import de.uka.ilkd.key.proof.BuiltInRuleIndex;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.TacletIndex;
-import de.uka.ilkd.key.proof.init.*;
+import de.uka.ilkd.key.proof.init.InitConfig;
+import de.uka.ilkd.key.proof.init.ModStrategy;
+import de.uka.ilkd.key.proof.init.ProofInputException;
+import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.visualdebugger.executiontree.ITNode;
 
 public class DebuggerPO implements ProofOblInput {
@@ -53,9 +61,9 @@ public class DebuggerPO implements ProofOblInput {
         return false;
     }
 
-    private Term createConjunction(ListOfTerm list) {
+    private Term createConjunction(ImmutableList<Term> list) {
         Term result = null;
-        for (IteratorOfTerm it = list.iterator(); it.hasNext();) {
+        for (Iterator<Term> it = list.iterator(); it.hasNext();) {
             result = (result == null ? it.next() : 
                 TermFactory.DEFAULT.createJunctorTerm(Op.AND, result, it.next()));
         }
@@ -95,9 +103,9 @@ public class DebuggerPO implements ProofOblInput {
         return po;
     }
 
-    private ListOfTerm getTerms(ListOfConstrainedFormula list) {
-        ListOfTerm result = SLListOfTerm.EMPTY_LIST;
-        for (IteratorOfConstrainedFormula it = list.iterator(); it.hasNext();) {
+    private ImmutableList<Term> getTerms(ImmutableList<ConstrainedFormula> list) {
+        ImmutableList<Term> result = ImmutableSLList.<Term>nil();
+        for (Iterator<ConstrainedFormula> it = list.iterator(); it.hasNext();) {
             result = result.append(it.next().formula());
         }
         return result;
@@ -108,9 +116,9 @@ public class DebuggerPO implements ProofOblInput {
 
     }
 
-    private Term list2term(ListOfTerm list) {
+    private Term list2term(ImmutableList<Term> list) {
         Term result = null;
-        for (IteratorOfTerm it = list.iterator(); it.hasNext();) {
+        for (Iterator<Term> it = list.iterator(); it.hasNext();) {
             Term t = it.next();
             t = TermFactory.DEFAULT.createJunctorTerm(Op.NOT, t);
             if (result == null)
@@ -165,7 +173,7 @@ public class DebuggerPO implements ProofOblInput {
     }
 
 
-    public void setPCImpl(ListOfTerm l1, ListOfTerm l2) {
+    public void setPCImpl(ImmutableList<Term> l1, ImmutableList<Term> l2) {
         Term t1 = list2term(l1);
         Term t2 = list2term(l2);
         specFormula = TermFactory.DEFAULT.createJunctorTerm(Op.IMP, new Term[] {
@@ -187,9 +195,9 @@ public class DebuggerPO implements ProofOblInput {
         this.sequent = s;
     }
 
-    public void setSpecFormula(ListOfTerm specFormula) {
+    public void setSpecFormula(ImmutableList<Term> specFormula) {
         Term result = null;
-        for (IteratorOfTerm it = specFormula.iterator(); it.hasNext();) {
+        for (Iterator<Term> it = specFormula.iterator(); it.hasNext();) {
             Term t = it.next();
             t = TermFactory.DEFAULT.createJunctorTerm(Op.NOT, t);
             if (result == null)
@@ -206,9 +214,9 @@ public class DebuggerPO implements ProofOblInput {
         Semisequent succ = s.succedent();
 
         Term a = TermFactory.DEFAULT.createJunctorTerm(Op.AND, getTerms(
-                ant.toList()).toArray());
+                ant.toList()).toArray(new Term[ant.size()]));
         Term b = TermFactory.DEFAULT.createJunctorTerm(Op.OR, getTerms(
-                succ.toList()).toArray());
+                succ.toList()).toArray(new Term[succ.size()]));
         specFormula = TermFactory.DEFAULT.createJunctorTerm(Op.IMP, a, b);
     }
 
@@ -222,14 +230,14 @@ public class DebuggerPO implements ProofOblInput {
         this.specFormula = specFormula;
     }
 
-    public void setTerms(ListOfTerm terms) {
+    public void setTerms(ImmutableList<Term> terms) {
         specFormula = TermFactory.DEFAULT
           .createJunctorTerm(Op.NOT, createConjunction(terms));
     }
 
     public void setUp(Sequent precondition, ITNode n) {
         Sequent result = precondition;
-        for (IteratorOfTerm it = n.getPc(true).iterator(); it.hasNext();) {
+        for (Iterator<Term> it = n.getPc(true).iterator(); it.hasNext();) {
             Term t = it.next();
             if (t.op() == Op.NOT)
                 result = result.addFormula(
@@ -244,9 +252,9 @@ public class DebuggerPO implements ProofOblInput {
         this.sequent = result;
     }
 
-    public void setUp(Sequent precondition, ITNode n, SetOfTerm indexConf) {
+    public void setUp(Sequent precondition, ITNode n, ImmutableSet<Term> indexConf) {
         this.setUp(precondition, n);
-        for (IteratorOfTerm it = indexConf.iterator(); it.hasNext();) {
+        for (Iterator<Term> it = indexConf.iterator(); it.hasNext();) {
             Term t = it.next();
             if (t.op() == Op.NOT)
                 this.sequent = sequent.addFormula(
@@ -259,7 +267,7 @@ public class DebuggerPO implements ProofOblInput {
         }
     }
 
-    public void setUp(Sequent precondition, ITNode n, SetOfTerm indexConf,
+    public void setUp(Sequent precondition, ITNode n, ImmutableSet<Term> indexConf,
             Term post) {
         this.setUp(precondition, n, indexConf);
         sequent = sequent.addFormula(

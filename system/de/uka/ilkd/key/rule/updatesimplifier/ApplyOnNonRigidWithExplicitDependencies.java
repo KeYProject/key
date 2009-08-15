@@ -10,6 +10,9 @@ package de.uka.ilkd.key.rule.updatesimplifier;
 import java.util.Arrays;
 import java.util.HashSet;
 
+import de.uka.ilkd.key.collection.ImmutableArray;
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
@@ -37,8 +40,8 @@ public class ApplyOnNonRigidWithExplicitDependencies extends AbstractUpdateRule 
      */
     public class ReplacementResult {
 
-        private ListOfAssignmentPair assignmentPairs = 
-            SLListOfAssignmentPair.EMPTY_LIST;
+        private ImmutableList<AssignmentPair> assignmentPairs = 
+            ImmutableSLList.<AssignmentPair>nil();
         private Term result;      
         
         /**
@@ -59,7 +62,7 @@ public class ApplyOnNonRigidWithExplicitDependencies extends AbstractUpdateRule 
          * returns a new {@link AssignmentPair} 
          * @return list of assignmentPairs
          */
-        public ListOfAssignmentPair getAssignmentPairs() {           
+        public ImmutableList<AssignmentPair> getAssignmentPairs() {           
             return assignmentPairs;
         }
 
@@ -162,7 +165,7 @@ public class ApplyOnNonRigidWithExplicitDependencies extends AbstractUpdateRule 
     private Update[] sequentializeUpdate(Update update,
             NRFunctionWithExplicitDependencies nr) {
         
-        final ArrayOfAssignmentPair pairs = update.getAllAssignmentPairs();
+        final ImmutableArray<AssignmentPair> pairs = update.getAllAssignmentPairs();
 
         final Location[] nrLocs = new Location[nr.dependencies().size()];
         nr.dependencies().arraycopy(0, nrLocs, 0, nrLocs.length);
@@ -170,13 +173,13 @@ public class ApplyOnNonRigidWithExplicitDependencies extends AbstractUpdateRule 
         HashSet<Location> nrDependencies = new HashSet<Location>();
         nrDependencies.addAll(Arrays.asList(nrLocs));
 
-        ListOfAssignmentPair leftUpdate = SLListOfAssignmentPair.EMPTY_LIST;
-        ListOfAssignmentPair rightUpdate = SLListOfAssignmentPair.EMPTY_LIST;
+        ImmutableList<AssignmentPair> leftUpdate = ImmutableSLList.<AssignmentPair>nil();
+        ImmutableList<AssignmentPair> rightUpdate = ImmutableSLList.<AssignmentPair>nil();
         // collect all assignment pairs with a location occuring in the
         // dependency list
         // as top operator on the left hand side
        for (int i = 0; i < pairs.size(); i++) {
-            final AssignmentPair pair = pairs.getAssignmentPair(i);            
+            final AssignmentPair pair = pairs.get(i);            
             Location pairLoc = pair.location();
             if (pairLoc instanceof AttributeOp) {
                 pairLoc = (Location) ((AttributeOp)pairLoc).attribute();
@@ -208,9 +211,9 @@ public class ApplyOnNonRigidWithExplicitDependencies extends AbstractUpdateRule 
         
         final Update[] updates = new Update[]{
                 leftUpdate.isEmpty() ? null :  
-                        Update.createUpdate(leftUpdate.toArray()),
+                        Update.createUpdate(leftUpdate.toArray(new AssignmentPair[leftUpdate.size()])),
                 rightUpdate.isEmpty() ? null :
-                    Update.createUpdate(rightUpdate.toArray())
+                    Update.createUpdate(rightUpdate.toArray(new AssignmentPair[rightUpdate.size()]))
         };        
         
         return updates;
@@ -235,8 +238,8 @@ public class ApplyOnNonRigidWithExplicitDependencies extends AbstractUpdateRule 
         } else {
             Term result = t;
             final Term[] newSubs = new Term[t.arity()];
-            final ArrayOfQuantifiableVariable[] quantifiedVars = 
-                new ArrayOfQuantifiableVariable[t.arity()];
+            final ImmutableArray<QuantifiableVariable>[] quantifiedVars = 
+                new ImmutableArray[t.arity()];
             boolean changed = false;
             for (int i = 0; i < t.arity(); i++) {
                 newSubs[i] = replaceOccurences(t.sub(i), deps, res);

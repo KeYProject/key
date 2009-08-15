@@ -10,6 +10,8 @@
 
 package de.uka.ilkd.key.pp;
 
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.Metavariable;
 import de.uka.ilkd.key.util.Debug;
@@ -29,7 +31,7 @@ import de.uka.ilkd.key.util.Debug;
  */
 public class InitialPositionTable extends PositionTable{
 
-    private ListOfRange updateRanges = SLListOfRange.EMPTY_LIST;
+    private ImmutableList<Range> updateRanges = ImmutableSLList.<Range>nil();
 
     /**
      * creates a new Initial PositionTable.
@@ -53,7 +55,7 @@ public class InitialPositionTable extends PositionTable{
 	    return null;
 	}
 
-	ListOfInteger posList = pathForIndex(index);
+	ImmutableList<Integer> posList = pathForIndex(index);
 
 	PosInSequent pis = getTopPIS(posList,filter);
 
@@ -75,7 +77,7 @@ public class InitialPositionTable extends PositionTable{
      * @param filter  the sequent print filter from that was used to
      *                print the sequent
      */
-    private PosInSequent getTopPIS(ListOfInteger posList,
+    private PosInSequent getTopPIS(ImmutableList<Integer> posList,
 				   SequentPrintFilter filter) {
 	if (posList.isEmpty() || posList.tail().isEmpty()) {
 	    return PosInSequent.createSequentPos();	
@@ -90,9 +92,9 @@ public class InitialPositionTable extends PositionTable{
      * ConstrainedFormula in the sequent, the position in the 
      * constrained formula, and possibly inside a Metavariable
      * instantiation. */
-    public ListOfInteger pathForPosition(PosInOccurrence pio,
+    public ImmutableList<Integer> pathForPosition(PosInOccurrence pio,
 					 SequentPrintFilter filter) {
-	ListOfInteger p = SLListOfInteger.EMPTY_LIST;
+	ImmutableList<Integer> p = ImmutableSLList.<Integer>nil();
 	
 	p = prependPathBelowMV(p,pio, entryForCfma(pio.constrainedFormula(),
 	                                           filter));
@@ -103,7 +105,7 @@ public class InitialPositionTable extends PositionTable{
 	return p;
     }
 
-    private ListOfInteger prependPathBelowMV(ListOfInteger p,
+    private ImmutableList<Integer> prependPathBelowMV(ImmutableList<Integer> p,
                                              PosInOccurrence pio,
                                              SequentPrintFilterEntry entry) {
 	if ( pio.posInTermBelowMetavariable () == null
@@ -148,7 +150,7 @@ public class InitialPositionTable extends PositionTable{
         return posTerm.equals ( displayedTerm );
     }
 
-    private ListOfInteger prependPathInFormula(ListOfInteger p,
+    private ImmutableList<Integer> prependPathInFormula(ImmutableList<Integer> p,
 					       PosInOccurrence pio) {
 	IntIterator pit = pio.posInTerm().reverseIterator();
 	while (pit.hasNext()) {
@@ -162,7 +164,7 @@ public class InitialPositionTable extends PositionTable{
      * as printed. */
     private int indexOfCfma(ConstrainedFormula cfma,
 			    SequentPrintFilter filter) {
-	ListOfSequentPrintFilterEntry list =
+	ImmutableList<SequentPrintFilterEntry> list =
 	    filter.getAntec().append(filter.getSucc());
 	int k;
 	for ( k=0 ; !list.isEmpty(); k++,list = list.tail() ) {
@@ -179,7 +181,7 @@ public class InitialPositionTable extends PositionTable{
      */
     private SequentPrintFilterEntry entryForCfma (ConstrainedFormula cfma,
                                                   SequentPrintFilter filter) {
-        ListOfSequentPrintFilterEntry list =
+        ImmutableList<SequentPrintFilterEntry> list =
             filter.getAntec ().append ( filter.getSucc () );
         int k;
         for ( k = 0; !list.isEmpty (); k++, list = list.tail () ) {
@@ -202,7 +204,7 @@ public class InitialPositionTable extends PositionTable{
     /** Returns the character range for the subtable indicated
      * by the given integer list.
      */
-    public Range rangeForPath(ListOfInteger path) {
+    public Range rangeForPath(ImmutableList<Integer> path) {
 	return rangeForPath(path,endPos[0]);
     }
 
@@ -211,7 +213,7 @@ public class InitialPositionTable extends PositionTable{
     }
 
     public Range[] getUpdateRanges() {
-        return updateRanges.toArray();
+        return updateRanges.toArray(new Range[updateRanges.size()]);
     }
 
 }

@@ -11,8 +11,9 @@
 
 package de.uka.ilkd.key.strategy.termgenerator;
 
+import java.util.Iterator;
+
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.IteratorOfTerm;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
@@ -36,7 +37,7 @@ public abstract class SuperTermGenerator implements TermGenerator {
     
     public static TermGenerator upwards(TermFeature cond) {
         return new SuperTermGenerator ( cond ) {
-            protected IteratorOfTerm createIterator(PosInOccurrence focus) {
+            protected Iterator<Term> createIterator(PosInOccurrence focus) {
                 return new UpwardsIterator ( focus );
             }
         };
@@ -44,17 +45,17 @@ public abstract class SuperTermGenerator implements TermGenerator {
     
     public static TermGenerator upwardsWithIndex(TermFeature cond) {
         return new SuperTermWithIndexGenerator ( cond ) {
-            protected IteratorOfTerm createIterator(PosInOccurrence focus) {
+            protected Iterator<Term> createIterator(PosInOccurrence focus) {
                 return new UpwardsIterator ( focus );
             }
         };
     }
     
-    public IteratorOfTerm generate(RuleApp app, PosInOccurrence pos, Goal goal) {
+    public Iterator<Term> generate(RuleApp app, PosInOccurrence pos, Goal goal) {
         return createIterator ( pos );
     }
 
-    protected abstract IteratorOfTerm createIterator(PosInOccurrence focus);
+    protected abstract Iterator<Term> createIterator(PosInOccurrence focus);
     
     protected Term generateOneTerm(Term superterm, int child) {
         return superterm;
@@ -72,7 +73,7 @@ public abstract class SuperTermGenerator implements TermGenerator {
             super ( cond );
         }
 
-        public IteratorOfTerm generate(RuleApp app, PosInOccurrence pos, Goal goal) {
+        public Iterator<Term> generate(RuleApp app, PosInOccurrence pos, Goal goal) {
             if ( services == null ) {
                 services = goal.proof ().getServices ();
                 final IntegerLDT numbers = services.getTypeConverter ().getIntegerLDT ();
@@ -91,7 +92,7 @@ public abstract class SuperTermGenerator implements TermGenerator {
         }
     }
     
-    class UpwardsIterator implements IteratorOfTerm {
+    class UpwardsIterator implements Iterator<Term> {
         private PosInOccurrence currentPos;
 
         private UpwardsIterator(PosInOccurrence startPos) {

@@ -10,10 +10,17 @@
 
 package de.uka.ilkd.key.util;
 
-import java.io.*;
-import java.util.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.NoSuchElementException;
 
-import recoder.io.*;
+import recoder.io.DataFileLocation;
+import recoder.io.DataLocation;
 
 /**
  * This class is used to describe a directory structure as a repository for

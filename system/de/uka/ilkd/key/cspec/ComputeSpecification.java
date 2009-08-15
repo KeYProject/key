@@ -14,12 +14,14 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.gui.AutoModeListener;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.proof.IteratorOfGoal;
+import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofEvent;
 import de.uka.ilkd.key.util.Debug;
@@ -180,9 +182,9 @@ public class ComputeSpecification {
 	Term precondition = termFactory.createJunctorTerm(Op.TRUE);
 	Term postcondition = termFactory.createJunctorTerm(Op.TRUE);
 	       
-        ListOfTerm prestateLocations = SLListOfTerm.EMPTY_LIST;
-	ListOfTerm prestateValues = SLListOfTerm.EMPTY_LIST; 
-	for (IteratorOfNamed i = programVariables.elements().iterator();
+        ImmutableList<Term> prestateLocations = ImmutableSLList.<Term>nil();
+	ImmutableList<Term> prestateValues = ImmutableSLList.<Term>nil(); 
+	for (Iterator<Named> i = programVariables.elements().iterator();
 	     i.hasNext();
 	     ) {
 	    final ProgramVariable v = (ProgramVariable) i.next();
@@ -254,7 +256,8 @@ public class ComputeSpecification {
 		//@internal createUpdateTerm does not work for empty update lists
 		? diamondTerm
 		// updates prestate (diamondTerm)
-		: termFactory.createUpdateTerm(prestateLocations.toArray(), prestateValues.toArray(), diamondTerm);
+		: termFactory.createUpdateTerm(prestateLocations.toArray(new Term[prestateLocations.size()]), 
+			prestateValues.toArray(new Term[prestateValues.size()]), diamondTerm);
 	    
 	case PRESTATE_REMEMBER_EQUATIONS:
 	    return termFactory.createJunctorTermAndSimplify(Op.IMP, precondition, diamondTerm);
@@ -319,7 +322,7 @@ public class ComputeSpecification {
     public Term computeSpecification(Proof proof) {
 	Debug.out("Compute specification:\n");
 	List caseSpecs = new LinkedList();
-	for (IteratorOfGoal i = proof.openGoals().iterator(); i.hasNext(); ) {
+	for (Iterator<Goal> i = proof.openGoals().iterator(); i.hasNext(); ) {
 	    Sequent open = i.next().sequent();
 	    Term caseSpec = computeSpecification(open);
 	    Debug.out("Goal Case" , caseSpec);
@@ -341,14 +344,14 @@ public class ComputeSpecification {
     private Term computeSpecification(Sequent seq) {
 	Semisequent ante = seq.antecedent();
 	Debug.out("\nCase ");
-	Term ante2 = createJunctorTermNAry(termFactory.createJunctorTerm(Op.TRUE),
+	Term ante2 = createJunctorTermNAryCF(termFactory.createJunctorTerm(Op.TRUE),
 					   Op.AND,
 					   ante.iterator()
 					   );
 	Debug.out("", ante2);
 	Debug.out(" => ");
 	Semisequent succ = seq.succedent();
-	Term succ2 = createJunctorTermNAry(termFactory.createJunctorTerm(Op.FALSE),
+	Term succ2 = createJunctorTermNAryCF(termFactory.createJunctorTerm(Op.FALSE),
 					   Op.OR,
 					   succ.iterator()
 					   );
@@ -366,7 +369,7 @@ public class ComputeSpecification {
      * see orbital.logic.functor.Functionals#foldRight
      * @internal almost identical to @see #createJunctorTermNAry(Term,Junctor,IteratorOfTerm)
      */
-    private static final Term createJunctorTermNAry(Term c, Junctor op, IteratorOfConstrainedFormula i) {
+    private static final Term createJunctorTermNAryCF(Term c, Junctor op, Iterator<ConstrainedFormula> i) {
 	Term construct = c;
 	while (i.hasNext()) {
 	    ConstrainedFormula f = i.next();
@@ -384,10 +387,10 @@ public class ComputeSpecification {
      * de.uka.ilkd.key.logic.TermFactory#createJunctorTerm(Junctor,Term[])}.
      * see orbital.logic.functor.Functionals#foldRight
      */
-    private static final Term createJunctorTermNAry(Term c, Junctor op, Iterator i) {
+    private static final Term createJunctorTermNAry(Term c, Junctor op, Iterator<Term> i) {
 	Term construct = c;
 	while (i.hasNext()) {
-	    construct = termFactory.createJunctorTermAndSimplify(op, construct, (Term)i.next());
+	    construct = termFactory.createJunctorTermAndSimplify(op, construct, i.next());
 	}
 	return construct;
     }

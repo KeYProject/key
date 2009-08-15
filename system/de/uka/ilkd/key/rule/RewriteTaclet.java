@@ -10,6 +10,10 @@
 
 package de.uka.ilkd.key.rule;
 
+import de.uka.ilkd.key.collection.ImmutableArray;
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableMap;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
@@ -69,21 +73,21 @@ public class RewriteTaclet extends FindTaclet{
      * @param attrs the TacletAttributes; these are boolean values
      * indicating a noninteractive or recursive use of the Taclet. 
      * @param find the find term of the Taclet
-     * @param prefixMap a MapFromSchemaVariableToTacletPrefix that contains the
+     * @param prefixMap a ImmMap<SchemaVariable,TacletPrefix> that contains the
      * prefix for each SchemaVariable in the Taclet
      * @param p_stateRestriction an int defining state restrictions of the taclet
      * (required for location check)
-     * @param choices the SetOfChoices to which this taclet belongs to
+     * @param choices the SetOf<Choices> to which this taclet belongs to
      */
     public RewriteTaclet(Name name, TacletApplPart applPart,  
-			 ListOfTacletGoalTemplate  goalTemplates, 
-			 ListOfRuleSet             ruleSets,
+			 ImmutableList<TacletGoalTemplate>  goalTemplates, 
+			 ImmutableList<RuleSet>             ruleSets,
 			 Constraint                constraint,
 			 TacletAttributes          attrs,
 			 Term                      find, 
-			 MapFromSchemaVariableToTacletPrefix prefixMap,
+			 ImmutableMap<SchemaVariable,TacletPrefix> prefixMap,
 			 int                       p_stateRestriction,
-			 SetOfChoice choices){
+			 ImmutableSet<Choice> choices){
 	super(name, applPart, goalTemplates, ruleSets, constraint,
 	      attrs, find, prefixMap, choices);
 	stateRestriction = p_stateRestriction;
@@ -176,8 +180,8 @@ public class RewriteTaclet extends FindTaclet{
 	if (it.hasNext()) {	    
 	    int sub = it.next();
 	    
-	    ArrayOfQuantifiableVariable[] origvars = 
-	        new ArrayOfQuantifiableVariable[term.arity()];
+	    ImmutableArray<QuantifiableVariable>[] origvars = 
+	        new ImmutableArray[term.arity()];
 	    final Term[] subs = new Term[term.arity()];
 	    
 	    for (int i=0, arity = term.arity(); i<arity; i++) {

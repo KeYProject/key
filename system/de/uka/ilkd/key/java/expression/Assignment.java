@@ -91,7 +91,7 @@ public abstract class Assignment extends Operator
 	String base=super.reuseSignature(services, ec);
 	Expression rhs;
 	try{
-	    rhs = children.getExpression(1);
+	    rhs = children.get(1);
 	} catch(ArrayIndexOutOfBoundsException e) {
 	    // no second argument, e.g. PostIncrement
 	    return base;

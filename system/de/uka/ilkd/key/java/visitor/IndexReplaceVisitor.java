@@ -12,13 +12,8 @@ package de.uka.ilkd.key.java.visitor;
 
 import java.io.StringWriter;
 
-import de.uka.ilkd.key.java.ArrayOfExpression;
-import de.uka.ilkd.key.java.Expression;
-import de.uka.ilkd.key.java.JavaSourceElement;
-import de.uka.ilkd.key.java.PositionInfo;
-import de.uka.ilkd.key.java.PrettyPrinter;
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.collection.ImmutableArray;
+import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.reference.ArrayReference;
 import de.uka.ilkd.key.java.reference.ReferencePrefix;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
@@ -111,10 +106,10 @@ public class IndexReplaceVisitor extends CreatingASTVisitor{
 	}
 	changeList.removeFirstOccurrence(PositionInfo.class);
 	ReferencePrefix rp = (ReferencePrefix) changeList.get(0);
-	ArrayOfExpression aoe = x.getDimensionExpressions();
+	ImmutableArray<Expression> aoe = x.getDimensionExpressions();
 	Expression[] indices = new Expression[aoe.size()];
 	for(int i=0; i<aoe.size(); i++){
-	    indices[i] = tryToReplaceByTestDatum(aoe.getExpression(i));
+	    indices[i] = tryToReplaceByTestDatum(aoe.get(i));
 	}
 	ArrayReference ar = new ArrayReference(rp, indices);
 	addChild(ar);

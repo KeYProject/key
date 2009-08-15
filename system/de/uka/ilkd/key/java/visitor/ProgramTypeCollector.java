@@ -13,13 +13,12 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
+import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.java.abstraction.IteratorOfKeYJavaType;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.abstraction.ListOfKeYJavaType;
 import de.uka.ilkd.key.java.reference.*;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -102,7 +101,7 @@ public class ProgramTypeCollector extends JavaASTVisitor {
 		     currentType);		   
 	    }
 	
-	    ListOfKeYJavaType imps = 
+	    ImmutableList<KeYJavaType> imps = 
 		services.getJavaInfo().getKeYProgModelInfo()
 		.findImplementations
 		(currentType,
@@ -112,7 +111,7 @@ public class ProgramTypeCollector extends JavaASTVisitor {
 		  new ExecutionContext(new TypeRef(currentType), 
 				       currentSelf)));
 
-	    IteratorOfKeYJavaType impsIt = imps.iterator();
+	    Iterator<KeYJavaType> impsIt = imps.iterator();
 	    while (impsIt.hasNext()) {
 		currentType = impsIt.next();
 		    

@@ -15,13 +15,20 @@ import java.io.StringReader;
 import java.io.StringWriter;
 
 import junit.framework.TestCase;
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Recoder2KeY;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.Named;
+import de.uka.ilkd.key.logic.NamespaceSet;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.SortedSchemaVariable;
-import de.uka.ilkd.key.logic.sort.*;
+import de.uka.ilkd.key.logic.sort.ArraySortImpl;
+import de.uka.ilkd.key.logic.sort.GenericSort;
+import de.uka.ilkd.key.logic.sort.Sort;
 
 
 public class TestDeclParser extends TestCase {
@@ -68,8 +75,8 @@ public class TestDeclParser extends TestCase {
 
 
     protected GenericSort checkGenericSort ( Named            p_n,
-					     SetOfSort        p_ext,
-					     SetOfSort        p_oneof ) {
+					     ImmutableSet<Sort>        p_ext,
+					     ImmutableSet<Sort>        p_oneof ) {
 	assertTrue ( "Generic sort does not exist", p_n != null );
 	assertTrue ( "Generic sort does not have type GenericSort, but " + p_n.getClass(),
 		     p_n instanceof GenericSort );
@@ -105,11 +112,11 @@ public class TestDeclParser extends TestCase {
 	parseDecls("\\sorts { \\generic G; \\generic H \\extends G; }");
 
 	G = checkGenericSort ( nss.sorts().lookup(new Name("G")),
-			       SetAsListOfSort.EMPTY_SET,
-			       SetAsListOfSort.EMPTY_SET );
+			       DefaultImmutableSet.<Sort>nil(),
+			       DefaultImmutableSet.<Sort>nil() );
 	H = checkGenericSort ( nss.sorts().lookup(new Name("H")),
-			       SetAsListOfSort.EMPTY_SET.add ( G ),
-			       SetAsListOfSort.EMPTY_SET );
+			       DefaultImmutableSet.<Sort>nil().add ( G ),
+			       DefaultImmutableSet.<Sort>nil() );
 
 
 	nss = new NamespaceSet ();
@@ -117,11 +124,11 @@ public class TestDeclParser extends TestCase {
 	
 	S = checkSort        ( nss.sorts().lookup(new Name("S")) );
 	G = checkGenericSort ( nss.sorts().lookup(new Name("G")),
-			       SetAsListOfSort.EMPTY_SET,
-			       SetAsListOfSort.EMPTY_SET );
+			       DefaultImmutableSet.<Sort>nil(),
+			       DefaultImmutableSet.<Sort>nil() );
 	H = checkGenericSort ( nss.sorts().lookup(new Name("H")),
-			       SetAsListOfSort.EMPTY_SET.add ( S ).add ( G ),
-			       SetAsListOfSort.EMPTY_SET );
+			       DefaultImmutableSet.<Sort>nil().add ( S ).add ( G ),
+			       DefaultImmutableSet.<Sort>nil() );
 
 
 	nss = new NamespaceSet ();
@@ -130,8 +137,8 @@ public class TestDeclParser extends TestCase {
 	S = checkSort        ( nss.sorts().lookup(new Name("S")) );
 	T = checkSort        ( nss.sorts().lookup(new Name("T")) );
 	H = checkGenericSort ( nss.sorts().lookup(new Name("H")),
-			       SetAsListOfSort.EMPTY_SET,
-			       SetAsListOfSort.EMPTY_SET.add ( S ).add ( T ) );
+			       DefaultImmutableSet.<Sort>nil(),
+			       DefaultImmutableSet.<Sort>nil().add ( S ).add ( T ) );
 	
 
 	nss = new NamespaceSet ();
@@ -140,11 +147,11 @@ public class TestDeclParser extends TestCase {
 	S = checkSort        ( nss.sorts().lookup(new Name("S")) );
 	T = checkSort        ( nss.sorts().lookup(new Name("T")) );
 	G = checkGenericSort ( nss.sorts().lookup(new Name("G")),
-			       SetAsListOfSort.EMPTY_SET,
-			       SetAsListOfSort.EMPTY_SET );
+			       DefaultImmutableSet.<Sort>nil(),
+			       DefaultImmutableSet.<Sort>nil() );
 	H = checkGenericSort ( nss.sorts().lookup(new Name("H")),
-			       SetAsListOfSort.EMPTY_SET.add ( T ).add ( G ),
-			       SetAsListOfSort.EMPTY_SET.add ( S ) );
+			       DefaultImmutableSet.<Sort>nil().add ( T ).add ( G ),
+			       DefaultImmutableSet.<Sort>nil().add ( S ) );
 	
 
 	nss = new NamespaceSet ();
@@ -153,17 +160,17 @@ public class TestDeclParser extends TestCase {
 	S = checkSort        ( nss.sorts().lookup(new Name("S")) );
 	T = checkSort        ( nss.sorts().lookup(new Name("T")) );
 	G = checkGenericSort ( nss.sorts().lookup(new Name("G")),
-			       SetAsListOfSort.EMPTY_SET,
-			       SetAsListOfSort.EMPTY_SET );
+			       DefaultImmutableSet.<Sort>nil(),
+			       DefaultImmutableSet.<Sort>nil() );
 	checkGenericSort     ( nss.sorts().lookup(new Name("G2")),
-			       SetAsListOfSort.EMPTY_SET,
-			       SetAsListOfSort.EMPTY_SET );
+			       DefaultImmutableSet.<Sort>nil(),
+			       DefaultImmutableSet.<Sort>nil() );
 	H = checkGenericSort ( nss.sorts().lookup(new Name("H")),
-			       SetAsListOfSort.EMPTY_SET.add ( T ).add ( G ),
-			       SetAsListOfSort.EMPTY_SET.add ( S ) );
+			       DefaultImmutableSet.<Sort>nil().add ( T ).add ( G ),
+			       DefaultImmutableSet.<Sort>nil().add ( S ) );
 	checkGenericSort     ( nss.sorts().lookup(new Name("H2")),
-			       SetAsListOfSort.EMPTY_SET.add ( T ).add ( G ),
-			       SetAsListOfSort.EMPTY_SET.add ( S ) );
+			       DefaultImmutableSet.<Sort>nil().add ( T ).add ( G ),
+			       DefaultImmutableSet.<Sort>nil().add ( S ) );
 	
 
 	nss = new NamespaceSet ();

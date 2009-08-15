@@ -12,16 +12,18 @@ package de.uka.ilkd.key.java.visitor;
 import java.util.HashSet;
 import java.util.Map;
 
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.logic.BasicLocationDescriptor;
 import de.uka.ilkd.key.logic.EverythingLocationDescriptor;
 import de.uka.ilkd.key.logic.LocationDescriptor;
-import de.uka.ilkd.key.logic.SetOfLocationDescriptor;
-import de.uka.ilkd.key.logic.SetOfTerm;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.Location;
+import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.rule.soundness.TermProgramVariableCollector;
 import de.uka.ilkd.key.speclang.LoopInvariant;
 
@@ -86,14 +88,14 @@ public class ProgramVariableCollector extends JavaASTVisitor {
         }
         
         //predicates
-        SetOfTerm preds = x.getPredicates(selfTerm, atPreFunctions, services);
+        ImmutableSet<Term> preds = x.getPredicates(selfTerm, atPreFunctions, services).asSet();
         for(Term pred : preds) {
             pred.execPostOrder(tpvc);
         }
         
         //modifies
-        SetOfLocationDescriptor mod 
-            = x.getModifies(selfTerm, atPreFunctions, services);
+        ImmutableSet<LocationDescriptor> mod 
+            = x.getModifies(selfTerm, atPreFunctions, services).asSet();
         for(LocationDescriptor loc : mod) {
             if(loc instanceof BasicLocationDescriptor) {
                 BasicLocationDescriptor bloc = (BasicLocationDescriptor) loc;

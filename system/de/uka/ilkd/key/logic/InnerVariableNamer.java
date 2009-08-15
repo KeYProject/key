@@ -16,6 +16,8 @@
 
 package de.uka.ilkd.key.logic;
 
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -48,7 +50,7 @@ public class InnerVariableNamer extends VariableNamer {
 
     // reklov
     // START TEMPORARY DOWNWARD COMPATIBILITY
-    private ListOfName oldProgVarProposals = SLListOfName.EMPTY_LIST;
+    private ImmutableList<Name> oldProgVarProposals = ImmutableSLList.<Name>nil();
 
     public void setOldProgVarProposals(Name proposals) {
         if (proposals == null) return;

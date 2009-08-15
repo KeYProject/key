@@ -15,7 +15,7 @@
 
 package de.uka.ilkd.key.logic;
 
-import de.uka.ilkd.key.logic.op.ArrayOfQuantifiableVariable;
+import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.Quantifier;
 
@@ -24,7 +24,7 @@ class QuantifierTerm extends Term {
     /**
      * array of quantifiable variables
      */
-    private final ArrayOfQuantifiableVariable varsBoundHere;
+    private final ImmutableArray<QuantifiableVariable> varsBoundHere;
     
     /** sub term */
     private final Term subTerm;
@@ -42,7 +42,7 @@ class QuantifierTerm extends Term {
      public QuantifierTerm(Quantifier op, 
 			   QuantifiableVariable[] varsBoundHere, 
 			   Term subTerm) {
-	this(op, new ArrayOfQuantifiableVariable(varsBoundHere), subTerm);
+	this(op, new ImmutableArray<QuantifiableVariable>(varsBoundHere), subTerm);
      }
 
 
@@ -54,7 +54,7 @@ class QuantifierTerm extends Term {
      * @param subTerm the Term representing the formula below the quantifier
      */
      public QuantifierTerm(Quantifier op, 
-		 	   ArrayOfQuantifiableVariable varsBoundHere, 
+		 	   ImmutableArray<QuantifiableVariable> varsBoundHere, 
 		 	   Term subTerm) {
 	super(op, op.sort(subTerm));
 	this.subTerm = subTerm;
@@ -69,7 +69,7 @@ class QuantifierTerm extends Term {
 
     /** @return the variables the term bound direct if it is a Quantifier(term)
      */
-    public ArrayOfQuantifiableVariable varsBoundHere(int n) {
+    public ImmutableArray<QuantifiableVariable> varsBoundHere(int n) {
 	return n==0? varsBoundHere : EMPTY_VAR_LIST;
     }
 

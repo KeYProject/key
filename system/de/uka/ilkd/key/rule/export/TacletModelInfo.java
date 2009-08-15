@@ -15,6 +15,8 @@
 
 package de.uka.ilkd.key.rule.export;
 
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.rule.Taclet;
@@ -26,8 +28,8 @@ public class TacletModelInfo implements Named {
     private String filename;
     private TacletModelInfo introducingTaclet = null;
     private DisplayNameModelInfo displayName;
-    private ListOfOptionModelInfo options = SLListOfOptionModelInfo.EMPTY_LIST;
-    private ListOfRuleSetModelInfo ruleSets = SLListOfRuleSetModelInfo.EMPTY_LIST;
+    private ImmutableList<OptionModelInfo> options = ImmutableSLList.<OptionModelInfo>nil();
+    private ImmutableList<RuleSetModelInfo> ruleSets = ImmutableSLList.<RuleSetModelInfo>nil();
 
     public TacletModelInfo ( Taclet taclet, String filename ) {
         this.taclet = taclet;
@@ -83,14 +85,14 @@ public class TacletModelInfo implements Named {
     /**
      * @return Returns the options.
      */
-    public ListOfOptionModelInfo getOptions () {
+    public ImmutableList<OptionModelInfo> getOptions () {
         return options;
     }
     
     /**
      * @param options The options to set.
      */
-    public void setOptions ( ListOfOptionModelInfo options ) {
+    public void setOptions ( ImmutableList<OptionModelInfo> options ) {
         this.options = options;
     }
     
@@ -102,14 +104,14 @@ public class TacletModelInfo implements Named {
     /**
      * @return Returns the ruleSets.
      */
-    public ListOfRuleSetModelInfo getRuleSets () {
+    public ImmutableList<RuleSetModelInfo> getRuleSets () {
         return ruleSets;
     }
     
     /**
      * @param ruleSets The ruleSets to set.
      */
-    public void setRuleSets ( ListOfRuleSetModelInfo ruleSets ) {
+    public void setRuleSets ( ImmutableList<RuleSetModelInfo> ruleSets ) {
         this.ruleSets = ruleSets;
     }
     

@@ -12,6 +12,7 @@ package de.uka.ilkd.key.logic.op;
 
 import java.io.IOException;
 
+import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
@@ -34,7 +35,7 @@ public class ProgramSV extends SortedSchemaVariable
 
     private static final ProgramList EMPTY_LIST_INSTANTIATION = 
         new ProgramList
-        (new ArrayOfProgramElement(new ProgramElement[0]));
+        (new ImmutableArray<ProgramElement>(new ProgramElement[0]));
 
     /** 
      * creates a new SchemaVariable used as a placeholder for program
@@ -158,11 +159,11 @@ public class ProgramSV extends SortedSchemaVariable
         return 0;
     }
 
-    public ArrayOfExpression getUpdates() {
+    public ImmutableArray<Expression> getUpdates() {
         return null;
     }
 
-    public ArrayOfLoopInitializer getInits() {
+    public ImmutableArray<LoopInitializer> getInits() {
         return null;
     }
 
@@ -398,7 +399,7 @@ x     * @return the updated match conditions including mapping
         }
 
         Debug.out("Program list match: ", this, matchedElements);
-        return addProgramInstantiation(new ProgramList(new ArrayOfProgramElement(matchedElements)), 
+        return addProgramInstantiation(new ProgramList(new ImmutableArray<ProgramElement>(matchedElements)), 
                 matchCond, services);
     }	
 }

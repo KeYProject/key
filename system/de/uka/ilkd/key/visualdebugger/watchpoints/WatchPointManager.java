@@ -11,19 +11,16 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.abstraction.ListOfType;
-import de.uka.ilkd.key.java.abstraction.SLListOfType;
+import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.declaration.VariableSpecification;
-import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.java.reference.ReferencePrefix;
-import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.ProgramPrefix;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
@@ -150,7 +147,7 @@ public class WatchPointManager {
         List<LocalVariableDescriptor> locVars = wp.getLocalVariables();
         //reconstruct signature
         List<String> parameterTypes = wp.getParameterTypes();
-        ListOfType signature = SLListOfType.EMPTY_LIST;
+        ImmutableList<Type> signature = ImmutableSLList.<Type>nil();
         for (String type : parameterTypes) {
             signature = signature.append(ji.getKeYJavaType(type));
         }
@@ -220,10 +217,10 @@ public class WatchPointManager {
     
     /**
      * Gets the list of WatchPoints. This method never returns
-     * null. In case that there are no WatchPoints an empty ListOfTerm is
+     * null. In case that there are no WatchPoints an empty IList<Term> is
      * returned.
      * 
-     * @return the list of WatchPoints as ListOfTerm
+     * @return the list of WatchPoints as IList<Term>
      */
     public LinkedList<WatchPoint> getListOfWatchpoints(Services services) {
 

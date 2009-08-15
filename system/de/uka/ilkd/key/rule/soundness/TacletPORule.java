@@ -10,15 +10,20 @@
 
 package de.uka.ilkd.key.rule.soundness;
 
+import java.util.Iterator;
+
 import org.apache.log4j.Logger;
 
+import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.gui.Main;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.ListOfGoal;
 import de.uka.ilkd.key.proof.TacletIndex;
-import de.uka.ilkd.key.rule.*;
+import de.uka.ilkd.key.rule.BuiltInRule;
+import de.uka.ilkd.key.rule.NoPosTacletApp;
+import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.rule.TacletApp;
 
 /**
  * This class is actually not used; taclet po are created through the methods of
@@ -46,7 +51,7 @@ public class TacletPORule implements BuiltInRule {
 	return false;
     }
 
-    public ListOfGoal apply(Goal     goal, 
+    public ImmutableList<Goal> apply(Goal     goal, 
 			    Services services, 
 			    RuleApp  ruleApp) {
         final Logger logger = Logger.getLogger ( "key.taclet_soundness" );
@@ -72,7 +77,7 @@ public class TacletPORule implements BuiltInRule {
 	POBuilder pob = new POBuilder ( app, services );
 	pob.build ();
 
-	ListOfGoal newGoals = goal.split ( 1 );
+	ImmutableList<Goal> newGoals = goal.split ( 1 );
 
 	newGoals.head ().addFormula
 	    ( new ConstrainedFormula ( pob.getPOTerm (), Constraint.BOTTOM ),
@@ -92,14 +97,14 @@ public class TacletPORule implements BuiltInRule {
 	Namespace    funcNs    = globalNss.functions ();
 
 	{
-	    IteratorOfNamed it =
+	    Iterator<Named> it =
 		p_pob.getFunctions ().allElements ().iterator ();
 	    while ( it.hasNext () )
 		funcNs.add ( it.next () );
 	}
 
 	{
-	    IteratorOfTacletApp it = p_pob.getTaclets ().iterator ();
+	    Iterator<TacletApp> it = p_pob.getTaclets ().iterator ();
 	    TacletApp           app;
 	    while ( it.hasNext () ) {
 		app = it.next ();

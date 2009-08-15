@@ -7,15 +7,22 @@
 // See LICENSE.TXT for details.
 package de.uka.ilkd.key.unittest;
 
+import java.util.*;
+
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.java.*;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.proof.*;
-import de.uka.ilkd.key.unittest.simplify.*;
+import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.unittest.cogent.CogentModelGenerator;
+import de.uka.ilkd.key.unittest.cogent.CogentTranslation;
+import de.uka.ilkd.key.unittest.simplify.OldSimplifyModelGenerator;
+import de.uka.ilkd.key.unittest.simplify.SimplifyModelGenerator;
 import de.uka.ilkd.key.unittest.simplify.translation.DecisionProcedureSimplify;
-import de.uka.ilkd.key.unittest.cogent.*;
-import java.util.*;
 
 public class ModelGenerator {
 
@@ -30,18 +37,18 @@ public class ModelGenerator {
 
     public static int decProdForTestGen = OLD_SIMPLIFY;
 
-    private ListOfTerm ante, succ;
+    private ImmutableList<Term> ante, succ;
 
     private HashMap<Term, EquivalenceClass> term2class;
 
     // Maps a location to the set of formulas it occurs in.
-    private HashMap<Term, SetOfTerm> eqvC2constr;
+    private HashMap<Term, ImmutableSet<Term>> eqvC2constr;
 
     private Services serv;
 
-    private SetOfTerm locations = SetAsListOfTerm.EMPTY_SET;
+    private ImmutableSet<Term> locations = DefaultImmutableSet.<Term>nil();
 
-    private SetOfProgramVariable pvs = SetAsListOfProgramVariable.EMPTY_SET;
+    private ImmutableSet<ProgramVariable> pvs = DefaultImmutableSet.<ProgramVariable>nil();
 
     private Node node;
 
@@ -53,14 +60,14 @@ public class ModelGenerator {
 
     public ModelGenerator(Services serv, Constraint userConstraint, Node node,
 	    String executionTrace, Node originalNode) {
-	IteratorOfConstrainedFormula itc = node.sequent().antecedent()
+	Iterator<ConstrainedFormula> itc = node.sequent().antecedent()
 		.iterator();
-	ante = SLListOfTerm.EMPTY_LIST;
+	ante = ImmutableSLList.<Term>nil();
 	while (itc.hasNext()) {
 	    ante = ante.append(itc.next().formula());
 	}
 	itc = node.sequent().succedent().iterator();
-	succ = SLListOfTerm.EMPTY_LIST;
+	succ = ImmutableSLList.<Term>nil();
 	while (itc.hasNext()) {
 	    succ = succ.append(itc.next().formula());
 	}
@@ -69,7 +76,7 @@ public class ModelGenerator {
 	this.userConstraint = userConstraint;
 	this.serv = serv;
 	this.executionTrace = executionTrace;
-	eqvC2constr = new HashMap<Term, SetOfTerm>();
+	eqvC2constr = new HashMap<Term, ImmutableSet<Term>>();
 	createEquivalenceClassesAndConstraints();
 	findBounds();
 	findDisjointClasses();
@@ -130,9 +137,9 @@ public class ModelGenerator {
 	if (isLocation(t, serv)) {
 	    getEqvClass(t);
 	    locations = locations.add(t);
-	    SetOfTerm constr = eqvC2constr.get(t);
+	    ImmutableSet<Term> constr = eqvC2constr.get(t);
 	    if (constr == null) {
-		constr = SetAsListOfTerm.EMPTY_SET;
+		constr = DefaultImmutableSet.<Term>nil();
 	    }
 	    eqvC2constr.put(t, constr.add(t));
 	}
@@ -167,7 +174,7 @@ public class ModelGenerator {
     /**
      * Returns the set of locations occuring in node.
      */
-    public SetOfTerm getLocations() {
+    public ImmutableSet<Term> getLocations() {
 	return locations;
     }
 
@@ -175,7 +182,7 @@ public class ModelGenerator {
      * Collects the program variables occuring in node.
      */
     public void collectProgramVariables() {
-	IteratorOfTerm it = locations.iterator();
+	Iterator<Term> it = locations.iterator();
 	while (it.hasNext()) {
 	    Term t = it.next();
 	    if ((t.op() instanceof ProgramVariable)
@@ -201,7 +208,7 @@ public class ModelGenerator {
 	}
     }
 
-    public SetOfProgramVariable getProgramVariables() {
+    public ImmutableSet<ProgramVariable> getProgramVariables() {
 	return pvs;
     }
 
@@ -209,11 +216,11 @@ public class ModelGenerator {
 	return term2class;
     }
 
-    // private SetOfTerm getConstraintsForEqvClass(EquivalenceClass ec) {
-    // IteratorOfTerm it = ec.getMembers().iterator();
-    // SetOfTerm result = SetAsListOfTerm.EMPTY_SET;
+    // private SetOf<Term> getConstraintsForEqvClass(EquivalenceClass ec) {
+    // Iterator<Term> it = ec.getMembers().iterator();
+    // SetOf<Term> result = SetAsListOf.<Term>nil();
     // while (it.hasNext()) {
-    // SetOfTerm constr = (SetOfTerm) eqvC2constr.get(it.next());
+    // SetOf<Term> constr = (SetOfTerm) eqvC2constr.get(it.next());
     // if (constr != null) {
     // result = result.union(constr);
     // }
@@ -227,7 +234,7 @@ public class ModelGenerator {
      */
     private void createEquivalenceClassesAndConstraints() {
 	term2class = new HashMap<Term, EquivalenceClass>();
-	IteratorOfTerm it = ante.iterator();
+	Iterator<Term> it = ante.iterator();
 	while (it.hasNext()) {
 	    EquivalenceClass ec = null;
 	    Term t = it.next();
@@ -246,7 +253,7 @@ public class ModelGenerator {
 		} else {
 		    ec = new EquivalenceClass(t.sub(0), t.sub(1), serv);
 		}
-		IteratorOfTerm ecIt = ec.getMembers().iterator();
+		Iterator<Term> ecIt = ec.getMembers().iterator();
 		while (ecIt.hasNext()) {
 		    term2class.put(ecIt.next(), ec);
 		}
@@ -264,7 +271,7 @@ public class ModelGenerator {
      * decision procedure.
      */
     private void findBounds() {
-	IteratorOfTerm it = ante.iterator();
+	Iterator<Term> it = ante.iterator();
 	while (it.hasNext()) {
 	    Term t = it.next();
 	    EquivalenceClass e0, e1;
@@ -294,7 +301,7 @@ public class ModelGenerator {
     }
 
     private void findDisjointClasses() {
-	IteratorOfTerm it = succ.iterator();
+	Iterator<Term> it = succ.iterator();
 	while (it.hasNext()) {
 	    Term t = it.next();
 	    EquivalenceClass e0, e1;

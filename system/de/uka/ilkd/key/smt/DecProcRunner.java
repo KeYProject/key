@@ -17,7 +17,9 @@
 
 package de.uka.ilkd.key.smt;
 
+import java.util.Iterator;
 
+import de.uka.ilkd.key.collection.ImmutableList;
 import java.awt.event.ActionEvent;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -124,10 +126,10 @@ public class DecProcRunner extends SwingWorker {
                         proof.env().registerRule(simpRule,
                                 de.uka.ilkd.key.proof.mgt.AxiomJustification.INSTANCE);
 
-                        main.setStatusLine("Running external decision procedure: " +
-                                simpRule.displayName(), 99*totalGoals); 
-                        
-                        final IteratorOfGoal goals = proof.openGoals().iterator();
+                main.setStatusLine("Running external decision procedure: " +
+                        simpRule.displayName(), 99*totalGoals); 
+                
+                final Iterator<Goal> goals = proof.openGoals().iterator();
 
                         while (goals.hasNext()) {    
                             BuiltInRuleApp birApp = new BuiltInRuleApp(simpRule, null, 
@@ -211,7 +213,7 @@ public class DecProcRunner extends SwingWorker {
     
     private BuiltInRule getIntegerDecisionProcedure() {
 	final Name simpRuleName = proof.getSettings().getDecisionProcedureSettings().getActiveRule().getRuleName();
-	final ListOfBuiltInRule rules = proof.getSettings().getProfile().getStandardRules().getStandardBuiltInRules();
+	final ImmutableList<BuiltInRule> rules = proof.getSettings().getProfile().getStandardRules().getStandardBuiltInRules();
         for (BuiltInRule r : rules) {
             if (r.name().equals(simpRuleName)) {
         	return r;

@@ -9,12 +9,13 @@ package de.uka.ilkd.key.visualdebugger.statevisualisation;
 
 import java.util.*;
 
+import de.uka.ilkd.key.collection.*;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.ClassType;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.Type;
-import de.uka.ilkd.key.java.declaration.ArrayOfParameterDeclaration;
+import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
 import de.uka.ilkd.key.java.reference.ReferencePrefix;
 import de.uka.ilkd.key.java.reference.TypeRef;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
@@ -84,33 +85,33 @@ public class SymbolicObjectDiagram {
                 && op.name().toString().indexOf("undef(") == -1;
     }
 
-    private ListOfTerm ante = SLListOfTerm.EMPTY_LIST;
+    private ImmutableList<Term> ante = ImmutableSLList.<Term>nil();
             
-    private ListOfTerm succ = SLListOfTerm.EMPTY_LIST;
+    private ImmutableList<Term> succ = ImmutableSLList.<Term>nil();
 
-    private SetOfTerm arrayLocations;
+    private ImmutableSet<Term> arrayLocations;
 
-    private SetOfTerm indexTerms;
+    private ImmutableSet<Term> indexTerms;
 
-    private SetOfTerm instanceConfiguration;
+    private ImmutableSet<Term> instanceConfiguration;
 
     private ITNode itNode;
 
-    private SetOfTerm locations = SetAsListOfTerm.EMPTY_SET;
+    private ImmutableSet<Term> locations = DefaultImmutableSet.<Term>nil();
 
     private Term methodReferences[];
 
     private Node node;
 
-    ListOfTerm pc = SLListOfTerm.EMPTY_LIST;
+    ImmutableList<Term> pc = ImmutableSLList.<Term>nil();
 
-    private SetOfTerm[] possibleIndexTerms;
+    private ImmutableSet<Term>[] possibleIndexTerms;
 
-    private ListOfTerm postTerms;
+    private ImmutableList<Term> postTerms;
 
     private HashMap<Term, Integer> ref2ser;
 
-    private SetOfTerm refInPC = SetAsListOfTerm.EMPTY_SET;
+    private ImmutableSet<Term> refInPC = DefaultImmutableSet.<Term>nil();
 
     private Services serv;
 
@@ -122,11 +123,11 @@ public class SymbolicObjectDiagram {
 
     private VisualDebugger vd;
 
-    public SymbolicObjectDiagram(ITNode itNode, Services serv, ListOfTerm pc,
-            SetOfTerm refInPC, ListOfTerm preTerms, ListOfTerm postTerms,
-            boolean pre, SetOfTerm arrayLocations,
-            SetOfTerm[] possibleIndexTerms, SetOfTerm indexTerms,
-            SetOfTerm instanceConfiguration) {
+    public SymbolicObjectDiagram(ITNode itNode, Services serv, ImmutableList<Term> pc,
+            ImmutableSet<Term> refInPC, ImmutableList<Term> preTerms, ImmutableList<Term> postTerms,
+            boolean pre, ImmutableSet<Term> arrayLocations,
+            ImmutableSet<Term>[] possibleIndexTerms, ImmutableSet<Term> indexTerms,
+            ImmutableSet<Term> instanceConfiguration) {
         this.instanceConfiguration = instanceConfiguration;
 
         prepare(itNode, serv, pc, refInPC);
@@ -243,8 +244,8 @@ public class SymbolicObjectDiagram {
         }
     }
 
-    private SetOfTerm collectLocations2(Term t) {
-        SetOfTerm result = SetAsListOfTerm.EMPTY_SET;
+    private ImmutableSet<Term> collectLocations2(Term t) {
+        ImmutableSet<Term> result = DefaultImmutableSet.<Term>nil();
         if (isLocation(t, serv)) {
             result = result.add(t);
 
@@ -275,7 +276,7 @@ public class SymbolicObjectDiagram {
 
     private void createEquivalenceClassesAndConstraints() {
         term2class = new HashMap<Term, EquClass>();
-        IteratorOfTerm it = ante.iterator();
+        Iterator<Term> it = ante.iterator();
         while (it.hasNext()) {
             EquClass ec = null;
             Term t = it.next();
@@ -294,7 +295,7 @@ public class SymbolicObjectDiagram {
                 } else {
                     ec = new EquClass(t.sub(0), t.sub(1));
                 }
-                IteratorOfTerm ecIt = ec.getMembers().iterator();
+                Iterator<Term> ecIt = ec.getMembers().iterator();
                 while (ecIt.hasNext()) {
                     term2class.put(ecIt.next(), ec);
                 }
@@ -308,10 +309,10 @@ public class SymbolicObjectDiagram {
         }
     }
 
-    private void createPostState(ListOfTerm pre, ListOfTerm post) {
+    private void createPostState(ImmutableList<Term> pre, ImmutableList<Term> post) {
         VisualDebugger.print("createPostState -----");
-        IteratorOfTerm pIt = post.iterator();
-        for (IteratorOfTerm it = pre.iterator(); it.hasNext();) {
+        Iterator<Term> pIt = post.iterator();
+        for (Iterator<Term> it = pre.iterator(); it.hasNext();) {
             Term preTerm = it.next();
             Term postTerm = pIt.next();
             // System.out.println(preTerm+":="+postTerm);
@@ -402,7 +403,7 @@ public class SymbolicObjectDiagram {
         }
 
         // create unknown objects
-        for (IteratorOfTerm it = postTerms.iterator(); it.hasNext();) {
+        for (Iterator<Term> it = postTerms.iterator(); it.hasNext();) {
             Term next = it.next();
             if (this.referenceSort(next.sort())
                     && !VisualDebugger.containsImplicitAttr(next)) {
@@ -420,8 +421,8 @@ public class SymbolicObjectDiagram {
         Iterator<SymbolicObject> it = result.iterator();
         while (it.hasNext()) {
             SymbolicObject so = it.next();
-            IteratorOfTerm it2 = so.getTerms().iterator();
-            // SetOfTerm result;
+            Iterator<Term> it2 = so.getTerms().iterator();
+            // SetOf<Term> result;
             // System.out.println("adding assos");
             while (it2.hasNext()) {
 
@@ -461,11 +462,11 @@ public class SymbolicObjectDiagram {
             }
         }
 
-        for (IteratorOfTerm it2 = pc.iterator(); it2.hasNext();) {
+        for (Iterator<Term> it2 = pc.iterator(); it2.hasNext();) {
             Term currentTerm = it2.next();
-            SetOfTerm locs = collectLocations2(currentTerm);
+            ImmutableSet<Term> locs = collectLocations2(currentTerm);
 
-            for (IteratorOfTerm it3 = locs.iterator(); it3.hasNext();) {
+            for (Iterator<Term> it3 = locs.iterator(); it3.hasNext();) {
 
                 Term t2 = it3.next();
                 if (!referenceSort(t2.sort())) {
@@ -496,8 +497,8 @@ public class SymbolicObjectDiagram {
         symbolicObjects = result;
     }
 
-    private void createSymbolicObjectsForNewInstances(ListOfTerm pre) {
-        for (IteratorOfTerm it = pre.iterator(); it.hasNext();) {
+    private void createSymbolicObjectsForNewInstances(ImmutableList<Term> pre) {
+        for (Iterator<Term> it = pre.iterator(); it.hasNext();) {
             Term next = it.next();
 
             if (next.op() instanceof AttributeOp) {
@@ -514,8 +515,8 @@ public class SymbolicObjectDiagram {
 
     }
 
-    private boolean disjunct(SetOfTerm s1, SetOfTerm s2) {
-        for (IteratorOfTerm it = s1.iterator(); it.hasNext();) {
+    private boolean disjunct(ImmutableSet<Term> s1, ImmutableSet<Term> s2) {
+        for (Iterator<Term> it = s1.iterator(); it.hasNext();) {
             if (s2.contains(it.next()))
                 return false;
         }
@@ -534,7 +535,7 @@ public class SymbolicObjectDiagram {
     }
 
     private void findDisjointClasses() {
-        IteratorOfTerm it = succ.iterator();
+        Iterator<Term> it = succ.iterator();
         while (it.hasNext()) {
             Term t = it.next();
             EquClass e0, e1;
@@ -547,10 +548,10 @@ public class SymbolicObjectDiagram {
         }
     }
 
-    public ListOfTerm getConstraints(Term toFind) {
+    public ImmutableList<Term> getConstraints(Term toFind) {
         // Term pvTerm = TermFactory.DEFAULT.createVariableTerm(pv);
-        ListOfTerm result = SLListOfTerm.EMPTY_LIST;
-        for (IteratorOfTerm it = pc.iterator(); it.hasNext();) {
+        ImmutableList<Term> result = ImmutableSLList.<Term>nil();
+        for (Iterator<Term> it = pc.iterator(); it.hasNext();) {
             final Term t = it.next();
             OpCollector vis = new OpCollector();
             t.execPostOrder(vis);
@@ -573,7 +574,7 @@ public class SymbolicObjectDiagram {
         return term2class.get(t);
     }
 
-    public SetOfTerm getIndexTerms() {
+    public ImmutableSet<Term> getIndexTerms() {
         return indexTerms;
     }
 
@@ -606,8 +607,8 @@ public class SymbolicObjectDiagram {
         return null;
     }
 
-    private ListOfTerm getPc(HashMap<PosInOccurrence, Label> labels) {
-        ListOfTerm pc2 = SLListOfTerm.EMPTY_LIST;
+    private ImmutableList<Term> getPc(HashMap<PosInOccurrence, Label> labels) {
+        ImmutableList<Term> pc2 = ImmutableSLList.<Term>nil();
 
         for (final PosInOccurrence pio : labels.keySet()) {
             // PCLabel pcLabel = ((PCLabel)labels.get(pio));
@@ -630,15 +631,15 @@ public class SymbolicObjectDiagram {
         return pc2;
     }
 
-    private LinkedList<SetOfTerm> getPossibleIndexTerms(SetOfTerm members) {
-        LinkedList<SetOfTerm> result = new LinkedList<SetOfTerm>();
+    private LinkedList<ImmutableSet<Term>> getPossibleIndexTerms(ImmutableSet<Term> members) {
+        LinkedList<ImmutableSet<Term>> result = new LinkedList<ImmutableSet<Term>>();
         if (possibleIndexTerms != null)
             for (int i = 0; i < possibleIndexTerms.length; i++) {
-                SetOfTerm currentIndexTerms = possibleIndexTerms[i];
-                SetOfTerm locInd = SetAsListOfTerm.EMPTY_SET;
-                SetOfTerm res = SetAsListOfTerm.EMPTY_SET;
+                ImmutableSet<Term> currentIndexTerms = possibleIndexTerms[i];
+                ImmutableSet<Term> locInd = DefaultImmutableSet.<Term>nil();
+                ImmutableSet<Term> res = DefaultImmutableSet.<Term>nil();
 
-                for (IteratorOfTerm locIt = this.arrayLocations.iterator(); locIt
+                for (Iterator<Term> locIt = this.arrayLocations.iterator(); locIt
                         .hasNext();) {
                     Term t = locIt.next();
                     if (members.contains(t.sub(0))) {
@@ -646,7 +647,7 @@ public class SymbolicObjectDiagram {
                     }
                 }
 
-                for (IteratorOfTerm posIndexTermsIt = currentIndexTerms
+                for (Iterator<Term> posIndexTermsIt = currentIndexTerms
                         .iterator(); posIndexTermsIt.hasNext();) {
                     final Term t = posIndexTermsIt.next();
                     final Term t2;
@@ -665,13 +666,13 @@ public class SymbolicObjectDiagram {
 
     }
 
-    private SetOfTerm getPossibleIndexTermsForArray(SetOfTerm members,
-            SetOfTerm ic) {
-        SetOfTerm result = SetAsListOfTerm.EMPTY_SET;
+    private ImmutableSet<Term> getPossibleIndexTermsForArray(ImmutableSet<Term> members,
+            ImmutableSet<Term> ic) {
+        ImmutableSet<Term> result = DefaultImmutableSet.<Term>nil();
 
-        SetOfTerm currentIndexTerms = ic;
-        SetOfTerm locInd = SetAsListOfTerm.EMPTY_SET;
-        for (IteratorOfTerm locIt = this.arrayLocations.iterator(); locIt
+        ImmutableSet<Term> currentIndexTerms = ic;
+        ImmutableSet<Term> locInd = DefaultImmutableSet.<Term>nil();
+        for (Iterator<Term> locIt = this.arrayLocations.iterator(); locIt
                 .hasNext();) {
             Term t = locIt.next();
             if (members.contains(t.sub(0))) {
@@ -679,7 +680,7 @@ public class SymbolicObjectDiagram {
             }
         }
 
-        for (IteratorOfTerm posIndexTermsIt = currentIndexTerms.iterator(); posIndexTermsIt
+        for (Iterator<Term> posIndexTermsIt = currentIndexTerms.iterator(); posIndexTermsIt
                 .hasNext();) {
             final Term t = posIndexTermsIt.next();
             final Term t2;
@@ -698,20 +699,20 @@ public class SymbolicObjectDiagram {
     }
 
     // TODO duplicate in statevisualization
-    private SetOfTerm getReferences(ListOfTerm terms) {
-        // ListOfTerm pc = itNode.getPc();
-        SetOfTerm result = SetAsListOfTerm.EMPTY_SET;
-        for (IteratorOfTerm it = terms.iterator(); it.hasNext();) {
+    private ImmutableSet<Term> getReferences(ImmutableList<Term> terms) {
+        // IList<Term> pc = itNode.getPc();
+        ImmutableSet<Term> result = DefaultImmutableSet.<Term>nil();
+        for (Iterator<Term> it = terms.iterator(); it.hasNext();) {
             result = result.union(getReferences2(it.next()));
         }
         return result;
     }
 
-    private SetOfTerm getReferences2(Term t) {
+    private ImmutableSet<Term> getReferences2(Term t) {
         // System.out.println(t);
         // if (t.sort()!= Sort.FORMULA && !this.isBool(t)&&!this.isInt(t))
 
-        SetOfTerm result = SetAsListOfTerm.EMPTY_SET;
+        ImmutableSet<Term> result = DefaultImmutableSet.<Term>nil();
         if (referenceSort(t.sort()))
             result = result.add(t);
         for (int i = 0; i < t.arity(); i++) {
@@ -720,10 +721,10 @@ public class SymbolicObjectDiagram {
         return result;
     }
 
-    private int getSerialNumber(SetOfTerm refs) {
+    private int getSerialNumber(ImmutableSet<Term> refs) {
         int current = -1;
 
-        for (IteratorOfTerm it = refs.iterator(); it.hasNext();) {
+        for (Iterator<Term> it = refs.iterator(); it.hasNext();) {
             final Term t = it.next();
             if (ref2ser.containsKey(t)
                     && ((current == -1) || ref2ser.get(t)
@@ -737,7 +738,7 @@ public class SymbolicObjectDiagram {
 
     private Set<Type> getStaticClasses() {
         HashSet<Type> res = new HashSet<Type>();
-        for (IteratorOfTerm it = this.pc.iterator(); it.hasNext();) {
+        for (Iterator<Term> it = this.pc.iterator(); it.hasNext();) {
             Term t = it.next();
             res.addAll(this.getStaticClasses(t));
 
@@ -780,8 +781,8 @@ public class SymbolicObjectDiagram {
 
     // TODO duplicate in prooflistener
 
-    private void prepare(ITNode itNode, Services serv, ListOfTerm pc,
-            SetOfTerm refInPc) {
+    private void prepare(ITNode itNode, Services serv, ImmutableList<Term> pc,
+            ImmutableSet<Term> refInPc) {
 
         this.vd = VisualDebugger.getVisualDebugger();
         this.pc = pc;
@@ -789,13 +790,13 @@ public class SymbolicObjectDiagram {
         this.itNode = itNode;
         this.serv = serv;
 
-        ante = SLListOfTerm.EMPTY_LIST;
+        ante = ImmutableSLList.<Term>nil();
         for (final ConstrainedFormula cfma : node.sequent().antecedent()) {
             ante = ante.append(cfma.formula());
         }
         
         
-        succ = SLListOfTerm.EMPTY_LIST;
+        succ = ImmutableSLList.<Term>nil();
         for (final ConstrainedFormula cfma : node.sequent().succedent()) {
             succ = succ.append(cfma.formula());
         }
@@ -835,9 +836,9 @@ public class SymbolicObjectDiagram {
         while (n.getParent() != null) {
             HashMap<PosInOccurrence, Label> labels = n.getNode()
                     .getNodeInfo().getVisualDebuggerState().getLabels();
-            ListOfTerm pc2 = getPc(labels);
-            SetOfTerm refs = getReferences(pc2);
-            for (IteratorOfTerm it = refs.iterator(); it.hasNext();) {
+            ImmutableList<Term> pc2 = getPc(labels);
+            ImmutableSet<Term> refs = getReferences(pc2);
+            for (Iterator<Term> it = refs.iterator(); it.hasNext();) {
                 Term t = it.next();
                 ref2ser.put(t, new Integer(n.getId()));
 
@@ -848,7 +849,7 @@ public class SymbolicObjectDiagram {
         // references in post term
         int j = 0;
         if (postTerms != null)
-            for (IteratorOfTerm it = postTerms.iterator(); it.hasNext();) {
+            for (Iterator<Term> it = postTerms.iterator(); it.hasNext();) {
 
                 Term t = it.next();
                 // System.out.println("pt "+t);
@@ -964,23 +965,22 @@ public class SymbolicObjectDiagram {
 
             }
 
-            // ArrayOfExpression aof = mbs.getArguments();;
+            // ArrayOf<n> aof = mbs.getArguments();;
             HashSet set = vd.getParam(mbs);
-            ListOfProgramVariable inputPara = vd
+            ImmutableList<ProgramVariable> inputPara = vd
                     .arrayOfExpression2ListOfProgVar(mbs.getArguments(), 0);
-            ProgramVariable[] inputParaArray = inputPara.toArray();
+            ProgramVariable[] inputParaArray = inputPara.toArray(new ProgramVariable[inputPara.size()]);
 
-            ArrayOfParameterDeclaration paraDecl = mbs.getProgramMethod(serv)
-                    .getParameters();
+            ImmutableArray<ParameterDeclaration> paraDecl = mbs.getProgramMethod(serv).getParameters();
 
             final HashMap<Term,Term> values = vd.getValuesForLocation(set, vd
                     .getProgramPIO(itNode.getNode().sequent()));
 
-            ListOfProgramVariable paramDeclAsPVList = SLListOfProgramVariable.EMPTY_LIST;
+            ImmutableList<ProgramVariable> paramDeclAsPVList = ImmutableSLList.<ProgramVariable>nil();
 
             for (int i = 0; i < paraDecl.size(); i++) {
                 ProgramVariable next = (ProgramVariable) paraDecl
-                        .getParameterDeclaration(i).getVariableSpecification()
+                        .get(i).getVariableSpecification()
                         .getProgramVariable();
                 Term val = (Term) values.get(TermFactory.DEFAULT
                         .createVariableTerm(inputParaArray[i]));// TODO
@@ -1017,20 +1017,20 @@ public class SymbolicObjectDiagram {
     }
 
     private class EquClass {
-        private SetOfTerm disjointRep = SetAsListOfTerm.EMPTY_SET;
+        private ImmutableSet<Term> disjointRep = DefaultImmutableSet.<Term>nil();
 
-        private SetOfTerm members;
+        private ImmutableSet<Term> members;
 
-        public EquClass(SetOfTerm members) {
+        public EquClass(ImmutableSet<Term> members) {
             this.members = members;
         }
 
         public EquClass(Term t) {
-            this(SetAsListOfTerm.EMPTY_SET.add(t));
+            this(DefaultImmutableSet.<Term>nil().add(t));
         }
 
         public EquClass(Term t1, Term t2) {
-            this(SetAsListOfTerm.EMPTY_SET.add(t1).add(t2));
+            this(DefaultImmutableSet.<Term>nil().add(t1).add(t2));
         }
 
         public void add(EquClass ec) {
@@ -1053,9 +1053,9 @@ public class SymbolicObjectDiagram {
             if (eqc.members.size() != members.size()) {
                 return false;
             }
-            IteratorOfTerm it = members.iterator();
+            Iterator<Term> it = members.iterator();
             l: while (it.hasNext()) {
-                IteratorOfTerm it2 = eqc.members.iterator();
+                Iterator<Term> it2 = eqc.members.iterator();
                 Term t = it.next();
                 while (it2.hasNext()) {
                     if (t.toString().equals(it2.next().toString())) {
@@ -1067,12 +1067,12 @@ public class SymbolicObjectDiagram {
             return true;
         }
 
-        public SetOfTerm getDisjoints() {
+        public ImmutableSet<Term> getDisjoints() {
             return disjointRep;
         }
 
         public KeYJavaType getKeYJavaType() {
-            final IteratorOfTerm it = members.iterator();
+            final Iterator<Term> it = members.iterator();
             Sort s = it.next().sort();
             while (it.hasNext()) {
                 final Sort s1 = it.next().sort();
@@ -1091,9 +1091,9 @@ public class SymbolicObjectDiagram {
         /**
          * Returns the locations that are members of this equivalence class.
          */
-        public SetOfTerm getLocations() {
-            SetOfTerm locations = SetAsListOfTerm.EMPTY_SET;
-            IteratorOfTerm it = members.iterator();
+        public ImmutableSet<Term> getLocations() {
+            ImmutableSet<Term> locations = DefaultImmutableSet.<Term>nil();
+            Iterator<Term> it = members.iterator();
             while (it.hasNext()) {
                 Term t = it.next();
                 if (ModelGenerator.isLocation(t, serv)) {
@@ -1103,12 +1103,12 @@ public class SymbolicObjectDiagram {
             return locations;
         }
 
-        public SetOfTerm getMembers() {
+        public ImmutableSet<Term> getMembers() {
             return members;
         }
 
         public boolean isArray() {
-            for (IteratorOfTerm it = members.iterator(); it.hasNext();) {
+            for (Iterator<Term> it = members.iterator(); it.hasNext();) {
                 Term t = it.next();
                 return isArraySort(t.sort());
             }
@@ -1121,7 +1121,7 @@ public class SymbolicObjectDiagram {
         }
 
         public boolean isBoolean() {
-            for (IteratorOfTerm it = members.iterator(); it.hasNext();) {
+            for (Iterator<Term> it = members.iterator(); it.hasNext();) {
                 if (serv.getTypeConverter().getBooleanLDT().targetSort() == it
                         .next().sort()) {
                     return true;
@@ -1131,7 +1131,7 @@ public class SymbolicObjectDiagram {
         }
 
         public boolean isInt() {
-            for (IteratorOfTerm it = members.iterator(); it.hasNext();) {
+            for (Iterator<Term> it = members.iterator(); it.hasNext();) {
                 Term t = it.next();
                 return isInt(t.sort());
             }

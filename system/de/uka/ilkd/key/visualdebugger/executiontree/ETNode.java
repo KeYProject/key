@@ -9,12 +9,11 @@ package de.uka.ilkd.key.visualdebugger.executiontree;
 
 import java.util.*;
 
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.gui.KeYMediator;
-import de.uka.ilkd.key.logic.ListOfTerm;
-import de.uka.ilkd.key.logic.SLListOfTerm;
-import de.uka.ilkd.key.proof.ListOfNode;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.proof.SLListOfNode;
 import de.uka.ilkd.key.strategy.DebuggerStrategy;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.visualdebugger.DebuggerPO;
@@ -50,7 +49,7 @@ public class ETNode {
             .getMediator();
 
     /** The bc. */
-    private ListOfTerm bc = SLListOfTerm.EMPTY_LIST;
+    private ImmutableList<Term> bc = ImmutableSLList.<Term>nil();
     
     /** A list of watchpoints satisfied at this node. */
     private List<WatchPoint> watchpointsSatisfied = null;
@@ -58,7 +57,7 @@ public class ETNode {
     /** Indicates that the watchpoint has been true for a subset of nodes of the proof tree nodes. */
     private Set<WatchPoint> watchpointsTrueInSubset = new HashSet<WatchPoint>();
 
-    // ListOfTerm pc= SLListOfTerm.EMPTY_LIST;
+    // IList<Term> pc= ImmSLList.<Term>nil();
     /** The it nodes. */
     private LinkedList<ITNode> itNodes = new LinkedList<ITNode>();
 
@@ -72,7 +71,7 @@ public class ETNode {
     private boolean isWatchpoint = false;
     
     /** The simplified bc. */
-    private ListOfTerm simplifiedBC = null;
+    private ImmutableList<Term> simplifiedBC = null;
 
     /**
      * Instantiates a new eT node.
@@ -80,7 +79,7 @@ public class ETNode {
      * @param bc the bc
      * @param parent the parent
      */
-    public ETNode(ListOfTerm bc, ETNode parent) {
+    public ETNode(ImmutableList<Term> bc, ETNode parent) {
         this.bc = bc;
         this.parent = parent;
         this.setMethodInvocation();
@@ -93,7 +92,7 @@ public class ETNode {
      * @param itNodes the it nodes
      * @param parent the parent
      */
-    public ETNode(ListOfTerm bc, LinkedList<ITNode> itNodes, ETNode parent) {
+    public ETNode(ImmutableList<Term> bc, LinkedList<ITNode> itNodes, ETNode parent) {
         this.bc = bc;
         this.itNodes = itNodes;
         this.parent = parent;
@@ -166,7 +165,7 @@ public class ETNode {
      * 
      * @return the bC
      */
-    public ListOfTerm getBC() {
+    public ImmutableList<Term> getBC() {
         if (!VisualDebugger.showImpliciteAttr && bc != null)
             return VisualDebugger.getVisualDebugger().removeImplicite(bc);
         return bc;
@@ -177,11 +176,11 @@ public class ETNode {
      * 
      * @param l the l
      */
-    public void appendBC(ListOfTerm l) {
+    public void appendBC(ImmutableList<Term> l) {
         if (bc != null) // TODO ??????? remove this!
             this.bc = bc.append(l);
         else
-            bc = SLListOfTerm.EMPTY_LIST.append(l);
+            bc = ImmutableSLList.<Term>nil().append(l);
     }
 
     /**
@@ -246,7 +245,7 @@ public class ETNode {
      * 
      * @return the simplified bc
      */
-    public ListOfTerm getSimplifiedBc() {
+    public ImmutableList<Term> getSimplifiedBc() {
         if (this.simplifiedBC == null)
             return bc;
         else
@@ -327,8 +326,8 @@ public class ETNode {
      * 
      * @return the proof tree nodes
      */
-    public ListOfNode getProofTreeNodes() {
-        ListOfNode result = SLListOfNode.EMPTY_LIST;
+    public ImmutableList<Node> getProofTreeNodes() {
+        ImmutableList<Node> result = ImmutableSLList.<Node>nil();
         for (Iterator<ITNode> it = itNodes.iterator(); it.hasNext();) {
             result = result.append(((ITNode) it.next()).getNode());
 

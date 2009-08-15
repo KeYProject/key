@@ -17,8 +17,14 @@
  */
 package de.uka.ilkd.key.rule;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.Stack;
 
+import de.uka.ilkd.key.collection.ImmutableArray;
+import de.uka.ilkd.key.collection.ImmutableMap;
+import de.uka.ilkd.key.collection.DefaultImmutableMap;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.visitor.ProgramContextAdder;
@@ -39,8 +45,8 @@ public class SyntacticalReplaceVisitor extends Visitor {
 
     private final SVInstantiations svInst;
     private final Constraint metavariableInst;
-    private MapFromSchemaVariableToTerm newInstantiations =
-                                MapAsListFromSchemaVariableToTerm.EMPTY_MAP;
+    private ImmutableMap<SchemaVariable,Term> newInstantiations =
+                                DefaultImmutableMap.<SchemaVariable,Term>nilMap();
     private final boolean forceSVInst;
     private final Name svInstBasename;
     private Services services;
@@ -450,10 +456,10 @@ public class SyntacticalReplaceVisitor extends Visitor {
     private Operator instantiateNRFunctionWithExplicitDependencies
     	(NRFunctionWithExplicitDependencies nrFunc) {
         final Location[] locs = new Location[nrFunc.dependencies().size()];
-        final ArrayOfLocation patternDeps = nrFunc.dependencies();
+        final ImmutableArray<Location> patternDeps = nrFunc.dependencies();
         boolean instantiationNecessary = false;
         for (int i = 0; i<locs.length; i++) {
-            Location loc = patternDeps.getLocation(i);            
+            Location loc = patternDeps.get(i);            
             if (loc instanceof SchemaVariable) {                
                 Object o = svInst.getInstantiation((SchemaVariable)loc); 
                 if (o instanceof Term) {
@@ -478,16 +484,16 @@ public class SyntacticalReplaceVisitor extends Visitor {
         }
         name += "]";
         return NRFunctionWithExplicitDependencies.
-        	getSymbol(new Name(name), new ArrayOfLocation(locs));
+        	getSymbol(new Name(name), new ImmutableArray<Location>(locs));
     }
     
-    private ArrayOfQuantifiableVariable[] instantiateBoundVariables(Term visited) {
+    private ImmutableArray<QuantifiableVariable>[] instantiateBoundVariables(Term visited) {
         boolean containsBoundVars = false;
-        ArrayOfQuantifiableVariable[] boundVars = 
-            new ArrayOfQuantifiableVariable[visited.arity()];
+        ImmutableArray<QuantifiableVariable>[] boundVars = 
+            new ImmutableArray[visited.arity()];
 
         for (int i = 0, arity = visited.arity(); i < arity; i++) {
-            final ArrayOfQuantifiableVariable vBoundVars =
+            final ImmutableArray<QuantifiableVariable> vBoundVars =
                 visited.varsBoundHere(i);
         
             final QuantifiableVariable[] newVars = (vBoundVars.size() > 0)? 
@@ -496,7 +502,7 @@ public class SyntacticalReplaceVisitor extends Visitor {
                     
             for (int j = 0, size = vBoundVars.size(); j < size; j++) {                 
                 containsBoundVars = true;
-                QuantifiableVariable boundVar = vBoundVars.getQuantifiableVariable(j);
+                QuantifiableVariable boundVar = vBoundVars.get(j);
                 if (boundVar instanceof SchemaVariable) {
                     final SortedSchemaVariable boundSchemaVariable = 
                         (SortedSchemaVariable) boundVar;
@@ -518,7 +524,7 @@ public class SyntacticalReplaceVisitor extends Visitor {
                 newVars[j] = boundVar;                    
             }
             boundVars[i] =  varsChanged.val() ?                     
-                    new ArrayOfQuantifiableVariable(newVars) : vBoundVars;                
+                    new ImmutableArray<QuantifiableVariable>(newVars) : vBoundVars;                
         }           
         
         if (!containsBoundVars) {
@@ -578,7 +584,7 @@ public class SyntacticalReplaceVisitor extends Visitor {
             
            // instantiate bound variables            
            varsChanged.setVal(false); // reset variable change flag
-           final ArrayOfQuantifiableVariable[] boundVars = 
+           final ImmutableArray<QuantifiableVariable>[] boundVars = 
                instantiateBoundVariables(visited);
             
             Term[] neededsubs = neededSubs(newOp.arity());
@@ -701,7 +707,7 @@ public class SyntacticalReplaceVisitor extends Visitor {
      * variables, or null if some schema variables could not be
      * instantiated
      */
-    public MapFromSchemaVariableToTerm getNewInstantiations () {
+    public ImmutableMap<SchemaVariable,Term> getNewInstantiations () {
 	return newInstantiations;
     }
 

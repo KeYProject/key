@@ -43,7 +43,7 @@ public class OldSimplifyModelGenerator implements DecProdModelGenerator {
     // time
     private HashSet<String> simplifyOutputs;
 
-    private ListOfString placeHoldersForClasses = SLListOfString.EMPTY_LIST;
+    private ImmutableList<String> placeHoldersForClasses = ImmutableSLList.<String>nil();
 
     public static int getModelLimit() {
 	return SimplifyModelGenerator.modelLimit;
@@ -51,7 +51,7 @@ public class OldSimplifyModelGenerator implements DecProdModelGenerator {
 
     public OldSimplifyModelGenerator(DecisionProcedureSimplify dps,
 	    Services serv, HashMap<Term, EquivalenceClass> term2class,
-	    SetOfTerm locations) {
+	    ImmutableSet<Term> locations) {
 
 	this.serv = serv;
 	this.term2class = term2class;
@@ -60,7 +60,7 @@ public class OldSimplifyModelGenerator implements DecProdModelGenerator {
 	initialCounterExample = res.getText();
 	this.simplifyOutputs = new HashSet<String>();
 	string2class = new HashMap<String, EquivalenceClass>();
-	IteratorOfTerm it = locations.iterator();
+	Iterator<Term> it = locations.iterator();
 	Vector<QuantifiableVariable> v = new Vector<QuantifiableVariable>();
 	SimplifyTranslation st = res.getTranslation();
 	try {

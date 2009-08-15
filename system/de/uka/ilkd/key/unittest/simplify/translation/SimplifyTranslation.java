@@ -9,41 +9,18 @@
 //
 package de.uka.ilkd.key.unittest.simplify.translation;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
-import java.util.Vector;
+import java.util.*;
 
 import org.apache.log4j.Logger;
 
-import de.uka.ilkd.key.collection.ListOfString;
-import de.uka.ilkd.key.collection.SLListOfString;
+import de.uka.ilkd.key.collection.ImmutableArray;
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.ConstrainedFormula;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Named;
-import de.uka.ilkd.key.logic.Semisequent;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermFactory;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.ldt.AbstractIntegerLDT;
-import de.uka.ilkd.key.logic.op.ArrayOfQuantifiableVariable;
-import de.uka.ilkd.key.logic.op.ArrayOp;
-import de.uka.ilkd.key.logic.op.AttributeOp;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.IUpdateOperator;
-import de.uka.ilkd.key.logic.op.IfThenElse;
-import de.uka.ilkd.key.logic.op.IteratorOfQuantifiableVariable;
-import de.uka.ilkd.key.logic.op.LogicVariable;
-import de.uka.ilkd.key.logic.op.Metavariable;
-import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.Op;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.ProgramMethod;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.logic.op.SetOfMetavariable;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.SyntacticalReplaceVisitor;
 import de.uka.ilkd.key.util.Debug;
@@ -161,7 +138,7 @@ public class SimplifyTranslation {
 
     private final HashSet<Metavariable> usedGlobalMv = new HashSet<Metavariable>();
 
-    private final SetOfMetavariable localMetavariables;
+    private final ImmutableSet<Metavariable> localMetavariables;
 
     private static final int ANTECEDENT = 0;
 
@@ -172,7 +149,7 @@ public class SimplifyTranslation {
 
     private HashMap<Term, StringBuffer> cacheForUninterpretedSymbols;
 
-    private ListOfString sortAxioms = SLListOfString.EMPTY_LIST;
+    private ImmutableList<String> sortAxioms = ImmutableSLList.<String>nil();
 
     private boolean quantifiersOccur = false;
 
@@ -210,7 +187,7 @@ public class SimplifyTranslation {
      *            the last branch.
      */
     public SimplifyTranslation(Sequent sequent, ConstraintSet cs,
-	    SetOfMetavariable localmv, Services services, boolean lightWeight)
+	    ImmutableSet<Metavariable> localmv, Services services, boolean lightWeight)
 	    throws SimplifyException {
 	// super(sequent, cs, localmv, services);
 	constraintSet = cs;
@@ -325,8 +302,7 @@ public class SimplifyTranslation {
 	}
 
 	// collect bound variables
-	final ArrayOfQuantifiableVariable[] vars = new ArrayOfQuantifiableVariable[t
-		.arity()];
+	final ImmutableArray<QuantifiableVariable>[] vars = new ImmutableArray[t.arity()];
 	for (int i = 0; i < t.arity(); i++) {
 	    vars[i] = t.varsBoundHere(i);
 	}
@@ -412,7 +388,7 @@ public class SimplifyTranslation {
 	boolean isForm = form.equals(divForm);
 	final int l = form.arity();
 	final Term[] subs = new Term[l];
-	final ArrayOfQuantifiableVariable[] qVars = new ArrayOfQuantifiableVariable[l];
+	final ImmutableArray<QuantifiableVariable>[] qVars = new ImmutableArray[l];
 	for (int i = 0; i < l; i++) {
 	    subs[i] = form.sub(i);
 	    if (isForm) {
@@ -435,7 +411,7 @@ public class SimplifyTranslation {
 	} else {
 	    final int l = term.arity();
 	    final Term[] subs = new Term[l];
-	    final ArrayOfQuantifiableVariable[] qVars = new ArrayOfQuantifiableVariable[l];
+	    final ImmutableArray<QuantifiableVariable>[] qVars = new ImmutableArray[l];
 	    for (int i = 0; i < l; i++) {
 		subs[i] = replaceTerm(term.sub(i), divTerm, newVar);
 		qVars[i] = term.varsBoundHere(i);
@@ -524,9 +500,9 @@ public class SimplifyTranslation {
 	    StringBuffer hb = new StringBuffer();
 	    Debug.assertTrue(term.arity() == 1);
 	    hb.append('(').append(op == Op.ALL ? ALL : EX).append(" (");
-	    ArrayOfQuantifiableVariable vars = term.varsBoundHere(0);
+	    ImmutableArray<QuantifiableVariable> vars = term.varsBoundHere(0);
 	    Debug.assertTrue(vars.size() == 1);
-	    String v = translateVariable(vars.getQuantifiableVariable(0))
+	    String v = translateVariable(vars.get(0))
 		    .toString();
 	    hb.append(v);
 	    Vector<QuantifiableVariable> cloneVars = (Vector<QuantifiableVariable>) quantifiedVars
@@ -538,7 +514,7 @@ public class SimplifyTranslation {
 	    // different from int
 
 	    hb.append("(").append(op == Op.ALL ? IMP : AND);
-	    Sort sort = vars.getQuantifiableVariable(0).sort();
+	    Sort sort = vars.get(0).sort();
 	    if (isSomeIntegerSort(sort))
 		sort = integerSort;
 	    hb.append("(" + getUniqueVariableName(sort) + " " + v + " )");
@@ -684,9 +660,9 @@ public class SimplifyTranslation {
      */
     private void collectQuantifiedVars(
 	    Vector<QuantifiableVariable> quantifiedVars, Term term) {
-	ArrayOfQuantifiableVariable vars = term.varsBoundHere(0);
+	ImmutableArray<QuantifiableVariable> vars = term.varsBoundHere(0);
 	for (int i = 0; i < vars.size(); ++i) {
-	    quantifiedVars.add(vars.getQuantifiableVariable(i));
+	    quantifiedVars.add(vars.get(i));
 	}
     }
 
@@ -829,7 +805,7 @@ public class SimplifyTranslation {
 	hb.append(')');
 
 	if (!sortAxioms.isEmpty() && quantifiersOccur) {
-	    String sar[] = sortAxioms.toArray();
+	    String sar[] = sortAxioms.toArray(new String[sortAxioms.size()]);
 	    String axioms = sar[0];
 	    for (int i = 1; i < sar.length; i++) {
 		axioms = "(" + AND + " " + axioms + " " + sar[i] + ")";
@@ -1002,7 +978,7 @@ public class SimplifyTranslation {
 	}
 	temp.append('|');
 	hb.append(temp);
-	IteratorOfQuantifiableVariable i;
+	Iterator<QuantifiableVariable> i;
 	for (i = term.freeVars().iterator(); i.hasNext();) {
 	    hb.append(' ');
 	    hb.append(translateVariable(i.next()));

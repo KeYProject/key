@@ -14,6 +14,8 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.ListIterator;
 
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.expression.literal.BooleanLiteral;
@@ -38,7 +40,7 @@ public class WhileInvRule extends AbstractMetaOperator {
         SchemaVariableFactory.createProgramSV(new ProgramElementName("inner_label"),
                                        ProgramSVSort.LABEL, false);
     /** list of the labels */
-    private ListOfSchemaVariable instantiations  = null;
+    private ImmutableList<SchemaVariable> instantiations  = null;
 
     /** list of breaks that lead to abrupt termination
      * of the loop to be transformed. Is initialised by
@@ -308,7 +310,7 @@ public class WhileInvRule extends AbstractMetaOperator {
      * Schemavariables in the loop that is why the found instantiations have to
      * be given.
      */
-    public ListOfSchemaVariable neededInstantiations(ProgramElement originalLoop,
+    public ImmutableList<SchemaVariable> neededInstantiations(ProgramElement originalLoop,
                                                      SVInstantiations svInst) {
         WhileInvariantTransformation w = 
 	    new WhileInvariantTransformation(originalLoop, 
@@ -317,7 +319,7 @@ public class WhileInvRule extends AbstractMetaOperator {
                                               ? null 
                                               : javaInfo.getServices());
         w.start();
-        instantiations = SLListOfSchemaVariable.EMPTY_LIST;
+        instantiations = ImmutableSLList.<SchemaVariable>nil();
         if (w.innerLabelNeeded()) {
             instantiations = instantiations.prepend(innerLabel);
         }

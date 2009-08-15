@@ -11,6 +11,7 @@
 
 package de.uka.ilkd.key.java.declaration;
 
+import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.reference.TypeReference;
@@ -70,7 +71,7 @@ public abstract class VariableDeclaration
      * @param parentIsInterfaceDeclaration a boolean set true iff
      * the parent is an InterfaceDeclaration 
      */
-    public VariableDeclaration(ArrayOfModifier mods, TypeReference typeRef,
+    public VariableDeclaration(ImmutableArray<Modifier> mods, TypeReference typeRef,
 			       boolean parentIsInterfaceDeclaration)
     { 
         super(mods);
@@ -141,7 +142,7 @@ public abstract class VariableDeclaration
      *      @return the variable specification array wrapper
      */
 
-    public abstract ArrayOfVariableSpecification getVariables();
+    public abstract ImmutableArray<? extends VariableSpecification> getVariables();
 
     /**
      * Test whether the declaration is final.

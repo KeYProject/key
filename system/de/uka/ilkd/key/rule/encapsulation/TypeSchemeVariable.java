@@ -10,6 +10,9 @@
 
 package de.uka.ilkd.key.rule.encapsulation;
 
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableSet;
+
 
 class TypeSchemeVariable implements TypeSchemeTerm {
     private final String name;
@@ -29,7 +32,7 @@ class TypeSchemeVariable implements TypeSchemeTerm {
     }
     
     
-    public SetOfTypeScheme getValueRange() {
+    public ImmutableSet<TypeScheme> getValueRange() {
         return defaultValue.getPossibilities();
     }
 
@@ -59,8 +62,8 @@ class TypeSchemeVariable implements TypeSchemeTerm {
     }
     
     
-    public SetOfTypeSchemeVariable getFreeVars() {
-        return SetAsListOfTypeSchemeVariable.EMPTY_SET.add(this);
+    public ImmutableSet<TypeSchemeVariable> getFreeVars() {
+        return DefaultImmutableSet.<TypeSchemeVariable>nil().add(this);
     }
     
     

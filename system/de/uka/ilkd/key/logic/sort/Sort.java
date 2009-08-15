@@ -11,6 +11,8 @@
 
 package de.uka.ilkd.key.logic.sort;
 
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.op.Equality;
@@ -25,8 +27,8 @@ public interface Sort extends Named {
      */
     Sort ANY      = new AbstractNonCollectionSort(new Name("any")) {
 
-        public SetOfSort extendsSorts() {            
-            return SetAsListOfSort.EMPTY_SET;
+        public ImmutableSet<Sort> extendsSorts() {            
+            return DefaultImmutableSet.<Sort>nil();
         }
 
         public boolean extendsTrans(Sort s) {        
@@ -49,7 +51,7 @@ public interface Sort extends Named {
      * undesired results when dealing with array- and intersection sorts!
      * @return the sorts of the predecessors of this sort
      */
-    SetOfSort extendsSorts();
+    ImmutableSet<Sort> extendsSorts();
 
     /**
      * returns true iff the given sort is a transitive supersort of this sort

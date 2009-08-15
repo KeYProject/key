@@ -10,10 +10,12 @@
 
 package de.uka.ilkd.key.rule.updatesimplifier;
 
+import de.uka.ilkd.key.collection.ImmutableArray;
+import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermFactory;
-import de.uka.ilkd.key.logic.op.ArrayOfQuantifiableVariable;
 import de.uka.ilkd.key.logic.op.Op;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 
 
 /**
@@ -22,7 +24,7 @@ import de.uka.ilkd.key.logic.op.Op;
 public class GuardSatisfiabilityFormulaBuilder extends GuardSimplifier {
 
     public GuardSatisfiabilityFormulaBuilder (Term condition,
-                                              ArrayOfQuantifiableVariable arMinimizedVars) {
+                                              ImmutableArray<QuantifiableVariable> arMinimizedVars) {
         super ( condition, arMinimizedVars );
 
         simplify ();
@@ -35,8 +37,9 @@ public class GuardSatisfiabilityFormulaBuilder extends GuardSimplifier {
         final UpdateSimplifierTermFactory utf = UpdateSimplifierTermFactory.DEFAULT;
         final TermFactory tf = utf.getBasicTermFactory ();
         
-        return tf.createQuantifierTerm ( Op.EX,
-                                         getMinimizedVars ().toArray (),
+        final ImmutableArray<QuantifiableVariable> minimizedVars = getMinimizedVars ();
+	return tf.createQuantifierTerm ( Op.EX,
+                                         minimizedVars,
                                          getCondition () );
     }
 }

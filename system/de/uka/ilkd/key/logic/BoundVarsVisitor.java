@@ -11,8 +11,11 @@
 
 package de.uka.ilkd.key.logic;
 
-import de.uka.ilkd.key.logic.op.SetAsListOfQuantifiableVariable;
-import de.uka.ilkd.key.logic.op.SetOfQuantifiableVariable;
+import java.util.Iterator;
+
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 
 /** 
  * Visitor traversing a term and collecting all variables that occur bound.
@@ -21,8 +24,8 @@ import de.uka.ilkd.key.logic.op.SetOfQuantifiableVariable;
  */
 public class BoundVarsVisitor extends Visitor{
   
-    private SetOfQuantifiableVariable bdVars =
-	SetAsListOfQuantifiableVariable.EMPTY_SET;  
+    private ImmutableSet<QuantifiableVariable> bdVars =
+	DefaultImmutableSet.<QuantifiableVariable>nil();  
 
  
     /**
@@ -39,8 +42,7 @@ public class BoundVarsVisitor extends Visitor{
         for (int i = 0, ar = visited.arity(); i<ar; i++) {
             for (int j = 0, boundVarsSize = 
                 visited.varsBoundHere(i).size(); j<boundVarsSize; j++) {
-                bdVars=bdVars.add(visited.varsBoundHere(i)
-                        .getQuantifiableVariable(j));	    
+                bdVars=bdVars.add(visited.varsBoundHere(i).get(j));	    
             }	  
         }
     }
@@ -49,7 +51,7 @@ public class BoundVarsVisitor extends Visitor{
      * visits a sequent
      */
     public void visit(Sequent visited) {        
-        final IteratorOfConstrainedFormula it = visited.iterator();
+        final Iterator<ConstrainedFormula> it = visited.iterator();
         while (it.hasNext()) {
             visit(it.next().formula());            
         }        
@@ -58,7 +60,7 @@ public class BoundVarsVisitor extends Visitor{
     /**
      * returns all the bound variables that have been stored
      */
-    public SetOfQuantifiableVariable getBoundVariables(){
+    public ImmutableSet<QuantifiableVariable> getBoundVariables(){
 	return bdVars;
     }
 

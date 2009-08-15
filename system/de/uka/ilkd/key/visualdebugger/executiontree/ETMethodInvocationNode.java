@@ -9,10 +9,10 @@ package de.uka.ilkd.key.visualdebugger.executiontree;
 
 import java.util.LinkedList;
 
-import de.uka.ilkd.key.logic.ListOfTerm;
+import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.ListOfProgramVariable;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
 
 /**
  * An instance of this specialised node class is used if a node in an execution
@@ -42,12 +42,12 @@ public class ETMethodInvocationNode extends ETNode {
      * the program variables representing the methods parameters TODO: check if
      * order is the same as in method signature and if yes comment it here!
      */
-    private final ListOfProgramVariable parameters;
+    private final ImmutableList<ProgramVariable> parameters;
 
     /**
      * the values of the parameters at the point of method invocation
      */
-    private final ListOfTerm values;
+    private final ImmutableList<Term> values;
 
     /**
      * creates an execution tree node referring to a method invocation
@@ -61,16 +61,16 @@ public class ETMethodInvocationNode extends ETNode {
      * @param methodReference
      *                TODO ????
      * @param parameters
-     *                ListOfProgramVariable enumerating the method parameters
+     *                IList<ProgramVariable> enumerating the method parameters
      * @param values
-     *                ListOfTerm enumerating the values of the paramters at the
+     *                IList<Term> enumerating the values of the paramters at the
      *                time when the method invocation occurred
      * @param parent
      *                the direct ancestor node of this node
      */
-    public ETMethodInvocationNode(ListOfTerm bc, LinkedList itNodes,
+    public ETMethodInvocationNode(ImmutableList<Term> bc, LinkedList itNodes,
             ProgramMethod method, Term methodReference,
-            ListOfProgramVariable parameters, ListOfTerm values, ETNode parent) {
+            ImmutableList<ProgramVariable> parameters, ImmutableList<Term> values, ETNode parent) {
         super(bc, itNodes, parent);
         this.method = method;
         this.methodReference = methodReference;
@@ -89,16 +89,16 @@ public class ETMethodInvocationNode extends ETNode {
      * @param methodReference
      *                TODO ????
      * @param parameters
-     *                ListOfProgramVariable enumerating the method parameters
+     *                IList<ProgramVariable> enumerating the method parameters
      * @param values
-     *                ListOfTerm enumerating the values of the paramters at the
+     *                IList<Term> enumerating the values of the paramters at the
      *                time when the method invocation occurred
      * @param parent
      *                the direct ancestor node of this node
      */
-    public ETMethodInvocationNode(ListOfTerm bc, ProgramMethod method,
-            Term methodReference, ListOfProgramVariable parameters,
-            ListOfTerm values, ETNode parent) {
+    public ETMethodInvocationNode(ImmutableList<Term> bc, ProgramMethod method,
+            Term methodReference, ImmutableList<ProgramVariable> parameters,
+            ImmutableList<Term> values, ETNode parent) {
         super(bc, parent);
         this.method = method;
         this.methodReference = methodReference;
@@ -124,7 +124,7 @@ public class ETMethodInvocationNode extends ETNode {
      * 
      * @return the program variables representing the method parameters
      */
-    public ListOfProgramVariable getParameters() {
+    public ImmutableList<ProgramVariable> getParameters() {
         return parameters;
     }
 
@@ -133,7 +133,7 @@ public class ETMethodInvocationNode extends ETNode {
      * 
      * @return the symbolic values of the method parameters
      */
-    public ListOfTerm getValues() {
+    public ImmutableList<Term> getValues() {
         return values;
     }
 

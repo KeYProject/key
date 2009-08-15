@@ -11,17 +11,15 @@
 
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
-import de.uka.ilkd.key.logic.IteratorOfTerm;
-import de.uka.ilkd.key.logic.SetAsListOfTerm;
-import de.uka.ilkd.key.logic.SetOfTerm;
+import java.util.Iterator;
+
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.IteratorOfQuantifiableVariable;
 import de.uka.ilkd.key.logic.op.Op;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.Quantifier;
-import de.uka.ilkd.key.logic.op.SetAsListOfQuantifiableVariable;
-import de.uka.ilkd.key.logic.op.SetOfQuantifiableVariable;
 
 class TriggerUtils {
 
@@ -40,15 +38,15 @@ class TriggerUtils {
      * @return set of terms that are that the term splite d through the operator
      *         <code>op</code>
      */
-    public static IteratorOfTerm iteratorByOperator(Term term, Operator op) {
+    public static Iterator<Term> iteratorByOperator(Term term, Operator op) {
         return setByOperator ( term, op ).iterator ();
     }
 
-    public static SetOfTerm setByOperator(Term term, Operator op) {
+    public static ImmutableSet<Term> setByOperator(Term term, Operator op) {
         if ( term.op () == op )
             return setByOperator ( term.sub ( 0 ), op )
                    .union ( setByOperator ( term.sub ( 1 ), op ) );
-        return SetAsListOfTerm.EMPTY_SET.add ( term );
+        return DefaultImmutableSet.<Term>nil().add ( term );
     }
 
 
@@ -59,10 +57,10 @@ class TriggerUtils {
      * @return a set of quantifiableVariable which are belonged to 
      *          both set0 and set1 have
      */
-    public static SetOfQuantifiableVariable intersect(SetOfQuantifiableVariable set0,
-                                                      SetOfQuantifiableVariable set1) {
-        SetOfQuantifiableVariable res = SetAsListOfQuantifiableVariable.EMPTY_SET;
-        final IteratorOfQuantifiableVariable it = set0.iterator ();
+    public static ImmutableSet<QuantifiableVariable> intersect(ImmutableSet<QuantifiableVariable> set0,
+                                                      ImmutableSet<QuantifiableVariable> set1) {
+        ImmutableSet<QuantifiableVariable> res = DefaultImmutableSet.<QuantifiableVariable>nil();
+        final Iterator<QuantifiableVariable> it = set0.iterator ();
         while ( it.hasNext () ) {
             final QuantifiableVariable el = it.next ();
             if ( set1.contains ( el ) ) res = res.add ( el );

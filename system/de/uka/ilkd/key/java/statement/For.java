@@ -11,8 +11,8 @@
 
 package de.uka.ilkd.key.java.statement;
 
+import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.*;
-import de.uka.ilkd.key.java.declaration.ArrayOfVariableSpecification;
 import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
 import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.visitor.Visitor;
@@ -26,8 +26,8 @@ import de.uka.ilkd.key.util.ExtList;
 public class For extends LoopStatement implements VariableScope {
 
     private static final 
-    ArrayOfVariableSpecification EMPTY_VARSPECS=
-    new ArrayOfVariableSpecification(new VariableSpecification[0]);
+    ImmutableArray<VariableSpecification> EMPTY_VARSPECS=
+    new ImmutableArray<VariableSpecification>(new VariableSpecification[0]);
 
     /**
      *      For.
@@ -96,9 +96,9 @@ public class For extends LoopStatement implements VariableScope {
         return true;
     }
 
-    public ArrayOfVariableSpecification getVariablesInScope() {
+    public ImmutableArray<VariableSpecification> getVariablesInScope() {
         if (inits != null) {
-            LoopInitializer li = inits.getInits().getLoopInitializer(0);
+            LoopInitializer li = inits.getInits().get(0);
             if (li instanceof LocalVariableDeclaration) {
                 return ((LocalVariableDeclaration)li).getVariables();
             }
@@ -108,12 +108,12 @@ public class For extends LoopStatement implements VariableScope {
 
     public VariableSpecification getVariableInScope(String name) {
         if (inits != null) {
-            LoopInitializer li = inits.getInits().getLoopInitializer(0);
+            LoopInitializer li = inits.getInits().get(0);
             if (li instanceof LocalVariableDeclaration) {
-                ArrayOfVariableSpecification vars =
+                ImmutableArray<VariableSpecification> vars =
                     ((LocalVariableDeclaration)li).getVariables();
                 for (int i = 0, s = vars.size(); i < s; i += 1) {
-                    VariableSpecification v = vars.getVariableSpecification(i);
+                    VariableSpecification v = vars.get(i);
                     if (name.equals(v.getName())) {
                         return v;
                     }

@@ -10,8 +10,13 @@
 
 package de.uka.ilkd.key.rule.soundness;
 
-import de.uka.ilkd.key.java.*;
-import de.uka.ilkd.key.java.abstraction.ArrayOfKeYJavaType;
+import de.uka.ilkd.key.collection.ImmutableArray;
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.java.ContextStatementBlock;
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.Statement;
+import de.uka.ilkd.key.java.StatementBlock;
+import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.expression.literal.IntLiteral;
 import de.uka.ilkd.key.java.expression.operator.Equals;
 import de.uka.ilkd.key.java.statement.Else;
@@ -19,7 +24,9 @@ import de.uka.ilkd.key.java.statement.If;
 import de.uka.ilkd.key.java.statement.Then;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.op.IProgramVariable;
+import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.ExtList;
@@ -44,8 +51,8 @@ public class StatementSkolemSymbolFactory extends SkolemSymbolTacletFactory {
      */
     public ProgramSVProxy createStatementSymbol
         (ProgramElementName     p_name,
-         ListOfIProgramVariable p_influencingPVs,
-         ArrayOfStatement       p_jumpTable) {
+         ImmutableList<IProgramVariable> p_influencingPVs,
+         ImmutableArray<Statement>       p_jumpTable) {
 	return createStatementSymbolWithoutSelector
 	    (p_name,
 	     p_influencingPVs.append(createSelectorVariable()),
@@ -59,8 +66,8 @@ public class StatementSkolemSymbolFactory extends SkolemSymbolTacletFactory {
      */
     public ProgramSVProxy createStatementSymbolWithoutSelector
         (ProgramElementName     p_name,
-         ListOfIProgramVariable p_influencingPVs,
-         ArrayOfStatement       p_jumpTable) {
+         ImmutableList<IProgramVariable> p_influencingPVs,
+         ImmutableArray<Statement>       p_jumpTable) {
         Debug.assertTrue ( checkSelectorVariable ( p_influencingPVs ),
                            "Last program variable argument is not an " +
                            "admissible selector variable" );
@@ -77,9 +84,9 @@ public class StatementSkolemSymbolFactory extends SkolemSymbolTacletFactory {
 
     private ProgramSVProxy createStatementSymbol
 	( ProgramElementName      p_name,
-	  ArrayOfKeYJavaType      p_influencingPVTypes,
-	  ArrayOfIProgramVariable p_influencingPVs,
-	  ArrayOfStatement        p_jumpTable ) {
+	  ImmutableArray<KeYJavaType>      p_influencingPVTypes,
+	  ImmutableArray<IProgramVariable> p_influencingPVs,
+	  ImmutableArray<Statement>        p_jumpTable ) {
 	
 	final ProgramSVSkolemStatement sk =
 	    new ProgramSVSkolemStatement ( p_name,
@@ -130,21 +137,21 @@ public class StatementSkolemSymbolFactory extends SkolemSymbolTacletFactory {
 	ProgramElementName      name   = new ProgramElementName
 	    ( "" + p.op ().getProgramElementName () + "_sep" );
 
-	ArrayOfIProgramVariable pvs    = createSVsForInfluencingPVs ( p );
+	ImmutableArray<IProgramVariable> pvs    = createSVsForInfluencingPVs ( p );
 
-	final IProgramVariable  sel    = pvs.getIProgramVariable(pvs.size()-1);
+	final IProgramVariable  sel    = pvs.get (pvs.size()-1);
 
 	Statement[]             findJT =
 	    createJumpCascade ( p.getJumpTable ().size (), p_jumpCascade, sel );
 
 	p_findProxy.add ( new ProgramSVProxy ( p.op (),
 					       pvs,
-					       new ArrayOfStatement ( findJT ) ) );
+					       new ImmutableArray<Statement> ( findJT ) ) );
 	p_rwProxy  .add ( createStatementSymbol
 	                      ( name,
                                 p.op ().getInfluencingPVTypes (),
                                 pvs,
-                                new ArrayOfStatement ( new Statement [ 0 ] ) ) );
+                                new ImmutableArray<Statement> ( new Statement [ 0 ] ) ) );
     }
 
     /**
@@ -198,7 +205,7 @@ public class StatementSkolemSymbolFactory extends SkolemSymbolTacletFactory {
     }
 
     private boolean checkSelectorVariable
-        ( ListOfIProgramVariable p_influencingPVs ) {
+        ( ImmutableList<IProgramVariable> p_influencingPVs ) {
          while ( p_influencingPVs.size () > 1 )
              p_influencingPVs = p_influencingPVs.tail ();
          return p_influencingPVs.size () != 0 &&
