@@ -5,13 +5,6 @@
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
-//This file is part of KeY - Integrated Deductive Software Design
-//Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
-//                      Universitaet Koblenz-Landau, Germany
-//                      Chalmers University of Technology, Sweden
-//
-//The KeY system is protected by the GNU General Public License. 
-//See LICENSE.TXT for details.
 //
 //
 
@@ -44,7 +37,7 @@ import de.uka.ilkd.key.proof.OpReplacer;
 /**
  * Standard implementation of the OperationContract interface.
  */
-public class OperationContractImpl implements OperationContract {
+public final class OperationContractImpl implements OperationContract {
     
     protected static final TermBuilder TB = TermBuilder.DF;
     protected static final SignatureVariablesFactory SVN 
@@ -376,6 +369,59 @@ public class OperationContractImpl implements OperationContract {
                                          originalResultVar,
                                          originalExcVar,
                                          newAtPreFunctions);
+    }
+    
+    
+    public OperationContract replaceProgramMethod(ProgramMethod pm, 
+	    					  Services services) {
+        return new OperationContractImpl(name,
+                			 displayName,
+                			 pm,
+                			 modality,
+                			 originalPre,
+                			 originalPost,
+                			 originalModifies,
+                			 originalSelfVar,
+                			 originalParamVars,
+                			 originalResultVar,
+                			 originalExcVar,
+                			 originalAtPreFunctions);	
+    }
+    
+    
+    public OperationContract addPre(FormulaWithAxioms addedPre,
+		    		    ParsableVariable selfVar, 
+		    		    ListOfParsableVariable paramVars,
+		    		    Services services) {
+	//replace in addedPre the variables used for self and parameters
+	Map <Operator, Operator> map = new LinkedHashMap<Operator,Operator>();
+	if(selfVar != null) {
+	    map.put(selfVar, originalSelfVar);
+	}
+	if(paramVars != null) {
+	    IteratorOfParsableVariable it1 = paramVars.iterator();
+	    IteratorOfParsableVariable it2 = originalParamVars.iterator();
+	    while(it1.hasNext()) {
+		assert it2.hasNext();
+		map.put(it1.next(), it2.next());
+	    }
+	}
+	OpReplacer or = new OpReplacer(map);
+	addedPre = or.replace(addedPre);
+	
+	//create new contract
+        return new OperationContractImpl(name,
+		 			 displayName,
+		 			 programMethod,
+		 			 modality,
+		 			 originalPre.conjoin(addedPre),
+		 			 originalPost,
+		 			 originalModifies,
+		 			 originalSelfVar,
+		 			 originalParamVars,
+		 			 originalResultVar,
+		 			 originalExcVar,
+		 			 originalAtPreFunctions);
     }
 
     

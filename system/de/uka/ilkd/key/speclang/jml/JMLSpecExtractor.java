@@ -382,7 +382,7 @@ public class JMLSpecExtractor implements SpecExtractor {
                 if(!pm.isConstructor()) {
                     specCase.addAssignable(new PositionedString("\\nothing"));
                 } else {
-                    specCase.addAssignable(new PositionedString("this.*"));
+                    specCase.addAssignable(new PositionedString("\\nothing"));//TODO: should be "this.*", but this is not yet supported
                 }
             }
 

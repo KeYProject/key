@@ -168,17 +168,6 @@ public class InteractiveProver {
     }
 
 
-    private int getMaxStepCount () {
-        int rv = mediator ().getMaxAutomaticSteps();
-        
-        if ( Main.batchMode ) {
-            //Allow much more steps in batchMode then in regular mode.
-            rv *= 100;
-        }
-        
-        return rv;
-    }
-
     private long getTimeout() {
         return mediator().getAutomaticApplicationTimeout();
     }
@@ -219,7 +208,7 @@ public class InteractiveProver {
             interactive = false;
         }
         
-        applyStrategy.start ( proof, goals, getMaxStepCount (), getTimeout() );
+        applyStrategy.start ( proof, goals, mediator ().getMaxAutomaticSteps(), getTimeout() );
     }
     
     /** stops the execution of rules */

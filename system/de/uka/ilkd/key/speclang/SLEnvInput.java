@@ -27,11 +27,25 @@ import de.uka.ilkd.key.gui.configuration.GeneralSettings;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.ProgramElement;
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.abstraction.Field;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.abstraction.ListOfField;
+import de.uka.ilkd.key.java.abstraction.ListOfKeYJavaType;
+import de.uka.ilkd.key.java.abstraction.SLListOfField;
+import de.uka.ilkd.key.java.abstraction.SLListOfKeYJavaType;
+import de.uka.ilkd.key.java.declaration.ClassDeclaration;
+import de.uka.ilkd.key.java.declaration.InterfaceDeclaration;
+import de.uka.ilkd.key.java.recoderext.ConstructorNormalformBuilder;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.visitor.JavaASTCollector;
+import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.ListOfProgramMethod;
+import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.init.AbstractEnvInput;
 import de.uka.ilkd.key.proof.init.ModStrategy;
 import de.uka.ilkd.key.proof.init.ProofInputException;
@@ -44,7 +58,12 @@ import de.uka.ilkd.key.speclang.ocl.OCLSpecExtractor;
 /** 
  * EnvInput for standalone specification language front ends.
  */
-public class SLEnvInput extends AbstractEnvInput {
+public final class SLEnvInput extends AbstractEnvInput {
+    
+    private static final String INIT_NAME 
+    	= ConstructorNormalformBuilder.CONSTRUCTOR_NORMALFORM_IDENTIFIER;
+    private static final TermBuilder TB = TermBuilder.DF;
+    
         
     //-------------------------------------------------------------------------
     //constructors
@@ -149,6 +168,78 @@ public class SLEnvInput extends AbstractEnvInput {
     }
     
     
+    /**
+     * Converts a contract for a constructor into a contract for <init>.
+     */
+    private OperationContract transformConstructorContract(
+	    					OperationContract contract,
+	    					Services services) {
+	final JavaInfo javaInfo = services.getJavaInfo();
+	final ProgramMethod pm = contract.getProgramMethod();
+	final KeYJavaType kjt = pm.getContainerType();
+	assert pm.isConstructor();
+
+	//determine corresponding <init> method
+	ListOfKeYJavaType sig = SLListOfKeYJavaType.EMPTY_LIST;
+	for(int i = 0, n = pm.getParameterDeclarationCount(); i < n; i++) {
+	    sig = sig.append(pm.getParameterType(i));
+	}
+	final ProgramMethod initMethod = javaInfo.getProgramMethod(kjt, 
+							           INIT_NAME, 
+							           sig, 
+							           kjt);
+	assert initMethod != null;
+	
+	//collect all fields of current class and its superclasses
+	ListOfKeYJavaType sups = services.getJavaInfo().getAllSupertypes(kjt);
+	ListOfField fields = SLListOfField.EMPTY_LIST;	
+	for(KeYJavaType sup : sups) {
+	    if(!(sup.getJavaType() instanceof ClassDeclaration)) {
+		continue;
+	    }
+	    fields = fields.prepend(javaInfo.getAllFields(
+		    			(ClassDeclaration) sup.getJavaType()));
+	}
+	
+	//build precondition corresponding to <prepare> (including superclasses)	
+	Term implicitPre = TB.tt();
+	LogicVariable selfVar = new LogicVariable(new Name("self"), 
+		                                  kjt.getSort());
+	Term selfTerm = TB.var(selfVar);
+	for(Field f : fields) {
+	    ProgramVariable pv = (ProgramVariable) f.getProgramVariable();
+	    if(pv.isImplicit() || pv.isStatic()) {
+		continue;
+	    }
+	    Term defaultValue 
+	    	= services.getTypeConverter()
+	                  .convertToLogicElement(f.getType().getDefaultValue());
+	    Term fieldHasDefaultValue = TB.equals(TB.dot(selfTerm, pv), 
+		                                  defaultValue);
+	    implicitPre = TB.and(implicitPre, fieldHasDefaultValue);
+	}
+
+	return contract.replaceProgramMethod(initMethod, services)
+	               .addPre(new FormulaWithAxioms(implicitPre), 
+	        	       selfVar, 
+	        	       null, 
+	        	       services);
+    }
+    
+    
+    
+    private SetOfOperationContract transformConstructorContracts(
+	    				SetOfOperationContract contracts,
+	    				Services services) {
+	SetOfOperationContract result = SetAsListOfOperationContract.EMPTY_SET;
+	for(OperationContract contract : contracts) {
+	    result = result.add(transformConstructorContract(contract, 
+		    					     services));
+	}
+	return result;
+    }
+    
+    
     private void createSpecs(SpecExtractor specExtractor) 
             throws ProofInputException {
         JavaInfo javaInfo 
@@ -158,16 +249,16 @@ public class SLEnvInput extends AbstractEnvInput {
        
         //sort types alphabetically (necessary for deterministic names)
         final Set<KeYJavaType> allKeYJavaTypes = javaInfo.getAllKeYJavaTypes();
-        for (KeYJavaType keYJavaType : allKeYJavaTypes) {
-            if(keYJavaType.getJavaType() == null) {
-                System.out.println(keYJavaType);
-            }
-        }
         final KeYJavaType[] kjts = 
             sortKJTs(allKeYJavaTypes.toArray(new KeYJavaType[allKeYJavaTypes.size()]));
         
         //create specifications for all types
         for(KeYJavaType kjt : kjts) {
+            if(!(kjt.getJavaType() instanceof ClassDeclaration 
+        	  || kjt.getJavaType() instanceof InterfaceDeclaration)) {
+        	continue;
+            }
+            
             //class invariants
             specRepos.addClassInvariants(
                         specExtractor.extractClassInvariants(kjt));
@@ -192,6 +283,19 @@ public class SLEnvInput extends AbstractEnvInput {
                         specRepos.setLoopInvariant(inv);
                     }
                 }
+            }
+            
+            //constructor contracts (add implicit preconditions, 
+            //move to <init> method)
+            ListOfProgramMethod constructors = javaInfo.getConstructors(kjt);
+            for(ProgramMethod constructor : constructors) {
+        	assert constructor.isConstructor();
+        	SetOfOperationContract contracts 
+			= specExtractor.extractOperationContracts(constructor);
+        	contracts = transformConstructorContracts(
+        					contracts, 
+        					initConfig.getServices());
+        	specRepos.addOperationContracts(contracts);
             }
         }
         

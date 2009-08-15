@@ -5,13 +5,6 @@
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
-//This file is part of KeY - Integrated Deductive Software Design
-//Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
-//                      Universitaet Koblenz-Landau, Germany
-//                      Chalmers University of Technology, Sweden
-//
-//The KeY system is protected by the GNU General Public License. 
-//See LICENSE.TXT for details.
 //
 //
 
@@ -48,6 +41,15 @@ public interface ClassInvariant {
      * the receiver object.
      */
     public FormulaWithAxioms getClosedInv(Services services);
+    
+    /**
+     * Returns the invariant formula with implicit all-quantification over
+     * all objects, excluding the object held by the passed variable.
+     */
+    public FormulaWithAxioms getClosedInvExcludingOne(
+	    					ParsableVariable excludedVar, 
+	                                        Services services);
+    
   
     /**
      * Returns the invariant formula without implicit all-quantification over

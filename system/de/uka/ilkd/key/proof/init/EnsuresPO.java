@@ -25,6 +25,7 @@ import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.expression.literal.NullLiteral;
 import de.uka.ilkd.key.java.expression.operator.CopyAssignment;
 import de.uka.ilkd.key.java.expression.operator.New;
+import de.uka.ilkd.key.java.recoderext.ConstructorNormalformBuilder;
 import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
 import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.java.statement.Branch;
@@ -46,6 +47,9 @@ import de.uka.ilkd.key.speclang.*;
  * The "Ensures" proof obligation. 
  */
 public abstract class EnsuresPO extends AbstractPO {
+    
+    private static final String INIT_NAME 
+        =  ConstructorNormalformBuilder.CONSTRUCTOR_NORMALFORM_IDENTIFIER;    
     
     protected final ProgramMethod programMethod;
     protected final Modality modality;
@@ -164,13 +168,16 @@ public abstract class EnsuresPO extends AbstractPO {
     }
     
     
-    private Term buildAssumedInvs() throws ProofInputException {
+    private Term buildAssumedInvs(ProgramVariable selfVar) throws ProofInputException {
         //inReachableState
         Term result = TB.func(javaInfo.getInReachableState());
         
         //assumed invariants
-        for(ClassInvariant assumedInv : assumedInvs) {
-            result = TB.and(result, translateInv(assumedInv));
+        if(programMethod.getName().equals(INIT_NAME)) {
+            result = TB.and(result, translateInvsExcludingOne(assumedInvs,
+        	    					      selfVar));
+        } else {
+            result = TB.and(result, translateInvs(assumedInvs));
         }
         
         //implicit invariants as taclets
@@ -193,7 +200,7 @@ public abstract class EnsuresPO extends AbstractPO {
         Term result = null;
         
         //build conjunction of invariants
-        Term assumedInvsTerm = buildAssumedInvs();
+        Term assumedInvsTerm = buildAssumedInvs(selfVar);
         result = assumedInvsTerm;
         
         //build disjunction of preconditions

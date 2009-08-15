@@ -5,13 +5,6 @@
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General Public License.
-// See LICENSE.TXT for details.
 //
 //
 
@@ -90,15 +83,15 @@ public abstract class AbstractPO implements ProofOblInput {
     //helper methods for subclasses
     //-------------------------------------------------------------------------
 
-    protected ProgramVariable buildSelfVarAsProgVar() {
+    protected final ProgramVariable buildSelfVarAsProgVar() {
         return new LocationVariable(new ProgramElementName("self"), selfKJT);
     }
 
-    protected LogicVariable buildSelfVarAsLogicVar() {
+    protected final LogicVariable buildSelfVarAsLogicVar() {
         return new LogicVariable(new ProgramElementName("self"), selfKJT.getSort());
     }
 
-    protected ListOfProgramVariable buildParamVars(ProgramMethod programMethod) {
+    protected final ListOfProgramVariable buildParamVars(ProgramMethod programMethod) {
         int numPars = programMethod.getParameterDeclarationCount();
         ListOfProgramVariable result = SLListOfProgramVariable.EMPTY_LIST;
 
@@ -116,7 +109,7 @@ public abstract class AbstractPO implements ProofOblInput {
     }
 
 
-    protected ProgramVariable buildResultVar(ProgramMethod programMethod) {
+    protected final ProgramVariable buildResultVar(ProgramMethod programMethod) {
         final KeYJavaType resultKJT = programMethod.getKeYJavaType();
         if(resultKJT != null) {
             final ProgramElementName resultPEN = new ProgramElementName("result");
@@ -126,7 +119,7 @@ public abstract class AbstractPO implements ProofOblInput {
     }
 
 
-    protected ProgramVariable buildExcVar() {
+    protected final ProgramVariable buildExcVar() {
         final KeYJavaType excType
         	= javaInfo.getTypeByClassName("java.lang.Throwable");
         return new LocationVariable(new ProgramElementName("exc"), excType);      
@@ -136,9 +129,9 @@ public abstract class AbstractPO implements ProofOblInput {
     /**
      * Translates a precondition out of an operation contract. 
      */
-    protected Term translatePre(OperationContract contract,
-                                ParsableVariable selfVar,
-                                ListOfParsableVariable paramVars) 
+    protected final Term translatePre(OperationContract contract,
+                                      ParsableVariable selfVar,
+                                      ListOfParsableVariable paramVars) 
     		throws ProofInputException {
         FormulaWithAxioms fwa = contract.getPre(selfVar, paramVars, services);
         axioms.putAll(fwa.getAxioms());
@@ -149,12 +142,12 @@ public abstract class AbstractPO implements ProofOblInput {
     /**
      * Translates a postcondition out of an operation contract. 
      */
-    protected Term translatePost(OperationContract contract,
-                                 ParsableVariable selfVar,
-                                 ListOfParsableVariable paramVars,
-                                 ParsableVariable resultVar,
-                                 ParsableVariable excVar,
-                                 /*inout*/ Map<Operator, Function/*(atPre)*/> atPreFunctions) 
+    protected final Term translatePost(OperationContract contract,
+                                       ParsableVariable selfVar,
+                                       ListOfParsableVariable paramVars,
+                                       ParsableVariable resultVar,
+                                       ParsableVariable excVar,
+                                       /*inout*/ Map<Operator, Function/*(atPre)*/> atPreFunctions) 
     		throws ProofInputException {
         FormulaWithAxioms fwa = contract.getPost(selfVar, 
         					 paramVars, 
@@ -170,10 +163,10 @@ public abstract class AbstractPO implements ProofOblInput {
     /**
      * Translates a modifies clause out of an operation contract.
      */
-    protected Term translateModifies(OperationContract contract,
-                                     Term targetTerm,
-                                     ParsableVariable selfVar,
-                                     ListOfParsableVariable paramVars) 
+    protected  final Term translateModifies(OperationContract contract,
+                                            Term targetTerm,
+                                            ParsableVariable selfVar,
+                                            ListOfParsableVariable paramVars) 
     		throws ProofInputException {
         SetOfLocationDescriptor locations = contract.getModifies(selfVar,
                                                                  paramVars,
@@ -190,7 +183,7 @@ public abstract class AbstractPO implements ProofOblInput {
     /**
      * Translates a class invariant. 
      */
-    protected Term translateInv(ClassInvariant inv) 
+    protected final Term translateInv(ClassInvariant inv) 
     		throws ProofInputException {
         final FormulaWithAxioms fwa = inv.getClosedInv(services);
         axioms.putAll(fwa.getAxioms());
@@ -199,9 +192,9 @@ public abstract class AbstractPO implements ProofOblInput {
     
     
     /**
-     * Translates a list of class invariants. 
+     * Translates a set of class invariants. 
      */
-    protected Term translateInvs(SetOfClassInvariant invs) 
+    protected final Term translateInvs(SetOfClassInvariant invs) 
     		throws ProofInputException {
 	Term result = TB.tt();
 	for (final ClassInvariant inv : invs) {
@@ -212,10 +205,39 @@ public abstract class AbstractPO implements ProofOblInput {
     
     
     /**
+     * Translates a class invariant such that the passed variable is excluded 
+     */
+    protected final Term translateInvExcludingOne(ClassInvariant inv, 
+	    			                  ParsableVariable excludedVar) 
+    		throws ProofInputException {
+        final FormulaWithAxioms fwa = inv.getClosedInvExcludingOne(excludedVar, 
+        							   services);
+        axioms.putAll(fwa.getAxioms());
+        return fwa.getFormula();
+    }
+    
+    
+    /**
+     * Translates a set of class invariants such that the passed variable is 
+     * excluded 
+     */
+    protected final Term translateInvsExcludingOne(
+	    				SetOfClassInvariant invs, 
+                			ParsableVariable excludedVar) 
+    		throws ProofInputException {
+	Term result = TB.tt();
+	for (final ClassInvariant inv : invs) {
+	    result = TB.and(result, translateInvExcludingOne(inv, excludedVar));
+	}
+	return result;
+    }
+    
+    
+    /**
      * Translates a class invariant as an open formula. 
      */
-    protected Term translateInvOpen(ClassInvariant inv, 
-	    			    ParsableVariable selfVar) 
+    protected final Term translateInvOpen(ClassInvariant inv, 
+	    			          ParsableVariable selfVar) 
     		throws ProofInputException {
         FormulaWithAxioms fwa = inv.getOpenInv(selfVar, services);
         axioms.putAll(fwa.getAxioms());
@@ -223,8 +245,11 @@ public abstract class AbstractPO implements ProofOblInput {
     }
     
     
-    protected Term translateInvsOpen(SetOfClassInvariant invs, 
-	    			     ParsableVariable selfVar) 
+    /**
+     * Translates a set of class invariants as an open formula. 
+     */
+    protected final Term translateInvsOpen(SetOfClassInvariant invs, 
+	    		                   ParsableVariable selfVar) 
     		throws ProofInputException {
 	Term result = TB.tt();
 	for (final ClassInvariant inv : invs) {
@@ -234,7 +259,7 @@ public abstract class AbstractPO implements ProofOblInput {
     }
     
     
-    protected ListOfParsableVariable toPV(ListOfProgramVariable vars) {
+    protected  final ListOfParsableVariable toPV(ListOfProgramVariable vars) {
 	ListOfParsableVariable result = SLListOfParsableVariable.EMPTY_LIST;
 	for (final ProgramVariable pv : vars) {
 	    result = result.append(pv);
@@ -246,18 +271,18 @@ public abstract class AbstractPO implements ProofOblInput {
     /**
      * Replaces operators in a term by other operators with the same signature.
      */
-    protected Term replaceOps(Map<? extends Operator, ? extends Operator> map, Term term) {      
+    protected final Term replaceOps(Map<? extends Operator, ? extends Operator> map, Term term) {      
         return new OpReplacer(map).replace(term);
     }
 
 
-    protected void registerInNamespaces(ProgramVariable pv) {
+    protected final void registerInNamespaces(ProgramVariable pv) {
         if(pv != null) {
             initConfig.progVarNS().add(pv);
         }
     }
 
-    protected void registerInNamespaces(Function f) {
+    protected final void registerInNamespaces(Function f) {
         if(f != null) {
             services.getNameRecorder().addProposal(f.name());
             initConfig.funcNS().add(f);
@@ -265,7 +290,7 @@ public abstract class AbstractPO implements ProofOblInput {
     }
 
 
-    protected void registerInNamespaces(ListOfProgramVariable pvs) {
+    protected final void registerInNamespaces(ListOfProgramVariable pvs) {
         final IteratorOfProgramVariable it = pvs.iterator();
         while(it.hasNext()) {
             initConfig.progVarNS().add(it.next());
@@ -273,7 +298,7 @@ public abstract class AbstractPO implements ProofOblInput {
     }
 
 
-    protected void registerInNamespaces(/*in*/ Map<Operator, Function> atPreFunctions) {
+    protected final void registerInNamespaces(/*in*/ Map<Operator, Function> atPreFunctions) {
         for (final Function atPreF : atPreFunctions.values()) {
             initConfig.funcNS().add(atPreF); 
         }
@@ -285,7 +310,7 @@ public abstract class AbstractPO implements ProofOblInput {
     //methods of ProofOblInput interface
     //-------------------------------------------------------------------------
     
-    public String name() {
+    public final String name() {
         return name;
     }
     
