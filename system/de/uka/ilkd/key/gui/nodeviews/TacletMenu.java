@@ -146,7 +146,7 @@ class TacletMenu extends JMenu {
 	if (!builtInList.isEmpty()) {
 	    addSeparator();	
 	    Iterator<BuiltInRule> it = builtInList.iterator();
-	    while (it.hasNext()) {                
+	    while (it.hasNext()) {
 		addBuiltInRuleItem(it.next(), control);
 	    }
 	}

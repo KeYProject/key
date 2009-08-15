@@ -17,6 +17,8 @@
 
 package de.uka.ilkd.key.smt;
 
+
+import java.awt.event.ActionEvent;
 import java.util.Iterator;
 
 import de.uka.ilkd.key.collection.ImmutableList;
@@ -126,10 +128,10 @@ public class DecProcRunner extends SwingWorker {
                         proof.env().registerRule(simpRule,
                                 de.uka.ilkd.key.proof.mgt.AxiomJustification.INSTANCE);
 
-                main.setStatusLine("Running external decision procedure: " +
-                        simpRule.displayName(), 99*totalGoals); 
-                
-                final Iterator<Goal> goals = proof.openGoals().iterator();
+                        main.setStatusLine("Running external decision procedure: " +
+                                simpRule.displayName(), 99*totalGoals); 
+                        
+                        final Iterator<Goal> goals = proof.openGoals().iterator();
 
                         while (goals.hasNext()) {    
                             BuiltInRuleApp birApp = new BuiltInRuleApp(simpRule, null, 
