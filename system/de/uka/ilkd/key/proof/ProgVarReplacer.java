@@ -206,7 +206,7 @@ public class ProgVarReplacer {
 		}
 
 		if(changedSomething) {
-		    ImmutableArray<ProgramElement> newA = new ImmutableArray(array);
+		    ImmutableArray<ProgramElement> newA = new ImmutableArray<ProgramElement>(array);
 		    result = result.replace(sv, newA);
 		}
 	    } else if(ie instanceof TermInstantiation) {
