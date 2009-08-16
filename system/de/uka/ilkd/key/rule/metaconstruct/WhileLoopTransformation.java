@@ -220,16 +220,16 @@ public class WhileLoopTransformation extends JavaASTVisitor {
 	    needInnerLabel = true;
 	    needOuterLabel = true;
         } else {
-            if (buffer instanceof ImmutableArray/*<Statement>*/){
-                ImmutableArray<Statement> aope = (ImmutableArray<Statement>)buffer;
+            if (buffer instanceof ProgramElement) {
+                walk((ProgramElement)buffer);                
+            } else {
+                final ImmutableArray<Statement> aope = (ImmutableArray<Statement>)buffer;
                 for (int iterate=0; iterate<aope.size();iterate++){
                     ProgramElement pe = aope.get(iterate);
 	            if (pe != null) {
                         walk(pe);
                     }
                 }
-            } else {
-                walk((ProgramElement)buffer);                
             }
         }
 

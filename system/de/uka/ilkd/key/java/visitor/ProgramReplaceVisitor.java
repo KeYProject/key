@@ -83,8 +83,6 @@ public class ProgramReplaceVisitor extends CreatingASTVisitor {
 	addChild(x);
     }
 
-
-    
     public void performActionOnSchemaVariable(SchemaVariable sv) {
 	final Object inst = svinsts.getInstantiation(sv);
 	if (inst instanceof ProgramElement) {
@@ -92,7 +90,10 @@ public class ProgramReplaceVisitor extends CreatingASTVisitor {
 	    Debug.out("ProgramReplace:", inst);
 	    addChild((ProgramElement)inst);
 	} else if (inst instanceof ImmutableArray/*<ProgramElement>*/) {
-	    addChildren((ImmutableArray<ProgramElement>)inst);
+	    final ImmutableArray<ProgramElement> instArray = (ImmutableArray<ProgramElement>)inst;
+	    // the assertion ensures the intended instanceof check from above
+	    assert instArray.size() == 0 || instArray.last() instanceof ProgramElement;
+	    addChildren(instArray);
 	} else if (inst instanceof Term
 		   && ((Term)inst).op() instanceof ProgramInLogic) {
 	    addChild(services.getTypeConverter().convertToProgramElement((Term)inst));
