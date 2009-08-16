@@ -85,29 +85,14 @@ endif
 ifeq ($(JAVAC),ajc)
   OPTIONS=$(COMMON_OPTIONS) -nowarn -classpath $(ASPECTJRTPATH):$(CLASSPATH):$(GENERATED_SRC_PATH):$(BINARYPATH):.
 else
-  ifeq ($(JAVAC),ejc)      
-    OPTIONS=$(COMMON_OPTIONS) -warn:uselessTypeCheck,localHiding,fieldHiding,tasks\(TODO\|HACK\|%%%\)  -source 1.5 -target 1.5 -classpath $(JAVA_HOME)/jre/lib/rt.jar:$(CLASSPATH):$(GENERATED_SRC_PATH):$(BINARYPATH):.
-  else 
-    OPTIONS=$(COMMON_OPTIONS) -J-Xmx512m -nowarn -source 1.5 -target 1.5 -classpath $(CLASSPATH):$(GENERATED_SRC_PATH):$(BINARYPATH):.
-  endif
+  OPTIONS=$(COMMON_OPTIONS) -J-Xmx512m -nowarn -source 1.5 -target 1.5 -classpath $(CLASSPATH):$(GENERATED_SRC_PATH):$(BINARYPATH):.
 endif
 
-
-#for JavaCC 3.0:
 JAVACC_MAIN=javacc
-#for JavaCC 2.0:
-#JAVACC_MAIN=COM.sun.labs.javacc.Main
-
 
 ## nice source links
 JAVADOC=javadoc
 JAVADOC_OPTIONS=-use -quiet -breakiterator -linksource -J-Xmx512m
-
-## KeY config
-PLUG_IN_FILTER?="(none)"
-export PLUG_IN_FILTER
-COMPILE_GF?=--with-gf
-export COMPILE_GF
 
 
 ANTLR_PARSER= \
@@ -252,7 +237,6 @@ clean:
 	@rm -f error.msg
 	@rm -f critical.msg
 	@rm -f warning.msg
-	@rm -f gf.msg
 	@rm -f -r ./qwe
 
 .PHONY: realclean
@@ -293,8 +277,7 @@ else
 	@rm -f argfile.aspects
 	@touch argfile.aspects
 endif	
-	@cat argfile.normal argfile.other argfile.aspects |\
-              (grep -v $(PLUG_IN_FILTER) || true) | sort -u > argfile
+	@cat argfile.normal argfile.other argfile.aspects | sort -u > argfile
 	@$(JAVAC) $(OPTIONS) @argfile 2>>error.msg || true
 	@./success
 
