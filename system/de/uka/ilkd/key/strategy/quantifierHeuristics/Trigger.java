@@ -14,7 +14,7 @@ import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 
-abstract class Trigger {
+public interface Trigger {
     
     /**
      * @param targetTerm

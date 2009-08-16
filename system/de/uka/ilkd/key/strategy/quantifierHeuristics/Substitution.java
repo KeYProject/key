@@ -105,7 +105,7 @@ class Substitution {
             try {
                 t = applySubst ( var, instance, t );
             } catch (TermCreationException e) {
-                final Sort quantifiedVarSort = var.sort ();
+                final Sort quantifiedVarSort = var.sort ();                
                 if ( !instance.sort ().extendsTrans ( quantifiedVarSort ) ) {
                     final CastFunctionSymbol quantifiedVarSortCast =
                         ( (AbstractSort)quantifiedVarSort ).getCastSymbol ();

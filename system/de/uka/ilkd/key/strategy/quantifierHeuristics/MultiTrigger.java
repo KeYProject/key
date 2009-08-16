@@ -16,8 +16,6 @@
 ///
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
-
-
 import java.util.Iterator;
 
 import de.uka.ilkd.key.collection.*;
@@ -25,8 +23,8 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 
-public class MultiTrigger extends Trigger {
-    
+class MultiTrigger implements Trigger {
+
     private final ImmutableSet<Trigger> triggers;
 
     private final ImmutableSet<QuantifiableVariable> qvs;
@@ -106,20 +104,21 @@ public class MultiTrigger extends Trigger {
 	}
 	return new Substitution(resMap);
     }
-    
 
-    
     public boolean equals(Object arg0) {
-        if (!(arg0 instanceof MultiTrigger)) return false;
+	if (!(arg0 instanceof MultiTrigger))
+	    return false;
 
-        final MultiTrigger a = (MultiTrigger) arg0;
-        return a.triggers.equals(triggers);
+	final MultiTrigger a = (MultiTrigger) arg0;
+	return a.triggers.equals(triggers);
     }
+
     public int hashCode() {
-        return triggers.hashCode();
+	return triggers.hashCode();
     }
+
     public String toString() {
-        return "" + triggers;
+	return "" + triggers;
     }
 
     public Term getTriggerTerm() {
@@ -127,4 +126,3 @@ public class MultiTrigger extends Trigger {
     }
 
 }
-     

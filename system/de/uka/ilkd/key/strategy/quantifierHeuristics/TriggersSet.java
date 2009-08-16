@@ -395,10 +395,9 @@ class TriggersSet {
         /**
          * find all possible combination of <code>ts</code>. Once a
          * combination of elements contains all variables of this clause,
-         * it will be used to contruct the multi-trigger which will be 
+         * it will be used to construct the multi-trigger which will be 
          * add to triggers set    
-         * @param ts elements of multi-triggers at the begining
-         * @param i
+         * @param ts elements of multi-triggers at the beginning
          * @return a set of triggers
          */
         private Set<ImmutableSet<Trigger>> setMultiTriggers(Iterator<Trigger> ts) {

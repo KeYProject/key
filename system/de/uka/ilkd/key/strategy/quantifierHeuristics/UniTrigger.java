@@ -29,7 +29,7 @@ import de.uka.ilkd.key.logic.op.Quantifier;
 import de.uka.ilkd.key.util.LRUCache;
 
 
-class UniTrigger extends Trigger {
+class UniTrigger implements Trigger {
   
     private final Term trigger;
     private final ImmutableSet<QuantifiableVariable> uqvs;
