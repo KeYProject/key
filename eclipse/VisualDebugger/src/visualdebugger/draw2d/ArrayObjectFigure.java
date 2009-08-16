@@ -8,7 +8,10 @@ import org.eclipse.draw2d.*;
 import org.eclipse.draw2d.geometry.Rectangle;
 import org.eclipse.swt.widgets.Display;
 
-import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.visualdebugger.VisualDebugger;
 import de.uka.ilkd.key.visualdebugger.statevisualisation.SymbolicArrayObject;
 import de.uka.ilkd.key.visualdebugger.statevisualisation.SymbolicObject;
@@ -21,14 +24,14 @@ public class ArrayObjectFigure extends ObjectFigure {
 
     private Label[] indexConstrColumns;
 
-    private LinkedList sos;
+    private LinkedList<SymbolicObject> sos;
 
     public ArrayObjectFigure(SymbolicArrayObject sao, MouseListener listener,
             SymbolicObjectDiagram symbState,boolean pre) {
         super(sao, listener, symbState,pre);        
         this.sos = symbState.getSymbolicObjects();
         createConstr(listener);
-        SetOf<Term> indexes = sao.getAllIndexTerms();
+        ImmutableSet<Term> indexes = sao.getAllIndexTerms();
         indexes=indexes.union(sao.getAllPostIndex());
 
         indexColumns = new IndexLabel[ indexes.size()];
@@ -55,8 +58,8 @@ public class ArrayObjectFigure extends ObjectFigure {
     }
 
 
-    private SetOf<Term> disj(SetOf<Term> s1, SetOf<Term> s2){
-        SetOf<Term> result = SetAsListOf.<Term>nil();
+    private ImmutableSet<Term> disj(ImmutableSet<Term> s1, ImmutableSet<Term> s2){
+        ImmutableSet<Term> result = DefaultImmutableSet.<Term>nil();
         for(Iterator<Term> it=s1.iterator();it.hasNext();){
             Term t = it.next();
             if(s2.contains(t))
@@ -67,8 +70,8 @@ public class ArrayObjectFigure extends ObjectFigure {
     }
 
 
-    private SetOf<Term> exclude(SetOf<Term> s1, SetOf<Term> s2){
-        SetOf<Term> result = s1;
+    private ImmutableSet<Term> exclude(ImmutableSet<Term> s1, ImmutableSet<Term> s2){
+        ImmutableSet<Term> result = s1;
         for(Iterator<Term> it=s2.iterator();it.hasNext();){
             Term t = it.next();
             if(s1.contains(t))
@@ -81,17 +84,17 @@ public class ArrayObjectFigure extends ObjectFigure {
 
 
     private void createConstr(MouseListener listener) {
-        LinkedList indexTermPos = 
+        LinkedList<ImmutableSet<Term>> indexTermPos = 
             ((SymbolicArrayObject)this.getSymbolicObject()).
             getPossibleIndexTermConfigurations();
         if (indexTermPos.size()<=1)
             return;
-        SetOf<Term> cut= SetAsListOf.<Term>nil();
+        ImmutableSet<Term> cut= DefaultImmutableSet.<Term>nil();
         if (indexTermPos.size()>0){
-            Iterator it = indexTermPos.iterator();
-            cut = (SetOfTerm)it.next();
+            Iterator<ImmutableSet<Term>> it = indexTermPos.iterator();
+            cut = it.next();
             while(it.hasNext()){
-                cut = disj(cut, (SetOfTerm)it.next());
+                cut = disj(cut, it.next());
             }
         }
 
@@ -101,9 +104,9 @@ public class ArrayObjectFigure extends ObjectFigure {
         indexConstrColumns = new Label[ indexTermPos.size()];
         final IFigure compColumns = new Figure();
         int i =0;
-        for(Iterator it=indexTermPos.iterator();it.hasNext();){
+        for(Iterator<ImmutableSet<Term>> it=indexTermPos.iterator();it.hasNext();){
 
-            final SetOf<Term> indexConstr = (SetOfTerm)it.next();
+            final ImmutableSet<Term> indexConstr = it.next();
             // System.out.println("Term asfasfdagsfdasgfdsdf "+pv);
             indexConstrColumns[ i ] = new IndexConstraintLabel((SymbolicArrayObject)so,indexConstr,exclude(indexConstr, cut),sos);
             indexConstrColumns[ i ].setTextAlignment(PositionConstants.CENTER);
@@ -140,8 +143,8 @@ public class ArrayObjectFigure extends ObjectFigure {
     }
 
 
-    public  HashMap getIndexY(){
-        HashMap result=new HashMap();
+    public  HashMap<Term, Integer> getIndexY(){
+        HashMap<Term, Integer> result=new HashMap<Term, Integer>();
         for(int i=0;i<indexColumns.length;i++){
             Term index = indexColumns[i].getIndex();
             Rectangle bounds = indexColumns[i].getBounds().getCopy();
@@ -178,7 +181,7 @@ public class ArrayObjectFigure extends ObjectFigure {
         private boolean selected=false;
         private String text;
 
-        public IndexLabel(SymbolicArrayObject so, Term index, LinkedList sos){
+        public IndexLabel(SymbolicArrayObject so, Term index, LinkedList<SymbolicObject> sos){
             super();
             this.so = so ;
             this.pv = index;
@@ -191,13 +194,13 @@ public class ArrayObjectFigure extends ObjectFigure {
             this.setLayoutManager(layout);
 
 
-            text = VisualDebugger.getVisualDebugger().prettyPrint(ImmSLList.<Term>nil().append(index),sos,so);
+            text = VisualDebugger.getVisualDebugger().prettyPrint(ImmutableSLList.<Term>nil().append(index),sos,so);
             final Label l= new Label(text);
             l.setLabelAlignment(PositionConstants.CENTER);
             this.add(l);
             l.setBorder(new LineBorder(ColorConstants.black));
             if (so.getAllPostIndex().contains(index)){
-                this.add(new Label(" := "+VisualDebugger.getVisualDebugger().prettyPrint(ImmSLList.<Term>nil().append(so.getValueTermForIndex(index)),sos,so)));
+                this.add(new Label(" := "+VisualDebugger.getVisualDebugger().prettyPrint(ImmutableSLList.<Term>nil().append(so.getValueTermForIndex(index)),sos,so)));
             }
 
 
@@ -240,10 +243,10 @@ public class ArrayObjectFigure extends ObjectFigure {
 
     public class IndexConstraintLabel extends Label{
         private final SymbolicArrayObject so;
-        private final SetOf<Term> con;
+        private final ImmutableSet<Term> con;
         private boolean selected=false;
 
-        public IndexConstraintLabel(SymbolicArrayObject so, SetOf<Term> index,SetOf<Term> index2,LinkedList sos){
+        public IndexConstraintLabel(SymbolicArrayObject so, ImmutableSet<Term> index,ImmutableSet<Term> index2,LinkedList<SymbolicObject> sos){
             super();           
             this.so = so ;
             this.con = index;
@@ -253,7 +256,7 @@ public class ArrayObjectFigure extends ObjectFigure {
             setFont( Display.getCurrent().getSystemFont() );
         }
 
-        public SetOf<Term> getIndexConstraints() {
+        public ImmutableSet<Term> getIndexConstraints() {
             return con;
         }
 

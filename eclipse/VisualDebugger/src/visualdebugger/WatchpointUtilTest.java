@@ -2,6 +2,7 @@ package visualdebugger;
 
 import java.util.LinkedList;
 
+import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -22,7 +23,8 @@ public class WatchpointUtilTest {
         ETNode etn = init();
         System.out.println("This ET has "+getETasList(etn).size() +" nodes.");
         WatchpointUtil.getAllLeafETNodes(etn);
-        Node[] array = getNode().getProofTreeNodes().toArray();
+        final ImmutableList<Node> proofTreeNodes = getNode().getProofTreeNodes();
+	Node[] array = proofTreeNodes.toArray(new Node[proofTreeNodes.size()]);
 
         System.out.println("Array.length: " + array.length);
         WatchpointUtil.getLeafNodesInETNode(array);

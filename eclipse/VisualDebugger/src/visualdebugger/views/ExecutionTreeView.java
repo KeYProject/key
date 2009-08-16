@@ -1,9 +1,6 @@
 package visualdebugger.views;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.Map;
+import java.util.*;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.draw2d.*;
@@ -31,6 +28,7 @@ import org.eclipse.swt.layout.RowData;
 import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.*;
 import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.List;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.PartInitException;
@@ -38,11 +36,15 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.ViewPart;
 import org.eclipse.ui.texteditor.MarkerUtilities;
 
+import visualdebugger.Activator;
 import visualdebugger.VBTBuilder;
 import visualdebugger.draw2d.*;
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.gui.IMain;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.proof.*;
+import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.smt.DecProcRunner;
 import de.uka.ilkd.key.unittest.ModelGenerator;
 import de.uka.ilkd.key.util.ProgressMonitor;
@@ -565,7 +567,7 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
                 // make sure that all information available is contained in the
                 // root node
                 currentETRootNode = null;
-                final IList<Goal> goals = getSubtreeGoalsForETNode(((SourceElementFigure) ExecutionTreeView.this.selected)
+                final ImmutableList<Goal> goals = getSubtreeGoalsForETNode(((SourceElementFigure) ExecutionTreeView.this.selected)
                         .getETNode());
                 vd.run(goals);
             }
@@ -582,7 +584,7 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
             public void widgetSelected(SelectionEvent event) {
                 ETNode node = ((SourceElementFigure) ExecutionTreeView.this.selected)
                         .getETNode();
-                final IList<Goal> goals = getSubtreeGoalsForETNode(node);
+                final ImmutableList<Goal> goals = getSubtreeGoalsForETNode(node);
                 vd.stepInto(goals);
             }
         });
@@ -595,7 +597,7 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
             }
 
             public void widgetSelected(SelectionEvent event) {
-                final IList<Goal> goals = getSubtreeGoalsForETNode(((SourceElementFigure) ExecutionTreeView.this.selected)
+                final ImmutableList<Goal> goals = getSubtreeGoalsForETNode(((SourceElementFigure) ExecutionTreeView.this.selected)
                         .getETNode());
                 vd.stepOver(goals);
             }
@@ -939,11 +941,11 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
      * 
      * @return the subtree goals for et node
      */
-    private IList<Goal> getSubtreeGoalsForETNode(ETNode etNode) {
+    private ImmutableList<Goal> getSubtreeGoalsForETNode(ETNode etNode) {
         final ITNode[] itNodes = etNode.getITNodesArray();
-        IList<Goal> goals = ImmSLList.<Goal>nil();
+        ImmutableList<Goal> goals = ImmutableSLList.<Goal>nil();
         for (int i = 0; i < itNodes.length; i++) {
-            final IList<Goal> g = vd.getMediator().getProof().getSubtreeGoals(
+            final ImmutableList<Goal> g = vd.getMediator().getProof().getSubtreeGoals(
                     (itNodes[i].getNode()));
             goals = goals.prepend(g);
         }
@@ -1205,7 +1207,7 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
             public void run() {
                 if (vd.getMediator().getProof() == null)
                     return;
-                IList<Node> nodes = toList(vd.getMediator().getProof().root()
+                ImmutableList<Node> nodes = toList(vd.getMediator().getProof().root()
                         .leavesIterator());
                 VBTBuilder builder = new VBTBuilder(nodes,
                         ModelGenerator.SIMPLIFY);
@@ -1458,16 +1460,15 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
      */
     private void setBranchConditionText(ETNode etn) {
 
-        if (etn != null && etn.getSimplifiedBc() != null
+        final ImmutableList<Term> simplifiedBc = etn.getSimplifiedBc();
+	if (etn != null && simplifiedBc != null
                 && etn.getParent() != null
                 && etn.getParent().getChildrenList().size() > 1) {
 
-            final Term[] bc = etn.getSimplifiedBc().toArray();
-            final String[] termsString = new String[bc.length];
-
-            for (int i = 0; i < bc.length; i++) {
-                termsString[i] = (vd.prettyPrint(bc[i]));
-
+            final String[] termsString = new String[simplifiedBc.size()];
+            int i = 0;
+            for (Term bc : simplifiedBc) {
+                termsString[i++] = vd.prettyPrint(bc);
             }
 
             bcListControl.setItems(termsString);
@@ -1499,9 +1500,9 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
 
         if (ln.getExpression() != null) {
             SourceElementId id = ln.getExpression();
-            Expression expr = visualdebugger.Activator.getDefault()
+            Expression expr = Activator.getDefault()
                     .getExpression(id);
-            ICompilationUnit unit = visualdebugger.Activator.getDefault()
+            ICompilationUnit unit = Activator.getDefault()
                     .getCompilationUnit(id);
             try {
                 IEditorPart ed = JavaUI.openInEditor(unit);
@@ -1608,8 +1609,8 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
      * 
      * @return the list of node
      */
-    private IList<Node> toList(Iterator<Node> it) {
-        IList<Node> result = ImmSLList.<Node>nil();
+    private ImmutableList<Node> toList(Iterator<Node> it) {
+        ImmutableList<Node> result = ImmutableSLList.<Node>nil();
         while (it.hasNext()) {
             result = result.append(it.next());
 

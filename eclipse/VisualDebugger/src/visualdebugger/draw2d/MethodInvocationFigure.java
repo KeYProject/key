@@ -1,13 +1,13 @@
 package visualdebugger.draw2d;
 
+import java.util.Iterator;
+
 import org.eclipse.draw2d.*;
 import org.eclipse.swt.graphics.Color;
 
-import de.uka.ilkd.key.logic.IteratorOfTerm;
-import de.uka.ilkd.key.logic.IList;
-import de.uka.ilkd.key.logic.SLListOfTerm;
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.IteratorOfProgramVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.visualdebugger.VisualDebugger;
 import de.uka.ilkd.key.visualdebugger.executiontree.ETMethodInvocationNode;
@@ -84,7 +84,7 @@ public class MethodInvocationFigure extends Figure implements DrawableNode {
 
         // etNode.getMethod().get
         st += etNode.getMethod().getProgramElementName().toString() + "(";
-        IList<Term> param = etNode.getValues();
+        ImmutableList<Term> param = etNode.getValues();
 
         for (Iterator<Term> it = param.iterator(); it.hasNext();) {
             st += VisualDebugger.getVisualDebugger().prettyPrint(it.next());
@@ -120,7 +120,7 @@ public class MethodInvocationFigure extends Figure implements DrawableNode {
                 toolTip += p.toString()
                         + " := "
                         + VisualDebugger.getVisualDebugger().prettyPrint(
-                                ImmSLList.<Term>nil().append(val)) + "\n";
+                                ImmutableSLList.<Term>nil().append(val)) + "\n";
             }
         }
         this.setToolTip(new Label(toolTip));
