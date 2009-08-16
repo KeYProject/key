@@ -1,19 +1,20 @@
 package de.uka.ilkd.key.collection;
 
 import java.lang.reflect.Array;
-import java.util.Collections;
 import java.util.Iterator;
 
-/** a NON-DESTRUCTIVE single linked list for elements of type <T>. The
- *    costs of the  
- * different operations are O(1) for prepending one element,
- * O(m) for prepending a list with m elements, 
+/**
+ * Simple implementation of a non-destructive (unmodifiable) list. The list implementation
+ * allows list sharing of sublists.
+ *
+ * The costs of the different operations are O(1) for prepending one element,
+ * O(m) for prepending a list with m elements,
  * O(n) for appending an element to this list(size n)
  * O(n) for appending a list with m elements to this list (size n)
  * head() has O(1)
  * tail has O(1)
  * size has O(1)
- * ATTENTION appending and prepending and element can be realized 
+ * ATTENTION appending and prepending and element can be realized
  * with O(1) costs (see Osaka) then having tail and head with
  * amortized O(1). This will be done later (if necessary).
  */
@@ -47,7 +48,6 @@ public abstract class ImmutableSLList<T> implements ImmutableList<T> {
 	return rev;
     }
 
-
     /**
      * Convert the list to a Java array (O(n))
      */
@@ -69,18 +69,18 @@ public abstract class ImmutableSLList<T> implements ImmutableList<T> {
 
     /** prepends array (O(n))
      * @param array the array of the elements to be prepended
-     * @return IList<T> the new list  
+     * @return IList<T> the new list
      */
     public ImmutableList<T> prepend(T[] array) {
 	return prepend ( array, array.length );
     }
 
 
-    /** 
+    /**
      * prepends the first <code>n</code> elements of an array (O(n))
      * @param array the array of the elements to be prepended
-     * @param n an int specifying the number of elements to be prepended 
-     * @return IList<T> the new list  
+     * @param n an int specifying the number of elements to be prepended
+     * @return IList<T> the new list
      */
     protected ImmutableList<T> prepend(T[] array, int n) {
 	ImmutableList<T> res = this;
@@ -89,10 +89,10 @@ public abstract class ImmutableSLList<T> implements ImmutableList<T> {
 	return res;
     }
 
-    /** 
+    /**
      * first <code>n</code> elements of the list are truncated
      * @param n an int specifying the number of elements to be truncated
-     * @return IList<T> this list without the first <code>n</code> elements  
+     * @return IList<T> this list without the first <code>n</code> elements
      */
     public ImmutableList<T> take(int n) {
 	if ( n < 0 || n > size () )
@@ -111,10 +111,10 @@ public abstract class ImmutableSLList<T> implements ImmutableList<T> {
     static class Cons<S> extends ImmutableSLList<S> {
 
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = 2377644880764534935L;
-	
+
 	/** the first element */
 	private final S element;
 	/** reference to the next element (equiv.to the tail of list) */
@@ -122,42 +122,39 @@ public abstract class ImmutableSLList<T> implements ImmutableList<T> {
 	/** size of the list */
 	private final int size;
 	/** caches the hashcode */
-	private final int hashCode;
-	
+	private int hashCode = -1;
+
 	/** new list with only one element
 	 * @param element the only element in list
 	 */
 	Cons(S element) {
 	    this.element=element;
-	    cons=nil();
+	    cons = nil();
 	    size=1;
-	    hashCode=(element == null ? 0 : element.hashCode()); 
 	}
-	    
+
 	/** constructs a new list with element as head and cons as tail
 	 * @param element a <T> stored in the head element of the list
-	 * @param cons tail of the list 
+	 * @param cons tail of the list
 	 */
 	Cons(S element, ImmutableSLList<S> cons) {
 	    this.element=element;
 	    this.cons=cons;
 	    size=cons.size()+1;
-	    hashCode=(element == null ? 0 : element.hashCode()) + 
-		31*cons.hashCode(); 
 	}
 
 	/** creates a new list with element as head and the
 	 * momentan list as tail (O(1))
 	 * @param e the <T> to be prepended
-	 * @return IList<T> the new list  
+	 * @return IList<T> the new list
 	 */
 	public ImmutableList<S> prepend(S e) {
 	    return new Cons<S>(e, this);
 	}
-	
+
 	/** prepends list (O(n))
 	 * @param list the IList<T> to be prepended
-	 * @return IList<T> the new list  
+	 * @return IList<T> the new list
 	 */
 	public ImmutableList<S> prepend(ImmutableList<S> list) {
 	    if (list.isEmpty()) {
@@ -166,13 +163,13 @@ public abstract class ImmutableSLList<T> implements ImmutableList<T> {
 	    ImmutableList<S> result = this;
 	    for (S el : list.reverse()) {
 		result = result.prepend(el);
-	    }	    
+	    }
 	    return result;
 	}
 
 	/** appends element at end (non-destructive) (O(n))
 	 * @param e the <T> to be prepended
-	 * @return IList<T> the new list  
+	 * @return IList<T> the new list
 	 */
 	public ImmutableList<S> append(S e) {
 	    return new Cons<S>(e).prepend(this);
@@ -198,28 +195,35 @@ public abstract class ImmutableSLList<T> implements ImmutableList<T> {
 	public S head() {
 	    return element;
 	}
-	
+
 	/** @return IList<T> tail of the list */
 	public ImmutableList<S> tail() {
 	    return cons;
 	}
-	
+
 	/**
 	 * hashcode for collections, implemented same algorithm as
-         * java.util.Collections use 	 
+         * java.util.Collections use
 	 * @return the hashcode of the list
          */
 	public int hashCode() {
+	    if (hashCode == -1) {
+		hashCode = (element == null ? 0 : element.hashCode()) +
+		31*cons.hashCode();
+		if (hashCode == -1) {
+		    hashCode = 2;
+		}
+	    }
 	    return hashCode;
 	}
 
-	
+
 	/** @return iterator through list */
 	public Iterator<S> iterator() {
 	    return new SLListIterator<S>(this);
 	}
-	
-	/** @return int the number of elements in list */    
+
+	/** @return int the number of elements in list */
 	public int size() {
 	    return size;
 	}
@@ -244,7 +248,7 @@ public abstract class ImmutableSLList<T> implements ImmutableList<T> {
 
 
 	/** removes first occurrences of obj (O(n))
-	 * @return new list 
+	 * @return new list
 	 */
 	public ImmutableList<S> removeFirst(S obj) {
 	    S[]       res            = (S[]) new Object [ size () ];
@@ -263,13 +267,13 @@ public abstract class ImmutableSLList<T> implements ImmutableList<T> {
 		}
 	    }
 	    return this;
-	    
-	}
-	
 
-	/** 
+	}
+
+
+	/**
 	 * removes all occurrences of obj (O(n))
-	 * @return new list 
+	 * @return new list
 	 */
 	public ImmutableList<S> removeAll(S obj) {
 	    S[]       res            = (S[]) new Object [ size () ];
@@ -304,8 +308,8 @@ public abstract class ImmutableSLList<T> implements ImmutableList<T> {
 	    while ( p.hasNext() ) {
 	        S ep = p.next();
 	        S eq = q.next();
-	        if ( ( ep == null && eq != null ) 
-		    || ( ep != null && !ep.equals(eq) ) ) 
+	        if ( ( ep == null && eq != null )
+		    || ( ep != null && !ep.equals(eq) ) )
 		  return false;
 	    }
 	    return true;
@@ -320,7 +324,7 @@ public abstract class ImmutableSLList<T> implements ImmutableList<T> {
 		if (it.hasNext()) {
 		    str.append(",");
 		}
-	    }	
+	    }
 	    str.append("]");
 	    return str.toString();
 	}
@@ -333,7 +337,7 @@ public abstract class ImmutableSLList<T> implements ImmutableList<T> {
 	private ImmutableList<T> list;
 
 	/** constructs the iterator
-	 *@param list the IList<T> that has to be iterated 
+	 *@param list the IList<T> that has to be iterated
 	 */
 	public SLListIterator(ImmutableList<T> list) {
 	    this.list = list;
@@ -347,19 +351,19 @@ public abstract class ImmutableSLList<T> implements ImmutableList<T> {
 	}
 
 	/** @return true iff there are unseen elements in the list
-	 */ 
+	 */
 	public boolean hasNext() {
 	    return !list.isEmpty();
-	}    
+	}
 
-	/** 
+	/**
 	 * throws an unsupported operation exception as removing elements
 	 * is not allowed on immutable lists
 	 */
 	public void remove() {
 	    throw new UnsupportedOperationException("Removing elements via an iterator" +
 	    " is not supported for immutable datastructures.");
-	} 
+	}
 
     }
 
@@ -369,23 +373,23 @@ public abstract class ImmutableSLList<T> implements ImmutableList<T> {
 	private final static ImmutableList<?> NIL = new NIL<Object>();
 
 	/**
-	 * serial id 
+	 * serial id
 	 */
 	private static final long serialVersionUID = -4070450212306526804L;
 
 	private final Iterator<S> iterator =  new SLNilListIterator();
-	
+
 	private NIL() {
 	}
-    
+
 	/** the NIL list is a singleton. Deserialization builds
 	 * a new NIL object that has to be replaced by the singleton.
-         */ 
-        private Object readResolve() 
+         */
+        private Object readResolve()
             throws java.io.ObjectStreamException {
             return nil();
 	}
-	
+
 	public int size() {
 	    return 0;
 	}
@@ -393,7 +397,7 @@ public abstract class ImmutableSLList<T> implements ImmutableList<T> {
 	public boolean equals ( Object o ) {
 	    return o instanceof NIL;
 	}
-	
+
 	public int hashCode() {
 	    return 0;
 	}
@@ -417,7 +421,7 @@ public abstract class ImmutableSLList<T> implements ImmutableList<T> {
 	public ImmutableList<S> append(S[] array) {
 	    return prepend ( array );
 	}
-	    
+
 	public boolean contains(S obj) {
 	    return false;
 	}
@@ -425,11 +429,11 @@ public abstract class ImmutableSLList<T> implements ImmutableList<T> {
 	public boolean isEmpty() {
 	    return true;
 	}
-	    
+
 	public Iterator<S> iterator() {
 	    return iterator;
 	}
-	    
+
 	public S head() {
 	    return null;
 	}
@@ -445,40 +449,42 @@ public abstract class ImmutableSLList<T> implements ImmutableList<T> {
 	public ImmutableList<S> removeFirst(S obj) {
 	    return this;
 	}
-	    
+
 	public String toString() {
 	    return "[]";
 	}
 
 	/** iterates through the a none destructive NIL list */
 	private class SLNilListIterator implements Iterator<S> {
-	    	
-	    /** 
+
+	    /**
 	     * creates the NIL list iterator
 	     */
 	    public SLNilListIterator() {
 	    }
-	    
+
 	    /** @return next element in list */
 	    public S next() {
 		return null;
 	    }
 
-	    /** 
+	    /**
 	     * @return true iff there are unseen elements in the list
-	     */ 
+	     */
 	    public boolean hasNext() {
 		return false;
 	    }
-	    
-	    /** 
+
+	    /**
 	     * throws an unsupported operation exception as removing elements
 	     * is not allowed on immutable lists
 	     */
 	    public void remove() {
 	    	throw new UnsupportedOperationException("Removing elements via an iterator" +
 	    	" is not supported for immutable datastructures.");
-	    }     
+	    }
 	}
+
+
     }
 }
