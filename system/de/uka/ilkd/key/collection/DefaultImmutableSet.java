@@ -3,15 +3,15 @@ package de.uka.ilkd.key.collection;
 import java.util.Iterator;
 
 
-/** 
+/**
  * implementation of a persistent set using the SLListOf<T> implementation
- * with all its implications (means e.g. O(n) for adding an 
- * element and so on. 
+ * with all its implications (means e.g. O(n) for adding an
+ * element and so on.
  */
 public class DefaultImmutableSet<T> implements ImmutableSet<T> {
 
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = -5000602574000532257L;
 
@@ -26,28 +26,28 @@ public class DefaultImmutableSet<T> implements ImmutableSet<T> {
     }
 
 
-    private Integer hashCode = null;
+    private int hashCode = -1;
 
     private DefaultImmutableSet() {
 	elementList = ImmutableSLList.<T>nil();
     }
 
-    /** creates new set with one element 
-     * @param element of type <T> the new Set contains 
+    /** creates new set with one element
+     * @param element of type <T> the new Set contains
      */
     DefaultImmutableSet(T element) {
 	elementList = (ImmutableList<T>) (ImmutableSLList.nil()).prepend(element);
     }
 
-    /** creates new set containg all elements from the elementList 
+    /** creates new set containg all elements from the elementList
      * PRECONDITION: elementList has no duplicates
-     * @param elementList IList<T> contains all elements of the new Set 
+     * @param elementList IList<T> contains all elements of the new Set
      */
     DefaultImmutableSet(ImmutableList<T> elementList) {
 	this.elementList=elementList;
     }
 
-    /** adds an element 
+    /** adds an element
      * @param element of type <T> that has to be added to this set
      */
     public ImmutableSet<T> add(T element) {
@@ -98,7 +98,7 @@ public class DefaultImmutableSet<T> implements ImmutableSet<T> {
 	    return false;
 	} else {
 	    Iterator<T> it=iterator();
-	    while (it.hasNext()) {		
+	    while (it.hasNext()) {
 		if (!s.contains(it.next())) {
 		    return false;
 		}
@@ -110,7 +110,7 @@ public class DefaultImmutableSet<T> implements ImmutableSet<T> {
     /** @return int the cardinality of the set */
     public int size() {
 	return elementList.size();
-    }    
+    }
 
     /** @return true iff the set is empty */
     public boolean isEmpty() {
@@ -136,8 +136,6 @@ public class DefaultImmutableSet<T> implements ImmutableSet<T> {
 	return (o.subset(this) && this.subset(o));
     }
 
-    
-    
     /**
      * Convert the set to a Java array (O(n))
      */
@@ -146,17 +144,13 @@ public class DefaultImmutableSet<T> implements ImmutableSet<T> {
     }
 
     public int hashCode() {
-	if ( hashCode == null ) {
-	    int h = 0;
-	    Iterator<T> p = iterator();
-	    while ( p.hasNext() ) {
-		h += p.next().hashCode();
+	if ( hashCode == -1 ) {
+	    hashCode = elementList.hashCode() * 7;
+	    if (hashCode == -1) {
+		hashCode = 2;
 	    }
-
-	    hashCode = new Integer (h);
 	}
-
-	return hashCode.intValue ();
+	return hashCode;
     }
 
 
@@ -168,7 +162,7 @@ public class DefaultImmutableSet<T> implements ImmutableSet<T> {
 	    if (it.hasNext()) {
 		str.append(",");
 	    }
-	}	
+	}
 	str.append("}");
 	return str.toString();
     }
@@ -176,14 +170,14 @@ public class DefaultImmutableSet<T> implements ImmutableSet<T> {
     /** represents the empty set for elements of type <T> */
     static private class NILSet<T> extends DefaultImmutableSet<T> {
 
-	public static final DefaultImmutableSet NIL = new NILSet<Object>();
+	public static final NILSet NIL = new NILSet<Object>();
 
-	private NILSet() {} 
+	private NILSet() {}
 
 	/** the NIL list is a singleton. Deserialization builds
 	 * a new NIL object that has to be replaced by the singleton.
-	 */ 
-	private Object readResolve() 
+	 */
+	private Object readResolve()
 	throws java.io.ObjectStreamException {
 	    return NIL;
 	}
@@ -222,7 +216,7 @@ public class DefaultImmutableSet<T> implements ImmutableSet<T> {
 	/** @return int the cardinality of the set */
 	public int size() {
 	    return 0;
-	}       
+	}
 
 	/** @return true iff the set is empty */
 	public boolean isEmpty() {
@@ -241,7 +235,7 @@ public class DefaultImmutableSet<T> implements ImmutableSet<T> {
 
 	public String toString() {
 	    return "{}";
-	}	
+	}
 
 	public ImmutableSet<T> remove(T element) {
 	    return this;
