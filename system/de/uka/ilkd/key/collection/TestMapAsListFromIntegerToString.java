@@ -3,7 +3,7 @@
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
+// The KeY system is protected by the GNU General Public License.
 // See LICENSE.TXT for details.
 //
 //
@@ -34,7 +34,7 @@ public class TestMapAsListFromIntegerToString extends junit.framework.TestCase {
 	put(0,0,"Null");
 	put(1,1,"Eins");
 	put(2,2,"Zwei");
-	put(3,3,"Drei");  
+	put(3,3,"Drei");
     }
 
     private ImmutableMap<Integer,String> createMap() {
@@ -45,14 +45,14 @@ public class TestMapAsListFromIntegerToString extends junit.framework.TestCase {
 	}
 	return map;
     }
-   
+
     public void testMapEntriesAreTheSameThatHaveBeenPutInside() {
 	ImmutableMap<Integer,String> map=createMap();
 	// assert that all entries are in list
 	for (int i=0;i<entryStr.length;i++) {
 	    assertEquals("Map does not contain entry("+entryInt[i]+
 			", "+entryStr[i]+")",
-			entryStr[i], map.get(entryInt[i])); 
+			entryStr[i], map.get(entryInt[i]));
 	}
     }
 
@@ -81,9 +81,9 @@ public class TestMapAsListFromIntegerToString extends junit.framework.TestCase {
 	Integer hundred=new Integer(100);
 	map=map.put(hundred,entryStr[1]);
 	assertSame(entryStr[1]+" is not mapped to the newer key 100", map.get(hundred),entryStr[1]);
-	assertSame(entryStr[1]+" is not mapped to the older key "+entryInt[1], map.get(entryInt[1]),entryStr[1]);   
-    } 
-    
+	assertSame(entryStr[1]+" is not mapped to the older key "+entryInt[1], map.get(entryInt[1]),entryStr[1]);
+    }
+
     public void testRemoveOneMappingWithSpecifiedKey() {
 	ImmutableMap<Integer,String> map=createMap();
 	// delete map (1,"Eins")
@@ -96,46 +96,46 @@ public class TestMapAsListFromIntegerToString extends junit.framework.TestCase {
 	// add a mapping with a value that has been mapped to
 	// another key before
 	Integer hundred=new Integer(100);
-	map=map.put(hundred,entryStr[1]);	
+	map=map.put(hundred,entryStr[1]);
 	// delete map (*,"Eins")
 	map=map.removeAll(entryStr[1]);
 	assertTrue("Value :"+entryStr[1]+" found in map. But I deleted all"+
-		   " of these values :-(", !map.containsValue(entryStr[1])); 
+		   " of these values :-(", !map.containsValue(entryStr[1]));
     }
 
     public void testSpecialCases() {
 	ImmutableMap<Integer,String> map=DefaultImmutableMap.<Integer,String>nilMap();
 	map = map.put(new Integer(0), "A");
-	assertTrue("Map should be empty and therefore equal to the EMPTY_MAP", 
+	assertTrue("Map should be empty and therefore equal to the EMPTY_MAP",
 	       map.remove(new Integer(0)).isEmpty());
-	
-	assertTrue("Repeated key removal should not change anything", 
+
+	assertTrue("Repeated key removal should not change anything",
 		   map.remove(new Integer(0)).remove(new Integer(0)).isEmpty());
 
 
 	map = map.put(new Integer(0), "B");
-	assertTrue("Map should have only one element with key 0 and value \"B\" ", 
+	assertTrue("Map should have only one element with key 0 and value \"B\" ",
 	       map.size() == 1 && "B".equals(map.get(new Integer(0))));
 
 
 	map = map.removeAll("B");
-	assertTrue("Map should be empty", 
+	assertTrue("Map should be empty",
 		   map.isEmpty());
 
 
 	map = map.put(new Integer(0), "B");
 	map = map.put(new Integer(1), "C");
 	map = map.put(new Integer(2), "B");
-	
+
 	map = map.removeAll("B");
-	assertTrue("Map should not contain value \"B\" any longer ", 
+	assertTrue("Map should not contain value \"B\" any longer ",
 	       map.size() == 1 && !map.containsValue("B"));
-	 
+
 	map = map.removeAll("B");
-	assertTrue("Removing non-existant values should not change anything", 
+	assertTrue("Removing non-existant values should not change anything",
 	       map.size() == 1 && !map.containsValue("B"));
-	
+
     }
 
-   
+
 }

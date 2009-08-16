@@ -3,7 +3,7 @@
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
+// The KeY system is protected by the GNU General Public License.
 // See LICENSE.TXT for details.
 //
 //
@@ -33,39 +33,39 @@ public class TestSetAsListOfString extends junit.framework.TestCase {
     }
 
 
-    // tests add and implicitly iterator, size 
+    // tests add and implicitly iterator, size
     public void testAdd() {
 	ImmutableSet<String>[] newSet=new ImmutableSet[str.length+1];
 	newSet[0]=DefaultImmutableSet.<String>nil();
 
 	for (int i=1;i<str.length+1;i++) {
-	    newSet[i]=newSet[i-1].add(str[i-1]);	    
+	    newSet[i]=newSet[i-1].add(str[i-1]);
 	}
 	// Test elements in set
 	for (int i=0;i<str.length+1;i++) {
 	    Iterator<String> it=newSet[i].iterator();
 	    int size=newSet[i].size();
-	    if (i>0) { // set should have elements 
+	    if (i>0) { // set should have elements
 		assertTrue("Set has no elements, but should have some.",it.hasNext());
 		assertTrue("Wrong cardinality",size==i);
 	    } else { // set is empty
 		assertTrue("Elements but set should be empty.",!it.hasNext());
 		assertTrue("Wrong cardinality.",size==0);
-	    }	    
+	    }
 	    int nr=0;
 	    while (it.hasNext()) {
-		assertTrue("Set has wrong elements",isInArray(it.next(),str));	    
+		assertTrue("Set has wrong elements",isInArray(it.next(),str));
 		nr++;
 	    }
 	    // has right number of elements
 	    assertTrue("Set has iterated to less/often",nr==size);
 	}
 
-	// add existing element, has to be SAME set 
+	// add existing element, has to be SAME set
 	assertSame("Element found 2 times in set or set is not the same.",newSet[str.length],newSet[str.length].add(str[0]));
     }
 
-    // tests unify 
+    // tests unify
     public void testUnify() {
 	ImmutableSet<String>[] newSet=new ImmutableSet[str.length+1];
 	newSet[0]=DefaultImmutableSet.<String>nil().add(str[0]).add(str[1]);
@@ -74,8 +74,8 @@ public class TestSetAsListOfString extends junit.framework.TestCase {
 	// appearance of str[1] == 1
 	ImmutableSet<String> union=newSet[1].union(newSet[0]);
 	assertTrue(union.size()==3);
-	//test if set has all elements 
-	for (int i=0;i<3;i++) {	
+	//test if set has all elements
+	for (int i=0;i<3;i++) {
 	    assertTrue(union.contains(str[0]));
 	}
 	// just to check that contains can say no too
@@ -107,8 +107,8 @@ public class TestSetAsListOfString extends junit.framework.TestCase {
     public void testToString() {
 	ImmutableSet<String> newSet=DefaultImmutableSet.<String>nil();
 	for (int i=0;i<str.length;i++) {
- 	    newSet=newSet.add(str[str.length-1-i]);	    
-	}	
+ 	    newSet=newSet.add(str[str.length-1-i]);
+	}
 	assertEquals("{Dies,ist,ein,Test}",newSet.toString());
     }
 

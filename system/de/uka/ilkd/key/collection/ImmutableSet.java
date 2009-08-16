@@ -2,9 +2,9 @@ package de.uka.ilkd.key.collection;
 
 import java.util.Iterator;
 
-/** interface implemented by non-destructive Sets. 
+/** interface implemented by non-destructive Sets.
  * CONVENTION: Each SetOf<T> implementation has to offer a public static
- *    final variable .<called>nil() 
+ *    final variable .<called>nil()
  */
 
 public interface ImmutableSet<T> extends Iterable<T>, java.io.Serializable {

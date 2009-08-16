@@ -3,7 +3,7 @@
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
+// The KeY system is protected by the GNU General Public License.
 // See LICENSE.TXT for details.
 //
 //
@@ -14,7 +14,7 @@ package de.uka.ilkd.key.collection;
 /** thrown if a duplicate is being added via addUnique() */
 public class NotUniqueException extends Exception {
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = 6565515240836947955L;
 

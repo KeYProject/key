@@ -3,7 +3,7 @@
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
+// The KeY system is protected by the GNU General Public License.
 // See LICENSE.TXT for details.
 //
 //
@@ -27,7 +27,7 @@ public class TestLeftistHeapOfInteger extends junit.framework.TestCase {
     ImmutableList<Integer> b;
 
     Random rand = new Random ();
-    
+
     public void setUp() {
 	a = ImmutableSLList.<Integer>nil()
 	    .prepend( new Integer ( 13 ) )
@@ -48,7 +48,7 @@ public class TestLeftistHeapOfInteger extends junit.framework.TestCase {
 	ImmutableHeap<Integer> h = ImmutableLeftistHeap.<Integer>nilHeap();
 	assertTrue("Empty heap should be empty",
 		   h.isEmpty () && h.size () == 0);
-	
+
 	h.insert ( new Integer ( 1 ) );
 	assertTrue("Empty heap should be empty",
 		   h.isEmpty () && h.size () == 0);
@@ -78,14 +78,14 @@ public class TestLeftistHeapOfInteger extends junit.framework.TestCase {
     private ImmutableList<Integer> removeFirst ( ImmutableList<Integer> list, Integer element ) {
 	ImmutableList<Integer> remainder = ImmutableSLList.<Integer>nil();
 	Integer       i;
-	
+
 	while ( true ) {
 	    assertTrue ( "Cannot remove element from list",
 			 !list.isEmpty() );
 
 	    i    = list.head ();
 	    list = list.tail ();
-	    
+
 	    if ( i.equals ( element ) )
 		break;
 
@@ -132,7 +132,7 @@ public class TestLeftistHeapOfInteger extends junit.framework.TestCase {
 			     lastElement.compareTo( element ) <= 0 );
 	    lastElement = element;
 	}
-	
+
 	assertTrue ( "Unsorted heap iterator does not return the right elements",
 		     equals ( h.sortedIterator (), elements.iterator () ) );
 
@@ -150,7 +150,7 @@ public class TestLeftistHeapOfInteger extends junit.framework.TestCase {
 	}
 
 	assertTrue ( "findMin does not return the right elements",
-		     equals ( list.iterator (), elements.iterator () ) );	
+		     equals ( list.iterator (), elements.iterator () ) );
     }
 
     private ImmutableHeap<Integer> removeAll ( ImmutableHeap<Integer> h, Iterator<Integer> elements ) {
@@ -166,16 +166,16 @@ public class TestLeftistHeapOfInteger extends junit.framework.TestCase {
 	checkHeap ( ImmutableSLList.<Integer>nil(), h );
 	assertTrue("Empty heap should be empty",
 		   h.isEmpty () && h.size () == 0);
-	
-	h = h.insert ( a.iterator () );	
+
+	h = h.insert ( a.iterator () );
 	checkHeap ( a, h );
 
-	h = h.insert ( a.iterator () );	
+	h = h.insert ( a.iterator () );
 	checkHeap ( a.prepend( a ), h );
 
 	h = h.insert ( ImmutableSLList.<Integer>nil().iterator () );
 	checkHeap ( a.prepend( a ), h );
-	
+
 	h = h.insert ( h.iterator () );
 	checkHeap ( a.prepend( a ).prepend( a ).prepend( a ), h );
 
@@ -187,7 +187,7 @@ public class TestLeftistHeapOfInteger extends junit.framework.TestCase {
     public void testInsertHeap() {
 	ImmutableHeap<Integer> h = ImmutableLeftistHeap.<Integer>nilHeap();
 
-	h = h.insert ( a.iterator () );	
+	h = h.insert ( a.iterator () );
 	checkHeap ( a, h );
 
 	h = h.insert ( ImmutableLeftistHeap.<Integer>nilHeap() );
@@ -200,14 +200,14 @@ public class TestLeftistHeapOfInteger extends junit.framework.TestCase {
 		       ( new Integer ( 123 ) ) );
 	checkHeap ( a.prepend( a ).prepend ( new Integer ( 123 ) ), h );
     }
- 
+
     public void testRemoveAll () {
 	ImmutableHeap<Integer> h = ImmutableLeftistHeap.<Integer>nilHeap();
 
 	// Test removal of all elements (from empty heap)
 	checkHeap ( ImmutableSLList.<Integer>nil(), removeAll( h, a.iterator () ) );
 
-	h = h.insert ( a.iterator () );	
+	h = h.insert ( a.iterator () );
 	checkHeap ( a, h );
 
 	// Test removal of arbitrary elements
@@ -220,7 +220,7 @@ public class TestLeftistHeapOfInteger extends junit.framework.TestCase {
 	assertSame ( "Heap should not be different",
 		    h, removeAll ( h, b.iterator () ) );
     }
-   
+
     public void testLargeHeap () {
 	ImmutableHeap<Integer> h = ImmutableLeftistHeap.<Integer>nilHeap();
 	ImmutableList<Integer> l = ImmutableSLList.<Integer>nil();

@@ -4,12 +4,12 @@ import java.util.Iterator;
 
 /**
  * This class implements ImmMap<S,T> and provides a
- * persistent Map. It is a simple implementation like lists     
+ * persistent Map. It is a simple implementation like lists
  */
 public class DefaultImmutableMap<S,T> implements ImmutableMap<S,T> {
 
     /** the empty map*/
-    private static final NILMap EMPTY_MAP=new NILMap();   
+    private static final NILMap EMPTY_MAP=new NILMap();
 
     public static <S,T> DefaultImmutableMap<S,T> nilMap() {
 	return EMPTY_MAP;
@@ -20,7 +20,7 @@ public class DefaultImmutableMap<S,T> implements ImmutableMap<S,T> {
     /** list of pairs (key,value) */
     private final ImmutableMapEntry<S,T> entry;
 
-    private int hashCode = 0;
+    private int hashCode = -1;
 
     /** only for use by NILMap */
     private DefaultImmutableMap() {
@@ -46,10 +46,10 @@ public class DefaultImmutableMap<S,T> implements ImmutableMap<S,T> {
     }
 
 
-    /**      
-     * inserts mapping <key,val> into the map (old map is not modified) 
-     * if key exists old entry has to be removed 
-     * @param key a S to be used as key 
+    /**
+     * inserts mapping <key,val> into the map (old map is not modified)
+     * if key exists old entry has to be removed
+     * @param key a S to be used as key
      * @param value a T to be stored as value
      * @return a ImmMap<S,T> including the <key, value> pair and all
      * other pairs of the current map with keys different from the given
@@ -127,7 +127,7 @@ public class DefaultImmutableMap<S,T> implements ImmutableMap<S,T> {
 	return result;
     }
 
-    /** 
+    /**
      * removes mapping (key,...) from map
      * @return the new map (the same if key is not in the map)
      */
@@ -167,13 +167,13 @@ public class DefaultImmutableMap<S,T> implements ImmutableMap<S,T> {
 
 	    if (entryVal != value && !entryVal.equals(value)) {
 		stack[counter] = e;
-		counter ++;		
+		counter ++;
 	    }
 
 	    queue = queue.parent;
 
 	}
-	return counter < stack.length ? 
+	return counter < stack.length ?
 		createMap(stack, counter, this.<S,T>nilMap()) : this;
     }
 
@@ -198,7 +198,7 @@ public class DefaultImmutableMap<S,T> implements ImmutableMap<S,T> {
 	while (it.hasNext()) {
 	    sb.append(""+it.next());
 	    if (it.hasNext()) {
-		sb.append(",");		
+		sb.append(",");
 	    }
 	}
 	sb.append("]");
@@ -232,9 +232,9 @@ public class DefaultImmutableMap<S,T> implements ImmutableMap<S,T> {
 	if ( hashCode == -1 ) {
 	    final Iterator<ImmutableMapEntry<S,T>> p = entryIterator();
 	    while ( p.hasNext() ) {
-		hashCode += 17*p.next().hashCode();
+		hashCode += 7*p.next().hashCode();
 	    }
-	    hashCode = hashCode == 0 ? 1 : hashCode; 
+	    hashCode = hashCode == -1 ? 2 : hashCode;
 	}
 	return hashCode;
     }
@@ -304,11 +304,11 @@ public class DefaultImmutableMap<S,T> implements ImmutableMap<S,T> {
 	// the value
 	private final T value;
 
-	/** creates a new map entry that contains key and value */ 
+	/** creates a new map entry that contains key and value */
 	MapEntry(S key, T value) {
 	    this.key   = key;
 	    this.value = value;
-	} 
+	}
 
 	/** @return the key stored in this entry */
 	public S key() {
@@ -318,11 +318,11 @@ public class DefaultImmutableMap<S,T> implements ImmutableMap<S,T> {
 	/** @return the value stored in this entry */
 	public T value() {
 	    return value;
-	}	
+	}
 
 	/** @return true iff both objects have equal pairs of key and
-	 * value 
-	 */ 
+	 * value
+	 */
 	public boolean equals(Object obj) {
 	    final ImmutableMapEntry<S,T> cmp = (ImmutableMapEntry<S,T>) obj;
 	    final S cmpKey = cmp.key();
@@ -362,14 +362,14 @@ public class DefaultImmutableMap<S,T> implements ImmutableMap<S,T> {
 	    return oldmap.entry;
 	}
 
-	/** 
+	/**
 	 * throws an unsupported operation exception as removing elements
 	 * is not allowed on immutable maps
 	 */
 	public void remove() {
 	    throw new UnsupportedOperationException("Removing elements via an iterator" +
 	    " is not supported for immutable maps.");
-	} 
+	}
     }
 
     /** iterator for the values */
@@ -387,7 +387,7 @@ public class DefaultImmutableMap<S,T> implements ImmutableMap<S,T> {
     }
 
 
-    private class MapValueIterator extends MapIterator<S,T> 
+    private class MapValueIterator extends MapIterator<S,T>
     implements Iterator<T> {
 
 	MapValueIterator(DefaultImmutableMap<S,T> map) {
@@ -400,7 +400,7 @@ public class DefaultImmutableMap<S,T> implements ImmutableMap<S,T> {
 	}
     }
 
-    private class MapKeyIterator extends MapIterator<S,T> 
+    private class MapKeyIterator extends MapIterator<S,T>
     implements Iterator<S> {
 
 	MapKeyIterator(DefaultImmutableMap<S,T> map) {

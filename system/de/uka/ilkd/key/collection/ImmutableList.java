@@ -22,7 +22,7 @@ public interface ImmutableList<T> extends Iterable<T>, java.io.Serializable {
 
     /** prepends array (O(n))
      * @param array the array of the elements to be prepended
-     * @return IList<T> the new list  
+     * @return IList<T> the new list
      */
     ImmutableList<T> prepend(T[] array);
 
@@ -73,19 +73,19 @@ public interface ImmutableList<T> extends Iterable<T>, java.io.Serializable {
     /** @return true iff the list is empty */
     boolean isEmpty();
 
-    /** removes first occurrence of obj 
-     * @return new list 
+    /** removes first occurrence of obj
+     * @return new list
      */
     ImmutableList<T> removeFirst(T obj);
 
-    /** removes all occurrences of obj 
-     * @return new list 
+    /** removes all occurrences of obj
+     * @return new list
      */
     ImmutableList<T> removeAll(T obj);
 
     /**
      * Convert the list to a Java array (O(n))
      */
-    <T> T[] toArray(T[] array);    
+    <S> S[] toArray(S[] array);
 }
 

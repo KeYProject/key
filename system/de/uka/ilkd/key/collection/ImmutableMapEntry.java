@@ -1,6 +1,6 @@
 package de.uka.ilkd.key.collection;
 
-/** This interface declares a tupel of two values. 
+/** This interface declares a tupel of two values.
  * The first one is of type <S> and named key, the second one
  * is of type <T> and named value
  */

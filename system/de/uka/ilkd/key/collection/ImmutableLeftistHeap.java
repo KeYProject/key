@@ -12,7 +12,7 @@ import de.uka.ilkd.key.util.Debug;
 public abstract class ImmutableLeftistHeap<T extends Comparable<T>> implements ImmutableHeap<T> {
 
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = -4035441830559680469L;
 
@@ -24,8 +24,8 @@ public abstract class ImmutableLeftistHeap<T extends Comparable<T>> implements I
     public static <T extends Comparable<T>> ImmutableLeftistHeap<T> nilHeap() {
 	return EMPTY_HEAP;
     }
-    
-    
+
+
     /**
      * Length of the right spine, i.e. the length of the path from the
      * root to rightmost leaf
@@ -64,7 +64,7 @@ public abstract class ImmutableLeftistHeap<T extends Comparable<T>> implements I
 	    this.left = ImmutableLeftistHeap.<S>nilHeap();
 	    this.right = ImmutableLeftistHeap.<S>nilHeap();
 	}
-    
+
 	/**
 	 * Node constructor for nodes with at most one non-empty child
 	 */
@@ -75,7 +75,7 @@ public abstract class ImmutableLeftistHeap<T extends Comparable<T>> implements I
 	    this.left = a;
 	    this.right = ImmutableLeftistHeap.<S>nilHeap();
 	}
-    
+
 	/**
 	 * Node constructor for nodes
 	 */
@@ -110,7 +110,7 @@ public abstract class ImmutableLeftistHeap<T extends Comparable<T>> implements I
 	{
 	    return false;
 	}
-    
+
 	/**
 	 * Add an element to this heap object
 	 * @param element the element to be added
@@ -190,7 +190,7 @@ public abstract class ImmutableLeftistHeap<T extends Comparable<T>> implements I
 		return newLeft.insert ( newRight );
 	    if ( left == newLeft && right == newRight )
 		return this;
-	    return new Node<S> ( data, newLeft, newRight );		
+	    return new Node<S> ( data, newLeft, newRight );
 	}
 
 	/**
@@ -208,7 +208,7 @@ public abstract class ImmutableLeftistHeap<T extends Comparable<T>> implements I
     private static class Empty<S extends Comparable<S>> extends ImmutableLeftistHeap<S> {
 
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = -2471143956420721016L;
 
@@ -219,7 +219,7 @@ public abstract class ImmutableLeftistHeap<T extends Comparable<T>> implements I
 	protected int getRightHeight () {
 	    return 0;
 	}
-	
+
 	/**
 	 * @return true iff this heap is empty
 	 */
@@ -338,7 +338,7 @@ public abstract class ImmutableLeftistHeap<T extends Comparable<T>> implements I
 	    if (it.hasNext()) {
 		str.append(",");
 	    }
-	}	
+	}
 	str.append("]");
 	return str.toString();
     }
@@ -373,11 +373,11 @@ public abstract class ImmutableLeftistHeap<T extends Comparable<T>> implements I
 	    // descend in right-first order, this helps to keep the stack small
 	    push ( heap.left );
 	    push ( heap.right );
-	    
+
 	    return heap.data;
 	}
-	
-	/** 
+
+	/**
 	 * throw an unsupported operation exception as leftiest heaps are immutable
 	 */
 	public void remove() {
@@ -411,8 +411,8 @@ public abstract class ImmutableLeftistHeap<T extends Comparable<T>> implements I
 
 	    return data;
 	}
-	
-	/** 
+
+	/**
 	 * throw an unsupported operation exception as leftiest heaps are immutable
 	 */
 	public void remove() {

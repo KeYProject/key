@@ -3,7 +3,7 @@
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
+// The KeY system is protected by the GNU General Public License.
 // See LICENSE.TXT for details.
 //
 //
@@ -46,28 +46,28 @@ public class TestSLListOfString extends junit.framework.TestCase {
 	e1 = ImmutableSLList.<String>nil().prepend((String)null).prepend("B").prepend("A");
     }
 
-    // tests prepend and implicitly iterator, size 
+    // tests prepend and implicitly iterator, size
     public void testPrepend() {
 	ImmutableList<String>[] newList = new ImmutableList[str.length+1];
 	newList[0] = ImmutableSLList.nil();
 
 	for (int i=1;i<str.length+1;i++) {
-	    newList[i]=newList[i-1].prepend(str[i-1]);	    
+	    newList[i]=newList[i-1].prepend(str[i-1]);
 	}
 	// Test elements in list
 	for (int i=0;i<str.length+1;i++) {
 	    Iterator<String> it=newList[i].iterator();
 	    int size=newList[i].size();
-	    if (i>0) { // list should have elements 
+	    if (i>0) { // list should have elements
 		assertTrue(it.hasNext());
 		assertTrue(size==i);
 	    } else { // list is empty
 		assertTrue(!it.hasNext());
 		assertTrue(size==0);
-	    }	    
+	    }
 	    int nr=0;
 	    while (it.hasNext()) {
-		assertSame(it.next(),str[size-1-nr]);	    
+		assertSame(it.next(),str[size-1-nr]);
 		nr++;
 	    }
 	    // list has right length
@@ -82,28 +82,28 @@ public class TestSLListOfString extends junit.framework.TestCase {
 	assertEquals(str[0],prepList.tail().tail().head());
     }
 
-    // tests append and implicitly iterator, size 
+    // tests append and implicitly iterator, size
     public void testAppend() {
 	ImmutableList<String>[] newList=new ImmutableList[str.length+1];
 	newList[0]=ImmutableSLList.nil();
 
 	for (int i=1;i<str.length+1;i++) {
-	    newList[i]=newList[i-1].append(str[i-1]);	    
+	    newList[i]=newList[i-1].append(str[i-1]);
 	}
 	// Test elements in list
-	for (int i=0;i<str.length+1;i++) {	    
+	for (int i=0;i<str.length+1;i++) {
 	    Iterator<String> it=newList[i].iterator();
 	    int size=newList[i].size();
-	    if (i>0) { // list should have elements 
+	    if (i>0) { // list should have elements
 		assertTrue(it.hasNext());
 		assertTrue(size==i);
 	    } else { // list is empty
 		assertTrue(!it.hasNext());
 		assertTrue(size==0);
-	    }	    
+	    }
 	    int nr=0;
 	    while (it.hasNext()) {
-		assertSame(it.next(),str[nr]);	    
+		assertSame(it.next(),str[nr]);
 		nr++;
 	    }
 	    // list has right length
@@ -125,13 +125,13 @@ public class TestSLListOfString extends junit.framework.TestCase {
 	newList[0]=ImmutableSLList.<String>nil();
 
 	for (int i=1;i<str.length+1;i++) {
-	    newList[i]=newList[i-1].prepend(str[i-1]);	    
-	}	
+	    newList[i]=newList[i-1].prepend(str[i-1]);
+	}
 	// test cascading tail
 	for (int i=0;i<str.length;i++) {
 	    assertSame(newList[i+1].tail(),newList[i]);
 	    assertSame(newList[i+1].head(),str[i]);
-	}	
+	}
     }
 
    // tests contains
@@ -139,12 +139,12 @@ public class TestSLListOfString extends junit.framework.TestCase {
 	ImmutableList<String> newList=ImmutableSLList.<String>nil();
 
 	for (int i=1;i<str.length+1;i++) {
-	    newList=newList.append(str[i-1]);	    
-	}	
+	    newList=newList.append(str[i-1]);
+	}
 	// test cascading tail
 	for (int i=0;i<str.length;i++) {
 	    assertTrue(newList.contains(str[i]));
-	}	
+	}
     }
 
 
@@ -154,21 +154,21 @@ public class TestSLListOfString extends junit.framework.TestCase {
 
 	newList=newList.append(str[0]);
 	for (int i=1;i<str.length+1;i++) {
-	    newList=newList.append(str[i-1]);	    
-	}	
+	    newList=newList.append(str[i-1]);
+	}
 	newList=newList.append(str[0]);
 	newList=newList.removeAll(str[0]);
 	assertTrue("str[0] should have been removed",!newList.contains(str[0]));
 
-    }   
+    }
 
     public void testRemoveFirst() {
 	ImmutableList<String> newList=ImmutableSLList.<String>nil();
 
 	newList=newList.prepend(str[0]);
 	for (int i=1;i<str.length+1;i++) {
-	    newList=newList.prepend(str[i-1]);	    
-	}	
+	    newList=newList.prepend(str[i-1]);
+	}
 	newList=newList.prepend(str[0]);
 	int oldSize = newList.size();
 	newList=newList.removeFirst(str[0]);
@@ -182,7 +182,7 @@ public class TestSLListOfString extends junit.framework.TestCase {
 
 	assertTrue("Only first occurrence should have been removed", !(newList.contains(str[0])) && newList.size() == oldSize - 3);
 
-    }   
+    }
 
     public void testEquals() {
 	assertTrue("a==a1",a.equals(a1));
@@ -193,13 +193,13 @@ public class TestSLListOfString extends junit.framework.TestCase {
 	assertTrue("e!=a",! e.equals(a));
 	assertTrue("e==e1", e.equals(e1));
     }
-    
+
 
     public void testToString() {
 	ImmutableList<String> newList=ImmutableSLList.<String>nil();
 	for (int i=0;i<str.length;i++) {
-	    newList=newList.append(str[i]);	    
-	}	
+	    newList=newList.append(str[i]);
+	}
 	assertEquals("[Dies,ist,ein,Test]",newList.toString());
     }
 
@@ -235,12 +235,12 @@ public class TestSLListOfString extends junit.framework.TestCase {
     public static void main(String[] args) {
 	ImmutableList<String> newList=ImmutableSLList.<String>nil();
 	newList.prepend("a");
-	
+
  	performanceTest(10);
  	performanceTest(100);
  	performanceTest(1000);
  	performanceTest(10000);
  	performanceTest(100000);
- 	performanceTest(1000000);	
+ 	performanceTest(1000000);
     }
 }
