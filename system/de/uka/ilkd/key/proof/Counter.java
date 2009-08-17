@@ -12,7 +12,6 @@
 package de.uka.ilkd.key.proof;
 
 
-import java.util.Stack;
 
 
 

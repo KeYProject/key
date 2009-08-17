@@ -3,7 +3,7 @@
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
+// The KeY system is protected by the GNU General Public License.
 // See LICENSE.TXT for details.
 //
 //
@@ -20,7 +20,7 @@ import de.uka.ilkd.key.parser.ParserMode;
 import de.uka.ilkd.key.proof.CountingBufferedInputStream;
 
 /**
- * Used for TESTS ONLY as we allow there to declare program variables global 
+ * Used for TESTS ONLY as we allow there to declare program variables global
  * in rule files .
  */
 public class KeYFileForTests extends KeYFile {
@@ -35,7 +35,7 @@ public class KeYFileForTests extends KeYFile {
     }
 
     /** reads the whole .key file and modifies the initial configuration
-     * assigned to this object according to the given modification strategy. 
+     * assigned to this object according to the given modification strategy.
      * Throws an exception if no initial configuration has been set yet.
      */
     public void read() throws ProofInputException {
@@ -43,7 +43,7 @@ public class KeYFileForTests extends KeYFile {
 	    throw new IllegalStateException("KeYFile: InitConfig not set.");
 	}
 	try {
-	    final CountingBufferedInputStream cinp = 
+	    final CountingBufferedInputStream cinp =
 		new CountingBufferedInputStream
 		    (getNewStream(),monitor,getNumberOfChars()/100);
 	    final ParserConfig pc = 

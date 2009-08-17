@@ -11,7 +11,10 @@
 
 package de.uka.ilkd.key.rule;
 
-import de.uka.ilkd.key.logic.IteratorOfConstrainedFormula;
+import java.util.Iterator;
+
+import de.uka.ilkd.key.collection.*;
+import de.uka.ilkd.key.logic.ConstrainedFormula;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.*;
@@ -22,19 +25,19 @@ public class TacletPrefixBuilder {
      * set of all schemavariables that are only allowed to be matched
      * with quantifiable variables. 
      */
-    private SetOfSchemaVariable currentlyBoundVars = SetAsListOfSchemaVariable.EMPTY_SET;
+    private ImmutableSet<SchemaVariable> currentlyBoundVars = DefaultImmutableSet.<SchemaVariable>nil();
     private TacletBuilder tacletBuilder;
 
-    protected MapFromSchemaVariableToTacletPrefix prefixMap = MapAsListFromSchemaVariableToTacletPrefix.EMPTY_MAP;
+    protected ImmutableMap<SchemaVariable,TacletPrefix> prefixMap = DefaultImmutableMap.<SchemaVariable,TacletPrefix>nilMap();
 
     TacletPrefixBuilder(TacletBuilder tacletBuilder) {
 	this.tacletBuilder=tacletBuilder;
     }
 
     private void addVarsBoundHere(Term visited, int subTerm) {
-	ArrayOfQuantifiableVariable bdVars=visited.varsBoundHere(subTerm);
+	ImmutableArray<QuantifiableVariable> bdVars=visited.varsBoundHere(subTerm);
 	for (int i=0; i<bdVars.size(); i++) {
-	    QuantifiableVariable boundVar = bdVars.getQuantifiableVariable(i);
+	    QuantifiableVariable boundVar = bdVars.get(i);
 	    if ( boundVar instanceof VariableSV ) {
 		currentlyBoundVars = currentlyBoundVars.add
 		    ((SchemaVariable)boundVar);
@@ -43,7 +46,7 @@ public class TacletPrefixBuilder {
     }
 
     private void setPrefixOfOccurrence(SchemaVariable sv, 
-				       SetOfSchemaVariable relevantBoundVars) {
+				       ImmutableSet<SchemaVariable> relevantBoundVars) {
 	prefixMap = 
 	    prefixMap.put(sv, new TacletPrefix(relevantBoundVars, false));
     }
@@ -52,9 +55,9 @@ public class TacletPrefixBuilder {
      * removes all variables x that are declared as x not free in sv from the
      * currently bound vars set.
      */
-    private SetOfSchemaVariable removeNotFreeIn(SchemaVariable sv) {
-	SetOfSchemaVariable result = currentlyBoundVars;
-	IteratorOfNotFreeIn it = tacletBuilder.varsNotFreeIn();
+    private ImmutableSet<SchemaVariable> removeNotFreeIn(SchemaVariable sv) {
+	ImmutableSet<SchemaVariable> result = currentlyBoundVars;
+	Iterator<NotFreeIn> it = tacletBuilder.varsNotFreeIn();
 	while (it.hasNext()) {
 	    NotFreeIn notFreeIn=it.next();
 	    if (notFreeIn.second() == sv) {
@@ -71,7 +74,7 @@ public class TacletPrefixBuilder {
 	    !(t.op() instanceof ProgramSV) &&
 	    !(t.op() instanceof SkolemTermSV)) { 
 	    SchemaVariable sv = (SchemaVariable)t.op();
-	    SetOfSchemaVariable relevantBoundVars = removeNotFreeIn(sv);
+	    ImmutableSet<SchemaVariable> relevantBoundVars = removeNotFreeIn(sv);
 	    TacletPrefix prefix = prefixMap.get(sv);
 	    if (prefix == null || prefix.prefix().equals(relevantBoundVars)) {
 		setPrefixOfOccurrence(sv, relevantBoundVars);
@@ -83,7 +86,7 @@ public class TacletPrefixBuilder {
 	    }
 	} 
 	for (int i=0; i<t.arity(); i++) {
-	    SetOfSchemaVariable oldBounds=currentlyBoundVars;
+	    ImmutableSet<SchemaVariable> oldBounds=currentlyBoundVars;
 	    addVarsBoundHere(t, i);
 	    visit(t.sub(i));
 	    currentlyBoundVars=oldBounds;
@@ -92,7 +95,7 @@ public class TacletPrefixBuilder {
     
 
     private void visit(Sequent s) {
-	IteratorOfConstrainedFormula it=s.iterator();
+	Iterator<ConstrainedFormula> it=s.iterator();
 	while (it.hasNext()) {
 	    visit(it.next().formula());
 	}
@@ -115,7 +118,7 @@ public class TacletPrefixBuilder {
 	    visit(((FindTacletBuilder)tacletBuilder).getFind());
 	}
 
-	IteratorOfTacletGoalTemplate itGoalTempl
+	Iterator<TacletGoalTemplate> itGoalTempl
 	    = tacletBuilder.goalTemplates().iterator();
 
 	while (itGoalTempl.hasNext()) {
@@ -124,7 +127,7 @@ public class TacletPrefixBuilder {
 	
 	itGoalTempl = tacletBuilder.goalTemplates().iterator();
 	while (itGoalTempl.hasNext()) {
-	    final IteratorOfTaclet addRules = itGoalTempl.next().rules().iterator();
+	    final Iterator<Taclet> addRules = itGoalTempl.next().rules().iterator();
 	    while (addRules.hasNext()) {
 		checkPrefixInAddRules(addRules.next());
 	    }
@@ -133,12 +136,12 @@ public class TacletPrefixBuilder {
 
 
     private void checkPrefixInAddRules(Taclet addRule) {
-	final MapFromSchemaVariableToTacletPrefix addRuleSV2PrefixMap = 
+	final ImmutableMap<SchemaVariable,TacletPrefix> addRuleSV2PrefixMap = 
 	    addRule.prefixMap();
-	final IteratorOfEntryOfSchemaVariableAndTacletPrefix it = 
+	final Iterator<ImmutableMapEntry<SchemaVariable,TacletPrefix>> it = 
 	    prefixMap.entryIterator();
 	while (it.hasNext()) {
-	    final EntryOfSchemaVariableAndTacletPrefix entry = it.next();
+	    final ImmutableMapEntry<SchemaVariable,TacletPrefix> entry = it.next();
 	    final TacletPrefix addRulePrefix = addRuleSV2PrefixMap.get(entry.key());
 	    
 	    if (addRulePrefix != null && !addRulePrefix.prefix().
@@ -152,9 +155,9 @@ public class TacletPrefixBuilder {
 
 	// we have to descend into the addrules of the addrules
 
-	final IteratorOfTacletGoalTemplate templateIt = addRule.goalTemplates().iterator();
+	final Iterator<TacletGoalTemplate> templateIt = addRule.goalTemplates().iterator();
 	while (templateIt.hasNext()) {
-	    final IteratorOfTaclet moreRules = templateIt.next().rules().iterator();
+	    final Iterator<Taclet> moreRules = templateIt.next().rules().iterator();
 	    while (moreRules.hasNext()) {
 		checkPrefixInAddRules(moreRules.next());
 	    }
@@ -164,7 +167,7 @@ public class TacletPrefixBuilder {
 
     private boolean atMostOneRepl() {
 	RewriteTacletBuilder rwtacletBuilder=(RewriteTacletBuilder)tacletBuilder;
-	IteratorOfTacletGoalTemplate it
+	Iterator<TacletGoalTemplate> it
 	    =rwtacletBuilder.goalTemplates().iterator();
 	int count=0;
 	while (it.hasNext()) {
@@ -183,7 +186,7 @@ public class TacletPrefixBuilder {
 	RewriteTacletBuilder rwtacletBuilder=(RewriteTacletBuilder)tacletBuilder;
 	TacletSchemaVariableCollector svc=new TacletSchemaVariableCollector();
 	svc.visit(rwtacletBuilder.ifSequent());
-	IteratorOfTacletGoalTemplate it
+	Iterator<TacletGoalTemplate> it
 	    = rwtacletBuilder.goalTemplates().iterator();
 	while (it.hasNext()) {
 	    TacletGoalTemplate tmpl = it.next();
@@ -191,7 +194,7 @@ public class TacletPrefixBuilder {
 //		RewriteTacletGoalTemplate
 //		    gt=(RewriteTacletGoalTemplate)tmpl; 
 		svc.visit(tmpl.sequent());   
-		IteratorOfTaclet addRuleIt = tmpl.rules().iterator();
+		Iterator<Taclet> addRuleIt = tmpl.rules().iterator();
 		while (addRuleIt.hasNext()) { // addrules
 		    svc.visit(addRuleIt.next(), true);
 		}
@@ -204,9 +207,9 @@ public class TacletPrefixBuilder {
 	if (!(tacletBuilder instanceof RewriteTacletBuilder) || !atMostOneRepl()) {
 	    return;
 	}
-	IteratorOfEntryOfSchemaVariableAndTacletPrefix it = prefixMap.entryIterator();
+	Iterator<ImmutableMapEntry<SchemaVariable,TacletPrefix>> it = prefixMap.entryIterator();
 	while (it.hasNext()) {
-	    EntryOfSchemaVariableAndTacletPrefix entry = it.next();
+	    ImmutableMapEntry<SchemaVariable,TacletPrefix> entry = it.next();
 	    if (occurrsOnlyInFindOrRepl(entry.key())) {
 		prefixMap = prefixMap.put(entry.key(), 
 					  entry.value().setContext(true));
@@ -214,7 +217,7 @@ public class TacletPrefixBuilder {
 	}
     }
 
-    public MapFromSchemaVariableToTacletPrefix getPrefixMap() { 
+    public ImmutableMap<SchemaVariable,TacletPrefix> getPrefixMap() { 
 	considerContext();
 	return prefixMap;
     }
@@ -225,10 +228,10 @@ public class TacletPrefixBuilder {
         InvalidPrefixException(String tacletName, 
                 SchemaVariable sv,
                 TacletPrefix prefix,
-                SetOfSchemaVariable sndPrefixVar) {
+                ImmutableSet<SchemaVariable> sndPrefixVar) {
             super("Schema variable " + sv + "occurs at different places " + 
                     "in taclet " + tacletName + " with different prefixes.\n" +
-                    "Prefix P1:"+((prefix == null) ? SetAsListOfSchemaVariable.EMPTY_SET : prefix.prefix()) +
+                    "Prefix P1:"+((prefix == null) ? DefaultImmutableSet.<SchemaVariable>nil() : prefix.prefix()) +
                     "\n" +
                     "Prefix P2:"+ sndPrefixVar);
         }

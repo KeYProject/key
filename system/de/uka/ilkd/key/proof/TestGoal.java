@@ -11,6 +11,7 @@
 package de.uka.ilkd.key.proof;
 
 import junit.framework.TestCase;
+import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.ConstrainedFormula;
 import de.uka.ilkd.key.logic.Semisequent;
@@ -47,7 +48,7 @@ public class TestGoal extends TestCase {
 	Goal g=new Goal(new Node(proof, seq), 
 			new RuleAppIndex(new TacletAppIndex(new TacletIndex()),
 					 new BuiltInRuleAppIndex(new BuiltInRuleIndex())));
-	ListOfGoal lg=g.split(3);
+	ImmutableList<Goal> lg=g.split(3);
 	lg.head().addNoPosTacletApp(TacletForTests.getRules().lookup("imp_right"));
 	lg.tail().head()
 	    .addNoPosTacletApp(TacletForTests.getRules().lookup("imp_left"));
@@ -55,10 +56,10 @@ public class TestGoal extends TestCase {
 	    .addNoPosTacletApp(TacletForTests.getRules().lookup("or_right"));
 	//just check if the test is trivially correct because of rules not found
 	assertNotNull(lg.head().indexOfTaclets().lookup("imp_right"));
-	ListOfGoal lg0=lg.head().split(3);
-	ListOfGoal lg00=lg0.tail().head().split(8);
-	ListOfGoal lg1=lg.tail().tail().head().split(2);
-	ListOfGoal res=lg.tail().head().setBack(lg1.append(lg00)
+	ImmutableList<Goal> lg0=lg.head().split(3);
+	ImmutableList<Goal> lg00=lg0.tail().head().split(8);
+	ImmutableList<Goal> lg1=lg.tail().tail().head().split(2);
+	ImmutableList<Goal> res=lg.tail().head().setBack(lg1.append(lg00)
 						.append(lg0.head())
 					.append(lg0.tail().tail().head())
 						.append(lg.tail().head()));
@@ -85,7 +86,7 @@ public class TestGoal extends TestCase {
 			new RuleAppIndex(new TacletAppIndex(new TacletIndex()),
 					 new BuiltInRuleAppIndex
 					 (new BuiltInRuleIndex())));
-	ListOfGoal lg=g.split(3);
+	ImmutableList<Goal> lg=g.split(3);
 	lg.head().addNoPosTacletApp(TacletForTests.getRules().lookup("imp_right"));
 	lg.tail().head()
 	    .addNoPosTacletApp(TacletForTests.getRules().lookup("imp_left"));
@@ -94,12 +95,12 @@ public class TestGoal extends TestCase {
 	//just check if the test is trivially correct because of rules not found
 	assertNotNull(lg.head().indexOfTaclets().lookup("imp_right"));
 
-	ListOfGoal lg0=lg.head().split(4);
+	ImmutableList<Goal> lg0=lg.head().split(4);
 	lg0.head().addNoPosTacletApp(TacletForTests.getRules().lookup("or_left"));
 	lg0.tail().head().addNoPosTacletApp(TacletForTests.getRules()
 					  .lookup("or_left"));
-	ListOfGoal lg1=lg.tail().tail().head().split(2);
-	ListOfGoal res=lg0.tail().head().setBack(lg1.append(lg0)
+	ImmutableList<Goal> lg1=lg.tail().tail().head().split(2);
+	ImmutableList<Goal> res=lg0.tail().head().setBack(lg1.append(lg0)
 						.append(lg.tail().head()));
 	assertTrue(res.size()==4);
 

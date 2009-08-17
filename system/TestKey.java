@@ -8,6 +8,7 @@
 //
 //
 
+import de.uka.ilkd.key.collection.TestSLListOfString;
 import junit.framework.TestCase;
 import junit.framework.TestResult;
 import junit.framework.TestSuite;

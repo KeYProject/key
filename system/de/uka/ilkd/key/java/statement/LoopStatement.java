@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.java.statement;
 
+import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.util.ExtList;
 
@@ -135,9 +136,9 @@ public abstract class LoopStatement extends JavaStatement
         this.body = body;
 	if (updates!=null) {
 	    this.updates = new ForUpdates
-		(new ArrayOfExpression(updates));
+		(new ImmutableArray<Expression>(updates));
 	} else {
-	    this.updates = new ForUpdates(new ArrayOfExpression(new Expression[0]));
+	    this.updates = new ForUpdates(new ImmutableArray<Expression>(new Expression[0]));
 	}
 	this.inits = new LoopInit(inits);
 	this.guard=new Guard(guard);
@@ -281,7 +282,7 @@ public abstract class LoopStatement extends JavaStatement
         if (inits != null) {
             int s = inits.size();
             for (int i = 0; i < s && index >= 0; i++) {
-                final LoopInitializer ii = inits.getInits().getLoopInitializer(i);
+                final LoopInitializer ii = inits.getInits().get(i);
                 if (ii instanceof Expression) {
                     if (index == 0) {
                         return (Expression)ii;
@@ -347,7 +348,7 @@ public abstract class LoopStatement extends JavaStatement
      *      Get initializers.
      *      @return the loop initializer array wrapper .
      */
-    public ArrayOfLoopInitializer getInitializers() {
+    public ImmutableArray<LoopInitializer> getInitializers() {
 	if (inits != null) {
 	    return inits.getInits();
 	}
@@ -359,7 +360,7 @@ public abstract class LoopStatement extends JavaStatement
      *      Get updates.
      *      @return the expression mutable list.
      */
-    public ArrayOfExpression getUpdates() {
+    public ImmutableArray<Expression> getUpdates() {
         if (updates != null) {
 	    return updates.getUpdates();
 	}

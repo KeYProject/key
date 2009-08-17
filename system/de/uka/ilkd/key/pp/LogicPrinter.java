@@ -16,6 +16,9 @@ import java.util.*;
 
 import org.apache.log4j.Logger;
 
+import de.uka.ilkd.key.collection.ImmutableArray;
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
@@ -304,10 +307,10 @@ public final class LogicPrinter {
     }
 
     protected void printVarCond(Taclet taclet) throws IOException{
-        IteratorOfNewVarcond itVarsNew      = taclet.varsNew().iterator();
-        IteratorOfNewDependingOn itVarsNewDepOn = taclet.varsNewDependingOn();
-        IteratorOfNotFreeIn itVarsNotFreeIn = taclet.varsNotFreeIn();
-        IteratorOfVariableCondition itVC = taclet.getVariableConditions();
+        Iterator<NewVarcond> itVarsNew      = taclet.varsNew().iterator();
+        Iterator<NewDependingOn> itVarsNewDepOn = taclet.varsNewDependingOn();
+        Iterator<NotFreeIn> itVarsNotFreeIn = taclet.varsNotFreeIn();
+        Iterator<VariableCondition> itVC = taclet.getVariableConditions();
 
         if (itVarsNew.hasNext() ||
                 itVarsNotFreeIn.hasNext() ||
@@ -394,7 +397,7 @@ public final class LogicPrinter {
                 return;
         }
                 layouter.brk().beginC(2).print("\\heuristics (");
-                for (IteratorOfRuleSet it = taclet.getRuleSets().iterator(); it.hasNext();) {
+                for (Iterator<RuleSet> it = taclet.getRuleSets().iterator(); it.hasNext();) {
                         layouter.brk();
                         RuleSet tgt = it.next();
                         printHeuristic(tgt);
@@ -444,7 +447,7 @@ public final class LogicPrinter {
             layouter.brk().print("\\closegoal").brk();
         }
 
-        for (final IteratorOfTacletGoalTemplate it =
+        for (final Iterator<TacletGoalTemplate> it =
                  taclet.goalTemplates().reverse().iterator(); it.hasNext();) {
             printGoalTemplate(it.next());
             if (it.hasNext()) {
@@ -490,10 +493,10 @@ public final class LogicPrinter {
 	//layouter.end();
     }
 
-    protected void printRules (ListOfTaclet rules) throws IOException{
+    protected void printRules (ImmutableList<Taclet> rules) throws IOException{
         layouter.brk().beginC(2).print("\\addrules (");
         SVInstantiations svi = instantiations;
-        for (IteratorOfTaclet it = rules.iterator(); it.hasNext();) {
+        for (Iterator<Taclet> it = rules.iterator(); it.hasNext();) {
             layouter.brk();
             Taclet t = it.next();
             printTaclet(t, instantiations, true);
@@ -502,9 +505,9 @@ public final class LogicPrinter {
         layouter.brk(1,-2).print(")").end();
     }
 
-    protected void printAddProgVars(SetOfSchemaVariable apv) throws IOException {
+    protected void printAddProgVars(ImmutableSet<SchemaVariable> apv) throws IOException {
         layouter.beginC(2).print("\\addprogvars (");
-        for (IteratorOfSchemaVariable it = apv.iterator(); it.hasNext();) {
+        for (Iterator<SchemaVariable> it = apv.iterator(); it.hasNext();) {
             layouter.brk();
             SchemaVariable tgt = it.next();
             printSchemaVariable(tgt);
@@ -614,8 +617,8 @@ public final class LogicPrinter {
     public void printSequent(SequentPrintFilter filter,
                              boolean finalbreak) {
         try {
-            ListOfSequentPrintFilterEntry antec = filter.getAntec();
-            ListOfSequentPrintFilterEntry succ  = filter.getSucc();
+            ImmutableList<SequentPrintFilterEntry> antec = filter.getAntec();
+            ImmutableList<SequentPrintFilterEntry> succ  = filter.getSucc();
             markStartSub();
             startTerm(antec.size()+succ.size());
             layouter.beginC(1).ind();
@@ -708,9 +711,9 @@ public final class LogicPrinter {
         }
     }
 
-    public void printSemisequent (ListOfSequentPrintFilterEntry p_formulas )
+    public void printSemisequent (ImmutableList<SequentPrintFilterEntry> p_formulas )
         throws IOException {
-        IteratorOfSequentPrintFilterEntry it   = p_formulas.iterator ();
+        Iterator<SequentPrintFilterEntry> it   = p_formulas.iterator ();
         SequentPrintFilterEntry           entry;
         int                               size = p_formulas.size     ();
         while ( size-- != 0 ) {
@@ -772,9 +775,10 @@ public final class LogicPrinter {
      * Pretty-prints a set of terms.
      * @param terms the terms to be printed
      */
-    public void printTerm(SetOfTerm terms) throws IOException {
+    public void printTerm(ImmutableSet<Term> terms)
+        throws IOException {
         getLayouter().print("{");
-        IteratorOfTerm it = terms.iterator();
+        Iterator<Term> it = terms.iterator();
         while (it.hasNext()) {
             printTerm(it.next());
             if (it.hasNext())
@@ -1223,11 +1227,11 @@ public final class LogicPrinter {
     }
     
 
-    protected void printVariables(ArrayOfQuantifiableVariable vars)
+    protected void printVariables (ImmutableArray<QuantifiableVariable> vars)
                                             throws IOException {
         int size = vars.size ();
         for(int j = 0; j != size; j++) {
-            final QuantifiableVariable v = vars.getQuantifiableVariable (j);
+            final QuantifiableVariable v = vars.get (j);
             if(v instanceof LogicVariable){
                 Term t =
                     TermFactory.DEFAULT.createTerm((LogicVariable) v);
@@ -1302,7 +1306,7 @@ public final class LogicPrinter {
         throws IOException
     {
         layouter.beginC(2).print(l);
-        printVariables(new ArrayOfQuantifiableVariable(v));
+        printVariables(new ImmutableArray<QuantifiableVariable>(v));
         startTerm(2);
         maybeParens(t, ass2);
         layouter.print(r).brk(0);
@@ -1329,7 +1333,7 @@ public final class LogicPrinter {
      * @param ass  associativity for phi
      */
     public void printQuantifierTerm(String name,
-                                    ArrayOfQuantifiableVariable vars,
+                                    ImmutableArray<QuantifiableVariable> vars,
                                     Term phi, int ass)
         throws IOException
     {
@@ -1343,7 +1347,7 @@ public final class LogicPrinter {
     }
 
     public void printNumericalQuantifierTerm(String name,
-            ArrayOfQuantifiableVariable vars,
+            ImmutableArray<QuantifiableVariable> vars,
             Term cond, Term summand, int ass, int ass2)
     throws IOException
     {
@@ -1365,7 +1369,7 @@ public final class LogicPrinter {
     }
 
     public void printBoundedNumericalQuantifierTerm(String name,
-            ArrayOfQuantifiableVariable vars,
+            ImmutableArray<QuantifiableVariable> vars,
             Term lower, Term upper, Term summand, int ass, int ass2)
     throws IOException
     {

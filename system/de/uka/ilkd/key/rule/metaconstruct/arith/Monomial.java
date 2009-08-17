@@ -11,7 +11,10 @@
 package de.uka.ilkd.key.rule.metaconstruct.arith;
 
 import java.math.BigInteger;
+import java.util.Iterator;
 
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.expression.literal.IntLiteral;
 import de.uka.ilkd.key.ldt.IntegerLDT;
@@ -26,10 +29,10 @@ import de.uka.ilkd.key.util.LRUCache;
  */
 public class Monomial {
     
-    private final ListOfTerm parts;
+    private final ImmutableList<Term> parts;
     private final BigInteger coefficient;
     
-    private Monomial(final ListOfTerm parts, final BigInteger coefficient) {
+    private Monomial(final ImmutableList<Term> parts, final BigInteger coefficient) {
         this.parts = parts;
         this.coefficient = coefficient;
     }
@@ -37,7 +40,7 @@ public class Monomial {
     private static final LRUCache<Term, Monomial> monomialCache = 
         new LRUCache<Term, Monomial> ( 2000 );
     
-    public static final Monomial ONE = new Monomial ( SLListOfTerm.EMPTY_LIST,
+    public static final Monomial ONE = new Monomial ( ImmutableSLList.<Term>nil(),
                                                       BigInteger.ONE );
     
     public static Monomial create(Term monoTerm, Services services) {
@@ -129,7 +132,7 @@ public class Monomial {
         final BigInteger c = this.coefficient;
 
         if ( a.signum () == 0 || c.signum () == 0 )
-            return new Monomial ( SLListOfTerm.EMPTY_LIST, BigInteger.ZERO );
+            return new Monomial ( ImmutableSLList.<Term>nil(), BigInteger.ZERO );
         
         return new Monomial ( difference ( m.parts, this.parts ),
                               LexPathOrdering.divide ( a, c ) );
@@ -144,7 +147,7 @@ public class Monomial {
         Debug.assertFalse ( coefficient.signum () == 0 );
         Debug.assertFalse ( m.coefficient.signum () == 0 );
         
-        final ListOfTerm newParts = difference ( m.parts, this.parts );
+        final ImmutableList<Term> newParts = difference ( m.parts, this.parts );
 
         final BigInteger gcd = coefficient.abs ().gcd ( m.coefficient.abs () );
         return new Monomial ( newParts, m.coefficient.divide ( gcd ) );
@@ -200,7 +203,7 @@ public class Monomial {
 	    services.getTypeConverter().getIntegerLDT().getMul();
         Term res = null;
         
-        final IteratorOfTerm it = parts.iterator ();
+        final Iterator<Term> it = parts.iterator ();
         if ( it.hasNext () ) {
             res = it.next ();
             while ( it.hasNext () )
@@ -223,7 +226,7 @@ public class Monomial {
         final StringBuffer res = new StringBuffer ();
         res.append ( coefficient );
         
-        final IteratorOfTerm it = parts.iterator ();
+        final Iterator<Term> it = parts.iterator ();
         while ( it.hasNext () )
             res.append ( " * " + it.next () );
 
@@ -232,7 +235,7 @@ public class Monomial {
     
     private static class Analyser {
         public BigInteger coeff = BigInteger.ONE;
-        public ListOfTerm parts = SLListOfTerm.EMPTY_LIST;
+        public ImmutableList<Term> parts = ImmutableSLList.<Term>nil();
         private final Services services;
         private final Operator numbers, mul;
         	
@@ -273,7 +276,7 @@ public class Monomial {
     
     public int hashCode() {
         int res = coefficient.hashCode ();
-        final IteratorOfTerm it = parts.iterator ();
+        final Iterator<Term> it = parts.iterator ();
         while ( it.hasNext () )
             res += it.next ().hashCode ();
         return res;
@@ -284,9 +287,9 @@ public class Monomial {
      *         <code>b</code>. multiplicity is treated as well here, so this
      *         is really difference of multisets
      */
-    private static ListOfTerm difference(ListOfTerm a, ListOfTerm b) {
-        ListOfTerm res = a;
-        final IteratorOfTerm it = b.iterator ();
+    private static ImmutableList<Term> difference(ImmutableList<Term> a, ImmutableList<Term> b) {
+        ImmutableList<Term> res = a;
+        final Iterator<Term> it = b.iterator ();
         while ( it.hasNext () && !res.isEmpty () )
             res = res.removeFirst ( it.next () );
         return res;
@@ -296,7 +299,7 @@ public class Monomial {
         return coefficient;
     }
 
-    public ListOfTerm getParts() {
+    public ImmutableList<Term> getParts() {
         return parts;
     }
 

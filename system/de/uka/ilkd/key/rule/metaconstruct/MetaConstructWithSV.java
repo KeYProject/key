@@ -10,7 +10,8 @@
 
 package de.uka.ilkd.key.rule.metaconstruct;
 
-import de.uka.ilkd.key.logic.op.ListOfSchemaVariable;
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 /**
@@ -31,5 +32,5 @@ public interface MetaConstructWithSV {
      *            the instatiations of SV so far.
      * @return a list of schema variables relevant for this entity;
      */
-    public ListOfSchemaVariable neededInstantiations(SVInstantiations svInst);
+    public ImmutableList<SchemaVariable> neededInstantiations(SVInstantiations svInst);
 }

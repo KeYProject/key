@@ -60,7 +60,7 @@ public class ParenthesizedExpression extends Operator
      */
     public ProgramElement getChildAt(int index) {
         if (children != null) {
-            return children.getExpression(index);
+            return children.get(index);
         }
         throw new ArrayIndexOutOfBoundsException();
     }

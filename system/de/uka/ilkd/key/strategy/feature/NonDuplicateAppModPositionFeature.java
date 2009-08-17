@@ -10,7 +10,7 @@
 
 package de.uka.ilkd.key.strategy.feature;
 
-import de.uka.ilkd.key.logic.ListOfTerm;
+import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
@@ -40,9 +40,9 @@ public class NonDuplicateAppModPositionFeature extends NonDuplicateAppFeature {
         final Term oldFocus = oldPio.subTerm ();
         if ( !newFocus.equals ( oldFocus ) ) return false;
         if ( newFocus.isRigid () ) return true;
-        final ListOfTerm oldUpdateContext =
+        final ImmutableList<Term> oldUpdateContext =
             oldApp.instantiations ().getUpdateContext ();
-        final ListOfTerm newUpdateContext =
+        final ImmutableList<Term> newUpdateContext =
             newApp.instantiations ().getUpdateContext ();
         return oldUpdateContext.equals ( newUpdateContext );
     }

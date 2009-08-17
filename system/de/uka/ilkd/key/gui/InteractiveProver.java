@@ -17,6 +17,10 @@ import java.util.List;
 
 import javax.swing.SwingUtilities;
 
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.logic.Constraint;
 import de.uka.ilkd.key.logic.PIOPathIterator;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -141,22 +145,10 @@ public class InteractiveProver {
     public void applyInteractive ( RuleApp app, Goal goal ) {
         goal.node().getNodeInfo().setInteractiveRuleApplication(true);
 
-        ListOfGoal goalList = goal.apply(app);
+ 		ImmutableList<Goal> goalList = goal.apply(app);
     }
 
 
-    private int getMaxStepCount () {
-        int rv = mediator ().getMaxAutomaticSteps();
-        
-        if ( Main.batchMode ) {
-            //Allow much more steps in batchMode than in regular mode.
-            rv *= 100;
-        }
-        
-        return rv;
-    }
-
-    
     private long getTimeout() {
         return mediator().getAutomaticApplicationTimeout();
     }
@@ -173,7 +165,7 @@ public class InteractiveProver {
      * strategy will only be applied on the goals of the list that
      * is handed over and on the new goals an applied rule adds
      */
-    public void startAutoMode ( ListOfGoal goals ) {
+    public void startAutoMode ( ImmutableList<Goal> goals ) {
         if ( goals.isEmpty () ) {
             if ( Main.batchMode ) {
                 // Everything is already proven.
@@ -189,7 +181,7 @@ public class InteractiveProver {
             interactive = false;
         }
         
-        applyStrategy.start ( proof, goals, getMaxStepCount (), getTimeout() );
+        applyStrategy.start ( proof, goals, mediator ().getMaxAutomaticSteps(), getTimeout() );
     }
     
     /** stops the execution of rules */
@@ -216,13 +208,13 @@ public class InteractiveProver {
             goal.setRuleAppManager ( focusManager );
         }
 
-        startAutoMode ( SLListOfGoal.EMPTY_LIST.prepend ( goal ) );
+        startAutoMode ( ImmutableSLList.<Goal>nil().prepend ( goal ) );
     }
 
     private void finishFocussedAutoMode () {
         applyStrategy.removeProverTaskObserver ( focussedAutoModeTaskListener );
         
-        final IteratorOfGoal it = proof.openGoals ().iterator ();
+        final Iterator<Goal> it = proof.openGoals ().iterator ();
         while ( it.hasNext () ) {
             // remove any filtering rule app managers that are left in the proof
             // goals
@@ -260,10 +252,10 @@ public class InteractiveProver {
      * @param userConstraint
      *            the user defined constraint
      */
-    public ListOfBuiltInRule getBuiltInRule(PosInOccurrence pos, 
+    public ImmutableList<BuiltInRule> getBuiltInRule(PosInOccurrence pos, 
 						 Constraint   userConstraint) {
-	ListOfBuiltInRule rules = SLListOfBuiltInRule.EMPTY_LIST;
-	IteratorOfRuleApp it = 
+	ImmutableList<BuiltInRule> rules = ImmutableSLList.<BuiltInRule>nil();
+	Iterator<RuleApp> it = 
 	    getInteractiveRuleAppIndex ().getBuiltInRule
 	    (focusedGoal, pos, userConstraint).iterator();
 
@@ -296,14 +288,14 @@ public class InteractiveProver {
      *            the PosInSequent the position information
      * @param userConstraint
      *            the user defined constraint
-     * @return a SetOfRuleApp with all possible rule applications
+     * @return a SetOf<RuleApp> with all possible rule applications
      */
-    public SetOfRuleApp getBuiltInRuleApp(BuiltInRule rule, 
+    public ImmutableSet<RuleApp> getBuiltInRuleApp(BuiltInRule rule, 
 					  PosInOccurrence     pos,
 					  Constraint       userConstraint) {
 	
-	SetOfRuleApp result = SetAsListOfRuleApp.EMPTY_SET;
-	IteratorOfRuleApp it = getInteractiveRuleAppIndex ().
+	ImmutableSet<RuleApp> result = DefaultImmutableSet.<RuleApp>nil();
+	Iterator<RuleApp> it = getInteractiveRuleAppIndex ().
 	    getBuiltInRule(focusedGoal, 
 			   pos,
 			   userConstraint).iterator();
@@ -325,19 +317,19 @@ public class InteractiveProver {
      * @param pos
      * 				the position in the sequent where the BuiltInRule should be applied
      * @return
-     * 				a SetOfRuleApp with all possible applications of the rule
+     * 				a SetOf<RuleApp> with all possible applications of the rule
      */
-    protected SetOfRuleApp getBuiltInRuleAppsForName(String name, PosInOccurrence pos)
+    protected ImmutableSet<RuleApp> getBuiltInRuleAppsForName(String name, PosInOccurrence pos)
     {
-        SetOfRuleApp result = SetAsListOfRuleApp.EMPTY_SET;
-        ListOfBuiltInRule match = SLListOfBuiltInRule.EMPTY_LIST;
+        ImmutableSet<RuleApp> result = DefaultImmutableSet.<RuleApp>nil();
+        ImmutableList<BuiltInRule> match = ImmutableSLList.<BuiltInRule>nil();
         
         final Constraint userConstraint = mediator.getUserConstraint().getConstraint();
         
         //get all possible rules for current position in sequent
-        ListOfBuiltInRule list = getBuiltInRule(pos, userConstraint);
+        ImmutableList<BuiltInRule> list = getBuiltInRule(pos, userConstraint);
         
-        IteratorOfBuiltInRule iter = list.iterator();
+        Iterator<BuiltInRule> iter = list.iterator();
         
         //find all rules that match given name
         while (iter.hasNext()) {
@@ -361,7 +353,7 @@ public class InteractiveProver {
 	 * 
 	 * @return a list of Taclets with all applicable NoFindTaclets
 	 */
-    ListOfTacletApp getNoFindTaclet() {
+    ImmutableList<TacletApp> getNoFindTaclet() {
 	return filterTaclet(getInteractiveRuleAppIndex ().
 		       getNoFindTaclet(TacletFilter.TRUE,
 				       mediator.getServices(),
@@ -372,7 +364,7 @@ public class InteractiveProver {
      * (called by the SequentViewer)
      * @return a list of Taclets with all applicable FindTaclets
      */
-    ListOfTacletApp getFindTaclet(PosInSequent pos) {
+    ImmutableList<TacletApp> getFindTaclet(PosInSequent pos) {
 	if (pos != null && !pos.isSequent() && focusedGoal != null) {
             Debug.out("NoPosTacletApp: Looking for applicables rule at node",
                       focusedGoal.node().serialNr());
@@ -382,14 +374,14 @@ public class InteractiveProver {
 		                            mediator.getServices(),
 					    mediator.getUserConstraint().getConstraint()));
 	}
-	return SLListOfTacletApp.EMPTY_LIST;
+	return ImmutableSLList.<TacletApp>nil();
     }
     
     /** collects all applicable RewriteTaclets of the current goal
      * (called by the SequentViewer)
      * @return a list of Taclets with all applicable RewriteTaclets
      */
-    ListOfTacletApp getRewriteTaclet(PosInSequent pos) {
+    ImmutableList<TacletApp> getRewriteTaclet(PosInSequent pos) {
 	if (!pos.isSequent())  {
 	    return filterTaclet(getInteractiveRuleAppIndex ().
 		   getRewriteTaclet(TacletFilter.TRUE,
@@ -398,7 +390,7 @@ public class InteractiveProver {
 				    mediator.getUserConstraint().getConstraint())); 
 	}
 
-	return SLListOfTacletApp.EMPTY_LIST;
+	return ImmutableSLList.<TacletApp>nil();
     }
 
 
@@ -412,7 +404,7 @@ public class InteractiveProver {
      * @return a list of all found rule applications of the given rule at
      * position pos  
      */
-    protected SetOfTacletApp getAppsForName(Goal goal, String name, 
+    protected ImmutableSet<TacletApp> getAppsForName(Goal goal, String name, 
             PosInOccurrence pos) {
         return getAppsForName(goal, name, pos, TacletFilter.TRUE);
     }
@@ -428,16 +420,16 @@ public class InteractiveProver {
      * @return a list of all found rule applications of the given rule at
      * position <tt>pos</tt> passing the filter
      */
-     protected SetOfTacletApp getAppsForName(Goal goal, String name, 
+     protected ImmutableSet<TacletApp> getAppsForName(Goal goal, String name, 
                                             PosInOccurrence pos,
                                             TacletFilter filter) {
-	SetOfTacletApp result = SetAsListOfTacletApp.EMPTY_SET;
-        ListOfTacletApp fittingApps = SLListOfTacletApp.EMPTY_LIST;
+	ImmutableSet<TacletApp> result = DefaultImmutableSet.<TacletApp>nil();
+        ImmutableList<TacletApp> fittingApps = ImmutableSLList.<TacletApp>nil();
         final RuleAppIndex index          = goal.ruleAppIndex();
 	final Constraint   userConstraint =
             mediator.getUserConstraint().getConstraint();
 	if ( pos == null ) {
-            final IteratorOfNoPosTacletApp it =
+            final Iterator<NoPosTacletApp> it =
                 index.getNoFindTaclet ( filter,
                                         mediator.getServices(),
                                         userConstraint ).iterator ();
@@ -449,7 +441,7 @@ public class InteractiveProver {
 			                         mediator.getServices(),
 					         userConstraint );
 
-	IteratorOfTacletApp it = fittingApps.iterator();
+	Iterator<TacletApp> it = fittingApps.iterator();
 	// filter fitting applications
 	while (it.hasNext()) {
 	    TacletApp app = it.next();
@@ -507,14 +499,14 @@ public class InteractiveProver {
      * takes NoPosTacletApps as arguments and returns a duplicate free list of
      * the contained TacletApps
      */
-    private ListOfTacletApp filterTaclet(ListOfNoPosTacletApp tacletInstances) {
+    private ImmutableList<TacletApp> filterTaclet(ImmutableList<NoPosTacletApp> tacletInstances) {
         java.util.HashSet<Taclet> applicableRules = new java.util.HashSet<Taclet>();
-        ListOfTacletApp result = SLListOfTacletApp.EMPTY_LIST;
-        IteratorOfNoPosTacletApp it = tacletInstances.iterator();		
+        ImmutableList<TacletApp> result = ImmutableSLList.<TacletApp>nil();
+        Iterator<NoPosTacletApp> it = tacletInstances.iterator();		
         while (it.hasNext()) {
             TacletApp app = it.next ();
             if (mediator().stupidMode()) {
-                ListOfTacletApp ifCandidates = 
+                ImmutableList<TacletApp> ifCandidates = 
                     app.findIfFormulaInstantiations(
                                                     mediator().getSelectedGoal().sequent(),
 						    mediator().getServices(),

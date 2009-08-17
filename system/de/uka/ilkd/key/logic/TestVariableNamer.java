@@ -10,17 +10,28 @@
 
 package de.uka.ilkd.key.logic;
 
+import java.util.Iterator;
+
 import junit.framework.TestCase;
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableMapEntry;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.expression.operator.PostIncrement;
-import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.sort.SortImpl;
+import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
+import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.proof.*;
-import de.uka.ilkd.key.rule.*;
+import de.uka.ilkd.key.rule.AntecTaclet;
+import de.uka.ilkd.key.rule.AntecTacletBuilder;
+import de.uka.ilkd.key.rule.NoPosTacletApp;
+import de.uka.ilkd.key.rule.inst.InstantiationEntry;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 
@@ -97,13 +108,13 @@ public class TestVariableNamer extends TestCase {
 
 
     private void addGlobal(Goal goal, ProgramVariable globalVar) {
- 	SetOfProgramVariable globals = goal.getGlobalProgVars().add(globalVar);
+ 	ImmutableSet<ProgramVariable> globals = goal.getGlobalProgVars().add(globalVar);
 	goal.setGlobalProgVars(globals);
     }
 
 
     private boolean inGlobals(Goal goal, ProgramVariable globalVar) {
-    	IteratorOfProgramVariable it = goal.getGlobalProgVars().iterator();
+    	Iterator<ProgramVariable> it = goal.getGlobalProgVars().iterator();
 	while(it.hasNext()) {
 	    if(it.next() == globalVar) {
 	    	return true;
@@ -134,16 +145,16 @@ public class TestVariableNamer extends TestCase {
     private boolean inTacletApps(Goal goal, ProgramVariable containedVar) {
 	RuleAppIndex ruleAppIndex = goal.ruleAppIndex();
 	TacletIndex tacletIndex = ruleAppIndex.tacletIndex();
-	ListOfNoPosTacletApp noPosTacletApps
+	ImmutableList<NoPosTacletApp> noPosTacletApps
 		= tacletIndex.getPartialInstantiatedApps();
 
-	IteratorOfNoPosTacletApp it = noPosTacletApps.iterator();
+	Iterator<NoPosTacletApp> it = noPosTacletApps.iterator();
 	while(it.hasNext()) {
 	    SVInstantiations insts = it.next().instantiations();
-    	    IteratorOfEntryOfSchemaVariableAndInstantiationEntry it2;
+    	    Iterator<ImmutableMapEntry<SchemaVariable,InstantiationEntry>> it2;
 	    it2 = insts.pairIterator();
 	    while(it2.hasNext()) {
-	        EntryOfSchemaVariableAndInstantiationEntry e = it2.next();
+	        ImmutableMapEntry<SchemaVariable,InstantiationEntry> e = it2.next();
 		Object inst = e.value().getInstantiation();
 		if(inst instanceof PostIncrement 
 		   && ((PostIncrement)inst).getFirstElement() == containedVar){

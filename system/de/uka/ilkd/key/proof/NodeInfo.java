@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.ProgramPrefix;
@@ -91,7 +92,7 @@ public class NodeInfo {
     }
     
     private boolean isSymbolicExecution(Taclet t) {
-        ListOfRuleSet list = t.getRuleSets();
+        ImmutableList<RuleSet> list = t.getRuleSets();
 	RuleSet       rs;
 	while (!list.isEmpty()) {
 	    rs = list.head ();

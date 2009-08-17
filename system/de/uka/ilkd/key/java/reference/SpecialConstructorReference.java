@@ -11,7 +11,7 @@
 
 package de.uka.ilkd.key.java.reference;
 
-import de.uka.ilkd.key.java.ArrayOfExpression;
+import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.JavaNonTerminalProgramElement;
 import de.uka.ilkd.key.java.PositionInfo;
@@ -31,7 +31,7 @@ public abstract class SpecialConstructorReference
     /**
      *      Arguments
      */
-    protected final ArrayOfExpression arguments;
+    protected final ImmutableArray<Expression> arguments;
 
 
     
@@ -47,7 +47,7 @@ public abstract class SpecialConstructorReference
      * @param arguments an expression mutable list.
      */
     public SpecialConstructorReference(Expression[] arguments) {
-	this.arguments = new ArrayOfExpression(arguments);
+	this.arguments = new ImmutableArray<Expression>(arguments);
     }
 
 
@@ -55,7 +55,7 @@ public abstract class SpecialConstructorReference
      * Special constructor reference.
      * @param arguments an expression mutable list.
      */
-    public SpecialConstructorReference(ArrayOfExpression arguments) {
+    public SpecialConstructorReference(ImmutableArray<Expression> arguments) {
 	this.arguments = arguments;
     }
 
@@ -69,7 +69,7 @@ public abstract class SpecialConstructorReference
      */ 
     public SpecialConstructorReference(ExtList children) {
 	super(children);	
-	this.arguments = new ArrayOfExpression
+	this.arguments = new ImmutableArray<Expression>
 	    ((Expression[])children.collect(Expression.class)); 
     }
 
@@ -82,7 +82,7 @@ public abstract class SpecialConstructorReference
      */ 
     public SpecialConstructorReference(ExtList children, PositionInfo pi) {
 	super(children, pi);	
-	this.arguments = new ArrayOfExpression
+	this.arguments = new ImmutableArray<Expression>
 	    ((Expression[])children.collect(Expression.class)); 
     }
 
@@ -105,7 +105,7 @@ public abstract class SpecialConstructorReference
      */
     public ProgramElement getChildAt(int index) {
         if (arguments != null) {
-            return arguments.getExpression(index);
+            return arguments.get(index);
         }
         throw new ArrayIndexOutOfBoundsException();
     }
@@ -129,7 +129,7 @@ public abstract class SpecialConstructorReference
     */
     public Expression getExpressionAt(int index) {
         if (arguments != null) {
-            return arguments.getExpression(index);
+            return arguments.get(index);
         }
         throw new ArrayIndexOutOfBoundsException();
     }
@@ -139,7 +139,7 @@ public abstract class SpecialConstructorReference
      *      @return the expression mutable list.
      */
 
-    public ArrayOfExpression getArguments() {
+    public ImmutableArray<Expression> getArguments() {
         return arguments;
     }
     

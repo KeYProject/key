@@ -10,14 +10,20 @@
 
 package de.uka.ilkd.key.smt;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.*;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Timer;
+import java.util.*;
+
+import javax.swing.JFileChooser;
 
 import org.apache.log4j.Logger;
 
+import de.uka.ilkd.key.gui.DecisionProcedureSettings;
+import de.uka.ilkd.key.gui.Main;
 import de.uka.ilkd.key.gui.configuration.PathConfig;
+import de.uka.ilkd.key.gui.configuration.ProofSettings;
+import de.uka.ilkd.key.gui.configuration.Settings;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -25,11 +31,12 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.util.HelperClassForTests;
+import de.uka.ilkd.key.util.ProgressMonitor;
 
 
 public abstract class AbstractSMTSolver implements SMTSolver {
 
-
+    
     private static final Logger logger = Logger
 	    .getLogger(AbstractSMTSolver.class.getName());
 
@@ -44,18 +51,38 @@ public abstract class AbstractSMTSolver implements SMTSolver {
      */
     private static final String FILE_BASE_NAME = "smt_formula";
     
+    /** true, if this solver was checked if installed */
+    private boolean installwaschecked = false;
+    /** true, if last check showed solver is installed */
+    private boolean isinstalled = false;
+    /** true, if the current run is for test uss only (for example checking, if the Solver is installed) */
+    private boolean inTestMode = false;
     
     /**
      * Get the command for executing the external prover.
+     * This is a hardcoded default value. It might be overridden by user settings
      * @param filename the location, where the file is stored.
      * @param formula the formula, that was created by the translator
      * @return Array of Strings, that can be used for executing an external decider.
      */
-    protected abstract String[] getExecutionCommand(String filename,
+    protected abstract String getExecutionCommand(String filename,
 	    				            String formula);
+  
     
+    private String getFinalExecutionCommand(String filename, String formula) {
+	//get the Command from user settings
+	String toReturn = ProofSettings.DEFAULT_SETTINGS.getDecisionProcedureSettings().getExecutionCommand(this);
+	if (toReturn == null || toReturn.length() == 0) {
+	    toReturn = this.getExecutionCommand(filename, formula);
+	} else {
+	    //replace the placeholder with filename and fomula
+	    toReturn = toReturn.replaceAll("%f", filename);
+	    toReturn = toReturn.replaceAll("%p", formula);
+	}
+	return toReturn;
+    }
     
-    /**
+  /*  /**
      * Interpret the answer of the program.
      * This is very solverdepending. Usually, an exitcode of 0 inicates no error.
      * But not every solver returns 0 if successfull termination was reached.
@@ -65,7 +92,7 @@ public abstract class AbstractSMTSolver implements SMTSolver {
      * @return A SMTSolverResult containing all information of the interpretation.
      * @throws IllegalArgumentException If the solver caused an error.
      */
-    protected abstract SMTSolverResult interpretAnswer(String output, String error, int exitstatus) throws IllegalArgumentException;
+   // public abstract SMTSolverResult interpretAnswer(String output, String error, int exitstatus) throws IllegalArgumentException;
 
     private static String toStringLeadingZeros(int n, int width) {
 	String rv = "" + n;
@@ -117,13 +144,32 @@ public abstract class AbstractSMTSolver implements SMTSolver {
 	out.write(text);
 	out.close();
 
+	//store the text permanent to a file 
+	if (!this.inTestMode && ProofSettings.DEFAULT_SETTINGS.getDecisionProcedureSettings().getSaveFile() &&
+		Main.getInstance() != null) {
+	    JFileChooser fc = new JFileChooser();
+	    fc.setDialogTitle("Select a file to save the created problem");
+	    fc.setMultiSelectionEnabled(false);
+	    int returnVal = fc.showOpenDialog(Main.getInstance());
+	    File target = fc.getSelectedFile();
+	    if (returnVal == JFileChooser.APPROVE_OPTION) {
+		try {
+		    final BufferedWriter out2 = new BufferedWriter(new FileWriter(target));
+		    out2.write(text);
+		    out2.close();
+		} catch (IOException e) {
+		    throw new RuntimeException("Could not store to file " + target.getAbsolutePath() + ".");
+		}
+	    }
+	}
+	
 	return smtFile;
     }
 
 
     /** Read the input until end of file and return contents in a
      * single string containing all line breaks. */
-    private static String read(InputStream in) throws IOException {
+    static String read(InputStream in) throws IOException {
 	BufferedReader reader = new BufferedReader(new InputStreamReader(in));
 	StringBuffer sb = new StringBuffer();
 	int x = reader.read();
@@ -159,6 +205,66 @@ public abstract class AbstractSMTSolver implements SMTSolver {
     	
     	return toReturn;
     }
+    
+    
+    
+    public Process run(Goal goal, Services services) throws IOException,IllegalFormulaException{
+	Process toReturn;
+	
+	SMTTranslator trans = this.getTranslator(services);
+	
+	String formula = trans.translate(goal.sequent(), services).toString();
+	
+	
+
+	
+	final File loc;
+	try {
+	    //store the translation to a file                                
+	    loc = this.storeToFile(formula);
+	} catch (IOException e) {
+	    logger.error("The file with the formula could not be written.", e);
+	    final IOException io = new IOException("Could not create or write the input file " +
+		    "for the external prover. Received error message:\n" + e.getMessage());
+	    io.initCause(e);
+	    throw io;
+	} 
+	
+	
+
+	//get the commands for execution
+	String execCommand = this.getFinalExecutionCommand(loc.getAbsolutePath(), formula);
+
+	
+	try {
+	    //execute the external solver
+	    toReturn = Runtime.getRuntime().exec(execCommand);
+	    } catch (IOException e) {
+		    String cmdStr = execCommand;
+
+		    IOException ioe = new IOException("Invocation of decision procedure\n\t\t" +
+			    this.name() + "\n with command \n\t\t" + cmdStr + "\n" +  
+			    "failed. The most common (but not all) reasons for this error are:\n" +
+			    "\n 1. the directory where you put the executable of the decision procedure is not in your PATH.\n " +
+			    "\t    Solution: Add the directory to your PATH environment variable." +
+			    "\n 2. we expect a different name than your executable " +
+			    "(prior to KeY 1.5 and later we expected 'Simplify' instead of 'simplify')" +
+			    "\n\t Solution: Change the name to " + (execCommand != null ? 
+			        	execCommand : "expected name") +
+			    "\n 3. you have not the permission to execute the decision procedure." +
+			    "\n\t Solution: *nix-like systems: try 'chmod u+x <path_to_executable>/<executable_filename>" +
+			    "\n 4. you use a too new or too old version of the decision procedure and the command " +
+			        "line parameters changed." +
+			    "\n\t Solution: Install a supported version (see http://www.key-project.org)\n" +
+			    "\n Original Error-Message: " + e.getMessage());
+		    ioe.initCause(e);
+		    throw ioe;
+		}
+	
+	
+	
+	 return toReturn;
+    }
 
 
     /**
@@ -179,13 +285,41 @@ public abstract class AbstractSMTSolver implements SMTSolver {
 	    String s = trans.translate(t, services).toString();
 	    toReturn = this.run(s, timeout, services);
     	} catch (IllegalFormulaException e) {
-	    //toReturn = SMTSolverResult.NO_IDEA;
-	    //logger.debug("The formula could not be translated.", e);
 	    throw new RuntimeException("The formula could not be translated.\n" + e.getMessage());
 	}    	
     	return toReturn;
     }
 
+    /**
+     * 
+     * @return the progress made on the current task.
+     */
+    public int getProgress() {
+	if (this.execWatch == null) {
+	    return 0;
+	} else {
+	    return this.execWatch.getProgress();
+	}
+    }
+    
+    private ExecutionWatchDog execWatch;
+    
+    private ArrayList<ProgressMonitor> progressMonitors = new ArrayList<ProgressMonitor>();
+    
+    public void addProgressMonitor(ProgressMonitor p) {
+	progressMonitors.add(p);
+    }
+    
+    public boolean removeProgressMonitor(ProgressMonitor p) {
+	return progressMonitors.remove(p);
+    }
+    
+    public void removeAllProgressMonitors() {
+	while (progressMonitors.size() > 0) {
+	    progressMonitors.remove(0);
+	}
+    }
+    
     /**
      * run the solver on a formula.
      * @param formula The formula to be proven in syntax, this solver supports.
@@ -214,29 +348,57 @@ public abstract class AbstractSMTSolver implements SMTSolver {
 	} 
 
 	//get the commands for execution
-	String[] execCommand = this.getExecutionCommand(loc.getAbsolutePath(), formula);
+	String execCommand = this.getFinalExecutionCommand(loc.getAbsolutePath(), formula);
 
 	try {
 	    //execute the external solver
 	    Process p = Runtime.getRuntime().exec(execCommand);
-	    ExecutionWatchDog tt = new ExecutionWatchDog(timeout, p);
+	    final int temptimeout = timeout;
+	    execWatch = new ExecutionWatchDog(timeout, p);
 	    Timer t = new Timer();
-	    t.schedule(tt, new Date(System.currentTimeMillis()), 1000);
+	    t.schedule(execWatch, new Date(System.currentTimeMillis()), 300);
+
+	    
 	    boolean interruptedByWatchdog = false;
 	    try {
-		p.waitFor();
-		if (tt.wasInterrupted()) {
+		//wait for the SMTSolver Thread and make popagate progress
+		boolean finished = false;
+		synchronized (p) {
+		while (!finished) {
+		    if (this.toBeInterrupted) {
+			this.toBeInterrupted = false;
+			execWatch.interrupt();
+		    }
+		    try {
+			p.wait(300);
+			p.exitValue();
+			//if the program comes here, p has been finished.
+			finished = true;
+		    } catch (IllegalThreadStateException e) {
+			//if program comes here, p has not been finished yet.
+			//update the progress.
+			for (ProgressMonitor pm : this.progressMonitors) {
+			    pm.setProgress(execWatch.getProgress());
+			}
+		    }
+		}
+		}
+		if (execWatch.wasInterruptedByTimeout()) {
 		    interruptedByWatchdog = true;
 		    logger.debug(
 		    "Process for smt formula proving interrupted because of timeout.");
+		} else if (execWatch.wasInterruptedByUser()) {
+		    interruptedByWatchdog = true;
+		    logger.debug(
+		    "Process for smt formula proving interrupted because of user interaction.");
 		}
 	    } catch (InterruptedException f) {
 		logger.debug(
 			"Process for smt formula proving interrupted.",
 			f);
-		//System.out.println("process was interrupted");
 	    } finally {
 		t.cancel();
+		this.execWatch = null;
 	    }
 	    
 	    if (interruptedByWatchdog) {
@@ -259,40 +421,9 @@ public abstract class AbstractSMTSolver implements SMTSolver {
 		    throw new RuntimeException("Error while executing solver:\n" + e.getMessage());
 		}
 	    }
-	    
-	    /*
-	    if (tt.wasInterrupted()) {
-		//the process was terminated by force.
-		toReturn = SMTSolverResult.NO_IDEA;
-	    } else {
-		if (p.exitValue() == 0) {
-		    //the process terminated as it should
-		    InputStream in = p.getInputStream();
-		    String text = read(in);
-		    in.close();
-		
-		    logger.debug("Answer for created formula: ");
-		    logger.debug(text);
-		    
-		    toReturn = this.interpretAnswer(text);
-		    
-	    	} else {
-	    	    //programm terminated with an error
-	    	    InputStream in = p.getErrorStream();
-		    String text = read(in);
-		    in.close();
-		
-		    logger.debug("Error in created formula: ");
-		    logger.debug(text);
-		    
-		    throw new RuntimeException("Error while executing solver:\n" + text);
-	    	}
-	    }*/
 	} catch (IOException e) {
-	    String cmdStr = "";
-	    for (String cmd : execCommand) {
-		cmdStr += cmd + " ";
-	    }
+	    String cmdStr = execCommand;
+
 	    IOException ioe = new IOException("Invocation of decision procedure\n\t\t" +
 		    this.name() + "\n with command \n\t\t" + cmdStr + "\n" +  
 		    "failed. The most common (but not all) reasons for this error are:\n" +
@@ -300,8 +431,8 @@ public abstract class AbstractSMTSolver implements SMTSolver {
 		    "\t    Solution: Add the directory to your PATH environment variable." +
 		    "\n 2. we expect a different name than your executable " +
 		    "(prior to KeY 1.5 and later we expected 'Simplify' instead of 'simplify')" +
-		    "\n\t Solution: Change the name to " + (execCommand.length > 0 ? 
-		        	execCommand[0] : "expected name") +
+		    "\n\t Solution: Change the name to " + (execCommand != null ? 
+		        	execCommand : "expected name") +
 		    "\n 3. you have not the permission to execute the decision procedure." +
 		    "\n\t Solution: *nix-like systems: try 'chmod u+x <path_to_executable>/<executable_filename>" +
 		    "\n 4. you use a too new or too old version of the decision procedure and the command " +
@@ -315,10 +446,11 @@ public abstract class AbstractSMTSolver implements SMTSolver {
 	return toReturn;
     }
     
-    /** true, if this solver was checked if installed */
-    private boolean installwaschecked = false;
-    /** true, if last check showed solver is installed */
-    private boolean isinstalled = false;
+    private boolean toBeInterrupted = false;
+    
+    public void interrupt() {
+	this.toBeInterrupted = true;
+    }
     
     /**
      * check, if this solver is installed and can be used.
@@ -327,23 +459,21 @@ public abstract class AbstractSMTSolver implements SMTSolver {
      */
     public boolean isInstalled(boolean recheck) {
 	if (recheck | !installwaschecked) {
-	    //build valid formula
-	    HelperClassForTests helper = new HelperClassForTests();	
-	    ProofAggregate p = helper.parse(new File(this.getTestFile()));
-	    Proof pr = p.getFirstProof();
-	    Goal g = pr.openGoals().iterator().next();
-	    //try to solve the formula
+	    this.inTestMode = true;
 	    try {
-		//TODO work here! translation doesn't work this way!
-		this.run(g, 1, pr.getServices());
+		//This will cause an error, but no IOException, if installed.
+		//avoid to call the translator. A fakeds service element will
+		//cause trouble this way.
+		this.run("test", 1, new Services());
 		isinstalled = true;
-//	    } catch (RuntimeException e) {
-//		if this exception: some problem, but not with insatllation
-//		isinstalled = true;
 	    } catch (IOException e2) {
 //		if exception: not installed
 		isinstalled = false;
+	    } catch (RuntimeException e) {
+		//if this exception: some problem, but not with insatllation
+		isinstalled = true;
 	    }
+	    this.inTestMode = false;
 	    installwaschecked = true;
 	}
 	return isinstalled;
@@ -356,5 +486,14 @@ public abstract class AbstractSMTSolver implements SMTSolver {
 	    + File.separator + "smt"
 	    + File.separator + "ornot.key";
     }
+    
+    /**
+     * get the hard coded execution command from this solver.
+     * The filename od a problem is indicated by %f, the problem itsself with %p
+     */
+    public String getDefaultExecutionCommand() {
+	return this.getExecutionCommand("%f", "%p");
+    }
+    
     
 }

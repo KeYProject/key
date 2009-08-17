@@ -19,10 +19,7 @@ header {
   import java.util.*;
   import java.math.BigInteger;
 
-  import de.uka.ilkd.key.collection.ListOfString;
-  import de.uka.ilkd.key.collection.IteratorOfString;
-  import de.uka.ilkd.key.collection.SLListOfString;
-
+  import de.uka.ilkd.key.collection.*;
   import de.uka.ilkd.key.logic.*;
   import de.uka.ilkd.key.logic.op.*;
   import de.uka.ilkd.key.logic.sort.*;
@@ -33,10 +30,8 @@ header {
   import de.uka.ilkd.key.rule.*;
   import de.uka.ilkd.key.rule.conditions.*;
  
-  import de.uka.ilkd.key.speclang.SetAsListOfClassInvariant;
-  import de.uka.ilkd.key.speclang.SetAsListOfOperationContract;
-  import de.uka.ilkd.key.speclang.SetOfClassInvariant;
-  import de.uka.ilkd.key.speclang.SetOfOperationContract;
+  import de.uka.ilkd.key.speclang.*;
+
   import de.uka.ilkd.key.speclang.dl.translation.DLSpecFactory;
 
   import de.uka.ilkd.key.util.*;
@@ -101,7 +96,7 @@ options {
     private NamespaceSet nss;
     private HashMap<String, String> category2Default = new HashMap<String, String>();
     private boolean onlyWith=false;
-    private SetOfChoice activatedChoices = SetAsListOfChoice.EMPTY_SET;
+    private ImmutableSet<Choice> activatedChoices = DefaultImmutableSet.<Choice>nil();
     private HashSet usedChoiceCategories = new HashSet();
     private HashMap taclet2Builder;
     private AbbrevMap scm;
@@ -136,9 +131,9 @@ options {
     private DeclPicker capturer = null;
     private ProgramMethod pm = null;
 
-    private SetOfTaclet taclets = SetAsListOfTaclet.EMPTY_SET; 
-    private SetOfOperationContract contracts = SetAsListOfOperationContract.EMPTY_SET;
-    private SetOfClassInvariant invs = SetAsListOfClassInvariant.EMPTY_SET;
+    private ImmutableSet<Taclet> taclets = DefaultImmutableSet.<Taclet>nil(); 
+    private ImmutableSet<OperationContract> contracts = DefaultImmutableSet.<OperationContract>nil();
+    private ImmutableSet<ClassInvariant> invs = DefaultImmutableSet.<ClassInvariant>nil();
 
     private ParserConfig schemaConfig;
     private ParserConfig normalConfig;
@@ -272,7 +267,7 @@ options {
                      ParserConfig schemaConfig,
                      ParserConfig normalConfig, 
                      HashMap taclet2Builder,
-                     SetOfTaclet taclets) { 
+                     ImmutableSet<Taclet> taclets) { 
         this(lexer, filename, null, null, mode);
         if (lexer instanceof DeclPicker) {
             this.capturer = (DeclPicker) lexer;
@@ -341,7 +336,7 @@ options {
         keh.reportException(ex);
     }
 
-    public SetOfChoice getActivatedChoices(){
+    public ImmutableSet<Choice> getActivatedChoices(){
         return activatedChoices;
     }
     
@@ -394,15 +389,15 @@ options {
         return namespaces().choices();
     }
 
-    public SetOfTaclet getTaclets(){
+    public ImmutableSet<Taclet> getTaclets(){
         return taclets;
     }
 
-    public SetOfOperationContract getContracts(){
+    public ImmutableSet<OperationContract> getContracts(){
         return contracts;
     }
     
-    public SetOfClassInvariant getInvariants(){
+    public ImmutableSet<ClassInvariant> getInvariants(){
     	return invs;
     }
     
@@ -702,9 +697,9 @@ options {
             ((Function) functions.lookup(new Name("Z")), result); 
     }
 
-    private String getTypeList(ListOfProgramVariable vars) {
+    private String getTypeList(ImmutableList<ProgramVariable> vars) {
 	StringBuffer result = new StringBuffer("");
-	final IteratorOfProgramVariable it = vars.iterator();
+	final Iterator<ProgramVariable> it = vars.iterator();
 	while (it.hasNext()) {
          result.append(it.next().getContainerType().getFullName());
          if (it.hasNext()) result.append(", ");         
@@ -749,7 +744,7 @@ options {
                 }
                 // WATCHOUT why not in DECLARATION MODE	   
                 if(!isDeclParser()) {			      	
-                    final ListOfProgramVariable vars = 	
+                    final ImmutableList<ProgramVariable> vars = 	
                     javaInfo.getAllAttributes(attributeName, prefixKJT);
                     
                     if (vars.size() == 0) {
@@ -1130,7 +1125,7 @@ options {
         kjt = getTypeByClassName(className.toString());
         if (kjt != null) { 
            if (LA(n+1) == DOT && LA(n+3) == LPAREN) {
-               IteratorOfProgramMethod it = javaInfo.getAllProgramMethods(kjt).iterator();
+               Iterator<ProgramMethod> it = javaInfo.getAllProgramMethods(kjt).iterator();
                while(it.hasNext()) {
                  final ProgramMethod pm = it.next();
                  final String name = kjt.getFullName()+"::"+LT(n+2).getText();                 
@@ -1206,9 +1201,9 @@ options {
                                  String id,
                                  Object rwObj,
                                  Sequent addSeq,
-                                 ListOfTaclet addRList,
-                                 SetOfSchemaVariable pvs,
-                                 SetOfChoice soc) 
+                                 ImmutableList<Taclet> addRList,
+                                 ImmutableSet<SchemaVariable> pvs,
+                                 ImmutableSet<Choice> soc) 
         throws SemanticException
         {
             TacletGoalTemplate gt = null;
@@ -1289,7 +1284,7 @@ options {
     }
 
     
-    private SetOfModality lookupOperatorSV(String opName, SetOfModality modalities) 
+    private ImmutableSet<Modality> lookupOperatorSV(String opName, ImmutableSet<Modality> modalities) 
     		throws KeYSemanticException {
 	ModalOperatorSV osv = (ModalOperatorSV)variables().lookup(new Name(opName));
         if(osv == null) {
@@ -1299,8 +1294,8 @@ options {
         return modalities;
     } 
     
-    private SetOfModality opSVHelper(String opName, 
-                                     SetOfModality modalities) 
+    private ImmutableSet<Modality> opSVHelper(String opName, 
+                                     ImmutableSet<Modality> modalities) 
         	throws KeYSemanticException {
         if(opName.charAt(0) == '#') {
             return lookupOperatorSV(opName, modalities);           
@@ -1339,7 +1334,7 @@ top {Term a;} : a=formula {
 decls : 
         (one_include_statement)* {
            if(parse_includes) return;
-           activatedChoices = SetAsListOfChoice.EMPTY_SET;  
+           activatedChoices = DefaultImmutableSet.<Choice>nil();  
 	}
         (options_choice)? { if(onlyWith) return; }
         (
@@ -1446,21 +1441,21 @@ choice_option[String cat]{
 
 sort_decls 
 {
-  ListOfSort lsorts = SLListOfSort.EMPTY_LIST;
-  ListOfSort multipleSorts = SLListOfSort.EMPTY_LIST;
+  ImmutableList<Sort> lsorts = ImmutableSLList.<Sort>nil();
+  ImmutableList<Sort> multipleSorts = ImmutableSLList.<Sort>nil();
 }
 : SORTS LBRACE 
        ( multipleSorts = one_sort_decl { lsorts = lsorts.prepend(multipleSorts); })* 
   RBRACE 
 ;
 
-one_sort_decl returns [ListOfSort createdSorts = SLListOfSort.EMPTY_LIST] 
+one_sort_decl returns [ImmutableList<Sort> createdSorts = ImmutableSLList.<Sort>nil()] 
 {
     boolean isGenericSort = false;
     Sort[] sortExt=new Sort [0];
     Sort[] sortOneOf=new Sort [0];
     String firstSort;
-    ListOfString sortIds = SLListOfString.EMPTY_LIST; 
+    ImmutableList<String> sortIds = ImmutableSLList.<String>nil(); 
 } : 
         ( 
          GENERIC {isGenericSort=true;} sortIds = simple_ident_comma_list
@@ -1473,7 +1468,7 @@ one_sort_decl returns [ListOfSort createdSorts = SLListOfSort.EMPTY_LIST]
           )?
         ) SEMI {   
             if (!skip_sorts) {
-                    IteratorOfString it = sortIds.iterator ();        
+                    Iterator<String> it = sortIds.iterator ();        
                     while ( it.hasNext () ) {
                         Name sort_name = new Name(it.next());   
                         // attention: no expand to java.lang here!       
@@ -1481,8 +1476,8 @@ one_sort_decl returns [ListOfSort createdSorts = SLListOfSort.EMPTY_LIST]
                             Sort s;
 			    if (isGenericSort) {
                                 int i;
-                                SetOfSort  ext   = SetAsListOfSort.EMPTY_SET;
-                                SetOfSort  oneOf = SetAsListOfSort.EMPTY_SET;
+                                ImmutableSet<Sort>  ext   = DefaultImmutableSet.<Sort>nil();
+                                ImmutableSet<Sort>  oneOf = DefaultImmutableSet.<Sort>nil();
 
                                 for ( i = 0; i != sortExt.length; ++i )
                                 ext = ext.add ( sortExt[i] );
@@ -1499,7 +1494,7 @@ one_sort_decl returns [ListOfSort createdSorts = SLListOfSort.EMPTY_LIST]
                             } else if (new Name("any").equals(sort_name)) {
                                 s = Sort.ANY;
                             } else  {
-                                SetOfSort  ext = SetAsListOfSort.EMPTY_SET;
+                                ImmutableSet<Sort>  ext = DefaultImmutableSet.<Sort>nil();
 
                                 for ( int i = 0; i != sortExt.length; ++i ) {
                                     ext = ext.add ( sortExt[i] );
@@ -1604,7 +1599,7 @@ prog_var_decls
 {
     String var_name;
     KeYJavaType kjt = null;
-    ListOfString var_names = null;
+    ImmutableList<String> var_names = null;
 }
     :
         { switchToNormalMode();}
@@ -1614,7 +1609,7 @@ prog_var_decls
             kjt = keyjavatype
             var_names = simple_ident_comma_list
             {
-	        IteratorOfString it = var_names.iterator();
+	        Iterator<String> it = var_names.iterator();
 		while(it.hasNext()){
 		  var_name = it.next();
 		  ProgramElementName pvName = new ProgramElementName(var_name);
@@ -1653,7 +1648,7 @@ simple_ident returns [String ident = null]
      id:IDENT { ident = id.getText(); }
    ;
 
-simple_ident_comma_list returns [ListOfString ids = SLListOfString.EMPTY_LIST]
+simple_ident_comma_list returns [ImmutableList<String> ids = ImmutableSLList.<String>nil()]
 {
   String id = null;
 }
@@ -1675,7 +1670,7 @@ one_schema_var_decl
     boolean makeVariableSV  = false;
     boolean makeSkolemTermSV = false;
     String id = null;
-    ListOfString ids = null;
+    ImmutableList<String> ids = null;
     SchemaVariableModifierSet mods = null;
 } :   
    (MODALOPERATOR one_schema_modal_op_decl SEMI)
@@ -1718,7 +1713,7 @@ one_schema_var_decl
     ids = simple_ident_comma_list 
   ) SEMI
    { 
-     IteratorOfString it = ids.iterator();
+     Iterator<String> it = ids.iterator();
      while(it.hasNext())
        schema_var_decl(it.next(),s,makeVariableSV,makeSkolemTermSV, 
        				   mods);
@@ -1729,14 +1724,14 @@ one_schema_var_decl
 
 schema_modifiers[SchemaVariableModifierSet mods]
 {
-    ListOfString opts = null;
+    ImmutableList<String> opts = null;
 }
     :
         LBRACKET
         opts = simple_ident_comma_list         
         RBRACKET
         {
-            final IteratorOfString it = opts.iterator ();
+            final Iterator<String> it = opts.iterator ();
             while ( it.hasNext () ) {
                 final String option = it.next();
                 if (!mods.addModifier(option))
@@ -1748,10 +1743,10 @@ schema_modifiers[SchemaVariableModifierSet mods]
 
 one_schema_modal_op_decl
 {
-    SetOfModality modalities = SetAsListOfModality.EMPTY_SET;
+    ImmutableSet<Modality> modalities = DefaultImmutableSet.<Modality>nil();
     String id = null;
     Sort sort = Sort.FORMULA;
-    ListOfString ids = null;
+    ImmutableList<String> ids = null;
 } 
     :
         (LPAREN sort = any_sortId_check[true] {
@@ -1763,7 +1758,7 @@ one_schema_modal_op_decl
 	{   if (skip_schemavariables) {	       
 	       return;
 	    }	        
-            IteratorOfString it1 = ids.iterator();
+            Iterator<String> it1 = ids.iterator();
             while(it1.hasNext()) {
   	      modalities = opSVHelper(it1.next(), modalities);
   	    }
@@ -2825,7 +2820,7 @@ sum_or_product_term returns [Term result=null]
 {
     Term cond, t;
     NumericalQuantifier op=null;
-    ListOfQuantifiableVariable index = null;   
+    ImmutableList<QuantifiableVariable> index = null;   
 }
     :
         (
@@ -2840,7 +2835,7 @@ sum_or_product_term returns [Term result=null]
         {
             unbindVars();
             result = tf.createNumericalQuantifierTerm(op, cond, t, 
-                new ArrayOfQuantifiableVariable(index.toArray()));
+                new ImmutableArray<QuantifiableVariable>(index.toArray()));
         }
         RPAREN
     ;
@@ -2849,7 +2844,7 @@ bounded_sum_term returns [Term result=null]
 {
     Term a, b, t;
     BoundedNumericalQuantifier op=null;
-    ListOfQuantifiableVariable index = null;   
+    ImmutableList<QuantifiableVariable> index = null;   
 }
     :
         BSUM {op = BoundedNumericalQuantifier.BSUM;}
@@ -2863,7 +2858,7 @@ bounded_sum_term returns [Term result=null]
         {
             unbindVars();
             result = tf.createBoundedNumericalQuantifierTerm(op, a, b, t, 
-                new ArrayOfQuantifiableVariable(index.toArray()));
+                new ImmutableArray<QuantifiableVariable>(index.toArray()));
         }
         RPAREN
     ;
@@ -2896,7 +2891,7 @@ ifThenElseTerm returns [Term result = null]
 
 argument returns [Term result = null]
 {
-    ArrayOfQuantifiableVariable vars = null;
+    ImmutableArray<QuantifiableVariable> vars = null;
     Term a;
 }
 :
@@ -2913,7 +2908,7 @@ argument returns [Term result = null]
 quantifierterm returns [Term a = null]
 {
     Operator op = null;
-    ListOfQuantifiableVariable vs = null;
+    ImmutableList<QuantifiableVariable> vs = null;
     Term a1 = null;
 }
 :
@@ -2922,8 +2917,8 @@ quantifierterm returns [Term a = null]
         vs = bound_variables a1 = term60
         {
             a = tf.createTerm((Quantifier)op,
-                              new ArrayOfTerm(a1),
-	       		      new ArrayOfQuantifiableVariable(vs.toArray()),
+                              new ImmutableArray<Term>(a1),
+	       		      new ImmutableArray<QuantifiableVariable>(vs.toArray(new QuantifiableVariable[vs.size()])),
 	       		      null);
             if(!isGlobalDeclTermParser())
               unbindVars();
@@ -2994,7 +2989,7 @@ updateterm returns [Term result = null]
 			(ex.getMessage(), getFilename(), getLine(), getColumn()));
         }           
         
-bound_variables returns[ListOfQuantifiableVariable list = SLListOfQuantifiableVariable.EMPTY_LIST]
+bound_variables returns[ImmutableList<QuantifiableVariable> list = ImmutableSLList.<QuantifiableVariable>nil()]
 {
   QuantifiableVariable var = null;
 }
@@ -3117,7 +3112,7 @@ argument_list returns [Term[] result = null]
 
 funcpredvarterm returns [Term a = null]
 {
-    ListOfQuantifiableVariable boundVars = null;
+    ImmutableList<QuantifiableVariable> boundVars = null;
     Term[] args = null;
     String varfuncid;
     String neg = "";
@@ -3190,7 +3185,7 @@ funcpredvarterm returns [Term a = null]
 	                    }
 	                    
 	                    //create term
-	                    a = tf.createTerm(op, args, new ArrayOfQuantifiableVariable(boundVars.toArray()), null);
+	                    a = tf.createTerm(op, args, new ImmutableArray<QuantifiableVariable>(boundVars.toArray(new QuantifiableVariable[boundVars.size()])), null);
 	                }
 	            }
 	    }
@@ -3243,13 +3238,13 @@ varId returns [ParsableVariable v = null]
 
 varIds returns [LinkedList list = new LinkedList()]
 {
-   ListOfString ids = null;
+   ImmutableList<String> ids = null;
    ParsableVariable v = null;
    String id = null;
 }
     :
       ids = simple_ident_comma_list {
-         IteratorOfString it = ids.iterator();
+         Iterator<String> it = ids.iterator();
 	 while(it.hasNext()) {
 	    id = it.next();
             v = (ParsableVariable) variables().lookup(new Name(id));
@@ -3261,7 +3256,7 @@ varIds returns [LinkedList list = new LinkedList()]
       }
   ;
 
-taclet[SetOfChoice choices] returns [Taclet r] 
+taclet[ImmutableSet<Choice> choices] returns [Taclet r] 
 { 
     Sequent ifSeq = Sequent.EMPTY_SEQUENT;
     Object  find = null;
@@ -3755,7 +3750,7 @@ goalspecs[TacletBuilder b] :
 
 goalspecwithoption[TacletBuilder b]
 {
-    SetOfChoice soc = SetAsListOfChoice.EMPTY_SET;
+    ImmutableSet<Choice> soc = DefaultImmutableSet.<Choice>nil();
 } :
         (( soc = option_list[soc]
                 LBRACE
@@ -3778,7 +3773,7 @@ option returns [Choice c=null]
         }
     ;
     
-option_list[SetOfChoice soc] returns [SetOfChoice result = null]
+option_list[ImmutableSet<Choice> soc] returns [ImmutableSet<Choice> result = null]
 {
    Choice c = null;
 }
@@ -3789,12 +3784,12 @@ LPAREN {result = soc; }
 RPAREN
 ;
 
-goalspec[TacletBuilder b, SetOfChoice soc] 
+goalspec[TacletBuilder b, ImmutableSet<Choice> soc] 
 {
     Object rwObj = null;
     Sequent addSeq = Sequent.EMPTY_SEQUENT;
-    ListOfTaclet addRList = SLListOfTaclet.EMPTY_LIST;
-    SetOfSchemaVariable addpv = SetAsListOfSchemaVariable.EMPTY_SET;
+    ImmutableList<Taclet> addRList = ImmutableSLList.<Taclet>nil();
+    ImmutableSet<SchemaVariable> addpv = DefaultImmutableSet.<SchemaVariable>nil();
     String name = null;
 }
     :
@@ -3819,26 +3814,26 @@ replacewith returns [Object o] { o = null; } :
 add returns [Sequent s] { s = null;} :
         ADD LPAREN s=seq RPAREN;
 
-addrules returns [ListOfTaclet lor] { lor = null; } :
+addrules returns [ImmutableList<Taclet> lor] { lor = null; } :
         ADDRULES LPAREN lor=tacletlist RPAREN;
 
-addprogvar returns [SetOfSchemaVariable pvs] {pvs = null; } :
+addprogvar returns [ImmutableSet<SchemaVariable> pvs] {pvs = null; } :
         ADDPROGVARS LPAREN pvs=pvset RPAREN;
 
-tacletlist returns [ListOfTaclet lor]
+tacletlist returns [ImmutableList<Taclet> lor]
 { 
     Taclet head = null;
-    lor = SLListOfTaclet.EMPTY_LIST; 
+    lor = ImmutableSLList.<Taclet>nil(); 
 }
     :
-        head=taclet[SetAsListOfChoice.EMPTY_SET]   
+        head=taclet[DefaultImmutableSet.<Choice>nil()]   
         ( /*empty*/ | COMMA lor=tacletlist ) { lor = lor.prepend(head); }
     ;
 
-pvset returns [SetOfSchemaVariable pvs] 
+pvset returns [ImmutableSet<SchemaVariable> pvs] 
 {
     ParsableVariable pv = null;
-    pvs = SetAsListOfSchemaVariable.EMPTY_SET;
+    pvs = DefaultImmutableSet.<SchemaVariable>nil();
 }
     :
         pv=varId
@@ -3996,9 +3991,9 @@ one_invariant[ParsableVariable selfVar]
 problem returns [ Term a = null ]
 {
     Taclet s = null;
-    SetOfChoice choices=SetAsListOfChoice.EMPTY_SET;
+    ImmutableSet<Choice> choices=DefaultImmutableSet.<Choice>nil();
     Choice c = null;
-    ListOfString stlist = null;
+    ImmutableList<String> stlist = null;
     String st = null;
     String pref = null;
 }
@@ -4040,7 +4035,7 @@ problem returns [ Term a = null ]
                     }
                 }
             )*
-            RBRACE {choices=SetAsListOfChoice.EMPTY_SET;}
+            RBRACE {choices=DefaultImmutableSet.<Choice>nil();}
         ) *
         ((PROBLEM LBRACE 
             {switchToNormalMode(); 
@@ -4052,7 +4047,7 @@ problem returns [ Term a = null ]
 		      })?
    ;
    
-classPaths returns [ListOfString ids = SLListOfString.EMPTY_LIST]
+classPaths returns [ImmutableList<String> ids = ImmutableSLList.<String>nil()]
 {
   String s = null;
 }

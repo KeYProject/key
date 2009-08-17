@@ -12,6 +12,7 @@ package de.uka.ilkd.key.rule.metaconstruct;
 
 import java.util.HashMap;
 
+import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.declaration.MethodDeclaration;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
@@ -22,7 +23,10 @@ import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.visitor.ProgVarReplaceVisitor;
 import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.op.IProgramVariable;
+import de.uka.ilkd.key.logic.op.ProgramMethod;
+import de.uka.ilkd.key.logic.op.ProgramSV;
+import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 public class ExpandMethodBody extends ProgramMetaConstruct {
@@ -69,14 +73,14 @@ public class ExpandMethodBody extends ProgramMetaConstruct {
 //	result = prettyNewObjectNames(result, methDecl, classContext);
 
 	// at this point all arguments should be program variables
-	ArrayOfExpression argsAsParam = mbs.getArguments();
+	ImmutableArray<Expression> argsAsParam = mbs.getArguments();
 
 	final HashMap<IProgramVariable, Expression> map = 
 	    new HashMap<IProgramVariable, Expression>();	
 	for (int i = 0; i < argsAsParam.size(); i++) {
 	    map.put(methDecl.getParameterDeclarationAt(i).
 		    getVariableSpecification().getProgramVariable(), 
-		    argsAsParam.getExpression(i));
+		    argsAsParam.get(i));
 	}
 	ProgVarReplaceVisitor paramRepl = 
 	    new ProgVarReplaceVisitor(result, map, services); 

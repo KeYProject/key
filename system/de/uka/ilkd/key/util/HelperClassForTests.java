@@ -13,12 +13,13 @@ package de.uka.ilkd.key.util;
 
 import java.io.File;
 
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.RuleSource;
 import de.uka.ilkd.key.proof.init.*;
-import de.uka.ilkd.key.rule.SLListOfBuiltInRule;
+import de.uka.ilkd.key.rule.BuiltInRule;
 
 /**
  * @author bubel
@@ -33,7 +34,7 @@ public class HelperClassForTests {
 	    public RuleCollection getStandardRules() {
                 return new RuleCollection(
                                 RuleSource.initRuleFile("LDTsForTestsOnly.key"), 
-                                SLListOfBuiltInRule.EMPTY_LIST);
+                                ImmutableSLList.<BuiltInRule>nil());
             }
         };
     

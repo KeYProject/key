@@ -11,7 +11,11 @@
 
 package de.uka.ilkd.key.java.reference;
 
-import de.uka.ilkd.key.java.*;
+import de.uka.ilkd.key.collection.ImmutableArray;
+import de.uka.ilkd.key.java.Expression;
+import de.uka.ilkd.key.java.PositionInfo;
+import de.uka.ilkd.key.java.PrettyPrinter;
+import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.util.ExtList;
 
@@ -70,7 +74,7 @@ public class SuperConstructorReference
      */
 
     public SuperConstructorReference(ReferencePrefix accessPath,
-                                     ArrayOfExpression arguments) { 
+                                     ImmutableArray<Expression> arguments) { 
         super(arguments);
         this.prefix = accessPath;
     }

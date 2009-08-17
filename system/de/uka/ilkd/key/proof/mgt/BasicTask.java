@@ -10,12 +10,15 @@
 
 package de.uka.ilkd.key.proof.mgt;
 
+import java.util.Iterator;
+
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.MutableTreeNode;
 
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
-import de.uka.ilkd.key.rule.IteratorOfRuleApp;
 import de.uka.ilkd.key.rule.RuleApp;
 
 
@@ -72,9 +75,9 @@ public class BasicTask extends DefaultMutableTreeNode implements TaskTreeNode{
     /** returns a list of operation contracts (with associated class invariants)
      *  that were used in the associated proof.
      */
-    public SetOfContractWithInvs getUsedSpecs() {
-        SetOfContractWithInvs result = SetAsListOfContractWithInvs.EMPTY_SET;       
-        IteratorOfRuleApp it = proof().mgt().getNonAxiomApps().iterator();
+    public ImmutableSet<ContractWithInvs> getUsedSpecs() {
+        ImmutableSet<ContractWithInvs> result = DefaultImmutableSet.<ContractWithInvs>nil();       
+        Iterator<RuleApp> it = proof().mgt().getNonAxiomApps().iterator();
         while(it.hasNext()) {
             RuleApp r = (RuleApp) it.next();
 	    RuleJustification rj = proof().mgt().getJustification(r);            

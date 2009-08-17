@@ -12,6 +12,8 @@ package de.uka.ilkd.key.logic.sort;
 
 import java.lang.ref.WeakReference;
 
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Named;
@@ -26,8 +28,8 @@ public final class NullSort implements Sort  {
     
     private WeakReference<Services> lastServices 
     	= new WeakReference<Services>(null);
-    private WeakReference<SetOfSort> extCache
-        = new WeakReference<SetOfSort>(null);
+    private WeakReference<ImmutableSet<Sort>> extCache
+        = new WeakReference<ImmutableSet<Sort>>(null);
     
     
     public NullSort(Sort objectSort) {
@@ -43,20 +45,20 @@ public final class NullSort implements Sort  {
     
     
     @Override
-    public SetOfSort extendsSorts() {
+    public ImmutableSet<Sort> extendsSorts() {
 	throw new UnsupportedOperationException(
 		  "NullSort.extendsSorts() cannot be supported");
     }
     
     
     @Override
-    public SetOfSort extendsSorts(Services services) {
+    public ImmutableSet<Sort> extendsSorts(Services services) {
 	assert services != null;
 	assert objectSort == services.getJavaInfo().objectSort();
 	
-	SetOfSort result = extCache.get();
+	ImmutableSet<Sort> result = extCache.get();
 	if(result == null || lastServices.get() != services) {
-	    result = SetAsListOfSort.EMPTY_SET;
+	    result = DefaultImmutableSet.<Sort>nil();
 
 	    for(Named n : services.getNamespaces().sorts().allElements()) {
 		Sort s = (Sort)n;
@@ -66,7 +68,7 @@ public final class NullSort implements Sort  {
 	    }
 	    
 	    lastServices = new WeakReference<Services>(services);
-	    extCache = new WeakReference<SetOfSort>(result);
+	    extCache = new WeakReference<ImmutableSet<Sort>>(result);
 	}
 	
 	return result;

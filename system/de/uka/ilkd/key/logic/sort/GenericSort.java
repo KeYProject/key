@@ -10,6 +10,10 @@
 
 package de.uka.ilkd.key.logic.sort;
 
+import java.util.Iterator;
+
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.logic.Name;
 
 /**
@@ -42,7 +46,7 @@ public final class GenericSort extends AbstractSort {
      * list of sorts this generic sort may be instantiated with;
      * EMPTY_SORT_SORT means that every sort may be used
      */
-    private final SetOfSort oneOf;
+    private final ImmutableSet<Sort> oneOf;
     
    /**
      * creates a generic sort
@@ -52,8 +56,8 @@ public final class GenericSort extends AbstractSort {
      */
     public GenericSort( 
             Name             name,
-            SetOfSort        ext,
-	    SetOfSort        oneOf)
+            ImmutableSet<Sort>        ext,
+	    ImmutableSet<Sort>        oneOf)
 		throws GenericSupersortException {
         super(name, ext, false);
 	this.oneOf = oneOf;
@@ -62,14 +66,14 @@ public final class GenericSort extends AbstractSort {
 
  
     public GenericSort(Name name) {
-	super(name, SetAsListOfSort.EMPTY_SET, false);
-	this.oneOf = SetAsListOfSort.EMPTY_SET;
+	super(name, DefaultImmutableSet.<Sort>nil(), false);
+	this.oneOf = DefaultImmutableSet.<Sort>nil();
     }
 
  
     private void checkSupersorts ()
 	throws GenericSupersortException {
-	IteratorOfSort it = extendsSorts ().iterator ();
+	Iterator<Sort> it = extendsSorts ().iterator ();
 	Sort           s, t;
 	while ( it.hasNext () ) {
 	    s = it.next ();
@@ -86,12 +90,10 @@ public final class GenericSort extends AbstractSort {
 	}
     }
 
-
-    
     /**
      * @return possible instantiations
      */
-    public SetOfSort getOneOf () {
+    public ImmutableSet<Sort> getOneOf () {
 	return oneOf;
     }
 
@@ -115,7 +117,7 @@ public final class GenericSort extends AbstractSort {
      * supersort of this sort
      */
     protected boolean checkNonGenericSupersorts ( Sort p_s ) {
-	IteratorOfSort it = extendsSorts().iterator ();
+	Iterator<Sort> it =  extendsSorts().iterator ();
 	Sort           ss;
 
 	while ( it.hasNext () ) {

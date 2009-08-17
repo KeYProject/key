@@ -10,18 +10,20 @@
 
 package de.uka.ilkd.key.logic.sort;
 
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.op.SortDependingFunction;
 
 public abstract class AbstractSort implements Sort {
     
     private final Name name;
-    private final SetOfSort ext;    
+    private final ImmutableSet<Sort> ext;    
     private final boolean isAbstract;
 
     
-    public AbstractSort(Name name, SetOfSort ext, boolean isAbstract) {
+    public AbstractSort(Name name, ImmutableSet<Sort> ext, boolean isAbstract) {
         this.name = name;
         this.ext = ext;
         this.isAbstract = isAbstract;
@@ -29,9 +31,9 @@ public abstract class AbstractSort implements Sort {
    
 
     @Override    
-    public final SetOfSort extendsSorts() {
+    public final ImmutableSet<Sort> extendsSorts() {
 	return this == Sort.FORMULA || this == Sort.UPDATE || this == Sort.ANY
-	       ? SetAsListOfSort.EMPTY_SET
+	       ? DefaultImmutableSet.<Sort>nil()
 	       : ext.isEmpty()
 	         ? ext.add(Sort.ANY)
 	         : ext;
@@ -39,7 +41,7 @@ public abstract class AbstractSort implements Sort {
     
     
     @Override
-    public final SetOfSort extendsSorts(Services services) {
+    public final ImmutableSet<Sort> extendsSorts(Services services) {
 	return extendsSorts();
     }
 

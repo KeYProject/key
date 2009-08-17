@@ -9,15 +9,30 @@
 
 package de.uka.ilkd.key.rule.metaconstruct;
 
+import de.uka.ilkd.key.collection.ImmutableArray;
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.*;
-import de.uka.ilkd.key.java.abstraction.*;
-import de.uka.ilkd.key.java.declaration.*;
+import de.uka.ilkd.key.java.abstraction.ArrayType;
+import de.uka.ilkd.key.java.abstraction.ClassType;
+import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.abstraction.Type;
+import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
+import de.uka.ilkd.key.java.declaration.MethodDeclaration;
+import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
+import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.expression.ArrayInitializer;
 import de.uka.ilkd.key.java.expression.operator.Instanceof;
 import de.uka.ilkd.key.java.expression.operator.NewArray;
 import de.uka.ilkd.key.java.reference.*;
-import de.uka.ilkd.key.java.statement.*;
-import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.java.statement.Else;
+import de.uka.ilkd.key.java.statement.If;
+import de.uka.ilkd.key.java.statement.MethodBodyStatement;
+import de.uka.ilkd.key.java.statement.Then;
+import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.ProgramElementName;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.VariableNamer;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
@@ -39,7 +54,7 @@ public class MethodCall extends ProgramMetaConstruct {
     protected ProgramVariable pvar;
     private IExecutionContext execContextSV;
     private ExecutionContext execContext;
-    protected ArrayOfExpression arguments;
+    protected ImmutableArray<Expression> arguments;
     protected KeYJavaType staticPrefixType;
 
     /** creates the methodcall-MetaConstruct 
@@ -81,10 +96,10 @@ public class MethodCall extends ProgramMetaConstruct {
     
 
     /** gets an array of expression and returns a list of types */
-    private ListOfKeYJavaType getTypes(ArrayOfExpression args, Services services) {        
-        ListOfKeYJavaType result = SLListOfKeYJavaType.EMPTY_LIST; 
+    private ImmutableList<KeYJavaType> getTypes(ImmutableArray<Expression> args, Services services) {        
+        ImmutableList<KeYJavaType> result = ImmutableSLList.<KeYJavaType>nil(); 
 	for (int i = args.size()-1; i >= 0 ; i--) {
-	    Expression argument = args.getExpression(i);
+	    Expression argument = args.get(i);
 	    result = result.prepend
 		(services.getTypeConverter().getKeYJavaType(argument, execContext));
 	}
@@ -248,7 +263,7 @@ public class MethodCall extends ProgramMetaConstruct {
 		Debug.out("method-call: invocation of non-private"
 			  +" instance method detected." 
 			  +"Requires dynamic resolving.");
-		ListOfKeYJavaType imps = 
+		ImmutableList<KeYJavaType> imps = 
 		    services.getJavaInfo().getKeYProgModelInfo().findImplementations
 		    (staticPrefixType, methRef.getName(), getTypes(arguments, services));
 		if (imps.isEmpty()) {
@@ -290,7 +305,7 @@ public class MethodCall extends ProgramMetaConstruct {
     }
 
 
-    protected Statement makeIfCascade(ListOfKeYJavaType imps, Services services) {
+    protected Statement makeIfCascade(ImmutableList<KeYJavaType> imps, Services services) {
         KeYJavaType currType = imps.head();
         if (imps.size()==1) 
            return makeMbs(currType, services);
@@ -416,12 +431,12 @@ public class MethodCall extends ProgramMetaConstruct {
 	return paramDecl;
     }
 
-    private ArrayOfExpression getVariables(VariableSpecification[] varspecs) {
+    private ImmutableArray<Expression> getVariables(VariableSpecification[] varspecs) {
 	Expression[] vars = new Expression[varspecs.length];
 	for (int i=0; i<varspecs.length; i++) {
 	    vars[i] = (Expression) varspecs[i].getProgramVariable();
 	}
-	return new ArrayOfExpression(vars);
+	return new ImmutableArray<Expression>(vars);
     }
     
     /**

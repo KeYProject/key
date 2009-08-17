@@ -3,7 +3,7 @@
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
+// The KeY system is protected by the GNU General Public License.
 // See LICENSE.TXT for details.
 //
 //
@@ -12,9 +12,9 @@ package de.uka.ilkd.key.collection;
 /** tests non-destructive list implementation with String */
 
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.Random;
 
-import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.util.ExtList;
 
 public class TestLeftistHeapOfInteger extends junit.framework.TestCase {
@@ -23,13 +23,13 @@ public class TestLeftistHeapOfInteger extends junit.framework.TestCase {
 	super(name);
     }
 
-    ListOfInteger a;
-    ListOfInteger b;
+    ImmutableList<Integer> a;
+    ImmutableList<Integer> b;
 
     Random rand = new Random ();
-    
+
     public void setUp() {
-	a = SLListOfInteger.EMPTY_LIST
+	a = ImmutableSLList.<Integer>nil()
 	    .prepend( Integer.valueOf ( 13 ) )
 	    .prepend( Integer.valueOf ( 20 ) )
 	    .prepend( Integer.valueOf ( 5 ) )
@@ -38,14 +38,14 @@ public class TestLeftistHeapOfInteger extends junit.framework.TestCase {
 	    .prepend( Integer.valueOf ( 60 ) )
 	    .prepend( Integer.valueOf ( 20 ) )
 	    .prepend( Integer.valueOf ( -34 ) );
-	b = SLListOfInteger.EMPTY_LIST
-	    .prepend( Integer.valueOf ( -1000 ) )
-	    .prepend( Integer.valueOf ( 1000 ) )
-	    .prepend( Integer.valueOf ( 8 ) );
+	b = ImmutableSLList.<Integer>nil()
+	   .prepend( Integer.valueOf ( -1000 ) )
+	   .prepend( Integer.valueOf ( 1000 ) )
+	   .prepend( Integer.valueOf ( 8 ) );
     }
 
     public void testInsertElements() {
-	HeapOfInteger h = LeftistHeapOfInteger.EMPTY_HEAP;
+	ImmutableHeap<Integer> h = ImmutableLeftistHeap.<Integer>nilHeap();
 	assertTrue("Empty heap should be empty",
 		   h.isEmpty () && h.size () == 0);
 	
@@ -75,8 +75,7 @@ public class TestLeftistHeapOfInteger extends junit.framework.TestCase {
 		   h.isEmpty () && h.size () == 0);
     }
 
-
-    private boolean equals ( IteratorOfInteger t0, IteratorOfInteger t1 ) {
+    private boolean equals ( Iterator<Integer> t0, Iterator<Integer> t1 ) {
 	ExtList l0 = new ExtList (), l1 = new ExtList ();
 
 	while ( t0.hasNext () )
@@ -94,7 +93,7 @@ public class TestLeftistHeapOfInteger extends junit.framework.TestCase {
 	return Arrays.equals ( a0, a1 );
     }
 
-    private void checkHeap( ListOfInteger elements, HeapOfInteger h ) {
+    private void checkHeap( ImmutableList<Integer> elements, ImmutableHeap<Integer> h ) {
 	assertTrue ( "Heap has incorrect size",
 		     h.size () == elements.size () &&
 		     ( h.size () == 0 ) == h.isEmpty () );
@@ -102,7 +101,7 @@ public class TestLeftistHeapOfInteger extends junit.framework.TestCase {
 	assertTrue ( "Unsorted heap iterator does not return the right elements",
 		     equals ( h.iterator (), elements.iterator () ) );
 
-	IteratorOfInteger t0           = h.sortedIterator ();
+	Iterator<Integer> t0           = h.sortedIterator ();
 	Integer           lastElement  = null;
 	Integer           element;
 
@@ -113,11 +112,11 @@ public class TestLeftistHeapOfInteger extends junit.framework.TestCase {
 			     lastElement.compareTo( element ) <= 0 );
 	    lastElement = element;
 	}
-	
+
 	assertTrue ( "Unsorted heap iterator does not return the right elements",
 		     equals ( h.sortedIterator (), elements.iterator () ) );
 
-	ListOfInteger list = SLListOfInteger.EMPTY_LIST;
+	ImmutableList<Integer> list = ImmutableSLList.<Integer>nil();
 	lastElement = null;
 
 	while ( !h.isEmpty () ) {
@@ -131,32 +130,32 @@ public class TestLeftistHeapOfInteger extends junit.framework.TestCase {
 	}
 
 	assertTrue ( "findMin does not return the right elements",
-		     equals ( list.iterator (), elements.iterator () ) );	
+		     equals ( list.iterator (), elements.iterator () ) );
     }
 
-    private HeapOfInteger removeAll ( HeapOfInteger h, IteratorOfInteger elements ) {
+    private ImmutableHeap<Integer> removeAll ( ImmutableHeap<Integer> h, Iterator<Integer> elements ) {
 	while ( elements.hasNext () )
 	    h = h.removeAll ( elements.next () );
 	return h;
     }
 
     public void testInsertIterator() {
-	HeapOfInteger h = LeftistHeapOfInteger.EMPTY_HEAP;
+	ImmutableHeap<Integer> h = ImmutableLeftistHeap.<Integer>nilHeap();
 
-	h = h.insert ( SLListOfInteger.EMPTY_LIST.iterator () );
-	checkHeap ( SLListOfInteger.EMPTY_LIST, h );
+	h = h.insert ( ImmutableSLList.<Integer>nil().iterator () );
+	checkHeap ( ImmutableSLList.<Integer>nil(), h );
 	assertTrue("Empty heap should be empty",
 		   h.isEmpty () && h.size () == 0);
-	
-	h = h.insert ( a.iterator () );	
+
+	h = h.insert ( a.iterator () );
 	checkHeap ( a, h );
 
-	h = h.insert ( a.iterator () );	
+	h = h.insert ( a.iterator () );
 	checkHeap ( a.prepend( a ), h );
 
-	h = h.insert ( SLListOfInteger.EMPTY_LIST.iterator () );
+	h = h.insert ( ImmutableSLList.<Integer>nil().iterator () );
 	checkHeap ( a.prepend( a ), h );
-	
+
 	h = h.insert ( h.iterator () );
 	checkHeap ( a.prepend( a ).prepend( a ).prepend( a ), h );
 
@@ -166,45 +165,45 @@ public class TestLeftistHeapOfInteger extends junit.framework.TestCase {
     }
 
     public void testInsertHeap() {
-	HeapOfInteger h = LeftistHeapOfInteger.EMPTY_HEAP;
+	ImmutableHeap<Integer> h = ImmutableLeftistHeap.<Integer>nilHeap();
 
-	h = h.insert ( a.iterator () );	
+	h = h.insert ( a.iterator () );
 	checkHeap ( a, h );
 
-	h = h.insert ( LeftistHeapOfInteger.EMPTY_HEAP );
+	h = h.insert ( ImmutableLeftistHeap.<Integer>nilHeap() );
 	checkHeap ( a, h );
 
 	h = h.insert ( h );
 	checkHeap ( a.prepend( a ), h );
 
-	h = h.insert ( LeftistHeapOfInteger.EMPTY_HEAP.insert
+	h = h.insert ( ImmutableLeftistHeap.<Integer>nilHeap().insert
 		       ( Integer.valueOf ( 123 ) ) );
-	checkHeap ( a.prepend( a ).prepend ( Integer.valueOf ( 123 ) ), h );
+	checkHeap ( a.prepend( a ).prepend ( new Integer ( 123 ) ), h );
     }
- 
+
     public void testRemoveAll () {
-	HeapOfInteger h = LeftistHeapOfInteger.EMPTY_HEAP;
+	ImmutableHeap<Integer> h = ImmutableLeftistHeap.<Integer>nilHeap();
 
 	// Test removal of all elements (from empty heap)
-	checkHeap ( SLListOfInteger.EMPTY_LIST, removeAll( h, a.iterator () ) );
+	checkHeap ( ImmutableSLList.<Integer>nil(), removeAll( h, a.iterator () ) );
 
-	h = h.insert ( a.iterator () );	
+	h = h.insert ( a.iterator () );
 	checkHeap ( a, h );
 
 	// Test removal of arbitrary elements
 	checkHeap ( a.removeAll( a.head () ), h.removeAll( a.head () ) );
 
 	// Test removal of all elements
-	checkHeap ( SLListOfInteger.EMPTY_LIST, removeAll( h, a.iterator () ) );
+	checkHeap ( ImmutableSLList.<Integer>nil(), removeAll( h, a.iterator () ) );
 
 	// Test removal of non-existing elements
 	assertSame ( "Heap should not be different",
 		    h, removeAll ( h, b.iterator () ) );
     }
-   
+
     public void testLargeHeap () {
-	HeapOfInteger h = LeftistHeapOfInteger.EMPTY_HEAP;
-	ListOfInteger l = SLListOfInteger.EMPTY_LIST;
+	ImmutableHeap<Integer> h = ImmutableLeftistHeap.<Integer>nilHeap();
+	ImmutableList<Integer> l = ImmutableSLList.<Integer>nil();
 
 	int i = 1000;
 	while ( i-- != 0 )

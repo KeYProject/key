@@ -62,7 +62,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         
         this.strategyProperties =
             (StrategyProperties)strategyProperties.clone ();
-        
+      
         this.tf = new ArithTermFeatures ( p_proof.getServices ()
                                           .getTypeConverter ().getIntegerLDT () );
         this.ff = new FormulaTermFeatures ();        

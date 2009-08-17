@@ -25,7 +25,8 @@ public abstract class Account {
      */
     public final int accountNumber;
     
-    protected /*@ pure @*/ Account (final int accountNumber) {
+    //@ assignable this.accountNumber, this.transactions;
+    protected Account (final int accountNumber) {
         this.accountNumber = accountNumber;
     }
     

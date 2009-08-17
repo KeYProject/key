@@ -12,6 +12,7 @@ package de.uka.ilkd.key.logic.op;
 
 import java.io.IOException;
 
+import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
@@ -33,10 +34,10 @@ public final class ProgramSV extends AbstractSV
     implements ProgramConstruct, UpdateableOperator {
     
     private static final ProgramList EMPTY_LIST_INSTANTIATION = 
-            new ProgramList(new ArrayOfProgramElement(new ProgramElement[0]));    
-    
-    private final boolean isListSV;
+        new ProgramList
+        (new ImmutableArray<ProgramElement>(new ProgramElement[0]));
 
+    private final boolean isListSV;
 
     /** 
      * creates a new SchemaVariable used as a placeholder for program
@@ -170,15 +171,13 @@ public final class ProgramSV extends AbstractSV
         return 0;
     }
 
-
     @Override
-    public ArrayOfExpression getUpdates() {
+	public ImmutableArray<Expression> getUpdates() {
         return null;
-    }
+    }    
 
-    
-    @Override
-    public ArrayOfLoopInitializer getInits() {
+	@Override
+    public ImmutableArray<LoopInitializer> getInits() {
         return null;
     }
 
@@ -361,7 +360,7 @@ x     * @return the updated match conditions including mapping
 	}
 
 	Debug.out("Program list match: ", this, matchedElements);
-	return addProgramInstantiation(new ProgramList(new ArrayOfProgramElement(matchedElements)), 
+	return addProgramInstantiation(new ProgramList(new ImmutableArray<ProgramElement>(matchedElements)), 
 		matchCond, services);
     }   
     

@@ -7,17 +7,22 @@
 // See LICENSE.TXT for details.
 package de.uka.ilkd.key.rule.conditions;
 
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import de.uka.ilkd.key.collection.ImmutableMapEntry;
 import de.uka.ilkd.key.java.Label;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.visitor.LabelCollector;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.op.ProgramSV;
+import de.uka.ilkd.key.logic.op.SVSubstitute;
+import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.VariableCondition;
+import de.uka.ilkd.key.rule.inst.InstantiationEntry;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 /**
@@ -66,10 +71,10 @@ public final class NewJumpLabelCondition implements VariableCondition {
 
     private List<ProgramElement> collect(SVInstantiations inst) {
         final List<ProgramElement> result = new LinkedList<ProgramElement>();
-        final IteratorOfEntryOfSchemaVariableAndInstantiationEntry 
+        final Iterator<ImmutableMapEntry<SchemaVariable,InstantiationEntry>> 
             it = inst.pairIterator();
         while (it.hasNext()) {
-            final EntryOfSchemaVariableAndInstantiationEntry entry = it.next();            
+            final ImmutableMapEntry<SchemaVariable,InstantiationEntry> entry = it.next();            
             if (entry.key() != labelSV && 
                     entry.value() != null && 
                     entry.value().getInstantiation() instanceof ProgramElement) {               

@@ -10,14 +10,20 @@
 
 package de.uka.ilkd.key.rule;
 
-import java.util.*;
+import java.util.Map;
+import java.util.WeakHashMap;
 
-import de.uka.ilkd.key.collection.ListOfString;
-import de.uka.ilkd.key.collection.SLListOfString;
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
-import de.uka.ilkd.key.java.*;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.proof.*;
+import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.TacletFilter;
+import de.uka.ilkd.key.proof.TacletIndex;
 
 
 public final class OneStepSimplifier implements BuiltInRule {
@@ -48,11 +54,11 @@ public final class OneStepSimplifier implements BuiltInRule {
     //internal methods
     //-------------------------------------------------------------------------
     
-    private SetOfTaclet tacletsForRuleSet(Goal goal, 
+    private ImmutableSet<Taclet> tacletsForRuleSet(Goal goal, 
 	    				  String ruleSetName,
-	    				  ListOfString excludedRuleSetNames) {
-	SetOfTaclet result = SetAsListOfTaclet.EMPTY_SET;
-	SetOfNoPosTacletApp allApps = goal.ruleAppIndex().tacletIndex()
+	    				  ImmutableList<String> excludedRuleSetNames) {
+	ImmutableSet<Taclet> result = DefaultImmutableSet.<Taclet>nil();
+	ImmutableSet<NoPosTacletApp> allApps = goal.ruleAppIndex().tacletIndex()
 	                                                 .allNoPosTacletApps();
 	for(NoPosTacletApp app : allApps) {
 	    if(!(app.taclet() instanceof RewriteTaclet)
@@ -91,11 +97,11 @@ public final class OneStepSimplifier implements BuiltInRule {
 	    indices[0] = new TacletIndex(tacletsForRuleSet(
 		    		goal, 
 		    		"concrete", 
-		    		SLListOfString.EMPTY_LIST));
+		    		ImmutableSLList.<String>nil()));
 	    indices[1] = new TacletIndex(tacletsForRuleSet(
 		    		goal, 
 		    		"simplify", 
-		    		SLListOfString.EMPTY_LIST.prepend("concrete")));
+		    		ImmutableSLList.<String>nil().prepend("concrete")));
 	    lastProof = goal.proof();
 	}
     }
@@ -104,7 +110,7 @@ public final class OneStepSimplifier implements BuiltInRule {
     private ConstrainedFormula simplifyPosOrSub(Services services,
 	    		     	  	        PosInOccurrence pos,
 	    		     	  	        int indexNr) {
-	ListOfNoPosTacletApp apps 
+	ImmutableList<NoPosTacletApp> apps 
 		= indices[indexNr].getRewriteTaclet(pos, 
 						    Constraint.BOTTOM, 
 						    TacletFilter.TRUE, 
@@ -164,8 +170,8 @@ public final class OneStepSimplifier implements BuiltInRule {
 	Instantiation result = cache.get(cf);
 	
 	if(result == null) {
-	    ListOfConstrainedFormula list 
-	    	= SLListOfConstrainedFormula.EMPTY_LIST.prepend(cf);
+	    ImmutableList<ConstrainedFormula> list 
+	    	= ImmutableSLList.<ConstrainedFormula>nil().prepend(cf);
 	    while(true) {
 		ConstrainedFormula nextCF 
 			= simplifyConstrainedFormula(services, 
@@ -227,8 +233,8 @@ public final class OneStepSimplifier implements BuiltInRule {
 
     
     @Override
-    public ListOfGoal apply(Goal goal, Services services, RuleApp ruleApp) {
-	final ListOfGoal result = goal.split(1);
+    public ImmutableList<Goal> apply(Goal goal, Services services, RuleApp ruleApp) {
+	final ImmutableList<Goal> result = goal.split(1);
 	final Goal resultGoal = result.head();
 	final PosInOccurrence pos = ruleApp.posInOccurrence();
 	assert pos != null && pos.isTopLevel();

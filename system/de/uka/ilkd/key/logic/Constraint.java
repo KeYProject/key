@@ -10,9 +10,9 @@
 
 package de.uka.ilkd.key.logic;
 
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.op.Metavariable;
-import de.uka.ilkd.key.logic.op.SetOfMetavariable;
 
 /**
  * Abstract constraint interface for constraints offering unification of terms
@@ -148,7 +148,7 @@ public interface Constraint {
      *         to the new constraint (the possible values of other variables are
      *         not modified)
      */
-    Constraint removeVariables(SetOfMetavariable mvs);
+    Constraint removeVariables ( ImmutableSet<Metavariable> mvs );
 
     /** @return String representation of the constraint */
     String toString();
@@ -241,7 +241,7 @@ public interface Constraint {
 	 *         any value according to the new constraint (the possible
 	 *         values of other variables are not modified)
 	 */
-	public Constraint removeVariables(SetOfMetavariable mvs) {
+	public Constraint removeVariables ( ImmutableSet<Metavariable> mvs ) {
 	    // the constraint will still be unsatisfiable, as the
 	    // other variables have no valid instantiations
 	    return this;

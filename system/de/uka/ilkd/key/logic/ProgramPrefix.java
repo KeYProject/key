@@ -10,6 +10,7 @@
 
 package de.uka.ilkd.key.logic;
 
+import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.NonTerminalProgramElement;
 
 /**
@@ -28,7 +29,7 @@ public interface ProgramPrefix extends NonTerminalProgramElement {
     
     /** returns an array with all prefix elements starting at 
      * this element */
-    ArrayOfProgramPrefix getPrefixElements();
+    ImmutableArray<ProgramPrefix> getPrefixElements();
     
     /** returns the position of the first active child */
     PosInProgram getFirstActiveChildPos();

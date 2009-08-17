@@ -15,9 +15,14 @@ package de.uka.ilkd.key.rule;
 
 
 import junit.framework.TestCase;
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.op.Modality;
+import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.util.Debug;
@@ -114,7 +119,7 @@ public class TestSchemaModalOperators extends TestCase {
 	TermFactory tf = TermFactory.DEFAULT;
 
 	SchemaVariable fsv = SchemaVariableFactory.createFormulaSV(new Name("post"), true);
-	SetOfModality modalities = SetAsListOfModality.EMPTY_SET;
+	ImmutableSet<Modality> modalities = DefaultImmutableSet.<Modality>nil();
 	modalities = modalities.add(Modality.DIA).add(Modality.BOX);
 	SchemaVariable osv = SchemaVariableFactory.createModalOperatorSV(
 	      new Name("diabox"), Sort.FORMULA, modalities);
@@ -136,7 +141,7 @@ public class TestSchemaModalOperators extends TestCase {
 	rtb.setFind(find); 
         rtb.addTacletGoalTemplate(new                                            
             RewriteTacletGoalTemplate(Sequent.EMPTY_SEQUENT,                           
-                                    SLListOfTaclet.EMPTY_LIST,                   
+                                    ImmutableSLList.<Taclet>nil(),                   
                                     replace));                                 
 
 	RewriteTaclet t = rtb.getRewriteTaclet();
@@ -171,12 +176,12 @@ public class TestSchemaModalOperators extends TestCase {
 			PosInOccurrence(goal.sequent().succedent().getFirst(), 
 					PosInTerm.TOP_LEVEL,
 					false);
-	ListOfTacletApp rApplist=goal.ruleAppIndex().
+	ImmutableList<TacletApp> rApplist=goal.ruleAppIndex().
 		    getTacletAppAt(TacletFilter.TRUE, applyPos, null, Constraint.BOTTOM);	
 	assertTrue("Too many or zero rule applications.",rApplist.size()==1);
 	RuleApp rApp=rApplist.head();
 	assertTrue("Rule App should be complete", rApp.complete());
-	ListOfGoal goals=rApp.execute(goal, TacletForTests.services());
+	ImmutableList<Goal> goals=rApp.execute(goal, TacletForTests.services());
 	assertTrue("There should be 1 goal for testSchemaModal1 taclet, was "+goals.size(), goals.size()==1);	
 	Sequent seq=goals.head().sequent();
         Semisequent antec0 = parseTermForSemisequent("\\<{ i--; }\\> i=0");
@@ -205,12 +210,12 @@ public class TestSchemaModalOperators extends TestCase {
 			PosInOccurrence(goal.sequent().succedent().getFirst(), 
 					PosInTerm.TOP_LEVEL,
 					false);
-	ListOfTacletApp rApplist=goal.ruleAppIndex().
+	ImmutableList<TacletApp> rApplist=goal.ruleAppIndex().
 		    getTacletAppAt(TacletFilter.TRUE, applyPos, null, Constraint.BOTTOM);	
 	assertTrue("Too many or zero rule applications.",rApplist.size()==1);
 	RuleApp rApp=rApplist.head();
 	assertTrue("Rule App should be complete", rApp.complete());
-	ListOfGoal goals=rApp.execute(goal, TacletForTests.services());
+	ImmutableList<Goal> goals=rApp.execute(goal, TacletForTests.services());
 	assertTrue("There should be 1 goal for testSchemaModal2 taclet, was "+goals.size(), goals.size()==1);	
 	Sequent seq=goals.head().sequent();
         Semisequent antec0 = parseTermForSemisequent("i=3");
@@ -235,12 +240,12 @@ public class TestSchemaModalOperators extends TestCase {
 			PosInOccurrence(goal.sequent().succedent().getFirst(), 
 					PosInTerm.TOP_LEVEL,
 					false);
-	ListOfTacletApp rApplist=goal.ruleAppIndex().
+	ImmutableList<TacletApp> rApplist=goal.ruleAppIndex().
 		    getTacletAppAt(TacletFilter.TRUE, applyPos, null, Constraint.BOTTOM);	
 	assertTrue("Too many or zero rule applications.",rApplist.size()==1);
 	RuleApp rApp=rApplist.head();
 	assertTrue("Rule App should be complete", rApp.complete());
-	ListOfGoal goals=rApp.execute(goal, TacletForTests.services());
+	ImmutableList<Goal> goals=rApp.execute(goal, TacletForTests.services());
 	assertTrue("There should be 3 goals for testSchemaModal3 taclet, was "+goals.size(), goals.size()==3);	
 	Sequent seq0=goals.head().sequent();
 	goals = goals.tail();

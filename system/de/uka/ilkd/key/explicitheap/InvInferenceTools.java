@@ -10,6 +10,10 @@
 
 package de.uka.ilkd.key.explicitheap;
 
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.statement.*;
 import de.uka.ilkd.key.java.visitor.CreatingASTVisitor;
@@ -59,16 +63,16 @@ class InvInferenceTools {
      */
     public Term close(Term formula) {
 	assert formula.sort() == Sort.FORMULA;
-	return TB.all(formula.freeVars().toArray(), formula);
+	return TB.all(formula.freeVars().toArray(new QuantifiableVariable[0]), formula);
     }
     
     
     /**
      * Returns the set of elementary conjuncts of the passed formula.
      */
-    public SetOfTerm toSet(Term formula) {
-	SetOfTerm result = SetAsListOfTerm.EMPTY_SET;
-        ListOfTerm workingList = SLListOfTerm.EMPTY_LIST.prepend(formula);
+    public ImmutableSet<Term> toSet(Term formula) {
+	ImmutableSet<Term> result = DefaultImmutableSet.<Term>nil();
+        ImmutableList<Term> workingList = ImmutableSLList.<Term>nil().prepend(formula);
         while(!workingList.isEmpty()) {
             Term f = workingList.head();
             workingList = workingList.tail();
@@ -85,7 +89,7 @@ class InvInferenceTools {
     /**
      * Conjoins the formulas in the passed set.
      */
-    public Term toFormula(SetOfTerm set) {
+    public Term toFormula(ImmutableSet<Term> set) {
 	Term result = TB.tt();
 	for(Term term : set) {
 	    result = TB.and(result, term);
@@ -272,8 +276,8 @@ class InvInferenceTools {
      * execution state given by the passed node.
      */
     public Node getEntryNodeForInnermostLoop(Node node) {
-        ListOfLoopStatement leftLoops 
-            = SLListOfLoopStatement.EMPTY_LIST;
+        ImmutableList<LoopStatement> leftLoops 
+            = ImmutableSLList.<LoopStatement>nil();
         for(Node n = node.parent(); n != null; n = n.parent()) {
             RuleApp app = n.getAppliedRuleApp();
             Rule rule = app.rule();
@@ -340,7 +344,7 @@ class InvInferenceTools {
     /**
      * Tells whether the passed sets of location symbols are disjoint.
      */
-    public boolean areDisjoint(SetOfUpdateableOperator set1, SetOfUpdateableOperator set2) {
+    public boolean areDisjoint(ImmutableSet<UpdateableOperator> set1, ImmutableSet<UpdateableOperator> set2) {
 	for(UpdateableOperator loc : set1) {
             if(set2.contains(loc)) {
                 return false;
@@ -353,8 +357,8 @@ class InvInferenceTools {
     /**
      * Collects all location symbols occurring in the passed term.
      */
-    public SetOfUpdateableOperator getOccurringLocationSymbols(Term t) {
-        SetOfUpdateableOperator result = SetAsListOfUpdateableOperator.EMPTY_SET;
+    public ImmutableSet<UpdateableOperator> getOccurringLocationSymbols(Term t) {
+        ImmutableSet<UpdateableOperator> result = DefaultImmutableSet.<UpdateableOperator>nil();
         if(t.op() instanceof UpdateableOperator) {
             result = result.add((UpdateableOperator)t.op());
         }

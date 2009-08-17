@@ -11,6 +11,7 @@
 
 package de.uka.ilkd.key.java.declaration;
 
+import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.LoopInitializer;
 import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.ProgramElement;
@@ -31,7 +32,7 @@ public class LocalVariableDeclaration
      *      Var specs.
      */
 
-    protected final ArrayOfVariableSpecification varSpecs;
+    protected final ImmutableArray<VariableSpecification> varSpecs;
 
     /**
      *      Local variable declaration.
@@ -54,7 +55,7 @@ public class LocalVariableDeclaration
 				    VariableSpecification[] vars) {  
 	super(mods,typeRef,false);
 	this.varSpecs=new
-	    ArrayOfVariableSpecification(vars); 
+	    ImmutableArray<VariableSpecification>(vars); 
     }
 
     /**
@@ -65,7 +66,7 @@ public class LocalVariableDeclaration
      */
     public LocalVariableDeclaration(TypeReference typeRef, 
 				    VariableSpecification var) {  
-	this(new ArrayOfModifier(new Modifier[0]),typeRef,var);
+	this(new ImmutableArray<Modifier>(new Modifier[0]),typeRef,var);
     }
 
 
@@ -75,10 +76,10 @@ public class LocalVariableDeclaration
      *      @param typeRef a type reference.
      *      @param var a variable specification .
      */
-    public LocalVariableDeclaration(ArrayOfModifier mods, TypeReference
+    public LocalVariableDeclaration(ImmutableArray<Modifier> mods, TypeReference
 				    typeRef, VariableSpecification var) {  
 	super(mods,typeRef,false);
-	this.varSpecs = new ArrayOfVariableSpecification(var); 
+	this.varSpecs = new ImmutableArray<VariableSpecification>(var); 
     }
 
     /**
@@ -87,10 +88,10 @@ public class LocalVariableDeclaration
      *      @param typeRef a type reference.
      *      @param vars a variable specification array.
      */
-    public LocalVariableDeclaration(ArrayOfModifier mods, TypeReference
+    public LocalVariableDeclaration(ImmutableArray<Modifier> mods, TypeReference
 				    typeRef, VariableSpecification[] vars) {  
 	super(mods,typeRef,false);
-	this.varSpecs = new ArrayOfVariableSpecification(vars); 
+	this.varSpecs = new ImmutableArray<VariableSpecification>(vars); 
     }
 
 
@@ -107,15 +108,15 @@ public class LocalVariableDeclaration
         super(children, false);
         
 	this.varSpecs = new
-	    ArrayOfVariableSpecification((VariableSpecification[]) 
+	    ImmutableArray<VariableSpecification>((VariableSpecification[]) 
 			 children.collect(VariableSpecification.class));
     }
 
-    public ArrayOfVariableSpecification getVariableSpecifications() {
+    public ImmutableArray<VariableSpecification> getVariableSpecifications() {
         return varSpecs;
     }
 
-    public ArrayOfVariableSpecification  getVariables() {
+    public ImmutableArray<VariableSpecification>  getVariables() {
         return varSpecs;
     }
 
@@ -146,7 +147,7 @@ public class LocalVariableDeclaration
         if (modArray != null) {
             len = modArray.size();
             if (len > index) {
-                return modArray.getModifier(index);
+                return modArray.get(index);
             }
             index -= len;
         }
@@ -155,7 +156,7 @@ public class LocalVariableDeclaration
             index--;
         }
         if (varSpecs != null) {
-            return varSpecs.getVariableSpecification(index);
+            return varSpecs.get(index);
         }
         throw new ArrayIndexOutOfBoundsException();
     }

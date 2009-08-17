@@ -17,6 +17,7 @@ import java.util.Stack;
 
 import org.apache.log4j.Logger;
 
+import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
 import de.uka.ilkd.key.java.expression.ExpressionStatement;
@@ -219,16 +220,16 @@ public class WhileLoopTransformation extends JavaASTVisitor {
 	    needInnerLabel = true;
 	    needOuterLabel = true;
         } else {
-            if (buffer instanceof ArrayOfProgramElement){
-                ArrayOfProgramElement aope = (ArrayOfProgramElement)buffer;
+            if (buffer instanceof ProgramElement) {
+                walk((ProgramElement)buffer);                
+            } else {
+                final ImmutableArray<Statement> aope = (ImmutableArray<Statement>)buffer;
                 for (int iterate=0; iterate<aope.size();iterate++){
-                    ProgramElement pe = aope.getProgramElement(iterate);
+                    ProgramElement pe = aope.get(iterate);
 	            if (pe != null) {
                         walk(pe);
                     }
                 }
-            } else {
-                walk((ProgramElement)buffer);                
             }
         }
 
@@ -392,14 +393,14 @@ public class WhileLoopTransformation extends JavaASTVisitor {
     *             Statement outerBlockStatements[] = new Statement[init.length+1];
     *             for (int copyStatements=0; copyStatements<init.length;copyStatements++)
     *                 outerBlockStatements[copyStatements] = init[copyStatements];
-    *             outerBlockStatements[init.length] = new If(guard ,new Then(new StatementBlock(new ArrayOfStatement(innerBlockStatements))));
+    *             outerBlockStatements[init.length] = new If(guard ,new Then(new StatementBlock(new ArrayOf<Statement>(innerBlockStatements))));
     *             //outerBlockStatements[init.length+1] = remainder;
     * 
     * 	    if (breakOuterLabel!=null)
     * 	        addChild(new LabeledStatement(breakOuterLabel.getLabel(), new StatementBlock(
-    * 	            new ArrayOfStatement(outerBlockStatements))));
+    * 	            new ArrayOf<Statement>(outerBlockStatements))));
     * 	    else
-    * 	        addChild(new StatementBlock(new ArrayOfStatement(outerBlockStatements)));
+    * 	        addChild(new StatementBlock(new ArrayOf<Statement>(outerBlockStatements)));
     *      	    changed();
     * 	} else {
     * 	    if (changeList.getFirst() == CHANGED) {
@@ -523,22 +524,22 @@ public class WhileLoopTransformation extends JavaASTVisitor {
 
             for (int copyStatements=0; copyStatements<initSize; copyStatements++) {
                 outerBlockStatements[copyStatements] = 
-		    inits.getInits().getLoopInitializer(copyStatements);
+		    inits.getInits().get(copyStatements);
 	    }
             
 	    outerBlockStatements[initSize] = 
 		new If(guard.getExpression(),
-		       new Then(new StatementBlock(new ArrayOfStatement
+		       new Then(new StatementBlock(new ImmutableArray<Statement>
 						   (innerBlockStatements))));
 	    
 	    if (outerLabelNeeded() && breakOuterLabel!=null) {
 	        addChild(new LabeledStatement
 			 (breakOuterLabel.getLabel(), 
-			  new StatementBlock(new ArrayOfStatement
+			  new StatementBlock(new ImmutableArray<Statement>
 					     (outerBlockStatements))));
 	    } else {
 	        addChild(new StatementBlock
-			 (new ArrayOfStatement(outerBlockStatements)));
+			 (new ImmutableArray<Statement>(outerBlockStatements)));
 	    }
      	    changed();
 	} else {
@@ -611,7 +612,7 @@ public class WhileLoopTransformation extends JavaASTVisitor {
 	    }
 	    Then then = null;
 	    StatementBlock block = new StatementBlock
-		(new ArrayOfStatement(new Statement[]
+		(new ImmutableArray<Statement>(new Statement[]
 		    {body, (Statement) root()}));
 	    if (outerLabelNeeded() && breakOuterLabel != null) {
 		// an unlabeled break occurs in the
@@ -661,7 +662,7 @@ public class WhileLoopTransformation extends JavaASTVisitor {
             }
 	    Statement resultStatement = null;
 	    StatementBlock block = new StatementBlock
-		(new ArrayOfStatement(new Statement[]
+		(new ImmutableArray<Statement>(new Statement[]
 		    {unwindedBody, 
 		        new While(guard, 
 		                  x.getBody(), 

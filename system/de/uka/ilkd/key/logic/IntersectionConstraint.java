@@ -10,9 +10,13 @@
 
 package de.uka.ilkd.key.logic;
 
+import java.util.Iterator;
+
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.op.Metavariable;
-import de.uka.ilkd.key.logic.op.SetOfMetavariable;
 
 /**
  * Class representing the intersection of a set of constraints (i.e. of
@@ -29,7 +33,7 @@ public class IntersectionConstraint implements Constraint {
      * and the list must not contain two different elements from which one is
      * stronger than the other.
      */
-    private ListOfConstraint subConstraints = SLListOfConstraint.EMPTY_LIST;
+    private ImmutableList<Constraint> subConstraints = ImmutableSLList.<Constraint>nil();
 
     /**
      * Use the static attributes of "Constraint" for new constraints
@@ -105,7 +109,7 @@ public class IntersectionConstraint implements Constraint {
 
 	IntersectionConstraint res = new IntersectionConstraint();
 	BooleanContainer bc = new BooleanContainer();
-	IteratorOfConstraint it;
+	Iterator<Constraint> it;
 	IntersectionConstraint diff = new IntersectionConstraint();
 	Constraint c;
 
@@ -114,7 +118,7 @@ public class IntersectionConstraint implements Constraint {
 	if (p_co instanceof IntersectionConstraint)
 	    it = ((IntersectionConstraint) p_co).subConstraints.iterator();
 	else
-	    it = SLListOfConstraint.EMPTY_LIST.prepend(p_co).iterator();
+	    it = ImmutableSLList.<Constraint>nil().prepend ( p_co ).iterator ();
 
 	while (it.hasNext()) {
 	    c = it.next();
@@ -145,8 +149,8 @@ public class IntersectionConstraint implements Constraint {
 	    BooleanContainer p_stronger) {
 
 	IntersectionConstraint res;
-	IteratorOfConstraint it;
-	Constraint c;
+	Iterator<Constraint>   it;
+	Constraint             c;
 
 	res = new IntersectionConstraint();
 	it = subConstraints.iterator();
@@ -240,8 +244,8 @@ public class IntersectionConstraint implements Constraint {
      * @return the joined constraint
      */
     public Constraint join(Constraint co, Services services) {
-	IteratorOfConstraint it = subConstraints.iterator();
-	Constraint res = Constraint.TOP;
+	Iterator<Constraint> it  = subConstraints.iterator ();
+	Constraint           res = Constraint.TOP;
 
 	while (it.hasNext())
 	    res = IntersectionConstraint.intersect(res, co.join(it.next(),
@@ -281,10 +285,10 @@ public class IntersectionConstraint implements Constraint {
      *         to the new constraint (the possible values of other variables are
      *         not modified)
      */
-    public Constraint removeVariables(SetOfMetavariable mvs) {
-	if (mvs.iterator().hasNext()) {
-	    Constraint res = Constraint.TOP;
-	    IteratorOfConstraint it = subConstraints.iterator();
+    public Constraint removeVariables ( ImmutableSet<Metavariable> mvs ) {
+	if ( mvs.iterator ().hasNext () ) {
+	    Constraint           res = Constraint.TOP;
+	    Iterator<Constraint> it  = subConstraints.iterator ();
 
 	    while (it.hasNext())
 		res = intersect(res, it.next().removeVariables(mvs));
@@ -315,10 +319,10 @@ public class IntersectionConstraint implements Constraint {
      * @return true iff this constraint is as strong as "co", i.e. every
      *         instantiation satisfying "this" also satisfies "co".
      */
-    public boolean isAsStrongAs(Constraint co) {
-	IteratorOfConstraint it = subConstraints.iterator();
-	while (it.hasNext()) {
-	    if (!it.next().isAsStrongAs(co))
+    public boolean isAsStrongAs ( Constraint co ) {
+	Iterator<Constraint> it = subConstraints.iterator ();
+	while ( it.hasNext () ) {
+	    if ( !it.next ().isAsStrongAs ( co ) )
 		return false;
 	}
 	return true;
@@ -328,12 +332,12 @@ public class IntersectionConstraint implements Constraint {
      * @return true iff this constraint is as weak as "co", i.e. every
      *         instantiation satisfying "co" also satisfies "this".
      */
-    public boolean isAsWeakAs(Constraint co) {
-	if (co instanceof IntersectionConstraint) {
-	    IteratorOfConstraint it = ((IntersectionConstraint) co).subConstraints
-		    .iterator();
-	    while (it.hasNext()) {
-		if (!isAsWeakAs(it.next()))
+    public boolean isAsWeakAs ( Constraint co ) {
+	if ( co instanceof IntersectionConstraint ) {
+	    Iterator<Constraint> it = 
+		((IntersectionConstraint)co).subConstraints.iterator ();
+	    while ( it.hasNext () ) {
+		if ( !isAsWeakAs ( it.next () ) )
 		    return false;
 	    }
 	    return true;
@@ -347,9 +351,9 @@ public class IntersectionConstraint implements Constraint {
     protected boolean isAsWeakAsInteger(Constraint co) {
 	// Under some assumptions this can be reduced to: one element
 	// of this intersection is weaker than "co"
-	IteratorOfConstraint it = subConstraints.iterator();
-	while (it.hasNext()) {
-	    if (it.next().isAsWeakAs(co))
+	Iterator<Constraint> it = subConstraints.iterator ();
+	while ( it.hasNext () ) {
+	    if ( it.next ().isAsWeakAs ( co ) )
 		return true;
 	}
 	return false;

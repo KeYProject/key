@@ -10,20 +10,24 @@
 
 package de.uka.ilkd.key.rule;
 
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import de.uka.ilkd.key.collection.*;
 import de.uka.ilkd.key.gui.ContractConfigurator;
 import de.uka.ilkd.key.gui.Main;
-
 import de.uka.ilkd.key.java.*;
+import de.uka.ilkd.key.java.recoderext.ConstructorNormalformBuilder;
 import de.uka.ilkd.key.java.statement.LabeledStatement;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.java.statement.Throw;
 import de.uka.ilkd.key.java.visitor.ProgramContextAdder;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.proof.*;
+import de.uka.ilkd.key.proof.AtPreFactory;
+import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.proof.init.CreatedAttributeTermFactory;
 import de.uka.ilkd.key.proof.mgt.ComplexRuleJustificationBySpec;
 import de.uka.ilkd.key.proof.mgt.ContractWithInvs;
@@ -45,6 +49,9 @@ public class UseOperationContractRule implements BuiltInRule {
     private static final AtPreFactory APF = AtPreFactory.INSTANCE;
     private static final CreatedAttributeTermFactory CATF 
         = CreatedAttributeTermFactory.INSTANCE;
+    private static final String INIT_NAME 
+	= ConstructorNormalformBuilder.CONSTRUCTOR_NORMALFORM_IDENTIFIER;
+    
   
     public static final UseOperationContractRule INSTANCE 
                                             = new UseOperationContractRule();
@@ -101,8 +108,8 @@ public class UseOperationContractRule implements BuiltInRule {
     /**
      * Returns all meta variables occurring in the passed term.
      */
-    private SetOfMetavariable getAllMetavariables(Term term) {
-        SetOfMetavariable result = SetAsListOfMetavariable.EMPTY_SET;            
+    private ImmutableSet<Metavariable> getAllMetavariables(Term term) {
+        ImmutableSet<Metavariable> result = DefaultImmutableSet.<Metavariable>nil();            
         
         if(term.op() instanceof Metavariable) {
             result = result.add((Metavariable) term.op());
@@ -120,11 +127,11 @@ public class UseOperationContractRule implements BuiltInRule {
      * Returns the operation contracts which are applicable for the passed 
      * operation and the passed modality (at the passed PosInOccurrence).
      */
-    private SetOfOperationContract getApplicableContracts(Services services, 
+    private ImmutableSet<OperationContract> getApplicableContracts(Services services, 
                                                           ProgramMethod pm, 
                                                           Modality modality,
                                                           PosInOccurrence pio) {
-        SetOfOperationContract result 
+        ImmutableSet<OperationContract> result 
                 = services.getSpecificationRepository()
                           .getOperationContracts(pm, modality);
         
@@ -149,7 +156,7 @@ public class UseOperationContractRule implements BuiltInRule {
                                                Modality modality,
                                                PosInOccurrence pio) {
         if(Main.getInstance().mediator().autoMode()) {
-            SetOfOperationContract contracts
+            ImmutableSet<OperationContract> contracts
                 = getApplicableContracts(services, pm, modality, pio);
             if(contracts.size() == 0) {
                 return null;
@@ -158,7 +165,7 @@ public class UseOperationContractRule implements BuiltInRule {
                 = services.getSpecificationRepository()
                           .combineContracts(contracts);
             
-            SetOfClassInvariant ownInvs
+            ImmutableSet<ClassInvariant> ownInvs
                 = services.getSpecificationRepository()
                           .getClassInvariants(pm.getContainerType());
             
@@ -211,11 +218,11 @@ public class UseOperationContractRule implements BuiltInRule {
         if (pe instanceof ProgramPrefix) {
             ProgramPrefix curPrefix = (ProgramPrefix)pe;
        
-            final ArrayOfProgramPrefix prefix = curPrefix.getPrefixElements();
+            final ImmutableArray<ProgramPrefix> prefix = curPrefix.getPrefixElements();
             final int length = prefix.size();
                 
             // fail fast check      
-            curPrefix = prefix.getProgramPrefix(length-1);// length -1 >= 0 as prefix array 
+            curPrefix = prefix.get(length-1);// length -1 >= 0 as prefix array 
                                                           //contains curPrefix as first element
 
             pe = curPrefix.getFirstActiveChildPos().getProgram(curPrefix);
@@ -227,7 +234,7 @@ public class UseOperationContractRule implements BuiltInRule {
                 result = curPrefix.getFirstActiveChildPos().append(result);
                 i--;
                 if (i >= 0) {
-                    curPrefix = prefix.getProgramPrefix(i);
+                    curPrefix = prefix.get(i);
                 }
             } while (i >= 0);       
 
@@ -286,7 +293,7 @@ public class UseOperationContractRule implements BuiltInRule {
         //there must be applicable contracts for the operation
         MethodBodyStatement mbs = (MethodBodyStatement) activeStatement;
         ProgramMethod pm = mbs.getProgramMethod(services);
-        SetOfOperationContract contracts 
+        ImmutableSet<OperationContract> contracts 
                 = getApplicableContracts(services, pm, modality, pio);
         if(contracts.size() == 0) {
             return false;
@@ -302,7 +309,7 @@ public class UseOperationContractRule implements BuiltInRule {
     }
 
     
-    public ListOfGoal apply(Goal goal, Services services, RuleApp ruleApp) {
+    public ImmutableList<Goal> apply(Goal goal, Services services, RuleApp ruleApp) {
 //        //collect information about sequent
 //        PosInOccurrence pio = goBelowUpdates(ruleApp.posInOccurrence());
 //        Modality modality = (Modality) pio.subTerm().op();
@@ -315,8 +322,8 @@ public class UseOperationContractRule implements BuiltInRule {
 //               ? services.getTypeConverter()
 //                         .convertToLogicElement(mbs.getDesignatedContext())
 //               : null);
-//        ListOfTerm actualParams = SLListOfTerm.EMPTY_LIST;
-//        ArrayOfExpression args = mbs.getArguments();
+//        ImmutableList<Term> actualParams = ImmutableSLList.<Term>nil();
+//        ImmutableArray<Expression> args = mbs.getArguments();
 //        for(int i = 0; i < args.size(); i++) {
 //            actualParams = actualParams.append(
 //                    services.getTypeConverter()
@@ -349,10 +356,10 @@ public class UseOperationContractRule implements BuiltInRule {
 //        if(selfVar != null)
 //            goal.addProgramVariable(selfVar);
 //        
-//        ListOfParsableVariable paramVars 
+//        ImmutableList<ParsableVariable> paramVars 
 //            = SVF.createParamVars(services, pm, true);
-//        ListOfProgramVariable paramVarsAsProgVars 
-//            = SLListOfProgramVariable.EMPTY_LIST;
+//        ImmutableList<ProgramVariable> paramVarsAsProgVars 
+//            = ImmutableSLList.<ProgramVariable>nil();
 //        for (ParsableVariable pvar : paramVars) {
 //            assert pvar instanceof ProgramVariable 
 //                   : pvar + " is not a ProgramVariable";
@@ -384,7 +391,7 @@ public class UseOperationContractRule implements BuiltInRule {
 //                                                      excVar, 
 //                                                      atPreFunctions,
 //                                                      services);
-//        SetOfLocationDescriptor modifies = cwi.contract.getModifies(selfVar, 
+//        ImmutableSet<LocationDescriptor> modifies = cwi.contract.getModifies(selfVar, 
 //                                                                    paramVars, 
 //                                                                    services);           
 //        for (final ClassInvariant inv : cwi.assumedInvs) {
@@ -403,7 +410,7 @@ public class UseOperationContractRule implements BuiltInRule {
 //        }
 //        
 //        //split goal into three branches
-//        ListOfGoal result = goal.split(3);
+//        ImmutableList<Goal> result = goal.split(3);
 //        Goal preGoal = result.tail().tail().head();
 //        preGoal.setBranchLabel("Pre");
 //        Goal postGoal = result.tail().head();
@@ -414,9 +421,9 @@ public class UseOperationContractRule implements BuiltInRule {
 //        //prepare common stuff for the three branches
 //        UpdateFactory uf = new UpdateFactory(services, goal.simplifier());
 //        AnonymisingUpdateFactory auf = new AnonymisingUpdateFactory(uf);
-//        SetOfMetavariable mvs = getAllMetavariables(pio.topLevel().subTerm());
+//        ImmutableSet<Metavariable> mvs = getAllMetavariables(pio.topLevel().subTerm());
 //        Term[] mvTerms = new Term[mvs.size()];
-//        final IteratorOfMetavariable it2 = mvs.iterator();
+//        final Iterator<Metavariable> it2 = mvs.iterator();
 //        for(int i = 0; i < mvTerms.length; i++) {
 //            assert it2.hasNext();
 //            mvTerms[i] = TB.func(it2.next());
@@ -431,7 +438,7 @@ public class UseOperationContractRule implements BuiltInRule {
 //                                   : uf.elementaryUpdate(TB.var(selfVar), 
 //                                                         actualSelf));
 //        
-//        final IteratorOfTerm actualParamsIt = actualParams.iterator();
+//        final Iterator<Term> actualParamsIt = actualParams.iterator();
 //        for (final ParsableVariable paramVar : paramVars) {
 //            assert actualParamsIt.hasNext();
 //            selfParamsUpdate 

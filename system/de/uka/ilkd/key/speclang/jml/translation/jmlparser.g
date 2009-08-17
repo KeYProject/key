@@ -14,6 +14,7 @@ header {
 
     import java.io.StringReader;
 
+    import de.uka.ilkd.key.collection.*;
     import de.uka.ilkd.key.java.JavaInfo;
     import de.uka.ilkd.key.java.Position;
     import de.uka.ilkd.key.java.Services;
@@ -38,6 +39,7 @@ header {
     import java.lang.RuntimeException;
     import java.math.BigInteger;
     import java.util.Map;
+    import java.util.Iterator;
     import java.util.LinkedHashMap;
 }
 
@@ -59,7 +61,7 @@ options {
     private static Sort boolSort;
 
     private ProgramVariable selfVar;
-    private ListOfProgramVariable paramVars;
+    private ImmutableList<ProgramVariable> paramVars;
     private ProgramVariable resultVar;
     private ProgramVariable excVar;
     private Term heapAtPre;
@@ -78,7 +80,7 @@ options {
 		Services services,
 		KeYJavaType specInClass,
 		ProgramVariable self,
-		ListOfProgramVariable paramVars,
+		ImmutableList<ProgramVariable> paramVars,
 		ProgramVariable result,
 		ProgramVariable exc,
 		Term heapAtPre) {
@@ -120,7 +122,7 @@ options {
 		Services services,
 		KeYJavaType specInClass,
 		ProgramVariable self,
-		ListOfProgramVariable paramVars,
+		ImmutableList<ProgramVariable> paramVars,
 		ProgramVariable result,
 		ProgramVariable exc,
 		Term heapAtPre) {
@@ -189,7 +191,7 @@ options {
 
     public FormulaWithAxioms parseSignalsOnly() throws SLTranslationException {
 
-	ListOfKeYJavaType signalsonly = null;
+	ImmutableList<KeYJavaType> signalsonly = null;
 	this.currentlyParsing = true;
 
 	try {
@@ -205,7 +207,7 @@ options {
 	// for every ExcType in the list
 	Term result = TB.ff();
 
-	IteratorOfKeYJavaType it = signalsonly.iterator();
+	Iterator<KeYJavaType> it = signalsonly.iterator();
 	while (it.hasNext()) {
 	    KeYJavaType kjt = it.next();
 		Function instance
@@ -235,9 +237,9 @@ options {
     }
 
 
-    public ListOfProgramVariable parseVariableDeclaration() throws SLTranslationException {
+    public ImmutableList<ProgramVariable> parseVariableDeclaration() throws SLTranslationException {
 
-	Pair<KeYJavaType,ListOfLogicVariable> vars;
+	Pair<KeYJavaType,ImmutableList<LogicVariable>> vars;
 
 	this.currentlyParsing = true;
 	try {
@@ -247,7 +249,7 @@ options {
 	}
 	this.currentlyParsing = false;
 
-	ListOfProgramVariable result = SLListOfProgramVariable.EMPTY_LIST;
+	ImmutableList<ProgramVariable> result = ImmutableSLList.<ProgramVariable>nil();
 	for(LogicVariable lv : vars.second) {
 	    ProgramVariable pv 
 	    	= new LocationVariable(new ProgramElementName(
@@ -322,7 +324,7 @@ options {
     }
 
 
-    private String createSignatureString(ListOfSLExpression signature) {
+    private String createSignatureString(ImmutableList<SLExpression> signature) {
 	if (signature == null || signature.isEmpty()) {
 	    return "";
 	}
@@ -440,8 +442,8 @@ options {
 
     
 /*    
-    private SetOfLocationDescriptor getObjectCreationModSet(KeYJavaType kjt) {
-    	SetOfLocationDescriptor result = SetAsListOfLocationDescriptor.EMPTY_SET;
+    private ImmutableSet<LocationDescriptor> getObjectCreationModSet(KeYJavaType kjt) {
+    	ImmutableSet<LocationDescriptor> result = SetAsImmutableList<LocationDescriptor>.EMPTY_SET;
     	
     	//collect implicit attributes
     	ProgramVariable nextToCreate 
@@ -506,14 +508,14 @@ options {
 
 	//local instance fields of created objects
 	if(kjt.getJavaType() instanceof ClassDeclaration) {
-		ListOfKeYJavaType kjts = javaInfo.getAllSupertypes(kjt).append(kjt);
-        IteratorOfKeYJavaType kit = kjts.iterator();
+		ImmutableList<KeYJavaType> kjts = javaInfo.getAllSupertypes(kjt).append(kjt);
+        Iterator<KeYJavaType> kit = kjts.iterator();
         while(kit.hasNext()){
             KeYJavaType skjt = kit.next();
             if(skjt.getJavaType() instanceof ClassDeclaration){
                 ClassDeclaration cd = (ClassDeclaration)skjt.getJavaType();
-	            ListOfField fields = javaInfo.getAllFields(cd);
-	            for(IteratorOfField it = fields.iterator(); it.hasNext(); ) {
+	            ImmutableList<Field> fields = javaInfo.getAllFields(cd);
+	            for(Iterator<Field> it = fields.iterator(); it.hasNext(); ) {
                     Field f = it.next();
                     ProgramVariable pv = (ProgramVariable) f.getProgramVariable();
                     if(!pv.isStatic()) {
@@ -732,7 +734,7 @@ storerefkeyword returns [Term result = null] throws SLTranslationException
 ;
 
 
-signalsonlyclause returns [ListOfKeYJavaType result = SLListOfKeYJavaType.EMPTY_LIST] throws SLTranslationException
+signalsonlyclause returns [ImmutableList<KeYJavaType> result = ImmutableSLList.<KeYJavaType>nil()] throws SLTranslationException
 {
     KeYJavaType t=null;
 }
@@ -1415,7 +1417,7 @@ primarysuffix[SLExpression receiver, String fullyQualifiedName]
 		throws SLTranslationException
 {
     String lookupName = null;   
-    ListOfSLExpression params = SLListOfSLExpression.EMPTY_LIST;
+    ImmutableList<SLExpression> params = ImmutableSLList.<SLExpression>nil();
 }
 :
 {
@@ -1484,7 +1486,7 @@ primarysuffix[SLExpression receiver, String fullyQualifiedName]
 new_expr throws SLTranslationException
 {
     KeYJavaType typ = null;
-    ListOfSLExpression params;
+    ImmutableList<SLExpression> params;
 }
 :
 	NEW typ=type LPAREN ( params=expressionlist )? RPAREN 
@@ -1493,7 +1495,7 @@ new_expr throws SLTranslationException
         }
     ;
 
-expressionlist returns [ListOfSLExpression result=SLListOfSLExpression.EMPTY_LIST] 
+expressionlist returns [ImmutableList<SLExpression> result=ImmutableSLList.<SLExpression>nil()] 
                throws SLTranslationException
 { 
     SLExpression expr;
@@ -1555,7 +1557,7 @@ decimalnumeral returns [SLExpression result=null] throws SLTranslationException
 
 jmlprimary returns [SLExpression result=null] throws SLTranslationException
 {
-    ListOfSLExpression list;
+    ImmutableList<SLExpression> list;
     KeYJavaType typ;
     Term t;
 }
@@ -1649,7 +1651,7 @@ jmlprimary returns [SLExpression result=null] throws SLTranslationException
                 assert atPreFunc != null;
 	    }	    
 	    t = TB.tt();
-            IteratorOfTerm it = sl.iterator();
+            Iterator<Term> it = sl.iterator();
             while(it.hasNext()){
             	Term n = it.next();
             	Term fn = TB.and(TB.not(TB.equals(n, TB.NULL(services))), TB.equals(TB.func(atPreFunc, n), TB.FALSE(services)));
@@ -1740,7 +1742,7 @@ specquantifiedexpression returns [Term result = null] throws SLTranslationExcept
     SLExpression expr;
     Term p = TB.tt();
     boolean nullable = false;
-    Pair<KeYJavaType,ListOfLogicVariable> declVars = null;
+    Pair<KeYJavaType,ImmutableList<LogicVariable>> declVars = null;
 }
 :
 	LPAREN
@@ -1776,13 +1778,13 @@ specquantifiedexpression returns [Term result = null] throws SLTranslationExcept
 		if (p != null) {
 		    t = TB.imp(p, t);
 		}
-		result = TB.all(declVars.second.toArray(), t);
+		result = TB.all(declVars.second.toArray(new LogicVariable[declVars.second.size()]), t);
 	    }
 	    else if (q.getText().equals("\\exists")) {
 		if (p != null) {
 		    t = TB.and(p, t);
 		}
-		result = TB.ex(declVars.second.toArray(), t);
+		result = TB.ex(declVars.second.toArray(new LogicVariable[declVars.second.size()]), t);
 	    }
 	    else if (q.getText().equals("\\min")) {
 	    	raiseNotSupported("\\min");
@@ -1798,7 +1800,7 @@ specquantifiedexpression returns [Term result = null] throws SLTranslationExcept
 	                result = TermFactory.DEFAULT.createBoundedNumericalQuantifierTerm(BoundedNumericalQuantifier.BSUM, 
         	                lowerBound(p, lv), upperBound(p, lv), TB.ife(
                 	                t, TB.zTerm(services, "1"), TB.zTerm(services, "0")),
-                        	        new ArrayOfQuantifiableVariable(lv));
+                        	        new ImmutableArray<QuantifiableVariable>(lv));
                                        
                 } else {
                     raiseError("only \\num_of expressions of form (\\sum int i; l<=i && i<u; t) are permitted");
@@ -1817,7 +1819,7 @@ specquantifiedexpression returns [Term result = null] throws SLTranslationExcept
                         t = TB.ife(p.sub(1), t, TB.zTerm(services, "0"));
                     }
                     result = TermFactory.DEFAULT.createBoundedNumericalQuantifierTerm(BoundedNumericalQuantifier.BSUM, 
-                            lowerBound(p, lv), upperBound(p, lv), t, new ArrayOfQuantifiableVariable(lv));
+                            lowerBound(p, lv), upperBound(p, lv), t, new ImmutableArray<QuantifiableVariable>(lv));
                 } else {
                     raiseError("only \\sum expressions of form (\\sum int i; l<=i && i<u; t) are permitted");
                 }
@@ -1833,7 +1835,7 @@ bsumterm returns [SLExpression result=null] throws SLTranslationException
 {
     SLExpression a = null;
     SLExpression b = null; 
-    Pair<KeYJavaType,ListOfLogicVariable> decls = null;
+    Pair<KeYJavaType,ImmutableList<LogicVariable>> decls = null;
 }:
         LPAREN
         q:BSUM decls=quantifiedvardecls 
@@ -1848,7 +1850,7 @@ bsumterm returns [SLExpression result=null] throws SLTranslationException
         {/*XXX
             LogicVariable lv = (LogicVariable) decls.head();
             result = TermFactory.DEFAULT.createBoundedNumericalQuantifierTerm(BoundedNumericalQuantifier.BSUM, 
-                        a, b, result, new ArrayOfQuantifiableVariable(lv));
+                        a, b, result, new ImmutableArray<QuantifiableVariable>(lv));
             resolverManager.popLocalVariablesNamespace();*/
             assert false : "not implemented";
         }
@@ -1859,11 +1861,11 @@ bsumterm returns [SLExpression result=null] throws SLTranslationException
         throw ex;
         }   
 
-quantifiedvardecls returns [Pair<KeYJavaType,ListOfLogicVariable> result = null]
+quantifiedvardecls returns [Pair<KeYJavaType,ImmutableList<LogicVariable>> result = null]
                    throws SLTranslationException
 {
     KeYJavaType t = null;
-    ListOfLogicVariable vars = SLListOfLogicVariable.EMPTY_LIST;
+    ImmutableList<LogicVariable> vars = ImmutableSLList.<LogicVariable>nil();
     LogicVariable v = null;
 }
 :
@@ -1877,7 +1879,7 @@ quantifiedvardecls returns [Pair<KeYJavaType,ListOfLogicVariable> result = null]
 	    { vars = vars.append(v); }
 	)*
 	{
-	    result = new Pair<KeYJavaType,ListOfLogicVariable>(t, vars);
+	    result = new Pair<KeYJavaType,ImmutableList<LogicVariable>>(t, vars);
 	}
 ;
 

@@ -11,6 +11,7 @@
 
 package de.uka.ilkd.key.java.expression;
 
+import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
@@ -28,7 +29,7 @@ public abstract class Operator extends JavaNonTerminalProgramElement
     /**
      *      Children.
      */
-    protected final ArrayOfExpression children;
+    protected final ImmutableArray<Expression> children;
 
 
     /**
@@ -49,7 +50,7 @@ public abstract class Operator extends JavaNonTerminalProgramElement
      @param rhs an expression.
      */
     public Operator(Expression lhs, Expression rhs) {
-	this.children=new ArrayOfExpression(new Expression[]{lhs, rhs});
+	this.children=new ImmutableArray<Expression>(new Expression[]{lhs, rhs});
     }
 
     /**
@@ -65,7 +66,7 @@ public abstract class Operator extends JavaNonTerminalProgramElement
     public Operator(ExtList children) {
         super(children);
 	this.children =
-	    new ArrayOfExpression
+	    new ImmutableArray<Expression>
 	    ((Expression[])children.collect(Expression.class)); 
     }
 
@@ -75,7 +76,7 @@ public abstract class Operator extends JavaNonTerminalProgramElement
      */
 
     public Operator(Expression unaryChild) {
-	this.children = new ArrayOfExpression(unaryChild);
+	this.children = new ImmutableArray<Expression>(unaryChild);
     }
 
     /**
@@ -84,7 +85,7 @@ public abstract class Operator extends JavaNonTerminalProgramElement
      */
 
     public Operator(Expression[] arguments) {
-	this.children = new ArrayOfExpression(arguments);
+	this.children = new ImmutableArray<Expression>(arguments);
     }
 
 
@@ -129,7 +130,7 @@ public abstract class Operator extends JavaNonTerminalProgramElement
         switch (getNotation()) {
         case INFIX:
         case POSTFIX:
-            return children.getExpression(0).getFirstElement();
+            return children.get(0).getFirstElement();
         case PREFIX:
         default:
             return this;
@@ -140,7 +141,7 @@ public abstract class Operator extends JavaNonTerminalProgramElement
         switch (getNotation()) {
         case INFIX:
         case PREFIX:
-            return children.getExpression(getArity() - 1).getLastElement();
+            return children.get(getArity() - 1).getLastElement();
             case POSTFIX:
         default:
             return this;
@@ -166,7 +167,7 @@ public abstract class Operator extends JavaNonTerminalProgramElement
      */
     public ProgramElement getChildAt(int index) {
         if (children != null) {
-            return children.getExpression(index);
+            return children.get(index);
         }
         throw new ArrayIndexOutOfBoundsException();
     }
@@ -191,13 +192,13 @@ public abstract class Operator extends JavaNonTerminalProgramElement
 
     public Expression getExpressionAt(int index) {
         if (children != null) {
-            return children.getExpression(index);
+            return children.get(index);
         }
         throw new ArrayIndexOutOfBoundsException();
     }
 
     /** return arguments */
-    public ArrayOfExpression getArguments() {
+    public ImmutableArray<Expression> getArguments() {
 	return children;
     }
 

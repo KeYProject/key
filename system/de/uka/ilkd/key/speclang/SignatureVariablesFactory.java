@@ -10,13 +10,19 @@
 
 package de.uka.ilkd.key.speclang;
 
+import de.uka.ilkd.key.collection.ImmutableArray;
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.sort.ArrayOfSort;
+import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.ProgramMethod;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.sort.Sort;
 
 
 /**
@@ -93,10 +99,10 @@ public class SignatureVariablesFactory {
     /**
      * Creates program variables for the parameters.
      */
-    public ListOfProgramVariable createParamVars(Services services, 
-                                                 ProgramMethod pm,
-                                                 boolean makeNamesUnique) {
-        ListOfProgramVariable result = SLListOfProgramVariable.EMPTY_LIST;
+    public ImmutableList<ProgramVariable> createParamVars(Services services, 
+                                                  ProgramMethod pm,
+                                                  boolean makeNamesUnique) {
+        ImmutableList<ProgramVariable> result = ImmutableSLList.<ProgramVariable>nil();
         for(int i = 0; i < pm.getParameterDeclarationCount(); i++) {
             KeYJavaType parType = pm.getParameterType(i);
             String parName = pm.getParameterDeclarationAt(i)
@@ -143,7 +149,7 @@ public class SignatureVariablesFactory {
 	    			        boolean makeNameUnique) {
 	return new Function(new Name(getNewName(services, "heapAtPre", makeNameUnique).toString()),
 		            services.getTypeConverter().getHeapLDT().targetSort(), 
-		            new ArrayOfSort());
+		            new ImmutableArray<Sort>());
     }
 }
     

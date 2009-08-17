@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.zip.GZIPOutputStream;
 
+import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.gui.Main;
 import de.uka.ilkd.key.rule.export.*;
 import de.uka.ilkd.key.util.KeYResourceManager;
@@ -266,13 +267,13 @@ public abstract class HTMLFile extends HTMLContainer {
     }
 
     protected void writeTacletOptions ( StringBuffer out, TacletModelInfo t ) {
-        final ListOfOptionModelInfo options = t.getOptions ();
+        final ImmutableList<OptionModelInfo> options = t.getOptions ();
         
         writeOptionList ( out, options );
     }
 
-    protected void writeOptionList ( StringBuffer out, ListOfOptionModelInfo options ) {
-        final IteratorOfOptionModelInfo it = options.iterator();
+    protected void writeOptionList ( StringBuffer out, ImmutableList<OptionModelInfo> options ) {
+        final Iterator<OptionModelInfo> it = options.iterator();
         boolean first = true;
         while ( it.hasNext() ) {
             final OptionModelInfo opt = it.next ();

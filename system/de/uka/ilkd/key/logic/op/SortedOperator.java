@@ -10,7 +10,7 @@
 
 package de.uka.ilkd.key.logic.op;
 
-import de.uka.ilkd.key.logic.sort.ArrayOfSort;
+import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.logic.sort.Sort;
 
 
@@ -23,5 +23,5 @@ public interface SortedOperator extends Operator {
 
     Sort argSort(int i);
     
-    public ArrayOfSort argSorts();
+    public ImmutableArray<Sort> argSorts();
 }

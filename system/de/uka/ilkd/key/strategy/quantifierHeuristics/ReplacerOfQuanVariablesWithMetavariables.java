@@ -16,16 +16,12 @@
 ///
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
+import de.uka.ilkd.key.collection.ImmutableMap;
+import de.uka.ilkd.key.collection.DefaultImmutableMap;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.MapAsListFromQuantifiableVariableToTerm;
-import de.uka.ilkd.key.logic.op.MapFromQuantifiableVariableToTerm;
-import de.uka.ilkd.key.logic.op.Metavariable;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.logic.op.Quantifier;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 
 /**
@@ -41,13 +37,13 @@ class ReplacerOfQuanVariablesWithMetavariables {
     private ReplacerOfQuanVariablesWithMetavariables () {}
     
     public static Substitution createSubstitutionForVars(Term allTerm) {
-        MapFromQuantifiableVariableToTerm res =
-            MapAsListFromQuantifiableVariableToTerm.EMPTY_MAP;
+        ImmutableMap<QuantifiableVariable,Term> res =
+            DefaultImmutableMap.<QuantifiableVariable,Term>nilMap();
         Term t = allTerm;
         Operator op = t.op ();
         while ( op instanceof Quantifier ) {
             QuantifiableVariable q =
-                t.varsBoundHere ( 0 ).getQuantifiableVariable ( 0 );
+                t.varsBoundHere ( 0 ).get ( 0 );
             Term m;
             if ( op == Quantifier.ALL ) {
                 Metavariable mv = new Metavariable ( ARBITRARY_NAME, q.sort () );

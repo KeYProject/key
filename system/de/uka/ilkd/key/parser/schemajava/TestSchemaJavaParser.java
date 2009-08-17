@@ -7,7 +7,6 @@
 // See LICENSE.TXT for details.
 package de.uka.ilkd.key.parser.schemajava;
 
-import java.io.Reader;
 import java.io.StringReader;
 
 import junit.framework.TestCase;

@@ -15,13 +15,15 @@ import java.io.StringReader;
 import java.io.StringWriter;
 
 import junit.framework.TestCase;
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.Recoder2KeY;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.pp.AbbrevMap;
-import de.uka.ilkd.key.rule.SetAsListOfTaclet;
+import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletForTests;
 import de.uka.ilkd.key.util.DefaultExceptionHandler;
 
@@ -165,8 +167,7 @@ public class TestTermParser extends TestCase {
 		 "No file. Call of parser from parser/TestTermParser.java",
 		 new ParserConfig(serv, nss),
 		 new ParserConfig(serv, nss),
-		 null, 
-		 SetAsListOfTaclet.EMPTY_SET).problem();	    
+		 null, DefaultImmutableSet.<Taclet>nil()).problem();	    
 	} catch (Exception e) {
 	    StringWriter sw = new StringWriter();
 	    PrintWriter pw = new PrintWriter(sw);
@@ -288,9 +289,9 @@ public class TestTermParser extends TestCase {
 	Term t = parseFma(s);
 	
 	LogicVariable thisx = (LogicVariable) t.varsBoundHere(0)
-	    .getQuantifiableVariable(0);
+	    .get(0);
 	LogicVariable l1 = (LogicVariable) t.sub(0).varsBoundHere(0)
-	    .getQuantifiableVariable(0);
+	    .get(0);
 
 	Term t1 = TermBuilder.DF.all(thisx,
 	     TermBuilder.DF.all(l1,
@@ -313,7 +314,7 @@ public class TestTermParser extends TestCase {
 	    Term t = parseTerm(s);
 
 	    LogicVariable thisxs = (LogicVariable) t.varsBoundHere(1)
-		.getQuantifiableVariable(0);
+		.get(0);
 	
 	    Term t1 = tf.createTerm
 		(WarySubstOp.SUBST,
@@ -322,7 +323,7 @@ public class TestTermParser extends TestCase {
         		  new Term[]{tf.createTerm(thisxs), t_ys},
         		  	     null,
         		  	     null)},
-		new ArrayOfQuantifiableVariable(thisxs),
+		new ImmutableArray<QuantifiableVariable>(thisxs),
 		null);
 
 	    assertTrue("new variable in subst term", thisxs != xs);
@@ -337,7 +338,7 @@ public class TestTermParser extends TestCase {
 	Term t = parseFma(s);
 	
 	LogicVariable thisx = (LogicVariable) t.varsBoundHere(0)
-	    .getQuantifiableVariable(0);
+	    .get(0);
 
 	Term t1 = TermBuilder.DF.ex(thisx,
 	     tf.createTerm

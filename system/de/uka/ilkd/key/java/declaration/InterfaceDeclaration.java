@@ -11,10 +11,11 @@
 
 package de.uka.ilkd.key.java.declaration;
 
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.abstraction.ListOfKeYJavaType;
-import de.uka.ilkd.key.java.abstraction.SLListOfKeYJavaType;
+import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.util.ExtList;
@@ -108,7 +109,7 @@ public class InterfaceDeclaration extends TypeDeclaration {
         if (modArray != null) {
             len = modArray.size();
             if (len > index) {
-                return modArray.getModifier(index);
+                return modArray.get(index);
             }
             index -= len;
         }
@@ -123,7 +124,7 @@ public class InterfaceDeclaration extends TypeDeclaration {
         if (members != null) {
             len = members.size();
             if (len > index) {
-                return members.getMemberDeclaration(index);
+                return members.get(index);
             }
             index -= len;
         }
@@ -203,8 +204,8 @@ public class InterfaceDeclaration extends TypeDeclaration {
     /** 
      * returns the local declared supertypes
      */
-    public ListOfKeYJavaType getSupertypes() {
-	ListOfKeYJavaType types = SLListOfKeYJavaType.EMPTY_LIST;
+    public ImmutableList<KeYJavaType> getSupertypes() {
+	ImmutableList<KeYJavaType> types = ImmutableSLList.<KeYJavaType>nil();
 	if (extending != null) {
 	    for (int i = extending.getTypeReferenceCount()-1; i>=0; i--) {		
 		types = types.prepend

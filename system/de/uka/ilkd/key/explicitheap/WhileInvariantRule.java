@@ -11,8 +11,11 @@
 package de.uka.ilkd.key.explicitheap;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.Map;
 
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
@@ -160,8 +163,8 @@ public final class WhileInvariantRule implements BuiltInRule {
     }
 
 //    private AnonymisationInfo getAnonymisation(Term u,
-//	    SetOfLocationDescriptor mod,
-//	    ListOfProgramVariable relevantLocalVars, Services services,
+//	    ImmutableSet<LocationDescriptor> mod,
+//	    ImmutableList<ProgramVariable> relevantLocalVars, Services services,
 //	    Goal goal) {
 	// final Term heapTerm = TB.heap(services);
 	// assert u.sort() == Sort.UPDATE;
@@ -171,8 +174,8 @@ public final class WhileInvariantRule implements BuiltInRule {
 	//	
 	// //build anon update
 	// Term anonUpdate = TB.skip();
-	// SetOfProgramVariable allowedLocalVars =
-	// SetAsListOfProgramVariable.EMPTY_SET;
+	// ImmutableSet<ProgramVariable> allowedLocalVars =
+	// DefaultImmutableSet.<ProgramVariable>nil();
 	// for(LocationDescriptor loc : mod) {
 	// if(loc instanceof BasicLocationDescriptor) {
 	// BasicLocationDescriptor bloc = (BasicLocationDescriptor) loc;
@@ -180,7 +183,7 @@ public final class WhileInvariantRule implements BuiltInRule {
 	// if(locTerm.op() instanceof ProgramVariable) {
 	// assert locTerm.op() instanceof ProgramVariable;
 	// Term pvAnonUpdate = auf.createAnonymisingUpdate(
-	// SetAsListOfLocationDescriptor.EMPTY_SET.add(loc),
+	// DefaultImmutableSet.<LocationDescriptor>nil().add(loc),
 	// services);
 	// assert pvAnonUpdate.locationCount() == 1;
 	// services.getNamespaces().functions().add(pvAnonUpdate.getAssignmentPair(0).value().op());
@@ -291,7 +294,7 @@ public final class WhileInvariantRule implements BuiltInRule {
 	return inst != null;
     }
 
-    public ListOfGoal apply(Goal goal, Services services, RuleApp ruleApp) {
+    public ImmutableList<Goal> apply(Goal goal, Services services, RuleApp ruleApp) {
 	return null;
 //	
 //	Instantiation inst = instantiate(ruleApp.posInOccurrence().subTerm(),
@@ -303,7 +306,7 @@ public final class WhileInvariantRule implements BuiltInRule {
 //		.getInternalAtPreFunctions();
 //	Term invTerm = inst.inv.getInvariant(inst.selfTerm, atPreFunctions,
 //		services);
-//	SetOfLocationDescriptor mod = inst.inv.getModifies(inst.selfTerm,
+//	ImmutableSet<LocationDescriptor> mod = inst.inv.getModifies(inst.selfTerm,
 //		atPreFunctions, services);
 //
 //	// get anonymising update, frame condition
@@ -313,7 +316,7 @@ public final class WhileInvariantRule implements BuiltInRule {
 //		services, goal);
 //
 //	// split goal into three branches
-//	ListOfGoal result = goal.split(3);
+//	ImmutableList<Goal> result = goal.split(3);
 //	Goal initGoal = result.tail().tail().head();
 //	Goal bodyGoal = result.tail().head();
 //	Goal useGoal = result.head();
@@ -466,9 +469,9 @@ public final class WhileInvariantRule implements BuiltInRule {
     }
 
     private static final class FreePVCollector extends JavaASTVisitor {
-	private ListOfProgramVariable declaredPVs = SLListOfProgramVariable.EMPTY_LIST;
+	private ImmutableList<ProgramVariable> declaredPVs = ImmutableSLList.<ProgramVariable>nil();
 
-	private ListOfProgramVariable freePVs = SLListOfProgramVariable.EMPTY_LIST;
+	private ImmutableList<ProgramVariable> freePVs = ImmutableSLList.<ProgramVariable>nil();
 
 	public FreePVCollector(ProgramElement root, Services services) {
 	    super(root, services);
@@ -494,10 +497,10 @@ public final class WhileInvariantRule implements BuiltInRule {
 	    }
 	}
 
-	public ListOfProgramVariable result() {
+	public ImmutableList<ProgramVariable> result() {
 	    // remove duplicates
-	    ListOfProgramVariable result = SLListOfProgramVariable.EMPTY_LIST;
-	    IteratorOfProgramVariable it = freePVs.iterator();
+	    ImmutableList<ProgramVariable> result = ImmutableSLList.<ProgramVariable>nil();
+	    Iterator<ProgramVariable> it = freePVs.iterator();
 	    while (it.hasNext()) {
 		ProgramVariable pv = it.next();
 		if (!result.contains(pv)) {

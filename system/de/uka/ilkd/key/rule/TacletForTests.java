@@ -14,11 +14,15 @@ package de.uka.ilkd.key.rule;
 import java.io.File;
 import java.io.StringReader;
 
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Recoder2KeY;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.Namespace;
+import de.uka.ilkd.key.logic.NamespaceSet;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -54,8 +58,8 @@ public class TacletForTests {
             //we do not want normal standard rules, but ruleSetsDeclarations is needed for string library (HACK)
             public RuleCollection getStandardRules() {
                 return new RuleCollection(
-                                RuleSource.initRuleFile("LDTsForTestsOnly.key"), 
-                                SLListOfBuiltInRule.EMPTY_LIST);
+                                RuleSource.initRuleFile("ruleSetsDeclarations.key"), 
+                                ImmutableSLList.<BuiltInRule>nil());
             }
         };
         

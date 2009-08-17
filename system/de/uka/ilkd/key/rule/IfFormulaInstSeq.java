@@ -10,6 +10,10 @@
 
 package de.uka.ilkd.key.rule;
 
+import java.util.Iterator;
+
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.proof.ProofSaver;
@@ -52,11 +56,11 @@ public class IfFormulaInstSeq implements IfFormulaInstantiation {
     /**
      * Create a list with all formulas of a given semisequent
      */
-    private static ListOfIfFormulaInstantiation createListHelp(Sequent     p_s,                                                               
+    private static ImmutableList<IfFormulaInstantiation> createListHelp(Sequent     p_s,                                                               
 							       boolean antec ) {
 	
-	ListOfIfFormulaInstantiation res = SLListOfIfFormulaInstantiation.EMPTY_LIST;
-	IteratorOfConstrainedFormula  it;
+	ImmutableList<IfFormulaInstantiation> res = ImmutableSLList.<IfFormulaInstantiation>nil();
+	Iterator<ConstrainedFormula>  it;
         if (antec) it = p_s.antecedent().iterator ();
            else it = p_s.succedent().iterator ();
 	while ( it.hasNext () ) {
@@ -67,13 +71,13 @@ public class IfFormulaInstSeq implements IfFormulaInstantiation {
 
     }
 
-    public static ListOfIfFormulaInstantiation createList ( Sequent     p_s,                                                            
+    public static ImmutableList<IfFormulaInstantiation> createList ( Sequent     p_s,                                                            
                                                             boolean antec ) {
         final Semisequent ss = antec ? p_s.antecedent() : p_s.succedent();
         
         synchronized ( cache ) {
             if ( ( antec ? cache.aKey : cache.sKey ) != ss ) {
-                final ListOfIfFormulaInstantiation val = createListHelp ( 
+                final ImmutableList<IfFormulaInstantiation> val = createListHelp ( 
 		    p_s, antec );
                 if ( antec ) {
                     cache.aKey = ss;
@@ -131,10 +135,10 @@ public class IfFormulaInstSeq implements IfFormulaInstantiation {
     // a simple cache for the results of the method <code>createList</code>
     private static final class Cache {
         public Semisequent aKey = null;
-        public ListOfIfFormulaInstantiation aVal = null;
+        public ImmutableList<IfFormulaInstantiation> aVal = null;
 
         public Semisequent sKey = null;
-        public ListOfIfFormulaInstantiation sVal = null;
+        public ImmutableList<IfFormulaInstantiation> sVal = null;
     }
     
     private static final Cache cache = new Cache ();

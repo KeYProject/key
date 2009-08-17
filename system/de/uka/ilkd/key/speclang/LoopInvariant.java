@@ -11,12 +11,11 @@
 package de.uka.ilkd.key.speclang;
 
 
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.visitor.Visitor;
-import de.uka.ilkd.key.logic.SetOfTerm;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.SortedOperator;
 
 
 /**
@@ -40,7 +39,7 @@ public interface LoopInvariant {
     /**
      * Returns the set of loop predicates.
      */
-    public SetOfTerm getPredicates(Term selfTerm, 
+    public LoopPredicateSet getPredicates(Term selfTerm, 
             			   Term heapAtPre,
             			   Services services);
     
@@ -95,7 +94,7 @@ public interface LoopInvariant {
      * Returns a new loop invariant where the loop predicates have been 
      * replaced with the passed ones.
      */
-    public LoopInvariant setPredicates(SetOfTerm predicates, 
+    public LoopInvariant setPredicates(ImmutableSet<Term> predicates, 
             Term selfTerm,
             Term heapAtPre,
             Services services);

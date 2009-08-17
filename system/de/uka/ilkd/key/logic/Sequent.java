@@ -10,6 +10,10 @@
 
 package de.uka.ilkd.key.logic;
 
+import java.util.Iterator;
+
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.pp.NotationInfo;
@@ -142,7 +146,7 @@ public class Sequent implements Iterable<ConstrainedFormula> {
      * inserted at the beginning or end of the ante-/succedent.
      *  (NOTICE:Sequent determines 
      * index using identity (==) not equality.)
-     * @param insertions the ListOfConstrainedFormula to be added
+     * @param insertions the IList<ConstrainedFormula> to be added
      * @param antec boolean selecting the correct semisequent where to
      * insert the formulas. If set to true, the antecedent is taken
      * otherwise the succedent.
@@ -151,7 +155,7 @@ public class Sequent implements Iterable<ConstrainedFormula> {
      * @return a SequentChangeInfo which contains the new sequent and
      * information which formulas have been added or removed 
      */
-    public SequentChangeInfo addFormula(ListOfConstrainedFormula insertions,
+    public SequentChangeInfo addFormula(ImmutableList<ConstrainedFormula> insertions,
 					boolean antec, boolean first) {
 
 	final Semisequent seq = antec ? antecedent : succedent;
@@ -166,13 +170,13 @@ public class Sequent implements Iterable<ConstrainedFormula> {
     /** adds the formulas of list insertions to the sequent starting at
      * position p. (NOTICE:Sequent determines 
      * index using identy (==) not equality.)
-     * @param insertions a ListOfConstrainedFormula with the formulas to be added
+     * @param insertions a IList<ConstrainedFormula> with the formulas to be added
      * @param p the PosInOccurrence describing the position where to
      * insert the formulas 
      * @return a SequentChangeInfo which contains the new sequent and
      * information which formulas have been added or removed 
      */
-    public SequentChangeInfo addFormula(ListOfConstrainedFormula insertions, 
+    public SequentChangeInfo addFormula(ImmutableList<ConstrainedFormula> insertions, 
 					PosInOccurrence p) {
 	final Semisequent seq = getSemisequent(p);
 
@@ -211,7 +215,7 @@ public class Sequent implements Iterable<ConstrainedFormula> {
      * list and adds the remaining list elements to the sequent
      * (NOTICE:Sequent determines 
      * index using identity (==) not equality.)  
-     * @param replacements the ListOfConstrainedFormula whose head
+     * @param replacements the IList<ConstrainedFormula> whose head
      * replaces the formula at position p and adds the rest of the list
      * behind the changed formula
      * @param p a PosInOccurrence describing the position of the formula
@@ -219,7 +223,7 @@ public class Sequent implements Iterable<ConstrainedFormula> {
      * @return a SequentChangeInfo which contains the new sequent and
      * information which formulas have been added or removed 
      */
-    public SequentChangeInfo changeFormula(ListOfConstrainedFormula replacements,
+    public SequentChangeInfo changeFormula(ImmutableList<ConstrainedFormula> replacements,
 					   PosInOccurrence p) {
 
 	final SemisequentChangeInfo semiCI = 
@@ -278,7 +282,7 @@ public class Sequent implements Iterable<ConstrainedFormula> {
     public int formulaNumberInSequent(boolean inAntec, 
                                       ConstrainedFormula cfma) {
         int n = inAntec ? 0 : antecedent.size();       
-        final IteratorOfConstrainedFormula formIter = 
+        final Iterator<ConstrainedFormula> formIter = 
             inAntec ? antecedent.iterator() : succedent.iterator();
         while (formIter.hasNext()) {
             n++;
@@ -314,7 +318,7 @@ public class Sequent implements Iterable<ConstrainedFormula> {
     /** returns iterator about all ConstrainedFormulae of the sequent
      * @return iterator about all ConstrainedFormulae of the sequent 
      */
-    public IteratorOfConstrainedFormula iterator() {
+    public Iterator<ConstrainedFormula> iterator() {
 	return new SequentIterator( antecedent(), succedent() );
     }
     
@@ -380,7 +384,7 @@ public class Sequent implements Iterable<ConstrainedFormula> {
      * @param v the bound variable to search for
      */
     public boolean varIsBound(QuantifiableVariable v) {
-	final IteratorOfConstrainedFormula it = iterator();	
+	final Iterator<ConstrainedFormula> it = iterator();	
 	while (it.hasNext()) {
 	    final BoundVarsVisitor bvv=new BoundVarsVisitor();
 	    it.next().formula().execPostOrder(bvv);
@@ -397,8 +401,8 @@ public class Sequent implements Iterable<ConstrainedFormula> {
             return true;
         }
                 
-        public IteratorOfConstrainedFormula iterator() {
-            return SLListOfConstrainedFormula.EMPTY_LIST.iterator();
+        public Iterator<ConstrainedFormula> iterator() {
+            return ImmutableSLList.<ConstrainedFormula>nil().iterator();
         }
         
         public boolean varIsBound(QuantifiableVariable v) {
@@ -407,10 +411,10 @@ public class Sequent implements Iterable<ConstrainedFormula> {
         
     } 
     
-    static class SequentIterator implements IteratorOfConstrainedFormula {
+    static class SequentIterator implements Iterator<ConstrainedFormula> {
 
-	private final IteratorOfConstrainedFormula anteIt;
-	private final IteratorOfConstrainedFormula succIt;      
+	private final Iterator<ConstrainedFormula> anteIt;
+	private final Iterator<ConstrainedFormula> succIt;      
 
 	SequentIterator(Semisequent ante, 
 			Semisequent succ) {

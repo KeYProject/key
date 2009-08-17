@@ -10,6 +10,12 @@
 
 package de.uka.ilkd.key.strategy;
 
+import java.util.Iterator;
+
+import de.uka.ilkd.key.collection.ImmutableHeap;
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.collection.ImmutableLeftistHeap;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.BooleanContainer;
 import de.uka.ilkd.key.logic.Constraint;
@@ -28,13 +34,13 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
 
     /** The priority queue containing all possible next rule applications,
      * ordered by the costs the strategy object has assigned to them */
-    private HeapOfRuleAppContainer queue       = null;
+    private ImmutableHeap<RuleAppContainer> queue       = null;
 
-    private HeapOfRuleAppContainer secQueue    = null;
+    private ImmutableHeap<RuleAppContainer> secQueue    = null;
     
     /** rule apps that have been deferred during the last call
      * of <code>next</code>, but that could be still relevant */
-    private ListOfRuleAppContainer workingList = null;
+    private ImmutableList<RuleAppContainer> workingList = null;
 
     private static final int PRIMARY_QUEUE   = 0;
     private static final int SECONDARY_QUEUE = 1;
@@ -74,9 +80,9 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
             return;
         }
 
-        queue = LeftistHeapOfRuleAppContainer.EMPTY_HEAP;
-        secQueue = LeftistHeapOfRuleAppContainer.EMPTY_HEAP;
-        workingList = SLListOfRuleAppContainer.EMPTY_LIST;
+        queue = ImmutableLeftistHeap.<RuleAppContainer>nilHeap();
+        secQueue = ImmutableLeftistHeap.<RuleAppContainer>nilHeap();
+        workingList = ImmutableSLList.<RuleAppContainer>nil();
 
         // to support encapsulating rule managers (delegation, like in
         // <code>FocussedRuleApplicationManager</code>) the rule index
@@ -103,7 +109,7 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
             // then the heap has to be rebuilt completely anyway, and the new
             // rule app is not of interest for us
             return;
-        final IteratorOfRuleAppContainer iterator = RuleAppContainer.createAppContainers
+        final Iterator<RuleAppContainer> iterator = RuleAppContainer.createAppContainers
         	           ( rule, pos, getGoal (), getStrategy () ).iterator ();
         push ( iterator,  PRIMARY_QUEUE );
     }
@@ -112,7 +118,7 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
     /**
      * Add a number of new rule apps to the heap
      */
-    private void push ( IteratorOfRuleAppContainer it, int target ) {
+    private void push ( Iterator<RuleAppContainer> it, int target ) {
         while ( it.hasNext () ) {
             push ( it.next (), target );
         }
@@ -201,7 +207,7 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
 //        System.out.println("Working list size: " + workingList.size());
 
         queue = queue.insert ( secQueue );
-        secQueue = LeftistHeapOfRuleAppContainer.EMPTY_HEAP;        
+        secQueue = ImmutableLeftistHeap.<RuleAppContainer>nilHeap();        
     }
 
 
@@ -228,7 +234,7 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
                 // <code>next()</code> the next time; all other considered rule
                 // apps can be put into the primary queue immediately
                 queue = queue.insert ( workingList.iterator () );
-                workingList = SLListOfRuleAppContainer.EMPTY_LIST;
+                workingList = ImmutableSLList.<RuleAppContainer>nil();
                 push ( c, WORKING_LIST );
             }
             
@@ -273,8 +279,8 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
      * rule apps are added to the heap
      */
     private void createFurtherApps () {
-    	final IteratorOfRuleAppContainer it = workingList.iterator();
-    	workingList = SLListOfRuleAppContainer.EMPTY_LIST;
+    	final Iterator<RuleAppContainer> it = workingList.iterator();
+    	workingList = ImmutableSLList.<RuleAppContainer>nil();
     
         while ( it.hasNext() )
             createFurtherRuleApps ( it.next (), true );
@@ -322,8 +328,8 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
     	return res;
     }
     
-    void printQueue(HeapOfRuleAppContainer p_queue) {
-        IteratorOfRuleAppContainer it = p_queue.sortedIterator();
+    void printQueue(ImmutableHeap<RuleAppContainer> p_queue) {
+        Iterator<RuleAppContainer> it = p_queue.sortedIterator();
         
         System.out.println("---- start of queue ----");
         

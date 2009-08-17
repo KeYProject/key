@@ -10,10 +10,8 @@
 
 package de.uka.ilkd.key.proof.init;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
-
-import de.uka.ilkd.key.java.ArrayOfExpression;
+import de.uka.ilkd.key.collection.*;
+import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.ClassType;
@@ -32,10 +30,13 @@ import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.java.statement.Try;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.sort.ArrayOfSort;
+import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.mgt.AxiomJustification;
-import de.uka.ilkd.key.rule.*;
-import de.uka.ilkd.key.speclang.*;
+import de.uka.ilkd.key.rule.NoFindTacletBuilder;
+import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.rule.TacletGoalTemplate;
+import de.uka.ilkd.key.speclang.ClassInvariant;
+import de.uka.ilkd.key.speclang.OperationContract;
 
 
 /**
@@ -45,11 +46,11 @@ public abstract class EnsuresPO extends AbstractPO {
     
     protected final ProgramMethod programMethod;
     protected final Modality modality;
-    protected final SetOfClassInvariant assumedInvs;
+    protected final ImmutableSet<ClassInvariant> assumedInvs;
     
     private final boolean skipPreconditions;
     
-    private SetOfTaclet invTaclets = SetAsListOfTaclet.EMPTY_SET;
+    private ImmutableSet<Taclet> invTaclets = DefaultImmutableSet.<Taclet>nil();
 
     
     
@@ -61,7 +62,7 @@ public abstract class EnsuresPO extends AbstractPO {
 	    	     String name,
 		     ProgramMethod programMethod,
 		     Modality modality,
-                     SetOfClassInvariant assumedInvs,
+                     ImmutableSet<ClassInvariant> assumedInvs,
                      boolean skipPreconditions) {
     	super(initConfig, 
     	      name, 
@@ -79,7 +80,7 @@ public abstract class EnsuresPO extends AbstractPO {
     //-------------------------------------------------------------------------
   
     protected abstract Term getPreTerm(ProgramVariable selfVar, 
-                                       ListOfProgramVariable paramVars, 
+                                       ImmutableList<ProgramVariable> paramVars, 
                                        ProgramVariable resultVar,
                                        ProgramVariable exceptionVar,
                                        Term heapAtPre) 
@@ -87,7 +88,7 @@ public abstract class EnsuresPO extends AbstractPO {
     
     
     protected abstract Term getPostTerm(ProgramVariable selfVar, 
-                                        ListOfProgramVariable paramVars, 
+                                        ImmutableList<ProgramVariable> paramVars, 
                                         ProgramVariable resultVar,
                                         ProgramVariable exceptionVar,
                                         Term heapAtPre)
@@ -147,7 +148,7 @@ public abstract class EnsuresPO extends AbstractPO {
         
         TacletGoalTemplate template 
             = new TacletGoalTemplate(sequent, 
-                                     SLListOfTaclet.EMPTY_LIST);
+                                     ImmutableSLList.<Taclet>nil());
         
         NoFindTacletBuilder tacletBuilder = new NoFindTacletBuilder();
         String s = "Insert implicit invariants of " + classKJT.getName();
@@ -184,7 +185,7 @@ public abstract class EnsuresPO extends AbstractPO {
      * Builds the "general assumption" for a set of assumed invariants. 
      */
     private Term buildGeneralAssumption(ProgramVariable selfVar,
-                                        ListOfProgramVariable paramVars) 
+                                        ImmutableList<ProgramVariable> paramVars) 
     		throws ProofInputException {
         Term result = null;
         
@@ -194,7 +195,7 @@ public abstract class EnsuresPO extends AbstractPO {
         
         //build disjunction of preconditions
         if(!skipPreconditions) {
-            SetOfOperationContract contracts 
+            ImmutableSet<OperationContract> contracts 
             = specRepos.getOperationContracts(programMethod);
             if (contracts.size() > 0) {
                 Term anyPreTerm = TB.ff();
@@ -244,7 +245,7 @@ public abstract class EnsuresPO extends AbstractPO {
             	= new MethodBodyStatement(programMethod,
             				  selfVar,
             				  resultVar,
-            				  new ArrayOfExpression(formalParVars));
+            				  new ImmutableArray<Expression>(formalParVars));
 	    sb = new StatementBlock(call);
 	}
         
@@ -321,14 +322,14 @@ public abstract class EnsuresPO extends AbstractPO {
     @Override
     public void readProblem() throws ProofInputException {
         //prepare variables, program method, heapAtPre
-        ListOfProgramVariable paramVars = buildParamVars(programMethod);
+        ImmutableList<ProgramVariable> paramVars = buildParamVars(programMethod);
         ProgramVariable selfVar = null;
         if(!programMethod.isStatic()) {
             selfVar = buildSelfVarAsProgVar();
         }
         ProgramVariable resultVar = buildResultVar(programMethod);
         ProgramVariable exceptionVar = buildExcVar();
-        Function heapAtPreFunc = new Function(new Name("heapAtPre"), services.getTypeConverter().getHeapLDT().targetSort(), new ArrayOfSort());//XXX
+        Function heapAtPreFunc = new Function(new Name("heapAtPre"), services.getTypeConverter().getHeapLDT().targetSort(), new ImmutableArray<Sort>());//XXX
         Term heapAtPre = TB.func(heapAtPreFunc);
         assert false : "not implemented";
         //build general assumption
@@ -365,7 +366,7 @@ public abstract class EnsuresPO extends AbstractPO {
 //        
 //        //save in field
 //        poTerms = new Term[]{result};
-//        poTaclets = new SetOfTaclet[]{invTaclets};
+//        poTaclets = new ImmutableSet<Taclet>[]{invTaclets};
 //        
 //        //register everything in namespaces
 //        registerInNamespaces(selfVar);

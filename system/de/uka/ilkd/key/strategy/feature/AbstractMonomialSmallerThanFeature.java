@@ -11,13 +11,19 @@
 
 package de.uka.ilkd.key.strategy.feature;
 
+import java.util.Iterator;
+
+import de.uka.ilkd.key.collection.ImmutableMapEntry;
+import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.ldt.IntegerLDT;
-import de.uka.ilkd.key.logic.ListOfTerm;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.rule.*;
+import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.rule.RuleSet;
+import de.uka.ilkd.key.rule.TacletApp;
+import de.uka.ilkd.key.rule.inst.InstantiationEntry;
 import de.uka.ilkd.key.util.LRUCache;
 
 public abstract class AbstractMonomialSmallerThanFeature
@@ -47,7 +53,7 @@ public abstract class AbstractMonomialSmallerThanFeature
     }
 
     private int introductionTimeHelp(Operator op) {
-        ListOfRuleApp appliedRules = getCurrentGoal().appliedRuleApps ();
+        ImmutableList<RuleApp> appliedRules = getCurrentGoal().appliedRuleApps ();
         while ( !appliedRules.isEmpty () ) {
             final RuleApp app = appliedRules.head ();
             appliedRules = appliedRules.tail ();
@@ -65,11 +71,11 @@ public abstract class AbstractMonomialSmallerThanFeature
     }
 
     private boolean introducesSkolemSymbol(TacletApp tapp, Operator op) {
-        final IteratorOfEntryOfSchemaVariableAndInstantiationEntry it =
+        final Iterator<ImmutableMapEntry<SchemaVariable,InstantiationEntry>> it =
             tapp.instantiations().pairIterator();
         while ( it.hasNext () ) {
-            final EntryOfSchemaVariableAndInstantiationEntry entry = it.next ();
-            if ( !(entry.key() instanceof SkolemTermSV) ) continue;
+            final ImmutableMapEntry<SchemaVariable,InstantiationEntry> entry = it.next ();
+            if ( !(entry.key () instanceof SkolemTermSV) ) continue;
             if ( op == ( (Term)entry.value ().getInstantiation () ).op () )
                 return true;
         }
@@ -77,7 +83,7 @@ public abstract class AbstractMonomialSmallerThanFeature
     }
 
     private boolean inNewSmallSymRuleSet(TacletApp tapp) {
-        ListOfRuleSet ruleSets = tapp.taclet ().getRuleSets ();
+        ImmutableList<RuleSet> ruleSets = tapp.taclet ().getRuleSets ();
         while ( !ruleSets.isEmpty () ) {
             final RuleSet rs = ruleSets.head ();
             ruleSets = ruleSets.tail ();
@@ -86,7 +92,7 @@ public abstract class AbstractMonomialSmallerThanFeature
         return false;
     }
 
-    protected ListOfTerm collectAtoms(Term t) {
+    protected ImmutableList<Term> collectAtoms(Term t) {
         final AtomCollector m = new AtomCollector ();
         m.collect ( t );
         return m.getResult ();

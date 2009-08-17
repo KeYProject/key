@@ -14,13 +14,12 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.visitor.Visitor;
-import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.proof.AtPreFactory;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.OpReplacer;
 
 
@@ -31,7 +30,7 @@ public class LoopInvariantImpl implements LoopInvariant {
         
     private final LoopStatement loop;
     private final Term originalInvariant;
-    private final SetOfTerm originalPredicates;
+    private final LoopPredicateSet originalPredicates;
     private final Term originalModifies;
     private final Term originalVariant;
     private final Term originalSelfTerm;
@@ -57,7 +56,7 @@ public class LoopInvariantImpl implements LoopInvariant {
      */
     public LoopInvariantImpl(LoopStatement loop,
                              Term invariant,
-                             SetOfTerm predicates,
+                             LoopPredicateSet predicates,
                              Term modifies,  
                              Term variant, 
                              Term selfTerm,
@@ -86,8 +85,8 @@ public class LoopInvariantImpl implements LoopInvariant {
 	    		     Term heapAtPre) {
         this(loop, 
              null, 
-             SetAsListOfTerm.EMPTY_SET, 
-             null,
+             new LoopPredicateSet(DefaultImmutableSet.<Term>nil()), 
+             null, 
              null, 
              selfTerm,
              null,
@@ -162,14 +161,13 @@ public class LoopInvariantImpl implements LoopInvariant {
     }
     
     
-    @Override
-    public SetOfTerm getPredicates(Term selfTerm,
-            		           Term heapAtPre,
-            		           Services services) {
+    public LoopPredicateSet getPredicates(Term selfTerm,
+            Term heapAtPre,
+            Services services) {
         assert (selfTerm == null) == (originalSelfTerm == null);
         Map replaceMap = getReplaceMap(selfTerm, heapAtPre, services);
         OpReplacer or = new OpReplacer(replaceMap);
-        return or.replace(originalPredicates);
+        return new LoopPredicateSet(or.replace(originalPredicates.asSet()));
     }
 
     
@@ -248,18 +246,17 @@ public class LoopInvariantImpl implements LoopInvariant {
     }
     
 
-    @Override
-    public LoopInvariant setPredicates(SetOfTerm predicates, 
-            			       Term selfTerm,
-            			       Term heapAtPre,
-            			       Services services) {
+    public LoopInvariant setPredicates(ImmutableSet<Term> predicates, 
+            Term selfTerm,
+            Term heapAtPre,
+            Services services) {
         assert (selfTerm == null) == (originalSelfTerm == null);
         Map inverseReplaceMap 
             = getInverseReplaceMap(selfTerm, heapAtPre, services);
         OpReplacer or = new OpReplacer(inverseReplaceMap);
         return new LoopInvariantImpl(loop,
                                      originalInvariant,
-                                     or.replace(predicates),
+                                     new LoopPredicateSet(or.replace(predicates)),
                                      originalModifies,
                                      originalVariant,
                                      originalSelfTerm,

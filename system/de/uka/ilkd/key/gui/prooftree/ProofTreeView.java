@@ -10,9 +10,15 @@
 
 package de.uka.ilkd.key.gui.prooftree;
 
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Font;
 import java.awt.event.*;
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Vector;
 
 import javax.swing.*;
 import javax.swing.event.*;
@@ -22,9 +28,16 @@ import javax.swing.plaf.metal.MetalTreeUI;
 import javax.swing.text.Position;
 import javax.swing.tree.*;
 
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.gui.*;
-import de.uka.ilkd.key.gui.configuration.*;
-import de.uka.ilkd.key.proof.*;
+import de.uka.ilkd.key.gui.configuration.Config;
+import de.uka.ilkd.key.gui.configuration.ConfigChangeEvent;
+import de.uka.ilkd.key.gui.configuration.ConfigChangeListener;
+import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.ProofEvent;
 import de.uka.ilkd.key.util.Debug;
 
 public class ProofTreeView extends JPanel {
@@ -68,7 +81,7 @@ public class ProofTreeView extends JPanel {
      * Roots of subtrees containing all nodes to which rules have been
      * applied; this is used when auto mode is active
      */
-    private ListOfNode modifiedSubtrees      = null;
+    private ImmutableList<Node> modifiedSubtrees      = null;
     private HashSet<Node>    modifiedSubtreesCache = null;
     
     /** the search dialog */
@@ -479,7 +492,7 @@ public class ProofTreeView extends JPanel {
 	/** invoked if automatic application of rules has started
 	 */
 	public void autoModeStarted(ProofEvent e) {
-	    modifiedSubtrees      = SLListOfNode.EMPTY_LIST;
+	    modifiedSubtrees      = ImmutableSLList.<Node>nil();
 	    modifiedSubtreesCache = new HashSet<Node>();
 	    if (delegateModel == null) {
                 Debug.out("delegateModel is null");
@@ -832,7 +845,7 @@ public class ProofTreeView extends JPanel {
 					.pathByAddingChild(child));
 			}
 		}
-		IteratorOfGoal it = proof.openGoals ().iterator ();
+		Iterator<Goal> it = proof.openGoals ().iterator ();
 		Node n;
 		while ( it.hasNext () ) {
 		    n = it.next ().node ();
@@ -923,10 +936,10 @@ public class ProofTreeView extends JPanel {
 	    Goal invokedGoal = proof.getGoal(invokedNode);
 	    // is the node a goal?
             if(invokedGoal == null) {
-                ListOfGoal enabledGoals = proof.getSubtreeEnabledGoals(invokedNode);
+                ImmutableList<Goal> enabledGoals = proof.getSubtreeEnabledGoals(invokedNode);
                 mediator().startAutoMode(enabledGoals);
             } else {
-                mediator().startAutoMode(SLListOfGoal.EMPTY_LIST.prepend(invokedGoal));
+                mediator().startAutoMode(ImmutableSLList.<Goal>nil().prepend(invokedGoal));
             }
 	}
 	
@@ -956,7 +969,7 @@ public class ProofTreeView extends JPanel {
 	     */
             @Override
             public Iterable<Goal> getGoalList() {
-                ListOfGoal goals = proof.getSubtreeGoals(invokedNode);
+                ImmutableList<Goal> goals = proof.getSubtreeGoals(invokedNode);
                 return goals;
             }
 

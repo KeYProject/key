@@ -10,26 +10,26 @@
 
 package de.uka.ilkd.key.proof.init;
 
-import java.util.*;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.logic.IteratorOfNamed;
-import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.SetAsListOfChoice;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.TermFactory;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.proof.AtPreFactory;
-import de.uka.ilkd.key.proof.OpReplacer;
-import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.ProofAggregate;
+import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
-import de.uka.ilkd.key.rule.SetOfTaclet;
-import de.uka.ilkd.key.speclang.*;
+import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.speclang.ClassInvariant;
+import de.uka.ilkd.key.speclang.FormulaWithAxioms;
+import de.uka.ilkd.key.speclang.OperationContract;
 
 
 
@@ -57,7 +57,7 @@ public abstract class AbstractPO implements ProofOblInput {
     
     protected Term[] poTerms;
     protected String[] poNames;
-    protected SetOfTaclet[] poTaclets;
+    protected ImmutableSet<Taclet>[] poTaclets;
 
 
     //-------------------------------------------------------------------------
@@ -85,9 +85,9 @@ public abstract class AbstractPO implements ProofOblInput {
         return new LogicVariable(new ProgramElementName("self"), selfKJT.getSort());
     }
 
-    protected ListOfProgramVariable buildParamVars(ProgramMethod programMethod) {
+    protected ImmutableList<ProgramVariable> buildParamVars(ProgramMethod programMethod) {
         int numPars = programMethod.getParameterDeclarationCount();
-        ListOfProgramVariable result = SLListOfProgramVariable.EMPTY_LIST;
+        ImmutableList<ProgramVariable> result = ImmutableSLList.<ProgramVariable>nil();
 
         for(int i = 0; i < numPars; i++) {
             KeYJavaType parType = programMethod.getParameterType(i);
@@ -125,7 +125,7 @@ public abstract class AbstractPO implements ProofOblInput {
      */
     protected Term translatePre(OperationContract contract,
                                 ProgramVariable selfVar,
-                                ListOfProgramVariable paramVars) 
+                                ImmutableList<ProgramVariable> paramVars) 
     		throws ProofInputException {
         FormulaWithAxioms fwa = contract.getPre(selfVar, paramVars, services);
         axioms.putAll(fwa.getAxioms());
@@ -138,7 +138,7 @@ public abstract class AbstractPO implements ProofOblInput {
      */
     protected Term translatePost(OperationContract contract,
                                  ProgramVariable selfVar,
-                                 ListOfProgramVariable paramVars,
+                                 ImmutableList<ProgramVariable> paramVars,
                                  ProgramVariable resultVar,
                                  ProgramVariable excVar,
                                  Term heapAtPre) 
@@ -160,11 +160,11 @@ public abstract class AbstractPO implements ProofOblInput {
     protected Term translateModifies(OperationContract contract,
                                      Term targetTerm,
                                      ProgramVariable selfVar,
-                                     ListOfProgramVariable paramVars) 
+                                     ImmutableList<ProgramVariable> paramVars) 
     		throws ProofInputException {
 	assert false : "not implemented";
     	return null;
-//        SetOfLocationDescriptor locations = contract.getModifies(selfVar,
+//        ImmutableSet<LocationDescriptor> locations = contract.getModifies(selfVar,
 //                                                                 paramVars,
 //                                                                 services);
 //
@@ -190,7 +190,7 @@ public abstract class AbstractPO implements ProofOblInput {
     /**
      * Translates a list of class invariants. 
      */
-    protected Term translateInvs(SetOfClassInvariant invs) 
+    protected Term translateInvs(ImmutableSet<ClassInvariant> invs) 
     		throws ProofInputException {
 	Term result = TB.tt();
 	for (final ClassInvariant inv : invs) {
@@ -212,7 +212,7 @@ public abstract class AbstractPO implements ProofOblInput {
     }
     
     
-    protected Term translateInvsOpen(SetOfClassInvariant invs, 
+    protected Term translateInvsOpen(ImmutableSet<ClassInvariant> invs, 
 	    			     ProgramVariable selfVar) 
     		throws ProofInputException {
 	Term result = TB.tt();
@@ -245,8 +245,8 @@ public abstract class AbstractPO implements ProofOblInput {
     }
 
 
-    protected void registerInNamespaces(ListOfProgramVariable pvs) {
-        final IteratorOfProgramVariable it = pvs.iterator();
+    protected void registerInNamespaces(ImmutableList<ProgramVariable> pvs) {
+        final Iterator<ProgramVariable> it = pvs.iterator();
         while(it.hasNext()) {
             initConfig.progVarNS().add(it.next());
         }
@@ -265,7 +265,7 @@ public abstract class AbstractPO implements ProofOblInput {
         
     @Override
     public final void readActivatedChoices() throws ProofInputException {
-	initConfig.setActivatedChoices(SetAsListOfChoice.EMPTY_SET);
+	initConfig.setActivatedChoices(DefaultImmutableSet.<Choice>nil());
     }
 
     
@@ -284,7 +284,7 @@ public abstract class AbstractPO implements ProofOblInput {
             header = "\\include \"./" + initConfig.getOriginalKeYFileName() + "\";";
         }
 
-        IteratorOfNamed it;
+        Iterator<Named> it;
 
         /* program sorts need not be declared and
          * there are no user-defined sorts with this kind of PO (yes?)
@@ -364,7 +364,7 @@ public abstract class AbstractPO implements ProofOblInput {
             
             if(poTaclets != null) {
                 proofs[i].getGoal(proofs[i].root()).indexOfTaclets()
-                                                   .addTaclets(poTaclets[i]);
+                                                   .addTaclets(TacletIndex.toNoPosTacletApp(poTaclets[i]));
             }
         }
         

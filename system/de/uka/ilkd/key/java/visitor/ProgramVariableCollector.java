@@ -11,10 +11,10 @@ package de.uka.ilkd.key.java.visitor;
 
 import java.util.HashSet;
 
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.logic.SetOfTerm;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.TermProgramVariableCollector;
@@ -82,7 +82,7 @@ public final class ProgramVariableCollector extends JavaASTVisitor {
         }
         
         //predicates
-        SetOfTerm preds = x.getPredicates(selfTerm, heapAtPre, services);
+        ImmutableSet<Term> preds = x.getPredicates(selfTerm, heapAtPre, services).asSet();
         for(Term pred : preds) {
             pred.execPostOrder(tpvc);
         }

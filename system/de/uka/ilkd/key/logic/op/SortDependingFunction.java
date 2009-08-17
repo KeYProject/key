@@ -11,9 +11,12 @@
 
 package de.uka.ilkd.key.logic.op;
 
+import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.sort.*;
+import de.uka.ilkd.key.logic.sort.GenericSort;
+import de.uka.ilkd.key.logic.sort.ProgramSVSort;
+import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.inst.GenericSortCondition;
 import de.uka.ilkd.key.rule.inst.SortException;
@@ -67,17 +70,17 @@ public final class SortDependingFunction extends Function {
     }
     
     
-    private static ArrayOfSort instantiateArgSorts(
+    private static ImmutableArray<Sort> instantiateArgSorts(
 	    			SortDependingFunctionTemplate template,
 	    			Sort sortDependingOn) {
 	Sort[] result = new Sort[template.argSorts.size()];
 	for(int i = 0; i < result.length; i++) {
 	    result[i] 
-	           = (template.argSorts.getSort(i) == template.sortDependingOn
+	           = (template.argSorts.get(i) == template.sortDependingOn
 		      ? sortDependingOn
-		      : template.argSorts.getSort(i));
+		      : template.argSorts.get(i));
 	}
-	return new ArrayOfSort(result);
+	return new ImmutableArray<Sort>(result);
     }
     
     
@@ -140,7 +143,7 @@ public final class SortDependingFunction extends Function {
 		= new SortDependingFunctionTemplate(sortDependingOn, 
 						    kind, 
 						    sort, 
-						    new ArrayOfSort(argSorts),
+						    new ImmutableArray<Sort>(argSorts),
 						    unique);
 	return new SortDependingFunction(template, Sort.ANY);
     }
@@ -260,13 +263,13 @@ public final class SortDependingFunction extends Function {
 	public final GenericSort sortDependingOn;
 	public final Name kind;	
 	public final Sort sort;
-	public final ArrayOfSort argSorts;
+	public final ImmutableArray<Sort> argSorts;
 	public final boolean unique;
 	
 	public SortDependingFunctionTemplate(GenericSort sortDependingOn,
 		                             Name kind,
 		                             Sort sort,
-		                             ArrayOfSort argSorts,
+		                             ImmutableArray<Sort> argSorts,
 		                             boolean unique) {
 	    this.sortDependingOn = sortDependingOn;
 	    this.kind = kind;

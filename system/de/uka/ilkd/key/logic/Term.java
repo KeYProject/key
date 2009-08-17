@@ -10,7 +10,13 @@
 
 package de.uka.ilkd.key.logic;
 
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.collection.ImmutableArray;
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.logic.op.Metavariable;
+import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.logic.sort.Sort;
 
 /** 
@@ -54,7 +60,7 @@ public interface Term extends SVSubstitute {
     /**
      * The subterms.
      */
-    public ArrayOfTerm subs();
+    public ImmutableArray<Term> subs();
         
     /** 
      * The <code>n</code>-th direct subterm.
@@ -69,13 +75,13 @@ public interface Term extends SVSubstitute {
      /**
      * The logical variables bound by the top level operator.
      */
-    public ArrayOfQuantifiableVariable boundVars();
+    public ImmutableArray<QuantifiableVariable> boundVars();
 
     /**
      * The logical variables bound by the top level operator for the nth 
      * subterm.
      */
-    public ArrayOfQuantifiableVariable varsBoundHere(int n);
+    public ImmutableArray<QuantifiableVariable> varsBoundHere(int n);
     
     /**
      * The Java block at top level.
@@ -113,7 +119,7 @@ public interface Term extends SVSubstitute {
     /** 
      * The set of free quantifiable variables occurring in this term.
      */
-    public SetOfQuantifiableVariable freeVars();
+    public ImmutableSet<QuantifiableVariable> freeVars();
     
     /** 
      * returns the set of metavariables that are part of this term 
@@ -121,7 +127,7 @@ public interface Term extends SVSubstitute {
      * the variables in <code>freeVars</code> are bound by some quantifier above)
      * @return the set of metavariables
      */
-    public SetOfMetavariable metaVars();       
+    public ImmutableSet<Metavariable> metaVars();       
     
     /** 
      * The visitor is handed through till the bottom of the tree and

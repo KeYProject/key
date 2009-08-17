@@ -11,6 +11,8 @@
 package de.uka.ilkd.key.logic;
 
 import junit.framework.TestCase;
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -201,7 +203,7 @@ public class TestSemisequent extends TestCase {
 
 	Semisequent expected = extract(extract(extract(origin.insertLast(con[4])).insertLast(con[5])).
 				       insertLast(con[6]));
-	ListOfConstrainedFormula insertionList = SLListOfConstrainedFormula.EMPTY_LIST.
+	ImmutableList<ConstrainedFormula> insertionList = ImmutableSLList.<ConstrainedFormula>nil().
 		    prepend(con[0]).prepend(con[1]).prepend(con[6]).prepend(con[5]).prepend(con[4]);
 	Semisequent result = extract(origin.insert(origin.size(), insertionList));
 	assertEquals("Both semisequents should be equal.", expected, result);
@@ -212,8 +214,8 @@ public class TestSemisequent extends TestCase {
 	Semisequent origin = extract(extract(extract(Semisequent.EMPTY_SEMISEQUENT.insertLast(con[0])).
 				     insertLast(con[1])).insertLast(con[2]));
  	Semisequent expected = extract(extract(extract(origin.insert(2, con[4])).insert(3, con[5])).insert(4, con[6]));
-	ListOfConstrainedFormula insertionList = 
-	    SLListOfConstrainedFormula.EMPTY_LIST.prepend(con[0]).prepend(con[1]).prepend(con[6]).prepend(con[5]).prepend(con[4]);
+	ImmutableList<ConstrainedFormula> insertionList = 
+	    ImmutableSLList.<ConstrainedFormula>nil().prepend(con[0]).prepend(con[1]).prepend(con[6]).prepend(con[5]).prepend(con[4]);
 	Semisequent result = extract(origin.insert(origin.size()-1, insertionList));
 	assertEquals("Both semisequents should be equal.", expected, result);
 	
@@ -228,16 +230,16 @@ public class TestSemisequent extends TestCase {
 	  extract(extract(extract(extract(origin.remove(2)).insertLast(con[4])).
 			  insertLast(con[5])).insertLast(con[6]));
 	// insert: [a,b,c,q,p]
-	ListOfConstrainedFormula insertionList = SLListOfConstrainedFormula.EMPTY_LIST.
+	ImmutableList<ConstrainedFormula> insertionList = ImmutableSLList.<ConstrainedFormula>nil().
 	  prepend(con[0]).prepend(con[1]).prepend(con[6]).prepend(con[5]).prepend(con[4]);
 
 	SemisequentChangeInfo result = origin.replace(origin.size()-1, insertionList);
 
 	assertEquals("SemisequentChangeInfo is corrupt due to wrong added formula list:",
-		     SLListOfConstrainedFormula.EMPTY_LIST.prepend(con[4]).
+		     ImmutableSLList.<ConstrainedFormula>nil().prepend(con[4]).
 		     prepend(con[5]).prepend(con[6]), result.addedFormulas());
 	assertEquals("SemisequentChangeInfo is corrupt due to wrong removed formula list:",
-		     SLListOfConstrainedFormula.EMPTY_LIST.prepend(con[2]),
+		     ImmutableSLList.<ConstrainedFormula>nil().prepend(con[2]),
 		     result.removedFormulas());
 	assertEquals("Both semisequents should be equal.", expected, extract(result));
 	
@@ -252,15 +254,15 @@ public class TestSemisequent extends TestCase {
 				       (extract(extract(origin.insertLast(con[4])).
 						insertLast(con[5])).insertLast(con[6])).insertLast(con[2]));
 	// insert:[a,b,c,r,r,q,p]
- 	ListOfConstrainedFormula insertionList = SLListOfConstrainedFormula.EMPTY_LIST.
+ 	ImmutableList<ConstrainedFormula> insertionList = ImmutableSLList.<ConstrainedFormula>nil().
  	    prepend(con[0]).prepend(con[1]).prepend(con[2]).prepend(con[3]).prepend(con[6]).prepend(con[5]).prepend(con[4]);
 	
 	SemisequentChangeInfo sci = origin.replace(origin.size(), insertionList);
 	assertEquals("SemisequentChangeInfo is corrupt due to wrong added formula list:",
-		     SLListOfConstrainedFormula.EMPTY_LIST.prepend(con[4]).prepend(con[5]).
+		     ImmutableSLList.<ConstrainedFormula>nil().prepend(con[4]).prepend(con[5]).
 		     prepend(con[6]).prepend(con[3]), sci.addedFormulas());
 	assertEquals("SemisequentChangeInfo is corrupt due to wrong removed formula list:",
-		     SLListOfConstrainedFormula.EMPTY_LIST, sci.removedFormulas());
+		     ImmutableSLList.<ConstrainedFormula>nil(), sci.removedFormulas());
  	assertEquals("Both semisequents should be equal.", expected, extract(sci));	
     }
 

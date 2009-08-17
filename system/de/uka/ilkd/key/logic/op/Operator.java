@@ -10,8 +10,8 @@
 
 package de.uka.ilkd.key.logic.op;
 
+import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.ArrayOfTerm;
 import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -39,7 +39,7 @@ public interface Operator extends Named, SVSubstitute {
      * @return sort of the term with this operator as top level operator of the
      * given substerms
      */
-    Sort sort(ArrayOfTerm terms);
+    Sort sort(ImmutableArray<Term> terms);
     
     /**
      * Tells whether the operator binds variables at the n-th subterm

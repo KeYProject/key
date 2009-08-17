@@ -14,11 +14,10 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import de.uka.ilkd.key.logic.SetAsListOfTerm;
-import de.uka.ilkd.key.logic.SetOfTerm;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermFactory;
-import de.uka.ilkd.key.logic.op.ArrayOfQuantifiableVariable;
+import de.uka.ilkd.key.collection.ImmutableArray;
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.speclang.FormulaWithAxioms;
@@ -85,7 +84,7 @@ public class OpReplacer {
             }
         }
         
-        final ArrayOfQuantifiableVariable newBoundVars 
+        final ImmutableArray<QuantifiableVariable> newBoundVars 
         	= replace(term.boundVars());
     
         final Term result;
@@ -107,8 +106,8 @@ public class OpReplacer {
     /**
      * Replaces in a set of terms.
      */
-    public SetOfTerm replace(SetOfTerm terms) {
-        SetOfTerm result = SetAsListOfTerm.EMPTY_SET;
+    public ImmutableSet<Term> replace(ImmutableSet<Term> terms) {
+        ImmutableSet<Term> result = DefaultImmutableSet.<Term>nil();
         for (final Term term : terms) {
             result = result.add(replace(term));
         }
@@ -142,20 +141,20 @@ public class OpReplacer {
     
     
     /**
-     * Replaces in an ArrayOfQuantifiableVariable.
+     * Replaces in an ImmutableArray<QuantifiableVariable>.
      */
-    public ArrayOfQuantifiableVariable replace(
-	    			ArrayOfQuantifiableVariable vars) {
+    public ImmutableArray<QuantifiableVariable> replace(
+	    			ImmutableArray<QuantifiableVariable> vars) {
 	QuantifiableVariable[] result = new QuantifiableVariable[vars.size()];
 	boolean changed = false;
 	for(int i = 0, n = vars.size(); i < n; i++) {
-	    QuantifiableVariable qv = vars.getQuantifiableVariable(i);
+	    QuantifiableVariable qv = vars.get(i);
 	    QuantifiableVariable newQv = (QuantifiableVariable)replace(qv);
 	    result[i++] = newQv;
 	    if(newQv != qv) {
 		changed = true;
 	    }
 	}
-	return changed ? new ArrayOfQuantifiableVariable(result) : vars;
+	return changed ? new ImmutableArray<QuantifiableVariable>(result) : vars;
     }
 }

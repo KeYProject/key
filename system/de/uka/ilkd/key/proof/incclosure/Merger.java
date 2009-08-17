@@ -10,6 +10,8 @@
 
 package de.uka.ilkd.key.proof.incclosure;
 
+import java.util.Iterator;
+
 
 public interface Merger {
 
@@ -22,7 +24,7 @@ public interface Merger {
     /**
      * Inputs offered by this merger
      */
-    IteratorOfSink getSinks      ();
+    Iterator<Sink> getSinks      ();
 
     /**
      * @return true iff the whole subtree of sinks below this merger

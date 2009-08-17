@@ -13,6 +13,7 @@ package de.uka.ilkd.key.logic.op;
 
 import java.io.IOException;
 
+import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.Constructor;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -249,7 +250,7 @@ public final class ProgramMethod extends AbstractSortedOperator
     }
     
     @Override
-    public ArrayOfModifier getModifiers(){
+    public ImmutableArray<Modifier> getModifiers(){
 	return method.getModifiers();
     }
 
@@ -352,8 +353,7 @@ public final class ProgramMethod extends AbstractSortedOperator
     	return getMethodDeclaration().getParameterDeclarationCount();
     }
     
-
-    public ArrayOfParameterDeclaration getParameters() {
+    public ImmutableArray<ParameterDeclaration> getParameters() {
     	return getMethodDeclaration().getParameters();
     }
 

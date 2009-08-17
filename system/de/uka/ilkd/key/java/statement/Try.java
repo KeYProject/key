@@ -11,9 +11,9 @@
 
 package de.uka.ilkd.key.java.statement;
 
+import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.visitor.Visitor;
-import de.uka.ilkd.key.logic.ArrayOfProgramPrefix;
 import de.uka.ilkd.key.logic.PosInProgram;
 import de.uka.ilkd.key.logic.ProgramPrefix;
 import de.uka.ilkd.key.util.ExtList;
@@ -35,9 +35,9 @@ public class Try extends BranchStatement
  *      Branches.
      */
 
-    private final ArrayOfBranch branches;
+    private final ImmutableArray<Branch> branches;
 
-    private final ArrayOfProgramPrefix prefixElementArray;
+    private final ImmutableArray<ProgramPrefix> prefixElementArray;
 
     private PosInProgram firstActiveChildPos = null;
     
@@ -60,7 +60,7 @@ public class Try extends BranchStatement
 
     public Try(StatementBlock body, Branch[] branches) {
         this.body=body;
-	this.branches=new ArrayOfBranch(branches);
+	this.branches=new ImmutableArray<Branch>(branches);
         prefixElementArray = computePrefix(body);
     }
 
@@ -70,7 +70,7 @@ public class Try extends BranchStatement
  *      @param branches a branch array.
      */
 
-    public Try(StatementBlock body, ArrayOfBranch branches) {
+    public Try(StatementBlock body, ImmutableArray<Branch> branches) {
         this.body=body;
 	this.branches = branches;
         prefixElementArray = computePrefix(body);
@@ -85,12 +85,12 @@ public class Try extends BranchStatement
         super(children);
 	this.body = (StatementBlock)children.get(StatementBlock.class);
 	this.branches=new
-	    ArrayOfBranch((Branch[])children.collect(Branch.class));
+	    ImmutableArray<Branch>((Branch[])children.collect(Branch.class));
         prefixElementArray = computePrefix(body);
     }
 
 
-    private ArrayOfProgramPrefix computePrefix(StatementBlock b) {
+    private ImmutableArray<ProgramPrefix> computePrefix(StatementBlock b) {
         return StatementBlock.
         computePrefixElements(b.getBody(), 0, this);                
     }
@@ -100,10 +100,10 @@ public class Try extends BranchStatement
     }
 
     public ProgramPrefix getPrefixElementAt(int i) {       
-        return prefixElementArray.getProgramPrefix(i);
+        return prefixElementArray.get(i);
     }
 
-    public ArrayOfProgramPrefix getPrefixElements() {
+    public ImmutableArray<ProgramPrefix> getPrefixElements() {
         return prefixElementArray;
     }
     
@@ -143,7 +143,7 @@ public class Try extends BranchStatement
             index--;
         }
         if (branches != null) {
-            return branches.getBranch(index);
+            return branches.get(index);
         }
         throw new ArrayIndexOutOfBoundsException();
     }
@@ -202,7 +202,7 @@ public class Try extends BranchStatement
 
     public Branch getBranchAt(int index) {
         if (branches != null) {
-            return branches.getBranch(index);
+            return branches.get(index);
         }
         throw new ArrayIndexOutOfBoundsException();
     }
@@ -210,7 +210,7 @@ public class Try extends BranchStatement
     /** Return the branch array wrapper
      * @return the array wrapper of the branches
      */
-    public ArrayOfBranch getBranchList() {
+    public ImmutableArray<Branch> getBranchList() {
 	return branches;
     }
 

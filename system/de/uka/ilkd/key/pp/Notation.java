@@ -11,18 +11,17 @@
 package de.uka.ilkd.key.pp;
 
 import java.io.IOException;
+import java.util.Iterator;
 
 import org.apache.log4j.Logger;
 
+import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.rule.IteratorOfObject;
-import de.uka.ilkd.key.rule.ListOfObject;
 import de.uka.ilkd.key.util.Debug;
 
 /**
@@ -331,8 +330,7 @@ public abstract class Notation {
 	}
 	
 	private QuantifiableVariable instQV(Term t, LogicPrinter sp, int subTerm) {
-	    QuantifiableVariable v = t.varsBoundHere(subTerm)
-	    .getQuantifiableVariable(0);
+	    QuantifiableVariable v = t.varsBoundHere(subTerm).get(0);
 
 	    if (v instanceof SchemaVariable) {
 		Object object = (sp.getInstantiations()
@@ -532,8 +530,8 @@ public abstract class Notation {
 		} else {
 		    // logger.debug("Instantiation of " + t+ " [" + t.op() +
                         // "]" + " known.");
-		    if (o instanceof ListOfObject) {
-			final IteratorOfObject it = ((ListOfObject) o)
+		    if (o instanceof ImmutableList) {
+			final Iterator<Object> it = ((ImmutableList<Object>) o)
 				.iterator();
 			sp.getLayouter().print("{");
 			while (it.hasNext()) {

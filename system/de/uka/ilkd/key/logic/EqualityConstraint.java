@@ -12,11 +12,13 @@ package de.uka.ilkd.key.logic;
 
 import java.util.*;
 
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.NameAbstractionTable;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.sort.SetAsListOfSort;
-import de.uka.ilkd.key.logic.sort.SetOfSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.SyntacticalReplaceVisitor;
 
@@ -203,8 +205,8 @@ public class EqualityConstraint implements Constraint {
     private static boolean compareBoundVariables
 	(QuantifiableVariable ownVar,
 	 QuantifiableVariable cmpVar,
-	 ListOfQuantifiableVariable ownBoundVars, 
-	 ListOfQuantifiableVariable cmpBoundVars) {	
+	 ImmutableList<QuantifiableVariable> ownBoundVars, 
+	 ImmutableList<QuantifiableVariable> cmpBoundVars) {	
 	
         final int ownNum = indexOf ( ownVar, ownBoundVars );
         final int cmpNum = indexOf ( cmpVar, cmpBoundVars );
@@ -226,7 +228,7 @@ public class EqualityConstraint implements Constraint {
      *         an element of the list
      */
     private static int indexOf (QuantifiableVariable var,
-                                ListOfQuantifiableVariable list) {
+                                ImmutableList<QuantifiableVariable> list) {
         int res = 0;
         while ( !list.isEmpty () ) {
             if ( list.head () == var ) return res;
@@ -266,8 +268,8 @@ public class EqualityConstraint implements Constraint {
      */
     private Constraint unifyHelp ( Term                       t0,
                                    Term                       t1,
-                                   ListOfQuantifiableVariable ownBoundVars, 
-                                   ListOfQuantifiableVariable cmpBoundVars,
+                                   ImmutableList<QuantifiableVariable> ownBoundVars, 
+                                   ImmutableList<QuantifiableVariable> cmpBoundVars,
                                    NameAbstractionTable       nat,
                                    boolean                    modifyThis, 
                                    Services services ) {
@@ -344,8 +346,8 @@ public class EqualityConstraint implements Constraint {
                                        Services services) {
         if (services == null) return Constraint.TOP;
         
-        final SetOfSort set = 
-            SetAsListOfSort.EMPTY_SET.add(t0.sort()).add(t1.sort());
+        final ImmutableSet<Sort> set = 
+            DefaultImmutableSet.<Sort>nil().add(t0.sort()).add(t1.sort());
         assert false : "metavariables disabled";
         return null;
 //        final Sort intersectionSort = 
@@ -411,24 +413,24 @@ public class EqualityConstraint implements Constraint {
     private Constraint descendRecursively 
                       (Term t0,
                        Term t1,
-                       ListOfQuantifiableVariable ownBoundVars,
-                       ListOfQuantifiableVariable cmpBoundVars,
+                       ImmutableList<QuantifiableVariable> ownBoundVars,
+                       ImmutableList<QuantifiableVariable> cmpBoundVars,
                        NameAbstractionTable nat,
                        boolean modifyThis,
                        Services services) {
         Constraint newConstraint = this;
 
         for ( int i = 0; i < t0.arity (); i++ ) {
-            ListOfQuantifiableVariable subOwnBoundVars = ownBoundVars;
-            ListOfQuantifiableVariable subCmpBoundVars = cmpBoundVars;            
+            ImmutableList<QuantifiableVariable> subOwnBoundVars = ownBoundVars;
+            ImmutableList<QuantifiableVariable> subCmpBoundVars = cmpBoundVars;            
             
             if ( t0.varsBoundHere ( i ).size () != t1.varsBoundHere ( i ).size () )
                 return Constraint.TOP;
             for ( int j = 0; j < t0.varsBoundHere ( i ).size (); j++ ) {
                 final QuantifiableVariable ownVar =
-                    t0.varsBoundHere ( i ).getQuantifiableVariable ( j );
+                    t0.varsBoundHere ( i ).get ( j );
                 final QuantifiableVariable cmpVar =
-                    t1.varsBoundHere ( i ).getQuantifiableVariable ( j );
+                    t1.varsBoundHere ( i ).get ( j );
                 if ( ownVar.sort () != cmpVar.sort () ) return Constraint.TOP;
 
                 subOwnBoundVars = subOwnBoundVars.prepend ( ownVar );
@@ -480,8 +482,8 @@ public class EqualityConstraint implements Constraint {
     private Constraint handleQuantifiableVariable 
                           (Term t0,
                            Term t1,
-                           ListOfQuantifiableVariable ownBoundVars,
-                           ListOfQuantifiableVariable cmpBoundVars) {
+                           ImmutableList<QuantifiableVariable> ownBoundVars,
+                           ImmutableList<QuantifiableVariable> cmpBoundVars) {
         if ( ! ( ( t1.op () instanceof QuantifiableVariable ) && 
                  compareBoundVariables ( (QuantifiableVariable)t0.op (),
                                          (QuantifiableVariable)t1.op (),
@@ -509,8 +511,8 @@ public class EqualityConstraint implements Constraint {
      */
     private Constraint unifyHelp (Term t1, Term t2, boolean modifyThis, Services services) {
 	return unifyHelp ( t1, t2,
-			   SLListOfQuantifiableVariable.EMPTY_LIST, 
-			   SLListOfQuantifiableVariable.EMPTY_LIST,
+			   ImmutableSLList.<QuantifiableVariable>nil(), 
+			   ImmutableSLList.<QuantifiableVariable>nil(),
 			   null,
 			   modifyThis, services);
     }
@@ -706,7 +708,7 @@ public class EqualityConstraint implements Constraint {
      * value according to the new constraint (the possible values of
      * other variables are not modified)
      */
-    public Constraint removeVariables ( SetOfMetavariable mvs ) {
+    public Constraint removeVariables ( ImmutableSet<Metavariable> mvs ) {
 	if ( !mvs.isEmpty() && !isBottom () ) {
 	    EqualityConstraint removeConstraint = new EqualityConstraint ();
 	    EqualityConstraint newConstraint    = new EqualityConstraint ();
@@ -779,12 +781,12 @@ public class EqualityConstraint implements Constraint {
      * would cause a cycle 
      */
     private boolean hasCycle ( Metavariable mv, Term term ) {
-        ListOfMetavariable body          = SLListOfMetavariable.EMPTY_LIST;
-        ListOfTerm         fringe        = SLListOfTerm.EMPTY_LIST;
+        ImmutableList<Metavariable> body          = ImmutableSLList.<Metavariable>nil();
+        ImmutableList<Term>         fringe        = ImmutableSLList.<Term>nil();
         Term               checkForCycle = term;
         
         while ( true ) {
-            final IteratorOfMetavariable it =
+            final Iterator<Metavariable> it =
                                 checkForCycle.metaVars ().iterator ();
             while ( it.hasNext () ) {
                 final Metavariable termMV = it.next ();
@@ -812,7 +814,7 @@ public class EqualityConstraint implements Constraint {
     }
 
     private boolean hasCycleByInst (Metavariable mv, Term term) {
-        final IteratorOfMetavariable it = term.metaVars ().iterator ();
+        final Iterator<Metavariable> it = term.metaVars ().iterator ();
         
         while ( it.hasNext () ) {
             final Metavariable termMV = it.next ();

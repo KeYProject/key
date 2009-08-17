@@ -10,17 +10,19 @@
 
 package de.uka.ilkd.key.strategy.feature;
 
+import java.util.Iterator;
+
+import de.uka.ilkd.key.collection.ImmutableMap;
+import de.uka.ilkd.key.collection.ImmutableMapEntry;
 import de.uka.ilkd.key.logic.ConstrainedFormula;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.op.EntryOfSchemaVariableAndInstantiationEntry;
-import de.uka.ilkd.key.logic.op.IteratorOfEntryOfSchemaVariableAndInstantiationEntry;
-import de.uka.ilkd.key.logic.op.MapFromSchemaVariableToInstantiationEntry;
+import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.SkolemTermSV;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.rule.IteratorOfIfFormulaInstantiation;
+import de.uka.ilkd.key.rule.IfFormulaInstantiation;
 import de.uka.ilkd.key.rule.PosTacletApp;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.TacletApp;
@@ -86,9 +88,9 @@ public abstract class AbstractNonDuplicateAppFeature extends BinaryTacletAppFeat
                 return false;
             } 
         } else { 
-            final IteratorOfIfFormulaInstantiation it0 =
+            final Iterator<IfFormulaInstantiation> it0 =
                 newApp.ifFormulaInstantiations ().iterator ();
-            final IteratorOfIfFormulaInstantiation it1 =
+            final Iterator<IfFormulaInstantiation> it1 =
                 cmp.ifFormulaInstantiations ().iterator ();
 
             while ( it0.hasNext () ) {
@@ -107,21 +109,21 @@ public abstract class AbstractNonDuplicateAppFeature extends BinaryTacletAppFeat
         if ( !inst0.getUpdateContext ().equals ( inst1.getUpdateContext () ) )
             return false;
         
-        final MapFromSchemaVariableToInstantiationEntry interesting0 =
+        final ImmutableMap<SchemaVariable,InstantiationEntry> interesting0 =
             inst0.interesting ();
-        final MapFromSchemaVariableToInstantiationEntry interesting1 =
+        final ImmutableMap<SchemaVariable,InstantiationEntry> interesting1 =
             inst1.interesting ();
         return subset ( interesting0, interesting1 )
                && subset ( interesting1, interesting0 );
     }
     
-    private boolean subset(MapFromSchemaVariableToInstantiationEntry insts0,
-                           MapFromSchemaVariableToInstantiationEntry insts1) {
-        final IteratorOfEntryOfSchemaVariableAndInstantiationEntry it =
+    private boolean subset(ImmutableMap<SchemaVariable,InstantiationEntry> insts0,
+                           ImmutableMap<SchemaVariable,InstantiationEntry> insts1) {
+        final Iterator<ImmutableMapEntry<SchemaVariable,InstantiationEntry>> it =
             insts0.entryIterator ();
 
         while ( it.hasNext () ) {
-            final EntryOfSchemaVariableAndInstantiationEntry entry0 = it.next ();
+            final ImmutableMapEntry<SchemaVariable,InstantiationEntry> entry0 = it.next ();
 
             if ( entry0.key () instanceof SkolemTermSV )
                 continue;

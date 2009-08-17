@@ -12,8 +12,15 @@ package de.uka.ilkd.key.proof;
 
 import java.util.*;
 
-import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.logic.Constraint;
+import de.uka.ilkd.key.logic.RenamingTable;
+import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.logic.op.Metavariable;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.incclosure.*;
 import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.util.Debug;
@@ -32,7 +39,7 @@ public class Node {
 
     private NameRecorder         nameRecorder;
 
-    private SetOfProgramVariable globalProgVars      = SetAsListOfProgramVariable.EMPTY_SET;
+    private ImmutableSet<ProgramVariable> globalProgVars      = DefaultImmutableSet.<ProgramVariable>nil();
 
     private boolean              closed              = false;
 
@@ -54,14 +61,14 @@ public class Node {
 
     private int                  siblingNr = -1;
 
-    private ListOfRenamingTable  renamings;
+    private ImmutableList<RenamingTable>  renamings;
     
     /**
      * If the rule base has been extended e.g. by loading a new taclet as
      * lemma or by applying a taclet with an addrule section on this node,
      * then these taclets are stored in this set
      */
-    private SetOfNoPosTacletApp  localIntroducedRules = SetAsListOfNoPosTacletApp.EMPTY_SET;
+    private ImmutableSet<NoPosTacletApp>  localIntroducedRules = DefaultImmutableSet.<NoPosTacletApp>nil();
     
     /** creates an empty node that is root and leaf.
      */
@@ -138,11 +145,11 @@ public class Node {
         nameRecorder = rec;
     }
 
-    public void setRenamings(ListOfRenamingTable list){
+    public void setRenamings(ImmutableList<RenamingTable> list){
         renamings = list;
     }
 
-    public ListOfRenamingTable getRenamingTable(){
+    public ImmutableList<RenamingTable> getRenamingTable(){
 	return renamings;
     }
 
@@ -151,15 +158,15 @@ public class Node {
     }
     
     /** Returns the set of NoPosTacletApps at this node */
-    public SetOfNoPosTacletApp getNoPosTacletApps() {
+    public ImmutableSet<NoPosTacletApp> getNoPosTacletApps() {
 	return localIntroducedRules;
     }
 
-    public SetOfProgramVariable getGlobalProgVars() {
+    public ImmutableSet<ProgramVariable> getGlobalProgVars() {
 	return globalProgVars;
     }
 
-    public void setGlobalProgVars(SetOfProgramVariable progVars) {
+    public void setGlobalProgVars(ImmutableSet<ProgramVariable> progVars) {
 	globalProgVars=progVars;
     }
 
@@ -244,9 +251,9 @@ public class Node {
      * ultimately more than one sink is needed, the first call to this
      * method MUST have p_count>1.
      */
-    public IteratorOfSink reserveSinks ( int p_count ) {
+    public Iterator<Sink> reserveSinks ( int p_count ) {
 	if ( p_count == 1 && forkMerger == null )
-	    return SLListOfSink.EMPTY_LIST.prepend ( branchSink ).iterator ();
+	    return ImmutableSLList.<Sink>nil().prepend ( branchSink ).iterator ();
 	else {
 	    int i = 0;
 
@@ -258,7 +265,7 @@ public class Node {
 		forkMerger.expand ( i + p_count );
 	    }
 
-	    IteratorOfSink it = forkMerger.getSinks ();
+	    Iterator<Sink> it = forkMerger.getSinks ();
 	    while ( i-- != 0 )
 		it.next ();
 
@@ -555,11 +562,11 @@ public class Node {
 	localSink.addRestriction ( mv );
     }
 
-    public SetOfMetavariable getRestrictedMetavariables () {
+    public ImmutableSet<Metavariable> getRestrictedMetavariables () {
 	if ( branchSink instanceof Restricter )
 	    return ((Restricter)branchSink).getRestrictions ();
 	else
-	    return SetAsListOfMetavariable.EMPTY_SET;
+	    return DefaultImmutableSet.<Metavariable>nil();
     }
 
     public BufferSink getRootSink () {
@@ -630,7 +637,7 @@ public class Node {
    
 
     // inner iterator class 
-    public static class NodeIterator implements Iterator<Node>, IteratorOfNode {
+    public static class NodeIterator implements Iterator<Node> {
 	private Iterator<Node> it;
 	
 	NodeIterator(Iterator<Node> it) {

@@ -22,16 +22,18 @@ http://java.sun.com/products/jfc/tsc/articles/threads/threads2.html
 package de.uka.ilkd.key.gui;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 
-import de.uka.ilkd.key.gui.configuration.ProofSettings;
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.gui.configuration.StrategySettings;
 import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
 import de.uka.ilkd.key.proof.*;
-import de.uka.ilkd.key.proof.proofevent.IteratorOfNodeReplacement;
+import de.uka.ilkd.key.proof.proofevent.NodeReplacement;
 import de.uka.ilkd.key.proof.proofevent.RuleAppInfo;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.StrategyProperties;
@@ -195,7 +197,7 @@ public class ApplyStrategy {
     }
 
 
-    private void init(Proof proof, ListOfGoal goals, int maxSteps, long timeout) {
+    private void init(Proof proof, ImmutableList<Goal> goals, int maxSteps, long timeout) {
         this.proof = proof;
         maxApplications = maxSteps;
         this.timeout = timeout;
@@ -229,7 +231,7 @@ public class ApplyStrategy {
     
 
 
-    public void start(Proof proof, ListOfGoal goals, int maxSteps, long timeout) {
+    public void start(Proof proof, ImmutableList<Goal> goals, int maxSteps, long timeout) {
         assert proof != null;
         init(proof, goals, maxSteps, timeout);
 
@@ -319,8 +321,8 @@ public class ApplyStrategy {
 		return;
 
 	    synchronized ( ApplyStrategy.this ) {
-		ListOfGoal                newGoals = SLListOfGoal.EMPTY_LIST;
-		IteratorOfNodeReplacement it       = rai.getReplacementNodes ();
+		ImmutableList<Goal>                newGoals = ImmutableSLList.<Goal>nil();
+		Iterator<NodeReplacement> it       = rai.getReplacementNodes ();
 		Node                      node;
 		Goal                      goal;          
                 
@@ -352,7 +354,7 @@ public class ApplyStrategy {
         stop();
         proof = null;
         if(goalChooser!=null){
-            goalChooser.init(null, SLListOfGoal.EMPTY_LIST);
+            goalChooser.init(null, ImmutableSLList.<Goal>nil());
         }
     }
 }

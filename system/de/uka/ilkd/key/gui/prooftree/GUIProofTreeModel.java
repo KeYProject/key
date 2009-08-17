@@ -12,7 +12,6 @@ package de.uka.ilkd.key.gui.prooftree;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Stack;
 import java.util.WeakHashMap;
 

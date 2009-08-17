@@ -10,7 +10,13 @@
 package de.uka.ilkd.key.java;
 
 
+import java.util.HashMap;
+import java.util.Iterator;
+
 import recoder.service.ConstantEvaluator;
+import de.uka.ilkd.key.collection.ImmutableArray;
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.abstraction.*;
 import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.expression.ParenthesizedExpression;
@@ -22,8 +28,6 @@ import de.uka.ilkd.key.ldt.*;
 import de.uka.ilkd.key.logic.ProgramInLogic;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.ldt.ListOfLDT;
-import de.uka.ilkd.key.ldt.SLListOfLDT;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.util.Debug;
@@ -42,7 +46,7 @@ public final class TypeConverter {
     private SetLDT setLDT;
     private HeapLDT heapLDT;
     
-    private ListOfLDT models = SLListOfLDT.EMPTY_LIST;
+    private ImmutableList<LDT> models = ImmutableSLList.<LDT>nil();
 
     public static StringConverter stringConverter = new StringConverter();
     
@@ -73,14 +77,13 @@ public final class TypeConverter {
     }
     
     
-    public void init(ListOfLDT ldts) {
+    public void init(ImmutableList<LDT> ldts) {
 	for(LDT ldt : ldts) {
 	    init(ldt);
 	}
     }
     
-    
-    public ListOfLDT getModels() {
+    public ImmutableList<LDT> getModels() {
         return models;
     }
 
@@ -256,7 +259,7 @@ public final class TypeConverter {
         final Term t = convertToLogicElement(ar.getReferencePrefix(), ec);
         for (int i=0; i<index.length; i++) { 
             index[i] = 
-                convertToLogicElement(ar.getDimensionExpressions().getExpression(i), ec);
+                convertToLogicElement(ar.getDimensionExpressions().get(i), ec);
         }
         assert index.length == 1 : "multi-dimensional arrays not implemented";
         return TB.dotArr(services, t, index[0]);

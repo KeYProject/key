@@ -27,9 +27,10 @@ import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.KeyStroke;
 
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.speclang.SetOfClassInvariant;
+import de.uka.ilkd.key.speclang.ClassInvariant;
 
 
 public class ClassInvariantSelectionDialog extends JDialog {
@@ -124,7 +125,7 @@ public class ClassInvariantSelectionDialog extends JDialog {
     /**
      * Returns the selected set of invariants.
      */
-    public SetOfClassInvariant getSelection() {
+    public ImmutableSet<ClassInvariant> getSelection() {
         return panel.getClassInvariants();
     }
 }

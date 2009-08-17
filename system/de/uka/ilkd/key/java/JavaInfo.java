@@ -11,9 +11,12 @@ package de.uka.ilkd.key.java;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 
-
+import de.uka.ilkd.key.collection.ImmutableArray;
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.abstraction.*;
 import de.uka.ilkd.key.java.declaration.*;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
@@ -23,7 +26,6 @@ import de.uka.ilkd.key.ldt.BooleanLDT;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.sort.IteratorOfSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.LRUCache;
@@ -91,7 +93,7 @@ public class JavaInfo {
     // resolution
     private HashMap<String, Object> sName2KJTCache = null;
     
-    private LRUCache<CacheKey, ListOfKeYJavaType> commonSubtypeCache = new LRUCache<CacheKey, ListOfKeYJavaType>(200);
+    private LRUCache<CacheKey, ImmutableList<KeYJavaType>> commonSubtypeCache = new LRUCache<CacheKey, ImmutableList<KeYJavaType>>(200);
     
     private int nameCachedSize = 0;
     private int sNameCachedSize = 0;
@@ -491,29 +493,33 @@ public class JavaInfo {
     /**
      * returns all methods from the given Type
      */
-    public ListOfMethod getAllMethods(KeYJavaType kjt) {
+    public ImmutableList<Method> getAllMethods(KeYJavaType kjt) {
         return kpmi.getAllMethods(kjt);
     }
 
     /**
      * returns all locally declared methods from the given Type
      */
-    public ListOfMethod getMethods(KeYJavaType kjt) {
+    public ImmutableList<Method> getMethods(KeYJavaType kjt) {
         return kpmi.getMethods(kjt);
     }
 
     /**
      * returns all methods from the given Type as ProgramMethods
      */
-    public ListOfProgramMethod getAllProgramMethods(KeYJavaType kjt) {
+    public ImmutableList<ProgramMethod> getAllProgramMethods(KeYJavaType kjt) {
         return kpmi.getAllProgramMethods(kjt);
     }
     
     /**
      * returns all methods declared in the given Type as ProgramMethods
      */
-    public ListOfProgramMethod getAllProgramMethodsLocallyDeclared(KeYJavaType kjt) {        
+    public ImmutableList<ProgramMethod> getAllProgramMethodsLocallyDeclared(KeYJavaType kjt) {        
         return kpmi.getAllProgramMethodsLocallyDeclared(kjt);
+    }
+    
+    public ImmutableList<ProgramMethod> getConstructors(KeYJavaType kjt) {
+	return kpmi.getConstructors(kjt);
     }
 
     /**
@@ -522,40 +528,23 @@ public class JavaInfo {
      * @param classType the KeYJavaType of the class where to look for the 
      *  method 
      * @param methodName the name of the method
-     * @param signature a ListOfType with the arguments types 
+     * @param signature a IList<Type> with the arguments types 
      * @param context the KeYJavaType of the class context from <em>where</em>
      *  the method is called 
      * @return a matching program method 
      */
     public ProgramMethod getProgramMethod(KeYJavaType classType, 
             String methodName,
-            ListOfType signature,
+            ImmutableList<? extends Type> signature,
             KeYJavaType context) {
         return kpmi.getProgramMethod(classType, methodName, signature, context);
-    }
-
-    /**
-     * returns the program methods defined in the given KeYJavaType with name
-     * m and the list of types as signature of the method
-     * @param ct the KeYJavaType of the class where to look for the 
-     *  method 
-     * @param methodName the name of the method
-     * @param signature a ListOfKeYJavaType with the arguments types 
-     * @param context the KeYJavaType of the class context from <em>where</em>
-     *  the method is called 
-     * @return a matching program method 
-     */
-    public ProgramMethod getProgramMethod(KeYJavaType ct, String methodName,
-					  ListOfKeYJavaType signature,
-					  KeYJavaType context) {
-        return kpmi.getProgramMethod(ct, methodName, signature, context);
     }
 
 
     public Term getProgramMethodTerm(Term prefix, String methodName, 
 				     Term[] args,
 				     String className) {
-	ListOfKeYJavaType sig = SLListOfKeYJavaType.EMPTY_LIST;
+	ImmutableList<KeYJavaType> sig = ImmutableSLList.<KeYJavaType>nil();
 	Term[] subs = new Term[args.length+2];
 	subs[0] = prefix;
 	subs[1] = TermBuilder.DF.heap(services);
@@ -591,13 +580,13 @@ public class JavaInfo {
      * implements) if extends is not given explict java.lang.Object is added
      * (it is not added for interfaces)
      */
-    public ListOfKeYJavaType getDirectSuperTypes(KeYJavaType type) {
+    public ImmutableList<KeYJavaType> getDirectSuperTypes(KeYJavaType type) {
         final ClassType javaType = (ClassType) type.getJavaType();
 
-        ListOfKeYJavaType localSupertypes = javaType.getSupertypes();
+        ImmutableList<KeYJavaType> localSupertypes = javaType.getSupertypes();
      
         if (!javaType.isInterface()) {
-            final IteratorOfKeYJavaType it = localSupertypes.iterator();
+            final Iterator<KeYJavaType> it = localSupertypes.iterator();
             boolean found = false;
             while (it.hasNext()) {
                 KeYJavaType keYType = it.next();
@@ -629,8 +618,8 @@ public class JavaInfo {
 	    return null;
 	}
 
-	final ListOfKeYJavaType localSupertypes = javaType.getSupertypes();
-	final IteratorOfKeYJavaType it = localSupertypes.iterator();
+	final ImmutableList<KeYJavaType> localSupertypes = javaType.getSupertypes();
+	final Iterator<KeYJavaType> it = localSupertypes.iterator();
 	while (result == null && it.hasNext()) {
 	    final KeYJavaType keYType = it.next();
 	    if (!((ClassType)keYType.getJavaType()).isInterface()) {
@@ -639,7 +628,7 @@ public class JavaInfo {
 	}
 	
 	if(result == null && ((ClassDeclaration) javaType).isAnonymousClass()){
-	    IteratorOfSort sit = type.getSort().extendsSorts().iterator();
+	    Iterator<Sort> sit = type.getSort().extendsSorts().iterator();
 	    while(sit.hasNext()){
 	        Sort s = sit.next();
 	        if(!((ClassType) getKeYJavaType(s).getJavaType()).isInterface()){
@@ -672,7 +661,7 @@ public class JavaInfo {
     public ProgramMethod getProgramMethod
 	(KeYJavaType classType, String methodName, ProgramVariable[] args,
 	        KeYJavaType context){
-        ListOfType types = SLListOfType.EMPTY_LIST;
+        ImmutableList<Type> types = ImmutableSLList.<Type>nil();
         for (int i = args.length - 1; i>=0; i--) {
             types = types.prepend(args[i].getKeYJavaType());
         }
@@ -680,11 +669,11 @@ public class JavaInfo {
     }
 
     /** gets an array of expression and returns a list of types */
-    private ListOfKeYJavaType getKeYJavaTypes(ArrayOfExpression args) {
-	ListOfKeYJavaType result = SLListOfKeYJavaType.EMPTY_LIST; 
+    private ImmutableList<KeYJavaType> getKeYJavaTypes(ImmutableArray<Expression> args) {
+	ImmutableList<KeYJavaType> result = ImmutableSLList.<KeYJavaType>nil(); 
 	if (args != null) {
 	    for (int i = args.size()-1; i >= 0 ; i--) {
-		final Expression argument = args.getExpression(i);
+		final Expression argument = args.get(i);
 		result = result.prepend
 		    (getTypeConverter().getKeYJavaType(argument));
 	    }
@@ -695,11 +684,11 @@ public class JavaInfo {
 
     /**
      * retrieves the signature according to the given expressions
-     * @param arguments ArrayOfExpression of which we try to construct a
+     * @param arguments ArrayOf<Expression> of which we try to construct a
      * signature 
      * @return the signature 
      */
-    public ListOfKeYJavaType createSignature(ArrayOfExpression arguments) {
+    public ImmutableList<KeYJavaType> createSignature(ImmutableArray<Expression> arguments) {
 	return getKeYJavaTypes(arguments);    
     }
 
@@ -710,7 +699,7 @@ public class JavaInfo {
      * @param classDecl the ClassDeclaration whose attributes shall be collected
      * @return all attributes declared in class <tt>cl</tt> 
      */
-    public ListOfField getAllFields(ClassDeclaration classDecl) {
+    public ImmutableList<Field> getAllFields(ClassDeclaration classDecl) {
 	return filterLocalDeclaredFields(classDecl, Filter.TRUE);
     }
 
@@ -721,7 +710,7 @@ public class JavaInfo {
      * attributes 
      * @return all implicit attributes declared in <tt>cl</tt>
      */
-    public ListOfField getImplicitFields(ClassDeclaration cl) {
+    public ImmutableList<Field> getImplicitFields(ClassDeclaration cl) {
         return filterLocalDeclaredFields(cl, Filter.IMPLICITFIELD);
     }
     
@@ -735,17 +724,17 @@ public class JavaInfo {
      * @return all attributes declared in class <tt>cl</tt> satisfying the 
      * given filter 
      */
-    private ListOfField filterLocalDeclaredFields(ClassDeclaration classDecl,
+    private ImmutableList<Field> filterLocalDeclaredFields(ClassDeclaration classDecl,
             Filter filter) {
-        ListOfField fields = SLListOfField.EMPTY_LIST;
-        final ArrayOfMemberDeclaration members = classDecl.getMembers();
+        ImmutableList<Field> fields = ImmutableSLList.<Field>nil();
+        final ImmutableArray<MemberDeclaration> members = classDecl.getMembers();
         for (int i = members.size()-1; i>=0; i--) {
-            final MemberDeclaration member = members.getMemberDeclaration(i);
+            final MemberDeclaration member = members.get(i);
             if (member instanceof FieldDeclaration) {
-        	final ArrayOfFieldSpecification specs = 
+        	final ImmutableArray<FieldSpecification> specs = 
         	    ((FieldDeclaration)member).getFieldSpecifications();
         	for (int j = specs.size()-1; j>=0; j--) {
-        	    final FieldSpecification fieldSpec = specs.getFieldSpecification(j);
+        	    final FieldSpecification fieldSpec = specs.get(j);
                     if (filter.isSatisfiedBy(fieldSpec)) {
                         fields = fields.prepend(fieldSpec);
                     }
@@ -802,13 +791,13 @@ public class JavaInfo {
     /**
      * retrieves a field with the given name out of the list
      * @param programName a String with the name of the field to be looked for
-     * @param fields the ListOfField where we have to look for the field
+     * @param fields the IList<Field> where we have to look for the field
      * @return the program variable of the given name or null if not
      * found
      */
     private final ProgramVariable find(String programName, 
-                                       ListOfField fields) {
-	IteratorOfField it = fields.iterator();
+                                       ImmutableList<Field> fields) {
+	Iterator<Field> it = fields.iterator();
 	while (it.hasNext()) {
 	    Field field = it.next();
 	    if (programName.equals(field.getProgramName())) {
@@ -823,14 +812,14 @@ public class JavaInfo {
      * extracts all fields out of fielddeclaration
      * @param field the FieldDeclaration of which the field
      * specifications have to be extracted
-     * @return a ListOfField the includes all field specifications found
+     * @return a IList<Field> the includes all field specifications found
      * int the field declaration of the given list
      */
-    private final ListOfField getFields(FieldDeclaration field) {
-	ListOfField result = SLListOfField.EMPTY_LIST;
-	final ArrayOfFieldSpecification spec = field.getFieldSpecifications();
+    private final ImmutableList<Field> getFields(FieldDeclaration field) {
+	ImmutableList<Field> result = ImmutableSLList.<Field>nil();
+	final ImmutableArray<FieldSpecification> spec = field.getFieldSpecifications();
 	for (int i = spec.size()-1; i>=0; i--) {
-	    result = result.prepend(spec.getFieldSpecification(i));
+	    result = result.prepend(spec.get(i));
 	} 
 	return result;
     }
@@ -838,15 +827,15 @@ public class JavaInfo {
     /**
      * extracts all field specifications out of the given
      * list. Therefore it descends into field declarations.
-     * @param list the ArrayOfMemberDeclaration with the members of a
+     * @param list the ArrayOf<MemberDeclaration> with the members of a
      * type declaration
-     * @return a ListOfField the includes all field specifications found
+     * @return a IList<Field> the includes all field specifications found
      * int the field declaration of the given list
      */
-    private ListOfField getFields(ArrayOfMemberDeclaration list) {
-	ListOfField result = SLListOfField.EMPTY_LIST;
+    private ImmutableList<Field> getFields(ImmutableArray<MemberDeclaration> list) {
+	ImmutableList<Field> result = ImmutableSLList.<Field>nil();
 	for (int i = list.size()-1; i >= 0; i--) {
-	    final MemberDeclaration pe = list.getMemberDeclaration(i);
+	    final MemberDeclaration pe = list.get(i);
 	    if (pe instanceof FieldDeclaration) {
 		result = result.append
 		    (getFields((FieldDeclaration)pe));
@@ -913,8 +902,8 @@ public class JavaInfo {
 	    } 
             return res;
 	} else {
-	    final ListOfField list   = kpmi.getAllFieldsLocallyDeclaredIn(classType);
-	    final IteratorOfField it = list.iterator();	   
+	    final ImmutableList<Field> list   = kpmi.getAllFieldsLocallyDeclaredIn(classType);
+	    final Iterator<Field> it = list.iterator();	   
             while (it.hasNext()) {
 		final Field f = it.next();
 		if (f!=null && (f.getName().equals(name) || 
@@ -950,12 +939,12 @@ public class JavaInfo {
      * where to look for
      * @return list of found attributes with name <tt>programName</tt> 
      */
-    public ListOfProgramVariable getAllAttributes(String programName, 
+    public ImmutableList<ProgramVariable> getAllAttributes(String programName, 
                                                   KeYJavaType type) {
                                 
 
-        ListOfProgramVariable result = 
-            SLListOfProgramVariable.EMPTY_LIST;      
+        ImmutableList<ProgramVariable> result = 
+            ImmutableSLList.<ProgramVariable>nil();      
         
 	if (!(type.getSort().extendsTrans(objectSort()))) {
 	    return result;
@@ -974,14 +963,14 @@ public class JavaInfo {
         
         // the assert statements below are not for fun, some methods rely 
         // on the correct order
-        ListOfKeYJavaType hierarchy = kpmi.getAllSubtypes(type);                
+        ImmutableList<KeYJavaType> hierarchy = kpmi.getAllSubtypes(type);                
         assert !hierarchy.contains(type);
         
         hierarchy = hierarchy.prepend(kpmi.getAllSupertypes(type));        
         assert hierarchy.head() == type;
         
         
-        final IteratorOfKeYJavaType it = hierarchy.iterator();
+        final Iterator<KeYJavaType> it = hierarchy.iterator();
         while (it.hasNext()) {
 	    KeYJavaType st = it.next();
 	    if(st != null){
@@ -1123,7 +1112,7 @@ public class JavaInfo {
      * @param type the KeYJavaType whose subtypes are returned
      * @return list of all subtypes
      */
-    public ListOfKeYJavaType getAllSubtypes(KeYJavaType type) {
+    public ImmutableList<KeYJavaType> getAllSubtypes(KeYJavaType type) {
         return kpmi.getAllSubtypes(type);
     }
     
@@ -1132,11 +1121,11 @@ public class JavaInfo {
      * @param type the KeYJavaType whose supertypes are returned
      * @return list of all supertypes
      */
-    public ListOfKeYJavaType getAllSupertypes(KeYJavaType type) {
+    public ImmutableList<KeYJavaType> getAllSupertypes(KeYJavaType type) {
         if (type.getJavaType() instanceof ArrayType) {
-            ListOfKeYJavaType arraySupertypes = SLListOfKeYJavaType.EMPTY_LIST;
-            final IteratorOfSort it = 
-                (type.getSort()).extendsSorts().iterator();
+            ImmutableList<KeYJavaType> arraySupertypes = ImmutableSLList.<KeYJavaType>nil();
+            final Iterator<Sort> it = 
+                type.getSort().extendsSorts().iterator();
             while (it.hasNext()) {
                 arraySupertypes.append(getKeYJavaType(it.next()));
             }
@@ -1181,25 +1170,25 @@ public class JavaInfo {
      * @param k2 the second KeYJavaType denoting a classtype
      * @return the list of common subtypes of types <tt>k1</tt> and <tt>k2</tt>
      */
-    public ListOfKeYJavaType getCommonSubtypes(KeYJavaType k1, KeYJavaType k2) {        
+    public ImmutableList<KeYJavaType> getCommonSubtypes(KeYJavaType k1, KeYJavaType k2) {        
         final CacheKey ck = new CacheKey(k1, k2);
-        ListOfKeYJavaType result = commonSubtypeCache.get(ck);
+        ImmutableList<KeYJavaType> result = commonSubtypeCache.get(ck);
         
         if (result != null) {
             return result;
         } 
          
-        result = SLListOfKeYJavaType.EMPTY_LIST;
+        result = ImmutableSLList.<KeYJavaType>nil();
         
         if (k1.getSort().extendsTrans(k2.getSort())) { 
             result = getAllSubtypes(k1).prepend(k1);
         } else if (k2.getSort().extendsTrans(k1.getSort())) { 
             result = getAllSubtypes(k2).prepend(k2);
         } else {
-            final ListOfKeYJavaType l1 = getAllSubtypes(k1);                
-            final ListOfKeYJavaType l2 = getAllSubtypes(k2);
+            final ImmutableList<KeYJavaType> l1 = getAllSubtypes(k1);                
+            final ImmutableList<KeYJavaType> l2 = getAllSubtypes(k2);
 
-            final IteratorOfKeYJavaType it = l1.iterator();
+            final Iterator<KeYJavaType> it = l1.iterator();
 
             while (it.hasNext()) {
                 final KeYJavaType next = it.next();
@@ -1221,7 +1210,7 @@ public class JavaInfo {
                 rec2key().getSuperArrayType().getJavaType();
             length = 
                 (ProgramVariable) sad.length().getVariables().
-                getVariableSpecification(0).getProgramVariable();
+                get(0).getProgramVariable();
             assert "length".equals(length.name().toString()) : "Wrong array length";
         }
         

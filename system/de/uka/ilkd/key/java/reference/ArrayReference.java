@@ -11,6 +11,7 @@
 
 package de.uka.ilkd.key.java.reference;
 
+import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.ArrayDeclaration;
@@ -36,7 +37,7 @@ public class ArrayReference extends JavaNonTerminalProgramElement
     /**
      Inits.
      */
-    protected final ArrayOfExpression inits; 
+    protected final ImmutableArray<Expression> inits; 
 
  
     /**
@@ -55,7 +56,7 @@ public class ArrayReference extends JavaNonTerminalProgramElement
     public ArrayReference(ReferencePrefix accessPath, 
 			  Expression[] initializers) {
         this.prefix = accessPath;
-	this.inits  = new ArrayOfExpression(initializers);
+	this.inits  = new ImmutableArray<Expression>(initializers);
     }
 
     /**
@@ -77,10 +78,10 @@ public class ArrayReference extends JavaNonTerminalProgramElement
 	    this.prefix=new ArrayReference(e1, accessPath);
 	    e1= new Expression[1];
 	    e1[0]=e[e.length-1];
-	    this.inits=new ArrayOfExpression(e1);
+	    this.inits=new ImmutableArray<Expression>(e1);
 	}else{
 	    this.prefix=accessPath;
-	    this.inits=new ArrayOfExpression(e);
+	    this.inits=new ImmutableArray<Expression>(e);
 	}
     }
 
@@ -105,10 +106,10 @@ public class ArrayReference extends JavaNonTerminalProgramElement
 	    for(int i=0; i<e1.length; i++) e1[i] = e[i];
 	    this.prefix=new ArrayReference(e1, accessPath);
 	    e1[0]=e[e.length-1];
-	    this.inits=new ArrayOfExpression(e1);
+	    this.inits=new ImmutableArray<Expression>(e1);
 	}else{
 	    this.prefix=accessPath;
-	    this.inits=new ArrayOfExpression(e);
+	    this.inits=new ImmutableArray<Expression>(e);
 	}
     }
 
@@ -138,7 +139,7 @@ public class ArrayReference extends JavaNonTerminalProgramElement
             index--;
         }
         if (inits != null) {
-            return inits.getExpression(index);
+            return inits.get(index);
         }
         throw new ArrayIndexOutOfBoundsException();
     }
@@ -201,7 +202,7 @@ public class ArrayReference extends JavaNonTerminalProgramElement
             index--;
         }
         if (inits != null) {
-            return inits.getExpression(index);
+            return inits.get(index);
         }
         throw new ArrayIndexOutOfBoundsException();
     }
@@ -210,7 +211,7 @@ public class ArrayReference extends JavaNonTerminalProgramElement
      *      Get dimension expressions.
      *      @return the expression array wrapper.
      */
-    public ArrayOfExpression getDimensionExpressions() {
+    public ImmutableArray<Expression> getDimensionExpressions() {
         return inits;
     }
 

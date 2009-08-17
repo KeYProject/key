@@ -10,28 +10,34 @@
 
 package de.uka.ilkd.key.logic;
 
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableArray;
+import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.logic.op.Metavariable;
+import de.uka.ilkd.key.logic.op.Modality;
+import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 
 
 final class TermImpl implements Term {
 
-    private static final ArrayOfTerm EMPTY_TERM_LIST 
-    	= new ArrayOfTerm();
-    private static final ArrayOfQuantifiableVariable EMPTY_VAR_LIST
-    	= new ArrayOfQuantifiableVariable();
+    private static final ImmutableArray<Term> EMPTY_TERM_LIST 
+    	= new ImmutableArray<Term>();
+    private static final ImmutableArray<QuantifiableVariable> EMPTY_VAR_LIST
+    	= new ImmutableArray<QuantifiableVariable>();
 
     //content
     private final Operator op;
-    private final ArrayOfTerm subs;
-    private final ArrayOfQuantifiableVariable boundVars;
+    private final ImmutableArray<Term> subs;
+    private final ImmutableArray<QuantifiableVariable> boundVars;
     private final JavaBlock javaBlock;
     
     //caches
     private static enum ThreeValuedTruth { TRUE, FALSE, UNKNOWN }
     private int depth = -1;
     private ThreeValuedTruth rigid = ThreeValuedTruth.UNKNOWN; 
-    private SetOfQuantifiableVariable freeVars = null; 
+    private ImmutableSet<QuantifiableVariable> freeVars = null; 
     private int hashcode = -1;
     
     
@@ -40,8 +46,8 @@ final class TermImpl implements Term {
     //-------------------------------------------------------------------------
     
     public TermImpl(Operator op, 
-	    	    ArrayOfTerm subs, 
-	    	    ArrayOfQuantifiableVariable boundVars, 
+	    	    ImmutableArray<Term> subs, 
+	    	    ImmutableArray<QuantifiableVariable> boundVars, 
 	    	    JavaBlock javaBlock) {
 	assert op != null;
 	assert subs != null;
@@ -58,7 +64,7 @@ final class TermImpl implements Term {
     //------------------------------------------------------------------------- 
 
     private void determineFreeVars() {
-	freeVars = SetAsListOfQuantifiableVariable.EMPTY_SET;
+	freeVars = DefaultImmutableSet.<QuantifiableVariable>nil();
         
         if(op instanceof QuantifiableVariable) {
             freeVars = freeVars.add((QuantifiableVariable) op);
@@ -66,11 +72,10 @@ final class TermImpl implements Term {
         
         for(int i = 0, ar = arity(); i < ar; i++) {
             Term subTerm = sub(i);
-	    SetOfQuantifiableVariable subFreeVars = subTerm.freeVars();
+	    ImmutableSet<QuantifiableVariable> subFreeVars = subTerm.freeVars();
 	    for(int j = 0, sz = varsBoundHere(i).size(); j < sz; j++) {
 		subFreeVars 
-		    = subFreeVars.remove(varsBoundHere(i)
-			         .getQuantifiableVariable(j));
+		    = subFreeVars.remove(varsBoundHere(i).get(j));
 	    }
 	    freeVars = freeVars.union(subFreeVars);
 	}
@@ -89,14 +94,14 @@ final class TermImpl implements Term {
     
     
     @Override
-    public ArrayOfTerm subs() {
+    public ImmutableArray<Term> subs() {
 	return subs;
     }
     
     
     @Override
     public Term sub(int nr) {
-	return subs.getTerm(nr);
+	return subs.get(nr);
     }
     
     
@@ -111,13 +116,13 @@ final class TermImpl implements Term {
     
     
     @Override
-    public ArrayOfQuantifiableVariable boundVars() {
+    public ImmutableArray<QuantifiableVariable> boundVars() {
 	return boundVars;
     }
     
         
     @Override
-    public ArrayOfQuantifiableVariable varsBoundHere(int n) {
+    public ImmutableArray<QuantifiableVariable> varsBoundHere(int n) {
 	return op.bindVarsAt(n) ? boundVars : EMPTY_VAR_LIST;
     }
     
@@ -186,7 +191,7 @@ final class TermImpl implements Term {
     
 
     @Override
-    public SetOfQuantifiableVariable freeVars() {
+    public ImmutableSet<QuantifiableVariable> freeVars() {
         if(freeVars == null) {
             determineFreeVars();
         }
@@ -195,8 +200,8 @@ final class TermImpl implements Term {
     
 
     @Override
-    public SetOfMetavariable metaVars () {
-	return SetAsListOfMetavariable.EMPTY_SET;
+    public ImmutableSet<Metavariable> metaVars () {
+	return DefaultImmutableSet.<Metavariable>nil();
     }
     
     
@@ -298,7 +303,7 @@ final class TermImpl implements Term {
             if(!boundVars.isEmpty()) {
        	    	sb.append("{");
        	    	for(int i = 0, n = boundVars.size(); i < n; i++) {
-       	    	    sb.append(boundVars.getQuantifiableVariable(i));
+       	    	    sb.append(boundVars.get(i));
        	    	    if(i < n - 1) {
        	    		sb.append(", ");
        	    	    }     	       	    	    

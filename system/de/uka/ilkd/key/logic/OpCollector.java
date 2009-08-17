@@ -10,9 +10,9 @@
 
 package de.uka.ilkd.key.logic;
 
-import de.uka.ilkd.key.logic.op.*;
-
 import java.util.HashSet;
+
+import de.uka.ilkd.key.logic.op.Operator;
 
 /**
  * Collects all operators occuring in the traversed term.

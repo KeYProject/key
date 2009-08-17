@@ -85,201 +85,15 @@ endif
 ifeq ($(JAVAC),ajc)
   OPTIONS=$(COMMON_OPTIONS) -nowarn -classpath $(ASPECTJRTPATH):$(CLASSPATH):$(GENERATED_SRC_PATH):$(BINARYPATH):.
 else
-  ifeq ($(JAVAC),ejc)      
-    OPTIONS=$(COMMON_OPTIONS) -warn:uselessTypeCheck,localHiding,fieldHiding,tasks\(TODO\|HACK\|%%%\)  -source 1.5 -target 1.5 -classpath $(JAVA_HOME)/jre/lib/rt.jar:$(CLASSPATH):$(GENERATED_SRC_PATH):$(BINARYPATH):.
-  else 
-    OPTIONS=$(COMMON_OPTIONS) -J-Xmx512m -nowarn -source 1.5 -target 1.5 -classpath $(CLASSPATH):$(GENERATED_SRC_PATH):$(BINARYPATH):.
-  endif
+  OPTIONS=$(COMMON_OPTIONS) -J-Xmx512m -nowarn -source 1.5 -target 1.5 -classpath $(CLASSPATH):$(GENERATED_SRC_PATH):$(BINARYPATH):.
 endif
 
-
-#for JavaCC 3.0:
 JAVACC_MAIN=javacc
-#for JavaCC 2.0:
-#JAVACC_MAIN=COM.sun.labs.javacc.Main
-
 
 ## nice source links
 JAVADOC=javadoc
 JAVADOC_OPTIONS=-use -quiet -breakiterator -linksource -J-Xmx512m
 
-## KeY config
-PLUG_IN_FILTER?="(none)"
-export PLUG_IN_FILTER
-
-# this part creates .java-files from .gjava files
-#	rule/SLListOfRule rule/SLListOfRuleApp \
-
-GENERATED_ITERATORS=proof/IteratorOfNode \
-	logic/op/IteratorOfBoolean \
-	rule/IteratorOfListOfNoPosTacletApp \
-	ldt/IteratorOfLDT \
-	java/abstraction/IteratorOfListOfType \
-	rule/IteratorOfVariableCondition \
-	logic/op/IteratorOfOperator
-
-GENERATED_LISTS=logic/SLListOfTerm \
-	logic/op/SLListOfQuantifiableVariable \
-	logic/SLListOfNamed \
-	logic/op/SLListOfSchemaVariable \
-	rule/SLListOfNewVarcond \
-	rule/SLListOfVariableCondition \
-	logic/op/SLListOfLogicVariable \
-	logic/op/SLListOfParsableVariable \
-	logic/op/SLListOfOperator \
-	logic/op/SLListOfUpdateableOperator \
-	collection/SLListOfString \
-	logic/op/SLListOfMetavariable \
-	logic/SLListOfRenamingTable \
-	collection/SLListOfDouble \
-	logic/SLListOfConstrainedFormula \
-	rule/SLListOfBuiltInRule \
-	rule/SLListOfTaclet rule/SLListOfFindTaclet \
-	rule/SLListOfNoFindTaclet \
-	rule/SLListOfRuleSet rule/SLListOfTacletGoalTemplate \
-	rule/SLListOfNotFreeIn  \
-	rule/SLListOfNewDependingOn  \
-	rule/SLListOfVariableCondition  \
-	rule/SLListOfTacletPrefix  \
-	rule/SLListOfObject \
-	logic/SLListOfInteger \
-        proof/SLListOfGoal \
-	proof/SLListOfNode \
-	rule/inst/SLListOfTacletInstantiations \
-	rule/inst/SLListOfSVInstantiations \
-	rule/SLListOfTacletApp \
-	rule/SLListOfNoPosTacletApp \
-	rule/inst/SLListOfProgramSVEntry \
-	rule/inst/SLListOfInstantiationEntry \
-	java/SLListOfStatement \
-	java/SLListOfProgramElement \
-	rule/SLListOfPosTacletApp \
-	logic/op/SLListOfProgramVariable \
-	logic/op/SLListOfProgramMethod \
-	java/declaration/SLListOfVariableSpecification \
-	java/abstraction/SLListOfMethod \
-	logic/op/SLListOfProgramMethod \
-	java/abstraction/SLListOfClassType \
-	java/abstraction/SLListOfType \
-	java/abstraction/SLListOfKeYJavaType \
-	java/abstraction/SLListOfField \
-	rule/SLListOfMatchConditions \
-	rule/SLListOfIfFormulaInstantiation \
-	java/abstraction/SLListOfConstructor \
-	logic/SLListOfConstraint \
-	pp/SLListOfSequentPrintFilterEntry \
-	proof/proofevent/SLListOfNodeReplacement \
-	proof/proofevent/SLListOfNodeChange \
-	proof/proofevent/SLListOfNodeChangesHolder \
-	proof/incclosure/SLListOfSink \
-	proof/SLListOfProof \
-	logic/sort/SLListOfGenericSort \
-	rule/inst/SLListOfGenericSortCondition \
-	logic/SLListOfName \
-	logic/op/SLListOfIProgramVariable \
-	logic/SLListOfSequentChangeInfo \
-	logic/SLListOfFormulaChangeInfo \
-	proof/SLListOfTermTacletAppIndex \
-	strategy/SLListOfRuleAppContainer \
-	logic/SLListOfProgramElementName \
-	proof/SLListOfInstantiationProposer \
-        speclang/SLListOfOperationContract \
-	speclang/SLListOfClassInvariant \
-	proof/init/SLListOfProofOblInput \
-	rule/export/SLListOfTacletModelInfo \
-	rule/export/SLListOfOptionModelInfo \
-	rule/export/SLListOfRuleSetModelInfo \
-	rule/export/SLListOfDisplayNameModelInfo \
-	rule/export/SLListOfCategoryModelInfo \
-	logic/SLListOfNamespace \
-	speclang/translation/SLListOfSLExpression \
-	speclang/translation/SLListOfSLExpressionResolver \
-	speclang/SLListOfPositionedString \
-        speclang/jml/pretranslation/SLListOfTextualJMLConstruct \
-	ldt/SLListOfLDT \
-        rule/metaconstruct/arith/SLListOfMonomial \
-	strategy/feature/instantiator/SLListOfCPBranch \
-	java/SLListOfComment \
-	strategy/SetAsListOfStrategyFactory \
-	pp/SLListOfRange
-
-GENERATED_SETS=logic/SetAsListOfTerm collection/SetAsListOfString \
-	rule/SetAsListOfTaclet rule/SetAsListOfRuleApp \
-	rule/SetAsListOfNoPosTacletApp \
-	logic/op/SetAsListOfQuantifiableVariable \
-	logic/op/SetAsListOfSchemaVariable \
-	rule/SetAsListOfTacletApp \
-	proof/SetAsListOfProof \
-	java/SetAsListOfExpression \
-	logic/op/SetAsListOfProgramVariable \
-	logic/op/SetAsListOfProgramMethod \
-	logic/sort/SetAsListOfSort \
-	logic/sort/SetAsListOfGenericSort \
-	logic/op/SetAsListOfIProgramVariable \
-	logic/op/SetAsListOfMetavariable \
-	logic/SetAsListOfChoice \
-	logic/SetAsListOfNamed \
-        logic/op/SetAsListOfLogicVariable \
-        proof/SetAsListOfGoalChooserBuilder \
-	speclang/SetAsListOfClassInvariant \
-        speclang/SetAsListOfOperationContract \
-        speclang/SetAsListOfLoopInvariant \
-	strategy/SetAsListOfStrategyFactory \
-	java/abstraction/SetAsListOfKeYJavaType \
-	proof/mgt/SetAsListOfContractWithInvs \
-	strategy/quantifierHeuristics/SetAsListOfTrigger\
-	strategy/quantifierHeuristics/SetAsListOfSubstitution \
-	java/statement/SetAsListOfLoopStatement \
-        proof/SetAsListOfGoalChooserBuilder \
-	strategy/SetAsListOfStrategyFactory \
-	logic/op/SetAsListOfUpdateableOperator \
-	speclang/SetAsListOfPositionedString \
-        logic/op/SetAsListOfModality
-
-GENERATED_MAPS=	collection/MapAsListFromIntegerToString \
-	logic/op/MapAsListFromQuantifiableVariableToInteger \
-	logic/op/MapAsListFromSchemaVariableToTerm \
-	logic/op/MapAsListFromSchemaVariableToInstantiationEntry \
-	logic/op/MapAsListFromLogicVariableToTerm \
-	logic/op/MapAsListFromSchemaVariableToTacletPrefix \
-	logic/sort/MapAsListFromGenericSortToSort \
-	logic/op/MapAsListFromSchemaVariableToSchemaVariable \
-	proof/MapAsListFromConstrainedFormulaToTermTacletAppIndex \
-	proof/proofevent/MapAsListFromNodeToNodeChangesHolder \
-	logic/op/MapAsListFromQuantifiableVariableToTerm \
-	logic/op/MapAsListFromQuantifiableVariableToMetavariable 
-
-GENERATED_ARRAYS=java/ArrayOfProgramElementExtnullInnull \
-	java/ArrayOfStatementExtProgramElementInnull \
-	java/ArrayOfExpressionExtProgramElementInnull \
-	java/ArrayOfLoopInitializerExtProgramElementInnull \
-	java/ArrayOfImportExtProgramElementInnull \
-	java/declaration/ArrayOfMemberDeclarationExtProgramElementInde.uka.ilkd.key.java \
-	java/declaration/ArrayOfVariableSpecificationExtProgramElementInde.uka.ilkd.key.java \
-	java/declaration/ArrayOfFieldSpecificationExtVariableSpecificationInnull \
-	java/declaration/ArrayOfImplicitFieldSpecificationExtFieldSpecificationInnull \
-	java/declaration/ArrayOfModifierExtProgramElementInde.uka.ilkd.key.java \
-	java/declaration/ArrayOfParameterDeclarationExtProgramElementInde.uka.ilkd.key.java \
-	java/declaration/ArrayOfTypeDeclarationExtProgramElementInde.uka.ilkd.key.java \
-	java/statement/ArrayOfBranchExtProgramElementInde.uka.ilkd.key.java \
-	java/reference/ArrayOfTypeReferenceExtProgramElementInde.uka.ilkd.key.java \
-	logic/ArrayOfProgramPrefixExtnullInnull \
-	logic/op/ArrayOfUpdateableOperatorExtnullInnull \
-	logic/op/ArrayOfQuantifiableVariableExtnullInnull \
-	logic/op/ArrayOfIProgramVariableExtProgramElementInde.uka.ilkd.key.java \
-	logic/ArrayOfTermExtnullInnull \
-	logic/sort/ArrayOfSortExtnullInnull \
-	java/abstraction/ArrayOfKeYJavaTypeExtnullInde.uka.ilkd.key.java.abstraction \
-	strategy/feature/ArrayOfFeatureExtnullInnull \
-        collection/ArrayOfBooleanExtnullInnull
-
-GENERATED_HEAPS= logic/LeftistHeapOfInteger \
-	strategy/LeftistHeapOfRuleAppContainer
-
-GENERATED_VECTORS_STACKS = util/SimpleStackOfExtList 
-
-GEN_FILES=$(GENERATED_MAPS) $(GENERATED_VECTORS_STACKS) $(GENERATED_ARRAYS) $(GENERATED_LISTS) $(GENERATED_SETS) \
-	$(GENERATED_ITERATORS) $(GENERATED_HEAPS)
 
 ANTLR_PARSER= \
 	$(GENERATED_SRC_PATH)$(PFX)parser/KeYLexer.java \
@@ -308,8 +122,7 @@ PROOFJAVA_PARSER= \
 	$(GENERATED_SRC_PATH)$(PFX)parser/proofjava/Token.java \
 
 
-## generic java support
-JAVAFILES=$(GEN_FILES:%=$(PFX)%.java) 
+
 
 .PHONY: all
 all:	javahomeset branding
@@ -318,7 +131,7 @@ all:	javahomeset branding
 
 ## create javadoc
 .PHONY: doc
-doc: argfile $(JAVAFILES)
+doc: argfile 
 	@mkdir -p doc
 ## old doc generation	
 #	@find de/ | grep "\.java" | grep -v "\~" | xargs javadoc -use -classpath $(CLASSPATH):$(BINARYPATH) -d doc 
@@ -404,21 +217,18 @@ clean:
 	@rm -f unit_manager.log 
 	@rm -f msg.txt
 	@rm -f argfile.aspects
-	@rm -f argfile.generic
 	@rm -f argfile.normal 
 	@rm -f argfile.other
 	@rm -f argfile
 	@rm -f error.msg
 	@rm -f critical.msg
 	@rm -f warning.msg
-	@rm -f gf.msg
 	@rm -f -r ./qwe
 
 .PHONY: realclean
 realclean: clean
 
 #help files of the makefile
-	@rm -f GenMakefile
 	@rm -f Makefile.mk
 
 .PHONY: distclean
@@ -429,11 +239,11 @@ distclean: realclean
 	@rm -f keySource.tgz
 
 .PHONY: all_gen
-all_gen: genericMakefile
+all_gen: 
 	@$(MAKE) -s all_hlp   	
 
 .PHONY: all_hlp
-all_hlp: argfile.normal $(JAVAFILES) $(ANTLR_PARSER) $(JAVACC_PARSER) $(PROOFJAVA_PARSER) $(DIFF_PARSER) copyResources
+all_hlp: argfile.normal $(ANTLR_PARSER) $(JAVACC_PARSER) $(PROOFJAVA_PARSER) $(DIFF_PARSER) copyResources
 ifeq "$(BRANDING)" ""
 # always update SHA1 hash in order to get useful bug reports		
 	@echo $(SHA1) > ${BINARYPATH}/de/uka/ilkd/key/util/sha1
@@ -453,8 +263,7 @@ else
 	@rm -f argfile.aspects
 	@touch argfile.aspects
 endif	
-	@cat argfile.generic argfile.normal argfile.other argfile.aspects |\
-              (grep -v $(PLUG_IN_FILTER) || true) | sort -u > argfile
+	@cat argfile.normal argfile.other argfile.aspects | sort -u > argfile
 	@$(JAVAC) $(OPTIONS) @argfile 2>>error.msg || true
 	@./success
 
@@ -574,30 +383,6 @@ $(GENERATED_SRC_PATH)$(PFX)speclang/jml/translation/KeYJMLParser.java \
 	@mkdir -p $(GENERATED_SRC_PATH)$(PFX)speclang/jml/translation
 	@$(JAVA) -cp $(CLASSPATH) antlr.Tool  -glib $(PFX)speclang/jml/translation/jmllexer.g \
 	                 -o $(GENERATED_SRC_PATH)$(PFX)speclang/jml/translation $<
-
-
-$(BINARYPATH)$(PFX)util/make/MakefileReader.class:
-	@mkdir -p $(GENERATED_SRC_PATH)
-	@mkdir -p $(BINARYPATH)$(PFX)util/make/
-	@$(JAVAC) $(OPTIONS) $(PFX)util/make/MakefileReader.java  2>&1 
-
-
-$(BINARYPATH)$(PFX)util/make/GenericParser.class: $(BINARYPATH)$(PFX)util/make/MakefileReader.class
-	@mkdir -p $(BINARYPATH)$(PFX)util/make/
-	@$(JAVAC) $(OPTIONS) $(PFX)util/make/GenericParser.java 2>&1 
-
-genericMakefile: $(BINARYPATH)$(PFX)util/make/GenericParser.class
-	@$(JAVA) -cp $(CLASSPATH):$(GENERATED_SRC_PATH):$(BINARYPATH) de.uka.ilkd.key.util.make.GenericParser $(GENERATED_SRC_PATH) GenMakefile argfile.generic $(JAVAFILES)
-
-
-GenMakefile:;
-
-sinclude GenMakefile
-
-%.java: $(BINARYPATH)$(PFX)util/make/GenericParser.class
-	@$(JAVA) -cp $(CLASSPATH):$(GENERATED_SRC_PATH):$(BINARYPATH) de.uka.ilkd.key.util.make.GenericParser $(GENERATED_SRC_PATH) GenMakefile argfile.generic $(JAVAFILES)
-	@$(MAKE) -s -w -f GenMakefile $@ >msg.txt
-
 
 .PHONY: help
 help:

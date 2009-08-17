@@ -3,13 +3,14 @@
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
+// The KeY system is protected by the GNU General Public License.
 // See LICENSE.TXT for details.
 //
 //
 
 package de.uka.ilkd.key.proof.init;
 
+import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.Type;
@@ -22,29 +23,29 @@ import de.uka.ilkd.key.logic.op.*;
 
 
 /**
- * Convenience class for creating terms related to the implicit 
+ * Convenience class for creating terms related to the implicit
  * "created" attribute.
  * Should possibly be merged into TermBuilder?
  */
 public class CreatedAttributeTermFactory {
-    public static final CreatedAttributeTermFactory INSTANCE 
+    public static final CreatedAttributeTermFactory INSTANCE
             = new CreatedAttributeTermFactory();
-    
+
     private static final TermBuilder TB = TermBuilder.DF;
-    
-    
+
+
     //-------------------------------------------------------------------------
     //constructors
-    //------------------------------------------------------------------------- 
-    
+    //-------------------------------------------------------------------------
+
     private CreatedAttributeTermFactory() {}
-    
-    
-    
+
+
+
     //-------------------------------------------------------------------------
     //internal methods
     //-------------------------------------------------------------------------
-    
+
     private Term createQuantifierTerm(Services services,
                                       Quantifier q,
                                       LogicVariable[] vars,
@@ -60,7 +61,7 @@ public class CreatedAttributeTermFactory {
                         = (nullForbidden
                            ? createCreatedAndNotNullTerm(services, variableTerm)
                            : createCreatedOrNullTerm(services, variableTerm));
-                guardConjunctionTerm 
+                guardConjunctionTerm
                        = TB.and(guardConjunctionTerm, guardTerm);
             }
         }
@@ -74,31 +75,31 @@ public class CreatedAttributeTermFactory {
             Term guardedTerm = TB.and(guardConjunctionTerm, subTerm);
             quantifierTerm = TB.ex(vars, guardedTerm);
         }
-        
+
         return quantifierTerm;
     }
-    
-    
-    
+
+
+
     //-------------------------------------------------------------------------
     //public interface
-    //-------------------------------------------------------------------------     
-    
+    //-------------------------------------------------------------------------
+
     /**
      * Creates the formula "objectTerm.<created> = TRUE".
      */
     public Term createCreatedTerm(Services services, Term objectTerm) {
         JavaInfo javaInfo = services.getJavaInfo();
         ProgramVariable createdAttribute
-                = javaInfo.getAttribute(ImplicitFieldAdder.IMPLICIT_CREATED, 
+                = javaInfo.getAttribute(ImplicitFieldAdder.IMPLICIT_CREATED,
                                         javaInfo.getJavaLangObject());
         final Function fieldSymbol = services.getTypeConverter().getHeapLDT().getFieldSymbolForPV(createdAttribute, services);
         Term createdTerm = TB.dot(services, createdAttribute.sort(), objectTerm, fieldSymbol);
         
         return TB.equals(createdTerm, TB.TRUE(services));
     }
-    
-    
+
+
     /**
      * Creates the formula "objectTerm.<created> = TRUE | objectTerm = null"
      */
@@ -114,27 +115,27 @@ public class CreatedAttributeTermFactory {
      */
     public Term createCreatedAndNotNullTerm(Services services, Term objectTerm) {
         Term objectCreatedTerm = createCreatedTerm(services, objectTerm);
-        Term objectNotNullTerm 
-            = TB.not(TB.equals(objectTerm, TB.NULL(services))); 
+        Term objectNotNullTerm
+            = TB.not(TB.equals(objectTerm, TB.NULL(services)));
         return TB.and(objectCreatedTerm, objectNotNullTerm);
     }
 
-    
-    
+
+
     /**
-     * Creates a quantifier term where the quantification only covers 
+     * Creates a quantifier term where the quantification only covers
      * objects which have already been created and which are not null.
      */
     public Term createCreatedNotNullQuantifierTerm(Services services,
-                                                   Quantifier q, 
-                                                   LogicVariable[] vars, 
+                                                   Quantifier q,
+                                                   LogicVariable[] vars,
                                                    Term subTerm) {
         return createQuantifierTerm(services, q, vars, subTerm, true);
     }
-    
+
 
     /**
-     * Creates a quantifier term where the quantification only covers 
+     * Creates a quantifier term where the quantification only covers
      * objects which have already been created and which are not null.
      */
     public Term createCreatedNotNullQuantifierTerm(Services services,
@@ -147,21 +148,21 @@ public class CreatedAttributeTermFactory {
 				                  subTerm);
     }
 
-    
+
     /**
-     * Creates a quantifier term where the quantification only covers 
+     * Creates a quantifier term where the quantification only covers
      * objects which have already been created and which are not null.
      */
     public Term createCreatedOrNullQuantifierTerm(Services services,
-                                                  Quantifier q, 
-                                                  LogicVariable[] vars, 
+                                                  Quantifier q,
+                                                  LogicVariable[] vars,
                                                   Term subTerm) {
         return createQuantifierTerm(services, q, vars, subTerm, false);
     }
-    
+
 
     /**
-     * Creates a quantifier term where the quantification only covers 
+     * Creates a quantifier term where the quantification only covers
      * objects which have already been created and which are not null.
      */
     public Term createCreatedOrNullQuantifierTerm(Services services,
@@ -173,16 +174,16 @@ public class CreatedAttributeTermFactory {
                                                   new LogicVariable[] {var},
                                                   subTerm);
     }
-    
-    
+
+
     /**
-     * Creates a formula expressing that the value of the passed program 
+     * Creates a formula expressing that the value of the passed program
      * variable is "java-reachable", i.e.:
      * - for an object type variable: the value is "null" or a created object
-     * - for an integer type variable: the value satisfies the corresponding 
+     * - for an integer type variable: the value satisfies the corresponding
      *   in-bounds-predicate
      */
-    public Term createReachableVariableValueTerm(Services services, 
+    public Term createReachableVariableValueTerm(Services services,
                                                  ProgramVariable var) {
         if(var == null) {
             return TB.tt();
@@ -197,20 +198,20 @@ public class CreatedAttributeTermFactory {
             }
         }
         return TB.tt();
-    }    
-    
-    
+    }
+
+
     /**
-     * Same as createReachableVariableValueTerm(), only for a *list* of 
-     * variables. 
+     * Same as createReachableVariableValueTerm(), only for a *list* of
+     * variables.
      */
-    public Term createReachableVariableValuesTerm(Services services, 
-                                                  ListOfProgramVariable vars) {
+    public Term createReachableVariableValuesTerm(Services services,
+                                                  ImmutableList<ProgramVariable> vars) {
         Term result = TB.tt();
         for(ProgramVariable var : vars) {
             Term varLegalTerm = createReachableVariableValueTerm(services, var);
             result = TB.and(result, varLegalTerm);
         }
         return result;
-    }    
+    }
 }

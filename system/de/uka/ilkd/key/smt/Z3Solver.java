@@ -26,19 +26,15 @@ public final class Z3Solver extends AbstractSMTSolver {
     
     
     @Override
-    protected String[] getExecutionCommand(String filename, String formula) {
-	String[] toReturn = new String[3];
+    protected String getExecutionCommand(String filename, String formula) {
 
-	toReturn[0] = "z3";
-	toReturn[1] = "-smt";
-	toReturn[2] = filename;
+	String toReturn = "z3 -smt " + filename;
 	
 	return toReturn;
     }
     
     
-    @Override
-    protected SMTSolverResult interpretAnswer(String text, String error, int val) {
+    public SMTSolverResult interpretAnswer(String text, String error, int val) {
 	if (val == 0) {
 	    //no error occured
 	    if (text.contains("unsat")) {

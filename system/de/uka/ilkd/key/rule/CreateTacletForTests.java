@@ -16,11 +16,13 @@ import java.io.StringReader;
 import java.io.StringWriter;
 
 import junit.framework.TestCase;
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.parser.KeYLexer;
 import de.uka.ilkd.key.parser.KeYParser;
 import de.uka.ilkd.key.parser.ParserMode;
@@ -142,7 +144,7 @@ public class CreateTacletForTests extends TestCase {
 	rwb1.setFind(t_rn);
 	rwb1.addTacletGoalTemplate(new
 	    RewriteTacletGoalTemplate(Sequent.EMPTY_SEQUENT,
-				    SLListOfTaclet.EMPTY_LIST,
+				    ImmutableSLList.<Taclet>nil(),
 				    t_0));
 
 	
@@ -153,11 +155,11 @@ public class CreateTacletForTests extends TestCase {
 	rwbuilder.setFind(t_rnminus1plus1);
 	rwbuilder.addTacletGoalTemplate(new
 	    RewriteTacletGoalTemplate(Sequent.EMPTY_SEQUENT,
-				    SLListOfTaclet.EMPTY_LIST,
+				    ImmutableSLList.<Taclet>nil(),
 				    t_rn));
 	rwbuilder.addTacletGoalTemplate(new
 	    RewriteTacletGoalTemplate(Sequent.EMPTY_SEQUENT,
-				    SLListOfTaclet.EMPTY_LIST
+				    ImmutableSLList.<Taclet>nil()
 				    .prepend(rwb1.getTaclet()),
 				    t_0plus1));
 	rwbuilder.setName(new Name("pred-succ-elim"));
@@ -170,7 +172,7 @@ public class CreateTacletForTests extends TestCase {
 						new Term[]{t_rn, t_0}));
 	rwbuilder.addTacletGoalTemplate(new
 	    RewriteTacletGoalTemplate(Sequent.EMPTY_SEQUENT,
-				    SLListOfTaclet.EMPTY_LIST,
+				    ImmutableSLList.<Taclet>nil(),
 				    t_rn));
 	rwbuilder.setName(new Name("plus-zero-elim"));
        	predsuccelim=rwbuilder.getRewriteTaclet();
@@ -182,7 +184,7 @@ public class CreateTacletForTests extends TestCase {
 						new Term[]{t_0, t_rn}));
 	rwbuilder.addTacletGoalTemplate(new
 	    RewriteTacletGoalTemplate(Sequent.EMPTY_SEQUENT,
-				    SLListOfTaclet.EMPTY_LIST,
+				    ImmutableSLList.<Taclet>nil(),
 				    t_rn));
 	rwbuilder.setName(new Name("zero-plus-elim"));
        	zeropluselim=rwbuilder.getRewriteTaclet();
@@ -214,7 +216,7 @@ public class CreateTacletForTests extends TestCase {
 	rwbuilder.setFind(t_rnplus1plusrm);
 	rwbuilder.addTacletGoalTemplate(new
 	    RewriteTacletGoalTemplate(Sequent.EMPTY_SEQUENT,
-				    SLListOfTaclet.EMPTY_LIST,
+				    ImmutableSLList.<Taclet>nil(),
 				    t_rnplusrmplus1));
 	rwbuilder.setName(new Name("switch-first-succ"));
        	switchfirstsucc=rwbuilder.getRewriteTaclet();
@@ -231,7 +233,7 @@ public class CreateTacletForTests extends TestCase {
 	rwbuilder.setFind(t_rnplus_rmplus1);
 	rwbuilder.addTacletGoalTemplate(new
 	    RewriteTacletGoalTemplate(Sequent.EMPTY_SEQUENT,
-				    SLListOfTaclet.EMPTY_LIST,
+				    ImmutableSLList.<Taclet>nil(),
 				    t_rnplusrmplus1));
 	rwbuilder.setName(new Name("switch-second-succ"));
        	switchsecondsucc=rwbuilder.getRewriteTaclet();
@@ -246,7 +248,7 @@ public class CreateTacletForTests extends TestCase {
 							   t_rmplus1}));
 	rwbuilder.addTacletGoalTemplate(new
 	    RewriteTacletGoalTemplate(Sequent.EMPTY_SEQUENT,
-				    SLListOfTaclet.EMPTY_LIST,
+				    ImmutableSLList.<Taclet>nil(),
 				    t_rneqrm));
 	rwbuilder.setName(new Name("succ-elim"));
        	succelim=rwbuilder.getRewriteTaclet();
@@ -382,7 +384,7 @@ public class CreateTacletForTests extends TestCase {
    	try {
 	    KeYParser p = stringTacletParser(s);
 	    
-	    return p.taclet(SetAsListOfChoice.EMPTY_SET);
+	    return p.taclet(DefaultImmutableSet.<Choice>nil());
 	} catch (Exception e) {
 	    StringWriter sw = new StringWriter();
 	    PrintWriter pw = new PrintWriter(sw);

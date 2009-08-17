@@ -10,6 +10,7 @@
 
 package de.uka.ilkd.key.logic.op;
 
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
@@ -57,7 +58,7 @@ public class SchemaVariableFactory {
       * @return the SchemaVariable
       */
     public static SchemaVariable createModalOperatorSV(Name name,
-            Sort sort, SetOfModality modalities) {
+            Sort sort, ImmutableSet<Modality> modalities) {
 	return new ModalOperatorSV(name, modalities);
     }
 

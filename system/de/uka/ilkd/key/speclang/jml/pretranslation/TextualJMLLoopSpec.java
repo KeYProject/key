@@ -5,40 +5,32 @@
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
-//This file is part of KeY - Integrated Deductive Software Design
-//Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
-//                      Universitaet Koblenz-Landau, Germany
-//                      Chalmers University of Technology, Sweden
-//
-//The KeY system is protected by the GNU General Public License. 
-//See LICENSE.TXT for details.
-//
-//
+
 
 package de.uka.ilkd.key.speclang.jml.pretranslation;
 
-import de.uka.ilkd.key.collection.ListOfString;
-import de.uka.ilkd.key.speclang.IteratorOfPositionedString;
-import de.uka.ilkd.key.speclang.ListOfPositionedString;
+import java.util.Iterator;
+
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.speclang.PositionedString;
-import de.uka.ilkd.key.speclang.SLListOfPositionedString;
 
 
 public class TextualJMLLoopSpec extends TextualJMLConstruct {
 
-    private ListOfPositionedString invariant          
-            = SLListOfPositionedString.EMPTY_LIST;
-    private ListOfPositionedString skolemDeclarations 
-            = SLListOfPositionedString.EMPTY_LIST;
-    private ListOfPositionedString predicates         
-            = SLListOfPositionedString.EMPTY_LIST;
-    private ListOfPositionedString assignable         
-            = SLListOfPositionedString.EMPTY_LIST;
+    private ImmutableList<PositionedString> invariant          
+            = ImmutableSLList.<PositionedString>nil();
+    private ImmutableList<PositionedString> skolemDeclarations 
+            = ImmutableSLList.<PositionedString>nil();
+    private ImmutableList<PositionedString> predicates         
+            = ImmutableSLList.<PositionedString>nil();
+    private ImmutableList<PositionedString> assignable         
+            = ImmutableSLList.<PositionedString>nil();
     private PositionedString variant                  
             = null;
     
     
-    public TextualJMLLoopSpec(ListOfString mods) {
+    public TextualJMLLoopSpec(ImmutableList<String> mods) {
         super(mods);
     }
 
@@ -69,22 +61,22 @@ public class TextualJMLLoopSpec extends TextualJMLConstruct {
     }
     
     
-    public ListOfPositionedString getInvariant() {
+    public ImmutableList<PositionedString> getInvariant() {
         return invariant;
     }
     
     
-    public ListOfPositionedString getSkolemDeclarations() {
+    public ImmutableList<PositionedString> getSkolemDeclarations() {
         return skolemDeclarations;
     }
     
     
-    public ListOfPositionedString getPredicates() {
+    public ImmutableList<PositionedString> getPredicates() {
         return predicates;
     }
     
     
-    public ListOfPositionedString getAssignable() {
+    public ImmutableList<PositionedString> getAssignable() {
         return assignable;
     }
     
@@ -96,7 +88,7 @@ public class TextualJMLLoopSpec extends TextualJMLConstruct {
     
     public String toString() {
         StringBuffer sb = new StringBuffer();
-        IteratorOfPositionedString it;
+        Iterator<PositionedString> it;
         
         it = invariant.iterator();
         while(it.hasNext()) {

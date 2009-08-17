@@ -11,6 +11,7 @@
 /** common superclass of TacletIfSelectionDialog and TacletMatchCompletionDialog */
 package de.uka.ilkd.key.gui;
 
+
 import java.awt.*;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
@@ -23,8 +24,9 @@ import javax.swing.border.TitledBorder;
 
 import org.apache.log4j.Logger;
 
+import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
-import de.uka.ilkd.key.logic.ListOfNamed;
+import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.ProgramPrinter;
@@ -32,6 +34,7 @@ import de.uka.ilkd.key.proof.ApplyTacletDialogModel;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.pp.StringBackend;
+
 
 public abstract class ApplyTacletDialog extends JDialog {
 
@@ -87,7 +90,7 @@ public abstract class ApplyTacletDialog extends JDialog {
     }
     
     protected JPanel createInfoPanel() {
-	ListOfNamed vars=model[0].programVariables().elements();
+	ImmutableList<Named> vars=model[0].programVariables().elements();
 	JPanel panel = new JPanel(new GridLayout(1,1));
 	panel.setBorder(new TitledBorder("Sequent program variables"));       
 	JScrollPane scroll = new JScrollPane();

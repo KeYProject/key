@@ -10,6 +10,11 @@
 
 package de.uka.ilkd.key.rule;
 
+import java.util.Iterator;
+
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Constraint;
@@ -61,7 +66,7 @@ public class NoPosTacletApp extends TacletApp {
 	return createNoPosTacletApp ( taclet,
 				      instantiations,
 				      Constraint.BOTTOM,
-				      SetAsListOfMetavariable.EMPTY_SET,
+				       DefaultImmutableSet.<Metavariable>nil(),
 				      null,
 				      services);
     }
@@ -70,7 +75,7 @@ public class NoPosTacletApp extends TacletApp {
 	createNoPosTacletApp(Taclet             taclet, 
 			     SVInstantiations   instantiations,
 			     Constraint         matchConstraint,
-			     SetOfMetavariable  matchNewMetavariables,
+			     ImmutableSet<Metavariable>  matchNewMetavariables,
 			     Services           services) {
 	return createNoPosTacletApp ( taclet,
 				      instantiations,
@@ -84,8 +89,8 @@ public class NoPosTacletApp extends TacletApp {
 	createNoPosTacletApp(Taclet                       taclet, 
 			     SVInstantiations             instantiations,
 			     Constraint                   matchConstraint,
-			     SetOfMetavariable            matchNewMetavariables,
-			     ListOfIfFormulaInstantiation ifInstantiations,
+			     ImmutableSet<Metavariable>            matchNewMetavariables,
+			     ImmutableList<IfFormulaInstantiation> ifInstantiations,
 			     Services                     services) {
 	Debug.assertTrue ( ifInstsCorrectSize ( taclet, ifInstantiations ),
 			   "If instantiations list has wrong size" );
@@ -133,12 +138,12 @@ public class NoPosTacletApp extends TacletApp {
 	NoPosTacletApp res = createNoPosTacletApp ( taclet,
 						    instantiations,
 						    constraint,
-						    SetAsListOfMetavariable.EMPTY_SET,
+						    DefaultImmutableSet.<Metavariable>nil(),
 						    null,
 						    services);
 	// Make the given SVs fixed
 	if ( res != null ) {
-	    final IteratorOfSchemaVariable it = instantiations.svIterator ();
+	    final Iterator<SchemaVariable> it = instantiations.svIterator ();
 	    while ( it.hasNext () ) {
 		res.fixedVars = res.fixedVars.add ( it.next () );
             }
@@ -163,8 +168,8 @@ public class NoPosTacletApp extends TacletApp {
     private NoPosTacletApp(Taclet                       taclet,
 			   SVInstantiations             instantiations,
 			   Constraint                   matchConstraint,
-			   SetOfMetavariable            matchNewMetavariables,
-			   ListOfIfFormulaInstantiation ifInstantiations) {
+			   ImmutableSet<Metavariable>            matchNewMetavariables,
+			   ImmutableList<IfFormulaInstantiation> ifInstantiations) {
 	super(taclet,
 	      instantiations,
 	      matchConstraint,
@@ -183,7 +188,7 @@ public class NoPosTacletApp extends TacletApp {
      */
     protected static boolean checkVarCondNotFreeIn(Taclet taclet,
 					 SVInstantiations instantiations) {
-	final IteratorOfSchemaVariable it = instantiations.svIterator();
+	final Iterator<SchemaVariable> it = instantiations.svIterator();
 	while ( it.hasNext () ) {
             final SchemaVariable sv = it.next ();
 
@@ -196,7 +201,7 @@ public class NoPosTacletApp extends TacletApp {
 	    final TacletPrefix prefix = taclet.getPrefix ( sv );
             if ( prefix.context () ) continue;
         
-	    final SetOfQuantifiableVariable boundVarSet =
+	    final ImmutableSet<QuantifiableVariable> boundVarSet =
 	        boundAtOccurrenceSet ( prefix, instantiations );
 	    final Term inst = (Term)instantiations.getInstantiation ( sv );
 	    if ( !inst.freeVars ().subset ( boundVarSet ) ) return false;
@@ -347,7 +352,7 @@ public class NoPosTacletApp extends TacletApp {
      * instantiations given and forget the old ones
      */
     protected TacletApp setAllInstantiations ( MatchConditions              mc,
-					       ListOfIfFormulaInstantiation ifInstantiations,
+					       ImmutableList<IfFormulaInstantiation> ifInstantiations,
 					       Services                     services) {
 	return createNoPosTacletApp( taclet(),
 				     mc.getInstantiations   (),
@@ -382,8 +387,8 @@ public class NoPosTacletApp extends TacletApp {
     }
 
 
-    protected SetOfQuantifiableVariable contextVars(SchemaVariable sv) {
-	return SetAsListOfQuantifiableVariable.EMPTY_SET;
+    protected ImmutableSet<QuantifiableVariable> contextVars(SchemaVariable sv) {
+	return DefaultImmutableSet.<QuantifiableVariable>nil();
     }
 
 

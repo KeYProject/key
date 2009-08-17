@@ -9,9 +9,11 @@
 
 package de.uka.ilkd.key.speclang.translation;
 
+import java.util.Iterator;
+
+import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.abstraction.ListOfKeYJavaType;
 import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Function;
@@ -32,7 +34,7 @@ public final class SLMethodResolver extends SLExpressionResolver {
                                        SLParameters parameters)
                                    throws SLTranslationException {
 
-        if(parameters == null || !parameters.isListOfTerm()) {
+        if(parameters == null || !parameters.isImmutableListOfTerm()) {
             return null;
         }
 
@@ -41,7 +43,7 @@ public final class SLMethodResolver extends SLExpressionResolver {
             return null;
         }
         
-        ListOfKeYJavaType signature = parameters.getSignature(javaInfo.getServices());
+        ImmutableList<KeYJavaType> signature = parameters.getSignature(javaInfo.getServices());
         
         ProgramMethod pm = null;
         Term recTerm = receiver.getTerm(); 
@@ -90,7 +92,7 @@ public final class SLMethodResolver extends SLExpressionResolver {
             i = 1;
         }
         
-        IteratorOfSLExpression it = parameters.getParameters().iterator();
+        Iterator<SLExpression> it = parameters.getParameters().iterator();
         while(it.hasNext()) {
             //Remember: parameters.isLisOfTerm() is true!
             subs[i++] = it.next().getTerm();

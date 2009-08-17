@@ -11,28 +11,19 @@
 package de.uka.ilkd.key.gui;
 
 import java.awt.Component;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.Iterator;
-import java.util.Set;
-import java.util.Vector;
+import java.util.*;
 
 import javax.swing.JLabel;
 import javax.swing.JTree;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeCellRenderer;
-import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.TreePath;
-import javax.swing.tree.TreeSelectionModel;
+import javax.swing.tree.*;
 
+import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
 import de.uka.ilkd.key.java.declaration.InterfaceDeclaration;
 import de.uka.ilkd.key.java.declaration.TypeDeclaration;
 import de.uka.ilkd.key.java.recoderext.ConstructorNormalformBuilder;
-import de.uka.ilkd.key.logic.op.IteratorOfProgramMethod;
-import de.uka.ilkd.key.logic.op.ListOfProgramMethod;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
 
 
@@ -175,10 +166,10 @@ class ClassTree extends JTree {
         
         //add all operations of kjt
         if(addOperations) {
-            ListOfProgramMethod pms 
+            ImmutableList<ProgramMethod> pms 
             	= services.getJavaInfo()
                           .getAllProgramMethodsLocallyDeclared(kjt);
-            IteratorOfProgramMethod it = pms.iterator();
+            Iterator<ProgramMethod> it = pms.iterator();
             while(it.hasNext()) {
                 ProgramMethod pm = it.next();
                 if ((!pm.isImplicit() || pm.getName().equals(INIT_NAME))

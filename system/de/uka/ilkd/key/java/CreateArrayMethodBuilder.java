@@ -8,12 +8,15 @@
 //
 package de.uka.ilkd.key.java;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
-import de.uka.ilkd.key.java.abstraction.*;
+import de.uka.ilkd.key.collection.ImmutableArray;
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.java.abstraction.Field;
+import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.abstraction.PrimitiveType;
+import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.declaration.*;
 import de.uka.ilkd.key.java.declaration.modifier.Private;
 import de.uka.ilkd.key.java.declaration.modifier.Protected;
@@ -88,9 +91,9 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
      * @return the statements which take the next object out of the list of
      *         available objects
      */
-    protected List<Statement> createArray(ListOfField fields) {
+    protected List<Statement> createArray(ImmutableList<Field> fields) {
         LinkedList<Statement> result = new LinkedList<Statement>();
-        ListOfField implicitFields = filterImplicitFields(fields);
+        ImmutableList<Field> implicitFields = filterImplicitFields(fields);
 
         // declared only in Object so we have to look there
         ProgramVariable initialized = findInObjectFields(ImplicitFieldAdder.IMPLICIT_INITIALIZED);
@@ -117,15 +120,15 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
      * descends into field declarations.
      * 
      * @param list
-     *            the ArrayOfMemberDeclaration with the members of a type
+     *            the ArrayOf<MemberDeclaration> with the members of a type
      *            declaration
-     * @return a ListOfField the includes all field specifications found int the
+     * @return a IList<Field> the includes all field specifications found int the
      *         field declaration of the given list
      */
-    protected ListOfField filterField(ArrayOfMemberDeclaration list) {
-        ListOfField result = SLListOfField.EMPTY_LIST;
+    protected ImmutableList<Field> filterField(ImmutableArray<MemberDeclaration> list) {
+        ImmutableList<Field> result = ImmutableSLList.<Field>nil();
         for (int i = list.size() - 1; i >= 0; i--) {
-            MemberDeclaration pe = list.getMemberDeclaration(i);
+            MemberDeclaration pe = list.get(i);
             if (pe instanceof FieldDeclaration) {
                 result = result.append(filterField((FieldDeclaration) pe));
             }
@@ -139,14 +142,14 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
      * @param field
      *            the FieldDeclaration of which the field specifications have to
      *            be extracted
-     * @return a ListOfField the includes all field specifications found int the
+     * @return a IList<Field> the includes all field specifications found int the
      *         field declaration of the given list
      */
-    protected final ListOfField filterField(FieldDeclaration field) {
-        ListOfField result = SLListOfField.EMPTY_LIST;
-        ArrayOfFieldSpecification spec = field.getFieldSpecifications();
+    protected final ImmutableList<Field> filterField(FieldDeclaration field) {
+        ImmutableList<Field> result = ImmutableSLList.<Field>nil();
+        ImmutableArray<FieldSpecification> spec = field.getFieldSpecifications();
         for (int i = spec.size() - 1; i >= 0; i--) {
-            result = result.prepend(spec.getFieldSpecification(i));
+            result = result.prepend(spec.get(i));
         }
         return result;
     }
@@ -155,13 +158,13 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
      * extracts all implicit field specifications out of the given list
      * 
      * @param list
-     *            the ListOfField from which the implicit ones have to be
+     *            the IList<Field> from which the implicit ones have to be
      *            selected
      * @return a list with all implicit fields found in 'list'
      */
-    protected ListOfField filterImplicitFields(ListOfField list) {
-        ListOfField result = SLListOfField.EMPTY_LIST;
-        IteratorOfField it = list.iterator();
+    protected ImmutableList<Field> filterImplicitFields(ImmutableList<Field> list) {
+        ImmutableList<Field> result = ImmutableSLList.<Field>nil();
+        Iterator<Field> it = list.iterator();
         while (it.hasNext()) {
             Field field = it.next();
             if (field instanceof ImplicitFieldSpecification) {
@@ -177,11 +180,11 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
      * @param name
      *            a String with the name of the field to be looked for
      * @param fields
-     *            the ListOfField where we have to look for the field
+     *            the IList<Field> where we have to look for the field
      * @return the program variable of the given name or null if not found
      */
-    protected ProgramVariable find(String name, ListOfField fields) {
-        IteratorOfField it = fields.iterator();
+    protected ProgramVariable find(String name, ImmutableList<Field> fields) {
+        Iterator<Field> it = fields.iterator();
         while (it.hasNext()) {
             Field field = it.next();
             final ProgramVariable fieldVar = (ProgramVariable) field
@@ -196,7 +199,7 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
     protected ProgramVariable findInObjectFields(String name) {
         ProgramVariable var = cache.get(name);
         if (var == null && objectType.getJavaType() != null) {
-            final ListOfField objectFields = filterImplicitFields(filterField(((ClassDeclaration) objectType
+            final ImmutableList<Field> objectFields = filterImplicitFields(filterField(((ClassDeclaration) objectType
                     .getJavaType()).getMembers()));
             var = find(name, objectFields);
             if (var != null) { // may be null if object is currently created
@@ -242,7 +245,7 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
         final LocalVariableDeclaration local = 
             declare(new ProgramElementName("newObject"), arrayRef);
         final ProgramVariable newObject = (ProgramVariable) local
-                .getVariables().getVariableSpecification(0)
+                .getVariables().get(0)
                 .getProgramVariable();
         final LinkedList<Statement> body = new LinkedList<Statement>();
 
@@ -250,13 +253,13 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
         body.addLast(assign(
                         newObject,
                         new MethodReference(
-                                new ArrayOfExpression(),
+                                new ImmutableArray<Expression>(),
                                 new ProgramElementName(
                                         InstanceAllocationMethodBuilder.IMPLICIT_INSTANCE_ALLOCATE),
                                 arrayRef)));
        
         body.add(new MethodReference(
-                        new ArrayOfExpression(paramLength),
+                        new ImmutableArray<Expression>(paramLength),
                         new ProgramElementName(
                                 CreateArrayMethodBuilder.IMPLICIT_ARRAY_CREATION_HELPER),
                         newObject));
@@ -280,14 +283,14 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
      * @param paramLength the ProgramVariable which is the parameter of
      *   the <code>&lt;createArray&gt;</code> method
      * <code>&lt;createArray&gt;</code> 
-     * @param fields the ListOfFields of the current array
+     * @param fields the IList<Fields> of the current array
      * @param createTransient a boolean indicating if a transient array has 
      * to be created (this is special to JavaCard)
      * @param transientType a ProgramVariable identifying the kind of transient
      * @return the StatementBlock which is the method's body <br></br>
      *     <code>
      *  {
-     *    this.<nextToCreate> = this.<nextToCreate>.<next>;
+     *    this.<nextToCreate> = this.<nextToCreate>.;
      *    this.<initialized> = false;
      *    this.<created>     = true;
      *    this.length = paramLength;
@@ -299,7 +302,7 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
      *   </code>
      */
     protected StatementBlock getCreateArrayHelperBody(ProgramVariable length,
-            ProgramVariable paramLength, ListOfField fields,
+            ProgramVariable paramLength, ImmutableList<Field> fields,
             boolean createTransient, ProgramVariable transientType) {
 
         final ThisReference thisRef = new ThisReference();
@@ -308,7 +311,7 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
 
         body.add(assign(attribute(thisRef, length), paramLength));
 
-        body.add(new MethodReference(new ArrayOfExpression(),
+        body.add(new MethodReference(new ImmutableArray<Expression>(),
                 new ProgramElementName(
                         PrepareObjectBuilder.IMPLICIT_OBJECT_PREPARE), null));
 
@@ -333,7 +336,7 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
      */
     public ProgramMethod getCreateArrayHelperMethod(
             TypeReference arrayTypeReference, ProgramVariable length,
-            ListOfField fields) {
+            ImmutableList<Field> fields) {
 
         final Modifier[] modifiers = new Modifier[] { new Private() };
         final KeYJavaType arrayType = arrayTypeReference.getKeYJavaType();
@@ -365,7 +368,7 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
      * addition it sets the arrays length and calls the prepare method
      */
     public ProgramMethod getCreateArrayMethod(TypeReference arrayTypeReference,
-            ProgramMethod prepare, ListOfField fields) {
+            ProgramMethod prepare, ImmutableList<Field> fields) {
 
         final Modifier[] modifiers = new Modifier[] { new Protected(),
                 new Static() };
@@ -409,7 +412,7 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
      * their default value
      */
     public ProgramMethod getPrepareArrayMethod(TypeRef arrayRef,
-            ProgramVariable length, Expression defaultValue, ListOfField fields) {
+            ProgramVariable length, Expression defaultValue, ImmutableList<Field> fields) {
 
         final KeYJavaType arrayType = arrayRef.getKeYJavaType();
 
@@ -420,7 +423,7 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
         declare(new ProgramElementName("i"), zero, integerType);
 
         final ProgramVariable pv = (ProgramVariable) forInit.getVariables()
-                .getVariableSpecification(0).getProgramVariable();
+                .get(0).getProgramVariable();
 
         final For forLoop = new For(new LoopInitializer[] { forInit },
                 new LessThan(pv,

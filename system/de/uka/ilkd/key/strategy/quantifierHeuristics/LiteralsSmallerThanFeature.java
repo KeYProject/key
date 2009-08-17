@@ -11,9 +11,10 @@
 
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
+import java.util.Iterator;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.IntegerLDT;
-import de.uka.ilkd.key.logic.IteratorOfTerm;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Equality;
@@ -128,8 +129,8 @@ public class LiteralsSmallerThanFeature extends SmallerThanFeature {
     }
 
     private int comparePolynomials(Term t1, Term t2) {
-        final IteratorOfTerm it1 = new MonomialIterator ( t1 );
-        final IteratorOfTerm it2 = new MonomialIterator ( t2 );
+        final Iterator<Term> it1 = new MonomialIterator ( t1 );
+        final Iterator<Term> it2 = new MonomialIterator ( t2 );
 
         while ( true ) {
             if ( it1.hasNext () ) {
@@ -164,7 +165,7 @@ public class LiteralsSmallerThanFeature extends SmallerThanFeature {
         return -1;
     }
 
-    private class MonomialIterator implements IteratorOfTerm {
+    private class MonomialIterator implements Iterator<Term> {
         private Term polynomial;
         private Term nextMonomial = null;
 

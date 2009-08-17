@@ -12,7 +12,7 @@
 
 package de.uka.ilkd.key.rule.metaconstruct;
 
-import de.uka.ilkd.key.java.ArrayOfExpression;
+import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
@@ -96,7 +96,7 @@ public class StaticInitialisation extends ProgramMetaConstruct {
 	}
 
  	return new PassiveExpression(new MethodReference
- 	    (new ArrayOfExpression(), 
+ 	    (new ImmutableArray<Expression>(), 
 	     new ProgramElementName
 	     (ClassInitializeMethodBuilder.CLASS_INITIALIZE_IDENTIFIER),
  	     new TypeRef(typeToBeInitialised)));

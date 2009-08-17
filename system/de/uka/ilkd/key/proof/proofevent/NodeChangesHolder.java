@@ -10,19 +10,19 @@
 
 package de.uka.ilkd.key.proof.proofevent;
 
-import de.uka.ilkd.key.logic.ListOfSequentChangeInfo;
-import de.uka.ilkd.key.logic.SLListOfSequentChangeInfo;
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.logic.SequentChangeInfo;
 
 
 public class NodeChangesHolder {
-    public ListOfSequentChangeInfo scis;
+    public ImmutableList<SequentChangeInfo> scis;
 
     NodeChangesHolder () {
-	this ( SLListOfSequentChangeInfo.EMPTY_LIST );
+	this ( ImmutableSLList.<SequentChangeInfo>nil() );
     }
 
-    NodeChangesHolder ( ListOfSequentChangeInfo p_scis ) {
+    NodeChangesHolder ( ImmutableList<SequentChangeInfo> p_scis ) {
 	scis = p_scis;
     }
 

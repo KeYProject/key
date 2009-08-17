@@ -14,15 +14,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.ArrayOfQuantifiableVariable;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.LogicVariable;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.ProgramMethod;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.sort.ArrayOfSort;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 
 
@@ -71,7 +66,7 @@ public class AtPreFactory {
      * Returns the sort of the passed operator.
      */
     private Sort getSort(Operator op) {
-        return op.sort((ArrayOfTerm)null);
+        return op.sort((ImmutableArray<Term>)null);
     }
     
     
@@ -79,11 +74,11 @@ public class AtPreFactory {
      * Returns the argument sorts of the passed operator 
      * (why is that so complicated?).
      */
-    private ArrayOfSort getArgSorts(Operator op, Services services) {
+    private ImmutableArray<Sort> getArgSorts(Operator op, Services services) {
         if(op instanceof Function) {
             return ((Function)op).argSorts();
         } else if(op instanceof ProgramVariable && op.arity() == 0) {
-            return new ArrayOfSort();
+            return new ImmutableArray<Sort>();
         } else {
             assert false : "unexpected operator: " + op.name() 
                             + " (" + op.getClass() + ")";
@@ -95,14 +90,12 @@ public class AtPreFactory {
     /**
      * Helper for buildAtPreDefinition().
      */
-    private Term[] getTerms(ArrayOfQuantifiableVariable vars) {
+    private Term[] getTerms(ImmutableArray<LogicVariable> vars) {
         int numVars = vars.size();
         Term[] result = new Term[numVars];
 
         for(int i = 0; i < numVars; i++) {
-            LogicVariable var
-                    = (LogicVariable)(vars.getQuantifiableVariable(i));
-            result[i] = TB.var(var);
+            result[i] = TB.var(vars.get(i));
         }
 
         return result;
@@ -220,7 +213,7 @@ public class AtPreFactory {
 //            }
 //        }
 //    
-//        Term[] argTerms = getTerms(new ArrayOfQuantifiableVariable(args));
+//        Term[] argTerms = getTerms(new ImmutableArray<QuantifiableVariable>(args));
 //        Term atPreTerm = TB.func(atPreFunc, argTerms);        
 //        Term normalTerm = TermFactory.DEFAULT.createTerm(
 //                                    normalOp,

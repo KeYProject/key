@@ -11,14 +11,10 @@
 package de.uka.ilkd.key.logic;
 
 import java.math.BigInteger;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.WeakHashMap;
+import java.util.*;
 
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.sort.IteratorOfSort;
 import de.uka.ilkd.key.logic.sort.NullSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 
@@ -229,7 +225,7 @@ public class LexPathOrdering implements TermOrdering {
         if ( "int".equals ( sName ) ) res = 10000;
         if ( "boolean".equals ( sName ) ) res = 20000;
 
-        final IteratorOfSort it = s.extendsSorts ().iterator ();
+        final Iterator<Sort> it = s.extendsSorts ().iterator ();
         while ( it.hasNext () )
             res = Math.max ( res, getSortDepth ( it.next () ) );
 

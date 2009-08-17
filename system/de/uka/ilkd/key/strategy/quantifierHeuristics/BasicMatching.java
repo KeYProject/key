@@ -17,6 +17,10 @@
 
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
+import de.uka.ilkd.key.collection.ImmutableMap;
+import de.uka.ilkd.key.collection.DefaultImmutableMap;
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.*;
 
@@ -30,8 +34,8 @@ class BasicMatching {
      * @param targetTerm    a gound term
      * @return all substitution found from this matching
      */
-    static SetOfSubstitution getSubstitutions(Term trigger, Term targetTerm) {
-        SetOfSubstitution allsubs = SetAsListOfSubstitution.EMPTY_SET;
+    static ImmutableSet<Substitution> getSubstitutions(Term trigger, Term targetTerm) {
+        ImmutableSet<Substitution> allsubs = DefaultImmutableSet.<Substitution>nil();
         if ( targetTerm.freeVars ().size () > 0
              || targetTerm.op () instanceof Quantifier ) return allsubs;
         final Substitution subst = match ( trigger, targetTerm );
@@ -53,8 +57,8 @@ class BasicMatching {
    	 * match in the instance. 
    	 */
 	private static Substitution match(Term pattern, Term instance) {
-        final MapFromQuantifiableVariableToTerm map =
-            matchRec ( MapAsListFromQuantifiableVariableToTerm.EMPTY_MAP,
+        final ImmutableMap<QuantifiableVariable,Term> map =
+            matchRec ( DefaultImmutableMap.<QuantifiableVariable,Term>nilMap(),
                        pattern, instance );
         if ( map == null ) return null;
         return new Substitution ( map );
@@ -63,8 +67,8 @@ class BasicMatching {
 	/**
 	 * match the pattern to instance recursively.
 	 */
-	private static MapFromQuantifiableVariableToTerm
-                   matchRec(MapFromQuantifiableVariableToTerm varMap,
+	private static ImmutableMap<QuantifiableVariable,Term>
+                   matchRec(ImmutableMap<QuantifiableVariable,Term> varMap,
                             Term pattern, Term instance) {
 		final Operator patternOp = pattern.op ();
     
@@ -85,8 +89,8 @@ class BasicMatching {
 	 *  @return true if it is a new vaiable or the instance it matched is
      *  the same as that it matched before.
 	 */
-	private static MapFromQuantifiableVariableToTerm
-                   mapVarWithCheck(MapFromQuantifiableVariableToTerm varMap,
+	private static ImmutableMap<QuantifiableVariable,Term>
+                   mapVarWithCheck(ImmutableMap<QuantifiableVariable,Term> varMap,
                                    QuantifiableVariable var, Term instance) {
 		final Term oldTerm = varMap.get ( var );
         if ( oldTerm == null ) return varMap.put ( var, instance );

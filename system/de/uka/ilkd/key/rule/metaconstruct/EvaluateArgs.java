@@ -15,6 +15,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
@@ -84,10 +85,10 @@ public class EvaluateArgs extends ProgramMetaConstruct{
 	    newCalled = mr.getReferencePrefix();
 	}
 	
-	ArrayOfExpression args = mr.getArguments();
+	ImmutableArray<Expression> args = mr.getArguments();
 	Expression[] newArgs = new Expression[args.size()];
 	for (int i=0; i<args.size(); i++) { 
-	    newArgs[i]=evaluate(args.getExpression(i), evalstat, services, ec);
+	    newArgs[i]=evaluate(args.get(i), evalstat, services, ec);
 	}
 
 	Statement[] res = new Statement[1+evalstat.size()];
@@ -98,7 +99,7 @@ public class EvaluateArgs extends ProgramMetaConstruct{
 	}
 
 	final MethodReference resMR = new MethodReference
-	    (new ArrayOfExpression(newArgs), mr.getMethodName(), newCalled);
+	    (new ImmutableArray<Expression>(newArgs), mr.getMethodName(), newCalled);
 
 	if (pe instanceof CopyAssignment) {
 	    res[res.length-1] = new CopyAssignment

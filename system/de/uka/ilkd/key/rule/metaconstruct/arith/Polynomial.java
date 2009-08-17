@@ -12,7 +12,10 @@
 package de.uka.ilkd.key.rule.metaconstruct.arith;
 
 import java.math.BigInteger;
+import java.util.Iterator;
 
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.TypeConverter;
 import de.uka.ilkd.key.ldt.IntegerLDT;
@@ -31,9 +34,9 @@ import de.uka.ilkd.key.util.LRUCache;
 public class Polynomial {
 
     private final BigInteger constantPart;
-    private final ListOfMonomial parts;
+    private final ImmutableList<Monomial> parts;
 
-    private Polynomial(ListOfMonomial parts, BigInteger constantPart) {
+    private Polynomial(ImmutableList<Monomial> parts, BigInteger constantPart) {
         this.parts = parts;
         this.constantPart = constantPart;
     }
@@ -43,9 +46,9 @@ public class Polynomial {
     private static final BigInteger MINUS_ONE = BigInteger.valueOf ( -1 );
 
     public final static Polynomial ZERO =
-        new Polynomial ( SLListOfMonomial.EMPTY_LIST, BigInteger.ZERO );    
+        new Polynomial ( ImmutableSLList.<Monomial>nil(), BigInteger.ZERO );    
     public final static Polynomial ONE =
-        new Polynomial ( SLListOfMonomial.EMPTY_LIST, BigInteger.ONE );    
+        new Polynomial ( ImmutableSLList.<Monomial>nil(), BigInteger.ONE );    
 
     public static Polynomial create(Term polyTerm, Services services) {
         Polynomial res = polynomialCache.get ( polyTerm );
@@ -64,9 +67,9 @@ public class Polynomial {
 
     public Polynomial multiply(BigInteger c) {
         if ( c.signum () == 0 )
-            return new Polynomial ( SLListOfMonomial.EMPTY_LIST, BigInteger.ZERO );
-        ListOfMonomial newParts = SLListOfMonomial.EMPTY_LIST;
-        final IteratorOfMonomial it = parts.iterator ();
+            return new Polynomial ( ImmutableSLList.<Monomial>nil(), BigInteger.ZERO );
+        ImmutableList<Monomial> newParts = ImmutableSLList.<Monomial>nil();
+        final Iterator<Monomial> it = parts.iterator ();
         while ( it.hasNext () )
             newParts = newParts.prepend ( it.next ().multiply ( c ) );
 
@@ -75,10 +78,10 @@ public class Polynomial {
 
     public Polynomial multiply(Monomial m) {
         if ( m.getCoefficient ().signum () == 0 )
-            return new Polynomial ( SLListOfMonomial.EMPTY_LIST, BigInteger.ZERO );
+            return new Polynomial ( ImmutableSLList.<Monomial>nil(), BigInteger.ZERO );
         
-        ListOfMonomial newParts = SLListOfMonomial.EMPTY_LIST;
-        final IteratorOfMonomial it = parts.iterator ();
+        ImmutableList<Monomial> newParts = ImmutableSLList.<Monomial>nil();
+        final Iterator<Monomial> it = parts.iterator ();
         while ( it.hasNext () )
             newParts = newParts.prepend ( it.next ().multiply ( m ) );
 
@@ -97,8 +100,8 @@ public class Polynomial {
     public Polynomial sub(Polynomial p) {
         final BigInteger newConst =
             getConstantTerm ().subtract ( p.getConstantTerm () );
-        ListOfMonomial newParts = parts;
-        final IteratorOfMonomial it = p.getParts ().iterator ();
+        ImmutableList<Monomial> newParts = parts;
+        final Iterator<Monomial> it = p.getParts ().iterator ();
         while ( it.hasNext () )
             newParts = addPart ( newParts, it.next ().multiply ( MINUS_ONE ) );
         return new Polynomial ( newParts, newConst );
@@ -115,8 +118,8 @@ public class Polynomial {
     public Polynomial add(Polynomial p) {
         final BigInteger newConst =
             getConstantTerm ().add ( p.getConstantTerm () );
-        ListOfMonomial newParts = parts;
-        final IteratorOfMonomial it = p.getParts ().iterator ();
+        ImmutableList<Monomial> newParts = parts;
+        final Iterator<Monomial> it = p.getParts ().iterator ();
         while ( it.hasNext () )
             newParts = addPart ( newParts, it.next () );
         return new Polynomial ( newParts, newConst );
@@ -130,7 +133,7 @@ public class Polynomial {
      */
     public BigInteger coeffGcd() {
         BigInteger res = BigInteger.ZERO;
-        final IteratorOfMonomial it = parts.iterator ();
+        final Iterator<Monomial> it = parts.iterator ();
         while ( it.hasNext () )
             res = res.gcd ( it.next ().getCoefficient () );
         return res;
@@ -201,7 +204,7 @@ public class Polynomial {
             services.getTypeConverter().getIntegerLDT().getAdd();
         Term res = null;
         
-        final IteratorOfMonomial it = parts.iterator ();
+        final Iterator<Monomial> it = parts.iterator ();
         if ( it.hasNext () ) {
             res = it.next ().toTerm ( services );
             while ( it.hasNext () )
@@ -223,7 +226,7 @@ public class Polynomial {
         final StringBuffer res = new StringBuffer ();
         res.append ( constantPart );
         
-        final IteratorOfMonomial it = parts.iterator ();
+        final Iterator<Monomial> it = parts.iterator ();
         while ( it.hasNext () )
             res.append ( " + " + it.next () );
 
@@ -232,7 +235,7 @@ public class Polynomial {
     
     private static class Analyser {
         public BigInteger constantPart = BigInteger.ZERO;
-        public ListOfMonomial parts = SLListOfMonomial.EMPTY_LIST;
+        public ImmutableList<Monomial> parts = ImmutableSLList.<Monomial>nil();
         private final Services services;
         private final TypeConverter tc;
         private final Operator numbers, add;
@@ -280,32 +283,32 @@ public class Polynomial {
      *         in <code>b</code>. multiplicity is treated as well here, so
      *         this is really difference of multisets
      */
-    private static ListOfMonomial difference(ListOfMonomial a, ListOfMonomial b) {
-        ListOfMonomial res = a;
-        final IteratorOfMonomial it = b.iterator ();
+    private static ImmutableList<Monomial> difference(ImmutableList<Monomial> a, ImmutableList<Monomial> b) {
+        ImmutableList<Monomial> res = a;
+        final Iterator<Monomial> it = b.iterator ();
         while ( it.hasNext () && !res.isEmpty () )
             res = res.removeFirst ( it.next () );
         return res;
     }
 
-    private static ListOfMonomial addPart(ListOfMonomial oldParts, Monomial m) {
+    private static ImmutableList<Monomial> addPart(ImmutableList<Monomial> oldParts, Monomial m) {
         if ( m.getCoefficient ().signum () == 0 ) return oldParts;
-        final ListOfMonomial newParts = addPartHelp ( oldParts, m );
+        final ImmutableList<Monomial> newParts = addPartHelp ( oldParts, m );
         if ( newParts != null ) return newParts;
         return oldParts.prepend ( m );
     }
 
-    private static ListOfMonomial addPartHelp(ListOfMonomial oldParts, Monomial m) {
+    private static ImmutableList<Monomial> addPartHelp(ImmutableList<Monomial> oldParts, Monomial m) {
         if ( oldParts.isEmpty () ) return null;
         final Monomial head = oldParts.head ();
-        final ListOfMonomial tail = oldParts.tail ();
+        final ImmutableList<Monomial> tail = oldParts.tail ();
         if ( head.variablesEqual ( m ) ) {
             final Monomial newHead =
                 head.addToCoefficient ( m.getCoefficient () );
             if ( newHead.getCoefficient ().signum () == 0 ) return tail;
             return tail.prepend ( newHead );
         }
-        final ListOfMonomial res = addPartHelp ( tail, m );
+        final ImmutableList<Monomial> res = addPartHelp ( tail, m );
         if ( res == null ) return null;
         return res.prepend ( head );
     }    
@@ -314,7 +317,7 @@ public class Polynomial {
         return constantPart;
     }
 
-    public ListOfMonomial getParts() {
+    public ImmutableList<Monomial> getParts() {
         return parts;
     }
 }

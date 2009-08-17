@@ -10,12 +10,12 @@
 
 package de.uka.ilkd.key.rule;
 
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.logic.Constraint;
 import de.uka.ilkd.key.logic.RenameTable;
 import de.uka.ilkd.key.logic.op.Metavariable;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.logic.op.SetAsListOfMetavariable;
-import de.uka.ilkd.key.logic.op.SetOfMetavariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 
@@ -28,19 +28,19 @@ public class MatchConditions {
     public static final MatchConditions EMPTY_MATCHCONDITIONS =
 	new MatchConditions ( SVInstantiations.EMPTY_SVINSTANTIATIONS,
 			      Constraint.BOTTOM,
-			      SetAsListOfMetavariable.EMPTY_SET,
+			      DefaultImmutableSet.<Metavariable>nil(),
                               RenameTable.EMPTY_TABLE);
 
     private SVInstantiations   instantiations   = SVInstantiations.EMPTY_SVINSTANTIATIONS;
     private Constraint         constraint       = Constraint.BOTTOM;
-    private SetOfMetavariable  newMetavariables = SetAsListOfMetavariable.EMPTY_SET;
+    private ImmutableSet<Metavariable>  newMetavariables = DefaultImmutableSet.<Metavariable>nil();
 
     private RenameTable renameTable = RenameTable.EMPTY_TABLE;
 
     
     public MatchConditions ( SVInstantiations   p_instantiations,
 			     Constraint         p_constraint,
-			     SetOfMetavariable  p_newMetavariables,
+			     ImmutableSet<Metavariable>  p_newMetavariables,
                              RenameTable        p_renameTable) {
 	instantiations   = p_instantiations;
 	constraint       = p_constraint;
@@ -72,11 +72,11 @@ public class MatchConditions {
                                          renameTable );
     }
 
-    public SetOfMetavariable getNewMetavariables () {
+    public ImmutableSet<Metavariable> getNewMetavariables () {
 	return newMetavariables;
     }
 
-    public MatchConditions    setNewMetavariables ( SetOfMetavariable  p_newMetavariables ) {
+    public MatchConditions    setNewMetavariables ( ImmutableSet<Metavariable>  p_newMetavariables ) {
 	if ( newMetavariables == p_newMetavariables )
 	    return this;
 	else

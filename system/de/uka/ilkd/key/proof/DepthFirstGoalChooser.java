@@ -10,6 +10,11 @@
 
 package de.uka.ilkd.key.proof;
 
+import java.util.Iterator;
+
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
+
 /**
  * Helper class for managing a list of goals on which rules are applied.
  * The class provides methods for removing a goal, and for updating the internal
@@ -39,14 +44,14 @@ public class DepthFirstGoalChooser extends DefaultGoalChooser {
         return result;
     }
     /*
-    protected static ListOfGoal rotateList ( ListOfGoal p_list ) {
+    protected static IList<Goal> rotateList ( IList<Goal> p_list ) {
         if ( p_list.isEmpty() )
-            return SLListOfGoal.EMPTY_LIST;        
+            return ImmSLList.<Goal>nil();        
         return p_list;
     }
     */
-    protected ListOfGoal insertNewGoals (ListOfGoal newGoals, ListOfGoal prevGoalList) {
-        final IteratorOfGoal it = newGoals.iterator ();
+    protected ImmutableList<Goal> insertNewGoals (ImmutableList<Goal> newGoals, ImmutableList<Goal> prevGoalList) {
+        final Iterator<Goal> it = newGoals.iterator ();
         
         while ( it.hasNext () ) {
             final Goal g = it.next ();
@@ -63,11 +68,11 @@ public class DepthFirstGoalChooser extends DefaultGoalChooser {
         return prevGoalList;
     }
 
-    protected void updateGoalListHelp ( Node node, ListOfGoal newGoals ) {
-        ListOfGoal prevGoalList     = SLListOfGoal.EMPTY_LIST;
+    protected void updateGoalListHelp ( Node node, ImmutableList<Goal> newGoals ) {
+        ImmutableList<Goal> prevGoalList     = ImmutableSLList.<Goal>nil();
         boolean    newGoalsInserted = false;
         
-        nextGoals                   = SLListOfGoal.EMPTY_LIST;
+        nextGoals                   = ImmutableSLList.<Goal>nil();
 
         // Remove "node" and goals contained within "newGoals"
         while ( !selectedList.isEmpty ( )) {

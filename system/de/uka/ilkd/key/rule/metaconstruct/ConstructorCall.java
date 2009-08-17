@@ -17,6 +17,7 @@ package de.uka.ilkd.key.rule.metaconstruct;
 
 import java.util.ArrayList;
 
+import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
@@ -25,7 +26,9 @@ import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.op.ProgramMethod;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.Debug;
@@ -82,7 +85,7 @@ public class ConstructorCall extends ProgramMetaConstruct {
 	    return pe;
 	}
 	
-	final ArrayOfExpression arguments = 
+	final ImmutableArray<Expression> arguments = 
 	    constructorReference.getArguments();
 	
 	final ArrayList<Statement> evaluatedArgs = new ArrayList<Statement>();
@@ -96,7 +99,7 @@ public class ConstructorCall extends ProgramMetaConstruct {
                
 	for (int i = 0, sz = arguments.size(); i<sz; i++) {
 	    argumentVariables[i] = 
-	        EvaluateArgs.evaluate(arguments.getExpression(i), evaluatedArgs, 
+	        EvaluateArgs.evaluate(arguments.get(i), evaluatedArgs, 
 	                services, ec);	  
 	}
         
@@ -118,7 +121,7 @@ public class ConstructorCall extends ProgramMetaConstruct {
 	Debug.assertTrue(method != null, "Call to non-existent constructor.");
     
 	final MethodBodyStatement mbs = new MethodBodyStatement(method, newObject, null, 
-               new ArrayOfExpression(argumentVariables)); 
+               new ImmutableArray<Expression>(argumentVariables)); 
     
 	//   the assignment statements + the method body statement
 	final Statement[] stmnts = new Statement[evaluatedArgs.size() + 1];

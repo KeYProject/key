@@ -10,12 +10,11 @@
 
 package de.uka.ilkd.key.speclang.jml.translation;
 
-import java.util.Map;
-
+import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.speclang.FormulaWithAxioms;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
@@ -41,7 +40,7 @@ class JMLTranslator {
 	    				PositionedString expr,
                                         KeYJavaType specInClass,
                                         ProgramVariable selfVar, 
-                                        ListOfProgramVariable paramVars,
+                                        ImmutableList<ProgramVariable> paramVars,
                                         ProgramVariable resultVar,
                                         ProgramVariable excVar,
                                         Term heapAtPre) 
@@ -82,7 +81,7 @@ class JMLTranslator {
 	    				PositionedString signalsExpr,
                                         KeYJavaType specInClass,
                                         ProgramVariable selfVar, 
-                                        ListOfProgramVariable paramVars, 
+                                        ImmutableList<ProgramVariable> paramVars, 
                                         ProgramVariable resultVar, 
                                         ProgramVariable excVar,
                                         Term heapAtPre)
@@ -149,7 +148,7 @@ class JMLTranslator {
                                     	PositionedString assignableExpr,
                                         KeYJavaType specInClass,
                                         ProgramVariable selfVar, 
-                                        ListOfProgramVariable paramVars)
+                                        ImmutableList<ProgramVariable> paramVars)
             throws SLTranslationException {        
             
         KeYJMLParser parser = new KeYJMLParser(assignableExpr,
@@ -172,7 +171,7 @@ class JMLTranslator {
     }
     
     
-    public ListOfProgramVariable translateVariableDeclaration(PositionedString variableDecl) 
+    public ImmutableList<ProgramVariable> translateVariableDeclaration(PositionedString variableDecl) 
             throws SLTranslationException {
         KeYJMLParser parser = new KeYJMLParser(variableDecl,
                                                services,
@@ -183,7 +182,7 @@ class JMLTranslator {
                                                null,
                                                null);
         
-        ListOfProgramVariable result = parser.parseVariableDeclaration();
+        ImmutableList<ProgramVariable> result = parser.parseVariableDeclaration();
         
 //      System.out.println(result);
 //      System.out.println();
