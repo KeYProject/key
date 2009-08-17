@@ -108,8 +108,8 @@ public final class OneStepSimplifier implements BuiltInRule {
 	    ImmutableList<String> done = ImmutableSLList.<String>nil();
 	    for(String ruleSet : ruleSets) {
 		ImmutableSet<Taclet> taclets = tacletsForRuleSet(goal, 
-						        ruleSet, 
-						        done);
+						        	 ruleSet, 
+						        	 done);
 		indices[i++] = new TacletIndex(taclets);
 		done = done.prepend(ruleSet);
 	    }
@@ -148,7 +148,7 @@ public final class OneStepSimplifier implements BuiltInRule {
 		app = app.tryToInstantiate(services);
 	    }
 	    if(app != null) {
-		RewriteTaclet taclet = (RewriteTaclet) app.rule();
+		RewriteTaclet taclet = (RewriteTaclet) app.rule();		
 		ConstrainedFormula result = taclet.getRewriteResult(services, 
 								    app);
 		return result;
@@ -175,7 +175,9 @@ public final class OneStepSimplifier implements BuiltInRule {
 	    PosInOccurrence pos = new PosInOccurrence(cf,
 	    		              		      PosInTerm.TOP_LEVEL,
 	    		              		      true);
+//	    System.out.println("Entering...");
 	    ConstrainedFormula result = simplifyPosOrSub(services, pos, i);
+//	    System.out.println("Done.");
 	    if(result != null) {
 		return result;
 	    }
@@ -254,7 +256,9 @@ public final class OneStepSimplifier implements BuiltInRule {
 
     
     @Override
-    public ImmutableList<Goal> apply(Goal goal, Services services, RuleApp ruleApp) {
+    public ImmutableList<Goal> apply(Goal goal, 
+	    			     Services services, 
+	    			     RuleApp ruleApp) {
 	final ImmutableList<Goal> result = goal.split(1);
 	final Goal resultGoal = result.head();
 	final PosInOccurrence pos = ruleApp.posInOccurrence();

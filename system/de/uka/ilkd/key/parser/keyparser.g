@@ -3396,7 +3396,8 @@ varexp[TacletBuilder b]
 }
 :
   ( varcond_applyUpdateOnRigid[b]
-    | varcond_dropEffectlessElementaries[b]  
+    | varcond_dropEffectlessElementaries[b]
+    | varcond_dropEffectlessStores[b]  
     | varcond_enum_const[b] 
     | varcond_free[b]  
     | varcond_hassort[b]
@@ -3453,6 +3454,24 @@ varcond_dropEffectlessElementaries[TacletBuilder b]
    }
 ;
 
+varcond_dropEffectlessStores[TacletBuilder b]
+{
+  ParsableVariable h = null;
+  ParsableVariable o = null;
+  ParsableVariable f = null;
+  ParsableVariable x = null;
+  ParsableVariable result = null;
+}
+:
+   DROP_EFFECTLESS_STORES LPAREN h=varId COMMA o=varId COMMA f=varId COMMA x=varId COMMA result=varId RPAREN 
+   {
+      b.addVariableCondition(new DropEffectlessStoresCondition((TermSV)h,
+      							       (TermSV)o,
+      							       (TermSV)f,
+      							       (TermSV)x, 
+                                                               (TermSV)result));
+   }
+;
 
 type_resolver returns [TypeResolver tr = null] 
 {

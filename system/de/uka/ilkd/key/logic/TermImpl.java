@@ -108,7 +108,7 @@ final class TermImpl implements Term {
     @Override
     public Term subAt(PosInTerm pos) {
         Term sub = this;
-        for (final IntIterator it = pos.iterator(); it.hasNext(); ) {	
+        for(final IntIterator it = pos.iterator(); it.hasNext(); ) {	
             sub = sub.sub(it.next());
         }
         return sub;
@@ -200,7 +200,7 @@ final class TermImpl implements Term {
     
 
     @Override
-    public ImmutableSet<Metavariable> metaVars () {
+    public ImmutableSet<Metavariable> metaVars() {
 	return DefaultImmutableSet.<Metavariable>nil();
     }
     

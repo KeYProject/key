@@ -64,6 +64,11 @@ public final class DropEffectlessElementariesCondition
 		newSub1 = newSub1 == null ? sub1 : newSub1;
 		return TB.parallel(newSub0, newSub1);
 	    }
+	} else if(update.op() == UpdateApplication.UPDATE_APPLICATION) {
+	    Term sub0 = update.sub(0);
+	    Term sub1 = update.sub(1);
+	    Term newSub1 = dropEffectlessElementariesHelper(sub1, relevantVars);
+	    return newSub1 == null ? null : TB.apply(sub0, newSub1);
 	} else {
 	    return null;
 	}
@@ -116,6 +121,7 @@ public final class DropEffectlessElementariesCondition
     
     @Override
     public String toString () {
-        return "\\dropEffectlessElementaries(" + u + ", " + x + ", " + result + ")";
+        return "\\dropEffectlessElementaries(" 
+               + u + ", " + x + ", " + result + ")";
     }
 }

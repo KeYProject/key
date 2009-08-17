@@ -61,7 +61,8 @@ tokens {
 	APPLY_UPDATE_ON_RIGID = "\\applyUpdateOnRigid";
         DEPENDINGON = "\\dependingOn";
 	DISJOINTMODULONULL  = "\\disjointModuloNull";
-	DROP_EFFECTLESS_ELEMENTARIES = "\\dropEffectlessElementaries";	
+	DROP_EFFECTLESS_ELEMENTARIES = "\\dropEffectlessElementaries";
+	DROP_EFFECTLESS_STORES = "\\dropEffectlessStores";	
 	ENUM_CONST = "\\enumConstant";	
         FREELABELIN = "\\freeLabelIn";
 	HASSORT = "\\hasSort";        

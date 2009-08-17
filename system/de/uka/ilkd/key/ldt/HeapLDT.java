@@ -128,7 +128,7 @@ public final class HeapLDT extends LDT {
 	String name = fieldSymbol.name().toString();
 	int index = name.indexOf("::");
 	if(index == -1) {
-	    return name;
+	    return null;
 	} else {
 	    return name.substring(0, index);
 	}

@@ -25,4 +25,19 @@ public class Pair<T1, T2> {
     public String toString() { 
 	return "(" + first + ", " + second + ")"; 
     }
+    
+    
+    public boolean equals(Object o) {
+	if(!(o instanceof Pair)) {
+	    return false;
+	} 
+	Pair p = (Pair) o;
+	return (first == null ? p.first == null : first.equals(p.first))
+	       && (second == null ? p.second == null : second.equals(p.second));
+    }
+    
+    
+    public int hashCode() {
+	return first.hashCode() + second.hashCode();
+    }
 }

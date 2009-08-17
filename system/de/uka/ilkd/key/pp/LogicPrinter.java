@@ -897,12 +897,22 @@ public final class LogicPrinter {
                 && fieldTerm.op() instanceof Function
                 && ((Function)fieldTerm.op()).isUnique()) {
         	assert fieldTerm.arity() == 0;
+        	String className 
+        		= heapLDT.getClassName((Function)fieldTerm.op());
         	
-        	markStartSub();
-        	//"null" not printed
-        	markEndSub();
         	
-        	layouter.print(heapLDT.getClassName((Function)fieldTerm.op()) + ".");
+        	if(className == null) {
+        	    markStartSub();
+        	    printTerm(objectTerm);
+        	    markEndSub();
+        	} else {
+        	    markStartSub();
+        	    //"null" not printed
+        	    markEndSub();
+        	    layouter.print(className);
+        	}
+        	
+        	layouter.print(".");
         	
                 markStartSub();
                 startTerm(0);                    
