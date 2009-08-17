@@ -7,27 +7,25 @@
 // See LICENSE.TXT for details.
 package de.uka.ilkd.key.speclang.translation;
 
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Services;
-
-import de.uka.ilkd.key.java.abstraction.ListOfKeYJavaType;
-import de.uka.ilkd.key.java.abstraction.SLListOfKeYJavaType;
+import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 
 public final class SLParameters {
     
-    private final ListOfSLExpression parameters;
+    private final ImmutableList<SLExpression> parameters;
 
-    
-    public SLParameters(ListOfSLExpression parameters) {
+    public SLParameters(ImmutableList<SLExpression> parameters) {
         this.parameters = parameters;
     }
     
-    
-    public ListOfSLExpression getParameters() {
+    public ImmutableList<SLExpression> getParameters() {
         return parameters;
     }
     
     
-    public boolean isListOfTerm() {
+    public boolean isImmutableListOfTerm() {
 	for(SLExpression expr : parameters) {
             if(!expr.isTerm()) {
                 return false;
@@ -37,8 +35,8 @@ public final class SLParameters {
     }
     
     
-    public ListOfKeYJavaType getSignature(Services services) {           
-        ListOfKeYJavaType result = SLListOfKeYJavaType.EMPTY_LIST;
+    public ImmutableList<KeYJavaType> getSignature(Services services) {           
+        ImmutableList<KeYJavaType> result = ImmutableSLList.<KeYJavaType>nil();
         for(SLExpression expr : parameters) {
             result = result.append(expr.getType());
         }        

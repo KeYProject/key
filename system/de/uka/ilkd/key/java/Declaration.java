@@ -10,7 +10,9 @@
 
 package de.uka.ilkd.key.java;
 
-import de.uka.ilkd.key.java.declaration.ArrayOfModifier;
+import de.uka.ilkd.key.collection.ImmutableArray;
+import de.uka.ilkd.key.java.declaration.Modifier;
+
 
 /**
  *  Declaration.
@@ -22,5 +24,5 @@ public interface Declaration extends NonTerminalProgramElement {
      * Get the modifiers.
      * @return the (original) list of modifiers wrapped .
      */
-    ArrayOfModifier getModifiers();
+    ImmutableArray<Modifier> getModifiers();
 }

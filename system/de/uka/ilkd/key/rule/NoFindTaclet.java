@@ -10,12 +10,20 @@
 
 package de.uka.ilkd.key.rule;
 
+import java.util.Iterator;
+
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableMap;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.Choice;
+import de.uka.ilkd.key.logic.Constraint;
+import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.IteratorOfGoal;
-import de.uka.ilkd.key.proof.ListOfGoal;
 
 /** 
  * Used to implement a Taclet that has no <I>find</I> part. This kind of taclet
@@ -30,21 +38,21 @@ public class NoFindTaclet extends Taclet {
      * @param name the name of the Taclet 
      * @param applPart contains the application part of an Taclet that is
      * the if-sequent, the variable conditions
-     * @param goalTemplates the ListOfTacletGoalTemplate containg all goal descriptions of the taclet to be created
+     * @param goalTemplates the IList<TacletGoalTemplate> containg all goal descriptions of the taclet to be created
      * @param ruleSets a list of rule sets for the Taclet
      * @param constraint the Constraint under which the Taclet is valid
      * @param attrs attributes for the Taclet; these are boolean values
-     * @param prefixMap a MapFromSchemaVariableToTacletPrefix that contains the
+     * @param prefixMap a ImmMap<SchemaVariable,TacletPrefix> that contains the
      * prefix for each SchemaVariable in the Taclet
-     * @param choices the SetOfChoices to which this taclet belongs to
+     * @param choices the SetOf<Choices> to which this taclet belongs to
      */
     public NoFindTaclet(Name name, TacletApplPart applPart,  
-		      ListOfTacletGoalTemplate goalTemplates, 
-		      ListOfRuleSet ruleSets, 
+		      ImmutableList<TacletGoalTemplate> goalTemplates, 
+		      ImmutableList<RuleSet> ruleSets, 
 		      Constraint constraint,
 		      TacletAttributes attrs,
-		      MapFromSchemaVariableToTacletPrefix prefixMap,
-		      SetOfChoice choices){
+		      ImmutableMap<SchemaVariable,TacletPrefix> prefixMap,
+		      ImmutableSet<Choice> choices){
 	super(name, applPart, goalTemplates, ruleSets, constraint, attrs, 
 	      prefixMap, choices);
 	cacheMatchInfo();
@@ -72,7 +80,7 @@ public class NoFindTaclet extends Taclet {
      * @param services the Services encapsulating all java information
      * @param ruleApp the taclet application that is executed
      */
-    public ListOfGoal apply(Goal     goal,
+    public ImmutableList<Goal> apply(Goal     goal,
 			    Services services, 
 			    RuleApp  ruleApp) {
 
@@ -85,14 +93,14 @@ public class NoFindTaclet extends Taclet {
 	// Restrict introduced metavariables to the subtree
 	setRestrictedMetavariables ( goal, mc );
 
-	ListOfGoal                   newGoals         =
+	ImmutableList<Goal>                   newGoals         =
 	    checkIfGoals ( goal,
 			   tacletApp.ifFormulaInstantiations (),
 			   mc,
 			   numberOfNewGoals );
 	
-	IteratorOfTacletGoalTemplate it               = goalTemplates().iterator();
-	IteratorOfGoal               goalIt           = newGoals.iterator();
+	Iterator<TacletGoalTemplate> it               = goalTemplates().iterator();
+	Iterator<Goal>               goalIt           = newGoals.iterator();
 
 	while (it.hasNext()) {
 	    TacletGoalTemplate gt          = it    .next();
@@ -130,7 +138,7 @@ public class NoFindTaclet extends Taclet {
      * @return Set of schemavariables of the if and the (optional)
      * find part
      */
-    public SetOfSchemaVariable getIfFindVariables () {
+    public ImmutableSet<SchemaVariable> getIfFindVariables () {
 	return getIfVariables ();
     }
 
@@ -139,8 +147,8 @@ public class NoFindTaclet extends Taclet {
      * variables cann occur bound than in the goal templates
      * @return empty set
      */
-    protected SetOfQuantifiableVariable getBoundVariablesHelper() {        
-        return SetAsListOfQuantifiableVariable.EMPTY_SET;
+    protected ImmutableSet<QuantifiableVariable> getBoundVariablesHelper() {        
+        return DefaultImmutableSet.<QuantifiableVariable>nil();
     }
 
 }

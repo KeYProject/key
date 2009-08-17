@@ -11,10 +11,10 @@ package de.uka.ilkd.key.util.install;
 
 
 import java.io.*;
+import java.util.Enumeration;
 import java.util.LinkedList;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
-import java.util.Enumeration;
 
 /** 
  * This class is an abstract installer for the binary version of KeY. The

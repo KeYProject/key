@@ -8,10 +8,12 @@
 package de.uka.ilkd.key.java;
 
 
-import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.statement.*;
-import de.uka.ilkd.key.util.ExtList;
+import de.uka.ilkd.key.logic.JavaBlock;
+import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.rule.TacletForTests;
+import de.uka.ilkd.key.util.ExtList;
 
 /** this class is an example how to work with a java AST. Therefore we
 * demonstrate the transformation of 'while (expr) { prg; }' to ' if
@@ -56,12 +58,12 @@ public class RecoderExample {
     public StatementBlock transform(StatementBlock prg) {
 	ExtList newBody=new ExtList();
 	
-	ArrayOfStatement body=prg.getBody();
+	ImmutableArray<? extends Statement> body=prg.getBody();
 	for (int i=0;i<body.size();i++) {
-	    if (body.getStatement(i) instanceof While) {
-		newBody.addAll(transform((While)body.getStatement(i)));
+	    if (body.get(i) instanceof While) {
+		newBody.addAll(transform((While)body.get(i)));
 	    } else {
-		newBody.add(body.getStatement(i));	    
+		newBody.add(body.get(i));	    
 	    }
 	}
 	return new StatementBlock(newBody);	

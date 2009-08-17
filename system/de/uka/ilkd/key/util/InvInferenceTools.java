@@ -10,16 +10,19 @@
 
 package de.uka.ilkd.key.util;
 
-import de.uka.ilkd.key.collection.ListOfString;
-import de.uka.ilkd.key.collection.SLListOfString;
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.expression.Assignment;
-import de.uka.ilkd.key.java.expression.operator.CopyAssignment;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.reference.ReferencePrefix;
 import de.uka.ilkd.key.java.reference.TypeReference;
-import de.uka.ilkd.key.java.statement.*;
+import de.uka.ilkd.key.java.statement.LabeledStatement;
+import de.uka.ilkd.key.java.statement.LoopStatement;
+import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.visitor.CreatingASTVisitor;
 import de.uka.ilkd.key.java.visitor.JavaASTCollector;
 import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
@@ -66,16 +69,16 @@ public class InvInferenceTools {
      */
     public Term close(Term formula) {
 	assert formula.sort() == Sort.FORMULA;
-	return TB.all(formula.freeVars().toArray(), formula);
+	return TB.all(formula.freeVars().toArray(new QuantifiableVariable[0]), formula);
     }
     
     
     /**
      * Returns the set of elementary conjuncts of the passed formula.
      */
-    public SetOfTerm toSet(Term formula) {
-	SetOfTerm result = SetAsListOfTerm.EMPTY_SET;
-        ListOfTerm workingList = SLListOfTerm.EMPTY_LIST.prepend(formula);
+    public ImmutableSet<Term> toSet(Term formula) {
+	ImmutableSet<Term> result = DefaultImmutableSet.<Term>nil();
+        ImmutableList<Term> workingList = ImmutableSLList.<Term>nil().prepend(formula);
         while(!workingList.isEmpty()) {
             Term f = workingList.head();
             workingList = workingList.tail();
@@ -92,7 +95,7 @@ public class InvInferenceTools {
     /**
      * Conjoins the formulas in the passed set.
      */
-    public Term toFormula(SetOfTerm set) {
+    public Term toFormula(ImmutableSet<Term> set) {
 	Term result = TB.tt();
 	for(Term term : set) {
 	    result = TB.and(result, term);
@@ -292,8 +295,8 @@ public class InvInferenceTools {
      * execution state given by the passed node.
      */
     public Node getEntryNodeForInnermostLoop(Node node) {
-        ListOfLoopStatement leftLoops 
-            = SLListOfLoopStatement.EMPTY_LIST;
+        ImmutableList<LoopStatement> leftLoops 
+            = ImmutableSLList.<LoopStatement>nil();
         for(Node n = node.parent(); n != null; n = n.parent()) {
             RuleApp app = n.getAppliedRuleApp();
             Rule rule = app.rule();
@@ -360,8 +363,7 @@ public class InvInferenceTools {
     /**
      * Tells whether the passed sets of location symbols are disjoint.
      */
-    public boolean areDisjoint(SetOfUpdateableOperator set1, 
-	    		       SetOfUpdateableOperator set2) {
+    public boolean areDisjoint(ImmutableSet<UpdateableOperator> set1, ImmutableSet<UpdateableOperator> set2) {
 	for(UpdateableOperator loc : set1) {
             if(set2.contains(loc)) {
                 return false;
@@ -374,8 +376,8 @@ public class InvInferenceTools {
     /**
      * Collects all location symbols occurring in the passed term.
      */
-    public SetOfUpdateableOperator getOccurringLocationSymbols(Term t) {
-        SetOfUpdateableOperator result = SetAsListOfUpdateableOperator.EMPTY_SET;
+    public ImmutableSet<UpdateableOperator> getOccurringLocationSymbols(Term t) {
+        ImmutableSet<UpdateableOperator> result = DefaultImmutableSet.<UpdateableOperator>nil();
         if(t.op() instanceof UpdateableOperator) {
             result = result.add((UpdateableOperator)t.op());
         }
@@ -400,7 +402,7 @@ public class InvInferenceTools {
      */
     public String getNewName(String baseName, 
                              Services services, 
-                             ListOfString locallyUsedNames) {
+                             ImmutableList<String> locallyUsedNames) {
         NamespaceSet namespaces = services.getNamespaces();
             
         int i = 0;
@@ -418,11 +420,11 @@ public class InvInferenceTools {
      * base name.
      */
     public String getNewName(String baseName, Services services) {
-        return getNewName(baseName, services, SLListOfString.EMPTY_LIST);
+        return getNewName(baseName, services, ImmutableSLList.<String>nil());
     }
     
     
-    public SetOfProgramVariable getWrittenPVs(ProgramElement pe, 
+    public ImmutableSet<ProgramVariable> getWrittenPVs(ProgramElement pe, 
 	    			              Services services) {
 	WrittenPVCollector wpvc = new WrittenPVCollector(pe, services);
 	wpvc.start();
@@ -436,11 +438,11 @@ public class InvInferenceTools {
     //-------------------------------------------------------------------------    
        
     private static final class WrittenPVCollector extends JavaASTVisitor {
-	private SetOfProgramVariable result 
-		= SetAsListOfProgramVariable.EMPTY_SET;
+	private ImmutableSet<ProgramVariable> result 
+		= DefaultImmutableSet.<ProgramVariable>nil();
 
-	private SetOfProgramVariable declaredPVs 
-		= SetAsListOfProgramVariable.EMPTY_SET;
+	private ImmutableSet<ProgramVariable> declaredPVs 
+		= DefaultImmutableSet.<ProgramVariable>nil();
 
 	public WrittenPVCollector(ProgramElement root, Services services) {
 	    super(root, services);
@@ -466,7 +468,7 @@ public class InvInferenceTools {
 	    }
 	}
 
-	public SetOfProgramVariable result() {
+	public ImmutableSet<ProgramVariable> result() {
 	    return result;
 	}
     }

@@ -10,9 +10,10 @@
 
 package de.uka.ilkd.key.proof;
 
+import java.util.Iterator;
 import java.util.Map;
 
-import de.uka.ilkd.key.java.ArrayOfProgramElement;
+import de.uka.ilkd.key.collection.*;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.Statement;
@@ -20,7 +21,7 @@ import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.visitor.ProgVarReplaceVisitor;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.rule.*;
+import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.inst.*;
 
 
@@ -67,13 +68,13 @@ public final class ProgVarReplacer {
                               int idx) {
         assert next.modifiedFormulas().isEmpty();
 
-        IteratorOfConstrainedFormula remIt = next.removedFormulas().iterator();
+        Iterator<ConstrainedFormula> remIt = next.removedFormulas().iterator();
         assert remIt.hasNext();
         ConstrainedFormula remCf = remIt.next();
         assert !remIt.hasNext();
         base.removedFormula(idx, remCf);
 
-        IteratorOfConstrainedFormula addIt = next.addedFormulas().iterator();
+        Iterator<ConstrainedFormula> addIt = next.addedFormulas().iterator();
         assert addIt.hasNext();
         ConstrainedFormula addCf = addIt.next();
         assert !addIt.hasNext();
@@ -89,7 +90,7 @@ public final class ProgVarReplacer {
      */
     public void replace(Goal goal) {
 	//globals
-    	SetOfProgramVariable set = replace(goal.getGlobalProgVars());
+    	ImmutableSet<ProgramVariable> set = replace(goal.getGlobalProgVars());
 	goal.setGlobalProgVars(set);
 
 	//taclet apps
@@ -104,8 +105,8 @@ public final class ProgVarReplacer {
     /**
      * replaces in a set
      */
-    public SetOfProgramVariable replace(SetOfProgramVariable vars) {
-    	SetOfProgramVariable result = vars;
+    public ImmutableSet<ProgramVariable> replace(ImmutableSet<ProgramVariable> vars) {
+    	ImmutableSet<ProgramVariable> result = vars;
 
     	for (final ProgramVariable var : vars) {
 	    ProgramVariable newVar = (ProgramVariable)map.get(var);
@@ -123,13 +124,13 @@ public final class ProgVarReplacer {
      * replaces in the partially instantiated apps of a taclet index
      */
     public void replace(TacletIndex tacletIndex) {
-	ListOfNoPosTacletApp noPosTacletApps
+	ImmutableList<NoPosTacletApp> noPosTacletApps
 		= tacletIndex.getPartialInstantiatedApps();
-	SetOfNoPosTacletApp appsToBeRemoved, appsToBeAdded;
-	appsToBeRemoved = SetAsListOfNoPosTacletApp.EMPTY_SET;
-	appsToBeAdded   = SetAsListOfNoPosTacletApp.EMPTY_SET;
+	ImmutableSet<NoPosTacletApp> appsToBeRemoved, appsToBeAdded;
+	appsToBeRemoved = DefaultImmutableSet.<NoPosTacletApp>nil();
+	appsToBeAdded   = DefaultImmutableSet.<NoPosTacletApp>nil();
 
-	IteratorOfNoPosTacletApp it = noPosTacletApps.iterator();
+	Iterator<NoPosTacletApp> it = noPosTacletApps.iterator();
 	while(it.hasNext()) {
 	    NoPosTacletApp noPosTacletApp = it.next();
 	    SVInstantiations insts = noPosTacletApp.instantiations();
@@ -161,10 +162,10 @@ public final class ProgVarReplacer {
     public SVInstantiations replace(SVInstantiations insts) {
    	SVInstantiations result = insts;
 
-    	IteratorOfEntryOfSchemaVariableAndInstantiationEntry it;
+    	Iterator<ImmutableMapEntry<SchemaVariable,InstantiationEntry>> it;
 	it = insts.pairIterator();
 	while(it.hasNext()) {
-	    EntryOfSchemaVariableAndInstantiationEntry e = it.next();
+	    ImmutableMapEntry<SchemaVariable,InstantiationEntry> e = it.next();
 	    SchemaVariable sv     = e.key();
 	    InstantiationEntry ie = e.value();
 	    Object inst = ie.getInstantiation();
@@ -189,13 +190,13 @@ public final class ProgVarReplacer {
 		    result = result.replace(sv, newPe, services);
 		}
 	    } else if(ie instanceof ProgramListInstantiation) {
-		ArrayOfProgramElement a = (ArrayOfProgramElement) inst;
+		ImmutableArray<ProgramElement> a = (ImmutableArray<ProgramElement>) inst;
 		int size = a.size();
                 ProgramElement[] array = new ProgramElement[size];
 
 		boolean changedSomething = false;
 		for(int i = 0; i < size; i++) {
-                    ProgramElement pe = a.getProgramElement(i);
+                    ProgramElement pe = a.get(i);
 		    array[i] = replace(pe);
 		    if(array[i] != pe) {
 		    	changedSomething = true;
@@ -203,7 +204,7 @@ public final class ProgVarReplacer {
 		}
 
 		if(changedSomething) {
-		    ArrayOfProgramElement newA = new ArrayOfProgramElement(array);
+		    ImmutableArray<ProgramElement> newA = new ImmutableArray<ProgramElement>(array);
 		    result = result.replace(sv, newA, services);
 		}
 	    } else if(ie instanceof TermInstantiation) {
@@ -248,7 +249,7 @@ public final class ProgVarReplacer {
         result.setFormulaList(s.toList());
         result.setSemisequent(s);
 
-        final IteratorOfConstrainedFormula it = s.iterator();
+        final Iterator<ConstrainedFormula> it = s.iterator();
         
         for (int formulaNumber = 0; it.hasNext(); formulaNumber++) {            
             final ConstrainedFormula oldcf = it.next();

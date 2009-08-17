@@ -10,9 +10,12 @@
 
 package de.uka.ilkd.key.speclang;
 
+import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.op.Modality;
+import de.uka.ilkd.key.logic.op.ProgramMethod;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
 
 
 /**
@@ -46,14 +49,14 @@ public interface OperationContract {
      * Returns the precondition of the contract.
      */
     public FormulaWithAxioms getPre(ProgramVariable selfVar, 
-                                    ListOfProgramVariable paramVars,
+	    			    ImmutableList<ProgramVariable> paramVars,
                                     Services services);
 
     /**
      * Returns the postcondition of the contract.
      */
     public FormulaWithAxioms getPost(ProgramVariable selfVar, 
-                                     ListOfProgramVariable paramVars, 
+                                     ImmutableList<ProgramVariable> paramVars, 
                                      ProgramVariable resultVar, 
                                      ProgramVariable excVar,
                                      Term heapAtPre,
@@ -63,7 +66,7 @@ public interface OperationContract {
      * Returns the modifies clause of the contract.
      */
     public Term getModifies(ProgramVariable selfVar, 
-                            ListOfProgramVariable paramVars,
+	    		    ImmutableList<ProgramVariable> paramVars,
                             Services services);
     
 

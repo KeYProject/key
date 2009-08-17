@@ -9,12 +9,12 @@
 
 package de.uka.ilkd.key.proof.mgt;
 
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.rule.SetOfRuleApp;
 
 public interface ProofCorrectnessMgt {
 
@@ -28,7 +28,7 @@ public interface ProofCorrectnessMgt {
 
     void ruleUnApplied(RuleApp r);
     
-    SetOfRuleApp getNonAxiomApps();
+    ImmutableSet<RuleApp> getNonAxiomApps();
 
     void setMediator ( KeYMediator p_mediator );
 

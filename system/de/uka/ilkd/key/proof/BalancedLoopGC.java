@@ -7,8 +7,10 @@
 // See LICENSE.TXT for details.
 package de.uka.ilkd.key.proof;
 
-import de.uka.ilkd.key.rule.IteratorOfRuleSet;
+import java.util.Iterator;
+
 import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.rule.Taclet;
 
 /**
@@ -64,7 +66,7 @@ public class BalancedLoopGC extends DefaultGoalChooser {
     }
 
     protected boolean ruleSetCriterion(Taclet t, String ruleSetName){
-        IteratorOfRuleSet it = t.getRuleSets().iterator();
+        Iterator<RuleSet> it = t.getRuleSets().iterator();
         while(it.hasNext()){
             if(it.next().name().toString().equals(ruleSetName)){
                 return true;

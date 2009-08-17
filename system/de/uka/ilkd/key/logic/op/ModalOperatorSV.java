@@ -10,6 +10,7 @@
 
 package de.uka.ilkd.key.logic.op;
 
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -21,7 +22,7 @@ public final class ModalOperatorSV extends AbstractSV  {
     /** 
      * the set of modalities this sv can match 
      */
-    private final SetOfModality modalities;    
+    private final ImmutableSet<Modality> modalities;    
     
     
     /** creates a new SchemaVariable that is used as placeholder for
@@ -29,7 +30,7 @@ public final class ModalOperatorSV extends AbstractSV  {
      * @param name the Name of the SchemaVariable
      * @param modalities modal operators matched by this SV
      */    
-    ModalOperatorSV(Name name, SetOfModality modalities) {
+    ModalOperatorSV(Name name, ImmutableSet<Modality> modalities) {
         super(name, new Sort[]{Sort.FORMULA}, Sort.FORMULA, false, false);
         this.modalities = modalities;
     }
@@ -68,7 +69,7 @@ public final class ModalOperatorSV extends AbstractSV  {
     /**
      * returns an unmodifiable set of operators this schemavariable can match
      */
-    public SetOfModality getModalities() {
+    public ImmutableSet<Modality> getModalities() {
         return modalities;
     }
     

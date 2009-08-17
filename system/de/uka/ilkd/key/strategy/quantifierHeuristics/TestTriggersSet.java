@@ -18,8 +18,9 @@ package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
 import junit.framework.TestCase;
 import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.sort.*;
+import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.rule.TacletForTests;
 

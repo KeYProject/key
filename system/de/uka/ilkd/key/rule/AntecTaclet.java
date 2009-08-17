@@ -10,9 +10,12 @@
 
 package de.uka.ilkd.key.rule;
 
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableMap;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.MapFromSchemaVariableToTacletPrefix;
+import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.proof.Goal;
 
 /** 
@@ -33,16 +36,16 @@ public class AntecTaclet extends FindTaclet{
      * @param attrs attributes for the Taclet; these are boolean values
      * indicating a noninteractive or recursive use of the Taclet. 
      * @param find the find term of the Taclet
-     * @param prefixMap a MapFromSchemaVariableToTacletPrefix that contains the
+     * @param prefixMap a ImmMap<SchemaVariable,TacletPrefix> that contains the
      * prefix for each SchemaVariable in the Taclet
      */
     public AntecTaclet(Name name, TacletApplPart applPart,  
-		     ListOfTacletGoalTemplate goalTemplates, 
-		     ListOfRuleSet heuristics,
+		     ImmutableList<TacletGoalTemplate> goalTemplates, 
+		     ImmutableList<RuleSet> heuristics,
 		     Constraint constraint,
 		     TacletAttributes attrs,
-		     Term find, MapFromSchemaVariableToTacletPrefix prefixMap,
-		     SetOfChoice choices){
+		     Term find, ImmutableMap<SchemaVariable,TacletPrefix> prefixMap,
+		     ImmutableSet<Choice> choices){
 	super(name, applPart, goalTemplates, heuristics, constraint, 
 	      attrs, find, prefixMap, choices);
 	cacheMatchInfo();

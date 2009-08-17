@@ -11,8 +11,7 @@
 
 package de.uka.ilkd.key.logic.op;
 
-import de.uka.ilkd.key.logic.ArrayOfTerm;
-import de.uka.ilkd.key.logic.ClashFreeSubst;
+import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -35,9 +34,9 @@ public abstract class SubstOp extends AbstractOperator {
      * IllegalArgumentException if the given term has no correct (2=) arity
      */
     @Override
-    public Sort sort(ArrayOfTerm terms) {
+    public Sort sort(ImmutableArray<Term> terms) {
 	if(terms.size() == 2) {
-	    return terms.getTerm(1).sort();
+	    return terms.get(1).sort();
 	}
 	else throw new IllegalArgumentException("Cannot determine sort of "+
 						"invalid term (Wrong arity).");
@@ -57,7 +56,7 @@ public abstract class SubstOp extends AbstractOperator {
 	    return false;
 	}
 	Sort substSort = term.sub(0).sort();
-	Sort varSort = term.varsBoundHere(1).getQuantifiableVariable(0).sort();       
+	Sort varSort = term.varsBoundHere(1).get(0).sort();       
 	return substSort.extendsTrans(varSort);
     }
 

@@ -11,6 +11,7 @@
 
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 
@@ -28,13 +29,13 @@ class Matching {
      * @param targetTerm    a gound term
      * @return all substitution found from this matching
      */
-    public static SetOfSubstitution basicMatching(Trigger trigger,
+    public static ImmutableSet<Substitution> basicMatching(Trigger trigger,
                                                   Term targetTerm) {
         return BasicMatching.getSubstitutions ( trigger.getTriggerTerm (),
                                                 targetTerm );
     }
 
-    public static SetOfSubstitution twoSidedMatching(UniTrigger trigger,
+    public static ImmutableSet<Substitution> twoSidedMatching(UniTrigger trigger,
                                                      Term targetTerm, 
                                                      Services services) {
         TwoSidedMatching tsm = new TwoSidedMatching ( trigger, targetTerm, services );

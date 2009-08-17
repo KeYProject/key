@@ -9,7 +9,7 @@
 
 package de.uka.ilkd.key.logic.op;
 
-import de.uka.ilkd.key.collection.ArrayOfBoolean;
+import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
@@ -24,13 +24,13 @@ abstract class AbstractOperator implements Operator {
     
     private final Name name;
     private final int arity;
-    private final ArrayOfBoolean whereToBind;
+    private final ImmutableArray<Boolean> whereToBind;
     private final boolean isRigid;
     
     
     protected AbstractOperator(Name name, 
 	    		       int arity, 
-	    		       ArrayOfBoolean whereToBind,
+	    		       ImmutableArray<Boolean> whereToBind,
 	    		       boolean isRigid) {
 	assert name != null;
 	assert arity >= 0;
@@ -46,16 +46,16 @@ abstract class AbstractOperator implements Operator {
 	    		       int arity, 
 	    		       Boolean[] whereToBind,
 	    		       boolean isRigid) {
-	this(name, arity, new ArrayOfBoolean(whereToBind), isRigid);
+	this(name, arity, new ImmutableArray<Boolean>(whereToBind), isRigid);
     }        
     
     
     protected AbstractOperator(Name name, int arity, boolean isRigid) {
-	this(name, arity, (ArrayOfBoolean) null, isRigid);
+	this(name, arity, (ImmutableArray<Boolean>) null, isRigid);
     }
     
     
-    protected final ArrayOfBoolean whereToBind() {
+    protected final ImmutableArray<Boolean> whereToBind() {
 	return whereToBind;
     }
     
@@ -74,7 +74,7 @@ abstract class AbstractOperator implements Operator {
     
     @Override
     public final boolean bindVarsAt(int n) {
-	return whereToBind != null && whereToBind.getBoolean(n);
+	return whereToBind != null && whereToBind.get(n);
     }
     
     

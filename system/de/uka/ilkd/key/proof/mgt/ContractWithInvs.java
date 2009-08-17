@@ -10,18 +10,18 @@
 
 package de.uka.ilkd.key.proof.mgt;
 
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.speclang.ClassInvariant;
 import de.uka.ilkd.key.speclang.OperationContract;
-import de.uka.ilkd.key.speclang.SetAsListOfClassInvariant;
-import de.uka.ilkd.key.speclang.SetOfClassInvariant;
 
 
 public class ContractWithInvs {
     
     public final OperationContract contract;
-    public final SetOfClassInvariant assumedInvs;
-    public final SetOfClassInvariant ensuredInvs;
+    public final ImmutableSet<ClassInvariant> assumedInvs;
+    public final ImmutableSet<ClassInvariant> ensuredInvs;
     
     
     //-------------------------------------------------------------------------
@@ -29,8 +29,8 @@ public class ContractWithInvs {
     //------------------------------------------------------------------------- 
     
     public ContractWithInvs(OperationContract contract, 
-                            SetOfClassInvariant assumedInvs,
-                            SetOfClassInvariant ensuredInvs) {
+                            ImmutableSet<ClassInvariant> assumedInvs,
+                            ImmutableSet<ClassInvariant> ensuredInvs) {
         assert contract != null;
         assert assumedInvs != null;
         assert ensuredInvs != null;
@@ -56,8 +56,8 @@ public class ContractWithInvs {
         contract = specRepos.getOperationContractByName(contractName);
         assert contract != null;
         
-        SetOfClassInvariant tempAssumedInvs 
-            = SetAsListOfClassInvariant.EMPTY_SET;
+        ImmutableSet<ClassInvariant> tempAssumedInvs 
+            = DefaultImmutableSet.<ClassInvariant>nil();
         for(int i = assumedInvNames.length - 1; i >=0; i--) {
             if(!assumedInvNames[i].equals("")) {
                 ClassInvariant inv 
@@ -68,8 +68,8 @@ public class ContractWithInvs {
         }
         assumedInvs = tempAssumedInvs;
         
-        SetOfClassInvariant tempEnsuredInvs 
-            = SetAsListOfClassInvariant.EMPTY_SET;
+        ImmutableSet<ClassInvariant> tempEnsuredInvs 
+            = DefaultImmutableSet.<ClassInvariant>nil();
         for(int i = ensuredInvNames.length - 1; i >= 0; i--) {
             if(!ensuredInvNames[i].equals("")) {
                 ClassInvariant inv 

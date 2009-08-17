@@ -13,9 +13,13 @@ package de.uka.ilkd.key.speclang.translation;
 import java.util.HashMap;
 import java.util.Map;
 
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.op.LogicVariable;
+import de.uka.ilkd.key.logic.op.ParsableVariable;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
 
 
 /**
@@ -29,19 +33,16 @@ public abstract class SLResolverManager {
     public final SLTranslationExceptionManager excManager;
     private static final TermBuilder TB = TermBuilder.DF;
 
-    private ListOfSLExpressionResolver resolvers 
-    	= SLListOfSLExpressionResolver.EMPTY_LIST;
+    private ImmutableList<SLExpressionResolver> resolvers = ImmutableSLList.<SLExpressionResolver>nil();
     private final KeYJavaType specInClass;
     private final ParsableVariable selfVar;
     private final boolean useLocalVarsAsImplicitReceivers;
         
-    private ListOfNamespace /*ParsableVariable*/
-        localVariablesNamespaces = SLListOfNamespace.EMPTY_LIST;
-    
-    private Map<ParsableVariable,KeYJavaType> kjts 
-    	= new HashMap<ParsableVariable,KeYJavaType>();
+    private ImmutableList<Namespace> /*ParsableVariable*/
+        localVariablesNamespaces = ImmutableSLList.<Namespace>nil();
 
-    
+    private Map<ParsableVariable,KeYJavaType> kjts 
+	= new HashMap<ParsableVariable,KeYJavaType>();
     
     //-------------------------------------------------------------------------
     //constructors
@@ -253,7 +254,7 @@ public abstract class SLResolverManager {
     /**
      * Puts a list of local variables into the topmost namespace on the stack. 
      */
-    public void putIntoTopLocalVariablesNamespace(ListOfLogicVariable pvs,
+    public void putIntoTopLocalVariablesNamespace(ImmutableList<LogicVariable> pvs,
 	    					  KeYJavaType kjt) {
         for(LogicVariable pv : pvs) {
             putIntoTopLocalVariablesNamespace(pv, kjt);
@@ -264,7 +265,7 @@ public abstract class SLResolverManager {
     /**
      * Puts a list of local variables into the topmost namespace on the stack. 
      */
-    public void putIntoTopLocalVariablesNamespace(ListOfProgramVariable pvs) {
+    public void putIntoTopLocalVariablesNamespace(ImmutableList< ProgramVariable > pvs) {
         for(ProgramVariable pv : pvs) {
             putIntoTopLocalVariablesNamespace(pv, pv.getKeYJavaType());
         }

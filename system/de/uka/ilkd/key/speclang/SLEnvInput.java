@@ -22,27 +22,44 @@ import java.util.Set;
 
 import javax.swing.*;
 
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.Main;
 import de.uka.ilkd.key.gui.configuration.GeneralSettings;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.ProgramElement;
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.abstraction.Field;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.declaration.ClassDeclaration;
+import de.uka.ilkd.key.java.declaration.InterfaceDeclaration;
+import de.uka.ilkd.key.java.recoderext.ConstructorNormalformBuilder;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.visitor.JavaASTCollector;
-import de.uka.ilkd.key.logic.op.ListOfProgramMethod;
+import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.init.AbstractEnvInput;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
-import de.uka.ilkd.key.speclang.LoopInvariant;
 import de.uka.ilkd.key.speclang.jml.JMLSpecExtractor;
 
 
 /** 
  * EnvInput for standalone specification language front ends.
  */
-public class SLEnvInput extends AbstractEnvInput {
+public final class SLEnvInput extends AbstractEnvInput {
+    
+    private static final String INIT_NAME 
+    	= ConstructorNormalformBuilder.CONSTRUCTOR_NORMALFORM_IDENTIFIER;
+    private static final TermBuilder TB = TermBuilder.DF;
+    
         
     //-------------------------------------------------------------------------
     //constructors
@@ -85,7 +102,7 @@ public class SLEnvInput extends AbstractEnvInput {
     }
     
     
-    private void showWarningDialog(SetOfPositionedString warnings) {
+    private void showWarningDialog(ImmutableSet<PositionedString> warnings) {
         if(!Main.visible) {
             return;
         }
@@ -107,7 +124,7 @@ public class SLEnvInput extends AbstractEnvInput {
         //scrollable warning list
         JScrollPane scrollpane = new JScrollPane();
         scrollpane.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-        JList list = new JList(warnings.toArray());
+        JList list = new JList(warnings.toArray(new PositionedString[warnings.size()]));
         list.setBorder(BorderFactory.createLoweredBevelBorder());
         scrollpane.setViewportView(list);
         pane.add(scrollpane, BorderLayout.CENTER);
@@ -155,22 +172,22 @@ public class SLEnvInput extends AbstractEnvInput {
        
         //sort types alphabetically (necessary for deterministic names)
         final Set<KeYJavaType> allKeYJavaTypes = javaInfo.getAllKeYJavaTypes();
-        for (KeYJavaType keYJavaType : allKeYJavaTypes) {
-            if(keYJavaType.getJavaType() == null) {
-                System.out.println(keYJavaType);
-            }
-        }
         final KeYJavaType[] kjts = 
             sortKJTs(allKeYJavaTypes.toArray(new KeYJavaType[allKeYJavaTypes.size()]));
         
         //create specifications for all types
         for(KeYJavaType kjt : kjts) {
+            if(!(kjt.getJavaType() instanceof ClassDeclaration 
+        	  || kjt.getJavaType() instanceof InterfaceDeclaration)) {
+        	continue;
+            }
+            
             //class invariants
             specRepos.addClassInvariants(
                         specExtractor.extractClassInvariants(kjt));
             
             //contracts, loop invariants
-            ListOfProgramMethod pms 
+            ImmutableList<ProgramMethod> pms 
                 = javaInfo.getAllProgramMethodsLocallyDeclared(kjt);
             for(ProgramMethod pm : pms) {
                 //contracts
@@ -190,10 +207,12 @@ public class SLEnvInput extends AbstractEnvInput {
                     }
                 }
             }
+            
+            
         }
         
         //show warnings to user
-        SetOfPositionedString warnings = specExtractor.getWarnings();
+        ImmutableSet<PositionedString> warnings = specExtractor.getWarnings();
         if(warnings != null && warnings.size() > 0) {
             showWarningDialog(warnings);
         }

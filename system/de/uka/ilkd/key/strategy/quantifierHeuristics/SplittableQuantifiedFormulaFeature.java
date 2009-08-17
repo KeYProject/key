@@ -11,9 +11,14 @@
 
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.op.Junctor;
+import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+import de.uka.ilkd.key.logic.op.Quantifier;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.feature.BinaryFeature;
@@ -49,8 +54,8 @@ public class SplittableQuantifiedFormulaFeature extends BinaryFeature {
     }
     
     private static class Analyser {
-        public SetOfQuantifiableVariable existentialVars =
-            SetAsListOfQuantifiableVariable.EMPTY_SET;
+        public ImmutableSet<QuantifiableVariable> existentialVars =
+            DefaultImmutableSet.<QuantifiableVariable>nil();
         public Operator binOp;
         public Term left, right;
         
@@ -60,15 +65,13 @@ public class SplittableQuantifiedFormulaFeature extends BinaryFeature {
             if ( op == Quantifier.ALL ) {
                 // might be that a variable is bound more than once
                 existentialVars =
-                    existentialVars.remove ( formula.varsBoundHere ( 0 )
-                                             .lastQuantifiableVariable () );
+                    existentialVars.remove ( formula.varsBoundHere ( 0 ).last () );
                 return analyse ( formula.sub ( 0 ) );
             }
             
             if ( op == Quantifier.EX ) {
                 existentialVars =
-                    existentialVars.add ( formula.varsBoundHere ( 0 )
-                                          .lastQuantifiableVariable () );
+                    existentialVars.add ( formula.varsBoundHere ( 0 ).last () );
                 return analyse ( formula.sub ( 0 ) );
             }
 

@@ -193,11 +193,11 @@ public class TestClashFreeSubst extends TestCase {
 						+top.varsBoundHere(0).size()];
 		    for( int i = 0; i<visited.varsBoundHere(0).size(); i++ ) {
 			bv[i] = visited.varsBoundHere(0)
-			    .getQuantifiableVariable(i);
+			    .get(i);
 		    }
 		    for( int i = 0; i<top.varsBoundHere(0).size(); i++ ) {
 			bv[visited.varsBoundHere(0).size()+i] = 
-			    top.varsBoundHere(0).getQuantifiableVariable(i);
+			    top.varsBoundHere(0).get(i);
 		    }
 		    subStack.pop();
 		    subStack.push(TermBuilder.DF.all(bv, top.sub(0)));
@@ -276,7 +276,7 @@ public class TestClashFreeSubst extends TestCase {
 	ClashFreeSubst cfs = new ClashFreeSubst(v,s);
 	Term res = cfs.apply(t);
 	QuantifiableVariable x1 = 
-	    res.varsBoundHere(0).getQuantifiableVariable(0);
+	    res.varsBoundHere(0).get(0);
 	nss.setVariables(new Namespace(nss.variables(), x1));
 	assertEquals("clash resolution", 
 		     parseTerm("\\exists x1; q(x1,f(x))"),
@@ -299,7 +299,7 @@ public class TestClashFreeSubst extends TestCase {
 	ClashFreeSubst cfs = new ClashFreeSubst(v,s);
 	Term res = cfs.apply(t);
 	QuantifiableVariable x1 = 
-	    res.varsBoundHere(1).getQuantifiableVariable(0);
+	    res.varsBoundHere(1).get(0);
 	nss.setVariables(new Namespace(nss.variables(), x1));
 	assertEquals("clash resolution in substitution term", 
 		     parseTerm("{\\subst x1; f(f(x))}g(x1,f(x))"),
@@ -333,7 +333,7 @@ public class TestClashFreeSubst extends TestCase {
 	ClashFreeSubst cfs = new ClashFreeSubst(v,s);
 	Term res = cfs.apply(t);
 	QuantifiableVariable x1 = 
-	    res.varsBoundHere(0).getQuantifiableVariable(1);
+	    res.varsBoundHere(0).get(1);
 	nss.setVariables(new Namespace(nss.variables(), x1));
 	assertEquals("clash resolution in multi term", 
 		     toMulti(parseTerm(
@@ -350,7 +350,7 @@ public class TestClashFreeSubst extends TestCase {
 	ClashFreeSubst cfs = new ClashFreeSubst(v,s);
 	Term res = cfs.apply(t);
 	QuantifiableVariable x1 = 
-	    res.varsBoundHere(0).getQuantifiableVariable(2);
+	    res.varsBoundHere(0).get(2);
 	nss.setVariables(new Namespace(nss.variables(), x1));
 	assertEquals("clash resolution in multi term", 
 		     toMulti(parseTerm(
@@ -384,7 +384,7 @@ public class TestClashFreeSubst extends TestCase {
 	WaryClashFreeSubst cfs = new WaryClashFreeSubst(v,s);
 	Term res = cfs.apply(t);
 	QuantifiableVariable x1 = 
-	    res.varsBoundHere(1).getQuantifiableVariable(0);
+	    res.varsBoundHere(1).get(0);
 	nss.setVariables(new Namespace(nss.variables(), x1));
 	assertEquals("substitution",
 		     parseTerm("{\\subst " + x1.name () +

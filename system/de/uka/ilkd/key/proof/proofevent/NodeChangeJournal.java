@@ -11,8 +11,14 @@
 package de.uka.ilkd.key.proof.proofevent;
 
 
+import java.util.Iterator;
+
+import de.uka.ilkd.key.collection.*;
 import de.uka.ilkd.key.logic.SequentChangeInfo;
-import de.uka.ilkd.key.proof.*;
+import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.GoalListener;
+import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.RuleApp;
 
 
@@ -32,8 +38,8 @@ public class NodeChangeJournal implements GoalListener {
      * This is a may storing the leaves that are currently below
      * the original node, and all changes applied to each of them
      */
-    private MapFromNodeToNodeChangesHolder changes =
-	MapAsListFromNodeToNodeChangesHolder.EMPTY_MAP;
+    private ImmutableMap<Node,NodeChangesHolder> changes =
+	DefaultImmutableMap.<Node,NodeChangesHolder>nilMap();
 
     /**
      * @param p_goal the original goal/node
@@ -51,12 +57,12 @@ public class NodeChangeJournal implements GoalListener {
      * within this object; remove all listeners
      */
     public RuleAppInfo getRuleAppInfo ( RuleApp p_ruleApp ) {
-	IteratorOfEntryOfNodeAndNodeChangesHolder it  = changeObjIterator ();
-	ListOfNodeReplacement                     nrs =
-	    SLListOfNodeReplacement.EMPTY_LIST;
+	Iterator<ImmutableMapEntry<Node,NodeChangesHolder>> it  = changeObjIterator ();
+	ImmutableList<NodeReplacement>                     nrs =
+	    ImmutableSLList.<NodeReplacement>nil();
 
 	while ( it.hasNext () ) {
-	    final EntryOfNodeAndNodeChangesHolder entry = it.next ();
+	    final ImmutableMapEntry<Node,NodeChangesHolder> entry = it.next ();
 	    final Node newNode = entry.key ();
 	    final Goal newGoal = proof.getGoal ( newNode );
 
@@ -96,11 +102,11 @@ public class NodeChangeJournal implements GoalListener {
      * <code>newGoals</code>). The nodes of <code>newGoals</code> are
      * children of the node <code>parent</code>
      */
-    public void goalReplaced(Goal source, Node parent, ListOfGoal newGoals) {
+    public void goalReplaced(Goal source, Node parent, ImmutableList<Goal> newGoals) {
 	NodeChangesHolder nc = removeChangeObj(parent);
 
 	if ( nc != null ) {
-	    IteratorOfGoal it = newGoals.iterator ();
+	    Iterator<Goal> it = newGoals.iterator ();
 	    if ( it.hasNext () ) {
 		while ( true ) {
 		    putChangeObj ( it.next ().node (), nc );
@@ -127,7 +133,7 @@ public class NodeChangeJournal implements GoalListener {
         return res;
     }
 
-    private IteratorOfEntryOfNodeAndNodeChangesHolder changeObjIterator () {
+    private Iterator<ImmutableMapEntry<Node,NodeChangesHolder>> changeObjIterator () {
 	return changes.entryIterator ();
     }
 

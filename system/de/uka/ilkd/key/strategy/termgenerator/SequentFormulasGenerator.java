@@ -11,8 +11,9 @@
 
 package de.uka.ilkd.key.strategy.termgenerator;
 
-import de.uka.ilkd.key.logic.IteratorOfConstrainedFormula;
-import de.uka.ilkd.key.logic.IteratorOfTerm;
+import java.util.Iterator;
+
+import de.uka.ilkd.key.logic.ConstrainedFormula;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
@@ -28,7 +29,7 @@ public abstract class SequentFormulasGenerator implements TermGenerator {
     
     public static SequentFormulasGenerator antecedent() {
         return new SequentFormulasGenerator () {
-            protected IteratorOfConstrainedFormula generateForIt(Goal goal) {
+            protected Iterator<ConstrainedFormula> generateForIt(Goal goal) {
                 return goal.sequent ().antecedent ().iterator ();
             }
         };
@@ -36,7 +37,7 @@ public abstract class SequentFormulasGenerator implements TermGenerator {
     
     public static SequentFormulasGenerator succedent() {
         return new SequentFormulasGenerator () {
-            protected IteratorOfConstrainedFormula generateForIt(Goal goal) {
+            protected Iterator<ConstrainedFormula> generateForIt(Goal goal) {
                 return goal.sequent ().succedent ().iterator ();
             }
         };
@@ -44,20 +45,20 @@ public abstract class SequentFormulasGenerator implements TermGenerator {
     
     public static SequentFormulasGenerator sequent() {
         return new SequentFormulasGenerator () {
-            protected IteratorOfConstrainedFormula generateForIt(Goal goal) {
+            protected Iterator<ConstrainedFormula> generateForIt(Goal goal) {
                 return goal.sequent ().iterator ();
             }
         };
     }
     
-    protected abstract IteratorOfConstrainedFormula generateForIt(Goal goal);
+    protected abstract Iterator<ConstrainedFormula> generateForIt(Goal goal);
 
-    public IteratorOfTerm generate(RuleApp app, PosInOccurrence pos, Goal goal) {
-        return new Iterator ( generateForIt ( goal ) );
+    public Iterator<Term> generate(RuleApp app, PosInOccurrence pos, Goal goal) {
+        return new SFIterator ( generateForIt ( goal ) );
     }
 
-    private static class Iterator implements IteratorOfTerm {
-        private final IteratorOfConstrainedFormula forIt;
+    private static class SFIterator implements Iterator<Term> {
+        private final Iterator<ConstrainedFormula> forIt;
 
         public boolean hasNext() {
             return forIt.hasNext ();
@@ -67,7 +68,7 @@ public abstract class SequentFormulasGenerator implements TermGenerator {
             return forIt.next ().formula ();
         }
 
-        public Iterator(IteratorOfConstrainedFormula forIt) {
+        public SFIterator(Iterator<ConstrainedFormula> forIt) {
             this.forIt = forIt;
         }
         

@@ -18,6 +18,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.WeakHashMap;
 
@@ -27,6 +28,7 @@ import javax.swing.event.ListDataListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
+import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.gui.prooftree.DisableGoal;
 import de.uka.ilkd.key.logic.Sequent;
@@ -411,9 +413,9 @@ public class GoalList extends JList {
 	    return attentive;
 	}
 
-	public void add(ListOfGoal g) {
+	public void add(ImmutableList<Goal> g) {
 	    if (!g.isEmpty()) {
-		final IteratorOfGoal it = g.iterator();
+		final Iterator<Goal> it = g.iterator();
 		while (it.hasNext()) {
 		    goals.add(it.next());
 		}	

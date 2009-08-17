@@ -11,13 +11,19 @@
 
 package de.uka.ilkd.key.java.reference;
 
+import de.uka.ilkd.key.collection.ImmutableArray;
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.*;
-import de.uka.ilkd.key.java.abstraction.*;
+import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.expression.ExpressionStatement;
 import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.op.ProgramMethod;
+import de.uka.ilkd.key.logic.op.ProgramSV;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.ExtList;
 
@@ -43,9 +49,9 @@ public class MethodReference extends JavaNonTerminalProgramElement
     /**
      *      Arguments.
      */
-    protected final ArrayOfExpression arguments;
+    protected final ImmutableArray<Expression> arguments;
     
-    public MethodReference(ArrayOfExpression args, MethodName n, 
+    public MethodReference(ImmutableArray<Expression> args, MethodName n, 
 			   ReferencePrefix p) {
 	this.prefix = p;
 	name = n;
@@ -53,7 +59,7 @@ public class MethodReference extends JavaNonTerminalProgramElement
 	this.arguments = args;
     }
 
-    public MethodReference(ArrayOfExpression args, MethodName n, 
+    public MethodReference(ImmutableArray<Expression> args, MethodName n, 
 			   ReferencePrefix p, PositionInfo pos) {
 	super(pos);
 	this.prefix=p;
@@ -63,13 +69,13 @@ public class MethodReference extends JavaNonTerminalProgramElement
     }
 
    public MethodReference(ExtList children, MethodName n, ReferencePrefix p) {
-	this(new ArrayOfExpression((Expression[]) 
+	this(new ImmutableArray<Expression>((Expression[]) 
 				   children.collect(Expression.class)),
 	     n, p, (PositionInfo) children.get(PositionInfo.class) );
     }
 
      public MethodReference(ExtList children, MethodName n, ReferencePrefix p,PositionInfo pos) {
-	this(new ArrayOfExpression((Expression[]) 
+	this(new ImmutableArray<Expression>((Expression[]) 
 				   children.collect(Expression.class)),
 	     n, p, pos);
     }
@@ -119,7 +125,7 @@ public class MethodReference extends JavaNonTerminalProgramElement
             index--;
         }
         if (arguments != null) {
-	    return arguments.getExpression(index);
+	    return arguments.get(index);
         }
         throw new ArrayIndexOutOfBoundsException();
     }
@@ -177,7 +183,7 @@ public class MethodReference extends JavaNonTerminalProgramElement
             index -= 1;
         }
         if (arguments != null) {
-            return arguments.getExpression(index);
+            return arguments.get(index);
         }
         throw new ArrayIndexOutOfBoundsException();
     }
@@ -206,7 +212,7 @@ public class MethodReference extends JavaNonTerminalProgramElement
      *      Get arguments.
      *      @return the expression array wrapper.
      */
-    public ArrayOfExpression getArguments() {
+    public ImmutableArray<Expression> getArguments() {
         return arguments;
     }
 
@@ -216,7 +222,7 @@ public class MethodReference extends JavaNonTerminalProgramElement
      */
     public Expression getArgumentAt(int index) {
         if (arguments != null) {
-            return arguments.getExpression(index);
+            return arguments.get(index);
         }
         throw new ArrayIndexOutOfBoundsException();
     }
@@ -225,9 +231,9 @@ public class MethodReference extends JavaNonTerminalProgramElement
      * determines the arguments types and constructs a signature of the current
      * method
      */
-    public ListOfKeYJavaType getMethodSignature(Services services,
+    public ImmutableList<KeYJavaType> getMethodSignature(Services services,
 						ExecutionContext ec) {
-	ListOfKeYJavaType signature = SLListOfKeYJavaType.EMPTY_LIST;
+	ImmutableList<KeYJavaType> signature = ImmutableSLList.<KeYJavaType>nil();
 	if (arguments != null) {
             final TypeConverter typeConverter = services.getTypeConverter();
 	    for (int i = arguments.size()-1; i>=0; i--) {		
@@ -284,13 +290,13 @@ public class MethodReference extends JavaNonTerminalProgramElement
      * information
      * @param classType the KeYJavaType where to start looking for the 
      * declared method
-     * @param signature the ListOfKeYJavaType of the arguments types
+     * @param signature the IList<KeYJavaType> of the arguments types
      * @param context the KeYJavaType from where the method is called  
      * @return the found program method
      */
     public ProgramMethod method
     	(Services services, KeYJavaType classType, 
-    	        ListOfKeYJavaType signature, 
+    	        ImmutableList<KeYJavaType> signature, 
     	        KeYJavaType context) {	
         final String methodName = name.toString();
         ProgramMethod pm = services.getJavaInfo().getProgramMethod(classType, 

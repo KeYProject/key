@@ -10,6 +10,7 @@
 
 package de.uka.ilkd.key.java.statement;
 
+import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.util.ExtList;
@@ -26,7 +27,7 @@ public class Switch extends BranchStatement
  *      Branches.
      */
 
-    protected final ArrayOfBranch branches;
+    protected final ImmutableArray<Branch> branches;
 
     /**
  *      Expression.
@@ -62,7 +63,7 @@ public class Switch extends BranchStatement
      */
 
     public Switch(Expression e, Branch[] branches) {
-	this.branches=new ArrayOfBranch(branches);
+	this.branches=new ImmutableArray<Branch>(branches);
         this.expression=e;
     }
 
@@ -74,7 +75,7 @@ public class Switch extends BranchStatement
     public Switch(ExtList children) {
         super(children);
 	this.expression = (Expression)children.get(Expression.class);
-	this.branches=new ArrayOfBranch((Branch[])
+	this.branches=new ImmutableArray<Branch>((Branch[])
 					children.collect(Branch.class)); 
     }
 
@@ -106,7 +107,7 @@ public class Switch extends BranchStatement
             index--;
         }
         if (branches != null) {
-            return branches.getBranch(index);
+            return branches.get(index);
         }
         throw new ArrayIndexOutOfBoundsException();
     }
@@ -166,7 +167,7 @@ public class Switch extends BranchStatement
 
     public Branch getBranchAt(int index) {
         if (branches != null) {
-            return branches.getBranch(index);
+            return branches.get(index);
         }
         throw new ArrayIndexOutOfBoundsException();
     }
@@ -175,7 +176,7 @@ public class Switch extends BranchStatement
     /* Return the branch array wrapper
      * @return the array wrapper of the branches
      */
-    public ArrayOfBranch getBranchList() {
+    public ImmutableArray<Branch> getBranchList() {
 	return branches;
     }
 

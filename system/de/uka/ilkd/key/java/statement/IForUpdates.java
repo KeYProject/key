@@ -9,7 +9,7 @@
 //
 package de.uka.ilkd.key.java.statement;
 
-import de.uka.ilkd.key.java.ArrayOfExpression;
+import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.Expression;
 
 public interface IForUpdates extends de.uka.ilkd.key.java.TerminalProgramElement {
@@ -18,6 +18,6 @@ public interface IForUpdates extends de.uka.ilkd.key.java.TerminalProgramElement
 
     Expression getExpressionAt(int i);
 
-    ArrayOfExpression getUpdates();
+    ImmutableArray<Expression> getUpdates();
 
 }

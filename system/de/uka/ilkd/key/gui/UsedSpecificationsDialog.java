@@ -17,27 +17,20 @@ import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.util.Iterator;
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.proof.IteratorOfProof;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.SetOfProof;
-import de.uka.ilkd.key.proof.init.EnsuresPostPO;
-import de.uka.ilkd.key.proof.init.InitConfig;
-import de.uka.ilkd.key.proof.init.PreservesInvPO;
-import de.uka.ilkd.key.proof.init.ProblemInitializer;
-import de.uka.ilkd.key.proof.init.ProofInputException;
-import de.uka.ilkd.key.proof.init.ProofOblInput;
+import de.uka.ilkd.key.proof.init.*;
 import de.uka.ilkd.key.proof.mgt.ContractWithInvs;
-import de.uka.ilkd.key.proof.mgt.SetAsListOfContractWithInvs;
-import de.uka.ilkd.key.proof.mgt.SetOfContractWithInvs;
 import de.uka.ilkd.key.speclang.OperationContract;
-import de.uka.ilkd.key.speclang.SetOfOperationContract;
 
 
 public class UsedSpecificationsDialog extends JDialog {
@@ -63,13 +56,13 @@ public class UsedSpecificationsDialog extends JDialog {
     //-------------------------------------------------------------------------
     
     public UsedSpecificationsDialog(Services services, 
-                                    SetOfContractWithInvs contractApps) {
+                                    ImmutableSet<ContractWithInvs> contractApps) {
         super(Main.getInstance(), "Used Specifications", true);
         this.services = services;
         
         //break contract apps down to atomic contracts
-        SetOfContractWithInvs atomicContractApps 
-            = SetAsListOfContractWithInvs.EMPTY_SET;
+        ImmutableSet<ContractWithInvs> atomicContractApps 
+            = DefaultImmutableSet.<ContractWithInvs>nil();
         for(ContractWithInvs cwi : contractApps) {
             for(OperationContract atomicContract 
                 : services.getSpecificationRepository()
@@ -92,7 +85,7 @@ public class UsedSpecificationsDialog extends JDialog {
         //create contract app list
         contractAppList = new JList();
         contractAppList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        contractAppList.setListData(atomicContractApps.toArray());
+        contractAppList.setListData(atomicContractApps.toArray(new ContractWithInvs[atomicContractApps.size()]));
         contractAppList.setSelectedIndex(0);
         contractAppList.addListSelectionListener(new ListSelectionListener() {
             public void valueChanged(ListSelectionEvent e) {                
@@ -270,7 +263,7 @@ public class UsedSpecificationsDialog extends JDialog {
     //-------------------------------------------------------------------------
     
     private Proof findPreferablyClosedProof(ProofOblInput po) {
-        SetOfProof proofs 
+        ImmutableSet<Proof> proofs 
             = services.getSpecificationRepository().getProofs(po);
         
         //no proofs?
@@ -279,7 +272,7 @@ public class UsedSpecificationsDialog extends JDialog {
         }
         
         //try to find closed proof
-        IteratorOfProof it = proofs.iterator();
+        Iterator<Proof> it = proofs.iterator();
         while(it.hasNext()) {
             Proof proof = it.next();
             if(proof.mgt().getStatus().getProofClosed()) {

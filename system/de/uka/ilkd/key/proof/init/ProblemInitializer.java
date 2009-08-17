@@ -11,14 +11,10 @@
 package de.uka.ilkd.key.proof.init;
 
 import java.io.File;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Vector;
+import java.util.*;
 
 import recoder.io.PathList;
 import recoder.io.ProjectSettings;
-
 import de.uka.ilkd.key.gui.IMain;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.Recoder2KeY;
@@ -29,11 +25,7 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.proof.JavaModel;
-import de.uka.ilkd.key.proof.ProblemLoader;
-import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.ProofAggregate;
-import de.uka.ilkd.key.proof.RuleSource;
+import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.mgt.AxiomJustification;
 import de.uka.ilkd.key.proof.mgt.GlobalProofMgt;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
@@ -343,7 +335,7 @@ public final class ProblemInitializer {
      */
     private void populateNamespaces(Proof proof) {
 	NamespaceSet namespaces = proof.getNamespaces();
-	IteratorOfConstrainedFormula it = proof.root().sequent().iterator();
+	Iterator<ConstrainedFormula> it = proof.root().sequent().iterator();
 	while(it.hasNext()) {
 	    ConstrainedFormula cf = it.next();
 	    populateNamespaces(cf.formula(), namespaces);

@@ -13,7 +13,8 @@ package de.uka.ilkd.key.proof;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import de.uka.ilkd.key.collection.ListOfString;
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.StatementBlock;
@@ -57,7 +58,7 @@ public class VariableNameProposer implements InstantiationProposer {
     			      SchemaVariable var,
 			      Services services,
 			      Node undoAnchor,
-			      ListOfString previousProposals) {
+			      ImmutableList<String> previousProposals) {
 	if(var instanceof SkolemTermSV) {
 	    return getNameProposalForSkolemTermVariable(app,
 	    					       var,
@@ -88,8 +89,7 @@ public class VariableNameProposer implements InstantiationProposer {
         oldMVProposal = proposal;
     }
 
-    private de.uka.ilkd.key.logic.ListOfName oldAnonUpdateProposals =
-            de.uka.ilkd.key.logic.SLListOfName.EMPTY_LIST;
+    private ImmutableList<Name> oldAnonUpdateProposals = ImmutableSLList.<Name>nil();
 
     public void setOldAnonUpdateProposals(Name proposals) {
         if (proposals == null) return;
@@ -163,7 +163,7 @@ public class VariableNameProposer implements InstantiationProposer {
     						       SchemaVariable p_var,
 						       Services services,
 						       Node undoAnchor,
-                                                       ListOfString previousProposals) {
+                                                       ImmutableList<String> previousProposals) {
 	return getNameProposalForSkolemTermVariable
 	    ( createBaseNameProposalBasedOnCorrespondence ( p_app, p_var ),
 	      services,
@@ -208,7 +208,7 @@ public class VariableNameProposer implements InstantiationProposer {
     private String getNameProposalForSkolemTermVariable(String name,
     						       Services services,
 						       Node undoAnchor,
-                                                       ListOfString previousProposals) {
+                                                       ImmutableList<String> previousProposals) {
 
 	final NamespaceSet nss = services.getNamespaces();
 	Name l_name;
@@ -265,7 +265,7 @@ public class VariableNameProposer implements InstantiationProposer {
 					   SchemaVariable var,
 					   Services services,
 					   Node undoAnchor,
-                                           ListOfString previousProposals) {       
+                                           ImmutableList<String> previousProposals) {       
 	        
         ProgramElement contextProgram =
             app.matchConditions().getInstantiations().

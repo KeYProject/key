@@ -15,7 +15,7 @@ package de.uka.ilkd.key.java;
 import java.io.IOException;
 import java.io.StringWriter;
 
-import de.uka.ilkd.key.java.declaration.ArrayOfTypeDeclaration;
+import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.declaration.TypeDeclaration;
 import de.uka.ilkd.key.java.declaration.TypeDeclarationContainer;
 import de.uka.ilkd.key.java.visitor.Visitor;
@@ -44,12 +44,12 @@ public class CompilationUnit
      * Imports.
      */
 
-    protected final ArrayOfImport imports;
+    protected final ImmutableArray<Import> imports;
 
     /**
      * Type declarations.
      */
-    protected final ArrayOfTypeDeclaration typeDeclarations;
+    protected final ImmutableArray<TypeDeclaration> typeDeclarations;
 
     /** creates a compilation unit 
      * @param packageSpec a PackageSpecification (pck of this CU)
@@ -62,8 +62,8 @@ public class CompilationUnit
 			   TypeDeclaration[] typeDeclarations)
     { 
 	this.packageSpec=packageSpec;
-	this.imports=new ArrayOfImport(imports);
-	this.typeDeclarations=new ArrayOfTypeDeclaration(typeDeclarations);
+	this.imports=new ImmutableArray<Import>(imports);
+	this.typeDeclarations=new ImmutableArray<TypeDeclaration>(typeDeclarations);
     }
 
 
@@ -74,10 +74,10 @@ public class CompilationUnit
 	super(children);
 	packageSpec=(PackageSpecification)children.get(
 					    PackageSpecification.class); 
-	this.imports=new ArrayOfImport((Import[])
+	this.imports=new ImmutableArray<Import>((Import[])
 				      children.collect(Import.class));
 	this.typeDeclarations=new
-	    ArrayOfTypeDeclaration((TypeDeclaration[])
+	    ImmutableArray<TypeDeclaration>((TypeDeclaration[])
 				   children.collect(TypeDeclaration.class)); 
     }
     
@@ -88,7 +88,7 @@ public class CompilationUnit
 
     public SourceElement getLastElement() {
         return
-	    typeDeclarations.getTypeDeclaration(typeDeclarations.size()-1);
+	    typeDeclarations.get(typeDeclarations.size()-1);
     }
 
     /**
@@ -132,12 +132,12 @@ public class CompilationUnit
         if (imports != null) {
             len = imports.size();
             if (len > index) {
-                return imports.getImport(index);
+                return imports.get(index);
             }
             index -= len;
         }
         if (typeDeclarations != null) {
-            return typeDeclarations.getTypeDeclaration(index);
+            return typeDeclarations.get(index);
         }
         throw new ArrayIndexOutOfBoundsException();
     }
@@ -147,7 +147,7 @@ public class CompilationUnit
  *      @return the wrapped import array.
      */
 
-    public ArrayOfImport getImports() {
+    public ImmutableArray<Import> getImports() {
         return imports;
     }
 
@@ -183,7 +183,7 @@ public class CompilationUnit
 
     public TypeDeclaration getTypeDeclarationAt(int index) {
         if (typeDeclarations != null) {
-            return typeDeclarations.getTypeDeclaration(index);         
+            return typeDeclarations.get(index);         
         }
         throw new ArrayIndexOutOfBoundsException();
     }
@@ -192,7 +192,7 @@ public class CompilationUnit
      *      Get declarations.
      *      @return the wrapped array of type declarations .
      */
-    public ArrayOfTypeDeclaration getDeclarations() {
+    public ImmutableArray<TypeDeclaration> getDeclarations() {
         return typeDeclarations;
     }
 
@@ -207,7 +207,7 @@ public class CompilationUnit
         TypeDeclaration res = null;
 	int s = typeDeclarations.size();
         for (int i = 0; i < s; i += 1) {
-            TypeDeclaration t = typeDeclarations.getTypeDeclaration(i);
+            TypeDeclaration t = typeDeclarations.get(i);
             if (t.isPublic()) {
                 if (res == null || !res.isPublic()) {
                     res = t;

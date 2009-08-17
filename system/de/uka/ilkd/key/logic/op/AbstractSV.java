@@ -10,12 +10,12 @@
 
 package de.uka.ilkd.key.logic.op;
 
+import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Constraint;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.sort.ArrayOfSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.inst.IllegalInstantiationException;
@@ -30,7 +30,7 @@ abstract class AbstractSV extends AbstractSortedOperator
     
     
     protected AbstractSV(Name name, 
-	                 ArrayOfSort argSorts, 
+	                 ImmutableArray<Sort> argSorts, 
 	                 Sort sort,
 	                 boolean isRigid,
 	                 boolean isStrict) {
@@ -44,7 +44,7 @@ abstract class AbstractSV extends AbstractSortedOperator
 	                 Sort sort,
 	                 boolean isRigid,
 	                 boolean isStrict) {
-	this(name, new ArrayOfSort(argSorts), sort, isRigid, isStrict);
+	this(name, new ImmutableArray<Sort>(argSorts), sort, isRigid, isStrict);
     }
     
     
@@ -52,7 +52,7 @@ abstract class AbstractSV extends AbstractSortedOperator
 	                 Sort sort,
 	                 boolean isRigid,
 	                 boolean isStrict) {
-	this(name,(ArrayOfSort) null, sort, isRigid, isStrict);
+	this(name,(ImmutableArray<Sort>) null, sort, isRigid, isStrict);
     }    
         
     

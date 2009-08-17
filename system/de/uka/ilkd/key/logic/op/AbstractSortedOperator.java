@@ -9,11 +9,9 @@
 
 package de.uka.ilkd.key.logic.op;
 
-import de.uka.ilkd.key.collection.ArrayOfBoolean;
-import de.uka.ilkd.key.logic.ArrayOfTerm;
+import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.sort.ArrayOfSort;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 
@@ -24,16 +22,16 @@ import de.uka.ilkd.key.logic.sort.Sort;
 abstract class AbstractSortedOperator extends AbstractOperator 
                                       implements SortedOperator {
     
-    private static final ArrayOfSort EMPTY_SORT_LIST = new ArrayOfSort();
+    private static final ImmutableArray<Sort> EMPTY_SORT_LIST = new ImmutableArray<Sort>();
     
     private final Sort sort;
-    private final ArrayOfSort argSorts;
+    private final ImmutableArray<Sort> argSorts;
 
     
     protected AbstractSortedOperator(Name name,
-	    			     ArrayOfSort argSorts,
+	    			     ImmutableArray<Sort> argSorts,
 	    		             Sort sort,
-	    		             ArrayOfBoolean whereToBind,
+	    		             ImmutableArray<Boolean> whereToBind,
 	    		             boolean isRigid) {
 	super(name, 
 	      argSorts == null ? 0 : argSorts.size(), 
@@ -51,15 +49,15 @@ abstract class AbstractSortedOperator extends AbstractOperator
 	    		             Boolean[] whereToBind,
 	    		             boolean isRigid) {
 	this(name, 
-             new ArrayOfSort(argSorts), 
+             new ImmutableArray<Sort>(argSorts), 
              sort, 
-             new ArrayOfBoolean(whereToBind), 
+             new ImmutableArray<Boolean>(whereToBind), 
              isRigid);
     }    
     
     
     protected AbstractSortedOperator(Name name,
-	    			     ArrayOfSort argSorts,
+	    			     ImmutableArray<Sort> argSorts,
 	    		             Sort sort,
 	    		             boolean isRigid) {
 	this(name, argSorts, sort, null, isRigid);
@@ -70,19 +68,19 @@ abstract class AbstractSortedOperator extends AbstractOperator
 	    			     Sort[] argSorts,
 	    		             Sort sort,
 	    		             boolean isRigid) {
-	this(name, new ArrayOfSort(argSorts), sort, null, isRigid);
+	this(name, new ImmutableArray<Sort>(argSorts), sort, null, isRigid);
     }
     
     
     protected AbstractSortedOperator(Name name,
 	    		             Sort sort,
 	    		             boolean isRigid) {
-	this(name, (ArrayOfSort) null, sort, null, isRigid);
+	this(name, (ImmutableArray<Sort>) null, sort, null, isRigid);
     }    
     
 
     @Override
-    public final Sort sort(ArrayOfTerm terms) {
+    public final Sort sort(ImmutableArray<Term> terms) {
 	return sort;
     }
     
@@ -126,12 +124,12 @@ abstract class AbstractSortedOperator extends AbstractOperator
     
     @Override    
     public final Sort argSort(int i) {
-	return argSorts.getSort(i);
+	return argSorts.get(i);
     }
     
     
     @Override
-    public final ArrayOfSort argSorts() {
+    public final ImmutableArray<Sort> argSorts() {
 	return argSorts;
     }
     

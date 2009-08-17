@@ -10,7 +10,6 @@
 package de.uka.ilkd.key.proof;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.StringReader;
 import java.util.Iterator;
@@ -18,13 +17,17 @@ import java.util.LinkedList;
 import java.util.Stack;
 import java.util.Vector;
 
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.*;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.parser.*;
+import de.uka.ilkd.key.parser.DefaultTermParser;
+import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.proof.init.*;
 import de.uka.ilkd.key.proof.mgt.ContractWithInvs;
@@ -53,8 +56,8 @@ public final class ProblemLoader implements Runnable {
     private ContractWithInvs currContract = null;
     private Stack stack = new Stack();
     private LinkedList loadedInsts = null;
-    private ListOfIfFormulaInstantiation ifFormulaList =
-        SLListOfIfFormulaInstantiation.EMPTY_LIST;
+    private ImmutableList<IfFormulaInstantiation> ifFormulaList =
+        ImmutableSLList.<IfFormulaInstantiation>nil();
     private Constraint matchConstraint = null;
 
 
@@ -295,7 +298,7 @@ public final class ProblemLoader implements Runnable {
             currFormula   = 0;
             currPosInTerm = PosInTerm.TOP_LEVEL;
             loadedInsts   = null;
-            ifFormulaList = SLListOfIfFormulaInstantiation.EMPTY_LIST;
+            ifFormulaList = ImmutableSLList.<IfFormulaInstantiation>nil();
             matchConstraint = Constraint.BOTTOM;
             break;
 
@@ -377,7 +380,7 @@ public final class ProblemLoader implements Runnable {
             break;
         case 'w' : //newnames
             final String[] newNames = s.split(",");
-            ListOfName l = SLListOfName.EMPTY_LIST;
+            ImmutableList<Name> l = ImmutableSLList.<Name>nil();
             for (int in = 0; in < newNames.length; in++) {
                 l = l.append(new Name(newNames[in]));
             }
@@ -463,7 +466,7 @@ public final class ProblemLoader implements Runnable {
             return ourApp;
         }
 
-        final SetOfRuleApp ruleApps =
+        final ImmutableSet<RuleApp> ruleApps =
             mediator.getBuiltInRuleApplications(currTacletName, pos);
 
         if (ruleApps.size() != 1) {
@@ -584,7 +587,7 @@ public final class ProblemLoader implements Runnable {
 
     private TacletApp constructInsts(TacletApp app, Services services) {
         if (loadedInsts == null) return app;
-        SetOfSchemaVariable uninsts = app.uninstantiatedVars();
+        ImmutableSet<SchemaVariable> uninsts = app.uninstantiatedVars();
 
         // first pass: add variables
         Iterator it = loadedInsts.iterator();
@@ -663,8 +666,8 @@ public final class ProblemLoader implements Runnable {
     }
 
 
-    private SchemaVariable lookupName(SetOfSchemaVariable set, String name) {
-        IteratorOfSchemaVariable it = set.iterator();
+    private SchemaVariable lookupName(ImmutableSet<SchemaVariable> set, String name) {
+        Iterator<SchemaVariable> it = set.iterator();
         while (it.hasNext()) {
             SchemaVariable v = it.next();
             if (v.name().toString().equals(name)) return v;

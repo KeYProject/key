@@ -8,13 +8,13 @@
 //
 //
 
-
 package de.uka.ilkd.key.java.declaration;
+
+import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.JavaNonTerminalProgramElement;
 import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.java.reference.ArrayOfTypeReference;
 import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.java.reference.TypeReferenceContainer;
 import de.uka.ilkd.key.java.visitor.Visitor;
@@ -25,15 +25,14 @@ import de.uka.ilkd.key.util.ExtList;
  *  @author <TT>AutoDoc</TT>
  */
 
-public class Throws
- extends JavaNonTerminalProgramElement
+public class Throws extends JavaNonTerminalProgramElement
  implements TypeReferenceContainer {
 
 
     /**
      *      Exceptions.
      */
-    protected final ArrayOfTypeReference exceptions;
+    protected final ImmutableArray<TypeReference> exceptions;
 
     /**
      *      Throws.
@@ -47,7 +46,7 @@ public class Throws
      *      @param exception a type reference.
      */
     public Throws(TypeReference exception) {
-	this.exceptions=new ArrayOfTypeReference(exception); 
+	this.exceptions=new ImmutableArray<TypeReference>(exception); 
     }
 
     /**
@@ -55,7 +54,7 @@ public class Throws
      *      @param list a type reference array.
      */
     public Throws(TypeReference[] list) {
-	this.exceptions = new ArrayOfTypeReference(list); 
+	this.exceptions = new ImmutableArray<TypeReference>(list); 
     }
 
 
@@ -70,7 +69,7 @@ public class Throws
     public Throws(ExtList children) {
 	super(children);
 	this.exceptions=new
-	    ArrayOfTypeReference((TypeReference[])
+	    ImmutableArray<TypeReference>((TypeReference[])
 				 children.collect(TypeReference.class));  
     }
 
@@ -78,7 +77,7 @@ public class Throws
         if (exceptions == null) {
             return this;
         }
-        return exceptions.getTypeReference(exceptions.size() - 1);
+        return exceptions.get(exceptions.size() - 1);
     }
 
     /**
@@ -101,7 +100,7 @@ public class Throws
      */
     public ProgramElement getChildAt(int index) {
         if (exceptions != null) {
-            return exceptions.getTypeReference(index);
+            return exceptions.get(index);
         }
         throw new ArrayIndexOutOfBoundsException();
     }
@@ -110,7 +109,7 @@ public class Throws
      *      Get exceptions.
      *      @return the type reference mutable list.
      */
-    public ArrayOfTypeReference getExceptions() {
+    public ImmutableArray<TypeReference> getExceptions() {
         return exceptions;
     }
 
@@ -132,7 +131,7 @@ public class Throws
     */
     public TypeReference getTypeReferenceAt(int index) {
         if (exceptions != null) {
-            return exceptions.getTypeReference(index);
+            return exceptions.get(index);
         }
         throw new ArrayIndexOutOfBoundsException();
     }

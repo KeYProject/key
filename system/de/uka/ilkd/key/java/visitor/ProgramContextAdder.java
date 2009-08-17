@@ -9,6 +9,7 @@
 //
 package de.uka.ilkd.key.java.visitor;
 
+import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
 import de.uka.ilkd.key.java.statement.LabeledStatement;
@@ -156,7 +157,7 @@ public class ProgramContextAdder {
 	   Attention: we have not yet added the enclosing braces or even
 	   the <code>moreStmnts</code>
 	 */
-	return new StatementBlock(new ArrayOfStatement(body));
+	return new StatementBlock(new ImmutableArray<Statement>(body));
     }
 
     /**
@@ -183,7 +184,7 @@ public class ProgramContextAdder {
 	    if (childrenCount - 1 > 0) {
 		wrapper.getBody().arraycopy(1, body, 1, childrenCount - 1);
 	    }
-	    return new StatementBlock(new ArrayOfStatement(body));
+	    return new StatementBlock(new ImmutableArray<Statement>(body));
 	}
     }
 

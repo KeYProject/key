@@ -10,8 +10,11 @@
 
 package de.uka.ilkd.key.proof;
 
+import java.util.Iterator;
 import java.util.Vector;
 
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.pp.AbbrevMap;
@@ -118,12 +121,12 @@ public class ApplyTacletDialogModel {
 	int     size    = asize + ifseq.succedent().size();
 
 	if ( size > 0 ) {
-	    ListOfIfFormulaInstantiation antecCand =
+	    ImmutableList<IfFormulaInstantiation> antecCand =
 		IfFormulaInstSeq.createList ( seq, true );
-	    ListOfIfFormulaInstantiation succCand  =
+	    ImmutableList<IfFormulaInstantiation> succCand  =
 		IfFormulaInstSeq.createList ( seq, false );
 
-	    IteratorOfConstrainedFormula it        = ifseq.iterator();
+	    Iterator<ConstrainedFormula> it        = ifseq.iterator();
 	    Term                         ifFma;
 	    MatchConditions              matchCond = app.matchConditions ();
 
@@ -154,7 +157,7 @@ public class ApplyTacletDialogModel {
 	       MissingInstantiationException,
 	       SortMismatchException {
 
-	ListOfIfFormulaInstantiation instList = SLListOfIfFormulaInstantiation.EMPTY_LIST;
+	ImmutableList<IfFormulaInstantiation> instList = ImmutableSLList.<IfFormulaInstantiation>nil();
 
 	int i = ifChoiceModel.length;
 	while ( i-- != 0 ) {

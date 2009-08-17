@@ -11,6 +11,9 @@
 //
 package de.uka.ilkd.key.java.visitor;
 
+import java.util.Stack;
+
+import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.declaration.ClassInitializer;
 import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
@@ -25,7 +28,6 @@ import de.uka.ilkd.key.java.statement.*;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.util.ExtList;
-import de.uka.ilkd.key.util.SimpleStackOfExtList;
 
 /**
  * Walks through a java AST in depth-left-fist-order.
@@ -37,8 +39,9 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
     boolean preservesPositionInfo = true;
 
     /**  */
-    protected SimpleStackOfExtList stack = new SimpleStackOfExtList();
-
+    //protected SimpleStackOfExtList stack = new SimpleStackOfExtList();
+    protected Stack<ExtList> stack = new Stack<ExtList>();
+    
     /**
      * create the CreatingASTVisitor
      * 
@@ -1162,10 +1165,10 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
         addToTopOfStack(x);
     }
 
-    protected void addChildren(ArrayOfProgramElement arr) {
+    protected void addChildren(ImmutableArray<ProgramElement> arr) {
         stack.pop();
         for (int i = 0, sz = arr.size(); i < sz; i++) {
-            addToTopOfStack(arr.getProgramElement(i));
+            addToTopOfStack(arr.get(i));
         }
     }
 

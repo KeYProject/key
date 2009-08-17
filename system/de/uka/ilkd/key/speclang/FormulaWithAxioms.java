@@ -21,10 +21,14 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.op.LogicVariable;
+import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+import de.uka.ilkd.key.logic.op.Quantifier;
 import de.uka.ilkd.key.proof.init.CreatedAttributeTermFactory;
 
 
@@ -110,9 +114,9 @@ public class FormulaWithAxioms {
     
     
     public FormulaWithAxioms allClose(Services services) {
-        SetOfQuantifiableVariable freeVars = formula.freeVars();
+        ImmutableSet<QuantifiableVariable> freeVars = formula.freeVars();
         LogicVariable[] freeVarsArray = new LogicVariable[freeVars.size()];
-        IteratorOfQuantifiableVariable it = freeVars.iterator();
+        Iterator<QuantifiableVariable> it = freeVars.iterator();
         for(int i = 0; i < freeVarsArray.length; i++) {
             freeVarsArray[i] = (LogicVariable) it.next();
         }

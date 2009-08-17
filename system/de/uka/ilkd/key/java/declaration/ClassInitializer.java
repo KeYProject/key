@@ -96,7 +96,7 @@ public class ClassInitializer extends JavaDeclaration implements MemberDeclarati
         if (modArray != null) {
             len = modArray.size();
             if (len > index) {
-                return modArray.getModifier(index);
+                return modArray.get(index);
             }
             index -= len;
         }

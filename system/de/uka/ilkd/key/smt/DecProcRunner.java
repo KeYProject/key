@@ -17,26 +17,29 @@
 
 package de.uka.ilkd.key.smt;
 
-import de.uka.ilkd.key.gui.ExceptionDialog;
-import de.uka.ilkd.key.gui.IMain;
-import de.uka.ilkd.key.gui.KeYMediator;
-import de.uka.ilkd.key.gui.Main;
+
+import java.awt.event.ActionEvent;
+import java.util.Iterator;
+
+import de.uka.ilkd.key.collection.ImmutableList;
+import java.awt.event.ActionEvent;
+import java.util.Timer;
+import java.util.TimerTask;
+
+import de.uka.ilkd.key.gui.*;
 import de.uka.ilkd.key.gui.notification.events.GeneralInformationEvent;
 import de.uka.ilkd.key.logic.Constraint;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.proof.*;
-import de.uka.ilkd.key.rule.BuiltInRule;
-import de.uka.ilkd.key.rule.BuiltInRuleApp;
-import de.uka.ilkd.key.rule.ListOfBuiltInRule;
-import de.uka.ilkd.key.util.ExceptionHandlerException;
-import de.uka.ilkd.key.util.KeYExceptionHandler;
+import de.uka.ilkd.key.rule.*;
+import de.uka.ilkd.key.util.*;
 
 
 /**
  * Runs the currently active decision procedure on 
  * each open goal of a given proof.
  */
-public class DecProcRunner implements Runnable {
+public class DecProcRunner extends SwingWorker {
 
     private final IMain main;
     
@@ -48,14 +51,24 @@ public class DecProcRunner implements Runnable {
     private final BuiltInRule simpRule;
 
     public DecProcRunner(IMain main, Proof proof, Constraint userConstraint) {
+	//instantiate this DecProcRunner with the currently selected standard SMT solver
+        this(main, proof, userConstraint, null);
+    }
+
+    public DecProcRunner(IMain main, Proof proof, Constraint userConstraint, BuiltInRule r) {
         this.main = main;
         this.proof = proof;
         this.userConstraint = userConstraint;
-        
-        this.simpRule = getIntegerDecisionProcedure();
+
+        if (r == null) {
+            this.simpRule = getIntegerDecisionProcedure();
+        } else {
+            this.simpRule = r;
+            
+        }
         exceptionHandler = main.mediator().getExceptionHandler();
     }
-
+    
     public void run() {
         /* Invoking start() on the SwingWorker causes a new Thread
          * to be created that will call construct(), and then
@@ -63,7 +76,6 @@ public class DecProcRunner implements Runnable {
          * the worker is interrupted because we catch the
          * InterruptedException in doWork().
          */
-        main.mediator().stopInterface(true);
         Object res = construct();
         finished(res);
     }
@@ -101,69 +113,109 @@ public class DecProcRunner implements Runnable {
         Object res = doWork();
         return res;
     }
-
+    
     private Object doWork() {
         String status = "";
-        
+        main.mediator().stopInterface(true);
         final KeYMediator mediator = main.mediator();        
         mediator.resetNrGoalsClosedByHeuristics();
-        try {
-            try {
-                totalGoals = proof.openGoals().size();
-                int cnt = 0;
-                
-                proof.env().registerRule(simpRule,
-                        de.uka.ilkd.key.proof.mgt.AxiomJustification.INSTANCE);
+        InterruptListener il = null;
+        	try {
+                    try {
+                        totalGoals = proof.openGoals().size();
+                        int cnt = 0;
+                        
+                        proof.env().registerRule(simpRule,
+                                de.uka.ilkd.key.proof.mgt.AxiomJustification.INSTANCE);
 
-                main.setStatusLine("Running external decision procedure: " +
-                        simpRule.displayName(), totalGoals); 
-                
-                final IteratorOfGoal goals = proof.openGoals().iterator();
+                        main.setStatusLine("Running external decision procedure: " +
+                                simpRule.displayName(), 99*totalGoals); 
+                        
+                        final Iterator<Goal> goals = proof.openGoals().iterator();
 
-                while (goals.hasNext()) {      
-                    BuiltInRuleApp birApp = new BuiltInRuleApp(simpRule, null, 
-                            userConstraint);                    						
-                    
-                    Goal g = goals.next();
-                    
-                    cnt++;
-                    final int temp = cnt;
-                    
-                    
-                    ProofTreeListener ptl = new ProofTreeListener() {
-                	
-                	public void proofGoalRemoved(ProofTreeEvent e) {
-                	    main.getProgressMonitor().setProgress(temp);
-                	}
-                	
-                	public void proofIsBeingPruned(ProofTreeEvent e) {}
-                	public void proofPruned(ProofTreeEvent e) {}
-                	public void proofClosed(ProofTreeEvent e) {}
-                	public void proofStructureChanged(ProofTreeEvent e) {}
-                	public void proofGoalsAdded(ProofTreeEvent e) {}
-                	public void proofGoalsChanged(ProofTreeEvent e) {}
-                	public void proofExpanded(ProofTreeEvent e) {}
-                    };
-                    proof.addProofTreeListener(ptl);
-                    g.apply(birApp);
-                    proof.removeProofTreeListener(ptl);
-                    
+                        while (goals.hasNext()) {    
+                            BuiltInRuleApp birApp = new BuiltInRuleApp(simpRule, null, 
+                                    userConstraint);                    						
+                            
+                            Goal g = goals.next();
+                            
+                            cnt++;
+                            final int temp = cnt;
+
+                            //start a task to update the progressbar according to the timeprogress.
+                            BaseProgressMonitor pm = null;
+                            
+                            //add a progress monitor to disply up to date progress.
+                            if (simpRule instanceof SMTRule || simpRule instanceof SMTRuleMulti) {
+                        	final MakesProgress prog = (MakesProgress) simpRule;
+                        	//final SMTRule rule = (SMTRule) simpRule;
+                        	il = new InterruptListener() {
+                                    public void interruptionPerformed(ActionEvent e) {
+                                        prog.interrupt();
+                                	//rule.interrupt();
+                                        main.setStatusLine("External decision procedure interrupted by user");
+                                    }
+                                 };
+                                main.mediator().addinterruptListener(il);
+                        	int step = 99;
+                		int base = (cnt-1) * step;
+                		pm = new BaseProgressMonitor(base, main.getProgressMonitor());
+                        	prog.addProgressMonitor(pm);
+                		//rule.addProgressMonitor(pm);
+                            }
+                            ProofTreeListener ptl = new ProofTreeListener() {
+                        	
+                        	public void proofGoalRemoved(ProofTreeEvent e) {
+                        	    int step = 99;
+                        	    main.getProgressMonitor().setProgress(step*temp);
+                        	}
+                        	
+                        	public void proofIsBeingPruned(ProofTreeEvent e) {}
+                        	public void proofPruned(ProofTreeEvent e) {}
+                        	public void proofClosed(ProofTreeEvent e) {}
+                        	public void proofStructureChanged(ProofTreeEvent e) {}
+                        	public void proofGoalsAdded(ProofTreeEvent e) {}
+                        	public void proofGoalsChanged(ProofTreeEvent e) {}
+                        	public void proofExpanded(ProofTreeEvent e) {}
+                            };
+                            proof.addProofTreeListener(ptl);
+                            g.apply(birApp);
+                            if (il != null) {
+                        	mediator.removeInterruptListener(il);
+                        	il = null;
+                            }
+                            //remove the progress monitor again
+                            if (pm != null) {
+                        	
+                        	((MakesProgress)simpRule).removeProgressMonitor(pm);
+                            }
+
+                            proof.removeProofTreeListener(ptl);
+                            
+                        }
+                    } catch (ExceptionHandlerException e) {
+                        throw e;
+                    } catch (Throwable thr) {
+                        exceptionHandler.reportException(thr);
+                    }
+                } catch (ExceptionHandlerException ex){
+                    main.setStatusLine("Running external decision procedure failed");
+                    throw(ex);
+                } finally {
+                    if (il != null) {
+                	mediator.removeInterruptListener(il);
+                	il = null;
+                    }
+                    mediator.startInterface(true);
                 }
-            } catch (ExceptionHandlerException e) {
-                throw e;
-            } catch (Throwable thr) {
-                exceptionHandler.reportException(thr);
-            }
-        } catch (ExceptionHandlerException ex){
-            main.setStatusLine("Running external decision procedure failed");
-            status =  ex.toString();
-        }
+        
         return status;
     }
 
+    
     private BuiltInRule getIntegerDecisionProcedure() {
 	final Name simpRuleName = proof.getSettings().getDecisionProcedureSettings().getActiveRule().getRuleName();
-	final ListOfBuiltInRule rules = proof.getSettings().getProfile().getStandardRules().getStandardBuiltInRules();
+	final ImmutableList<BuiltInRule> rules = proof.getSettings().getProfile().getStandardRules().getStandardBuiltInRules();
         for (BuiltInRule r : rules) {
             if (r.name().equals(simpRuleName)) {
         	return r;
@@ -172,9 +224,29 @@ public class DecProcRunner implements Runnable {
         return null;
     }	
 
-
-
-
-
-
+    /**
+     * this ProgressMonitor adds the progress it gets to basevalue and passes it on to 
+     * a registered progress monitor.
+     * @author Simon Greiner
+     *
+     */
+    private static class BaseProgressMonitor implements ProgressMonitor {
+	
+	private int baseval;
+	private ProgressMonitor delegate;
+	
+	public BaseProgressMonitor(int baseval, ProgressMonitor delegate) {
+	    this.baseval = baseval;
+	    this.delegate = delegate;
+	}
+	
+	public void setProgress(int val) {
+	    delegate.setProgress(val+baseval);
+	}
+	    
+	public void setMaximum(int val) {
+	    //do nothing.
+	}
+	
+    }
 }

@@ -13,9 +13,11 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
-import de.uka.ilkd.key.collection.ListOfString;
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.NamespaceSet;
@@ -26,7 +28,7 @@ import de.uka.ilkd.key.parser.ParserMode;
 import de.uka.ilkd.key.proof.CountingBufferedInputStream;
 import de.uka.ilkd.key.proof.RuleSource;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
-import de.uka.ilkd.key.rule.SetOfTaclet;
+import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.speclang.SLEnvInput;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.ProgressMonitor;
@@ -59,7 +61,7 @@ public class KeYFile implements EnvInput {
     private boolean chooseContract = false;
 
     // when parsing the key file store the classPaths here
-    private ListOfString classPaths;
+    private ImmutableList<String> classPaths;
 
     private Includes includes;
     
@@ -292,7 +294,7 @@ public class KeYFile implements EnvInput {
             problemParser.problem(); 
 	    initConfig.addCategory2DefaultChoices(problemParser.
 						  getCategory2Default());
-	    SetOfTaclet st = problemParser.getTaclets();
+	    ImmutableSet<Taclet> st = problemParser.getTaclets();
 	    initConfig.setTaclets(st);
             
 	    SpecificationRepository specRepos 

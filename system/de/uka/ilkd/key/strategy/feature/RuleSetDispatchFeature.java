@@ -12,11 +12,11 @@
 package de.uka.ilkd.key.strategy.feature;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.rule.IteratorOfRuleSet;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.rule.TacletApp;
@@ -46,7 +46,7 @@ public class RuleSetDispatchFeature implements Feature {
         if ( ! ( app instanceof TacletApp ) ) return LongRuleAppCost.ZERO_COST;
 
         RuleAppCost res = LongRuleAppCost.ZERO_COST;
-        final IteratorOfRuleSet it = ( (TacletApp)app ).taclet ().ruleSets ();
+        final Iterator<RuleSet> it = ( (TacletApp)app ).taclet ().ruleSets ();
         while ( !( res instanceof TopRuleAppCost ) && it.hasNext () ) {
             final Feature partialF = rulesetToFeature.get ( it.next () );
             if ( partialF != null )

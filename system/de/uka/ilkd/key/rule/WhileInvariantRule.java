@@ -13,7 +13,12 @@ package de.uka.ilkd.key.rule;
 import java.util.HashMap;
 import java.util.Map;
 
-import de.uka.ilkd.key.java.*;
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.SourceElement;
+import de.uka.ilkd.key.java.Statement;
+import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
@@ -23,11 +28,11 @@ import de.uka.ilkd.key.java.reference.TypeRef;
 import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.statement.While;
 import de.uka.ilkd.key.ldt.HeapLDT;
-import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.proof.*;
+import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.metaconstruct.WhileInvRule;
 import de.uka.ilkd.key.speclang.LoopInvariant;
@@ -145,7 +150,7 @@ public final class WhileInvariantRule implements BuiltInRule {
 		                	    		TB.func(anonHeapFunc)));
 	
 	//local vars
-	SetOfProgramVariable localVars = IIT.getWrittenPVs(loop, services);
+	ImmutableSet<ProgramVariable> localVars = IIT.getWrittenPVs(loop, services);
 	for(ProgramVariable pv : localVars) {
 	    String anonFuncName = IIT.getNewName(pv.name().toString(), 
 		    				 services);
@@ -224,7 +229,7 @@ public final class WhileInvariantRule implements BuiltInRule {
 
     
     @Override
-    public ListOfGoal apply(Goal goal, Services services, RuleApp ruleApp) {
+    public ImmutableList<Goal> apply(Goal goal, Services services, RuleApp ruleApp) {
 	final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
 	final KeYJavaType booleanKJT = services.getTypeConverter()
 	                                       .getBooleanType();
@@ -280,7 +285,7 @@ public final class WhileInvariantRule implements BuiltInRule {
 			       TB.lt(variant, TB.var(variantPV), services)) : TB.tt();
 	
 	//split goal into three branches
-	ListOfGoal result = goal.split(3);
+	ImmutableList<Goal> result = goal.split(3);
 	Goal initGoal = result.tail().tail().head();
 	Goal bodyGoal = result.tail().head();
 	Goal useGoal = result.head();

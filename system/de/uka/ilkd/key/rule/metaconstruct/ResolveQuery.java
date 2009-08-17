@@ -9,7 +9,14 @@
 //
 package de.uka.ilkd.key.rule.metaconstruct;
 
-import de.uka.ilkd.key.java.*;
+import java.util.Iterator;
+
+import de.uka.ilkd.key.collection.ImmutableArray;
+import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.java.Expression;
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.Statement;
+import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
 import de.uka.ilkd.key.java.declaration.VariableSpecification;
@@ -43,7 +50,7 @@ public class ResolveQuery extends AbstractMetaOperator {
     }
 
 
-    private ArrayOfExpression createArgumentPVs(Term t, Services services) {
+    private ImmutableArray<Expression> createArgumentPVs(Term t, Services services) {
 	final ProgramMethod pm = ((ProgramMethod)t.op());
 	boolean staticMethod = pm.isStatic() || pm.isConstructor();
 	Expression[] result = new Expression[t.arity()-(staticMethod ? 0 : 1)];
@@ -53,17 +60,17 @@ public class ResolveQuery extends AbstractMetaOperator {
             final KeYJavaType argumentType = pm.getParameterType(i);
             result[i] = createPV(parameter.name().toString(), argumentType, services);
 	}
-	return new ArrayOfExpression(result);
+	return new ImmutableArray<Expression>(result);
     }
 
-    private ArrayOfQuantifiableVariable collectFreeVariables(Term t){
-	SetOfQuantifiableVariable qvs = t.freeVars();
+    private ImmutableArray<QuantifiableVariable> collectFreeVariables(Term t){
+	ImmutableSet<QuantifiableVariable> qvs = t.freeVars();
 	QuantifiableVariable[] qva = new QuantifiableVariable[qvs.size()];
-	IteratorOfQuantifiableVariable it = qvs.iterator();
+	Iterator<QuantifiableVariable> it = qvs.iterator();
 	for(int i=0; it.hasNext(); i++){
 	    qva[i] = it.next();
 	}
-	return new ArrayOfQuantifiableVariable(qva);
+	return new ImmutableArray<QuantifiableVariable>(qva);
     }
 
     private ProgramVariable createPV(String name, Sort s, Services services) {       
@@ -88,7 +95,7 @@ public class ResolveQuery extends AbstractMetaOperator {
 	addUpdatesVal = new Term[t.arity()];
 	// the last slot is for the subterm of the update term (to
 	// be set on a higher recursion level)
-	ArrayOfExpression argPVs = createArgumentPVs(t, services);
+	ImmutableArray<Expression> argPVs = createArgumentPVs(t, services);
 	
         final ProgramVariable callerPV = 
 	    (pm.isStatic() || pm.isConstructor()) ? null : 
@@ -96,7 +103,7 @@ public class ResolveQuery extends AbstractMetaOperator {
 	// create updates
 	for (int i = 0; i<argPVs.size(); i++) {
 	    addUpdatesLoc[i] = TB.var
-		((ProgramVariable)argPVs.getExpression(i));
+		((ProgramVariable)argPVs.get(i));
 	    addUpdatesVal[i] = 
 		t.sub(i + (pm.isStatic() || pm.isConstructor() ? 0 : 1));
 	}
@@ -134,7 +141,7 @@ public class ResolveQuery extends AbstractMetaOperator {
 	    (new TypeRef(res.getKeYJavaType()), 
 	     new VariableSpecification(res)); 
 	for (int i=0; i<argPVs.size(); i++) {
-	    ProgramVariable pv = (ProgramVariable)argPVs.getExpression(i);
+	    ProgramVariable pv = (ProgramVariable)argPVs.get(i);
 	    vardecls[i+1] = new LocalVariableDeclaration
 		(new TypeRef(pv.getKeYJavaType()), 
 		 new VariableSpecification(pv));
@@ -156,7 +163,7 @@ public class ResolveQuery extends AbstractMetaOperator {
 	if (addDecls!=null) {
 	    result = TB.dia(addDecls, result);
 	}
-	ArrayOfQuantifiableVariable qvs = collectFreeVariables(t);
+	ImmutableArray<QuantifiableVariable> qvs = collectFreeVariables(t);
 	if(qvs.size() > 0){
 	    result = TB.all(qvs, result);
 	}

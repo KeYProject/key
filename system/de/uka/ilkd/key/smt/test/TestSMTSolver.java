@@ -13,13 +13,14 @@ package de.uka.ilkd.key.smt.test;
 import java.io.File;
 import java.io.IOException;
 
+import junit.framework.Assert;
+import junit.framework.TestCase;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
-import de.uka.ilkd.key.smt.*;
+import de.uka.ilkd.key.smt.SMTSolver;
+import de.uka.ilkd.key.smt.SMTSolverResult;
 import de.uka.ilkd.key.util.HelperClassForTests;
-import junit.framework.Assert;
-import junit.framework.TestCase;
 
 public abstract class TestSMTSolver extends TestCase {
 

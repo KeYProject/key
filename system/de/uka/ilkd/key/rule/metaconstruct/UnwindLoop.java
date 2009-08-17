@@ -9,12 +9,12 @@
 //
 
 package de.uka.ilkd.key.rule.metaconstruct;
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.op.ListOfSchemaVariable;
-import de.uka.ilkd.key.logic.op.SLListOfSchemaVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
@@ -97,8 +97,8 @@ public class UnwindLoop extends ProgramMetaConstruct implements MetaConstructWit
      * @param svInst the instantiations so far - ignored
      * @return a list of 0 to 2 schema variables (outer/inner label)
      */
-    public ListOfSchemaVariable neededInstantiations(SVInstantiations svInst) {
-		ListOfSchemaVariable ret = SLListOfSchemaVariable.EMPTY_LIST;
+    public ImmutableList<SchemaVariable> neededInstantiations(SVInstantiations svInst) {
+		ImmutableList<SchemaVariable> ret = ImmutableSLList.<SchemaVariable>nil();
 		
 		if(innerLabel != null)
 			ret = ret.prepend(innerLabel);

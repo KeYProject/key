@@ -9,13 +9,17 @@
 
 package de.uka.ilkd.key.logic;
 
+import de.uka.ilkd.key.collection.ImmutableArray;
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.expression.literal.IntLiteral;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.ldt.SetLDT;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.sort.*;
+import de.uka.ilkd.key.logic.sort.ArraySort;
+import de.uka.ilkd.key.logic.sort.Sort;
 
 
 /**
@@ -96,7 +100,7 @@ public final class TermBuilder {
     
     public Term func(Function f, 
 	    	     Term[] s, 
-	    	     ArrayOfQuantifiableVariable boundVars) {
+	    	     ImmutableArray<QuantifiableVariable> boundVars) {
         return tf.createTerm(f, s, boundVars, null);
     }
     
@@ -139,51 +143,51 @@ public final class TermBuilder {
 
     public Term all(QuantifiableVariable qv, Term t) {
         return tf.createTerm(Quantifier.ALL, 
-    	                     new ArrayOfTerm(t), 
-    	                     new ArrayOfQuantifiableVariable(qv), 
+    	                     new ImmutableArray<Term>(t), 
+    	                     new ImmutableArray<QuantifiableVariable>(qv), 
     	                     null);
     }
     
     
-    public Term all(ArrayOfQuantifiableVariable qv, Term t2) {
+    public Term all(ImmutableArray<QuantifiableVariable> qv, Term t2) {
 	if(qv.size() == 0) {
 	    throw new TermCreationException("Cannot quantify over 0 variables");
 	}
         Term result = t2;
         for (int i = qv.size() - 1; i >= 0; i--) {
-            result = all(qv.getQuantifiableVariable(i), result); 
+            result = all(qv.get(i), result); 
         }
         return result;
     }    
     
     
     public Term all(QuantifiableVariable[] qv, Term t2) {
-	return all(new ArrayOfQuantifiableVariable(qv), t2);
+	return all(new ImmutableArray<QuantifiableVariable>(qv), t2);
     }
     
     
     public Term ex(QuantifiableVariable qv, Term t) {
 	return tf.createTerm(Quantifier.EX, 
-			     new ArrayOfTerm(t),
-			     new ArrayOfQuantifiableVariable(qv),
+			     new ImmutableArray<Term>(t),
+			     new ImmutableArray<QuantifiableVariable>(qv),
 			     null);
     }
     
     
-    public Term ex(ArrayOfQuantifiableVariable qv, Term t2) {
+    public Term ex(ImmutableArray<QuantifiableVariable> qv, Term t2) {
 	if(qv.size() == 0) {
 	    throw new TermCreationException("Cannot quantify over 0 variables");
 	}	
         Term result = t2;
         for (int i = qv.size() - 1; i >= 0; i--) {
-            result = ex(qv.getQuantifiableVariable(i), result); 
+            result = ex(qv.get(i), result); 
         }
         return result;
     }        
     
     
     public Term ex(QuantifiableVariable[] qv, Term t2) {
-        return ex(new ArrayOfQuantifiableVariable(qv), t2);
+        return ex(new ImmutableArray<QuantifiableVariable>(qv), t2);
     }
     
     
@@ -223,7 +227,7 @@ public final class TermBuilder {
     }
     
     
-    public Term and(ListOfTerm subTerms) {
+    public Term and(ImmutableList<Term> subTerms) {
 	Term result = tt();
 	for(Term sub : subTerms) {
 	    result = and(result, sub);
@@ -253,8 +257,7 @@ public final class TermBuilder {
         return result;
     }
     
-    
-    public Term or(ListOfTerm subTerms) {
+    public Term or(ImmutableList<Term> subTerms) {
 	Term result = ff();
 	for(Term sub : subTerms) {
 	    result = or(result, sub);
@@ -310,8 +313,8 @@ public final class TermBuilder {
 	              Term substTerm, 
 	              Term origTerm) {
 	return tf.createTerm(op, 
-		             new ArrayOfTerm(new Term[]{substTerm, origTerm}), 
-		             new ArrayOfQuantifiableVariable(substVar), 
+		             new ImmutableArray<Term>(new Term[]{substTerm, origTerm}), 
+		             new ImmutableArray<QuantifiableVariable>(substVar), 
 		             null);
     }
     
@@ -381,8 +384,8 @@ public final class TermBuilder {
     }
     
     
-    public Term parallel(ListOfTerm updates) {
-	return parallel(updates.toArray());
+    public Term parallel(ImmutableList<Term> updates) {
+	return parallel(updates.toArray(new Term[updates.size()]));
     }
     
     
@@ -405,7 +408,7 @@ public final class TermBuilder {
     }
     
     
-    public Term sequential(ListOfTerm updates) {
+    public Term sequential(ImmutableList<Term> updates) {
 	if(updates.size() == 0) {
 	    return skip();
 	} else if(updates.size() == 1) {
@@ -442,7 +445,7 @@ public final class TermBuilder {
     }
     
     
-    public Term applyParallel(ListOfTerm updates, Term target) {	
+    public Term applyParallel(ImmutableList<Term> updates, Term target) {	
 	return apply(parallel(updates), target);
     }
     
@@ -459,7 +462,7 @@ public final class TermBuilder {
 	if(updates.length == 0) {
 	    return target;
 	} else {
-	    ListOfTerm updateList = SLListOfTerm.EMPTY_LIST
+	    ImmutableList<Term> updateList = ImmutableSLList.<Term>nil()
 	                                        .append(updates)
 	                                        .tail();
 	    return apply(updates[0],
@@ -468,7 +471,7 @@ public final class TermBuilder {
     }    
     
     
-    public Term applySequential(ListOfTerm updates, Term target) {
+    public Term applySequential(ImmutableList<Term> updates, Term target) {
 	if(updates.size() == 0) {
 	    return target;
 	} else {
@@ -644,7 +647,7 @@ public final class TermBuilder {
 	} else {
 	    return tf.createTerm(ldt.getSetComprehension(), 
 		                 new Term[]{a,s}, 
-		                 new ArrayOfQuantifiableVariable(qv), 
+		                 new ImmutableArray<QuantifiableVariable>(qv), 
 		                 null);
 	}
     }

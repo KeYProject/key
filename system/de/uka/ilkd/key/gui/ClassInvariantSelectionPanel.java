@@ -18,28 +18,13 @@
 package de.uka.ilkd.key.gui;
 
 
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.Font;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Iterator;
 import java.util.Set;
 
-import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
-import javax.swing.DefaultListCellRenderer;
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JList;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTree;
-import javax.swing.ListModel;
-import javax.swing.ListSelectionModel;
-import javax.swing.SwingConstants;
+import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -48,13 +33,12 @@ import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
 
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.speclang.ClassInvariant;
-import de.uka.ilkd.key.speclang.IteratorOfClassInvariant;
-import de.uka.ilkd.key.speclang.SetAsListOfClassInvariant;
-import de.uka.ilkd.key.speclang.SetOfClassInvariant;
 
 
 /**
@@ -71,8 +55,8 @@ class ClassInvariantSelectionPanel extends JPanel {
     private final JPanel leftButtonPanel;
     private final JPanel rightButtonPanel;
 
-    private SetOfClassInvariant selectedInvs 
-            = SetAsListOfClassInvariant.EMPTY_SET;
+    private ImmutableSet<ClassInvariant> selectedInvs 
+            = DefaultImmutableSet.<ClassInvariant>nil();
     
     
     //-------------------------------------------------------------------------
@@ -286,7 +270,7 @@ class ClassInvariantSelectionPanel extends JPanel {
     //internal methods
     //-------------------------------------------------------------------------    
     
-    private SetOfClassInvariant getRelevantInvs(KeYJavaType kjt) {
+    private ImmutableSet<ClassInvariant> getRelevantInvs(KeYJavaType kjt) {
         if(useThroughoutInvs) {
             return specRepos.getThroughoutClassInvariants(kjt);
         } else {
@@ -330,8 +314,8 @@ class ClassInvariantSelectionPanel extends JPanel {
         
         ClassTree.Entry te = (ClassTree.Entry) node.getUserObject();
         if(te.kjt != null) {
-            SetOfClassInvariant invs = getRelevantInvs(te.kjt);
-            IteratorOfClassInvariant it = invs.iterator();
+            ImmutableSet<ClassInvariant> invs = getRelevantInvs(te.kjt);
+            Iterator<ClassInvariant> it = invs.iterator();
             while(it.hasNext()) {
                 if(selectedInvs.contains(it.next())) {
                     numSelectedMembers++;
@@ -402,7 +386,7 @@ class ClassInvariantSelectionPanel extends JPanel {
     
     private void selectAll() {
         //select all
-        selectedInvs = SetAsListOfClassInvariant.EMPTY_SET;
+        selectedInvs = DefaultImmutableSet.<ClassInvariant>nil();
 	final Set<KeYJavaType> kjts = services.getJavaInfo().getAllKeYJavaTypes();
 	final Iterator<KeYJavaType> it = kjts.iterator();
         while (it.hasNext()) {
@@ -420,7 +404,7 @@ class ClassInvariantSelectionPanel extends JPanel {
     
     private void unselectAll() {
         //unselect all
-        selectedInvs = SetAsListOfClassInvariant.EMPTY_SET;
+        selectedInvs = DefaultImmutableSet.<ClassInvariant>nil();
         
         //update selection counters in tree
         DefaultMutableTreeNode rootNode
@@ -438,8 +422,8 @@ class ClassInvariantSelectionPanel extends JPanel {
         if(selectedEntry == null || selectedEntry.kjt == null) {
             invList.setListData(new Object[0]);
         } else {
-            SetOfClassInvariant invariants = getRelevantInvs(selectedEntry.kjt);
-            ClassInvariant[] listData = invariants.toArray();
+            ImmutableSet<ClassInvariant> invariants = getRelevantInvs(selectedEntry.kjt);
+            ClassInvariant[] listData = invariants.toArray(new ClassInvariant[invariants.size()]);
             invList.setListData(listData);
             
             for(int i = 0; i < listData.length; i++) {
@@ -466,7 +450,7 @@ class ClassInvariantSelectionPanel extends JPanel {
     /**
      * Returns the selected set of invariants.
      */
-    public SetOfClassInvariant getClassInvariants() {
+    public ImmutableSet<ClassInvariant> getClassInvariants() {
         return selectedInvs;
     }
 }

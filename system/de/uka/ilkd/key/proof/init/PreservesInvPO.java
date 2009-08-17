@@ -9,9 +9,13 @@
 
 package de.uka.ilkd.key.proof.init;
 
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.speclang.SetOfClassInvariant;
+import de.uka.ilkd.key.logic.op.Modality;
+import de.uka.ilkd.key.logic.op.ProgramMethod;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.speclang.ClassInvariant;
 
 
 /**
@@ -19,14 +23,14 @@ import de.uka.ilkd.key.speclang.SetOfClassInvariant;
  */
 public class PreservesInvPO extends EnsuresPO {
     
-    private final SetOfClassInvariant ensuredInvs;
+    private final ImmutableSet<ClassInvariant> ensuredInvs;
     
     
     protected PreservesInvPO(InitConfig initConfig,
 	    		     String name,
                              ProgramMethod programMethod,
-                             SetOfClassInvariant assumedInvs,
-                             SetOfClassInvariant ensuredInvs) {
+                             ImmutableSet<ClassInvariant> assumedInvs,
+                             ImmutableSet<ClassInvariant> ensuredInvs) {
         super(initConfig, name, programMethod, Modality.BOX, assumedInvs, false);
         this.ensuredInvs = ensuredInvs;
     }
@@ -34,8 +38,8 @@ public class PreservesInvPO extends EnsuresPO {
     
     public PreservesInvPO(InitConfig initConfig,
 	    		  ProgramMethod programMethod, 
-                          SetOfClassInvariant assumedInvs,
-                          SetOfClassInvariant ensuredInvs) {
+                          ImmutableSet<ClassInvariant> assumedInvs,
+                          ImmutableSet<ClassInvariant> ensuredInvs) {
         this(initConfig, 
              "PreservesInv (" + programMethod + ")", 
              programMethod, 
@@ -46,7 +50,7 @@ public class PreservesInvPO extends EnsuresPO {
     
     @Override
     protected Term getPreTerm(ProgramVariable selfVar, 
-                              ListOfProgramVariable paramVars, 
+                              ImmutableList<ProgramVariable> paramVars, 
                               ProgramVariable resultVar,
                               ProgramVariable exceptionVar,
                               Term heapAtPre) throws ProofInputException {
@@ -56,7 +60,7 @@ public class PreservesInvPO extends EnsuresPO {
     
     @Override
     protected Term getPostTerm(ProgramVariable selfVar, 
-                               ListOfProgramVariable paramVars, 
+                               ImmutableList<ProgramVariable> paramVars, 
                                ProgramVariable resultVar,
                                ProgramVariable exceptionVar,
                                Term heapAtPre) throws ProofInputException {        

@@ -14,8 +14,12 @@
 package de.uka.ilkd.key.rule;
 
 import junit.framework.TestCase;
-import de.uka.ilkd.key.java.ArrayOfProgramElement;
+import de.uka.ilkd.key.collection.ImmutableArray;
+import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
@@ -25,7 +29,6 @@ import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.SortImpl;
-import de.uka.ilkd.key.logic.sort.SetAsListOfSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.IHTacletFilter;
 import de.uka.ilkd.key.proof.TacletIndex;
@@ -130,7 +133,7 @@ public class TestMatchTaclet extends TestCase {
 	assertTrue("Expected list of statement to be instantiated.",
 		   svi.getInstantiations().isInstantiated(sv));
 	assertTrue("The three statements behind the break should be matched.",
-		   ((ArrayOfProgramElement)svi.getInstantiations().getInstantiation(sv)).size() == 3);
+		   ((ImmutableArray<? extends ProgramElement>)svi.getInstantiations().getInstantiation(sv)).size() == 3);
     }
 
     public void testProgramMatch0() {
@@ -255,7 +258,7 @@ public class TestMatchTaclet extends TestCase {
 
 	JavaBlock javaBlock = JavaBlock.createJavaBlock
 	    (new de.uka.ilkd.key.java.StatementBlock
-		(new de.uka.ilkd.key.java.ArrayOfStatement
+		(new ImmutableArray<Statement>
 		    (new de.uka.ilkd.key.java.Statement[]{
 			(de.uka.ilkd.key.java.Statement)sb.getChildAt(2),
 			(de.uka.ilkd.key.java.Statement)sb.getChildAt(3)
@@ -473,7 +476,7 @@ public class TestMatchTaclet extends TestCase {
                 PosInTerm.TOP_LEVEL, false);
 
 	TacletApp tacletApp = index.getSuccedentTaclet(pio,
-	                                               new IHTacletFilter (true, SLListOfRuleSet.EMPTY_LIST),
+	                                               new IHTacletFilter (true, ImmutableSLList.<RuleSet>nil()),
 	                                               services, Constraint.BOTTOM).iterator().next();
 	assertTrue("Match should be possible(modulo renaming)",
 		   tacletApp.findIfFormulaInstantiations ( seq, services, Constraint.BOTTOM ).size()>0);
@@ -547,7 +550,7 @@ public class TestMatchTaclet extends TestCase {
 	Sort osort2=new SortImpl(new Name("os2"), osort1);
 	Sort osort3=new SortImpl(new Name("os3"), osort1);
 	Sort osort4=new SortImpl(new Name("os4"), 
-					      SetAsListOfSort.EMPTY_SET
+					       DefaultImmutableSet.<Sort>nil()
 					      .add(osort2).add(osort3), false);
 	Function v4=new Function(new Name("v4"), osort4, new Sort[0]);	
 	TermFactory tf=TermFactory.DEFAULT;
@@ -567,7 +570,7 @@ public class TestMatchTaclet extends TestCase {
 	Sort osort2=new SortImpl(new Name("os2"), osort1);
 	Sort osort3=new SortImpl(new Name("os3"), osort1);
 	Sort osort4=new SortImpl(new Name("os4"), 
-					      SetAsListOfSort.EMPTY_SET
+					       DefaultImmutableSet.<Sort>nil()
 					      .add(osort2).add(osort3), false);	
 	TermFactory tf=TermFactory.DEFAULT;
 	Function aPred = (Function)TacletForTests.getFunctions().lookup(new Name("A"));

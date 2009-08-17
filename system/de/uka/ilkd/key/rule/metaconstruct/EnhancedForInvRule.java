@@ -181,10 +181,9 @@ public final class EnhancedForInvRule extends AbstractMetaOperator {
         // the loop is an enhanced for loop
         arrayexp = loop.getGuardExpression();
         LocalVariableDeclaration lvd =
-                (LocalVariableDeclaration) loop.getILoopInit().getInits().getLoopInitializer(
-                        0);
+                (LocalVariableDeclaration) loop.getILoopInit().getInits().get(0);
         formalParam =
-                lvd.getVariableSpecifications().getVariableSpecification(0);
+                lvd.getVariableSpecifications().get(0);
 
         returnType = removeWhile.returnType();
     }

@@ -39,7 +39,7 @@ public class EliminableQuantifierTF extends BinaryTermFeature {
         if ( matrix.op () == Quantifier.ALL || matrix.op () == Quantifier.EX ) return false;
 
         final QuantifiableVariable var =
-            term.varsBoundHere ( 0 ).lastQuantifiableVariable ();
+            term.varsBoundHere ( 0 ).last ();
 
         return quanAnalyser.isEliminableVariableAllPaths ( var, matrix, op == Quantifier.EX );
     }

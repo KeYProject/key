@@ -18,12 +18,13 @@
 package de.uka.ilkd.key.proof;
 
 import java.io.StringReader;
+import java.util.Iterator;
 import java.util.Vector;
 
 import javax.swing.table.AbstractTableModel;
 
-import de.uka.ilkd.key.collection.ListOfString;
-import de.uka.ilkd.key.collection.SLListOfString;
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.*;
@@ -97,7 +98,7 @@ public class TacletInstantiationsTableModel extends AbstractTableModel {
     */
     private Vector createEntryArray(TacletApp tacletApp) {
         Vector rowVec = new Vector();
-        IteratorOfSchemaVariable it = tacletApp.instantiations().svIterator();
+        Iterator<SchemaVariable> it = tacletApp.instantiations().svIterator();
         int count = 0;
 
         while (it.hasNext()) {
@@ -113,8 +114,8 @@ public class TacletInstantiationsTableModel extends AbstractTableModel {
 
         noEditRow = count - 1;
 
-        IteratorOfSchemaVariable varIt = tacletApp.uninstantiatedVars().iterator();
-        ListOfString proposals = SLListOfString.EMPTY_LIST;
+        Iterator<SchemaVariable> varIt = tacletApp.uninstantiatedVars().iterator();
+        ImmutableList<String> proposals = ImmutableSLList.<String>nil();
 
         while (varIt.hasNext()) {
             Object[] column = new Object[2];

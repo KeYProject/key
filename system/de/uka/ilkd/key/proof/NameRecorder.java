@@ -10,21 +10,21 @@
 
 package de.uka.ilkd.key.proof;
 
-import de.uka.ilkd.key.logic.ListOfName;
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.SLListOfName;
 
 public class NameRecorder {
 
-    private ListOfName pre = SLListOfName.EMPTY_LIST;
+    private ImmutableList<Name> pre = ImmutableSLList.<Name>nil();
 
-    private ListOfName post = SLListOfName.EMPTY_LIST;
+    private ImmutableList<Name> post = ImmutableSLList.<Name>nil();
 
-    public void setProposals(ListOfName proposals) {
+    public void setProposals(ImmutableList<Name> proposals) {
         pre = proposals;
     }
 
-    public ListOfName getProposals() {
+    public ImmutableList<Name> getProposals() {
         return post;
     }
 

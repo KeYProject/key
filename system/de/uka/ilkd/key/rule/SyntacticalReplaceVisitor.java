@@ -17,8 +17,14 @@
  */
 package de.uka.ilkd.key.rule;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.Stack;
 
+import de.uka.ilkd.key.collection.DefaultImmutableMap;
+import de.uka.ilkd.key.collection.ImmutableArray;
+import de.uka.ilkd.key.collection.ImmutableMap;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.visitor.ProgramContextAdder;
@@ -37,8 +43,8 @@ public final class SyntacticalReplaceVisitor extends Visitor {
 
     private final SVInstantiations svInst;
     private final Constraint metavariableInst;
-    private MapFromSchemaVariableToTerm newInstantiations =
-                                MapAsListFromSchemaVariableToTerm.EMPTY_MAP;
+    private ImmutableMap<SchemaVariable,Term> newInstantiations =
+                                DefaultImmutableMap.<SchemaVariable,Term>nilMap();
     private final boolean forceSVInst;
     private final Name svInstBasename;
     private Services services;
@@ -363,15 +369,15 @@ public final class SyntacticalReplaceVisitor extends Visitor {
 	return op;
     }
     
-    private ArrayOfQuantifiableVariable instantiateBoundVariables(Term visited) {
-        final ArrayOfQuantifiableVariable vBoundVars = visited.boundVars();
+    private ImmutableArray<QuantifiableVariable> instantiateBoundVariables(Term visited) {
+        final ImmutableArray<QuantifiableVariable> vBoundVars = visited.boundVars();
         final QuantifiableVariable[] newVars = (vBoundVars.size() > 0)? 
         	new QuantifiableVariable[vBoundVars.size()]
         	                         : EMPTY_QUANTIFIABLE_VARS;
         boolean varsChanged = false;
 
         for(int j = 0, size = vBoundVars.size(); j < size; j++) {                 
-            QuantifiableVariable boundVar = vBoundVars.getQuantifiableVariable(j);
+            QuantifiableVariable boundVar = vBoundVars.get(j);
             if (boundVar instanceof SchemaVariable) {
         	final SchemaVariable boundSchemaVariable = 
         	    (SchemaVariable) boundVar;
@@ -394,7 +400,7 @@ public final class SyntacticalReplaceVisitor extends Visitor {
         }
         
         return  varsChanged                     
-        	? new ArrayOfQuantifiableVariable(newVars) 
+        	? new ImmutableArray<QuantifiableVariable>(newVars) 
                 : vBoundVars;                
     }
     
@@ -444,7 +450,7 @@ public final class SyntacticalReplaceVisitor extends Visitor {
             }
             
            // instantiate bound variables            
-           final ArrayOfQuantifiableVariable boundVars = 
+           final ImmutableArray<QuantifiableVariable> boundVars = 
                instantiateBoundVariables(visited);
             
             Term[] neededsubs = neededSubs(newOp.arity());
@@ -575,7 +581,7 @@ public final class SyntacticalReplaceVisitor extends Visitor {
      * variables, or null if some schema variables could not be
      * instantiated
      */
-    public MapFromSchemaVariableToTerm getNewInstantiations () {
+    public ImmutableMap<SchemaVariable,Term> getNewInstantiations () {
 	return newInstantiations;
     }
 

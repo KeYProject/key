@@ -13,6 +13,7 @@ package de.uka.ilkd.key.logic;
 
 import java.util.*;
 
+import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.util.LRUCache;
 
@@ -35,7 +36,7 @@ public final class TermFactory {
     private static final Map<Term, Term> cache 
     	= Collections.synchronizedMap(new LRUCache<Term, Term>(10000));
 
-    private static final ArrayOfTerm NO_SUBTERMS = new ArrayOfTerm();
+    private static final ImmutableArray<Term> NO_SUBTERMS = new ImmutableArray<Term>();
     
     
 
@@ -57,8 +58,8 @@ public final class TermFactory {
      * are created.
      */
     public Term createTerm(Operator op, 
-	    		   ArrayOfTerm subs, 
-	    		   ArrayOfQuantifiableVariable boundVars,
+	    		   ImmutableArray<Term> subs, 
+	    		   ImmutableArray<QuantifiableVariable> boundVars,
 	    		   JavaBlock javaBlock) {
 	if(op == null) {
 	    throw new TermCreationException("null-Operator at TermFactory");
@@ -77,9 +78,9 @@ public final class TermFactory {
     
     public Term createTerm(Operator op,
 	    		   Term[] subs, 
-	    		   ArrayOfQuantifiableVariable boundVars,
+	    		   ImmutableArray<QuantifiableVariable> boundVars,
 	    		   JavaBlock javaBlock) {
-	return createTerm(op, new ArrayOfTerm(subs), boundVars, javaBlock);
+	return createTerm(op, new ImmutableArray<Term>(subs), boundVars, javaBlock);
     }
     
     
@@ -91,7 +92,7 @@ public final class TermFactory {
     
     public Term createTerm(Operator op, 
 	    		   Term sub) {
-	return createTerm(op, new ArrayOfTerm(sub), null, null);
+	return createTerm(op, new ImmutableArray<Term>(sub), null, null);
     }    
     
     

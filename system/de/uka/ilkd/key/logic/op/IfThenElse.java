@@ -9,12 +9,12 @@
 
 package de.uka.ilkd.key.logic.op;
 
-import de.uka.ilkd.key.logic.ArrayOfTerm;
+import de.uka.ilkd.key.collection.ImmutableArray;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.sort.NullSort;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
-import de.uka.ilkd.key.logic.sort.SetOfSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 
 
@@ -43,8 +43,8 @@ public final class IfThenElse extends AbstractOperator {
             return Sort.ANY;
         } else {
             Sort result = Sort.ANY;
-            final SetOfSort set1 = s1.extendsSorts();
-            final SetOfSort set2 = s2.extendsSorts();
+            final ImmutableSet<Sort> set1 = s1.extendsSorts();
+            final ImmutableSet<Sort> set2 = s2.extendsSorts();
             assert set1 != null : "null for sort: " + s1;
             assert set2 != null : "null for sort: " + s2;
             
@@ -65,9 +65,9 @@ public final class IfThenElse extends AbstractOperator {
 
     
     @Override
-    public Sort sort(ArrayOfTerm terms) {
-        final Sort s2 = terms.getTerm(1).sort ();
-        final Sort s3 = terms.getTerm(2).sort ();
+    public Sort sort(ImmutableArray<Term> terms) {
+        final Sort s2 = terms.get(1).sort ();
+        final Sort s3 = terms.get(2).sort ();
         if(s2 instanceof ProgramSVSort
              || s2 == AbstractMetaOperator.METASORT ) { 
             return s3; 

@@ -10,9 +10,10 @@
 package de.uka.ilkd.key.logic;
 
 
+import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.SortedOperator;
-import de.uka.ilkd.key.logic.sort.*;
+import de.uka.ilkd.key.logic.sort.Sort;
 
 
 public class TermCreationException extends RuntimeException {
@@ -25,10 +26,10 @@ public class TermCreationException extends RuntimeException {
     }
 
     public TermCreationException(Operator op, Term failed) {
-	ArrayOfTerm subs = failed.subs();
+	ImmutableArray<Term> subs = failed.subs();
 	for (int i = 0, n = subs.size(); i < n; i++) {
-	    Term sub = subs.getTerm(i);
-	    assert sub == failed.subs().getTerm(i);
+	    Term sub = subs.get(i);
+	    assert sub == failed.subs().get(i);
 	}            
 
 	errorMessage = 
@@ -61,11 +62,11 @@ public class TermCreationException extends RuntimeException {
     }
 
 
-    private String subsToString(ArrayOfTerm subs) {
+    private String subsToString(ImmutableArray<Term> subs) {
 	StringBuffer sb = new StringBuffer();
 	for (int i = 0, n = subs.size(); i < n; i++) {
 	    sb.append((i+1) + ".) ");
-	    Term subi = subs.getTerm(i);
+	    Term subi = subs.get(i);
 	    if(subi!=null){
 		sb.append(subi);
 		Sort subiSort = subi.sort();

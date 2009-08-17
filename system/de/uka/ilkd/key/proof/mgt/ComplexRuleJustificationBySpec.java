@@ -13,7 +13,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.rule.*;
+import de.uka.ilkd.key.rule.RuleApp;
 
 
 public class ComplexRuleJustificationBySpec implements ComplexRuleJustification {

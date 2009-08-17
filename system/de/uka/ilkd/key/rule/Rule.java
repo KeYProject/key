@@ -12,10 +12,10 @@
  * act as a rule in the calculus. */
 package de.uka.ilkd.key.rule;
 
+import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.ListOfGoal;
 
 
 public interface Rule {
@@ -30,7 +30,7 @@ public interface Rule {
      * @return all open goals below \old(goal.node()), i.e. the goals
      * resulting from the rule application
      */
-    ListOfGoal apply(Goal goal, Services services, RuleApp ruleApp);
+    ImmutableList<Goal> apply(Goal goal, Services services, RuleApp ruleApp);
     
     /** 
      * the name of the rule

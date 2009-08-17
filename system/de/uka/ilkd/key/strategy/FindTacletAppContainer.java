@@ -10,12 +10,8 @@
 
 package de.uka.ilkd.key.strategy;
 
-import de.uka.ilkd.key.logic.ConstrainedFormula;
-import de.uka.ilkd.key.logic.FormulaChangeInfo;
-import de.uka.ilkd.key.logic.ListOfFormulaChangeInfo;
-import de.uka.ilkd.key.logic.PIOPathIterator;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
@@ -82,7 +78,7 @@ public class FindTacletAppContainer extends TacletAppContainer {
      * preceeding update has changed
      */
     private boolean subformulaOrPreceedingUpdateHasChanged ( Goal p_goal ) {
-    	ListOfFormulaChangeInfo infoList =
+    	ImmutableList<FormulaChangeInfo> infoList =
     	    p_goal.getFormulaTagManager().getModifications(positionTag);
 
 	while ( !infoList.isEmpty () ) {

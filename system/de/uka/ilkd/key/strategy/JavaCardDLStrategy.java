@@ -26,6 +26,7 @@ import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.UseOperationContractRule;
 import de.uka.ilkd.key.rule.WhileInvariantRule;
 import de.uka.ilkd.key.smt.SMTRule;
+import de.uka.ilkd.key.smt.SMTRuleMulti;
 import de.uka.ilkd.key.strategy.feature.*;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.*;
 import de.uka.ilkd.key.strategy.termProjection.*;
@@ -63,7 +64,7 @@ public final class JavaCardDLStrategy extends AbstractFeatureStrategy {
         
         this.strategyProperties =
             (StrategyProperties)strategyProperties.clone ();
-        
+      
         this.tf = new ArithTermFeatures ( p_proof.getServices ()
                                           .getTypeConverter ().getIntegerLDT () );
         this.ff = new FormulaTermFeatures ();        
@@ -123,6 +124,7 @@ public final class JavaCardDLStrategy extends AbstractFeatureStrategy {
         
         
         final Feature smtF = smtFeature(inftyConst());
+	final Feature smtMultiF = smtMultiFeature(inftyConst());
 
         return SumFeature.createSum ( new Feature [] {
               AutomatedRuleFeature.INSTANCE,
@@ -132,7 +134,8 @@ public final class JavaCardDLStrategy extends AbstractFeatureStrategy {
               strengthenConstraints, 
               AgeFeature.INSTANCE,
               oneStepSimplificationF,
-              smtF,
+              smtF, 
+              smtMultiF,
               methodSpecF, 
               loopInvF,
               ifMatchedF,
@@ -162,6 +165,10 @@ public final class JavaCardDLStrategy extends AbstractFeatureStrategy {
         return ConditionalFeature.createConditional(filter, cost);        
     }       
     
+    private Feature smtMultiFeature(Feature cost) {
+	ClassRuleFilter filter = new ClassRuleFilter(SMTRuleMulti.class);
+        return ConditionalFeature.createConditional(filter, cost);        
+    }       
 
     
     

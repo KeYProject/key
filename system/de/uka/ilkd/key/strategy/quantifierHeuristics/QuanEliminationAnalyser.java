@@ -11,6 +11,8 @@
 
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
+import java.util.Iterator;
+
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.*;
@@ -47,7 +49,7 @@ public class QuanEliminationAnalyser {
         int distance = 0;        
         while ( true ) {
             final QuantifiableVariable var =
-                quantTerm.varsBoundHere ( 0 ).lastQuantifiableVariable ();
+                quantTerm.varsBoundHere ( 0 ).last ();
 
             if ( isDefinition ( definition, var, ex )
                  && isEliminableVariableSomePaths ( var, matrix, ex ) )
@@ -80,7 +82,7 @@ public class QuanEliminationAnalyser {
     }
     
     private boolean hasDefinitionShape(Term t, boolean ex) {
-        final IteratorOfQuantifiableVariable it = t.freeVars ().iterator ();
+        final Iterator<QuantifiableVariable> it = t.freeVars ().iterator ();
         while ( it.hasNext () ) {
             if ( isDefinition ( t, it.next (), ex ) ) return true;
         }

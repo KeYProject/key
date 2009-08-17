@@ -10,11 +10,12 @@
 
 package de.uka.ilkd.key.proof.init;
 
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.ListOfProgramVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.speclang.ClassInvariant;
 import de.uka.ilkd.key.speclang.OperationContract;
-import de.uka.ilkd.key.speclang.SetOfClassInvariant;
 
 
 /**
@@ -27,7 +28,7 @@ public final class EnsuresPostPO extends EnsuresPO {
     public EnsuresPostPO(InitConfig initConfig, 
                          String name,
                          OperationContract contract, 
-                         SetOfClassInvariant assumedInvs) {
+                         ImmutableSet<ClassInvariant> assumedInvs) {
         super(initConfig, 
               name, 
               contract.getProgramMethod(), 
@@ -39,7 +40,7 @@ public final class EnsuresPostPO extends EnsuresPO {
 
 
     public EnsuresPostPO(InitConfig initConfig, OperationContract contract,
-            SetOfClassInvariant assumedInvs) {
+            ImmutableSet<ClassInvariant> assumedInvs) {
         this(initConfig, 
              "EnsuresPost (" 
                  + contract.getProgramMethod() + ", " 
@@ -51,7 +52,7 @@ public final class EnsuresPostPO extends EnsuresPO {
     
     @Override
     protected Term getPreTerm(ProgramVariable selfVar, 
-                              ListOfProgramVariable paramVars, 
+                              ImmutableList<ProgramVariable> paramVars, 
                               ProgramVariable resultVar,
                               ProgramVariable exceptionVar,
                               Term heapAtPre) 
@@ -63,7 +64,7 @@ public final class EnsuresPostPO extends EnsuresPO {
     
     @Override
     protected Term getPostTerm(ProgramVariable selfVar, 
-                               ListOfProgramVariable paramVars, 
+                               ImmutableList<ProgramVariable> paramVars, 
                                ProgramVariable resultVar,
                                ProgramVariable exceptionVar,
                                Term heapAtPre) 

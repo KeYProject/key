@@ -10,9 +10,9 @@
 
 package de.uka.ilkd.key.strategy.termgenerator;
 
+import java.util.Iterator;
 import java.util.Stack;
 
-import de.uka.ilkd.key.logic.IteratorOfTerm;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Junctor;
@@ -31,15 +31,15 @@ public class AllowedCutPositionsGenerator implements TermGenerator {
     
     public final static TermGenerator INSTANCE = new AllowedCutPositionsGenerator ();
     
-    public IteratorOfTerm generate(RuleApp app, PosInOccurrence pos, Goal goal) {
-        return new Iterator ( pos.constrainedFormula ().formula (),
+    public Iterator<Term> generate(RuleApp app, PosInOccurrence pos, Goal goal) {
+        return new ACPIterator ( pos.constrainedFormula ().formula (),
                               pos.isInAntec () );
     }
 
-    private static class Iterator implements IteratorOfTerm {
+    private class ACPIterator implements Iterator<Term> {
         private final Stack termStack = new Stack (); 
 
-        public Iterator(Term t, boolean negated) {
+        public ACPIterator(Term t, boolean negated) {
             push ( t, negated );
         }
 

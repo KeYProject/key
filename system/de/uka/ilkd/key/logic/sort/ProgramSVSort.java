@@ -12,9 +12,17 @@ package de.uka.ilkd.key.logic.sort;
 import java.util.HashMap;
 import java.util.Iterator;
 
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.*;
-import de.uka.ilkd.key.java.abstraction.*;
-import de.uka.ilkd.key.java.declaration.*;
+import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.abstraction.PrimitiveType;
+import de.uka.ilkd.key.java.abstraction.Type;
+import de.uka.ilkd.key.java.declaration.ConstructorDeclaration;
+import de.uka.ilkd.key.java.declaration.MethodDeclaration;
+import de.uka.ilkd.key.java.declaration.VariableDeclaration;
+import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.expression.ArrayInitializer;
 import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.expression.PassiveExpression;
@@ -27,7 +35,10 @@ import de.uka.ilkd.key.java.recoderext.InstanceAllocationMethodBuilder;
 import de.uka.ilkd.key.java.reference.*;
 import de.uka.ilkd.key.java.statement.*;
 import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.op.ProgramConstant;
+import de.uka.ilkd.key.logic.op.ProgramMethod;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.util.ExtList;
 
 public abstract class ProgramSVSort extends AbstractSort {
@@ -273,7 +284,7 @@ public abstract class ProgramSVSort extends AbstractSort {
     //--------------------------------------------------------------------------
     
     public ProgramSVSort(Name name) {
-	super(name, SetAsListOfSort.EMPTY_SET, false);
+	super(name, DefaultImmutableSet.<Sort>nil(), false);
 	name2sort.put(name, this);
     }
 
@@ -1075,7 +1086,7 @@ public abstract class ProgramSVSort extends AbstractSort {
 	    if (pe instanceof VariableDeclaration &&
 		((VariableDeclaration)pe).getVariables().size() == 1 &&
 		((VariableDeclaration)pe).getVariables().
-		getVariableSpecification(0).getDimensions() > 0) {
+		get(0).getDimensions() > 0) {
 		return true;
 	    }
 		
@@ -1220,7 +1231,7 @@ public abstract class ProgramSVSort extends AbstractSort {
     private static final class MethodNameReferenceSort 
 	extends NameMatchingSort {
 
-	private ListOfName reverseSignature = SLListOfName.EMPTY_LIST;
+	private ImmutableList<Name> reverseSignature = ImmutableSLList.<Name>nil();
 	private String fullTypeName;
 
 	public MethodNameReferenceSort(Name name,
@@ -1240,7 +1251,7 @@ public abstract class ProgramSVSort extends AbstractSort {
 	public MethodNameReferenceSort(Name name,
 	                               String methodName, 
 				       String declaredInType,
-				       ListOfName signature) {
+				       ImmutableList<Name> signature) {
 	    this(name, methodName, declaredInType);	    
 	    this.reverseSignature = reverse(signature);
 	}
@@ -1248,23 +1259,23 @@ public abstract class ProgramSVSort extends AbstractSort {
 	public MethodNameReferenceSort(Name name,
 	                               String[] methodNames, 
 				       String declaredInType,
-				       ListOfName signature) {
+				       ImmutableList<Name> signature) {
 	    this(name, methodNames, declaredInType);	    
 	    this.reverseSignature = reverse(signature);
 	}
 
-	private ListOfName reverse(ListOfName names) {
-	    ListOfName result = SLListOfName.EMPTY_LIST;
-	    IteratorOfName it = names.iterator();
+	private ImmutableList<Name> reverse(ImmutableList<Name> names) {
+	    ImmutableList<Name> result = ImmutableSLList.<Name>nil();
+	    Iterator<Name> it = names.iterator();
 	    while (it.hasNext()) {
 		result = result.append(it.next());
 	    }
 	    return result;
 	}
 
-	private ListOfType createSignature(Services services) {
-	    ListOfType result = SLListOfType.EMPTY_LIST;
-	    IteratorOfName ownSig = reverseSignature.iterator();
+	private ImmutableList<Type> createSignature(Services services) {
+	    ImmutableList<Type> result = ImmutableSLList.<Type>nil();
+	    Iterator<Name> ownSig = reverseSignature.iterator();
 	    while (ownSig.hasNext()) {
 		result = result.prepend(services.getJavaInfo()
 					.getKeYJavaType(""+ownSig.next()));

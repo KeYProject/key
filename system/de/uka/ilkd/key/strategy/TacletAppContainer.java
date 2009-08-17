@@ -11,12 +11,14 @@
 package de.uka.ilkd.key.strategy;
 
 import java.util.HashMap;
+import java.util.Iterator;
 
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.IteratorOfSchemaVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.op.SetOfSchemaVariable;
 import de.uka.ilkd.key.logic.op.SkolemTermSV;
 import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.rule.*;
@@ -45,7 +47,7 @@ public abstract class TacletAppContainer extends RuleAppContainer {
         return age;
     }
 
-    private ListOfTacletApp incMatchIfFormulas (Goal p_goal) {
+    private ImmutableList<TacletApp> incMatchIfFormulas (Goal p_goal) {
         final IfInstantiator instantiator = new IfInstantiator ( p_goal );
         instantiator.findIfFormulaInstantiations ();
         return instantiator.getResults ();
@@ -80,25 +82,25 @@ public abstract class TacletAppContainer extends RuleAppContainer {
      * Create a list of new RuleAppContainers that are to be 
      * considered for application.
      */
-    public ListOfRuleAppContainer createFurtherApps (Goal p_goal,
+    public ImmutableList<RuleAppContainer> createFurtherApps (Goal p_goal,
                                                      Strategy p_strategy) {
         if ( !isStillApplicable ( p_goal )
              ||
              getTacletApp ().ifInstsComplete ()
              && !ifFormulasStillValid ( p_goal ))
-            return SLListOfRuleAppContainer.EMPTY_LIST;
+            return ImmutableSLList.<RuleAppContainer>nil();
 
         final TacletAppContainer newCont = createContainer ( p_goal, p_strategy );
         if ( newCont.getCost () instanceof TopRuleAppCost )
-            return SLListOfRuleAppContainer.EMPTY_LIST;
+            return ImmutableSLList.<RuleAppContainer>nil();
 
-        ListOfRuleAppContainer res =
-            SLListOfRuleAppContainer.EMPTY_LIST.prepend ( newCont );
+        ImmutableList<RuleAppContainer> res =
+            ImmutableSLList.<RuleAppContainer>nil().prepend ( newCont );
 
         if ( getTacletApp ().ifInstsComplete () ) {
             res = addInstances ( getTacletApp (), res, p_goal, p_strategy );            
         } else {
-            final IteratorOfTacletApp it =
+            final Iterator<TacletApp> it =
                 incMatchIfFormulas ( p_goal ).iterator ();
             while ( it.hasNext () ) {
                 final TacletApp app = it.next ();
@@ -116,8 +118,8 @@ public abstract class TacletAppContainer extends RuleAppContainer {
      * using method <code>instantiateApp</code> of the strategy) to
      * <code>targetList</code>
      */
-    private ListOfRuleAppContainer addInstances( TacletApp app,
-                                                 ListOfRuleAppContainer targetList,
+    private ImmutableList<RuleAppContainer> addInstances( TacletApp app,
+                                                 ImmutableList<RuleAppContainer> targetList,
                                                  Goal p_goal,
                                                  Strategy p_strategy) {
         if ( app.uninstantiatedVars ().size () == 0 ) return targetList;
@@ -128,14 +130,13 @@ public abstract class TacletAppContainer extends RuleAppContainer {
      * Use the method <code>instantiateApp</code> of the strategy for choosing
      * the values of schema variables that have not been instantiated so far
      */
-    private ListOfRuleAppContainer instantiateApp(TacletApp app,
-                                                  ListOfRuleAppContainer targetList,
+    private ImmutableList<RuleAppContainer> instantiateApp(TacletApp app,
+                                                  ImmutableList<RuleAppContainer> targetList,
                                                   final Goal p_goal,
                                                   Strategy p_strategy) {
         // just for being able to modify the result-list in an
         // anonymous class
-        final ListOfRuleAppContainer[] resA =
-            new ListOfRuleAppContainer[] { targetList };
+        final ImmutableList<RuleAppContainer>[] resA =  new ImmutableList[] { targetList };
         
         final RuleAppCostCollector collector =
             new RuleAppCostCollector () {
@@ -160,8 +161,8 @@ public abstract class TacletAppContainer extends RuleAppContainer {
      * is <code>sufficientlyComplete</code>, and add the container to
      * <code>targetList</code>
      */
-    private ListOfRuleAppContainer addContainer(TacletApp app,
-                                                ListOfRuleAppContainer targetList,
+    private ImmutableList<RuleAppContainer> addContainer(TacletApp app,
+                                                ImmutableList<RuleAppContainer> targetList,
                                                 Goal p_goal,
                                                 Strategy p_strategy) {
         return targetList.prepend ( TacletAppContainer
@@ -177,8 +178,8 @@ public abstract class TacletAppContainer extends RuleAppContainer {
      * is <code>sufficientlyComplete</code>, and add the container to
      * <code>targetList</code>
      */
-    private ListOfRuleAppContainer addContainer(TacletApp app,
-                                                ListOfRuleAppContainer targetList,
+    private ImmutableList<RuleAppContainer> addContainer(TacletApp app,
+                                                ImmutableList<RuleAppContainer> targetList,
                                                 Goal p_goal,
                                                 RuleAppCost cost) {
         if ( !sufficientlyCompleteApp ( app, p_goal.proof().getServices() ) ) return targetList;
@@ -191,9 +192,9 @@ public abstract class TacletAppContainer extends RuleAppContainer {
     }
 
     private boolean sufficientlyCompleteApp(TacletApp app, Services services) {
-        final SetOfSchemaVariable needed = app.neededUninstantiatedVars (services);
+        final ImmutableSet<SchemaVariable> needed = app.neededUninstantiatedVars (services);
         if ( needed.size () == 0 ) return true;
-        final IteratorOfSchemaVariable it = needed.iterator ();
+        final Iterator<SchemaVariable> it = needed.iterator ();
         while ( it.hasNext () ) {
             final SchemaVariable sv = it.next ();
             if ( sv instanceof SkolemTermSV ) continue;
@@ -214,7 +215,7 @@ public abstract class TacletAppContainer extends RuleAppContainer {
     /**
      * Create containers for NoFindTaclets.
      */
-    static ListOfRuleAppContainer createAppContainers
+    static ImmutableList<RuleAppContainer> createAppContainers
         ( NoPosTacletApp p_app, Goal p_goal, Strategy  p_strategy ) {
 	return createAppContainers ( p_app, null, p_goal, p_strategy );
     }
@@ -227,7 +228,7 @@ public abstract class TacletAppContainer extends RuleAppContainer {
      * @return list of containers for currently applicable TacletApps, the cost
      * may be an instance of <code>TopRuleAppCost</code>.
      */
-    static ListOfRuleAppContainer createAppContainers
+    static ImmutableList<RuleAppContainer> createAppContainers
         ( NoPosTacletApp  p_app,
           PosInOccurrence p_pio,
           Goal            p_goal,
@@ -240,7 +241,7 @@ public abstract class TacletAppContainer extends RuleAppContainer {
 
         // Create an initial container for the given taclet; the if-formulas of
         // the taclet are only matched lazy (by <code>createFurtherApps()</code>
-        return SLListOfRuleAppContainer.EMPTY_LIST
+        return ImmutableSLList.<RuleAppContainer>nil()
                     .prepend ( createContainer ( p_app,
                                                  p_pio,
                                                  p_goal,
@@ -259,7 +260,7 @@ public abstract class TacletAppContainer extends RuleAppContainer {
     	if ( !getTacletApp().ifInstsComplete() )
     	    return false;
 
-    	final IteratorOfIfFormulaInstantiation it =
+    	final Iterator<IfFormulaInstantiation> it =
     	    getTacletApp().ifFormulaInstantiations().iterator();
 	final Sequent seq = p_goal.sequent(); 
 
@@ -324,10 +325,10 @@ public abstract class TacletAppContainer extends RuleAppContainer {
     private class IfInstantiator {
         private final Goal      goal;
         
-        private ListOfIfFormulaInstantiation allAntecFormulas;
-        private ListOfIfFormulaInstantiation allSuccFormulas;
+        private ImmutableList<IfFormulaInstantiation> allAntecFormulas;
+        private ImmutableList<IfFormulaInstantiation> allSuccFormulas;
 
-        private ListOfTacletApp results = SLListOfTacletApp.EMPTY_LIST;
+        private ImmutableList<TacletApp> results = ImmutableSLList.<TacletApp>nil();
         
         IfInstantiator ( final Goal goal ) {
             this.goal = goal;
@@ -369,7 +370,7 @@ public abstract class TacletAppContainer extends RuleAppContainer {
                                   .succedent () ),                       // with the last formula
                       createSemisequentList ( getTaclet ().ifSequent ()
                                   .antecedent () ),
-                      SLListOfIfFormulaInstantiation.EMPTY_LIST,
+                      ImmutableSLList.<IfFormulaInstantiation>nil(),
                       getTacletApp ().matchConditions (),
                       false );
             }
@@ -389,15 +390,15 @@ public abstract class TacletAppContainer extends RuleAppContainer {
          * @return a list of potential if-formula instantiations (analogously to
          *         <code>IfFormulaInstSeq.createList</code>)
          */
-        private ListOfIfFormulaInstantiation getSequentFormulas ( boolean p_antec,
+        private ImmutableList<IfFormulaInstantiation> getSequentFormulas ( boolean p_antec,
                                                                   boolean p_all ) {
             if ( p_all ) return getAllSequentFormulas ( p_antec );
 
-            final ListOfIfFormulaInstantiation cache =
+            final ImmutableList<IfFormulaInstantiation> cache =
                 getNewSequentFormulasFromCache(p_antec);
             if ( cache != null ) return cache;
 
-            final ListOfIfFormulaInstantiation newFormulas =
+            final ImmutableList<IfFormulaInstantiation> newFormulas =
                 selectNewFormulas ( p_antec );
 
             addNewSequentFormulasToCache(newFormulas, p_antec);
@@ -411,11 +412,11 @@ public abstract class TacletAppContainer extends RuleAppContainer {
          *         only of those formulas of the current goal for which the
          *         method <code>isNewFormula</code> returns <code>true</code>
          */
-        private ListOfIfFormulaInstantiation selectNewFormulas (boolean p_antec) {
-            final IteratorOfIfFormulaInstantiation it =
+        private ImmutableList<IfFormulaInstantiation> selectNewFormulas (boolean p_antec) {
+            final Iterator<IfFormulaInstantiation> it =
                 getAllSequentFormulas ( p_antec ).iterator ();                                                                
-            ListOfIfFormulaInstantiation res =
-                SLListOfIfFormulaInstantiation.EMPTY_LIST;
+            ImmutableList<IfFormulaInstantiation> res =
+                ImmutableSLList.<IfFormulaInstantiation>nil();
 
             while ( it.hasNext () ) {
                 final IfFormulaInstantiation ifInstantiation = it.next ();
@@ -435,7 +436,7 @@ public abstract class TacletAppContainer extends RuleAppContainer {
         private boolean isNewFormula (IfFormulaInstantiation p_ifInstantiation) {
             final boolean antec = ( (IfFormulaInstSeq)p_ifInstantiation ).inAntec ();
 
-            final ListOfIfFormulaInstantiation cache =
+            final ImmutableList<IfFormulaInstantiation> cache =
                             getNewSequentFormulasFromCache ( antec );
 
             if ( cache != null ) return cache.contains ( p_ifInstantiation );
@@ -468,7 +469,7 @@ public abstract class TacletAppContainer extends RuleAppContainer {
             return getAge () < formulaAge;
         }
 
-        private ListOfIfFormulaInstantiation
+        private ImmutableList<IfFormulaInstantiation>
                     getNewSequentFormulasFromCache (boolean p_antec) {
             synchronized ( ifInstCache ) {
                 if ( ifInstCache.cacheKey != goal.node () ) return null;
@@ -478,7 +479,7 @@ public abstract class TacletAppContainer extends RuleAppContainer {
             }
         }
 
-        private void addNewSequentFormulasToCache (ListOfIfFormulaInstantiation p_list,
+        private void addNewSequentFormulasToCache (ImmutableList<IfFormulaInstantiation> p_list,
                                                    boolean p_antec) {
             synchronized ( ifInstCache ) {
                 if ( ifInstCache.cacheKey != goal.node () ) {
@@ -490,7 +491,7 @@ public abstract class TacletAppContainer extends RuleAppContainer {
         }
 
 
-        private HashMap<Long, ListOfIfFormulaInstantiation> getCacheMap (boolean p_antec) {
+        private HashMap<Long, ImmutableList<IfFormulaInstantiation>> getCacheMap (boolean p_antec) {
             return p_antec ? ifInstCache.antecCache : ifInstCache.succCache;
         }
 
@@ -499,7 +500,7 @@ public abstract class TacletAppContainer extends RuleAppContainer {
         }
 
 
-        private ListOfIfFormulaInstantiation getAllSequentFormulas ( boolean p_antec ) {
+        private ImmutableList<IfFormulaInstantiation> getAllSequentFormulas ( boolean p_antec ) {
             return p_antec ? allAntecFormulas : allSuccFormulas;
         }
 
@@ -519,9 +520,9 @@ public abstract class TacletAppContainer extends RuleAppContainer {
          *            formula that has been modified recently
          */
         private void findIfFormulaInstantiationsHelp
-            ( ListOfConstrainedFormula      p_ifSeqTail,
-              ListOfConstrainedFormula      p_ifSeqTail2nd,
-              ListOfIfFormulaInstantiation  p_alreadyMatched,
+            ( ImmutableList<ConstrainedFormula>      p_ifSeqTail,
+              ImmutableList<ConstrainedFormula>      p_ifSeqTail2nd,
+              ImmutableList<IfFormulaInstantiation>  p_alreadyMatched,
               MatchConditions               p_matchCond,
               boolean                       p_alreadyMatchedNewFor ) {
             
@@ -543,7 +544,7 @@ public abstract class TacletAppContainer extends RuleAppContainer {
             final boolean lastIfFormula =
                 p_ifSeqTail.size () == 1
                 && ( p_ifSeqTail2nd == null || p_ifSeqTail2nd.isEmpty () );
-            final ListOfIfFormulaInstantiation formulas =
+            final ImmutableList<IfFormulaInstantiation> formulas =
                 getSequentFormulas ( antec,
                                      !lastIfFormula || p_alreadyMatchedNewFor );
             final IfMatchResult mr = getTaclet ().matchIf ( formulas.iterator (),
@@ -554,8 +555,8 @@ public abstract class TacletAppContainer extends RuleAppContainer {
 
             // For each matching formula call the method again to match
             // the remaining terms
-            IteratorOfIfFormulaInstantiation itCand = mr.getFormulas        ().iterator ();
-            IteratorOfMatchConditions        itMC   = mr.getMatchConditions ().iterator ();
+            Iterator<IfFormulaInstantiation> itCand = mr.getFormulas        ().iterator ();
+            Iterator<MatchConditions>        itMC   = mr.getMatchConditions ().iterator ();
             p_ifSeqTail                             = p_ifSeqTail.tail ();
             while ( itCand.hasNext () ) {
                 final IfFormulaInstantiation ifInstantiation = itCand.next ();
@@ -582,7 +583,7 @@ public abstract class TacletAppContainer extends RuleAppContainer {
             return getProof ().getServices();
         }
 
-        private NoPosTacletApp setAllInstantiations ( MatchConditions p_matchCond, ListOfIfFormulaInstantiation p_alreadyMatched ) {
+        private NoPosTacletApp setAllInstantiations ( MatchConditions p_matchCond, ImmutableList<IfFormulaInstantiation> p_alreadyMatched ) {
             return NoPosTacletApp.createNoPosTacletApp(
         	    getTaclet(),
                     p_matchCond.getInstantiations(), 
@@ -592,8 +593,8 @@ public abstract class TacletAppContainer extends RuleAppContainer {
                     getServices());
         }
 
-        private ListOfConstrainedFormula createSemisequentList ( Semisequent p_ss ) {
-            ListOfConstrainedFormula res = SLListOfConstrainedFormula.EMPTY_LIST;
+        private ImmutableList<ConstrainedFormula> createSemisequentList ( Semisequent p_ss ) {
+            ImmutableList<ConstrainedFormula> res = ImmutableSLList.<ConstrainedFormula>nil();
 
             for (final ConstrainedFormula cf : p_ss) {
                 res = res.prepend ( cf );
@@ -604,7 +605,7 @@ public abstract class TacletAppContainer extends RuleAppContainer {
         /**
          * @return Returns the results.
          */
-        public ListOfTacletApp getResults () {
+        public ImmutableList<TacletApp> getResults () {
             return results;
         }
     }
@@ -619,15 +620,15 @@ public abstract class TacletAppContainer extends RuleAppContainer {
      * Hashmaps of the particular lists of formulas; the keys of the maps
      * is the point of time that separates old from new (modified) formulas 
      * 
-     * Keys: Long        Values: ListOfIfFormulaInstantiation
+     * Keys: Long        Values: IList<IfFormulaInstantiation>
      */
     protected static final class IfInstCache {
         public Node cacheKey = null;
 
-        public final HashMap<Long, ListOfIfFormulaInstantiation> 
-            antecCache = new HashMap<Long, ListOfIfFormulaInstantiation> ();
-        public final HashMap<Long, ListOfIfFormulaInstantiation>  succCache  = 
-            new HashMap<Long, ListOfIfFormulaInstantiation>  ();  
+        public final HashMap<Long, ImmutableList<IfFormulaInstantiation>> 
+            antecCache = new HashMap<Long, ImmutableList<IfFormulaInstantiation>> ();
+        public final HashMap<Long, ImmutableList<IfFormulaInstantiation>>  succCache  = 
+            new HashMap<Long, ImmutableList<IfFormulaInstantiation>>  ();  
         
         public void reset(Node n){
             cacheKey = n;

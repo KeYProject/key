@@ -85,6 +85,8 @@ Export-Package: .,
  de.uka.ilkd.key.unittest.ppAndJavaASTExtension,
  de.uka.ilkd.key.unittest.simplify,
  de.uka.ilkd.key.unittest.simplify.ast,
+ de.uka.ilkd.key.unittest.simplify.translation,
+ de.uka.ilkd.key.unittest.testing,
  de.uka.ilkd.key.util,
  de.uka.ilkd.key.util.install,
  de.uka.ilkd.key.util.keydoc.html,
@@ -96,5 +98,6 @@ Export-Package: .,
  de.uka.ilkd.key.visualdebugger.executiontree,
  de.uka.ilkd.key.visualdebugger.statevisualisation,
  de.uka.ilkd.key.visualdebugger.watchpoints,
- de.uka.ilkd.key.visualization
+ de.uka.ilkd.key.visualization,
+ recoder.service
 Require-Bundle: KeYExternalLibraries

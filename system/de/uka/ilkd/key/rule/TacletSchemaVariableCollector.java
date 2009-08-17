@@ -10,6 +10,10 @@
 
 package de.uka.ilkd.key.rule;
 
+import java.util.Iterator;
+
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.visitor.ProgramSVCollector;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
@@ -32,15 +36,14 @@ import de.uka.ilkd.key.rule.metaconstruct.WhileInvRuleWrapper;
 public class TacletSchemaVariableCollector extends Visitor {
 
     /** collects all found variables */
-    protected ListOfSchemaVariable varList;
-    
+    protected ImmutableList<SchemaVariable> varList;
     /** the instantiations needed for unwind loop constructs */
     private SVInstantiations instantiations = 
 	SVInstantiations.EMPTY_SVINSTANTIATIONS;
 
 
     public TacletSchemaVariableCollector() {
-	varList = SLListOfSchemaVariable.EMPTY_LIST;
+	varList = ImmutableSLList.<SchemaVariable>nil();
     }
 
     
@@ -49,19 +52,19 @@ public class TacletSchemaVariableCollector extends Visitor {
      * (needed by unwind loop constructs to determine which labels are needed)
      */
     public TacletSchemaVariableCollector(SVInstantiations svInsts) {
-	varList = SLListOfSchemaVariable.EMPTY_LIST;
+	varList = ImmutableSLList.<SchemaVariable>nil();
 	instantiations = svInsts;
     }
 
     
     /** collects all SchemVariables that occur in the JavaBlock
      * @param jb the JavaBlock where to look for Schemavariables
-     * @param vars the ListOfSchemaVariable where to add the found
+     * @param vars the IList<SchemaVariable> where to add the found
      * SchemaVariables 
      * @return the extended list of found schemavariables 
      */
-    protected ListOfSchemaVariable collectSVInProgram
-	(JavaBlock jb, ListOfSchemaVariable vars) {
+    protected ImmutableList<SchemaVariable> collectSVInProgram
+	(JavaBlock jb, ImmutableList<SchemaVariable> vars) {
 
 	ProgramSVCollector prgSVColl = new 
 	    ProgramSVCollector(jb.program(), vars, instantiations);
@@ -70,8 +73,8 @@ public class TacletSchemaVariableCollector extends Visitor {
     }
     
 
-    private ListOfSchemaVariable collectSVInProgram
-	(Term t, ListOfSchemaVariable vars) {
+    private ImmutableList<SchemaVariable> collectSVInProgram
+	(Term t, ImmutableList<SchemaVariable> vars) {
 
 	ProgramSVCollector prgSVColl = new 
 	    ProgramSVCollector(new WhileInvRuleWrapper(t), 
@@ -101,7 +104,7 @@ public class TacletSchemaVariableCollector extends Visitor {
 	for (int j=0, ar = t.arity(); j<ar; j++) {
 	    for (int i=0, sz = t.varsBoundHere(j).size(); i<sz; i++) {
 		final QuantifiableVariable qVar = 
-                    t.varsBoundHere(j).getQuantifiableVariable(i);
+                    t.varsBoundHere(j).get(i);
                 if (qVar instanceof SchemaVariable) {
 		    varList = varList.prepend((SchemaVariable)qVar);
 		}
@@ -117,14 +120,14 @@ public class TacletSchemaVariableCollector extends Visitor {
     /**
      * collects all schema variables occurring on the lhs of an elementary update
      * @param op the ElementaryUpdate operator to be scanned for schemavariables
-     * @param vars the ListOfSchemaVariables with already found schema variables
+     * @param vars the ImmutableList<SchemaVariable> with already found schema variables
      * @return a list of schema variables containing the ones of <code>vars</code> 
      *   together with the schema variables found in <code>op</code>
      */
-    private ListOfSchemaVariable collectSVInElementaryUpdate(
+    private ImmutableList<SchemaVariable> collectSVInElementaryUpdate(
 	    	ElementaryUpdate op, 
-	    	ListOfSchemaVariable vars) {
-        ListOfSchemaVariable result = vars;
+	    	ImmutableList<SchemaVariable> vars) {
+        ImmutableList<SchemaVariable> result = vars;
         
         if(op.lhs() instanceof SchemaVariable) {
             result = result.prepend((SchemaVariable) op.lhs());
@@ -135,7 +138,7 @@ public class TacletSchemaVariableCollector extends Visitor {
     
     
     /** @return iterator of the found Variables */
-    public IteratorOfSchemaVariable varIterator() {
+    public Iterator<SchemaVariable> varIterator() {
 	return varList.iterator();
     }
     
@@ -156,7 +159,7 @@ public class TacletSchemaVariableCollector extends Visitor {
      * @param semiseq the Semisequent to visit
      */
     private void visit(Semisequent semiseq) {
-	IteratorOfConstrainedFormula it=semiseq.iterator();
+	Iterator<ConstrainedFormula> it=semiseq.iterator();
 	while(it.hasNext()) {
 	    it.next().formula().execPostOrder(this);
 	}
@@ -192,7 +195,7 @@ public class TacletSchemaVariableCollector extends Visitor {
     
     
     protected void visitGoalTemplates(Taclet taclet, boolean visitAddrules) {
-	IteratorOfTacletGoalTemplate it = taclet.goalTemplates().iterator();
+	Iterator<TacletGoalTemplate> it = taclet.goalTemplates().iterator();
 	while (it.hasNext()) {
 	    TacletGoalTemplate gt=it.next();
 	    visit(gt.sequent());
@@ -204,7 +207,7 @@ public class TacletSchemaVariableCollector extends Visitor {
 		}
 	    }
 	    if (visitAddrules) {
-		IteratorOfTaclet addruleIt = gt.rules().iterator();
+		Iterator<Taclet> addruleIt = gt.rules().iterator();
 		while (addruleIt.hasNext()) {
 		    visit(addruleIt.next(), true);		    
 		}

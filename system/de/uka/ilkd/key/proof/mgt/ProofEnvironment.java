@@ -15,11 +15,18 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.proof.*;
+import de.uka.ilkd.key.proof.JavaModel;
+import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
-import de.uka.ilkd.key.rule.*;
+import de.uka.ilkd.key.rule.BuiltInRule;
+import de.uka.ilkd.key.rule.Rule;
+import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.rule.Taclet;
 
 /** The unique environment a proof is performed in. The environment
  * consists of a java model, specifications, and a set of justified
@@ -122,8 +129,8 @@ public class ProofEnvironment {
      * environment. All rules of the set are given the same
      * justification. 
      */
-    public void registerRules(SetOfTaclet s, RuleJustification j) {
-	IteratorOfTaclet it = s.iterator();
+    public void registerRules(ImmutableSet<Taclet> s, RuleJustification j) {
+	Iterator<Taclet> it = s.iterator();
 	while (it.hasNext()) {
 	    registerRule(it.next(), j);
 	}
@@ -134,8 +141,8 @@ public class ProofEnvironment {
      * environment. All rules of the list are given the same
      * justification. 
      */
-    public void registerRules(ListOfBuiltInRule s, RuleJustification j) {
-	IteratorOfBuiltInRule it = s.iterator();
+    public void registerRules(ImmutableList<BuiltInRule> s, RuleJustification j) {
+	Iterator<BuiltInRule> it = s.iterator();
 	while (it.hasNext()) {
 	    Rule r=it.next();
 	    registerRule(r, j);

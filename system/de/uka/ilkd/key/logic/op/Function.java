@@ -11,9 +11,8 @@
 
 package de.uka.ilkd.key.logic.op;
 
-import de.uka.ilkd.key.collection.ArrayOfBoolean;
+import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.sort.ArrayOfSort;
 import de.uka.ilkd.key.logic.sort.NullSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 
@@ -29,8 +28,8 @@ public class Function extends AbstractSortedOperator {
 
     public Function(Name name, 
 	            Sort sort, 
-	            ArrayOfSort argSorts, 
-	            ArrayOfBoolean whereToBind,
+	            ImmutableArray<Sort> argSorts, 
+	            ImmutableArray<Boolean> whereToBind,
 	            boolean unique) {
 	super(name, argSorts, sort, whereToBind, true);
 	this.unique = unique;
@@ -48,13 +47,13 @@ public class Function extends AbstractSortedOperator {
 	    	    boolean unique) {
 	this(name, 
              sort, 
-             new ArrayOfSort(argSorts), 
-             whereToBind == null ? null : new ArrayOfBoolean(whereToBind), 
+             new ImmutableArray<Sort>(argSorts), 
+             whereToBind == null ? null : new ImmutableArray<Boolean>(whereToBind), 
              unique);
     }
     
 
-    public Function(Name name, Sort sort, ArrayOfSort argSorts) {
+    public Function(Name name, Sort sort, ImmutableArray<Sort> argSorts) {
 	this(name, sort, argSorts, null, false);
     }    
     
@@ -65,7 +64,7 @@ public class Function extends AbstractSortedOperator {
     
     
     public Function(Name name, Sort sort) {
-	this(name, sort, new ArrayOfSort(), null, false);
+	this(name, sort, new ImmutableArray<Sort>(), null, false);
     }    
     
     

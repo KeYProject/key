@@ -10,9 +10,11 @@
 
 package de.uka.ilkd.key.speclang;
 
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -38,7 +40,7 @@ public final class OperationContractImpl implements OperationContract {
     private final FormulaWithAxioms originalPost;
     private final Term originalModifies;
     private final ProgramVariable originalSelfVar;
-    private final ListOfProgramVariable originalParamVars;
+    private final ImmutableList<ProgramVariable> originalParamVars;
     private final ProgramVariable originalResultVar;
     private final ProgramVariable originalExcVar;
     private final Term originalHeapAtPre;
@@ -71,7 +73,7 @@ public final class OperationContractImpl implements OperationContract {
             		         FormulaWithAxioms post,
             		         Term modifies,
             		         ProgramVariable selfVar,
-            		         ListOfProgramVariable paramVars,
+            		         ImmutableList<ProgramVariable> paramVars,
             		         ProgramVariable resultVar,
             		         ProgramVariable excVar,
                                  Term heapAtPre) {
@@ -111,7 +113,7 @@ public final class OperationContractImpl implements OperationContract {
     
     private Map /*Operator, Operator, Term -> Term*/ getReplaceMap(
 	    		      ProgramVariable selfVar, 
-	    		      ListOfProgramVariable paramVars, 
+	    		      ImmutableList<ProgramVariable> paramVars, 
 	    		      ProgramVariable resultVar, 
 	    		      ProgramVariable excVar,
 	    		      Term heapAtPre,
@@ -127,8 +129,8 @@ public final class OperationContractImpl implements OperationContract {
         //parameters
 	if(paramVars != null) {
 	    assert originalParamVars.size() == paramVars.size();
-	    IteratorOfProgramVariable it1 = originalParamVars.iterator();
-	    IteratorOfProgramVariable it2 = paramVars.iterator();
+	    Iterator< ProgramVariable > it1 = originalParamVars.iterator();
+	    Iterator< ProgramVariable > it2 = paramVars.iterator();
 	    while(it1.hasNext()) {
 		ProgramVariable originalParamVar = it1.next();
 		ProgramVariable paramVar         = it2.next();
@@ -161,10 +163,10 @@ public final class OperationContractImpl implements OperationContract {
     }
     
     
-//    private SetOfLocationDescriptor addGuard(SetOfLocationDescriptor modifies, 
+//    private ImmutableSet<LocationDescriptor> addGuard(ImmutableSet<LocationDescriptor> modifies, 
 //                                             Term formula) {
-//        SetOfLocationDescriptor result 
-//            = SetAsListOfLocationDescriptor.EMPTY_SET;
+//        ImmutableSet<LocationDescriptor> result 
+//            = DefaultImmutableSet.<LocationDescriptor>nil();
 //        for(LocationDescriptor loc : modifies) {
 //            if(loc instanceof EverythingLocationDescriptor) {
 //                return EverythingLocationDescriptor.INSTANCE_AS_SET;
@@ -220,9 +222,8 @@ public final class OperationContractImpl implements OperationContract {
     }
     
     
-    @Override
     public FormulaWithAxioms getPre(ProgramVariable selfVar, 
-	    			    ListOfProgramVariable paramVars,
+	    			    ImmutableList< ProgramVariable > paramVars,
                                     Services services) {
         assert (selfVar == null) == (originalSelfVar == null);
         assert paramVars != null;
@@ -241,7 +242,7 @@ public final class OperationContractImpl implements OperationContract {
   
     @Override
     public FormulaWithAxioms getPost(ProgramVariable selfVar, 
-                                     ListOfProgramVariable paramVars, 
+                                     ImmutableList<ProgramVariable> paramVars, 
                                      ProgramVariable resultVar, 
                                      ProgramVariable excVar,
                                      Term heapAtPre,
@@ -266,7 +267,7 @@ public final class OperationContractImpl implements OperationContract {
   
     @Override
     public Term getModifies(ProgramVariable selfVar, 
-                            ListOfProgramVariable paramVars,
+                            ImmutableList<ProgramVariable> paramVars,
                             Services services) {
         assert (selfVar == null) == (originalSelfVar == null);
         assert paramVars != null;
@@ -308,7 +309,7 @@ public final class OperationContractImpl implements OperationContract {
 //        FormulaWithAxioms post = atPreify(originalPre, 
 //                                          newAtPreFunctions, 
 //                                          services).imply(originalPost);
-////        SetOfLocationDescriptor modifies = addGuard(originalModifies, 
+////        ImmutableSet<LocationDescriptor> modifies = addGuard(originalModifies, 
 ////                                                    originalPre.getFormula());
 //        Term modifies = originalModifies;
 //        for(OperationContract other : others) {
@@ -347,6 +348,59 @@ public final class OperationContractImpl implements OperationContract {
 //                                         originalResultVar,
 //                                         originalExcVar,
 //                                         newAtPreFunctions);
+    }
+    
+    
+    public OperationContract replaceProgramMethod(ProgramMethod pm, 
+	    					  Services services) {
+        return new OperationContractImpl(name,
+                			 displayName,
+                			 pm,
+                			 modality,
+                			 originalPre,
+                			 originalPost,
+                			 originalModifies,
+                			 originalSelfVar,
+                			 originalParamVars,
+                			 originalResultVar,
+                			 originalExcVar,
+                			 originalHeapAtPre);	
+    }
+    
+    
+    public OperationContract addPre(FormulaWithAxioms addedPre,
+		    		    ParsableVariable selfVar, 
+		    		    ImmutableList<ProgramVariable> paramVars,
+		    		    Services services) {
+	//replace in addedPre the variables used for self and parameters
+	Map <Operator, Operator> map = new LinkedHashMap<Operator,Operator>();
+	if(selfVar != null) {
+	    map.put(selfVar, originalSelfVar);
+	}
+	if(paramVars != null) {
+	    Iterator<ProgramVariable> it1 = paramVars.iterator();
+	    Iterator<ProgramVariable> it2 = originalParamVars.iterator();
+	    while(it1.hasNext()) {
+		assert it2.hasNext();
+		map.put(it1.next(), it2.next());
+	    }
+	}
+	OpReplacer or = new OpReplacer(map);
+	addedPre = or.replace(addedPre);
+	
+	//create new contract
+        return new OperationContractImpl(name,
+		 			 displayName,
+		 			 programMethod,
+		 			 modality,
+		 			 originalPre.conjoin(addedPre),
+		 			 originalPost,
+		 			 originalModifies,
+		 			 originalSelfVar,
+		 			 originalParamVars,
+		 			 originalResultVar,
+		 			 originalExcVar,
+		 			 originalHeapAtPre);
     }
 
     

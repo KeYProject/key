@@ -11,13 +11,15 @@
 
 package de.uka.ilkd.key.strategy.termgenerator;
 
+import java.util.Iterator;
+
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.collection.*;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.logic.op.SortedOperator;
-import de.uka.ilkd.key.logic.sort.ArrayOfSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.MatchConditions;
@@ -35,7 +37,7 @@ public abstract class SuperTermGenerator implements TermGenerator {
     
     public static TermGenerator upwards(TermFeature cond) {
         return new SuperTermGenerator ( cond ) {
-            protected IteratorOfTerm createIterator(PosInOccurrence focus) {
+            protected Iterator<Term> createIterator(PosInOccurrence focus) {
                 return new UpwardsIterator ( focus );
             }
         };
@@ -43,17 +45,17 @@ public abstract class SuperTermGenerator implements TermGenerator {
     
     public static TermGenerator upwardsWithIndex(TermFeature cond) {
         return new SuperTermWithIndexGenerator ( cond ) {
-            protected IteratorOfTerm createIterator(PosInOccurrence focus) {
+            protected Iterator<Term> createIterator(PosInOccurrence focus) {
                 return new UpwardsIterator ( focus );
             }
         };
     }
     
-    public IteratorOfTerm generate(RuleApp app, PosInOccurrence pos, Goal goal) {
+    public Iterator<Term> generate(RuleApp app, PosInOccurrence pos, Goal goal) {
         return createIterator ( pos );
     }
 
-    protected abstract IteratorOfTerm createIterator(PosInOccurrence focus);
+    protected abstract Iterator<Term> createIterator(PosInOccurrence focus);
     
     protected Term generateOneTerm(Term superterm, int child) {
         return superterm;
@@ -71,7 +73,7 @@ public abstract class SuperTermGenerator implements TermGenerator {
             super ( cond );
         }
 
-        public IteratorOfTerm generate(RuleApp app, PosInOccurrence pos, Goal goal) {
+        public Iterator<Term> generate(RuleApp app, PosInOccurrence pos, Goal goal) {
             if ( services == null ) {
                 services = goal.proof ().getServices ();
                 final IntegerLDT numbers = services.getTypeConverter ().getIntegerLDT ();
@@ -86,7 +88,7 @@ public abstract class SuperTermGenerator implements TermGenerator {
                 	return 2;
                     }
 
-                    public Sort sort(ArrayOfTerm terms) {
+                    public Sort sort(ImmutableArray<Term> terms) {
                 	return Sort.ANY;
                     }
                     
@@ -98,7 +100,7 @@ public abstract class SuperTermGenerator implements TermGenerator {
                 	return Sort.ANY;
                     }
                     
-                    public ArrayOfSort argSorts () {
+                    public ImmutableArray<Sort> argSorts () {
                 	return null;
                     }
 
@@ -136,7 +138,7 @@ public abstract class SuperTermGenerator implements TermGenerator {
         }
     }
     
-    class UpwardsIterator implements IteratorOfTerm {
+    class UpwardsIterator implements Iterator<Term> {
         private PosInOccurrence currentPos;
 
         private UpwardsIterator(PosInOccurrence startPos) {

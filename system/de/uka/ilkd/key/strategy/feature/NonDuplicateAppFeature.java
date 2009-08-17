@@ -17,12 +17,14 @@
 
 package de.uka.ilkd.key.strategy.feature;
 
+import java.util.Iterator;
+
+import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.logic.ConstrainedFormula;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.rule.IteratorOfRuleApp;
-import de.uka.ilkd.key.rule.ListOfRuleApp;
+import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.TacletApp;
 
 /**
@@ -33,11 +35,11 @@ public class NonDuplicateAppFeature extends AbstractNonDuplicateAppFeature {
 
     public static final Feature INSTANCE = new NonDuplicateAppFeature ();
 
-    protected boolean containsRuleApp (ListOfRuleApp list,
+    protected boolean containsRuleApp (ImmutableList<RuleApp> list,
                                        TacletApp rapp,
                                        PosInOccurrence pio) {
 
-        final IteratorOfRuleApp it = list.iterator ();
+        final Iterator<RuleApp> it = list.iterator ();
         while ( it.hasNext () ) {
             if ( sameApplication ( it.next (), rapp, pio ) ) return true;
         }

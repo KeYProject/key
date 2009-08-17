@@ -12,6 +12,9 @@ package de.uka.ilkd.key.proof;
 
 import java.util.Iterator;
 
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
+
 
 /**
  * Helper class for managing a list of goals on which rules are applied.
@@ -24,10 +27,10 @@ public class DefaultGoalChooser implements IGoalChooser {
     protected Proof      proof;
 
     /** list of goals on which the strategy should be applied */
-    protected ListOfGoal goalList;
+    protected ImmutableList<Goal> goalList;
 
     /** part of goalList that should be worked on next */
-    protected ListOfGoal nextGoals;
+    protected ImmutableList<Goal> nextGoals;
 
     /** true iff all goals have satisfiable constraints */
     protected boolean    allGoalsSatisfiable = false;
@@ -37,7 +40,7 @@ public class DefaultGoalChooser implements IGoalChooser {
      * is the list of goals with unsatisfiable constraints, later this is a
      * subset of the goals having inconsistent constraints
      */
-    protected ListOfGoal selectedList;
+    protected ImmutableList<Goal> selectedList;
 
     protected Node       currentSubtreeRoot  = null;
 
@@ -45,9 +48,9 @@ public class DefaultGoalChooser implements IGoalChooser {
     }
     
     /* (non-Javadoc)
-     * @see de.uka.ilkd.key.proof.IGoalChooser#init(de.uka.ilkd.key.proof.Proof, de.uka.ilkd.key.proof.ListOfGoal)
+     * @see de.uka.ilkd.key.proof.IGoalChooser#init(de.uka.ilkd.key.proof.Proof, de.uka.ilkd.key.proof.IList<Goal>)
      */
-    public void init ( Proof p_proof, ListOfGoal p_goals ) {
+    public void init ( Proof p_proof, ImmutableList<Goal> p_goals ) {
         if(p_proof==null && !(p_goals==null || p_goals.isEmpty())){
             throw new RuntimeException("A not existing proof has goals. This makes no sense.");
         }
@@ -70,10 +73,10 @@ public class DefaultGoalChooser implements IGoalChooser {
         setupGoals ( p_goals );
     }
 
-    protected void setupGoals ( ListOfGoal p_goals ) {
-        goalList     = SLListOfGoal.EMPTY_LIST;
-        selectedList = SLListOfGoal.EMPTY_LIST;
-        nextGoals    = SLListOfGoal.EMPTY_LIST;
+    protected void setupGoals ( ImmutableList<Goal> p_goals ) {
+        goalList     = ImmutableSLList.<Goal>nil();
+        selectedList = ImmutableSLList.<Goal>nil();
+        nextGoals    = ImmutableSLList.<Goal>nil();
 
         if ( allGoalsSatisfiable ) {
             goalList = p_goals;
@@ -81,7 +84,7 @@ public class DefaultGoalChooser implements IGoalChooser {
                 findMinimalSubtree ( currentSubtreeRoot );
             }
         } else {
-            final IteratorOfGoal it = p_goals.iterator ();
+            final Iterator<Goal> it = p_goals.iterator ();
 
             while ( it.hasNext () ) {
                 final Goal goal = it.next ();
@@ -149,16 +152,16 @@ public class DefaultGoalChooser implements IGoalChooser {
      */
     public void removeGoal ( Goal p_goal ) {
 	selectedList = selectedList.removeAll ( p_goal );
-	nextGoals    = SLListOfGoal.EMPTY_LIST;
+	nextGoals    = ImmutableSLList.<Goal>nil();
     
 	if ( selectedList.isEmpty () ) setupGoals ( goalList );
     }
 
 
     /* (non-Javadoc)
-     * @see de.uka.ilkd.key.proof.IGoalChooser#updateGoalList(de.uka.ilkd.key.proof.Node, de.uka.ilkd.key.proof.ListOfGoal)
+     * @see de.uka.ilkd.key.proof.IGoalChooser#updateGoalList(de.uka.ilkd.key.proof.Node, de.uka.ilkd.key.proof.IList<Goal>)
      */
-    public void updateGoalList ( Node node, ListOfGoal newGoals ) {
+    public void updateGoalList ( Node node, ImmutableList<Goal> newGoals ) {
         if ( newGoals.isEmpty ()
                 || (newGoals.tail ().isEmpty () && newGoals
                         .head ().node () == node)) {
@@ -170,7 +173,7 @@ public class DefaultGoalChooser implements IGoalChooser {
 
         if (proof.openGoals ().isEmpty())
             // proof has been closed
-            nextGoals = selectedList = goalList = SLListOfGoal.EMPTY_LIST;
+            nextGoals = selectedList = goalList = ImmutableSLList.<Goal>nil();
         else {
             if ( selectedList.isEmpty ()
                     || (currentSubtreeRoot != null 
@@ -179,11 +182,11 @@ public class DefaultGoalChooser implements IGoalChooser {
         }
     }
 
-    protected void updateGoalListHelp ( Node node, ListOfGoal newGoals ) {
-        ListOfGoal prevGoalList     = SLListOfGoal.EMPTY_LIST;
+    protected void updateGoalListHelp ( Node node, ImmutableList<Goal> newGoals ) {
+        ImmutableList<Goal> prevGoalList     = ImmutableSLList.<Goal>nil();
         boolean    newGoalsInserted = false;
         
-        nextGoals                   = SLListOfGoal.EMPTY_LIST;
+        nextGoals                   = ImmutableSLList.<Goal>nil();
 
         // Remove "node" and goals contained within "newGoals"
         while ( !selectedList.isEmpty ( )) {
@@ -209,8 +212,8 @@ public class DefaultGoalChooser implements IGoalChooser {
         }
     }
 
-    protected ListOfGoal insertNewGoals (ListOfGoal newGoals, ListOfGoal prevGoalList) {
-        final IteratorOfGoal it = newGoals.iterator ();
+    protected ImmutableList<Goal> insertNewGoals (ImmutableList<Goal> newGoals, ImmutableList<Goal> prevGoalList) {
+        final Iterator<Goal> it = newGoals.iterator ();
         
         while ( it.hasNext () ) {
             final Goal g = it.next ();
@@ -228,17 +231,17 @@ public class DefaultGoalChooser implements IGoalChooser {
     }
 
 
-    protected static ListOfGoal rotateList ( ListOfGoal p_list ) {
+    protected static ImmutableList<Goal> rotateList ( ImmutableList<Goal> p_list ) {
         if ( p_list.isEmpty() )
-            return SLListOfGoal.EMPTY_LIST;
+            return ImmutableSLList.<Goal>nil();
         
         return p_list.tail ().append ( p_list.head () );
     }
     
     protected void removeClosedGoals () {
         boolean        changed = false;
-        IteratorOfGoal it      = goalList.iterator ();
-        goalList               = SLListOfGoal.EMPTY_LIST;
+        Iterator<Goal> it      = goalList.iterator ();
+        goalList               = ImmutableSLList.<Goal>nil();
 
         while (it.hasNext ()) {
             final Goal goal = it.next ();
@@ -248,7 +251,7 @@ public class DefaultGoalChooser implements IGoalChooser {
         }
 
         it = selectedList.iterator ();
-        ListOfGoal newList = SLListOfGoal.EMPTY_LIST;
+        ImmutableList<Goal> newList = ImmutableSLList.<Goal>nil();
 
         while ( it.hasNext () ) {
             final Goal goal = it.next ();
@@ -264,11 +267,11 @@ public class DefaultGoalChooser implements IGoalChooser {
         }
 
         if ( changed ) {
-            nextGoals = SLListOfGoal.EMPTY_LIST;
+            nextGoals = ImmutableSLList.<Goal>nil();
 
             // for "selectedList", order does matter
             it = newList.iterator ();
-            selectedList = SLListOfGoal.EMPTY_LIST;
+            selectedList = ImmutableSLList.<Goal>nil();
             while ( it.hasNext () )
                 selectedList = selectedList.prepend ( it.next () );
         }

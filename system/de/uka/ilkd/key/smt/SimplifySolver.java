@@ -24,20 +24,17 @@ public final class SimplifySolver extends AbstractSMTSolver {
 	return new SimplifyTranslator(services);
     }
     
-    
     @Override
-    protected String[] getExecutionCommand(String filename, String formula) {
-	String[] toReturn = new String[2];
+    protected String getExecutionCommand(String filename, String formula) {
 
-	toReturn[0] = "simplify";
-	toReturn[1] = filename;
+	String toReturn = "simplify " + filename;
 
 	return toReturn;
     }
 
     
-    @Override
-    protected SMTSolverResult interpretAnswer(String text, String error, int val) {	
+
+    public SMTSolverResult interpretAnswer(String text, String error, int val) {	
 	
 	if (val == 0) {
 	    //no error occured

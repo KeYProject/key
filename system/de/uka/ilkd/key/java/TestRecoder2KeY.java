@@ -14,14 +14,14 @@ import java.io.FileReader;
 import java.io.IOException;
 
 import junit.framework.TestCase;
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.expression.Operator;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.op.ListOfProgramVariable;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.SLListOfProgramVariable;
 import de.uka.ilkd.key.rule.TacletForTests;
 
 public class TestRecoder2KeY extends TestCase {
@@ -127,7 +127,7 @@ public class TestRecoder2KeY extends TestCase {
     public void testReadBlockWithContext() {
 	ProgramVariable pv = new LocationVariable
 	    (new ProgramElementName("i"), TacletForTests.services().getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_INT));
-	ListOfProgramVariable list = SLListOfProgramVariable.EMPTY_LIST.prepend(pv);	
+	ImmutableList<ProgramVariable> list = ImmutableSLList.<ProgramVariable>nil().prepend(pv);		
 	JavaBlock block = c2k.readBlock("{ i = 2; }", c2k.createContext(list));
 	ProgramVariable prgVarCmp = (ProgramVariable)	    
 	    ((Operator)((StatementBlock)block.program()).

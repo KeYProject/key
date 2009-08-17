@@ -10,24 +10,26 @@
 
 package de.uka.ilkd.key.logic.sort;
 
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.logic.Name;
 
 public final class SortImpl extends AbstractSort {
     
-    public SortImpl(Name name, SetOfSort ext, boolean isAbstract) {
+    public SortImpl(Name name, ImmutableSet<Sort> ext, boolean isAbstract) {
         super(name, ext, isAbstract);
     }    
     
-    public SortImpl(Name name, SetOfSort ext) {
+    public SortImpl(Name name, ImmutableSet<Sort> ext) {
         this(name, ext, false);
     }
     
     public SortImpl(Name name, Sort ext) {
-        this(name, SetAsListOfSort.EMPTY_SET.add(ext), false);
+        this(name, DefaultImmutableSet.<Sort>nil().add(ext), false);
     }    
     
 
     public SortImpl(Name name) {
-        this(name, SetAsListOfSort.EMPTY_SET);        
+        this(name, DefaultImmutableSet.<Sort>nil());        
     }
 }

@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.java.statement;
 
+import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.util.ExtList;
@@ -20,14 +21,14 @@ import de.uka.ilkd.key.util.ExtList;
 public class LoopInit extends JavaNonTerminalProgramElement
     implements StatementContainer, ILoopInit{
 
-    ArrayOfLoopInitializer inits;
+    ImmutableArray<LoopInitializer> inits;
 
-    public LoopInit(ArrayOfLoopInitializer exprarr) {
+    public LoopInit(ImmutableArray<LoopInitializer> exprarr) {
 	inits = exprarr;
     }
 
     public LoopInit(LoopInitializer[] exprarr) {
-	inits = new ArrayOfLoopInitializer(exprarr);
+	inits = new ImmutableArray<LoopInitializer>(exprarr);
     }
 
     public LoopInit(ExtList ups, PositionInfo pos) {
@@ -36,7 +37,7 @@ public class LoopInit extends JavaNonTerminalProgramElement
 	for (int i=0; i<exps.length; i++) {
 	    exps[i] = (LoopInitializer)ups.get(i);
 	}
-	inits = new ArrayOfLoopInitializer(exps);
+	inits = new ImmutableArray<LoopInitializer>(exps);
     }
     
 
@@ -57,14 +58,14 @@ public class LoopInit extends JavaNonTerminalProgramElement
       of bounds.
     */
     public Statement getStatementAt(int index) {
-	return inits.getLoopInitializer(index);
+	return inits.get(index);
     }
 
     public int size() {
 	return getStatementCount();
     }
 
-    public ArrayOfLoopInitializer getInits() {
+    public ImmutableArray<LoopInitializer> getInits() {
 	return inits;
     }
     

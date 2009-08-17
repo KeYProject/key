@@ -10,6 +10,8 @@
 
 package de.uka.ilkd.key.logic;
 
+import de.uka.ilkd.key.collection.ImmutableArray;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.logic.op.*;
 
 public class WaryClashFreeSubst extends ClashFreeSubst {
@@ -26,7 +28,7 @@ public class WaryClashFreeSubst extends ClashFreeSubst {
 
     /** variables occurring within the original term and within the
      * term to be substituted */
-    private SetOfQuantifiableVariable warysvars            = null;
+    private ImmutableSet<QuantifiableVariable> warysvars            = null;
    
     public WaryClashFreeSubst ( QuantifiableVariable v, Term s ) {
 	super ( v, s );
@@ -141,8 +143,8 @@ public class WaryClashFreeSubst extends ClashFreeSubst {
 	    return super.apply1 ( t );
 
 	final Term[] newSubterms = new Term[t.arity()];
-	final ArrayOfQuantifiableVariable[] newBoundVars =
-	    new ArrayOfQuantifiableVariable[t.arity()];
+	final ImmutableArray<QuantifiableVariable>[] newBoundVars =
+	    new ImmutableArray[t.arity()];
 
 	for ( int i = 0; i < t.arity (); i++ ) {
             if ( i != updOp.targetPos () )

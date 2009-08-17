@@ -1,6 +1,6 @@
 package de.uka.ilkd.key.logic.op;
 
-import de.uka.ilkd.key.logic.ArrayOfTerm;
+import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -16,8 +16,8 @@ public final class BoundedNumericalQuantifier extends AbstractOperator {
     
     
     @Override    
-    public Sort sort(ArrayOfTerm terms) {
-        return terms.getTerm(2).sort();
+    public Sort sort(ImmutableArray<Term> terms) {
+        return terms.get(2).sort();
     }
     
     

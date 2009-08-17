@@ -25,26 +25,18 @@ import java.awt.event.MouseListener;
 import java.util.Arrays;
 import java.util.Comparator;
 
-import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
-import javax.swing.DefaultListCellRenderer;
-import javax.swing.JLabel;
-import javax.swing.JList;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.ListSelectionModel;
-import javax.swing.SwingConstants;
+import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.speclang.OperationContract;
-import de.uka.ilkd.key.speclang.SetAsListOfOperationContract;
-import de.uka.ilkd.key.speclang.SetOfOperationContract;
 
 
 /**
@@ -64,7 +56,7 @@ class OperationContractSelectionPanel extends JPanel {
      * Creates a contract selection panel containing the specified contracts.
      */
     public OperationContractSelectionPanel(Services services,
-                                           SetOfOperationContract contracts,
+                                           ImmutableSet<OperationContract> contracts,
                                            String title,
                                            boolean multipleSelection) {
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
@@ -79,7 +71,7 @@ class OperationContractSelectionPanel extends JPanel {
         add(scrollPane);
         
         //sort contracts alphabetically (for the user's convenience)
-        OperationContract[] contractsArray = contracts.toArray();
+        OperationContract[] contractsArray = contracts.toArray(new OperationContract[contracts.size()]);
         Arrays.sort(contractsArray, new Comparator<OperationContract> () {
             public int compare(OperationContract c1, OperationContract c2) {
                 return c1.getName().compareTo(c2.getName());
@@ -147,12 +139,12 @@ class OperationContractSelectionPanel extends JPanel {
     }
     
     
-    private static SetOfOperationContract collectContracts(Services services,
+    private static ImmutableSet<OperationContract> collectContracts(Services services,
                                                            ProgramMethod pm, 
                                                            Modality modality) {
         SpecificationRepository specRepos 
                 = services.getSpecificationRepository();
-        SetOfOperationContract result;
+        ImmutableSet<OperationContract> result;
         if(modality != null) {
             result = specRepos.getOperationContracts(pm, modality);
             
@@ -199,8 +191,8 @@ class OperationContractSelectionPanel extends JPanel {
     
     public OperationContract getOperationContract() {
         Object[] selection = contractList.getSelectedValues();
-        SetOfOperationContract contracts 
-            = SetAsListOfOperationContract.EMPTY_SET;
+        ImmutableSet<OperationContract> contracts 
+            = DefaultImmutableSet.<OperationContract>nil();
         for(Object contract : selection) {
             contracts = contracts.add((OperationContract) contract);
         }        

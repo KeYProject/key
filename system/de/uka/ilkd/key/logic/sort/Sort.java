@@ -12,6 +12,8 @@
 package de.uka.ilkd.key.logic.sort;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
@@ -32,12 +34,12 @@ public interface Sort extends Named {
     /**
      * Returns the direct supersorts of this sort. Not supported by NullSort.
      */
-    SetOfSort extendsSorts();
+    ImmutableSet<Sort> extendsSorts();
     
     /**
      * Returns the direct supersorts of this sort.
      */
-    SetOfSort extendsSorts(Services services); 
+    ImmutableSet<Sort> extendsSorts(Services services); 
 
     /**
      * Tells whether the given sort is a reflexive, transitive supersort of this 

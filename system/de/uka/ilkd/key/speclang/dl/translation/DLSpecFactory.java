@@ -10,27 +10,23 @@
 
 package de.uka.ilkd.key.speclang.dl.translation;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
-
-import de.uka.ilkd.key.java.ArrayOfExpression;
+import de.uka.ilkd.key.collection.ImmutableArray;
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.statement.CatchAllStatement;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.op.Modality;
+import de.uka.ilkd.key.logic.op.ParsableVariable;
+import de.uka.ilkd.key.logic.op.ProgramMethod;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.init.ProofInputException;
-import de.uka.ilkd.key.speclang.ClassInvariant;
-import de.uka.ilkd.key.speclang.ClassInvariantImpl;
-import de.uka.ilkd.key.speclang.FormulaWithAxioms;
-import de.uka.ilkd.key.speclang.OperationContract;
-import de.uka.ilkd.key.speclang.OperationContractImpl;
-import de.uka.ilkd.key.speclang.SignatureVariablesFactory;
+import de.uka.ilkd.key.speclang.*;
 
 
 /**
@@ -90,12 +86,12 @@ public class DLSpecFactory {
     }
     
     
-    private ListOfProgramVariable extractParamVars(MethodBodyStatement mbs) {
-        ArrayOfExpression args = mbs.getArguments();
+    private ImmutableList<ProgramVariable> extractParamVars(MethodBodyStatement mbs) {
+        ImmutableArray<Expression> args = mbs.getArguments();
         
-        ListOfProgramVariable result = SLListOfProgramVariable.EMPTY_LIST;
+        ImmutableList<ProgramVariable> result = ImmutableSLList.<ProgramVariable>nil();
         for(int i = args.size() - 1; i >= 0; i--) {
-            result = result.prepend((ProgramVariable) args.getExpression(i));
+            result = result.prepend((ProgramVariable) args.get(i));
         }
         
         return result;
@@ -190,7 +186,7 @@ public class DLSpecFactory {
         FormulaWithAxioms pre            = extractPre(fma);
         FormulaWithAxioms post           = extractPost(fma);
         ProgramVariable selfVar          = extractSelfVar(mbs);
-        ListOfProgramVariable paramVars  = extractParamVars(mbs);
+        ImmutableList<ProgramVariable> paramVars  = extractParamVars(mbs);
         ProgramVariable resultVar        = extractResultVar(mbs);
         ProgramVariable excVar           = extractExcVar(fma);
         //Term heapAtPre                   = extractAtPreFunctions(post.getFormula());

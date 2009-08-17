@@ -9,18 +9,16 @@
 
 package de.uka.ilkd.key.proof.mgt;
 
+import java.util.Iterator;
+
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.RuleAppListener;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.proof.*;
-import de.uka.ilkd.key.proof.init.EnsuresPostPO;
-import de.uka.ilkd.key.proof.init.InitConfig;
-import de.uka.ilkd.key.proof.init.PreservesInvPO;
-import de.uka.ilkd.key.proof.init.ProofOblInput;
-import de.uka.ilkd.key.rule.IteratorOfRuleApp;
+import de.uka.ilkd.key.proof.init.*;
 import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.rule.SetAsListOfRuleApp;
-import de.uka.ilkd.key.rule.SetOfRuleApp;
 import de.uka.ilkd.key.speclang.OperationContract;
 
 public class DefaultProofCorrectnessMgt implements ProofCorrectnessMgt {
@@ -33,7 +31,7 @@ public class DefaultProofCorrectnessMgt implements ProofCorrectnessMgt {
 	= new DefaultMgtProofTreeListener();
     
     private KeYMediator mediator;
-    private SetOfRuleApp cachedRuleApps = SetAsListOfRuleApp.EMPTY_SET;
+    private ImmutableSet<RuleApp> cachedRuleApps = DefaultImmutableSet.<RuleApp>nil();
     private ProofStatus proofStatus = null;
     
     
@@ -53,8 +51,8 @@ public class DefaultProofCorrectnessMgt implements ProofCorrectnessMgt {
     //internal methods
     //-------------------------------------------------------------------------
     
-    private boolean atLeastOneClosed(SetOfProof proofs) {
-        IteratorOfProof it = proofs.iterator();
+    private boolean atLeastOneClosed(ImmutableSet<Proof> proofs) {
+        Iterator<Proof> it = proofs.iterator();
         while(it.hasNext()) {
             Proof proof = it.next();
             proof.mgt().updateProofStatus();
@@ -90,15 +88,15 @@ public class DefaultProofCorrectnessMgt implements ProofCorrectnessMgt {
         
         //collect all proofs on which the specification of the 
         //passed operation may depend
-        SetOfProof proofs = specRepos.getProofs(pm);
-        SetOfProof newProofs = proofs;
+        ImmutableSet<Proof> proofs = specRepos.getProofs(pm);
+        ImmutableSet<Proof> newProofs = proofs;
         while(newProofs.size() > 0) {
-            IteratorOfProof it = newProofs.iterator();
-            newProofs = SetAsListOfProof.EMPTY_SET;
+            Iterator<Proof> it = newProofs.iterator();
+            newProofs = DefaultImmutableSet.<Proof>nil();
             
             while(it.hasNext()) {
                 Proof proof = it.next();
-                IteratorOfRuleApp cachedRuleAppsIt 
+                Iterator<RuleApp> cachedRuleAppsIt 
                     = proof.mgt().getNonAxiomApps().iterator();
                 while(cachedRuleAppsIt.hasNext()) {
                     RuleApp ruleApp = cachedRuleAppsIt.next();
@@ -106,7 +104,7 @@ public class DefaultProofCorrectnessMgt implements ProofCorrectnessMgt {
                     if(ruleJusti instanceof RuleJustificationBySpec) {
                         ContractWithInvs cwi 
                             = ((RuleJustificationBySpec) ruleJusti).getSpec();
-                        SetOfProof proofsForPm 
+                        ImmutableSet<Proof> proofsForPm 
                             = specRepos.getProofs(cwi.contract
                                                      .getProgramMethod());
                         newProofs = newProofs.union(proofsForPm);
@@ -117,7 +115,7 @@ public class DefaultProofCorrectnessMgt implements ProofCorrectnessMgt {
         }
         
         //is one of those proofs about the operation under verification? 
-        IteratorOfProof it = proofs.iterator();
+        Iterator<Proof> it = proofs.iterator();
         while(it.hasNext()) {
             ProgramMethod pm2 = specRepos.getOperationForProof(it.next());
             if(pm2.equals(pmUnderVerification)) {
@@ -137,7 +135,7 @@ public class DefaultProofCorrectnessMgt implements ProofCorrectnessMgt {
         }
 	
 //        //used, but yet unproven specifications?
-//        IteratorOfRuleApp cachedRuleAppsIt = cachedRuleApps.iterator();
+//        Iterator<RuleApp> cachedRuleAppsIt = cachedRuleApps.iterator();
 //        while(cachedRuleAppsIt.hasNext()) {
 //            RuleApp ruleApp = cachedRuleAppsIt.next();
 //            RuleJustification ruleJusti = getJustification(ruleApp);
@@ -153,20 +151,20 @@ public class DefaultProofCorrectnessMgt implements ProofCorrectnessMgt {
 //                        = new EnsuresPostPO(initConfig, 
 //                                            atomicContract, 
 //                                            cwi.assumedInvs);
-//                    SetOfProof ensuresPostProofs 
+//                    ImmutableSet<Proof> ensuresPostProofs 
 //                        = specRepos.getProofs(ensuresPostPO);
 //                    ProofOblInput preservesInvPO
 //                        = new PreservesInvPO(initConfig, 
 //                                             atomicContract.getProgramMethod(), 
 //                                             cwi.assumedInvs, 
 //                                             cwi.ensuredInvs);
-//                    SetOfProof preservesInvProofs 
+//                    ImmutableSet<Proof> preservesInvProofs 
 //                        = specRepos.getProofs(preservesInvPO);
 //                    ProofOblInput respectsModifiesPO
 //                        = new RespectsModifiesPO(initConfig, 
 //                                                 atomicContract, 
 //                                                 cwi.assumedInvs);
-//                    SetOfProof respectsModifiesProofs
+//                    ImmutableSet<Proof> respectsModifiesProofs
 //                        = specRepos.getProofs(respectsModifiesPO);
 //                    
 //                    if(!(atLeastOneClosed(ensuresPostProofs)
@@ -205,7 +203,7 @@ public class DefaultProofCorrectnessMgt implements ProofCorrectnessMgt {
     }
 
     
-    public SetOfRuleApp getNonAxiomApps() {
+    public ImmutableSet<RuleApp> getNonAxiomApps() {
 	return cachedRuleApps;
     }
 

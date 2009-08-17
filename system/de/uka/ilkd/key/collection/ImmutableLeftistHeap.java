@@ -1,36 +1,30 @@
-#!/bin/sh
-# This file is part of KeY - Integrated Deductive Software Design
-# Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
-#                         Universitaet Koblenz-Landau, Germany
-#                         Chalmers University of Technology, Sweden
-#
-# The KeY system is protected by the GNU General Public License. 
-# See LICENSE.TXT for details.
-#
-#
-pck=$1
-outDir=$GENERATED_SRC_PATH`echo $1 | sed 's!\.!/!g;'`
-mkdir -p $outDir
-outFile=$outDir"/"LeftistHeapOf$2".java"
-sed "s/<Pck>/$pck/g;s/<T>/$2/g;" <<END_OF_CLASS >$outFile
+package de.uka.ilkd.key.collection;
 
-package <Pck>;
-
-
+import java.util.Iterator;
 import java.util.Stack;
-import de.uka.ilkd.key.util.Debug;
 
+import de.uka.ilkd.key.util.Debug;
 
 /**
  * This class implements the leftist heap, see &quot;Functional Data
  * Structures&quot; by Chris Okasaki
  */
-public abstract class LeftistHeapOf<T> implements HeapOf<T> {
+public abstract class ImmutableLeftistHeap<T extends Comparable<T>> implements ImmutableHeap<T> {
+
+    /**
+     *
+     */
+    private static final long serialVersionUID = -4035441830559680469L;
 
     /**
      * Use this element to construct new heaps
      */
-    public static final LeftistHeapOf<T> EMPTY_HEAP = new Empty ();
+    private static final ImmutableLeftistHeap EMPTY_HEAP = new Empty ();
+
+    public static <T extends Comparable<T>> ImmutableLeftistHeap<T> nilHeap() {
+	return EMPTY_HEAP;
+    }
+
 
     /**
      * Length of the right spine, i.e. the length of the path from the
@@ -41,7 +35,7 @@ public abstract class LeftistHeapOf<T> implements HeapOf<T> {
     /**
      * Class for non-empty heaps
      */
-    private static class Node extends LeftistHeapOf<T> {
+    private static class Node<S extends Comparable<S>> extends ImmutableLeftistHeap<S> {
 
 	/**
 	 * Length of the right spine, i.e. the length of the path from the
@@ -51,43 +45,43 @@ public abstract class LeftistHeapOf<T> implements HeapOf<T> {
 
 	private final int size;
 
-	private final <T> data;
+	private final S data;
 
 	/**
 	 * Children of the root of this heap
 	 */
-	private final LeftistHeapOf<T> left;
-	private final LeftistHeapOf<T> right;
+	private final ImmutableLeftistHeap<S> left;
+	private final ImmutableLeftistHeap<S> right;
 
 
 	/**
 	 * Node constructor for nodes with only empty children
 	 */
-	public Node(<T> element) {
+	public Node(S element) {
 	    this.rightHeight = 1;
 	    this.size = 1;
 	    this.data = element;
-	    this.left = EMPTY_HEAP;
-	    this.right = EMPTY_HEAP;
+	    this.left = ImmutableLeftistHeap.<S>nilHeap();
+	    this.right = ImmutableLeftistHeap.<S>nilHeap();
 	}
-    
+
 	/**
 	 * Node constructor for nodes with at most one non-empty child
 	 */
-	public Node(<T> element, LeftistHeapOf<T> a) {
+	public Node(S element, ImmutableLeftistHeap<S> a) {
 	    this.rightHeight = 1;
 	    this.size = 1 + a.size();
 	    this.data = element;
 	    this.left = a;
-	    this.right = EMPTY_HEAP;
+	    this.right = ImmutableLeftistHeap.<S>nilHeap();
 	}
-    
+
 	/**
 	 * Node constructor for nodes
 	 */
-	private Node(<T> element,
-		     LeftistHeapOf<T> a,
-		     LeftistHeapOf<T> b) {
+	private Node(S element,
+		     ImmutableLeftistHeap<S> a,
+		     ImmutableLeftistHeap<S> b) {
 	    data = element;
 	    size = 1 + a.size() + b.size();
 	    if (a.getRightHeight() <= b.getRightHeight()) {
@@ -116,20 +110,20 @@ public abstract class LeftistHeapOf<T> implements HeapOf<T> {
 	{
 	    return false;
 	}
-    
+
 	/**
 	 * Add an element to this heap object
 	 * @param element the element to be added
 	 * @return a heap that contains all elements of this heap, and
 	 * additionally <code>element</code>
 	 */
-	public HeapOf<T> insert ( <T> element ) {
+	public ImmutableHeap<S> insert ( S element ) {
 	    if (element.compareTo(data) <= 0) {
-		return new Node(element, this);
+		return new Node<S>(element, this);
 	    } else {
-		return new Node(data,
-				(LeftistHeapOf<T>)left,
-				(LeftistHeapOf<T>)right.insert(element));
+		return new Node<S>(data,
+				(ImmutableLeftistHeap<S>)left,
+				(ImmutableLeftistHeap<S>)right.insert(element));
 	    }
 	}
 
@@ -139,19 +133,19 @@ public abstract class LeftistHeapOf<T> implements HeapOf<T> {
 	 * @return a heap that contains all elements of this heap, and
 	 * additionally all objects from <code>h</code>
 	 */
-	public HeapOf<T> insert ( HeapOf<T> h ) {
+	public ImmutableHeap<S> insert ( ImmutableHeap<S> h ) {
 	    if (h.isEmpty()) {
 		return this;
-	    } else if (h instanceof Node) {
-		Node other = (Node) h;
+	    } else if (h instanceof Node/*<S>*/) {
+		Node<S> other = (Node<S>) h;
 		if (data.compareTo(other.data) <= 0) {
-		    return new Node(data,
-                                    (LeftistHeapOf<T>)left,
-                                    (LeftistHeapOf<T>)right.insert(other));
+		    return new Node<S>(data,
+                                    (ImmutableLeftistHeap<S>)left,
+                                    (ImmutableLeftistHeap<S>)right.insert(other));
 		} else {
-		    return new Node(other.data,
-			            (LeftistHeapOf<T>)other.left,
-			            (LeftistHeapOf<T>)insert(other.right));
+		    return new Node<S>(other.data,
+			            (ImmutableLeftistHeap<S>)other.left,
+			            (ImmutableLeftistHeap<S>)insert(other.right));
 		}
 	    } else {
 		return insert(h.iterator());
@@ -162,7 +156,7 @@ public abstract class LeftistHeapOf<T> implements HeapOf<T> {
 	 * @return the minimum element of this heap, or null iff this heap
 	 * is empty (<code>isEmpty()==true</code>)
 	 */
-	public <T> findMin () {
+	public S findMin () {
 	    return data;
 	}
 
@@ -171,7 +165,7 @@ public abstract class LeftistHeapOf<T> implements HeapOf<T> {
 	 * @return a heap that contains all elements of this heap except
 	 * for the minimum element
 	 */
-	public HeapOf<T> deleteMin () {
+	public ImmutableHeap<S> deleteMin () {
 	    return left.insert(right);
 	}
 
@@ -181,22 +175,22 @@ public abstract class LeftistHeapOf<T> implements HeapOf<T> {
 	 * @return heap that has all occurrences of <code>element</code>
 	 * removed
 	 */
-	public HeapOf<T> removeAll ( <T> element ) {
+	public ImmutableHeap<S> removeAll ( S element ) {
 	    int c = data.compareTo ( element );
 
 	    if ( c > 0 )
 		return this;
 
-	    LeftistHeapOf<T> newLeft  =
-		(LeftistHeapOf<T>)left .removeAll ( element );
-	    LeftistHeapOf<T> newRight =
-		(LeftistHeapOf<T>)right.removeAll ( element );
-	    
+	    ImmutableLeftistHeap<S> newLeft  =
+		(ImmutableLeftistHeap<S>)left .removeAll ( element );
+	    ImmutableLeftistHeap<S> newRight =
+		(ImmutableLeftistHeap<S>)right.removeAll ( element );
+
 	    if ( c == 0 && data.equals ( element ) )
 		return newLeft.insert ( newRight );
 	    if ( left == newLeft && right == newRight )
 		return this;
-	    return new Node ( data, newLeft, newRight );		
+	    return new Node<S> ( data, newLeft, newRight );
 	}
 
 	/**
@@ -211,7 +205,12 @@ public abstract class LeftistHeapOf<T> implements HeapOf<T> {
     /**
      * Singleton class for empty heaps
      */
-    private static class Empty extends LeftistHeapOf<T> {
+    private static class Empty<S extends Comparable<S>> extends ImmutableLeftistHeap<S> {
+
+	/**
+	 *
+	 */
+	private static final long serialVersionUID = -2471143956420721016L;
 
 	/**
 	 * Length of the right spine, i.e. the length of the path from the
@@ -220,7 +219,7 @@ public abstract class LeftistHeapOf<T> implements HeapOf<T> {
 	protected int getRightHeight () {
 	    return 0;
 	}
-	
+
 	/**
 	 * @return true iff this heap is empty
 	 */
@@ -234,8 +233,8 @@ public abstract class LeftistHeapOf<T> implements HeapOf<T> {
 	 * @return a heap that contains all elements of this heap, and
 	 * additionally <code>element</code>
 	 */
-	public HeapOf<T> insert ( <T> element ) {
-	    return new Node (element);
+	public ImmutableHeap<S> insert ( S element ) {
+	    return new Node<S> (element);
 	}
 
 	/**
@@ -244,7 +243,7 @@ public abstract class LeftistHeapOf<T> implements HeapOf<T> {
 	 * @return a heap that contains all elements of this heap, and
 	 * additionally all objects from <code>h</code>
 	 */
-	public HeapOf<T> insert ( HeapOf<T> h ) {
+	public ImmutableHeap<S> insert ( ImmutableHeap<S> h ) {
 	    return h;
 	}
 
@@ -252,7 +251,7 @@ public abstract class LeftistHeapOf<T> implements HeapOf<T> {
 	 * @return the minimum element of this heap, or null iff this heap
 	 * is empty (<code>isEmpty()==true</code>)
 	 */
-	public <T> findMin () {
+	public S findMin () {
 	    return null;
 	}
 
@@ -261,7 +260,7 @@ public abstract class LeftistHeapOf<T> implements HeapOf<T> {
 	 * @return a heap that contains all elements of this heap except
 	 * for the minimum element
 	 */
-	public HeapOf<T> deleteMin () {
+	public ImmutableHeap<S> deleteMin () {
 	    return this;
 	}
 
@@ -271,7 +270,7 @@ public abstract class LeftistHeapOf<T> implements HeapOf<T> {
 	 * @return heap that has all occurrences of <code>element</code>
 	 * removed
 	 */
-	public HeapOf<T> removeAll ( <T> element ) {
+	public ImmutableHeap<S> removeAll ( S element ) {
 	    return this;
 	}
 
@@ -290,15 +289,15 @@ public abstract class LeftistHeapOf<T> implements HeapOf<T> {
      * @return a heap that contains all elements of this heap, and
      * additionally all objects from <code>elements</code>
      */
-    public HeapOf<T> insert ( IteratorOf<T> elements ) {
+    public ImmutableHeap<T> insert ( Iterator<T> elements ) {
 	// Use bottom-up strategy to compose new heap in O(n)
 
-	Stack s = new Stack();
+	Stack<ImmutableHeap<T>> s = new Stack<ImmutableHeap<T>>();
 	s.push(this);
 	while (elements.hasNext()) {
-	    HeapOf<T> h = new Node(elements.next());
+	    ImmutableHeap<T> h = new Node<T>(elements.next());
 	    do {
-		HeapOf<T> top = (HeapOf<T>) s.peek();
+		ImmutableHeap<T> top = (ImmutableHeap<T>) s.peek();
 		if (h.size() >= top.size()) {
 		    h = h.insert(top);
 		    s.pop();
@@ -308,9 +307,9 @@ public abstract class LeftistHeapOf<T> implements HeapOf<T> {
 	    } while (!s.isEmpty());
 	    s.push(h);
 	}
-	HeapOf<T> res = (HeapOf<T>) s.pop();
+	ImmutableHeap<T> res = (ImmutableHeap<T>) s.pop();
 	while (!s.isEmpty()) {
-	    res = res.insert((HeapOf<T>)s.pop());
+	    res = res.insert((ImmutableHeap<T>)s.pop());
 	}
 	return res;
     }
@@ -318,28 +317,28 @@ public abstract class LeftistHeapOf<T> implements HeapOf<T> {
     /**
      * @return an iterator that returns all elements of this heap
      */
-    public IteratorOf<T> iterator () {
-	return new UnsortedIterator ( this );
+    public Iterator<T> iterator () {
+	return new UnsortedIterator<T> ( this );
     }
 
     /**
      * @return an iterator that returns all elements of this heap in
      * increasing order
      */
-    public IteratorOf<T> sortedIterator () {
-	return new SortedIterator ( this );
+    public Iterator<T> sortedIterator () {
+	return new SortedIterator<T> ( this );
     }
 
 
     public String toString() {
-	IteratorOf<T> it=this.iterator();
+	Iterator<T> it=this.iterator();
 	StringBuffer str=new StringBuffer("[");
 	while (it.hasNext()) {
 	    str.append(""+it.next());
 	    if (it.hasNext()) {
 		str.append(",");
 	    }
-	}	
+	}
 	str.append("]");
 	return str.toString();
     }
@@ -348,37 +347,37 @@ public abstract class LeftistHeapOf<T> implements HeapOf<T> {
     /**
      * Class for iterating the elements of a heap in unspecified order
      */
-    private static class UnsortedIterator implements IteratorOf<T> {
+    private static class UnsortedIterator<T extends Comparable<T>> implements Iterator<T> {
 
-	private final Stack remainder = new Stack ();
+	private final Stack<Node<T>> remainder = new Stack<Node<T>> ();
 
-	public UnsortedIterator ( LeftistHeapOf<T> heap ) {
+	public UnsortedIterator ( ImmutableLeftistHeap<T> heap ) {
 	    push ( heap );
 	}
 
-	private void push ( LeftistHeapOf<T> heap ) {
+	private void push ( ImmutableLeftistHeap<T> heap ) {
 	    if ( !heap.isEmpty () )
-		remainder.push ( heap );
+		remainder.push ( (Node<T>) heap );
 	}
 
 	public boolean hasNext () {
 	    return !remainder.isEmpty ();
 	}
 
-	public <T> next () {
+	public T next () {
 	    Debug.assertFalse ( remainder.isEmpty (),
 				"Missing next element in " +
 				"UnsortedIterator.next()" );
 
-	    Node heap = (Node)remainder.pop ();
+	    Node<T> heap = (Node<T>)remainder.pop ();
 	    // descend in right-first order, this helps to keep the stack small
 	    push ( heap.left );
 	    push ( heap.right );
-	    
+
 	    return heap.data;
 	}
-	
-	/** 
+
+	/**
 	 * throw an unsupported operation exception as leftiest heaps are immutable
 	 */
 	public void remove() {
@@ -390,11 +389,11 @@ public abstract class LeftistHeapOf<T> implements HeapOf<T> {
     /**
      * Class for iterating the elements of a heap in increasing order
      */
-    private static class SortedIterator implements IteratorOf<T> {
+    private static class SortedIterator<T extends Comparable<T>> implements Iterator<T> {
 
-	private HeapOf<T> remainder;
+	private ImmutableHeap<T> remainder;
 
-	public SortedIterator ( HeapOf<T> heap ) {
+	public SortedIterator ( ImmutableHeap<T> heap ) {
 	    remainder = heap;
 	}
 
@@ -402,18 +401,18 @@ public abstract class LeftistHeapOf<T> implements HeapOf<T> {
 	    return !remainder.isEmpty ();
 	}
 
-	public <T> next () {
+	public T next () {
 	    Debug.assertFalse ( remainder.isEmpty (),
 				"Missing next element in " +
 				"UnsortedIterator.next()" );
 
-	    <T> data = remainder.findMin ();
+	    T data = remainder.findMin ();
 	    remainder = remainder.deleteMin ();
 
 	    return data;
 	}
-	
-	/** 
+
+	/**
 	 * throw an unsupported operation exception as leftiest heaps are immutable
 	 */
 	public void remove() {

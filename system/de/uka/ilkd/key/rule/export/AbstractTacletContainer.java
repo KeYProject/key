@@ -15,18 +15,20 @@
 
 package de.uka.ilkd.key.rule.export;
 
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.logic.Name;
 
 
 
 public abstract class AbstractTacletContainer implements TacletContainer {
-    private ListOfTacletModelInfo taclets = SLListOfTacletModelInfo.EMPTY_LIST;
+    private ImmutableList<TacletModelInfo> taclets = ImmutableSLList.<TacletModelInfo>nil();
 
-    public ListOfTacletModelInfo getTaclets () {
+    public ImmutableList<TacletModelInfo> getTaclets () {
         return taclets;
     }
     
-    public void setTaclets ( ListOfTacletModelInfo p_taclets ) {
+    public void setTaclets ( ImmutableList<TacletModelInfo> p_taclets ) {
         taclets = p_taclets;
     }
     

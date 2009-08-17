@@ -13,6 +13,8 @@ package de.uka.ilkd.key.logic.sort;
 import java.lang.ref.WeakReference;
 import java.util.WeakHashMap;
 
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.logic.Name;
 
@@ -30,7 +32,7 @@ public final class ArraySort extends AbstractSort {
     //constructors
     //------------------------------------------------------------------------- 
         
-    private ArraySort(SetOfSort extendsSorts, SortKey sk) {
+    private ArraySort(ImmutableSet<Sort> extendsSorts, SortKey sk) {
 	super(new Name((sk.elemType != null 
 		        ? sk.elemType.getName() 
 		        : sk.elemSort.name()) + "[]"), 
@@ -49,14 +51,14 @@ public final class ArraySort extends AbstractSort {
     //------------------------------------------------------------------------- 
 
 
-    private static SetOfSort getArraySuperSorts(Sort elemSort, 
+    private static ImmutableSet<Sort> getArraySuperSorts(Sort elemSort, 
 	    					Sort objectSort, 
 	    					Sort cloneableSort,
 	    					Sort serializableSort) {
-	SetOfSort result = SetAsListOfSort.EMPTY_SET;
+	ImmutableSet<Sort> result = DefaultImmutableSet.<Sort>nil();
 	
-	SetOfSort elemDirectSuperSorts = elemSort.extendsSorts();
-	if(elemDirectSuperSorts.equals(SetAsListOfSort.EMPTY_SET
+	ImmutableSet<Sort> elemDirectSuperSorts = elemSort.extendsSorts();
+	if(elemDirectSuperSorts.equals(DefaultImmutableSet.<Sort>nil()
 		                                      .add(Sort.ANY))) {
 	    result = result.add(objectSort)
 	                   .add(cloneableSort)
@@ -99,7 +101,7 @@ public final class ArraySort extends AbstractSort {
 	ArraySort as = ref != null ? ref.get() : null;          
 
 	if(as == null) { 
-	    SetOfSort localExtendsSorts 
+	    ImmutableSet<Sort> localExtendsSorts 
 	    	= getArraySuperSorts(elemSort, 
 	    		             objectSort,
 	    		             cloneableSort, 

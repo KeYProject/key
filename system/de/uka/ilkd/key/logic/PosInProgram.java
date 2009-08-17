@@ -176,9 +176,9 @@ public class PosInProgram {
     }
 
     /**
-     * returns an IteratorOfInteger that iterates through the subterms
+     * returns an Iterator<Integer> that iterates through the subterms
      * of a sequent in the reverse order as the PosInProgram has been defined.
-     * @return IteratorOfInteger that iterates through the subterms
+     * @return Iterator<Integer> that iterates through the subterms
      * of a sequent in the reverse order as the PosInProgram has been defined.
      */ 
     public IntIterator reverseIterator() {

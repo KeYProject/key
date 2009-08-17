@@ -16,112 +16,109 @@
 ///
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
+import java.util.Iterator;
 
-
+import de.uka.ilkd.key.collection.*;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.SetOfTerm;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.EntryOfQuantifiableVariableAndTerm;
-import de.uka.ilkd.key.logic.op.IteratorOfEntryOfQuantifiableVariableAndTerm;
-import de.uka.ilkd.key.logic.op.MapAsListFromQuantifiableVariableToTerm;
-import de.uka.ilkd.key.logic.op.MapFromQuantifiableVariableToTerm;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.logic.op.SetOfQuantifiableVariable;
 
+class MultiTrigger implements Trigger {
 
-class MultiTrigger extends Trigger {
+    private final ImmutableSet<Trigger> triggers;
 
-    private final SetOfTrigger triggers;
-    private final SetOfQuantifiableVariable qvs;
+    private final ImmutableSet<QuantifiableVariable> qvs;
+
     private final Term clause;
 
-    MultiTrigger(SetOfTrigger triggers, 
-                 SetOfQuantifiableVariable qvs,Term clause){
-        this.triggers = triggers;
-        this.qvs = qvs;
-        this.clause = clause;
+    MultiTrigger(ImmutableSet<Trigger> triggers, ImmutableSet<QuantifiableVariable> qvs,
+	    Term clause) {
+	this.triggers = triggers;
+	this.qvs = qvs;
+	this.clause = clause;
     }
-    
-    public SetOfSubstitution getSubstitutionsFromTerms(SetOfTerm targetTerms, 
-            Services services){
-        SetOfSubstitution res = SetAsListOfSubstitution.EMPTY_SET;
-        SetOfSubstitution mulsubs = 
-        	                setMultiSubstitution(triggers.toArray(),0,targetTerms, 
-                                        services);
-        IteratorOfSubstitution it = mulsubs.iterator();
-        while(it.hasNext()){
-        	    Substitution sub = it.next();
-            if(sub.isTotalOn(qvs))res=res.add(sub);
-        }
-        
-        return res;
+
+    public ImmutableSet<Substitution> getSubstitutionsFromTerms(
+	    ImmutableSet<Term> targetTerms, Services services) {
+	ImmutableSet<Substitution> res = DefaultImmutableSet.<Substitution> nil();
+	
+	ImmutableSet<Substitution> mulsubs = setMultiSubstitution(triggers.iterator(),
+		targetTerms, services);
+
+	for (Substitution sub : mulsubs) {
+	    if (sub.isTotalOn(qvs)) {
+		res = res.add(sub);
+	    }
+	}
+
+	return res;
     }
-    
-    /**help function for getMultiSubstitution*/
-    private SetOfSubstitution setMultiSubstitution(Trigger[] ts,int i,
-            SetOfTerm terms, Services services){
-    	    SetOfSubstitution res = SetAsListOfSubstitution.EMPTY_SET;
-    	    if(i>=ts.length)return res;
-    	    SetOfSubstitution subi = ts[i].getSubstitutionsFromTerms(terms, services);
-            SetOfSubstitution nextSubs = setMultiSubstitution(ts,i+1,terms, services);
-            if(nextSubs.size()==0)return res.union(subi);
-            IteratorOfSubstitution it = nextSubs.iterator();
-            while(it.hasNext()){
-                    Substitution sub0= it.next();
-                    IteratorOfSubstitution it1 = subi.iterator();
-                    while(it1.hasNext()){
-                    	Substitution sub1 = unifySubstitution(sub0,it1.next());
-                    	if(sub1!=null) res = res.add(sub1);
-                    }
-                    
-            }
-            return res;
-    }   
-    
-     
-    /**unify two substitution, if same variable are bound with same term return
+
+    /** help function for getMultiSubstitution */
+    private ImmutableSet<Substitution> setMultiSubstitution(
+	    Iterator<? extends Trigger> ts, ImmutableSet<Term> terms, Services services) {
+	ImmutableSet<Substitution> res = DefaultImmutableSet.<Substitution> nil();
+	if (ts.hasNext()) {
+	    ImmutableSet<Substitution> subi = ts.next().getSubstitutionsFromTerms(
+		    terms, services);
+	    ImmutableSet<Substitution> nextSubs = setMultiSubstitution(ts, terms,
+		    services);
+	    if (nextSubs.isEmpty()) {
+		return subi;
+	    } else if (subi.isEmpty()) {
+		return nextSubs;
+	    }
+	    for (Substitution sub0 : nextSubs) {
+		for (Substitution subiSub : subi) {
+		    final Substitution sub1 = unifySubstitution(sub0, subiSub);
+		    if (sub1 != null) {
+			res = res.add(sub1);
+		    }
+		}
+
+	    }
+	}
+	return res;
+    }
+
+    /**
+     * unify two substitution, if same variable are bound with same term return
      * a new substitution with all universal quantifiable variables in two
-     *  substituition, otherwise return null*/
-    private Substitution unifySubstitution(Substitution sub0,
-    		                                Substitution  sub1){
-    	IteratorOfEntryOfQuantifiableVariableAndTerm it0 = sub0.getVarMap()
-                .entryIterator();
-        MapFromQuantifiableVariableToTerm map1 = sub1.getVarMap();
-        MapFromQuantifiableVariableToTerm resMap = 
-        	                    MapAsListFromQuantifiableVariableToTerm.EMPTY_MAP;
+     * substituition, otherwise return null
+     */
+    private Substitution unifySubstitution(Substitution sub0, Substitution sub1) {
+	Iterator<ImmutableMapEntry<QuantifiableVariable, Term>> it0 = sub0.getVarMap()
+		.entryIterator();
+	final ImmutableMap<QuantifiableVariable, Term> varMap1 = sub1.getVarMap();
+	ImmutableMap<QuantifiableVariable, Term> resMap = varMap1;
 
-        while (it0.hasNext()) {
-            EntryOfQuantifiableVariableAndTerm en = it0.next();
-            QuantifiableVariable key = en.key();
-            Term value = en.value();
-            if (map1.containsKey(key)) {
-                if (!(map1.get(key).equals(value)))
-                    return null;
-            }
-            resMap = resMap.put(key, value);
-        }
-        IteratorOfEntryOfQuantifiableVariableAndTerm it1 = map1.entryIterator();
-        while (it1.hasNext()) {
-            EntryOfQuantifiableVariableAndTerm en = it1.next();
-            resMap = resMap.put(en.key(), en.value());
-        }
-        
-        return new Substitution(resMap);
+	while (it0.hasNext()) {
+	    ImmutableMapEntry<QuantifiableVariable, Term> en = it0.next();
+	    QuantifiableVariable key = en.key();
+	    Term value = en.value();
+	    if (varMap1.containsKey(key)) {
+		if (!(varMap1.get(key).equals(value)))
+		    return null;
+	    }
+	    resMap = resMap.put(key, value);
+	}
+	return new Substitution(resMap);
     }
-    
 
-    
     public boolean equals(Object arg0) {
-        if (!(arg0 instanceof MultiTrigger)) return false;
+	if (!(arg0 instanceof MultiTrigger))
+	    return false;
 
-        final MultiTrigger a = (MultiTrigger) arg0;
-        return a.triggers.equals(triggers);
+	final MultiTrigger a = (MultiTrigger) arg0;
+	return a.triggers.equals(triggers);
     }
+
     public int hashCode() {
-        return triggers.hashCode();
+	return triggers.hashCode();
     }
+
     public String toString() {
-        return "" + triggers;
+	return "" + triggers;
     }
 
     public Term getTriggerTerm() {
@@ -129,4 +126,3 @@ class MultiTrigger extends Trigger {
     }
 
 }
-     
