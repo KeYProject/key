@@ -32,12 +32,18 @@ public final class OneStepSimplifier implements BuiltInRule {
                                             = new OneStepSimplifier();
     
     private static final Name NAME = new Name("One Step Simplification");
+    
+    private static final ImmutableList<String> ruleSets 
+    	= ImmutableSLList.<String>nil().append("concrete")
+    	                           .append("simplify_literals")
+    	                           .append("simplify");
   
     private final Map<ConstrainedFormula, Instantiation> cache 
     		= new WeakHashMap<ConstrainedFormula, Instantiation>();
     
-    private TacletIndex[] indices;
     private Proof lastProof;
+    private ImmutableSet<NoPosTacletApp> appsTakenOver;
+    private TacletIndex[] indices;
     
     
 
@@ -73,7 +79,7 @@ public final class OneStepSimplifier implements BuiltInRule {
 	    }
 	    
 	    boolean accept = false;	    
-	    for(RuleSet rs : (app.taclet()).getRuleSets()) {
+	    for(RuleSet rs : app.taclet().getRuleSets()) {
 		if(rs.name().toString().equals(ruleSetName)) {
 		    accept = true;
 		} else if(excludedRuleSetNames.contains(rs.name().toString())) {
@@ -83,6 +89,8 @@ public final class OneStepSimplifier implements BuiltInRule {
 	    }
 	    
 	    if(accept) {
+		appsTakenOver = appsTakenOver.add(app);		
+		goal.ruleAppIndex().removeNoPosTacletApp(app);
 		result = result.add(app.taclet());
 	    }
 	}
@@ -93,16 +101,34 @@ public final class OneStepSimplifier implements BuiltInRule {
     
     private void initIndices(Goal goal) {
 	if(goal.proof() != lastProof) {
-	    indices = new TacletIndex[2];
-	    indices[0] = new TacletIndex(tacletsForRuleSet(
-		    		goal, 
-		    		"concrete", 
-		    		ImmutableSLList.<String>nil()));
-	    indices[1] = new TacletIndex(tacletsForRuleSet(
-		    		goal, 
-		    		"simplify", 
-		    		ImmutableSLList.<String>nil().prepend("concrete")));
-	    lastProof = goal.proof();
+	    lastProof = goal.proof();	    
+	    appsTakenOver = DefaultImmutableSet.<NoPosTacletApp>nil();;	    
+	    indices = new TacletIndex[ruleSets.size()];
+	    int i = 0;
+	    ImmutableList<String> done = ImmutableSLList.<String>nil();
+	    for(String ruleSet : ruleSets) {
+		ImmutableSet<Taclet> taclets = tacletsForRuleSet(goal, 
+						        ruleSet, 
+						        done);
+		indices[i++] = new TacletIndex(taclets);
+		done = done.prepend(ruleSet);
+	    }
+	}
+    }
+    
+    
+    private void shutdownIndices() {
+	if(lastProof != null) {
+	    for(Goal g : lastProof.openGoals()) {
+		for(NoPosTacletApp app : appsTakenOver) {
+		    g.ruleAppIndex().addNoPosTacletApp(app);
+		}
+		g.getRuleAppManager().clearCache();
+		g.ruleAppIndex().clearIndexes();		
+	    }
+	    lastProof = null;
+	    appsTakenOver = null;
+	    indices = null;
 	}
     }
     
@@ -117,22 +143,16 @@ public final class OneStepSimplifier implements BuiltInRule {
 						    services, 
 						    Constraint.BOTTOM);
 	for(TacletApp app : apps) {	    
-	    app = ((NoPosTacletApp)app).matchFind(pos, 
-		                                  Constraint.BOTTOM, 
-		                                  services, 
-		                                  Constraint.BOTTOM);
-	    if(app != null) {
-		app = app.setPosInOccurrence(pos, services);
-		if(!app.complete()) {
-		    app = app.tryToInstantiate(services);
-		}
-		if(app != null) {
-		    RewriteTaclet taclet = (RewriteTaclet) app.rule();
-		    ConstrainedFormula result 
-		    	= taclet.getRewriteResult(services, app);
-		    return result;
-		} 
+	    app = app.setPosInOccurrence(pos, services);
+	    if(!app.complete()) {
+		app = app.tryToInstantiate(services);
 	    }
+	    if(app != null) {
+		RewriteTaclet taclet = (RewriteTaclet) app.rule();
+		ConstrainedFormula result = taclet.getRewriteResult(services, 
+								    app);
+		return result;
+	    } 
 	}
 	
 	Term term = pos.subTerm();
@@ -207,18 +227,19 @@ public final class OneStepSimplifier implements BuiltInRule {
     public boolean isApplicable(Goal goal, 
                                 PosInOccurrence pio, 
                                 Constraint userConstraint) {
-	//abort if switched off
-	if(! ProofSettings.DEFAULT_SETTINGS
-		          .getGeneralSettings()
-		          .oneStepSimplification()) {
-	    return false;
-	}
-	
 	//abort if not top level constrained formula
 	if(pio == null || !pio.isTopLevel()) {
 	    return false;
-	}
+	}	
 	
+	//abort if switched off
+	if(!ProofSettings.DEFAULT_SETTINGS
+		         .getGeneralSettings()
+		         .oneStepSimplification()) {
+	    shutdownIndices();
+	    return false;
+	}
+		
 	//initialize if needed
 	initIndices(goal);
 	

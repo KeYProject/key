@@ -29,7 +29,6 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.proof.AtPreFactory;
 import de.uka.ilkd.key.proof.ProofSaver;
 import de.uka.ilkd.key.speclang.FormulaWithAxioms;
 import de.uka.ilkd.key.speclang.PositionedString;

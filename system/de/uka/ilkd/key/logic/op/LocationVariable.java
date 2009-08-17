@@ -17,7 +17,6 @@ import de.uka.ilkd.key.logic.sort.Sort;
  * This class represents all kind of local and instance variables. In addition it represents
  * static variables, which are no compile time constants, i.e. which are not final or
  * not initialised with a compile time constant.
- * 
  */
 public final class LocationVariable extends ProgramVariable implements UpdateableOperator {
 

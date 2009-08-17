@@ -63,6 +63,11 @@ public class Function extends AbstractSortedOperator {
     }
     
     
+    public Function(Name name, Sort sort) {
+	this(name, sort, new ImmutableArray<Sort>(), null, false);
+    }    
+    
+    
     //-------------------------------------------------------------------------
     //public interface
     //-------------------------------------------------------------------------     

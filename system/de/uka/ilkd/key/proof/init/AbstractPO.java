@@ -42,7 +42,6 @@ public abstract class AbstractPO implements ProofOblInput {
     protected static final CreatedAttributeTermFactory CATF
                                    = CreatedAttributeTermFactory.INSTANCE;
     protected static final TermBuilder TB = TermBuilder.DF;
-    protected static final AtPreFactory APF = AtPreFactory.INSTANCE;
 
     protected final InitConfig initConfig;
     protected final Services services;

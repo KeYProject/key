@@ -10,30 +10,33 @@
 
 package de.uka.ilkd.key.rule;
 
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import de.uka.ilkd.key.collection.*;
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableArray;
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.ContractConfigurator;
 import de.uka.ilkd.key.gui.Main;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.recoderext.ConstructorNormalformBuilder;
 import de.uka.ilkd.key.java.statement.LabeledStatement;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
-import de.uka.ilkd.key.java.statement.Throw;
 import de.uka.ilkd.key.java.visitor.ProgramContextAdder;
 import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.proof.AtPreFactory;
+import de.uka.ilkd.key.logic.op.Metavariable;
+import de.uka.ilkd.key.logic.op.Modality;
+import de.uka.ilkd.key.logic.op.ProgramMethod;
+import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.proof.init.CreatedAttributeTermFactory;
-import de.uka.ilkd.key.proof.mgt.ComplexRuleJustificationBySpec;
 import de.uka.ilkd.key.proof.mgt.ContractWithInvs;
-import de.uka.ilkd.key.proof.mgt.RuleJustificationBySpec;
 import de.uka.ilkd.key.rule.inst.ContextStatementBlockInstantiation;
-import de.uka.ilkd.key.speclang.*;
+import de.uka.ilkd.key.speclang.ClassInvariant;
+import de.uka.ilkd.key.speclang.OperationContract;
+import de.uka.ilkd.key.speclang.SignatureVariablesFactory;
 
 
 /**
@@ -46,7 +49,6 @@ public class UseOperationContractRule implements BuiltInRule {
     private static final TermBuilder TB = TermBuilder.DF;
     private static final SignatureVariablesFactory SVF 
         = SignatureVariablesFactory.INSTANCE;
-    private static final AtPreFactory APF = AtPreFactory.INSTANCE;
     private static final CreatedAttributeTermFactory CATF 
         = CreatedAttributeTermFactory.INSTANCE;
     private static final String INIT_NAME 

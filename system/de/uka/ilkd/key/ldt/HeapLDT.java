@@ -121,6 +121,17 @@ public final class HeapLDT extends LDT {
 	}
     }
     
+    public String getClassName(Function fieldSymbol) {
+	assert fieldSymbol.sort() == fieldSort;
+	String name = fieldSymbol.name().toString();
+	int index = name.indexOf("::");
+	if(index == -1) {
+	    return name;
+	} else {
+	    return name.substring(0, index);
+	}
+    }
+    
     
     public Sort getFieldSort() {
 	return fieldSort;
@@ -236,6 +247,15 @@ public final class HeapLDT extends LDT {
 	assert result.sort() == fieldSort : "symbol has wrong sort: " + result;
         assert result.isUnique() : "symbol is not unique: " + result;        
         return result;
+    }
+    
+    
+    public ProgramVariable getPVForFieldSymbol(Function fieldSymbol,
+	    				       Services services) {
+	String className = getClassName(fieldSymbol);
+	String fieldName = getPrettyFieldName(fieldSymbol);
+	return services.getJavaInfo()
+	               .getAttribute(className + "::" + fieldName);
     }
     
     

@@ -70,17 +70,15 @@
 
 
   <target name="compile" depends="prepare, keyparser, proofjavaparser, schemajavaparser, 
-  	                                   simplifyparser, 
-  	                                   jmlparser, jmlpreparser,
-  					   oclparser,
-  	                                   diffparser, dictionaryParser, keydocwalker"
+  	                                   jmlparser, jmlpreparser"
           description="Compiles all java files into the source directory.">
   	<copy todir="${build.dir}">
     	    <fileset dir="${basedir}/resources/"/>
         </copy>
      <javac srcdir= "${src.dir}:${gen.dir}"
            destdir="${dist.dir}"
-           deprecation="on"
+           source="1.6"
+     	   deprecation="on"
            debug="on"
            depend="${build.depend}"
            optimize="off">
@@ -112,35 +110,7 @@
   	  />
   </target>
 	
-	
-  <target name="dictionaryLexer">
-	     <antlr
-	         target="de/uka/ilkd/key/parser/dictionary/dictionaryLexer.g"
-	         outputdirectory="${gen.dir}/de/uka/ilkd/key/parser/dictionary">
-	       
-	     	<classpath>
-	           <pathelement location="${ext.dir}/antlr.jar" />
-	        </classpath>
-	     </antlr>
-  </target>
 
-	  <target name="dictionaryParser" depends="dictionaryLexer">
-		     <antlr
-		         target="de/uka/ilkd/key/parser/dictionary/dictionary.g"
-		         outputdirectory="${gen.dir}/de/uka/ilkd/key/parser/dictionary">
-		        <classpath>
-		           <pathelement location="${ext.dir}/antlr.jar" />
-		        </classpath>
-		     </antlr>
-	  </target>
-	
-
-  <target name="diffparser">
-     <javacc
-         target="de/uka/ilkd/key/parser/diffparser/DiffParser.jj"
-         outputdirectory="${gen.dir}/de/uka/ilkd/key/parser/diffparser"
-         javacchome="${ext.dir}" />
-    </target>
 
 
   <target name="keylexer">
@@ -228,37 +198,7 @@
 	     </antlr>
 	  </target>
 	
-	<target name="keydoclexer">
-	     <antlr
-	         target="de/uka/ilkd/key/util/keydoc/parser/KeYDocLexer.g"
-	         outputdirectory="${gen.dir}/de/uka/ilkd/key/util/keydoc/parser">
-	        <classpath>
-	           <pathelement location="${ext.dir}/antlr.jar" />
-	        </classpath>
-	     </antlr>
-	  </target>
-
-
-	<target name="keydocparser" depends="keydoclexer">
-	     <antlr
-	         target="de/uka/ilkd/key/util/keydoc/parser/KeYDocParser.g"
-	         outputdirectory="${gen.dir}/de/uka/ilkd/key/util/keydoc/parser">
-	        <classpath>
-	           <pathelement location="${ext.dir}/antlr.jar" />
-	        </classpath>
-	     </antlr>
-	  </target>
-
-	<target name="keydocwalker" depends="keydocparser">
-	     <antlr
-	         target="de/uka/ilkd/key/util/keydoc/parser/KeYDocTreeWalker.g"
-	         outputdirectory="${gen.dir}/de/uka/ilkd/key/util/keydoc/parser">
-	        <classpath>
-	           <pathelement location="${ext.dir}/antlr.jar" />
-	        </classpath>
-	     </antlr>
-	  </target>
-
+	
 	
 	
 

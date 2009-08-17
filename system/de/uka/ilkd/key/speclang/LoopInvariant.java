@@ -86,9 +86,9 @@ public interface LoopInvariant {
      * the receiver, parameters, and local variables must stay the same!
      */
     public LoopInvariant setInvariant(Term invariant, 
-            Term selfTerm,
-            Term heapAtPre,
-            Services services); 
+            			      Term selfTerm,
+            			      Term heapAtPre,
+            			      Services services); 
     
     /**
      * Returns a new loop invariant where the loop predicates have been 

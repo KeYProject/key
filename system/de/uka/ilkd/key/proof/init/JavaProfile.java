@@ -8,7 +8,6 @@
 
 package de.uka.ilkd.key.proof.init;
 
-import de.uka.ilkd.key.explicitheap.WhileInvariantRule;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.IMain;
@@ -16,10 +15,7 @@ import de.uka.ilkd.key.proof.GoalChooserBuilder;
 import de.uka.ilkd.key.proof.mgt.ComplexRuleJustification;
 import de.uka.ilkd.key.proof.mgt.ComplexRuleJustificationBySpec;
 import de.uka.ilkd.key.proof.mgt.RuleJustification;
-import de.uka.ilkd.key.rule.OneStepSimplifier;
-import de.uka.ilkd.key.rule.BuiltInRule;
-import de.uka.ilkd.key.rule.Rule;
-import de.uka.ilkd.key.rule.UseOperationContractRule;
+import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.strategy.JavaCardDLStrategy;
 import de.uka.ilkd.key.strategy.StrategyFactory;
 

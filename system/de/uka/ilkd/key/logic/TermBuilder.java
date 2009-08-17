@@ -11,6 +11,7 @@ package de.uka.ilkd.key.logic;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.expression.literal.IntLiteral;
 import de.uka.ilkd.key.ldt.HeapLDT;
@@ -455,6 +456,19 @@ public final class TermBuilder {
 	                      Term target) {
 	return apply(parallel(services, lhss, values), target);
     }
+    
+    
+    public Term applySequential(Term[] updates, Term target) {
+	if(updates.length == 0) {
+	    return target;
+	} else {
+	    ImmutableList<Term> updateList = ImmutableSLList.<Term>nil()
+	                                        .append(updates)
+	                                        .tail();
+	    return apply(updates[0],
+		         applySequential(updateList, target));
+	}    	
+    }    
     
     
     public Term applySequential(ImmutableList<Term> updates, Term target) {

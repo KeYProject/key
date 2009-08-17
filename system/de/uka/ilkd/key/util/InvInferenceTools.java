@@ -8,14 +8,21 @@
 //
 //
 
-package de.uka.ilkd.key.explicitheap;
+package de.uka.ilkd.key.util;
 
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.*;
-import de.uka.ilkd.key.java.statement.*;
+import de.uka.ilkd.key.java.declaration.VariableSpecification;
+import de.uka.ilkd.key.java.expression.Assignment;
+import de.uka.ilkd.key.java.reference.ExecutionContext;
+import de.uka.ilkd.key.java.reference.ReferencePrefix;
+import de.uka.ilkd.key.java.reference.TypeReference;
+import de.uka.ilkd.key.java.statement.LabeledStatement;
+import de.uka.ilkd.key.java.statement.LoopStatement;
+import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.visitor.CreatingASTVisitor;
 import de.uka.ilkd.key.java.visitor.JavaASTCollector;
 import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
@@ -24,26 +31,25 @@ import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.rule.Rule;
-import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.rule.RuleSet;
-import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.util.ExtList;
+import de.uka.ilkd.key.rule.*;
 
 
 /**
  * Collection of some common, stateless functionality. Stolen from
  * the weissInvariants side branch.
  */
-class InvInferenceTools {
+public class InvInferenceTools {
     
     public static final InvInferenceTools INSTANCE = new InvInferenceTools();
     
     private static final TermBuilder TB = TermBuilder.DF;
     
-    
     private InvInferenceTools() {}
     
+    
+    //-------------------------------------------------------------------------
+    //public interface
+    //-------------------------------------------------------------------------
     
     /**
      * Removes universal quantifiers from a formula.
@@ -160,13 +166,11 @@ class InvInferenceTools {
      */
     public MethodFrame getInnermostMethodFrame(Term term, Services services) {
         //ignore updates
-        while(term.op() instanceof UpdateApplication) {
-            term = term.sub(((UpdateApplication)term.op()).targetPos());
-        }
+	term = goBelowUpdates(term);
         
         //the remaining term should have a Java block 
         final ProgramElement pe = term.javaBlock().program();
-                
+
         //fetch "self" from innermost method-frame
         MethodFrame result = new JavaASTVisitor(pe, services) {
             private MethodFrame result;
@@ -174,7 +178,7 @@ class InvInferenceTools {
                 node.visit(this);
             }
             protected void doDefaultAction(SourceElement node) {
-                if(node instanceof MethodFrame) {
+                if(node instanceof MethodFrame && result == null) {
                     result = (MethodFrame) node;
                 }
             }
@@ -186,7 +190,22 @@ class InvInferenceTools {
                 
         return result;
     }
-        
+    
+    
+    /**
+     * Returns the receiver term of the passed method frame, or null if
+     * the frame belongs to a static method.
+     */
+    public Term getSelfTerm(MethodFrame mf, Services services) {
+	ExecutionContext ec = (ExecutionContext) mf.getExecutionContext();
+	ReferencePrefix rp = ec.getRuntimeInstance();
+	if(!(rp instanceof TypeReference) && rp != null) {
+	    return services.getTypeConverter().convertToLogicElement(rp);
+	} else {
+	    return null;
+	}
+    }
+    
     
     /**
      * Removes all formulas from the passed goal.
@@ -265,7 +284,7 @@ class InvInferenceTools {
      */
     public Term goBelowUpdates(Term term) {
         while(term.op() instanceof UpdateApplication) {
-            term = term.sub(((UpdateApplication)term.op()).targetPos());
+            term = UpdateApplication.getTarget(term);
         }        
         return term;
     }
@@ -374,5 +393,83 @@ class InvInferenceTools {
             result = result.union(getOccurringLocationSymbols(t.sub(i)));
         }
         return result;
+    }
+    
+    
+    /**
+     * Returns an available name constructed by affixing a counter to the passed 
+     * base name.
+     */
+    public String getNewName(String baseName, 
+                             Services services, 
+                             ImmutableList<String> locallyUsedNames) {
+        NamespaceSet namespaces = services.getNamespaces();
+            
+        int i = 0;
+        String result = baseName;
+        while(namespaces.lookup(new Name(result)) != null) {
+            result = baseName + "_" + i++;
+        }
+        
+        return result;
+    }
+    
+    
+    /**
+     * Returns an available name constructed by affixing a counter to the passed 
+     * base name.
+     */
+    public String getNewName(String baseName, Services services) {
+        return getNewName(baseName, services, ImmutableSLList.<String>nil());
+    }
+    
+    
+    public ImmutableSet<ProgramVariable> getWrittenPVs(ProgramElement pe, 
+	    			              Services services) {
+	WrittenPVCollector wpvc = new WrittenPVCollector(pe, services);
+	wpvc.start();
+	return wpvc.result();
+    }
+    
+    
+    
+    //-------------------------------------------------------------------------
+    //inner classes
+    //-------------------------------------------------------------------------    
+       
+    private static final class WrittenPVCollector extends JavaASTVisitor {
+	private ImmutableSet<ProgramVariable> result 
+		= DefaultImmutableSet.<ProgramVariable>nil();
+
+	private ImmutableSet<ProgramVariable> declaredPVs 
+		= DefaultImmutableSet.<ProgramVariable>nil();
+
+	public WrittenPVCollector(ProgramElement root, Services services) {
+	    super(root, services);
+	}
+
+	@Override	
+	protected void doDefaultAction(SourceElement node) {
+	    if(node instanceof Assignment) {
+		ProgramElement lhs = ((Assignment) node).getChildAt(0);
+		if(lhs instanceof ProgramVariable) {
+		    ProgramVariable pv = (ProgramVariable) lhs;
+		    if(!pv.isMember() && !declaredPVs.contains(pv)) {
+			result = result.add(pv);
+		    }		    
+		}
+	    } else if(node instanceof VariableSpecification) {
+		VariableSpecification vs = (VariableSpecification) node;
+		ProgramVariable pv = (ProgramVariable) vs.getProgramVariable();
+		if(!pv.isMember()) {
+		    assert !declaredPVs.contains(pv);
+		    assert !result.contains(pv);
+		}
+	    }
+	}
+
+	public ImmutableSet<ProgramVariable> result() {
+	    return result;
+	}
     }
 }
