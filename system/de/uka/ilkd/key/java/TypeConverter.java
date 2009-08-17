@@ -205,13 +205,17 @@ public final class TypeConverter {
     }
     
     
-    public Term findThisForSort(Sort s, Term self, KeYJavaType context, boolean exact){
+    public Term findThisForSort(Sort s, 
+	    			Term self, 
+	    			KeYJavaType context, 
+	    			boolean exact) {
         Term result = self;
-        ProgramVariable inst;
-        while(!exact && !context.getSort().extendsTrans(s) ||
-                 exact && !context.getSort().equals(s)){
-            inst = services.getJavaInfo().getAttribute(
-                    ImplicitFieldAdder.IMPLICIT_ENCLOSING_THIS, context);
+        LocationVariable inst;
+        while(!exact && !context.getSort().extendsTrans(s) 
+              || exact && !context.getSort().equals(s)){
+            inst = (LocationVariable)
+                    services.getJavaInfo().getAttribute(
+                       ImplicitFieldAdder.IMPLICIT_ENCLOSING_THIS, context);
             final Function fieldSymbol
             	= heapLDT.getFieldSymbolForPV(inst, services);
             result = TB.dot(services, inst.sort(), result, fieldSymbol);
@@ -223,24 +227,31 @@ public final class TypeConverter {
     
     public Term convertVariableReference(VariableReference fr,
 					 ExecutionContext ec) {	       
-	Debug.out("TypeConverter: FieldReference: ",fr);
+	Debug.out("TypeConverter: FieldReference: ", fr);
 	final ReferencePrefix prefix = fr.getReferencePrefix();
 	final ProgramVariable var = fr.getProgramVariable();
-	if (var.isStatic()) {
+	if(var instanceof ProgramConstant) {
+	    return TB.var(var);
+	} else if(var.isStatic()) {
 	    final Function fieldSymbol 
-	    	= heapLDT.getFieldSymbolForPV(var, services);
+	    	= heapLDT.getFieldSymbolForPV((LocationVariable)var, services);
 	    return TB.staticDot(services, var.sort(), fieldSymbol);
-	} else if (prefix == null) {
-	    if (var.isMember()) {
+	} else if(prefix == null) {
+	    if(var.isMember()) {
 		final Function fieldSymbol 
-			= heapLDT.getFieldSymbolForPV(var, services);
-		return TB.dot(services, var.sort(), findThisForSort(var.getContainerType().getSort(), ec), 
-		        fieldSymbol);
+			= heapLDT.getFieldSymbolForPV((LocationVariable)var, 
+						      services);
+		return TB.dot(services, 
+			      var.sort(), 
+			      findThisForSort(var.getContainerType().getSort(), 
+				              ec), 
+			      fieldSymbol);
+	    } else {
+		return TB.var(var);
 	    }
-	    return TB.var(var); 
 	} else if (!(prefix instanceof PackageReference) ) {
 	    final Function fieldSymbol 
-	    	= heapLDT.getFieldSymbolForPV(var, services);
+	    	= heapLDT.getFieldSymbolForPV((LocationVariable)var, services);
 	    return TB.dot(services, var.sort(), convertReferencePrefix(prefix, ec), fieldSymbol);
 	} 
 	Debug.out("typeconverter: Not supported reference type (fr, class):",

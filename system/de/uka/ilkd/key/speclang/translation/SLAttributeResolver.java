@@ -49,14 +49,15 @@ public class SLAttributeResolver extends SLExpressionResolver {
                     attribute 
                     	= javaInfo.lookupVisibleAttribute(ImplicitFieldAdder.FINAL_VAR_PREFIX+name, containingType);
                 }
-                ProgramVariable et 
-                	= javaInfo.getAttribute(ImplicitFieldAdder.IMPLICIT_ENCLOSING_THIS, containingType);
+                LocationVariable et 
+                	= (LocationVariable) javaInfo.getAttribute(ImplicitFieldAdder.IMPLICIT_ENCLOSING_THIS, 
+                					           containingType);
                 if(et != null && attribute == null){
                     containingType = et.getKeYJavaType();
                     if(recTerm != null){
-                	final Function fieldSymbol 
+                	final Function thisFieldSymbol 
                 		= heapLDT.getFieldSymbolForPV(et, services);
-                        recTerm = TB.dot(services, et.sort(), recTerm, fieldSymbol);
+                        recTerm = TB.dot(services, et.sort(), recTerm, thisFieldSymbol);
                     }
                 } else {
                     break;
@@ -69,26 +70,32 @@ public class SLAttributeResolver extends SLExpressionResolver {
                 throw manager.excManager.createException(
                         "Reference to non-static field without receiver: " +
                         attribute.name());
-            }
-            try {
-        	final Function fieldSymbol 
-        		= heapLDT.getFieldSymbolForPV(attribute, services);
-        	Term attributeTerm;
-        	if(attribute.isStatic()) {
-        	    attributeTerm = TB.staticDot(services, 
-        		                         attribute.sort(), 
-        		                         fieldSymbol);
-        	} else {
-        	    attributeTerm = TB.dot(services, 
-        		                   attribute.sort(), 
-        		                   recTerm, 
-        		                   fieldSymbol);
+            } else if(attribute instanceof ProgramConstant) {
+        	return new SLExpression(TB.var(attribute), 
+        				attribute.getKeYJavaType());
+            } else {
+        	try {
+        	    final Function fieldSymbol 
+        	    	= heapLDT.getFieldSymbolForPV((LocationVariable)
+        	    		                         attribute, 
+        	    		                       services);
+        	    Term attributeTerm;
+        	    if(attribute.isStatic()) {
+        		attributeTerm = TB.staticDot(services, 
+        					     attribute.sort(), 
+        					     fieldSymbol);
+        	    } else {
+        		attributeTerm = TB.dot(services, 
+        				       attribute.sort(), 
+        				       recTerm, 
+        				       fieldSymbol);
+        	    }
+        	    return new SLExpression(attributeTerm, 
+        		    		    attribute.getKeYJavaType());
+        	} catch (TermCreationException e) {
+        	    throw manager.excManager.createException(
+        		    "Wrong attribute reference " + name + ".");
         	}
-                return new SLExpression(attributeTerm, 
-                			attribute.getKeYJavaType());
-            } catch (TermCreationException e) {
-                throw manager.excManager.createException(
-                        "Wrong attribute reference " + name + ".");
             }
         }   
     

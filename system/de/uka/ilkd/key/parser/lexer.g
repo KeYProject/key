@@ -83,7 +83,6 @@ tokens {
 	STRICT    = "\\strict";	
 	TYPEOF = "\\typeof";
 	INSTANTIATE_GENERIC = "\\instantiateGeneric";
-	INSERT_CONSTANT_VALUE = "\\insertConstantValue";
 
 	// Quantifiers, binding, substitution
 	FORALL = "\\forall";

@@ -801,11 +801,19 @@ options {
                                            tf.createTerm(attribute));
         } else {
             ProgramVariable pv = (ProgramVariable) attribute;
-            Function fieldSymbol = getServices().getTypeConverter().getHeapLDT().getFieldSymbolForPV(pv, getServices());        
-            if (pv.isStatic()){
-                result = TermBuilder.DF.staticDot(getServices(), pv.sort(), fieldSymbol);
-            } else {            
-                result = TermBuilder.DF.dot(getServices(), pv.sort(), result, fieldSymbol);                
+            if(pv instanceof ProgramConstant) {
+                result = tf.createTerm(pv);
+            } else {
+            	Function fieldSymbol 
+            		= getServices().getTypeConverter()
+            		               .getHeapLDT()
+            		               .getFieldSymbolForPV((LocationVariable)pv, 
+            		                                    getServices());        
+            	if (pv.isStatic()){
+                    result = TermBuilder.DF.staticDot(getServices(), pv.sort(), fieldSymbol);
+            	} else {            
+                    result = TermBuilder.DF.dot(getServices(), pv.sort(), result, fieldSymbol);                
+            	}
             }
         }
         return result;
@@ -3402,7 +3410,6 @@ varexp[TacletBuilder b]
     | varcond_new[b]
     | varcond_newlabel[b]
     | varcond_query[b] 
-    | varcond_insertConstantValue[b]
   ) 
   | 
   ( (NOT {negated = true;} )? 
@@ -3634,19 +3641,6 @@ varcond_query [TacletBuilder b]
      b.addVariableCondition(new TestQuery((SchemaVariable)x));
    }
 ;
-
-varcond_insertConstantValue [TacletBuilder b]
-{
-  ParsableVariable f = null;
-  ParsableVariable result = null;
-}
-:
-   INSERT_CONSTANT_VALUE LPAREN f=varId COMMA result=varId RPAREN {
-     b.addVariableCondition(new InsertConstantValueCondition((TermSV)f, 
-     							     (TermSV)result));
-   }
-;
-
 
 
 varcond_inReachableState [TacletBuilder b]

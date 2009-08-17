@@ -67,7 +67,9 @@ public final class HeapLDT extends LDT {
     public HeapLDT(Namespace sorts, Namespace functions, Namespace progVars) {
 	super(NAME, sorts);
         fieldSort         = (Sort) sorts.lookup(new Name("Field"));	
-        select            = (SortDependingFunction) addFunction(functions, Sort.ANY + "::" + SELECT_NAME);
+        select            = (SortDependingFunction) addFunction(
+        				functions, 
+        				Sort.ANY + "::" + SELECT_NAME);
         store             = addFunction(functions, "store");
         changeHeapAtLocs  = addFunction(functions, "changeHeapAtLocs");
         changeHeapAtLocs2 = addFunction(functions, "changeHeapAtLocs2");
@@ -87,7 +89,7 @@ public final class HeapLDT extends LDT {
     //internal methods
     //------------------------------------------------------------------------- 
     
-    private String getFieldSymbolName(ProgramVariable fieldPV) {
+    private String getFieldSymbolName(LocationVariable fieldPV) {
 	if(fieldPV.isImplicit()) {
 	    return fieldPV.name().toString();
 	} else {
@@ -213,7 +215,7 @@ public final class HeapLDT extends LDT {
     }    
     
     
-    public Function getFieldSymbolForPV(ProgramVariable fieldPV, 
+    public Function getFieldSymbolForPV(LocationVariable fieldPV, 
 	    				Services services) {
 	assert fieldPV.isMember();	
 	if(fieldPV == services.getJavaInfo().getArrayLength()) {
@@ -247,15 +249,6 @@ public final class HeapLDT extends LDT {
 	assert result.sort() == fieldSort : "symbol has wrong sort: " + result;
         assert result.isUnique() : "symbol is not unique: " + result;        
         return result;
-    }
-    
-    
-    public ProgramVariable getPVForFieldSymbol(Function fieldSymbol,
-	    				       Services services) {
-	String className = getClassName(fieldSymbol);
-	String fieldName = getPrettyFieldName(fieldSymbol);
-	return services.getJavaInfo()
-	               .getAttribute(className + "::" + fieldName);
     }
     
     

@@ -30,16 +30,15 @@ public final class ConstantValue extends AbstractMetaOperator {
     }
 
 
-    /** calculates the resulting term. */
     public Term calculate(Term term, SVInstantiations svInst, Services services) {
 	term = term.sub ( 0 );
 	Operator op = term.op ();
 
-	if ( op instanceof ProgramConstant ) {
-	    Literal lit = ((ProgramConstant)op).getCompileTimeConstant ();
-	    if ( lit != null )
-		term = services.getTypeConverter ()
-		    .convertToLogicElement ( lit );
+	if(op instanceof ProgramConstant) {
+	    Literal lit = ((ProgramConstant)op).getCompileTimeConstant();
+	    if(lit != null) {
+		term = services.getTypeConverter().convertToLogicElement(lit);
+	    }
 	}
 
 	return term;

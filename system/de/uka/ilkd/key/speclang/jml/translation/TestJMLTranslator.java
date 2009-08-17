@@ -317,7 +317,10 @@ public class TestJMLTranslator extends TestCase {
         FormulaWithAxioms result = null;
 
         ProgramVariable selfVar = buildSelfVarAsProgVar();
-        Function instance = services.getTypeConverter().getHeapLDT().getFieldSymbolForPV(javaInfo.getAttribute("testPackage.TestClass::instance"), services);
+        Function instance = services.getTypeConverter()
+                                    .getHeapLDT()
+                                    .getFieldSymbolForPV((LocationVariable)javaInfo.getAttribute("testPackage.TestClass::instance"), 
+                                	                 services);
 
         try {
             result = translator.translateExpression(new PositionedString("\\created(this.instance)"),
@@ -542,7 +545,8 @@ public class TestJMLTranslator extends TestCase {
         FormulaWithAxioms result = null;
 
         ProgramVariable selfVar = buildSelfVarAsProgVar();
-        ProgramVariable array = javaInfo.getAttribute("testPackage.TestClass::array");
+        LocationVariable array 
+        	= (LocationVariable) javaInfo.getAttribute("testPackage.TestClass::array");
 
         try {
             result = translator.translateExpression

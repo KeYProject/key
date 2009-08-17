@@ -12,10 +12,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.op.AbstractMetaOperator;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
@@ -39,8 +36,8 @@ public class MemberPVToField extends AbstractMetaOperator {
  	
  	    
  	Operator op = term.sub(0).op();
-	if(op instanceof ProgramVariable) {	
-	    ProgramVariable fieldPV = (ProgramVariable) term.sub(0).op();
+	if(op instanceof LocationVariable) {
+	    LocationVariable fieldPV = (LocationVariable) term.sub(0).op();
 	    Function fieldSymbol 
 	    	= heapLDT.getFieldSymbolForPV(fieldPV, services);
 	    return TB.func(fieldSymbol);

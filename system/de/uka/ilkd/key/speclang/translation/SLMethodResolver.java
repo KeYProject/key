@@ -15,8 +15,8 @@ import de.uka.ilkd.key.java.abstraction.ListOfKeYJavaType;
 import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
 
 
 public final class SLMethodResolver extends SLExpressionResolver {
@@ -53,13 +53,15 @@ public final class SLMethodResolver extends SLExpressionResolver {
                     methodName,
                     signature,
                     containingType);
-            ProgramVariable et = javaInfo.getAttribute(
+            LocationVariable et = (LocationVariable) javaInfo.getAttribute(
                     ImplicitFieldAdder.IMPLICIT_ENCLOSING_THIS, containingType);
             if(et!=null && pm==null){
                 containingType = et.getKeYJavaType();
                 if(recTerm!=null){
                     final Function fieldSymbol 
-                    	= services.getTypeConverter().getHeapLDT().getFieldSymbolForPV(et, services);
+                    	= services.getTypeConverter()
+                    	          .getHeapLDT()
+                    	          .getFieldSymbolForPV(et, services);
                     recTerm = TB.dot(services, et.sort(), recTerm, fieldSymbol);
                 }
             }else{

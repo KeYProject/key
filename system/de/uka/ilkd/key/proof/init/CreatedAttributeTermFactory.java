@@ -12,6 +12,7 @@ package de.uka.ilkd.key.proof.init;
 
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.TypeConverter;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
 import de.uka.ilkd.key.ldt.IntegerLDT;
@@ -88,12 +89,12 @@ public class CreatedAttributeTermFactory {
      * Creates the formula "objectTerm.<created> = TRUE".
      */
     public Term createCreatedTerm(Services services, Term objectTerm) {
-        JavaInfo javaInfo = services.getJavaInfo();
-        ProgramVariable createdAttribute
-                = javaInfo.getAttribute(ImplicitFieldAdder.IMPLICIT_CREATED, 
-                                        javaInfo.getJavaLangObject());
-        final Function fieldSymbol = services.getTypeConverter().getHeapLDT().getFieldSymbolForPV(createdAttribute, services);
-        Term createdTerm = TB.dot(services, createdAttribute.sort(), objectTerm, fieldSymbol);
+	final TypeConverter tc = services.getTypeConverter();
+        final Function fieldSymbol = tc.getHeapLDT().getCreated();
+        Term createdTerm = TB.dot(services, 
+        			  tc.getBooleanLDT().targetSort(), 
+        			  objectTerm, 
+        			  fieldSymbol);
         
         return TB.equals(createdTerm, TB.TRUE(services));
     }
