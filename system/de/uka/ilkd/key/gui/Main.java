@@ -136,6 +136,12 @@ public final class Main extends JFrame implements IMain {
     /** action for opening a KeY file */
     public static OpenFile openFileAction;
     
+    /** action for opening the most recent KeY file */
+    public static OpenMostRecentFile openMostRecentFileAction;
+    
+    /** action for editing the most recent KeY file */
+    public static EditMostRecentFile editMostRecentFileAction;    
+    
     /** action for saving a proof (attempt) */
     public static SaveFile saveFileAction;
     
@@ -376,10 +382,12 @@ public final class Main extends JFrame implements IMain {
         setJMenuBar(new JMenuBar());
         setToolBar(new JToolBar("Proof Control"));
         
-        autoModeAction = new AutoModeAction();
-        openFileAction = new OpenFile();
-        saveFileAction = new SaveFile();
-        poBrowserAction = new POBrowserAction();
+        autoModeAction           = new AutoModeAction();
+        openFileAction           = new OpenFile();
+        openMostRecentFileAction = new OpenMostRecentFile();
+        editMostRecentFileAction = new EditMostRecentFile();
+        saveFileAction           = new SaveFile();
+        poBrowserAction          = new POBrowserAction();
 
 	// ============================================================
 	// ==================  create empty views =====================
@@ -434,7 +442,8 @@ public final class Main extends JFrame implements IMain {
         JToolBar fileOperations = new JToolBar("File Operations");
         fileOperations.add(createOpenFile());
         fileOperations.add(createOpenMostRecentFile());
-        fileOperations.add(createSaveFile());
+        fileOperations.add(createEditMostRecentFile());
+        fileOperations.add(createSaveFile());        
         fileOperations.addSeparator();
         fileOperations.add(createPOBrowserComponent());
         
@@ -522,18 +531,26 @@ public final class Main extends JFrame implements IMain {
         return new JButton(autoModeAction);
     }
     
-    private JComponent createOpenMostRecentFile() {
-        final JButton button = new JButton();
-        button.setAction(new OpenMostRecentFile());
-        return button;
-    }
-    
     private JComponent createOpenFile() {
         final JButton button = new JButton();
         button.setAction(openFileAction);
         button.setText(null);
         return button;
     }
+    
+    private JComponent createOpenMostRecentFile() {
+        final JButton button = new JButton();
+        button.setAction(openMostRecentFileAction);
+        button.setText(null);        
+        return button;
+    }
+    
+    private JComponent createEditMostRecentFile() {
+        final JButton button = new JButton();
+        button.setAction(editMostRecentFileAction);
+        button.setText(null);        
+        return button;	
+    }    
     
     private JComponent createSaveFile() {
         final JButton button = new JButton();
@@ -946,10 +963,18 @@ public final class Main extends JFrame implements IMain {
         JMenuItem load = new JMenuItem();
         load.setAction(openFileAction);
         
+        JMenuItem loadRecent = new JMenuItem();
+        loadRecent.setAction(openMostRecentFileAction);
+        
+        JMenuItem edit = new JMenuItem();
+        edit.setAction(editMostRecentFileAction);        
+        
         JMenuItem save = new JMenuItem();
         save.setAction(saveFileAction);
         
         registerAtMenu(fileMenu, load);
+        registerAtMenu(fileMenu, loadRecent);
+        registerAtMenu(fileMenu, edit);
         registerAtMenu(fileMenu, save);
                 
         JMenuItem exit = new JMenuItem("Exit");
@@ -1566,25 +1591,6 @@ public final class Main extends JFrame implements IMain {
 	}
     }
 
-    /**
-     * Loads the last opened file
-     */
-    private final class OpenMostRecentFile extends AbstractAction {
-        
-        public OpenMostRecentFile() {
-            putValue(SMALL_ICON, IconFactory.openMostRecent(TOOLBAR_ICON_SIZE));
-            putValue(SHORT_DESCRIPTION, "Load last opened file.");
-        }
-        
-        public void actionPerformed(ActionEvent e) {
-            if (recentFiles != null && recentFiles.getMostRecent() != null) {
-                final String recentFile = recentFiles.getMostRecent().getAbsolutePath();
-                if (recentFile != null) {
-                    loadProblem(new File(recentFile));
-                }
-            }
-        }
-    }
     
     /**
      * Opens a file dialog allowing to select the file to be loaded
@@ -1595,7 +1601,6 @@ public final class Main extends JFrame implements IMain {
             putValue(SMALL_ICON, IconFactory.openKeYFile(TOOLBAR_ICON_SIZE));
             putValue(SHORT_DESCRIPTION, "Browse and load problem or proof files.");
             putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_O, ActionEvent.CTRL_MASK));
-            
         }
         
         public void actionPerformed(ActionEvent e) {
@@ -1609,6 +1614,67 @@ public final class Main extends JFrame implements IMain {
             
         }
     }
+    
+
+    /**
+     * Loads the last opened file
+     */
+    private final class OpenMostRecentFile extends AbstractAction {
+        
+        public OpenMostRecentFile() {
+            putValue(NAME, "Reload");
+            putValue(SMALL_ICON, IconFactory.openMostRecent(TOOLBAR_ICON_SIZE));
+            putValue(SHORT_DESCRIPTION, "Reload last opened file.");
+        }
+        
+        public void actionPerformed(ActionEvent e) {
+            if (recentFiles != null && recentFiles.getMostRecent() != null) {
+                final String recentFile = recentFiles.getMostRecent().getAbsolutePath();
+                if (recentFile != null) {
+                    loadProblem(new File(recentFile));
+                }
+            }
+        }
+    }    
+    
+
+    
+    /**
+     * Opens the last opened file in an editor (well, it tries)
+     */
+    private final class EditMostRecentFile extends AbstractAction {        
+        public EditMostRecentFile() {
+            putValue(NAME, "Edit");            
+            putValue(SMALL_ICON, IconFactory.editFile(TOOLBAR_ICON_SIZE));
+            putValue(SHORT_DESCRIPTION, "Edit last opened file.");     
+            if(!Desktop.isDesktopSupported()
+               || (!Desktop.getDesktop().isSupported(Desktop.Action.EDIT) 
+                   && !Desktop.getDesktop().isSupported(Desktop.Action.OPEN))) {
+        	setEnabled(false);
+            }
+        }
+        
+        public void actionPerformed(ActionEvent e) {
+            if(recentFiles != null && recentFiles.getMostRecent() != null) {
+        	Desktop d = Desktop.getDesktop();
+                final String recentFile = recentFiles.getMostRecent()
+                                                     .getAbsolutePath();
+                if(recentFile != null) {
+                    File f = new File(recentFile);
+                    try {
+                	if(d.isSupported(Desktop.Action.EDIT) && f.isFile()) {
+                	    d.edit(f);
+                	} else {
+                	    d.open(f);
+                	}
+                    } catch(Exception exc) {
+                	setEnabled(false);
+                    }
+                }
+            }
+        }
+    }            
+    
     
     /**
      * Saves the current selected proof.
@@ -1644,6 +1710,7 @@ public final class Main extends JFrame implements IMain {
             }
         }
     }
+    
     
     
     /**

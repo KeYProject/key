@@ -27,7 +27,6 @@ header {
     import de.uka.ilkd.key.logic.*;
     import de.uka.ilkd.key.logic.op.*;
     import de.uka.ilkd.key.logic.sort.*;
-    import de.uka.ilkd.key.proof.AtPreFactory;
     import de.uka.ilkd.key.proof.OpReplacer;
     import de.uka.ilkd.key.proof.init.CreatedAttributeTermFactory;
     import de.uka.ilkd.key.speclang.FormulaWithAxioms;
@@ -50,7 +49,6 @@ options {
 
 {
     private static final TermBuilder TB = TermBuilder.DF;
-    private static final AtPreFactory APF = AtPreFactory.INSTANCE;
 
     private Services services;
     private JavaInfo javaInfo;
@@ -1633,30 +1631,7 @@ jmlprimary returns [SLExpression result=null] throws SLTranslationException
 	
     |   FRESH LPAREN list=expressionlist RPAREN
 	{
-	    assert false : "not implemented";
-/*	    if (atPreFunctions == null) {
-                raiseError("JML construct " +
-                    "\\fresh not allowed in this context.");
-	    }
-    	    ProgramVariable createdAttribute
-            	= javaInfo.getAttribute(ImplicitFieldAdder.IMPLICIT_CREATED, 
-					javaInfo.getJavaLangObject());
-            AttributeOp ao = AttributeOp.getAttributeOp(createdAttribute);
-            Function atPreFunc = (Function) atPreFunctions.get(ao);
-	    if(atPreFunc == null) {
-                atPreFunc = APF.createAtPreFunction(ao, services);
-                atPreFunctions.put(ao, atPreFunc);
-                assert atPreFunc != null;
-	    }	    
-	    t = TB.tt();
-            IteratorOfTerm it = sl.iterator();
-            while(it.hasNext()){
-            	Term n = it.next();
-            	Term fn = TB.and(TB.not(TB.equals(n, TB.NULL(services))), TB.equals(TB.func(atPreFunc, n), TB.FALSE(services)));
-            	t = TB.and(t, fn);
-            }
-            result = new SLExpression(t);
-*/
+	    raiseNotSupported("\\fresh");
 	} 
 	
     |   REACH LPAREN result=expression RPAREN

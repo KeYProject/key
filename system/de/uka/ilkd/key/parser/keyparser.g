@@ -3402,6 +3402,7 @@ varexp[TacletBuilder b]
     | varcond_new[b]
     | varcond_newlabel[b]
     | varcond_query[b] 
+    | varcond_insertConstantValue[b]
   ) 
   | 
   ( (NOT {negated = true;} )? 
@@ -3633,6 +3634,20 @@ varcond_query [TacletBuilder b]
      b.addVariableCondition(new TestQuery((SchemaVariable)x));
    }
 ;
+
+varcond_insertConstantValue [TacletBuilder b]
+{
+  ParsableVariable f = null;
+  ParsableVariable result = null;
+}
+:
+   INSERT_CONSTANT_VALUE LPAREN f=varId COMMA result=varId RPAREN {
+     b.addVariableCondition(new InsertConstantValueCondition((TermSV)f, 
+     							     (TermSV)result));
+   }
+;
+
+
 
 varcond_inReachableState [TacletBuilder b]
 {

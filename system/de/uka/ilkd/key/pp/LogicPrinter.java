@@ -888,23 +888,17 @@ public final class LogicPrinter {
             markStartSub();
             //heap not printed
             markEndSub();
-            
-            ProgramVariable fieldPV;
-            try {
-        	fieldPV = services.getJavaInfo().getAttribute(fieldTerm.toString()); 
-            } catch(Throwable e) {
-        	fieldPV = null;
-            }             	
-            if(fieldPV != null 
-        	 && fieldPV.isStatic() 
-        	 && objectTerm.equals(TermBuilder.DF.NULL(services))) {
+
+            if(objectTerm.equals(TermBuilder.DF.NULL(services))
+                && fieldTerm.op() instanceof Function
+                && ((Function)fieldTerm.op()).isUnique()) {
         	assert fieldTerm.arity() == 0;
         	
         	markStartSub();
         	//"null" not printed
         	markEndSub();
         	
-        	layouter.print(fieldPV.getContainerType().getName() + ".");
+        	layouter.print(heapLDT.getClassName((Function)fieldTerm.op()) + ".");
         	
                 markStartSub();
                 startTerm(0);                    

@@ -17,7 +17,7 @@ public class CubicSum {
 	int res = 0;
 	/*@
 	  @ loop_invariant 0<= i && i<=n && 4 * res == i*i * (i+1)*(i+1);
-	  @ assignable i,res;
+	  @ assignable \nothing;
 	  @ */
 	while (i < n) {
 	    i++;

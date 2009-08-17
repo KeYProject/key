@@ -42,7 +42,6 @@ public class UseOperationContractRule implements BuiltInRule {
     private static final TermBuilder TB = TermBuilder.DF;
     private static final SignatureVariablesFactory SVF 
         = SignatureVariablesFactory.INSTANCE;
-    private static final AtPreFactory APF = AtPreFactory.INSTANCE;
     private static final CreatedAttributeTermFactory CATF 
         = CreatedAttributeTermFactory.INSTANCE;
   

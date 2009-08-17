@@ -5,6 +5,7 @@
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
+
 public class Gcd {
     
     /*@
@@ -50,7 +51,7 @@ public class Gcd {
 	  @                          <==>
 	  @                          (big % x == 0 && small % x == 0));
 	  @ decreases small;
-	  @ assignable big, small;
+	  @ assignable \nothing;
 	  @*/
 	while (small != 0) {
 	    final int t = big % small;

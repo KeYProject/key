@@ -15,6 +15,7 @@ import java.util.Map;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
+import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.reference.ReferencePrefix;
 import de.uka.ilkd.key.java.reference.TypeReference;
@@ -23,103 +24,125 @@ import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.statement.SetAsListOfLoopStatement;
 import de.uka.ilkd.key.java.statement.SetOfLoopStatement;
 import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
+import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.SetOfTerm;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.AbstractMetaOperator;
 import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.proof.AtPreFactory;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.speclang.LoopInvariant;
 import de.uka.ilkd.key.speclang.LoopInvariantImpl;
+import de.uka.ilkd.key.util.InvInferenceTools;
+import de.uka.ilkd.key.util.Pair;
 
 
 
 public final class IntroAtPreDefsOp extends AbstractMetaOperator {
     
-    private static final AtPreFactory APF = AtPreFactory.INSTANCE;
-   
+    private static final InvInferenceTools IIT 
+    	= InvInferenceTools.INSTANCE;
+       
     public IntroAtPreDefsOp() {
         super(new Name("#introAtPreDefs"), 1);
     }
 
     
-    public Term calculate(Term term, SVInstantiations svInst, Services services) {
-        Term target = term.sub(0);
+    @Override
+    public Term calculate(Term term, 
+	    		  SVInstantiations svInst, 
+	    		  Services services) {
+        final Term target = term.sub(0);
         
-//        //the target term should have a Java block 
-//        ProgramElement pe = target.javaBlock().program();
-//        assert pe != null;
-//                
-//        //collect all loops in the innermost method frame
-//        Object[] frameAndLoops = new JavaASTVisitor(pe, services) {
-//            private MethodFrame frame = null;
-//            private SetOfLoopStatement loops = SetAsListOfLoopStatement.EMPTY_SET;
-//            protected void doDefaultAction(SourceElement node) {
-//                if(node instanceof MethodFrame && frame == null) {
-//                    frame = (MethodFrame) node;
-//                } else if(frame == null && node instanceof LoopStatement) {
-//                    loops = loops.add((LoopStatement) node);
-//                }
-//            }
-//            public Object[] run() {
-//                walk(root());
-//                return new Object[]{frame, loops};
-//            }
-//        }.run();
-//        MethodFrame frame = (MethodFrame) frameAndLoops[0];
-//        SetOfLoopStatement loops = (SetOfLoopStatement) frameAndLoops[1];
-//        
-//        //determine "self"
-//        Term selfTerm;
-//        ExecutionContext ec = (ExecutionContext) frame.getExecutionContext();
-//        ReferencePrefix rp = ec.getRuntimeInstance();
-//        if(rp == null || rp instanceof TypeReference) {
-//            selfTerm = null;
-//        } else {
-//            selfTerm = services.getTypeConverter().convertToLogicElement(rp);
-//        }
-//
-//        //collect atPre-functions, update loop invariants
-//        Map<Operator, Function /*atPre*/> atPreFunctions = 
-//            new LinkedHashMap<Operator, Function>();
-//        for(LoopStatement loop : loops) {
-//            LoopInvariant inv 
-//                = services.getSpecificationRepository().getLoopInvariant(loop);
-//            if(inv != null) {
-//                if(selfTerm != null && inv.getInternalSelfTerm() == null) {
-//                    //we're calling a static method from an instance context
-//                    selfTerm = null;
-//                }
-//                Term newInvariant 
-//                    = inv.getInvariant(selfTerm, atPreFunctions, services);
-//                SetOfTerm newPredicates
-//                    = inv.getPredicates(selfTerm, atPreFunctions, services);
-//                Term newModifies
-//                    = inv.getModifies(selfTerm, atPreFunctions, services);
-//                Term newVariant
-//                    = inv.getVariant(selfTerm, atPreFunctions, services);
-//                boolean newPredicateHeuristicsAllowed
-//                    = inv.getPredicateHeuristicsAllowed();
-//                
-//                LoopInvariant newInv 
-//                    = new LoopInvariantImpl(loop, 
-//                                            newInvariant, 
-//                                            newPredicates,
-//                                            newModifies, 
-//                                            newVariant, 
-//                                            selfTerm,
-//                                            atPreFunctions,
-//                                            newPredicateHeuristicsAllowed);
-//                services.getSpecificationRepository().setLoopInvariant(newInv);                
-//            }
-//        }
-//        
-//        //define atPre symbols
-//        Term atPreUpdate 
-//            = APF.createAtPreDefinitions(atPreFunctions, services);
-//        return TB.apply(atPreUpdate, target);
-        return target;
+        //the target term should have a Java block 
+        final ProgramElement pe = target.javaBlock().program();
+        assert pe != null;
+                
+        //collect all loops in the innermost method frame
+        final Pair<MethodFrame,SetOfLoopStatement> frameAndLoops 
+        	= new JavaASTVisitor(pe, services) {
+            private MethodFrame frame = null;
+            private SetOfLoopStatement loops 
+            	= SetAsListOfLoopStatement.EMPTY_SET;
+            protected void doDefaultAction(SourceElement node) {
+                if(node instanceof MethodFrame && frame == null) {
+                    frame = (MethodFrame) node;
+                } else if(frame == null && node instanceof LoopStatement) {
+                    loops = loops.add((LoopStatement) node);
+                }
+            }
+            public Pair<MethodFrame,SetOfLoopStatement> run() {
+                walk(root());
+                return new Pair<MethodFrame,SetOfLoopStatement>(frame, loops);
+            }
+        }.run();
+        final MethodFrame frame = frameAndLoops.first;
+        final SetOfLoopStatement loops = frameAndLoops.second;
+        
+        //determine "self"
+        Term selfTerm;
+        final ExecutionContext ec 
+        	= (ExecutionContext) frame.getExecutionContext();
+        final ReferencePrefix rp = ec.getRuntimeInstance();
+        if(rp == null || rp instanceof TypeReference) {
+            selfTerm = null;
+        } else {
+            selfTerm = services.getTypeConverter().convertToLogicElement(rp);
+        }
+        
+        //create atPre heap
+        final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+        final String methodName = frame.getProgramMethod().getName();
+	final ProgramElementName heapBeforeLoopName 
+		= new ProgramElementName(IIT.getNewName("heapBefore_" + methodName, 
+							services));
+	final LocationVariable heapAtPreVar 
+		= new LocationVariable(heapBeforeLoopName,
+				       new KeYJavaType(heapLDT.targetSort()));
+	services.getNamespaces().programVariables().addSafely(heapAtPreVar);
+	final Term heapAtPre = TB.var(heapAtPreVar);
+	final Term heapAtPreUpdate = TB.elementary(services, 
+						   heapAtPreVar, 
+						   TB.heap(services));
+        
+        //collect atPre-functions, update loop invariants
+        Map<Operator, Function /*atPre*/> atPreFunctions = 
+            new LinkedHashMap<Operator, Function>();
+        for(LoopStatement loop : loops) {
+            LoopInvariant inv 
+                = services.getSpecificationRepository().getLoopInvariant(loop);
+            if(inv != null) {
+                if(selfTerm != null && inv.getInternalSelfTerm() == null) {
+                    //we're calling a static method from an instance context
+                    selfTerm = null;
+                }
+                final Term newInvariant 
+                    = inv.getInvariant(selfTerm, heapAtPre, services);
+                final SetOfTerm newPredicates
+                    = inv.getPredicates(selfTerm, heapAtPre, services);
+                final Term newModifies
+                    = inv.getModifies(selfTerm, heapAtPre, services);
+                final Term newVariant
+                    = inv.getVariant(selfTerm, heapAtPre, services);
+                boolean newPredicateHeuristicsAllowed
+                    = inv.getPredicateHeuristicsAllowed();
+                
+                final LoopInvariant newInv 
+                    = new LoopInvariantImpl(loop, 
+                                            newInvariant, 
+                                            newPredicates,
+                                            newModifies, 
+                                            newVariant, 
+                                            selfTerm,
+                                            heapAtPre,
+                                            newPredicateHeuristicsAllowed);
+                services.getSpecificationRepository().setLoopInvariant(newInv);                
+            }
+        }
+        
+        return TB.apply(heapAtPreUpdate, target);
     }
 }

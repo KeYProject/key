@@ -24,6 +24,7 @@ import de.uka.ilkd.key.proof.SetRuleFilter;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.UseOperationContractRule;
+import de.uka.ilkd.key.rule.WhileInvariantRule;
 import de.uka.ilkd.key.smt.SMTRule;
 import de.uka.ilkd.key.strategy.feature.*;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.*;
@@ -36,7 +37,7 @@ import de.uka.ilkd.key.strategy.termgenerator.*;
  * Strategy tailored to be used as long as a java program can be found in
  * the sequent.
  */
-public class JavaCardDLStrategy extends AbstractFeatureStrategy {
+public final class JavaCardDLStrategy extends AbstractFeatureStrategy {
 
     private final RuleSetDispatchFeature costComputationDispatcher;
     private final Feature costComputationF;
@@ -76,9 +77,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         approvalF = add ( setupApprovalF ( p_proof ), approvalDispatcher );
     }
 
-    private Feature setupGlobalF(Feature dispatcher, Proof p_proof) {
-//        final Feature simplifierF = selectSimplifier ( -10000 );
-//        
+    private Feature setupGlobalF(Feature dispatcher, Proof p_proof) {//        
         final Feature ifMatchedF = ifZero ( MatchedIfFeature.INSTANCE,
                                             longConst ( +1 ) );
     
@@ -108,7 +107,16 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
             methodSpecF = null;
             assert false;
         }
-            
+        
+        final Feature loopInvF;
+        final String loopProp
+        	= strategyProperties.getProperty(
+        		StrategyProperties.LOOP_OPTIONS_KEY);
+        if(loopProp.equals(StrategyProperties.LOOP_INVARIANT)) {
+            loopInvF = loopInvFeature(longConst(0));
+        } else {
+            loopInvF = loopInvFeature(inftyConst());
+        }
         
         final Feature oneStepSimplificationF 
         	= oneStepSimplificationFeature(longConst(-10000));
@@ -126,8 +134,15 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
               oneStepSimplificationF,
               smtF,
               methodSpecF, 
+              loopInvF,
               ifMatchedF,
               ifThenElseF } );
+    }
+    
+    private Feature loopInvFeature(Feature cost) {
+	SetRuleFilter filter = new SetRuleFilter();
+	filter.addRuleToSet(WhileInvariantRule.INSTANCE);
+	return ConditionalFeature.createConditional(filter, cost);
     }
 
     private Feature methodSpecFeature(Feature cost) {
@@ -263,9 +278,6 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         boolean useLoopExpand = strategyProperties.getProperty(
                 StrategyProperties.LOOP_OPTIONS_KEY).
                     equals(StrategyProperties.LOOP_EXPAND);
-        boolean useLoopInvariant = strategyProperties.getProperty(
-                StrategyProperties.LOOP_OPTIONS_KEY).
-                    equals(StrategyProperties.LOOP_INVARIANT);
         boolean programsToRight = expandQueries () ||
                 strategyProperties.getProperty(
                 StrategyProperties.QUERY_OPTIONS_KEY).
@@ -288,9 +300,9 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                       useLoopExpand ? longConst ( 0 )
                                     : inftyConst () );
         
-        bindRuleSet  ( d, "loop_invariant", 
-                       useLoopInvariant ? longConst ( 100 )  
-                                        : inftyConst () );
+//        bindRuleSet  ( d, "loop_invariant", 
+//                       useLoopInvariant ? longConst ( 100 )  
+//                                        : inftyConst () );
             
         bindRuleSet  ( d, "loop_invariant_proposal", 
                        ifHeuristics(new String[]{"loop_invariant"}, 

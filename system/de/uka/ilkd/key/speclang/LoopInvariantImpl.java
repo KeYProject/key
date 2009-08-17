@@ -18,16 +18,13 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.proof.AtPreFactory;
 import de.uka.ilkd.key.proof.OpReplacer;
 
 
 /**
  * Standard implementation of the LoopInvariant interface.
  */
-public class LoopInvariantImpl implements LoopInvariant {
+public final class LoopInvariantImpl implements LoopInvariant {
         
     private final LoopStatement loop;
     private final Term originalInvariant;

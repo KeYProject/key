@@ -455,6 +455,19 @@ public final class TermBuilder {
     }
     
     
+    public Term applySequential(Term[] updates, Term target) {
+	if(updates.length == 0) {
+	    return target;
+	} else {
+	    ListOfTerm updateList = SLListOfTerm.EMPTY_LIST
+	                                        .append(updates)
+	                                        .tail();
+	    return apply(updates[0],
+		         applySequential(updateList, target));
+	}    	
+    }    
+    
+    
     public Term applySequential(ListOfTerm updates, Term target) {
 	if(updates.size() == 0) {
 	    return target;

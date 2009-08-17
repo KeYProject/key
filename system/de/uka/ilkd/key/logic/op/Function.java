@@ -64,6 +64,11 @@ public class Function extends AbstractSortedOperator {
     }
     
     
+    public Function(Name name, Sort sort) {
+	this(name, sort, new ArrayOfSort(), null, false);
+    }    
+    
+    
     //-------------------------------------------------------------------------
     //public interface
     //-------------------------------------------------------------------------     

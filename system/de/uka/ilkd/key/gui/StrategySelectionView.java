@@ -178,7 +178,7 @@ public class StrategySelectionView extends JPanel {
         addJavaDLOption ( rdBut17, javaDLOptionsLayout, 2, yCoord, 2 );        
 
         rdBut18 = new JRadioButtonHashMap(
-                "Non-Closable Goal", StrategyProperties.STOPMODE_NONCLOSE, false, false);
+                "Non-Closable", StrategyProperties.STOPMODE_NONCLOSE, false, false);
 	rdBut18.setToolTipText( "<html>Stop as soon as the first not automatically<br>" +
                                 "closable goal is encountered.</html>");
         stopModeGroup.add(rdBut18);

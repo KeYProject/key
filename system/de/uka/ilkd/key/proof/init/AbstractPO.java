@@ -23,7 +23,6 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.proof.AtPreFactory;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
@@ -42,7 +41,6 @@ public abstract class AbstractPO implements ProofOblInput {
     protected static final CreatedAttributeTermFactory CATF
                                    = CreatedAttributeTermFactory.INSTANCE;
     protected static final TermBuilder TB = TermBuilder.DF;
-    protected static final AtPreFactory APF = AtPreFactory.INSTANCE;
 
     protected final InitConfig initConfig;
     protected final Services services;

@@ -23,6 +23,7 @@ import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.visitor.ProgramContextAdder;
 import de.uka.ilkd.key.java.visitor.ProgramReplaceVisitor;
+import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -302,65 +303,42 @@ public final class SyntacticalReplaceVisitor extends Visitor {
 	return null;
     }
 
-//    private void updateLocation (UpdateableOperator loc,
-//                                 Term location,
-//                                 int positionInStack,
-//                                 int oldLocationArity,
-//                                 boolean replace) {
-//        final Term[] newSubterms = new Term [loc.arity ()];
-//        for ( int j = 0; j < newSubterms.length; j++ ) {
-//            newSubterms[j] = location.sub ( j );
-//        }
-//        if ( replace ) {
-//            replaceAt ( newSubterms, positionInStack, oldLocationArity );
-//        } else {
-//            pushNewAt ( newSubterms, positionInStack );
-//        }
-//    }
 
-
+    private Term elementaryUpdateLhs; //HACK
     private ElementaryUpdate instantiateElementaryUpdate(ElementaryUpdate op) {
+	elementaryUpdateLhs = null;
 	final UpdateableOperator originalLhs = op.lhs();
-	UpdateableOperator newLhs;
-	if (originalLhs instanceof SchemaVariable) {
-	    final Object inst 
-	    	= svInst.getInstantiation((SchemaVariable)originalLhs);
-	    if(!(inst instanceof UpdateableOperator)) {
-		if(inst == null) {
-		    // we have only a partial instantiation
-		    // continue with schema
-		    newLhs = originalLhs;
-		} else {                
-//		    final int posInStack = op.arity() - op.locationSubtermsEnd(i);
-		    Term instantiation = toTerm(inst);
-		    assert instantiation.op() instanceof UpdateableOperator 
-		           : "not updateable: " + instantiation;
-		    newLhs = (UpdateableOperator)instantiation.op();
-//		    updateLocation(newLhs, instantiation, 
-//			    posInStack, 0, false);
-		}
-	    } else {
-		newLhs = (UpdateableOperator) inst;
-	    }
-	} else if (originalLhs instanceof MetaOperator) {
-	    assert false : "not implemented";
-	    newLhs = originalLhs;
-//	    final MetaOperator mop = (MetaOperator) originalLhs;		
-//	    final int posInStack = op.arity() - op.locationSubtermsEnd(i);
-//
-//	    final Term computedLocation =
-//		mop.calculate(tf.createMetaTerm(mop,
-//			peek(posInStack, mop.arity())), 
-//			svInst, getServices());		
-//	    newLhs = (UpdateableOperator) computedLocation.op();
-
-//	    updateLocation(newOps[i], computedLocation, posInStack, 
-//		    mop.arity(), true);
-	} else {
-	    newLhs = (UpdateableOperator) instantiateOperator(originalLhs);
+	if(!(originalLhs instanceof SchemaVariable)) {
+	    return op;
 	}
 	
-	return newLhs == originalLhs ? op : ElementaryUpdate.getInstance(newLhs); 
+	final Object lhsInst 
+		= svInst.getInstantiation((SchemaVariable) originalLhs);
+	final UpdateableOperator newLhs;
+	if(lhsInst instanceof UpdateableOperator) {
+	    newLhs = (UpdateableOperator) lhsInst;
+	} else if(lhsInst == null) {
+	    // we have only a partial instantiation
+	    // continue with schema
+	    newLhs = originalLhs;
+	} else {
+	    Term termInst = toTerm(lhsInst);
+	    HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+	    if(termInst.op() instanceof UpdateableOperator) {
+		newLhs = (UpdateableOperator)termInst.op();
+	    } else if(heapLDT.getSortOfSelect(termInst.op()) != null
+		    && termInst.sub(0).op().equals(heapLDT.getHeap())) {
+		newLhs = (LocationVariable) termInst.sub(0).op();
+		elementaryUpdateLhs = termInst;
+	    } else {
+		assert false : "not updateable: " + termInst;
+	    	newLhs = null;
+	    }
+	}
+	
+	return newLhs == originalLhs 
+	       ? op 
+	       : ElementaryUpdate.getInstance(newLhs); 
     }
 
           
@@ -441,9 +419,8 @@ public final class SyntacticalReplaceVisitor extends Visitor {
             	}
                 // then we are done ...
         } else if (visitedOp instanceof Metavariable) {
-            assert false;
+            assert false : "metavariables are disabled";
         } else {
-           
             Operator newOp = instantiateOperator(visitedOp);
 
             if (newOp == null) {
@@ -471,7 +448,14 @@ public final class SyntacticalReplaceVisitor extends Visitor {
                instantiateBoundVariables(visited);
             
             Term[] neededsubs = neededSubs(newOp.arity());
-            if (boundVars != visited.boundVars() 
+            if(visitedOp instanceof ElementaryUpdate 
+        	&& elementaryUpdateLhs != null) {
+        	assert neededsubs.length == 1;
+        	Term newTerm = TermBuilder.DF.elementary(services, 
+        						 elementaryUpdateLhs, 
+        						 neededsubs[0]);
+        	pushNew(newTerm);
+            } else if(boundVars != visited.boundVars() 
         	 || jblockChanged 
         	 || operatorInst
                  || (!subStack.empty() && subStack.peek() == newMarker)) {

@@ -16,7 +16,6 @@ import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.SetOfTerm;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.SortedOperator;
 
 
 /**
@@ -87,18 +86,18 @@ public interface LoopInvariant {
      * the receiver, parameters, and local variables must stay the same!
      */
     public LoopInvariant setInvariant(Term invariant, 
-            Term selfTerm,
-            Term heapAtPre,
-            Services services); 
+            			      Term selfTerm,
+            			      Term heapAtPre,
+            			      Services services); 
     
     /**
      * Returns a new loop invariant where the loop predicates have been 
      * replaced with the passed ones.
      */
     public LoopInvariant setPredicates(SetOfTerm predicates, 
-            Term selfTerm,
-            Term heapAtPre,
-            Services services);
+            			       Term selfTerm,
+            			       Term heapAtPre,
+            			       Services services);
     
     /**
      * Returns a new loop invariant where the flag for predicate generation

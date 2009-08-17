@@ -46,11 +46,7 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
 
     public static final String  IMPLICIT_ARRAY_CREATE                    = "<createArray>";
 
-    public static final String  IMPLICIT_ARRAY_CREATE_TRANSIENT          = "<createTransientArray>";
-
     public static final String  IMPLICIT_ARRAY_CREATION_HELPER           = "<createArrayHelper>";
-
-    public static final String  IMPLICIT_ARRAY_TRANSIENT_CREATION_HELPER = "<createTransientArrayHelper>";
 
     // as these methods are thought to be only preliminary(we cache some
     // information here)

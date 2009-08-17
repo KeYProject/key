@@ -61,6 +61,8 @@ public class IconFactory {
         getImage("images/toolbar/openMostRecent.png");
     private static Image saveFile = 
         getImage("images/toolbar/saveFile.png");
+    private static Image editFile = 
+        getImage("images/toolbar/editFile.gif");    
 
     private static Image interactiveAppLogo = 
         getImage("images/interactiveAppLogo.png");
@@ -177,6 +179,10 @@ public class IconFactory {
     public static Icon saveFile(int size) {       
         return scaleIcon(saveFile, size, size);
     }
+    
+    public static Icon editFile(int size) {       
+        return scaleIcon(editFile, size, size);
+    }    
 
     public static Icon interactiveAppLogo(int size) {       
        return scaleIcon(interactiveAppLogo, size, size);

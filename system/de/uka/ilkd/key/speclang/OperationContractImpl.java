@@ -18,19 +18,17 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.pp.LogicPrinter;
-import de.uka.ilkd.key.proof.AtPreFactory;
 import de.uka.ilkd.key.proof.OpReplacer;
 
 
 /**
  * Standard implementation of the OperationContract interface.
  */
-public class OperationContractImpl implements OperationContract {
+public final class OperationContractImpl implements OperationContract {
     
     protected static final TermBuilder TB = TermBuilder.DF;
     protected static final SignatureVariablesFactory SVN 
         = SignatureVariablesFactory.INSTANCE;
-    protected static final AtPreFactory APF = AtPreFactory.INSTANCE;
 
     private final String name;
     private final String displayName;
