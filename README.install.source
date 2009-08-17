@@ -8,7 +8,7 @@
 (1) Requirements: 
 -------------------------------------
 
-Operating System: Linux/Unix 
+Operating System: Linux/Unix, MacOSX, Windows (untested) 
 
 Java 2 SDK, Version 1.5.x or newer (already installed)
 
@@ -54,8 +54,9 @@ Optionally, KeY can make use of the following binaries:
            in. If you use csh and all the needed libraries are in
            ~/key_lib use, e.g.
 
-				setenv KEY_LIB ~/key_lib
-
+				   setenv KEY_LIB ~/key_lib
+                     or (bash)     export KEY_LIB=~/key_lib                  
+                     or (Windows)  set KEY_LIB=<path to libraries>
 
 	4) Optional: Install Simplify and/or SMT-LIB provers.
 
@@ -89,6 +90,15 @@ Optionally, KeY can make use of the following binaries:
 	6) Compile KeY:
 
 		 make all (or gmake all)
+             or 
+                 export ANT_OPTS="-Xmx512m"
+                 ant
+
+           (compilation via 'ant' should work under Windows too, but you need to set the ANT_OPTS
+            environment variable most likely via
+                           set ANT_OPTS = "-Xmx512m"
+            )                   
+
 	
 
 (4) Start KeY 

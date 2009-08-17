@@ -20,9 +20,6 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.rule.MatchConditions;
-import de.uka.ilkd.key.rule.RewriteTaclet;
-import de.uka.ilkd.key.rule.RewriteTacletBuilder;
 import de.uka.ilkd.key.util.Debug;
 
 public abstract class AbstractSMTTranslator implements SMTTranslator {

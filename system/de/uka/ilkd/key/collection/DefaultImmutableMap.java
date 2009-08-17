@@ -8,6 +8,11 @@ import java.util.Iterator;
  */
 public class DefaultImmutableMap<S,T> implements ImmutableMap<S,T> {
 
+    /**
+     * generated serial
+     */
+    private static final long serialVersionUID = 3268346732418187405L;
+
     /** the empty map*/
     private static final NILMap EMPTY_MAP=new NILMap();
 
@@ -34,7 +39,7 @@ public class DefaultImmutableMap<S,T> implements ImmutableMap<S,T> {
 	if (entry == null)
 	    throw new RuntimeException("Invalid entry");
 	this.entry = entry;
-	this.parent = this.<S,T>nilMap();
+	this.parent = DefaultImmutableMap.<S,T>nilMap();
     }
 
     /** creates new map with mapping entry and parent map */
@@ -174,7 +179,7 @@ public class DefaultImmutableMap<S,T> implements ImmutableMap<S,T> {
 
 	}
 	return counter < stack.length ?
-		createMap(stack, counter, this.<S,T>nilMap()) : this;
+		createMap(stack, counter, DefaultImmutableMap.<S,T>nilMap()) : this;
     }
 
     /** @return iterator for all keys */
@@ -241,6 +246,11 @@ public class DefaultImmutableMap<S,T> implements ImmutableMap<S,T> {
 
     /** the empty map */
     private static class NILMap<S,T> extends DefaultImmutableMap<S,T>{
+
+	/**
+	 * generated serial 
+	 */
+	private static final long serialVersionUID = 412820308341055305L;
 
 	private NILMap() {
 	}
@@ -323,7 +333,13 @@ public class DefaultImmutableMap<S,T> implements ImmutableMap<S,T> {
 	/** @return true iff both objects have equal pairs of key and
 	 * value
 	 */
-	public boolean equals(Object obj) {
+	public boolean equals(Object obj) {	
+	    if (obj == this) {
+		return true;
+	    }
+	    if (!(obj instanceof ImmutableMapEntry)) {
+		return false;
+	    }
 	    final ImmutableMapEntry<S,T> cmp = (ImmutableMapEntry<S,T>) obj;
 	    final S cmpKey = cmp.key();
 	    final T cmpVal = cmp.value();

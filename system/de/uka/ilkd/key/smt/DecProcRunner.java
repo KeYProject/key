@@ -22,17 +22,19 @@ import java.awt.event.ActionEvent;
 import java.util.Iterator;
 
 import de.uka.ilkd.key.collection.ImmutableList;
-import java.awt.event.ActionEvent;
-import java.util.Timer;
-import java.util.TimerTask;
-
 import de.uka.ilkd.key.gui.*;
 import de.uka.ilkd.key.gui.notification.events.GeneralInformationEvent;
 import de.uka.ilkd.key.logic.Constraint;
 import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.proof.*;
-import de.uka.ilkd.key.rule.*;
-import de.uka.ilkd.key.util.*;
+import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.ProofTreeEvent;
+import de.uka.ilkd.key.proof.ProofTreeListener;
+import de.uka.ilkd.key.rule.BuiltInRule;
+import de.uka.ilkd.key.rule.BuiltInRuleApp;
+import de.uka.ilkd.key.util.ExceptionHandlerException;
+import de.uka.ilkd.key.util.KeYExceptionHandler;
+import de.uka.ilkd.key.util.ProgressMonitor;
 
 
 /**

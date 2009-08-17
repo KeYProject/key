@@ -142,7 +142,7 @@ public class ImmutableArray<S> implements java.lang.Iterable<S>, java.io.Seriali
 	}
 
 	public void remove() {
-	    throw new NotSupported("Illegal modification acces on unmodifiable array.");
+	    throw new NotSupported("Illegal modification access on unmodifiable array.");
 	}
 
 
