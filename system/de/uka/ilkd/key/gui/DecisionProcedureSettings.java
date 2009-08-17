@@ -333,7 +333,8 @@ public class DecisionProcedureSettings implements Settings {
     private void writeMultipleProversString(Properties prop) {
 	String toStore = "";
 	
-	ArrayList<String> listNames = ruleMultipleProvers.getNamesOfSolvers(); 
+	ArrayList<String> listNames = ruleMultipleProvers == null ? 
+			new ArrayList<String>() : ruleMultipleProvers.getNamesOfSolvers(); 
 	
 	for(String name : listNames){
 	    String value = ruleMultipleProvers.SMTSolverIsUsed(name) ? "true" : "false";
@@ -541,7 +542,7 @@ public class DecisionProcedureSettings implements Settings {
         else {
             props.setProperty(SAVEFILE, "false");
         }
-        props.setProperty(WAITFORALLPROVERS, ruleMultipleProvers.isWaitingForAllProvers() ? "true":"false");
+        props.setProperty(WAITFORALLPROVERS, isWaitingForAllProvers() ? "true":"false");
         this.writeExecutionString(props);
         this.writeMultipleProversString(props);
     }
