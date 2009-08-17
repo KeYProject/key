@@ -36,6 +36,7 @@ import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.mgt.AxiomJustification;
 import de.uka.ilkd.key.rule.NoFindTacletBuilder;
+import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletGoalTemplate;
 import de.uka.ilkd.key.rule.updatesimplifier.Update;
@@ -57,7 +58,7 @@ public abstract class EnsuresPO extends AbstractPO {
 
     private final boolean skipPreconditions;
 
-    private ImmutableSet<Taclet> invTaclets = DefaultImmutableSet.<Taclet>nil();
+    private ImmutableSet<NoPosTacletApp> invTaclets = DefaultImmutableSet.<NoPosTacletApp>nil();
 
 
 
@@ -162,7 +163,7 @@ public abstract class EnsuresPO extends AbstractPO {
         tacletBuilder.setName(new Name(s));
         tacletBuilder.addTacletGoalTemplate(template);
         Taclet taclet = tacletBuilder.getNoFindTaclet();
-        invTaclets = invTaclets.add(taclet);
+        invTaclets = invTaclets.add(NoPosTacletApp.createNoPosTacletApp(taclet));
         initConfig.getProofEnv().registerRule(taclet,
                                               AxiomJustification.INSTANCE);
     }
