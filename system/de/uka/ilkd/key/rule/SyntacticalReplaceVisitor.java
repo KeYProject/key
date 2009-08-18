@@ -424,8 +424,9 @@ public final class SyntacticalReplaceVisitor extends Visitor {
             	    throw new IllegalInstantiationException("Could not force instantiation with metavariable");
             	}
                 // then we are done ...
-        } else if (visitedOp instanceof Metavariable) {
-            assert false : "metavariables are disabled";
+        } else if((visitedOp instanceof Metavariable)
+                 && metavariableInst.getInstantiation((Metavariable) visitedOp) != visitedOp) {
+            pushNew(metavariableInst.getInstantiation((Metavariable) visitedOp));
         } else {
             Operator newOp = instantiateOperator(visitedOp);
 

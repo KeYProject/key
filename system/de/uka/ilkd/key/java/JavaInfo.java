@@ -23,6 +23,8 @@ import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.reference.TypeRef;
 import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.ldt.BooleanLDT;
+import de.uka.ilkd.key.ldt.DoubleLDT;
+import de.uka.ilkd.key.ldt.FloatLDT;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
@@ -380,17 +382,19 @@ public class JavaInfo {
 	
 	if(result == null) {
 	    final Namespace sorts = services.getNamespaces().sorts();
-	    final Sort boolSort = (Sort) sorts.lookup(BooleanLDT.NAME);
-	    final Sort intSort  = (Sort) sorts.lookup(IntegerLDT.NAME);
 	    final Sort sort;
 	    if(type == PrimitiveType.JAVA_BOOLEAN) {
-		sort = boolSort;
+		sort = (Sort) sorts.lookup(BooleanLDT.NAME);;
 	    } else if(type == PrimitiveType.JAVA_BYTE
 	              || type == PrimitiveType.JAVA_CHAR 
 	              || type == PrimitiveType.JAVA_INT 
                       || type == PrimitiveType.JAVA_LONG 
 		      || type == PrimitiveType.JAVA_SHORT) { 
-		 sort = intSort;
+		 sort = (Sort) sorts.lookup(IntegerLDT.NAME);;
+	    } else if(type == PrimitiveType.JAVA_FLOAT) {
+		sort = (Sort) sorts.lookup(FloatLDT.NAME);
+	    } else if(type == PrimitiveType.JAVA_DOUBLE) {
+		sort = (Sort) sorts.lookup(DoubleLDT.NAME);
 	    } else {
 		assert false : "unexpected primitive type: " + type;
 	    	sort = null;

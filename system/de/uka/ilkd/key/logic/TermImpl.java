@@ -37,7 +37,8 @@ final class TermImpl implements Term {
     private static enum ThreeValuedTruth { TRUE, FALSE, UNKNOWN }
     private int depth = -1;
     private ThreeValuedTruth rigid = ThreeValuedTruth.UNKNOWN; 
-    private ImmutableSet<QuantifiableVariable> freeVars = null; 
+    private ImmutableSet<QuantifiableVariable> freeVars = null;
+    private ImmutableSet<Metavariable> metaVars = null;
     private int hashcode = -1;
     
     
@@ -54,7 +55,9 @@ final class TermImpl implements Term {
 	this.op   = op;
 	this.subs = subs.size() == 0 ? EMPTY_TERM_LIST : subs;
 	this.boundVars = boundVars == null ? EMPTY_VAR_LIST : boundVars;	
-	this.javaBlock = javaBlock == null ? JavaBlock.EMPTY_JAVABLOCK : javaBlock;
+	this.javaBlock = javaBlock == null 
+	                 ? JavaBlock.EMPTY_JAVABLOCK 
+	                 : javaBlock;
     }
     
 
@@ -62,24 +65,26 @@ final class TermImpl implements Term {
     //-------------------------------------------------------------------------
     //internal methods
     //------------------------------------------------------------------------- 
-
-    private void determineFreeVars() {
+    
+    private void determineFreeVarsAndMetaVars() {
 	freeVars = DefaultImmutableSet.<QuantifiableVariable>nil();
+        metaVars = DefaultImmutableSet.<Metavariable>nil();
         
         if(op instanceof QuantifiableVariable) {
             freeVars = freeVars.add((QuantifiableVariable) op);
+        } else if(op instanceof Metavariable) {
+            metaVars = metaVars.add((Metavariable) op);
         }
-        
         for(int i = 0, ar = arity(); i < ar; i++) {
-            Term subTerm = sub(i);
-	    ImmutableSet<QuantifiableVariable> subFreeVars = subTerm.freeVars();
+	    ImmutableSet<QuantifiableVariable> subFreeVars = sub(i).freeVars();
 	    for(int j = 0, sz = varsBoundHere(i).size(); j < sz; j++) {
-		subFreeVars 
-		    = subFreeVars.remove(varsBoundHere(i).get(j));
+		subFreeVars = subFreeVars.remove(varsBoundHere(i).get(j));
 	    }
 	    freeVars = freeVars.union(subFreeVars);
+	    metaVars = metaVars.union(sub(i).metaVars());
 	}
     }
+    
     
     
     
@@ -193,7 +198,7 @@ final class TermImpl implements Term {
     @Override
     public ImmutableSet<QuantifiableVariable> freeVars() {
         if(freeVars == null) {
-            determineFreeVars();
+            determineFreeVarsAndMetaVars();
         }
         return freeVars;
     }
@@ -201,7 +206,10 @@ final class TermImpl implements Term {
 
     @Override
     public ImmutableSet<Metavariable> metaVars() {
-	return DefaultImmutableSet.<Metavariable>nil();
+	if(metaVars == null) {
+	    determineFreeVarsAndMetaVars();
+	}
+	return metaVars;
     }
     
     

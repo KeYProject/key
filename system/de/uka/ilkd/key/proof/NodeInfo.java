@@ -26,9 +26,6 @@ import de.uka.ilkd.key.rule.*;
  * carry something of logical value.
  */
 public class NodeInfo {
-    
-    // for optimizing memory consumption of large proofs
-    public static boolean largeProofMode = false;
 
     /** firstStatement stripped of method frames */
     private SourceElement activeStatement                 = null;

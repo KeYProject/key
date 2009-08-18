@@ -24,6 +24,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.TacletFilter;
 import de.uka.ilkd.key.proof.TacletIndex;
+import de.uka.ilkd.key.util.LRUCache;
 
 
 public final class OneStepSimplifier implements BuiltInRule {
@@ -38,12 +39,13 @@ public final class OneStepSimplifier implements BuiltInRule {
     	                           .append("simplify_literals")
     	                           .append("simplify");
   
-    private final Map<ConstrainedFormula, Instantiation> cache 
+   private final Map<ConstrainedFormula, Instantiation> cache 
     		= new WeakHashMap<ConstrainedFormula, Instantiation>();
-    
+   
     private Proof lastProof;
     private ImmutableSet<NoPosTacletApp> appsTakenOver;
     private TacletIndex[] indices;
+    private Map<Term,Term> notSimplifiableCaches[];
     
     
 
@@ -104,13 +106,16 @@ public final class OneStepSimplifier implements BuiltInRule {
 	    lastProof = goal.proof();	    
 	    appsTakenOver = DefaultImmutableSet.<NoPosTacletApp>nil();;	    
 	    indices = new TacletIndex[ruleSets.size()];
+	    notSimplifiableCaches = new LRUCache[indices.length];
 	    int i = 0;
 	    ImmutableList<String> done = ImmutableSLList.<String>nil();
 	    for(String ruleSet : ruleSets) {
 		ImmutableSet<Taclet> taclets = tacletsForRuleSet(goal, 
 						        	 ruleSet, 
 						        	 done);
-		indices[i++] = new TacletIndex(taclets);
+		indices[i] = new TacletIndex(taclets);
+		notSimplifiableCaches[i] = new LRUCache<Term,Term>(5000);
+		i++;
 		done = done.prepend(ruleSet);
 	    }
 	}
@@ -136,13 +141,18 @@ public final class OneStepSimplifier implements BuiltInRule {
     private ConstrainedFormula simplifyPosOrSub(Services services,
 	    		     	  	        PosInOccurrence pos,
 	    		     	  	        int indexNr) {
+	final Term term = pos.subTerm();
+	if(notSimplifiableCaches[indexNr].get(term) != null) {
+	    return null;
+	}
+	
 	ImmutableList<NoPosTacletApp> apps 
 		= indices[indexNr].getRewriteTaclet(pos, 
 						    Constraint.BOTTOM, 
 						    TacletFilter.TRUE, 
 						    services, 
 						    Constraint.BOTTOM);
-	for(TacletApp app : apps) {	    
+	for(TacletApp app : apps) {
 	    app = app.setPosInOccurrence(pos, services);
 	    if(!app.complete()) {
 		app = app.tryToInstantiate(services);
@@ -155,7 +165,6 @@ public final class OneStepSimplifier implements BuiltInRule {
 	    } 
 	}
 	
-	Term term = pos.subTerm();
 	for(int i = 0, n = term.arity(); i < n; i++) {
 	    ConstrainedFormula result 
 	    	= simplifyPosOrSub(services, pos.down(i), indexNr);
@@ -163,7 +172,8 @@ public final class OneStepSimplifier implements BuiltInRule {
 		return result;
 	    }
 	}
-	
+
+	notSimplifiableCaches[indexNr].put(term, term);
 	return null;
     }
     	   
@@ -175,9 +185,7 @@ public final class OneStepSimplifier implements BuiltInRule {
 	    PosInOccurrence pos = new PosInOccurrence(cf,
 	    		              		      PosInTerm.TOP_LEVEL,
 	    		              		      true);
-//	    System.out.println("Entering...");
 	    ConstrainedFormula result = simplifyPosOrSub(services, pos, i);
-//	    System.out.println("Done.");
 	    if(result != null) {
 		return result;
 	    }

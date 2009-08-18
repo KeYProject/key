@@ -45,6 +45,8 @@ public final class TypeConverter {
     private PairLDT pairLDT;
     private SetLDT setLDT;
     private HeapLDT heapLDT;
+    private FloatLDT floatLDT;
+    private DoubleLDT doubleLDT;
     
     private ImmutableList<LDT> models = ImmutableSLList.<LDT>nil();
 
@@ -70,6 +72,10 @@ public final class TypeConverter {
             this.setLDT = (SetLDT) ldt;
         } else if (ldt instanceof HeapLDT) {
             this.heapLDT = (HeapLDT)ldt;
+        } else if (ldt instanceof FloatLDT ) {
+            this.floatLDT = (FloatLDT)ldt;
+        } else if (ldt instanceof DoubleLDT) {
+            this.doubleLDT = (DoubleLDT)ldt;
         }
 
         this.models = this.models.prepend(ldt);

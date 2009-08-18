@@ -122,6 +122,7 @@ while [ $# -ne 0 ]; do
     esac
 done	
 
+
 if [ ! -d "$HOME/.key" ]
 then
 mkdir "$HOME/.key"
@@ -133,9 +134,18 @@ PATH=${PATH}:$KEY_LIB
 export PATH
 
 
-$JAVA $JAVA_OPTIONS $keysysprops -Xms64m -Xmx512m \
+#
+# This command actually runs KeY
+#
+#-server \
+#-XX:CompileThreshold=1500 \
+
+$JAVA $JAVA_OPTIONS $keysysprops \
+-ea:de.uka.ilkd.key... -Xms64m -Xmx1024m \
+-javaagent:/export/home/i12pc4/benjamin/sw/jip/profile/profile.jar \
+-Dprofile.properties=/export/home/i12pc4/benjamin/sw/jip/profile/profile.properties \
 -Dkey.home=$KEY_HOME \
 -Dkey.simplify.logdir=$KEY_SIMPLIFY_LOG_DIR \
 -Dkey.ics.logdir=$KEY_ICS_LOG_DIR \
 -Dsun.awt.exception.handler=de.uka.ilkd.key.gui.ExceptionalHandler \
--classpath $keyclasspath de.uka.ilkd.key.rule.export.TacletExporter $keyarg
+-classpath $keyclasspath de.uka.ilkd.key.gui.Main $keyarg

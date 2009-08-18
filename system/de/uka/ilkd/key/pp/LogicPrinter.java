@@ -126,6 +126,9 @@ public final class LogicPrinter {
 	this.prgPrinter   = prgPrinter;
 	this.notationInfo = notationInfo;
 	this.services     = services;
+	if(services != null) {
+	    notationInfo.refresh(services);
+	}
     }
 
     /**
@@ -143,11 +146,7 @@ public final class LogicPrinter {
                         NotationInfo notationInfo, 
                         Services services,
                         boolean purePrint) {
-        backend           = new PosTableStringBackend(lineWidth);
-        layouter          = new Layouter(backend,2);
-        this.prgPrinter   = prgPrinter;
-        this.notationInfo = notationInfo;
-        this.services     = services;
+	this(prgPrinter, notationInfo, services);
         pure = purePrint;
     }
 
@@ -167,12 +166,8 @@ public final class LogicPrinter {
                         Backend backend, 
                         Services services,
                         boolean purePrint) {
+	this(prgPrinter, notationInfo, services, purePrint);
         this.backend      = backend;
-        layouter          = new Layouter(backend,2);
-        this.prgPrinter   = prgPrinter;
-        this.notationInfo = notationInfo;
-        this.services     = services;
-        pure = purePrint;
     }
 
 
