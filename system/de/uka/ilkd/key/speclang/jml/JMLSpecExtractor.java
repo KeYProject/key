@@ -241,15 +241,11 @@ public class JMLSpecExtractor implements SpecExtractor {
         TypeDeclaration td = (TypeDeclaration) kjt.getJavaType();
         String fileName = td.getPositionInfo().getFileName();
 
-        //add invariants for non_null fields
-        ImmutableArray<MemberDeclaration> fds = td.getMembers();
-        for(int i = 0, m = fds.size(); i < m; i++) {
-            if(fds.get(i) instanceof FieldDeclaration) {
-                FieldDeclaration fd 
-                    = (FieldDeclaration) fds.get(i);
-                ImmutableArray<FieldSpecification> fields = fd.getFieldSpecifications();
-                for(int j = 0, n = fields.size(); j < n; j++) {
-                    FieldSpecification field = fields.get(j);
+        //add invariants for non_null fields        
+        for(MemberDeclaration member : td.getMembers()) {
+            if (member instanceof FieldDeclaration) {
+                for(FieldSpecification field : ((FieldDeclaration) member).getFieldSpecifications()) {
+                    
                     //add invariant only for fields of reference types
                     //and not for implicit fields.
                     if (!JMLInfoExtractor.isNullable(field.getProgramName(), kjt)) {
@@ -257,7 +253,7 @@ public class JMLSpecExtractor implements SpecExtractor {
                 	    createNonNullPositionedString(field.getProgramName(),
                 		    field.getProgramVariable().getKeYJavaType(),
                 		    field instanceof ImplicitFieldSpecification,
-                		    fileName, fd.getEndPosition());
+                		    fileName, member.getEndPosition());
                 	for (PositionedString classInv : nonNullInvs) {
                 	    result = result.add(jsf.createJMLClassInvariant(kjt,
                 		    classInv));
