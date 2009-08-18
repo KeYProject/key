@@ -108,7 +108,7 @@ public abstract class ImmutableSLList<T> implements ImmutableList<T> {
     }
 
 
-    static class Cons<S> extends ImmutableSLList<S> {
+    private static class Cons<S> extends ImmutableSLList<S> {
 
 	/**
 	 *
@@ -317,8 +317,8 @@ public abstract class ImmutableSLList<T> implements ImmutableList<T> {
 
 
 	public String toString() {
-	    Iterator<S> it=this.iterator();
-	    StringBuffer str=new StringBuffer("[");
+	    Iterator<S> it    = this.iterator();
+	    StringBuilder str = new StringBuilder("[");
 	    while (it.hasNext()) {
 		str.append(""+it.next());
 		if (it.hasNext()) {
@@ -370,7 +370,7 @@ public abstract class ImmutableSLList<T> implements ImmutableList<T> {
 
     private static class NIL<S> extends ImmutableSLList<S> {
 
-	private final static ImmutableList<?> NIL = new NIL<Object>();
+	final static ImmutableList<?> NIL = new NIL<Object>();
 
 	/**
 	 * serial id

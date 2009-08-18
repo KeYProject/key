@@ -28,14 +28,14 @@ public class DefaultImmutableSet<T> implements ImmutableSet<T> {
 
     private int hashCode = -1;
 
-    private DefaultImmutableSet() {
+    protected DefaultImmutableSet() {
 	elementList = ImmutableSLList.<T>nil();
     }
 
     /** creates new set with one element
      * @param element of type <T> the new Set contains
      */
-    DefaultImmutableSet(T element) {
+    protected DefaultImmutableSet(T element) {
 	elementList = (ImmutableList<T>) (ImmutableSLList.nil()).prepend(element);
     }
 
@@ -43,7 +43,7 @@ public class DefaultImmutableSet<T> implements ImmutableSet<T> {
      * PRECONDITION: elementList has no duplicates
      * @param elementList IList<T> contains all elements of the new Set
      */
-    DefaultImmutableSet(ImmutableList<T> elementList) {
+    protected DefaultImmutableSet(ImmutableList<T> elementList) {
 	this.elementList=elementList;
     }
 
@@ -93,13 +93,12 @@ public class DefaultImmutableSet<T> implements ImmutableSet<T> {
     }
 
     /** @return true iff this set is subset of set s */
-    public boolean subset(ImmutableSet<T> s) {
-	if (size()>s.size()) {
+    public boolean subset(ImmutableSet<T> s) {	
+	if (size() > s.size()) {
 	    return false;
 	} else {
-	    Iterator<T> it=iterator();
-	    while (it.hasNext()) {
-		if (!s.contains(it.next())) {
+	    for (T el: this) {
+		if (!s.contains(el)) {
 		    return false;
 		}
 	    }
@@ -205,7 +204,7 @@ public class DefaultImmutableSet<T> implements ImmutableSet<T> {
 
 	/** @return Iterator<T> of the set */
 	public Iterator<T> iterator() {
-	    return (Iterator<T>) (ImmutableSLList.nil()).iterator();
+	    return ImmutableSLList.<T>nil().iterator();
 	}
 
 	/** @return true iff this set is subset of set s */

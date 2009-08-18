@@ -6,8 +6,6 @@ import java.util.Iterator;
 /**
  * This interface has to be implemented by a Class providing a
  * persistent Map.
- * CONVENTION: Every Class implementing MapFrom<S>To<T> has to provide
- * a static final variable with the empty map
  */
 public interface ImmutableMap<S,T> extends java.io.Serializable {
 

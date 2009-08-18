@@ -111,11 +111,11 @@ public class ImmutableArray<S> implements java.lang.Iterable<S>, java.io.Seriali
     }
 
     public String toString() {
-	StringBuffer sb = new StringBuffer();
+	StringBuilder sb = new StringBuilder();
 	sb.append("[");
-	for (int i = 0; i<size(); i++) {
+	for (int i = 0, sz = size(); i < sz; i++) {
 	    sb.append(""+content[i]);
-	    if (i<size()-1) sb.append(",");
+	    if (i<sz-1) sb.append(",");
 	}
 	sb.append("]");
 	return sb.toString();

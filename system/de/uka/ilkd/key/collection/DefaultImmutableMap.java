@@ -14,28 +14,27 @@ public class DefaultImmutableMap<S,T> implements ImmutableMap<S,T> {
     private static final long serialVersionUID = 3268346732418187405L;
 
     /** the empty map*/
-    private static final NILMap EMPTY_MAP=new NILMap();
 
     public static <S,T> DefaultImmutableMap<S,T> nilMap() {
-	return EMPTY_MAP;
+	return (DefaultImmutableMap<S, T>) NILMap.EMPTY_MAP;
     }
 
     private final DefaultImmutableMap<S,T> parent;
 
     /** list of pairs (key,value) */
-    private final ImmutableMapEntry<S,T> entry;
+    final ImmutableMapEntry<S,T> entry;
 
     private int hashCode = -1;
 
     /** only for use by NILMap */
-    private DefaultImmutableMap() {
+    protected DefaultImmutableMap() {
 	entry       = null;
 	this.parent = null;
     }
 
 
     /** creates new map with mapping entry */
-    private DefaultImmutableMap(ImmutableMapEntry<S,T> entry) {
+    protected DefaultImmutableMap(ImmutableMapEntry<S,T> entry) {
 	if (entry == null)
 	    throw new RuntimeException("Invalid entry");
 	this.entry = entry;
@@ -43,7 +42,7 @@ public class DefaultImmutableMap<S,T> implements ImmutableMap<S,T> {
     }
 
     /** creates new map with mapping entry and parent map */
-    private DefaultImmutableMap(ImmutableMapEntry<S,T> entry, DefaultImmutableMap<S,T> parent) {
+    protected DefaultImmutableMap(ImmutableMapEntry<S,T> entry, DefaultImmutableMap<S,T> parent) {
 	if (entry == null)
 	    throw new RuntimeException("Invalid entry");
 	this.entry = entry;
@@ -247,6 +246,8 @@ public class DefaultImmutableMap<S,T> implements ImmutableMap<S,T> {
     /** the empty map */
     private static class NILMap<S,T> extends DefaultImmutableMap<S,T>{
 
+        static final NILMap<?,?> EMPTY_MAP=new NILMap();
+	
 	/**
 	 * generated serial 
 	 */
@@ -308,7 +309,7 @@ public class DefaultImmutableMap<S,T> implements ImmutableMap<S,T> {
     }
 
     /** inner class for the entries */
-    static class MapEntry<S,T> implements ImmutableMapEntry<S,T> {
+    private static class MapEntry<S,T> implements ImmutableMapEntry<S,T> {
 	// the key
 	private final S key;
 	// the value
