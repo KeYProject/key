@@ -22,7 +22,7 @@ public class DefaultImmutableMap<S,T> implements ImmutableMap<S,T> {
     private final DefaultImmutableMap<S,T> parent;
 
     /** list of pairs (key,value) */
-    final ImmutableMapEntry<S,T> entry;
+    private final ImmutableMapEntry<S,T> entry;
 
     private int hashCode = -1;
 

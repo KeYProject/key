@@ -16,13 +16,10 @@ public abstract class ImmutableLeftistHeap<T extends Comparable<T>> implements I
      */
     private static final long serialVersionUID = -4035441830559680469L;
 
-    /**
-     * Use this element to construct new heaps
-     */
-    private static final ImmutableLeftistHeap EMPTY_HEAP = new Empty ();
+    
 
     public static <T extends Comparable<T>> ImmutableLeftistHeap<T> nilHeap() {
-	return EMPTY_HEAP;
+	return (ImmutableLeftistHeap<T>) Empty.EMPTY_HEAP;
     }
 
 
@@ -57,7 +54,7 @@ public abstract class ImmutableLeftistHeap<T extends Comparable<T>> implements I
 	/**
 	 * Node constructor for nodes with only empty children
 	 */
-	public Node(S element) {
+	public Node(S element) {	    
 	    this.rightHeight = 1;
 	    this.size = 1;
 	    this.data = element;
@@ -212,6 +209,11 @@ public abstract class ImmutableLeftistHeap<T extends Comparable<T>> implements I
 	 */
 	private static final long serialVersionUID = -2471143956420721016L;
 
+	/**
+	 * Use this element to construct new heaps
+	 */
+	private static final ImmutableLeftistHeap<?> EMPTY_HEAP = new Empty();
+	
 	/**
 	 * Length of the right spine, i.e. the length of the path from the
 	 * root to rightmost leaf
