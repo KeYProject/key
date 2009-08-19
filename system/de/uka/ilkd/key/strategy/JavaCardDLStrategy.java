@@ -232,6 +232,11 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         boolean useLoopExpand = strategyProperties.getProperty(
                 StrategyProperties.LOOP_OPTIONS_KEY).
                     equals(StrategyProperties.LOOP_EXPAND);
+        
+        boolean useLoopExpandBounded = strategyProperties.getProperty( //chrisg
+                StrategyProperties.LOOP_OPTIONS_KEY).
+                    equals(StrategyProperties.LOOP_EXPAND_BOUNDED);
+        
         boolean useLoopInvariant = strategyProperties.getProperty(
                 StrategyProperties.LOOP_OPTIONS_KEY).
                     equals(StrategyProperties.LOOP_INVARIANT);
@@ -257,6 +262,10 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                       useLoopExpand ? longConst ( 0 )
                                     : inftyConst () );
         
+        bindRuleSet ( d, "loop_expand_bounded", //chrisg
+                useLoopExpandBounded ? longConst ( 0 )
+                              : inftyConst () );
+
         bindRuleSet  ( d, "loop_invariant", 
                        useLoopInvariant ? longConst ( 100 )  
                                         : inftyConst () );

@@ -30,7 +30,7 @@ public class VBTStrategy extends JavaCardDLStrategy {
         res.setProperty( StrategyProperties.SPLITTING_OPTIONS_KEY,
                 StrategyProperties.SPLITTING_NORMAL);  
         res.setProperty ( StrategyProperties.LOOP_OPTIONS_KEY,
-                          StrategyProperties.LOOP_EXPAND );
+                          StrategyProperties.LOOP_EXPAND_BOUNDED );//chrisg
         res.setProperty ( StrategyProperties.METHOD_OPTIONS_KEY,
                           StrategyProperties.METHOD_EXPAND );
         res.setProperty ( StrategyProperties.QUERY_OPTIONS_KEY,
