@@ -74,12 +74,15 @@ public class DefaultImmutableSet<T> implements ImmutableSet<T> {
 	if (set.isEmpty()) {
 	    return this;
 	}
-	ImmutableSet<T> unified=set;
-	Iterator<T> it=elementList.iterator();
-	while (it.hasNext()) {
-	    unified=unified.add(it.next());
+	
+	
+	ImmutableList<T> unionElements = this.elementList;
+	for (T otherEl : set) {	    	    
+	    if (!contains(otherEl)) {
+		unionElements = unionElements.prepend(otherEl);
+	    }
 	}
-	return unified;
+	return new DefaultImmutableSet<T>(unionElements);
     }
 
     /** @return Iterator<T> of the set */
