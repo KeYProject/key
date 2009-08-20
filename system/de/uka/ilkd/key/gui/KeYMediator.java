@@ -1036,10 +1036,11 @@ public class KeYMediator {
 	}
 
 	public void proofStructureChanged(ProofTreeEvent e) {
+	    if (autoMode()) return;
 	    Proof p = e.getSource();
 	    if (p == getSelectedProof()) {
 		Node sel_node = getSelectedNode();
-		if (!(p.find(sel_node))) {
+		if (!p.find(sel_node)) {
 		    keySelectionModel.defaultSelection();
 		} else {
 		    // %%% hack does need to be done proper
@@ -1059,6 +1060,7 @@ public class KeYMediator {
         
 	/** invoked when a rule has been applied */
 	public void ruleApplied(ProofEvent e) {
+	    if (autoMode()) return;
 	    if (e.getSource() == getProof()) {
 	        keySelectionModel.defaultSelection();
 	    }
