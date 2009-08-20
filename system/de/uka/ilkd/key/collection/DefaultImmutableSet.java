@@ -167,9 +167,9 @@ public class DefaultImmutableSet<T> implements ImmutableSet<T> {
     }
 
     /** represents the empty set for elements of type <T> */
-    static private class NILSet<T> extends DefaultImmutableSet<T> {
+    private static class NILSet<T> extends DefaultImmutableSet<T> {
 
-	public static final NILSet NIL = new NILSet<Object>();
+	static final NILSet<?> NIL = new NILSet();
 
 	private NILSet() {}
 
@@ -225,7 +225,7 @@ public class DefaultImmutableSet<T> implements ImmutableSet<T> {
 	/** @return true iff the this set is subset of o and vice versa.
 	 */
 	public boolean equals(Object o) {
-	    return o instanceof NILSet;
+	    return o instanceof NILSet<?>;
 	}
 
 	public int hashCode() {
