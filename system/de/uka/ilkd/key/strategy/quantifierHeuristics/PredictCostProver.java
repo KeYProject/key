@@ -63,39 +63,35 @@ class PredictCostProver {
     // init context
     private void initClauses(Term instance) {
 	for (Term t : TriggerUtils.setByOperator(instance, Op.AND)) {
-	    // clauses.add(new Clause(literals));
-	    for (ImmutableSet<Term> lit : createClause(TriggerUtils.setByOperator(t, Op.OR).iterator())) {
+ 	    for (ImmutableSet<Term> lit : createClause(TriggerUtils.setByOperator(t, Op.OR))) {
 		clauses.add(new Clause(lit));
 	    }
 	}
     }
 
-    private Set<ImmutableSet<Term>> createClause(Iterator<Term> terms) {
-	Set<ImmutableSet<Term>> res = new HashSet<ImmutableSet<Term>>();
-
-	if (terms.hasNext()) {
-	    final Term self = terms.next();	    
-	    final Set<ImmutableSet<Term>> next = createClause(terms);
-
-	    if (next.isEmpty()) {
-		createClauseHelper(res, self,  DefaultImmutableSet.<Term>nil());
-	    } else {
-		for(ImmutableSet<Term> ts : next) {
-		    createClauseHelper(res, self, ts);
-		}
+    private ImmutableSet<ImmutableSet<Term>> createClause(ImmutableSet<Term> set)  {
+	final DefaultImmutableSet<ImmutableSet<Term>> nil = 
+	    DefaultImmutableSet.<ImmutableSet<Term>>nil();	
+	ImmutableSet<ImmutableSet<Term>> res = nil.add(DefaultImmutableSet.<Term>nil());
+	for (Term t : set) {	    
+            ImmutableSet<ImmutableSet<Term>> tmp = nil;
+	    for (ImmutableSet<Term> cl : res) {
+		tmp = createClauseHelper(tmp, t, cl);
 	    }
+	    res = tmp;
 	}
 	return res;
     }
 
-    private void createClauseHelper(Set<ImmutableSet<Term>> res, Term self,
-	    ImmutableSet<Term> ts) {
+    private ImmutableSet<ImmutableSet<Term>> createClauseHelper(ImmutableSet<ImmutableSet<Term>> res, 
+	    Term self, ImmutableSet<Term> ts) {
 	if (self.op() == Op.IF_EX_THEN_ELSE) {
-	    res.add(ts.add(tb.not(self.sub(0))).add(self.sub(1)));
-	    res.add(ts.add(self.sub(0)).add(self.sub(2)));
+	    res = res.add(ts.add(tb.not(self.sub(0))).add(self.sub(1)));
+	    res = res.add(ts.add(self.sub(0)).add(self.sub(2)));
 	} else {
-	    res.add(ts.add(self));
+	    res = res.add(ts.add(self));
 	}
+	return res;
     }
 
     // end
@@ -130,7 +126,7 @@ class PredictCostProver {
      * @return trueT if problem is equal axiom, false if problem's negation is
      *         equal axiom. Otherwise retrun problem.
      */
-    private Term provedByequal(Term problem, Term axiom) {
+    private Term directConsequenceOrContradictionOfAxiom(Term problem, Term axiom) {
 	boolean negated = false;
 	Term pro = problem;
 	while (pro.op() == Op.NOT) {
@@ -155,7 +151,7 @@ class PredictCostProver {
      *         negation of problem return fastT. Otherwise, return problem
      */
     private Term provedByAnother(Term problem, Term axiom) {
-	Term res = provedByequal(problem, axiom);
+	Term res = directConsequenceOrContradictionOfAxiom(problem, axiom);
 	if (TriggerUtils.isTrueOrFalse(res))
 	    return res;
 	return HandleArith.provedByArith(problem, axiom, services);
