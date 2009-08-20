@@ -24,12 +24,15 @@ public class DefaultImmutableMap<S,T> implements ImmutableMap<S,T> {
     /** list of pairs (key,value) */
     private final ImmutableMapEntry<S,T> entry;
 
+    private final int size;
+    
     private int hashCode = -1;
 
     /** only for use by NILMap */
     protected DefaultImmutableMap() {
 	entry       = null;
 	this.parent = null;
+	this.size   = 0;
     }
 
 
@@ -39,6 +42,7 @@ public class DefaultImmutableMap<S,T> implements ImmutableMap<S,T> {
 	    throw new RuntimeException("Invalid entry");
 	this.entry = entry;
 	this.parent = DefaultImmutableMap.<S,T>nilMap();
+	this.size = 1;
     }
 
     /** creates new map with mapping entry and parent map */
@@ -47,6 +51,7 @@ public class DefaultImmutableMap<S,T> implements ImmutableMap<S,T> {
 	    throw new RuntimeException("Invalid entry");
 	this.entry = entry;
 	this.parent = parent;
+	this.size = parent.size + 1;
     }
 
 
@@ -83,7 +88,7 @@ public class DefaultImmutableMap<S,T> implements ImmutableMap<S,T> {
 
     /** @return number of entries as int */
     public int size() {
-	return 1 + parent.size();
+	return size;
     }
 
     /** returns true if the map is empty */
