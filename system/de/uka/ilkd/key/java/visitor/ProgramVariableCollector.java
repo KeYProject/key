@@ -39,6 +39,7 @@ public final class ProgramVariableCollector extends JavaASTVisitor {
                                     Services services) {
 	super(root, services);
         assert services != null;
+        result.add(services.getTypeConverter().getHeapLDT().getHeap());
     }
     
     
@@ -58,12 +59,12 @@ public final class ProgramVariableCollector extends JavaASTVisitor {
     }
 
     @Override
-        protected void doDefaultAction(SourceElement x) {
+    protected void doDefaultAction(SourceElement x) {
     }
 
 
     @Override
-        public void performActionOnLocationVariable(LocationVariable x) {
+    public void performActionOnLocationVariable(LocationVariable x) {
         result.add(x);
     }
     

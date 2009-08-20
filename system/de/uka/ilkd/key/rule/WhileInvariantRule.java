@@ -386,7 +386,8 @@ public final class WhileInvariantRule implements BuiltInRule {
 	// (#v1=FALSE -> \[{.. ...}\]post)),anon2))
 	useGoal.addFormula(new ConstrainedFormula(uAnonInv), true, false);
 
-	Term restPsi = TB.box(IIT.removeActiveStatement(inst.progPost.javaBlock(), 
+	Term restPsi = TB.mod(dia ? Modality.DIA : Modality.BOX,
+		              IIT.removeActiveStatement(inst.progPost.javaBlock(), 
 							services), 
                               inst.progPost.sub(0));
 	Term guardFalseRestPsi = TB.box(guardJb, 

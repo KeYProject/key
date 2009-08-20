@@ -28,7 +28,7 @@ public class ArrayMax {
 	  @      (\forall int j; j >= 0 && j < i; max >= a[j])
 	  @      &&
 	  @      (\exists int j; j >= 0 && j < i; max == a[j]);
-	  @ modifies i, max;
+	  @ modifies \nothing;
 	  @ decreases a.length - i;
 	  @*/
 	while ( i < a.length ) {

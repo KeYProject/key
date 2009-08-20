@@ -29,7 +29,6 @@ import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
-import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.pp.Backend;
 import de.uka.ilkd.key.util.pp.Layouter;
 import de.uka.ilkd.key.util.pp.StringBackend;
@@ -108,6 +107,34 @@ public final class LogicPrinter {
         return p.result().toString();
     }
     
+    
+    /**
+     * Creates a LogicPrinter.  Sets the sequent to be printed, as
+     * well as a ProgramPrinter to print Java programs and a
+     * NotationInfo which determines the concrete syntax.
+     *
+     * @param prgPrinter   the ProgramPrinter that pretty-prints Java programs
+     * @param notationInfo the NotationInfo for the concrete syntax
+     * @param backend      the Backend for the output
+     * @param purePrint    if true the PositionTable will not be calculated
+                    (simulates the behaviour of the former PureSequentPrinter)
+     */
+    public LogicPrinter(ProgramPrinter prgPrinter,
+                        NotationInfo notationInfo,
+                        Backend backend, 
+                        Services services,
+                        boolean purePrint) {
+	this.backend      = backend;
+	this.layouter     = new Layouter(backend,2);
+	this.prgPrinter   = prgPrinter;
+	this.notationInfo = notationInfo;
+	this.services     = services;
+	this.pure         = purePrint;
+	if(services != null) {
+	    notationInfo.refresh(services);
+	}
+    }    
+    
 
     /**
      * Creates a LogicPrinter.  Sets the sequent to be printed, as
@@ -121,14 +148,11 @@ public final class LogicPrinter {
     public LogicPrinter(ProgramPrinter prgPrinter,
                         NotationInfo notationInfo,
                         Services services) {
-	backend           = new PosTableStringBackend(lineWidth);
-	layouter          = new Layouter(backend,2);
-	this.prgPrinter   = prgPrinter;
-	this.notationInfo = notationInfo;
-	this.services     = services;
-	if(services != null) {
-	    notationInfo.refresh(services);
-	}
+	this(prgPrinter, 
+             notationInfo, 
+             new PosTableStringBackend(DEFAULT_LINE_WIDTH), 
+             services, 
+             false);
     }
 
     /**
@@ -146,29 +170,14 @@ public final class LogicPrinter {
                         NotationInfo notationInfo, 
                         Services services,
                         boolean purePrint) {
-	this(prgPrinter, notationInfo, services);
-        pure = purePrint;
+	this(prgPrinter, 
+	     notationInfo,
+	     new PosTableStringBackend(DEFAULT_LINE_WIDTH), 
+	     services,
+	     purePrint);
     }
 
-    /**
-     * Creates a LogicPrinter.  Sets the sequent to be printed, as
-     * well as a ProgramPrinter to print Java programs and a
-     * NotationInfo which determines the concrete syntax.
-     *
-     * @param prgPrinter   the ProgramPrinter that pretty-prints Java programs
-     * @param notationInfo the NotationInfo for the concrete syntax
-     * @param backend      the Backend for the output
-     * @param purePrint    if true the PositionTable will not be calculated
-                    (simulates the behaviour of the former PureSequentPrinter)
-     */
-    public LogicPrinter(ProgramPrinter prgPrinter,
-                        NotationInfo notationInfo,
-                        Backend backend, 
-                        Services services,
-                        boolean purePrint) {
-	this(prgPrinter, notationInfo, services, purePrint);
-        this.backend      = backend;
-    }
+
 
 
     /**
@@ -891,10 +900,8 @@ public final class LogicPrinter {
             if(objectTerm.equals(TermBuilder.DF.NULL(services))
                 && fieldTerm.op() instanceof Function
                 && ((Function)fieldTerm.op()).isUnique()) {
-        	assert fieldTerm.arity() == 0;
         	String className 
         		= heapLDT.getClassName((Function)fieldTerm.op());
-        	
         	
         	if(className == null) {
         	    markStartSub();

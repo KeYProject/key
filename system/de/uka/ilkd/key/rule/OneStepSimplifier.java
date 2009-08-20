@@ -11,7 +11,6 @@
 package de.uka.ilkd.key.rule;
 
 import java.util.Map;
-import java.util.WeakHashMap;
 
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableList;
@@ -37,10 +36,11 @@ public final class OneStepSimplifier implements BuiltInRule {
     private static final ImmutableList<String> ruleSets 
     	= ImmutableSLList.<String>nil().append("concrete")
     	                           .append("simplify_literals")
+    	                           .append("elimQuantifier")
     	                           .append("simplify");
   
-   private final Map<ConstrainedFormula, Instantiation> cache 
-    		= new WeakHashMap<ConstrainedFormula, Instantiation>();
+    private final Map<ConstrainedFormula, Instantiation> cache 
+    		= new LRUCache<ConstrainedFormula, Instantiation>(1000);
    
     private Proof lastProof;
     private ImmutableSet<NoPosTacletApp> appsTakenOver;
@@ -71,8 +71,9 @@ public final class OneStepSimplifier implements BuiltInRule {
 	for(NoPosTacletApp app : allApps) {
 	    if(!(app.taclet() instanceof RewriteTaclet)
 	       || !app.taclet().hasReplaceWith()
+	       || !app.taclet().ifSequent().isEmpty()	       
 	       || app.taclet().goalTemplates().size() != 1
-	       || !app.taclet().ifSequent().isEmpty()
+	       || !app.taclet().goalTemplates().head().sequent().isEmpty()
 	       || ((RewriteTaclet)app.taclet()).getStateRestriction() 
 	             != RewriteTaclet.NONE
 	       || !goal.proof().mgt().getJustification(app)
@@ -114,7 +115,7 @@ public final class OneStepSimplifier implements BuiltInRule {
 						        	 ruleSet, 
 						        	 done);
 		indices[i] = new TacletIndex(taclets);
-		notSimplifiableCaches[i] = new LRUCache<Term,Term>(5000);
+		notSimplifiableCaches[i] = new LRUCache<Term,Term>(10000);
 		i++;
 		done = done.prepend(ruleSet);
 	    }
@@ -131,13 +132,15 @@ public final class OneStepSimplifier implements BuiltInRule {
 		g.getRuleAppManager().clearCache();
 		g.ruleAppIndex().clearIndexes();		
 	    }
+	    cache.clear();
 	    lastProof = null;
 	    appsTakenOver = null;
 	    indices = null;
+	    notSimplifiableCaches = null;
 	}
     }
     
-    
+
     private ConstrainedFormula simplifyPosOrSub(Services services,
 	    		     	  	        PosInOccurrence pos,
 	    		     	  	        int indexNr) {
@@ -146,7 +149,7 @@ public final class OneStepSimplifier implements BuiltInRule {
 	    return null;
 	}
 	
-	ImmutableList<NoPosTacletApp> apps 
+	final ImmutableList<NoPosTacletApp> apps 
 		= indices[indexNr].getRewriteTaclet(pos, 
 						    Constraint.BOTTOM, 
 						    TacletFilter.TRUE, 
@@ -154,15 +157,18 @@ public final class OneStepSimplifier implements BuiltInRule {
 						    Constraint.BOTTOM);
 	for(TacletApp app : apps) {
 	    app = app.setPosInOccurrence(pos, services);
+	    if(app == null) {
+		continue;
+	    } 
 	    if(!app.complete()) {
 		app = app.tryToInstantiate(services);
+		if(app == null) {
+		    continue;
+		}
 	    }
-	    if(app != null) {
-		RewriteTaclet taclet = (RewriteTaclet) app.rule();		
-		ConstrainedFormula result = taclet.getRewriteResult(services, 
-								    app);
-		return result;
-	    } 
+	    RewriteTaclet taclet = (RewriteTaclet) app.rule();		
+	    ConstrainedFormula result = taclet.getRewriteResult(services, app);
+	    return result;
 	}
 	
 	for(int i = 0, n = term.arity(); i < n; i++) {
@@ -204,8 +210,7 @@ public final class OneStepSimplifier implements BuiltInRule {
 	    	= ImmutableSLList.<ConstrainedFormula>nil().prepend(cf);
 	    while(true) {
 		ConstrainedFormula nextCF 
-			= simplifyConstrainedFormula(services, 
-					             list.head());
+			= simplifyConstrainedFormula(services, list.head());
 		if(nextCF != null && !list.contains(nextCF)) {
 		    list = list.prepend(nextCF);
 		} else {
@@ -221,7 +226,7 @@ public final class OneStepSimplifier implements BuiltInRule {
 	    }
 	    
 	    result = cache.get(cf);
-	}
+	} 
 	
 	assert result != null;
 	return result;
@@ -306,12 +311,12 @@ public final class OneStepSimplifier implements BuiltInRule {
     //inner classes
     //-------------------------------------------------------------------------
     
-    private static final class Instantiation {
-	private static final Instantiation EMPTY_INSTANTIATION 
-		= new Instantiation(null, 0);
-	
+    private static final class Instantiation {	
 	private final ConstrainedFormula cf;
 	private final int numAppliedRules;
+	
+	public static final Instantiation EMPTY_INSTANTIATION 
+		= new Instantiation(null, 0);
 	
 	public Instantiation(ConstrainedFormula cf, int numAppliedRules) {
 	    assert numAppliedRules >= 0;

@@ -32,7 +32,7 @@ public class PolishFlagSort {
 	  @                &&
 	  @                (\forall int J; j <= J && J < ar.length;
 	  @                 ar[J] == WHITE);
-	  @ assignable ar[*], i, j;
+	  @ assignable ar[*];
 	  @ decreases j - i;
 	  @*/
 	while (i != j) {

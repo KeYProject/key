@@ -90,7 +90,7 @@
        @      (m_Sum[j] == m_Sum[j-1] + m_Tab[j-1][VALUE_ATTR_IDX]))) &&
        @  res1 == m_Sum[i];
        @ decreases num_Instances - i;
-       @ modifies m_Sum[*], res1, total1, i;
+       @ modifies m_Sum[*], res1;
        @*/
        while ( i < num_Instances ) {
            if (m_Tab[i][TAG_ATTR_IDX] != 0) {
@@ -116,7 +116,7 @@
        @ 0 <= i && i <= num_Instances &&
        @  res2 == m_Sum[i];
        @ decreases num_Instances - i;
-       @ modifies res2, total2, i;
+       @ modifies res2;
        @*/
        while ( i < num_Instances ) {
            if (m_Tab2[i][TAG_ATTR_IDX] != 0) {

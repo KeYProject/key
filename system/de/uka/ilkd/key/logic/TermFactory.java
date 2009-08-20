@@ -34,7 +34,7 @@ public final class TermFactory {
     public static final TermFactory DEFAULT = new TermFactory();    
 
     private static final Map<Term, Term> cache 
-    	= Collections.synchronizedMap(new LRUCache<Term, Term>(10000));
+    	= Collections.synchronizedMap(new LRUCache<Term, Term>(20000));
 
     private static final ImmutableArray<Term> NO_SUBTERMS = new ImmutableArray<Term>();
     

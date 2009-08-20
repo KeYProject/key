@@ -206,7 +206,7 @@ public class ApplyStrategy {
         if(usedCoalChooserOptionsKey.compareTo(sSettings.getActiveStrategyProperties().getProperty(StrategyProperties.GOALCHOOSER_OPTIONS_KEY))!=0){
             usedCoalChooserOptionsKey = sSettings.getActiveStrategyProperties().getProperty(StrategyProperties.GOALCHOOSER_OPTIONS_KEY);
             if(usedCoalChooserOptionsKey.equals(StrategyProperties.GOALCHOOSER_DEFAULT)){
-        	medi.getProfile().setSelectedGoalChooserBuilder(DefaultGoalChooserBuilder.NAME);
+        	medi.getProfile().setSelectedGoalChooserBuilder(DepthFirstGoalChooserBuilder.NAME);//XXX
             }else if(usedCoalChooserOptionsKey.equals(StrategyProperties.GOALCHOOSER_DEPTH)){
         	medi.getProfile().setSelectedGoalChooserBuilder(DepthFirstGoalChooserBuilder.NAME);
             }
@@ -297,6 +297,10 @@ public class ApplyStrategy {
 			}
 		    }else{
 			mediator().startInterface(true);
+			Goal g = goalChooser.getNextGoal();
+			if(g != null) {
+			    mediator().goalChosen(goalChooser.getNextGoal());
+			}
 		    }
 		}
             }

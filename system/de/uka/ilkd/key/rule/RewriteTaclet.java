@@ -266,8 +266,8 @@ public final class RewriteTaclet extends FindTaclet {
     public ConstrainedFormula getRewriteResult(Services services, 
 	    				       TacletApp app) {
 	assert goalTemplates().size() == 1;
-	assert ifSequent().isEmpty();
-	assert getStateRestriction() == NONE;
+	assert goalTemplates().head().sequent().isEmpty();	
+	assert getStateRestriction() != IN_SEQUENT_STATE;
 	assert app.complete();
 	RewriteTacletGoalTemplate gt 
 		= (RewriteTacletGoalTemplate) goalTemplates().head();

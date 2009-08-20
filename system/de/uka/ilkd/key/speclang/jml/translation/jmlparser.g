@@ -420,9 +420,12 @@ options {
     private Term buildEqualityTerm(Term a, Term b) throws SLTranslationException {
 
 	Term result = null;
-
 	try {
-	    result = TB.equals(a, b);
+	    if(a.sort() != Sort.FORMULA && b.sort() != Sort.FORMULA) {
+		result = TB.equals(a,b);
+	    } else {
+		result = TB.equals(convertToFormula(a), convertToFormula(b));
+	    }
 	} catch (IllegalArgumentException e) {
 	    try {
 		raiseError("Illegal Arguments in equality expression near " + LT(0));

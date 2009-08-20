@@ -44,7 +44,6 @@ public class StrategySelectionView extends JPanel {
     ButtonGroup queryGroup = new ButtonGroup();
     ButtonGroup nonLinArithGroup = new ButtonGroup();
     ButtonGroup quantifierGroup = new ButtonGroup();
-    ButtonGroup goalChooserGroup = new ButtonGroup();
     ButtonGroup stopModeGroup = new ButtonGroup();    
     ButtonGroup[] userTacletsGroup = new ButtonGroup[StrategyProperties.USER_TACLETS_NUM];
     {
@@ -57,8 +56,6 @@ public class StrategySelectionView extends JPanel {
     JRadioButtonHashMap rdBut12;
     JRadioButtonHashMap rdBut13;
     JRadioButtonHashMap rdBut14;
-    JRadioButtonHashMap rdBut15;
-    JRadioButtonHashMap rdBut16;
     JRadioButtonHashMap rdBut17;
     JRadioButtonHashMap rdBut18;
     private JRadioButtonHashMap splittingNormal;
@@ -147,26 +144,6 @@ public class StrategySelectionView extends JPanel {
         ////////////////////////////////////////////////////////////////////////
 
         int yCoord = 0;
-
-        ////////////////////////////////////////////////////////////////////////
-        
-        addJavaDLOption ( new JLabel ( "Goal Chooser" ),
-                    javaDLOptionsLayout, 1, yCoord, 7 );
-        
-        ++yCoord;
-
-        rdBut15 = new JRadioButtonHashMap("Default", StrategyProperties.GOALCHOOSER_DEFAULT, true, false);
-        goalChooserGroup.add(rdBut15);
-        addJavaDLOption ( rdBut15, javaDLOptionsLayout, 2, yCoord, 2 );        
-
-        rdBut16 = new JRadioButtonHashMap(
-                "Depth First", StrategyProperties.GOALCHOOSER_DEPTH, false, false);
-        goalChooserGroup.add(rdBut16);
-        addJavaDLOption ( rdBut16, javaDLOptionsLayout, 4, yCoord, 2 );        
-       
-        
-        ++yCoord;
-        addJavaDLOptionSpace ( javaDLOptionsLayout, yCoord );
 
         ////////////////////////////////////////////////////////////////////////
         ++yCoord;
@@ -556,8 +533,6 @@ public class StrategySelectionView extends JPanel {
         rdBut12.addActionListener(optListener);       
         rdBut13.addActionListener(optListener);     
         rdBut14.addActionListener(optListener);
-        rdBut15.addActionListener(optListener);
-        rdBut16.addActionListener(optListener);
         rdBut17.addActionListener(optListener);
         rdBut18.addActionListener(optListener);
         queryExpand.addActionListener(optListener);
@@ -783,10 +758,6 @@ public class StrategySelectionView extends JPanel {
             JRadioButton bQuantifierActive = getStrategyOptionButton(quantifierOptions, 
                     StrategyProperties.QUANTIFIERS_OPTIONS_KEY);
             bQuantifierActive.setSelected(true);   
-            String goalChooserOptions = p.getProperty(StrategyProperties.GOALCHOOSER_OPTIONS_KEY);
-            JRadioButton bCoalChooserActive = getStrategyOptionButton(goalChooserOptions, 
-                    StrategyProperties.GOALCHOOSER_OPTIONS_KEY);
-            bCoalChooserActive.setSelected(true); 
             String stopmodeOptions = p.getProperty(StrategyProperties.STOPMODE_OPTIONS_KEY);
             JRadioButton bStopModeActive = getStrategyOptionButton(stopmodeOptions, 
                     StrategyProperties.STOPMODE_OPTIONS_KEY);
@@ -874,8 +845,6 @@ public class StrategySelectionView extends JPanel {
                        nonLinArithGroup.getSelection().getActionCommand());
         p.setProperty( StrategyProperties.QUANTIFIERS_OPTIONS_KEY, 
                        quantifierGroup.getSelection().getActionCommand());
-        p.setProperty( StrategyProperties.GOALCHOOSER_OPTIONS_KEY, 
-                       goalChooserGroup.getSelection().getActionCommand());
         p.setProperty( StrategyProperties.STOPMODE_OPTIONS_KEY, 
                        stopModeGroup.getSelection().getActionCommand());
         

@@ -28,7 +28,7 @@ public class ReverseArray {
 	  @   && (\forall int j; j>=i && j<length; \old(a[a.length-(j+1)])==a[a.length-(j+1)] && \old(a[j])==a[j])
 	  @   && (a.length % 2 != 0 ==> \old(a[a.length/2])==a[length])
 	  @   && i>=0 && i<=length;
-	  @ modifies a[*], i;
+	  @ modifies a[*];
 	  @*/
 	while (i<length) {
 	    int tmp = a[i];
@@ -51,7 +51,7 @@ public class ReverseArray {
 	int i = 0;
 	/*@ 
 	    @ loop_invariant (\forall int j; j>=0 && j<i; b[j]==p_a[p_a.length-(j+1)]) && i>=0 && i<=p_a.length;
-	      @ modifies b[*], i;
+	      @ modifies b[*];
 	      @*/
 	while (i<p_a.length) {      
 	    b[i] = p_a[p_a.length-(i+1)];      
