@@ -67,8 +67,7 @@ class TriggersSet {
             // add check whether it is in PCNF
             trs = new TriggersSet(allTerm, services);
             cache.put(allTerm, trs);
-        }
-        return trs;
+        }         return trs;
     }
 
     /**

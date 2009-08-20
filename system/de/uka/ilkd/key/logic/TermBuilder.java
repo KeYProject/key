@@ -176,14 +176,12 @@ public class TermBuilder {
         return tf.createFunctionTerm(integerLDT.getLessOrEquals(), t1, t2);
     }    
     
-    public Term zero(Services services) {
-        final IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();
-        return integerLDT.translateLiteral(new IntLiteral(0));        
+    public Term zero(Services services) {       
+        return services.getTypeConverter().getIntegerLDT().zero();        
     }
 
-    public Term one(Services services) {
-        final IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();
-        return integerLDT.translateLiteral(new IntLiteral(1));        
+    public Term one(Services services) {       
+        return services.getTypeConverter().getIntegerLDT().one();        
     }
     
     public Term NULL(Services services) {
