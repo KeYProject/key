@@ -210,9 +210,7 @@ class PredictCostProver {
 	long cost = 1;
 	boolean assertChanged = false;
 	Set<Clause> res = new HashSet<Clause>();
-	Iterator<Clause> it = clauses.iterator();
-	while (it.hasNext()) {
-	    Clause c = (it.next());
+	for (final Clause c : clauses) {
 	    c.firstRefine();
 	    long cCost = c.cost();
 	    if (cCost == 0) {
@@ -226,8 +224,9 @@ class PredictCostProver {
 	    if (c.literals.size() == 1) {
 		assertChanged = true;
 		assertLiterals = assertLiterals.union(c.literals);
-	    } else
+	    } else {
 		res.add(c);
+	    }
 	    cost = cost * cCost;
 	}
 	clauses = res;
@@ -254,13 +253,26 @@ class PredictCostProver {
      * } } return cost; }
      */
 
-    private class Clause {
+    private class Clause implements Iterable<Term>{
 
 	/** all literals contains in this clause */
 	public ImmutableSet<Term> literals = DefaultImmutableSet.<Term> nil();
 
 	public Clause(ImmutableSet<Term> lits) {
 	    literals = lits;
+	}	
+	
+	public boolean equals(Object o) {
+	    if (!(o instanceof Clause)) return false;
+	    final Clause other = (Clause) o;
+	    if (other.literals.size() != literals.size()) {
+		return false;
+	    }
+	    return literals.equals(other.literals);
+	}
+	
+	public int hashCode() {
+	    return literals.hashCode();
 	}
 
 	public Iterator<Term> iterator() {
@@ -272,12 +284,11 @@ class PredictCostProver {
 	 *         Otherwise,return the number of literals it left.
 	 */
 	public long cost() {
-	    if (literals.contains(falseT) && literals.size() == 1)
+	    if (literals.size() == 1 && literals.contains(falseT))
 		return 0;
 	    if (literals.contains(trueT))
 		return -1;
-	    int cost = literals.size();
-	    return cost;
+	    return literals.size();
 	}
 
 	/**
@@ -299,11 +310,8 @@ class PredictCostProver {
 	 */
 	public ImmutableSet<Term> refine(Iterable<? extends Term> assertLits) {
 	    ImmutableSet<Term> res = DefaultImmutableSet.<Term> nil();
-	    Iterator<Term> it = this.iterator();
-	    while (it.hasNext()) {
-		Term lit = it.next();
-		Term temp = proveLiteral(lit, assertLits);
-		final Operator op = temp.op();
+	    for (final Term lit : this) {
+		final Operator op = proveLiteral(lit, assertLits).op();
 		if (op == Op.TRUE) {
 		    res = DefaultImmutableSet.<Term> nil().add(trueT);
 		    break;
