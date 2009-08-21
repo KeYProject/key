@@ -58,15 +58,6 @@ public class InitArrayCreation extends InitArray {
 	this.newObjectSV = newObjectSV;
     }
 
-    public InitArrayCreation(SchemaVariable newObjectSV,
-			     ProgramElement newExpr, boolean transientArray) {	
-	super("init-array-creation", newExpr); 
-	this.newObjectSV = newObjectSV;
-	if(transientArray)
-	    this.createArrayName = "<createTransientArray>";
-    }
-
-
     
     /** 
      * trying to create an array of negative length causes a 
@@ -154,6 +145,7 @@ public class InitArrayCreation extends InitArray {
 					 KeYJavaType arrayType,
 					 ProgramVariable[] dimensions,
 					 Services services) {
+	assert dimensions.length > 0;
 	bodyStmnts.add
 	    (assign(resultVar,
 		    new MethodReference
@@ -180,12 +172,12 @@ public class InitArrayCreation extends InitArray {
 
 	    TypeReference baseTypeRef =
 		((ArrayType)arrayType.getJavaType()).getBaseType();
-
-	    KeYJavaType baseType = baseTypeRef.getKeYJavaType();
+	    final KeYJavaType baseType = baseTypeRef.getKeYJavaType();
             
-            for(int i=0; i<dimensions.length-1; i++){
-                baseTypeRef = ((ArrayType) baseType.getJavaType()).getBaseType();
-                baseType = baseTypeRef.getKeYJavaType();                  
+            for(int i = 0; i < dimensions.length - 1; i++){
+        	ArrayType at = (ArrayType) baseTypeRef.getKeYJavaType()
+        	                                      .getJavaType();
+                baseTypeRef = at.getBaseType();                  
             }
 
 	    final For forLoop = 
@@ -194,31 +186,15 @@ public class InitArrayCreation extends InitArray {
 			new Expression[]{new PostIncrement(pv)},			
 			assign(new ArrayReference
 			       ((ReferencePrefix)resultVar, new Expression[]{pv}),
-			       new NewArray
-			       (baseDim, baseTypeRef, baseType, null, 
-				(baseType.getJavaType() instanceof ArrayType)?
-                                        ((ArrayType)baseType.getJavaType()).getDimension() : 0)
-			       )
-			);
+			       new NewArray(baseDim, 
+				       	    baseTypeRef, 
+				       	    baseType, 
+				       	    null, 
+				       	    dimensions.length - 1)));
 
 	    bodyStmnts.add(forLoop);
 	}
 
-    }
-
-
-    private void createOneDimensionalArrayTransient(LinkedList<Statement> bodyStmnts,
-					 Expression resultVar,
-					 KeYJavaType arrayType,
-					 ProgramVariable[] dimensions, 
-					 Expression transientType, 
-					 Services services) {
-	bodyStmnts.add
-	    (assign(resultVar, new MethodReference
-		    (new ImmutableArray<Expression>(new Expression[]{dimensions[0], 
-							    transientType}), 
-		     new ProgramElementName(createArrayName), 
-		     new TypeRef(arrayType))));
     }
 
 
@@ -241,36 +217,8 @@ public class InitArrayCreation extends InitArray {
 
  	return new StatementBlock(bodyStmnts.toArray
 				  (new Statement[bodyStmnts.size()]));
-	
     }
     
-
-    /**
-     * executes an array creation without initializers involved 
-     */
-    private ProgramElement arrayCreationTransient
-	(Expression newObject, MethodReference mref,
-	 Services services, ExecutionContext ec) {
-	
-	LinkedList<Statement> bodyStmnts = new LinkedList<Statement>();	
-
-	ProgramVariable[] dimensions = 
-	    evaluateAndCheckDimensionExpressions
-	    (bodyStmnts, 
-	     new ImmutableArray<Expression>
-	     (new Expression[]{mref.getArgumentAt(0)}), services);
-
-	createOneDimensionalArrayTransient(bodyStmnts, 
-				newObject,
-				mref.getKeYJavaType(services, ec), 
-				dimensions,
-				mref.getArgumentAt(1),
-				services);
-
- 	return new StatementBlock(bodyStmnts.toArray
-				  (new Statement[bodyStmnts.size()]));
-	
-    }
 
     public ProgramElement symbolicExecution(ProgramElement pe, 
 					    Services services,
@@ -281,16 +229,13 @@ public class InitArrayCreation extends InitArray {
 
 	NewArray na = null;
 
-	if( pe instanceof MethodReference && 
-	    ((MethodReference)pe).getName().toString().startsWith("jvmMakeTransient")) {
-	    return arrayCreationTransient(array, (MethodReference)pe,
-	             services, svInst.getExecutionContext());
-	} else if ( pe instanceof NewArray ) {
+	if ( pe instanceof NewArray ) {
 	    na = (NewArray) pe;
 	    if (na.getArrayInitializer() == null) {
 		return arrayCreationWithoutInitializers(array, na, services);
 	    }
 	} else if (pe instanceof ArrayInitializer) {
+	    assert false : "dubious code";
 	    final KeYJavaType kjt = 
 		array.getKeYJavaType(services, svInst.getExecutionContext());
 	    na = new NewArray(new Expression[0],

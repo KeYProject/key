@@ -333,7 +333,7 @@ public final class OneStepSimplifier implements BuiltInRule {
 	}
 	
 	public String toString() {
-	    return cf + " (" + numAppliedRules + " rules)";
+	    return cf + " (" + (numAppliedRules > 1 ? " rules)" : "rule)");
 	}
     }
 }

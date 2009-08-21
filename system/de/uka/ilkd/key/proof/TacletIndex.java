@@ -110,6 +110,8 @@ public final class TacletIndex  {
 	    if(indexObj instanceof SortDependingFunction) {
 		// indexed independently of sort
 		indexObj=((SortDependingFunction)indexObj).getKind ();
+	    } else if(indexObj instanceof ElementaryUpdate) {
+		indexObj = ElementaryUpdate.class;
 	    }
 	}
 	
@@ -126,7 +128,7 @@ public final class TacletIndex  {
 	    } else {
 		indexObj = DEFAULT_SV_KEY;
 	    }
-	}
+	}	
 	return indexObj;
     }
 
@@ -408,9 +410,11 @@ public final class TacletIndex  {
 
 	final ImmutableList<NoPosTacletApp> inMap;
 
-	if (term.op () instanceof SortDependingFunction)
+	if (term.op () instanceof SortDependingFunction) {
 	    inMap = map.get(((SortDependingFunction)term.op()).getKind ());
-	else {
+	} else if (term.op() instanceof ElementaryUpdate){
+	    inMap = map.get(ElementaryUpdate.class);
+	} else {
 	    inMap = map.get(term.op());
 	}
 	if (inMap != null) {

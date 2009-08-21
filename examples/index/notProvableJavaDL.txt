@@ -1,1 +1,4 @@
+./standard_key/arrays/arrayStoreException/array2Dim.key
+./standard_key/arrays/arrayStoreException/array2DimClose.key
+./standard_key/arrays/arrayStoreException/throwASEForPrim.key
 ./standard_key/java_dl/danglingElse.key

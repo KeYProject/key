@@ -46,11 +46,11 @@ public class TypeOf extends ProgramMetaConstruct {
         KeYJavaType kjt=null;
         if(pe instanceof Expression){
             kjt = services.getTypeConverter().getKeYJavaType((Expression)pe, ec);
-        }else{
+        } else {
             kjt = ((TypeRef) pe).getKeYJavaType();
         }
         
-        assert kjt != null;  
+        assert kjt != null;
         
 	if (!(kjt.getJavaType() instanceof PrimitiveType)) {
 	    if (kjt.getJavaType() instanceof ArrayType) {

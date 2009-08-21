@@ -1,7 +1,6 @@
 \settings {
 "#Proof-Settings-Config-File
 #Mon Aug 03 16:58:18 CEST 2009
-[StrategyProperty]GOALCHOOSER_OPTIONS_KEY=GOALCHOOSER_DEFAULT
 [StrategyProperty]METHOD_OPTIONS_KEY=METHOD_EXPAND
 [StrategyProperty]USER_TACLETS_OPTIONS_KEY3=USER_TACLETS_OFF
 [StrategyProperty]LOOP_OPTIONS_KEY=LOOP_INVARIANT
@@ -14,6 +13,7 @@
 [View]MaxTooltipLines=40
 [General]DnDDirectionSensitive=true
 [General]StupidMode=true
+[General]OneStepSimplification=true
 [Strategy]Timeout=-1
 [Strategy]MaximumNumberOfAutomaticApplications=10000
 [StrategyProperty]QUERY_OPTIONS_KEY=QUERY_NONE

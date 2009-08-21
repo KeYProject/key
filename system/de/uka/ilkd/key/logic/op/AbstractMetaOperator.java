@@ -96,6 +96,8 @@ public abstract class AbstractMetaOperator extends AbstractSortedOperator
     
     public static final AbstractMetaOperator MEMBER_PV_TO_FIELD = new MemberPVToField();
 
+    public static final AbstractMetaOperator ADD_CAST = new AddCast();    
+
     
     protected static final TermFactory termFactory = TermFactory.DEFAULT;
     protected static final TermBuilder TB = TermBuilder.DF;

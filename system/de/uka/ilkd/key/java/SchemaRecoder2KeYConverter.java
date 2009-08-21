@@ -139,9 +139,6 @@ public class SchemaRecoder2KeYConverter extends Recoder2KeYConverter {
         } else if ("#init-array-creation".equals(mcName)) {
             return new InitArrayCreation(mc.getFirstSV().getSV(),
                     (Expression) list.get(Expression.class));
-        } else if ("#init-array-creation-transient".equals(mcName)) {
-            return new InitArrayCreation(mc.getFirstSV().getSV(),
-                    (Expression) list.get(Expression.class), true);
         } else {
             throw new ConvertException("Program meta construct "
                     + mc.toString() + " unknown.");
