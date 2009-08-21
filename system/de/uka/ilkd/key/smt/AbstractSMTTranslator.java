@@ -26,11 +26,11 @@ import org.apache.log4j.Logger;
 
 /**
  * This abstract class provides a stubb for translation of KeY-Formulas to other standards.
- * Formulas are  translated in a correct, if not always complete representation
+ * Formulas are  translated in a correct, but not always complete representation
  * of the target standard.
- * Non first order elements in a formula are translated as uninterpreted predicates.
+ * Non-first-order elements in a formula are translated as uninterpreted predicates.
  * 
- * The translation for standards with no type hierarchy is oriented on the paper 
+ * The translation for standards supporting multiple sorts is oriented on the paper 
  * "The Boogie 2 Type System: Design and Verification Condition Generation" 
  * by Leino and Ruemmer.
  * 
