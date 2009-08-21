@@ -191,36 +191,35 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
      */
     private ArrayList<StringBuffer> getAssumptions(Services services, ArrayList<ContextualBlock> assumptionTypes) throws IllegalFormulaException {
 	ArrayList<StringBuffer> toReturn = new ArrayList<StringBuffer>();
-	
-	if (!this.isMultiSorted()) {
 	     
-	    // add the type definitions
-	    //this means all predicates that are needed for functions to define
-	    //their result type, all predicates for constants (like number symbols)
+	// add the type definitions
+	//this means all predicates that are needed for functions to define
+	//their result type, all predicates for constants (like number symbols)
 
-	    int start = toReturn.size();
-	    toReturn.addAll(this.getTypeDefinitions());
-	    assumptionTypes.add(new ContextualBlock(start,toReturn.size()-1,ContextualBlock.ASSUMPTION_FUNCTION_DEFINTION));
+	int start = toReturn.size();
+	toReturn.addAll(this.getTypeDefinitions());
+	assumptionTypes.add(new ContextualBlock(start,toReturn.size()-1,ContextualBlock.ASSUMPTION_FUNCTION_DEFINTION));
 	    
-	    // add the type hierarchy
-	    //this means, add the typepredicates, that are needed to define
-	    //for every type, what type they are (direct) subtype of
+	// add the type hierarchy
+	//this means, add the typepredicates, that are needed to define
+	//for every type, what type they are (direct) subtype of
+	start = toReturn.size();
+	toReturn.addAll(this.getSortHierarchyPredicates());
+	assumptionTypes.add(new ContextualBlock(start,toReturn.size()-1,ContextualBlock.ASSUMPTION_TYPE_HIERARCHY));
+	//add the formulas, that make sure, type correctness is kept, also
+	//for interpreted functions
+	//leave this away. This is not needed, if interpreted int functions are typed by the second type u
+	if (!this.isMultiSorted()) {
 	    start = toReturn.size();
-	    toReturn.addAll(this.getSortHierarchyPredicates());
-	    assumptionTypes.add(new ContextualBlock(start,toReturn.size()-1,ContextualBlock.ASSUMPTION_TYPE_HIERARCHY));
-	    //add the formulas, that make sure, type correctness is kept, also
-	    //for interpreted functions
-	    //leave this away. This is not needed, if interpreted int functions are typed by the second type u
-	    //start = toReturn.size();
-	    //toReturn.addAll(this.getSpecialSortPredicates(services));
-	    assumptionTypes.add(new ContextualBlock(start,toReturn.size()-1,ContextualBlock.ASSUMPTION_SORT_PREDICATES));
-	    
-	    //add the assumptions created during translation
-	    //for example while translating term if then else
-	    start = toReturn.size();
-	    toReturn.addAll(this.assumptions);
-	    assumptionTypes.add(new ContextualBlock(start,toReturn.size()-1,ContextualBlock.ASSUMPTION_DUMMY_IMPLEMENTATION));
+	    toReturn.addAll(this.getSpecialSortPredicates(services));
 	}
+	assumptionTypes.add(new ContextualBlock(start,toReturn.size()-1,ContextualBlock.ASSUMPTION_SORT_PREDICATES));
+	    
+	//add the assumptions created during translation
+	//for example while translating term if then else
+	start = toReturn.size();
+	toReturn.addAll(this.assumptions);
+	assumptionTypes.add(new ContextualBlock(start,toReturn.size()-1,ContextualBlock.ASSUMPTION_DUMMY_IMPLEMENTATION));
 	
 	return toReturn;
     }
@@ -351,8 +350,13 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 			varlist);
 
 		form = this.translateLogicalImply(leftForm, rightForm);
-		form = this.translateLogicalAll(var, this.standardSort,
+		if (this.isMultiSorted()) {
+		    form = this.translateLogicalAll(var, this.standardSort,
 			form);
+		} else {
+		    form = this.translateLogicalAll(var, this.getIntegerSort(),
+				form);
+		}
 	    }
 	    if (form.length() > 0) {
 		toReturn.add(form);
@@ -392,10 +396,11 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 	}
 
 	//add the type predicates for constant values like number symbols
-	//not needed, as constant types are always of type int
-	//for (StringBuffer s : this.constantTypePreds.values()) {
-	//    toReturn.add(s);
-	//}
+	if (!this.isMultiSorted()) {
+	    for (StringBuffer s : this.constantTypePreds.values()) {
+		toReturn.add(s);
+	    }
+	}
 	
 	return toReturn;
     }
@@ -416,6 +421,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 	/*
 	 * given: the name of a function and its sorts.
 	 * 
+	 * in case of MultiSort-mode:
 	 * if the functions result is of some non-integer type
 	 * returned: for all tvar1:displaysort1,...,tvarn:displaysortn : 
 	 * 	[type_of_sort1(tvar1) AND ... type_of_sortn(tvarn)] implies
@@ -425,8 +431,8 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 	 * if all of them are, skip lefthandside of the implication
 	 * 
 	 */
-	
-	if (!isSomeIntegerSort(sorts.get(sorts.size()-1))) {
+	int firstIndex = -1;
+	if (!this.isMultiSorted() || !isSomeIntegerSort(sorts.get(sorts.size()-1))) {
 	    // collect the quantify vars
 	    ArrayList<StringBuffer> qVar = new ArrayList<StringBuffer>();
 	    for (int i = 0; i < sorts.size() - 1; i++) {
@@ -434,31 +440,48 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 	    }
 
 	    // left hand side of the type implication
-	    //find the first non-int sort
-	    int firstIndex = -1;
-	    for (int i = 0; i < qVar.size() && firstIndex == -1 ; i++) {
-		if (!isSomeIntegerSort(sorts.get(i))) {
-		    firstIndex = i;
-		    toReturn = this.getTypePredicate(sorts.get(i), qVar.get(i));
+	    if (!this.isMultiSorted()) {
+		if (qVar.size() > 0) {
+		     toReturn = this.getTypePredicate(sorts.get(0), qVar.get(0));
 		}
-	    }
+		for (int i = 1; i < qVar.size(); i++) {
+		     StringBuffer temp = getTypePredicate(sorts.get(i), qVar.get(i));
+		     toReturn = this.translateLogicalAnd(toReturn, temp);
+		}
+	    } else {
+		//find the first non-int sort
+		
+		for (int i = 0; i < qVar.size() && firstIndex == -1 ; i++) {
+		    if (!isSomeIntegerSort(sorts.get(i))) {
+			firstIndex = i;
+			toReturn = this.getTypePredicate(sorts.get(i), qVar.get(i));
+		    }
+		}
 	    
-	    for (int i = firstIndex+1; i < qVar.size() && firstIndex > -1; i++) {
-		if (isSomeIntegerSort(sorts.get(i))){
-		    StringBuffer temp = getTypePredicate(sorts.get(i), qVar.get(i));
-		    toReturn = this.translateLogicalAnd(toReturn, temp);
+		for (int i = firstIndex+1; i < qVar.size() && firstIndex > -1; i++) {
+		    if (isSomeIntegerSort(sorts.get(i))){
+			StringBuffer temp = getTypePredicate(sorts.get(i), qVar.get(i));
+			toReturn = this.translateLogicalAnd(toReturn, temp);
+		    }
 		}
 	    }
-
 	    // build the right side
 	    StringBuffer rightSide;
 	    rightSide = this.translateFunction(funName, qVar);
 	    rightSide = getTypePredicate(sorts.get(sorts.size() - 1), rightSide);
 
-	    if (firstIndex > -1) {
-		toReturn = this.translateLogicalImply(toReturn, rightSide);
+	    if (!this.isMultiSorted()) {
+		if (qVar.size() > 0) {
+		    toReturn = this.translateLogicalImply(toReturn, rightSide);
+		} else {
+		    toReturn = rightSide;
+		}
 	    } else {
-		toReturn = rightSide;
+		if (firstIndex > -1) {
+		    toReturn = this.translateLogicalImply(toReturn, rightSide);
+		} else {
+		    toReturn = rightSide;
+		}
 	    }
 
 	    // built the forall around it
@@ -500,21 +523,18 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 
 	if (this.nullUsed) {
 	    //add the null constant to the declarations
+	    ArrayList<StringBuffer> a = new ArrayList<StringBuffer>();
+	    a.add(this.nullString);
 	    if (this.isMultiSorted()) {
-		ArrayList<StringBuffer> a = new ArrayList<StringBuffer>();
-		a.add(this.nullString);
-		a.add(this.translateNullSort());
-		toReturn.add(a);
-	    } else {
-		ArrayList<StringBuffer> a = new ArrayList<StringBuffer>();
-		a.add(this.nullString);
 		a.add(this.standardSort);
-		toReturn.add(a);
+	    } else {
+		a.add(this.getIntegerSort());
 	    }
+	    toReturn.add(a);
 	}
 
 	//add the definition of the cast function
-	if (this.castPredicate != null) {
+	if (this.isMultiSorted() && this.castPredicate != null) {
 	    //it was used at least once
 	    ArrayList<StringBuffer> temp = new ArrayList<StringBuffer>();
 	    temp.add(this.castPredicate);
@@ -553,19 +573,18 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 	// add the typePredicates
         
         start = toReturn.size();
-	if (!this.isMultiSorted()) {
 	    
-	    for (Sort s : this.typePredicates.keySet()) {
-		ArrayList<StringBuffer> element = new ArrayList<StringBuffer>();
-		element.add(typePredicates.get(s));
-		//element.add(this.usedDisplaySort.get(s));
-		//type predicates can only be used for standardSort, never for integer sorts.
-		//always tape cast needed for this.
-		element.add(this.standardSort);
-		toReturn.add(element);
-	    }
-
-	    
+        for (Sort s : this.typePredicates.keySet()) {
+            ArrayList<StringBuffer> element = new ArrayList<StringBuffer>();
+            element.add(typePredicates.get(s));
+            if (!this.isMultiSorted()) {
+        	element.add(this.usedDisplaySort.get(s));
+            } else {
+        	//type predicates can only be used for standardSort, never for integer sorts.
+        	//always tape cast needed for this.
+        	element.add(this.standardSort);
+            }
+            toReturn.add(element);
 	}
 
         predicateTypes.add(new ContextualBlock(start,toReturn.size()-1,ContextualBlock.PREDICATE_TYPE));	
@@ -580,11 +599,8 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
      */
     private ArrayList<StringBuffer> buildTranslatedSorts() {
 	ArrayList<StringBuffer> toReturn = new ArrayList<StringBuffer>();
+	
 	if (!this.isMultiSorted()) {
-	    //add the two sorts needed as maximum
-	    toReturn.add(this.standardSort);
-	    toReturn.add(this.getIntegerSort());
-	} else {
 	    for (Sort s : this.usedDisplaySort.keySet()) {
 		StringBuffer newSort = this.usedDisplaySort.get(s);
 		// make sure, no sort is added twice!!
@@ -598,6 +614,10 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 		    toReturn.add(newSort);
 		}
 	    }
+	} else {
+	    //add the two sorts needed as maximum
+	    toReturn.add(this.standardSort);
+	    toReturn.add(this.getIntegerSort());
 	}
 	return toReturn;
     }
@@ -698,8 +718,8 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
     
     /**
      * Returns, whether the Structure, this translator creates should be a
-     * Structure, that is multi sorted with inheritance of Sorts. If false, a
-     * single sorted structure is created.
+     * Structure, that is multi sorted. If false, a single sorted structure 
+     * is created. Then all sorts are translated as integers.
      * 
      * @return true, if multi sorted logic is supported.
      */
@@ -1121,9 +1141,13 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 	//but object values are needed
 	StringBuffer cond = translateTerm(iteTerm.sub(0), quantifiedVars, services);
 	StringBuffer ifterm = translateTerm(iteTerm.sub(1), quantifiedVars, services);
-	ifterm = this.castIfNeccessary(ifterm, iteTerm.sub(1).sort(), iteTerm.sort());
+	if (this.isMultiSorted()) {
+	    ifterm = this.castIfNeccessary(ifterm, iteTerm.sub(1).sort(), iteTerm.sort());
+	}
 	StringBuffer elseterm = translateTerm(iteTerm.sub(2), quantifiedVars, services);
-	elseterm = this.castIfNeccessary(elseterm, iteTerm.sub(2).sort(), iteTerm.sort());
+	if (this.isMultiSorted()) {
+	    elseterm = this.castIfNeccessary(elseterm, iteTerm.sub(2).sort(), iteTerm.sort());
+	}
 	try {
 	    return this.translateTermIfThenElse(cond, ifterm, elseterm);
 	} catch (IllegalFormulaException e) {
@@ -1198,11 +1222,11 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 	     */
 	    StringBuffer arg1 = translateTerm(term.sub(0), quantifiedVars, services);
 	    StringBuffer arg2 = translateTerm(term.sub(1), quantifiedVars, services);
-	    if (isSomeIntegerSort(term.sub(0).sort()) 
+	    if (this.isMultiSorted() && isSomeIntegerSort(term.sub(0).sort()) 
 		    && !isSomeIntegerSort(term.sub(1).sort())) {
 		arg1 = cast(arg1);
 	    }
-	    if (!isSomeIntegerSort(term.sub(0).sort()) 
+	    if (this.isMultiSorted() && !isSomeIntegerSort(term.sub(0).sort()) 
 		    && isSomeIntegerSort(term.sub(1).sort())) {
 		arg2 = cast(arg2);
 	    }
@@ -1239,11 +1263,10 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 	    StringBuffer form = this.translateTerm(term.sub(0), quantifiedVars,
 		    services);
 
-	    if (!this.isMultiSorted() 
-		    && !isSomeIntegerSort(vars.getQuantifiableVariable(0).sort())) {
+	    if (!this.isMultiSorted() || !isSomeIntegerSort(vars.getQuantifiableVariable(0).sort())) {
 		// add the typepredicate
 		// this is not needed, if the variable, that is quantified over is of
-		// some integer type
+		// some integer type and in Multisort mode
 		form = this.translateLogicalImply(this.getTypePredicate(vars
 			.getQuantifiableVariable(0).sort(), qv), form);
 	    }
@@ -1265,8 +1288,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 	    StringBuffer form = this.translateTerm(term.sub(0), quantifiedVars,
 		    services);
 
-	    if (!this.isMultiSorted() 
-		    && !isSomeIntegerSort(vars.getQuantifiableVariable(0).sort())) {
+	    if (!this.isMultiSorted() || !isSomeIntegerSort(vars.getQuantifiableVariable(0).sort())) {
 		// add the typepredicate
 		// a and is needed!!
 		//This is not the case, if the variable, that is quantified ofer is of some
@@ -1345,7 +1367,9 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 			StringBuffer subterm = translateTerm(term.sub(i), quantifiedVars,
 				services);
 			//add the typecast, if needed
-			subterm = this.castIfNeccessary(subterm, term.sub(i).sort(), fun.argSort(i));
+			if (this.isMultiSorted()) {
+			    subterm = this.castIfNeccessary(subterm, term.sub(i).sort(), fun.argSort(i));
+			}
 			subterms.add(subterm);
 		    }
 		    ArrayList<Sort> sorts = new ArrayList<Sort>();
@@ -1428,7 +1452,9 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 			//make type casts, if neccessary
 			StringBuffer subterm = translateTerm(term.sub(i), quantifiedVars,
 				services);
-			subterm = this.castIfNeccessary(subterm, term.sub(i).sort(), fun.argSort(i));
+			if (this.isMultiSorted()) {
+			    subterm = this.castIfNeccessary(subterm, term.sub(i).sort(), fun.argSort(i));
+			}
 			subterms.add(subterm);
 		    }
 		    ArrayList<Sort> sorts = new ArrayList<Sort>();
@@ -1505,21 +1531,20 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
      * @return A stringBuffer containing a type cast, if neccessary.
      */
     private StringBuffer castIfNeccessary(StringBuffer formula, Sort formulaSort, Sort targetSort) {
-	if (this.isMultiSorted()) {
+	if (!this.isMultiSorted()) {
 	    return formula;
-	} else {
-	    if (isSomeIntegerSort(formulaSort) && !isSomeIntegerSort(targetSort)) {
-		return this.cast(formula);
-	    } else if (!isSomeIntegerSort(formulaSort) && isSomeIntegerSort(targetSort)) {
-		throw new RuntimeException("Error while translation.\n" +
+	}
+	if (isSomeIntegerSort(formulaSort) && !isSomeIntegerSort(targetSort)) {
+	    return this.cast(formula);
+	} else if (!isSomeIntegerSort(formulaSort) && isSomeIntegerSort(targetSort)) {
+	    throw new RuntimeException("Error while translation.\n" +
 				"Not possible to perform a typecast\n" +
 				"for the formula " + formula + "\n" +
 				"from type " + formulaSort.toString() + "\n" +
 				"to type " + targetSort.toString() + "\n" +
 				"Heavy internal error. Notify the administrator of the KeY tool.");
-	    } else {
-		return formula;
-	    }
+	} else {
+	    return formula;
 	}
     }
     
@@ -1530,9 +1555,6 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
      * @return the casted formula.
      */
     private StringBuffer cast(StringBuffer formula) {
-	if (this.isMultiSorted()) {
-	    return formula;
-	}
 	if (this.castPredicate == null) {
 	    this.castPredicate = this.translateFunctionName(
 		    new StringBuffer("castInt2U"));
@@ -1752,23 +1774,22 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 	    StringBuffer sortname = this.translateSort(s.name().toString(),
 		    isSomeIntegerSort(s));
 	    StringBuffer displaysort;
-	    if (this.isMultiSorted()) {
-		displaysort = sortname;
+
+	    if (!this.isMultiSorted()) {
+		displaysort = this.getIntegerSort();
 	    } else {
 		if (isSomeIntegerSort(s)) {
 		    displaysort = this.getIntegerSort();
 		} else {
 		    displaysort = this.standardSort;
 		}
-		
 	    }
+		
 	    StringBuffer realsort = sortname;
 
 	    usedDisplaySort.put(s, displaysort);
 	    usedRealSort.put(s, realsort);
-	    if (!this.isMultiSorted()) {
-		addTypePredicate(realsort, s);
-	    }
+	    addTypePredicate(realsort, s);
 
 	    return displaysort;
 	}
