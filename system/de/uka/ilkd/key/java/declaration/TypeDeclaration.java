@@ -223,13 +223,10 @@ public abstract class TypeDeclaration extends JavaDeclaration
 
         ImmutableList<Field> result = ImmutableSLList.<Field>nil();
 
-        for (int i = 0; i < members.size(); i++) {
-            if (members.get(i) instanceof FieldDeclaration) {
-                FieldDeclaration fds = (FieldDeclaration) members
-                        .get(i);
-                ImmutableArray<FieldSpecification> aofs = fds.getFieldSpecifications();
-                for (int j = 0; j < aofs.size(); j++) {
-                    result = result.append(aofs.get(j));
+        for (MemberDeclaration member : members) {
+            if (member instanceof FieldDeclaration) {                
+                for (FieldSpecification field : ((FieldDeclaration) member).getFieldSpecifications()) {
+                    result = result.append(field);
                 }
             }
         }

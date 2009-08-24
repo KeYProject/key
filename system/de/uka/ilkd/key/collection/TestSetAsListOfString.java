@@ -66,7 +66,7 @@ public class TestSetAsListOfString extends junit.framework.TestCase {
     }
 
     // tests unify
-    public void testUnify() {
+    public void testUnion() {
 	ImmutableSet<String>[] newSet=new ImmutableSet[str.length+1];
 	newSet[0]=DefaultImmutableSet.<String>nil().add(str[0]).add(str[1]);
 	newSet[1]=DefaultImmutableSet.<String>nil().add(str[1]).add(str[2]);
@@ -82,6 +82,24 @@ public class TestSetAsListOfString extends junit.framework.TestCase {
 	assertTrue(!union.contains(str[3]));
     }
 
+    public void testUnionEmptyWithNonEmptySet() {
+	ImmutableSet<String> empty = DefaultImmutableSet.<String>nil();
+	ImmutableSet<String> hal = DefaultImmutableSet.<String>nil().add("H").add("a").add("l");
+	
+	assertEquals("Union of two sets should be symmetric", empty.union(hal), hal.union(empty));
+	assertEquals("Wrong size.", empty.union(hal).size(), 3);	;	
+    }
+
+    public void testUnionRemoveDuplicates() {
+	ImmutableSet<String> hal = DefaultImmutableSet.<String>nil().add("H").add("a").add("l");
+	ImmutableSet<String> lo = DefaultImmutableSet.<String>nil().add("l").add("o");
+	
+	assertEquals("Union of two sets should be symmetric", hal.union(lo), lo.union(hal));
+	assertEquals("Wrong size.", hal.union(lo).size(), 4);	;	
+    }
+
+    
+    
     public void testSubset() {
 	ImmutableSet<String> subSet=DefaultImmutableSet.<String>nil();
 	ImmutableSet<String> superSet=DefaultImmutableSet.<String>nil();

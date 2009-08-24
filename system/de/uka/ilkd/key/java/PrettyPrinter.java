@@ -183,7 +183,7 @@ public class PrettyPrinter {
     private boolean isPrintingSingleLineComments = false;
 
 
-    protected HashMap indentMap=new HashMap();
+    protected HashMap<SourceElement, Position> indentMap=new HashMap<SourceElement, Position>();
 
     /**
        Set a new stream to write to. Useful to redirect the output
@@ -1234,17 +1234,17 @@ public class PrettyPrinter {
     }
 
     private ImmutableArray<Modifier> removeFinal(ImmutableArray<Modifier> ma){
-	LinkedList l = new LinkedList();
-	for(int i=0; i<ma.size(); i++){
-	    if(!(ma.get(i) instanceof Final)){
-		l.add(ma.get(i));
+	LinkedList<Modifier> l = new LinkedList<Modifier>();
+	for (Modifier mod : ma){
+	    if (!(mod instanceof Final)) {
+		l.add(mod);
 	    }
 	}
 	return new ImmutableArray<Modifier>(l);
     }
 
     private ImmutableArray<Modifier> replacePrivateByPublic(ImmutableArray<Modifier> ma){
-	LinkedList l = new LinkedList();
+	LinkedList<Modifier> l = new LinkedList<Modifier>();
 	boolean publicFound = false;
 	for(int i=0; i<ma.size(); i++){
 	    if(ma.get(i) instanceof Private){

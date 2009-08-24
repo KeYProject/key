@@ -6,7 +6,7 @@
 [StrategyProperty]LOOP_OPTIONS_KEY=LOOP_INVARIANT
 [StrategyProperty]USER_TACLETS_OPTIONS_KEY2=USER_TACLETS_OFF
 [StrategyProperty]USER_TACLETS_OPTIONS_KEY1=USER_TACLETS_OFF
-[StrategyProperty]QUANTIFIERS_OPTIONS_KEY=QUANTIFIERS_NON_SPLITTING
+[StrategyProperty]QUANTIFIERS_OPTIONS_KEY=QUANTIFIERS_NON_SPLITTING_WITH_PROGS
 [StrategyProperty]NON_LIN_ARITH_OPTIONS_KEY=NON_LIN_ARITH_DEF_OPS
 [DecisionProcedure]Timeout=60
 [View]ShowWholeTaclet=false
@@ -24,6 +24,6 @@
 [View]HideClosedSubtrees=false
 [View]HideIntermediateProofsteps=false
 [Strategy]ActiveStrategy=JavaCardDLStrategy
-[StrategyProperty]SPLITTING_OPTIONS_KEY=SPLITTING_NORMAL
+[StrategyProperty]SPLITTING_OPTIONS_KEY=SPLITTING_DELAYED
 "
 }

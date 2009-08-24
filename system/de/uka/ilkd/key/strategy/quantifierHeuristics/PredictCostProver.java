@@ -5,15 +5,9 @@
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
-//This file is part of KeY - Integrated Deductive Software Design
-//Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
-//                Universitaet Koblenz-Landau, Germany
-//                Chalmers University of Technology, Sweden
-//
-//The KeY system is protected by the GNU General Public License. 
-//See LICENSE.TXT for details.
 //
 //
+
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
 import java.util.HashSet;
@@ -64,35 +58,32 @@ class PredictCostProver {
 
     // init context
     private void initClauses(Term instance) {
+
 	for (Term t : TriggerUtils.setByOperator(instance, Junctor.AND)) {
-	    // clauses.add(new Clause(literals));
-	    for (ImmutableSet<Term> lit : createClause(TriggerUtils.setByOperator(t, Junctor.OR).iterator())) {
+ 	    for (ImmutableSet<Term> lit : createClause(TriggerUtils.setByOperator(t, Junctor.OR))) {
 		clauses.add(new Clause(lit));
 	    }
 	}
     }
 
-    private Set<ImmutableSet<Term>> createClause(Iterator<Term> terms) {
-	Set<ImmutableSet<Term>> res = new HashSet<ImmutableSet<Term>>();
-
-	if (terms.hasNext()) {
-	    final Term self = terms.next();	    
-	    final Set<ImmutableSet<Term>> next = createClause(terms);
-
-	    if (next.isEmpty()) {
-		createClauseHelper(res, self,  DefaultImmutableSet.<Term>nil());
-	    } else {
-		for(ImmutableSet<Term> ts : next) {
-		    createClauseHelper(res, self, ts);
-		}
+    private ImmutableSet<ImmutableSet<Term>> createClause(ImmutableSet<Term> set)  {
+	final DefaultImmutableSet<ImmutableSet<Term>> nil = 
+	    DefaultImmutableSet.<ImmutableSet<Term>>nil();	
+	ImmutableSet<ImmutableSet<Term>> res = nil.add(DefaultImmutableSet.<Term>nil());
+	for (Term t : set) {	    
+            ImmutableSet<ImmutableSet<Term>> tmp = nil;
+	    for (ImmutableSet<Term> cl : res) {
+		tmp = createClauseHelper(tmp, t, cl);
 	    }
+	    res = tmp;
 	}
 	return res;
     }
 
-    private void createClauseHelper(Set<ImmutableSet<Term>> res, Term self,
-	    ImmutableSet<Term> ts) {	
-	    res.add(ts.add(self));
+    private ImmutableSet<ImmutableSet<Term>> createClauseHelper(ImmutableSet<ImmutableSet<Term>> res, 
+	    Term self, ImmutableSet<Term> ts) {
+	res = res.add(ts.add(self));
+	return res;
     }
 
     // end
@@ -127,7 +118,7 @@ class PredictCostProver {
      * @return trueT if problem is equal axiom, false if problem's negation is
      *         equal axiom. Otherwise retrun problem.
      */
-    private Term provedByequal(Term problem, Term axiom) {
+    private Term directConsequenceOrContradictionOfAxiom(Term problem, Term axiom) {
 	boolean negated = false;
 	Term pro = problem;
 	while (pro.op() == Junctor.NOT) {
@@ -152,7 +143,7 @@ class PredictCostProver {
      *         negation of problem return fastT. Otherwise, return problem
      */
     private Term provedByAnother(Term problem, Term axiom) {
-	Term res = provedByequal(problem, axiom);
+	Term res = directConsequenceOrContradictionOfAxiom(problem, axiom);
 	if (TriggerUtils.isTrueOrFalse(res))
 	    return res;
 	return HandleArith.provedByArith(problem, axiom, services);
@@ -211,9 +202,7 @@ class PredictCostProver {
 	long cost = 1;
 	boolean assertChanged = false;
 	Set<Clause> res = new HashSet<Clause>();
-	Iterator<Clause> it = clauses.iterator();
-	while (it.hasNext()) {
-	    Clause c = (it.next());
+	for (final Clause c : clauses) {
 	    c.firstRefine();
 	    long cCost = c.cost();
 	    if (cCost == 0) {
@@ -227,8 +216,9 @@ class PredictCostProver {
 	    if (c.literals.size() == 1) {
 		assertChanged = true;
 		assertLiterals = assertLiterals.union(c.literals);
-	    } else
+	    } else {
 		res.add(c);
+	    }
 	    cost = cost * cCost;
 	}
 	clauses = res;
@@ -255,13 +245,26 @@ class PredictCostProver {
      * } } return cost; }
      */
 
-    private class Clause {
+    private class Clause implements Iterable<Term>{
 
 	/** all literals contains in this clause */
 	public ImmutableSet<Term> literals = DefaultImmutableSet.<Term> nil();
 
 	public Clause(ImmutableSet<Term> lits) {
 	    literals = lits;
+	}	
+	
+	public boolean equals(Object o) {
+	    if (!(o instanceof Clause)) return false;
+	    final Clause other = (Clause) o;
+	    if (other.literals.size() != literals.size()) {
+		return false;
+	    }
+	    return literals.equals(other.literals);
+	}
+	
+	public int hashCode() {
+	    return literals.hashCode();
 	}
 
 	public Iterator<Term> iterator() {
@@ -273,12 +276,11 @@ class PredictCostProver {
 	 *         Otherwise,return the number of literals it left.
 	 */
 	public long cost() {
-	    if (literals.contains(falseT) && literals.size() == 1)
+	    if (literals.size() == 1 && literals.contains(falseT))
 		return 0;
 	    if (literals.contains(trueT))
 		return -1;
-	    int cost = literals.size();
-	    return cost;
+	    return literals.size();
 	}
 
 	/**
@@ -300,11 +302,8 @@ class PredictCostProver {
 	 */
 	public ImmutableSet<Term> refine(Iterable<? extends Term> assertLits) {
 	    ImmutableSet<Term> res = DefaultImmutableSet.<Term> nil();
-	    Iterator<Term> it = this.iterator();
-	    while (it.hasNext()) {
-		Term lit = it.next();
-		Term temp = proveLiteral(lit, assertLits);
-		final Operator op = temp.op();
+	    for (final Term lit : this) {
+		final Operator op = proveLiteral(lit, assertLits).op();
 		if (op == Junctor.TRUE) {
 		    res = DefaultImmutableSet.<Term> nil().add(trueT);
 		    break;

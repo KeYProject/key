@@ -10,8 +10,6 @@
 
 package de.uka.ilkd.key.speclang.jml;
 
-import java.util.Iterator;
-
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
@@ -37,13 +35,12 @@ class JMLInfoExtractor {
         }
 
         TypeDeclaration td = (TypeDeclaration) containingClass.getJavaType();
-        ImmutableArray<MemberDeclaration> md = td.getMembers();
         FieldDeclaration fd = null;
         int position = 0;
 
-        for (int i = 0; i < md.size(); i++) {
-            if (md.get(i) instanceof FieldDeclaration) {
-                FieldDeclaration tmp = (FieldDeclaration) md.get(i);
+        for (final MemberDeclaration md : td.getMembers()) {
+            if (md instanceof FieldDeclaration) {
+                FieldDeclaration tmp = (FieldDeclaration) md;
                 ImmutableArray<FieldSpecification> aofs = tmp.getFieldSpecifications();
                 for (int j = 0; j < aofs.size(); j++) {
                     if (aofs.get(j).getProgramName().equals(fieldName)) {
@@ -64,16 +61,15 @@ class JMLInfoExtractor {
         comments = comments.prepend(fd.getComments());
         comments = comments.prepend(fd.getTypeReference().getComments());
         comments = comments.prepend(fd.getFieldSpecifications().get(position).getComments());
-        ImmutableArray<Modifier> mods = fd.getModifiers();
-        for (int i = 0; i < mods.size(); i++) {
-            comments = comments.prepend(mods.get(i).getComments());
+        
+        for (Modifier mod : fd.getModifiers()) {
+            comments = comments.prepend(mod.getComments());
         }
 
         boolean non_null = false;
         boolean nullable = false;
 
-        for (Iterator<Comment> it = comments.iterator(); it.hasNext();) {
-            Comment c = it.next();
+        for (final Comment c : comments) {
             if (checkFor("non_null", c.getText()))
                 non_null = true;
             if (checkFor("nullable", c.getText()))
@@ -105,11 +101,10 @@ class JMLInfoExtractor {
         comments = comments.prepend(pd.getComments());
         comments = comments.prepend(pd.getTypeReference().getComments());
         comments = comments.prepend(pd.getVariableSpecification().getComments());
-        for (int j=0; j < pd.getModifiers().size(); j++) {
-            comments = comments.prepend(pd.getModifiers().get(j).getComments());
+        for (Modifier mod : pd.getModifiers()) {
+            comments = comments.prepend(mod.getComments());
         }
-        for (Iterator<Comment> it = comments.iterator(); it.hasNext(); ) {
-            Comment c = it.next();
+        for (final Comment c : comments) {
             if (checkFor("nullable",c.getText()))
                 return true;
             else if (checkFor("non_null",c.getText())) {
@@ -125,9 +120,8 @@ class JMLInfoExtractor {
         MethodDeclaration md = pm.getMethodDeclaration();
         
         ImmutableList<Comment> comments = ImmutableSLList.<Comment>nil();
-        ImmutableArray<Modifier> mods = md.getModifiers();
-        for (int i=0; i < mods.size(); i++) {
-            comments = comments.prepend(mods.get(i).getComments());
+        for (final Modifier mod : md.getModifiers()) {
+            comments = comments.prepend(mod.getComments());
         }        
         if (md.getTypeReference() != null) {
             comments = comments.prepend(md.getTypeReference().getComments());
@@ -137,11 +131,10 @@ class JMLInfoExtractor {
             comments = comments.prepend(methodComments[methodComments.length - 1]);
         }
 
-        for(Iterator<Comment> it = comments.iterator(); it.hasNext(); ) {
-            Comment c = it.next();
-            if(checkFor("nullable", c.getText())) {
+        for (final Comment c : comments) {
+            if (checkFor("nullable",c.getText()))
                 return true;
-            } else if(checkFor("non_null", c.getText())) {
+            else if (checkFor("non_null",c.getText())) {
                 return false;
             }
         }
@@ -158,10 +151,9 @@ class JMLInfoExtractor {
         MethodDeclaration method = pm.getMethodDeclaration();
         
         // Either "pure" is attached to a modifier ....
-        ImmutableArray<Modifier> mods = method.getModifiers();
-        for (int i=0; i < mods.size(); i++) {
-            coms = coms.prepend(mods.get(i).getComments());
-        }       
+        for (final Modifier mod : method.getModifiers()) {
+            coms = coms.prepend(mod.getComments());
+        }      
         
         // .... or to the return type ....
         if (method.getTypeReference() != null) {
@@ -177,8 +169,8 @@ class JMLInfoExtractor {
         // .... or to the method name
         coms = coms.prepend(method.getProgramElementName().getComments());
         
-        for (Iterator<Comment> it = coms.iterator(); it.hasNext(); ) {
-            if (checkFor("pure", it.next().getText()))
+        for (Comment c : coms) {
+            if (checkFor("pure", c.getText()))
                 return true;
         }
         
@@ -209,15 +201,15 @@ class JMLInfoExtractor {
         if(td.getProgramElementName() != null) {
             coms = coms.prepend(td.getProgramElementName().getComments());
         }
-        ImmutableArray<Modifier> mods = td.getModifiers();
-        for (int i=0; i < mods.size(); i++) {
-            coms = coms.prepend(mods.get(i).getComments());
+
+        for (final Modifier mod : td.getModifiers()) {
+            coms = coms.prepend(mod.getComments());
         }
         
         // Check if a comment is a JML annotation containing
         // "nullable_by_default"
-        for (Iterator<Comment> it = coms.iterator(); it.hasNext(); ) {
-            if (checkFor("pure", it.next().getText()))
+        for (Comment c : coms) {
+            if (checkFor("pure", c.getText()))
                 return true;
         }
     
@@ -245,15 +237,14 @@ class JMLInfoExtractor {
         if(td.getProgramElementName() != null) {
             coms = coms.prepend(td.getProgramElementName().getComments());
         }
-        ImmutableArray<Modifier> mods = td.getModifiers();
-        for (int i=0; i < mods.size(); i++) {
-            coms = coms.prepend(mods.get(i).getComments());
+        for (final Modifier mod : td.getModifiers()) {
+            coms = coms.prepend(mod.getComments());
         }
         
         // Check if a comment is a JML annotation containing
         // "nullable_by_default"
-        for (Iterator<Comment> it = coms.iterator(); it.hasNext(); ) {
-            if (checkFor("nullable_by_default", it.next().getText()))
+        for (Comment c : coms) {
+            if (checkFor("nullable_by_default", c.getText()))
                 return true;
         }
     

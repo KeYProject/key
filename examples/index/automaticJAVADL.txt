@@ -1,6 +1,7 @@
 ./heap/anonymise_datagroup.key
 ./heap/array_creation.key
 ./heap/arrays_with_disjoint_sorts.key
+./heap/arrays.key
 ./heap/attributes.key
 ./heap/dependencies.key
 ./heap/loop1.key
@@ -8,6 +9,7 @@
 ./heap/modifies_datagroup.key
 ./heap/modifies.key
 ./heap/select_store.key
+./heap/selection_sort.key
 ./heap/sets_and_pairs.key
 ./standard_key/arith/binomial1.key
 ./standard_key/arith/binomial2.key

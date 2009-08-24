@@ -65,8 +65,7 @@ public class FieldDeclaration extends VariableDeclaration implements MemberDecla
 	    ImmutableArray<FieldSpecification>((FieldSpecification[])
 				      children.collect(FieldSpecification.class));
     }
-
-
+    
     public ImmutableArray<FieldSpecification> getFieldSpecifications() {
         return fieldSpecs;
     }

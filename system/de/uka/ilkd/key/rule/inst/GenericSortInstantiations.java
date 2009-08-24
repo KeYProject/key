@@ -248,7 +248,7 @@ public final class GenericSortInstantiations {
 
 	if ( res == null )
 	    throw new GenericSortException
-		( "Conditions for generic sorts could not be solved: " +
+		( "Conditions for generic sorts could not be solved: ", 
 		  p_conditions );
 
 	return res;
