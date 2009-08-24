@@ -31,7 +31,6 @@ import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.OpReplacer;
-import de.uka.ilkd.key.proof.init.CreatedAttributeTermFactory;
 import de.uka.ilkd.key.proof.mgt.ContractWithInvs;
 import de.uka.ilkd.key.rule.inst.ContextStatementBlockInstantiation;
 import de.uka.ilkd.key.speclang.ClassInvariant;
@@ -49,8 +48,6 @@ public class UseOperationContractRule implements BuiltInRule {
     private static final TermBuilder TB = TermBuilder.DF;
     private static final SignatureVariablesFactory SVF 
         = SignatureVariablesFactory.INSTANCE;
-    private static final CreatedAttributeTermFactory CATF 
-        = CreatedAttributeTermFactory.INSTANCE;
     private static final String INIT_NAME 
 	= ConstructorNormalformBuilder.CONSTRUCTOR_NORMALFORM_IDENTIFIER;
     

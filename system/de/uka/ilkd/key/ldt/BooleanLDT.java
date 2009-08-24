@@ -36,12 +36,12 @@ public final class BooleanLDT extends LDT {
     private final Term term_bool_false;
     
 
-    public BooleanLDT(Namespace sorts, Namespace functions) {
-        super(NAME, sorts);
+    public BooleanLDT(Services services) {
+        super(NAME, services);
         
-        bool_true       = addFunction((Function)functions.lookup(new Name("TRUE")));
+        bool_true       = addFunction(services, "TRUE");
 	term_bool_true  = TermBuilder.DF.func(bool_true);
-	bool_false      = addFunction((Function)functions.lookup(new Name("FALSE")));
+	bool_false      = addFunction(services, "FALSE");
 	term_bool_false = TermBuilder.DF.func(bool_false);
     }
     

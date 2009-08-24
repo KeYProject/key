@@ -65,15 +65,6 @@ public class InvInferenceTools {
     
     
     /**
-     * Universally closes a formula.
-     */
-    public Term close(Term formula) {
-	assert formula.sort() == Sort.FORMULA;
-	return TB.all(formula.freeVars().toArray(new QuantifiableVariable[0]), formula);
-    }
-    
-    
-    /**
      * Returns the set of elementary conjuncts of the passed formula.
      */
     public ImmutableSet<Term> toSet(Term formula) {
@@ -393,34 +384,6 @@ public class InvInferenceTools {
             result = result.union(getOccurringLocationSymbols(t.sub(i)));
         }
         return result;
-    }
-    
-    
-    /**
-     * Returns an available name constructed by affixing a counter to the passed 
-     * base name.
-     */
-    public String getNewName(String baseName, 
-                             Services services, 
-                             ImmutableList<String> locallyUsedNames) {
-        NamespaceSet namespaces = services.getNamespaces();
-            
-        int i = 0;
-        String result = baseName;
-        while(namespaces.lookup(new Name(result)) != null) {
-            result = baseName + "_" + i++;
-        }
-        
-        return result;
-    }
-    
-    
-    /**
-     * Returns an available name constructed by affixing a counter to the passed 
-     * base name.
-     */
-    public String getNewName(String baseName, Services services) {
-        return getNewName(baseName, services, ImmutableSLList.<String>nil());
     }
     
     

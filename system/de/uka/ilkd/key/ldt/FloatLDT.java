@@ -14,13 +14,10 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.expression.Literal;
-import de.uka.ilkd.key.java.expression.literal.BooleanLiteral;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.ExtList;
 
 /**
@@ -28,12 +25,12 @@ import de.uka.ilkd.key.util.ExtList;
  * 
  * At the moment this class contains only stubs.
  */
-public class FloatLDT extends LDT {
+public final class FloatLDT extends LDT {
     
     public static final Name NAME = new Name("float");    
 
-    public FloatLDT(Namespace sorts, Namespace functions) {
-	super(NAME, sorts);
+    public FloatLDT(Services services) {
+	super(NAME, services);
     }
     
     

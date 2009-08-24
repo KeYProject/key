@@ -16,7 +16,6 @@ import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.util.ExtList;
@@ -26,13 +25,13 @@ import de.uka.ilkd.key.util.ExtList;
  * 
  * At the moment this class contains only stubs.
  */
-public class DoubleLDT extends LDT {
+public final class DoubleLDT extends LDT {
     
     public static final Name NAME = new Name("double");    
     
 
-    public DoubleLDT(Namespace sorts, Namespace functions) {
-	super(NAME, sorts);
+    public DoubleLDT(Services services) {
+	super(NAME, services);
     }
     
     

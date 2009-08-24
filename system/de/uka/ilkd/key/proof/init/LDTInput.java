@@ -15,6 +15,7 @@ import java.util.List;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.gui.IMain;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.*;
 import de.uka.ilkd.key.logic.Namespace;
 
@@ -119,14 +120,13 @@ public class LDTInput implements EnvInput {
 	}
 		
 	//create LDT objects
-        Namespace sorts     = initConfig.sortNS();
-        Namespace functions = initConfig.funcNS();
+        Services services = initConfig.getServices();
         ImmutableList<LDT> ldts = ImmutableSLList.<LDT>nil()
-                        	.prepend(new IntegerLDT(sorts, functions))
-                        	.prepend(new BooleanLDT(sorts, functions))
-                        	.prepend(new PairLDT(sorts, functions))
-                        	.prepend(new SetLDT(sorts, functions))
-                        	.prepend(new HeapLDT(sorts, functions, initConfig.progVarNS()));
+                        	.prepend(new IntegerLDT(services))
+                        	.prepend(new BooleanLDT(services))
+                        	.prepend(new PairLDT(services))
+                        	.prepend(new SetLDT(services))
+                        	.prepend(new HeapLDT(services));
         initConfig.getServices().getTypeConverter().init(ldts);
     }
   

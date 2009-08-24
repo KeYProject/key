@@ -29,8 +29,6 @@ header {
     import de.uka.ilkd.key.logic.op.*;
     import de.uka.ilkd.key.logic.sort.*;
     import de.uka.ilkd.key.proof.OpReplacer;
-    import de.uka.ilkd.key.proof.init.CreatedAttributeTermFactory;
-    import de.uka.ilkd.key.speclang.FormulaWithAxioms;
     import de.uka.ilkd.key.speclang.PositionedString;
     import de.uka.ilkd.key.speclang.translation.*;
     import de.uka.ilkd.key.util.Pair;
@@ -153,7 +151,7 @@ options {
     }
 	
 
-    public FormulaWithAxioms parseExpression() throws SLTranslationException {
+    public Term parseExpression() throws SLTranslationException {
     
 	Term result = null;
 	this.currentlyParsing = true;
@@ -166,11 +164,11 @@ options {
 
 	this.currentlyParsing = false;
 
-	return new FormulaWithAxioms(convertToFormula(result));
+	return convertToFormula(result);
     }
 
 
-    public FormulaWithAxioms parseSignals() throws SLTranslationException {
+    public Term parseSignals() throws SLTranslationException {
 
 	Term result = null;
 	this.currentlyParsing = true;
@@ -183,11 +181,11 @@ options {
 
 	this.currentlyParsing = false;
 
-	return new FormulaWithAxioms(convertToFormula(result));
+	return convertToFormula(result);
     }
 
 
-    public FormulaWithAxioms parseSignalsOnly() throws SLTranslationException {
+    public Term parseSignalsOnly() throws SLTranslationException {
 
 	ImmutableList<KeYJavaType> signalsonly = null;
 	this.currentlyParsing = true;
@@ -216,7 +214,7 @@ options {
 		    TB.TRUE(services)));
 	}
 
-	return new FormulaWithAxioms(result);
+	return result;
     }
 
 
@@ -1592,8 +1590,7 @@ jmlprimary returns [SLExpression result=null] throws SLTranslationException
 	             .sort()
 	             .extendsTrans(services.getJavaInfo().objectSort())) {
 		result = new SLExpression(
-		    CreatedAttributeTermFactory.INSTANCE.
-			createCreatedTerm(services, result.getTerm()));
+		    TB.dotCreated(services, result.getTerm()));
 	    } else {
 		raiseError("\\created only allowed for reference types.");
 	    }

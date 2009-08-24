@@ -20,7 +20,6 @@ import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.speclang.FormulaWithAxioms;
 
 
 /**
@@ -131,15 +130,6 @@ public class OpReplacer {
     }
     
    
-    /**
-     * Replaces in a FormulaWithAxioms.
-     */
-    public FormulaWithAxioms replace(FormulaWithAxioms fwa) {
-        return new FormulaWithAxioms(replace(fwa.getFormula()), 
-                                     replace(fwa.getAxioms()));
-    }
-    
-    
     /**
      * Replaces in an ImmutableArray<QuantifiableVariable>.
      */

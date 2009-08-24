@@ -30,7 +30,7 @@ public final class LoopInvariantImpl implements LoopInvariant {
         
     private final LoopStatement loop;
     private final Term originalInvariant;
-    private final LoopPredicateSet originalPredicates;
+    private final ImmutableSet<Term> originalPredicates;
     private final Term originalModifies;
     private final Term originalVariant;
     private final Term originalSelfTerm;
@@ -56,7 +56,7 @@ public final class LoopInvariantImpl implements LoopInvariant {
      */
     public LoopInvariantImpl(LoopStatement loop,
                              Term invariant,
-                             LoopPredicateSet predicates,
+                             ImmutableSet<Term> predicates,
                              Term modifies,  
                              Term variant, 
                              Term selfTerm,
@@ -85,7 +85,7 @@ public final class LoopInvariantImpl implements LoopInvariant {
 	    		     Term heapAtPre) {
         this(loop, 
              null, 
-             new LoopPredicateSet(DefaultImmutableSet.<Term>nil()), 
+             DefaultImmutableSet.<Term>nil(), 
              null, 
              null, 
              selfTerm,
@@ -161,13 +161,13 @@ public final class LoopInvariantImpl implements LoopInvariant {
     }
     
     
-    public LoopPredicateSet getPredicates(Term selfTerm,
-            Term heapAtPre,
-            Services services) {
+    public ImmutableSet<Term> getPredicates(Term selfTerm,
+            				    Term heapAtPre,
+            				    Services services) {
         assert (selfTerm == null) == (originalSelfTerm == null);
         Map replaceMap = getReplaceMap(selfTerm, heapAtPre, services);
         OpReplacer or = new OpReplacer(replaceMap);
-        return new LoopPredicateSet(or.replace(originalPredicates.asSet()));
+        return or.replace(originalPredicates);
     }
 
     
@@ -256,7 +256,7 @@ public final class LoopInvariantImpl implements LoopInvariant {
         OpReplacer or = new OpReplacer(inverseReplaceMap);
         return new LoopInvariantImpl(loop,
                                      originalInvariant,
-                                     new LoopPredicateSet(or.replace(predicates)),
+                                     or.replace(predicates),
                                      originalModifies,
                                      originalVariant,
                                      originalSelfTerm,

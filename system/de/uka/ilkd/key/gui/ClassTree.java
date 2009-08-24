@@ -13,6 +13,7 @@ package de.uka.ilkd.key.gui;
 import java.awt.Component;
 import java.util.*;
 
+import javax.swing.Icon;
 import javax.swing.JLabel;
 import javax.swing.JTree;
 import javax.swing.tree.*;
@@ -32,6 +33,8 @@ class ClassTree extends JTree {
     private static final String INIT_NAME 
         =  ConstructorNormalformBuilder.CONSTRUCTOR_NORMALFORM_IDENTIFIER;
     
+    private final Map<ProgramMethod,Icon> methodIcons;
+    
     
     //-------------------------------------------------------------------------
     //constructors
@@ -41,10 +44,12 @@ class ClassTree extends JTree {
 	             boolean skipLibraryClasses,
 	    	     KeYJavaType defaultClass,
 	    	     ProgramMethod defaultPm,
-	    	     Services services) {
+	    	     Services services,
+	    	     Map<ProgramMethod,Icon> methodIcons) {
 	super(new DefaultTreeModel(createTree(addOperations, 
 					      skipLibraryClasses, 
 					      services)));
+	this.methodIcons = methodIcons;
 	if(defaultPm != null) {
 	    defaultClass = defaultPm.getContainerType();
 	}
@@ -83,13 +88,28 @@ class ClassTree extends JTree {
 							     	hasFocus);
 		    
 		    if(entry.pm != null && result instanceof JLabel) {
-			((JLabel) result).setIcon(null);
+			((JLabel) result).setIcon(
+				ClassTree.this.methodIcons.get(entry.pm));
 		    }
 		}
 		
 		return result;
 	    }
 	});
+    }
+    
+    
+    public ClassTree(boolean addOperations, 
+	             boolean skipLibraryClasses,
+	    	     KeYJavaType defaultClass,
+	    	     ProgramMethod defaultPm,
+	    	     Services services) {
+	this(addOperations, 
+	     skipLibraryClasses, 
+	     defaultClass, 
+	     defaultPm, 
+	     services, 
+	     new HashMap<ProgramMethod,Icon>());
     }
     
     

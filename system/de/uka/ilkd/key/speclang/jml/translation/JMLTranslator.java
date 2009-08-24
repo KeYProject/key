@@ -15,7 +15,6 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.speclang.FormulaWithAxioms;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 
@@ -36,14 +35,13 @@ class JMLTranslator {
     /**
      * Translates a normal top-level JML expression, i.e. a formula.
      */
-    public FormulaWithAxioms translateExpression(
-	    				PositionedString expr,
-                                        KeYJavaType specInClass,
-                                        ProgramVariable selfVar, 
-                                        ImmutableList<ProgramVariable> paramVars,
-                                        ProgramVariable resultVar,
-                                        ProgramVariable excVar,
-                                        Term heapAtPre) 
+    public Term translateExpression(PositionedString expr,
+                                    KeYJavaType specInClass,
+                                    ProgramVariable selfVar, 
+                                    ImmutableList<ProgramVariable> paramVars,
+                                    ProgramVariable resultVar,
+                                    ProgramVariable excVar,
+                                    Term heapAtPre) 
             throws SLTranslationException {
         assert expr != null;
         assert specInClass != null;
@@ -57,7 +55,7 @@ class JMLTranslator {
     					       excVar,
                                                heapAtPre);
     	
-    	FormulaWithAxioms result = null;
+    	Term result = null;
     	
 //    	System.out.println("JMLTranslator.translateExpression("+expr+")" + " in " + expr.fileName);
     	
@@ -77,14 +75,14 @@ class JMLTranslator {
      * or
      *       "(typename varname) expression"
      */
-    public FormulaWithAxioms translateSignalsExpression(
-	    				PositionedString signalsExpr,
-                                        KeYJavaType specInClass,
-                                        ProgramVariable selfVar, 
-                                        ImmutableList<ProgramVariable> paramVars, 
-                                        ProgramVariable resultVar, 
-                                        ProgramVariable excVar,
-                                        Term heapAtPre)
+    public Term translateSignalsExpression(
+	    			PositionedString signalsExpr,
+                                KeYJavaType specInClass,
+                                ProgramVariable selfVar, 
+                                ImmutableList<ProgramVariable> paramVars, 
+                                ProgramVariable resultVar, 
+                                ProgramVariable excVar,
+                                Term heapAtPre)
             throws SLTranslationException {
         
         KeYJMLParser parser = new KeYJMLParser(signalsExpr,
@@ -96,7 +94,7 @@ class JMLTranslator {
                                                excVar,
                                                heapAtPre);
         
-        FormulaWithAxioms result = null;
+        Term result = null;
         
 //      System.out.println("JMLTranslator.translateSignalsExpression("+signalsExpr+") results: ");
 
@@ -113,7 +111,7 @@ class JMLTranslator {
      * Translates an expression as it occurs in JML signals_only-clauses,
      * i.e. a list of types.
      */
-    public FormulaWithAxioms translateSignalsOnlyExpression(
+    public Term translateSignalsOnlyExpression(
 	    				PositionedString signalsOnlyExpr,
                                         KeYJavaType specInClass,
 	    				ProgramVariable excVar)
@@ -128,7 +126,7 @@ class JMLTranslator {
                                                excVar,
                                                null);
         
-        FormulaWithAxioms result = null;
+        Term result = null;
         
 //          System.out.println("JMLTranslator.translateSignalsOnlyExpression("+signalsOnlyExpr+") results: ");
 

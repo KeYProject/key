@@ -89,7 +89,7 @@ public class StrategySettings implements Settings {
         String timeoutString = props.getProperty(TIMEOUT_KEY);
     
         long localTimeout = -1;
-        int numSteps = 1000;
+        int numSteps = 10000;
     
         if (numString != null){
             try {

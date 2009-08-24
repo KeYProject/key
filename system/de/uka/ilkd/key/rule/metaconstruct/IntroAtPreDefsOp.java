@@ -35,17 +35,13 @@ import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.speclang.LoopInvariant;
 import de.uka.ilkd.key.speclang.LoopInvariantImpl;
-import de.uka.ilkd.key.speclang.LoopPredicateSet;
 import de.uka.ilkd.key.util.InvInferenceTools;
 import de.uka.ilkd.key.util.Pair;
 
 
 
 public final class IntroAtPreDefsOp extends AbstractMetaOperator {
-    
-    private static final InvInferenceTools IIT 
-    	= InvInferenceTools.INSTANCE;
-       
+          
     public IntroAtPreDefsOp() {
         super(new Name("#introAtPreDefs"), 1);
     }
@@ -97,7 +93,7 @@ public final class IntroAtPreDefsOp extends AbstractMetaOperator {
         final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
         final String methodName = frame.getProgramMethod().getName();
 	final ProgramElementName heapBeforeLoopName 
-		= new ProgramElementName(IIT.getNewName("heapBefore_" + methodName, 
+		= new ProgramElementName(TB.getNewName("heapBefore_" + methodName, 
 							services));
 	final LocationVariable heapAtPreVar 
 		= new LocationVariable(heapBeforeLoopName,
@@ -121,7 +117,7 @@ public final class IntroAtPreDefsOp extends AbstractMetaOperator {
                 }
                 final Term newInvariant 
                     = inv.getInvariant(selfTerm, heapAtPre, services);
-                final LoopPredicateSet newPredicates
+                final ImmutableSet<Term> newPredicates
                     = inv.getPredicates(selfTerm, heapAtPre, services);
                 final Term newModifies
                     = inv.getModifies(selfTerm, heapAtPre, services);

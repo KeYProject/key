@@ -221,9 +221,10 @@ public final class ProblemLoader implements Runnable {
         	   if(envInput instanceof KeYFile) {
         	       initConfig.setOriginalKeYFileName(envInput.name());
         	   }
-        	   POBrowser poBrowser = POBrowser.showInstance(initConfig);        	       
-        	   po = poBrowser.getAndClearPO();
-        	   if(po == null) {
+        	   ProofManagementDialog.showInstance(initConfig);
+        	   if(ProofManagementDialog.startedProof()) {
+        	       return status;
+        	   } else {
         	       return "Aborted.";
         	   }
                }

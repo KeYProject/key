@@ -77,7 +77,7 @@ public class JMLSpecFactory {
     private String getContractName(Behavior behavior) {
         return "JML " 
 	    + behavior 
-	    + "operation contract (id: " + contractCounter++ + ")";
+	    + "contract (id: " + contractCounter++ + ")";
     }
     
     
@@ -216,9 +216,9 @@ public class JMLSpecFactory {
         Term heapAtPre = TB.func(SVF.createHeapAtPreFunc(services, false));
 
         //translate requires
-        FormulaWithAxioms requires = FormulaWithAxioms.TT;
+        Term requires = TB.tt();
         for(PositionedString expr : originalRequires) {
-            FormulaWithAxioms translated 
+            Term translated 
                 = translator.translateExpression(
                     expr,
                     programMethod.getContainerType(),
@@ -227,7 +227,7 @@ public class JMLSpecFactory {
                     null, 
                     null,
                     null);
-            requires = requires.conjoin(translated);        
+            requires = TB.and(requires, translated);        
         }
 
         //translate assignable
@@ -243,9 +243,9 @@ public class JMLSpecFactory {
         }
 
         //translate ensures
-        FormulaWithAxioms ensures = FormulaWithAxioms.TT;
+        Term ensures = TB.tt();
         for(PositionedString expr : originalEnsures) {
-            FormulaWithAxioms translated 
+            Term translated 
                 = translator.translateExpression(
                     expr,
                     programMethod.getContainerType(),
@@ -254,13 +254,13 @@ public class JMLSpecFactory {
                     resultVar, 
                     excVar,
                     heapAtPre);
-            ensures = ensures.conjoin(translated);        
+            ensures = TB.and(ensures, translated);        
         }
 
         //translate signals
-        FormulaWithAxioms signals = FormulaWithAxioms.TT;
+        Term signals = TB.tt();
         for(PositionedString expr : originalSignals) {
-            FormulaWithAxioms translated 
+            Term translated 
                 = translator.translateSignalsExpression(
                     expr, 
                     programMethod.getContainerType(),
@@ -269,24 +269,24 @@ public class JMLSpecFactory {
                     resultVar, 
                     excVar,
                     heapAtPre);
-            signals = signals.conjoin(translated);        
+            signals = TB.and(signals, translated);        
         }
 
         //translate signals_only
-        FormulaWithAxioms signalsOnly = FormulaWithAxioms.TT;
+        Term signalsOnly = TB.tt();
         for(PositionedString expr : originalSignalsOnly) {
-            FormulaWithAxioms translated 
+            Term translated 
                 = translator.translateSignalsOnlyExpression(
                     expr,
                     programMethod.getContainerType(),
                     excVar);
-            signalsOnly = signalsOnly.conjoin(translated);        
+            signalsOnly = TB.and(signalsOnly, translated);
         }
 
         //translate diverges
-        FormulaWithAxioms diverges = FormulaWithAxioms.FF;
+        Term diverges = TB.tt();
         for(PositionedString expr : originalDiverges) {
-            FormulaWithAxioms translated 
+            Term translated 
                 = translator.translateExpression(
                     expr, 
                     programMethod.getContainerType(),
@@ -295,41 +295,39 @@ public class JMLSpecFactory {
                     null, 
                     null,
                     null);
-            diverges = diverges.disjoin(translated);        
+            diverges = TB.and(diverges, translated);        
         }
 
         //translate normal_behavior / exceptional_behavior
         if(originalBehavior == Behavior.NORMAL_BEHAVIOR) {
             assert originalSignals.isEmpty();
             assert originalSignalsOnly.isEmpty();
-            signals = FormulaWithAxioms.FF;
-            signalsOnly = FormulaWithAxioms.FF;
+            signals = TB.ff();
+            signalsOnly = TB.ff();
         } else if(originalBehavior == Behavior.EXCEPTIONAL_BEHAVIOR) {
             assert originalEnsures.isEmpty();
-            ensures = FormulaWithAxioms.FF;
+            ensures = TB.ff();
         }
 
         //create contract(s)
         ImmutableSet<OperationContract> result 
             = DefaultImmutableSet.<OperationContract>nil();
-        FormulaWithAxioms excNull 
-            = new FormulaWithAxioms(TB.equals(TB.var(excVar), 
-                                              TB.NULL(services)));
-        FormulaWithAxioms post1 
+        Term excNull = TB.equals(TB.var(excVar), TB.NULL(services));
+        Term post1 
             = (originalBehavior == Behavior.NORMAL_BEHAVIOR
                ? ensures
-               : excNull.imply(ensures));
-        FormulaWithAxioms post2 
+               : TB.imp(excNull, ensures));
+        Term post2 
             = (originalBehavior == Behavior.EXCEPTIONAL_BEHAVIOR
-               ? signals.conjoin(signalsOnly)
-               : excNull.negate().imply(signals.conjoin(signalsOnly)));
-        FormulaWithAxioms post = post1.conjoin(post2);
+               ? TB.and(signals, signalsOnly)
+               : TB.imp(TB.not(excNull), TB.and(signals, signalsOnly)));
+        Term post = TB.and(post1, post2);
         String name = getContractName(originalBehavior);        
         String displayName = (customName.text.length() > 0 
                               ? customName.text + " [" + name + "]" 
                               : name); 
         
-        if(diverges.equals(FormulaWithAxioms.FF)) {
+        if(diverges.equals(TB.ff())) {
             OperationContract contract
                 = new OperationContractImpl(name,
                                             displayName,
@@ -344,7 +342,7 @@ public class JMLSpecFactory {
                                             excVar,
                                             heapAtPre); 
             result = result.add(contract);
-        } else if(diverges.equals(FormulaWithAxioms.TT)) {
+        } else if(diverges.equals(TB.tt())) {
             OperationContract contract
                 = new OperationContractImpl(name,
                                             displayName,
@@ -369,7 +367,7 @@ public class JMLSpecFactory {
                                             displayName,
                                             programMethod,
                                             Modality.DIA,
-                                            requires.conjoin(diverges.negate()),
+                                            TB.and(requires, TB.not(diverges)),
                                             post,
                                             assignable,
                                             selfVar,
@@ -432,13 +430,13 @@ public class JMLSpecFactory {
         	= new LocationVariable(new ProgramElementName("self"), kjt);
         
         //translate expression
-        FormulaWithAxioms inv = translator.translateExpression(originalInv,
-                                                               kjt,
-                                                               selfVar,
-                                                               null,
-                                                               null,
-                                                               null,
-                                                               null);        
+        Term inv = translator.translateExpression(originalInv,
+        					  kjt,
+        					  selfVar,
+        					  null,
+        					  null,
+        					  null,
+        					  null);        
         //create invariant
         String name = getInvName();
         return new ClassInvariantImpl(name,
@@ -564,7 +562,7 @@ public class JMLSpecFactory {
         } else {
             invariant = TB.tt();
             for(PositionedString expr : originalInvariant) {
-                FormulaWithAxioms translated 
+                Term translated 
                     = translator.translateExpression(
                                             expr, 
                                             programMethod.getContainerType(),
@@ -573,8 +571,7 @@ public class JMLSpecFactory {
                                             null, 
                                             null,
                                             heapAtPre);
-                assert translated.getAxioms().isEmpty();
-                invariant = TB.and(invariant, translated.getFormula());
+                invariant = TB.and(invariant, translated);
             }
         }
 
@@ -595,7 +592,7 @@ public class JMLSpecFactory {
             String[] exprs = ps.text.split(",", 0);
             
             for(int i = 0; i < exprs.length; i++) {
-                FormulaWithAxioms translated
+                Term translated
                     = translator.translateExpression(
                             new PositionedString(exprs[i]), 
                             programMethod.getContainerType(),
@@ -604,8 +601,7 @@ public class JMLSpecFactory {
                             null, 
                             null,
                             heapAtPre);
-                assert translated.getAxioms().isEmpty();
-                predicates = predicates.add(translated.getFormula());                
+                predicates = predicates.add(translated);                
             }
         }
         
@@ -626,7 +622,7 @@ public class JMLSpecFactory {
         if(originalVariant == null) {
             variant = null;
         } else {
-            FormulaWithAxioms translated 
+            Term translated 
                 = translator.translateExpression(
                                         originalVariant,
                                         programMethod.getContainerType(),
@@ -635,15 +631,14 @@ public class JMLSpecFactory {
                                         null,
                                         null,
                                         heapAtPre);
-            assert translated.getAxioms().isEmpty();
-            variant = translated.getFormula();
+            variant = translated;
         }
         
         //create loop invariant annotation
         Term selfTerm = selfVar == null ? null : TB.var(selfVar);
         return new LoopInvariantImpl(loop,
                                      invariant,
-                                     new LoopPredicateSet(predicates),
+                                     predicates,
                                      assignable,
                                      variant,
                                      selfTerm,

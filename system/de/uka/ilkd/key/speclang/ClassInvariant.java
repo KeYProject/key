@@ -12,6 +12,7 @@ package de.uka.ilkd.key.speclang;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.ParsableVariable;
 
 
@@ -40,23 +41,22 @@ public interface ClassInvariant {
      * Returns the invariant formula with implicit all-quantification over
      * the receiver object.
      */
-    public FormulaWithAxioms getClosedInv(Services services);
+    public Term getClosedInv(Services services);
     
     /**
      * Returns the invariant formula with implicit all-quantification over
      * all objects, excluding the object held by the passed variable.
      */
-    public FormulaWithAxioms getClosedInvExcludingOne(
-	    					ParsableVariable excludedVar, 
-	                                        Services services);
+    public Term getClosedInvExcludingOne(ParsableVariable excludedVar, 
+	    				 Services services);
     
   
     /**
      * Returns the invariant formula without implicit all-quantification over
      * the receiver object.
      */
-    public FormulaWithAxioms getOpenInv(ParsableVariable selfVar, 
-	      			        Services services);
+    public Term getOpenInv(ParsableVariable selfVar, 
+	    		   Services services);
     
     /**
      * Returns the invariant in pretty HTML format.

@@ -116,13 +116,13 @@ public class DLSpecFactory {
     }
     
     
-    private FormulaWithAxioms extractPre(Term fma) {
-        return new FormulaWithAxioms(fma.sub(0));
+    private Term extractPre(Term fma) {
+        return fma.sub(0);
     }
     
     
-    private FormulaWithAxioms extractPost(Term fma) {
-        return new FormulaWithAxioms(fma.sub(1).sub(0));
+    private Term extractPost(Term fma) {
+        return fma.sub(1).sub(0);
     }
     
     
@@ -151,7 +151,7 @@ public class DLSpecFactory {
         return new ClassInvariantImpl(name, 
                                       displayName, 
                                       kjt, 
-                                      new FormulaWithAxioms(inv), 
+                                      inv, 
                                       selfVar);
     }
   
@@ -183,8 +183,8 @@ public class DLSpecFactory {
         }
         ProgramMethod pm                 = extractProgramMethod(mbs);
         Modality modality                = extractModality(fma);
-        FormulaWithAxioms pre            = extractPre(fma);
-        FormulaWithAxioms post           = extractPost(fma);
+        Term pre           		 = extractPre(fma);
+        Term post        		 = extractPost(fma);
         ProgramVariable selfVar          = extractSelfVar(mbs);
         ImmutableList<ProgramVariable> paramVars  = extractParamVars(mbs);
         ProgramVariable resultVar        = extractResultVar(mbs);

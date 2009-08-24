@@ -16,7 +16,6 @@ import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.util.ExtList;
@@ -36,17 +35,17 @@ public final class SetLDT extends LDT {
     private final Function subset;
     private final Function disjoint;    
     
-    public SetLDT(Namespace sorts, Namespace functions) {
-	super(NAME, sorts);
-        empty	         = addFunction(functions, "empty");
-        singleton        = addFunction(functions, "singleton");
-        union            = addFunction(functions, "union");
-        intersect        = addFunction(functions, "intersect");
-        setMinus         = addFunction(functions, "setMinus");
-        setComprehension = addFunction(functions, "setComprehension");
-        elementOf        = addFunction(functions, "elementOf");
-        subset           = addFunction(functions, "subset");
-        disjoint         = addFunction(functions, "disjoint");
+    public SetLDT(Services services) {
+	super(NAME, services);
+        empty	         = addFunction(services, "empty");
+        singleton        = addFunction(services, "singleton");
+        union            = addFunction(services, "union");
+        intersect        = addFunction(services, "intersect");
+        setMinus         = addFunction(services, "setMinus");
+        setComprehension = addFunction(services, "setComprehension");
+        elementOf        = addFunction(services, "elementOf");
+        subset           = addFunction(services, "subset");
+        disjoint         = addFunction(services, "disjoint");
     }
     
     

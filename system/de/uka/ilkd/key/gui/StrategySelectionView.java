@@ -32,10 +32,13 @@ import de.uka.ilkd.key.strategy.StrategyFactory;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 
 
-public class StrategySelectionView extends JPanel {
+public final class StrategySelectionView extends JPanel {
+    
+    private static final String JAVACARDDL_STRATEGY_NAME 
+    	= "JavaCardDLStrategy";
 
     final JRadioButtonHashMap bSimpleJavaCardDLStrategy = new JRadioButtonHashMap(
-        "Java DL", "JavaCardDLStrategy", false, false);
+        "Java DL", JAVACARDDL_STRATEGY_NAME, false, false);
    
     ButtonGroup stratGroup = new ButtonGroup();
     ButtonGroup splittingGroup = new ButtonGroup();
@@ -74,7 +77,8 @@ public class StrategySelectionView extends JPanel {
     
     private KeYMediator mediator;
     
-    private TimeoutSpinner timeoutSpinner;
+//    private TimeoutSpinner timeoutSpinner;
+    private JButton defaultButton;
     
     
     JPanel javaDLOptionsPanel = new JPanel() {
@@ -113,7 +117,7 @@ public class StrategySelectionView extends JPanel {
         addComponentListener(new java.awt.event.ComponentAdapter() {
             public void componentShown(java.awt.event.ComponentEvent e) {
                 maxSlider.refresh();
-                timeoutSpinner.refresh();
+//                timeoutSpinner.refresh();
             }
         });
     }
@@ -161,7 +165,7 @@ public class StrategySelectionView extends JPanel {
         addJavaDLOption ( rdBut17, javaDLOptionsLayout, 2, yCoord, 2 );        
 
         rdBut18 = new JRadioButtonHashMap(
-                "Non-Closable", StrategyProperties.STOPMODE_NONCLOSE, false, false);
+                "Unclosable", StrategyProperties.STOPMODE_NONCLOSE, false, false);
 	rdBut18.setToolTipText( "<html>Stop as soon as the first not automatically<br>" +
                                 "closable goal is encountered.</html>");
         stopModeGroup.add(rdBut18);
@@ -624,26 +628,48 @@ public class StrategySelectionView extends JPanel {
     }
     
     private JPanel createTimeoutSpinner() {
-        final JPanel timeoutPanel = new JPanel();
-        timeoutPanel.setLayout(new FlowLayout());
-        final JLabel timeoutLabel = new JLabel("Time limit (ms)"); 
-        timeoutPanel.add(timeoutLabel);
-        timeoutPanel.setToolTipText("Interrupt automatic rule application " +
-                        "after the specified period of time (-1 disables timeout).");
-        
-        timeoutSpinner = new TimeoutSpinner();       
-        
-        timeoutSpinner.addChangeListener(new ChangeListener() {
-
-            public void stateChanged(ChangeEvent e) {
-                if (e.getSource() == timeoutSpinner) {
-                    long timeout = ((Long)((JSpinner)e.getSource()).getValue()).longValue();
-                    mediator.setAutomaticApplicationTimeout(timeout);
-                }
-            }            
+//        final JPanel timeoutPanel = new JPanel();
+//        timeoutPanel.setLayout(new FlowLayout());
+//        final JLabel timeoutLabel = new JLabel("Time limit (ms)"); 
+//        timeoutPanel.add(timeoutLabel);
+//        timeoutPanel.setToolTipText("Interrupt automatic rule application " +
+//                        "after the specified period of time (-1 disables timeout).");
+//        
+//        timeoutSpinner = new TimeoutSpinner();       
+//        
+//        timeoutSpinner.addChangeListener(new ChangeListener() {
+//
+//            public void stateChanged(ChangeEvent e) {
+//                if (e.getSource() == timeoutSpinner) {
+//                    long timeout = ((Long)((JSpinner)e.getSource()).getValue()).longValue();
+//                    mediator.setAutomaticApplicationTimeout(timeout);
+//                }
+//            }            
+//        });
+//        timeoutPanel.add(timeoutSpinner);
+//        return timeoutPanel;
+	final JPanel panel = new JPanel();
+	defaultButton = new JButton("Defaults");
+	defaultButton.addActionListener(new ActionListener() {
+	    public void actionPerformed(ActionEvent e) {
+		mediator.getProof()
+		        .getSettings()
+		        .getStrategySettings()
+		        .setMaxSteps(10000);
+		updateStrategySettings(JAVACARDDL_STRATEGY_NAME,
+			               new StrategyProperties());
+		refresh(mediator.getSelectedProof());
+	    }
+	});
+	panel.add(defaultButton);
+	
+        maxSlider.addChangeListener( new ChangeListener() {
+            public void stateChanged ( ChangeEvent e ) {
+        	refreshDefaultButton(); 
+            }
         });
-        timeoutPanel.add(timeoutSpinner);
-        return timeoutPanel;
+	
+	return panel;
     }
     
     public void setMediator(KeYMediator mediator) {
@@ -684,23 +710,23 @@ public class StrategySelectionView extends JPanel {
         }
     }
 
-    class TimeoutSpinner extends JSpinner {        
-        public TimeoutSpinner() {
-            super(new SpinnerNumberModel
-                    (Long.valueOf(-1), Long.valueOf(-1), Long.valueOf(Long.MAX_VALUE), Long.valueOf(1))); 
-            if (this.getEditor() instanceof JSpinner.DefaultEditor) {
-                JFormattedTextField ftf = ((JSpinner.DefaultEditor)this.getEditor()).getTextField();
-                if (ftf != null) {
-                    ftf.setColumns(6); 
-                    ftf.setHorizontalAlignment(SwingConstants.RIGHT);
-                }
-            }            
-        }
-        
-        public void refresh() {
-            setValue(Long.valueOf(mediator.getAutomaticApplicationTimeout()));
-        }    
-    }
+//    class TimeoutSpinner extends JSpinner {        
+//        public TimeoutSpinner() {
+//            super(new SpinnerNumberModel
+//                    (Long.valueOf(-1), Long.valueOf(-1), Long.valueOf(Long.MAX_VALUE), Long.valueOf(1))); 
+//            if (this.getEditor() instanceof JSpinner.DefaultEditor) {
+//                JFormattedTextField ftf = ((JSpinner.DefaultEditor)this.getEditor()).getTextField();
+//                if (ftf != null) {
+//                    ftf.setColumns(6); 
+//                    ftf.setHorizontalAlignment(SwingConstants.RIGHT);
+//                }
+//            }            
+//        }
+//        
+//        public void refresh() {
+//            setValue(Long.valueOf(mediator.getAutomaticApplicationTimeout()));
+//        }    
+//    }
 
     /**
      * TODO: here should be a settings listener listening to strategy setting changes
@@ -724,9 +750,6 @@ public class StrategySelectionView extends JPanel {
         if (proof == null) {            
             enableAll(false);                
         } else {
-            maxSlider.refresh();
-            timeoutSpinner.refresh();
-            enableAll(true);
             String activeS = proof.getActiveStrategy().name().toString();
             JRadioButton bactive = JRadioButtonHashMap.getButton(activeS);
             bactive.setSelected(true);
@@ -770,8 +793,25 @@ public class StrategySelectionView extends JPanel {
                     StrategyProperties.USER_TACLETS_OFF);
                 userTacletsActive.setSelected(true);
             }
+            
+            maxSlider.refresh();
+//            timeoutSpinner.refresh();
+            enableAll(true);
+            refreshDefaultButton();
         }
     }
+    
+    
+    private void refreshDefaultButton() {
+	defaultButton.setEnabled(maxSlider.getPos() != 10000
+		                 || !mediator.getSelectedProof()
+		                             .getActiveStrategy()
+		                 	     .name()
+		                 	     .toString()
+		                 	     .equals(JAVACARDDL_STRATEGY_NAME)
+		                 || !getProperties().isDefault());	
+    }
+    
 
     private JRadioButton getStrategyOptionButton(String activeOptions, String category) {
         JRadioButton bActive = JRadioButtonHashMap.getButton(
@@ -796,7 +836,8 @@ public class StrategySelectionView extends JPanel {
      */
     private void enableAll(boolean enable) {             
         maxSlider.setEnabled(enable);     
-        timeoutSpinner.setEnabled(enable);
+//        timeoutSpinner.setEnabled(enable);
+        defaultButton.setEnabled(enable);
         if (mediator != null) {                   
             final Iterator<StrategyFactory> supportedStrategies = 
                mediator.getProfile().supportedStrategies().iterator();
@@ -807,8 +848,9 @@ public class StrategySelectionView extends JPanel {
         }
     }
 
-    public Strategy getStrategy(String strategyName, Proof proof,
-            StrategyProperties properties) {
+    public Strategy getStrategy(String strategyName, 
+	    			Proof proof,
+	    			StrategyProperties properties) {
         if (mediator != null) {        
             final Iterator<StrategyFactory> supportedStrategies = 
                mediator.getProfile().supportedStrategies().iterator();
@@ -827,6 +869,7 @@ public class StrategySelectionView extends JPanel {
     private String removeLast(String str, int num) {
         return str.substring ( 0, str.length () - num );
     }
+    
     
     /**
      * @return the StrategyProperties
@@ -858,9 +901,9 @@ public class StrategySelectionView extends JPanel {
     }
 
     
-    private void updateStrategySettings(String strategyName) {
+    private void updateStrategySettings(String strategyName,
+	    				StrategyProperties p) {
         final Proof proof = mediator.getProof();
-        final StrategyProperties p = getProperties();
         final Strategy strategy = getStrategy(strategyName, proof, p);
 
         ProofSettings.DEFAULT_SETTINGS.getStrategySettings().
@@ -874,19 +917,23 @@ public class StrategySelectionView extends JPanel {
             setActiveStrategyProperties(p);
         
         proof.setActiveStrategy(strategy);
+        
+        refresh(proof);
     }
 
     public class StratListener implements ActionListener { 
-        public void actionPerformed(ActionEvent e) {            
-            updateStrategySettings(e.getActionCommand());
+        public void actionPerformed(ActionEvent e) {
+            StrategyProperties props = getProperties();
+            updateStrategySettings(e.getActionCommand(), props);
         }
     }
 
     public class OptListener implements ActionListener { 
         public void actionPerformed(ActionEvent e) { 	
-        	
-            updateStrategySettings(mediator.getProof().
-                    getActiveStrategy().name().toString());
+            StrategyProperties props = getProperties();        	
+            updateStrategySettings(
+        	    mediator.getProof().getActiveStrategy().name().toString(),
+                    props);
         }
     }
 }

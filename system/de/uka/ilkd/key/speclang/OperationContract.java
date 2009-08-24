@@ -48,19 +48,19 @@ public interface OperationContract {
     /**
      * Returns the precondition of the contract.
      */
-    public FormulaWithAxioms getPre(ProgramVariable selfVar, 
-	    			    ImmutableList<ProgramVariable> paramVars,
-                                    Services services);
+    public Term getPre(ProgramVariable selfVar, 
+	    	       ImmutableList<ProgramVariable> paramVars,
+	    	       Services services);
 
     /**
      * Returns the postcondition of the contract.
      */
-    public FormulaWithAxioms getPost(ProgramVariable selfVar, 
-                                     ImmutableList<ProgramVariable> paramVars, 
-                                     ProgramVariable resultVar, 
-                                     ProgramVariable excVar,
-                                     Term heapAtPre,
-                                     Services services);
+    public Term getPost(ProgramVariable selfVar, 
+	    	        ImmutableList<ProgramVariable> paramVars, 
+	    	        ProgramVariable resultVar, 
+	    	        ProgramVariable excVar,
+	    	        Term heapAtPre,
+	    	        Services services);
 
     /**
      * Returns the modifies clause of the contract.

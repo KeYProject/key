@@ -17,6 +17,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.NamespaceSet;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.Operator;
@@ -38,7 +39,7 @@ public final class ClassInvariantImpl implements ClassInvariant {
     private final String name;
     private final String displayName;
     private final KeYJavaType kjt;
-    private final FormulaWithAxioms originalInv;
+    private final Term originalInv;
     private final ParsableVariable originalSelfVar;
     
     
@@ -57,7 +58,7 @@ public final class ClassInvariantImpl implements ClassInvariant {
     public ClassInvariantImpl(String name, 
                               String displayName,
                               KeYJavaType kjt, 
-                              FormulaWithAxioms inv,
+                              Term inv,
                               ParsableVariable selfVar) {
         assert name != null && !name.equals("");
         assert displayName != null && !displayName.equals("");
@@ -127,32 +128,29 @@ public final class ClassInvariantImpl implements ClassInvariant {
     }    
     
 
-    public FormulaWithAxioms getClosedInv(Services services) {
+    public Term getClosedInv(Services services) {
         Sort sort = getKJT().getSort();
         String baseName = sort.name().toString().substring(0, 1).toLowerCase();
-        String name = getNewName(baseName, services);
-        LogicVariable selfVar = new LogicVariable(new Name(name), sort);
-        return getOpenInv(selfVar, services).allClose(services);
+        String fullName = getNewName(baseName, services);
+        LogicVariable selfVar = new LogicVariable(new Name(fullName), sort);
+        return TB.allClose(getOpenInv(selfVar, services));
     }
     
     
-    public FormulaWithAxioms getClosedInvExcludingOne(
-	    				ParsableVariable excludedVar, 
-	                                Services services) {
+    public Term getClosedInvExcludingOne(ParsableVariable excludedVar, 
+	                                 Services services) {
         Sort sort = getKJT().getSort();
         String baseName = sort.name().toString().substring(0, 1).toLowerCase();
-        String name = getNewName(baseName, services);
-        LogicVariable quantifVar = new LogicVariable(new Name(name), sort);
-        FormulaWithAxioms openInv = getOpenInv(quantifVar, services);
-        FormulaWithAxioms notSelf 
-        	= new FormulaWithAxioms(TB.not(TB.equals(TB.var(quantifVar), 
-        		                                 TB.var(excludedVar))));        
-        return notSelf.imply(openInv).allClose(services);
+        String fullName = getNewName(baseName, services);
+        LogicVariable quantifVar = new LogicVariable(new Name(fullName), sort);
+        Term openInv = getOpenInv(quantifVar, services);
+        Term notSelf = TB.not(TB.equals(TB.var(quantifVar), 
+        	                        TB.var(excludedVar)));        
+        return TB.allClose(TB.imp(notSelf, openInv));
     }
     
     
-    public FormulaWithAxioms getOpenInv(ParsableVariable selfVar, 
-                                        Services services) {
+    public Term getOpenInv(ParsableVariable selfVar, Services services) {
         final Map<Operator, Operator> replaceMap = getReplaceMap(selfVar, services);
         final OpReplacer or = new OpReplacer(replaceMap);
         return or.replace(originalInv);   
@@ -160,7 +158,7 @@ public final class ClassInvariantImpl implements ClassInvariant {
 
     
     public String getHTMLText(Services services) {
-        final String inv = LogicPrinter.quickPrintTerm(originalInv.getFormula(), 
+        final String inv = LogicPrinter.quickPrintTerm(originalInv, 
                 services);
         
         return "<html>"

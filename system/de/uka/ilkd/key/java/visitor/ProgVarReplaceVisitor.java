@@ -27,7 +27,6 @@ import de.uka.ilkd.key.logic.VariableNamer;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.speclang.LoopInvariant;
 import de.uka.ilkd.key.speclang.LoopInvariantImpl;
-import de.uka.ilkd.key.speclang.LoopPredicateSet;
 import de.uka.ilkd.key.util.ExtList;
 
 /**
@@ -236,7 +235,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
         ImmutableSet<Term> newPredicates 
             = replaceVariablesInTerms(inv.getPredicates(selfTerm, 
                                                         heapAtPre, 
-                                                        services).asSet());
+                                                        services));
         
         //modifies
         Term newModifies
@@ -258,7 +257,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
         LoopInvariant newInv 
             = new LoopInvariantImpl(newLoop, 
                                     newInvariant, 
-                                    new LoopPredicateSet(newPredicates),
+                                    newPredicates,
                                     newModifies, 
                                     newVariant, 
                                     newSelfTerm,

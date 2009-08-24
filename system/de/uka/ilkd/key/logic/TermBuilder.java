@@ -9,10 +9,15 @@
 
 package de.uka.ilkd.key.logic;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.TypeConverter;
 import de.uka.ilkd.key.java.expression.literal.IntLiteral;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.IntegerLDT;
@@ -20,6 +25,7 @@ import de.uka.ilkd.key.ldt.SetLDT;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.ArraySort;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.proof.OpReplacer;
 
 
 /**
@@ -43,10 +49,43 @@ public final class TermBuilder {
     }
     
     
-        
     public TermFactory tf() {
         return tf;
     }
+    
+    
+    
+    //-------------------------------------------------------------------------
+    //naming
+    //-------------------------------------------------------------------------
+    
+    /**
+     * Returns an available name constructed by affixing a counter to the passed
+     * base name.
+     */
+    public String getNewName(String baseName, 
+                             Services services, 
+                             ImmutableList<String> locallyUsedNames) {
+        NamespaceSet namespaces = services.getNamespaces();
+            
+        int i = 0;
+        String result = baseName;
+        while(namespaces.lookup(new Name(result)) != null) {
+            result = baseName + "_" + i++;
+        }
+        
+        return result;
+    }
+    
+    
+    /**
+     * Returns an available name constructed by affixing a counter to the passed
+     * base name.
+     */
+    public String getNewName(String baseName, Services services) {
+        return getNewName(baseName, services, ImmutableSLList.<String>nil());
+    }    
+    
     
     
     //-------------------------------------------------------------------------
@@ -188,6 +227,18 @@ public final class TermBuilder {
     
     public Term ex(QuantifiableVariable[] qv, Term t2) {
         return ex(new ImmutableArray<QuantifiableVariable>(qv), t2);
+    }
+    
+    
+    public Term allClose(Term t) {
+	ImmutableSet<QuantifiableVariable> freeVars = t.freeVars();
+	if(freeVars.isEmpty()) {
+	    return t;
+	} else {
+	    return all(freeVars.toArray(
+		    		new QuantifiableVariable[freeVars.size()]), 
+		       t);
+	}
     }
     
     
@@ -725,23 +776,7 @@ public final class TermBuilder {
         return dot(services, asSort, o, func(f));
     }
     
-    
-    public Term dotLength(Services services, Term a) {
-	return dot(services, 
-		   services.getTypeConverter().getIntegerLDT().targetSort(), 
-		   a, 
-		   services.getTypeConverter().getHeapLDT().getLength());
-    }
-    
-    
-    public Term dotCreated(Services services, Term o) {
-	return dot(services,
-		   services.getTypeConverter().getBooleanLDT().targetSort(),
-		   o,
-		   services.getTypeConverter().getHeapLDT().getCreated());
-    }
 
-    
     public Term staticDot(Services services, Sort asSort, Term f) {
         return dot(services, asSort, NULL(services), f);
     }
@@ -751,25 +786,14 @@ public final class TermBuilder {
 	return staticDot(services, asSort, func(f));
     }
     
-    
-    public Term nextToCreate(Services services) {
-	return staticDot(services, 
-		         services.getTypeConverter()
-		                 .getIntegerLDT()
-		                 .targetSort(),
-		         services.getTypeConverter()
-		                 .getHeapLDT()
-		                 .getNextToCreate());
-    }
-    
-    
+
     public Term arr(Services services, Term idx) {
 	return func(services.getTypeConverter().getHeapLDT().getArr(), idx);
     }
     
 
     public Term dotArr(Services services, Term ref, Term idx) {
-        if (ref == null || idx == null) {
+        if(ref == null || idx == null) {
             throw new TermCreationException("Tried to build an array access "+
                     "term without providing an " +
                     (ref==null ? "array reference." : "index.") + 
@@ -790,8 +814,70 @@ public final class TermBuilder {
         	      heap(services), 
         	      ref, 
         	      arr(services, idx));
+    }    
+    
+    
+    public Term dotLength(Services services, Term a) {
+	final TypeConverter tc = services.getTypeConverter();
+	return dot(services, 
+		   tc.getIntegerLDT().targetSort(), 
+		   a, 
+		   tc.getHeapLDT().getLength());
     }
     
+    
+    public Term dotCreated(Services services, Term o) {
+	final TypeConverter tc = services.getTypeConverter();	
+	return dot(services,
+		   tc.getBooleanLDT().targetSort(),
+		   o,
+		   tc.getHeapLDT().getCreated());
+    }
+    
+    
+    public Term dotInitialized(Services services, Term o) {
+	final TypeConverter tc = services.getTypeConverter();	
+	return dot(services,
+		   tc.getBooleanLDT().targetSort(),
+		   o,
+		   tc.getHeapLDT().getInitialized());
+    }
+
+    
+    public Term dotClassPrepared(Services services, Sort classSort) {
+	final TypeConverter tc = services.getTypeConverter();	
+	return staticDot(services,
+		         tc.getBooleanLDT().targetSort(),
+		         tc.getHeapLDT().getClassPrepared(classSort, services));	
+    }
+    
+    public Term dotClassInitialized(Services services, Sort classSort) {
+	final TypeConverter tc = services.getTypeConverter();	
+	return staticDot(services,
+		         tc.getBooleanLDT().targetSort(),
+		         tc.getHeapLDT().getClassInitialized(classSort, 
+		        	 			     services));	
+    }
+
+    public Term dotClassInitializationInProgress(Services services, 
+	    					 Sort classSort) {
+	final TypeConverter tc = services.getTypeConverter();	
+	return staticDot(services,
+		         tc.getBooleanLDT().targetSort(),
+		         tc.getHeapLDT()
+		           .getClassInitializationInProgress(classSort, 
+		        	   			     services));	
+    }
+
+        
+    public Term dotClassErroneous(Services services, Sort classSort) {
+	final TypeConverter tc = services.getTypeConverter();	
+	return staticDot(services,
+		         tc.getBooleanLDT().targetSort(),
+		         tc.getHeapLDT().getClassErroneous(classSort, 
+		        	 			   services));	
+    }
+
     
     public Term store(Services services, Term h, Term o, Term f, Term v) {
         return func(services.getTypeConverter().getHeapLDT().getStore(), 
@@ -841,6 +927,7 @@ public final class TermBuilder {
 		                allLocs(services));
     }
     
+    
     public Term guardedLocComprehension(Services services, 
 	                         	QuantifiableVariable qv,
 	                         	Term cond,
@@ -850,5 +937,59 @@ public final class TermBuilder {
 		                qv, 
 		                ife(cond, pair(services, o, f), empty(services)),
 		                allLocs(services));
+    }    
+    
+    
+    public Term reachableValue(Services services, ProgramVariable pv) {
+	IntegerLDT intLDT = services.getTypeConverter().getIntegerLDT();
+	Term pvVar = var(pv);
+	if(pv.sort().extendsTrans(services.getJavaInfo().objectSort())) {
+	    return or(equals(dotCreated(services, pvVar), TRUE(services)), 
+		      equals(pvVar, NULL(services)));
+	} else if(pv.getKeYJavaType() != null
+		  && pv.sort().equals(intLDT.targetSort())) {
+	    return func(intLDT.getInBounds(pv.getKeYJavaType().getJavaType()), 
+		        pvVar);
+	} else {
+	    return tt();
+	}
+    }
+    
+    
+    public Term frame(Services services,
+	    	      Term heapAtPre, 
+	    	      Term mod) {
+	Sort objectSort = services.getJavaInfo().objectSort();
+	Sort fieldSort = services.getTypeConverter()
+	                         .getHeapLDT()
+	                         .getFieldSort();
+	
+	Name objVarName   = new Name(getNewName("o", services));
+	Name fieldVarName = new Name(getNewName("f", services));
+	LogicVariable objVar   = new LogicVariable(objVarName, objectSort);
+	LogicVariable fieldVar = new LogicVariable(fieldVarName, fieldSort);
+	Term objVarTerm = var(objVar);
+	Term fieldVarTerm = var(fieldVar);
+	
+	Map map = new HashMap();
+	map.put(heap(services), heapAtPre);
+	OpReplacer or = new OpReplacer(map);
+	Term modAtPre = or.replace(mod);
+	
+	return all(new QuantifiableVariable[]{objVar, fieldVar},
+		   or(pairElementOf(services,
+			   	    objVarTerm,
+			   	    fieldVarTerm,
+			   	    modAtPre),
+		      equals(select(services,
+				    Sort.ANY,
+				    heap(services),
+				    objVarTerm,
+				    fieldVarTerm),
+		             select(services,
+ 			            Sort.ANY,
+				    heapAtPre,
+				    objVarTerm,
+				    fieldVarTerm))));
     }    
 }

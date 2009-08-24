@@ -47,7 +47,11 @@ public final class HeapLDT extends LDT {
     private final Function arr;
     private final Function length;
     private final Function created;
-    private final Function nextToCreate;
+    private final Function initialized;
+    private final SortDependingFunction classPrepared;
+    private final SortDependingFunction classInitialized;
+    private final SortDependingFunction classInitializationInProgress;
+    private final SortDependingFunction classErroneous;
     
     //null
     private final Function nullFunc;
@@ -64,23 +68,29 @@ public final class HeapLDT extends LDT {
     //constructors
     //------------------------------------------------------------------------- 
     
-    public HeapLDT(Namespace sorts, Namespace functions, Namespace progVars) {
-	super(NAME, sorts);
+    public HeapLDT(Services services) {
+	super(NAME, services);
+	final Namespace sorts    = services.getNamespaces().sorts();
+	final Namespace progVars = services.getNamespaces().programVariables();
+	
         fieldSort         = (Sort) sorts.lookup(new Name("Field"));	
-        select            = (SortDependingFunction) addFunction(
-        				functions, 
-        				Sort.ANY + "::" + SELECT_NAME);
-        store             = addFunction(functions, "store");
-        changeHeapAtLocs  = addFunction(functions, "changeHeapAtLocs");
-        changeHeapAtLocs2 = addFunction(functions, "changeHeapAtLocs2");
-        allLocs           = addFunction(functions, "allLocs");
-        allFields         = addFunction(functions, "allFields");        
-        arr               = addFunction(functions, "arr");
-        length            = addFunction(functions, "length");
-        created           = addFunction(functions, "java.lang.Object::<created>");
-        nextToCreate      = addFunction(functions, "java.lang.Object::<nextToCreate>");
-        nullFunc          = addFunction(functions, "null");
-        wellFormed        = addFunction(functions, "wellFormed");
+        select            = addSortDependingFunction(services, SELECT_NAME.toString());
+        store             = addFunction(services, "store");
+        changeHeapAtLocs  = addFunction(services, "changeHeapAtLocs");
+        changeHeapAtLocs2 = addFunction(services, "changeHeapAtLocs2");
+        allLocs           = addFunction(services, "allLocs");
+        allFields         = addFunction(services, "allFields");        
+        arr               = addFunction(services, "arr");
+        length            = addFunction(services, "length");
+        created           = addFunction(services, "java.lang.Object::<created>");
+        initialized       = addFunction(services, "java.lang.Object::<initialized>");
+        classPrepared     = addSortDependingFunction(services, "<classPrepared>");
+        classInitialized  = addSortDependingFunction(services, "<classInitialized>");
+        classInitializationInProgress  
+                          = addSortDependingFunction(services, "<classInitializationInProgress>");
+        classErroneous    = addSortDependingFunction(services, "<classErroneous>");
+        nullFunc          = addFunction(services, "null");
+        wellFormed        = addFunction(services, "wellFormed");
         heap	          = (LocationVariable) progVars.lookup(new Name("heap"));        
     }
     
@@ -141,7 +151,7 @@ public final class HeapLDT extends LDT {
     
     
     public Function getSelect(Sort instanceSort, Services services) {
-	return (Function) select.getInstanceFor(instanceSort, services);
+	return select.getInstanceFor(instanceSort, services);
     }
     
     
@@ -195,9 +205,31 @@ public final class HeapLDT extends LDT {
     }
     
     
-    public Function getNextToCreate() {
-	return nextToCreate;
+    public Function getInitialized() {
+	return initialized;
     }
+    
+        
+    public Function getClassPrepared(Sort instanceSort, Services services) {
+	return classPrepared.getInstanceFor(instanceSort, services);
+    }
+    
+    
+    public Function getClassInitialized(Sort instanceSort, Services services) {
+	return classInitialized.getInstanceFor(instanceSort, services);
+    }
+    
+    
+    public Function getClassInitializationInProgress(Sort instanceSort, 
+	    					     Services services) {
+	return classInitializationInProgress.getInstanceFor(instanceSort, 
+							    services);
+    }
+    
+    
+    public Function getClassErroneous(Sort instanceSort, Services services) {
+	return classErroneous.getInstanceFor(instanceSort, services);
+    }    
     
     
     public Function getNull() {

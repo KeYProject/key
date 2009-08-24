@@ -1779,7 +1779,7 @@ one_schema_modal_op_decl
             
             if (inSchemaMode()) {
                 variables().add(osv);
-                functions().add(osv);
+                //functions().add(osv);
             }
         }
     ;

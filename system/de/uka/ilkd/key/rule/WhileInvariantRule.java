@@ -138,7 +138,7 @@ public final class WhileInvariantRule implements BuiltInRule {
 	//heap
 	HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
 	Name anonHeapName
-		= new Name(IIT.getNewName("loopAnonHeap", services));
+		= new Name(TB.getNewName("loopAnonHeap", services));
 	Function anonHeapFunc = new Function(anonHeapName,
 					     heapLDT.targetSort());
 	services.getNamespaces().functions().addSafely(anonHeapFunc);
@@ -152,8 +152,8 @@ public final class WhileInvariantRule implements BuiltInRule {
 	//local vars
 	ImmutableSet<ProgramVariable> localVars = IIT.getWrittenPVs(loop, services);
 	for(ProgramVariable pv : localVars) {
-	    String anonFuncName = IIT.getNewName(pv.name().toString(), 
-		    				 services);
+	    String anonFuncName = TB.getNewName(pv.name().toString(), 
+		    			        services);
 	    Function anonFunc = new Function(new Name(anonFuncName), pv.sort());
 	    services.getNamespaces().functions().addSafely(anonFunc);
 	    Term elemUpd = TB.elementary(services, 
@@ -166,47 +166,6 @@ public final class WhileInvariantRule implements BuiltInRule {
     }
     
     
-    private Term createFrameCondition(Term heapAtPre, 
-	    			      Term mod, 
-	    			      Services services) {
-	Sort objectSort = services.getJavaInfo().objectSort();
-	Sort fieldSort = services.getTypeConverter()
-	                         .getHeapLDT()
-	                         .getFieldSort();
-	
-	//prepare variables
-	Name objVarName   = new Name(IIT.getNewName("o", services));
-	Name fieldVarName = new Name(IIT.getNewName("f", services));
-	LogicVariable objVar   = new LogicVariable(objVarName, objectSort);
-	LogicVariable fieldVar = new LogicVariable(fieldVarName, fieldSort);
-	Term objVarTerm = TB.var(objVar);
-	Term fieldVarTerm = TB.var(fieldVar);
-	
-	//atPre-ify modifies clause
-	Map map = new HashMap();
-	map.put(TB.heap(services), heapAtPre);
-	OpReplacer or = new OpReplacer(map);
-	Term modAtPre = or.replace(mod);
-	
-	//build frame condition
-	return TB.all(new QuantifiableVariable[]{objVar, fieldVar},
-		      TB.or(TB.pairElementOf(services,
-			      		     objVarTerm,
-			      		     fieldVarTerm,
-			      		     modAtPre),
-			    TB.equals(TB.select(services,
-				    		Sort.ANY,
-				    		TB.heap(services),
-				    		objVarTerm,
-				    		fieldVarTerm),
-				      TB.select(services,
-				      Sort.ANY,
-				      heapAtPre,
-				      objVarTerm,
-				      fieldVarTerm))));
-    }
-    
-  
     
     //-------------------------------------------------------------------------
     //public interface
@@ -253,7 +212,7 @@ public final class WhileInvariantRule implements BuiltInRule {
 	
 	//prepare heapBeforeLoop
 	final ProgramElementName heapBeforeLoopName 
-		= new ProgramElementName(IIT.getNewName("heapBeforeLoop", 
+		= new ProgramElementName(TB.getNewName("heapBeforeLoop", 
 							services));
 	final LocationVariable heapBeforeLoop 
 		= new LocationVariable(heapBeforeLoopName,
@@ -265,13 +224,13 @@ public final class WhileInvariantRule implements BuiltInRule {
 	
 	//prepare anon update, frame condition
 	final Term anon = createAnonUpdate(inst.loop, mod, services);
-	final Term frameCondition = createFrameCondition(TB.var(heapBeforeLoop), 
-						         mod, 
-						         services);
+	final Term frameCondition = TB.frame(services,
+		                             TB.var(heapBeforeLoop), 
+		                             mod);
 	
 	//prepare variant
 	final ProgramElementName variantName 
-		= new ProgramElementName(IIT.getNewName("variant", services));
+		= new ProgramElementName(TB.getNewName("variant", services));
 	final LocationVariable variantPV = new LocationVariable(variantName, 
 								intKJT);
 	services.getNamespaces().programVariables().add(variantPV);
@@ -295,7 +254,7 @@ public final class WhileInvariantRule implements BuiltInRule {
 
 	//prepare guard
 	final ProgramElementName guardVarName 
-		= new ProgramElementName(IIT.getNewName("b", services));
+		= new ProgramElementName(TB.getNewName("b", services));
 	final LocationVariable guardVar = new LocationVariable(guardVarName, 
 						               booleanKJT);
 	services.getNamespaces().programVariables().addSafely(guardVar);	

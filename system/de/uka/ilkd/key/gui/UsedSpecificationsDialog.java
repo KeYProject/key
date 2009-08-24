@@ -44,8 +44,8 @@ public class UsedSpecificationsDialog extends JDialog {
     
     private final Services services;
     private final JList contractAppList;
-    private final JButton ensuresPostButton;
-    private final JButton preservesInvButton;
+//    private final JButton ensuresPostButton;
+//    private final JButton preservesInvButton;
 //    private final JButton respectsModifiesButton;
     private final JButton cancelButton;
 
@@ -148,50 +148,50 @@ public class UsedSpecificationsDialog extends JDialog {
         getContentPane().add(buttonPanel);
         
         //create "EnsuresPost" button
-        ensuresPostButton = new JButton("EnsuresPost");
-        ensuresPostButton.setPreferredSize(largeButtonDim);
-        ensuresPostButton.setMinimumSize(largeButtonDim);
-        ensuresPostButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                ContractWithInvs cwi 
-                    = (ContractWithInvs) contractAppList.getSelectedValue();
-                InitConfig initConfig = Main.getInstance().mediator()
-                                                          .getSelectedProof()
-                                                          .env()
-                                                          .getInitConfig();
-                ProofOblInput po = new EnsuresPostPO(initConfig, 
-                                                     cwi.contract, 
-                                                     cwi.assumedInvs);
-                findOrStartProof(initConfig, po);
-                setVisible(false);
-                dispose();
-            }
-        });
-        buttonPanel.add(ensuresPostButton);
+//        ensuresPostButton = new JButton("EnsuresPost");
+//        ensuresPostButton.setPreferredSize(largeButtonDim);
+//        ensuresPostButton.setMinimumSize(largeButtonDim);
+//        ensuresPostButton.addActionListener(new ActionListener() {
+//            public void actionPerformed(ActionEvent e) {
+//                ContractWithInvs cwi 
+//                    = (ContractWithInvs) contractAppList.getSelectedValue();
+//                InitConfig initConfig = Main.getInstance().mediator()
+//                                                          .getSelectedProof()
+//                                                          .env()
+//                                                          .getInitConfig();
+//                ProofOblInput po = new EnsuresPostPO(initConfig, 
+//                                                     cwi.contract, 
+//                                                     cwi.assumedInvs);
+//                findOrStartProof(initConfig, po);
+//                setVisible(false);
+//                dispose();
+//            }
+//        });
+//        buttonPanel.add(ensuresPostButton);
         
-        //create "PreservesInv" button
-        preservesInvButton = new JButton("PreservesInv");
-        preservesInvButton.setPreferredSize(largeButtonDim);
-        preservesInvButton.setMinimumSize(largeButtonDim);
-        preservesInvButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                ContractWithInvs cwi 
-                    = (ContractWithInvs) contractAppList.getSelectedValue();
-                InitConfig initConfig = Main.getInstance().mediator()
-                                                          .getSelectedProof()
-                                                          .env()
-                                                          .getInitConfig();
-                ProofOblInput po 
-                    = new PreservesInvPO(initConfig, 
-                                         cwi.contract.getProgramMethod(),
-                                         cwi.assumedInvs,
-                                         cwi.ensuredInvs);
-                findOrStartProof(initConfig, po);
-                setVisible(false);
-                dispose();
-            }
-        });
-        buttonPanel.add(preservesInvButton);
+//        //create "PreservesInv" button
+//        preservesInvButton = new JButton("PreservesInv");
+//        preservesInvButton.setPreferredSize(largeButtonDim);
+//        preservesInvButton.setMinimumSize(largeButtonDim);
+//        preservesInvButton.addActionListener(new ActionListener() {
+//            public void actionPerformed(ActionEvent e) {
+//                ContractWithInvs cwi 
+//                    = (ContractWithInvs) contractAppList.getSelectedValue();
+//                InitConfig initConfig = Main.getInstance().mediator()
+//                                                          .getSelectedProof()
+//                                                          .env()
+//                                                          .getInitConfig();
+//                ProofOblInput po 
+//                    = new PreservesInvPO(initConfig, 
+//                                         cwi.contract.getProgramMethod(),
+//                                         cwi.assumedInvs,
+//                                         cwi.ensuredInvs);
+//                findOrStartProof(initConfig, po);
+//                setVisible(false);
+//                dispose();
+//            }
+//        });
+//        buttonPanel.add(preservesInvButton);
         
 //        //create "RespectsModifies" button
 //        respectsModifiesButton = new JButton("RespectsModifies");
@@ -293,42 +293,42 @@ public class UsedSpecificationsDialog extends JDialog {
         ContractWithInvs cwi 
             = (ContractWithInvs) contractAppList.getSelectedValue();
         
-        //ensuresPost
-        ProofOblInput ensuresPostPO = new EnsuresPostPO(initConfig, 
-                                                        cwi.contract, 
-                                                        cwi.assumedInvs);
-        Proof ensuresPostProof = findPreferablyClosedProof(ensuresPostPO);
-        if(ensuresPostProof == null) {
-            ensuresPostButton.setIcon(null);
-        } else if(ensuresPostProof.mgt().getStatus().getProofOpen()) {
-            ensuresPostButton.setIcon(keyIcon);
-        } else if(ensuresPostProof.mgt().getStatus()
-                                        .getProofClosedButLemmasLeft()) {
-            ensuresPostButton.setIcon(keyAlmostClosedIcon);
-        } else {
-            assert ensuresPostProof.mgt().getStatus().getProofClosed();
-            ensuresPostButton.setIcon(keyClosedIcon);
-        }
+//        //ensuresPost
+//        ProofOblInput ensuresPostPO = new EnsuresPostPO(initConfig, 
+//                                                        cwi.contract, 
+//                                                        cwi.assumedInvs);
+//        Proof ensuresPostProof = findPreferablyClosedProof(ensuresPostPO);
+//        if(ensuresPostProof == null) {
+//            ensuresPostButton.setIcon(null);
+//        } else if(ensuresPostProof.mgt().getStatus().getProofOpen()) {
+//            ensuresPostButton.setIcon(keyIcon);
+//        } else if(ensuresPostProof.mgt().getStatus()
+//                                        .getProofClosedButLemmasLeft()) {
+//            ensuresPostButton.setIcon(keyAlmostClosedIcon);
+//        } else {
+//            assert ensuresPostProof.mgt().getStatus().getProofClosed();
+//            ensuresPostButton.setIcon(keyClosedIcon);
+//        }
 
-        //preservesInv
-        ProofOblInput preservesInvPO 
-            = new PreservesInvPO(initConfig, 
-                                 cwi.contract.getProgramMethod(), 
-                                 cwi.assumedInvs,
-                                 cwi.ensuredInvs);
-        Proof preservesInvProof = findPreferablyClosedProof(preservesInvPO);
-        if(preservesInvProof == null) {
-            preservesInvButton.setIcon(null);
-        } else if(preservesInvProof.mgt().getStatus().getProofOpen()) {
-            preservesInvButton.setIcon(keyIcon);
-        } else if(preservesInvProof.mgt().getStatus()
-                                        .getProofClosedButLemmasLeft()) {
-            preservesInvButton.setIcon(keyAlmostClosedIcon);
-        } else {
-            assert preservesInvProof.mgt().getStatus().getProofClosed();
-            preservesInvButton.setIcon(keyClosedIcon);
-        }
-        
+//        //preservesInv
+//        ProofOblInput preservesInvPO 
+//            = new PreservesInvPO(initConfig, 
+//                                 cwi.contract.getProgramMethod(), 
+//                                 cwi.assumedInvs,
+//                                 cwi.ensuredInvs);
+//        Proof preservesInvProof = findPreferablyClosedProof(preservesInvPO);
+//        if(preservesInvProof == null) {
+//            preservesInvButton.setIcon(null);
+//        } else if(preservesInvProof.mgt().getStatus().getProofOpen()) {
+//            preservesInvButton.setIcon(keyIcon);
+//        } else if(preservesInvProof.mgt().getStatus()
+//                                        .getProofClosedButLemmasLeft()) {
+//            preservesInvButton.setIcon(keyAlmostClosedIcon);
+//        } else {
+//            assert preservesInvProof.mgt().getStatus().getProofClosed();
+//            preservesInvButton.setIcon(keyClosedIcon);
+//        }
+//        
 //        //respectsModifies
 //        ProofOblInput respectsModifiesPO 
 //            = new RespectsModifiesPO(initConfig, 

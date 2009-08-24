@@ -24,9 +24,6 @@ public class GeneralSettings implements Settings {
 
 
     private static final String STUPID_MODE_KEY = "[General]StupidMode";
-    private static final String PROOF_ASSISTANT_MODE_KEY = "[General]ProofAssistant";
-
-    private static final String SOUND_NOTIFICATION_KEY = "[General]SoundNotification";
     private static final String DND_DIRECTION_SENSITIVE_KEY 
         = "[General]DnDDirectionSensitive";
     private static final String ONE_STEP_SIMPLIFICATION_KEY 
@@ -42,14 +39,8 @@ public class GeneralSettings implements Settings {
     /** minimize interaction is on by default */
     private boolean stupidMode = true;
 
-    /** proof assistant is on by default */
-    private boolean proofAssistantMode = true;
-
     /** suggestive var names are off by default */
     private boolean suggestiveVarNames = false;
-
-    /** sound notification is on by default */
-    private boolean soundNotification = true;
 
     /** is drag and drop instantiation direction sensitive */
     private boolean dndDirectionSensitive = true;
@@ -73,20 +64,10 @@ public class GeneralSettings implements Settings {
     }
 
     
-    public boolean proofAssistantMode() {
-	return proofAssistantMode;
-    }
-
-    
     public boolean suggestiveVarNames() {
 	return suggestiveVarNames;
     }
     
-
-    public boolean soundNotification() {
-        return soundNotification;
-    }
-
 
     public boolean isDndDirectionSensitive() {        
         return dndDirectionSensitive;
@@ -115,23 +96,7 @@ public class GeneralSettings implements Settings {
           fireSettingsChanged();
         }
     }
-
     
-    public void setProofAssistantMode(boolean b) {
-        if(proofAssistantMode != b) {
-	  proofAssistantMode = b;
-	  fireSettingsChanged();
-	}
-    }
-    
-
-    public void setSoundNotification(boolean b) {
-        if (soundNotification != b) {
-          soundNotification = b;
-          fireSettingsChanged();
-	}
-    }
-
     
     public void setDnDDirectionSensitivity(boolean b) {
         if (dndDirectionSensitive != b) {
@@ -175,17 +140,7 @@ public class GeneralSettings implements Settings {
 	if (val != null) {
 	    stupidMode = Boolean.valueOf(val).booleanValue();
 	}
-
-	val = props.getProperty(PROOF_ASSISTANT_MODE_KEY);
-	if (val != null) {
-	    proofAssistantMode = Boolean.valueOf(val).booleanValue();
-	}
     
-	val = props.getProperty(SOUND_NOTIFICATION_KEY);
-	if (val != null) {
-	    soundNotification = Boolean.valueOf(val).booleanValue();
-	} 
-        
         val = props.getProperty(DND_DIRECTION_SENSITIVE_KEY);
         if (val != null) {
             dndDirectionSensitive = Boolean.valueOf(val).booleanValue();
@@ -215,8 +170,6 @@ public class GeneralSettings implements Settings {
      */
     public void writeSettings(Properties props) {
 	props.setProperty(STUPID_MODE_KEY, "" + stupidMode);
-	props.setProperty(PROOF_ASSISTANT_MODE_KEY, "" + proofAssistantMode);
-        props.setProperty(SOUND_NOTIFICATION_KEY, "" + soundNotification);
         props.setProperty(DND_DIRECTION_SENSITIVE_KEY, "" + dndDirectionSensitive);
         props.setProperty(ONE_STEP_SIMPLIFICATION_KEY, "" + oneStepSimplification);        
         props.setProperty(USE_JML_KEY, "" + useJML);

@@ -150,20 +150,20 @@ public class ChoiceSettings implements Settings {
 		
 	    }
 	}
-	choiceSequence = props.getProperty(CHOICES_KEY);
-	if (choiceSequence != null) {
-	    StringTokenizer st = new StringTokenizer(choiceSequence, ",");
-	    while (st.hasMoreTokens()) {
-		StringTokenizer st2 = new StringTokenizer(
-				       st.nextToken().trim(), "-");
-		String category = st2.nextToken().trim();
-		Set<String> soc = new HashSet<String>();
-		while(st2.hasMoreTokens()){
-		    soc.add(st2.nextToken().trim());
-		}
-		category2Choices.put(category, soc);
-	    }
-	}
+//	choiceSequence = props.getProperty(CHOICES_KEY);
+//	if (choiceSequence != null) {
+//	    StringTokenizer st = new StringTokenizer(choiceSequence, ",");
+//	    while (st.hasMoreTokens()) {
+//		StringTokenizer st2 = new StringTokenizer(
+//				       st.nextToken().trim(), "-");
+//		String category = st2.nextToken().trim();
+//		Set<String> soc = new HashSet<String>();
+//		while(st2.hasMoreTokens()){
+//		    soc.add(st2.nextToken().trim());
+//		}
+//		category2Choices.put(category, soc);
+//	    }
+//	}
     }
 
     /** implements the method required by the Settings interface. The
@@ -182,18 +182,18 @@ public class ChoiceSettings implements Settings {
 		entry.getValue().toString();
 	}
 	props.setProperty(DEFAULTCHOICES_KEY, choiceSequence);
-	choiceSequence = "";
-	for (final String cat : category2Choices.keySet()) {
-	    if (choiceSequence.length() > 0) {
-	        choiceSequence += " , ";
-	    }
-	    Set<String> soc = category2Choices.get(cat);
-	    choiceSequence += cat;
-	    for (final String choice : soc) {
-		choiceSequence += "-"+choice.toString();
-	    }
-	}
-	props.setProperty(CHOICES_KEY, choiceSequence);	
+//	choiceSequence = "";
+//	for (final String cat : category2Choices.keySet()) {
+//	    if (choiceSequence.length() > 0) {
+//	        choiceSequence += " , ";
+//	    }
+//	    Set<String> soc = category2Choices.get(cat);
+//	    choiceSequence += cat;
+//	    for (final String choice : soc) {
+//		choiceSequence += "-"+choice.toString();
+//	    }
+//	}
+//	props.setProperty(CHOICES_KEY, choiceSequence);	
     }
     
     public ChoiceSettings updateWith(ImmutableSet<Choice> sc) {

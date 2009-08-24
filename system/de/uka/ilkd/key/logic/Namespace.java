@@ -14,6 +14,7 @@ import java.util.Iterator;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.logic.op.ModalOperatorSV;
 
 /**
  * A Namespace keeps track of already used {@link Name}s and the objects

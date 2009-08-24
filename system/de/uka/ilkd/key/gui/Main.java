@@ -575,7 +575,7 @@ public final class Main extends JFrame implements IMain {
     private JComponent createPOBrowserComponent() {
         final JButton button = new JButton();
         button.setAction(poBrowserAction);
-        button.setText("Proof Obligations");
+        button.setText("Proof Management");
         return button;
     }
 
@@ -769,7 +769,7 @@ public final class Main extends JFrame implements IMain {
                 pane.add(scrollpane, BorderLayout.CENTER);
             }
             {
-                JButton button = new JButton("OK");
+                final JButton button = new JButton("OK");
                 button.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
                         dialog.setVisible(false);
@@ -780,6 +780,20 @@ public final class Main extends JFrame implements IMain {
                     JPanel panel = new JPanel();
                     panel.add(button);
                     pane.add(panel, BorderLayout.SOUTH);
+                    dialog.getRootPane().setDefaultButton(button);
+                    ActionListener escapeListener = new ActionListener() {
+                	public void actionPerformed(ActionEvent event) {
+                	    if(event.getActionCommand().equals("ESC")) {
+                		button.doClick();
+                	    }
+                	}
+                    };
+                    button.registerKeyboardAction(
+                	    escapeListener,
+                	    "ESC",
+                	    KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
+                	    JComponent.WHEN_IN_FOCUSED_WINDOW);
+
                 }
             }
             dialog.setSize(300, 400);
@@ -788,22 +802,12 @@ public final class Main extends JFrame implements IMain {
         }
     }
 
-    public void showPOBrowser(){
+    public void showProofManagement(){
 	if(mediator.getProof() == null){
 	    mediator.notify
 	    (new GeneralFailureEvent("Please load a proof first"));
 	}else{
-	    POBrowser poBrowser 
-	    	= POBrowser.showInstance(mediator.getProof().env().getInitConfig());
-	    ProofOblInput po = poBrowser.getAndClearPO();
-	    if(po != null) {
-		ProblemInitializer pi = new ProblemInitializer(this);
-		try {
-		    pi.startProver(mediator.getProof().env(), po);
-		} catch(ProofInputException e)  {
-		    new ExceptionDialog(this, e);
-		}
-	    }
+	    ProofManagementDialog.showInstance(mediator.getProof().env().getInitConfig());
 	}
     }
 
@@ -1852,7 +1856,7 @@ public final class Main extends JFrame implements IMain {
         
         
         public void actionPerformed(ActionEvent e) {
-            showPOBrowser();
+            showProofManagement();
         }
     }
     

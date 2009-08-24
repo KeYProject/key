@@ -24,11 +24,10 @@ import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.ParsableVariable;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.init.EnsuresPO;
+import de.uka.ilkd.key.proof.init.ContractPO;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.speclang.ClassInvariant;
 import de.uka.ilkd.key.speclang.LoopInvariant;
@@ -325,8 +324,8 @@ public class SpecificationRepository {
         for(Map.Entry<ProofOblInput,ImmutableSet<Proof>> entry : proofs.entrySet()) {
             ProofOblInput po = entry.getKey();
             ImmutableSet<Proof> sop = entry.getValue();
-            if(po instanceof EnsuresPO 
-               && ((EnsuresPO) po).getProgramMethod().equals(pm)) {
+            if(po instanceof ContractPO 
+               && ((ContractPO) po).getContract().getProgramMethod().equals(pm)) {
                 result = result.union(sop);
             }
         }
@@ -341,8 +340,8 @@ public class SpecificationRepository {
 	for(Map.Entry<ProofOblInput,ImmutableSet<Proof>> entry : proofs.entrySet()) {
 	    ProofOblInput po = entry.getKey();
             ImmutableSet<Proof> sop = entry.getValue();
-            if(sop.contains(proof) && po instanceof EnsuresPO) {
-                return ((EnsuresPO)po).getProgramMethod();
+            if(sop.contains(proof) && po instanceof ContractPO) {
+                return ((ContractPO)po).getContract().getProgramMethod();
             }
         }
         return null;
@@ -414,7 +413,7 @@ public class SpecificationRepository {
         ImmutableList<ProgramVariable> paramVars 
         	= svf.createParamVars(services, pm, false);
 	for(OperationContract c : getOperationContracts(pm, Modality.DIA)) {
-	    if(c.getPre(selfVar, paramVars, services).getFormula().equals(tt)	   
+	    if(c.getPre(selfVar, paramVars, services).equals(tt)	   
 	       && c.getModifies(selfVar, paramVars, services).equals(TermBuilder.DF.empty(services))) {
 		result = true;
 		break;

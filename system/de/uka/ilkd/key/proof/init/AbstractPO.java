@@ -11,25 +11,20 @@
 package de.uka.ilkd.key.proof.init;
 
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
-import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
-import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.speclang.ClassInvariant;
-import de.uka.ilkd.key.speclang.FormulaWithAxioms;
-import de.uka.ilkd.key.speclang.OperationContract;
 
 
 
@@ -39,24 +34,21 @@ import de.uka.ilkd.key.speclang.OperationContract;
 public abstract class AbstractPO implements ProofOblInput {
 
     protected static final TermFactory TF = TermFactory.DEFAULT;
-    protected static final CreatedAttributeTermFactory CATF
-                                   = CreatedAttributeTermFactory.INSTANCE;
     protected static final TermBuilder TB = TermBuilder.DF;
 
     protected final InitConfig initConfig;
     protected final Services services;
     protected final JavaInfo javaInfo;
+    protected final HeapLDT heapLDT;
     protected final SpecificationRepository specRepos;
     protected final String name;
     protected final KeYJavaType selfKJT;
 
-    private final Map<Operator, Term> axioms = new LinkedHashMap<Operator, Term>();
     private String header;
     private ProofAggregate proofAggregate;
     
     protected Term[] poTerms;
     protected String[] poNames;
-    protected ImmutableSet<Taclet>[] poTaclets;
 
 
     //-------------------------------------------------------------------------
@@ -67,26 +59,28 @@ public abstract class AbstractPO implements ProofOblInput {
 	this.initConfig = initConfig;
         this.services   = initConfig.getServices();
         this.javaInfo   = initConfig.getServices().getJavaInfo();
+        this.heapLDT    = initConfig.getServices().getTypeConverter().getHeapLDT();
         this.specRepos  = initConfig.getServices().getSpecificationRepository();
         this.name       = name;
         this.selfKJT    = selfKJT;
     }
 
+    
+    
     //-------------------------------------------------------------------------
     //helper methods for subclasses
     //-------------------------------------------------------------------------
 
-    protected ProgramVariable buildSelfVarAsProgVar() {
+    protected final ProgramVariable buildSelfVarAsProgVar() {
         return new LocationVariable(new ProgramElementName("self"), selfKJT);
     }
+    
 
-    protected LogicVariable buildSelfVarAsLogicVar() {
-        return new LogicVariable(new ProgramElementName("self"), selfKJT.getSort());
-    }
-
-    protected ImmutableList<ProgramVariable> buildParamVars(ProgramMethod programMethod) {
+    protected final ImmutableList<ProgramVariable> buildParamVars(
+	    				ProgramMethod programMethod) {
         int numPars = programMethod.getParameterDeclarationCount();
-        ImmutableList<ProgramVariable> result = ImmutableSLList.<ProgramVariable>nil();
+        ImmutableList<ProgramVariable> result 
+        	= ImmutableSLList.<ProgramVariable>nil();
 
         for(int i = 0; i < numPars; i++) {
             KeYJavaType parType = programMethod.getParameterType(i);
@@ -102,141 +96,38 @@ public abstract class AbstractPO implements ProofOblInput {
     }
 
 
-    protected ProgramVariable buildResultVar(ProgramMethod programMethod) {
+    protected final ProgramVariable buildResultVar(ProgramMethod programMethod){
         final KeYJavaType resultKJT = programMethod.getKeYJavaType();
         if(resultKJT != null) {
-            final ProgramElementName resultPEN = new ProgramElementName("result");
+            final ProgramElementName resultPEN 
+            	= new ProgramElementName("result");
             return new LocationVariable(resultPEN, resultKJT);
         }
         return null;
     }
 
 
-    protected ProgramVariable buildExcVar() {
+    protected final ProgramVariable buildExcVar() {
         final KeYJavaType excType
         	= javaInfo.getTypeByClassName("java.lang.Throwable");
         return new LocationVariable(new ProgramElementName("exc"), excType);      
     }
     
-
-    /**
-     * Translates a precondition out of an operation contract. 
-     */
-    protected Term translatePre(OperationContract contract,
-                                ProgramVariable selfVar,
-                                ImmutableList<ProgramVariable> paramVars) 
-    		throws ProofInputException {
-        FormulaWithAxioms fwa = contract.getPre(selfVar, paramVars, services);
-        axioms.putAll(fwa.getAxioms());
-        return fwa.getFormula();
-    }
-
-
-    /**
-     * Translates a postcondition out of an operation contract. 
-     */
-    protected Term translatePost(OperationContract contract,
-                                 ProgramVariable selfVar,
-                                 ImmutableList<ProgramVariable> paramVars,
-                                 ProgramVariable resultVar,
-                                 ProgramVariable excVar,
-                                 Term heapAtPre) 
-    		throws ProofInputException {
-        FormulaWithAxioms fwa = contract.getPost(selfVar, 
-        					 paramVars, 
-        					 resultVar, 
-        					 excVar, 
-                                                 heapAtPre,
-        					 services);
-        axioms.putAll(fwa.getAxioms());
-        return fwa.getFormula();
-    }
-
-
-    /**
-     * Translates a modifies clause out of an operation contract.
-     */
-    protected Term translateModifies(OperationContract contract,
-                                     Term targetTerm,
-                                     ProgramVariable selfVar,
-                                     ImmutableList<ProgramVariable> paramVars) 
-    		throws ProofInputException {
-	assert false : "not implemented";
-    	return null;
-//        ImmutableSet<LocationDescriptor> locations = contract.getModifies(selfVar,
-//                                                                 paramVars,
-//                                                                 services);
-//
-//        UpdateFactory uf = new UpdateFactory(services, new OldUpdateSimplifier());
-//        AnonymisingUpdateFactory auf = new AnonymisingUpdateFactory(uf);
-//        return auf.createAnonymisingUpdateTerm(locations,
-//                targetTerm,
-//                services);
-    }
-    
-    
-    /**
-     * Translates a class invariant. 
-     */
-    protected Term translateInv(ClassInvariant inv) 
-    		throws ProofInputException {
-        final FormulaWithAxioms fwa = inv.getClosedInv(services);
-        axioms.putAll(fwa.getAxioms());
-        return fwa.getFormula();
-    }
-    
-    
-    /**
-     * Translates a list of class invariants. 
-     */
-    protected Term translateInvs(ImmutableSet<ClassInvariant> invs) 
-    		throws ProofInputException {
-	Term result = TB.tt();
-	for (final ClassInvariant inv : invs) {
-	    result = TB.and(result, translateInv(inv));
-	}
-	return result;
-    }
-    
-    
-    /**
-     * Translates a class invariant as an open formula. 
-     */
-    protected Term translateInvOpen(ClassInvariant inv, 
-	    			    ProgramVariable selfVar) 
-    		throws ProofInputException {
-        FormulaWithAxioms fwa = inv.getOpenInv(selfVar, services);
-        axioms.putAll(fwa.getAxioms());
-        return fwa.getFormula();
-    }
-    
-    
-    protected Term translateInvsOpen(ImmutableSet<ClassInvariant> invs, 
-	    			     ProgramVariable selfVar) 
-    		throws ProofInputException {
-	Term result = TB.tt();
-	for (final ClassInvariant inv : invs) {
-	    result = TB.and(result, translateInvOpen(inv, selfVar));
-	}
-	return result;
-    }
-    
-    
     /**
      * Replaces operators in a term by other operators with the same signature.
      */
-    protected Term replaceOps(Map<? extends Operator, ? extends Operator> map, Term term) {      
+    protected final Term replaceOps(Map<? extends Operator, ? extends Operator> map, Term term) {      
         return new OpReplacer(map).replace(term);
     }
 
 
-    protected void registerInNamespaces(ProgramVariable pv) {
+    protected final void registerInNamespaces(ProgramVariable pv) {
         if(pv != null) {
             initConfig.progVarNS().add(pv);
         }
     }
 
-    protected void registerInNamespaces(Function f) {
+    protected final void registerInNamespaces(Function f) {
         if(f != null) {
             services.getNameRecorder().addProposal(f.name());
             initConfig.funcNS().add(f);
@@ -244,7 +135,7 @@ public abstract class AbstractPO implements ProofOblInput {
     }
 
 
-    protected void registerInNamespaces(ImmutableList<ProgramVariable> pvs) {
+    protected final void registerInNamespaces(ImmutableList<ProgramVariable> pvs) {
         final Iterator<ProgramVariable> it = pvs.iterator();
         while(it.hasNext()) {
             initConfig.progVarNS().add(it.next());
@@ -359,12 +250,7 @@ public abstract class AbstractPO implements ProofOblInput {
         Proof[] proofs = new Proof[poTerms.length];
         for(int i = 0; i < proofs.length; i++) {
             proofs[i] = createProof(poNames != null ? poNames[i] : name,
-                                    poTerms[i]);
-            
-            if(poTaclets != null) {
-                proofs[i].getGoal(proofs[i].root()).indexOfTaclets()
-                                                   .addTaclets(TacletIndex.toNoPosTacletApp(poTaclets[i]));
-            }
+                                    poTerms[i]);            
         }
         
         return proofAggregate = ProofAggregate.createProofAggregate(proofs, name);

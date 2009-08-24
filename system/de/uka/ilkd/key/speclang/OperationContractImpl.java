@@ -10,6 +10,7 @@
 
 package de.uka.ilkd.key.speclang;
 
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -36,8 +37,8 @@ public final class OperationContractImpl implements OperationContract {
     private final String displayName;
     private final ProgramMethod programMethod;
     private final Modality modality;
-    private final FormulaWithAxioms originalPre;
-    private final FormulaWithAxioms originalPost;
+    private final Term originalPre;
+    private final Term originalPost;
     private final Term originalModifies;
     private final ProgramVariable originalSelfVar;
     private final ImmutableList<ProgramVariable> originalParamVars;
@@ -69,8 +70,8 @@ public final class OperationContractImpl implements OperationContract {
                                  String displayName,
                                  ProgramMethod programMethod,
             		         Modality modality,
-            		         FormulaWithAxioms pre,
-            		         FormulaWithAxioms post,
+            		         Term pre,
+            		         Term post,
             		         Term modifies,
             		         ProgramVariable selfVar,
             		         ImmutableList<ProgramVariable> paramVars,
@@ -163,35 +164,12 @@ public final class OperationContractImpl implements OperationContract {
     }
     
     
-//    private ImmutableSet<LocationDescriptor> addGuard(ImmutableSet<LocationDescriptor> modifies, 
-//                                             Term formula) {
-//        ImmutableSet<LocationDescriptor> result 
-//            = DefaultImmutableSet.<LocationDescriptor>nil();
-//        for(LocationDescriptor loc : modifies) {
-//            if(loc instanceof EverythingLocationDescriptor) {
-//                return EverythingLocationDescriptor.INSTANCE_AS_SET;
-//            } else {
-//                BasicLocationDescriptor bloc = (BasicLocationDescriptor) loc;
-//                Term newGuard = TB.and(bloc.getFormula(), formula);
-//                result = result.add(new BasicLocationDescriptor(
-//                        newGuard, 
-//                        bloc.getLocTerm()));
-//            }
-//        }
-//        return result;
-//    }
-//    
+    private Term atPreify(Term t, Term heapAtPre, Services services) {
+	Map map = new HashMap();
+	map.put(TB.heap(services), heapAtPre);
+        return new OpReplacer(map).replace(t);
+    }
     
-//    private FormulaWithAxioms atPreify(
-//                FormulaWithAxioms fwa, 
-//                /*inout*/Map<Operator, Function/*atPre*/> atPreFunctions,
-//                Services services) {
-//        APF.createAtPreFunctionsForTerm(fwa.getFormula(), 
-//                                        atPreFunctions, 
-//                                        services);
-//        return new OpReplacer(atPreFunctions).replace(fwa);
-//    }
-//    
     
     
     //-------------------------------------------------------------------------
@@ -222,9 +200,9 @@ public final class OperationContractImpl implements OperationContract {
     }
     
     
-    public FormulaWithAxioms getPre(ProgramVariable selfVar, 
-	    			    ImmutableList< ProgramVariable > paramVars,
-                                    Services services) {
+    public Term getPre(ProgramVariable selfVar, 
+	    	       ImmutableList<ProgramVariable> paramVars,
+                       Services services) {
         assert (selfVar == null) == (originalSelfVar == null);
         assert paramVars != null;
         assert paramVars.size() == originalParamVars.size();
@@ -241,12 +219,12 @@ public final class OperationContractImpl implements OperationContract {
 
   
     @Override
-    public FormulaWithAxioms getPost(ProgramVariable selfVar, 
-                                     ImmutableList<ProgramVariable> paramVars, 
-                                     ProgramVariable resultVar, 
-                                     ProgramVariable excVar,
-                                     Term heapAtPre,
-                                     Services services) {
+    public Term getPost(ProgramVariable selfVar, 
+                        ImmutableList<ProgramVariable> paramVars, 
+                        ProgramVariable resultVar, 
+                        ProgramVariable excVar,
+                        Term heapAtPre,
+                        Services services) {
         assert (selfVar == null) == (originalSelfVar == null);
         assert paramVars != null;
         assert paramVars.size() == originalParamVars.size();
@@ -286,68 +264,56 @@ public final class OperationContractImpl implements OperationContract {
     
     @Override
     public OperationContract union(OperationContract[] others, 
-                                   String name, 
-                                   String displayName, 
+                                   String newName, 
+                                   String newDisplayName, 
                                    Services services) {
-	assert false : "not implemented";
-	return null;
-//        assert others != null;
-//        for(OperationContract contract : others) {
-//            assert contract.getProgramMethod().equals(programMethod);
-//        }
-//        if(others.length == 0) {
-//            return this;
-//        }
-//        
-//        //copy atPre map
-//        Map<Operator, Function> newAtPreFunctions 
-//            = new LinkedHashMap<Operator, Function>();
-//        newAtPreFunctions.putAll(originalAtPreFunctions);
-//
-//        //collect information
-//        FormulaWithAxioms pre = originalPre;
-//        FormulaWithAxioms post = atPreify(originalPre, 
-//                                          newAtPreFunctions, 
-//                                          services).imply(originalPost);
-////        ImmutableSet<LocationDescriptor> modifies = addGuard(originalModifies, 
-////                                                    originalPre.getFormula());
-//        Term modifies = originalModifies;
-//        for(OperationContract other : others) {
-//            FormulaWithAxioms otherPre = other.getPre(originalSelfVar, 
-//                                                      originalParamVars, 
-//                                                      services);
-//            FormulaWithAxioms otherPost = other.getPost(originalSelfVar, 
-//                                                        originalParamVars, 
-//                                                        originalResultVar, 
-//                                                        originalExcVar, 
-//                                                        newAtPreFunctions, 
-//                                                        services);
-//            Term otherModifies 
-//                    = other.getModifies(originalSelfVar, 
-//                                        originalParamVars, 
-//                                        services);
-//
-//            pre = pre.disjoin(otherPre);
-//            post = post.conjoin(atPreify(otherPre, 
-//                                         newAtPreFunctions, 
-//                                         services).imply(otherPost));
-////            modifies = modifies.union(addGuard(otherModifies, 
-////                                      otherPre.getFormula()));
-//            modifies = TB.union(services, modifies, otherModifies);
-//        }
-//
-//        return new OperationContractImpl(name,
-//                                         displayName,
-//                                         programMethod,
-//                                         modality,
-//                                         pre,
-//                                         post,
-//                                         modifies,
-//                                         originalSelfVar,
-//                                         originalParamVars,
-//                                         originalResultVar,
-//                                         originalExcVar,
-//                                         newAtPreFunctions);
+        assert others != null;
+        for(OperationContract contract : others) {
+            assert contract.getProgramMethod().equals(programMethod);
+        }
+        if(others.length == 0) {
+            return this;
+        }
+        
+        //collect information
+        Term pre = originalPre;
+        Term post = TB.imp(atPreify(originalPre, originalHeapAtPre, services), 
+        		   originalPost);
+        Term modifies = originalModifies;
+        for(OperationContract other : others) {
+            Term otherPre = other.getPre(originalSelfVar, 
+        	    			 originalParamVars, 
+        	    			 services);
+            Term otherPost = other.getPost(originalSelfVar, 
+        	    			   originalParamVars, 
+        	    			   originalResultVar, 
+        	    			   originalExcVar, 
+        	    			   originalHeapAtPre, 
+        	    			   services);
+            Term otherModifies = other.getModifies(originalSelfVar, 
+                                        	   originalParamVars, 
+                                        	   services);
+
+            pre = TB.or(pre, otherPre);
+            post = TB.and(post, TB.imp(atPreify(otherPre, 
+        	    				originalHeapAtPre, 
+        	    				services), 
+        	    		       otherPost));
+            modifies = TB.union(services, modifies, otherModifies);
+        }
+
+        return new OperationContractImpl(newName,
+                                         newDisplayName,
+                                         programMethod,
+                                         modality,
+                                         pre,
+                                         post,
+                                         modifies,
+                                         originalSelfVar,
+                                         originalParamVars,
+                                         originalResultVar,
+                                         originalExcVar,
+                                         originalHeapAtPre);
     }
     
     
@@ -368,7 +334,7 @@ public final class OperationContractImpl implements OperationContract {
     }
     
     
-    public OperationContract addPre(FormulaWithAxioms addedPre,
+    public OperationContract addPre(Term addedPre,
 		    		    ParsableVariable selfVar, 
 		    		    ImmutableList<ProgramVariable> paramVars,
 		    		    Services services) {
@@ -393,7 +359,7 @@ public final class OperationContractImpl implements OperationContract {
 		 			 displayName,
 		 			 programMethod,
 		 			 modality,
-		 			 originalPre.conjoin(addedPre),
+		 			 TB.and(originalPre, addedPre),
 		 			 originalPost,
 		 			 originalModifies,
 		 			 originalSelfVar,
@@ -426,12 +392,8 @@ public final class OperationContractImpl implements OperationContract {
 	sig.append(originalExcVar);
 	sig.append(")");
 	
-        final String pre 
-        	= LogicPrinter.quickPrintTerm(originalPre.getFormula(), 
-        				      services);
-        final String post 
-        	= LogicPrinter.quickPrintTerm(originalPost.getFormula(), 
-        				      services);
+        final String pre = LogicPrinter.quickPrintTerm(originalPre, services);
+        final String post = LogicPrinter.quickPrintTerm(originalPost, services);
         final String mod = LogicPrinter.quickPrintTerm(originalModifies, 
         					       services);
                       

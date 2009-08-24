@@ -39,9 +39,9 @@ public interface LoopInvariant {
     /**
      * Returns the set of loop predicates.
      */
-    public LoopPredicateSet getPredicates(Term selfTerm, 
-            			   Term heapAtPre,
-            			   Services services);
+    public ImmutableSet<Term> getPredicates(Term selfTerm, 
+            			   	    Term heapAtPre,
+            			   	    Services services);
     
     /**
      * Returns the modifies clause.

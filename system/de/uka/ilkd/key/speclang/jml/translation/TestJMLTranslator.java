@@ -12,8 +12,6 @@
 package de.uka.ilkd.key.speclang.jml.translation;
 
 import java.io.File;
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 import junit.framework.TestCase;
 import de.uka.ilkd.key.collection.ImmutableList;
@@ -30,7 +28,6 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.ProofSaver;
-import de.uka.ilkd.key.speclang.FormulaWithAxioms;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.SignatureVariablesFactory;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
@@ -123,7 +120,7 @@ public class TestJMLTranslator extends TestCase {
 
     
     public void testTrueTerm() {
-        FormulaWithAxioms result = null;
+        Term result = null;
 
         try {
             result = translator.translateExpression(new PositionedString("true"), testClassType,
@@ -133,13 +130,12 @@ public class TestJMLTranslator extends TestCase {
         }
 
         assertTrue(result != null);
-        assertTrue(result.getFormula().equals(tb.tt()));
-        assertTrue(result.getAxioms().isEmpty());
+        assertTrue(result.equals(tb.tt()));
     }
 
     
     public void testSelfVar() {
-        FormulaWithAxioms result = null;
+        Term result = null;
 
         ProgramVariable selfVar = buildSelfVarAsProgVar();
 
@@ -151,13 +147,12 @@ public class TestJMLTranslator extends TestCase {
         }
 
         assertTrue(result != null);
-        assertTrue(result.getFormula().equals(tb.var(selfVar)));
-        assertTrue(result.getAxioms().isEmpty());
+        assertTrue(result.equals(tb.var(selfVar)));
     }
 
     
     public void testLogicalExpression() {
-        FormulaWithAxioms result = null;
+        Term result = null;
 
         ProgramVariable selfVar = buildSelfVarAsProgVar();
 
@@ -170,16 +165,15 @@ public class TestJMLTranslator extends TestCase {
         }
 
         assertTrue(result != null);
-        assertTrue(result.getAxioms().isEmpty());
-        assertTrue(result.getFormula().op().equals(Junctor.IMP));
-        assertTrue(result.getFormula().sub(0).op().equals(Junctor.AND));
-        assertTrue(termContains(result.getFormula(), tb.zTerm(services, "5")));
-        assertTrue(termContains(result.getFormula(), selfVar));
+        assertTrue(result.op().equals(Junctor.IMP));
+        assertTrue(result.sub(0).op().equals(Junctor.AND));
+        assertTrue(termContains(result, tb.zTerm(services, "5")));
+        assertTrue(termContains(result, selfVar));
     }
     
     
     public void testPrimitiveField() {
-        FormulaWithAxioms result = null;
+        Term result = null;
 
         ProgramVariable selfVar = buildSelfVarAsProgVar();
         ProgramVariable i = javaInfo.getAttribute("testPackage.TestClass::i");
@@ -192,14 +186,13 @@ public class TestJMLTranslator extends TestCase {
         }
 
         assertTrue(result != null);
-        assertTrue(result.getAxioms().isEmpty());
         //assertTrue(termContains(result.getFormula(), AttributeOp.getAttributeOp(i) ));
-        assertTrue(termContains(result.getFormula(), selfVar ));
+        assertTrue(termContains(result, selfVar ));
     }
 
     
     public void testSimpleQuery() {
-        FormulaWithAxioms result = null;
+        Term result = null;
 
         ProgramVariable selfVar = buildSelfVarAsProgVar();
         ProgramMethod getOne = javaInfo.getProgramMethod(testClassType,
@@ -214,14 +207,13 @@ public class TestJMLTranslator extends TestCase {
         }
 
         assertTrue(result != null);
-        assertTrue(result.getAxioms().isEmpty());
-        assertTrue(termContains(result.getFormula(), selfVar));
-        assertTrue(termContains(result.getFormula(), getOne));
+        assertTrue(termContains(result, selfVar));
+        assertTrue(termContains(result, getOne));
     }
 
     
     public void testForAll() {
-        FormulaWithAxioms result = null;
+        Term result = null;
 
         try {
             result = translator.translateExpression(
@@ -233,15 +225,14 @@ public class TestJMLTranslator extends TestCase {
         }
 
         assertTrue(result != null);
-        assertTrue(result.getAxioms().isEmpty());
-        assertTrue(result.getFormula().op().equals(Quantifier.ALL));
-        assertTrue(termContains(result.getFormula(), tb.zTerm(services, "2147483647")));
-        assertTrue(termContains(result.getFormula(), Junctor.AND));
+        assertTrue(result.op().equals(Quantifier.ALL));
+        assertTrue(termContains(result, tb.zTerm(services, "2147483647")));
+        assertTrue(termContains(result, Junctor.AND));
     }
 
     
     public void testComplexExists() {
-        FormulaWithAxioms result = null;
+        Term result = null;
 
         try {
             result = translator.translateExpression(
@@ -253,15 +244,14 @@ public class TestJMLTranslator extends TestCase {
         }
 
         assertTrue(result != null);
-        assertTrue(result.getAxioms().isEmpty());
-        assertTrue(result.getFormula().op().equals(Quantifier.EX));
-        assertTrue(result.getFormula().sub(0).op().equals(Junctor.AND));
-        assertTrue(termContains(result.getFormula(), tb.NULL(services)));
+        assertTrue(result.op().equals(Quantifier.EX));
+        assertTrue(result.sub(0).op().equals(Junctor.AND));
+        assertTrue(termContains(result, tb.NULL(services)));
     }
 
 
     public void testOld() {
-        FormulaWithAxioms result = null;
+        Term result = null;
 
         ProgramVariable selfVar = buildSelfVarAsProgVar();
         ProgramVariable excVar = buildExcVar();
@@ -277,15 +267,14 @@ public class TestJMLTranslator extends TestCase {
         }
 
         assertTrue(result != null);
-        assertTrue(result.getAxioms().isEmpty());
-        assertTrue(result.getFormula().op().equals(Equality.EQUALS));
-        assertTrue(termContains(result.getFormula(), services.getTypeConverter().getHeapLDT().getHeap()));        
-        assertTrue(termContains(result.getFormula(), heapAtPre.op()));
+        assertTrue(result.op().equals(Equality.EQUALS));
+        assertTrue(termContains(result, services.getTypeConverter().getHeapLDT().getHeap()));        
+        assertTrue(termContains(result, heapAtPre.op()));
     }
 
     
     public void testResultVar() {
-        FormulaWithAxioms result = null;
+        Term result = null;
 
         ProgramVariable selfVar = buildSelfVarAsProgVar();
         ProgramVariable excVar = buildExcVar();
@@ -305,15 +294,14 @@ public class TestJMLTranslator extends TestCase {
         }
 
         assertTrue(result != null);
-        assertTrue(result.getAxioms().isEmpty());
-        assertTrue(result.getFormula().op().equals(Equality.EQUALS));
-        assertTrue(termContains(result.getFormula(), resultVar));
+        assertTrue(result.op().equals(Equality.EQUALS));
+        assertTrue(termContains(result, resultVar));
         
     }
 
     
     public void testCreated() {
-        FormulaWithAxioms result = null;
+        Term result = null;
 
         ProgramVariable selfVar = buildSelfVarAsProgVar();
         Function instance = services.getTypeConverter()
@@ -329,8 +317,7 @@ public class TestJMLTranslator extends TestCase {
         }
 
         assertTrue(result != null);
-        assertTrue(result.getAxioms().isEmpty());
-        assertTrue(termContains(result.getFormula(), instance));
+        assertTrue(termContains(result, instance));
         //assertTrue(termContains(result.getFormula(), AttributeOp
         //        .getAttributeOp(javaInfo.getAttribute(
         //                ImplicitFieldAdder.IMPLICIT_CREATED, javaInfo
@@ -339,7 +326,7 @@ public class TestJMLTranslator extends TestCase {
 
     
     public void testNonNullElements() {
-        FormulaWithAxioms result = null;
+        Term result = null;
         
         ProgramVariable selfVar = buildSelfVarAsProgVar();
         ProgramVariable array = javaInfo.getAttribute("testPackage.TestClass::array");
@@ -357,15 +344,14 @@ public class TestJMLTranslator extends TestCase {
         }
         
         assertTrue(result != null);
-        assertTrue(result.getAxioms().isEmpty());
         //assertTrue(termContains(result.getFormula(), AttributeOp.getAttributeOp(array)));
-        assertTrue(termContains(result.getFormula(), tb.NULL(services)));
+        assertTrue(termContains(result, tb.NULL(services)));
     }
 
     
     public void testIsInitialized() {
         
-        FormulaWithAxioms result = null;
+        Term result = null;
         
         ProgramVariable selfVar = buildSelfVarAsProgVar();
         
@@ -382,16 +368,15 @@ public class TestJMLTranslator extends TestCase {
         }
         
         assertTrue(result != null);
-        assertTrue(result.getAxioms().isEmpty());
-        assertTrue(result.getFormula().op().equals(Equality.EQUALS));
-        assertTrue(termContains(result.getFormula(), tb.var(javaInfo
+        assertTrue(result.op().equals(Equality.EQUALS));
+        assertTrue(termContains(result, tb.var(javaInfo
                 .getAttribute(ImplicitFieldAdder.IMPLICIT_CLASS_INITIALIZED,
                         testClassType))));
     }
 
   
     public void testHexLiteral() {
-        FormulaWithAxioms result = null;
+        Term result = null;
         
         ProgramVariable selfVar = buildSelfVarAsProgVar();
         
@@ -404,13 +389,13 @@ public class TestJMLTranslator extends TestCase {
         }
         
         assertTrue(result != null);
-        assertTrue(result.getFormula().op().equals(Equality.EQUALS));
-        assertTrue(termContains(result.getFormula(),tb.zTerm(services, "18")));
+        assertTrue(result.op().equals(Equality.EQUALS));
+        assertTrue(termContains(result, tb.zTerm(services, "18")));
     }
     
     
     public void testComplexQueryResolving1() {
-        FormulaWithAxioms result = null;
+        Term result = null;
 
         ProgramVariable selfVar = buildSelfVarAsProgVar();
 
@@ -431,14 +416,13 @@ public class TestJMLTranslator extends TestCase {
         }
 
         assertTrue(result != null);
-        assertTrue(result.getAxioms().isEmpty());
-        assertTrue(result.getFormula().sub(0).op().equals(pm));
-        assertTrue(result.getFormula().sub(1).op().equals(pm));
+        assertTrue(result.sub(0).op().equals(pm));
+        assertTrue(result.sub(1).op().equals(pm));
     }
 
     
     public void testComplexQueryResolving2() {
-        FormulaWithAxioms result = null;
+        Term result = null;
 
         ProgramVariable selfVar = buildSelfVarAsProgVar();
 
@@ -459,14 +443,13 @@ public class TestJMLTranslator extends TestCase {
         }
 
         assertTrue(result != null);
-        assertTrue(result.getAxioms().isEmpty());
-        assertTrue(result.getFormula().sub(0).op().equals(pm));
-        assertTrue(result.getFormula().sub(1).op().equals(pm));
+        assertTrue(result.sub(0).op().equals(pm));
+        assertTrue(result.sub(1).op().equals(pm));
     }
 
 
     public void testComplexQueryResolving3() {
-        FormulaWithAxioms result = null;
+        Term result = null;
 
         ProgramVariable selfVar = buildSelfVarAsProgVar();
 
@@ -487,14 +470,13 @@ public class TestJMLTranslator extends TestCase {
         }
 
         assertTrue(result != null);
-        assertTrue(result.getAxioms().isEmpty());
-        assertTrue(result.getFormula().sub(0).op().equals(pm));
-        assertTrue(result.getFormula().sub(1).op().equals(pm));
+        assertTrue(result.sub(0).op().equals(pm));
+        assertTrue(result.sub(1).op().equals(pm));
     }
 
 
     public void testStaticQueryResolving() {
-        FormulaWithAxioms result = null;
+        Term result = null;
 
         ProgramVariable selfVar = buildSelfVarAsProgVar();
 
@@ -513,13 +495,12 @@ public class TestJMLTranslator extends TestCase {
         }
 
         assertTrue(result != null);
-        assertTrue(result.getAxioms().isEmpty());
-        assertTrue(result.getFormula().sub(0).op().equals(pm));
+        assertTrue(result.sub(0).op().equals(pm));
     }
     
     
     public void testSubtypeExpression() {
-        FormulaWithAxioms result = null;
+        Term result = null;
 
         ProgramVariable selfVar = buildSelfVarAsProgVar();
 
@@ -536,12 +517,12 @@ public class TestJMLTranslator extends TestCase {
 
         Sort sds = javaInfo.objectSort();
         Function ioFunc = sds.getInstanceofSymbol(services);
-        assertTrue(termContains(result.getFormula(), ioFunc));
+        assertTrue(termContains(result, ioFunc));
     }
     
     
     public void testCorrectImplicitThisResolution() {
-        FormulaWithAxioms result = null;
+        Term result = null;
 
         ProgramVariable selfVar = buildSelfVarAsProgVar();
         LocationVariable array 
@@ -571,7 +552,7 @@ public class TestJMLTranslator extends TestCase {
                         ),
                         tb.equals(tb.var(qv), tb.var(selfVar))));
         assertTrue("Expected:"+ProofSaver.printTerm(expected,services)+"\n Was:"+
-                ProofSaver.printTerm(result.getFormula(),services),
-                result.getFormula().equalsModRenaming(expected));
+                ProofSaver.printTerm(result,services),
+                result.equalsModRenaming(expected));
     } 
 }

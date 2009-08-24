@@ -96,9 +96,9 @@ public class ContractConfigurator extends JDialog {
         if(allowContract) {
             contractPanel 
                 = new OperationContractSelectionPanel(services, 
-                                                      pm, 
-                                                      modality,
+                				      "Contracts for " + pm.getName(),
                                                       allowMultipleContracts);
+            contractPanel.setContracts(pm, modality);
             contractPanel.addMouseListener(new MouseAdapter() {
                 public void mouseClicked(MouseEvent e){                
                     if(e.getClickCount() == 2){
@@ -206,7 +206,7 @@ public class ContractConfigurator extends JDialog {
      * Returns the selected contract.
      */
     public OperationContract getContract() {
-	return contractPanel.getOperationContract();
+	return contractPanel.getContract();
     }
     
     

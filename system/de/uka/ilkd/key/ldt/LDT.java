@@ -20,6 +20,7 @@ import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.util.ExtList;
 
@@ -40,8 +41,8 @@ public abstract class LDT implements Named {
     //constructors
     //-------------------------------------------------------------------------
     
-    protected LDT(Name name, Namespace sorts) {
-	sort = (Sort) sorts.lookup(name);
+    protected LDT(Name name, Services services) {
+	sort = (Sort) services.getNamespaces().sorts().lookup(name);
 	assert sort != null;
         this.name = name;
     }
@@ -64,15 +65,29 @@ public abstract class LDT implements Named {
     
     /**
      * looks up a function in the namespace and adds it to the LDT 
-     * @param funcNS a Namespace with symbols
      * @param funcName the String with the name of the function to look up
      * @return the added function (for convenience reasons)
      */
-    protected final Function addFunction(Namespace funcNS, String funcName) {
+    protected final Function addFunction(Services services, String funcName) {
+	final Namespace funcNS = services.getNamespaces().functions();
         final Function f = (Function)funcNS.lookup(new Name(funcName));
         assert f != null : "LDT: Function " + funcName + " not found";
         return addFunction(f);
     }
+    
+    
+    protected final SortDependingFunction addSortDependingFunction(
+	    					Services services, 
+	    					String kind) {	
+	final SortDependingFunction f 
+		= SortDependingFunction.getFirstInstance(new Name(kind), 
+							 services);
+	assert f != null : "LDT: Sort depending function " 
+	                   + kind + " not found";
+	addFunction(f);
+	return f;
+    }
+
     
     
     /** returns the basic functions of the model
