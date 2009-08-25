@@ -302,8 +302,8 @@ public final class OperationContractImpl implements OperationContract {
     
     
     public OperationContract union(OperationContract[] others, 
-                                   String name, 
-                                   String displayName, 
+                                   String p_name, 
+                                   String p_displayName, 
                                    Services services) {
         assert others != null;
         for(OperationContract contract : others) {
@@ -348,8 +348,8 @@ public final class OperationContractImpl implements OperationContract {
                                       otherPre.getFormula()));
         }
 
-        return new OperationContractImpl(name,
-                                         displayName,
+        return new OperationContractImpl(p_name,
+                                         p_displayName,
                                          programMethod,
                                          modality,
                                          pre,
