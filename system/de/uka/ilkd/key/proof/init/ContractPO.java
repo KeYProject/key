@@ -45,9 +45,7 @@ public final class ContractPO extends AbstractPO {
     //-------------------------------------------------------------------------
     
     public ContractPO(InitConfig initConfig, OperationContract contract) {
-    	super(initConfig, 
-    	      "ContractSatisfied: " + contract.getName(),
-    	      contract.getProgramMethod().getContainerType());
+    	super(initConfig, contract.getName());
     	this.contract = contract;
     }
     
@@ -95,9 +93,7 @@ public final class ContractPO extends AbstractPO {
         Term selfCreated
            = selfVar == null
              ? TB.tt()
-             : TB.equals(TB.dotCreated(services, 
-                                       TB.var(selfVar)), 
-                         TB.TRUE(services));
+             : TB.created(services, TB.var(selfVar));
         
         //conjunction of... 
         //- "p_i.<created> = TRUE | p_i = null" for object parameters, and
@@ -183,7 +179,7 @@ public final class ContractPO extends AbstractPO {
                                             exceptionVar);
         
         //create program term
-        final Term programTerm = TB.mod(contract.getModality(), jb, postTerm);
+        final Term programTerm = TB.prog(contract.getModality(), jb, postTerm);
         
         //create update
         Term update = TB.elementary(services, heapAtPreVar, TB.heap(services));
@@ -210,14 +206,13 @@ public final class ContractPO extends AbstractPO {
 	final ProgramMethod pm = contract.getProgramMethod();
 	
         //prepare variables, program method, heapAtPre
-        final ImmutableList<ProgramVariable> paramVars = buildParamVars(pm);
-        final ProgramVariable selfVar
-            = pm.isStatic() ? null : buildSelfVarAsProgVar();
-        final ProgramVariable resultVar = buildResultVar(pm);
-        final ProgramVariable exceptionVar = buildExcVar();
+        final ImmutableList<ProgramVariable> paramVars 
+        	= TB.paramVars(services, pm, true);
+        final ProgramVariable selfVar = TB.selfVar(services, pm, true);
+        final ProgramVariable resultVar = TB.resultVar(services, pm, true);
+        final ProgramVariable exceptionVar = TB.excVar(services, pm, true);
      	final LocationVariable heapAtPreVar 
-		= new LocationVariable(new ProgramElementName("heapAtPre"),
-				       new KeYJavaType(heapLDT.targetSort()));
+		= TB.heapAtPreVar(services, "heapAtPre", true);
         final Term heapAtPre = TB.var(heapAtPreVar);
 
         //build precondition

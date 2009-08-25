@@ -437,128 +437,6 @@ options {
 
 	return result;
     }
-
-
-    
-/*    
-    private ImmutableSet<LocationDescriptor> getObjectCreationModSet(KeYJavaType kjt) {
-    	ImmutableSet<LocationDescriptor> result = SetAsImmutableList<LocationDescriptor>.EMPTY_SET;
-    	
-    	//collect implicit attributes
-    	ProgramVariable nextToCreate 
-    		= javaInfo.getAttribute(
-    				ImplicitFieldAdder.IMPLICIT_NEXT_TO_CREATE, 
-    				kjt);
-    	ProgramVariable createdAttribute
-		= javaInfo.getAttribute(ImplicitFieldAdder.IMPLICIT_CREATED, 
-					javaInfo.getJavaLangObject());
-	ProgramVariable initializedAttribute
-		= javaInfo.getAttribute(ImplicitFieldAdder.IMPLICIT_INITIALIZED, 
-                                        javaInfo.getJavaLangObject());
-	ProgramVariable transientAttribute
-		= javaInfo.getAttribute(ImplicitFieldAdder.IMPLICIT_TRANSIENT, 
-                                        javaInfo.getJavaLangObject());
-	ProgramVariable objectTimesFinalizedAttribute
-		= javaInfo.getAttribute("objectTimesFinalized", 
-                                        javaInfo.getJavaLangObject());
-        
-        //create logic variable, guard
-        Sort integerSort 
-        	= services.getTypeConverter().getIntegerLDT().targetSort();
-        LogicVariable lv 
-        	= new LogicVariable(new Name("x"), integerSort);
-	Term lvTerm = TB.var(lv);
-	Function repos = kjt.getSort().getObjectRepository();
-	Term objectTerm = TB.func(repos, lvTerm); 
-	Term guardFma = TB.leq(TB.dot(null, nextToCreate), lvTerm, services); 
-	
-	//<nextToCreate>
-	Term nextToCreateTerm = TB.dot(null, nextToCreate);
-	BasicLocationDescriptor nextToCreateLd
-		= new BasicLocationDescriptor(nextToCreateTerm);
-	result = result.add(nextToCreateLd);
-		
-	//<created>
-	Term createdTerm = TB.dot(objectTerm, createdAttribute);
-	BasicLocationDescriptor createdLd 
-		= new BasicLocationDescriptor(guardFma, createdTerm);
-	result = result.add(createdLd);
-		
-	//<initialized>
-	Term initializedTerm = TB.dot(objectTerm, initializedAttribute);
-	BasicLocationDescriptor initializedLd
-		= new BasicLocationDescriptor(guardFma, initializedTerm);
-	result = result.add(initializedLd); 
-	
-	//<transient>
-	Term transientTerm   = TB.dot(objectTerm, transientAttribute);
-	BasicLocationDescriptor transientLd
-		= new BasicLocationDescriptor(guardFma, transientTerm);
-	result = result.add(transientLd);
-	
-	//objectTimesFinalized (a ghost field in java.lang.Object)
-	if(objectTimesFinalizedAttribute != null) {
-	    Term objectTimesFinalizedTerm 
-			     = TB.dot(objectTerm, objectTimesFinalizedAttribute);
-	    BasicLocationDescriptor objectTimesFinalizedLd
-		= new BasicLocationDescriptor(guardFma, objectTimesFinalizedTerm);
-	    result = result.add(objectTimesFinalizedLd); 
-    	}
-
-	//local instance fields of created objects
-	if(kjt.getJavaType() instanceof ClassDeclaration) {
-		ImmutableList<KeYJavaType> kjts = javaInfo.getAllSupertypes(kjt).append(kjt);
-        Iterator<KeYJavaType> kit = kjts.iterator();
-        while(kit.hasNext()){
-            KeYJavaType skjt = kit.next();
-            if(skjt.getJavaType() instanceof ClassDeclaration){
-                ClassDeclaration cd = (ClassDeclaration)skjt.getJavaType();
-	            ImmutableList<Field> fields = javaInfo.getAllFields(cd);
-	            for(Iterator<Field> it = fields.iterator(); it.hasNext(); ) {
-                    Field f = it.next();
-                    ProgramVariable pv = (ProgramVariable) f.getProgramVariable();
-                    if(!pv.isStatic()) {
-                        Term fieldTerm = TB.dot(objectTerm, pv);
-                        BasicLocationDescriptor fieldLd 
-                            = new BasicLocationDescriptor(guardFma, fieldTerm);
-                        result = result.add(fieldLd);
-                    }
-                }
-            }
-        }
-	} else {
-	    assert kjt.getJavaType() instanceof ArrayDeclaration;
-	    
-	    //length
-	    Term lengthTerm = TB.dot(objectTerm, javaInfo.getArrayLength());
-	    BasicLocationDescriptor lengthLd
-		= new BasicLocationDescriptor(guardFma, lengthTerm);
-	    result = result.add(lengthLd);
-	    
-	    //slots
-	    LogicVariable idxLv 
-	    	= new LogicVariable(new Name("idx"), integerSort);
-	    Term arrTerm 
-	    	= TB.dotArr(services, objectTerm, TB.var(idxLv));
-	    BasicLocationDescriptor arrLd
-	    	= new BasicLocationDescriptor(guardFma, arrTerm);
-	    result = result.add(arrLd);
-	}
-    	
-	return result;
-    }    
-
-    
-    private Term getObjectCreationFma(KeYJavaType kjt) {
-	ProgramVariable nextToCreate 
-    		= javaInfo.getAttribute(
-    				ImplicitFieldAdder.IMPLICIT_NEXT_TO_CREATE, 
-    				kjt);
-	Term nextToCreateTerm = TB.dot(null, nextToCreate);
-	Term oldNextToCreateTerm = convertToOld(nextToCreateTerm);
-	return TB.leq(oldNextToCreateTerm, nextToCreateTerm, services);
-    }
-*/        
 }
 
 
@@ -1590,7 +1468,7 @@ jmlprimary returns [SLExpression result=null] throws SLTranslationException
 	             .sort()
 	             .extendsTrans(services.getJavaInfo().objectSort())) {
 		result = new SLExpression(
-		    TB.dotCreated(services, result.getTerm()));
+		    TB.created(services, result.getTerm()));
 	    } else {
 		raiseError("\\created only allowed for reference types.");
 	    }

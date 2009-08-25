@@ -87,7 +87,8 @@ class ClassInvariantSelectionPanel extends JPanel {
         listPanel.add(classScrollPane);
         
         //create class tree
-        classTree = new ClassTree(false, false, defaultClass, null, services);
+        classTree = new ClassTree(false, false, services);
+        classTree.select(defaultClass);
         setInvCounters(classTree.getRootNode());
         classTree.addTreeSelectionListener(new TreeSelectionListener() {
             public void valueChanged(TreeSelectionEvent e) {

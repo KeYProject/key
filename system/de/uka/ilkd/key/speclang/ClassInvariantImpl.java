@@ -32,8 +32,6 @@ import de.uka.ilkd.key.proof.OpReplacer;
  */
 public final class ClassInvariantImpl implements ClassInvariant {
     
-    private static final SignatureVariablesFactory SVN 
-        = SignatureVariablesFactory.INSTANCE;
     private static final TermBuilder TB = TermBuilder.DF;
     
     private final String name;

@@ -18,6 +18,7 @@ import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.TypeConverter;
+import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.expression.literal.IntLiteral;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.IntegerLDT;
@@ -63,9 +64,7 @@ public final class TermBuilder {
      * Returns an available name constructed by affixing a counter to the passed
      * base name.
      */
-    public String getNewName(String baseName, 
-                             Services services, 
-                             ImmutableList<String> locallyUsedNames) {
+    public String newName(Services services, String baseName) {
         NamespaceSet namespaces = services.getNamespaces();
             
         int i = 0;
@@ -78,13 +77,109 @@ public final class TermBuilder {
     }
     
     
+    
+    //-------------------------------------------------------------------------
+    //common variable constructions
+    //-------------------------------------------------------------------------
+    
     /**
-     * Returns an available name constructed by affixing a counter to the passed
-     * base name.
+     * Creates a program variable for "self". Take care to register it
+     * in the namespaces.
      */
-    public String getNewName(String baseName, Services services) {
-        return getNewName(baseName, services, ImmutableSLList.<String>nil());
-    }    
+    public LocationVariable selfVar(Services services, 
+                                    ProgramMethod pm,
+                                    boolean makeNameUnique) {
+        if(pm.isStatic()) {
+            return null;
+        } else {
+            String name = "self";
+            if(makeNameUnique) {
+        	name = newName(services, name);
+            }
+            return new LocationVariable(new ProgramElementName(name), 
+                                        pm.getContainerType());
+        }
+    }
+    
+    
+    /**
+     * Creates program variables for the parameters. Take care to register them
+     * in the namespaces.
+     */
+    public ImmutableList<ProgramVariable> paramVars(Services services, 
+                                                    ProgramMethod pm,
+                                                    boolean makeNamesUnique) {
+        ImmutableList<ProgramVariable> result 
+        	= ImmutableSLList.<ProgramVariable>nil();
+        for(int i = 0, n = pm.getParameterDeclarationCount(); i < n; i++) {
+            KeYJavaType parType = pm.getParameterType(i);
+            String name = pm.getParameterDeclarationAt(i)
+                            .getVariableSpecification()
+                            .getName();
+            if(makeNamesUnique) {
+        	name = newName(services, name);
+            }
+            LocationVariable paramVar
+            	= new LocationVariable(new ProgramElementName(name), parType);
+            result = result.append(paramVar);
+        }        
+        return result;
+    }
+    
+    
+    /**
+     * Creates a program variable for the result. Take care to register it
+     * in the namespaces.
+     */
+    public LocationVariable resultVar(Services services, 
+                                      ProgramMethod pm,
+                                      boolean makeNameUnique) {
+	if(pm.getKeYJavaType() == null) {
+	    return null;
+	} else {
+	    String name = "result";
+	    if(makeNameUnique) {
+		name = newName(services, name);
+	    }
+	    return new LocationVariable(new ProgramElementName(name),
+				    	pm.getKeYJavaType());
+	}
+    }
+    
+    
+    /**
+     * Creates a program variable for the thrown exception. Take care to 
+     * register it in the namespaces.
+     */
+    public LocationVariable excVar(Services services, 
+                                   ProgramMethod pm,
+                                   boolean makeNameUnique) {
+	String name = "exc";
+	if(makeNameUnique) {
+	    name = newName(services, name);
+	}	
+        return new LocationVariable(new ProgramElementName(name),
+                                    services.getJavaInfo().getTypeByClassName(
+                                                   "java.lang.Throwable"));
+    }
+    
+    
+    /**
+     * Creates a program variable for the atPre heap. Take care to register it
+     * in the namespaces.
+     */
+    public LocationVariable heapAtPreVar(Services services,
+	    				 String baseName,
+	    			         boolean makeNameUnique) {
+	if(makeNameUnique) {
+	    baseName = newName(services, baseName);
+	}	
+	return new LocationVariable(new ProgramElementName(baseName),
+		            	    new KeYJavaType(services.getTypeConverter()
+		            	            		    .getHeapLDT()
+		            	            		    .targetSort()));
+    }
+        
     
     
     
@@ -144,18 +239,18 @@ public final class TermBuilder {
     }
     
     
-    public Term mod(Modality mod, JavaBlock jb, Term t) {
+    public Term prog(Modality mod, JavaBlock jb, Term t) {
 	return tf.createTerm(mod, new Term[]{t}, null, jb);
     }
     
     
     public Term box(JavaBlock jb, Term t) {
-        return mod(Modality.BOX, jb, t);
+        return prog(Modality.BOX, jb, t);
     }
     
     
     public Term dia(JavaBlock jb, Term t) {
-        return mod(Modality.DIA, jb, t);
+        return prog(Modality.DIA, jb, t);
     }
     
     
@@ -456,6 +551,19 @@ public final class TermBuilder {
     
     public Term sequential(Term u1, Term u2) {
 	return parallel(u1, apply(u1, u2));
+    }
+    
+    
+    public Term sequential(Term[] updates) {
+	if(updates.length == 0) {
+	    return skip();
+	} else {
+	    Term result = updates[updates.length - 1];
+	    for(int i = updates.length - 2; i >= 0; i++) {
+		result = sequential(updates[i], result);
+	    }
+	    return result;
+	}
     }
     
     
@@ -826,56 +934,63 @@ public final class TermBuilder {
     }
     
     
-    public Term dotCreated(Services services, Term o) {
+    public Term created(Services services, Term o) {
 	final TypeConverter tc = services.getTypeConverter();	
-	return dot(services,
-		   tc.getBooleanLDT().targetSort(),
-		   o,
-		   tc.getHeapLDT().getCreated());
+	return equals(dot(services,
+		          tc.getBooleanLDT().targetSort(),
+		          o,
+		          tc.getHeapLDT().getCreated()),
+		      TRUE(services));
     }
     
     
-    public Term dotInitialized(Services services, Term o) {
+    public Term initialized(Services services, Term o) {
 	final TypeConverter tc = services.getTypeConverter();	
-	return dot(services,
-		   tc.getBooleanLDT().targetSort(),
-		   o,
-		   tc.getHeapLDT().getInitialized());
-    }
-
-    
-    public Term dotClassPrepared(Services services, Sort classSort) {
-	final TypeConverter tc = services.getTypeConverter();	
-	return staticDot(services,
-		         tc.getBooleanLDT().targetSort(),
-		         tc.getHeapLDT().getClassPrepared(classSort, services));	
-    }
-    
-    public Term dotClassInitialized(Services services, Sort classSort) {
-	final TypeConverter tc = services.getTypeConverter();	
-	return staticDot(services,
-		         tc.getBooleanLDT().targetSort(),
-		         tc.getHeapLDT().getClassInitialized(classSort, 
-		        	 			     services));	
+	return equals(dot(services,
+		          tc.getBooleanLDT().targetSort(),
+		          o,
+		          tc.getHeapLDT().getInitialized()),
+		      TRUE(services));
     }
 
-    public Term dotClassInitializationInProgress(Services services, 
-	    					 Sort classSort) {
+    
+    public Term classPrepared(Services services, Sort classSort) {
 	final TypeConverter tc = services.getTypeConverter();	
-	return staticDot(services,
-		         tc.getBooleanLDT().targetSort(),
-		         tc.getHeapLDT()
-		           .getClassInitializationInProgress(classSort, 
-		        	   			     services));	
+	return equals(staticDot(services,
+		                tc.getBooleanLDT().targetSort(),
+		                tc.getHeapLDT().getClassPrepared(classSort, 
+		                				 services)),
+		      TRUE(services));	
+    }
+    
+    public Term classInitialized(Services services, Sort classSort) {
+	final TypeConverter tc = services.getTypeConverter();	
+	return equals(staticDot(services,
+		                tc.getBooleanLDT().targetSort(),
+		                 tc.getHeapLDT().getClassInitialized(classSort, 
+		        	 			             services)),
+		      TRUE(services));
+    }
+
+    public Term classInitializationInProgress(Services services, 
+	    				      Sort classSort) {
+	final TypeConverter tc = services.getTypeConverter();	
+	return equals(staticDot(services,
+		                tc.getBooleanLDT().targetSort(),
+		                tc.getHeapLDT()
+		                  .getClassInitializationInProgress(classSort, 
+		        	   			            services)),
+		      TRUE(services));
     }
 
         
-    public Term dotClassErroneous(Services services, Sort classSort) {
+    public Term classErroneous(Services services, Sort classSort) {
 	final TypeConverter tc = services.getTypeConverter();	
-	return staticDot(services,
-		         tc.getBooleanLDT().targetSort(),
-		         tc.getHeapLDT().getClassErroneous(classSort, 
-		        	 			   services));	
+	return equals(staticDot(services,
+		                tc.getBooleanLDT().targetSort(),
+		                tc.getHeapLDT().getClassErroneous(classSort, 
+		        	 			          services)),
+		      TRUE(services));
     }
 
     
@@ -944,8 +1059,7 @@ public final class TermBuilder {
 	IntegerLDT intLDT = services.getTypeConverter().getIntegerLDT();
 	Term pvVar = var(pv);
 	if(pv.sort().extendsTrans(services.getJavaInfo().objectSort())) {
-	    return or(equals(dotCreated(services, pvVar), TRUE(services)), 
-		      equals(pvVar, NULL(services)));
+	    return or(created(services, pvVar), equals(pvVar, NULL(services)));
 	} else if(pv.getKeYJavaType() != null
 		  && pv.sort().equals(intLDT.targetSort())) {
 	    return func(intLDT.getInBounds(pv.getKeYJavaType().getJavaType()), 
@@ -964,8 +1078,8 @@ public final class TermBuilder {
 	                         .getHeapLDT()
 	                         .getFieldSort();
 	
-	Name objVarName   = new Name(getNewName("o", services));
-	Name fieldVarName = new Name(getNewName("f", services));
+	Name objVarName   = new Name(newName(services, "o"));
+	Name fieldVarName = new Name(newName(services, "f"));
 	LogicVariable objVar   = new LogicVariable(objVarName, objectSort);
 	LogicVariable fieldVar = new LogicVariable(fieldVarName, fieldSort);
 	Term objVarTerm = var(objVar);
@@ -991,5 +1105,15 @@ public final class TermBuilder {
 				    heapAtPre,
 				    objVarTerm,
 				    fieldVarTerm))));
-    }    
+    }
+    
+    
+    public Term anon(Services services, Term mod, Term anonHeap) {
+	return elementary(services,
+		          services.getTypeConverter().getHeapLDT().getHeap(),
+		          changeHeapAtLocs(services, 
+		        	           heap(services), 
+		        	           mod, 
+		        	           anonHeap));
+    }
 }

@@ -291,8 +291,11 @@ public class ApplyStrategy {
 		    }else{
 			mediator().startInterface(true);
 			Goal g = goalChooser.getNextGoal();
+			if(g == null) {
+			    g = proof.openGoals().head();
+			}
 			if(g != null) {
-			    mediator().goalChosen(goalChooser.getNextGoal());
+			    mediator().goalChosen(g);
 			}
 		    }
 		}

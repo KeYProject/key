@@ -30,8 +30,6 @@ import de.uka.ilkd.key.proof.OpReplacer;
 public final class OperationContractImpl implements OperationContract {
     
     protected static final TermBuilder TB = TermBuilder.DF;
-    protected static final SignatureVariablesFactory SVN 
-        = SignatureVariablesFactory.INSTANCE;
 
     private final String name;
     private final String displayName;

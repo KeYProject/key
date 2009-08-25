@@ -11,14 +11,10 @@
 package de.uka.ilkd.key.proof.init;
 
 import java.util.Iterator;
-import java.util.Map;
 
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
-import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
@@ -42,7 +38,6 @@ public abstract class AbstractPO implements ProofOblInput {
     protected final HeapLDT heapLDT;
     protected final SpecificationRepository specRepos;
     protected final String name;
-    protected final KeYJavaType selfKJT;
 
     private String header;
     private ProofAggregate proofAggregate;
@@ -55,96 +50,18 @@ public abstract class AbstractPO implements ProofOblInput {
     //constructors
     //-------------------------------------------------------------------------
 
-    public AbstractPO(InitConfig initConfig, String name, KeYJavaType selfKJT) {
+    public AbstractPO(InitConfig initConfig, String name) {
 	this.initConfig = initConfig;
         this.services   = initConfig.getServices();
         this.javaInfo   = initConfig.getServices().getJavaInfo();
         this.heapLDT    = initConfig.getServices().getTypeConverter().getHeapLDT();
         this.specRepos  = initConfig.getServices().getSpecificationRepository();
         this.name       = name;
-        this.selfKJT    = selfKJT;
     }
 
-    
     
     //-------------------------------------------------------------------------
-    //helper methods for subclasses
-    //-------------------------------------------------------------------------
-
-    protected final ProgramVariable buildSelfVarAsProgVar() {
-        return new LocationVariable(new ProgramElementName("self"), selfKJT);
-    }
-    
-
-    protected final ImmutableList<ProgramVariable> buildParamVars(
-	    				ProgramMethod programMethod) {
-        int numPars = programMethod.getParameterDeclarationCount();
-        ImmutableList<ProgramVariable> result 
-        	= ImmutableSLList.<ProgramVariable>nil();
-
-        for(int i = 0; i < numPars; i++) {
-            KeYJavaType parType = programMethod.getParameterType(i);
-            assert parType != null;
-            String parName = programMethod.getParameterDeclarationAt(i)
-            				  .getVariableSpecification()
-            				  .getName();
-            ProgramElementName parPEN = new ProgramElementName(parName);
-            result = result.append(new LocationVariable(parPEN, parType));
-        }
-
-        return result;
-    }
-
-
-    protected final ProgramVariable buildResultVar(ProgramMethod programMethod){
-        final KeYJavaType resultKJT = programMethod.getKeYJavaType();
-        if(resultKJT != null) {
-            final ProgramElementName resultPEN 
-            	= new ProgramElementName("result");
-            return new LocationVariable(resultPEN, resultKJT);
-        }
-        return null;
-    }
-
-
-    protected final ProgramVariable buildExcVar() {
-        final KeYJavaType excType
-        	= javaInfo.getTypeByClassName("java.lang.Throwable");
-        return new LocationVariable(new ProgramElementName("exc"), excType);      
-    }
-    
-    /**
-     * Replaces operators in a term by other operators with the same signature.
-     */
-    protected final Term replaceOps(Map<? extends Operator, ? extends Operator> map, Term term) {      
-        return new OpReplacer(map).replace(term);
-    }
-
-
-    protected final void registerInNamespaces(ProgramVariable pv) {
-        if(pv != null) {
-            initConfig.progVarNS().add(pv);
-        }
-    }
-
-    protected final void registerInNamespaces(Function f) {
-        if(f != null) {
-            services.getNameRecorder().addProposal(f.name());
-            initConfig.funcNS().add(f);
-        }
-    }
-
-
-    protected final void registerInNamespaces(ImmutableList<ProgramVariable> pvs) {
-        final Iterator<ProgramVariable> it = pvs.iterator();
-        while(it.hasNext()) {
-            initConfig.progVarNS().add(it.next());
-        }
-    }
-
-
-    //-------------------------------------------------------------------------
-    //methods of ProofOblInput interface
+    //public interface
     //-------------------------------------------------------------------------
     
     @Override
@@ -224,11 +141,11 @@ public abstract class AbstractPO implements ProofOblInput {
     /**
      * Creates a Proof (helper for getPO()).
      */
-    private Proof createProof(String name, Term poTerm) {
+    private Proof createProof(String proofName, Term poTerm) {
          createProofHeader(initConfig.getProofEnv()
    	    		             .getJavaModel()
         	    	             .getModelDir());
-        return new Proof(name,
+        return new Proof(proofName,
                          poTerm,
                          header,
                          initConfig.createTacletIndex(),
@@ -253,7 +170,8 @@ public abstract class AbstractPO implements ProofOblInput {
                                     poTerms[i]);            
         }
         
-        return proofAggregate = ProofAggregate.createProofAggregate(proofs, name);
+        proofAggregate = ProofAggregate.createProofAggregate(proofs, name);
+        return proofAggregate;
     }
     
     

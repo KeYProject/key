@@ -21,7 +21,6 @@ import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
-import de.uka.ilkd.key.proof.mgt.ContractWithInvs;
 import de.uka.ilkd.key.speclang.ClassInvariant;
 import de.uka.ilkd.key.speclang.OperationContract;
 
@@ -223,15 +222,5 @@ public class ContractConfigurator extends JDialog {
      */
     public ImmutableSet<ClassInvariant> getEnsuredInvs() {
 	return ensuredInvPanel.getClassInvariants();
-    }
-    
-    
-    /**
-     * Returns the selected tuple (contract, assumed invs, ensured invs).
-     */
-    public ContractWithInvs getContractWithInvs() {
-        return new ContractWithInvs(getContract(), 
-                                    getAssumedInvs(), 
-                                    getEnsuredInvs());
     }
 }

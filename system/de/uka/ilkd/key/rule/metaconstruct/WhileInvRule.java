@@ -232,7 +232,7 @@ public class WhileInvRule extends AbstractMetaOperator {
         
         Modality loopBodyModality = modality;
         
-        return TB.mod(loopBodyModality, 
+        return TB.prog(loopBodyModality, 
         	      JavaBlock.createJavaBlock(new StatementBlock(resSta)), 
         	      result); 
     }
@@ -329,7 +329,7 @@ public class WhileInvRule extends AbstractMetaOperator {
                             KeYJavaType returnType,
                             ProgramVariable returnExpression,
                             Term post) {
-        Term executeReturn = TB.mod
+        Term executeReturn = TB.prog
             (modality, 
              addContext(root, new StatementBlock
                         (KeYJavaASTFactory.returnClause(returnExpression))), 
@@ -359,7 +359,7 @@ public class WhileInvRule extends AbstractMetaOperator {
                            Term post,
                            ArrayList<If> breakIfCascade) {
         Term executeBreak = 
-            TB.mod(modality,
+            TB.prog(modality,
              addContext(root, new StatementBlock
                         (breakIfCascade.toArray(new Statement[0]))),
              post);
@@ -405,7 +405,7 @@ public class WhileInvRule extends AbstractMetaOperator {
                            ProgramVariable thrownException,
                            Term post) {
         Term throwException = 
-            TB.mod(modality, 
+            TB.prog(modality, 
         	   addContext(root, new StatementBlock(KeYJavaASTFactory.throwClause(thrownException))), 
                    post);
         return TB.imp( 

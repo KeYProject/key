@@ -10,29 +10,21 @@
 
 package de.uka.ilkd.key.proof.mgt;
 
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
-import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.statement.LoopStatement;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ContractPO;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.speclang.ClassInvariant;
 import de.uka.ilkd.key.speclang.LoopInvariant;
 import de.uka.ilkd.key.speclang.OperationContract;
-import de.uka.ilkd.key.speclang.SignatureVariablesFactory;
 
 
 public class SpecificationRepository {
@@ -55,8 +47,6 @@ public class SpecificationRepository {
                 = new LinkedHashMap<ProofOblInput,ImmutableSet<Proof>>();
     private final Map<LoopStatement,LoopInvariant> loopInvs
                 = new LinkedHashMap<LoopStatement,LoopInvariant>();
-    private final Map<ProgramMethod,Boolean> strictPurityCache
-    		= new LinkedHashMap<ProgramMethod,Boolean>();
     private final Services services;
     
     
@@ -334,6 +324,19 @@ public class SpecificationRepository {
     
     
     /**
+     * Returns all proofs registered with this specification repository.
+     */
+    public ImmutableSet<Proof> getAllProofs() {
+	ImmutableSet<Proof> result = DefaultImmutableSet.<Proof>nil();
+	Collection<ImmutableSet<Proof>> proofSets = proofs.values();
+	for(ImmutableSet<Proof> proofSet : proofSets) {
+	    result = result.union(proofSet);
+	}
+	return result;
+    }
+    
+    
+    /**
      * Returns the operation that the passed proof is about, or null.
      */
     public ProgramMethod getOperationForProof(Proof proof) {
@@ -390,37 +393,5 @@ public class SpecificationRepository {
     public void setLoopInvariant(LoopInvariant inv) {
         LoopStatement loop = inv.getLoop();
         loopInvs.put(loop, inv);
-    }
-    
-    
-    /**
-     * Tells whether the passed operation is "strictly pure", i.e., whether
-     * its specification says that it may have absolutely no side effects
-     * (except for abrupt termination, which is not considered a side effect).
-     */
-    public boolean isStrictlyPure(ProgramMethod pm) {
-        assert pm != null;
-	Boolean result = strictPurityCache.get(pm);
-	if(result != null) {
-	    return result;
-	}
-	
-	result = false;
-	SignatureVariablesFactory svf = SignatureVariablesFactory.INSTANCE;
-	Term tt = TermBuilder.DF.tt();
-        ProgramVariable selfVar 
-        	= svf.createSelfVar(services, pm, true);
-        ImmutableList<ProgramVariable> paramVars 
-        	= svf.createParamVars(services, pm, false);
-	for(OperationContract c : getOperationContracts(pm, Modality.DIA)) {
-	    if(c.getPre(selfVar, paramVars, services).equals(tt)	   
-	       && c.getModifies(selfVar, paramVars, services).equals(TermBuilder.DF.empty(services))) {
-		result = true;
-		break;
-	    }
-	}
-	
-	strictPurityCache.put(pm, result);
-	return result;
     }
 }

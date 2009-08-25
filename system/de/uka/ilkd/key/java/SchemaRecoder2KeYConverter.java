@@ -97,8 +97,7 @@ public class SchemaRecoder2KeYConverter extends Recoder2KeYConverter {
         } else if ("#expand-method-body".equals(mcName)) {
             return new ExpandMethodBody((SchemaVariable) list
                     .get(SchemaVariable.class));
-        } else if ("#method-call".equals(mcName)
-                || "#method-call-contract".equals(mcName)) {
+        } else if ("#method-call".equals(mcName)) {
             ProgramSV[] svw = mc.getSV();
             ProgramSV execSV = null;
             ProgramSV returnSV = null;
@@ -110,13 +109,8 @@ public class SchemaRecoder2KeYConverter extends Recoder2KeYConverter {
                     execSV = svw[i];
                 }
             }
-            if ("#method-call".equals(mcName)) {
-                return new MethodCall(execSV, returnSV, (Expression) list
-                        .get(Expression.class));
-            } else {
-                return new MethodCallContract(execSV, returnSV,
-                        (Expression) list.get(Expression.class));
-            }
+            return new MethodCall(execSV, returnSV, (Expression) list
+        	    .get(Expression.class));
         } else if ("#evaluate-arguments".equals(mcName)) {
             return new EvaluateArgs((Expression) list.get(Expression.class));
         } else if ("#constructor-call".equals(mcName)) {

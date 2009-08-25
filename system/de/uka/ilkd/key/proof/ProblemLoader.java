@@ -30,8 +30,8 @@ import de.uka.ilkd.key.parser.DefaultTermParser;
 import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.proof.init.*;
-import de.uka.ilkd.key.proof.mgt.ContractWithInvs;
 import de.uka.ilkd.key.rule.*;
+import de.uka.ilkd.key.speclang.OperationContract;
 import de.uka.ilkd.key.speclang.SLEnvInput;
 import de.uka.ilkd.key.util.ExceptionHandlerException;
 import de.uka.ilkd.key.util.KeYExceptionHandler;
@@ -53,7 +53,7 @@ public final class ProblemLoader implements Runnable {
     private String currTacletName = null;
     private int currFormula = 0;
     private PosInTerm currPosInTerm = PosInTerm.TOP_LEVEL;
-    private ContractWithInvs currContract = null;
+    private OperationContract currContract = null;
     private Stack stack = new Stack();
     private LinkedList loadedInsts = null;
     private ImmutableList<IfFormulaInstantiation> ifFormulaList =
@@ -354,7 +354,7 @@ public final class ProblemLoader implements Runnable {
             currPosInTerm = PosInTerm.TOP_LEVEL;
             break;
         case 'c' : //contract
-            currContract = new ContractWithInvs(s, proof.getServices());
+            currContract = proof.getServices().getSpecificationRepository().getOperationContractByName(s);
             if(currContract == null) {
                 throw new RuntimeException("Error loading proof: contract \"" + s + "\" not found.");
             }

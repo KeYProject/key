@@ -41,10 +41,7 @@ import de.uka.ilkd.key.speclang.translation.SLTranslationException;
  */
 public class JMLSpecFactory {
     
-    private static final TermBuilder TB
-            = TermBuilder.DF;
-    private static final SignatureVariablesFactory SVF 
-            = SignatureVariablesFactory.INSTANCE;
+    private static final TermBuilder TB = TermBuilder.DF;
     
     private final Services services;
     private final JMLTranslator translator;
@@ -178,7 +175,7 @@ public class JMLSpecFactory {
      * signature information for the programMethod. 
      */
     private ImmutableSet<OperationContract> createJMLOperationContracts(
-                                ProgramMethod programMethod,
+                                ProgramMethod pm,
                                 Behavior originalBehavior,                              
                                 PositionedString customName,
                                 ImmutableList<PositionedString> originalRequires,
@@ -189,7 +186,7 @@ public class JMLSpecFactory {
                                 ImmutableList<PositionedString> originalDiverges,
                                 ImmutableList<ProgramVariable> paramVars) 
             throws SLTranslationException {
-        assert programMethod != null;
+        assert pm != null;
         assert originalBehavior != null;
         assert originalRequires != null;
         assert originalAssignable != null;
@@ -200,20 +197,14 @@ public class JMLSpecFactory {
 
         //create variables for self, parameters, result, exception,
         //and the map for atPre-Functions
-        ProgramVariable selfVar = SVF.createSelfVar(services, 
-                                                    programMethod, 
-                                                    false);
+        ProgramVariable selfVar = TB.selfVar(services, pm, false);
         if(paramVars == null) {
-            paramVars = SVF.createParamVars(services, programMethod, false);
+            paramVars = TB.paramVars(services, pm, false);
         }
-        ProgramVariable resultVar = SVF.createResultVar(services, 
-                                                        programMethod, 
-                                                        false);
-        ProgramVariable excVar = SVF.createExcVar(services,
-                                                  programMethod, 
-                                                  false);
+        ProgramVariable resultVar = TB.resultVar(services, pm, false);
+        ProgramVariable excVar = TB.excVar(services, pm, false);
         
-        Term heapAtPre = TB.func(SVF.createHeapAtPreFunc(services, false));
+        Term heapAtPre = TB.var(TB.heapAtPreVar(services, "heapAtPre", false));
 
         //translate requires
         Term requires = TB.tt();
@@ -221,7 +212,7 @@ public class JMLSpecFactory {
             Term translated 
                 = translator.translateExpression(
                     expr,
-                    programMethod.getContainerType(),
+                    pm.getContainerType(),
                     selfVar, 
                     paramVars, 
                     null, 
@@ -236,7 +227,7 @@ public class JMLSpecFactory {
             Term translated 
                 = translator.translateAssignableExpression(
                     expr, 
-                    programMethod.getContainerType(),
+                    pm.getContainerType(),
                     selfVar, 
                     paramVars);
             assignable = TB.union(services, assignable, translated);        
@@ -248,7 +239,7 @@ public class JMLSpecFactory {
             Term translated 
                 = translator.translateExpression(
                     expr,
-                    programMethod.getContainerType(),
+                    pm.getContainerType(),
                     selfVar, 
                     paramVars, 
                     resultVar, 
@@ -263,7 +254,7 @@ public class JMLSpecFactory {
             Term translated 
                 = translator.translateSignalsExpression(
                     expr, 
-                    programMethod.getContainerType(),
+                    pm.getContainerType(),
                     selfVar, 
                     paramVars, 
                     resultVar, 
@@ -278,7 +269,7 @@ public class JMLSpecFactory {
             Term translated 
                 = translator.translateSignalsOnlyExpression(
                     expr,
-                    programMethod.getContainerType(),
+                    pm.getContainerType(),
                     excVar);
             signalsOnly = TB.and(signalsOnly, translated);
         }
@@ -289,7 +280,7 @@ public class JMLSpecFactory {
             Term translated 
                 = translator.translateExpression(
                     expr, 
-                    programMethod.getContainerType(),
+                    pm.getContainerType(),
                     selfVar, 
                     paramVars, 
                     null, 
@@ -331,7 +322,7 @@ public class JMLSpecFactory {
             OperationContract contract
                 = new OperationContractImpl(name,
                                             displayName,
-                                            programMethod,
+                                            pm,
                                             Modality.DIA,
                                             requires,
                                             post,
@@ -346,7 +337,7 @@ public class JMLSpecFactory {
             OperationContract contract
                 = new OperationContractImpl(name,
                                             displayName,
-                                            programMethod,
+                                            pm,
                                             Modality.BOX,
                                             requires,
                                             post,
@@ -365,7 +356,7 @@ public class JMLSpecFactory {
             OperationContract contract1
                 = new OperationContractImpl(name,
                                             displayName,
-                                            programMethod,
+                                            pm,
                                             Modality.DIA,
                                             TB.and(requires, TB.not(diverges)),
                                             post,
@@ -378,7 +369,7 @@ public class JMLSpecFactory {
             OperationContract contract2
                 = new OperationContractImpl(name2,
                                             displayName2,
-                                            programMethod,
+                                            pm,
                                             Modality.BOX,
                                             requires,
                                             post,
@@ -456,7 +447,7 @@ public class JMLSpecFactory {
     
     
     public ImmutableSet<OperationContract> createJMLOperationContracts(
-                                ProgramMethod programMethod,
+                                ProgramMethod pm,
                                 Behavior originalBehavior,				
 				PositionedString customName,
                                 ImmutableList<PositionedString> originalRequires,
@@ -466,7 +457,7 @@ public class JMLSpecFactory {
                                 ImmutableList<PositionedString> originalSignalsOnly,
                                 ImmutableList<PositionedString> originalDiverges) 
             throws SLTranslationException {
-        return createJMLOperationContracts(programMethod,
+        return createJMLOperationContracts(pm,
                                            originalBehavior,
                                            customName,
                                            originalRequires,
@@ -480,32 +471,32 @@ public class JMLSpecFactory {
     
     
     public ImmutableSet<OperationContract> createJMLOperationContracts(
-                                        ProgramMethod programMethod,
+                                        ProgramMethod pm,
                                         TextualJMLSpecCase textualSpecCase) 
             throws SLTranslationException {
-        return createJMLOperationContracts(programMethod, 
+        return createJMLOperationContracts(pm, 
                                            textualSpecCase, 
                                            null);
     }
     
     
     public ImmutableSet<OperationContract> createJMLOperationContractsAndInherit(
-                                        ProgramMethod programMethod,
+                                        ProgramMethod pm,
                                         TextualJMLSpecCase textualSpecCase) 
             throws SLTranslationException {
         //parameter names of original method must be used for all inherited 
         //instances of the contract
-        ImmutableList< ProgramVariable > paramVars 
-            = SVF.createParamVars(services, programMethod, false);
+        ImmutableList<ProgramVariable> paramVars 
+            = TB.paramVars(services, pm, false);
         
         //create contracts for original method
         ImmutableSet<OperationContract> result 
-            = createJMLOperationContracts(programMethod, 
+            = createJMLOperationContracts(pm, 
                                           textualSpecCase, 
                                           paramVars);
         
         //create contracts for all overriding methods
-        for(ProgramMethod subPm : getOverridingMethods(programMethod)) {
+        for(ProgramMethod subPm : getOverridingMethods(pm)) {
             
             
             ImmutableSet<OperationContract> subContracts 
@@ -520,7 +511,7 @@ public class JMLSpecFactory {
     
     
     public LoopInvariant createJMLLoopInvariant(
-                            ProgramMethod programMethod,
+                            ProgramMethod pm,
                             LoopStatement loop,
                             ImmutableList<PositionedString> originalInvariant,
                             ImmutableList<PositionedString> originalSkolemDeclarations,
@@ -528,7 +519,7 @@ public class JMLSpecFactory {
                             ImmutableList<PositionedString> originalAssignable,
                             PositionedString originalVariant) 
             throws SLTranslationException {                
-        assert programMethod != null;
+        assert pm != null;
         assert loop != null;
         assert originalInvariant != null;
         assert originalSkolemDeclarations != null;
@@ -538,22 +529,21 @@ public class JMLSpecFactory {
         //create variables for self, parameters, other relevant local variables 
         //(disguised as parameters to the translator) and the map for 
         //atPre-Functions
-        ProgramVariable selfVar = SVF.createSelfVar(services, 
-                                                     programMethod, 
-                                                     false);
-        ImmutableList< ProgramVariable > paramVars = ImmutableSLList.< ProgramVariable >nil();
-        int numParams = programMethod.getParameterDeclarationCount();
+        ProgramVariable selfVar = TB.selfVar(services, pm, false);
+        ImmutableList<ProgramVariable> paramVars 
+        	= ImmutableSLList.<ProgramVariable>nil();
+        int numParams = pm.getParameterDeclarationCount();
         for(int i = numParams - 1; i >= 0; i--) {
-            ParameterDeclaration pd = programMethod.getParameterDeclarationAt(i);
+            ParameterDeclaration pd = pm.getParameterDeclarationAt(i);
             paramVars = paramVars.prepend((ProgramVariable) 
                                           pd.getVariableSpecification()
                                              .getProgramVariable());
         }
 
-        ImmutableList< ProgramVariable > localVars 
-            = collectLocalVariables(programMethod.getBody(), loop);        
+        ImmutableList<ProgramVariable> localVars 
+            = collectLocalVariables(pm.getBody(), loop);        
         paramVars = paramVars.append(localVars);
-        Term heapAtPre = TB.func(SVF.createHeapAtPreFunc(services, false));
+        Term heapAtPre = TB.var(TB.heapAtPreVar(services, "heapAtPre", false));
         
         //translate invariant
         Term invariant;
@@ -565,7 +555,7 @@ public class JMLSpecFactory {
                 Term translated 
                     = translator.translateExpression(
                                             expr, 
-                                            programMethod.getContainerType(),
+                                            pm.getContainerType(),
                                             selfVar, 
                                             paramVars, 
                                             null, 
@@ -577,9 +567,9 @@ public class JMLSpecFactory {
 
         
         //translate skolem declarations
-        ImmutableList< ProgramVariable > freeVars = ImmutableSLList.< ProgramVariable >nil();
+        ImmutableList<ProgramVariable> freeVars = ImmutableSLList.<ProgramVariable>nil();
         for(PositionedString expr : originalSkolemDeclarations) {
-            ImmutableList< ProgramVariable > translated 
+            ImmutableList<ProgramVariable> translated 
                 = translator.translateVariableDeclaration(expr);
             for(ProgramVariable pv : translated) {
                 freeVars = freeVars.prepend(pv);
@@ -595,7 +585,7 @@ public class JMLSpecFactory {
                 Term translated
                     = translator.translateExpression(
                             new PositionedString(exprs[i]), 
-                            programMethod.getContainerType(),
+                            pm.getContainerType(),
                             selfVar, 
                             paramVars.append(freeVars), 
                             null, 
@@ -611,7 +601,7 @@ public class JMLSpecFactory {
             Term translated 
                 = translator.translateAssignableExpression(
                     expr, 
-                    programMethod.getContainerType(),
+                    pm.getContainerType(),
                     selfVar, 
                     paramVars);
             assignable = TB.union(services, assignable, translated);        
@@ -625,7 +615,7 @@ public class JMLSpecFactory {
             Term translated 
                 = translator.translateExpression(
                                         originalVariant,
-                                        programMethod.getContainerType(),
+                                        pm.getContainerType(),
                                         selfVar,
                                         paramVars,
                                         null,
@@ -648,11 +638,11 @@ public class JMLSpecFactory {
     
     
     public LoopInvariant createJMLLoopInvariant(
-                                        ProgramMethod programMethod,
+                                        ProgramMethod pm,
                                         LoopStatement loop,
                                         TextualJMLLoopSpec textualLoopSpec) 
             throws SLTranslationException {
-        return createJMLLoopInvariant(programMethod,
+        return createJMLLoopInvariant(pm,
                                       loop,
                                       textualLoopSpec.getInvariant(),
                                       textualLoopSpec.getSkolemDeclarations(),

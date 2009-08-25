@@ -860,6 +860,9 @@ public class KeYMediator {
 	}
 
 	public void proofStructureChanged(ProofTreeEvent e) {
+	    if(autoMode) { //XXX
+		return;
+	    }
 	    Proof p = e.getSource();
 	    if (p == getSelectedProof()) {
 		Node sel_node = getSelectedNode();
@@ -875,15 +878,12 @@ public class KeYMediator {
 	}
     }
 
-    //INNER CLASS
-    class KeYMediatorProofListener implements RuleAppListener, 
-                                              AutoModeListener {
+    private final class KeYMediatorProofListener implements RuleAppListener, 
+                                                            AutoModeListener {
 
-        private Node selectedBeforeAutoMode;
-        
 	/** invoked when a rule has been applied */
 	public void ruleApplied(ProofEvent e) {
-	    if (e.getSource() == getProof()) {
+	    if(!autoMode && e.getSource() == getProof()) {
 	        keySelectionModel.defaultSelection();
 	    }
 	}
@@ -892,25 +892,13 @@ public class KeYMediator {
 	/** invoked if automatic execution has started
 	 */
 	public void autoModeStarted(ProofEvent e) {
-              autoMode = true;
-              selectedBeforeAutoMode = getSelectedNode(); 
-//            if (proof == null) return; // there is no selection or anything
+	    autoMode = true;
 	}
 	
 	/** invoked if automatic execution has stopped
 	 */
 	public void autoModeStopped(ProofEvent e) {
             autoMode = false;
-            if (getProof() != null) {
-                if (selectedBeforeAutoMode!=null) {
-//XXX%%%%% This is way too slow for big proofs! 
-                // XXX Could you please check if it is still to slow?
-                    keySelectionModel.nearestOpenGoalSelection(selectedBeforeAutoMode);
-                } else {
-                    keySelectionModel.defaultSelection();
-                }
-            }
-            selectedBeforeAutoMode = null; //Important to prevent memory leaking	    
 	}
     }
 
@@ -925,8 +913,7 @@ public class KeYMediator {
 	 */ 
 	public void selectedProofChanged(KeYSelectionEvent e) {
 	    setProof(e.getSource().getSelectedProof());
-	}
-	
+	}	
     }
 
     /**

@@ -4195,28 +4195,6 @@ RKeYMetaConstruct KeYMetaConstructStatement() :
 	  ) 
 	  |
 	  (
-	   "#method-call-contract" "("	
-	   [  LOOKAHEAD(2) sv = VariableSV() ","]
-	   [  LOOKAHEAD(2) execsv = ExecutionContextSV() ","]
-           methRef = PrimaryExpression() 
-	
-	   ")" ";" 
-	      {
-		  result = factory.createRKeYMetaConstruct();
-		  setPrefixInfo(result);
-		  result.setChild((Statement)methRef);
-		  if (sv != null) {
-		      result.setSV(sv);
-		  }
-		  if (execsv != null) {
-		      result.addSV(execsv);
-		  }		
-		  result.setName("#method-call-contract");
-		  return result;
-	      }
-	  ) 
-	  |
-	  (
 	   "#expand-method-body" "(" stat = Statement() ("," sv = VariableSV() )?  ")" ";" 
 	      {
 		  result = factory.createRKeYMetaConstruct();

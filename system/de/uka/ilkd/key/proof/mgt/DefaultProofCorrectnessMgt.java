@@ -102,11 +102,10 @@ public class DefaultProofCorrectnessMgt implements ProofCorrectnessMgt {
                     RuleApp ruleApp = cachedRuleAppsIt.next();
                     RuleJustification ruleJusti = getJustification(ruleApp);
                     if(ruleJusti instanceof RuleJustificationBySpec) {
-                        ContractWithInvs cwi 
+                        OperationContract c 
                             = ((RuleJustificationBySpec) ruleJusti).getSpec();
                         ImmutableSet<Proof> proofsForPm 
-                            = specRepos.getProofs(cwi.contract
-                                                     .getProgramMethod());
+                            = specRepos.getProofs(c.getProgramMethod());
                         newProofs = newProofs.union(proofsForPm);
                         proofs = proofs.union(proofsForPm);
                     }   
@@ -134,48 +133,31 @@ public class DefaultProofCorrectnessMgt implements ProofCorrectnessMgt {
             return;
         }
 	
-//        //used, but yet unproven specifications?
-//        Iterator<RuleApp> cachedRuleAppsIt = cachedRuleApps.iterator();
-//        while(cachedRuleAppsIt.hasNext()) {
-//            RuleApp ruleApp = cachedRuleAppsIt.next();
-//            RuleJustification ruleJusti = getJustification(ruleApp);
-//            if(ruleJusti instanceof RuleJustificationBySpec) {
-//                ContractWithInvs cwi 
-//                    = ((RuleJustificationBySpec) ruleJusti).getSpec();
-//                for(OperationContract atomicContract 
-//                    : proof.getServices().getSpecificationRepository()
-//                                         .splitContract(cwi.contract)) {
-//                
-//                    InitConfig initConfig = proof.env().getInitConfig();
-//                    ProofOblInput ensuresPostPO 
-//                        = new EnsuresPostPO(initConfig, 
-//                                            atomicContract, 
-//                                            cwi.assumedInvs);
-//                    ImmutableSet<Proof> ensuresPostProofs 
-//                        = specRepos.getProofs(ensuresPostPO);
-//                    ProofOblInput preservesInvPO
-//                        = new PreservesInvPO(initConfig, 
-//                                             atomicContract.getProgramMethod(), 
-//                                             cwi.assumedInvs, 
-//                                             cwi.ensuredInvs);
-//                    ImmutableSet<Proof> preservesInvProofs 
-//                        = specRepos.getProofs(preservesInvPO);
-//                    ProofOblInput respectsModifiesPO
-//                        = new RespectsModifiesPO(initConfig, 
-//                                                 atomicContract, 
-//                                                 cwi.assumedInvs);
-//                    ImmutableSet<Proof> respectsModifiesProofs
-//                        = specRepos.getProofs(respectsModifiesPO);
-//                    
-//                    if(!(atLeastOneClosed(ensuresPostProofs)
-//                         && atLeastOneClosed(preservesInvProofs)
-//                         && atLeastOneClosed(respectsModifiesProofs))) {
-//                        proofStatus = ProofStatus.CLOSED_BUT_LEMMAS_LEFT;
-//                        return;
-//                    }
-//                }
-//            }
-//        }
+        //used, but yet unproven specifications?
+        Iterator<RuleApp> cachedRuleAppsIt = cachedRuleApps.iterator();
+        while(cachedRuleAppsIt.hasNext()) {
+            RuleApp ruleApp = cachedRuleAppsIt.next();
+            RuleJustification ruleJusti = getJustification(ruleApp);
+            if(ruleJusti instanceof RuleJustificationBySpec) {
+        	OperationContract contract
+                    = ((RuleJustificationBySpec) ruleJusti).getSpec();
+                for(OperationContract atomicContract 
+                    : proof.getServices().getSpecificationRepository()
+                                         .splitContract(contract)) {
+                
+                    InitConfig initConfig = proof.env().getInitConfig();
+                    ProofOblInput contractPO 
+                        = new ContractPO(initConfig, atomicContract);
+                    ImmutableSet<Proof> proofs 
+                        = specRepos.getProofs(contractPO);
+                    
+                    if(!(atLeastOneClosed(proofs))) {
+                        proofStatus = ProofStatus.CLOSED_BUT_LEMMAS_LEFT;
+                        return;
+                    }
+                }
+            }
+        }
         
         //no -> proof is closed
         proofStatus = ProofStatus.CLOSED;

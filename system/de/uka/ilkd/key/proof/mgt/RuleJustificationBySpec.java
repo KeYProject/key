@@ -9,13 +9,15 @@
 
 package de.uka.ilkd.key.proof.mgt;
 
+import de.uka.ilkd.key.speclang.OperationContract;
+
 
 public class RuleJustificationBySpec implements RuleJustification {
     
-    private final ContractWithInvs spec;
+    private final OperationContract spec;
     
     
-    public RuleJustificationBySpec(ContractWithInvs spec) {
+    public RuleJustificationBySpec(OperationContract spec) {
         this.spec = spec;
     }
     
@@ -25,7 +27,7 @@ public class RuleJustificationBySpec implements RuleJustification {
     }
     
     
-    public ContractWithInvs getSpec() {
+    public OperationContract getSpec() {
         return spec;
     }
 }

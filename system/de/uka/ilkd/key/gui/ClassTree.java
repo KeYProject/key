@@ -42,20 +42,12 @@ class ClassTree extends JTree {
 
     public ClassTree(boolean addOperations, 
 	             boolean skipLibraryClasses,
-	    	     KeYJavaType defaultClass,
-	    	     ProgramMethod defaultPm,
 	    	     Services services,
 	    	     Map<ProgramMethod,Icon> methodIcons) {
 	super(new DefaultTreeModel(createTree(addOperations, 
 					      skipLibraryClasses, 
 					      services)));
 	this.methodIcons = methodIcons;
-	if(defaultPm != null) {
-	    defaultClass = defaultPm.getContainerType();
-	}
-	if(defaultClass != null) {
-	    open(defaultClass, defaultPm);
-	}
 	getSelectionModel().setSelectionMode(
 				TreeSelectionModel.SINGLE_TREE_SELECTION);
 	setCellRenderer(new DefaultTreeCellRenderer() {
@@ -101,13 +93,9 @@ class ClassTree extends JTree {
     
     public ClassTree(boolean addOperations, 
 	             boolean skipLibraryClasses,
-	    	     KeYJavaType defaultClass,
-	    	     ProgramMethod defaultPm,
 	    	     Services services) {
 	this(addOperations, 
 	     skipLibraryClasses, 
-	     defaultClass, 
-	     defaultPm, 
 	     services, 
 	     new HashMap<ProgramMethod,Icon>());
     }
@@ -302,6 +290,16 @@ class ClassTree extends JTree {
     //-------------------------------------------------------------------------
     //public interface
     //-------------------------------------------------------------------------
+    
+    public void select(KeYJavaType kjt) {
+	open(kjt, null);
+    }
+    
+    
+    public void select(ProgramMethod pm) {
+	open(pm.getContainerType(), pm);
+    }
+    
     
     public DefaultMutableTreeNode getRootNode() {
 	return (DefaultMutableTreeNode) getModel().getRoot();

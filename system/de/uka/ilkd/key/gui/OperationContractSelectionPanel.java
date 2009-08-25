@@ -5,13 +5,6 @@
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General Public License.
-// See LICENSE.TXT for details.
 //
 //
 
@@ -46,6 +39,7 @@ class OperationContractSelectionPanel extends JPanel {
     
     private final Services services;
     private final JList contractList;
+    private final TitledBorder border;
     
     
     //-------------------------------------------------------------------------
@@ -63,7 +57,8 @@ class OperationContractSelectionPanel extends JPanel {
         
         //create scroll pane
         JScrollPane scrollPane = new JScrollPane();
-        scrollPane.setBorder(new TitledBorder(title));
+        border = new TitledBorder(title);
+        scrollPane.setBorder(border);
         Dimension scrollPaneDim = new Dimension(700, 500);
         scrollPane.setPreferredSize(scrollPaneDim);
         scrollPane.setMinimumSize(scrollPaneDim);
@@ -163,7 +158,13 @@ class OperationContractSelectionPanel extends JPanel {
     }
     
     
-    public void setContracts(ImmutableSet<OperationContract> contracts) {
+    public void addListSelectionListener(ListSelectionListener lsl) {
+	contractList.addListSelectionListener(lsl);
+    }
+    
+    
+    public void setContracts(ImmutableSet<OperationContract> contracts,
+	                     String title) {
         //sort contracts alphabetically (for the user's convenience)
         OperationContract[] contractsArray 
         	= contracts.toArray(new OperationContract[contracts.size()]);
@@ -174,19 +175,22 @@ class OperationContractSelectionPanel extends JPanel {
         });
         
         contractList.setListData(contractsArray);
-        contractList.setSelectedIndex(0);        
+        contractList.setSelectedIndex(0);
+        border.setTitle(title);
+        updateUI();
     }
     
     
     public void setContracts(ProgramMethod pm, Modality modality) {
-	setContracts(collectContracts(pm, modality));
+	setContracts(collectContracts(pm, modality), 
+		     "Contracts for method \"" + pm.getName() + "\"");
     }
     
     
     
     public void setContracts(ProgramMethod pm) {
-	setContracts(collectContracts(pm, null));
-    }    
+	setContracts(pm, null);
+    }
     
     
     public OperationContract getContract() {

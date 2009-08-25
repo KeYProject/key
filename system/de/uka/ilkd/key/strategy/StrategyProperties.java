@@ -66,7 +66,7 @@ public final class StrategyProperties extends Properties {
     static {
         defaultMap.setProperty(SPLITTING_OPTIONS_KEY, SPLITTING_DELAYED);
         defaultMap.setProperty(LOOP_OPTIONS_KEY, LOOP_INVARIANT);
-        defaultMap.setProperty(METHOD_OPTIONS_KEY, METHOD_EXPAND);
+        defaultMap.setProperty(METHOD_OPTIONS_KEY, METHOD_CONTRACT);
         defaultMap.setProperty(QUERY_OPTIONS_KEY, QUERY_NONE);
         defaultMap.setProperty(NON_LIN_ARITH_OPTIONS_KEY, NON_LIN_ARITH_NONE);
         defaultMap.setProperty(QUANTIFIERS_OPTIONS_KEY, QUANTIFIERS_NON_SPLITTING_WITH_PROGS);

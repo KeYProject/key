@@ -20,6 +20,7 @@ import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.speclang.OperationContract;
 
 
 /** Captures a node in the TaskTree which contains exactly one
@@ -72,17 +73,17 @@ public class BasicTask extends DefaultMutableTreeNode implements TaskTreeNode{
 	return proof().mgt().getStatus();
     }
     
-    /** returns a list of operation contracts (with associated class invariants)
+    /** returns a list of operation contracts
      *  that were used in the associated proof.
      */
-    public ImmutableSet<ContractWithInvs> getUsedSpecs() {
-        ImmutableSet<ContractWithInvs> result = DefaultImmutableSet.<ContractWithInvs>nil();       
+    public ImmutableSet<OperationContract> getUsedSpecs() {
+        ImmutableSet<OperationContract> result = DefaultImmutableSet.<OperationContract>nil();       
         Iterator<RuleApp> it = proof().mgt().getNonAxiomApps().iterator();
         while(it.hasNext()) {
             RuleApp r = (RuleApp) it.next();
 	    RuleJustification rj = proof().mgt().getJustification(r);            
 	    if(rj instanceof RuleJustificationBySpec) {
-                ContractWithInvs spec = ((RuleJustificationBySpec)rj).getSpec();
+                OperationContract spec = ((RuleJustificationBySpec)rj).getSpec();
                 assert spec != null;
                 result = result.add(spec);
             }

@@ -29,7 +29,6 @@ import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.ProofSaver;
 import de.uka.ilkd.key.speclang.PositionedString;
-import de.uka.ilkd.key.speclang.SignatureVariablesFactory;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.util.HelperClassForTests;
 
@@ -42,7 +41,7 @@ public class TestJMLTranslator extends TestCase {
             + File.separator + "speclang"
             + File.separator + "testFile.key";
 
-    private static final TermBuilder tb = TermBuilder.DF;
+    private static final TermBuilder TB = TermBuilder.DF;
 
     private static JavaInfo javaInfo;
     private static Services services;
@@ -61,7 +60,7 @@ public class TestJMLTranslator extends TestCase {
         services = javaInfo.getServices();
         translator = new JMLTranslator(services);
         testClassType = javaInfo.getKeYJavaType("testPackage.TestClass");
-        heapAtPre = tb.func(SignatureVariablesFactory.INSTANCE.createHeapAtPreFunc(services, false));        
+        heapAtPre = TB.var(TB.heapAtPreVar(services, "heapAtPre", false));        
     }
 
     
@@ -130,7 +129,7 @@ public class TestJMLTranslator extends TestCase {
         }
 
         assertTrue(result != null);
-        assertTrue(result.equals(tb.tt()));
+        assertTrue(result.equals(TB.tt()));
     }
 
     
@@ -147,7 +146,7 @@ public class TestJMLTranslator extends TestCase {
         }
 
         assertTrue(result != null);
-        assertTrue(result.equals(tb.var(selfVar)));
+        assertTrue(result.equals(TB.var(selfVar)));
     }
 
     
@@ -167,7 +166,7 @@ public class TestJMLTranslator extends TestCase {
         assertTrue(result != null);
         assertTrue(result.op().equals(Junctor.IMP));
         assertTrue(result.sub(0).op().equals(Junctor.AND));
-        assertTrue(termContains(result, tb.zTerm(services, "5")));
+        assertTrue(termContains(result, TB.zTerm(services, "5")));
         assertTrue(termContains(result, selfVar));
     }
     
@@ -226,7 +225,7 @@ public class TestJMLTranslator extends TestCase {
 
         assertTrue(result != null);
         assertTrue(result.op().equals(Quantifier.ALL));
-        assertTrue(termContains(result, tb.zTerm(services, "2147483647")));
+        assertTrue(termContains(result, TB.zTerm(services, "2147483647")));
         assertTrue(termContains(result, Junctor.AND));
     }
 
@@ -246,7 +245,7 @@ public class TestJMLTranslator extends TestCase {
         assertTrue(result != null);
         assertTrue(result.op().equals(Quantifier.EX));
         assertTrue(result.sub(0).op().equals(Junctor.AND));
-        assertTrue(termContains(result, tb.NULL(services)));
+        assertTrue(termContains(result, TB.NULL(services)));
     }
 
 
@@ -345,7 +344,7 @@ public class TestJMLTranslator extends TestCase {
         
         assertTrue(result != null);
         //assertTrue(termContains(result.getFormula(), AttributeOp.getAttributeOp(array)));
-        assertTrue(termContains(result, tb.NULL(services)));
+        assertTrue(termContains(result, TB.NULL(services)));
     }
 
     
@@ -369,7 +368,7 @@ public class TestJMLTranslator extends TestCase {
         
         assertTrue(result != null);
         assertTrue(result.op().equals(Equality.EQUALS));
-        assertTrue(termContains(result, tb.var(javaInfo
+        assertTrue(termContains(result, TB.var(javaInfo
                 .getAttribute(ImplicitFieldAdder.IMPLICIT_CLASS_INITIALIZED,
                         testClassType))));
     }
@@ -390,7 +389,7 @@ public class TestJMLTranslator extends TestCase {
         
         assertTrue(result != null);
         assertTrue(result.op().equals(Equality.EQUALS));
-        assertTrue(termContains(result, tb.zTerm(services, "18")));
+        assertTrue(termContains(result, TB.zTerm(services, "18")));
     }
     
     
@@ -544,13 +543,13 @@ public class TestJMLTranslator extends TestCase {
         assertTrue(result != null);
         final LogicVariable qv = new LogicVariable(new Name("a"),selfVar.sort());
         final Function fieldSymbol = services.getTypeConverter().getHeapLDT().getFieldSymbolForPV(array, services);
-        Term expected = tb.all(qv,
-                tb.imp(tb.and(
-                        tb.equals(tb.dot(services, array.sort(), tb.var(qv), fieldSymbol),
-                        	  tb.dot(services, array.sort(), tb.var(selfVar), fieldSymbol)),
-                        tb.not(tb.equals(tb.var(qv), tb.NULL(services))) // implicit non null
+        Term expected = TB.all(qv,
+                TB.imp(TB.and(
+                        TB.equals(TB.dot(services, array.sort(), TB.var(qv), fieldSymbol),
+                        	  TB.dot(services, array.sort(), TB.var(selfVar), fieldSymbol)),
+                        TB.not(TB.equals(TB.var(qv), TB.NULL(services))) // implicit non null
                         ),
-                        tb.equals(tb.var(qv), tb.var(selfVar))));
+                        TB.equals(TB.var(qv), TB.var(selfVar))));
         assertTrue("Expected:"+ProofSaver.printTerm(expected,services)+"\n Was:"+
                 ProofSaver.printTerm(result,services),
                 result.equalsModRenaming(expected));

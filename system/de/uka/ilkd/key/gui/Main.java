@@ -41,9 +41,6 @@ import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.pp.*;
 import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.init.JavaProfile;
-import de.uka.ilkd.key.proof.init.ProblemInitializer;
-import de.uka.ilkd.key.proof.init.ProofInputException;
-import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.mgt.TaskTreeNode;
 import de.uka.ilkd.key.smt.DecProcRunner;
 import de.uka.ilkd.key.util.Debug;
@@ -497,7 +494,7 @@ public final class Main extends JFrame implements IMain {
         tabbedPane.getInputMap(JComponent.WHEN_FOCUSED).getParent().remove(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, ActionEvent.CTRL_MASK));
         
         proofListView.setPreferredSize(new java.awt.Dimension(250, 100));
-        paintEmptyViewComponent(proofListView, "Tasks");
+        paintEmptyViewComponent(proofListView, "Proofs");
         
         JSplitPane leftPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, proofListView, tabbedPane) {
             public void setUI(javax.swing.plaf.SplitPaneUI ui) {
@@ -763,7 +760,7 @@ public final class Main extends JFrame implements IMain {
             pane.setLayout(new BorderLayout());
             {   
                 JScrollPane scrollpane = new JScrollPane();
-                ClassTree classTree = new ClassTree(false, false, null, null, currentProof.getServices());
+                ClassTree classTree = new ClassTree(false, false, currentProof.getServices());
                 classTree.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
                 scrollpane.setViewportView(classTree);
                 pane.add(scrollpane, BorderLayout.CENTER);
@@ -1104,7 +1101,7 @@ public final class Main extends JFrame implements IMain {
     protected JMenu createProofMenu() {
         JMenu proof = new JMenu("Proof");
         proof.setMnemonic(KeyEvent.VK_P);
-        JMenuItem close = new JMenuItem("Abandon Task");
+        JMenuItem close = new JMenuItem("Abandon");
         close.setAccelerator(KeyStroke.getKeyStroke
                 (KeyEvent.VK_W, ActionEvent.CTRL_MASK));
         close.addActionListener(new ActionListener() {
@@ -1113,25 +1110,24 @@ public final class Main extends JFrame implements IMain {
             }});
         registerAtMenu(proof, close);	
         
-        JMenuItem choiceItem = new JMenuItem("Show Active Taclet Options");
+        JMenuItem choiceItem = new JMenuItem("Show Active Taclet Options...");
         choiceItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 showActivatedChoices();
             }});
         registerAtMenu(proof, choiceItem);
         
-        JMenuItem methodContractsItem = new JMenuItem("Show Used Specifications...");
+        JMenuItem methodContractsItem = new JMenuItem("Show Used Contracts...");
         methodContractsItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                new UsedSpecificationsDialog(
-                             mediator.getServices(), 
-                             mediator.getSelectedProof()
-                                     .getBasicTask()
-                                     .getUsedSpecs());
+        	ProofManagementDialog.showInstance(mediator.getProof()
+        		                                   .env()
+        		                                   .getInitConfig(),
+        					   mediator.getProof());
             }});
         registerAtMenu(proof, methodContractsItem);
 
-        final JMenuItem statisticsInfo = new JMenuItem("Show Proof Statistics");
+        final JMenuItem statisticsInfo = new JMenuItem("Show Proof Statistics...");
         
         statisticsInfo.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {                                    
@@ -1166,7 +1162,7 @@ public final class Main extends JFrame implements IMain {
         });
         registerAtMenu(proof, statisticsInfo);
         
-        final JMenuItem typeHierInfo = new JMenuItem("Show Known Types");
+        final JMenuItem typeHierInfo = new JMenuItem("Show Known Types...");
         typeHierInfo.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 showTypeHierarchy();

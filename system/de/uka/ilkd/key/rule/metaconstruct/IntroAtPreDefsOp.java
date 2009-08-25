@@ -9,33 +9,24 @@
 
 package de.uka.ilkd.key.rule.metaconstruct;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
-
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.reference.ReferencePrefix;
 import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
-import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.AbstractMetaOperator;
-import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.speclang.LoopInvariant;
 import de.uka.ilkd.key.speclang.LoopInvariantImpl;
-import de.uka.ilkd.key.util.InvInferenceTools;
 import de.uka.ilkd.key.util.Pair;
 
 
@@ -90,23 +81,16 @@ public final class IntroAtPreDefsOp extends AbstractMetaOperator {
         }
         
         //create atPre heap
-        final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
         final String methodName = frame.getProgramMethod().getName();
-	final ProgramElementName heapBeforeLoopName 
-		= new ProgramElementName(TB.getNewName("heapBefore_" + methodName, 
-							services));
 	final LocationVariable heapAtPreVar 
-		= new LocationVariable(heapBeforeLoopName,
-				       new KeYJavaType(heapLDT.targetSort()));
+		= TB.heapAtPreVar(services, "heapBefore_" + methodName, true);
 	services.getNamespaces().programVariables().addSafely(heapAtPreVar);
 	final Term heapAtPre = TB.var(heapAtPreVar);
 	final Term heapAtPreUpdate = TB.elementary(services, 
 						   heapAtPreVar, 
 						   TB.heap(services));
         
-        //collect atPre-functions, update loop invariants
-        Map<Operator, Function /*atPre*/> atPreFunctions = 
-            new LinkedHashMap<Operator, Function>();
+        //update loop invariants
         for(LoopStatement loop : loops) {
             LoopInvariant inv 
                 = services.getSpecificationRepository().getLoopInvariant(loop);

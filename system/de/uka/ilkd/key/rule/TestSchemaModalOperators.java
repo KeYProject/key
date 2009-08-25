@@ -146,7 +146,7 @@ public class TestSchemaModalOperators extends TestCase {
 
 	RewriteTaclet t = rtb.getRewriteTaclet();
 
-	Term goal = TermBuilder.DF.mod(
+	Term goal = TermBuilder.DF.prog(
 	    Modality.DIA, 
             JavaBlock.EMPTY_JAVABLOCK,
             TermBuilder.DF.ff());

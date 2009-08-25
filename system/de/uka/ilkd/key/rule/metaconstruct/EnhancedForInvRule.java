@@ -362,7 +362,7 @@ public final class EnhancedForInvRule extends AbstractMetaOperator {
         Modality loopBodyModality = modality;
 
         final Term resultTerm =
-                TB.mod(loopBodyModality,
+                TB.prog(loopBodyModality,
                        JavaBlock.createJavaBlock(new StatementBlock(resSta)),
                        result);
 
@@ -484,7 +484,7 @@ public final class EnhancedForInvRule extends AbstractMetaOperator {
     private Term breakCase(ProgramVariable breakFlag, Term post,
             ArrayList<If> breakIfCascade) {
         Term executeBreak =
-                TB.mod(
+                TB.prog(
                         modality,
                         addContext(
                                 root,
@@ -568,7 +568,7 @@ public final class EnhancedForInvRule extends AbstractMetaOperator {
     private Term returnCase(ProgramVariable returnFlag, KeYJavaType returnType,
             ProgramVariable returnExpression, Term post) {
         Term executeReturn =
-                TB.mod(
+                TB.prog(
                         modality,
                         addContext(
                                 root,
@@ -602,7 +602,7 @@ public final class EnhancedForInvRule extends AbstractMetaOperator {
     private Term throwCase(ProgramVariable excFlag,
             ProgramVariable thrownException, Term post) {
         Term throwException =
-                TB.mod( modality,
+                TB.prog( modality,
                         addContext(root, new StatementBlock(
                                 KeYJavaASTFactory.throwClause(thrownException))),
                         post);

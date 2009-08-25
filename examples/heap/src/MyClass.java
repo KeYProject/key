@@ -3,12 +3,18 @@ class MyClass {
     int attr2;    
         
     /*@ normal_behavior
-      @   requires attr2 == 358;
+      @   requires attr2 != 358;
       @   assignable attr; 
       @   ensures attr == 27;
       @   diverges true;
+      @ also exceptional_behavior
+      @   requires attr2 == 358;
+      @   signals_only RuntimeException;
       @*/
     void loop1() {
+	if(attr2 == 358) {
+	    throw new RuntimeException();
+	}
         /*@ loop_invariant 0 <= i && i <= 3 && (i > 0 ==> attr == 27);
           @ assignable attr;
           @*/

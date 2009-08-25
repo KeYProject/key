@@ -10,9 +10,6 @@
 
 package de.uka.ilkd.key.rule;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
@@ -32,7 +29,6 @@ import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.metaconstruct.WhileInvRule;
 import de.uka.ilkd.key.speclang.LoopInvariant;
@@ -137,8 +133,7 @@ public final class WhileInvariantRule implements BuiltInRule {
     private Term createAnonUpdate(While loop, Term mod, Services services) {
 	//heap
 	HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
-	Name anonHeapName
-		= new Name(TB.getNewName("loopAnonHeap", services));
+	Name anonHeapName = new Name(TB.newName(services, "loopAnonHeap"));
 	Function anonHeapFunc = new Function(anonHeapName,
 					     heapLDT.targetSort());
 	services.getNamespaces().functions().addSafely(anonHeapFunc);
@@ -150,10 +145,10 @@ public final class WhileInvariantRule implements BuiltInRule {
 		                	    		TB.func(anonHeapFunc)));
 	
 	//local vars
-	ImmutableSet<ProgramVariable> localVars = IIT.getWrittenPVs(loop, services);
+	ImmutableSet<ProgramVariable> localVars 
+		= IIT.getWrittenPVs(loop, services);
 	for(ProgramVariable pv : localVars) {
-	    String anonFuncName = TB.getNewName(pv.name().toString(), 
-		    			        services);
+	    String anonFuncName = TB.newName(services, pv.name().toString());
 	    Function anonFunc = new Function(new Name(anonFuncName), pv.sort());
 	    services.getNamespaces().functions().addSafely(anonFunc);
 	    Term elemUpd = TB.elementary(services, 
@@ -189,7 +184,6 @@ public final class WhileInvariantRule implements BuiltInRule {
     
     @Override
     public ImmutableList<Goal> apply(Goal goal, Services services, RuleApp ruleApp) {
-	final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
 	final KeYJavaType booleanKJT = services.getTypeConverter()
 	                                       .getBooleanType();
 	final KeYJavaType intKJT 
@@ -211,12 +205,8 @@ public final class WhileInvariantRule implements BuiltInRule {
 						 services);
 	
 	//prepare heapBeforeLoop
-	final ProgramElementName heapBeforeLoopName 
-		= new ProgramElementName(TB.getNewName("heapBeforeLoop", 
-							services));
 	final LocationVariable heapBeforeLoop 
-		= new LocationVariable(heapBeforeLoopName,
-				       new KeYJavaType(heapLDT.targetSort()));
+		= TB.heapAtPreVar(services, "heapBeforeLoop", true);
 	services.getNamespaces().programVariables().addSafely(heapBeforeLoop);
 	final Term heapBeforeLoopUpdate = TB.elementary(services, 
 						        heapBeforeLoop, 
@@ -230,7 +220,7 @@ public final class WhileInvariantRule implements BuiltInRule {
 	
 	//prepare variant
 	final ProgramElementName variantName 
-		= new ProgramElementName(TB.getNewName("variant", services));
+		= new ProgramElementName(TB.newName(services, "variant"));
 	final LocationVariable variantPV = new LocationVariable(variantName, 
 								intKJT);
 	services.getNamespaces().programVariables().add(variantPV);
@@ -241,7 +231,8 @@ public final class WhileInvariantRule implements BuiltInRule {
 		= dia ? TB.leq(TB.zero(services), variant, services) : TB.tt();
 	final Term variantPO
 		= dia ? TB.and(variantNonNeg, 
-			       TB.lt(variant, TB.var(variantPV), services)) : TB.tt();
+			       TB.lt(variant, TB.var(variantPV), services)) 
+                      : TB.tt();
 	
 	//split goal into three branches
 	ImmutableList<Goal> result = goal.split(3);
@@ -254,7 +245,7 @@ public final class WhileInvariantRule implements BuiltInRule {
 
 	//prepare guard
 	final ProgramElementName guardVarName 
-		= new ProgramElementName(TB.getNewName("b", services));
+		= new ProgramElementName(TB.newName(services, "b"));
 	final LocationVariable guardVar = new LocationVariable(guardVarName, 
 						               booleanKJT);
 	services.getNamespaces().programVariables().addSafely(guardVar);	
@@ -345,7 +336,7 @@ public final class WhileInvariantRule implements BuiltInRule {
 	// (#v1=FALSE -> \[{.. ...}\]post)),anon2))
 	useGoal.addFormula(new ConstrainedFormula(uAnonInv), true, false);
 
-	Term restPsi = TB.mod(dia ? Modality.DIA : Modality.BOX,
+	Term restPsi = TB.prog(dia ? Modality.DIA : Modality.BOX,
 		              IIT.removeActiveStatement(inst.progPost.javaBlock(), 
 							services), 
                               inst.progPost.sub(0));
