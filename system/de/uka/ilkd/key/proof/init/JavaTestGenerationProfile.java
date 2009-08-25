@@ -21,6 +21,8 @@ import de.uka.ilkd.key.proof.DepthFirstGoalChooserBuilder;
 import de.uka.ilkd.key.proof.GoalChooserBuilder;
 import de.uka.ilkd.key.strategy.StrategyFactory;
 import de.uka.ilkd.key.strategy.VBTStrategy;
+import de.uka.ilkd.key.rule.metaconstruct.WhileLoopTransformation2;
+
 
 public class JavaTestGenerationProfile extends JavaProfile {
 
@@ -35,8 +37,25 @@ public class JavaTestGenerationProfile extends JavaProfile {
                 add(new BalancedGoalChooserBuilder()),
                 main);
     }
+    
+    /** @param main can be null. It is not used
+     *  @param loop - if true then the BalancedGoalChooserBuilder is selected. This parameter is independent from @param loopBound.
+     *  @param loopBound - if the value is smaller than 0 then it has no effect (unbounded loop unwinding is used). 
+     *  Otherwise if @loopBound is equal or greater than 0 then this is the number of loop iterations considered. 
+     */
+    public JavaTestGenerationProfile(IMain main, boolean loop, int loopBound ) {
+	this(main);
+	if(loop){
+	    VBTStrategy.preferedGoalChooser = BalancedGoalChooserBuilder.NAME;
+	    setSelectedGoalChooserBuilder(VBTStrategy.preferedGoalChooser);
+	}
+	if(loopBound>=0){
+            VBTStrategy.loopUnwindBounded = true;
+            WhileLoopTransformation2.unwindings=loopBound;
+	}
+    }
 
-	protected ImmutableSet<StrategyFactory> getStrategyFactories() {
+    protected ImmutableSet<StrategyFactory> getStrategyFactories() {
         return
             super.getStrategyFactories().add(DEFAULT);
     }

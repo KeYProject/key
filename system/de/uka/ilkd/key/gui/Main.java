@@ -2566,8 +2566,7 @@ public class Main extends JFrame implements IMain {
 		    	System.out.println("DepthFirst GoalChooser ...");
 			Profile p = ProofSettings.DEFAULT_SETTINGS.getProfile();
 			p.setSelectedGoalChooserBuilder(DepthFirstGoalChooserBuilder.NAME);  
-			VBTStrategy.preferedGoalChooser = DepthFirstGoalChooserBuilder.NAME;
-            
+			VBTStrategy.preferedGoalChooser = DepthFirstGoalChooserBuilder.NAME; 
 		} else if (opt[index].equals("TESTING") || opt[index].equals("UNIT")) {
                     if(opt[index].equals("TESTING")){
                         testStandalone = true;
@@ -2575,18 +2574,30 @@ public class Main extends JFrame implements IMain {
                     }
                     System.out.println("VBT optimizations enabled ...");                    
                     
-                    final JavaTestGenerationProfile p = new JavaTestGenerationProfile(null);
+                    //Parameters of JavaTestGenerationProfile
+                    boolean loop=false;
+                    int loopBound=-1;
                     
-                    if (index + 1 < opt.length && 
-                            opt[index + 1].toUpperCase().equals("LOOP")) {
-                        VBTStrategy.preferedGoalChooser = BalancedGoalChooserBuilder.NAME;
-                        p.setSelectedGoalChooserBuilder(VBTStrategy.preferedGoalChooser);
+                    if (index + 1 < opt.length){
+                        if(opt[index + 1].equalsIgnoreCase("loop")) {
+                        loop=true;
                         System.out.println("Balanced loop unwinding ...");
                         index ++;
+                        }
                     }
-                    
-                    ProofSettings.DEFAULT_SETTINGS.setProfile(p);                   
+                    if (index + 1 < opt.length){
+                        if(opt[index + 1].equalsIgnoreCase("loop0"))loopBound=0;
+                        else if(opt[index + 1].equalsIgnoreCase("loop1"))loopBound=1;
+                        else if(opt[index + 1].equalsIgnoreCase("loop2"))loopBound=2;
+                        else if(opt[index + 1].equalsIgnoreCase("loop3"))loopBound=3;
+                        else if(opt[index + 1].equalsIgnoreCase("loop4"))loopBound=4;
+                        if(loopBound>=0)System.out.println("Bounded loop unwinding. Unwinding bound:"+loopBound);
+                        index++;
+                    }
+                    ProofSettings.DEFAULT_SETTINGS.setProfile(
+                	    new JavaTestGenerationProfile(null,loop,loopBound));                   
                     testMode = true;
+                    
 		} else if (opt[index].equals("DEBUGGER")) {                                     
                     System.out.println("Symbolic Execution Debugger Mode enabled ...");                                        
                     final Profile p = new DebuggerProfile(null);                    
@@ -2645,8 +2656,10 @@ public class Main extends JFrame implements IMain {
         System.out.println("  no_assertion    : disables assertions");
         System.out.println("  assertion       : enables assertions (*)");
         System.out.println("  no_jmlspecs     : disables parsing JML specifications");
-        System.out.println("  unit [loop]     : unit test generation mode (optional argument loop to " +
-                            "enable balanced loop unwinding)");
+        System.out.println("  unit [loop] [loop0|loop1|loop2|loop3|loop4]: \n"+
+        	           "                    unit test generation mode. Optional arguments:\n"+
+        	           "                    loop: to enable balanced loop unwinding\n"+
+        	           "                    loopX: to allow at most X loop iterations");
 	System.out.println("  depthfirst      : constructs the proof tree in a depth first manner. Recommended for large proofs");
         System.out.println("  auto	          : start prove procedure after initialisation");
         System.out.println("  testing         : starts the prover with a simple test generation oriented user interface");
