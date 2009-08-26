@@ -31,9 +31,9 @@ public final class OperationContractImpl implements OperationContract {
     
     protected static final TermBuilder TB = TermBuilder.DF;
 
+    private final String baseName;
     private final String name;
-    private final String displayName;
-    private final ProgramMethod programMethod;
+    private final ProgramMethod pm;
     private final Modality modality;
     private final Term originalPre;
     private final Term originalPost;
@@ -43,17 +43,57 @@ public final class OperationContractImpl implements OperationContract {
     private final ProgramVariable originalResultVar;
     private final ProgramVariable originalExcVar;
     private final Term originalHeapAtPre;
+    private final int id;    
     
     
     //-------------------------------------------------------------------------
     //constructors
-    //------------------------------------------------------------------------- 
+    //-------------------------------------------------------------------------
+    
+    private OperationContractImpl(String baseName,
+                                  ProgramMethod pm,
+            		          Modality modality,
+            		          Term pre,
+            		          Term post,
+            		          Term modifies,
+            		          ProgramVariable selfVar,
+            		          ImmutableList<ProgramVariable> paramVars,
+            		          ProgramVariable resultVar,
+            		          ProgramVariable excVar,
+                                  Term heapAtPre,
+                                  int id) {
+        assert baseName != null && !baseName.equals("");
+        assert pm != null;
+        assert modality != null;
+        assert pre != null;
+        assert post != null;
+        assert modifies != null;
+        assert (selfVar == null) == pm.isStatic();
+        assert paramVars != null;
+        assert paramVars.size() == pm.getParameterDeclarationCount();
+        assert (resultVar == null) == (pm.getKeYJavaType() == null);
+        assert excVar != null;
+        assert heapAtPre != null;
+        this.baseName               = baseName;
+        this.name                   = baseName + " [id: " + id + " / " + pm + "]";
+        this.pm          	    = pm;
+        this.modality               = modality;
+	this.originalPre            = pre;
+	this.originalPost           = post;
+	this.originalModifies       = modifies;
+	this.originalSelfVar        = selfVar;
+	this.originalParamVars      = paramVars;
+	this.originalResultVar      = resultVar;
+	this.originalExcVar         = excVar;
+	this.originalHeapAtPre      = heapAtPre;
+	this.id                     = id;
+    }    
 
+    
     /**
      * Creates an operation contract.
-     * @param name the unique internal name of the contract
-     * @param displayName the displayed name of the contract
-     * @param programMethod the ProgramMethod to which the contract belongs
+     * @param baseName base name of the contract (does not have to be unique)
+     * @param pm the ProgramMethod to which the contract belongs
      * @param modality the modality of the contract
      * @param pre the precondition of the contract
      * @param post the postcondition of the contract
@@ -64,9 +104,8 @@ public final class OperationContractImpl implements OperationContract {
      * @param excVar the variable used for the thrown exception
      * @param heapAtPre the operator used for the pre-heap
      */
-    public OperationContractImpl(String name,
-                                 String displayName,
-                                 ProgramMethod programMethod,
+    public OperationContractImpl(String baseName,
+                                 ProgramMethod pm,
             		         Modality modality,
             		         Term pre,
             		         Term post,
@@ -76,32 +115,18 @@ public final class OperationContractImpl implements OperationContract {
             		         ProgramVariable resultVar,
             		         ProgramVariable excVar,
                                  Term heapAtPre) {
-        assert name != null && !name.equals("");
-        assert displayName != null && !displayName.equals("");
-        assert programMethod != null;
-        assert modality != null;
-        assert pre != null;
-        assert post != null;
-        assert modifies != null;
-        assert (selfVar == null) == programMethod.isStatic();
-        assert paramVars != null;
-        assert paramVars.size() 
-                == programMethod.getParameterDeclarationCount();
-        assert (resultVar == null) == (programMethod.getKeYJavaType() == null);
-        assert excVar != null;
-        assert heapAtPre != null;
-        this.name                   = name;
-        this.displayName            = displayName;
-        this.programMethod          = programMethod;
-        this.modality               = modality;
-	this.originalPre            = pre;
-	this.originalPost           = post;
-	this.originalModifies       = modifies;
-	this.originalSelfVar        = selfVar;
-	this.originalParamVars      = paramVars;
-	this.originalResultVar      = resultVar;
-	this.originalExcVar         = excVar;
-	this.originalHeapAtPre      = heapAtPre;
+        this(baseName,
+             pm,
+             modality,
+             pre,
+             post,
+             modifies,
+             selfVar,
+             paramVars,
+             resultVar,
+             excVar,
+             heapAtPre,
+             INVALID_ID);
     }
     
     
@@ -109,6 +134,13 @@ public final class OperationContractImpl implements OperationContract {
     //-------------------------------------------------------------------------
     //internal methods
     //-------------------------------------------------------------------------
+    
+    private static Term atPreify(Term t, Term heapAtPre, Services services) {
+	Map map = new HashMap();
+	map.put(TB.heap(services), heapAtPre);
+        return new OpReplacer(map).replace(t);
+    }
+
     
     private Map /*Operator, Operator, Term -> Term*/ getReplaceMap(
 	    		      ProgramVariable selfVar, 
@@ -162,13 +194,6 @@ public final class OperationContractImpl implements OperationContract {
     }
     
     
-    private Term atPreify(Term t, Term heapAtPre, Services services) {
-	Map map = new HashMap();
-	map.put(TB.heap(services), heapAtPre);
-        return new OpReplacer(map).replace(t);
-    }
-    
-    
     
     //-------------------------------------------------------------------------
     //public interface
@@ -179,16 +204,16 @@ public final class OperationContractImpl implements OperationContract {
         return name;
     }
     
-    
+
     @Override
-    public String getDisplayName() {
-        return displayName;
+    public int id() {
+	return id;
     }
     
     
     @Override
     public ProgramMethod getProgramMethod() {
-        return programMethod;
+        return pm;
     }
     
     
@@ -263,11 +288,10 @@ public final class OperationContractImpl implements OperationContract {
     @Override
     public OperationContract union(OperationContract[] others, 
                                    String newName, 
-                                   String newDisplayName, 
                                    Services services) {
         assert others != null;
         for(OperationContract contract : others) {
-            assert contract.getProgramMethod().equals(programMethod);
+            assert contract.getProgramMethod().equals(pm);
         }
         if(others.length == 0) {
             return this;
@@ -301,8 +325,7 @@ public final class OperationContractImpl implements OperationContract {
         }
 
         return new OperationContractImpl(newName,
-                                         newDisplayName,
-                                         programMethod,
+                                         pm,
                                          modality,
                                          pre,
                                          post,
@@ -311,14 +334,14 @@ public final class OperationContractImpl implements OperationContract {
                                          originalParamVars,
                                          originalResultVar,
                                          originalExcVar,
-                                         originalHeapAtPre);
+                                         originalHeapAtPre,
+                                         OperationContract.INVALID_ID);
     }
     
     
-    public OperationContract replaceProgramMethod(ProgramMethod pm, 
-	    					  Services services) {
-        return new OperationContractImpl(name,
-                			 displayName,
+    @Override
+    public OperationContract setID(int newId) {
+        return new OperationContractImpl(baseName,
                 			 pm,
                 			 modality,
                 			 originalPre,
@@ -328,12 +351,32 @@ public final class OperationContractImpl implements OperationContract {
                 			 originalParamVars,
                 			 originalResultVar,
                 			 originalExcVar,
-                			 originalHeapAtPre);	
+                			 originalHeapAtPre,
+                			 newId);	
     }
     
     
+    @Override
+    public OperationContract setProgramMethod(ProgramMethod pm, 
+	    				      Services services) {
+        return new OperationContractImpl(baseName,
+                			 pm,
+                			 modality,
+                			 originalPre,
+                			 originalPost,
+                			 originalModifies,
+                			 originalSelfVar,
+                			 originalParamVars,
+                			 originalResultVar,
+                			 originalExcVar,
+                			 originalHeapAtPre,
+                			 id);	
+    }
+    
+    
+    @Override
     public OperationContract addPre(Term addedPre,
-		    		    ParsableVariable selfVar, 
+		    		    ProgramVariable selfVar, 
 		    		    ImmutableList<ProgramVariable> paramVars,
 		    		    Services services) {
 	//replace in addedPre the variables used for self and parameters
@@ -353,9 +396,8 @@ public final class OperationContractImpl implements OperationContract {
 	addedPre = or.replace(addedPre);
 	
 	//create new contract
-        return new OperationContractImpl(name,
-		 			 displayName,
-		 			 programMethod,
+        return new OperationContractImpl(baseName,
+		 			 pm,
 		 			 modality,
 		 			 TB.and(originalPre, addedPre),
 		 			 originalPost,
@@ -364,14 +406,14 @@ public final class OperationContractImpl implements OperationContract {
 		 			 originalParamVars,
 		 			 originalResultVar,
 		 			 originalExcVar,
-		 			 originalHeapAtPre);
+		 			 originalHeapAtPre,
+		 			 id);
     }
-
+    
     
     @Override
     public String getHTMLText(Services services) {
 	final StringBuffer sig = new StringBuffer();
-//	sig.append("try { ");	
 	if(originalResultVar != null) {
 	    sig.append(originalResultVar);
 	    sig.append(" = ");
@@ -380,7 +422,7 @@ public final class OperationContractImpl implements OperationContract {
 	    sig.append(originalSelfVar);
 	    sig.append(".");
 	}
-	sig.append(programMethod.getName());
+	sig.append(pm.getName());
 	sig.append("(");
 	for(ProgramVariable pv : originalParamVars) {
 	    sig.append(pv.name());

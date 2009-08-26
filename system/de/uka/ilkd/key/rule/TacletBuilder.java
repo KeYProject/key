@@ -108,13 +108,6 @@ public abstract class TacletBuilder {
        attrs.setDisplayName(s);
     }
 
-    /** adds an old name to the list of old names
-     */
-    public void addOldName(String s) {
-       attrs.addOldName(s);
-    }
-
-
     public void setHelpText(String s) {
        attrs.setHelpText(s);
     }

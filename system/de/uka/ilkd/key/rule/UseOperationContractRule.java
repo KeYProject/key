@@ -19,15 +19,14 @@ import de.uka.ilkd.key.gui.ContractConfigurator;
 import de.uka.ilkd.key.gui.Main;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.recoderext.MethodCallStatement;
-import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.java.reference.MethodReference;
-import de.uka.ilkd.key.java.statement.MethodBodyStatement;
+import de.uka.ilkd.key.java.expression.operator.CopyAssignment;
+import de.uka.ilkd.key.java.reference.*;
 import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.statement.Throw;
 import de.uka.ilkd.key.java.visitor.ProgramContextAdder;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.proof.mgt.ComplexRuleJustificationBySpec;
@@ -35,6 +34,7 @@ import de.uka.ilkd.key.proof.mgt.RuleJustificationBySpec;
 import de.uka.ilkd.key.rule.inst.ContextStatementBlockInstantiation;
 import de.uka.ilkd.key.speclang.OperationContract;
 import de.uka.ilkd.key.util.InvInferenceTools;
+import de.uka.ilkd.key.util.Pair;
 
 
 /**
@@ -65,21 +65,108 @@ public final class UseOperationContractRule implements BuiltInRule {
     //internal methods
     //-------------------------------------------------------------------------
     
-    private ProgramMethod getProgramMethod(Services services,
-	    				   MethodReference mr, 
-	    				   Term programTerm) {
-	MethodFrame frame 
-		= IIT.getInnermostMethodFrame(programTerm, services);
-	ExecutionContext ec = frame == null 
-			      ? null
-			      : (ExecutionContext) frame.getExecutionContext();
-	KeYJavaType staticType = mr.determineStaticPrefixType(services, ec);
-	ProgramMethod pm = mr.method(services, staticType, ec);
-	assert pm != null;
-	return pm;
+    private Pair<LocationVariable,MethodReference> getMethodCall(
+	    						JavaBlock jb,
+	    						Services services) {
+	final LocationVariable resultVar;
+        final MethodReference mr;
+        
+        final SourceElement activeStatement = IIT.getActiveStatement(jb);
+        if(activeStatement instanceof MethodReference) {
+            resultVar = null;
+            mr = (MethodReference) activeStatement;
+        } else if(activeStatement instanceof CopyAssignment) {
+            CopyAssignment ca = (CopyAssignment) activeStatement;
+            Expression lhs = ca.getExpressionAt(0);
+            Expression rhs = ca.getExpressionAt(1);
+            if(rhs instanceof MethodReference
+               && lhs instanceof LocationVariable) {
+        	resultVar = (LocationVariable) lhs;
+        	mr        = (MethodReference) rhs;
+            } else {
+        	return null;
+            }
+        } else {
+            return null;
+        }
+        
+        final ReferencePrefix rp = mr.getReferencePrefix();
+        if(rp != null 
+           && !ProgramSVSort.SIMPLEEXPRESSION.canStandFor(rp, null, services)
+           && ! (rp instanceof ThisReference)
+           && ! (rp instanceof SuperReference)
+           && ! (rp instanceof TypeReference)) {
+            return null;
+        } else {
+            return new Pair<LocationVariable,MethodReference>(resultVar, mr);
+        }
     }
     
     
+    //copied from MethodCall.java
+    private ProgramMethod getProgramMethod(MethodReference mr,
+	    				   KeYJavaType staticType, 
+	    				   ExecutionContext ec,
+	    				   Services services) {
+	ProgramMethod result;
+ 	if(ec != null){
+	    result = mr.method(services, staticType, ec);
+	    if(result == null) {
+		// if a method is declared protected and prefix and
+		// execContext are in different packages we have to
+		// simulate visibility rules like being in prefixType
+		result = mr.method(services, 
+				  staticType, 
+				  mr.getMethodSignature(services, ec), 
+				  staticType);
+	    }
+ 	} else {
+	    result = mr.method(services, 
+		    	       staticType, 
+		    	       mr.getMethodSignature(services, ec), 
+		    	       staticType);
+ 	}
+	return result;
+    }
+    
+    
+    private Term getActualSelf(MethodReference mr,
+	    		       ProgramMethod pm,
+	    		       ExecutionContext ec, 
+	    		       Services services) {
+	final TypeConverter tc = services.getTypeConverter();
+	final ReferencePrefix rp = mr.getReferencePrefix();
+	if(pm.isStatic()) {
+	    return null;
+	} else if(rp == null 
+		  || rp instanceof ThisReference 
+		  || rp instanceof SuperReference) {
+	    return tc.findThisForSort(pm.getContainerType().getSort(), ec);
+	} else if(rp instanceof FieldReference
+		  && ((FieldReference) rp).referencesOwnInstanceField()) {
+	    final ReferencePrefix rp2 
+	    	= ((FieldReference)rp).setReferencePrefix(
+	    					ec.getRuntimeInstance());
+	    return tc.convertToLogicElement(rp2);
+	} else {
+	    return tc.convertToLogicElement(rp, ec);
+	}
+    }
+    
+    
+    private ImmutableList<Term> getActualParams(MethodReference mr,
+	    					ExecutionContext ec,
+	    					Services services) {        
+	ImmutableList<Term> result = ImmutableSLList.<Term>nil();
+	for(Expression expr : mr.getArguments()) {
+	    Term actualParam 
+	    	= services.getTypeConverter().convertToLogicElement(expr, ec);
+	    result = result.append(actualParam);
+	}
+	return result;
+    }
+    
+       
     /**
      * Returns the operation contracts which are applicable for the passed 
      * operation and the passed modality
@@ -175,7 +262,8 @@ public final class UseOperationContractRule implements BuiltInRule {
 
             pe = curPrefix.getFirstActiveChildPos().getProgram(curPrefix);
 
-            assert pe instanceof MethodBodyStatement;
+            assert pe instanceof CopyAssignment 
+                   || pe instanceof MethodReference;
         
             int i = length - 1;
             do {
@@ -187,7 +275,8 @@ public final class UseOperationContractRule implements BuiltInRule {
             } while(i >= 0);       
 
         } else {
-            assert pe instanceof MethodBodyStatement;
+            assert pe instanceof CopyAssignment 
+                   || pe instanceof MethodReference;
         }
         return result;
     }
@@ -216,6 +305,7 @@ public final class UseOperationContractRule implements BuiltInRule {
     //public interface
     //------------------------------------------------------------------------- 
     
+    @Override
     public boolean isApplicable(Goal goal, 
                                 PosInOccurrence pio, 
                                 Constraint userConstraint) {
@@ -231,27 +321,28 @@ public final class UseOperationContractRule implements BuiltInRule {
             return false;
         }
         
-        //delete--->
+        //active statement must be method call
         final Modality modality = (Modality) term.op();
-        final SourceElement activeStatement 
-                = IIT.getActiveStatement(term.javaBlock());
-        if(!(activeStatement instanceof MethodBodyStatement)) {
+        final Pair<LocationVariable,MethodReference> methodCall
+        	= getMethodCall(term.javaBlock(), goal.proof().getServices());
+        if(methodCall == null) {
             return false;
         }
-        final ProgramMethod pm = ((MethodBodyStatement)activeStatement).getProgramMethod(services);
-        //<----
-        
-//        //active statement must be method reference
-//        final Modality modality = (Modality) term.op();
-//        final SourceElement activeStatement 
-//                = IIT.getActiveStatement(term.javaBlock());
-//        if(!(activeStatement instanceof MethodReference)) {
-//            return false;
-//        }
-// 
-//        //there must be applicable contracts for the operation
-//        final MethodReference mr = (MethodReference) activeStatement;
-//        final ProgramMethod pm = getProgramMethod(services, mr, term);
+ 
+        //there must be applicable contracts for the operation
+	final MethodFrame frame 
+		= IIT.getInnermostMethodFrame(term, services);
+	final ExecutionContext ec 
+		= frame == null 
+                  ? null
+		  : (ExecutionContext) frame.getExecutionContext();
+	final KeYJavaType staticType 
+		= methodCall.second.determineStaticPrefixType(services, ec);
+	final ProgramMethod pm = getProgramMethod(methodCall.second, 
+		                                  staticType,
+		                                  ec, 
+		                                  services);
+	
         final ImmutableSet<OperationContract> contracts 
                 = getApplicableContracts(services, pm, modality);
         if(contracts.isEmpty()) {
@@ -268,29 +359,31 @@ public final class UseOperationContractRule implements BuiltInRule {
     }
 
     
-    public ImmutableList<Goal> apply(Goal goal, Services services, RuleApp ruleApp) {
+    @Override    
+    public ImmutableList<Goal> apply(Goal goal, 
+	    			     Services services, 
+	    			     RuleApp ruleApp) {
         //collect information about sequent
 	final PosInOccurrence pio = ruleApp.posInOccurrence();
 	final Term term = IIT.goBelowUpdates(pio.subTerm());
         final Modality modality = (Modality) term.op();
         final JavaBlock jb = term.javaBlock();
-        final SourceElement activeStatement = IIT.getActiveStatement(jb);
-        final MethodBodyStatement mbs = (MethodBodyStatement) activeStatement;
-        final ProgramMethod pm = mbs.getProgramMethod(services);
-        final Term actualSelf 
-            = (mbs.getDesignatedContext() instanceof Expression
-               ? services.getTypeConverter()
-                         .convertToLogicElement(mbs.getDesignatedContext())
-               : null);
-        final ImmutableArray<Expression> args = mbs.getArguments();        
-        ImmutableList<Term> actualParams = ImmutableSLList.<Term>nil();
-        for(int i = 0; i < args.size(); i++) {
-            actualParams = actualParams.append(
-                    services.getTypeConverter()
-                            .convertToLogicElement(args.get(i)));
-        }
-        final LocationVariable actualResult 
-            = (LocationVariable) mbs.getResultVariable();
+        final Pair<LocationVariable,MethodReference> methodCall
+        	= getMethodCall(term.javaBlock(), services);
+	final MethodFrame frame 
+		= IIT.getInnermostMethodFrame(term, services);
+	final ExecutionContext ec 
+		= frame == null 
+                  ? null
+		  : (ExecutionContext) frame.getExecutionContext();
+	final KeYJavaType staticType 
+		= methodCall.second.determineStaticPrefixType(services, ec);
+	final ProgramMethod pm 
+		= getProgramMethod(methodCall.second, staticType, ec, services);
+	final Term actualSelf 
+		= getActualSelf(methodCall.second, pm, ec, services);
+	final ImmutableList<Term> actualParams
+		= getActualParams(methodCall.second, ec, services);
         
         //configure contract and assumed / ensured invariants
         final OperationContract contract;
@@ -314,6 +407,7 @@ public final class UseOperationContractRule implements BuiltInRule {
         if(selfVar != null) {
             goal.addProgramVariable(selfVar);
         }
+        assert (selfVar == null) == (actualSelf == null);
         
         final ImmutableList<ProgramVariable> paramVars 
         	= TB.paramVars(services, pm, true);
@@ -324,8 +418,8 @@ public final class UseOperationContractRule implements BuiltInRule {
         final ProgramVariable resultVar = TB.resultVar(services, pm, true);
         if(resultVar != null) {
             goal.addProgramVariable(resultVar);
-            assert actualResult != null;
         }
+        assert (resultVar == null) == (methodCall.first == null);
         
         final ProgramVariable excVar = TB.excVar(services, pm, true);
         assert excVar != null;
@@ -347,13 +441,29 @@ public final class UseOperationContractRule implements BuiltInRule {
                                            services);
         final Term mod = contract.getModifies(selfVar, paramVars, services);
         
-        //split goal into three branches
-        ImmutableList<Goal> result = goal.split(3);
-        Goal preGoal = result.tail().tail().head();
+        //split goal into three/four branches
+        final ImmutableList<Goal> result;
+        final Goal preGoal, postGoal, excPostGoal, nullGoal;
+        final ReferencePrefix rp = methodCall.second.getReferencePrefix();
+        if(rp != null 
+           && !(rp instanceof ThisReference) 
+           && !(rp instanceof SuperReference)
+           && !(rp instanceof TypeReference)) {
+            result = goal.split(4);
+            preGoal = result.tail().tail().tail().head();
+            postGoal = result.tail().tail().head();
+            excPostGoal = result.tail().head();
+            nullGoal = result.head();
+            nullGoal.setBranchLabel("Null reference (" + actualSelf + " = null)");
+        } else {
+            result = goal.split(3);
+            preGoal = result.tail().tail().head();
+            postGoal = result.tail().head();
+            excPostGoal = result.head();
+            nullGoal = null;
+        }
         preGoal.setBranchLabel("Pre");
-        Goal postGoal = result.tail().head();
         postGoal.setBranchLabel("Post");
-        Goal excPostGoal = result.head();
         excPostGoal.setBranchLabel("Exceptional Post");
         
         //prepare common stuff for the three branches
@@ -401,10 +511,10 @@ public final class UseOperationContractRule implements BuiltInRule {
                      TB.prog(modality,
                              JavaBlock.createJavaBlock(postSB),
                              term.sub(0)));
-        final Term resultUpdate = (actualResult == null
+        final Term resultUpdate = (resultVar == null
                                    ? TB.skip()
                                    : TB.elementary(services, 
-                                	   	   actualResult, 
+                                	   	   methodCall.first, 
                                 	   	   TB.var(resultVar)));
         
         final Term normalPost 
@@ -434,6 +544,13 @@ public final class UseOperationContractRule implements BuiltInRule {
                                                             
         replaceInGoal(term, excPost, excPostGoal, pio);
         
+        //create "Null Reference" branch
+        if(nullGoal != null) {
+            final Term actualSelfNotNull 
+            	= TB.not(TB.equals(actualSelf, TB.NULL(services)));
+            replaceInGoal(term, actualSelfNotNull, nullGoal, pio);
+        }
+        
         //create justification
         final RuleJustificationBySpec just 
         	= new RuleJustificationBySpec(contract);
@@ -446,16 +563,19 @@ public final class UseOperationContractRule implements BuiltInRule {
     }
     
     
+    @Override    
     public Name name() {
         return NAME;
     }
 
 
+    @Override    
     public String displayName() { 
         return NAME.toString();
     }
     
-    
+
+    @Override
     public String toString() {
         return displayName();
     }

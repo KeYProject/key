@@ -15,6 +15,7 @@ import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.speclang.OperationContract;
 
 public interface ProofCorrectnessMgt {
 
@@ -29,8 +30,10 @@ public interface ProofCorrectnessMgt {
     void ruleUnApplied(RuleApp r);
     
     ImmutableSet<RuleApp> getNonAxiomApps();
+    
+    ImmutableSet<OperationContract> getUsedContracts();
 
-    void setMediator ( KeYMediator p_mediator );
+    void setMediator(KeYMediator mediator);
 
     boolean proofSimilarTo(Proof p);
 

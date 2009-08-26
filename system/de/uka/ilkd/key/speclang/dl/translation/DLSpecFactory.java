@@ -30,23 +30,26 @@ import de.uka.ilkd.key.speclang.*;
  * A factory for creating class invariants and operation contracts from DL
  * specifications.
  */
-public class DLSpecFactory {
+public final class DLSpecFactory {
 
     private static final TermBuilder TB = TermBuilder.DF;
     private final Services services;
+        
 
-    // -------------------------------------------------------------------------
-    // constructors
-    // -------------------------------------------------------------------------
+    //-------------------------------------------------------------------------
+    //constructors
+    //-------------------------------------------------------------------------
 
     public DLSpecFactory(Services services) {
 	assert services != null;
 	this.services = services;
     }
 
-    // -------------------------------------------------------------------------
-    // internal methods
-    // -------------------------------------------------------------------------
+    
+    
+    //-------------------------------------------------------------------------
+    //internal methods
+    //-------------------------------------------------------------------------
 
     private MethodBodyStatement extractMBS(Term fma) {
 	SourceElement se = fma.sub(1).javaBlock().program().getFirstElement();
@@ -121,10 +124,12 @@ public class DLSpecFactory {
     private Term extractPost(Term fma) {
 	return fma.sub(1).sub(0);
     }
+    
+    
 
-    // -------------------------------------------------------------------------
-    // public interface
-    // -------------------------------------------------------------------------
+    //-------------------------------------------------------------------------
+    //public interface
+    //-------------------------------------------------------------------------
 
     /**
      * Creates a class invariant from a formula and a designated "self".
@@ -150,17 +155,15 @@ public class DLSpecFactory {
      * <code>pre -> \<p\> post</code> and a modifies clause (which is how DL
      * contracts are currently represented in .key files).
      */
-    public OperationContract createDLOperationContract(String name,
-	    String displayName, Term fma, Term modifies)
+    public OperationContract createDLOperationContract(String name, 
+	    					       Term fma, 
+	    					       Term modifies)
 	    throws ProofInputException {
 	assert name != null;
-	if (displayName == null) {
-	    displayName = name;
-	}
 	assert fma != null;
 	assert modifies != null;
 
-	// extract parts
+	//extract parts
 	MethodBodyStatement mbs = extractMBS(fma);
 	if (mbs.getProgramMethod(services) == null) {
 	    throw new ProofInputException("method \""
@@ -176,7 +179,7 @@ public class DLSpecFactory {
 	ProgramVariable excVar = extractExcVar(fma);
 	Term heapAtPre = extractHeapAtPre(post);
 
-	// atPre-functions may not occur in precondition or modifies clause
+	//atPre-functions may not occur in precondition or modifies clause
 	Term forbiddenHeapAtPre = extractHeapAtPre(pre);
 	if (forbiddenHeapAtPre != null) {
 	    throw new ProofInputException(
@@ -190,13 +193,13 @@ public class DLSpecFactory {
 		            + forbiddenHeapAtPre);
 	}
 
-	// result variable may be omitted
+	//result variable may be omitted
 	if (resultVar == null && pm.getKeYJavaType() != null) {
 	    ProgramElementName resultPEN = new ProgramElementName("res");
 	    resultVar = new LocationVariable(resultPEN, pm.getKeYJavaType());
 	}
 
-	// exception variable may be omitted
+	//exception variable may be omitted
 	if (excVar == null) {
 	    excVar = TB.excVar(services, pm, false);
 	    Term excNullTerm = TB.equals(TB.var(excVar), TB.NULL(services));
@@ -211,8 +214,16 @@ public class DLSpecFactory {
 	    }
 	}
 
-	return new OperationContractImpl(name, displayName, pm, modality, pre,
-	        post, modifies, selfVar, paramVars, resultVar, excVar,
-	        heapAtPre);
+	return new OperationContractImpl(name, 
+					 pm, 
+					 modality, 
+					 pre,
+					 post, 
+					 modifies, 
+					 selfVar, 
+					 paramVars, 
+					 resultVar, 
+					 excVar,
+					 heapAtPre);
     }
 }

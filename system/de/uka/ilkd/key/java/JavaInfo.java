@@ -14,9 +14,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
-import de.uka.ilkd.key.collection.ImmutableArray;
-import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.collection.*;
 import de.uka.ilkd.key.java.abstraction.*;
 import de.uka.ilkd.key.java.declaration.*;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
@@ -40,7 +38,7 @@ import de.uka.ilkd.key.util.LRUCache;
  * {@link KeYProgModelInfo}. This class can be extended to provide further 
  * services.
  */ 
-public class JavaInfo {
+public final class JavaInfo {
 
 
     public static class CacheKey {
@@ -69,8 +67,7 @@ public class JavaInfo {
 
 
     private Services services;
-    private KeYProgModelInfo  kpmi;
-    private String javaSourcePath;
+    private KeYProgModelInfo kpmi;
 
     /**
      * the type of null
@@ -95,7 +92,8 @@ public class JavaInfo {
     // resolution
     private HashMap<String, Object> sName2KJTCache = null;
     
-    private LRUCache<CacheKey, ImmutableList<KeYJavaType>> commonSubtypeCache = new LRUCache<CacheKey, ImmutableList<KeYJavaType>>(200);
+    private LRUCache<CacheKey, ImmutableList<KeYJavaType>> commonSubtypeCache 
+    	= new LRUCache<CacheKey, ImmutableList<KeYJavaType>>(200);
     
     private int nameCachedSize = 0;
     private int sNameCachedSize = 0;
@@ -1154,14 +1152,6 @@ public class JavaInfo {
         return find(programName, kpmi.getAllVisibleFields(classType));
     }        
     
-    public void setJavaSourcePath(String path) {
-        javaSourcePath = path;
-    }
-    
-    public String getJavaSourcePath() {
-        return javaSourcePath;
-    }
-    
     
     /**
      * returns the list of all common subtypes of types <tt>k1</tt> and <tt>k2</tt>
@@ -1220,7 +1210,44 @@ public class JavaInfo {
         
         return length;
     }
-
+    
+    
+    public ImmutableSet<ProgramMethod> getOverridingMethods(ProgramMethod pm) {
+        final String name   = pm.getMethodDeclaration().getName();
+        final int numParams = pm.getParameterDeclarationCount();
+        ImmutableSet<ProgramMethod> result 
+        	= DefaultImmutableSet.<ProgramMethod>nil();
+        
+        final KeYJavaType kjt = pm.getContainerType();
+        assert kjt != null;
+        for(KeYJavaType sub : getAllSubtypes(kjt)) {
+            assert sub != null;
+            
+            final ImmutableList<ProgramMethod> subPms 
+                = getAllProgramMethodsLocallyDeclared(sub);
+            for(ProgramMethod subPm : subPms) {
+                if(subPm.getMethodDeclaration().getName().equals(name) 
+                   && subPm.getParameterDeclarationCount() == numParams) {
+                    boolean paramsEqual = true;
+                    for(int i = 0; i < numParams; i++) {
+                        if(!subPm.getParameterType(i)
+                                 .equals(pm.getParameterType(i))) {
+                            paramsEqual = false;
+                            break;
+                        }
+                    }
+                    
+                    if(paramsEqual) {
+                        result = result.add(subPm);
+                    }
+                }
+            }
+        }
+        
+        return result;
+    }
+    
+    
     
     /**
      * inner class used to filter certain types of program elements

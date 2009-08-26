@@ -334,7 +334,7 @@ public class JMLSpecExtractor implements SpecExtractor {
                                          Behavior.NONE);
             sc.addAssignable(new PositionedString("\\nothing"));
             ImmutableSet<OperationContract> contracts 
-                = jsf.createJMLOperationContractsAndInherit(pm, sc);
+                = jsf.createJMLOperationContracts(pm, sc);
             result = result.union(contracts);
         }
 
@@ -420,7 +420,7 @@ public class JMLSpecExtractor implements SpecExtractor {
             //translate contract
             try {
                 ImmutableSet<OperationContract> contracts 
-                    = jsf.createJMLOperationContractsAndInherit(pm, specCase);
+                    = jsf.createJMLOperationContracts(pm, specCase);
                 result = result.union(contracts);
             } catch (SLWarningException e) {
                 warnings = warnings.add(e.getWarning());

@@ -797,7 +797,7 @@ public final class TermBuilder {
     
     
     public Term setComprehension(Services services, 
-	                         QuantifiableVariable qv, 
+	                         QuantifiableVariable[] qvs, 
 	                         Term a, 
 	                         Term s) {
 	SetLDT ldt = services.getTypeConverter().getSetLDT();
@@ -806,7 +806,7 @@ public final class TermBuilder {
 	} else {
 	    return tf.createTerm(ldt.getSetComprehension(), 
 		                 new Term[]{a,s}, 
-		                 new ImmutableArray<QuantifiableVariable>(qv), 
+		                 new ImmutableArray<QuantifiableVariable>(qvs), 
 		                 null);
 	}
     }
@@ -1032,25 +1032,29 @@ public final class TermBuilder {
     }
     
     
+    public Term freshLocs(Services services, Term h) {
+	return func(services.getTypeConverter().getHeapLDT().freshLocs(), h);
+    }
+    
+    
     public Term locComprehension(Services services, 
-	                         QuantifiableVariable qv, 
+	                         QuantifiableVariable[] qvs, 
 	                         Term o, 
 	                         Term f) {
 	return setComprehension(services, 
-		                qv, 
+		                qvs, 
 		                pair(services, o, f), 
 		                allLocs(services));
     }
     
     
     public Term guardedLocComprehension(Services services, 
-	                         	QuantifiableVariable qv,
-	                         	Term cond,
-	                         	Term o, 
-	                         	Term f) {
+	                         	QuantifiableVariable[] qvs,
+	                         	Term guard,
+	                         	Term loc) {
 	return setComprehension(services, 
-		                qv, 
-		                ife(cond, pair(services, o, f), empty(services)),
+		                qvs, 
+		                ife(guard, loc, zero(services)),
 		                allLocs(services));
     }    
     

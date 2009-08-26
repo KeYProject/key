@@ -5,6 +5,7 @@
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
+
 public class MyClass {
 
   private int a;
@@ -17,5 +18,4 @@ public class MyClass {
   public void addTen() {
     a = a + 10;
   }
-  
 }

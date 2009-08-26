@@ -750,6 +750,16 @@ public final class StrategySelectionView extends JPanel {
         if (proof == null) {            
             enableAll(false);                
         } else {
+            boolean methodExpandAllowed = false;
+            for(de.uka.ilkd.key.logic.Choice c 
+        	     : proof.env().getInitConfig().getActivatedChoices()) {
+        	if(c.name().toString().equals("methodExpand:allow")) {
+        	    methodExpandAllowed = true;
+        	    break;
+        	}
+            }
+            rdBut12.setEnabled(methodExpandAllowed);
+            
             String activeS = proof.getActiveStrategy().name().toString();
             JRadioButton bactive = JRadioButtonHashMap.getButton(activeS);
             bactive.setSelected(true);

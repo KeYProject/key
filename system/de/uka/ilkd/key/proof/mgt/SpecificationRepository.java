@@ -27,7 +27,7 @@ import de.uka.ilkd.key.speclang.LoopInvariant;
 import de.uka.ilkd.key.speclang.OperationContract;
 
 
-public class SpecificationRepository {
+public final class SpecificationRepository {
     
     private static final String CONTRACT_COMBINATION_MARKER = "#";
     
@@ -49,6 +49,8 @@ public class SpecificationRepository {
                 = new LinkedHashMap<LoopStatement,LoopInvariant>();
     private final Services services;
     
+    private int contractCounter = 0;
+    
     
     
     //-------------------------------------------------------------------------
@@ -68,9 +70,12 @@ public class SpecificationRepository {
     /**
      * Returns all registered (atomic) contracts for the passed operation.
      */
-    public ImmutableSet<OperationContract> getOperationContracts(ProgramMethod pm) {
+    public ImmutableSet<OperationContract> getOperationContracts(
+	    					ProgramMethod pm) {
 	ImmutableSet<OperationContract> result = contracts.get(pm);
-        return result == null ? DefaultImmutableSet.<OperationContract>nil() : result;
+        return result == null 
+               ? DefaultImmutableSet.<OperationContract>nil() 
+               : result;
     }
     
     
@@ -78,8 +83,9 @@ public class SpecificationRepository {
      * Returns all registered (atomic) contracts for the passed operation which 
      * refer to the passed modality.
      */
-    public ImmutableSet<OperationContract> getOperationContracts(ProgramMethod pm, 
-	    						Modality modality) {
+    public ImmutableSet<OperationContract> getOperationContracts(
+	    					ProgramMethod pm, 
+	    					Modality modality) {
 	ImmutableSet<OperationContract> result = getOperationContracts(pm);
 	for(OperationContract contract : result) {
 	    if(!contract.getModality().equals(modality)) {
@@ -115,27 +121,78 @@ public class SpecificationRepository {
     
     
     /**
-     * Registers the passed (atomic) operation contract, whose name must
-     * be different from all previously registered contracts.
+     * Returns a set encompassing the passed contract and all its versions 
+     * inherited to overriding methods.
+     */
+    public ImmutableSet<OperationContract> getInheritedContracts(
+	    					OperationContract contract) {
+	ImmutableSet<OperationContract> result 
+		= DefaultImmutableSet.<OperationContract>nil().add(contract);
+        final ImmutableSet<ProgramMethod> pms 
+        	= services.getJavaInfo()
+        	          .getOverridingMethods(contract.getProgramMethod());
+        for(ProgramMethod pm : pms) {
+            for(OperationContract pmContract : getOperationContracts(pm)) {
+        	if(pmContract.id() == contract.id()) {
+        	    result = result.add(pmContract);
+        	    break;
+        	}
+            }
+        }
+        return result;
+    }
+    
+    
+    /**
+     * Returns a set encompassing the passed contracts and all its versions 
+     * inherited to overriding methods.
+     */    
+    public ImmutableSet<OperationContract> getInheritedContracts(
+	    			ImmutableSet<OperationContract> contractSet) {
+	ImmutableSet<OperationContract> result 
+		= DefaultImmutableSet.<OperationContract>nil();
+        for(OperationContract c : contractSet) {
+            result = result.union(getInheritedContracts(c));
+        }
+        return result;
+    }
+        
+    
+    /**
+     * Registers the passed (atomic) operation contract, and inherits it to all
+     * overriding methods.
      */
     public void addOperationContract(OperationContract contract) {
-        ProgramMethod pm = contract.getProgramMethod();
-        String name = contract.getName();
-        assert contractsByName.get(name) == null 
-               : "Tried to add a contract with a non-unique name!";
-        assert !name.contains(CONTRACT_COMBINATION_MARKER)
-               : "Tried to add a contract with a name containing the reserved" 
-                  + " character " + CONTRACT_COMBINATION_MARKER + "!";
-        contracts.put(pm, getOperationContracts(pm).add(contract));
-        contractsByName.put(name, contract);
+	//set id
+	contract = contract.setID(contractCounter++);
+
+	//register and inherit
+        final ImmutableSet<ProgramMethod> pms 
+        	= services.getJavaInfo()
+        	          .getOverridingMethods(contract.getProgramMethod())
+        	          .add(contract.getProgramMethod());
+        for(ProgramMethod pm : pms) {
+            contract = contract.setProgramMethod(pm, services);
+            assert contractsByName.get(contract.getName()) == null
+                   : "Tried to add a contract with a non-unique name!";
+            assert !contract.getName().contains(CONTRACT_COMBINATION_MARKER)
+                   : "Tried to add a contract with a name containing the"
+                     + " reserved character " 
+                     + CONTRACT_COMBINATION_MARKER 
+                     + "!";
+            assert contract.id() != OperationContract.INVALID_ID
+                   : "Tried to add a contract with an invalid id!";
+            contracts.put(pm, getOperationContracts(pm).add(contract));
+            contractsByName.put(contract.getName(), contract);
+        }
     }
     
     
     /**
      * Registers the passed contracts.
      */
-    public void addOperationContracts(ImmutableSet<OperationContract> contracts) {
-        for(OperationContract contract : contracts) {
+    public void addOperationContracts(ImmutableSet<OperationContract> toAdd) {
+        for(OperationContract contract : toAdd) {
             addOperationContract(contract);
         }
     }
@@ -145,15 +202,16 @@ public class SpecificationRepository {
      * Creates a combined contract out of the passed atomic contracts.
      */
     public OperationContract combineContracts(
-                                        ImmutableSet<OperationContract> contracts) {
-        assert contracts != null && contracts.size() > 0;
-        for(OperationContract contract : contracts) {            
+                                    ImmutableSet<OperationContract> toCombine) {
+        assert toCombine != null && toCombine.size() > 0;
+        for(OperationContract contract : toCombine) {            
             assert !contract.getName().contains(CONTRACT_COMBINATION_MARKER)
                    : "Please combine only atomic contracts!";
         }
 
         //sort contracts alphabetically (for determinism)
-        OperationContract[] contractsArray = contracts.toArray(new OperationContract[contracts.size()]);
+        OperationContract[] contractsArray 
+        	= toCombine.toArray(new OperationContract[toCombine.size()]);
         Arrays.sort(contractsArray, new Comparator<OperationContract> () {
             public int compare(OperationContract c1, OperationContract c2) {
                 return c1.getName().compareTo(c2.getName());
@@ -172,16 +230,13 @@ public class SpecificationRepository {
         
         //determine names
         StringBuffer nameSB = new StringBuffer(contract.getName());
-        StringBuffer displayNameSB = new StringBuffer(contract.getDisplayName());
         for(OperationContract other : others) {
             nameSB.append(CONTRACT_COMBINATION_MARKER + other.getName());
-            displayNameSB.append(", ").append(other.getDisplayName());
         }
         
         return contract.union(
                 others, 
                 nameSB.toString(), 
-                (others.length > 0 ? "Combined Contract: " : "") + displayNameSB, 
                 services);
     }
     
@@ -189,8 +244,10 @@ public class SpecificationRepository {
     /**
      * Splits the passed contract into its atomic components. 
      */
-    public ImmutableSet<OperationContract> splitContract(OperationContract contract) {
-        ImmutableSet<OperationContract> result = DefaultImmutableSet.<OperationContract>nil();
+    public ImmutableSet<OperationContract> splitContract(
+	    					OperationContract contract) {
+        ImmutableSet<OperationContract> result 
+        	= DefaultImmutableSet.<OperationContract>nil();
         String[] atomicNames 
             = contract.getName().split(CONTRACT_COMBINATION_MARKER);
         for(String atomicName : atomicNames) {
@@ -211,7 +268,9 @@ public class SpecificationRepository {
      */
     public ImmutableSet<ClassInvariant> getClassInvariants(KeYJavaType kjt) {
 	ImmutableSet<ClassInvariant> result = invs.get(kjt);
-	return result == null ? DefaultImmutableSet.<ClassInvariant>nil() : result;
+	return result == null 
+	       ? DefaultImmutableSet.<ClassInvariant>nil() 
+               : result;
     }
     
 
@@ -251,9 +310,12 @@ public class SpecificationRepository {
     /**
      * Returns all known throughout invariants for the passed type.
      */
-    public ImmutableSet<ClassInvariant> getThroughoutClassInvariants(KeYJavaType kjt) {
+    public ImmutableSet<ClassInvariant> getThroughoutClassInvariants(
+	    						KeYJavaType kjt) {
 	ImmutableSet<ClassInvariant> result = throughoutInvs.get(kjt);
-        return result == null ? DefaultImmutableSet.<ClassInvariant>nil() : result;
+        return result == null 
+               ? DefaultImmutableSet.<ClassInvariant>nil() 
+               : result;
     }
     
     
@@ -283,7 +345,8 @@ public class SpecificationRepository {
     /**
      * Registers the passed throughout invariants.
      */
-    public void addThroughoutClassInvariants(ImmutableSet<ClassInvariant> invs) {
+    public void addThroughoutClassInvariants(
+	    				ImmutableSet<ClassInvariant> invs) {
         for(ClassInvariant inv : invs) {
             addThroughoutClassInvariant(inv);
         }
@@ -295,7 +358,8 @@ public class SpecificationRepository {
      */
     public ImmutableSet<Proof> getProofs(ProofOblInput po) {
         ImmutableSet<Proof> result = DefaultImmutableSet.<Proof>nil();
-        for(Map.Entry<ProofOblInput,ImmutableSet<Proof>> entry : proofs.entrySet()) {
+        for(Map.Entry<ProofOblInput,ImmutableSet<Proof>> entry 
+        	: proofs.entrySet()) {
             ProofOblInput mapPO = entry.getKey();
             ImmutableSet<Proof> sop = entry.getValue();
             if(mapPO.implies(po)) {
@@ -311,11 +375,13 @@ public class SpecificationRepository {
      */
     public ImmutableSet<Proof> getProofs(ProgramMethod pm) {
         ImmutableSet<Proof> result = DefaultImmutableSet.<Proof>nil();
-        for(Map.Entry<ProofOblInput,ImmutableSet<Proof>> entry : proofs.entrySet()) {
+        for(Map.Entry<ProofOblInput,ImmutableSet<Proof>> entry 
+        	: proofs.entrySet()) {
             ProofOblInput po = entry.getKey();
             ImmutableSet<Proof> sop = entry.getValue();
             if(po instanceof ContractPO 
-               && ((ContractPO) po).getContract().getProgramMethod().equals(pm)) {
+               && ((ContractPO) po).getContract()
+                                   .getProgramMethod().equals(pm)) {
                 result = result.union(sop);
             }
         }
@@ -340,7 +406,8 @@ public class SpecificationRepository {
      * Returns the operation that the passed proof is about, or null.
      */
     public ProgramMethod getOperationForProof(Proof proof) {
-	for(Map.Entry<ProofOblInput,ImmutableSet<Proof>> entry : proofs.entrySet()) {
+	for(Map.Entry<ProofOblInput,ImmutableSet<Proof>> entry 
+		: proofs.entrySet()) {
 	    ProofOblInput po = entry.getKey();
             ImmutableSet<Proof> sop = entry.getValue();
             if(sop.contains(proof) && po instanceof ContractPO) {
@@ -363,7 +430,8 @@ public class SpecificationRepository {
      * Unregisters the passed proof.
      */
     public void removeProof(Proof proof) {
-        for(Map.Entry<ProofOblInput,ImmutableSet<Proof>> entry : proofs.entrySet()) {
+        for(Map.Entry<ProofOblInput,ImmutableSet<Proof>> entry 
+        	: proofs.entrySet()) {
             ImmutableSet<Proof> sop = (ImmutableSet<Proof>) entry.getValue();
             if(sop.contains(proof)) {
                 sop = sop.remove(proof);

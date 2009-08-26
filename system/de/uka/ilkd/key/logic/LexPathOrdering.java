@@ -327,8 +327,8 @@ public class LexPathOrdering implements TermOrdering {
 
             if ( opStr.equals("heap")) return Integer.valueOf(0);
             if ( p_op instanceof Function && ((Function)p_op).isUnique()) return Integer.valueOf(5);
-            if ( opStr.endsWith ( "::<get>" ) ) return Integer.valueOf ( 10 );
-            if ( opStr.endsWith ( "<nextToCreate>" ) ) return Integer.valueOf ( 20 );
+            //if ( opStr.endsWith ( "::<get>" ) ) return Integer.valueOf ( 10 );
+            //if ( opStr.endsWith ( "<nextToCreate>" ) ) return Integer.valueOf ( 20 );
             
 
 /*            if ( p_op instanceof SortDependingSymbol ) return new Integer ( 10 );

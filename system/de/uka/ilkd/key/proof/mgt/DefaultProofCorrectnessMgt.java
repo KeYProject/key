@@ -21,7 +21,7 @@ import de.uka.ilkd.key.proof.init.*;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.speclang.OperationContract;
 
-public class DefaultProofCorrectnessMgt implements ProofCorrectnessMgt {
+public final class DefaultProofCorrectnessMgt implements ProofCorrectnessMgt {
 
     private final Proof proof;
     private final SpecificationRepository specRepos;
@@ -31,7 +31,8 @@ public class DefaultProofCorrectnessMgt implements ProofCorrectnessMgt {
 	= new DefaultMgtProofTreeListener();
     
     private KeYMediator mediator;
-    private ImmutableSet<RuleApp> cachedRuleApps = DefaultImmutableSet.<RuleApp>nil();
+    private ImmutableSet<RuleApp> cachedRuleApps 
+    	= DefaultImmutableSet.<RuleApp>nil();
     private ProofStatus proofStatus = null;
     
     
@@ -52,11 +53,9 @@ public class DefaultProofCorrectnessMgt implements ProofCorrectnessMgt {
     //-------------------------------------------------------------------------
     
     private boolean atLeastOneClosed(ImmutableSet<Proof> proofs) {
-        Iterator<Proof> it = proofs.iterator();
-        while(it.hasNext()) {
-            Proof proof = it.next();
-            proof.mgt().updateProofStatus();
-            if(proof.mgt().getStatus().getProofClosed()) {
+	for(Proof p : proofs) {
+            p.mgt().updateProofStatus();
+            if(p.mgt().getStatus().getProofClosed()) {
                 return true;
             }
         }
@@ -69,8 +68,11 @@ public class DefaultProofCorrectnessMgt implements ProofCorrectnessMgt {
     //public interface
     //-------------------------------------------------------------------------
     
+    @Override
     public RuleJustification getJustification(RuleApp r) {
-	return proof.env().getJustifInfo().getJustification(r, proof.getServices());
+	return proof.env()
+	            .getJustifInfo()
+	            .getJustification(r, proof.getServices());
     }
 
     
@@ -78,45 +80,37 @@ public class DefaultProofCorrectnessMgt implements ProofCorrectnessMgt {
      * Tells whether a contract for the passed operation may be applied 
      * in the passed goal without creating circular dependencies.
      */
+    @Override    
     public boolean contractApplicableFor(ProgramMethod pm, Goal g) {
         //get the method which is being verified in the passed goal
-        ProgramMethod pmUnderVerification 
+        final ProgramMethod pmUnderVerification 
             = specRepos.getOperationForProof(g.proof());
         if(pmUnderVerification == null) {
             return true;
         }
         
         //collect all proofs on which the specification of the 
-        //passed operation may depend
+        //passed method may depend
         ImmutableSet<Proof> proofs = specRepos.getProofs(pm);
         ImmutableSet<Proof> newProofs = proofs;
         while(newProofs.size() > 0) {
-            Iterator<Proof> it = newProofs.iterator();
+            final Iterator<Proof> it = newProofs.iterator();
             newProofs = DefaultImmutableSet.<Proof>nil();
             
             while(it.hasNext()) {
-                Proof proof = it.next();
-                Iterator<RuleApp> cachedRuleAppsIt 
-                    = proof.mgt().getNonAxiomApps().iterator();
-                while(cachedRuleAppsIt.hasNext()) {
-                    RuleApp ruleApp = cachedRuleAppsIt.next();
-                    RuleJustification ruleJusti = getJustification(ruleApp);
-                    if(ruleJusti instanceof RuleJustificationBySpec) {
-                        OperationContract c 
-                            = ((RuleJustificationBySpec) ruleJusti).getSpec();
-                        ImmutableSet<Proof> proofsForPm 
-                            = specRepos.getProofs(c.getProgramMethod());
-                        newProofs = newProofs.union(proofsForPm);
-                        proofs = proofs.union(proofsForPm);
-                    }   
+                final Proof p = it.next();
+                for(OperationContract contract : p.mgt().getUsedContracts()) {
+                    ImmutableSet<Proof> proofsForPm 
+                    	= specRepos.getProofs(contract.getProgramMethod());
+                    newProofs = newProofs.union(proofsForPm);
+                    proofs = proofs.union(proofsForPm);                    
                 }
             }
         }
         
         //is one of those proofs about the operation under verification? 
-        Iterator<Proof> it = proofs.iterator();
-        while(it.hasNext()) {
-            ProgramMethod pm2 = specRepos.getOperationForProof(it.next());
+        for(Proof p : proofs) {
+            final ProgramMethod pm2 = specRepos.getOperationForProof(p);
             if(pm2.equals(pmUnderVerification)) {
                 return false;
             }
@@ -125,7 +119,8 @@ public class DefaultProofCorrectnessMgt implements ProofCorrectnessMgt {
         return true;
     }
 
-    
+
+    @Override    
     public void updateProofStatus() {
         //proof open?
         if(proof.openGoals().size() > 0) {
@@ -133,29 +128,14 @@ public class DefaultProofCorrectnessMgt implements ProofCorrectnessMgt {
             return;
         }
 	
-        //used, but yet unproven specifications?
-        Iterator<RuleApp> cachedRuleAppsIt = cachedRuleApps.iterator();
-        while(cachedRuleAppsIt.hasNext()) {
-            RuleApp ruleApp = cachedRuleAppsIt.next();
-            RuleJustification ruleJusti = getJustification(ruleApp);
-            if(ruleJusti instanceof RuleJustificationBySpec) {
-        	OperationContract contract
-                    = ((RuleJustificationBySpec) ruleJusti).getSpec();
-                for(OperationContract atomicContract 
-                    : proof.getServices().getSpecificationRepository()
-                                         .splitContract(contract)) {
-                
-                    InitConfig initConfig = proof.env().getInitConfig();
-                    ProofOblInput contractPO 
-                        = new ContractPO(initConfig, atomicContract);
-                    ImmutableSet<Proof> proofs 
-                        = specRepos.getProofs(contractPO);
-                    
-                    if(!(atLeastOneClosed(proofs))) {
-                        proofStatus = ProofStatus.CLOSED_BUT_LEMMAS_LEFT;
-                        return;
-                    }
-                }
+        //used, but yet unproven specifications?        
+        for(OperationContract contract : getUsedContracts()) { 
+            InitConfig initConfig = proof.env().getInitConfig();
+            ProofOblInput contractPO = new ContractPO(initConfig, contract);
+            ImmutableSet<Proof> proofs = specRepos.getProofs(contractPO);
+            if(!(atLeastOneClosed(proofs))) {
+        	proofStatus = ProofStatus.CLOSED_BUT_LEMMAS_LEFT;
+        	return;
             }
         }
         
@@ -164,18 +144,21 @@ public class DefaultProofCorrectnessMgt implements ProofCorrectnessMgt {
     }
 
     
+    @Override    
     public void ruleApplied(RuleApp r) {
 	RuleJustification rj = getJustification(r);
-	if (rj==null) {
-	    System.err.println("No justification found for rule " + r.rule().name());
+	if(rj==null) {
+	    System.err.println("No justification found for rule " 
+		               + r.rule().name());
 	    return;
 	}
-	if (!rj.isAxiomJustification()) {
+	if(!rj.isAxiomJustification()) {
             cachedRuleApps = cachedRuleApps.add(r);
 	}
     }
 
     
+    @Override    
     public void ruleUnApplied(RuleApp r) {
         int oldSize = cachedRuleApps.size();
         cachedRuleApps = cachedRuleApps.remove(r);
@@ -185,44 +168,68 @@ public class DefaultProofCorrectnessMgt implements ProofCorrectnessMgt {
     }
 
     
+    @Override    
     public ImmutableSet<RuleApp> getNonAxiomApps() {
 	return cachedRuleApps;
     }
 
     
-    public void setMediator ( KeYMediator p_mediator ) {
-	if ( mediator != null )
-	    mediator.removeRuleAppListener ( proofListener );
+    @Override
+    public ImmutableSet<OperationContract> getUsedContracts() {
+	ImmutableSet<OperationContract> result 
+		= DefaultImmutableSet.<OperationContract>nil();
+	for(RuleApp ruleApp : cachedRuleApps) {
+            RuleJustification ruleJusti = getJustification(ruleApp);
+            if(ruleJusti instanceof RuleJustificationBySpec) {
+        	OperationContract contract
+                    = ((RuleJustificationBySpec) ruleJusti).getSpec();
+        	ImmutableSet<OperationContract> atomicContracts
+        		= specRepos.splitContract(contract);
+        	atomicContracts 
+        		= specRepos.getInheritedContracts(atomicContracts); 
+        	result = result.union(atomicContracts);
+            }
+        }
+	return result;
+    }
+
+    
+    @Override    
+    public void setMediator(KeYMediator p_mediator) {
+	if(mediator != null) {
+	    mediator.removeRuleAppListener(proofListener);
+	}
 
 	mediator = p_mediator;
 
-	if ( mediator != null )
-	    mediator.addRuleAppListener ( proofListener );
+	if(mediator != null) {
+	    mediator.addRuleAppListener(proofListener);
+	}
     }
     
+    
+    @Override    
     public void removeProofListener(){
         mediator.removeRuleAppListener(proofListener);
     }
 
     
-    public Proof getProof() {
-	return proof;
-    }
-
-    
+    @Override
     public boolean proofSimilarTo(Proof p) {
-	return p.name().equals(getProof().name()); //%%%
+	return p.name().equals(proof.name()); //%%%
     }
 
     
+    @Override
     public ProofStatus getStatus() {
-	if (proofStatus == null) updateProofStatus();
+	if(proofStatus == null) updateProofStatus();
 	return proofStatus;
     }
     
     
+    @Override
     public void finalize() {
-        if (mediator != null) {
+        if(mediator != null) {
             mediator.removeRuleAppListener(proofListener);
         }
     }
@@ -234,7 +241,7 @@ public class DefaultProofCorrectnessMgt implements ProofCorrectnessMgt {
     
     private class DefaultMgtProofListener implements RuleAppListener {
 	public void ruleApplied(ProofEvent e) {
-	    if (DefaultProofCorrectnessMgt.this.getProof()==e.getSource()) {
+	    if(DefaultProofCorrectnessMgt.this.proof == e.getSource()) {
                 //%% actually I only want to listen to events of one proof
 		DefaultProofCorrectnessMgt.this.ruleApplied
 		    (e.getRuleAppInfo().getRuleApp());

@@ -814,7 +814,6 @@ options {
         return result;
     }
 
-
     private LogicVariable bindVar(String id, Sort s) {
         if(isGlobalDeclTermParser())
   	  Debug.fail("bindVar was called in Global Declaration Term parser.");
@@ -856,11 +855,11 @@ options {
         } 
     }
     
-    private void unbindVars() {
+    private void unbindVars(Namespace orig) {
         if(isGlobalDeclTermParser()) {
             Debug.fail("unbindVars was called in Global Declaration Term parser.");
         }
-        namespaces().setVariables(variables().parent());
+        namespaces().setVariables(orig);
     }
 
 
@@ -2828,7 +2827,8 @@ sum_or_product_term returns [Term result=null]
 {
     Term cond, t;
     NumericalQuantifier op=null;
-    ImmutableList<QuantifiableVariable> index = null;   
+    ImmutableList<QuantifiableVariable> index = null;
+    Namespace orig = variables();   
 }
     :
         (
@@ -2841,7 +2841,7 @@ sum_or_product_term returns [Term result=null]
         cond=term 
         SEMI t=term 
         {
-            unbindVars();
+            unbindVars(orig);
             result = tf.createNumericalQuantifierTerm(op, cond, t, 
                 new ImmutableArray<QuantifiableVariable>(index.toArray()));
         }
@@ -2852,7 +2852,8 @@ bounded_sum_term returns [Term result=null]
 {
     Term a, b, t;
     BoundedNumericalQuantifier op=null;
-    ImmutableList<QuantifiableVariable> index = null;   
+    ImmutableList<QuantifiableVariable> index = null;
+    Namespace orig = variables();     
 }
     :
         BSUM {op = BoundedNumericalQuantifier.BSUM;}
@@ -2864,7 +2865,7 @@ bounded_sum_term returns [Term result=null]
         SEMI
         t=term 
         {
-            unbindVars();
+            unbindVars(orig);
             result = tf.createBoundedNumericalQuantifierTerm(op, a, b, t, 
                 new ImmutableArray<QuantifiableVariable>(index.toArray()));
         }
@@ -2918,6 +2919,7 @@ quantifierterm returns [Term a = null]
     Operator op = null;
     ImmutableList<QuantifiableVariable> vs = null;
     Term a1 = null;
+     Namespace orig = variables();  
 }
 :
         (   FORALL { op = Quantifier.ALL; }
@@ -2929,7 +2931,7 @@ quantifierterm returns [Term a = null]
 	       		      new ImmutableArray<QuantifiableVariable>(vs.toArray(new QuantifiableVariable[vs.size()])),
 	       		      null);
             if(!isGlobalDeclTermParser())
-              unbindVars();
+              unbindVars(orig);
         }
 ;
 
@@ -2946,13 +2948,14 @@ substitutionterm returns [Term result = null]
   SubstOp op = WarySubstOp.SUBST;
   Term a1 = null;
   Term a2 = null;
+   Namespace orig = variables();  
 }
 :
    LBRACE SUBST
      v = one_bound_variable SEMI
      { // Tricky part, v cannot be bound while parsing a1
        if(!isGlobalDeclTermParser())
-          unbindVars();
+          unbindVars(orig);
      }
      a1=logicTermReEntry
      { // The rest of the tricky part, bind it again
@@ -2966,7 +2969,7 @@ substitutionterm returns [Term result = null]
    ( a2 = term110 | a2 = unary_formula ) {
       result = TermBuilder.DF.subst ( op, v, a1, a2 );
       if(!isGlobalDeclTermParser())
-        unbindVars();
+        unbindVars(orig);
    }
 ; exception
         catch [TermCreationException ex] {
@@ -3125,6 +3128,7 @@ funcpredvarterm returns [Term a = null]
     String varfuncid;
     String neg = "";
     boolean opSV = false;
+    Namespace orig = variables();  
 }
     :
       ch:CHAR_LITERAL {
@@ -3199,7 +3203,7 @@ funcpredvarterm returns [Term a = null]
 	    }
 	    
 	    if(boundVars != null) {
-	        unbindVars();
+	        unbindVars(orig);
 	    }
         }
 ; exception
@@ -3321,8 +3325,6 @@ modifiers[TacletBuilder b]
             }       
         | DISPLAYNAME dname = string_literal 
             {b.setDisplayName(dname);}
-        | OLDNAME oname = string_literal 
-            {b.addOldName(oname);}
         | HELPTEXT htext = string_literal
             {b.setHelpText(htext);}
         ) *
@@ -3947,6 +3949,7 @@ contracts
 invariants
 {
   QuantifiableVariable selfVar;
+  Namespace orig = variables();  
 }
 :
    INVARIANTS LPAREN selfVar=one_logic_bound_variable RPAREN
@@ -3955,7 +3958,7 @@ invariants
        }
        ( one_invariant[(ParsableVariable)selfVar] )*
        RBRACE  {
-           unbindVars();
+           unbindVars(orig);
        }
 ;
 
@@ -3976,12 +3979,10 @@ one_contract
      }
      (prog_var_decls)? 
      fma = formula MODIFIES (modifiesClause = term)?
-     (DISPLAYNAME displayName = string_literal)?
      {
        DLSpecFactory dsf = new DLSpecFactory(getServices());
        try {
          contracts = contracts.add(dsf.createDLOperationContract(contractName,
-	       					                 displayName,
        					                         fma, 
            				                         modifiesClause));
        } catch(ProofInputException e) {

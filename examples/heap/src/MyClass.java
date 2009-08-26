@@ -1,6 +1,14 @@
 class MyClass {
     int attr;
-    int attr2;    
+    int attr2;
+    
+    /*@ normal_behavior
+      @   ensures result == i + 27;
+      @*/
+    int add27(int i) {
+	return i + 27;
+    }
+    
         
     /*@ normal_behavior
       @   requires attr2 != 358;
@@ -19,7 +27,7 @@ class MyClass {
           @ assignable attr;
           @*/
         for(int i = 0; i < 3; i++) {
-            attr = 27;
+            attr = add27(0);
         }
     }
     

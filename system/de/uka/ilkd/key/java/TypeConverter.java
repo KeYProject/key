@@ -156,7 +156,7 @@ public final class TypeConverter {
 	    Debug.out("typeconverter: no data type model "+
 		      "available to convert:", op, op.getClass());		
 	    throw new IllegalArgumentException("TypeConverter could not handle"
-					       +" this");
+					       +" this operator: " + op);
 	}
 	return TB.func(responsibleLDT.getFunctionFor(op, services, ec), subs);
     }

@@ -349,19 +349,9 @@ public final class ProofManagementDialog extends JDialog {
     
     private void showPOsFor(Proof p) {
 	ImmutableSet<OperationContract> usedContracts 
-		= p.getBasicTask().getUsedSpecs();
-	
-        //break contract apps down to atomic contracts
-        ImmutableSet<OperationContract> atomicContracts 
-            = DefaultImmutableSet.<OperationContract>nil();
-        for(OperationContract contract : usedContracts) {
-            for(OperationContract atomicContract 
-                : specRepos.splitContract(contract)) {
-                atomicContracts = atomicContracts.add(atomicContract);
-            }
-        }
-        
-        getActiveContractPanel().setContracts(atomicContracts, 
+		= p.mgt().getUsedContracts();
+	        
+        getActiveContractPanel().setContracts(usedContracts, 
         	                              "Contracts used in proof \"" 
         	                                 + p.name() + "\"");
         updateStartButton();

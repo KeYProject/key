@@ -42,6 +42,7 @@ public final class HeapLDT extends LDT {
     //location sets
     private final Function allLocs;
     private final Function allFields;
+    private final Function freshLocs;
     
     //fields
     private final Function arr;
@@ -79,7 +80,8 @@ public final class HeapLDT extends LDT {
         changeHeapAtLocs  = addFunction(services, "changeHeapAtLocs");
         changeHeapAtLocs2 = addFunction(services, "changeHeapAtLocs2");
         allLocs           = addFunction(services, "allLocs");
-        allFields         = addFunction(services, "allFields");        
+        allFields         = addFunction(services, "allFields");
+        freshLocs         = addFunction(services, "freshLocs");
         arr               = addFunction(services, "arr");
         length            = addFunction(services, "length");
         created           = addFunction(services, "java.lang.Object::<created>");
@@ -187,6 +189,11 @@ public final class HeapLDT extends LDT {
     
     public Function allFields() {
 	return allFields;
+    }
+    
+    
+    public Function freshLocs() {
+	return freshLocs;
     }
     
     

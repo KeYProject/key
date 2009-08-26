@@ -24,15 +24,19 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
  */
 public interface OperationContract {
     
+    public static final int INVALID_ID = -1;
+    
     /**
-     * Returns the unique internal name of the contract.
+     * Returns the name of the contract.
      */
     public String getName();
     
     /**
-     * Returns the displayed name of the contract.
+     * Returns the id number of the contract. If a contract has instances for
+     * several methods (inheritance!), all instances have the same id.
+     * The id is either non-negative or equal to INVALID_ID.
      */
-    public String getDisplayName();
+    public int id();
     
     /**
      * Returns the ProgramMethod representing the operation to which the 
@@ -74,12 +78,32 @@ public interface OperationContract {
      * Returns the union of this contract and those in the passed array. 
      * Probably you want to use SpecificationRepository.combineContracts()
      * instead, which additionally takes care that the combined contract can be 
-     * loaded later.
+     * loaded later. The resulting contract has id "INVALID_ID".
      */
     public OperationContract union(OperationContract[] others, 
                                    String name, 
-                                   String displayName, 
                                    Services services);
+    
+    /**
+     * Returns another contract like this one but with the passed id.
+     */
+    public OperationContract setID(int id);
+    
+    /**
+     * Returns another contract like this one, except that it refers to the 
+     * passed program method. 
+     */
+    public OperationContract setProgramMethod(ProgramMethod pm,
+	    			  	      Services services);
+    
+    /**
+     * Returns another contract like this one, except that the passed term
+     * has been added as a precondition.
+     */
+    public OperationContract addPre(Term addedPre,
+	    			    ProgramVariable selfVar, 
+                                    ImmutableList<ProgramVariable> paramVars,
+                                    Services services);    
         
     /**
      * Returns the contract in pretty HTML format.

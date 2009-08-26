@@ -222,10 +222,6 @@ public class InitConfig {
             while (it.hasNext())  {
                 Taclet t = it.next();
                 quickTacletMap.put(t.name(), t);
-                Iterator<Name> itOld = t.oldNames().iterator();
-                while (itOld.hasNext()) {
-                    quickTacletMap.put(itOld.next(), t);
-                }
             }
         }
 

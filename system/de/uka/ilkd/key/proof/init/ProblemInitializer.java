@@ -251,8 +251,7 @@ public final class ProblemInitializer {
             }
 
             String[] cus = getClasses(javaPath).toArray(new String[]{});
-            r2k.readCompilationUnitsAsFiles(cus);
-            initConfig.getServices().getJavaInfo().setJavaSourcePath(javaPath);               
+            r2k.readCompilationUnitsAsFiles(cus);               
 	} else {
             reportStatus("Reading Java libraries");	    
 	    r2k.parseSpecialClasses();

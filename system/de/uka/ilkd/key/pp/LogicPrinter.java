@@ -1250,8 +1250,11 @@ public final class LogicPrinter {
             } else {
                 layouter.print (v.name().toString());
             }
-            layouter.print(";");
+            if(j < size - 1) {
+        	layouter.print(", ");
+            }
         }
+        layouter.print(";");        
     }
 
       

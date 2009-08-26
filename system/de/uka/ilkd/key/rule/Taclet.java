@@ -77,8 +77,6 @@ public abstract class Taclet implements Rule, Named {
     /** name displayed by the pretty printer */
     private final String displayName;
     
-    /** list of old names for downward compatibility */
-    private final ImmutableList<Name> oldNames;
     /** contains useful text explaining the taclet */
     private final String helpText = null;
     
@@ -198,8 +196,7 @@ public abstract class Taclet implements Rule, Named {
 	this.prefixMap     = prefixMap;
         this.displayName   = attrs.displayName() == null ? 
                 name.toString() : attrs.displayName();
-        this.oldNames      = attrs.oldNames();
-
+        assert constraint.isBottom() : "metavariables are disabled";
     }
 
     protected void cacheMatchInfo() {
@@ -725,13 +722,6 @@ public abstract class Taclet implements Rule, Named {
      */
     public String displayName() {
 	return displayName;
-    }
-    
-    
-    /** returns the list of old names of the taclet
-     */
-    public ImmutableList<Name> oldNames() {
-	return oldNames;
     }
     
     

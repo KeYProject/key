@@ -573,7 +573,7 @@ specarrayrefexpr[SLExpression receiver] returns [Term result = null] throws SLTr
 	    // We have a star. A star includes all components of an array even
 	    // those out of bounds. This makes proving easier.	    
 	    result = TB.locComprehension(services,
-	    				 indexVar, 
+	    				 new QuantifiableVariable[]{indexVar}, 
 	                                 receiver.getTerm(), 
 	                                 arrIndex);
 	} else if (rangeTo != null) {
@@ -583,10 +583,9 @@ specarrayrefexpr[SLExpression receiver] returns [Term result = null] throws SLTr
 		         TB.leq(TB.var(indexVar), rangeTo.getTerm(), services));
             result = TB.guardedLocComprehension(
 	    			services, 
-	                        indexVar,
+	                        new QuantifiableVariable[]{indexVar},
 	                        guardFormula,
-	                        receiver.getTerm(),
-				arrIndex);
+	                        TB.pair(services, receiver.getTerm(), arrIndex));
 	} else {
 	    // We have a regular array access
 	    result = TB.pairSingleton(services, 

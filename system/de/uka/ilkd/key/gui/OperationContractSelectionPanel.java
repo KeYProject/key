@@ -111,7 +111,7 @@ class OperationContractSelectionPanel extends JPanel {
 		//set border
 		TitledBorder border = new TitledBorder(
 				BorderFactory.createEtchedBorder(),
-                                contract.getDisplayName());
+                                contract.getName());
 		border.setTitleFont(border.getTitleFont()
 					  .deriveFont(Font.BOLD));
 		result.setBorder(border);
@@ -183,7 +183,7 @@ class OperationContractSelectionPanel extends JPanel {
     
     public void setContracts(ProgramMethod pm, Modality modality) {
 	setContracts(collectContracts(pm, modality), 
-		     "Contracts for method \"" + pm.getName() + "\"");
+		     "Contracts for " + pm);
     }
     
     

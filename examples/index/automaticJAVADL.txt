@@ -8,6 +8,7 @@
 ./heap/loop2.key
 ./heap/modifies_datagroup.key
 ./heap/modifies.key
+./heap/object_creation.key
 ./heap/select_store.key
 ./heap/selection_sort.key
 ./heap/sets_and_pairs.key
