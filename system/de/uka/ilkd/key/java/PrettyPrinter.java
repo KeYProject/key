@@ -1039,12 +1039,14 @@ public class PrettyPrinter {
 	} else if (x.getProgramElementName() != null) {
 	    printHeader(x);
 	    if (x.getReferencePrefix() != null) {
-		writeElement(x.getReferencePrefix());
-		writeToken(".", x);
-	    }   
-            writeElement(x.getProgramElementName());
+		write(x.getReferencePrefix() + "." + x.getProgramElementName());//XXX
+//		writeElement(x.getReferencePrefix());
+//		writeToken(".", x);
+	    } else {
+		writeElement(x.getProgramElementName());
+	    }
+            printFooter(x);            
         }
-        printFooter(x);
     }
 
     public void printSchemaTypeReference(SchemaTypeReference x) throws java.io.IOException {

@@ -14,7 +14,9 @@ package de.uka.ilkd.key.rule.conditions;
 import java.util.Map;
 import java.util.WeakHashMap;
 
+import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.declaration.InterfaceDeclaration;
 import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
@@ -145,6 +147,8 @@ public final class TypeComparisonCondition extends VariableConditionAdapter {
 	
 	//if not, compute it 
 	if(result == null) {
+	    final JavaInfo javaInfo = services.getJavaInfo();
+	    
 	    //array sorts are disjoint if their element sorts are disjoint
 	    Sort fstElemSort = fstSort;
 	    Sort sndElemSort = sndSort;
@@ -162,16 +166,21 @@ public final class TypeComparisonCondition extends VariableConditionAdapter {
 	    if(fstElemIsObject 
 	       && sndElemIsObject
 	       && !(fstElemSort instanceof ArraySort)
-	       && !(sndElemSort instanceof ArraySort)) {
+	       && !(sndElemSort instanceof ArraySort)
+	       && (javaInfo.getKeYJavaType(fstSort).getJavaType() 
+		       	instanceof InterfaceDeclaration
+		   || javaInfo.getKeYJavaType(sndSort).getJavaType() 
+		   	instanceof InterfaceDeclaration)) {
 		//be conservative wrt. modularity: program extensions may add 
-		//new subtypes between non-array object sorts
+		//new subtypes between object sorts, if none of them is
+		//an array sort and at least one of them is an interface sort
 		result = false;
 	    } else {
 		//otherwise, we just check whether *currently* there are is 
 		//some common subsort
 		result = true;
 		for(Named n : services.getNamespaces().sorts().allElements()) {
-		    Sort s = (Sort) n;
+		    final Sort s = (Sort) n;
 		    if(!(s instanceof NullSort)
 		         && s.extendsTrans(fstSort)
 			 && s.extendsTrans(sndSort)) {

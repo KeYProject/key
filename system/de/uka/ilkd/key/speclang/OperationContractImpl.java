@@ -51,6 +51,7 @@ public final class OperationContractImpl implements OperationContract {
     //-------------------------------------------------------------------------
     
     private OperationContractImpl(String baseName,
+	                          String name,
                                   ProgramMethod pm,
             		          Modality modality,
             		          Term pre,
@@ -62,7 +63,6 @@ public final class OperationContractImpl implements OperationContract {
             		          ProgramVariable excVar,
                                   Term heapAtPre,
                                   int id) {
-        assert baseName != null && !baseName.equals("");
         assert pm != null;
         assert modality != null;
         assert pre != null;
@@ -75,7 +75,9 @@ public final class OperationContractImpl implements OperationContract {
         assert excVar != null;
         assert heapAtPre != null;
         this.baseName               = baseName;
-        this.name                   = baseName + " [id: " + id + " / " + pm + "]";
+        this.name                   = name != null 
+                                      ? name 
+                                      : baseName + " [id: " + id + " / " + pm + "]";
         this.pm          	    = pm;
         this.modality               = modality;
 	this.originalPre            = pre;
@@ -116,6 +118,7 @@ public final class OperationContractImpl implements OperationContract {
             		         ProgramVariable excVar,
                                  Term heapAtPre) {
         this(baseName,
+             null,
              pm,
              modality,
              pre,
@@ -324,7 +327,8 @@ public final class OperationContractImpl implements OperationContract {
             modifies = TB.union(services, modifies, otherModifies);
         }
 
-        return new OperationContractImpl(newName,
+        return new OperationContractImpl(null,
+        				 newName,
                                          pm,
                                          modality,
                                          pre,
@@ -342,6 +346,7 @@ public final class OperationContractImpl implements OperationContract {
     @Override
     public OperationContract setID(int newId) {
         return new OperationContractImpl(baseName,
+        	                         null,
                 			 pm,
                 			 modality,
                 			 originalPre,
@@ -360,6 +365,7 @@ public final class OperationContractImpl implements OperationContract {
     public OperationContract setProgramMethod(ProgramMethod pm, 
 	    				      Services services) {
         return new OperationContractImpl(baseName,
+        				 null,
                 			 pm,
                 			 modality,
                 			 originalPre,
@@ -397,6 +403,7 @@ public final class OperationContractImpl implements OperationContract {
 	
 	//create new contract
         return new OperationContractImpl(baseName,
+        	                         name,
 		 			 pm,
 		 			 modality,
 		 			 TB.and(originalPre, addedPre),

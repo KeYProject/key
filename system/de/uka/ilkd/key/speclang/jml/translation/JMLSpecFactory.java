@@ -132,31 +132,6 @@ public class JMLSpecFactory {
     }
     
     
-    private Term addImplicitAssignable(Term assignable) {
-//	return assignable;
-	return TB.union(services,
-		        assignable,
-		        TB.freshLocs(services, TB.heap(services)));
-//	LogicVariable objVar 
-//		= new LogicVariable(new Name("newObj"), 
-//				    services.getJavaInfo().objectSort());
-//	LogicVariable fieldVar
-//		= new LogicVariable(new Name("f"), 
-//			            services.getTypeConverter()
-//			                    .getHeapLDT().getFieldSort());
-//	final Term implicitAssignable
-//	    = TB.guardedLocComprehension(services, 
-//		                         new QuantifiableVariable[]{objVar,
-//		                                                    fieldVar}, 
-//		                         TB.not(TB.created(services,  
-//		                       	                   TB.var(objVar))), 
-//		                         TB.pair(services, 
-//		                        	 TB.var(objVar), 
-//		                        	 TB.var(fieldVar)));
-//	return TB.union(services, assignable, implicitAssignable); 
-    }
-    
-    
     /**
      * Creates operation contracts out of the passed JML specification.
      */
@@ -205,17 +180,24 @@ public class JMLSpecFactory {
         }
 
         //translate assignable
-        Term assignable = TB.empty(services);
-        for(PositionedString expr : originalAssignable) {
-            Term translated 
-                = translator.translateAssignableExpression(
-                    expr, 
-                    pm.getContainerType(),
-                    selfVar, 
-                    paramVars);
-            assignable = TB.union(services, assignable, translated);        
+        Term assignable;
+        if(originalAssignable.isEmpty()) {
+            assignable = TB.allLocs(services);
+        } else {
+            assignable = TB.empty(services);
+            for(PositionedString expr : originalAssignable) {
+        	Term translated 
+        		= translator.translateAssignableExpression(
+        				expr, 
+        				pm.getContainerType(),
+        				selfVar, 
+        				paramVars);
+        	assignable = TB.union(services, assignable, translated);
+            }
+            assignable = TB.union(services, 
+        	                  assignable, 
+        	                  TB.freshLocs(services, TB.heap(services)));
         }
-        assignable = addImplicitAssignable(assignable);
 
         //translate ensures
         Term ensures = TB.tt();
@@ -506,17 +488,24 @@ public class JMLSpecFactory {
         }
         
         //translate assignable
-        Term assignable = TB.empty(services);
-        for(PositionedString expr : originalAssignable) {
-            Term translated 
-                = translator.translateAssignableExpression(
-                    expr, 
-                    pm.getContainerType(),
-                    selfVar, 
-                    paramVars);
-            assignable = TB.union(services, assignable, translated);        
+        Term assignable;
+        if(originalAssignable.isEmpty()) {
+            assignable = TB.allLocs(services);
+        } else {
+            assignable = TB.empty(services);
+            for(PositionedString expr : originalAssignable) {
+        	Term translated 
+        	    = translator.translateAssignableExpression(
+        		    expr, 
+        		    pm.getContainerType(),
+        		    selfVar, 
+        		    paramVars);
+        	assignable = TB.union(services, assignable, translated);        
+            }
+            assignable = TB.union(services,
+        	                  assignable, 
+        	                  TB.freshLocs(services, TB.heap(services)));
         }
-        assignable = addImplicitAssignable(assignable);
         
         //translate variant
         Term variant;

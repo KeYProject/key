@@ -165,12 +165,12 @@ class OperationContractSelectionPanel extends JPanel {
     
     public void setContracts(ImmutableSet<OperationContract> contracts,
 	                     String title) {
-        //sort contracts alphabetically (for the user's convenience)
+        //sort contracts by id (for the user's convenience)
         OperationContract[] contractsArray 
         	= contracts.toArray(new OperationContract[contracts.size()]);
         Arrays.sort(contractsArray, new Comparator<OperationContract> () {
             public int compare(OperationContract c1, OperationContract c2) {
-                return c1.getName().compareTo(c2.getName());
+                return c1.id() - c2.id();
             }
         });
         

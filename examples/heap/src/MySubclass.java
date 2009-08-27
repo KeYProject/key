@@ -1,7 +1,7 @@
 class MySubclass extends MyClass {
     
     int add27(int i) {
-	return i + 27;
+	return attr = 27 + i;
     }
     
     //@ normal_behavior
@@ -13,12 +13,12 @@ class MySubclass extends MyClass {
     
     MyClass mc;
     /*@ requires mc != null;
-      @ assignable attr, mc;    
-      @ ensures attr == 27;
+      @ assignable mc.attr;    
+      @ ensures \result == 388;
       @*/
-    void useContract() {
-	attr = 0;
-	int i = MySubclass.test();//super.add27(attr);
-	attr = i;
+    int useContract() {
+	int i = 360;
+	i = mc.add27(++i);
+	return i;
     }
 }

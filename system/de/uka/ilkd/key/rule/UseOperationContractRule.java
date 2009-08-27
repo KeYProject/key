@@ -328,14 +328,22 @@ public final class UseOperationContractRule implements BuiltInRule {
         if(methodCall == null) {
             return false;
         }
- 
-        //there must be applicable contracts for the operation
 	final MethodFrame frame 
 		= IIT.getInnermostMethodFrame(term, services);
 	final ExecutionContext ec 
 		= frame == null 
                   ? null
-		  : (ExecutionContext) frame.getExecutionContext();
+		  : (ExecutionContext) frame.getExecutionContext();        
+        
+        //arguments of method call must be simple expressions
+        for(Expression arg : methodCall.second.getArguments()) {
+            if(!ProgramSVSort.SIMPLEEXPRESSION
+        	             .canStandFor(arg, ec, services)) {
+        	return false;
+            }
+        }
+ 
+        //there must be applicable contracts for the operation
 	final KeYJavaType staticType 
 		= methodCall.second.determineStaticPrefixType(services, ec);
 	final ProgramMethod pm = getProgramMethod(methodCall.second, 
@@ -419,7 +427,7 @@ public final class UseOperationContractRule implements BuiltInRule {
         if(resultVar != null) {
             goal.addProgramVariable(resultVar);
         }
-        assert (resultVar == null) == (methodCall.first == null);
+        assert !(methodCall.first != null && resultVar == null);
         
         final ProgramVariable excVar = TB.excVar(services, pm, true);
         assert excVar != null;
@@ -511,7 +519,7 @@ public final class UseOperationContractRule implements BuiltInRule {
                      TB.prog(modality,
                              JavaBlock.createJavaBlock(postSB),
                              term.sub(0)));
-        final Term resultUpdate = (resultVar == null
+        final Term resultUpdate = (methodCall.first == null
                                    ? TB.skip()
                                    : TB.elementary(services, 
                                 	   	   methodCall.first, 

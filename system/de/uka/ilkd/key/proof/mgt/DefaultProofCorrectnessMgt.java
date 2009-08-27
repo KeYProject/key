@@ -185,6 +185,7 @@ public final class DefaultProofCorrectnessMgt implements ProofCorrectnessMgt {
                     = ((RuleJustificationBySpec) ruleJusti).getSpec();
         	ImmutableSet<OperationContract> atomicContracts
         		= specRepos.splitContract(contract);
+        	assert atomicContracts != null;
         	atomicContracts 
         		= specRepos.getInheritedContracts(atomicContracts); 
         	result = result.union(atomicContracts);

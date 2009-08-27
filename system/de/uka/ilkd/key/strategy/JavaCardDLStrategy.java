@@ -294,7 +294,7 @@ public final class JavaCardDLStrategy extends AbstractFeatureStrategy {
             strategyProperties.getProperty ( StrategyProperties.METHOD_OPTIONS_KEY );
 	
         if (methProp.equals(StrategyProperties.METHOD_CONTRACT)) {
-            bindRuleSet(d, "method_expand", inftyConst());	
+            bindRuleSet(d, "method_expand", longConst(200));	
         } else if (methProp.equals(StrategyProperties.METHOD_EXPAND)) {
             bindRuleSet(d, "method_expand", longConst(100));	   
         } else if (methProp.equals(StrategyProperties.METHOD_NONE)) {

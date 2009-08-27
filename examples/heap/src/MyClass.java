@@ -3,10 +3,12 @@ class MyClass {
     int attr2;
     
     /*@ normal_behavior
-      @   ensures result == i + 27;
+      @   assignable attr;
+      @   ensures \result == i + 27 && attr == \result;
       @*/
     int add27(int i) {
-	return i + 27;
+	attr = i + 27;
+	return attr;
     }
     
         
@@ -17,6 +19,7 @@ class MyClass {
       @   diverges true;
       @ also exceptional_behavior
       @   requires attr2 == 358;
+      @   assignable \nothing;
       @   signals_only RuntimeException;
       @*/
     void loop1() {
@@ -27,7 +30,7 @@ class MyClass {
           @ assignable attr;
           @*/
         for(int i = 0; i < 3; i++) {
-            attr = add27(0);
+            add27(0);
         }
     }
     
