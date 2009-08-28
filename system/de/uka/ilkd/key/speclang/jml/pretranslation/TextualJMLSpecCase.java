@@ -16,7 +16,7 @@ import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.speclang.PositionedString;
 
 
-public class TextualJMLSpecCase extends TextualJMLConstruct {
+public final class TextualJMLSpecCase extends TextualJMLConstruct {
 
     private final Behavior behavior;
     private ImmutableList<PositionedString> requires     
@@ -40,8 +40,8 @@ public class TextualJMLSpecCase extends TextualJMLConstruct {
         this.behavior = behavior;
     }
     
-    public void addName(PositionedString name) {
-	this.name = name;
+    public void addName(PositionedString n) {
+	this.name = n;
     }
 
     public void addRequires(PositionedString ps) {
@@ -117,6 +117,7 @@ public class TextualJMLSpecCase extends TextualJMLConstruct {
     }
     
     
+    @Override
     public String toString() {
         StringBuffer sb = new StringBuffer();
         Iterator<PositionedString> it;
@@ -151,6 +152,7 @@ public class TextualJMLSpecCase extends TextualJMLConstruct {
     }
     
     
+    @Override
     public boolean equals(Object o) {
         if(!(o instanceof TextualJMLSpecCase)) {
             return false;
@@ -167,6 +169,7 @@ public class TextualJMLSpecCase extends TextualJMLConstruct {
     }
     
     
+    @Override
     public int hashCode() {
         return mods.hashCode()
                + behavior.hashCode()

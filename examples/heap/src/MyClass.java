@@ -2,6 +2,8 @@ class MyClass {
     int attr;
     int attr2;
     
+    //@ accessible <inv>: this.*;
+    
     /*@ normal_behavior
       @   assignable attr;
       @   ensures \result == i + 27 && attr == \result;

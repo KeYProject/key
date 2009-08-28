@@ -16,13 +16,21 @@ import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 
-public class SLAttributeResolver extends SLExpressionResolver {
+public final class SLAttributeResolver extends SLExpressionResolver {
 
     
     public SLAttributeResolver(JavaInfo javaInfo, SLResolverManager manager) {
         super(javaInfo, manager);
     }
     
+
+    @Override
+    protected boolean canHandleReceiver(SLExpression receiver) {
+        return receiver != null;
+    }    
+    
+    
+    @Override
     protected SLExpression doResolving(SLExpression receiver, 
 	    			       String name,
 	    			       SLParameters parameters) 
@@ -34,7 +42,13 @@ public class SLAttributeResolver extends SLExpressionResolver {
         
         final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT(); 
         
-        Term recTerm = receiver.getTerm();        
+        Term recTerm = receiver.getTerm(); 
+        
+        //<inv> is special case (because it's really a predicate, not a boolean attribute)
+        if(name.equals("<inv>") && receiver.isTerm()) {
+            return new SLExpression(TB.inv(services, receiver.getTerm()));
+        }
+        
         ProgramVariable attribute = null;
         try {
             //try as fully qualified name
@@ -100,14 +114,5 @@ public class SLAttributeResolver extends SLExpressionResolver {
         }   
     
         return null;
-
-    }
-
-    public boolean canHandleReceiver(SLExpression receiver) {
-        return receiver != null && (receiver.isTerm() || receiver.isType());
-    }
-
-    public boolean needVarDeclaration(String name) {
-        return false;
     }
 }

@@ -20,12 +20,13 @@ public final class SLParameters {
         this.parameters = parameters;
     }
     
+    
     public ImmutableList<SLExpression> getParameters() {
         return parameters;
     }
     
     
-    public boolean isImmutableListOfTerm() {
+    public boolean isListOfTerm() {
 	for(SLExpression expr : parameters) {
             if(!expr.isTerm()) {
                 return false;

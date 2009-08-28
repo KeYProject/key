@@ -5,7 +5,6 @@ package java.lang;
 
 public class Object 
 {
-
    public Object() { };
 // public final java.lang.Class getClass();
    public int hashCode();

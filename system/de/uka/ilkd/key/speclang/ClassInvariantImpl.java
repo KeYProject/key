@@ -19,10 +19,8 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ParsableVariable;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.OpReplacer;
 
@@ -124,44 +122,12 @@ public final class ClassInvariantImpl implements ClassInvariant {
     public KeYJavaType getKJT() {
 	return kjt;
     }    
+        
     
-
-    public Term getClosedInv(Services services) {
-        Sort sort = getKJT().getSort();
-        String baseName = sort.name().toString().substring(0, 1).toLowerCase();
-        String fullName = getNewName(baseName, services);
-        LogicVariable selfVar = new LogicVariable(new Name(fullName), sort);
-        return TB.allClose(getOpenInv(selfVar, services));
-    }
-    
-    
-    public Term getClosedInvExcludingOne(ParsableVariable excludedVar, 
-	                                 Services services) {
-        Sort sort = getKJT().getSort();
-        String baseName = sort.name().toString().substring(0, 1).toLowerCase();
-        String fullName = getNewName(baseName, services);
-        LogicVariable quantifVar = new LogicVariable(new Name(fullName), sort);
-        Term openInv = getOpenInv(quantifVar, services);
-        Term notSelf = TB.not(TB.equals(TB.var(quantifVar), 
-        	                        TB.var(excludedVar)));        
-        return TB.allClose(TB.imp(notSelf, openInv));
-    }
-    
-    
-    public Term getOpenInv(ParsableVariable selfVar, Services services) {
+    public Term getInv(ParsableVariable selfVar, Services services) {
         final Map<Operator, Operator> replaceMap = getReplaceMap(selfVar, services);
         final OpReplacer or = new OpReplacer(replaceMap);
         return or.replace(originalInv);   
-    }
-
-    
-    public String getHTMLText(Services services) {
-        final String inv = LogicPrinter.quickPrintTerm(originalInv, 
-                services);
-        
-        return "<html>"
-               + LogicPrinter.escapeHTML(inv) 
-               + "</html>";
     }
     
     

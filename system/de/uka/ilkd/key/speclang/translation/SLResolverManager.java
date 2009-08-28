@@ -33,7 +33,8 @@ public abstract class SLResolverManager {
     public final SLTranslationExceptionManager excManager;
     private static final TermBuilder TB = TermBuilder.DF;
 
-    private ImmutableList<SLExpressionResolver> resolvers = ImmutableSLList.<SLExpressionResolver>nil();
+    private ImmutableList<SLExpressionResolver> resolvers 
+    	= ImmutableSLList.<SLExpressionResolver>nil();
     private final KeYJavaType specInClass;
     private final ParsableVariable selfVar;
     private final boolean useLocalVarsAsImplicitReceivers;

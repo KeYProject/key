@@ -842,6 +842,26 @@ public final class LogicPrinter {
                           .getHeapLDT()
                           .getPrettyFieldName((Function)t.op());            
             layouter.print(prettyFieldName);
+        } else if(NotationInfo.PRETTY_SYNTAX
+        	  && services != null
+        	  && t.op() instanceof Function 
+        	  && t.arity() == 2
+        	  && t.sub(0).op() == services.getTypeConverter().getHeapLDT().getHeap()
+        	  && t.boundVars().isEmpty()) {
+            startTerm(2);
+            markStartSub();
+            //heap not printed
+            markEndSub();
+            
+            markStartSub();
+            printTerm(t.sub(1));
+            markEndSub();
+            
+            final String prettyFieldName 
+            	= services.getTypeConverter()
+                          .getHeapLDT()
+                          .getPrettyFieldName((Function)t.op());
+            layouter.print("." + prettyFieldName);                    
         }
         
         else {

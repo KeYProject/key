@@ -5,13 +5,6 @@
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
-//This file is part of KeY - Integrated Deductive Software Design
-//Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
-//                      Universitaet Koblenz-Landau, Germany
-//                      Chalmers University of Technology, Sweden
-//
-//The KeY system is protected by the GNU General Public License. 
-//See LICENSE.TXT for details.
 //
 //
 
@@ -30,6 +23,11 @@ public abstract class SLExpressionResolver {
     protected final Services services;
     protected final SLResolverManager manager;
     
+
+    //-------------------------------------------------------------------------
+    //constructors
+    //-------------------------------------------------------------------------
+    
     public SLExpressionResolver(JavaInfo javaInfo, SLResolverManager manager) {
         assert javaInfo != null;
         assert manager  != null;
@@ -38,7 +36,27 @@ public abstract class SLExpressionResolver {
         this.services = javaInfo.getServices();
         this.manager = manager;
     }
+    
+    
 
+    //-------------------------------------------------------------------------
+    //internal methods
+    //-------------------------------------------------------------------------
+    
+    protected abstract boolean canHandleReceiver(SLExpression receiver);    
+
+    protected abstract SLExpression doResolving(SLExpression receiver,
+                                		String name, 
+                                		SLParameters parameters) 
+    	throws SLTranslationException;
+    
+    
+
+
+    //-------------------------------------------------------------------------
+    //public interface
+    //-------------------------------------------------------------------------
+    
     /**
      * Resolves property calls on explicit receivers.
      * @param receiver receiver (may *not* be null)
@@ -46,12 +64,7 @@ public abstract class SLExpressionResolver {
      * @param parameters the actual parameters, or null if not applicable
      * @return a suitable term or collection if successful, null otherwise
      * @throws SLTranslationException 
-     */
-    protected abstract SLExpression doResolving(SLExpression receiver,
-                                String name, 
-                                SLParameters parameters) throws SLTranslationException;
-    
-    
+     */    
     public SLExpression resolve(SLExpression receiver,
                                 String name,
                                 SLParameters parameters) throws SLTranslationException {
@@ -59,10 +72,5 @@ public abstract class SLExpressionResolver {
             return null;
         }
         return doResolving(receiver, name, parameters);
-        
     }
-    
-    
-    protected abstract boolean canHandleReceiver(SLExpression receiver);    
-    public abstract boolean needVarDeclaration(String name);
 }

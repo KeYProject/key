@@ -24,7 +24,7 @@ header {
     import de.uka.ilkd.key.java.expression.literal.BooleanLiteral;
     import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
     import de.uka.ilkd.key.ldt.IntegerLDT;
-    import de.uka.ilkd.key.ldt.LDT;
+    import de.uka.ilkd.key.ldt.HeapLDT;
     import de.uka.ilkd.key.logic.*;
     import de.uka.ilkd.key.logic.op.*;
     import de.uka.ilkd.key.logic.sort.*;
@@ -52,6 +52,7 @@ options {
 
     private Services services;
     private JavaInfo javaInfo;
+    private HeapLDT heapLDT;
     private SLTranslationExceptionManager excManager;
 
     private static Sort boolSort;
@@ -85,6 +86,7 @@ options {
 	// save parameters
 	this.services       = services;
 	this.javaInfo       = services.getJavaInfo();
+	this.heapLDT        = services.getTypeConverter().getHeapLDT();
 	this.excManager     = new SLTranslationExceptionManager(this,
 				    				fileName, 
 				    				offsetPos);
@@ -231,6 +233,36 @@ options {
 
 	return result;
     }
+    
+    
+    public Term parseRepresents() throws SLTranslationException {
+    	Term result = null;
+
+	this.currentlyParsing = true;
+	try {
+	    result = representsclause();
+	} catch (antlr.ANTLRException e) {
+	    throw excManager.convertException(e);
+	}
+	this.currentlyParsing = false;
+
+	return result;
+    }    
+    
+    
+    public Pair<Operator,Term> parseAccessible() throws SLTranslationException {
+    	Pair<Operator,Term> result = null;
+
+	this.currentlyParsing = true;
+	try {
+	    result = accessibleclause();
+	} catch (antlr.ANTLRException e) {
+	    throw excManager.convertException(e);
+	}
+	this.currentlyParsing = false;
+
+	return result;
+    }    
 
 
     public ImmutableList<ProgramVariable> parseVariableDeclaration() throws SLTranslationException {
@@ -487,9 +519,7 @@ storerefexpression returns [Term result = null] throws SLTranslationException
     {
 	if(result == null) {
 	    if(!expr.isTerm()
-	       || services.getTypeConverter()
-	                  .getHeapLDT()
-	                  .getSortOfSelect(expr.getTerm().op()) == null) {
+	       || heapLDT.getSortOfSelect(expr.getTerm().op()) == null) {
 	        raiseError("Not a valid store-ref expression: " + expr.getTerm());
 	    } else {
 	        Term objTerm = expr.getTerm().sub(1);
@@ -533,7 +563,7 @@ storerefnamesuffix[SLExpression receiver] returns [Term result = null] throws SL
 	if (!expr.isTerm()) {
 	    raiseError("Error in store-ref-suffix");
 	}
-	if(services.getTypeConverter().getHeapLDT().getSortOfSelect(expr.getTerm().op()) == null) {
+	if(heapLDT.getSortOfSelect(expr.getTerm().op()) == null) {
 	    raiseError("Something is wrong.");
 	} else {
 	    Term objTerm = expr.getTerm().sub(1);
@@ -656,6 +686,51 @@ signalsclause returns [Term result=null] throws SLTranslationException
 	    }
 	}
     ;
+    
+representsclause returns [Term result=null] throws SLTranslationException
+{
+    SLExpression lhs, rhs;
+}
+:
+    lhs=expression 
+    {
+        if(!lhs.isTerm() || lhs.getTerm().sub(0).op() != heapLDT.getHeap()) {
+            raiseError("Represents clause with unexpected lhs: " + lhs);
+        }
+    } 
+    (
+        (
+            (LARROW | "=") rhs=expression
+            {
+                if(!rhs.isTerm()) {
+                    raiseError("Represents clause with unexpected rhs: " + rhs);
+                }
+                result = TB.equals(lhs.getTerm(), rhs.getTerm());
+            }
+        ) 
+        |
+        (
+            SUCH_THAT result=predicate
+        ) 
+    )
+    ;
+    
+    
+accessibleclause returns [Pair<Operator,Term> result=null] throws SLTranslationException
+{
+    SLExpression lhs;
+    Term rhs;
+}
+:
+    lhs=expression COLON rhs=storereflist 
+    {
+        if(!lhs.isTerm() || lhs.getTerm().sub(0).op() != heapLDT.getHeap()) {
+            raiseError("Accessible clause with unexpected lhs: " + lhs);
+        }
+        result = new Pair<Operator,Term>(lhs.getTerm().op(), rhs);
+    } 
+    ;
+    
 
 predornot returns [Term result=null] throws SLTranslationException
 :

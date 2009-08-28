@@ -1094,11 +1094,20 @@ public class Recoder2KeYConverter {
                         makeAdmissibleName(recContainingClassType.getFullName()));
 
                 final Literal compileTimeConstant = getCompileTimeConstantInitializer(recoderVarSpec);
+                
+                boolean isModel = false;
+                for(recoder.java.declaration.Modifier mod : recoderVarSpec.getParent().getModifiers()) {
+                    if(mod instanceof de.uka.ilkd.key.java.recoderext.Model) {
+                	isModel = true;
+                	break;
+                    }
+                }
 
                 if (compileTimeConstant == null) {
                     pv = new LocationVariable(pen, getKeYJavaType(recoderType),
                             getKeYJavaType(recContainingClassType),
-                            recoderVarSpec.isStatic());
+                            recoderVarSpec.isStatic(),
+                            isModel);
                 } else {
                     pv = new ProgramConstant(pen, getKeYJavaType(recoderType),
                             getKeYJavaType(recContainingClassType),
@@ -1254,10 +1263,18 @@ public class Recoder2KeYConverter {
             .getByteCodeInfo().getType(recField);
             recoder.java.declaration.FieldSpecification fs = new recoder.java.declaration.FieldSpecification(
                     fr.getIdentifier());
+            boolean isModel = false;
+            for(recoder.java.declaration.Modifier mod : recoderVarSpec.getParent().getModifiers()) {
+        	if(mod instanceof de.uka.ilkd.key.java.recoderext.Model) {
+        	    isModel = true;
+        	    break;
+        	}
+            }            
+            
             pv = new LocationVariable(new ProgramElementName(makeAdmissibleName(fs.getName()),
                     makeAdmissibleName(recField.getContainingClassType().getFullName())),
                     getKeYJavaType(recoderType), getKeYJavaType(recField
-                            .getContainingClassType()), recField.isStatic());
+                            .getContainingClassType()), recField.isStatic(), isModel);
             insertToMap(fs, new FieldSpecification(pv));
             return new FieldReference(pv, prefix);
         }

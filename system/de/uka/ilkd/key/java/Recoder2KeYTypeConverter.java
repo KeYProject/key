@@ -415,7 +415,10 @@ public class Recoder2KeYTypeConverter {
 
         FieldSpecification specLength = new FieldSpecification(
                 new LocationVariable(new ProgramElementName("length"),
-                        integerType, superArrayType, false));
+                        	     integerType, 
+                        	     superArrayType, 
+                        	     false,
+                        	     false));
         FieldDeclaration f = new FieldDeclaration(new Modifier[] {
                 new Public(), new Final() }, new TypeRef(integerType),
                 new FieldSpecification[] { specLength }, false);
@@ -494,11 +497,13 @@ public class Recoder2KeYTypeConverter {
             TypeReference typeRef, boolean isStatic, KeYJavaType prefix) {
 
         ImplicitFieldSpecification varSpec = new ImplicitFieldSpecification(
-                new LocationVariable(
-                        new ProgramElementName(Recoder2KeYConverter.makeAdmissibleName(name),
-                                Recoder2KeYConverter.makeAdmissibleName(prefix.getSort().name().toString())),
-                                typeRef.getKeYJavaType(), prefix, isStatic), typeRef
-                                .getKeYJavaType());
+                new LocationVariable(new ProgramElementName(Recoder2KeYConverter.makeAdmissibleName(name),
+                                     Recoder2KeYConverter.makeAdmissibleName(prefix.getSort().name().toString())),
+                                     typeRef.getKeYJavaType(), 
+                                     prefix, 
+                                     isStatic,
+                                     false), 
+                typeRef.getKeYJavaType());
         // no recoder dependance
         // insertToMap(recoderVarSpec, varSpec);
         Modifier[] modifiers = new Modifier[isStatic ? 2 : 1];

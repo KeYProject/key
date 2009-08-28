@@ -6,9 +6,7 @@
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
 //
-//
-//
-//
+
 
 // This file is partially taken from the RECODER library, which is protected by 
 // the LGPL, and modified.
@@ -38,13 +36,6 @@ import de.uka.ilkd.key.parser.proofjava.ProofJavaParser;
 
 public class ProofJavaProgramFactory extends JavaProgramFactory {
     
-    /*
-     * by default allow java5 expressions such as the enum keyword
-     */
-    /*private static boolean ALLOW_JAVA5 =
-            System.getProperty("key.allowJava5", "true").equalsIgnoreCase(
-                    "true");*/
-
     /**
      Protected constructor - use {@link #getInstance} instead.
      */

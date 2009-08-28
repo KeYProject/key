@@ -45,13 +45,13 @@ public abstract class ProgramVariable extends AbstractSortedOperator
     private final KeYJavaType containingType;
 
     protected ProgramVariable(ProgramElementName name, 
-			    Sort               s,
-			    KeYJavaType        t, 
-			    KeYJavaType        containingType,
-			    boolean            isStatic,
-			    boolean            isModel,
-			    boolean            isGhost,
-			    boolean            isFinal) {
+			      Sort               s,
+			      KeYJavaType        t, 
+			      KeYJavaType        containingType,
+			      boolean            isStatic,
+			      boolean            isModel,
+			      boolean            isGhost,
+			      boolean            isFinal) {
 	super(name, s == null ?  t.getSort() : s, false);
 	this.type = t;
 	this.containingType = containingType;	

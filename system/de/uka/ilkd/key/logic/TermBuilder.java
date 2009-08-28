@@ -84,7 +84,22 @@ public final class TermBuilder {
     
     /**
      * Creates a program variable for "self". Take care to register it
-     * in the namespaces.
+     * in the namespaces!
+     */
+    public LocationVariable selfVar(Services services, 
+                                    KeYJavaType kjt,
+                                    boolean makeNameUnique) {
+	String name = "self";
+	if(makeNameUnique) {
+	    name = newName(services, name);
+	}
+	return new LocationVariable(new ProgramElementName(name), kjt);
+    }    
+    
+    
+    /**
+     * Creates a program variable for "self". Take care to register it
+     * in the namespaces!
      */
     public LocationVariable selfVar(Services services, 
                                     ProgramMethod pm,
@@ -92,19 +107,15 @@ public final class TermBuilder {
         if(pm.isStatic()) {
             return null;
         } else {
-            String name = "self";
-            if(makeNameUnique) {
-        	name = newName(services, name);
-            }
-            return new LocationVariable(new ProgramElementName(name), 
-                                        pm.getContainerType());
+            return selfVar(services, pm.getContainerType(), makeNameUnique);
         }
     }
+
     
     
     /**
      * Creates program variables for the parameters. Take care to register them
-     * in the namespaces.
+     * in the namespaces!
      */
     public ImmutableList<ProgramVariable> paramVars(Services services, 
                                                     ProgramMethod pm,
@@ -858,12 +869,20 @@ public final class TermBuilder {
     
     
     public Term wellFormedHeap(Services services) {
-        return func(services.getTypeConverter().getHeapLDT().getWellFormed(), heap(services));
+        return func(services.getTypeConverter().getHeapLDT().getWellFormed(), 
+        	    heap(services));
     }
     
 
     public Term inReachableState(Services services) {
         return wellFormedHeap(services);
+    }
+    
+    
+    public Term inv(Services services, Term o) {
+	return func(services.getTypeConverter().getHeapLDT().getInv(),
+		    heap(services),
+		    o);
     }
 
     
@@ -881,7 +900,11 @@ public final class TermBuilder {
 
     
     public Term dot(Services services, Sort asSort, Term o, Function f) {
-        return dot(services, asSort, o, func(f));
+	final Sort fieldSort 
+		= services.getTypeConverter().getHeapLDT().getFieldSort();
+        return f.sort() == fieldSort
+               ? dot(services, asSort, o, func(f))
+               : func(f, heap(services), o);
     }
     
 
@@ -891,7 +914,11 @@ public final class TermBuilder {
     
     
     public Term staticDot(Services services, Sort asSort, Function f) {
-	return staticDot(services, asSort, func(f));
+	final Sort fieldSort 
+		= services.getTypeConverter().getHeapLDT().getFieldSort();
+	return f.sort() == fieldSort
+	       ? staticDot(services, asSort, func(f))
+	       : func(f, heap(services));
     }
     
 
@@ -1119,5 +1146,17 @@ public final class TermBuilder {
 		        	           heap(services), 
 		        	           mod, 
 		        	           anonHeap));
+    }
+    
+    
+    public Term forallHeaps(Services services, Term t) {
+	final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+	final LogicVariable heapLV 
+		= new LogicVariable(new Name("h"), heapLDT.targetSort());
+	final Map map = new HashMap();
+	map.put(heapLDT.getHeap(), heapLV);
+	final OpReplacer or = new OpReplacer(map);
+	t = or.replace(t);
+	return all(heapLV, t);
     }
 }

@@ -17,32 +17,30 @@ import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.statement.LoopStatement;
-import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.ProgramMethod;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ContractPO;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
-import de.uka.ilkd.key.speclang.ClassInvariant;
-import de.uka.ilkd.key.speclang.LoopInvariant;
-import de.uka.ilkd.key.speclang.OperationContract;
+import de.uka.ilkd.key.speclang.*;
 
 
 public final class SpecificationRepository {
     
     private static final String CONTRACT_COMBINATION_MARKER = "#";
+    private static final TermBuilder TB = TermBuilder.DF;
     
     private final Map<ProgramMethod, ImmutableSet<OperationContract>> contracts 
     		= new LinkedHashMap<ProgramMethod,ImmutableSet<OperationContract>>();
-    private final Map<String, OperationContract> contractsByName
+    private final Map<String,OperationContract> contractsByName
                 = new LinkedHashMap<String,OperationContract>();
+    private final Map<Operator,DependencyContract> depContracts
+    		= new LinkedHashMap<Operator,DependencyContract>();
     private final Map<KeYJavaType,ImmutableSet<ClassInvariant>> invs
     		= new LinkedHashMap<KeYJavaType, ImmutableSet<ClassInvariant>>();
-    private final Map<String,ClassInvariant> invsByName
-                = new LinkedHashMap<String, ClassInvariant>();
-    private final Map<KeYJavaType, ImmutableSet<ClassInvariant>> throughoutInvs
-    		= new LinkedHashMap<KeYJavaType, ImmutableSet<ClassInvariant>>();
-    private final Map<String,ClassInvariant> throughoutInvsByName
-                = new LinkedHashMap<String,ClassInvariant>();
+    private final Map<KeYJavaType,ImmutableSet<ClassAxiom>> axioms
+    		= new LinkedHashMap<KeYJavaType, ImmutableSet<ClassAxiom>>();
     private final Map<ProofOblInput,ImmutableSet<Proof>> proofs
                 = new LinkedHashMap<ProofOblInput,ImmutableSet<Proof>>();
     private final Map<LoopStatement,LoopInvariant> loopInvs
@@ -61,6 +59,20 @@ public final class SpecificationRepository {
 	this.services = services;
     }
     
+
+    //-------------------------------------------------------------------------
+    //internal methods
+    //------------------------------------------------------------------------- 
+    
+    /**
+     * Returns all known class invariants for the passed type.
+     */
+    private ImmutableSet<ClassInvariant> getClassInvariants(KeYJavaType kjt) {
+	ImmutableSet<ClassInvariant> result = invs.get(kjt);
+	return result == null 
+	       ? DefaultImmutableSet.<ClassInvariant>nil() 
+               : result;
+    }    
     
     
     //-------------------------------------------------------------------------
@@ -262,95 +274,86 @@ public final class SpecificationRepository {
         return result;
     }
     
+    
+    public DependencyContract getDependencyContract(Operator obs) {
+	return depContracts.get(obs);
+    }
+    
+    
+    public void addDependencyContract(DependencyContract depContract) {
+	depContracts.put(depContract.getObserver(), depContract);
+    }
+    
         
-    /**
-     * Returns all known class invariants for the passed type.
-     */
-    public ImmutableSet<ClassInvariant> getClassInvariants(KeYJavaType kjt) {
-	ImmutableSet<ClassInvariant> result = invs.get(kjt);
-	return result == null 
-	       ? DefaultImmutableSet.<ClassInvariant>nil() 
-               : result;
-    }
-    
-
-    /**
-     * Returns the known class invariant corresponding to the passed name, 
-     * or null.
-     */
-    public ClassInvariant getClassInvariantByName(String name) {
-        return invsByName.get(name);
-    }
-    
-
     /**
      * Registers the passed class invariant, whose name must be different from 
      * all previously registered class invariants.
      */
     public void addClassInvariant(ClassInvariant inv) {
         KeYJavaType kjt = inv.getKJT();
-        String name = inv.getName();
-        assert invsByName.get(name) == null
-               : "Tried to add an invariant with a non-unique name!";
         invs.put(kjt, getClassInvariants(kjt).add(inv));
-        invsByName.put(name, inv);
     }
     
     
     /**
      * Registers the passed class invariants.
      */
-    public void addClassInvariants(ImmutableSet<ClassInvariant> invs) {
-        for(ClassInvariant inv : invs) {
+    public void addClassInvariants(ImmutableSet<ClassInvariant> toAdd) {
+        for(ClassInvariant inv : toAdd) {
             addClassInvariant(inv);
         }
     }
     
-    
     /**
-     * Returns all known throughout invariants for the passed type.
+     * Returns all class axioms registered for the passed class, including
+     * the one defined by the class invariants registered for the class.
      */
-    public ImmutableSet<ClassInvariant> getThroughoutClassInvariants(
-	    						KeYJavaType kjt) {
-	ImmutableSet<ClassInvariant> result = throughoutInvs.get(kjt);
-        return result == null 
-               ? DefaultImmutableSet.<ClassInvariant>nil() 
-               : result;
+    public ImmutableSet<ClassAxiom> getClassAxioms(KeYJavaType kjt) {
+	//get registered axioms
+	ImmutableSet<ClassAxiom> result = axioms.get(kjt);
+	if(result == null) {
+	    result = DefaultImmutableSet.<ClassAxiom>nil();
+	}
+	
+	//add invariant axiom
+	ImmutableSet<ClassInvariant> myInvs = getClassInvariants(kjt);
+	ProgramVariable selfVar = TB.selfVar(services, kjt, false);
+	Term invDef = TB.tt();
+	for(ClassInvariant inv : myInvs) {
+	    invDef = TB.and(invDef, inv.getInv(selfVar, services));
+	}
+	invDef = TB.equals(TB.inv(services, TB.var(selfVar)), invDef);
+	ClassAxiom invAxiom = new ClassAxiomImpl("Class invariant axiom",
+		                                 kjt,
+		                                 invDef,
+		                                 selfVar);
+	result = result.add(invAxiom);
+	
+	return result;
     }
     
     
     /**
-     * Returns the known throughout invariant corresponding to the passed name, 
-     * or null.
+     * Registers the passed class axiom.
      */
-    public ClassInvariant getThroughoutClassInvariantByName(String name) {
-        return throughoutInvsByName.get(name);
-    }
-    
-
-    /**
-     * Registers the passed throughout invariant, whose name must be different 
-     * from all previously registered throughout invariants.
-     */
-    public void addThroughoutClassInvariant(ClassInvariant inv) {
-        KeYJavaType kjt = inv.getKJT();
-        String name = inv.getName();
-        assert throughoutInvsByName.get(name) == null
-               : "Tried to add an invariant with a non-unique name!";
-        throughoutInvs.put(kjt, getThroughoutClassInvariants(kjt).add(inv));
-        throughoutInvsByName.put(name, inv);
-    }
-    
-    
-    /**
-     * Registers the passed throughout invariants.
-     */
-    public void addThroughoutClassInvariants(
-	    				ImmutableSet<ClassInvariant> invs) {
-        for(ClassInvariant inv : invs) {
-            addThroughoutClassInvariant(inv);
+    public void addClassAxiom(ClassAxiom ax) {
+        KeYJavaType kjt = ax.getKJT();
+        ImmutableSet<ClassAxiom> currentAxioms = axioms.get(kjt);
+        if(currentAxioms == null) {
+            currentAxioms = DefaultImmutableSet.<ClassAxiom>nil();
         }
+        axioms.put(kjt, currentAxioms.add(ax));
     }
+    
+    
+    /**
+     * Registers the passed class axioms.
+     */
+    public void addClassAxioms(ImmutableSet<ClassAxiom> toAdd) {
+        for(ClassAxiom ax : toAdd) {
+            addClassAxiom(ax);
+        }
+    }    
     
     
     /**
@@ -461,5 +464,24 @@ public final class SpecificationRepository {
     public void setLoopInvariant(LoopInvariant inv) {
         LoopStatement loop = inv.getLoop();
         loopInvs.put(loop, inv);
+    }
+    
+    
+    public void addSpecs(ImmutableSet<SpecificationElement> specs) {
+	for(SpecificationElement spec : specs) {
+	    if(spec instanceof OperationContract) {
+		addOperationContract((OperationContract)spec);
+	    } else if(spec instanceof DependencyContract) {
+		addDependencyContract((DependencyContract)spec);
+	    } else if(spec instanceof ClassInvariant) {
+		addClassInvariant((ClassInvariant)spec);
+	    } else if(spec instanceof ClassAxiom) {
+		addClassAxiom((ClassAxiom)spec);
+	    } else if(spec instanceof LoopInvariant) {
+		setLoopInvariant((LoopInvariant)spec);
+	    } else {
+		assert false : "unexpected spec: " + spec;
+	    }
+	}
     }
 }

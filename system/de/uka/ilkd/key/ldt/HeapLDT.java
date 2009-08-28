@@ -59,6 +59,7 @@ public final class HeapLDT extends LDT {
     
     //predicates
     private final Function wellFormed;
+    private final Function inv;    
     
     //heap pv
     private final LocationVariable heap;
@@ -93,6 +94,7 @@ public final class HeapLDT extends LDT {
         classErroneous    = addSortDependingFunction(services, "<classErroneous>");
         nullFunc          = addFunction(services, "null");
         wellFormed        = addFunction(services, "wellFormed");
+        inv               = addFunction(services, "java.lang.Object::<inv>");
         heap	          = (LocationVariable) progVars.lookup(new Name("heap"));        
     }
     
@@ -121,7 +123,6 @@ public final class HeapLDT extends LDT {
     //-------------------------------------------------------------------------
     
     public String getPrettyFieldName(Function fieldSymbol) {
-	assert fieldSymbol.sort() == fieldSort;
 	String name = fieldSymbol.name().toString();
 	int index = name.indexOf("::");
 	if(index == -1) {
@@ -136,7 +137,6 @@ public final class HeapLDT extends LDT {
     }
     
     public String getClassName(Function fieldSymbol) {
-	assert fieldSymbol.sort() == fieldSort;
 	String name = fieldSymbol.name().toString();
 	int index = name.indexOf("::");
 	if(index == -1) {
@@ -248,6 +248,11 @@ public final class HeapLDT extends LDT {
 	return wellFormed;
     }
     
+    
+    public Function getInv() {
+	return inv;
+    }
+    
 
     public LocationVariable getHeap() {
 	return heap;
@@ -276,20 +281,34 @@ public final class HeapLDT extends LDT {
 		Sort sortDependingOn = fieldPV.getContainerType().getSort();		
 		result = firstInstance.getInstanceFor(sortDependingOn, services);
 	    } else {
-		result = new Function(name, 
-				      fieldSort, 
-				      new Sort[0], 
-				      null,
-				      true);
+		if(fieldPV.isModel()) {
+		    result = new Function(name, 
+			                  fieldPV.sort(), 
+			                  new Sort[]{targetSort(), 
+						     fieldPV.getContainerType()
+						            .getSort()});
+		} else {
+		    result = new Function(name, 
+				          fieldSort, 
+				          new Sort[0], 
+				          null,
+				          true);
+		}
 		services.getNamespaces().functions().addSafely(result);
 	    }
 	}
-        
-	assert result.sort() == fieldSort : "symbol has wrong sort: " + result;
-        assert result.isUnique() : "symbol is not unique: " + result;        
+	
+	//sanity check
+	if(result.sort() == fieldSort) {
+	    assert result.isUnique()
+	           : "field symbol is not unique: " + result;
+	} else {
+	    assert result.argSort(0) == targetSort();
+	}
+                       
         return result;
     }
-    
+
     
     @Override
     public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, 

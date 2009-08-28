@@ -22,29 +22,20 @@ import java.util.Set;
 
 import javax.swing.*;
 
-import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.Main;
 import de.uka.ilkd.key.gui.configuration.GeneralSettings;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.Field;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
 import de.uka.ilkd.key.java.declaration.InterfaceDeclaration;
 import de.uka.ilkd.key.java.recoderext.ConstructorNormalformBuilder;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.visitor.JavaASTCollector;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.init.AbstractEnvInput;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
@@ -58,7 +49,6 @@ public final class SLEnvInput extends AbstractEnvInput {
     
     private static final String INIT_NAME 
     	= ConstructorNormalformBuilder.CONSTRUCTOR_NORMALFORM_IDENTIFIER;
-    private static final TermBuilder TB = TermBuilder.DF;
     
         
     //-------------------------------------------------------------------------
@@ -182,17 +172,19 @@ public final class SLEnvInput extends AbstractEnvInput {
         	continue;
             }
             
-            //class invariants
-            specRepos.addClassInvariants(
-                        specExtractor.extractClassInvariants(kjt));
+            //class invariants, represents clauses, ...
+            ImmutableSet<SpecificationElement> classSpecs 
+            	= specExtractor.extractClassSpecs(kjt);
+            specRepos.addSpecs(classSpecs);
             
             //contracts, loop invariants
             ImmutableList<ProgramMethod> pms 
                 = javaInfo.getAllProgramMethodsLocallyDeclared(kjt);
             for(ProgramMethod pm : pms) {
                 //contracts
-                specRepos.addOperationContracts(
-                            specExtractor.extractOperationContracts(pm));
+        	ImmutableSet<SpecificationElement> methodSpecs
+        	    = specExtractor.extractMethodSpecs(pm);
+        	specRepos.addSpecs(methodSpecs);
                 
                 //loop invariants
                 JavaASTCollector collector 

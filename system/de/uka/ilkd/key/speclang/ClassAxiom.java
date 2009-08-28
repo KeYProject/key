@@ -13,34 +13,24 @@ package de.uka.ilkd.key.speclang;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.ParsableVariable;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
 
 
-/**
- * A class invariant.
- */
-public interface ClassInvariant extends SpecificationElement {
+public interface ClassAxiom extends SpecificationElement {
         
     /**
-     * Returns the unique internal name of the invariant.
+     * Returns the name of the axiom
      */
     public String getName();
     
     /**
-     * Returns the displayed name of the invariant.
-     */
-    public String getDisplayName();
-
-    /**
      * Returns the KeYJavaType representing the class/interface to which the 
-     * invariant belongs.
+     * axiom belongs.
      */
-    public KeYJavaType getKJT();   
-  
+    public KeYJavaType getKJT();
+    
     /**
-     * Returns the invariant formula without implicit all-quantification over
-     * the receiver object.
+     * The actual formula.
      */
-    public Term getInv(ParsableVariable selfVar, 
-	    		   Services services);
+    public Term getAxiom(ProgramVariable selfVar, Services services);
 }

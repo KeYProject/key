@@ -22,7 +22,7 @@ import de.uka.ilkd.key.logic.Term;
  * A loop invariant, consisting of an invariant formula, a set of loop 
  * predicates, a modifies clause, and a variant term.
  */
-public interface LoopInvariant {
+public interface LoopInvariant extends SpecificationElement {
     
     /**
      * Returns the loop to which the invariant belongs.

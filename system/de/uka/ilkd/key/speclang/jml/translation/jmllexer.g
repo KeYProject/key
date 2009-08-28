@@ -71,7 +71,6 @@ LEQ : "<=";
 LOCKSET : "\\lockset";
 LOGICALAND : "&&";
 LOGICALOR : "||";
-LT : "<";
 MINUS : "-";
 MOD : "%";
 MULT : "*";
@@ -106,6 +105,24 @@ UNSIGNEDSHIFTRIGHT : ">>>";
 WORKINGSPACE : "\\working_space";
 XOR : "^";
 
+
+LT_DISPATCH
+     :
+     ('<' (LETTER)+ '>') => IMPLICIT_IDENT {$setType(IDENT);}
+    |
+     LT {$setType(LT);}
+    ;
+    
+protected LT : "<";
+
+    
+protected IMPLICIT_IDENT
+options {
+  paraphrase = "an implicit identifier (letters only)";
+}
+:
+  '<' (LETTER)+ '>'
+;
 
 
 LPAREN

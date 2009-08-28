@@ -14,15 +14,17 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
+import de.uka.ilkd.key.util.Pair;
 
 
 /**
  * Translates JML expressions to FOL.
  */
-class JMLTranslator {
+final class JMLTranslator {
     
     private final Services services;
     
@@ -167,6 +169,64 @@ class JMLTranslator {
         
         return result;
     }
+    
+    
+    /**
+     * Translates an expression as it occurs in JML represents-clauses.
+     */
+    public Term translateRepresentsExpression(
+                                    	PositionedString representsExpr,
+                                        KeYJavaType specInClass,
+                                        ProgramVariable selfVar)
+            throws SLTranslationException {        
+            
+        KeYJMLParser parser = new KeYJMLParser(representsExpr,
+                                               services,
+                                               specInClass,
+                                               selfVar,
+                                               null, 
+                                               null, 
+                                               null,
+                                               null);
+        
+//      System.out.println("JMLTranslator.translateRepresentsExpression("+representsExpr+") results: ");
+
+        Term result = parser.parseRepresents();
+        
+//      System.out.println(result);
+//      System.out.println();
+        
+        return result;
+    }    
+    
+    
+   /**
+     * Translates an expression as it occurs in our custom class-level accessible clauses.
+     */
+    public Pair<Operator,Term> translateAccessibleExpression(
+                                    	PositionedString representsExpr,
+                                        KeYJavaType specInClass,
+                                        ProgramVariable selfVar)
+            throws SLTranslationException {        
+            
+        KeYJMLParser parser = new KeYJMLParser(representsExpr,
+                                               services,
+                                               specInClass,
+                                               selfVar,
+                                               null, 
+                                               null, 
+                                               null,
+                                               null);
+        
+//      System.out.println("JMLTranslator.translateAccessibleExpression("+representsExpr+") results: ");
+
+        Pair<Operator,Term> result = parser.parseAccessible();
+        
+//      System.out.println(result);
+//      System.out.println();
+        
+        return result;
+    }        
     
     
     public ImmutableList<ProgramVariable> translateVariableDeclaration(PositionedString variableDecl) 

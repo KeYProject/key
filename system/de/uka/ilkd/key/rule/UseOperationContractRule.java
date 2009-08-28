@@ -211,10 +211,7 @@ public final class UseOperationContractRule implements BuiltInRule {
                                                services,
                                                pm,
                                                modality,
-                                               true,
-                                               true,
-                                               false,
-                                               false);
+                                               true);
             if(cc.wasSuccessful()) {
                 return cc.getContract();
             } else {

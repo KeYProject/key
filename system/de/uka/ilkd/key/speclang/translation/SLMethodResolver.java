@@ -27,6 +27,13 @@ public final class SLMethodResolver extends SLExpressionResolver {
         super(javaInfo, manager);
     }
 
+
+    @Override    
+    protected boolean canHandleReceiver(SLExpression receiver) {
+        return receiver != null 
+               && !receiver.getType().getFullName().endsWith("[]");
+    }
+    
     
     @Override
     protected SLExpression doResolving(SLExpression receiver,
@@ -34,7 +41,7 @@ public final class SLMethodResolver extends SLExpressionResolver {
                                        SLParameters parameters)
                                    throws SLTranslationException {
 
-        if(parameters == null || !parameters.isImmutableListOfTerm()) {
+        if(parameters == null || !parameters.isListOfTerm()) {
             return null;
         }
 
@@ -110,16 +117,4 @@ public final class SLMethodResolver extends SLExpressionResolver {
         	                pm.getKeYJavaType());
     }
 
-
-    @Override    
-    public boolean canHandleReceiver(SLExpression receiver) {
-        return receiver != null 
-               && !receiver.getType().getFullName().endsWith("[]");
-    }
-
-    
-    @Override    
-    public boolean needVarDeclaration(String name) {
-        return false;
-    }
 }

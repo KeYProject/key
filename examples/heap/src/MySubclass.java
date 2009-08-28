@@ -4,16 +4,12 @@ class MySubclass extends MyClass {
 	return attr = 27 + i;
     }
     
-    //@ normal_behavior
-    //@  ensures \result == 27;
-    static int test() {
-	return 27;
-    }
     
     
     MyClass mc;
-    /*@ requires mc != null;
-      @ assignable mc.attr;    
+    //@ invariant mc.<inv>;   
+    
+    /*@ assignable mc.attr;    
       @ ensures \result == 388;
       @*/
     int useContract() {
@@ -21,4 +17,21 @@ class MySubclass extends MyClass {
 	i = mc.add27(++i);
 	return i;
     }
+    
+    
+    
+    
+    //@ model int modelField;
+    int x;
+    int y;
+    //@ represents modelField <- x + y;
+    
+    
+    /*@ assignable this.*;
+      @ ensures modelField == \old(modelField) + 2;
+      @*/
+    void changeModelField() {
+	x++;
+	y++;
+    }   
 }

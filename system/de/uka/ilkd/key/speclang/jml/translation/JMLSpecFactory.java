@@ -27,11 +27,9 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.speclang.*;
-import de.uka.ilkd.key.speclang.jml.pretranslation.Behavior;
-import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLClassInv;
-import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLLoopSpec;
-import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase;
+import de.uka.ilkd.key.speclang.jml.pretranslation.*;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
+import de.uka.ilkd.key.util.Pair;
 
 
 /**
@@ -356,8 +354,7 @@ public class JMLSpecFactory {
         assert originalInv != null;
         
         //create variable for self
-        ProgramVariable selfVar 
-        	= new LocationVariable(new ProgramElementName("self"), kjt);
+        ProgramVariable selfVar = TB.selfVar(services, kjt, false);
         
         //translate expression
         Term inv = translator.translateExpression(originalInv,
@@ -383,6 +380,66 @@ public class JMLSpecFactory {
             throws SLTranslationException {
         return createJMLClassInvariant(kjt, textualInv.getInv());
     }
+    
+    
+   public ClassAxiom createJMLRepresents(KeYJavaType kjt, 
+                                         PositionedString originalRep) 
+            throws SLTranslationException {
+        assert kjt != null;
+        assert originalRep != null;
+        
+        //create variable for self
+        ProgramVariable selfVar = TB.selfVar(services, kjt, false);
+        
+        //translate expression
+        Term rep = translator.translateRepresentsExpression(
+        					  originalRep,
+        					  kjt,
+        					  selfVar);        
+        //create invariant
+        return new ClassAxiomImpl("JML represents clause",
+        	                  kjt,
+        	                  rep,
+        	                  selfVar);
+    }
+   
+    
+    public ClassAxiom createJMLRepresents(KeYJavaType kjt, 
+	    				  TextualJMLRepresents textualRep)
+    	throws SLTranslationException {
+	return createJMLRepresents(kjt, textualRep.getRepresents());
+    }
+    
+    
+   public DependencyContract createJMLDependencyContract(
+	   					 KeYJavaType kjt, 
+                                                 PositionedString originalAcc) 
+            throws SLTranslationException {
+        assert kjt != null;
+        assert originalAcc != null;
+        
+        //create variable for self
+        ProgramVariable selfVar = TB.selfVar(services, kjt, false);
+        
+        //translate expression
+        Pair<Operator,Term> dep = translator.translateAccessibleExpression(
+        					  originalAcc,
+        					  kjt,
+        					  selfVar);        
+        //create invariant
+        return new DependencyContractImpl("JML accessible clause",
+        				  kjt,
+        	                          dep.first,
+        	                          dep.second,
+        	                          selfVar);//TODO!
+    }
+   
+    
+    public DependencyContract createJMLDependencyContract(KeYJavaType kjt, 
+	    				  		  TextualJMLAccessible textualAcc)
+    	throws SLTranslationException {
+	return createJMLDependencyContract(kjt, textualAcc.getAccessible());
+    }    
     
     
     public ImmutableSet<OperationContract> createJMLOperationContracts(

@@ -14,41 +14,41 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.speclang.PositionedString;
 
 
-public final class TextualJMLFieldDecl extends TextualJMLConstruct {
+public final class TextualJMLRepresents extends TextualJMLConstruct {
     
-    private final PositionedString decl;
+    private final PositionedString represents;
     
     
-    public TextualJMLFieldDecl(ImmutableList<String> mods, PositionedString decl) {
+    public TextualJMLRepresents(ImmutableList<String> mods,
+	                        PositionedString represents) {
         super(mods);
-        assert decl != null;
-        this.decl = decl;
+        assert represents != null;
+        this.represents = represents;
     }
     
     
-    public PositionedString getDecl() {
-        return decl;
+    public PositionedString getRepresents() {
+        return represents;
     }
-    
     
     @Override
     public String toString() {
-        return decl.toString();
+        return represents.toString();
     }
     
     
     @Override
     public boolean equals(Object o) {
-        if(!(o instanceof TextualJMLFieldDecl)) {
+        if(!(o instanceof TextualJMLRepresents)) {
             return false;
         }
-        TextualJMLFieldDecl fd = (TextualJMLFieldDecl) o;
-        return mods.equals(fd.mods) && decl.equals(fd.decl);
+        TextualJMLRepresents r = (TextualJMLRepresents) o;
+        return mods.equals(r.mods) && represents.equals(r.represents);
     }
     
     
     @Override
     public int hashCode() {
-        return mods.hashCode() + decl.hashCode();
+        return mods.hashCode() + represents.hashCode();
     }
 }

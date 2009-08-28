@@ -10,10 +10,13 @@
 
 package de.uka.ilkd.key.proof.init;
 
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 
 import de.uka.ilkd.key.collection.*;
 import de.uka.ilkd.key.java.Expression;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -29,6 +32,9 @@ import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.java.statement.Try;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.proof.OpReplacer;
+import de.uka.ilkd.key.speclang.ClassAxiom;
+import de.uka.ilkd.key.speclang.ClassInvariant;
 import de.uka.ilkd.key.speclang.OperationContract;
 
 
@@ -77,20 +83,20 @@ public final class ContractPO extends AbstractPO {
     
     
     /**
-     * Builds the "general assumption" for a set of assumed invariants. 
+     * Builds the "general assumption". 
      */
     private Term buildFreePre(ProgramVariable selfVar,
                               ImmutableList<ProgramVariable> paramVars) 
     		throws ProofInputException {
 
         //"self != null"
-        Term selfNotNull 
+        final Term selfNotNull 
             = selfVar == null
               ? TB.tt()
               : TB.not(TB.equals(TB.var(selfVar), TB.NULL(services)));
         	      
         //"self.<created> = TRUE"
-        Term selfCreated
+        final Term selfCreated
            = selfVar == null
              ? TB.tt()
              : TB.created(services, TB.var(selfVar));
@@ -102,11 +108,20 @@ public final class ContractPO extends AbstractPO {
         for(ProgramVariable paramVar : paramVars) {
             paramsOK = TB.and(paramsOK, TB.reachableValue(services, paramVar));
         }
-
+        
+        //class axioms
+        ImmutableSet<ClassAxiom> axioms 
+        	= specRepos.getClassAxioms(selfVar.getKeYJavaType());
+        Term axiomTerm = TB.tt();
+        for(ClassAxiom ax : axioms) {
+            axiomTerm = TB.and(axiomTerm, ax.getAxiom(selfVar, services));
+        }
+        
         return TB.and(new Term[]{TB.inReachableState(services), 
         	       		 selfNotNull,
         	       		 selfCreated,
-        	       		 paramsOK});
+        	       		 paramsOK,
+        	       		 axiomTerm});
     }
     
     

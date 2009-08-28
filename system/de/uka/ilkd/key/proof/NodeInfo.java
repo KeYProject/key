@@ -190,7 +190,7 @@ public class NodeInfo {
                     res = arg; // use sv name instead
                 } else
                     res = ProofSaver.printAnything(val, node.proof().getServices());
-                m.appendReplacement(sb, res);
+                m.appendReplacement(sb, res.replace("$", "\\$"));
             }
             m.appendTail(sb);
             branchLabel = sb.toString();

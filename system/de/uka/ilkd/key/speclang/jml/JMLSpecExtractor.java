@@ -5,14 +5,6 @@
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
-//This file is part of KeY - Integrated Deductive Software Design
-//Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
-//                      Universitaet Koblenz-Landau, Germany
-//                      Chalmers University of Technology, Sweden
-//
-//The KeY system is protected by the GNU General Public License. 
-//See LICENSE.TXT for details.
-//
 //
 
 package de.uka.ilkd.key.speclang.jml;
@@ -29,20 +21,19 @@ import de.uka.ilkd.key.java.declaration.*;
 import de.uka.ilkd.key.java.recoderext.JMLTransformer;
 import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.java.statement.LoopStatement;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.speclang.*;
 import de.uka.ilkd.key.speclang.jml.pretranslation.*;
 import de.uka.ilkd.key.speclang.jml.translation.JMLSpecFactory;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.speclang.translation.SLWarningException;
+import de.uka.ilkd.key.util.Pair;
 
 /**
  * Extracts JML class invariants and operation contracts from JML comments. 
  * This is the public interface to the jml package.
  */
-public class JMLSpecExtractor implements SpecExtractor {
+public final class JMLSpecExtractor implements SpecExtractor {
 
     private final Services services;
     private final JMLSpecFactory jsf;
@@ -106,51 +97,7 @@ public class JMLSpecExtractor implements SpecExtractor {
     }
 
     
-    private void transformFieldDecl(TextualJMLFieldDecl decl,
-                                    KeYJavaType classKjt) 
-            throws SLTranslationException {
-        if(!decl.getMods().contains("model")) {
-            return;
-        }
-
-        String[] splittedDecl = decl.getDecl().text.split(" ");
-        if(splittedDecl.length != 2) {
-            throw new SLTranslationException(
-                    "Unexpected structure of model field declaration!", 
-                    decl.getDecl().fileName, 
-                    decl.getDecl().pos);
-        }
-        String typeName  = splittedDecl[0];
-        String fieldName = splittedDecl[1].substring(0, 
-                                                     splittedDecl[1].length() 
-                                                         - 1);
-
-        Sort sort;
-        ImmutableArray<Sort> argSorts;
-        try {
-            sort 
-                = services.getJavaInfo().getTypeByClassName(typeName).getSort();
-            argSorts = decl.getMods().contains("static") 
-                       ? new ImmutableArray<Sort>()
-                       : new ImmutableArray<Sort>(classKjt.getSort());
-        } catch(Throwable e) {
-            throw new SLTranslationException(e.getMessage() 
-                                             + " ("
-                                             + e.getClass().getName() 
-                                             + ")", 
-                                             decl.getDecl().fileName,
-                                             decl.getDecl().pos, 
-                                             e.getStackTrace());
-        }
-        assert false : "model fields not implemented";
-//        NonRigidHeapDependentFunction f 
-//            = new NonRigidHeapDependentFunction(new Name(fieldName), 
-//                                                sort, 
-//                                                argSorts);
-//        services.getNamespaces().functions().add(f);
-    }
-
-    
+ 
     private String getDefaultSignalsOnly(ProgramMethod pm) {
         if(pm.getThrown() == null) {
             return "\\nothing;";
@@ -227,9 +174,11 @@ public class JMLSpecExtractor implements SpecExtractor {
     //public interface
     //-------------------------------------------------------------------------
 
-    public ImmutableSet<ClassInvariant> extractClassInvariants(KeYJavaType kjt)
+    @Override
+    public ImmutableSet<SpecificationElement> extractClassSpecs(KeYJavaType kjt)
             throws SLTranslationException {
-        ImmutableSet<ClassInvariant> result = DefaultImmutableSet.<ClassInvariant>nil();
+        ImmutableSet<SpecificationElement> result 
+        	= DefaultImmutableSet.<SpecificationElement>nil();
 
         //primitive types have no class invariants
         if(!(kjt.getJavaType() instanceof TypeDeclaration)) {
@@ -242,20 +191,21 @@ public class JMLSpecExtractor implements SpecExtractor {
 
         //add invariants for non_null fields        
         for(MemberDeclaration member : td.getMembers()) {
-            if (member instanceof FieldDeclaration) {
-                for(FieldSpecification field : ((FieldDeclaration) member).getFieldSpecifications()) {
+            if(member instanceof FieldDeclaration) {
+                for(FieldSpecification field 
+                      : ((FieldDeclaration) member).getFieldSpecifications()) {
                     
                     //add invariant only for fields of reference types
                     //and not for implicit fields.
-                    if (!JMLInfoExtractor.isNullable(field.getProgramName(), kjt)) {
+                    if(!JMLInfoExtractor.isNullable(field.getProgramName(), kjt)) {
                 	ImmutableSet<PositionedString> nonNullInvs =
                 	    createNonNullPositionedString(field.getProgramName(),
                 		    field.getProgramVariable().getKeYJavaType(),
                 		    field instanceof ImplicitFieldSpecification,
                 		    fileName, member.getEndPosition());
-                	for (PositionedString classInv : nonNullInvs) {
+                	for(PositionedString classInv : nonNullInvs) {
                 	    result = result.add(jsf.createJMLClassInvariant(kjt,
-                		    classInv));
+                		            				    classInv));
                 	}
                     }
                 }
@@ -298,18 +248,26 @@ public class JMLSpecExtractor implements SpecExtractor {
 
             //create class invs out of textual constructs, add them to result
             for(TextualJMLConstruct c : constructs) {
-                if(c instanceof TextualJMLClassInv) {
-                    try {
-                        TextualJMLClassInv textualInv = (TextualJMLClassInv) c;
-                        ClassInvariant inv 
-                            = jsf.createJMLClassInvariant(kjt, textualInv);
-                        result = result.add(inv);
-                    } catch (SLWarningException e) {
-                        warnings = warnings.add(e.getWarning());
-                    }
-                } else if(c instanceof TextualJMLFieldDecl) {
-                    transformFieldDecl((TextualJMLFieldDecl) c, kjt);
-                }
+        	try {        	
+        	    if(c instanceof TextualJMLClassInv) {
+        		TextualJMLClassInv textualInv = (TextualJMLClassInv) c;
+        		ClassInvariant inv 
+        			= jsf.createJMLClassInvariant(kjt, textualInv);
+        		result = result.add(inv);
+        	    } else if(c instanceof TextualJMLRepresents) {
+        		TextualJMLRepresents textualRep = (TextualJMLRepresents) c;
+        		ClassAxiom rep 
+        			= jsf.createJMLRepresents(kjt, textualRep);
+        		result = result.add(rep);
+        	    } else if(c instanceof TextualJMLAccessible) {
+        		TextualJMLAccessible textualAcc = (TextualJMLAccessible) c;
+        		DependencyContract depContract 
+        			= jsf.createJMLDependencyContract(kjt, textualAcc);
+        		result = result.add(depContract);
+        	    }
+        	} catch (SLWarningException e) {
+        	    warnings = warnings.add(e.getWarning());
+        	}
             }
         }
 
@@ -317,9 +275,11 @@ public class JMLSpecExtractor implements SpecExtractor {
     }
 
     
-    public ImmutableSet<OperationContract> extractOperationContracts(ProgramMethod pm)
+    @Override    
+    public ImmutableSet<SpecificationElement> extractMethodSpecs(ProgramMethod pm)
             throws SLTranslationException {
-        ImmutableSet<OperationContract> result = DefaultImmutableSet.<OperationContract>nil();
+        ImmutableSet<SpecificationElement> result 
+        	= DefaultImmutableSet.<SpecificationElement>nil();
 
         //get type declaration, file name
         TypeDeclaration td 
@@ -335,7 +295,9 @@ public class JMLSpecExtractor implements SpecExtractor {
             sc.addAssignable(new PositionedString("\\nothing"));
             ImmutableSet<OperationContract> contracts 
                 = jsf.createJMLOperationContracts(pm, sc);
-            result = result.union(contracts);
+            for(OperationContract contract : contracts) {
+        	result = result.add(contract);
+            }
         }
 
         //get textual JML constructs
@@ -371,13 +333,25 @@ public class JMLSpecExtractor implements SpecExtractor {
             TextualJMLSpecCase specCase 
                 = (TextualJMLSpecCase) constructsArray[i];
 
+            //add purity
             if(isPure) {
                 specCase.addDiverges(new PositionedString("false"));
                 if(!pm.isConstructor()) {
                     specCase.addAssignable(new PositionedString("\\nothing"));
                 } else {
-                    specCase.addAssignable(new PositionedString("\\nothing"));//TODO: should be "this.*", but this is not yet supported
+                    specCase.addAssignable(new PositionedString("this.*"));
                 }
+            }
+            
+            //add invariants (TODO: static invariants)
+            if(!pm.isStatic()) {
+        	specCase.addRequires(new PositionedString("<inv>"));
+        	if(specCase.getBehavior() != Behavior.EXCEPTIONAL_BEHAVIOR) {
+        	    specCase.addEnsures(new PositionedString("<inv>"));
+        	}
+        	if(specCase.getBehavior() != Behavior.NORMAL_BEHAVIOR) {
+        	    specCase.addSignals(new PositionedString("(Exception e) <inv>"));
+        	}
             }
 
             //add non-null preconditions
@@ -421,7 +395,9 @@ public class JMLSpecExtractor implements SpecExtractor {
             try {
                 ImmutableSet<OperationContract> contracts 
                     = jsf.createJMLOperationContracts(pm, specCase);
-                result = result.union(contracts);
+                for(OperationContract contract : contracts) {
+                    result = result.add(contract);
+                }
             } catch (SLWarningException e) {
                 warnings = warnings.add(e.getWarning());
             }
@@ -431,6 +407,7 @@ public class JMLSpecExtractor implements SpecExtractor {
     }
 
     
+    @Override    
     public LoopInvariant extractLoopInvariant(ProgramMethod pm,
                                               LoopStatement loop) 
             throws SLTranslationException {
@@ -475,6 +452,8 @@ public class JMLSpecExtractor implements SpecExtractor {
         return result;
     }
 
+    
+    @Override    
     public ImmutableSet<PositionedString> getWarnings() {
         return JMLTransformer.getWarningsOfLastInstance().union(warnings);
     }

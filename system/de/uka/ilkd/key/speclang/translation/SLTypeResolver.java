@@ -14,16 +14,20 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 
-public class SLTypeResolver extends SLExpressionResolver {
+public final class SLTypeResolver extends SLExpressionResolver {
 
     public SLTypeResolver(JavaInfo javaInfo, SLResolverManager manager) {
         super(javaInfo, manager);
     }
 
+    
+    @Override
     protected boolean canHandleReceiver(SLExpression receiver) {
         return true;
     }
 
+    
+    @Override
     protected SLExpression doResolving(SLExpression receiver,
                                        String name,
                                        SLParameters parameters)
@@ -54,9 +58,4 @@ public class SLTypeResolver extends SLExpressionResolver {
             return null;
         }
     }
-
-    public boolean needVarDeclaration(String name) {
-        return false;
-    }
-
 }

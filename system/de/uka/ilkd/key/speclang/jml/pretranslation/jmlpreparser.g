@@ -139,9 +139,10 @@ classlevel_element[ImmutableList<String> mods]
         result=class_invariant[mods]
     |   result=method_specification[mods]
     |   (method_declaration[mods]) => result=method_declaration[mods]
-    |   result=field_declaration[mods]    
-    |   result=history_constraint[mods]
+    |   result=field_declaration[mods] 
     |   result=represents_clause[mods]
+    |   result=accessible_clause[mods]    
+    |   result=history_constraint[mods]
     |   result=initially_clause[mods]
     |   result=monitors_for_clause[mods]
     |   result=readable_if_clause[mods]
@@ -774,6 +775,64 @@ method_declaration[ImmutableList<String> mods]
 
 
 //-----------------------------------------------------------------------------
+//represents clauses
+//-----------------------------------------------------------------------------
+
+
+represents_clause[ImmutableList<String> mods] 
+	returns [ImmutableList<TextualJMLConstruct> result = null] 
+	throws SLTranslationException 
+{
+    PositionedString ps;
+}
+:
+    represents_keyword ps=expression
+    {
+    	TextualJMLRepresents rc 
+    		= new TextualJMLRepresents(mods, ps);
+	result = ImmutableSLList.<TextualJMLConstruct>nil().prepend(rc);
+    }
+;
+
+
+represents_keyword
+:
+        REPRESENTS
+    |   REPRESENTS_RED
+;
+
+
+
+//-----------------------------------------------------------------------------
+//classlevel accessible clauses (custom extension of JML)
+//-----------------------------------------------------------------------------
+
+accessible_clause[ImmutableList<String> mods] 
+	returns [ImmutableList<TextualJMLConstruct> result = null] 
+	throws SLTranslationException 
+{
+    PositionedString ps;
+}
+:
+    accessible_keyword ps=expression
+    {
+    	TextualJMLAccessible ac 
+    		= new TextualJMLAccessible(mods, ps);
+	result = ImmutableSLList.<TextualJMLConstruct>nil().prepend(ac);
+    }
+;
+
+
+accessible_keyword
+:
+        ACCESSIBLE
+    |   ACCESSIBLE_REDUNDANTLY
+;
+
+
+
+
+//-----------------------------------------------------------------------------
 //unsupported classlevel stuff
 //-----------------------------------------------------------------------------
 
@@ -798,28 +857,6 @@ constraint_keyword
     |   CONSTRAINT_RED
 ;
 
-
-represents_clause[ImmutableList<String> mods] 
-	returns [ImmutableList<TextualJMLConstruct> result = null] 
-	throws SLTranslationException 
-{
-    PositionedString ps;
-}
-:
-    represents_keyword ps=expression
-    {
-    	raiseNotSupported("represents clauses");
-	result = ImmutableSLList.<TextualJMLConstruct>nil();
-    }
-;
-
-
-represents_keyword
-:
-        REPRESENTS
-    |   REPRESENTS_RED
-;
-    
     
 initially_clause[ImmutableList<String> mods] 
 	returns [ImmutableList<TextualJMLConstruct> result = null] 

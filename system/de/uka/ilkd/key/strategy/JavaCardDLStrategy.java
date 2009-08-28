@@ -21,10 +21,7 @@ import de.uka.ilkd.key.proof.ClassRuleFilter;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.SetRuleFilter;
-import de.uka.ilkd.key.rule.OneStepSimplifier;
-import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.rule.UseOperationContractRule;
-import de.uka.ilkd.key.rule.WhileInvariantRule;
+import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.smt.SMTRule;
 import de.uka.ilkd.key.smt.SMTRuleMulti;
 import de.uka.ilkd.key.strategy.feature.*;
@@ -109,6 +106,8 @@ public final class JavaCardDLStrategy extends AbstractFeatureStrategy {
             assert false;
         }
         
+        final Feature depSpecF = methodSpecFeature(inftyConst());//TODO
+        
         final Feature loopInvF;
         final String loopProp
         	= strategyProperties.getProperty(
@@ -137,6 +136,7 @@ public final class JavaCardDLStrategy extends AbstractFeatureStrategy {
               smtF, 
               smtMultiF,
               methodSpecF, 
+              depSpecF,
               loopInvF,
               ifMatchedF,
               ifThenElseF } );
@@ -153,6 +153,12 @@ public final class JavaCardDLStrategy extends AbstractFeatureStrategy {
 	filter.addRuleToSet(UseOperationContractRule.INSTANCE);
         return ConditionalFeature.createConditional(filter, cost);        
     }
+    
+    private Feature depSpecFeature(Feature cost) {
+	SetRuleFilter filter = new SetRuleFilter();
+	filter.addRuleToSet(UseDependencyContractRule.INSTANCE);
+        return ConditionalFeature.createConditional(filter, cost);        
+    }    
     
     private Feature oneStepSimplificationFeature(Feature cost) {
 	SetRuleFilter filter = new SetRuleFilter();

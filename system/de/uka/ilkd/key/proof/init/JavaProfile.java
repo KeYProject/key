@@ -61,6 +61,7 @@ public class JavaProfile extends AbstractProfile {
         ImmutableList<BuiltInRule> builtInRules = super.initBuiltInRules();
         
         builtInRules = builtInRules.prepend(WhileInvariantRule.INSTANCE)
+                                   .prepend(UseDependencyContractRule.INSTANCE)
                                    .prepend(OneStepSimplifier.INSTANCE);
   
         //contract insertion rule, ATTENTION: ProofMgt relies on the fact 

@@ -16,7 +16,7 @@ import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.speclang.PositionedString;
 
 
-public class TextualJMLLoopSpec extends TextualJMLConstruct {
+public final class TextualJMLLoopSpec extends TextualJMLConstruct {
 
     private ImmutableList<PositionedString> invariant          
             = ImmutableSLList.<PositionedString>nil();
@@ -86,6 +86,7 @@ public class TextualJMLLoopSpec extends TextualJMLConstruct {
     }
     
     
+    @Override
     public String toString() {
         StringBuffer sb = new StringBuffer();
         Iterator<PositionedString> it;
@@ -114,7 +115,7 @@ public class TextualJMLLoopSpec extends TextualJMLConstruct {
     }
     
     
-    
+    @Override
     public boolean equals(Object o) {
         if(!(o instanceof TextualJMLLoopSpec)) {
             return false;
@@ -130,6 +131,7 @@ public class TextualJMLLoopSpec extends TextualJMLConstruct {
     }
     
     
+    @Override
     public int hashCode() {
         return mods.hashCode()
                 + invariant.hashCode() 

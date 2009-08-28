@@ -26,6 +26,8 @@ options {
 
 tokens {
     ABSTRACT 			= "abstract";
+    ACCESSIBLE                  = "accessible";
+    ACCESSIBLE_REDUNDANTLY      = "accessible_redundantly";
     ALSO 			= "also";
     ASSERT                      = "assert";
     ASSERT_REDUNDANTLY          = "assert_redundantly";

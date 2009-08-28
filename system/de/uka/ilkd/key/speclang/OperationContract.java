@@ -22,7 +22,7 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
  * A contract about an operation, consisting of a precondition, a 
  * postcondition, a modifies clause, and a modality.
  */
-public interface OperationContract {
+public interface OperationContract extends SpecificationElement {
     
     public static final int INVALID_ID = -1;
     

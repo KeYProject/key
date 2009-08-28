@@ -5,13 +5,6 @@
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
-//This file is part of KeY - Integrated Deductive Software Design
-//Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
-//                      Universitaet Koblenz-Landau, Germany
-//                      Chalmers University of Technology, Sweden
-//
-//The KeY system is protected by the GNU General Public License. 
-//See LICENSE.TXT for details.
 //
 //
 
@@ -21,7 +14,7 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.speclang.PositionedString;
 
 
-public class TextualJMLSetStatement extends TextualJMLConstruct {
+public final class TextualJMLSetStatement extends TextualJMLConstruct {
     
     private final PositionedString assignment;
     
@@ -39,11 +32,13 @@ public class TextualJMLSetStatement extends TextualJMLConstruct {
     }
     
     
+    @Override
     public String toString() {
         return assignment.toString();
     }
     
     
+    @Override
     public boolean equals(Object o) {
         if(!(o instanceof TextualJMLSetStatement)) {
             return false;
@@ -53,6 +48,7 @@ public class TextualJMLSetStatement extends TextualJMLConstruct {
     }
     
     
+    @Override
     public int hashCode() {
         return mods.hashCode() + assignment.hashCode();
     }
