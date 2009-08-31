@@ -285,7 +285,7 @@ public class ClassFileDeclarationBuilder implements Comparable<ClassFileDeclarat
      * @throws ParserException
      *                 thrown by the parser
      */
-    public static CompilationUnit makeEmptyClassFile(
+    public static CompilationUnit makeEmptyClassDeclaration(
             ProgramFactory programFactory, 
             String fullClassName) 
                       throws ParserException {

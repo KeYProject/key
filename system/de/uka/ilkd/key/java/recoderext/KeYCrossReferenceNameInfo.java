@@ -29,6 +29,10 @@ import de.uka.ilkd.key.java.ConvertException;
  * If it records an attempt to register a declaration type twice, a verbose
  * conversion exception is thrown.
  * 
+ * It also reports a missing "java.lang.Object" definition in a
+ * {@link ConvertException}. Recoder itself usually fails at a random point
+ * with a {@link NullPointerException}.
+ * 
  * An instance of this class is created in
  * {@link KeYCrossReferenceServiceConfiguration}.
  * 
@@ -100,6 +104,24 @@ public class KeYCrossReferenceNameInfo extends DefaultNameInfo {
         if(t instanceof ClassType)
             classtypes.put(name, (ClassType)t);
         return t;
+    }
+    
+    /**
+     * {@inheritDoc}
+     * 
+     * This implementation checks whether an implementation is available and
+     * fails if not.
+     * 
+     * @throws ConvertException
+     *             if no implementation of java.lang.Object is available
+     *             presently.
+     */
+    @Override 
+    public ClassType getJavaLangObject() throws ConvertException {
+        ClassType result = super.getJavaLangObject();
+        if(result == null)
+            throw new ConvertException("Class type 'java.lang.Object' cannot be found");
+        return result;
     }
 
 }

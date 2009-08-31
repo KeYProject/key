@@ -111,13 +111,16 @@ classes.
 
 If you want to replace the default classes, you have to specify
 "\noDefaultClasses" somewhere amongst the classpath specifications.
-However, you have to make sure that all classes in A that are not
-marked with a (*) are defined and have all needed methods and
-fields. You might want to look into the key sources to compare the
-current implementation of the default classes.
+However, you have to make sure that all classes in A that are *not*
+marked with a (*) are defined within a classpath location (not within
+javaSource) and have all needed methods and fields. You might want to
+look into the key sources[1] to compare the current implementation of
+the default classes.
 
 If you forget to include classes, it may to lead to unexpected and 
 mysterious errors at runtime of KeY.
+
+[1] system/resources/de/uka/ilkd/key/java/JavaRedux
 
 4. Known issues
 ---------------
