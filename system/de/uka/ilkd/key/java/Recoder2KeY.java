@@ -506,18 +506,21 @@ public class Recoder2KeY implements JavaReader {
      * 
      * Proceed as follows:
      * 
-     * 1) If "classPath" is set and contains at least one entry
-     *     1.1) for each entry read every java file in its content
-     *     1.2) for each entry read every class file in its file tree
-     *     
-     * 2) else
-     *     2.1) read a special collection of classes that is stored
-     *          internally
-     *          
-     * @author mu
-     * @throws ParserException 
-     * @throws IOException 
-     * @throws ParseException 
+     * <ol>
+     * <li> If "classPath" is set and contains at least one entry
+     * <ol>
+     * <li>read every <code>.java</code> file within the entries (directories
+     * or zip files)
+     * <li>read every <code>.class</code> file within the entries
+     * (directories or zip files)
+     * </ol>
+     * <li>else read a special collection of classes that is stored internally
+     * </ol>
+     * 
+     * @author mulbrich
+     * @throws ParserException
+     * @throws IOException
+     * @throws ParseException
      */
     private List<recoder.java.CompilationUnit> parseLibs() throws ParseException, IOException, ParserException {
         
@@ -544,7 +547,7 @@ public class Recoder2KeY implements JavaReader {
         DataLocation currentDataLocation = null;
         if(parseDefault) {
             parseInternalClasses(pf, rcuList);
-        }
+        } 
 
         // -- read java files --
         for (FileCollection fc : sources) {
@@ -1158,7 +1161,8 @@ public class Recoder2KeY implements JavaReader {
         int[] pos = extractPositionInfo(e.toString());
         final RuntimeException rte;
         if (pos.length > 0) {
-            rte = (PosConvertException) new PosConvertException(message, pos[0], pos[1]).initCause(e);
+            rte = new PosConvertException(message, pos[0], pos[1]);
+            rte.initCause(e);
         } else {
             rte = new ConvertException(message, e);
         }
