@@ -13,7 +13,9 @@ package de.uka.ilkd.key.proof.mgt;
 import java.util.*;
 
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.statement.LoopStatement;
@@ -24,6 +26,7 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ContractPO;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.speclang.*;
+import de.uka.ilkd.key.util.Pair;
 
 
 public final class SpecificationRepository {
@@ -31,8 +34,8 @@ public final class SpecificationRepository {
     private static final String CONTRACT_COMBINATION_MARKER = "#";
     private static final TermBuilder TB = TermBuilder.DF;
     
-    private final Map<ProgramMethod, ImmutableSet<OperationContract>> contracts 
-    		= new LinkedHashMap<ProgramMethod,ImmutableSet<OperationContract>>();
+    private final Map<Pair<ProgramMethod,KeYJavaType>, ImmutableSet<OperationContract>> contracts 
+    		= new LinkedHashMap<Pair<ProgramMethod,KeYJavaType>,ImmutableSet<OperationContract>>();
     private final Map<String,OperationContract> contractsByName
                 = new LinkedHashMap<String,OperationContract>();
     private final Map<Operator,DependencyContract> depContracts
@@ -62,7 +65,48 @@ public final class SpecificationRepository {
 
     //-------------------------------------------------------------------------
     //internal methods
-    //------------------------------------------------------------------------- 
+    //-------------------------------------------------------------------------
+
+    public ImmutableSet<Pair<ProgramMethod,KeYJavaType>> 
+    		getOverridingMethods(ProgramMethod pm) {
+        final String name   = pm.getMethodDeclaration().getName();
+        final int numParams = pm.getParameterDeclarationCount();
+        ImmutableSet<Pair<ProgramMethod,KeYJavaType>> result 
+        	= DefaultImmutableSet.<Pair<ProgramMethod,KeYJavaType>>nil();
+        
+        final KeYJavaType kjt = pm.getContainerType();
+        assert kjt != null;
+        final JavaInfo javaInfo = services.getJavaInfo();
+        for(KeYJavaType sub : javaInfo.getAllSubtypes(kjt)) {
+            assert sub != null;
+            
+            final ImmutableList<ProgramMethod> subPms 
+                = javaInfo.getAllProgramMethodsLocallyDeclaredOrAutomaticOverride(sub);
+            for(ProgramMethod subPm : subPms) {
+                if(subPm.getMethodDeclaration().getName().equals(name) 
+                   && subPm.getParameterDeclarationCount() == numParams) {
+                    boolean paramsEqual = true;
+                    for(int i = 0; i < numParams; i++) {
+                        if(!subPm.getParameterType(i)
+                                 .equals(pm.getParameterType(i))) {
+                            paramsEqual = false;
+                            break;
+                        }
+                    }
+                    
+                    if(paramsEqual) {
+                        result = result.add(
+                           new Pair<ProgramMethod,KeYJavaType>(subPm, sub));
+                        break;
+                    }
+                }
+            }
+        }
+        
+        return result;
+    }
+        
+    
     
     /**
      * Returns all known class invariants for the passed type.
@@ -83,8 +127,11 @@ public final class SpecificationRepository {
      * Returns all registered (atomic) contracts for the passed operation.
      */
     public ImmutableSet<OperationContract> getOperationContracts(
-	    					ProgramMethod pm) {
-	ImmutableSet<OperationContract> result = contracts.get(pm);
+	    					ProgramMethod pm, 
+	    					KeYJavaType kjt) {
+	final Pair<ProgramMethod,KeYJavaType> pair 
+		= new Pair<ProgramMethod,KeYJavaType>(pm,kjt);
+	final ImmutableSet<OperationContract> result = contracts.get(pair);
         return result == null 
                ? DefaultImmutableSet.<OperationContract>nil() 
                : result;
@@ -96,9 +143,10 @@ public final class SpecificationRepository {
      * refer to the passed modality.
      */
     public ImmutableSet<OperationContract> getOperationContracts(
-	    					ProgramMethod pm, 
+	    					ProgramMethod pm,
+	    					KeYJavaType kjt,
 	    					Modality modality) {
-	ImmutableSet<OperationContract> result = getOperationContracts(pm);
+	ImmutableSet<OperationContract> result = getOperationContracts(pm, kjt);
 	for(OperationContract contract : result) {
 	    if(!contract.getModality().equals(modality)) {
 		result = result.remove(contract);
@@ -140,13 +188,13 @@ public final class SpecificationRepository {
 	    					OperationContract contract) {
 	ImmutableSet<OperationContract> result 
 		= DefaultImmutableSet.<OperationContract>nil().add(contract);
-        final ImmutableSet<ProgramMethod> pms 
-        	= services.getJavaInfo()
-        	          .getOverridingMethods(contract.getProgramMethod());
-        for(ProgramMethod pm : pms) {
-            for(OperationContract pmContract : getOperationContracts(pm)) {
-        	if(pmContract.id() == contract.id()) {
-        	    result = result.add(pmContract);
+        final ImmutableSet<Pair<ProgramMethod,KeYJavaType>> subs 
+        	= getOverridingMethods(contract.getProgramMethod());
+        for(Pair<ProgramMethod,KeYJavaType> sub : subs) {
+            for(OperationContract subContract
+        	     : getOperationContracts(sub.first, sub.second)) {
+        	if(subContract.id() == contract.id()) {
+        	    result = result.add(subContract);
         	    break;
         	}
             }
@@ -179,12 +227,16 @@ public final class SpecificationRepository {
 	contract = contract.setID(contractCounter++);
 
 	//register and inherit
-        final ImmutableSet<ProgramMethod> pms 
-        	= services.getJavaInfo()
-        	          .getOverridingMethods(contract.getProgramMethod())
-        	          .add(contract.getProgramMethod());
-        for(ProgramMethod pm : pms) {
-            contract = contract.setProgramMethod(pm, services);
+        final ImmutableSet<Pair<ProgramMethod,KeYJavaType>> impls 
+        	= getOverridingMethods(contract.getProgramMethod())
+        	  .add(new Pair<ProgramMethod,KeYJavaType>(
+        		        contract.getProgramMethod(), 
+        		        contract.getKJT()));
+        
+        for(Pair<ProgramMethod,KeYJavaType> impl : impls) {
+            contract = contract.setProgramMethod(impl.first, 
+        	                                 impl.second, 
+        	                                 services);
             assert contractsByName.get(contract.getName()) == null
                    : "Tried to add a contract with a non-unique name!";
             assert !contract.getName().contains(CONTRACT_COMBINATION_MARKER)
@@ -194,7 +246,8 @@ public final class SpecificationRepository {
                      + "!";
             assert contract.id() != OperationContract.INVALID_ID
                    : "Tried to add a contract with an invalid id!";
-            contracts.put(pm, getOperationContracts(pm).add(contract));
+            contracts.put(impl, getOperationContracts(impl.first, impl.second)
+        	                                 .add(contract));
             contractsByName.put(contract.getName(), contract);
         }
     }
@@ -286,12 +339,21 @@ public final class SpecificationRepository {
     
         
     /**
-     * Registers the passed class invariant, whose name must be different from 
-     * all previously registered class invariants.
+     * Registers the passed class invariant, and inherits it to all
+     * subclasses.
      */
     public void addClassInvariant(ClassInvariant inv) {
-        KeYJavaType kjt = inv.getKJT();
+        final KeYJavaType kjt = inv.getKJT();
         invs.put(kjt, getClassInvariants(kjt).add(inv));
+        
+        if(!inv.isStatic()) {
+            final ImmutableList<KeYJavaType> subs 
+            	= services.getJavaInfo().getAllSubtypes(kjt);
+            for(KeYJavaType sub : subs) {
+        	ClassInvariant subInv = inv.setKJT(sub);
+        	invs.put(sub, getClassInvariants(sub).add(subInv));
+            }
+        }
     }
     
     

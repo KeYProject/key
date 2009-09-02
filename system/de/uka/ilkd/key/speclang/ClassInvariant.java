@@ -35,12 +35,23 @@ public interface ClassInvariant extends SpecificationElement {
      * Returns the KeYJavaType representing the class/interface to which the 
      * invariant belongs.
      */
-    public KeYJavaType getKJT();   
-  
+    public KeYJavaType getKJT();
+    
     /**
      * Returns the invariant formula without implicit all-quantification over
      * the receiver object.
      */
-    public Term getInv(ParsableVariable selfVar, 
-	    		   Services services);
+    public Term getInv(ParsableVariable selfVar, Services services);
+    
+    /**
+     * Tells whether the invariant is static (i.e., does not refer to a
+     * receiver object)..
+     */
+    public boolean isStatic();    
+    
+    /**
+     * Returns another class invariant like this one, except that it refers to the 
+     * passed KeYJavaType.
+     */    
+    public ClassInvariant setKJT(KeYJavaType kjt);
 }

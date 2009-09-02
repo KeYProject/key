@@ -26,6 +26,7 @@ import javax.swing.event.ListSelectionListener;
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
@@ -129,20 +130,24 @@ class OperationContractSelectionPanel extends JPanel {
     
     private ImmutableSet<OperationContract> collectContracts(
 	    					ProgramMethod pm, 
+	    					KeYJavaType kjt,
                                                 Modality modality) {
         SpecificationRepository specRepos 
                 = services.getSpecificationRepository();
         ImmutableSet<OperationContract> result;
         if(modality != null) {
-            result = specRepos.getOperationContracts(pm, modality);
+            result = specRepos.getOperationContracts(pm, kjt, modality);
             
             //in box modalities, diamond contracts may be applied as well
             if(modality == Modality.BOX) {
                 result = result.union(services.getSpecificationRepository()
-                                              .getOperationContracts(pm, Modality.DIA));
+                                              .getOperationContracts(
+                                        	      pm, 
+                                        	      kjt, 
+                                        	      Modality.DIA));
             }
         } else {
-            result = specRepos.getOperationContracts(pm);
+            result = specRepos.getOperationContracts(pm, kjt);
         }
         return result;
     }
@@ -181,15 +186,19 @@ class OperationContractSelectionPanel extends JPanel {
     }
     
     
-    public void setContracts(ProgramMethod pm, Modality modality) {
-	setContracts(collectContracts(pm, modality), 
-		     "Contracts for " + pm);
+    public void setContracts(ProgramMethod pm, 
+	    		     KeYJavaType kjt, 
+	    		     Modality modality) {
+	setContracts(collectContracts(pm, kjt, modality),
+		     "Contracts");
+//		     "Contracts for " + pm + " in " 
+//		      + kjt.getJavaType().getName());
     }
     
     
     
-    public void setContracts(ProgramMethod pm) {
-	setContracts(pm, null);
+    public void setContracts(ProgramMethod pm, KeYJavaType kjt) {
+	setContracts(pm, kjt, null);
     }
     
     

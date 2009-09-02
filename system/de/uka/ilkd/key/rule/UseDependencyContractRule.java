@@ -105,9 +105,9 @@ public final class UseDependencyContractRule implements BuiltInRule {
         final Term depFormula 
                 = TB.all(new LogicVariable[]{selfVar, heapVar1, heapVar2},
         		 TB.imp(TB.all(new LogicVariable[]{objVar,fieldVar},
-        			       TB.or(TB.elementOf(services, TB.pair(services, TB.var(objVar), TB.var(fieldVar)), dep),
-        				     TB.equals(TB.select(services, Sort.ANY, TB.var(heapVar1), TB.var(objVar), TB.var(fieldVar)),
-        				               TB.select(services, Sort.ANY, TB.var(heapVar2), TB.var(objVar), TB.var(fieldVar))))),
+        			       TB.imp(TB.elementOf(services, TB.pair(services, TB.var(objVar), TB.var(fieldVar)), dep),
+        				      TB.equals(TB.select(services, Sort.ANY, TB.var(heapVar1), TB.var(objVar), TB.var(fieldVar)),
+        				                TB.select(services, Sort.ANY, TB.var(heapVar2), TB.var(objVar), TB.var(fieldVar))))),
         			TB.equals(TB.tf().createTerm(obs, new Term[]{TB.var(heapVar1), TB.var(selfVar)}),
         				  TB.tf().createTerm(obs, new Term[]{TB.var(heapVar2), TB.var(selfVar)}))));
         		 
@@ -115,8 +115,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
         final ImmutableList<Goal> newGoals = goal.split(1);
         final Goal newGoal = newGoals.head();
         final ConstrainedFormula cf = new ConstrainedFormula(depFormula);
-        final PosInOccurrence pio = new PosInOccurrence(cf, PosInTerm.TOP_LEVEL, true);
-        newGoal.addFormula(cf, pio);
+        newGoal.addFormula(cf, true, false);
         
         return newGoals;
     }

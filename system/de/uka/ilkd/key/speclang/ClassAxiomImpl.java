@@ -58,8 +58,7 @@ public final class ClassAxiomImpl implements ClassAxiom {
 	Map map = new HashMap();
 	map.put(originalSelfVar, selfVar);
 	OpReplacer or = new OpReplacer(map);
-	Term axiom = or.replace(originalAxiom);
-	return TB.forallHeaps(services, axiom);
+	return or.replace(originalAxiom);
     }
     
     

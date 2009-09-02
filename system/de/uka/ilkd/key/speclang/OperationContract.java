@@ -12,6 +12,7 @@ package de.uka.ilkd.key.speclang;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
@@ -43,6 +44,11 @@ public interface OperationContract extends SpecificationElement {
      * contract belongs.
      */
     public ProgramMethod getProgramMethod();
+    
+    /**
+     * Returns the KeYJavaType to which the contract belongs.
+     */
+    public KeYJavaType getKJT();
     
     /**
      * Returns the modality of the contract.
@@ -93,7 +99,8 @@ public interface OperationContract extends SpecificationElement {
      * Returns another contract like this one, except that it refers to the 
      * passed program method. 
      */
-    public OperationContract setProgramMethod(ProgramMethod pm,
+    public OperationContract setProgramMethod(ProgramMethod newPM,
+	    				     KeYJavaType newKJT,
 	    			  	      Services services);
     
     /**

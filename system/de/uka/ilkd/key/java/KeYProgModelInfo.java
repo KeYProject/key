@@ -816,10 +816,4 @@ public class KeYProgModelInfo{
  	return new KeYProgModelInfo(getServConf(), rec2key().copy(), 
  				    typeConverter);
     }
-    
-
 }
-
-
-
-

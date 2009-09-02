@@ -520,6 +520,18 @@ public final class JavaInfo {
         return kpmi.getAllProgramMethodsLocallyDeclared(kjt);
     }
     
+    
+    public ImmutableList<ProgramMethod> getAllProgramMethodsLocallyDeclaredOrAutomaticOverride(KeYJavaType kjt) {        
+        ImmutableList<ProgramMethod> result = getAllProgramMethods(kjt);
+        for(ProgramMethod pm : result) {
+            if((pm.isStatic() || pm.isPrivate()) && !pm.getContainerType().equals(kjt)) {
+        	result = result.removeFirst(pm);
+            }
+        }
+        return result;
+    } 
+    
+    
     public ImmutableList<ProgramMethod> getConstructors(KeYJavaType kjt) {
 	return kpmi.getConstructors(kjt);
     }
@@ -1210,43 +1222,6 @@ public final class JavaInfo {
         
         return length;
     }
-    
-    
-    public ImmutableSet<ProgramMethod> getOverridingMethods(ProgramMethod pm) {
-        final String name   = pm.getMethodDeclaration().getName();
-        final int numParams = pm.getParameterDeclarationCount();
-        ImmutableSet<ProgramMethod> result 
-        	= DefaultImmutableSet.<ProgramMethod>nil();
-        
-        final KeYJavaType kjt = pm.getContainerType();
-        assert kjt != null;
-        for(KeYJavaType sub : getAllSubtypes(kjt)) {
-            assert sub != null;
-            
-            final ImmutableList<ProgramMethod> subPms 
-                = getAllProgramMethodsLocallyDeclared(sub);
-            for(ProgramMethod subPm : subPms) {
-                if(subPm.getMethodDeclaration().getName().equals(name) 
-                   && subPm.getParameterDeclarationCount() == numParams) {
-                    boolean paramsEqual = true;
-                    for(int i = 0; i < numParams; i++) {
-                        if(!subPm.getParameterType(i)
-                                 .equals(pm.getParameterType(i))) {
-                            paramsEqual = false;
-                            break;
-                        }
-                    }
-                    
-                    if(paramsEqual) {
-                        result = result.add(subPm);
-                    }
-                }
-            }
-        }
-        
-        return result;
-    }
-    
     
     
     /**

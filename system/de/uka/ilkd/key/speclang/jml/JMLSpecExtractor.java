@@ -288,6 +288,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
 
         //determine purity, add purity contract
         final boolean isPure = JMLInfoExtractor.isPure(pm);
+        final boolean isHelper = JMLInfoExtractor.isHelper(pm);
         if(isPure) {
             TextualJMLSpecCase sc 
                 = new TextualJMLSpecCase(ImmutableSLList.<String>nil(), 
@@ -343,8 +344,8 @@ public final class JMLSpecExtractor implements SpecExtractor {
                 }
             }
             
-            //add invariants (TODO: static invariants)
-            if(!pm.isStatic()) {
+            //add invariants
+            if(!pm.isStatic() && !isHelper) {
         	specCase.addRequires(new PositionedString("<inv>"));
         	if(specCase.getBehavior() != Behavior.EXCEPTIONAL_BEHAVIOR) {
         	    specCase.addEnsures(new PositionedString("<inv>"));

@@ -16,7 +16,6 @@ import java.util.Map;
 
 import de.uka.ilkd.key.collection.*;
 import de.uka.ilkd.key.java.Expression;
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -33,8 +32,9 @@ import de.uka.ilkd.key.java.statement.Try;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.OpReplacer;
+import de.uka.ilkd.key.proof.mgt.AxiomJustification;
+import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.speclang.ClassAxiom;
-import de.uka.ilkd.key.speclang.ClassInvariant;
 import de.uka.ilkd.key.speclang.OperationContract;
 
 
@@ -44,6 +44,9 @@ import de.uka.ilkd.key.speclang.OperationContract;
 public final class ContractPO extends AbstractPO {
     
     private final OperationContract contract;
+    
+    private ImmutableSet<NoPosTacletApp> taclets 
+    	= DefaultImmutableSet.<NoPosTacletApp>nil();
        
     
     //-------------------------------------------------------------------------
@@ -58,34 +61,47 @@ public final class ContractPO extends AbstractPO {
     
     //-------------------------------------------------------------------------
     //internal methods
-    //-------------------------------------------------------------------------    
-
-//    /**
-//     * (helper for buildAssumedInvs())
-//     */
-//    private Term buildImplicitInvariantsForClass(KeYJavaType classKJT) 
-//    		throws ProofInputException {
-//	assert classKJT.getJavaType() instanceof ClassType;
-//	
-//        //"C.<classErroneous> = FALSE"
-//	Term notErroneous
-//	    = TB.equals(TB.dotClassErroneous(services, classKJT.getSort()), 
-//		        TB.FALSE(services));
-//        
-//        //"C.<classInitializationInProgress> = FALSE"
-//        Term notInitInProgress
-//            = TB.equals(TB.dotClassInitializationInProgress(services,  
-//        	                                            classKJT.getSort()), 
-//        	        TB.FALSE(services));
-//        
-//        return TB.and(notErroneous, notInitInProgress);
-//    }
+    //-------------------------------------------------------------------------
+    
+    
+    private Taclet buildAxiomTaclet(ClassAxiom ax, 
+	    			    ProgramVariable selfVar) {
+	final Term axiomTerm = ax.getAxiom(selfVar, services);
+	if(!(axiomTerm.op() instanceof Equality)) {
+	    return null;
+	}
+	final Term lhs = axiomTerm.sub(0);
+	final Term rhs = axiomTerm.sub(1);
+	
+	final SchemaVariable heapSV 
+		= SchemaVariableFactory.createTermSV(new Name("h"), 
+						     heapLDT.targetSort(), 
+						     false, 
+						     false);
+	final Map map = new HashMap();
+	map.put(TB.heap(services), TB.var(heapSV));
+	final OpReplacer or = new OpReplacer(map);
+	final Term schemaLhs = or.replace(lhs);
+	final Term schemaRhs = or.replace(rhs);
+	
+	RewriteTacletBuilder tacletBuilder = new RewriteTacletBuilder();
+	tacletBuilder.setFind(schemaLhs);
+	tacletBuilder.addTacletGoalTemplate
+	    (new RewriteTacletGoalTemplate(Sequent.EMPTY_SEQUENT,
+					   ImmutableSLList.<Taclet>nil(),
+					   schemaRhs));
+	tacletBuilder.setName(new Name(ax.getName()));
+	tacletBuilder.addRuleSet(new RuleSet(new Name("simplify")));
+	
+	return tacletBuilder.getTaclet();
+    }
     
     
     /**
      * Builds the "general assumption". 
      */
     private Term buildFreePre(ProgramVariable selfVar,
+	                      KeYJavaType selfKJT,
                               ImmutableList<ProgramVariable> paramVars) 
     		throws ProofInputException {
 
@@ -100,6 +116,14 @@ public final class ContractPO extends AbstractPO {
            = selfVar == null
              ? TB.tt()
              : TB.created(services, TB.var(selfVar));
+             
+        //"MyClass::exactInstance(self) = TRUE"
+        final Term selfExactType
+           = selfVar == null
+             ? TB.tt()
+             : TB.exactInstance(services, 
+        	                selfKJT.getSort(), 
+        	                TB.var(selfVar));
         
         //conjunction of... 
         //- "p_i.<created> = TRUE | p_i = null" for object parameters, and
@@ -110,16 +134,29 @@ public final class ContractPO extends AbstractPO {
         }
         
         //class axioms
-        ImmutableSet<ClassAxiom> axioms 
-        	= specRepos.getClassAxioms(selfVar.getKeYJavaType());
+        final ImmutableSet<ClassAxiom> axioms 
+        	= specRepos.getClassAxioms(selfKJT);
         Term axiomTerm = TB.tt();
         for(ClassAxiom ax : axioms) {
-            axiomTerm = TB.and(axiomTerm, ax.getAxiom(selfVar, services));
+            Taclet axiomTaclet = buildAxiomTaclet(ax, selfVar);
+            if(axiomTaclet != null) {
+        	taclets = taclets.add(NoPosTacletApp.createNoPosTacletApp(
+        							axiomTaclet));
+        	initConfig.getProofEnv()
+        	          .registerRule(axiomTaclet,
+        	        	        AxiomJustification.INSTANCE);
+            } else {
+        	axiomTerm = TB.and(axiomTerm, 
+        			   TB.forallHeaps(services, 
+        				   	  ax.getAxiom(selfVar, 
+        				   		      services)));
+            }
         }
         
         return TB.and(new Term[]{TB.inReachableState(services), 
         	       		 selfNotNull,
         	       		 selfCreated,
+        	       		 selfExactType,
         	       		 paramsOK,
         	       		 axiomTerm});
     }
@@ -223,7 +260,8 @@ public final class ContractPO extends AbstractPO {
         //prepare variables, program method, heapAtPre
         final ImmutableList<ProgramVariable> paramVars 
         	= TB.paramVars(services, pm, true);
-        final ProgramVariable selfVar = TB.selfVar(services, pm, true);
+        final ProgramVariable selfVar 
+        	= TB.selfVar(services, pm, contract.getKJT(), true);
         final ProgramVariable resultVar = TB.resultVar(services, pm, true);
         final ProgramVariable exceptionVar = TB.excVar(services, pm, true);
      	final LocationVariable heapAtPreVar 
@@ -231,7 +269,9 @@ public final class ContractPO extends AbstractPO {
         final Term heapAtPre = TB.var(heapAtPreVar);
 
         //build precondition
-        final Term pre = TB.and(buildFreePre(selfVar, paramVars), 
+        final Term pre = TB.and(buildFreePre(selfVar, 
+        	                             contract.getKJT(), 
+        	                             paramVars), 
         	                contract.getPre(selfVar, paramVars, services)); 
                 
         //build program term
@@ -255,6 +295,7 @@ public final class ContractPO extends AbstractPO {
         
         //save in field
         poTerms = new Term[]{TB.imp(pre, progPost)};
+        poTaclets = new ImmutableSet[]{taclets};        
     }
     
     

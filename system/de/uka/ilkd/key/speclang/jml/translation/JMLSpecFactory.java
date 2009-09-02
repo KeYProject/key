@@ -155,7 +155,8 @@ public class JMLSpecFactory {
 
         //create variables for self, parameters, result, exception,
         //and the map for atPre-Functions
-        ProgramVariable selfVar = TB.selfVar(services, pm, false);
+        ProgramVariable selfVar 
+        	= TB.selfVar(services, pm, pm.getContainerType(), false);
         ImmutableList<ProgramVariable> paramVars 
         	= TB.paramVars(services, pm, false);
         ProgramVariable resultVar = TB.resultVar(services, pm, false);
@@ -285,6 +286,7 @@ public class JMLSpecFactory {
             OperationContract contract
                 = new OperationContractImpl(name,
                                             pm,
+                                            pm.getContainerType(),
                                             Modality.DIA,
                                             requires,
                                             post,
@@ -299,6 +301,7 @@ public class JMLSpecFactory {
             OperationContract contract
                 = new OperationContractImpl(name,
                                             pm,
+                                            pm.getContainerType(),
                                             Modality.BOX,
                                             requires,
                                             post,
@@ -313,6 +316,7 @@ public class JMLSpecFactory {
             OperationContract contract1
                 = new OperationContractImpl(name,
                                             pm,
+                                            pm.getContainerType(),
                                             Modality.DIA,
                                             TB.and(requires, TB.not(diverges)),
                                             post,
@@ -325,6 +329,7 @@ public class JMLSpecFactory {
             OperationContract contract2
                 = new OperationContractImpl(name,
                                             pm,
+                                            pm.getContainerType(),
                                             Modality.BOX,
                                             requires,
                                             post,
@@ -478,7 +483,8 @@ public class JMLSpecFactory {
         //create variables for self, parameters, other relevant local variables 
         //(disguised as parameters to the translator) and the map for 
         //atPre-Functions
-        ProgramVariable selfVar = TB.selfVar(services, pm, false);
+        ProgramVariable selfVar 
+        	= TB.selfVar(services, pm, pm.getContainerType(), false);
         ImmutableList<ProgramVariable> paramVars 
         	= ImmutableSLList.<ProgramVariable>nil();
         int numParams = pm.getParameterDeclarationCount();

@@ -26,6 +26,7 @@ import de.uka.ilkd.key.java.declaration.InterfaceDeclaration;
 import de.uka.ilkd.key.java.declaration.TypeDeclaration;
 import de.uka.ilkd.key.java.recoderext.ConstructorNormalformBuilder;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
+import de.uka.ilkd.key.util.Pair;
 
 
 class ClassTree extends JTree {
@@ -33,7 +34,7 @@ class ClassTree extends JTree {
     private static final String INIT_NAME 
         =  ConstructorNormalformBuilder.CONSTRUCTOR_NORMALFORM_IDENTIFIER;
     
-    private final Map<ProgramMethod,Icon> methodIcons;
+    private final Map<Pair<ProgramMethod,KeYJavaType>,Icon> methodIcons;
     
     
     //-------------------------------------------------------------------------
@@ -43,7 +44,7 @@ class ClassTree extends JTree {
     public ClassTree(boolean addOperations, 
 	             boolean skipLibraryClasses,
 	    	     Services services,
-	    	     Map<ProgramMethod,Icon> methodIcons) {
+	    	     Map<Pair<ProgramMethod,KeYJavaType>,Icon> methodIcons) {
 	super(new DefaultTreeModel(createTree(addOperations, 
 					      skipLibraryClasses, 
 					      services)));
@@ -62,7 +63,7 @@ class ClassTree extends JTree {
 		Entry entry = (Entry) node.getUserObject();
 		
 		Component result;
-		if(entry.kjt != null) {
+		if(entry.pm == null) {
 		    result =  super.getTreeCellRendererComponent(tree, 
 			    				      	 value, 
 			    				      	 sel, 
@@ -81,7 +82,9 @@ class ClassTree extends JTree {
 		    
 		    if(entry.pm != null && result instanceof JLabel) {
 			((JLabel) result).setIcon(
-				ClassTree.this.methodIcons.get(entry.pm));
+				ClassTree.this.methodIcons.get(
+		          new Pair<ProgramMethod,KeYJavaType>(entry.pm, 
+		        	                              entry.kjt)));
 		    }
 		}
 		
@@ -97,7 +100,7 @@ class ClassTree extends JTree {
 	this(addOperations, 
 	     skipLibraryClasses, 
 	     services, 
-	     new HashMap<ProgramMethod,Icon>());
+	     new HashMap<Pair<ProgramMethod,KeYJavaType>,Icon>());
     }
     
     
@@ -176,7 +179,8 @@ class ClassTree extends JTree {
         if(addOperations) {
             ImmutableList<ProgramMethod> pms 
             	= services.getJavaInfo()
-                          .getAllProgramMethodsLocallyDeclared(kjt);
+            		  .getAllProgramMethodsLocallyDeclaredOrAutomaticOverride(kjt);
+                          //.getAllProgramMethodsLocallyDeclared(kjt);
             Iterator<ProgramMethod> it = pms.iterator();
             while(it.hasNext()) {
                 ProgramMethod pm = it.next();
@@ -195,6 +199,7 @@ class ClassTree extends JTree {
                     Entry te = new Entry(sb.toString());
                     DefaultMutableTreeNode childNode 
                     	= new DefaultMutableTreeNode(te);
+                    te.kjt = kjt;
                     te.pm = pm;
                     node.add(childNode);
                 }

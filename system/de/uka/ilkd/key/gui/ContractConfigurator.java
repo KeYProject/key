@@ -18,6 +18,7 @@ import java.awt.event.*;
 import javax.swing.*;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.speclang.OperationContract;
@@ -37,13 +38,15 @@ public class ContractConfigurator extends JDialog {
     //-------------------------------------------------------------------------
     
     public ContractConfigurator(JDialog owner,
-            Services services, 
-            ProgramMethod pm,
-            Modality modality,
-            boolean allowMultipleContracts) {
+            		        Services services, 
+            		        ProgramMethod pm,
+            		        KeYJavaType kjt,
+            		        Modality modality,
+            		        boolean allowMultipleContracts) {
         super(owner, "Contract Configurator", true);
         init(services, 
              pm, 
+             kjt,
              modality, 
              allowMultipleContracts);
     }
@@ -52,11 +55,13 @@ public class ContractConfigurator extends JDialog {
     public ContractConfigurator(Frame owner,
                                 Services services,
                                 ProgramMethod pm,
+                                KeYJavaType kjt,
                                 Modality modality,
                                 boolean allowMultipleContracts) {
         super(owner, "Contract Configurator", true);
         init(services, 
              pm, 
+             kjt,
              modality, 
              allowMultipleContracts);
     }
@@ -66,6 +71,7 @@ public class ContractConfigurator extends JDialog {
      */
     private void init(Services services, 
                       ProgramMethod pm,
+                      KeYJavaType kjt,
                       Modality modality,
                       boolean allowMultipleContracts) {        
         //create contract panel
@@ -73,7 +79,7 @@ public class ContractConfigurator extends JDialog {
         	= new OperationContractSelectionPanel(services, 
         		"Contracts for " + pm.getName(),
         		allowMultipleContracts);
-        contractPanel.setContracts(pm, modality);
+        contractPanel.setContracts(pm, kjt, modality);
         contractPanel.addMouseListener(new MouseAdapter() {
             public void mouseClicked(MouseEvent e){                
         	if(e.getClickCount() == 2){

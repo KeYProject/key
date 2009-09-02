@@ -32,6 +32,7 @@ import de.uka.ilkd.key.proof.init.*;
 import de.uka.ilkd.key.proof.mgt.ProofStatus;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.speclang.OperationContract;
+import de.uka.ilkd.key.util.Pair;
 
 
 public final class ProofManagementDialog extends JDialog {
@@ -51,7 +52,7 @@ public final class ProofManagementDialog extends JDialog {
     private SpecificationRepository specRepos;
 
     private JTabbedPane tabbedPane;
-    private Map<ProgramMethod,Icon> methodIcons;
+    private Map<Pair<ProgramMethod,KeYJavaType>,Icon> methodIcons;
     private ClassTree classTree;
     private JList proofList;
     private OperationContractSelectionPanel contractPanelByMethod;
@@ -71,7 +72,7 @@ public final class ProofManagementDialog extends JDialog {
 	this.specRepos  = initConfig.getServices().getSpecificationRepository();
 	
 	//create class tree
-	methodIcons = new HashMap<ProgramMethod,Icon>();
+	methodIcons = new HashMap<Pair<ProgramMethod,KeYJavaType>,Icon>();
 	classTree = new ClassTree(true, true, services, methodIcons);
 	classTree.addTreeSelectionListener(new TreeSelectionListener() {
 	    public void valueChanged(TreeSelectionEvent e) {
@@ -81,7 +82,7 @@ public final class ProofManagementDialog extends JDialog {
 		ClassTree.Entry entry 
 			= (ClassTree.Entry) selectedNode.getUserObject();
 		if(entry.pm != null) {
-		    showPOsFor(entry.pm);
+		    showPOsFor(entry.pm, entry.kjt);
 		} else {
 		    clearPOList();
 		}
@@ -312,7 +313,7 @@ public final class ProofManagementDialog extends JDialog {
         	              .getAllProgramMethodsLocallyDeclared(kjt);
         	    for(ProgramMethod pm : pms) {
         		if(!services.getSpecificationRepository()
-        			    .getOperationContracts(pm).isEmpty()) {
+        			    .getOperationContracts(pm, kjt).isEmpty()) {
         		    selectedPM = pm;
         		    break outer;
         		}
@@ -341,8 +342,8 @@ public final class ProofManagementDialog extends JDialog {
     }
     
     
-    private void showPOsFor(ProgramMethod pm) {
-	getActiveContractPanel().setContracts(pm);
+    private void showPOsFor(ProgramMethod pm, KeYJavaType kjt) {
+	getActiveContractPanel().setContracts(pm, kjt);
 	updateStartButton();
     }
     
@@ -467,7 +468,7 @@ public final class ProofManagementDialog extends JDialog {
 	    	= services.getJavaInfo().getAllProgramMethods(kjt);
 	    for(ProgramMethod pm : pms) {
 		ImmutableSet<OperationContract> contracts 
-			= specRepos.getOperationContracts(pm);
+			= specRepos.getOperationContracts(pm, kjt);
 		boolean startedProving = false;
 		boolean allClosed = true;		
 		boolean lemmasLeft = false;
@@ -486,13 +487,14 @@ public final class ProofManagementDialog extends JDialog {
 			}		    
 		    }
 		}
-		methodIcons.put(pm, startedProving
-			            ? (allClosed
-			               ? (lemmasLeft 
-			                  ? keyAlmostClosedIcon 
-			                  : keyClosedIcon)
-			               : keyIcon)
-			             : null);
+		methodIcons.put(new Pair<ProgramMethod,KeYJavaType>(pm, kjt), 
+			        startedProving
+			        ? (allClosed
+			           ? (lemmasLeft 
+			              ? keyAlmostClosedIcon 
+			              : keyClosedIcon)
+			           : keyIcon)
+			        : null);
 	    }
 	}
 	classTree.updateUI();

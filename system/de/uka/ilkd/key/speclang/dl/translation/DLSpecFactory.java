@@ -216,6 +216,7 @@ public final class DLSpecFactory {
 
 	return new OperationContractImpl(name, 
 					 pm, 
+					 pm.getContainerType(),
 					 modality, 
 					 pre,
 					 post, 

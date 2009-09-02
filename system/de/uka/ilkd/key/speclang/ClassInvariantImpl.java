@@ -15,13 +15,9 @@ import java.util.Map;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.NamespaceSet;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ParsableVariable;
-import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.OpReplacer;
 
 
@@ -37,6 +33,7 @@ public final class ClassInvariantImpl implements ClassInvariant {
     private final KeYJavaType kjt;
     private final Term originalInv;
     private final ParsableVariable originalSelfVar;
+    private final boolean isStatic;
     
     
     //-------------------------------------------------------------------------
@@ -65,6 +62,9 @@ public final class ClassInvariantImpl implements ClassInvariant {
 	this.kjt             = kjt;
         this.originalInv     = inv;
         this.originalSelfVar = selfVar;
+        final OpCollector oc = new OpCollector();
+        originalInv.execPostOrder(oc);
+        this.isStatic        = !oc.contains(originalSelfVar);
     }
     
 
@@ -86,51 +86,56 @@ public final class ClassInvariantImpl implements ClassInvariant {
         return result;
     }
     
-    
-    /**
-     * Returns an available name constructed by affixing a counter to the passed 
-     * base name.
-     */
-    private String getNewName(String baseName, Services services) {
-        NamespaceSet namespaces = services.getNamespaces();
-            
-        int i = 0;
-        String result;
-        do {
-            result = baseName + "_" + i++;
-        } while(namespaces.lookup(new Name(result)) != null);
-        
-        return result;
-    }
 
-    
     
     //-------------------------------------------------------------------------
     //public interface
     //------------------------------------------------------------------------- 
     
+    @Override
     public String getName() {
         return name;
     }
     
     
+    @Override
     public String getDisplayName() {
         return displayName;
     }
     
         
+    @Override
     public KeYJavaType getKJT() {
 	return kjt;
-    }    
-        
+    }
     
+    
+    @Override
     public Term getInv(ParsableVariable selfVar, Services services) {
-        final Map<Operator, Operator> replaceMap = getReplaceMap(selfVar, services);
+        final Map<Operator, Operator> replaceMap 
+        	= getReplaceMap(selfVar, services);
         final OpReplacer or = new OpReplacer(replaceMap);
         return or.replace(originalInv);   
     }
     
+ 
+    @Override
+    public boolean isStatic() {
+	return isStatic;
+    }    
     
+    
+    @Override
+    public ClassInvariant setKJT(KeYJavaType newKjt) {
+	return new ClassInvariantImpl(name, 
+                                      displayName,
+                                      newKjt, 
+                                      originalInv,
+                                      originalSelfVar);
+    }
+    
+    
+    @Override
     public String toString() {
         return originalInv.toString();
     }

@@ -17,6 +17,7 @@ import java.util.Map;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.*;
@@ -34,6 +35,7 @@ public final class OperationContractImpl implements OperationContract {
     private final String baseName;
     private final String name;
     private final ProgramMethod pm;
+    private final KeYJavaType kjt;
     private final Modality modality;
     private final Term originalPre;
     private final Term originalPost;
@@ -53,6 +55,7 @@ public final class OperationContractImpl implements OperationContract {
     private OperationContractImpl(String baseName,
 	                          String name,
                                   ProgramMethod pm,
+                                  KeYJavaType kjt,
             		          Modality modality,
             		          Term pre,
             		          Term post,
@@ -64,6 +67,7 @@ public final class OperationContractImpl implements OperationContract {
                                   Term heapAtPre,
                                   int id) {
         assert pm != null;
+        assert kjt != null;
         assert modality != null;
         assert pre != null;
         assert post != null;
@@ -77,8 +81,14 @@ public final class OperationContractImpl implements OperationContract {
         this.baseName               = baseName;
         this.name                   = name != null 
                                       ? name 
-                                      : baseName + " [id: " + id + " / " + pm + "]";
+                                      : baseName + " [id: " + id + " / " + pm 
+                                        + (kjt.equals(pm.getContainerType()) 
+                                           ? "" 
+                                           : " for " 
+                                             + kjt.getJavaType().getName()) 
+                                        + "]";
         this.pm          	    = pm;
+        this.kjt                    = kjt;
         this.modality               = modality;
 	this.originalPre            = pre;
 	this.originalPost           = post;
@@ -108,6 +118,7 @@ public final class OperationContractImpl implements OperationContract {
      */
     public OperationContractImpl(String baseName,
                                  ProgramMethod pm,
+                                 KeYJavaType kjt,
             		         Modality modality,
             		         Term pre,
             		         Term post,
@@ -120,6 +131,7 @@ public final class OperationContractImpl implements OperationContract {
         this(baseName,
              null,
              pm,
+             kjt,
              modality,
              pre,
              post,
@@ -217,6 +229,12 @@ public final class OperationContractImpl implements OperationContract {
     @Override
     public ProgramMethod getProgramMethod() {
         return pm;
+    }
+    
+    
+    @Override
+    public KeYJavaType getKJT() {
+	return kjt;
     }
     
     
@@ -330,6 +348,7 @@ public final class OperationContractImpl implements OperationContract {
         return new OperationContractImpl(null,
         				 newName,
                                          pm,
+                                         kjt,
                                          modality,
                                          pre,
                                          post,
@@ -348,6 +367,7 @@ public final class OperationContractImpl implements OperationContract {
         return new OperationContractImpl(baseName,
         	                         null,
                 			 pm,
+                			 kjt,
                 			 modality,
                 			 originalPre,
                 			 originalPost,
@@ -362,11 +382,13 @@ public final class OperationContractImpl implements OperationContract {
     
     
     @Override
-    public OperationContract setProgramMethod(ProgramMethod pm, 
+    public OperationContract setProgramMethod(ProgramMethod newPM, 
+	                                      KeYJavaType newKJT,
 	    				      Services services) {
         return new OperationContractImpl(baseName,
         				 null,
-                			 pm,
+                			 newPM,
+                			 newKJT,
                 			 modality,
                 			 originalPre,
                 			 originalPost,
@@ -405,6 +427,7 @@ public final class OperationContractImpl implements OperationContract {
         return new OperationContractImpl(baseName,
         	                         name,
 		 			 pm,
+		 			 kjt,
 		 			 modality,
 		 			 TB.and(originalPre, addedPre),
 		 			 originalPost,

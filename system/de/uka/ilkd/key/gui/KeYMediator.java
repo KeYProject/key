@@ -860,7 +860,7 @@ public class KeYMediator {
 	}
 
 	public void proofStructureChanged(ProofTreeEvent e) {
-	    if(autoMode) { //XXX
+	    if(autoMode) {
 		return;
 	    }
 	    Proof p = e.getSource();

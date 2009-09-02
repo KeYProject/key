@@ -7,13 +7,14 @@ class MySubclass extends MyClass {
     
     
     MyClass mc;
-    //@ invariant mc.<inv>;   
+    //@ invariant mc.<inv>;
     
-    /*@ assignable mc.attr;    
+    /*@ assignable mc.attr, x;    
       @ ensures \result == 388;
       @*/
     int useContract() {
 	int i = 360;
+	x++;
 	i = mc.add27(++i);
 	return i;
     }
@@ -27,7 +28,8 @@ class MySubclass extends MyClass {
     //@ represents modelField <- x + y;
     
     
-    /*@ assignable this.*;
+    /*@ requires this != mc;
+      @ assignable x, y;
       @ ensures modelField == \old(modelField) + 2;
       @*/
     void changeModelField() {

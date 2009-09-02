@@ -106,7 +106,7 @@ public final class JavaCardDLStrategy extends AbstractFeatureStrategy {
             assert false;
         }
         
-        final Feature depSpecF = methodSpecFeature(inftyConst());//TODO
+        final Feature depSpecF = depSpecFeature(inftyConst());//TODO
         
         final Feature loopInvF;
         final String loopProp

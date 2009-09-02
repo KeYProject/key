@@ -315,15 +315,19 @@ public final class ProblemInitializer {
     }
 
 
-    private void populateNamespaces(Term term, NamespaceSet namespaces) {
+    private void populateNamespaces(Term term, 
+	    			    NamespaceSet namespaces,
+	    			    Goal rootGoal) {
 	for(int i = 0; i < term.arity(); i++) {
-	    populateNamespaces(term.sub(i), namespaces);
+	    populateNamespaces(term.sub(i), namespaces, rootGoal);
 	}
 	
 	if(term.op() instanceof Function) {
 	    namespaces.functions().add(term.op());
 	} else if(term.op() instanceof ProgramVariable) {
-	    namespaces.programVariables().add(term.op());
+	    if(namespaces.programVariables().lookup(term.op().name()) == null) {
+		rootGoal.addProgramVariable((ProgramVariable)term.op());
+	    }
 	}
     }
     
@@ -333,11 +337,12 @@ public final class ProblemInitializer {
      * and program variables used in its root sequent.
      */
     private void populateNamespaces(Proof proof) {
-	NamespaceSet namespaces = proof.getNamespaces();
+	final NamespaceSet namespaces = proof.getNamespaces();
+	final Goal rootGoal = proof.openGoals().head();
 	Iterator<ConstrainedFormula> it = proof.root().sequent().iterator();
 	while(it.hasNext()) {
 	    ConstrainedFormula cf = it.next();
-	    populateNamespaces(cf.formula(), namespaces);
+	    populateNamespaces(cf.formula(), namespaces, rootGoal);
 	}
     }
     

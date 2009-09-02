@@ -2,6 +2,7 @@ class MyClass {
     int attr;
     int attr2;
     
+    //@ invariant attr2 != 0;
     //@ accessible <inv>: this.*;
     
     /*@ normal_behavior
@@ -13,7 +14,7 @@ class MyClass {
 	return attr;
     }
     
-        
+
     /*@ normal_behavior
       @   requires attr2 != 358;
       @   assignable attr; 
@@ -24,7 +25,7 @@ class MyClass {
       @   assignable \nothing;
       @   signals_only RuntimeException;
       @*/
-    void loop1() {
+    private void loop1() {
 	if(attr2 == 358) {
 	    throw new RuntimeException();
 	}

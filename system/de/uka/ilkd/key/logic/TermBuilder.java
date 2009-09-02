@@ -103,11 +103,12 @@ public final class TermBuilder {
      */
     public LocationVariable selfVar(Services services, 
                                     ProgramMethod pm,
+                                    KeYJavaType kjt,
                                     boolean makeNameUnique) {
         if(pm.isStatic()) {
             return null;
         } else {
-            return selfVar(services, pm.getContainerType(), makeNameUnique);
+            return selfVar(services, kjt, makeNameUnique);
         }
     }
 
@@ -473,6 +474,17 @@ public final class TermBuilder {
 		             new ImmutableArray<Term>(new Term[]{substTerm, origTerm}), 
 		             new ImmutableArray<QuantifiableVariable>(substVar), 
 		             null);
+    }
+    
+    
+    public Term instance(Services services, Sort s, Term t) {
+	return func(s.getInstanceofSymbol(services), t);
+    }
+    
+    
+    public Term exactInstance(Services services, Sort s, Term t) {
+	return equals(func(s.getExactInstanceofSymbol(services), t), 
+		      TRUE(services));
     }
     
     

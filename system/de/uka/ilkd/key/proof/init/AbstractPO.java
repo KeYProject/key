@@ -13,6 +13,7 @@ package de.uka.ilkd.key.proof.init;
 import java.util.Iterator;
 
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.HeapLDT;
@@ -21,6 +22,7 @@ import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
+import de.uka.ilkd.key.rule.NoPosTacletApp;
 
 
 
@@ -44,8 +46,9 @@ public abstract class AbstractPO implements ProofOblInput {
     
     protected Term[] poTerms;
     protected String[] poNames;
+    protected ImmutableSet<NoPosTacletApp>[] poTaclets;    
 
-
+    
     //-------------------------------------------------------------------------
     //constructors
     //-------------------------------------------------------------------------
@@ -167,7 +170,11 @@ public abstract class AbstractPO implements ProofOblInput {
         Proof[] proofs = new Proof[poTerms.length];
         for(int i = 0; i < proofs.length; i++) {
             proofs[i] = createProof(poNames != null ? poNames[i] : name,
-                                    poTerms[i]);            
+                                    poTerms[i]);   
+            if(poTaclets != null) {
+                proofs[i].getGoal(proofs[i].root()).indexOfTaclets()
+                                                   .addTaclets(poTaclets[i]);
+            }            
         }
         
         proofAggregate = ProofAggregate.createProofAggregate(proofs, name);
