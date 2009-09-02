@@ -64,6 +64,9 @@ public class KeYFile implements EnvInput {
 
     // when parsing the key file store the classPaths here
     private ImmutableList<String> classPaths;
+    
+    // when parsing the key file store the boot class path here (or null if none given)
+    private String bootClassPath;
 
     private Includes includes;
 
@@ -241,6 +244,17 @@ public class KeYFile implements EnvInput {
 
         return result;
     }
+    
+    public File readBootClassPath() {
+        if(!javaPathAlreadyParsed)
+            throw new IllegalStateException("Can access this only after 'readJavaPath' has been called");
+        
+        if(bootClassPath == null)
+            return null;
+        
+        String parentDirectory = file.file().getParent();
+        return new File(parentDirectory, bootClassPath);
+    }
 
     public List<File> readClassPath() {
         if(!javaPathAlreadyParsed)
@@ -274,6 +288,7 @@ public class KeYFile implements EnvInput {
 
             problemParser.preferences(); // skip preferences
 
+            bootClassPath = problemParser.bootClassPath();
             classPaths = problemParser.classPaths();
             ImmutableList<String> javaPaths = problemParser.javaSource();
 

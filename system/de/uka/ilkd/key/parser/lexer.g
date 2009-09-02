@@ -111,6 +111,7 @@ tokens {
 	INCLUDE="\\include";
 	INCLUDELDTS="\\includeLDTs";
 	CLASSPATH="\\classpath";
+	BOOTCLASSPATH="\\bootclasspath";
 	NODEFAULTCLASSES="\\noDefaultClasses";
 	JAVASOURCE="\\javaSource";
         NOJAVAMODEL ="\\noJavaModel";

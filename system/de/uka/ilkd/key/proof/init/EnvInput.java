@@ -59,9 +59,16 @@ public interface EnvInput {
     List<File> readClassPath() throws ProofInputException;
 
     /**
+     * gets the boot classpath element, null if none set.
+     */
+    File readBootClassPath();
+    
+    /**
      * Reads the input using the given modification strategy, i.e.,
      * parts of the input do not modify the initial configuration while
      * others do.
      */
     void read(ModStrategy mod) throws ProofInputException;
+
+    
 }
