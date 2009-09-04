@@ -106,12 +106,6 @@ import de.uka.ilkd.key.util.ZipFileCollection;
 public class Recoder2KeY implements JavaReader {
 
     /**
-     * The location where the libraries to be parsed can be found. It will be
-     * used as a resource path relative to the path of the package.
-     */
-    // private static String JAVA_SRC_DIR = "JavaRedux";
-    
-    /**
      * the set of File objects that describes the classpath to be searched
      * for classes.
      * it may contain a null file which indicates that the default classes are 
@@ -487,13 +481,16 @@ public class Recoder2KeY implements JavaReader {
     
     /**
      * This method loads the internal classes - also called the "boot" classes.
+     * 
      * If {@link #bootClassPath} is set to null, it locates java classes that
      * are stored internally within the jar-file or the binary directory. The
-     * JAVALANG.TXT file lists all files to be loaded.
+     * JAVALANG.TXT file lists all files to be loaded. The files are found using
+     * a special {@link JavaReduxFileCollection}.
      * 
      * If, however, {@link #bootClassPath} is assigned a value, this is treated
      * as a directory (not a JAR file at the moment) and all files in this
-     * directory are read in.
+     * directory are read in. This is done using a
+     * {@link DirectoryFileCollection}.
      */
     private void parseInternalClasses(ProgramFactory pf, List<recoder.java.CompilationUnit> rcuList) 
                     throws IOException, ParseException, ParserException {
