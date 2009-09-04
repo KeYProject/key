@@ -43,6 +43,14 @@ public class OpReplacer {
     }
     
     
+    public static Term replace(Term toReplace, Term with, Term in) {
+	Map map = new HashMap();
+	map.put(toReplace, with);
+	OpReplacer or = new OpReplacer(map);
+	return or.replace(in);
+    }
+    
+    
     /**
      * Replaces in an operator.
      */

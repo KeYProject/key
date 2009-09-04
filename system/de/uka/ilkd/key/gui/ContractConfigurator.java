@@ -18,15 +18,12 @@ import java.awt.event.*;
 import javax.swing.*;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.ProgramMethod;
-import de.uka.ilkd.key.speclang.OperationContract;
+import de.uka.ilkd.key.speclang.Contract;
 
 
 public class ContractConfigurator extends JDialog {
     
-    private OperationContractSelectionPanel contractPanel;
+    private ContractSelectionPanel contractPanel;
     private JButton okButton;
     private JButton cancelButton;
     
@@ -39,47 +36,45 @@ public class ContractConfigurator extends JDialog {
     
     public ContractConfigurator(JDialog owner,
             		        Services services, 
-            		        ProgramMethod pm,
-            		        KeYJavaType kjt,
-            		        Modality modality,
+            		        Contract[] contracts,
+            		        String title,
             		        boolean allowMultipleContracts) {
         super(owner, "Contract Configurator", true);
-        init(services, 
-             pm, 
-             kjt,
-             modality, 
+        init(services,
+             contracts,
+             title,
              allowMultipleContracts);
     }
     
     
     public ContractConfigurator(Frame owner,
                                 Services services,
-                                ProgramMethod pm,
-                                KeYJavaType kjt,
-                                Modality modality,
+                                Contract[] contracts,
+                                String title,
                                 boolean allowMultipleContracts) {
         super(owner, "Contract Configurator", true);
-        init(services, 
-             pm, 
-             kjt,
-             modality, 
+        init(services,
+             contracts,
+             title,
              allowMultipleContracts);
     }
+    
+    
+    //-------------------------------------------------------------------------
+    //internal methods
+    //-------------------------------------------------------------------------
     
     /**
      * Helper for constructors.
      */
     private void init(Services services, 
-                      ProgramMethod pm,
-                      KeYJavaType kjt,
-                      Modality modality,
+                      Contract[] contracts,
+                      String title,
                       boolean allowMultipleContracts) {        
         //create contract panel
-        contractPanel 
-        	= new OperationContractSelectionPanel(services, 
-        		"Contracts for " + pm.getName(),
-        		allowMultipleContracts);
-        contractPanel.setContracts(pm, kjt, modality);
+        contractPanel = new ContractSelectionPanel(services, 
+        				           allowMultipleContracts);
+        contractPanel.setContracts(contracts, title);
         contractPanel.addMouseListener(new MouseAdapter() {
             public void mouseClicked(MouseEvent e){                
         	if(e.getClickCount() == 2){
@@ -164,7 +159,7 @@ public class ContractConfigurator extends JDialog {
     /**
      * Returns the selected contract.
      */
-    public OperationContract getContract() {
+    public Contract getContract() {
 	return contractPanel.getContract();
     }
 }

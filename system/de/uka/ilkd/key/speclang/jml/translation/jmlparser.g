@@ -235,8 +235,8 @@ options {
     }
     
     
-    public Term parseRepresents() throws SLTranslationException {
-    	Term result = null;
+    public Pair<ObserverFunction,Term> parseRepresents() throws SLTranslationException {
+    	Pair<ObserverFunction,Term> result = null;
 
 	this.currentlyParsing = true;
 	try {
@@ -250,8 +250,8 @@ options {
     }    
     
     
-    public Pair<Operator,Term> parseAccessible() throws SLTranslationException {
-    	Pair<Operator,Term> result = null;
+    public Pair<ObserverFunction,Term> parseAccessible() throws SLTranslationException {
+    	Pair<ObserverFunction,Term> result = null;
 
 	this.currentlyParsing = true;
 	try {
@@ -687,15 +687,18 @@ signalsclause returns [Term result=null] throws SLTranslationException
 	}
     ;
     
-representsclause returns [Term result=null] throws SLTranslationException
+representsclause returns [Pair<ObserverFunction,Term> result=null] throws SLTranslationException
 {
     SLExpression lhs, rhs;
+    Term resultFormula = null;
 }
 :
     lhs=expression 
     {
-        if(!lhs.isTerm() || lhs.getTerm().sub(0).op() != heapLDT.getHeap()) {
-            raiseError("Represents clause with unexpected lhs: " + lhs);
+        if(!lhs.isTerm() 
+            || !(lhs.getTerm().op() instanceof ObserverFunction)
+            || lhs.getTerm().sub(0).op() != heapLDT.getHeap()) {
+            raiseError("Accessible clause with unexpected lhs: " + lhs);
         }
     } 
     (
@@ -705,18 +708,23 @@ representsclause returns [Term result=null] throws SLTranslationException
                 if(!rhs.isTerm()) {
                     raiseError("Represents clause with unexpected rhs: " + rhs);
                 }
-                result = TB.equals(lhs.getTerm(), rhs.getTerm());
+                resultFormula = TB.equals(lhs.getTerm(), rhs.getTerm());
             }
         ) 
         |
         (
-            SUCH_THAT result=predicate
+            SUCH_THAT resultFormula=predicate
         ) 
     )
+    {
+        result = new Pair<ObserverFunction,Term>(
+                     (ObserverFunction) lhs.getTerm().op(), 
+                     resultFormula);
+    }
     ;
     
     
-accessibleclause returns [Pair<Operator,Term> result=null] throws SLTranslationException
+accessibleclause returns [Pair<ObserverFunction,Term> result=null] throws SLTranslationException
 {
     SLExpression lhs;
     Term rhs;
@@ -724,10 +732,14 @@ accessibleclause returns [Pair<Operator,Term> result=null] throws SLTranslationE
 :
     lhs=expression COLON rhs=storereflist 
     {
-        if(!lhs.isTerm() || lhs.getTerm().sub(0).op() != heapLDT.getHeap()) {
+        if(!lhs.isTerm() 
+            || !(lhs.getTerm().op() instanceof ObserverFunction)
+            || lhs.getTerm().sub(0).op() != heapLDT.getHeap()) {
             raiseError("Accessible clause with unexpected lhs: " + lhs);
         }
-        result = new Pair<Operator,Term>(lhs.getTerm().op(), rhs);
+        result = new Pair<ObserverFunction,Term>(
+                             (ObserverFunction) lhs.getTerm().op(), 
+                             rhs);
     } 
     ;
     

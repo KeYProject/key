@@ -70,7 +70,7 @@ public class JMLSpecFactory {
     
     private String getContractName(ProgramMethod programMethod, 
 	                           Behavior behavior) {
-        return "JML " + behavior.toString() + "contract";
+        return "JML " + behavior.toString() + "operation contract";
     }
     
     
@@ -285,12 +285,13 @@ public class JMLSpecFactory {
         if(diverges.equals(TB.ff())) {
             OperationContract contract
                 = new OperationContractImpl(name,
+                                            pm.getContainerType(),                	
                                             pm,
-                                            pm.getContainerType(),
                                             Modality.DIA,
                                             requires,
                                             post,
                                             assignable,
+                                            TB.allLocs(services),//TODO
                                             selfVar,
                                             paramVars,
                                             resultVar,
@@ -300,12 +301,13 @@ public class JMLSpecFactory {
         } else if(diverges.equals(TB.tt())) {
             OperationContract contract
                 = new OperationContractImpl(name,
+                                            pm.getContainerType(),                	
                                             pm,
-                                            pm.getContainerType(),
                                             Modality.BOX,
                                             requires,
                                             post,
                                             assignable,
+                                            TB.allLocs(services),//TODO
                                             selfVar,
                                             paramVars,
                                             resultVar,
@@ -315,12 +317,13 @@ public class JMLSpecFactory {
         } else {
             OperationContract contract1
                 = new OperationContractImpl(name,
+                                            pm.getContainerType(),                	
                                             pm,
-                                            pm.getContainerType(),
                                             Modality.DIA,
                                             TB.and(requires, TB.not(diverges)),
                                             post,
                                             assignable,
+                                            TB.allLocs(services),//TODO
                                             selfVar,
                                             paramVars,
                                             resultVar,
@@ -328,12 +331,13 @@ public class JMLSpecFactory {
                                             heapAtPre);
             OperationContract contract2
                 = new OperationContractImpl(name,
+                                            pm.getContainerType(),                	
                                             pm,
-                                            pm.getContainerType(),
                                             Modality.BOX,
                                             requires,
                                             post,
                                             assignable,
+                                            TB.allLocs(services),//TODO
                                             selfVar,
                                             paramVars,
                                             resultVar,
@@ -387,7 +391,7 @@ public class JMLSpecFactory {
     }
     
     
-   public ClassAxiom createJMLRepresents(KeYJavaType kjt, 
+    public ClassAxiom createJMLRepresents(KeYJavaType kjt, 
                                          PositionedString originalRep) 
             throws SLTranslationException {
         assert kjt != null;
@@ -397,14 +401,15 @@ public class JMLSpecFactory {
         ProgramVariable selfVar = TB.selfVar(services, kjt, false);
         
         //translate expression
-        Term rep = translator.translateRepresentsExpression(
-        					  originalRep,
-        					  kjt,
-        					  selfVar);        
+        Pair<ObserverFunction,Term> rep 
+        	= translator.translateRepresentsExpression(originalRep,
+        					  	   kjt,
+        					  	   selfVar);        
         //create invariant
         return new ClassAxiomImpl("JML represents clause",
-        	                  kjt,
-        	                  rep,
+        	                  kjt,        	
+        		          rep.first,
+        	                  rep.second,
         	                  selfVar);
     }
    
@@ -416,9 +421,8 @@ public class JMLSpecFactory {
     }
     
     
-   public DependencyContract createJMLDependencyContract(
-	   					 KeYJavaType kjt, 
-                                                 PositionedString originalAcc) 
+    public Contract createJMLDependencyContract(KeYJavaType kjt, 
+                                                PositionedString originalAcc) 
             throws SLTranslationException {
         assert kjt != null;
         assert originalAcc != null;
@@ -427,21 +431,26 @@ public class JMLSpecFactory {
         ProgramVariable selfVar = TB.selfVar(services, kjt, false);
         
         //translate expression
-        Pair<Operator,Term> dep = translator.translateAccessibleExpression(
-        					  originalAcc,
-        					  kjt,
-        					  selfVar);        
-        //create invariant
+        Pair<ObserverFunction,Term> dep 
+        	= translator.translateAccessibleExpression(originalAcc,
+        					  	   kjt,
+        					  	   selfVar);
+        assert dep.first.arity() <= 2;
+        
+        //create dependency contract
+        final ImmutableList<ProgramVariable> paramVars 
+        	= TB.paramVars(services, dep.first, false);        
         return new DependencyContractImpl("JML accessible clause",
         				  kjt,
         	                          dep.first,
         	                          dep.second,
-        	                          selfVar);//TODO!
+        	                          selfVar,
+        	                          paramVars);
     }
    
     
-    public DependencyContract createJMLDependencyContract(KeYJavaType kjt, 
-	    				  		  TextualJMLAccessible textualAcc)
+    public Contract createJMLDependencyContract(KeYJavaType kjt, 
+	   				        TextualJMLAccessible textualAcc)
     	throws SLTranslationException {
 	return createJMLDependencyContract(kjt, textualAcc.getAccessible());
     }    

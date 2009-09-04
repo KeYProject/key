@@ -14,6 +14,7 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.ObserverFunction;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.speclang.PositionedString;
@@ -174,7 +175,7 @@ final class JMLTranslator {
     /**
      * Translates an expression as it occurs in JML represents-clauses.
      */
-    public Term translateRepresentsExpression(
+    public Pair<ObserverFunction,Term> translateRepresentsExpression(
                                     	PositionedString representsExpr,
                                         KeYJavaType specInClass,
                                         ProgramVariable selfVar)
@@ -191,7 +192,7 @@ final class JMLTranslator {
         
 //      System.out.println("JMLTranslator.translateRepresentsExpression("+representsExpr+") results: ");
 
-        Term result = parser.parseRepresents();
+        Pair<ObserverFunction,Term> result = parser.parseRepresents();
         
 //      System.out.println(result);
 //      System.out.println();
@@ -203,7 +204,7 @@ final class JMLTranslator {
    /**
      * Translates an expression as it occurs in our custom class-level accessible clauses.
      */
-    public Pair<Operator,Term> translateAccessibleExpression(
+    public Pair<ObserverFunction,Term> translateAccessibleExpression(
                                     	PositionedString representsExpr,
                                         KeYJavaType specInClass,
                                         ProgramVariable selfVar)
@@ -220,7 +221,7 @@ final class JMLTranslator {
         
 //      System.out.println("JMLTranslator.translateAccessibleExpression("+representsExpr+") results: ");
 
-        Pair<Operator,Term> result = parser.parseAccessible();
+        Pair<ObserverFunction,Term> result = parser.parseAccessible();
         
 //      System.out.println(result);
 //      System.out.println();

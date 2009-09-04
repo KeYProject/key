@@ -73,6 +73,20 @@ public class ImmutableArray<S> implements java.lang.Iterable<S>, java.io.Seriali
 	}
 	return false;
     }
+    
+    /**
+     * Convert the array to a Java array (O(n))
+     */
+    public <S> S[] toArray(S[] array) {
+	S[] result;
+	if (array.length < size()) {
+	    result = (S[]) Array.newInstance(array.getClass().getComponentType(), size());
+	} else {
+	    result = array;
+	}
+	System.arraycopy(content, 0, result, 0, size());
+	return result;
+    }    
 
     public int hashCode() {
 	if (hashCode == -1) {

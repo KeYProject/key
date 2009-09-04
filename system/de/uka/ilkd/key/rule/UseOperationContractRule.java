@@ -178,13 +178,13 @@ public final class UseOperationContractRule implements BuiltInRule {
                                                           Modality modality) {
         ImmutableSet<OperationContract> result 
                 = services.getSpecificationRepository()
-                          .getOperationContracts(pm, kjt, modality);
+                          .getOperationContracts(kjt, pm, modality);
         
         //in box modalities, diamond contracts may be applied as well
         if(modality == Modality.BOX) {
             result = result.union(services.getSpecificationRepository()
-                                          .getOperationContracts(pm, 
-                                        	  		 kjt,
+                                          .getOperationContracts(kjt, 
+                                        	  		 pm,
                                         	  		 Modality.DIA));
         }
 
@@ -200,24 +200,23 @@ public final class UseOperationContractRule implements BuiltInRule {
                                                 ProgramMethod pm,
                                                 KeYJavaType kjt,
                                                 Modality modality) {
-        if(Main.getInstance().mediator().autoMode()) {
-            ImmutableSet<OperationContract> contracts
+	final ImmutableSet<OperationContract> contracts
                 = getApplicableContracts(services, pm, kjt, modality);
-            if(contracts.isEmpty()) {
-                return null;
-            }
+	assert !contracts.isEmpty();
+        if(Main.getInstance().mediator().autoMode()) {
             return services.getSpecificationRepository()
-                           .combineContracts(contracts);
+                           .combineOperationContracts(contracts);
         } else {
+            OperationContract[] contractsArr 
+            	= contracts.toArray(new OperationContract[contracts.size()]);
             ContractConfigurator cc 
                     = new ContractConfigurator(Main.getInstance(),
                                                services,
-                                               pm,
-                                               kjt,
-                                               modality,
+                                               contractsArr,
+                                               "Contracts for " + pm.getName(),
                                                true);
             if(cc.wasSuccessful()) {
-                return cc.getContract();
+                return (OperationContract) cc.getContract();
             } else {
                 return null;
             }
@@ -360,7 +359,7 @@ public final class UseOperationContractRule implements BuiltInRule {
         
         //applying a contract here must not create circular dependencies 
         //between proofs
-        if(!goal.proof().mgt().contractApplicableFor(pm, goal)) {
+        if(!goal.proof().mgt().contractApplicableFor(staticType, pm, goal)) {
             return false;
         }
 
@@ -407,7 +406,7 @@ public final class UseOperationContractRule implements BuiltInRule {
         	return null;
             }
         }
-        assert contract.getProgramMethod().equals(pm);
+        assert contract.getTarget().equals(pm);
 
         //create variables for self, parameters, result, exception, 
         //and atPre-heap
@@ -449,7 +448,7 @@ public final class UseOperationContractRule implements BuiltInRule {
                                            excVar, 
                                            heapAtPre,
                                            services);
-        final Term mod = contract.getModifies(selfVar, paramVars, services);
+        final Term mod = contract.getMod(selfVar, paramVars, services);
         
         //split goal into three/four branches
         final ImmutableList<Goal> result;

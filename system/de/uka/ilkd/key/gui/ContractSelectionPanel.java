@@ -26,17 +26,14 @@ import javax.swing.event.ListSelectionListener;
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.ProgramMethod;
-import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
+import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.OperationContract;
 
 
 /**
- * A panel for selecting operation contracts.
+ * A panel for selecting contracts.
  */
-class OperationContractSelectionPanel extends JPanel {
+class ContractSelectionPanel extends JPanel {
     
     private final Services services;
     private final JList contractList;
@@ -50,15 +47,14 @@ class OperationContractSelectionPanel extends JPanel {
     /**
      * Creates a contract selection panel containing the specified contracts.
      */
-    public OperationContractSelectionPanel(Services services,
-                                           String title,
-                                           boolean multipleSelection) {
+    public ContractSelectionPanel(Services services, 
+	                          boolean multipleSelection) {
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         this.services = services;
         
         //create scroll pane
         JScrollPane scrollPane = new JScrollPane();
-        border = new TitledBorder(title);
+        border = new TitledBorder("Contracts");
         scrollPane.setBorder(border);
         Dimension scrollPaneDim = new Dimension(700, 500);
         scrollPane.setPreferredSize(scrollPaneDim);
@@ -88,7 +84,7 @@ class OperationContractSelectionPanel extends JPanel {
                                 		    int index,
                                 		    boolean isSelected,
                                 		    boolean cellHasFocus) {
-		OperationContract contract = (OperationContract) value;
+		Contract contract = (Contract) value;
 		Component supComp 
 		    	= super.getListCellRendererComponent(list, 
 		    					     value, 
@@ -128,30 +124,6 @@ class OperationContractSelectionPanel extends JPanel {
     //internal methods
     //-------------------------------------------------------------------------
     
-    private ImmutableSet<OperationContract> collectContracts(
-	    					ProgramMethod pm, 
-	    					KeYJavaType kjt,
-                                                Modality modality) {
-        SpecificationRepository specRepos 
-                = services.getSpecificationRepository();
-        ImmutableSet<OperationContract> result;
-        if(modality != null) {
-            result = specRepos.getOperationContracts(pm, kjt, modality);
-            
-            //in box modalities, diamond contracts may be applied as well
-            if(modality == Modality.BOX) {
-                result = result.union(services.getSpecificationRepository()
-                                              .getOperationContracts(
-                                        	      pm, 
-                                        	      kjt, 
-                                        	      Modality.DIA));
-            }
-        } else {
-            result = specRepos.getOperationContracts(pm, kjt);
-        }
-        return result;
-    }
-    
     
     
     //-------------------------------------------------------------------------
@@ -168,50 +140,42 @@ class OperationContractSelectionPanel extends JPanel {
     }
     
     
-    public void setContracts(ImmutableSet<OperationContract> contracts,
-	                     String title) {
+    public void setContracts(Contract[] contracts, String title) {
         //sort contracts by id (for the user's convenience)
-        OperationContract[] contractsArray 
-        	= contracts.toArray(new OperationContract[contracts.size()]);
-        Arrays.sort(contractsArray, new Comparator<OperationContract> () {
-            public int compare(OperationContract c1, OperationContract c2) {
+        Arrays.sort(contracts, new Comparator<Contract> () {
+            public int compare(Contract c1, Contract c2) {
                 return c1.id() - c2.id();
             }
         });
         
-        contractList.setListData(contractsArray);
+        contractList.setListData(contracts);
         contractList.setSelectedIndex(0);
-        border.setTitle(title);
+        if(title != null) {
+            border.setTitle(title);
+        }
         updateUI();
     }
     
     
-    public void setContracts(ProgramMethod pm, 
-	    		     KeYJavaType kjt, 
-	    		     Modality modality) {
-	setContracts(collectContracts(pm, kjt, modality),
-		     "Contracts");
-//		     "Contracts for " + pm + " in " 
-//		      + kjt.getJavaType().getName());
+    public void setContracts(ImmutableSet<Contract> contracts, String title) {
+	setContracts(contracts.toArray(new Contract[contracts.size()]), title);
     }
+     
     
-    
-    
-    public void setContracts(ProgramMethod pm, KeYJavaType kjt) {
-	setContracts(pm, kjt, null);
-    }
-    
-    
-    public OperationContract getContract() {
-        Object[] selection = contractList.getSelectedValues();
-        ImmutableSet<OperationContract> contracts 
+    public Contract getContract() {
+        final Object[] selection = contractList.getSelectedValues();
+        if(selection.length == 0) {
+            return null;
+        } else if(selection.length == 1) {
+            return (Contract) selection[0];
+        } else {
+            ImmutableSet<OperationContract> contracts 
             = DefaultImmutableSet.<OperationContract>nil();
-        for(Object contract : selection) {
-            contracts = contracts.add((OperationContract) contract);
-        }        
-        return contracts.isEmpty() 
-               ? null 
-               : services.getSpecificationRepository()
-                         .combineContracts(contracts);
+            for(Object contract : selection) {
+        	contracts = contracts.add((OperationContract) contract);
+            }        
+            return services.getSpecificationRepository()
+                           .combineOperationContracts(contracts);
+        }
     }
 }

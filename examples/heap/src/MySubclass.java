@@ -1,24 +1,23 @@
 class MySubclass extends MyClass {
     
+    MyClass mc;
+    //@ invariant mc != this && mc.<inv>;
+
+    
+    
     int add27(int i) {
 	return attr = 27 + i;
     }
     
     
-    
-    MyClass mc;
-    //@ invariant mc.<inv>;
-    
-    /*@ assignable mc.attr, x;    
+    /*@ assignable mc.attr;
       @ ensures \result == 388;
       @*/
     int useContract() {
 	int i = 360;
-	x++;
 	i = mc.add27(++i);
 	return i;
     }
-    
     
     
     
@@ -28,8 +27,7 @@ class MySubclass extends MyClass {
     //@ represents modelField <- x + y;
     
     
-    /*@ requires this != mc;
-      @ assignable x, y;
+    /*@ assignable x, y;
       @ ensures modelField == \old(modelField) + 2;
       @*/
     void changeModelField() {

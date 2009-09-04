@@ -52,10 +52,6 @@ public class JavaProfile extends AbstractProfile {
         return set;
     }
 
-    protected UseOperationContractRule getContractRule() {
-        return UseOperationContractRule.INSTANCE;
-    }
-    
     
     protected ImmutableList<BuiltInRule> initBuiltInRules() {       
         ImmutableList<BuiltInRule> builtInRules = super.initBuiltInRules();
@@ -66,7 +62,7 @@ public class JavaProfile extends AbstractProfile {
   
         //contract insertion rule, ATTENTION: ProofMgt relies on the fact 
         // that Contract insertion rule is the FIRST element of this list!
-        builtInRules = builtInRules.prepend(getContractRule());
+        builtInRules = builtInRules.prepend(UseOperationContractRule.INSTANCE);
 
         return builtInRules;
     }
@@ -79,8 +75,10 @@ public class JavaProfile extends AbstractProfile {
      * @return justification for the given rule
      */
     public RuleJustification getJustification(Rule r) {
-        return r == getContractRule() ? new ComplexRuleJustificationBySpec() :
-            super.getJustification(r);
+        return r == UseOperationContractRule.INSTANCE 
+               || r == UseDependencyContractRule.INSTANCE
+               ? new ComplexRuleJustificationBySpec()
+               : super.getJustification(r);
     }
 
 

@@ -113,26 +113,30 @@ public final class TermBuilder {
     }
 
     
-    
     /**
      * Creates program variables for the parameters. Take care to register them
      * in the namespaces!
      */
     public ImmutableList<ProgramVariable> paramVars(Services services, 
-                                                    ProgramMethod pm,
+                                                    ObserverFunction obs,
                                                     boolean makeNamesUnique) {
         ImmutableList<ProgramVariable> result 
-        	= ImmutableSLList.<ProgramVariable>nil();
-        for(int i = 0, n = pm.getParameterDeclarationCount(); i < n; i++) {
-            KeYJavaType parType = pm.getParameterType(i);
-            String name = pm.getParameterDeclarationAt(i)
-                            .getVariableSpecification()
-                            .getName();
+        	= ImmutableSLList.<ProgramVariable>nil(); 
+        for(int i = 0, n = obs.getNumParams(); i < n; i++) {
+            final KeYJavaType paramType = obs.getParamType(i);
+            String name; 
+            if(obs instanceof ProgramMethod) {
+        	name = ((ProgramMethod)obs).getParameterDeclarationAt(i)
+        	                           .getVariableSpecification()
+        	                           .getName();
+            } else {
+        	name = paramType.getSort().name().toString().charAt(0) + "";
+            }
             if(makeNamesUnique) {
         	name = newName(services, name);
             }
-            LocationVariable paramVar
-            	= new LocationVariable(new ProgramElementName(name), parType);
+            final LocationVariable paramVar
+            	= new LocationVariable(new ProgramElementName(name), paramType);
             result = result.append(paramVar);
         }        
         return result;
@@ -892,7 +896,7 @@ public final class TermBuilder {
     
     
     public Term inv(Services services, Term o) {
-	return func(services.getTypeConverter().getHeapLDT().getInv(),
+	return func(services.getJavaInfo().getInv(),
 		    heap(services),
 		    o);
     }

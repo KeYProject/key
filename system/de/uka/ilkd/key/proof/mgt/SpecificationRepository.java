@@ -34,12 +34,14 @@ public final class SpecificationRepository {
     private static final String CONTRACT_COMBINATION_MARKER = "#";
     private static final TermBuilder TB = TermBuilder.DF;
     
-    private final Map<Pair<ProgramMethod,KeYJavaType>, ImmutableSet<OperationContract>> contracts 
-    		= new LinkedHashMap<Pair<ProgramMethod,KeYJavaType>,ImmutableSet<OperationContract>>();
-    private final Map<String,OperationContract> contractsByName
-                = new LinkedHashMap<String,OperationContract>();
-    private final Map<Operator,DependencyContract> depContracts
-    		= new LinkedHashMap<Operator,DependencyContract>();
+    private final Map<Pair<KeYJavaType,ObserverFunction>, ImmutableSet<Contract>> contracts 
+    		= new LinkedHashMap<Pair<KeYJavaType,ObserverFunction>,ImmutableSet<Contract>>();
+    private final Map<Pair<KeYJavaType,ProgramMethod>, ImmutableSet<OperationContract>> operationContracts 
+    		= new LinkedHashMap<Pair<KeYJavaType,ProgramMethod>,ImmutableSet<OperationContract>>();    
+    private final Map<String,Contract> contractsByName
+                = new LinkedHashMap<String,Contract>();
+    private final Map<KeYJavaType,ImmutableSet<ObserverFunction>> contractTargets
+    		= new LinkedHashMap<KeYJavaType,ImmutableSet<ObserverFunction>>();    
     private final Map<KeYJavaType,ImmutableSet<ClassInvariant>> invs
     		= new LinkedHashMap<KeYJavaType, ImmutableSet<ClassInvariant>>();
     private final Map<KeYJavaType,ImmutableSet<ClassAxiom>> axioms
@@ -67,14 +69,13 @@ public final class SpecificationRepository {
     //internal methods
     //-------------------------------------------------------------------------
 
-    public ImmutableSet<Pair<ProgramMethod,KeYJavaType>> 
-    		getOverridingMethods(ProgramMethod pm) {
+    private ImmutableSet<Pair<KeYJavaType,ObserverFunction>> 
+    		getOverridingMethods(KeYJavaType kjt, ProgramMethod pm) {
         final String name   = pm.getMethodDeclaration().getName();
         final int numParams = pm.getParameterDeclarationCount();
-        ImmutableSet<Pair<ProgramMethod,KeYJavaType>> result 
-        	= DefaultImmutableSet.<Pair<ProgramMethod,KeYJavaType>>nil();
+        ImmutableSet<Pair<KeYJavaType,ObserverFunction>> result 
+        	= DefaultImmutableSet.<Pair<KeYJavaType,ObserverFunction>>nil();
         
-        final KeYJavaType kjt = pm.getContainerType();
         assert kjt != null;
         final JavaInfo javaInfo = services.getJavaInfo();
         for(KeYJavaType sub : javaInfo.getAllSubtypes(kjt)) {
@@ -96,7 +97,7 @@ public final class SpecificationRepository {
                     
                     if(paramsEqual) {
                         result = result.add(
-                           new Pair<ProgramMethod,KeYJavaType>(subPm, sub));
+                           new Pair<KeYJavaType,ObserverFunction>(sub, subPm));
                         break;
                     }
                 }
@@ -105,7 +106,22 @@ public final class SpecificationRepository {
         
         return result;
     }
-        
+    
+    
+    private ImmutableSet<Pair<KeYJavaType,ObserverFunction>> 
+    		getOverridingTargets(KeYJavaType kjt, ObserverFunction target) {
+	if(target instanceof ProgramMethod) {
+	    return getOverridingMethods(kjt, (ProgramMethod)target);
+	} else {
+	    ImmutableSet<Pair<KeYJavaType,ObserverFunction>> result 
+        	= DefaultImmutableSet.<Pair<KeYJavaType,ObserverFunction>>nil();
+	    for(KeYJavaType sub : services.getJavaInfo().getAllSubtypes(kjt)) {
+		result = result.add(
+			new Pair<KeYJavaType,ObserverFunction>(sub, target));
+	    }
+	    return result;
+	}
+    }
     
     
     /**
@@ -119,34 +135,51 @@ public final class SpecificationRepository {
     }    
     
     
+    
     //-------------------------------------------------------------------------
     //public interface
     //------------------------------------------------------------------------- 
     
     /**
-     * Returns all registered (atomic) contracts for the passed operation.
+     * Returns all registered (atomic) contracts for the passed target.
      */
-    public ImmutableSet<OperationContract> getOperationContracts(
-	    					ProgramMethod pm, 
-	    					KeYJavaType kjt) {
-	final Pair<ProgramMethod,KeYJavaType> pair 
-		= new Pair<ProgramMethod,KeYJavaType>(pm,kjt);
-	final ImmutableSet<OperationContract> result = contracts.get(pair);
+    public ImmutableSet<Contract> getContracts(KeYJavaType kjt,
+	    				       ObserverFunction target) {
+	final Pair<KeYJavaType,ObserverFunction> pair 
+		= new Pair<KeYJavaType,ObserverFunction>(kjt, target);
+	final ImmutableSet<Contract> result = contracts.get(pair);
         return result == null 
-               ? DefaultImmutableSet.<OperationContract>nil() 
+               ? DefaultImmutableSet.<Contract>nil() 
                : result;
     }
     
     
     /**
-     * Returns all registered (atomic) contracts for the passed operation which 
-     * refer to the passed modality.
+     * Returns all registered (atomic) operation contracts for the passed 
+     * operation.
      */
     public ImmutableSet<OperationContract> getOperationContracts(
-	    					ProgramMethod pm,
-	    					KeYJavaType kjt,
-	    					Modality modality) {
-	ImmutableSet<OperationContract> result = getOperationContracts(pm, kjt);
+	    						KeYJavaType kjt, 
+	    						ProgramMethod pm) {
+	final Pair<KeYJavaType,ProgramMethod> pair 
+		= new Pair<KeYJavaType,ProgramMethod>(kjt, pm);
+	final ImmutableSet<OperationContract> result 
+		= operationContracts.get(pair);
+        return result == null 
+               ? DefaultImmutableSet.<OperationContract>nil() 
+               : result;	
+    }
+    
+    
+    /**
+     * Returns all registered (atomic) operation contracts for the passed 
+     * operation which refer to the passed modality.
+     */
+    public ImmutableSet<OperationContract> getOperationContracts(
+	    				       KeYJavaType kjt,	    
+	    				       ProgramMethod pm,
+	    				       Modality modality) {
+	ImmutableSet<OperationContract> result = getOperationContracts(kjt, pm);
 	for(OperationContract contract : result) {
 	    if(!contract.getModality().equals(modality)) {
 		result = result.remove(contract);
@@ -160,23 +193,28 @@ public final class SpecificationRepository {
      * Returns the registered (atomic or combined) contract corresponding to the 
      * passed name, or null.
      */
-    public OperationContract getOperationContractByName(String name) {
+    public Contract getContractByName(String name) {
         if(name == null || name.length() == 0) {
             return null;
         }
         
-        String[] baseNames = name.split(CONTRACT_COMBINATION_MARKER);        
+        String[] baseNames = name.split(CONTRACT_COMBINATION_MARKER);
+        if(baseNames.length == 1) {
+            return contractsByName.get(baseNames[0]);
+        }
+        
         ImmutableSet<OperationContract> baseContracts 
             = DefaultImmutableSet.<OperationContract>nil();
         for(String baseName : baseNames) {
-            OperationContract baseContract = contractsByName.get(baseName);
+            OperationContract baseContract 
+            	= (OperationContract) contractsByName.get(baseName);
             if(baseContract == null) {
                 return null;
             }
             baseContracts = baseContracts.add(baseContract);
         }
         
-        return combineContracts(baseContracts);
+        return combineOperationContracts(baseContracts);
     }
     
     
@@ -184,15 +222,13 @@ public final class SpecificationRepository {
      * Returns a set encompassing the passed contract and all its versions 
      * inherited to overriding methods.
      */
-    public ImmutableSet<OperationContract> getInheritedContracts(
-	    					OperationContract contract) {
-	ImmutableSet<OperationContract> result 
-		= DefaultImmutableSet.<OperationContract>nil().add(contract);
-        final ImmutableSet<Pair<ProgramMethod,KeYJavaType>> subs 
-        	= getOverridingMethods(contract.getProgramMethod());
-        for(Pair<ProgramMethod,KeYJavaType> sub : subs) {
-            for(OperationContract subContract
-        	     : getOperationContracts(sub.first, sub.second)) {
+    public ImmutableSet<Contract> getInheritedContracts(Contract contract) {
+	ImmutableSet<Contract> result 
+		= DefaultImmutableSet.<Contract>nil().add(contract);
+        final ImmutableSet<Pair<KeYJavaType,ObserverFunction>> subs 
+        	= getOverridingTargets(contract.getKJT(), contract.getTarget());
+        for(Pair<KeYJavaType,ObserverFunction> sub : subs) {
+            for(Contract subContract : getContracts(sub.first, sub.second)) {
         	if(subContract.id() == contract.id()) {
         	    result = result.add(subContract);
         	    break;
@@ -207,36 +243,44 @@ public final class SpecificationRepository {
      * Returns a set encompassing the passed contracts and all its versions 
      * inherited to overriding methods.
      */    
-    public ImmutableSet<OperationContract> getInheritedContracts(
-	    			ImmutableSet<OperationContract> contractSet) {
-	ImmutableSet<OperationContract> result 
-		= DefaultImmutableSet.<OperationContract>nil();
-        for(OperationContract c : contractSet) {
+    public ImmutableSet<Contract> getInheritedContracts(
+	    			ImmutableSet<Contract> contractSet) {
+	ImmutableSet<Contract> result = DefaultImmutableSet.<Contract>nil();
+        for(Contract c : contractSet) {
             result = result.union(getInheritedContracts(c));
         }
         return result;
     }
+    
+    
+    /**
+     * Returns all functions for which contracts are registered in the passed
+     * type.
+     */
+    public ImmutableSet<ObserverFunction> getContractTargets(KeYJavaType kjt) {
+	final ImmutableSet<ObserverFunction> result = contractTargets.get(kjt);
+        return result == null 
+               ? DefaultImmutableSet.<ObserverFunction>nil() 
+               : result;
+    }
         
     
     /**
-     * Registers the passed (atomic) operation contract, and inherits it to all
+     * Registers the passed (atomic) contract, and inherits it to all
      * overriding methods.
      */
-    public void addOperationContract(OperationContract contract) {
+    public void addContract(Contract contract) {
 	//set id
 	contract = contract.setID(contractCounter++);
 
 	//register and inherit
-        final ImmutableSet<Pair<ProgramMethod,KeYJavaType>> impls 
-        	= getOverridingMethods(contract.getProgramMethod())
-        	  .add(new Pair<ProgramMethod,KeYJavaType>(
-        		        contract.getProgramMethod(), 
-        		        contract.getKJT()));
+        final ImmutableSet<Pair<KeYJavaType,ObserverFunction>> impls 
+        	= getOverridingTargets(contract.getKJT(), contract.getTarget())
+        	  .add(new Pair<KeYJavaType,ObserverFunction>(contract.getKJT(),
+        		        		              contract.getTarget()));
         
-        for(Pair<ProgramMethod,KeYJavaType> impl : impls) {
-            contract = contract.setProgramMethod(impl.first, 
-        	                                 impl.second, 
-        	                                 services);
+        for(Pair<KeYJavaType,ObserverFunction> impl : impls) {
+            contract = contract.setTarget(impl.first, impl.second, services);
             assert contractsByName.get(contract.getName()) == null
                    : "Tried to add a contract with a non-unique name!";
             assert !contract.getName().contains(CONTRACT_COMBINATION_MARKER)
@@ -244,11 +288,19 @@ public final class SpecificationRepository {
                      + " reserved character " 
                      + CONTRACT_COMBINATION_MARKER 
                      + "!";
-            assert contract.id() != OperationContract.INVALID_ID
+            assert contract.id() != Contract.INVALID_ID
                    : "Tried to add a contract with an invalid id!";
-            contracts.put(impl, getOperationContracts(impl.first, impl.second)
-        	                                 .add(contract));
+            contracts.put(impl, 
+        	          getContracts(impl.first, impl.second).add(contract));
+            if(contract instanceof OperationContract) {
+        	operationContracts.put(new Pair<KeYJavaType,ProgramMethod>(impl.first, (ProgramMethod)impl.second), 
+        		               getOperationContracts(impl.first, 
+        		        	                     (ProgramMethod)impl.second)
+        		        	              .add((OperationContract)contract));
+            }
             contractsByName.put(contract.getName(), contract);
+            contractTargets.put(impl.first, 
+                                getContractTargets(impl.first).add(impl.second));
         }
     }
     
@@ -256,20 +308,21 @@ public final class SpecificationRepository {
     /**
      * Registers the passed contracts.
      */
-    public void addOperationContracts(ImmutableSet<OperationContract> toAdd) {
-        for(OperationContract contract : toAdd) {
-            addOperationContract(contract);
+    public void addContracts(ImmutableSet<Contract> toAdd) {
+        for(Contract contract : toAdd) {
+            addContract(contract);
         }
     }
     
+        
     
     /**
      * Creates a combined contract out of the passed atomic contracts.
      */
-    public OperationContract combineContracts(
+    public OperationContract combineOperationContracts(
                                     ImmutableSet<OperationContract> toCombine) {
         assert toCombine != null && toCombine.size() > 0;
-        for(OperationContract contract : toCombine) {            
+        for(Contract contract : toCombine) {            
             assert !contract.getName().contains(CONTRACT_COMBINATION_MARKER)
                    : "Please combine only atomic contracts!";
         }
@@ -309,32 +362,20 @@ public final class SpecificationRepository {
     /**
      * Splits the passed contract into its atomic components. 
      */
-    public ImmutableSet<OperationContract> splitContract(
-	    					OperationContract contract) {
-        ImmutableSet<OperationContract> result 
-        	= DefaultImmutableSet.<OperationContract>nil();
+    public ImmutableSet<Contract> splitContract(Contract contract) {
+        ImmutableSet<Contract> result 
+        	= DefaultImmutableSet.<Contract>nil();
         String[] atomicNames 
             = contract.getName().split(CONTRACT_COMBINATION_MARKER);
         for(String atomicName : atomicNames) {
-            OperationContract atomicContract = contractsByName.get(atomicName);
+            Contract atomicContract = contractsByName.get(atomicName);
             if(atomicContract == null) {
                 return null;
             }
-            assert atomicContract.getProgramMethod()
-                                 .equals(contract.getProgramMethod());
+            assert atomicContract.getTarget().equals(contract.getTarget());
             result = result.add(atomicContract);
         }
         return result;
-    }
-    
-    
-    public DependencyContract getDependencyContract(Operator obs) {
-	return depContracts.get(obs);
-    }
-    
-    
-    public void addDependencyContract(DependencyContract depContract) {
-	depContracts.put(depContract.getObserver(), depContract);
     }
     
         
@@ -366,6 +407,7 @@ public final class SpecificationRepository {
         }
     }
     
+    
     /**
      * Returns all class axioms registered for the passed class, including
      * the one defined by the class invariants registered for the class.
@@ -378,17 +420,19 @@ public final class SpecificationRepository {
 	}
 	
 	//add invariant axiom
-	ImmutableSet<ClassInvariant> myInvs = getClassInvariants(kjt);
-	ProgramVariable selfVar = TB.selfVar(services, kjt, false);
+	final ImmutableSet<ClassInvariant> myInvs = getClassInvariants(kjt);
+	final ProgramVariable selfVar = TB.selfVar(services, kjt, false);
 	Term invDef = TB.tt();
 	for(ClassInvariant inv : myInvs) {
 	    invDef = TB.and(invDef, inv.getInv(selfVar, services));
 	}
 	invDef = TB.equals(TB.inv(services, TB.var(selfVar)), invDef);
-	ClassAxiom invAxiom = new ClassAxiomImpl("Class invariant axiom",
-		                                 kjt,
-		                                 invDef,
-		                                 selfVar);
+	final ObserverFunction invSymbol = services.getJavaInfo().getInv();
+	final  ClassAxiom invAxiom = new ClassAxiomImpl("Class invariant axiom",
+		                                 	kjt,		
+		                                 	invSymbol,
+		                                 	invDef,
+		                                 	selfVar);
 	result = result.add(invAxiom);
 	
 	return result;
@@ -434,20 +478,29 @@ public final class SpecificationRepository {
         return result;
     }
     
-    
+
     /**
-     * Returns all proofs registered for the passed operation.
+     * Returns all proofs registered for the passed target and its overriding
+     * targets.
      */
-    public ImmutableSet<Proof> getProofs(ProgramMethod pm) {
+    public ImmutableSet<Proof> getProofs(KeYJavaType kjt, 
+	    				 ObserverFunction target) {
+	final ImmutableSet<Pair<KeYJavaType,ObserverFunction>> targets 
+		= getOverridingTargets(kjt, target);
         ImmutableSet<Proof> result = DefaultImmutableSet.<Proof>nil();
         for(Map.Entry<ProofOblInput,ImmutableSet<Proof>> entry 
         	: proofs.entrySet()) {
-            ProofOblInput po = entry.getKey();
-            ImmutableSet<Proof> sop = entry.getValue();
-            if(po instanceof ContractPO 
-               && ((ContractPO) po).getContract()
-                                   .getProgramMethod().equals(pm)) {
-                result = result.union(sop);
+            final ProofOblInput po = entry.getKey();
+            final ImmutableSet<Proof> sop = entry.getValue();
+            if(po instanceof ContractPO) {
+               final Contract contract = ((ContractPO) po).getContract();
+               final Pair<KeYJavaType,ObserverFunction> pair 
+               	    = new Pair<KeYJavaType,ObserverFunction>(
+               		    		contract.getKJT(),
+               		                contract.getTarget());
+               if(targets.contains(pair)) {
+        	   result = result.union(sop);
+               }
             }
         }
         return result;
@@ -468,15 +521,15 @@ public final class SpecificationRepository {
     
     
     /**
-     * Returns the operation that the passed proof is about, or null.
+     * Returns the target that the passed proof is about, or null.
      */
-    public ProgramMethod getOperationForProof(Proof proof) {
+    public ObserverFunction getTargetOfProof(Proof proof) {
 	for(Map.Entry<ProofOblInput,ImmutableSet<Proof>> entry 
 		: proofs.entrySet()) {
 	    ProofOblInput po = entry.getKey();
             ImmutableSet<Proof> sop = entry.getValue();
             if(sop.contains(proof) && po instanceof ContractPO) {
-                return ((ContractPO)po).getContract().getProgramMethod();
+                return ((ContractPO)po).getContract().getTarget();
             }
         }
         return null;
@@ -531,10 +584,8 @@ public final class SpecificationRepository {
     
     public void addSpecs(ImmutableSet<SpecificationElement> specs) {
 	for(SpecificationElement spec : specs) {
-	    if(spec instanceof OperationContract) {
-		addOperationContract((OperationContract)spec);
-	    } else if(spec instanceof DependencyContract) {
-		addDependencyContract((DependencyContract)spec);
+	    if(spec instanceof Contract) {
+		addContract((Contract)spec);
 	    } else if(spec instanceof ClassInvariant) {
 		addClassInvariant((ClassInvariant)spec);
 	    } else if(spec instanceof ClassAxiom) {

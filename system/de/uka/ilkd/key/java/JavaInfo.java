@@ -117,6 +117,8 @@ public final class JavaInfo {
     
     /** the name of the class used as default execution context */
     static final String DEFAULT_EXECUTION_CONTEXT_CLASS = "<Default>";
+    
+    private ObserverFunction inv;
 
 	
     /**
@@ -555,32 +557,34 @@ public final class JavaInfo {
     }
 
 
-    public Term getProgramMethodTerm(Term prefix, String methodName, 
+    public Term getProgramMethodTerm(Term prefix, 
+	    			     String methodName, 
 				     Term[] args,
 				     String className) {
 	ImmutableList<KeYJavaType> sig = ImmutableSLList.<KeYJavaType>nil();
 	Term[] subs = new Term[args.length+2];
-	subs[0] = prefix;
-	subs[1] = TermBuilder.DF.heap(services);
-	for (int i = 2; i<subs.length; i++) {
+	subs[0] = TermBuilder.DF.heap(services);
+	subs[1] = prefix;
+	for(int i = 2; i < subs.length; i++) {
               Term t = args[i-2];             
-              sig=sig.append(getServices().getTypeConverter()
-			     .getKeYJavaType(t));
+              sig = sig.append(getServices().getTypeConverter()
+        	                            .getKeYJavaType(t));
               subs[i] = t;
 	}
 	className = translateArrayType(className);
 	KeYJavaType clType = getKeYJavaTypeByClassName(className);
 	ProgramMethod pm   = getProgramMethod(clType, methodName, sig, clType);
-	if (pm==null) {
+	if(pm == null) {
 	    throw new IllegalArgumentException("Program method "+methodName
 					       +" in "+className+" not found.");
 	}
-	if (pm.isStatic()) {
-	    Term[] newSubs = new Term[subs.length-1];
-	    System.arraycopy(subs,1,newSubs,0,newSubs.length);
+	if(pm.isStatic()) {
+	    Term[] newSubs = new Term[subs.length - 1];
+	    newSubs[0] = subs[0];
+	    System.arraycopy(subs, 2, newSubs, 1, newSubs.length - 1);
 	    subs=newSubs;
 	}
-	if (pm.getKeYJavaType()==null) {
+	if(pm.getKeYJavaType() == null) {
 	    throw new IllegalArgumentException("Program method "+methodName
 					       +" in "+className+" must have"
 					       +" a non-void type.");
@@ -1221,6 +1225,19 @@ public final class JavaInfo {
         }
         
         return length;
+    }
+    
+    
+    public ObserverFunction getInv() {
+	if(inv == null) {
+	    inv = new ObserverFunction(new Name("java.lang.Object::<inv>"),
+        			       Sort.FORMULA,
+        			       services.getTypeConverter().getHeapLDT().targetSort(),
+        			       getJavaLangObject(),
+        			       false,
+        			       new ImmutableArray<KeYJavaType>());
+	}
+	return inv;
     }
     
     

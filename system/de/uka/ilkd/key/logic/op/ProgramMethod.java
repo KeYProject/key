@@ -36,72 +36,62 @@ import de.uka.ilkd.key.util.ExtList;
  * In case of an instance method the first argument represents the 
  * object on which the method is invoked. 
  */
-public final class ProgramMethod extends AbstractSortedOperator 
+public final class ProgramMethod extends ObserverFunction 
     			  	 implements SourceElement, ProgramElement, 
     			  	            MemberDeclaration, ProgramInLogic {
 
     private final MethodDeclaration method; 
     private final KeYJavaType kjt;
-    private final KeYJavaType contKJT;
     private final PositionInfo pi;
     
     
+
+    //-------------------------------------------------------------------------
+    //constructors
+    //-------------------------------------------------------------------------     
+    
     public ProgramMethod(MethodDeclaration method, 
-			 KeYJavaType contKJT, 
+			 KeYJavaType container, 
 			 KeYJavaType kjt,
                          PositionInfo pi,
                          Sort heapSort) {
         super(new ProgramElementName(method.getProgramElementName().toString(), 
-                		     contKJT.getSort().toString()), 
-              getArgumentSorts(method, contKJT, heapSort), 
+                		     container.getSort().toString()),
               kjt == null ? Sort.ANY : kjt.getSort(),
-              false); 
+              heapSort,
+              container,
+              method.isStatic(),
+              getParamTypes(method)); 
                         
-	this.method  = method;
-	this.contKJT = contKJT;
+	this.method  = method;;
 	this.kjt     = kjt;
         this.pi      = pi;
     }
     
+    
 
-   /**
-    * determines the argument sorts of the symbol to be created 
-    * @param md the MethodDeclaration whose signature is used as blueprint
-    * @param container the KeYJavaType of the type where this method is declared
-    * @return the symbols argument sorts
-    */
-   private static Sort[] getArgumentSorts(MethodDeclaration md, 
-	   			          KeYJavaType container,
-	   			          Sort heapSort) {  
-       final boolean instanceMethod = !md.isStatic() && !(md instanceof Constructor);
-       
-       final int arity = instanceMethod  
-                         ? md.getParameterDeclarationCount() + 2 
-                         : md.getParameterDeclarationCount() + 1;       
-       
-       final Sort[] argSorts = new Sort[arity];
- 
-       int offset;
-       
-       if (instanceMethod) {  
-           argSorts[0] = container.getSort();
-           assert argSorts[0] != null : "Bad KJT: " + container;
-           offset = 1;
-       } else {
-           offset = 0;
-       }
-       
-       argSorts[offset] = heapSort;
-       offset++;
-       
-       for (int i = offset; i<argSorts.length; i++) {
-           argSorts[i] = 
-               md.getParameterDeclarationAt(i-offset).
-               getTypeReference().getKeYJavaType().getSort();
-       }
-       return argSorts;
+    //-------------------------------------------------------------------------
+    //internal methods
+    //-------------------------------------------------------------------------     
+
+
+    private static ImmutableArray<KeYJavaType> getParamTypes(
+	    					MethodDeclaration md) {
+	KeYJavaType[] result 
+		= new KeYJavaType[md.getParameterDeclarationCount()];
+	for(int i = 0; i < result.length; i++) {
+	    result[i] = md.getParameterDeclarationAt(i)
+	                  .getTypeReference()
+	                  .getKeYJavaType();
+	}
+	return new ImmutableArray<KeYJavaType>(result);
     }
-   
+    
+    
+
+    //-------------------------------------------------------------------------
+    //public interface
+    //-------------------------------------------------------------------------     
 
     // convenience methods to access methods of the corresponding MethodDeclaration
     // in a direct way
@@ -220,14 +210,6 @@ public final class ProgramMethod extends AbstractSortedOperator
     }
 
     /**
-     * Test whether the declaration is static.
-     */
-    @Override
-    public boolean isStatic(){
-	return method.isStatic();
-    }
-
-    /**
      * Test whether the declaration is a constructor.
      */
     public boolean isConstructor(){
@@ -268,28 +250,24 @@ public final class ProgramMethod extends AbstractSortedOperator
      * SourceElement.
      */
     @Override
-     public boolean equalsModRenaming(SourceElement se, 
-				      NameAbstractionTable nat) {
-	 if (se == null || !(se instanceof ProgramMethod)) {
-	     return false;
-	 }
+    public boolean equalsModRenaming(SourceElement se, 
+	    NameAbstractionTable nat) {
+	if (se == null || !(se instanceof ProgramMethod)) {
+	    return false;
+	}
 
-	 return method==((ProgramMethod)se).getMethodDeclaration();
-     }
+	return method==((ProgramMethod)se).getMethodDeclaration();
+    }
 
     public KeYJavaType getKeYJavaType() {
 	return kjt;
-    }
-
-    public KeYJavaType getContainerType() {
-	return contKJT;
     }
 
     @Override
     public Expression convertToProgram(Term t, ExtList l) {
 	ProgramElement called;
 	if (isStatic()) {
-	    called = new TypeRef(contKJT);
+	    called = new TypeRef(getContainerType());
 	} else {
 	    called=(ProgramElement)l.get(0);
 	    l.remove(0);

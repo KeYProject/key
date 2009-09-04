@@ -354,7 +354,7 @@ public final class ProblemLoader implements Runnable {
             currPosInTerm = PosInTerm.TOP_LEVEL;
             break;
         case 'c' : //contract
-            currContract = proof.getServices().getSpecificationRepository().getOperationContractByName(s);
+            currContract = (OperationContract) proof.getServices().getSpecificationRepository().getContractByName(s);
             if(currContract == null) {
                 throw new RuntimeException("Error loading proof: contract \"" + s + "\" not found.");
             }

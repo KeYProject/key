@@ -10,8 +10,10 @@
 
 package de.uka.ilkd.key.ldt;
 
+import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
@@ -58,8 +60,7 @@ public final class HeapLDT extends LDT {
     private final Function nullFunc;
     
     //predicates
-    private final Function wellFormed;
-    private final Function inv;    
+    private final Function wellFormed;    
     
     //heap pv
     private final LocationVariable heap;
@@ -94,8 +95,7 @@ public final class HeapLDT extends LDT {
         classErroneous    = addSortDependingFunction(services, "<classErroneous>");
         nullFunc          = addFunction(services, "null");
         wellFormed        = addFunction(services, "wellFormed");
-        inv               = addFunction(services, "java.lang.Object::<inv>");
-        heap	          = (LocationVariable) progVars.lookup(new Name("heap"));        
+        heap	          = (LocationVariable) progVars.lookup(new Name("heap"));    
     }
     
     
@@ -249,14 +249,9 @@ public final class HeapLDT extends LDT {
     }
     
     
-    public Function getInv() {
-	return inv;
-    }
-    
-
     public LocationVariable getHeap() {
 	return heap;
-    }    
+    }
     
     
     public Function getFieldSymbolForPV(LocationVariable fieldPV, 
@@ -282,11 +277,13 @@ public final class HeapLDT extends LDT {
 		result = firstInstance.getInstanceFor(sortDependingOn, services);
 	    } else {
 		if(fieldPV.isModel()) {
-		    result = new Function(name, 
-			                  fieldPV.sort(), 
-			                  new Sort[]{targetSort(), 
-						     fieldPV.getContainerType()
-						            .getSort()});
+		    result = new ObserverFunction(
+			    		name, 
+			                fieldPV.sort(),
+			                targetSort(),
+			                fieldPV.getContainerType(),
+			                fieldPV.isStatic(),
+			                new ImmutableArray<KeYJavaType>());
 		} else {
 		    result = new Function(name, 
 				          fieldSort, 
@@ -299,11 +296,12 @@ public final class HeapLDT extends LDT {
 	}
 	
 	//sanity check
-	if(result.sort() == fieldSort) {
+	if(fieldPV.isModel()) {
+	    assert result instanceof ObserverFunction;
+	} else {
+	    assert !(result instanceof ObserverFunction);
 	    assert result.isUnique()
 	           : "field symbol is not unique: " + result;
-	} else {
-	    assert result.argSort(0) == targetSort();
 	}
                        
         return result;
@@ -371,5 +369,5 @@ public final class HeapLDT extends LDT {
     public final Type getType(Term t) {
 	assert false;
 	return null;
-    }    
+    }
 }

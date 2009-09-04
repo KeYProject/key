@@ -299,7 +299,7 @@ public class KeYFile implements EnvInput {
             
 	    SpecificationRepository specRepos 
 	        = initConfig.getServices().getSpecificationRepository();
-	    specRepos.addOperationContracts(problemParser.getContracts());
+	    specRepos.addContracts(problemParser.getContracts());
 	    specRepos.addClassInvariants(problemParser.getInvariants());
             chooseContract = problemParser.getChooseContract();
             Debug.out("Read KeY file   ", file);

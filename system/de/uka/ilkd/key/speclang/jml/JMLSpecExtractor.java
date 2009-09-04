@@ -261,7 +261,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
         		result = result.add(rep);
         	    } else if(c instanceof TextualJMLAccessible) {
         		TextualJMLAccessible textualAcc = (TextualJMLAccessible) c;
-        		DependencyContract depContract 
+        		Contract depContract 
         			= jsf.createJMLDependencyContract(kjt, textualAcc);
         		result = result.add(depContract);
         	    }

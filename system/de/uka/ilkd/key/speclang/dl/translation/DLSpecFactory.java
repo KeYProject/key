@@ -214,13 +214,14 @@ public final class DLSpecFactory {
 	    }
 	}
 
-	return new OperationContractImpl(name, 
+	return new OperationContractImpl(name,
+					 pm.getContainerType(),		
 					 pm, 
-					 pm.getContainerType(),
 					 modality, 
 					 pre,
 					 post, 
 					 modifies, 
+					 TB.allLocs(services),
 					 selfVar, 
 					 paramVars, 
 					 resultVar, 

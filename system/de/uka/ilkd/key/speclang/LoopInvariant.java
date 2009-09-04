@@ -95,9 +95,9 @@ public interface LoopInvariant extends SpecificationElement {
      * replaced with the passed ones.
      */
     public LoopInvariant setPredicates(ImmutableSet<Term> predicates, 
-            Term selfTerm,
-            Term heapAtPre,
-            Services services);
+            			       Term selfTerm,
+            			       Term heapAtPre,
+            			       Services services);
     
     /**
      * Returns a new loop invariant where the flag for predicate generation

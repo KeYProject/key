@@ -132,7 +132,7 @@ options {
     private ProgramMethod pm = null;
 
     private ImmutableSet<Taclet> taclets = DefaultImmutableSet.<Taclet>nil(); 
-    private ImmutableSet<OperationContract> contracts = DefaultImmutableSet.<OperationContract>nil();
+    private ImmutableSet<Contract> contracts = DefaultImmutableSet.<Contract>nil();
     private ImmutableSet<ClassInvariant> invs = DefaultImmutableSet.<ClassInvariant>nil();
 
     private ParserConfig schemaConfig;
@@ -393,7 +393,7 @@ options {
         return taclets;
     }
 
-    public ImmutableSet<OperationContract> getContracts(){
+    public ImmutableSet<Contract> getContracts(){
         return contracts;
     }
     
@@ -2528,7 +2528,6 @@ classReference returns [String classReference = ""]
 
 staticAttributeOrQueryReference returns [String attrReference = ""]
 :
-        
       //  attrReference=simple_ident_dots 
       id:IDENT
         {

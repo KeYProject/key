@@ -194,6 +194,10 @@ public class MethodCall extends ProgramMetaConstruct {
 	}
 
 	methRef = (MethodReference) pe;
+	if(!methRef.implicit()) {
+	    System.out.println("Modularity warning: Method " 
+		               + methRef.getName() + " has been expanded!");
+	}
 
 	ReferencePrefix refPrefix = methRef.getReferencePrefix();
 	if (refPrefix == null) {
@@ -459,7 +463,4 @@ public class MethodCall extends ProgramMetaConstruct {
         Sort typeSort = ((KeYJavaType) type).getSort(); // was: services.getJavaInfo().getKeYJavaType(type);
         return expSort.extendsTrans(typeSort);
     }
-
-	
-
 }

@@ -106,7 +106,7 @@ public final class JavaCardDLStrategy extends AbstractFeatureStrategy {
             assert false;
         }
         
-        final Feature depSpecF = depSpecFeature(inftyConst());//TODO
+        final Feature depSpecF = depSpecFeature(longConst(10000));
         
         final Feature loopInvF;
         final String loopProp
@@ -157,6 +157,7 @@ public final class JavaCardDLStrategy extends AbstractFeatureStrategy {
     private Feature depSpecFeature(Feature cost) {
 	SetRuleFilter filter = new SetRuleFilter();
 	filter.addRuleToSet(UseDependencyContractRule.INSTANCE);
+	cost = add(BuiltInNonDuplicateAppModPositionFeature.INSTANCE, cost);
         return ConditionalFeature.createConditional(filter, cost);        
     }    
     
