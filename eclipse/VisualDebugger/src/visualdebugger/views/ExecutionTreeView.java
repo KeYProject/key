@@ -1259,7 +1259,7 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
                     return;
                 new DecProcRunner((IMain)vd.getMediator().mainFrame(),
                         vd.getMediator().getProof(), 
-                        vd.getMediator().getUserConstraint().getConstraint()).run();
+                        vd.getMediator().getUserConstraint().getConstraint()).start();
             }
 
         };
