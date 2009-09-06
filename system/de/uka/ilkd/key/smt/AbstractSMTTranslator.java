@@ -1262,7 +1262,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 	    StringBuffer form = this.translateTerm(term.sub(0), quantifiedVars,
 		    services);
 
-	    if (!this.isMultiSorted() || !isSomeIntegerSort(vars.getQuantifiableVariable(0).sort())) {
+	    if (!this.isMultiSorted() || !isSomeIntegerSort(vars.get(0).sort())) {
 		// add the typepredicate
 		// this is not needed, if the variable, that is quantified over is of
 		// some integer type and in Multisort mode
@@ -1287,7 +1287,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 	    StringBuffer form = this.translateTerm(term.sub(0), quantifiedVars,
 		    services);
 
-	    if (!this.isMultiSorted() || !isSomeIntegerSort(vars.getQuantifiableVariable(0).sort())) {
+	    if (!this.isMultiSorted() || !isSomeIntegerSort(vars.get(0).sort())) {
 		// add the typepredicate
 		// a and is needed!!
 		//This is not the case, if the variable, that is quantified ofer is of some
