@@ -19,8 +19,6 @@ package de.uka.ilkd.key.smt;
 
 
 import java.awt.event.ActionEvent;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import de.uka.ilkd.key.gui.*;
 import de.uka.ilkd.key.gui.notification.events.GeneralInformationEvent;
@@ -46,6 +44,8 @@ public class DecProcRunner extends SwingWorker {
     private final Constraint userConstraint;
     private final BuiltInRule simpRule;
 
+    private Object construcResult = null;
+    
     public DecProcRunner(IMain main, Proof proof, Constraint userConstraint) {
 	//instantiate this DecProcRunner with the currently selected standard SMT solver
         this(main, proof, userConstraint, null);
@@ -65,21 +65,11 @@ public class DecProcRunner extends SwingWorker {
         exceptionHandler = main.mediator().getExceptionHandler();
     }
     
-    public void run() {
-        /* Invoking start() on the SwingWorker causes a new Thread
-         * to be created that will call construct(), and then
-         * finished().  Note that finished() is called even if
-         * the worker is interrupted because we catch the
-         * InterruptedException in doWork().
-         */
-        Object res = construct();
-        finished(res);
-    }
 
-    public void finished(Object res) {
+    public void finished() {	
         final KeYMediator mediator = main.mediator();
         mediator.startInterface(true);		
-        String msg = (String) res;
+        String msg = (String) this.construcResult;
         if(!"".equals(msg)) {
             if(Main.batchMode){
                 System.exit(-1);
@@ -89,7 +79,7 @@ public class DecProcRunner extends SwingWorker {
                 exceptionHandler.clear();
             }
         } else {
-            int nrGoalsClosed = mediator.getNrGoalsClosedByAutoMode();
+            int nrGoalsClosed = mediator.getNrGoalsClosedByAutoMode();          
             main.setStatusLine( simpRule.displayName() + ": " + totalGoals + 
                     (totalGoals != 1 ? " goals" : " goal" ) + " processed, " + nrGoalsClosed + 
                     (nrGoalsClosed != 1 ? " goals" : " goal" )+ " could be closed!");
@@ -106,11 +96,11 @@ public class DecProcRunner extends SwingWorker {
     }
     
     public Object construct() {
-        Object res = doWork();
-        return res;
+        this.construcResult = this.doWork();
+        return this.construcResult;
     }
     
-    private Object doWork() {
+    private Object doWork() {	
         String status = "";
         main.mediator().stopInterface(true);
         final KeYMediator mediator = main.mediator();        
