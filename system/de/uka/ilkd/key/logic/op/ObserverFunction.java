@@ -13,7 +13,7 @@ package de.uka.ilkd.key.logic.op;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.sort.Sort;
 
 
@@ -28,16 +28,16 @@ public class ObserverFunction extends Function {
     //constructors
     //-------------------------------------------------------------------------     
 
-    public ObserverFunction(Name name, 
+    public ObserverFunction(String baseName, 
 	            	    Sort sort, 
 	            	    Sort heapSort,
 	            	    KeYJavaType container,
 	            	    boolean isStatic,	            	    
 	            	    ImmutableArray<KeYJavaType> paramTypes) {
-	super(name, sort, getArgSorts(heapSort, 
-				      container, 
-				      isStatic, 
-				      paramTypes));
+	super(new ProgramElementName(baseName, 
+		                     container.getSort().toString()),
+              sort, 
+              getArgSorts(heapSort, container, isStatic, paramTypes));
 	this.container = container;
 	this.isStatic = isStatic;
 	this.paramTypes = paramTypes;

@@ -223,7 +223,8 @@ public final class JMLSpecExtractor implements SpecExtractor {
                 //skip model and ghost elements
                 //(their comments are duplicates of other comments)
                 if((child instanceof FieldDeclaration 
-                       && ((FieldDeclaration) child).isGhost())
+                       && (((FieldDeclaration) child).isGhost()
+                           || ((FieldDeclaration) child).isModel()))
                     || (child instanceof ProgramMethod 
                         && ((ProgramMethod) child).isModel())) {
                     continue;

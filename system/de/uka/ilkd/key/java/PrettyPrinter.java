@@ -926,6 +926,13 @@ public class PrettyPrinter {
         write(x.getValue() ? "true" : "false");
         printFooter(x);
     }
+    
+    public void printEmptySetLiteral(EmptySetLiteral x) throws java.io.IOException {
+        printHeader(x);
+        writeInternalIndentation(x);
+        write("{}");
+        printFooter(x);
+    }    
 
     public void printStringLiteral(StringLiteral x) throws java.io.IOException {
         printHeader(x);

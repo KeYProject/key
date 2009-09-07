@@ -16,7 +16,6 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.proof.mgt.ComplexRuleJustificationBySpec;
@@ -93,11 +92,13 @@ public final class UseDependencyContractRule implements BuiltInRule {
 	    return false;
 	}
 	
+	//top level symbol must be observer
 	final Term term = pio.subTerm();
 	if(!(term.op() instanceof ObserverFunction)) {
 	    return false;
 	}
 	
+	//there must be contracts for the observer
 	final Services services = goal.proof().getServices();	
 	final ObserverFunction target = (ObserverFunction) term.op();
 	final KeYJavaType kjt 
@@ -106,7 +107,17 @@ public final class UseDependencyContractRule implements BuiltInRule {
 	          : services.getJavaInfo().getKeYJavaType(term.sub(1).sort());
         final ImmutableSet<Contract> contracts 
         	= getApplicableContracts(services, kjt, target);
-        return !contracts.isEmpty();
+        if(contracts.isEmpty()) {
+            return false;
+        }
+        
+        //applying a contract here must not create circular dependencies 
+        //between proofs
+        if(!goal.proof().mgt().contractApplicableFor(kjt, target)) {
+            return false;
+        }
+
+        return true;
     }
 
     
@@ -135,32 +146,36 @@ public final class UseDependencyContractRule implements BuiltInRule {
         //create logic variables
         final LogicVariable heapVar
         	= new LogicVariable(new Name("h"), heapLDT.targetSort());
-        final LogicVariable objVar
-        	= new LogicVariable(new Name("o"), 
-        			    services.getJavaInfo().objectSort());
-        final LogicVariable fieldVar 
-        	= new LogicVariable(new Name("f"), heapLDT.getFieldSort());
         
         //get dependency term
         final Term secondHeapTerm = TB.var(heapVar);        
-        final Term dep = OpReplacer.replace(TB.heap(services), 
-        				    secondHeapTerm, 
-        				    contract.getDep(selfTerm, 
-        					            paramTerms, 
-        					            services));
+        final Term dep = contract.getDep(heapTerm, 
+        				 selfTerm, 
+        				 paramTerms, 
+        				 services);
+        
+        //get preconditions
+        final Term pre = contract.getPre(selfTerm, paramTerms, services);
+        final Term pre1 = OpReplacer.replace(TB.heap(services), 
+        				     heapTerm, 
+        				     pre);
+        final Term pre2 = OpReplacer.replace(TB.heap(services), 
+        				     secondHeapTerm, 
+        				     pre);
 
         //create dependency formula        
         final Term[] subs = term.subs().toArray(new Term[term.arity()]);
         subs[0] = secondHeapTerm;
         final Term secondTerm = TB.tf().createTerm(target, subs);
-        
         final Term depFormula 
-                        = TB.all(heapVar, 
-                	     	TB.imp(TB.all(new LogicVariable[]{objVar,fieldVar},
-        			       TB.imp(TB.elementOf(services, TB.pair(services, TB.var(objVar), TB.var(fieldVar)), dep),
-        				      TB.equals(TB.select(services, Sort.ANY, heapTerm, TB.var(objVar), TB.var(fieldVar)),
-        				                TB.select(services, Sort.ANY, secondHeapTerm, TB.var(objVar), TB.var(fieldVar))))),
-        			TB.equals(term, secondTerm)));
+                = TB.all(heapVar, 
+                	 TB.imp(TB.and(new Term[]{pre1,
+                		                  pre2, 
+                		                  TB.unchanged(services, 
+                	          		               heapTerm, 
+                	          		               secondHeapTerm, 
+                	          		               dep)}),
+                	        TB.equals(term, secondTerm)));
         		 
         //change goal
         final ImmutableList<Goal> newGoals = goal.split(1);

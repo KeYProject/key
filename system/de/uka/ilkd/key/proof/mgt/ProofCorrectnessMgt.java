@@ -13,7 +13,6 @@ import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.op.ObserverFunction;
-import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.speclang.Contract;
@@ -25,8 +24,7 @@ public interface ProofCorrectnessMgt {
      * in the passed goal without creating circular dependencies.
      */    
     boolean contractApplicableFor(KeYJavaType kjt, 
-	                          ObserverFunction target, 
-	                          Goal g);
+	                          ObserverFunction target);
 
     ProofStatus getStatus();
 

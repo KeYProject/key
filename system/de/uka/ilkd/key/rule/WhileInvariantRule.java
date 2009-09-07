@@ -39,7 +39,7 @@ public final class WhileInvariantRule implements BuiltInRule {
 
     public static final WhileInvariantRule INSTANCE = new WhileInvariantRule();
 
-    private static final Name NAME = new Name("whileInvariant");
+    private static final Name NAME = new Name("Loop Invariant");
     private static final TermBuilder TB = TermBuilder.DF;
     private static final InvInferenceTools IIT = InvInferenceTools.INSTANCE;
 

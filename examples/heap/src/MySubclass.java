@@ -1,7 +1,9 @@
 class MySubclass extends MyClass {
     
     MyClass mc;
-    //@ invariant mc != this && mc.<inv>;
+    //@ invariant mc.<inv> && \disjoint(this.*, mc.footprint);
+    
+    //@ represents footprint <- this.*, mc.footprint;
 
     
     

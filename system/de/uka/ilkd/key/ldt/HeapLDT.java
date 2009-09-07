@@ -268,7 +268,7 @@ public final class HeapLDT extends LDT {
 	if(result == null) {
 	    int index = name.toString().indexOf("::");
 	    assert index > 0;
-	    Name kind = new Name(name.toString().substring(index + 2));
+	    final Name kind = new Name(name.toString().substring(index + 2));
 	    
 	    SortDependingFunction firstInstance 
 		= SortDependingFunction.getFirstInstance(kind, services);
@@ -278,7 +278,7 @@ public final class HeapLDT extends LDT {
 	    } else {
 		if(fieldPV.isModel()) {
 		    result = new ObserverFunction(
-			    		name, 
+			    		kind.toString(), 
 			                fieldPV.sort(),
 			                targetSort(),
 			                fieldPV.getContainerType(),

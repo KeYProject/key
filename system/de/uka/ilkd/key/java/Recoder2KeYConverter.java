@@ -653,6 +653,11 @@ public class Recoder2KeYConverter {
         return (booleanLit.getValue() ? BooleanLiteral.TRUE
                 : BooleanLiteral.FALSE);
     }
+    
+    
+    public EmptySetLiteral convert(de.uka.ilkd.key.java.recoderext.EmptySetLiteral e) {
+	return EmptySetLiteral.INSTANCE;
+    }    
 
     /** convert a recoder StringLiteral to a KeY StringLiteral */
     public StringLiteral convert(

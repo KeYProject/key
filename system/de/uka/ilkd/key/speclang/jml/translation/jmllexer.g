@@ -105,6 +105,16 @@ UNSIGNEDSHIFTRIGHT : ">>>";
 WORKINGSPACE : "\\working_space";
 XOR : "^";
 
+//XXX
+SET : "\\set";
+EMPTYSET : "\\empty";
+UNION : "\\union";
+INTERSECT : "\\intersect";
+SETMINUS : "\\setMinus";
+DISJOINT : "\\disjoint";
+SUBSET : "\\subset";
+
+
 
 LT_DISPATCH
      :

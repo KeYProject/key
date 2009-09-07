@@ -16,6 +16,7 @@ import java.util.*;
 import recoder.ParserException;
 import recoder.ServiceConfiguration;
 import recoder.abstraction.ClassType;
+import recoder.abstraction.PrimitiveType;
 import recoder.abstraction.Type;
 import recoder.abstraction.Variable;
 import recoder.convenience.Format;
@@ -56,20 +57,7 @@ public class KeYCrossReferenceSourceInfo
 
     private HashMap<String, recoder.java.declaration.VariableSpecification>  names2vars = null;
 
-    /**
-       Strict checking. Does not allow "broken links" during reference
-       resolution.
-     */
-    // never used
-    //public static final int STRICT = 0;
-
-    /**
-       Sloppy checking. Allows "broken links" during reference resolution.
-     */
-    // never used
-    //public static final int SLOPPY = 1;
-
-
+    
     public KeYCrossReferenceSourceInfo(ServiceConfiguration config) {
 	super(config);
     }
@@ -90,6 +78,9 @@ public class KeYCrossReferenceSourceInfo
 	cfg.getChangeHistory().
 	    removeChangeHistoryListener(this);
 	cfg.getChangeHistory().addChangeHistoryListener(this);
+	
+	//XXX
+	name2primitiveType.put("\\set", new PrimitiveType("\\set", this));
     }
 
     /**

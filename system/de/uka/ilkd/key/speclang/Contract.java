@@ -54,15 +54,29 @@ public interface Contract extends SpecificationElement {
      */
     public Term getPre(ProgramVariable selfVar, 
 	    	       ImmutableList<ProgramVariable> paramVars,
+	    	       Services services);
+    
+    /**
+     * Returns the precondition of the contract.
+     */
+    public Term getPre(Term selfTerm, 
+	    	       ImmutableList<Term> paramTerms,
 	    	       Services services);    
     
     /**
      * Returns the dependency set.
      */
-    public Term getDep(Term selfTerm,
+    public Term getDep(ProgramVariable selfVar,
+	               ImmutableList<ProgramVariable> paramVars,
+	               Services services);    
+        
+    /**
+     * Returns the dependency set.
+     */
+    public Term getDep(Term heapTerm,
+	               Term selfTerm,
 	               ImmutableList<Term> paramTerms,
 	               Services services);
-
     
     /**
      * Returns another contract like this one but with the passed id.

@@ -1165,6 +1165,36 @@ public final class TermBuilder {
     }
     
     
+    public Term unchanged(Services services, Term h1, Term h2, Term dep) {
+	Sort objectSort = services.getJavaInfo().objectSort();
+	Sort fieldSort = services.getTypeConverter()
+	                         .getHeapLDT()
+	                         .getFieldSort();
+	
+	Name objVarName   = new Name(newName(services, "o"));
+	Name fieldVarName = new Name(newName(services, "f"));
+	LogicVariable objVar   = new LogicVariable(objVarName, objectSort);
+	LogicVariable fieldVar = new LogicVariable(fieldVarName, fieldSort);
+	Term objVarTerm = var(objVar);
+	Term fieldVarTerm = var(fieldVar);
+	
+	return all(new QuantifiableVariable[]{objVar, fieldVar},
+                   imp(elementOf(services, 
+                	         pair(services, objVarTerm, fieldVarTerm), 
+                	         dep),
+        	                 equals(select(services, 
+        	                	       Sort.ANY, 
+        	                	       h1, 
+        	                	       objVarTerm, 
+        	                	       fieldVarTerm),
+        				select(services, 
+        				       Sort.ANY, 
+        				       h2, 
+        				       objVarTerm, 
+        				       fieldVarTerm))));
+    }
+    
+    
     public Term forallHeaps(Services services, Term t) {
 	final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
 	final LogicVariable heapLV 

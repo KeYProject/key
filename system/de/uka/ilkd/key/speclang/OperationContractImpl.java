@@ -361,7 +361,26 @@ public final class OperationContractImpl implements OperationContract {
 	OpReplacer or = new OpReplacer(replaceMap);
 	return or.replace(originalPre);
     }
-
+    
+    
+    @Override
+    public Term getPre(Term selfTerm, 
+	    	       ImmutableList<Term> paramTerms,
+                       Services services) {
+        assert (selfTerm == null) == (originalSelfVar == null);
+        assert paramTerms != null;
+        assert paramTerms.size() == originalParamVars.size();
+        assert services != null;
+	Map replaceMap = new HashMap();
+	replaceMap.put(TB.var(originalSelfVar), selfTerm);
+	for(ProgramVariable paramVar : originalParamVars) {
+	    replaceMap.put(TB.var(paramVar), paramTerms.head());
+	    paramTerms = paramTerms.tail();
+	}
+	OpReplacer or = new OpReplacer(replaceMap);
+	return or.replace(originalPre);
+    }
+    
   
     @Override
     public Term getPost(ProgramVariable selfVar, 
@@ -428,10 +447,12 @@ public final class OperationContractImpl implements OperationContract {
     
     
     @Override
-    public Term getDep(Term selfTerm,
+    public Term getDep(Term heapTerm,
+	               Term selfTerm,
 	               ImmutableList<Term> paramTerms,
 	               Services services) {
-	assert hasDep();	
+	assert hasDep();
+	assert heapTerm != null;	
         assert (selfTerm == null) == (originalSelfVar == null);
         assert paramTerms != null;
         assert paramTerms.size() == originalParamVars.size();
@@ -440,6 +461,7 @@ public final class OperationContractImpl implements OperationContract {
             return null;
         }        
 	Map replaceMap = new HashMap();
+	replaceMap.put(TB.heap(services), heapTerm);
 	replaceMap.put(TB.var(originalSelfVar), selfTerm);
 	for(ProgramVariable paramVar : originalParamVars) {
 	    replaceMap.put(TB.var(paramVar), paramTerms.head());

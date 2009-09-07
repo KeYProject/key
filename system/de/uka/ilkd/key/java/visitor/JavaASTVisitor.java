@@ -124,7 +124,11 @@ public abstract class JavaASTVisitor extends JavaASTWalker
 
     public void performActionOnBooleanLiteral(BooleanLiteral x) {
 	doDefaultAction(x);
-    } 
+    }
+    
+    public void performActionOnEmptySetLiteral(EmptySetLiteral x) {
+	doDefaultAction(x);
+    }     
 
     public void performActionOnBreak(Break x) {
 	doDefaultAction(x);

@@ -41,7 +41,7 @@ public interface ClassAxiom extends SpecificationElement {
     public Term getAxiom(ProgramVariable selfVar, Services services);
     
     /**
-     * The axiom as a taclet (may be null).
+     * The axiom as a taclet.
      */
     public Taclet getAxiomAsTaclet(ProgramVariable selfVar, Services services);
 }

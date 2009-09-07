@@ -57,6 +57,7 @@ public final class DefaultProofCorrectnessMgt implements ProofCorrectnessMgt {
     
     private boolean atLeastOneClosed(ImmutableSet<Proof> proofs) {
 	for(Proof p : proofs) {
+	    assert p != proof : "uh oh, looks like a cycle";
             p.mgt().updateProofStatus();
             if(p.mgt().getStatus().getProofClosed()) {
                 return true;
@@ -81,18 +82,17 @@ public final class DefaultProofCorrectnessMgt implements ProofCorrectnessMgt {
     
     @Override    
     public boolean contractApplicableFor(KeYJavaType kjt,
-	                                 ObserverFunction target, 
-	                                 Goal g) {
+	                                 ObserverFunction target) {
         //get the target which is being verified in the passed goal
         final ObserverFunction targetUnderVerification 
-            = specRepos.getTargetOfProof(g.proof());
+            = specRepos.getTargetOfProof(proof);
         if(targetUnderVerification == null) {
             return true;
         }
         
         //collect all proofs on which the specification of the 
         //passed target may depend
-        ImmutableSet<Proof> proofs = specRepos.getProofs(kjt, target);        
+        ImmutableSet<Proof> proofs = specRepos.getProofs(kjt, target);    
         ImmutableSet<Proof> newProofs = proofs;
         while(newProofs.size() > 0) {
             final Iterator<Proof> it = newProofs.iterator();

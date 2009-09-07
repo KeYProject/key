@@ -2,8 +2,12 @@ class MyClass {
     int attr;
     int attr2;
     
+    //@ model \set footprint;
+    //@ represents footprint <- this.*;
+    //@ accessible footprint: footprint;
+       
     //@ invariant attr2 != 0;
-    //@ accessible <inv>: this.*;
+    //@ accessible <inv>: footprint;
     
     /*@ normal_behavior
       @   assignable attr;

@@ -69,7 +69,6 @@ public final class OperationContractPO extends AbstractPO
 	                      KeYJavaType selfKJT,
                               ImmutableList<ProgramVariable> paramVars) 
     		throws ProofInputException {
-
         //"self != null"
         final Term selfNotNull 
             = selfVar == null

@@ -82,7 +82,7 @@ public final class SpecificationRepository {
             assert sub != null;
             
             final ImmutableList<ProgramMethod> subPms 
-                = javaInfo.getAllProgramMethodsLocallyDeclaredOrAutomaticOverride(sub);
+                = javaInfo.getAllProgramMethods(sub);
             for(ProgramMethod subPm : subPms) {
                 if(subPm.getMethodDeclaration().getName().equals(name) 
                    && subPm.getParameterDeclarationCount() == numParams) {
@@ -486,7 +486,8 @@ public final class SpecificationRepository {
     public ImmutableSet<Proof> getProofs(KeYJavaType kjt, 
 	    				 ObserverFunction target) {
 	final ImmutableSet<Pair<KeYJavaType,ObserverFunction>> targets 
-		= getOverridingTargets(kjt, target);
+		= getOverridingTargets(kjt, target)
+		  .add(new Pair<KeYJavaType,ObserverFunction>(kjt, target));
         ImmutableSet<Proof> result = DefaultImmutableSet.<Proof>nil();
         for(Map.Entry<ProofOblInput,ImmutableSet<Proof>> entry 
         	: proofs.entrySet()) {

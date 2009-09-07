@@ -148,21 +148,53 @@ public final class DependencyContractImpl implements Contract {
 	return TB.tt();
     }
     
+    
+    @Override
+    public Term getPre(Term selfTerm, 
+	    	       ImmutableList<Term> paramTerms,
+	    	       Services services) {
+	return TB.tt();
+    }    
+    
+    
+    @Override
+    public Term getDep(ProgramVariable selfVar,
+	               ImmutableList<ProgramVariable> paramVars,
+	               Services services) {
+        assert (selfVar == null) == (originalSelfVar == null);
+        assert paramVars != null;
+        assert paramVars.size() == originalParamVars.size();
+        assert services != null;
+	Map map = new HashMap();
+	map.put(originalSelfVar, selfVar);
+	for(ProgramVariable originalParamVar : originalParamVars) {
+	    map.put(originalParamVar, paramVars.head());
+	    paramVars = paramVars.tail();
+	}
+	OpReplacer or = new OpReplacer(map);
+	return or.replace(originalDep);
+    }
+    
 
     @Override
-    public Term getDep(Term selfTerm, 
+    public Term getDep(Term heapTerm,
+	               Term selfTerm, 
 	               ImmutableList<Term> paramTerms, 
 	               Services services) {
-	assert paramTerms.size() == originalParamVars.size();	
+	assert heapTerm != null;
+	assert (selfTerm == null) == (originalSelfVar == null);
+	assert paramTerms != null;
+	assert paramTerms.size() == originalParamVars.size();
+	assert services != null;
 	Map map = new HashMap();
+	map.put(TB.heap(services), heapTerm);
 	map.put(TB.var(originalSelfVar), selfTerm);
-	for(ProgramVariable paramVar : originalParamVars) {
-	    map.put(TB.var(paramVar), paramTerms.head());
+	for(ProgramVariable originalParamVar : originalParamVars) {
+	    map.put(TB.var(originalParamVar), paramTerms.head());
 	    paramTerms = paramTerms.tail();
 	}	
 	OpReplacer or = new OpReplacer(map);
-	Term dependencies = or.replace(originalDep);
-	return dependencies;
+	return or.replace(originalDep);
     }
     
     

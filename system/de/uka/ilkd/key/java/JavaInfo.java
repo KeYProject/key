@@ -395,6 +395,8 @@ public final class JavaInfo {
 		sort = (Sort) sorts.lookup(FloatLDT.NAME);
 	    } else if(type == PrimitiveType.JAVA_DOUBLE) {
 		sort = (Sort) sorts.lookup(DoubleLDT.NAME);
+	    } else if(type == PrimitiveType.JAVA_SET) {
+		sort = services.getTypeConverter().getSetLDT().targetSort();
 	    } else {
 		assert false : "unexpected primitive type: " + type;
 	    	sort = null;
@@ -521,18 +523,6 @@ public final class JavaInfo {
     public ImmutableList<ProgramMethod> getAllProgramMethodsLocallyDeclared(KeYJavaType kjt) {        
         return kpmi.getAllProgramMethodsLocallyDeclared(kjt);
     }
-    
-    
-    public ImmutableList<ProgramMethod> getAllProgramMethodsLocallyDeclaredOrAutomaticOverride(KeYJavaType kjt) {        
-        ImmutableList<ProgramMethod> result = getAllProgramMethods(kjt);
-        for(ProgramMethod pm : result) {
-            if((pm.isStatic() || pm.isPrivate()) && !pm.getContainerType().equals(kjt)) {
-        	result = result.removeFirst(pm);
-            }
-        }
-        return result;
-    } 
-    
     
     public ImmutableList<ProgramMethod> getConstructors(KeYJavaType kjt) {
 	return kpmi.getConstructors(kjt);
@@ -1230,7 +1220,7 @@ public final class JavaInfo {
     
     public ObserverFunction getInv() {
 	if(inv == null) {
-	    inv = new ObserverFunction(new Name("java.lang.Object::<inv>"),
+	    inv = new ObserverFunction("<inv>",
         			       Sort.FORMULA,
         			       services.getTypeConverter().getHeapLDT().targetSort(),
         			       getJavaLangObject(),

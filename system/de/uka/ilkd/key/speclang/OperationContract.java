@@ -58,10 +58,6 @@ public interface OperationContract extends Contract {
 	    	       ImmutableList<ProgramVariable> paramVars,
                        Services services);
     
-    
-    public Term getDep(ProgramVariable selfVar,
-	               ImmutableList<ProgramVariable> paramVars,
-	               Services services);    
 
     /**
      * Returns the union of this contract and those in the passed array. 

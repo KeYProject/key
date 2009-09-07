@@ -318,9 +318,9 @@ public final class JavaCardDLStrategy extends AbstractFeatureStrategy {
 //                       useLoopInvariant ? longConst ( 100 )  
 //                                        : inftyConst () );
             
-        bindRuleSet  ( d, "loop_invariant_proposal", 
-                       ifHeuristics(new String[]{"loop_invariant"}, 
-                                    longConst(0), inftyConst()));
+//        bindRuleSet  ( d, "loop_invariant_proposal", 
+//                       ifHeuristics(new String[]{"loop_invariant"}, 
+//                                    longConst(0), inftyConst()));
             
         // delete cast
         bindRuleSet ( d, "cast_deletion",

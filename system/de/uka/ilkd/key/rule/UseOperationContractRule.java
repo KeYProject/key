@@ -359,7 +359,7 @@ public final class UseOperationContractRule implements BuiltInRule {
         
         //applying a contract here must not create circular dependencies 
         //between proofs
-        if(!goal.proof().mgt().contractApplicableFor(staticType, pm, goal)) {
+        if(!goal.proof().mgt().contractApplicableFor(staticType, pm)) {
             return false;
         }
 

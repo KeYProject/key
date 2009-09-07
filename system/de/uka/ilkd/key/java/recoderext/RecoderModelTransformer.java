@@ -89,6 +89,8 @@ public abstract class RecoderModelTransformer extends TwoPassTransformation {
 		return new FloatLiteral(0.0F);
 	    } else if ("double".equals(type.getName())) {
 		return new DoubleLiteral(0.0D);
+	    } else if("\\set".equals(type.getName())) {
+		return EmptySetLiteral.INSTANCE;
 	    }
 	}
 	Debug.fail("makeImplicitMembersExplicit: unknown primitive type"+type);

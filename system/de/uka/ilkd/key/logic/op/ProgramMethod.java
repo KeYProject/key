@@ -55,8 +55,7 @@ public final class ProgramMethod extends ObserverFunction
 			 KeYJavaType kjt,
                          PositionInfo pi,
                          Sort heapSort) {
-        super(new ProgramElementName(method.getProgramElementName().toString(), 
-                		     container.getSort().toString()),
+        super(method.getProgramElementName().toString(), 
               kjt == null ? Sort.ANY : kjt.getSort(),
               heapSort,
               container,

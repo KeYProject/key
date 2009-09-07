@@ -24,6 +24,8 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
 import de.uka.ilkd.key.java.declaration.InterfaceDeclaration;
 import de.uka.ilkd.key.java.declaration.TypeDeclaration;
+import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.ObserverFunction;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.util.Pair;
@@ -190,17 +192,26 @@ class ClassTree extends JTree {
         		      && o2 instanceof ProgramMethod) {
         		return 1;
         	    } else {
-        		return o1.name()
-        		         .toString()
-        		         .compareTo(o2.name().toString());
+        		String s1 = o1.name() instanceof ProgramElementName 
+        		            ? ((ProgramElementName)o1.name()).getProgramName()
+        		            : o1.name().toString();
+        		String s2 = o2.name() instanceof ProgramElementName 
+        		            ? ((ProgramElementName)o2.name()).getProgramName()
+        		            : o2.name().toString();
+        		return s1.compareTo(s2);
         	    }
         	}
             });
             
             for(ObserverFunction target : targetsArr) {
         	StringBuffer sb = new StringBuffer();
-        	if(target instanceof ProgramMethod) {
-        	    sb.append(((ProgramMethod)target).getName());
+        	String prettyName = services.getTypeConverter()
+        	                            .getHeapLDT()
+        	                            .getPrettyFieldName(target);
+        	if(prettyName != null) {
+        	    sb.append(prettyName);
+        	} else if(target.name() instanceof ProgramElementName) {
+        	    sb.append(((ProgramElementName)target.name()).getProgramName());
         	} else {
         	    sb.append(target.name());
         	}

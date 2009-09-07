@@ -40,6 +40,8 @@ public class PrimitiveType
 	new PrimitiveType("double", new DoubleLiteral(0.0d));
     public static final PrimitiveType JAVA_BOOLEAN = 
 	new PrimitiveType("boolean", BooleanLiteral.FALSE);
+    public static final PrimitiveType JAVA_SET = 
+	new PrimitiveType("\\set", EmptySetLiteral.INSTANCE);
     public static final PrimitiveType PROGRAM_SV   = new PrimitiveType("SV", null);
 
     private ProgramElementName arrayElementName = null;
@@ -55,6 +57,7 @@ public class PrimitiveType
 	typeMap.put("float", JAVA_FLOAT);
 	typeMap.put("double", JAVA_DOUBLE);
 	typeMap.put("boolean", JAVA_BOOLEAN);	
+	typeMap.put("\\set", JAVA_SET);
     }
 
     public static PrimitiveType getPrimitiveType(String name) {

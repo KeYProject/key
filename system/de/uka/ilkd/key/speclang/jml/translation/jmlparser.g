@@ -23,8 +23,7 @@ header {
     import de.uka.ilkd.key.java.declaration.ClassDeclaration;
     import de.uka.ilkd.key.java.expression.literal.BooleanLiteral;
     import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
-    import de.uka.ilkd.key.ldt.IntegerLDT;
-    import de.uka.ilkd.key.ldt.HeapLDT;
+    import de.uka.ilkd.key.ldt.*;
     import de.uka.ilkd.key.logic.*;
     import de.uka.ilkd.key.logic.op.*;
     import de.uka.ilkd.key.logic.sort.*;
@@ -53,6 +52,7 @@ options {
     private Services services;
     private JavaInfo javaInfo;
     private HeapLDT heapLDT;
+    private SetLDT setLDT;
     private SLTranslationExceptionManager excManager;
 
     private static Sort boolSort;
@@ -87,6 +87,7 @@ options {
 	this.services       = services;
 	this.javaInfo       = services.getJavaInfo();
 	this.heapLDT        = services.getTypeConverter().getHeapLDT();
+	this.setLDT         = services.getTypeConverter().getSetLDT();
 	this.excManager     = new SLTranslationExceptionManager(this,
 				    				fileName, 
 				    				offsetPos);
@@ -518,13 +519,14 @@ storerefexpression returns [Term result = null] throws SLTranslationException
     )*
     {
 	if(result == null) {
-	    if(!expr.isTerm()
-	       || heapLDT.getSortOfSelect(expr.getTerm().op()) == null) {
-	        raiseError("Not a valid store-ref expression: " + expr.getTerm());
-	    } else {
-	        Term objTerm = expr.getTerm().sub(1);
-	        Term fieldTerm = expr.getTerm().sub(2);
+	    if(expr.isTerm() && expr.getTerm().sort().equals(setLDT.targetSort())) {
+	    	result = expr.getTerm();
+	    } else if(expr.isTerm() && heapLDT.getSortOfSelect(expr.getTerm().op()) != null) {
+	        final Term objTerm = expr.getTerm().sub(1);
+	        final Term fieldTerm = expr.getTerm().sub(2);
 	    	result = TB.pairSingleton(services, objTerm, fieldTerm);
+	    } else {
+	    	raiseError("Not a valid store-ref expression: " + expr.getTerm());
 	    }
 	}
     }
@@ -563,12 +565,14 @@ storerefnamesuffix[SLExpression receiver] returns [Term result = null] throws SL
 	if (!expr.isTerm()) {
 	    raiseError("Error in store-ref-suffix");
 	}
-	if(heapLDT.getSortOfSelect(expr.getTerm().op()) == null) {
-	    raiseError("Something is wrong.");
-	} else {
+	if(expr.getTerm().sort().equals(setLDT.targetSort())) {
+	    result = expr.getTerm();
+	} else if(heapLDT.getSortOfSelect(expr.getTerm().op()) != null) {
 	    Term objTerm = expr.getTerm().sub(1);
 	    Term fieldTerm = expr.getTerm().sub(2);
 	    result = TB.pairSingleton(services, objTerm, fieldTerm);
+	} else {
+	    raiseError("Something is wrong: " + expr.getTerm());
 	}
     }
     | DOT THIS
@@ -690,7 +694,7 @@ signalsclause returns [Term result=null] throws SLTranslationException
 representsclause returns [Pair<ObserverFunction,Term> result=null] throws SLTranslationException
 {
     SLExpression lhs, rhs;
-    Term resultFormula = null;
+    Term t = null;
 }
 :
     lhs=expression 
@@ -702,24 +706,33 @@ representsclause returns [Pair<ObserverFunction,Term> result=null] throws SLTran
         }
     } 
     (
+        {!lhs.getTerm().sort().equals(setLDT.targetSort())}?    
         (
             (LARROW | "=") rhs=expression
             {
                 if(!rhs.isTerm()) {
                     raiseError("Represents clause with unexpected rhs: " + rhs);
                 }
-                resultFormula = TB.equals(lhs.getTerm(), rhs.getTerm());
+                t = TB.equals(lhs.getTerm(), rhs.getTerm());
             }
         ) 
         |
+        {lhs.getTerm().sort().equals(setLDT.targetSort())}?        
         (
-            SUCH_THAT resultFormula=predicate
+            (LARROW | "=") t=storereflist
+            {
+                t = TB.equals(lhs.getTerm(), t);
+            }            
+        )
+        |
+        (
+            SUCH_THAT t=predicate
         ) 
     )
     {
         result = new Pair<ObserverFunction,Term>(
                      (ObserverFunction) lhs.getTerm().op(), 
-                     resultFormula);
+                     t);
     }
     ;
     
@@ -1522,7 +1535,7 @@ jmlprimary returns [SLExpression result=null] throws SLTranslationException
 {
     ImmutableList<SLExpression> list;
     KeYJavaType typ;
-    Term t;
+    Term t, t2;
 }
 :
 	RESULT
@@ -1667,11 +1680,30 @@ jmlprimary returns [SLExpression result=null] throws SLTranslationException
 	    raiseNotSupported("\\lblpos");
 	} 
 	
-    |
-	NOWARN 
+    |   NOWARN 
 	{
 	    raiseNotSupported("\\nowarn");
-	} 
+	}
+
+    |   INTERSECT LPAREN t=storeref COMMA t2=storeref RPAREN
+        {
+            result = new SLExpression(TB.intersect(services, t, t2));
+        } 
+
+    |   SETMINUS LPAREN t=storeref COMMA t2=storeref RPAREN
+        {
+            result = new SLExpression(TB.setMinus(services, t, t2));
+        } 
+
+    |   DISJOINT LPAREN t=storeref COMMA t2=storeref RPAREN
+        {
+            result = new SLExpression(TB.disjoint(services, t, t2));
+        } 
+
+    |   SUBSET LPAREN t=storeref COMMA t2=storeref RPAREN
+        {
+            result = new SLExpression(TB.subset(services, t, t2));
+        } 
 
     |   LPAREN result=expression RPAREN
 ;
@@ -1929,6 +1961,10 @@ builtintype returns [KeYJavaType type = null] throws SLTranslationException
 	    {
 		raiseNotSupported("\\real");
 	    } 
+        |   SET
+            {
+                type = new KeYJavaType(setLDT.targetSort());
+            }
 	)
 	
 ;
