@@ -553,7 +553,19 @@ storerefname returns [SLExpression result = null] throws SLTranslationException
     | THIS
     {
 	result = new SLExpression(TB.var(selfVar), selfVar.getKeYJavaType());
-    }
+    } 
+    | (OLD | PRE) LPAREN result=expression RPAREN
+	{
+	    if(heapAtPre == null) {
+		raiseError("JML construct " +
+			   "\\old not allowed in this context.");
+	    } else if(!result.isTerm() || !result.getTerm().sort().equals(setLDT.targetSort())) {
+	    	raiseError("Not a valid store-ref expression: " + result);
+	    }
+	    result = new SLExpression(convertToOld(result.getTerm()), 
+	                              result.getType());
+	}
+
     ;
     
 
@@ -1610,7 +1622,24 @@ jmlprimary returns [SLExpression result=null] throws SLTranslationException
 	
     |   FRESH LPAREN list=expressionlist RPAREN
 	{
-	    raiseNotSupported("\\fresh");
+	    if(heapAtPre == null) {
+	        raiseError("\\fresh not allowed in this context");
+	    }
+	    t = TB.tt();
+	    final Sort objectSort = services.getJavaInfo().objectSort();
+	    for(SLExpression expr: list) {
+	        if(!expr.isTerm()) {
+	            raiseError("Expected a term, but found: " + expr);
+	        } else if(expr.getTerm().sort().extendsTrans(objectSort)) {
+	            t = TB.and(t, TB.not(TB.created(services, expr.getTerm())));
+	        } else if(expr.getTerm().sort().extendsTrans(setLDT.targetSort())) {
+	            t = TB.and(t, TB.subset(services, expr.getTerm(), TB.freshLocs(services, TB.heap(services))));
+	        } else {
+	            raiseError("Wrong type: " + expr);
+	        }
+	    }
+	    t = convertToOld(t);
+	    result = new SLExpression(t);
 	} 
 	
     |   REACH LPAREN result=expression RPAREN

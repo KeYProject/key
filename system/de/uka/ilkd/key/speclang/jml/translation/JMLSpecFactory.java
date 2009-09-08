@@ -21,8 +21,6 @@ import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.statement.BranchStatement;
 import de.uka.ilkd.key.java.statement.For;
 import de.uka.ilkd.key.java.statement.LoopStatement;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.*;
@@ -392,7 +390,7 @@ public class JMLSpecFactory {
     
     
     public ClassAxiom createJMLRepresents(KeYJavaType kjt, 
-                                         PositionedString originalRep) 
+                                          PositionedString originalRep) 
             throws SLTranslationException {
         assert kjt != null;
         assert originalRep != null;
@@ -404,9 +402,10 @@ public class JMLSpecFactory {
         Pair<ObserverFunction,Term> rep 
         	= translator.translateRepresentsExpression(originalRep,
         					  	   kjt,
-        					  	   selfVar);        
-        //create invariant
-        return new ClassAxiomImpl("JML represents clause",
+        					  	   selfVar);
+        //create class axiom
+        return new ClassAxiomImpl("JML represents clause for " 
+        	                     + rep.first.name(),
         	                  kjt,        	
         		          rep.first,
         	                  rep.second,

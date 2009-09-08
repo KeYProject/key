@@ -79,8 +79,6 @@ public abstract class AbstractMetaOperator extends AbstractSortedOperator
 
     public static final AbstractMetaOperator ARRAY_BASE_INSTANCE_OF = new ArrayBaseInstanceOf();
 
-    public static final AbstractMetaOperator RESOLVE_QUERY = new ResolveQuery();
-
     public static final AbstractMetaOperator CONSTANT_VALUE = new ConstantValue();
     
     public static final AbstractMetaOperator ENUM_CONSTANT_VALUE = new EnumConstantValue();

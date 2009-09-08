@@ -60,6 +60,18 @@ public final class TermBuilder {
     //naming
     //-------------------------------------------------------------------------
     
+    public String shortBaseName(Sort s) {
+	String result = s.name().toString();
+	int index = result.lastIndexOf(".");
+	if(index == -1) {
+	    result = result.charAt(0) + "";
+	} else {
+	    result = result.substring(index).charAt(0) + "";
+	}
+	return result.toLowerCase();
+    }
+    
+    
     /**
      * Returns an available name constructed by affixing a counter to the passed
      * base name.
@@ -75,6 +87,16 @@ public final class TermBuilder {
         
         return result;
     }
+    
+
+    /**
+     * Returns an available name constructed by affixing a counter to a self-
+     * chosen base name for the passed sort.
+     */
+    public String newName(Services services, Sort sort) {
+	return newName(services, shortBaseName(sort));
+    }
+    
     
     
     

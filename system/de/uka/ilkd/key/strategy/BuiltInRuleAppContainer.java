@@ -34,13 +34,16 @@ public class BuiltInRuleAppContainer extends RuleAppContainer {
     public ImmutableList<RuleAppContainer> createFurtherApps(
         Goal p_goal,
         Strategy p_strategy) {
-        if (isStillApplicable(p_goal))
+        if(isStillApplicable(p_goal)) {
+            BuiltInRuleApp bir = getBuiltInRuleApp();
             return createAppContainers(
-                (BuiltInRuleApp) getRuleApp(),
-                null,
+                bir,
+                bir.posInOccurrence(),
                 p_goal,
                 p_strategy);
-        return ImmutableSLList.<RuleAppContainer>nil();
+        } else {
+            return ImmutableSLList.<RuleAppContainer>nil();
+        }
     }
 
     /**

@@ -155,9 +155,9 @@ public final class SLEnvInput extends AbstractEnvInput {
     
     private void createSpecs(SpecExtractor specExtractor) 
             throws ProofInputException {
-        JavaInfo javaInfo 
+        final JavaInfo javaInfo 
             = initConfig.getServices().getJavaInfo();
-        SpecificationRepository specRepos 
+        final SpecificationRepository specRepos 
             = initConfig.getServices().getSpecificationRepository();
        
         //sort types alphabetically (necessary for deterministic names)
@@ -173,21 +173,21 @@ public final class SLEnvInput extends AbstractEnvInput {
             }
             
             //class invariants, represents clauses, ...
-            ImmutableSet<SpecificationElement> classSpecs 
+            final ImmutableSet<SpecificationElement> classSpecs 
             	= specExtractor.extractClassSpecs(kjt);
             specRepos.addSpecs(classSpecs);
             
             //contracts, loop invariants
-            ImmutableList<ProgramMethod> pms 
+            final ImmutableList<ProgramMethod> pms 
                 = javaInfo.getAllProgramMethodsLocallyDeclared(kjt);
             for(ProgramMethod pm : pms) {
                 //contracts
-        	ImmutableSet<SpecificationElement> methodSpecs
+        	final ImmutableSet<SpecificationElement> methodSpecs
         	    = specExtractor.extractMethodSpecs(pm);
         	specRepos.addSpecs(methodSpecs);
                 
                 //loop invariants
-                JavaASTCollector collector 
+                final JavaASTCollector collector 
                     = new JavaASTCollector(pm.getBody(), LoopStatement.class);
                 collector.start();
                 for(ProgramElement loop : collector.getNodes()) {
@@ -200,7 +200,15 @@ public final class SLEnvInput extends AbstractEnvInput {
                 }
             }
             
-            
+            //constructor contracts
+            final ImmutableList<ProgramMethod> constructors 
+            	= javaInfo.getConstructors(kjt);
+            for(ProgramMethod constructor : constructors) {
+        	assert constructor.isConstructor();
+        	final ImmutableSet<SpecificationElement> constructorSpecs 
+			= specExtractor.extractMethodSpecs(constructor);
+        	specRepos.addSpecs(constructorSpecs);
+            }            
         }
         
         //show warnings to user

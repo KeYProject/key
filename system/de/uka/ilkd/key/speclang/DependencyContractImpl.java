@@ -150,7 +150,8 @@ public final class DependencyContractImpl implements Contract {
     
     
     @Override
-    public Term getPre(Term selfTerm, 
+    public Term getPre(Term heapTerm,
+	               Term selfTerm, 
 	    	       ImmutableList<Term> paramTerms,
 	    	       Services services) {
 	return TB.tt();

@@ -18,23 +18,40 @@ import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.RuleApp;
 
 
-public final class BuiltInNonDuplicateAppModPositionFeature extends BinaryFeature {
+public final class BuiltInNonDuplicateAppModPositionFeature 
+						extends BinaryFeature {
     
     public static final BuiltInNonDuplicateAppModPositionFeature INSTANCE
     	= new BuiltInNonDuplicateAppModPositionFeature();
     
     private BuiltInNonDuplicateAppModPositionFeature() {}
     
+    
+    Term lastTerm;
     @Override
     protected boolean filter(RuleApp app, PosInOccurrence pos, Goal goal) {
 	final Rule rule = app.rule();
-	final Term term = app.posInOccurrence().subTerm();
+	final Term term = pos.subTerm();
 	Node node = goal.node();
+
+	boolean myNode = false;	
+//if(node.serialNr() == 391) {
+//    myNode = true;
+//    System.out.println("Checking for " + node.serialNr());
+//    System.out.println("###Term: ");
+//    printTerm(term);
+//    if(lastTerm != null) {
+//	System.out.println("###Last term: ");
+//	printTerm(lastTerm);
+//	System.out.println("###Equal: "  + lastTerm.equals(term));
+//    }
+//    lastTerm = term;
+//}
 	while(!node.root()) {
 	    node = node.parent();
 	    RuleApp app2 = node.getAppliedRuleApp();
 	    if(app2.rule().equals(rule) 
-	       && app2.posInOccurrence().subTerm().equals(term)) {
+	       && app2.posInOccurrence().subTerm().op().equals(term.op())) {
 		return false;
 	    }
 	}

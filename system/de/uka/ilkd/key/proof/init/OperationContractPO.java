@@ -101,7 +101,7 @@ public final class OperationContractPO extends AbstractPO
         final ImmutableSet<ClassAxiom> axioms 
         	= specRepos.getClassAxioms(selfKJT);
         Term axiomTerm = TB.tt();
-        for(ClassAxiom ax : axioms) {
+        for(ClassAxiom ax : axioms) {            
             Taclet axiomTaclet = ax.getAxiomAsTaclet(selfVar, services);
             if(axiomTaclet != null) {
         	taclets = taclets.add(NoPosTacletApp.createNoPosTacletApp(

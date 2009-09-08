@@ -151,35 +151,37 @@ public class InvInferenceTools {
     
     
     /**
-     * Returns the innermost method frame of the java block of the passed term.
-     * @param term A term of the form "{u}[p]psi"
-     * @param services The services object. 
+     * Returns the innermost method frame of the passed java block
      */
-    public MethodFrame getInnermostMethodFrame(Term term, Services services) {
-        //ignore updates
-	term = goBelowUpdates(term);
-        
-        //the remaining term should have a Java block 
-        final ProgramElement pe = term.javaBlock().program();
-
-        //fetch "self" from innermost method-frame
-        MethodFrame result = new JavaASTVisitor(pe, services) {
-            private MethodFrame result;
+    public MethodFrame getInnermostMethodFrame(JavaBlock jb, 
+	    				       Services services) { 
+        final ProgramElement pe = jb.program();
+        final MethodFrame result = new JavaASTVisitor(pe, services) {
+            private MethodFrame res;
             protected void doAction(ProgramElement node) {
                 node.visit(this);
             }
             protected void doDefaultAction(SourceElement node) {
-                if(node instanceof MethodFrame && result == null) {
-                    result = (MethodFrame) node;
+                if(node instanceof MethodFrame && res == null) {
+                    res = (MethodFrame) node;
                 }
             }
             public MethodFrame run() {
                 walk(pe);
-                return result;
+                return res;
             }
         }.run();
                 
         return result;
+    }
+    
+    
+    public ExecutionContext getInnermostExecutionContext(JavaBlock jb, 
+	    						 Services services) {
+	final MethodFrame frame = getInnermostMethodFrame(jb, services);
+	return frame == null 
+               ? null
+	       : (ExecutionContext) frame.getExecutionContext();	
     }
     
     

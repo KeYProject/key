@@ -10,6 +10,9 @@
 
 package de.uka.ilkd.key.rule;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 import de.uka.ilkd.key.collection.*;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -21,6 +24,7 @@ import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.proof.mgt.ComplexRuleJustificationBySpec;
 import de.uka.ilkd.key.proof.mgt.RuleJustificationBySpec;
 import de.uka.ilkd.key.speclang.Contract;
+import de.uka.ilkd.key.util.Pair;
 
 
 public final class UseDependencyContractRule implements BuiltInRule {
@@ -28,7 +32,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
     public static final UseDependencyContractRule INSTANCE 
                                             = new UseDependencyContractRule();    
 
-    private static final Name NAME = new Name("Insert Dependency Contract");
+    private static final Name NAME = new Name("Use Dependency Contract");
     private static final TermBuilder TB = TermBuilder.DF;
         
 
@@ -44,6 +48,38 @@ public final class UseDependencyContractRule implements BuiltInRule {
     //-------------------------------------------------------------------------
     //internal methods
     //-------------------------------------------------------------------------
+    
+    private Pair<Term,Term> getBaseHeapAndChangedLocs(Term heapTerm,
+	    					      Services services,
+	                                              HeapLDT heapLDT) {
+	Operator op = heapTerm.op();
+	if(op == heapLDT.getStore()) {
+	    final Term h = heapTerm.sub(0);
+	    final Term o = heapTerm.sub(1);
+	    final Term f = heapTerm.sub(2);
+	    final Pair<Term,Term> sub
+	    	= getBaseHeapAndChangedLocs(h, services, heapLDT);
+	    return new Pair<Term,Term>(sub.first, 
+		    		       TB.union(services, 
+		    			        TB.pairSingleton(services, 
+		    			        	         o, 
+		    			        	         f),
+		    			        sub.second));
+	} else if(op == heapLDT.getChangeHeapAtLocs() 
+		  || op == heapLDT.getChangeHeapAtLocs2()) {
+	    final Term h = heapTerm.sub(0);
+	    final Term s = heapTerm.sub(1);
+	    final Pair<Term,Term> sub 
+	    	= getBaseHeapAndChangedLocs(h, services, heapLDT);
+	    return new Pair<Term,Term>(sub.first, 
+				       TB.union(services, 
+					        s,
+					        sub.second));
+	} else {
+	    return new Pair<Term,Term>(heapTerm, TB.empty(services));
+	}
+    }
+    
     
     /**
      * Returns the dependency contracts which are applicable for the passed 
@@ -77,6 +113,30 @@ public final class UseDependencyContractRule implements BuiltInRule {
 	assert !contracts.isEmpty();
 	return contracts.iterator().next();//TODO
     }
+    
+    
+    /**
+     * Replaces all occurrences of "orig" by "replacement".
+     */
+    private void replaceInGoal(Term orig, Term replacement, Goal goal) {
+        final Map<Term, Term> replaceMap = new LinkedHashMap<Term, Term>();
+        replaceMap.put(orig, replacement);
+        final OpReplacer or = new OpReplacer(replaceMap);
+        
+	final Sequent s = goal.sequent();        
+	for(int i = 1, n = s.size(); i <= n; i++) {
+	    ConstrainedFormula cf = s.getFormulabyNr(i);
+	    Term formula = cf.formula();
+	    Term newFormula = or.replace(formula);
+	    if(!formula.equals(newFormula)) {
+		goal.changeFormula(new ConstrainedFormula(newFormula), 
+			           PosInOccurrence.findInSequent(
+			        	   		s, 
+			        	   		i, 
+			        	                PosInTerm.TOP_LEVEL));
+	    }
+	}
+    }
 
     
 
@@ -98,8 +158,21 @@ public final class UseDependencyContractRule implements BuiltInRule {
 	    return false;
 	}
 	
+	//there must not be free variables in the focus term
+	if(!term.freeVars().isEmpty()) {
+	    return false;
+	}
+	
+	//heap term of observer must be store-term
+	final Services services = goal.proof().getServices();		
+	final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+	final Pair<Term,Term> baseHeapAndChangedLocs 
+		= getBaseHeapAndChangedLocs(term.sub(0), services, heapLDT);
+	if(baseHeapAndChangedLocs.first.equals(term.sub(0))) {
+	    return false;
+	}
+	
 	//there must be contracts for the observer
-	final Services services = goal.proof().getServices();	
 	final ObserverFunction target = (ObserverFunction) term.op();
 	final KeYJavaType kjt 
 		= target.isStatic() 
@@ -127,62 +200,61 @@ public final class UseDependencyContractRule implements BuiltInRule {
 	    			     RuleApp ruleApp) {
 	//collect information
 	final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();	
-        final Term term = ruleApp.posInOccurrence().subTerm();
+	final PosInOccurrence pio = ruleApp.posInOccurrence();	
+        final Term term = pio.subTerm();
         final ObserverFunction target = (ObserverFunction) term.op();
-        final KeYJavaType kjt
-        	= target.isStatic() 
-		  ? target.getContainerType()
-	          : services.getJavaInfo().getKeYJavaType(term.sub(1).sort());
-        final Contract contract = configureContract(services, kjt, target);
-        assert contract != null;	
-        final Term heapTerm = term.sub(0);
-        assert heapTerm.sort().equals(heapLDT.targetSort());
+        final Term heap = term.sub(0);
+        assert heap.sort().equals(heapLDT.targetSort());
         final Term selfTerm = target.isStatic() ? null : term.sub(1);
         ImmutableList<Term> paramTerms = ImmutableSLList.<Term>nil();
         for(int i = target.isStatic() ? 1 : 2, n = term.arity(); i < n; i++) {
             paramTerms = paramTerms.append(term.sub(i));
         }
-                
-        //create logic variables
-        final LogicVariable heapVar
-        	= new LogicVariable(new Name("h"), heapLDT.targetSort());
+        final KeYJavaType kjt
+        	= target.isStatic() 
+		  ? target.getContainerType()
+	          : services.getJavaInfo().getKeYJavaType(selfTerm.sort());
+        final Contract contract = configureContract(services, kjt, target);
+        assert contract != null;	
+        final Pair<Term,Term> baseHeapAndChangedLocs 
+        	= getBaseHeapAndChangedLocs(heap, services, heapLDT); 
         
-        //get dependency term
-        final Term secondHeapTerm = TB.var(heapVar);        
-        final Term dep = contract.getDep(heapTerm, 
+        //get precondition, dependency term
+        final Term pre = contract.getPre(baseHeapAndChangedLocs.first,
+        	                         selfTerm, 
+        	                         paramTerms, 
+        	                         services);
+        final Term dep = contract.getDep(baseHeapAndChangedLocs.first, 
         				 selfTerm, 
         				 paramTerms, 
         				 services);
         
-        //get preconditions
-        final Term pre = contract.getPre(selfTerm, paramTerms, services);
-        final Term pre1 = OpReplacer.replace(TB.heap(services), 
-        				     heapTerm, 
-        				     pre);
-        final Term pre2 = OpReplacer.replace(TB.heap(services), 
-        				     secondHeapTerm, 
-        				     pre);
-
-        //create dependency formula        
-        final Term[] subs = term.subs().toArray(new Term[term.arity()]);
-        subs[0] = secondHeapTerm;
-        final Term secondTerm = TB.tf().createTerm(target, subs);
-        final Term depFormula 
-                = TB.all(heapVar, 
-                	 TB.imp(TB.and(new Term[]{pre1,
-                		                  pre2, 
-                		                  TB.unchanged(services, 
-                	          		               heapTerm, 
-                	          		               secondHeapTerm, 
-                	          		               dep)}),
-                	        TB.equals(term, secondTerm)));
-        		 
-        //change goal
-        final ImmutableList<Goal> newGoals = goal.split(1);
-        final Goal newGoal = newGoals.head();
-        final ConstrainedFormula cf = new ConstrainedFormula(depFormula);
-        newGoal.addFormula(cf, true, false);
+        //split goal into two branches
+        final ImmutableList<Goal> result = goal.split(2);
+        final Goal preGoal = result.head();//tail().head();
+        final Goal postGoal = result.tail().head();
+        preGoal.setBranchLabel("Dependencies changed");
+        postGoal.setBranchLabel("Dependencies unchanged");
         
+        //create "Pre" branch
+        final Term changedLocsAndDepDisjoint 
+        	= TB.disjoint(services, baseHeapAndChangedLocs.second, dep);
+        preGoal.removeFormula(pio);
+        preGoal.addFormula(new ConstrainedFormula(
+        				TB.and(pre, changedLocsAndDepDisjoint)),
+        		   false,
+        		   true);
+        
+        //create "Post" branch
+        final Term[] subs = term.subs().toArray(new Term[term.arity()]);
+        subs[0] = baseHeapAndChangedLocs.first;
+        final Term termWithBaseHeap = TB.func(target, subs);
+        replaceInGoal(term, termWithBaseHeap, postGoal);
+        postGoal.addFormula(new ConstrainedFormula(
+        				TB.and(pre, changedLocsAndDepDisjoint)),
+        	 	    true,
+        	 	    false);
+
         //create justification
         final RuleJustificationBySpec just 
         	= new RuleJustificationBySpec(contract);
@@ -191,7 +263,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
             	    goal.proof().env().getJustifInfo().getJustification(this);
         cjust.add(ruleApp, just);        
         
-        return newGoals;
+        return result;
     }
     
     

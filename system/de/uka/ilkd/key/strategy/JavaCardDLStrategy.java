@@ -84,29 +84,37 @@ public final class JavaCardDLStrategy extends AbstractFeatureStrategy {
         final Feature ifThenElseF =
             ScaleFeature.createScaled ( IfThenElseMalusFeature.INSTANCE, 500);
     
-        final Feature strengthenConstraints =
-            ifHeuristics ( new String[] { "concrete", "closure" },
-                           longConst ( 0 ),
-                           ifZero ( ConstraintStrengthenFeatureUC.create ( p_proof ),
-                                    inftyConst () ) );
+//        final Feature strengthenConstraints =
+//            ifHeuristics ( new String[] { "concrete", "closure" },
+//                           longConst ( 0 ),
+//                           ifZero ( ConstraintStrengthenFeatureUC.create ( p_proof ),
+//                                    inftyConst () ) );
     
             
         final Feature methodSpecF;
         final String methProp 
         	= strategyProperties.getProperty(
         		StrategyProperties.METHOD_OPTIONS_KEY);        
-        if (methProp.equals(StrategyProperties.METHOD_CONTRACT)) {   
+        if(methProp.equals(StrategyProperties.METHOD_CONTRACT)) {   
             methodSpecF = methodSpecFeature(longConst(-20));
-        } else if (methProp.equals(StrategyProperties.METHOD_EXPAND)) {  
+        } else if(methProp.equals(StrategyProperties.METHOD_EXPAND)) {  
             methodSpecF = methodSpecFeature(inftyConst());
-        } else if (methProp.equals(StrategyProperties.METHOD_NONE)) {   
+        } else if(methProp.equals(StrategyProperties.METHOD_NONE)) {   
             methodSpecF = methodSpecFeature(inftyConst());
         } else {
             methodSpecF = null;
             assert false;
         }
         
-        final Feature depSpecF = depSpecFeature(longConst(10000));
+        final Feature depSpecF;
+        final String depProp
+        	= strategyProperties.getProperty(
+        		StrategyProperties.DEP_OPTIONS_KEY);
+        if(depProp.equals(StrategyProperties.DEP_ON)) {
+            depSpecF = depSpecFeature(longConst(10000));            
+        } else {
+            depSpecF = depSpecFeature(inftyConst());
+        }
         
         final Feature loopInvF;
         final String loopProp
@@ -130,7 +138,7 @@ public final class JavaCardDLStrategy extends AbstractFeatureStrategy {
 //              splitF,
               dispatcher,
               NonDuplicateAppFeature.INSTANCE,
-              strengthenConstraints, 
+//              strengthenConstraints, 
               AgeFeature.INSTANCE,
               oneStepSimplificationF,
               smtF, 
@@ -157,8 +165,8 @@ public final class JavaCardDLStrategy extends AbstractFeatureStrategy {
     private Feature depSpecFeature(Feature cost) {
 	SetRuleFilter filter = new SetRuleFilter();
 	filter.addRuleToSet(UseDependencyContractRule.INSTANCE);
-	cost = add(BuiltInNonDuplicateAppModPositionFeature.INSTANCE, cost);
-        return ConditionalFeature.createConditional(filter, cost);        
+//	cost = add(BuiltInNonDuplicateAppModPositionFeature.INSTANCE, cost);
+        return ConditionalFeature.createConditional(filter, cost);
     }    
     
     private Feature oneStepSimplificationFeature(Feature cost) {
@@ -238,9 +246,9 @@ public final class JavaCardDLStrategy extends AbstractFeatureStrategy {
                    longConst ( -5000 ) ) );
         
         bindRuleSet ( d, "simplify_literals",
-                      ifZero ( ConstraintStrengthenFeatureUC.create(p_proof),
-                               longConst ( 0 ),
-                               longConst ( -8000 ) ) );
+//                      ifZero ( ConstraintStrengthenFeatureUC.create(p_proof),
+//                               longConst ( 0 ),
+                               longConst ( -8000 ) );
         
         bindRuleSet ( d, "simplify_instanceof_static",
                       add ( EqNonDuplicateAppFeature.INSTANCE,
@@ -292,10 +300,7 @@ public final class JavaCardDLStrategy extends AbstractFeatureStrategy {
         boolean useLoopExpand = strategyProperties.getProperty(
                 StrategyProperties.LOOP_OPTIONS_KEY).
                     equals(StrategyProperties.LOOP_EXPAND);
-        boolean programsToRight = expandQueries () ||
-                strategyProperties.getProperty(
-                StrategyProperties.QUERY_OPTIONS_KEY).
-                    equals(StrategyProperties.QUERY_PROGRAMS_TO_RIGHT);
+        boolean programsToRight = false;//XXX
         
         String methProp =
             strategyProperties.getProperty ( StrategyProperties.METHOD_OPTIONS_KEY );
@@ -326,8 +331,6 @@ public final class JavaCardDLStrategy extends AbstractFeatureStrategy {
         bindRuleSet ( d, "cast_deletion",
                       ifZero ( implicitCastNecessary ( instOf ( "castedTerm" ) ),
                                longConst ( -5000 ), inftyConst () ) );
-           
-        setupQueries ( d );
             
         bindRuleSet ( d, "inReachableStateImplication",
                       add ( NonDuplicateAppModPositionFeature.INSTANCE,
@@ -402,39 +405,6 @@ public final class JavaCardDLStrategy extends AbstractFeatureStrategy {
                            longConst ( 100 ) ) ) ) );
     }
 
-    private void setupQueries(RuleSetDispatchFeature d) {
-        // attention: usually this application is against the term order but
-        // does not interfere as only applied below updates
-        bindRuleSet ( d, "query_normalize", 
-	    SumFeature.createSum ( new Feature [] {
-                DirectlyBelowOpClassFeature.create ( ProgramMethod.class ),
-                applyTF(FocusProjection.create(2), ff.update),
-                applyTF("t", IsNonRigidTermFeature.INSTANCE),
-		// we actually have to be in the scope of an update,
-		// not only within an update
-		not(NotInScopeOfModalityFeature.INSTANCE),
-                longConst (-10) } ));
-
-        bindRuleSet ( d, "query_normalize_high_costs", 
-	    SumFeature.createSum ( new Feature [] {
-                SomeWhereBelowOpClassFeature.create ( ProgramMethod.class ),
-                SomeWhereBelowOpClassFeature.create ( UpdateApplication.class ),
-                applyTF("t", IsNonRigidTermFeature.INSTANCE),
-		// we actually have to be in the scope of an update,
-		// not only within an update
-		not(NotInScopeOfModalityFeature.INSTANCE),
-                longConst (10) } ));
-
-        if ( expandQueries () )
-            bindRuleSet ( d, "queries",
-                add ( normalSplitting () ?
-                         not ( isBelow ( add ( ff.forF, not ( ff.atom ) ) ) ) :
-                         longConst ( 0 ),
-                      NonDuplicateAppModPositionFeature.INSTANCE ) );
-        else
-            bindRuleSet ( d, "queries", inftyConst () );
-    }
-
     private void setupUserTaclets(RuleSetDispatchFeature d) {
         for (int i = 1; i <= StrategyProperties.USER_TACLETS_NUM; ++i) {
             final String userTacletsProbs =
@@ -464,12 +434,6 @@ public final class JavaCardDLStrategy extends AbstractFeatureStrategy {
     ////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////
     
-    private boolean expandQueries() {
-        return strategyProperties.getProperty(
-                StrategyProperties.QUERY_OPTIONS_KEY).
-                    equals(StrategyProperties.QUERY_EXPAND);
-    }
-
     private boolean arithNonLinInferences() {
         return StrategyProperties.NON_LIN_ARITH_COMPLETION.equals (
                  strategyProperties.getProperty
@@ -516,9 +480,6 @@ public final class JavaCardDLStrategy extends AbstractFeatureStrategy {
     }
 
     private Feature sequentContainsNoPrograms() {
-//        return not ( expandQueries ()
-//                     ? SeqContainsExecutableCodeFeature.PROGRAMS_OR_QUERIES
-//                     : SeqContainsExecutableCodeFeature.PROGRAMS );
         return not ( SeqContainsExecutableCodeFeature.PROGRAMS );
     }
     
@@ -1866,8 +1827,9 @@ public final class JavaCardDLStrategy extends AbstractFeatureStrategy {
     ////////////////////////////////////////////////////////////////////////////
 
     private Feature setupApprovalF(Proof p_proof) {
-        return add ( NonDuplicateAppFeature.INSTANCE,
-                     UCIncompatibleFeature.create ( p_proof ) );
+	return NonDuplicateAppFeature.INSTANCE;
+//        return add ( NonDuplicateAppFeature.INSTANCE,
+//                     UCIncompatibleFeature.create ( p_proof ) );
     }
     
     private RuleSetDispatchFeature setupApprovalDispatcher(Proof p_proof) {
@@ -1976,11 +1938,11 @@ public final class JavaCardDLStrategy extends AbstractFeatureStrategy {
     }
 
     /**
-	 * Re-Evaluate a <code>RuleApp</code>. This method is called immediately
-	 * before a rule is really applied
-	 * 
-	 * @return true iff the rule should be applied, false otherwise
-	 */
+     * Re-Evaluate a <code>RuleApp</code>. This method is called immediately
+     * before a rule is really applied
+     * 
+     * @return true iff the rule should be applied, false otherwise
+     */
     public final boolean isApprovedApp (RuleApp app,
                                         PosInOccurrence pio,
                                         Goal goal) {
@@ -2192,8 +2154,6 @@ public final class JavaCardDLStrategy extends AbstractFeatureStrategy {
             notF = op ( Junctor.NOT );
             ifThenElse = OperatorClassTF.create ( IfThenElse.class );
             
-            query = OperatorClassTF.create ( ProgramMethod.class );
-            
             atom = AtomTermFeature.INSTANCE;
             propJunctor = or ( OperatorClassTF.create ( Junctor.class ),
                                op ( Equality.EQV ) );
@@ -2227,9 +2187,7 @@ public final class JavaCardDLStrategy extends AbstractFeatureStrategy {
             modalOperator = or ( update, program );
             
 //            directCutAllowed = add ( atom, not ( modalOperator ) );
-            notExecutable =
-                expandQueries () ?
-                add ( not ( program ), not ( query ) ) : not ( program );
+            notExecutable = not ( program );
             notContainsExecutable = rec ( any (), notExecutable );
             
             cutAllowed =
@@ -2257,7 +2215,6 @@ public final class JavaCardDLStrategy extends AbstractFeatureStrategy {
         final TermFeature notF;
         final TermFeature propJunctor;
         final TermFeature ifThenElse;
-        final TermFeature query;
         final TermFeature notExecutable;
         final TermFeature notContainsExecutable;
 

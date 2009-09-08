@@ -194,7 +194,11 @@ public final class DependencyContractPO extends AbstractPO
 	final Term pre2 = OpReplacer.replace(TB.heap(services), 
 					     heapLV2Term, 
 					     pre);
-	final Term dep = contract.getDep(selfVar, paramVars, services);
+	final Term dep = OpReplacer.replace(TB.heap(services), 
+		                            heapLV1Term, 
+		                            contract.getDep(selfVar, 
+		                        	    	    paramVars, 
+		                        	    	    services));
 	final Term po = TB.imp(TB.and(new Term[]{indepPre,
 		                                 pre1,
 		                                 pre2,

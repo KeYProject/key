@@ -364,14 +364,17 @@ public final class OperationContractImpl implements OperationContract {
     
     
     @Override
-    public Term getPre(Term selfTerm, 
+    public Term getPre(Term heapTerm,
+	               Term selfTerm, 
 	    	       ImmutableList<Term> paramTerms,
                        Services services) {
+	assert heapTerm != null;		
         assert (selfTerm == null) == (originalSelfVar == null);
         assert paramTerms != null;
         assert paramTerms.size() == originalParamVars.size();
         assert services != null;
 	Map replaceMap = new HashMap();
+	replaceMap.put(TB.heap(services), heapTerm);
 	replaceMap.put(TB.var(originalSelfVar), selfTerm);
 	for(ProgramVariable paramVar : originalParamVars) {
 	    replaceMap.put(TB.var(paramVar), paramTerms.head());

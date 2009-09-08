@@ -9,9 +9,14 @@ class MyClass {
     //@ invariant attr2 != 0;
     //@ accessible <inv>: footprint;
     
+    //@ ensures \fresh(footprint);
+    MyClass() {}
+    
+    
     /*@ normal_behavior
-      @   assignable attr;
+      @   assignable footprint;
       @   ensures \result == i + 27 && attr == \result;
+      @   ensures footprint == \old(footprint);
       @*/
     int add27(int i) {
 	attr = i + 27;
@@ -21,7 +26,7 @@ class MyClass {
 
     /*@ normal_behavior
       @   requires attr2 != 358;
-      @   assignable attr; 
+      @   assignable footprint; 
       @   ensures attr == 27;
       @   diverges true;
       @ also exceptional_behavior
@@ -33,8 +38,8 @@ class MyClass {
 	if(attr2 == 358) {
 	    throw new RuntimeException();
 	}
-        /*@ loop_invariant 0 <= i && i <= 3 && (i > 0 ==> attr == 27);
-          @ assignable attr;
+        /*@ loop_invariant 0 <= i && i <= 3 && (i > 0 ==> attr == 27) && <inv>;
+          @ assignable footprint;
           @*/
         for(int i = 0; i < 3; i++) {
             add27(0);

@@ -65,31 +65,38 @@ public final class UseOperationContractRule implements BuiltInRule {
     //internal methods
     //-------------------------------------------------------------------------
     
-    private Pair<LocationVariable,MethodReference> getMethodCall(
-	    						JavaBlock jb,
-	    						Services services) {
-	final LocationVariable resultVar;
+    private Pair<Term,MethodReference> getMethodCall(JavaBlock jb,
+	    					     Services services) {
+	final Term resultTerm;
         final MethodReference mr;
         
         final SourceElement activeStatement = IIT.getActiveStatement(jb);
+        //active statement must be method reference or assignment with
+        //method reference
         if(activeStatement instanceof MethodReference) {
-            resultVar = null;
+            resultTerm = null;
             mr = (MethodReference) activeStatement;
         } else if(activeStatement instanceof CopyAssignment) {
-            CopyAssignment ca = (CopyAssignment) activeStatement;
-            Expression lhs = ca.getExpressionAt(0);
-            Expression rhs = ca.getExpressionAt(1);
-            if(rhs instanceof MethodReference
-               && lhs instanceof LocationVariable) {
-        	resultVar = (LocationVariable) lhs;
-        	mr        = (MethodReference) rhs;
+            final CopyAssignment ca = (CopyAssignment) activeStatement;
+            final Expression lhs = ca.getExpressionAt(0);
+            final Expression rhs = ca.getExpressionAt(1);
+            if(rhs instanceof MethodReference 
+               && (lhs instanceof LocationVariable 
+        	   || lhs instanceof FieldReference)) {
+        	final ExecutionContext ec 
+        		= IIT.getInnermostExecutionContext(jb, services);
+        	resultTerm
+        		= services.getTypeConverter().convertToLogicElement(lhs,
+        								    ec);        	
+        	mr = (MethodReference) rhs;
             } else {
         	return null;
             }
         } else {
             return null;
         }
-        
+
+        //receiver must be simple
         final ReferencePrefix rp = mr.getReferencePrefix();
         if(rp != null 
            && !ProgramSVSort.SIMPLEEXPRESSION.canStandFor(rp, null, services)
@@ -98,7 +105,7 @@ public final class UseOperationContractRule implements BuiltInRule {
            && ! (rp instanceof TypeReference)) {
             return null;
         } else {
-            return new Pair<LocationVariable,MethodReference>(resultVar, mr);
+            return new Pair<Term,MethodReference>(resultTerm, mr);
         }
     }
     
@@ -323,19 +330,15 @@ public final class UseOperationContractRule implements BuiltInRule {
         
         //active statement must be method call
         final Modality modality = (Modality) term.op();
-        final Pair<LocationVariable,MethodReference> methodCall
+        final Pair<Term,MethodReference> methodCall
         	= getMethodCall(term.javaBlock(), goal.proof().getServices());
         if(methodCall == null) {
             return false;
         }
-	final MethodFrame frame 
-		= IIT.getInnermostMethodFrame(term, services);
-	final ExecutionContext ec 
-		= frame == null 
-                  ? null
-		  : (ExecutionContext) frame.getExecutionContext();        
         
         //arguments of method call must be simple expressions
+	final ExecutionContext ec 
+		= IIT.getInnermostExecutionContext(term.javaBlock(), services); 
         for(Expression arg : methodCall.second.getArguments()) {
             if(!ProgramSVSort.SIMPLEEXPRESSION
         	             .canStandFor(arg, ec, services)) {
@@ -376,14 +379,10 @@ public final class UseOperationContractRule implements BuiltInRule {
 	final Term term = IIT.goBelowUpdates(pio.subTerm());
         final Modality modality = (Modality) term.op();
         final JavaBlock jb = term.javaBlock();
-        final Pair<LocationVariable,MethodReference> methodCall
+        final Pair<Term,MethodReference> methodCall
         	= getMethodCall(term.javaBlock(), services);
-	final MethodFrame frame 
-		= IIT.getInnermostMethodFrame(term, services);
-	final ExecutionContext ec 
-		= frame == null 
-                  ? null
-		  : (ExecutionContext) frame.getExecutionContext();
+        final ExecutionContext ec 
+		= IIT.getInnermostExecutionContext(term.javaBlock(), services);
 	final KeYJavaType staticType 
 		= methodCall.second.determineStaticPrefixType(services, ec);
 	final ProgramMethod pm 

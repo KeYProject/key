@@ -59,7 +59,8 @@ public interface Contract extends SpecificationElement {
     /**
      * Returns the precondition of the contract.
      */
-    public Term getPre(Term selfTerm, 
+    public Term getPre(Term heapTerm,
+	               Term selfTerm, 
 	    	       ImmutableList<Term> paramTerms,
 	    	       Services services);    
     

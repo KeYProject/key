@@ -44,7 +44,7 @@ public final class StrategySelectionView extends JPanel {
     ButtonGroup splittingGroup = new ButtonGroup();
     ButtonGroup loopGroup = new ButtonGroup();
     ButtonGroup methodGroup = new ButtonGroup();
-    ButtonGroup queryGroup = new ButtonGroup();
+    ButtonGroup depGroup = new ButtonGroup();
     ButtonGroup nonLinArithGroup = new ButtonGroup();
     ButtonGroup quantifierGroup = new ButtonGroup();
     ButtonGroup stopModeGroup = new ButtonGroup();    
@@ -64,9 +64,8 @@ public final class StrategySelectionView extends JPanel {
     private JRadioButtonHashMap splittingNormal;
     private JRadioButtonHashMap splittingOff;
     private JRadioButtonHashMap splittingDelayed;
-    private JRadioButtonHashMap queryNone;
-    private JRadioButtonHashMap queryExpand;
-    private JRadioButtonHashMap queryProgramsToRight;
+    private JRadioButtonHashMap depOn;
+    private JRadioButtonHashMap depOff;
     private JRadioButtonHashMap nonLinArithNone;
     private JRadioButtonHashMap nonLinArithDefOps;
     private JRadioButtonHashMap nonLinArithCompletion;
@@ -187,10 +186,16 @@ public final class StrategySelectionView extends JPanel {
 
         ++yCoord;
         
-        splittingNormal = new JRadioButtonHashMap("Normal",
+        splittingNormal = new JRadioButtonHashMap("Free",
                        StrategyProperties.SPLITTING_NORMAL, true, false);
         splittingGroup.add(splittingNormal);
-        addJavaDLOption ( splittingNormal, javaDLOptionsLayout, 2, yCoord, 2 );        
+        addJavaDLOption ( splittingNormal, javaDLOptionsLayout, 4, yCoord, 2 );     
+        splittingNormal.setToolTipText("<html>" +
+                                        "Split formulas (if-then-else expressions,<br>" +
+                                        "disjunctions in the antecedent, conjunctions in<br>" +
+                                        "the succedent) freely without restrictions." +
+                                        "</html>");
+        
 
         splittingDelayed = new JRadioButtonHashMap("Delayed",
                      StrategyProperties.SPLITTING_DELAYED, true, false);
@@ -206,7 +211,7 @@ public final class StrategySelectionView extends JPanel {
                                         "improve the performance." +
                                         "</html>");
         splittingGroup.add(splittingDelayed);
-        addJavaDLOption ( splittingDelayed, javaDLOptionsLayout, 4, yCoord, 2 );
+        addJavaDLOption ( splittingDelayed, javaDLOptionsLayout, 2, yCoord, 2 );
 
         splittingOff = new JRadioButtonHashMap("Off",
                      StrategyProperties.SPLITTING_OFF, true, false);
@@ -238,11 +243,11 @@ public final class StrategySelectionView extends JPanel {
         
         rdBut9 = new JRadioButtonHashMap("Expand", StrategyProperties.LOOP_EXPAND, true, false);
         loopGroup.add(rdBut9);
-        addJavaDLOption ( rdBut9, javaDLOptionsLayout, 2, yCoord, 2 );        
+        addJavaDLOption ( rdBut9, javaDLOptionsLayout, 4, yCoord, 2 );        
 
         rdBut10 = new JRadioButtonHashMap("Invariant", StrategyProperties.LOOP_INVARIANT, false, false);
         loopGroup.add(rdBut10);
-        addJavaDLOption ( rdBut10, javaDLOptionsLayout, 4, yCoord, 2 );        
+        addJavaDLOption ( rdBut10, javaDLOptionsLayout, 2, yCoord, 2 );        
 
         rdBut11 = new JRadioButtonHashMap("None", StrategyProperties.LOOP_NONE, false, false);
         loopGroup.add(rdBut11);
@@ -262,12 +267,12 @@ public final class StrategySelectionView extends JPanel {
 
         rdBut12 = new JRadioButtonHashMap("Expand", StrategyProperties.METHOD_EXPAND, true, false);
         methodGroup.add(rdBut12);
-        addJavaDLOption ( rdBut12, javaDLOptionsLayout, 2, yCoord, 2 );        
+        addJavaDLOption ( rdBut12, javaDLOptionsLayout, 4, yCoord, 2 );        
 
         rdBut13 = new JRadioButtonHashMap(
-                "Contracts", StrategyProperties.METHOD_CONTRACT, false, false);
+                "Contract", StrategyProperties.METHOD_CONTRACT, false, false);
         methodGroup.add(rdBut13);
-        addJavaDLOption ( rdBut13, javaDLOptionsLayout, 4, yCoord, 2 );        
+        addJavaDLOption ( rdBut13, javaDLOptionsLayout, 2, yCoord, 2 );        
 
         rdBut14 = new JRadioButtonHashMap("None",
                 StrategyProperties.METHOD_NONE, false, false);
@@ -281,33 +286,29 @@ public final class StrategySelectionView extends JPanel {
 
         ++yCoord;
         
-        addJavaDLOption ( new JLabel ( "Query treatment" ),
+        addJavaDLOption ( new JLabel ( "Dependency contracts" ),
                     javaDLOptionsLayout, 1, yCoord, 7 );
         
         ++yCoord;
 
-        queryExpand = new JRadioButtonHashMap("Expand", 
-                StrategyProperties.QUERY_EXPAND, false, false);
-        queryGroup.add(queryExpand);
-        addJavaDLOption ( queryExpand, javaDLOptionsLayout, 2, yCoord, 2 );        
+        depOn = new JRadioButtonHashMap("On", 
+                StrategyProperties.DEP_ON, false, false);
+        depGroup.add(depOn);
+        addJavaDLOption ( depOn, javaDLOptionsLayout, 2, yCoord, 2 );        
         
-        queryProgramsToRight = new JRadioButtonHashMap("Prog2Succ", 
-                StrategyProperties.QUERY_PROGRAMS_TO_RIGHT, false, false);
-        queryProgramsToRight.setToolTipText ( "<html>Move all program blocks to the" +
-                                              " succedent.<br>" +
-                                              " This is necessary" +
-                                              " when query invocations<br>" +
-                                              " are" +
-                                              " supposed to be eliminated" +
-                                              " using<br>" +
-                                              " method contracts.</html>" );
-        queryGroup.add(queryProgramsToRight);
-        addJavaDLOption ( queryProgramsToRight, javaDLOptionsLayout, 4, yCoord, 2 );
-                                      
-        queryNone = new JRadioButtonHashMap("None", 
-                StrategyProperties.QUERY_NONE, true, false);
-        queryGroup.add(queryNone);
-        addJavaDLOption ( queryNone, javaDLOptionsLayout, 6, yCoord, 2 );        
+        depOff = new JRadioButtonHashMap("Off", 
+                StrategyProperties.DEP_OFF, false, false);
+//        queryProgramsToRight.setToolTipText ( "<html>Move all program blocks to the" +
+//                                              " succedent.<br>" +
+//                                              " This is necessary" +
+//                                              " when query invocations<br>" +
+//                                              " are" +
+//                                              " supposed to be eliminated" +
+//                                              " using<br>" +
+//                                              " method contracts.</html>" );
+        depGroup.add(depOff);
+        addJavaDLOption ( depOff, javaDLOptionsLayout, 4, yCoord, 2 );
+
         
         ++yCoord;
         addJavaDLOptionSpace ( javaDLOptionsLayout, yCoord );
@@ -413,7 +414,7 @@ public final class StrategySelectionView extends JPanel {
         quantifierGroup.add(quantifierNonSplittingWithProgs);
         addJavaDLOption ( quantifierNonSplittingWithProgs, javaDLOptionsLayout, 2, yCoord, 4 );
 
-        quantifierInstantiate = new JRadioButtonHashMap("Unrestricted", 
+        quantifierInstantiate = new JRadioButtonHashMap("Free", 
                               StrategyProperties.QUANTIFIERS_INSTANTIATE, true, false);
         quantifierInstantiate.setToolTipText ( "<html>" +
             "Instantiate quantified formulas automatically<br>" +
@@ -435,8 +436,7 @@ public final class StrategySelectionView extends JPanel {
         userTacletsLabel.setToolTipText("<html>" +
                                         "These options define whether user- and problem-specific taclets<br>" +
                                         "are applied automatically by the strategy. Problem-specific taclets<br>" +
-                                        "can be defined in the \\rules-section of a .key-problem file or be<br>" +
-                                        "loaded during a proof with \"Load Non-Axiom Lemma ...\". For<br>" +
+                                        "can be defined in the \\rules-section of a .key-problem file. For<br>" +
                                         "automatic application, the taclets have to contain a clause<br>" +
                                         "\\heuristics(userTaclets1), \\heuristics(userTaclets2), etc." +
                                         "</html>");
@@ -539,9 +539,8 @@ public final class StrategySelectionView extends JPanel {
         rdBut14.addActionListener(optListener);
         rdBut17.addActionListener(optListener);
         rdBut18.addActionListener(optListener);
-        queryExpand.addActionListener(optListener);
-        queryProgramsToRight.addActionListener(optListener);
-        queryNone.addActionListener(optListener);
+        depOn.addActionListener(optListener);
+        depOff.addActionListener(optListener);
         splittingNormal.addActionListener(optListener);
         splittingDelayed.addActionListener(optListener);
         splittingOff.addActionListener(optListener);
@@ -782,10 +781,10 @@ public final class StrategySelectionView extends JPanel {
             JRadioButton bMethodActive = getStrategyOptionButton(activeMethodOptions, 
                     StrategyProperties.METHOD_OPTIONS_KEY);
             bMethodActive.setSelected(true);   
-            String activeQueryOptions = p.getProperty(StrategyProperties.QUERY_OPTIONS_KEY);
-            JRadioButton bQueryActive = getStrategyOptionButton(activeQueryOptions, 
-                    StrategyProperties.QUERY_OPTIONS_KEY);
-            bQueryActive.setSelected(true);   
+            String activeDepOptions = p.getProperty(StrategyProperties.DEP_OPTIONS_KEY);
+            JRadioButton bDepActive = getStrategyOptionButton(activeDepOptions, 
+                    StrategyProperties.DEP_OPTIONS_KEY);
+            bDepActive.setSelected(true);   
             String activeNonLinArithOptions = p.getProperty(StrategyProperties.NON_LIN_ARITH_OPTIONS_KEY);
             JRadioButton bNonLinArithActive = getStrategyOptionButton(activeNonLinArithOptions, 
                     StrategyProperties.NON_LIN_ARITH_OPTIONS_KEY);
@@ -895,8 +894,8 @@ public final class StrategySelectionView extends JPanel {
                        loopGroup.getSelection().getActionCommand());
         p.setProperty( StrategyProperties.METHOD_OPTIONS_KEY, 
                        methodGroup.getSelection().getActionCommand());
-        p.setProperty( StrategyProperties.QUERY_OPTIONS_KEY, 
-                       queryGroup.getSelection().getActionCommand());
+        p.setProperty( StrategyProperties.DEP_OPTIONS_KEY, 
+                       depGroup.getSelection().getActionCommand());
         p.setProperty( StrategyProperties.NON_LIN_ARITH_OPTIONS_KEY, 
                        nonLinArithGroup.getSelection().getActionCommand());
         p.setProperty( StrategyProperties.QUANTIFIERS_OPTIONS_KEY, 
