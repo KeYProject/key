@@ -87,8 +87,16 @@ public class LDTInput implements EnvInput {
     }
     
     
+    // no class path elements here
     @Override
     public List<File> readClassPath() throws ProofInputException {
+        return null;
+    }
+
+
+    // no class path elements here
+    @Override
+    public File readBootClassPath() {
         return null;
     }
 

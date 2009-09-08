@@ -76,5 +76,10 @@ public abstract class AbstractEnvInput implements EnvInput {
     public final List<File> readClassPath() throws ProofInputException {
         return null;
     }
+    
+    // no class path elements here
+    public File readBootClassPath() {
+        return null;
+    }
 
 }

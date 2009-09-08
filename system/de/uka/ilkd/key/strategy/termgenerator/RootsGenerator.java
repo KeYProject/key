@@ -43,7 +43,7 @@ public class RootsGenerator implements TermGenerator {
 
     private final ProjectionToTerm powerRelation;
 
-    final TermBuilder tb = TermBuilder.DF;            
+    final TermBuilder tb = TermBuilder.DF;        
     private final BigInteger one = BigInteger.ONE;
     private final BigInteger two = BigInteger.valueOf ( 2 );
 
@@ -101,7 +101,7 @@ public class RootsGenerator implements TermGenerator {
 
     private Term breakDownEq(Term var, BigInteger lit, int pow,
                              Services services) {
-        final Term zero = tb.zTerm ( services, "0" );
+        final Term zero = tb.zero(services);
 
         if ( ( pow % 2 == 0 ) ) {
             // the even case
@@ -184,7 +184,7 @@ public class RootsGenerator implements TermGenerator {
                 // no solutions
                 return tb.ff ();
             case 0:
-                return tb.equals ( var, tb.zTerm ( services, "0" ) );
+                return tb.equals ( var, tb.zero( services ) );
             case 1:
                 final BigInteger r = root ( lit, pow );
                 final Term rTerm = tb.zTerm ( services, r.toString () );

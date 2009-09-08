@@ -143,7 +143,7 @@ class HandleArith {
                         pro = tb.geq ( pro.sub ( 1 ),
                                        tb.func ( ig.getAdd(),
                                                  pro.sub ( 0 ),
-                                                 tb.zTerm ( services, "1" ) ),
+                                                 ig.one() ),
                                        services );
         } else {
             if ( op == leq ) {
@@ -151,7 +151,7 @@ class HandleArith {
                     pro = tb.geq ( pro.sub ( 0 ),
                                    tb.func ( ig.getAdd (),
                                              pro.sub ( 1 ),
-                                             tb.zTerm ( services, "1" ) ),
+                                             ig.one() ),
                                    services );
                 else
                     pro = tb.geq ( pro.sub ( 1 ), pro.sub ( 0 ), services );

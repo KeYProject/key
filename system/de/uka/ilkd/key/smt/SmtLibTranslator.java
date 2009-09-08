@@ -253,7 +253,7 @@ public class SmtLibTranslator extends AbstractSMTTranslator {
 
     @Override
     protected boolean isMultiSorted() {
-	return false;
+	return true;
     }
 
     @Override

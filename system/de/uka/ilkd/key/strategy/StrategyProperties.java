@@ -24,6 +24,7 @@ public final class StrategyProperties extends Properties {
 
     public final static String LOOP_OPTIONS_KEY = "LOOP_OPTIONS_KEY";
     public final static String LOOP_EXPAND = "LOOP_EXPAND";
+    public final static String LOOP_EXPAND_BOUNDED = "LOOP_EXPAND_BOUNDED"; //Used for test generation chrisg
     public final static String LOOP_INVARIANT = "LOOP_INVARIANT";
     public final static String LOOP_NONE = "LOOP_NONE";
     

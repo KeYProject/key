@@ -734,15 +734,14 @@ public final class TermBuilder {
     
     
     public Term zero(Services services) {
-        final IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();
-        return integerLDT.translateLiteral(new IntLiteral(0));        
+	return services.getTypeConverter().getIntegerLDT().zero();
     }
 
     
     public Term one(Services services) {
-        final IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();
-        return integerLDT.translateLiteral(new IntLiteral(1));        
+        return services.getTypeConverter().getIntegerLDT().one();
     }
+
     
     /**
      * @param services Services which contains the number-functions

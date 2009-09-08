@@ -583,6 +583,16 @@ public class WhileLoopTransformation extends JavaASTVisitor {
         }
     }
 
+    /* Performs the unwinding of the loop
+     * Warning: The unwinding does not comply with the rule in the KeY book up to 100%
+     * The difference is revealed by the following example:
+     * <code> Label1:while(c){b}</code>
+     * According to the KeY book the transformation should be
+     * <code> if(c) l':{l'':{p#} Label1:while(c){b}}</code>
+     * This implementation creates however.
+     * <code> Label1:if(c) l':{l'':{p#} while(c){b}}</code>
+     * Check if this is ok when labeled continue statements are involved.
+     */
     public void performActionOnWhile(While x)     {
 	ExtList changeList = (ExtList)stack.peek();
 	if (replaceBreakWithNoLabel == 0) {

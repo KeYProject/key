@@ -230,12 +230,14 @@ public final class ProblemInitializer {
 	envInput.setInitConfig(initConfig);
 	String javaPath = envInput.readJavaPath();
 	List<File> classPath = envInput.readClassPath();
+	File bootClassPath = envInput.readBootClassPath();
 	
 	//create Recoder2KeY, set classpath
 	final Recoder2KeY r2k = new Recoder2KeY(initConfig.getServices(), 
                                                 initConfig.namespaces());
-	r2k.setClassPath(classPath);
-	
+	r2k.setClassPath(bootClassPath, classPath);
+
+
 	if(javaPath != null) {
     	    //read Java	
             reportStatus("Reading Java source");
@@ -249,7 +251,6 @@ public final class ProblemInitializer {
             if(searchPathList.find(javaPath) == null) {
                 searchPathList.add(javaPath);
             }
-
             String[] cus = getClasses(javaPath).toArray(new String[]{});
             r2k.readCompilationUnitsAsFiles(cus);               
 	} else {

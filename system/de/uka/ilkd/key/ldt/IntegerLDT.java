@@ -124,7 +124,8 @@ public final class IntegerLDT extends LDT {
     private final Function inInt;
     private final Function inLong;
     private final Function inChar;
-
+    private final Term one;
+    private final Term zero;
 
     
     
@@ -223,6 +224,10 @@ public final class IntegerLDT extends LDT {
         inInt               = addFunction(services, "inInt");
         inLong              = addFunction(services, "inLong");
         inChar              = addFunction(services, "inChar");
+
+        // cache often used constants       
+        zero = translateLiteral(new IntLiteral(0));
+        one = translateLiteral(new IntLiteral(1));        
     }
     
     
@@ -940,4 +945,13 @@ public final class IntegerLDT extends LDT {
     public Function getJavaUnsignedShiftRightLong() {
         return javaUnsignedShiftRightLong;
     }
+    
+    public Term zero() {	
+	return zero;
+    }
+
+    public Term one() {	
+	return one;
+    }
+
 } 
