@@ -22,6 +22,8 @@ import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
 import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.expression.literal.NullLiteral;
 import de.uka.ilkd.key.java.expression.operator.CopyAssignment;
+import de.uka.ilkd.key.java.expression.operator.New;
+import de.uka.ilkd.key.java.reference.TypeRef;
 import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.java.statement.Branch;
 import de.uka.ilkd.key.java.statement.Catch;
@@ -71,19 +73,19 @@ public final class OperationContractPO extends AbstractPO
     		throws ProofInputException {
         //"self != null"
         final Term selfNotNull 
-            = selfVar == null
+            = selfVar == null || contract.getTarget().isConstructor()
               ? TB.tt()
               : TB.not(TB.equals(TB.var(selfVar), TB.NULL(services)));
         	      
         //"self.<created> = TRUE"
         final Term selfCreated
-           = selfVar == null
+           = selfVar == null || contract.getTarget().isConstructor()
              ? TB.tt()
              : TB.created(services, TB.var(selfVar));
              
         //"MyClass::exactInstance(self) = TRUE"
         final Term selfExactType
-           = selfVar == null
+           = selfVar == null || contract.getTarget().isConstructor()
              ? TB.tt()
              : TB.exactInstance(services, 
         	                selfKJT.getSort(), 
@@ -135,13 +137,25 @@ public final class OperationContractPO extends AbstractPO
 	final ImmutableArray<Expression> formalArray 
 		= new ImmutableArray<Expression>(formalParVars.toArray(
 			            new ProgramVariable[formalParVars.size()]));
-	final MethodBodyStatement call 
+	final StatementBlock sb;
+	if(contract.getTarget().isConstructor()) {
+	    assert selfVar != null;
+	    assert resultVar == null;
+	    final Expression[] formalArray2 
+	    	= formalArray.toArray(new Expression[formalArray.size()]);
+	    final New n 
+	    	= new New(formalArray2, new TypeRef(contract.getKJT()), null);
+	    final CopyAssignment ca = new CopyAssignment(selfVar, n);
+	    sb = new StatementBlock(ca);
+	} else {
+	    final MethodBodyStatement call 
 		= new MethodBodyStatement(contract.getTarget(),
 					  selfVar,
 					  resultVar,
 					  formalArray);
-	final StatementBlock sb = new StatementBlock(call);
-        
+	    sb = new StatementBlock(call);
+	}
+
         //create variables for try statement
         final KeYJavaType eType 
         	= javaInfo.getTypeByClassName("java.lang.Throwable");

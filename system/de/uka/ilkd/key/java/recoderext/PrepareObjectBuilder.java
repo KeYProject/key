@@ -25,13 +25,7 @@ import recoder.abstraction.Field;
 import recoder.java.Identifier;
 import recoder.java.Statement;
 import recoder.java.StatementBlock;
-import recoder.java.declaration.ClassDeclaration;
-import recoder.java.declaration.DeclarationSpecifier;
-import recoder.java.declaration.FieldDeclaration;
-import recoder.java.declaration.FieldSpecification;
-import recoder.java.declaration.MethodDeclaration;
-import recoder.java.declaration.ParameterDeclaration;
-import recoder.java.declaration.TypeDeclaration;
+import recoder.java.declaration.*;
 import recoder.java.declaration.modifier.Private;
 import recoder.java.declaration.modifier.Protected;
 import recoder.java.reference.MethodReference;
@@ -76,10 +70,16 @@ public class PrepareObjectBuilder
      */
     private List<Field> getFields(ClassDeclaration cd) {
 	List<Field> result = new ArrayList<Field>(cd.getChildCount());
-	for (int i = 0; i<cd.getChildCount(); i++) {
+	outer: for (int i = 0; i<cd.getChildCount(); i++) {
 	    if (cd.getChildAt(i) instanceof FieldDeclaration) {
-		ASTList<FieldSpecification> fields = 
-		    ((FieldDeclaration)cd.getChildAt(i)).getFieldSpecifications();
+		final FieldDeclaration fd = (FieldDeclaration) cd.getChildAt(i);
+		for(Modifier mod : fd.getModifiers()) {
+		    if(mod instanceof Model) {
+			continue outer;
+		    }
+		}
+		final ASTList<FieldSpecification> fields 
+			= fd.getFieldSpecifications();
 		for (int j = 0; j<fields.size(); j++) {
 		    result.add(fields.get(j));
 		}
@@ -147,7 +147,7 @@ public class PrepareObjectBuilder
 	ASTList<Statement> result = new ASTArrayList<Statement>(fields.size());
 	for (int i = 0; i<fields.size(); i++) {
 	    Field field = fields.get(i);
-	    if (!field.isStatic()) {		
+	    if (!field.isStatic() ) {		
 		Identifier fieldId;
 		if (field.getName().charAt(0) != '<') {
 		    fieldId = new Identifier(field.getName());

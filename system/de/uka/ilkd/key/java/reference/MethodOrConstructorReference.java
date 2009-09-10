@@ -11,15 +11,13 @@
 
 package de.uka.ilkd.key.java.reference;
 
-import de.uka.ilkd.key.java.Statement;
+import de.uka.ilkd.key.collection.ImmutableArray;
+import de.uka.ilkd.key.java.Expression;
 
-/**
- *  Constructor reference.
- *  @author <TT>AutoDoc</TT>
- */
+public interface MethodOrConstructorReference extends MemberReference, ReferencePrefix {
 
-public interface ConstructorReference extends MethodOrConstructorReference,
-                                              MemberReference, 
-                                              Statement {
-
+    /**
+     * @return the array wrapper of the argument expressions .
+     */
+    ImmutableArray<Expression> getArguments();
 }

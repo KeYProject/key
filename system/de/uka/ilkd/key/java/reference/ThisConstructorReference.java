@@ -74,4 +74,11 @@ public class ThisConstructorReference extends SpecialConstructorReference {
     public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
         p.printThisConstructorReference(this);
     }
+    
+    
+    @Override
+    public ReferencePrefix getReferencePrefix() {
+	assert false : "not implemented";
+        return null;
+    }
 }

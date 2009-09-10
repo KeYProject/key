@@ -1,21 +1,33 @@
 class MyClient {
     
     MyClass mc;
+    int i;
     //@ invariant mc.<inv> && \disjoint(this.*, mc.footprint);
     
-    int i;
     
+    //@ assignable \nothing;
+    MyClient() {
+	mc = new MyClass();
+    }
+        
     
     //@ assignable i;
-    void changingIPreservesInv() {
+    void invariantPreservation() {
 	i++;
     }
     
+    
+    //@ assignable mc, i;
+    void dependencyContracts() {
+	mc = new MyClass();
+	i++;
+    }
 
+    
     /*@ assignable i, mc.footprint;
       @ ensures \result == 388;
       @*/
-    int useContract() {
+    int operationContracts() {
 	i = 360;
 	i = mc.add27(++i);
 	return i;

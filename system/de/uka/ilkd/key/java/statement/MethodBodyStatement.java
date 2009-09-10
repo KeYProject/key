@@ -128,7 +128,6 @@ public class MethodBodyStatement extends JavaNonTerminalProgramElement
         this.methodReference = new MethodReference(args, 
                                                    method.getProgramElementName(), 
                                                    newContext);
-
     }
 
 

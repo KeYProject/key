@@ -170,7 +170,7 @@ class ContractSelectionPanel extends JPanel {
             return (Contract) selection[0];
         } else {
             ImmutableSet<OperationContract> contracts 
-            = DefaultImmutableSet.<OperationContract>nil();
+            	= DefaultImmutableSet.<OperationContract>nil();
             for(Object contract : selection) {
         	contracts = contracts.add((OperationContract) contract);
             }        

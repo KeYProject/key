@@ -101,7 +101,7 @@ public class TestJavaInfo extends TestCase {
     
     private static final String[] generalImplicitFields = new String[]{
       ImplicitFieldAdder.IMPLICIT_CREATED, ImplicitFieldAdder.IMPLICIT_NEXT_TO_CREATE,
-      ImplicitFieldAdder.IMPLICIT_INITIALIZED, ImplicitFieldAdder.IMPLICIT_TRANSIENT
+      ImplicitFieldAdder.IMPLICIT_INITIALIZED
     };
     
     

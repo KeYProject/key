@@ -2141,7 +2141,7 @@ public final class Main extends JFrame implements IMain {
             // Says that all Proofs have succeeded
             if (proof.getBasicTask().getStatus().getProofClosedButLemmasLeft()) {
                 // Says that the proof is closed by depends on (unproved) lemmas                
-                System.exit ( 2 ); 
+                System.exit ( 0 ); //XXX, was: 2 
             }
             System.exit ( 0 ); 
         } else {

@@ -21,12 +21,10 @@ import javax.swing.border.TitledBorder;
 import javax.swing.event.*;
 
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
-import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.op.ObserverFunction;
-import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.*;
 import de.uka.ilkd.key.proof.mgt.ProofStatus;
@@ -249,7 +247,7 @@ public final class ProofManagementDialog extends JDialog {
     //-------------------------------------------------------------------------
     
     private static void showInstance(InitConfig initConfig,
-	    			     ProgramMethod selectedPM,
+	    			     ObserverFunction selectedTarget,
 	    			     Proof selectedProof) {
 	if(instance == null
            || instance.initConfig != initConfig
@@ -278,7 +276,7 @@ public final class ProofManagementDialog extends JDialog {
             instance = new ProofManagementDialog(initConfig, 
             			     		 "Proof Management");
             //determine own defaults if not given
-            if(selectedPM == null) {
+            if(selectedTarget == null) {
         	Services services = initConfig.getServices();
         	Set<KeYJavaType> kjts 
         		= services.getJavaInfo().getAllKeYJavaTypes();
@@ -290,13 +288,12 @@ public final class ProofManagementDialog extends JDialog {
         	    }
         	});
         	outer: for(KeYJavaType kjt : kjtsarr) {
-        	    ImmutableList<ProgramMethod> pms 
-        	    	= services.getJavaInfo()
-        	                  .getAllProgramMethodsLocallyDeclared(kjt);
-        	    for(ProgramMethod pm : pms) {
+        	    ImmutableSet<ObserverFunction> targets
+        	    	= services.getSpecificationRepository().getContractTargets(kjt);
+        	    for(ObserverFunction target : targets) {
         		if(!services.getSpecificationRepository()
-        			    .getContracts(kjt, pm).isEmpty()) {
-        		    selectedPM = pm;
+        			    .getContracts(kjt, target).isEmpty()) {
+        		    selectedTarget = target;
         		    break outer;
         		}
         	    }
@@ -309,8 +306,8 @@ public final class ProofManagementDialog extends JDialog {
 	if(selectedProof != null) {
 	    instance.select(selectedProof);
 	}
-	if(selectedPM != null) {
-	    instance.select(selectedPM);
+	if(selectedTarget != null) {
+	    instance.select(selectedTarget);
 	}
         instance.setVisible(true);
     }    
@@ -323,9 +320,9 @@ public final class ProofManagementDialog extends JDialog {
     }
 
     
-    private void select(ProgramMethod pm) {
+    private void select(ObserverFunction target) {
 	tabbedPane.setSelectedIndex(0);
-	classTree.select(pm.getContainerType(), pm);
+	classTree.select(target.getContainerType(), target);
     }
     
     
@@ -528,8 +525,8 @@ public final class ProofManagementDialog extends JDialog {
      * Shows the dialog and selects the passed method.
      */
     public static void showInstance(InitConfig initConfig,
-	    			    ProgramMethod selectedPM) {
-	showInstance(initConfig, selectedPM, null);
+	    			    ObserverFunction selectedTarget) {
+	showInstance(initConfig, selectedTarget, null);
     }
 
     

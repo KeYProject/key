@@ -405,18 +405,19 @@ public class KeYProgModelInfo{
      * @param signature IList<KeYJavaType> representing the signature of the constructor
      * @return the most specific constructor declared in the given type 
      */
-    public Constructor getConstructor(KeYJavaType ct, 
-				      ImmutableList<KeYJavaType> signature) {
+    public ProgramMethod getConstructor(KeYJavaType ct, 
+				       ImmutableList<KeYJavaType> signature) {
         List<? extends recoder.abstraction.Constructor> constructors =
             getRecoderConstructors(ct, signature);
         if (constructors.size()==1) {
-	    Object o = rec2key().toKeY(constructors.get(0));
-	    if(o instanceof Constructor){
-		return (Constructor) o;
-	    }
-	    if(o instanceof ProgramMethod){
-		return (Constructor) ((ProgramMethod) o).getMethodDeclaration();
-	    }
+            return (ProgramMethod) rec2key().toKeY(constructors.get(0));
+//	    Object o = rec2key().toKeY(constructors.get(0));
+//	    if(o instanceof Constructor){
+//		return (Constructor) o;
+//	    }
+//	    if(o instanceof ProgramMethod){
+//		return (Constructor) ((ProgramMethod) o).getMethodDeclaration();
+//	    }
         }
         if (constructors.size()==0) {
             Debug.out("javainfo: Constructor not found: ",ct);

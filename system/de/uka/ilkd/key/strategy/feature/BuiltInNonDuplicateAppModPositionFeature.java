@@ -51,7 +51,7 @@ public final class BuiltInNonDuplicateAppModPositionFeature
 	    node = node.parent();
 	    RuleApp app2 = node.getAppliedRuleApp();
 	    if(app2.rule().equals(rule) 
-	       && app2.posInOccurrence().subTerm().op().equals(term.op())) {
+	       && app2.posInOccurrence().subTerm().equals(term)) {
 		return false;
 	    }
 	}

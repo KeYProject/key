@@ -32,7 +32,8 @@ import de.uka.ilkd.key.util.ExtList;
  *  @author <TT>AutoDoc</TT>
  */
 public class MethodReference extends JavaNonTerminalProgramElement
-                             implements MemberReference, ReferencePrefix, 
+                             implements MethodOrConstructorReference,
+                             MemberReference, ReferencePrefix, 
                              ReferenceSuffix, ExpressionStatement, 
                              TypeReferenceContainer, NameReference {
  
@@ -90,6 +91,7 @@ public class MethodReference extends JavaNonTerminalProgramElement
      *      Get reference prefix.
      *      @return the reference prefix.
      */
+    @Override
     public ReferencePrefix getReferencePrefix() {
         return prefix;
     }
@@ -212,6 +214,7 @@ public class MethodReference extends JavaNonTerminalProgramElement
      *      Get arguments.
      *      @return the expression array wrapper.
      */
+    @Override
     public ImmutableArray<Expression> getArguments() {
         return arguments;
     }
@@ -297,8 +300,8 @@ public class MethodReference extends JavaNonTerminalProgramElement
     public ProgramMethod method
     	(Services services, KeYJavaType classType, 
     	        ImmutableList<KeYJavaType> signature, 
-    	        KeYJavaType context) {	
-        final String methodName = name.toString();
+    	        KeYJavaType context) {
+        final String methodName = name.toString();        
         ProgramMethod pm = services.getJavaInfo().getProgramMethod(classType, 
                 methodName, signature, context);
 	return pm;

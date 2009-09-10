@@ -293,8 +293,11 @@ public final class OperationContractImpl implements OperationContract {
 	if(originalResultVar != null) {
 	    sig.append(originalResultVar);
 	    sig.append(" = ");
+	} else if(pm.isConstructor()) {
+	    sig.append(originalSelfVar);
+	    sig.append(" = new ");
 	}
-	if(originalSelfVar != null) {
+	if(!pm.isStatic() && !pm.isConstructor()) {
 	    sig.append(originalSelfVar);
 	    sig.append(".");
 	}

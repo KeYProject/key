@@ -616,7 +616,7 @@ options {
       skipFuncs(); 
       skipPreds();
       skipRuleSets();
-      skipVars(); 
+      //skipVars(); 
       skipTaclets();
       return problem();
     }

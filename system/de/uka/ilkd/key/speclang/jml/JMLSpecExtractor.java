@@ -27,7 +27,6 @@ import de.uka.ilkd.key.speclang.jml.pretranslation.*;
 import de.uka.ilkd.key.speclang.jml.translation.JMLSpecFactory;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.speclang.translation.SLWarningException;
-import de.uka.ilkd.key.util.Pair;
 
 /**
  * Extracts JML class invariants and operation contracts from JML comments. 
@@ -320,7 +319,8 @@ public final class JMLSpecExtractor implements SpecExtractor {
         }
 
         //create JML contracts out of constructs, add them to result
-        TextualJMLConstruct[] constructsArray = constructs.toArray(new TextualJMLConstruct[constructs.size()]);
+        TextualJMLConstruct[] constructsArray 
+            = constructs.toArray(new TextualJMLConstruct[constructs.size()]);
 
         int startPos;
         if(pm.isModel()) {
@@ -347,7 +347,9 @@ public final class JMLSpecExtractor implements SpecExtractor {
             
             //add invariants
             if(!pm.isStatic() && !isHelper) {
-        	specCase.addRequires(new PositionedString("<inv>"));
+        	if(!pm.isConstructor()) {
+        	    specCase.addRequires(new PositionedString("<inv>"));
+        	}
         	if(specCase.getBehavior() != Behavior.EXCEPTIONAL_BEHAVIOR) {
         	    specCase.addEnsures(new PositionedString("<inv>"));
         	}

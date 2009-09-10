@@ -3,12 +3,16 @@
 ./heap/simple/arrays_with_disjoint_sorts.key
 ./heap/simple/arrays.key
 ./heap/simple/attributes.key
+./heap/simple/constructor_contracts.key
 ./heap/simple/dependencies.key
+./heap/simple/dependency_contracts.key
+./heap/simple/invariant_preservation.key
 ./heap/simple/loop1.key
 ./heap/simple/loop2.key
 ./heap/simple/modifies_datagroup.key
 ./heap/simple/modifies.key
 ./heap/simple/object_creation.key
+./heap/simple/operation_contracts.key
 ./heap/simple/select_store.key
 ./heap/simple/selection_sort.key
 ./heap/simple/sets_and_pairs.key

@@ -53,9 +53,8 @@ options {
     private JavaInfo javaInfo;
     private HeapLDT heapLDT;
     private SetLDT setLDT;
+    private BooleanLDT booleanLDT;
     private SLTranslationExceptionManager excManager;
-
-    private static Sort boolSort;
 
     private ProgramVariable selfVar;
     private ImmutableList<ProgramVariable> paramVars;
@@ -88,6 +87,7 @@ options {
 	this.javaInfo       = services.getJavaInfo();
 	this.heapLDT        = services.getTypeConverter().getHeapLDT();
 	this.setLDT         = services.getTypeConverter().getSetLDT();
+	this.booleanLDT     = services.getTypeConverter().getBooleanLDT();
 	this.excManager     = new SLTranslationExceptionManager(this,
 				    				fileName, 
 				    				offsetPos);
@@ -113,7 +113,6 @@ options {
 	}
 
 	intHelper = new JavaIntegerSemanticsHelper(services, excManager);
-	boolSort = services.getTypeConverter().getBooleanLDT().targetSort();
     }
     
     
@@ -406,7 +405,7 @@ options {
 
     // If a is a boolean literal, the method returns the literal as a Formula.
     private Term convertToFormula(Term a) {
-	if(a.sort() == boolSort) {
+	if(a.sort() == booleanLDT.targetSort()) {
 	    return TB.equals(a, TB.TRUE(services));
 	}
 
@@ -1330,7 +1329,7 @@ unaryexprnotplusminus returns [SLExpression result=null] throws SLTranslationExc
 	    
 	    if (t.sort() == Sort.FORMULA) {
 		result = new SLExpression(TB.not(t));
-	    } else if(t.sort() == boolSort) {
+	    } else if(t.sort() == booleanLDT.targetSort()) {
 		result = new SLExpression(TB.not(TB.equals(t, TB.TRUE(services))));
 	    } else {
 		raiseError("Wrong type in not-expression: " + t);
@@ -1631,14 +1630,21 @@ jmlprimary returns [SLExpression result=null] throws SLTranslationException
 	        if(!expr.isTerm()) {
 	            raiseError("Expected a term, but found: " + expr);
 	        } else if(expr.getTerm().sort().extendsTrans(objectSort)) {
-	            t = TB.and(t, TB.not(TB.created(services, expr.getTerm())));
+	            t = TB.and(t, 
+	                       TB.equals(TB.select(services,
+	                                           booleanLDT.targetSort(),
+	                                           heapAtPre,
+	                                           expr.getTerm(),
+	                                           TB.func(heapLDT.getCreated())),
+	                                 TB.FALSE(services)));
 	        } else if(expr.getTerm().sort().extendsTrans(setLDT.targetSort())) {
-	            t = TB.and(t, TB.subset(services, expr.getTerm(), TB.freshLocs(services, TB.heap(services))));
+	            t = TB.and(t, TB.subset(services, 
+	                                    expr.getTerm(), 
+	                                    TB.freshLocs(services, heapAtPre)));
 	        } else {
 	            raiseError("Wrong type: " + expr);
 	        }
 	    }
-	    t = convertToOld(t);
 	    result = new SLExpression(t);
 	} 
 	

@@ -742,6 +742,7 @@ public abstract class TacletApp implements RuleApp {
 
 	SVInstantiations insts = instantiations();
 	ImmutableSet<Metavariable> newVars = newMetavariables();
+	assert newVars.isEmpty() : "metavariables are disabled";
 	Constraint constr = constraint();
 
 	if (!newVars.isEmpty()) {

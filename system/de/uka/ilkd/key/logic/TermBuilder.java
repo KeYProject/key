@@ -172,7 +172,7 @@ public final class TermBuilder {
     public LocationVariable resultVar(Services services, 
                                       ProgramMethod pm,
                                       boolean makeNameUnique) {
-	if(pm.getKeYJavaType() == null) {
+	if(pm.getKeYJavaType() == null || pm.isConstructor()) {
 	    return null;
 	} else {
 	    String name = "result";

@@ -527,6 +527,11 @@ public final class JavaInfo {
     public ImmutableList<ProgramMethod> getConstructors(KeYJavaType kjt) {
 	return kpmi.getConstructors(kjt);
     }
+    
+    public ProgramMethod getConstructor(KeYJavaType kjt, 
+	    				ImmutableList<KeYJavaType> signature) {
+	return kpmi.getConstructor(kjt, signature);
+    }
 
     /**
      * returns the program methods defined in the given KeYJavaType with name

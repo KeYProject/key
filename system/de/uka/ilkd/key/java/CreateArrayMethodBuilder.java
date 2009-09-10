@@ -93,18 +93,11 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
 
         // declared only in Object so we have to look there
         ProgramVariable initialized = findInObjectFields(ImplicitFieldAdder.IMPLICIT_INITIALIZED);
-        ProgramVariable trans;
         if (initialized == null) {
             // only if createObject for Object is called
             initialized = find(ImplicitFieldAdder.IMPLICIT_INITIALIZED,
                     implicitFields);
-            trans = find(ImplicitFieldAdder.IMPLICIT_TRANSIENT, implicitFields);
-        } else {
-            trans = findInObjectFields(ImplicitFieldAdder.IMPLICIT_TRANSIENT);
-        }
-
-        result.addLast(assign(attribute(new ThisReference(), trans),
-                new IntLiteral(0)));
+        } 
 
         result.addLast(assign(attribute(new ThisReference(), initialized),
                 BooleanLiteral.FALSE));
@@ -300,6 +293,7 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
     protected StatementBlock getCreateArrayHelperBody(ProgramVariable length,
             ProgramVariable paramLength, ImmutableList<Field> fields,
             boolean createTransient, ProgramVariable transientType) {
+	assert !createTransient;
 
         final ThisReference thisRef = new ThisReference();
 
@@ -310,12 +304,6 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
         body.add(new MethodReference(new ImmutableArray<Expression>(),
                 new ProgramElementName(
                         PrepareObjectBuilder.IMPLICIT_OBJECT_PREPARE), null));
-
-        if (createTransient) {
-            body.add(assign(attribute(thisRef,
-                    findInObjectFields(ImplicitFieldAdder.IMPLICIT_TRANSIENT)),
-                    transientType));
-        }
 
         body.add(assign(attribute(thisRef,
                 findInObjectFields(ImplicitFieldAdder.IMPLICIT_INITIALIZED)),

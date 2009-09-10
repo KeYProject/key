@@ -13,12 +13,12 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.termProjection.ProjectionToTerm;
 
-public class SortComparisionFeature extends BinaryFeature {
+public class SortComparisonFeature extends BinaryFeature {
 
     public final static int SUBSORT = 0;
     
     public static Feature create(ProjectionToTerm s1, ProjectionToTerm s2, int cmp) {
-        return new SortComparisionFeature(s1, s2, cmp);
+        return new SortComparisonFeature(s1, s2, cmp);
     }
     
     private final ProjectionToTerm s1;
@@ -28,7 +28,7 @@ public class SortComparisionFeature extends BinaryFeature {
     /**
      * creates a new comparision term feature
      */
-    private SortComparisionFeature(ProjectionToTerm s1, ProjectionToTerm s2, 
+    private SortComparisonFeature(ProjectionToTerm s1, ProjectionToTerm s2, 
             int comparator) {
         this.s1 = s1;
         this.s2 = s2;

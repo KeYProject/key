@@ -19,6 +19,7 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.proof.mgt.ComplexRuleJustificationBySpec;
@@ -49,34 +50,23 @@ public final class UseDependencyContractRule implements BuiltInRule {
     //internal methods
     //-------------------------------------------------------------------------
     
-    private Pair<Term,Term> getBaseHeapAndChangedLocs(Term heapTerm,
-	    					      Services services,
-	                                              HeapLDT heapLDT) {
-	Operator op = heapTerm.op();
+    private Pair<Term,Term> getBaseHeapAndChangedLocs(
+	    			Term heapTerm,
+	    			Services services) {
+	final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+	final Operator op = heapTerm.op();
 	if(op == heapLDT.getStore()) {
 	    final Term h = heapTerm.sub(0);
 	    final Term o = heapTerm.sub(1);
 	    final Term f = heapTerm.sub(2);
-	    final Pair<Term,Term> sub
-	    	= getBaseHeapAndChangedLocs(h, services, heapLDT);
-	    return new Pair<Term,Term>(sub.first, 
-		    		       TB.union(services, 
-		    			        TB.pairSingleton(services, 
-		    			        	         o, 
-		    			        	         f),
-		    			        sub.second));
+	    return new Pair<Term,Term>(h, TB.pairSingleton(services, o, f));
 	} else if(op == heapLDT.getChangeHeapAtLocs() 
 		  || op == heapLDT.getChangeHeapAtLocs2()) {
 	    final Term h = heapTerm.sub(0);
 	    final Term s = heapTerm.sub(1);
-	    final Pair<Term,Term> sub 
-	    	= getBaseHeapAndChangedLocs(h, services, heapLDT);
-	    return new Pair<Term,Term>(sub.first, 
-				       TB.union(services, 
-					        s,
-					        sub.second));
+	    return new Pair<Term,Term>(h, s); 
 	} else {
-	    return new Pair<Term,Term>(heapTerm, TB.empty(services));
+	    return null;
 	}
     }
     
@@ -115,30 +105,6 @@ public final class UseDependencyContractRule implements BuiltInRule {
     }
     
     
-    /**
-     * Replaces all occurrences of "orig" by "replacement".
-     */
-    private void replaceInGoal(Term orig, Term replacement, Goal goal) {
-        final Map<Term, Term> replaceMap = new LinkedHashMap<Term, Term>();
-        replaceMap.put(orig, replacement);
-        final OpReplacer or = new OpReplacer(replaceMap);
-        
-	final Sequent s = goal.sequent();        
-	for(int i = 1, n = s.size(); i <= n; i++) {
-	    ConstrainedFormula cf = s.getFormulabyNr(i);
-	    Term formula = cf.formula();
-	    Term newFormula = or.replace(formula);
-	    if(!formula.equals(newFormula)) {
-		goal.changeFormula(new ConstrainedFormula(newFormula), 
-			           PosInOccurrence.findInSequent(
-			        	   		s, 
-			        	   		i, 
-			        	                PosInTerm.TOP_LEVEL));
-	    }
-	}
-    }
-
-    
 
     //-------------------------------------------------------------------------
     //public interface
@@ -164,11 +130,10 @@ public final class UseDependencyContractRule implements BuiltInRule {
 	}
 	
 	//heap term of observer must be store-term
-	final Services services = goal.proof().getServices();		
-	final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+	final Services services = goal.proof().getServices();
 	final Pair<Term,Term> baseHeapAndChangedLocs 
-		= getBaseHeapAndChangedLocs(term.sub(0), services, heapLDT);
-	if(baseHeapAndChangedLocs.first.equals(term.sub(0))) {
+		= getBaseHeapAndChangedLocs(term.sub(0), services);
+	if(baseHeapAndChangedLocs == null) {
 	    return false;
 	}
 	
@@ -195,8 +160,8 @@ public final class UseDependencyContractRule implements BuiltInRule {
 
     
     @Override    
-    public ImmutableList<Goal> apply(Goal goal, 
-	    			     Services services, 
+    public ImmutableList<Goal> apply(Goal goal,
+	    			     Services services,
 	    			     RuleApp ruleApp) {
 	//collect information
 	final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();	
@@ -215,9 +180,9 @@ public final class UseDependencyContractRule implements BuiltInRule {
 		  ? target.getContainerType()
 	          : services.getJavaInfo().getKeYJavaType(selfTerm.sort());
         final Contract contract = configureContract(services, kjt, target);
-        assert contract != null;	
+        assert contract != null;
         final Pair<Term,Term> baseHeapAndChangedLocs 
-        	= getBaseHeapAndChangedLocs(heap, services, heapLDT); 
+        	= getBaseHeapAndChangedLocs(heap, services); 
         
         //get precondition, dependency term
         final Term pre = contract.getPre(baseHeapAndChangedLocs.first,
@@ -228,18 +193,22 @@ public final class UseDependencyContractRule implements BuiltInRule {
         				 selfTerm, 
         				 paramTerms, 
         				 services);
+        final Term changedLocsAndDepDisjoint 
+        	= TB.disjoint(services, baseHeapAndChangedLocs.second, dep);
         
         //split goal into two branches
         final ImmutableList<Goal> result = goal.split(2);
-        final Goal preGoal = result.head();//tail().head();
+        final Goal preGoal = result.head();
         final Goal postGoal = result.tail().head();
-        preGoal.setBranchLabel("Dependencies changed");
-        postGoal.setBranchLabel("Dependencies unchanged");
+        final String changeString 
+        	= LogicPrinter.quickPrintTerm(baseHeapAndChangedLocs.second, 
+        				      services);
+        preGoal.setBranchLabel("Dependencies changed by write to " 
+        	               + changeString);
+        postGoal.setBranchLabel("Dependencies unchanged by write to " 
+        	                + changeString);
         
         //create "Pre" branch
-        final Term changedLocsAndDepDisjoint 
-        	= TB.disjoint(services, baseHeapAndChangedLocs.second, dep);
-        preGoal.removeFormula(pio);
         preGoal.addFormula(new ConstrainedFormula(
         				TB.and(pre, changedLocsAndDepDisjoint)),
         		   false,
@@ -249,7 +218,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
         final Term[] subs = term.subs().toArray(new Term[term.arity()]);
         subs[0] = baseHeapAndChangedLocs.first;
         final Term termWithBaseHeap = TB.func(target, subs);
-        replaceInGoal(term, termWithBaseHeap, postGoal);
+        postGoal.addFormula(new ConstrainedFormula(TB.equals(term, termWithBaseHeap)), true, false);
         postGoal.addFormula(new ConstrainedFormula(
         				TB.and(pre, changedLocsAndDepDisjoint)),
         	 	    true,

@@ -30,7 +30,7 @@ import de.uka.ilkd.key.rule.RuleApp;
  * manager simulates a backtracking behaviour by repeated evaluation of the
  * feature term.
  */
-public class BackTrackingManager {
+public final class BackTrackingManager {
 
     /**
      * The original rule application in question, i.e., the application without

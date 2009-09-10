@@ -46,11 +46,7 @@ import de.uka.ilkd.key.speclang.jml.JMLSpecExtractor;
  * EnvInput for standalone specification language front ends.
  */
 public final class SLEnvInput extends AbstractEnvInput {
-    
-    private static final String INIT_NAME 
-    	= ConstructorNormalformBuilder.CONSTRUCTOR_NORMALFORM_IDENTIFIER;
-    
-        
+            
     //-------------------------------------------------------------------------
     //constructors
     //-------------------------------------------------------------------------

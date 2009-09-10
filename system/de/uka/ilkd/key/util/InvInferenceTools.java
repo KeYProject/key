@@ -284,6 +284,19 @@ public class InvInferenceTools {
     
     
     /**
+     * Removes leading updates from the passed term.
+     */
+    public Pair<ImmutableList<Term>,Term> goBelowUpdates2(Term term) {
+	ImmutableList<Term> updates = ImmutableSLList.<Term>nil();
+        while(term.op() instanceof UpdateApplication) {
+            updates = updates.append(UpdateApplication.getUpdate(term));
+            term = UpdateApplication.getTarget(term);
+        }        
+        return new Pair<ImmutableList<Term>,Term>(updates, term);
+    }    
+    
+    
+    /**
      * Returns the entry node for the innermost loop of the symbolic 
      * execution state given by the passed node.
      */

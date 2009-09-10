@@ -252,7 +252,7 @@ public final class ProblemInitializer {
                 searchPathList.add(javaPath);
             }
             String[] cus = getClasses(javaPath).toArray(new String[]{});
-            r2k.readCompilationUnitsAsFiles(cus);               
+            r2k.readCompilationUnitsAsFiles(cus);
 	} else {
             reportStatus("Reading Java libraries");	    
 	    r2k.parseSpecialClasses();
@@ -433,6 +433,8 @@ public final class ProblemInitializer {
         
 	//read Java
         readJava(envInput, initConfig);
+        initConfig.getServices().getNamespaces().functions()
+        	  .add(initConfig.getServices().getJavaInfo().getInv());
 
         //read envInput
         readEnvInput(envInput, initConfig);

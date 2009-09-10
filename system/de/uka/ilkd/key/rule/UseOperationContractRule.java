@@ -20,8 +20,8 @@ import de.uka.ilkd.key.gui.Main;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.expression.operator.CopyAssignment;
+import de.uka.ilkd.key.java.expression.operator.New;
 import de.uka.ilkd.key.java.reference.*;
-import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.statement.Throw;
 import de.uka.ilkd.key.java.visitor.ProgramContextAdder;
 import de.uka.ilkd.key.logic.*;
@@ -65,30 +65,33 @@ public final class UseOperationContractRule implements BuiltInRule {
     //internal methods
     //-------------------------------------------------------------------------
     
-    private Pair<Term,MethodReference> getMethodCall(JavaBlock jb,
-	    					     Services services) {
-	final Term resultTerm;
-        final MethodReference mr;
+    private Pair<Expression,MethodOrConstructorReference> getMethodCall(
+	    						JavaBlock jb,
+	    				                Services services) {
+	final Expression resultExpr;
+        final MethodOrConstructorReference mr;
         
         final SourceElement activeStatement = IIT.getActiveStatement(jb);
         //active statement must be method reference or assignment with
         //method reference
         if(activeStatement instanceof MethodReference) {
-            resultTerm = null;
+            resultExpr = null;
             mr = (MethodReference) activeStatement;
+        } else if(activeStatement instanceof New 
+        	  && ((New)activeStatement).getTypeDeclarationCount() == 0) {
+            resultExpr = null;
+            mr = (New) activeStatement;
         } else if(activeStatement instanceof CopyAssignment) {
             final CopyAssignment ca = (CopyAssignment) activeStatement;
             final Expression lhs = ca.getExpressionAt(0);
             final Expression rhs = ca.getExpressionAt(1);
-            if(rhs instanceof MethodReference 
+            if((rhs instanceof MethodReference 
+        	|| rhs instanceof New 
+        	   && ((New)rhs).getTypeDeclarationCount() == 0)
                && (lhs instanceof LocationVariable 
-        	   || lhs instanceof FieldReference)) {
-        	final ExecutionContext ec 
-        		= IIT.getInnermostExecutionContext(jb, services);
-        	resultTerm
-        		= services.getTypeConverter().convertToLogicElement(lhs,
-        								    ec);        	
-        	mr = (MethodReference) rhs;
+                   || lhs instanceof FieldReference)) {
+        	resultExpr = lhs;
+        	mr = (MethodOrConstructorReference) rhs;
             } else {
         	return null;
             }
@@ -99,51 +102,73 @@ public final class UseOperationContractRule implements BuiltInRule {
         //receiver must be simple
         final ReferencePrefix rp = mr.getReferencePrefix();
         if(rp != null 
-           && !ProgramSVSort.SIMPLEEXPRESSION.canStandFor(rp, null, services)
+           && ! ProgramSVSort.SIMPLEEXPRESSION.canStandFor(rp, null, services)
            && ! (rp instanceof ThisReference)
            && ! (rp instanceof SuperReference)
            && ! (rp instanceof TypeReference)) {
             return null;
         } else {
-            return new Pair<Term,MethodReference>(resultTerm, mr);
+            return new Pair<Expression,MethodOrConstructorReference>(resultExpr, mr);
         }
     }
     
     
-    //copied from MethodCall.java
-    private ProgramMethod getProgramMethod(MethodReference mr,
+    private KeYJavaType getStaticPrefixType(MethodOrConstructorReference mr,
+	                                    Services services,
+	                                    ExecutionContext ec) {
+	if(mr instanceof MethodReference) { 
+	    return ((MethodReference)mr).determineStaticPrefixType(services, 
+		                         ec);
+	} else {
+	    New n = (New) mr;
+	    return n.getKeYJavaType(services, ec);
+	}
+    }
+    
+    
+    private ProgramMethod getProgramMethod(MethodOrConstructorReference mr,
 	    				   KeYJavaType staticType, 
 	    				   ExecutionContext ec,
 	    				   Services services) {
-	ProgramMethod result;
- 	if(ec != null){
-	    result = mr.method(services, staticType, ec);
-	    if(result == null) {
-		// if a method is declared protected and prefix and
-		// execContext are in different packages we have to
-		// simulate visibility rules like being in prefixType
-		result = mr.method(services, 
-				  staticType, 
-				  mr.getMethodSignature(services, ec), 
-				  staticType);
+	ProgramMethod result;	
+	if(mr instanceof MethodReference) { //from MethodCall.java
+	    MethodReference methRef = (MethodReference) mr;
+	    if(ec != null) {
+		result = methRef.method(services, staticType, ec);
+		if(result == null) {
+		    // if a method is declared protected and prefix and
+		    // execContext are in different packages we have to
+		    // simulate visibility rules like being in prefixType
+		    result = methRef.method(services, 
+			    staticType, 
+			    methRef.getMethodSignature(services, ec), 
+			    staticType);
+		}
+	    } else {
+		result = methRef.method(services, 
+			staticType, 
+			methRef.getMethodSignature(services, ec), 
+			staticType);
 	    }
- 	} else {
-	    result = mr.method(services, 
-		    	       staticType, 
-		    	       mr.getMethodSignature(services, ec), 
-		    	       staticType);
- 	}
+	} else {
+	    New n = (New) mr;
+	    ImmutableList<KeYJavaType> sig = ImmutableSLList.<KeYJavaType>nil();
+	    for(Expression e : n.getArguments()) {
+		sig = sig.append(e.getKeYJavaType(services, ec));
+	    }
+	    result = services.getJavaInfo().getConstructor(staticType, sig);
+	}
 	return result;
     }
     
     
-    private Term getActualSelf(MethodReference mr,
+    private Term getActualSelf(MethodOrConstructorReference mr,
 	    		       ProgramMethod pm,
 	    		       ExecutionContext ec, 
 	    		       Services services) {
 	final TypeConverter tc = services.getTypeConverter();
 	final ReferencePrefix rp = mr.getReferencePrefix();
-	if(pm.isStatic()) {
+	if(pm.isStatic() || pm.isConstructor()) {
 	    return null;
 	} else if(rp == null 
 		  || rp instanceof ThisReference 
@@ -161,7 +186,7 @@ public final class UseOperationContractRule implements BuiltInRule {
     }
     
     
-    private ImmutableList<Term> getActualParams(MethodReference mr,
+    private ImmutableList<Term> getActualParams(MethodOrConstructorReference mr,
 	    					ExecutionContext ec,
 	    					Services services) {        
 	ImmutableList<Term> result = ImmutableSLList.<Term>nil();
@@ -228,6 +253,40 @@ public final class UseOperationContractRule implements BuiltInRule {
                 return null;
             }
         }
+    }
+    
+    
+    private Term getFreePost(ProgramMethod pm,
+	    		     KeYJavaType kjt,
+	                     ProgramVariable selfVar, 
+	                     ProgramVariable resultVar,
+	                     ProgramVariable heapAtPreVar,
+	                     Services services) {
+        final Term reachableConstructorPost;
+        if(pm.isConstructor()) {
+            reachableConstructorPost
+                = TB.and(new Term[]{
+        	      TB.not(TB.equals(TB.var(selfVar), TB.NULL(services))),
+                      OpReplacer.replace(TB.heap(services), 
+        	                  	 TB.var(heapAtPreVar), 
+        	                   	 TB.not(TB.created(services, 
+        	                   	                   TB.var(selfVar)))),
+                      TB.created(services, TB.var(selfVar)),
+                      TB.exactInstance(services, 
+                       	               kjt.getSort(), 
+                        	       TB.var(selfVar))});            
+        } else {
+            reachableConstructorPost = TB.tt();
+        }
+        
+        final Term reachableResult
+        	= resultVar != null 
+        	  ? TB.reachableValue(services, resultVar)
+                  : TB.tt();
+        	  
+        return TB.and(new Term[]{TB.inReachableState(services),
+        			 reachableConstructorPost, 
+        			 reachableResult}); 
     }
    
     
@@ -328,9 +387,9 @@ public final class UseOperationContractRule implements BuiltInRule {
             return false;
         }
         
-        //active statement must be method call
+        //active statement must be method call or new
         final Modality modality = (Modality) term.op();
-        final Pair<Term,MethodReference> methodCall
+        final Pair<Expression,MethodOrConstructorReference> methodCall
         	= getMethodCall(term.javaBlock(), goal.proof().getServices());
         if(methodCall == null) {
             return false;
@@ -347,12 +406,14 @@ public final class UseOperationContractRule implements BuiltInRule {
         }
  
         //there must be applicable contracts for the operation
-	final KeYJavaType staticType 
-		= methodCall.second.determineStaticPrefixType(services, ec);
+	final KeYJavaType staticType
+		= getStaticPrefixType(methodCall.second, services, ec);
+	assert staticType != null;
 	final ProgramMethod pm = getProgramMethod(methodCall.second, 
 		                                  staticType,
 		                                  ec, 
 		                                  services);
+	assert pm != null;
 	
         final ImmutableSet<OperationContract> contracts 
                 = getApplicableContracts(services, pm, staticType, modality);
@@ -379,12 +440,12 @@ public final class UseOperationContractRule implements BuiltInRule {
 	final Term term = IIT.goBelowUpdates(pio.subTerm());
         final Modality modality = (Modality) term.op();
         final JavaBlock jb = term.javaBlock();
-        final Pair<Term,MethodReference> methodCall
+        final Pair<Expression,MethodOrConstructorReference> methodCall
         	= getMethodCall(term.javaBlock(), services);
         final ExecutionContext ec 
 		= IIT.getInnermostExecutionContext(term.javaBlock(), services);
 	final KeYJavaType staticType 
-		= methodCall.second.determineStaticPrefixType(services, ec);
+		= getStaticPrefixType(methodCall.second, services, ec);
 	final ProgramMethod pm 
 		= getProgramMethod(methodCall.second, staticType, ec, services);
 	final Term actualSelf 
@@ -415,7 +476,8 @@ public final class UseOperationContractRule implements BuiltInRule {
         if(selfVar != null) {
             goal.addProgramVariable(selfVar);
         }
-        assert (selfVar == null) == (actualSelf == null);
+        assert pm.isConstructor() 
+               || ((selfVar == null) == (actualSelf == null));
         
         final ImmutableList<ProgramVariable> paramVars 
         	= TB.paramVars(services, pm, true);
@@ -427,7 +489,8 @@ public final class UseOperationContractRule implements BuiltInRule {
         if(resultVar != null) {
             goal.addProgramVariable(resultVar);
         }
-        assert !(methodCall.first != null && resultVar == null);
+        assert pm.isConstructor() 
+               || !(methodCall.first != null && resultVar == null);
         
         final ProgramVariable excVar = TB.excVar(services, pm, true);
         assert excVar != null;
@@ -481,16 +544,16 @@ public final class UseOperationContractRule implements BuiltInRule {
 					     	           .getHeapLDT()
 					     	           .targetSort());
 	services.getNamespaces().functions().addSafely(anonHeapFunc);
-        final Term anonUpdate = TB.anon(services, mod, TB.func(anonHeapFunc));
+        final Term anonUpdate = TB.anon(services, mod, TB.func(anonHeapFunc));        	  
         final Term heapAtPreUpdate = TB.elementary(services, 
         					   heapAtPreVar, 
         					   TB.heap(services));
         
-        Term selfParamsUpdate = (selfVar == null
-                                       ? TB.skip()
-                                       : TB.elementary(services, 
-                                	       	       selfVar, 
-                                	       	       actualSelf));
+        Term selfParamsUpdate = (selfVar == null || actualSelf == null
+                                 ? TB.skip()
+                                 : TB.elementary(services, 
+                                      	         selfVar, 
+                                	       	 actualSelf));
         final Iterator<Term> actualParamsIt = actualParams.iterator();
         for(final ParsableVariable paramVar : paramVars) {
             assert actualParamsIt.hasNext();
@@ -507,40 +570,48 @@ public final class UseOperationContractRule implements BuiltInRule {
         replaceInGoal(term, TB.apply(selfParamsUpdate, pre), preGoal, pio);
         
         //create "Post" branch
-        final Term reachablePost = TB.and(TB.inReachableState(services), 
-                		          resultVar != null
-                		          ? TB.reachableValue(services, 
-                		        	  	     resultVar)
-                                          : TB.tt());
+        final Term freePost = getFreePost(pm,
+	    		     		  staticType,
+	    		     		  selfVar, 
+	    		     		  resultVar,
+	    		     		  heapAtPreVar,
+	    		     		  services);
+	final StatementBlock resultAssign;
+	if(methodCall.first == null) {
+	    resultAssign = new StatementBlock();
+	} else {
+	    CopyAssignment ca 
+	    	= new CopyAssignment(methodCall.first, 
+	    		             pm.isConstructor() ? selfVar : resultVar);
+	    resultAssign = new StatementBlock(ca);
+	}        
         final StatementBlock postSB 
-        	= replaceStatement(jb, new StatementBlock());
+        	= replaceStatement(jb, resultAssign);
         final Term postWithoutUpdate 
-            = TB.imp(TB.and(new Term[]{excNull, reachablePost, post}),
+            = TB.imp(TB.and(new Term[]{excNull, freePost, post}),
                      TB.prog(modality,
                              JavaBlock.createJavaBlock(postSB),
-                             term.sub(0)));
-        final Term resultUpdate = (methodCall.first == null
-                                   ? TB.skip()
-                                   : TB.elementary(services, 
-                                	   	   methodCall.first, 
-                                	   	   TB.var(resultVar)));
-        
+                             term.sub(0)));        
         final Term normalPost 
-        	= TB.applySequential(new Term[]{heapAtPreUpdate,
-                                                selfParamsUpdate,
-                                                anonUpdate,
-                                                resultUpdate},
+        	= TB.applySequential(new Term[]{selfParamsUpdate,
+                                                heapAtPreUpdate,
+                                                anonUpdate},
                                      postWithoutUpdate);
         replaceInGoal(term, normalPost, postGoal, pio);
         
         //create "Exceptional Post" branch
-        final Term reachableExcPost = TB.inReachableState(services);
+        final Term freeExcPost = getFreePost(pm,
+	    		     		     staticType,
+	    		     		     selfVar, 
+	    		     		     null,
+	    		     		     heapAtPreVar,
+	    		     		     services);
         final StatementBlock excPostSB 
             = replaceStatement(jb, new StatementBlock(new Throw(excVar)));
         final Term excPostWithoutUpdate
             = TB.imp(TB.and(new Term[]{TB.not(excNull),
         	                       excCreated, 
-        	    		       reachableExcPost, 
+        	    		       freeExcPost, 
         	    		       post}),
                      TB.prog(modality,
                              JavaBlock.createJavaBlock(excPostSB), 
@@ -549,7 +620,6 @@ public final class UseOperationContractRule implements BuiltInRule {
                                                            heapAtPreUpdate,
                                                            anonUpdate},
                                                  excPostWithoutUpdate);
-                                                            
         replaceInGoal(term, excPost, excPostGoal, pio);
         
         //create "Null Reference" branch
