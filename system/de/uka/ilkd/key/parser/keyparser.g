@@ -4275,6 +4275,16 @@ varcond_isupdated [TacletBuilder b]
         } 
 ;
 
+varcond_sameheapdeppred [TacletBuilder b]
+{
+  ParsableVariable x = null, y = null;
+}
+:
+   SAMEHEAPDEPPRED LPAREN x=varId COMMA y=varId RPAREN {
+     b.addVariableCondition(new SameHeapDependentPredicate(
+       (SchemaVariable) x, (SchemaVariable) y));          
+   }
+;
 
 varcond_freeLabelIn [TacletBuilder b, boolean negated]
 {
