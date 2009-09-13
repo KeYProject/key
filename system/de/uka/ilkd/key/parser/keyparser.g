@@ -4281,7 +4281,7 @@ varcond_sameheapdeppred [TacletBuilder b]
 }
 :
    SAMEHEAPDEPPRED LPAREN x=varId COMMA y=varId RPAREN {
-     b.addVariableCondition(new SameHeapDependentPredicate(
+     b.addVariableCondition(new SameHeapDependentPredicateVariableCondition(
        (SchemaVariable) x, (SchemaVariable) y));          
    }
 ;
