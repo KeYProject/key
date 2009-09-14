@@ -399,6 +399,22 @@ public abstract class Notation {
     
     
     /**
+     * The standard concrete syntax for observer function terms.
+     */
+    static final class ObserverNotation extends Notation {
+
+	public ObserverNotation() {
+	    super(130);
+	}
+
+	public void print(Term t, LogicPrinter sp) throws IOException {
+	    sp.printObserver(t);
+	}
+    }
+    
+    
+    
+    /**
      * The standard concrete syntax for singleton sets.
      */
     public static final class SingletonNotation extends Notation {
@@ -443,33 +459,6 @@ public abstract class Notation {
     }        
         
     
-    /**
-     * The standard concrete syntax for query terms <code>o.q(x)</code>.
-     */
-    static final class ProgramMethod extends Notation {
-	private final int ass;
-
-	public ProgramMethod(int ass) {
-	    super(130);
-	    this.ass = ass;
-	}
-
-	public void print(Term t, LogicPrinter sp) throws IOException {
-	    if (((de.uka.ilkd.key.logic.op.ProgramMethod) t.op())
-		    .isStatic()) {
-
-		sp.printFunctionTerm(t.op().name().toString().replaceAll("::",
-			"."), t);
-	    } else {
-		final ProgramElementName name = (ProgramElementName) t.op()
-			.name();
-		sp.printQueryTerm(name.getProgramName() + "@("
-			+ name.getQualifier() + ")", t, ass);
-	    }
-	}
-    }
-    
-
     /**
      * The standard concrete syntax for conditional terms
      * <code>if (phi) (t1) (t2)</code>.

@@ -76,7 +76,7 @@ public final class DependencyContractPO extends AbstractPO
         	= specRepos.getClassAxioms(selfKJT);
         Term axiomTerm = TB.tt();
         for(ClassAxiom ax : axioms) {
-            Taclet axiomTaclet = ax.getAxiomAsTaclet(selfVar, services);
+            Taclet axiomTaclet = ax.getAxiomAsTaclet(services);
             if(axiomTaclet != null) {
         	taclets = taclets.add(NoPosTacletApp.createNoPosTacletApp(
         							axiomTaclet));
@@ -86,8 +86,7 @@ public final class DependencyContractPO extends AbstractPO
             } else {
         	axiomTerm = TB.and(axiomTerm, 
         			   TB.forallHeaps(services, 
-        				   	  ax.getAxiom(selfVar, 
-        				   		      services)));
+        				   	  ax.getAxiom(services)));
             }
         }
         

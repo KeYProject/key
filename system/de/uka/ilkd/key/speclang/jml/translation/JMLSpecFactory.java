@@ -289,7 +289,7 @@ public class JMLSpecFactory {
                                             requires,
                                             post,
                                             assignable,
-                                            TB.allLocs(services),//TODO
+                                            null, //TODO
                                             selfVar,
                                             paramVars,
                                             resultVar,
@@ -305,7 +305,7 @@ public class JMLSpecFactory {
                                             requires,
                                             post,
                                             assignable,
-                                            TB.allLocs(services),//TODO
+                                            null, //TODO
                                             selfVar,
                                             paramVars,
                                             resultVar,
@@ -321,7 +321,7 @@ public class JMLSpecFactory {
                                             TB.and(requires, TB.not(diverges)),
                                             post,
                                             assignable,
-                                            TB.allLocs(services),//TODO
+                                            null, //TODO
                                             selfVar,
                                             paramVars,
                                             resultVar,
@@ -335,7 +335,7 @@ public class JMLSpecFactory {
                                             requires,
                                             post,
                                             assignable,
-                                            TB.allLocs(services),//TODO
+                                            null, //TODO
                                             selfVar,
                                             paramVars,
                                             resultVar,

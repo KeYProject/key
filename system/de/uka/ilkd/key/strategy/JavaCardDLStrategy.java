@@ -1827,7 +1827,8 @@ public final class JavaCardDLStrategy extends AbstractFeatureStrategy {
     ////////////////////////////////////////////////////////////////////////////
 
     private Feature setupApprovalF(Proof p_proof) {
-	return NonDuplicateAppFeature.INSTANCE;
+	return add(NonDuplicateAppFeature.INSTANCE, depSpecFeature(longConst(0)));//XXX
+//	return NonDuplicateAppFeature.INSTANCE;
 //        return add ( NonDuplicateAppFeature.INSTANCE,
 //                     UCIncompatibleFeature.create ( p_proof ) );
     }
@@ -1934,6 +1935,11 @@ public final class JavaCardDLStrategy extends AbstractFeatureStrategy {
     public final RuleAppCost computeCost (RuleApp app,
                                           PosInOccurrence pio,
                                           Goal goal) {
+//	if(app.rule()==UseDependencyContractRule.INSTANCE/* && (goal.node().serialNr() == 433 || goal.node().serialNr() == 421)*/) {
+//	    RuleAppCost result = costComputationF.compute ( app, pio, goal );
+//	    System.out.println("Cost for node " + goal.node().serialNr() + ": " + result);
+//	    return result;
+//	}
         return costComputationF.compute ( app, pio, goal );
     }
 
@@ -1946,6 +1952,11 @@ public final class JavaCardDLStrategy extends AbstractFeatureStrategy {
     public final boolean isApprovedApp (RuleApp app,
                                         PosInOccurrence pio,
                                         Goal goal) {
+//	if(app.rule()==UseDependencyContractRule.INSTANCE) {
+//	    boolean result = !( approvalF.compute ( app, pio, goal ) instanceof TopRuleAppCost );
+//	    System.out.println("Approval for node " + goal.node().serialNr() + ": " + result);
+//	    return result;
+//	}	
         return !( approvalF.compute ( app, pio, goal ) instanceof TopRuleAppCost );
     }
     

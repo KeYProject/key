@@ -16,6 +16,7 @@
 ./heap/simple/select_store.key
 ./heap/simple/selection_sort.key
 ./heap/simple/sets_and_pairs.key
+./heap/SmansEtAl/cell_client.key
 ./standard_key/arith/binomial1.key
 ./standard_key/arith/binomial2.key
 ./standard_key/arith/check_jdiv.key

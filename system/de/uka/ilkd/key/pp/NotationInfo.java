@@ -160,7 +160,6 @@ public final class NotationInfo {
 	tbl.put(LogicVariable.class, new Notation.VariableNotation());
 	tbl.put(LocationVariable.class, new Notation.VariableNotation());
         tbl.put(ProgramConstant.class, new Notation.VariableNotation());
-	tbl.put(ProgramMethod.class, new Notation.ProgramMethod(121));
 	tbl.put(Equality.class, new Notation.Infix("=", 70, 80, 80)); 
 	tbl.put(ElementaryUpdate.class, new Notation.ElementaryUpdateNotation());
 	tbl.put(ModalOperatorSV.class, new Notation.ModalSVNotation(60, 60));
@@ -194,6 +193,8 @@ public final class NotationInfo {
 	
 	//heap operators
 	tbl.put(HeapLDT.SELECT_NAME, new Notation.SelectNotation());
+	tbl.put(ObserverFunction.class, new Notation.ObserverNotation());
+	tbl.put(ProgramMethod.class, new Notation.ObserverNotation());	
 	
 	//set operators
 	SetLDT setLDT = services.getTypeConverter().getSetLDT();

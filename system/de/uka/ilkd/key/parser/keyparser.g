@@ -3402,11 +3402,9 @@ varexp[TacletBuilder b]
     | varcond_enum_const[b] 
     | varcond_free[b]  
     | varcond_hassort[b]
-    | varcond_inReachableState[b]
     | varcond_equalUnique[b]
     | varcond_new[b]
-    | varcond_newlabel[b]
-    | varcond_query[b] 
+    | varcond_newlabel[b] 
   ) 
   | 
   ( (NOT {negated = true;} )? 
@@ -3646,29 +3644,7 @@ varcond_reference [TacletBuilder b, boolean isPrimitive]
    { b.addVariableCondition(new TypeCondition(tr, !isPrimitive, nonNull)); }
 ;
 
-
-varcond_query [TacletBuilder b]
-{
-  ParsableVariable x = null;
-}
-:
-   ISQUERY LPAREN x=varId RPAREN {
-     b.addVariableCondition(new TestQuery((SchemaVariable)x));
-   }
-;
-
-
-varcond_inReachableState [TacletBuilder b]
-{
-  ParsableVariable x = null;
-}
-:
-   ISINREACHABLESTATE LPAREN x=varId RPAREN    	
-   {
-      b.addVariableCondition(new InReachableStateCondition((SchemaVariable)x));
-   }
-;
-         
+        
 varcond_staticmethod [TacletBuilder b, boolean negated]
 {
   ParsableVariable x = null, y = null, z = null;

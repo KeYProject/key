@@ -521,16 +521,16 @@ public final class UseOperationContractRule implements BuiltInRule {
            && !(rp instanceof SuperReference)
            && !(rp instanceof TypeReference)) {
             result = goal.split(4);
-            preGoal = result.tail().tail().tail().head();
-            postGoal = result.tail().tail().head();
-            excPostGoal = result.tail().head();
+            postGoal = result.tail().tail().tail().head();
+            excPostGoal = result.tail().tail().head();
+            preGoal = result.tail().head();
             nullGoal = result.head();
             nullGoal.setBranchLabel("Null reference (" + actualSelf + " = null)");
         } else {
             result = goal.split(3);
-            preGoal = result.tail().tail().head();
-            postGoal = result.tail().head();
-            excPostGoal = result.head();
+            postGoal = result.tail().tail().head();
+            excPostGoal = result.tail().head();
+            preGoal = result.head();
             nullGoal = null;
         }
         preGoal.setBranchLabel("Pre");
@@ -538,7 +538,8 @@ public final class UseOperationContractRule implements BuiltInRule {
         excPostGoal.setBranchLabel("Exceptional Post");
         
         //prepare common stuff for the three branches
-	final Name anonHeapName = new Name(TB.newName(services, "anonHeap"));
+	final Name anonHeapName 
+		= new Name(TB.newName(services, pm.getName() + "Heap"));
 	final Function anonHeapFunc = new Function(anonHeapName, 
 					           services.getTypeConverter()
 					     	           .getHeapLDT()

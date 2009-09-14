@@ -1647,7 +1647,7 @@ jmlprimary returns [SLExpression result=null] throws SLTranslationException
 	    }
 	    result = new SLExpression(t);
 	} 
-	
+
     |   REACH LPAREN result=expression RPAREN
 	{
 	    raiseNotSupported("\\reach");
@@ -1739,6 +1739,17 @@ jmlprimary returns [SLExpression result=null] throws SLTranslationException
         {
             result = new SLExpression(TB.subset(services, t, t2));
         } 
+        
+    |   NEWELEMSFRESH LPAREN t=storeref RPAREN
+        {
+            result = new SLExpression(TB.subset(services, 
+                                                t, 
+                                                TB.union(services,
+                                                         convertToOld(t),
+                                                         TB.freshLocs(services, 
+                                                         	      heapAtPre))));
+                                                        
+        }
 
     |   LPAREN result=expression RPAREN
 ;

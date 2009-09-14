@@ -27,7 +27,7 @@ public final class BuiltInNonDuplicateAppModPositionFeature
     private BuiltInNonDuplicateAppModPositionFeature() {}
     
     
-    Term lastTerm;
+//    Term lastTerm;
     @Override
     protected boolean filter(RuleApp app, PosInOccurrence pos, Goal goal) {
 	final Rule rule = app.rule();
@@ -35,14 +35,14 @@ public final class BuiltInNonDuplicateAppModPositionFeature
 	Node node = goal.node();
 
 	boolean myNode = false;	
-//if(node.serialNr() == 391) {
+//if(node.serialNr() == 433 || node.serialNr() == 421) {
 //    myNode = true;
 //    System.out.println("Checking for " + node.serialNr());
 //    System.out.println("###Term: ");
-//    printTerm(term);
+//    System.out.println(term);
 //    if(lastTerm != null) {
 //	System.out.println("###Last term: ");
-//	printTerm(lastTerm);
+//	System.out.println(lastTerm);
 //	System.out.println("###Equal: "  + lastTerm.equals(term));
 //    }
 //    lastTerm = term;

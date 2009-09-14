@@ -101,8 +101,8 @@ public class FindTacletAppContainer extends TacletAppContainer {
 
 
     /**
-     * checks if the modification path and the postition where this taclet application
-     * has been matched again denote independant subformulas. The modification affects 
+     * checks if the modification path and the position where this taclet application
+     * has been matched again denote independent subformulas. The modification affects 
      * a formula <code>F</code> if <code>F</code> is a subformula of the modified one 
      * or the modification took part inside an update which may occur in the update 
      * prefix instantiation of the taclet application    

@@ -68,8 +68,7 @@ tokens {
 	HASSORT = "\\hasSort";        
 	ISARRAY="\\isArray";
         ISENUMTYPE="\\isEnumType";
-	ISLOCALVARIABLE = "\\isLocalVariable";        	
-	ISQUERY = "\\isQuery";		
+	ISLOCALVARIABLE = "\\isLocalVariable";        			
 	ISREFERENCE="\\isReference";	        
 	ISREFERENCEARRAY="\\isReferenceArray";
 	ISSUBTYPE = "\\sub";	
@@ -143,7 +142,6 @@ tokens {
 
         // The first two guys are not really meta operators, treated separately
 	IN_TYPE = "\\inType";
-	ISINREACHABLESTATE = "\\isInReachableState";
         IS_ABSTRACT_OR_INTERFACE = "\\isAbstractOrInterface";
         CONTAINERTYPE = "\\containerType";
 }

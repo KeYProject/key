@@ -842,27 +842,7 @@ public final class LogicPrinter {
                           .getHeapLDT()
                           .getPrettyFieldName((Function)t.op());            
             layouter.print(prettyFieldName);
-        } else if(NotationInfo.PRETTY_SYNTAX
-        	  && services != null
-        	  && t.op() instanceof Function 
-        	  && t.arity() == 2
-        	  && t.sub(0).op() == services.getTypeConverter().getHeapLDT().getHeap()
-        	  && t.boundVars().isEmpty()) {
-            startTerm(2);
-            markStartSub();
-            //heap not printed
-            markEndSub();
-            
-            markStartSub();
-            printTerm(t.sub(1));
-            markEndSub();
-            
-            final String prettyFieldName 
-            	= services.getTypeConverter()
-                          .getHeapLDT()
-                          .getPrettyFieldName((Function)t.op());
-            layouter.print("." + prettyFieldName);                    
-        }
+        } 
         
         else {
             startTerm(t.arity());
@@ -872,7 +852,7 @@ public final class LogicPrinter {
         	printVariables(t.boundVars());
         	layouter.print("}").end();
             }
-            if(t.arity()>0 || t.op() instanceof ProgramMethod) {
+            if(t.arity() > 0) {
                 layouter.print("(").beginC(0);
                 for(int i = 0, n = t.arity(); i < n; i++) {
                     markStartSub();
@@ -903,11 +883,14 @@ public final class LogicPrinter {
     
     
     public void printSelect(Term t) throws IOException {
-	HeapLDT heapLDT = services == null ? null : services.getTypeConverter().getHeapLDT();
+        assert t.boundVars().isEmpty();            
+        assert t.arity() == 3;	
+	final HeapLDT heapLDT = services == null 
+			        ? null 
+			        : services.getTypeConverter().getHeapLDT();
         if(NotationInfo.PRETTY_SYNTAX
             && heapLDT != null
             && t.sub(0).op() == heapLDT.getHeap()) {
-            assert t.arity() == 3;
             startTerm(3);
             
             final Term objectTerm = t.sub(1);
@@ -972,6 +955,52 @@ public final class LogicPrinter {
     }
     
     
+    public void printObserver(Term t) throws IOException {
+	assert t.op() instanceof ObserverFunction;
+	assert t.boundVars().isEmpty();
+	final HeapLDT heapLDT = services == null 
+			        ? null 
+			        : services.getTypeConverter().getHeapLDT();	
+	if(NotationInfo.PRETTY_SYNTAX
+           && heapLDT != null 
+           && t.sub(0).op() == heapLDT.getHeap()) {
+	    final ObserverFunction obs = (ObserverFunction) t.op();
+            startTerm(t.arity());
+            markStartSub();
+            //heap not printed
+            markEndSub();
+            
+            if(!obs.isStatic()) {
+        	markStartSub();
+        	printTerm(t.sub(1));
+        	markEndSub();
+        	layouter.print(".");
+            }
+            
+            final String prettyFieldName 
+            	= services.getTypeConverter()
+                          .getHeapLDT()
+                          .getPrettyFieldName((Function)t.op());
+            layouter.print(prettyFieldName);
+            
+            if(obs.getNumParams() > 0 || obs instanceof ProgramMethod) {
+        	layouter.print("(").beginC(0);
+        	for(int i = 0, n = obs.getNumParams(); i < n; i++) {
+        	    markStartSub();
+        	    printTerm(t.sub(i + (obs.isStatic() ? 1 : 2)));
+        	    markEndSub();
+                    if(i < n - 1) {
+                        layouter.print(",").brk(1,0);
+                    }
+        	}
+        	layouter.print(")").end();
+            }
+        } else {
+            printFunctionTerm(t.op().name().toString(), t);            
+        }
+    }
+    
+    
     public void printSingleton(Term t) throws IOException {
 	assert t.arity() == 1;
 	startTerm(1);	 
@@ -1024,46 +1053,6 @@ public final class LogicPrinter {
 	markEndSub();
 
 	layouter.print(")");
-    }
-       
-
-
-    /** Print a term in <code>f(t1,...tn)</code> style.  If it doesn't
-     * fit on one line, <code>t2...tn</code> are aligned below t1.
-     * Print a term in <code>o.q(t1,...tn)</code> style.
-     *
-     * @param name the name of the query
-     * @param t the Term to be printed
-     * @param ass the int defining the associativity of 
-     * the term
-     */
-    public void printQueryTerm(String name,
-			       Term t, 
-			       int ass) 
-	throws IOException
-    {
-	int start = 0;
-	if((t.op() instanceof ProgramMethod) && (
-	       ((ProgramMethod) t.op()).isStatic() || 
-	       ((ProgramMethod) t.op()).isConstructor())){
-	    startTerm(t.arity());
-	    layouter.print(((ProgramMethod) t.op()).
-			   getContainerType().getName());
-	}else{
-	    start = 1;
-	    startTerm(t.arity());
-	    maybeParens(t.sub(0), ass);
-	}
-	layouter.print(".").print(name).print("(").beginC(0);
-	for (int i=start;i<t.arity();i++) {
-	    markStartSub();
-	    printTerm(t.sub(i));
-	    markEndSub();
-	    if (i<t.arity()-1) {
-		layouter.print(",").brk(1,0);
-	    }
-	}
-	layouter.print(")").end();
     }
 
 

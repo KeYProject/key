@@ -105,7 +105,7 @@ public class TacletGoalTemplate {
     }
 
    
-    /** returns the set of schemavaroable whos einstantiations will be
+    /** returns the set of schemavaroable whose instantiations will be
      * added to the sequent namespace */
     public ImmutableSet<SchemaVariable> addedProgVars() {
 	return addedProgVars;
@@ -113,7 +113,7 @@ public class TacletGoalTemplate {
 
 
     /**
-     * rertieves and returns all variables that are bound in the 
+     * retrieves and returns all variables that are bound in the 
      * goal template
      * @return all variables that occur bound in this goal template
      */

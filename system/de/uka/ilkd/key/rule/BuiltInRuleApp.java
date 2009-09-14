@@ -92,6 +92,6 @@ public class BuiltInRuleApp implements RuleApp {
     
     @Override    
     public String toString() {
-	return ""+rule().name();
+	return "BuiltInRule: " + rule().name() + " at pos " + pio.subTerm();
     }
 }

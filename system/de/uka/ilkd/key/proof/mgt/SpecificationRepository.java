@@ -426,14 +426,28 @@ public final class SpecificationRepository {
 	for(ClassInvariant inv : myInvs) {
 	    invDef = TB.and(invDef, inv.getInv(selfVar, services));
 	}
-	invDef = TB.equals(TB.inv(services, TB.var(selfVar)), invDef);
+	invDef = TB.tf().createTerm(Equality.EQV, 
+		                    TB.inv(services, TB.var(selfVar)), 
+		                    invDef);
 	final ObserverFunction invSymbol = services.getJavaInfo().getInv();
-	final  ClassAxiom invAxiom = new ClassAxiomImpl("Class invariant axiom",
-		                                 	kjt,		
-		                                 	invSymbol,
-		                                 	invDef,
-		                                 	selfVar);
+	final ClassAxiom invAxiom = new ClassAxiomImpl("Class invariant axiom",
+		                                       kjt,		
+		                                       invSymbol,
+		                                       invDef,
+		                                       selfVar);
 	result = result.add(invAxiom);
+	
+	//add query axioms
+	for(ProgramMethod pm : services.getJavaInfo()
+		                       .getAllProgramMethods(kjt)) {
+	    if(pm.getKeYJavaType() != null) {
+		final ClassAxiom queryAxiom 
+		    = new QueryClassAxiom("Query axiom for " + pm.getFullName(),
+			                  kjt, 
+			                  pm);
+		result = result.add(queryAxiom);
+	    }
+	}
 	
 	return result;
     }

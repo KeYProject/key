@@ -17,10 +17,7 @@ import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.ldt.HeapLDT;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.OpReplacer;
@@ -49,11 +46,27 @@ public final class ClassAxiomImpl implements ClassAxiom {
 	assert kjt != null;
 	assert target != null;
 	assert axiom.sort() == Sort.FORMULA;
+	assert (selfVar == null) == target.isStatic();
 	this.name = name;
 	this.target = target;
 	this.kjt = kjt;
 	this.originalAxiom = axiom;
 	this.originalSelfVar = selfVar;
+    }
+    
+    
+    private Term getAxiom(ParsableVariable heapVar, 
+	    		  ParsableVariable selfVar,
+	    		  Services services) {
+	assert heapVar != null;
+	assert (selfVar == null) == target.isStatic();
+	final Map map = new HashMap();
+	map.put(services.getTypeConverter().getHeapLDT().getHeap(), heapVar);	
+	if(selfVar != null) {
+	    map.put(originalSelfVar, selfVar);
+	}
+	final OpReplacer or = new OpReplacer(map);
+	return or.replace(originalAxiom);
     }
     
 
@@ -76,41 +89,70 @@ public final class ClassAxiomImpl implements ClassAxiom {
 
     
     @Override
-    public Term getAxiom(ProgramVariable selfVar, Services services) {
-	Map map = new HashMap();
-	map.put(originalSelfVar, selfVar);
-	OpReplacer or = new OpReplacer(map);
-	return or.replace(originalAxiom);
+    public Term getAxiom(Services services) {
+	final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+	final LogicVariable heapLV
+	      = new LogicVariable(new Name("h"), heapLDT.targetSort());
+	final LogicVariable selfLV
+	      = target.isStatic()
+	        ? null
+	        : new LogicVariable(originalSelfVar.name(), 
+	    			    originalSelfVar.sort());
+	final Term varAxiom = getAxiom(heapLV, selfLV, services); 
+	final Term varAxiom2 
+		= target.isStatic() ? varAxiom : TB.all(selfLV, varAxiom); 
+	return TB.all(heapLV, varAxiom2);
     }
     
     
     @Override
-    public Taclet getAxiomAsTaclet(ProgramVariable selfVar, Services services) {
-	final Term axiomTerm = getAxiom(selfVar, services);
-	if(!(axiomTerm.op() instanceof Equality)) {
+    public Taclet getAxiomAsTaclet(Services services) {
+	if(!(originalAxiom.op() instanceof Equality)) {
 	    return null;
 	}
-	final Term lhs = axiomTerm.sub(0);
-	final Term rhs = axiomTerm.sub(1);
 	
+	//create schema variables
 	final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
 	final SchemaVariable heapSV 
 		= SchemaVariableFactory.createTermSV(new Name("h"), 
 						     heapLDT.targetSort(), 
 						     false, 
 						     false);
-	final Map map = new HashMap();
-	map.put(TB.heap(services), TB.var(heapSV));
-	final OpReplacer or = new OpReplacer(map);
-	final Term schemaLhs = or.replace(lhs);
-	final Term schemaRhs = or.replace(rhs);
+	final SchemaVariable selfSV
+		= target.isStatic()
+		  ? null
+	          : SchemaVariableFactory.createTermSV(originalSelfVar.name(), 
+						       kjt.getSort());
 	
-	RewriteTacletBuilder tacletBuilder = new RewriteTacletBuilder();
+	//instantiate axiom with schema variables
+	final Term schemaAxiom = getAxiom(heapSV, selfSV, services);
+	assert schemaAxiom.op() instanceof Equality;
+	final Term schemaLhs = schemaAxiom.sub(0);
+	final Term schemaRhs = schemaAxiom.sub(1);
+	
+	//create if sequent
+	final Sequent ifSeq;
+	if(target.isStatic()) {
+	    ifSeq = null;
+	} else {
+	    final Term ifFormula 
+	    	= TB.exactInstance(services, kjt.getSort(), TB.var(selfSV));
+	    final ConstrainedFormula ifCf = new ConstrainedFormula(ifFormula);
+	    final Semisequent ifSemiSeq 
+	    	= Semisequent.EMPTY_SEMISEQUENT.insertFirst(ifCf).semisequent();
+	    ifSeq = Sequent.createAnteSequent(ifSemiSeq);
+	}
+	
+	//create taclet
+	final RewriteTacletBuilder tacletBuilder = new RewriteTacletBuilder();
 	tacletBuilder.setFind(schemaLhs);
 	tacletBuilder.addTacletGoalTemplate
 	    (new RewriteTacletGoalTemplate(Sequent.EMPTY_SEQUENT,
 					   ImmutableSLList.<Taclet>nil(),
 					   schemaRhs));
+	if(!target.isStatic()) {
+	    tacletBuilder.setIfSequent(ifSeq);
+	}
 	tacletBuilder.setName(new Name(name));
 	tacletBuilder.addRuleSet(new RuleSet(new Name("simplify")));
 	

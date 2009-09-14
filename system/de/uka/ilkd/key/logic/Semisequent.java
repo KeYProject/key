@@ -603,17 +603,6 @@ public class Semisequent implements Iterable<ConstrainedFormula> {
 	public String toString() {
 	    return "[]";
 	}
-	
-    }
-    
+    }    
 }
-
-
-
-
-
-
-
-
-
 

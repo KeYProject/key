@@ -82,7 +82,7 @@ public abstract class TacletAppContainer extends RuleAppContainer {
      * Create a list of new RuleAppContainers that are to be 
      * considered for application.
      */
-    public ImmutableList<RuleAppContainer> createFurtherApps (Goal p_goal,
+    public final ImmutableList<RuleAppContainer> createFurtherApps (Goal p_goal,
                                                      Strategy p_strategy) {
         if ( !isStillApplicable ( p_goal )
              ||

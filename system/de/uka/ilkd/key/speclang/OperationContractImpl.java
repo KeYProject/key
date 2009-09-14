@@ -68,7 +68,7 @@ public final class OperationContractImpl implements OperationContract {
             		          ProgramVariable excVar,
                                   Term heapAtPre,
                                   int id) {
-	assert baseName != null;
+	assert !(name == null && baseName == null);
         assert kjt != null;	
         assert pm != null;
         assert modality != null;
@@ -327,8 +327,8 @@ public final class OperationContractImpl implements OperationContract {
                 + "<br><b>mod</b> "
                 + LogicPrinter.escapeHTML(mod)
                 + (hasDep() 
-                   ? ""
-                   :"<br><b>dep</b> " + LogicPrinter.escapeHTML(dep))
+                   ? "<br><b>dep</b> " + LogicPrinter.escapeHTML(dep)
+                   : "")
                 + "<br><b>termination</b> "
                 + getModality()
                 + "</html>";
@@ -509,9 +509,11 @@ public final class OperationContractImpl implements OperationContract {
             Term otherMod = other.getMod(originalSelfVar, 
                                          originalParamVars, 
                                          services);
-            Term otherDep = other.getDep(originalSelfVar, 
-        	                         originalParamVars, 
-        	                         services);
+            Term otherDep = other.hasDep()
+                            ? other.getDep(originalSelfVar, 
+        	                           originalParamVars, 
+        	                           services)
+        	            : null;
 
             pre = TB.or(pre, otherPre);
             post = TB.and(post, TB.imp(atPreify(otherPre, 
@@ -519,10 +521,12 @@ public final class OperationContractImpl implements OperationContract {
         	    				services), 
         	    		       otherPost));
             mod = TB.union(services, mod, otherMod);
-            dep = TB.union(services, dep, otherDep);
+            dep = dep != null && otherDep != null
+                  ? TB.union(services, dep, otherDep)
+                  : null;
         }
 
-        return new OperationContractImpl(null,
+        return new OperationContractImpl("invalid_name",
         				 newName,
                                          kjt,        				 
                                          pm,

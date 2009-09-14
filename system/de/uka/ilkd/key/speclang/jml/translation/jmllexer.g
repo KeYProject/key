@@ -113,7 +113,7 @@ INTERSECT : "\\intersect";
 SETMINUS : "\\setMinus";
 DISJOINT : "\\disjoint";
 SUBSET : "\\subset";
-
+NEWELEMSFRESH : "\\newElemsFresh";
 
 
 LT_DISPATCH
