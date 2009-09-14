@@ -194,10 +194,10 @@ public class MethodCall extends ProgramMetaConstruct {
 	}
 
 	methRef = (MethodReference) pe;
-	if(!methRef.implicit()) {
-	    System.out.println("Modularity warning: Method " 
-		               + methRef.getName() + " has been expanded!");
-	}
+//	if(!methRef.implicit()) {
+//	    System.out.println("Modularity warning: Method " 
+//		               + methRef.getName() + " has been expanded!");
+//	}
 
 	ReferencePrefix refPrefix = methRef.getReferencePrefix();
 	if (refPrefix == null) {

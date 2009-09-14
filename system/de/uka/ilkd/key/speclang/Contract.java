@@ -65,14 +65,14 @@ public interface Contract extends SpecificationElement {
 	    	       Services services);    
     
     /**
-     * Returns the dependency set.
+     * Returns the dependency set of the contract.
      */
     public Term getDep(ProgramVariable selfVar,
 	               ImmutableList<ProgramVariable> paramVars,
 	               Services services);    
         
     /**
-     * Returns the dependency set.
+     * Returns the dependency set of the contract.
      */
     public Term getDep(Term heapTerm,
 	               Term selfTerm,

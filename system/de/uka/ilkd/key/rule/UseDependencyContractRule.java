@@ -10,9 +10,6 @@
 
 package de.uka.ilkd.key.rule;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
-
 import de.uka.ilkd.key.collection.*;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -21,7 +18,6 @@ import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.proof.mgt.ComplexRuleJustificationBySpec;
 import de.uka.ilkd.key.proof.mgt.RuleJustificationBySpec;
 import de.uka.ilkd.key.speclang.Contract;
@@ -50,8 +46,21 @@ public final class UseDependencyContractRule implements BuiltInRule {
     //internal methods
     //-------------------------------------------------------------------------
     
+    private Term getEqualityDef(Term term, Sequent seq) {
+	for(ConstrainedFormula cf : seq.antecedent()) {
+	    Term formula = cf.formula();
+	    if(formula.op() instanceof Equality 
+	       && formula.sub(1).equals(term)) {
+		return formula.sub(0);
+	    }
+	}
+	return null;
+    }
+    
+    
     private Pair<Term,Term> getBaseHeapAndChangedLocs(
 	    			Term heapTerm,
+	    			Sequent seq,
 	    			Services services) {
 	final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
 	final Operator op = heapTerm.op();
@@ -65,6 +74,13 @@ public final class UseDependencyContractRule implements BuiltInRule {
 	    final Term h = heapTerm.sub(0);
 	    final Term s = heapTerm.sub(1);
 	    return new Pair<Term,Term>(h, s); 
+	} else if(op.arity() == 0) {
+	    final Term def = getEqualityDef(heapTerm, seq);
+	    if(def != null) {
+		return getBaseHeapAndChangedLocs(def, seq, services);
+	    } else {
+		return null;
+	    }
 	} else {
 	    return null;
 	}
@@ -132,7 +148,9 @@ public final class UseDependencyContractRule implements BuiltInRule {
 	//heap term of observer must be store-term
 	final Services services = goal.proof().getServices();
 	final Pair<Term,Term> baseHeapAndChangedLocs 
-		= getBaseHeapAndChangedLocs(term.sub(0), services);
+		= getBaseHeapAndChangedLocs(term.sub(0), 
+			                    goal.sequent(), 
+			                    services);
 	if(baseHeapAndChangedLocs == null) {
 	    return false;
 	}
@@ -182,7 +200,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
         final Contract contract = configureContract(services, kjt, target);
         assert contract != null;
         final Pair<Term,Term> baseHeapAndChangedLocs 
-        	= getBaseHeapAndChangedLocs(heap, services); 
+        	= getBaseHeapAndChangedLocs(heap, goal.sequent(), services); 
         
         //get precondition, dependency term
         final Term pre = contract.getPre(baseHeapAndChangedLocs.first,

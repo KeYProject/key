@@ -65,10 +65,11 @@ public final class TermFactory {
 	    throw new TermCreationException("null-Operator at TermFactory");
 	}
 	
-	final Term newTerm = new TermImpl(op, subs, boundVars, javaBlock);
+	final Term newTerm 
+		= new TermImpl(op, subs, boundVars, javaBlock).checked();
 	Term term = cache.get(newTerm);
 	if(term == null) {
-	    term = newTerm.checked();
+	    term = newTerm;
 	    cache.put(term, term);
 	}
 

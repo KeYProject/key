@@ -119,7 +119,7 @@ public final class ProofManagementDialog extends JDialog {
 	listPanelByMethod.setLayout(new BoxLayout(listPanelByMethod, 
 						  BoxLayout.X_AXIS));
 	JScrollPane classScrollPane = new JScrollPane(classTree);
-	classScrollPane.setBorder(new TitledBorder("Methods"));
+	classScrollPane.setBorder(new TitledBorder("Contract Targets"));
 	Dimension classScrollPaneDim = new Dimension(250, 400);
 	classScrollPane.setPreferredSize(classScrollPaneDim);
 	classScrollPane.setMinimumSize(classScrollPaneDim);
@@ -171,7 +171,7 @@ public final class ProofManagementDialog extends JDialog {
 	
 	//create tabbed pane
 	tabbedPane = new JTabbedPane();	
-        tabbedPane.addTab("By Method", listPanelByMethod);
+        tabbedPane.addTab("By Target", listPanelByMethod);
         tabbedPane.addTab("By Proof", listPanelByProof);
         tabbedPane.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent e) {

@@ -308,7 +308,8 @@ public class KeYProgModelInfo{
 	(KeYJavaType ct, ImmutableList<KeYJavaType> signature){
         recoder.abstraction.ClassType rct
             = (recoder.abstraction.ClassType) rec2key().toRecoder(ct);
-	List<? extends recoder.abstraction.Constructor> res = rct.getProgramModelInfo().getConstructors
+	List<? extends recoder.abstraction.Constructor> res 
+		= rct.getProgramModelInfo().getConstructors
 	    (rct, getRecoderTypes(signature));
 	return res;
     }

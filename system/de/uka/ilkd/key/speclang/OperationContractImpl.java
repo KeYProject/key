@@ -158,7 +158,7 @@ public final class OperationContractImpl implements OperationContract {
     //-------------------------------------------------------------------------
     
     private static Term atPreify(Term t, Term heapAtPre, Services services) {
-	Map map = new HashMap();
+	final Map<Term,Term> map = new HashMap<Term,Term>();
 	map.put(TB.heap(services), heapAtPre);
         return new OpReplacer(map).replace(t);
     }
@@ -171,7 +171,7 @@ public final class OperationContractImpl implements OperationContract {
 	    		      ProgramVariable excVar,
 	    		      Term heapAtPre,
 	    		      Services services) {
-	Map result = new LinkedHashMap();
+	final Map result = new LinkedHashMap();
 	
         //self
 	if(selfVar != null) {
@@ -182,8 +182,8 @@ public final class OperationContractImpl implements OperationContract {
         //parameters
 	if(paramVars != null) {
 	    assert originalParamVars.size() == paramVars.size();
-	    Iterator< ProgramVariable > it1 = originalParamVars.iterator();
-	    Iterator< ProgramVariable > it2 = paramVars.iterator();
+	    final Iterator<ProgramVariable> it1 = originalParamVars.iterator();
+	    final Iterator<ProgramVariable> it2 = paramVars.iterator();
 	    while(it1.hasNext()) {
 		ProgramVariable originalParamVar = it1.next();
 		ProgramVariable paramVar         = it2.next();
@@ -200,9 +200,7 @@ public final class OperationContractImpl implements OperationContract {
 	
         //exception
 	if(excVar != null) {
-	    assert originalExcVar.sort().equals(excVar.sort())
-		    || originalExcVar.sort().name().toString() //for backward compatibility with old DL contracts
-		                     .equals("java.lang.Exception");
+	    assert originalExcVar.sort().equals(excVar.sort());
 	    result.put(originalExcVar, excVar);
 	}
         
@@ -214,6 +212,64 @@ public final class OperationContractImpl implements OperationContract {
 
 	return result;
     }
+    
+    
+    private Map /*Operator, Operator, Term -> Term*/ getReplaceMap(
+	    		      Term heapTerm,
+	    		      Term selfTerm, 
+	    		      ImmutableList<Term> paramTerms, 
+	    		      Term resultTerm, 
+	    		      Term excTerm,
+	    		      Term heapAtPre,
+	    		      Services services) {
+	final Map<Term,Term> result = new LinkedHashMap<Term,Term>();
+	
+	//heap
+	assert heapTerm != null;
+	assert heapTerm.sort().equals(services.getTypeConverter()
+		                              .getHeapLDT()
+		                              .targetSort());
+	result.put(TB.heap(services), heapTerm);
+	
+        //self
+	if(selfTerm != null) {
+            assert selfTerm.sort().extendsTrans(originalSelfVar.sort());
+	    result.put(TB.var(originalSelfVar), selfTerm);
+	}
+	
+        //parameters
+	if(paramTerms != null) {
+	    assert originalParamVars.size() == paramTerms.size();
+	    final Iterator<ProgramVariable> it1 = originalParamVars.iterator();
+	    final Iterator<Term> it2 = paramTerms.iterator();
+	    while(it1.hasNext()) {
+		ProgramVariable originalParamVar = it1.next();
+		Term paramTerm                   = it2.next();
+		assert originalParamVar.sort().equals(paramTerm.sort());
+		result.put(TB.var(originalParamVar), paramTerm);
+	    }
+	}
+	
+        //result
+	if(resultTerm != null) {
+	    assert originalResultVar.sort().equals(resultTerm.sort());
+	    result.put(TB.var(originalResultVar), resultTerm);
+	}
+	
+        //exception
+	if(excTerm != null) {
+	    assert originalExcVar.sort().equals(excTerm.sort());
+	    result.put(TB.var(originalExcVar), excTerm);
+	}
+        
+        //atPre-functions
+	if(heapAtPre != null) {
+	    assert originalHeapAtPre.sort().equals(heapAtPre.sort());
+	    result.put(originalHeapAtPre, heapAtPre);
+	}
+
+	return result;
+    }    
     
     
     
@@ -355,13 +411,13 @@ public final class OperationContractImpl implements OperationContract {
         assert paramVars != null;
         assert paramVars.size() == originalParamVars.size();
         assert services != null;
-	Map replaceMap = getReplaceMap(selfVar, 
-                                       paramVars, 
-                                       null, 
-                                       null,
-                                       null, 
-                                       services);
-	OpReplacer or = new OpReplacer(replaceMap);
+	final Map replaceMap = getReplaceMap(selfVar, 
+                                             paramVars, 
+                                             null, 
+                                             null,
+                                             null, 
+                                             services);
+	final OpReplacer or = new OpReplacer(replaceMap);
 	return or.replace(originalPre);
     }
     
@@ -376,14 +432,14 @@ public final class OperationContractImpl implements OperationContract {
         assert paramTerms != null;
         assert paramTerms.size() == originalParamVars.size();
         assert services != null;
-	Map replaceMap = new HashMap();
-	replaceMap.put(TB.heap(services), heapTerm);
-	replaceMap.put(TB.var(originalSelfVar), selfTerm);
-	for(ProgramVariable paramVar : originalParamVars) {
-	    replaceMap.put(TB.var(paramVar), paramTerms.head());
-	    paramTerms = paramTerms.tail();
-	}
-	OpReplacer or = new OpReplacer(replaceMap);
+	final Map replaceMap = getReplaceMap(heapTerm, 
+					     selfTerm, 
+					     paramTerms, 
+					     null, 
+					     null, 
+					     null, 
+					     services);
+	final OpReplacer or = new OpReplacer(replaceMap);
 	return or.replace(originalPre);
     }
     
@@ -402,15 +458,43 @@ public final class OperationContractImpl implements OperationContract {
         assert excVar != null;
         assert heapAtPre != null;
         assert services != null;
-	Map replaceMap = getReplaceMap(selfVar, 
-                                       paramVars, 
-                                       resultVar, 
-                                       excVar, 
-                                       heapAtPre, 
-                                       services);
-	OpReplacer or = new OpReplacer(replaceMap);
+	final Map replaceMap = getReplaceMap(selfVar, 
+                                       	     paramVars, 
+                                       	     resultVar, 
+                                       	     excVar, 
+                                       	     heapAtPre, 
+                                       	     services);
+	final OpReplacer or = new OpReplacer(replaceMap);
 	return or.replace(originalPost);
     }
+    
+    
+    @Override
+    public Term getPost(Term heapTerm,
+	                Term selfTerm, 
+                        ImmutableList<Term> paramTerms, 
+                        Term resultTerm, 
+                        Term excTerm,
+                        Term heapAtPre,
+                        Services services) {
+	assert heapTerm != null;
+        assert (selfTerm == null) == (originalSelfVar == null);
+        assert paramTerms != null;
+        assert paramTerms.size() == originalParamVars.size();
+        assert (resultTerm == null) == (originalResultVar == null);
+        assert excTerm != null;
+        assert heapAtPre != null;
+        assert services != null;
+	final Map replaceMap = getReplaceMap(heapTerm,
+		                             selfTerm, 
+                                             paramTerms, 
+                                             resultTerm, 
+                                             excTerm, 
+                                       	     heapAtPre, 
+                                       	     services);
+	final OpReplacer or = new OpReplacer(replaceMap);
+	return or.replace(originalPost);
+    }    
 
   
     @Override
@@ -421,14 +505,36 @@ public final class OperationContractImpl implements OperationContract {
         assert paramVars != null;
         assert paramVars.size() == originalParamVars.size();
         assert services != null;
-	Map replaceMap = getReplaceMap(selfVar, 
-                                       paramVars, 
-                                       null, 
-                                       null, 
-                                       null, 
-                                       services);
-	OpReplacer or = new OpReplacer(replaceMap);
+	final Map replaceMap = getReplaceMap(selfVar, 
+                                             paramVars, 
+                                             null, 
+                                             null, 
+                                             null, 
+                                             services);
+	final OpReplacer or = new OpReplacer(replaceMap);
         return or.replace(originalMod);
+    }
+    
+    
+    @Override    
+    public Term getMod(Term heapTerm,
+	               Term selfTerm, 
+	    	       ImmutableList<Term> paramTerms,
+                       Services services) {
+	assert heapTerm != null;	
+        assert (selfTerm == null) == (originalSelfVar == null);
+        assert paramTerms != null;
+        assert paramTerms.size() == originalParamVars.size();
+        assert services != null;
+	final Map replaceMap = getReplaceMap(heapTerm,
+		                             selfTerm, 
+                                             paramTerms, 
+                                             null, 
+                                             null, 
+                                             null, 
+                                             services);
+	final OpReplacer or = new OpReplacer(replaceMap);
+	return or.replace(originalMod);
     }
     
     
@@ -441,13 +547,13 @@ public final class OperationContractImpl implements OperationContract {
         assert paramVars != null;
         assert paramVars.size() == originalParamVars.size();
         assert services != null;
-	Map replaceMap = getReplaceMap(selfVar, 
-                                       paramVars, 
-                                       null, 
-                                       null, 
-                                       null, 
-                                       services);
-	OpReplacer or = new OpReplacer(replaceMap);
+	final Map replaceMap = getReplaceMap(selfVar, 
+                                             paramVars, 
+                                             null, 
+                                             null, 
+                                             null, 
+                                             services);
+	final OpReplacer or = new OpReplacer(replaceMap);
 	return or.replace(originalDep);
     }            
     
@@ -463,17 +569,14 @@ public final class OperationContractImpl implements OperationContract {
         assert paramTerms != null;
         assert paramTerms.size() == originalParamVars.size();
         assert services != null;
-        if(originalDep == null) {
-            return null;
-        }        
-	Map replaceMap = new HashMap();
-	replaceMap.put(TB.heap(services), heapTerm);
-	replaceMap.put(TB.var(originalSelfVar), selfTerm);
-	for(ProgramVariable paramVar : originalParamVars) {
-	    replaceMap.put(TB.var(paramVar), paramTerms.head());
-	    paramTerms = paramTerms.tail();
-	}
-	OpReplacer or = new OpReplacer(replaceMap);
+	final Map replaceMap = getReplaceMap(heapTerm,
+		                       	     selfTerm, 
+		                       	     paramTerms, 
+		                       	     null, 
+		                       	     null, 
+		                       	     null, 
+		                       	     services);
+	final OpReplacer or = new OpReplacer(replaceMap);
 	return or.replace(originalDep);
     }    
         

@@ -1123,18 +1123,21 @@ public final class TermBuilder {
     }    
     
     
-    public Term reachableValue(Services services, ProgramVariable pv) {
-	IntegerLDT intLDT = services.getTypeConverter().getIntegerLDT();
-	Term pvVar = var(pv);
-	if(pv.sort().extendsTrans(services.getJavaInfo().objectSort())) {
-	    return or(created(services, pvVar), equals(pvVar, NULL(services)));
-	} else if(pv.getKeYJavaType() != null
-		  && pv.sort().equals(intLDT.targetSort())) {
-	    return func(intLDT.getInBounds(pv.getKeYJavaType().getJavaType()), 
-		        pvVar);
+    public Term reachableValue(Services services, Term t, KeYJavaType kjt) {
+	assert t.sort().equals(kjt.getSort());
+	final IntegerLDT intLDT = services.getTypeConverter().getIntegerLDT();
+	if(t.sort().extendsTrans(services.getJavaInfo().objectSort())) {
+	    return or(created(services, t), equals(t, NULL(services)));
+	} else if(t.sort().equals(intLDT.targetSort())) {
+	    return func(intLDT.getInBounds(kjt.getJavaType()), t);
 	} else {
 	    return tt();
 	}
+    }    
+    
+    
+    public Term reachableValue(Services services, ProgramVariable pv) {
+	return reachableValue(services, var(pv), pv.getKeYJavaType());
     }
     
     

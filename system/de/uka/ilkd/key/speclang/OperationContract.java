@@ -50,6 +50,17 @@ public interface OperationContract extends Contract {
 	    	        ProgramVariable excVar,
 	    	        Term heapAtPre,
 	    	        Services services);
+    
+    /**
+     * Returns the postcondition of the contract.
+     */
+    public Term getPost(Term heapTerm,
+	                Term selfTerm, 
+	    	        ImmutableList<Term> paramTerms, 
+	    	        Term resultTerm, 
+	    	        Term excTerm,
+	    	        Term heapAtPre,
+	    	        Services services);    
 
     /**
      * Returns the modifies clause of the contract.
@@ -58,6 +69,14 @@ public interface OperationContract extends Contract {
 	    	       ImmutableList<ProgramVariable> paramVars,
                        Services services);
     
+    
+    /**
+     * Returns the modifies clause of the contract.
+     */
+    public Term getMod(Term heapTerm,
+	               Term selfTerm, 
+	    	       ImmutableList<Term> paramTerms,
+                       Services services);
 
     /**
      * Returns the union of this contract and those in the passed array. 

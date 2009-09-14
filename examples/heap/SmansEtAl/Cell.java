@@ -1,9 +1,10 @@
 class Cell {
     private int x;
     
-    //@ model \set footprint;
-    //@ accessible footprint: footprint;
-    //@ represents footprint <- x;
+    /*@ model \set footprint;
+      @ accessible footprint: footprint;
+      @ represents footprint <- x;
+      @*/
     
     /*@ assignable \nothing;
       @ ensures getX() == 0;
@@ -14,7 +15,6 @@ class Cell {
     
     
     //@ accessible getX(): footprint;
-    
     /*@ assignable \nothing;
       @ ensures \result == getX();
       @*/
