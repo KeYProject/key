@@ -33,8 +33,14 @@ this.s2 = s2;
 public boolean check(SchemaVariable var, SVSubstitute instCandidate, 
 				  SVInstantiations instMap, Services services) {
 
+   	if (var != s2) {
+	    return true;  // not responsible
+	}     
+
 	Term f1 = (Term) instMap.getInstantiation(s1);
 	Term f2 = (Term) instMap.getInstantiation(s2);
+
+	if(f1==null || f2==null) return false;
 	
 	if (f1.op() instanceof IUpdateOperator) {
 	f1 = ((IUpdateOperator) f1.op()).target(f1);

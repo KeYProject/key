@@ -186,6 +186,10 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                       add ( EqNonDuplicateAppFeature.INSTANCE,
                             longConst ( -500 ) ) );
 
+        bindRuleSet ( d, "update_equivalence",
+                      add ( NonDuplicateAppModPositionFeature.INSTANCE,
+                            longConst ( 30 ) ) );
+
         bindRuleSet ( d, "comprehensions",
                       add ( NonDuplicateAppModPositionFeature.INSTANCE,
                             longConst ( 1000 ) ) );

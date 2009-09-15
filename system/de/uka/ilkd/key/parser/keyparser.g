@@ -3943,6 +3943,7 @@ varexp[TacletBuilder b]
     | varcond_enum_const[b]
     | varcond_inReachableState[b] 
     | varcond_isupdated[b]    
+    | varcond_sameheapdeppred[b]
   ) 
   | 
   ( (NOT {negated = true;} )? 
