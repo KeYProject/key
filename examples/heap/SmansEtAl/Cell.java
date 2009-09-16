@@ -5,12 +5,12 @@ class Cell {
       @ accessible footprint: footprint;
       @ represents footprint <- x;
       @*/
-    
+        
     /*@ assignable \nothing;
       @ ensures getX() == 0;
       @ ensures \fresh(footprint);
-      @ */
-    Cell() {
+      @*/
+    /*@helper@*/ Cell() {
     }
     
     
@@ -18,7 +18,7 @@ class Cell {
     /*@ assignable \nothing;
       @ ensures \result == getX();
       @*/
-    int getX() {
+    /*@helper@*/ int getX() {
 	return x;
     }
     
@@ -27,7 +27,7 @@ class Cell {
       @ ensures getX() == value;
       @ ensures \newElemsFresh(footprint); 
       @*/
-    void setX(int value) {
+    /*@helper@*/ void setX(int value) {
 	x = value;
     }
 }

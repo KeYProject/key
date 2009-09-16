@@ -138,7 +138,7 @@ public class SVInstantiations {
             			Services services) {
         return add(sv, new OperatorInstantiation(sv, op), services);
     }
-      
+    
 
     public SVInstantiations addInteresting(SchemaVariable sv, 
 	    				   Term subst,

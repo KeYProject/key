@@ -21,6 +21,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.mgt.ComplexRuleJustificationBySpec;
 import de.uka.ilkd.key.proof.mgt.RuleJustificationBySpec;
 import de.uka.ilkd.key.speclang.Contract;
+import de.uka.ilkd.key.util.InvInferenceTools;
 import de.uka.ilkd.key.util.Pair;
 
 
@@ -31,6 +32,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
 
     private static final Name NAME = new Name("Use Dependency Contract");
     private static final TermBuilder TB = TermBuilder.DF;
+    private static final InvInferenceTools IIT = InvInferenceTools.INSTANCE;
         
 
     //-------------------------------------------------------------------------
@@ -109,7 +111,6 @@ public final class UseDependencyContractRule implements BuiltInRule {
     
     /**
      * Chooses a contract to be applied. 
-     * This is done either automatically or by asking the user.
      */
     private Contract configureContract(Services services, 
                                        KeYJavaType kjt,
@@ -121,6 +122,19 @@ public final class UseDependencyContractRule implements BuiltInRule {
     }
     
     
+    private ImmutableSet<Term> addEqualDefs(ImmutableSet<Term> terms, Goal g) {
+	ImmutableSet<Term> result = terms;
+	for(ConstrainedFormula cf : g.sequent().antecedent()) {
+	    final Term formula = cf.formula();
+	    if(formula.op() instanceof Equality 
+	        && terms.contains(formula.sub(1))) {
+		result = result.add(formula.sub(0));
+	    }
+	}
+	return result;
+    }
+    
+        
 
     //-------------------------------------------------------------------------
     //public interface
@@ -203,6 +217,14 @@ public final class UseDependencyContractRule implements BuiltInRule {
         	= getBaseHeapAndChangedLocs(heap, goal.sequent(), services); 
         
         //get precondition, dependency term
+        final Term freePre = TB.and(new Term[]{//TB.wellFormed(services, baseHeapAndChangedLocs.first),
+        	                    	       TB.not(TB.equals(selfTerm, TB.NULL(services))),
+        	                    	       TB.equals(TB.select(services,
+        	                    		                   services.getTypeConverter().getBooleanLDT().targetSort(), 
+        	                    		                   baseHeapAndChangedLocs.first, 
+        	                    		                   selfTerm, 
+        	                    		                   TB.func(heapLDT.getCreated())), 
+        	                    		         TB.TRUE(services))});
         final Term pre = contract.getPre(baseHeapAndChangedLocs.first,
         	                         selfTerm, 
         	                         paramTerms, 
@@ -211,8 +233,18 @@ public final class UseDependencyContractRule implements BuiltInRule {
         				 selfTerm, 
         				 paramTerms, 
         				 services);
-        final Term changedLocsAndDepDisjoint 
+        final Term disjoint 
         	= TB.disjoint(services, baseHeapAndChangedLocs.second, dep);
+        final Term cutFormula = TB.and(new Term[]{freePre, pre, disjoint});
+        
+        //bail out if obviously not helpful
+        final ImmutableSet<Term> changed 
+        	= addEqualDefs(IIT.unionToSet(baseHeapAndChangedLocs.second, 
+        				      services), 
+        		       goal);
+        if(changed.contains(dep)) {
+            return goal.split(1);
+        }
         
         //split goal into two branches
         final ImmutableList<Goal> result = goal.split(2);
@@ -227,8 +259,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
         	                + changeString);
         
         //create "Pre" branch
-        preGoal.addFormula(new ConstrainedFormula(
-        				TB.and(pre, changedLocsAndDepDisjoint)),
+        preGoal.addFormula(new ConstrainedFormula(cutFormula),
         		   false,
         		   true);
         
@@ -237,11 +268,10 @@ public final class UseDependencyContractRule implements BuiltInRule {
         subs[0] = baseHeapAndChangedLocs.first;
         final Term termWithBaseHeap = TB.func(target, subs);
         postGoal.addFormula(new ConstrainedFormula(TB.equals(term, termWithBaseHeap)), true, false);
-        postGoal.addFormula(new ConstrainedFormula(
-        				TB.and(pre, changedLocsAndDepDisjoint)),
+        postGoal.addFormula(new ConstrainedFormula(cutFormula),
         	 	    true,
         	 	    false);
-
+        
         //create justification
         final RuleJustificationBySpec just 
         	= new RuleJustificationBySpec(contract);

@@ -633,27 +633,30 @@ options {
       problem();
     }
 
-    private void schema_var_decl(String name, Sort s, boolean makeVariableSV,
-            boolean makeSkolemTermSV,
-            SchemaVariableModifierSet mods) throws AmbigiousDeclException {
+    private void schema_var_decl(String name, 
+    				 Sort s, 
+    				 boolean makeVariableSV,
+            			 boolean makeSkolemTermSV,
+            			 SchemaVariableModifierSet mods) 
+            			 	throws AmbigiousDeclException {
         if (!skip_schemavariables) {
-
             SchemaVariable v;
-            if ( s == Sort.FORMULA ) {
+            if(s == Sort.FORMULA) {
                 v = SchemaVariableFactory.createFormulaSV
                 (new Name(name), mods.rigid());
-            } else if (s == Sort.UPDATE) {
+            } else if(s == Sort.UPDATE) {
                 v = SchemaVariableFactory.createUpdateSV(new Name(name));
-            } else if ( s instanceof ProgramSVSort ) {
+            } else if(s instanceof ProgramSVSort) {
                 v = SchemaVariableFactory.createProgramSV
                 (new ProgramElementName(name),(ProgramSVSort) s, mods.list());
             } else {
-                if ( makeVariableSV ) {
+                if(makeVariableSV) {
                     v=SchemaVariableFactory.createVariableSV
                     (new Name(name), s);
-                } else if ( makeSkolemTermSV ) {
-                    v = SchemaVariableFactory.createSkolemTermSV
-                    (new Name(name), s);
+                } else if(makeSkolemTermSV) {
+                    v = SchemaVariableFactory.createSkolemTermSV(
+                    				new Name(name), 
+                    				s);
                 } else { v = SchemaVariableFactory.createTermSV
                     (new Name(name), s, mods.rigid(), mods.strict());
                 }
@@ -667,7 +670,6 @@ options {
                variables().add(v);
             }
         }
-        
     }
 
     public static Term toZNotation(String number, Namespace functions){    
@@ -1722,8 +1724,11 @@ one_schema_var_decl
    { 
      Iterator<String> it = ids.iterator();
      while(it.hasNext())
-       schema_var_decl(it.next(),s,makeVariableSV,makeSkolemTermSV, 
-       				   mods);
+       schema_var_decl(it.next(),
+                       s,
+                       makeVariableSV,
+                       makeSkolemTermSV, 
+		       mods);
    }
  )
 
@@ -3405,6 +3410,7 @@ varexp[TacletBuilder b]
     | varcond_equalUnique[b]
     | varcond_new[b]
     | varcond_newlabel[b] 
+    | varcond_observer[b]    
   ) 
   | 
   ( (NOT {negated = true;} )? 
@@ -3721,6 +3727,22 @@ varcond_localvariable [TacletBuilder b, boolean negated]
      	   b.addVariableCondition(new LocalVariableCondition((SchemaVariable) x, negated));
         } 
 ;
+
+varcond_observer [TacletBuilder b]
+{
+  ParsableVariable obs = null;
+  ParsableVariable heap = null;
+  ParsableVariable obj = null;
+}
+:
+   ISOBSERVER 
+	LPAREN obs=varId COMMA heap=varId COMMA obj=varId RPAREN {
+     	   b.addVariableCondition(new ObserverCondition((TermSV)obs, 
+     	                                                (TermSV)heap,
+     	                                                (TermSV)obj));
+        } 
+;
+
 
 varcond_equalUnique [TacletBuilder b]
 {

@@ -9,7 +9,6 @@ class MyClient {
     MyClient() {
 	mc = new MyClass();
     }
-        
     
     //@ assignable i;
     void invariantPreservation() {
@@ -24,7 +23,7 @@ class MyClient {
     }
 
     
-    /*@ assignable i, mc.footprint;
+    /*@ assignable \everything;//i, mc.footprint;
       @ ensures \result == 388;
       @*/
     int operationContracts() {

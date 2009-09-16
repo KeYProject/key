@@ -48,7 +48,7 @@ public class ObserverFunction extends Function {
     //-------------------------------------------------------------------------
     //internal methods
     //-------------------------------------------------------------------------
-    
+
     private static Sort[] getArgSorts(Sort heapSort,
 	    			      KeYJavaType container, 
 	                              boolean isStatic, 
@@ -75,7 +75,6 @@ public class ObserverFunction extends Function {
        
        return result;	
     }
-        
 
     
     //-------------------------------------------------------------------------

@@ -210,6 +210,8 @@ public abstract class TypeResolver {
             Sort result = null;
             if (op instanceof ProgramVariable) {
                 result  = ((ProgramVariable)op).getContainerType().getSort();
+            } else if(op instanceof ObserverFunction) {
+        	result = ((ObserverFunction)op).getContainerType().getSort();
             } else if(op instanceof Function
         	      && ((Function)op).isUnique()
         	      && ((Function)op).name().toString().contains("::")) {

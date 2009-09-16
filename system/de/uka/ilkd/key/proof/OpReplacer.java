@@ -14,9 +14,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import de.uka.ilkd.key.collection.ImmutableArray;
-import de.uka.ilkd.key.collection.DefaultImmutableSet;
-import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.collection.*;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
@@ -44,11 +42,21 @@ public class OpReplacer {
     
     
     public static Term replace(Term toReplace, Term with, Term in) {
-	Map map = new HashMap();
+	Map<Term,Term> map = new HashMap<Term,Term>();
 	map.put(toReplace, with);
 	OpReplacer or = new OpReplacer(map);
 	return or.replace(in);
     }
+    
+    
+    public static ImmutableList<Term> replace(Term toReplace, 
+	                                      Term with, 
+	                                      ImmutableList<Term> in) {
+	Map<Term,Term> map = new HashMap<Term,Term>();
+	map.put(toReplace, with);
+	OpReplacer or = new OpReplacer(map);
+	return or.replace(in);
+    }    
     
     
     /**
@@ -108,6 +116,19 @@ public class OpReplacer {
     
         return result;
     }  
+    
+    
+    
+    /**
+     * Replaces in a list of terms.
+     */
+    public ImmutableList<Term> replace(ImmutableList<Term> terms) {
+        ImmutableList<Term> result = ImmutableSLList.<Term>nil();
+        for(final Term term : terms) {
+            result = result.append(replace(term));
+        }
+        return result;
+    }    
     
     
     /**

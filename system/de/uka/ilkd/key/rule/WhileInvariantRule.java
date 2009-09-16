@@ -257,9 +257,9 @@ public final class WhileInvariantRule implements BuiltInRule {
 	
 	//split goal into three branches
 	ImmutableList<Goal> result = goal.split(3);
-	Goal initGoal = result.tail().tail().head();
+	Goal useGoal = result.tail().tail().head();
 	Goal bodyGoal = result.tail().head();
-	Goal useGoal = result.head();
+	Goal initGoal = result.head();
 	initGoal.setBranchLabel("Invariant Initially Valid");
 	bodyGoal.setBranchLabel("Body Preserves Invariant");
 	useGoal.setBranchLabel("Use Case");
@@ -304,14 +304,14 @@ public final class WhileInvariantRule implements BuiltInRule {
 	               TB.and(anonAssumptionAndUpdate.first, 
 	        	      TB.apply(anonAssumptionAndUpdate.second, 
 	        		       TB.and(invTerm, 
-	        			      TB.wellFormedHeap(services)))));
+	        			      TB.inReachableState(services)))));
 	final Term uAnonInvVariantNonNeg
 	    = TB.apply(inst.u,
 		       TB.and(anonAssumptionAndUpdate.first,
 			      TB.apply(anonAssumptionAndUpdate.second,
 				       TB.and(new Term[]{
 					        invTerm, 
-					        TB.wellFormedHeap(services), 
+					        TB.inReachableState(services), 
 					        variantNonNeg}))));
 
 	//"Invariant Initially Valid":

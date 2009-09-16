@@ -360,7 +360,7 @@ public final class UseOperationContractRule implements BuiltInRule {
 		= new Function(loopHeapName, heapLDT.targetSort());
 	services.getNamespaces().functions().addSafely(loopHeapFunc);
 	final Name anonHeapName 
-		= new Name(TB.newName(services, "anonHeap"));
+		= new Name(TB.newName(services, "anonHeap_" + pm.getName()));
 	final Function anonHeapFunc = new Function(anonHeapName,
 					           heapLDT.targetSort());
 	services.getNamespaces().functions().addSafely(anonHeapFunc);
@@ -425,7 +425,8 @@ public final class UseOperationContractRule implements BuiltInRule {
             pe = curPrefix.getFirstActiveChildPos().getProgram(curPrefix);
 
             assert pe instanceof CopyAssignment 
-                   || pe instanceof MethodReference;
+                   || pe instanceof MethodReference
+                   || pe instanceof New;
         
             int i = length - 1;
             do {
@@ -438,7 +439,8 @@ public final class UseOperationContractRule implements BuiltInRule {
 
         } else {
             assert pe instanceof CopyAssignment 
-                   || pe instanceof MethodReference;
+                   || pe instanceof MethodReference
+                   || pe instanceof New;
         }
         return result;
     }
@@ -556,25 +558,33 @@ public final class UseOperationContractRule implements BuiltInRule {
         
         //translate the contract
         final Term contractSelf 
-        	= inst.pm.isConstructor() ? TB.var(resultVar) : inst.actualSelf;
+        	= OpReplacer.replace(TB.heap(services), 
+        		             heapAtPre,
+        		             inst.pm.isConstructor() 
+        		               ? TB.var(resultVar) 
+        		               : inst.actualSelf);
+        final ImmutableList<Term> contractParams
+        	= OpReplacer.replace(TB.heap(services), 
+        			    heapAtPre, 
+        			    inst.actualParams);
         final Term contractResult
         	= inst.pm.isConstructor() || resultVar == null 
         	  ? null 
                   : TB.var(resultVar);
         final Term pre  = contract.getPre(TB.heap(services), 
         				  contractSelf, 
-        				  inst.actualParams, 
+        				  contractParams, 
         				  services);
         final Term post = contract.getPost(TB.heap(services),
         	                           contractSelf, 
-        				   inst.actualParams, 
+        				   contractParams, 
                                            contractResult, 
                                            TB.var(excVar), 
                                            heapAtPre,
                                            services);
         final Term mod = contract.getMod(TB.heap(services),
         	                         contractSelf,
-        	                         inst.actualParams, 
+        	                         contractParams, 
         	                         services);
         
         //split goal into three/four branches
@@ -623,24 +633,20 @@ public final class UseOperationContractRule implements BuiltInRule {
                                  ? freePost 
                                  : TB.inReachableState(services);        
         final Term postAssumption 
-        	= TB.apply(inst.u, 
-        		   TB.and(anonAssumptionAndUpdate.first,
-                                  TB.applyParallel(
-                                     new Term[]{heapAtPreUpdate,
-                                	        anonAssumptionAndUpdate.second},
-                                     TB.and(new Term[]{excNull, 
-                                	     	       freePost, 
-                                	     	       post}))));
+        	= TB.applySequential(new Term[]{inst.u, heapAtPreUpdate}, 
+        		   	     TB.and(anonAssumptionAndUpdate.first,
+        		   		    TB.apply(anonAssumptionAndUpdate.second,
+        		   	                     TB.and(new Term[]{excNull, 
+                                	     	                       freePost, 
+                                	     	                       post}))));
         final Term excPostAssumption 
-        	= TB.apply(inst.u, 
+        	= TB.applySequential(new Term[]{inst.u, heapAtPreUpdate}, 
         		   TB.and(anonAssumptionAndUpdate.first,
-                                  TB.applyParallel(
-                                     new Term[]{heapAtPreUpdate,
-                                	        anonAssumptionAndUpdate.second},
-                                     TB.and(new Term[]{TB.not(excNull),
-                                	     	       excCreated, 
-                                	     	       freeExcPost, 
-                                	     	       post}))));
+                                  TB.apply(anonAssumptionAndUpdate.second,
+                                           TB.and(new Term[]{TB.not(excNull),
+                                	     	             excCreated, 
+                                	     	             freeExcPost, 
+                                	     	             post}))));
        
         //create "Pre" branch
         preGoal.changeFormula(new ConstrainedFormula(TB.apply(inst.u, pre)),

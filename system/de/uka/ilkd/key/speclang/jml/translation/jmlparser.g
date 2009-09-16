@@ -533,7 +533,6 @@ storerefexpression returns [Term result = null] throws SLTranslationException
         catch [TermCreationException ex] {
 	    raiseError(ex.getMessage());
         }
-    
 
 
 storerefname returns [SLExpression result = null] throws SLTranslationException
@@ -564,7 +563,13 @@ storerefname returns [SLExpression result = null] throws SLTranslationException
 	    result = new SLExpression(convertToOld(result.getTerm()), 
 	                              result.getType());
 	}
-
+    | RESULT
+	{
+	    if(resultVar==null) {
+		raiseError("\\result used in wrong context");
+	    }
+	    result = new SLExpression(TB.var(resultVar), resultVar.getKeYJavaType());
+	}
     ;
     
 

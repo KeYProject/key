@@ -21,9 +21,13 @@ public abstract class SchemaVariableModifierSet {
     public boolean rigid () {
         return rigid;
     }
+    
+    
     protected boolean rigidEnabled () {
         return false;
     }
+    
+    
     public boolean strict () {
         return strict;
     }

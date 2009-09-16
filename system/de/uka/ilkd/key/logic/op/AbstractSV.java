@@ -64,7 +64,8 @@ abstract class AbstractSV extends AbstractSortedOperator
      * <tt>(this,x)</tt> exists where <tt>x<>pe</tt>
      */
     protected MatchConditions addInstantiation(ProgramElement pe,
-	    MatchConditions matchCond, Services services) {
+	    				       MatchConditions matchCond, 
+	    				       Services services) {
 
 	final SVInstantiations instantiations = matchCond.getInstantiations();
 	final SVSubstitute inMap = (SVSubstitute) instantiations

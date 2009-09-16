@@ -905,14 +905,14 @@ public final class TermBuilder {
     }
     
     
-    public Term wellFormedHeap(Services services) {
+    public Term wellFormed(Services services, Term h) {
         return func(services.getTypeConverter().getHeapLDT().getWellFormed(), 
-        	    heap(services));
+        	    h);
     }
     
 
     public Term inReachableState(Services services) {
-        return wellFormedHeap(services);
+        return wellFormed(services, heap(services));
     }
     
     

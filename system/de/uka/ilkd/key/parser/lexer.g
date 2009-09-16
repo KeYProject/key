@@ -42,7 +42,6 @@ tokens {
 	SCHEMAVARIABLES = "\\schemaVariables";
 	SCHEMAVAR = "\\schemaVar";
 	MODALOPERATOR = "\\modalOperator";
-	OPERATOR = "\\operator";
 	PROGRAM = "\\program";
 	FORMULA = "\\formula";
 	TERM = "\\term";
@@ -68,7 +67,8 @@ tokens {
 	HASSORT = "\\hasSort";        
 	ISARRAY="\\isArray";
         ISENUMTYPE="\\isEnumType";
-	ISLOCALVARIABLE = "\\isLocalVariable";        			
+	ISLOCALVARIABLE = "\\isLocalVariable";
+	ISOBSERVER = "\\isObserver";        			
 	ISREFERENCE="\\isReference";	        
 	ISREFERENCEARRAY="\\isReferenceArray";
 	ISSUBTYPE = "\\sub";	

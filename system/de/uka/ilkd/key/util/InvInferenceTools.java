@@ -26,6 +26,7 @@ import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.visitor.CreatingASTVisitor;
 import de.uka.ilkd.key.java.visitor.JavaASTCollector;
 import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
+import de.uka.ilkd.key.ldt.SetLDT;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -68,12 +69,33 @@ public class InvInferenceTools {
      * Returns the set of elementary conjuncts of the passed formula.
      */
     public ImmutableSet<Term> toSet(Term formula) {
+	assert formula.sort().equals(Sort.FORMULA);
 	ImmutableSet<Term> result = DefaultImmutableSet.<Term>nil();
-        ImmutableList<Term> workingList = ImmutableSLList.<Term>nil().prepend(formula);
+        ImmutableList<Term> workingList 
+        	= ImmutableSLList.<Term>nil().prepend(formula);
+        while(!workingList.isEmpty()) {
+            final Term f = workingList.head();
+            workingList = workingList.tail();
+            if(f.op() == Junctor.AND) {
+                workingList = workingList.prepend(f.sub(1)).prepend(f.sub(0));
+            } else {
+                result = result.add(f);
+            }
+        }
+        return result;
+    }
+    
+    
+    public ImmutableSet<Term> unionToSet(Term s, Services services) {
+	final SetLDT setLDT = services.getTypeConverter().getSetLDT();
+	assert s.sort().equals(setLDT.targetSort());
+	final Function union = setLDT.getUnion();
+	ImmutableSet<Term> result = DefaultImmutableSet.<Term>nil();
+        ImmutableList<Term> workingList = ImmutableSLList.<Term>nil().prepend(s);
         while(!workingList.isEmpty()) {
             Term f = workingList.head();
             workingList = workingList.tail();
-            if(f.op() == Junctor.AND) {
+            if(f.op() == union) {
                 workingList = workingList.prepend(f.sub(1)).prepend(f.sub(0));
             } else {
                 result = result.add(f);

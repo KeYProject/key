@@ -19,7 +19,7 @@ class MyClass {
     /*@ normal_behavior
       @   assignable footprint;
       @   ensures \result == i + 27 && attr == \result;
-      @   ensures footprint == \old(footprint);
+      @   ensures \newElemsFresh(footprint);
       @*/
     int add27(int i) {
 	attr = i + 27;

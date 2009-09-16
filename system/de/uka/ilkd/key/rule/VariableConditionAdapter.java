@@ -32,7 +32,7 @@ public abstract class VariableConditionAdapter implements VariableCondition {
      * @return true iff condition is fulfilled
      */
     public abstract boolean check(SchemaVariable var, 
-	    			   SVSubstitute instCandidate, 
+	    			  SVSubstitute instCandidate, 
 				  SVInstantiations instMap, Services services);
 
 
