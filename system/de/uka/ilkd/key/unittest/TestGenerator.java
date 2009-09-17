@@ -342,7 +342,7 @@ public class TestGenerator {
 		Expression loc1 = translateTerm(nonPrimLocTerm, null, null);
 		Expression cons;
 		if (nonPrimLocTerm.sort() instanceof ArraySort) {
-		    cons = array2Cons.get(loc1.toString());
+		    cons = array2Cons.get(CompilableJavaPP.toString(loc1));
 		    if (cons == null) {
 			KeYJavaType locKJT = nonPrim[i].getKeYJavaType();
 			cons = new NewArray(new Expression[] { new IntLiteral(
