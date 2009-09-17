@@ -41,9 +41,9 @@ public class StrategySettings implements Settings {
     
     private StrategyProperties strategyProperties = new StrategyProperties();
     
-    /** returns the maximal amount of heuristics steps before an user
+    /** returns the maximal amount of heuristics steps before a user
      * interaction is required 
-     * @return the maximal amount of heuristics steps before an user
+     * @return the maximal amount of heuristics steps before a user
      * interaction is required
      */
     public int getMaxSteps(){

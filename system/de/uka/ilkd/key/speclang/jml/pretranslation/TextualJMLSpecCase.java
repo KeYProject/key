@@ -23,6 +23,8 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
             = ImmutableSLList.<PositionedString>nil();
     private ImmutableList<PositionedString> assignable   
             = ImmutableSLList.<PositionedString>nil();
+    private ImmutableList<PositionedString> accessible   
+            = ImmutableSLList.<PositionedString>nil();
     private ImmutableList<PositionedString> ensures      
             = ImmutableSLList.<PositionedString>nil();
     private ImmutableList<PositionedString> signals      
@@ -53,9 +55,14 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         requires = requires.append(l);
     }
     
-
+    
     public void addAssignable(PositionedString ps) {
         assignable = assignable.append(ps);
+    }
+    
+    
+    public void addAccessible(PositionedString ps) {
+	accessible = accessible.append(ps);
     }
     
     
@@ -87,10 +94,15 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
     public ImmutableList<PositionedString> getRequires() {
         return requires;
     }
-
+    
     
     public ImmutableList<PositionedString> getAssignable() {
         return assignable;
+    }
+    
+    
+    public ImmutableList<PositionedString> getAccessible() {
+        return accessible;
     }
 
     
@@ -131,6 +143,10 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         while(it.hasNext()) {
             sb.append("assignable: " + it.next() + "\n");
         }
+        it = accessible.iterator();
+        while(it.hasNext()) {
+            sb.append("accessible: " + it.next() + "\n");
+        }        
         it = ensures.iterator();
         while(it.hasNext()) {
             sb.append("ensures: " + it.next() + "\n");
@@ -162,6 +178,7 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
                && behavior.equals(sc.behavior)
                && requires.equals(sc.requires)
                && assignable.equals(sc.assignable)
+               && accessible.equals(sc.accessible)               
                && ensures.equals(sc.ensures)
                && signals.equals(sc.signals)
                && signalsOnly.equals(sc.signalsOnly)
@@ -175,6 +192,7 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
                + behavior.hashCode()
                + requires.hashCode()
                + assignable.hashCode()
+               + accessible.hashCode()               
                + ensures.hashCode()
                + signals.hashCode()
                + signalsOnly.hashCode()

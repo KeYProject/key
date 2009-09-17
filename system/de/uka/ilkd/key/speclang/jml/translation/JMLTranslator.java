@@ -204,13 +204,13 @@ final class JMLTranslator {
    /**
      * Translates an expression as it occurs in our custom class-level accessible clauses.
      */
-    public Pair<ObserverFunction,Term> translateAccessibleExpression(
-                                    	PositionedString representsExpr,
+    public Pair<ObserverFunction,Term> translateDependsExpression(
+                                    	PositionedString accessibleExpr,
                                         KeYJavaType specInClass,
                                         ProgramVariable selfVar)
             throws SLTranslationException {        
             
-        KeYJMLParser parser = new KeYJMLParser(representsExpr,
+        KeYJMLParser parser = new KeYJMLParser(accessibleExpr,
                                                services,
                                                specInClass,
                                                selfVar,
@@ -219,9 +219,9 @@ final class JMLTranslator {
                                                null,
                                                null);
         
-//      System.out.println("JMLTranslator.translateAccessibleExpression("+representsExpr+") results: ");
+//      System.out.println("JMLTranslator.translateDependsExpression("+representsExpr+") results: ");
 
-        Pair<ObserverFunction,Term> result = parser.parseAccessible();
+        Pair<ObserverFunction,Term> result = parser.parseDepends();
         
 //      System.out.println(result);
 //      System.out.println();

@@ -137,11 +137,11 @@ classlevel_element[ImmutableList<String> mods]
 	throws SLTranslationException
 :
         result=class_invariant[mods]
+    |   result=depends_clause[mods]        
     |   result=method_specification[mods]
     |   (method_declaration[mods]) => result=method_declaration[mods]
     |   result=field_declaration[mods] 
-    |   result=represents_clause[mods]
-    |   result=accessible_clause[mods]    
+    |   result=represents_clause[mods]    
     |   result=history_constraint[mods]
     |   result=initially_clause[mods]
     |   result=monitors_for_clause[mods]
@@ -520,6 +520,7 @@ simple_spec_body_clause[TextualJMLSpecCase sc, Behavior b]
 :
     (
 	    ps=assignable_clause     { sc.addAssignable(ps); }
+	|   ps=accessible_clause     { sc.addAccessible(ps); }
 	|   ps=ensures_clause        { sc.addEnsures(ps); }
 	|   ps=signals_clause        { sc.addSignals(ps); }
 	|   ps=signals_only_clause   { sc.addSignalsOnly(ps); }
@@ -566,6 +567,21 @@ assignable_keyword
     |   MODIFIABLE_RED 
     |   MODIFIES 
     |   MODIFIES_RED
+;
+
+
+accessible_clause 
+	returns [PositionedString result = null] 
+	throws SLTranslationException
+:
+    accessible_keyword result=expression
+;
+
+
+accessible_keyword
+:
+        ACCESSIBLE
+    |   ACCESSIBLE_REDUNDANTLY
 ;
 
 
@@ -804,31 +820,30 @@ represents_keyword
 
 
 //-----------------------------------------------------------------------------
-//classlevel accessible clauses (custom extension of JML)
+//classlevel depends clauses (custom extension of JML)
 //-----------------------------------------------------------------------------
 
-accessible_clause[ImmutableList<String> mods] 
+depends_clause[ImmutableList<String> mods] 
 	returns [ImmutableList<TextualJMLConstruct> result = null] 
 	throws SLTranslationException 
 {
     PositionedString ps;
 }
 :
-    accessible_keyword ps=expression
+    depends_keyword ps=expression
     {
-    	TextualJMLAccessible ac 
-    		= new TextualJMLAccessible(mods, ps);
-	result = ImmutableSLList.<TextualJMLConstruct>nil().prepend(ac);
+    	TextualJMLDepends d 
+    		= new TextualJMLDepends(mods, ps);
+	result = ImmutableSLList.<TextualJMLConstruct>nil().prepend(d);
     }
 ;
 
 
-accessible_keyword
+depends_keyword
 :
-        ACCESSIBLE
-    |   ACCESSIBLE_REDUNDANTLY
+        DEPENDS
+    |   DEPENDS_REDUNDANTLY
 ;
-
 
 
 

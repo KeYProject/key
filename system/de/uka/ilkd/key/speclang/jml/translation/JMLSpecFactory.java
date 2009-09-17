@@ -137,6 +137,7 @@ public class JMLSpecFactory {
                                 PositionedString customName,
                                 ImmutableList<PositionedString> originalRequires,
                                 ImmutableList<PositionedString> originalAssignable,
+                                ImmutableList<PositionedString> originalAccessible,
                                 ImmutableList<PositionedString> originalEnsures,
                                 ImmutableList<PositionedString> originalSignals,
                                 ImmutableList<PositionedString> originalSignalsOnly,
@@ -194,6 +195,23 @@ public class JMLSpecFactory {
             assignable = TB.union(services, 
         	                  assignable, 
         	                  TB.freshLocs(services, TB.heap(services)));
+        }
+        
+        //translate accessible
+        Term accessible;
+        if(originalAccessible.isEmpty()) {
+            accessible = null;
+        } else {
+            accessible = TB.empty(services);
+            for(PositionedString expr : originalAccessible) {
+        	Term translated 
+        		= translator.translateAssignableExpression(
+        				expr, 
+        				pm.getContainerType(),
+        				selfVar, 
+        				paramVars);
+        	accessible = TB.union(services, accessible, translated);
+            }
         }
 
         //translate ensures
@@ -289,7 +307,7 @@ public class JMLSpecFactory {
                                             requires,
                                             post,
                                             assignable,
-                                            null, //TODO
+                                            accessible,
                                             selfVar,
                                             paramVars,
                                             resultVar,
@@ -305,7 +323,7 @@ public class JMLSpecFactory {
                                             requires,
                                             post,
                                             assignable,
-                                            null, //TODO
+                                            accessible,
                                             selfVar,
                                             paramVars,
                                             resultVar,
@@ -321,7 +339,7 @@ public class JMLSpecFactory {
                                             TB.and(requires, TB.not(diverges)),
                                             post,
                                             assignable,
-                                            null, //TODO
+                                            accessible,
                                             selfVar,
                                             paramVars,
                                             resultVar,
@@ -335,7 +353,7 @@ public class JMLSpecFactory {
                                             requires,
                                             post,
                                             assignable,
-                                            null, //TODO
+                                            accessible,
                                             selfVar,
                                             paramVars,
                                             resultVar,
@@ -421,25 +439,25 @@ public class JMLSpecFactory {
     
     
     public Contract createJMLDependencyContract(KeYJavaType kjt, 
-                                                PositionedString originalAcc) 
+                                                PositionedString originalDep) 
             throws SLTranslationException {
         assert kjt != null;
-        assert originalAcc != null;
+        assert originalDep != null;
         
         //create variable for self
         ProgramVariable selfVar = TB.selfVar(services, kjt, false);
         
         //translate expression
         Pair<ObserverFunction,Term> dep 
-        	= translator.translateAccessibleExpression(originalAcc,
-        					  	   kjt,
-        					  	   selfVar);
+        	= translator.translateDependsExpression(originalDep,
+        					  	kjt,
+        					  	selfVar);
         assert dep.first.arity() <= 2;
         
         //create dependency contract
         final ImmutableList<ProgramVariable> paramVars 
         	= TB.paramVars(services, dep.first, false);        
-        return new DependencyContractImpl("JML accessible clause",
+        return new DependencyContractImpl("JML depends clause",
         				  kjt,
         	                          dep.first,
         	                          dep.second,
@@ -449,9 +467,9 @@ public class JMLSpecFactory {
    
     
     public Contract createJMLDependencyContract(KeYJavaType kjt, 
-	   				        TextualJMLAccessible textualAcc)
+	   				        TextualJMLDepends textualDep)
     	throws SLTranslationException {
-	return createJMLDependencyContract(kjt, textualAcc.getAccessible());
+	return createJMLDependencyContract(kjt, textualDep.getDepends());
     }    
     
     
@@ -465,6 +483,7 @@ public class JMLSpecFactory {
                                     textualSpecCase.getName(),
                                     textualSpecCase.getRequires(),
                                     textualSpecCase.getAssignable(),
+                                    textualSpecCase.getAccessible(),
                                     textualSpecCase.getEnsures(),
                                     textualSpecCase.getSignals(),
                                     textualSpecCase.getSignalsOnly(),

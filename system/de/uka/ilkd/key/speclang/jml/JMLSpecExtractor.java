@@ -259,10 +259,10 @@ public final class JMLSpecExtractor implements SpecExtractor {
         		ClassAxiom rep 
         			= jsf.createJMLRepresents(kjt, textualRep);
         		result = result.add(rep);
-        	    } else if(c instanceof TextualJMLAccessible) {
-        		TextualJMLAccessible textualAcc = (TextualJMLAccessible) c;
+        	    } else if(c instanceof TextualJMLDepends) {
+        		TextualJMLDepends textualDep = (TextualJMLDepends) c;
         		Contract depContract 
-        			= jsf.createJMLDependencyContract(kjt, textualAcc);
+        			= jsf.createJMLDependencyContract(kjt, textualDep);
         		result = result.add(depContract);
         	    }
         	} catch (SLWarningException e) {

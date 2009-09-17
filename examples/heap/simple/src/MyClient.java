@@ -23,7 +23,7 @@ class MyClient {
     }
 
     
-    /*@ assignable \everything;//i, mc.footprint;
+    /*@ assignable i, mc.footprint;
       @ ensures \result == 388;
       @*/
     int operationContracts() {

@@ -250,12 +250,12 @@ options {
     }    
     
     
-    public Pair<ObserverFunction,Term> parseAccessible() throws SLTranslationException {
+    public Pair<ObserverFunction,Term> parseDepends() throws SLTranslationException {
     	Pair<ObserverFunction,Term> result = null;
 
 	this.currentlyParsing = true;
 	try {
-	    result = accessibleclause();
+	    result = dependsclause();
 	} catch (antlr.ANTLRException e) {
 	    throw excManager.convertException(e);
 	}
@@ -503,7 +503,6 @@ storereflist returns [Term result = null] throws SLTranslationException
 storeref returns [Term result = null] throws SLTranslationException
 :
 	result=storerefexpression
-    |   LPAREN MULT { raiseNotSupported("informal descriptions"); }
     |   result=storerefkeyword
     ;
 
@@ -512,13 +511,9 @@ storerefexpression returns [Term result = null] throws SLTranslationException
     SLExpression expr;
 }
 :
-    expr=storerefname 
-    (
-	result=storerefnamesuffix[expr]   { expr = new SLExpression(result); }
-    )*
+    expr=expression 
     {
-	if(result == null) {
-	    if(expr.isTerm() && expr.getTerm().sort().equals(setLDT.targetSort())) {
+ 	    if(expr.isTerm() && expr.getTerm().sort().equals(setLDT.targetSort())) {
 	    	result = expr.getTerm();
 	    } else if(expr.isTerm() && heapLDT.getSortOfSelect(expr.getTerm().op()) != null) {
 	        final Term objTerm = expr.getTerm().sub(1);
@@ -527,7 +522,6 @@ storerefexpression returns [Term result = null] throws SLTranslationException
 	    } else {
 	    	raiseError("Not a valid store-ref expression: " + expr.getTerm());
 	    }
-	}
     }
     ; exception
         catch [TermCreationException ex] {
@@ -535,74 +529,9 @@ storerefexpression returns [Term result = null] throws SLTranslationException
         }
 
 
-storerefname returns [SLExpression result = null] throws SLTranslationException
-:
-    id:IDENT
-    {
-	result = lookupIdentifier(id.getText(), null, null, id);
-	if(result == null) {
-	    raiseError("identifier not found: " + id.getText());
-	}
-    }
-    | SUPER
-    {
-	raiseNotSupported("location \"super\"");
-    }
-    | THIS
-    {
-	result = new SLExpression(TB.var(selfVar), selfVar.getKeYJavaType());
-    } 
-    | (OLD | PRE) LPAREN result=expression RPAREN
-	{
-	    if(heapAtPre == null) {
-		raiseError("JML construct " +
-			   "\\old not allowed in this context.");
-	    } else if(!result.isTerm() || !result.getTerm().sort().equals(setLDT.targetSort())) {
-	    	raiseError("Not a valid store-ref expression: " + result);
-	    }
-	    result = new SLExpression(convertToOld(result.getTerm()), 
-	                              result.getType());
-	}
-    | RESULT
-	{
-	    if(resultVar==null) {
-		raiseError("\\result used in wrong context");
-	    }
-	    result = new SLExpression(TB.var(resultVar), resultVar.getKeYJavaType());
-	}
-    ;
-    
-
-storerefnamesuffix[SLExpression receiver] returns [Term result = null] throws SLTranslationException
-:
-    DOT id:IDENT
-    {
-	SLExpression expr = lookupIdentifier(id.getText(), receiver, null, id);
-	if (!expr.isTerm()) {
-	    raiseError("Error in store-ref-suffix");
-	}
-	if(expr.getTerm().sort().equals(setLDT.targetSort())) {
-	    result = expr.getTerm();
-	} else if(heapLDT.getSortOfSelect(expr.getTerm().op()) != null) {
-	    Term objTerm = expr.getTerm().sub(1);
-	    Term fieldTerm = expr.getTerm().sub(2);
-	    result = TB.pairSingleton(services, objTerm, fieldTerm);
-	} else {
-	    raiseError("Something is wrong: " + expr.getTerm());
-	}
-    }
-    | DOT THIS
-    {
-	raiseNotSupported("location \"this\" as store-ref-suffix");
-    }
-    | LBRACKET result = specarrayrefexpr[receiver] RBRACKET
-    | DOT MULT
-    {
-	result = TB.allFields(services, receiver.getTerm());
-    }
-    ;
-
-specarrayrefexpr[SLExpression receiver] returns [Term result = null] throws SLTranslationException
+specarrayrefexpr[SLExpression receiver, String fullyQualifiedName, Token lbrack] 
+               returns [SLExpression result = null] 
+               throws SLTranslationException
 {
     SLExpression rangeFrom=null;
     SLExpression rangeTo=null;
@@ -613,6 +542,15 @@ specarrayrefexpr[SLExpression receiver] returns [Term result = null] throws SLTr
 	| MULT
     )
     {
+	if(receiver == null) {
+	    raiseError("Array \"" + fullyQualifiedName + "\" not found.", lbrack);
+	} else if(receiver.isType()) {
+	    raiseError("Error in array expression: \"" + fullyQualifiedName +
+		    "\" is a type.", lbrack);
+	} else if(!(receiver.getType().getJavaType() instanceof ArrayType)) {
+	    raiseError("Cannot access " + receiver.getTerm() + " as an array.");
+	}
+    
         LogicVariable indexVar 
 	    = new LogicVariable(
 	              new Name("i"), 
@@ -622,25 +560,30 @@ specarrayrefexpr[SLExpression receiver] returns [Term result = null] throws SLTr
 	if (rangeFrom == null) {
 	    // We have a star. A star includes all components of an array even
 	    // those out of bounds. This makes proving easier.	    
-	    result = TB.locComprehension(services,
+	    Term t = TB.locComprehension(services,
 	    				 new QuantifiableVariable[]{indexVar}, 
 	                                 receiver.getTerm(), 
 	                                 arrIndex);
+	    result = new SLExpression(t);
 	} else if (rangeTo != null) {
 	    // We have "rangeFrom .. rangeTo"
 	    Term guardFormula 
 	    	= TB.and(TB.leq(rangeFrom.getTerm(), TB.var(indexVar), services),
 		         TB.leq(TB.var(indexVar), rangeTo.getTerm(), services));
-            result = TB.guardedLocComprehension(
+            Term t = TB.guardedLocComprehension(
 	    			services, 
 	                        new QuantifiableVariable[]{indexVar},
 	                        guardFormula,
 	                        TB.pair(services, receiver.getTerm(), arrIndex));
+	    result = new SLExpression(t);
 	} else {
 	    // We have a regular array access
-	    result = TB.pairSingleton(services, 
-	                              receiver.getTerm(),
-	                              TB.arr(services, rangeFrom.getTerm()));
+	    Term t = TB.dotArr(services, 
+	    		       receiver.getTerm(),
+	    		       rangeFrom.getTerm());
+	    ArrayType arrayType = (ArrayType) receiver.getType().getJavaType();
+	    KeYJavaType elementType = arrayType.getBaseType().getKeYJavaType();	    		       
+            result = new SLExpression(t, elementType);
 	}
     }
     ;exception
@@ -718,7 +661,7 @@ representsclause returns [Pair<ObserverFunction,Term> result=null] throws SLTran
         if(!lhs.isTerm() 
             || !(lhs.getTerm().op() instanceof ObserverFunction)
             || lhs.getTerm().sub(0).op() != heapLDT.getHeap()) {
-            raiseError("Accessible clause with unexpected lhs: " + lhs);
+            raiseError("Represents clause with unexpected lhs: " + lhs);
         }
     } 
     (
@@ -753,7 +696,7 @@ representsclause returns [Pair<ObserverFunction,Term> result=null] throws SLTran
     ;
     
     
-accessibleclause returns [Pair<ObserverFunction,Term> result=null] throws SLTranslationException
+dependsclause returns [Pair<ObserverFunction,Term> result=null] throws SLTranslationException
 {
     SLExpression lhs;
     Term rhs;
@@ -764,7 +707,7 @@ accessibleclause returns [Pair<ObserverFunction,Term> result=null] throws SLTran
         if(!lhs.isTerm() 
             || !(lhs.getTerm().op() instanceof ObserverFunction)
             || lhs.getTerm().sub(0).op() != heapLDT.getHeap()) {
-            raiseError("Accessible clause with unexpected lhs: " + lhs);
+            raiseError("Depends clause with unexpected lhs: " + lhs);
         }
         result = new Pair<ObserverFunction,Term>(
                              (ObserverFunction) lhs.getTerm().op(), 
@@ -1449,29 +1392,13 @@ primarysuffix[SLExpression receiver, String fullyQualifiedName]
 	    }
 	}
     |
-	lbrack:LBRACKET result=expression RBRACKET
-	{
-	    if(receiver == null) {
-		raiseError("Array \"" + fullyQualifiedName + "\" not found.", lbrack);
-	    } else if(receiver.isType()) {
-		raiseError("Error in array expression: \"" + fullyQualifiedName +
-		    "\" is a type.", lbrack);
-	    } else if(!(receiver.getType().getJavaType() instanceof ArrayType)) {
-	    	raiseError("Cannot access " + receiver.getTerm() + " as an array.");
-	    }
-	    
-	    ArrayType arrayType = (ArrayType) receiver.getType().getJavaType();
-	    KeYJavaType elementType = arrayType.getBaseType().getKeYJavaType();
-	    
-	    try {
-	        result = new SLExpression(TB.dotArr(services, receiver.getTerm(), result.getTerm()),
-	                                  elementType);
-	    } catch (TermCreationException e) {
-		raiseError(e.getMessage());
-	    } catch (IllegalArgumentException e) {
-		raiseError(e.getMessage());
-	    }
-	}
+	lbrack:LBRACKET result=specarrayrefexpr[receiver, fullyQualifiedName, lbrack] RBRACKET
+    |    
+         DOT MULT
+         {
+	     result = new SLExpression(TB.allFields(services, receiver.getTerm()));
+         }
+	
 )	
 ;
 

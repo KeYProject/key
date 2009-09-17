@@ -1,18 +1,6 @@
 class ArrayList {
     private int count;
-    private /*@nullable@*/Object[] items;
-    
-    /*@ model \set footprint;
-      @ accessible footprint: footprint;
-      @ represents footprint <- count, items, items[*], items.length;
-      @*/
-    
-    
-    /*@ invariant items != null;
-      @ invariant 0 <= count && count <= items.length;
-      @ invariant \typeof(items) == \type(Object[]);
-      @ accessible <inv>: footprint;
-      @*/
+    private /*@nullable@*/ Object[] items;
     
     
     /*@ assignable \nothing;
@@ -30,9 +18,9 @@ class ArrayList {
       @ ensures (\forall int i; 0 <= i && i < size() - 1; get(i) == \old(get(i)));
       @ ensures \newElemsFresh(footprint);
       @*/
-    void add(Object o) {
+    void add(/*@nullable@*/ Object o) {
 	if(count == items.length) {
-	    Object[] temp = new Object[count + 10];
+	    final Object[] temp = new Object[count + 10];
 	    /*@ loop_invariant 0 <= i && i <= count
 	      @    && (\forall int x; 0 <= x && x < i; temp[x] == items[x]);
 	      @ assignable temp[*];
@@ -46,20 +34,35 @@ class ArrayList {
     }
     
     
-    // @ accessible get: footprint; 
-    /*@ requires 0 <= i && i <= size();
-      @ assignable \nothing;
+    /*@ requires 0 <= i && i < size();
+      @ assignable \nothing; 
+      @ accessible footprint;
       @ ensures \result == get(i);
       @*/
-    Object get(int i) {
+    /*@nullable@*/ Object get(int i) {
 	return items[i];
     }
 
     
-    //@ accessible size(): footprint;
-    /*@ ensures \result == size();
+    /*@ assignable \nothing;
+      @ accessible footprint;
+      @ ensures \result == size();
+      @ ensures 0 <= \result;
       @*/
     int size() {
 	return count;
     }
+    
+    
+    /*@ depends <inv>: footprint;
+      @ invariant items != null;
+      @ invariant 0 <= count && count <= items.length;
+      @ invariant \typeof(items) == \type(Object[]);
+      @*/
+
+    
+    /*@ model \set footprint;
+      @ depends footprint: footprint;
+      @ represents footprint <- count, items, items[*], items.length;
+      @*/    
 }

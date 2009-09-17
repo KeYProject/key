@@ -4,10 +4,10 @@ class MyClass {
     
     //@ model \set footprint;
     //@ represents footprint <- this.*;
-    //@ accessible footprint: footprint;
+    //@ depends footprint: footprint;
        
     //@ invariant attr2 != 0;
-    //@ accessible <inv>: footprint;
+    //@ depends <inv>: footprint;
 
     //@ assignable \nothing;
     //@ ensures \fresh(footprint);

@@ -649,7 +649,10 @@ public final class UseOperationContractRule implements BuiltInRule {
                                 	     	             post}))));
        
         //create "Pre" branch
-        preGoal.changeFormula(new ConstrainedFormula(TB.apply(inst.u, pre)),
+        preGoal.changeFormula(new ConstrainedFormula(
+        			TB.applySequential(new Term[]{inst.u, 
+        						      heapAtPreUpdate}, 
+        	                                   pre)),
                               ruleApp.posInOccurrence());
        
         //create "Post" branch

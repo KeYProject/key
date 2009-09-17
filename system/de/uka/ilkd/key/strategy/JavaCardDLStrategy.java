@@ -300,7 +300,7 @@ public final class JavaCardDLStrategy extends AbstractFeatureStrategy {
         boolean useLoopExpand = strategyProperties.getProperty(
                 StrategyProperties.LOOP_OPTIONS_KEY).
                     equals(StrategyProperties.LOOP_EXPAND);
-        boolean programsToRight = false;//XXX
+        boolean programsToRight = true;//XXX
         
         String methProp =
             strategyProperties.getProperty ( StrategyProperties.METHOD_OPTIONS_KEY );

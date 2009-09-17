@@ -33,7 +33,6 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.metaconstruct.WhileInvRule;
 import de.uka.ilkd.key.speclang.LoopInvariant;
 import de.uka.ilkd.key.util.InvInferenceTools;
-import de.uka.ilkd.key.util.Pair;
 
 
 public final class WhileInvariantRule implements BuiltInRule {
@@ -85,7 +84,7 @@ public final class WhileInvariantRule implements BuiltInRule {
 	}
 
 	//active statement must be while loop
-	final SourceElement activeStatement 
+	SourceElement activeStatement 
 		= IIT.getActiveStatement(progPost.javaBlock());
 	if(!(activeStatement instanceof While)) {
 	    return null;
@@ -119,48 +118,31 @@ public final class WhileInvariantRule implements BuiltInRule {
 		          innermostMethodFrame.getExecutionContext();
 
 	//cache and return result
-	final Instantiation result 
-		= new Instantiation(u, 
-			            progPost, 
-			            loop, 
-			            inv,
-			            selfTerm, 
-			            innermostExecutionContext);
+	Instantiation result = new Instantiation(u, 
+					         progPost, 
+					         loop, 
+					         inv,
+					         selfTerm, 
+					         innermostExecutionContext);
 	lastFocusTerm = focusTerm;
 	lastInstantiation = result;
 	return result;
     }
 
     
-    /**
-     * @return (assumption, update)
-     */
-    private Pair<Term,Term> createAnonUpdate(While loop, 
-	    				     Term mod, 
-	    				     Services services) {
-	Term assumption;
-	Term update;
-	
+    private Term createAnonUpdate(While loop, Term mod, Services services) {
 	//heap
-	final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
-	final Name loopHeapName 
-		= new Name(TB.newName(services, "heapAfterLoop"));
-	final Function loopHeapFunc
-		= new Function(loopHeapName, heapLDT.targetSort());
-	services.getNamespaces().functions().addSafely(loopHeapFunc);
-	final Name anonHeapName 
-		= new Name(TB.newName(services, "anonHeap"));
-	final Function anonHeapFunc = new Function(anonHeapName,
+	HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+	Name anonHeapName = new Name(TB.newName(services, "loopHeap"));
+	Function anonHeapFunc = new Function(anonHeapName,
 					     heapLDT.targetSort());
 	services.getNamespaces().functions().addSafely(anonHeapFunc);
-	assumption = TB.equals(TB.changeHeapAtLocs(services, 
-		                	    	   TB.heap(services), 
-		                	    	   mod,
-		                	    	   TB.func(anonHeapFunc)),
-		               TB.func(loopHeapFunc)); 
-	update = TB.elementary(services,
-		               heapLDT.getHeap(),
-		               TB.func(loopHeapFunc));
+	Term result = TB.elementary(services,
+		                    heapLDT.getHeap(), 
+		                    TB.changeHeapAtLocs(services, 
+		                	    		TB.heap(services), 
+		                	    		mod,
+		                	    		TB.func(anonHeapFunc)));
 	
 	//local vars
 	ImmutableSet<ProgramVariable> localVars 
@@ -172,10 +154,10 @@ public final class WhileInvariantRule implements BuiltInRule {
 	    Term elemUpd = TB.elementary(services, 
 		                         (LocationVariable)pv, 
 		                         TB.func(anonFunc));
-	    update = TB.parallel(update, elemUpd);
+	    result = TB.parallel(result, elemUpd);
 	}
 	
-	return new Pair<Term,Term>(assumption, update);
+	return result;
     }
     
     
@@ -194,16 +176,14 @@ public final class WhileInvariantRule implements BuiltInRule {
 	}
 
 	//instantiation must succeed
-	final Instantiation inst = instantiate(pio.subTerm(), 
-		                               goal.proof().getServices());
+	Instantiation inst = instantiate(pio.subTerm(), 
+		                         goal.proof().getServices());
 	return inst != null;
     }
 
     
     @Override
-    public ImmutableList<Goal> apply(Goal goal, 
-	    			     Services services, 
-	    			     RuleApp ruleApp) {
+    public ImmutableList<Goal> apply(Goal goal, Services services, RuleApp ruleApp) {
 	final KeYJavaType booleanKJT = services.getTypeConverter()
 	                                       .getBooleanType();
 	final KeYJavaType intKJT 
@@ -211,8 +191,8 @@ public final class WhileInvariantRule implements BuiltInRule {
 	                  .getPrimitiveKeYJavaType(PrimitiveType.JAVA_INT);
 	
 	//get instantiation
-	final Instantiation inst 
-		= instantiate(ruleApp.posInOccurrence().subTerm(), services);
+	Instantiation inst = instantiate(ruleApp.posInOccurrence().subTerm(), 
+				         services);
 	final Term heapAtMethodPre = inst.inv.getInternalHeapAtPre();
 	final Term invTerm         = inst.inv.getInvariant(inst.selfTerm, 
 		 	                                   heapAtMethodPre, 
@@ -227,14 +207,13 @@ public final class WhileInvariantRule implements BuiltInRule {
 	//prepare heapBeforeLoop
 	final LocationVariable heapBeforeLoop 
 		= TB.heapAtPreVar(services, "heapBeforeLoop", true);
-	goal.addProgramVariable(heapBeforeLoop);
+	services.getNamespaces().programVariables().addSafely(heapBeforeLoop);
 	final Term heapBeforeLoopUpdate = TB.elementary(services, 
 						        heapBeforeLoop, 
 						        TB.heap(services));
 	
 	//prepare anon update, frame condition
-	final Pair<Term,Term> anonAssumptionAndUpdate 
-		= createAnonUpdate(inst.loop, mod, services);
+	final Term anon = createAnonUpdate(inst.loop, mod, services);
 	final Term frameCondition = TB.frame(services,
 		                             TB.var(heapBeforeLoop), 
 		                             mod);
@@ -257,9 +236,9 @@ public final class WhileInvariantRule implements BuiltInRule {
 	
 	//split goal into three branches
 	ImmutableList<Goal> result = goal.split(3);
-	Goal useGoal = result.tail().tail().head();
+	Goal initGoal = result.tail().tail().head();
 	Goal bodyGoal = result.tail().head();
-	Goal initGoal = result.head();
+	Goal useGoal = result.head();
 	initGoal.setBranchLabel("Invariant Initially Valid");
 	bodyGoal.setBranchLabel("Body Preserves Invariant");
 	useGoal.setBranchLabel("Use Case");
@@ -293,26 +272,18 @@ public final class WhileInvariantRule implements BuiltInRule {
 	
 	//prepare common assumption
 	final Term[] uAnon 
-		= new Term[]{inst.u, anonAssumptionAndUpdate.second};
+		= new Term[]{inst.u, anon};
 	final Term[] uBeforeLoopDefAnonVariant 
-		= new Term[]{inst.u, 
-		             heapBeforeLoopUpdate, 
-		             anonAssumptionAndUpdate.second, 
-		             variantUpdate};
+		= new Term[]{inst.u, heapBeforeLoopUpdate, anon, variantUpdate};
 	final Term uAnonInv 
-	    = TB.apply(inst.u, 
-	               TB.and(anonAssumptionAndUpdate.first, 
-	        	      TB.apply(anonAssumptionAndUpdate.second, 
-	        		       TB.and(invTerm, 
-	        			      TB.inReachableState(services)))));
+		= TB.applySequential(uAnon, 
+				     TB.and(invTerm, 
+					    TB.inReachableState(services)));
 	final Term uAnonInvVariantNonNeg
-	    = TB.apply(inst.u,
-		       TB.and(anonAssumptionAndUpdate.first,
-			      TB.apply(anonAssumptionAndUpdate.second,
-				       TB.and(new Term[]{
-					        invTerm, 
-					        TB.inReachableState(services), 
-					        variantNonNeg}))));
+		= TB.applySequential(uAnon, 
+				     TB.and(TB.and(invTerm, 
+					           TB.inReachableState(services)),
+					    variantNonNeg));
 
 	//"Invariant Initially Valid":
 	// \replacewith (==> inv );

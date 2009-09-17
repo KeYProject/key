@@ -14,41 +14,41 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.speclang.PositionedString;
 
 
-public final class TextualJMLAccessible extends TextualJMLConstruct {
+public final class TextualJMLDepends extends TextualJMLConstruct {
     
-    private final PositionedString accessible;
+    private final PositionedString depends;
     
     
-    public TextualJMLAccessible(ImmutableList<String> mods,
-	                        PositionedString represents) {
+    public TextualJMLDepends(ImmutableList<String> mods,
+	                     PositionedString depends) {
         super(mods);
-        assert represents != null;
-        this.accessible = represents;
+        assert depends != null;
+        this.depends = depends;
     }
     
     
-    public PositionedString getAccessible() {
-        return accessible;
+    public PositionedString getDepends() {
+        return depends;
     }
     
     @Override
     public String toString() {
-        return accessible.toString();
+        return depends.toString();
     }
     
     
     @Override
     public boolean equals(Object o) {
-        if(!(o instanceof TextualJMLAccessible)) {
+        if(!(o instanceof TextualJMLDepends)) {
             return false;
         }
-        TextualJMLAccessible a = (TextualJMLAccessible) o;
-        return mods.equals(a.mods) && accessible.equals(a.accessible);
+        TextualJMLDepends a = (TextualJMLDepends) o;
+        return mods.equals(a.mods) && depends.equals(a.depends);
     }
     
     
     @Override
     public int hashCode() {
-        return mods.hashCode() + accessible.hashCode();
+        return mods.hashCode() + depends.hashCode();
     }
 }
