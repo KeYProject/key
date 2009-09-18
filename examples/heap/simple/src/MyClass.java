@@ -1,7 +1,7 @@
 class MyClass {
     int attr;
     int attr2;
-    
+
     //@ model \set footprint;
     //@ represents footprint <- this.*;
     //@ depends footprint: footprint;

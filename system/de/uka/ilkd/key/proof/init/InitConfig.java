@@ -76,6 +76,8 @@ public class InitConfig {
     private HashMap<Name, Named> quickTacletMap;
 
     private String originalKeYFileName;
+    
+    private ProofSettings settings;    
 
 
 
@@ -336,6 +338,16 @@ public class InitConfig {
 
     public String getOriginalKeYFileName() {
         return originalKeYFileName;
+    }
+    
+    
+    public void setSettings(ProofSettings settings) {
+	this.settings = settings;
+    }
+    
+    
+    public ProofSettings getSettings() {
+	return settings;
     }
 
 

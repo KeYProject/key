@@ -3,7 +3,7 @@ class Iterator {
     private int index;
     
     
-    /*@ requires l.<inv>;
+    /*@ requires l.<inv> && l.size() >= 0;
       @ assignable \nothing;
       @ ensures list() == l;
       @ ensures \fresh(footprint);
@@ -49,7 +49,7 @@ class Iterator {
     
     
     /*@ model \set footprint;
-      @ accessible footprint: footprint;
+      @ depends footprint: footprint;
       @ represents footprint <- list, index;
       @*/    
 }

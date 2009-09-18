@@ -501,9 +501,21 @@ storereflist returns [Term result = null] throws SLTranslationException
 
 
 storeref returns [Term result = null] throws SLTranslationException
+{
+    Term s1 = null;
+    Term s2 = null;
+}
 :
 	result=storerefexpression
     |   result=storerefkeyword
+    |   UNION LPAREN s1=storeref COMMA s2 = storeref RPAREN
+        {
+            result = TB.union(services, s1, s2);
+        }
+    |   EMPTYSET
+        {
+            result = TB.empty(services);
+        }
     ;
 
 storerefexpression returns [Term result = null] throws SLTranslationException

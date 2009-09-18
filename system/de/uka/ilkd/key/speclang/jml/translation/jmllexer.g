@@ -108,7 +108,7 @@ XOR : "^";
 //XXX
 SET : "\\set";
 EMPTYSET : "\\empty";
-UNION : "\\union";
+UNION : "\\setUnion";
 INTERSECT : "\\intersect";
 SETMINUS : "\\setMinus";
 DISJOINT : "\\disjoint";

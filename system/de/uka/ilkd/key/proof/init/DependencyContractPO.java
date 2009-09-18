@@ -17,7 +17,6 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.proof.mgt.AxiomJustification;
 import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.speclang.ClassAxiom;
@@ -53,15 +52,22 @@ public final class DependencyContractPO extends AbstractPO
     //internal methods
     //-------------------------------------------------------------------------    
     
-    private Term buildFreePreNoHeap(ProgramVariable selfVar,
-	                            KeYJavaType selfKJT,
-	                            ImmutableList<ProgramVariable> paramVars) 
+    private Term buildFreePre(ProgramVariable selfVar,
+	                      KeYJavaType selfKJT,
+	                      ImmutableList<ProgramVariable> paramVars) 
     		throws ProofInputException {
         //"self != null"
 	final Term selfNotNull 
             = selfVar == null
               ? TB.tt()
               : TB.not(TB.equals(TB.var(selfVar), TB.NULL(services)));
+              
+        //"self.<created> = TRUE"
+        final Term selfCreated
+           = selfVar == null
+             ? TB.tt()
+             : TB.created(services, TB.var(selfVar));
+	
         	      
         //"MyClass::exactInstance(self) = TRUE"
         final Term selfExactType
@@ -70,6 +76,15 @@ public final class DependencyContractPO extends AbstractPO
              : TB.exactInstance(services, 
         	                selfKJT.getSort(), 
         	                TB.var(selfVar));
+             
+	
+        //conjunction of... 
+        //- "p_i.<created> = TRUE | p_i = null" for object parameters, and
+        //- "inBounds(p_i)" for integer parameters
+        Term paramsOK = TB.tt();
+        for(ProgramVariable paramVar : paramVars) {
+            paramsOK = TB.and(paramsOK, TB.reachableValue(services, paramVar));
+        }             
              
         //class axioms
         final ImmutableSet<ClassAxiom> axioms 
@@ -115,29 +130,14 @@ public final class DependencyContractPO extends AbstractPO
             }
         }             
         
-        return TB.and(new Term[]{selfNotNull, selfExactType, axiomTerm});
+        return TB.and(new Term[]{TB.inReachableState(services), 
+        	       		 selfNotNull,
+        	       		 selfCreated,
+        	       		 selfExactType,
+        	       		 paramsOK,
+        	       		 axiomTerm});        
     }    
     
-    
-    private Term buildFreePreWithHeap(ProgramVariable selfVar,
-	                              KeYJavaType selfKJT,
-	                              ImmutableList<ProgramVariable> paramVars)
-		throws ProofInputException {	
-	//self.<created> = TRUE
-	final Term selfCreated = TB.created(services, TB.var(selfVar)); 
-	
-        //conjunction of... 
-        //- "p_i.<created> = TRUE | p_i = null" for object parameters, and
-        //- "inBounds(p_i)" for integer parameters
-        Term paramsOK = TB.tt();
-        for(ProgramVariable paramVar : paramVars) {
-            paramsOK = TB.and(paramsOK, TB.reachableValue(services, paramVar));
-        }
-        
-        return TB.and(new Term[]{TB.inReachableState(services), 
-        	       		 selfCreated,
-        	       		 paramsOK});
-    }
     		
 
     
@@ -154,63 +154,54 @@ public final class DependencyContractPO extends AbstractPO
 		= TB.selfVar(services, contract.getKJT(), true);
 	final ImmutableList<ProgramVariable> paramVars
 		= TB.paramVars(services, target, true);
-	final LogicVariable heapLV1 
-		= new LogicVariable(new Name("h1"),  heapLDT.targetSort());
-	final LogicVariable heapLV2 
-		= new LogicVariable(new Name("h2"),  heapLDT.targetSort());
-	final Term heapLV1Term = TB.var(heapLV1);
-	final Term heapLV2Term = TB.var(heapLV2);
-	final Term[] subs1
+	
+	//translate contract
+	final Term pre = TB.and(buildFreePre(selfVar, 
+			                     contract.getKJT(), 
+					     paramVars),
+			        contract.getPre(selfVar, paramVars, services));
+	final Term dep = contract.getDep(selfVar, paramVars, services);
+	
+	//prepare update
+	final Name anonHeapName 
+		= new Name(TB.newName(services, "anonHeap"));
+	final Function anonHeapFunc = new Function(anonHeapName,
+					           heapLDT.targetSort());
+	final Term anonHeap = TB.func(anonHeapFunc);
+	final Term changedHeap 
+		= TB.changeHeapAtLocs(services, 
+			              TB.heap(services), 
+				      TB.setMinus(services, 
+					          TB.allLocs(services), 
+					          dep), 
+	                              anonHeap);
+	final Term update = TB.elementary(services, 
+					  heapLDT.getHeap(), 
+					  changedHeap);
+	
+	//prepare target term
+	final Term[] subs
 		= new Term[paramVars.size() + (target.isStatic() ? 1 : 2)];
-	final Term[] subs2 = new Term[subs1.length];
-	subs1[0] = heapLV1Term;
-	subs2[0] = heapLV2Term;
+	subs[0] = TB.heap(services);
 	int offset = 1;
 	if(!target.isStatic()) {
-	    subs1[1] = TB.var(selfVar);
-	    subs2[1] = TB.var(selfVar);
+	    subs[1] = TB.var(selfVar);
 	    offset++;
 	}
 	for(ProgramVariable paramVar : paramVars) {
-	    subs1[offset] = TB.var(paramVar);
-	    subs2[offset] = TB.var(paramVar);
+	    subs[offset] = TB.var(paramVar);
+	    subs[offset] = TB.var(paramVar);
 	    offset++;
 	}
-	final Term targetTerm1 = TB.func(target, subs1);
-	final Term targetTerm2 = TB.func(target, subs2);
+	final Term targetTerm = TB.func(target, subs);
 	
 	//build po
-	final Term indepPre = buildFreePreNoHeap(selfVar, 
-						 contract.getKJT(), 
-						 paramVars);
-	final Term pre = TB.and(buildFreePreWithHeap(selfVar, 
-        	                                     contract.getKJT(), 
-        	                                     paramVars), 
-        	                contract.getPre(selfVar, paramVars, services));
-	final Term pre1 = OpReplacer.replace(TB.heap(services), 
-					     heapLV1Term, 
-					     pre);
-	final Term pre2 = OpReplacer.replace(TB.heap(services), 
-					     heapLV2Term, 
-					     pre);
-	final Term dep = OpReplacer.replace(TB.heap(services), 
-		                            heapLV1Term, 
-		                            contract.getDep(selfVar, 
-		                        	    	    paramVars, 
-		                        	    	    services));
-	final Term po = TB.imp(TB.and(new Term[]{indepPre,
-		                                 pre1,
-		                                 pre2,
-		                                 TB.unchanged(services, 
-					    		      heapLV1Term, 
-					    		      heapLV2Term, 
-					    		      dep)}),
-                               TB.equals(targetTerm1, targetTerm2));
-		               
+	final Term po = TB.imp(pre,
+                               TB.equals(targetTerm, 
+                        	         TB.apply(update, targetTerm)));
+
         //save in field
-        poTerms = new Term[]{TB.all(new QuantifiableVariable[]{heapLV1, 
-        	                                               heapLV2}, 
-        	                    po)};
+        poTerms = new Term[]{po};
         poTaclets = new ImmutableSet[]{taclets};        
     }
     

@@ -135,7 +135,7 @@ public class StrategySettings implements Settings {
 	    setStrategy(SimpleJavaCardDLOptions.LOOPS_METHODS.name());
 	}
 	if (maxSteps<0) {
-	    setMaxSteps(1000);
+	    setMaxSteps(10000);
 	}
         props.setProperty(STRATEGY_KEY, getStrategy().toString());
         props.setProperty(STEPS_KEY,  String.valueOf(getMaxSteps()));

@@ -51,14 +51,12 @@ public class KeYFile implements EnvInput {
     
     private String javaPath;
     private boolean javaPathAlreadyParsed=false;
-
-    private ProofSettings settings;
     
     private InputStream input;
     
     protected InitConfig initConfig;
     
-    private boolean chooseContract = false;
+    private String chooseContract = null;
 
     // when parsing the key file store the classPaths here
     private ImmutableList<String> classPaths;
@@ -122,7 +120,7 @@ public class KeYFile implements EnvInput {
     
     
     protected ProofSettings getPreferences() throws ProofInputException {
-        if (settings == null) {
+        if (initConfig.getSettings() == null) {
             if (file.isDirectory()) {
                 return null;
             }
@@ -131,9 +129,11 @@ public class KeYFile implements EnvInput {
                     = new KeYParser(ParserMode.PROBLEM,
                                     new KeYLexer(getNewStream(), null), 
                                     file.toString());
-                settings = new ProofSettings(ProofSettings.DEFAULT_SETTINGS);
+                ProofSettings settings = new ProofSettings(ProofSettings.DEFAULT_SETTINGS);
                 settings.setProfile(ProofSettings.DEFAULT_SETTINGS.getProfile());
                 settings.loadSettingsFromString(problemParser.preferences());
+                initConfig.setSettings(settings);
+                return settings;                
             } catch (antlr.ANTLRException e) {
                 throw new ProofInputException(e);
             } catch (FileNotFoundException fnfe) {
@@ -141,8 +141,9 @@ public class KeYFile implements EnvInput {
             } catch (de.uka.ilkd.key.util.ExceptionHandlerException ehe) {
                 throw new ProofInputException(ehe.getCause().getMessage());
             }
+        } else {
+            return initConfig.getSettings();
         }
-        return settings;
     }
     
     
@@ -326,6 +327,7 @@ public class KeYFile implements EnvInput {
         }
         
         //read in-code specifications
+	getPreferences();
         readJavaPath();
         if(javaPath != null && !javaPath.equals("")) {            
             SLEnvInput slEnvInput = new SLEnvInput(javaPath);
@@ -413,7 +415,7 @@ public class KeYFile implements EnvInput {
     }
     
     
-    public boolean chooseContract() {
+    public String chooseContract() {
         return chooseContract;
     }
 

@@ -6,7 +6,7 @@ class Cell {
       @ ensures getX() == 0;
       @ ensures \fresh(footprint);
       @*/
-    /*@helper@*/ Cell() {
+    Cell() {
     }
     
     
@@ -14,7 +14,7 @@ class Cell {
       @ accessible footprint;
       @ ensures \result == getX();
       @*/
-    /*@helper@*/ int getX() {
+    int getX() {
 	return x;
     }
     
@@ -23,12 +23,14 @@ class Cell {
       @ ensures getX() == value;
       @ ensures \newElemsFresh(footprint); 
       @*/
-    /*@helper@*/ void setX(int value) {
+    void setX(int value) {
 	x = value;
     }
     
     /*@ model \set footprint;
       @ depends footprint: footprint;
       @ represents footprint <- x;
-      @*/    
+      @*/
+    
+    //@ depends <inv>: \nothing;
 }

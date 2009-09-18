@@ -31,6 +31,7 @@ import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.proof.init.*;
 import de.uka.ilkd.key.rule.*;
+import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.OperationContract;
 import de.uka.ilkd.key.speclang.SLEnvInput;
 import de.uka.ilkd.key.util.ExceptionHandlerException;
@@ -213,14 +214,33 @@ public final class ProblemLoader implements Runnable {
                init = new ProblemInitializer(main); 
                InitConfig initConfig = init.prepare(envInput);
 
-               if(envInput instanceof ProofOblInput
-        	       && !(envInput instanceof KeYFile 
-        		       && ((KeYFile) envInput).chooseContract())) {
-        	   po = (ProofOblInput) envInput;
+               final String chooseContract;
+               if(envInput instanceof KeYFile) {
+        	   chooseContract = ((KeYFile)envInput).chooseContract();
+        	   initConfig.setOriginalKeYFileName(envInput.name());
                } else {
-        	   if(envInput instanceof KeYFile) {
-        	       initConfig.setOriginalKeYFileName(envInput.name());
+        	   chooseContract = null;
+               }
+               if(envInput instanceof ProofOblInput && chooseContract == null) {
+        	   po = (ProofOblInput) envInput;
+               } else if(chooseContract != null 
+        	         && chooseContract.length() > 0) {
+        	   final Contract contract
+        	   	= initConfig.getServices()
+        	                    .getSpecificationRepository()
+        	                    .getContractByName(chooseContract);
+        	   if(contract == null) {
+        	       throw new RuntimeException("Contract not found: " 
+        		                          + chooseContract);
+        	   } else if(contract instanceof OperationContract) {
+        	       po = new OperationContractPO(
+        		       		initConfig, 
+        		       		(OperationContract)contract);
+        	   } else {
+        	       po = new DependencyContractPO(initConfig, contract);
         	   }
+        	   
+               } else { 
         	   ProofManagementDialog.showInstance(initConfig);
         	   if(ProofManagementDialog.startedProof()) {
         	       return status;

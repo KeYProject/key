@@ -39,4 +39,20 @@ class Stack {
       @ depends footprint: footprint;
       @ represents footprint <- contents, contents.footprint;
       @*/
+    
+    
+    /*@ requires other.<inv>;
+      @ requires \disjoint(footprint, other.footprint);
+      @ requires \typeof(other) == \type(Stack);
+      @ assignable footprint, other.footprint;
+      @ ensures other.<inv>;
+      @ //ensures size() == \old(other.size()) && other.size() == \old(size());
+      @ ensures \disjoint(footprint, other.footprint);
+      @ ensures \newElemsFresh(\setUnion(footprint, other.footprint));
+      @*/
+    void switchContents(Stack other) {
+        ArrayList tmp = contents;
+        contents = other.contents;
+        other.contents = tmp;
+    }
 }

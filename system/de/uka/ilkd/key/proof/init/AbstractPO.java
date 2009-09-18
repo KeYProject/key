@@ -14,6 +14,7 @@ import java.util.Iterator;
 
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.HeapLDT;
@@ -153,7 +154,10 @@ public abstract class AbstractPO implements ProofOblInput {
                          header,
                          initConfig.createTacletIndex(),
                          initConfig.createBuiltInRuleIndex(),
-                         initConfig.getServices());
+                         initConfig.getServices(),
+                         initConfig.getSettings() != null 
+                          ? initConfig.getSettings() 
+                          : new ProofSettings(ProofSettings.DEFAULT_SETTINGS));
     }
 
     

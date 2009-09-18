@@ -17,10 +17,13 @@ import recoder.io.PathList;
 import recoder.io.ProjectSettings;
 import de.uka.ilkd.key.gui.IMain;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
+import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Recoder2KeY;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.logic.sort.GenericSort;
@@ -433,8 +436,16 @@ public final class ProblemInitializer {
         
 	//read Java
         readJava(envInput, initConfig);
-        initConfig.getServices().getNamespaces().functions()
-        	  .add(initConfig.getServices().getJavaInfo().getInv());
+        final JavaInfo javaInfo = initConfig.getServices().getJavaInfo();
+        final Namespace functions 
+        	= initConfig.getServices().getNamespaces().functions();
+        functions.add(initConfig.getServices().getJavaInfo().getInv());
+        for(KeYJavaType kjt : javaInfo.getAllKeYJavaTypes()) {
+            for(ProgramMethod pm
+        	    : javaInfo.getAllProgramMethodsLocallyDeclared(kjt)) {
+        	functions.add(pm);
+            }
+        }
 
         //read envInput
         readEnvInput(envInput, initConfig);

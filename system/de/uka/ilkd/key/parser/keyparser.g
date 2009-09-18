@@ -117,7 +117,7 @@ options {
     private boolean schemaMode = false;
     private ParserMode parserMode;
 
-    private boolean chooseContract = false;
+    private String chooseContract = null;
     private int savedGuessing = -1;
 
     private int lineOffset=0;
@@ -300,7 +300,7 @@ options {
         this.keh = new KeYRecoderExcHandler();
     }
  
-    public boolean getChooseContract() {
+    public String getChooseContract() {
       return chooseContract;
     }
     
@@ -4071,10 +4071,18 @@ problem returns [ Term a = null ]
             {switchToNormalMode(); 
 	     if (capturer != null) capturer.capture();}
                 a = formula 
-            RBRACE) | CHOOSECONTRACT {
-	                if (capturer != null) capturer.capture();
-	                chooseContract = true;
-		      })?
+            RBRACE) 
+           | 
+           CHOOSECONTRACT (chooseContract=string_literal SEMI)?
+           {
+	       if (capturer != null) {
+	            capturer.capture();
+	       }
+	       if(chooseContract == null) {
+	           chooseContract = "";
+	       }
+           } 
+	)?
    ;
    
 bootClassPath returns [String id = null] :

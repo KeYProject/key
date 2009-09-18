@@ -460,6 +460,7 @@ public class JMLSpecFactory {
         return new DependencyContractImpl("JML depends clause",
         				  kjt,
         	                          dep.first,
+        				  TB.inv(services, TB.var(selfVar)),        	                          
         	                          dep.second,
         	                          selfVar,
         	                          paramVars);

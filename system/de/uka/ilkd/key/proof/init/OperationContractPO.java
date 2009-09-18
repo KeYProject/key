@@ -249,7 +249,7 @@ public final class OperationContractPO extends AbstractPO
         final Term pre = TB.and(buildFreePre(selfVar, 
         	                             contract.getKJT(), 
         	                             paramVars), 
-        	                contract.getPre(selfVar, paramVars, services)); 
+        	                contract.getPre(selfVar, paramVars, services));
                 
         //build program term
         final Term post = TB.and(contract.getPost(selfVar, 

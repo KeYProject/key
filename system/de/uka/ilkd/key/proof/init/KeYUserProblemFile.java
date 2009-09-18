@@ -116,7 +116,7 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
             String searchS = "\\problem";            
 
 	    if(problemTerm == null) {
-	       boolean chooseDLContract = problemParser.getChooseContract();
+	       boolean chooseDLContract = problemParser.getChooseContract() != null;
 	       if(chooseDLContract)
   	         searchS = "\\chooseContract";
 	       else {

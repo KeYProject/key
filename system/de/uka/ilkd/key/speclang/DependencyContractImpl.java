@@ -31,6 +31,7 @@ public final class DependencyContractImpl implements Contract {
     private final String name;
     private final KeYJavaType kjt;
     private final ObserverFunction target;
+    private final Term originalPre;
     private final Term originalDep;
     private final ProgramVariable originalSelfVar;
     private final ImmutableList<ProgramVariable> originalParamVars;
@@ -45,6 +46,7 @@ public final class DependencyContractImpl implements Contract {
 	                           String name, 
 	                           KeYJavaType kjt,
 	    			   ObserverFunction target,
+	    			   Term pre,
 	                  	   Term dep,
 	                  	   ProgramVariable selfVar,
 	                  	   ImmutableList<ProgramVariable> paramVars,
@@ -52,6 +54,7 @@ public final class DependencyContractImpl implements Contract {
 	assert baseName != null;
 	assert kjt != null;
 	assert target != null;
+	assert pre != null;
 	assert dep != null;
         assert (selfVar == null) == target.isStatic();
         assert paramVars != null;
@@ -66,6 +69,7 @@ public final class DependencyContractImpl implements Contract {
                                         + "]";
 	this.kjt = kjt;
 	this.target = target;
+	this.originalPre = pre;
 	this.originalDep = dep;
 	this.originalSelfVar = selfVar;
 	this.originalParamVars = paramVars;
@@ -76,10 +80,19 @@ public final class DependencyContractImpl implements Contract {
     public DependencyContractImpl(String baseName, 
 	                          KeYJavaType kjt,
 	    			  ObserverFunction target,
+	    			  Term pre,
 	                  	  Term dep,
 	                  	  ProgramVariable selfVar,
 	                  	  ImmutableList<ProgramVariable> paramVars) {
-	this(baseName, null, kjt, target, dep, selfVar, paramVars, INVALID_ID);
+	this(baseName, 
+             null, 
+             kjt, 
+             target, 
+             pre, 
+             dep, 
+             selfVar, 
+             paramVars, 
+             INVALID_ID);
     }    
     
     
@@ -113,6 +126,7 @@ public final class DependencyContractImpl implements Contract {
         	                          null,
                 			  kjt,        	                         
                 			  target,
+                			  originalPre,
                 			  originalDep,
                 			  originalSelfVar,
                 			  originalParamVars,
@@ -128,6 +142,7 @@ public final class DependencyContractImpl implements Contract {
         				  null,
                 			  newKJT,        				 
                 			  newTarget,
+                			  originalPre,
                 			  originalDep,
                 			  originalSelfVar,
                 			  originalParamVars,
@@ -145,7 +160,18 @@ public final class DependencyContractImpl implements Contract {
     public Term getPre(ProgramVariable selfVar, 
 	    	       ImmutableList<ProgramVariable> paramVars,
 	    	       Services services) {
-	return TB.tt();
+        assert (selfVar == null) == (originalSelfVar == null);
+        assert paramVars != null;
+        assert paramVars.size() == originalParamVars.size();
+        assert services != null;
+	Map map = new HashMap();
+	map.put(originalSelfVar, selfVar);
+	for(ProgramVariable originalParamVar : originalParamVars) {
+	    map.put(originalParamVar, paramVars.head());
+	    paramVars = paramVars.tail();
+	}
+	OpReplacer or = new OpReplacer(map);
+	return or.replace(originalPre);
     }
     
     
@@ -154,8 +180,21 @@ public final class DependencyContractImpl implements Contract {
 	               Term selfTerm, 
 	    	       ImmutableList<Term> paramTerms,
 	    	       Services services) {
-	return TB.tt();
-    }    
+	assert heapTerm != null;
+	assert (selfTerm == null) == (originalSelfVar == null);
+	assert paramTerms != null;
+	assert paramTerms.size() == originalParamVars.size();
+	assert services != null;
+	Map map = new HashMap();
+	map.put(TB.heap(services), heapTerm);
+	map.put(TB.var(originalSelfVar), selfTerm);
+	for(ProgramVariable originalParamVar : originalParamVars) {
+	    map.put(TB.var(originalParamVar), paramTerms.head());
+	    paramTerms = paramTerms.tail();
+	}	
+	OpReplacer or = new OpReplacer(map);
+	return or.replace(originalPre);
+    }
     
     
     @Override
@@ -201,10 +240,13 @@ public final class DependencyContractImpl implements Contract {
     
     @Override
     public String getHTMLText(Services services) {
+	final String pre = LogicPrinter.quickPrintTerm(originalPre, services);
         final String dep = LogicPrinter.quickPrintTerm(originalDep, services);
                       
         return "<html>"
-                + "<b>dep</b> "
+                + "<b>pre</b> "
+                + LogicPrinter.escapeHTML(pre)
+                + "<br><b>dep</b> "
                 + LogicPrinter.escapeHTML(dep)
                 + "</html>";
     }    
