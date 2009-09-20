@@ -149,7 +149,11 @@ public class DecProcRunner extends SwingWorker {
                                     public void interruptionPerformed(ActionEvent e) {
                                         prog.interrupt();
                                 	//rule.interrupt();
-                                        main.setStatusLine("External decision procedure interrupted by user");
+                                        if (temp == totalGoals) {
+                                            main.setStatusLine("Goal " + temp + " interrupted by user.");
+                                        } else {
+                                            main.setStatusLine("Goal " + temp + " interrupted by user. Processing goal " + (temp+1) );
+                                        }
                                     }
                                  };
                                 main.mediator().addinterruptListener(il);
