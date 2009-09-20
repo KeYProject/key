@@ -7,12 +7,14 @@
 // See LICENSE.TXT for details.
 package de.uka.ilkd.key.unittest.ppAndJavaASTExtension;
 
+import java.beans.Expression;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
 
 import de.uka.ilkd.key.gui.Main;
 import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
+import de.uka.ilkd.key.java.JavaSourceElement;
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.SourceElement;
@@ -31,7 +33,7 @@ import de.uka.ilkd.key.java.declaration.modifier.Ghost;
  * @author gladisch
  */
 public class CompilableJavaPP extends PrettyPrinter {
-
+    
     public CompilableJavaPP(Writer o, boolean noLinefeed) {
         super(o, noLinefeed, true);
     }
@@ -117,9 +119,25 @@ public class CompilableJavaPP extends PrettyPrinter {
 	    errorOccurred=true;
 	    String sshort = s.length()>80?s.substring(80)+"...":s; //Shorten the output to fit into the dialogbox
 	    Main.getInstance().notify(new GeneralFailureEvent("CodeError: Unexpected parametertype. The problem originates\n" +
-	    		"from the syntax tree of the substring:\n"+sshort));
+	    		"from the syntax tree of the substring:\n "+sshort+
+	    		"\n Despite this error an exception is not thrown and \n KeY will continue the current taks."));
 	    Thread.dumpStack();
 	}
         pp.write(s);
+    }
+    
+    /** A utility method to invoke e.toString where e is the argument. 
+     * However, if the argument has dynamic type JavaSourceElement, 
+     * then use the CompilableJavaPP and return the value of e.toString(CompilableJavaPP,StringWriter).
+     * This is important to handle the case that e contains a SyntacticalXXX object.*/
+    public static String toString(de.uka.ilkd.key.java.Expression e){
+	if(e instanceof JavaSourceElement) {
+	    JavaSourceElement jse = (JavaSourceElement)e;
+	    StringWriter sw=new StringWriter();
+	    CompilableJavaPP cjpp = new CompilableJavaPP(sw,true);
+	    return jse.toString(cjpp, sw);
+	}else{
+	    return e.toString();
+	}
     }
 }

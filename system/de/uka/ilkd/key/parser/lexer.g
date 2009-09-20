@@ -89,6 +89,7 @@ tokens {
 	ISLOCALVARIABLE = "\\isLocalVariable";
 	NOTISLOCALVARIABLE = "\\notIsLocalVariable";
 	ISUPDATED = "\\isUpdated";
+	SAMEHEAPDEPPRED = "\\sameHeapDepPred";
 
 
 	// Quantifiers, binding, substitution

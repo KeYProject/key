@@ -3943,6 +3943,7 @@ varexp[TacletBuilder b]
     | varcond_enum_const[b]
     | varcond_inReachableState[b] 
     | varcond_isupdated[b]    
+    | varcond_sameheapdeppred[b]
   ) 
   | 
   ( (NOT {negated = true;} )? 
@@ -4275,6 +4276,16 @@ varcond_isupdated [TacletBuilder b]
         } 
 ;
 
+varcond_sameheapdeppred [TacletBuilder b]
+{
+  ParsableVariable x = null, y = null;
+}
+:
+   SAMEHEAPDEPPRED LPAREN x=varId COMMA y=varId RPAREN {
+     b.addVariableCondition(new SameHeapDependentPredicateVariableCondition(
+       (SchemaVariable) x, (SchemaVariable) y));          
+   }
+;
 
 varcond_freeLabelIn [TacletBuilder b, boolean negated]
 {
