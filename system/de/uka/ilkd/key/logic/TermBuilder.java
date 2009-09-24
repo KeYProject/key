@@ -916,6 +916,23 @@ public final class TermBuilder {
     }
     
     
+    public Term acc(Services services, Term h, Term s, Term o1, Term o2) {
+	return func(services.getTypeConverter().getHeapLDT().getAcc(), 
+		    new Term[]{h, s, o1, o2});
+    }
+    
+    
+    public Term reach(Services services, 
+	    	      Term h, 
+	    	      Term s, 
+	    	      Term o1, 
+	    	      Term o2, 
+	    	      Term n) {
+	return func(services.getTypeConverter().getHeapLDT().getReach(), 
+		    new Term[]{h, s, o1, o2, n});
+    }    
+    
+    
     public Term inv(Services services, Term o) {
 	return func(services.getJavaInfo().getInv(),
 		    heap(services),

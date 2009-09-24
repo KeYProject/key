@@ -132,8 +132,18 @@ public final class QueryClassAxiom implements ClassAxiom {
 	final Term post = TB.equals(TB.var(skolemSV), TB.var(resultVar));
 	
 	//create java block
+    	final ImmutableList<KeYJavaType> sig 
+		= ImmutableSLList.<KeYJavaType>nil()
+		                 .append(target.getParamTypes()
+		                	       .toArray(
+		                      new KeYJavaType[target.getNumParams()]));	
+	final ProgramMethod targetImpl 
+		= services.getJavaInfo().getProgramMethod(kjt, 
+							  target.getName(), 
+							  sig, 
+							  kjt);
 	final MethodBodyStatement mbs
-		= new MethodBodyStatement(target,
+		= new MethodBodyStatement(targetImpl,
 					  selfVar,
 					  resultVar,
 					  new ImmutableArray<Expression>(paramVars));

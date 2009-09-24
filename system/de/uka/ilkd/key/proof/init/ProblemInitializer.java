@@ -440,12 +440,13 @@ public final class ProblemInitializer {
         final Namespace functions 
         	= initConfig.getServices().getNamespaces().functions();
         functions.add(initConfig.getServices().getJavaInfo().getInv());
-        for(KeYJavaType kjt : javaInfo.getAllKeYJavaTypes()) {
-            for(ProgramMethod pm
-        	    : javaInfo.getAllProgramMethodsLocallyDeclared(kjt)) {
-        	functions.add(pm);
-            }
-        }
+//        
+//        for(KeYJavaType kjt : javaInfo.getAllKeYJavaTypes()) {
+//            for(ProgramMethod pm
+//        	    : javaInfo.getAllProgramMethodsLocallyDeclared(kjt)) {
+//        	functions.add(pm);
+//            }
+//        }
 
         //read envInput
         readEnvInput(envInput, initConfig);

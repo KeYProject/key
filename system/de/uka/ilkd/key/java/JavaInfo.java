@@ -524,6 +524,7 @@ public final class JavaInfo {
         return kpmi.getAllProgramMethodsLocallyDeclared(kjt);
     }
     
+
     public ImmutableList<ProgramMethod> getConstructors(KeYJavaType kjt) {
 	return kpmi.getConstructors(kjt);
     }
@@ -550,7 +551,31 @@ public final class JavaInfo {
             KeYJavaType context) {
         return kpmi.getProgramMethod(classType, methodName, signature, context);
     }
+    
+    
+    public ProgramMethod getToplevelPM(KeYJavaType kjt, 
+	    			       String methodName, 
+	    			       ImmutableList<KeYJavaType> sig) {
+	for(KeYJavaType sup : getAllSupertypes(kjt).removeAll(kjt)) {
+	    final ProgramMethod result = getToplevelPM(sup, methodName, sig);
+	    if(result != null) {
+		return result;
+	    }
+	}
+	return getProgramMethod(kjt, methodName, sig, kjt);
+    }
 
+    
+    public ProgramMethod getToplevelPM(KeYJavaType kjt, ProgramMethod pm) {
+	final String methodName = pm.getName();
+    	final ImmutableList<KeYJavaType> sig 
+		= ImmutableSLList.<KeYJavaType>nil()
+		                 .append(pm.getParamTypes()
+		                	   .toArray(
+		                      new KeYJavaType[pm.getNumParams()]));
+	return getToplevelPM(kjt, methodName, sig);
+    }
+    
 
     public Term getProgramMethodTerm(Term prefix, 
 	    			     String methodName, 
@@ -774,7 +799,7 @@ public final class JavaInfo {
         final NamespaceSet nss = services.getNamespaces().copy();
         nss.startProtocol();
         final JavaBlock block = kpmi.readBlock(java, cd, nss);
-        // if we are here everything is fine nad wen can add the
+        // if we are here everything is fine and we can add the
         // changes (may be new array types)       
         services.getNamespaces().addProtocolled(nss);        
         return block;

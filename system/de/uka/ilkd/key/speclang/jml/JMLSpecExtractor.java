@@ -286,20 +286,9 @@ public final class JMLSpecExtractor implements SpecExtractor {
             = (TypeDeclaration) pm.getContainerType().getJavaType();
         String fileName = td.getPositionInfo().getFileName();
 
-        //determine purity, add purity contract
+        //determine purity
         final boolean isPure = JMLInfoExtractor.isPure(pm);
         final boolean isHelper = JMLInfoExtractor.isHelper(pm);
-        if(isPure) {
-            TextualJMLSpecCase sc 
-                = new TextualJMLSpecCase(ImmutableSLList.<String>nil(), 
-                                         Behavior.NONE);
-            sc.addAssignable(new PositionedString("\\nothing"));
-            ImmutableSet<OperationContract> contracts 
-                = jsf.createJMLOperationContracts(pm, sc);
-            for(OperationContract contract : contracts) {
-        	result = result.add(contract);
-            }
-        }
 
         //get textual JML constructs
         Comment[] comments = pm.getComments();
@@ -338,11 +327,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
             //add purity
             if(isPure) {
                 specCase.addDiverges(new PositionedString("false"));
-                if(!pm.isConstructor()) {
-                    specCase.addAssignable(new PositionedString("\\nothing"));
-                } else {
-                    specCase.addAssignable(new PositionedString("this.*"));
-                }
+                specCase.addAssignable(new PositionedString("\\nothing"));
             }
             
             //add invariants

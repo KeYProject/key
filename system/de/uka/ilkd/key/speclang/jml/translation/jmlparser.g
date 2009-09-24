@@ -51,8 +51,10 @@ options {
 
     private Services services;
     private JavaInfo javaInfo;
+    private IntegerLDT intLDT;
     private HeapLDT heapLDT;
     private SetLDT setLDT;
+    private PairLDT pairLDT;
     private BooleanLDT booleanLDT;
     private SLTranslationExceptionManager excManager;
 
@@ -85,8 +87,10 @@ options {
 	// save parameters
 	this.services       = services;
 	this.javaInfo       = services.getJavaInfo();
+	this.intLDT         = services.getTypeConverter().getIntegerLDT();
 	this.heapLDT        = services.getTypeConverter().getHeapLDT();
 	this.setLDT         = services.getTypeConverter().getSetLDT();
+	this.pairLDT        = services.getTypeConverter().getPairLDT();
 	this.booleanLDT     = services.getTypeConverter().getBooleanLDT();
 	this.excManager     = new SLTranslationExceptionManager(this,
 				    				fileName, 
@@ -334,7 +338,7 @@ options {
             a=a.sub(0);
         }
         if(a.arity()==2 && a.op()==Junctor.AND && a.sub(0).arity()==2 && a.sub(0).sub(1).op()==lv
-                && a.sub(0).op().equals(services.getTypeConverter().getIntegerLDT().getLessOrEquals())){
+                && a.sub(0).op().equals(intLDT.getLessOrEquals())){
             return a.sub(0).sub(0);
         }
         return null;
@@ -345,7 +349,7 @@ options {
             a=a.sub(0);
         }   
         if(a.arity()==2 && a.op()==Junctor.AND && a.sub(1).arity()==2 && a.sub(1).sub(0).op()==lv
-                && a.sub(1).op().equals(services.getTypeConverter().getIntegerLDT().getLessThan())){
+                && a.sub(1).op().equals(intLDT.getLessThan())){
             return a.sub(1).sub(1);
         }
         return null;
@@ -469,6 +473,22 @@ options {
 
 	return result;
     }
+    
+    
+    private Term getFields(Term t) throws SLTranslationException {
+        if(t.op().equals(setLDT.getUnion())) {
+            final Term sub0 = getFields(t.sub(0));
+            final Term sub1 = getFields(t.sub(1));
+            return TB.union(services, sub0, sub1);
+        } else if(t.op().equals(setLDT.getSingleton())
+                  && t.sub(0).op().equals(pairLDT.getPair())
+                  && t.sub(0).sub(1).sort().equals(heapLDT.getFieldSort())) {
+            return TB.singleton(services, t.sub(0).sub(1));
+        } else {
+            raiseError("Inacceptable field expression: " + t);
+            return null;
+        }
+    }
 }
 
 
@@ -564,9 +584,7 @@ specarrayrefexpr[SLExpression receiver, String fullyQualifiedName, Token lbrack]
 	}
     
         LogicVariable indexVar 
-	    = new LogicVariable(
-	              new Name("i"), 
-		      services.getTypeConverter().getIntegerLDT().targetSort());
+	    = new LogicVariable(new Name("i"), intLDT.targetSort());
 	Term arrIndex = TB.arr(services, TB.var(indexVar));
 
 	if (rangeFrom == null) {
@@ -981,25 +999,25 @@ relationalexpr returns [SLExpression result=null] throws SLTranslationException
 	(
 	    lt:LT right=shiftexpr 
 	    {
-		f = services.getTypeConverter().getIntegerLDT().getLessThan();
+		f = intLDT.getLessThan();
 		opToken = lt;
 	    }
 	|
 	    gt:GT right=shiftexpr
 	    {
-		f = services.getTypeConverter().getIntegerLDT().getGreaterThan();
+		f = intLDT.getGreaterThan();
 		opToken = gt;
 	    }
 	|
 	    leq:LEQ right=shiftexpr
 	    {
-		f = services.getTypeConverter().getIntegerLDT().getLessOrEquals();
+		f = intLDT.getLessOrEquals();
 		opToken = leq;
 	    }
 	|
 	    geq:GEQ right=shiftexpr
 	    {
-		f = services.getTypeConverter().getIntegerLDT().getGreaterOrEquals();
+		f = intLDT.getGreaterOrEquals();
 		opToken = geq;
 	    }
 	|
@@ -1489,6 +1507,9 @@ decimalnumeral returns [SLExpression result=null] throws SLTranslationException
 jmlprimary returns [SLExpression result=null] throws SLTranslationException
 {
     ImmutableList<SLExpression> list;
+    SLExpression e1 = null;
+    SLExpression e2 = null;
+    SLExpression e3 = null;
     KeYJavaType typ;
     Term t, t2;
 }
@@ -1592,10 +1613,55 @@ jmlprimary returns [SLExpression result=null] throws SLTranslationException
 	    result = new SLExpression(t);
 	} 
 
-    |   REACH LPAREN result=expression RPAREN
+    |   REACH LPAREN t=storeref COMMA e1=expression COMMA e2=expression (COMMA e3=expression)? RPAREN
 	{
-	    raiseNotSupported("\\reach");
+	    final LogicVariable stepsLV 
+	    	= e3 == null 
+	          ? new LogicVariable(new Name("n"), intLDT.targetSort()) 
+	          : null;
+	    final Term h = TB.heap(services);
+	    final Term s = getFields(t);
+	    final Term o = e1.getTerm();
+	    final Term o2 = e2.getTerm();
+	    final Term n = e3 == null ? TB.var(stepsLV) : e3.getTerm();
+	    Term reach = TB.reach(services, h, s, o, o2, n);
+	    if(e3 == null) {
+	        reach = TB.ex(stepsLV, reach);
+	    }
+	    result = new SLExpression(reach);
 	} 
+	
+    |   REACHLOCS LPAREN t=storeref COMMA e1=expression (COMMA e3=expression)? RPAREN
+	{
+	    final LogicVariable objLV
+	    	= new LogicVariable(new Name("o"), javaInfo.objectSort());
+	    final LogicVariable stepsLV 
+	    	= e3 == null 
+	          ? new LogicVariable(new Name("n"), intLDT.targetSort()) 
+	          : null;
+	    final Term h = TB.heap(services);
+	    final Term s = getFields(t);
+	    final Term o = e1.getTerm();
+	    final Term o2 = TB.var(objLV);
+	    final Term n = e3 == null ? TB.var(stepsLV) : e3.getTerm();
+	    Term reach = TB.reach(services, h, s, o, o2, n);
+	    if(e3 == null) {
+	        reach = TB.ex(stepsLV, reach);
+	    }
+	    
+	    final LogicVariable fieldLV
+	    	= new LogicVariable(new Name("f"), heapLDT.getFieldSort());
+	    final Term a = TB.ife(reach,
+	                          TB.pair(services, o2, TB.var(fieldLV)), 
+	                          TB.zero(services));
+	    final Term locSet 
+	    	= TB.setComprehension(services, 
+	    	                      new LogicVariable[]{objLV, fieldLV}, 
+	    	                      a, 
+	    	                      TB.allLocs(services));
+	    
+	    result = new SLExpression(locSet);
+	} 	
 	
     |   DURATION LPAREN result=expression RPAREN 
 	{
@@ -1729,8 +1795,7 @@ specquantifiedexpression returns [Term result = null] throws SLTranslationExcept
 	    	if(lv.sort().extendsTrans(services.getJavaInfo().objectSort()) && !nullable) {
 		    p = TB.and(p, TB.not(TB.equals(TB.var(lv), nullTerm)));
 		} else {
-	    	     IntegerLDT ldt = services.getTypeConverter().getIntegerLDT();
-		     Function inBounds = ldt.getInBounds(declVars.first.getJavaType());
+		     Function inBounds = intLDT.getInBounds(declVars.first.getJavaType());
 		     p = TB.and(p, TB.func(inBounds, TB.var(lv)));
 	    	}
 	    }	    

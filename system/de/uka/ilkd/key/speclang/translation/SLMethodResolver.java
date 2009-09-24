@@ -26,7 +26,7 @@ public final class SLMethodResolver extends SLExpressionResolver {
     public SLMethodResolver(JavaInfo javaInfo, SLResolverManager manager) {
         super(javaInfo, manager);
     }
-
+    
 
     @Override    
     protected boolean canHandleReceiver(SLExpression receiver) {
@@ -57,11 +57,7 @@ public final class SLMethodResolver extends SLExpressionResolver {
         
         
         while(pm == null) {
-            pm = javaInfo.getProgramMethod(
-                    containingType,
-                    methodName,
-                    signature,
-                    containingType);
+            pm = javaInfo.getToplevelPM(containingType, methodName, signature);
             LocationVariable et = (LocationVariable) javaInfo.getAttribute(
                     ImplicitFieldAdder.IMPLICIT_ENCLOSING_THIS, containingType);
             if(et!=null && pm==null){

@@ -89,6 +89,7 @@ PRIVATEDATA : "\\private_data";
 QUESTIONMARK : "?";
 RBRACE : "}";
 REACH : "\\reach";
+REACHLOCS : "\\reachLocs";
 REAL : "\\real";
 RESULT : "\\result";
 SAME : "\\same";

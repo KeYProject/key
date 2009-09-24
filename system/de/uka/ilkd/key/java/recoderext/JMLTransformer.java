@@ -39,11 +39,11 @@ public final class JMLTransformer extends RecoderModelTransformer {
     
     private static final ImmutableList<String> javaMods
         = ImmutableSLList.<String>nil().prepend(new String[]{"abstract",
-                                                         "final", 
-                                                         "private", 
-                                                         "protected", 
-                                                         "public", 
-                                                         "static"});    
+                                                             "final", 
+                                                             "private", 
+                                                             "protected", 
+                                                             "public", 
+        						     "static"});    
     
     private static ImmutableSet<PositionedString> warnings;
     
@@ -236,9 +236,9 @@ public final class JMLTransformer extends RecoderModelTransformer {
         }
         if(!(isGhost || isModel)) {
             throw new SLTranslationException(
-                            "JML field declaration has to be ghost or model!", 
-                            declWithMods.fileName, 
-                            declWithMods.pos);            
+                            "JML field declaration has to be ghost or model!",
+                            declWithMods.fileName,
+                            declWithMods.pos);
         }
         
         //determine parent, child index

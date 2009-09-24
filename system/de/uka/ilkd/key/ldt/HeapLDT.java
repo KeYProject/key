@@ -61,6 +61,8 @@ public final class HeapLDT extends LDT {
     
     //predicates
     private final Function wellFormed;    
+    private final Function acc;
+    private final Function reach;
     
     //heap pv
     private final LocationVariable heap;
@@ -95,6 +97,8 @@ public final class HeapLDT extends LDT {
         classErroneous    = addSortDependingFunction(services, "<classErroneous>");
         nullFunc          = addFunction(services, "null");
         wellFormed        = addFunction(services, "wellFormed");
+        acc               = addFunction(services, "acc");
+        reach             = addFunction(services, "reach");
         heap	          = (LocationVariable) progVars.lookup(new Name("heap"));    
     }
     
@@ -246,6 +250,16 @@ public final class HeapLDT extends LDT {
     
     public Function getWellFormed() {
 	return wellFormed;
+    }
+    
+    
+    public Function getAcc() {
+	return acc;
+    }
+    
+    
+    public Function getReach() {
+	return reach;
     }
     
     

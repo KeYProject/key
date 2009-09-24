@@ -441,6 +441,7 @@ public final class SpecificationRepository {
 	for(ProgramMethod pm : services.getJavaInfo()
 		                       .getAllProgramMethods(kjt)) {
 	    if(pm.getKeYJavaType() != null) {
+		pm = services.getJavaInfo().getToplevelPM(kjt, pm);		
 		final ClassAxiom queryAxiom 
 		    = new QueryClassAxiom("Query axiom for " + pm.getFullName(),
 			                  kjt, 
