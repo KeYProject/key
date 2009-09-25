@@ -23,45 +23,47 @@ final class LinkedList implements List {
     
     
     public void add(Object o) {
-	Node n = new Node();
-	n.data = o;
+	Node node = new Node();
+	node.data = o;
 	if(first == null) {
-	    first = n;
-	    last = n;
+	    first = node;
+	    last = node;
 	} else {
-	    last.next = n;
-	    last = n;
+	    last.next = node;
+	    last = node;
 	}
     }
 
     
     public Object get(int index) {
-	if(index < 0) {
+	if(index < 0 || first == null) {
 	    throw new IndexOutOfBoundsException();
 	}
-	Node n = first;
-	/*@ loop_invariant 0 <= index;
+	
+	Node node = first;
+	/*@ loop_invariant 0 <= i && i <= index && \reach(first.next, first, node, i);
 	  @ assignable \nothing;
 	  @*/
-	while(index > 0) {
-	    if(n == null) {
+	for(int i = 0; i < index; i++) {
+	    if(node.next == null) {
 		throw new IndexOutOfBoundsException();
 	    }
-	    n = n.next;
-	    index--;
+	    node = node.next;
 	}
-	return n.data;
+	
+	return node.data;
     }
     
     
-    //@ ensures \result >= 0;
-    //@ diverges true;
     public int size() {
+	if(first == null) {
+	    return 0;
+	}
 	int i = 0;
-	/*@ loop_invariant i >= 0 && \reach(first.next, first, n, i);
+	/*@ loop_invariant 0 <= i && \reach(first.next, first, node, i);
 	  @ assignable \nothing;
 	  @*/
-	for(Node n = first; n != last; n = n.next) {
+	for(Node node = first; node.next != null; node = node.next) {
 	    i++;
 	}
 	return i;

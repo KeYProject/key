@@ -133,7 +133,7 @@ public final class WhileInvariantRule implements BuiltInRule {
     private Term createAnonUpdate(While loop, Term mod, Services services) {
 	//heap
 	HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
-	Name anonHeapName = new Name(TB.newName(services, "loopHeap"));
+	Name anonHeapName = new Name(TB.newName(services, "anonHeap_loop"));
 	Function anonHeapFunc = new Function(anonHeapName,
 					     heapLDT.targetSort());
 	services.getNamespaces().functions().addSafely(anonHeapFunc);

@@ -111,7 +111,7 @@ public final class JavaCardDLStrategy extends AbstractFeatureStrategy {
         	= strategyProperties.getProperty(
         		StrategyProperties.DEP_OPTIONS_KEY);
         if(depProp.equals(StrategyProperties.DEP_ON)) {
-            depSpecF = depSpecFeature(longConst(50));//10000));            
+            depSpecF = depSpecFeature(longConst(50));            
         } else {
             depSpecF = depSpecFeature(inftyConst());
         }
@@ -302,9 +302,9 @@ public final class JavaCardDLStrategy extends AbstractFeatureStrategy {
                     equals(StrategyProperties.LOOP_EXPAND);
         boolean programsToRight = true;//XXX
         
-        String methProp =
-            strategyProperties.getProperty ( StrategyProperties.METHOD_OPTIONS_KEY );
-	
+        final String methProp
+        	= strategyProperties.getProperty(
+        			StrategyProperties.METHOD_OPTIONS_KEY);
         if (methProp.equals(StrategyProperties.METHOD_CONTRACT)) {
             bindRuleSet(d, "method_expand", longConst(200));	
         } else if (methProp.equals(StrategyProperties.METHOD_EXPAND)) {
@@ -313,35 +313,40 @@ public final class JavaCardDLStrategy extends AbstractFeatureStrategy {
             bindRuleSet(d, "method_expand", inftyConst());	  
         } else throw new RuntimeException("Unexpected strategy property "+
                                           methProp);
-	
         
         bindRuleSet ( d, "loop_expand",
                       useLoopExpand ? longConst ( 0 )
                                     : inftyConst () );
         
-//        bindRuleSet  ( d, "loop_invariant", 
-//                       useLoopInvariant ? longConst ( 100 )  
-//                                        : inftyConst () );
-            
-//        bindRuleSet  ( d, "loop_invariant_proposal", 
-//                       ifHeuristics(new String[]{"loop_invariant"}, 
-//                                    longConst(0), inftyConst()));
-            
         // delete cast
         bindRuleSet ( d, "cast_deletion",
                       ifZero ( implicitCastNecessary ( instOf ( "castedTerm" ) ),
                                longConst ( -5000 ), inftyConst () ) );
-            
+        
+        //inReachableState        
         bindRuleSet ( d, "inReachableStateImplication",
                       add ( NonDuplicateAppModPositionFeature.INSTANCE,
                             longConst ( 100 ) ) );
-
+        
         bindRuleSet ( d, "inReachableStateExpandAntec", -200 );
 
         bindRuleSet ( d, "inReachableStateExpandRewrite",
 		      add ( not ( TopLevelFindFeature.ANTEC ),
 		            NonDuplicateAppModPositionFeature.INSTANCE,
 		            longConst ( -100 ) ) );
+        
+        //dependencies
+        final String depProp
+        	= strategyProperties.getProperty(
+        			StrategyProperties.DEP_OPTIONS_KEY);
+        if(depProp.equals(StrategyProperties.DEP_ON)) {
+            bindRuleSet(d, 
+        	        "dependencies", 
+        	        add(NonDuplicateAppModPositionFeature.INSTANCE, 
+        	            longConst(50)));
+        } else {
+            bindRuleSet(d, "dependencies", inftyConst());
+        }                
 
         bindRuleSet ( d, "type_hierarchy_def", -6500 );
         
@@ -1864,6 +1869,8 @@ public final class JavaCardDLStrategy extends AbstractFeatureStrategy {
         
         bindRuleSet ( d, "inReachableStateImplication",
                       NonDuplicateAppModPositionFeature.INSTANCE );
+        bindRuleSet(d, "dependencies", NonDuplicateAppModPositionFeature.INSTANCE);
+        
 
         setupQuantifierInstantiationApproval ( d );
         setupSplittingApproval ( d );

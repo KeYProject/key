@@ -69,7 +69,4 @@ public class NotFreeIn {
     	result = 37 * result + second().hashCode();
     	return result;
     }
-
 }
-
- 

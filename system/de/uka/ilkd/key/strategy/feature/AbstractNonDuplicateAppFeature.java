@@ -20,6 +20,7 @@ import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.SkolemTermSV;
+import de.uka.ilkd.key.logic.op.VariableSV;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.rule.IfFormulaInstantiation;
@@ -125,7 +126,7 @@ public abstract class AbstractNonDuplicateAppFeature extends BinaryTacletAppFeat
         while ( it.hasNext () ) {
             final ImmutableMapEntry<SchemaVariable,InstantiationEntry> entry0 = it.next ();
 
-            if ( entry0.key () instanceof SkolemTermSV )
+            if ( entry0.key () instanceof SkolemTermSV || entry0.key() instanceof VariableSV)
                 continue;
                 
             final InstantiationEntry instEntry1 = insts1.get ( entry0.key () );

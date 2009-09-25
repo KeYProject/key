@@ -326,7 +326,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
 
             //add purity
             if(isPure) {
-                specCase.addDiverges(new PositionedString("false"));
+                //specCase.addDiverges(new PositionedString("false"));
                 specCase.addAssignable(new PositionedString("\\nothing"));
             }
             

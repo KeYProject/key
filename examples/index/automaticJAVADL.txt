@@ -1,3 +1,13 @@
+./heap/list/ArrayList_add.key
+./heap/list/ArrayList_ArrayList.key
+./heap/list/ArrayList_enlarge.key
+./heap/list/ArrayList_footprint.key
+./heap/list/ArrayList_get_exceptional.key
+./heap/list/ArrayList_get_normal.key
+./heap/list/ArrayList_inv.key
+./heap/list/ArrayList_size.key
+./heap/list/LinkedList_get_normal.key
+./heap/list/LinkedList_size.key
 ./heap/simple/anonymise_datagroup.key
 ./heap/simple/array_creation.key
 ./heap/simple/arrays_with_disjoint_sorts.key

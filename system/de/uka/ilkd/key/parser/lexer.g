@@ -68,7 +68,8 @@ tokens {
 	ISARRAY="\\isArray";
         ISENUMTYPE="\\isEnumType";
 	ISLOCALVARIABLE = "\\isLocalVariable";
-	ISOBSERVER = "\\isObserver";        			
+	ISOBSERVER = "\\isObserver";
+	DIFFERENT = "\\different";	        			
 	ISREFERENCE="\\isReference";	        
 	ISREFERENCEARRAY="\\isReferenceArray";
 	ISSUBTYPE = "\\sub";	

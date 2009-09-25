@@ -3410,7 +3410,8 @@ varexp[TacletBuilder b]
     | varcond_equalUnique[b]
     | varcond_new[b]
     | varcond_newlabel[b] 
-    | varcond_observer[b]    
+    | varcond_observer[b]
+    | varcond_different[b]    
   ) 
   | 
   ( (NOT {negated = true;} )? 
@@ -3728,6 +3729,7 @@ varcond_localvariable [TacletBuilder b, boolean negated]
         } 
 ;
 
+
 varcond_observer [TacletBuilder b]
 {
   ParsableVariable obs = null;
@@ -3740,6 +3742,20 @@ varcond_observer [TacletBuilder b]
      	   b.addVariableCondition(new ObserverCondition((TermSV)obs, 
      	                                                (TermSV)heap,
      	                                                (TermSV)obj));
+        } 
+;
+
+
+varcond_different [TacletBuilder b]
+{
+  ParsableVariable var1, var2;
+}
+:
+   DIFFERENT 
+	LPAREN var1=varId COMMA var2=varId RPAREN {
+     	   b.addVariableCondition(new DifferentInstantiationCondition(
+     	   				(SchemaVariable)var1,
+     	   				 (SchemaVariable)var2));
         } 
 ;
 
