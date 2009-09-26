@@ -17,13 +17,20 @@ import de.uka.ilkd.key.rule.Taclet;
  */
 
 public interface TacletTranslator {
-
+    public static final String RIGHT = "";
     /**
      * Translates a taclet to a formula.
      * @param t taclet to be translated
      * @return formula which expresses the meaning of the taclet.
      */
     public Term translate(Taclet t);
+    
+    /**
+     * Checks wether the given taclet can be translated by the translator.
+     * @param t taclet to be checked.
+     * @return <code>true</code> if the given taclet <code>t</code> can be translated by the translator, otherwise <code>false</code>.
+     */
+    public String check(Taclet t);
     
      
     

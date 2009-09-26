@@ -35,6 +35,8 @@ public interface TacletSetTranslation {
      * Builds the translation of the taclets given by calling the method <code>setTacletSet()</code>.
      * @return returns the resulting formulae of the taclets. Each formula of the resulting set is associated with one taclet.
      */
-    public ImmutableList<Term> getTranslation();
+    public ImmutableList<TacletFormula> getTranslation();
+    
+
 
 }

@@ -76,7 +76,7 @@ public class RewriteTacletTranslator extends AbstractTacletTranslator{
     public Term translate(Taclet t) {
 	if(!(t instanceof RewriteTaclet)) throw new IllegalArgumentException("The given taclet is not of the type RewriteTaclet");
 	String checkResult;
-	if((checkResult=checkGeneralConditions(t)) != null) throw new IllegalArgumentException(checkResult);
+//	if((checkResult=checkGeneralConditions(t)) != null) throw new IllegalArgumentException(checkResult);
 
 	
 	RewriteTaclet rewriteTaclet = (RewriteTaclet)t;
@@ -125,6 +125,24 @@ public class RewriteTacletTranslator extends AbstractTacletTranslator{
 	
 	return term;
 	
+    }
+    
+    @Override
+    public String checkGoalTemplates(Taclet t){
+	for(TacletGoalTemplate template : t.goalTemplates()){
+	    if(template.rules().size() >0) return "taclet has addrules";
+	    String res = checkSequent(template.sequent());
+	    if(res != RIGHT) return res;
+	    res = checkTerm(((RewriteTacletGoalTemplate)template).replaceWith()); 
+	    if(res != RIGHT) return res; 
+	}
+	return RIGHT;
+    }
+
+    public String check(Taclet t) {
+	if(! (t instanceof RewriteTaclet)) return "Not a instance of " + RewriteTaclet.class.getName();
+		
+	return checkGeneralConditions(t);
     }
 
 }

@@ -13,18 +13,27 @@ package de.uka.ilkd.key.smt;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
+
 import de.uka.ilkd.key.logic.ConstrainedFormula;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.op.Equality;
+import de.uka.ilkd.key.logic.op.Junctor;
+import de.uka.ilkd.key.logic.op.Op;
+import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.op.Quantifier;
+import de.uka.ilkd.key.logic.op.SortedSchemaVariable;
+import de.uka.ilkd.key.parser.SchemaVariableModifierSet.FormulaSV;
+import de.uka.ilkd.key.parser.SchemaVariableModifierSet.TermSV;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletGoalTemplate;
 
 
 public abstract class AbstractTacletTranslator implements TacletTranslator {
 
-    
+  
     
     /** Translates a sequent to a term by using the following translations rules:
      * T ==> D is translated to: And(T)->Or(D).<br>
@@ -56,9 +65,18 @@ public abstract class AbstractTacletTranslator implements TacletTranslator {
      * @return if there is a problem the reason is returned, otherwise <code>null</code>
      */
     protected String checkGeneralConditions(Taclet t){
-	if(checkAddRules(t)){return "The taclet has ddrules.";}
+	
+	
 	if(t.getVariableConditions().hasNext()) {return "The taclet has variable conditions.";}
-	return null;
+	String res;
+	
+	res = checkGoalTemplates(t);
+	if(res != RIGHT){ return res;}
+	
+	res = checkSequent(t.ifSequent());
+	if(res != RIGHT){ return res;}	
+	
+	return RIGHT;
     }
     
     /**
@@ -66,10 +84,45 @@ public abstract class AbstractTacletTranslator implements TacletTranslator {
      * @param t taclet to be checked.
      * @return true, if the taclet has one or more addrules.
      */
-    private boolean checkAddRules(Taclet t){
-	for(TacletGoalTemplate template : t.goalTemplates())
-	    if(template.rules().size() >0) return true;
-	return false;
+    protected String checkGoalTemplates(Taclet t){
+	for(TacletGoalTemplate template : t.goalTemplates()){
+	    if(template.rules().size() >0) return "taclet has addrules";
+	    String res = checkSequent(template.sequent());
+	    if(res != RIGHT) return res;  
+	}
+	return RIGHT;
+    }
+    
+    
+    protected String checkSequent(Sequent s){
+	String res;
+	for(ConstrainedFormula cf : s){
+	   if((res = checkTerm(cf.formula())) != RIGHT) return res;
+	}
+	return RIGHT;
+    }
+    
+    protected String checkOperator(Operator op){
+	if((op instanceof Junctor) ||
+	   (op instanceof Equality) ||
+	   (op instanceof Quantifier)//||
+	  // (op instanceof TermSV)||
+	   //sss(op instanceof FormulaSV)//||
+	   //(op instanceof SortedSchemaVariable)
+	   ) return RIGHT;
+	return "The operator " + op.toString() + " is not supported. Class: "+op.getClass().getSimpleName();
+    }
+    
+    protected String checkTerm(Term term){
+	
+	String res = checkOperator(term.op());
+	if(res != RIGHT) return res;
+	for(int i=0; i < term.arity(); i++){
+	    res = checkTerm(term.sub(i));
+	    if(res != RIGHT) return res;
+	}
+	
+	return RIGHT;
     }
     
     
