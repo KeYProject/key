@@ -113,6 +113,9 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
     //assumptions. they have to be added to the formula!
     private ArrayList<StringBuffer> assumptions = new ArrayList<StringBuffer>();
     
+    /**Assumptions made of taclets */
+    private ArrayList<StringBuffer> tacletAssumptions = new ArrayList<StringBuffer>();
+    
     /**
      * Just a constructor which starts the conversion to Simplify syntax.
      * The result can be fetched with
@@ -142,6 +145,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 	this(null, s);
     }
 
+    
     /**
      * Translate a sequent into a given syntax.
      * @param sequent the sequent to translate.
@@ -179,6 +183,10 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
     }
 
 
+    public void setTacletAssumptions(StringBuffer s){
+	tacletAssumptions.clear();
+	tacletAssumptions.add(s);
+    }
     
     
     
@@ -219,6 +227,12 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 	start = toReturn.size();
 	toReturn.addAll(this.assumptions);
 	assumptionTypes.add(new ContextualBlock(start,toReturn.size()-1,ContextualBlock.ASSUMPTION_DUMMY_IMPLEMENTATION));
+	
+	// add the assumptions that that are made of taclets
+	start = toReturn.size();
+	toReturn.addAll(this.tacletAssumptions);
+	assumptionTypes.add(new ContextualBlock(start,toReturn.size()-1,ContextualBlock.ASSUMPTION_TACLET_TRANSLATION));
+	
 	
 	return toReturn;
     }
@@ -1795,6 +1809,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 	}
     }
 
+  
     /**
      * Create a type predicate for a given sort.
      * @param sortname the name, that should be used for the sort.

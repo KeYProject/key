@@ -87,18 +87,24 @@ public abstract class AbstractProfile implements Profile {
 
     protected ImmutableList<BuiltInRule> initBuiltInRules() {
         ImmutableList<BuiltInRule> builtInRules = ImmutableSLList.<BuiltInRule>nil();
-		ArrayList<SMTSolver> solverList = new ArrayList<SMTSolver>();
-        solverList.add(new Z3Solver());
-		solverList.add(new YicesSolver());
+	ArrayList<SMTSolver> solverList = new ArrayList<SMTSolver>();
+        
+	TacletSetTranslation tacletSetTranslation = new DefaultTacletSetTranslation();
+	
+	
+	solverList.add(new Z3Solver());
+	solverList.add(new YicesSolver());
         solverList.add(new SimplifySolver());
-		solverList.add(new CVC3Solver());
+	solverList.add(new CVC3Solver());
         
-		// init builtIRule for using several provers at the same time
-		builtInRules = builtInRules.prepend(new SMTRuleMulti(solverList));
+	// init builtIRule for using several provers at the same time
+	builtInRules = builtInRules.prepend(new SMTRuleMulti(solverList));
         
-		// builtInRules for single use of provers
-		for(SMTSolver s : solverList)
-          builtInRules = builtInRules.prepend(new SMTRule(s));        
+	// builtInRules for single use of provers
+	for(SMTSolver s : solverList){
+          builtInRules = builtInRules.prepend(new SMTRule(s));
+          s.setTacletSetTranslation(tacletSetTranslation);
+	}        
 
       
         

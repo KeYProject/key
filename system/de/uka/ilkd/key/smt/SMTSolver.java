@@ -139,4 +139,16 @@ public interface SMTSolver {
      * interrupt a running SMT solver.
      */
     public void interrupt();
+    
+    /**
+     * @return the translation of a set of taclets. 
+     */
+    public TacletSetTranslation getTacletSetTranslation();
+
+
+    /**
+     * Sets the the translation of a taclet set that is used for assumptions.
+     * @param tacletSetTranslation the tacletSetTranslation to set
+     */
+    public void setTacletSetTranslation(TacletSetTranslation tacletSetTranslation);
 }

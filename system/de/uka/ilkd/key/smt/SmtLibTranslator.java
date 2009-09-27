@@ -103,12 +103,12 @@ public class SmtLibTranslator extends AbstractSMTTranslator {
 	String [] commentPredicate = new String[2];
 	commentPredicate[ContextualBlock.PREDICATE_FORMULA] = "\n\n:notes \"Predicates used in formula:\"";
 	commentPredicate[ContextualBlock.PREDICATE_TYPE]    = "\n\n:notes \"Types expressed by predicates:\"";
-	String [] commentAssumption = new String[4];
+	String [] commentAssumption = new String[5];
 	commentAssumption[ContextualBlock.ASSUMPTION_DUMMY_IMPLEMENTATION] = "\n\n:notes \"Assumptions for dummy variables:\"";
 	commentAssumption[ContextualBlock.ASSUMPTION_FUNCTION_DEFINTION] = "\n\n:notes \"Assumptions for function definitions:\""; 
 	commentAssumption[ContextualBlock.ASSUMPTION_SORT_PREDICATES] = "\n\n:notes \"Assumptions for sort predicates:\"";
 	commentAssumption[ContextualBlock.ASSUMPTION_TYPE_HIERARCHY] = "\n\n:notes \"Assumptions for type hierarchy:\"";
-	
+	commentAssumption[ContextualBlock.ASSUMPTION_TACLET_TRANSLATION] = "\n\n:notes \"Assumptions made of taclets:\"\n\n";
 	//add the logic definition
 	toReturn.append("\n:logic AUFLIA");
 	

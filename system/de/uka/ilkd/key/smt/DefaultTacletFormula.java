@@ -7,12 +7,14 @@ class DefaultTacletFormula implements TacletFormula {
 
     Taclet taclet;
     Term   formula;
+    String status;
     
         
-    public DefaultTacletFormula(Taclet taclet, Term formula) {
+    public DefaultTacletFormula(Taclet taclet, Term formula, String status) {
 	super();
 	this.taclet = taclet;
 	this.formula = formula;
+	this.status = status;
     }
 
     public Term getFormula() {
@@ -21,6 +23,10 @@ class DefaultTacletFormula implements TacletFormula {
 
     public Taclet getTaclet() {
 	return taclet;
+    }
+
+    public String getStatus() {
+	return status;
     }
 
 }

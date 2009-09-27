@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.smt;
 
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.Taclet;
 
 /**
@@ -18,8 +19,13 @@ public interface TacletFormula {
     Taclet getTaclet();
     /**
      * 
-     * @return the formula of the instance.
+     * @return the formula of the instance if the taclet is translatable otherwise <code>null</code>
      */
     Term   getFormula();
+    
+    /**
+     * @return <code>TRANSLATABLE</code> if the taclet is translatable {@link TacletTranslator#TRANSLATABLE}, otherwise a non empty string containing a reason. 
+     */
+    String getStatus();
 
 }

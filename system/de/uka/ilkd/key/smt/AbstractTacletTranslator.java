@@ -21,17 +21,16 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Junctor;
-import de.uka.ilkd.key.logic.op.Op;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.Quantifier;
-import de.uka.ilkd.key.logic.op.SortedSchemaVariable;
-import de.uka.ilkd.key.parser.SchemaVariableModifierSet.FormulaSV;
-import de.uka.ilkd.key.parser.SchemaVariableModifierSet.TermSV;
+import de.uka.ilkd.key.logic.op.RigidFunction;
+
+
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletGoalTemplate;
 
 
-public abstract class AbstractTacletTranslator implements TacletTranslator {
+abstract class AbstractTacletTranslator implements TacletTranslator {
 
   
     
@@ -68,61 +67,101 @@ public abstract class AbstractTacletTranslator implements TacletTranslator {
 	
 	
 	if(t.getVariableConditions().hasNext()) {return "The taclet has variable conditions.";}
+	if(t.varsNotFreeIn().hasNext()) {return "The taclet has \\notFreeIn conditions.";}
+	//if(t.varshasNext()) {return "The taclet has ";}
+
 	String res;
 	
 	res = checkGoalTemplates(t);
-	if(res != RIGHT){ return res;}
+	if(res != TRANSLATABLE){ return res;}
+	
 	
 	res = checkSequent(t.ifSequent());
-	if(res != RIGHT){ return res;}	
+	if(res != TRANSLATABLE){ return res;}	
 	
-	return RIGHT;
+	
+	
+	return TRANSLATABLE;
     }
     
     /**
-     * Checks whether the taclet has addrules. 
+     * Checks whether the taclet has addrules.<br>
      * @param t taclet to be checked.
-     * @return true, if the taclet has one or more addrules.
+     * @return <code>TRANSLATABLE</code> if there is no add rule, otherwise a string that is not empty.
      */
-    protected String checkGoalTemplates(Taclet t){
+    private String checkGoalTemplates(Taclet t){
 	for(TacletGoalTemplate template : t.goalTemplates()){
-	    if(template.rules().size() >0) return "taclet has addrules";
+	    if(template.rules().size() >0) return "taclet has addrules.";
 	    String res = checkSequent(template.sequent());
-	    if(res != RIGHT) return res;  
+	    if(res != TRANSLATABLE) return res; 
+	    res = checkGoalTemplate(template);
+	    if(res !=TRANSLATABLE) return res;
+	    
 	}
-	return RIGHT;
+	return TRANSLATABLE;
     }
     
+    /**
+     * Override this method if you want to check a goal template in a sub class.
+     * @param template
+     * @return  <code>TRANSLATABLE</code> if there is no add rule, otherwise a string that is not empty.
+     */
+    protected String checkGoalTemplate(TacletGoalTemplate template){return TRANSLATABLE;}
     
+    /**
+     * Checks the sequent by checking every term within in this sequent.
+     * @param s
+     *  @return <code>TRANSLATABLE</code> if the sequent is supported, otherwise a string that is not empty.
+     */
     protected String checkSequent(Sequent s){
 	String res;
 	for(ConstrainedFormula cf : s){
-	   if((res = checkTerm(cf.formula())) != RIGHT) return res;
+	    if((res = checkTerm(cf.formula())) != TRANSLATABLE) return res;
 	}
-	return RIGHT;
+	return TRANSLATABLE;
     }
+    
+    
+    /**
+     * Checks whether a operator is supported. This method contains operators every taclet should support. 
+     * Override this method if a special taclet should support more operators.
+     * @param op the operator to be checked.
+     * @return <code>TRANSLATABLE</code> if the operator is supported, otherwise a string that is not empty.
+     */
     
     protected String checkOperator(Operator op){
-	if((op instanceof Junctor) ||
-	   (op instanceof Equality) ||
-	   (op instanceof Quantifier)//||
-	  // (op instanceof TermSV)||
+	
+	if((op instanceof Junctor) 
+	   ||(op instanceof Equality) 
+	   ||(op instanceof Quantifier)
+	   ||(op instanceof RigidFunction)
+	   // can't not be done by the typical 'instanceof' because TermSV and FormulaSV are not public. 
+	   ||(op.getClass().getName().equals("de.uka.ilkd.key.logic.op.TermSV"))
+	   ||(op.getClass().getName().equals("de.uka.ilkd.key.logic.op.FormulaSV"))
+	  
 	   //sss(op instanceof FormulaSV)//||
-	   //(op instanceof SortedSchemaVariable)
-	   ) return RIGHT;
-	return "The operator " + op.toString() + " is not supported. Class: "+op.getClass().getSimpleName();
+	   //||(op instanceof SortedSchemaVariable)
+	   ) {return TRANSLATABLE;}
+	return "The operator " + op.toString() + " is not supported. Class: "+op.getClass().getName();
     }
     
+    
+    
+    /**
+     * Checks the given term by checking the operator of the term and by checking the subterms. 
+     * @param term the operator to be checked.
+     * @return <code>TRANSLATABLE</code> if the term is supported, otherwise a string that is not empty.
+     */    
     protected String checkTerm(Term term){
 	
 	String res = checkOperator(term.op());
-	if(res != RIGHT) return res;
+	if(res != TRANSLATABLE) return res;
 	for(int i=0; i < term.arity(); i++){
 	    res = checkTerm(term.sub(i));
-	    if(res != RIGHT) return res;
+	    if(res != TRANSLATABLE) return res;
 	}
 	
-	return RIGHT;
+	return TRANSLATABLE;
     }
     
     

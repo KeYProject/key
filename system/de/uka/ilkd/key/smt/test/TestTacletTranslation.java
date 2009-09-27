@@ -13,6 +13,7 @@ import java.io.File;
 
 
 import de.uka.ilkd.key.smt.*;
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
@@ -91,24 +92,59 @@ public class TestTacletTranslation extends TestCase {
 	return null;
     }
     
-    public void testAll(){
+    public void testTranslateWhatYouGet(){
 	TacletSetTranslation  translation = new DefaultTacletSetTranslation();
 	translation.setTacletSet(taclets);
-
-	ImmutableList<TacletFormula> list = translation.getTranslation();
+	translation.addHeuristic("smt_axiom_not_verified");
 	
-	System.out.println("Count: "+list.size());
-	
-	
-	for(TacletFormula tf : list){
-	    System.out.println(tf.getTaclet().toString());
+	System.out.println("\n\nTranslated: ");
+	for(TacletFormula tf : translation.getTranslation()){
+	    System.out.println(tf.getTaclet().name());
+	}
+	System.out.println("\n\nNot translated: ");
+	for(TacletFormula tf : translation.getNotTranslated()){
+	    System.out.println(tf.getTaclet().name()+"\n"+tf.getStatus()+"\n");
 	}
 	
 	
-	/*
-	for(Term term : list){
-	    printTerm(term,0);
-	}*/
+    }
+    
+    public void testBadExamples(){
+	TacletSetTranslation  translation = new DefaultTacletSetTranslation();
+	ImmutableSet<Taclet> set = DefaultImmutableSet.nil();
+	String [] tacletList = {
+		"ex_bool",  // has a bad replace pattern: substitution
+		"testUninstantiatedSVCollector", // has a bad find pattern: diamond-operator
+		"TestCollisionResolving_coll_context", // has notFreeIn-Condtion:
+		"testParsingExplicitMethodBody", // has bad find pattern: box-operator
+		"AND_literals_1", // has a bad replace pattern: meta-construct
+		"imp_left", // not a rewrite taclet
+		"TestMatchTaclet_whileright" // has variable conditions
+		
+	};
+	
+	for(String s : tacletList){
+	    set = set.add(getTacletByName(s)); 
+	}
+	Assert.assertTrue("Some taclets have not been loaded.",tacletList.length == set.size());
+		
+	
+	
+	translation.setTacletSet(set);
+	
+
+	ImmutableList<TacletFormula> list = translation.getTranslation();
+	String reason = "The following taclets were translated:\n";
+	for(TacletFormula tf : list){
+	    reason = reason + tf.getTaclet().name().toString();
+	}
+	
+	Assert.assertTrue(reason,list.size() == 0);
+	
+	for(TacletFormula tf : translation.getNotTranslated())
+	    System.out.println(tf.getTaclet().name()+": "+ tf.getStatus());
+	
+	
 	
     }
     

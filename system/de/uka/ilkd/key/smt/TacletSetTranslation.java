@@ -37,6 +37,30 @@ public interface TacletSetTranslation {
      */
     public ImmutableList<TacletFormula> getTranslation();
     
+    /**
+     * Returns all taclet that have not been translated. The reason can be got by {@link TacletFormula#getStatus}.
+     * @return a list of taclets.
+     */
+    public ImmutableList<TacletFormula> getNotTranslated();
+    
+    /**
+     * Updates the translation, i.d. the given list of taclets is being translated again.
+     */
+    public void update();
+    
+    /**
+     * Adds a new heuristic to the translation. Only taclets that contain one of the added heuristics will be translated.
+     * If no heuristic was added every taclet is being translated. 
+     * @param h The heuristic to be added.
+     */
+    public void addHeuristic(String h);   
+    
+    /**
+     * Removes a heuristic. It has no effect of the translation that is already done, call <code>update</code> to renew the translation.
+     * @param h the heuristic to be removed.
+     * @return return <code>true</code> if the heuristic have been remove successfully, otherwise <code>false</code>.
+     */
+    public boolean removeHeursitic(String h);
 
 
 }

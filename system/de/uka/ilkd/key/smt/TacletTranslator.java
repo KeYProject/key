@@ -17,7 +17,8 @@ import de.uka.ilkd.key.rule.Taclet;
  */
 
 public interface TacletTranslator {
-    public static final String RIGHT = "";
+    /**Empty string that is used to indicate that a taclet can be translated. */
+    public static final String TRANSLATABLE = "";
     /**
      * Translates a taclet to a formula.
      * @param t taclet to be translated
@@ -28,8 +29,7 @@ public interface TacletTranslator {
     /**
      * Checks wether the given taclet can be translated by the translator.
      * @param t taclet to be checked.
-     * @return <code>true</code> if the given taclet <code>t</code> can be translated by the translator, otherwise <code>false</code>.
-     */
+     * @return <code>TRANSLATABLE</code> if the given taclet <code>t</code> can be translated by the translator, otherwise a non empty string containing a reason.     *   */
     public String check(Taclet t);
     
      

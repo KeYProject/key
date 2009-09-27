@@ -19,6 +19,8 @@ import javax.swing.JFileChooser;
 
 import org.apache.log4j.Logger;
 
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.gui.DecisionProcedureSettings;
 import de.uka.ilkd.key.gui.Main;
 import de.uka.ilkd.key.gui.configuration.PathConfig;
@@ -26,6 +28,7 @@ import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.gui.configuration.Settings;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
@@ -57,7 +60,13 @@ public abstract class AbstractSMTSolver implements SMTSolver {
     private boolean isinstalled = false;
     /** true, if the current run is for test uss only (for example checking, if the Solver is installed) */
     private boolean inTestMode = false;
+    /** translation of the taclets that are used for assumptions */
+    private TacletSetTranslation tacletSetTranslation;
     
+    
+
+
+
     /**
      * Get the command for executing the external prover.
      * This is a hardcoded default value. It might be overridden by user settings
@@ -81,6 +90,8 @@ public abstract class AbstractSMTSolver implements SMTSolver {
 	}
 	return toReturn;
     }
+    
+   
     
   /*  /**
      * Interpret the answer of the program.
@@ -195,6 +206,7 @@ public abstract class AbstractSMTSolver implements SMTSolver {
 	SMTTranslator trans = this.getTranslator(services);
 	
 	try {
+	    trans.setTacletAssumptions(getTacletAssumptions(services));
 	    String s = trans.translate(goal.sequent(), services).toString();
 	    toReturn = this.run(s, timeout, services);
     	} catch (IllegalFormulaException e) {
@@ -212,7 +224,7 @@ public abstract class AbstractSMTSolver implements SMTSolver {
 	Process toReturn;
 	
 	SMTTranslator trans = this.getTranslator(services);
-	
+	trans.setTacletAssumptions(getTacletAssumptions(services));
 	String formula = trans.translate(goal.sequent(), services).toString();
 	
 	
@@ -282,6 +294,7 @@ public abstract class AbstractSMTSolver implements SMTSolver {
 	SMTTranslator trans = this.getTranslator(services);
 	
 	try {
+
 	    String s = trans.translate(t, services).toString();
 	    toReturn = this.run(s, timeout, services);
     	} catch (IllegalFormulaException e) {
@@ -493,6 +506,45 @@ public abstract class AbstractSMTSolver implements SMTSolver {
      */
     public String getDefaultExecutionCommand() {
 	return this.getExecutionCommand("%f", "%p");
+    }
+    
+    
+    
+    /**
+     * @return the tacletSetTranslation
+     */
+    public TacletSetTranslation getTacletSetTranslation() {
+        return tacletSetTranslation;
+    }
+
+
+    /**
+     * @param tacletSetTranslation the tacletSetTranslation to set
+     */
+    public void setTacletSetTranslation(TacletSetTranslation tacletSetTranslation) {
+        this.tacletSetTranslation = tacletSetTranslation;
+    }
+    
+    /**
+     * @return returns a list of assumtions builded up from taclets.
+     */
+    private StringBuffer getTacletAssumptions( Services services){
+	Term term;
+	TermBuilder tb = new TermBuilder();
+	ImmutableList<Term> list=  ImmutableSLList.nil();
+	for(TacletFormula tf : tacletSetTranslation.getTranslation()){
+	   list = list.append(tf.getFormula());
+	}
+	
+	term = tb.and(list);
+	
+	try {
+	      StringBuffer res = this.getTranslator(services).translate(term,services);
+	      return res;
+	} catch (IllegalFormulaException e) {
+	    throw new RuntimeException("The taclets could not be translated.\n" + e.getMessage());
+             }
+	
     }
     
     

@@ -15,6 +15,8 @@ import de.uka.ilkd.key.java.Services;
 
 public final class SimplifySolver extends AbstractSMTSolver {
     
+
+
     public String name() {
         return "Simplify";
     }
