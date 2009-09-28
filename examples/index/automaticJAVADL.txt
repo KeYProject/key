@@ -6,7 +6,9 @@
 ./heap/list/ArrayList_get_normal.key
 ./heap/list/ArrayList_inv.key
 ./heap/list/ArrayList_size.key
+./heap/list/LinkedList_get_exceptional.key
 ./heap/list/LinkedList_get_normal.key
+./heap/list/LinkedList_LinkedList.key
 ./heap/list/LinkedList_size.key
 ./heap/simple/anonymise_datagroup.key
 ./heap/simple/array_creation.key

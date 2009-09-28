@@ -84,6 +84,21 @@ public class DefaultImmutableSet<T> implements ImmutableSet<T> {
 	}
 	return new DefaultImmutableSet<T>(unionElements);
     }
+    
+    /** @return intersection of this set with set */
+    public ImmutableSet<T> intersect(ImmutableSet<T> set) {
+	if (set.isEmpty()) {
+	    return set;
+	}
+	
+	ImmutableList<T> intersectElements = this.elementList;
+	for (T el : intersectElements) {	    	    
+	    if (!set.contains(el)) {
+		intersectElements = intersectElements.removeFirst(el);
+	    }
+	}
+	return new DefaultImmutableSet<T>(intersectElements);
+    }
 
     /** @return Iterator<T> of the set */
     public Iterator<T> iterator() {

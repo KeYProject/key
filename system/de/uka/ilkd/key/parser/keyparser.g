@@ -3411,7 +3411,8 @@ varexp[TacletBuilder b]
     | varcond_new[b]
     | varcond_newlabel[b] 
     | varcond_observer[b]
-    | varcond_different[b]    
+    | varcond_different[b]
+    | varcond_metadisjoint[b]    
   ) 
   | 
   ( (NOT {negated = true;} )? 
@@ -3758,6 +3759,21 @@ varcond_different [TacletBuilder b]
      	   				 (SchemaVariable)var2));
         } 
 ;
+
+
+varcond_metadisjoint [TacletBuilder b]
+{
+  ParsableVariable var1, var2;
+}
+:
+   METADISJOINT 
+	LPAREN var1=varId COMMA var2=varId RPAREN {
+     	   b.addVariableCondition(new MetaDisjointCondition(
+     	   				(TermSV)var1,
+     	   				(TermSV)var2));
+        } 
+;
+
 
 
 varcond_equalUnique [TacletBuilder b]

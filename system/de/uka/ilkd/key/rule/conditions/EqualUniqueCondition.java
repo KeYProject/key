@@ -26,13 +26,13 @@ public final class EqualUniqueCondition implements VariableCondition {
     
     private final TermSV t;
     private final TermSV t2;
-    private final FormulaSV phi;
+    private final FormulaSV res;
     
     
-    public EqualUniqueCondition(TermSV t, TermSV t2, FormulaSV phi) {
+    public EqualUniqueCondition(TermSV t, TermSV t2, FormulaSV res) {
         this.t = t;
         this.t2 = t2;
-        this.phi = phi;
+        this.res = res;
     }
     
     
@@ -62,18 +62,18 @@ public final class EqualUniqueCondition implements VariableCondition {
 	SVInstantiations svInst = mc.getInstantiations();
 	Term tInst   = (Term) svInst.getInstantiation(t);
 	Term t2Inst  = (Term) svInst.getInstantiation(t2);
-	Term phiInst = (Term) svInst.getInstantiation(phi);
+	Term resInst = (Term) svInst.getInstantiation(res);
 	if(tInst == null || t2Inst == null) {
 	    return mc;
 	}
 	
-	Term properPhiInst = equalUnique(tInst, t2Inst, services);
-	if(properPhiInst == null) {
+	Term properResInst = equalUnique(tInst, t2Inst, services);
+	if(properResInst == null) {
 	    return null;
-	} else if(phiInst == null) {
-	    svInst = svInst.add(phi, properPhiInst, services);
+	} else if(resInst == null) {
+	    svInst = svInst.add(res, properResInst, services);
 	    return mc.setInstantiations(svInst);
-	} else if(phiInst.equals(properPhiInst)) {
+	} else if(resInst.equals(properResInst)) {
 	    return mc;
 	} else {
 	    return null;
@@ -83,6 +83,6 @@ public final class EqualUniqueCondition implements VariableCondition {
 
     @Override
     public String toString () {
-        return "\\equalUnique (" + t + ", " + t2 + ", " + phi + ")";
+        return "\\equalUnique (" + t + ", " + t2 + ", " + res + ")";
     }
 }

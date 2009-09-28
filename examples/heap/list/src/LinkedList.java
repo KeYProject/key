@@ -1,18 +1,19 @@
-//not yet verifiable
 final class LinkedList implements List {
         
     private /*@nullable@*/ Node first;
     private /*@nullable@*/ Node last;
+    private int size;
     
-    //@ represents footprint <- first, last, \reachLocs(first.next, first);
+    //@ represents footprint <- first, last, size, \reachLocs(first.next, first);
     
-    /*@ invariant first == null && last == null
-      @            || first != null 
+    /*@ invariant size == 0 && first == null && last == null
+      @            || size > 0
+      @               && first != null 
       @               && last != null 
       @               && last.next == null
-      @               && \reach(first.next, first, last);
+      @               && \reach(first.next, first, last, size - 1);
       @*/
-    
+   
     
     /*@ normal_behaviour
       @   ensures size() == 0;
@@ -21,22 +22,23 @@ final class LinkedList implements List {
     public /*@pure@*/ LinkedList() {
     }
     
-    
+
     public void add(Object o) {
 	Node node = new Node();
 	node.data = o;
-	if(first == null) {
+	if(size == 0) {
 	    first = node;
 	    last = node;
 	} else {
 	    last.next = node;
 	    last = node;
 	}
+	size++;
     }
 
     
     public Object get(int index) {
-	if(index < 0 || first == null) {
+	if(index < 0 || size <= index) {
 	    throw new IndexOutOfBoundsException();
 	}
 	
@@ -45,9 +47,6 @@ final class LinkedList implements List {
 	  @ assignable \nothing;
 	  @*/
 	for(int i = 0; i < index; i++) {
-	    if(node.next == null) {
-		throw new IndexOutOfBoundsException();
-	    }
 	    node = node.next;
 	}
 	
@@ -56,16 +55,13 @@ final class LinkedList implements List {
     
     
     public int size() {
-	if(first == null) {
-	    return 0;
-	}
-	int i = 0;
-	/*@ loop_invariant 0 <= i && \reach(first.next, first, node, i);
-	  @ assignable \nothing;
-	  @*/
-	for(Node node = first; node.next != null; node = node.next) {
-	    i++;
-	}
-	return i;
+	return size;
     }
+    
+    
+    //interactive proofs:
+    //-footprint (apply reachDependenciesChangeHeapAtLocs)
+    //-<inv> (apply reachDependenciesChangeHeapAtLocs)
+    
+    //not yet verified: add
 }
