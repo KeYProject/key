@@ -15,6 +15,7 @@ import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.IMain;
+import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.proof.DefaultGoalChooserBuilder;
@@ -25,6 +26,7 @@ import de.uka.ilkd.key.proof.mgt.AxiomJustification;
 import de.uka.ilkd.key.proof.mgt.RuleJustification;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.Rule;
+import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.smt.*;
 import de.uka.ilkd.key.strategy.StrategyFactory;
 
@@ -38,7 +40,7 @@ public abstract class AbstractProfile implements Profile {
     private final ImmutableSet<GoalChooserBuilder> supportedGCB;
 
     private GoalChooserBuilder prototype;
-
+    
     protected AbstractProfile(String standardRuleFilename,
             ImmutableSet<GoalChooserBuilder> supportedGCB, IMain main) {
 
@@ -49,6 +51,7 @@ public abstract class AbstractProfile implements Profile {
         this.supportedGCB = supportedGCB;
         this.supportedGC = extractNames(supportedGCB);
         this.prototype = getDefaultGoalChooserBuilder();
+        
         assert( this.prototype!=null );
 
     }
@@ -89,9 +92,7 @@ public abstract class AbstractProfile implements Profile {
         ImmutableList<BuiltInRule> builtInRules = ImmutableSLList.<BuiltInRule>nil();
 	ArrayList<SMTSolver> solverList = new ArrayList<SMTSolver>();
         
-	TacletSetTranslation tacletSetTranslation = new DefaultTacletSetTranslation();
-	
-	
+
 	solverList.add(new Z3Solver());
 	solverList.add(new YicesSolver());
         solverList.add(new SimplifySolver());
@@ -103,7 +104,7 @@ public abstract class AbstractProfile implements Profile {
 	// builtInRules for single use of provers
 	for(SMTSolver s : solverList){
           builtInRules = builtInRules.prepend(new SMTRule(s));
-          s.setTacletSetTranslation(tacletSetTranslation);
+       
 	}        
 
       

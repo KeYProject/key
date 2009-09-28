@@ -206,7 +206,7 @@ public abstract class AbstractSMTSolver implements SMTSolver {
 	SMTTranslator trans = this.getTranslator(services);
 	
 	try {
-	    trans.setTacletAssumptions(getTacletAssumptions(services));
+	    trans.setTacletAssumptions(getTacletAssumptions(trans,services));
 	    String s = trans.translate(goal.sequent(), services).toString();
 	    toReturn = this.run(s, timeout, services);
     	} catch (IllegalFormulaException e) {
@@ -224,7 +224,7 @@ public abstract class AbstractSMTSolver implements SMTSolver {
 	Process toReturn;
 	
 	SMTTranslator trans = this.getTranslator(services);
-	trans.setTacletAssumptions(getTacletAssumptions(services));
+	trans.setTacletAssumptions(getTacletAssumptions(trans,services));
 	String formula = trans.translate(goal.sequent(), services).toString();
 	
 	
@@ -528,7 +528,7 @@ public abstract class AbstractSMTSolver implements SMTSolver {
     /**
      * @return returns a list of assumtions builded up from taclets.
      */
-    private StringBuffer getTacletAssumptions( Services services){
+    private StringBuffer getTacletAssumptions(SMTTranslator trans, Services services){
 	Term term;
 	TermBuilder tb = new TermBuilder();
 	ImmutableList<Term> list=  ImmutableSLList.nil();
@@ -539,7 +539,7 @@ public abstract class AbstractSMTSolver implements SMTSolver {
 	term = tb.and(list);
 	
 	try {
-	      StringBuffer res = this.getTranslator(services).translate(term,services);
+	      StringBuffer res = trans.translate(term,services);
 	      return res;
 	} catch (IllegalFormulaException e) {
 	    throw new RuntimeException("The taclets could not be translated.\n" + e.getMessage());

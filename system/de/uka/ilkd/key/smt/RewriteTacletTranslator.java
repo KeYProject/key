@@ -130,7 +130,7 @@ public class RewriteTacletTranslator extends AbstractTacletTranslator{
     @Override
     public String checkGoalTemplate(TacletGoalTemplate template){
 	String res;
-	
+	if(!(template instanceof RewriteTacletGoalTemplate)) return "GoalTemplate not of type RewriteTacletGoalTemplate.";
 	res = checkTerm(((RewriteTacletGoalTemplate)template).replaceWith()); 
 	if(res != TRANSLATABLE) return res; 
 	return TRANSLATABLE;
