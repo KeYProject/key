@@ -415,7 +415,7 @@ public class SMTRuleMulti implements BuiltInRule, MakesProgress {
 		boolean finished = false;
 		
 		
-		while (!finished) {
+		while (!finished&&runningProcesses.size()>0) {
 		    //if there is a interruption signal, interrupt execWatch, 
 		    if (this.toBeInterrupted) {
 			this.toBeInterrupted = false;
