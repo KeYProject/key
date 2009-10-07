@@ -10,10 +10,11 @@
 
 package de.uka.ilkd.key.rule;
 
+import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.logic.BoundVariableTools;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.ArrayOfQuantifiableVariable;
 import de.uka.ilkd.key.logic.op.IUpdateOperator;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.util.Debug;
 
 /** 
@@ -46,7 +47,7 @@ public class UpdatePair {
 	return update.sub(n);
     }
     
-    public ArrayOfQuantifiableVariable varsBoundHere (int n) {
+    public ImmutableArray<QuantifiableVariable> varsBoundHere (int n) {
         if ( n >= arity () ) throw new IndexOutOfBoundsException ();
         return update.varsBoundHere ( n );
     }
@@ -65,13 +66,13 @@ public class UpdatePair {
 	final UpdatePair cmp = (UpdatePair) o;	
 
 	if (cmp.updateOperator() != updateOperator()) {
-	    return false;
+	     return false;
 	}		
 
         
 	for (int i = 0, ar = arity(); i<ar; i++) {        
-	    final ArrayOfQuantifiableVariable qVars = varsBoundHere(i);
-	    final ArrayOfQuantifiableVariable cmpQVars = cmp.varsBoundHere(i);
+	    final ImmutableArray<QuantifiableVariable> qVars = varsBoundHere(i);
+	    final ImmutableArray<QuantifiableVariable> cmpQVars = cmp.varsBoundHere(i);
 	    if (qVars.size() != cmpQVars.size()) {
 		return false;
 	    } else if (qVars.size() == 0) {

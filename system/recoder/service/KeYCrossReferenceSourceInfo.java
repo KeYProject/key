@@ -45,6 +45,7 @@ import de.uka.ilkd.key.java.recoderext.ExecutionContext;
 import de.uka.ilkd.key.java.recoderext.MethodCallStatement;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.ExceptionHandlerException;
+import de.uka.ilkd.key.util.SpecDataLocation;
 
 
 /**
@@ -577,7 +578,8 @@ public class KeYCrossReferenceSourceInfo
 
             recoder.java.CompilationUnit cu;
             try {
-                cu = ClassFileDeclarationBuilder.makeEmptyClassFile(serviceConfiguration.getProgramFactory(), typeString);
+                cu = ClassFileDeclarationBuilder.makeEmptyClassDeclaration(serviceConfiguration.getProgramFactory(), typeString);
+                cu.setDataLocation(new SpecDataLocation("stub", typeString));
             } catch (ParserException e) {
                 throw new RuntimeException(e);
             }

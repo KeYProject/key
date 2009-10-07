@@ -12,11 +12,12 @@
 
 package de.uka.ilkd.key.logic.sort;
 
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Namespace;
-import de.uka.ilkd.key.logic.op.ListOfSortDependingSymbol;
-import de.uka.ilkd.key.logic.op.SLListOfSortDependingSymbol;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
+import de.uka.ilkd.key.logic.op.SortDependingSymbol;
 
 
 public class BagSort extends de.uka.ilkd.key.logic.sort.AbstractCollectionSort {
@@ -42,7 +43,7 @@ public class BagSort extends de.uka.ilkd.key.logic.sort.AbstractCollectionSort {
 	if(!symbolsCreated) {
 	    super.createSymbols(p_func_ns, sort_ns);
 	    
-            ListOfSortDependingSymbol res = SLListOfSortDependingSymbol.EMPTY_LIST;
+            ImmutableList<SortDependingSymbol> res = ImmutableSLList.<SortDependingSymbol>nil();
             
 	    final Sort intSort = (Sort)sort_ns.lookup(new Name("int"));	
             if ( intSort == null ){
@@ -86,8 +87,8 @@ public class BagSort extends de.uka.ilkd.key.logic.sort.AbstractCollectionSort {
 	}
     }
 
-    private ListOfSortDependingSymbol createSymbol
-    ( ListOfSortDependingSymbol p_list,
+    private ImmutableList<SortDependingSymbol> createSymbol
+    ( ImmutableList<SortDependingSymbol> p_list,
       String                    p_name,
       Sort                      p_valueSort,
       Sort[]                    p_argSorts ) {

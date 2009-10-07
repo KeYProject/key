@@ -11,9 +11,15 @@
 
 package de.uka.ilkd.key.rule.soundness;
 
+import java.util.Iterator;
+
+import de.uka.ilkd.key.collection.ImmutableArray;
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.*;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.logic.op.IProgramVariable;
+import de.uka.ilkd.key.logic.op.SchemaVariable;
 
 
 
@@ -34,27 +40,27 @@ public abstract class AbstractPVPrefixSkolemBuilder
 	return prefixes;
     }
 
-    protected ListOfIProgramVariable getProgramVariablePrefix ( SchemaVariable p ) {
-	ListOfIProgramVariable res = getProgramVariablePrefixes ().getPrefix ( p );
+    protected ImmutableList<IProgramVariable> getProgramVariablePrefix ( SchemaVariable p ) {
+	ImmutableList<IProgramVariable> res = getProgramVariablePrefixes ().getPrefix ( p );
 	if ( res == null )
-	    res = SLListOfIProgramVariable.EMPTY_LIST;
+	    res = ImmutableSLList.<IProgramVariable>nil();
 	return res;
     }
 
-    protected ArrayOfIProgramVariable getProgramVariablePrefixAsArray
+    protected ImmutableArray<IProgramVariable> getProgramVariablePrefixAsArray
 	( SchemaVariable p ) {
 	return getProgramVariablesAsArray
 	    ( getProgramVariablePrefix ( p ) );
     }
 
-    protected ArrayOfIProgramVariable getProgramVariablesAsArray
-	( ListOfIProgramVariable p ) {
+    protected ImmutableArray<IProgramVariable> getProgramVariablesAsArray
+	( ImmutableList<IProgramVariable> p ) {
 
 	int                       pvpSize = p.size ();
 
 	IProgramVariable[]         pva     = new IProgramVariable [ pvpSize ];
 
-	IteratorOfIProgramVariable it      = p.iterator ();
+	Iterator<IProgramVariable> it      = p.iterator ();
 
 	int                       i       = 0;
 	while ( it.hasNext () ) {
@@ -62,17 +68,17 @@ public abstract class AbstractPVPrefixSkolemBuilder
 	    ++i;
 	}
 
-	return new ArrayOfIProgramVariable ( pva );
+	return new ImmutableArray<IProgramVariable> ( pva );
     }
 
-    protected ArrayOfKeYJavaType getKeYJavaTypesAsArray
-	( ListOfKeYJavaType p ) {
+    protected ImmutableArray<KeYJavaType> getKeYJavaTypesAsArray
+	( ImmutableList<KeYJavaType> p ) {
 
 	int                   pvpSize = p.size ();
 
 	KeYJavaType[]         pva     = new KeYJavaType [ pvpSize ];
 
-	IteratorOfKeYJavaType it      = p.iterator ();
+	Iterator<KeYJavaType> it      = p.iterator ();
 
 	int                   i       = 0;
 	while ( it.hasNext () ) {
@@ -80,48 +86,48 @@ public abstract class AbstractPVPrefixSkolemBuilder
 	    ++i;
 	}
 
-	return new ArrayOfKeYJavaType ( pva );
+	return new ImmutableArray<KeYJavaType> ( pva );
     }
 
-    public ListOfIProgramVariable getProgramVariablesAsList
-	( ArrayOfIProgramVariable p ) {
+    public ImmutableList<IProgramVariable> getProgramVariablesAsList
+	( ImmutableArray<IProgramVariable> p ) {
 
-	ListOfIProgramVariable res = SLListOfIProgramVariable.EMPTY_LIST;
+	ImmutableList<IProgramVariable> res = ImmutableSLList.<IProgramVariable>nil();
 
 	int i = p.size ();
 	while ( i-- != 0 )
-	    res = res.prepend ( p.getIProgramVariable ( i ) );
+	    res = res.prepend ( p.get ( i ) );
 
 	return res;
 
     }
 
-    protected ListOfKeYJavaType getKeYJavaTypesAsList
-	( ArrayOfKeYJavaType p ) {
+    protected ImmutableList<KeYJavaType> getKeYJavaTypesAsList
+	( ImmutableArray<KeYJavaType> p ) {
 
-	ListOfKeYJavaType res = SLListOfKeYJavaType.EMPTY_LIST;
+	ImmutableList<KeYJavaType> res = ImmutableSLList.<KeYJavaType>nil();
 
 	int i = p.size ();
 	while ( i-- != 0 )
-	    res = res.prepend ( p.getKeYJavaType ( i ) );
+	    res = res.prepend ( p.get ( i ) );
 
 	return res;
 
     }
 
-    protected ArrayOfKeYJavaType getProgramVariablePrefixTypes
+    protected ImmutableArray<KeYJavaType> getProgramVariablePrefixTypes
 	( SchemaVariable p ) {
 	return getProgramVariableTypes
 	    ( getProgramVariablePrefix ( p ) );
     }
 
-    protected ArrayOfKeYJavaType getProgramVariableTypes
-	( ListOfIProgramVariable p ) {
+    protected ImmutableArray<KeYJavaType> getProgramVariableTypes
+	( ImmutableList<IProgramVariable> p ) {
 
 	int                       pvpSize  = p.size ();
 
 	KeYJavaType[]             types    = new KeYJavaType [ pvpSize ];
-	IteratorOfIProgramVariable it       = p.iterator ();
+	Iterator<IProgramVariable> it       = p.iterator ();
 
 	int                       i        = 0;
 	while ( it.hasNext () ) {
@@ -129,7 +135,7 @@ public abstract class AbstractPVPrefixSkolemBuilder
 	    ++i;
 	}
 
-	return new ArrayOfKeYJavaType ( types );
+	return new ImmutableArray<KeYJavaType> ( types );
 	
     }
 

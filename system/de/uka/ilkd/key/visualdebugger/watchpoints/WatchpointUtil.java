@@ -13,10 +13,10 @@ import java.util.Map.Entry;
 
 import javax.swing.SwingUtilities;
 
+import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.proof.IteratorOfNode;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.InitConfig;
@@ -101,7 +101,7 @@ public class WatchpointUtil {
      */
     private static PosInOccurrence findPos(Semisequent seq) {
 
-        IteratorOfConstrainedFormula iter = seq.iterator();
+        Iterator<ConstrainedFormula> iter = seq.iterator();
         ConstrainedFormula constrainedFormula;
         PosInOccurrence pos = null;
         Term term;
@@ -168,7 +168,7 @@ public class WatchpointUtil {
     private static boolean hasChildrenInSet(Node currentNode,
             List<Node> proofnodes) {
 
-        IteratorOfNode iter = currentNode.childrenIterator();
+        Iterator<Node> iter = currentNode.childrenIterator();
         while (iter.hasNext()) {
             Node child = (Node) iter.next();
             if (proofnodes.contains(child)) {
@@ -511,7 +511,7 @@ public class WatchpointUtil {
         assert nodes != null : "The parameter Node[] (proof)nodes was null / in getLeafNodesInETNode()/ in WatchpointUtil!";
         assert nodes.length != 0 : "No nodes contained in the passed Array /in getLeafNodesInETNode() / in WatchpointUtil!";
         // create a collection from the array -> type conversion
-        // since getProofTreeNodes() only returns a ListOfNode which
+        // since getProofTreeNodes() only returns a IList<Node> which
         // does not implement the Collection interface
 
         // handle simple case
@@ -558,8 +558,10 @@ public class WatchpointUtil {
         try {
             for (ETNode node : nodes) {
 
-                HashSet<Node> leafNodesInETNode = getLeafNodesInETNode(node
-                        .getProofTreeNodes().toArray());
+                final ImmutableList<Node> proofTreeNodes = node
+                        .getProofTreeNodes();
+		HashSet<Node> leafNodesInETNode = getLeafNodesInETNode(proofTreeNodes.
+			toArray(new Node[proofTreeNodes.size()]));
 
                 node.setWatchpoint(satisfiesWatchpoint(
                         leafNodesInETNode, watchpoints, node));
@@ -623,11 +625,11 @@ public class WatchpointUtil {
      * @return the update
      */
     private static Update buildNameUpdates(UpdateFactory uf,
-            Map<ProgramMethod, ListOfRenamingTable> nameMaps) {
+            Map<ProgramMethod, ImmutableList<RenamingTable>> nameMaps) {
 
         List<Update> nameUpdates = new LinkedList<Update>();
         System.out.println(nameMaps);
-        for (ListOfRenamingTable lort : nameMaps.values()) {
+        for (ImmutableList<RenamingTable> lort : nameMaps.values()) {
 
             if(!lort.isEmpty()){
                 RenamingTable lastRT = lort.head();

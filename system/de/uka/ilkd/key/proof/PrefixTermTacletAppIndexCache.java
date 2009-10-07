@@ -11,38 +11,39 @@
 
 package de.uka.ilkd.key.proof;
 
+import de.uka.ilkd.key.collection.ImmutableArray;
+import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.ArrayOfQuantifiableVariable;
-import de.uka.ilkd.key.logic.op.ListOfQuantifiableVariable;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 
 /**
  * The abstract superclass of caches for taclet app indexes that are separated
  * by different prefixes of bound variables. This class simply stores a
- * <code>ListOfQuantifiableVariable</code> and offers a couple of access
+ * <code>IList<QuantifiableVariable></code> and offers a couple of access
  * functions to this list.
  */
 abstract class PrefixTermTacletAppIndexCache implements
                                              ITermTacletAppIndexCache {
 
-    private final ListOfQuantifiableVariable prefix;   
+    private final ImmutableList<QuantifiableVariable> prefix;   
     
-    protected PrefixTermTacletAppIndexCache(ListOfQuantifiableVariable prefix) {
+    protected PrefixTermTacletAppIndexCache(ImmutableList<QuantifiableVariable> prefix) {
         this.prefix = prefix;
     }
 
-    protected ListOfQuantifiableVariable getPrefix() {
+    protected ImmutableList<QuantifiableVariable> getPrefix() {
         return prefix;
     }
 
-    protected ListOfQuantifiableVariable
-              getExtendedPrefix(ArrayOfQuantifiableVariable extension) {
-        ListOfQuantifiableVariable res = prefix;
+    protected ImmutableList<QuantifiableVariable>
+              getExtendedPrefix(ImmutableArray<QuantifiableVariable> extension) {
+        ImmutableList<QuantifiableVariable> res = prefix;
         for ( int i = 0; i != extension.size (); ++i )
-            res = res.prepend ( extension.getQuantifiableVariable ( i ) );
+            res = res.prepend ( extension.get ( i ) );
         return res;
     }
 
-    protected ListOfQuantifiableVariable getExtendedPrefix(Term t, int subtermIndex) {
+    protected ImmutableList<QuantifiableVariable> getExtendedPrefix(Term t, int subtermIndex) {
         return getExtendedPrefix ( t.varsBoundHere ( subtermIndex ) );
     }
     

@@ -27,11 +27,16 @@ public class SimpleStarter implements IMain {
 
     private KeYMediator mediator;
     private String fileNameOnStartUp;
-    private MainTaskListenerBatchMode ptl;
+    private ProverTaskListener ptl;
 
     public SimpleStarter(String file) {
+	this.fileNameOnStartUp = file;
+        this.ptl= new MainTaskListenerBatchMode();
+    }
+    
+    public SimpleStarter(String file, ProverTaskListener ptl ) {
         this.fileNameOnStartUp = file;
-        this.ptl = new MainTaskListenerBatchMode();
+        this.ptl = ptl;
     }
     
     public void setKeYMediator(KeYMediator mediator) {
@@ -78,6 +83,10 @@ public class SimpleStarter implements IMain {
             public void setProgress(int progress) {
                 // TODO Auto-generated method stub
                 
+            }
+            
+            public void setProgressImmediatly(int progress) {
+        	
             }
             
         };

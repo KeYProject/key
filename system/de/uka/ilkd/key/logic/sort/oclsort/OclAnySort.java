@@ -11,10 +11,15 @@
 
 package de.uka.ilkd.key.logic.sort.oclsort;
 
+import java.util.Iterator;
+
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Op;
-import de.uka.ilkd.key.logic.sort.*;
+import de.uka.ilkd.key.logic.sort.GenericSort;
+import de.uka.ilkd.key.logic.sort.Sort;
 
 public class OclAnySort implements OclSort {
     
@@ -36,8 +41,8 @@ public class OclAnySort implements OclSort {
      * undesired results when dealing with arraysorts! 
      * @return the sorts of the predecessors of this sort
      */
-    public SetOfSort extendsSorts() {
-	return SetAsListOfSort.EMPTY_SET;
+    public ImmutableSet<Sort> extendsSorts() {
+	return DefaultImmutableSet.<Sort>nil();
     }
 
     /**
@@ -51,7 +56,7 @@ public class OclAnySort implements OclSort {
 	    if (((GenericSort)s).getOneOf().size() == 0) {
 		return true;
 	    } else {
-		IteratorOfSort iter = ((GenericSort)s).getOneOf().iterator();
+		Iterator<Sort> iter = ((GenericSort)s).getOneOf().iterator();
 		while (iter.hasNext()) {
 		    if (this.extendsTrans(iter.next())) {
 			return true;

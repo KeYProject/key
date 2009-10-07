@@ -175,7 +175,7 @@ public class NewArray extends TypeOperator
         if (children != null) {
             len = children.size();
             if (len > index) {
-                return children.getExpression(index);
+                return children.get(index);
             }
             index -= len;
         }
@@ -211,7 +211,7 @@ public class NewArray extends TypeOperator
         if (children != null) {
             len = children.size();
             if (len > index) {
-                return children.getExpression(index);
+                return children.get(index);
             }
             index -= len;
         }

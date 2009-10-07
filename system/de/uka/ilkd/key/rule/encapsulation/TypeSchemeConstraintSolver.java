@@ -10,6 +10,12 @@
 
 package de.uka.ilkd.key.rule.encapsulation;
 
+import java.util.Iterator;
+
+import de.uka.ilkd.key.collection.ImmutableArray;
+import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+
 
 class TypeSchemeConstraintSolver {
     private TypeSchemeConstraint constraint;
@@ -21,7 +27,7 @@ class TypeSchemeConstraintSolver {
             return true;
         }
         
-        IteratorOfTypeScheme it = vars[varPos].getValueRange().iterator();
+        Iterator<TypeScheme> it = vars[varPos].getValueRange().iterator();
         while(it.hasNext()) {
             vars[varPos].assignValue(it.next());
             if(constraint.evaluate()) {
@@ -45,7 +51,8 @@ class TypeSchemeConstraintSolver {
      */
     public boolean solve(TypeSchemeConstraint constraint) {
         this.constraint = constraint;
-        this.vars       = constraint.getFreeVars().toArray();
+        final ImmutableSet<TypeSchemeVariable> freeVars = constraint.getFreeVars();
+        this.vars       = freeVars.toArray(new TypeSchemeVariable[freeVars.size()]);
         
         for(int i = 0; i < vars.length; i++) {
             vars[i].assignDefaultValue();

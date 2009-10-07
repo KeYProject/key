@@ -10,8 +10,15 @@
 
 package de.uka.ilkd.key.rule;
 
+import java.util.Iterator;
+
+import de.uka.ilkd.key.collection.ImmutableMap;
+import de.uka.ilkd.key.collection.DefaultImmutableMap;
 import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.op.SubstOp;
 
 /**
  * This visitor is used to collect information about schema variable
@@ -26,8 +33,8 @@ public class SVNameCorrespondenceCollector extends Visitor {
      * This map contains (a, b) if there is a substitution {b a}
      * somewhere in the taclet
      */
-    private MapFromSchemaVariableToSchemaVariable nameCorrespondences =
-	MapAsListFromSchemaVariableToSchemaVariable.EMPTY_MAP;
+    private ImmutableMap<SchemaVariable,SchemaVariable> nameCorrespondences =
+	DefaultImmutableMap.<SchemaVariable,SchemaVariable>nilMap();
 
 
     /** is called by the execPostOrder-method of a term 
@@ -41,7 +48,7 @@ public class SVNameCorrespondenceCollector extends Visitor {
     
 	if ( top instanceof SubstOp ) {
             final Operator substTermOp = t.sub ( 0 ).op ();
-            final QuantifiableVariable substVar = t.varsBoundHere ( 1 ).getQuantifiableVariable ( 0 );
+            final QuantifiableVariable substVar = t.varsBoundHere ( 1 ).get ( 0 );
             if ( substTermOp instanceof SchemaVariable
                  && substVar instanceof SchemaVariable )
             addNameCorrespondence ( (SchemaVariable)substTermOp,
@@ -63,7 +70,7 @@ public class SVNameCorrespondenceCollector extends Visitor {
      *         onto schema variables b if b is replaced with a somewhere in this
      *         taclet
      */
-    public MapFromSchemaVariableToSchemaVariable getCorrespondences () {
+    public ImmutableMap<SchemaVariable,SchemaVariable> getCorrespondences () {
 	return nameCorrespondences;
     }
    
@@ -72,7 +79,7 @@ public class SVNameCorrespondenceCollector extends Visitor {
      * @param semiseq the Semisequent to visit
      */
     private void visit(Semisequent semiseq) {
-	IteratorOfConstrainedFormula it=semiseq.iterator();
+	Iterator<ConstrainedFormula> it=semiseq.iterator();
 	while(it.hasNext()) {
 	    it.next().formula().execPostOrder(this);
 	}
@@ -101,7 +108,7 @@ public class SVNameCorrespondenceCollector extends Visitor {
             if ( findTerm.op () instanceof SchemaVariable )
                 findSV = (SchemaVariable)findTerm.op ();
 	}	
-	IteratorOfTacletGoalTemplate it = taclet.goalTemplates().iterator();
+	Iterator<TacletGoalTemplate> it = taclet.goalTemplates().iterator();
 	while (it.hasNext()) {
 	    TacletGoalTemplate gt=it.next();
 	    visit(gt.sequent());
@@ -118,7 +125,7 @@ public class SVNameCorrespondenceCollector extends Visitor {
 		}
 	    }
 	    if (visitAddrules) {
-		IteratorOfTaclet addruleIt = gt.rules().iterator();
+		Iterator<Taclet> addruleIt = gt.rules().iterator();
 		while (addruleIt.hasNext()) {
 		    visit(addruleIt.next(), true);		    
 		}

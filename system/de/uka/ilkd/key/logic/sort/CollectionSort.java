@@ -12,6 +12,8 @@
 
 package de.uka.ilkd.key.logic.sort;
 
+import de.uka.ilkd.key.collection.ImmutableSet;
+
 
 public interface CollectionSort extends Sort {
 
@@ -21,7 +23,7 @@ public interface CollectionSort extends Sort {
     /**
      * @return the sorts of the predecessors of this sort
      */
-    SetOfSort extendsSorts();
+    ImmutableSet<Sort> extendsSorts();
 
     /**
      * @return an object of this class with elementSort().equals(p),

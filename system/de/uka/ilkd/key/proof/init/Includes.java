@@ -3,7 +3,7 @@
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
+// The KeY system is protected by the GNU General Public License.
 // See LICENSE.TXT for details.
 //
 //
@@ -19,13 +19,13 @@ import de.uka.ilkd.key.proof.RuleSource;
 
 
 /**
- * Encapsulates 2 lists (one for LDT-include, one for "normal" includes) 
+ * Encapsulates 2 lists (one for LDT-include, one for "normal" includes)
  * containing the filenames parsed in the include-section of a <code>KeYFile</code>.
  * <code>name2Source</code> maps the entries of both lists to the corresponding
  * RuleSources.
- */ 
+ */
 public class Includes{
-    
+
     /** a list containing the "normal" includes, represented as Strings */
     private final List<String> includes;
     /** a list containing the LDT includes, represented as Strings */
@@ -38,7 +38,7 @@ public class Includes{
 	ldtIncludes = new LinkedList<String>();
 	name2Source = new LinkedHashMap<String, RuleSource>();
     }
-    
+
     private void put(String name, RuleSource source, List<String> list){
 	if(!list.contains(name)){
 	    list.add(name);
@@ -51,12 +51,12 @@ public class Includes{
 	put(name, source, includes);
     }
 
-    /** adds a LDT include.*/    
+    /** adds a LDT include.*/
     public void putLDT(String name, RuleSource source){
 	put(name, source, ldtIncludes);
-    } 
+    }
 
-    /** returns the corresponding RuleSource to the filename 
+    /** returns the corresponding RuleSource to the filename
      * <code>name</name>
      */
     public RuleSource get(String name){
@@ -70,12 +70,12 @@ public class Includes{
 	name2Source.remove(name);
     }
 
-    /** return the list of non-LDT includes*/ 
+    /** return the list of non-LDT includes*/
     public List<String> getIncludes(){
 	return includes;
     }
 
-    /** return the list of LDT includes*/ 
+    /** return the list of LDT includes*/
     public List<String> getLDTIncludes(){
 	return ldtIncludes;
     }
@@ -83,8 +83,8 @@ public class Includes{
     public boolean isEmpty(){
 	return name2Source.isEmpty();
     }
-    
-    
+
+
     public void putAll(Includes in) {
 	includes.addAll(in.includes);
 	ldtIncludes.addAll(in.ldtIncludes);

@@ -7,8 +7,8 @@
 // See LICENSE.TXT for details.
 package de.uka.ilkd.key.logic;
 
-import de.uka.ilkd.key.logic.op.MapAsListFromQuantifiableVariableToInteger;
-import de.uka.ilkd.key.logic.op.MapFromQuantifiableVariableToInteger;
+import de.uka.ilkd.key.collection.ImmutableMap;
+import de.uka.ilkd.key.collection.DefaultImmutableMap;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 
 public class RenameTable {
@@ -19,7 +19,7 @@ public class RenameTable {
      * local map mapping a QuantifiableVariable object to an abstract name. This map
      * is allowed to hide bound renaming of the parent table.
      */
-    private final MapFromQuantifiableVariableToInteger localRenamingTable;
+    private final ImmutableMap<QuantifiableVariable,Integer> localRenamingTable;
     
     /**
      * the maximal value of an abstract name
@@ -31,7 +31,7 @@ public class RenameTable {
 
 
     public RenameTable(RenameTable parent, 
-                       MapFromQuantifiableVariableToInteger localTable, 
+                       ImmutableMap<QuantifiableVariable,Integer> localTable, 
                        int newMax) {
         this.parent = parent;
         this.localRenamingTable = localTable;
@@ -109,7 +109,7 @@ public class RenameTable {
      */
     public RenameTable extend() {	        
 	return new RenameTable(this, 
-                               MapAsListFromQuantifiableVariableToInteger.EMPTY_MAP, 
+                               DefaultImmutableMap.<QuantifiableVariable,Integer>nilMap(), 
                                createNewAbstractName().intValue());
     }
 
@@ -125,7 +125,7 @@ public class RenameTable {
     private static class EmptyRenameTable extends RenameTable {       	
 
 	private EmptyRenameTable() {
-	    super(null, MapAsListFromQuantifiableVariableToInteger.EMPTY_MAP, 0);
+	    super(null, DefaultImmutableMap.<QuantifiableVariable,Integer>nilMap(), 0);
 	}
 
 	/**

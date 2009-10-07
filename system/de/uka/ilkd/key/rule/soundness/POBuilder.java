@@ -11,16 +11,18 @@
 
 package de.uka.ilkd.key.rule.soundness;
 
+import java.util.Iterator;
+
 import org.apache.log4j.Logger;
 
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.IteratorOfNamed;
+import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.Op;
-import de.uka.ilkd.key.rule.ListOfTacletApp;
-import de.uka.ilkd.key.rule.SLListOfTacletApp;
 import de.uka.ilkd.key.rule.SyntacticalReplaceVisitor;
 import de.uka.ilkd.key.rule.TacletApp;
 
@@ -32,7 +34,7 @@ public class POBuilder {
     private final Namespace            variables;
     private final Services             services;
 
-    private ListOfTacletApp            taclets;
+    private ImmutableList<TacletApp>            taclets;
     private Term                       meaningTerm;
     private Term                       poTerm;
     private int                        numberOfPOParts = 0;
@@ -54,7 +56,7 @@ public class POBuilder {
 	poTerm    = null;
 	functions = new Namespace ();
 	variables = new Namespace ();
-	taclets   = SLListOfTacletApp.EMPTY_LIST;
+	taclets   = ImmutableSLList.<TacletApp>nil();
     }
 
     public void build () {
@@ -69,7 +71,7 @@ public class POBuilder {
     private void buildContext ( SkolemSet p_ss ) {
 	SkolemBuilder       sb = new ContextSkolemBuilder ( p_ss,
 							    getServices () );
-	IteratorOfSkolemSet it = sb.build ();
+	Iterator<SkolemSet> it = sb.build ();
 
 	while ( it.hasNext () ) {
 	    contextFitting = false;
@@ -87,7 +89,7 @@ public class POBuilder {
     private void buildLabels ( SkolemSet p_ss ) {
 	SkolemBuilder       sb =
 	    new LabelSkolemBuilder ( p_ss, getServices () );
-	IteratorOfSkolemSet it = sb.build ();
+	Iterator<SkolemSet> it = sb.build ();
 
 	while ( it.hasNext () )
 	    buildLogicVariables ( it.next () );
@@ -96,7 +98,7 @@ public class POBuilder {
     private void buildLogicVariables ( SkolemSet p_ss ) {
 	SkolemBuilder       sb =
 	    new LogicVariableSkolemBuilder ( p_ss, getServices () );
-	IteratorOfSkolemSet it = sb.build ();
+	Iterator<SkolemSet> it = sb.build ();
 
 	while ( it.hasNext () )
 	    buildPartitioning ( it.next () );
@@ -107,7 +109,7 @@ public class POBuilder {
 
 	SkolemBuilder       sb = new SVPartitioningBuilder
 	    ( p_ss, getRawProgramVariablePrefixes(), getServices () );
-	IteratorOfSkolemSet it = sb.build ();
+	Iterator<SkolemSet> it = sb.build ();
 
 	while ( it.hasNext () )
 	    buildTypeInfos ( it.next () );
@@ -118,7 +120,7 @@ public class POBuilder {
 	    new TypeInfoBuilder ( p_ss,
 				  getRawProgramVariablePrefixes (),
 				  getServices () );
-	IteratorOfSkolemSet it = sb.build ();
+	Iterator<SkolemSet> it = sb.build ();
 
 	while ( it.hasNext () )
 	    buildProgramVariables ( it.next () );
@@ -129,7 +131,7 @@ public class POBuilder {
 	    new ProgramVariableSkolemBuilder ( p_ss,
 					       getRawProgramVariablePrefixes (),
 					       getServices () );
-	IteratorOfSkolemSet it = sb.build ();
+	Iterator<SkolemSet> it = sb.build ();
 
 	while ( it.hasNext () ) {
 	    final SkolemSet ss = it.next (); 
@@ -144,7 +146,7 @@ public class POBuilder {
 					p_ss,
 					getProgramVariablePrefixes (),
 					getServices () );
-	IteratorOfSkolemSet it = sb.build ();	
+	Iterator<SkolemSet> it = sb.build ();	
 
 	while ( it.hasNext () )
 	    buildStatements ( it.next () );
@@ -156,7 +158,7 @@ public class POBuilder {
 					 getProgramVariablePrefixes (),
 					 getJumpStatementPrefixes (),
 					 getServices () );
-	IteratorOfSkolemSet it = sb.build ();
+	Iterator<SkolemSet> it = sb.build ();
 
 	while ( it.hasNext () )
 	    buildExpressions ( it.next () );
@@ -168,7 +170,7 @@ public class POBuilder {
 					  getProgramVariablePrefixes (),
 					  getJumpStatementPrefixes (),
 					  getServices () );
-	IteratorOfSkolemSet it = sb.build ();
+	Iterator<SkolemSet> it = sb.build ();
 
 	while ( it.hasNext () )
 	    addPOPart ( it.next () );
@@ -243,7 +245,7 @@ public class POBuilder {
 	return variables;
     }
 
-    public ListOfTacletApp getTaclets () {
+    public ImmutableList<TacletApp> getTaclets () {
 	return taclets;
     }
 
@@ -283,7 +285,7 @@ public class POBuilder {
     }
     
     private void copyNamespace(Namespace p_source, Namespace p_target) {
-	IteratorOfNamed it = p_source.allElements ().iterator ();
+	Iterator<Named> it = p_source.allElements ().iterator ();
 	while ( it.hasNext () )
 	    p_target.add ( it.next () );
     }

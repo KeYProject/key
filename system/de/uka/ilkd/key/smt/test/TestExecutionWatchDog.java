@@ -22,7 +22,7 @@ public class TestExecutionWatchDog extends TestCase {
 		//System.out.println("waiting");
 		int i = p.waitFor();
 		//System.out.println("Result from waiting: " + i);
-		wasInterrupted = wd.wasInterrupted();
+		wasInterrupted = wd.wasInterruptedByTimeout();
 	    } catch (InterruptedException e) {
 		wasInterrupted = true;
 	    }

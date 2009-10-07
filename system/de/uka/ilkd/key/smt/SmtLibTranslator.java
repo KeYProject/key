@@ -88,8 +88,10 @@ public class SmtLibTranslator extends AbstractSMTTranslator {
     @Override
     protected StringBuffer buildCompleteText(StringBuffer formula,
 	    ArrayList<StringBuffer> assumptions,
+	    ArrayList<ContextualBlock> assumptionBlocks,
 	    ArrayList<ArrayList<StringBuffer>> functions,
 	    ArrayList<ArrayList<StringBuffer>> predicates,
+	    ArrayList<ContextualBlock> predicateBlocks,
 	    ArrayList<StringBuffer> types, SortHierarchy sortHierarchy) {
 	StringBuffer toReturn = new StringBuffer(
 		"( benchmark KeY_translation\n");
@@ -98,8 +100,17 @@ public class SmtLibTranslator extends AbstractSMTTranslator {
 	// sort should be used
 	// no extra sorts needed
 
+	String [] commentPredicate = new String[2];
+	commentPredicate[ContextualBlock.PREDICATE_FORMULA] = "\n\n:notes \"Predicates used in formula:\"";
+	commentPredicate[ContextualBlock.PREDICATE_TYPE]    = "\n\n:notes \"Types expressed by predicates:\"";
+	String [] commentAssumption = new String[4];
+	commentAssumption[ContextualBlock.ASSUMPTION_DUMMY_IMPLEMENTATION] = "\n\n:notes \"Assumptions for dummy variables:\"";
+	commentAssumption[ContextualBlock.ASSUMPTION_FUNCTION_DEFINTION] = "\n\n:notes \"Assumptions for function definitions:\""; 
+	commentAssumption[ContextualBlock.ASSUMPTION_SORT_PREDICATES] = "\n\n:notes \"Assumptions for sort predicates:\"";
+	commentAssumption[ContextualBlock.ASSUMPTION_TYPE_HIERARCHY] = "\n\n:notes \"Assumptions for type hierarchy:\"";
+	
 	//add the logic definition
-	toReturn.append("\n :logic AUFLIA");
+	toReturn.append("\n:logic AUFLIA");
 	
 	// add the sort declarations
 	StringBuffer extrasorts = new StringBuffer();	    
@@ -116,21 +127,55 @@ public class SmtLibTranslator extends AbstractSMTTranslator {
 	}
 
 	// add the predicate declarations
-	if (predicates.size() > 0) {
-	    toReturn.append("\n:extrapreds (");
-	    for (ArrayList<StringBuffer> a : predicates) {
-		toReturn.append("(");
-		for (StringBuffer s : a) {
-		    toReturn.append(s);
-		    toReturn.append(" ");
+	// add the predicate declarations for formula predicates
+	ArrayList<ArrayList<StringBuffer>> PredicatesToRemove = new ArrayList<ArrayList<StringBuffer>>();
+	
+	StringBuffer preds = new StringBuffer();
+	
+	for(int k=0; k < commentPredicate.length; k++){
+		ContextualBlock block = predicateBlocks.get(k);
+		
+		
+		if (block.getStart() <= block.getEnd()) {
+		    preds.append(commentPredicate[block.getType()]);
+		    preds.append("\n:extrapreds (");
+		    for (int i = block.getStart(); i <= block.getEnd(); i++) {
+			preds.append("(");
+			PredicatesToRemove.add(predicates.get(i));
+			for (StringBuffer s : predicates.get(i)) {
+			    preds.append(s);
+			    preds.append(" ");
+			}
+			preds.append(") ");
+		    }
+		    preds.append(")");
 		}
-		toReturn.append(") ");
-	    }
-	    toReturn.append(")");
 	}
+
+	
+
+	predicates.removeAll(PredicatesToRemove);
+	
+	// add other predicates
+	if (predicates.size() > 0) {
+	    preds = preds.append("\n\n:notes \"Other predicates\"");
+	    preds.append("\n:extrapreds (");
+	    for (ArrayList<StringBuffer> a : predicates) {
+		preds.append("(");
+		for (StringBuffer s : a) {
+		    preds.append(s);
+		    preds.append(" ");
+		}
+		preds.append(") ");
+	    }
+	    preds.append(")");
+	}
+	
+	toReturn.append(preds);
 	
 	// add the function declarations
 	if (functions.size() > 0) {
+	    toReturn.append("\n\n:notes \"Function declarations\""); 
 	    toReturn.append("\n:extrafuns (");
 	    for (ArrayList<StringBuffer> a : functions) {
 		toReturn.append("(");
@@ -143,11 +188,42 @@ public class SmtLibTranslator extends AbstractSMTTranslator {
 	    toReturn.append(")");
 	}
 	    
-	for (StringBuffer s : assumptions) {
-	    toReturn.append("\n:assumption ").append(s);
+	//add the assumptions
+	ArrayList<StringBuffer> AssumptionsToRemove = new ArrayList<StringBuffer>();
+	    StringBuffer assump = new StringBuffer();	
+	
+	for(int k=0; k < commentAssumption.length; k++){
+	    ContextualBlock block = assumptionBlocks.get(k);
+	
+	    if (block.getStart() <= block.getEnd()) {
+		assump.append(commentAssumption[block.getType()]);
+	    	    for(int i=block.getStart(); i <= block.getEnd(); i++){
+	    		AssumptionsToRemove.add(assumptions.get(i));   
+	    		assump.append("\n:assumption ").append(assumptions.get(i)); 
+	    	    }
+		}  
+	}
+	    
+	
+
+	
+	
+	
+	assumptions.removeAll(AssumptionsToRemove);
+	
+	
+	
+	if (assumptions.size() > 0) {
+	    assump.append("\n\n:notes \"Other assumptions:\"");    
+	    for (StringBuffer s : assumptions) {
+		assump.append("\n:assumption ").append(s);
+	    }
 	}
 	
+	toReturn.append(assump);
+	
 	// add the formula
+	toReturn.append("\n\n:notes \"The formula to proof:\""); 
 	formula = this.translateLogicalNot(formula);
 	toReturn.append("\n:formula ").append(formula).append("\n");
 
@@ -177,7 +253,7 @@ public class SmtLibTranslator extends AbstractSMTTranslator {
 
     @Override
     protected boolean isMultiSorted() {
-	return false;
+	return true;
     }
 
     @Override
@@ -460,7 +536,7 @@ public class SmtLibTranslator extends AbstractSMTTranslator {
     }
 
     private StringBuffer removeIllegalChars(StringBuffer template, ArrayList<String> toReplace, ArrayList<String> replacement) {
-//	replace one String
+	//replace one String
 	for (int i = 0; i < toReplace.size(); i++) {
 	    String toRep = toReplace.get(i);
 	    String replace = replacement.get(i);
@@ -477,7 +553,7 @@ public class SmtLibTranslator extends AbstractSMTTranslator {
     private StringBuffer makeUnique(StringBuffer name) {
 	StringBuffer toReturn = new StringBuffer(name);
 	
-//	build the replacement pairs
+	//build the replacement pairs
 	ArrayList<String> toReplace = new ArrayList<String>();
 	ArrayList<String> replacement = new ArrayList<String>();
 	

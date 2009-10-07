@@ -89,6 +89,7 @@ tokens {
 	ISLOCALVARIABLE = "\\isLocalVariable";
 	NOTISLOCALVARIABLE = "\\notIsLocalVariable";
 	ISUPDATED = "\\isUpdated";
+	SAMEHEAPDEPPRED = "\\sameHeapDepPred";
 
 
 	// Quantifiers, binding, substitution
@@ -111,6 +112,7 @@ tokens {
 	INCLUDE="\\include";
 	INCLUDELDTS="\\includeLDTs";
 	CLASSPATH="\\classpath";
+	BOOTCLASSPATH="\\bootclasspath";
 	NODEFAULTCLASSES="\\noDefaultClasses";
 	JAVASOURCE="\\javaSource";
         NOJAVAMODEL ="\\noJavaModel";

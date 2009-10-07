@@ -11,10 +11,10 @@
 
 package de.uka.ilkd.key.rule.soundness;
 
-import de.uka.ilkd.key.java.abstraction.ArrayOfKeYJavaType;
+import de.uka.ilkd.key.collection.ImmutableArray;
+import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.op.NonRigidFunction;
-import de.uka.ilkd.key.logic.sort.ArrayOfSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 
 
@@ -23,36 +23,36 @@ public class SVSkolemFunction extends NonRigidFunction
     implements StateDependingObject {
 
 
-    private ArrayOfKeYJavaType influencingPVTypes;
+    private ImmutableArray<KeYJavaType> influencingPVTypes;
 
 
     public SVSkolemFunction ( Name               name,
 			      Sort               sort,
-			      ArrayOfSort        argSorts,
-			      ArrayOfKeYJavaType influencingPVTypes ) {
+			      ImmutableArray<Sort>        argSorts,
+			      ImmutableArray<KeYJavaType> influencingPVTypes ) {
 	super ( name, sort, effectiveArgs ( argSorts, influencingPVTypes ) );
 	this.influencingPVTypes = influencingPVTypes;
     }    
 
 
-    public ArrayOfKeYJavaType getInfluencingPVTypes () {
+    public ImmutableArray<KeYJavaType> getInfluencingPVTypes () {
 	return influencingPVTypes;
     }
 
 
-    private static ArrayOfSort effectiveArgs
-	( ArrayOfSort        argSorts,
-	  ArrayOfKeYJavaType influencingPVTypes ) {
+    private static ImmutableArray<Sort> effectiveArgs
+	( ImmutableArray<Sort>        argSorts,
+	  ImmutableArray<KeYJavaType> influencingPVTypes ) {
 	Sort[] res = new Sort [ argSorts.size () + influencingPVTypes.size () ];
 
 	int j;
 	for ( j = 0; j != argSorts.size (); ++j )
-	    res[j] = argSorts.getSort ( j );
+	    res[j] = argSorts.get ( j );
 
 	int i;
 	for ( i = 0; i != influencingPVTypes.size (); ++i, ++j )
-	    res[ j ] = influencingPVTypes.getKeYJavaType ( i ).getSort ();
+	    res[ j ] = influencingPVTypes.get ( i ).getSort ();
 
-	return new ArrayOfSort ( res );
+	return new ImmutableArray<Sort> ( res );
     }
 }

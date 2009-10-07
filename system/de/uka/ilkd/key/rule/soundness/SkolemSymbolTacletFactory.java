@@ -11,6 +11,9 @@
 
 package de.uka.ilkd.key.rule.soundness;
 
+import de.uka.ilkd.key.collection.ImmutableArray;
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.JavaBlock;
@@ -29,7 +32,7 @@ import de.uka.ilkd.key.rule.*;
  */
 abstract class SkolemSymbolTacletFactory extends SkolemSymbolFactory {
 
-    private ListOfTacletApp taclets = SLListOfTacletApp.EMPTY_LIST;
+    private ImmutableList<TacletApp> taclets = ImmutableSLList.<TacletApp>nil();
 
     SkolemSymbolTacletFactory(Services p_services) {
         super(p_services);
@@ -38,7 +41,7 @@ abstract class SkolemSymbolTacletFactory extends SkolemSymbolFactory {
     /**
      * @return all created taclets
      */
-    public ListOfTacletApp getTaclets() {
+    public ImmutableList<TacletApp> getTaclets() {
         return taclets;
     }
 
@@ -146,7 +149,7 @@ abstract class SkolemSymbolTacletFactory extends SkolemSymbolFactory {
 
 	RewriteTacletGoalTemplate goal = new RewriteTacletGoalTemplate
 	    ( Sequent.EMPTY_SEQUENT,
-	      SLListOfTaclet.EMPTY_LIST,
+	      ImmutableSLList.<Taclet>nil(),
 	      p_rw );
 	builder.addTacletGoalTemplate ( goal );
 	
@@ -160,7 +163,7 @@ abstract class SkolemSymbolTacletFactory extends SkolemSymbolFactory {
      * Create an array of PVSV which is compatible to the
      * program variable arguments of <code>p</code>
      */
-    protected ArrayOfIProgramVariable
+    protected ImmutableArray<IProgramVariable>
 	createSVsForInfluencingPVs ( ProgramSVProxy p ) {
 
 	int                i   = p.getInfluencingPVs ().size ();
@@ -172,7 +175,7 @@ abstract class SkolemSymbolTacletFactory extends SkolemSymbolFactory {
 				   ProgramSVSort.VARIABLE,
 				   false );
 	
-	return new ArrayOfIProgramVariable ( res );
+	return new ImmutableArray<IProgramVariable> ( res );
     }
 
     protected void addVocabulary(SkolemSymbolFactory p) {

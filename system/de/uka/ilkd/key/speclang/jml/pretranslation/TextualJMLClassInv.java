@@ -17,7 +17,7 @@
 
 package de.uka.ilkd.key.speclang.jml.pretranslation;
 
-import de.uka.ilkd.key.collection.ListOfString;
+import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.speclang.PositionedString;
 
 
@@ -26,7 +26,7 @@ public class TextualJMLClassInv extends TextualJMLConstruct {
     private final PositionedString inv;
     
     
-    public TextualJMLClassInv(ListOfString mods, PositionedString inv) {
+    public TextualJMLClassInv(ImmutableList<String> mods, PositionedString inv) {
         super(mods);
         assert inv != null;
         this.inv = inv;

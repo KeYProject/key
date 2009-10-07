@@ -15,7 +15,9 @@ import java.util.HashMap;
 import java.util.Iterator;
 
 import de.uka.ilkd.key.logic.ldt.AbstractIntegerLDT;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.op.Metavariable;
+import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 
 /** 
  * This class is used to collect all appearing metavariables and logic

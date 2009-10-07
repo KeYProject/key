@@ -16,23 +16,24 @@
  */
 package de.uka.ilkd.key.rule;
 
-import de.uka.ilkd.key.logic.op.IteratorOfSchemaVariable;
+import java.util.Iterator;
+
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.op.SetOfSchemaVariable;
 
 public class TacletPrefix {
 
     /** the prefix of the taclet */
-    private SetOfSchemaVariable prefix;
+    private ImmutableSet<SchemaVariable> prefix;
     /** used by rewrite taclets to mark the context */
     private boolean context;
 
     /** creates the prefix
-     * @param prefix the SetOfSchemaVariable that is the prefix of a termsv or
+     * @param prefix the SetOf<SchemaVariable> that is the prefix of a termsv or
      * formulasv 
      * @param context a boolean marker 
      */
-    public TacletPrefix(SetOfSchemaVariable prefix, boolean context) {
+    public TacletPrefix(ImmutableSet<SchemaVariable> prefix, boolean context) {
 	this.prefix = prefix;
 	this.context = context;
     }
@@ -40,11 +41,11 @@ public class TacletPrefix {
     /** returns the prefix 
      * @return the prefix
      */
-    public SetOfSchemaVariable prefix() {
+    public ImmutableSet<SchemaVariable> prefix() {
 	return prefix;
     }
 
-    public IteratorOfSchemaVariable iterator() {
+    public Iterator<SchemaVariable> iterator() {
 	return prefix().iterator();
     }
     

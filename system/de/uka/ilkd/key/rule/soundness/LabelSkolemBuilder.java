@@ -11,9 +11,10 @@
 
 package de.uka.ilkd.key.rule.soundness;
 
+import java.util.Iterator;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.op.IteratorOfSchemaVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.SortedSchemaVariable;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
@@ -29,8 +30,8 @@ public class LabelSkolemBuilder extends AbstractSkolemBuilder {
 	super ( p_oriSkolemSet, p_services );
     }
     
-    public IteratorOfSkolemSet build () {
-	IteratorOfSchemaVariable it =
+    public Iterator<SkolemSet> build () {
+	Iterator<SchemaVariable> it =
 	    getOriginalSkolemSet ().getMissing ().iterator ();
 	SchemaVariable           sv;
 

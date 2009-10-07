@@ -13,6 +13,10 @@ header {
     package de.uka.ilkd.key.speclang.jml.translation;
 
     import java.io.StringReader;
+ 
+    import java.util.Iterator;
+    
+    import de.uka.ilkd.key.collection.*;
 
     import de.uka.ilkd.key.java.JavaInfo;
     import de.uka.ilkd.key.java.Position;
@@ -60,7 +64,7 @@ options {
     private static Term trueLitTerm;
 
     private ParsableVariable selfVar;
-    private ListOfParsableVariable paramVars;
+    private ImmutableList<ParsableVariable> paramVars;
     private ParsableVariable resultVar;
     private ParsableVariable excVar;
     private Map atPreFunctions;
@@ -81,7 +85,7 @@ options {
 		KeYJavaType specInClass,
 		AxiomCollector ac,
 		ParsableVariable self,
-		ListOfParsableVariable paramVars,
+		ImmutableList<ParsableVariable> paramVars,
 		ParsableVariable result,
 		ParsableVariable exc,
 		/*inout*/ Map /*operator (normal) 
@@ -113,7 +117,7 @@ options {
 	    resolverManager.putIntoTopLocalVariablesNamespace(selfVar);
 	}
 	if (paramVars != null) {
-	    IteratorOfParsableVariable it = paramVars.iterator(); 
+	    Iterator<ParsableVariable> it = paramVars.iterator(); 
 	    while(it.hasNext()) {
 	    resolverManager.putIntoTopLocalVariablesNamespace(it.next());
 	    }
@@ -137,7 +141,7 @@ options {
 		KeYJavaType specInClass,
 		AxiomCollector ac,
 		ParsableVariable self,
-		ListOfParsableVariable paramVars,
+		ImmutableList<ParsableVariable> paramVars,
 		ParsableVariable result,
 		ParsableVariable exc,
 		/*inout*/ Map /*operator (normal) 
@@ -206,7 +210,7 @@ options {
 
     public FormulaWithAxioms parseSignalsOnly() throws SLTranslationException {
 
-	ListOfKeYJavaType signalsonly = null;
+	ImmutableList<KeYJavaType> signalsonly = null;
 	this.currentlyParsing = true;
 
 	try {
@@ -222,7 +226,7 @@ options {
 	// for every ExcType in the list
 	Term result = tb.ff();
 
-	IteratorOfKeYJavaType it = signalsonly.iterator();
+	Iterator<KeYJavaType> it = signalsonly.iterator();
 	while (it.hasNext()) {
 	    KeYJavaType kjt = it.next();
 	    SortDefiningSymbols os = (SortDefiningSymbols)(kjt.getSort());
@@ -238,9 +242,9 @@ options {
     }
 
 
-    public SetOfLocationDescriptor parseAssignable() throws SLTranslationException {
+    public ImmutableSet<LocationDescriptor> parseAssignable() throws SLTranslationException {
 
-	SetOfLocationDescriptor assignableClause = SetAsListOfLocationDescriptor.EMPTY_SET;
+	ImmutableSet<LocationDescriptor> assignableClause = DefaultImmutableSet.<LocationDescriptor>nil();
 
 	this.currentlyParsing = true;
 	try {
@@ -254,9 +258,9 @@ options {
     }
 
 
-    public ListOfLogicVariable parseVariableDeclaration() throws SLTranslationException {
+    public ImmutableList<LogicVariable> parseVariableDeclaration() throws SLTranslationException {
 
-	ListOfLogicVariable result = SLListOfLogicVariable.EMPTY_LIST;
+	ImmutableList<LogicVariable> result = ImmutableSLList.<LogicVariable>nil();
 
 	this.currentlyParsing = true;
 	try {
@@ -314,8 +318,8 @@ options {
 	    newOp = term.op();
 	}
 	
-	final ArrayOfQuantifiableVariable[] vars = 
-		new ArrayOfQuantifiableVariable[term.arity()];
+	final ImmutableArray<QuantifiableVariable>[] vars = 
+		new ImmutableArray[term.arity()];
 	
 	Term[] subTerms = getSubTerms(term);
 	Term[] newSubTerms = new Term[subTerms.length];
@@ -357,13 +361,13 @@ options {
     }
 
 
-    private String createSignatureString(ListOfTerm signature) {
+    private String createSignatureString(ImmutableList<Term> signature) {
 	if (signature == null || signature.isEmpty()) {
 	    return "";
 	}
 	String sigString = "";
 	
-	for(IteratorOfTerm it=signature.iterator(); it.hasNext(); ) {
+	for(Iterator<Term> it=signature.iterator(); it.hasNext(); ) {
 	    sigString += 
 		services.getTypeConverter()
 		    .getKeYJavaType(it.next()).getFullName() + ", ";
@@ -375,7 +379,7 @@ options {
     
     private JMLExpression lookupIdentifier(String lookupName,
 					   JMLExpression receiver,
-					   ListOfTerm callingParameters,
+					   ImmutableList<Term> callingParameters,
 					   Token t)
 				       throws SLTranslationException {
 
@@ -391,11 +395,11 @@ options {
 	    }
 	}
 
-	ListOfSLExpression paramList = null;
+	ImmutableList<SLExpression> paramList = null;
 	SLParameters params = null;
 	if (callingParameters != null) {
-	    paramList = SLListOfSLExpression.EMPTY_LIST;
-	    IteratorOfTerm it = callingParameters.iterator();
+	    paramList = ImmutableSLList.<SLExpression>nil();
+	    Iterator<Term> it = callingParameters.iterator();
 	    while(it.hasNext()) {
 		paramList = paramList.append(new JMLExpression(it.next()));
 	    }
@@ -497,9 +501,9 @@ options {
 //     *
 //     * See minor thesis "A translation from JML to Java DL" by Christian Engel, p. 40
 //     */
-//    private Term buildMaxMinAxiom(boolean maxmin, Function y, ListOfLogicVariable qVars, Term pred, Term body) {
+//    private Term buildMaxMinAxiom(boolean maxmin, Function y, ImmutableList<LogicVariable> qVars, Term pred, Term body) {
 //
-//	Term result = tb.not(tb.ex(qVars.toArray(), pred));
+//	Term result = tb.not(tb.ex(qVars.toArray(new LogicVariable[qVars.size()]), pred));
 //
 //	ProgramVariable n;
 //	String progVarName;
@@ -535,10 +539,10 @@ options {
 //	    t = tb.leq(t,body, services);
 //	}
 //
-//	t = tb.all(qVars.toArray(), tb.imp(pred,t));
+//	t = tb.all(qVars.toArray(new LogicVariable[qVars.size()]), tb.imp(pred,t));
 //	t = tb.and(
 //	    t,
-//	    tb.ex(qVars.toArray(),
+//	    tb.ex(qVars.toArray(new LogicVariable[qVars.size()]),
 //		tb.and(
 //		    pred,
 //		    tb.equals(
@@ -551,8 +555,8 @@ options {
 //  }
     
     
-    private SetOfLocationDescriptor getObjectCreationModSet(KeYJavaType kjt) {
-    	SetOfLocationDescriptor result = SetAsListOfLocationDescriptor.EMPTY_SET;
+    private ImmutableSet<LocationDescriptor> getObjectCreationModSet(KeYJavaType kjt) {
+    	ImmutableSet<LocationDescriptor> result = DefaultImmutableSet.<LocationDescriptor>nil();
     	
     	//collect implicit attributes
     	ProgramVariable nextToCreate 
@@ -619,14 +623,14 @@ options {
 
 	//local instance fields of created objects
 	if(kjt.getJavaType() instanceof ClassDeclaration) {
-		ListOfKeYJavaType kjts = javaInfo.getAllSupertypes(kjt).append(kjt);
-        IteratorOfKeYJavaType kit = kjts.iterator();
+		ImmutableList<KeYJavaType> kjts = javaInfo.getAllSupertypes(kjt).append(kjt);
+        Iterator<KeYJavaType> kit = kjts.iterator();
         while(kit.hasNext()){
             KeYJavaType skjt = kit.next();
             if(skjt.getJavaType() instanceof ClassDeclaration){
                 ClassDeclaration cd = (ClassDeclaration)skjt.getJavaType();
-	            ListOfField fields = javaInfo.getAllFields(cd);
-	            for(IteratorOfField it = fields.iterator(); it.hasNext(); ) {
+	            ImmutableList<Field> fields = javaInfo.getAllFields(cd);
+	            for(Iterator<Field> it = fields.iterator(); it.hasNext(); ) {
                     Field f = it.next();
                     ProgramVariable pv = (ProgramVariable) f.getProgramVariable();
                     if(!pv.isStatic()) {
@@ -685,15 +689,15 @@ top throws SLTranslationException
     ;
     
 
-assignableclause returns [SetOfLocationDescriptor result=SetAsListOfLocationDescriptor.EMPTY_SET] throws SLTranslationException
+assignableclause returns [ImmutableSet<LocationDescriptor> result=DefaultImmutableSet.<LocationDescriptor>nil()] throws SLTranslationException
 :
     result=storereflist
     ;
     
 
-storereflist returns [SetOfLocationDescriptor result=SetAsListOfLocationDescriptor.EMPTY_SET] throws SLTranslationException
+storereflist returns [ImmutableSet<LocationDescriptor> result=DefaultImmutableSet.<LocationDescriptor>nil()] throws SLTranslationException
 {
-    SetOfLocationDescriptor mod = null;
+    ImmutableSet<LocationDescriptor> mod = null;
 }
 :
     mod=storeref { result = result.union(mod); } 
@@ -701,14 +705,14 @@ storereflist returns [SetOfLocationDescriptor result=SetAsListOfLocationDescript
     ;
 
 
-storeref returns [SetOfLocationDescriptor result = SetAsListOfLocationDescriptor.EMPTY_SET] throws SLTranslationException
+storeref returns [ImmutableSet<LocationDescriptor> result = DefaultImmutableSet.<LocationDescriptor>nil()] throws SLTranslationException
 :
 	result=storerefexpression
     |   LPAREN MULT { raiseNotSupported("informal descriptions"); }
     |   result=storerefkeyword
     ;
 
-storerefexpression returns [SetOfLocationDescriptor result = SetAsListOfLocationDescriptor.EMPTY_SET] throws SLTranslationException
+storerefexpression returns [ImmutableSet<LocationDescriptor> result = DefaultImmutableSet.<LocationDescriptor>nil()] throws SLTranslationException
 {
     JMLExpression expr;
     BasicLocationDescriptor ld = null;
@@ -824,7 +828,7 @@ specarrayrefexpr[JMLExpression receiver] returns [BasicLocationDescriptor result
     }
     ;
 
-storerefkeyword returns [SetOfLocationDescriptor result = SetAsListOfLocationDescriptor.EMPTY_SET] throws SLTranslationException
+storerefkeyword returns [ImmutableSet<LocationDescriptor> result = DefaultImmutableSet.<LocationDescriptor>nil()] throws SLTranslationException
 {
     KeYJavaType t = null;
 }
@@ -836,7 +840,7 @@ storerefkeyword returns [SetOfLocationDescriptor result = SetAsListOfLocationDes
 ;
 
 
-signalsonlyclause returns [ListOfKeYJavaType result = SLListOfKeYJavaType.EMPTY_LIST] throws SLTranslationException
+signalsonlyclause returns [ImmutableList<KeYJavaType> result = ImmutableSLList.<KeYJavaType>nil()] throws SLTranslationException
 {
     KeYJavaType t=null;
 }
@@ -901,7 +905,7 @@ specexpression returns [Term result=null] throws SLTranslationException
 	result=expression
     ;
 
-spec_expression_list returns [ListOfTerm result=SLListOfTerm.EMPTY_LIST] throws SLTranslationException
+spec_expression_list returns [ImmutableList<Term> result=ImmutableSLList.<Term>nil()] throws SLTranslationException
 {
     Term t;
 }
@@ -1550,7 +1554,7 @@ primarysuffix[JMLExpression receiver, String fullyQualifiedName] returns [JMLExp
     Term t;
     String lookupName = null;
     
-    ListOfTerm callingParameters = SLListOfTerm.EMPTY_LIST;
+    ImmutableList<Term> callingParameters = ImmutableSLList.<Term>nil();
 }
 :
 {
@@ -1629,13 +1633,13 @@ new_expr throws SLTranslationException
 
 new_suffix throws SLTranslationException
 {
-    ListOfTerm terms;
+    ImmutableList<Term> terms;
 }
 :
 	LPAREN ( terms=expressionlist )? RPAREN 
     ;
 
-expressionlist returns [ListOfTerm result=SLListOfTerm.EMPTY_LIST] throws SLTranslationException
+expressionlist returns [ImmutableList<Term> result=ImmutableSLList.<Term>nil()] throws SLTranslationException
 { 
     Term t;
 }
@@ -1701,7 +1705,7 @@ decimalnumeral returns [Term result=null] throws SLTranslationException
 jmlprimary returns [JMLExpression result=null] throws SLTranslationException
 {
     Term t;
-    ListOfTerm sl;
+    ImmutableList<Term> sl;
     KeYJavaType typ;
 }
 :
@@ -1792,7 +1796,7 @@ jmlprimary returns [JMLExpression result=null] throws SLTranslationException
                 assert atPreFunc != null;
 	    }	    
 	    t = tb.tt();
-        IteratorOfTerm it = sl.iterator();
+        Iterator<Term> it = sl.iterator();
         while(it.hasNext()){
             Term n = it.next();
             Term fn = tb.and(tb.not(tb.equals(n, tb.NULL(services))), tb.equals(tb.func(atPreFunc, n), tb.FALSE(services)));
@@ -1889,7 +1893,7 @@ specquantifiedexpression returns [Term result = null] throws SLTranslationExcept
     Term t = null;
     Term p = tb.tt();
     boolean nullable = false;
-    ListOfLogicVariable declVars = null;
+    ImmutableList<LogicVariable> declVars = null;
 }
 :
 	LPAREN
@@ -1914,7 +1918,7 @@ specquantifiedexpression returns [Term result = null] throws SLTranslationExcept
 	    //add implicit "non-null" guards for reference types, 
 	    //"in-bounds" guards for integer types
 	    Term nullTerm = tb.NULL(services);
-	    for(IteratorOfLogicVariable it = declVars.iterator(); 
+	    for(Iterator<LogicVariable> it = declVars.iterator(); 
 	        it.hasNext(); ) {
 	        LogicVariable lv = it.next();
 	        
@@ -1935,13 +1939,14 @@ specquantifiedexpression returns [Term result = null] throws SLTranslationExcept
 		if (p != null) {
 		    t = tb.imp(p, t);
 		}
-		result = tb.all(declVars.toArray(), t);
+		
+		result = tb.all(declVars.toArray(new LogicVariable[declVars.size()]), t);
 	    }
 	    else if (q.getText().equals("\\exists")) {
 		if (p != null) {
 		    t = tb.and(p, t);
 		}
-		result = tb.ex(declVars.toArray(), t);
+		result = tb.ex(declVars.toArray(new LogicVariable[declVars.size()]), t);
 	    }
 	    else if (q.getText().equals("\\min")) {
 	    	raiseNotSupported("\\min");
@@ -1972,7 +1977,7 @@ specquantifiedexpression returns [Term result = null] throws SLTranslationExcept
                 result = TermFactory.DEFAULT.createBoundedNumericalQuantifierTerm(Op.BSUM, 
                         lowerBound(p, lv), upperBound(p, lv), tb.ife(
                                 t, tb.zTerm(services, "1"), tb.zTerm(services, "0")),
-                                new ArrayOfQuantifiableVariable(lv));                          
+                                new ImmutableArray<QuantifiableVariable>(lv));                          
             }else{
                 raiseError("only \\num_of expressions of form (\\sum int i; l<=i && i<u; t) are permitted");
             }
@@ -1988,7 +1993,7 @@ specquantifiedexpression returns [Term result = null] throws SLTranslationExcept
                     t = tb.ife(p.sub(1), t, tb.zTerm(services, "0"));
                 }
                 result = TermFactory.DEFAULT.createBoundedNumericalQuantifierTerm(Op.BSUM, 
-                        lowerBound(p, lv), upperBound(p, lv), t, new ArrayOfQuantifiableVariable(lv));
+                        lowerBound(p, lv), upperBound(p, lv), t, new ImmutableArray<QuantifiableVariable>(lv));
             }else{
                 raiseError("only \\sum expressions of form (\\sum int i; l<=i && i<u; t) are permitted");
             }
@@ -2004,7 +2009,7 @@ specquantifiedexpression returns [Term result = null] throws SLTranslationExcept
 bsumterm returns [Term t=null] throws SLTranslationException
 {
     Term a=null,b=null; 
-    ListOfLogicVariable decls=null;
+    ImmutableList<LogicVariable> decls=null;
 }:
         LPAREN
         q:BSUM decls=quantifiedvardecls 
@@ -2019,7 +2024,7 @@ bsumterm returns [Term t=null] throws SLTranslationException
         {
             LogicVariable lv = (LogicVariable) decls.head();
             t = TermFactory.DEFAULT.createBoundedNumericalQuantifierTerm(Op.BSUM, 
-                        a, b, t, new ArrayOfQuantifiableVariable(lv));
+                        a, b, t, new ImmutableArray<QuantifiableVariable>(lv));
             resolverManager.popLocalVariablesNamespace();
         }
         RPAREN
@@ -2031,7 +2036,7 @@ exception
         throw ex;
         }   
 
-quantifiedvardecls returns [ListOfLogicVariable vars = SLListOfLogicVariable.EMPTY_LIST] throws SLTranslationException
+quantifiedvardecls returns [ImmutableList<LogicVariable> vars = ImmutableSLList.<LogicVariable>nil()] throws SLTranslationException
 {
     KeYJavaType t = null;
     LogicVariable v = null;

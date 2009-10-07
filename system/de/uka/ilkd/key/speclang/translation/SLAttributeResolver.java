@@ -10,8 +10,13 @@ package de.uka.ilkd.key.speclang.translation;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
-import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.TermCreationException;
+import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.NonRigidHeapDependentFunction;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
 
 public class SLAttributeResolver extends SLExpressionResolver {
 

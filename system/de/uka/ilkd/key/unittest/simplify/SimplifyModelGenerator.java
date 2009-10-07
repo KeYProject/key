@@ -9,17 +9,16 @@ package de.uka.ilkd.key.unittest.simplify;
 
 import java.io.IOException;
 import java.io.StringReader;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
-import java.util.Vector;
+import java.util.*;
 
-import de.uka.ilkd.key.collection.ListOfString;
-import de.uka.ilkd.key.collection.SLListOfString;
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.ConstrainedFormula;
+import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.parser.simplify.SimplifyLexer;
 import de.uka.ilkd.key.parser.simplify.SimplifyParser;
@@ -55,7 +54,7 @@ public class SimplifyModelGenerator implements DecProdModelGenerator {
     // time
     private HashSet<String> simplifyOutputs;
 
-    private ListOfString placeHoldersForClasses = SLListOfString.EMPTY_LIST;
+    private ImmutableList<String> placeHoldersForClasses = ImmutableSLList.<String>nil();
 
     private SMTSolver simplify = new SimplifySolver();
 
@@ -73,7 +72,7 @@ public class SimplifyModelGenerator implements DecProdModelGenerator {
     }
 
     public SimplifyModelGenerator(Node node, Services serv,
-	    HashMap<Term, EquivalenceClass> term2class, SetOfTerm locations) {
+	    HashMap<Term, EquivalenceClass> term2class, ImmutableSet<Term> locations) {
 
 	this.serv = serv;
 	this.term2class = term2class;
@@ -98,7 +97,7 @@ public class SimplifyModelGenerator implements DecProdModelGenerator {
 	initialCounterExample = res.text();
 	this.simplifyOutputs = new HashSet<String>();
 	string2class = new HashMap<String, EquivalenceClass>();
-	IteratorOfTerm it = locations.iterator();
+	Iterator<Term> it = locations.iterator();
 
 	SMTTranslator st = simplify.getTranslator(serv);
 

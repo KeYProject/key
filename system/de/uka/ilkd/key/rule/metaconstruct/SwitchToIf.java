@@ -10,6 +10,7 @@
 
 package de.uka.ilkd.key.rule.metaconstruct;
 
+import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
@@ -77,7 +78,7 @@ public class SwitchToIf extends ProgramMetaConstruct {
 	    (new TypeRef(sw.getExpression().
 			 getKeYJavaType(services, ec)),
 	     exVSpec);
-	result = new StatementBlock(new ArrayOfStatement(s));
+	result = new StatementBlock(new ImmutableArray<Statement>(s));
 	result = 
 	    insertStatementInBlock(result,
 				   new Statement[]{new CopyAssignment(exV,
@@ -154,7 +155,7 @@ public class SwitchToIf extends ProgramMetaConstruct {
 	for (int i = 0; i < stmnt.length; i++) {
 	    block[i+b.getStatementCount()] = stmnt[i];
 	}
-	return new StatementBlock(new ArrayOfStatement(block));	
+	return new StatementBlock(new ImmutableArray<Statement>(block));	
     }
 
     /**
@@ -183,10 +184,10 @@ public class SwitchToIf extends ProgramMetaConstruct {
 	    if(p instanceof Case) return new Case(((Case)p).getExpression(),s);
 	    if(p instanceof Default) return new Default(s);
 	    if(p instanceof Catch) return new Catch(((Catch)p).getParameterDeclaration(),
-						    new StatementBlock(new ArrayOfStatement(s)));
-	    if(p instanceof Finally) return new Finally(new StatementBlock(new ArrayOfStatement(s)));
-	    if(p instanceof Then) return new Then(new StatementBlock(new ArrayOfStatement(s)));
-	    if(p instanceof Else) return new Else(new StatementBlock(new ArrayOfStatement(s)));
+						    new StatementBlock(new ImmutableArray<Statement>(s)));
+	    if(p instanceof Finally) return new Finally(new StatementBlock(new ImmutableArray<Statement>(s)));
+	    if(p instanceof Then) return new Then(new StatementBlock(new ImmutableArray<Statement>(s)));
+	    if(p instanceof Else) return new Else(new StatementBlock(new ImmutableArray<Statement>(s)));
 	}
 	if(p instanceof If){
 	    return new If(((If)p).getExpression(),(Then)recChangeBreaks(((If)p).getThen(),b),
@@ -197,7 +198,7 @@ public class SwitchToIf extends ProgramMetaConstruct {
 	    for(int i=0; i<((StatementBlock)p).getStatementCount(); i++){
 		s[i]=(Statement)recChangeBreaks(((StatementBlock)p).getStatementAt(i), b);
 	    }
-	    return new StatementBlock(new ArrayOfStatement(s));
+	    return new StatementBlock(new ImmutableArray<Statement>(s));
 	}
 	if(p instanceof Try){
 	    int n=((Try) p).getBranchCount();
@@ -230,7 +231,7 @@ public class SwitchToIf extends ProgramMetaConstruct {
 		k++;
 	    }
 	}
-	return new StatementBlock(new ArrayOfStatement(stats));
+	return new StatementBlock(new ImmutableArray<Statement>(stats));
     }
 
 

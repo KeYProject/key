@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.java.statement;
 
+import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.util.ExtList;
@@ -20,9 +21,9 @@ import de.uka.ilkd.key.util.ExtList;
 public class ForUpdates extends JavaNonTerminalProgramElement
     implements ExpressionContainer, IForUpdates{
 
-    ArrayOfExpression updates;
+    ImmutableArray<Expression> updates;
 
-    public ForUpdates(ArrayOfExpression exprarr) {
+    public ForUpdates(ImmutableArray<Expression> exprarr) {
 	updates = exprarr;
     }
 
@@ -32,7 +33,7 @@ public class ForUpdates extends JavaNonTerminalProgramElement
 	for (int i = 0; i < exps.length; i++) {
 	    exps[i] = (Expression)ups.get(i);
 	}
-	updates = new ArrayOfExpression(exps);
+	updates = new ImmutableArray<Expression>(exps);
     }
     
 
@@ -53,14 +54,14 @@ public class ForUpdates extends JavaNonTerminalProgramElement
       of bounds.
     */
     public Expression getExpressionAt(int index) {
-	return updates.getExpression(index);
+	return updates.get(index);
     }
 
     public int size() {
 	return getExpressionCount();
     }
 
-    public ArrayOfExpression getUpdates() {
+    public ImmutableArray<Expression> getUpdates() {
 	return updates;
     }
     

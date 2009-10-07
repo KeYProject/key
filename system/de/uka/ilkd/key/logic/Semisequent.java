@@ -10,6 +10,11 @@
 
 package de.uka.ilkd.key.logic;
 
+import java.util.Iterator;
+
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
+
 
 /** 
  * This class represents the succedent or antecendent part of a
@@ -23,17 +28,17 @@ public class Semisequent implements Iterable<ConstrainedFormula> {
     /** the empty semisequent (using singleton pattern) */
     public static final Semisequent EMPTY_SEMISEQUENT = new Empty();
     /** list with the Constraintformulae of the Semisequent */
-    private final ListOfConstrainedFormula seqList; 
+    private final ImmutableList<ConstrainedFormula> seqList; 
  
     /** used by inner class Empty*/
     private Semisequent() {
-        seqList = SLListOfConstrainedFormula.EMPTY_LIST; 
+        seqList = ImmutableSLList.<ConstrainedFormula>nil(); 
     }
 
 
     /** creates a new Semisequent with the Semisequent elements in
      * seqList */ 
-    private Semisequent(ListOfConstrainedFormula seqList) {
+    private Semisequent(ImmutableList<ConstrainedFormula> seqList) {
         assert !seqList.isEmpty();
         this.seqList = seqList;
     }
@@ -54,12 +59,12 @@ public class Semisequent implements Iterable<ConstrainedFormula> {
     /** inserts the elements of the list at the specified index
      * performing redundancy checks
      * @param idx int encoding the place where the insertion starts
-     * @param insertionList ListOfConstrainedFormula to be inserted
+     * @param insertionList IList<ConstrainedFormula> to be inserted
      * starting at idx
      * @return a semi sequent change information object with the new semisequent
      * and information which formulas have been added or removed
      */    
-    public SemisequentChangeInfo insert(int idx, ListOfConstrainedFormula insertionList) {	
+    public SemisequentChangeInfo insert(int idx, ImmutableList<ConstrainedFormula> insertionList) {	
 	return removeRedundance(idx, insertionList);
     }
 
@@ -78,11 +83,11 @@ public class Semisequent implements Iterable<ConstrainedFormula> {
      * inserts element at index 0 performing redundancy
      * checks, this may result in returning same semisequent if
      * inserting would create redundancies 
-     * @param insertions ListOfConstrainedFormula to be inserted
+     * @param insertions IList<ConstrainedFormula> to be inserted
      * @return a semi sequent change information object with the new semisequent
      * and information which formulas have been added or removed
      */
-    public SemisequentChangeInfo insertFirst(ListOfConstrainedFormula insertions) {
+    public SemisequentChangeInfo insertFirst(ImmutableList<ConstrainedFormula> insertions) {
 	return insert(0, insertions);
     }
     
@@ -101,11 +106,11 @@ public class Semisequent implements Iterable<ConstrainedFormula> {
      * inserts the formulas of the list at the end of the semisequent
      * performing redundancy checks, this may result in returning same 
      * semisequent if inserting would create redundancies 
-     * @param insertions the ListOfConstrainedFormula to be inserted
+     * @param insertions the IList<ConstrainedFormula> to be inserted
      * @return a semi sequent change information object with the new semisequent
      * and information which formulas have been added or removed
      */	
-    public SemisequentChangeInfo insertLast(ListOfConstrainedFormula insertions) {
+    public SemisequentChangeInfo insertLast(ImmutableList<ConstrainedFormula> insertions) {
 	return insert(size(), insertions);
     }
 
@@ -146,8 +151,8 @@ public class Semisequent implements Iterable<ConstrainedFormula> {
 						       FormulaChangeInfo fci) {
 
 	// Search for equivalent formulas and weakest constraint
-	ListOfConstrainedFormula searchList = semiCI.getFormulaList();
-	ListOfConstrainedFormula newSeqList = SLListOfConstrainedFormula.EMPTY_LIST;
+	ImmutableList<ConstrainedFormula> searchList = semiCI.getFormulaList();
+	ImmutableList<ConstrainedFormula> newSeqList = ImmutableSLList.<ConstrainedFormula>nil();
 	ConstrainedFormula       cf;
 	Constraint               c;
 	int                      pos        = -1;
@@ -210,18 +215,18 @@ public class Semisequent implements Iterable<ConstrainedFormula> {
     /** .
      * inserts new ConstrainedFormulas starting at index idx and removes
      * duplicates, perform simplifications etc.
-     * @param conForm the ListOfConstrainedFormula to be inserted at position idx
+     * @param conForm the IList<ConstrainedFormula> to be inserted at position idx
      * @param idx an int that means insert conForm at the idx-th
      * position in the semisequent 
      * @return a semi sequent change information object with the new semisequent
      * and information which formulas have been added or removed
      */
     private SemisequentChangeInfo removeRedundance
-	(int idx, ListOfConstrainedFormula conForm, SemisequentChangeInfo sci) {
+	(int idx, ImmutableList<ConstrainedFormula> conForm, SemisequentChangeInfo sci) {
 
 	int pos = idx;	
-	ListOfConstrainedFormula oldFormulas = sci.getFormulaList();
-	final IteratorOfConstrainedFormula it = conForm.iterator();	
+	ImmutableList<ConstrainedFormula> oldFormulas = sci.getFormulaList();
+	final Iterator<ConstrainedFormula> it = conForm.iterator();	
 
 	while (it.hasNext()) {	   
 	    sci = removeRedundanceHelp(pos, it.next(), sci);
@@ -238,14 +243,14 @@ public class Semisequent implements Iterable<ConstrainedFormula> {
     /** .
      * inserts new ConstrainedFormulas starting at index idx and removes
      * duplicates, perform simplifications etc.
-     * @param conForm the ListOfConstrainedFormula to be inserted at position idx
+     * @param conForm the IList<ConstrainedFormula> to be inserted at position idx
      * @param idx an int that means insert conForm at the idx-th
      * position in the semisequent 
      * @return a semi sequent change information object with the new semisequent
      * and information which formulas have been added or removed
      */
     private SemisequentChangeInfo removeRedundance
-	(int idx, ListOfConstrainedFormula conForm) {
+	(int idx, ImmutableList<ConstrainedFormula> conForm) {
 	return removeRedundance(idx, conForm, new SemisequentChangeInfo(seqList));
     }
 
@@ -302,19 +307,19 @@ public class Semisequent implements Iterable<ConstrainedFormula> {
      * given list and adds the rest of the list to the semisequent
      * behind the replaced formula
      * @param pos the formula to be replaced
-     * @param replacements the ListOfConstrainedFormula whose head
+     * @param replacements the IList<ConstrainedFormula> whose head
      * replaces the element at index idx and the tail is added to the
      * semisequent 
      * @return a semi sequent change information object with the new semisequent
      * and information which formulas have been added or removed
      */
     public SemisequentChangeInfo replace(PosInOccurrence pos,
-					 ListOfConstrainedFormula replacements) {	
+					 ImmutableList<ConstrainedFormula> replacements) {	
 	final int idx = indexOf(pos.constrainedFormula());
 	return removeRedundance(idx, replacements, remove(idx));
     }
 
-    public SemisequentChangeInfo replace(int idx, ListOfConstrainedFormula replacements) {	
+    public SemisequentChangeInfo replace(int idx, ImmutableList<ConstrainedFormula> replacements) {	
 	return removeRedundance(idx, replacements, remove(idx));
     }
 
@@ -330,7 +335,7 @@ public class Semisequent implements Iterable<ConstrainedFormula> {
     protected SemisequentChangeInfo complete(SemisequentChangeInfo semiCI)
     {
         
-      final ListOfConstrainedFormula formulaList = semiCI.getFormulaList();
+      final ImmutableList<ConstrainedFormula> formulaList = semiCI.getFormulaList();
       if (formulaList.isEmpty()) {
           semiCI.setSemisequent(EMPTY_SEMISEQUENT);
       } else {
@@ -351,9 +356,9 @@ public class Semisequent implements Iterable<ConstrainedFormula> {
      */
     public SemisequentChangeInfo remove(int idx) {	       
 
-	ListOfConstrainedFormula newList = seqList;  
-	ListOfConstrainedFormula queue =
-	    SLListOfConstrainedFormula.EMPTY_LIST;  
+	ImmutableList<ConstrainedFormula> newList = seqList;  
+	ImmutableList<ConstrainedFormula> queue =
+	    ImmutableSLList.<ConstrainedFormula>nil();  
 	int index = 0;
 	
 	if (idx<0 || idx>=size()) {
@@ -394,7 +399,7 @@ public class Semisequent implements Iterable<ConstrainedFormula> {
      * @return index of conForm (-1 if not found)
      */
     public int indexOf(ConstrainedFormula conForm) {
-	ListOfConstrainedFormula searchList = seqList;  
+	ImmutableList<ConstrainedFormula> searchList = seqList;  
 	int index=0;
 	while (!searchList.isEmpty())
 	    { 
@@ -451,11 +456,11 @@ public class Semisequent implements Iterable<ConstrainedFormula> {
      * returns iterator about the elements of the sequent     
      * @return IteratorOfConstrainedFormula
      */
-    public IteratorOfConstrainedFormula iterator() {
+    public Iterator<ConstrainedFormula> iterator() {
 	return seqList.iterator();
     }
 
-    public ListOfConstrainedFormula toList () {
+    public ImmutableList<ConstrainedFormula> toList () {
 	return seqList;
     }
 
@@ -503,7 +508,7 @@ public class Semisequent implements Iterable<ConstrainedFormula> {
 	 */
 	public SemisequentChangeInfo insertFirst(ConstrainedFormula conForm) {
 	  final SemisequentChangeInfo sci = new SemisequentChangeInfo
-	  (SLListOfConstrainedFormula.EMPTY_LIST.prepend(conForm));
+	  (ImmutableSLList.<ConstrainedFormula>nil().prepend(conForm));
 	  sci.addedFormula(0, conForm);
 	  return complete(sci);
 	}
@@ -550,7 +555,7 @@ public class Semisequent implements Iterable<ConstrainedFormula> {
 	 * semisequent as result
 	 */
 	public SemisequentChangeInfo remove(int idx) {
-	  return complete(new SemisequentChangeInfo(SLListOfConstrainedFormula.EMPTY_LIST));
+	  return complete(new SemisequentChangeInfo(ImmutableSLList.<ConstrainedFormula>nil()));
 	}
 
 	/** returns index of a ConstrainedFormula 

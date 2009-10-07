@@ -12,8 +12,10 @@
 package de.uka.ilkd.key.strategy.feature.instantiator;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.Stack;
 
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.rule.RuleApp;
 
 
@@ -41,7 +43,7 @@ public class BackTrackingManager {
      * <code>ChoicePoint</code>s that have not yet been taken, the branches
      * of later points being further up in the stack
      */
-    private final Stack<IteratorOfCPBranch> choices = new Stack<IteratorOfCPBranch> ();
+    private final Stack<Iterator<CPBranch>> choices = new Stack<Iterator<CPBranch>> ();
     
     /**
      * List of <code>CPBranch</code>: the branches that are taken in the
@@ -119,7 +121,7 @@ public class BackTrackingManager {
         position = 0;
 
         while ( !choices.isEmpty () ) {
-            final IteratorOfCPBranch chs = (IteratorOfCPBranch)choices.pop ();
+            final Iterator<CPBranch> chs = (Iterator<CPBranch>)choices.pop ();
             chosenBranches.remove ( chosenBranches.size () - 1 );
 
             if ( chs.hasNext () ) {
@@ -145,7 +147,7 @@ public class BackTrackingManager {
         return getOldRuleApp ();
     }
 
-    private void pushChoices(IteratorOfCPBranch remainingChoices,
+    private void pushChoices(Iterator<CPBranch> remainingChoices,
                              CPBranch chosen) {
         choices.push ( remainingChoices );
         chosenBranches.add ( chosen );
@@ -163,7 +165,7 @@ public class BackTrackingManager {
             return;
         }
 
-        final IteratorOfCPBranch chs = cp.getBranches ( oldApp );
+        final Iterator<CPBranch> chs = cp.getBranches ( oldApp );
         if ( !chs.hasNext () ) {
             // This <code>ChoicePoint</code> does not have any branches
             cancelChoicePoint ();
@@ -176,7 +178,7 @@ public class BackTrackingManager {
     }
 
     private void cancelChoicePoint() {
-        pushChoices ( SLListOfCPBranch.EMPTY_LIST.iterator (), null );
+        pushChoices ( ImmutableSLList.<CPBranch>nil().iterator (), null );
     }
 
 

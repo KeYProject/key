@@ -10,7 +10,7 @@
 
 package de.uka.ilkd.key.logic;
 
-import de.uka.ilkd.key.logic.op.ArrayOfQuantifiableVariable;
+import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.QuanUpdateOperator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
@@ -25,12 +25,12 @@ class QuanUpdateTerm extends Term {
     /**
      * contains the subterms of the represented term
      */
-    private final ArrayOfTerm subTerm;
+    private final ImmutableArray<Term> subTerm;
 
     /** depth of the term */
     private final int depth;
 
-    private final ArrayOfQuantifiableVariable[] quanUpdateVars;
+    private final ImmutableArray<QuantifiableVariable>[] quanUpdateVars;
     
     /** 
      * creates a UpdateTerm
@@ -39,11 +39,11 @@ class QuanUpdateTerm extends Term {
      */
     QuanUpdateTerm (QuanUpdateOperator op,
                     Term[] subs,
-                    ArrayOfQuantifiableVariable[] quanUpdateVars) {
+                    ImmutableArray<QuantifiableVariable>[] quanUpdateVars) {
         super ( op, op.sort ( subs ) );
 
         this.quanUpdateVars = quanUpdateVars;
-        this.subTerm = new ArrayOfTerm ( subs );
+        this.subTerm = new ImmutableArray<Term> ( subs );
         
         // move this to <code>QuanUpdateOperator.validTopLevel</code>?
         Debug.assertTrue ( quanUpdateVars.length == op.locationCount () );
@@ -72,7 +72,7 @@ class QuanUpdateTerm extends Term {
 	    if(quanUpdateVars[i].size()>0)
               sb.append ( "\\for " );
 	    if(quanUpdateVars[i].size() == 1) {
-                qvar = quanUpdateVars[i].getQuantifiableVariable(0);
+                qvar = quanUpdateVars[i].get(0);
 		if(qvar instanceof LogicVariable) {
 		  sb.append (((LogicVariable)qvar).sort()+" "+((LogicVariable)qvar).name());
 		}else{
@@ -83,7 +83,7 @@ class QuanUpdateTerm extends Term {
 	      for(int j=0;j<quanUpdateVars[i].size();j++) {
                 if(j==0)
 	          sb.append("(");
-		qvar = quanUpdateVars[i].getQuantifiableVariable(j);
+		qvar = quanUpdateVars[i].get(j);
 		if(qvar instanceof LogicVariable) {
 		  sb.append (((LogicVariable)qvar).sort()+" "+((LogicVariable)qvar).name());
 		}else{
@@ -112,16 +112,16 @@ class QuanUpdateTerm extends Term {
         return sb.toString ();
     }
 
-    private ArrayOfQuantifiableVariable[] boundVarsCache = null;
+    private ImmutableArray<QuantifiableVariable>[] boundVarsCache = null;
     
     /* (non-Javadoc)
      * @see de.uka.ilkd.key.logic.Term#varsBoundHere(int)
      */
-    public ArrayOfQuantifiableVariable varsBoundHere (int n) {
-        if ( n >= arity () - 1 ) return new ArrayOfQuantifiableVariable ();
+    public ImmutableArray<QuantifiableVariable> varsBoundHere (int n) {
+        if ( n >= arity () - 1 ) return new ImmutableArray<QuantifiableVariable> ();
 
         if ( boundVarsCache == null ) {
-            boundVarsCache = new ArrayOfQuantifiableVariable [arity () - 1];
+            boundVarsCache = new ImmutableArray [arity () - 1];
 
             final QuanUpdateOperator thisOp = (QuanUpdateOperator)op ();
             for ( int i = 0; i != thisOp.locationCount (); ++i ) {
@@ -154,6 +154,6 @@ class QuanUpdateTerm extends Term {
      * @see de.uka.ilkd.key.logic.Term#sub(int)
      */
     public Term sub (int nr) {
-        return subTerm.getTerm ( nr );
+        return subTerm.get ( nr );
     }
 }

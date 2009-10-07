@@ -11,15 +11,15 @@
 
 package de.uka.ilkd.key.rule.soundness;
 
+import java.util.Iterator;
+
+import de.uka.ilkd.key.collection.ImmutableArray;
+import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.IteratorOfTerm;
-import de.uka.ilkd.key.logic.ListOfTerm;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.IteratorOfIProgramVariable;
-import de.uka.ilkd.key.logic.op.ListOfIProgramVariable;
+import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.sort.ArrayOfSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.util.ExtList;
 
@@ -34,8 +34,8 @@ public class FunctionSkolemSymbolFactory extends SkolemSymbolFactory {
 
     public Term createFunctionSymbol( Name                   p_name,
 				      Sort                   p_sort,
-				      ListOfTerm             p_logicArgs,
-				      ListOfIProgramVariable p_influencingPVs ) {
+				      ImmutableList<Term>             p_logicArgs,
+				      ImmutableList<IProgramVariable> p_influencingPVs ) {
 	Term[] logicArgs = toArray ( p_logicArgs );
 	Term[] pvArgs    = createPVArgs ( p_influencingPVs );
         
@@ -46,7 +46,7 @@ public class FunctionSkolemSymbolFactory extends SkolemSymbolFactory {
         
         SVSkolemFunction f = new SVSkolemFunction
             ( p_name, p_sort,
-              new ArrayOfSort ( sortsOf(logicArgs) ),
+              new ImmutableArray<Sort> ( sortsOf(logicArgs) ),
               getProgramVariableTypes ( p_influencingPVs ) );
         addFunction ( f );
         
@@ -54,8 +54,8 @@ public class FunctionSkolemSymbolFactory extends SkolemSymbolFactory {
     }
 
     // Very inefficient
-    private Term[] createPVArgs(ListOfIProgramVariable pvp) {
-        IteratorOfIProgramVariable it  = pvp.iterator ();
+    private Term[] createPVArgs(ImmutableList<IProgramVariable> pvp) {
+        Iterator<IProgramVariable> it  = pvp.iterator ();
 	ExtList                    res = new ExtList ();
 
 	while ( it.hasNext () )
@@ -66,8 +66,8 @@ public class FunctionSkolemSymbolFactory extends SkolemSymbolFactory {
     }
 
     // Very inefficient
-    private Term[] toArray(ListOfTerm p_list) {
-        IteratorOfTerm it  = p_list.iterator ();
+    private Term[] toArray(ImmutableList<Term> p_list) {
+        Iterator<Term> it  = p_list.iterator ();
 	ExtList        res = new ExtList ();
 
 	while ( it.hasNext () )

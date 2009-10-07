@@ -69,20 +69,18 @@ public class EnumClassDeclaration extends ClassDeclaration {
      * This will never happen.
      * 
      */
-    private IProgramVariable findAttr(String name) {
-        String completeName = getName() + "::" + name;
+    private IProgramVariable findAttr(String fieldName) {
+        String completeName = getName() + "::" + fieldName;
         for (int i = 0; i < members.size(); i++) {
-            if (members.getMemberDeclaration(i) instanceof FieldDeclaration) {
-                FieldDeclaration fd = (FieldDeclaration) members
-                        .getMemberDeclaration(i);
-                FieldSpecification fs = fd.getFieldSpecifications()
-                        .getFieldSpecification(0);
+            if (members.get(i) instanceof FieldDeclaration) {
+                FieldDeclaration fd = (FieldDeclaration) members.get(i);
+                FieldSpecification fs = fd.getFieldSpecifications().get(0);
                 if (fs.getName().equals(completeName)) {
                     return fs.getProgramVariable();
                 }
             }
         }
-        throw new IllegalStateException(name + " is not an attribute of "
+        throw new IllegalStateException(fieldName + " is not an attribute of "
                 + this.getName());
     }
 

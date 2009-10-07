@@ -17,8 +17,12 @@ package de.uka.ilkd.key.rule.export.html;
 
 import java.io.IOException;
 import java.io.Writer;
+import java.util.Iterator;
 
-import de.uka.ilkd.key.rule.export.*;
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.rule.export.RuleExportModel;
+import de.uka.ilkd.key.rule.export.TacletModelInfo;
 
 
 
@@ -58,16 +62,16 @@ public class HTMLFileByRuleName extends HTMLFile {
     public void init(RuleExportModel model) {
         super.init(model);
         
-        final IteratorOfTacletModelInfo it = model.taclets();
+        final Iterator<TacletModelInfo> it = model.taclets();
         int n = 0;
-        ListOfTacletModelInfo list = SLListOfTacletModelInfo.EMPTY_LIST;
+        ImmutableList<TacletModelInfo> list = ImmutableSLList.<TacletModelInfo>nil();
         while ( it.hasNext () ) {
             final TacletModelInfo t = it.next ();
             list = list.append( t );
             n++;
             if ( n % TACLETS_PER_FILE == 0 ) {
                 HTMLFile file = new HTMLFileTaclet(htmlModel(), this, list, n / TACLETS_PER_FILE);
-                list = SLListOfTacletModelInfo.EMPTY_LIST;
+                list = ImmutableSLList.<TacletModelInfo>nil();
             }
         }
         if ( !list.isEmpty() ) {
@@ -88,7 +92,7 @@ public class HTMLFileByRuleName extends HTMLFile {
         }
         out.append ( "<ol>\n" );
         
-        final IteratorOfTacletModelInfo it = model.taclets();
+        final Iterator<TacletModelInfo> it = model.taclets();
         while ( it.hasNext () ) {
             // TOC entry
             final TacletModelInfo t = it.next ();

@@ -15,11 +15,13 @@
 */
 package de.uka.ilkd.key.rule;
 
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.logic.BoundVarsVisitor;
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.op.SetAsListOfSchemaVariable;
-import de.uka.ilkd.key.logic.op.SetOfQuantifiableVariable;
-import de.uka.ilkd.key.logic.op.SetOfSchemaVariable;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+import de.uka.ilkd.key.logic.op.SchemaVariable;
 
 public class AntecSuccTacletGoalTemplate extends TacletGoalTemplate{
     /** sequent that replaces another one */
@@ -27,14 +29,14 @@ public class AntecSuccTacletGoalTemplate extends TacletGoalTemplate{
 
     /** creates new Goaldescription 
      *@param addedSeq new Sequent to be added
-     *@param addedRules ListOfTaclet contains the new allowed rules
+     *@param addedRules IList<Taclet> contains the new allowed rules
      * at this branch 
      *@param replacewith the Sequent that replaces another one
      */
     public AntecSuccTacletGoalTemplate(Sequent addedSeq,
-			   ListOfTaclet addedRules,
+			   ImmutableList<Taclet> addedRules,
 			   Sequent replacewith,
-			   SetOfSchemaVariable pvs) {
+			   ImmutableSet<SchemaVariable> pvs) {
 	super(addedSeq, addedRules, pvs);
 	TacletBuilder.checkContainsFreeVarSV(replacewith, 
                 null, "replacewith sequent");
@@ -42,10 +44,10 @@ public class AntecSuccTacletGoalTemplate extends TacletGoalTemplate{
     }
 
     public AntecSuccTacletGoalTemplate(Sequent addedSeq,
-				     ListOfTaclet addedRules,				     
+				     ImmutableList<Taclet> addedRules,				     
 				     Sequent replacewith) {
 	this(addedSeq, addedRules, replacewith,
-	     SetAsListOfSchemaVariable.EMPTY_SET);
+	     DefaultImmutableSet.<SchemaVariable>nil());
     }
 
     /** a Taclet may replace a Sequent by another. The new Sequent is returned.
@@ -61,7 +63,7 @@ public class AntecSuccTacletGoalTemplate extends TacletGoalTemplate{
      * goal template
      * @return all variables that occur bound in this goal template
      */
-    protected SetOfQuantifiableVariable getBoundVariables() {
+    protected ImmutableSet<QuantifiableVariable> getBoundVariables() {
         final BoundVarsVisitor bvv = new BoundVarsVisitor();
         bvv.visit(replaceWith());
         return bvv.getBoundVariables().union(super.getBoundVariables());

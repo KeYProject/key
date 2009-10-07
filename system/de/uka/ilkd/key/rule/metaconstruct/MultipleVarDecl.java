@@ -10,8 +10,15 @@
 
 package de.uka.ilkd.key.rule.metaconstruct;
 
-import de.uka.ilkd.key.java.*;
-import de.uka.ilkd.key.java.declaration.*;
+import de.uka.ilkd.key.collection.ImmutableArray;
+import de.uka.ilkd.key.java.ProgramElement;
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.Statement;
+import de.uka.ilkd.key.java.StatementBlock;
+import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
+import de.uka.ilkd.key.java.declaration.Modifier;
+import de.uka.ilkd.key.java.declaration.VariableDeclaration;
+import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.op.ProgramSV;
@@ -38,22 +45,22 @@ public class MultipleVarDecl extends ProgramMetaConstruct {
 					    Services services,
 					    SVInstantiations svInst) {
 	VariableDeclaration vardecl = (VariableDeclaration)pe;
-	ArrayOfModifier modifiers = vardecl.getModifiers();
+	ImmutableArray<Modifier> modifiers = vardecl.getModifiers();
 	TypeReference tref = vardecl.getTypeReference();
-	ArrayOfVariableSpecification variables = vardecl.getVariables();
-	VariableSpecification headVar = variables.getVariableSpecification(0);
+	ImmutableArray<? extends VariableSpecification> variables = vardecl.getVariables();
+	VariableSpecification headVar = variables.get(0);
 	VariableSpecification[] tailVars = new 
 	    VariableSpecification[variables.size()-1];
 
 	for (int i=0; i<variables.size()-1; i++)
-	    tailVars[i] = variables.getVariableSpecification(i+1);
+	    tailVars[i] = variables.get(i+1);
 
 	if (pe instanceof LocalVariableDeclaration) {	    	    
 	    LocalVariableDeclaration newVarDecl = 
 		new LocalVariableDeclaration(modifiers, tref, headVar);
 	    LocalVariableDeclaration newVarDeclList =
 		new LocalVariableDeclaration(modifiers, tref, tailVars);
-	    return new StatementBlock(new ArrayOfStatement
+	    return new StatementBlock(new ImmutableArray<Statement>
 		(new Statement[]{newVarDecl, newVarDeclList}));
 	} 
 	throw new RuntimeException("Meta-construct MultipleVarDecl could "+

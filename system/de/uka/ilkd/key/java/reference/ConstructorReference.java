@@ -11,7 +11,8 @@
 
 package de.uka.ilkd.key.java.reference;
 
-import de.uka.ilkd.key.java.ArrayOfExpression;
+import de.uka.ilkd.key.collection.ImmutableArray;
+import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.Statement;
 
 /**
@@ -25,6 +26,6 @@ public interface ConstructorReference extends MemberReference, Statement {
      *      Get arguments.
      *      @return the array wrapper of the argument expressions .
      */
-    ArrayOfExpression getArguments();
+    ImmutableArray<Expression> getArguments();
 
 }

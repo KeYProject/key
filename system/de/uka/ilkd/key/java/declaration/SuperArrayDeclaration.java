@@ -10,9 +10,10 @@
 
 package de.uka.ilkd.key.java.declaration;
 
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.abstraction.ListOfKeYJavaType;
-import de.uka.ilkd.key.java.abstraction.SLListOfKeYJavaType;
+import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.ProgramElementName;
 
@@ -52,8 +53,8 @@ public class SuperArrayDeclaration extends TypeDeclaration{
     /** 
      * returns the local declared supertypes
      */
-    public ListOfKeYJavaType getSupertypes() {
-	return SLListOfKeYJavaType.EMPTY_LIST;
+    public ImmutableList<KeYJavaType> getSupertypes() {
+	return ImmutableSLList.<KeYJavaType>nil();
     }
 
 

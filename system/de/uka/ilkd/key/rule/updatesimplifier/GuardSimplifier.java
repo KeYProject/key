@@ -10,10 +10,20 @@
 
 package de.uka.ilkd.key.rule.updatesimplifier;
 
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+
+import de.uka.ilkd.key.collection.ImmutableArray;
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.WaryClashFreeSubst;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.op.Junctor;
+import de.uka.ilkd.key.logic.op.Op;
+import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 
 
 /**
@@ -23,16 +33,16 @@ public abstract class GuardSimplifier {
 
     private Term condition;
 
-    private ListOfQuantifiableVariable minimizedVars;
+    private ImmutableArray<QuantifiableVariable> minimizedVars;
 
     public GuardSimplifier (Term condition,
-                            ArrayOfQuantifiableVariable arMinimizedVars) {
+                            ImmutableArray<QuantifiableVariable> arMinimizedVars) {
         this.condition = condition;
-        this.minimizedVars = toList ( arMinimizedVars );
+        this.minimizedVars = arMinimizedVars;
     }
 
     public boolean bindsVariables () {
-        return !getMinimizedVars().isEmpty ();
+        return getMinimizedVars().size() > 0;
     }
 
     public boolean isValidGuard () {
@@ -54,7 +64,7 @@ public abstract class GuardSimplifier {
      * @return variables that are supposed to represent minimum individuals for
      *         which the guard is satisfied
      */
-    protected ListOfQuantifiableVariable getMinimizedVars () {
+    protected ImmutableArray<QuantifiableVariable> getMinimizedVars () {
         return minimizedVars;
     }
 
@@ -71,7 +81,7 @@ public abstract class GuardSimplifier {
      * end of constructors of subclasses
      */
     protected void simplify () {
-        while ( !getMinimizedVars().isEmpty () ) {
+        while ( getMinimizedVars().size() > 0 ) {
             final PairOfQuantifiableVariableAndTerm definingPair =
                 findSimpleEquation ( getCondition() );
             if ( definingPair == null ) break;
@@ -89,18 +99,24 @@ public abstract class GuardSimplifier {
      * supposed to select certain elements of <code>allVars</code> without
      * changing their order
      */
-    private ListOfQuantifiableVariable neededVars (ListOfQuantifiableVariable allVars) {
-        ListOfQuantifiableVariable needed = SLListOfQuantifiableVariable.EMPTY_LIST;
+    private ImmutableArray<QuantifiableVariable> neededVars (ImmutableArray<QuantifiableVariable> allVars) {
+        final LinkedList<QuantifiableVariable> needed = new LinkedList<QuantifiableVariable>();
         
-        ListOfQuantifiableVariable innerVars = allVars;
-        while ( !innerVars.isEmpty () ) {
-            final QuantifiableVariable var = innerVars.head ();
-            innerVars = innerVars.tail ();
+        HashSet<QuantifiableVariable> alreadySeen = new HashSet<QuantifiableVariable>();
+        
+        for (final QuantifiableVariable var : allVars) {
             // order is important
-            if ( !innerVars.contains ( var ) && isNeededVarTempl ( var ) )
-                needed = needed.append ( var );
+            if ( !alreadySeen.contains ( var ) && isNeededVarTempl ( var ) )
+                needed.add ( var );
+            // mark as seen
+            alreadySeen.add(var);
         }
-        return needed;
+        
+        if (needed.size() == allVars.size()) {
+            return allVars;
+        }
+        
+        return new ImmutableArray<QuantifiableVariable>(needed);
     }
 
     /**
@@ -145,6 +161,8 @@ public abstract class GuardSimplifier {
         return formula;
     }
 
+    
+    
     /**
      * Template method to substitute <code>var</code> with
      * <code>substTerm</code> (called from <code>simplify()</code>)
@@ -152,7 +170,19 @@ public abstract class GuardSimplifier {
      * filled by subclasses
      */
     private void substituteTempl (QuantifiableVariable var, Term substTerm) {
-        this.minimizedVars = getMinimizedVars().removeAll ( var );
+	
+	final ImmutableArray<QuantifiableVariable> oldVars = getMinimizedVars();
+	
+	final List<QuantifiableVariable> minVars = new LinkedList<QuantifiableVariable>();
+	for (QuantifiableVariable qv : oldVars) {	    
+	    if (!qv.equals(var)) {
+		minVars.add(qv);
+	    }
+	}
+		
+	this.minimizedVars = minVars.size() < oldVars.size() ? 
+		new ImmutableArray<QuantifiableVariable>
+			(minVars.toArray(new QuantifiableVariable[minVars.size()])) : oldVars;
 
         this.condition = subst ( var, substTerm, getCondition () );
 
@@ -173,10 +203,10 @@ public abstract class GuardSimplifier {
      */
     protected void substitute (QuantifiableVariable var, Term substTerm) {}
     
-    private ListOfQuantifiableVariable toList (ArrayOfQuantifiableVariable ar) {
-        ListOfQuantifiableVariable res = SLListOfQuantifiableVariable.EMPTY_LIST;
+    private ImmutableList<QuantifiableVariable> toList (ImmutableArray<QuantifiableVariable> ar) {
+        ImmutableList<QuantifiableVariable> res = ImmutableSLList.<QuantifiableVariable>nil();
         for ( int i = ar.size () - 1; i >= 0; --i )
-            res = res.prepend ( ar.getQuantifiableVariable ( i ) );
+            res = res.prepend ( ar.get ( i ) );
         return res;
     }
 

@@ -13,6 +13,8 @@ package de.uka.ilkd.key.proof;
 import java.util.Iterator;
 
 import junit.framework.TestCase;
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.LogicVariable;
@@ -124,8 +126,8 @@ public class TestProofTree extends TestCase {
         n7 = null;
     }
 
-    public static ListOfGoal emptyGoalList() {
-	return SLListOfGoal.EMPTY_LIST;
+    public static ImmutableList<Goal> emptyGoalList() {
+	return ImmutableSLList.<Goal>nil();
     }
     
 

@@ -11,10 +11,11 @@
 
 package de.uka.ilkd.key.strategy.termgenerator;
 
-import de.uka.ilkd.key.logic.IteratorOfTerm;
-import de.uka.ilkd.key.logic.ListOfTerm;
+import java.util.Iterator;
+
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.SLListOfTerm;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
@@ -45,7 +46,7 @@ public abstract class SubtermGenerator implements TermGenerator {
     public static TermGenerator leftTraverse(ProjectionToTerm cTerm,
                                              TermFeature cond) {
         return new SubtermGenerator (cTerm, cond) {
-            public IteratorOfTerm generate(RuleApp app, PosInOccurrence pos, Goal goal) {
+            public Iterator<Term> generate(RuleApp app, PosInOccurrence pos, Goal goal) {
                 return new LeftIterator ( getTermInst ( app, pos, goal ) );
             }
         };
@@ -58,7 +59,7 @@ public abstract class SubtermGenerator implements TermGenerator {
     public static TermGenerator rightTraverse(ProjectionToTerm cTerm,
                                               TermFeature cond) {
         return new SubtermGenerator (cTerm, cond) {
-            public IteratorOfTerm generate(RuleApp app, PosInOccurrence pos, Goal goal) {
+            public Iterator<Term> generate(RuleApp app, PosInOccurrence pos, Goal goal) {
                 return new RightIterator ( getTermInst ( app, pos, goal ) );
             }
         };
@@ -72,11 +73,11 @@ public abstract class SubtermGenerator implements TermGenerator {
         return ! ( cond.compute ( t ) instanceof TopRuleAppCost );
     }
         
-    abstract class Iterator implements IteratorOfTerm {
-        protected ListOfTerm termStack;
+    abstract class SubIterator implements Iterator<Term> {
+        protected ImmutableList<Term> termStack;
 
-        public Iterator(Term t) {
-            termStack = SLListOfTerm.EMPTY_LIST.prepend ( t );
+        public SubIterator(Term t) {
+            termStack = ImmutableSLList.<Term>nil().prepend ( t );
         }
 
         public boolean hasNext() {
@@ -84,7 +85,7 @@ public abstract class SubtermGenerator implements TermGenerator {
         }
     }
 
-    class LeftIterator extends Iterator {
+    class LeftIterator extends SubIterator {
         public LeftIterator(Term t) {
             super ( t );
         }
@@ -110,7 +111,7 @@ public abstract class SubtermGenerator implements TermGenerator {
    
     }
 
-    class RightIterator extends Iterator {
+    class RightIterator extends SubIterator {
         public RightIterator(Term t) {
             super ( t );
         }

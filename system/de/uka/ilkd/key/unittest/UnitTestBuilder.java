@@ -7,33 +7,51 @@
 // See LICENSE.TXT for details.
 package de.uka.ilkd.key.unittest;
 
-import de.uka.ilkd.key.java.*;
+import java.util.*;
+
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.java.Position;
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.Statement;
+import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.reference.PackageReference;
 import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.visitor.JavaASTCollector;
-import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.proof.*;
-import de.uka.ilkd.key.visualization.*;
-
-import java.util.*;
+import de.uka.ilkd.key.logic.Constraint;
+import de.uka.ilkd.key.logic.Namespace;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.ProgramMethod;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.unittest.testing.DataStorage;
+import de.uka.ilkd.key.visualization.ExecutionTraceModel;
+import de.uka.ilkd.key.visualization.ProofVisualization;
+import de.uka.ilkd.key.visualization.TraceElement;
+import de.uka.ilkd.key.visualization.VisualizationStrategyForTesting;
 
 /**
  * Generates a unittest from a proof or a node in a proof-tree.
  */
 public class UnitTestBuilder {
 
-    private HashMap<Node, ExecutionTraceModel[]> node2trace;
+    private final HashMap<Node, ExecutionTraceModel[]> node2trace;
 
-    private Services serv;
+    private final Services serv;
 
-    private Constraint uc;
+    private final Constraint uc;
 
     // the nodes containing trace ends that have already been processed by the
     // proof visualization
-    private HashSet<Node> traceEndNodes;
+    private final HashSet<Node> traceEndNodes;
 
     private PackageReference pr;
+
+    // mbender: This object is only needed to store certain values, that are
+    // needed for the KeY junit tests
+    private final DataStorage dataForTest;
 
     // private int coverage;
 
@@ -54,21 +72,29 @@ public class UnitTestBuilder {
 
     private String directory = null;
 
-    public UnitTestBuilder(Services serv, Proof p) {
+    private final boolean testing;
+
+    public UnitTestBuilder(Services serv, Proof p, boolean testing) {
 	this.serv = serv;
 	node2trace = new HashMap<Node, ExecutionTraceModel[]>();
 	uc = p.getUserConstraint().getConstraint();
 	traceEndNodes = new HashSet<Node>();
 	pvn = p.getNamespaces().programVariables();
+	dataForTest = new DataStorage();
+	this.testing = testing;
+    }
+
+    public UnitTestBuilder(Services serv, Proof p) {
+	this(serv, p, false);
     }
 
     /**
      * Returns the program methods that are symbolically executed in the
      * implementation under test <code>p</code>.
      */
-    public SetOfProgramMethod getProgramMethods(Proof p) {
+    public ImmutableSet<ProgramMethod> getProgramMethods(Proof p) {
 	Iterator<Node> it = p.root().leavesIterator();
-	SetOfProgramMethod result = SetAsListOfProgramMethod.EMPTY_SET;
+	ImmutableSet<ProgramMethod> result = DefaultImmutableSet.<ProgramMethod>nil();
 	while (it.hasNext()) {
 	    Node n = it.next();
 	    ExecutionTraceModel[] tr = getTraces(n);
@@ -77,9 +103,9 @@ public class UnitTestBuilder {
 	return result;
     }
 
-    private SetOfProgramMethod getProgramMethods(ListOfNode nodes) {
-	IteratorOfNode it = nodes.iterator();
-	SetOfProgramMethod result = SetAsListOfProgramMethod.EMPTY_SET;
+    private ImmutableSet<ProgramMethod> getProgramMethods(ImmutableList<Node> nodes) {
+	Iterator<Node> it = nodes.iterator();
+	ImmutableSet<ProgramMethod> result = DefaultImmutableSet.<ProgramMethod>nil();
 	while (it.hasNext()) {
 	    Node n = it.next();
 	    ExecutionTraceModel[] tr = getTraces(n);
@@ -114,7 +140,7 @@ public class UnitTestBuilder {
      * methods in pms. Only execution traces on branches that end with one of
      * the nodes iterated by <code>it</code> are considered.
      */
-    private String createTestForNodes(Iterator<Node> it, SetOfProgramMethod pms) {
+    private String createTestForNodes(Iterator<Node> it, ImmutableSet<ProgramMethod> pms) {
 	TestGenerator tg = null;
 	String methodName = null;
 	Statement[] code = null;
@@ -129,7 +155,7 @@ public class UnitTestBuilder {
 
 	HashSet<Node> nodesAlreadyProcessed = new HashSet<Node>();
 
-	SetOfProgramVariable pvs = null;
+	ImmutableSet<ProgramVariable> pvs = null;
 
 	// the statements occuring in the considered execution traces
 	HashSet<Position> statements = new HashSet<Position>();
@@ -141,6 +167,8 @@ public class UnitTestBuilder {
 	    nodeCounter++;
 
 	    ExecutionTraceModel[] tr = getTraces(n);
+	    //mbender: collect data for KeY junit tests (see TestTestGenerator,TestHelper)
+	    dataForTest.addETM(tr);
 
 	    statements.addAll(getStatements(tr));
 	    int maxRating = -1;
@@ -213,7 +241,7 @@ public class UnitTestBuilder {
 		    coll.start();
 		    if (coll.getNodes().size() == 0) {
 			tg = new TestGenerator(serv,
-				"Test" + tce.getFileName(), directory);
+				"Test" + tce.getFileName(), directory, testing);
 			if (methodName == null) {
 			    methodName = tce.getMethodName();
 			}
@@ -235,7 +263,7 @@ public class UnitTestBuilder {
 	}
 	if (methodName == null) {
 	    String pmsStr = "";
-	    IteratorOfProgramMethod pmIt = pms.iterator();
+	    Iterator<ProgramMethod> pmIt = pms.iterator();
 	    while (pmIt.hasNext()) {
 		ProgramMethod pm = pmIt.next();
 		pmsStr += pm.getName() + "\n";
@@ -254,6 +282,15 @@ public class UnitTestBuilder {
 				    + minTraceLen + ")\n"
 				    : ""));
 	}
+//	mbender: collect data for KeY junit tests (see TestTestGenerator,TestHelper)
+	dataForTest.setPms(pms);
+	dataForTest.setNodeCount(nodeCounter);
+	dataForTest.setCode(code);
+	dataForTest.setOracle(oracle);
+	dataForTest.setMgs(mgs);
+	dataForTest.setPvs(pvs);
+	dataForTest.setTg(tg);
+	tg.setData(dataForTest);
 	// computeStatementCoverage(statements, tce.getStatements());
 	tg.generateTestSuite(code, oracle, mgs, pvs, "test" + methodName, pr);
 	return tg.getPath();
@@ -269,11 +306,11 @@ public class UnitTestBuilder {
 		getProgramMethods(tr));
     }
 
-    public String createTestForNodes(ListOfNode l){        
-	return createTestForNodes(Arrays.asList(l.toArray()).iterator(), 
-	                getProgramMethods(l));
+    public String createTestForNodes(ImmutableList<Node> l) {
+	return createTestForNodes(Arrays.asList(l.toArray(new Node[l.size()])).iterator(),
+		getProgramMethods(l));
     }
-    
+
     // private void computeStatementCoverage(HashSet<Position>
     // executedStatements,
     // HashSet<Statement> sourceStatements) {
@@ -297,8 +334,8 @@ public class UnitTestBuilder {
 		&& (!requireCompleteExecution || tr.blockCompletelyExecuted());
     }
 
-    private SetOfProgramMethod getProgramMethods(ExecutionTraceModel[] traces) {
-	SetOfProgramMethod result = SetAsListOfProgramMethod.EMPTY_SET;
+    private ImmutableSet<ProgramMethod> getProgramMethods(ExecutionTraceModel[] traces) {
+	ImmutableSet<ProgramMethod> result = DefaultImmutableSet.<ProgramMethod>nil();
 	for (int i = 0; i < traces.length; i++) {
 	    if (isInteresting(traces[i])) {
 		result = result.union(traces[i].getProgramMethods(serv));
@@ -329,13 +366,17 @@ public class UnitTestBuilder {
      * executed. The testdata is derived from the leaves of <code>p</code>'s
      * proof tree.
      */
-    public String createTestForProof(Proof p, SetOfProgramMethod pms) {
+    public String createTestForProof(Proof p, ImmutableSet<ProgramMethod> pms) {
 	return createTestForNodes(p.root().leavesIterator(), pms);
     }
 
     private ModelGenerator getModelGenerator(ExecutionTraceModel tr, Node n) {
 	return new ModelGenerator(serv, uc, tr.getLastTraceElement().node(), tr
 		.toString(), n);
+    }
+
+    public DataStorage getDS() {
+	return dataForTest;
     }
 
 }

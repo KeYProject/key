@@ -10,7 +10,12 @@
 
 package de.uka.ilkd.key.logic;
 
-import de.uka.ilkd.key.logic.op.*;
+import java.util.Iterator;
+
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+import de.uka.ilkd.key.logic.op.Quantifier;
 /**
  * This class is used to collect all appearing variables that can
  * represent logic variables in a term. Duplicates are not removed
@@ -21,11 +26,11 @@ import de.uka.ilkd.key.logic.op.*;
 
 public class LVRCollector extends Visitor{
     /** collects all found variables */
-    private ListOfQuantifiableVariable varList;
+    private ImmutableList<QuantifiableVariable> varList;
 
     /** creates the Variable collector */
     public LVRCollector() {
-	varList = SLListOfQuantifiableVariable.EMPTY_LIST;
+	varList = ImmutableSLList.<QuantifiableVariable>nil();
     }
 
     /** is called by the execPostOrder-method of a term 
@@ -39,7 +44,7 @@ public class LVRCollector extends Visitor{
 	    for (int j = 0, ar = ((Quantifier)t.op()).arity(); j<ar; j++) {
 	        for (int i = 0, sz = t.varsBoundHere(j).size(); i<sz;i++) {		
 	            varList=varList.prepend
-	            (t.varsBoundHere(j).getQuantifiableVariable(i));		
+	            (t.varsBoundHere(j).get(i));		
 	        }
 	    }
 	}
@@ -47,7 +52,7 @@ public class LVRCollector extends Visitor{
 
         
     /** @return iterator of the found Variables */
-    public IteratorOfQuantifiableVariable varIterator() {
+    public Iterator<QuantifiableVariable> varIterator() {
 	return varList.iterator();
     }
 

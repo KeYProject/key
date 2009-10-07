@@ -10,7 +10,9 @@
 
 package de.uka.ilkd.key.rule.soundness;
 
-import de.uka.ilkd.key.logic.IteratorOfConstrainedFormula;
+import java.util.Iterator;
+
+import de.uka.ilkd.key.logic.ConstrainedFormula;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermFactory;
@@ -67,7 +69,7 @@ public class MeaningFormulaBuilder {
         if ( !( (RewriteTaclet)getTaclet () ).ifSequent ().isEmpty() )
             return true;
 
-        final IteratorOfTacletGoalTemplate it =
+        final Iterator<TacletGoalTemplate> it =
             getTaclet ().goalTemplates ().iterator ();
             
         while ( it.hasNext () ) {
@@ -96,7 +98,7 @@ public class MeaningFormulaBuilder {
 
     private Term createPremisses() {
         Term res = True ();
-    	final IteratorOfTacletGoalTemplate it =
+    	final Iterator<TacletGoalTemplate> it =
     	    getTaclet ().goalTemplates().iterator ();
     	    
     	while ( it.hasNext () )
@@ -134,7 +136,7 @@ public class MeaningFormulaBuilder {
 
     private Term createMF ( Sequent p ){
 	Term antec = True ();
-	IteratorOfConstrainedFormula it = p.antecedent().iterator ();
+	Iterator<ConstrainedFormula> it = p.antecedent().iterator ();
     	
 	while ( it.hasNext () )
 	    antec = And ( antec, it.next ().formula () );

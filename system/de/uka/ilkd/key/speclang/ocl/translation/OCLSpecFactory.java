@@ -20,21 +20,17 @@ package de.uka.ilkd.key.speclang.ocl.translation;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.EverythingLocationDescriptor;
+import de.uka.ilkd.key.logic.LocationDescriptor;
 import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.SetOfLocationDescriptor;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.speclang.ClassInvariant;
-import de.uka.ilkd.key.speclang.ClassInvariantImpl;
-import de.uka.ilkd.key.speclang.FormulaWithAxioms;
-import de.uka.ilkd.key.speclang.OperationContract;
-import de.uka.ilkd.key.speclang.OperationContractImpl;
-import de.uka.ilkd.key.speclang.SetAsListOfOperationContract;
-import de.uka.ilkd.key.speclang.SetOfOperationContract;
-import de.uka.ilkd.key.speclang.SignatureVariablesFactory;
+import de.uka.ilkd.key.speclang.*;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 
 
@@ -120,7 +116,7 @@ public class OCLSpecFactory {
     }        
     
     
-    public SetOfOperationContract createOCLOperationContracts(
+    public ImmutableSet<OperationContract> createOCLOperationContracts(
                                             ProgramMethod programMethod,
                                             String originalPre,
                                             String originalPost,
@@ -133,7 +129,7 @@ public class OCLSpecFactory {
         ParsableVariable selfVar = SVF.createSelfVar(services, 
                                                      programMethod, 
                                                      false);
-        ListOfParsableVariable paramVars = SVF.createParamVars(services, 
+        ImmutableList<ParsableVariable> paramVars = SVF.createParamVars(services, 
                                                                programMethod, 
                                                                false);
         ParsableVariable resultVar = SVF.createResultVar(services, 
@@ -173,7 +169,7 @@ public class OCLSpecFactory {
         }
         
         //translate modifies
-        SetOfLocationDescriptor modifies;
+        ImmutableSet<LocationDescriptor> modifies;
         if(originalModifies == null || originalModifies.equals("")) {
             modifies = EverythingLocationDescriptor.INSTANCE_AS_SET;
         } else {
@@ -183,7 +179,7 @@ public class OCLSpecFactory {
         }
         
         //create contracts
-        SetOfOperationContract result = SetAsListOfOperationContract.EMPTY_SET;
+        ImmutableSet<OperationContract> result = DefaultImmutableSet.<OperationContract>nil();
         String name1 = getContractName();
         String name2 = getContractName();
         OperationContract contract1 

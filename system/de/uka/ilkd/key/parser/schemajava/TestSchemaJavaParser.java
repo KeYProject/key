@@ -7,7 +7,6 @@
 // See LICENSE.TXT for details.
 package de.uka.ilkd.key.parser.schemajava;
 
-import java.io.Reader;
 import java.io.StringReader;
 
 import junit.framework.TestCase;
@@ -15,7 +14,6 @@ import recoder.ServiceConfiguration;
 import de.uka.ilkd.key.java.recoderext.SchemaCrossReferenceServiceConfiguration;
 import de.uka.ilkd.key.java.recoderext.SchemaJavaProgramFactory;
 import de.uka.ilkd.key.logic.Namespace;
-import de.uka.ilkd.key.util.KeYExceptionHandler;
 import de.uka.ilkd.key.util.KeYRecoderExcHandler;
 
 public class TestSchemaJavaParser extends TestCase {

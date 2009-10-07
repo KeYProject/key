@@ -13,15 +13,18 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import de.uka.ilkd.key.collection.*;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.declaration.ArrayOfVariableSpecification;
 import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
+import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.speclang.LocationDescriptorSet;
 import de.uka.ilkd.key.speclang.LoopInvariant;
 import de.uka.ilkd.key.speclang.LoopInvariantImpl;
+import de.uka.ilkd.key.speclang.LoopPredicateSet;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.ExtList;
 
@@ -102,11 +105,11 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
     protected void walk(ProgramElement node) {
 	if (node instanceof LocalVariableDeclaration && replaceallbynew) {
 	    LocalVariableDeclaration vd= (LocalVariableDeclaration)node;
-	    ArrayOfVariableSpecification vspecs=vd.getVariableSpecifications();
+	    ImmutableArray<VariableSpecification> vspecs=vd.getVariableSpecifications();
 	    for (int i=0; i<vspecs.size(); i++) {
 		ProgramVariable pv 
 		    = (ProgramVariable) 
-		         vspecs.getVariableSpecification(i).getProgramVariable();
+		         vspecs.get(i).getProgramVariable();
 		if (!replaceMap.containsKey(pv)) {
 		    replaceMap.put(pv, copy(pv));
 		}
@@ -170,8 +173,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
 	    }
 	} else {
 	    Term subTerms[] = new Term[t.arity()];
-	    final ArrayOfQuantifiableVariable[] vars = 
-	        new ArrayOfQuantifiableVariable[t.arity()]; 
+	    final ImmutableArray<QuantifiableVariable>[] vars = new ImmutableArray[t.arity()]; 
 	    for ( int i = 0; i<t.arity(); i++ ) {
 		vars[i] = t.varsBoundHere(i);
 		subTerms[i] = replaceVariablesInTerm(t.sub(i));
@@ -179,17 +181,15 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
 	    Operator op;
 	    if(t.op() instanceof IUpdateOperator){
 		IUpdateOperator uo = (IUpdateOperator) t.op();
-		ListOfLocation locs = SLListOfLocation.EMPTY_LIST;
-		for(int i = 0; i<uo.locationCount(); i++){
+		final Location[] locs = new Location[uo.locationCount()];
+		for(int i = 0; i<locs.length; i++){
 		    if (replaceMap.containsKey(uo.location(i))){ 
-			locs = locs.append((Location)
-					   replaceMap.
-					   get(uo.location(i)));
+			locs[i] = (Location) replaceMap.get(uo.location(i));
 		    }else{
-			locs = locs.append(uo.location(i));
+			locs[i] = uo.location(i);
 		    }
 		}
-		op = uo.replaceLocations ( locs.toArray () );
+		op = uo.replaceLocations ( locs );
 	    }else{
 		op = t.op();
 	    }
@@ -198,10 +198,10 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
     }
 
     
-    private SetOfLocationDescriptor replaceVariablesInLocs(
-                                                SetOfLocationDescriptor locs) {
-        SetOfLocationDescriptor res 
-            = SetAsListOfLocationDescriptor.EMPTY_SET;
+    private ImmutableSet<LocationDescriptor> replaceVariablesInLocs(
+                                                ImmutableSet<LocationDescriptor> locs) {
+        ImmutableSet<LocationDescriptor> res 
+            = DefaultImmutableSet.<LocationDescriptor>nil();
         for (final LocationDescriptor loc : locs) {
             LocationDescriptor newLoc;
             
@@ -222,8 +222,8 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
     }
     
         
-    private SetOfTerm replaceVariablesInTerms(SetOfTerm terms) {
-        SetOfTerm res = SetAsListOfTerm.EMPTY_SET;        
+    private ImmutableSet<Term> replaceVariablesInTerms(ImmutableSet<Term> terms) {
+        ImmutableSet<Term> res = DefaultImmutableSet.<Term>nil();        
         for (final Term term : terms) {
             res = res.add(replaceVariablesInTerm(term));
         }        
@@ -278,16 +278,16 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
                                                       services));
         
         //predicates
-        SetOfTerm newPredicates 
+        ImmutableSet<Term> newPredicates 
             = replaceVariablesInTerms(inv.getPredicates(selfTerm, 
                                                         atPreFunctions, 
-                                                        services));
+                                                        services).asSet());
         
         //modifies
-        SetOfLocationDescriptor newModifies
+        ImmutableSet<LocationDescriptor> newModifies
             = replaceVariablesInLocs(inv.getModifies(selfTerm, 
                                                      atPreFunctions, 
-                                                     services));
+                                                     services).asSet());
         
         //variant
         Term newVariant
@@ -303,8 +303,8 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
         LoopInvariant newInv 
             = new LoopInvariantImpl(newLoop, 
                                     newInvariant, 
-                                    newPredicates,
-                                    newModifies, 
+                                    new LoopPredicateSet(newPredicates),
+                                    new LocationDescriptorSet(newModifies), 
                                     newVariant, 
                                     newSelfTerm,
                                     newAtPreFunctions,

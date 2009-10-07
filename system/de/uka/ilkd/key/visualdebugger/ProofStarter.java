@@ -9,14 +9,18 @@ package de.uka.ilkd.key.visualdebugger;
 
 import java.util.*;
 
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.gui.RuleAppListener;
 import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
-import de.uka.ilkd.key.proof.proofevent.IteratorOfNodeReplacement;
+import de.uka.ilkd.key.proof.proofevent.NodeReplacement;
 import de.uka.ilkd.key.proof.proofevent.RuleAppInfo;
-import de.uka.ilkd.key.rule.*;
+import de.uka.ilkd.key.rule.BuiltInRule;
+import de.uka.ilkd.key.rule.BuiltInRuleApp;
+import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.smt.SMTRule;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.util.ProgressMonitor;
@@ -81,7 +85,7 @@ public class ProofStarter {
 
  
     // - Note: This should be removed
-    private void applySimplificationOnGoals(ListOfGoal goals, 
+    private void applySimplificationOnGoals(ImmutableList<Goal> goals, 
             BuiltInRule decisionProcedureRule) {
         if (goals.isEmpty()) {
             return;
@@ -89,7 +93,7 @@ public class ProofStarter {
 
         final Proof p = goals.head().node().proof();
 
-        final IteratorOfGoal i = goals.iterator();                      
+        final Iterator<Goal> i = goals.iterator();                      
         p.env().registerRule(decisionProcedureRule,
                 de.uka.ilkd.key.proof.mgt.AxiomJustification.INSTANCE);
         while (i.hasNext()) {
@@ -265,7 +269,7 @@ public class ProofStarter {
      */
     private BuiltInRule findSimplifyRule() {
         BuiltInRule decisionProcedureRule = null;
-        final IteratorOfBuiltInRule builtinRules = 
+        final Iterator<BuiltInRule> builtinRules = 
             proof.getSettings().getProfile().getStandardRules().getStandardBuiltInRules().iterator();
         while (builtinRules.hasNext()) {
             final BuiltInRule bir = builtinRules.next();
@@ -318,8 +322,8 @@ public class ProofStarter {
                 return;
 
             synchronized (ProofStarter.this) {
-                ListOfGoal newGoals = SLListOfGoal.EMPTY_LIST;
-                IteratorOfNodeReplacement it = rai.getReplacementNodes();
+                ImmutableList<Goal> newGoals = ImmutableSLList.<Goal>nil();
+                Iterator<NodeReplacement> it = rai.getReplacementNodes();
                 Node node;
                 Goal goal;
 

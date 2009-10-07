@@ -3,7 +3,7 @@
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
+// The KeY system is protected by the GNU General Public License.
 // See LICENSE.TXT for details.
 //
 //
@@ -20,7 +20,7 @@ import de.uka.ilkd.key.proof.CountingBufferedInputStream;
 import de.uka.ilkd.key.proof.RuleSource;
 
 /**
- * Used for TESTS ONLY as we allow there to declare program variables global 
+ * Used for TESTS ONLY as we allow there to declare program variables global
  * in rule files .
  */
 public class KeYFileForTests extends KeYFile {
@@ -33,7 +33,7 @@ public class KeYFileForTests extends KeYFile {
     }
 
     /** reads the whole .key file and modifies the initial configuration
-     * assigned to this object according to the given modification strategy. 
+     * assigned to this object according to the given modification strategy.
      * Throws an exception if no initial configuration has been set yet.
      */
     public void read(ModStrategy mod) throws ProofInputException {
@@ -41,17 +41,17 @@ public class KeYFileForTests extends KeYFile {
 	    throw new IllegalStateException("KeYFile: InitConfig not set.");
 	}
 	try {
-	    final CountingBufferedInputStream cinp = 
+	    final CountingBufferedInputStream cinp =
 		new CountingBufferedInputStream
 		    (getNewStream(),monitor,getNumberOfChars()/100);
-	    final ParserConfig pc = 
-		new ParserConfig(initConfig.getServices().copy(), 
+	    final ParserConfig pc =
+		new ParserConfig(initConfig.getServices().copy(),
 				 initConfig.namespaces().copy());
 	    KeYParser problemParser = new KeYParser
 		(ParserMode.PROBLEM,new KeYLexer(cinp,null), file.toString(), pc, pc,initConfig.
-		 getTaclet2Builder(), initConfig.getTaclets(),initConfig.getActivatedChoices()); 
-            problemParser.problem(); 
-	    initConfig.setTaclets(problemParser.getTaclets()); 
+		 getTaclet2Builder(), initConfig.getTaclets(),initConfig.getActivatedChoices());
+            problemParser.problem();
+	    initConfig.setTaclets(problemParser.getTaclets());
 	    initConfig.add(problemParser.namespaces(), ModStrategy.MOD_ALL);
 	} catch (antlr.ANTLRException e) {
 	    throw new ProofInputException(e);
@@ -59,16 +59,16 @@ public class KeYFileForTests extends KeYFile {
             throw new ProofInputException(ioe);
         }
     }
-    
+
     public Includes readIncludes() throws ProofInputException {
 	Includes result = super.readIncludes();
-        		      
+
 	//add test LDTs
         if(result.getLDTIncludes().isEmpty()) {
-            result.put("ldtsForTests", 
+            result.put("ldtsForTests",
         	       RuleSource.initRuleFile("LDTsForTestsOnly.key"));
         }
-        
+
         return result;
     }
 }

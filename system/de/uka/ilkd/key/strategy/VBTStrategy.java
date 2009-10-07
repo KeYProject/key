@@ -13,7 +13,7 @@ package de.uka.ilkd.key.strategy;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.proof.DefaultGoalChooserBuilder;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.strategy.feature.*;
+import de.uka.ilkd.key.strategy.feature.NonDuplicateAppModPositionFeature;
 
 
 /**
@@ -21,16 +21,27 @@ import de.uka.ilkd.key.strategy.feature.*;
  */
 public class VBTStrategy extends JavaCardDLStrategy {
 
-    /** This is the default value when changing back from a different Strategy back to VBTStrategy */
-    public static String preferedGoalChooser=DefaultGoalChooserBuilder.NAME;//Maybe set to BalancedGoalChooser
+    /** This is the default value when changing back from a different Strategy back to VBTStrategy.
+     * The value can be changed via the command option "loop". It is set in JavaTestGenerationProfile.
+     * @see de.uka.ilkd.key.proof.init.JavaTestGenerationProfile */
+    public static String preferedGoalChooser=DefaultGoalChooserBuilder.NAME;//Maybe set to BalancedGoalChooser. But on the other hand this can be set via the option "loop".
+   
+    /** if false then the normal loop unwinding rule is used. Otherwise bounded loop unwinding is activated. This
+     * flag activates the respective rule in testGenOpt.key when calling the method setupStrategyProperties(); 
+     * @see de.uka.ilkd.key.rule.metaconstruct.WhileLoopTransformation2
+     * @see de.uka.ilkd.key.proof.init.JavaTestGenerationProfile */
+    public static boolean loopUnwindBounded=false;
 
     public static String VBTStrategy="VBTStrategy";
     protected static StrategyProperties setupStrategyProperties() {
         final StrategyProperties res = new StrategyProperties ();
         res.setProperty( StrategyProperties.SPLITTING_OPTIONS_KEY,
-                StrategyProperties.SPLITTING_NORMAL);  
-        res.setProperty ( StrategyProperties.LOOP_OPTIONS_KEY,
-                          StrategyProperties.LOOP_EXPAND );
+                StrategyProperties.SPLITTING_NORMAL);
+        if(loopUnwindBounded){
+            res.setProperty ( StrategyProperties.LOOP_OPTIONS_KEY, StrategyProperties.LOOP_EXPAND_BOUNDED );
+        }else{
+            res.setProperty ( StrategyProperties.LOOP_OPTIONS_KEY, StrategyProperties.LOOP_EXPAND);
+        }
         res.setProperty ( StrategyProperties.METHOD_OPTIONS_KEY,
                           StrategyProperties.METHOD_EXPAND );
         res.setProperty ( StrategyProperties.QUERY_OPTIONS_KEY,

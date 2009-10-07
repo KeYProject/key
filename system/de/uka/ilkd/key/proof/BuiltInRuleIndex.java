@@ -11,8 +11,9 @@
 
 package de.uka.ilkd.key.proof;
 
-import de.uka.ilkd.key.rule.ListOfBuiltInRule;
-import de.uka.ilkd.key.rule.SLListOfBuiltInRule;
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.rule.BuiltInRule;
 
 /**
  * Index for managing built-in-rules usch as integer decision or update
@@ -21,7 +22,7 @@ import de.uka.ilkd.key.rule.SLListOfBuiltInRule;
 public class BuiltInRuleIndex implements java.io.Serializable {
 
     /** list of available built in rules */
-    private ListOfBuiltInRule rules = SLListOfBuiltInRule.EMPTY_LIST;
+    private ImmutableList<BuiltInRule> rules = ImmutableSLList.<BuiltInRule>nil();
 
     /** constructs empty rule index */
     public BuiltInRuleIndex() {
@@ -29,16 +30,16 @@ public class BuiltInRuleIndex implements java.io.Serializable {
 
     /**
      * creates a new index with the given built-in-rules
-     * @param rules a ListOfBuiltInRule with available built in rules
+     * @param rules a IList<BuiltInRule> with available built in rules
      */
-    public BuiltInRuleIndex(ListOfBuiltInRule rules) {
+    public BuiltInRuleIndex(ImmutableList<BuiltInRule> rules) {
 	this.rules = rules;
     }
 
     /**
      * returns all available rules     
      */
-    public ListOfBuiltInRule rules() {
+    public ImmutableList<BuiltInRule> rules() {
 	return rules;
     }
     

@@ -5,13 +5,6 @@
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
-//This file is part of KeY - Integrated Deductive Software Design
-//Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
-//                      Universitaet Koblenz-Landau, Germany
-//                      Chalmers University of Technology, Sweden
-//
-//The KeY system is protected by the GNU General Public License. 
-//See LICENSE.TXT for details.
 //
 //
 
@@ -21,21 +14,12 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.BasicLocationDescriptor;
-import de.uka.ilkd.key.logic.EverythingLocationDescriptor;
-import de.uka.ilkd.key.logic.LocationDescriptor;
-import de.uka.ilkd.key.logic.SetAsListOfLocationDescriptor;
-import de.uka.ilkd.key.logic.SetOfLocationDescriptor;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.IteratorOfParsableVariable;
-import de.uka.ilkd.key.logic.op.ListOfParsableVariable;
-import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.ParsableVariable;
-import de.uka.ilkd.key.logic.op.ProgramMethod;
+import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.AtPreFactory;
 import de.uka.ilkd.key.proof.OpReplacer;
@@ -44,7 +28,7 @@ import de.uka.ilkd.key.proof.OpReplacer;
 /**
  * Standard implementation of the OperationContract interface.
  */
-public class OperationContractImpl implements OperationContract {
+public final class OperationContractImpl implements OperationContract {
     
     protected static final TermBuilder TB = TermBuilder.DF;
     protected static final SignatureVariablesFactory SVN 
@@ -57,9 +41,9 @@ public class OperationContractImpl implements OperationContract {
     private final Modality modality;
     private final FormulaWithAxioms originalPre;
     private final FormulaWithAxioms originalPost;
-    private final SetOfLocationDescriptor originalModifies;
+    private final ImmutableSet<LocationDescriptor> originalModifies;
     private final ParsableVariable originalSelfVar;
-    private final ListOfParsableVariable originalParamVars;
+    private final ImmutableList<ParsableVariable> originalParamVars;
     private final ParsableVariable originalResultVar;
     private final ParsableVariable originalExcVar;
     private final Map<Operator, Function/* atPre */> originalAtPreFunctions;
@@ -90,9 +74,9 @@ public class OperationContractImpl implements OperationContract {
             		         Modality modality,
             		         FormulaWithAxioms pre,
             		         FormulaWithAxioms post,
-            		         SetOfLocationDescriptor modifies,
+            		         ImmutableSet<LocationDescriptor> modifies,
             		         ParsableVariable selfVar,
-            		         ListOfParsableVariable paramVars,
+            		         ImmutableList<ParsableVariable> paramVars,
             		         ParsableVariable resultVar,
             		         ParsableVariable excVar,
                                  /*in*/ Map<Operator, Function /*atPre*/> atPreFunctions) {
@@ -133,7 +117,7 @@ public class OperationContractImpl implements OperationContract {
     
     private Map <Operator, Operator> getReplaceMap(
 	    				ParsableVariable selfVar, 
-	    				ListOfParsableVariable paramVars, 
+	    				ImmutableList<ParsableVariable> paramVars, 
 	    				ParsableVariable resultVar, 
 	    				ParsableVariable excVar,
                                         /*inout*/ Map< Operator, Function/*atPre*/> atPreFunctions,
@@ -149,8 +133,8 @@ public class OperationContractImpl implements OperationContract {
         //parameters
 	if(paramVars != null) {
 	    assert originalParamVars.size() == paramVars.size();
-	    IteratorOfParsableVariable it1 = originalParamVars.iterator();
-	    IteratorOfParsableVariable it2 = paramVars.iterator();
+	    Iterator<ParsableVariable> it1 = originalParamVars.iterator();
+	    Iterator<ParsableVariable> it2 = paramVars.iterator();
 	    while(it1.hasNext()) {
 		ParsableVariable originalParamVar = it1.next();
 		ParsableVariable paramVar         = it2.next();
@@ -202,10 +186,10 @@ public class OperationContractImpl implements OperationContract {
     }
     
     
-    private SetOfLocationDescriptor addGuard(SetOfLocationDescriptor modifies, 
+    private ImmutableSet<LocationDescriptor> addGuard(ImmutableSet<LocationDescriptor> modifies, 
                                              Term formula) {
-        SetOfLocationDescriptor result 
-            = SetAsListOfLocationDescriptor.EMPTY_SET;
+        ImmutableSet<LocationDescriptor> result 
+            = DefaultImmutableSet.<LocationDescriptor>nil();
         for(LocationDescriptor loc : modifies) {
             if(loc instanceof EverythingLocationDescriptor) {
                 return EverythingLocationDescriptor.INSTANCE_AS_SET;
@@ -258,7 +242,7 @@ public class OperationContractImpl implements OperationContract {
     
     
     public FormulaWithAxioms getPre(ParsableVariable selfVar, 
-	    			    ListOfParsableVariable paramVars,
+	    			    ImmutableList<ParsableVariable> paramVars,
                                     Services services) {
         assert (selfVar == null) == (originalSelfVar == null);
         assert paramVars != null;
@@ -276,7 +260,7 @@ public class OperationContractImpl implements OperationContract {
 
   
     public FormulaWithAxioms getPost(ParsableVariable selfVar, 
-                                     ListOfParsableVariable paramVars, 
+                                     ImmutableList<ParsableVariable> paramVars, 
                                      ParsableVariable resultVar, 
                                      ParsableVariable excVar,
                                      /*inout*/ Map<Operator, Function> atPreFunctions,
@@ -299,8 +283,8 @@ public class OperationContractImpl implements OperationContract {
     }
 
   
-    public SetOfLocationDescriptor getModifies(ParsableVariable selfVar, 
-                                               ListOfParsableVariable paramVars,
+    public ImmutableSet<LocationDescriptor> getModifies(ParsableVariable selfVar, 
+                                               ImmutableList<ParsableVariable> paramVars,
                                                Services services) {
         assert (selfVar == null) == (originalSelfVar == null);
         assert paramVars != null;
@@ -313,13 +297,13 @@ public class OperationContractImpl implements OperationContract {
                                        null, 
                                        services);
 	OpReplacer or = new OpReplacer(replaceMap);
-        return or.replace(originalModifies);
+        return or.replaceLoc(originalModifies);
     }
     
     
     public OperationContract union(OperationContract[] others, 
-                                   String name, 
-                                   String displayName, 
+                                   String p_name, 
+                                   String p_displayName, 
                                    Services services) {
         assert others != null;
         for(OperationContract contract : others) {
@@ -339,7 +323,7 @@ public class OperationContractImpl implements OperationContract {
         FormulaWithAxioms post = atPreify(originalPre, 
                                           newAtPreFunctions, 
                                           services).imply(originalPost);
-        SetOfLocationDescriptor modifies = addGuard(originalModifies, 
+        ImmutableSet<LocationDescriptor> modifies = addGuard(originalModifies, 
                                                     originalPre.getFormula());
         for(OperationContract other : others) {
             FormulaWithAxioms otherPre = other.getPre(originalSelfVar, 
@@ -351,7 +335,7 @@ public class OperationContractImpl implements OperationContract {
                                                         originalExcVar, 
                                                         newAtPreFunctions, 
                                                         services);
-            SetOfLocationDescriptor otherModifies 
+            ImmutableSet<LocationDescriptor> otherModifies 
                     = other.getModifies(originalSelfVar, 
                                         originalParamVars, 
                                         services);
@@ -364,8 +348,8 @@ public class OperationContractImpl implements OperationContract {
                                       otherPre.getFormula()));
         }
 
-        return new OperationContractImpl(name,
-                                         displayName,
+        return new OperationContractImpl(p_name,
+                                         p_displayName,
                                          programMethod,
                                          modality,
                                          pre,
@@ -376,6 +360,59 @@ public class OperationContractImpl implements OperationContract {
                                          originalResultVar,
                                          originalExcVar,
                                          newAtPreFunctions);
+    }
+    
+    
+    public OperationContract replaceProgramMethod(ProgramMethod pm, 
+	    					  Services services) {
+        return new OperationContractImpl(name,
+                			 displayName,
+                			 pm,
+                			 modality,
+                			 originalPre,
+                			 originalPost,
+                			 originalModifies,
+                			 originalSelfVar,
+                			 originalParamVars,
+                			 originalResultVar,
+                			 originalExcVar,
+                			 originalAtPreFunctions);	
+    }
+    
+    
+    public OperationContract addPre(FormulaWithAxioms addedPre,
+		    		    ParsableVariable selfVar, 
+		    		    ImmutableList<ParsableVariable> paramVars,
+		    		    Services services) {
+	//replace in addedPre the variables used for self and parameters
+	Map <Operator, Operator> map = new LinkedHashMap<Operator,Operator>();
+	if(selfVar != null) {
+	    map.put(selfVar, originalSelfVar);
+	}
+	if(paramVars != null) {
+	    Iterator<ParsableVariable> it1 = paramVars.iterator();
+	    Iterator<ParsableVariable> it2 = originalParamVars.iterator();
+	    while(it1.hasNext()) {
+		assert it2.hasNext();
+		map.put(it1.next(), it2.next());
+	    }
+	}
+	OpReplacer or = new OpReplacer(map);
+	addedPre = or.replace(addedPre);
+	
+	//create new contract
+        return new OperationContractImpl(name,
+		 			 displayName,
+		 			 programMethod,
+		 			 modality,
+		 			 originalPre.conjoin(addedPre),
+		 			 originalPost,
+		 			 originalModifies,
+		 			 originalSelfVar,
+		 			 originalParamVars,
+		 			 originalResultVar,
+		 			 originalExcVar,
+		 			 originalAtPreFunctions);
     }
 
     

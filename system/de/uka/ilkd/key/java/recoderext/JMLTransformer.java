@@ -14,14 +14,6 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 
-import de.uka.ilkd.key.collection.ListOfString;
-import de.uka.ilkd.key.collection.SLListOfString;
-import de.uka.ilkd.key.gui.configuration.ProofSettings;
-import de.uka.ilkd.key.speclang.PositionedString;
-import de.uka.ilkd.key.speclang.SetAsListOfPositionedString;
-import de.uka.ilkd.key.speclang.SetOfPositionedString;
-import de.uka.ilkd.key.speclang.jml.pretranslation.*;
-import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.abstraction.Constructor;
 import recoder.abstraction.Method;
@@ -31,20 +23,29 @@ import recoder.java.SourceElement.Position;
 import recoder.java.declaration.*;
 import recoder.java.expression.operator.CopyAssignment;
 import recoder.java.statement.EmptyStatement;
-import recoder.list.generic.*;
+import recoder.list.generic.ASTArrayList;
+import recoder.list.generic.ASTList;
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.gui.configuration.ProofSettings;
+import de.uka.ilkd.key.speclang.PositionedString;
+import de.uka.ilkd.key.speclang.jml.pretranslation.*;
+import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 
 
 public class JMLTransformer extends RecoderModelTransformer {
     
-    private static final ListOfString javaMods
-        = SLListOfString.EMPTY_LIST.prepend(new String[]{"abstract",
+    private static final ImmutableList<String> javaMods
+        = ImmutableSLList.<String>nil().prepend(new String[]{"abstract",
                                                          "final", 
                                                          "private", 
                                                          "protected", 
                                                          "public", 
                                                          "static"});    
     
-    private static SetOfPositionedString warnings;
+    private static ImmutableSet<PositionedString> warnings;
     
 
     /**
@@ -63,7 +64,7 @@ public class JMLTransformer extends RecoderModelTransformer {
     public JMLTransformer(CrossReferenceServiceConfiguration services,
                           TransformerCache cache) {
         super(services, cache);
-        warnings = SetAsListOfPositionedString.EMPTY_SET;
+        warnings = DefaultImmutableSet.<PositionedString>nil();
     }
 
    
@@ -103,7 +104,7 @@ public class JMLTransformer extends RecoderModelTransformer {
      * to the passed PositionedString. Inserts whitespace in place of 
      * the JML modifiers (in order to preserve position information).
      */
-    private PositionedString prependJavaMods(ListOfString mods,
+    private PositionedString prependJavaMods(ImmutableList<String> mods,
                                              PositionedString ps) {
         StringBuffer sb = new StringBuffer();
         for(String mod : mods) {
@@ -130,7 +131,7 @@ public class JMLTransformer extends RecoderModelTransformer {
      * Puts the JML modifiers from the passed list into a string enclosed
      * in JML markers.
      */
-    private String getJMLModString(ListOfString mods) {
+    private String getJMLModString(ImmutableList<String> mods) {
         StringBuffer sb = new StringBuffer("/*@");
         
         for(String mod : mods) {
@@ -414,7 +415,7 @@ public class JMLTransformer extends RecoderModelTransformer {
             //call preparser            
             KeYJMLPreParser preParser 
                 = new KeYJMLPreParser(concatenatedComment, fileName, pos);
-            ListOfTextualJMLConstruct constructs 
+            ImmutableList<TextualJMLConstruct> constructs 
                 = preParser.parseClasslevelComment();
             warnings = warnings.union(preParser.getWarnings());
             
@@ -474,7 +475,7 @@ public class JMLTransformer extends RecoderModelTransformer {
         //call preparser
         KeYJMLPreParser preParser 
             = new KeYJMLPreParser(concatenatedComment, fileName, pos);
-        ListOfTextualJMLConstruct constructs 
+        ImmutableList<TextualJMLConstruct> constructs 
             = preParser.parseMethodlevelComment();
         warnings = warnings.union(preParser.getWarnings());
 
@@ -583,7 +584,7 @@ public class JMLTransformer extends RecoderModelTransformer {
     }
     
     
-    public static SetOfPositionedString getWarningsOfLastInstance() {
+    public static ImmutableSet<PositionedString> getWarningsOfLastInstance() {
         return warnings;
     }
     

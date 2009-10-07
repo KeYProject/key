@@ -10,10 +10,10 @@
 
 package de.uka.ilkd.key.proof.incclosure;
 
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.logic.Constraint;
 import de.uka.ilkd.key.logic.op.Metavariable;
-import de.uka.ilkd.key.logic.op.SetAsListOfMetavariable;
-import de.uka.ilkd.key.logic.op.SetOfMetavariable;
 
 
 /**
@@ -25,8 +25,8 @@ public class Restricter implements Sink {
     /**
      * Variables to remove from passing constraints
      */
-    private SetOfMetavariable removedVariables =
-	SetAsListOfMetavariable.EMPTY_SET;
+    private ImmutableSet<Metavariable> removedVariables =
+	DefaultImmutableSet.<Metavariable>nil();
 
     /**
      * Parent sink within the tree of sinks
@@ -61,7 +61,7 @@ public class Restricter implements Sink {
         parent.addRestriction(p_mv);
     }
 
-    public SetOfMetavariable getRestrictions () {
+    public ImmutableSet<Metavariable> getRestrictions () {
 	return removedVariables;
     }
 

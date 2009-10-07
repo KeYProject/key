@@ -17,6 +17,7 @@
 
 package de.uka.ilkd.key.speclang;
 
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
@@ -30,13 +31,13 @@ public interface SpecExtractor {
     /**
      * Returns the operation contracts for the passed operation.
      */
-    public SetOfOperationContract extractOperationContracts(ProgramMethod pm)
+    public ImmutableSet<OperationContract> extractOperationContracts(ProgramMethod pm)
         throws SLTranslationException;
     
     /**
      * Returns the class invariants for the passed type.
      */
-    public SetOfClassInvariant extractClassInvariants(KeYJavaType kjt)
+    public ImmutableSet<ClassInvariant> extractClassInvariants(KeYJavaType kjt)
         throws SLTranslationException;
         
     /**
@@ -51,5 +52,5 @@ public interface SpecExtractor {
      * (e.g. this may warn about unsupported features which have been ignored 
      * by the translation)
      */
-    public SetOfPositionedString getWarnings();
+    public ImmutableSet<PositionedString> getWarnings();
 }

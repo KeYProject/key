@@ -17,6 +17,7 @@
 
 package de.uka.ilkd.key.speclang.ocl.translation;
 
+import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Term;
@@ -92,8 +93,8 @@ class OCLMethodResolver extends SLExpressionResolver {
             containingName = containingType.getFullName();
         }
         
-        Term[] args 
-            = fbc.convertFormulasToBool(((OCLParameters)parameters).getEntities()).toArray();
+        final ImmutableList<Term> argList = fbc.convertFormulasToBool(((OCLParameters)parameters).getEntities());
+	Term[] args = argList.toArray(new Term[argList.size()]);
            
         OCLCollection recCollection = (OCLCollection) receiver.getCollection();       
 

@@ -7,20 +7,24 @@
 // See LICENSE.TXT for details.
 package de.uka.ilkd.key.rule.metaconstruct;
 
+import java.util.Iterator;
+
+import de.uka.ilkd.key.collection.ImmutableArray;
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.IteratorOfKeYJavaType;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.abstraction.ListOfKeYJavaType;
-import de.uka.ilkd.key.java.abstraction.SLListOfKeYJavaType;
 import de.uka.ilkd.key.java.declaration.EnumClassDeclaration;
 import de.uka.ilkd.key.java.expression.literal.IntLiteral;
 import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
-import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.UpdateFactory;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.*;
 import de.uka.ilkd.key.rule.UpdateSimplifier;
-import de.uka.ilkd.key.rule.updatesimplifier.ArrayOfAssignmentPair;
 import de.uka.ilkd.key.rule.updatesimplifier.AssignmentPair;
 import de.uka.ilkd.key.rule.updatesimplifier.Update;
 import de.uka.ilkd.key.util.Debug;
@@ -72,11 +76,11 @@ public class InReachableStatePOBuilder extends TermBuilder {
         }
         final Update update = Update.createUpdate(updateInReachableState);
 
-        ListOfTerm conjunctions = SLListOfTerm.EMPTY_LIST;
-        final ArrayOfAssignmentPair pairs = update.getAllAssignmentPairs();
+        ImmutableList<Term> conjunctions = ImmutableSLList.<Term>nil();
+        final ImmutableArray<AssignmentPair> pairs = update.getAllAssignmentPairs();
 
         for (int i = 0; i < pairs.size(); i++) {
-            final AssignmentPair pair = pairs.getAssignmentPair(i);
+            final AssignmentPair pair = pairs.get(i);
             final Location loc = pair.location();
 
             Term result = null;
@@ -523,10 +527,10 @@ public class InReachableStatePOBuilder extends TermBuilder {
                         implicitFields[1], implicitFields[2], null);
 
         final KeYJavaType currentType = implicitFields[0].getContainerType();
-        final ListOfKeYJavaType directSubTypes = getDirectSubtypes(currentType);
+        final ImmutableList<KeYJavaType> directSubTypes = getDirectSubtypes(currentType);
 
         if (!directSubTypes.isEmpty()) {
-            final IteratorOfKeYJavaType it = directSubTypes.iterator();
+            final Iterator<KeYJavaType> it = directSubTypes.iterator();
             Term subsNotInit = tt();
             while (it.hasNext()) {
                 final ProgramVariable subsCInitPV =
@@ -628,12 +632,12 @@ public class InReachableStatePOBuilder extends TermBuilder {
                         implicitFields[0], implicitFields[2], implicitFields[3]);
         // direct supertypes
 
-        final ListOfKeYJavaType directSuperTypes =
+        final ImmutableList<KeYJavaType> directSuperTypes =
                 services.getJavaInfo().getDirectSuperTypes(
                         implicitFields[0].getContainerType());
 
         if (!directSuperTypes.isEmpty()) {
-            final IteratorOfKeYJavaType it = directSuperTypes.iterator();
+            final Iterator<KeYJavaType> it = directSuperTypes.iterator();
             Term superTypesInit = tt();
             while (it.hasNext()) {
                 final ProgramVariable superCInitPV =
@@ -673,17 +677,17 @@ public class InReachableStatePOBuilder extends TermBuilder {
     /**
      * @param currentType
      */
-    private ListOfKeYJavaType getDirectSubtypes(final KeYJavaType currentType) {
-        ListOfKeYJavaType directSubTypes = SLListOfKeYJavaType.EMPTY_LIST;
+    private ImmutableList<KeYJavaType> getDirectSubtypes(final KeYJavaType currentType) {
+        ImmutableList<KeYJavaType> directSubTypes = ImmutableSLList.<KeYJavaType>nil();
 
         final JavaInfo javaInfo = services.getJavaInfo();
-        final ListOfKeYJavaType allSubTypes =
+        final ImmutableList<KeYJavaType> allSubTypes =
                 javaInfo.getAllSubtypes(currentType);
 
-        final IteratorOfKeYJavaType subTypes = allSubTypes.iterator();
+        final Iterator<KeYJavaType> subTypes = allSubTypes.iterator();
         while (subTypes.hasNext()) {
             final KeYJavaType subtype = subTypes.next();
-            final ListOfKeYJavaType subsDirectSuper =
+            final ImmutableList<KeYJavaType> subsDirectSuper =
                     javaInfo.getDirectSuperTypes(subtype);
             if (subsDirectSuper.contains(currentType)) {
                 directSubTypes = directSubTypes.prepend(subtype);
@@ -709,7 +713,7 @@ public class InReachableStatePOBuilder extends TermBuilder {
     }
 
     // Helpers to build term
-    private Term conjunction(IteratorOfTerm it) {
+    private Term conjunction(Iterator<Term> it) {
         Term result = tt();
         while (it.hasNext()) {
             result = and(result, it.next());

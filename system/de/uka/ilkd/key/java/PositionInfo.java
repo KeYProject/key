@@ -41,7 +41,26 @@ public class PositionInfo {
         this.relPos=relPos;
         this.startPos=startPos;
         this.endPos=endPos;
-        this.fileName=fileName;
+        this.fileName=simplifyPath(fileName);//bugfix:2009.09.17
+    }
+    
+    /** If the path contains the substring "/../", then this method tries to 
+     * simplify the path by removing this substring and the preceeding directory name
+     * to that substring. Otherwise java.io.FileReader would have a problem.
+     * E.g. Input "/A/B/../D" - Output "/A/D"
+     * @author gladisch*/
+    private static String simplifyPath(String path){
+	if(path==null || path.length()==0)
+	    return path;
+	int idx = path.indexOf("/../");;
+	while(idx > 0){
+	    int pre= path.lastIndexOf("/", idx-1);
+	    if(pre!=-1){
+		path = path.substring(0, pre) + path.substring(idx+3);
+	    }
+	    idx = path.indexOf("/../");
+	}
+	return path;
     }
 
     public Position getRelativePosition() {

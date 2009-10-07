@@ -10,11 +10,12 @@
  */
 package de.uka.ilkd.key.rule.metaconstruct;
 
+import java.util.Iterator;
+
+import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.IteratorOfKeYJavaType;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.abstraction.ListOfKeYJavaType;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -44,10 +45,10 @@ public class ArrayStoreStaticAnalyse extends AbstractMetaOperator {
         super(new Name("#arrayStoreStaticAnalyse"), 1);
     }
 
-    private ListOfKeYJavaType determineDynamicTypes(ClassInstanceSortImpl s,
+    private ImmutableList<KeYJavaType> determineDynamicTypes(ClassInstanceSortImpl s,
             Services serv) {        
         final KeYJavaType keYJavaType = serv.getJavaInfo().getKeYJavaType(s);
-        final ListOfKeYJavaType result = serv.getJavaInfo().getAllSubtypes(keYJavaType);
+        final ImmutableList<KeYJavaType> result = serv.getJavaInfo().getAllSubtypes(keYJavaType);
        
         return result.prepend(keYJavaType);
     }
@@ -61,16 +62,16 @@ public class ArrayStoreStaticAnalyse extends AbstractMetaOperator {
     private Term assignmentCompatible
     	(ClassInstanceSortImpl arrayElementSort,
     	        ClassInstanceSortImpl elementSort, Services serv) {
-        final IteratorOfKeYJavaType elementDynamicTypesIt = determineDynamicTypes(
+        final Iterator<KeYJavaType> elementDynamicTypesIt = determineDynamicTypes(
                 elementSort, serv).iterator();
-        final ListOfKeYJavaType arrayElementDynamicTypes = determineDynamicTypes(
+        final ImmutableList<KeYJavaType> arrayElementDynamicTypes = determineDynamicTypes(
                 arrayElementSort, serv);
 
         boolean assignmentCompatible = true;
         boolean assignmentCompatibleSet = false;
         
         while (elementDynamicTypesIt.hasNext()) {
-            final IteratorOfKeYJavaType arrayElementDynamicTypesIt = 
+            final Iterator<KeYJavaType> arrayElementDynamicTypesIt = 
                 arrayElementDynamicTypes.iterator();
             final Sort dynamicElementSort = elementDynamicTypesIt.next().getSort();
             boolean extTrans = false;           

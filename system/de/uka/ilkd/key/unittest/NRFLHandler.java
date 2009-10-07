@@ -20,21 +20,22 @@ package de.uka.ilkd.key.unittest;
 import java.util.HashSet;
 import java.util.LinkedList;
 
+import de.uka.ilkd.key.collection.ImmutableArray;
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.UpdateFactory;
-import de.uka.ilkd.key.logic.op.ArrayOfQuantifiableVariable;
 import de.uka.ilkd.key.logic.op.Location;
 import de.uka.ilkd.key.logic.op.NonRigidFunctionLocation;
 import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.rule.UpdateSimplifier;
 import de.uka.ilkd.key.rule.updatesimplifier.AssignmentPair;
 import de.uka.ilkd.key.rule.updatesimplifier.AssignmentPairImpl;
-import de.uka.ilkd.key.rule.updatesimplifier.ListOfAssignmentPair;
-import de.uka.ilkd.key.rule.updatesimplifier.SLListOfAssignmentPair;
 import de.uka.ilkd.key.rule.updatesimplifier.Update;
 
 /**
@@ -86,7 +87,7 @@ public class NRFLHandler {
                 return post;
             } else {
                 final Term[] subs = new Term[arity];
-                final ArrayOfQuantifiableVariable[] bVars = new ArrayOfQuantifiableVariable[arity];
+                final ImmutableArray<QuantifiableVariable>[] bVars = new ImmutableArray[arity];
                 for (int i = 0; i < arity; i++) {
                     subs[i] = createNewPost(post.sub(i));
                     bVars[i] = post.varsBoundHere(i);
@@ -137,12 +138,12 @@ public class NRFLHandler {
      *         
      */
     private Update createIdentUp(HashSet<Term> funcs) {
-        ListOfAssignmentPair newAssPairs = SLListOfAssignmentPair.EMPTY_LIST;
+        ImmutableList<AssignmentPair> newAssPairs = ImmutableSLList.<AssignmentPair>nil();
         for (Term NRFL : funcs) {
             newAssPairs = newAssPairs.append(new AssignmentPairImpl(
                     (NonRigidFunctionLocation) NRFL.op(), getSubs(NRFL), NRFL));
         }
-        return Update.createUpdate(newAssPairs.toArray());
+        return Update.createUpdate(newAssPairs.toArray(new AssignmentPair[newAssPairs.size()]));
     }
 
     /**

@@ -10,10 +10,11 @@
 
 package de.uka.ilkd.key.rule.metaconstruct;
 
+import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.declaration.ArrayOfModifier;
 import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
+import de.uka.ilkd.key.java.declaration.Modifier;
 import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.reference.TypeRef;
 import de.uka.ilkd.key.java.reference.TypeReference;
@@ -43,13 +44,13 @@ public class ArrayPostDecl extends ProgramMetaConstruct {
 
 
 	final LocalVariableDeclaration declaration = (LocalVariableDeclaration)pe;
-	final ArrayOfModifier modifiers = declaration.getModifiers();
+	final ImmutableArray<Modifier> modifiers = declaration.getModifiers();
 	final TypeReference originalTypeReference = declaration.getTypeReference();
 	/*	Debug.assertTrue
 	    (declaration.getVariables().size() == 1,
 	    "ArrayPostDecl metaconsstruct can only treat single variable declarations");*/
 	final VariableSpecification var = 
-	    declaration.getVariables().getVariableSpecification(0);
+	    declaration.getVariables().get(0);
 	
 	final TypeReference newTypeReference = 
 	    new TypeRef(originalTypeReference.getProgramElementName(),

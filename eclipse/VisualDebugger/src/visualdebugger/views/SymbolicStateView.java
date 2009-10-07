@@ -27,8 +27,9 @@ import org.eclipse.ui.part.ViewPart;
 import visualdebugger.draw2d.ArrayObjectFigure;
 import visualdebugger.draw2d.FixedConnectionAnchor;
 import visualdebugger.draw2d.ObjectFigure;
-import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.IteratorOfProgramVariable;
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.visualdebugger.DebuggerEvent;
 import de.uka.ilkd.key.visualdebugger.DebuggerListener;
@@ -46,7 +47,7 @@ public class SymbolicStateView extends ViewPart implements DebuggerListener {
 
     private StateVisualization stateVis = null;
     
-    private SetOfTerm[] possibleIndexTerms; 
+    private ImmutableSet<Term>[] possibleIndexTerms; 
 
     private Shell shell;
 
@@ -64,7 +65,7 @@ public class SymbolicStateView extends ViewPart implements DebuggerListener {
 
     private org.eclipse.swt.widgets.List constraintsList;
 
-    private LinkedList symbolicObjects;
+    private LinkedList<SymbolicObject> symbolicObjects;
 
     private Object selectedAttr;
 
@@ -175,9 +176,9 @@ public class SymbolicStateView extends ViewPart implements DebuggerListener {
         arrayIndexSlider.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent e) {
                 if (preState)
-                currentState = stateVis.getSymbolicState(prestateForTracesSlider.getSelection(),(SetOfTerm) possibleIndexTerms[arrayIndexSlider.getSelection()],true);
+                currentState = stateVis.getSymbolicState(prestateForTracesSlider.getSelection(),(ImmutableSet<Term>) possibleIndexTerms[arrayIndexSlider.getSelection()],true);
                 else 
-                currentState = stateVis.getSymbolicState(prestateForTracesSlider.getSelection(),(SetOfTerm) possibleIndexTerms[arrayIndexSlider.getSelection()],false);               
+                currentState = stateVis.getSymbolicState(prestateForTracesSlider.getSelection(),(ImmutableSet<Term>) possibleIndexTerms[arrayIndexSlider.getSelection()],false);               
                 refreshVisualizedState();
             }
         });
@@ -207,7 +208,7 @@ public class SymbolicStateView extends ViewPart implements DebuggerListener {
         postButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent e) {
                 preState = !postButton.getSelection();
-                currentState = stateVis.getSymbolicState(prestateForTracesSlider.getSelection(),(SetOfTerm)possibleIndexTerms[arrayIndexSlider.getSelection()],false);                          
+                currentState = stateVis.getSymbolicState(prestateForTracesSlider.getSelection(),(ImmutableSet<Term>)possibleIndexTerms[arrayIndexSlider.getSelection()],false);                          
                 refreshVisualizedState();
             }
         });
@@ -301,15 +302,15 @@ public class SymbolicStateView extends ViewPart implements DebuggerListener {
 
         figures.removeAll();
         connections.removeAll();
-        final HashMap node2figure = new HashMap();
-        final HashMap figure2node = new HashMap();
+        final HashMap<Node, ObjectFigure> node2figure = new HashMap<Node, ObjectFigure>();
+        final HashMap<ObjectFigure, Node> figure2node = new HashMap<ObjectFigure, Node>();
 
         final DirectedGraph graph = new DirectedGraph();
         graph.setDefaultPadding(new Insets(50));
 
         // create object figure and nodes
-        for (Iterator soIt = symbolicObjects.iterator(); soIt.hasNext();) {
-            final SymbolicObject so = (SymbolicObject) soIt.next();
+        for (Iterator<SymbolicObject> soIt = symbolicObjects.iterator(); soIt.hasNext();) {
+            final SymbolicObject so = soIt.next();
             if (!so.isNull()){
             final ObjectFigure f = createFigure(so);
             final Node n = new Node();
@@ -323,8 +324,8 @@ public class SymbolicStateView extends ViewPart implements DebuggerListener {
 
         // create edges
 
-        for (Iterator ofIt = figure2node.keySet().iterator(); ofIt.hasNext();) {
-            final ObjectFigure ofStart = (ObjectFigure) ofIt.next();
+        for (Iterator<ObjectFigure> ofIt = figure2node.keySet().iterator(); ofIt.hasNext();) {
+            final ObjectFigure ofStart = ofIt.next();
             for (Iterator soEndsIt = ofStart.getSymbolicObject()
                     .getAllAssociationEnds().iterator(); soEndsIt.hasNext();) {
                 SymbolicObject soEnd = (SymbolicObject) soEndsIt.next();
@@ -332,8 +333,8 @@ public class SymbolicStateView extends ViewPart implements DebuggerListener {
                 final ObjectFigure ofEnd = getOFbySO(figure2node.keySet(),
                         soEnd);
                 if (ofEnd != ofStart) {
-                    final Edge edge = new Edge((Node) figure2node.get(ofStart),
-                            (Node) figure2node.get(ofEnd));
+                    final Edge edge = new Edge(figure2node.get(ofStart),
+                            figure2node.get(ofEnd));
 
                     edge.setPadding(100);
                     graph.edges.add(edge);
@@ -349,17 +350,17 @@ public class SymbolicStateView extends ViewPart implements DebuggerListener {
         // add figures
         for (int i = 0; i < graph.nodes.size(); i++) {
             Node node = graph.nodes.getNode(i);
-            buildNodeFigure(figures, node, (ObjectFigure) node2figure.get(node));
+            buildNodeFigure(figures, node, node2figure.get(node));
         }
 
         figures.validate(); // TODO warum ?
         int offset = 0;
 
         // create and add connections
-        for (Iterator ofIt = figure2node.keySet().iterator(); ofIt.hasNext();) {
-            final ObjectFigure ofStart = (ObjectFigure) ofIt.next();
+        for (Iterator<ObjectFigure> ofIt = figure2node.keySet().iterator(); ofIt.hasNext();) {
+            final ObjectFigure ofStart = ofIt.next();
 
-            for (IteratorOfProgramVariable pvIt = ofStart.getSymbolicObject()
+            for (Iterator<ProgramVariable> pvIt = ofStart.getSymbolicObject()
                     .getNonPrimAttributes().iterator(); pvIt.hasNext();) {
                 ProgramVariable pv = pvIt.next();
                 final SymbolicObject soEnd = ofStart.getSymbolicObject()
@@ -387,7 +388,7 @@ public class SymbolicStateView extends ViewPart implements DebuggerListener {
                 SymbolicArrayObject saoStart = ((SymbolicArrayObject)aofStart.
                         getSymbolicObject());
 
-                for (IteratorOfTerm indexIt = saoStart.getAllIndexTerms().iterator(); indexIt
+                for (Iterator<Term> indexIt = saoStart.getAllIndexTerms().iterator(); indexIt
                         .hasNext();) {
                     Term index = indexIt.next();
                     SymbolicObject soEnd = ((SymbolicArrayObject)aofStart.getSymbolicObject())
@@ -410,11 +411,11 @@ public class SymbolicStateView extends ViewPart implements DebuggerListener {
         new Dragger(of);
     }
 
-    private ObjectFigure getOFbySO(Collection objectFigures,
+    private ObjectFigure getOFbySO(Collection<ObjectFigure> objectFigures,
             SymbolicObject toFind) {
-        Iterator it = objectFigures.iterator();
+        Iterator<ObjectFigure> it = objectFigures.iterator();
         while (it.hasNext()) {
-            ObjectFigure of = (ObjectFigure) it.next();
+            ObjectFigure of = it.next();
             if (of.getSymbolicObject() == toFind) {
                 return of;
             }
@@ -490,7 +491,7 @@ public class SymbolicStateView extends ViewPart implements DebuggerListener {
             }
             al.setSelected(true);
             this.selectedAttr = al;
-            if (al.getSo().getConstraintsForIndex(al.getIndex()) != SLListOfTerm.EMPTY_LIST)
+            if (!al.getSo().getConstraintsForIndex(al.getIndex()).isEmpty())
                 setConstraints(al.getSo()
                         .getConstraintsForIndex(al.getIndex()), symbolicObjects,
                         al.getSo());
@@ -500,9 +501,9 @@ public class SymbolicStateView extends ViewPart implements DebuggerListener {
         }    else if (o instanceof ArrayObjectFigure.IndexConstraintLabel) {
             ArrayObjectFigure.IndexConstraintLabel al = (ArrayObjectFigure.IndexConstraintLabel) o;
             this.currentState.getIndexTerms();
-            SetOfTerm indexConstr = al.getIndexConstraints();
-            for(Iterator it = this.symbolicObjects.iterator(); it.hasNext();){
-                SymbolicObject next = (SymbolicObject) it.next();
+            ImmutableSet<Term> indexConstr = al.getIndexConstraints();
+            for(Iterator<SymbolicObject> it = this.symbolicObjects.iterator(); it.hasNext();){
+                SymbolicObject next = it.next();
                 if (next instanceof SymbolicArrayObject){
                     SymbolicArrayObject sao = (SymbolicArrayObject)next;
                     if (sao != al.getSo()){
@@ -515,7 +516,7 @@ public class SymbolicStateView extends ViewPart implements DebuggerListener {
             int result =-1; 
             int i=0;
             for(int j = 0 ; j< possibleIndexTerms.length;j++){
-                SetOfTerm next = (SetOfTerm ) possibleIndexTerms[j];
+                ImmutableSet<Term> next = (ImmutableSet<Term> ) possibleIndexTerms[j];
                // System.out.println("checking"+next);
                 if (next.subset(indexConstr)&& indexConstr.subset(next)){
                     result = i;
@@ -544,9 +545,9 @@ public class SymbolicStateView extends ViewPart implements DebuggerListener {
     }
     
     
-    private void setConstraints(ListOfTerm cons, LinkedList sos, SymbolicObject so){
+    private void setConstraints(ImmutableList<Term> cons, LinkedList<SymbolicObject> sos, SymbolicObject so){
         if (cons!=null){            
-            final Term[] conArray = cons.toArray();
+            final Term[] conArray = cons.toArray(new Term[cons.size()]);
             final  String[] termsString =new String[conArray.length];             
             //text.setItems();
             for(int i=0;i<conArray.length;i++){
@@ -575,7 +576,7 @@ public class SymbolicStateView extends ViewPart implements DebuggerListener {
 
         BendpointConnectionRouter router = new BendpointConnectionRouter();
         con.setConnectionRouter(router);
-        ArrayList list = new ArrayList();
+        ArrayList<RelativeBendpoint> list = new ArrayList<RelativeBendpoint>();
 
         RelativeBendpoint b = new RelativeBendpoint(con);
         b.setWeight(0.2f);

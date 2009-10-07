@@ -9,7 +9,8 @@ package de.uka.ilkd.key.visualdebugger.executiontree;
 
 import java.util.LinkedList;
 
-import de.uka.ilkd.key.logic.ListOfTerm;
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.visualdebugger.SourceElementId;
 
 /**
@@ -21,14 +22,14 @@ import de.uka.ilkd.key.visualdebugger.SourceElementId;
 public class ETStatementNode extends ETNode {
     SourceElementId statementId;
 
-    public ETStatementNode(ListOfTerm bc, LinkedList nodes, SourceElementId id,
+    public ETStatementNode(ImmutableList<Term> bc, LinkedList nodes, SourceElementId id,
             ETNode parent) {
         super(bc, nodes, parent);
         statementId = id;
         assert (id != null);
     }
 
-    public ETStatementNode(ListOfTerm bc, SourceElementId id, ETNode parent) {
+    public ETStatementNode(ImmutableList<Term> bc, SourceElementId id, ETNode parent) {
         super(bc, parent);
         statementId = id;
         assert (id != null);

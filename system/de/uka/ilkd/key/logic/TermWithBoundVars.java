@@ -16,7 +16,8 @@
 
 package de.uka.ilkd.key.logic;
 
-import de.uka.ilkd.key.logic.op.ArrayOfQuantifiableVariable;
+import de.uka.ilkd.key.collection.ImmutableArray;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 
 /**
  * A TermWithBoundVars is an object that contains a Term and 0, 1,
@@ -29,7 +30,7 @@ public class TermWithBoundVars {
     /** 
      * the variables that are bound in the Term
      */
-    public ArrayOfQuantifiableVariable boundVars;
+    public ImmutableArray<QuantifiableVariable> boundVars;
 
     /** 
      * the Term
@@ -40,7 +41,7 @@ public class TermWithBoundVars {
      * @param vars the variables that are bound in t
      * @param t the term
      */
-    public TermWithBoundVars(ArrayOfQuantifiableVariable vars, Term t) {
+    public TermWithBoundVars(ImmutableArray<QuantifiableVariable> vars, Term t) {
 	boundVars = vars;
 	term = t;
     }

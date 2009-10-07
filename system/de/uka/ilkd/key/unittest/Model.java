@@ -7,9 +7,11 @@
 // See LICENSE.TXT for details.
 package de.uka.ilkd.key.unittest;
 
-import java.util.*;
-import de.uka.ilkd.key.java.*;
-import de.uka.ilkd.key.java.expression.literal.*;
+import java.util.HashMap;
+import java.util.Iterator;
+
+import de.uka.ilkd.key.java.Expression;
+import de.uka.ilkd.key.java.expression.literal.IntLiteral;
 import de.uka.ilkd.key.logic.Term;
 
 /**

@@ -3,7 +3,7 @@
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
+// The KeY system is protected by the GNU General Public License.
 // See LICENSE.TXT for details.
 //
 //
@@ -14,6 +14,8 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Vector;
 
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.expression.literal.IntLiteral;
@@ -25,7 +27,10 @@ import de.uka.ilkd.key.java.visitor.CreatingASTVisitor;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.proof.*;
+import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.util.ExtList;
@@ -57,9 +62,9 @@ public class NonInterferencePO implements ProofOblInput {
     ProofAggregate po;
     InitConfig initConfig;
     Proof proof1,proof2;
-    
+
     ProgramVariable trueSelf;
-    
+
     public NonInterferencePO(ProofEnvironment env, Proof p1, Proof p2) {
         initConfig = env.getInitConfig();
         if(p1 == null || p2 == null)throw new IllegalStateException(
@@ -69,14 +74,14 @@ public class NonInterferencePO implements ProofOblInput {
         trueSelf = (ProgramVariable) proof1.getNamespaces().programVariables().
             lookup(new Name("self"));
     }
-    
-    
+
+
 
     public ProofAggregate getPO() {
         return po;
     }
-    
-    
+
+
     public boolean implies(ProofOblInput po) {
         return equals(po);
     }
@@ -89,21 +94,21 @@ public class NonInterferencePO implements ProofOblInput {
 			     initConfig.createTacletIndex(),
 			     initConfig.createBuiltInRuleIndex(),
 			     initConfig.getServices());
-    
+
         po = ProofAggregate.createProofAggregate(new Proof[] { p }, name());
-        
+
     }
-    
-    
-    
+
+
+
     public void createSubgoals() {
         Proof p = po.getFirstProof();
-    
+
         Vector nodes1 = new Vector();
         Vector nodes2 = new Vector();
         getSymExecNodes (proof1.root(),false,nodes1);
         getSymExecNodes (proof2.root(),true, nodes2);
-        
+
         LinkedList conditions = new LinkedList();
 
 
@@ -113,7 +118,7 @@ public class NonInterferencePO implements ProofOblInput {
             for( Enumeration j=nodes2.elements(); j.hasMoreElements();) {
                 Node b = (Node)j.nextElement();
                 if (syntacticNonInterference(a,b)) continue;
-                ConstrainedFormula cf = 
+                ConstrainedFormula cf =
                     new ConstrainedFormula(nonInterfCondition(a,b));
                 conditions.addFirst(
                     new ConditionContainer(cf,a.serialNr()+"<->"+b.serialNr()));
@@ -122,8 +127,8 @@ public class NonInterferencePO implements ProofOblInput {
 
 
         Goal firstGoal = p.openGoals().head();
-        ListOfGoal newGoals = firstGoal.split(conditions.size());
-        de.uka.ilkd.key.proof.IteratorOfGoal it = newGoals.iterator();
+        ImmutableList<Goal> newGoals = firstGoal.split(conditions.size());
+        Iterator<Goal> it = newGoals.iterator();
         while (it.hasNext()) {
             Goal g = it.next();
             ConditionContainer cc = (ConditionContainer) conditions.getFirst();
@@ -135,8 +140,8 @@ public class NonInterferencePO implements ProofOblInput {
 
         p.replace(firstGoal,newGoals);
     }
-    
-    
+
+
     /** Serves as an utility-method for getPOTerm(). It takes a Node
     (from a proof), traverses the tree of nodes, and collects in v all
     nodes where symbolic execution has been performed. To reduce the
@@ -174,7 +179,7 @@ where p2' is the first assignment statement of p2.
 
 
         Term stateA = sequentState(sa);
-        Term resAnte = TermFactory.DEFAULT.createJunctorTerm(Op.AND, 
+        Term resAnte = TermFactory.DEFAULT.createJunctorTerm(Op.AND,
             stateA, sequentState(sb));
 
         JavaProgramElement progA = program(sa);
@@ -186,9 +191,9 @@ where p2' is the first assignment statement of p2.
         }
 
 
-        FirstStatementExtractionVisitor v = 
-            new FirstStatementExtractionVisitor(progB, 
-                                                b, 
+        FirstStatementExtractionVisitor v =
+            new FirstStatementExtractionVisitor(progB,
+                                                b,
                                                 initConfig.getServices());
         v.start();
         JavaBlock p2prime = JavaBlock.createJavaBlock(
@@ -221,20 +226,20 @@ where p2' is the first assignment statement of p2.
         Term result = null;
 
         Term gamma = TermFactory.DEFAULT.createJunctorTerm(Op.TRUE);
-        for(IteratorOfConstrainedFormula icf = s.antecedent().iterator();
+        for(Iterator<ConstrainedFormula> icf = s.antecedent().iterator();
             icf.hasNext();) {
             gamma = TermFactory.DEFAULT.createJunctorTerm(Op.AND, gamma,
                                         icf.next().formula());
         }
-        
+
         if (progTerm.op() instanceof IUpdateOperator) {
             // TODO: what to change for quantified updates here??? /PR
-            
+
             IUpdateOperator upOp = (IUpdateOperator) progTerm.op();
-        
+
             int nrUps = upOp.locationCount(); // number of updates
 
-	    Term[] locs   = new Term[nrUps];	     
+	    Term[] locs   = new Term[nrUps];
 	    Term[] values = new Term[nrUps];
 	    Term target = gamma;
 	    for (int k = 0; k<nrUps; k=k+1) { //fix update with new vars
@@ -242,9 +247,9 @@ where p2' is the first assignment statement of p2.
                 LogicVariable newVar = new LogicVariable(
                     new Name("neww"+varNr++), upOp.value(progTerm,k).sort());
                 values[k] = TermFactory.DEFAULT.createVariableTerm(newVar);
-	    }	  
+	    }
             result = TermFactory.DEFAULT.createUpdateTerm(locs, values, target); // apply update to gamma
-            
+
             for(int k=0; k<nrUps; k++) { // add equations for "new" values
                 // XXX: here more work has to be done if x is more complex
                 Term left = locs[k];
@@ -253,18 +258,18 @@ where p2' is the first assignment statement of p2.
                     createUpdateTerm(locs, values, target);
                 Term updEqTerm = TermFactory.DEFAULT.createEqualityTerm(
                    left, right);
-                result = TermFactory.DEFAULT.createJunctorTerm(Op.AND, 
+                result = TermFactory.DEFAULT.createJunctorTerm(Op.AND,
                     result, updEqTerm);
             }
-            
-                
+
+
             for(int k=0; k<nrUps; k++) { // quantify existentially
                 result = TermFactory.DEFAULT.createQuantifierTerm(
                     Op.EX, (LogicVariable)values[k].op(), result);
             }
-                
+
         } else result = gamma;
-        
+
         return result;
     }
 
@@ -277,36 +282,36 @@ System.err.println(nr++);
 	//get TacletApp for Instantiations
 	TacletApp tapp1 = (TacletApp) a.getAppliedRuleApp();
 	TacletApp tapp2 = (TacletApp) b.getAppliedRuleApp();
-        if ("empty_modality".equals(tapp1.rule().name().toString())) 
+        if ("empty_modality".equals(tapp1.rule().name().toString()))
             return false;
 
-	//get Read-Sets 
-	ListOfSchemaVariable readVars1 = tapp1.taclet().readSet(); 
-	ListOfSchemaVariable readVars2 = tapp2.taclet().readSet();
-	ListOfSchemaVariable writeVars1 = tapp1.taclet().writeSet(); 
-	ListOfSchemaVariable writeVars2 = tapp2.taclet().writeSet();
+	//get Read-Sets
+	ImmutableList<SchemaVariable> readVars1 = tapp1.taclet().readSet();
+	ImmutableList<SchemaVariable> readVars2 = tapp2.taclet().readSet();
+	ImmutableList<SchemaVariable> writeVars1 = tapp1.taclet().writeSet();
+	ImmutableList<SchemaVariable> writeVars2 = tapp2.taclet().writeSet();
 
-        if (hasIntersection(instantiate(readVars1, tapp1), 
+        if (hasIntersection(instantiate(readVars1, tapp1),
                             instantiate(writeVars2, tapp2)))
             return false;
-        if (hasIntersection(instantiate(readVars2, tapp2), 
+        if (hasIntersection(instantiate(readVars2, tapp2),
                             instantiate(writeVars1, tapp1)))
             return false;
-        if (hasIntersection(instantiate(writeVars1, tapp1), 
+        if (hasIntersection(instantiate(writeVars1, tapp1),
                             instantiate(writeVars2, tapp2)))
             return false;
-            
+
         return true;
     }
 
 
-    
-    private Vector instantiate(ListOfSchemaVariable vlist, TacletApp tapp) {
+
+    private Vector instantiate(ImmutableList<SchemaVariable> vlist, TacletApp tapp) {
 //System.err.print(vlist+"->");
         Vector result = new Vector(5);
-	IteratorOfSchemaVariable vit =  vlist.iterator(); 
+	Iterator<SchemaVariable> vit =  vlist.iterator();
 	while (vit.hasNext()) {
-            Object inst = tapp.instantiations().getInstantiation(vit.next()); 
+            Object inst = tapp.instantiations().getInstantiation(vit.next());
 	    if (inst instanceof Literal) continue;
             if (inst instanceof ProgramVariable) continue;
             if ((inst instanceof FieldReference) &&
@@ -315,25 +320,25 @@ System.err.println(nr++);
         }
 //System.err.println(result);
         return result;
-    
+
     }
 
     public void setExceptionHandler(KeYExceptionHandler keh){
     }
-    
-    
+
+
     private boolean hasIntersection(Vector l1, Vector l2) {
         for( Enumeration i=l1.elements(); i.hasMoreElements();) {
             Sort s = getSort(i.nextElement());
-            for( Enumeration j=l2.elements(); j.hasMoreElements();) 
+            for( Enumeration j=l2.elements(); j.hasMoreElements();)
                 if (checkCompatibility(s, getSort(j.nextElement())))
                     return true;
         }
         return false;
-                                    
+
     }
-    
-    
+
+
     public Sort getSort(Object var){
         if (var == null) return null;
 	Sort s = null;
@@ -350,21 +355,21 @@ if ((var!=null) && (s==null)) System.err.println("NULL SORT OF "+var+" "+var.get
 
     public boolean checkCompatibility(Sort s1, Sort s2){
 	if(s1 == null || s2 == null) return false;
-	return (s1.extendsTrans(s2)||(s2.extendsTrans(s1))); 
+	return (s1.extendsTrans(s2)||(s2.extendsTrans(s1)));
     }
 
 
-    
+
     private Term syncCondition(JavaProgramElement pa, JavaProgramElement pb) {
         Term exa = syncExpr(pa);
         Term exb = syncExpr(pb);
         if ((exa==null) || (exb==null)) return null;
-        Term result = TermFactory.DEFAULT.createJunctorTerm(Op.EQUALS, 
+        Term result = TermFactory.DEFAULT.createJunctorTerm(Op.EQUALS,
             exa, exb);
         result = TermFactory.DEFAULT.createJunctorTerm(Op.NOT, result);
         return result;
     }
-    
+
 
     public Term syncExpr(JavaProgramElement pp) {
         Expression syncExpr = null;
@@ -392,7 +397,7 @@ if ((var!=null) && (s==null)) System.err.println("NULL SORT OF "+var+" "+var.get
                 convertToLogicElement(syncExpr, ec);
         }
     }
-    
+
 
 
 
@@ -407,7 +412,7 @@ if ((var!=null) && (s==null)) System.err.println("NULL SORT OF "+var+" "+var.get
     public String getJavaPath() throws ProofInputException {
         return null;
     }
-    
+
 
     /** set the initial configuration used to read an input. It may become
      * modified during reading depending on the modification strategy used
@@ -419,21 +424,21 @@ if ((var!=null) && (s==null)) System.err.println("NULL SORT OF "+var+" "+var.get
     public void readSpecs() {
     }
 
-    public void readActivatedChoices() throws ProofInputException { 
-	//nothing to do 
+    public void readActivatedChoices() throws ProofInputException {
+	//nothing to do
     }
 
-    public SetOfChoice getActivatedChoices() throws ProofInputException {
+    public ImmutableSet<Choice> getActivatedChoices() throws ProofInputException {
         return null;
-    
+
     }
-    
-    /** reads the include section and returns an Includes object.  
+
+    /** reads the include section and returns an Includes object.
      */
     public Includes readIncludes() throws ProofInputException {
         return new Includes();
     }
-    
+
     /** returns the name of the proof obligation input.
      */
     public String name() {
@@ -443,13 +448,13 @@ if ((var!=null) && (s==null)) System.err.println("NULL SORT OF "+var+" "+var.get
     public void startProtocol() {
 	// do nothing
     }
-    
-    
+
+
     private class FirstStatementExtractionVisitor extends CreatingASTVisitor {
 
         private ProgramElement result;
         private Node node;
-        
+
         public FirstStatementExtractionVisitor(ProgramElement root,
                                                Node n,
                                                Services services) {
@@ -458,8 +463,8 @@ if ((var!=null) && (s==null)) System.err.println("NULL SORT OF "+var+" "+var.get
         }
 
         /** starts the walker*/
-        public void start() {	
-	    stack.push(new ExtList());		
+        public void start() {
+	    stack.push(new ExtList());
 	    walk(root());
 	    ExtList el=stack.peek();
 	    int i=0;
@@ -469,7 +474,7 @@ if ((var!=null) && (s==null)) System.err.println("NULL SORT OF "+var+" "+var.get
 	    result=(ProgramElement) (stack.peek()).get(i);
         }
 
-        public ProgramElement result() { 	
+        public ProgramElement result() {
 	    return result;
         }
 
@@ -503,24 +508,24 @@ if ((var!=null) && (s==null)) System.err.println("NULL SORT OF "+var+" "+var.get
 
 
     }
-    
+
     private class ConditionContainer {
         private ConstrainedFormula f;
         private String label;
-        
+
         public ConditionContainer(ConstrainedFormula f, String s) {
             this.f = f;
             this.label = s;
         }
-        
+
         public ConstrainedFormula getFormula() {
             return f;
         }
-        
+
         public String getLabel() {
             return label;
         }
     }
-    
+
 
 }

@@ -10,7 +10,6 @@
 
 package de.uka.ilkd.key.parser;
 
-import de.uka.ilkd.key.java.ConvertException;
 import antlr.Token;
 
 public class JavaParserException extends antlr.SemanticException {

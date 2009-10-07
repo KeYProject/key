@@ -3,6 +3,8 @@ package de.uka.ilkd.key.speclang.ocl;
 import java.util.Set;
 import java.util.Vector;
 
+import de.uka.ilkd.key.collection.ImmutableList;
+
 
 public interface ModelClass {
 
@@ -27,7 +29,7 @@ public interface ModelClass {
     /**
      * Returns all supertypes of the class, including implemented interfaces.
      */ 
-    ListOfModelClass getMyParents();
+    ImmutableList<ModelClass> getMyParents();
     
     // returns ReprModelMethod
     Vector getOps();

@@ -7,19 +7,22 @@
 // See LICENSE.TXT for details.
 package de.uka.ilkd.key.rule.metaconstruct;
 
+import java.util.Iterator;
+
+import de.uka.ilkd.key.collection.ImmutableMapEntry;
+import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.AbstractMetaOperator;
-import de.uka.ilkd.key.logic.op.EntryOfSchemaVariableAndInstantiationEntry;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
-import de.uka.ilkd.key.logic.op.IteratorOfEntryOfSchemaVariableAndInstantiationEntry;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.rule.inst.InstantiationEntry;
 import de.uka.ilkd.key.rule.inst.ProgramInstantiation;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.Debug;
-import de.uka.ilkd.key.java.statement.MethodBodyStatement;
-import de.uka.ilkd.key.java.ProgramElement;
 
 /**
  * Transforms a method call into an update. Used for strictly pure methods.
@@ -46,11 +49,11 @@ public class MethodCallToUpdate extends AbstractMetaOperator {
               "and contains " + term.sub(1).toString() );
 
         // find SchemaVariable containing our strictly pure method body statement
-        IteratorOfEntryOfSchemaVariableAndInstantiationEntry it
+        Iterator<ImmutableMapEntry<SchemaVariable,InstantiationEntry>> it
             = svInst.pairIterator();
         MethodBodyStatement spmbs = null;
         while( it.hasNext() ) {
-            EntryOfSchemaVariableAndInstantiationEntry entry = it.next();
+            ImmutableMapEntry<SchemaVariable,InstantiationEntry> entry = it.next();
             if( entry.value() instanceof ProgramInstantiation ) {
                 ProgramInstantiation pi = (ProgramInstantiation) entry.value();
                 ProgramElement pe = pi.getProgramElement();
@@ -85,7 +88,7 @@ public class MethodCallToUpdate extends AbstractMetaOperator {
         for( int i = 0; i < spmbs.getArguments().size(); i++ ) {
             // arguments should all be simple variables by now... (?)
             param[i+offset] = services.getTypeConverter()
-             .convertToLogicElement(spmbs.getArguments().getExpression(i));
+             .convertToLogicElement(spmbs.getArguments().get(i));
         }
         
         // generate a new function

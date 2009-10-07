@@ -13,8 +13,9 @@ package de.uka.ilkd.key.proof;
 
 import java.util.Map;
 
+import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.ListOfQuantifiableVariable;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 
 /**
  * The abstract superclass of caches for taclet app indexes that are implemented
@@ -33,7 +34,7 @@ abstract class PrefixTermTacletAppIndexCacheImpl extends
 
     private final Map cache;
     
-    protected PrefixTermTacletAppIndexCacheImpl(ListOfQuantifiableVariable prefix,
+    protected PrefixTermTacletAppIndexCacheImpl(ImmutableList<QuantifiableVariable> prefix,
                                                 Map cache) {
         super ( prefix );
         this.cache = cache;

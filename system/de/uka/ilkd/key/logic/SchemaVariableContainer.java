@@ -7,7 +7,8 @@
 // See LICENSE.TXT for details.
 package de.uka.ilkd.key.logic;
 
-import de.uka.ilkd.key.logic.op.ListOfSchemaVariable;
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.logic.op.SchemaVariable;
 
 
 /**
@@ -19,6 +20,6 @@ import de.uka.ilkd.key.logic.op.ListOfSchemaVariable;
  */
 public interface SchemaVariableContainer {
 
-    ListOfSchemaVariable collectSV(ListOfSchemaVariable varList);
+    ImmutableList<SchemaVariable> collectSV(ImmutableList<SchemaVariable> varList);
 
 }

@@ -10,9 +10,12 @@
 
 package de.uka.ilkd.key.pp;
 
+import java.util.Iterator;
+
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.logic.ConstrainedFormula;
 import de.uka.ilkd.key.logic.Constraint;
-import de.uka.ilkd.key.logic.IteratorOfConstrainedFormula;
 import de.uka.ilkd.key.logic.Sequent;
 
 
@@ -27,8 +30,8 @@ public class ConstraintSequentPrintFilter implements SequentPrintFilter {
 
     protected Constraint           userConstraint;
 
-    protected ListOfSequentPrintFilterEntry antec = null;
-    protected ListOfSequentPrintFilterEntry succ  = null;
+    protected ImmutableList<SequentPrintFilterEntry> antec = null;
+    protected ImmutableList<SequentPrintFilterEntry> succ  = null;
 
     public ConstraintSequentPrintFilter ( Sequent    p_s,
 					  Constraint p_userConstraint ) {
@@ -40,14 +43,14 @@ public class ConstraintSequentPrintFilter implements SequentPrintFilter {
 	if ( antec != null )
 	    return;
 
-	IteratorOfConstrainedFormula it;
+	Iterator<ConstrainedFormula> it;
 
-	antec = SLListOfSequentPrintFilterEntry.EMPTY_LIST;
+	antec = ImmutableSLList.<SequentPrintFilterEntry>nil();
 	it    = originalSequent.antecedent ().iterator ();
 	while ( it.hasNext () )
 	    antec = antec.append ( filterFormula ( it.next () ) );
 	
-	succ  = SLListOfSequentPrintFilterEntry.EMPTY_LIST;
+	succ  = ImmutableSLList.<SequentPrintFilterEntry>nil();
 	it    = originalSequent.succedent ().iterator ();
 	while ( it.hasNext () )
 	    succ  = succ .append ( filterFormula ( it.next () ) );
@@ -94,12 +97,12 @@ public class ConstraintSequentPrintFilter implements SequentPrintFilter {
      * Get the formulas of the filtered sequent and the constraints to
      * use for instantiating metavariables when printing
      */
-    public ListOfSequentPrintFilterEntry getAntec       () {
+    public ImmutableList<SequentPrintFilterEntry> getAntec       () {
 	filterSequent ();
 	return antec;
     }
 
-    public ListOfSequentPrintFilterEntry getSucc        () {
+    public ImmutableList<SequentPrintFilterEntry> getSucc        () {
 	filterSequent ();
 	return succ;
     }

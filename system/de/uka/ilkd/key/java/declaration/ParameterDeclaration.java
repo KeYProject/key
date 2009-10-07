@@ -11,6 +11,7 @@
 
 package de.uka.ilkd.key.java.declaration;
 
+import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.java.visitor.Visitor;
@@ -26,7 +27,7 @@ public class ParameterDeclaration extends VariableDeclaration {
     /**
      *   Var spec.
      */
-    protected final ArrayOfVariableSpecification varSpec;
+    protected final ImmutableArray<VariableSpecification> varSpec;
     
     /**
      * flag to store whether this parameter is a the last arg in a method
@@ -61,7 +62,7 @@ public class ParameterDeclaration extends VariableDeclaration {
                                 boolean parameterIsVarArg)
     {   
         super(mods,typeRef,parentIsInterfaceDeclaration);
-        this.varSpec = new ArrayOfVariableSpecification(var);
+        this.varSpec = new ImmutableArray<VariableSpecification>(var);
         this.varArgParameter = parameterIsVarArg;
     }
 
@@ -100,7 +101,7 @@ public class ParameterDeclaration extends VariableDeclaration {
 				boolean parentIsInterfaceDeclaration,
 				boolean parameterIsVarArg) {
         super(children,parentIsInterfaceDeclaration);
-	this.varSpec = new ArrayOfVariableSpecification(new
+	this.varSpec = new ImmutableArray<VariableSpecification>(new
 	    VariableSpecification[]{(VariableSpecification)
 	        children.get(VariableSpecification.class)});      
 	this.varArgParameter = parameterIsVarArg;
@@ -108,10 +109,10 @@ public class ParameterDeclaration extends VariableDeclaration {
 
 
     public VariableSpecification getVariableSpecification() {
-        return varSpec.getVariableSpecification(0);
+        return varSpec.get(0);
     }
 
-    public ArrayOfVariableSpecification getVariables() {
+    public ImmutableArray<VariableSpecification> getVariables() {
         return varSpec;
     }
 
@@ -143,7 +144,7 @@ public class ParameterDeclaration extends VariableDeclaration {
         if (modArray != null) {
             len = modArray.size();
             if (len > index) {
-                return modArray.getModifier(index);
+                return modArray.get(index);
             }
             index -= len;
         }
@@ -152,7 +153,7 @@ public class ParameterDeclaration extends VariableDeclaration {
             index--;
         }
         if (varSpec != null) {
-            if (index == 0) return varSpec.getVariableSpecification(0);
+            if (index == 0) return varSpec.get(0);
         }
         throw new ArrayIndexOutOfBoundsException();
     }

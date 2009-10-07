@@ -15,11 +15,15 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Constraint;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.SequentChangeInfo;
-import de.uka.ilkd.key.rule.*;
+import de.uka.ilkd.key.rule.NoPosTacletApp;
+import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.rule.TacletApp;
 
 /**
  * manages the possible application of rules (RuleApps) 
@@ -162,11 +166,11 @@ public class RuleAppIndex  {
      * @param userConstraint the Constraint with user defined instantiations
      * of meta variables
      */
-    public ListOfTacletApp getTacletAppAt(TacletFilter    filter,
+    public ImmutableList<TacletApp> getTacletAppAt(TacletFilter    filter,
 					  PosInOccurrence pos,
 					  Services        services,
 					  Constraint      userConstraint) { 
-	ListOfTacletApp result = SLListOfTacletApp.EMPTY_LIST;
+	ImmutableList<TacletApp> result = ImmutableSLList.<TacletApp>nil();
 	if ( !autoMode ) {
 	    result = result.prepend 
 		( interactiveTacletAppIndex.getTacletAppAt
@@ -197,11 +201,11 @@ public class RuleAppIndex  {
      * of meta variables
      * @return the possible rule applications 
      */
-    public ListOfTacletApp getTacletAppAtAndBelow(TacletFilter    filter,
+    public ImmutableList<TacletApp> getTacletAppAtAndBelow(TacletFilter    filter,
 						  PosInOccurrence pos,
 						  Services        services,
 						  Constraint      userConstraint) {
-	ListOfTacletApp result = SLListOfTacletApp.EMPTY_LIST;
+	ImmutableList<TacletApp> result = ImmutableSLList.<TacletApp>nil();
 	if ( !autoMode ) {
 	    result = result.prepend 
 		( interactiveTacletAppIndex.getTacletAppAtAndBelow
@@ -231,11 +235,11 @@ public class RuleAppIndex  {
      * of meta variables
      * @return list of all possible instantiations
      */
-    public ListOfNoPosTacletApp getFindTaclet(TacletFilter    filter,
+    public ImmutableList<NoPosTacletApp> getFindTaclet(TacletFilter    filter,
 					      PosInOccurrence pos,
 					      Services        services,
 					      Constraint      userConstraint) { 
-	ListOfNoPosTacletApp result = SLListOfNoPosTacletApp.EMPTY_LIST;
+	ImmutableList<NoPosTacletApp> result = ImmutableSLList.<NoPosTacletApp>nil();
 	if ( !autoMode ) {
 	    result = result.prepend 
 		( interactiveTacletAppIndex.getFindTaclet
@@ -263,10 +267,10 @@ public class RuleAppIndex  {
      * of meta variables
      * @return list of all possible instantiations
      */
-    public ListOfNoPosTacletApp getNoFindTaclet(TacletFilter    filter,
+    public ImmutableList<NoPosTacletApp> getNoFindTaclet(TacletFilter    filter,
 						Services        services,
 						Constraint      userConstraint) { 
-	ListOfNoPosTacletApp result = SLListOfNoPosTacletApp.EMPTY_LIST;
+	ImmutableList<NoPosTacletApp> result = ImmutableSLList.<NoPosTacletApp>nil();
 	if ( !autoMode ) {
 	    result = result.prepend 
 		( interactiveTacletAppIndex.getNoFindTaclet
@@ -295,11 +299,11 @@ public class RuleAppIndex  {
      * of meta variables
      * @return list of all possible instantiations
      */
-    public ListOfNoPosTacletApp getRewriteTaclet (TacletFilter    filter,
+    public ImmutableList<NoPosTacletApp> getRewriteTaclet (TacletFilter    filter,
 						  PosInOccurrence pos,
 						  Services        services,
 						  Constraint      userConstraint) { 
-	ListOfNoPosTacletApp result = SLListOfNoPosTacletApp.EMPTY_LIST;
+	ImmutableList<NoPosTacletApp> result = ImmutableSLList.<NoPosTacletApp>nil();
 	if ( !autoMode ) {
 	    result = result.prepend 
 		( interactiveTacletAppIndex.getRewriteTaclet
@@ -322,7 +326,7 @@ public class RuleAppIndex  {
      * returns a list of built-in rule applications applicable
      * for the given goal, user defined constraint and position
      */
-    public ListOfRuleApp getBuiltInRule(Goal            goal, 
+    public ImmutableList<RuleApp> getBuiltInRule(Goal            goal, 
 					PosInOccurrence pos,
 					Constraint      userConstraint) {
 	 	 	

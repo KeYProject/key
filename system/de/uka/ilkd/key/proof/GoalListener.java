@@ -11,6 +11,7 @@
 
 package de.uka.ilkd.key.proof;
 
+import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.logic.SequentChangeInfo;
 
 /** interface to be implemented by a goal listener */
@@ -29,5 +30,5 @@ public interface GoalListener {
      * <code>newGoals</code>). The nodes of <code>newGoals</code> are
      * children of the node <code>parent</code>
      */
-    void goalReplaced(Goal source, Node parent, ListOfGoal newGoals);
+    void goalReplaced(Goal source, Node parent, ImmutableList<Goal> newGoals);
 }

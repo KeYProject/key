@@ -12,9 +12,13 @@
 package de.uka.ilkd.key.gui;
 
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.Iterator;
 
 import javax.swing.*;
 import javax.swing.border.Border;
@@ -22,10 +26,10 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
-import de.uka.ilkd.key.proof.DefaultGoalChooserBuilder;
-import de.uka.ilkd.key.proof.DepthFirstGoalChooserBuilder;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.strategy.*;
+import de.uka.ilkd.key.strategy.Strategy;
+import de.uka.ilkd.key.strategy.StrategyFactory;
+import de.uka.ilkd.key.strategy.StrategyProperties;
 
 public class StrategySelectionView extends JPanel {
 
@@ -890,7 +894,7 @@ thing. People were thinking it was a button.
         maxSlider.setEnabled(enable);     
         timeoutSpinner.setEnabled(enable);
         if (mediator != null) {                   
-            final IteratorOfStrategyFactory supportedStrategies = 
+            final Iterator<StrategyFactory> supportedStrategies = 
                mediator.getProfile().supportedStrategies().iterator();
             while (supportedStrategies.hasNext()) {                  
                 final StrategyFactory next = supportedStrategies.next();              
@@ -902,7 +906,7 @@ thing. People were thinking it was a button.
     public Strategy getStrategy(String strategyName, Proof proof,
             StrategyProperties properties) {
         if (mediator != null) {        
-            final IteratorOfStrategyFactory supportedStrategies = 
+            final Iterator<StrategyFactory> supportedStrategies = 
                mediator.getProfile().supportedStrategies().iterator();
             while (supportedStrategies.hasNext()) {                
                 final StrategyFactory s = supportedStrategies.next();

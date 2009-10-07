@@ -16,13 +16,10 @@ package de.uka.ilkd.key.jmltest;
 
 import java.io.IOException;
 
+import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.ArrayOfQuantifiableVariable;
-import de.uka.ilkd.key.logic.op.CastFunctionSymbol;
-import de.uka.ilkd.key.logic.op.LogicVariable;
-import de.uka.ilkd.key.logic.op.ProgramMethod;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.ProgramPrinter;
@@ -90,7 +87,7 @@ public class JMLLogicPrinter extends LogicPrinter {
     }
 
     public void printQuantifierTerm(String name,
-            ArrayOfQuantifiableVariable vars, Term phi, int ass)
+            ImmutableArray<QuantifiableVariable> vars, Term phi, int ass)
             throws IOException {
         layouter.beginC(2);
         layouter.print("(");

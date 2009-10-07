@@ -7,27 +7,41 @@
 // See LICENSE.TXT for details.
 package de.uka.ilkd.key.unittest;
 
-import de.uka.ilkd.key.java.*;
-import de.uka.ilkd.key.java.declaration.*;
-import de.uka.ilkd.key.java.declaration.modifier.*;
-import de.uka.ilkd.key.java.expression.*;
-import de.uka.ilkd.key.java.expression.operator.*;
-import de.uka.ilkd.key.java.expression.literal.*;
-import de.uka.ilkd.key.java.reference.*;
-import de.uka.ilkd.key.java.abstraction.*;
-import de.uka.ilkd.key.java.statement.*;
-import de.uka.ilkd.key.java.visitor.*;
-import de.uka.ilkd.key.unittest.ppAndJavaASTExtension.*;
-import de.uka.ilkd.key.util.*;
-import de.uka.ilkd.key.visualdebugger.VisualDebugger;
-import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.sort.*;
-import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.rule.soundness.TermProgramVariableCollector;
-import de.uka.ilkd.key.rule.UpdateSimplifier;
-
 import java.io.*;
 import java.util.*;
+
+import de.uka.ilkd.key.collection.*;
+import de.uka.ilkd.key.java.*;
+import de.uka.ilkd.key.java.abstraction.*;
+import de.uka.ilkd.key.java.declaration.*;
+import de.uka.ilkd.key.java.declaration.modifier.Private;
+import de.uka.ilkd.key.java.declaration.modifier.Public;
+import de.uka.ilkd.key.java.declaration.modifier.Static;
+import de.uka.ilkd.key.java.expression.ArrayInitializer;
+import de.uka.ilkd.key.java.expression.ParenthesizedExpression;
+import de.uka.ilkd.key.java.expression.literal.BooleanLiteral;
+import de.uka.ilkd.key.java.expression.literal.IntLiteral;
+import de.uka.ilkd.key.java.expression.literal.NullLiteral;
+import de.uka.ilkd.key.java.expression.literal.StringLiteral;
+import de.uka.ilkd.key.java.expression.operator.*;
+import de.uka.ilkd.key.java.reference.*;
+import de.uka.ilkd.key.java.statement.*;
+import de.uka.ilkd.key.java.visitor.FieldReplaceVisitor;
+import de.uka.ilkd.key.java.visitor.IndexReplaceVisitor;
+import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.sort.ArraySort;
+import de.uka.ilkd.key.logic.sort.ArraySortImpl;
+import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.rule.UpdateSimplifier;
+import de.uka.ilkd.key.rule.soundness.TermProgramVariableCollector;
+import de.uka.ilkd.key.unittest.ppAndJavaASTExtension.CompilableJavaPP;
+import de.uka.ilkd.key.unittest.ppAndJavaASTExtension.SyntacticalArrayType;
+import de.uka.ilkd.key.unittest.ppAndJavaASTExtension.SyntacticalProgramVariable;
+import de.uka.ilkd.key.unittest.ppAndJavaASTExtension.SyntacticalTypeRef;
+import de.uka.ilkd.key.unittest.testing.DataStorage;
+import de.uka.ilkd.key.util.ExtList;
+import de.uka.ilkd.key.visualdebugger.VisualDebugger;
 
 /**
  * Generates a unittest for a given piece of code and a set of modelgenerators.
@@ -80,6 +94,10 @@ public class TestGenerator {
 
     // private HashMap array2length;
 
+    private DataStorage data;
+
+    private final boolean testing;
+
     /**
      * creates a TestGenerator instance for the given compilation unit
      * 
@@ -88,7 +106,9 @@ public class TestGenerator {
      * @param fileName
      *            the name of the unittest file this TestGenerator creates.
      */
-    public TestGenerator(Services serv, String fileName) {
+    public TestGenerator(Services serv, String fileName, String directory,
+	    boolean testing) {
+	this.testing = testing;
 	ji = serv.getJavaInfo();
 	translatedFormulas = new HashMap<Term, Expression>();
 	// array2length = new HashMap();
@@ -123,10 +143,6 @@ public class TestGenerator {
 	// clean typesystem for JavaCard).
 	suiteMethod = createSuiteMethod();
 	rand = new Random();
-    }
-
-    public TestGenerator(Services serv, String fileName, String directory) {
-	this(serv, fileName);
 	if (directory != null)
 	    this.directory = directory;
     }
@@ -187,7 +203,7 @@ public class TestGenerator {
 	    // ProgramVariable[] pvs,
 	    ProgramVariable[] pvsNotDecl, String name, ExtList children,
 	    ModelGenerator mg, EquivalenceClass[] testLocEqvs) {
-	ListOfStatement s = SLListOfStatement.EMPTY_LIST;
+	ImmutableList<Statement> s = ImmutableSLList.<Statement>nil();
 	// declare and initialize program variables
 	for (int i = 0; i < pvsNotDecl.length; i++) {
 	    VariableSpecification varSpec = null;
@@ -217,6 +233,7 @@ public class TestGenerator {
 
 	// put test data in array
 	ProgramVariable[] testArray = new ProgramVariable[testLocation.length];
+
 	boolean singleTuple = singleTuple(testData);
 	for (int i = 0; i < testData.length; i++) {
 	    KeYJavaType kjt = testLocEqvs[i].getKeYJavaType();
@@ -260,7 +277,7 @@ public class TestGenerator {
 				vs));
 	    }
 	}
-	// ArrayOfExpression arg = new ArrayOfExpression();
+	// ArrayOf<n> arg = new ArrayOf<n>();
 	ExtList l = new ExtList();
 	l.add(new ProgramElementName(name));
 	l.add(new Public());
@@ -273,11 +290,11 @@ public class TestGenerator {
 
 	// assignments of test data to locations + initialization of
 	// object references
-	ListOfStatement assignments = SLListOfStatement.EMPTY_LIST;
+	ImmutableList<Statement> assignments = ImmutableSLList.<Statement>nil();
 
 	// initialization of arrays and creation of test data assignments
 	HashMap<String, NewArray> array2Cons = new HashMap<String, NewArray>();
-	ListOfStatement testDataAssignments = SLListOfStatement.EMPTY_LIST;
+	ImmutableList<Statement> testDataAssignments = ImmutableSLList.<Statement>nil();
 	for (int i = 0; i < testData.length; i++) {
 	    for (int k = 0; k < testLocation[i].length; k++) {
 		Expression testDat = singleTuple ? (Expression) testArray[i]
@@ -318,14 +335,14 @@ public class TestGenerator {
 	HashMap<Expression, Expression> loc2cons = new HashMap<Expression, Expression>();
 	LinkedList<Expression> locationsOrdered = new LinkedList<Expression>();
 	for (int i = 0; i < nonPrim.length; i++) {
-	    SetOfTerm locs = nonPrim[i].getLocations();
-	    IteratorOfTerm itt = locs.iterator();
+	    ImmutableSet<Term> locs = nonPrim[i].getLocations();
+	    Iterator<Term> itt = locs.iterator();
 	    if (!nonPrim[i].isNull()) {
 		Term nonPrimLocTerm = itt.next();
 		Expression loc1 = translateTerm(nonPrimLocTerm, null, null);
 		Expression cons;
 		if (nonPrimLocTerm.sort() instanceof ArraySort) {
-		    cons = array2Cons.get(loc1.toString());
+		    cons = array2Cons.get(CompilableJavaPP.toString(loc1));
 		    if (cons == null) {
 			KeYJavaType locKJT = nonPrim[i].getKeYJavaType();
 			cons = new NewArray(new Expression[] { new IntLiteral(
@@ -386,7 +403,7 @@ public class TestGenerator {
 
 	assignments = assignments.append(testDataAssignments);
 	// assignments = removeOutOfBounds(assignments);
-	ib[0] = new StatementBlock(assignments.toArray());
+	ib[0] = new StatementBlock(assignments.toArray(new Statement[assignments.size()]));
 
 	for (int i = 0; i < code.length; i++) {
 	    ib[i + 1] = code[i];
@@ -409,7 +426,7 @@ public class TestGenerator {
 	 * This variable seems to be unused. JavaInfo methods cannot be applied
 	 * on SyntacticalTypeReferences. This is on purpose. ProgramMethod
 	 * assertTrue = ji.getProgramMethod(testCase, "assertTrue",
-	 * SLListOfKeYJavaType.EMPTY_LIST. append(ji.getKeYJavaTypeByClassName(
+	 * ImmSLList.<KeYJavaType>nil(). append(ji.getKeYJavaTypeByClassName(
 	 * "java.lang.String")).append(b), testCase);
 	 */Expression failure = new StringLiteral(
 		"\\nPost evaluated to false.\\n"
@@ -430,10 +447,10 @@ public class TestGenerator {
 	}
 	Expression str = new Plus(new StringLiteral(
 		"\\nEvaluation of subformulas so far: "), new MethodReference(
-		new ArrayOfExpression(), new ProgramElementName("toString"),
+		new ImmutableArray<Expression>(), new ProgramElementName("toString"),
 		buffer));
 	str = new Plus(failure, str);
-	ib[code.length + 5] = new MethodReference(new ArrayOfExpression(
+	ib[code.length + 5] = new MethodReference(new ImmutableArray<Expression>(
 		new Expression[] { str, result }), new ProgramElementName(
 		"assertTrue"), null);
 	Statement body = new StatementBlock(ib);
@@ -470,7 +487,7 @@ public class TestGenerator {
 	}
 
 	s = s.append(body);
-	StatementBlock mBody = new StatementBlock(s.toArray());
+	StatementBlock mBody = new StatementBlock(s.toArray(new Statement[s.size()]));
 	FieldReplaceVisitor frv = new FieldReplaceVisitor(mBody, serv);
 	frv.start();
 	l.add(frv.result());
@@ -534,9 +551,9 @@ public class TestGenerator {
 	    String pvName = pv.name().toString();
 	    pvName = pvName.substring(pvName.lastIndexOf(":") + 1);
 	    String methodName = "_set" + pvName + typeName;
-	    ListOfKeYJavaType sig = SLListOfKeYJavaType.EMPTY_LIST;
+	    ImmutableList<KeYJavaType> sig = ImmutableSLList.<KeYJavaType>nil();
 	    sig = sig.append(pv.getKeYJavaType());
-	    return new MethodReference(new ArrayOfExpression(rhs),
+	    return new MethodReference(new ImmutableArray<Expression>(rhs),
 		    new ProgramElementName(methodName), ((FieldReference) lhs)
 			    .getReferencePrefix());
 	}
@@ -608,7 +625,7 @@ public class TestGenerator {
      *            the test case.
      */
     public void generateTestSuite(Statement[] code, Term oracle,
-	    List<ModelGenerator> mgs, SetOfProgramVariable programVars,
+	    List<ModelGenerator> mgs, ImmutableSet<ProgramVariable> programVars,
 	    String methodName, PackageReference pr) {
 	UpdateSimplifier simplifier = new UpdateSimplifier();
 	oracle = simplifier.simplify(oracle, serv);
@@ -621,7 +638,9 @@ public class TestGenerator {
 	    ModelGenerator mg = it.next();
 	    programVars = programVars.union(mg.getProgramVariables());
 	}
-	pvaNotDecl = removeDublicates(programVars).toArray();
+	final ImmutableSet<ProgramVariable> reducedPVSet = removeDublicates(programVars);
+	pvaNotDecl = reducedPVSet.toArray(new ProgramVariable[reducedPVSet.size()]);
+	data.setPvs2(pvaNotDecl);
 	it = mgs.iterator();
 	ExtList l = new ExtList();
 	l.add(suiteMethod);
@@ -660,10 +679,10 @@ public class TestGenerator {
 	    Expression[][] testData = new Expression[eqvArray.length][models.length
 		    - dublicate];
 	    for (int i = 0; i < eqvArray.length; i++) {
-		SetOfTerm locs = eqvArray[i].getLocations();
+		ImmutableSet<Term> locs = eqvArray[i].getLocations();
 		testLocation[i] = new Expression[locs.size()];
 		int k = 0;
-		IteratorOfTerm itt = locs.iterator();
+		Iterator<Term> itt = locs.iterator();
 		while (itt.hasNext()) {
 		    Term testLoc = itt.next();
 		    testLocation[i][k++] = translateTerm(testLoc, null, null);
@@ -673,6 +692,10 @@ public class TestGenerator {
 			    .getValueAsExpression(eqvArray[i]);
 		}
 	    }
+	    // mbender: collect data for KeY junit tests (see
+	    // TestTestGenerator,TestHelper)
+	    data.addTestDat(testData);
+	    data.addTestLoc(testLocation);
 	    MethodDeclaration methDec = createTestMethod(code, oracle,
 		    testLocation, testData, pvaNotDecl, methodName
 			    + (testMethods.size()), l, mg, eqvArray);
@@ -688,18 +711,21 @@ public class TestGenerator {
 	try {
 	    // write the file to disk
 	    pp.printClassDeclaration(suite);
-	    File dir = new File(directory);
-	    if (!dir.exists()) {
-		dir.mkdirs();
+	    if (!testing) {
+		File dir = new File(directory);
+		if (!dir.exists()) {
+		    dir.mkdirs();
+		}
+		File pcFile = new File(dir, fileName + ".java");
+		path = pcFile.getAbsolutePath();
+		FileWriter fw = new FileWriter(pcFile);
+		BufferedWriter bw = new BufferedWriter(fw);
+		bw.write(addImports(clean(w.toString()), pr));
+		bw.close();
 	    }
-	    File pcFile = new File(dir, fileName + ".java");
-	    path = pcFile.getAbsolutePath();
-	    FileWriter fw = new FileWriter(pcFile);
-	    BufferedWriter bw = new BufferedWriter(fw);
-	    bw.write(addImports(clean(w.toString()), pr));
-	    bw.close();
 	} catch (IOException ioe) {
 	}
+
 	exportCodeUnderTest();
     }
 
@@ -744,7 +770,7 @@ public class TestGenerator {
 	// ReferencePrefix pref =null;
 
 	for (int i = 0; i < testMethods.size(); i++) {
-	    ib[statementCount++] = new MethodReference(new ArrayOfExpression(
+	    ib[statementCount++] = new MethodReference(new ImmutableArray<Expression>(
 		    new Expression[] {}), new ProgramElementName(testMethods
 		    .elementAt(i).getName()), pref);
 	}
@@ -799,20 +825,23 @@ public class TestGenerator {
 			    .getPositionInfo().getFileName();
 
 		    String header = getHeader(fn);
+		    if (!testing) {
+			File dir = new File(directory
+				+ fn.substring(fn.indexOf(File.separator), fn
+					.lastIndexOf(File.separator)));
+			fn = fn.substring(fn.lastIndexOf(File.separator) + 1);
+			if (!dir.exists()) {
+			    dir.mkdirs();
+			}
+			File pcFile = new File(dir, fn);
+			FileWriter fw = new FileWriter(pcFile);
+			BufferedWriter bw = new BufferedWriter(fw);
+			bw.write(header);
+			bw.write(clean(sw.toString()));
+			bw.close();
+		    } else {
 
-		    File dir = new File(directory
-			    + fn.substring(fn.indexOf(File.separator), fn
-				    .lastIndexOf(File.separator)));
-		    fn = fn.substring(fn.lastIndexOf(File.separator) + 1);
-		    if (!dir.exists()) {
-			dir.mkdirs();
 		    }
-		    File pcFile = new File(dir, fn);
-		    FileWriter fw = new FileWriter(pcFile);
-		    BufferedWriter bw = new BufferedWriter(fw);
-		    bw.write(header);
-		    bw.write(clean(sw.toString()));
-		    bw.close();
 		} catch (IOException ioe) {
 		    throw new UnitTestException(ioe);
 		}
@@ -867,10 +896,10 @@ public class TestGenerator {
 	return result + "\n\n";
     }
 
-    private SetOfProgramVariable removeDublicates(SetOfProgramVariable pvs) {
+    private ImmutableSet<ProgramVariable> removeDublicates(ImmutableSet<ProgramVariable> pvs) {
 	HashSet<String> names = new HashSet<String>();
-	IteratorOfProgramVariable it = pvs.iterator();
-	SetOfProgramVariable result = SetAsListOfProgramVariable.EMPTY_SET;
+	Iterator<ProgramVariable> it = pvs.iterator();
+	ImmutableSet<ProgramVariable> result = DefaultImmutableSet.<ProgramVariable>nil();
 	while (it.hasNext()) {
 	    ProgramVariable pv = it.next();
 	    if (names.add(pv.name().toString())) {
@@ -955,7 +984,7 @@ public class TestGenerator {
 	s[1] = new CopyAssignment(result, f);
 	Plus str = new Plus(new StringLiteral("\\neval(" + post + ") = "),
 		result);
-	s[2] = new MethodReference(new ArrayOfExpression(str),
+	s[2] = new MethodReference(new ImmutableArray<Expression>(str),
 		new ProgramElementName("append"), buffer);
 	s[3] = new Return(result);
 	return s;
@@ -1151,8 +1180,7 @@ public class TestGenerator {
 	// if(true ) return BooleanLiteral.TRUE;
 	Statement[] body = new Statement[4];
 	Expression[] bounds = new Expression[] { null, null, null, null };
-	LogicVariable lv = (LogicVariable) t.varsBoundHere(0)
-		.lastQuantifiableVariable();
+	LogicVariable lv = (LogicVariable) t.varsBoundHere(0).last();
 	if (t.varsBoundHere(0).size() > 1
 		|| !(lv.sort() == intType.getSort() || lv.sort().toString()
 			.equals("jint"))) {
@@ -1196,7 +1224,7 @@ public class TestGenerator {
 	body[1] = new For(new LoopInitializer[] { init }, guard,
 		new Expression[] { update }, new StatementBlock(loopBody));
 	Plus str = new Plus(new StringLiteral("\\neval(" + t + ") = "), result);
-	body[2] = new MethodReference(new ArrayOfExpression(str),
+	body[2] = new MethodReference(new ImmutableArray<Expression>(str),
 		new ProgramElementName("append"), buffer);
 	body[3] = new Return(result);
 
@@ -1215,7 +1243,7 @@ public class TestGenerator {
      * Returns the location variables occuring in t that are no attributes.
      */
     private ExtList getArguments(Term t) {
-	SetOfProgramVariable programVars = SetAsListOfProgramVariable.EMPTY_SET;
+	ImmutableSet<ProgramVariable> programVars = DefaultImmutableSet.<ProgramVariable>nil();
 	TermProgramVariableCollector pvColl = new TermProgramVariableCollector(
 		serv);
 	t.execPreOrder(pvColl);
@@ -1227,7 +1255,7 @@ public class TestGenerator {
 	    }
 	}
 	programVars = removeDublicates(programVars);
-	IteratorOfProgramVariable it = programVars.iterator();
+	Iterator<ProgramVariable> it = programVars.iterator();
 	ExtList args = new ExtList();
 	while (it.hasNext()) {
 	    args.add(it.next());
@@ -1307,8 +1335,7 @@ public class TestGenerator {
 	    return tf.createVariableTerm(pv);
 	} else {
 	    Term subTerms[] = new Term[t.arity()];
-	    ArrayOfQuantifiableVariable[] quantVars = new ArrayOfQuantifiableVariable[t
-		    .arity()];
+	    ImmutableArray<QuantifiableVariable>[] quantVars = new ImmutableArray[t.arity()];
 	    for (int i = 0; i < t.arity(); i++) {
 		quantVars[i] = t.varsBoundHere(i);
 		subTerms[i] = replaceLogicVariable(t.sub(i), lv, pv);
@@ -1332,8 +1359,7 @@ public class TestGenerator {
     /**
      * Replaces rigid constants by program variables.
      */
-    protected static Term replaceConstants(Term t, Services serv,
-	    Namespace newPVs) {
+    static Term replaceConstants(Term t, Services serv, Namespace newPVs) {
 	TermFactory tf = TermFactory.DEFAULT;
 	Term result = null;
 	if (t.op() instanceof RigidFunction && t.arity() == 0
@@ -1360,8 +1386,7 @@ public class TestGenerator {
 	    return t;
 	} else {
 	    Term subTerms[] = new Term[t.arity()];
-	    ArrayOfQuantifiableVariable[] quantVars = new ArrayOfQuantifiableVariable[t
-		    .arity()];
+	    ImmutableArray<QuantifiableVariable>[] quantVars = new ImmutableArray[t.arity()];
 	    for (int i = 0; i < t.arity(); i++) {
 		quantVars[i] = t.varsBoundHere(i);
 		subTerms[i] = replaceConstants(t.sub(i), serv, newPVs);
@@ -1370,6 +1395,14 @@ public class TestGenerator {
 	    result = tf.createTerm(t.op(), subTerms, quantVars, jb);
 	}
 	return result;
+    }
+
+    public DataStorage getData() {
+	return data;
+    }
+
+    public void setData(DataStorage data) {
+	this.data = data;
     }
 
 }

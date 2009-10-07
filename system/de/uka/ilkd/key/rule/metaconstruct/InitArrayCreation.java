@@ -18,6 +18,7 @@ package de.uka.ilkd.key.rule.metaconstruct;
 
 import java.util.LinkedList;
 
+import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.ArrayType;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -101,12 +102,12 @@ public class InitArrayCreation extends InitArray {
      * dimension expressions are returned
      * @param bodyStmnts the LinkedList of statements where the new
      * statements are inserted
-     * @param dimExpr the ArrayOfExpression which describe the array's
+     * @param dimExpr the ArrayOf<Expression> which describe the array's
      * dimensions
      * @param services the Services object
      */
     private ProgramVariable[] evaluateAndCheckDimensionExpressions
-	(LinkedList<Statement> bodyStmnts, ArrayOfExpression dimExpr,
+	(LinkedList<Statement> bodyStmnts, ImmutableArray<Expression> dimExpr,
 	 Services services) {
 
 	Expression checkDimensions = BooleanLiteral.FALSE;
@@ -122,10 +123,10 @@ public class InitArrayCreation extends InitArray {
 	    final LocalVariableDeclaration argDecl =
 		KeYJavaASTFactory.
 		declare(name,
-			dimExpr.getExpression(i),
+			dimExpr.get(i),
 			intType);
 	    pvars[i] = (ProgramVariable)argDecl.getVariables().
-		getVariableSpecification(0).getProgramVariable();
+	    get(0).getProgramVariable();
 
 	    bodyStmnts.add(argDecl);
 	    final LessThan negativeDimension = new LessThan(pvars[i],
@@ -156,7 +157,7 @@ public class InitArrayCreation extends InitArray {
 	bodyStmnts.add
 	    (assign(resultVar,
 		    new MethodReference
-		    (new ArrayOfExpression(dimensions[0]),
+		    (new ImmutableArray<Expression>(dimensions[0]),
 		     new ProgramElementName(createArrayName),
 		     new TypeRef(arrayType))));
 
@@ -175,7 +176,7 @@ public class InitArrayCreation extends InitArray {
 					  intType);
 
 	    final ProgramVariable pv = (ProgramVariable)forInit.getVariables().
-		getVariableSpecification(0).getProgramVariable();
+	    get(0).getProgramVariable();
 
 	    TypeReference baseTypeRef =
 		((ArrayType)arrayType.getJavaType()).getBaseType();
@@ -214,7 +215,7 @@ public class InitArrayCreation extends InitArray {
 					 Services services) {
 	bodyStmnts.add
 	    (assign(resultVar, new MethodReference
-		    (new ArrayOfExpression(new Expression[]{dimensions[0], 
+		    (new ImmutableArray<Expression>(new Expression[]{dimensions[0], 
 							    transientType}), 
 		     new ProgramElementName(createArrayName), 
 		     new TypeRef(arrayType))));
@@ -256,7 +257,7 @@ public class InitArrayCreation extends InitArray {
 	ProgramVariable[] dimensions = 
 	    evaluateAndCheckDimensionExpressions
 	    (bodyStmnts, 
-	     new ArrayOfExpression
+	     new ImmutableArray<Expression>
 	     (new Expression[]{mref.getArgumentAt(0)}), services);
 
 	createOneDimensionalArrayTransient(bodyStmnts, 

@@ -11,8 +11,8 @@
 
 package de.uka.ilkd.key.rule.soundness;
 
-import de.uka.ilkd.key.logic.op.ListOfIProgramVariable;
-import de.uka.ilkd.key.logic.op.ListOfSchemaVariable;
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
@@ -20,11 +20,11 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 public interface RawProgramVariablePrefixes {
 
-    ListOfIProgramVariable  getFreeProgramVariables ();
-    ListOfSchemaVariable    getFreeSchemaVariables  ();
-    ListOfSchemaVariable    getBoundSchemaVariables ();
+    ImmutableList<IProgramVariable>  getFreeProgramVariables ();
+    ImmutableList<SchemaVariable>    getFreeSchemaVariables  ();
+    ImmutableList<SchemaVariable>    getBoundSchemaVariables ();
 
-    ListOfIProgramVariable  getPrefix   ( SchemaVariable p );
+    ImmutableList<IProgramVariable>  getPrefix   ( SchemaVariable p );
 
     ProgramVariablePrefixes instantiate ( SVInstantiations p );
 

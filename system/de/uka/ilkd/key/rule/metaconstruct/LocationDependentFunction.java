@@ -7,15 +7,24 @@
 // See LICENSE.TXT for details.
 package de.uka.ilkd.key.rule.metaconstruct;
 
-import java.util.*;
+import java.util.Iterator;
+import java.util.Map;
 
-import de.uka.ilkd.key.java.*;
+import de.uka.ilkd.key.collection.ImmutableArray;
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.java.ProgramElement;
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.SourceElement;
+import de.uka.ilkd.key.java.StatementContainer;
 import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
-import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermFactory;
+import de.uka.ilkd.key.logic.UpdateFactory;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.sort.ArrayOfSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.proof.VariableNameProposer;
@@ -35,7 +44,7 @@ public class LocationDependentFunction extends AbstractMetaOperator {
         }
         updTerm = term.sub(0);
 
-        final ListOfProgramVariable pvs = collectRelevantPVs(term, services);
+        final ImmutableList<ProgramVariable> pvs = collectRelevantPVs(term, services);
         heapDepFuncTerm = createHeapDependentFunctionTerm(pvs, services);        
         Map map = AtPreEquations.getAtPreFunctions(updTerm, services);
         OpReplacer or = new OpReplacer(map);
@@ -58,19 +67,19 @@ public class LocationDependentFunction extends AbstractMetaOperator {
         return getHeapDepFuncTermFor(term, services);
     }
     
-    private static Term createHeapDependentFunctionTerm(ListOfProgramVariable l,
+    private static Term createHeapDependentFunctionTerm(ImmutableList<ProgramVariable> l,
                                                         Services services){
         Term[] subs = new Term[l.size()];
         Sort[] subSorts = new Sort[l.size()];
         int i=0;
         TermFactory tf = TermFactory.DEFAULT;
-        IteratorOfProgramVariable it = l.iterator();
+        Iterator<ProgramVariable> it = l.iterator();
         while(it.hasNext()){
             ProgramVariable pv = it.next();
             subs[i] = tf.createVariableTerm(pv);
             subSorts[i++] = pv.sort();
         }
-        ArrayOfSort aos = new ArrayOfSort(subSorts);
+        ImmutableArray<Sort> aos = new ImmutableArray<Sort>(subSorts);
         Name anonName = VariableNameProposer.DEFAULT.getNewName(services,
                 new Name("anon"));
         Function anon = new NonRigidHeapDependentFunction(anonName, Sort.FORMULA, aos);
@@ -79,7 +88,7 @@ public class LocationDependentFunction extends AbstractMetaOperator {
         return tf.createFunctionTerm(anon, subs);
     }
     
-    private static ListOfProgramVariable collectRelevantPVs(Term t, 
+    private static ImmutableList<ProgramVariable> collectRelevantPVs(Term t, 
                                                             Services services){
         LoopStatement loop = getLoop(t.sub(1).javaBlock().program());
         FreePVCollector pc = new FreePVCollector(loop, services);
@@ -137,10 +146,10 @@ public class LocationDependentFunction extends AbstractMetaOperator {
       * in a program.
       */
      private static class FreePVCollector extends JavaASTVisitor {
-         private ListOfProgramVariable declaredPVs
-             = SLListOfProgramVariable.EMPTY_LIST;
-         private ListOfProgramVariable freePVs
-             = SLListOfProgramVariable.EMPTY_LIST;
+         private ImmutableList<ProgramVariable> declaredPVs
+             = ImmutableSLList.<ProgramVariable>nil();
+         private ImmutableList<ProgramVariable> freePVs
+             = ImmutableSLList.<ProgramVariable>nil();
          public FreePVCollector(ProgramElement root, Services services) {
              super(root, services);
          }
@@ -163,10 +172,10 @@ public class LocationDependentFunction extends AbstractMetaOperator {
                  }
              }
          }
-         public ListOfProgramVariable result() {
+         public ImmutableList<ProgramVariable> result() {
              //remove duplicates
-             ListOfProgramVariable result = SLListOfProgramVariable.EMPTY_LIST;
-             IteratorOfProgramVariable it = freePVs.iterator();
+             ImmutableList<ProgramVariable> result = ImmutableSLList.<ProgramVariable>nil();
+             Iterator<ProgramVariable> it = freePVs.iterator();
              while(it.hasNext()) {
                  ProgramVariable pv = it.next();
                  if(!result.contains(pv)) {

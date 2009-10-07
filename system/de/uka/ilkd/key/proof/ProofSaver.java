@@ -16,6 +16,8 @@ import java.io.PrintStream;
 import java.util.Iterator;
 import java.util.Vector;
 
+import de.uka.ilkd.key.collection.ImmutableMapEntry;
+import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.gui.IMain;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
@@ -23,8 +25,6 @@ import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.EntryOfSchemaVariableAndInstantiationEntry;
-import de.uka.ilkd.key.logic.op.IteratorOfEntryOfSchemaVariableAndInstantiationEntry;
 import de.uka.ilkd.key.logic.op.Metavariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.pp.LogicPrinter;
@@ -147,11 +147,11 @@ public class ProofSaver {
         if (rec == null) {
             return s;
         }
-        ListOfName proposals = rec.getProposals();
+        ImmutableList<Name> proposals = rec.getProposals();
         if (proposals.isEmpty()) {
             return s;
         }
-        for (IteratorOfName it = proposals.iterator(); it.hasNext();) {
+        for (Iterator<Name> it = proposals.iterator(); it.hasNext();) {
             s += "," + it.next();
         }
         return " (newnames \"" + s.substring(1) + "\")";
@@ -199,7 +199,7 @@ public class ProofSaver {
          tree.append(mc2Proof(((TacletApp)appliedRuleApp).matchConditions()));
          tree.append(newNames2Proof(node));
          tree.append(getInteresting(((TacletApp)appliedRuleApp).instantiations()));
-         ListOfIfFormulaInstantiation l =
+         ImmutableList<IfFormulaInstantiation> l =
             ((TacletApp)appliedRuleApp).ifFormulaInstantiations();
          if (l != null) tree.append(ifFormulaInsts(node, l));
          tree.append("");
@@ -299,11 +299,11 @@ public class ProofSaver {
    public String getInteresting(SVInstantiations inst) {
 //System.err.println(inst);   
       String s = "";
-      IteratorOfEntryOfSchemaVariableAndInstantiationEntry pairIt =
+      Iterator<ImmutableMapEntry<SchemaVariable,InstantiationEntry>> pairIt =
          inst.interesting().entryIterator();
 
       while (pairIt.hasNext()) {
-         EntryOfSchemaVariableAndInstantiationEntry pair = pairIt.next();
+         ImmutableMapEntry<SchemaVariable,InstantiationEntry> pair = pairIt.next();
          SchemaVariable var = pair.key();
 	 
          String singleInstantiation = var.name()+ "="; 
@@ -324,7 +324,7 @@ public class ProofSaver {
 	 }
          else 
          if (value instanceof ListInstantiation) {
-             ListOfObject l = (ListOfObject) ((ListInstantiation) value).getInstantiation();
+             ImmutableList<Object> l = (ImmutableList<Object>) ((ListInstantiation) value).getInstantiation();
              singleInstantiation += printListInstantiation(l, proof.getServices());
          }
          else
@@ -341,9 +341,9 @@ public class ProofSaver {
    
    
 
-   public static String printListInstantiation(ListOfObject l, Services serv) {
+   public static String printListInstantiation(ImmutableList<Object> l, Services serv) {
        final StringBuffer sb = new StringBuffer("{");
-       final IteratorOfObject it = l.iterator();
+       final Iterator<Object> it = l.iterator();
        while (it.hasNext()) {
            final Object next = it.next();
            if (next instanceof LocationDescriptor) {
@@ -359,9 +359,9 @@ public class ProofSaver {
        return sb.toString();
    }
 
-   public String ifFormulaInsts(Node node, ListOfIfFormulaInstantiation l) {
+   public String ifFormulaInsts(Node node, ImmutableList<IfFormulaInstantiation> l) {
       String s ="";
-      IteratorOfIfFormulaInstantiation it = l.iterator();
+      Iterator<IfFormulaInstantiation> it = l.iterator();
       while (it.hasNext()) {
          IfFormulaInstantiation iff = it.next();
          if (iff instanceof IfFormulaInstSeq) {

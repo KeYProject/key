@@ -9,6 +9,8 @@ package de.uka.ilkd.key.visualization;
 
 import java.util.*;
 
+import de.uka.ilkd.key.collection.ImmutableArray;
+import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.gui.Main;
 import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
 import de.uka.ilkd.key.java.*;
@@ -432,9 +434,9 @@ public class SimpleVisualizationStrategy implements VisualizationStrategy {
             // if parent is null then nodeIndex has been set to -1 and 
             // this branch is not entered
             if (parent.getAppliedRuleApp() instanceof TacletApp) {
-                final ListOfTacletGoalTemplate l = 
+                final ImmutableList<TacletGoalTemplate> l = 
                     ((TacletApp) parent.getAppliedRuleApp()).taclet().goalTemplates();
-                final TacletGoalTemplate[] gt = l.toArray();
+                final TacletGoalTemplate[] gt = l.toArray(new TacletGoalTemplate[l.size()]);
                 if (gt == null || gt.length == 0) {
                     return null;
                 }
@@ -453,13 +455,13 @@ public class SimpleVisualizationStrategy implements VisualizationStrategy {
     private Occ[] getJavaBlocks(Sequent sequent, boolean ignoreAntec) {
         LinkedList list = new LinkedList();
         
-        final IteratorOfConstrainedFormula iterator = sequent.succedent().iterator();        
+        final Iterator<ConstrainedFormula> iterator = sequent.succedent().iterator();        
         for (int i = 0; iterator.hasNext(); i++) {            
             list.addAll(findJavaBlocks(false, i , iterator.next().formula(), 0));
         } 
 
         if (!ignoreAntec) {
-            final IteratorOfConstrainedFormula antec = sequent.antecedent().iterator();
+            final Iterator<ConstrainedFormula> antec = sequent.antecedent().iterator();
             for (int i = 0; antec.hasNext(); i++) {
                 list.addAll(findJavaBlocks(true, i, antec.next().formula(), 0));              
             }
@@ -494,7 +496,7 @@ public class SimpleVisualizationStrategy implements VisualizationStrategy {
         
         for (Iterator sequentIt = sequents.iterator(); sequentIt.hasNext(); ) {
             final Sequent seq = (Sequent) sequentIt.next();            
-            final IteratorOfConstrainedFormula it = seq.iterator();
+            final Iterator<ConstrainedFormula> it = seq.iterator();
             while (it.hasNext()) {              
                 templateList.addAll(getList(it.next().formula()));
             }
@@ -781,7 +783,7 @@ public class SimpleVisualizationStrategy implements VisualizationStrategy {
         final HashMap index2cfm = new HashMap();
  
         final TacletApp tacletApp = (TacletApp)n.parent().getAppliedRuleApp();        
-        final IteratorOfConstrainedFormula it = 
+        final Iterator<ConstrainedFormula> it = 
             (antec ? schemaSeq.antecedent() : schemaSeq.succedent()).iterator();
        
         while (it.hasNext()) {
@@ -977,7 +979,7 @@ public class SimpleVisualizationStrategy implements VisualizationStrategy {
                 }               
                 
                 ExtList otherTgts = new ExtList();     
-                final IteratorOfTacletGoalTemplate it = 
+                final Iterator<TacletGoalTemplate> it = 
                     tacletApp.taclet().goalTemplates().iterator();
                 while (it.hasNext()) {
                     final TacletGoalTemplate currentTgt = it.next();
@@ -1071,7 +1073,7 @@ public class SimpleVisualizationStrategy implements VisualizationStrategy {
      */
  
     private int indexOf(Semisequent semi, ConstrainedFormula toFind){
-        final IteratorOfConstrainedFormula iterator = semi.iterator();        
+        final Iterator<ConstrainedFormula> iterator = semi.iterator();        
         int i=0;
         while (iterator.hasNext()) {
             final ConstrainedFormula cfm = iterator.next();
@@ -1591,9 +1593,9 @@ public class SimpleVisualizationStrategy implements VisualizationStrategy {
      * @return a sequent that is the result of renaming variables in the order
      *          the renamings appear in the list;
      */
-    private Semisequent rename(Semisequent semi, ListOfRenamingTable renamings){
+    private Semisequent rename(Semisequent semi, ImmutableList<RenamingTable> renamings){
         if (renamings!=null){
-            IteratorOfRenamingTable it = renamings.iterator();
+            Iterator<RenamingTable> it = renamings.iterator();
             while (it.hasNext()){
                 RenamingTable rt =  it.next();
                 HashMap hm = rt.getHashMap();
@@ -1607,9 +1609,9 @@ public class SimpleVisualizationStrategy implements VisualizationStrategy {
 
     
     
-    private Term rename(Term formula,ListOfRenamingTable renamings){
+    private Term rename(Term formula,ImmutableList<RenamingTable> renamings){
         if (renamings!=null){
-            IteratorOfRenamingTable it = renamings.iterator();
+            Iterator<RenamingTable> it = renamings.iterator();
             while (it.hasNext()){
                 RenamingTable rt = it.next();
 		HashMap hm = rt.getHashMap();
@@ -1646,7 +1648,7 @@ public class SimpleVisualizationStrategy implements VisualizationStrategy {
     private boolean tacletWithLabel(Node n, String ruleSet) {
         if (n.getAppliedRuleApp() instanceof TacletApp) {
             final Name ruleSetName = new Name(ruleSet); 
-            final IteratorOfRuleSet rs =  ((TacletApp) n.getAppliedRuleApp()).taclet().ruleSets();
+            final Iterator<RuleSet> rs =  ((TacletApp) n.getAppliedRuleApp()).taclet().ruleSets();
     
             while (rs.hasNext()) {
                 if (rs.next().name().equals(ruleSetName)) {
@@ -1715,8 +1717,8 @@ public class SimpleVisualizationStrategy implements VisualizationStrategy {
         if (it.hasNext()) {         
             int sub = it.next();
             
-            ArrayOfQuantifiableVariable[] origvars = 
-                new ArrayOfQuantifiableVariable[term.arity()];
+            ImmutableArray<QuantifiableVariable>[] origvars = 
+                new ImmutableArray[term.arity()];
             final Term[] subs = new Term[term.arity()];
             
             boolean containsBoundVar = false;

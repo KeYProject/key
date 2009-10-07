@@ -17,33 +17,19 @@
 
 package de.uka.ilkd.key.jmltest;
 
-import de.uka.ilkd.key.cspec.ComputeSpecification;
-import de.uka.ilkd.key.gui.Main;
-import de.uka.ilkd.key.java.declaration.ArrayOfParameterDeclaration;
-import de.uka.ilkd.key.logic.IteratorOfConstrainedFormula;
-import de.uka.ilkd.key.logic.op.IteratorOfProgramMethod;
-import de.uka.ilkd.key.proof.IteratorOfGoal;
-import de.uka.ilkd.key.rule.updatesimplifier.ArrayOfAssignmentPair;
-
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.StringWriter;
+import java.io.*;
+import java.util.Iterator;
 import java.util.Vector;
 
 import javax.swing.JOptionPane;
 
-import de.uka.ilkd.key.java.Comment;
-import de.uka.ilkd.key.java.Expression;
-import de.uka.ilkd.key.java.JavaInfo;
-import de.uka.ilkd.key.java.PrettyPrinter;
-import de.uka.ilkd.key.java.StatementBlock;
+import de.uka.ilkd.key.collection.ImmutableArray;
+import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.cspec.ComputeSpecification;
+import de.uka.ilkd.key.gui.Main;
+import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.declaration.ClassDeclaration;
-import de.uka.ilkd.key.java.declaration.ConstructorDeclaration;
-import de.uka.ilkd.key.java.declaration.Extends;
-import de.uka.ilkd.key.java.declaration.MethodDeclaration;
+import de.uka.ilkd.key.java.declaration.*;
 import de.uka.ilkd.key.java.declaration.modifier.Public;
 import de.uka.ilkd.key.java.declaration.modifier.Static;
 import de.uka.ilkd.key.java.reference.MethodReference;
@@ -54,14 +40,7 @@ import de.uka.ilkd.key.logic.ConstrainedFormula;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermFactory;
-import de.uka.ilkd.key.logic.op.AttributeOp;
-import de.uka.ilkd.key.logic.op.CastFunctionSymbol;
-import de.uka.ilkd.key.logic.op.IUpdateOperator;
-import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.Op;
-import de.uka.ilkd.key.logic.op.ProgramMethod;
-import de.uka.ilkd.key.logic.op.RigidFunction;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.SpecExtPO;
@@ -142,7 +121,7 @@ public class WrapperConstructor extends Thread {
         // with the signature of the current method is added to l
         // Correct constructor is created by CreateMethod(met.getParameters(),
         // true)
-        final IteratorOfProgramMethod iter = ji.getAllProgramMethods(
+        final Iterator<ProgramMethod> iter = ji.getAllProgramMethods(
                 supertypeKey).iterator();
         while (iter.hasNext()) {
             ProgramMethod met = (ProgramMethod) iter.next();
@@ -179,7 +158,7 @@ public class WrapperConstructor extends Thread {
      * @return MethodDeclaration or ConstructorDeclaration
      */
     private final MethodDeclaration createMethod(
-            ArrayOfParameterDeclaration args, boolean isConstructor) {
+            ImmutableArray<? extends ParameterDeclaration> args, boolean isConstructor) {
         final ExtList l = new ExtList();
 
         // Choose name of method/constructor and add it to list
@@ -196,7 +175,7 @@ public class WrapperConstructor extends Thread {
         }
         l.add(new ProgramElementName(name));
 
-        // Iterates over the ArrayOfParameterDeclaration args to get all
+        // Iterates over the ArrayOf<n> args to get all
         // Parameters
         // ParameterDeclarations are added to list l so that new
         // method/constructor has correct numbers of parameters
@@ -204,8 +183,8 @@ public class WrapperConstructor extends Thread {
         // method/constructor that is called in body is correct
         final ExtList params = new ExtList();
         for (int i = 0; i < args.size(); i++) {
-            l.add(args.getParameterDeclaration(i));
-            params.add((Expression) args.getProgramElement(i).getLastElement());
+            l.add(args.get(i));
+            params.add((Expression) args.get(i).getLastElement());
         }
 
         // Add the modifier public to method/constructor
@@ -291,22 +270,21 @@ public class WrapperConstructor extends Thread {
 
         // Get all OperationContracts for method from the
         // SpecificationRepositorie and converts them to an array
-        final OperationContract[] opCon = proof.getServices()
-                .getSpecificationRepository().getOperationContracts(pm)
-                .toArray();
-        for (int i = 0; i < opCon.length; i++) {
-            if (opCon[i] instanceof OperationContractImpl) {
+        final ImmutableSet<OperationContract> opCon = proof.getServices()
+                .getSpecificationRepository().getOperationContracts(pm);
+        for (OperationContract oc : opCon) {
+            if (oc instanceof OperationContractImpl) {
 
                 // Append the requires term
                 result.append("@ requires "
-                        + (jmlEx.translate(((OperationContractImpl) opCon[i])
+                        + (jmlEx.translate(((OperationContractImpl) oc)
                                 .getOriginalPre().getFormula())) + ";");
 
                 // Apend the ensures term
                 result
                         .append("\n@ ensures "
                                 + (jmlEx
-                                        .translate(excFreeTerm(((OperationContractImpl) opCon[i])
+                                        .translate(excFreeTerm(((OperationContractImpl) oc)
                                                 .getOriginalPost().getFormula())))
                                 + ";");
                 // Append the concatinating 'also'
@@ -335,7 +313,7 @@ public class WrapperConstructor extends Thread {
     private final StringBuffer collectAllSpecs() {
         final StringBuffer result = new StringBuffer();
 
-        final IteratorOfGoal iter = proof.openGoals().iterator();
+        final Iterator<Goal> iter = proof.openGoals().iterator();
 
         // Iterates through all open goals in current proof and creates term for
         // requires and ensures
@@ -345,11 +323,11 @@ public class WrapperConstructor extends Thread {
             final Goal currentGoal = (Goal) iter.next();
 
             // An iterator over the antecedent of the current goal
-            final IteratorOfConstrainedFormula antIterator = currentGoal
+            final Iterator<ConstrainedFormula> antIterator = currentGoal
                     .sequent().antecedent().toList().iterator();
 
             // An iterator over the succedent of the current goal
-            final IteratorOfConstrainedFormula sucIterator = currentGoal
+            final Iterator<ConstrainedFormula> sucIterator = currentGoal
                     .sequent().succedent().toList().iterator();
 
             // The term, that represents the new requires-clause
@@ -497,11 +475,11 @@ public class WrapperConstructor extends Thread {
      * @see de.uka.ilkd.key.jmltest.WrapperConstructor#isUsefulPair(AssignmentPair)
      * @param upTerm
      *                The Term thats needs to be cleaned up
-     * @return An ArrayOfAssignmentPairs containing only good Terms
+     * @return An ArrayOf<s> containing only good Terms
      */
-    private ArrayOfAssignmentPair cleanUpdate(Term upTerm) {
+    private ImmutableArray<AssignmentPair> cleanUpdate(Term upTerm) {
 
-        final ArrayOfAssignmentPair pairs = Update.createUpdate(upTerm)
+        final ImmutableArray<AssignmentPair> pairs = Update.createUpdate(upTerm)
                 .getAllAssignmentPairs();
 
         final Vector tmpVect = new Vector();
@@ -509,7 +487,7 @@ public class WrapperConstructor extends Thread {
         // Iterate over all existing Assignment pairs and adds good pairs in a
         // Vector
         for (int i = 0; i < pairs.size(); ++i) {
-            final AssignmentPair currPair = pairs.getAssignmentPair(i);
+            final AssignmentPair currPair = pairs.get(i);
 
             if (checkTerm(currPair.locationAsTerm())
                     && checkTerm((Term) currPair.value())
@@ -518,17 +496,17 @@ public class WrapperConstructor extends Thread {
             }
         }
         // If there is at least one good Term, create a new
-        // ArrayOfAssignmentPair containing good terms
+        // ArrayOf<r> containing good terms
         if (tmpVect.size() > 0) {
             final AssignmentPair[] tmp = new QuanAssignmentPairLazy[tmpVect
                     .size()];
             for (int i = 0; i < tmpVect.size(); i++) {
                 tmp[i] = (QuanAssignmentPairLazy) tmpVect.elementAt(i);
             }
-            return new ArrayOfAssignmentPair(tmp);
+            return new ImmutableArray<AssignmentPair>(tmp);
         }
         // No good terms --> return empty Array
-        return new ArrayOfAssignmentPair();
+        return new ImmutableArray<AssignmentPair>();
     }
 
     /**

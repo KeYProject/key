@@ -11,12 +11,14 @@
 
 package de.uka.ilkd.key.strategy.feature.instantiator;
 
+import java.util.Iterator;
+
+import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.IteratorOfSchemaVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.op.SetOfSchemaVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.TacletApp;
@@ -61,8 +63,8 @@ public class SVInstantiationCP implements Feature {
     }
 
     private SchemaVariable findSVWithName(TacletApp app) {
-        final SetOfSchemaVariable vars = app.uninstantiatedVars ();
-        final IteratorOfSchemaVariable it = vars.iterator ();
+        final ImmutableSet<SchemaVariable> vars = app.uninstantiatedVars ();
+        final Iterator<SchemaVariable> it = vars.iterator ();
         while ( it.hasNext () ) {
             final SchemaVariable svt = it.next ();
             if ( svt.name ().equals ( svToInstantiate ) ) return svt;
@@ -89,7 +91,7 @@ public class SVInstantiationCP implements Feature {
             this.goal = goal;
         }
 
-        public IteratorOfCPBranch getBranches(RuleApp oldApp) {
+        public Iterator<CPBranch> getBranches(RuleApp oldApp) {
             if ( ! ( oldApp instanceof TacletApp ) )
                 Debug.fail ( "Instantiation feature is only applicable to " +
                              "taclet apps, but got " + oldApp );
@@ -109,7 +111,7 @@ public class SVInstantiationCP implements Feature {
                 public RuleApp getRuleAppForBranch() { return newApp; }
             };
             
-            return SLListOfCPBranch.EMPTY_LIST.prepend ( branch ).iterator ();
+            return ImmutableSLList.<CPBranch>nil().prepend ( branch ).iterator ();
         }
         
     }

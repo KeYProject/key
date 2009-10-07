@@ -17,13 +17,18 @@
 
 package de.uka.ilkd.key.speclang.ocl.translation;
 
+import java.util.Iterator;
+
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.expression.literal.BooleanLiteral;
-import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.ListOfLogicVariable;
+import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.NamespaceSet;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.LogicVariable;
-import de.uka.ilkd.key.logic.op.SLListOfLogicVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 
 
@@ -39,9 +44,9 @@ class FormulaBoolConverter {
     private final Sort boolSort;
     
     private int varCounter = 0;
-    private ListOfTerm termsToAdd = SLListOfTerm.EMPTY_LIST;
-    private ListOfLogicVariable introducedVars 
-                                  = SLListOfLogicVariable.EMPTY_LIST;
+    private ImmutableList<Term> termsToAdd = ImmutableSLList.<Term>nil();
+    private ImmutableList<LogicVariable> introducedVars 
+                                  = ImmutableSLList.<LogicVariable>nil();
     
     
     /**
@@ -87,12 +92,12 @@ class FormulaBoolConverter {
         if(termsToAdd.size() == 1) {
             termToAdd = termsToAdd.head();
         } else if(termsToAdd.size() > 1) {
-            termToAdd = tb.and(termsToAdd.toArray());
+            termToAdd = tb.and(termsToAdd.toArray(new Term[termsToAdd.size()]));
         }
         
         if(termToAdd != null) {
             Term impTerm = tb.imp(termToAdd, result);
-            result = tb.all(introducedVars.toArray(), impTerm);
+            result = tb.all(introducedVars.toArray(new LogicVariable[introducedVars.size()]), impTerm);
         } 
         
         return result;
@@ -146,10 +151,10 @@ class FormulaBoolConverter {
      * Converts those terms in a list which are formulas to boolean 
      * terms, and leaves the others unchanged.
      */
-    public ListOfTerm convertFormulasToBool(ListOfTerm list) {
-        ListOfTerm result = SLListOfTerm.EMPTY_LIST;
+    private ImmutableList<Term> convertFormulasToBoolHelper(ImmutableList<Term> list) {
+        ImmutableList<Term> result = ImmutableSLList.<Term>nil();
         
-        IteratorOfTerm it = list.iterator();
+        Iterator<Term> it = list.iterator();
         while(it.hasNext()) {
             result = result.append(convertFormulaToBool(it.next()));
         }
@@ -162,15 +167,15 @@ class FormulaBoolConverter {
      * Converts those terms in a list of OCLEntities which are formulas 
      * to boolean terms, and leaves the others unchanged.
      */
-    public ListOfTerm convertFormulasToBool(ListOfOCLExpression list) {
-        ListOfTerm result = SLListOfTerm.EMPTY_LIST;
+    public ImmutableList<Term> convertFormulasToBool(ImmutableList<OCLExpression> list) {
+        ImmutableList<Term> result = ImmutableSLList.<Term>nil();
         
-        IteratorOfOCLExpression it = list.iterator();
+        Iterator<OCLExpression> it = list.iterator();
         while(it.hasNext()) {
             result = result.append(it.next().getTerm());
         }
         
-        return convertFormulasToBool(result);
+        return convertFormulasToBoolHelper(result);
     }
 
 }

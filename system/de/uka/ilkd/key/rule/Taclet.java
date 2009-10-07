@@ -11,18 +11,17 @@
 package de.uka.ilkd.key.rule;
 
 import java.util.HashMap;
+import java.util.Iterator;
 
+import de.uka.ilkd.key.collection.*;
 import de.uka.ilkd.key.java.ContextStatementBlock;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceData;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.IteratorOfGoal;
-import de.uka.ilkd.key.proof.ListOfGoal;
+import de.uka.ilkd.key.rule.inst.GenericSortCondition;
 import de.uka.ilkd.key.rule.inst.IllegalInstantiationException;
-import de.uka.ilkd.key.rule.inst.IteratorOfGenericSortCondition;
-import de.uka.ilkd.key.rule.inst.ListOfGenericSortCondition;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.Debug;
 
@@ -77,11 +76,11 @@ public abstract class Taclet implements Rule, Named {
     /** name displayed by the pretty printer */
     private final String displayName;
     /** list of old names for downward compatibility */
-    private final ListOfName oldNames;
+    private final ImmutableList<Name> oldNames;
     /** contains useful text explaining the taclet */
     private final String helpText = null;
     /** the set of taclet options for this taclet */
-    protected final SetOfChoice choices;
+    protected final ImmutableSet<Choice> choices;
 
     /**
      * the <tt>if</tt> sequent of the taclet
@@ -91,32 +90,32 @@ public abstract class Taclet implements Rule, Named {
      * Variables that have to be created each time the taclet is applied. 
      * Those variables occur in the varcond part of a taclet description.
      */
-    private final ListOfNewVarcond varsNew;
+    private final ImmutableList<NewVarcond> varsNew;
     /** 
      * variables with a "x not free in y" variable condition. This means the
      * instantiation of VariableSV x must not occur free in the instantiation of
      * TermSV y.
      */
-    private final ListOfNotFreeIn varsNotFreeIn;
+    private final ImmutableList<NotFreeIn> varsNotFreeIn;
     /** 
      * variable conditions used to express that a termsv depends on the free
      * variables of a given formula(SV)
      * Used by skolemization rules.
      */
-    private final ListOfNewDependingOn varsNewDependingOn;
+    private final ImmutableList<NewDependingOn> varsNewDependingOn;
 
     /** Additional generic conditions for schema variable instantiations. */
-    private final ListOfVariableCondition variableConditions;
+    private final ImmutableList<VariableCondition> variableConditions;
 
     /**
      * the list of taclet goal descriptions 
      */
-    private final ListOfTacletGoalTemplate goalTemplates;
+    private final ImmutableList<TacletGoalTemplate> goalTemplates;
 
     /**
      * list of rulesets (formerly known as heuristica) the taclet belongs to
      */
-    protected final ListOfRuleSet ruleSets;
+    protected final ImmutableList<RuleSet> ruleSets;
 
     /** 
      * should taclet be applied by strategies only 
@@ -134,10 +133,10 @@ public abstract class Taclet implements Rule, Named {
      * may appear free in the instantiation of the schemavariable (a bit more
      * complicated for rewrite taclets, see paper of M:Giese)
      */
-    protected final MapFromSchemaVariableToTacletPrefix prefixMap;
+    protected final ImmutableMap<SchemaVariable,TacletPrefix> prefixMap;
     
     /** cache; contains set of all bound variables */
-    private SetOfQuantifiableVariable boundVariables = null;
+    private ImmutableSet<QuantifiableVariable> boundVariables = null;
     
     /** tracks state of pre-computation */
     private boolean contextInfoComputed = false;
@@ -149,11 +148,11 @@ public abstract class Taclet implements Rule, Named {
     protected String tacletAsString;
 
     /** Set of schemavariables of the if part */
-    private SetOfSchemaVariable ifVariables = null;
+    private ImmutableSet<SchemaVariable> ifVariables = null;
 
     /** This map contains (a, b) if there is a substitution {b a}
      * somewhere in this taclet */
-    private MapFromSchemaVariableToSchemaVariable
+    private ImmutableMap<SchemaVariable,SchemaVariable>
 	svNameCorrespondences = null;
 	
     /** Integer to cache the hashcode */
@@ -173,12 +172,12 @@ public abstract class Taclet implements Rule, Named {
      */
     Taclet(Name                     name,
 	   TacletApplPart           applPart,  
-	   ListOfTacletGoalTemplate goalTemplates, 
-	   ListOfRuleSet            ruleSets,
+	   ImmutableList<TacletGoalTemplate> goalTemplates, 
+	   ImmutableList<RuleSet>            ruleSets,
 	   Constraint               constraint, 
 	   TacletAttributes         attrs,
-	   MapFromSchemaVariableToTacletPrefix prefixMap,
-	   SetOfChoice choices ){
+	   ImmutableMap<SchemaVariable,TacletPrefix> prefixMap,
+	   ImmutableSet<Choice> choices ){
 
 	this.name          = name;
 	ifSequent          = applPart.ifSequent();
@@ -201,7 +200,7 @@ public abstract class Taclet implements Rule, Named {
     protected void cacheMatchInfo() {
 	boundVariables = getBoundVariables();
         
-	final IteratorOfTacletGoalTemplate goalDescriptions = 
+	final Iterator<TacletGoalTemplate> goalDescriptions = 
 	    goalTemplates.iterator();
 	
 	while (!hasReplaceWith && goalDescriptions.hasNext()) {
@@ -218,10 +217,10 @@ public abstract class Taclet implements Rule, Named {
      * is cached and therefore only computed once.  
      * @return all variables occuring bound in the taclet
      */
-    public SetOfQuantifiableVariable getBoundVariables() {        
+    public ImmutableSet<QuantifiableVariable> getBoundVariables() {        
         if (boundVariables == null) {        
-            SetOfQuantifiableVariable result = 
-                SetAsListOfQuantifiableVariable.EMPTY_SET;
+            ImmutableSet<QuantifiableVariable> result = 
+                DefaultImmutableSet.<QuantifiableVariable>nil();
                        
             for (final TacletGoalTemplate tgt : goalTemplates()) {
                 result = result.union(tgt.getBoundVariables());
@@ -244,7 +243,7 @@ public abstract class Taclet implements Rule, Named {
      * @return set of variables that occur bound in taclet entities others 
      * than goal templates
      */
-    protected abstract SetOfQuantifiableVariable getBoundVariablesHelper(); 
+    protected abstract ImmutableSet<QuantifiableVariable> getBoundVariablesHelper(); 
 
     /**
      * looks if a variable is declared as not free in
@@ -288,7 +287,7 @@ public abstract class Taclet implements Rule, Named {
     /**
      * @return the generic variable conditions of this taclet
      */
-    public IteratorOfVariableCondition getVariableConditions () {
+    public Iterator<VariableCondition> getVariableConditions () {
 	return variableConditions.iterator ();
     }
 
@@ -409,7 +408,7 @@ public abstract class Taclet implements Rule, Named {
             return null;
         }
         MatchConditions result = cond;
-        final IteratorOfSchemaVariable svIterator = 
+        final Iterator<SchemaVariable> svIterator = 
             cond.getInstantiations().svIterator();
         while (svIterator.hasNext()) {
             final SchemaVariable sv = svIterator.next();
@@ -479,12 +478,12 @@ public abstract class Taclet implements Rule, Named {
      * instantiations, or <code>null</code> if any of the new
      * instantiations collide with older ones
      */
-    private MatchConditions addNewInstantiations (MapFromSchemaVariableToTerm newInst,
+    private MatchConditions addNewInstantiations (ImmutableMap<SchemaVariable,Term> newInst,
                                                   MatchConditions matchCond,
                                                   Services services) {
-        final IteratorOfEntryOfSchemaVariableAndTerm it = newInst.entryIterator ();
+        final Iterator<ImmutableMapEntry<SchemaVariable,Term>> it = newInst.entryIterator ();
         while ( it.hasNext () ) {
-            final EntryOfSchemaVariableAndTerm entry = it.next ();
+            final ImmutableMapEntry<SchemaVariable,Term> entry = it.next ();
             matchCond = addInstantiation ( entry.value (),
                                            entry.key (),
                                            matchCond,
@@ -492,7 +491,7 @@ public abstract class Taclet implements Rule, Named {
             if ( matchCond == null ) return null;
             final Operator op = entry.value ().op ();
             if ( op instanceof Metavariable ) {
-                final SetOfMetavariable newMVs =
+                final ImmutableSet<Metavariable> newMVs =
                     matchCond.getNewMetavariables ().add ( (Metavariable)op );
                 matchCond = matchCond.setNewMetavariables ( newMVs );
             }
@@ -521,16 +520,16 @@ public abstract class Taclet implements Rule, Named {
         
         for (int j=0, arity = term.arity(); j<arity; j++) {		
 	    
-	    ArrayOfQuantifiableVariable bound    = term.varsBoundHere(j);
-	    ArrayOfQuantifiableVariable tplBound = template.varsBoundHere(j); 
+	    ImmutableArray<QuantifiableVariable> bound    = term.varsBoundHere(j);
+	    ImmutableArray<QuantifiableVariable> tplBound = template.varsBoundHere(j); 
 	    
 	    if (bound.size() != tplBound.size()) {
 		return null; //FAILED
 	    }
 	    
 	    for (int i=0, boundSize = bound.size(); i<boundSize; i++) {		
-	        final QuantifiableVariable templateQVar = tplBound.getQuantifiableVariable(i);
-                final QuantifiableVariable qVar = bound.getQuantifiableVariable(i);
+	        final QuantifiableVariable templateQVar = tplBound.get(i);
+                final QuantifiableVariable qVar = bound.get(i);
                 if (templateQVar instanceof LogicVariable) {
                     final RenameTable rt = matchCond.renameTable();                   
                     if (!rt.containsLocally(templateQVar) && !rt.containsLocally(qVar)) {                           
@@ -798,7 +797,7 @@ public abstract class Taclet implements Rule, Named {
             return null; //FAILED;
         }
 
-        final MapFromSchemaVariableToTerm newInst = srVisitor.getNewInstantiations ();
+        final ImmutableMap<SchemaVariable,Term> newInst = srVisitor.getNewInstantiations ();
         if ( newInst == null ) return null; //FAILED;
 
         final MatchConditions mc = addNewInstantiations ( newInst,
@@ -840,15 +839,15 @@ public abstract class Taclet implements Rule, Named {
      * the elements of p_toMatch that could successfully be matched
      * against p_template, and the corresponding MatchConditions.
      */
-    public IfMatchResult matchIf ( IteratorOfIfFormulaInstantiation p_toMatch,
+    public IfMatchResult matchIf ( Iterator<IfFormulaInstantiation> p_toMatch,
 				   Term                             p_template,
 				   MatchConditions                  p_matchCond,
 				   Services                         p_services,
 				   Constraint                       p_userConstraint ) {
-	ListOfIfFormulaInstantiation     resFormulas =
-	    SLListOfIfFormulaInstantiation.EMPTY_LIST;
-	ListOfMatchConditions            resMC       =
-	    SLListOfMatchConditions       .EMPTY_LIST;
+	ImmutableList<IfFormulaInstantiation>     resFormulas =
+	    ImmutableSLList.<IfFormulaInstantiation>nil();
+	ImmutableList<MatchConditions>            resMC       =
+	    ImmutableSLList.<MatchConditions>nil();
 
 	Term                             updateFormula;
 	if ( p_matchCond.getInstantiations ().getUpdateContext().isEmpty() )
@@ -896,18 +895,18 @@ public abstract class Taclet implements Rule, Named {
      * @return resulting MatchConditions or null if the given list
      * p_toMatch does not match
      */
-    public MatchConditions matchIf ( IteratorOfIfFormulaInstantiation p_toMatch,
+    public MatchConditions matchIf ( Iterator<IfFormulaInstantiation> p_toMatch,
 				     MatchConditions                  p_matchCond,
 				     Services                         p_services,
 				     Constraint                       p_userConstraint ) {
 
-	IteratorOfConstrainedFormula     itIfSequent   = ifSequent () .iterator ();
+	Iterator<ConstrainedFormula>     itIfSequent   = ifSequent () .iterator ();
 
-	ListOfMatchConditions            newMC;	
+	ImmutableList<MatchConditions>            newMC;	
 	
 	while ( itIfSequent.hasNext () ) {
-	    newMC = matchIf ( ( SLListOfIfFormulaInstantiation.EMPTY_LIST
-				.prepend ( p_toMatch.next () ).iterator () ),
+	    newMC = matchIf ( ImmutableSLList.<IfFormulaInstantiation>nil()
+				.prepend ( p_toMatch.next () ).iterator (),
 			      itIfSequent.next ().formula (),
 			      p_matchCond,
 			      p_services,
@@ -941,7 +940,7 @@ public abstract class Taclet implements Rule, Named {
     
     /** returns the list of old names of the taclet
      */
-    public ListOfName oldNames() {
+    public ImmutableList<Name> oldNames() {
 	return oldNames;
     }
     
@@ -959,7 +958,7 @@ public abstract class Taclet implements Rule, Named {
     
     /** returns an iterator over the variables that are new in the Taclet. 
      */
-    public ListOfNewVarcond varsNew() {
+    public ImmutableList<NewVarcond> varsNew() {
 	return varsNew;
     } 
 
@@ -967,11 +966,11 @@ public abstract class Taclet implements Rule, Named {
     /** returns an iterator over the variable pairs that indicate that are 
      * new in the Taclet. 
      */
-    public IteratorOfNotFreeIn varsNotFreeIn() { 
+    public Iterator<NotFreeIn> varsNotFreeIn() { 
 	return varsNotFreeIn.iterator();
     } 
 
-    public IteratorOfNewDependingOn varsNewDependingOn() { 
+    public Iterator<NewDependingOn> varsNewDependingOn() { 
 	return varsNewDependingOn.iterator();
     } 
     
@@ -984,20 +983,20 @@ public abstract class Taclet implements Rule, Named {
 
     /** returns an iterator over the goal descriptions.
      */
-    public ListOfTacletGoalTemplate goalTemplates() {
+    public ImmutableList<TacletGoalTemplate> goalTemplates() {
 	return goalTemplates;
     } 
 
-    public SetOfChoice getChoices(){
+    public ImmutableSet<Choice> getChoices(){
 	return choices;
     }
 
     /** returns an iterator over the rule sets. */
-    public IteratorOfRuleSet ruleSets() {
+    public Iterator<RuleSet> ruleSets() {
 	return ruleSets.iterator();
     } 
 
-    public ListOfRuleSet getRuleSets() {
+    public ImmutableList<RuleSet> getRuleSets() {
 	return ruleSets;
     }
 
@@ -1009,7 +1008,7 @@ public abstract class Taclet implements Rule, Named {
     }
 
 
-    public MapFromSchemaVariableToTacletPrefix prefixMap() {
+    public ImmutableMap<SchemaVariable,TacletPrefix> prefixMap() {
 	return prefixMap;
     }
 
@@ -1048,7 +1047,7 @@ public abstract class Taclet implements Rule, Named {
 	    return contextIsInPrefix;
 	}
 	contextInfoComputed=true;
-	IteratorOfTacletPrefix it=prefixMap().valueIterator();
+	Iterator<TacletPrefix> it=prefixMap().valueIterator();
 	while (it.hasNext()) {
 	    if (it.next().context()) {
 		contextIsInPrefix=true;
@@ -1075,11 +1074,11 @@ public abstract class Taclet implements Rule, Named {
 
 	if (!name.equals(t2.name)) return false;
 
-        final IteratorOfChoice it1 = choices.iterator();
+        final Iterator<Choice> it1 = choices.iterator();
 	        
 	while (it1.hasNext()) {
             final Choice c1 = it1.next(); 
-            final IteratorOfChoice it2 = t2.getChoices().iterator();
+            final Iterator<Choice> it2 = t2.getChoices().iterator();
 	    while (it2.hasNext()){
                 final Choice c2 = it2.next();
 		if(c1 != c2 && c1.category().equals(c2.category())){
@@ -1184,11 +1183,11 @@ public abstract class Taclet implements Rule, Named {
      * Schemavariables to concrete logic elements
      * @return the instanted formulas of the semisquent as list
      */
-    private ListOfConstrainedFormula instantiateSemisequent(Semisequent semi, Services services, 
+    private ImmutableList<ConstrainedFormula> instantiateSemisequent(Semisequent semi, Services services, 
             MatchConditions matchCond) {       
         
-        ListOfConstrainedFormula replacements = SLListOfConstrainedFormula.EMPTY_LIST;
-        final IteratorOfConstrainedFormula it = semi.iterator();        
+        ImmutableList<ConstrainedFormula> replacements = ImmutableSLList.<ConstrainedFormula>nil();
+        final Iterator<ConstrainedFormula> it = semi.iterator();        
         
         while (it.hasNext()) {
             replacements = replacements.append
@@ -1239,7 +1238,7 @@ public abstract class Taclet implements Rule, Named {
 			    boolean antec,
 			    Services services, 
 			    MatchConditions matchCond ) {
-	final ListOfConstrainedFormula replacements = 
+	final ImmutableList<ConstrainedFormula> replacements = 
             instantiateSemisequent(semi, services, matchCond);
 	
 	if (pos != null) {
@@ -1316,17 +1315,17 @@ public abstract class Taclet implements Rule, Named {
      * @param matchCond the MatchConditions containing in particular
      * the instantiations of the schemavariables
      */
-    protected void applyAddrule(ListOfTaclet rules, Goal goal, 
+    protected void applyAddrule(ImmutableList<Taclet> rules, Goal goal, 
 				Services services,
 				MatchConditions matchCond) {
                                 
-	final IteratorOfTaclet it = rules.iterator();
+	final Iterator<Taclet> it = rules.iterator();
 	while (it.hasNext()) {
 	    Taclet tacletToAdd = it.next(); 
 	    String uniqueTail=""; // we need to name the new taclet uniquely
 /*
             TacletGoalTemplate replacewithCandidate = null;
-	    IteratorOfTacletGoalTemplate actions = 
+	    Iterator<TacletGoalTemplate> actions = 
                tacletToAdd.goalTemplates().iterator();
             while (actions.hasNext()) {
                replacewithCandidate = actions.next();
@@ -1376,7 +1375,7 @@ public abstract class Taclet implements Rule, Named {
 	    collector.visit(tacletToAdd, true);// true, because
 	                                     // descend into
 					     // addrules
-	    final IteratorOfSchemaVariable svIt = collector.varIterator();
+	    final Iterator<SchemaVariable> svIt = collector.varIterator();
 	    while (svIt.hasNext()) {
 		SchemaVariable sv = svIt.next();
 		if (matchCond.getInstantiations ().isInstantiated(sv)) {
@@ -1386,10 +1385,10 @@ public abstract class Taclet implements Rule, Named {
 	    }
 
 	    {
-		final ListOfGenericSortCondition     cs  =
+		final ImmutableList<GenericSortCondition>     cs  =
 		    matchCond.getInstantiations ()
 		    .getGenericSortInstantiations ().toConditions ();
-		final IteratorOfGenericSortCondition cit = cs.iterator ();
+		final Iterator<GenericSortCondition> cit = cs.iterator ();
 
 		while ( cit.hasNext () )
 		    neededInstances = neededInstances.add ( cit.next () );
@@ -1402,11 +1401,11 @@ public abstract class Taclet implements Rule, Named {
 
 
 
-    protected void applyAddProgVars(SetOfSchemaVariable pvs, Goal goal,
+    protected void applyAddProgVars(ImmutableSet<SchemaVariable> pvs, Goal goal,
                                     PosInOccurrence posOfFind,
                                     Services services, 
                                     MatchConditions matchCond) {
-        ListOfRenamingTable renamings = SLListOfRenamingTable.EMPTY_LIST;
+        ImmutableList<RenamingTable> renamings = ImmutableSLList.<RenamingTable>nil();
 	for (final SchemaVariable sv : pvs) {
 	    ProgramVariable inst
 		= (ProgramVariable)matchCond.getInstantiations ().getInstantiation(sv);
@@ -1435,7 +1434,7 @@ public abstract class Taclet implements Rule, Named {
      * the first goal of the return list is the goal that should be
      * closed (with the constraint this taclet is applied under).
      */
-    public abstract ListOfGoal apply(Goal goal, Services services, 
+    public abstract ImmutableList<Goal> apply(Goal goal, Services services, 
 				     RuleApp tacletApp);
 
 
@@ -1446,12 +1445,12 @@ public abstract class Taclet implements Rule, Named {
      * second goal is the if goal), otherwise an array consisting of
      * the single element p_goal
      */
-    protected ListOfGoal checkIfGoals ( Goal                         p_goal,
-					ListOfIfFormulaInstantiation p_list,
+    protected ImmutableList<Goal> checkIfGoals ( Goal                         p_goal,
+					ImmutableList<IfFormulaInstantiation> p_list,
 					MatchConditions              p_matchCond,
 					int                          p_numberOfNewGoals ) {
-	ListOfGoal     res    = null;
-	IteratorOfGoal itGoal;
+	ImmutableList<Goal>     res    = null;
+	Iterator<Goal> itGoal;
 
 	// proof obligation for the if formulas
 	Term           ifObl  = null;
@@ -1533,14 +1532,14 @@ public abstract class Taclet implements Rule, Named {
      * returns the set of schemavariables of the taclet's if-part
      * @return Set of schemavariables of the if part
      */
-    protected SetOfSchemaVariable getIfVariables () {
+    protected ImmutableSet<SchemaVariable> getIfVariables () {
 	// should be synchronized
 	if ( ifVariables == null ) {
 	    TacletSchemaVariableCollector svc = new TacletSchemaVariableCollector ();
 	    svc.visit( ifSequent () );
 	    
-	    ifVariables                 = SetAsListOfSchemaVariable.EMPTY_SET;
-	    IteratorOfSchemaVariable it = svc.varIterator ();
+	    ifVariables                 = DefaultImmutableSet.<SchemaVariable>nil();
+	    Iterator<SchemaVariable> it = svc.varIterator ();
 	    while ( it.hasNext () )
 		ifVariables = ifVariables.add ( it.next () );
 	}
@@ -1553,7 +1552,7 @@ public abstract class Taclet implements Rule, Named {
      * @return set of schemavariables of the if and the (optional)
      * find part
      */
-    public abstract SetOfSchemaVariable getIfFindVariables ();
+    public abstract ImmutableSet<SchemaVariable> getIfFindVariables ();
 
 
     /**
@@ -1585,9 +1584,9 @@ public abstract class Taclet implements Rule, Named {
     }
 
     StringBuffer toStringVarCond(StringBuffer sb) {
-	IteratorOfNewVarcond itVarsNew=varsNew().iterator();
-	IteratorOfNotFreeIn itVarsNotFreeIn=varsNotFreeIn();
-	IteratorOfVariableCondition itVC=getVariableConditions();
+	Iterator<NewVarcond> itVarsNew=varsNew().iterator();
+	Iterator<NotFreeIn> itVarsNotFreeIn=varsNotFreeIn();
+	Iterator<VariableCondition> itVC=getVariableConditions();
 	if (itVarsNew.hasNext() ||
 	    itVarsNotFreeIn.hasNext() ||
 	    itVC.hasNext()) {
@@ -1617,7 +1616,7 @@ public abstract class Taclet implements Rule, Named {
 	if (goalTemplates.isEmpty()) {
 	    sb.append("\\closegoal");
 	} else {
-	    IteratorOfTacletGoalTemplate it=goalTemplates().iterator();
+	    Iterator<TacletGoalTemplate> it=goalTemplates().iterator();
 	    while (it.hasNext()) {
 		sb=sb.append(it.next());
 		if (it.hasNext()) sb = sb.append(";");
@@ -1628,7 +1627,7 @@ public abstract class Taclet implements Rule, Named {
     }
 
     StringBuffer toStringRuleSets(StringBuffer sb) {
-	IteratorOfRuleSet itRS=ruleSets();
+	Iterator<RuleSet> itRS=ruleSets();
 	if (itRS.hasNext()) {
 	    sb=sb.append("\\heuristics(");
 	    while (itRS.hasNext()) {
@@ -1668,14 +1667,14 @@ public abstract class Taclet implements Rule, Named {
      * given mode (interactive/non-interactive, activated rule sets)
      */
     public boolean admissible(boolean       interactive,
-			      ListOfRuleSet p_ruleSets) {
+			      ImmutableList<RuleSet> p_ruleSets) {
 	if ( interactive )
 	    return admissibleInteractive(p_ruleSets);
 	else
 	    return admissibleAutomatic(p_ruleSets);
     }
 
-    protected boolean admissibleInteractive(ListOfRuleSet notAdmissibleRuleSets) {
+    protected boolean admissibleInteractive(ImmutableList<RuleSet> notAdmissibleRuleSets) {
         if (noninteractive()) {
             for (final RuleSet tacletRuleSet : getRuleSets() ) {
                 if ( notAdmissibleRuleSets.contains ( tacletRuleSet ) ) return false;
@@ -1684,7 +1683,7 @@ public abstract class Taclet implements Rule, Named {
         return true;
     }
 
-    protected boolean admissibleAutomatic(ListOfRuleSet admissibleRuleSets) {
+    protected boolean admissibleAutomatic(ImmutableList<RuleSet> admissibleRuleSets) {
         for (final RuleSet tacletRuleSet : getRuleSets() ) {
             if ( admissibleRuleSets.contains ( tacletRuleSet ) ) return true;
         }
@@ -1693,14 +1692,14 @@ public abstract class Taclet implements Rule, Named {
         
     /** returns the variables in a Taclet with a read access
     */
-    public ListOfSchemaVariable readSet() {
-	return SLListOfSchemaVariable.EMPTY_LIST;
+    public ImmutableList<SchemaVariable> readSet() {
+	return ImmutableSLList.<SchemaVariable>nil();
     }
 
     /** returns the variable in a Taclet to which is written to
     */
-    public ListOfSchemaVariable writeSet() {
-	return SLListOfSchemaVariable.EMPTY_LIST; 
+    public ImmutableList<SchemaVariable> writeSet() {
+	return ImmutableSLList.<SchemaVariable>nil(); 
     }
   
          

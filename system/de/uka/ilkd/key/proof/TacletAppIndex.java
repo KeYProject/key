@@ -10,6 +10,10 @@
 
 package de.uka.ilkd.key.proof;
 
+import java.util.Iterator;
+
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Constraint;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -192,12 +196,12 @@ public class TacletAppIndex  {
         return pos.isInAntec () ? antecIndex : succIndex;
     }
 
-    private ListOfTacletApp getFindTacletWithPos ( PosInOccurrence pos,
+    private ImmutableList<TacletApp> getFindTacletWithPos ( PosInOccurrence pos,
                                                    TacletFilter    filter,
                                                    Services        services, 
                                                    Constraint      userConstraint ) {
         Debug.assertFalse ( pos == null );
-        ListOfNoPosTacletApp tacletInsts = getFindTaclet ( pos, filter,
+        ImmutableList<NoPosTacletApp> tacletInsts = getFindTaclet ( pos, filter,
                                                            services,
                                                            userConstraint );
         return createTacletApps ( tacletInsts, pos );
@@ -208,11 +212,11 @@ public class TacletAppIndex  {
      * at the given position of the given sequent.
      * @param pos the PosInOccurrence to focus
      */
-    public ListOfTacletApp getTacletAppAt(PosInOccurrence pos,
+    public ImmutableList<TacletApp> getTacletAppAt(PosInOccurrence pos,
                                           TacletFilter    filter,
                                           Services        services,
                                           Constraint      userConstraint) {
-        ListOfTacletApp sal = getFindTacletWithPos ( pos, filter, services,
+        ImmutableList<TacletApp> sal = getFindTacletWithPos ( pos, filter, services,
                                                      userConstraint );
         return prepend ( sal,
                          getNoFindTaclet ( filter, services, userConstraint ) );
@@ -224,10 +228,10 @@ public class TacletAppIndex  {
      * @param pos the PosInOccurrence to focus
      * @return list of all created TacletApps
      */
-    static ListOfTacletApp createTacletApps(ListOfNoPosTacletApp tacletInsts,
+    static ImmutableList<TacletApp> createTacletApps(ImmutableList<NoPosTacletApp> tacletInsts,
                                             PosInOccurrence pos) {
-        ListOfTacletApp result = SLListOfTacletApp.EMPTY_LIST;
-        IteratorOfNoPosTacletApp it = tacletInsts.iterator ();
+        ImmutableList<TacletApp> result = ImmutableSLList.<TacletApp>nil();
+        Iterator<NoPosTacletApp> it = tacletInsts.iterator ();
         while ( it.hasNext () ) {
             NoPosTacletApp tacletApp = it.next ();
             if ( tacletApp.taclet () instanceof FindTaclet ) {
@@ -262,7 +266,7 @@ public class TacletAppIndex  {
      * about the java datastructures like (static)types etc.
      * @return list of all possible instantiations
      */
-    public ListOfNoPosTacletApp getNoFindTaclet(TacletFilter filter,
+    public ImmutableList<NoPosTacletApp> getNoFindTaclet(TacletFilter filter,
                                                 Services services,
                                                 Constraint userConstraint) {
         RuleFilter effectiveFilter = new AndRuleFilter ( filter, ruleFilter );
@@ -279,15 +283,15 @@ public class TacletAppIndex  {
      * about the java datastructures like (static)types etc.
      * @return list of all possible instantiations
      */
-    public ListOfNoPosTacletApp getRewriteTaclet(PosInOccurrence pos, 
+    public ImmutableList<NoPosTacletApp> getRewriteTaclet(PosInOccurrence pos, 
                                                  TacletFilter    filter,
                                                  Services        services,
                                                  Constraint      userConstraint) { 
 
-        final IteratorOfNoPosTacletApp it =
+        final Iterator<NoPosTacletApp> it =
             getFindTaclet ( pos, filter, services, userConstraint ).iterator();
 
-        ListOfNoPosTacletApp result = SLListOfNoPosTacletApp.EMPTY_LIST;
+        ImmutableList<NoPosTacletApp> result = ImmutableSLList.<NoPosTacletApp>nil();
 
         while ( it.hasNext () ) {
             final NoPosTacletApp tacletApp = it.next ();
@@ -305,7 +309,7 @@ public class TacletAppIndex  {
      * about the java datastructures like (static)types etc.
      * @return list of all possible instantiations
      */
-    public ListOfNoPosTacletApp getFindTaclet(PosInOccurrence pos,
+    public ImmutableList<NoPosTacletApp> getFindTaclet(PosInOccurrence pos,
                                               TacletFilter    filter,
                                               Services        services,
                                               Constraint      userConstraint) { 
@@ -322,11 +326,11 @@ public class TacletAppIndex  {
      * about the java datastructures like (static)types etc.
      * @return the possible rule applications 
      */
-    public ListOfTacletApp getTacletAppAtAndBelow(PosInOccurrence pos,
+    public ImmutableList<TacletApp> getTacletAppAtAndBelow(PosInOccurrence pos,
                                                   TacletFilter    filter,
                                                   Services        services,
                                                   Constraint      userConstraint) {
-        final ListOfTacletApp findTaclets =
+        final ImmutableList<TacletApp> findTaclets =
             getIndex ( pos ).getTacletAppAtAndBelow ( pos, filter );
         return prepend ( findTaclets,
                          getNoFindTaclet ( filter, services, userConstraint ) );
@@ -419,10 +423,10 @@ public class TacletAppIndex  {
                + " TacletIndex " + tacletIndex ();
     }
 
-    // helper because ListOfNoPosTacletApp is no ListOfTacletApp
-    private static ListOfTacletApp prepend(ListOfTacletApp l1,
-                                           ListOfNoPosTacletApp l2) {
-        IteratorOfNoPosTacletApp it = l2.iterator ();
+    // helper because IList<NoPosTacletApp> is no IList<TacletApp>
+    private static ImmutableList<TacletApp> prepend(ImmutableList<TacletApp> l1,
+                                           ImmutableList<NoPosTacletApp> l2) {
+        Iterator<NoPosTacletApp> it = l2.iterator ();
         while ( it.hasNext () ) {
             l1 = l1.prepend ( it.next () );
         }
@@ -471,7 +475,7 @@ public class TacletAppIndex  {
         if ( antecIndex != null ) antecIndex.reportRuleApps ( l );
         if ( succIndex != null ) succIndex.reportRuleApps ( l );
 
-        final IteratorOfNoPosTacletApp it =
+        final Iterator<NoPosTacletApp> it =
             getNoFindTaclet ( TacletFilter.TRUE,
                               services,
                               userConstraint ).iterator ();

@@ -10,6 +10,7 @@ package de.uka.ilkd.key.parser;
 import java.util.HashMap;
 import java.util.Map;
 
+import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Named;
@@ -17,7 +18,6 @@ import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.RigidFunction;
-import de.uka.ilkd.key.logic.sort.ArrayOfSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 
 /**
@@ -62,7 +62,7 @@ public class AtPreNamespace extends Namespace {
                     } else {
                         argSorts = new Sort[0];
                     }
-                    n = createAtPreFunction(name, pv.sort(), new ArrayOfSort(argSorts));
+                    n = createAtPreFunction(name, pv.sort(), new ImmutableArray<Sort>(argSorts));
                 } else if (atPost instanceof Function) {
                     n = createAtPreFunction(name, ((Function)atPost).sort(), ((Function)atPost).argSort());
                 } 
@@ -74,7 +74,7 @@ public class AtPreNamespace extends Namespace {
 
     /**
      */
-    private Named createAtPreFunction(Name name, Sort sort, ArrayOfSort argsort) {
+    private Named createAtPreFunction(Name name, Sort sort, ImmutableArray<Sort> argsort) {
         return new RigidFunction(name, sort, argsort);
     }
 

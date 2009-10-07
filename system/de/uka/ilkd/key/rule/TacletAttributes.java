@@ -13,22 +13,22 @@
 
 package de.uka.ilkd.key.rule;
 
-import de.uka.ilkd.key.logic.ListOfName;
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.SLListOfName;
 
 public class TacletAttributes {
     private boolean noninteractive;
    
     private String displayName;
-    private ListOfName oldNames;
+    private ImmutableList<Name> oldNames;
     private String helpText;
 
 
    public TacletAttributes() {
 	this.noninteractive = false;	
         this.displayName = null;
-        this.oldNames = SLListOfName.EMPTY_LIST;
+        this.oldNames = ImmutableSLList.<Name>nil();
         this.helpText = null;
    }
 
@@ -43,7 +43,7 @@ public class TacletAttributes {
        return displayName;
     }
     
-    public ListOfName oldNames() {
+    public ImmutableList<Name> oldNames() {
        return oldNames;
     }
     

@@ -11,8 +11,13 @@ package de.uka.ilkd.key.gui.configuration;
 
 import java.util.*;
 
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.GUIEvent;
-import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.Choice;
+import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.Named;
+import de.uka.ilkd.key.logic.Namespace;
 
 public class ChoiceSettings implements Settings {
 
@@ -57,12 +62,12 @@ public class ChoiceSettings implements Settings {
     /** 
      * returns the current selected choices as set    
      */ 
-    public SetOfChoice getDefaultChoicesAsSet() {              
+    public ImmutableSet<Choice> getDefaultChoicesAsSet() {              
         return choiceMap2choiceSet(category2Default);   
     }
 
-    private SetOfChoice choiceMap2choiceSet(HashMap<String, String> ccc) {
-        SetOfChoice choices = SetAsListOfChoice.EMPTY_SET;        
+    private ImmutableSet<Choice> choiceMap2choiceSet(HashMap<String, String> ccc) {
+        ImmutableSet<Choice> choices = DefaultImmutableSet.<Choice>nil();        
         for (final Map.Entry<String,String> entry : ccc.entrySet()) {
             choices = choices.
               add(new Choice(new Name(entry.getValue()), entry.getKey()));
@@ -75,7 +80,7 @@ public class ChoiceSettings implements Settings {
      * are no longer present in <code>choiceNS</code>
      * @param remove remove entries not present in <code>choiceNS</code> */
     public void updateChoices(Namespace choiceNS, boolean remove){
-	IteratorOfNamed it = choiceNS.allElements().iterator();
+	Iterator<Named> it = choiceNS.allElements().iterator();
 	HashMap<String,Set<String>> c2C = new HashMap<String, Set<String>>();
 	Choice c;
 	Set<String> soc;
@@ -191,7 +196,7 @@ public class ChoiceSettings implements Settings {
 	props.setProperty(CHOICES_KEY, choiceSequence);	
     }
     
-    public ChoiceSettings updateWith(SetOfChoice sc) {
+    public ChoiceSettings updateWith(ImmutableSet<Choice> sc) {
         for (final Choice c : sc) {
             if (category2Default.containsKey(c.category())) {
                 category2Default.remove(c.category());

@@ -70,7 +70,7 @@ import javax.swing.tree.TreePath;
 
        Actually I don't like the side-effect of the constructor.
 
-       Collections.EMPTY_SET can of course be used if there is no state yet.
+       .<Collections>nil() can of course be used if there is no state yet.
 
     b) Only request the state on demand, and also restore it. This has less overhead
        during execution, but a) has to modify the expansion structure while

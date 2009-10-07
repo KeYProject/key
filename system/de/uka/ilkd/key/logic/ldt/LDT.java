@@ -11,9 +11,12 @@ package de.uka.ilkd.key.logic.ldt;
 
 import java.util.HashMap;
 
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.*;
+import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.Name;
@@ -22,8 +25,7 @@ import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.rule.SetAsListOfTaclet;
-import de.uka.ilkd.key.rule.SetOfTaclet;
+import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.util.ExtList;
 
 /** this class extends the class ADT and is used to represent language
@@ -41,7 +43,7 @@ public abstract class LDT {
     private Namespace functions = new Namespace();
 
     /** the model specific rules */
-    private SetOfTaclet rules = SetAsListOfTaclet.EMPTY_SET;
+    private ImmutableSet<Taclet> rules = DefaultImmutableSet.<Taclet>nil();
     
     /** the sort represented by the LDT */
     protected final Sort sort;
@@ -128,7 +130,7 @@ public abstract class LDT {
     /** returns the model specific rules 
      * @return the model specific rules 
      */
-    public SetOfTaclet rules() {
+    public ImmutableSet<Taclet> rules() {
 	return rules;
     }
 

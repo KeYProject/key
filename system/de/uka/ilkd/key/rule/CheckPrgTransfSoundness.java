@@ -10,18 +10,20 @@ package de.uka.ilkd.key.rule;
 import java.io.*;
 import java.util.*;
 
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.expression.Operator;
 import de.uka.ilkd.key.java.visitor.ProgramSVCollector;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.op.SVSubstitute;
+import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.op.SortedSchemaVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.proof.init.EnvInput;
-import de.uka.ilkd.key.proof.init.InitConfig;
-import de.uka.ilkd.key.proof.init.JavaProfile;
-import de.uka.ilkd.key.proof.init.KeYFileForTests;
-import de.uka.ilkd.key.proof.init.ProblemInitializer;
+import de.uka.ilkd.key.proof.init.*;
 import de.uka.ilkd.key.util.KeYResourceManager;
 
 
@@ -63,7 +65,7 @@ public class CheckPrgTransfSoundness {
 
     // This variable contains the list of new variables, when
     // applicable, depending on each taclet.
-    private static ListOfNewVarcond newvars = null;
+    private static ImmutableList<NewVarcond> newvars = null;
 
     // This is a Map from SchemaVariables to Restrictions.
     private static Map<SVSubstitute, Restriction> svToRestriction = new HashMap<SVSubstitute, Restriction>();
@@ -159,7 +161,7 @@ public class CheckPrgTransfSoundness {
 
     // This method parses the file which includes all taclets. It
     // creates a "SetOfTaclet" set which includes the taclets.
-    public static SetOfTaclet parseTaclets() {
+    public static ImmutableSet<Taclet> parseTaclets() {
 
         Set<String> checkTacsName = new HashSet<String>();
 
@@ -188,7 +190,7 @@ public class CheckPrgTransfSoundness {
             return null;
         }
 
-        SetOfTaclet rules = SetAsListOfTaclet.EMPTY_SET;
+        ImmutableSet<Taclet> rules = DefaultImmutableSet.<Taclet>nil();
         File allTacletsFile = null;
         try {
             allTacletsFile = File.createTempFile("allTaclets","tmp");
@@ -211,12 +213,12 @@ public class CheckPrgTransfSoundness {
             EnvInput envInput = new KeYFileForTests("Test", allTacletsFile);
             ProblemInitializer pi = new ProblemInitializer(JAVA_PROFILE);
             InitConfig ic = pi.prepare(envInput);
-            SetOfTaclet currentRules = ic.getTaclets();
+            ImmutableSet<Taclet> currentRules = ic.getTaclets();
             //filtern von currentRules mit obigen checkTacsName, treffer in rules hinzuf�gen
             // schleife �ber alle elemente von currentRules
 
 
-            IteratorOfTaclet currentRulesIt = currentRules.iterator();
+            Iterator<Taclet> currentRulesIt = currentRules.iterator();
             while (currentRulesIt.hasNext()) {
                 Taclet cT = (Taclet) currentRulesIt.next();
 
@@ -243,8 +245,8 @@ public class CheckPrgTransfSoundness {
 
     // This method iterates over all the taclets created by the parsing
     // process and feeds them to the "processTaclet" method.
-    public static void processAllTaclets(SetOfTaclet taclets) {
-        IteratorOfTaclet tacletIt = taclets.iterator();
+    public static void processAllTaclets(ImmutableSet<Taclet> taclets) {
+        Iterator<Taclet> tacletIt = taclets.iterator();
         int i = 1;
         while(tacletIt.hasNext()) {
             Taclet tac = tacletIt.next();
@@ -283,7 +285,7 @@ public class CheckPrgTransfSoundness {
         newvars = null;
 
         // Intermediate variable.
-        ListOfTacletGoalTemplate listTgt = taclet.goalTemplates();
+        ImmutableList<TacletGoalTemplate> listTgt = taclet.goalTemplates();
 
         if (taclet instanceof RewriteTaclet && listTgt.size() == 1) {
             findTerm = ((RewriteTaclet) taclet).find();
@@ -343,14 +345,14 @@ public class CheckPrgTransfSoundness {
         // Collects all SVs in the code of the find part.
         ProgramSVCollector PSVC =
             new ProgramSVCollector(findStatementBlock,
-                                   SLListOfSchemaVariable.EMPTY_LIST) ;
+                                   ImmutableSLList.<SchemaVariable>nil()) ;
         PSVC.start();
-        ListOfSchemaVariable list = PSVC.getSchemaVariables();
+        ImmutableList<SchemaVariable> list = PSVC.getSchemaVariables();
 
         // Creates a map with all the schema variables mapped to the no
         // restriction class.
         svToRestriction = new HashMap<SVSubstitute, Restriction>();
-        IteratorOfSchemaVariable listIt = list.iterator();
+        Iterator<SchemaVariable> listIt = list.iterator();
         while (listIt.hasNext()) {
             svToRestriction.put(listIt.next(), RESTRICTNONE);
         }
@@ -1125,7 +1127,7 @@ public class CheckPrgTransfSoundness {
     // "addNewString"
     public static void createNewVarsAddString(Map<SchemaVariable, String> svToMaude) {
         addNewString = "";
-        IteratorOfNewVarcond newvarsIt = newvars.iterator();
+        Iterator<NewVarcond> newvarsIt = newvars.iterator();
         while (newvarsIt.hasNext()) {
             NewVarcond newVC =  newvarsIt.next();
             SchemaVariable sv = newVC.getSchemaVariable();
@@ -1284,7 +1286,7 @@ public class CheckPrgTransfSoundness {
             // that sv is replaced in the code by
             // sv+"Name:TacletNewVarName" and it does not matter what
             // the type of the variable is!
-            IteratorOfNewVarcond newvarsIt = newvars.iterator();
+            Iterator<NewVarcond> newvarsIt = newvars.iterator();
             while (newvarsIt.hasNext()) {
                 NewVarcond newVC = newvarsIt.next();
                 SchemaVariable newSV = newVC.getSchemaVariable();
@@ -1629,7 +1631,7 @@ public class CheckPrgTransfSoundness {
             return;
         }
 
-        SetOfTaclet taclets = parseTaclets();
+        ImmutableSet<Taclet> taclets = parseTaclets();
         processAllTaclets(taclets);
 
         try {

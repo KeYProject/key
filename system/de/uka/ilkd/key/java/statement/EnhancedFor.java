@@ -106,7 +106,7 @@ public class EnhancedFor extends LoopStatement implements VariableScope {
      * @return the local variable declaration.
      */
     public LocalVariableDeclaration getVariableDeclaration() {
-        return (LocalVariableDeclaration)getInitializers().getLoopInitializer(0);
+        return (LocalVariableDeclaration)getInitializers().get(0);
     }
 
 }

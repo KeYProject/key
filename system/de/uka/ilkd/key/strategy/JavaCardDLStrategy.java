@@ -15,15 +15,7 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.ldt.IntegerLDT;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.IUpdateOperator;
-import de.uka.ilkd.key.logic.op.IfThenElse;
-import de.uka.ilkd.key.logic.op.Junctor;
-import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.Op;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.ProgramMethod;
-import de.uka.ilkd.key.logic.op.TermSymbol;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
@@ -66,7 +58,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         
         this.strategyProperties =
             (StrategyProperties)strategyProperties.clone ();
-        
+      
         this.tf = new ArithTermFeatures ( p_proof.getServices ()
                                           .getTypeConverter ().getIntegerLDT () );
         this.ff = new FormulaTermFeatures ();        
@@ -194,6 +186,10 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                       add ( EqNonDuplicateAppFeature.INSTANCE,
                             longConst ( -500 ) ) );
 
+        bindRuleSet ( d, "update_equivalence",
+                      add ( NonDuplicateAppModPositionFeature.INSTANCE,
+                            longConst ( 30 ) ) );
+
         bindRuleSet ( d, "comprehensions",
                       add ( NonDuplicateAppModPositionFeature.INSTANCE,
                             longConst ( 1000 ) ) );
@@ -240,6 +236,11 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         boolean useLoopExpand = strategyProperties.getProperty(
                 StrategyProperties.LOOP_OPTIONS_KEY).
                     equals(StrategyProperties.LOOP_EXPAND);
+        
+        boolean useLoopExpandBounded = strategyProperties.getProperty( //chrisg
+                StrategyProperties.LOOP_OPTIONS_KEY).
+                    equals(StrategyProperties.LOOP_EXPAND_BOUNDED);
+        
         boolean useLoopInvariant = strategyProperties.getProperty(
                 StrategyProperties.LOOP_OPTIONS_KEY).
                     equals(StrategyProperties.LOOP_INVARIANT);
@@ -265,6 +266,10 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                       useLoopExpand ? longConst ( 0 )
                                     : inftyConst () );
         
+        bindRuleSet ( d, "loop_expand_bounded", //chrisg
+                useLoopExpandBounded ? longConst ( 0 )
+                              : inftyConst () );
+
         bindRuleSet  ( d, "loop_invariant", 
                        useLoopInvariant ? longConst ( 100 )  
                                         : inftyConst () );

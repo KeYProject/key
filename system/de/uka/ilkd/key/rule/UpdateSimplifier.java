@@ -8,12 +8,15 @@
 //
 package de.uka.ilkd.key.rule;
 
+import de.uka.ilkd.key.collection.ImmutableArray;
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.ConstrainedFormula;
 import de.uka.ilkd.key.logic.Constraint;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.ArrayOfQuantifiableVariable;
 import de.uka.ilkd.key.logic.op.IUpdateOperator;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.rule.updatesimplifier.*;
 import de.uka.ilkd.key.util.Debug;
 
@@ -57,7 +60,7 @@ public class UpdateSimplifier {
      */
     public UpdateSimplifier(boolean deletionEnabled, boolean eager) {
 	this.eager = eager;
-        ListOfIUpdateRule usRules = SLListOfIUpdateRule.EMPTY_LIST.    
+        ImmutableList<IUpdateRule> usRules = ImmutableSLList.<IUpdateRule>nil().    
         append(new ApplyOnAnonymousUpdate(this)).
         append(new ApplyAnonymousUpdateOnNonRigid(this)).
         append(new ApplyOnUpdate(this)).
@@ -78,11 +81,11 @@ public class UpdateSimplifier {
     /**
      * Uses the given rules for update simplification. The order is
      * important as the first applicable rule is taken.
-     * @param rules a ListOfUpdateRule to use for update
+     * @param rules a IList<UpdateRule> to use for update
      * simplification
      */
-    public void setSimplificationRules(ListOfIUpdateRule rules) {
-	simplificationRules = rules.toArray();
+    public void setSimplificationRules(ImmutableList<IUpdateRule> rules) {
+	simplificationRules = rules.toArray(new IUpdateRule[rules.size()]);
     }
 
     
@@ -170,8 +173,8 @@ public class UpdateSimplifier {
         }
 
         final Term[] subs = new Term[target.arity()];
-        final ArrayOfQuantifiableVariable[] vars = 
-            new ArrayOfQuantifiableVariable[target.arity()];
+        final ImmutableArray<QuantifiableVariable>[] vars = 
+            new ImmutableArray[target.arity()];
         
         boolean changed = false;
         for (int i = 0; i<subs.length; i++) {

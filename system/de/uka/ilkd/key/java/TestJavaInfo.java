@@ -10,8 +10,8 @@ package de.uka.ilkd.key.java;
 import java.io.File;
 
 import junit.framework.TestCase;
+import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.abstraction.ListOfKeYJavaType;
 import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.util.HelperClassForTests;
@@ -78,7 +78,7 @@ public class TestJavaInfo extends TestCase {
     public void testGetAllSupertypes() {
         KeYJavaType rte = javaInfo.getKeYJavaType("java.lang.RuntimeException");
         assertTrue("Did not find class java.lang.RuntimeException", rte != null);
-        final ListOfKeYJavaType allSupertypes = javaInfo.getAllSupertypes(rte);
+        final ImmutableList<KeYJavaType> allSupertypes = javaInfo.getAllSupertypes(rte);
         
         assertTrue("No supertypes of java.lang.RuntimeException?", 
                 allSupertypes != null);
@@ -183,7 +183,7 @@ public class TestJavaInfo extends TestCase {
         
         long start = System.currentTimeMillis();
 
-        final ListOfKeYJavaType commons = javaInfo.getCommonSubtypes(obj, rte);        
+        final ImmutableList<KeYJavaType> commons = javaInfo.getCommonSubtypes(obj, rte);        
         assertTrue(commons.equals(javaInfo.getAllSubtypes(rte).prepend(rte)));             
 
         
@@ -194,7 +194,7 @@ public class TestJavaInfo extends TestCase {
         long durationCache = 0;
         for (int i = 0; i<1000; i++) {          
             start = System.currentTimeMillis();
-            final ListOfKeYJavaType commonsCache = 
+            final ImmutableList<KeYJavaType> commonsCache = 
                 javaInfo.getCommonSubtypes(obj, rte);
             end = System.currentTimeMillis();            
             assertTrue("Cache inconsistence", commonsCache.equals(commons));

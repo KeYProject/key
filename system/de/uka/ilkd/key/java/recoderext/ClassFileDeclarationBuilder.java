@@ -16,28 +16,12 @@ import java.util.List;
 import recoder.ParserException;
 import recoder.ProgramFactory;
 import recoder.abstraction.TypeParameter;
-import recoder.bytecode.ClassFile;
-import recoder.bytecode.ConstructorInfo;
-import recoder.bytecode.FieldInfo;
-import recoder.bytecode.MethodInfo;
-import recoder.bytecode.TypeParameterInfo;
+import recoder.bytecode.*;
 import recoder.io.DataLocation;
 import recoder.java.CompilationUnit;
 import recoder.java.Identifier;
 import recoder.java.PackageSpecification;
-import recoder.java.declaration.ClassDeclaration;
-import recoder.java.declaration.ConstructorDeclaration;
-import recoder.java.declaration.DeclarationSpecifier;
-import recoder.java.declaration.EnumConstantDeclaration;
-import recoder.java.declaration.EnumConstantSpecification;
-import recoder.java.declaration.EnumDeclaration;
-import recoder.java.declaration.Extends;
-import recoder.java.declaration.FieldDeclaration;
-import recoder.java.declaration.InterfaceDeclaration;
-import recoder.java.declaration.MemberDeclaration;
-import recoder.java.declaration.MethodDeclaration;
-import recoder.java.declaration.ParameterDeclaration;
-import recoder.java.declaration.TypeDeclaration;
+import recoder.java.declaration.*;
 import recoder.java.declaration.modifier.Private;
 import recoder.java.reference.EnumConstructorReference;
 import recoder.java.reference.PackageReference;
@@ -301,7 +285,7 @@ public class ClassFileDeclarationBuilder implements Comparable<ClassFileDeclarat
      * @throws ParserException
      *                 thrown by the parser
      */
-    public static CompilationUnit makeEmptyClassFile(
+    public static CompilationUnit makeEmptyClassDeclaration(
             ProgramFactory programFactory, 
             String fullClassName) 
                       throws ParserException {

@@ -12,11 +12,7 @@ package de.uka.ilkd.key.jmltest;
 
 import javax.swing.JOptionPane;
 
-import de.uka.ilkd.key.gui.AutoModeListener;
-import de.uka.ilkd.key.gui.InteractiveProver;
-import de.uka.ilkd.key.gui.JRadioButtonHashMap;
-import de.uka.ilkd.key.gui.KeYMediator;
-import de.uka.ilkd.key.gui.Main;
+import de.uka.ilkd.key.gui.*;
 import de.uka.ilkd.key.proof.ProofEvent;
 import de.uka.ilkd.key.proof.init.SpecExtPO;
 import de.uka.ilkd.key.strategy.StrategyProperties;

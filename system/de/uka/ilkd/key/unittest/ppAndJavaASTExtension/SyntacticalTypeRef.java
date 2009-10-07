@@ -9,8 +9,6 @@ package de.uka.ilkd.key.unittest.ppAndJavaASTExtension;
 
 import java.io.StringWriter;
 
-import de.uka.ilkd.key.gui.Main;
-import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
 import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.Type;

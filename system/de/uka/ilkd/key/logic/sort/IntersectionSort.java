@@ -17,6 +17,8 @@ import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Named;
@@ -57,13 +59,13 @@ public class IntersectionSort extends AbstractSort {
      * intersection sort is created and added to the namespace. 
      * The created intersection sort is in normalform. 
      *
-     * @param sorts the SetOfSort whose intersection sort has to be determined
+     * @param sorts the SetOf<Sort> whose intersection sort has to be determined
      * @param services the Namespace with all known sorts to which if necessary 
      * the intersection sort of the given sorts is added
      * @return the intersection sort of the given sorts or null if this sort would have an empty domain 
      */
-    public static Sort getIntersectionSort(SetOfSort sorts, Services services) {        
-        return rightAssoc(sort(flatten(minimize(sorts.toArray()))), services);                     
+    public static Sort getIntersectionSort(ImmutableSet<Sort> sorts, Services services) {        
+        return rightAssoc(sort(flatten(minimize(sorts.toArray(new Sort[sorts.size()])))), services);                     
     }
     
     /** 
@@ -72,15 +74,16 @@ public class IntersectionSort extends AbstractSort {
      * intersection sort is created and added to the namespace. 
      * The created intersection sort is in normalform. 
      *
-     * @param components the SetOfSort whose intersection sort has to be determined
+     * @param components the SetOf<Sort> whose intersection sort has to be determined
      * @param sorts the Namespace with all known sorts to which if necessary 
      * the intersection sort of the given sorts is added
      * @param functions the Namespace where to add the sort depending functions 
      * @return the intersection sort of the given sorts or null if this sort would have an empty domain 
      */
-    public static Sort getIntersectionSort(SetOfSort components, 
+    public static Sort getIntersectionSort(ImmutableSet<Sort> components, 
                                            Namespace sorts, Namespace functions) {        
-        return rightAssoc(sort(flatten(minimize(components.toArray()))), sorts, functions);                     
+        return rightAssoc(sort(flatten(minimize(components.toArray(new Sort[components.size()])))), 
+        	sorts, functions);                     
     }
     
     /** 
@@ -179,7 +182,7 @@ public class IntersectionSort extends AbstractSort {
      * The used sorting algorithm is more or less a simple bubble sort
      * as we (hopely) have only to compute the intersection of some 
      * few sorts. 
-     * @param sorts ListOfSort the sorts to be sorted
+     * @param sorts IList<Sort> the sorts to be sorted
      * @return return the same array but sorted in the lexicographical 
      * order of the sorts names
      */
@@ -194,7 +197,7 @@ public class IntersectionSort extends AbstractSort {
      * Removes all sorts of the given sorts that are a supersort 
      * of an existing one. For efficiency reasons flattening 
      * should be performed after minimizing.
-     * @param sorts the SetOfSorts to be minimized
+     * @param sorts the SetOf<Sorts> to be minimized
      * @return the minimized array of sorts 
      */
     private static Sort[] minimize(Sort[] sorts) {                        
@@ -221,7 +224,7 @@ public class IntersectionSort extends AbstractSort {
     /**
      * flattens the given sorts by decomposing intersection 
      * sorts
-     * @param sorts the ListOfSort to be flattened
+     * @param sorts the IList<Sort> to be flattened
      * @return the flattened list of sorts 
      * (i.e. means without subsorts)  
      */
@@ -259,7 +262,7 @@ public class IntersectionSort extends AbstractSort {
     private final Sort rightComposite;
     
     /** the non-intersection sorts this sort inherits of */
-    private SetOfSort extendsSorts = null;
+    private ImmutableSet<Sort> extendsSorts = null;
 
     /** 
      * empty domain caches the computation if the domain of
@@ -292,16 +295,16 @@ public class IntersectionSort extends AbstractSort {
      * return the set of the 'real' sorts this 
      * intersection sort consists of (no intersection sorts) 
      */
-    public SetOfSort extendsSorts() {    
+    public ImmutableSet<Sort> extendsSorts() {    
         if (extendsSorts == null) {
-            extendsSorts = SetAsListOfSort.EMPTY_SET.add(leftComposite);
+            extendsSorts = DefaultImmutableSet.<Sort>nil().add(leftComposite);
             if (rightComposite instanceof IntersectionSort) {
                 extendsSorts = extendsSorts.
                 union(rightComposite.extendsSorts());
             } else {
                 extendsSorts = extendsSorts.add(rightComposite);
             }
-            extendsSorts = asSet(minimize(extendsSorts.toArray()));            
+            extendsSorts = asSet(minimize(extendsSorts.toArray(new Sort[extendsSorts.size()])));            
         }
         return extendsSorts;
     }
@@ -427,8 +430,8 @@ public class IntersectionSort extends AbstractSort {
     /**
      * converts the given array of sorts into a {@link SetOfSort}
      */
-    private static SetOfSort asSet(Sort[] s) {
-        SetOfSort set = SetAsListOfSort.EMPTY_SET;
+    private static ImmutableSet<Sort> asSet(Sort[] s) {
+        ImmutableSet<Sort> set = DefaultImmutableSet.<Sort>nil();
         for (int i = 0; i<s.length;i++) {
             set = set.add(s[i]);            
         }

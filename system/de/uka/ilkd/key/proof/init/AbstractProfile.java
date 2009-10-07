@@ -3,62 +3,66 @@
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
+// The KeY system is protected by the GNU General Public License.
 // See LICENSE.TXT for details.
 package de.uka.ilkd.key.proof.init;
 
-import de.uka.ilkd.key.collection.SetAsListOfString;
-import de.uka.ilkd.key.collection.SetOfString;
+import java.util.ArrayList;
+import java.util.Iterator;
+
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.IMain;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.proof.*;
+import de.uka.ilkd.key.proof.DefaultGoalChooserBuilder;
+import de.uka.ilkd.key.proof.DepthFirstGoalChooserBuilder;
+import de.uka.ilkd.key.proof.GoalChooserBuilder;
+import de.uka.ilkd.key.proof.RuleSource;
 import de.uka.ilkd.key.proof.mgt.AxiomJustification;
 import de.uka.ilkd.key.proof.mgt.RuleJustification;
-import de.uka.ilkd.key.rule.ListOfBuiltInRule;
+import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.Rule;
-import de.uka.ilkd.key.rule.SLListOfBuiltInRule;
 import de.uka.ilkd.key.smt.*;
-import de.uka.ilkd.key.strategy.IteratorOfStrategyFactory;
-import de.uka.ilkd.key.strategy.SetAsListOfStrategyFactory;
-import de.uka.ilkd.key.strategy.SetOfStrategyFactory;
 import de.uka.ilkd.key.strategy.StrategyFactory;
 
 public abstract class AbstractProfile implements Profile {
 
     private final RuleCollection       standardRules;
 
-    private final SetOfStrategyFactory strategies;
+    private final ImmutableSet<StrategyFactory> strategies;
 
-    private final SetOfString supportedGC;
-    private final SetOfGoalChooserBuilder supportedGCB;
-    
+    private final ImmutableSet<String> supportedGC;
+    private final ImmutableSet<GoalChooserBuilder> supportedGCB;
+
     private GoalChooserBuilder prototype;
-            
-    protected AbstractProfile(String standardRuleFilename, 
-            SetOfGoalChooserBuilder supportedGCB, IMain main) {
-        
+
+    protected AbstractProfile(String standardRuleFilename,
+            ImmutableSet<GoalChooserBuilder> supportedGCB, IMain main) {
+
         standardRules = new RuleCollection(RuleSource
-                .initRuleFile(standardRuleFilename), 
+                .initRuleFile(standardRuleFilename),
                 initBuiltInRules());
         strategies = getStrategyFactories();
-        this.supportedGCB = supportedGCB;        
+        this.supportedGCB = supportedGCB;
         this.supportedGC = extractNames(supportedGCB);
         this.prototype = getDefaultGoalChooserBuilder();
         assert( this.prototype!=null );
-        
+
     }
 
-    private static 
-        SetOfString extractNames(SetOfGoalChooserBuilder supportedGCB) {
+    private static
+        ImmutableSet<String> extractNames(ImmutableSet<GoalChooserBuilder> supportedGCB) {
 
-        SetOfString result = SetAsListOfString.EMPTY_SET;
-        
-        final IteratorOfGoalChooserBuilder it = supportedGCB.iterator();
+        ImmutableSet<String> result = DefaultImmutableSet.<String>nil();
+
+        final Iterator<GoalChooserBuilder> it = supportedGCB.iterator();
         while (it.hasNext()) {
             result  = result.add(it.next().name());
         }
-        
+
         return result;
     }
 
@@ -67,8 +71,8 @@ public abstract class AbstractProfile implements Profile {
     }
 
     public AbstractProfile(String standardRuleFilename, IMain main) {
-        this(standardRuleFilename, 
-                SetAsListOfGoalChooserBuilder.EMPTY_SET.
+        this(standardRuleFilename,
+                DefaultImmutableSet.<GoalChooserBuilder>nil().
                 add(new DefaultGoalChooserBuilder()).
                 add(new DepthFirstGoalChooserBuilder()), main);
     }
@@ -77,83 +81,93 @@ public abstract class AbstractProfile implements Profile {
         return standardRules;
     }
 
-    protected SetOfStrategyFactory getStrategyFactories() {
-        return SetAsListOfStrategyFactory.EMPTY_SET;
+    protected ImmutableSet<StrategyFactory> getStrategyFactories() {
+        return DefaultImmutableSet.<StrategyFactory>nil();
     }
 
-    protected ListOfBuiltInRule initBuiltInRules() {
-        ListOfBuiltInRule builtInRules = SLListOfBuiltInRule.EMPTY_LIST;
+    protected ImmutableList<BuiltInRule> initBuiltInRules() {
+        ImmutableList<BuiltInRule> builtInRules = ImmutableSLList.<BuiltInRule>nil();
+		ArrayList<SMTSolver> solverList = new ArrayList<SMTSolver>();
+        solverList.add(new Z3Solver());
+		solverList.add(new YicesSolver());
+        solverList.add(new SimplifySolver());
+		solverList.add(new CVC3Solver());
         
-        builtInRules = builtInRules.prepend(new SMTRule(new Z3Solver()));        
-        builtInRules = builtInRules.prepend(new SMTRule(new YicesSolver()));
-        builtInRules = builtInRules.prepend(new SMTRule(new SimplifySolver()));        
-        builtInRules = builtInRules.prepend(new SMTRule(new CVC3Solver()));
+		// init builtIRule for using several provers at the same time
+		builtInRules = builtInRules.prepend(new SMTRuleMulti(solverList));
+        
+		// builtInRules for single use of provers
+		for(SMTSolver s : solverList)
+          builtInRules = builtInRules.prepend(new SMTRule(s));        
+
+      
+        
         
         return builtInRules;
     }
-    
 
-    public SetOfStrategyFactory supportedStrategies() {
+
+    public ImmutableSet<StrategyFactory> supportedStrategies() {
         return strategies;
     }
 
     public boolean supportsStrategyFactory(Name strategy) {
         return getStrategyFactory(strategy) != null;
     }
-    
+
     public StrategyFactory getStrategyFactory(Name n) {
-        IteratorOfStrategyFactory it = getStrategyFactories().iterator();
+        Iterator<StrategyFactory> it = getStrategyFactories().iterator();
         while (it.hasNext()) {
             final StrategyFactory sf = it.next();
             if (sf.name().equals(n)) {
                 return sf;
-            }            
+            }
         }
         return null;
     }
 
     /**
-     * returns the names of the supported goal chooser 
+     * returns the names of the supported goal chooser
      * builders
      */
-     public SetOfString supportedGoalChoosers() {
+     public ImmutableSet<String> supportedGoalChoosers() {
          return supportedGC;
      }
-  
-     /** 
+
+     /**
       * returns the default builder for a goal chooser
       * @return this implementation returns a new instance of
-      * {@link DefaultGoalChooserBuilder}       
+      * {@link DefaultGoalChooserBuilder}
       */
      public GoalChooserBuilder getDefaultGoalChooserBuilder() {
          return new DefaultGoalChooserBuilder();
      }
-               
+
      /**
       * sets the user selected goal chooser builder to be used as prototype
       * @throws IllegalArgumentException if a goal chooser of the given name is not
       *  supported
       */
-     public void setSelectedGoalChooserBuilder(String name) {         
-         
+     public void setSelectedGoalChooserBuilder(String name) {
+
          this.prototype = lookupGC(name);
-         
+
          if (this.prototype == null) {
              throw new IllegalArgumentException("Goal chooser:" + name +
                      " is not supported by this profile.");
          }
      }
-     
+
      /**
-      * looks up the demanded goal chooser is supported and returns a 
-      * new instance if possible otherwise <code>null</code> is returned 
-      *  
+      * looks up the demanded goal chooser is supported and returns a
+      * new instance if possible otherwise <code>null</code> is returned
+      *
       * @param name the String with the goal choosers name
       * @return a new instance of the builder or <code>null</code> if the
       * demanded chooser is not supported
       */
      public GoalChooserBuilder lookupGC(String name) {
-        final IteratorOfGoalChooserBuilder it  = supportedGCB.iterator();
+        final Iterator<GoalChooserBuilder> it  = supportedGCB.iterator();
         while (it.hasNext()) {
             final GoalChooserBuilder supprotedGCB = it.next();
             if (supprotedGCB.name().equals(name)) {
@@ -164,16 +178,16 @@ public abstract class AbstractProfile implements Profile {
     }
 
     /**
-      * returns a copy of the selected goal chooser builder 
+      * returns a copy of the selected goal chooser builder
       */
      public GoalChooserBuilder getSelectedGoalChooserBuilder(){
-        return prototype.copy(); 
+        return prototype.copy();
      }
-    
+
      /**
-      * any standard rule has is by default justified by an axiom rule 
-      * justification 
-      * @return the justification for the standard rules             
+      * any standard rule has is by default justified by an axiom rule
+      * justification
+      * @return the justification for the standard rules
       */
      public RuleJustification getJustification(Rule r) {
          return AxiomJustification.INSTANCE;
@@ -183,9 +197,9 @@ public abstract class AbstractProfile implements Profile {
       * sets the given settings to some default depending on the profile
       */
      public void updateSettings(ProofSettings settings) {
-	 settings.getDecisionProcedureSettings().updateSMTRules(this);	 
-     }   
-     
+	 settings.getDecisionProcedureSettings().updateSMTRules(this);
+     }
+
      /**
       * returns the file name of the internal class list
       * @return the file name of the internal class list

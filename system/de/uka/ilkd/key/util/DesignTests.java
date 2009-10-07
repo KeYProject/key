@@ -211,7 +211,7 @@ public class DesignTests {
 	    if (meth[i].getName().startsWith("test")) {
 		try {
 		    message = ".";
-		    badClasses = (LinkedList)meth[i].invoke(this, null);
+		    badClasses = (LinkedList)meth[i].invoke(this, (Object[])null);
 		    System.out.print(message);
 		    testcases++;
 		    failures += badClasses.size() > 0 ? 1 : 0;

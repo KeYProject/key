@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
@@ -41,13 +42,12 @@ public class AtPreEquations extends AbstractMetaOperator {
     /**
      * Helper for buildAtPreDefinitions().
      */
-    private static Term[] getTerms(ArrayOfQuantifiableVariable vars) {
+    private static Term[] getTerms(ImmutableArray<QuantifiableVariable> vars) {
         int numVars = vars.size();
         Term[] result = new Term[numVars];
 
         for(int i = 0; i < numVars; i++) {
-            LogicVariable var
-                    = (LogicVariable)(vars.getQuantifiableVariable(i));
+            LogicVariable var = (LogicVariable) vars.get(i);
             result[i] = TermBuilder.DF.var(var);
         }
 
@@ -74,7 +74,7 @@ public class AtPreEquations extends AbstractMetaOperator {
                 args[i] = new LogicVariable(new Name("x" + i), f2.argSort(i));
             }
 
-            Term[] argTerms = getTerms(new ArrayOfQuantifiableVariable(args));
+            Term[] argTerms = getTerms(new ImmutableArray<QuantifiableVariable>(args));
 
             TermFactory tf = TermBuilder.DF.tf();
             Term f1Term = tf.createTerm(f1,   argTerms,

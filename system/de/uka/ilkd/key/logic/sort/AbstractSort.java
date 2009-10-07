@@ -10,6 +10,9 @@
 
 package de.uka.ilkd.key.logic.sort;
 
+import java.util.Iterator;
+
+import de.uka.ilkd.key.collection.*;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.op.*;
@@ -33,8 +36,8 @@ public abstract class AbstractSort implements Sort, SortDefiningSymbols {
     private CastFunctionSymbol castSymbol;
             
     
-    protected MapFromNameToSortDependingSymbol definedSymbols = 
-        MapAsListFromNameToSortDependingSymbol.EMPTY_MAP;
+    protected ImmutableMap<Name,SortDependingSymbol> definedSymbols = 
+        DefaultImmutableMap.<Name,SortDependingSymbol>nilMap();
 
     protected boolean symbolsCreated = false;
 
@@ -46,7 +49,7 @@ public abstract class AbstractSort implements Sort, SortDefiningSymbols {
     /**
      * @return the sorts of the successors of this sort
      */
-    public abstract SetOfSort extendsSorts();
+    public abstract ImmutableSet<Sort> extendsSorts();
 
     /**
      * returns true iff given sort is a part of the transitive closure of the
@@ -72,7 +75,7 @@ public abstract class AbstractSort implements Sort, SortDefiningSymbols {
            }
            return true;
        } else {           
-           final IteratorOfSort it = extendsSorts().iterator();
+           final Iterator<Sort> it = extendsSorts().iterator();
            while (it.hasNext()) {
                final Sort s = it.next();
                assert s != null;
@@ -131,8 +134,8 @@ public abstract class AbstractSort implements Sort, SortDefiningSymbols {
             if ( booleanSort == null || intSort == null ) {              
                 return; //create symbols later
             }
-            ListOfSortDependingSymbol l0 = 
-                SLListOfSortDependingSymbol.EMPTY_LIST;
+            ImmutableList<SortDependingSymbol> l0 = 
+                ImmutableSLList.<SortDependingSymbol>nil();
             l0 = l0.prepend(createCastSymbol()).prepend 
             ( new InstanceofSymbol (this, booleanSort)).prepend
             ( new ExactInstanceSymbol (this, booleanSort)).prepend
@@ -175,8 +178,8 @@ public abstract class AbstractSort implements Sort, SortDefiningSymbols {
     }
 
     
-    protected void addSymbols(ListOfSortDependingSymbol p) {
-        final IteratorOfSortDependingSymbol it = p.iterator();        
+    protected void addSymbols(ImmutableList<SortDependingSymbol> p) {
+        final Iterator<SortDependingSymbol> it = p.iterator();        
         while (it.hasNext()) {
             final SortDependingSymbol s = it.next();
             definedSymbols = definedSymbols.put(s.getKind(), s);
@@ -191,7 +194,7 @@ public abstract class AbstractSort implements Sort, SortDefiningSymbols {
         if (!symbolsCreated) {
             createSymbols(functions, sorts);            
         } 
-        final IteratorOfSortDependingSymbol it = 
+        final Iterator<SortDependingSymbol> it = 
             definedSymbols.valueIterator();        
         while (it.hasNext()) {                  
             final SortDependingSymbol sds = it.next();

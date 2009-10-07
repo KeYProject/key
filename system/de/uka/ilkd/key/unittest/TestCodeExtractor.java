@@ -7,18 +7,28 @@
 // See LICENSE.TXT for details.
 package de.uka.ilkd.key.unittest;
 
-import de.uka.ilkd.key.java.*;
-import de.uka.ilkd.key.java.declaration.*;
-import de.uka.ilkd.key.java.reference.*;
-import de.uka.ilkd.key.java.statement.*;
-import de.uka.ilkd.key.java.visitor.*;
-import de.uka.ilkd.key.java.expression.operator.*;
-import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.proof.*;
-import de.uka.ilkd.key.visualization.*;
+import java.util.HashSet;
+import java.util.Iterator;
 
-import java.util.*;
+import de.uka.ilkd.key.collection.*;
+import de.uka.ilkd.key.java.*;
+import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
+import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
+import de.uka.ilkd.key.java.declaration.VariableSpecification;
+import de.uka.ilkd.key.java.expression.operator.CopyAssignment;
+import de.uka.ilkd.key.java.reference.MethodReference;
+import de.uka.ilkd.key.java.reference.PackageReference;
+import de.uka.ilkd.key.java.reference.TypeRef;
+import de.uka.ilkd.key.java.statement.MethodBodyStatement;
+import de.uka.ilkd.key.java.visitor.JavaASTCollector;
+import de.uka.ilkd.key.logic.Named;
+import de.uka.ilkd.key.logic.Namespace;
+import de.uka.ilkd.key.logic.ProgramElementName;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.visualization.ExecutionTraceModel;
+import de.uka.ilkd.key.visualization.TraceElement;
 
 /**
  * Extracts the code, for which we want to create a unittest, from a formula of
@@ -70,7 +80,7 @@ public class TestCodeExtractor {
     // Semisequent succ = getNodeForCodeExtraction(tr).sequent().succedent();
     // for(int i=0; i<succ.size(); i++){
     // Term current = new NRFLtoProgVar().transform(succ.get(i).formula());
-    // ListOfStatement statements = SLListOfStatement.EMPTY_LIST;
+    // IList<Statement> statements = ImmSLList.<Statement>nil();
     // //TODO: Resolve data dependencies in simultaneous updates.
     // while(current.op() instanceof IUpdateOperator){
     // statements = statements.append(getAssignments(current));
@@ -96,7 +106,7 @@ public class TestCodeExtractor {
 	nrflHan = new NRFLHandler(serv, this, trace.getPosOfModality());
 
 	Term current = nrflHan.getResult();
-	ListOfStatement statements = SLListOfStatement.EMPTY_LIST;
+	ImmutableList<Statement> statements = ImmutableSLList.<Statement>nil();
 	// TODO: Resolve data dependencies in simultaneous updates.
 	while (current.op() instanceof IUpdateOperator) {
 	    statements = statements.append(getAssignments(current));
@@ -107,7 +117,7 @@ public class TestCodeExtractor {
 	    sb = (StatementBlock) trace.getProgram();
 	    collectUndeclaredVariables(sb);
 	    statements = statements.append(flatten(sb));
-	    testCode = statements.toArray();
+	    testCode = statements.toArray(new Statement[statements.size()]);
 	    return testCode;
 	}
 	throw new NotTranslatableException("Could not extract testcode");
@@ -119,8 +129,8 @@ public class TestCodeExtractor {
     private void collectUndeclaredVariables(StatementBlock sb) {
 	JavaASTCollector coll = new JavaASTCollector(sb, ProgramVariable.class);
 	coll.start();
-	ListOfProgramElement l = coll.getNodes();
-	IteratorOfProgramElement it = l.iterator();
+	ImmutableList<ProgramElement> l = coll.getNodes();
+	Iterator<ProgramElement> it = l.iterator();
 	while (it.hasNext()) {
 	    ProgramVariable pv = (ProgramVariable) it.next();
 	    if (pvn.lookup(pv.name()) == pv) {
@@ -161,9 +171,9 @@ public class TestCodeExtractor {
 	}
 
 	it = l.iterator();
-	ListOfNamed lon = newPVs.allElements();
+	ImmutableList<Named> lon = newPVs.allElements();
 	while (it.hasNext()) {
-	    ArrayOfVariableSpecification vars = null;
+	    ImmutableArray<VariableSpecification> vars = null;
 	    Object pvDecl = it.next();
 	    if (pvDecl instanceof LocalVariableDeclaration) {
 		LocalVariableDeclaration lvd = (LocalVariableDeclaration) pvDecl;
@@ -173,8 +183,7 @@ public class TestCodeExtractor {
 		vars = pd.getVariables();
 	    }
 	    for (int i = 0; i < vars.size(); i++) {
-		IProgramVariable pv = vars.getVariableSpecification(i)
-			.getProgramVariable();
+		IProgramVariable pv = vars.get(i).getProgramVariable();
 		if (pvn.lookup(pv.name()) == pv) {
 		    lon = lon.removeAll(pv);
 		}
@@ -205,8 +214,8 @@ public class TestCodeExtractor {
 			((MethodBodyStatement) s).getBody(serv),
 			Statement.class);
 		coll.start();
-		ListOfProgramElement l = coll.getNodes();
-		IteratorOfProgramElement it = l.iterator();
+		ImmutableList<ProgramElement> l = coll.getNodes();
+		Iterator<ProgramElement> it = l.iterator();
 		while (it.hasNext()) {
 		    Statement next = (Statement) it.next();
 		    if (!(next instanceof StatementContainer)) {
@@ -232,8 +241,8 @@ public class TestCodeExtractor {
 	return node;
     }
 
-    private ListOfStatement flatten(StatementBlock sb) {
-	ListOfStatement result = SLListOfStatement.EMPTY_LIST;
+    private ImmutableList<Statement> flatten(StatementBlock sb) {
+	ImmutableList<Statement> result = ImmutableSLList.<Statement>nil();
 	for (int i = 0; i < sb.getStatementCount(); i++) {
 	    if (fileName == null) {
 		fileName = sb.getStatementAt(i).getPositionInfo().getFileName();
@@ -276,8 +285,8 @@ public class TestCodeExtractor {
     /**
      * Transforms updates into assignment expressions.
      */
-    private ListOfStatement getAssignments(Term t) {
-	ListOfStatement result = SLListOfStatement.EMPTY_LIST;
+    private ImmutableList<Statement> getAssignments(Term t) {
+	ImmutableList<Statement> result = ImmutableSLList.<Statement>nil();
 	IUpdateOperator uop = (IUpdateOperator) t.op();
 	Term currLoc;
 	for (int i = 0; i < uop.locationCount(); i++) {
@@ -304,9 +313,9 @@ public class TestCodeExtractor {
      * Returns the program variables newly introduced as substitution for skolem
      * constants and those found in the IUT.
      */
-    public SetOfProgramVariable getNewProgramVariables() {
-	SetOfProgramVariable result = SetAsListOfProgramVariable.EMPTY_SET;
-	IteratorOfNamed it = newPVs.allElements().iterator();
+    public ImmutableSet<ProgramVariable> getNewProgramVariables() {
+	ImmutableSet<ProgramVariable> result = DefaultImmutableSet.<ProgramVariable>nil();
+	Iterator<Named> it = newPVs.allElements().iterator();
 	while (it.hasNext()) {
 	    result = result.add((ProgramVariable) it.next());
 	}

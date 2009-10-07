@@ -10,11 +10,11 @@
 
 package de.uka.ilkd.key.rule;
 
+import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Constraint;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.ListOfGoal;
 
 /** 
  * this class represents an application of a built in rule
@@ -59,9 +59,9 @@ public class BuiltInRuleApp implements RuleApp {
      * @param services the Services encapsulating all java information
      * @return list of new created goals 
      */
-    public ListOfGoal execute(Goal goal, Services services) {
+    public ImmutableList<Goal> execute(Goal goal, Services services) {
 	goal.addAppliedRuleApp(this);	
-	ListOfGoal result = builtInRule.apply(goal, services, this);
+	ImmutableList<Goal> result = builtInRule.apply(goal, services, this);
 	if (result == null)
 	    goal.removeAppliedRuleApp();
 	return result;

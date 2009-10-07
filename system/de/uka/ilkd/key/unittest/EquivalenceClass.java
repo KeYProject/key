@@ -7,19 +7,26 @@
 // See LICENSE.TXT for details.
 package de.uka.ilkd.key.unittest;
 
-import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.java.*;
-import de.uka.ilkd.key.java.expression.literal.*;
-import de.uka.ilkd.key.java.expression.operator.*;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import java.util.HashMap;
+import java.util.Iterator;
 
-import java.util.*;
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.java.ProgramElement;
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.expression.literal.BooleanLiteral;
+import de.uka.ilkd.key.java.expression.literal.IntLiteral;
+import de.uka.ilkd.key.java.expression.operator.Negative;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermFactory;
+import de.uka.ilkd.key.logic.op.Op;
+import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.sort.Sort;
 
 public class EquivalenceClass {
 
-    private SetOfTerm members;
+    private ImmutableSet<Term> members;
 
     private HashMap<EquivalenceClass, Boolean> lb2ex, ub2ex;
 
@@ -30,7 +37,7 @@ public class EquivalenceClass {
 
     // contains the set of terms whose value is not equal to the value
     // of the terms in this class.
-    private SetOfTerm disjointRep = SetAsListOfTerm.EMPTY_SET;
+    private ImmutableSet<Term> disjointRep = DefaultImmutableSet.<Term>nil();
 
     private Boolean bValue = null;
 
@@ -47,7 +54,7 @@ public class EquivalenceClass {
     private static Term nullTerm = TermFactory.DEFAULT
 	    .createFunctionTerm(Op.NULL);
 
-    private EquivalenceClass(SetOfTerm members, Services serv) {
+    private EquivalenceClass(ImmutableSet<Term> members, Services serv) {
 	this.members = members;
 	lb2ex = new HashMap<EquivalenceClass, Boolean>();
 	ub2ex = new HashMap<EquivalenceClass, Boolean>();
@@ -59,11 +66,11 @@ public class EquivalenceClass {
     }
 
     public EquivalenceClass(Term t1, Term t2, Services serv) {
-	this(SetAsListOfTerm.EMPTY_SET.add(t1).add(t2), serv);
+	this(DefaultImmutableSet.<Term>nil().add(t1).add(t2), serv);
     }
 
     public EquivalenceClass(Term t, Services serv) {
-	this(SetAsListOfTerm.EMPTY_SET.add(t), serv);
+	this(DefaultImmutableSet.<Term>nil().add(t), serv);
     }
 
     private boolean isInt(Sort s) {
@@ -72,7 +79,7 @@ public class EquivalenceClass {
     }
 
     public boolean isInt() {
-	for (IteratorOfTerm it = members.iterator(); it.hasNext();) {
+	for (Iterator<Term> it = members.iterator(); it.hasNext();) {
 	    Term t = it.next();
 	    return isInt(t.sort());
 	}
@@ -80,7 +87,7 @@ public class EquivalenceClass {
     }
 
     public KeYJavaType getKeYJavaType() {
-	IteratorOfTerm it = members.iterator();
+	Iterator<Term> it = members.iterator();
 	Sort s = it.next().sort();
 	while (it.hasNext()) {
 	    Sort s1 = it.next().sort();
@@ -97,7 +104,7 @@ public class EquivalenceClass {
     }
 
     public boolean isBoolean() {
-	for (IteratorOfTerm it = members.iterator(); it.hasNext();) {
+	for (Iterator<Term> it = members.iterator(); it.hasNext();) {
 	    if (serv.getTypeConverter().getBooleanLDT().targetSort() == it
 		    .next().sort()) {
 		return true;
@@ -109,9 +116,9 @@ public class EquivalenceClass {
     /**
      * Returns the locations that are members of this equivalence class.
      */
-    public SetOfTerm getLocations() {
-	SetOfTerm locations = SetAsListOfTerm.EMPTY_SET;
-	IteratorOfTerm it = members.iterator();
+    public ImmutableSet<Term> getLocations() {
+	ImmutableSet<Term> locations = DefaultImmutableSet.<Term>nil();
+	Iterator<Term> it = members.iterator();
 	while (it.hasNext()) {
 	    Term t = it.next();
 	    if (ModelGenerator.isLocation(t, serv)) {
@@ -123,7 +130,7 @@ public class EquivalenceClass {
 
     public int hashCode() {
 	int result = 0;
-	IteratorOfTerm it = members.iterator();
+	Iterator<Term> it = members.iterator();
 	while (it.hasNext()) {
 	    result += it.next().toString().hashCode();
 	}
@@ -138,9 +145,9 @@ public class EquivalenceClass {
 	if (eqc.members.size() != members.size()) {
 	    return false;
 	}
-	IteratorOfTerm it = members.iterator();
+	Iterator<Term> it = members.iterator();
 	l: while (it.hasNext()) {
-	    IteratorOfTerm it2 = eqc.members.iterator();
+	    Iterator<Term> it2 = eqc.members.iterator();
 	    Term t = it.next();
 	    while (it2.hasNext()) {
 		if (t.toString().equals(it2.next().toString())) {
@@ -205,7 +212,7 @@ public class EquivalenceClass {
      * // * underlying sequence for a member t of this class. //
      */
     // public boolean isNotNull(HashMap<Term,EquivalenceClass> term2class) {
-    // IteratorOfTerm it = disjointRep.iterator();
+    // Iterator<Term> it = disjointRep.iterator();
     // while (it.hasNext()) {
     // Term d = it.next();
     // if (term2class.get(d).isNull()) {
@@ -214,7 +221,7 @@ public class EquivalenceClass {
     // }
     // return false;
     // }
-    public SetOfTerm getMembers() {
+    public ImmutableSet<Term> getMembers() {
 	return members;
     }
 
@@ -234,7 +241,7 @@ public class EquivalenceClass {
 	disjointRep = disjointRep.add(t);
     }
 
-    // public SetOfTerm getDisjoints() {
+    // public SetOf<Term> getDisjoints() {
     // return disjointRep;
     // }
 
@@ -355,7 +362,7 @@ public class EquivalenceClass {
 			|| getConcreteIntValue(term2class).longValue() < getMaximalConcreteLowerBound(term2class)) {
 		    return false;
 		}
-		IteratorOfTerm itt = disjointRep.iterator();
+		Iterator<Term> itt = disjointRep.iterator();
 		while (itt.hasNext()) {
 		    EquivalenceClass ec = term2class.get(itt.next());
 		    Integer i = ec.getConcreteIntValue(term2class);
@@ -367,7 +374,7 @@ public class EquivalenceClass {
 		}
 	    }
 	} else if (isBoolean() && getConcreteBooleanValue(term2class) != null) {
-	    IteratorOfTerm itt = disjointRep.iterator();
+	    Iterator<Term> itt = disjointRep.iterator();
 	    while (itt.hasNext()) {
 		EquivalenceClass ec = term2class.get(itt.next());
 		Boolean b = ec.getConcreteBooleanValue(term2class);
@@ -392,7 +399,7 @@ public class EquivalenceClass {
 	} else {
 	    visited = true;
 	}
-	IteratorOfTerm it = disjointRep.iterator();
+	Iterator<Term> it = disjointRep.iterator();
 	while (it.hasNext()) {
 	    Term t = it.next();
 	    EquivalenceClass ec = term2class.get(t);
@@ -415,7 +422,7 @@ public class EquivalenceClass {
 	if (containsLiteral() || iValue != null) {
 	    return iValue;
 	}
-	IteratorOfTerm it = members.iterator();
+	Iterator<Term> it = members.iterator();
 	while (it.hasNext()) {
 	    Term t = it.next();
 	    Operator op = t.op();
@@ -464,7 +471,7 @@ public class EquivalenceClass {
     }
 
     public boolean containsLiteral() {
-	IteratorOfTerm it = members.iterator();
+	Iterator<Term> it = members.iterator();
 	while (it.hasNext()) {
 	    Term t = it.next();
 	    if (isBoolean()) {

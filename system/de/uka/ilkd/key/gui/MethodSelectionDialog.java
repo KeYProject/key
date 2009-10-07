@@ -11,24 +11,13 @@ import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import javax.swing.BoxLayout;
-import javax.swing.DefaultListCellRenderer;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
-import javax.swing.JDialog;
-import javax.swing.JList;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextField;
-import javax.swing.ScrollPaneConstants;
+import javax.swing.*;
 import javax.swing.border.TitledBorder;
 
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.declaration.MethodDeclaration;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
-import de.uka.ilkd.key.logic.op.SetAsListOfProgramMethod;
-import de.uka.ilkd.key.logic.op.SetOfProgramMethod;
 import de.uka.ilkd.key.unittest.ModelGenerator;
 import de.uka.ilkd.key.unittest.UnitTestBuilder;
 import de.uka.ilkd.key.unittest.simplify.SimplifyModelGenerator;
@@ -160,9 +149,9 @@ public class MethodSelectionDialog extends JDialog {
 		return this;
 	    }
 	});
-	SetOfProgramMethod pms = testBuilder.getProgramMethods(mediator
+	ImmutableSet<ProgramMethod> pms = testBuilder.getProgramMethods(mediator
 		.getProof());
-	methodList.setListData(pms.toArray());
+	methodList.setListData(pms.toArray(new ProgramMethod[pms.size()]));
 	JScrollPane methodListScroll = new JScrollPane(
 		ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
 		ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
@@ -253,7 +242,7 @@ public class MethodSelectionDialog extends JDialog {
 		latestTests.append(test + " ");
 		mediator.testCaseConfirmation(test);
 	    } else {
-		SetOfProgramMethod pmSet = SetAsListOfProgramMethod.EMPTY_SET;
+		ImmutableSet<ProgramMethod> pmSet = DefaultImmutableSet.<ProgramMethod>nil();
 		for (int i = 0; i < pms.length; i++) {
 		    pmSet = pmSet.add((ProgramMethod) pms[i]);
 		}

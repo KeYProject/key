@@ -8,10 +8,11 @@
 //
 package de.uka.ilkd.key.rule.updatesimplifier;
 
+import de.uka.ilkd.key.collection.ImmutableArray;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.ArrayOfQuantifiableVariable;
 import de.uka.ilkd.key.logic.op.Location;
-import de.uka.ilkd.key.logic.op.SetOfQuantifiableVariable;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 
 /**
  * Models an assignment pair <code> l_i := t_i </code>  of an update.
@@ -94,13 +95,13 @@ public interface AssignmentPair {
      * 
      * @return variables that are bound for this assignment pair
      */
-    ArrayOfQuantifiableVariable boundVars();
+    ImmutableArray<QuantifiableVariable> boundVars();
     
     /**
      * @return the set of quantifiable variables that turn up free in this
      *         assignment pair
      */
-    SetOfQuantifiableVariable freeVars();
+    ImmutableSet<QuantifiableVariable> freeVars();
     
     /**
      * compares the location of the given assignment pair with the

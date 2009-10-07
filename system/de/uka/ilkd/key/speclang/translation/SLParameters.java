@@ -7,27 +7,30 @@
 // See LICENSE.TXT for details.
 package de.uka.ilkd.key.speclang.translation;
 
+import java.util.Iterator;
+
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.ListOfKeYJavaType;
-import de.uka.ilkd.key.java.abstraction.SLListOfKeYJavaType;
+import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 
 public class SLParameters {
 
     
-    private final ListOfSLExpression parameters;
+    private final ImmutableList<SLExpression> parameters;
 
-    public SLParameters(ListOfSLExpression parameters) {
+    public SLParameters(ImmutableList<SLExpression> parameters) {
         this.parameters = parameters;
     }
     
-    public ListOfSLExpression getParameters() {
+    public ImmutableList<SLExpression> getParameters() {
         return parameters;
     }
     
     
     public boolean isListOfTerm() {
         
-        IteratorOfSLExpression it = parameters.iterator();
+        Iterator<SLExpression> it = parameters.iterator();
         
         while(it.hasNext()) {
             if (!it.next().isTerm())
@@ -37,10 +40,10 @@ public class SLParameters {
         return true;
     }
     
-    public ListOfKeYJavaType getSignature(Services services) {
+    public ImmutableList<KeYJavaType> getSignature(Services services) {
             
-        ListOfKeYJavaType result = SLListOfKeYJavaType.EMPTY_LIST;
-        IteratorOfSLExpression it = parameters.iterator();
+        ImmutableList<KeYJavaType> result = ImmutableSLList.<KeYJavaType>nil();
+        Iterator<SLExpression> it = parameters.iterator();
         
         while(it.hasNext()) {
             result = result.append( it.next().getKeYJavaType(services.getJavaInfo()) );

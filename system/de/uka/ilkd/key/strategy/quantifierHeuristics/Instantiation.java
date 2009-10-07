@@ -17,14 +17,19 @@
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
+import de.uka.ilkd.key.collection.ImmutableMap;
+import de.uka.ilkd.key.collection.DefaultImmutableMap;
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.ConstrainedFormula;
+import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.CastFunctionSymbol;
-import de.uka.ilkd.key.logic.op.IteratorOfQuantifiableVariable;
-import de.uka.ilkd.key.logic.op.MapAsListFromQuantifiableVariableToTerm;
-import de.uka.ilkd.key.logic.op.MapFromQuantifiableVariableToTerm;
 import de.uka.ilkd.key.logic.op.Op;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
@@ -44,7 +49,7 @@ class Instantiation {
     
 	/** Literals occurring in the sequent at hand. This is used for branch
      * prediction */
-	private SetOfTerm assumedLiterals = SetAsListOfTerm.EMPTY_SET;
+	private ImmutableSet<Term> assumedLiterals = DefaultImmutableSet.<Term>nil();
 
 	/** HashMap from instance(<code>Term</code>) to cost <code>Long</code> */
 	private final Map<Term,Long> instancesWithCosts = new HashMap<Term,Long> ();
@@ -53,10 +58,10 @@ class Instantiation {
 	private final TriggersSet triggersSet;
 	
 	/**Terms bound in every formula on <code>goal</code>*/
-	private final SetOfTerm matchedTerms;
+	private final ImmutableSet<Term> matchedTerms;
 
 	private Instantiation(Term allterm, Sequent seq, Services services) {
-	    firstVar = allterm.varsBoundHere ( 0 ).getQuantifiableVariable ( 0 );
+	    firstVar = allterm.varsBoundHere ( 0 ).get ( 0 );
 	    matrix = TriggerUtils.discardQuantifiers ( allterm );
 	    matchedTerms = sequentToTerms ( seq );
 	    triggersSet = TriggersSet.create ( allterm, services );
@@ -80,8 +85,8 @@ class Instantiation {
         return lastResult;
     }
     
-    private static SetOfTerm sequentToTerms(Sequent seq) {
-        SetOfTerm res = SetAsListOfTerm.EMPTY_SET;
+    private static ImmutableSet<Term> sequentToTerms(Sequent seq) {
+        ImmutableSet<Term> res = DefaultImmutableSet.<Term>nil();
         for (final ConstrainedFormula cf : seq) {
             res = res.add ( cf.formula () );
         }
@@ -98,7 +103,7 @@ class Instantiation {
      *            instance (Term) and cost(Long) in
      *            <code>instancesCostCache</code>
      */
-    private void addInstances(SetOfTerm terms, Services services) {
+    private void addInstances(ImmutableSet<Term> terms, Services services) {
         for (final Trigger t : triggersSet.getAllTriggers ()) {
             for (final Substitution sub : 
                 t.getSubstitutionsFromTerms ( terms, services )) {
@@ -111,10 +116,10 @@ class Instantiation {
     }
 
     private void addArbitraryInstance(Services services) {
-        MapFromQuantifiableVariableToTerm varMap =
-            MapAsListFromQuantifiableVariableToTerm.EMPTY_MAP;
+        ImmutableMap<QuantifiableVariable,Term> varMap =
+            DefaultImmutableMap.<QuantifiableVariable,Term>nilMap();
         
-        final IteratorOfQuantifiableVariable it =
+        final Iterator<QuantifiableVariable> it =
             triggersSet.getUniQuantifiedVariables().iterator();
         while ( it.hasNext () ) {
             final QuantifiableVariable v = it.next();
@@ -158,8 +163,8 @@ class Instantiation {
      * @return all literals in antesequent, and all negation of literal in
      *         succedent
      */
-    private SetOfTerm initAssertLiterals(Sequent seq) {
-        SetOfTerm assertLits = SetAsListOfTerm.EMPTY_SET;
+    private ImmutableSet<Term> initAssertLiterals(Sequent seq) {
+        ImmutableSet<Term> assertLits = DefaultImmutableSet.<Term>nil();
         for (final ConstrainedFormula cf : seq.antecedent()) {
             final Term atom = cf.formula ();
             final Operator op = atom.op ();
@@ -198,8 +203,8 @@ class Instantiation {
     }
 
     /**get all instances from instancesCostCache subsCache*/
-    SetOfTerm getSubstitution() {
-        SetOfTerm res = SetAsListOfTerm.EMPTY_SET;
+    ImmutableSet<Term> getSubstitution() {
+        ImmutableSet<Term> res = DefaultImmutableSet.<Term>nil();
         for (final Term inst : instancesWithCosts.keySet ()) {
             res = res.add ( inst );
         }

@@ -7,7 +7,7 @@
 // See LICENSE.TXT for details.
 package de.uka.ilkd.key.unittest.simplify.ast;
 
-import de.uka.ilkd.key.util.*;
+import de.uka.ilkd.key.util.ExtList;
 
 public class FunctionTerm extends Term{
 

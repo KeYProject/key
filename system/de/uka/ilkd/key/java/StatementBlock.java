@@ -11,11 +11,11 @@
 
 package de.uka.ilkd.key.java;
 
+import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.declaration.TypeDeclaration;
 import de.uka.ilkd.key.java.declaration.TypeDeclarationContainer;
 import de.uka.ilkd.key.java.statement.JavaStatement;
 import de.uka.ilkd.key.java.visitor.Visitor;
-import de.uka.ilkd.key.logic.ArrayOfProgramPrefix;
 import de.uka.ilkd.key.logic.PosInProgram;
 import de.uka.ilkd.key.logic.ProgramPrefix;
 import de.uka.ilkd.key.util.ExtList;
@@ -32,20 +32,20 @@ public class StatementBlock extends JavaStatement
     /**
      *      Body.
      */
-    private final ArrayOfStatement body;
+    private final ImmutableArray<? extends Statement> body;
 
     
     /**
      * contains all program prefix elements below and including itself
      */
-    private final ArrayOfProgramPrefix prefixElementArray;
+    private final ImmutableArray<ProgramPrefix> prefixElementArray;
 
     private PosInProgram firstActiveChildPos = null;
     
     
     public StatementBlock() {
-	body = new ArrayOfStatement();
-        prefixElementArray = new ArrayOfProgramPrefix(this);
+	body = new ImmutableArray<Statement>();
+        prefixElementArray = new ImmutableArray<ProgramPrefix>(this);
     }
 
     /**
@@ -56,46 +56,46 @@ public class StatementBlock extends JavaStatement
     public StatementBlock(ExtList children) {
         super(children);
         body = new
-            ArrayOfStatement((Statement[])children.collect(Statement.class));
+            ImmutableArray<Statement>((Statement[])children.collect(Statement.class));
         
         prefixElementArray = computePrefixElements(body);
     }
 
-    public StatementBlock(ArrayOfStatement as) {
+    public StatementBlock(ImmutableArray<? extends Statement> as) {
 	body = as;
         prefixElementArray = computePrefixElements(body);
     }
         
 
     public StatementBlock(Statement as) {
-	this(new ArrayOfStatement(as));
+	this(new ImmutableArray<Statement>(as));
     }
 
     public StatementBlock(Statement[] body) {
-	this(new ArrayOfStatement(body));
+	this(new ImmutableArray<Statement>(body));
     }
 
-    private ArrayOfProgramPrefix computePrefixElements(ArrayOfStatement b) {
+    private ImmutableArray<ProgramPrefix> computePrefixElements(ImmutableArray<? extends Statement> b) {
         return computePrefixElements(b,0,this);
     }
 
     /** computes the prefix elements for the given array of statment block */
-    public static ArrayOfProgramPrefix computePrefixElements(ArrayOfStatement b, 
+    public static ImmutableArray<ProgramPrefix> computePrefixElements(ImmutableArray<? extends Statement> b, 
             int offset, ProgramPrefix current) {
         final ProgramPrefix[] pp;
 
-        if (b.size()>0 && b.getStatement(0) instanceof ProgramPrefix) {
-            final ProgramPrefix prefixElement = (ProgramPrefix) b.getStatement(0);
+        if (b.size()>0 && b.get(0) instanceof ProgramPrefix) {
+            final ProgramPrefix prefixElement = (ProgramPrefix) b.get(0);
             
             final int prefixLength = 
-                ((ProgramPrefix)b.getStatement(0)).getPrefixLength();
+                ((ProgramPrefix)b.get(0)).getPrefixLength();
             pp = new ProgramPrefix[prefixLength + 1];            
             prefixElement.getPrefixElements().arraycopy(offset, pp, 1, prefixLength);            
         } else {
             pp = new ProgramPrefix[1];            
         }                
         pp[0] = current;
-        return new ArrayOfProgramPrefix(pp);
+        return new ImmutableArray<ProgramPrefix>(pp);
     }
 
    
@@ -105,7 +105,7 @@ public class StatementBlock extends JavaStatement
      *      @return the statement array wrapper.
      */
 
-    public ArrayOfStatement getBody() {
+    public ImmutableArray<? extends Statement> getBody() {
         return body;
     }
 
@@ -134,7 +134,7 @@ public class StatementBlock extends JavaStatement
 
     public ProgramElement getChildAt(int index) {
         if (body != null) {
-            return body.getStatement(index);
+            return body.get(index);
         }
         throw new ArrayIndexOutOfBoundsException();
     }
@@ -159,7 +159,7 @@ public class StatementBlock extends JavaStatement
 
     public Statement getStatementAt(int index) {
         if (body != null) {
-            return body.getStatement(index);
+            return body.get(index);
         }
         throw new ArrayIndexOutOfBoundsException();
     }
@@ -173,7 +173,7 @@ public class StatementBlock extends JavaStatement
         int count = 0;
         if (body != null) {
             for (int i = body.size() - 1; i >= 0; i -= 1) {
-                if (body.getStatement(i) instanceof TypeDeclaration) {
+                if (body.get(i) instanceof TypeDeclaration) {
                     count += 1;
                 }
             }
@@ -194,7 +194,7 @@ public class StatementBlock extends JavaStatement
         if (body != null) {
             int s = body.size();
             for (int i = 0; i < s && index >= 0; i++) {
-                Statement st = body.getStatement(i);
+                Statement st = body.get(i);
                 if (st instanceof TypeDeclaration) {
                     if (index == 0) {
                         return (TypeDeclaration)st;
@@ -221,7 +221,7 @@ public class StatementBlock extends JavaStatement
 
     public SourceElement getFirstElement() {
         if (isEmpty()) return this;
-        final SourceElement e = getBody().getStatement(0);
+        final SourceElement e = getBody().get(0);
         return (e instanceof StatementBlock) ? e.getFirstElement() : e;
     }
 
@@ -230,10 +230,10 @@ public class StatementBlock extends JavaStatement
     }
 
     public ProgramPrefix getPrefixElementAt(int i) {       
-        return prefixElementArray.getProgramPrefix(i);
+        return prefixElementArray.get(i);
     }
 
-    public ArrayOfProgramPrefix getPrefixElements() {
+    public ImmutableArray<ProgramPrefix> getPrefixElements() {
         return prefixElementArray;
     }
 

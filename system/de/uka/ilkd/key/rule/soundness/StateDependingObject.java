@@ -11,15 +11,16 @@
 
 package de.uka.ilkd.key.rule.soundness;
 
-import de.uka.ilkd.key.java.abstraction.ArrayOfKeYJavaType;
+import de.uka.ilkd.key.collection.ImmutableArray;
+import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.op.NonRigid;
 
 
 
 public interface StateDependingObject extends NonRigid {
 
-    //    public ListOfProgramVariable getInfluencingPV ();
+    //    public IList<ProgramVariable> getInfluencingPV ();
 
-    ArrayOfKeYJavaType getInfluencingPVTypes ();
+    ImmutableArray<KeYJavaType> getInfluencingPVTypes ();
 
 }

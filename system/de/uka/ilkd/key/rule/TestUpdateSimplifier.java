@@ -15,6 +15,7 @@ import java.util.Arrays;
 import java.util.LinkedList;
 
 import junit.framework.TestCase;
+import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -156,9 +157,9 @@ public class TestUpdateSimplifier extends TestCase {
         final QuanUpdateOperator op =
             QuanUpdateOperator.createUpdateOp ( locations, guards );
 
-        final ArrayOfQuantifiableVariable[] bv =
-            new ArrayOfQuantifiableVariable [subs.length];
-        Arrays.fill ( bv, new ArrayOfQuantifiableVariable () );
+        final ImmutableArray<QuantifiableVariable>[] bv =
+            new ImmutableArray[subs.length];
+        Arrays.fill ( bv, new ImmutableArray<QuantifiableVariable> () );
         
         return op.normalize(bv, subs);
     }
@@ -1395,10 +1396,8 @@ public class TestUpdateSimplifier extends TestCase {
                         uf.quantify(intVar, uf.elementaryUpdate(intVarAccess, u)));
         
         assertEquals(parUpd.getAllAssignmentPairs().size(), 2);
-        assertSame(parUpd.getAssignmentPair(0).boundVars().lastQuantifiableVariable(),
-                   arrayVar1);
-        assertSame(parUpd.getAssignmentPair(1).boundVars().lastQuantifiableVariable(),
-                   intVar);
+        assertSame(parUpd.getAssignmentPair(0).boundVars().last(), arrayVar1);
+        assertSame(parUpd.getAssignmentPair(1).boundVars().last(), intVar);
         
         final Term updateTerm = uf.apply(parUpd,
                                          tb.dia(JavaBlock

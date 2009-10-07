@@ -15,28 +15,21 @@ import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.op.ListOfParsableVariable;
-import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.Op;
-import de.uka.ilkd.key.logic.op.ProgramMethod;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.SetAsListOfProof;
-import de.uka.ilkd.key.proof.SetOfProof;
 import de.uka.ilkd.key.proof.init.EnsuresPO;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.speclang.ClassInvariant;
 import de.uka.ilkd.key.speclang.LoopInvariant;
 import de.uka.ilkd.key.speclang.OperationContract;
-import de.uka.ilkd.key.speclang.SetAsListOfClassInvariant;
-import de.uka.ilkd.key.speclang.SetAsListOfOperationContract;
-import de.uka.ilkd.key.speclang.SetOfClassInvariant;
-import de.uka.ilkd.key.speclang.SetOfOperationContract;
 import de.uka.ilkd.key.speclang.SignatureVariablesFactory;
 
 
@@ -44,20 +37,20 @@ public class SpecificationRepository {
     
     private static final String CONTRACT_COMBINATION_MARKER = "#";
     
-    private final Map<ProgramMethod, SetOfOperationContract> contracts 
-    		= new LinkedHashMap<ProgramMethod,SetOfOperationContract>();
+    private final Map<ProgramMethod, ImmutableSet<OperationContract>> contracts 
+    		= new LinkedHashMap<ProgramMethod,ImmutableSet<OperationContract>>();
     private final Map<String, OperationContract> contractsByName
                 = new LinkedHashMap<String,OperationContract>();
-    private final Map<KeYJavaType,SetOfClassInvariant> invs
-    		= new LinkedHashMap<KeYJavaType, SetOfClassInvariant>();
+    private final Map<KeYJavaType,ImmutableSet<ClassInvariant>> invs
+    		= new LinkedHashMap<KeYJavaType, ImmutableSet<ClassInvariant>>();
     private final Map<String,ClassInvariant> invsByName
                 = new LinkedHashMap<String, ClassInvariant>();
-    private final Map<KeYJavaType, SetOfClassInvariant> throughoutInvs
-    		= new LinkedHashMap<KeYJavaType, SetOfClassInvariant>();
+    private final Map<KeYJavaType, ImmutableSet<ClassInvariant>> throughoutInvs
+    		= new LinkedHashMap<KeYJavaType, ImmutableSet<ClassInvariant>>();
     private final Map<String,ClassInvariant> throughoutInvsByName
                 = new LinkedHashMap<String,ClassInvariant>();
-    private final Map<ProofOblInput,SetOfProof> proofs
-                = new LinkedHashMap<ProofOblInput,SetOfProof>();
+    private final Map<ProofOblInput,ImmutableSet<Proof>> proofs
+                = new LinkedHashMap<ProofOblInput,ImmutableSet<Proof>>();
     private final Map<LoopStatement,LoopInvariant> loopInvs
                 = new LinkedHashMap<LoopStatement,LoopInvariant>();
     private final Map<ProgramMethod,Boolean> strictPurityCache
@@ -83,9 +76,9 @@ public class SpecificationRepository {
     /**
      * Returns all registered (atomic) contracts for the passed operation.
      */
-    public SetOfOperationContract getOperationContracts(ProgramMethod pm) {
-	SetOfOperationContract result = contracts.get(pm);
-        return result == null ? SetAsListOfOperationContract.EMPTY_SET : result;
+    public ImmutableSet<OperationContract> getOperationContracts(ProgramMethod pm) {
+	ImmutableSet<OperationContract> result = contracts.get(pm);
+        return result == null ? DefaultImmutableSet.<OperationContract>nil() : result;
     }
     
     
@@ -93,9 +86,9 @@ public class SpecificationRepository {
      * Returns all registered (atomic) contracts for the passed operation which 
      * refer to the passed modality.
      */
-    public SetOfOperationContract getOperationContracts(ProgramMethod pm, 
+    public ImmutableSet<OperationContract> getOperationContracts(ProgramMethod pm, 
 	    						Modality modality) {
-	SetOfOperationContract result = getOperationContracts(pm);
+	ImmutableSet<OperationContract> result = getOperationContracts(pm);
 	for(OperationContract contract : result) {
 	    if(!contract.getModality().equals(modality)) {
 		result = result.remove(contract);
@@ -115,8 +108,8 @@ public class SpecificationRepository {
         }
         
         String[] baseNames = name.split(CONTRACT_COMBINATION_MARKER);        
-        SetOfOperationContract baseContracts 
-            = SetAsListOfOperationContract.EMPTY_SET;
+        ImmutableSet<OperationContract> baseContracts 
+            = DefaultImmutableSet.<OperationContract>nil();
         for(String baseName : baseNames) {
             OperationContract baseContract = contractsByName.get(baseName);
             if(baseContract == null) {
@@ -149,7 +142,7 @@ public class SpecificationRepository {
     /**
      * Registers the passed contracts.
      */
-    public void addOperationContracts(SetOfOperationContract contracts) {
+    public void addOperationContracts(ImmutableSet<OperationContract> contracts) {
         for(OperationContract contract : contracts) {
             addOperationContract(contract);
         }
@@ -160,7 +153,7 @@ public class SpecificationRepository {
      * Creates a combined contract out of the passed atomic contracts.
      */
     public OperationContract combineContracts(
-                                        SetOfOperationContract contracts) {
+                                        ImmutableSet<OperationContract> contracts) {
         assert contracts != null && contracts.size() > 0;
         for(OperationContract contract : contracts) {            
             assert !contract.getName().contains(CONTRACT_COMBINATION_MARKER)
@@ -168,7 +161,7 @@ public class SpecificationRepository {
         }
 
         //sort contracts alphabetically (for determinism)
-        OperationContract[] contractsArray = contracts.toArray();
+        OperationContract[] contractsArray = contracts.toArray(new OperationContract[contracts.size()]);
         Arrays.sort(contractsArray, new Comparator<OperationContract> () {
             public int compare(OperationContract c1, OperationContract c2) {
                 return c1.getName().compareTo(c2.getName());
@@ -204,8 +197,8 @@ public class SpecificationRepository {
     /**
      * Splits the passed contract into its atomic components. 
      */
-    public SetOfOperationContract splitContract(OperationContract contract) {
-        SetOfOperationContract result = SetAsListOfOperationContract.EMPTY_SET;
+    public ImmutableSet<OperationContract> splitContract(OperationContract contract) {
+        ImmutableSet<OperationContract> result = DefaultImmutableSet.<OperationContract>nil();
         String[] atomicNames 
             = contract.getName().split(CONTRACT_COMBINATION_MARKER);
         for(String atomicName : atomicNames) {
@@ -224,9 +217,9 @@ public class SpecificationRepository {
     /**
      * Returns all known class invariants for the passed type.
      */
-    public SetOfClassInvariant getClassInvariants(KeYJavaType kjt) {
-	SetOfClassInvariant result = invs.get(kjt);
-	return result == null ? SetAsListOfClassInvariant.EMPTY_SET : result;
+    public ImmutableSet<ClassInvariant> getClassInvariants(KeYJavaType kjt) {
+	ImmutableSet<ClassInvariant> result = invs.get(kjt);
+	return result == null ? DefaultImmutableSet.<ClassInvariant>nil() : result;
     }
     
 
@@ -256,7 +249,7 @@ public class SpecificationRepository {
     /**
      * Registers the passed class invariants.
      */
-    public void addClassInvariants(SetOfClassInvariant invs) {
+    public void addClassInvariants(ImmutableSet<ClassInvariant> invs) {
         for(ClassInvariant inv : invs) {
             addClassInvariant(inv);
         }
@@ -266,9 +259,9 @@ public class SpecificationRepository {
     /**
      * Returns all known throughout invariants for the passed type.
      */
-    public SetOfClassInvariant getThroughoutClassInvariants(KeYJavaType kjt) {
-	SetOfClassInvariant result = throughoutInvs.get(kjt);
-        return result == null ? SetAsListOfClassInvariant.EMPTY_SET : result;
+    public ImmutableSet<ClassInvariant> getThroughoutClassInvariants(KeYJavaType kjt) {
+	ImmutableSet<ClassInvariant> result = throughoutInvs.get(kjt);
+        return result == null ? DefaultImmutableSet.<ClassInvariant>nil() : result;
     }
     
     
@@ -298,7 +291,7 @@ public class SpecificationRepository {
     /**
      * Registers the passed throughout invariants.
      */
-    public void addThroughoutClassInvariants(SetOfClassInvariant invs) {
+    public void addThroughoutClassInvariants(ImmutableSet<ClassInvariant> invs) {
         for(ClassInvariant inv : invs) {
             addThroughoutClassInvariant(inv);
         }
@@ -308,11 +301,11 @@ public class SpecificationRepository {
     /**
      * Returns all proofs registered for the passed PO (or stronger POs).
      */
-    public SetOfProof getProofs(ProofOblInput po) {
-        SetOfProof result = SetAsListOfProof.EMPTY_SET;
-        for(Map.Entry<ProofOblInput,SetOfProof> entry : proofs.entrySet()) {
+    public ImmutableSet<Proof> getProofs(ProofOblInput po) {
+        ImmutableSet<Proof> result = DefaultImmutableSet.<Proof>nil();
+        for(Map.Entry<ProofOblInput,ImmutableSet<Proof>> entry : proofs.entrySet()) {
             ProofOblInput mapPO = entry.getKey();
-            SetOfProof sop = entry.getValue();
+            ImmutableSet<Proof> sop = entry.getValue();
             if(mapPO.implies(po)) {
                 result = result.union(sop);
             }
@@ -324,11 +317,11 @@ public class SpecificationRepository {
     /**
      * Returns all proofs registered for the passed operation.
      */
-    public SetOfProof getProofs(ProgramMethod pm) {
-        SetOfProof result = SetAsListOfProof.EMPTY_SET;
-        for(Map.Entry<ProofOblInput,SetOfProof> entry : proofs.entrySet()) {
+    public ImmutableSet<Proof> getProofs(ProgramMethod pm) {
+        ImmutableSet<Proof> result = DefaultImmutableSet.<Proof>nil();
+        for(Map.Entry<ProofOblInput,ImmutableSet<Proof>> entry : proofs.entrySet()) {
             ProofOblInput po = entry.getKey();
-            SetOfProof sop = entry.getValue();
+            ImmutableSet<Proof> sop = entry.getValue();
             if(po instanceof EnsuresPO 
                && ((EnsuresPO) po).getProgramMethod().equals(pm)) {
                 result = result.union(sop);
@@ -342,9 +335,9 @@ public class SpecificationRepository {
      * Returns the operation that the passed proof is about, or null.
      */
     public ProgramMethod getOperationForProof(Proof proof) {
-	for(Map.Entry<ProofOblInput,SetOfProof> entry : proofs.entrySet()) {
+	for(Map.Entry<ProofOblInput,ImmutableSet<Proof>> entry : proofs.entrySet()) {
 	    ProofOblInput po = entry.getKey();
-            SetOfProof sop = entry.getValue();
+            ImmutableSet<Proof> sop = entry.getValue();
             if(sop.contains(proof) && po instanceof EnsuresPO) {
                 return ((EnsuresPO)po).getProgramMethod();
             }
@@ -365,8 +358,8 @@ public class SpecificationRepository {
      * Unregisters the passed proof.
      */
     public void removeProof(Proof proof) {
-        for(Map.Entry<ProofOblInput,SetOfProof> entry : proofs.entrySet()) {
-            SetOfProof sop = (SetOfProof) entry.getValue();
+        for(Map.Entry<ProofOblInput,ImmutableSet<Proof>> entry : proofs.entrySet()) {
+            ImmutableSet<Proof> sop = (ImmutableSet<Proof>) entry.getValue();
             if(sop.contains(proof)) {
                 sop = sop.remove(proof);
                 if(sop.size()==0){
@@ -415,7 +408,7 @@ public class SpecificationRepository {
 	Term tt = TermBuilder.DF.tt();
         ProgramVariable selfVar 
         	= svf.createSelfVar(services, pm, true);
-        ListOfParsableVariable paramVars 
+        ImmutableList<ParsableVariable> paramVars 
         	= svf.createParamVars(services, pm, false);
 	for(OperationContract c : getOperationContracts(pm, Op.DIA)) {
 	    if(c.getPre(selfVar, paramVars, services).getFormula().equals(tt)	   

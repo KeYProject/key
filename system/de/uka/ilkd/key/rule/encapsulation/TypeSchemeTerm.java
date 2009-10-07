@@ -10,9 +10,11 @@
 
 package de.uka.ilkd.key.rule.encapsulation;
 
+import de.uka.ilkd.key.collection.ImmutableSet;
+
 
 interface TypeSchemeTerm {
     public TypeSchemeUnion evaluate();
     
-    public SetOfTypeSchemeVariable getFreeVars();
+    public ImmutableSet<TypeSchemeVariable> getFreeVars();
 }

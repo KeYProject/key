@@ -11,6 +11,9 @@
 package de.uka.ilkd.key.proof.proofevent;
 
 
+import java.util.Iterator;
+
+import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.rule.RuleApp;
 
@@ -22,7 +25,7 @@ public class RuleAppInfo {
 
     RuleAppInfo ( RuleApp               p_appliedRule,
 		  Node                  p_originalNode,
-		  ListOfNodeReplacement p_newNodes ) {
+		  ImmutableList<NodeReplacement> p_newNodes ) {
 	app          = p_appliedRule;
 	originalNode = p_originalNode;
 	newNodes     = p_newNodes;
@@ -42,7 +45,7 @@ public class RuleAppInfo {
     /**
      * New nodes that have been introduced by this rule application
      */
-    ListOfNodeReplacement newNodes     = null;
+    ImmutableList<NodeReplacement> newNodes     = null;
 
     public RuleApp                   getRuleApp          () {
 	return app;
@@ -60,7 +63,7 @@ public class RuleAppInfo {
      * original node, if only the closure constraint of this node has
      * been changed)
      */
-    public IteratorOfNodeReplacement getReplacementNodes () {
+    public Iterator<NodeReplacement> getReplacementNodes () {
 	return newNodes.iterator ();
     }
     

@@ -8,15 +8,20 @@
 package de.uka.ilkd.key.visualization;
 
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Set;
 
-import de.uka.ilkd.key.java.*;
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.java.Position;
+import de.uka.ilkd.key.java.ProgramElement;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.statement.Throw;
 import de.uka.ilkd.key.java.visitor.JavaASTCollector;
-import de.uka.ilkd.key.logic.op.SetAsListOfProgramMethod;
-import de.uka.ilkd.key.logic.op.SetOfProgramMethod;
+import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.proof.Node;
 
 public class ExecutionTraceModel {
@@ -124,15 +129,15 @@ public class ExecutionTraceModel {
     /**
      * Returns all ProgramMethods occuring in this trace.
      */
-    public SetOfProgramMethod getProgramMethods(Services serv) {
-	SetOfProgramMethod result = SetAsListOfProgramMethod.EMPTY_SET;
+    public ImmutableSet<ProgramMethod> getProgramMethods(Services serv) {
+	ImmutableSet<ProgramMethod> result = DefaultImmutableSet.<ProgramMethod>nil();
 	TraceElement current = start;
 	while (current != end) {
 	    JavaASTCollector coll = new JavaASTCollector(current.getProgram(),
 		    MethodFrame.class);
 	    coll.start();
-	    ListOfProgramElement l = coll.getNodes();
-	    IteratorOfProgramElement it = l.iterator();
+	    ImmutableList<ProgramElement> l = coll.getNodes();
+	    Iterator<ProgramElement> it = l.iterator();
 	    while (it.hasNext()) {
 		MethodFrame mf = (MethodFrame) it.next();
 		if (mf.getProgramMethod() != null) {

@@ -17,20 +17,22 @@
 
 package de.uka.ilkd.key.speclang.ocl.translation;
 
-import de.uka.ilkd.key.logic.op.IteratorOfLogicVariable;
-import de.uka.ilkd.key.logic.op.ListOfLogicVariable;
-import de.uka.ilkd.key.speclang.translation.ListOfSLExpression;
-import de.uka.ilkd.key.speclang.translation.SLListOfSLExpression;
+import java.util.Iterator;
+
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.logic.op.LogicVariable;
+import de.uka.ilkd.key.speclang.translation.SLExpression;
 import de.uka.ilkd.key.speclang.translation.SLParameters;
 import de.uka.ilkd.key.util.Debug;
 
 
 class OCLParameters extends SLParameters {
-    private final ListOfLogicVariable declaredVars;
-    private final ListOfOCLExpression entities;
+    private final ImmutableList<LogicVariable> declaredVars;
+    private final ImmutableList<OCLExpression> entities;
             
-    public OCLParameters(ListOfLogicVariable declaredVars,
-                         ListOfOCLExpression entities) {
+    public OCLParameters(ImmutableList<LogicVariable> declaredVars,
+                         ImmutableList<OCLExpression> entities) {
         super(convertToListOfSLExpression(entities));
         Debug.assertTrue(declaredVars != null);
         Debug.assertTrue(entities != null);
@@ -39,10 +41,10 @@ class OCLParameters extends SLParameters {
     }
     
     
-    private static ListOfSLExpression convertToListOfSLExpression(ListOfOCLExpression list) {
-        ListOfSLExpression result = SLListOfSLExpression.EMPTY_LIST;
+    private static ImmutableList<SLExpression> convertToListOfSLExpression(ImmutableList<OCLExpression> list) {
+        ImmutableList<SLExpression> result = ImmutableSLList.<SLExpression>nil();
         
-        IteratorOfOCLExpression it = list.iterator();
+        Iterator<OCLExpression> it = list.iterator();
         
         while(it.hasNext()) {
             result = result.append(it.next());
@@ -52,12 +54,12 @@ class OCLParameters extends SLParameters {
     }
 
 
-    public ListOfOCLExpression getEntities() {
+    public ImmutableList<OCLExpression> getEntities() {
         return entities;
     }
         
     
-    public ListOfLogicVariable getDeclaredVars() {
+    public ImmutableList<LogicVariable> getDeclaredVars() {
         return declaredVars;
     }
     
@@ -65,7 +67,7 @@ class OCLParameters extends SLParameters {
     public String toString() {
         String result = "(";
         
-        IteratorOfLogicVariable it = declaredVars.iterator();
+        Iterator<LogicVariable> it = declaredVars.iterator();
         while(it.hasNext()) {
             result += it.next() + ",";
         }
@@ -73,7 +75,7 @@ class OCLParameters extends SLParameters {
             result = result.substring(0, result.length() - 1) + "|";
         }
         
-        IteratorOfOCLExpression it2 = entities.iterator();
+        Iterator<OCLExpression> it2 = entities.iterator();
         while(it2.hasNext()) {
             result += it2.next() + ",";
         }

@@ -11,6 +11,10 @@
 package de.uka.ilkd.key.proof.proofevent;
 
 
+import java.util.Iterator;
+
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.proof.Node;
 
@@ -22,8 +26,8 @@ public class NodeReplacement {
 
     Node                    node;
     Node                    parent;
-    ListOfSequentChangeInfo rawChanges;
-    ListOfNodeChange        changes    = null;
+    ImmutableList<SequentChangeInfo> rawChanges;
+    ImmutableList<NodeChange>        changes    = null;
 
     /**
      * @param p_node the node this object reports about
@@ -34,7 +38,7 @@ public class NodeReplacement {
      */
     public NodeReplacement ( Node                    p_node,
 			     Node                    p_parent,
-			     ListOfSequentChangeInfo p_changes ) {
+			     ImmutableList<SequentChangeInfo> p_changes ) {
 	node       = p_node;
 	parent     = p_parent;
 	rawChanges = p_changes;
@@ -53,8 +57,8 @@ public class NodeReplacement {
     }
 
     private void addNodeChange ( SequentChangeInfo p_sci ) {
-        IteratorOfConstrainedFormula it;
-        IteratorOfFormulaChangeInfo  it2;
+        Iterator<ConstrainedFormula> it;
+        Iterator<FormulaChangeInfo>  it2;
      
         //---
         it = p_sci.removedFormulas ( true ).iterator ();
@@ -174,8 +178,8 @@ public class NodeReplacement {
 
     private void removeNodeChanges ( ConstrainedFormula p_cf,
 				     boolean            p_inAntec ) {
-	IteratorOfNodeChange it     = changes.iterator ();
-	changes                     = SLListOfNodeChange.EMPTY_LIST;
+	Iterator<NodeChange> it     = changes.iterator ();
+	changes                     = ImmutableSLList.<NodeChange>nil();
 	NodeChange           oldNC;
 	PosInOccurrence      oldPio;
 
@@ -200,9 +204,9 @@ public class NodeReplacement {
     /**
      * @return Modifications that have been made to node
      */
-    public IteratorOfNodeChange getNodeChanges () {
+    public Iterator<NodeChange> getNodeChanges () {
 	if ( changes == null ) {
-	    changes = SLListOfNodeChange.EMPTY_LIST;
+	    changes = ImmutableSLList.<NodeChange>nil();
 	    addNodeChanges ();
 	}
 	return changes.iterator ();

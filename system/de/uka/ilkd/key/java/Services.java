@@ -252,10 +252,10 @@ public class Services{
 	return s;
     }
     
-    public Services copyProofSpecific(Proof proof) {
+    public Services copyProofSpecific(Proof p_proof) {
         final Services s = new Services(getJavaInfo().getKeYProgModelInfo().getServConf(),
                 getJavaInfo().getKeYProgModelInfo().rec2key());
-        s.proof = proof;
+        s.proof = p_proof;
         s.specRepos = specRepos;
         s.setTypeConverter(getTypeConverter().copy(s));
         s.setExceptionHandler(getExceptionHandler());

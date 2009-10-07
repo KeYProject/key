@@ -12,8 +12,13 @@ package de.uka.ilkd.key.logic.sort;
 import java.util.HashMap;
 import java.util.Iterator;
 
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.*;
-import de.uka.ilkd.key.java.abstraction.*;
+import de.uka.ilkd.key.java.abstraction.ClassType;
+import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.abstraction.PrimitiveType;
+import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.declaration.*;
 import de.uka.ilkd.key.java.expression.ArrayInitializer;
 import de.uka.ilkd.key.java.expression.Literal;
@@ -309,7 +314,7 @@ public abstract class ProgramSVSort extends PrimitiveSort {
 				        "jvmMakeTransientShortArray",
 				        "jvmMakeTransientObjectArray"}, 
 				      "de.uka.ilkd.key.javacard.KeYJCSystem",
-				      SLListOfName.EMPTY_LIST.append
+				      ImmutableSLList.<Name>nil().append
 				      (new Name("byte")).append(new Name("short")));
 
     public static final ProgramSVSort ARRAYCOPY
@@ -1189,7 +1194,7 @@ public abstract class ProgramSVSort extends PrimitiveSort {
 	    if (pe instanceof VariableDeclaration &&
 		((VariableDeclaration)pe).getVariables().size() == 1 &&
 		((VariableDeclaration)pe).getVariables().
-		getVariableSpecification(0).getDimensions() > 0) {
+		get(0).getDimensions() > 0) {
 		return true;
 	    }
 		
@@ -1334,7 +1339,7 @@ public abstract class ProgramSVSort extends PrimitiveSort {
     private static class MethodNameReferenceSort 
 	extends NameMatchingSort {
 
-	private ListOfName reverseSignature = SLListOfName.EMPTY_LIST;
+	private ImmutableList<Name> reverseSignature = ImmutableSLList.<Name>nil();
 	private String fullTypeName;
 
 	public MethodNameReferenceSort(Name name,
@@ -1354,7 +1359,7 @@ public abstract class ProgramSVSort extends PrimitiveSort {
 	public MethodNameReferenceSort(Name name,
 	                               String methodName, 
 				       String declaredInType,
-				       ListOfName signature) {
+				       ImmutableList<Name> signature) {
 	    this(name, methodName, declaredInType);	    
 	    this.reverseSignature = reverse(signature);
 	}
@@ -1362,23 +1367,23 @@ public abstract class ProgramSVSort extends PrimitiveSort {
 	public MethodNameReferenceSort(Name name,
 	                               String[] methodNames, 
 				       String declaredInType,
-				       ListOfName signature) {
+				       ImmutableList<Name> signature) {
 	    this(name, methodNames, declaredInType);	    
 	    this.reverseSignature = reverse(signature);
 	}
 
-	private ListOfName reverse(ListOfName names) {
-	    ListOfName result = SLListOfName.EMPTY_LIST;
-	    IteratorOfName it = names.iterator();
+	private ImmutableList<Name> reverse(ImmutableList<Name> names) {
+	    ImmutableList<Name> result = ImmutableSLList.<Name>nil();
+	    Iterator<Name> it = names.iterator();
 	    while (it.hasNext()) {
 		result = result.append(it.next());
 	    }
 	    return result;
 	}
 
-	private ListOfType createSignature(Services services) {
-	    ListOfType result = SLListOfType.EMPTY_LIST;
-	    IteratorOfName ownSig = reverseSignature.iterator();
+	private ImmutableList<Type> createSignature(Services services) {
+	    ImmutableList<Type> result = ImmutableSLList.<Type>nil();
+	    Iterator<Name> ownSig = reverseSignature.iterator();
 	    while (ownSig.hasNext()) {
 		result = result.prepend(services.getJavaInfo()
 					.getKeYJavaType(""+ownSig.next()));

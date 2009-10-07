@@ -12,6 +12,9 @@ package de.uka.ilkd.key.logic;
 import java.util.HashMap;
 import java.util.Iterator;
 
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
+
 /**
  * A Namespace keeps track of already used {@link Name}s and the objects
  * carrying these names. These objects have to implement the interface
@@ -118,7 +121,7 @@ public class Namespace implements java.io.Serializable {
      *  resets the protocol */
     public Iterator<Named> getProtocolled() {
         if (protocol == null) {
-            return SLListOfNamed.EMPTY_LIST.iterator();
+            return ImmutableSLList.<Named>nil().iterator();
         }
         final Iterator<Named> it = protocol.values().iterator();
         protocol = null;
@@ -149,9 +152,9 @@ public class Namespace implements java.io.Serializable {
 	return new Namespace(this, sym);
     }
 
-    public Namespace extended(ListOfNamed ext) {
+    public Namespace extended(ImmutableList<Named> ext) {
 	Namespace res=new Namespace(this);
-	IteratorOfNamed it=ext.iterator();
+	Iterator<Named> it=ext.iterator();
 	while (it.hasNext()) {
 	    res.add(it.next());
 	}
@@ -178,8 +181,8 @@ public class Namespace implements java.io.Serializable {
      * namespace (not about the one of the parent)
      * @return the list of the named objects
      */
-    public ListOfNamed elements() {
-	ListOfNamed list = SLListOfNamed.EMPTY_LIST;
+    public ImmutableList<Named> elements() {
+	ImmutableList<Named> list = ImmutableSLList.<Named>nil();
 
 	if (numLocalSyms == 1) {
             list = list.prepend(localSym);
@@ -198,7 +201,7 @@ public class Namespace implements java.io.Serializable {
 	return list;
     }
 
-    public ListOfNamed allElements() {
+    public ImmutableList<Named> allElements() {
 	if (parent==null) {
 	    return elements();
 	} else {
@@ -220,15 +223,15 @@ public class Namespace implements java.io.Serializable {
     }
 
     public void add(Namespace source) {
-	IteratorOfNamed it=source.elements().iterator();
+	Iterator<Named> it=source.elements().iterator();
 	while (it.hasNext()) {
 	    add(it.next());
 	}
 	
     }
 
-    public void add(ListOfNamed l) {
-	IteratorOfNamed it = l.iterator();
+    public void add(ImmutableList<Named> l) {
+	Iterator<Named> it = l.iterator();
 	while (it.hasNext()) {
 	    add(it.next());
 	}
@@ -242,7 +245,7 @@ public class Namespace implements java.io.Serializable {
 	    copy = new Namespace();
 	}
 	//%%%%make more efficient!!!
-	IteratorOfNamed it=allElements().iterator();
+	Iterator<Named> it=allElements().iterator();
 	while (it.hasNext()) {
 	    copy.add(it.next());
 	}

@@ -17,7 +17,10 @@ package de.uka.ilkd.key.rule.export;
 
 import java.util.*;
 
-import de.uka.ilkd.key.logic.IteratorOfNamed;
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.NamespaceSet;
@@ -25,7 +28,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.logic.sort.SortDefiningSymbols;
 import de.uka.ilkd.key.proof.RuleSource;
 import de.uka.ilkd.key.proof.init.*;
-import de.uka.ilkd.key.rule.*;
+import de.uka.ilkd.key.rule.Taclet;
 
 
 
@@ -36,17 +39,17 @@ public class TacletLoader {
     //private static InitConfig BASE_CONFIG = null;
     
     private InitConfig initConfig;
-    private HashSet alreadyParsed;
+    private HashSet<String> alreadyParsed;
     
     // key: String
     // value: SetOfTaclet
-    private HashMap file2taclets;
+    private HashMap<String, ImmutableSet<Taclet>> file2taclets;
     
     public TacletLoader() {
         initConfig = new InitConfig();
-        alreadyParsed = new HashSet();
+        alreadyParsed = new HashSet<String>();
         
-        file2taclets = new HashMap();
+        file2taclets = new HashMap<String, ImmutableSet<Taclet>>();
     }
     
     private void printlnIndented(int level, String msg) {
@@ -58,7 +61,7 @@ public class TacletLoader {
     
     
     private void setUpSorts(InitConfig initConfig) {
-	IteratorOfNamed it = initConfig.sortNS().allElements().iterator();
+	Iterator<Named> it = initConfig.sortNS().allElements().iterator();
         while(it.hasNext()) {
             Sort sort = (Sort)it.next ();
             if(sort instanceof SortDefiningSymbols) {
@@ -121,7 +124,7 @@ public class TacletLoader {
             final String name = keyFile[i].name();
             
             printlnIndented(level+1, name+": loading taclets");            
-            initConfig.setTaclets(SetAsListOfTaclet.EMPTY_SET);
+            initConfig.setTaclets(DefaultImmutableSet.<Taclet>nil());
             keyFile[i].readRulesAndProblem(mod);
             file2taclets.put(name, initConfig.getTaclets());
             
@@ -148,7 +151,7 @@ public class TacletLoader {
             }
                         
             printlnIndented(level, filename+": loading taclets");
-            initConfig.setTaclets(SetAsListOfTaclet.EMPTY_SET);
+            initConfig.setTaclets(DefaultImmutableSet.<Taclet>nil());
             
             setUpSorts(initConfig);
             file.read(ModStrategy.NO_VARS);
@@ -172,8 +175,8 @@ public class TacletLoader {
     }
     }
 
-    public ListOfTaclet loadRules(String filename) {
-        ListOfTaclet result = null;
+    public ImmutableList<Taclet> loadRules(String filename) {
+        ImmutableList<Taclet> result = null;
         
         try {
         System.out.println("Loading "+filename);
@@ -181,16 +184,16 @@ public class TacletLoader {
             
             //dumpInitConfig(initConfig);
             
-            //initConfig.setTaclets(SetAsListOfTaclet.EMPTY_SET);
+            //initConfig.setTaclets(SetAsListOf.<Taclet>nil());
         
             System.out.println("Loading rules for "+filename);
             //file.readRulesAndProblem(ModStrategy.NO_VARS_FUNCS);
             
             //dumpInitConfig(initConfig);
             
-            result = SLListOfTaclet.EMPTY_LIST;
+            result = ImmutableSLList.<Taclet>nil();
             
-            final IteratorOfTaclet it = ((SetOfTaclet)file2taclets.get(filename)).iterator();
+            final Iterator<Taclet> it = file2taclets.get(filename).iterator();
             
             while (it.hasNext()) {
                 final Taclet taclet = it.next();
@@ -213,12 +216,12 @@ public class TacletLoader {
     
     public void addAllLoadedRules ( RuleExportModel model ) {
         
-        final Iterator it = file2taclets.entrySet().iterator();
+        final Iterator<Map.Entry<String, ImmutableSet<Taclet>>> it = file2taclets.entrySet().iterator();
         while ( it.hasNext() ) {
-            final Map.Entry entry = (Map.Entry)it.next();
-            final String filename = (String)entry.getKey();
-            final SetOfTaclet tacletSet = (SetOfTaclet)entry.getValue();
-            final IteratorOfTaclet it2 = tacletSet.iterator();
+            final Map.Entry<String, ImmutableSet<Taclet>> entry = it.next();
+            final String filename = entry.getKey();
+            final ImmutableSet<Taclet> tacletSet = entry.getValue();
+            final Iterator<Taclet> it2 = tacletSet.iterator();
             while ( it2.hasNext() ) {
                 final Taclet t = it2.next ();
                 model.addTaclet ( t, filename );
@@ -248,7 +251,8 @@ public class TacletLoader {
 
     /** Dump namespace with given name (for debugging). */
     private static void dumpNamespace ( Namespace ns, String name ) {
-        Named elements[] = ns.elements().toArray();
+	final ImmutableList<Named> elemList = ns.elements();
+	Named elements[] = elemList.toArray(new Named[elemList.size()]);
         Arrays.sort(elements, new Comparator() {
             public int compare(Object a, Object b) {
                 return ((Named)a).name().compareTo(((Named)b).name());

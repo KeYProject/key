@@ -9,16 +9,17 @@
 //
 package de.uka.ilkd.key.rule.inst;
 
-import de.uka.ilkd.key.java.ArrayOfProgramElement;
+import de.uka.ilkd.key.collection.ImmutableArray;
+import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
-/** This class is used to store the instantiation of a schemavarible
+/** This class is used to store the instantiation of a schemavariable
  * if it is a ProgramElement.
  */
 
 public class ProgramListInstantiation extends InstantiationEntry {
 
     /** the pe the schemavariable is instantiated with */
-    private final ArrayOfProgramElement pes ;
+    private final ImmutableArray<ProgramElement> pes ;
 
    
     /** creates a new ContextInstantiationEntry 
@@ -28,7 +29,7 @@ public class ProgramListInstantiation extends InstantiationEntry {
      * SchemaVariable is instantiated with
      */
     ProgramListInstantiation(SchemaVariable sv, 
-            ArrayOfProgramElement pes) {
+            ImmutableArray<ProgramElement> pes) {
 	super(sv);
 	this.pes = pes;
     }
@@ -36,7 +37,7 @@ public class ProgramListInstantiation extends InstantiationEntry {
     /** returns the ProgramElement the SchemaVariable is instantiated with
      * @return the ProgramElement the SchemaVariable is instantiated with
      */
-    public ArrayOfProgramElement getProgramElements() {
+    public ImmutableArray<ProgramElement> getProgramElements() {
 	return pes;
     }
     

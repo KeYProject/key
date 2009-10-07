@@ -17,6 +17,7 @@
 
 package de.uka.ilkd.key.speclang.ocl.translation;
 
+import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Term;
@@ -24,13 +25,8 @@ import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.sort.AbstractCollectionSort;
 import de.uka.ilkd.key.speclang.ocl.Association;
-import de.uka.ilkd.key.speclang.ocl.ListOfAssociation;
 import de.uka.ilkd.key.speclang.ocl.UMLInfo;
-import de.uka.ilkd.key.speclang.translation.SLResolverManager;
-import de.uka.ilkd.key.speclang.translation.SLExpression;
-import de.uka.ilkd.key.speclang.translation.SLExpressionResolver;
-import de.uka.ilkd.key.speclang.translation.SLParameters;
-import de.uka.ilkd.key.speclang.translation.SLTranslationException;
+import de.uka.ilkd.key.speclang.translation.*;
 
 
 /**
@@ -87,7 +83,7 @@ class AssociationResolver extends SLExpressionResolver {
         }
         
         KeYJavaType containingKjt = receiver.getKeYJavaType(javaInfo);
-        ListOfAssociation assocs = umlInfo.getAssociations(containingKjt, name);
+        ImmutableList<Association> assocs = umlInfo.getAssociations(containingKjt, name);
         
         if(!assocs.isEmpty()) {            
             Term recTerm                = receiver.getTerm();

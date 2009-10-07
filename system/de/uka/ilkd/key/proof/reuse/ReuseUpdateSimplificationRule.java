@@ -10,6 +10,7 @@
 
 package de.uka.ilkd.key.proof.reuse;
 
+import java.util.Iterator;
 import java.util.List;
 
 import de.uka.ilkd.key.gui.KeYMediator;
@@ -37,7 +38,7 @@ public class ReuseUpdateSimplificationRule {
       Goal g = blank.target();
       RuleApp templateApp = blank.getApp();
 
-      IteratorOfConstrainedFormula formIter;
+      Iterator<ConstrainedFormula> formIter;
       
       final PosInOccurrence pio = templateApp.posInOccurrence();
       

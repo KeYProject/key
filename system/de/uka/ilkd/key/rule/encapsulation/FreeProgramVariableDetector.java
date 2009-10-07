@@ -10,18 +10,22 @@
 
 package de.uka.ilkd.key.rule.encapsulation;
 
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.ProgramConstant;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.sort.ObjectSort;
 
 
 class FreeProgramVariableDetector extends JavaASTVisitor {
-    private SetOfProgramVariable freeVars;
-    private SetOfProgramVariable declaredVars;
+    private ImmutableSet<ProgramVariable> freeVars;
+    private ImmutableSet<ProgramVariable> declaredVars;
     
     
     public FreeProgramVariableDetector(ProgramElement root, Services services) {
@@ -39,8 +43,8 @@ class FreeProgramVariableDetector extends JavaASTVisitor {
     
     
     public boolean findFreePV() {
-        freeVars     = SetAsListOfProgramVariable.EMPTY_SET;
-        declaredVars = SetAsListOfProgramVariable.EMPTY_SET;
+        freeVars     = DefaultImmutableSet.<ProgramVariable>nil();
+        declaredVars = DefaultImmutableSet.<ProgramVariable>nil();
         walk(root());
         return freeVars.size() > 0;
     }

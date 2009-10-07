@@ -11,8 +11,12 @@ package de.uka.ilkd.key.java;
 
 
 import java.util.HashMap;
+import java.util.Iterator;
 
 import recoder.service.ConstantEvaluator;
+import de.uka.ilkd.key.collection.ImmutableArray;
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.abstraction.*;
 import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.expression.ParenthesizedExpression;
@@ -26,7 +30,6 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.ldt.*;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.sort.ArrayOfSort;
 import de.uka.ilkd.key.logic.sort.ObjectSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.logic.sort.SortDefiningSymbols;
@@ -49,7 +52,7 @@ public class TypeConverter extends TermBuilder {
     private FloatLDT floatLDT;
     private DoubleLDT doubleLDT;
 
-    private ListOfLDT models = SLListOfLDT.EMPTY_LIST;
+    private ImmutableList<LDT> models = ImmutableSLList.<LDT>nil();
 
     
     public static StringConverter stringConverter =new StringConverter();
@@ -91,14 +94,14 @@ public class TypeConverter extends TermBuilder {
         Debug.out("Initialize LDTs: ", ldt);
     }
     
-    public void init(ListOfLDT ldts) {
-        IteratorOfLDT it = ldts.iterator();
+    public void init(ImmutableList<LDT> ldts) {
+        Iterator<LDT> it = ldts.iterator();
         while (it.hasNext()) {
             init(it.next());
         }
     }
     
-    public ListOfLDT getModels() {
+    public ImmutableList<LDT> getModels() {
         return models;
     }
 
@@ -204,7 +207,7 @@ public class TypeConverter extends TermBuilder {
 
         final Sort dummySort = services.getJavaInfo().getJavaLangObjectAsSort();       
         final Term tMCR = func(new RigidFunction(new Name(name), 
-                dummySort, new ArrayOfSort()));
+                dummySort, new ImmutableArray<Sort>()));
         mcrMap.put(name, tMCR);
         return tMCR;
     }
@@ -327,7 +330,7 @@ public class TypeConverter extends TermBuilder {
         final Term t = convertToLogicElement(ar.getReferencePrefix(), ec);
         for (int i=0; i<index.length; i++) { 
             index[i] = 
-                convertToLogicElement(ar.getDimensionExpressions().getExpression(i), ec);
+                convertToLogicElement(ar.getDimensionExpressions().get(i), ec);
         }
         return tf.createArrayTerm(ArrayOp.getArrayOp(t.sort()), t, index);
     }

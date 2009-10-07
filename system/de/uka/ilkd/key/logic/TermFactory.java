@@ -11,11 +11,15 @@
 
 package de.uka.ilkd.key.logic;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Map;
 
+import de.uka.ilkd.key.collection.ImmutableArray;
+import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.sort.*;
-import de.uka.ilkd.key.rule.ListOfUpdatePair;
+import de.uka.ilkd.key.logic.sort.AbstractSort;
+import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.UpdatePair;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.LRUCache;
@@ -394,7 +398,7 @@ public class TermFactory {
 
     public Term createFunctionWithBoundVarsTerm(TermSymbol op,
 						Term[] subTerms,
-						ArrayOfQuantifiableVariable[] boundVars) {
+						ImmutableArray<QuantifiableVariable>[] boundVars) {
 	if (boundVars != null) {
 	   return new BoundVarsTerm(op, subTerms, boundVars).checked(); 
 	} else {
@@ -414,7 +418,7 @@ public class TermFactory {
     /**
      * Create an 'ifEx-then-else' term (or formula)
      */
-    public Term createIfExThenElseTerm(ArrayOfQuantifiableVariable exVars,
+    public Term createIfExThenElseTerm(ImmutableArray<QuantifiableVariable> exVars,
                                        Term condF, Term thenT, Term elseT) {
         return new IfExThenElseTerm ( Op.IF_EX_THEN_ELSE,
                                       new Term [] { condF, thenT, elseT },
@@ -572,7 +576,7 @@ public class TermFactory {
      * @return the quantified term
      */
     public Term createQuantifierTerm(Quantifier quant,
-				     ArrayOfQuantifiableVariable varsBoundHere, 
+				     ImmutableArray<QuantifiableVariable> varsBoundHere, 
 				     Term subTerm) {
 	if (varsBoundHere.size()<=1) {
 	    return new QuantifierTerm(quant, varsBoundHere, 
@@ -581,7 +585,7 @@ public class TermFactory {
 	    Term qt = subTerm;
 	    for (int i=varsBoundHere.size()-1; i>=0; i--) {
 		QuantifiableVariable qv 
-		    = varsBoundHere.getQuantifiableVariable(i);
+		    = varsBoundHere.get(i);
 		qt = createQuantifierTerm(quant, qv, qt);
 	    }
 	    return qt;
@@ -616,7 +620,7 @@ public class TermFactory {
     public Term createQuantifierTerm(Quantifier quant, 
 				     QuantifiableVariable[] varsBoundHere, 
 				     Term subTerm) {
-	return createQuantifierTerm(quant, new ArrayOfQuantifiableVariable
+	return createQuantifierTerm(quant, new ImmutableArray<QuantifiableVariable>
 	    (varsBoundHere), subTerm);
     }
 
@@ -707,7 +711,7 @@ public class TermFactory {
 
 
    public Term createTerm(Operator op, Term[] subTerms, 
-			  ArrayOfQuantifiableVariable[] bv,
+			  ImmutableArray<QuantifiableVariable>[] bv,
 			  JavaBlock javaBlock) {
 	if (op==null) {
 	    throw new IllegalArgumentException("null-Operator at TermFactory");
@@ -719,7 +723,7 @@ public class TermFactory {
 	    }
 	    final Term[] resTerms = new Term [2];
 	    System.arraycopy ( subTerms, 0, resTerms, 0, 2 );
-	    final ArrayOfQuantifiableVariable exVars =
+	    final ImmutableArray<QuantifiableVariable> exVars =
 		BoundVariableTools.DEFAULT.unifyBoundVariables (bv, resTerms, 
 								0, 1);
 	    return createNumericalQuantifierTerm((NumericalQuantifier) op, 
@@ -734,14 +738,14 @@ public class TermFactory {
         } else if (op instanceof QuanUpdateOperator) {
 	    final QuanUpdateOperator updOp = (QuanUpdateOperator)op;
 	    if ( bv == null ) {
-	        bv = new ArrayOfQuantifiableVariable [subTerms.length];
-                java.util.Arrays.fill ( bv, new ArrayOfQuantifiableVariable () );
+	        bv = new ImmutableArray[subTerms.length];
+                java.util.Arrays.fill ( bv, new ImmutableArray<QuantifiableVariable> () );
 	    }
 	    return createQuanUpdateTerm (updOp, subTerms, bv);
 	} else if (op instanceof IfExThenElse) {
 	    final Term[] resTerms = new Term [3];
             System.arraycopy ( subTerms, 0, resTerms, 0, 3 );
-	    final ArrayOfQuantifiableVariable exVars =
+	    final ImmutableArray<QuantifiableVariable> exVars =
 	        BoundVariableTools.DEFAULT.unifyBoundVariables ( bv, resTerms,
 	                                                         0, 2 );
 	    return createIfExThenElseTerm ( exVars,
@@ -750,7 +754,7 @@ public class TermFactory {
                                             resTerms[2] );
 	} else if (op instanceof SubstOp) {	    
 	    return createSubstitutionTerm((SubstOp)op, 
-					  bv[1].getQuantifiableVariable(0),
+					  bv[1].get(0),
 					  subTerms);
 	} else if (op instanceof TermSymbol) { 
 	    // special treatment for OCL operators binding variables	    
@@ -768,7 +772,7 @@ public class TermFactory {
      * creates an update term like
      *    <code>{pair0}..{pairN}target</code>     
      */
-    public Term createUpdateTerm(ListOfUpdatePair pairs, Term target) {
+    public Term createUpdateTerm(ImmutableList<UpdatePair> pairs, Term target) {
 	if (pairs.size()>1) {
 	    return createUpdateTerm(pairs.head(), 
 				    (createUpdateTerm(pairs.tail(), 
@@ -804,9 +808,9 @@ public class TermFactory {
     public Term createUpdateTerm(Term[] locs, 
                                  Term[] values,
                                  Term target) {
-        final ArrayOfQuantifiableVariable[] boundVars =
-            new ArrayOfQuantifiableVariable [locs.length];
-        Arrays.fill ( boundVars, new ArrayOfQuantifiableVariable () );
+        final ImmutableArray<QuantifiableVariable>[] boundVars =
+            new ImmutableArray[locs.length];
+        Arrays.fill ( boundVars, new ImmutableArray<QuantifiableVariable> () );
         final Term[] guards = new Term [locs.length];
         Arrays.fill ( guards, createJunctorTerm ( Op.TRUE ) );
         
@@ -831,11 +835,11 @@ public class TermFactory {
 	subs[subs.length-1] = target;
 
 	if ( op instanceof QuanUpdateOperator ) {
-            final ArrayOfQuantifiableVariable[] boundVars =
-                new ArrayOfQuantifiableVariable [pair.arity () + 1];
+            final ImmutableArray<QuantifiableVariable>[] boundVars =
+                new ImmutableArray[pair.arity () + 1];
             for ( int i = 0; i < subs.length - 1; i++ )
                 boundVars[i] = pair.varsBoundHere ( i );
-            boundVars[subs.length - 1] = new ArrayOfQuantifiableVariable ();
+            boundVars[subs.length - 1] = new ImmutableArray<QuantifiableVariable> ();
             return createQuanUpdateTerm ( (QuanUpdateOperator)op,
                                           subs,
                                           boundVars );
@@ -857,7 +861,7 @@ public class TermFactory {
     public Term createNormalizedQuanUpdateTerm
                         (QuanUpdateOperator op,
                          Term[] subs,
-                         ArrayOfQuantifiableVariable[] boundVarsPerSub) {
+                         ImmutableArray<QuantifiableVariable>[] boundVarsPerSub) {
         return op.normalize ( boundVarsPerSub, subs );
     }
 
@@ -870,8 +874,8 @@ public class TermFactory {
     public Term createQuanUpdateTerm
                         (QuanUpdateOperator op,
                          Term[] subs,
-                         ArrayOfQuantifiableVariable[] boundVarsPerSub) {
-        final ArrayOfQuantifiableVariable[] boundVars =
+                         ImmutableArray<QuantifiableVariable>[] boundVarsPerSub) {
+        final ImmutableArray<QuantifiableVariable>[] boundVars =
             op.toBoundVarsPerAssignment ( boundVarsPerSub, subs );
         return new QuanUpdateTerm ( op, subs, boundVars ).checked ();
     }
@@ -885,7 +889,7 @@ public class TermFactory {
     public Term createQuanUpdateTermUnordered
         (QuanUpdateOperator op,
          Term[] subs,
-         ArrayOfQuantifiableVariable[] boundVars) {
+         ImmutableArray<QuantifiableVariable>[] boundVars) {
         
         return new QuanUpdateTerm ( op, subs, boundVars ).checked ();
     }
@@ -904,7 +908,7 @@ public class TermFactory {
      *            the Term on which the update is applied to
      * @return the update term as described above
      */
-    public Term createQuanUpdateTerm (ArrayOfQuantifiableVariable[] boundVars,
+    public Term createQuanUpdateTerm (ImmutableArray<QuantifiableVariable>[] boundVars,
 				      Term[] guards,
 				      Term[] locs,
 				      Term[] values,
@@ -915,12 +919,12 @@ public class TermFactory {
     }
 
     public Term createNumericalQuantifierTerm(NumericalQuantifier op, 
-            Term cond, Term t, ArrayOfQuantifiableVariable va){
+            Term cond, Term t, ImmutableArray<QuantifiableVariable> va){
         return new NumericalQuantifierTerm(op, new Term[]{cond, t}, va).checked();
     }
     
     public Term createBoundedNumericalQuantifierTerm(BoundedNumericalQuantifier op, 
-            Term a, Term b, Term t, ArrayOfQuantifiableVariable va){
+            Term a, Term b, Term t, ImmutableArray<QuantifiableVariable> va){
         return new BoundedNumericalQuantifierTerm(op, new Term[]{a, b, t}, va).checked();
     } 
 

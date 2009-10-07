@@ -11,10 +11,15 @@
  */
 package de.uka.ilkd.key.rule.updatesimplifier;
 
+import de.uka.ilkd.key.collection.ImmutableArray;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermFactory;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.op.Location;
+import de.uka.ilkd.key.logic.op.LogicVariable;
+import de.uka.ilkd.key.logic.op.Op;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.sort.AbstractSort;
 import de.uka.ilkd.key.util.Debug;
 
@@ -38,11 +43,11 @@ public class AssignmentPairImpl implements AssignmentPair {
     
     private int cachedLocationHashCode;
     private final Term guard;
-    private final ArrayOfQuantifiableVariable boundVars;
-    private SetOfQuantifiableVariable freeVars = null;
+    private final ImmutableArray<QuantifiableVariable> boundVars;
+    private ImmutableSet<QuantifiableVariable> freeVars = null;
     
     
-    public AssignmentPairImpl (final ArrayOfQuantifiableVariable boundVars,
+    public AssignmentPairImpl (final ImmutableArray<QuantifiableVariable> boundVars,
                                final Term guard,
                                final Location accessOp,
                                final Term[] locSubs,
@@ -63,7 +68,7 @@ public class AssignmentPairImpl implements AssignmentPair {
     public AssignmentPairImpl (final Location accessOp,
                                final Term[] locSubs,
                                final Term value) {
-        this ( new ArrayOfQuantifiableVariable (),
+        this ( new ImmutableArray<QuantifiableVariable> (),
                UpdateSimplifierTermFactory.DEFAULT.getValidGuard(),
                accessOp,
                locSubs,
@@ -127,22 +132,21 @@ public class AssignmentPairImpl implements AssignmentPair {
     /* (non-Javadoc)
      * @see de.uka.ilkd.key.rule.updatesimplifier.AssignmentPair#boundVars()
      */
-    public ArrayOfQuantifiableVariable boundVars () {
+    public ImmutableArray<QuantifiableVariable> boundVars () {
         return boundVars;
     }
     
     /* (non-Javadoc)
      * @see de.uka.ilkd.key.rule.updatesimplifier.AssignmentPair#freeVars()
      */
-    public SetOfQuantifiableVariable freeVars () {
+    public ImmutableSet<QuantifiableVariable> freeVars () {
         if ( freeVars == null ) {
             freeVars = guard ().freeVars ().union ( value ().freeVars () );
             for ( int i = 0; i != locationSubs ().length; ++i )
                 freeVars = freeVars.union ( locationSubs ()[i].freeVars () );
 
             for ( int i = 0; i != boundVars ().size (); ++i )
-                freeVars = freeVars.remove ( boundVars ()
-                                             .getQuantifiableVariable ( i ) );
+                freeVars = freeVars.remove ( boundVars ().get ( i ) );
         }
         
         return freeVars;
@@ -229,7 +233,7 @@ public class AssignmentPairImpl implements AssignmentPair {
         StringBuffer sb = new StringBuffer();
 	QuantifiableVariable qvar = null;
 	if(boundVars().size() == 1){
-	   qvar = boundVars().getQuantifiableVariable(0);
+	   qvar = boundVars().get (0);
 	   if(qvar instanceof LogicVariable) {
 	     sb.append(((LogicVariable)qvar).sort()+" "+((LogicVariable)qvar).name());
 	   }else{
@@ -239,7 +243,7 @@ public class AssignmentPairImpl implements AssignmentPair {
 	}else{
 	   sb.append("(");
 	   for(int i=0;i<boundVars().size();i++) {
-	     qvar = boundVars().getQuantifiableVariable(i);
+	     qvar = boundVars().get (i);
 	     if(qvar instanceof LogicVariable) {
 	       sb.append(((LogicVariable)qvar).sort()+" "+((LogicVariable)qvar).name());
 	     }else{

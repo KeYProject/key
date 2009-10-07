@@ -1,7 +1,8 @@
 package de.uka.ilkd.key.logic;
 
-import de.uka.ilkd.key.logic.op.ArrayOfQuantifiableVariable;
+import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.logic.op.BoundedNumericalQuantifier;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 
 /**
  * Represents a term with a numerical quantifier as top level operator.
@@ -11,15 +12,15 @@ import de.uka.ilkd.key.logic.op.BoundedNumericalQuantifier;
  */
 class BoundedNumericalQuantifierTerm extends OpTerm.ArbitraryOpTerm {
 
-    private final ArrayOfQuantifiableVariable varsBoundHere;
+    private final ImmutableArray<QuantifiableVariable> varsBoundHere;
 
     BoundedNumericalQuantifierTerm(BoundedNumericalQuantifier op, Term[] subTerm, 
-				   ArrayOfQuantifiableVariable varsBoundHere) {
+				   ImmutableArray<QuantifiableVariable> varsBoundHere) {
         super(op, subTerm);
 	this.varsBoundHere = varsBoundHere;
     }
 
-    public ArrayOfQuantifiableVariable varsBoundHere(int n) {
+    public ImmutableArray<QuantifiableVariable> varsBoundHere(int n) {
 	return n == 2 ? varsBoundHere : EMPTY_VAR_LIST;
     }
 }

@@ -15,14 +15,19 @@ import java.io.StringReader;
 import java.io.StringWriter;
 
 import junit.framework.TestCase;
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Recoder2KeY;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.IUpdateOperator;
+import de.uka.ilkd.key.logic.op.LogicVariable;
+import de.uka.ilkd.key.logic.op.Op;
 import de.uka.ilkd.key.logic.sort.AbstractSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.pp.AbbrevMap;
-import de.uka.ilkd.key.rule.SetAsListOfTaclet;
+import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletForTests;
 import de.uka.ilkd.key.util.DefaultExceptionHandler;
 import de.uka.ilkd.key.util.ExceptionHandlerException;
@@ -168,7 +173,7 @@ public class TestTermParser extends TestCase {
 		 "No file. Call of parser from parser/TestTermParser.java",
 		 new ParserConfig(serv, nss),
 		 new ParserConfig(serv, nss),
-		 null, SetAsListOfTaclet.EMPTY_SET,null).problem();	    
+		 null, DefaultImmutableSet.<Taclet>nil(),null).problem();	    
 	} catch (Exception e) {
 	    StringWriter sw = new StringWriter();
 	    PrintWriter pw = new PrintWriter(sw);
@@ -199,7 +204,7 @@ public class TestTermParser extends TestCase {
 	}
     }
     
-    public SetOfLocationDescriptor parseModifies(String s) {
+    public ImmutableSet<LocationDescriptor> parseModifies(String s) {
     	try {     
             return stringTermParser(s).location_list();
         } catch (Exception e) {
@@ -304,9 +309,9 @@ public class TestTermParser extends TestCase {
 	Term t = parseFma(s);
 	
 	LogicVariable thisx = (LogicVariable) t.varsBoundHere(0)
-	    .getQuantifiableVariable(0);
+	    .get(0);
 	LogicVariable l1 = (LogicVariable) t.sub(0).varsBoundHere(0)
-	    .getQuantifiableVariable(0);
+	    .get(0);
 
 	Term t1 = tf.createQuantifierTerm
 	    (Op.ALL,thisx,
@@ -330,7 +335,7 @@ public class TestTermParser extends TestCase {
 	    Term t = parseTerm(s);
 
 	    LogicVariable thisxs = (LogicVariable) t.varsBoundHere(1)
-		.getQuantifiableVariable(0);
+		.get(0);
 	
 	    Term t1 = tf.createSubstitutionTerm
 		(Op.SUBST,
@@ -352,7 +357,7 @@ public class TestTermParser extends TestCase {
 	Term t = parseFma(s);
 	
 	LogicVariable thisx = (LogicVariable) t.varsBoundHere(0)
-	    .getQuantifiableVariable(0);
+	    .get(0);
 
 	Term t1 = tf.createQuantifierTerm
 	    (Op.EX,thisx,
@@ -606,8 +611,8 @@ public class TestTermParser extends TestCase {
         assertTrue ( "Failed parsing propositional ifEx-then-else term",
                      t.op () == Op.IF_EX_THEN_ELSE
                      && t.sub ( 0 ).op() == Op.EQUALS
-                     && t.sub ( 0 ).sub ( 0 ).op () == t.varsBoundHere ( 0 ).getQuantifiableVariable ( 0 )
-                     && t.sub ( 0 ).sub ( 1 ).op () == t.varsBoundHere ( 0 ).getQuantifiableVariable ( 1 )
+                     && t.sub ( 0 ).sub ( 0 ).op () == t.varsBoundHere ( 0 ).get ( 0 )
+                     && t.sub ( 0 ).sub ( 1 ).op () == t.varsBoundHere ( 0 ).get ( 1 )
                      && t.sub ( 1 ).equals ( parseTerm ( "1=2" ) )
                      && t.sub ( 2 ).equals ( parseTerm ( "2=3" ) ) );
 
@@ -686,7 +691,7 @@ public class TestTermParser extends TestCase {
         r2k.parseSpecialClasses();
         r2k.readCompilationUnit("class ZMod { static ZMod z; int a; int[] b; }");              
         
-        SetOfLocationDescriptor locs = null;
+        ImmutableSet<LocationDescriptor> locs = null;
         try {
             locs = parseModifies("{\\for ZMod x; x.a@(ZMod), "
                                  + "\\for int i; \\if(0 <= i & i <= 7) ZMod.z.b@(ZMod)[i], "

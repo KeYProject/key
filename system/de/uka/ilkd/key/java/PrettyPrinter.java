@@ -18,6 +18,7 @@ import java.util.LinkedList;
 
 import org.apache.log4j.Logger;
 
+import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.abstraction.ArrayType;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.declaration.*;
@@ -38,7 +39,6 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.metaconstruct.ProgramMetaConstruct;
 import de.uka.ilkd.key.rule.soundness.ProgramSVProxy;
 import de.uka.ilkd.key.util.Debug;
-import de.uka.ilkd.key.java.recoderext.StatementSVWrapper;
 
 /**
    A configurable pretty printer for Java source elements originally from COMPOST.
@@ -184,7 +184,7 @@ public class PrettyPrinter {
     private boolean isPrintingSingleLineComments = false;
 
 
-    protected HashMap indentMap=new HashMap();
+    protected HashMap<SourceElement, Position> indentMap=new HashMap<SourceElement, Position>();
 
     /**
        Set a new stream to write to. Useful to redirect the output
@@ -458,7 +458,7 @@ public class PrettyPrinter {
     }
 
     /**
-       Write a complete ArrayOfProgramElement.
+       Write a complete ArrayOf<ProgramElement>.
     */
     protected void writeArrayOfProgramElement(int firstLF,
                                         int levelChange,
@@ -466,26 +466,26 @@ public class PrettyPrinter {
                                         String separationSymbol,
                                         int separationLF,
                                         int separationBlanks,
-                                        ArrayOfProgramElement list)
+                                        ImmutableArray<? extends ProgramElement> list)
         throws IOException {
         int s = list.size();
         if (s == 0) {
             return;
         }
         writeElement(firstLF, levelChange, firstBlanks,
-                            list.getProgramElement(0));
+                            list.get(0));
         for (int i = 1; i < s; i += 1) {
             write(separationSymbol);
             writeElement(separationLF, separationBlanks,
-                                list.getProgramElement(i));
+                                list.get(i));
         }
     }
 
     /**
-       Write a complete ArrayOfProgramElement using "Keyword" style.
+       Write a complete ArrayOf<ProgramElement> using "Keyword" style.
     */
     protected void writeKeywordList(int firstLF, int levelChange, int firstBlanks, 
-				    ArrayOfProgramElement list) throws IOException {
+				    ImmutableArray<? extends ProgramElement> list) throws IOException {
         writeArrayOfProgramElement(firstLF, levelChange, firstBlanks, "", 0, 1, list);
     }
 
@@ -494,15 +494,15 @@ public class PrettyPrinter {
        @param list a program element list.
        @exception IOException occasionally thrown.
     */
-    protected void writeKeywordList(ArrayOfProgramElement list) throws IOException {
+    protected void writeKeywordList(ImmutableArray<? extends ProgramElement> list) throws IOException {
         writeArrayOfProgramElement(0, 0, 0, "", 0, 1, list);
     }
 
     /**
-       Write a complete ArrayOfProgramElement using "Comma" style.
+       Write a complete ArrayOf<ProgramElement> using "Comma" style.
     */
     protected void writeCommaList(int firstLF, int levelChange, int firstBlanks, 
-				  ArrayOfProgramElement list) throws IOException {
+				  ImmutableArray<? extends ProgramElement> list) throws IOException {
         writeArrayOfProgramElement(firstLF, levelChange, 
 				   firstBlanks, ",", 0, 1, list);
     }
@@ -512,7 +512,7 @@ public class PrettyPrinter {
        @param list a program element list.
        @exception IOException occasionally thrown.
     */
-    protected void writeCommaList(int separationBlanks, ArrayOfProgramElement list)
+    protected void writeCommaList(int separationBlanks, ImmutableArray<? extends ProgramElement> list)
         throws IOException {
         writeArrayOfProgramElement(0, 0, 0, ",", 0, separationBlanks, list);
     }
@@ -522,15 +522,15 @@ public class PrettyPrinter {
        @param list a program element list.
        @exception IOException occasionally thrown.
     */
-    protected void writeCommaList(ArrayOfProgramElement list) throws IOException {
+    protected void writeCommaList(ImmutableArray<? extends ProgramElement> list) throws IOException {
         writeArrayOfProgramElement(0, 0, 0, ",", 0, 1, list);
     }
 
     /**
-       Write a complete ArrayOfProgramElement using "Line" style.
+       Write a complete ArrayOf<ProgramElement> using "Line" style.
     */
     protected void writeLineList(int firstLF, int levelChange, int firstBlanks, 
-				 ArrayOfProgramElement list) throws IOException {
+				 ImmutableArray<? extends ProgramElement> list) throws IOException {
         writeArrayOfProgramElement(firstLF, levelChange, firstBlanks, "", 1, 0, list);
     }
 
@@ -539,15 +539,15 @@ public class PrettyPrinter {
        @param list a program element list.
        @exception IOException occasionally thrown.
     */
-    protected void writeLineList(ArrayOfProgramElement list) throws IOException {
+    protected void writeLineList(ImmutableArray<? extends ProgramElement> list) throws IOException {
         writeArrayOfProgramElement(0, 0, 0, "", 1, 0, list);
     }
 
     /**
-       Write a complete ArrayOfProgramElement using "Block" style.
+       Write a complete ArrayOf<ProgramElement> using "Block" style.
     */
     protected void writeBlockList(int firstLF, int levelChange, int firstBlanks, 
-				  ArrayOfProgramElement list) throws IOException {
+				  ImmutableArray<? extends ProgramElement> list) throws IOException {
         writeArrayOfProgramElement(firstLF, levelChange, firstBlanks, "", 2, 0, list);
     }
 
@@ -556,7 +556,7 @@ public class PrettyPrinter {
        @param list a program element list.
        @exception IOException occasionally thrown.
     */
-    protected void writeBlockList(ArrayOfProgramElement list) throws IOException {
+    protected void writeBlockList(ImmutableArray<? extends ProgramElement> list) throws IOException {
         writeArrayOfProgramElement(0, 0, 0, "", 2, 0, list);
     }
 
@@ -783,7 +783,7 @@ public class PrettyPrinter {
         markStart(0,x);
 
 
-        ArrayOfExpression children = x.getArguments();
+        ImmutableArray<Expression> children = x.getArguments();
         if (children != null) {
 //          boolean addParentheses = x.isToBeParenthesized();
 //          if (addParentheses) {
@@ -802,22 +802,22 @@ public class PrettyPrinter {
             switch (x.getArity()) {
             case 2:
                 noLinefeed=true;
-                writeElement(0, children.getExpression(0));
+                writeElement(0, children.get(0));
                 writeToken(0, symbol, x);
                 output();
-                writeElement(0, children.getExpression(1));
+                writeElement(0, children.get(1));
                 break;
             case 1:
                 switch (x.getNotation()) {
                 case Operator.PREFIX:
                     noLinefeed = true;
                     writeToken(symbol, x);
-                    writeElement(0, children.getExpression(0));
+                    writeElement(0, children.get(0));
                     output();
                     break;
                 case Operator.POSTFIX:
                     noLinefeed = true;
-                    writeElement(0, children.getExpression(0));
+                    writeElement(0, children.get(0));
                     writeToken(1, symbol, x);
                     break;
                 default:
@@ -1156,7 +1156,7 @@ public class PrettyPrinter {
             m = x.getModifiers().size();
         }
         if (m > 0) {
-	    ArrayOfModifier mods = x.getModifiers();
+	    ImmutableArray<Modifier> mods = x.getModifiers();
 	    if(fileWriterMode){
 		mods = replacePrivateByPublic(mods);
 	    }
@@ -1192,9 +1192,9 @@ public class PrettyPrinter {
 	}
     }
 
-    private boolean containsDefaultConstructor(ArrayOfMemberDeclaration members){
+    private boolean containsDefaultConstructor(ImmutableArray<MemberDeclaration> members){
 	for(int i=0; i<members.size(); i++){
-	    MemberDeclaration md = members.getMemberDeclaration(i);
+	    MemberDeclaration md = members.get(i);
 	    if(md instanceof ProgramMethod){
 		md = ((ProgramMethod) md).getMethodDeclaration();
 	    }
@@ -1234,52 +1234,51 @@ public class PrettyPrinter {
         printFooter(x);
     }
 
-    private ArrayOfModifier removeFinal(ArrayOfModifier ma){
-	LinkedList l = new LinkedList();
-	for(int i=0; i<ma.size(); i++){
-	    if(!(ma.getModifier(i) instanceof Final)){
-		l.add(ma.getModifier(i));
+    private ImmutableArray<Modifier> removeFinal(ImmutableArray<Modifier> ma){
+	LinkedList<Modifier> l = new LinkedList<Modifier>();
+	for (Modifier mod : ma){
+	    if (!(mod instanceof Final)) {
+		l.add(mod);
 	    }
 	}
-	return new ArrayOfModifier(l);
+	return new ImmutableArray<Modifier>(l);
     }
 
-    private ArrayOfModifier replacePrivateByPublic(ArrayOfModifier ma){
-	LinkedList l = new LinkedList();
+    private ImmutableArray<Modifier> replacePrivateByPublic(ImmutableArray<Modifier> ma){
+	LinkedList<Modifier> l = new LinkedList<Modifier>();
 	boolean publicFound = false;
 	for(int i=0; i<ma.size(); i++){
-	    if(ma.getModifier(i) instanceof Private){
+	    if(ma.get(i) instanceof Private){
 		l.add(new Public());
 		publicFound = true;
-	    }else if(ma.getModifier(i) instanceof Public){
-		l.add(ma.getModifier(i));
+	    }else if(ma.get(i) instanceof Public){
+		l.add(ma.get(i));
 		publicFound = true;
-	    }else if(ma.getModifier(i) instanceof Protected){
+	    }else if(ma.get(i) instanceof Protected){
 		l.add(new Public());
 		publicFound = true;
 	    }else{
-		l.add(ma.getModifier(i));
+		l.add(ma.get(i));
 	    }
 	}
 	if(!publicFound){
 	    l.add(new Public());
 	}
-	return new ArrayOfModifier(l);
+	return new ImmutableArray<Modifier>(l);
     }
 
     public void printFieldDeclaration(FieldDeclaration x) throws java.io.IOException {
-	if(!fileWriterMode || !((ProgramVariable) x.getVariables().
-				lastVariableSpecification().
+	if(!fileWriterMode || !((ProgramVariable) x.getVariables().last().
 				getProgramVariable()).isImplicit()){
 	    printHeader(x);
 	    int m = 0;
 	    if (x.getModifiers() != null) {
-		ArrayOfModifier mods = x.getModifiers();
+		ImmutableArray<Modifier> mods = x.getModifiers();
 		m = mods.size();
 		if(fileWriterMode && x.isFinal() && 
 		        (!x.isStatic() ||
 		                !(x.getVariables().
-		                        getVariableSpecification(0).
+		                        get(0).
 		                        getProgramVariable() instanceof ProgramConstant))) {
 		    m--;
 		    mods = removeFinal(mods);
@@ -1287,7 +1286,7 @@ public class PrettyPrinter {
 		writeKeywordList(mods);
 	    }
 	    writeElement((m > 0) ? 1 : 0, x.getTypeReference());
-	    final ArrayOfVariableSpecification varSpecs = x.getVariables();
+	    final ImmutableArray<? extends VariableSpecification> varSpecs = x.getVariables();
 	    assert varSpecs != null : "Strange: a field declaration without a" +
                         " variable specification";
 	    writeCommaList(0, 0, 1, varSpecs);	    
@@ -1298,7 +1297,7 @@ public class PrettyPrinter {
 	    if (fileWriterMode) {
 	        for (int i=0; i < varSpecs.size(); i++){
 	            VariableSpecification varSpec = 
-	                varSpecs.getVariableSpecification(i);
+	                varSpecs.get(i);
 	            ProgramVariable pv = 
 	                (ProgramVariable) varSpec.getProgramVariable();
 	            if(!(x.isFinal() && x.isStatic() && 
@@ -1352,7 +1351,7 @@ public class PrettyPrinter {
         }
         writeElement((m > 0) ? 1 : 0, x.getTypeReference());
 	write(" ");
-        ArrayOfVariableSpecification varSpecs = x.getVariables();
+        ImmutableArray<VariableSpecification> varSpecs = x.getVariables();
 	boolean wasNoSemicolons = noSemicolons;
 	boolean wasNoLinefeed   = noLinefeed;
 	noSemicolons = true;
@@ -1387,7 +1386,7 @@ public class PrettyPrinter {
         }
         writeElement((m > 0) ? 1 : 0, x.getTypeReference());
 	write(" ");
-        ArrayOfVariableSpecification varSpecs = x.getVariables();
+        ImmutableArray<? extends VariableSpecification> varSpecs = x.getVariables();
         if (varSpecs != null) {
             writeCommaList(0, 0, 1, varSpecs);
         }
@@ -1408,7 +1407,7 @@ public class PrettyPrinter {
 		printComment(c[i]);
 	    }
 	    if (x.getModifiers() != null) {
-		ArrayOfModifier mods = x.getModifiers();
+		ImmutableArray<Modifier> mods = x.getModifiers();
 		if((x instanceof ConstructorDeclaration) && 
 		   fileWriterMode){
 		    mods = replacePrivateByPublic(mods);
@@ -1638,9 +1637,9 @@ public class PrettyPrinter {
         noLinefeed = true;
         noSemicolons = true;
 
-        ArrayOfLoopInitializer initializers = x.getInitializers();
+        ImmutableArray<LoopInitializer> initializers = x.getInitializers();
         if(initializers != null) {
-            LoopInitializer loopInit = initializers.getLoopInitializer(0);
+            LoopInitializer loopInit = initializers.get(0);
             writeElement(1, loopInit);
         }
         
@@ -2088,9 +2087,9 @@ public class PrettyPrinter {
         noLinefeed=true;
         
         write("#set ");
-        writeElement(0, x.getArguments().getExpression(0));
+        writeElement(0, x.getArguments().get(0));
         writeToken(0, " = ", x);
-        writeElement(0, x.getArguments().getExpression(1));
+        writeElement(0, x.getArguments().get(1));
         output();
         
         noSemicolons = wasNoSemicolons;
@@ -2207,11 +2206,11 @@ public class PrettyPrinter {
             if (addParentheses) {
                 write("(");
             }
-            writeElement(0, x.getArguments().getExpression(0));
+            writeElement(0, x.getArguments().get(0));
             write(" ?");
-            writeElement(1, x.getArguments().getExpression(1));
+            writeElement(1, x.getArguments().get(1));
             write(" :");
-            writeElement(1, x.getArguments().getExpression(2));
+            writeElement(1, x.getArguments().get(2));
             if (addParentheses) {
                 write(")");
             }
@@ -2274,7 +2273,7 @@ public class PrettyPrinter {
         if (x.getArguments() != null) {
             for (; i < x.getArguments().size(); i += 1) {
                 write("[");
-                writeElement(x.getArguments().getExpression(i));
+                writeElement(x.getArguments().get(i));
                 write("]");
             }
         }
@@ -2384,7 +2383,7 @@ public class PrettyPrinter {
         }
         write(")");
         if (x.getArguments() != null) {
-            writeElement(0, x.getArguments().getExpression(0));
+            writeElement(0, x.getArguments().get(0));
         }
         if (addParentheses) {
             write(")");
@@ -2475,7 +2474,7 @@ public class PrettyPrinter {
             int s = x.getDimensionExpressions().size();
             for (int i = 0; i < s; i += 1) {
                 write("[");
-                writeElement(x.getDimensionExpressions().getExpression(i));
+                writeElement(x.getDimensionExpressions().get(i));
                 write("]");
             }
         }
@@ -2731,8 +2730,8 @@ public class PrettyPrinter {
     			//Debug.assertTrue(o instanceof ProgramElement);
     			if (o instanceof ProgramElement) {
     				((ProgramElement)o).prettyPrint(this);
-    			} else if (o instanceof ArrayOfProgramElement) {
-    				writeBlockList((ArrayOfProgramElement)o);
+    			} else if (o instanceof ImmutableArray/*<ProgramElement>*/) {
+    				writeBlockList((ImmutableArray<ProgramElement>)o);
     			} else {
     				logger.warn("No PrettyPrinting available for " + o.getClass().getName());
     			}
@@ -2781,7 +2780,7 @@ public class PrettyPrinter {
 
         writeToken("(", x);
         if (x.getArguments() != null) {
-            writeElement(x.getArguments().getExpression(0));
+            writeElement(x.getArguments().get(0));
         }
         write(")");
 	output();
@@ -2826,7 +2825,7 @@ public class PrettyPrinter {
 
         writeToken("@(", x);
         if (x.getArguments() != null) {
-            writeElement(x.getArguments().getExpression(0));
+            writeElement(x.getArguments().get(0));
         }
         write(")");
 	output();

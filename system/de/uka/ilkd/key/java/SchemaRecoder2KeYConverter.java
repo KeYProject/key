@@ -10,7 +10,7 @@ package de.uka.ilkd.key.java;
 import java.util.List;
 
 import recoder.list.generic.ASTList;
-
+import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
@@ -18,54 +18,15 @@ import de.uka.ilkd.key.java.declaration.Modifier;
 import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.recoderext.ProgramVariableSVWrapper;
 import de.uka.ilkd.key.java.recoderext.TypeSVWrapper;
-import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.java.reference.IExecutionContext;
-import de.uka.ilkd.key.java.reference.MethodName;
-import de.uka.ilkd.key.java.reference.MethodReference;
-import de.uka.ilkd.key.java.reference.PackageReference;
-import de.uka.ilkd.key.java.reference.ReferencePrefix;
-import de.uka.ilkd.key.java.reference.SchemaTypeReference;
-import de.uka.ilkd.key.java.reference.SchematicFieldReference;
-import de.uka.ilkd.key.java.reference.SuperReference;
-import de.uka.ilkd.key.java.reference.ThisReference;
-import de.uka.ilkd.key.java.reference.TypeReference;
-import de.uka.ilkd.key.java.statement.EnhancedFor;
-import de.uka.ilkd.key.java.statement.For;
-import de.uka.ilkd.key.java.statement.IForUpdates;
-import de.uka.ilkd.key.java.statement.IGuard;
-import de.uka.ilkd.key.java.statement.ILoopInit;
-import de.uka.ilkd.key.java.statement.LabeledStatement;
-import de.uka.ilkd.key.java.statement.LoopStatement;
-import de.uka.ilkd.key.java.statement.MethodBodyStatement;
-import de.uka.ilkd.key.java.statement.MethodFrame;
+import de.uka.ilkd.key.java.reference.*;
+import de.uka.ilkd.key.java.statement.*;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
-import de.uka.ilkd.key.rule.metaconstruct.ArrayLength;
-import de.uka.ilkd.key.rule.metaconstruct.ArrayPostDecl;
-import de.uka.ilkd.key.rule.metaconstruct.ConstructorCall;
-import de.uka.ilkd.key.rule.metaconstruct.CreateObject;
-import de.uka.ilkd.key.rule.metaconstruct.DoBreak;
-import de.uka.ilkd.key.rule.metaconstruct.EnhancedForElimination;
-import de.uka.ilkd.key.rule.metaconstruct.EvaluateArgs;
-import de.uka.ilkd.key.rule.metaconstruct.ExpandMethodBody;
-import de.uka.ilkd.key.rule.metaconstruct.ForToWhile;
-import de.uka.ilkd.key.rule.metaconstruct.InitArrayCreation;
-import de.uka.ilkd.key.rule.metaconstruct.IsStatic;
-import de.uka.ilkd.key.rule.metaconstruct.MethodCall;
-import de.uka.ilkd.key.rule.metaconstruct.MethodCallContract;
-import de.uka.ilkd.key.rule.metaconstruct.MultipleVarDecl;
-import de.uka.ilkd.key.rule.metaconstruct.PostWork;
-import de.uka.ilkd.key.rule.metaconstruct.ProgramMetaConstruct;
-import de.uka.ilkd.key.rule.metaconstruct.SpecialConstructorCall;
-import de.uka.ilkd.key.rule.metaconstruct.StaticInitialisation;
-import de.uka.ilkd.key.rule.metaconstruct.SwitchToIf;
-import de.uka.ilkd.key.rule.metaconstruct.TypeOf;
-import de.uka.ilkd.key.rule.metaconstruct.Unpack;
-import de.uka.ilkd.key.rule.metaconstruct.UnwindLoop;
+import de.uka.ilkd.key.rule.metaconstruct.*;
 import de.uka.ilkd.key.util.ExtList;
 
 /**
@@ -118,6 +79,10 @@ public class SchemaRecoder2KeYConverter extends Recoder2KeYConverter {
         } else if ("#unwind-loop".equals(mcName)) {
             final ProgramSV[] labels = mc.getSV();
             return new UnwindLoop(labels[0], labels[1], (LoopStatement) list
+                    .get(LoopStatement.class));
+        } else if ("#unwind-loop-bounded".equals(mcName)) { //chrisg
+            final ProgramSV[] labels = mc.getSV();
+            return new UnwindLoopBounded(labels[0], labels[1], (LoopStatement) list
                     .get(LoopStatement.class));
         } else if ("#unpack".equals(mcName)) {
             return new Unpack((For) list.get(For.class));
@@ -501,7 +466,7 @@ public class SchemaRecoder2KeYConverter extends Recoder2KeYConverter {
             keyArgs[i] = (Expression) callConvert(recoderArgs.get(i));
         }
 
-        return new MethodReference(new ArrayOfExpression(keyArgs), name, prefix);
+        return new MethodReference(new ImmutableArray<Expression>(keyArgs), name, prefix);
     }
 
     /**

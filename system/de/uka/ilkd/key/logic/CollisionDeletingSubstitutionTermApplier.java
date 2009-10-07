@@ -12,9 +12,16 @@
 
 package de.uka.ilkd.key.logic;
 
+import java.util.Iterator;
 import java.util.Stack;
 
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.collection.ImmutableArray;
+import de.uka.ilkd.key.collection.ImmutableMapEntry;
+import de.uka.ilkd.key.collection.ImmutableMap;
+import de.uka.ilkd.key.collection.DefaultImmutableMap;
+import de.uka.ilkd.key.logic.op.LogicVariable;
+import de.uka.ilkd.key.logic.op.Op;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 
 
 /**
@@ -65,24 +72,24 @@ public class CollisionDeletingSubstitutionTermApplier extends Visitor {
 
     public void visit(Term visited) {
 	// Sort equality has to be ensured before calling this method
-	MapFromLogicVariableToTerm substToApply;
+	ImmutableMap<LogicVariable,Term> substToApply;
 	Term resultTerm;
 
 	if (visited.op()==Op.SUBST) {
 	    // get completely processed childs ...
 	    Term[] neededsubs=neededSubs(visited.arity());
-	    substToApply = MapAsListFromLogicVariableToTerm.EMPTY_MAP;
+	    substToApply = DefaultImmutableMap.<LogicVariable,Term>nilMap();
 	    // Replace substVar 'x'  by 'KS(s)' if the
 	    // SubstitutionTerm has the form {x s} t 
 	    // and leave other variables unchanged ...
 	    substToApply =
 		substToApply.put((LogicVariable)visited.varsBoundHere(1)
-				 .getQuantifiableVariable(0),
+				 .get(0),
 				 neededsubs[0]); 
-	    IteratorOfEntryOfLogicVariableAndTerm it = 
+	    Iterator<ImmutableMapEntry<LogicVariable,Term>> it = 
 		substToApply.entryIterator();
 	    while (it.hasNext()) {
-		EntryOfLogicVariableAndTerm substitution = it.next();
+		ImmutableMapEntry<LogicVariable,Term> substitution = it.next();
 		ClashFreeSubst cfSubst = 
 		    new ClashFreeSubst(substitution.key(),
 				       substitution.value());
@@ -95,8 +102,8 @@ public class CollisionDeletingSubstitutionTermApplier extends Visitor {
 	    }  
 	} else {	 
 	    Term[] neededsubs=neededSubs(visited.arity());
-	    final ArrayOfQuantifiableVariable[] boundVars = 
-	        new ArrayOfQuantifiableVariable[neededsubs.length];
+	    final ImmutableArray<QuantifiableVariable>[] boundVars = 
+	        new ImmutableArray[neededsubs.length];
 	    for (int i = 0; i<visited.arity(); i++) {
 	        boundVars[i] = visited.varsBoundHere(i);
 	    }

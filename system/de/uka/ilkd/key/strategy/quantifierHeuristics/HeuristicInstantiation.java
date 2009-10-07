@@ -16,7 +16,8 @@
 //
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
-import de.uka.ilkd.key.logic.IteratorOfTerm;
+import java.util.Iterator;
+
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -37,7 +38,7 @@ public class HeuristicInstantiation implements TermGenerator {
     
     private HeuristicInstantiation() {}
     
-    public IteratorOfTerm generate(RuleApp app,
+    public Iterator<Term> generate(RuleApp app,
                                    PosInOccurrence pos,
                                    Goal goal) {
         assert pos != null : "Feature is only applicable to rules with find";
@@ -46,13 +47,13 @@ public class HeuristicInstantiation implements TermGenerator {
         final Instantiation ia = Instantiation.create ( qf, goal.sequent(), 
                 goal.proof().getServices() );
         final QuantifiableVariable var =
-            qf.varsBoundHere ( 0 ).lastQuantifiableVariable ();
-        return new Iterator ( ia.getSubstitution ().iterator (), var );
+            qf.varsBoundHere ( 0 ).last ();
+        return new HIIterator ( ia.getSubstitution ().iterator (), var );
     }
 
 
-    private class Iterator implements IteratorOfTerm {
-        private final IteratorOfTerm       instances;
+    private class HIIterator implements Iterator<Term> {
+        private final Iterator<Term>       instances;
 
         private final QuantifiableVariable quantifiedVar;
 
@@ -61,7 +62,7 @@ public class HeuristicInstantiation implements TermGenerator {
 
         private Term                       nextInst = null;
 
-        private Iterator(IteratorOfTerm it, QuantifiableVariable var) {
+        private HIIterator(Iterator<Term> it, QuantifiableVariable var) {
             this.instances = it;
             this.quantifiedVar = var;
             quantifiedVarSort = quantifiedVar.sort ();

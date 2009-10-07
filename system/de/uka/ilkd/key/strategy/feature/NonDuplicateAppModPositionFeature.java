@@ -10,11 +10,12 @@
 
 package de.uka.ilkd.key.strategy.feature;
 
+import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.rule.ListOfUpdatePair;
 import de.uka.ilkd.key.rule.TacletApp;
+import de.uka.ilkd.key.rule.UpdatePair;
 
 /**
  * Binary feature that returns zero iff a certain Taclet app has not already
@@ -39,9 +40,9 @@ public class NonDuplicateAppModPositionFeature extends NonDuplicateAppFeature {
         final Term oldFocus = oldPio.subTerm ();
         if ( !newFocus.equals ( oldFocus ) ) return false;
         if ( newFocus.isRigid () ) return true;
-        final ListOfUpdatePair oldUpdateContext =
+        final ImmutableList<UpdatePair> oldUpdateContext =
             oldApp.instantiations ().getUpdateContext ();
-        final ListOfUpdatePair newUpdateContext =
+        final ImmutableList<UpdatePair> newUpdateContext =
             newApp.instantiations ().getUpdateContext ();
         return oldUpdateContext.equals ( newUpdateContext );
     }

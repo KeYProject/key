@@ -44,14 +44,14 @@ public class TestSyntacticalReplaceVisitor extends TestCase {
 	rw=((RewriteTacletGoalTemplate)taclet.goalTemplates().head())
 	    .replaceWith();
 	SchemaVariable u=(SchemaVariable)rw.varsBoundHere(0)
-	    .getQuantifiableVariable(0);
+	    .get(0);
 
 	SchemaVariable b=(SchemaVariable)rw.sub(0).sub(0).op();
 
 	SchemaVariable c=(SchemaVariable)rw.sub(0).sub(1).sub(1).op();
 
 	SchemaVariable v=(SchemaVariable)rw.sub(0).sub(1)
-	    .varsBoundHere(1).getQuantifiableVariable(0);
+	    .varsBoundHere(1).get(0);
 
 	Sort s=((SortedSchemaVariable)u).sort();
 

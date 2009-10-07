@@ -10,9 +10,10 @@
 
 package de.uka.ilkd.key.rule.updatesimplifier;
 
+import de.uka.ilkd.key.collection.ImmutableArray;
+import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermFactory;
-import de.uka.ilkd.key.logic.op.ArrayOfQuantifiableVariable;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 
 
@@ -21,7 +22,7 @@ class IfExCascadeEntryBuilder extends GuardSimplifier {
     private Term thenBranch;
     
     public IfExCascadeEntryBuilder (final Term condition,
-                           final ArrayOfQuantifiableVariable minimizedVars,
+                           final ImmutableArray<QuantifiableVariable> minimizedVars,
                            final Term thenBranch) {
         super ( condition, minimizedVars );
         this.thenBranch = thenBranch;
@@ -44,8 +45,7 @@ class IfExCascadeEntryBuilder extends GuardSimplifier {
         } else if ( isUnsatisfiableGuard() ) {
             return elseBranch;
         } else if ( bindsVariables() ) {
-            final ArrayOfQuantifiableVariable vars =
-                new ArrayOfQuantifiableVariable ( getMinimizedVars().toArray () );
+	    final ImmutableArray<QuantifiableVariable> vars = getMinimizedVars();
             return TermFactory.DEFAULT.createIfExThenElseTerm ( vars,
                                                                 getCondition(),
                                                                 thenBranch,

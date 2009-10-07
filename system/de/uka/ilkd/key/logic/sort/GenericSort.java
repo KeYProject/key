@@ -10,6 +10,10 @@
 
 package de.uka.ilkd.key.logic.sort;
 
+import java.util.Iterator;
+
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.logic.Name;
 
 /**
@@ -37,16 +41,16 @@ public class GenericSort extends AbstractNonCollectionSort
      * - if "oneOf" is not empty, the instantiation must be an element
          of "oneOf"
      */
-    private static final SetOfSort EMPTY_SORT_SET 
-	= SetAsListOfSort.EMPTY_SET;
+    private static final ImmutableSet<Sort> EMPTY_SORT_SET 
+	= DefaultImmutableSet.<Sort>nil();
 
     /** direct supersorts */
-    SetOfSort        ext        = EMPTY_SORT_SET;
+    ImmutableSet<Sort>        ext        = EMPTY_SORT_SET;
     /**
      * list of sorts this generic sort may be instantiated with;
      * EMPTY_SORT_SORT means that every sort may be used
      */
-    SetOfSort        oneOf      = EMPTY_SORT_SET;
+    ImmutableSet<Sort>        oneOf      = EMPTY_SORT_SET;
 
     /**
      * creates a generic sort (with a new equality symbol for this
@@ -64,8 +68,8 @@ public class GenericSort extends AbstractNonCollectionSort
      */
     public GenericSort( 
             Name             name,
-            SetOfSort        ext,
-	    SetOfSort        oneOf)
+            ImmutableSet<Sort>        ext,
+	    ImmutableSet<Sort>        oneOf)
 	throws GenericSupersortException {
 	
         this ( name );
@@ -76,7 +80,7 @@ public class GenericSort extends AbstractNonCollectionSort
 
     private void checkSupersorts ()
 	throws GenericSupersortException {
-	IteratorOfSort it = extendsSorts ().iterator ();
+	Iterator<Sort> it = extendsSorts ().iterator ();
 	Sort           s, t;
 	while ( it.hasNext () ) {
 	    s = it.next ();
@@ -96,14 +100,14 @@ public class GenericSort extends AbstractNonCollectionSort
     /**
      * @return direct supersorts
      */
-    public SetOfSort extendsSorts () {
+    public ImmutableSet<Sort> extendsSorts () {
 	return ext;
     }
 
     /**
      * @return possible instantiations or "EMPTY_SORT_SET"
      */
-    public SetOfSort getOneOf () {
+    public ImmutableSet<Sort> getOneOf () {
 	return oneOf;
     }
 
@@ -127,7 +131,7 @@ public class GenericSort extends AbstractNonCollectionSort
      * supersort of this sort
      */
     protected boolean checkNonGenericSupersorts ( Sort p_s ) {
-	IteratorOfSort it = ext.iterator ();
+	Iterator<Sort> it = ext.iterator ();
 	Sort           ss;
 
 	while ( it.hasNext () ) {

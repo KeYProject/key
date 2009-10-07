@@ -10,12 +10,12 @@
 
 package de.uka.ilkd.key.strategy;
 
+import java.util.Iterator;
 import java.util.List;
 
-import de.uka.ilkd.key.logic.IteratorOfNamed;
-import de.uka.ilkd.key.logic.ListOfNamed;
-import de.uka.ilkd.key.logic.ListOfTerm;
+import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.strategy.feature.*;
@@ -128,12 +128,12 @@ public class DebuggerStrategy extends VBTStrategy {
 
         // FIXME: do not add it for each rule set add it as sum feature
 
-        final ListOfNamed h = nss.ruleSets().allElements();
+        final ImmutableList<Named> h = nss.ruleSets().allElements();
 
         final Feature inUpdateFeature = InUpdateFeature.create(
                 isSplittingAllowed, inUpdateAndAssumes, inInitPhase);
 
-        final IteratorOfNamed it = h.iterator();
+        final Iterator<Named> it = h.iterator();
         while (it.hasNext()) {
             final String ruleSetName = it.next().name().toString();
             bindRuleSet(d, ruleSetName, ifZero(inUpdateFeature, inftyConst(),

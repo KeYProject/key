@@ -19,6 +19,7 @@ package de.uka.ilkd.key.logic;
 
 import java.util.Stack;
 
+import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.recoderext.JVMIsTransientMethodBuilder;
 import de.uka.ilkd.key.logic.op.*;
@@ -101,7 +102,7 @@ public class ShadowReplaceVisitor extends Visitor{
 			
 	Term[] neededsubs = neededSubs(visited.arity());
 
-        final ArrayOfQuantifiableVariable[] boundVars;
+        final ImmutableArray<QuantifiableVariable>[] boundVars;
 
 	if (changed || (!subStack.empty() && 
 			subStack.peek() == newMarker)) {
@@ -129,7 +130,7 @@ public class ShadowReplaceVisitor extends Visitor{
 		    System.arraycopy(neededsubs, 0, newsubs, 0, neededsubs.length);
 		    newsubs[neededsubs.length] = transactionCounter;
 		    neededsubs = newsubs;
-		    boundVars =  new ArrayOfQuantifiableVariable[neededsubs.length + 1];
+		    boundVars =  new ImmutableArray[neededsubs.length + 1];
 		    for (int i = 0; i<visited.arity(); i++) {
 		        boundVars[i] = visited.varsBoundHere(i);
 		    }
@@ -152,10 +153,10 @@ public class ShadowReplaceVisitor extends Visitor{
 	
     }
 
-    private ArrayOfQuantifiableVariable[] extractBoundVars(Term visited,
+    private ImmutableArray<QuantifiableVariable>[] extractBoundVars(Term visited,
             Term[] neededsubs) {
-        final ArrayOfQuantifiableVariable[] boundVars;
-        boundVars =  new ArrayOfQuantifiableVariable[neededsubs.length];
+        final ImmutableArray<QuantifiableVariable>[] boundVars;
+        boundVars =  new ImmutableArray[neededsubs.length];
         for (int i = 0; i<visited.arity(); i++) {
             boundVars[i] = visited.varsBoundHere(i);
         }

@@ -10,6 +10,9 @@
 
 package de.uka.ilkd.key.proof;
 
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
+
 /** Encapsulates information describing changes to a proof tree, and
  * used to notify proof tree listeners of the change.  
  */
@@ -19,7 +22,7 @@ public class ProofTreeEvent {
     private Proof source;
     private Node  node;
     private Goal  goal;
-    private ListOfGoal goals = SLListOfGoal.EMPTY_LIST;
+    private ImmutableList<Goal> goals = ImmutableSLList.<Goal>nil();
     
     /** Create ProofTreeEvent for an event that happens at 
      * the specified node. */
@@ -46,7 +49,7 @@ public class ProofTreeEvent {
     /** Create ProofTreeEvent for the event that affects the goals
      * given in the list.
      */
-    public ProofTreeEvent(Proof source, ListOfGoal goals) {
+    public ProofTreeEvent(Proof source, ImmutableList<Goal> goals) {
 	this.source = source;
 	this.goals = goals;
     }
@@ -63,7 +66,7 @@ public class ProofTreeEvent {
 	return goal;
     }
 
-    public ListOfGoal getGoals() {
+    public ImmutableList<Goal> getGoals() {
 	return goals;
     }
     

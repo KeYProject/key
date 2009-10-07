@@ -11,6 +11,9 @@
 
 package de.uka.ilkd.key.logic;
 
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
+
 /**
  * Records the changes made to a semisequent. Keeps track of added and
  * removed formula to the semisequents. 
@@ -18,19 +21,19 @@ package de.uka.ilkd.key.logic;
 public class SemisequentChangeInfo implements java.io.Serializable {
     
     /** contains the added formulas to the semisequent */
-    private ListOfConstrainedFormula added   = SLListOfConstrainedFormula.EMPTY_LIST;
+    private ImmutableList<ConstrainedFormula> added   = ImmutableSLList.<ConstrainedFormula>nil();
     /** contains the removed formulas from the semisequent */
-    private ListOfConstrainedFormula removed = SLListOfConstrainedFormula.EMPTY_LIST;
+    private ImmutableList<ConstrainedFormula> removed = ImmutableSLList.<ConstrainedFormula>nil();
     /** contains the modified formulas from the semisequent */
-    private ListOfFormulaChangeInfo modified = SLListOfFormulaChangeInfo.EMPTY_LIST;
+    private ImmutableList<FormulaChangeInfo> modified = ImmutableSLList.<FormulaChangeInfo>nil();
     /** stores the redundance free formula list of the semisequent */
-    private ListOfConstrainedFormula modifiedSemisequent =
-	SLListOfConstrainedFormula.EMPTY_LIST; 
+    private ImmutableList<ConstrainedFormula> modifiedSemisequent =
+	ImmutableSLList.<ConstrainedFormula>nil(); 
     /**
      * contains formulas that have been tried to add, but which have been rejected due to
      * already existing formulas in the sequent subsuming these formulas 
      */
-    public ListOfConstrainedFormula rejected = SLListOfConstrainedFormula.EMPTY_LIST; 
+    public ImmutableList<ConstrainedFormula> rejected = ImmutableSLList.<ConstrainedFormula>nil(); 
     
     /** */
     private int lastFormulaIndex = -1;
@@ -42,7 +45,7 @@ public class SemisequentChangeInfo implements java.io.Serializable {
     public SemisequentChangeInfo() {
     }
 
-    public SemisequentChangeInfo(ListOfConstrainedFormula formulas) {
+    public SemisequentChangeInfo(ImmutableList<ConstrainedFormula> formulas) {
       this.modifiedSemisequent = formulas;
     }
 
@@ -59,14 +62,14 @@ public class SemisequentChangeInfo implements java.io.Serializable {
      * sets the list of constrained formula containing all formulas of
      * the semisequent after the operation
      */
-    public void setFormulaList(ListOfConstrainedFormula list) {
+    public void setFormulaList(ImmutableList<ConstrainedFormula> list) {
 	modifiedSemisequent = list;
     }
 
     /**
      * returns the list of constrained formula of the new semisequent
      */
-    public ListOfConstrainedFormula getFormulaList() {
+    public ImmutableList<ConstrainedFormula> getFormulaList() {
 	return modifiedSemisequent;
     }
     
@@ -93,17 +96,17 @@ public class SemisequentChangeInfo implements java.io.Serializable {
 
     /** 
      * returns the list of all added constrained formulas
-     * @return ListOfConstrainedFormula added to the semisequent
+     * @return IList<ConstrainedFormula> added to the semisequent
      */
-    public ListOfConstrainedFormula addedFormulas() {
+    public ImmutableList<ConstrainedFormula> addedFormulas() {
 	return added;
     }
 
     /** 
      * returns the list of all removed constrained formulas
-     * @return ListOfConstrainedFormula removed from the semisequent
+     * @return IList<ConstrainedFormula> removed from the semisequent
      */
-    public ListOfConstrainedFormula removedFormulas() {
+    public ImmutableList<ConstrainedFormula> removedFormulas() {
 	return removed;
     }
     
@@ -112,7 +115,7 @@ public class SemisequentChangeInfo implements java.io.Serializable {
      * the semisequent but got rejected as they were redundant
      * @return list of formulas rejected due to redundancy
      */
-    public ListOfConstrainedFormula rejectedFormulas() {
+    public ImmutableList<ConstrainedFormula> rejectedFormulas() {
         return this.rejected;
     }
     
@@ -129,10 +132,10 @@ public class SemisequentChangeInfo implements java.io.Serializable {
 
     /** 
      * returns the list of all modification positions
-     * @return ListOfConstrainedFormula modified within the
+     * @return IList<ConstrainedFormula> modified within the
      * semisequent
      */
-    public ListOfFormulaChangeInfo modifiedFormulas() {
+    public ImmutableList<FormulaChangeInfo> modifiedFormulas() {
 	return modified;
     }    
 

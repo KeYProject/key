@@ -11,11 +11,11 @@
 
 package de.uka.ilkd.key.logic.sort.oclsort;
 
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Op;
-import de.uka.ilkd.key.logic.sort.SetAsListOfSort;
-import de.uka.ilkd.key.logic.sort.SetOfSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 
 public class OclGenericSort implements OclSort {
@@ -38,8 +38,8 @@ public class OclGenericSort implements OclSort {
      * undesired results when dealing with arraysorts! 
      * @return the sorts of the predecessors of this sort
      */
-    public SetOfSort extendsSorts() {
-	return SetAsListOfSort.EMPTY_SET;
+    public ImmutableSet<Sort> extendsSorts() {
+	return DefaultImmutableSet.<Sort>nil();
     }
 
     /**

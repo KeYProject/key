@@ -9,12 +9,14 @@
 //
 package de.uka.ilkd.key.java.statement;
 
-import de.uka.ilkd.key.java.ArrayOfLoopInitializer;
+import de.uka.ilkd.key.collection.ImmutableArray;
+import de.uka.ilkd.key.java.LoopInitializer;
+import de.uka.ilkd.key.java.TerminalProgramElement;
 
-public interface ILoopInit extends de.uka.ilkd.key.java.TerminalProgramElement {
+public interface ILoopInit extends TerminalProgramElement {
 
     int size();
 
-    ArrayOfLoopInitializer getInits();
+    ImmutableArray<LoopInitializer> getInits();
 
 }

@@ -7,6 +7,9 @@
 // See LICENSE.TXT for details.
 package de.uka.ilkd.key.logic;
 
+import java.util.Iterator;
+
+import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.expression.literal.IntLiteral;
 import de.uka.ilkd.key.logic.ldt.IntegerLDT;
@@ -98,9 +101,9 @@ public class TermBuilder {
         return result;
     }
     
-    public Term and(ListOfTerm subTerms) {
+    public Term and(ImmutableList<Term> subTerms) {
 	Term result = tt();
-	IteratorOfTerm it = subTerms.iterator();
+	Iterator<Term> it = subTerms.iterator();
 	while(it.hasNext()) {
 	    result = and(result, it.next());
 	}
@@ -120,9 +123,9 @@ public class TermBuilder {
         return result;
     }
     
-    public Term or(ListOfTerm subTerms) {
+    public Term or(ImmutableList<Term> subTerms) {
 	Term result = ff();
-	IteratorOfTerm it = subTerms.iterator();
+	Iterator<Term> it = subTerms.iterator();
 	while(it.hasNext()) {
 	    result = or(result, it.next());
 	}
@@ -173,14 +176,12 @@ public class TermBuilder {
         return tf.createFunctionTerm(integerLDT.getLessOrEquals(), t1, t2);
     }    
     
-    public Term zero(Services services) {
-        final IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();
-        return integerLDT.translateLiteral(new IntLiteral(0));        
+    public Term zero(Services services) {       
+        return services.getTypeConverter().getIntegerLDT().zero();        
     }
 
-    public Term one(Services services) {
-        final IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();
-        return integerLDT.translateLiteral(new IntLiteral(1));        
+    public Term one(Services services) {       
+        return services.getTypeConverter().getIntegerLDT().one();        
     }
     
     public Term NULL(Services services) {
