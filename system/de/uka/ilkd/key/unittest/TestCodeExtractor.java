@@ -27,6 +27,7 @@ import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.unittest.AssGenFac.AssignmentGenerator;
 import de.uka.ilkd.key.visualization.ExecutionTraceModel;
 import de.uka.ilkd.key.visualization.TraceElement;
 
@@ -36,10 +37,12 @@ import de.uka.ilkd.key.visualization.TraceElement;
  */
 public class TestCodeExtractor {
 
-    // private Term modTerm;
-    private Services serv;
+    private final ExecutionTraceModel tr;
+    private final Services serv;
 
-    private ExecutionTraceModel tr;
+    private final Namespace pvn;
+
+    private final AssignmentGenerator ag;
 
     private Statement[] testCode = null;
 
@@ -61,15 +64,14 @@ public class TestCodeExtractor {
 
     private Namespace newPVs = new Namespace();
 
-    private Namespace pvn;
-
     private NRFLHandler nrflHan;
 
-    public TestCodeExtractor(ExecutionTraceModel tr, Services serv,
-	    Namespace pvn) {
+    public TestCodeExtractor(final ExecutionTraceModel tr, final Services serv,
+	    final Namespace pvn, final AssignmentGenerator ag) {
 	this.tr = tr;
 	this.serv = serv;
 	this.pvn = pvn;
+	this.ag = ag;
     }
 
     // MAYBE OBSOLETE
@@ -106,7 +108,7 @@ public class TestCodeExtractor {
 	nrflHan = new NRFLHandler(serv, this, trace.getPosOfModality());
 
 	Term current = nrflHan.getResult();
-	ImmutableList<Statement> statements = ImmutableSLList.<Statement>nil();
+	ImmutableList<Statement> statements = ImmutableSLList.<Statement> nil();
 	// TODO: Resolve data dependencies in simultaneous updates.
 	while (current.op() instanceof IUpdateOperator) {
 	    statements = statements.append(getAssignments(current));
@@ -126,21 +128,21 @@ public class TestCodeExtractor {
     /**
      * Collects variables not explicitely declared in the IUT.
      */
-    private void collectUndeclaredVariables(StatementBlock sb) {
-	JavaASTCollector coll = new JavaASTCollector(sb, ProgramVariable.class);
+    private void collectUndeclaredVariables(final StatementBlock stb) {
+	JavaASTCollector coll = new JavaASTCollector(stb, ProgramVariable.class);
 	coll.start();
 	ImmutableList<ProgramElement> l = coll.getNodes();
 	Iterator<ProgramElement> it = l.iterator();
 	while (it.hasNext()) {
-	    ProgramVariable pv = (ProgramVariable) it.next();
+	    final ProgramVariable pv = (ProgramVariable) it.next();
 	    if (pvn.lookup(pv.name()) == pv) {
 		newPVs.add(pv);
 	    }
 	}
-	coll = new JavaASTCollector(sb, LocalVariableDeclaration.class);
+	coll = new JavaASTCollector(stb, LocalVariableDeclaration.class);
 	coll.start();
 	l = coll.getNodes();
-	coll = new JavaASTCollector(sb, ParameterDeclaration.class); // chrisg:14.5.2009;
+	coll = new JavaASTCollector(stb, ParameterDeclaration.class); // chrisg:14.5.2009;
 	// The
 	// argument
 	// in the
@@ -174,16 +176,16 @@ public class TestCodeExtractor {
 	ImmutableList<Named> lon = newPVs.allElements();
 	while (it.hasNext()) {
 	    ImmutableArray<VariableSpecification> vars = null;
-	    Object pvDecl = it.next();
+	    final Object pvDecl = it.next();
 	    if (pvDecl instanceof LocalVariableDeclaration) {
-		LocalVariableDeclaration lvd = (LocalVariableDeclaration) pvDecl;
+		final LocalVariableDeclaration lvd = (LocalVariableDeclaration) pvDecl;
 		vars = lvd.getVariables();
 	    } else if (pvDecl instanceof ParameterDeclaration) {
-		ParameterDeclaration pd = (ParameterDeclaration) pvDecl;
+		final ParameterDeclaration pd = (ParameterDeclaration) pvDecl;
 		vars = pd.getVariables();
 	    }
 	    for (int i = 0; i < vars.size(); i++) {
-		IProgramVariable pv = vars.get(i).getProgramVariable();
+		final IProgramVariable pv = vars.get(i).getProgramVariable();
 		if (pvn.lookup(pv.name()) == pv) {
 		    lon = lon.removeAll(pv);
 		}
@@ -203,21 +205,21 @@ public class TestCodeExtractor {
 	return new HashSet<Statement>();
     }
 
-    private HashSet<Statement> getStatements(StatementBlock sbl) {
-	HashSet<Statement> result = new HashSet<Statement>();
+    private HashSet<Statement> getStatements(final StatementBlock sbl) {
+	final HashSet<Statement> result = new HashSet<Statement>();
 	for (int i = 0; i < sbl.getChildCount(); i++) {
-	    Statement s = sbl.getStatementAt(i);
+	    final Statement s = sbl.getStatementAt(i);
 	    if (s instanceof StatementBlock) {
 		result.addAll(getStatements((StatementBlock) s));
 	    } else if (s instanceof MethodBodyStatement) {
-		JavaASTCollector coll = new JavaASTCollector(
-			((MethodBodyStatement) s).getBody(serv),
-			Statement.class);
+		final JavaASTCollector coll = new JavaASTCollector(
+		        ((MethodBodyStatement) s).getBody(serv),
+		        Statement.class);
 		coll.start();
-		ImmutableList<ProgramElement> l = coll.getNodes();
-		Iterator<ProgramElement> it = l.iterator();
+		final ImmutableList<ProgramElement> l = coll.getNodes();
+		final Iterator<ProgramElement> it = l.iterator();
 		while (it.hasNext()) {
-		    Statement next = (Statement) it.next();
+		    final Statement next = (Statement) it.next();
 		    if (!(next instanceof StatementContainer)) {
 			result.add(next);
 		    }
@@ -229,33 +231,34 @@ public class TestCodeExtractor {
 	return result;
     }
 
-    public Node getNodeForCodeExtraction(ExecutionTraceModel tr) {
-	Node node = tr.getFirstTraceElement().node();
+    public Node getNodeForCodeExtraction(final ExecutionTraceModel etr) {
+	Node node = etr.getFirstTraceElement().node();
 	while (!node.root()) {
 	    node = node.parent();
 	}
 	while (node.childrenCount() == 1
-		&& node != tr.getFirstTraceElement().node()) {
+	        && node != etr.getFirstTraceElement().node()) {
 	    node = node.child(0);
 	}
 	return node;
     }
 
-    private ImmutableList<Statement> flatten(StatementBlock sb) {
-	ImmutableList<Statement> result = ImmutableSLList.<Statement>nil();
-	for (int i = 0; i < sb.getStatementCount(); i++) {
+    private ImmutableList<Statement> flatten(final StatementBlock stb) {
+	ImmutableList<Statement> result = ImmutableSLList.<Statement> nil();
+	for (int i = 0; i < stb.getStatementCount(); i++) {
 	    if (fileName == null) {
-		fileName = sb.getStatementAt(i).getPositionInfo().getFileName();
+		fileName = stb.getStatementAt(i).getPositionInfo()
+		        .getFileName();
 	    }
-	    if (sb.getStatementAt(i) instanceof StatementBlock) {
-		result = result.append(flatten((StatementBlock) sb
-			.getStatementAt(i)));
-	    } else if (sb.getStatementAt(i) instanceof MethodBodyStatement) {
+	    if (stb.getStatementAt(i) instanceof StatementBlock) {
+		result = result.append(flatten((StatementBlock) stb
+		        .getStatementAt(i)));
+	    } else if (stb.getStatementAt(i) instanceof MethodBodyStatement) {
 		result = result
-			.append(convertMBSToMethodCall((MethodBodyStatement) sb
-				.getStatementAt(i)));
+		        .append(convertMBSToMethodCall((MethodBodyStatement) stb
+		                .getStatementAt(i)));
 	    } else {
-		result = result.append(sb.getStatementAt(i));
+		result = result.append(stb.getStatementAt(i));
 	    }
 	}
 	return result;
@@ -285,9 +288,9 @@ public class TestCodeExtractor {
     /**
      * Transforms updates into assignment expressions.
      */
-    private ImmutableList<Statement> getAssignments(Term t) {
-	ImmutableList<Statement> result = ImmutableSLList.<Statement>nil();
-	IUpdateOperator uop = (IUpdateOperator) t.op();
+    private ImmutableList<Statement> getAssignments(final Term t) {
+	ImmutableList<Statement> result = ImmutableSLList.<Statement> nil();
+	final IUpdateOperator uop = (IUpdateOperator) t.op();
 	Term currLoc;
 	for (int i = 0; i < uop.locationCount(); i++) {
 	    currLoc = uop.location(t, i);
@@ -297,8 +300,7 @@ public class TestCodeExtractor {
 		Expression l, r;
 		l = convertToProgramElement(currLoc);
 		r = convertToProgramElement(uop.value(t, i));
-		result = result.append(TestGenerator
-			.assignmentOrSet(l, r, serv));
+		result = result.append(ag.assignmentOrSet(l, r, serv));
 	    }
 	}
 	return result;
@@ -314,33 +316,35 @@ public class TestCodeExtractor {
      * constants and those found in the IUT.
      */
     public ImmutableSet<ProgramVariable> getNewProgramVariables() {
-	ImmutableSet<ProgramVariable> result = DefaultImmutableSet.<ProgramVariable>nil();
-	Iterator<Named> it = newPVs.allElements().iterator();
+	ImmutableSet<ProgramVariable> result = DefaultImmutableSet
+	        .<ProgramVariable> nil();
+	final Iterator<Named> it = newPVs.allElements().iterator();
 	while (it.hasNext()) {
 	    result = result.add((ProgramVariable) it.next());
 	}
 	return result;
     }
 
-    private Statement convertMBSToMethodCall(MethodBodyStatement mbs) {
+    private Statement convertMBSToMethodCall(final MethodBodyStatement mbs) {
 	methodName = mbs.getProgramMethod(serv).getMethodDeclaration()
-		.getName();
-	String sortName = mbs.getProgramMethod(serv).getContainerType()
-		.getSort().name().toString();
+	        .getName();
+	final String sortName = mbs.getProgramMethod(serv).getContainerType()
+	        .getSort().name().toString();
 	fileName = sortName.substring(sortName.lastIndexOf(".") + 1, sortName
-		.length());
+	        .length());
 	// if(sortName.lastIndexOf(".")!=-1){
 	// packageName = sortName.substring(0, sortName.lastIndexOf("."));
 	// }
-	MethodReference mr = new MethodReference(mbs.getArguments(),
-		new ProgramElementName(mbs.getProgramMethod(serv).getName()),
-		mbs.getProgramMethod(serv).isStatic() ? new TypeRef(mbs
-			.getProgramMethod(serv).getContainerType()) : mbs
-			.getDesignatedContext());
+	final MethodReference mr = new MethodReference(mbs.getArguments(),
+	        new ProgramElementName(mbs.getProgramMethod(serv).getName()),
+	        mbs.getProgramMethod(serv).isStatic() ? new TypeRef(mbs
+	                .getProgramMethod(serv).getContainerType()) : mbs
+	                .getDesignatedContext());
 	context = mbs.getProgramMethod(serv).getContainerType()
-		.createPackagePrefix();
+	        .createPackagePrefix();
 	if (mbs.getResultVariable() != null) {
-	    ProgramVariable rv = (ProgramVariable) mbs.getResultVariable();
+	    final ProgramVariable rv = (ProgramVariable) mbs
+		    .getResultVariable();
 	    newPVs.add(rv);
 	    return new CopyAssignment(rv, mr);
 	} else {

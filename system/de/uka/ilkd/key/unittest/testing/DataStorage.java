@@ -46,7 +46,7 @@ public class DataStorage {
 
     private TestGenerator tg;
 
-    private ProgramVariable[] pvs2;
+    private ImmutableSet<ProgramVariable> pvs2;
 
     private final ArrayList<Expression[][]> testDat = new ArrayList<Expression[][]>();
 
@@ -56,11 +56,11 @@ public class DataStorage {
 	return pms;
     }
 
-    public void setPms(ImmutableSet<ProgramMethod> pms) {
+    public void setPms(final ImmutableSet<ProgramMethod> pms) {
 	this.pms = pms;
     }
 
-    public void addETM(ExecutionTraceModel[] etm) {
+    public void addETM(final ExecutionTraceModel[] etm) {
 	allETM.add(etm);
     }
 
@@ -72,7 +72,7 @@ public class DataStorage {
 	return nodeCount;
     }
 
-    public void setNodeCount(int nodeCount) {
+    public void setNodeCount(final int nodeCount) {
 	this.nodeCount = nodeCount;
     }
 
@@ -80,7 +80,7 @@ public class DataStorage {
 	return code;
     }
 
-    public void setCode(Statement[] code) {
+    public void setCode(final Statement[] code) {
 	this.code = code;
     }
 
@@ -88,7 +88,7 @@ public class DataStorage {
 	return oracle;
     }
 
-    public void setOracle(Term oracle) {
+    public void setOracle(final Term oracle) {
 	this.oracle = oracle;
     }
 
@@ -96,7 +96,7 @@ public class DataStorage {
 	return mgs;
     }
 
-    public void setMgs(LinkedList<ModelGenerator> mgs) {
+    public void setMgs(final LinkedList<ModelGenerator> mgs) {
 	this.mgs = mgs;
     }
 
@@ -104,7 +104,7 @@ public class DataStorage {
 	return pvs;
     }
 
-    public void setPvs(ImmutableSet<ProgramVariable> pvs) {
+    public void setPvs(final ImmutableSet<ProgramVariable> pvs) {
 	this.pvs = pvs;
     }
 
@@ -112,23 +112,23 @@ public class DataStorage {
 	return tg;
     }
 
-    public void setTg(TestGenerator tg) {
+    public void setTg(final TestGenerator tg) {
 	this.tg = tg;
     }
 
-    public ProgramVariable[] getPvs2() {
+    public ImmutableSet<ProgramVariable> getPvs2() {
 	return pvs2;
     }
 
-    public void setPvs2(ProgramVariable[] pvs2) {
-	this.pvs2 = pvs2;
+    public void setPvs2(final ImmutableSet<ProgramVariable> reducedPVSet) {
+	this.pvs2 = reducedPVSet;
     }
 
-    public void addTestDat(Expression[][] tDat) {
+    public void addTestDat(final Expression[][] tDat) {
 	testDat.add(tDat);
     }
 
-    public void addTestLoc(Expression[][] tLoc) {
+    public void addTestLoc(final Expression[][] tLoc) {
 	testLoc.add(tLoc);
     }
 

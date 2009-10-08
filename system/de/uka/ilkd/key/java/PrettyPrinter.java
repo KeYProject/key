@@ -19,7 +19,6 @@ import java.util.LinkedList;
 import org.apache.log4j.Logger;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
-import de.uka.ilkd.key.java.abstraction.ArrayType;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.declaration.*;
 import de.uka.ilkd.key.java.declaration.modifier.Final;
@@ -67,8 +66,8 @@ public class PrettyPrinter {
     protected StringBuffer outBuf;
     protected boolean noLinefeed=false;
     protected boolean noSemicolons=false;
-    /**Enforces the output of real Java syntax that can be compiled. See also {@link de.uka.ilkd.key.unittest.ppAndJavaASTExtension.CompilableJavaPP}*/
-    protected boolean fileWriterMode=false; 
+    /**Enforces the output of real Java syntax that can be compiled. See also {@link de.uka.ilkd.key.unittest.ppAndJavaASTExtension.CompilableJavaCardPP}*/
+     
     protected Type classToPrint = null;
 
     protected int firstStatementStart = -1;
@@ -85,12 +84,6 @@ public class PrettyPrinter {
 	outBuf = new StringBuffer();
     }
 
-    public PrettyPrinter(Writer o, boolean noLinefeed, 
-			 boolean fileWriterMode) {
-	this(o, noLinefeed);
-	this.fileWriterMode = fileWriterMode;
-    }
-    
     public PrettyPrinter(Writer o, SVInstantiations svi) {
     	this(o);
     	this.instantiations = svi;
@@ -858,17 +851,13 @@ public class PrettyPrinter {
     }
 
     public void printProgramVariable(ProgramVariable x)
-	throws java.io.IOException {
-	
-        printHeader(x);
-        writeInternalIndentation(x);
-	if(fileWriterMode){
-	    write(x.name().toString().substring(x.name().toString().
-						lastIndexOf(":")+1));
-	}else{
-	    write(x.name().toString());
-	}
-        printFooter(x);
+	    throws java.io.IOException {
+
+	printHeader(x);
+	writeInternalIndentation(x);
+
+	write(x.name().toString());
+	printFooter(x);
     }
     
     public void printProgramMethod(ProgramMethod x)
@@ -931,15 +920,7 @@ public class PrettyPrinter {
     public void printStringLiteral(StringLiteral x) throws java.io.IOException {
         printHeader(x);
         writeInternalIndentation(x);
-	if(fileWriterMode && 
-	   !encodeUnicodeChars(x.getValue()).startsWith("\"")){
-	    write("\"");
-	}
         write(encodeUnicodeChars(x.getValue()));
-	if(fileWriterMode && 
-	   !encodeUnicodeChars(x.getValue()).startsWith("\"")){ 
-	    write("\"");
-	}
         printFooter(x);
     }
 
@@ -1147,9 +1128,6 @@ public class PrettyPrinter {
 
     public void printClassDeclaration(ClassDeclaration x) 
 	throws java.io.IOException {
-	if(fileWriterMode){
-	    classToPrint = x;
-	}
         printHeader(x);
         int m = 0;
         if (x.getModifiers() != null) {
@@ -1157,9 +1135,6 @@ public class PrettyPrinter {
         }
         if (m > 0) {
 	    ImmutableArray<Modifier> mods = x.getModifiers();
-	    if(fileWriterMode){
-		mods = replacePrivateByPublic(mods);
-	    }
             writeKeywordList(mods);
             m = 1;
         }
@@ -1180,19 +1155,13 @@ public class PrettyPrinter {
         }
         if (x.getMembers() != null) {
 //	    services.getJavaInfo().getKeYProgModelInfo().getConstructors(kjt)
-	    if(fileWriterMode && !containsDefaultConstructor(x.getMembers())){
-		write("\n   public "+x.getProgramElementName()+"(){}\n");
-	    }
             writeBlockList(2, 1, 0, x.getMembers());
         }
         writeSymbol(1, (x.getMembers() != null) ? -1 : 0, "}");
         printFooter(x);
-	if(fileWriterMode){
-	    classToPrint = null;
-	}
     }
 
-    private boolean containsDefaultConstructor(ImmutableArray<MemberDeclaration> members){
+    protected boolean containsDefaultConstructor(ImmutableArray<MemberDeclaration> members){
 	for(int i=0; i<members.size(); i++){
 	    MemberDeclaration md = members.get(i);
 	    if(md instanceof ProgramMethod){
@@ -1234,7 +1203,7 @@ public class PrettyPrinter {
         printFooter(x);
     }
 
-    private ImmutableArray<Modifier> removeFinal(ImmutableArray<Modifier> ma){
+    protected ImmutableArray<Modifier> removeFinal(ImmutableArray<Modifier> ma){
 	LinkedList<Modifier> l = new LinkedList<Modifier>();
 	for (Modifier mod : ma){
 	    if (!(mod instanceof Final)) {
@@ -1244,7 +1213,7 @@ public class PrettyPrinter {
 	return new ImmutableArray<Modifier>(l);
     }
 
-    private ImmutableArray<Modifier> replacePrivateByPublic(ImmutableArray<Modifier> ma){
+    protected ImmutableArray<Modifier> replacePrivateByPublic(ImmutableArray<Modifier> ma){
 	LinkedList<Modifier> l = new LinkedList<Modifier>();
 	boolean publicFound = false;
 	for(int i=0; i<ma.size(); i++){
@@ -1267,71 +1236,24 @@ public class PrettyPrinter {
 	return new ImmutableArray<Modifier>(l);
     }
 
-    public void printFieldDeclaration(FieldDeclaration x) throws java.io.IOException {
-	if(!fileWriterMode || !((ProgramVariable) x.getVariables().last().
-				getProgramVariable()).isImplicit()){
-	    printHeader(x);
-	    int m = 0;
-	    if (x.getModifiers() != null) {
-		ImmutableArray<Modifier> mods = x.getModifiers();
-		m = mods.size();
-		if(fileWriterMode && x.isFinal() && 
-		        (!x.isStatic() ||
-		                !(x.getVariables().
-		                        get(0).
-		                        getProgramVariable() instanceof ProgramConstant))) {
-		    m--;
-		    mods = removeFinal(mods);
-		}
-		writeKeywordList(mods);
-	    }
-	    writeElement((m > 0) ? 1 : 0, x.getTypeReference());
-	    final ImmutableArray<? extends VariableSpecification> varSpecs = x.getVariables();
-	    assert varSpecs != null : "Strange: a field declaration without a" +
-                        " variable specification";
-	    writeCommaList(0, 0, 1, varSpecs);	    
-	    write(";");
-	    printFooter(x);
-	    // provides a set method for each field. Necessary for unittest
-	    // generation. 
-	    if (fileWriterMode) {
-	        for (int i=0; i < varSpecs.size(); i++){
-	            VariableSpecification varSpec = 
-	                varSpecs.get(i);
-	            ProgramVariable pv = 
-	                (ProgramVariable) varSpec.getProgramVariable();
-	            if(!(x.isFinal() && x.isStatic() && 
-	                    pv instanceof ProgramConstant)){
-	                final String pvName = 
-	                    pv.getProgramElementName().getProgramName();			
-	                String typeName;
-	                final Type javaType = pv.getKeYJavaType().getJavaType();
-	                if (javaType instanceof ArrayType) {
-	                    typeName = ((ArrayType)javaType).getAlternativeNameRepresentation();
-	                } else {
-	                    typeName = javaType.getFullName();
-	                }
-
-	                String typeNameNoBrackets = 
-	                    getTypeNameForAccessMethods(
-	                            pv.getKeYJavaType().getName());
-	                printHeader(x);
-	                write("\n\npublic "+(x.isStatic() ? "static " : "")+
-	                        "void _set"+pvName+typeNameNoBrackets+"("+typeName+" _"+pvName
-	                        +"){\n");
-	                write("    "+pvName+" = _"+pvName+";\n");
-	                write("}");
-	                write("\n\npublic "+(x.isStatic() ? "static " : "")+
-	                        typeName+" _"+pvName+
-	                        typeNameNoBrackets+
-	                "(){\n");
-	                write("    return "+pvName+";\n");
-	                write("}");
-	                printFooter(x);
-	            }
-	        }
-	    }
+    public void printFieldDeclaration(FieldDeclaration x)
+	    throws java.io.IOException {
+	printHeader(x);
+	int m = 0;
+	if (x.getModifiers() != null) {
+	    ImmutableArray<Modifier> mods = x.getModifiers();
+	    m = mods.size();
+	    writeKeywordList(mods);
 	}
+	writeElement((m > 0) ? 1 : 0, x.getTypeReference());
+	final ImmutableArray<? extends VariableSpecification> varSpecs = x
+	        .getVariables();
+	assert varSpecs != null : "Strange: a field declaration without a"
+	        + " variable specification";
+	writeCommaList(0, 0, 1, varSpecs);
+	write(";");
+	printFooter(x);
+
     }
 
     public static String getTypeNameForAccessMethods(String typeName){
@@ -1397,57 +1319,51 @@ public class PrettyPrinter {
         printFooter(x);
     }
 
-    public void printMethodDeclaration(MethodDeclaration x) 
-	throws java.io.IOException {
-	if(!fileWriterMode || x.getFullName().indexOf("<")==-1){
-	    printHeader(x);
-	    Comment[] c = x.getComments();
-	    int m = c.length;
-	    for(int i=0; i<c.length; i++){
-		printComment(c[i]);
-	    }
-	    if (x.getModifiers() != null) {
-		ImmutableArray<Modifier> mods = x.getModifiers();
-		if((x instanceof ConstructorDeclaration) && 
-		   fileWriterMode){
-		    mods = replacePrivateByPublic(mods);
-		}
-		m += mods.size();
-		writeKeywordList(mods);
-	    }
-	    if (x.getTypeReference() != null) {
-		if (m > 0) {
-		    writeElement(1, x.getTypeReference());
-		} else {
-		    writeElement(x.getTypeReference());
-		}
-		writeElement(1, x.getProgramElementName());
-	    }else if (x.getTypeReference() == null && 
-		      !(x instanceof ConstructorDeclaration)) {
-		write(" void ");
-		writeElement(1, x.getProgramElementName());
-	    } else {
-		if (m > 0) {
-		    writeElement(1, x.getProgramElementName());
-		} else {
-		    writeElement(x.getProgramElementName());
-		}
-	    }
-	    write(" (");
-	    if (x.getParameters() != null) {
-		writeCommaList(1, x.getParameters());
-	    }
-	    write(")");
-	    if (x.getThrown() != null) {
-		writeElement(1, x.getThrown());
-	    }
-	    if (x.getBody() != null) {
-		writeElement(1, x.getBody());
-	    } else {
-		write(";");
-	    }
-	    printFooter(x);
+    public void printMethodDeclaration(MethodDeclaration x)
+	    throws java.io.IOException {
+	printHeader(x);
+	Comment[] c = x.getComments();
+	int m = c.length;
+	for (int i = 0; i < c.length; i++) {
+	    printComment(c[i]);
 	}
+	if (x.getModifiers() != null) {
+	    ImmutableArray<Modifier> mods = x.getModifiers();
+	    m += mods.size();
+	    writeKeywordList(mods);
+	}
+	if (x.getTypeReference() != null) {
+	    if (m > 0) {
+		writeElement(1, x.getTypeReference());
+	    } else {
+		writeElement(x.getTypeReference());
+	    }
+	    writeElement(1, x.getProgramElementName());
+	} else if (x.getTypeReference() == null
+	        && !(x instanceof ConstructorDeclaration)) {
+	    write(" void ");
+	    writeElement(1, x.getProgramElementName());
+	} else {
+	    if (m > 0) {
+		writeElement(1, x.getProgramElementName());
+	    } else {
+		writeElement(x.getProgramElementName());
+	    }
+	}
+	write(" (");
+	if (x.getParameters() != null) {
+	    writeCommaList(1, x.getParameters());
+	}
+	write(")");
+	if (x.getThrown() != null) {
+	    writeElement(1, x.getThrown());
+	}
+	if (x.getBody() != null) {
+	    writeElement(1, x.getBody());
+	} else {
+	    write(";");
+	}
+	printFooter(x);
     }
 
     public void printClassInitializer(ClassInitializer x) 
@@ -1918,40 +1834,38 @@ public class PrettyPrinter {
 
     }
 
-    public void printMethodBodyStatement(MethodBodyStatement x) 
-	throws java.io.IOException {
+    public void printMethodBodyStatement(MethodBodyStatement x)
+	    throws java.io.IOException {
 
-	boolean wasNoLinefeed   = noLinefeed;
-	noLinefeed   = false;
-        
-        printHeader(x);
-        writeInternalIndentation(x);
-	markStart(0,x);
+	boolean wasNoLinefeed = noLinefeed;
+	noLinefeed = false;
+
+	printHeader(x);
+	writeInternalIndentation(x);
+	markStart(0, x);
 
 	IProgramVariable pvar = x.getResultVariable();
 	if (pvar != null) {
 	    writeElement(pvar);
 	    write("=");
-	} 
+	}
 
-        printMethodReference(x.getMethodReference(), false);
-//CHG:
-    if(!fileWriterMode){
-        write("@");
+	printMethodReference(x.getMethodReference(), false);
+	// CHG:
+	write("@");
 	final TypeReference tr = x.getBodySourceAsTypeReference();
-        if (tr instanceof SchemaTypeReference) {
-            printSchemaTypeReference((SchemaTypeReference)tr);
-        } else if (tr instanceof SchemaVariable) {
-            printSchemaVariable((SchemaVariable)tr);
-        } else {
-            printTypeReference(tr);
-        }
-    }
-        write(";");
-	markEnd(0,x);
-        printFooter(x);
+	if (tr instanceof SchemaTypeReference) {
+	    printSchemaTypeReference((SchemaTypeReference) tr);
+	} else if (tr instanceof SchemaVariable) {
+	    printSchemaVariable((SchemaVariable) tr);
+	} else {
+	    printTypeReference(tr);
+	}
+	write(";");
+	markEnd(0, x);
+	printFooter(x);
 
-	noLinefeed   = wasNoLinefeed;
+	noLinefeed = wasNoLinefeed;
     }
 
 
@@ -2499,7 +2413,7 @@ public class PrettyPrinter {
     }
 
 
-    private void printMethodReference(MethodReference x,
+    protected void printMethodReference(MethodReference x,
             boolean withSemicolon) 
 	throws java.io.IOException {      
 	printHeader(x);       
@@ -2762,17 +2676,7 @@ public class PrettyPrinter {
     }
 
     public void printComment(Comment x) throws java.io.IOException {
-	if(fileWriterMode){
-	    write("\n");
-	    if(x.getText().startsWith("/*")){
-		write(x.getText());
-		if(x.getText().indexOf("*/")==-1){
-		    write("*/");
-		}
-	    }else{
-		write("/*"+x.getText()+"*/");
-	    }
-	}
+	write("/*" + x.getText() + "*/");
     }
 
     public void printParenthesizedExpression(ParenthesizedExpression x) 

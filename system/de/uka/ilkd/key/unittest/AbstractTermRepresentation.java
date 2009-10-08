@@ -43,16 +43,17 @@ public abstract class AbstractTermRepresentation {
     protected final Term right;
     protected final Term readRep;
 
-    public AbstractTermRepresentation(AssignmentPair up, Services serv,
-            TestCodeExtractor tce, TermRepHandler trh) {
-        left = up.locationAsTerm();
-        right = up.value();
-        this.up = up;
-        this.serv = serv;
-        this.tce = tce;
-        this.trh = trh;
-        this.tf = TermFactory.DEFAULT;
-        this.readRep = createReadRep();
+    public AbstractTermRepresentation(final AssignmentPair up,
+	    final Services serv, final TestCodeExtractor tce,
+	    final TermRepHandler trh) {
+	left = up.locationAsTerm();
+	right = up.value();
+	this.up = up;
+	this.serv = serv;
+	this.tce = tce;
+	this.trh = trh;
+	this.tf = TermFactory.DEFAULT;
+	this.readRep = createReadRep();
 
     }
 
@@ -66,7 +67,7 @@ public abstract class AbstractTermRepresentation {
      * @return the Representation
      */
     public Term getReadRep() {
-        return readRep;
+	return readRep;
     }
 
     /**
@@ -77,31 +78,32 @@ public abstract class AbstractTermRepresentation {
      */
     public abstract Statement getWriteRep();
 
-    protected ProgramElementName createNewName(Term t) {
-        return new ProgramElementName(cNewName(t));
+    protected ProgramElementName createNewName(final Term t) {
+	return new ProgramElementName(cNewName(t));
     }
 
-    protected ProgramElementName createNewName(String t) {
-        return new ProgramElementName(cNewName(t));
+    protected ProgramElementName createNewName(final String t) {
+	return new ProgramElementName(cNewName(t));
     }
 
-    private String cNewName(String t) {
-        return "_" + t + "_" + TestGenerator.counter++;
+    private String cNewName(final String t) {
+	return "_" + t + "_" + TestGenFac.counter++;
     }
 
-    private String cNewName(Term t) {
-        String result = cNewName(t.op().name().toString());
-        Term sub;
-        for (int i = 0; i < t.arity(); i++) {
-            sub = t.sub(i);
-            if (!(sub.op() instanceof LogicVariable)) {
-                result += createNewName(sub);
-            }
-        }
-        return result;
+    private String cNewName(final Term t) {
+	String result = cNewName(t.op().name().toString());
+	Term sub;
+	for (int i = 0; i < t.arity(); i++) {
+	    sub = t.sub(i);
+	    if (!(sub.op() instanceof LogicVariable)) {
+		result += createNewName(sub);
+	    }
+	}
+	return result;
     }
 
+    @Override
     public String toString() {
-        return up.toString();
+	return up.toString();
     }
 }

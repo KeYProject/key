@@ -7,47 +7,29 @@
 // See LICENSE.TXT for details.
 //
 //
-
 package de.uka.ilkd.key.java.visitor;
 
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.reference.ArrayLengthReference;
 import de.uka.ilkd.key.java.reference.FieldReference;
 import de.uka.ilkd.key.java.reference.MethodReference;
-import de.uka.ilkd.key.java.reference.ReferencePrefix;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.unittest.AccessMethodsManager;
 import de.uka.ilkd.key.util.ExtList;
 
 /**
- * Replaces field references o.a by methodcalls o._a(). This is needed for unit
- * test generation.
+ * @author mbender
+ * 
  */
-public class FieldReplaceVisitor extends CreatingASTVisitor {
+public class ReflFieldReplaceVisitor extends FieldReplaceVisitor {
 
-    private ProgramElement result = null;
+    AccessMethodsManager amm;
 
-    // private KeYJavaType containingKJT=null
-
-    public FieldReplaceVisitor(final ProgramElement pe, final Services services) {
-	super(pe, true, services);
-    }
-
-    /** starts the walker */
-    @Override
-    public void start() {
-	stack.push(new ExtList());
-	walk(root());
-	final ExtList el = stack.peek();
-	int i = 0;
-	while (!(el.get(i) instanceof ProgramElement)) {
-	    i++;
-	}
-	result = (ProgramElement) stack.peek().get(i);
-    }
-
-    public ProgramElement result() {
-	return result;
+    public ReflFieldReplaceVisitor(final ProgramElement pe,
+	    final Services services) {
+	super(pe, services);
+	amm = AccessMethodsManager.getInstance();
     }
 
     @Override
@@ -68,13 +50,8 @@ public class FieldReplaceVisitor extends CreatingASTVisitor {
 		    l.add(changeList.get(0));
 		    addChild(new ArrayLengthReference(l));
 		} else {
-		    String typeName = ((ProgramVariable) x.getChildAt(1))
-			    .getKeYJavaType().getName();
-		    typeName = PrettyPrinter
-			    .getTypeNameForAccessMethods(typeName);
-		    addChild(new MethodReference(new ExtList(),
-			    new ProgramElementName("_" + shortName + typeName),
-			    (ReferencePrefix) changeList.get(0)));
+		    assert x instanceof FieldReference;
+		    addChild(amm.callGetter(x));
 		}
 	    }
 	} else {
@@ -89,4 +66,5 @@ public class FieldReplaceVisitor extends CreatingASTVisitor {
 	}
 	changed();
     }
+
 }

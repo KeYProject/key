@@ -19,14 +19,16 @@ import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.declaration.MethodDeclaration;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.unittest.ModelGenerator;
+import de.uka.ilkd.key.unittest.TestGenFac;
 import de.uka.ilkd.key.unittest.UnitTestBuilder;
 import de.uka.ilkd.key.unittest.simplify.SimplifyModelGenerator;
 
+@SuppressWarnings("serial")
 public class MethodSelectionDialog extends JDialog {
 
-    private UnitTestBuilder testBuilder;
+    private final UnitTestBuilder testBuilder;
 
-    private KeYMediator mediator;
+    private final KeYMediator mediator;
 
     JList methodList;
 
@@ -36,8 +38,11 @@ public class MethodSelectionDialog extends JDialog {
 
     final static String COGENT = "Cogent";
 
-    JComboBox solverChoice = new JComboBox(new String[] { OLD_SIMPLIFY,
+    final JComboBox solverChoice = new JComboBox(new String[] { OLD_SIMPLIFY,
 	    SIMPLIFY, COGENT });
+
+    final JComboBox testGenChoice = new JComboBox(new String[] {
+	    TestGenFac.TG_JAVACARD, TestGenFac.TG_JAVA });
 
     final JCheckBox completeEx = new JCheckBox("Only completely "
 	    + "executed traces");
@@ -48,20 +53,20 @@ public class MethodSelectionDialog extends JDialog {
 
     private StringBuffer latestTests = new StringBuffer();
 
-    private MethodSelectionDialog(KeYMediator mediator) {
+    private MethodSelectionDialog(final KeYMediator mediator) {
 	super(mediator.mainFrame(), "Method selection dialog");
 	this.mediator = mediator;
 	testBuilder = new UnitTestBuilder(mediator.getServices(), mediator
-		.getProof());
+	        .getProof());
 	simplifyDataTupleNumber = new JTextField(""
-		+ SimplifyModelGenerator.modelLimit, 2);
+	        + SimplifyModelGenerator.modelLimit, 2);
 	layoutMethodSelectionDialog();
 	pack();
 	setLocation(70, 70);
 	setVisible(true);
     }
 
-    public static MethodSelectionDialog getInstance(KeYMediator mediator) {
+    public static MethodSelectionDialog getInstance(final KeYMediator mediator) {
 	if (instance != null) {
 	    instance.setVisible(false);
 	    instance.dispose();
@@ -83,9 +88,15 @@ public class MethodSelectionDialog extends JDialog {
 		    "Unhandled case in MethodSelecitonDialog.");
 	}
 	instance.completeEx
-		.setSelected(UnitTestBuilder.requireCompleteExecution);
+	        .setSelected(UnitTestBuilder.requireCompleteExecution);
 	instance.simplifyDataTupleNumber.setText(Integer
-		.toString(SimplifyModelGenerator.modelLimit));
+	        .toString(SimplifyModelGenerator.modelLimit));
+	assert (TestGenFac.testGen == TestGenFac.TG_JAVACARD || TestGenFac.testGen == TestGenFac.TG_JAVA) : "Unhandled case in MethodSelectionDialog.";
+	if (TestGenFac.testGen == TestGenFac.TG_JAVACARD) {
+	    instance.testGenChoice.setSelectedItem(TestGenFac.TG_JAVACARD);
+	} else {
+	    instance.testGenChoice.setSelectedItem(TestGenFac.TG_JAVA);
+	}
 	return instance;
     }
 
@@ -93,14 +104,14 @@ public class MethodSelectionDialog extends JDialog {
 	return latestTests;
     }
 
-    public void setLatestTests(StringBuffer latest) {
+    public void setLatestTests(final StringBuffer latest) {
 	latestTests = latest;
     }
 
-    public void setSimplifyCount(String s) {
+    public void setSimplifyCount(final String s) {
 	try {
 	    SimplifyModelGenerator.modelLimit = Integer.parseInt(s);
-	} catch (NumberFormatException ex) {
+	} catch (final NumberFormatException ex) {
 	    System.out.println(ex);
 	    // do nothing
 	}
@@ -109,26 +120,27 @@ public class MethodSelectionDialog extends JDialog {
     private boolean layoutWasCalled = false;
 
     private void layoutMethodSelectionDialog() {
-	if (layoutWasCalled)
+	if (layoutWasCalled) {
 	    throw new RuntimeException(
 		    "Method  \"layoutMethodSelectionDialog\" must not be called multiple times.");
+	}
 	layoutWasCalled = true;
 	getContentPane().setLayout(
-		new BoxLayout(getContentPane(), BoxLayout.Y_AXIS));
+	        new BoxLayout(getContentPane(), BoxLayout.Y_AXIS));
 
 	simplifyDataTupleNumber.setToolTipText("Minimal number of data tuples "
-		+ "per test method");
+	        + "per test method");
 	// methodlist
 	methodList = new JList();
 	methodList.setCellRenderer(new DefaultListCellRenderer() {
 	    @Override
-	    public Component getListCellRendererComponent(JList list,
-		    Object value, int index, boolean isSelected,
-		    boolean cellHasFocus) {
+	    public Component getListCellRendererComponent(final JList list,
+		    final Object value, final int index,
+		    final boolean isSelected, final boolean cellHasFocus) {
 		if (value != null) {
-		    ProgramMethod pm = (ProgramMethod) value;
-		    MethodDeclaration md = pm.getMethodDeclaration();
-		    String params = md.getParameters().toString();
+		    final ProgramMethod pm = (ProgramMethod) value;
+		    final MethodDeclaration md = pm.getMethodDeclaration();
+		    final String params = md.getParameters().toString();
 		    setText((md.getTypeReference() == null ? "void" : md
 			    .getTypeReference().getName())
 			    + " "
@@ -149,32 +161,33 @@ public class MethodSelectionDialog extends JDialog {
 		return this;
 	    }
 	});
-	ImmutableSet<ProgramMethod> pms = testBuilder.getProgramMethods(mediator
-		.getProof());
+	final ImmutableSet<ProgramMethod> pms = testBuilder
+	        .getProgramMethods(mediator.getProof());
 	methodList.setListData(pms.toArray(new ProgramMethod[pms.size()]));
-	JScrollPane methodListScroll = new JScrollPane(
-		ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
-		ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+	final JScrollPane methodListScroll = new JScrollPane(
+	        ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
+	        ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 	methodListScroll.getViewport().setView(methodList);
 	methodListScroll
-		.setBorder(new TitledBorder("Methods occuring in Proof"));
+	        .setBorder(new TitledBorder("Methods occuring in Proof"));
 	methodListScroll.setMinimumSize(new java.awt.Dimension(250, 400));
 	getContentPane().add(methodListScroll);
 
 	// buttons
 	final JPanel buttonPanel = new JPanel();
 	buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
-	JButton testAll = new JButton("Create Test For Proof");
+	final JButton testAll = new JButton("Create Test For Proof");
 	testAll.addActionListener(new ActionListener() {
-	    public void actionPerformed(ActionEvent e) {
+	    public void actionPerformed(final ActionEvent e) {
 		setSimplifyCount(simplifyDataTupleNumber.getText());
 		createTest(null);
 	    }
 	});
 	buttonPanel.add(testAll);
-	JButton testSel = new JButton("Create Test For Selected Method(s)");
+	final JButton testSel = new JButton(
+	        "Create Test For Selected Method(s)");
 	testSel.addActionListener(new ActionListener() {
-	    public void actionPerformed(ActionEvent e) {
+	    public void actionPerformed(final ActionEvent e) {
 		if (methodList.getSelectedValues().length == 0) {
 		    JOptionPane.showMessageDialog(null,
 			    "Please select the method(s) first!",
@@ -188,14 +201,14 @@ public class MethodSelectionDialog extends JDialog {
 	buttonPanel.add(testSel);
 
 	completeEx.addActionListener(new ActionListener() {
-	    public void actionPerformed(ActionEvent e) {
+	    public void actionPerformed(final ActionEvent e) {
 		UnitTestBuilder.requireCompleteExecution = completeEx
-			.isSelected();
+		        .isSelected();
 	    }
 	});
-	JButton exit = new JButton("Exit");
+	final JButton exit = new JButton("Exit");
 	exit.addActionListener(new ActionListener() {
-	    public void actionPerformed(ActionEvent e) {
+	    public void actionPerformed(final ActionEvent e) {
 		setSimplifyCount(simplifyDataTupleNumber.getText());
 		setVisible(false);
 		dispose();
@@ -204,10 +217,7 @@ public class MethodSelectionDialog extends JDialog {
 	});
 
 	solverChoice.addActionListener(new ActionListener() {
-	    public void actionPerformed(ActionEvent e) {
-		if (e.getSource() != solverChoice)
-		    throw new RuntimeException(
-			    "CodeError: ActionListener is used by wrong combobox.");
+	    public void actionPerformed(final ActionEvent e) {
 		if (solverChoice.getSelectedItem() == OLD_SIMPLIFY) {
 		    ModelGenerator.decProdForTestGen = ModelGenerator.OLD_SIMPLIFY;
 		} else if (solverChoice.getSelectedItem() == SIMPLIFY) {
@@ -219,8 +229,8 @@ public class MethodSelectionDialog extends JDialog {
 			    "Not implemented case in MethodSelectionDialog");
 		}
 		simplifyDataTupleNumber.setEnabled(solverChoice
-			.getSelectedItem() == OLD_SIMPLIFY
-			|| solverChoice.getSelectedItem() == SIMPLIFY);
+		        .getSelectedItem() == OLD_SIMPLIFY
+		        || solverChoice.getSelectedItem() == SIMPLIFY);
 	    }
 	});
 	buttonPanel.add(solverChoice);
@@ -228,13 +238,28 @@ public class MethodSelectionDialog extends JDialog {
 	buttonPanel.add(simplifyDataTupleNumber);
 
 	simplifyDataTupleNumber
-		.setEnabled(solverChoice.getSelectedItem() == OLD_SIMPLIFY
-			|| solverChoice.getSelectedItem() == SIMPLIFY);
+	        .setEnabled(solverChoice.getSelectedItem() == OLD_SIMPLIFY
+	                || solverChoice.getSelectedItem() == SIMPLIFY);
+
+	testGenChoice.addActionListener(new ActionListener() {
+	    public void actionPerformed(final ActionEvent e) {
+		if (testGenChoice.getSelectedItem() == TestGenFac.TG_JAVACARD) {
+		    TestGenFac.testGen = TestGenFac.TG_JAVACARD;
+		} else if (testGenChoice.getSelectedItem() == TestGenFac.TG_JAVA) {
+		    TestGenFac.testGen = TestGenFac.TG_JAVA;
+		} else {
+		    throw new RuntimeException(
+			    "Not implemented case in MethodSelectionDialog");
+		}
+	    }
+	});
+	buttonPanel.add(testGenChoice);
+
 	buttonPanel.add(exit);
 	getContentPane().add(buttonPanel);
     }
 
-    void createTest(Object[] pms) {
+    void createTest(final Object[] pms) {
 	try {
 	    String test;
 	    if (pms == null) {
@@ -242,16 +267,17 @@ public class MethodSelectionDialog extends JDialog {
 		latestTests.append(test + " ");
 		mediator.testCaseConfirmation(test);
 	    } else {
-		ImmutableSet<ProgramMethod> pmSet = DefaultImmutableSet.<ProgramMethod>nil();
-		for (int i = 0; i < pms.length; i++) {
-		    pmSet = pmSet.add((ProgramMethod) pms[i]);
+		ImmutableSet<ProgramMethod> pmSet = DefaultImmutableSet
+		        .<ProgramMethod> nil();
+		for (final Object pm : pms) {
+		    pmSet = pmSet.add((ProgramMethod) pm);
 		}
 		test = testBuilder.createTestForProof(mediator.getProof(),
-			pmSet);
+		        pmSet);
 		latestTests.append(test + " ");
 		mediator.testCaseConfirmation(test);
 	    }
-	} catch (Exception e) {
+	} catch (final Exception e) {
 	    new ExceptionDialog(Main.getInstance(), e);
 	}
     }
