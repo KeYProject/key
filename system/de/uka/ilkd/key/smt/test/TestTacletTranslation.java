@@ -10,10 +10,12 @@
 package de.uka.ilkd.key.smt.test;
 
 import java.io.File;
+import java.util.ArrayList;
 
 
 import de.uka.ilkd.key.smt.*;
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
@@ -96,7 +98,7 @@ public class TestTacletTranslation extends TestCase {
 	TacletSetTranslation  translation = new DefaultTacletSetTranslation();
 	translation.setTacletSet(taclets);
 	translation.addHeuristic("smt_axiom_not_verified");
-	
+	/*
 	System.out.println("\n\nTranslated: ");
 	for(TacletFormula tf : translation.getTranslation()){
 	    System.out.println(tf.getTaclet().name());
@@ -104,7 +106,7 @@ public class TestTacletTranslation extends TestCase {
 	System.out.println("\n\nNot translated: ");
 	for(TacletFormula tf : translation.getNotTranslated()){
 	    System.out.println(tf.getTaclet().name()+"\n"+tf.getStatus()+"\n");
-	}
+	}*/
 	
 	
     }
@@ -141,8 +143,8 @@ public class TestTacletTranslation extends TestCase {
 	
 	Assert.assertTrue(reason,list.size() == 0);
 	
-	for(TacletFormula tf : translation.getNotTranslated())
-	    System.out.println(tf.getTaclet().name()+": "+ tf.getStatus());
+	//for(TacletFormula tf : translation.getNotTranslated())
+	  //  System.out.println(tf.getTaclet().name()+": "+ tf.getStatus());
 	
 	
 	
@@ -160,9 +162,14 @@ public class TestTacletTranslation extends TestCase {
 	
 	Term term = translator.translate(t);
 
-	String s = "all({b1 (boolean term)}all({b2 (boolean term)}equiv(equiv(equals(b1,TRUE),equals(b2,TRUE)),equals(b1,b2))))";
+	String s = "all({b1:boolean}all({b2:boolean}equiv(equiv(equals(b1,TRUE),equals(b2,TRUE)),equals(b1,b2))))";
+	
 
-	Assert.assertTrue(s.equals(term.toString()));
+	//printTerm(term,0);
+	
+	
+
+	Assert.assertTrue("\n\nReference: "+s+"\nHypothese: "+ term.toString(),s.equals(term.toString()));
 
 	//TODO: introduce mechanism to verify the translation.  
 	
@@ -186,11 +193,11 @@ public class TestTacletTranslation extends TestCase {
 	Term term = translator.translate(t);
 	
 	
-	String s = "all({br (boolean term)}imp(not(equals(br,FALSE)),equals(br,TRUE)))";
+	String s = "all({br:boolean}imp(not(equals(br,FALSE)),equals(br,TRUE)))";
 	
 
 	
-	Assert.assertTrue(s.equals(term.toString()));
+	Assert.assertTrue("\n\nReference: "+s+"\nHypothese: "+ term.toString(),s.equals(term.toString()));
 	
 	
 	//printTerm(term,0);
@@ -204,22 +211,31 @@ public class TestTacletTranslation extends TestCase {
     }
     
     
+ 
+    
     private void printTerm(Term term){
 	System.out.println(LogicPrinter.quickPrintTerm(term,null)); 
     }
     
-    private void printTerm(Term t, int depth){
+    public static void printTerm(Term t, int depth){
 	System.out.println(depth + ": "+t.toString());
+	
+	//System.out.pritnln("VarsBoundHere: "+t.v);
 	for(int i=0; i < t.arity(); i++){
 	  printTerm(t.sub(i),depth+1);
 	
 	  
 	}
+	
 	if(t.arity()== 0) {
 	    System.out.println(depth+"Sort: "+t.sort());
 	    System.out.println(depth+"FreeVar:"+t.freeVars().size());
+	    System.out.println(depth+"Name:"+t.getClass().getName());
+	   
+	   
 	    for(QuantifiableVariable qv : t.freeVars()){
-		System.out.println(depth+"NameFreeVar:"+qv.toString());
+		System.out.println(depth+"NameFreeVar:"+qv.toString()+" "+qv.getClass().getSimpleName());
+	
 	    }
 	}
     }

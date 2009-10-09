@@ -11,19 +11,29 @@ package de.uka.ilkd.key.smt;
 
 
 
+import java.util.HashMap;
+
+import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.logic.ConstrainedFormula;
+import de.uka.ilkd.key.logic.JavaBlock;
+import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Junctor;
+import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.Quantifier;
 import de.uka.ilkd.key.logic.op.RigidFunction;
+import de.uka.ilkd.key.logic.op.SortedSchemaVariable;
+import de.uka.ilkd.key.logic.sort.Sort;
 
 
 import de.uka.ilkd.key.rule.Taclet;
@@ -32,7 +42,9 @@ import de.uka.ilkd.key.rule.TacletGoalTemplate;
 
 abstract class AbstractTacletTranslator implements TacletTranslator {
 
-  
+    protected final static TermFactory tf = TermFactory.DEFAULT;
+    
+    protected HashMap<String,LogicVariable> usedVariables = new HashMap<String,LogicVariable>();
     
     /** Translates a sequent to a term by using the following translations rules:
      * T ==> D is translated to: And(T)->Or(D).<br>
@@ -179,6 +191,52 @@ abstract class AbstractTacletTranslator implements TacletTranslator {
 	}
 	return terms;
 	
+    }
+    
+    /**
+     * Use this method to rebuild the given term. The method splits the term in its single components and assemblies them. After every splitting step
+     * the method calls <code>changeTerm</code>. This mechanism can be used to exchange subterms.
+     * @param term the term to rebuild.
+     * @return returns the new term.
+     */
+    protected Term rebuildTerm(Term term){
+	ImmutableArray<QuantifiableVariable> variables[] = new  ImmutableArray[term.arity()];
+	Term [] subTerms = new Term[term.arity()];
+	for(int i=0; i < term.arity(); i++){
+	   subTerms[i] = rebuildTerm(term.sub(i)); 
+	   variables[i] = subTerms[i].varsBoundHere(i);
+	}
+	
+	term = changeTerm(term);
+	
+	term = tf.createTerm(term.op(),subTerms,variables,JavaBlock.EMPTY_JAVABLOCK);
+	return term;
+    }
+    
+    /**
+     * Returns a new logic variable with the given name and sort. If already a logic variable exists with the same name and sort this variable is returned
+     * instead of a new logic variable.
+     * @param name name of the logic variable.
+     * @param sort sort of the logic variable.
+     * @return logic variable with the given name and sort. 
+     */
+    protected LogicVariable getLogicVariable(Name name, Sort sort){
+	LogicVariable l = usedVariables.get(name.toString());
+	if(l== null){
+	    l = new LogicVariable(name,sort);
+	    usedVariables.put(name.toString(), l);
+	}
+	return l;
+	
+    }
+    
+    /**
+     * Override this method if you want to change the term, i.e. exchanging schema variables with logic variables. See <code>rebuildTerm</code>.
+     * @param term the term to be changed.
+     * @return the new term.
+     */
+    protected Term changeTerm(Term term){
+	return term;
     }
     
     

@@ -56,7 +56,6 @@ public class DefaultTacletSetTranslation implements TacletSetTranslation {
     public boolean checkHeuristic(Taclet t){
 	for(String h : heuristics){
 	    for(RuleSet rs : t.getRuleSets()){
-		System.out.println(rs.name().toString());
 		if(rs.name().toString().equals(h)) return true; 
 	    }
 	  

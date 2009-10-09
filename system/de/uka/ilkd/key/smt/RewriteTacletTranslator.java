@@ -1,13 +1,26 @@
 package de.uka.ilkd.key.smt;
 
 
+import java.util.HashMap;
+import java.util.HashSet;
+
+import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 
+import de.uka.ilkd.key.logic.JavaBlock;
+import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.TermFactory;
 
+import de.uka.ilkd.key.logic.op.Equality;
+import de.uka.ilkd.key.logic.op.Junctor;
+import de.uka.ilkd.key.logic.op.LogicVariable;
+import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+import de.uka.ilkd.key.logic.op.Quantifier;
+import de.uka.ilkd.key.logic.op.SortedSchemaVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.pp.LogicPrinter;
 
@@ -24,6 +37,10 @@ import de.uka.ilkd.key.rule.TacletGoalTemplate;
 public class RewriteTacletTranslator extends AbstractTacletTranslator{
 
     private final Term STD_REPLACE,STD_ADD,STD_ASSUM,STD_FIND;
+    
+
+    
+
     
     public RewriteTacletTranslator(){
 	TermBuilder tb = new TermBuilder();
@@ -77,7 +94,7 @@ public class RewriteTacletTranslator extends AbstractTacletTranslator{
 	if(!(t instanceof RewriteTaclet)) throw new IllegalArgumentException("The given taclet is not of the type RewriteTaclet");
 	String checkResult;
 //	if((checkResult=checkGeneralConditions(t)) != null) throw new IllegalArgumentException(checkResult);
-
+	usedVariables = new HashMap<String,LogicVariable>();
 	
 	RewriteTaclet rewriteTaclet = (RewriteTaclet)t;
 	TermBuilder tb = new TermBuilder();
@@ -114,7 +131,9 @@ public class RewriteTacletTranslator extends AbstractTacletTranslator{
 	Term term;
 	term = tb.imp(tb.and(list),assum);
 
-		
+	//Rebuild the term to exchange schema variables with logic varibales.
+	term = rebuildTerm(term);
+	// Quantifie over all free variables.
 	for(QuantifiableVariable qv : term.freeVars()){
 	    term = tb.all(qv, term);
 	}
@@ -122,10 +141,22 @@ public class RewriteTacletTranslator extends AbstractTacletTranslator{
 
 	
 	
-	
 	return term;
 	
     }
+    
+    @Override
+    protected Term changeTerm(Term term){
+	TermBuilder tb = new TermBuilder();
+	if(term.op() instanceof SortedSchemaVariable){
+	    term = tb.var(getLogicVariable(term.op().name(),term.sort()));
+	}
+	return term;
+    }
+    
+   
+    
+
     
     @Override
     public String checkGoalTemplate(TacletGoalTemplate template){

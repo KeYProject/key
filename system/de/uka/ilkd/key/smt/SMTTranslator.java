@@ -47,7 +47,7 @@ public interface SMTTranslator {
      * Set the assumption before calling the general translate method. 
      * @param assumption
      */
-    public void setTacletAssumptions(StringBuffer assumption);
+    public void setTacletAssumptions(ImmutableList<TacletFormula> assumption);
     
     //TODO remove after testing!!
     /**

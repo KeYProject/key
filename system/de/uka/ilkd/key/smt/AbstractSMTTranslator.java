@@ -15,11 +15,14 @@ import java.util.*;
 import org.apache.log4j.Logger;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.smt.test.TestTacletTranslation;
 import de.uka.ilkd.key.util.Debug;
 
 
@@ -113,7 +116,10 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
     //assumptions. they have to be added to the formula!
     private ArrayList<StringBuffer> assumptions = new ArrayList<StringBuffer>();
     
-    /**Assumptions made of taclets */
+    /**Formulae made of taclets, used for assumptions.*/
+    private ImmutableList<TacletFormula> tacletFormulae = ImmutableSLList.nil();
+    
+    /**Assumptions made of taclets - the translation of <code>tacletFormulae</code>*/
     private ArrayList<StringBuffer> tacletAssumptions = new ArrayList<StringBuffer>();
     
     /**
@@ -174,6 +180,8 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 	
 	hb = this.translateLogicalImply(ante, succ);
 
+	tacletAssumptions = translateTaclets(services);
+	
 	StringBuffer s = buildComplText(services, hb);
 	/*StringBuffer s = buildCompleteText(hb, assumptions, this.buildTranslatedFuncDecls(), this
 		.buildTranslatedPredDecls(), this.buildTranslatedSorts(), this.buildSortHierarchy());*/
@@ -183,10 +191,9 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
     }
 
 
-    public void setTacletAssumptions(StringBuffer s){
-	tacletAssumptions.clear();
-	tacletAssumptions.add(s);
-    }
+   
+    
+    
     
     
     
@@ -724,10 +731,11 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 	StringBuffer hb = new StringBuffer();
 	Term t;
 	t = cf.formula();
-	Operator op = t.op();
-	hb.append(translateTerm(t, new Vector<QuantifiableVariable>(), services));
+	hb.append(translateTerm(t,new Vector<QuantifiableVariable>() , services));
 	return hb;
     }
+    
+
     
     /**
      * Returns, whether the Structure, this translator creates should be a
@@ -1266,7 +1274,6 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 	} else if (op == Op.ALL) {
 	    ImmutableArray<QuantifiableVariable> vars = term.varsBoundHere(0);
 	    Debug.assertTrue(vars.size() == 1);
-
 	    quantifiedVars.add(vars.get(0));
 
 	    StringBuffer qv = this.translateVariable(vars
@@ -1839,6 +1846,45 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 		|| s == jlongSort || s == jcharSort || s == integerSort)
 	    return true;
 	return false;
+    }
+    
+    /*
+     * Part for taclet translation. It is not possibile to separate the translation of taclets from the SMT translation absolutely.
+     */
+    
+    /**
+     * Sets the formulae made of taclets, which should be used for translation.
+     * @param list list of formulae made of taclets.
+     */
+    public void setTacletAssumptions(ImmutableList<TacletFormula> list){
+	if(list == null) {
+	    tacletFormulae = ImmutableSLList.nil();
+	}
+	tacletFormulae = list;
+    }
+
+    /**
+     * Translates the list <code>tacletFormulae</code> to the given syntax.
+     *
+     * @param services used for <code>translateTerm</code>
+     */
+    private ArrayList<StringBuffer> translateTaclets(Services services)
+    	throws IllegalFormulaException{
+	ArrayList<StringBuffer> result = new ArrayList<StringBuffer>();
+	if(tacletFormulae.isEmpty() || tacletFormulae == null){
+	    return result;
+	}
+	
+	Vector<QuantifiableVariable> vector = new Vector<QuantifiableVariable>();
+	
+	for(TacletFormula tf : tacletFormulae){
+	    StringBuffer term = translateTerm(tf.getFormula(),vector,services);
+	    result.add(term);
+	}
+
+	
+	
+	return result;	
     }
 
 }
