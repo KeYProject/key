@@ -54,27 +54,30 @@ public class GlobalProofMgt {
 	if (setOfEnv==null || setOfEnv.size()==0) {
 	    return null;
 	} else {
-	    Object[] choice = new Object[setOfEnv.size()+1];
-	    System.arraycopy(setOfEnv.toArray(), 0, choice, 1, setOfEnv.size());
-	    choice[0] = "Open in new environment";
-	    Object o =(JOptionPane.showInputDialog
-		       (mediator.mainFrame(), 
-			"Java model and rule sets are suitable "
-			+"to already existing environment(s). \n"
-			+"Please select one or choose to open the problem "
-			+"in a new environment.\n"
-			+"Attention: Unless you open the problem in a "
-			+"new environment,\n"
-			+"sort, function, and rule declarations are ignored.", 
-			"Proof Environment",
-			JOptionPane.QUESTION_MESSAGE, null, 
-			choice, null));	
-	    if (o instanceof ProofEnvironment) {
-		return (ProofEnvironment)o;
-	    } else {
-		return null;
-	    }
+	    return setOfEnv.iterator().next();
 	}
+//	} else {
+//	    Object[] choice = new Object[setOfEnv.size()+1];
+//	    System.arraycopy(setOfEnv.toArray(), 0, choice, 1, setOfEnv.size());
+//	    choice[0] = "Open in new environment";
+//	    Object o =(JOptionPane.showInputDialog
+//		       (mediator.mainFrame(), 
+//			"Java model and rule sets are suitable "
+//			+"to already existing environment(s). \n"
+//			+"Please select one or choose to open the problem "
+//			+"in a new environment.\n"
+//			+"Attention: Unless you open the problem in a "
+//			+"new environment,\n"
+//			+"sort, function, and rule declarations are ignored.", 
+//			"Proof Environment",
+//			JOptionPane.QUESTION_MESSAGE, null, 
+//			choice, null));	
+//	    if (o instanceof ProofEnvironment) {
+//		return (ProofEnvironment)o;
+//	    } else {
+//		return null;
+//	    }
+//	}
     }
 
     public void registerProofEnvironment(ProofEnvironment env) {
