@@ -9,75 +9,29 @@
 //
 package de.uka.ilkd.key.smt.test;
 
-import java.io.File;
-import java.util.ArrayList;
 
 
 import de.uka.ilkd.key.smt.*;
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
-import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
-
-import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.logic.sort.oclsort.BooleanSort;
 import de.uka.ilkd.key.pp.LogicPrinter;
-import de.uka.ilkd.key.proof.ProofAggregate;
-import de.uka.ilkd.key.proof.RuleSource;
-import de.uka.ilkd.key.proof.init.EnvInput;
-import de.uka.ilkd.key.proof.init.InitConfig;
-import de.uka.ilkd.key.proof.init.JUnitTestProfile;
-import de.uka.ilkd.key.proof.init.KeYFileForTests;
-import de.uka.ilkd.key.proof.init.ProblemInitializer;
-import de.uka.ilkd.key.proof.init.Profile;
-import de.uka.ilkd.key.proof.init.RuleCollection;
-import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
-import de.uka.ilkd.key.rule.BuiltInRule;
-import de.uka.ilkd.key.rule.RewriteTaclet;
-
-
 import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.rule.TacletForTests;
-
-
-
-import de.uka.ilkd.key.util.HelperClassForTests;
 import junit.framework.Assert;
-import junit.framework.TestCase;
 
-/**
- * 
- *
- */
-public class TestTacletTranslation extends TestCase {
-    
-    
- 
 
+public class TestTacletTranslation extends TestTaclet {
     
-    private static ImmutableSet<Taclet> taclets= null; 
+    
     
     
     protected void setUp(){
 	parse();
     }
     
-    /** For any reason, this special initialization is needed, copyed from TacletForTests.
-      */
-    private static Profile profile = new JUnitTestProfile() {
-        //we do not want normal standard rules, but ruleSetsDeclarations is needed for string library (HACK)
-        public RuleCollection getStandardRules() {
-            return new RuleCollection(
-                            RuleSource.initRuleFile("ruleSetsDeclarations.key"), 
-                            (ImmutableList)ImmutableSLList.nil());
-        }
-    };
+
     
     
     /**
@@ -86,7 +40,7 @@ public class TestTacletTranslation extends TestCase {
      * @return if sucessfull the taclet called 'name', otherwise null
      */
     private Taclet getTacletByName(String name){
-	for(Taclet t: taclets){
+	for(Taclet t: getTaclets()){
 	    if(t.name().toString().equals(name)){
 		return t;
 	    }
@@ -95,8 +49,9 @@ public class TestTacletTranslation extends TestCase {
     }
     
     public void testTranslateWhatYouGet(){
+
 	TacletSetTranslation  translation = new DefaultTacletSetTranslation();
-	translation.setTacletSet(taclets);
+	translation.setTacletSet(getTaclets());
 	translation.addHeuristic("smt_axiom_not_verified");
 	/*
 	System.out.println("\n\nTranslated: ");
@@ -111,24 +66,35 @@ public class TestTacletTranslation extends TestCase {
 	
     }
     
+    /**
+     * Taclets that should not be accepted. 
+     */
     public void testBadExamples(){
 	TacletSetTranslation  translation = new DefaultTacletSetTranslation();
 	ImmutableSet<Taclet> set = DefaultImmutableSet.nil();
 	String [] tacletList = {
 		"ex_bool",  // has a bad replace pattern: substitution
-		"testUninstantiatedSVCollector", // has a bad find pattern: diamond-operator
-		"TestCollisionResolving_coll_context", // has notFreeIn-Condtion:
-		"testParsingExplicitMethodBody", // has bad find pattern: box-operator
+		//"testUninstantiatedSVCollector", // has a bad find pattern: diamond-operator
+		//"TestCollisionResolving_coll_context", // has notFreeIn-Condtion:
+		//"testParsingExplicitMethodBody", // has bad find pattern: box-operator
 		"AND_literals_1", // has a bad replace pattern: meta-construct
-		"imp_left", // not a rewrite taclet
-		"TestMatchTaclet_whileright" // has variable conditions
+		//"imp_left", // not a rewrite taclet
+		//"TestMatchTaclet_whileright" // has variable conditions
 		
 	};
 	
+	String missing = "";
 	for(String s : tacletList){
-	    set = set.add(getTacletByName(s)); 
+	    Taclet t = getTacletByName(s);
+	    if(t == null) {missing += s+";";}
+	    else          {set = set.add(t);} 
 	}
-	Assert.assertTrue("Some taclets have not been loaded.",tacletList.length == set.size());
+	
+	
+	
+	
+	
+	Assert.assertTrue("Some taclets have not been loaded: "+missing,tacletList.length == set.size());
 		
 	
 	
@@ -177,7 +143,7 @@ public class TestTacletTranslation extends TestCase {
 	// TODO: delete
 	// Only for a very very quick test
 	
-	System.out.println(LogicPrinter.quickPrintTerm(term,null));    
+	//System.out.println(LogicPrinter.quickPrintTerm(term,null));    
     }
     
     /**
@@ -207,7 +173,7 @@ public class TestTacletTranslation extends TestCase {
 	// TODO: delete
 	// Only for a very very quick test
 	
-	System.out.println(LogicPrinter.quickPrintTerm(term,null));    
+	//System.out.println(LogicPrinter.quickPrintTerm(term,null));    
     }
     
     
@@ -242,36 +208,10 @@ public class TestTacletTranslation extends TestCase {
 
     
     
-    /**
-     * Loads taclets.
-     */
-    public static void parse(){
-	if(taclets != null) return;
-	 try{   
-	        EnvInput envInput = new KeYFileForTests("Test", getProofFile());	
-		ProblemInitializer pi = new ProblemInitializer(profile); 
-		InitConfig ic = pi.prepare(envInput);
-		taclets= ic.getTaclets();
-	 }
-	 catch(Exception e){
-	     System.out.println(e);
-	 }
-	
-	
-    }
+
     
     
-    /** 
-     * @return returns the name of a prooffile in <code>folderPath</code>.
-     */
-    static private File getProofFile(){
-	
-	return new File(System.getProperty("key.home")+
-	        File.separator+"examples"+
-	        File.separator+"_testcase"+
-	        File.separator+"testrules.key");
-		
-    }
+
     
 
 

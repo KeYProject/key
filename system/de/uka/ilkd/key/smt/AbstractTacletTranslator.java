@@ -54,7 +54,7 @@ abstract class AbstractTacletTranslator implements TacletTranslator {
      * @return the resulting term of the translation or <code>null</code> if both antecedent and succendent are empty.
      */
     protected Term translate(Sequent s) {
-        TermBuilder builder = new TermBuilder();
+        TermBuilder builder = TermBuilder.DF;
     
         
         ImmutableList<Term> ante = getFormulaeOfSemisequent(s.antecedent());

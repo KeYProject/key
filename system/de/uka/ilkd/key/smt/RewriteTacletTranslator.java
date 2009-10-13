@@ -43,7 +43,7 @@ public class RewriteTacletTranslator extends AbstractTacletTranslator{
 
     
     public RewriteTacletTranslator(){
-	TermBuilder tb = new TermBuilder();
+	TermBuilder tb = TermBuilder.DF;
 	STD_REPLACE = tb.ff();
 	STD_ADD = tb.ff();
 	STD_ASSUM  = tb.ff();
@@ -57,7 +57,7 @@ public class RewriteTacletTranslator extends AbstractTacletTranslator{
      * @return translation 
      */
     private Term translateReplaceAndAddTerm(RewriteTacletGoalTemplate template, Term find){
-	TermBuilder tb = new TermBuilder();
+	TermBuilder tb = TermBuilder.DF;
 	Term replace = template.replaceWith()!=null ? template.replaceWith() : STD_REPLACE;
 	Term add     = template.sequent()!=null ? translate(template.sequent()) : STD_ADD;
 	if(add == null) add = STD_ADD;
@@ -76,7 +76,7 @@ public class RewriteTacletTranslator extends AbstractTacletTranslator{
      * @return translation 
      */
     private Term translateReplaceAndAddFormula(RewriteTacletGoalTemplate template, Term find){
-	TermBuilder tb = new TermBuilder();
+	TermBuilder tb = TermBuilder.DF;
 	Term replace = template.replaceWith()!=null ? template.replaceWith() : STD_REPLACE;
 	Term add     = template.sequent()!=null ? translate(template.sequent()) : STD_ADD;
 	if(add == null) add = STD_ADD;
@@ -97,7 +97,7 @@ public class RewriteTacletTranslator extends AbstractTacletTranslator{
 	usedVariables = new HashMap<String,LogicVariable>();
 	
 	RewriteTaclet rewriteTaclet = (RewriteTaclet)t;
-	TermBuilder tb = new TermBuilder();
+	TermBuilder tb = TermBuilder.DF;
 	
 	//the standard translation of the patterns.
 	
@@ -147,7 +147,7 @@ public class RewriteTacletTranslator extends AbstractTacletTranslator{
     
     @Override
     protected Term changeTerm(Term term){
-	TermBuilder tb = new TermBuilder();
+	TermBuilder tb = TermBuilder.DF;
 	if(term.op() instanceof SortedSchemaVariable){
 	    term = tb.var(getLogicVariable(term.op().name(),term.sort()));
 	}

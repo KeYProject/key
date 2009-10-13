@@ -88,7 +88,8 @@ public class TestKey extends TestCase {
 	  de.uka.ilkd.key.smt.test.TestYices.class,
 	  de.uka.ilkd.key.smt.test.TestCvc3.class,
 	  de.uka.ilkd.key.smt.test.TestExecutionWatchDog.class,
- 	  de.uka.ilkd.key.smt.test.TestTacletTranslation.class
+ 	  de.uka.ilkd.key.smt.test.TestTacletTranslation.class,
+	  de.uka.ilkd.key.smt.test.TestSMTWithTaclets.class
       };
 
      

@@ -141,6 +141,7 @@ public interface SMTSolver {
     public void interrupt();
     
     /**
+     * TODO: is this method really necessary? check!
      * @return the translation of a set of taclets. 
      */
     public TacletSetTranslation getTacletSetTranslation();
@@ -151,4 +152,10 @@ public interface SMTSolver {
      * @param tacletSetTranslation the tacletSetTranslation to set
      */
     public void setTacletSetTranslation(TacletSetTranslation tacletSetTranslation);
+    
+    /**
+     * Determines whether taclets are used for this solver.
+     * @param b <code>true</code> if taclets should be used.
+     */
+    public void useTaclets(boolean b);
 }

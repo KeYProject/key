@@ -22,7 +22,6 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.smt.test.TestTacletTranslation;
 import de.uka.ilkd.key.util.Debug;
 
 
@@ -185,7 +184,6 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 	StringBuffer s = buildComplText(services, hb);
 	/*StringBuffer s = buildCompleteText(hb, assumptions, this.buildTranslatedFuncDecls(), this
 		.buildTranslatedPredDecls(), this.buildTranslatedSorts(), this.buildSortHierarchy());*/
-	
 	return s;
 
     }
