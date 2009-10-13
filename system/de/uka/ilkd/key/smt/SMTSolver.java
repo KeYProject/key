@@ -15,6 +15,7 @@ import java.io.IOException;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.smt.taclettranslation.TacletSetTranslation;
 import de.uka.ilkd.key.util.ProgressMonitor;
 
 
@@ -140,18 +141,6 @@ public interface SMTSolver {
      */
     public void interrupt();
     
-    /**
-     * TODO: is this method really necessary? check!
-     * @return the translation of a set of taclets. 
-     */
-    public TacletSetTranslation getTacletSetTranslation();
-
-
-    /**
-     * Sets the the translation of a taclet set that is used for assumptions.
-     * @param tacletSetTranslation the tacletSetTranslation to set
-     */
-    public void setTacletSetTranslation(TacletSetTranslation tacletSetTranslation);
     
     /**
      * Determines whether taclets are used for this solver.

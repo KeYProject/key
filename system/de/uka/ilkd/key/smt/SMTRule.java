@@ -22,6 +22,8 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.smt.taclettranslation.DefaultTacletSetTranslation;
+import de.uka.ilkd.key.smt.taclettranslation.TacletSetTranslation;
 import de.uka.ilkd.key.util.ProgressMonitor;
 
 public class SMTRule implements BuiltInRule, MakesProgress {
@@ -65,11 +67,7 @@ public class SMTRule implements BuiltInRule, MakesProgress {
 	int timeout = ProofSettings.DEFAULT_SETTINGS
 	                           .getDecisionProcedureSettings()
 	                           .getTimeout()*100;
-	TacletSetTranslation tacletSetTranslation = new DefaultTacletSetTranslation();
-	tacletSetTranslation.setTacletSet(goal.proof().env().getInitConfig().getTaclets());
-	
-	tacletSetTranslation.addHeuristic("smt_axiom_not_verified");
-	this.solver.setTacletSetTranslation(tacletSetTranslation);
+
 		
 	SMTSolverResult result = SMTSolverResult.NO_IDEA;	
 	try {

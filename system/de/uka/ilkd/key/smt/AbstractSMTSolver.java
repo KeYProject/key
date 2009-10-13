@@ -19,6 +19,7 @@ import javax.swing.JFileChooser;
 import org.apache.log4j.Logger;
 
 import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.Main;
 import de.uka.ilkd.key.gui.configuration.PathConfig;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
@@ -26,6 +27,10 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.smt.taclettranslation.DefaultTacletSetTranslation;
+import de.uka.ilkd.key.smt.taclettranslation.TacletFormula;
+import de.uka.ilkd.key.smt.taclettranslation.TacletSetTranslation;
 import de.uka.ilkd.key.util.ProgressMonitor;
 
 
@@ -52,10 +57,11 @@ public abstract class AbstractSMTSolver implements SMTSolver {
     private boolean isinstalled = false;
     /** true, if the current run is for test uss only (for example checking, if the Solver is installed) */
     private boolean inTestMode = false;
-    /** translation of the taclets that are used for assumptions */
-    private TacletSetTranslation tacletSetTranslation=null;
+
     /** determines whether taclets are used for this solver.*/
     private boolean useTaclets = true;
+    /** Only for testing*/
+    private ImmutableSet<Taclet> tacletsForTest = null;
     
     
 
@@ -196,12 +202,11 @@ public abstract class AbstractSMTSolver implements SMTSolver {
      */
     public final SMTSolverResult run(Goal goal, int timeout, Services services) throws IOException {
 	SMTSolverResult toReturn;
-		
+			
 	SMTTranslator trans = this.getTranslator(services);
-	ImmutableSLList<TacletFormula> emptyList = ImmutableSLList.nil();
+	instantiateTaclets(goal, trans);
 	try {
-	    if(!useTaclets || tacletSetTranslation == null){trans.setTacletAssumptions(emptyList);}
-	    else 	   {trans.setTacletAssumptions(tacletSetTranslation.getTranslation());}
+	  
 	    String s = trans.translate(goal.sequent(), services).toString();
 	    toReturn = this.run(s, timeout, services);
     	} catch (IllegalFormulaException e) {
@@ -217,13 +222,17 @@ public abstract class AbstractSMTSolver implements SMTSolver {
     public Process run(Goal goal, Services services) throws IOException,IllegalFormulaException{
 	Process toReturn;
 	
-	ImmutableSLList<TacletFormula> emptyList = ImmutableSLList.nil();
+	
+
+
+
 	SMTTranslator trans = this.getTranslator(services);
-	if(!useTaclets || tacletSetTranslation == null){trans.setTacletAssumptions(emptyList);}
-	else 	   {trans.setTacletAssumptions(tacletSetTranslation.getTranslation());}
+	
+	instantiateTaclets(goal, trans);
+
 	String formula = trans.translate(goal.sequent(), services).toString();
-	
-	
+
+
 
 	
 	final File loc;
@@ -505,47 +514,37 @@ public abstract class AbstractSMTSolver implements SMTSolver {
     
     
     
-    /**
-     * @return the tacletSetTranslation
-     */
-    public TacletSetTranslation getTacletSetTranslation() {
-        return tacletSetTranslation;
-    }
-
-
-    /**
-     * @param tacletSetTranslation the tacletSetTranslation to set
-     */
-    public void setTacletSetTranslation(TacletSetTranslation tacletSetTranslation) {
-        this.tacletSetTranslation = tacletSetTranslation;
-    }
-   
+  
     
     public void useTaclets(boolean b){
 	this.useTaclets = b;
     }
     
-    /**
-     * @return returns a list of assumtions builded up from taclets.
-     */
-  /*  private StringBuffer getTacletAssumptions(SMTTranslator trans, Services services){
-	Term term;
-	TermBuilder tb = new TermBuilder();
-	ImmutableList<Term> list=  ImmutableSLList.nil();
-	for(TacletFormula tf : tacletSetTranslation.getTranslation()){
-	   list = list.append(tf.getFormula());
-	}
+    private void instantiateTaclets(Goal goal, SMTTranslator trans){
+	 ImmutableSLList<TacletFormula> emptyList = ImmutableSLList.nil();
+	 if(!useTaclets){
+	     trans.setTacletAssumptions(emptyList);	     
+	 }else{
+	     TacletSetTranslation tacletSetTranslation = new DefaultTacletSetTranslation();
+	     if(tacletsForTest == null){
+		 tacletSetTranslation.setTacletSet(goal.proof().env().getInitConfig().getTaclets()); 
+	     }else{
+		tacletSetTranslation.setTacletSet(tacletsForTest); 
+	     }
+		 
+	     
+
+      	     tacletSetTranslation.addHeuristic("smt_axiom_not_verified");
+	     trans.setTacletAssumptions(tacletSetTranslation.getTranslation());
+	 }
+	    
 	
-	term = tb.and(list);
-	
-	try {
-	      StringBuffer res = trans.translate(term,services);
-	      return res;
-	} catch (IllegalFormulaException e) {
-	    throw new RuntimeException("The taclets could not be translated.\n" + e.getMessage());
-             }
-	
-    }*/
+    }
+    
+    public void setTacletsForTest(ImmutableSet<Taclet> set){
+	tacletsForTest = set;
+    }
+
     
     
 }

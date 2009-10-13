@@ -19,15 +19,16 @@ import junit.framework.Assert;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
+import de.uka.ilkd.key.smt.AbstractSMTSolver;
 import de.uka.ilkd.key.smt.CVC3Solver;
-import de.uka.ilkd.key.smt.DefaultTacletSetTranslation;
 import de.uka.ilkd.key.smt.SMTSolver;
 import de.uka.ilkd.key.smt.SMTSolverResult;
 import de.uka.ilkd.key.smt.SimplifySolver;
 
-import de.uka.ilkd.key.smt.TacletSetTranslation;
 import de.uka.ilkd.key.smt.YicesSolver;
 import de.uka.ilkd.key.smt.Z3Solver;
+import de.uka.ilkd.key.smt.taclettranslation.DefaultTacletSetTranslation;
+import de.uka.ilkd.key.smt.taclettranslation.TacletSetTranslation;
 
 
 /**
@@ -162,11 +163,13 @@ public class TestSMTWithTaclets extends TestTaclet  {
     private String checkFile(SMTSolver solver, String filepath) throws IOException{
 	ProofAggregate p = parse(new File(filepath));
 	
-	TacletSetTranslation translation = new DefaultTacletSetTranslation();
+	/*TacletSetTranslation translation = new DefaultTacletSetTranslation();
 	translation.addHeuristic("smt_axiom_not_verified");
 	translation.setTacletSet(getTaclets());	
 	solver.setTacletSetTranslation(translation);
+	*/
 	
+	((AbstractSMTSolver)solver).setTacletsForTest(getTaclets());
 
 	Assert.assertTrue(p.getProofs().length == 1);
 	Proof proof = p.getProofs()[0];	    

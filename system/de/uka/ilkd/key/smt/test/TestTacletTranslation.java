@@ -12,6 +12,12 @@ package de.uka.ilkd.key.smt.test;
 
 
 import de.uka.ilkd.key.smt.*;
+import de.uka.ilkd.key.smt.taclettranslation.DefaultTacletSetTranslation;
+import de.uka.ilkd.key.smt.taclettranslation.IllegalTacletException;
+import de.uka.ilkd.key.smt.taclettranslation.RewriteTacletTranslator;
+import de.uka.ilkd.key.smt.taclettranslation.TacletFormula;
+import de.uka.ilkd.key.smt.taclettranslation.TacletSetTranslation;
+import de.uka.ilkd.key.smt.taclettranslation.TacletTranslator;
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
@@ -120,14 +126,15 @@ public class TestTacletTranslation extends TestTaclet {
      * This is only a simple syntactical test to ensure that there is no change which
      * has a negative effect on the translation.
      */    
-    public void testBooleanEqual(){
+    public void testBooleanEqual() throws IllegalTacletException{
 	Taclet t = getTacletByName("boolean_equal_2");
 	Assert.assertTrue("Taclet boolean_equal_2 not found.", t!=null);
 
 	TacletTranslator translator = new RewriteTacletTranslator();
 	
+	
 	Term term = translator.translate(t);
-
+	
 	String s = "all({b1:boolean}all({b2:boolean}equiv(equiv(equals(b1,TRUE),equals(b2,TRUE)),equals(b1,b2))))";
 	
 
@@ -150,7 +157,7 @@ public class TestTacletTranslation extends TestTaclet {
      * This is only a simple syntactical test to ensure that there is no change which
      * has a negative effect on the translation.
      */
-    public void testApplyEqBooleanRigid(){
+    public void testApplyEqBooleanRigid() throws IllegalTacletException{
 	Taclet t = getTacletByName("apply_eq_boolean_rigid");
 	Assert.assertTrue("Taclet apply_eq_boolean_rigid not found.", t!=null);
 
