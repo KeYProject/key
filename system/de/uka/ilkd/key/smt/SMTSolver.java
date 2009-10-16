@@ -70,7 +70,7 @@ public interface SMTSolver {
      * @throws IOException if the external prover could not be found, executed or if the SMT translation
      * could not be written to a file
      */
-    public SMTSolverResult run(Term formula, int timeout, Services services) throws IOException;
+    public SMTSolverResult run(Term formula, int timeout, Services services) throws IOException,  IllegalFormulaException;
     
     /**
      * Check if the valid formula is valid. This method is used for using multiple provers. 

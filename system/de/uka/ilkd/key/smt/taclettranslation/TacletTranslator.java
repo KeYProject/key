@@ -12,24 +12,21 @@ package de.uka.ilkd.key.smt.taclettranslation;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.rule.Taclet;
 
-/** 
- * A instance of <code>TacletTranslator</code> translates a single taclet to a formula.
+/**
+ * A instance of <code>TacletTranslator</code> translates a single taclet to a
+ * formula.
  */
 
 public interface TacletTranslator {
 
     /**
      * Translates a taclet to a formula.
-     * @param t taclet to be translated
+     * 
+     * @param t
+     *            taclet to be translated
      * @return formula which expresses the meaning of the taclet.
-     * @throw  IllegalTacletException if the taclet is not translatable.
+     * @throw IllegalTacletException if the taclet is not translatable.
      */
     public Term translate(Taclet t) throws IllegalTacletException;
-    
-   
-    
-     
-    
-  
-    
+
 }

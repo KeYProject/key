@@ -6,7 +6,7 @@ public class IllegalTacletException extends Exception {
      */
     private static final long serialVersionUID = 1L;
 
-    IllegalTacletException(String msg) {
+    public IllegalTacletException(String msg) {
 	super(msg);
     }
 }

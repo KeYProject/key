@@ -358,6 +358,19 @@ public class SmtLibTranslator extends AbstractSMTTranslator {
 
     @Override
     protected StringBuffer translateIntegerValue(long val) {
+	
+	StringBuffer arg =  new StringBuffer(Long.toString(val));
+	
+	if(val < 0){
+	   // delete the minus sign. 
+	   arg = new StringBuffer(arg.substring(1, arg.length()));  
+	   arg = translateIntegerUnaryMinus(arg);
+	}
+	
+	return arg;
+	
+	/* TODO: Delete
+	 * This code does not work for val = Long.MIN_VALUE
 	StringBuffer arg;
 	if (val < 0) {
 	    arg = translateIntegerValue(val * (-1));
@@ -366,7 +379,7 @@ public class SmtLibTranslator extends AbstractSMTTranslator {
 	    arg = new StringBuffer(Long.toString(val));
 	}
 
-	return arg;
+	return arg;*/
     }
 
     @Override

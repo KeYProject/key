@@ -21,6 +21,7 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.smt.AbstractSMTSolver;
 import de.uka.ilkd.key.smt.CVC3Solver;
+import de.uka.ilkd.key.smt.IllegalFormulaException;
 import de.uka.ilkd.key.smt.SMTSolver;
 import de.uka.ilkd.key.smt.SMTSolverResult;
 import de.uka.ilkd.key.smt.SimplifySolver;
@@ -30,89 +31,84 @@ import de.uka.ilkd.key.smt.Z3Solver;
 import de.uka.ilkd.key.smt.taclettranslation.DefaultTacletSetTranslation;
 import de.uka.ilkd.key.smt.taclettranslation.TacletSetTranslation;
 
-
 /**
  * @author niederma
- *
+ * 
  */
-public class TestSMTWithTaclets extends TestTaclet  {
-    
+public class TestSMTWithTaclets extends TestTaclet {
+
     private static String VALID = "valid";
     private static String INVALID = "not valid";
     private static String UNKNOWN = "unknown";
     private static String NOTAVAILABLE = "not installed";
-    
 
-      
-
-    
- 
-    /**Set this variable to <code>true</code>, if you want a output file. Change this variable directly in code.*/
+    /**
+     * Set this variable to <code>true</code>, if you want a output file. Change
+     * this variable directly in code.
+     */
     private boolean storeToFile = true;
-   
+
     protected void setUp() {
 
     }
-    
-    
+
     /**
-     * Tests some files (see <code>collectFilenames</code>) with problems that can be sovled by external provers only by means of taclets.
+     * Tests some files (see <code>collectFilenames</code>) with problems that
+     * can be sovled by external provers only by means of taclets.
+     * 
      * @throws IOException
      */
-    public void testTaclets() throws IOException {
+    public void testTaclets() throws IOException, IllegalFormulaException {
 	ArrayList<SMTSolver> solvers = getRules();
 
 	// First check whether the solvers are installed.
-	for(SMTSolver solver : solvers){
+	for (SMTSolver solver : solvers) {
 	    solver.isInstalled(true);
 	}
-	
-	String [] files = collectFilenames();
-	boolean use[] = {false,true};
-	
-	ArrayList<ArrayList<String>> result = new ArrayList<ArrayList<String>>(); 
-	
-	
 
-	for(String file : files){
-	    for(int i=0; i < 2; i++){
-		ArrayList<String> solverRes = new ArrayList<String>(); 
+	String[] files = collectFilenames();
+	boolean use[] = { false, true };
+
+	ArrayList<ArrayList<String>> result = new ArrayList<ArrayList<String>>();
+
+	for (String file : files) {
+	    for (int i = 0; i < 2; i++) {
+		ArrayList<String> solverRes = new ArrayList<String>();
 		result.add(solverRes);
 		solverRes.add(Boolean.toString(use[i]));
 
-
-		for(SMTSolver solver  : solvers){
-		    if(!solver.isInstalled(false)){
+		for (SMTSolver solver : solvers) {
+		    if (!solver.isInstalled(false)) {
 			solverRes.add(NOTAVAILABLE);
 			continue;
 		    }
 		    solver.useTaclets(use[i]);
 
-		    String res="";
+		    String res = "";
 
-		    res = checkFile(solver,folder+file);
-
+		    res = checkFile(solver, folder + file);
 
 		    solverRes.add(res);
 
-
-		    if(use[i]){
-			Assert.assertTrue("The problem "+file+ " can not be solved.",(res.equals(VALID)));
-		    }else{
-			Assert.assertTrue("The problem "+file+" can be solved without using taclets.",res.equals(UNKNOWN) || res.equals(INVALID)); 
-		    }		 
-		}	      
+		    if (use[i]) {
+			Assert.assertTrue("The problem " + file
+			        + " can not be solved.", (res.equals(VALID)));
+		    } else {
+			Assert.assertTrue("The problem " + file
+			        + " can be solved without using taclets.", res
+			        .equals(UNKNOWN)
+			        || res.equals(INVALID));
+		    }
+		}
 	    }
 
-	    if(this.storeToFile){
-		storeToFile(result,file,solvers,folder+"smtTacletTestResults.csv");
+	    if (this.storeToFile) {
+		storeToFile(result, file, solvers, folder
+		        + "smtTacletTestResults.csv");
 	    }
 	}
     }
-    
-    
 
-    
     private String translateResult(SMTSolverResult r) {
 	if (r.isValid() == SMTSolverResult.ThreeValuedTruth.TRUE) {
 	    return VALID;
@@ -125,25 +121,25 @@ public class TestSMTWithTaclets extends TestTaclet  {
 	    return UNKNOWN;
 	}
     }
-    
 
-    private void storeToFile(ArrayList<ArrayList<String>> result, String file,ArrayList<SMTSolver> solvers,
-            String dest) {
-	
+    private void storeToFile(ArrayList<ArrayList<String>> result, String file,
+	    ArrayList<SMTSolver> solvers, String dest) {
+
 	String toStore = "Filename\t\t\tused taclets\t\t\t";
-	for(SMTSolver solver : solvers){
-	    toStore = toStore+solver.name()+"\t\t\t";
+	for (SMTSolver solver : solvers) {
+	    toStore = toStore + solver.name() + "\t\t\t";
 	}
-	toStore = toStore+"\n";
-	
-	for(ArrayList<String> solverRes : result){
-	    String temp = file+"\t\t\t";
-	    for(String res : solverRes){
-		temp = temp + res+ "\t\t\t";}
-	    temp=temp+"\n";
+	toStore = toStore + "\n";
 
-	    toStore = toStore+temp;
-	    
+	for (ArrayList<String> solverRes : result) {
+	    String temp = file + "\t\t\t";
+	    for (String res : solverRes) {
+		temp = temp + res + "\t\t\t";
+	    }
+	    temp = temp + "\n";
+
+	    toStore = toStore + temp;
+
 	}
 	FileWriter fw;
 	try {
@@ -154,34 +150,34 @@ public class TestSMTWithTaclets extends TestTaclet  {
 	    System.out.println("Error while writing result file");
 	}
 
-	
     }
 
     /**
      * Loads the proof and taclets. Starts the external prover.
      */
-    private String checkFile(SMTSolver solver, String filepath) throws IOException{
+    private String checkFile(SMTSolver solver, String filepath)
+	    throws IOException, IllegalFormulaException {
 	ProofAggregate p = parse(new File(filepath));
-	
-	/*TacletSetTranslation translation = new DefaultTacletSetTranslation();
-	translation.addHeuristic("smt_axiom_not_verified");
-	translation.setTacletSet(getTaclets());	
-	solver.setTacletSetTranslation(translation);
-	*/
-	
-	((AbstractSMTSolver)solver).setTacletsForTest(getTaclets());
+
+	/*
+	 * TacletSetTranslation translation = new DefaultTacletSetTranslation();
+	 * translation.addHeuristic("smt_axiom_not_verified");
+	 * translation.setTacletSet(getTaclets());
+	 * solver.setTacletSetTranslation(translation);
+	 */
+
+	((AbstractSMTSolver) solver).setTacletsForTest(getTaclets());
 
 	Assert.assertTrue(p.getProofs().length == 1);
-	Proof proof = p.getProofs()[0];	    
+	Proof proof = p.getProofs()[0];
 	Assert.assertTrue(proof.openGoals().size() == 1);
-	
+
 	Goal g = proof.openGoals().iterator().next();
 	SMTSolverResult result = solver.run(g, 50, proof.getServices());
 	return translateResult(result);
-	
+
     }
-    
-    
+
     private ArrayList<SMTSolver> getRules() {
 	ArrayList<SMTSolver> toReturn = new ArrayList<SMTSolver>();
 	toReturn.add(new SimplifySolver());
@@ -190,19 +186,10 @@ public class TestSMTWithTaclets extends TestTaclet  {
 	toReturn.add(new CVC3Solver());
 	return toReturn;
     }
-    
 
-    
-    
-    
-    
-    private String[] collectFilenames(){
-	String [] res = {"booleanProblems.key"};
+    private String[] collectFilenames() {
+	String[] res = { "booleanProblems.key" };
 	return res;
     }
-    
- 
-    
-   
-  
+
 }

@@ -80,7 +80,8 @@ public class SMTRule implements BuiltInRule, MakesProgress {
 		re.initCause(ioe);
 		throw re;
 	    }	    
-	}
+	} 	 
+	
 	if (result.isValid() == SMTSolverResult.ThreeValuedTruth.TRUE) {
 	    return ImmutableSLList.<Goal>nil();
 	} else {
