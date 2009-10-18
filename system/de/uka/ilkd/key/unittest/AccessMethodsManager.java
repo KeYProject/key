@@ -158,7 +158,7 @@ public class AccessMethodsManager {
 	    return new CopyAssignment(lhs, rhs);
 	} else if (refPre instanceof FieldReference) {
 	    final ReferencePrefix reference = callGetter((FieldReference) refPre);
-	    final Expression[] index = { lhs.getExpressionAt(0) };
+	    final Expression[] index = { lhs.getExpressionAt(lhs.getExpressionCount()-1) };
 	    return new CopyAssignment(new ArrayReference(reference, index), rhs);
 	}
 	assert false : "\nMissing type for refPre=\n" + refPre
@@ -201,7 +201,7 @@ public class AccessMethodsManager {
 	    return lhs;
 	} else if (refPre instanceof FieldReference) {
 	    final ReferencePrefix reference = callGetter((FieldReference) refPre);
-	    final Expression[] index = { lhs.getExpressionAt(0) };
+	    final Expression[] index = { lhs.getExpressionAt(lhs.getExpressionCount()-1) };
 	    return new ArrayReference(reference, index);
 	}
 	assert false : "\nMissing type for refPre=\n" + refPre
@@ -218,7 +218,12 @@ public class AccessMethodsManager {
      */
     public Expression objParam(final ReferencePrefix refPre,
 	    final ProgramVariable pv) {
-	if (refPre instanceof LocationVariable) {
+	assert(refPre!=null): "Unexpected null pointer. pv is" + pv;
+	if(pv.isStatic()){
+	    //see http://tutorials.jenkov.com/java-reflection/fields.html
+	    TypeRef tr=(TypeRef)refPre;
+	    return new SyntacticalProgramVariable(new ProgramElementName("null"), tr.getKeYJavaType());
+	}else if (refPre instanceof LocationVariable) {
 	    final KeYJavaType classOfPv = pv.getContainerType();
 	    return new SyntacticalProgramVariable(new ProgramElementName(refPre
 		    .toString()), classOfPv);
@@ -229,9 +234,9 @@ public class AccessMethodsManager {
 	} else if (refPre instanceof ArrayReference) {
 	    return callGetter((ArrayReference) refPre);
 	}
-	assert false : "\nMissing type for refPre=\n" + refPre
-	        + " with class: " + refPre.getClass();
-	return null;
+	throw new RuntimeException( "\nMissing type for refPre=\n" + refPre
+	        + " with class: " + refPre.getClass());
+	//return null;
     }
 
     /**
@@ -263,7 +268,7 @@ public class AccessMethodsManager {
     }
 
     private String clean(String s) {
-	if (" jbyte jint jlong jfloat jdouble jboolean jchar jbyte[] jint[] jlong[] jfloat[] jdouble[] jboolean[] jchar[]"
+	if (" jbyte jint jlong jfloat jdouble jboolean jchar jbyte[] jint[] jlong[] jfloat[] jdouble[] jboolean[] jchar[] " //WARNING: Make sure this fixed string begins with a SPACE and also ends with a SPACE.
 	        .indexOf(" " + s + " ") != -1) {
 	    s = s.substring(1);
 	}
@@ -427,9 +432,12 @@ public class AccessMethodsManager {
 		    + "(Object obj, String attr, " + sort
 		    + " val) throws RuntimeException{\n");
 	    r.append("    try {\n");
-	    r.append("      Class<?> c = obj.getClass();\n");
-	    r
-		    .append("      java.lang.reflect.Field f = c.getDeclaredField(attr);\n");
+	    r.append("      Class<?> c;\n");
+	    r.append("      if(obj!=null){\n");
+	    r.append("         c = obj.getClass();\n");
+	    r.append("        }else{\n");
+	    r.append("         c = "+ sort +".class;\n}\n");	    
+	    r.append("      java.lang.reflect.Field f = c.getDeclaredField(attr);\n");
 	    r.append("      f.setAccessible(true);\n");
 	    r.append(cmd);
 	    r.append("    } catch(Exception e) {\n");
@@ -450,9 +458,12 @@ public class AccessMethodsManager {
 		    + "(Object obj, String attr) throws RuntimeException{\n");
 	    r.append("    " + sort + " res = " + def + ";\n");
 	    r.append("    try {\n");
-	    r.append("      Class<?> c = obj.getClass();\n");
-	    r
-		    .append("      java.lang.reflect.Field f = c.getDeclaredField(attr);\n");
+	    r.append("      Class<?> c;\n");
+	    r.append("      if(obj!=null){\n");
+	    r.append("         c = obj.getClass();\n");
+	    r.append("        }else{\n");
+	    r.append("         c = "+ sort +".class;\n}\n");	    
+	    r.append("      java.lang.reflect.Field f = c.getDeclaredField(attr);\n");
 	    r.append("      f.setAccessible(true);\n");
 	    r.append(cmd);
 	    r.append("    } catch(Exception e) {\n");

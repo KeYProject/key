@@ -91,8 +91,8 @@ public class MethodSelectionDialog extends JDialog {
 	        .setSelected(UnitTestBuilder.requireCompleteExecution);
 	instance.simplifyDataTupleNumber.setText(Integer
 	        .toString(SimplifyModelGenerator.modelLimit));
-	assert (TestGenFac.testGen == TestGenFac.TG_JAVACARD || TestGenFac.testGen == TestGenFac.TG_JAVA) : "Unhandled case in MethodSelectionDialog.";
-	if (TestGenFac.testGen == TestGenFac.TG_JAVACARD) {
+	assert (TestGenFac.testGenMode == TestGenFac.TG_JAVACARD || TestGenFac.testGenMode == TestGenFac.TG_JAVA) : "Unhandled case in MethodSelectionDialog.";
+	if (TestGenFac.testGenMode == TestGenFac.TG_JAVACARD) {
 	    instance.testGenChoice.setSelectedItem(TestGenFac.TG_JAVACARD);
 	} else {
 	    instance.testGenChoice.setSelectedItem(TestGenFac.TG_JAVA);
@@ -244,9 +244,9 @@ public class MethodSelectionDialog extends JDialog {
 	testGenChoice.addActionListener(new ActionListener() {
 	    public void actionPerformed(final ActionEvent e) {
 		if (testGenChoice.getSelectedItem() == TestGenFac.TG_JAVACARD) {
-		    TestGenFac.testGen = TestGenFac.TG_JAVACARD;
+		    TestGenFac.testGenMode = TestGenFac.TG_JAVACARD;
 		} else if (testGenChoice.getSelectedItem() == TestGenFac.TG_JAVA) {
-		    TestGenFac.testGen = TestGenFac.TG_JAVA;
+		    TestGenFac.testGenMode = TestGenFac.TG_JAVA;
 		} else {
 		    throw new RuntimeException(
 			    "Not implemented case in MethodSelectionDialog");
