@@ -26,6 +26,7 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.unittest.ppAndJavaASTExtension.SyntacticalProgramVariable;
 import de.uka.ilkd.key.unittest.ppAndJavaASTExtension.SyntacticalTypeRef;
+import de.uka.ilkd.key.util.ExtList;
 
 /**
  * @author mbender
@@ -102,7 +103,6 @@ public class AccessMethodsManager {
 	usedObjectSorts.add(sort);
 	return new MethodReference(new ImmutableArray<Expression>(),
 	        new ProgramElementName("new" + clean(sort.toString())), twClass);
-
     }
 
     /**
@@ -115,7 +115,6 @@ public class AccessMethodsManager {
 	usedObjectSorts.add(sort);
 	return new MethodReference(rhs.getArguments(), new ProgramElementName(
 	        "new" + clean(sort.toString())), twClass);
-
     }
 
     // ********************
@@ -137,12 +136,14 @@ public class AccessMethodsManager {
 	    final Expression rhs) {
 	final ProgramVariable pv = lhs.getProgramVariable();
 	final StringLiteral var = new StringLiteral(varName(pv));
+	final Expression paraClassClass = classParam(pv);
 	final Expression paraClassObj = objParam(lhs.getReferencePrefix(), pv);
 	final Sort sort = pv.sort();
 	usedObjectSorts.add(sort);
-	return new MethodReference(new ImmutableArray<Expression>(paraClassObj,
-	        var, rhs), new ProgramElementName("_set_"
-	        + clean(sort.toString())), twClass);
+	return new MethodReference(new ImmutableArray<Expression>(
+	        paraClassClass, paraClassObj, var, rhs),
+	        new ProgramElementName("_set_" + clean(sort.toString())),
+	        twClass);
     }
 
     /**
@@ -158,12 +159,12 @@ public class AccessMethodsManager {
 	    return new CopyAssignment(lhs, rhs);
 	} else if (refPre instanceof FieldReference) {
 	    final ReferencePrefix reference = callGetter((FieldReference) refPre);
-	    final Expression[] index = { lhs.getExpressionAt(lhs.getExpressionCount()-1) };
+	    final Expression[] index = { lhs.getExpressionAt(lhs
+		    .getExpressionCount() - 1) };
 	    return new CopyAssignment(new ArrayReference(reference, index), rhs);
 	}
-	assert false : "\nMissing type for refPre=\n" + refPre
-	        + " with class: " + refPre.getClass();
-	return null;
+	throw new RuntimeException("Missing type for refPre=\n" + refPre
+	        + " with class: " + refPre.getClass());
     }
 
     // ********************
@@ -182,12 +183,21 @@ public class AccessMethodsManager {
     public MethodReference callGetter(final FieldReference lhs) {
 	final ProgramVariable pv = lhs.getProgramVariable();
 	final StringLiteral var = new StringLiteral(varName(pv));
+	final Expression paraClassClass = classParam(pv);
 	final Expression paraClassObj = objParam(lhs.getReferencePrefix(), pv);
 	final Sort sort = pv.sort();
 	usedObjectSorts.add(sort);
-	return new MethodReference(new ImmutableArray<Expression>(paraClassObj,
-	        var), new ProgramElementName("_get_" + clean(sort.toString())),
-	        twClass);
+	return new MethodReference(new ImmutableArray<Expression>(
+	        paraClassClass, paraClassObj, var), new ProgramElementName(
+	        "_get_" + clean(sort.toString())), twClass);
+    }
+
+    @SuppressWarnings("unchecked")
+    public ArrayLengthReference arrayLength(final FieldReference fr) {
+	final ExtList l = new ExtList();
+	l.add((ReferencePrefix) objParam(fr.getReferencePrefix(), fr
+	        .getProgramVariable()));
+	return new ArrayLengthReference(l);
     }
 
     /**
@@ -201,13 +211,12 @@ public class AccessMethodsManager {
 	    return lhs;
 	} else if (refPre instanceof FieldReference) {
 	    final ReferencePrefix reference = callGetter((FieldReference) refPre);
-	    final Expression[] index = { lhs.getExpressionAt(lhs.getExpressionCount()-1) };
+	    final Expression[] index = { lhs.getExpressionAt(lhs
+		    .getExpressionCount() - 1) };
 	    return new ArrayReference(reference, index);
 	}
-	assert false : "\nMissing type for refPre=\n" + refPre
-	        + " with class: " + refPre.getClass();
-	return null;
-
+	throw new RuntimeException("Missing type for refPre=\n" + refPre
+	        + " with class: " + refPre.getClass());
     }
 
     /**
@@ -218,12 +227,13 @@ public class AccessMethodsManager {
      */
     public Expression objParam(final ReferencePrefix refPre,
 	    final ProgramVariable pv) {
-	assert(refPre!=null): "Unexpected null pointer. pv is" + pv;
-	if(pv.isStatic()){
-	    //see http://tutorials.jenkov.com/java-reflection/fields.html
-	    TypeRef tr=(TypeRef)refPre;
-	    return new SyntacticalProgramVariable(new ProgramElementName("null"), tr.getKeYJavaType());
-	}else if (refPre instanceof LocationVariable) {
+	assert (refPre != null) : "Unexpected null pointer. pv is" + pv;
+	if (pv.isStatic()) {
+	    // see http://tutorials.jenkov.com/java-reflection/fields.html
+	    return new SyntacticalProgramVariable(
+		    new ProgramElementName("null"), ((TypeRef) refPre)
+		            .getKeYJavaType());
+	} else if (refPre instanceof LocationVariable) {
 	    final KeYJavaType classOfPv = pv.getContainerType();
 	    return new SyntacticalProgramVariable(new ProgramElementName(refPre
 		    .toString()), classOfPv);
@@ -234,9 +244,15 @@ public class AccessMethodsManager {
 	} else if (refPre instanceof ArrayReference) {
 	    return callGetter((ArrayReference) refPre);
 	}
-	throw new RuntimeException( "\nMissing type for refPre=\n" + refPre
+	throw new RuntimeException("\nMissing type for refPre=\n" + refPre
 	        + " with class: " + refPre.getClass());
-	//return null;
+    }
+
+    private Expression classParam(final ProgramVariable pv) {
+	final KeYJavaType classOfPv = pv.getContainerType();
+	return new SyntacticalProgramVariable(new ProgramElementName(classOfPv
+	        .getName()
+	        + ".class"), classOfPv);
     }
 
     /**
@@ -268,7 +284,9 @@ public class AccessMethodsManager {
     }
 
     private String clean(String s) {
-	if (" jbyte jint jlong jfloat jdouble jboolean jchar jbyte[] jint[] jlong[] jfloat[] jdouble[] jboolean[] jchar[] " //WARNING: Make sure this fixed string begins with a SPACE and also ends with a SPACE.
+	// WARNING: Make sure this fixed string begins with a SPACE and also
+	// ends with a SPACE.
+	if (" jbyte jint jlong jfloat jdouble jboolean jchar jbyte[] jint[] jlong[] jfloat[] jdouble[] jboolean[] jchar[] "
 	        .indexOf(" " + s + " ") != -1) {
 	    s = s.substring(1);
 	}
@@ -429,15 +447,11 @@ public class AccessMethodsManager {
 		    + "(obj, val);\n" : "      f.set(obj, val);\n");
 	    r.append("\n");
 	    r.append("  public static void _set_" + clean(sort)
-		    + "(Object obj, String attr, " + sort
+		    + "(Class<?> c, Object obj, String attr, " + sort
 		    + " val) throws RuntimeException{\n");
 	    r.append("    try {\n");
-	    r.append("      Class<?> c;\n");
-	    r.append("      if(obj!=null){\n");
-	    r.append("         c = obj.getClass();\n");
-	    r.append("        }else{\n");
-	    r.append("         c = "+ sort +".class;\n}\n");	    
-	    r.append("      java.lang.reflect.Field f = c.getDeclaredField(attr);\n");
+	    r
+		    .append("      java.lang.reflect.Field f = c.getDeclaredField(attr);\n");
 	    r.append("      f.setAccessible(true);\n");
 	    r.append(cmd);
 	    r.append("    } catch(Exception e) {\n");
@@ -454,16 +468,16 @@ public class AccessMethodsManager {
 		    + Character.toUpperCase(sort.charAt(0)) + sort.substring(1)
 		    + "(obj);\n" : "      return (" + sort + ") f.get(obj);\n");
 	    r.append("\n");
-	    r.append("  public static " + sort + " _get_" + clean(sort)
-		    + "(Object obj, String attr) throws RuntimeException{\n");
+	    r
+		    .append("  public static "
+		            + sort
+		            + " _get_"
+		            + clean(sort)
+		            + "(Class<?> c, Object obj, String attr) throws RuntimeException{\n");
 	    r.append("    " + sort + " res = " + def + ";\n");
 	    r.append("    try {\n");
-	    r.append("      Class<?> c;\n");
-	    r.append("      if(obj!=null){\n");
-	    r.append("         c = obj.getClass();\n");
-	    r.append("        }else{\n");
-	    r.append("         c = "+ sort +".class;\n}\n");	    
-	    r.append("      java.lang.reflect.Field f = c.getDeclaredField(attr);\n");
+	    r
+		    .append("      java.lang.reflect.Field f = c.getDeclaredField(attr);\n");
 	    r.append("      f.setAccessible(true);\n");
 	    r.append(cmd);
 	    r.append("    } catch(Exception e) {\n");

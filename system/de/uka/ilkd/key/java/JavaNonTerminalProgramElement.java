@@ -98,11 +98,7 @@ public abstract class JavaNonTerminalProgramElement extends JavaProgramElement
 	    int result = 17;
 	    result = 37 * result + getChildCount();
 	    for (int i = 0, cc = getChildCount(); i<cc; i++) {
-		ProgramElement pe = getChildAt(i);
-		if(pe==null){ //to be able to set a break-point here
-		    throw new NullPointerException();
-		}
-	        result = 37 * result + pe.hashCode();
+	        result = 37 * result + getChildAt(i).hashCode();
 	    }
 	    if (result == 0) { 
 		hashCode = 1;
