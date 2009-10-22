@@ -108,7 +108,7 @@ public final class SLAttributeResolver extends SLExpressionResolver {
         		    		    attribute.getKeYJavaType());
         	} catch (TermCreationException e) {
         	    throw manager.excManager.createException(
-        		    "Wrong attribute reference " + name + ".");
+        		    "Wrong attribute reference \"" + name + "\": " + e.getMessage());
         	}
             }
         }   

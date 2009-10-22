@@ -44,6 +44,20 @@ final class ArrayList implements List {
 	}
 	array[size++] = o;
     }
+    
+    
+    public boolean contains(Object o) {
+	/*@ loop_invariant 0 <= i && i <= size
+	  @  && (\forall int x; 0 <= x && x < i; array[x] != o);
+	  @ assignable \nothing;
+	  @*/
+	for(int i = 0; i < size; i++) {
+	    if(array[i] == o) {
+		return true;
+	    }
+	}
+	return false;
+    }    
 
     
     public Object get(int index) {
@@ -54,7 +68,44 @@ final class ArrayList implements List {
     }
     
     
+    public ListIterator iterator() {
+	return new ArrayListIterator();
+    }
+    
+    
     public int size() {
 	return size;
+    }
+        
+    //interactive proofs:
+    //-contains (obvious quantifier instantiation)
+    
+    
+    
+    //inner class--------------------------------------------------------------
+    
+    private class ArrayListIterator implements ListIterator {
+	private int arrayPos = 0;
+	
+	//@ represents list <- ArrayList.this;
+	//@ represents pos <- arrayPos;
+	
+	//@ invariant list.<inv>;
+	//@ invariant 0 <= arrayPos && arrayPos <= list.size;
+	//@ invariant \typeof(list) == ArrayList;
+	
+	
+	public boolean hasNext() {
+	    return arrayPos < ArrayList.this.size;
+	}
+    
+	
+	public Object next() {
+	    if(arrayPos == ArrayList.this.size) {
+		throw new IndexOutOfBoundsException();
+	    }
+	    arrayPos++;
+	    return ArrayList.this.array[arrayPos - 1];
+	}
     }
 }

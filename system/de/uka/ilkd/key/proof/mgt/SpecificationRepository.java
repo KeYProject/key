@@ -18,6 +18,8 @@ import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.declaration.ClassDeclaration;
+import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -430,11 +432,13 @@ public final class SpecificationRepository {
 		                    TB.inv(services, TB.var(selfVar)), 
 		                    invDef);
 	final ObserverFunction invSymbol = services.getJavaInfo().getInv();
-	final ClassAxiom invAxiom = new ClassAxiomImpl("Class invariant axiom",
-		                                       kjt,		
-		                                       invSymbol,
-		                                       invDef,
-		                                       selfVar);
+	final ClassAxiom invAxiom 
+		= new ClassAxiomImpl("Class invariant axiom for " 
+			                 + kjt.getFullName(),
+				     kjt,		
+				     invSymbol,
+				     invDef,
+				     selfVar);
 	result = result.add(invAxiom);
 	
 	//add query axioms
@@ -448,6 +452,15 @@ public final class SpecificationRepository {
 			                  pm);
 		result = result.add(queryAxiom);
 	    }
+	}
+	
+	//add axioms for enclosing class, if applicable
+	final ProgramVariable et 
+		= services.getJavaInfo().getAttribute(
+			    ImplicitFieldAdder.IMPLICIT_ENCLOSING_THIS, kjt);
+	if(et != null){
+	    final KeYJavaType enclosingKJT = et.getKeYJavaType();
+	    result = result.union(getClassAxioms(enclosingKJT));
 	}
 	
 	return result;

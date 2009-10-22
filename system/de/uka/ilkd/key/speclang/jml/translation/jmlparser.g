@@ -1340,7 +1340,9 @@ postfixexpr returns [SLExpression result=null] throws SLTranslationException
 	}
 	(
 	    {
-		if (expr != null && expr.getType().getJavaType() instanceof PrimitiveType) {
+	        if (expr != null && expr.getType() == null) {
+	            raiseError("SLExpression without a type: " + expr);
+	        } else if (expr != null && expr.getType().getJavaType() instanceof PrimitiveType) {
 		    raiseError("Cannot build postfix expression from primitive type.");
 		}
 	    }
@@ -1410,7 +1412,8 @@ primarysuffix[SLExpression receiver, String fullyQualifiedName]
     		services.getTypeConverter().findThisForSort(receiver.getType().getSort(),
     							    TB.var(selfVar), 
     							    javaInfo.getKeYJavaType(selfVar.sort()), 
-    							    true));//XXX
+    							    true),
+                receiver.getType());
     }
     |
 	l:LPAREN (params=expressionlist)? RPAREN

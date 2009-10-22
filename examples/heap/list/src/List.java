@@ -13,6 +13,13 @@ interface List {
       @   ensures \newElemsFresh(footprint);
       @*/    
      public void add(/*@nullable@*/ Object o);
+     
+     
+    /*@ normal_behaviour
+      @   accessible footprint;
+      @   ensures \result == (\exists int i; 0 <= i && i < size(); get(i) == o);
+      @*/
+    public /*@pure@*/ boolean contains(/*@nullable@*/ Object o);  
     
     
     /*@ normal_behaviour
@@ -25,6 +32,14 @@ interface List {
       @   signals_only IndexOutOfBoundsException;
       @*/
     public /*@pure nullable@*/ Object get(int index);
+    
+    
+    /*@ normal_behaviour
+      @   ensures \fresh(\result);
+      @   ensures \result.list == this;
+      @   ensures \result.pos == 0;
+      @*/
+    public /*@pure@*/ ListIterator iterator();    
     
     
     /*@ normal_behaviour
