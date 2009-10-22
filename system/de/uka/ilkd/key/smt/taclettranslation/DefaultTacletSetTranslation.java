@@ -2,18 +2,20 @@ package de.uka.ilkd.key.smt.taclettranslation;
 
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.HashSet;
 
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.rule.Taclet;
 
 public final class DefaultTacletSetTranslation 
-			implements TacletSetTranslation {
+			implements TacletSetTranslation,TranslationListener {
 
     /**
      * if <code>translate</code> is <code>true</code> the method
@@ -51,9 +53,19 @@ public final class DefaultTacletSetTranslation
      * change the list.
      */
     private ImmutableList<String> heuristics = ImmutableSLList.nil();
+    
+    private ImmutableSet<Sort> usedFormulaSorts = DefaultImmutableSet.nil();
+    
+    /**
+     * Sorts that has been used while translating the set of taclets.
+     */
+    private HashSet<Sort> usedSorts = new HashSet<Sort>();
 
     public DefaultTacletSetTranslation() {
-	translators = translators.append(new RewriteTacletTranslator());
+	TacletTranslator tt = new RewriteTacletTranslator();
+	tt.addListener(this);
+	translators = translators.append(tt);
+	
     }
 
     /**
@@ -76,13 +88,13 @@ public final class DefaultTacletSetTranslation
 	return false;
     }
 
-    public ImmutableList<TacletFormula> getTranslation() {
+    public ImmutableList<TacletFormula> getTranslation(ImmutableSet<Sort> sorts) {
 
 	// only translate once a time.
 	if (!translate)
 	    return translation;
 	translate = false;
-
+	usedSorts.clear();
 	notTranslated = ImmutableSLList.nil();
 	translation = ImmutableSLList.nil();
 
@@ -103,7 +115,7 @@ public final class DefaultTacletSetTranslation
 	    for (TacletTranslator translator : translators) {
 		try { // check for the right translator
 
-		    Term term = translator.translate(t);
+		    Term term = translator.translate(t,sorts);
 		    translation = translation.append(new DefaultTacletFormula(
 			    t, term, ""));
 		    break; // translate only once a time.
@@ -143,19 +155,35 @@ public final class DefaultTacletSetTranslation
 	return size == heuristics.size() + 1;
     }
 
+    
     public void update() {
 	translate = true;
-	getTranslation();
+	getTranslation(usedFormulaSorts);
 
     }
 
+    /**
+     * Stores the translation to a file by using the key-format for problem files.  
+     * @param dest the path of the file.
+     */
     public void storeToFile(String dest) {
-	storeToFile(getTranslation(), dest);
+	storeToFile(getTranslation(usedFormulaSorts), dest);
     }
 
     private void storeToFile(ImmutableList<TacletFormula> list, String dest) {
-
-	String toStore = "\\problem{\n\n";
+        String toStore = "";
+        
+        if(usedSorts.size() > 0){
+            toStore += "\\sorts{\n\n";
+            for(Sort sort : usedSorts){
+                toStore += sort.name().toString()+";\n";  
+            }
+            toStore += "}\n";
+    	
+        }
+        
+      
+	toStore += "\\problem{\n\n";
 	int i = 0;
 	for (TacletFormula tf : list) {
 	    toStore += "//" + tf.getTaclet().name().toString() + "\n";
@@ -182,6 +210,16 @@ public final class DefaultTacletSetTranslation
     private String convertTerm(Term term) {
 	return LogicPrinter.quickPrintTerm(term, null);
     }
+
+    /* (non-Javadoc)
+     * @see de.uka.ilkd.key.smt.taclettranslation.TranslationListener#eventSort(de.uka.ilkd.key.logic.sort.Sort)
+     */
+    public void eventSort(Sort sort) {
+	usedSorts.add(sort);
+	
+    }
+
+
 
 
 

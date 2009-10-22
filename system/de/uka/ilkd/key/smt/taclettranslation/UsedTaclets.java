@@ -134,11 +134,7 @@ final class UsedTaclets {
 	     */
 
 	    // genericRules.key
-	    /*
-	     * Not translatable yet because generics sorts are not supported
-	     * yet.
-	     */
-	    // usedTaclets.add("castDel");
+	    usedTaclets.add("castDel");
 
 	    // instanceAllocation.key
 	    /** Not translatable yet. */

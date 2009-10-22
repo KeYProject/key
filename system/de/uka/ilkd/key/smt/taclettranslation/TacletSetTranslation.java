@@ -12,6 +12,7 @@ package de.uka.ilkd.key.smt.taclettranslation;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.Taclet;
 
 /**
@@ -38,7 +39,7 @@ public interface TacletSetTranslation {
      * @return returns the resulting formulae of the taclets. Each formula of
      *         the resulting set is associated with one taclet.
      */
-    public ImmutableList<TacletFormula> getTranslation();
+    public ImmutableList<TacletFormula> getTranslation(ImmutableSet<Sort> sorts);
 
     /**
      * Returns all taclet that have not been translated. The reason can be got

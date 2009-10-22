@@ -25,6 +25,7 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.rule.Taclet;
 import junit.framework.Assert;
@@ -53,9 +54,10 @@ public class TestTacletTranslation extends TestTaclet {
 
     public void testTranslateWhatYouGet() {
 
+	ImmutableSet<Sort> emptySet = DefaultImmutableSet.nil();
 	TacletSetTranslation translation = new DefaultTacletSetTranslation();
 	translation.setTacletSet(getTaclets());
-	storeToFile(translation.getTranslation(), TestTaclet.folder
+	storeToFile(translation.getTranslation(emptySet), TestTaclet.folder
 	        + "TacletProofObligation.key");
 
 	// translation.addHeuristic("smt_axiom_not_verified");
@@ -130,8 +132,8 @@ public class TestTacletTranslation extends TestTaclet {
 	        tacletList.length == set.size());
 
 	translation.setTacletSet(set);
-
-	ImmutableList<TacletFormula> list = translation.getTranslation();
+	ImmutableSet<Sort> emptySet = DefaultImmutableSet.nil();
+	ImmutableList<TacletFormula> list = translation.getTranslation(emptySet);
 	String reason = "The following taclets were translated:\n";
 	for (TacletFormula tf : list) {
 	    reason = reason + tf.getTaclet().name().toString();
@@ -153,8 +155,8 @@ public class TestTacletTranslation extends TestTaclet {
 	Assert.assertTrue("Taclet boolean_equal_2 not found.", t != null);
 
 	TacletTranslator translator = new RewriteTacletTranslator();
-
-	Term term = translator.translate(t);
+	ImmutableSet<Sort> emptySet = DefaultImmutableSet.nil();
+	Term term = translator.translate(t,emptySet);
 
 	String s = "all({b1:boolean}all({b2:boolean}equiv(equiv(equals(b1,TRUE),equals(b2,TRUE)),equals(b1,b2))))";
 
@@ -182,8 +184,8 @@ public class TestTacletTranslation extends TestTaclet {
 	                t != null);
 
 	TacletTranslator translator = new RewriteTacletTranslator();
-
-	Term term = translator.translate(t);
+	ImmutableSet<Sort> emptySet = DefaultImmutableSet.nil();
+	Term term = translator.translate(t,emptySet);
 
 	String s = "all({br:boolean}imp(not(equals(br,FALSE)),equals(br,TRUE)))";
 

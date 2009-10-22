@@ -22,6 +22,7 @@ import org.apache.log4j.Logger;
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.gui.DecisionProcedureSettings;
 import de.uka.ilkd.key.gui.Main;
 import de.uka.ilkd.key.gui.configuration.PathConfig;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
@@ -218,6 +219,7 @@ public abstract class AbstractSMTSolver implements SMTSolver {
 	  
 	try{
 	    String s = trans.translate(goal.sequent(), services).toString();
+	    saveTacletTranslation(trans);
 	    toReturn = this.run(s, timeout, services);
     	} catch (IllegalFormulaException e) {
 	    toReturn = SMTSolverResult.NO_IDEA;
@@ -242,7 +244,8 @@ public abstract class AbstractSMTSolver implements SMTSolver {
 
 	String formula = trans.translate(goal.sequent(), services).toString();
 
-
+	saveTacletTranslation(trans);
+	
 
 	
 	final File loc;
@@ -362,6 +365,7 @@ public abstract class AbstractSMTSolver implements SMTSolver {
 	    	                     int timeout, 
 	    			     Services services) throws IOException {
 	SMTSolverResult toReturn;
+	
 	
 	final File loc;
 	try {
@@ -542,9 +546,39 @@ public abstract class AbstractSMTSolver implements SMTSolver {
 	 return res;
     }
     
+   
+    private void saveTacletTranslation(SMTTranslator trans){
+	 if(!this.inTestMode && ProofSettings.DEFAULT_SETTINGS.getDecisionProcedureSettings().isSavingTacletTranslation()
+            && ProofSettings.DEFAULT_SETTINGS.getDecisionProcedureSettings().isUsingTaclets()){
+		 JFileChooser fc = new JFileChooser();
+		 fc.setDialogTitle("Select a file to save the taclet translation");
+		 fc.setMultiSelectionEnabled(false);
+		 int returnVal = fc.showOpenDialog(Main.getInstance());
+		 File target = fc.getSelectedFile();
+		 if (returnVal == JFileChooser.APPROVE_OPTION) {
+		     DefaultTacletSetTranslation translation = (DefaultTacletSetTranslation)((AbstractSMTTranslator)trans).getTacletSetTranslation();
+		     
+		     if(translation != null){		     
+		       translation.storeToFile(target.getAbsolutePath());
+		     }
+		    }
+		  
+		     
+	     }
+    }
+    
     private void instantiateTaclets(Goal goal, SMTTranslator trans) throws IllegalFormulaException{
-	 ImmutableSLList<TacletFormula> emptyList = ImmutableSLList.nil();
-	 if(!useTaclets){
+	ImmutableSet<Taclet> emptySet = DefaultImmutableSet.nil();
+	if(!ProofSettings.DEFAULT_SETTINGS.getDecisionProcedureSettings().isUsingTaclets()){
+	    trans.setTacletsForAssumptions(emptySet);
+	}else{
+	    trans.setTacletsForAssumptions(getTaclets(goal));
+	}
+	
+	
+	/* ImmutableSLList<TacletFormula> emptyList = ImmutableSLList.nil();
+	
+	 if(!ProofSettings.DEFAULT_SETTINGS.getDecisionProcedureSettings().isUsingTaclets()){
 	     trans.setTacletAssumptions(emptyList);	     
 	 }else{
 	     DefaultTacletSetTranslation tacletSetTranslation = new DefaultTacletSetTranslation();
@@ -574,7 +608,7 @@ public abstract class AbstractSMTSolver implements SMTSolver {
       	    // tacletSetTranslation.addHeuristic("smt_axiom_not_verified");
 	    
 	     trans.setTacletAssumptions(tacletSetTranslation.getTranslation());
-	     if(saveTacletTranslation){
+	     if(!this.inTestMode && ProofSettings.DEFAULT_SETTINGS.getDecisionProcedureSettings().isSavingTacletTranslation()){
 		 JFileChooser fc = new JFileChooser();
 		 fc.setDialogTitle("Select a file to save the taclet translation");
 		 fc.setMultiSelectionEnabled(false);
@@ -588,7 +622,7 @@ public abstract class AbstractSMTSolver implements SMTSolver {
 	     }
 		    
 	     
-	 }
+	 }*/
 	 
 	
 	

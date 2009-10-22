@@ -9,11 +9,16 @@
 // 
 package de.uka.ilkd.key.smt.taclettranslation;
 
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
 
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.collection.ImmutableSet;
 
 import de.uka.ilkd.key.logic.ConstrainedFormula;
 import de.uka.ilkd.key.logic.JavaBlock;
@@ -23,6 +28,7 @@ import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermFactory;
+import de.uka.ilkd.key.logic.op.CastFunctionSymbol;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.IfThenElse;
 import de.uka.ilkd.key.logic.op.Junctor;
@@ -32,6 +38,9 @@ import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.Quantifier;
 import de.uka.ilkd.key.logic.op.RigidFunction;
 import de.uka.ilkd.key.logic.op.SchemaVariableAdapter;
+import de.uka.ilkd.key.logic.op.SortedSchemaVariable;
+import de.uka.ilkd.key.logic.sort.AbstractSort;
+import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 
 import de.uka.ilkd.key.rule.Taclet;
@@ -40,9 +49,13 @@ import de.uka.ilkd.key.rule.TacletGoalTemplate;
 abstract class AbstractTacletTranslator implements TacletTranslator {
 
     protected final static TermFactory tf = TermFactory.DEFAULT;
+    
+    
 
     protected HashMap<String, LogicVariable> usedVariables = 
 	new HashMap<String, LogicVariable>();
+
+    protected Collection<TranslationListener> listener= new LinkedList<TranslationListener>();
 
     /**
      * Translates a sequent to a term by using the following translations rules:
@@ -67,7 +80,7 @@ abstract class AbstractTacletTranslator implements TacletTranslator {
 	    return builder.not(builder.and(ante));
 	if (ante.size() == 0)
 	    return builder.or(succ);
-
+	
 	return builder.imp(builder.and(ante), builder.or(succ));
     }
 
@@ -161,7 +174,7 @@ abstract class AbstractTacletTranslator implements TacletTranslator {
      */
 
     protected void checkOperator(Operator op) throws IllegalTacletException {
-
+	
 	if ((op instanceof Junctor)
 	        || (op instanceof Equality)
 	        || (op instanceof Quantifier)
@@ -191,6 +204,11 @@ abstract class AbstractTacletTranslator implements TacletTranslator {
      */
     protected void checkTerm(Term term) throws IllegalTacletException {
 	checkOperator(term.op());
+	for(TranslationListener l : listener){
+	    if(term.sort() != null && !(term.sort() instanceof GenericSort)){
+		l.eventSort(term.sort());
+	    }
+	}
 	for (int i = 0; i < term.arity(); i++) {
 	    checkTerm(term.sub(i));
 	}
@@ -218,13 +236,14 @@ abstract class AbstractTacletTranslator implements TacletTranslator {
      * method calls <code>changeTerm</code>. This mechanism can be used to
      * exchange subterms.
      * 
-     * @param term
-     *            the term to rebuild.
+     * @param term the term to rebuild.
+     * @param genericSorts for the translation of generic variables. 
      * @return returns the new term.
      */
-    protected Term rebuildTerm(Term term) {
+   
+    protected Term rebuildTerm(Term term){
 	ImmutableArray<QuantifiableVariable> variables[] = new ImmutableArray[term
-	        .arity()];
+	                                                                      .arity()];
 	Term[] subTerms = new Term[term.arity()];
 	for (int i = 0; i < term.arity(); i++) {
 	    subTerms[i] = rebuildTerm(term.sub(i));
@@ -233,10 +252,60 @@ abstract class AbstractTacletTranslator implements TacletTranslator {
 
 	term = changeTerm(term);
 
+
+
 	term = tf.createTerm(term.op(), subTerms, variables,
-	        JavaBlock.EMPTY_JAVABLOCK);
+		JavaBlock.EMPTY_JAVABLOCK);
 	return term;
     }
+    
+   
+    /**
+     * Instantiates all variables of a generic sort with logic variables. 
+     * The logic variable has the same name with the prefix [sort]__
+     * @param term 
+     * @param generic the generic sort that should be instantiated. 
+     * @param instantiation the instantiation sort.
+     * @return returns the new term with instantiated variables.
+     */
+    
+    protected Term instantiateGeneric(Term term, GenericSort generic, Sort instantiation){
+	ImmutableArray<QuantifiableVariable> variables[] = new ImmutableArray[term
+	                                                                      .arity()];
+	Term[] subTerms = new Term[term.arity()];
+	for (int i = 0; i < term.arity(); i++) {
+	    subTerms[i] = instantiateGeneric(term.sub(i),generic,instantiation);
+	    variables[i] = subTerms[i].varsBoundHere(i);
+	}
+
+
+	if(term.sort().equals(generic)){
+
+	    
+	   if(term.op() instanceof LogicVariable){ 
+	   TermBuilder tb = TermBuilder.DF;
+	   
+	   term = tb.var(getLogicVariable(new Name(instantiation.name().toString()+"__"+term.op().name().toString()), instantiation));
+		for(TranslationListener l : listener){
+		    l.eventSort(instantiation);
+		}
+	   }
+	   if(term.op() instanceof CastFunctionSymbol){
+	       term =  TermFactory.DEFAULT.createCastTerm((AbstractSort)instantiation,subTerms[0]); 
+	   }
+			   
+		
+	}
+
+	term = tf.createTerm(term.op(), subTerms, variables,
+		JavaBlock.EMPTY_JAVABLOCK);
+	return term;
+
+    }
+    
+
+    
+    
 
     /**
      * Returns a new logic variable with the given name and sort. If already a
@@ -269,6 +338,14 @@ abstract class AbstractTacletTranslator implements TacletTranslator {
      */
     protected Term changeTerm(Term term) {
 	return term;
+    }
+    
+    public void addListener(TranslationListener listener){
+	this.listener.add(listener);
+    }
+    
+    public void removeListener(TranslationListener listener){
+	this.listener.remove(listener);
     }
 
 }

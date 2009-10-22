@@ -13,10 +13,12 @@ package de.uka.ilkd.key.smt;
 import java.util.Vector;
 
 import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.smt.taclettranslation.TacletFormula;
 
 
@@ -44,11 +46,11 @@ public interface SMTTranslator {
     public StringBuffer translate(Term t, Services services) 
     		throws IllegalFormulaException;
     /**
-     * Sets a assumption which has already the format of the used prover.  The assumptions is made of taclets.
+     * Sets the taclets that should be used for generating new assumptions.
      * Set the assumption before calling the general translate method. 
-     * @param assumption
+     * @param taclets 
      */
-    public void setTacletAssumptions(ImmutableList<TacletFormula> assumption);
+    public void setTacletsForAssumptions(ImmutableSet<Taclet> taclets);
     
     //TODO remove after testing!!
     /**

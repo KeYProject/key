@@ -1525,6 +1525,8 @@ public class Main extends JFrame implements IMain {
     
     JCheckBoxMenuItem saveSMTFile;
     private JCheckBoxMenuItem waitForAllProvers;
+    private JCheckBoxMenuItem saveTacletTranslation;
+    private JCheckBoxMenuItem useTaclets;
     
     /**
      * creates a menu allowing to choose the external prover to be used
@@ -1615,6 +1617,28 @@ public class Main extends JFrame implements IMain {
 		   }
 		});
 	decProcOptions.add(waitForAllProvers);
+	
+	useTaclets = new JCheckBoxMenuItem("Use taclets");
+	useTaclets.setSelected(dps.isUsingTaclets());
+	useTaclets.addActionListener(new ActionListener() {
+		   public void actionPerformed(ActionEvent e) {
+		       dps.setUseTaclets(useTaclets.isSelected());
+		   }
+		});
+	
+	decProcOptions.add(useTaclets);
+	
+	saveTacletTranslation = new JCheckBoxMenuItem("Save taclet translation");
+	saveTacletTranslation.setSelected(dps.isSavingTacletTranslation());
+	saveTacletTranslation.addActionListener(new ActionListener() {
+		   public void actionPerformed(ActionEvent e) {
+		       dps.setSaveTacletTranslation(saveTacletTranslation.isSelected());
+		   }
+		});
+	
+	decProcOptions.add(saveTacletTranslation);
+	
+
 	
 	
 	return decProcOptions;
