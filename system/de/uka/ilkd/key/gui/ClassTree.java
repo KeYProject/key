@@ -175,7 +175,8 @@ class ClassTree extends JTree {
         ((Entry) node.getUserObject()).kjt = kjt;
         
         //add all contract targets of kjt
-        if(addContractTargets) {
+        if(addContractTargets 
+           && !(kjt.getJavaType() instanceof InterfaceDeclaration)) {
             final ImmutableSet<ObserverFunction> targets
             	= services.getSpecificationRepository().getContractTargets(kjt);
             
@@ -228,7 +229,7 @@ class ClassTree extends JTree {
         	}
         	Entry te = new Entry(sb.toString());
         	DefaultMutableTreeNode childNode 
-        	= new DefaultMutableTreeNode(te);
+        		= new DefaultMutableTreeNode(te);
         	te.kjt = kjt;
         	te.target = target;
         	node.add(childNode);

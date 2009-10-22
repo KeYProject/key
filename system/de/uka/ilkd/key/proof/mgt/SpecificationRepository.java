@@ -17,9 +17,9 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.abstraction.ClassType;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
-import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -135,6 +135,29 @@ public final class SpecificationRepository {
 	       ? DefaultImmutableSet.<ClassInvariant>nil() 
                : result;
     }    
+    
+    
+    /**
+     * Returns the kjt for the outer class, if the passed kjt is a member class,
+     * and null otherwise.
+     */
+    private KeYJavaType getEnclosingKJT(KeYJavaType kjt) {
+	//HACK, this should be easier
+	if(kjt.getJavaType() instanceof ClassDeclaration) {
+	    final String name = kjt.getJavaType().getFullName();
+	    if(name.contains(".")) {
+		final String enclosingName 
+			= name.substring(0, name.lastIndexOf("."));
+		final KeYJavaType result 
+			= services.getJavaInfo().getKeYJavaType(enclosingName);
+		return result;
+	    } else {
+		return null;
+	    }
+	} else {
+	    return null;
+	}
+    }
     
     
     
@@ -455,11 +478,8 @@ public final class SpecificationRepository {
 	}
 	
 	//add axioms for enclosing class, if applicable
-	final ProgramVariable et 
-		= services.getJavaInfo().getAttribute(
-			    ImplicitFieldAdder.IMPLICIT_ENCLOSING_THIS, kjt);
-	if(et != null){
-	    final KeYJavaType enclosingKJT = et.getKeYJavaType();
+	final KeYJavaType enclosingKJT = getEnclosingKJT(kjt);
+	if(enclosingKJT != null) {
 	    result = result.union(getClassAxioms(enclosingKJT));
 	}
 	

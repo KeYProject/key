@@ -508,6 +508,7 @@ public final class TypeConverter {
      * @throws RuntimeException iff a conversion is not possible
      */
     public Expression convertToProgramElement(Term term) {
+	assert term != null;
 	if (term.op() == heapLDT.getNull()) {
 	    return NullLiteral.NULL;
 	} else if (term.op() instanceof Function) {

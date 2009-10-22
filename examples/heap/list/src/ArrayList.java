@@ -69,7 +69,7 @@ final class ArrayList implements List {
     
     
     public ListIterator iterator() {
-	return new ArrayListIterator();
+	return new ArrayListIterator(this);
     }
     
     
@@ -84,28 +84,38 @@ final class ArrayList implements List {
     
     //inner class--------------------------------------------------------------
     
-    private class ArrayListIterator implements ListIterator {
+    private static class ArrayListIterator implements ListIterator {
+	private final ArrayList arrayList; //workaround; should be ArrayList.this
 	private int arrayPos = 0;
 	
-	//@ represents list <- ArrayList.this;
+	//@ represents list <- arrayList;
 	//@ represents pos <- arrayPos;
 	
-	//@ invariant list.<inv>;
-	//@ invariant 0 <= arrayPos && arrayPos <= list.size;
-	//@ invariant \typeof(list) == ArrayList;
+	//@ invariant arrayList.<inv>;
+	//@ invariant 0 <= arrayPos && arrayPos <= arrayList.size;
+	//@ invariant \typeof(arrayList) == ArrayList;
+	
+	/*@ normal_behaviour
+	  @   requires l.<inv> && \typeof(l) == ArrayList;
+	  @   ensures list == l;
+	  @   ensures pos == 0; 
+	  @*/
+	public /*@pure@*/ ArrayListIterator(ArrayList l) {
+	    arrayList = l;
+	}
 	
 	
 	public boolean hasNext() {
-	    return arrayPos < ArrayList.this.size;
+	    return arrayPos < arrayList.size;
 	}
     
 	
 	public Object next() {
-	    if(arrayPos == ArrayList.this.size) {
+	    if(arrayPos == arrayList.size) {
 		throw new IndexOutOfBoundsException();
 	    }
 	    arrayPos++;
-	    return ArrayList.this.array[arrayPos - 1];
+	    return arrayList.array[arrayPos - 1];
 	}
     }
 }
