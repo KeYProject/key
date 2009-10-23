@@ -11,6 +11,7 @@
 package de.uka.ilkd.key.rule;
 
 import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Constraint;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -25,6 +26,8 @@ public class BuiltInRuleApp implements RuleApp {
     private BuiltInRule builtInRule;
     private PosInOccurrence pio;
     private Constraint userConstraint;
+    private ImmutableList<PosInOccurrence> ifInstantiations 
+    	= ImmutableSLList.nil();
 
    
     public BuiltInRuleApp(BuiltInRule builtInRule, 
@@ -81,6 +84,19 @@ public class BuiltInRuleApp implements RuleApp {
     public Constraint userConstraint () {
 	return userConstraint;
     }
+    
+    
+    public void setIfInstantiations(ImmutableList<PosInOccurrence> 
+     						ifInstantiations) {
+	assert this.ifInstantiations.isEmpty();
+	this.ifInstantiations = ifInstantiations; 
+    }
+    
+    
+    public ImmutableList<PosInOccurrence> ifInstantiations() {
+	return ifInstantiations;
+    }
+    
 
     /** returns true if all variables are instantiated 
      * @return true if all variables are instantiated 

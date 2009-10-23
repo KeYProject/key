@@ -170,7 +170,9 @@ public class NonGoalInfoView extends JTextArea {
 
 	    if ( app instanceof TacletApp ) {	 
 		highlightIfFormulas ( (TacletApp)app );	 
-	    }	 
+	    } else if(app instanceof BuiltInRuleApp) {
+		highlightIfInsts ( (BuiltInRuleApp)app );	 		
+	    }
 
 	    if ( r != null ) makeRangeVisible ( r );	 
 	} catch(BadLocationException badLocation) {	 
@@ -236,6 +238,17 @@ public class NonGoalInfoView extends JTextArea {
 	    makeRangeVisible ( r );	 
 	}	 
     }	 
+    
+    
+    private void highlightIfInsts(BuiltInRuleApp bapp) 
+    		throws BadLocationException {
+	final ImmutableList<PosInOccurrence> ifs = bapp.ifInstantiations();
+	for(PosInOccurrence pio : ifs) {
+	    final Range r = highlightPos ( pio, IF_FORMULA_HIGHLIGHTER );	 
+	    makeRangeVisible ( r );	 
+	}	 
+    }	 
+    
  	 
     /**	 
      * @param pos   the PosInOccurrence that should be highlighted.	 

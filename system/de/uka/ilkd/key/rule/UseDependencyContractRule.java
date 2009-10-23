@@ -33,6 +33,8 @@ public final class UseDependencyContractRule implements BuiltInRule {
     private static final Name NAME = new Name("Use Dependency Contract");
     private static final TermBuilder TB = TermBuilder.DF;
     private static final InvInferenceTools IIT = InvInferenceTools.INSTANCE;
+    
+    private ImmutableList<PosInOccurrence> ifInsts;
         
 
     //-------------------------------------------------------------------------
@@ -53,11 +55,26 @@ public final class UseDependencyContractRule implements BuiltInRule {
 	    Term formula = cf.formula();
 	    if(formula.op() instanceof Equality 
 	       && formula.sub(1).equals(term)) {
+		PosInOccurrence pio = new PosInOccurrence(cf, PosInTerm.TOP_LEVEL, true);
+		if(ifInsts != null) ifInsts = ifInsts.prepend(pio);
 		return formula.sub(0);
 	    }
 	}
 	return null;
     }
+    
+    
+    private ImmutableSet<Term> addEqualDefs(ImmutableSet<Term> terms, Goal g) {
+	ImmutableSet<Term> result = terms;
+	for(ConstrainedFormula cf : g.sequent().antecedent()) {
+	    final Term formula = cf.formula();
+	    if(formula.op() instanceof Equality 
+	        && terms.contains(formula.sub(1))) {
+		result = result.add(formula.sub(0));
+	    }
+	}
+	return result;
+    }    
     
     
     private Pair<Term,Term> getBaseHeapAndChangedLocs(
@@ -121,19 +138,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
 	return contracts.iterator().next();//TODO
     }
     
-    
-    private ImmutableSet<Term> addEqualDefs(ImmutableSet<Term> terms, Goal g) {
-	ImmutableSet<Term> result = terms;
-	for(ConstrainedFormula cf : g.sequent().antecedent()) {
-	    final Term formula = cf.formula();
-	    if(formula.op() instanceof Equality 
-	        && terms.contains(formula.sub(1))) {
-		result = result.add(formula.sub(0));
-	    }
-	}
-	return result;
-    }
-    
+        
         
 
     //-------------------------------------------------------------------------
@@ -195,6 +200,8 @@ public final class UseDependencyContractRule implements BuiltInRule {
     public ImmutableList<Goal> apply(Goal goal,
 	    			     Services services,
 	    			     RuleApp ruleApp) {
+	ifInsts = ImmutableSLList.nil();
+		
 	//collect information
 	final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();	
 	final PosInOccurrence pio = ruleApp.posInOccurrence();	
@@ -278,8 +285,10 @@ public final class UseDependencyContractRule implements BuiltInRule {
         final ComplexRuleJustificationBySpec cjust 
             	= (ComplexRuleJustificationBySpec)
             	    goal.proof().env().getJustifInfo().getJustification(this);
-        cjust.add(ruleApp, just);        
+        cjust.add(ruleApp, just);
         
+        ((BuiltInRuleApp)ruleApp).setIfInstantiations(ifInsts);
+        ifInsts = null;
         return result;
     }
     
