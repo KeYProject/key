@@ -56,7 +56,7 @@ public class ModelGenerator {
 
     private String executionTrace;
 
-    private Node originalNode;
+    public Node originalNode;
 
     public ModelGenerator(Services serv, Constraint userConstraint, Node node,
 	    String executionTrace, Node originalNode) {

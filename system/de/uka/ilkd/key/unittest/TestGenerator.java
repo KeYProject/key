@@ -69,6 +69,8 @@ public abstract class TestGenerator {
     private final HashMap<Term, Expression> translatedFormulas;
 
     private DataStorage data;
+    
+    public Thread modelGenThread=null;
 
     /**
      * creates a TestGenerator instance for the given compilation unit
@@ -143,10 +145,11 @@ public abstract class TestGenerator {
      * @return The string that show the path of the generated file
      */
     @SuppressWarnings("unchecked")
-    public String generateTestSuite(final Statement[] code, Term oracle,
+    synchronized public String  generateTestSuite(final Statement[] code, Term oracle,
 	    final List<ModelGenerator> mgs,
 	    ImmutableSet<ProgramVariable> programVars, final String methodName,
-	    final PackageReference pr) {
+	    final PackageReference pr,
+	    final long timeout) {
 	oracle = new UpdateSimplifier().simplify(oracle, serv);
 	for (final ModelGenerator mg : mgs) {
 	    programVars = programVars.union(mg.getProgramVariables());
@@ -161,36 +164,66 @@ public abstract class TestGenerator {
 	// used to increment a counter of the test methods for automatic
 	// unique naming.
 	final Vector<MethodDeclaration> testMethods = new Vector<MethodDeclaration>();
+	int count=0;
+	int totalCount= mgs.size();
 	for (final ModelGenerator mg : mgs) {
-	    final Model[] models = mg.createModels();
-	    if (models.length == 0 && mgs.size() != 1) {
-		continue;
+	    Model[] models=null;
+	    MethodDeclaration methDec=null;
+	    count++;
+	    try{
+        	    generateTestSuite_processNotification1(count,totalCount,mg);
+        	    //Model generation. The threads implement a timeout-feature for model generation.
+        	    ModelGeneratorThread modelGeneration = new ModelGeneratorThread(mg);
+        	    modelGenThread = new Thread(modelGeneration, "Model generation thread for node "+ mg.originalNode.serialNr());
+        	    modelGenThread.start();
+        	    if(timeout>0){
+        		modelGenThread.join(timeout);
+        	    }else{
+        		modelGenThread.join();
+        	    }
+        	    models = modelGeneration.models; //read the generated model
+        	    boolean terminated=false;
+        	    if(models==null && timeout>0){
+        		modelGenThread.stop();
+        		terminated = true;
+        	    }
+        	    modelGenThread=null;
+        	    
+        	    //Read model
+        	    final boolean createModelsSuccess = models!=null && !(models.length == 0 && mgs.size() != 1);
+        	    generateTestSuite_processNotification2(count,totalCount,mg, models, createModelsSuccess, terminated);
+        	    if (!createModelsSuccess) {
+        		continue;
+        	    }
+        	    final EquivalenceClass[] eqvArray = mg
+        		    .getPrimitiveLocationEqvClasses();
+        	    final Expression[][] testLocation = new Expression[eqvArray.length][];
+        	    final Expression[][] testData = new Expression[eqvArray.length][models.length];
+        	    for (int i = 0; i < eqvArray.length; i++) {
+        		final ImmutableSet<Term> locs = eqvArray[i].getLocations();
+        		testLocation[i] = new Expression[locs.size()];
+        		int k = 0;
+        		for (final Term testLoc : locs) {
+        		    testLocation[i][k++] = translateTerm(testLoc, null, null);
+        		}
+        		for (int j = 0; j < models.length; j++) {
+        		    testData[i][j] = models[j]
+        			    .getValueAsExpression(eqvArray[i]);
+        		}
+        	    }
+        	    // mbender: collect data for KeY junit tests (see
+        	    // TestTestGenerator,TestHelper)
+        	    data.addTestDat(testData);
+        	    data.addTestLoc(testLocation);
+        	    methDec = createTestMethod(code, oracle,
+        		    testLocation, testData, reducedPVSet, methodName
+        		            + (testMethods.size()), l, mg, eqvArray);
+        	    l.add(methDec);
+        	    testMethods.add(methDec);
+        	    generateTestSuite_processNotification3(count,totalCount,mg,models,methDec);
+	    }catch(Exception e){
+		generateTestSuite_processNotification4(count,totalCount,e, mg,models,methDec);
 	    }
-	    final EquivalenceClass[] eqvArray = mg
-		    .getPrimitiveLocationEqvClasses();
-	    final Expression[][] testLocation = new Expression[eqvArray.length][];
-	    final Expression[][] testData = new Expression[eqvArray.length][models.length];
-	    for (int i = 0; i < eqvArray.length; i++) {
-		final ImmutableSet<Term> locs = eqvArray[i].getLocations();
-		testLocation[i] = new Expression[locs.size()];
-		int k = 0;
-		for (final Term testLoc : locs) {
-		    testLocation[i][k++] = translateTerm(testLoc, null, null);
-		}
-		for (int j = 0; j < models.length; j++) {
-		    testData[i][j] = models[j]
-			    .getValueAsExpression(eqvArray[i]);
-		}
-	    }
-	    // mbender: collect data for KeY junit tests (see
-	    // TestTestGenerator,TestHelper)
-	    data.addTestDat(testData);
-	    data.addTestLoc(testLocation);
-	    final MethodDeclaration methDec = createTestMethod(code, oracle,
-		    testLocation, testData, reducedPVSet, methodName
-		            + (testMethods.size()), l, mg, eqvArray);
-	    l.add(methDec);
-	    testMethods.add(methDec);
 	}
 
 	l = createMain(l, testMethods);// Create main() method. Required for
@@ -229,6 +262,47 @@ public abstract class TestGenerator {
 	    exportCodeUnderTest();
 	}
 	return path;
+    }
+    
+    class ModelGeneratorThread implements Runnable {
+	/** stores the result of the model generation. 
+	 * If the result is null then either the thread has not finished computation or an error occurred. */
+	public Model[] models=null;
+	final ModelGenerator mg;
+	ModelGeneratorThread(ModelGenerator mg){
+	    this.mg = mg;
+	    assert(mg!=null);
+	}
+	public void run(){
+	    models = mg.createModels();
+	}
+    }
+    
+    /**When generateTestSuite() is executed on a separate thread, then this notification method
+     * is called in order to report the progress of computation to other threads. This method
+     * is overwritten by TestGeneratorGUIInterface */
+    protected void generateTestSuite_processNotification1(
+	    int count, int totalCount, ModelGenerator mg){return;}
+
+    /**When generateTestSuite() is executed on a separate thread, then this notification method
+     * is called in order to report the progress of computation to other threads. This method
+     * is overwritten by TestGeneratorGUIInterface */
+    protected void generateTestSuite_processNotification2(
+	    int count, int totalCount, ModelGenerator mg, Model[] models, 
+	    boolean createModelsSuccess, boolean terminated){	return;}
+
+    /**When generateTestSuite() is executed on a separate thread, then this notification method
+     * is called in order to report the progress of computation to other threads. This method
+     * is overwritten by TestGeneratorGUIInterface */
+    protected void generateTestSuite_processNotification3(
+	    int count, int totalCount, ModelGenerator mg, Model[] models, MethodDeclaration mDecl){return;}
+
+    /**When generateTestSuite() is executed on a separate thread, then this notification method
+     * is called in order to report the progress of computation to other threads. This method
+     * is overwritten by TestGeneratorGUIInterface */
+    protected void generateTestSuite_processNotification4(
+	    int count, int totalCount, Exception e, ModelGenerator mg, Model[] models, MethodDeclaration mDecl){
+	throw new RuntimeException(e);
     }
 
     /**
@@ -588,7 +662,7 @@ public abstract class TestGenerator {
 
 	return tm;
     }
-
+    
     protected Expression createCons(final Sort sort,
 	    final HashMap<String, NewArray> array2Cons, final Expression loc1,
 	    final KeYJavaType locKJT) {
@@ -1379,5 +1453,12 @@ public abstract class TestGenerator {
 	    result = tf.createTerm(t.op(), subTerms, quantVars, jb);
 	}
 	return result;
+    }
+
+    public void clean(){
+	if(modelGenThread!=null){
+	    modelGenThread.stop();
+	    modelGenThread=null;
+	}
     }
 }

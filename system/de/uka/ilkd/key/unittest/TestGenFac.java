@@ -65,7 +65,7 @@ public class TestGenFac {
 	}
     }
 
-    private class JavaCardTestGenerator extends TestGenerator {
+    private class JavaCardTestGenerator extends TestGeneratorGUIInterface {
 
 	private JavaCardTestGenerator(final Services serv,
 	        final String fileName, final String directory,
@@ -135,7 +135,7 @@ public class TestGenFac {
 	}
     }
 
-    private class JavaTestGenerator extends TestGenerator {
+    private class JavaTestGenerator extends TestGeneratorGUIInterface {
 
 	private static final String DONT_COPY = "aux";
 

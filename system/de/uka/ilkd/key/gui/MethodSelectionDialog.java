@@ -21,16 +21,17 @@ import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.unittest.ModelGenerator;
 import de.uka.ilkd.key.unittest.TestGenFac;
 import de.uka.ilkd.key.unittest.UnitTestBuilder;
+import de.uka.ilkd.key.unittest.UnitTestBuilderGUIInterface;
 import de.uka.ilkd.key.unittest.simplify.SimplifyModelGenerator;
 
 @SuppressWarnings("serial")
 public class MethodSelectionDialog extends JDialog {
 
-    private final UnitTestBuilder testBuilder;
+    private final UnitTestBuilderGUIInterface testBuilder;
 
-    private final KeYMediator mediator;
+    public final KeYMediator mediator;
 
-    JList methodList;
+    public JList methodList;
 
     final static String OLD_SIMPLIFY = "Simplify (old interface)";
 
@@ -56,14 +57,15 @@ public class MethodSelectionDialog extends JDialog {
     private MethodSelectionDialog(final KeYMediator mediator) {
 	super(mediator.mainFrame(), "Method selection dialog");
 	this.mediator = mediator;
-	testBuilder = new UnitTestBuilder(mediator.getServices(), mediator
-	        .getProof());
 	simplifyDataTupleNumber = new JTextField(""
 	        + SimplifyModelGenerator.modelLimit, 2);
 	layoutMethodSelectionDialog();
 	pack();
 	setLocation(70, 70);
 	setVisible(true);
+	testBuilder = new UnitTestBuilderGUIInterface(mediator);
+	testBuilder.setMethodSelectionDialog(this);
+	testBuilder.initMethodListInBackground(mediator.getProof());
     }
 
     public static MethodSelectionDialog getInstance(final KeYMediator mediator) {
@@ -138,6 +140,7 @@ public class MethodSelectionDialog extends JDialog {
 		    final Object value, final int index,
 		    final boolean isSelected, final boolean cellHasFocus) {
 		if (value != null) {
+		    if(value instanceof ProgramMethod){
 		    final ProgramMethod pm = (ProgramMethod) value;
 		    final MethodDeclaration md = pm.getMethodDeclaration();
 		    final String params = md.getParameters().toString();
@@ -154,6 +157,11 @@ public class MethodSelectionDialog extends JDialog {
 			setBackground(list.getBackground());
 			setForeground(list.getForeground());
 		    }
+		    }else if(value instanceof String){
+			//Warning: Use this case ONLY for a temporary message display to the user
+			//Do not use Strings to represent method, because the unit testing components don't like that
+			setText((String)value);
+		    }
 		    setEnabled(list.isEnabled());
 		    setFont(list.getFont());
 		    setOpaque(true);
@@ -161,9 +169,10 @@ public class MethodSelectionDialog extends JDialog {
 		return this;
 	    }
 	});
-	final ImmutableSet<ProgramMethod> pms = testBuilder
-	        .getProgramMethods(mediator.getProof());
-	methodList.setListData(pms.toArray(new ProgramMethod[pms.size()]));
+	if(testBuilder!=null){ //gladisch 23.10.2009: The test builder is created later and methodList is should be initialized later after the GUI has been set up. testBuilder should be null.
+	    final ImmutableSet<ProgramMethod> pms = testBuilder.getProgramMethods(mediator.getProof());
+	    methodList.setListData(pms.toArray(new ProgramMethod[pms.size()]));
+	}
 	final JScrollPane methodListScroll = new JScrollPane(
 	        ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
 	        ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
@@ -209,6 +218,9 @@ public class MethodSelectionDialog extends JDialog {
 	final JButton exit = new JButton("Exit");
 	exit.addActionListener(new ActionListener() {
 	    public void actionPerformed(final ActionEvent e) {
+		if(testBuilder!=null){
+		    testBuilder.stopThreads();
+		}
 		setSimplifyCount(simplifyDataTupleNumber.getText());
 		setVisible(false);
 		dispose();
@@ -260,26 +272,28 @@ public class MethodSelectionDialog extends JDialog {
     }
 
     void createTest(final Object[] pms) {
-	try {
-	    String test;
-	    if (pms == null) {
-		test = testBuilder.createTestForProof(mediator.getProof());
-		latestTests.append(test + " ");
-		mediator.testCaseConfirmation(test);
-	    } else {
-		ImmutableSet<ProgramMethod> pmSet = DefaultImmutableSet
-		        .<ProgramMethod> nil();
-		for (final Object pm : pms) {
-		    pmSet = pmSet.add((ProgramMethod) pm);
-		}
-		test = testBuilder.createTestForProof(mediator.getProof(),
-		        pmSet);
-		latestTests.append(test + " ");
-		mediator.testCaseConfirmation(test);
-	    }
-	} catch (final Exception e) {
-	    new ExceptionDialog(Main.getInstance(), e);
-	}
+	testBuilder.createTestInBackground( pms);
+	//The code below is now implemented in testBuilder.createTestInBackground 
+//	try {
+//	    String test;
+//	    if (pms == null) {
+//		test = testBuilder.createTestForProof(mediator.getProof());
+//		latestTests.append(test + " ");
+//		mediator.testCaseConfirmation(test);
+//	    } else {
+//		ImmutableSet<ProgramMethod> pmSet = DefaultImmutableSet
+//		        .<ProgramMethod> nil();
+//		for (final Object pm : pms) {
+//		    pmSet = pmSet.add((ProgramMethod) pm);
+//		}
+//		test = testBuilder.createTestForProof(mediator.getProof(),
+//		        pmSet);
+//		latestTests.append(test + " ");
+//		mediator.testCaseConfirmation(test);
+//	    }
+//	} catch (final Exception e) {
+//	    new ExceptionDialog(Main.getInstance(), e);
+//	}
     }
 
 }

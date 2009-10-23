@@ -74,6 +74,12 @@ public class UnitTestBuilder {
     private final String directory = null;
 
     private final boolean testing;
+    
+    /**The TestGenerator contains a thread object that is made accessible through this field. */
+    public TestGenerator tg = null;
+    
+    /** Millisecond to wait for modelGeneration for each node. -1 = infinitely.  */
+    public long modelCreationTimeout=-1; 
 
     public UnitTestBuilder(final Services serv, final Proof p,
 	    final boolean testing) {
@@ -99,12 +105,21 @@ public class UnitTestBuilder {
 	ImmutableSet<ProgramMethod> result = DefaultImmutableSet
 	        .<ProgramMethod> nil();
 	while (it.hasNext()) {
+	    getProgramMethods_ProgressNotification(result,false);
 	    final Node n = it.next();
 	    final ExecutionTraceModel[] tr = getTraces(n);
 	    result = result.union(getProgramMethods(tr));
 	}
+	getProgramMethods_ProgressNotification(result,true);
 	return result;
     }
+    /**
+     * This method is meant to be overwritten by UnitTestBuilderGUIInterface in order to report
+     * the progress of the evaluation of the method getProgramMethods to the user.
+     * @param result intermediate result so far
+     * @param finished true when the final result is computed by getProgramMethods.
+     */
+    protected void getProgramMethods_ProgressNotification(ImmutableSet<ProgramMethod> result, boolean finished){ }
 
     private ImmutableSet<ProgramMethod> getProgramMethods(
 	    final ImmutableList<Node> nodes) {
@@ -145,9 +160,8 @@ public class UnitTestBuilder {
      * methods in pms. Only execution traces on branches that end with one of
      * the nodes iterated by <code>it</code> are considered.
      */
-    private String createTestForNodes(final Iterator<Node> it,
+    protected String createTestForNodes(final Iterator<Node> it,
 	    final ImmutableSet<ProgramMethod> pms) {
-	TestGenerator tg = null;
 	String methodName = null;
 	Statement[] code = null;
 	Term oracle = null;
@@ -260,6 +274,14 @@ public class UnitTestBuilder {
 		    if (coll.getNodes().size() == 0) {
 			tg = new TestGenFac().create(serv, "Test"
 			        + tce.getFileName(), directory, testing, ag);
+
+			//There are "GUI interface" versions of the classes UnitTestBuilder and TestGenerator.
+			if(this instanceof UnitTestBuilderGUIInterface &&
+				tg instanceof TestGeneratorGUIInterface){
+			    UnitTestBuilderGUIInterface thisGUI = (UnitTestBuilderGUIInterface) this;
+			    TestGeneratorGUIInterface tgGUI = (TestGeneratorGUIInterface)tg;
+			    tgGUI.setMethodSelectionDialog(thisGUI.dialog);
+			}
 			if (methodName == null) {
 			    methodName = tce.getMethodName();
 			}
@@ -272,8 +294,9 @@ public class UnitTestBuilder {
 			pr = tce.getPackage();
 		    }
 		}
-	    }
+	    }//for
 	    if (maxRating != -1) {
+		createTestForNodes_progressNotification1(tr[maxRating], n);
 		mgs.add(getModelGenerator(tr[maxRating], n));
 		nodesAlreadyProcessed.add(tr[maxRating].getLastTraceElement()
 		        .node());
@@ -286,8 +309,9 @@ public class UnitTestBuilder {
 		final ProgramMethod pm = pmIt.next();
 		pmsStr += pm.getName() + "\n";
 	    }
-
-	    throw new UnitTestException(
+	    
+	    //The following call throws an exception if it is not overwritten. 
+	    createTestForNodes_progressNotification2(new UnitTestException(
 		    "No suitable Execution Trace was found. "
 		            + "The reasons for filtering out traces were:\n"
 		            + (nodeCounter == 0 ? "-Number of inspected nodes is 0\n"
@@ -298,7 +322,7 @@ public class UnitTestBuilder {
 		                    : pmsStr)
 		            + (minTraceLen <= 1 ? "(warning: the longest trace has length:"
 		                    + minTraceLen + ")\n"
-		                    : ""));
+		                    : "")));
 	}
 	// mbender: collect data for KeY junit tests (see
 	// TestTestGenerator,TestHelper)
@@ -311,8 +335,20 @@ public class UnitTestBuilder {
 	dataForTest.setTg(tg);
 	tg.setData(dataForTest);
 	// computeStatementCoverage(statements, tce.getStatements());
-	return tg.generateTestSuite(code, oracle, mgs, pvs,
-	        "test" + methodName, pr);
+	 String filename = tg.generateTestSuite(code, oracle, mgs, pvs,
+		 				"test" + methodName, pr,modelCreationTimeout);
+	 tg.clean();
+	 tg = null;
+	 return filename;
+    }
+    
+    /** called by createTestForNodes. Should be overwritten by UnitTestBuilderGUIInterface to
+     * notify the user about the progress of the computation.*/
+    protected void createTestForNodes_progressNotification1(ExecutionTraceModel etm, Node n){return;}
+    /** called by createTestForNodes. Should be overwritten by UnitTestBuilderGUIInterface to
+     * notify the user about the progress of the computation.*/
+    protected void createTestForNodes_progressNotification2(UnitTestException e){
+	throw e;
     }
 
     /**
@@ -402,4 +438,5 @@ public class UnitTestBuilder {
 	return dataForTest;
     }
 
+   
 }
