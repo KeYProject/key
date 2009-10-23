@@ -111,7 +111,7 @@ public final class JavaCardDLStrategy extends AbstractFeatureStrategy {
         	= strategyProperties.getProperty(
         		StrategyProperties.DEP_OPTIONS_KEY);
         if(depProp.equals(StrategyProperties.DEP_ON)) {
-            depSpecF = depSpecFeature(longConst(50));            
+            depSpecF = depSpecFeature(longConst(5000));            
         } else {
             depSpecF = depSpecFeature(inftyConst());
         }

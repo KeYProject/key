@@ -175,8 +175,7 @@ class ClassTree extends JTree {
         ((Entry) node.getUserObject()).kjt = kjt;
         
         //add all contract targets of kjt
-        if(addContractTargets 
-           && !(kjt.getJavaType() instanceof InterfaceDeclaration)) {
+        if(addContractTargets) {
             final ImmutableSet<ObserverFunction> targets
             	= services.getSpecificationRepository().getContractTargets(kjt);
             
