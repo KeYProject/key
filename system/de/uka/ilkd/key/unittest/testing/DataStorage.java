@@ -40,7 +40,8 @@ public class DataStorage {
 
     private Term oracle;
 
-    private LinkedList<ModelGenerator> mgs;
+    //private LinkedList<ModelGenerator> mgs;
+    private int numberOfModelGenerators;
 
     private ImmutableSet<ProgramVariable> pvs;
 
@@ -92,12 +93,12 @@ public class DataStorage {
 	this.oracle = oracle;
     }
 
-    public LinkedList<ModelGenerator> getMgs() {
-	return mgs;
+    public int getNrOfMgs() {
+	return numberOfModelGenerators;
     }
 
-    public void setMgs(final LinkedList<ModelGenerator> mgs) {
-	this.mgs = mgs;
+    public void setNrOfMgs(final int numberOfModelGenerators) {
+	this.numberOfModelGenerators = numberOfModelGenerators;
     }
 
     public ImmutableSet<ProgramVariable> getPvs() {

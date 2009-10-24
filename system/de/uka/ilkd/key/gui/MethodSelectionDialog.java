@@ -7,6 +7,7 @@
 // See LICENSE.TXT for details.
 package de.uka.ilkd.key.gui;
 
+import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -45,10 +46,13 @@ public class MethodSelectionDialog extends JDialog {
     final JComboBox testGenChoice = new JComboBox(new String[] {
 	    TestGenFac.TG_JAVACARD, TestGenFac.TG_JAVA });
 
-    final JCheckBox completeEx = new JCheckBox("Only completely "
-	    + "executed traces");
+    final JCheckBox completeEx = new JCheckBox("Only completely executed traces");
+    
+    final public JCheckBox trackProgressInViewport = new JCheckBox("Track progress in proof view");
 
     final JTextField simplifyDataTupleNumber;
+    
+    final JTextField modelGenTimeout;
 
     static MethodSelectionDialog instance = null;
 
@@ -57,14 +61,15 @@ public class MethodSelectionDialog extends JDialog {
     private MethodSelectionDialog(final KeYMediator mediator) {
 	super(mediator.mainFrame(), "Method selection dialog");
 	this.mediator = mediator;
+	testBuilder = new UnitTestBuilderGUIInterface(mediator,this);
 	simplifyDataTupleNumber = new JTextField(""
 	        + SimplifyModelGenerator.modelLimit, 2);
+	assert(UnitTestBuilder.modelCreationTimeout<Integer.MAX_VALUE);
+	modelGenTimeout = new JTextField(Integer.toString((int)UnitTestBuilder.modelCreationTimeout),7);
 	layoutMethodSelectionDialog();
 	pack();
 	setLocation(70, 70);
 	setVisible(true);
-	testBuilder = new UnitTestBuilderGUIInterface(mediator);
-	testBuilder.setMethodSelectionDialog(this);
 	testBuilder.initMethodListInBackground(mediator.getProof());
     }
 
@@ -93,6 +98,7 @@ public class MethodSelectionDialog extends JDialog {
 	        .setSelected(UnitTestBuilder.requireCompleteExecution);
 	instance.simplifyDataTupleNumber.setText(Integer
 	        .toString(SimplifyModelGenerator.modelLimit));
+	instance.modelGenTimeout.setText(Integer.toString((int)UnitTestBuilder.modelCreationTimeout));
 	assert (TestGenFac.testGenMode == TestGenFac.TG_JAVACARD || TestGenFac.testGenMode == TestGenFac.TG_JAVA) : "Unhandled case in MethodSelectionDialog.";
 	if (TestGenFac.testGenMode == TestGenFac.TG_JAVACARD) {
 	    instance.testGenChoice.setSelectedItem(TestGenFac.TG_JAVACARD);
@@ -118,6 +124,16 @@ public class MethodSelectionDialog extends JDialog {
 	    // do nothing
 	}
     }
+    
+    public void setModelGenTimeout(final String s) {
+	try {
+	    UnitTestBuilder.modelCreationTimeout = Integer.parseInt(s);
+	} catch (final NumberFormatException ex) {
+	    System.out.println(ex);
+	    // do nothing
+	}
+    }
+
 
     private boolean layoutWasCalled = false;
 
@@ -127,11 +143,13 @@ public class MethodSelectionDialog extends JDialog {
 		    "Method  \"layoutMethodSelectionDialog\" must not be called multiple times.");
 	}
 	layoutWasCalled = true;
-	getContentPane().setLayout(
-	        new BoxLayout(getContentPane(), BoxLayout.Y_AXIS));
+	getContentPane().setLayout(new BoxLayout(getContentPane(), BoxLayout.Y_AXIS));
+	//getContentPane().setLayout(new BorderLayout());
 
 	simplifyDataTupleNumber.setToolTipText("Minimal number of data tuples "
 	        + "per test method");
+	
+	modelGenTimeout.setToolTipText("Timeout in milliseconds for test data (model) generation \n for each node. -1 means infinity.");
 	// methodlist
 	methodList = new JList();
 	methodList.setCellRenderer(new DefaultListCellRenderer() {
@@ -180,35 +198,12 @@ public class MethodSelectionDialog extends JDialog {
 	methodListScroll
 	        .setBorder(new TitledBorder("Methods occuring in Proof"));
 	methodListScroll.setMinimumSize(new java.awt.Dimension(250, 400));
-	getContentPane().add(methodListScroll);
+	getContentPane().add(methodListScroll);//,BorderLayout.CENTER
 
 	// buttons
-	final JPanel buttonPanel = new JPanel();
-	buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
-	final JButton testAll = new JButton("Create Test For Proof");
-	testAll.addActionListener(new ActionListener() {
-	    public void actionPerformed(final ActionEvent e) {
-		setSimplifyCount(simplifyDataTupleNumber.getText());
-		createTest(null);
-	    }
-	});
-	buttonPanel.add(testAll);
-	final JButton testSel = new JButton(
-	        "Create Test For Selected Method(s)");
-	testSel.addActionListener(new ActionListener() {
-	    public void actionPerformed(final ActionEvent e) {
-		if (methodList.getSelectedValues().length == 0) {
-		    JOptionPane.showMessageDialog(null,
-			    "Please select the method(s) first!",
-			    "No Methods Selected", JOptionPane.ERROR_MESSAGE);
-		} else {
-		    setSimplifyCount(simplifyDataTupleNumber.getText());
-		    createTest(methodList.getSelectedValues());
-		}
-	    }
-	});
-	buttonPanel.add(testSel);
-
+	final JPanel controlPanel = new JPanel();
+	controlPanel.setLayout(new BoxLayout(controlPanel, BoxLayout.Y_AXIS));
+	
 	completeEx.addActionListener(new ActionListener() {
 	    public void actionPerformed(final ActionEvent e) {
 		UnitTestBuilder.requireCompleteExecution = completeEx
@@ -222,53 +217,97 @@ public class MethodSelectionDialog extends JDialog {
 		    testBuilder.stopThreads();
 		}
 		setSimplifyCount(simplifyDataTupleNumber.getText());
+		setModelGenTimeout(modelGenTimeout.getText());
 		setVisible(false);
 		dispose();
 		instance = null;
 	    }
 	});
 
-	solverChoice.addActionListener(new ActionListener() {
-	    public void actionPerformed(final ActionEvent e) {
-		if (solverChoice.getSelectedItem() == OLD_SIMPLIFY) {
-		    ModelGenerator.decProdForTestGen = ModelGenerator.OLD_SIMPLIFY;
-		} else if (solverChoice.getSelectedItem() == SIMPLIFY) {
-		    ModelGenerator.decProdForTestGen = ModelGenerator.SIMPLIFY;
-		} else if (solverChoice.getSelectedItem() == COGENT) {
-		    ModelGenerator.decProdForTestGen = ModelGenerator.COGENT;
-		} else {
-		    throw new RuntimeException(
-			    "Not implemented case in MethodSelectionDialog");
-		}
-		simplifyDataTupleNumber.setEnabled(solverChoice
-		        .getSelectedItem() == OLD_SIMPLIFY
-		        || solverChoice.getSelectedItem() == SIMPLIFY);
-	    }
-	});
-	buttonPanel.add(solverChoice);
+	
+	JPanel choisePanel = new JPanel();
+		//choisePanel.setLayout(new BoxLayout(choisePanel,BoxLayout.X_AXIS));
+        	solverChoice.addActionListener(new ActionListener() {
+        	    public void actionPerformed(final ActionEvent e) {
+        		if (solverChoice.getSelectedItem() == OLD_SIMPLIFY) {
+        		    ModelGenerator.decProdForTestGen = ModelGenerator.OLD_SIMPLIFY;
+        		} else if (solverChoice.getSelectedItem() == SIMPLIFY) {
+        		    ModelGenerator.decProdForTestGen = ModelGenerator.SIMPLIFY;
+        		} else if (solverChoice.getSelectedItem() == COGENT) {
+        		    ModelGenerator.decProdForTestGen = ModelGenerator.COGENT;
+        		} else {
+        		    throw new RuntimeException(
+        			    "Not implemented case in MethodSelectionDialog");
+        		}
+        		simplifyDataTupleNumber.setEnabled(solverChoice
+        		        .getSelectedItem() == OLD_SIMPLIFY
+        		        || solverChoice.getSelectedItem() == SIMPLIFY);
+        	    }
+        	});
+	
+	choisePanel.add(solverChoice);
+	choisePanel.add(simplifyDataTupleNumber);
+        	simplifyDataTupleNumber
+        	        .setEnabled(solverChoice.getSelectedItem() == OLD_SIMPLIFY
+        	                || solverChoice.getSelectedItem() == SIMPLIFY);
+        
+        	testGenChoice.addActionListener(new ActionListener() {
+        	    public void actionPerformed(final ActionEvent e) {
+        		if (testGenChoice.getSelectedItem() == TestGenFac.TG_JAVACARD) {
+        		    TestGenFac.testGenMode = TestGenFac.TG_JAVACARD;
+        		} else if (testGenChoice.getSelectedItem() == TestGenFac.TG_JAVA) {
+        		    TestGenFac.testGenMode = TestGenFac.TG_JAVA;
+        		} else {
+        		    throw new RuntimeException(
+        			    "Not implemented case in MethodSelectionDialog");
+        		}
+        	    }
+        	});
+	choisePanel.add(testGenChoice);
 
-	buttonPanel.add(simplifyDataTupleNumber);
+	final JPanel buttonPanel = new JPanel();
+		//buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
 
-	simplifyDataTupleNumber
-	        .setEnabled(solverChoice.getSelectedItem() == OLD_SIMPLIFY
-	                || solverChoice.getSelectedItem() == SIMPLIFY);
+        	final JButton testAll = new JButton("Create Test For Proof");
+        	testAll.addActionListener(new ActionListener() {
+        	    public void actionPerformed(final ActionEvent e) {
+        		setSimplifyCount(simplifyDataTupleNumber.getText());
+        		setModelGenTimeout(modelGenTimeout.getText());
+        		createTest(null);
+        	    }
+        	});
+	
+	buttonPanel.add(testAll);
+        	final JButton testSel = new JButton(
+        	        "Create Test For Selected Method(s)");
+        	testSel.addActionListener(new ActionListener() {
+        	    public void actionPerformed(final ActionEvent e) {
+        		if (methodList.getSelectedValues().length == 0) {
+        		    JOptionPane.showMessageDialog(null,
+        			    "Please select the method(s) first!",
+        			    "No Methods Selected", JOptionPane.ERROR_MESSAGE);
+        		} else {
+        		    setSimplifyCount(simplifyDataTupleNumber.getText());
+        		    setModelGenTimeout(modelGenTimeout.getText());
+        		    createTest(methodList.getSelectedValues());
+        		}
+        	    }
+        	});
+	buttonPanel.add(testSel);
+	
+	controlPanel.add(choisePanel);
+		JPanel timeoutPanel = new JPanel();
+		timeoutPanel.add(new JLabel("Test data generation timeout per node (ms):"));
+		timeoutPanel.add(modelGenTimeout);
+	controlPanel.add(timeoutPanel);
+	controlPanel.add(completeEx);
+	//controlPanel.add(Box.createVerticalGlue());
+	controlPanel.add(trackProgressInViewport);
+		trackProgressInViewport.setSelected(false);
+	controlPanel.add(buttonPanel);
 
-	testGenChoice.addActionListener(new ActionListener() {
-	    public void actionPerformed(final ActionEvent e) {
-		if (testGenChoice.getSelectedItem() == TestGenFac.TG_JAVACARD) {
-		    TestGenFac.testGenMode = TestGenFac.TG_JAVACARD;
-		} else if (testGenChoice.getSelectedItem() == TestGenFac.TG_JAVA) {
-		    TestGenFac.testGenMode = TestGenFac.TG_JAVA;
-		} else {
-		    throw new RuntimeException(
-			    "Not implemented case in MethodSelectionDialog");
-		}
-	    }
-	});
-	buttonPanel.add(testGenChoice);
-
-	buttonPanel.add(exit);
-	getContentPane().add(buttonPanel);
+	controlPanel.add(exit);
+	getContentPane().add(controlPanel);//,BorderLayout.EAST
     }
 
     void createTest(final Object[] pms) {

@@ -79,7 +79,7 @@ public class UnitTestBuilder {
     public TestGenerator tg = null;
     
     /** Millisecond to wait for modelGeneration for each node. -1 = infinitely.  */
-    public long modelCreationTimeout=-1; 
+    public static long modelCreationTimeout=-1; 
 
     public UnitTestBuilder(final Services serv, final Proof p,
 	    final boolean testing) {
@@ -182,6 +182,8 @@ public class UnitTestBuilder {
 	final HashSet<Position> statements = new HashSet<Position>();
 
 	TestCodeExtractor tce = null;
+	
+	System.out.println("UnitTestBuilder.createTestForNodes searching for suitable execution traces...");
 
 	while (it.hasNext()) {
 	    final Node n = it.next();
@@ -330,7 +332,7 @@ public class UnitTestBuilder {
 	dataForTest.setNodeCount(nodeCounter);
 	dataForTest.setCode(code);
 	dataForTest.setOracle(oracle);
-	dataForTest.setMgs(mgs);
+	dataForTest.setNrOfMgs(mgs.size());
 	dataForTest.setPvs(pvs);
 	dataForTest.setTg(tg);
 	tg.setData(dataForTest);

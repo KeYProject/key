@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.unittest;
 
 import java.io.*;
+import java.lang.ref.WeakReference;
 import java.util.*;
 
 import de.uka.ilkd.key.collection.*;
@@ -166,33 +167,26 @@ public abstract class TestGenerator {
 	final Vector<MethodDeclaration> testMethods = new Vector<MethodDeclaration>();
 	int count=0;
 	int totalCount= mgs.size();
-	for (final ModelGenerator mg : mgs) {
+	
+	while(mgs.size()>0){//for (final ModelGenerator mg : mgs) {  
+	    ModelGenerator mg = mgs.get(0); //modelGenerators are removed from the list (and hopefully destroyed) in order to save memory.
 	    Model[] models=null;
 	    MethodDeclaration methDec=null;
+	    WeakReference<ModelGenerator> refMG = new WeakReference<ModelGenerator>(mg);
+	    WeakReference<Model[]> refModels =null;
 	    count++;
 	    try{
-        	    generateTestSuite_processNotification1(count,totalCount,mg);
         	    //Model generation. The threads implement a timeout-feature for model generation.
-        	    ModelGeneratorThread modelGeneration = new ModelGeneratorThread(mg);
-        	    modelGenThread = new Thread(modelGeneration, "Model generation thread for node "+ mg.originalNode.serialNr());
-        	    modelGenThread.start();
-        	    if(timeout>0){
-        		modelGenThread.join(timeout);
-        	    }else{
-        		modelGenThread.join();
-        	    }
-        	    models = modelGeneration.models; //read the generated model
-        	    boolean terminated=false;
-        	    if(models==null && timeout>0){
-        		modelGenThread.stop();
-        		terminated = true;
-        	    }
-        	    modelGenThread=null;
+        	    ModelGeneratorRunnable modelGeneration = new ModelGeneratorRunnable(mg);
+        	    generateTestSuite_progressNotification1(count,totalCount,refMG);
+        	    models = modelGeneration.createModels(timeout);
+        	    refModels = new WeakReference<Model[]>(models);
         	    
         	    //Read model
         	    final boolean createModelsSuccess = models!=null && !(models.length == 0 && mgs.size() != 1);
-        	    generateTestSuite_processNotification2(count,totalCount,mg, models, createModelsSuccess, terminated);
+        	    generateTestSuite_progressNotification2(count,totalCount,refMG, refModels, createModelsSuccess, modelGeneration.wasInterrupted());
         	    if (!createModelsSuccess) {
+        		mgs.remove(0);//This ModelGenerator has been used in this iteration and is not needed anymore
         		continue;
         	    }
         	    final EquivalenceClass[] eqvArray = mg
@@ -220,10 +214,12 @@ public abstract class TestGenerator {
         		            + (testMethods.size()), l, mg, eqvArray);
         	    l.add(methDec);
         	    testMethods.add(methDec);
-        	    generateTestSuite_processNotification3(count,totalCount,mg,models,methDec);
+        	    generateTestSuite_progressNotification3(count,totalCount,refMG,refModels,methDec);
 	    }catch(Exception e){
-		generateTestSuite_processNotification4(count,totalCount,e, mg,models,methDec);
+		generateTestSuite_progressNotification4(count,totalCount,e, refMG,refModels,methDec);
 	    }
+	//}//for
+	    mgs.remove(0);//This ModelGenerator has been used in this iteration and is not needed anymore
 	}
 
 	l = createMain(l, testMethods);// Create main() method. Required for
@@ -264,44 +260,72 @@ public abstract class TestGenerator {
 	return path;
     }
     
-    class ModelGeneratorThread implements Runnable {
+    class ModelGeneratorRunnable implements Runnable {
 	/** stores the result of the model generation. 
 	 * If the result is null then either the thread has not finished computation or an error occurred. */
 	public Model[] models=null;
 	final ModelGenerator mg;
-	ModelGeneratorThread(ModelGenerator mg){
+	protected boolean interrupted=false;
+
+	ModelGeneratorRunnable(ModelGenerator mg){
 	    this.mg = mg;
 	    assert(mg!=null);
 	}
 	public void run(){
 	    models = mg.createModels();
 	}
+	
+	public Model[] createModels(long timeout)throws InterruptedException{
+	    if(modelGenThread!=null){
+		modelGenThread.stop();
+	    }
+	    modelGenThread = new Thread(this, "Model generation thread for node "+ mg.originalNode.serialNr());
+	    modelGenThread.start();
+	    final boolean timeoutActive = timeout>0;
+	    if(timeoutActive){
+		modelGenThread.join(timeout);
+	    }else{
+		modelGenThread.join();
+	    }
+	    //models = modelGeneration.models; //read the generated model
+	    if(models==null && timeoutActive){
+		modelGenThread.stop();
+		interrupted = true;
+	    }
+	    modelGenThread=null;
+
+	    return models;
+	}
+	
+	public boolean wasInterrupted(){
+	    return interrupted;
+	}
     }
     
     /**When generateTestSuite() is executed on a separate thread, then this notification method
      * is called in order to report the progress of computation to other threads. This method
      * is overwritten by TestGeneratorGUIInterface */
-    protected void generateTestSuite_processNotification1(
-	    int count, int totalCount, ModelGenerator mg){return;}
+    protected void generateTestSuite_progressNotification1(
+	    int count, int totalCount, WeakReference<ModelGenerator> refMG){return;}
 
     /**When generateTestSuite() is executed on a separate thread, then this notification method
      * is called in order to report the progress of computation to other threads. This method
      * is overwritten by TestGeneratorGUIInterface */
-    protected void generateTestSuite_processNotification2(
-	    int count, int totalCount, ModelGenerator mg, Model[] models, 
+    protected void generateTestSuite_progressNotification2(
+	    int count, int totalCount, WeakReference<ModelGenerator> refMG, WeakReference<Model[]> models, 
 	    boolean createModelsSuccess, boolean terminated){	return;}
 
     /**When generateTestSuite() is executed on a separate thread, then this notification method
      * is called in order to report the progress of computation to other threads. This method
      * is overwritten by TestGeneratorGUIInterface */
-    protected void generateTestSuite_processNotification3(
-	    int count, int totalCount, ModelGenerator mg, Model[] models, MethodDeclaration mDecl){return;}
+    protected void generateTestSuite_progressNotification3(
+	    int count, int totalCount, WeakReference<ModelGenerator> refMG, WeakReference<Model[]> models, MethodDeclaration mDecl){return;}
 
     /**When generateTestSuite() is executed on a separate thread, then this notification method
      * is called in order to report the progress of computation to other threads. This method
      * is overwritten by TestGeneratorGUIInterface */
-    protected void generateTestSuite_processNotification4(
-	    int count, int totalCount, Exception e, ModelGenerator mg, Model[] models, MethodDeclaration mDecl){
+    protected void generateTestSuite_progressNotification4(
+	    int count, int totalCount, Exception e, WeakReference<ModelGenerator> refMG, WeakReference<Model[]> models, MethodDeclaration mDecl){
 	throw new RuntimeException(e);
     }
 
@@ -1458,6 +1482,7 @@ public abstract class TestGenerator {
     public void clean(){
 	if(modelGenThread!=null){
 	    modelGenThread.stop();
+	    System.out.println("Thread killed:"+modelGenThread.getName());
 	    modelGenThread=null;
 	}
     }

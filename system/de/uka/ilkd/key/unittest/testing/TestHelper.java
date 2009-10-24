@@ -143,7 +143,7 @@ public class TestHelper {
     }
 
     public int getNrOfMGS() {
-	return data.getMgs().size();
+	return data.getNrOfMgs();
     }
 
     public int getNrOfPV() {

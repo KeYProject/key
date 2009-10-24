@@ -46,18 +46,17 @@ public class UnitTestBuilderGUIInterface extends UnitTestBuilder {
     protected MethodSelectionDialog dialog;
     protected KeYMediator mediator;
 
-    public UnitTestBuilderGUIInterface(KeYMediator mediator){
+    public UnitTestBuilderGUIInterface(KeYMediator mediator, MethodSelectionDialog msDialog){
 	this(mediator.getServices(), mediator.getProof(),false);
 	this.mediator = mediator;
+	this.dialog = msDialog;
     }
     
     protected UnitTestBuilderGUIInterface(Services s, Proof p, final boolean testing){
 	super(s,p,testing);
     }
     
-    public void setMethodSelectionDialog( final MethodSelectionDialog methodSelDialog){
-	dialog = methodSelDialog;
-    }
+   
     
     /**
      * Initializes the method list for the method selection dialog. These are the methods the user
@@ -89,15 +88,17 @@ public class UnitTestBuilderGUIInterface extends UnitTestBuilder {
    /** Executes test generation in a different thread than the calling thread. */
    public void createTestInBackground( final Object[] pms) {
        TestCreationRunnable tcr = new TestCreationRunnable(pms);
-       Thread t = new Thread(tcr,"Generating tests for "+pms.toString());
+       Thread t = new Thread(tcr,"Generating tests for "+ ((pms==null)?"proof":pms.toString()));
        tcr.setThread(t);
        t.start();
    }
    
    /** called by createTestForNodes.*/
    protected void createTestForNodes_progressNotification1(ExecutionTraceModel etm, Node n){
-       System.out.println("Processing Node:"+n.serialNr());
-       mediator.getSelectionModel().setSelectedNode(n);
+       //System.out.println("Selected execution trace for node:"+n.serialNr()+ "  Last node of execution trace is: "+etm.getLastNode().serialNr());
+//       if(dialog!=null && dialog.trackProgressInViewport.isSelected()){
+//	   mediator.getSelectionModel().setSelectedNode(n);
+//       }
        return;
    }
    
@@ -153,6 +154,8 @@ public class UnitTestBuilderGUIInterface extends UnitTestBuilder {
        public void run() {
   	 final ImmutableSet<ProgramMethod> pms = getProgramMethods(p);
   	 methodList.setListData(pms.toArray(new ProgramMethod[pms.size()]));
+  	 dialog.pack();
+  	 dialog.repaint();
   	 super.run();
       }
    }
