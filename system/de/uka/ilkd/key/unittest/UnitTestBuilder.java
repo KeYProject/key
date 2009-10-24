@@ -12,6 +12,7 @@ import java.util.*;
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.gui.Main;
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.Statement;
@@ -78,8 +79,8 @@ public class UnitTestBuilder {
     /**The TestGenerator contains a thread object that is made accessible through this field. */
     public TestGenerator tg = null;
     
-    /** Millisecond to wait for modelGeneration for each node. -1 = infinitely.  */
-    public static long modelCreationTimeout=-1; 
+    /** Seconds to wait for modelGeneration for each node. -1 = infinitely.  */
+    public static int modelCreationTimeout=-1; 
 
     public UnitTestBuilder(final Services serv, final Proof p,
 	    final boolean testing) {
@@ -183,8 +184,6 @@ public class UnitTestBuilder {
 
 	TestCodeExtractor tce = null;
 	
-	System.out.println("UnitTestBuilder.createTestForNodes searching for suitable execution traces...");
-
 	while (it.hasNext()) {
 	    final Node n = it.next();
 	    nodeCounter++;

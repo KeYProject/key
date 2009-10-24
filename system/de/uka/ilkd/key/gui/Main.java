@@ -54,6 +54,7 @@ import de.uka.ilkd.key.proof.reuse.ReusePoint;
 import de.uka.ilkd.key.smt.DecProcRunner;
 import de.uka.ilkd.key.strategy.VBTStrategy;
 import de.uka.ilkd.key.unittest.UnitTestBuilder;
+import de.uka.ilkd.key.unittest.UnitTestBuilderGUIInterface;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.KeYExceptionHandler;
 import de.uka.ilkd.key.util.KeYResourceManager;
@@ -176,7 +177,7 @@ public class Main extends JFrame implements IMain {
     public static boolean testStandalone = false;
     
     /** Determines if the KeY prover is started in visible mode*/
-    public static boolean visible = true;
+    private static boolean visible = true;
 
     public static String statisticsFile = null;
 
@@ -402,7 +403,7 @@ public class Main extends JFrame implements IMain {
     }
     
     public void setVisible(boolean v){
-        super.setVisible(v && visible);
+        super.setVisible(v && isVisibleMode());
     }
     
     /** paints empty view */
@@ -2176,7 +2177,7 @@ public class Main extends JFrame implements IMain {
     class MainListener extends WindowAdapter {
         public void windowClosing(WindowEvent e) {
             if(testStandalone){
-                visible = false;
+                setVisibleMode(false);
                 setVisible(false);
             }else{
                 exitMain();
@@ -2561,7 +2562,7 @@ public class Main extends JFrame implements IMain {
 		    GeneralSettings.disableSpecs = true;
 		} else if (opt[index].equals("AUTO")) {
 		    batchMode = true;
-                    visible = false;
+                    setVisibleMode(false);
 		} else if (opt[index].equals("DEPTHFIRST")) {		
 		    	System.out.println("DepthFirst GoalChooser ...");
 			Profile p = ProofSettings.DEFAULT_SETTINGS.getProfile();
@@ -2570,7 +2571,7 @@ public class Main extends JFrame implements IMain {
 		} else if (opt[index].equals("TESTING") || opt[index].equals("UNIT")) {
                     if(opt[index].equals("TESTING")){
                         testStandalone = true;
-                        visible = false;
+                        setVisibleMode(false);//Problem:Mixed semantics
                     }
                     System.out.println("VBT optimizations enabled ...");                    
                     
@@ -3187,7 +3188,7 @@ public class Main extends JFrame implements IMain {
  	
         configureLogger();
         Main.evaluateOptions(args);        
- 	Main key = getInstance(visible);   
+ 	Main key = getInstance(isVisibleMode());   
  	key.loadCommandLineFile();
         if(testStandalone){
             key.unitKeY = new UnitTestGeneratorGui(key);
@@ -3459,9 +3460,9 @@ public class Main extends JFrame implements IMain {
                     (KeyEvent.VK_P, ActionEvent.CTRL_MASK));
             showProver.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    Main.visible = !Main.visible;
-                    main.setVisible(Main.visible);
-                    showProver.setText(Main.visible ? "Hide Prover" : "Show Prover");
+                    Main.setVisibleMode(!Main.isVisibleMode());
+                    main.setVisible(Main.isVisibleMode());
+                    showProver.setText(Main.isVisibleMode() ? "Hide Prover" : "Show Prover");
                 }});
             toolsMenu.add(showProver);
             
@@ -3488,7 +3489,7 @@ public class Main extends JFrame implements IMain {
                 public void menuDeselected(MenuEvent arg0) {}
 
                 public void menuSelected(MenuEvent arg0) {
-                    showProver.setText(Main.visible ? "Hide Prover" : "Show Prover"); 
+                    showProver.setText(Main.isVisibleMode() ? "Hide Prover" : "Show Prover"); 
                     showRequirements.setText(proofList.isVisible() ? 
                             "Hide Test Requirements" : "Show Test Requirements"); 
                 }});
@@ -3670,9 +3671,13 @@ public class Main extends JFrame implements IMain {
                                             MethodSelectionDialog msd = MethodSelectionDialog.getInstance(mediator);
                                             msd.setLatestTests(testPath);
                                         }else{
-                                            UnitTestBuilder testBuilder = 
-                                                new UnitTestBuilder(mediator.getServices(), 
-                                                        mediator.getProof());
+//					The ordinary UnitTestBuilder can be used as well.                                            
+//                                            UnitTestBuilder testBuilder = 
+//                                                new UnitTestBuilder(mediator.getServices(), 
+//                                                        mediator.getProof());
+                                            UnitTestBuilderGUIInterface testBuilder = 
+                                                new UnitTestBuilderGUIInterface(mediator);
+
                                             testPath.append(testBuilder.createTestForProof(
                                                     associatedProof)+" ");
                                             
@@ -3715,6 +3720,14 @@ public class Main extends JFrame implements IMain {
 
     public static boolean hasInstance() {
         return instance != null;
+    }
+
+    public static void setVisibleMode(boolean visible) {
+	Main.visible = visible;
+    }
+
+    public static boolean isVisibleMode() {
+	return visible;
     }
 
    

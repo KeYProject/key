@@ -150,7 +150,7 @@ public abstract class TestGenerator {
 	    final List<ModelGenerator> mgs,
 	    ImmutableSet<ProgramVariable> programVars, final String methodName,
 	    final PackageReference pr,
-	    final long timeout) {
+	    final int timeout) {
 	oracle = new UpdateSimplifier().simplify(oracle, serv);
 	for (final ModelGenerator mg : mgs) {
 	    programVars = programVars.union(mg.getProgramVariables());
@@ -275,7 +275,10 @@ public abstract class TestGenerator {
 	    models = mg.createModels();
 	}
 	
-	public Model[] createModels(long timeout)throws InterruptedException{
+	/**
+	 * @param timeout Seconds until the thread is terminated by a time out
+	 */
+	public Model[] createModels(int timeout)throws InterruptedException{
 	    if(modelGenThread!=null){
 		modelGenThread.stop();
 	    }
@@ -283,7 +286,7 @@ public abstract class TestGenerator {
 	    modelGenThread.start();
 	    final boolean timeoutActive = timeout>0;
 	    if(timeoutActive){
-		modelGenThread.join(timeout);
+		modelGenThread.join(((long)timeout) * 1000l);
 	    }else{
 		modelGenThread.join();
 	    }

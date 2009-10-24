@@ -106,7 +106,7 @@ public final class SLEnvInput extends AbstractEnvInput {
     
     
     private void showWarningDialog(ImmutableSet<PositionedString> warnings) {
-        if(!Main.visible) {
+        if(!Main.isVisibleMode()) {
             return;
         }
                 

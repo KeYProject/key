@@ -43,8 +43,15 @@ import de.uka.ilkd.key.visualization.VisualizationStrategyForTesting;
 public class UnitTestBuilderGUIInterface extends UnitTestBuilder {
     
     HashSet<Thread> busyThreads= new HashSet<Thread>();
+    /**Warning this field is allowed to be null! It is null when running KeY with the option "testing" */
     protected MethodSelectionDialog dialog;
     protected KeYMediator mediator;
+
+    public UnitTestBuilderGUIInterface(KeYMediator mediator){
+	this(mediator.getServices(), mediator.getProof(),false);
+	this.mediator = mediator;
+	this.dialog = null;
+    }
 
     public UnitTestBuilderGUIInterface(KeYMediator mediator, MethodSelectionDialog msDialog){
 	this(mediator.getServices(), mediator.getProof(),false);
@@ -63,7 +70,7 @@ public class UnitTestBuilderGUIInterface extends UnitTestBuilder {
      * can select to be tested.
      */
     public void initMethodListInBackground(final Proof p){
-	MethodListComputation mc= new MethodListComputation(p,dialog.methodList);
+	MethodListComputation mc= new MethodListComputation(p,(dialog==null)?new JList():dialog.methodList);
 	Thread t = new Thread(mc,"Collecting methods from the proof tree");
 	mc.setThread(t);
 	t.start();
@@ -75,14 +82,19 @@ public class UnitTestBuilderGUIInterface extends UnitTestBuilder {
     * @param finished true when the final result is computed by getProgramMethods.
     */
    protected void getProgramMethods_ProgressNotification(ImmutableSet<ProgramMethod> result, boolean finished){
-       String[] list = new String[result.size()+1];
-       int i=0;
-       list[i++]="Please wait while traces are being computed...";
-       for(ProgramMethod pm:result){
-	   list[i++]=pm.getName();
+       if(dialog!=null){
+           String[] list = new String[result.size()+1];
+           int i=0;
+           list[i++]="Please wait while traces are being computed...";
+           for(ProgramMethod pm:result){
+    	   list[i++]=pm.getName();
+           }
+           dialog.methodList.setListData(list);
+           Thread.currentThread().yield();
+       }else if(Main.isVisibleMode()){
+	   String txt = finished? "Computation of traces has finished" :"Traces are being computed...";
+	   Main.getInstance().setStatusLine(txt);
        }
-       dialog.methodList.setListData(list);
-       Thread.currentThread().yield();
    }
    
    /** Executes test generation in a different thread than the calling thread. */
@@ -95,6 +107,8 @@ public class UnitTestBuilderGUIInterface extends UnitTestBuilder {
    
    /** called by createTestForNodes.*/
    protected void createTestForNodes_progressNotification1(ExecutionTraceModel etm, Node n){
+       if(dialog!=null && Main.isVisibleMode())
+	   dialog.msg("Selected execution trace for node:"+n.serialNr());
        //System.out.println("Selected execution trace for node:"+n.serialNr()+ "  Last node of execution trace is: "+etm.getLastNode().serialNr());
 //       if(dialog!=null && dialog.trackProgressInViewport.isSelected()){
 //	   mediator.getSelectionModel().setSelectedNode(n);
@@ -104,8 +118,10 @@ public class UnitTestBuilderGUIInterface extends UnitTestBuilder {
    
    /** called by createTestForNodes. */
    protected void createTestForNodes_progressNotification2(UnitTestException e){
-       System.out.println("Problem Occured:"+e.toString());
-       System.out.println("Continuing despite the exception.");
+       String msg="Problem Occured:"+e.toString()+ "\n Continuing despite the exception";
+       if(dialog!=null && Main.isVisibleMode()){
+	   dialog.error(msg);
+       }
    }
 
  
@@ -116,7 +132,9 @@ public class UnitTestBuilderGUIInterface extends UnitTestBuilder {
    public void stopThreads(){
        for(Thread t:busyThreads){
 	   t.stop();
-	   System.out.println("Thread killed:"+t.getName());
+	   String msg = "Thread killed:"+t.getName();
+	   if(dialog!=null && Main.isVisibleMode())
+	       dialog.msg(msg);
        }
        busyThreads.clear();
        if(tg!=null){
@@ -154,8 +172,10 @@ public class UnitTestBuilderGUIInterface extends UnitTestBuilder {
        public void run() {
   	 final ImmutableSet<ProgramMethod> pms = getProgramMethods(p);
   	 methodList.setListData(pms.toArray(new ProgramMethod[pms.size()]));
-  	 dialog.pack();
-  	 dialog.repaint();
+  	 if(dialog!=null){
+          	 dialog.pack();
+          	 dialog.repaint();
+  	 }
   	 super.run();
       }
    }
@@ -188,7 +208,11 @@ public class UnitTestBuilderGUIInterface extends UnitTestBuilder {
 			mediator.testCaseConfirmation(test);
 		    }
 		} catch (final Exception e) {
-		    new ExceptionDialog(Main.getInstance(), e);
+		    if(Main.isVisibleMode()){
+			new ExceptionDialog(Main.getInstance(), e);
+		    }else{
+			throw new RuntimeException(e);
+		    }
 		}
   
 	  super.run();

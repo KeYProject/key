@@ -8,6 +8,7 @@
 //
 //
 
+import de.uka.ilkd.key.gui.Main;
 import junit.framework.TestCase;
 import junit.framework.TestResult;
 import junit.framework.TestSuite;
@@ -113,6 +114,7 @@ public class TestKey extends TestCase {
      
     public static junit.framework.Test suite() {
 	de.uka.ilkd.key.util.Debug.ENABLE_DEBUG = false;
+	de.uka.ilkd.key.gui.Main.setVisibleMode(false);
         
 	TestSuite suite = new TestSuite();
 	suite.addTest(createSuite(utilityTests, "Testing Utilities and Collections"));
@@ -129,7 +131,7 @@ public class TestKey extends TestCase {
     }
 
     public TestKey(String name) {
-	super(name);        
+	super(name);
     }
 
 }

@@ -14,6 +14,8 @@ import java.awt.event.ActionListener;
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.html.HTMLDocument;
 
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableSet;
@@ -53,7 +55,10 @@ public class MethodSelectionDialog extends JDialog {
     final JTextField simplifyDataTupleNumber;
     
     final JTextField modelGenTimeout;
-
+    
+    //final JEditorPane msgEditorPane = new JEditorPane();
+    final JList msgList = new JList();
+    
     static MethodSelectionDialog instance = null;
 
     private StringBuffer latestTests = new StringBuffer();
@@ -61,7 +66,6 @@ public class MethodSelectionDialog extends JDialog {
     private MethodSelectionDialog(final KeYMediator mediator) {
 	super(mediator.mainFrame(), "Method selection dialog");
 	this.mediator = mediator;
-	testBuilder = new UnitTestBuilderGUIInterface(mediator,this);
 	simplifyDataTupleNumber = new JTextField(""
 	        + SimplifyModelGenerator.modelLimit, 2);
 	assert(UnitTestBuilder.modelCreationTimeout<Integer.MAX_VALUE);
@@ -70,6 +74,8 @@ public class MethodSelectionDialog extends JDialog {
 	pack();
 	setLocation(70, 70);
 	setVisible(true);
+	Thread.currentThread().yield();
+	testBuilder = new UnitTestBuilderGUIInterface(mediator,this);
 	testBuilder.initMethodListInBackground(mediator.getProof());
     }
 
@@ -197,7 +203,8 @@ public class MethodSelectionDialog extends JDialog {
 	methodListScroll.getViewport().setView(methodList);
 	methodListScroll
 	        .setBorder(new TitledBorder("Methods occuring in Proof"));
-	methodListScroll.setMinimumSize(new java.awt.Dimension(250, 400));
+	//methodListScroll.setMinimumSize(new java.awt.Dimension(250, 400));
+	methodListScroll.setPreferredSize(new java.awt.Dimension(250, 200));
 	getContentPane().add(methodListScroll);//,BorderLayout.CENTER
 
 	// buttons
@@ -221,6 +228,7 @@ public class MethodSelectionDialog extends JDialog {
 		setVisible(false);
 		dispose();
 		instance = null;
+		Main.getInstance().setStandardStatusLine();
 	    }
 	});
 
@@ -297,7 +305,7 @@ public class MethodSelectionDialog extends JDialog {
 	
 	controlPanel.add(choisePanel);
 		JPanel timeoutPanel = new JPanel();
-		timeoutPanel.add(new JLabel("Test data generation timeout per node (ms):"));
+		timeoutPanel.add(new JLabel("Test data generation timeout per node (sec.):"));
 		timeoutPanel.add(modelGenTimeout);
 	controlPanel.add(timeoutPanel);
 	controlPanel.add(completeEx);
@@ -308,8 +316,45 @@ public class MethodSelectionDialog extends JDialog {
 
 	controlPanel.add(exit);
 	getContentPane().add(controlPanel);//,BorderLayout.EAST
+	
+        	final JScrollPane messageScroll = new JScrollPane(
+        	        ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
+        	        ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        	msgList.setModel(new DefaultListModel());
+        	messageScroll.getViewport().setView(msgList);
+        	messageScroll.setBorder(new TitledBorder("Progress Notification"));
+        	messageScroll.setPreferredSize(new java.awt.Dimension(250, 200));
+	getContentPane().add(messageScroll);//,BorderLayout.CENTER
+    }
+    
+    public void msg(String msg){
+	printMessage("<html><body><p>"+msg+"</p></body></html>");
+    }
+    
+    public void error(String msg){
+	printMessage("<html><body><p style=\"color:red;\">"+msg+"</p></body></html>");
     }
 
+    public void goodMsg(String msg){
+	printMessage("<html><body><p style=\"color:green;\">"+msg+"</p></body></html>");
+    }
+
+    public void badMsg(String msg){
+	printMessage("<html><body><p style=\"color:rgb(200,100,30);\">"+msg+"</p></body></html>");
+    }
+
+    protected void printMessage(String msg){
+	try {
+	    DefaultListModel model = (DefaultListModel)msgList.getModel();
+	    model.addElement(msg);
+	    msgList.ensureIndexIsVisible(model.size()-1);
+        } catch (Exception e) {
+	    // TODO Auto-generated catch block
+	    e.printStackTrace();
+        }	
+    }
+    
+    
     void createTest(final Object[] pms) {
 	testBuilder.createTestInBackground( pms);
 	//The code below is now implemented in testBuilder.createTestInBackground 
