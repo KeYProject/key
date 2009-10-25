@@ -12,7 +12,7 @@ import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.ExceptionDialog;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.Main;
-import de.uka.ilkd.key.gui.MethodSelectionDialog;
+import de.uka.ilkd.key.gui.TestGenerationDialog;
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.Statement;
@@ -44,7 +44,7 @@ public class UnitTestBuilderGUIInterface extends UnitTestBuilder {
     
     HashSet<Thread> busyThreads= new HashSet<Thread>();
     /**Warning this field is allowed to be null! It is null when running KeY with the option "testing" */
-    protected MethodSelectionDialog dialog;
+    protected TestGenerationDialog dialog;
     protected KeYMediator mediator;
 
     public UnitTestBuilderGUIInterface(KeYMediator mediator){
@@ -53,7 +53,7 @@ public class UnitTestBuilderGUIInterface extends UnitTestBuilder {
 	this.dialog = null;
     }
 
-    public UnitTestBuilderGUIInterface(KeYMediator mediator, MethodSelectionDialog msDialog){
+    public UnitTestBuilderGUIInterface(KeYMediator mediator, TestGenerationDialog msDialog){
 	this(mediator.getServices(), mediator.getProof(),false);
 	this.mediator = mediator;
 	this.dialog = msDialog;
@@ -91,7 +91,7 @@ public class UnitTestBuilderGUIInterface extends UnitTestBuilder {
            }
            dialog.methodList.setListData(list);
            Thread.currentThread().yield();
-       }else if(Main.isVisibleMode()){
+       }else if(Main.isVisibleMode() || Main.testStandalone){
 	   String txt = finished? "Computation of traces has finished" :"Traces are being computed...";
 	   Main.getInstance().setStatusLine(txt);
        }
@@ -105,6 +105,19 @@ public class UnitTestBuilderGUIInterface extends UnitTestBuilder {
        t.start();
    }
    
+   /** called by createTestForNodes.*/
+   protected void createTestForNodes_progressNotification0(int nodeCounter, Node n){
+       String txt = "("+nodeCounter+") Compute an execution trace for node:"+n.serialNr();
+       if(dialog!=null && Main.isVisibleMode()){
+	   dialog.msg(txt);
+       }
+       if(Main.testStandalone){
+	   Main.getInstance().setStatusLine(txt);
+       }
+       
+       return;
+   }
+
    /** called by createTestForNodes.*/
    protected void createTestForNodes_progressNotification1(ExecutionTraceModel etm, Node n){
        if(dialog!=null && Main.isVisibleMode())
@@ -194,7 +207,7 @@ public class UnitTestBuilderGUIInterface extends UnitTestBuilder {
 		    String test;
 		    if (pms == null) {
 			test = createTestForProof(mediator.getProof());
-			dialog.getLatestTests().append(test + " ");
+			//dialog.getLatestTests().append(test + " ");
 			mediator.testCaseConfirmation(test);
 		    } else {
 			ImmutableSet<ProgramMethod> pmSet = DefaultImmutableSet
@@ -204,7 +217,7 @@ public class UnitTestBuilderGUIInterface extends UnitTestBuilder {
 			}
 			test = createTestForProof(mediator.getProof(),
 			        pmSet);
-			dialog.getLatestTests().append(test + " ");
+			//dialog.getLatestTests().append(test + " ");
 			mediator.testCaseConfirmation(test);
 		    }
 		} catch (final Exception e) {

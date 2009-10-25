@@ -6,7 +6,7 @@ import java.util.List;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.KeYSelectionModel;
 import de.uka.ilkd.key.gui.Main;
-import de.uka.ilkd.key.gui.MethodSelectionDialog;
+import de.uka.ilkd.key.gui.TestGenerationDialog;
 import de.uka.ilkd.key.gui.TaskFinishedInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.Statement;
@@ -27,14 +27,14 @@ import de.uka.ilkd.key.util.ProgressMonitor;
  */
 public abstract class TestGeneratorGUIInterface extends TestGenerator {
 
-    protected MethodSelectionDialog dialog;
+    protected TestGenerationDialog dialog;
     
     protected TestGeneratorGUIInterface(Services serv, String fileName,
             String directory, boolean testing, AssignmentGenerator ag) {
 	super(serv, fileName, directory, testing, ag);
     }
     
-    public void setMethodSelectionDialog(MethodSelectionDialog dialog){
+    public void setMethodSelectionDialog(TestGenerationDialog dialog){
 	this.dialog = dialog; 
     }
     

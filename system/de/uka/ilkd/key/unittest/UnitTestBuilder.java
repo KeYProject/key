@@ -7,6 +7,11 @@
 // See LICENSE.TXT for details.
 package de.uka.ilkd.key.unittest;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.*;
 
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
@@ -80,7 +85,7 @@ public class UnitTestBuilder {
     public TestGenerator tg = null;
     
     /** Seconds to wait for modelGeneration for each node. -1 = infinitely.  */
-    public static int modelCreationTimeout=-1; 
+    public static int modelCreationTimeout=20; 
 
     public UnitTestBuilder(final Services serv, final Proof p,
 	    final boolean testing) {
@@ -187,6 +192,9 @@ public class UnitTestBuilder {
 	while (it.hasNext()) {
 	    final Node n = it.next();
 	    nodeCounter++;
+	    
+	    createTestForNodes_progressNotification0(nodeCounter, n);
+
 
 	    final ExecutionTraceModel[] tr = getTraces(n);
 	    // mbender: collect data for KeY junit tests (see
@@ -345,6 +353,10 @@ public class UnitTestBuilder {
     
     /** called by createTestForNodes. Should be overwritten by UnitTestBuilderGUIInterface to
      * notify the user about the progress of the computation.*/
+    protected void createTestForNodes_progressNotification0(int nodeCounter, Node n){return;}
+
+    /** called by createTestForNodes. Should be overwritten by UnitTestBuilderGUIInterface to
+     * notify the user about the progress of the computation.*/
     protected void createTestForNodes_progressNotification1(ExecutionTraceModel etm, Node n){return;}
     /** called by createTestForNodes. Should be overwritten by UnitTestBuilderGUIInterface to
      * notify the user about the progress of the computation.*/
@@ -438,6 +450,5 @@ public class UnitTestBuilder {
     public DataStorage getDS() {
 	return dataForTest;
     }
-
    
 }

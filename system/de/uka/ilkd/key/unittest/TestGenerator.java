@@ -248,7 +248,7 @@ public abstract class TestGenerator {
 		    dir.mkdirs();
 		}
 		final File pcFile = new File(dir, fileName + ".java");
-		path = "\n" + pcFile.getAbsolutePath();
+		path = pcFile.getAbsolutePath();
 		final FileWriter fw = new FileWriter(pcFile);
 		final BufferedWriter bw = new BufferedWriter(fw);
 		bw.write(addImports(clean(w.toString()), pr));

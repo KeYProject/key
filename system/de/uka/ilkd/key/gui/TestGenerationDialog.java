@@ -28,7 +28,7 @@ import de.uka.ilkd.key.unittest.UnitTestBuilderGUIInterface;
 import de.uka.ilkd.key.unittest.simplify.SimplifyModelGenerator;
 
 @SuppressWarnings("serial")
-public class MethodSelectionDialog extends JDialog {
+public class TestGenerationDialog extends JDialog {
 
     private final UnitTestBuilderGUIInterface testBuilder;
 
@@ -59,11 +59,11 @@ public class MethodSelectionDialog extends JDialog {
     //final JEditorPane msgEditorPane = new JEditorPane();
     final JList msgList = new JList();
     
-    static MethodSelectionDialog instance = null;
+    static TestGenerationDialog instance = null;
 
-    private StringBuffer latestTests = new StringBuffer();
+    //private StringBuffer latestTests = new StringBuffer();
 
-    private MethodSelectionDialog(final KeYMediator mediator) {
+    private TestGenerationDialog(final KeYMediator mediator) {
 	super(mediator.mainFrame(), "Method selection dialog");
 	this.mediator = mediator;
 	simplifyDataTupleNumber = new JTextField(""
@@ -79,12 +79,12 @@ public class MethodSelectionDialog extends JDialog {
 	testBuilder.initMethodListInBackground(mediator.getProof());
     }
 
-    public static MethodSelectionDialog getInstance(final KeYMediator mediator) {
+    public static TestGenerationDialog getInstance(final KeYMediator mediator) {
 	if (instance != null) {
 	    instance.setVisible(false);
 	    instance.dispose();
 	}
-	instance = new MethodSelectionDialog(mediator);
+	instance = new TestGenerationDialog(mediator);
 
 	switch (ModelGenerator.decProdForTestGen) {
 	case ModelGenerator.OLD_SIMPLIFY:
@@ -114,13 +114,13 @@ public class MethodSelectionDialog extends JDialog {
 	return instance;
     }
 
-    public StringBuffer getLatestTests() {
-	return latestTests;
-    }
+//    public StringBuffer getLatestTests() {
+//	return latestTests;
+//    }
 
-    public void setLatestTests(final StringBuffer latest) {
-	latestTests = latest;
-    }
+//    public void setLatestTests(final StringBuffer latest) {
+//	latestTests = latest;
+//    }
 
     public void setSimplifyCount(final String s) {
 	try {

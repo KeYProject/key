@@ -2821,7 +2821,7 @@ public class Main extends JFrame implements IMain {
         }
         
         public void actionPerformed(ActionEvent e) {
-            MethodSelectionDialog.getInstance(mediator);
+            TestGenerationDialog.getInstance(mediator);
         }
     }
     
@@ -3185,7 +3185,7 @@ public class Main extends JFrame implements IMain {
         
         // does no harm on non macs
         System.setProperty("apple.laf.useScreenMenuBar","true"); 
- 	
+        
         configureLogger();
         Main.evaluateOptions(args);        
  	Main key = getInstance(isVisibleMode());   
@@ -3219,7 +3219,9 @@ public class Main extends JFrame implements IMain {
         private JFrame proofList;
         private HashMap<StringBuffer, String> test2model;
         private boolean autoMode = false;
-		private JList testList;
+	//private JList testList;
+        //public static final JList testList = new JList();
+
         
         public static final String AUTO_MODE_TEXT = "Create Tests";
         
@@ -3280,131 +3282,6 @@ public class Main extends JFrame implements IMain {
             }
         }  
         
-        private void runTest(String testPath, String modelDir) throws IOException{
-            String testDir = testPath.substring(0, testPath.lastIndexOf(File.separator))+modelDir;
-            String test = testPath.substring(testPath.lastIndexOf(File.separator)+1);
-            Runtime.getRuntime().exec("cp "+testPath+" "+testDir);
-            File testDirFile = new File(testDir);
-            Runtime rt = Runtime.getRuntime();
-            Process compile = rt.exec("javac "+test, null, testDirFile);
-            String compileError = read(compile.getErrorStream()).trim();
-            if(!"".equals(compileError)){
-                throw new RuntimeException(compileError);
-            }
-            
-            Process runJUnit = rt.exec("java junit.swingui.TestRunner "+
-                    test.substring(0, test.lastIndexOf(".")), null, testDirFile);
-            String junitError = read(runJUnit.getErrorStream());
-            if(!"".equals(junitError)){
-                throw new RuntimeException(junitError);
-            }   
-        }
-        
-        private void createTestSelectionWindow(){
-            JDialog tsw = new JDialog(this, "Select Test Case");
-            tsw.getContentPane().setLayout(new BoxLayout(tsw.getContentPane(), 
-                 BoxLayout.Y_AXIS));
-            testList = new JList();
-            testList.setListData(bubbleSortTests(createTestArray()));
-            
-            JScrollPane testListScroll = new
-                JScrollPane(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED, 
-                        ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-            testListScroll.getViewport().setView(testList);
-            testListScroll.setBorder(
-                    new TitledBorder("Created Tests"));
-            testListScroll.setMinimumSize(new java.awt.Dimension(150, 400));
-            tsw.getContentPane().add(testListScroll);
-            
-            JButton test = new JButton("Run Test");
-            test.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    if(testList.getSelectedValue() == null){
-                        JOptionPane.showMessageDialog(
-                            null, "You must select a test first!",
-                            "No Test Selected", 
-                            JOptionPane.ERROR_MESSAGE);
-                    }else{
-                        TestAndModel tam = (TestAndModel) testList.getSelectedValue();
-                        try{
-                            runTest(tam.test, tam.model);
-                        }catch(Exception exc){
-                            new ExceptionDialog(testGui, exc);    
-                        }
-                    }
-                }
-            });
-            tsw.getContentPane().add(test);
-            tsw.pack();
-            tsw.setVisible(true);
-        }
-
-        public void updateTestSelection(){
-        	if(testList!=null){
-        		testList.setListData(bubbleSortTests(createTestArray()));
-        		testList.repaint();
-        	}        			
-        }
-        
-        private Object[] bubbleSortTests(Object[] tams){
-            boolean sorted = false;
-            while(!sorted){
-                sorted = true;
-                for(int i=0; i<tams.length-1; i++){
-                    if(tams[i].toString().compareTo(tams[i+1].toString())>0){
-                        Object temp = tams[i];
-                        tams[i] = tams[i+1];
-                        tams[i+1] = temp;
-                        sorted = false;
-                    }
-                }
-            }
-            return tams;
-        }
-        
-        private Object[] createTestArray(){
-            final Iterator<Map.Entry<StringBuffer, String>> it = 
-                test2model.entrySet().iterator();
-            Vector<TestAndModel> v = new Vector<TestAndModel>();
-            while(it.hasNext()){
-                final Map.Entry<StringBuffer, String> e = it.next();
-                String test = e.getKey().toString();
-                String model = e.getValue();
-                while(!"".equals(test.trim())){
-                    v.add(new TestAndModel(test.substring(0, test.indexOf(" ")), model));
-                    test = test.substring(test.indexOf(" ")+1);
-                }
-            }
-            return v.toArray();
-        }
-        
-        class TestAndModel{
-            public String test;
-            public String model;
-            
-            public TestAndModel(String test, String model){
-                this.test = test;
-                this.model = model;
-            }
-            
-            public String toString(){
-                return test;
-            }
-        }
-        
-        /** Read the input until end of file and return contents in a
-         * single string containing all line breaks. */
-        protected String read ( InputStream in ) throws IOException {
-            String lineSeparator = System.getProperty("line.separator");
-            BufferedReader reader = new BufferedReader
-                (new InputStreamReader(in));
-            StringBuffer sb = new StringBuffer();
-            String line;
-            while ((line = reader.readLine()) != null) {
-                sb.append(line).append(lineSeparator);
-            }
-            return sb.toString();
-        }
         
         protected JMenu createFileMenu() {
             JMenu fileMenu = new JMenu("File");
@@ -3470,7 +3347,7 @@ public class Main extends JFrame implements IMain {
                     IconFactory.junitLogo(toolbarIconSize));
             runTest.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    createTestSelectionWindow();    
+                    TestExecutionDialog.getInstance(main).setVisible(true);
                 }});
             toolsMenu.add(runTest);
             
@@ -3663,13 +3540,13 @@ public class Main extends JFrame implements IMain {
                                     try{
                                         setEnabled(false);
                                         main.setStatusLine("Generating Tests");
-                                        StringBuffer testPath = new StringBuffer();
+                                        //StringBuffer testPath = new StringBuffer();
                                         String modelDir = associatedProof.getJavaModel().getModelDir();
-                                        test2model.put(testPath, modelDir);                                        
+                                        //test2model.put(testPath, modelDir);                                        
                                         buttonPressed = false;
                                         if(openDialog){
-                                            MethodSelectionDialog msd = MethodSelectionDialog.getInstance(mediator);
-                                            msd.setLatestTests(testPath);
+                                            TestGenerationDialog msd = TestGenerationDialog.getInstance(mediator);
+                                            //msd.setLatestTests(testPath);
                                         }else{
 //					The ordinary UnitTestBuilder can be used as well.                                            
 //                                            UnitTestBuilder testBuilder = 
@@ -3678,14 +3555,14 @@ public class Main extends JFrame implements IMain {
                                             UnitTestBuilderGUIInterface testBuilder = 
                                                 new UnitTestBuilderGUIInterface(mediator);
 
-                                            testPath.append(testBuilder.createTestForProof(
-                                                    associatedProof)+" ");
+                                            String testfile = testBuilder.createTestForProof(associatedProof);
+                                            //TestExecutionDialog.addTest(testfile, null, null);
                                             
                                             main.setStatusLine("Test Generation Completed");
-                                            mediator.testCaseConfirmation(testPath.toString());
+                                            mediator.testCaseConfirmation(testfile);
                                         }
                                         main.setStatusLine("Test Generation Completed");
-                                        updateTestSelection();
+                                        //updateTestSelection();
                                     }catch(Exception exc){
                                         new ExceptionDialog(testGui, exc);
                                     }
