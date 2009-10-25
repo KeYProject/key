@@ -121,7 +121,7 @@ public class UnitTestBuilderGUIInterface extends UnitTestBuilder {
    /** called by createTestForNodes.*/
    protected void createTestForNodes_progressNotification1(ExecutionTraceModel etm, Node n){
        if(dialog!=null && Main.isVisibleMode())
-	   dialog.msg("Selected execution trace for node:"+n.serialNr());
+	   dialog.goodMsg("     Selected execution trace for node:"+n.serialNr());
        //System.out.println("Selected execution trace for node:"+n.serialNr()+ "  Last node of execution trace is: "+etm.getLastNode().serialNr());
 //       if(dialog!=null && dialog.trackProgressInViewport.isSelected()){
 //	   mediator.getSelectionModel().setSelectedNode(n);
