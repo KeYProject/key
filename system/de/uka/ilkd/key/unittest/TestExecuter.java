@@ -174,7 +174,7 @@ public class TestExecuter {
 			if(keyExtJars==null) throw new Exception();
 		    }catch(Exception e){
 			try{
-			    Process p = Runtime.getRuntime().exec("cmd.exe /c echo %MYVAR%");
+			    Process p = Runtime.getRuntime().exec("cmd.exe /c echo %KEY_LIB%");
 			    BufferedReader br = new BufferedReader
 			         ( new InputStreamReader( p.getInputStream() ) );
 			    keyExtJars = br.readLine();
