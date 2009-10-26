@@ -44,8 +44,8 @@ public class BuiltInRuleAppIndex implements java.io.Serializable {
      * for the given goal and position
      */
     public ImmutableList<RuleApp> getBuiltInRule(Goal            goal, 
-					PosInOccurrence pos, 
-					Constraint      userConstraint) {
+						 PosInOccurrence pos, 
+						 Constraint      userConstraint) {
 
 	ImmutableList<RuleApp> result = ImmutableSLList.<RuleApp>nil();
 	Iterator<BuiltInRule> it = index.rules().iterator();
@@ -207,5 +207,4 @@ public class BuiltInRuleAppIndex implements java.io.Serializable {
             fcis = fcis.tail();
         }
     }
-
 }

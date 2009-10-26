@@ -163,7 +163,8 @@ public class BuiltInRuleAppContainer extends RuleAppContainer {
         
         final BuiltInRule rule = (BuiltInRule) bir.rule();
         final Constraint userConstraint = bir.userConstraint();
+        final ImmutableList<PosInOccurrence> ifInsts = bir.ifInsts();
 	
-        return new BuiltInRuleApp(rule, pio, userConstraint);
+        return new BuiltInRuleApp(rule, pio, userConstraint, ifInsts);
     }
 }

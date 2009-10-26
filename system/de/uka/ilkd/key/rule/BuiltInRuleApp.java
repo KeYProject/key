@@ -26,7 +26,7 @@ public class BuiltInRuleApp implements RuleApp {
     private BuiltInRule builtInRule;
     private PosInOccurrence pio;
     private Constraint userConstraint;
-    private ImmutableList<PosInOccurrence> ifInstantiations 
+    private ImmutableList<PosInOccurrence> ifInsts 
     	= ImmutableSLList.nil();
 
    
@@ -37,6 +37,16 @@ public class BuiltInRuleApp implements RuleApp {
 	this.pio            = pio;
 	this.userConstraint = userConstraint;        
     }
+    
+    
+    public BuiltInRuleApp(BuiltInRule builtInRule, 
+			  PosInOccurrence pio,
+			  Constraint userConstraint,
+			  ImmutableList<PosInOccurrence> ifInsts) {
+	this(builtInRule, pio, userConstraint);
+	this.ifInsts = ifInsts;
+    }
+    
 
     /**
      * returns the rule of this rule application
@@ -86,15 +96,14 @@ public class BuiltInRuleApp implements RuleApp {
     }
     
     
-    public void setIfInstantiations(ImmutableList<PosInOccurrence> 
-     						ifInstantiations) {
-	assert this.ifInstantiations.isEmpty();
-	this.ifInstantiations = ifInstantiations; 
+    public void setIfInsts(ImmutableList<PosInOccurrence> ifInsts) {
+	assert ifInsts != null;
+	this.ifInsts = ifInsts;
     }
     
     
-    public ImmutableList<PosInOccurrence> ifInstantiations() {
-	return ifInstantiations;
+    public ImmutableList<PosInOccurrence> ifInsts() {
+	return ifInsts;
     }
     
 

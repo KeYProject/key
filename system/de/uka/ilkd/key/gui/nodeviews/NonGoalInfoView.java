@@ -242,7 +242,7 @@ public class NonGoalInfoView extends JTextArea {
     
     private void highlightIfInsts(BuiltInRuleApp bapp) 
     		throws BadLocationException {
-	final ImmutableList<PosInOccurrence> ifs = bapp.ifInstantiations();
+	final ImmutableList<PosInOccurrence> ifs = bapp.ifInsts();
 	for(PosInOccurrence pio : ifs) {
 	    final Range r = highlightPos ( pio, IF_FORMULA_HIGHLIGHTER );	 
 	    makeRangeVisible ( r );	 

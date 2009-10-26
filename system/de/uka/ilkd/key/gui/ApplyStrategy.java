@@ -32,6 +32,7 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.gui.configuration.StrategySettings;
 import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
+import de.uka.ilkd.key.logic.Constraint;
 import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.proofevent.NodeReplacement;
 import de.uka.ilkd.key.proof.proofevent.RuleAppInfo;
@@ -95,6 +96,12 @@ public class ApplyStrategy {
         Goal                  g;
         while ( ( g = goalChooser.getNextGoal () ) != null ) {                
             app = g.getRuleAppManager().next();
+            //Hack: built in rules may become applicable without BuiltInRuleAppIndex noticing---->
+            if(app == null) {
+        	g.ruleAppIndex().scanBuiltInRules(g, Constraint.BOTTOM);
+        	app = g.getRuleAppManager().next();
+            }
+            //<-------
 
             if (app == null) {
         	if (medi.getProof().getSettings().getStrategySettings()

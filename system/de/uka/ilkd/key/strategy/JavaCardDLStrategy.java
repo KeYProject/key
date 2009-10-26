@@ -110,10 +110,19 @@ public final class JavaCardDLStrategy extends AbstractFeatureStrategy {
         final String depProp
         	= strategyProperties.getProperty(
         		StrategyProperties.DEP_OPTIONS_KEY);
+        final SetRuleFilter depFilter = new SetRuleFilter();
+        depFilter.addRuleToSet(UseDependencyContractRule.INSTANCE);
         if(depProp.equals(StrategyProperties.DEP_ON)) {
-            depSpecF = depSpecFeature(longConst(5000));            
+//            depSpecF = ConditionalFeature.createConditional(
+//        	    		depFilter,
+//        	    		ifZero(new DependencyContractFeature(), 
+//        	    		       longConst(5000),
+//        	    		       inftyConst()));
+            depSpecF = ConditionalFeature.createConditional(depFilter, 
+        	    					    longConst(5000));            
         } else {
-            depSpecF = depSpecFeature(inftyConst());
+            depSpecF = ConditionalFeature.createConditional(depFilter, 
+        	    					    inftyConst());
         }
         
         final Feature loopInvF;
@@ -161,13 +170,6 @@ public final class JavaCardDLStrategy extends AbstractFeatureStrategy {
 	filter.addRuleToSet(UseOperationContractRule.INSTANCE);
         return ConditionalFeature.createConditional(filter, cost);        
     }
-    
-    private Feature depSpecFeature(Feature cost) {
-	SetRuleFilter filter = new SetRuleFilter();
-	filter.addRuleToSet(UseDependencyContractRule.INSTANCE);
-	cost = add(BuiltInNonDuplicateAppModPositionFeature.INSTANCE, cost);
-        return ConditionalFeature.createConditional(filter, cost);
-    }    
     
     private Feature oneStepSimplificationFeature(Feature cost) {
 	SetRuleFilter filter = new SetRuleFilter();
@@ -1832,10 +1834,24 @@ public final class JavaCardDLStrategy extends AbstractFeatureStrategy {
     ////////////////////////////////////////////////////////////////////////////
 
     private Feature setupApprovalF(Proof p_proof) {
-	return add(NonDuplicateAppFeature.INSTANCE, depSpecFeature(longConst(0)));//XXX
-//	return NonDuplicateAppFeature.INSTANCE;
-//        return add ( NonDuplicateAppFeature.INSTANCE,
-//                     UCIncompatibleFeature.create ( p_proof ) );
+        final Feature depSpecF;
+        final String depProp
+        	= strategyProperties.getProperty(
+        		StrategyProperties.DEP_OPTIONS_KEY);
+        final SetRuleFilter depFilter = new SetRuleFilter();
+        depFilter.addRuleToSet(UseDependencyContractRule.INSTANCE);
+        if(depProp.equals(StrategyProperties.DEP_ON)) {
+            depSpecF = ConditionalFeature.createConditional(
+        	    		depFilter,
+        	    		ifZero(new DependencyContractFeature(), 
+        	    		       longConst(0),
+        	    		       inftyConst()));
+        } else {
+            depSpecF = ConditionalFeature.createConditional(depFilter, 
+        	    					    inftyConst());
+        }
+	
+	return add(NonDuplicateAppFeature.INSTANCE, depSpecF);
     }
     
     private RuleSetDispatchFeature setupApprovalDispatcher(Proof p_proof) {
