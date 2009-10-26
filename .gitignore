@@ -30,4 +30,3 @@ system/warning.msg
 tags
 *.tgz
 *.tar
-key-ext-jar/*

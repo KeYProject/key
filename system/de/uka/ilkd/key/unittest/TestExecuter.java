@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.Properties;
 import java.util.Vector;
 
 import javax.swing.JOptionPane;
@@ -150,28 +151,66 @@ public class TestExecuter {
 
 	    public static void setClasspath(String classpath) {
 	        TestExecuter.classpath = classpath;
-            }
-
+	    }
+	    
 	    public static String getClasspath() {
 		if(classpath==null){
-		    String keyhome = System.getProperty("key.home");
-		    if(keyhome==null){
-			if(Main.isVisibleMode() || Main.testStandalone){
-			    JOptionPane.showMessageDialog(Main.getInstance(),
-				    "The environment variable \"key.home\" is not set",
-				    "Warning",
-				    JOptionPane.WARNING_MESSAGE);
-			}else{
-			    System.out.println("The environment variable \"key.home\" is not set");
-			}
-		    }else{
-			classpath=keyhome+File.separator+"key-ext-jars"+File.separator+"junit.jar"+
-				":"+keyhome+File.separator+"key-ext-jars"+File.separator+"objenesis.jar";
-			if(File.separatorChar=='/')
-			    classpath+=":./";
-		    }
+		    String keyExtJars = getKeyExtJars();
+		    classpath=keyExtJars+File.separator+"junit.jar"+
+			":"+keyExtJars+File.separator+"objenesis.jar";
+		    if(File.separatorChar=='/')
+			classpath+=":./";		    
 		}
 	        return classpath;
             }
+	    
+	    static boolean keyExtJarsWarning = false;
+
+	    public static String getKeyExtJars(){
+		String keyExtJars = null;
+		    try{
+			Properties env = getEnvironment();
+			keyExtJars = env.getProperty("KEY_LIB");
+			if(keyExtJars==null) throw new Exception();
+		    }catch(Exception e){
+			try{
+			    Process p = Runtime.getRuntime().exec("cmd.exe /c echo %MYVAR%");
+			    BufferedReader br = new BufferedReader
+			         ( new InputStreamReader( p.getInputStream() ) );
+			    keyExtJars = br.readLine();
+			    if(keyExtJars==null) throw new Exception();
+			}catch(Exception e2){
+				keyExtJars = System.getProperty("key.home")+File.separator+"key-ext-jars";
+			}
+		    }
+		    if(keyExtJars!=null && keyExtJars.endsWith(File.separator))
+			keyExtJars = keyExtJars.substring(0, keyExtJars.length()-1);
+		    
+		    if(keyExtJars==null && keyExtJarsWarning){
+			keyExtJarsWarning = true;
+			String msg="Cannot determine the path to key-ext-jars, the external libraries of KeY.";
+			if(Main.isVisibleMode() || Main.testStandalone){
+			    JOptionPane.showMessageDialog(Main.getInstance(),
+				    msg,
+				    "Warning",
+				    JOptionPane.WARNING_MESSAGE);
+			}else{
+			    System.out.println(msg);
+			}
+			keyExtJars = "KEY_EXT_JARS";
+		    }
+		    return keyExtJars;
+		    
+	    }
+	   /**
+	    * @See http://www.rgagnon.com/javadetails/java-0150.html
+	    */
+	    public static Properties getEnvironment() throws java.io.IOException {
+	        Properties env = new Properties();
+	        env.load(Runtime.getRuntime().exec("env").getInputStream());
+	        return env;
+	    }
+
+
 
 }
