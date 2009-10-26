@@ -36,6 +36,7 @@ import de.uka.ilkd.key.logic.op.ShadowAttributeOp;
 import de.uka.ilkd.key.logic.op.SortedSchemaVariable;
 import de.uka.ilkd.key.logic.op.WorkingSpaceRigidOp;
 import de.uka.ilkd.key.util.Service;
+import de.uka.ilkd.key.pp.CharListNotation;
 
 
 /** 
@@ -228,6 +229,11 @@ public class NotationInfo {
 		new Notation.NRFunctionWithDependenciesNotation());               
 	tbl.put(ModalOperatorSV.class, new Notation.ModalSVNotation(60, 60));
 	tbl.put(SortedSchemaVariable.class, new Notation.SortedSchemaVariableNotation());
+
+	//FIXME quick and dirty to print concat applications as infix "+". Better add Function instances to map...
+	tbl.put("concat", new Notation.Infix("+",120,130,130));
+	tbl.put("cons", new CharListNotation());
+	tbl.put("empty", new Notation.Constant("\"\"",140));
     }
 
     public AbbrevMap getAbbrevMap(){

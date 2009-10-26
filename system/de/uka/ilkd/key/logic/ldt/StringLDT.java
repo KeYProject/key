@@ -38,7 +38,7 @@ public class StringLDT extends LDT {
     Function empty;
 
     public StringLDT(Services services, Namespace sorts, Namespace functions, CharLDT charLDT) {
-	super(new Name("CharList"), sorts, null);
+	super(new Name("java.lang.String"), sorts, null);
 	// instead of null should be: services.getJavaInfo().getTypeByName("java.lang.String").getJavaType();
 	// but getTypeName yields null!
 	this.charLDT = charLDT;
