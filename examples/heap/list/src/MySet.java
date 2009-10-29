@@ -18,21 +18,33 @@ final class MySet {
     
     
     /*@ normal_behaviour
+      @   ensures (\forall \nullable Object x; !contains(x));
+      @   ensures \fresh(footprint);
+      @*/
+    public /*@pure@*/ MySet() {
+	this.list = new ArrayList();
+    }   
+        
+    
+    /*@ normal_behaviour
       @   requires initial.<inv> && initial.size() >= 0;
       @   requires \disjoint(initial.footprint, this.*);
       @   requires (\forall int x, y; 0 <= x && x < initial.size() && 0 <= y 
       @                                && y < initial.size() && x != y; 
       @                               initial.get(x) != initial.get(y));
-      @   ensures (\forall int x; 0 <= x && x < initial.size(); contains(initial.get(x)));
+      @   ensures (\forall \nullable Object x; 
+      @              contains(x) ==  (\exists int y; 0 <= y && y < initial.size(); initial.get(y) == x));
+      @   ensures \subset(footprint, \setUnion(this.*, initial.footprint));
       @*/
     public /*@pure@*/ MySet(List initial) {
 	this.list = initial;
     }
-    
+
     
     /*@ normal_behaviour
       @   assignable footprint;
-      @   ensures (\forall Object x; contains(x) == (\old(contains(x)) || o == x));
+      @   ensures (\forall \nullable Object x; contains(x) == (\old(contains(x)) || o == x));
+      @   ensures \newElemsFresh(footprint);      
       @*/
     public void add(Object o) {
 	if(!list.contains(o)) {
@@ -45,10 +57,11 @@ final class MySet {
       @   requires l.<inv> && l.size() >= 0;
       @   requires \disjoint(l.footprint, footprint);      
       @   assignable footprint;
-      @   ensures (\forall Object x; contains(x) == (\old(contains(x)) || l.contains(x)));
+      @   ensures (\forall \nullable Object x; contains(x) == (\old(contains(x)) || l.contains(x)));
+      @   ensures \newElemsFresh(footprint);
       @*/
     public void addAll(List l) {
-	ListIterator it = l.iterator();
+	final ListIterator it = l.iterator();
 	/*@ loop_invariant 0 <= it.pos && it.pos < l.size()
 	  @   && (\forall int x; 0 <= x && x < \old(list.size()) - 1; list.get(x) == \old(list.get(x)));
           @ assignable l.footprint;
@@ -67,11 +80,22 @@ final class MySet {
     }
     
     
+    /*@ normal_behaviour
+      @   assignable footprint;
+      @   ensures !contains(o);
+      @   ensures \newElemsFresh(footprint);
+      @*/
+    public void remove(Object o) {
+	list.remove(o);
+    }
+    
+    
     //interactive proofs:
-    //-Constructor (obvious quantifier instantiation)
-    //-add (some relatively obvious quantifier instantiations [self.list.size()])
+    //-the second constructor (obvious quantifier instantiations)
+    //-add (relatively obvious quantifier instantiations [self.list.size()])
     //-contains (obvious quantifier instantiation)
     
     //not yet verified:
     //-addAll
+    //-remove
 }

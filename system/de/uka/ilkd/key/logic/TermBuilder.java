@@ -1114,7 +1114,7 @@ public final class TermBuilder {
     
     
     public Term freshLocs(Services services, Term h) {
-	return func(services.getTypeConverter().getHeapLDT().freshLocs(), h);
+	return func(services.getTypeConverter().getHeapLDT().getFreshLocs(), h);
     }
     
     

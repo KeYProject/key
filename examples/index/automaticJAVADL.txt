@@ -15,6 +15,7 @@
 ./heap/list/LinkedList_get_normal.key
 ./heap/list/LinkedList_LinkedList.key
 ./heap/list/LinkedList_size.key
+./heap/list/MySet_MySet.key
 ./heap/simple/anonymise_datagroup.key
 ./heap/simple/array_creation.key
 ./heap/simple/arrays_with_disjoint_sorts.key

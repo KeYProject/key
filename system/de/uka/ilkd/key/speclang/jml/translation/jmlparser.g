@@ -1797,9 +1797,9 @@ specquantifiedexpression returns [Term result = null] throws SLTranslationExcept
 	    for(LogicVariable lv : declVars.second) {
 	    	if(lv.sort().extendsTrans(services.getJavaInfo().objectSort()) && !nullable) {
 		    p = TB.and(p, TB.not(TB.equals(TB.var(lv), nullTerm)));
-		} else {
-		     Function inBounds = intLDT.getInBounds(declVars.first.getJavaType());
-		     p = TB.and(p, TB.func(inBounds, TB.var(lv)));
+		} else if(lv.sort().equals(intLDT.targetSort())) {
+		    Function inBounds = intLDT.getInBounds(declVars.first.getJavaType());
+		    p = TB.and(p, TB.func(inBounds, TB.var(lv)));
 	    	}
 	    }	    
 

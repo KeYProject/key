@@ -36,12 +36,7 @@ public final class DependencyContractFeature extends BinaryFeature {
 	       && app.posInOccurrence().subTerm().equals(focus)) {
 		final BuiltInRuleApp bapp = (BuiltInRuleApp) app;
 		for(PosInOccurrence ifInst : bapp.ifInsts()) {
-		    if(UseDependencyContractRule.INSTANCE
-			                        .isBaseOcc(focus, 
-			    			    	   ifInst.subTerm())) {
-			steps.remove(ifInst);
-			break;
-		    }
+		    steps.remove(ifInst);
 		}
 	    }
 	}
@@ -60,7 +55,7 @@ public final class DependencyContractFeature extends BinaryFeature {
 
 	//determine possible steps
 	final List<PosInOccurrence> steps 
-		= rule.getSteps(focus, 
+		= rule.getSteps(pos, 
 				goal.sequent(), 
 				goal.proof().getServices());
 	if(steps.isEmpty()) {

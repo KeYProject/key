@@ -24,6 +24,7 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.sort.NullSort;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.mgt.ComplexRuleJustificationBySpec;
@@ -143,15 +144,42 @@ public final class UseDependencyContractRule implements BuiltInRule {
     }
     
     
+    private PosInOccurrence getFreshLocsStep(PosInOccurrence heapPos, 
+	    				     Sequent seq, 
+	    				     Services services) {
+	final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+	final Term heapTerm = heapPos.subTerm();
+	final Operator op = heapTerm.op();
+	assert heapTerm.sort().equals(heapLDT.targetSort());
+	if(heapTerm.op() == heapLDT.getChangeHeapAtLocs()
+	   && heapTerm.sub(1).op().equals(heapLDT.getFreshLocs())
+	   && heapTerm.sub(1).sub(0).equals(heapTerm.sub(0))) {
+	    return heapPos;
+	} else if(op.arity() == 0) {
+	    final Pair<Term,PosInOccurrence> def 
+	    	= getEqualityDefAndPos(heapTerm, seq);
+	    if(def != null) {
+		final PosInOccurrence defHeapPos = def.second.down(0);
+		assert defHeapPos.subTerm().equals(def.first);
+		return getFreshLocsStep(defHeapPos, seq, services);
+	    } else {
+		return null;
+	    }
+	} else {
+	    return null;
+	}
+    }
+    
+    
     private Pair<Term,ImmutableList<PosInOccurrence>> 
     		 getChangedLocsForStep(Term heapTerm, 
-	                       	       PosInOccurrence pos, 
+	                       	       Term stepHeap, 
 	                       	       Sequent seq,
 	                       	       Services services) {
 	final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
 	final Operator op = heapTerm.op();
 	assert heapTerm.sort().equals(heapLDT.targetSort());
-	if(heapTerm.equals(pos.subTerm().sub(0))) {
+	if(heapTerm.equals(stepHeap)) {
 	    return new Pair<Term,ImmutableList<PosInOccurrence>>(
 		    		TB.empty(services), 
 		    		ImmutableSLList.<PosInOccurrence>nil());
@@ -161,7 +189,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
 	    final Term f = heapTerm.sub(2);
 	    final Term locs = TB.pairSingleton(services, o, f);
 	    final Pair<Term,ImmutableList<PosInOccurrence>> furtherLocs 
-	    	= getChangedLocsForStep(h, pos, seq, services);
+	    	= getChangedLocsForStep(h, stepHeap, seq, services);
 	    return new Pair<Term,ImmutableList<PosInOccurrence>>(
 		    	    TB.union(services, locs, furtherLocs.first), 
 		    	    furtherLocs.second);	    
@@ -170,7 +198,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
 	    final Term h = heapTerm.sub(0);
 	    final Term s = heapTerm.sub(1);
 	    final Pair<Term,ImmutableList<PosInOccurrence>> furtherLocs 
-	    	= getChangedLocsForStep(h, pos, seq, services);
+	    	= getChangedLocsForStep(h, stepHeap, seq, services);
 	    return new Pair<Term,ImmutableList<PosInOccurrence>>(
 		    	    TB.union(services, s, furtherLocs.first), 
 	                    furtherLocs.second); 
@@ -179,7 +207,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
 	    	= getEqualityDefAndPos(heapTerm, seq);
 	    if(def != null) {
 		final Pair<Term,ImmutableList<PosInOccurrence>> furtherLocs
-		    = getChangedLocsForStep(def.first, pos, seq, services);
+		    = getChangedLocsForStep(def.first, stepHeap, seq, services);
 		return new Pair<Term,ImmutableList<PosInOccurrence>>(
 				furtherLocs.first, 
 			        furtherLocs.second.prepend(def.second));
@@ -235,13 +263,22 @@ public final class UseDependencyContractRule implements BuiltInRule {
     }    
     
     
-    public List<PosInOccurrence> getSteps(Term focus,
+    public List<PosInOccurrence> getSteps(PosInOccurrence pos,
 	    				  Sequent seq,
-	    				  Services services) {	
+	    				  Services services) {
+	final Term focus = pos.subTerm();
 	assert focus.op() instanceof ObserverFunction;
 	
 	final List<PosInOccurrence> result 
 		= new LinkedList<PosInOccurrence>();
+	
+	//special treatment for changeHeapAtLocs(h, freshLocs(h), h')
+	final PosInOccurrence freshLocsStep 
+		= getFreshLocsStep(pos.down(0), seq, services);
+	if(freshLocsStep != null) {
+	    result.add(freshLocsStep);
+	    return result;
+	}
 	
 	//get raw steps
 	final List<Term> rawSteps = new LinkedList<Term>();
@@ -315,15 +352,16 @@ public final class UseDependencyContractRule implements BuiltInRule {
     
     
     private Pair<Term,Term> getBaseHeapAndChangedLocs(
-	    			Term focus,
+	    			PosInOccurrence pos,
 	    			Sequent seq,
 	    			Services services,
 	    			BuiltInRuleApp app) {
+	final Term focus = pos.subTerm();
 	assert app != null;
 	assert focus.op() instanceof ObserverFunction;
 	
 	//get possible steps
-	final List<PosInOccurrence> steps = getSteps(focus, seq, services);
+	final List<PosInOccurrence> steps = getSteps(pos, seq, services);
 	
 	//choose a step
 	final PosInOccurrence step;
@@ -345,7 +383,10 @@ public final class UseDependencyContractRule implements BuiltInRule {
 	
 	//get changed locs and used equalities
 	final Pair<Term,ImmutableList<PosInOccurrence>> changedLocs 
-		= getChangedLocsForStep(focus.sub(0), step, seq, services);
+		= getChangedLocsForStep(focus.sub(0), 
+					step.subTerm().sub(0), 
+					seq, 
+					services);
 	
 	//store insts in rule app
 	app.setIfInsts(changedLocs.second.prepend(step));
@@ -412,19 +453,23 @@ public final class UseDependencyContractRule implements BuiltInRule {
 	if(!focus.freeVars().isEmpty()) {
 	    return false;
 	}
-	
+
 	//heap term of observer must be store-term
 	final Services services = goal.proof().getServices();
 	if(!hasRawSteps(focus.sub(0), goal.sequent(), services)) {
 	    return false;
 	}
-	
+
 	//there must be contracts for the observer
 	final ObserverFunction target = (ObserverFunction) focus.op();
 	final KeYJavaType kjt 
 		= target.isStatic() 
 		  ? target.getContainerType()
 	          : services.getJavaInfo().getKeYJavaType(focus.sub(1).sort());
+	assert kjt != null : "could not determine receiver type for " + focus;
+	if(kjt.getSort() instanceof NullSort) {
+	    return false;
+	}
         final ImmutableSet<Contract> contracts 
         	= getApplicableContracts(services, kjt, target);
         if(contracts.isEmpty()) {
@@ -436,6 +481,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
         if(!goal.proof().mgt().contractApplicableFor(kjt, target)) {
             return false;
         }
+        
         return true;
     }
 
@@ -461,7 +507,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
         final Contract contract = configureContract(services, kjt, target);
         assert contract != null;
         final Pair<Term,Term> baseHeapAndChangedLocs 
-        	= getBaseHeapAndChangedLocs(focus, 
+        	= getBaseHeapAndChangedLocs(pio, 
         				    goal.sequent(), 
         				    services, 
         				    (BuiltInRuleApp)ruleApp);

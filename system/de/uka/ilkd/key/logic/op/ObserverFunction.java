@@ -38,6 +38,7 @@ public class ObserverFunction extends Function {
 		                     container.getSort().toString()),
               sort, 
               getArgSorts(heapSort, container, isStatic, paramTypes));
+	assert container != null;
 	this.container = container;
 	this.isStatic = isStatic;
 	this.paramTypes = paramTypes;

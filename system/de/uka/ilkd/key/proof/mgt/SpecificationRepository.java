@@ -17,7 +17,6 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.ClassType;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
 import de.uka.ilkd.key.java.statement.LoopStatement;
@@ -70,40 +69,74 @@ public final class SpecificationRepository {
     //-------------------------------------------------------------------------
     //internal methods
     //-------------------------------------------------------------------------
+    
+    private ObserverFunction getCanonicalFormForKJT(ObserverFunction obs, 
+	    				            KeYJavaType kjt) {
+	assert obs != null;
+	assert kjt != null;
+	if(!(obs instanceof ProgramMethod) || obs.getContainerType().equals(kjt)) {
+	    return obs;
+	}
+	final ProgramMethod pm = (ProgramMethod) obs;
+	if(pm.isConstructor()) {
+	    assert pm.getContainerType().equals(kjt);
+	    return pm;
+	}
+	
+	//search through all locally available methods
+        final String name   = pm.getMethodDeclaration().getName();
+        final int numParams = pm.getParameterDeclarationCount();
+	final ImmutableList<ProgramMethod> candidatePMs 
+		= services.getJavaInfo().getAllProgramMethods(kjt);
+	outer: for(ProgramMethod candidatePM : candidatePMs) {
+	    if(candidatePM.getMethodDeclaration().getName().equals(name) 
+	       && candidatePM.getParameterDeclarationCount() == numParams) {
+		for(int i = 0; i < numParams; i++) {
+		    if(!candidatePM.getParameterType(i)
+			           .equals(pm.getParameterType(i))) {
+			continue outer;
+		    }
+		}
+		return candidatePM;
+	    }
+	}
+	
+	//not found (happens for private methods of superclasses) 
+	//-> search through superclasses
+	for(KeYJavaType sup : services.getJavaInfo()
+		                      .getAllSupertypes(kjt)
+		                      .removeAll(kjt)) {
+	    final ProgramMethod result 
+	    	= (ProgramMethod) getCanonicalFormForKJT(obs, sup);
+	    if(result != null) {
+		return result;
+	    }
+	}
+	
+	//should not happen
+	assert false : "Could not find method " 
+	               + pm.getName() + " in type " + kjt;
+	return null;
+    }
+    
 
     private ImmutableSet<Pair<KeYJavaType,ObserverFunction>> 
     		getOverridingMethods(KeYJavaType kjt, ProgramMethod pm) {
-        final String name   = pm.getMethodDeclaration().getName();
-        final int numParams = pm.getParameterDeclarationCount();
         ImmutableSet<Pair<KeYJavaType,ObserverFunction>> result 
         	= DefaultImmutableSet.<Pair<KeYJavaType,ObserverFunction>>nil();
+        
+        if(pm.isConstructor()) {
+            return result;
+        }
         
         assert kjt != null;
         final JavaInfo javaInfo = services.getJavaInfo();
         for(KeYJavaType sub : javaInfo.getAllSubtypes(kjt)) {
             assert sub != null;
-            
-            final ImmutableList<ProgramMethod> subPms 
-                = javaInfo.getAllProgramMethods(sub);
-            for(ProgramMethod subPm : subPms) {
-                if(subPm.getMethodDeclaration().getName().equals(name) 
-                   && subPm.getParameterDeclarationCount() == numParams) {
-                    boolean paramsEqual = true;
-                    for(int i = 0; i < numParams; i++) {
-                        if(!subPm.getParameterType(i)
-                                 .equals(pm.getParameterType(i))) {
-                            paramsEqual = false;
-                            break;
-                        }
-                    }
-                    
-                    if(paramsEqual) {
-                        result = result.add(
-                           new Pair<KeYJavaType,ObserverFunction>(sub, subPm));
-                        break;
-                    }
-                }
-            }
+            final ProgramMethod subPM 
+            	= (ProgramMethod) getCanonicalFormForKJT(pm, sub);
+            result = result.add(new Pair<KeYJavaType,ObserverFunction>(sub, 
+        	    						       subPM));
         }
         
         return result;
@@ -170,6 +203,9 @@ public final class SpecificationRepository {
      */
     public ImmutableSet<Contract> getContracts(KeYJavaType kjt,
 	    				       ObserverFunction target) {
+	assert kjt != null;
+	assert target != null;
+	target = getCanonicalFormForKJT(target, kjt);
 	final Pair<KeYJavaType,ObserverFunction> pair 
 		= new Pair<KeYJavaType,ObserverFunction>(kjt, target);
 	final ImmutableSet<Contract> result = contracts.get(pair);
@@ -186,6 +222,7 @@ public final class SpecificationRepository {
     public ImmutableSet<OperationContract> getOperationContracts(
 	    						KeYJavaType kjt, 
 	    						ProgramMethod pm) {
+	pm = (ProgramMethod) getCanonicalFormForKJT(pm, kjt);
 	final Pair<KeYJavaType,ProgramMethod> pair 
 		= new Pair<KeYJavaType,ProgramMethod>(kjt, pm);
 	final ImmutableSet<OperationContract> result 
@@ -295,6 +332,11 @@ public final class SpecificationRepository {
      * overriding methods.
      */
     public void addContract(Contract contract) {
+	//sanity check
+	assert getCanonicalFormForKJT(contract.getTarget(), 
+		                      contract.getKJT())
+	            .equals(contract.getTarget());
+	
 	//set id
 	contract = contract.setID(contractCounter++);
 

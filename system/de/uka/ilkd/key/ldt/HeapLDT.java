@@ -196,7 +196,7 @@ public final class HeapLDT extends LDT {
     }
     
     
-    public Function freshLocs() {
+    public Function getFreshLocs() {
 	return freshLocs;
     }
     

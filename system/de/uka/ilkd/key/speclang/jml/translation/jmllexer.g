@@ -75,6 +75,8 @@ MINUS : "-";
 MOD : "%";
 MULT : "*";
 NONNULLELEMENTS : "\\nonnullelements";
+NON_NULL : "\\non_null";
+NULLABLE : "\\nullable";
 NOT : "!";
 NOT_MODIFIED : "\\not_modified";
 NOT_SPECIFIED : "\\not_specified";
@@ -183,7 +185,7 @@ QUANTIFIER
     |
         "\\sum"
     ;
-
+    
 protected
 LETTER
 options {

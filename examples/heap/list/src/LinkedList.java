@@ -35,6 +35,27 @@ final class LinkedList implements List {
 	}
 	size++;
     }
+    
+    
+    public boolean contains(Object o) {
+	if(size == 0) {
+	    return false;
+	}
+	
+	Node node = first;
+	/*@ loop_invariant 0 <= i && i < size && \reach(first.next, first, node, i)
+	  @   && (\forall int x; 0 <= x && x < i; get(x) != o);
+	  @ assignable \nothing;
+	  @*/
+	for(int i = 0; i < size - 1; i++) {
+	    if(node.data == o) {
+		return true;
+	    }
+	    node = node.next;
+	}
+	
+	return node.data == o;
+    }    
 
     
     public Object get(int index) {
@@ -59,29 +80,13 @@ final class LinkedList implements List {
     }
     
     
-    public int size() {
-	return size;
+    public void remove(Object o) {
+	//TODO
     }
     
     
-    public boolean contains(Object o) {
-	if(size == 0) {
-	    return false;
-	}
-	
-	Node node = first;
-	/*@ loop_invariant 0 <= i && i < size && \reach(first.next, first, node, i)
-	  @   && (\forall int x; 0 <= x && x < i; get(x) != o);
-	  @ assignable \nothing;
-	  @*/
-	for(int i = 0; i < size - 1; i++) {
-	    if(node.data == o) {
-		return true;
-	    }
-	    node = node.next;
-	}
-	
-	return node.data == o;
+    public int size() {
+	return size;
     }
     
     

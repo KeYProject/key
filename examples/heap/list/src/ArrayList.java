@@ -73,17 +73,34 @@ final class ArrayList implements List {
     }
     
     
+    public void remove(Object o) {
+	/*@ loop_invariant 0 <= i && i <= size
+	  @  && (\forall int x; 0 <= x && x < i; array[x] != o);
+	  @ assignable \nothing;
+	  @*/
+	for(int i = 0; i < size; i++) {
+	    if(array[i] == o) {
+		/*@ loop_invariant i <= j && j < size
+		  @  && (\forall int x; 0 <= x && x < i; array[x] == \old(array[x]))
+		  @  && (\forall int x; i <= x && x < j; array[x] == \old(array[x+1]))
+		  @  && (\forall int x; j <= x && x < size; array[x] == \old(array[x]));
+		  @ assignable array[*];
+		  @*/
+		for(int j = i; j < size - 1; j++) {
+		    array[j] = array[j+1];
+		}
+		size--;
+		return;
+	    }
+	}
+    }
+    
+    
     public int size() {
 	return size;
     }
+    
         
-    //interactive proofs:
-    //-contains (obvious quantifier instantiation)
-    
-    
-    
-    //inner class--------------------------------------------------------------
-    
     private static class ArrayListIterator implements ListIterator {
 	private final ArrayList arrayList; //workaround; should be ArrayList.this
 	private int arrayPos = 0;
@@ -118,4 +135,9 @@ final class ArrayList implements List {
 	    return arrayList.array[arrayPos - 1];
 	}
     }
+    
+    
+    //interactive proofs:
+    //-contains (obvious quantifier instantiation)
+    //-remove (manual quantifier instantiations; auto instantiation seems to run into a matching loop)
 }

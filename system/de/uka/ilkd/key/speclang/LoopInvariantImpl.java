@@ -103,11 +103,14 @@ public final class LoopInvariantImpl implements LoopInvariant {
             Term selfTerm,
             Term heapAtPre,
             Services services) {
-        Map result = new LinkedHashMap();
+        final Map result = new LinkedHashMap();
         
         //self
         if(selfTerm != null) {
-            assert selfTerm.sort().extendsTrans(originalSelfTerm.sort());
+//            assert selfTerm.sort().extendsTrans(originalSelfTerm.sort()) :
+//        	   "instantiating sort " + originalSelfTerm.sort()
+//        	   + " with sort " + selfTerm.sort()
+//        	   + " which is not a subsort!";
             result.put(originalSelfTerm, selfTerm);
         }
         
@@ -128,8 +131,8 @@ public final class LoopInvariantImpl implements LoopInvariant {
             Term selfTerm,
             Term heapAtPre,
             Services services) {
-       Map result = new LinkedHashMap();
-       Map replaceMap = getReplaceMap(selfTerm, heapAtPre, services);
+       final Map result = new LinkedHashMap();
+       final Map replaceMap = getReplaceMap(selfTerm, heapAtPre, services);
        final Iterator<Map.Entry> it = replaceMap.entrySet().iterator();
        while(it.hasNext()) {
            Map.Entry entry = it.next();
