@@ -94,8 +94,8 @@ final class MySet {
     //-the second constructor (obvious quantifier instantiations)
     //-add (relatively obvious quantifier instantiations [self.list.size()])
     //-contains (obvious quantifier instantiation)
+    //-remove (manual case split before applying method contract)
     
     //not yet verified:
     //-addAll
-    //-remove
 }

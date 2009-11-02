@@ -53,7 +53,7 @@ interface List {
       @              (\forall int j; 0 <= j && j < i; get(j) == \old(get(j)))
       @              && (\forall int k; i <= k && k < size(); get(k) == \old(get(k+1))));
       @   ensures \newElemsFresh(footprint);
-      @*/     
+      @*/
     public void remove(/*@nullable@*/ Object o);
     
     

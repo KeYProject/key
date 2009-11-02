@@ -73,8 +73,6 @@ public class ApplyStrategy {
 
     /** time in ms after which rule application shall be aborted, -1 disables timeout */
     private long timeout = -1;
-    
-    private String usedCoalChooserOptionsKey="";
 
     
     // Please create this object beforehand and re-use it.

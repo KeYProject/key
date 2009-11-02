@@ -44,9 +44,7 @@ public final class ProblemInitializer {
     private final IMain main;
     private final Profile profile;
     private final Services services;
-    
-    private final ProgressMonitor pm;
-    
+    private final ProgressMonitor progMon;
     private final HashSet<EnvInput> alreadyParsed = new LinkedHashSet<EnvInput>();
     
     
@@ -56,7 +54,7 @@ public final class ProblemInitializer {
     
     public ProblemInitializer(IMain main) {
         this.main       = main;
-        this.pm         = main == null ? null : main.getProgressMonitor();
+        this.progMon    = main == null ? null : main.getProgressMonitor();
         this.profile    = main == null ? null : main.mediator().getProfile();
         this.services   = main == null ? null : new Services(main.mediator().getExceptionHandler());
     }
@@ -65,7 +63,7 @@ public final class ProblemInitializer {
     public ProblemInitializer(Profile profile) {
 	assert profile != null;
 	this.main       = null;
-        this.pm         = null;
+        this.progMon    = null;
         this.profile    = profile;
         this.services   = new Services();
     }
@@ -139,7 +137,7 @@ public final class ProblemInitializer {
 	
 	int i = 0;
         for (String name : in.getLDTIncludes()) {
-	    keyFile[i++] = new KeYFile(name, in.get(name), pm);
+	    keyFile[i++] = new KeYFile(name, in.get(name), progMon);
 	}
 
         LDTInput ldtInp = new LDTInput(keyFile, main);
@@ -164,7 +162,7 @@ public final class ProblemInitializer {
         
 	//read normal includes
 	for (String fileName : in.getIncludes()) {
-	    KeYFile keyFile = new KeYFile(fileName, in.get(fileName), pm);
+	    KeYFile keyFile = new KeYFile(fileName, in.get(fileName), progMon);
 	    readEnvInput(keyFile, initConfig);
 	}
     }
@@ -420,7 +418,7 @@ public final class ProblemInitializer {
     	    	KeYFile tacletBaseFile
     	    	    = new KeYFile("taclet base", 
     	    		          profile.getStandardRules().getTacletBase(),
-			          pm);
+			          progMon);
     	    	readEnvInput(tacletBaseFile, baseConfig);
 	    }	    
 	}
@@ -440,13 +438,14 @@ public final class ProblemInitializer {
         final Namespace functions 
         	= initConfig.getServices().getNamespaces().functions();
         functions.add(initConfig.getServices().getJavaInfo().getInv());
-//        
-//        for(KeYJavaType kjt : javaInfo.getAllKeYJavaTypes()) {
-//            for(ProgramMethod pm
-//        	    : javaInfo.getAllProgramMethodsLocallyDeclared(kjt)) {
-//        	functions.add(pm);
-//            }
-//        }
+        for(KeYJavaType kjt : javaInfo.getAllKeYJavaTypes()) {
+            for(ProgramMethod pm
+        	    : javaInfo.getAllProgramMethodsLocallyDeclared(kjt)) {
+        	if(pm.getKeYJavaType() != null) {
+        	    functions.add(pm);
+        	}
+            }
+        }
 
         //read envInput
         readEnvInput(envInput, initConfig);
