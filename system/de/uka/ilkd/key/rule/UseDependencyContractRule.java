@@ -22,6 +22,7 @@ import de.uka.ilkd.key.gui.Main;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.ldt.HeapLDT;
+import de.uka.ilkd.key.ldt.SetLDT;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.NullSort;
@@ -103,8 +104,8 @@ public final class UseDependencyContractRule implements BuiltInRule {
 	final Operator op = heapTerm.op();
 	assert heapTerm.sort().equals(heapLDT.targetSort());
 	if(op == heapLDT.getStore()
-           || op == heapLDT.getChangeHeapAtLocs() 
-	   || op == heapLDT.getChangeHeapAtLocs2()) {
+           || op == heapLDT.getAnon() 
+	   || op == heapLDT.getMemset()) {
 	   return true;
 	} else if(op.arity() == 0) {
 	    final Term def = getEqualityDef(heapTerm, seq);
@@ -130,8 +131,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
 	    final Term h = heapTerm.sub(0);
 	    result.add(h);	    
 	    getRawSteps(h, seq, services, result);
-	} else if(op == heapLDT.getChangeHeapAtLocs() 
-	          || op == heapLDT.getChangeHeapAtLocs2()) {
+	} else if(op == heapLDT.getAnon() || op == heapLDT.getMemset()) {
 	    final Term h = heapTerm.sub(0);
 	    result.add(h);
 	    getRawSteps(h, seq, services, result);
@@ -148,12 +148,12 @@ public final class UseDependencyContractRule implements BuiltInRule {
 	    				     Sequent seq, 
 	    				     Services services) {
 	final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+	final SetLDT setLDT   = services.getTypeConverter().getSetLDT();
 	final Term heapTerm = heapPos.subTerm();
 	final Operator op = heapTerm.op();
 	assert heapTerm.sort().equals(heapLDT.targetSort());
-	if(heapTerm.op() == heapLDT.getChangeHeapAtLocs()
-	   && heapTerm.sub(1).op().equals(heapLDT.getFreshLocs())
-	   && heapTerm.sub(1).sub(0).equals(heapTerm.sub(0))) {
+	if(heapTerm.op() == heapLDT.getAnon()
+	   && heapTerm.sub(1).op().equals(setLDT.getEmpty())) {
 	    return heapPos;
 	} else if(op.arity() == 0) {
 	    final Pair<Term,PosInOccurrence> def 
@@ -193,8 +193,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
 	    return new Pair<Term,ImmutableList<PosInOccurrence>>(
 		    	    TB.union(services, locs, furtherLocs.first), 
 		    	    furtherLocs.second);	    
-	} else if(op == heapLDT.getChangeHeapAtLocs() 
-	          || op == heapLDT.getChangeHeapAtLocs2()) {
+	} else if(op == heapLDT.getAnon() || op == heapLDT.getMemset()) {
 	    final Term h = heapTerm.sub(0);
 	    final Term s = heapTerm.sub(1);
 	    final Pair<Term,ImmutableList<PosInOccurrence>> furtherLocs 
@@ -272,7 +271,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
 	final List<PosInOccurrence> result 
 		= new LinkedList<PosInOccurrence>();
 	
-	//special treatment for changeHeapAtLocs(h, freshLocs(h), h')
+	//special treatment for anon(h, empty, h')
 	final PosInOccurrence freshLocsStep 
 		= getFreshLocsStep(pos.down(0), seq, services);
 	if(freshLocsStep != null) {
@@ -491,7 +490,8 @@ public final class UseDependencyContractRule implements BuiltInRule {
 	    			     Services services,
 	    			     RuleApp ruleApp) {		
 	//collect information
-	final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();	
+	final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+	final SetLDT setLDT   = services.getTypeConverter().getSetLDT();
 	final PosInOccurrence pio = ruleApp.posInOccurrence();	
         final Term focus = pio.subTerm();
         final ObserverFunction target = (ObserverFunction) focus.op();
@@ -537,12 +537,14 @@ public final class UseDependencyContractRule implements BuiltInRule {
         final Term cutFormula = TB.and(new Term[]{freePre, pre, disjoint});
         
         //bail out if obviously not helpful
-        final ImmutableSet<Term> changed 
-        	= addEqualDefs(IIT.unionToSet(baseHeapAndChangedLocs.second, 
-        				      services), 
-        		       goal);
-        if(changed.contains(dep)) {
-            return goal.split(1);
+        if(!baseHeapAndChangedLocs.second.op().equals(setLDT.getEmpty())) {
+            final ImmutableSet<Term> changed 
+            	= addEqualDefs(IIT.unionToSet(baseHeapAndChangedLocs.second, 
+            				      services), 
+            				      goal);
+            if(changed.contains(dep)) {
+        	return goal.split(1);
+            }
         }
         
         //split goal into two branches

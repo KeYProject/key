@@ -1081,9 +1081,8 @@ public final class TermBuilder {
     }
     
     
-    public Term changeHeapAtLocs(Services services, Term h1, Term s, Term h2) {
-	return func(services.getTypeConverter().getHeapLDT()
-		                               .getChangeHeapAtLocs(), 
+    public Term anon(Services services, Term h1, Term s, Term h2) {
+	return func(services.getTypeConverter().getHeapLDT().getAnon(), 
 		    new Term[]{h1, s, h2});
     }
     
@@ -1161,45 +1160,50 @@ public final class TermBuilder {
     public Term frame(Services services,
 	    	      Term heapAtPre, 
 	    	      Term mod) {
-	Sort objectSort = services.getJavaInfo().objectSort();
-	Sort fieldSort = services.getTypeConverter()
-	                         .getHeapLDT()
-	                         .getFieldSort();
+	final Sort objectSort = services.getJavaInfo().objectSort();
+	final Sort fieldSort = services.getTypeConverter()
+	                               .getHeapLDT()
+	                               .getFieldSort();
 	
-	Name objVarName   = new Name(newName(services, "o"));
-	Name fieldVarName = new Name(newName(services, "f"));
-	LogicVariable objVar   = new LogicVariable(objVarName, objectSort);
-	LogicVariable fieldVar = new LogicVariable(fieldVarName, fieldSort);
-	Term objVarTerm = var(objVar);
-	Term fieldVarTerm = var(fieldVar);
+	final Name objVarName   = new Name(newName(services, "o"));
+	final Name fieldVarName = new Name(newName(services, "f"));
+	final LogicVariable objVar   
+		= new LogicVariable(objVarName, objectSort);
+	final LogicVariable fieldVar 
+		= new LogicVariable(fieldVarName, fieldSort);
+	final Term objVarTerm = var(objVar);
+	final Term fieldVarTerm = var(fieldVar);
 	
-	Map map = new HashMap();
+	final Map<Term,Term> map = new HashMap<Term,Term>();
 	map.put(heap(services), heapAtPre);
-	OpReplacer or = new OpReplacer(map);
-	Term modAtPre = or.replace(mod);
+	final OpReplacer or = new OpReplacer(map);
+	final Term modAtPre = or.replace(mod);
+	final Term createdAtPre = or.replace(created(services, objVarTerm));
 	
 	return all(new QuantifiableVariable[]{objVar, fieldVar},
-		   or(pairElementOf(services,
-			   	    objVarTerm,
-			   	    fieldVarTerm,
-			   	    modAtPre),
-		      equals(select(services,
-				    Sort.ANY,
-				    heap(services),
-				    objVarTerm,
-				    fieldVarTerm),
-		             select(services,
- 			            Sort.ANY,
-				    heapAtPre,
-				    objVarTerm,
-				    fieldVarTerm))));
+		   or(new Term[]{pairElementOf(services,
+			   	    	       objVarTerm,
+			   	    	       fieldVarTerm,
+			   	    	       modAtPre),
+			   	 and(not(equals(objVarTerm, NULL(services))),
+			             not(createdAtPre)),
+			   	 equals(select(services,
+			   		       Sort.ANY,
+			   		       heap(services),
+			   		       objVarTerm,
+			   		       fieldVarTerm),
+			   		select(services,
+			   		       Sort.ANY,
+			   		       heapAtPre,
+			   		       objVarTerm,
+			   		       fieldVarTerm))}));
     }
     
     
-    public Term anon(Services services, Term mod, Term anonHeap) {
+    public Term anonUpd(Services services, Term mod, Term anonHeap) {
 	return elementary(services,
 		          services.getTypeConverter().getHeapLDT().getHeap(),
-		          changeHeapAtLocs(services, 
+		          anon(services, 
 		        	           heap(services), 
 		        	           mod, 
 		        	           anonHeap));

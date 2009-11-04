@@ -169,7 +169,7 @@ public final class DependencyContractPO extends AbstractPO
 					           heapLDT.targetSort());
 	final Term anonHeap = TB.func(anonHeapFunc);
 	final Term changedHeap 
-		= TB.changeHeapAtLocs(services, 
+		= TB.anon(services, 
 			              TB.heap(services), 
 				      TB.setMinus(services, 
 					          TB.allLocs(services), 

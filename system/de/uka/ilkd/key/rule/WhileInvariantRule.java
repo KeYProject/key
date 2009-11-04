@@ -132,28 +132,26 @@ public final class WhileInvariantRule implements BuiltInRule {
     
     private Term createAnonUpdate(While loop, Term mod, Services services) {
 	//heap
-	HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
-	Name anonHeapName = new Name(TB.newName(services, "anonHeap_loop"));
-	Function anonHeapFunc = new Function(anonHeapName,
+	final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+	final Name anonHeapName 
+		= new Name(TB.newName(services, "anonHeap_loop"));
+	final Function anonHeapFunc = new Function(anonHeapName,
 					     heapLDT.targetSort());
 	services.getNamespaces().functions().addSafely(anonHeapFunc);
-	Term result = TB.elementary(services,
-		                    heapLDT.getHeap(), 
-		                    TB.changeHeapAtLocs(services, 
-		                	    		TB.heap(services), 
-		                	    		mod,
-		                	    		TB.func(anonHeapFunc)));
+	Term result = TB.anonUpd(services, mod, TB.func(anonHeapFunc));
 	
 	//local vars
-	ImmutableSet<ProgramVariable> localVars 
+	final ImmutableSet<ProgramVariable> localVars 
 		= IIT.getWrittenPVs(loop, services);
 	for(ProgramVariable pv : localVars) {
-	    String anonFuncName = TB.newName(services, pv.name().toString());
-	    Function anonFunc = new Function(new Name(anonFuncName), pv.sort());
+	    final String anonFuncName 
+	    	= TB.newName(services, pv.name().toString());
+	    final Function anonFunc 
+	    	= new Function(new Name(anonFuncName), pv.sort());
 	    services.getNamespaces().functions().addSafely(anonFunc);
-	    Term elemUpd = TB.elementary(services, 
-		                         (LocationVariable)pv, 
-		                         TB.func(anonFunc));
+	    final Term elemUpd = TB.elementary(services, 
+		                               (LocationVariable)pv, 
+		                               TB.func(anonFunc));
 	    result = TB.parallel(result, elemUpd);
 	}
 	

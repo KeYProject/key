@@ -38,8 +38,8 @@ public final class HeapLDT extends LDT {
     //select/store
     private final SortDependingFunction select;
     private final Function store;
-    private final Function changeHeapAtLocs;
-    private final Function changeHeapAtLocs2;
+    private final Function anon;
+    private final Function memset;
 
     //location sets
     private final Function allLocs;
@@ -81,8 +81,8 @@ public final class HeapLDT extends LDT {
         fieldSort         = (Sort) sorts.lookup(new Name("Field"));	
         select            = addSortDependingFunction(services, SELECT_NAME.toString());
         store             = addFunction(services, "store");
-        changeHeapAtLocs  = addFunction(services, "changeHeapAtLocs");
-        changeHeapAtLocs2 = addFunction(services, "changeHeapAtLocs2");
+        anon              = addFunction(services, "anon");
+        memset            = addFunction(services, "memset");
         allLocs           = addFunction(services, "allLocs");
         allFields         = addFunction(services, "allFields");
         freshLocs         = addFunction(services, "freshLocs");
@@ -176,13 +176,13 @@ public final class HeapLDT extends LDT {
     }
     
 
-    public Function getChangeHeapAtLocs() {
-	return changeHeapAtLocs;
+    public Function getAnon() {
+	return anon;
     }    
     
     
-    public Function getChangeHeapAtLocs2() {
-	return changeHeapAtLocs2;
+    public Function getMemset() {
+	return memset;
     }     
     
     

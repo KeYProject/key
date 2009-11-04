@@ -192,9 +192,6 @@ public class JMLSpecFactory {
         				paramVars);
         	assignable = TB.union(services, assignable, translated);
             }
-            assignable = TB.union(services, 
-        	                  assignable, 
-        	                  TB.freshLocs(services, TB.heap(services)));
         }
         
         //translate accessible
@@ -593,9 +590,6 @@ public class JMLSpecFactory {
         		    paramVars);
         	assignable = TB.union(services, assignable, translated);        
             }
-            assignable = TB.union(services,
-        	                  assignable, 
-        	                  TB.freshLocs(services, TB.heap(services)));
         }
         
         //translate variant

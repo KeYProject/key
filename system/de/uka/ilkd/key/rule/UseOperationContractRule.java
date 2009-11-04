@@ -364,7 +364,7 @@ public final class UseOperationContractRule implements BuiltInRule {
 	final Function anonHeapFunc = new Function(anonHeapName,
 					           heapLDT.targetSort());
 	services.getNamespaces().functions().addSafely(anonHeapFunc);
-	assumption = TB.equals(TB.changeHeapAtLocs(services, 
+	assumption = TB.equals(TB.anon(services, 
 		                	    	   TB.heap(services), 
 		                	    	   mod,
 		                	    	   TB.func(anonHeapFunc)),
