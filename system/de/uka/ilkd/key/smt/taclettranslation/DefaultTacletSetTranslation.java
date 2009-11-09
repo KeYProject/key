@@ -193,15 +193,8 @@ public final class DefaultTacletSetTranslation
             toStore += "}\n\n\n";
     	
         }
-
-       
         
-        /*if(usedQuantifiedVariable.size() > 0 || usedFormulaSV.size() >0){
-            toStore += "\\schemaVariables{\n\n";
-            for(QuantifiableVariable var : usedQuantifiedVariable){
-                toStore += "\\variables " + var.sort()+" "+var.name().toString()+";\n";  
-            }
-         */
+     
         
         if(!usedQuantifiedVariable.isEmpty()){
             toStore += "\\functions{\n\n";
