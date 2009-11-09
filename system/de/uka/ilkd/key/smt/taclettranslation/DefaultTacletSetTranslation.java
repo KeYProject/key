@@ -9,7 +9,12 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.op.TermSymbol;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.parser.SchemaVariableModifierSet.VariableSV;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.rule.Taclet;
@@ -57,9 +62,16 @@ public final class DefaultTacletSetTranslation
     private ImmutableSet<Sort> usedFormulaSorts = DefaultImmutableSet.nil();
     
     /**
-     * Sorts that has been used while translating the set of taclets.
+     * Sorts that have been used while translating the set of taclets.
      */
     private HashSet<Sort> usedSorts = new HashSet<Sort>();
+
+    /**
+     * Shema variables of the type Variable that have been used while translating the set of taclets.
+     */
+    private HashSet<QuantifiableVariable> usedQuantifiedVariable = new HashSet<QuantifiableVariable>();
+    
+    private HashSet<SchemaVariable> usedFormulaSV = new HashSet<SchemaVariable>();
 
     public DefaultTacletSetTranslation() {
 	TacletTranslator tt = new RewriteTacletTranslator();
@@ -113,9 +125,9 @@ public final class DefaultTacletSetTranslation
 		continue;
 	    }
 	    for (TacletTranslator translator : translators) {
-		try { // check for the right translator
-
+		try { // check for the right translator // TODO: check this part of code!
 		    Term term = translator.translate(t,sorts);
+		
 		    translation = translation.append(new DefaultTacletFormula(
 			    t, term, ""));
 		    break; // translate only once a time.
@@ -178,8 +190,33 @@ public final class DefaultTacletSetTranslation
             for(Sort sort : usedSorts){
                 toStore += sort.name().toString()+";\n";  
             }
-            toStore += "}\n";
+            toStore += "}\n\n\n";
     	
+        }
+
+       
+        
+        /*if(usedQuantifiedVariable.size() > 0 || usedFormulaSV.size() >0){
+            toStore += "\\schemaVariables{\n\n";
+            for(QuantifiableVariable var : usedQuantifiedVariable){
+                toStore += "\\variables " + var.sort()+" "+var.name().toString()+";\n";  
+            }
+         */
+        
+        if(!usedQuantifiedVariable.isEmpty()){
+            toStore += "\\functions{\n\n";
+            for(QuantifiableVariable var : usedQuantifiedVariable){
+        	toStore += var.sort() + " "+ var.name().toString()+";\n";  
+            }
+            toStore += "}\n\n\n";
+        }
+        
+        if(!usedFormulaSV.isEmpty()){
+            toStore += "\\predicates{\n\n";
+            for(SchemaVariable var : usedFormulaSV){
+        	toStore +=  var.name().toString()+";\n";  
+            }
+            toStore += "}\n\n\n";
         }
         
       
@@ -195,6 +232,16 @@ public final class DefaultTacletSetTranslation
 	}
 
 	toStore += "}";
+	
+	
+	if(notTranslated.size() > 0){
+	    toStore += "\n\n// not translated:\n";
+	    for(TacletFormula tf : notTranslated){
+		toStore += "\n//"+tf.getTaclet().name()+": "+tf.getStatus();
+	    }
+	}
+	
+	
 
 	FileWriter fw;
 	try {
@@ -202,7 +249,7 @@ public final class DefaultTacletSetTranslation
 	    fw.write(toStore);
 	    fw.close();
 	} catch (IOException e) {
-	    System.out.println("Error while writing result file");
+	    // TODO: handling the exception
 	}
 
     }
@@ -218,6 +265,23 @@ public final class DefaultTacletSetTranslation
 	usedSorts.add(sort);
 	
     }
+
+    /* (non-Javadoc)
+     * @see de.uka.ilkd.key.smt.taclettranslation.TranslationListener#eventQuantifiedVariable(de.uka.ilkd.key.logic.op.QuantifiableVariable)
+     */
+    public void eventQuantifiedVariable(QuantifiableVariable var) {
+	usedQuantifiedVariable.add(var);
+	
+    }
+
+    /* (non-Javadoc)
+     * @see de.uka.ilkd.key.smt.taclettranslation.TranslationListener#eventFormulaSV(de.uka.ilkd.key.logic.op.SchemaVariable)
+     */
+    public void eventFormulaSV(SchemaVariable formula) {
+	usedFormulaSV.add(formula);
+	
+    }
+
 
 
 
