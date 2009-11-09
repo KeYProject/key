@@ -126,6 +126,10 @@ public final class DefaultTacletSetTranslation
 	    }
 	    for (TacletTranslator translator : translators) {
 		try { // check for the right translator // TODO: check this part of code!
+<<<<<<< HEAD:system/de/uka/ilkd/key/smt/taclettranslation/DefaultTacletSetTranslation.java
+=======
+		    System.out.println("Translate taclet: " + t);
+>>>>>>> 7b95cb150c70675918d5f75e84f4b2bc7cb1f102:system/de/uka/ilkd/key/smt/taclettranslation/DefaultTacletSetTranslation.java
 		    Term term = translator.translate(t,sorts);
 		
 		    translation = translation.append(new DefaultTacletFormula(
@@ -192,6 +196,31 @@ public final class DefaultTacletSetTranslation
             }
             toStore += "}\n\n\n";
     	
+        }
+
+       
+        
+        /*if(usedQuantifiedVariable.size() > 0 || usedFormulaSV.size() >0){
+            toStore += "\\schemaVariables{\n\n";
+            for(QuantifiableVariable var : usedQuantifiedVariable){
+                toStore += "\\variables " + var.sort()+" "+var.name().toString()+";\n";  
+            }
+         */
+        
+        if(!usedQuantifiedVariable.isEmpty()){
+            toStore += "\\functions{\n\n";
+            for(QuantifiableVariable var : usedQuantifiedVariable){
+        	toStore += var.sort() + " "+ var.name().toString()+";\n";  
+            }
+            toStore += "}\n\n\n";
+        }
+        
+        if(!usedFormulaSV.isEmpty()){
+            toStore += "\\predicates{\n\n";
+            for(SchemaVariable var : usedFormulaSV){
+        	toStore +=  var.name().toString()+";\n";  
+            }
+            toStore += "}\n\n\n";
         }
         
      
