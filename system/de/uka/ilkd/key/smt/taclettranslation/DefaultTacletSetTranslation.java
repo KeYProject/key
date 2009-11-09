@@ -101,7 +101,6 @@ public final class DefaultTacletSetTranslation
     }
 
     public ImmutableList<TacletFormula> getTranslation(ImmutableSet<Sort> sorts) {
-
 	// only translate once a time.
 	if (!translate)
 	    return translation;
