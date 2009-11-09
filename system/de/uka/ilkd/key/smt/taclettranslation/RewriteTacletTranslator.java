@@ -8,9 +8,12 @@ import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.op.BoundedNumericalQuantifier;
 import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+import de.uka.ilkd.key.logic.op.SchemaVariableAdapter;
 import de.uka.ilkd.key.logic.op.SortedSchemaVariable;
+import de.uka.ilkd.key.logic.op.WarySubstOp;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.RewriteTaclet;
@@ -186,16 +189,30 @@ public class RewriteTacletTranslator extends AbstractTacletTranslator {
 	TermBuilder tb = TermBuilder.DF;
 	// Quantify over all free variables.
 	for (QuantifiableVariable qv : term.freeVars()) {
+	   if(!term.sort().equals(Sort.FORMULA)){
 	    term = tb.all(qv, term);
+	   }
 	}
 	return term;
     }
 
     @Override
     protected Term changeTerm(Term term) {
+	
+	
 	TermBuilder tb = TermBuilder.DF;
-	if (term.op() instanceof SortedSchemaVariable) {
-	    term = tb.var(getLogicVariable(term.op().name(), term.sort()));
+
+
+	
+	if(term.op() instanceof SortedSchemaVariable) {
+	    if(term.sort().equals(Sort.FORMULA)){
+		
+	//	term = tb.var(getLogicVariable(term.op().name(),Sort.FORMULA));
+		//term = tb.var(getLogicVariable(term.op().name(),term.sort()));
+	    }else{
+		term = tb.var(getLogicVariable(term.op().name(), term.sort()));
+	    }
+	    
 	}
 	if(term.sort() instanceof GenericSort){
 	    usedGenericSorts  = usedGenericSorts.add((GenericSort) term.sort());   

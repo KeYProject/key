@@ -28,6 +28,7 @@ import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermFactory;
+import de.uka.ilkd.key.logic.op.BoundedNumericalQuantifier;
 import de.uka.ilkd.key.logic.op.CastFunctionSymbol;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.IfThenElse;
@@ -37,12 +38,15 @@ import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.Quantifier;
 import de.uka.ilkd.key.logic.op.RigidFunction;
+import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariableAdapter;
 import de.uka.ilkd.key.logic.op.SortedSchemaVariable;
+import de.uka.ilkd.key.logic.op.WarySubstOp;
 import de.uka.ilkd.key.logic.sort.AbstractSort;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 
+import de.uka.ilkd.key.parser.SchemaVariableModifierSet.VariableSV;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletGoalTemplate;
 
@@ -54,6 +58,7 @@ abstract class AbstractTacletTranslator implements TacletTranslator {
 
     protected HashMap<String, LogicVariable> usedVariables = 
 	new HashMap<String, LogicVariable>();
+    protected HashMap<String, VariableSV> usedSchemaVariables = new HashMap<String, VariableSV>();
 
     protected Collection<TranslationListener> listener= new LinkedList<TranslationListener>();
 
@@ -102,10 +107,10 @@ abstract class AbstractTacletTranslator implements TacletTranslator {
 	    throw new IllegalTacletException(
 		    "The taclet has variable conditions.");
 	}
-	if (t.varsNotFreeIn().hasNext()) {
+	/*if (t.varsNotFreeIn().hasNext()) {
 	    throw new IllegalTacletException(
 		    "The taclet has \\notFreeIn conditions.");
-	}
+	}*/
 	// if(t.varshasNext()) {return "The taclet has ";}
 
 	// Check for addrules, they are in general not allowed.
@@ -184,6 +189,13 @@ abstract class AbstractTacletTranslator implements TacletTranslator {
 	                .isTermSV())
 	        || ((op instanceof SchemaVariableAdapter) && ((SchemaVariableAdapter) op)
 	                .isFormulaSV())
+	     //   || ((op instanceof SchemaVariableAdapter) && ((SchemaVariableAdapter) op)
+	     //           .isVariableSV())
+	     //   || ((op instanceof BoundedNumericalQuantifier))
+	        || ((op instanceof WarySubstOp))
+
+	        
+	
 
 	) {
 	    return;
@@ -206,7 +218,17 @@ abstract class AbstractTacletTranslator implements TacletTranslator {
 	checkOperator(term.op());
 	for(TranslationListener l : listener){
 	    if(term.sort() != null && !(term.sort() instanceof GenericSort)){
-		l.eventSort(term.sort());
+		if(term.sort().equals(Sort.FORMULA)){
+		    if(((term.op() instanceof SchemaVariableAdapter) && ((SchemaVariableAdapter) term.op())
+		                .isFormulaSV())){
+			 l.eventFormulaSV((SchemaVariable) term.op());
+		    }
+		   
+		    //   l.eventFormulaSV(term);
+		}else{
+		    l.eventSort(term.sort());
+		}
+		
 	    }
 	}
 	for (int i = 0; i < term.arity(); i++) {
@@ -242,16 +264,47 @@ abstract class AbstractTacletTranslator implements TacletTranslator {
      */
    
     protected Term rebuildTerm(Term term){
+	
 	ImmutableArray<QuantifiableVariable> variables[] = new ImmutableArray[term
 	                                                                      .arity()];
 	Term[] subTerms = new Term[term.arity()];
+
+	
+
 	for (int i = 0; i < term.arity(); i++) {
+	    variables[i] = term.varsBoundHere(i);//subTerms[i].varsBoundHere(i);
 	    subTerms[i] = rebuildTerm(term.sub(i));
-	    variables[i] = subTerms[i].varsBoundHere(i);
+	    
 	}
 
 	term = changeTerm(term);
-
+	
+	
+	if(term.op() instanceof Quantifier){
+	       
+	  
+	   // ImmutableArray<QuantifiableVariable> temp = new ImmutableArray<QuantifiableVariable>(); 
+	    QuantifiableVariable [] temp = new QuantifiableVariable[variables[0].size()];
+	    int i=0;
+	    for(QuantifiableVariable qv : variables[0]){
+		    for(TranslationListener l : listener){
+			    l.eventQuantifiedVariable(qv);
+			}
+		// Replace quantified schema variables with logical variables of the same sort.
+	//	temp[i] = getLogicVariable(qv.name(),qv.sort());
+	//	i++;
+	    }
+	  //  variables[0] = new ImmutableArray<QuantifiableVariable>(temp);
+	    
+	    
+	
+	    
+	   // tf.createQuantifierTerm(Quantifier.ALL,term.varsBoundHere(0),subTerms[0]);
+	    
+	}/*else{
+	    term = tf.createTerm(term.op(), subTerms, variables,
+			JavaBlock.EMPTY_JAVABLOCK);
+	}*/
 
 
 	term = tf.createTerm(term.op(), subTerms, variables,
@@ -296,6 +349,8 @@ abstract class AbstractTacletTranslator implements TacletTranslator {
 			   
 		
 	}
+	
+	
 
 	term = tf.createTerm(term.op(), subTerms, variables,
 		JavaBlock.EMPTY_JAVABLOCK);
@@ -321,6 +376,7 @@ abstract class AbstractTacletTranslator implements TacletTranslator {
     protected LogicVariable getLogicVariable(Name name, Sort sort) {
 	LogicVariable l = usedVariables.get(name.toString());
 	if (l == null) {
+	    
 	    l = new LogicVariable(name, sort);
 	    usedVariables.put(name.toString(), l);
 	}
