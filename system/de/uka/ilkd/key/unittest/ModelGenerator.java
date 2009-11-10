@@ -37,26 +37,32 @@ public class ModelGenerator {
 
     public static int decProdForTestGen = OLD_SIMPLIFY;
 
-    private ImmutableList<Term> ante, succ;
+    protected ImmutableList<Term> ante, succ;
 
-    private HashMap<Term, EquivalenceClass> term2class;
+    protected HashMap<Term, EquivalenceClass> term2class;
 
     // Maps a location to the set of formulas it occurs in.
-    private HashMap<Term, ImmutableSet<Term>> eqvC2constr;
+    protected HashMap<Term, ImmutableSet<Term>> eqvC2constr;
 
-    private Services serv;
+    protected Services serv;
 
-    private ImmutableSet<Term> locations = DefaultImmutableSet.<Term>nil();
+    protected ImmutableSet<Term> locations = DefaultImmutableSet.<Term>nil();
 
-    private ImmutableSet<ProgramVariable> pvs = DefaultImmutableSet.<ProgramVariable>nil();
+    protected ImmutableSet<ProgramVariable> pvs = DefaultImmutableSet.<ProgramVariable>nil();
 
-    private Node node;
+    protected Node node;
 
-    private Constraint userConstraint;
+    protected Constraint userConstraint;
 
-    private String executionTrace;
+    protected String executionTrace;
 
     public Node originalNode;
+    
+    /** required in order to access during model generation dmg.terminateAsSoonAsPossible.
+     * Do not set this field directly but use getDecProdModelGenerator() instead*/
+    protected 	DecProdModelGenerator dmg;
+
+    protected volatile boolean terminateAsSoonAsPossible=false;
 
     public ModelGenerator(Services serv, Constraint userConstraint, Node node,
 	    String executionTrace, Node originalNode) {
@@ -133,7 +139,7 @@ public class ModelGenerator {
      * variable found in <code>t</code> and updates the mapping from this class
      * to the formulas it occurs in.
      */
-    private void collectLocations(Term t) {
+    protected void collectLocations(Term t) {
 	if (isLocation(t, serv)) {
 	    getEqvClass(t);
 	    locations = locations.add(t);
@@ -216,7 +222,7 @@ public class ModelGenerator {
 	return term2class;
     }
 
-    // private SetOf<Term> getConstraintsForEqvClass(EquivalenceClass ec) {
+    // protected SetOf<Term> getConstraintsForEqvClass(EquivalenceClass ec) {
     // Iterator<Term> it = ec.getMembers().iterator();
     // SetOf<Term> result = SetAsListOf.<Term>nil();
     // while (it.hasNext()) {
@@ -232,7 +238,7 @@ public class ModelGenerator {
      * Creates equivalence classes based on the equality formulas (l=r)
      * contained in <code>formulas</code>.
      */
-    private void createEquivalenceClassesAndConstraints() {
+    protected void createEquivalenceClassesAndConstraints() {
 	term2class = new HashMap<Term, EquivalenceClass>();
 	Iterator<Term> it = ante.iterator();
 	while (it.hasNext()) {
@@ -270,7 +276,7 @@ public class ModelGenerator {
      * Obsolete! Used when it is tried to generate a model without the help of a
      * decision procedure.
      */
-    private void findBounds() {
+    protected void findBounds() {
 	Iterator<Term> it = ante.iterator();
 	while (it.hasNext()) {
 	    Term t = it.next();
@@ -300,7 +306,7 @@ public class ModelGenerator {
 	}
     }
 
-    private void findDisjointClasses() {
+    protected void findDisjointClasses() {
 	Iterator<Term> it = succ.iterator();
 	while (it.hasNext()) {
 	    Term t = it.next();
@@ -317,7 +323,7 @@ public class ModelGenerator {
     /**
      * Resets the concrete values of all EquivalenceClasses.
      */
-    private void resetAllClasses(LinkedList<EquivalenceClass> classes) {
+    protected void resetAllClasses(LinkedList<EquivalenceClass> classes) {
 	for (int i = 0; i < classes.size(); i++) {
 	    (classes.get(i)).resetValue();
 	}
@@ -326,7 +332,7 @@ public class ModelGenerator {
     /**
      * Obsolete. Checks whether the current partial model is consistent.
      */
-    private boolean consistencyCheck() {
+    protected boolean consistencyCheck() {
 	Iterator<EquivalenceClass> it = term2class.values().iterator();
 	while (it.hasNext()) {
 	    EquivalenceClass ec = it.next();
@@ -342,10 +348,11 @@ public class ModelGenerator {
      * the partial model.
      */
     public Model[] createModels() {
-	DecProdModelGenerator dmg;
+	terminateAsSoonAsPossible=false;
 	Set<Model> intModelSet = new HashSet<Model>();
 	LinkedList<EquivalenceClass> classes = new LinkedList<EquivalenceClass>(
 		term2class.values());
+	createModels_progressNotification0(term2class);
 	for (int i = classes.size() - 1; i >= 0; i--) {
 	    if (// !((EquivalenceClass) classes.get(i)).isInt() &&
 	    !classes.get(i).isBoolean()
@@ -353,21 +360,11 @@ public class ModelGenerator {
 		classes.remove(i);
 	    }
 	}
-	if (decProdForTestGen == COGENT) {
-	    dmg = new CogentModelGenerator(
-		    new CogentTranslation(node.sequent()), term2class,
-		    locations);
-	    intModelSet = dmg.createModels();
-	}
-	if (decProdForTestGen == SIMPLIFY /* || intModelSet.isEmpty() */) {
-	    dmg = new SimplifyModelGenerator(node, serv, term2class, locations);
-	    intModelSet = dmg.createModels();
-	}
-	if (decProdForTestGen == OLD_SIMPLIFY /* || intModelSet.isEmpty() */) {
-	    dmg = new OldSimplifyModelGenerator(new DecisionProcedureSimplify(
-		    node, userConstraint, serv), serv, term2class, locations);
-	    intModelSet = dmg.createModels();
-	}
+	dmg = getDecProdModelGenerator();
+	
+	intModelSet = dmg.createModels();
+	    
+	createModels_progressNotification1(intModelSet);
 	Set<Model> modelSet = new HashSet<Model>();
 	Iterator<Model> it = intModelSet.iterator();
 	while (it.hasNext()) {
@@ -385,17 +382,43 @@ public class ModelGenerator {
 	for (int i = 0; i < result.length; i++) {
 	    result[i] = models[i];
 	}
+	dmg = null;
 	return result;
     }
+    
+    /** Overwrites the old value of this.dmg.
+     * This method is overwritten in ModelGeneratorGUIInterface*/
+    protected DecProdModelGenerator getDecProdModelGenerator(){
+	if (decProdForTestGen == COGENT) {
+	    dmg = new CogentModelGenerator(
+		    new CogentTranslation(node.sequent()), term2class,
+		    locations);
+	}else	if (decProdForTestGen == SIMPLIFY /* || intModelSet.isEmpty() */) {
+	    dmg = new SimplifyModelGenerator(node, serv, term2class, locations);
+	}else 	if (decProdForTestGen == OLD_SIMPLIFY /* || intModelSet.isEmpty() */) {
+	    dmg = new OldSimplifyModelGenerator(new DecisionProcedureSimplify(
+		    node, userConstraint, serv), serv, term2class, locations);
+	}else {
+	    dmg=null;
+	}
+	return dmg;
+
+    }
+    
+    /**Is meant to be overwritten by subclasses in order to give the user feedback. */
+    protected void createModels_progressNotification0(HashMap<Term,EquivalenceClass> term2class){ }
+
+    /**Is meant to be overwritten by subclasses in order to give the user feedback. */
+    protected void createModels_progressNotification1(Set<Model> intModelSet){ }
 
     /**
      * Computes values for EquivalenceClasses of type boolean and adds these
      * assignments to the partial model <code>model</code>.
      */
-    private Set<Model> createModelHelp(Model model,
+    protected Set<Model> createModelHelp(Model model,
 	    LinkedList<EquivalenceClass> classes) {
 	HashSet<Model> models = new HashSet<Model>();
-	if (!consistencyCheck()) {
+	if (!consistencyCheck() || terminateAsSoonAsPossible) {
 	    return models;
 	}
 	classes = (LinkedList) classes.clone();
@@ -490,7 +513,7 @@ public class ModelGenerator {
      * Returns the equivalence class of term t. If it doesn't exist yet a new
      * one is created.
      */
-    private EquivalenceClass getEqvClass(Term t) {
+    protected EquivalenceClass getEqvClass(Term t) {
 	if (!term2class.containsKey(t)) {
 	    term2class.put(t, new EquivalenceClass(t, serv));
 	}
@@ -500,7 +523,14 @@ public class ModelGenerator {
     // public Node getNode() {
     // return node;
     // }
-
+    
+    /**Notifies the ModelGenerator and DecProcModelGenerators to stop as soon as possible,
+     * even if model generation has not finished yet. */
+    public void terminateAsSoonAsPossible(){
+	terminateAsSoonAsPossible = true;
+	dmg.terminateAsSoonAsPossible = true;
+    }
+    
     public Node getOriginalNode() {
 	return originalNode;
     }

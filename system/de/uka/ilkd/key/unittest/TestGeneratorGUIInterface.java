@@ -38,6 +38,7 @@ public abstract class TestGeneratorGUIInterface extends TestGenerator {
 	this.dialog = dialog; 
     }
     
+    /** Warning. Background threads and ModelGenerator.modelGenerationTimeout are used internally*/
     synchronized public String  generateTestSuite(final Statement[] code, Term oracle,
 	    final List<ModelGenerator> mgs,
 	    ImmutableSet<ProgramVariable> programVars, final String methodName,
@@ -46,7 +47,7 @@ public abstract class TestGeneratorGUIInterface extends TestGenerator {
 	if(Main.isVisibleMode()||Main.testStandalone){
 	    Main.getInstance().getProverTaskListener().taskStarted("Generating tests", mgs.size());
 	}
-	String file = super.generateTestSuite(code, oracle, mgs, programVars, methodName, pr, timeout);
+	String file = super.generateTestSuite(code, oracle, mgs, programVars, methodName, pr);
 	//Main.getInstance().getProverTaskListener().taskFinished(new TaskFinishedInfo());
 	return file;
     }
@@ -54,12 +55,12 @@ public abstract class TestGeneratorGUIInterface extends TestGenerator {
     /**When generateTestSuite() is executed on a separate thread, then this notification method
      * is called in order to report the progress of computation to other threads. */
     protected void generateTestSuite_progressNotification1(int count,
-	    int totalCount, WeakReference<ModelGenerator> refMG) {
+	    int totalCount, ModelGenerator refMG) {
 	try {
-	    Node n = refMG.get().originalNode;
+	    Node n = refMG.originalNode;
     
 	    if (dialog != null  && Main.isVisibleMode()){
-		dialog.msg("(" + count + "/" + totalCount+ ") Generating model for node:" + n.serialNr());
+		dialog.msg("(" + count + "/" + totalCount+ ") Generating model for node:" + n.serialNr(), n, null);
 		if(dialog.trackProgressInViewport != null  && dialog.trackProgressInViewport.isSelected()) {
 			dialog.mediator.getSelectionModel().setSelectedNode(n);
 		}
@@ -74,23 +75,25 @@ public abstract class TestGeneratorGUIInterface extends TestGenerator {
     /**When generateTestSuite() is executed on a separate thread, then this notification method
      * is called in order to report the progress of computation to other threads.  */
     protected void generateTestSuite_progressNotification2(int count,
-	    int totalCount, WeakReference<ModelGenerator> refMG,
-	    WeakReference<Model[]> models, boolean createModelsSuccess,
+	    int totalCount, ModelGenerator refMG,
+	    Model[] models, boolean createModelsSuccess,
 	    boolean terminated) {
 	if (terminated) {
+	    Node n = refMG.originalNode;
 	    String msg = "(" + count + "/" + totalCount
 		    + ") modelGeneration thread has timed out for node:"
-		    + refMG.get().originalNode.serialNr();
+		    + n.serialNr();
 	    if (dialog != null && Main.isVisibleMode())
-		dialog.badMsg(msg);
+		dialog.badMsg(msg, n, null);
 	}
 
-	if (models.get() == null || models.get().length == 0) {
+	if (models == null || models.length == 0) {
+	    Node n = refMG.originalNode;
 	    String msg = "(" + count + "/" + totalCount
 		    + ") NO model generated for node:"
-		    + refMG.get().originalNode.serialNr();
+		    + n.serialNr();
 	    if (dialog != null && Main.isVisibleMode())
-		dialog.badMsg(msg);
+		dialog.badMsg(msg, n, null);
 	}
 
     }
@@ -98,12 +101,13 @@ public abstract class TestGeneratorGUIInterface extends TestGenerator {
     /**When generateTestSuite() is executed on a separate thread, then this notification method
      * is called in order to report the progress of computation to other threads.*/
     protected void generateTestSuite_progressNotification3(
-	    int count, int totalCount, WeakReference<ModelGenerator> refMG, WeakReference<Model[]> models, MethodDeclaration mDecl){
-	    String msg = "("+count+"/"+totalCount+") test method generated for node "+refMG.get().originalNode.serialNr();
+	    int count, int totalCount, ModelGenerator refMG, Model[] models, MethodDeclaration mDecl){
+	    Node n = refMG.originalNode;
+	    String msg = "("+count+"/"+totalCount+") test method generated for node "+n.serialNr();
 	    if(Main.isVisibleMode()||Main.testStandalone){
 		Main.getInstance().getProverTaskListener().taskProgress(count);
 		if (dialog != null ){
-		    dialog.goodMsg(msg);
+		    dialog.goodMsg(msg, n, null);
 		}
 	    }
     }
@@ -111,10 +115,11 @@ public abstract class TestGeneratorGUIInterface extends TestGenerator {
     /**When generateTestSuite() is executed on a separate thread, then this notification method
      * is called in order to report the progress of computation to other threads. */
     protected void generateTestSuite_progressNotification4(
-	    int count, int totalCount, Exception e, WeakReference<ModelGenerator> refMG, WeakReference<Model[]> models, MethodDeclaration mDecl){
+	    int count, int totalCount, Exception e, ModelGenerator refMG, Model[] models, MethodDeclaration mDecl){
+	Node n = refMG.originalNode;
 	if (dialog != null && Main.isVisibleMode()){
-	dialog.error("("+count+"/"+totalCount+") An error occured while generating test method for node "+refMG.get().originalNode.serialNr()+
-			" \n Test generation will however continue. The error was "+e.toString()+ " \n");
+	dialog.error("("+count+"/"+totalCount+") An error occured while generating test method for node "+n.serialNr()+
+			" \n Test generation will however continue. The error was "+e.toString()+ " \n", n, null);
 	}
 	e.printStackTrace();
 

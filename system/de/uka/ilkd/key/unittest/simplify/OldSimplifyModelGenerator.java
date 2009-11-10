@@ -21,7 +21,7 @@ import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import java.io.StringReader;
 import java.util.*;
 
-public class OldSimplifyModelGenerator implements DecProdModelGenerator {
+public class OldSimplifyModelGenerator extends DecProdModelGenerator {
 
     private Services serv;
 
@@ -35,8 +35,11 @@ public class OldSimplifyModelGenerator implements DecProdModelGenerator {
 
     // first element has to be 0. Only positive values at even indices.
 
-    private static final int[] genericTestValues = new int[] { 0, -1, 1, -10,
+    protected static int[] genericTestValues = new int[] { 0, -1, 1, -10,
 	    10, -1000, 1000, -1000000, 1000000, -2000000000, 2000000000 };
+    
+    /**In the original implementation the value was 1. But some examples are solved at depth 3 and it takes a long time until 3 is reached. */
+    public static int iterativeDeepeningStart = 3;
 
     // Outputs of Simplify are stored in order to prevent Simplify
     // from being called several times with the same formula -> saves execution
@@ -100,22 +103,29 @@ public class OldSimplifyModelGenerator implements DecProdModelGenerator {
 
     public Set<Model> createModels() {
 	HashSet<Model> models = new HashSet<Model>();
-	int datCount = 1;
+	int datCount = iterativeDeepeningStart;
 	while (models.size() < getModelLimit()
-		&& datCount <= genericTestValues.length) {
+		&& datCount <= genericTestValues.length
+		&& !terminateAsSoonAsPossible) {
+	    createModels_ProgressNotification1(initialCounterExample,datCount);
 	    models.addAll(createModelsHelp(initialCounterExample, new Model(
 		    term2class), datCount++));
 	    simplifyOutputs.clear();
 	}
 	return models;
     }
+    
+    /** Ment to be overwritten by OLDSimplifyMG_GUIInterface*/
+    protected void createModels_ProgressNotification1(String initCounterExample, int datCount){ }
 
     private Set<Model> createModelsHelp(String counterEx, Model model,
 	    int datCount) {
 	String counterExOLD = new String(counterEx);
+	createModelsHelp_ProgressNotification1(counterExOLD);
 	Set<Model> models = new HashSet<Model>();
 	if (counterEx.indexOf("Counterexample") == -1
-		|| models.size() >= getModelLimit()) {
+		|| models.size() >= getModelLimit()
+		|| terminateAsSoonAsPossible) {
 	    return models;
 	}
 	counterEx = counterEx.replaceAll("_ ", "_");
@@ -210,6 +220,10 @@ public class OldSimplifyModelGenerator implements DecProdModelGenerator {
 	}
 	return models;
     }
+    
+    /**To be overwritten by OLDSimplifyMG_GUIInterface */
+    protected void createModelsHelp_ProgressNotification1(String counterExOld){   }
+
 
     private String simplify(Conjunction c) {
 	try {

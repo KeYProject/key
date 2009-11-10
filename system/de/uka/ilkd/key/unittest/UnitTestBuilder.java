@@ -44,21 +44,21 @@ import de.uka.ilkd.key.visualization.VisualizationStrategyForTesting;
  */
 public class UnitTestBuilder {
 
-    private final HashMap<Node, ExecutionTraceModel[]> node2trace;
+    protected final HashMap<Node, ExecutionTraceModel[]> node2trace;
 
-    private final Services serv;
+    protected final Services serv;
 
-    private final Constraint uc;
+    protected final Constraint uc;
 
     // the nodes containing trace ends that have already been processed by the
     // proof visualization
-    private final HashSet<Node> traceEndNodes;
+    protected final HashSet<Node> traceEndNodes;
 
-    private PackageReference pr;
+    protected PackageReference pr;
 
     // mbender: This object is only needed to store certain values, that are
     // needed for the KeY junit tests
-    private final DataStorage dataForTest;
+    protected final DataStorage dataForTest;
 
     // private int coverage;
 
@@ -70,23 +70,20 @@ public class UnitTestBuilder {
      * execute because it is a black-box. Set this attribute to true to allow
      * such traces for the test code extraction.
      */
-    private final boolean allowStartWithNonContextTraceElement = true;
+    protected final boolean allowStartWithNonContextTraceElement = true;
 
     // iff true only terminated traces are considered for test case generation
     public static boolean requireCompleteExecution = false;
 
-    private final Namespace pvn;
+    protected final Namespace pvn;
 
-    private final String directory = null;
+    protected final String directory = null;
 
-    private final boolean testing;
+    protected final boolean testing;
     
     /**The TestGenerator contains a thread object that is made accessible through this field. */
     public TestGenerator tg = null;
     
-    /** Seconds to wait for modelGeneration for each node. -1 = infinitely.  */
-    public static int modelCreationTimeout=20; 
-
     public UnitTestBuilder(final Services serv, final Proof p,
 	    final boolean testing) {
 	this.serv = serv;
@@ -127,7 +124,7 @@ public class UnitTestBuilder {
      */
     protected void getProgramMethods_ProgressNotification(ImmutableSet<ProgramMethod> result, boolean finished){ }
 
-    private ImmutableSet<ProgramMethod> getProgramMethods(
+    protected ImmutableSet<ProgramMethod> getProgramMethods(
 	    final ImmutableList<Node> nodes) {
 	final Iterator<Node> it = nodes.iterator();
 	ImmutableSet<ProgramMethod> result = DefaultImmutableSet
@@ -140,7 +137,7 @@ public class UnitTestBuilder {
 	return result;
     }
 
-    private ExecutionTraceModel[] getTraces(final Node n) {
+    protected ExecutionTraceModel[] getTraces(final Node n) {
 	ExecutionTraceModel[] tr = node2trace.get(n);
 	if (tr == null) {
 	    final ProofVisualization pv = new ProofVisualization(n,
@@ -153,7 +150,7 @@ public class UnitTestBuilder {
 	return tr;
     }
 
-    private HashSet<Position> getStatements(final ExecutionTraceModel[] tr) {
+    protected HashSet<Position> getStatements(final ExecutionTraceModel[] tr) {
 	final HashSet<Position> result = new HashSet<Position>();
 	for (final ExecutionTraceModel element : tr) {
 	    result.addAll(element.getExecutedStatementPositions());
@@ -344,8 +341,7 @@ public class UnitTestBuilder {
 	dataForTest.setTg(tg);
 	tg.setData(dataForTest);
 	// computeStatementCoverage(statements, tce.getStatements());
-	 String filename = tg.generateTestSuite(code, oracle, mgs, pvs,
-		 				"test" + methodName, pr,modelCreationTimeout);
+	 String filename = tg.generateTestSuite(code, oracle, mgs, pvs,"test" + methodName, pr);
 	 tg.clean();
 	 tg = null;
 	 return filename;
@@ -379,7 +375,7 @@ public class UnitTestBuilder {
 	        .iterator(), getProgramMethods(l));
     }
 
-    // private void computeStatementCoverage(HashSet<Position>
+    // protected void computeStatementCoverage(HashSet<Position>
     // executedStatements,
     // HashSet<Statement> sourceStatements) {
     // if (sourceStatements.size() == 0) {
@@ -397,12 +393,12 @@ public class UnitTestBuilder {
     // }
     // }
 
-    private boolean isInteresting(final ExecutionTraceModel tr) {
+    protected boolean isInteresting(final ExecutionTraceModel tr) {
 	return tr.getRating() != 0 && !tr.getLastTraceElement().isInAntec()
 	        && (!requireCompleteExecution || tr.blockCompletelyExecuted());
     }
 
-    private ImmutableSet<ProgramMethod> getProgramMethods(
+    protected ImmutableSet<ProgramMethod> getProgramMethods(
 	    final ExecutionTraceModel[] traces) {
 	ImmutableSet<ProgramMethod> result = DefaultImmutableSet
 	        .<ProgramMethod> nil();
@@ -441,7 +437,7 @@ public class UnitTestBuilder {
 	return createTestForNodes(p.root().leavesIterator(), pms);
     }
 
-    private ModelGenerator getModelGenerator(final ExecutionTraceModel tr,
+    protected ModelGenerator getModelGenerator(final ExecutionTraceModel tr,
 	    final Node n) {
 	return new ModelGenerator(serv, uc, tr.getLastTraceElement().node(), tr
 	        .toString(), n);

@@ -32,8 +32,8 @@ public class TestExecutionDialog extends JDialog {
     protected JTextArea classPathText; 
     /**The directory in which the commands "javac" and "java" are executed. */
     protected JTextField workingDirText = new JTextField();
-    final static String COMPILE_ONLY_TEST="Compile only the test file and generated utility files";
-    final static String COMPILE_ALL="Compile all .java files in the test working directory";
+    final static String COMPILE_ONLY_TEST="Compile only the test file and generated utility files (i.e. RFL.java)";
+    final static String COMPILE_ALL="Compile all .java files in the test working directory and its sub-directories";
     protected JComboBox  compileChoice = new JComboBox(new String[]{COMPILE_ONLY_TEST,COMPILE_ALL});
     
     /**The first time this method is called the main frame must be provided as parameters.
