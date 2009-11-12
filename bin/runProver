@@ -140,9 +140,9 @@ export PATH
 #-server \
 #-XX:CompileThreshold=1500 \
 
-#-ea:de.uka.ilkd.key... -Xms64m -Xmx1024m \
+
 $JAVA $JAVA_OPTIONS $keysysprops \
--ea:de.uka.ilkd.key... -Xms128m -Xmx2048m \
+-ea:de.uka.ilkd.key... -Xms64m -Xmx1024m \
 -Dkey.home=$KEY_HOME \
 -Dkey.simplify.logdir=$KEY_SIMPLIFY_LOG_DIR \
 -Dkey.ics.logdir=$KEY_ICS_LOG_DIR \
