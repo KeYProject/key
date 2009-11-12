@@ -248,24 +248,31 @@ public final class JMLTransformer extends RecoderModelTransformer {
             = astParent.getIndexOfChild(originalComments[0].getParent());
         
         //parse declaration, attach to AST
-        Declaration fieldDel;
+        Declaration fieldDecl;
         try {
             if(astParent instanceof TypeDeclaration) {
-                fieldDel 
+                fieldDecl 
                     = services.getProgramFactory()
                               .parseFieldDeclaration(declWithMods.text);
-                updatePositionInformation(fieldDel, declWithMods.pos);
+                if(decl.getMods().contains("instance")) {
+                    fieldDecl = new FieldDeclaration((FieldDeclaration)fieldDecl) {
+                	@Override
+                	public boolean isStatic() {
+                	    return false;
+                	}
+                    };
+                }                
+                updatePositionInformation(fieldDecl, declWithMods.pos);
                 
                 //set comments: the original list of comments with the declaration, 
                 //and the JML modifiers
                 ASTList<Comment> newComments 
                    = new ASTArrayList<Comment>(Arrays.asList(originalComments));
                 Comment jmlComment = new Comment(getJMLModString(decl.getMods()));
-                jmlComment.setParent(fieldDel);
+                jmlComment.setParent(fieldDecl);
                 newComments.add(jmlComment);
-                fieldDel.setComments(newComments);
-                
-                attach((FieldDeclaration)fieldDel, 
+                fieldDecl.setComments(newComments);
+                attach((FieldDeclaration)fieldDecl, 
                        (TypeDeclaration) astParent, 
                        0);   //No matter what the javadoc for attach() may say, 
                              //this value is *not* used as a child index but as 
@@ -286,9 +293,9 @@ public final class JMLTransformer extends RecoderModelTransformer {
                 	= services.getProgramFactory()
                                   .parseStatements(declWithMods.text);
                 assert declStatement.size() == 1;
-                fieldDel = (LocalVariableDeclaration) declStatement.get(0);
-                updatePositionInformation(fieldDel, declWithMods.pos);
-                attach((LocalVariableDeclaration)fieldDel, 
+                fieldDecl = (LocalVariableDeclaration) declStatement.get(0);
+                updatePositionInformation(fieldDecl, declWithMods.pos);
+                attach((LocalVariableDeclaration)fieldDecl, 
                        (StatementBlock) astParent, 
                        childIndex); //Unlike above, here the value is really a 
                                     //child index, and here the position really
@@ -306,9 +313,9 @@ public final class JMLTransformer extends RecoderModelTransformer {
 
         //add ghost modifier
         ASTList<DeclarationSpecifier> mods 
-        	= fieldDel.getDeclarationSpecifiers();
+        	= fieldDecl.getDeclarationSpecifiers();
         mods.add(isGhost ? new Ghost() : new Model());
-        fieldDel.setDeclarationSpecifiers(mods);
+        fieldDecl.setDeclarationSpecifiers(mods);
     }
     
 
@@ -386,9 +393,8 @@ public final class JMLTransformer extends RecoderModelTransformer {
             assert stmtList.size() == 1;
             CopyAssignment assignStmt 
                 = (CopyAssignment) stmtList.get(0);
-            SetAssignment setStmt = new SetAssignment(assignStmt);
-            updatePositionInformation(setStmt, stat.getAssignment().pos);
-            attach(setStmt, astParent, childIndex);
+            updatePositionInformation(assignStmt, stat.getAssignment().pos);
+            doAttach(assignStmt, astParent, childIndex);
         } catch(Throwable e) {
             throw new SLTranslationException(e.getMessage()
                                              + " (" 
@@ -575,7 +581,7 @@ public final class JMLTransformer extends RecoderModelTransformer {
                                    constructorList.get(k);
                             transformMethodlevelComments(cd, fileName);
                         }
-                    }               
+                    }
                                         
                     //iterate over all pre-existing methods
                     for(int k = 0, o = methodList.size(); k < o; k++) {

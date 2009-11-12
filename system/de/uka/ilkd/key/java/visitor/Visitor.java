@@ -62,6 +62,16 @@ public interface Visitor {
     void performActionOnBooleanLiteral(BooleanLiteral x);
     
     void performActionOnEmptySetLiteral(EmptySetLiteral x);
+    
+    void performActionOnSingleton(Singleton x);    
+    
+    void performActionOnSetUnion(SetUnion x);
+    
+    void performActionOnIntersect(Intersect x);
+    
+    void performActionOnSetMinus(SetMinus x);
+    
+    void performActionOnAllFields(AllFields x);
 
     void performActionOnStringLiteral(StringLiteral x); 
 
@@ -163,8 +173,6 @@ public interface Visitor {
 
     void performActionOnCopyAssignment(CopyAssignment x);
 
-    void performActionOnSetAssignment(SetAssignment x);
-
     void performActionOnDivideAssignment(DivideAssignment x);
 
     void performActionOnMinusAssignment(MinusAssignment x); 
@@ -195,7 +203,7 @@ public interface Visitor {
     void performActionOnBinaryOr(BinaryOr x); 
 
     void performActionOnBinaryXOr(BinaryXOr x);
-
+    
     void performActionOnConditional(Conditional x);
 
     void performActionOnDivide(Divide x);

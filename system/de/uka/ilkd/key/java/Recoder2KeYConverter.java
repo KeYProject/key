@@ -657,7 +657,32 @@ public class Recoder2KeYConverter {
     
     public EmptySetLiteral convert(de.uka.ilkd.key.java.recoderext.EmptySetLiteral e) {
 	return EmptySetLiteral.INSTANCE;
-    }    
+    }
+    
+    public Singleton convert(de.uka.ilkd.key.java.recoderext.Singleton e) {
+        ExtList children = collectChildren(e);	
+	return new Singleton(children);
+    }        
+    
+    public SetUnion convert(de.uka.ilkd.key.java.recoderext.SetUnion e) {
+        ExtList children = collectChildren(e);	
+	return new SetUnion(children);
+    }
+    
+    public Intersect convert(de.uka.ilkd.key.java.recoderext.Intersect e) {
+        ExtList children = collectChildren(e);	
+	return new Intersect(children);
+    }
+    
+    public SetMinus convert(de.uka.ilkd.key.java.recoderext.SetMinus e) {
+        ExtList children = collectChildren(e);	
+	return new SetMinus(children);
+    }
+    
+    public AllFields convert(de.uka.ilkd.key.java.recoderext.AllFields e) {
+        ExtList children = collectChildren(e);	
+	return new AllFields(children);
+    }
 
     /** convert a recoder StringLiteral to a KeY StringLiteral */
     public StringLiteral convert(
@@ -1609,10 +1634,6 @@ public class Recoder2KeYConverter {
 
     public CopyAssignment convert(recoder.java.expression.operator.CopyAssignment arg) {
         return new CopyAssignment(collectChildrenAndComments(arg));
-    }
-
-    public SetAssignment convert(de.uka.ilkd.key.java.recoderext.SetAssignment ass){ 
-        return new SetAssignment(collectChildren(ass));
     }
 
     public PostIncrement convert(recoder.java.expression.operator.PostIncrement arg) {

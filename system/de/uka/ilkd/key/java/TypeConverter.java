@@ -136,8 +136,7 @@ public final class TypeConverter {
     
 
     private Term translateOperator
-	(de.uka.ilkd.key.java.expression.Operator op,
-	 LDT intLDT, LDT booleanLDT, ExecutionContext ec) {
+	(de.uka.ilkd.key.java.expression.Operator op, ExecutionContext ec) {
 
 	final Term[] subs  = new Term[op.getArity()];
 	if (op.getArity() >= 1) {
@@ -145,19 +144,28 @@ public final class TypeConverter {
 	}
 	if (op.getArity() == 2) {
 	    subs[1] = convertToLogicElement(op.getExpressionAt(1), ec);	  
+	}
+	
+	//hack: convert object singleton to location singleton
+	if(op instanceof Singleton) {
+	    assert heapLDT.getSortOfSelect(subs[0].op()) != null;
+	    return TB.pairSingleton(services, subs[0].sub(1), subs[0].sub(2));
 	}	
 	
 	LDT responsibleLDT = null;
-	if (intLDT.isResponsible(op, subs, services, ec)) {
-	    responsibleLDT = intLDT;
+	if (integerLDT.isResponsible(op, subs, services, ec)) {
+	    responsibleLDT = integerLDT;
 	} else if (booleanLDT.isResponsible(op, subs, services, ec)) {
 	    responsibleLDT = booleanLDT;
-	} else{
+	} else if (setLDT.isResponsible(op, subs, services, ec)) {
+	    responsibleLDT = setLDT;
+	} else {
 	    Debug.out("typeconverter: no data type model "+
 		      "available to convert:", op, op.getClass());		
 	    throw new IllegalArgumentException("TypeConverter could not handle"
 					       +" this operator: " + op);
 	}
+	
 	return TB.func(responsibleLDT.getFunctionFor(op, services, ec), subs);
     }
    
@@ -346,8 +354,7 @@ public final class TypeConverter {
 	    return convertToInstanceofTerm((Instanceof)pe, ec);
 	} else if (pe instanceof de.uka.ilkd.key.java.expression.Operator) {
 	    return translateOperator
-		((de.uka.ilkd.key.java.expression.Operator)pe,
-		 integerLDT, booleanLDT, ec);
+		((de.uka.ilkd.key.java.expression.Operator)pe, ec);
 	} else if (pe instanceof PrimitiveType) {
 	    throw new IllegalArgumentException("TypeConverter could not handle"
 					       +" this primitive type");
@@ -378,6 +385,8 @@ public final class TypeConverter {
             return integerLDT.translateLiteral(lit);
         } else if (lit instanceof StringLiteral) {
             return stringConverter.translateLiteral(lit,integerLDT,services);
+        } else if (lit instanceof EmptySetLiteral) {
+            return setLDT.translateLiteral(lit);
         } else {
             Debug.fail("Unknown literal type", lit);                 
             return null;
@@ -434,7 +443,9 @@ public final class TypeConverter {
                         t2 == PrimitiveType.JAVA_INT||
                         t2 == PrimitiveType.JAVA_CHAR||
                         t2 == PrimitiveType.JAVA_LONG)) 
-            return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_LONG);		    
+            return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_LONG);
+        if (t1 == PrimitiveType.JAVA_SET && t2 == PrimitiveType.JAVA_SET) 
+            return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_SET);
         throw new RuntimeException("Could not determine promoted type "+
                 "of "+t1+" and "+t2);
     }
@@ -453,6 +464,8 @@ public final class TypeConverter {
 	    return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_INT);
 	if (t1 == PrimitiveType.JAVA_LONG)
 	    return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_LONG);
+	if (t1 == PrimitiveType.JAVA_SET) 
+	    return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_SET);
 	throw new RuntimeException("Could not determine promoted type "+
 				   "of "+type1);
     }

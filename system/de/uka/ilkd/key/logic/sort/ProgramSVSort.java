@@ -27,10 +27,7 @@ import de.uka.ilkd.key.java.expression.ArrayInitializer;
 import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.expression.PassiveExpression;
 import de.uka.ilkd.key.java.expression.literal.StringLiteral;
-import de.uka.ilkd.key.java.expression.operator.Instanceof;
-import de.uka.ilkd.key.java.expression.operator.Negative;
-import de.uka.ilkd.key.java.expression.operator.New;
-import de.uka.ilkd.key.java.expression.operator.NewArray;
+import de.uka.ilkd.key.java.expression.operator.*;
 import de.uka.ilkd.key.java.recoderext.InstanceAllocationMethodBuilder;
 import de.uka.ilkd.key.java.reference.*;
 import de.uka.ilkd.key.java.statement.*;
@@ -476,7 +473,7 @@ public abstract class ProgramSVSort extends AbstractSort {
  	    }	   
 
 	    if (pe instanceof Literal) {
-				return true;
+		return true;
 	    }
 	    if (pe instanceof Instanceof) {
 		ProgramElement v = ((Instanceof) pe).getChildAt(0);
@@ -486,7 +483,15 @@ public abstract class ProgramSVSort extends AbstractSort {
 	    if (pe instanceof ThisReference) {
 		return true;
 	    }
-
+	    
+	    if(pe instanceof SetUnion 
+		|| pe instanceof Singleton		    
+		|| pe instanceof Intersect 
+		|| pe instanceof SetMinus
+		|| pe instanceof AllFields) {
+		return true;
+	    }
+	    
 	    return VARIABLE.canStandFor(pe, services);    
 	}
     }

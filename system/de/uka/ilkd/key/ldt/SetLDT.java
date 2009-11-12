@@ -14,9 +14,12 @@ import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.expression.Literal;
+import de.uka.ilkd.key.java.expression.literal.EmptySetLiteral;
+import de.uka.ilkd.key.java.expression.operator.*;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.util.ExtList;
 
@@ -99,7 +102,7 @@ public final class SetLDT extends LDT {
                                  Term[] subs, 
                                  Services services, 
                                  ExecutionContext ec) {
-	return false;
+	return isResponsible(op, (Term)null, services, ec);
     }
     
 
@@ -118,14 +121,18 @@ public final class SetLDT extends LDT {
 	    			 Term sub, 
 	    			 Services services, 
 	    			 ExecutionContext ec) {
-	return false;
+	return op instanceof Singleton
+	       || op instanceof SetUnion
+	       || op instanceof Intersect 
+	       || op instanceof SetMinus
+	       || op instanceof AllFields;
     }
 
 
     @Override
     public Term translateLiteral(Literal lit) {
-	assert false;
-	return null;
+	assert lit instanceof EmptySetLiteral;
+	return TermBuilder.DF.func(empty);
     }
     
 
@@ -133,6 +140,17 @@ public final class SetLDT extends LDT {
     public Function getFunctionFor(de.uka.ilkd.key.java.expression.Operator op, 
 	    			   Services serv, 
 	    			   ExecutionContext ec) {
+	if(op instanceof Singleton) {
+	    return singleton;
+	} else if(op instanceof SetUnion) {
+	    return union;
+	} else if(op instanceof Intersect) {
+	    return intersect;
+	} else if(op instanceof SetMinus) {
+	    return setMinus;
+	} else if(op instanceof AllFields) {
+	    return serv.getTypeConverter().getHeapLDT().allFields();
+	}
 	assert false;
 	return null;
     }
@@ -140,12 +158,15 @@ public final class SetLDT extends LDT {
     
     @Override
     public boolean hasLiteralFunction(Function f) {
-	return false;
+	return f.equals(empty);
     }
 
     
     @Override
     public Expression translateTerm(Term t, ExtList children) {
+	if(t.op().equals(empty)) {
+	    return EmptySetLiteral.INSTANCE;
+	}
 	assert false;
 	return null;
     }

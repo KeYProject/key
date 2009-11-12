@@ -23,7 +23,6 @@ import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
 import de.uka.ilkd.key.java.expression.ExpressionStatement;
 import de.uka.ilkd.key.java.expression.literal.BooleanLiteral;
 import de.uka.ilkd.key.java.expression.operator.CopyAssignment;
-import de.uka.ilkd.key.java.expression.operator.SetAssignment;
 import de.uka.ilkd.key.java.reference.IExecutionContext;
 import de.uka.ilkd.key.java.statement.*;
 import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
@@ -793,15 +792,6 @@ public class WhileLoopTransformation extends JavaASTVisitor {
 	def.doAction(x);	
     }
     
-    public void performActionOnSetAssignment(SetAssignment x) {
-        DefaultAction def=new DefaultAction() {         
-            ProgramElement createNewElement(ExtList changeList) {
-                return new SetAssignment(changeList);
-            }
-        };
-        def.doAction(x);                
-    }
-
     public void performActionOnThen(Then x)     {
 	DefaultAction def=new DefaultAction() {		
 		ProgramElement createNewElement(ExtList changeList) {

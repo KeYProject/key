@@ -405,16 +405,18 @@ public class JMLSpecFactory {
     
     
     public ClassAxiom createJMLRepresents(KeYJavaType kjt, 
-                                          PositionedString originalRep) 
+                                          PositionedString originalRep,
+                                          boolean isStatic) 
             throws SLTranslationException {
         assert kjt != null;
         assert originalRep != null;
         
         //create variable for self
-        ProgramVariable selfVar = TB.selfVar(services, kjt, false);
+        final ProgramVariable selfVar 
+        	= isStatic ? null : TB.selfVar(services, kjt, false);
         
         //translate expression
-        Pair<ObserverFunction,Term> rep 
+        final Pair<ObserverFunction,Term> rep 
         	= translator.translateRepresentsExpression(originalRep,
         					  	   kjt,
         					  	   selfVar);
@@ -431,7 +433,9 @@ public class JMLSpecFactory {
     public ClassAxiom createJMLRepresents(KeYJavaType kjt, 
 	    				  TextualJMLRepresents textualRep)
     	throws SLTranslationException {
-	return createJMLRepresents(kjt, textualRep.getRepresents());
+	return createJMLRepresents(kjt, 
+		                   textualRep.getRepresents(), 
+		                   textualRep.getMods().contains("static"));
     }
     
     

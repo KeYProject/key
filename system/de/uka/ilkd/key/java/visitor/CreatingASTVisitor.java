@@ -491,15 +491,6 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
         def.doAction(x);
     }
     
-    public void performActionOnSetAssignment(SetAssignment x) {        
-        DefaultAction def = new DefaultAction(x) {
-            ProgramElement createNewElement(ExtList changeList) {
-                return new SetAssignment(changeList);
-            }
-        };
-        def.doAction(x);        
-    }
-
     public void performActionOnPreIncrement(PreIncrement x) {
         DefaultAction def = new DefaultAction(x) {
             ProgramElement createNewElement(ExtList changeList) {

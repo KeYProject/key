@@ -16,6 +16,13 @@
 ./heap/list/LinkedList_LinkedList.key
 ./heap/list/LinkedList_size.key
 ./heap/list/MySet_MySet.key
+./heap/list_ghost/ArrayList_add.key
+./heap/list_ghost/ArrayList_ArrayList.key
+./heap/list_ghost/ArrayList_enlarge.key
+./heap/list_ghost/ArrayList_get_exceptional.key
+./heap/list_ghost/ArrayList_get_normal.key
+./heap/list_ghost/ArrayList_inv.key
+./heap/list_ghost/ArrayList_size.key
 ./heap/simple/anonymise_datagroup.key
 ./heap/simple/array_creation.key
 ./heap/simple/arrays_with_disjoint_sorts.key

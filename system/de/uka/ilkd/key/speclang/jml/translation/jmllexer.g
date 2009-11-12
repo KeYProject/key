@@ -108,16 +108,16 @@ UNSIGNEDSHIFTRIGHT : ">>>";
 WORKINGSPACE : "\\working_space";
 XOR : "^";
 
-//XXX
 SET : "\\set";
 EMPTYSET : "\\empty";
+SINGLETON : "\\singleton";
 UNION : "\\setUnion";
 INTERSECT : "\\intersect";
 SETMINUS : "\\setMinus";
+ALLFIELDS : "\\allFields";
 DISJOINT : "\\disjoint";
 SUBSET : "\\subset";
 NEWELEMSFRESH : "\\newElemsFresh";
-
 
 LT_DISPATCH
      :

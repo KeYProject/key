@@ -2267,23 +2267,48 @@ Expression Expression() :
     ASTList<Expression> leftRight = new ASTArrayList<Expression>();
 }
 {
-  (result = ConditionalExpression()
-  [
-    op   = AssignmentOperator()
-    expr = Expression()
+    (result = ConditionalExpression()
+    [
+      op   = AssignmentOperator()
+      expr = Expression()
+      {
+          leftRight.add(result);
+          leftRight.add(expr);
+          op.setArguments(leftRight);
+          result = op;
+      }
+    ]
+    |
+    "\\singleton" "(" expr = Expression() ")"
     {
-        leftRight.add(result);
-        leftRight.add(expr);
-        op.setArguments(leftRight);
-        result = op;
+        result = new Singleton(expr);
     }
-  ]
+    |
+    "\\setUnion" "(" expr = Expression() "," result = Expression() ")"
+    {
+        result = new SetUnion(expr, result);
+    }
+    |
+    "\\intersect" "(" expr = Expression() "," result = Expression() ")"
+    {
+        result = new Intersect(expr, result);
+    }
+    |
+    "\\setMinus" "(" expr = Expression() "," result = Expression() ")"
+    {
+        result = new SetMinus(expr, result);
+    }
+    |
+    "\\allFields" "(" expr = Expression() ")"
+    {
+        result = new AllFields(expr);
+    }    
+  )
   {
       checkConstruction(result);
       setPostfixInfo(result);
       return result;
-  })
-
+  }
 }
 
 
@@ -3164,6 +3189,7 @@ Literal Literal() :
   }
 | result = BooleanLiteral()
 | result = NullLiteral()
+| result = EmptySetLiteral()
 
 )
   { 
@@ -3200,6 +3226,19 @@ NullLiteral NullLiteral() :
   "null"
   {
       result = factory.createNullLiteral();
+      setPrefixInfo(result);
+      return result;
+  }
+}
+
+EmptySetLiteral EmptySetLiteral() :
+{
+    EmptySetLiteral result;
+}
+{
+  "\\empty"
+  {
+      result = EmptySetLiteral.INSTANCE;
       setPrefixInfo(result);
       return result;
   }

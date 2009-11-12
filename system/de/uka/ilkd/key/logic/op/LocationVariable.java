@@ -25,7 +25,7 @@ public final class LocationVariable extends ProgramVariable implements Updateabl
             		    KeYJavaType        containingType,
             		    boolean            isStatic,
             		    boolean            isModel) {
-        super(name, t.getSort(), t, containingType, isStatic && !isModel/*HACK*/, isModel, false);
+        super(name, t.getSort(), t, containingType, isStatic, isModel, false);
     }
 
     public LocationVariable(ProgramElementName name, KeYJavaType t) {

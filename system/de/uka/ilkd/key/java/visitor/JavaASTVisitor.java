@@ -128,8 +128,28 @@ public abstract class JavaASTVisitor extends JavaASTWalker
     
     public void performActionOnEmptySetLiteral(EmptySetLiteral x) {
 	doDefaultAction(x);
-    }     
+    }
+    
+    public void performActionOnSingleton(Singleton x) {
+	doDefaultAction(x);
+    }                     
+    
+    public void performActionOnSetUnion(SetUnion x) {
+	doDefaultAction(x);
+    }
+    
+    public void performActionOnIntersect(Intersect x) {
+	doDefaultAction(x);
+    }         
 
+    public void performActionOnSetMinus(SetMinus x) {
+	doDefaultAction(x);
+    }
+    
+    public void performActionOnAllFields(AllFields x) {
+	doDefaultAction(x);
+    }
+    
     public void performActionOnBreak(Break x) {
 	doDefaultAction(x);
     } 
@@ -191,10 +211,6 @@ public abstract class JavaASTVisitor extends JavaASTWalker
 	doDefaultAction(x);	
     }
     
-    public void performActionOnSetAssignment(SetAssignment x) {
-        doDefaultAction(x);
-    }
-
     public void performActionOnDefault(Default x) {
 	doDefaultAction(x);
     }

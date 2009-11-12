@@ -3886,17 +3886,6 @@ Expression StatementExpression() :
 	     )
 	]
 	)
-     | (
-         "#set"
-         result = PrimaryExpression()
-         "="
-         expr = Expression()
-         {
-             op = new SetAssignment(result, expr);
-             testLeftHandSide(result);
-             result = op;             
-         }
-       )
      )
 	{
 	    checkConstruction(result);

@@ -1,6 +1,6 @@
 interface List {
     
-    //@ instance model \set footprint;
+    //@ model instance \set footprint;
     //@ depends footprint: footprint;
     //@ depends <inv>: footprint;
     

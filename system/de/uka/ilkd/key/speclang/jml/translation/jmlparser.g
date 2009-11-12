@@ -528,14 +528,6 @@ storeref returns [Term result = null] throws SLTranslationException
 :
 	result=storerefexpression
     |   result=storerefkeyword
-    |   UNION LPAREN s1=storeref COMMA s2 = storeref RPAREN
-        {
-            result = TB.union(services, s1, s2);
-        }
-    |   EMPTYSET
-        {
-            result = TB.empty(services);
-        }
     ;
 
 storerefexpression returns [Term result = null] throws SLTranslationException
@@ -692,6 +684,9 @@ representsclause returns [Pair<ObserverFunction,Term> result=null] throws SLTran
             || !(lhs.getTerm().op() instanceof ObserverFunction)
             || lhs.getTerm().sub(0).op() != heapLDT.getHeap()) {
             raiseError("Represents clause with unexpected lhs: " + lhs);
+        } else if(selfVar != null 
+                  && ((ObserverFunction)lhs.getTerm().op()).isStatic()) {
+            raiseError("Represents clauses for static model fields must be static.");
         }
     } 
     (
@@ -1362,6 +1357,9 @@ postfixexpr returns [SLExpression result=null] throws SLTranslationException
 ;
 
 primaryexpr returns [SLExpression result=null] throws SLTranslationException
+{
+    Term s1, s2;
+}
 :
 	result=constant
     |   id:IDENT     { result = lookupIdentifier(id.getText(), null, null, id); }
@@ -1733,15 +1731,47 @@ jmlprimary returns [SLExpression result=null] throws SLTranslationException
 	    raiseNotSupported("\\nowarn");
 	}
 
+    |   EMPTYSET
+        {
+            result = new SLExpression(TB.empty(services));
+        }
+        
+    |   SINGLETON LPAREN t=storeref RPAREN
+        {
+            if(!t.op().equals(setLDT.getSingleton())) {
+            	if(heapLDT.getSortOfSelect(t.op()) != null) {
+	            final Term objTerm = t.sub(1);
+	            final Term fieldTerm = t.sub(2);
+	    	    t = TB.pairSingleton(services, objTerm, fieldTerm);
+            	} else {
+                    raiseError("Not a singleton: " + t);
+                }
+            }
+            result = new SLExpression(t);
+        }
+        
+    |   UNION LPAREN t=storeref COMMA t2 = storeref RPAREN
+        {
+            result = new SLExpression(TB.union(services, t, t2));
+        }
+        
     |   INTERSECT LPAREN t=storeref COMMA t2=storeref RPAREN
         {
             result = new SLExpression(TB.intersect(services, t, t2));
-        } 
+        }         
 
     |   SETMINUS LPAREN t=storeref COMMA t2=storeref RPAREN
         {
             result = new SLExpression(TB.setMinus(services, t, t2));
         } 
+        
+    |   ALLFIELDS LPAREN e1=expression RPAREN
+        {
+            if(!e1.isTerm() || !e1.getTerm().sort().extendsTrans(services.getJavaInfo().objectSort())) {
+                raiseError("Invalid argument to \\allFields: " + e1);
+            }
+            result = new SLExpression(TB.allFields(services, e1.getTerm()));
+        }        
 
     |   DISJOINT LPAREN t=storeref COMMA t2=storeref RPAREN
         {

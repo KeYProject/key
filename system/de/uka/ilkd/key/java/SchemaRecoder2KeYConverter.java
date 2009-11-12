@@ -80,10 +80,6 @@ public class SchemaRecoder2KeYConverter extends Recoder2KeYConverter {
             final ProgramSV[] labels = mc.getSV();
             return new UnwindLoop(labels[0], labels[1], (LoopStatement) list
                     .get(LoopStatement.class));
-        } else if ("#unwind-loop-bounded".equals(mcName)) { //chrisg
-            final ProgramSV[] labels = mc.getSV();
-            return new UnwindLoopBounded(labels[0], labels[1], (LoopStatement) list
-                    .get(LoopStatement.class));
         } else if ("#unpack".equals(mcName)) {
             return new Unpack((For) list.get(For.class));
         } else if ("#for-to-while".equals(mcName)) {
