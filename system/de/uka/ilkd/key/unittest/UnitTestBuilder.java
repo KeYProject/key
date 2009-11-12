@@ -220,11 +220,19 @@ public class UnitTestBuilder {
 		        .isInAntec();
 		final boolean noContextTraceElementCond = (tr[i]
 		        .getFirstContextTraceElement() == TraceElement.END && !allowStartWithNonContextTraceElement);
+		boolean nullPointer=true; 
+		try{
+		    tr[i].getFirstTraceElement().getPosOfModality().subTerm().sub(0);
+		    nullPointer = false;
+		}catch(Exception ex){
+		    nullPointer = true;
+		}
 		// boolean executionTraceTypeCond = tr[i].getType() !=
 		// ExecutionTraceModel.TYPE1;
 		if (ratingCond || blockCompletelyExecutedCond || infeasibleCond
 		        || programMethodsNumCond || nodeAlreadyProcessedCond
 		        || inAntecCond || noContextTraceElementCond
+		        || nullPointer
 		// || executionTraceTypeCond
 		) {
 		    noTraceReasons.append("---------------------\nNode["
@@ -262,6 +270,10 @@ public class UnitTestBuilder {
 		    if (noContextTraceElementCond) {
 			noTraceReasons
 			        .append(" -No ContextTraceElement was found like, e.g., a method-frame.\n");
+		    }
+		    if (nullPointer){
+			noTraceReasons
+		        .append(" -Null pointer occured during evaluation of \ntr[i].getFirstTraceElement().getPosOfModality().subTerm().sub(0).\n");
 		    }
 		    continue;
 		}

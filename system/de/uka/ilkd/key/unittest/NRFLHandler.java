@@ -62,11 +62,12 @@ public class NRFLHandler {
         trh = new TermRepHandler(serv, tce);
         uf = new UpdateFactory(serv, new UpdateSimplifier());
 
-        final Update identUp = createIdentUp(collectNRFLInPost(pos.subTerm()
-                .sub(0)));
-        final Update compUp = composeUpdate(getOrigUp(pos.constrainedFormula()
-                .formula()), identUp);
+        final Update identUp = createIdentUp(collectNRFLInPost(pos.subTerm().sub(0)));
+        
+        final Update compUp = composeUpdate(getOrigUp(pos.constrainedFormula().formula()), identUp);
+        
         initNRFL(compUp);
+        
         result = uf.apply(compUp, TermFactory.DEFAULT.createDiamondTerm(pos
                 .subTerm().javaBlock(), createNewPost(pos.subTerm().sub(0))));
     }

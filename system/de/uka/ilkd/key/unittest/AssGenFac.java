@@ -106,6 +106,7 @@ public class AssGenFac {
 	@Override
 	public Statement assignmentOrSet(final Expression lhs, Expression rhs,
 	        final Services serv) {
+	    Statement res = null;
 	    // Determine the RightHandSite
 	    if (rhs instanceof New) {
 		rhs = amm.callNew((New) rhs);
@@ -119,30 +120,55 @@ public class AssGenFac {
 
 	    // Determine the LeftHandSite
 	    if (lhs instanceof LocationVariable) {
-		return new CopyAssignment(lhs, rhs);
-	    }
-	    if (lhs instanceof FieldReference) {
-		return amm.callSetter((FieldReference) lhs, rhs);
-	    }
-	    if (lhs instanceof ArrayReference) {
-		final Statement arrAcc = amm.callSetter((ArrayReference) lhs,
-		        rhs);
-		final KeYJavaType ae = serv.getJavaInfo()
-		        .getKeYJavaTypeByClassName(
-		                "java.lang.ArrayIndexOutOfBoundsException");
-		final ParameterDeclaration pd = new ParameterDeclaration(
-		        new Modifier[0], new TypeRef(ae),
-		        new VariableSpecification(new LocationVariable(
-		                new ProgramElementName(
-		                        "arrayIndexOutOfBoundsEx"), ae)), false);
-		final Branch c = new Catch(pd, new StatementBlock());
-		return new Try(new StatementBlock(arrAcc), new Branch[] { c });
+		res = new CopyAssignment(lhs, rhs);
+	    }else if (lhs instanceof FieldReference) {
+		res = amm.callSetter((FieldReference) lhs, rhs);
+	    }else if (lhs instanceof ArrayReference) {
+		res = amm.callSetter((ArrayReference) lhs, rhs);
 	    } else {
 		assert false : "\nMissing type for lhs=\n" + lhs
 		        + " with class: " + lhs.getClass();
-		return null;
 	    }
+	    
+	    if(hasArrayAccess(res)){
+		res = safeArrayAccess(res,serv);
+	    }
+	    return res;
 	}
+	
+	/**This method is used by the method assignmentOrSet.
+	 * @param assignOrSet is a assignment or call to a setter method;
+	 * @return assignOrSet is surrounded by a try-catch-block preventing index out of bounds exceptions*/
+	private Statement safeArrayAccess(Statement assignOrSet, final Services serv){
+		final KeYJavaType ae = serv.getJavaInfo()
+	        .getKeYJavaTypeByClassName(
+	                "java.lang.ArrayIndexOutOfBoundsException");
+        	final ParameterDeclaration pd = new ParameterDeclaration(
+        	        new Modifier[0], new TypeRef(ae),
+        	        new VariableSpecification(new LocationVariable(
+        	                new ProgramElementName(
+        	                        "arrayEx"), ae)), false);
+        	final Branch c = new Catch(pd, new StatementBlock());
+        	return  new Try(new StatementBlock(assignOrSet), new Branch[] { c });
+	}
+	
+	/**check recursively if this program element has an array access. */
+	private boolean hasArrayAccess(ProgramElement pe){
+	    if(pe == null)
+		return false;
+	    if(pe instanceof ArrayReference)
+		return true;
+	    if(pe instanceof NonTerminalProgramElement){
+		NonTerminalProgramElement ntpe = (NonTerminalProgramElement)pe;
+		for(int i = 0 ;i<ntpe.getChildCount(); i++){
+		    if(hasArrayAccess(ntpe.getChildAt(i))){
+		    	return true; 
+		    }
+		}
+	    }
+	    return false;
+	}
+	
     }
 
 }
