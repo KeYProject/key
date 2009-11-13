@@ -79,7 +79,7 @@ public class TestGenerationDialog extends JDialog {
     //private StringBuffer latestTests = new StringBuffer();
 
     private TestGenerationDialog(final KeYMediator mediator) {
-	super(mediator.mainFrame(), "Method selection dialog");
+	super(mediator.mainFrame(), "Test generation dialog");
 	this.mediator = mediator;
 	simplifyDataTupleNumber = new JTextField("" + SimplifyModelGenerator.modelLimit, 2);
 	assert(TestGenerator.modelCreationTimeout<Integer.MAX_VALUE);
@@ -379,8 +379,8 @@ public class TestGenerationDialog extends JDialog {
 	msgList.setModel(new DefaultListModel());
 	msgList.addListSelectionListener(new ListSelectionListener(){
 	    public void valueChanged(ListSelectionEvent arg0) {
-		int idx = arg0.getFirstIndex();
 		JList list = (JList)arg0.getSource();
+		int idx = list.getSelectedIndex();
 		if(0<=idx ){
 		    Object data = list.getModel().getElementAt(idx);
 		    if(Main.isVisibleMode() &&  data instanceof MessageForNode){
@@ -390,7 +390,6 @@ public class TestGenerationDialog extends JDialog {
 			}
 		    }
 		}
-                
             }
 	});
 	messageScroll.getViewport().setView(msgList);

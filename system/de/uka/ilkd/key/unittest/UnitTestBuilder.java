@@ -187,13 +187,15 @@ public class UnitTestBuilder {
 	TestCodeExtractor tce = null;
 	
 	while (it.hasNext()) {
-	    final Node n = it.next();
+	  //The original node is not necessarily the node for which the test is generated. 
+	  //Tests are generated generated for nodes where execution traces end. Otherwise no tests could be generated for a closed proof tree. 
+	    final Node originalNode = it.next(); 
 	    nodeCounter++;
 	    
-	    createTestForNodes_progressNotification0(nodeCounter, n);
+	    createTestForNodes_progressNotification0(nodeCounter, originalNode);
 
 
-	    final ExecutionTraceModel[] tr = getTraces(n);
+	    final ExecutionTraceModel[] tr = getTraces(originalNode);
 	    // mbender: collect data for KeY junit tests (see
 	    // TestTestGenerator,TestHelper)
 	    dataForTest.addETM(tr);
@@ -207,17 +209,14 @@ public class UnitTestBuilder {
 		final boolean ratingCond = tr[i].getRating() == 0;
 		final boolean blockCompletelyExecutedCond = (!tr[i]
 		        .blockCompletelyExecuted() && requireCompleteExecution);
-		final boolean infeasibleCond = (!tr[i]
-		        .blockCompletelyExecuted())
-		        && n.isClosed();
-		final boolean programMethodsNumCond = tr[i].getProgramMethods(
-		        serv).union(pms).size() == tr[i]
-		        .getProgramMethods(serv).size()
-		        + pms.size();
-		final boolean nodeAlreadyProcessedCond = nodesAlreadyProcessed
-		        .contains(tr[i].getLastTraceElement().node());
-		final boolean inAntecCond = tr[i].getLastTraceElement()
-		        .isInAntec();
+		final boolean infeasibleCond = (!tr[i].blockCompletelyExecuted())
+		        			&& originalNode.isClosed();
+		final boolean programMethodsNumCond = 
+		    	tr[i].getProgramMethods(serv).union(pms).size() == 
+		    	    tr[i].getProgramMethods(serv).size() + pms.size();
+		final boolean nodeAlreadyProcessedCond = 
+		    	nodesAlreadyProcessed.contains(tr[i].getLastTraceElement().node());
+		final boolean inAntecCond = tr[i].getLastTraceElement().isInAntec();
 		final boolean noContextTraceElementCond = (tr[i]
 		        .getFirstContextTraceElement() == TraceElement.END && !allowStartWithNonContextTraceElement);
 		boolean nullPointer=true; 
@@ -308,14 +307,17 @@ public class UnitTestBuilder {
 			// tr[i].getFirstTraceElement().
 			// node().getGlobalProgVars().
 			// union(tce.getNewProgramVariables());
-			tce.getNewProgramVariables();
+			//tce.getNewProgramVariables();
 			pr = tce.getPackage();
 		    }
 		}
 	    }//for
 	    if (maxRating != -1) {
-		createTestForNodes_progressNotification1(tr[maxRating], n);
-		mgs.add(getModelGenerator(tr[maxRating], n));
+		Node pathConditionNode = tr[maxRating].getLastTraceElement().node();
+		createTestForNodes_progressNotification1(tr[maxRating], pathConditionNode, originalNode);
+		mgs.add(getModelGenerator(tr[maxRating].toString(),
+					  pathConditionNode, 
+					  originalNode));
 		nodesAlreadyProcessed.add(tr[maxRating].getLastTraceElement()
 		        .node());
 	    }
@@ -365,7 +367,7 @@ public class UnitTestBuilder {
 
     /** called by createTestForNodes. Should be overwritten by UnitTestBuilderGUIInterface to
      * notify the user about the progress of the computation.*/
-    protected void createTestForNodes_progressNotification1(ExecutionTraceModel etm, Node n){return;}
+    protected void createTestForNodes_progressNotification1(ExecutionTraceModel etm, Node pathConditionNode, Node originalNode){return;}
     /** called by createTestForNodes. Should be overwritten by UnitTestBuilderGUIInterface to
      * notify the user about the progress of the computation.*/
     protected void createTestForNodes_progressNotification2(UnitTestException e){
@@ -449,10 +451,13 @@ public class UnitTestBuilder {
 	return createTestForNodes(p.root().leavesIterator(), pms);
     }
 
-    protected ModelGenerator getModelGenerator(final ExecutionTraceModel tr,
-	    final Node n) {
-	return new ModelGenerator(serv, uc, tr.getLastTraceElement().node(), tr
-	        .toString(), n);
+    /**This method is overwritten by UnitTestGuilderGUIInterface where ModelGeneratorGUIInterface is returned.
+     * @param node this is the node for which a counter example is generated.
+     * @param originalNode this may be a leaf node below {@code node}. 
+      */
+    protected ModelGenerator getModelGenerator(final String executionTraceModel, final Node node,
+	    final Node originalNode) {
+	return new ModelGenerator(serv, uc, node, executionTraceModel, originalNode);
     }
 
     public DataStorage getDS() {

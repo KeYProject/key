@@ -119,9 +119,12 @@ public class UnitTestBuilderGUIInterface extends UnitTestBuilder {
    }
 
    /** called by createTestForNodes.*/
-   protected void createTestForNodes_progressNotification1(ExecutionTraceModel etm, Node n){
+   protected void createTestForNodes_progressNotification1(ExecutionTraceModel etm, Node pathConditionNode, Node originalNode){
        if(dialog!=null && Main.isVisibleMode())
-	   dialog.goodMsg("     Selected execution trace for node:"+n.serialNr(), n, null);
+	   dialog.goodMsg("Selected execution trace for "+originalNode.serialNr()+
+		   ". Using path condition from "+pathConditionNode.serialNr(), 
+		   pathConditionNode, 
+		   null);
        //System.out.println("Selected execution trace for node:"+n.serialNr()+ "  Last node of execution trace is: "+etm.getLastNode().serialNr());
 //       if(dialog!=null && dialog.trackProgressInViewport.isSelected()){
 //	   mediator.getSelectionModel().setSelectedNode(n);
@@ -232,10 +235,9 @@ public class UnitTestBuilderGUIInterface extends UnitTestBuilder {
        }
    }
    
-   protected ModelGenerator getModelGenerator(final ExecutionTraceModel tr,
-	    final Node n) {
-	return new ModelGeneratorGUIInterface(serv, uc, tr.getLastTraceElement().node(), tr
-	        .toString(), n);
+   protected ModelGenerator getModelGenerator(final String executionTraceModel, final Node node,
+	    final Node originalNode) {
+	return new ModelGeneratorGUIInterface(serv, uc, node, executionTraceModel, originalNode);
    }
 
 

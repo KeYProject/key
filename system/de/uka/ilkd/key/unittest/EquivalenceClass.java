@@ -229,6 +229,7 @@ public class EquivalenceClass {
 	members = members.add(t);
     }
 
+    /**Add the elements from the equivalence class given as parameter to this equivalence class*/
     public void add(EquivalenceClass ec) {
 	members = members.union(ec.getMembers());
     }

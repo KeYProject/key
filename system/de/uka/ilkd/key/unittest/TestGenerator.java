@@ -286,7 +286,7 @@ public abstract class TestGenerator {
 	    if(modelGenThread!=null){
 		modelGenThread.stop();
 	    }
-	    modelGenThread = new Thread(this, "Model generation thread for node "+ mg.originalNode.serialNr());
+	    modelGenThread = new Thread(this, "Model generation thread for node "+ mg.node.serialNr()+" (leaf node was "+mg.originalNode.serialNr()+")");
 	    modelGenThread.start();
 	    boolean timeoutActive = timeoutIsActive();
 	    if(timeoutActive){

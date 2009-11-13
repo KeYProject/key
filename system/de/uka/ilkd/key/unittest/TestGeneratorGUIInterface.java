@@ -57,10 +57,12 @@ public abstract class TestGeneratorGUIInterface extends TestGenerator {
     protected void generateTestSuite_progressNotification1(int count,
 	    int totalCount, ModelGenerator refMG) {
 	try {
-	    Node n = refMG.originalNode;
+	    Node n = refMG.node;
+	    Node originalNode = refMG.originalNode;
     
 	    if (dialog != null  && Main.isVisibleMode()){
-		dialog.msg("(" + count + "/" + totalCount+ ") Generating model for node:" + n.serialNr(), n, null);
+		dialog.msg("(" + count + "/" + totalCount+ ") Generating model for node " + n.serialNr()
+			+ ". Selected child node was:"+originalNode.serialNr(), n, null);
 		if(dialog.trackProgressInViewport != null  && dialog.trackProgressInViewport.isSelected()) {
 			dialog.mediator.getSelectionModel().setSelectedNode(n);
 		}
@@ -79,7 +81,7 @@ public abstract class TestGeneratorGUIInterface extends TestGenerator {
 	    Model[] models, boolean createModelsSuccess,
 	    boolean terminated) {
 	if (terminated) {
-	    Node n = refMG.originalNode;
+	    Node n = refMG.node;
 	    String msg = "(" + count + "/" + totalCount
 		    + ") modelGeneration thread has timed out for node:"
 		    + n.serialNr();
@@ -88,7 +90,7 @@ public abstract class TestGeneratorGUIInterface extends TestGenerator {
 	}
 
 	if (models == null || models.length == 0) {
-	    Node n = refMG.originalNode;
+	    Node n = refMG.node;
 	    String msg = "(" + count + "/" + totalCount
 		    + ") NO model generated for node:"
 		    + n.serialNr();
@@ -102,7 +104,7 @@ public abstract class TestGeneratorGUIInterface extends TestGenerator {
      * is called in order to report the progress of computation to other threads.*/
     protected void generateTestSuite_progressNotification3(
 	    int count, int totalCount, ModelGenerator refMG, Model[] models, MethodDeclaration mDecl){
-	    Node n = refMG.originalNode;
+	    Node n = refMG.node;
 	    String msg = "("+count+"/"+totalCount+") test method generated for node "+n.serialNr();
 	    if(Main.isVisibleMode()||Main.testStandalone){
 		Main.getInstance().getProverTaskListener().taskProgress(count);
@@ -116,7 +118,7 @@ public abstract class TestGeneratorGUIInterface extends TestGenerator {
      * is called in order to report the progress of computation to other threads. */
     protected void generateTestSuite_progressNotification4(
 	    int count, int totalCount, Exception e, ModelGenerator refMG, Model[] models, MethodDeclaration mDecl){
-	Node n = refMG.originalNode;
+	Node n = refMG.node;
 	if (dialog != null && Main.isVisibleMode()){
 	dialog.error("("+count+"/"+totalCount+") An error occured while generating test method for node "+n.serialNr()+
 			" \n Test generation will however continue. The error was "+e.toString()+ " \n", n, null);

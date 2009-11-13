@@ -41,22 +41,25 @@ public class ModelGenerator {
 
     protected HashMap<Term, EquivalenceClass> term2class;
 
-    // Maps a location to the set of formulas it occurs in.
+    /** Maps a location to the set of formulas it occurs in. */
     protected HashMap<Term, ImmutableSet<Term>> eqvC2constr;
 
     protected Services serv;
 
+    /**Is initialized by method {@code collectLocations(Term t)} */
     protected ImmutableSet<Term> locations = DefaultImmutableSet.<Term>nil();
 
+    /**Is initialized by method {@code collectProgramVariables}. The data comes from the field {@code locations} */
     protected ImmutableSet<ProgramVariable> pvs = DefaultImmutableSet.<ProgramVariable>nil();
 
+    /**The node for which to generate the counter example  */
     protected Node node;
 
     protected Constraint userConstraint;
 
     protected String executionTrace;
 
-    public Node originalNode;
+    protected Node originalNode;
     
     /** required in order to access during model generation dmg.terminateAsSoonAsPossible.
      * Do not set this field directly but use getDecProdModelGenerator() instead*/
@@ -64,6 +67,8 @@ public class ModelGenerator {
 
     protected volatile boolean terminateAsSoonAsPossible=false;
 
+    /**@param node this is the node for which a counter example is generated.
+     * @param originalNode this may be a leaf node below {@code node}. */
     public ModelGenerator(Services serv, Constraint userConstraint, Node node,
 	    String executionTrace, Node originalNode) {
 	Iterator<ConstrainedFormula> itc = node.sequent().antecedent()
@@ -137,7 +142,7 @@ public class ModelGenerator {
     /**
      * Ensures the existence of an EquivalenceClass for each location and logic
      * variable found in <code>t</code> and updates the mapping from this class
-     * to the formulas it occurs in.
+     * to the formulas it occurs in, i.e. field {@code locations} is initialized.
      */
     protected void collectLocations(Term t) {
 	if (isLocation(t, serv)) {
@@ -149,8 +154,9 @@ public class ModelGenerator {
 	    }
 	    eqvC2constr.put(t, constr.add(t));
 	}
-	if (!(t.op() instanceof Modality || t.op() instanceof IUpdateOperator || t
-		.op() instanceof Quantifier)) {
+	if (!(t.op() instanceof Modality || 
+		t.op() instanceof IUpdateOperator || 
+		t.op() instanceof Quantifier)) {
 	    /*
 	     * if(t.op() instanceof IUpdateOperator){ IUpdateOperator uop =
 	     * (IUpdateOperator) t.op(); for(int i = 0; i<uop.locationCount();
@@ -178,14 +184,15 @@ public class ModelGenerator {
     }
 
     /**
-     * Returns the set of locations occuring in node.
+     * Returns the set of locations occurring in node.
      */
     public ImmutableSet<Term> getLocations() {
 	return locations;
     }
 
     /**
-     * Collects the program variables occuring in node.
+     * Collects the program variables occurring in node, or more precisely occurring in {@code locations}. 
+     * The result is stored in {@code pvs}.
      */
     public void collectProgramVariables() {
 	Iterator<Term> it = locations.iterator();
@@ -196,16 +203,15 @@ public class ModelGenerator {
 		pvs = pvs.add((ProgramVariable) t.op());
 	    } else if (t.op() instanceof RigidFunction) {
 		KeYJavaType kjt;
-		if (t.sort().toString().startsWith("jint")
-			|| t.sort().toString().startsWith("jshort")
-			|| t.sort().toString().startsWith("jbyte")
-			|| t.sort().toString().startsWith("jlong")
-			|| t.sort().toString().startsWith("jchar")) {
-		    kjt = serv.getJavaInfo().getKeYJavaType(
-			    t.sort().toString().substring(1));
+		String sortName = t.sort().toString(); 
+		if (	   sortName.startsWith("jint")
+			|| sortName.startsWith("jshort")
+			|| sortName.startsWith("jbyte")
+			|| sortName.startsWith("jlong")
+			|| sortName.startsWith("jchar")) {
+		    kjt = serv.getJavaInfo().getKeYJavaType(sortName.substring(1));
 		} else {
-		    kjt = serv.getJavaInfo()
-			    .getKeYJavaType(t.sort().toString());
+		    kjt = serv.getJavaInfo().getKeYJavaType(sortName);
 		}
 		assert kjt != null;
 		pvs = pvs.add(new LocationVariable(new ProgramElementName(t
@@ -387,7 +393,8 @@ public class ModelGenerator {
     }
     
     /** Overwrites the old value of this.dmg.
-     * This method is overwritten in ModelGeneratorGUIInterface*/
+     * This method is overwritten in ModelGeneratorGUIInterface.
+     * The returned DecProdModelGenerator is initialised with {@code node}, {@code term2class}, and {@code locations}*/
     protected DecProdModelGenerator getDecProdModelGenerator(){
 	if (decProdForTestGen == COGENT) {
 	    dmg = new CogentModelGenerator(
