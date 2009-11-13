@@ -24,6 +24,20 @@ final class UsedTaclets {
      * The taclets that could be used for external provers.
      */
     static private HashSet<String> usedTaclets = null;
+    
+    /**
+     * Use this field, to allow only special taclets that are listed 
+     * in the method <code>contains</code>. Use this method only for
+     * testing the taclet translation.
+     * If </code>testTaclets</code> is <code>null</code> all taclets
+     * listed in <code>contains</code> are used (should be the normal
+     * case).
+     */
+    static final private String testTaclets[] =null;/* {""
+						     ,"disjoint_repositories"
+						     ,"castDel"
+						     ,"identical_object_equal_index"
+						   };*/
 
     /**
      * Checks whether a taclet specified by its name can be used for external
@@ -144,6 +158,9 @@ final class UsedTaclets {
 	    // instanceAllocation.key
 	    /** Not translatable yet. */
 	    
+	    usedTaclets.add("disjoint_repositories");
+	    usedTaclets.add("identical_object_equal_index");
+	    
 //	      usedTaclets.add("only_created_object_are_referenced");
 //	      usedTaclets.add("only_created_object_are_referenced_non_null");
 //	     usedTaclets.add("enclosing_this_is_created");
@@ -185,6 +202,12 @@ final class UsedTaclets {
 
 	}
 
+	boolean found = false;
+	if(testTaclets == null){found = true;}
+	for(int i=0; i < (testTaclets == null ? 0 : testTaclets.length); i++){
+	    if(testTaclets[i].equals(tacletname)){found = true;}
+	}
+	if(found == false) return false;
 	return usedTaclets.contains(tacletname);
     }
 

@@ -1,11 +1,13 @@
 package de.uka.ilkd.key.smt.taclettranslation;
 
 import java.util.HashMap;
+import java.util.Iterator;
 
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.BoundedNumericalQuantifier;
@@ -20,6 +22,9 @@ import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletGoalTemplate;
+import de.uka.ilkd.key.rule.VariableCondition;
+import de.uka.ilkd.key.rule.conditions.TypeComparisionCondition;
+import de.uka.ilkd.key.rule.conditions.TypeResolver;
 
 /**
  * Translates a rewrite taclet to a formula.
@@ -97,9 +102,11 @@ public class RewriteTacletTranslator extends AbstractTacletTranslator {
     /**
      * Translates a RewriteTaclet to a formula.
      */
-    public Term translate(Taclet t, ImmutableSet<Sort> sorts) throws IllegalTacletException {
-
+    public Term translate(Taclet t, ImmutableSet<Sort> sorts)
+    	throws IllegalTacletException {
 	check(t);
+	
+	
 
 	usedVariables = new HashMap<String, LogicVariable>();
 
@@ -143,35 +150,12 @@ public class RewriteTacletTranslator extends AbstractTacletTranslator {
 	
 	
 	
-	if(usedGenericSorts.size() > 1){
-	    throw new IllegalTacletException("Can not translate taclets with more than one generic sort.");}
+	Term genericTerm = instantiateGeneric(term, usedGenericSorts, sorts, t);
 	
-	ImmutableList<Term> genericTerms = ImmutableSLList.nil();
-	// replace generic variables with logic variables.
-	for(Sort sort : sorts){
-	    
-	    if(sort instanceof GenericSort){continue;}
-
-	    for(GenericSort gs : usedGenericSorts){
-		    genericTerms = genericTerms.append(instantiateGeneric(term, gs, sort));    
+	term = genericTerm==null ? quantifyTerm(term) : genericTerm; 
 	
-	    }  
-	}
 
-	// quantify the term
-	ImmutableList<Term> genericTermsQuantified = ImmutableSLList.nil();
-	if(genericTerms.size() > 0){
-	    for(Term gt : genericTerms){
-		gt = quantifyTerm(gt);
-		genericTermsQuantified = genericTermsQuantified.append(gt); 
-	    }
-	    term = tb.and(genericTermsQuantified);
-	    
-	}else{
-	    term = quantifyTerm(term);
-	}
-
-
+	
 
 
 
@@ -179,6 +163,144 @@ public class RewriteTacletTranslator extends AbstractTacletTranslator {
 	return term;
 
     }
+    
+    //TODO: !!!Find a better way to implement this method!!!!
+    //TODO: Introduce a general method for testing the variable conditions.
+    private boolean hasNotTheSameCondtion(Iterator<VariableCondition> it,
+	    GenericSort [] gs){
+	while(it.hasNext()){
+	    VariableCondition vc = it.next();
+	    
+	    if(vc instanceof TypeComparisionCondition){
+		TypeComparisionCondition t1  = ((TypeComparisionCondition)vc);
+		 
+		 
+		
+		TypeComparisionCondition t2 = new TypeComparisionCondition(
+			TypeResolver.createGenericSortResolver(gs[1]),
+			TypeResolver.createGenericSortResolver(gs[0]),
+			TypeComparisionCondition.NOT_SAME);
+		
+		TypeComparisionCondition t3 = new TypeComparisionCondition(
+			TypeResolver.createGenericSortResolver(gs[0]),
+			TypeResolver.createGenericSortResolver(gs[1]),
+			TypeComparisionCondition.NOT_SAME);
+		
+		
+		
+		if(t1.toString().equals(t3.toString())) return true;
+		if(t1.toString().equals(t2.toString())) return true;
+		
+	
+		
+	    }
+	}
+	return false;
+    }
+    
+    /**
+     * Tests sort of its instantiation ability.
+     * @param sort sort to be tested.
+     * @return <code>true</code> if can be instantiated,
+     *  otherwise <code>false</code>
+     */
+    private boolean doInstantiation(Sort sort){
+	return !((sort instanceof GenericSort) || (sort.equals(Sort.ANY)));
+    }
+    
+
+    /**
+     * Instantiates generic variables of the term. 
+     * It instantiates the variables using
+     * all possibilities. This method supports two different 
+     * generic variables and the following variable conditions:
+     * - \not\same(G,H)
+     * @param term the term to be instantiated.
+     * @param genericSorts the generic sorts that should be replaced.
+     * @param sorts the instantiations
+     * @param t the current taclet, that is being translated.
+     * @return returns a new term, where all generic variables
+     * are instantiated.
+     * @throws IllegalTacletException
+     */
+    private Term instantiateGeneric(Term term, 
+	    ImmutableSet<GenericSort> genericSorts, ImmutableSet<Sort> sorts, Taclet t) 
+	    throws IllegalTacletException{
+	if(genericSorts.size() == 0){return null;}
+	if(usedGenericSorts.size() > 2){
+	    throw new 
+	    IllegalTacletException("Can not translate taclets with " +
+	    		"more than two generic sorts.");}
+	
+	ImmutableList<Term> genericTerms = ImmutableSLList.nil();
+	
+	GenericSort gs [] = new GenericSort[2];
+	int i=0;
+	for(GenericSort sort : genericSorts){
+	    gs[i]= sort;
+	    i++;
+	}
+
+	// instantiate the first generic variable
+	for(Sort sort1 : sorts){
+	    if(!doInstantiation(sort1)){continue;}
+	  
+	    Term temp = instantiateGeneric(term, gs[0], sort1);
+
+	    if(temp == null){continue;}
+	    
+	    //instantiate the second generic variable
+	    if(genericSorts.size() == 2){
+		int instCount =0;
+		
+		for(Sort sort2 : sorts){
+
+		   if(!(hasNotTheSameCondtion(t.getVariableConditions(),gs) && 
+			   sort1.equals(sort2)) && 
+			   doInstantiation(sort2)){
+	
+		            Term temp2 = instantiateGeneric(temp,gs[1],sort2);
+		       	    if(temp2 !=null){
+		       		instCount++;
+		       		genericTerms = genericTerms.append(temp2);
+		       	    }
+		       	 
+			} 
+		    
+		}
+		if(instCount == 0){
+		    throw new 
+		    IllegalTacletException("Can not instantiate generic variables" +
+			" because there are not enough different sorts.");
+		}
+	
+	    }else{
+		genericTerms = genericTerms.append(temp);
+	    }
+	    
+	 
+	}
+	
+	if(genericTerms.size() == 0){
+		throw new 
+		IllegalTacletException("Can not instantiate generic variables" +
+		" because there are not enough different sorts.");
+	} 
+	
+
+	// quantify the term
+	ImmutableList<Term> genericTermsQuantified = ImmutableSLList.nil();
+	if(genericTerms.size() > 0){
+	     for(Term gt : genericTerms){
+		genericTermsQuantified = genericTermsQuantified.append(quantifyTerm(gt)); 
+		
+	    }
+	    term = TermBuilder.DF.and(genericTermsQuantified);
+	    
+	}
+	return term;
+    }
+    
     
     /**
      * Quantifies a term, i.d. every free variable is bounded by a allquantor. 
@@ -189,9 +311,9 @@ public class RewriteTacletTranslator extends AbstractTacletTranslator {
 	TermBuilder tb = TermBuilder.DF;
 	// Quantify over all free variables.
 	for (QuantifiableVariable qv : term.freeVars()) {
-	   if(!term.sort().equals(Sort.FORMULA)){
+	  // if(!term.sort().equals(Sort.FORMULA)){
 	    term = tb.all(qv, term);
-	   }
+	  // }
 	}
 	return term;
     }
@@ -203,13 +325,14 @@ public class RewriteTacletTranslator extends AbstractTacletTranslator {
 	TermBuilder tb = TermBuilder.DF;
 
 
-	
+		
 	if(term.op() instanceof SortedSchemaVariable) {
 	    if(term.sort().equals(Sort.FORMULA)){
 		
 	//	term = tb.var(getLogicVariable(term.op().name(),Sort.FORMULA));
 		//term = tb.var(getLogicVariable(term.op().name(),term.sort()));
 	    }else{
+		
 		term = tb.var(getLogicVariable(term.op().name(), term.sort()));
 	    }
 	    
