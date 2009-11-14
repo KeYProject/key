@@ -82,9 +82,11 @@ public class Model {
 	 * return new Expression[]{(o==boolTrue ? BooleanLiteral.TRUE :
 	 * BooleanLiteral.FALSE)}; }
 	 */
+	/*
 	if (o == null) {
 	    return new Expression[] { new IntLiteral(15) };
 	}
+	*/
 	if (o instanceof ValueContainer) {
 	    return ((ValueContainer) o).getValuesAsExpressions();
 	}

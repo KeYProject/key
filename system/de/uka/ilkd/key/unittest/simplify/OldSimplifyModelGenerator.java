@@ -33,17 +33,16 @@ public class OldSimplifyModelGenerator extends DecProdModelGenerator {
 
     private String initialCounterExample;
 
-    // first element has to be 0. Only positive values at even indices.
-
+    /** first element has to be 0. Only positive values at even indices. */
     protected static int[] genericTestValues = new int[] { 0, -1, 1, -10,
 	    10, -1000, 1000, -1000000, 1000000, -2000000000, 2000000000 };
     
     /**In the original implementation the value was 1. But some examples are solved at depth 3 and it takes a long time until 3 is reached. */
     public static int iterativeDeepeningStart = 3;
 
-    // Outputs of Simplify are stored in order to prevent Simplify
-    // from being called several times with the same formula -> saves execution
-    // time
+    /** Outputs of Simplify are cached in order to prevent Simplify
+     from being called several times with the same formula -> saves execution
+     time */
     private HashSet<String> simplifyOutputs;
 
     private ImmutableList<String> placeHoldersForClasses = ImmutableSLList.<String>nil();
@@ -105,12 +104,11 @@ public class OldSimplifyModelGenerator extends DecProdModelGenerator {
 	HashSet<Model> models = new HashSet<Model>();
 	int datCount = iterativeDeepeningStart;
 	while (models.size() < getModelLimit()
-		&& datCount <= genericTestValues.length
-		&& !terminateAsSoonAsPossible) {
+		&& datCount <= genericTestValues.length) {
 	    createModels_ProgressNotification1(initialCounterExample,datCount);
-	    models.addAll(createModelsHelp(initialCounterExample, new Model(
-		    term2class), datCount++));
 	    simplifyOutputs.clear();
+	    models.addAll(createModelsHelp(initialCounterExample, new Model(
+		    term2class), datCount++, 0));
 	}
 	return models;
     }
@@ -118,14 +116,18 @@ public class OldSimplifyModelGenerator extends DecProdModelGenerator {
     /** Ment to be overwritten by OLDSimplifyMG_GUIInterface*/
     protected void createModels_ProgressNotification1(String initCounterExample, int datCount){ }
 
+    public static final String[] POS = new String[]{"POS0","POS1","POS2","POS3","POS4"};
+
+
     private Set<Model> createModelsHelp(String counterEx, Model model,
-	    int datCount) {
+	    int datCount, int recDepth) {
 	String counterExOLD = new String(counterEx);
 	createModelsHelp_ProgressNotification1(counterExOLD);
 	Set<Model> models = new HashSet<Model>();
 	if (counterEx.indexOf("Counterexample") == -1
 		|| models.size() >= getModelLimit()
 		|| terminateAsSoonAsPossible) {
+	    if(terminateAsSoonAsPossible)
 	    return models;
 	}
 	counterEx = counterEx.replaceAll("_ ", "_");
@@ -135,8 +137,7 @@ public class OldSimplifyModelGenerator extends DecProdModelGenerator {
 	    return models;
 	}
 	StringReader stream = new StringReader(counterEx);
-	SimplifyParser parser = new SimplifyParser(new SimplifyLexer(stream),
-		serv);
+	SimplifyParser parser = new SimplifyParser(new SimplifyLexer(stream),serv);
 	Conjunction c = null;
 	try {
 	    c = parser.top();
@@ -161,6 +162,13 @@ public class OldSimplifyModelGenerator extends DecProdModelGenerator {
 	    }
 	    if (model.size() == intClasses.size()) {
 		models.add(model);
+		createModelsHelp_ProgressNotificationX(POS[0], datCount, recDepth, "model.size() == intClasses.size() == "+model.size());
+//gladisch:14.11.2009
+//   if (models.size() >= getModelLimit()) {
+//       System.out.println("Create Models Help exiting at A\n"+models.iterator().next());
+//	return models;
+//   }
+		
 	    } else {
 		for (int i = 0; i < eqs.length; i++) {
 		    // set a subterm to an arbitrary value an test if
@@ -170,8 +178,10 @@ public class OldSimplifyModelGenerator extends DecProdModelGenerator {
 				genericTestValues[j]);
 			if (e != null) {
 			    c.add(e);
-			    models.addAll(createModelsHelp(simplify(c), model
-				    .copy(), datCount));
+			    createModelsHelp_ProgressNotificationX(POS[1], datCount, 
+				    recDepth, //"createEquationForSubTerm("+eqs[i]+","+genericTestValues[j]+") = " + 
+				    e.toString());
+			    models.addAll(createModelsHelp(simplify(c), model.copy(), datCount, recDepth+1));
 			    if (models.size() >= getModelLimit()) {
 				return models;
 			    }
@@ -185,8 +195,9 @@ public class OldSimplifyModelGenerator extends DecProdModelGenerator {
 	    for (int i = 0; i < leqs.length; i++) {
 		for (int j = 0; j < datCount; j += 2) {
 		    c.add(lessEqToEq(leqs[i], genericTestValues[j]));
-		    models.addAll(createModelsHelp(simplify(c), model.copy(),
-			    datCount));
+		    createModelsHelp_ProgressNotificationX(POS[2], datCount, 
+			    recDepth, "lessEqToEq("+genericTestValues[j]+", "+leqs[i]+" ) ");
+		    models.addAll(createModelsHelp(simplify(c), model.copy(), datCount, recDepth+1));
 		    if (models.size() >= getModelLimit()) {
 			return models;
 		    }
@@ -197,8 +208,9 @@ public class OldSimplifyModelGenerator extends DecProdModelGenerator {
 	    for (int i = 0; i < les.length; i++) {
 		for (int j = 2; j < datCount; j += 2) {
 		    c.add(lessToEq(les[i], genericTestValues[j]));
-		    models.addAll(createModelsHelp(simplify(c), model.copy(),
-			    datCount));
+		    createModelsHelp_ProgressNotificationX(POS[3], datCount,
+			    recDepth, "lessToEq("+genericTestValues[j]+", "+les[i]+")");
+		    models.addAll(createModelsHelp(simplify(c), model.copy(), datCount, recDepth+1));
 		    if (models.size() >= getModelLimit()) {
 			return models;
 		    }
@@ -207,15 +219,28 @@ public class OldSimplifyModelGenerator extends DecProdModelGenerator {
 	    }
 	    Inequation[] neq = c.getInequations();
 	    for (int i = 0; i < neq.length; i++) {
-		for (int j = 1; j < datCount; j++) {
-		    c.add(ineqToEq(neq[i], genericTestValues[j]));
-		    models.addAll(createModelsHelp(simplify(c), model.copy(),
-			    datCount));
+//		for (int j = 1; j < datCount; j++) {
+//		    c.add(ineqToEq(neq[i], genericTestValues[j]));
+//		    createModelsHelp_ProgressNotificationX(POS[4], recDepth,
+//			    "ineqToEq("+genericTestValues[j]+", "+neq[i]+")");
+//		    models.addAll(createModelsHelp(simplify(c), model.copy(), datCount, recDepth+1));
+//		    if (models.size() >= getModelLimit()) {
+//			return models;
+//		    }
+//		    c.removeLast();
+//		}
+		//gladisch 14.11.2009
+		for (int j = 0; j < 2; j++) {
+		    c.add(ineqToLess(neq[i], j==0));
+		    createModelsHelp_ProgressNotificationX(POS[4], datCount,
+			    recDepth, "ineqToLess("+(j==0)+", "+neq[i]+")");
+		    models.addAll(createModelsHelp(simplify(c), model.copy(), datCount, recDepth+1));
 		    if (models.size() >= getModelLimit()) {
 			return models;
 		    }
 		    c.removeLast();
 		}
+
 	    }
 	}
 	return models;
@@ -224,6 +249,10 @@ public class OldSimplifyModelGenerator extends DecProdModelGenerator {
     /**To be overwritten by OLDSimplifyMG_GUIInterface */
     protected void createModelsHelp_ProgressNotification1(String counterExOld){   }
 
+    /**To be overwritten by OLDSimplifyMG_GUIInterface 
+     * @param iterativeDeepeningDepth TODO
+     * @param info TODO*/
+    protected void createModelsHelp_ProgressNotificationX(String codePos, int iterativeDeepeningDepth, int recDepth, String info){   }
 
     private String simplify(Conjunction c) {
 	try {
@@ -305,8 +334,7 @@ public class OldSimplifyModelGenerator extends DecProdModelGenerator {
     }
 
     /**
-     * Removes uninterpreted predicatesand extracts the formula provided by
-     * Simplify.
+     * Removes uninterpreted predicates and extracts the formula provided by Simplify.
      */
     private String removeIrrelevantSubformulas(String s) {
 	int index = s.indexOf("(AND");
@@ -372,6 +400,18 @@ public class OldSimplifyModelGenerator extends DecProdModelGenerator {
 	eq.setLeft(t.sub(0));
 	eq.setRight(plus(t.sub(1), i));
 	return eq;
+    }
+
+    private Less ineqToLess(Inequation t, boolean inverse) {
+	Less less = new Less();
+	if(!inverse){
+        	less.setLeft(t.sub(0));
+        	less.setRight(t.sub(1));
+	}else{
+    		less.setLeft(t.sub(1));
+    		less.setRight(t.sub(0));	    
+	}
+	return less;
     }
 
 }

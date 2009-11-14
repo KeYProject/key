@@ -99,6 +99,19 @@ public abstract class TestGeneratorGUIInterface extends TestGenerator {
 	}
 
     }
+    
+    /**When generateTestSuite() is executed on a separate thread, then this notification method
+     * is called in order to report the progress of computation to other threads.  */
+    protected void generateTestSuite_progressNotification2b(
+	    int count, int totalCount, ModelGenerator refMG,EquivalenceClass ec){
+	    Node n = refMG.node;
+	    String msg = "(" + count + "/" + totalCount
+		    + ") "+n.serialNr()+"  No test data for equivalence class "+ ec.toString();
+	    if (dialog != null && Main.isVisibleMode())
+		dialog.badMsg(msg, n, null);
+	    }
+	
+
 
     /**When generateTestSuite() is executed on a separate thread, then this notification method
      * is called in order to report the progress of computation to other threads.*/

@@ -12,7 +12,7 @@ import java.util.Set;
 public abstract class DecProdModelGenerator{
 
     /** Stop model generation as soon as possible even if no model was created. (Otherwise this thread will be stopped)*/
-    public boolean terminateAsSoonAsPossible=false;
+    public volatile boolean  terminateAsSoonAsPossible=false;
 
     public Set<Model> createModels(){return null;};
 

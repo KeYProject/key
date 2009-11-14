@@ -233,13 +233,15 @@ public class TestGenFac {
 	}
 
 	@Override
-	protected Expression createCons(final Sort sort,
+	protected Expression createConstructorCall(final Sort sort,
 	        final HashMap<String, NewArray> array2Cons,
 	        final Expression loc1, final KeYJavaType locKJT) {
 	    if (sort instanceof ArraySort) {
-		final Expression cons = array2Cons.get(CompilableJavaCardPP
-		        .toString(loc1));
+		    String arrayExpression = CompilableJavaCardPP.toString(loc1);
+		    final Expression cons = array2Cons.get(arrayExpression);
 		if (cons == null) {
+			System.err.println("WARNING (TestGenFac.java):Problem with generating an array constructor for "+arrayExpression+
+			"  An array of size 20 will be created but this is an emergency solution.");
 		    return amm.callNew(new NewArray(
 			    new Expression[] { new IntLiteral(20) },
 			    new TypeRef(getBaseType(locKJT)), locKJT, null, 0));

@@ -17,6 +17,7 @@ public class TestGenerationInspectionDialog extends JDialog {
     
     static TestGenerationInspectionDialog dialog;
     public static JTextArea msg = new JTextArea(); 
+    public static JTextArea createModelsHelp = new JTextArea(); 
     
     /**When invoked the first time, the parent must be set. In subsequent calls
      * parent may be null. */
@@ -37,8 +38,12 @@ public class TestGenerationInspectionDialog extends JDialog {
                         ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
             msgScroll.getViewport().setView(msg);
             msgScroll.setBorder(new TitledBorder("Messages"));
-            msgScroll.setPreferredSize(new java.awt.Dimension(500, 500));
+            msgScroll.setPreferredSize(new java.awt.Dimension(700, 600));
         getContentPane().add(msgScroll);
+        
+            createModelsHelp.setPreferredSize(new java.awt.Dimension(700, 100));
+            //createModelsHelp.setAutoscrolls(true);
+        getContentPane().add(createModelsHelp);
 
         
 	this.addWindowStateListener(new WindowStateListener(){
@@ -54,6 +59,11 @@ public class TestGenerationInspectionDialog extends JDialog {
     public void msg(String txt){
 	if(txt!=null)
 	    msg.append(txt+"\n");
+    }
+    
+    public void createModelsHelpMsg(String txt){
+	if(txt!=null)
+	    createModelsHelp.setText(txt);
     }
 
 }

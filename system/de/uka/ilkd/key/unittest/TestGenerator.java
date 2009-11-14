@@ -183,26 +183,28 @@ public abstract class TestGenerator {
         	    models = modelGeneration.createModels();
         	    
         	    //Read model
-        	    final boolean createModelsSuccess = models!=null && !(models.length == 0 && mgs.size() != 1);
-        	    generateTestSuite_progressNotification2(count,totalCount,mg, models, createModelsSuccess, modelGeneration.wasInterrupted());
-        	    if (!createModelsSuccess) {
+        	    final boolean createModelsFailed = models==null || (models.length == 0);// && mgs.size() != 1);//
+        	    generateTestSuite_progressNotification2(count,totalCount,mg, models, !createModelsFailed, modelGeneration.wasInterrupted());
+        	    if (createModelsFailed) {
         		mgs.remove(0);//This ModelGenerator has been used in this iteration and is not needed anymore
         		continue;
         	    }
-        	    final EquivalenceClass[] eqvArray = mg
-        		    .getPrimitiveLocationEqvClasses();
-        	    final Expression[][] testLocation = new Expression[eqvArray.length][];
-        	    final Expression[][] testData = new Expression[eqvArray.length][models.length];
-        	    for (int i = 0; i < eqvArray.length; i++) {
-        		final ImmutableSet<Term> locs = eqvArray[i].getLocations();
+        	    final EquivalenceClass[] intOrBoolEqvArray = mg.getPrimitiveLocationEqvClasses();
+        	    final Expression[][] testLocation = new Expression[intOrBoolEqvArray.length][];
+        	    final Expression[][] testData = new Expression[intOrBoolEqvArray.length][models.length];
+        	    for (int i = 0; i < intOrBoolEqvArray.length; i++) {
+        		final ImmutableSet<Term> locs = intOrBoolEqvArray[i].getLocations();
         		testLocation[i] = new Expression[locs.size()];
         		int k = 0;
         		for (final Term testLoc : locs) {
         		    testLocation[i][k++] = translateTerm(testLoc, null, null);
         		}
         		for (int j = 0; j < models.length; j++) {
-        		    testData[i][j] = models[j]
-        			    .getValueAsExpression(eqvArray[i]);
+        		    testData[i][j] = models[j].getValueAsExpression(intOrBoolEqvArray[i]);
+        		    if(testData[i][j]==null){
+        			testData[i][j]= new IntLiteral(15); //Emergency solution. Was earlier in Model.getValueAsExpressions()
+        			generateTestSuite_progressNotification2b(count,totalCount,mg,intOrBoolEqvArray[i]);
+        		    }
         		}
         	    }
         	    // mbender: collect data for KeY junit tests (see
@@ -210,8 +212,8 @@ public abstract class TestGenerator {
         	    data.addTestDat(testData);
         	    data.addTestLoc(testLocation);
         	    methDec = createTestMethod(code, oracle,
-        		    testLocation, testData, reducedPVSet, methodName
-        		            + (testMethods.size()), l, mg, eqvArray);
+        		    testLocation, testData, reducedPVSet, 
+        		    methodName + (testMethods.size()), l, mg, intOrBoolEqvArray);
         	    l.add(methDec);
         	    testMethods.add(methDec);
         	    generateTestSuite_progressNotification3(count,totalCount,mg,models,methDec);
@@ -222,9 +224,7 @@ public abstract class TestGenerator {
 	    mgs.remove(0);//This ModelGenerator has been used in this iteration and is not needed anymore
 	}
 
-	l = createMain(l, testMethods);// Create main() method. Required for
-	// the
-	// KeYGenU Tool chain.
+	l = createMain(l, testMethods);// Create main() method. Required for the KeYGenU Tool chain.
 
 	final ClassDeclaration suite = createSuiteClass(l);
 
@@ -303,7 +303,8 @@ public abstract class TestGenerator {
 	    //models = modelGeneration.models; //read the generated model
 	    if(models==null && timeoutActive ){
 		mg.terminateAsSoonAsPossible();
-		modelGenThread.join(1000);//give the thread one more second before it gets terminated
+		modelGenThread.join(3000);//give the thread one more second before it gets terminated
+		System.out.println("Contorlled termination");
 		modelGenThread.stop();
 		interrupted = true;
 	    }
@@ -329,6 +330,14 @@ public abstract class TestGenerator {
     protected void generateTestSuite_progressNotification2(
 	    int count, int totalCount, ModelGenerator refMG, Model[] models, 
 	    boolean createModelsSuccess, boolean terminated){	return;}
+
+    /**When generateTestSuite() is executed on a separate thread, then this notification method
+     * is called in order to report the progress of computation to other threads. This method
+     * is overwritten by TestGeneratorGUIInterface */
+    protected void generateTestSuite_progressNotification2b(
+	    int count, int totalCount, ModelGenerator refMG,EquivalenceClass ec){
+	System.err.println("No test data available for equivalence class:"+ec.toString());
+	}
 
     /**When generateTestSuite() is executed on a separate thread, then this notification method
      * is called in order to report the progress of computation to other threads. This method
@@ -479,12 +488,10 @@ public abstract class TestGenerator {
 	final boolean singleTuple = singleTuple(testData);
 
 	// put test data in array
-	final ProgramVariable[] testArray = initTestDataArr(testData.length,
-	        singleTuple, testLocEqvs);
+	final ProgramVariable[] testArray = initTestDataArr(testData.length, singleTuple, testLocEqvs);
 
 	// create Statements
-	s = appendStatements(testData.length, singleTuple, testLocEqvs,
-	        testArray, s, testData);
+	s = appendStatements(testData.length, singleTuple, testLocEqvs, testArray, s, testData);
 
 	final ExtList l = new ExtList();
 	l.add(new ProgramElementName(name));
@@ -500,24 +507,24 @@ public abstract class TestGenerator {
 	for (int i = 0; i < testData.length; i++) {
 	    for (int k = 0; k < testLocation[i].length; k++) {
 		final Expression testDat = singleTuple ? (Expression) testArray[i]
-		        : (Expression) new ArrayReference(testArray[i],
-		                new Expression[] { partCounter });
+		        : (Expression) new ArrayReference(testArray[i], new Expression[] { partCounter });
 		if (testLocation[i][k] instanceof FieldReference
 		        && ((FieldReference) testLocation[i][k])
-		                .getProgramVariable().name().toString().equals(
-		                        "length")) {
-		    final KeYJavaType at = ((Expression) ((FieldReference) testLocation[i][k])
-			    .getReferencePrefix()).getKeYJavaType(serv, null);
-		    if (at.getSort() instanceof ArraySort) {
-			final NewArray ar = new NewArray(
-			        new Expression[] { testDat }, new TypeRef(
-			                getBaseType(at)), at, null, 0);
+		                .getProgramVariable().name().toString().equals("length")) {
+		    //Generate an array constructor call respecting the correct size/length of the array.
+		    //The size of the array is given by the test data "testDat".
+		    final KeYJavaType arrType = ((Expression) ((FieldReference) testLocation[i][k])
+			    			.getReferencePrefix()).getKeYJavaType(serv, null);
+		    if (arrType.getSort() instanceof ArraySort) {
+			final NewArray arrayConstructor = new NewArray(
+			        		new Expression[] { testDat }, 
+			        		new TypeRef( getBaseType(arrType)), arrType, null, 0);
 			// array2length.put(((FieldReference)
 			// testLocation[i][k]).
 			// getReferencePrefix().toString(),
 			// testDat);
-			array2Cons.put(((FieldReference) testLocation[i][k])
-			        .getReferencePrefix().toString(), ar);
+			array2Cons.put(((FieldReference) testLocation[i][k]).getReferencePrefix().toString(), 
+					arrayConstructor);
 			continue;
 		    }
 		}
@@ -533,54 +540,51 @@ public abstract class TestGenerator {
 	}
 
 	// initialization of other object references
-	final EquivalenceClass[] nonPrim = mg
-	        .getNonPrimitiveLocationEqvClasses();
-	final HashMap<Expression, Expression> loc2cons = new HashMap<Expression, Expression>();
+	final EquivalenceClass[] nonPrim = mg.getNonPrimitiveLocationEqvClasses();
+	final HashMap<Expression, Expression> loc2constrCall = new HashMap<Expression, Expression>();
 	final LinkedList<Expression> locationsOrdered = new LinkedList<Expression>();
 	// assignments of test data to locations + initialization of
 	// object references
-	ImmutableList<Statement> assignments = ImmutableSLList
-	        .<Statement> nil();
+	ImmutableList<Statement> assignments = ImmutableSLList.<Statement> nil();
 	for (int i = 0; i < nonPrim.length; i++) {
-	    final EquivalenceClass eC = nonPrim[i];
+	    final EquivalenceClass nonPrimEqvClass = nonPrim[i];
 
-	    final ImmutableSet<Term> locs = eC.getLocations();
+	    final ImmutableSet<Term> locs = nonPrimEqvClass.getLocations();
 	    final Iterator<Term> itt = locs.iterator();
-	    if (!eC.isNull()) {
+	    if (!nonPrimEqvClass.isNull()) {
 		final Term nonPrimLocTerm = itt.next();
 		final Expression loc1 = translateTerm(nonPrimLocTerm, null,
 		        null);
-		final Expression cons = createCons(nonPrimLocTerm.sort(),
-		        array2Cons, loc1, eC.getKeYJavaType());
+		final Expression constrCall = createConstructorCall(nonPrimLocTerm.sort(),
+		        array2Cons, loc1, nonPrimEqvClass.getKeYJavaType());
 
 		if (locs.size() > 1) {
 		    final ProgramVariable pv = new LocationVariable(
-			    new ProgramElementName("_init" + i), eC
-			            .getKeYJavaType());
+			    new ProgramElementName("_init" + i), 
+			    	nonPrimEqvClass.getKeYJavaType());
 		    final VariableSpecification varSpec = new VariableSpecification(
-			    pv, cons, eC.getKeYJavaType());
+			    pv, constrCall, nonPrimEqvClass.getKeYJavaType());
 		    assignments = assignments
-			    .append(new LocalVariableDeclaration(new TypeRef(eC
-			            .getKeYJavaType()), varSpec));
-		    loc2cons.put(loc1, pv);
+			    .append(new LocalVariableDeclaration(
+				    	new TypeRef(nonPrimEqvClass.getKeYJavaType()), varSpec));
+		    loc2constrCall.put(loc1, pv);
 		    while (itt.hasNext()) {
-			final Expression loc2 = translateTerm(itt.next(), null,
-			        null);
+			final Expression loc2 = translateTerm(itt.next(), null, null);
 			addOrdered(loc2, locationsOrdered);
-			loc2cons.put(loc2, pv);
+			loc2constrCall.put(loc2, pv);
 		    }
 		} else {
-		    loc2cons.put(loc1, cons);
+		    loc2constrCall.put(loc1, constrCall);
 		}
 		addOrdered(loc1, locationsOrdered);
-	    } else {
+	    } else { // nonPrimEqvClass.isNull
 		while (itt.hasNext()) {
 		    final Term locTerm = itt.next();
 		    if (locTerm.op() != Op.NULL) {
 			final Expression loc2 = translateTerm(locTerm, null,
 			        null);
 			addOrdered(loc2, locationsOrdered);
-			loc2cons.put(loc2, NullLiteral.NULL);
+			loc2constrCall.put(loc2, NullLiteral.NULL);
 		    }
 		}
 	    }
@@ -588,13 +592,13 @@ public abstract class TestGenerator {
 	final Iterator<Expression> locIt = locationsOrdered.iterator();
 	while (locIt.hasNext()) {
 	    final Expression loc = locIt.next();
-	    final Expression cons = loc2cons.get(loc);
+	    final Expression constrCall = loc2constrCall.get(loc);
 	    final IndexReplaceVisitor irv = new IndexReplaceVisitor(loc,
 		    testLocation, singleTuple, partCounter, testArray, serv);
 	    irv.start();
 	    irv.result();
 	    assignments = assignments.append(ag.assignmentOrSet(
-		    (Expression) irv.result(), cons, serv));
+		    (Expression) irv.result(), constrCall, serv));
 	}
 	assignments = assignments.append(testDataAssignments);
 	final Statement[] ib = new Statement[6 + code.length];
@@ -702,13 +706,16 @@ public abstract class TestGenerator {
 	return tm;
     }
     
-    protected Expression createCons(final Sort sort,
+    /**@param array2Cons maps an array expression to a constructor call for the array with dimension initialized by test data */
+    protected Expression createConstructorCall(final Sort sort,
 	    final HashMap<String, NewArray> array2Cons, final Expression loc1,
 	    final KeYJavaType locKJT) {
 	if (sort instanceof ArraySort) {
-	    final Expression cons = array2Cons.get(CompilableJavaCardPP
-		    .toString(loc1));
+	    String arrayExpression = CompilableJavaCardPP.toString(loc1);
+	    final Expression cons = array2Cons.get(arrayExpression);
 	    if (cons == null) {
+		System.err.println("WARNING:Problem with generating an array constructor for "+arrayExpression+
+			"  An array of size 20 will be created but this is an emergency solution.");
 		return new NewArray(new Expression[] { new IntLiteral(20) },
 		        new TypeRef(getBaseType(locKJT)), locKJT, null, 0);
 	    } else {

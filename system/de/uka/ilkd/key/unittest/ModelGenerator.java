@@ -57,8 +57,12 @@ public class ModelGenerator {
 
     protected Constraint userConstraint;
 
+    /**Just information for the user. */
     protected String executionTrace;
 
+    /**Used only by VisualDebugger and for information for the user. It's not required for model generation!
+     * originalNode may differ from node. The latter is the path condition and original Node may 
+     * be a leaf node where the pathconditions is already combined with the post conditiond */
     protected Node originalNode;
     
     /** required in order to access during model generation dmg.terminateAsSoonAsPossible.
@@ -68,7 +72,8 @@ public class ModelGenerator {
     protected volatile boolean terminateAsSoonAsPossible=false;
 
     /**@param node this is the node for which a counter example is generated.
-     * @param originalNode this may be a leaf node below {@code node}. */
+     * @param originalNode this may be a leaf node below {@code node}.
+     * @param executionTrace is not required for model generation itself. It is just to provide better information to the user  */
     public ModelGenerator(Services serv, Constraint userConstraint, Node node,
 	    String executionTrace, Node originalNode) {
 	Iterator<ConstrainedFormula> itc = node.sequent().antecedent()
@@ -143,6 +148,7 @@ public class ModelGenerator {
      * Ensures the existence of an EquivalenceClass for each location and logic
      * variable found in <code>t</code> and updates the mapping from this class
      * to the formulas it occurs in, i.e. field {@code locations} is initialized.
+     * Formulas below modalities, updates, and quantifiers are ignored
      */
     protected void collectLocations(Term t) {
 	if (isLocation(t, serv)) {
@@ -259,16 +265,20 @@ public class ModelGenerator {
 		    } else {
 			ec.add(t.sub(1));
 		    }
+		    term2class.put(t.sub(1), ec);
 		} else if (term2class.containsKey(t.sub(1))) {
 		    ec = term2class.get(t.sub(1));
 		    ec.add(t.sub(0));
+		    term2class.put(t.sub(0), ec);
 		} else {
 		    ec = new EquivalenceClass(t.sub(0), t.sub(1), serv);
-		}
-		Iterator<Term> ecIt = ec.getMembers().iterator();
-		while (ecIt.hasNext()) {
-		    term2class.put(ecIt.next(), ec);
-		}
+		    term2class.put(t.sub(0), ec);
+		    term2class.put(t.sub(1), ec);
+		}		
+//		Iterator<Term> ecIt = ec.getMembers().iterator();
+//		while (ecIt.hasNext()) {
+//		    term2class.put(ecIt.next(), ec);
+//		}
 	    }
 	}
 	it = succ.iterator();
@@ -293,6 +303,7 @@ public class ModelGenerator {
 		e0.addUpperBound(e1, true);
 		e1.addLowerBound(e0, true);
 	    }
+	    //gladisch: What about leq, geq, gt ?
 	}
 	it = succ.iterator();
 	while (it.hasNext()) {
@@ -355,10 +366,15 @@ public class ModelGenerator {
      */
     public Model[] createModels() {
 	terminateAsSoonAsPossible=false;
-	Set<Model> intModelSet = new HashSet<Model>();
-	LinkedList<EquivalenceClass> classes = new LinkedList<EquivalenceClass>(
-		term2class.values());
+
+	LinkedList<EquivalenceClass> classes = 
+	    new LinkedList<EquivalenceClass>(term2class.values());
 	createModels_progressNotification0(term2class);
+
+	dmg = getDecProdModelGenerator();
+	Set<Model> intModelSet = dmg.createModels();
+	createModels_progressNotification1(intModelSet);
+
 	for (int i = classes.size() - 1; i >= 0; i--) {
 	    if (// !((EquivalenceClass) classes.get(i)).isInt() &&
 	    !classes.get(i).isBoolean()
@@ -366,11 +382,7 @@ public class ModelGenerator {
 		classes.remove(i);
 	    }
 	}
-	dmg = getDecProdModelGenerator();
-	
-	intModelSet = dmg.createModels();
 	    
-	createModels_progressNotification1(intModelSet);
 	Set<Model> modelSet = new HashSet<Model>();
 	Iterator<Model> it = intModelSet.iterator();
 	while (it.hasNext()) {
@@ -388,6 +400,7 @@ public class ModelGenerator {
 	for (int i = 0; i < result.length; i++) {
 	    result[i] = models[i];
 	}
+	createModels_progressNotification2(result);
 	dmg = null;
 	return result;
     }
@@ -418,6 +431,9 @@ public class ModelGenerator {
     /**Is meant to be overwritten by subclasses in order to give the user feedback. */
     protected void createModels_progressNotification1(Set<Model> intModelSet){ }
 
+    /**Is meant to be overwritten by subclasses in order to give the user feedback. */
+    protected void createModels_progressNotification2(Model[] intModelSet){ }
+
     /**
      * Computes values for EquivalenceClasses of type boolean and adds these
      * assignments to the partial model <code>model</code>.
@@ -431,8 +447,9 @@ public class ModelGenerator {
 	classes = (LinkedList) classes.clone();
 	Model m;
 	for (int i = classes.size() - 1; i >= 0; i--) {
-	    if (classes.get(i).hasConcreteValue(term2class)
-		    && classes.get(i).getLocations().size() > 0) {
+	    if (classes.get(i).getLocations().size() > 0
+		    && classes.get(i).hasConcreteValue(term2class)
+		    ) {
 		model.setValue(classes.remove(i));
 	    }
 	}

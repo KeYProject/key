@@ -28,6 +28,7 @@ public class EquivalenceClass {
 
     private ImmutableSet<Term> members;
 
+    /** The keys of the hashmap are lower bounds or upper bounds to this hashmap. Initialized by {@code ModelGenerator.findBounds} */
     private HashMap<EquivalenceClass, Boolean> lb2ex, ub2ex;
 
     // This flag is used to avoid cycles, when it is checked if a concrete
@@ -379,8 +380,10 @@ public class EquivalenceClass {
 	    while (itt.hasNext()) {
 		EquivalenceClass ec = term2class.get(itt.next());
 		Boolean b = ec.getConcreteBooleanValue(term2class);
-		if (bValue == b) {
-		    return false;
+		if(b!=null){
+        		if (bValue == b) {
+        		    return false;
+        		}
 		}
 	    }
 	}
