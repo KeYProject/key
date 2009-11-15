@@ -176,8 +176,7 @@ public class DecisionProcedureSimplify {
 	    // End of logging part
 
 	    if (response.indexOf("Valid.") > 0) {
-		logger
-			.info("Simplify has decided and found the formula to be valid.");
+		logger.info("Simplify has decided and found the formula to be valid.");
 		return new DecisionProcedureResult(true, response, st);
 	    } else {
 		return new DecisionProcedureResult(false, response, st);

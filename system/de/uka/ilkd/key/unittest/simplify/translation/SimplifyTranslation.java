@@ -483,6 +483,11 @@ public class SimplifyTranslation {
 	    Vector<QuantifiableVariable> quantifiedVars)
 	    throws SimplifyException {
 	Operator op = term.op();
+//	String response = op.toString();
+//	if(response.indexOf("jint")!=-1 || response.indexOf("jchar")!=-1 || response.indexOf("cast")!=-1){
+//	    System.out.println(response);
+//	}
+
 	if (op == Op.NOT) {
 	    return (translateSimpleTerm(term, NOT, quantifiedVars));
 	} else if (op == Op.AND) {
@@ -586,6 +591,9 @@ public class SimplifyTranslation {
 		    addPredicate(getUniqueVariableName(sort).toString(), 1);
 		}
 		return (new StringBuffer(res));
+	    } else if(op instanceof CastFunctionSymbol){
+		//assuming that a cast is an identity function.
+		return translate(term.sub(0), quantifiedVars);
 	    } else if (name.equals("byte_MIN") | name.equals("byte_MAX")
 		    | name.equals("byte_RANGE") | name.equals("byte_HALFRANGE")
 		    | name.equals("short_MIN") | name.equals("short_MAX")
@@ -598,11 +606,9 @@ public class SimplifyTranslation {
 		return (translateSimpleTerm(term, name, quantifiedVars));
 	    } else {
 		if (term.sort() == Sort.FORMULA) {
-		    addPredicate(getUniqueVariableName(op).toString(), op
-			    .arity());
+		    addPredicate(getUniqueVariableName(op).toString(), op.arity());
 		}
-		return (translateSimpleTerm(term, getUniqueVariableName(op)
-			.toString(), quantifiedVars));
+		return (translateSimpleTerm(term, getUniqueVariableName(op).toString(), quantifiedVars));
 	    }
 	} else if ((op instanceof Modality) || (op instanceof IUpdateOperator)
 	/* ||(op instanceof IfThenElse) */) {
@@ -755,10 +761,12 @@ public class SimplifyTranslation {
 	    Operator op = t.op();
 	    if (!lightWeight || !(op instanceof Modality)
 		    && !(op instanceof IUpdateOperator)
-		    && !(op instanceof IfThenElse) && op != Op.ALL
+		    //&& !(op instanceof IfThenElse) gladisch:14.11.2009 
+		    && op != Op.ALL
 		    && op != Op.EX) {
 		hb.append(pretranslate(t, new Vector<QuantifiableVariable>()));
 	    }
+
 	}
 	return hb;
     }

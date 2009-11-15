@@ -74,7 +74,7 @@ public abstract class TestGenerator {
     public Thread modelGenThread=null;
 
     /** Seconds to wait for modelGeneration for each node. -1 = infinitely.  */
-    public static volatile int modelCreationTimeout=20;
+    public static volatile int modelCreationTimeout=100;
 
     /**
      * creates a TestGenerator instance for the given compilation unit

@@ -38,7 +38,7 @@ public class OldSimplifyModelGenerator extends DecProdModelGenerator {
 	    10, -1000, 1000, -1000000, 1000000, -2000000000, 2000000000 };
     
     /**In the original implementation the value was 1. But some examples are solved at depth 3 and it takes a long time until 3 is reached. */
-    public static int iterativeDeepeningStart = 3;
+    public static int iterativeDeepeningStart = 1;
 
     /** Outputs of Simplify are cached in order to prevent Simplify
      from being called several times with the same formula -> saves execution
@@ -119,6 +119,9 @@ public class OldSimplifyModelGenerator extends DecProdModelGenerator {
     public static final String[] POS = new String[]{"POS0","POS1","POS2","POS3","POS4"};
 
 
+    /** This method calls itself recursively and tries to create in each recursion step a more concrete
+     * model. Firstly inequations ("NEQ") are replaced by "<" then, then "<=" and "<" are replaced
+     * by equations.   */
     private Set<Model> createModelsHelp(String counterEx, Model model,
 	    int datCount, int recDepth) {
 	String counterExOLD = new String(counterEx);
@@ -127,7 +130,6 @@ public class OldSimplifyModelGenerator extends DecProdModelGenerator {
 	if (counterEx.indexOf("Counterexample") == -1
 		|| models.size() >= getModelLimit()
 		|| terminateAsSoonAsPossible) {
-	    if(terminateAsSoonAsPossible)
 	    return models;
 	}
 	counterEx = counterEx.replaceAll("_ ", "_");
@@ -163,14 +165,10 @@ public class OldSimplifyModelGenerator extends DecProdModelGenerator {
 	    if (model.size() == intClasses.size()) {
 		models.add(model);
 		createModelsHelp_ProgressNotificationX(POS[0], datCount, recDepth, "model.size() == intClasses.size() == "+model.size());
-//gladisch:14.11.2009
-//   if (models.size() >= getModelLimit()) {
-//       System.out.println("Create Models Help exiting at A\n"+models.iterator().next());
-//	return models;
-//   }
-		
 	    } else {
-		for (int i = 0; i < eqs.length; i++) {
+		//The condition i<1 prevents that PERMUTATIONS of equations are enumerated.
+		//Enumeration of equations is done via recursive calls of this method.
+		for (int i = 0; i < eqs.length && i < 1; i++) {
 		    // set a subterm to an arbitrary value an test if
 		    // the system of equations has a unique solution now.
 		    for (int j = 0; j < datCount; j++) {
@@ -191,34 +189,8 @@ public class OldSimplifyModelGenerator extends DecProdModelGenerator {
 		}
 	    }
 	} else {
-	    LessEq[] leqs = c.getLessEq();
-	    for (int i = 0; i < leqs.length; i++) {
-		for (int j = 0; j < datCount; j += 2) {
-		    c.add(lessEqToEq(leqs[i], genericTestValues[j]));
-		    createModelsHelp_ProgressNotificationX(POS[2], datCount, 
-			    recDepth, "lessEqToEq("+genericTestValues[j]+", "+leqs[i]+" ) ");
-		    models.addAll(createModelsHelp(simplify(c), model.copy(), datCount, recDepth+1));
-		    if (models.size() >= getModelLimit()) {
-			return models;
-		    }
-		    c.removeLast();
-		}
-	    }
-	    Less[] les = c.getLess();
-	    for (int i = 0; i < les.length; i++) {
-		for (int j = 2; j < datCount; j += 2) {
-		    c.add(lessToEq(les[i], genericTestValues[j]));
-		    createModelsHelp_ProgressNotificationX(POS[3], datCount,
-			    recDepth, "lessToEq("+genericTestValues[j]+", "+les[i]+")");
-		    models.addAll(createModelsHelp(simplify(c), model.copy(), datCount, recDepth+1));
-		    if (models.size() >= getModelLimit()) {
-			return models;
-		    }
-		    c.removeLast();
-		}
-	    }
 	    Inequation[] neq = c.getInequations();
-	    for (int i = 0; i < neq.length; i++) {
+	    for (int i = 0; i < neq.length && i < 1; i++) {
 //		for (int j = 1; j < datCount; j++) {
 //		    c.add(ineqToEq(neq[i], genericTestValues[j]));
 //		    createModelsHelp_ProgressNotificationX(POS[4], recDepth,
@@ -229,8 +201,9 @@ public class OldSimplifyModelGenerator extends DecProdModelGenerator {
 //		    }
 //		    c.removeLast();
 //		}
-		//gladisch 14.11.2009
-		for (int j = 0; j < 2; j++) {
+		//gladisch 14.11.2009 
+		for (int j = 0; j < 2 && j<datCount; j++) {
+		//This loop changes "(NEQ A B)" either to "(< A B)" or to "(< B A)"
 		    c.add(ineqToLess(neq[i], j==0));
 		    createModelsHelp_ProgressNotificationX(POS[4], datCount,
 			    recDepth, "ineqToLess("+(j==0)+", "+neq[i]+")");
@@ -240,7 +213,44 @@ public class OldSimplifyModelGenerator extends DecProdModelGenerator {
 		    }
 		    c.removeLast();
 		}
-
+	    }
+	    //The following if-cascade prevents that all permutations of "NEQ"-constraints,
+	    //"<="-constraints, and "<"-constraints are enumerated. The permutations would be useless.
+	    if(c.getInequations().length==0){
+		//This branch is entered in a deeper recursion depth of createModelsHelp, when all inequations are replaced
+        	    LessEq[] leqs = c.getLessEq();
+        	    //Note, only one iteration is considered of the following loop (because of i<1)
+        	    //This is to prevent enumeration of permutations of "<=" constraints when the method is called recursively
+        	    for (int i = 0; i < leqs.length && i < 1; i++) {
+        		for (int j = 0; j < datCount*2; j += 2) {
+        		    c.add(lessEqToEq(leqs[i], genericTestValues[j]));
+        		    createModelsHelp_ProgressNotificationX(POS[2], datCount, 
+        			    recDepth, "lessEqToEq("+genericTestValues[j]+", "+leqs[i]+" ) ");
+        		    models.addAll(createModelsHelp(simplify(c), model.copy(), datCount, recDepth+1));
+        		    if (models.size() >= getModelLimit()) {
+        			return models;
+        		    }
+        		    c.removeLast();
+        		}
+        	    }
+        	    if(c.getLessEq().length==0){
+        		//This branch is entered in a deeper recursion depth of createModelsHelp, when all <= are solved
+                	    Less[] les = c.getLess();
+                	    //Note, only one iteration is considered of the following loop (because of i<1)
+                	    //This is to prevent enumeration of permutations of "<=" constraints when the method is called recursively
+                	    for (int i = 0; i < les.length && i < 1; i++) {
+                		for (int j = 2; j < 2 + datCount*2; j += 2) {
+                		    c.add(lessToEq(les[i], genericTestValues[j]));
+                		    createModelsHelp_ProgressNotificationX(POS[3], datCount,
+                			    recDepth, "lessToEq("+genericTestValues[j]+", "+les[i]+")");
+                		    models.addAll(createModelsHelp(simplify(c), model.copy(), datCount, recDepth+1));
+                		    if (models.size() >= getModelLimit()) {
+                			return models;
+                		    }
+                		    c.removeLast();
+                		}
+                	    }
+        	    }
 	    }
 	}
 	return models;
