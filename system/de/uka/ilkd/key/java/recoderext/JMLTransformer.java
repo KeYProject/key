@@ -314,6 +314,9 @@ public final class JMLTransformer extends RecoderModelTransformer {
         //add ghost modifier
         ASTList<DeclarationSpecifier> mods 
         	= fieldDecl.getDeclarationSpecifiers();
+        if(mods == null) {
+            mods = new ASTArrayList<DeclarationSpecifier>();
+        }
         mods.add(isGhost ? new Ghost() : new Model());
         fieldDecl.setDeclarationSpecifiers(mods);
     }

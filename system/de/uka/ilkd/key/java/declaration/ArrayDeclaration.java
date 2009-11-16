@@ -59,6 +59,7 @@ public class ArrayDeclaration
 			     ProgramElementName name,
 			     KeYJavaType superType) { 	
 	super(addLength(children, superType), name, name, false);
+	assert name != null;
 	this.basetype  = baseType;
 	this.dim       = dimension();
 	this.superType = superType;
@@ -212,6 +213,7 @@ public class ArrayDeclaration
 	} else if (javaBasetype instanceof PrimitiveType) {
 	    return ((PrimitiveType)javaBasetype).getArrayElementName();
 	} 
+	assert false;
 	return null;
     }
 

@@ -80,6 +80,8 @@ public final class SLEnvInput extends AbstractEnvInput {
         
         Arrays.sort(kjts, new Comparator<KeYJavaType> () {
             public int compare(KeYJavaType o1, KeYJavaType o2) {
+        	assert o1.getFullName() != null : "type without name: " + o1;
+        	assert o2.getFullName() != null : "type without name: " + o2;
                 return o1.getFullName().compareTo(o2.getFullName());
             }
         });

@@ -145,7 +145,10 @@ public class PrimitiveType
 		arrayElementName = new ProgramElementName("[S");
 	    else if (this.getName().equals("boolean"))
 		arrayElementName = new ProgramElementName("[Z");
+	    else if (this.getName().equals("\\set"))
+		arrayElementName = new ProgramElementName("[X");	    
 	}
+	assert arrayElementName != null;
 	return arrayElementName;
     }
 

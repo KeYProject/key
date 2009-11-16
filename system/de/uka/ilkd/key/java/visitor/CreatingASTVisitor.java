@@ -1124,6 +1124,50 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
         };
         def.doAction(x);
     }
+    
+    
+    @Override
+    public void performActionOnSetUnion(SetUnion x) {
+        DefaultAction def = new DefaultAction(x) {
+            ProgramElement createNewElement(ExtList changeList) {
+                return new SetUnion(changeList);
+            }
+        };
+        def.doAction(x);	
+    }
+    
+    
+    @Override
+    public void performActionOnIntersect(Intersect x) {
+        DefaultAction def = new DefaultAction(x) {
+            ProgramElement createNewElement(ExtList changeList) {
+                return new Intersect(changeList);
+            }
+        };
+        def.doAction(x);	
+    }
+    
+    @Override    
+    public void performActionOnSetMinus(SetMinus x) {
+        DefaultAction def = new DefaultAction(x) {
+            ProgramElement createNewElement(ExtList changeList) {
+                return new SetMinus(changeList);
+            }
+        };
+        def.doAction(x);	
+    }
+    
+    @Override
+    public void performActionOnAllFields(AllFields x) {
+        DefaultAction def = new DefaultAction(x) {
+            ProgramElement createNewElement(ExtList changeList) {
+                return new AllFields(changeList);
+            }
+        };
+        def.doAction(x);	
+    }
+    
+
 
     /**
      * returns the position of pe2 in the virtual child array of pe1

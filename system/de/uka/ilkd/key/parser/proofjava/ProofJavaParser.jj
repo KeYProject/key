@@ -2282,26 +2282,31 @@ Expression Expression() :
     "\\singleton" "(" expr = Expression() ")"
     {
         result = new Singleton(expr);
+        setPrefixInfo(result);
     }
     |
     "\\setUnion" "(" expr = Expression() "," result = Expression() ")"
     {
         result = new SetUnion(expr, result);
+        setPrefixInfo(result);
     }
     |
     "\\intersect" "(" expr = Expression() "," result = Expression() ")"
     {
         result = new Intersect(expr, result);
+        setPrefixInfo(result);
     }
     |
     "\\setMinus" "(" expr = Expression() "," result = Expression() ")"
     {
         result = new SetMinus(expr, result);
+        setPrefixInfo(result);
     }
     |
     "\\allFields" "(" expr = Expression() ")"
     {
         result = new AllFields(expr);
+        setPrefixInfo(result);
     }    
   )
   {
