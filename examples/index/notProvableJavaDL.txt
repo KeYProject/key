@@ -1,3 +1,5 @@
+./heap/information_flow/UpdateAbstraction_ex7_1_insecure.key
+./heap/information_flow/UpdateAbstraction_ex7_2_insecure.key
 ./standard_key/arrays/arrayStoreException/array2Dim.key
 ./standard_key/arrays/arrayStoreException/array2DimClose.key
 ./standard_key/arrays/arrayStoreException/throwASEForPrim.key

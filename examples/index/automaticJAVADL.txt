@@ -1,3 +1,11 @@
+./heap/information_flow/ArrayList_contains.key
+./heap/information_flow/ArrayList_get.key
+./heap/information_flow/ArrayList_size.key
+./heap/information_flow/UpdateAbstraction_ex7_3_secure.key
+./heap/information_flow/UpdateAbstraction_ex7_4_secure.key
+./heap/information_flow/UpdateAbstraction_ex7_5_secure.key
+./heap/information_flow/UpdateAbstraction_ex7_6_secure.key
+./heap/information_flow/UpdateAbstraction_ex9_secure.key
 ./heap/list/ArrayList_add.key
 ./heap/list/ArrayList_ArrayList.key
 ./heap/list/ArrayList_enlarge.key
