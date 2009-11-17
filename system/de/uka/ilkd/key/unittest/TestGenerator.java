@@ -1,7 +1,6 @@
 package de.uka.ilkd.key.unittest;
 
 import java.io.*;
-import java.lang.ref.WeakReference;
 import java.util.*;
 
 import de.uka.ilkd.key.collection.*;
@@ -30,6 +29,7 @@ import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.ArraySort;
 import de.uka.ilkd.key.logic.sort.ArraySortImpl;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.proof.ProofSaver;
 import de.uka.ilkd.key.rule.UpdateSimplifier;
 import de.uka.ilkd.key.rule.soundness.TermProgramVariableCollector;
 import de.uka.ilkd.key.unittest.AssGenFac.AssignmentGenerator;
@@ -1031,7 +1031,7 @@ public abstract class TestGenerator {
 	final Expression f = translateFormula(post, buffer, children);
 	s[1] = new CopyAssignment(result, f);
 	final Plus str = new Plus(
-	        new StringLiteral("\\neval(" + post + ") = "), result);
+	        new StringLiteral("\\neval(" + ProofSaver.escapeCharacters(ProofSaver.printTerm(post, serv).toString()) + ") = "), result);
 	s[2] = new MethodReference(new ImmutableArray<Expression>(str),
 	        new ProgramElementName("append"), buffer);
 	s[3] = new Return(result);
@@ -1273,7 +1273,7 @@ public abstract class TestGenerator {
 	final Expression update = new PostIncrement(pv);
 	body[1] = new For(new LoopInitializer[] { init }, guard,
 	        new Expression[] { update }, new StatementBlock(loopBody));
-	final Plus str = new Plus(new StringLiteral("\\neval(" + t + ") = "),
+	final Plus str = new Plus(new StringLiteral("\\neval(" + ProofSaver.escapeCharacters(ProofSaver.printTerm(t, serv).toString()) + ") = "),
 	        result);
 	body[2] = new MethodReference(new ImmutableArray<Expression>(str),
 	        new ProgramElementName("append"), buffer);
