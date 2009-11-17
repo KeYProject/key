@@ -55,6 +55,12 @@ public class StrategyProperties extends Properties {
     public final static String STOPMODE_DEFAULT = "STOPMODE_DEFAULT";
     public final static String STOPMODE_NONCLOSE = "STOPMODE_NONCLOSE";
 
+    public final static String VBT_PHASE = "VBT_PHASE"; //Used for verification-based testing
+    public final static String VBT_SYM_EX = "VBT_SYM_EX";
+    public final static String VBT_QUAN_INST = "VBT_QUAN_INST";
+    public final static String VBT_MODEL_GEN = "VBT_MODEL_GEN";
+    
+
 
     public final static int USER_TACLETS_NUM = 3;
     private final static String USER_TACLETS_OPTIONS_KEY_BASE = "USER_TACLETS_OPTIONS_KEY";
@@ -77,11 +83,12 @@ public class StrategyProperties extends Properties {
             defaultMap.setProperty(USER_TACLETS_OPTIONS_KEY(i), USER_TACLETS_OFF);
         defaultMap.setProperty(GOALCHOOSER_OPTIONS_KEY, GOALCHOOSER_DEFAULT);
         defaultMap.setProperty(STOPMODE_OPTIONS_KEY, STOPMODE_DEFAULT);
+        defaultMap.setProperty(VBT_PHASE, VBT_SYM_EX);
     }
     
     public StrategyProperties() {
         put(SPLITTING_OPTIONS_KEY, defaultMap.get(SPLITTING_OPTIONS_KEY));                
-        put(LOOP_OPTIONS_KEY, defaultMap.get(LOOP_OPTIONS_KEY));                
+        put(LOOP_OPTIONS_KEY, defaultMap.get(LOOP_OPTIONS_KEY));      
         put(METHOD_OPTIONS_KEY, defaultMap.get(METHOD_OPTIONS_KEY));
         put(QUERY_OPTIONS_KEY, defaultMap.get(QUERY_OPTIONS_KEY));
         put(NON_LIN_ARITH_OPTIONS_KEY, defaultMap.get(NON_LIN_ARITH_OPTIONS_KEY));
@@ -90,6 +97,7 @@ public class StrategyProperties extends Properties {
             put(USER_TACLETS_OPTIONS_KEY(i), defaultMap.get(USER_TACLETS_OPTIONS_KEY(i)));
         put(GOALCHOOSER_OPTIONS_KEY, defaultMap.get(GOALCHOOSER_OPTIONS_KEY));
         put(STOPMODE_OPTIONS_KEY, defaultMap.get(STOPMODE_OPTIONS_KEY));
+        put(VBT_PHASE, defaultMap.getProperty(VBT_PHASE));
     }
 
     public static String getDefaultProperty(String key) {
@@ -106,7 +114,7 @@ public class StrategyProperties extends Properties {
         StrategyProperties sp = new StrategyProperties();
 
         sp.put(SPLITTING_OPTIONS_KEY, readSingleOption(p, SPLITTING_OPTIONS_KEY));                
-        sp.put(LOOP_OPTIONS_KEY, readSingleOption(p, LOOP_OPTIONS_KEY));                
+        sp.put(LOOP_OPTIONS_KEY, readSingleOption(p, LOOP_OPTIONS_KEY)); 
         sp.put(METHOD_OPTIONS_KEY, readSingleOption(p, METHOD_OPTIONS_KEY));
         sp.put(QUERY_OPTIONS_KEY, readSingleOption(p,QUERY_OPTIONS_KEY));
         sp.put(NON_LIN_ARITH_OPTIONS_KEY, readSingleOption(p,NON_LIN_ARITH_OPTIONS_KEY));
@@ -115,6 +123,7 @@ public class StrategyProperties extends Properties {
             sp.put(USER_TACLETS_OPTIONS_KEY(i), readSingleOption(p,USER_TACLETS_OPTIONS_KEY(i)));
         sp.put(GOALCHOOSER_OPTIONS_KEY, readSingleOption(p,GOALCHOOSER_OPTIONS_KEY));
         sp.put(STOPMODE_OPTIONS_KEY, readSingleOption(p,STOPMODE_OPTIONS_KEY));
+        sp.put(VBT_PHASE, readSingleOption(p,VBT_PHASE));
         return sp;
     }
 
@@ -138,6 +147,7 @@ public class StrategyProperties extends Properties {
             p.put("[StrategyProperty]"+USER_TACLETS_OPTIONS_KEY(i), get(USER_TACLETS_OPTIONS_KEY(i)));
         p.put("[StrategyProperty]"+GOALCHOOSER_OPTIONS_KEY, get(GOALCHOOSER_OPTIONS_KEY));
         p.put("[StrategyProperty]"+STOPMODE_OPTIONS_KEY, get(STOPMODE_OPTIONS_KEY));
+        p.put("[StrategyProperty]"+VBT_PHASE, get(VBT_PHASE));
     }
 
     

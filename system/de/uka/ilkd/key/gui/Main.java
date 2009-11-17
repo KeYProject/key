@@ -2569,12 +2569,24 @@ public class Main extends JFrame implements IMain {
 			Profile p = ProofSettings.DEFAULT_SETTINGS.getProfile();
 			p.setSelectedGoalChooserBuilder(DepthFirstGoalChooserBuilder.NAME);  
 			VBTStrategy.preferedGoalChooser = DepthFirstGoalChooserBuilder.NAME; 
-		} else if (opt[index].equals("TESTING") || opt[index].equals("UNIT")) {
-                    if(opt[index].equals("TESTING")){
+		} else if (opt[index].equals("TESTING") || opt[index].equals("UNIT") || opt[index].equals("UNIT2")) {
+		    int mode=-1;
+		    if(opt[index].equals("TESTING")){
+			mode=1;
+		    } else if(opt[index].equals("UNIT")) {
+			mode=2;
+		    } else if(opt[index].equals("UNIT2")){
+			mode=3;
+		    }
+                    if(mode==1){
                         testStandalone = true;
                         setVisibleMode(false);//Problem:Mixed semantics
                     }
-                    System.out.println("VBT optimizations enabled ...");                    
+                    if(mode==1||mode==2){
+                	System.out.println("VBT optimizations enabled ...");
+                    }else{
+                	System.out.println("VBT 2 optimizations enabled ...");
+                    }
                     
                     //Parameters of JavaTestGenerationProfile
                     boolean loop=false;
@@ -2596,8 +2608,13 @@ public class Main extends JFrame implements IMain {
                         if(loopBound>=0)System.out.println("Bounded loop unwinding. Unwinding bound:"+loopBound);
                         index++;
                     }
-                    ProofSettings.DEFAULT_SETTINGS.setProfile(
-                	    new JavaTestGenerationProfile(null,loop,loopBound));                   
+                    if(mode==1||mode==2){
+                	ProofSettings.DEFAULT_SETTINGS.setProfile(
+                	    new JavaTestGenerationProfile(null,loop,loopBound));
+                    } else if(mode==3){
+                	ProofSettings.DEFAULT_SETTINGS.setProfile(
+                    	    new JavaTestGenerationProfile2(null,loop,loopBound));                	
+                    }
                     testMode = true;
                     
 		} else if (opt[index].equals("DEBUGGER")) {                                     
@@ -2662,6 +2679,9 @@ public class Main extends JFrame implements IMain {
         	           "                    unit test generation mode. Optional arguments:\n"+
         	           "                    loop: to enable balanced loop unwinding\n"+
         	           "                    loopX: to allow at most X loop iterations");
+        System.out.println("  unit2 [loop] [loop0|loop1|loop2|loop3|loop4]: \n"+
+	           	   "                    unit test generation mode that is compatible with\n"+
+	           	   "                    the normal verification mode.");
 	System.out.println("  depthfirst      : constructs the proof tree in a depth first manner. Recommended for large proofs");
         System.out.println("  auto	          : start prove procedure after initialisation");
         System.out.println("  testing         : starts the prover with a simple test generation oriented user interface");

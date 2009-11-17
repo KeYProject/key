@@ -51,7 +51,7 @@ import de.uka.ilkd.key.util.ExtList;
 public class WhileLoopTransformation2 extends WhileLoopTransformation {
 
     /** Global variable that determins how often to unwind the loop. */
-    public static int unwindings=2;
+    public static int unwindings=1;
 
 
     /** creates the WhileLoopTransformation for the transformation mode

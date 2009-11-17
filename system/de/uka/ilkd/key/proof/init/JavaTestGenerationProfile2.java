@@ -1,10 +1,3 @@
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General Public License.
-// See LICENSE.TXT for details.
 package de.uka.ilkd.key.proof.init;
 
 import java.util.HashMap;
@@ -19,23 +12,24 @@ import de.uka.ilkd.key.proof.BalancedGoalChooserBuilder;
 import de.uka.ilkd.key.proof.DefaultGoalChooserBuilder;
 import de.uka.ilkd.key.proof.DepthFirstGoalChooserBuilder;
 import de.uka.ilkd.key.proof.GoalChooserBuilder;
+import de.uka.ilkd.key.rule.metaconstruct.WhileLoopTransformation2;
 import de.uka.ilkd.key.strategy.StrategyFactory;
 import de.uka.ilkd.key.strategy.VBTStrategy;
-import de.uka.ilkd.key.rule.metaconstruct.WhileLoopTransformation2;
 
-/** @see de.uka.ilkd.key.proof.init.JavaTestGenerationProfile2 */
-public class JavaTestGenerationProfile extends JavaProfile {
 
+/** This profile is for verification-based testing. The rule set standardRules-testGen2.key is loaded.
+ * In contrast to {@link de.uka.ilkd.key.proof.init.JavaTestGenerationProfile}, this
+ * modus is closer to the normal mode of KeY respecting the rule sets and proof strategy.
+ * @author gladisch
+ * */
+public class JavaTestGenerationProfile2 extends JavaProfile {
+
+    
     private final static StrategyFactory DEFAULT =
-        new VBTStrategy.Factory(0);
+        new VBTStrategy.Factory(1);
 
-    public JavaTestGenerationProfile(IMain main) {
-        super("standardRules-testGen.key",
-                DefaultImmutableSet.<GoalChooserBuilder>nil().
-                add(new DefaultGoalChooserBuilder()).
-                add(new DepthFirstGoalChooserBuilder()).
-                add(new BalancedGoalChooserBuilder()),
-                main);
+    public JavaTestGenerationProfile2(IMain main) {
+        super("standardRules-testGen2.key",  main);
     }
     
     /** @param main can be null. It is not used
@@ -43,7 +37,7 @@ public class JavaTestGenerationProfile extends JavaProfile {
      *  @param loopBound - if the value is smaller than 0 then it has no effect (unbounded loop unwinding is used). 
      *  Otherwise if @loopBound is equal or greater than 0 then this is the number of loop iterations considered. 
      */
-    public JavaTestGenerationProfile(IMain main, boolean loop, int loopBound ) {
+    public JavaTestGenerationProfile2(IMain main, boolean loop, int loopBound ) {
 	this(main);
 	if(loop){
 	    VBTStrategy.preferedGoalChooser = BalancedGoalChooserBuilder.NAME;
@@ -61,7 +55,7 @@ public class JavaTestGenerationProfile extends JavaProfile {
     }
 
     public String name() {
-        return "Java Testcase Generation Profile";
+        return "Java Verification + Test Case Generation Profile 2";
     }
 
     public StrategyFactory getDefaultStrategyFactory() {
@@ -74,14 +68,7 @@ public class JavaTestGenerationProfile extends JavaProfile {
         dcs.put("testGeneration", "testGeneration:testOn");
         cs.setDefaultChoices(dcs);
         settings.getStrategySettings().setStrategy(new Name("VBTStrategy"));
-    }
-
-    /**
-     * returns the file name of the internal class list
-     * @return the file name of the internal class list
-     */
-    public String getInternalClasslistFilename() {
-	 return "JAVALANGTESTGEN.TXT";
+        super.updateSettings(settings);
     }
 
 }

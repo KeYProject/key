@@ -79,7 +79,7 @@ public class DebuggerStrategy extends VBTStrategy {
     protected DebuggerStrategy(Proof p_proof, StrategyProperties props,
             List<WatchPoint> watchpoints) {
 
-        super(p_proof, props);
+        super(p_proof, props, 0);
 
         final boolean isSplittingAllowed = props.get(
                 VISUAL_DEBUGGER_SPLITTING_RULES_KEY).equals(

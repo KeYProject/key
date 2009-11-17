@@ -173,7 +173,7 @@ public class OldSimplifyModelGenerator extends DecProdModelGenerator {
 		    // the system of equations has a unique solution now.
 		    for (int j = 0; j < datCount; j++) {
 			Equation e = createEquationForSubTerm(eqs[i],
-				genericTestValues[j]);
+				-genericTestValues[j]);
 			if (e != null) {
 			    c.add(e);
 			    createModelsHelp_ProgressNotificationX(POS[1], datCount, 
