@@ -382,9 +382,9 @@ public final class JMLSpecExtractor implements SpecExtractor {
 
             //translate contract
             try {
-                ImmutableSet<OperationContract> contracts 
+                ImmutableSet<Contract> contracts 
                     = jsf.createJMLOperationContracts(pm, specCase);
-                for(OperationContract contract : contracts) {
+                for(Contract contract : contracts) {
                     result = result.add(contract);
                 }
             } catch (SLWarningException e) {

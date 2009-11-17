@@ -131,7 +131,7 @@ public class JMLSpecFactory {
     /**
      * Creates operation contracts out of the passed JML specification.
      */
-    private ImmutableSet<OperationContract> createJMLOperationContracts(
+    private ImmutableSet<Contract> createJMLOperationContracts(
                                 ProgramMethod pm,
                                 Behavior originalBehavior,                              
                                 PositionedString customName,
@@ -279,8 +279,7 @@ public class JMLSpecFactory {
         }
 
         //create contract(s)
-        ImmutableSet<OperationContract> result 
-            = DefaultImmutableSet.<OperationContract>nil();
+        ImmutableSet<Contract> result = DefaultImmutableSet.<Contract>nil();
         Term excNull = TB.equals(TB.var(excVar), TB.NULL(services));
         Term post1 
             = (originalBehavior == Behavior.NORMAL_BEHAVIOR
@@ -304,7 +303,7 @@ public class JMLSpecFactory {
                                             requires,
                                             post,
                                             assignable,
-                                            accessible,
+                                            null,//accessible,
                                             selfVar,
                                             paramVars,
                                             resultVar,
@@ -320,7 +319,7 @@ public class JMLSpecFactory {
                                             requires,
                                             post,
                                             assignable,
-                                            accessible,
+                                            null,//accessible,
                                             selfVar,
                                             paramVars,
                                             resultVar,
@@ -336,7 +335,7 @@ public class JMLSpecFactory {
                                             TB.and(requires, TB.not(diverges)),
                                             post,
                                             assignable,
-                                            accessible,
+                                            null,//accessible,
                                             selfVar,
                                             paramVars,
                                             resultVar,
@@ -350,13 +349,26 @@ public class JMLSpecFactory {
                                             requires,
                                             post,
                                             assignable,
-                                            accessible,
+                                            null,//accessible,
                                             selfVar,
                                             paramVars,
                                             resultVar,
                                             excVar,
                                             heapAtPre);
             result = result.add(contract1).add(contract2);
+        }
+        
+        //add separate dependency contract
+        if(accessible != null) {
+            final Contract depContract
+            	= new DependencyContractImpl("JML accessible clause",
+        				     pm.getContainerType(),
+        				     pm,
+        				     requires,        	                          
+        				     accessible,
+        				     selfVar,
+        				     paramVars);
+            result = result.add(depContract);
         }
 
         return result;
@@ -475,7 +487,7 @@ public class JMLSpecFactory {
     }    
     
     
-    public ImmutableSet<OperationContract> createJMLOperationContracts(
+    public ImmutableSet<Contract> createJMLOperationContracts(
             				ProgramMethod pm,
             				TextualJMLSpecCase textualSpecCase) 
             throws SLTranslationException {

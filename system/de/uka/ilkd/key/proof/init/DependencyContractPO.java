@@ -147,7 +147,11 @@ public final class DependencyContractPO extends AbstractPO
     
     @Override
     public void readProblem() throws ProofInputException {
-	final ObserverFunction target = contract.getTarget();
+	ObserverFunction target = contract.getTarget();
+	if(target instanceof ProgramMethod) {
+	    target = javaInfo.getToplevelPM(contract.getKJT(), 
+		    			    (ProgramMethod)target);
+	}
 	
 	//prepare variables
 	final ProgramVariable selfVar 
