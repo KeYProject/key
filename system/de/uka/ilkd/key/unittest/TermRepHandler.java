@@ -56,10 +56,10 @@ public class TermRepHandler {
      * @param ass
      */
     public void add(AssignmentPair ass) {
-        Operator currOp;
-        currOp = ass.locationAsTerm().op();
-        assert currOp instanceof NonRigidFunctionLocation : "add(AssignmentPair ass) failed "
-                + currOp + " is no NRFl";
+        Term currOp;
+        currOp = ass.locationAsTerm();
+        assert currOp.op() instanceof NonRigidFunctionLocation : "add(AssignmentPair ass) failed "
+                + currOp.op() + " is no NRFl";
         switch (currOp.arity()) {
         case 0:
             store.put(new NRFLIdentifier(currOp), new SimpleTermRep(ass, serv,
@@ -96,10 +96,10 @@ public class TermRepHandler {
      *            the NRFL
      * @return the Write Representation
      */
-    public Statement getWriteRep(Operator op) {
-        assert op instanceof NonRigidFunctionLocation : "Operator " + op
-                + "is not a NonRigidFunctionLocation but" + op.getClass();
-        return store.get(new NRFLIdentifier(op)).getWriteRep();
+    public Statement getWriteRep(Term t) {
+        assert t.op() instanceof NonRigidFunctionLocation : "Operator " + t.op()
+                + "is not a NonRigidFunctionLocation but" + t.op().getClass();
+        return store.get(new NRFLIdentifier(t)).getWriteRep();
     }
 
     /**
@@ -109,10 +109,11 @@ public class TermRepHandler {
      *            the NRFL
      * @return the Read Representation
      */
-    public Term getReadRep(Operator op) {
-        assert op instanceof NonRigidFunctionLocation : "Operator " + op
-                + "is not a NonRigidFunctionLocation but" + op.getClass();
-        return store.get(new NRFLIdentifier(op)).getReadRep();
+    public Term getReadRep(Term t) {
+        assert t.op() instanceof NonRigidFunctionLocation : "Operator " + t.op()
+                + "is not a NonRigidFunctionLocation but" + t.op().getClass();
+        System.out.println("getReadRep for "+t);
+        return store.get(new NRFLIdentifier(t)).getReadRep();
     }
 
 }

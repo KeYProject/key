@@ -81,7 +81,7 @@ public class NRFLHandler {
      */
     private Term createNewPost(Term post) {
         if (post.op() instanceof NonRigidFunctionLocation) {
-            return trh.getReadRep(post.op());
+            return trh.getReadRep(post);
         } else {
             final int arity = post.arity();
             if (arity == 0) {
@@ -242,8 +242,8 @@ public class NRFLHandler {
         return Update.createUpdate(t);
     }
 
-    public Statement getWriteRep(Operator op) {
-        return trh.getWriteRep(op);
+    public Statement getWriteRep(Term t) {
+        return trh.getWriteRep(t);
     }
 
     public Term getResult() {

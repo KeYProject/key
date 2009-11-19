@@ -73,7 +73,7 @@ public class ArrayTermRep extends AbstractTermRepresentation {
             return tf.createArrayTerm(ArrayOp.getArrayOp(term.sort()), subs);
         } else {
             if (term.sub(0).op() instanceof NonRigidFunctionLocation) {
-                subs[0] = trh.getReadRep(term.sub(0).op());
+                subs[0] = trh.getReadRep(term.sub(0));
 
             } else {
                 subs[0] = term.sub(0);

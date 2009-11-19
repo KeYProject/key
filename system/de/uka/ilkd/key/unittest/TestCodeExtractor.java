@@ -295,7 +295,7 @@ public class TestCodeExtractor {
 	for (int i = 0; i < uop.locationCount(); i++) {
 	    currLoc = uop.location(t, i);
 	    if (currLoc.op() instanceof NonRigidFunctionLocation) {
-		result = result.append(nrflHan.getWriteRep(currLoc.op()));
+		result = result.append(nrflHan.getWriteRep(currLoc));
 	    } else {
 		Expression l, r;
 		l = convertToProgramElement(currLoc);
