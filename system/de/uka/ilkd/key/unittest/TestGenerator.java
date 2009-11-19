@@ -1030,8 +1030,15 @@ public abstract class TestGenerator {
 	        new VariableSpecification(result));
 	final Expression f = translateFormula(post, buffer, children);
 	s[1] = new CopyAssignment(result, f);
-	final Plus str = new Plus(
-	        new StringLiteral("\\neval(" + ProofSaver.escapeCharacters(ProofSaver.printTerm(post, serv).toString()) + ") = "), result);
+	StringLiteral sl = null;
+	try{
+	    //The following can go wrong because it uses the ordinary PrettyPrinter instead of CompilableJavaPP
+	    //The ordinary PrettyPrinter does not handle classes defined in the package ppAnJavaASTExtension
+	    sl = new StringLiteral("\\neval(" + ProofSaver.escapeCharacters(ProofSaver.printTerm(post, serv).toString()) + ") = ");
+	}catch(Exception ex){
+	    sl = new StringLiteral("\\neval(" + post + ") = ");
+	}
+	final Plus str = new Plus(sl, result);
 	s[2] = new MethodReference(new ImmutableArray<Expression>(str),
 	        new ProgramElementName("append"), buffer);
 	s[3] = new Return(result);
@@ -1273,8 +1280,15 @@ public abstract class TestGenerator {
 	final Expression update = new PostIncrement(pv);
 	body[1] = new For(new LoopInitializer[] { init }, guard,
 	        new Expression[] { update }, new StatementBlock(loopBody));
-	final Plus str = new Plus(new StringLiteral("\\neval(" + ProofSaver.escapeCharacters(ProofSaver.printTerm(t, serv).toString()) + ") = "),
-	        result);
+	StringLiteral sl = null;
+	try{
+	    //The following can go wrong because it uses the ordinary PrettyPrinter instead of CompilableJavaPP
+	    //The ordinary PrettyPrinter does not handle classes defined in the package ppAnJavaASTExtension
+	    sl = new StringLiteral("\\neval(" + ProofSaver.escapeCharacters(ProofSaver.printTerm(t, serv).toString()) + ") = ");
+	}catch(Exception ex){
+	    sl = new StringLiteral("\\neval(" + t + ") = ");
+	}
+	final Plus str = new Plus(sl, result);
 	body[2] = new MethodReference(new ImmutableArray<Expression>(str),
 	        new ProgramElementName("append"), buffer);
 	body[3] = new Return(result);
