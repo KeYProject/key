@@ -311,7 +311,9 @@ public class Main extends JFrame implements IMain {
         if (instance == null) {
             instance = new Main("KeY -- Prover");
         }
-        if (!instance.isVisible()) {
+        if (!instance.isVisible() &&
+        	instance.isVisibleMode() 
+        	) {
             if (SwingUtilities.isEventDispatchThread()) {
                 instance.setVisible(visible); // XXX: enough?
             } else {

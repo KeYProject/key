@@ -40,14 +40,14 @@ public abstract class AbstractTermRepresentation {
     protected final TermFactory tf;
     protected final TermRepHandler trh;
     protected final Term left;
-    protected final Term right;
+    //protected final Term right;
     protected final Term readRep;
 
     public AbstractTermRepresentation(final AssignmentPair up,
 	    final Services serv, final TestCodeExtractor tce,
 	    final TermRepHandler trh) {
 	left = up.locationAsTerm();
-	right = up.value();
+	//right = up.value();
 	this.up = up;
 	this.serv = serv;
 	this.tce = tce;
@@ -73,10 +73,11 @@ public abstract class AbstractTermRepresentation {
     /**
      * This method returns a statement that is used during the initialisation of
      * generated Test-Files to initialize the represented NRFL
+     * @param right the term that is written.
      * 
      * @return a Statement for initialization
      */
-    public abstract Statement getWriteRep();
+    public abstract Statement getWriteRep(Term right);
 
     protected ProgramElementName createNewName(final Term t) {
 	return new ProgramElementName(cNewName(t));
