@@ -61,7 +61,7 @@ public abstract class TestGenerator {
 
     protected final SyntacticalTypeRef testTypeRef;
 
-    protected final KeYJavaType b;
+    protected final KeYJavaType booleanType;
 
     protected final KeYJavaType intType;
 
@@ -121,7 +121,7 @@ public abstract class TestGenerator {
 	// You can create a SyntacticalTypeRef for BooleanType as well if
 	// JavaInfo doesn't provide it (as it should be in a clean
 	// typesystem for JavaCard).
-	b = ji.getTypeByName("boolean");
+	booleanType = ji.getTypeByName("boolean");
 	// You can create a SyntacticalTypeRef for Integer type as well if
 	// JavaInfo doesn't provide it (as it should be in a clean
 	// typesystem for JavaCard).
@@ -615,8 +615,8 @@ public abstract class TestGenerator {
 	ib[code.length + 2] = new CopyAssignment(buffer, cons);
 
 	final ProgramVariable result = new LocationVariable(
-	        new ProgramElementName(RESULT_NAME), b);
-	ib[code.length + 3] = new LocalVariableDeclaration(new TypeRef(b),
+	        new ProgramElementName(RESULT_NAME), booleanType);
+	ib[code.length + 3] = new LocalVariableDeclaration(new TypeRef(booleanType),
 	        new VariableSpecification(result));
 	final MethodReference oracle = getOracle(post, buffer, children);
 	ib[code.length + 4] = new CopyAssignment(result, oracle);
@@ -744,7 +744,7 @@ public abstract class TestGenerator {
 		        new IntLiteral(0),
 		        new TypeRef(element.getKeYJavaType())), element
 		        .getKeYJavaType());
-	    } else if (element.getKeYJavaType().getSort() == b.getSort()) {
+	    } else if (element.getKeYJavaType().getSort() == booleanType.getSort()) {
 		varSpec = new VariableSpecification(element,
 		        BooleanLiteral.TRUE, element.getKeYJavaType());
 	    } else {
@@ -1010,7 +1010,7 @@ public abstract class TestGenerator {
 	final Statement[] mBody = buildMethodBodyFromFormula(post, buffer,
 	        children);
 	final MethodDeclaration md = buildMethodDeclaration(mBody, new TypeRef(
-	        b), "subformula", params);
+	        booleanType), "subformula", params);
 	children.add(md);
 	final MethodReference mr = new MethodReference(args,
 	        new ProgramElementName(md.getName()), testTypeRef);
@@ -1025,8 +1025,8 @@ public abstract class TestGenerator {
 	    final SyntacticalProgramVariable buffer, final ExtList children) {
 	final Statement[] s = new Statement[4];
 	final ProgramVariable result = new LocationVariable(
-	        new ProgramElementName(RESULT_NAME), b);
-	s[0] = new LocalVariableDeclaration(new TypeRef(b),
+	        new ProgramElementName(RESULT_NAME), booleanType);
+	s[0] = new LocalVariableDeclaration(new TypeRef(booleanType),
 	        new VariableSpecification(result));
 	final Expression f = translateFormula(post, buffer, children);
 	s[1] = new CopyAssignment(result, f);
@@ -1241,14 +1241,14 @@ public abstract class TestGenerator {
 	    throw new NotTranslatableException("quantified Term " + t);
 	}
 	final ProgramVariable result = new LocationVariable(
-	        new ProgramElementName("subFormResult"), b);// The name used
+	        new ProgramElementName("subFormResult"), booleanType);// The name used
 	// to
 	// be "result"
 	// causing a
 	// clash with the program variable
 	// representing JMLs "\result"
-	body[0] = new LocalVariableDeclaration(new TypeRef(b),
-	        new VariableSpecification(result, resInit, b.getJavaType()));
+	body[0] = new LocalVariableDeclaration(new TypeRef(booleanType),
+	        new VariableSpecification(result, resInit, booleanType.getJavaType()));
 	final KeYJavaType lvType = intType;
 	final ProgramVariable pv = new LocationVariable(new ProgramElementName(
 	        "_" + lv.name() + (TestGenFac.counter++)), lvType);
@@ -1298,7 +1298,7 @@ public abstract class TestGenerator {
 	final LinkedList<ParameterDeclaration> params = getParameterDeclarations(args);
 
 	final MethodDeclaration md = buildMethodDeclaration(body,
-	        new TypeRef(b), "quantifierTerm", params);
+	        new TypeRef(booleanType), "quantifierTerm", params);
 	children.add(md);
 	return new MethodReference(args, new ProgramElementName(md.getName()),
 	        testTypeRef);

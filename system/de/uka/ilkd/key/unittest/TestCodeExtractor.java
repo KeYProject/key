@@ -294,8 +294,9 @@ public class TestCodeExtractor {
 	Term currLoc;
 	for (int i = 0; i < uop.locationCount(); i++) {
 	    currLoc = uop.location(t, i);
+	    //Design problem: Results computed by NRFLHandler are not handled by AssignmentGenerator
 	    if (currLoc.op() instanceof NonRigidFunctionLocation) {
-		result = result.append(nrflHan.getWriteRep(currLoc));
+		result = result.append(nrflHan.getWriteRep(currLoc, uop.value(t, i)));
 	    } else {
 		Expression l, r;
 		l = convertToProgramElement(currLoc);

@@ -42,7 +42,7 @@ public class TermRepHandler {
 
     private TestCodeExtractor tce;
 
-    private HashMap<NRFLIdentifier, AbstractTermRepresentation> store = new HashMap<NRFLIdentifier, AbstractTermRepresentation>();
+    private HashMap<Term, AbstractTermRepresentation> store = new HashMap<Term, AbstractTermRepresentation>();
 
     public TermRepHandler(Services serv, TestCodeExtractor tce) {
         this.serv = serv;
@@ -56,21 +56,21 @@ public class TermRepHandler {
      * @param ass
      */
     public void add(AssignmentPair ass) {
-        Term currOp;
-        currOp = ass.locationAsTerm();
-        assert currOp.op() instanceof NonRigidFunctionLocation : "add(AssignmentPair ass) failed "
-                + currOp.op() + " is no NRFl";
-        switch (currOp.arity()) {
+        Term currLocTerm;
+        currLocTerm = ass.locationAsTerm();
+        assert currLocTerm.op() instanceof NonRigidFunctionLocation : "add(AssignmentPair ass) failed "
+                + currLocTerm.op() + " is no NRFl";
+        switch (currLocTerm.arity()) {
         case 0:
-            store.put(new NRFLIdentifier(currOp), new SimpleTermRep(ass, serv,
+            store.put(currLocTerm, new SimpleTermRep(ass, serv,
                     tce, this));
             break;
         case 1:
-            store.put(new NRFLIdentifier(currOp), new AttributeTermRep(ass,
+            store.put(currLocTerm, new AttributeTermRep(ass,
                     serv, tce, this));
             break;
         case 2:
-            store.put(new NRFLIdentifier(currOp), new ArrayTermRep(ass, serv,
+            store.put(currLocTerm, new ArrayTermRep(ass, serv,
                     tce, this));
             break;
         default:
@@ -91,15 +91,16 @@ public class TermRepHandler {
 
     /**
      * Returns the Write Representation for a given NRFL
-     * 
+     * @param right TODO
      * @param op
      *            the NRFL
+     * 
      * @return the Write Representation
      */
-    public Statement getWriteRep(Term t) {
-        assert t.op() instanceof NonRigidFunctionLocation : "Operator " + t.op()
-                + "is not a NonRigidFunctionLocation but" + t.op().getClass();
-        return store.get(new NRFLIdentifier(t)).getWriteRep();
+    public Statement getWriteRep(Term left, Term right) {
+        assert left.op() instanceof NonRigidFunctionLocation : "Operator " + left.op()
+                + "is not a NonRigidFunctionLocation but" + left.op().getClass();
+        return store.get(left).getWriteRep(right);
     }
 
     /**
@@ -112,8 +113,8 @@ public class TermRepHandler {
     public Term getReadRep(Term t) {
         assert t.op() instanceof NonRigidFunctionLocation : "Operator " + t.op()
                 + "is not a NonRigidFunctionLocation but" + t.op().getClass();
-        System.out.println("getReadRep for "+t);
-        return store.get(new NRFLIdentifier(t)).getReadRep();
+        AbstractTermRepresentation atr = store.get(t);
+        return atr.getReadRep();
     }
 
 }
