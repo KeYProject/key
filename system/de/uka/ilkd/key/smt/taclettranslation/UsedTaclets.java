@@ -33,11 +33,13 @@ final class UsedTaclets {
      * listed in <code>contains</code> are used (should be the normal
      * case).
      */
-    static final private String testTaclets[] =null;/* {""
+    static final private String testTaclets[] = {/*""
+						   //  ,"boolean_equal_2"
 						     ,"disjoint_repositories"
 						     ,"castDel"
 						     ,"identical_object_equal_index"
-						   };*/
+						    // ,"all_integer_sorts_are_equals"*/
+						   };
 
     /**
      * Checks whether a taclet specified by its name can be used for external
@@ -160,6 +162,11 @@ final class UsedTaclets {
 	    
 	    usedTaclets.add("disjoint_repositories");
 	    usedTaclets.add("identical_object_equal_index");
+	    usedTaclets.add("boolean_is_no_int");
+	    usedTaclets.add("int_is_no_boolean");
+	    //usedTaclets.add("all_integer_sorts_are_equals");
+	    
+	    
 	    
 //	      usedTaclets.add("only_created_object_are_referenced");
 //	      usedTaclets.add("only_created_object_are_referenced_non_null");
@@ -203,7 +210,7 @@ final class UsedTaclets {
 	}
 
 	boolean found = false;
-	if(testTaclets == null){found = true;}
+	if(testTaclets == null || testTaclets.length==0){found = true;}
 	for(int i=0; i < (testTaclets == null ? 0 : testTaclets.length); i++){
 	    if(testTaclets[i].equals(tacletname)){found = true;}
 	}

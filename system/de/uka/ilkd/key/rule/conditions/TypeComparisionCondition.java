@@ -125,5 +125,22 @@ public class TypeComparisionCondition extends VariableConditionAdapter {
 	    return "invalid type copmparision mode";         	    
 	}
     }
+    
+    /**
+     * @return returns the mode of the condition.
+     */
+    public int getMode() {return mode;}
+    
+    /**
+     * @return returns the first resolver of the condition, 
+     * i.d. the first resolver set by the constructor.
+     */
+    public TypeResolver getFirstResolver() {return fst;}
+    /**
+     * @return returns the second resolver of the condition, 
+     * i.d. the second resolver set by the constructor.
+     */
+    public TypeResolver getSecondResolver() {return snd;}
+    
 
 }

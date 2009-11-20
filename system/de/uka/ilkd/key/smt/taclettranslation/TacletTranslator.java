@@ -31,7 +31,7 @@ public interface TacletTranslator {
      * @return formula which expresses the meaning of the taclet.
      * @throw IllegalTacletException if the taclet is not translatable.
      */
-    public Term translate(Taclet t, ImmutableSet<Sort> sortsForGeneric) throws IllegalTacletException;
+    public TacletFormula translate(Taclet t, ImmutableSet<Sort> sortsForGeneric) throws IllegalTacletException;
     
     /**
      * Adds a <code>TranslationListener</code> to the list of listener. For events that are called see <code>TranslationListener</code>.

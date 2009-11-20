@@ -124,21 +124,19 @@ public final class DefaultTacletSetTranslation
 		        "The taclet does not have the right heuristic."));
 		continue;
 	    }
+	    int i=0;
 	    for (TacletTranslator translator : translators) {
-		try { // check for the right translator // TODO: check this part of code!
-
-		    Term term = translator.translate(t,sorts);
-		
-		    translation = translation.append(new DefaultTacletFormula(
-			    t, term, ""));
+		try { // check for the right translator 
+		    translation = translation.append(translator.translate(t,sorts));
 		    break; // translate only once a time.
 		} catch (IllegalTacletException e) {
-
-		    notTranslated = notTranslated
+		    if(i == translators.size()-1){
+			   notTranslated = notTranslated
 			    .append(new DefaultTacletFormula(t, null, e
 			            .getMessage()));
-
+		    }
 		}
+		i++;
 	    }
 	}
 

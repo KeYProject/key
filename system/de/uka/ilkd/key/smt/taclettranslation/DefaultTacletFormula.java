@@ -8,14 +8,28 @@ class DefaultTacletFormula implements TacletFormula {
     Taclet taclet;
     Term   formula;
     String status;
+    TacletConditions conditions;
     
         
-    public DefaultTacletFormula(Taclet taclet, Term formula, String status) {
+    public TacletConditions getConditions() {
+        return conditions;
+    }
+    
+    public DefaultTacletFormula(Taclet taclet, Term formula,
+	    			String status){
+	this(taclet,formula,status,new TacletConditions(taclet));
+    }
+
+    public DefaultTacletFormula(Taclet taclet, Term formula,
+	    String status, TacletConditions conditions) {
 	super();
 	this.taclet = taclet;
 	this.formula = formula;
 	this.status = status;
-    }
+	this.conditions = 
+	    conditions == null ? new TacletConditions(taclet):conditions;
+	    
+    	}
 
     public Term getFormula() {
 	return formula;
@@ -28,5 +42,7 @@ class DefaultTacletFormula implements TacletFormula {
     public String getStatus() {
 	return status;
     }
+    
+    
 
 }

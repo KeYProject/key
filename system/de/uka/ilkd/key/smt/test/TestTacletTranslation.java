@@ -156,8 +156,9 @@ public class TestTacletTranslation extends TestTaclet {
 
 	TacletTranslator translator = new RewriteTacletTranslator();
 	ImmutableSet<Sort> emptySet = DefaultImmutableSet.nil();
-	Term term = translator.translate(t,emptySet);
+	TacletFormula tf = translator.translate(t,emptySet);
 
+	Term term = tf.getFormula();
 	String s = "all({b1:boolean}all({b2:boolean}equiv(equiv(equals(b1,TRUE),equals(b2,TRUE)),equals(b1,b2))))";
 
 	// printTerm(term,0);
@@ -185,8 +186,9 @@ public class TestTacletTranslation extends TestTaclet {
 
 	TacletTranslator translator = new RewriteTacletTranslator();
 	ImmutableSet<Sort> emptySet = DefaultImmutableSet.nil();
-	Term term = translator.translate(t,emptySet);
+	TacletFormula tf = translator.translate(t,emptySet);
 
+	Term term = tf.getFormula();
 	String s = "all({br:boolean}imp(not(equals(br,FALSE)),equals(br,TRUE)))";
 
 	Assert.assertTrue("\n\nReference: " + s + "\nHypothese: "

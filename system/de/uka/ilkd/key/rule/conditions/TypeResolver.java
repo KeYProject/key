@@ -69,6 +69,8 @@ public abstract class TypeResolver {
         public String toString() {
             return gs.toString();
         }
+        
+        public GenericSort getGenericSort() {return gs;}
     }
     public static class ElementTypeResolverForSV extends TypeResolver {
 

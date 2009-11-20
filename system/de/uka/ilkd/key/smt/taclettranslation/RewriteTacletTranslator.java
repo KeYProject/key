@@ -36,7 +36,7 @@ public class RewriteTacletTranslator extends AbstractTacletTranslator {
     private static final Term STD_REPLACE = TermBuilder.DF.ff(),
 	    STD_ADD = TermBuilder.DF.ff(), STD_ASSUM = TermBuilder.DF.ff(),
 	    STD_FIND = TermBuilder.DF.ff();
-    private ImmutableSet<GenericSort> usedGenericSorts = DefaultImmutableSet.nil();
+   
 
     public RewriteTacletTranslator() {
 
@@ -102,10 +102,10 @@ public class RewriteTacletTranslator extends AbstractTacletTranslator {
     /**
      * Translates a RewriteTaclet to a formula.
      */
-    public Term translate(Taclet t, ImmutableSet<Sort> sorts)
+    public Term translateTaclet(Taclet t, ImmutableSet<Sort> sorts)
     	throws IllegalTacletException {
-	check(t);
 	
+
 	
 
 	usedVariables = new HashMap<String, LogicVariable>();
@@ -140,208 +140,20 @@ public class RewriteTacletTranslator extends AbstractTacletTranslator {
 	    }
 	}
 
-	Term term;
-	term = tb.imp(tb.and(list), assum);
-
-	// Rebuild the term to exchange schema variables with logic varibales.
+	//Term term;
+	//term = 
 	
-	usedGenericSorts = DefaultImmutableSet.nil();
-	term = rebuildTerm(term);
-	
-	
-	
-	Term genericTerm = instantiateGeneric(term, usedGenericSorts, sorts, t);
-	
-	term = genericTerm==null ? quantifyTerm(term) : genericTerm; 
-	
-
-	
+	return tb.imp(tb.and(list), assum);
 
 
-
-
-	return term;
 
     }
-    
-    //TODO: !!!Find a better way to implement this method!!!!
-    //TODO: Introduce a general method for testing the variable conditions.
-    private boolean hasNotTheSameCondtion(Iterator<VariableCondition> it,
-	    GenericSort [] gs){
-	while(it.hasNext()){
-	    VariableCondition vc = it.next();
-	    
-	    if(vc instanceof TypeComparisionCondition){
-		TypeComparisionCondition t1  = ((TypeComparisionCondition)vc);
-		 
-		 
-		
-		TypeComparisionCondition t2 = new TypeComparisionCondition(
-			TypeResolver.createGenericSortResolver(gs[1]),
-			TypeResolver.createGenericSortResolver(gs[0]),
-			TypeComparisionCondition.NOT_SAME);
-		
-		TypeComparisionCondition t3 = new TypeComparisionCondition(
-			TypeResolver.createGenericSortResolver(gs[0]),
-			TypeResolver.createGenericSortResolver(gs[1]),
-			TypeComparisionCondition.NOT_SAME);
-		
-		
-		
-		if(t1.toString().equals(t3.toString())) return true;
-		if(t1.toString().equals(t2.toString())) return true;
-		
-	
-		
-	    }
-	}
-	return false;
-    }
-    
-    /**
-     * Tests sort of its instantiation ability.
-     * @param sort sort to be tested.
-     * @return <code>true</code> if can be instantiated,
-     *  otherwise <code>false</code>
-     */
-    private boolean doInstantiation(Sort sort){
-	return !((sort instanceof GenericSort) || (sort.equals(Sort.ANY)));
-    }
+
+   
     
 
-    /**
-     * Instantiates generic variables of the term. 
-     * It instantiates the variables using
-     * all possibilities. This method supports two different 
-     * generic variables and the following variable conditions:
-     * - \not\same(G,H)
-     * @param term the term to be instantiated.
-     * @param genericSorts the generic sorts that should be replaced.
-     * @param sorts the instantiations
-     * @param t the current taclet, that is being translated.
-     * @return returns a new term, where all generic variables
-     * are instantiated.
-     * @throws IllegalTacletException
-     */
-    private Term instantiateGeneric(Term term, 
-	    ImmutableSet<GenericSort> genericSorts, ImmutableSet<Sort> sorts, Taclet t) 
-	    throws IllegalTacletException{
-	if(genericSorts.size() == 0){return null;}
-	if(usedGenericSorts.size() > 2){
-	    throw new 
-	    IllegalTacletException("Can not translate taclets with " +
-	    		"more than two generic sorts.");}
-	
-	ImmutableList<Term> genericTerms = ImmutableSLList.nil();
-	
-	GenericSort gs [] = new GenericSort[2];
-	int i=0;
-	for(GenericSort sort : genericSorts){
-	    gs[i]= sort;
-	    i++;
-	}
-
-	// instantiate the first generic variable
-	for(Sort sort1 : sorts){
-	    if(!doInstantiation(sort1)){continue;}
-	  
-	    Term temp = instantiateGeneric(term, gs[0], sort1);
-
-	    if(temp == null){continue;}
-	    
-	    //instantiate the second generic variable
-	    if(genericSorts.size() == 2){
-		int instCount =0;
-		
-		for(Sort sort2 : sorts){
-
-		   if(!(hasNotTheSameCondtion(t.getVariableConditions(),gs) && 
-			   sort1.equals(sort2)) && 
-			   doInstantiation(sort2)){
-	
-		            Term temp2 = instantiateGeneric(temp,gs[1],sort2);
-		       	    if(temp2 !=null){
-		       		instCount++;
-		       		genericTerms = genericTerms.append(temp2);
-		       	    }
-		       	 
-			} 
-		    
-		}
-		if(instCount == 0){
-		    throw new 
-		    IllegalTacletException("Can not instantiate generic variables" +
-			" because there are not enough different sorts.");
-		}
-	
-	    }else{
-		genericTerms = genericTerms.append(temp);
-	    }
-	    
-	 
-	}
-	
-	if(genericTerms.size() == 0){
-		throw new 
-		IllegalTacletException("Can not instantiate generic variables" +
-		" because there are not enough different sorts.");
-	} 
-	
-
-	// quantify the term
-	ImmutableList<Term> genericTermsQuantified = ImmutableSLList.nil();
-	if(genericTerms.size() > 0){
-	     for(Term gt : genericTerms){
-		genericTermsQuantified = genericTermsQuantified.append(quantifyTerm(gt)); 
-		
-	    }
-	    term = TermBuilder.DF.and(genericTermsQuantified);
-	    
-	}
-	return term;
-    }
-    
-    
-    /**
-     * Quantifies a term, i.d. every free variable is bounded by a allquantor. 
-     * @param term the term to be quantify.
-     * @return the quantified term.
-     */
-    private Term quantifyTerm(Term term){
-	TermBuilder tb = TermBuilder.DF;
-	// Quantify over all free variables.
-	for (QuantifiableVariable qv : term.freeVars()) {
-	  // if(!term.sort().equals(Sort.FORMULA)){
-	    term = tb.all(qv, term);
-	  // }
-	}
-	return term;
-    }
-
-    @Override
-    protected Term changeTerm(Term term) {
-	
-	
-	TermBuilder tb = TermBuilder.DF;
 
 
-		
-	if(term.op() instanceof SortedSchemaVariable) {
-	    if(term.sort().equals(Sort.FORMULA)){
-		
-	//	term = tb.var(getLogicVariable(term.op().name(),Sort.FORMULA));
-		//term = tb.var(getLogicVariable(term.op().name(),term.sort()));
-	    }else{
-		
-		term = tb.var(getLogicVariable(term.op().name(), term.sort()));
-	    }
-	    
-	}
-	if(term.sort() instanceof GenericSort){
-	    usedGenericSorts  = usedGenericSorts.add((GenericSort) term.sort());   
-	}
-	return term;
-    }
 
     @Override
     public void checkGoalTemplate(TacletGoalTemplate template)
@@ -362,7 +174,8 @@ public class RewriteTacletTranslator extends AbstractTacletTranslator {
      * @throws IllegalTacletException
      *             if the taclet can not be translated.
      */
-    private void check(Taclet t) throws IllegalTacletException {
+    @Override
+    protected void check(Taclet t) throws IllegalTacletException {
 	if (!(t instanceof RewriteTaclet)) {
 	    throw new IllegalTacletException("Not a instance of "
 		    + RewriteTaclet.class.getName());
