@@ -392,14 +392,12 @@ public class AccessMethodsManager {
 	private StringBuffer newInstance(final String sort) {
 	    final StringBuffer r = new StringBuffer();
 	    r.append("\n");
-	    r.append("  public static " + sort + " new" + clean(sort)
-		    + "() throws java.lang.RuntimeException {\n");
-	    r.append("  try{");
-	    r.append("      return (" + sort + ")newInstance(" + sort
-		    + ".class);\n");
-	    r.append("  } catch (java.lang.Throwable e) {");
-	    r.append("      throw new java.lang.RuntimeException(e);");
-	    r.append("  }");
+	    r.append("  public static " + sort + " new" + clean(sort)   + "() throws java.lang.RuntimeException {\n");
+	    r.append("    try{\n");
+	    r.append("      return (" + sort + ")newInstance(" + sort  + ".class);\n");
+	    r.append("    } catch (java.lang.Throwable e) {\n");
+	    r.append("       throw new java.lang.RuntimeException(e);\n");
+	    r.append("    }\n");
 	    r.append("  }\n");
 	    return r;
 	}
@@ -450,8 +448,7 @@ public class AccessMethodsManager {
 		    + "(Class<?> c, Object obj, String attr, " + sort
 		    + " val) throws RuntimeException{\n");
 	    r.append("    try {\n");
-	    r
-		    .append("      java.lang.reflect.Field f = c.getDeclaredField(attr);\n");
+	    r.append("      java.lang.reflect.Field f = c.getDeclaredField(attr);\n");
 	    r.append("      f.setAccessible(true);\n");
 	    r.append(cmd);
 	    r.append("    } catch(Exception e) {\n");
@@ -468,16 +465,14 @@ public class AccessMethodsManager {
 		    + Character.toUpperCase(sort.charAt(0)) + sort.substring(1)
 		    + "(obj);\n" : "      return (" + sort + ") f.get(obj);\n");
 	    r.append("\n");
-	    r
-		    .append("  public static "
+	    r.append("  public static "
 		            + sort
 		            + " _get_"
 		            + clean(sort)
 		            + "(Class<?> c, Object obj, String attr) throws RuntimeException{\n");
 	    r.append("    " + sort + " res = " + def + ";\n");
 	    r.append("    try {\n");
-	    r
-		    .append("      java.lang.reflect.Field f = c.getDeclaredField(attr);\n");
+	    r.append("      java.lang.reflect.Field f = c.getDeclaredField(attr);\n");
 	    r.append("      f.setAccessible(true);\n");
 	    r.append(cmd);
 	    r.append("    } catch(Exception e) {\n");

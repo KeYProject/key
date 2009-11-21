@@ -761,7 +761,7 @@ public class SimplifyTranslation {
 	    Operator op = t.op();
 	    if (!lightWeight || !(op instanceof Modality)
 		    && !(op instanceof IUpdateOperator)
-		    //&& !(op instanceof IfThenElse) gladisch:14.11.2009 
+		    //&& !(op instanceof IfThenElse) //gladisch:14.11.2009 
 		    && op != Op.ALL
 		    && op != Op.EX) {
 		hb.append(pretranslate(t, new Vector<QuantifiableVariable>()));

@@ -130,6 +130,9 @@ public class OldSimplifyModelGenerator extends DecProdModelGenerator {
 	if (counterEx.indexOf("Counterexample") == -1
 		|| models.size() >= getModelLimit()
 		|| terminateAsSoonAsPossible) {
+	    if(terminateAsSoonAsPossible){
+		System.out.println("Termianted");
+	    }
 	    return models;
 	}
 	counterEx = counterEx.replaceAll("_ ", "_");
@@ -222,8 +225,9 @@ public class OldSimplifyModelGenerator extends DecProdModelGenerator {
         	    //Note, only one iteration is considered of the following loop (because of i<1)
         	    //This is to prevent enumeration of permutations of "<=" constraints when the method is called recursively
         	    for (int i = 0; i < leqs.length && i < 1; i++) {
-        		for (int j = 0; j < datCount*2; j += 2) {
-        		    c.add(lessEqToEq(leqs[i], genericTestValues[j]));
+        		for (int j = 0; j < datCount*2 && j < genericTestValues.length; j += 2) {
+        		    c.add(lessEqToEq(leqs[i], 
+        			    genericTestValues[j]));
         		    createModelsHelp_ProgressNotificationX(POS[2], datCount, 
         			    recDepth, "lessEqToEq("+genericTestValues[j]+", "+leqs[i]+" ) ");
         		    models.addAll(createModelsHelp(simplify(c), model.copy(), datCount, recDepth+1));
@@ -239,7 +243,7 @@ public class OldSimplifyModelGenerator extends DecProdModelGenerator {
                 	    //Note, only one iteration is considered of the following loop (because of i<1)
                 	    //This is to prevent enumeration of permutations of "<=" constraints when the method is called recursively
                 	    for (int i = 0; i < les.length && i < 1; i++) {
-                		for (int j = 2; j < 2 + datCount*2; j += 2) {
+                		for (int j = 2; j < 2 + datCount*2 && j < genericTestValues.length; j += 2) {
                 		    c.add(lessToEq(les[i], genericTestValues[j]));
                 		    createModelsHelp_ProgressNotificationX(POS[3], datCount,
                 			    recDepth, "lessToEq("+genericTestValues[j]+", "+les[i]+")");

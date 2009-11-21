@@ -64,6 +64,10 @@ public class DecisionProcedureSimplify {
 	in.close();
 
 	file.delete();
+	
+	if(response.indexOf("ReadError")!=-1){
+	    throw new RuntimeException("Simplify outputs:"+response+" \nThe input to simplify was:"+input);
+	}
 
 	return response;
     }
