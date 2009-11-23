@@ -102,7 +102,6 @@ public class VBTStrategy extends JavaCardDLStrategy {
             
             clearRuleSetBindings (rsd, "simplify_prog_subset" );
             bindRuleSet (rsd, "simplify_prog_subset",10000);
-            System.out.println("VBTStrategy(0)");
         }else if(mode==1){
             boolean vbt_sym_ex = strategyProperties.getProperty(
                     			StrategyProperties.VBT_PHASE).
@@ -114,7 +113,7 @@ public class VBTStrategy extends JavaCardDLStrategy {
 					StrategyProperties.VBT_PHASE).
 					equals(StrategyProperties.VBT_MODEL_GEN);
 
-            System.out.println("VBTStrategy(1) sym_ex:"+vbt_sym_ex+" quan_inst:"+vbt_quan_inst+" model_gen:"+vbt_model_gen);
+            //System.out.println("VBTStrategy(1) sym_ex:"+vbt_sym_ex+" quan_inst:"+vbt_quan_inst+" model_gen:"+vbt_model_gen);
 
             clearRuleSetBindings (rsd, "test_gen_empty_modality_hide" );
             bindRuleSet (rsd, "test_gen_empty_modality_hide", inftyConst());
@@ -170,7 +169,6 @@ public class VBTStrategy extends JavaCardDLStrategy {
 //                bindRuleSet (rsd, "beta", -1000);
 //            }
         }
-        System.out.println("blaasdfkjalsdf");
     }
     
 

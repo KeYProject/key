@@ -157,12 +157,15 @@ public class OldSimplifyModelGenerator extends DecProdModelGenerator {
 	removeNegativeArrayIndices(c);
 	Equation[] eqs = c.getEquations();
 	if (eqs.length == c.arity()) {
+	    Vector<Equation> nonConcreteEquations = new Vector<Equation>(eqs.length);
 	    for (int i = 0; i < eqs.length; i++) {
 		de.uka.ilkd.key.unittest.simplify.ast.Term ft = eqs[i].sub(0);
 		EquivalenceClass ec = getEqvClass(ft);
 		if (ec != null && ec.getLocations().size() > 0
 			&& eqs[i].sub(1) instanceof NumberTerm) {
 		    model.setValue(ec, ((NumberTerm) eqs[i].sub(1)).getValue());
+		}else{
+		    nonConcreteEquations.add(eqs[i]);
 		}
 	    }
 	    if (model.size() == intClasses.size()) {
@@ -171,12 +174,13 @@ public class OldSimplifyModelGenerator extends DecProdModelGenerator {
 	    } else {
 		//The condition i<1 prevents that PERMUTATIONS of equations are enumerated.
 		//Enumeration of equations is done via recursive calls of this method.
-		for (int i = 0; i < eqs.length && i < 1; i++) {
+		//for (int i = 0; i < eqs.length && i < 1; i++) {
+		for(Equation eq: nonConcreteEquations){
 		    // set a subterm to an arbitrary value an test if
 		    // the system of equations has a unique solution now.
 		    for (int j = 0; j < datCount; j++) {
-			Equation e = createEquationForSubTerm(eqs[i],
-				-genericTestValues[j]);
+			Equation e = createEquationForSubTerm(eq, //eqs[i],
+				genericTestValues[j]);
 			if (e != null) {
 			    c.add(e);
 			    createModelsHelp_ProgressNotificationX(POS[1], datCount, 

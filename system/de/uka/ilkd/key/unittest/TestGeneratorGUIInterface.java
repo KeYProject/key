@@ -25,31 +25,20 @@ import de.uka.ilkd.key.util.ProgressMonitor;
  * of this class.
  * @author gladisch
  */
-public abstract class TestGeneratorGUIInterface extends TestGenerator {
+public  class TestGeneratorGUIInterface  {
 
     protected TestGenerationDialog dialog;
     
-    protected TestGeneratorGUIInterface(Services serv, String fileName,
-            String directory, boolean testing, AssignmentGenerator ag) {
-	super(serv, fileName, directory, testing, ag);
-    }
     
     public void setMethodSelectionDialog(TestGenerationDialog dialog){
 	this.dialog = dialog; 
     }
     
     /** Warning. Background threads and ModelGenerator.modelGenerationTimeout are used internally*/
-    synchronized public String  generateTestSuite(final Statement[] code, Term oracle,
-	    final List<ModelGenerator> mgs,
-	    ImmutableSet<ProgramVariable> programVars, final String methodName,
-	    final PackageReference pr,
-	    final int timeout) {
+    synchronized void generateTestSuite_progressNotification0(final int totalCount) {
 	if(Main.isVisibleMode()||Main.testStandalone){
-	    Main.getInstance().getProverTaskListener().taskStarted("Generating tests", mgs.size());
+	    Main.getInstance().getProverTaskListener().taskStarted("Generating tests", totalCount);
 	}
-	String file = super.generateTestSuite(code, oracle, mgs, programVars, methodName, pr);
-	//Main.getInstance().getProverTaskListener().taskFinished(new TaskFinishedInfo());
-	return file;
     }
     
     /**When generateTestSuite() is executed on a separate thread, then this notification method

@@ -4,6 +4,7 @@ import java.io.*;
 import java.util.*;
 
 import de.uka.ilkd.key.collection.*;
+import de.uka.ilkd.key.gui.Main;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.ArrayType;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -29,6 +30,7 @@ import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.ArraySort;
 import de.uka.ilkd.key.logic.sort.ArraySortImpl;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.ProofSaver;
 import de.uka.ilkd.key.rule.UpdateSimplifier;
 import de.uka.ilkd.key.rule.soundness.TermProgramVariableCollector;
@@ -75,6 +77,8 @@ public abstract class TestGenerator {
 
     /** Seconds to wait for modelGeneration for each node. -1 = infinitely.  */
     public static volatile int modelCreationTimeout=100;
+    
+    public final TestGeneratorGUIInterface gui;
 
     /**
      * creates a TestGenerator instance for the given compilation unit
@@ -90,11 +94,12 @@ public abstract class TestGenerator {
      *            from the runTest regression testing script.
      * @param ag
      *            the AssignmentGenerator to use.
+     * @param gui is allowed to be null. Otherwise the gui interface is used to display test generation progress to the user.
      */
     @SuppressWarnings("unchecked")
     protected TestGenerator(final Services serv, final String fileName,
 	    final String directory, final boolean testing,
-	    final AssignmentGenerator ag) {
+	    final AssignmentGenerator ag, final TestGeneratorGUIInterface gui) {
 	this.serv = serv;
 	this.fileName = fileName;
 	if (directory != null) {
@@ -126,9 +131,10 @@ public abstract class TestGenerator {
 	// JavaInfo doesn't provide it (as it should be in a clean
 	// typesystem for JavaCard).
 	intType = ji.getTypeByName("int");
-
+	
+	this.gui = gui;
     }
-
+    
     /**
      * Generates the testcase and writes it to a file. 
      * It uses background threads that access the field TestGenerator.modelCreationTimeout.
@@ -170,21 +176,29 @@ public abstract class TestGenerator {
 	final Vector<MethodDeclaration> testMethods = new Vector<MethodDeclaration>();
 	int count=0;
 	int totalCount= mgs.size();
-	
+	generateTestSuite_progressNotification0(totalCount);
 	while(mgs.size()>0){//for (final ModelGenerator mg : mgs) {  
 	    ModelGenerator mg = mgs.get(0); //modelGenerators are removed from the list (and hopefully destroyed) in order to save memory.
 	    Model[] models=null;
 	    MethodDeclaration methDec=null;
 	    count++;
 	    try{
-        	    //Model generation. The threads implement a timeout-feature for model generation.
-        	    ModelGeneratorRunnable modelGeneration = new ModelGeneratorRunnable(mg);
+		    
         	    generateTestSuite_progressNotification1(count,totalCount,mg);
-        	    models = modelGeneration.createModels();
+        	    ModelGeneratorRunnable modelGeneration=null;
+		    if(!testing){
+			//Model generation. The threads implement a timeout-feature for model generation.
+			modelGeneration = new ModelGeneratorRunnable(mg);
+	        	models = modelGeneration.createModels(); 
+		    }else{ 
+			//The following call does not run another thread
+			models = mg.createModels();
+		    }
         	    
         	    //Read model
         	    final boolean createModelsFailed = models==null || (models.length == 0);// && mgs.size() != 1);//
-        	    generateTestSuite_progressNotification2(count,totalCount,mg, models, !createModelsFailed, modelGeneration.wasInterrupted());
+        	    generateTestSuite_progressNotification2(count,totalCount,mg, models, !createModelsFailed, 
+        		    				(modelGeneration==null?false:modelGeneration.wasInterrupted()));
         	    if (createModelsFailed) {
         		mgs.remove(0);//This ModelGenerator has been used in this iteration and is not needed anymore
         		continue;
@@ -304,7 +318,7 @@ public abstract class TestGenerator {
 	    if(models==null && timeoutActive ){
 		mg.terminateAsSoonAsPossible();
 		modelGenThread.join(3000);//give the thread one more second before it gets terminated
-		System.out.println("Contorlled termination");
+		//System.out.println("Contorlled termination");
 		modelGenThread.stop();
 		interrupted = true;
 	    }
@@ -319,38 +333,62 @@ public abstract class TestGenerator {
     }
     
     /**When generateTestSuite() is executed on a separate thread, then this notification method
-     * is called in order to report the progress of computation to other threads. This method
-     * is overwritten by TestGeneratorGUIInterface */
-    protected void generateTestSuite_progressNotification1(
-	    int count, int totalCount, ModelGenerator refMG){return;}
+     * is called in order to report the progress of computation to other threads.  */
+    protected void generateTestSuite_progressNotification0(int totalCount){
+	if(gui!=null){
+	    gui.generateTestSuite_progressNotification0(totalCount);
+	}
+	//else System.out.println("("+count+"/"+totalCount+") Generating test for node "+refMG.originalNode.serialNr());
+    }
 
     /**When generateTestSuite() is executed on a separate thread, then this notification method
-     * is called in order to report the progress of computation to other threads. This method
-     * is overwritten by TestGeneratorGUIInterface */
+     * is called in order to report the progress of computation to other threads.  */
+    protected void generateTestSuite_progressNotification1(
+	    int count, int totalCount, ModelGenerator refMG){
+	if(gui!=null){
+	    gui.generateTestSuite_progressNotification1(count, totalCount,  refMG);
+	}
+	//else System.out.println("("+count+"/"+totalCount+") Generating test for node "+refMG.originalNode.serialNr());
+    }
+
+    /**When generateTestSuite() is executed on a separate thread, then this notification method
+     * is called in order to report the progress of computation to other threads.  */
     protected void generateTestSuite_progressNotification2(
 	    int count, int totalCount, ModelGenerator refMG, Model[] models, 
-	    boolean createModelsSuccess, boolean terminated){	return;}
+	    boolean createModelsSuccess, boolean terminated){
+	return;
+    }
 
     /**When generateTestSuite() is executed on a separate thread, then this notification method
-     * is called in order to report the progress of computation to other threads. This method
-     * is overwritten by TestGeneratorGUIInterface */
+     * is called in order to report the progress of computation to other threads.  */
     protected void generateTestSuite_progressNotification2b(
 	    int count, int totalCount, ModelGenerator refMG,EquivalenceClass ec){
-	System.err.println("No test data available for equivalence class:"+ec.toString());
+	if(gui!=null){
+	    gui.generateTestSuite_progressNotification2b(count, totalCount, refMG, ec);
 	}
+	else System.err.println("No test data available for equivalence class:"+ec.toString());
+    }
 
     /**When generateTestSuite() is executed on a separate thread, then this notification method
-     * is called in order to report the progress of computation to other threads. This method
-     * is overwritten by TestGeneratorGUIInterface */
+     * is called in order to report the progress of computation to other threads. */
     protected void generateTestSuite_progressNotification3(
-	    int count, int totalCount, ModelGenerator refMG, Model[] models, MethodDeclaration mDecl){return;}
+	    int count, int totalCount, ModelGenerator refMG, Model[] models, MethodDeclaration mDecl){
+	if(gui!=null){
+	    gui.generateTestSuite_progressNotification3(count, totalCount, refMG, models, mDecl);
+	}
+	//else System.out.println("("+count+"/"+totalCount+") Test data generated for node "+refMG.originalNode.serialNr());
+    }
 
     /**When generateTestSuite() is executed on a separate thread, then this notification method
      * is called in order to report the progress of computation to other threads. This method
      * is overwritten by TestGeneratorGUIInterface */
     protected void generateTestSuite_progressNotification4(
 	    int count, int totalCount, Exception e, ModelGenerator refMG, Model[] models, MethodDeclaration mDecl){
-	throw new RuntimeException(e);
+	if(gui!=null){
+	    generateTestSuite_progressNotification4(count, totalCount, e, refMG, models, mDecl);
+	}else{
+	    throw new RuntimeException(e);
+	}
     }
 
     /**
@@ -1514,7 +1552,8 @@ public abstract class TestGenerator {
 	}
 	return result;
     }
-
+    
+    
     public void clean(){
 	if(modelGenThread!=null){
 	    modelGenThread.stop();

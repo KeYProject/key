@@ -289,15 +289,18 @@ public class UnitTestBuilder {
 			    new StatementBlock(code), MethodFrame.class);
 		    coll.start();
 		    if (coll.getNodes().size() == 0) {
-			tg = new TestGenFac().create(serv, "Test"
-			        + tce.getFileName(), directory, testing, ag);
 
 			//There are "GUI interface" versions of the classes UnitTestBuilder and TestGenerator.
-			if(this instanceof UnitTestBuilderGUIInterface &&
-				tg instanceof TestGeneratorGUIInterface){
+			if(this instanceof UnitTestBuilderGUIInterface ){
 			    UnitTestBuilderGUIInterface thisGUI = (UnitTestBuilderGUIInterface) this;
-			    TestGeneratorGUIInterface tgGUI = (TestGeneratorGUIInterface)tg;
-			    tgGUI.setMethodSelectionDialog(thisGUI.dialog);
+				tg = new TestGenFac().create(serv, "Test"
+				        + tce.getFileName(), directory, testing, ag,
+				        new TestGeneratorGUIInterface());
+			    tg.gui.setMethodSelectionDialog(thisGUI.dialog); //A big clumsy. 
+			}else{
+				tg = new TestGenFac().create(serv, "Test"
+				        + tce.getFileName(), directory, testing, ag,
+				        null);			    
 			}
 			if (methodName == null) {
 			    methodName = tce.getMethodName();
@@ -363,11 +366,17 @@ public class UnitTestBuilder {
     
     /** called by createTestForNodes. Should be overwritten by UnitTestBuilderGUIInterface to
      * notify the user about the progress of the computation.*/
-    protected void createTestForNodes_progressNotification0(int nodeCounter, Node n){return;}
+    protected void createTestForNodes_progressNotification0(int nodeCounter, Node n){
+	//System.out.println("("+nodeCounter+") Searching for suitable trace for node "+n.serialNr());
+	return;
+    }
 
     /** called by createTestForNodes. Should be overwritten by UnitTestBuilderGUIInterface to
      * notify the user about the progress of the computation.*/
-    protected void createTestForNodes_progressNotification1(ExecutionTraceModel etm, Node pathConditionNode, Node originalNode){return;}
+    protected void createTestForNodes_progressNotification1(ExecutionTraceModel etm, Node pathConditionNode, Node originalNode){
+	//System.out.println("Selected node with path condition is "+pathConditionNode.serialNr()+" for child node "+originalNode.serialNr());
+	return;
+    }
     /** called by createTestForNodes. Should be overwritten by UnitTestBuilderGUIInterface to
      * notify the user about the progress of the computation.*/
     protected void createTestForNodes_progressNotification2(UnitTestException e){

@@ -55,22 +55,23 @@ public class TestGenFac {
 
     public TestGenerator create(final Services serv, final String fileName,
 	    final String directory, final boolean testing,
-	    final AssignmentGenerator ag) {
+	    final AssignmentGenerator ag, final TestGeneratorGUIInterface gui) {
 	assert (testGenMode == TG_JAVACARD || testGenMode == TG_JAVA) : "Unhandled case in AssignmentGenerator.";
 	if (testGenMode == TG_JAVACARD) {
 	    return new JavaCardTestGenerator(serv, fileName, directory,
-		    testing, ag);
+		    testing, ag, gui);
 	} else {
-	    return new JavaTestGenerator(serv, fileName, directory, testing, ag);
+	    return new JavaTestGenerator(serv, fileName, directory, testing, ag, gui);
 	}
     }
 
-    private class JavaCardTestGenerator extends TestGeneratorGUIInterface {
+    private class JavaCardTestGenerator extends TestGenerator {
 
 	private JavaCardTestGenerator(final Services serv,
 	        final String fileName, final String directory,
-	        final boolean testing, final AssignmentGenerator ag) {
-	    super(serv, fileName, directory, testing, ag);
+	        final boolean testing, final AssignmentGenerator ag,
+	        final TestGeneratorGUIInterface gui) {
+	    super(serv, fileName, directory, testing, ag, gui);
 	}
 
 	@Override
@@ -135,7 +136,7 @@ public class TestGenFac {
 	}
     }
 
-    private class JavaTestGenerator extends TestGeneratorGUIInterface {
+    private class JavaTestGenerator extends TestGenerator{
 
 	private static final String DONT_COPY = "aux";
 
@@ -147,8 +148,8 @@ public class TestGenFac {
 
 	private JavaTestGenerator(final Services serv, final String fileName,
 	        final String directory, final boolean testing,
-	        final AssignmentGenerator ag) {
-	    super(serv, fileName, directory, testing, ag);
+	        final AssignmentGenerator ag,final TestGeneratorGUIInterface gui) {
+	    super(serv, fileName, directory, testing, ag, gui);
 	    dontCopy = modDir + File.separator + DONT_COPY;
 	    callOracle = false;
 	    amm = AccessMethodsManager.getInstance();

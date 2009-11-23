@@ -920,7 +920,7 @@ thing. People were thinking it was a button.
             String vbtOpts = p.getProperty(StrategyProperties.VBT_PHASE);
             JRadioButton bVBTOptions = getStrategyOptionButton(vbtOpts, 
                     StrategyProperties.VBT_PHASE);
-            bVBTOptions.setSelected(true);        
+            if(bVBTOptions!=null)bVBTOptions.setSelected(true);        
          
             for (int i = 1; i <= StrategyProperties.USER_TACLETS_NUM; ++i) {
                 String userTacletsOptions =
