@@ -314,6 +314,7 @@ public class AccessMethodsManager {
 	    final HashSet<String> sorts = sortsToString();
 	    final StringWriter result = new StringWriter();
 	    result.append(classDecl());
+	    result.append(ghostMapDecls(true));
 	    result.append(instanceMethod());
 	    result.append(instances(sorts));
 	    result.append(getterAndSetter(sorts));
@@ -329,12 +330,31 @@ public class AccessMethodsManager {
 	    final StringBuffer r = new StringBuffer();
 	    r.append("\n\n");
 	    r.append("/* Example of an \"ObjectWrapper\" class. \n");
-	    r
-		    .append(" * see http://www.j2ee.me/docs/books/tutorial/reflect/member/ctorInstance.html\n");
-	    r
-		    .append(" * see http://objenesis.googlecode.com/svn/docs/tutorial.html\n");
+	    r.append(" * @see http://www.j2ee.me/docs/books/tutorial/reflect/member/ctorInstance.html\n");
+	    r.append(" * @see http://objenesis.googlecode.com/svn/docs/tutorial.html\n");
 	    r.append(" */\n");
 	    r.append("public class " + NAME_OF_CLASS + " {\n");
+	    return r;
+	}
+	
+	/** Writes a  hashmap and a utility method for associating ghost/model fiels with objects.
+	 * @param ghostMapActive becomes are runtime flag that determins if the hashmap should be enabled or not.*/
+	private StringBuffer ghostMapDecls(boolean ghostMapActive){
+	    final StringBuffer r = new StringBuffer();
+	    r.append("\n");
+	    
+	    r.append("  private static final String NoSuchFieldExceptionText =\n");
+	    r.append("  \"This exception occurs when ghost fields or model fields are used in the code or \" +\n");
+	    r.append("  \"if mock objects are used that have different fields, than the real objects. \" +\n");
+	    r.append("  \"The tester should extend the handling of such fields in this generated utility class RFL.java.\";\n\n");
+	    
+	    r.append("  public static boolean ghostMapActive = "+ghostMapActive+";\n\n");
+
+	    r.append("  public static java.util.HashMap<Integer,Object> ghostModelFields = new java.util.HashMap<Integer,Object>();\n\n");
+
+	    r.append("  public static int getHash(Class<?> c, Object obj, String attr){\n");
+	    r.append("    return c.hashCode() * (obj!=null?obj.hashCode():1) * attr.hashCode();\n");
+	    r.append("  }\n\n");
 	    return r;
 	}
 
@@ -344,16 +364,12 @@ public class AccessMethodsManager {
 	private StringBuffer instanceMethod() {
 	    final StringBuffer r = new StringBuffer();
 	    r.append("\n\n");
-	    r
-		    .append("  /** The Objenesis library can create instances of classes that have no default constructor. */\n");
-	    r
-		    .append("  private static org.objenesis.Objenesis objenesis = new org.objenesis.ObjenesisStd();\n\n");
-	    r
-		    .append("  private static Object newInstance(Class c) throws Exception {\n");
+	    r.append("  /** The Objenesis library can create instances of classes that have no default constructor. */\n");
+	    r.append("  private static org.objenesis.Objenesis objenesis = new org.objenesis.ObjenesisStd();\n\n");
+	    r.append("  private static Object newInstance(Class c) throws Exception {\n");
 	    r.append("    Object res=objenesis.newInstance(c);\n");
 	    r.append("    if (res==null)\n");
-	    r
-		    .append("      throw new Exception(\"Couldn't create instance of class:\"+c);\n");
+	    r.append("      throw new Exception(\"Couldn't create instance of class:\"+c);\n");
 	    r.append("  return res;\n");
 	    r.append("  }\n");
 	    return r;
@@ -440,9 +456,9 @@ public class AccessMethodsManager {
 
 	private StringBuffer declareSetter(final String sort, final boolean prim) {
 	    final StringBuffer r = new StringBuffer();
-	    final String cmd = (prim ? "      f.set"
-		    + Character.toUpperCase(sort.charAt(0)) + sort.substring(1)
-		    + "(obj, val);\n" : "      f.set(obj, val);\n");
+	    final String cmd = "      "+(prim ? 
+		      "f.set" + Character.toUpperCase(sort.charAt(0)) + sort.substring(1)+ "(obj, val);\n" 
+		    : "f.set(obj, val);\n");
 	    r.append("\n");
 	    r.append("  public static void _set_" + clean(sort)
 		    + "(Class<?> c, Object obj, String attr, " + sort
@@ -451,19 +467,33 @@ public class AccessMethodsManager {
 	    r.append("      java.lang.reflect.Field f = c.getDeclaredField(attr);\n");
 	    r.append("      f.setAccessible(true);\n");
 	    r.append(cmd);
+	    r.append("    } catch(NoSuchFieldException e) {\n");
+	    r.append("      if(ghostMapActive)\n");
+	    r.append("        ghostModelFields.put(getHash(c,obj,attr), val);\n");
+	    r.append("      else\n");
+	    r.append("        throw new RuntimeException(e.toString() + NoSuchFieldExceptionText);\n");
 	    r.append("    } catch(Exception e) {\n");
 	    r.append("      throw new RuntimeException(e);\n");
 	    r.append("    }\n");
 	    r.append("  }\n");
 	    return r;
 	}
+	
+	private String primToWrapClass(String sort){
+	    if(sort.equals("int"))
+		return "Integer";
+	    else if(sort.equals("char"))
+		return "Character";
+	    else
+		return Character.toUpperCase(sort.charAt(0)) + sort.substring(1);
+	}
 
 	private StringBuffer declareGetter(final String sort, final String def,
 	        final boolean prim) {
 	    final StringBuffer r = new StringBuffer();
-	    final String cmd = (prim ? "      return f.get"
-		    + Character.toUpperCase(sort.charAt(0)) + sort.substring(1)
-		    + "(obj);\n" : "      return (" + sort + ") f.get(obj);\n");
+	    final String cmd = "      "+(prim ? 
+		    "return f.get" + Character.toUpperCase(sort.charAt(0)) + sort.substring(1)+ "(obj);\n" 
+		  : "return (" + sort + ") f.get(obj);\n");
 	    r.append("\n");
 	    r.append("  public static "
 		            + sort
@@ -475,6 +505,8 @@ public class AccessMethodsManager {
 	    r.append("      java.lang.reflect.Field f = c.getDeclaredField(attr);\n");
 	    r.append("      f.setAccessible(true);\n");
 	    r.append(cmd);
+	    r.append("      } catch(NoSuchFieldException e) {\n");
+	    r.append("      return ("+ (prim? primToWrapClass(sort) : sort) +")ghostModelFields.get(getHash(c,obj,attr));\n");
 	    r.append("    } catch(Exception e) {\n");
 	    r.append("      throw new RuntimeException(e);\n");
 	    r.append("    }\n");
