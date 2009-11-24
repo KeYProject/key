@@ -918,9 +918,10 @@ thing. People were thinking it was a button.
                     StrategyProperties.STOPMODE_OPTIONS_KEY);
             bStopModeActive.setSelected(true);        
             String vbtOpts = p.getProperty(StrategyProperties.VBT_PHASE);
-            JRadioButton bVBTOptions = getStrategyOptionButton(vbtOpts, 
-                    StrategyProperties.VBT_PHASE);
-            if(bVBTOptions!=null)bVBTOptions.setSelected(true);        
+            if(Main.testMode){
+        	JRadioButton bVBTOptions = getStrategyOptionButton(vbtOpts, StrategyProperties.VBT_PHASE);
+        	bVBTOptions.setSelected(true);
+            }
          
             for (int i = 1; i <= StrategyProperties.USER_TACLETS_NUM; ++i) {
                 String userTacletsOptions =
@@ -1008,8 +1009,10 @@ thing. People were thinking it was a button.
                        goalChooserGroup.getSelection().getActionCommand());
         p.setProperty( StrategyProperties.STOPMODE_OPTIONS_KEY, 
                        stopModeGroup.getSelection().getActionCommand());
-        p.setProperty( StrategyProperties.VBT_PHASE, 
-                       vbtPhaseGroup.getSelection().getActionCommand());
+        if(Main.testMode){
+            p.setProperty( StrategyProperties.VBT_PHASE, 
+                           vbtPhaseGroup.getSelection().getActionCommand());
+        }
         
         for (int i = 1; i <= StrategyProperties.USER_TACLETS_NUM; ++i) {
             p.setProperty( StrategyProperties.USER_TACLETS_OPTIONS_KEY(i), 
