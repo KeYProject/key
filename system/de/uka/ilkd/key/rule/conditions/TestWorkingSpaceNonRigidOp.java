@@ -19,6 +19,7 @@ public class TestWorkingSpaceNonRigidOp extends VariableConditionAdapter {
     
     public boolean check(SchemaVariable var, SVSubstitute instCandidate,
             SVInstantiations instMap, Services services) {
+        if(sv1!=var) return true;
         Term ws1 = (Term) instMap.getInstantiation(sv1);
         if(ws1==null){
             return false;

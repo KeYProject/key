@@ -335,4 +335,11 @@ public class Test extends SuperTest{
 	}
     }
 
+    /*@ public normal_behavior
+      @  requires a.length>0 && \outerScope(\memoryArea(a[0]),\memoryArea(this));
+      @*/
+    public void testAssignmentArray4(Test[] a){
+	next=a[0];
+    }
+
 }

@@ -7,22 +7,20 @@
 // See LICENSE.TXT for details.
 package de.uka.ilkd.key.rule.metaconstruct;
 
+import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.IteratorOfKeYJavaType;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.abstraction.ListOfKeYJavaType;
-import de.uka.ilkd.key.java.abstraction.SLListOfKeYJavaType;
+import de.uka.ilkd.key.java.abstraction.*;
 import de.uka.ilkd.key.java.declaration.EnumClassDeclaration;
 import de.uka.ilkd.key.java.expression.literal.IntLiteral;
 import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.*;
+import de.uka.ilkd.key.proof.init.PercProfile;
+import de.uka.ilkd.key.proof.init.RTSJProfile;
 import de.uka.ilkd.key.rule.UpdateSimplifier;
-import de.uka.ilkd.key.rule.updatesimplifier.ArrayOfAssignmentPair;
-import de.uka.ilkd.key.rule.updatesimplifier.AssignmentPair;
-import de.uka.ilkd.key.rule.updatesimplifier.Update;
+import de.uka.ilkd.key.rule.updatesimplifier.*;
 import de.uka.ilkd.key.util.Debug;
 
 /**
@@ -39,6 +37,12 @@ public class InReachableStatePOBuilder extends TermBuilder {
     private final Term TRUE;
     private final Term FALSE;
     private final ProgramVariable arraylength;
+    private final boolean rtsj;
+    private final boolean perc;
+    private final TermSymbol os;
+    private final TermSymbol im;
+    private final ProgramVariable ma;
+    private final ProgramVariable stack;
 
     public InReachableStatePOBuilder(Services services) {
         uf = new UpdateFactory(services, new UpdateSimplifier());
@@ -48,9 +52,19 @@ public class InReachableStatePOBuilder extends TermBuilder {
                 services.getJavaInfo().getAttribute(
                         ImplicitFieldAdder.IMPLICIT_CREATED,
                         services.getJavaInfo().getJavaLangObject());
+        this.ma = services.getJavaInfo().getAttribute(
+                        ImplicitFieldAdder.IMPLICIT_MEMORY_AREA,
+                        services.getJavaInfo().getJavaLangObject());
+        this.stack = services.getJavaInfo().getAttribute(
+                "stack",
+                services.getJavaInfo().getJavaxRealtimeMemoryArea());
         this.arraylength = services.getJavaInfo().getArrayLength();
+        os = (TermSymbol) services.getNamespaces().functions().lookup(new Name("outerScope"));
+        im = (TermSymbol) services.getNamespaces().functions().lookup(new Name("immortal"));
         this.TRUE = TRUE(services);
         this.FALSE = FALSE(services);
+        this.perc = (ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof PercProfile);
+        this.rtsj = (ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof RTSJProfile);
     }
 
     /**
@@ -330,6 +344,83 @@ public class InReachableStatePOBuilder extends TermBuilder {
         final Term o_created = equals(dot(var(o), created), TRUE);
         return all(o, imp(o_created, update(update, o_created)));
     }
+    
+    /**
+     * Generates a formula ensuring that the update does not lead to a state in which
+     * a memory scope is allocated in one of its inner scopes
+     * The formula is:
+     *    \forall MemoryArea m; m.<created> = TRUE -> ¬ outerScope(m.stack, m.<memoryArea>.stack)
+     * @param update
+     * @return a formula that evaluates to true if no memory scope is allocated in one of its inner scopes
+     */
+    private Term scopeAllocInOuterScope(Update update){
+        final LogicVariable m =
+            new LogicVariable(new Name("m"),
+                    services.getJavaInfo().getJavaxRealtimeMemoryArea().getSort()); 
+        final Term m_created = equals(dot(var(m), created), TRUE);
+        return update(update, all(m, imp(m_created, not(func(os, dot(var(m), stack), dot(dot(var(m), ma), stack))))));
+    }
+    
+    /**
+     * 
+     * @param update
+     * @return a formula evaluating to true if each scope stack is referenced by at most one created scope.
+     */
+    private Term stackInjective(Update update){
+        final LogicVariable a =
+            new LogicVariable(new Name("a"),
+                    services.getJavaInfo().getJavaxRealtimeMemoryArea().getSort()); 
+        final LogicVariable b =
+            new LogicVariable(new Name("b"),
+                    services.getJavaInfo().getJavaxRealtimeMemoryArea().getSort());       
+        final Term a_created = equals(dot(var(a), created), TRUE);
+        final Term b_created = equals(dot(var(b), created), TRUE);
+        final Term a_stackNotNull = not(equals(dot(var(a), stack), NULL(services)));
+        final Term a_b_stack_equal = equals(dot(var(a), stack), dot(var(b), stack));
+        Term[] premise = new Term[]{a_created, b_created, a_stackNotNull, a_b_stack_equal};
+        QuantifiableVariable[] qvs = new QuantifiableVariable[]{a,b};
+        return update(update, all(qvs, imp(and(premise), equals(var(a), var(b)))));
+    }
+
+    /**
+     *  
+     * @param update
+     * @return the formula \forall Object o; o.<created> = TRUE -> o.<memoryArea>!=null 
+     */
+    private Term scopeNotNull(Update update){
+        final LogicVariable o =
+            new LogicVariable(new Name("o"),
+                    services.getJavaInfo().getJavaLangObjectAsSort());
+        final Term o_created = equals(dot(var(o), created), TRUE);
+        return update(update, all(o, imp(o_created, not(equals(dot(var(o), ma), NULL(services))))));
+    }
+    
+    /**
+     * 
+     * @param update
+     * @param attr
+     * @return the formula \forall typeof(attr) o; (o.<created>=TRUE & o.attr!=null & o!=null) ->
+     *                                              outerScope(o.attr.<memoryArea>.stack, o.<memoryArea>.stack)
+     */
+    private Term attrOuterRef(Update update, ProgramVariable attr){
+        final LogicVariable o =
+            new LogicVariable(new Name("o"),
+                    attr.getContainerType().getSort());
+        final Term o_created = equals(dot(var(o), created), TRUE);
+        final Term o_notNull = not(equals(var(o), NULL(services)));
+        final Term attr_notNull = not(equals(dot(var(o), attr), NULL(services)));
+        final Term osAttr = func(os, dot(dot(dot(var(o), attr), ma), stack), dot(dot(var(o), ma), stack));
+        return update(update, all(o, imp(and(new Term[]{o_created, o_notNull, attr_notNull}), osAttr)));
+    }
+    
+    private Term staticAttrImmortal(Update update, ProgramVariable attr){
+        final Term attr_notNull = not(equals(var(attr), NULL(services)));
+        final Term attr_created = equals(dot(var(attr), created), TRUE);
+        final Term attrImmortal = func(im, dot(dot(var(attr), ma), stack));
+        return update(update, imp(attr_notNull, and(attr_created, attrImmortal)));
+    }
+    
+    //TODO: arrayOuterRef, memoryArea only changeable if it was null in pre state
 
     /**
      * Generates a formula checking that the given static field <tt>T.sv</tt>
