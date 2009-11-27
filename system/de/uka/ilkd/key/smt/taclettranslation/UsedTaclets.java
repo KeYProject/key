@@ -33,12 +33,14 @@ final class UsedTaclets {
      * listed in <code>contains</code> are used (should be the normal
      * case).
      */
-    static final private String testTaclets[] = {/*""
-						   //  ,"boolean_equal_2"
-						     ,"disjoint_repositories"
-						     ,"castDel"
-						     ,"identical_object_equal_index"
-						    // ,"all_integer_sorts_are_equals"*/
+    static final private String testTaclets[] = {//""
+						  //   ,"boolean_equal_2"
+						   //  ,"disjoint_repositories"
+						   //  ,"castDel"
+						    //,"all_integer_sorts_are_equals"
+						     //,"exact_instance_definition_int"
+						     //, "exact_instance_definition_known"
+						   // ,"exact_instance_definition_known_false"
 						   };
 
     /**
@@ -125,33 +127,6 @@ final class UsedTaclets {
 	    usedTaclets.add("translateJavaBitwiseXOrInt");
 	    usedTaclets.add("translateJavaBitwiseXOrLong");
 
-	    // integerSimplificationRules.key
-	    
-	     // Can not be translated yet, because of \notFreeIn conditions
-	    /**
-	     * Probably not translatable because of substitution terms within these taclets.
-	     */
-//	      usedTaclets.add("bsum_split");
-	//      usedTaclets.add("bsum_induction_upper");
-//	      usedTaclets.add("bsum_commutative_associative");
-//	      usedTaclets.add("bsum_induction_upper2");
-//	      usedTaclets.add("bsum_induction_upper_concrete");
-//	      usedTaclets.add("bsum_induction_upper2_concrete");
-//	      usedTaclets.add("bsum_induction_lower");
-//	      usedTaclets.add("bsum_induction_lower_concrete");
-//	      usedTaclets.add("bsum_induction_lower2");
-//	      usedTaclets.add("bsum_induction_lower2_concrete");
-//	      usedTaclets.add("bsum_distributive");
-//	      usedTaclets.add("bsum_empty");
-//	      usedTaclets.add("bsum_one_summand");
-//	      usedTaclets.add("bsum_empty_concrete2");
-//	      usedTaclets.add("bsum_zero");
-//	      usedTaclets.add("bsum_lower_equals_upper");
-//	      usedTaclets.add("bsum_positive1");
-//	      usedTaclets.add("bsum_positive2");
-//	      usedTaclets.add("bsum_empty_concrete2");
-//	      usedTaclets.add("bsum_zero");
-//	      usedTaclets.add("bsum_lower_equals_upper");
 	     
 
 	    // genericRules.key
@@ -164,47 +139,31 @@ final class UsedTaclets {
 	    usedTaclets.add("identical_object_equal_index");
 	    usedTaclets.add("boolean_is_no_int");
 	    usedTaclets.add("int_is_no_boolean");
-	    //usedTaclets.add("all_integer_sorts_are_equals");
+	    //usedTaclets.add("all_integer_sorts_are_equals"); 
+	    
+	  //  usedTaclets.add("only_created_object_are_referenced");
+	    //usedTaclets.add("exact_instance_definition_reference"); 
+	    usedTaclets.add("exact_instance_definition_integerDomain");
+	    usedTaclets.add("exact_instance_definition_int");
+	    usedTaclets.add("exact_instance_definition_jbyte");
+	    usedTaclets.add("exact_instance_definition_jshort");
+	    usedTaclets.add("exact_instance_definition_jint");
+	    usedTaclets.add("exact_instance_definition_jlong");
+	    usedTaclets.add("exact_instance_definition_jchar");
+	    usedTaclets.add("exact_instance_definition_boolean");
+	    usedTaclets.add("exact_instance_definition_null");
+	    usedTaclets.add("exact_instance_definition_known");
+	    usedTaclets.add("exact_instance_definition_known_eq");
+	    usedTaclets.add("exact_instance_definition_known_false");
+	   
+	    
+	   
+	  
 	    
 	    
 	    
-//	      usedTaclets.add("only_created_object_are_referenced");
-//	      usedTaclets.add("only_created_object_are_referenced_non_null");
-//	     usedTaclets.add("enclosing_this_is_created");
-//	      usedTaclets.add("only_created_object_are_referenced_by_arrays");
-//	      usedTaclets
-//	      .add("only_created_object_are_referenced_by_arrays_non_null");
-//	      usedTaclets.add(
-//	      "static_fields_of_initialized_classes_are_null_or_reference_created_objects"
-//	      ); usedTaclets.add(
-//	      "static_fields_of_initialized_classes_reference_created_objects"
-//	      ); usedTaclets.add("created_to_known_index_in_bounds");
-//	      usedTaclets.add("repository_object_non_null");
-//	      usedTaclets.add("nextToCreate_non_negative");
-//	      usedTaclets.add("array_length_non_negative");
-//	      usedTaclets.add("array_length_non_negative_2");
-//	      usedTaclets.add("array_length_non_negative_3");
-//	      usedTaclets.add("identical_object_equal_index");
-//	      usedTaclets.add("disjoint_repositories");
-//	      usedTaclets.add("boolean_is_no_int");
-//	      usedTaclets.add("int_is_no_boolean");
-//	      usedTaclets.add("all_integer_sorts_are_equals");
-//	      usedTaclets.add("exact_instance_definition_reference");
-//	      usedTaclets.add("exact_instance_definition_integerDomain");
-//	      usedTaclets.add("exact_instance_definition_int");
-//	      usedTaclets.add("exact_instance_definition_jbyte");
-//	      usedTaclets.add("exact_instance_definition_jshort");
-//	      usedTaclets.add("exact_instance_definition_jint");
-//	      usedTaclets.add("exact_instance_definition_jlong");
-//	      usedTaclets.add("exact_instance_definition_jchar");
-//	      usedTaclets.add("exact_instance_definition_boolean");
-//	      usedTaclets.add("exact_instance_definition_null");
-//	      usedTaclets.add("exact_instance_definition_known");
-//	      usedTaclets.add("exact_instance_definition_known_eq");
-//	      usedTaclets.add("exact_instance_definition_known_false");
-//	      usedTaclets.add("exact_instance_definition_known_eq_false");
-//	      usedTaclets.add("exact_instance_for_interfaces_or_abstract_classes");
-//	     usedTaclets.add("array_length_short_javacard");
+	    
+
 	     
 
 	}

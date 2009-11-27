@@ -13,6 +13,7 @@ import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.TermSymbol;
+import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.parser.SchemaVariableModifierSet.VariableSV;
 import de.uka.ilkd.key.pp.LogicPrinter;
@@ -39,6 +40,12 @@ public final class DefaultTacletSetTranslation
      * Taclets can not be translated because checking the taclet failed.
      */
     private ImmutableList<TacletFormula> notTranslated = ImmutableSLList.nil();
+    
+    /**
+     * If a instantiation failure occurs the returned information is stored
+     * in a String.
+     */
+    private ImmutableList<String> instantiationFailures = ImmutableSLList.nil();
 
     /**
      * List of taclets that should be translated. The translation will be done
@@ -194,13 +201,13 @@ public final class DefaultTacletSetTranslation
         }
 
         
-        if(!usedQuantifiedVariable.isEmpty()){
+    /*    if(!usedQuantifiedVariable.isEmpty()){
             toStore += "\\functions{\n\n";
             for(QuantifiableVariable var : usedQuantifiedVariable){
         	toStore += var.sort() + " "+ var.name().toString()+";\n";  
             }
             toStore += "}\n\n\n";
-        }
+        }*/
         
         if(!usedFormulaSV.isEmpty()){
             toStore += "\\predicates{\n\n";
@@ -211,23 +218,7 @@ public final class DefaultTacletSetTranslation
         }
         
      
-        
-        if(!usedQuantifiedVariable.isEmpty()){
-            toStore += "\\functions{\n\n";
-            for(QuantifiableVariable var : usedQuantifiedVariable){
-        	toStore += var.sort() + " "+ var.name().toString()+";\n";  
-            }
-            toStore += "}\n\n\n";
-        }
-        
-        if(!usedFormulaSV.isEmpty()){
-            toStore += "\\predicates{\n\n";
-            for(SchemaVariable var : usedFormulaSV){
-        	toStore +=  var.name().toString()+";\n";  
-            }
-            toStore += "}\n\n\n";
-        }
-        
+
       
 	toStore += "\\problem{\n\n";
 	int i = 0;
@@ -250,6 +241,13 @@ public final class DefaultTacletSetTranslation
 	    }
 	}
 	
+	if(instantiationFailures.size() > 0){
+	    toStore += "\n\n/* instantiation failures:\n";
+	    for(String s : instantiationFailures){
+		toStore += "\n\n"+s;
+	    }
+	    toStore +="\n\n*/";
+	}
 	
 
 	FileWriter fw;
@@ -267,29 +265,36 @@ public final class DefaultTacletSetTranslation
 	return LogicPrinter.quickPrintTerm(term, null);
     }
 
-    /* (non-Javadoc)
-     * @see de.uka.ilkd.key.smt.taclettranslation.TranslationListener#eventSort(de.uka.ilkd.key.logic.sort.Sort)
-     */
+
     public void eventSort(Sort sort) {
 	usedSorts.add(sort);
 	
     }
 
-    /* (non-Javadoc)
-     * @see de.uka.ilkd.key.smt.taclettranslation.TranslationListener#eventQuantifiedVariable(de.uka.ilkd.key.logic.op.QuantifiableVariable)
-     */
+  
     public void eventQuantifiedVariable(QuantifiableVariable var) {
 	usedQuantifiedVariable.add(var);
 	
     }
 
-    /* (non-Javadoc)
-     * @see de.uka.ilkd.key.smt.taclettranslation.TranslationListener#eventFormulaSV(de.uka.ilkd.key.logic.op.SchemaVariable)
-     */
+
     public void eventFormulaSV(SchemaVariable formula) {
 	usedFormulaSV.add(formula);
 	
     }
+
+
+    public boolean eventInstantiationFailure(GenericSort dest, Sort sort,
+            Taclet t, Term term) {
+	String s = "";
+	s += "taclet: " + t.name()+"\n";
+	s += "term: " + term +"\n"; 
+	s += "generic sort: " + dest + "\n";
+	s += "sort: "+ sort +"\n";
+	instantiationFailures = instantiationFailures.append(s);
+	return false;
+    }
+
 
 
 

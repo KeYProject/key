@@ -22,6 +22,8 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 
+import de.uka.ilkd.key.java.expression.operator.ExactInstanceof;
+import de.uka.ilkd.key.java.expression.operator.Instanceof;
 import de.uka.ilkd.key.logic.ConstrainedFormula;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Name;
@@ -29,13 +31,19 @@ import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.TermCreationException;
 import de.uka.ilkd.key.logic.TermFactory;
+import de.uka.ilkd.key.logic.op.AttributeOp;
 import de.uka.ilkd.key.logic.op.BoundedNumericalQuantifier;
 import de.uka.ilkd.key.logic.op.CastFunctionSymbol;
 import de.uka.ilkd.key.logic.op.Equality;
+import de.uka.ilkd.key.logic.op.ExactInstanceSymbol;
+import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IfThenElse;
+import de.uka.ilkd.key.logic.op.InstanceofSymbol;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.LogicVariable;
+import de.uka.ilkd.key.logic.op.NonRigidHeapDependentFunction;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.Quantifier;
@@ -52,14 +60,16 @@ import de.uka.ilkd.key.logic.sort.PrimitiveSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.logic.sort.SortDefiningSymbols;
 
-import de.uka.ilkd.key.parser.SchemaVariableModifierSet.TermSV;
-import de.uka.ilkd.key.parser.SchemaVariableModifierSet.VariableSV;
+
+
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletGoalTemplate;
 import de.uka.ilkd.key.rule.VariableCondition;
 import de.uka.ilkd.key.rule.conditions.AbstractOrInterfaceType;
 import de.uka.ilkd.key.rule.conditions.TypeComparisionCondition;
 import de.uka.ilkd.key.rule.conditions.TypeCondition;
+import de.uka.ilkd.key.rule.metaconstruct.MetaCreated;
+import de.uka.ilkd.key.rule.metaconstruct.MetaNextToCreate;
 
 abstract class AbstractTacletTranslator implements TacletTranslator {
 
@@ -69,7 +79,7 @@ abstract class AbstractTacletTranslator implements TacletTranslator {
 
     protected HashMap<String, LogicVariable> usedVariables = 
 	new HashMap<String, LogicVariable>();
-    protected HashMap<String, VariableSV> usedSchemaVariables = new HashMap<String, VariableSV>();
+  //  protected HashMap<String, VariableSV> usedSchemaVariables = new HashMap<String, VariableSV>();
     
     private HashSet<GenericSort> usedGenericSorts = new HashSet<GenericSort>();
 
@@ -107,7 +117,7 @@ abstract class AbstractTacletTranslator implements TacletTranslator {
 	
 
 	// sixth step: translate the generics sorts.
-	term = translateGeneric(term,usedGenericSorts,sorts);
+	term = translateGeneric(term,usedGenericSorts,sorts,t);
 	
 	
 	
@@ -167,9 +177,9 @@ abstract class AbstractTacletTranslator implements TacletTranslator {
      * @return
      * @throws IllegalTacletException
      */
-    protected Term translateGeneric(Term currentTerm,HashSet<GenericSort> genericSorts, ImmutableSet<Sort> sorts)
+    protected Term translateGeneric(Term currentTerm,HashSet<GenericSort> genericSorts, ImmutableSet<Sort> sorts, Taclet t)
     throws IllegalTacletException{
-	return instantiateGeneric(currentTerm, genericSorts, sorts);
+	return instantiateGeneric(currentTerm, genericSorts, sorts,t);
     }
 
     /**
@@ -201,10 +211,10 @@ abstract class AbstractTacletTranslator implements TacletTranslator {
 	}
 	
 
-	if (t.varsNotFreeIn().hasNext()) {
+	/*if (t.varsNotFreeIn().hasNext()) {
 	    throw new IllegalTacletException(
 		    "The taclet has \\notFreeIn conditions.");
-	}
+	}*/
 	
 
 	// Check for addrules, they are in general not allowed.
@@ -283,7 +293,14 @@ abstract class AbstractTacletTranslator implements TacletTranslator {
 	        	((SchemaVariableAdapter) op).isTermSV())
 	        || ((op instanceof SchemaVariableAdapter) && 
 	        	((SchemaVariableAdapter) op).isFormulaSV())
+	        || ((op instanceof SchemaVariableAdapter) && 
+	        	((SchemaVariableAdapter) op).isVariableSV())
 	        || ((op instanceof WarySubstOp))
+	        || (op instanceof MetaNextToCreate)
+	        || (op instanceof NonRigidHeapDependentFunction)
+	        || (op instanceof AttributeOp)
+	        || (op instanceof MetaCreated)
+	   
 
 	        
 	
@@ -367,16 +384,16 @@ abstract class AbstractTacletTranslator implements TacletTranslator {
 	    subTerms[i] = rebuildTerm(term.sub(i));
 	    
 	}
+	
+	term = tf.createTerm(term.op(), subTerms, variables,
+		JavaBlock.EMPTY_JAVABLOCK);
 
 	term = changeTerm(term);
 	
 	
+
 	if(term.op() instanceof Quantifier){
-	       
-	  
-	   // ImmutableArray<QuantifiableVariable> temp = new ImmutableArray<QuantifiableVariable>(); 
-	    QuantifiableVariable [] temp = new QuantifiableVariable[variables[0].size()];
-	    int i=0;
+	    // ImmutableArray<QuantifiableVariable> temp = new ImmutableArray<QuantifiableVariable>(); 
 	    for(QuantifiableVariable qv : variables[0]){
 		    for(TranslationListener l : listener){
 			    l.eventQuantifiedVariable(qv);
@@ -384,39 +401,12 @@ abstract class AbstractTacletTranslator implements TacletTranslator {
 	    }	    
 	}
 
-
-	term = tf.createTerm(term.op(), subTerms, variables,
-		JavaBlock.EMPTY_JAVABLOCK);
 	return term;
     }
     
 
     
-    /**
-     * Instantiates all variables of a generic sort with 
-     * logical variables in the given term.
-     * @param term the term to instantiate.
-     * @param genericSort generic sort to instantiate.
-     * @param sorts sorts used for instantiation.
-     * @return returns list of terms that are instantiated with 
-     * the given generic sort.
-     */
-    protected ImmutableList<Term> instantiateGeneric(Term term, 
-	    GenericSort genericSort, ImmutableSet<Sort> sorts){
-	ImmutableList<Term> genericTerms = ImmutableSLList.nil();
-	
-	for(Sort sort : sorts){
-	    if(sort instanceof GenericSort){continue;}
-	      Term temp = instantiateGeneric(term, genericSort, sort);
-	    if(temp != null){
-		    genericTerms = genericTerms.append(temp);
-	    }
-	
-	    
-	}
-	
-	return genericTerms;
-    }
+
    
     
     private LogicVariable getInstantiationOfLogicVar(Sort instantiation, LogicVariable lv){
@@ -457,6 +447,7 @@ abstract class AbstractTacletTranslator implements TacletTranslator {
 	    variables[i] = subTerms[i].varsBoundHere(i);
 	}
 
+
 	if (term.sort().equals(generic)) {
 
 	    if (term.op() instanceof LogicVariable) {
@@ -473,10 +464,10 @@ abstract class AbstractTacletTranslator implements TacletTranslator {
 		term = TermFactory.DEFAULT.createCastTerm(
 		        (AbstractSort) instantiation, subTerms[0]);
 	    }   
-	    
-	    else if (term.op() instanceof SortDependingFunction) {
+		    
+	 /*   else if (term.op() instanceof SortDependingFunction) {
 		SortDependingFunction func = (SortDependingFunction) term.op();
-
+		
 		// SortDependingFunctions can not be instantiated with primitive
 		// sorts.
 		if ((instantiation instanceof PrimitiveSort)) {
@@ -489,9 +480,31 @@ abstract class AbstractTacletTranslator implements TacletTranslator {
 			            subTerms);
 		}
 
-	    }
+	    }*/
 
 	}
+	
+	if(term.op() instanceof SortDependingFunction){
+
+	    
+	    SortDependingFunction func = (SortDependingFunction) term.op();
+	    if ((instantiation instanceof PrimitiveSort)) {
+		return null;
+	    } else {
+		if(func.getSortDependingOn().equals(generic)){
+		    term = tf
+		    .createFunctionTerm(
+			    (SortDependingFunction) func
+			    .getInstanceFor((SortDefiningSymbols) instantiation),
+			    subTerms);
+		}
+
+	    }
+
+
+
+	}
+	
 	
 	
 	if(term.op() instanceof Quantifier){
@@ -515,6 +528,9 @@ abstract class AbstractTacletTranslator implements TacletTranslator {
 	return term;
 
     }
+    
+    
+
     
     
     private boolean isReferenceSort(Sort sort){
@@ -552,7 +568,7 @@ abstract class AbstractTacletTranslator implements TacletTranslator {
      * @throws IllegalTacletException
      */
     protected Term instantiateGeneric(Term term, 
-	    HashSet<GenericSort> genericSorts, ImmutableSet<Sort> instSorts) 
+	    HashSet<GenericSort> genericSorts, ImmutableSet<Sort> instSorts, Taclet t) 
 	    throws IllegalTacletException{
 	if(genericSorts.size() == 0){return term;}
 	  if(genericSorts.size() > 2){
@@ -573,22 +589,36 @@ abstract class AbstractTacletTranslator implements TacletTranslator {
 	for(Sort sort1 : instSorts){
 	   
 	    if(!doInstantiation(gs[0],sort1)){continue;}
-		  
-	    Term temp = instantiateGeneric(term, gs[0], sort1);
-
-	    if(temp == null){continue;}
+		
+	    Term temp = null;
+	    try{
+	      temp = instantiateGeneric(term, gs[0], sort1);
+	    }catch(TermCreationException e){
+		for(TranslationListener l : listener){
+	       		if(l.eventInstantiationFailure(gs[0], sort1, t, term))
+	       		       throw e;
+	       		}
+	    }
 	    
+	    if(temp == null){continue;}
+
 	    //instantiate the second generic variable
 	    if(genericSorts.size() == 2){
 		int instCount =0;
-		
 		for(Sort sort2 : instSorts){
-
 		   if(!(conditions.containsNotSameCondition(gs[0], gs[1]) && 
 			   sort1.equals(sort2)) && 
 			   doInstantiation(gs[1],sort2)){
-	
-		            Term temp2 = instantiateGeneric(temp,gs[1],sort2);
+		       	    Term temp2 = null;
+		       	    try{
+		       		temp2 = instantiateGeneric(temp,gs[1],sort2);
+		       	    }catch(TermCreationException e){
+		       		for(TranslationListener l : listener){
+		       		   if(l.eventInstantiationFailure(gs[1], sort2, t, term))
+		       		       throw e;
+		       		}
+		       	    }
+		             
 		       	    if(temp2 !=null){
 		       		instCount++;
 		       		genericTerms = genericTerms.append(temp2);
@@ -639,12 +669,21 @@ abstract class AbstractTacletTranslator implements TacletTranslator {
      * @param term the term to be quantify.
      * @return the quantified term.
      */
-     protected Term quantifyTerm(Term term){
+     protected Term quantifyTerm(Term term) throws IllegalTacletException{
 	TermBuilder tb = TermBuilder.DF;
 	// Quantify over all free variables.
+
+	
 	for (QuantifiableVariable qv : term.freeVars()) {
 	  // if(!term.sort().equals(Sort.FORMULA)){
+	    if(!(qv instanceof LogicVariable)){
+		throw new IllegalTacletException("Error of translation: " +
+				"There is a free variable that is not of type LogicVariable: "
+			+ qv);
+	    }
+
 	    term = tb.all(qv, term);
+	    
 
 	  // }
 	}
@@ -696,6 +735,9 @@ abstract class AbstractTacletTranslator implements TacletTranslator {
 	toReplace.add(":");
 	replacement.add("_col_");
 	
+	toReplace.add("#");
+	replacement.add("_meta_");
+	
 	
 	
 	toReturn = this.removeIllegalChars(toReturn, toReplace, replacement);
@@ -735,16 +777,39 @@ abstract class AbstractTacletTranslator implements TacletTranslator {
 
 		
 	if(term.op() instanceof SortedSchemaVariable) {
+		
 	    if(term.sort().equals(Sort.FORMULA)){
-
+	
 	//	term = tb.var(getLogicVariable(term.op().name(),Sort.FORMULA));
 		//term = tb.var(getLogicVariable(term.op().name(),term.sort()));
-	    }else if(!(term.sort() instanceof GenericSort)){
-
+	    }else //if(!(term.sort() instanceof GenericSort))
+	    {
 		term = tb.var(getLogicVariable(term.op().name(), term.sort()));
+	
 	    }
 	    
 	}
+	
+	if(term.op() instanceof Quantifier){
+	    LinkedList<QuantifiableVariable> list = new LinkedList<QuantifiableVariable>();
+	    
+	    for(QuantifiableVariable qv : term.varsBoundHere(0)){
+		list.add(getLogicVariable(qv.name(), qv.sort()));
+	    }
+	    
+	    ImmutableArray<QuantifiableVariable> array = new ImmutableArray<QuantifiableVariable>(list);
+	    term = TermFactory.DEFAULT.createQuantifierTerm((Quantifier)term.op(),array , term.sub(0));
+
+	
+	}
+	
+	if(term.op() instanceof SortDependingFunction){	    
+	    SortDependingFunction func = (SortDependingFunction) term.op();
+	    if(func.getSortDependingOn() instanceof GenericSort){
+	       usedGenericSorts.add((GenericSort)func.getSortDependingOn());
+	    }
+	}
+	
 	if(term.sort() instanceof GenericSort){
 	    usedGenericSorts.add((GenericSort) term.sort());   
 	}

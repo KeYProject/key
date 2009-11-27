@@ -9,12 +9,15 @@
 //
 package de.uka.ilkd.key.smt.taclettranslation;
 
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.TermSymbol;
+import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.parser.SchemaVariableModifierSet.VariableSV;
+import de.uka.ilkd.key.rule.Taclet;
 
 /** 
  * Listener for the classes which implement <code>TacletTranslator</code>. 
@@ -42,5 +45,19 @@ public interface TranslationListener {
      */
     public void eventFormulaSV(SchemaVariable formula);
     
+    /**
+     * Called when the translator can not instantiate a generic sort
+     * with a particular sort in the given term.
+     * The result type determines whether the
+     * translation is aborted: The idea is, to make the translation 
+     * robust against invalid instantiation. 
+     * @param dest the generic sort to instantiate
+     * @param sort the instantiation sort.
+     * @param t the taclet thats belongs to the term
+     * @param term the term to be instantiated
+     * @return return <code>true</code> if you want to terminate the translation
+     * of the taclet, otherwise <code>false<code>.
+     */
+    public boolean eventInstantiationFailure(GenericSort dest, Sort sort, Taclet t, Term term);
 
 }
