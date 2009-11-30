@@ -31,6 +31,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.pp.AbbrevException;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.pp.PosInSequent;
+import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.smt.DecProcRunner;
 import de.uka.ilkd.key.smt.SMTRule;
@@ -51,11 +52,14 @@ class TacletMenu extends JMenu {
     private TacletAppComparator comp = new TacletAppComparator();
     
     static Logger logger = Logger.getLogger(TacletMenu.class.getName());
+    private final Goal selectedGoal;
     
     /** 
      * creates empty menu 
      */
-    TacletMenu() {}
+    TacletMenu() {
+	selectedGoal = null;
+    }
 
 
     /** creates a new menu that displays all applicable rules at the given
@@ -68,6 +72,7 @@ class TacletMenu extends JMenu {
      * @param pos the PosInSequent
      */ 
     TacletMenu(SequentView sequentView,
+	    	final Goal selectedGoal,
 	       ImmutableList<TacletApp> findList, ImmutableList<TacletApp> rewriteList,
 	       ImmutableList<TacletApp> noFindList, ImmutableList<BuiltInRule> builtInList,
 	       PosInSequent pos) {
@@ -75,6 +80,7 @@ class TacletMenu extends JMenu {
 	this.sequentView = sequentView;
 	this.mediator = sequentView.mediator();
  	this.pos = pos;
+ 	this.selectedGoal = selectedGoal;
 	// delete RewriteTaclet from findList because they will be in
 	// the rewrite list and concatenate both lists
 	createTacletMenu(removeRewrites(findList).prepend(rewriteList),
@@ -350,7 +356,7 @@ class TacletMenu extends JMenu {
         	if (((BuiltInRuleMenuItem) e.getSource()).connectedTo() instanceof SMTRule ||
         	    ((BuiltInRuleMenuItem) e.getSource()).connectedTo() instanceof SMTRuleMulti) {
         	    new DecProcRunner(Main.getInstance()
-        		, Main.getInstance().mediator().getProof()
+        		, selectedGoal//Main.getInstance().mediator().getProof()
         		, Main.getInstance().mediator().getProof().getUserConstraint().getConstraint()
         		, ((BuiltInRuleMenuItem) e.getSource()).connectedTo()).start();
         	} else {
