@@ -61,6 +61,8 @@ public abstract class MemoryArea{
 	logic.run();
     }
 
+    private void delete(MemoryArea m);
+
     public void	enter(){
 	if(logic==null) throw new IllegalArgumentException();
 	if(//stack!=null && outerScopeM(this, <currentMemoryArea>) ||
@@ -81,6 +83,7 @@ public abstract class MemoryArea{
 	}finally{
 	    referenceCount--;
 	    if(referenceCount==0){
+		delete(RealtimeSystem.TRASH);
 		consumed=0;
 		parent=null;
 		stack=null;
@@ -108,6 +111,7 @@ public abstract class MemoryArea{
 	}finally{
 	    referenceCount--;
 	    if(referenceCount==0){
+		delete(RealtimeSystem.TRASH);
 		consumed=0;
 		parent=null;
 		stack=null;

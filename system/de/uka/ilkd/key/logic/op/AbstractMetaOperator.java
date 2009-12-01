@@ -83,6 +83,8 @@ public abstract class AbstractMetaOperator extends Op implements MetaOperator {
     
     public static final AbstractMetaOperator META_STACK_AT_INDEX = new StackAtIndex();
     
+    public static final AbstractMetaOperator META_UPDATE_SCOPE = new UpdateScope();
+    
     public static final AbstractMetaOperator META_UNIQUE_ANON_UPDATE = new UniqueAnonUpdate(); 
     
     public static final AbstractMetaOperator META_STACK_FOR_CONSTRUCTED_SCOPE = new StackForConstructedScope();

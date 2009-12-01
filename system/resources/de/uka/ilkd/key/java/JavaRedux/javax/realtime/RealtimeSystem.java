@@ -8,7 +8,11 @@ public class RealtimeSystem{
 
     //@ public static invariant \inImmortalMemory(TBE);
 
+    //@ public static invariant \inImmortalMemory(TRASH);
+
     public static final OutOfMemoryError OOME = new OutOfMemoryError();
+
+    public static final ScopedMemory TRASH = new LTMemory(0);
 
     //    public static final IllegalAssignmentError IAE = 
     //	new IllegalAssignmentError();

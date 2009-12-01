@@ -355,6 +355,9 @@ public abstract class ProgramSVSort extends PrimitiveSort {
     public static final ProgramSVSort PUSH
     = new SpecificMethodNameSort(new ProgramElementName("push"));
     
+    public static final ProgramSVSort DELETE
+    = new SpecificMethodNameSort(new ProgramElementName("delete"));
+    
     public static final ProgramSVSort ALLOCATEAREA
     = new SpecificMethodNameSort(new ProgramElementName
             (AreaAllocationMethodBuilder.IMPLICIT_AREA_ALLOCATE));
