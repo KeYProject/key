@@ -211,21 +211,23 @@ public class DecProcRunner extends SwingWorker {
                 }
                 ProofTreeListener ptl = new ProofTreeListener() {
             	
-            	public void proofGoalRemoved(ProofTreeEvent e) {
-            	    int step = 99;
-            	    main.getProgressMonitor().setProgress(step*temp);
-            	}
-            	
-            	public void proofIsBeingPruned(ProofTreeEvent e) {}
-            	public void proofPruned(ProofTreeEvent e) {}
-            	public void proofClosed(ProofTreeEvent e) {}
-            	public void proofStructureChanged(ProofTreeEvent e) {}
-            	public void proofGoalsAdded(ProofTreeEvent e) {}
-            	public void proofGoalsChanged(ProofTreeEvent e) {}
-            	public void proofExpanded(ProofTreeEvent e) {}
+                	public void proofGoalRemoved(ProofTreeEvent e) {
+                	    int step = 99;
+                	    main.getProgressMonitor().setProgress(step*temp);
+                	}
+                	
+                	public void proofIsBeingPruned(ProofTreeEvent e) {}
+                	public void proofPruned(ProofTreeEvent e) {}
+                	public void proofClosed(ProofTreeEvent e) {}
+                	public void proofStructureChanged(ProofTreeEvent e) {}
+                	public void proofGoalsAdded(ProofTreeEvent e) {}
+                	public void proofGoalsChanged(ProofTreeEvent e) {}
+                	public void proofExpanded(ProofTreeEvent e) {}
+                	public void counterExampleUpdate(ProofTreeEvent e) {}
                 };
                 proof.addProofTreeListener(ptl);
                 g.apply(birApp);
+//System.out.println("DecisionProcedure Result"+g.node().getCounterExampleData());
                 if (il != null) {
             	mediator.removeInterruptListener(il);
             	il = null;

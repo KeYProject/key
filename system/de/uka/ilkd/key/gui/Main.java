@@ -260,6 +260,8 @@ public class Main extends JFrame implements IMain {
         initGoalList();
         initGUIProofTree();
         
+        new DecisionProcedureResultsDialog(mediator);
+        
         SwingUtilities.updateComponentTreeUI(this);
         ToolTipManager.sharedInstance().setDismissDelay(30000);
         setSize(1000, 750);

@@ -15,8 +15,9 @@ import de.uka.ilkd.key.java.Services;
 
 public final class SimplifySolver extends AbstractSMTSolver {
     
+    public static final String name="Simplify";
     public String name() {
-        return "Simplify";
+        return name;
     }
     
     
@@ -39,11 +40,11 @@ public final class SimplifySolver extends AbstractSMTSolver {
 	if (val == 0) {
 	    //no error occured
 	    if (meansValid(text)) {
-		return SMTSolverResult.createValidResult(text);
+		return SMTSolverResult.createValidResult(text,name());
 	    } else if (meansInvalid(text)) {
-		return SMTSolverResult.createInvalidResult(text);
+		return SMTSolverResult.createInvalidResult(text,name());
 	    } else {
-		return SMTSolverResult.createUnknownResult(text);
+		return SMTSolverResult.createUnknownResult(text,name());
 	    } 
 	} else {
 	    //error occured

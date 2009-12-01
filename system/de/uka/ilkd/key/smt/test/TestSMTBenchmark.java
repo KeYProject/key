@@ -138,7 +138,7 @@ public class TestSMTBenchmark extends TestCase implements FilenameFilter{
 	    return VALID;
 	} else if (r.isValid() == SMTSolverResult.ThreeValuedTruth.UNKNOWN) {
 	    return UNKNOWN;
-	} else if (r.isValid() == SMTSolverResult.ThreeValuedTruth.FALSE) {
+	} else if (r.isValid() == SMTSolverResult.ThreeValuedTruth.FALSIFIABLE) {
 	    return INVALID;
 	} else {
 	    Assert.assertTrue(false);

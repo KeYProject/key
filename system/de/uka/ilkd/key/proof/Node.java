@@ -78,8 +78,10 @@ public class Node {
      */
     private ImmutableSet<NoPosTacletApp>  localIntroducedRules = DefaultImmutableSet.<NoPosTacletApp>nil();
     
+    
     /** creates an empty node that is root and leaf.
      */
+
     public Node(Proof proof) {
 	this.proof = proof;
 	rootSink = new BufferSink ( null );
@@ -731,6 +733,20 @@ public class Node {
 
     public int getUniqueTacletNr() {
         return getIntroducedRulesCount();
+    }
+
+    
+    /**@see {@code Proof.nodeToCounterExData}
+     * @author gladisch */
+    public void addCounterExampleData(Object counterExampleData) {
+	proof().addCounterExData(this, counterExampleData);
+    }
+    
+    /**If there is no counterExample Data associated with this node, then null is returned. 
+     * @author gladisch*/
+
+    public Vector<Object> getCounterExampleData() {
+	return proof().getCounterExData(this);
     }
 
  }

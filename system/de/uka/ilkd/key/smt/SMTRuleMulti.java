@@ -489,7 +489,7 @@ public class SMTRuleMulti implements BuiltInRule, MakesProgress {
 		    SMTSolverResult res;
 		    if(sw.hasFinished()){
 		      	res = sw.getResult();
-		      	if(res.isValid() == SMTSolverResult.ThreeValuedTruth.FALSE) notValid = true;
+		      	if(res.isValid() == SMTSolverResult.ThreeValuedTruth.FALSIFIABLE) notValid = true;
 			if(res.isValid() == SMTSolverResult.ThreeValuedTruth.TRUE) valid = true;
 			
 			    

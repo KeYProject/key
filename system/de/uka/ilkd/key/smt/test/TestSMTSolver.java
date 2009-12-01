@@ -181,7 +181,7 @@ public abstract class TestSMTSolver extends TestCase {
 	
 	//unknown is always allowed. But wrong answers are not allowed
 	if (isValid) {
-	    return result.isValid() != SMTSolverResult.ThreeValuedTruth.FALSE; 
+	    return result.isValid() != SMTSolverResult.ThreeValuedTruth.FALSIFIABLE; 
 	} else {
 	    return result.isValid() != SMTSolverResult.ThreeValuedTruth.TRUE;
 	}
