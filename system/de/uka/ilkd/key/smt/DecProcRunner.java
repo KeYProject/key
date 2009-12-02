@@ -223,7 +223,7 @@ public class DecProcRunner extends SwingWorker {
                 	public void proofGoalsAdded(ProofTreeEvent e) {}
                 	public void proofGoalsChanged(ProofTreeEvent e) {}
                 	public void proofExpanded(ProofTreeEvent e) {}
-                	public void counterExampleUpdate(ProofTreeEvent e) {}
+                	public void smtDataUpdate(ProofTreeEvent e) {}
                 };
                 proof.addProofTreeListener(ptl);
                 g.apply(birApp);

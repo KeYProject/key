@@ -512,7 +512,7 @@ public class GoalList extends JList {
             }
 
 	    
-	    public void counterExampleUpdate(ProofTreeEvent e) {}
+	    public void smtDataUpdate(ProofTreeEvent e) {}
 
 	}
     }

@@ -736,17 +736,21 @@ public class Node {
     }
 
     
-    /**@see {@code Proof.nodeToCounterExData}
+    /**@see {@code Proof.nodeToSMTData}
+     * The argument may be an {@code SMTSolverResult} or data from the test generator
      * @author gladisch */
-    public void addCounterExampleData(Object counterExampleData) {
-	proof().addCounterExData(this, counterExampleData);
+    public void addSMTData(Object smtData) {
+	proof().addSMTData(this, smtData);
     }
     
-    /**If there is no counterExample Data associated with this node, then null is returned. 
+    /**If there is no smt Data associated with this node, then null is returned. 
      * @author gladisch*/
-
-    public Vector<Object> getCounterExampleData() {
-	return proof().getCounterExData(this);
+    public Vector<Object> getSMTData() {
+	return proof().getSMTData(this);
+    }
+    
+    public void clearSMTData(){
+	proof().clearSMTData(this);
     }
 
  }
