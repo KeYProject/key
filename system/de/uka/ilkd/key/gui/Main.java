@@ -233,6 +233,8 @@ public class Main extends JFrame implements IMain {
     /** The menu for the decproc options */
     private final JMenu decProcOptions = new JMenu("Decision Procedures");
     
+    public DecisionProcedureResultsDialog decProcResDialog;
+    
     
     /**
      * creates prover -- private, use getInstance()
@@ -259,8 +261,7 @@ public class Main extends JFrame implements IMain {
         layoutMain();
         initGoalList();
         initGUIProofTree();
-        
-        new DecisionProcedureResultsDialog(mediator);
+        decProcResDialog = DecisionProcedureResultsDialog.getInstance(mediator);
         
         SwingUtilities.updateComponentTreeUI(this);
         ToolTipManager.sharedInstance().setDismissDelay(30000);
@@ -1529,6 +1530,7 @@ public class Main extends JFrame implements IMain {
 	}
     }
     
+    JCheckBoxMenuItem showSMTResDialog;
     JCheckBoxMenuItem saveSMTFile;
     private JCheckBoxMenuItem waitForAllProvers;
     
@@ -1602,6 +1604,24 @@ public class Main extends JFrame implements IMain {
 	decProcOptions.add(setButton);
 	//dpButtonGroup.add(setButton);
 	
+	//add a checkbox for saving a created problem file
+	showSMTResDialog = new JCheckBoxMenuItem("Show SMT Progress Dialog");
+	showSMTResDialog.setSelected(dps.getShowSMTResDialog());
+	showSMTResDialog.addActionListener(new ActionListener() {
+	   public void actionPerformed(ActionEvent e) {
+	       boolean b = showSMTResDialog.isSelected();
+	       dps.setSMTResDialog(b);
+	       DecisionProcedureResultsDialog dia =DecisionProcedureResultsDialog.getInstance(null);
+	       if(dia!=null){
+		   if(b){
+		       dia.rebuildTableForProof();
+		   }
+		   dia.setVisible(b);
+	       }
+	   }
+	});
+	decProcOptions.add(showSMTResDialog);
+
 	//add a checkbox for saving a created problem file
 	saveSMTFile = new JCheckBoxMenuItem("Save created problemfile");
 	saveSMTFile.setSelected(dps.getSaveFile());

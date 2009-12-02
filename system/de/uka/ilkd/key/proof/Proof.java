@@ -912,7 +912,7 @@ public class Proof implements Named {
      * Be aware that this method fires events to listeners and may therefore have other side-effects.
      * @see {@code nodeToSMTData}
      * @author gladisch */
-    public void addSMTData(Node n, Object data){
+    public synchronized void addSMTData(Node n, Object data){
 	if(n.proof()!=this)//checking by the way against a null pointer
 	    new RuntimeException("The referenced node does not belong to this proof");
 	
@@ -936,7 +936,7 @@ public class Proof implements Named {
     /**If there is no SMT Data, then null is returned.
      * This method is meant to be invoked by {@code Node.getSMTData()} 
      * @author gladisch*/
-    public Vector<Object> getSMTData(Node n){
+    public synchronized Vector<Object> getSMTData(Node n){
 	if(n.proof()!=this)//checking by the way against a null pointer
 	    new RuntimeException("The referenced node does not belong to this proof");
 
@@ -950,7 +950,7 @@ public class Proof implements Named {
 	return vect;
     }
     
-    public void clearSMTData(Node n){
+    public synchronized void clearSMTData(Node n){
 	if(n.proof()!=this)//checking by the way against a null pointer
 	    new RuntimeException("The referenced node does not belong to this proof");
 
@@ -959,7 +959,7 @@ public class Proof implements Named {
 	nodeToSMTData.remove(n);
     }
     
-    public void clearSMTData(){
+    public synchronized void clearSMTData(){
 	if(nodeToSMTData!=null){
 	    nodeToSMTData.clear();
 	}

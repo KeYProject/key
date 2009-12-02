@@ -76,6 +76,8 @@ public class DecisionProcedureSettings implements Settings {
     
     private static final String SAVEFILE="[DecisionProcedure]savefile";
     
+    private static final String SHOW_SMT_RES_DIA="[DecisionProcedure]showSMTResDialog";
+    
     private static final String MULTIPLEPROVERS="[DecisionProcedure]multprovers";
     
     private static final String WAITFORALLPROVERS = "[DecisionProcedure]WaitForAllProvers";
@@ -256,6 +258,14 @@ public class DecisionProcedureSettings implements Settings {
 	} else {
 	    this.saveFile = false;
 	}
+	
+	String sd = props.getProperty(SHOW_SMT_RES_DIA);
+	if (!(sd == null) && sf.equals("true")) {
+	    this.showSMTResDialog = true;
+	} else {
+	    this.showSMTResDialog = false;
+	}
+
     }
     
 
@@ -517,6 +527,19 @@ public class DecisionProcedureSettings implements Settings {
 	return this.saveFile;
     }
     
+    private boolean showSMTResDialog = false;
+    
+    public void setSMTResDialog(boolean b){
+	if(b!=this.showSMTResDialog){
+	    this.showSMTResDialog = b;
+	    this.fireSettingsChanged();
+	}
+    }
+    
+    public boolean getShowSMTResDialog(){
+	return this.showSMTResDialog;
+    }
+    
     /**
      * true, if the argument should be used for test
      * TODO implement?
@@ -541,6 +564,12 @@ public class DecisionProcedureSettings implements Settings {
         else {
             props.setProperty(SAVEFILE, "false");
         }
+        if (this.showSMTResDialog)
+            props.setProperty(SHOW_SMT_RES_DIA, "true");
+        else {
+            props.setProperty(SHOW_SMT_RES_DIA, "false");
+        }
+        
         props.setProperty(WAITFORALLPROVERS, ruleMultipleProvers.isWaitingForAllProvers() ? "true":"false");
         this.writeExecutionString(props);
         this.writeMultipleProversString(props);

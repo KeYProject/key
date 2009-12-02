@@ -1,6 +1,8 @@
 package de.uka.ilkd.key.gui;
 
 import java.awt.Dimension;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.Vector;
@@ -41,10 +43,11 @@ public class DecisionProcedureResultsDialog extends JFrame {
     /**The current proof object in focus */
     private Proof proof;
     private final SMTSolverProofListener listener;
-    
+    private static DecisionProcedureResultsDialog instance;
     public final static Object[] columnNames = {"Node", CVC3Solver.name, YicesSolver.name, Z3Solver.name, SimplifySolver.name};
     
-    public DecisionProcedureResultsDialog(KeYMediator medi){
+    /**The window is set visible by the ProofTree event smtDataUpdate */
+    protected DecisionProcedureResultsDialog(KeYMediator medi){
 	//super(mediator.mainFrame(), "SMT Solver Progress and Results");
 	super("SMT Solver Progress and Results");
 	this.mediator = medi;
@@ -69,10 +72,24 @@ public class DecisionProcedureResultsDialog extends JFrame {
 		}
             }
 	});
-
-	this.setVisible(true);
+	
+	//this.setVisible(true);
     }
     
+    /**Creates a new instance or returns an existing instance if one already exists.
+     * Does not create a window if medi is null.
+     * The window is set visible by an smtDataUpdate event.
+     * This method registers a KeYSelectionListener at the mediator and a
+     * ProofTreeListener when a proof is selected. */
+    public static DecisionProcedureResultsDialog getInstance(KeYMediator medi){
+	if(instance==null){
+	    if(medi==null){
+		return null;
+	    }
+	    instance = new DecisionProcedureResultsDialog(medi);
+	}
+	return instance;
+    }
     
     private void layoutWindow(){
 	
@@ -80,18 +97,27 @@ public class DecisionProcedureResultsDialog extends JFrame {
 	
 	tableModel = new DefaultTableModel(columnNames,0);
 	table = new JTable(tableModel);
+	table.setToolTipText("<html>Solver outputs are TRUE, UNKNOWN, FALSIFIABLE.<br> " +
+			"Note that weakening is performed, when the node contains<br>" +
+			"formulas or terms not directly translatable to FOL, such as<br>" +
+			"dynamic logic formulas. In this case the result FALSIFIABLE is <br>" +
+			"not sound and you should apply KeY rules to eliminate such formulas</html>");
 	
 	
 	JScrollPane tableScrollPane = new JScrollPane(table);
 	tableScrollPane.setPreferredSize(new Dimension(300, 350));
 	//tableScrollPane.setMinimumSize(minimumSize);
-	tableScrollPane.setBorder(new TitledBorder("Progressed Nodes"));
+	tableScrollPane.setBorder(new TitledBorder("Processed Nodes"));
 
     	textArea = new JTextArea();
 	JScrollPane modelScrollPane = new JScrollPane(textArea);
     	modelScrollPane.setPreferredSize(new Dimension(300, 350));
     	modelScrollPane.setBorder(new TitledBorder("SMT Solver output for selected node"));
     	//tableScrollPane.setMinimumSize(minimumSize);
+    	textArea.setToolTipText("<html>Note that the input to the SMT solvers is the negated" +
+    			"sequent of the selected node. Thus, e.g., the output sat implies that" +
+    			"that the respective sequent is falsifiable. Be aware of the possible " +
+    			"weakening of sequents that are no directly translatable to FOL.</html>");
 	
 
 	
@@ -113,7 +139,6 @@ public class DecisionProcedureResultsDialog extends JFrame {
 	}
 	StringBuffer sb=new StringBuffer();
 	for(int i=1;i<tableModel.getColumnCount();i++){
-	    System.out.println("Access "+idx+" "+i);
 	    SMTSolverResultWrap val = (SMTSolverResultWrap)tableModel.getValueAt(idx, i);
 	    if(val!=null){
 		sb.append("------------"+val.r.solverName+"----------\n"+val.r+"\n");
@@ -135,7 +160,7 @@ public class DecisionProcedureResultsDialog extends JFrame {
 
     /** Searches the {@code table} or {@code tableModel} for an entry of node {@code n}.
      * If there is no entry/row of the node yet, then a new table row is created.
-     * {@code Node.getCounterExampleData} is accessed to fill in the cells of the row
+     * {@code Node.getSMTData} is accessed to fill in the cells of the row
      * with infos from the SMTSolverResults.
      * @return the row index of the node in the table. -1 is returned if something went wrong
      * @author gladisch*/
@@ -181,13 +206,12 @@ public class DecisionProcedureResultsDialog extends JFrame {
     
     /**Call this method when the field {@code proof} changes.
      * @author gladisch*/
-    protected synchronized int rebuildTableForProof(){
+    public synchronized int rebuildTableForProof(){
 //	int rows = tableModel.getRowCount();
 //	for(int i=0;i<rows;i++){
 //	    tableModel.removeRow(i);
 //	}
 //	Strange, the commented out code didn't work for some reason.	
-	System.out.println("tableModel.getRowCount()="+tableModel.getRowCount());
 	tableModel.setRowCount(0);
 	if(proof!=null){
         	Set<Node> nodes = proof.getNodesWithSMTData();
@@ -247,7 +271,11 @@ public class DecisionProcedureResultsDialog extends JFrame {
 	     * of the SMT solver. The data from the SMT solver can be accessed via.
 	     * {@code Node.getCounterExData()}*/
 	public synchronized void smtDataUpdate(ProofTreeEvent e){
-	    System.out.println("counterExampleUpdate for node "+ e.getNode().serialNr());
+	    //System.out.println("counterExampleUpdate for node "+ e.getNode().serialNr());
+	    if(Main.batchMode || !Main.isVisibleMode()||
+		    !DecisionProcedureSettings.getInstance().getShowSMTResDialog()){
+		return;
+	    }
 	    setVisible(true);
 	    Node n = e.getNode();
 	    final int rowIdx = updateTableForNode(n);
