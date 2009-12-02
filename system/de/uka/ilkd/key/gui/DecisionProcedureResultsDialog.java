@@ -66,6 +66,7 @@ public class DecisionProcedureResultsDialog extends JFrame {
 		    if(idx>=0){
         		NodeWrap nw = (NodeWrap)tableModel.getValueAt(idx, 0);
         		Node n = nw.n;
+        		//System.out.println("Selecting node:"+n.serialNr());
         		mediator.getSelectionModel().setSelectedNode(n);
 		    }
 		    updateTextArea(idx);//-1 is accepted
@@ -114,9 +115,9 @@ public class DecisionProcedureResultsDialog extends JFrame {
     	modelScrollPane.setPreferredSize(new Dimension(300, 350));
     	modelScrollPane.setBorder(new TitledBorder("SMT Solver output for selected node"));
     	//tableScrollPane.setMinimumSize(minimumSize);
-    	textArea.setToolTipText("<html>Note that the input to the SMT solvers is the negated" +
-    			"sequent of the selected node. Thus, e.g., the output sat implies that" +
-    			"that the respective sequent is falsifiable. Be aware of the possible " +
+    	textArea.setToolTipText("<html>Note that the input to the SMT solvers is the negated<br>" +
+    			"sequent of the selected node. Thus, e.g., the output sat implies that<br>" +
+    			"that the respective sequent is falsifiable. Be aware of the possible<br>" +
     			"weakening of sequents that are no directly translatable to FOL.</html>");
 	
 
@@ -132,19 +133,21 @@ public class DecisionProcedureResultsDialog extends JFrame {
     
     /**@param idx is the row index of {@code tableModel} from which to read the information
      * that shall be displayed in {@code testArea}. If a number smaller than 0 is passed, then the textArea is cleared. */
-    protected synchronized void updateTextArea(int idx){
-	if(idx<0){
-	    textArea.setText("");
-	    return;
+    protected  void updateTextArea(int idx){
+	synchronized(tableModel){
+        	if(idx<0){
+        	    textArea.setText("");
+        	    return;
+        	}
+        	StringBuffer sb=new StringBuffer();
+        	for(int i=1;i<tableModel.getColumnCount();i++){
+        	    SMTSolverResultWrap val = (SMTSolverResultWrap)tableModel.getValueAt(idx, i);
+        	    if(val!=null){
+        		sb.append("------------"+val.r.solverName+"----------\n"+val.r+"\n");
+        	    }
+        	}
+        	textArea.setText(sb.toString());
 	}
-	StringBuffer sb=new StringBuffer();
-	for(int i=1;i<tableModel.getColumnCount();i++){
-	    SMTSolverResultWrap val = (SMTSolverResultWrap)tableModel.getValueAt(idx, i);
-	    if(val!=null){
-		sb.append("------------"+val.r.solverName+"----------\n"+val.r+"\n");
-	    }
-	}
-	textArea.setText(sb.toString());
     }
 
     
@@ -164,7 +167,8 @@ public class DecisionProcedureResultsDialog extends JFrame {
      * with infos from the SMTSolverResults.
      * @return the row index of the node in the table. -1 is returned if something went wrong
      * @author gladisch*/
-    protected synchronized int updateTableForNode(Node n){
+    protected  int updateTableForNode(Node n){
+	synchronized(tableModel){
 	    if(n==null || n.proof()!=proof){
 		//The displayed proof might have changed by concurrent threads
 		return -1;
@@ -202,26 +206,29 @@ public class DecisionProcedureResultsDialog extends JFrame {
 	    }
 	    
 	    return rowIdx;
+	}
     }
     
     /**Call this method when the field {@code proof} changes.
      * @author gladisch*/
-    public synchronized int rebuildTableForProof(){
-//	int rows = tableModel.getRowCount();
-//	for(int i=0;i<rows;i++){
-//	    tableModel.removeRow(i);
-//	}
-//	Strange, the commented out code didn't work for some reason.	
-	tableModel.setRowCount(0);
-	if(proof!=null){
-        	Set<Node> nodes = proof.getNodesWithSMTData();
-        	if(nodes!=null){
-        	    for(Node n:nodes){
-        		updateTableForNode(n);
-        	    }
+    public  int rebuildTableForProof(){
+	synchronized(tableModel){
+        //	int rows = tableModel.getRowCount();
+        //	for(int i=0;i<rows;i++){
+        //	    tableModel.removeRow(i);
+        //	}
+        //	Strange, the commented out code didn't work for some reason.
+        	tableModel.setRowCount(0);
+        	if(proof!=null){
+                	Set<Node> nodes = proof.getNodesWithSMTData();
+                	if(nodes!=null){
+                	    for(Node n:nodes){
+                		updateTableForNode(n);
+                	    }
+                	}
         	}
+        	return tableModel.getRowCount()-1;
 	}
-	return tableModel.getRowCount()-1;
     }
  
     class SMTSolverProofListener extends ProofTreeAdapter implements	KeYSelectionListener {
@@ -240,7 +247,6 @@ public class DecisionProcedureResultsDialog extends JFrame {
         	    }
         	    proof = e.getSource().getSelectedProof();
         	    if(proof!=null && !proof.containsProofTreeListener(this)){
-        		System.out.println("added proof tree listener");
         		proof.addProofTreeListener(this);
         	    }
         	    //(new RuntimeException("INFORMATION")).printStackTrace();
@@ -279,10 +285,11 @@ public class DecisionProcedureResultsDialog extends JFrame {
 	    setVisible(true);
 	    Node n = e.getNode();
 	    final int rowIdx = updateTableForNode(n);
-	    updateTextArea(rowIdx);
-	    if(rowIdx>=0){
-		table.getSelectionModel().setSelectionInterval(rowIdx,rowIdx);
-	    }
+//	The commented out code causes deadlocks.  It was supposed to do on-the-fly selection of table rows and nodes. 
+//	    updateTextArea(rowIdx);
+//	    if(rowIdx>=0){
+//		table.getSelectionModel().setSelectionInterval(rowIdx,rowIdx);
+//	    }
 	};
 
     }

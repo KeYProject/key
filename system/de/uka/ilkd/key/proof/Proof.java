@@ -908,62 +908,76 @@ public class Proof implements Named {
         return specExtPO;
     }
 
+    private static final Object nodeToSMTDataAltLock = new Object();
+    private Object nodeToSMTDataLock(){
+	if(nodeToSMTData!=null)
+	    return nodeToSMTData;
+	return nodeToSMTDataAltLock;
+    }
     /**This method is meant to be invoked by {@code Node.setSMTData()}
      * Be aware that this method fires events to listeners and may therefore have other side-effects.
      * @see {@code nodeToSMTData}
      * @author gladisch */
-    public synchronized void addSMTData(Node n, Object data){
-	if(n.proof()!=this)//checking by the way against a null pointer
-	    new RuntimeException("The referenced node does not belong to this proof");
-	
-	if(nodeToSMTData==null){
-	    nodeToSMTData = new WeakHashMap<Node, Vector<Object>>();
-	}
-	Vector<Object> vect = nodeToSMTData.get(n);
-	if(vect==null){
-	    vect = new Vector<Object>();
-	    nodeToSMTData.put(n, vect);
-	}
-	vect.add(data);
-	
-	//fireEvent
-	ProofTreeEvent e = new ProofTreeEvent(this, n);
-	for (int i = 0; i<listenerList.size(); i++) {
-	    listenerList.get(i).smtDataUpdate(e);
+    public  void addSMTData(Node n, Object data){
+	synchronized(nodeToSMTDataLock()){
+        	if(n.proof()!=this)//checking by the way against a null pointer
+        	    new RuntimeException("The referenced node does not belong to this proof");
+        	
+        	if(nodeToSMTData==null){
+        	    nodeToSMTData = new WeakHashMap<Node, Vector<Object>>();
+        	}
+        	Vector<Object> vect = nodeToSMTData.get(n);
+        	if(vect==null){
+        	    vect = new Vector<Object>();
+        	    nodeToSMTData.put(n, vect);
+        	}
+        	vect.add(data);
+        	
+        	//fireEvent
+        	ProofTreeEvent e = new ProofTreeEvent(this, n);
+        	for (int i = 0; i<listenerList.size(); i++) {
+        	    listenerList.get(i).smtDataUpdate(e);
+        	}
 	}
     }
     
     /**If there is no SMT Data, then null is returned.
      * This method is meant to be invoked by {@code Node.getSMTData()} 
      * @author gladisch*/
-    public synchronized Vector<Object> getSMTData(Node n){
-	if(n.proof()!=this)//checking by the way against a null pointer
-	    new RuntimeException("The referenced node does not belong to this proof");
-
-	if(nodeToSMTData==null) return null;
-	Vector<Object> vect = nodeToSMTData.get(n);
-	if(vect!=null){
-	    //This is just a check. Read the documentation of this method to understand this.
-	    if(vect.size()==0)
-		throw new RuntimeException("Map with counter example data is broken.");
+    public  Vector<Object> getSMTData(Node n){
+	synchronized(nodeToSMTDataLock()){
+        	if(n.proof()!=this)//checking by the way against a null pointer
+        	    new RuntimeException("The referenced node does not belong to this proof");
+        
+        	if(nodeToSMTData==null) return null;
+        	Vector<Object> vect = nodeToSMTData.get(n);
+        	if(vect!=null){
+        	    //This is just a check. Read the documentation of this method to understand this.
+        	    if(vect.size()==0)
+        		throw new RuntimeException("Map with counter example data is broken.");
+        	}
+        	return vect;
 	}
-	return vect;
     }
     
-    public synchronized void clearSMTData(Node n){
-	if(n.proof()!=this)//checking by the way against a null pointer
-	    new RuntimeException("The referenced node does not belong to this proof");
-
-	if(nodeToSMTData==null) return;
-	
-	nodeToSMTData.remove(n);
+    public  void clearSMTData(Node n){
+	synchronized(nodeToSMTDataLock()){
+        	if(n.proof()!=this)//checking by the way against a null pointer
+        	    new RuntimeException("The referenced node does not belong to this proof");
+        
+        	if(nodeToSMTData==null) return;
+        	
+        	nodeToSMTData.remove(n);
+	}
     }
     
-    public synchronized void clearSMTData(){
-	if(nodeToSMTData!=null){
-	    nodeToSMTData.clear();
+    public  void clearSMTData(){
+	synchronized(nodeToSMTDataLock()){
+        	if(nodeToSMTData!=null){
+        	    nodeToSMTData.clear();
+        	}
+        	nodeToSMTData=null;
 	}
-	nodeToSMTData=null;
     }
     
     /**@return returns the keys of the weak hashmap {@code nodeToSMTData}
