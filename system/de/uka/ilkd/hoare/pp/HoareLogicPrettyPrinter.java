@@ -311,8 +311,12 @@ public class HoareLogicPrettyPrinter extends LogicPrinter {
     private void printIfElse(final ProgramElement guard,
             final ProgramElement elseS, boolean wcet) throws IOException {
         layouter.beginI(2);
-        printHoarePreconditon("P", new Term[] { TermBuilder.DF.not(services
-                .getTypeConverter().convertToLogicElement(guard)) });
+	Term guardT = services
+	    .getTypeConverter().convertToLogicElement(guard);
+	if (guardT.sort() != Sort.FORMULA) {
+	    guardT = TermBuilder.DF.equals(guardT, TermBuilder.DF.TRUE(services));
+	}
+        printHoarePreconditon("P", new Term[] { TermBuilder.DF.not(guardT) });
         printHoareUpdate("U"
                 + (wcet ? ", executionTime := executionTime + 1" : ""));
 
