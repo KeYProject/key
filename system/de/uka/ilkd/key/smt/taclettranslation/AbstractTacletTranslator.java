@@ -22,8 +22,11 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 
+import de.uka.ilkd.key.java.JavaInfo;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.expression.operator.ExactInstanceof;
 import de.uka.ilkd.key.java.expression.operator.Instanceof;
+import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
 import de.uka.ilkd.key.logic.ConstrainedFormula;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Name;
@@ -45,6 +48,8 @@ import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.NonRigidHeapDependentFunction;
 import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.op.ProgramSV;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.Quantifier;
 import de.uka.ilkd.key.logic.op.RigidFunction;
@@ -54,14 +59,17 @@ import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.logic.op.SortedSchemaVariable;
 import de.uka.ilkd.key.logic.op.WarySubstOp;
 import de.uka.ilkd.key.logic.sort.AbstractSort;
+import de.uka.ilkd.key.logic.sort.ArraySort;
 import de.uka.ilkd.key.logic.sort.ClassInstanceSort;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.logic.sort.PrimitiveSort;
+import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.logic.sort.SortDefiningSymbols;
 
 
 
+import de.uka.ilkd.key.proof.init.CreatedAttributeTermFactory;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletGoalTemplate;
 import de.uka.ilkd.key.rule.VariableCondition;
@@ -72,6 +80,9 @@ import de.uka.ilkd.key.rule.metaconstruct.MetaCreated;
 import de.uka.ilkd.key.rule.metaconstruct.MetaNextToCreate;
 
 abstract class AbstractTacletTranslator implements TacletTranslator {
+    
+    // only for testing. 
+    private boolean appendGenericTerm = false;
 
     protected final static TermFactory tf = TermFactory.DEFAULT;
     
@@ -86,7 +97,11 @@ abstract class AbstractTacletTranslator implements TacletTranslator {
     protected Collection<TranslationListener> listener= new LinkedList<TranslationListener>();
     
     protected TacletConditions conditions; 
-        
+    private Services services;
+    
+    AbstractTacletTranslator(Services services){
+	this.services = services;
+    }
     
     public TacletFormula translate(Taclet t, ImmutableSet<Sort> sorts)
     throws IllegalTacletException{
@@ -300,6 +315,7 @@ abstract class AbstractTacletTranslator implements TacletTranslator {
 	        || (op instanceof NonRigidHeapDependentFunction)
 	        || (op instanceof AttributeOp)
 	        || (op instanceof MetaCreated)
+	        || (op instanceof ProgramSV)
 	   
 
 	        
@@ -519,7 +535,13 @@ abstract class AbstractTacletTranslator implements TacletTranslator {
 	
 		i++;
 	    }
-	    term = TermBuilder.DF.all(copy,subTerms[0]);
+	    if((term.op()).equals(Quantifier.ALL)){
+		term = TermBuilder.DF.all(copy,subTerms[0]);
+	    }
+	    if((term.op()).equals(Quantifier.EX)){
+		term = TermBuilder.DF.ex(copy,subTerms[0]);
+	    }
+	    
 
 	}else{
 	    term = tf.createTerm(term.op(), subTerms, variables,
@@ -531,7 +553,14 @@ abstract class AbstractTacletTranslator implements TacletTranslator {
     
     
 
-    
+    private boolean isAbstractOrInterface(Sort sort){
+        if(!isReferenceSort(sort)) return false;
+        
+        
+        return    !(sort instanceof ArraySort) &&  
+               ((ClassInstanceSort)sort).representAbstractClassOrInterface();
+	
+    }
     
     private boolean isReferenceSort(Sort sort){
 	return  ( sort instanceof ClassInstanceSort );
@@ -549,7 +578,11 @@ abstract class AbstractTacletTranslator implements TacletTranslator {
 		|| (inst.equals(Sort.ANY)) 
 		|| (conditions.containsIsReferenceCondition(generic)
 			>0
-			&& !isReferenceSort(inst)));
+			&& !isReferenceSort(inst))
+		|| (conditions.containsNotAbstractInterfaceCondition(generic)
+			&& isAbstractOrInterface(inst))
+		|| (conditions.containsAbstractInterfaceCondition(generic)
+			&& !isAbstractOrInterface(inst)));
     }
     
 
@@ -654,6 +687,9 @@ abstract class AbstractTacletTranslator implements TacletTranslator {
 		genericTermsQuantified = genericTermsQuantified.append(quantifyTerm(gt)); 
 		
 	    }
+	     if(appendGenericTerm){
+		 genericTermsQuantified= genericTermsQuantified.append(term);
+	     }
 	    term = TermBuilder.DF.and(genericTermsQuantified);
 	    
 	}
@@ -803,6 +839,9 @@ abstract class AbstractTacletTranslator implements TacletTranslator {
 	
 	}
 	
+	
+	
+
 	if(term.op() instanceof SortDependingFunction){	    
 	    SortDependingFunction func = (SortDependingFunction) term.op();
 	    if(func.getSortDependingOn() instanceof GenericSort){
@@ -810,11 +849,19 @@ abstract class AbstractTacletTranslator implements TacletTranslator {
 	    }
 	}
 	
+	
+	
+
+	
+	
 	if(term.sort() instanceof GenericSort){
 	    usedGenericSorts.add((GenericSort) term.sort());   
 	}
 	return term;
     }
+    
+    
+
     
     public void addListener(TranslationListener listener){
 	this.listener.add(listener);

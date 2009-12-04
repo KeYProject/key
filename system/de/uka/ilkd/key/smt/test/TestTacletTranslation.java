@@ -55,7 +55,7 @@ public class TestTacletTranslation extends TestTaclet {
     public void testTranslateWhatYouGet() {
 
 	ImmutableSet<Sort> emptySet = DefaultImmutableSet.nil();
-	TacletSetTranslation translation = new DefaultTacletSetTranslation();
+	TacletSetTranslation translation = new DefaultTacletSetTranslation(getServices());
 	translation.setTacletSet(getTaclets());
 	storeToFile(translation.getTranslation(emptySet), TestTaclet.folder
 	        + "TacletProofObligation.key");
@@ -102,7 +102,7 @@ public class TestTacletTranslation extends TestTaclet {
      * Taclets that should not be accepted.
      */
     public void testBadExamples() {
-	TacletSetTranslation translation = new DefaultTacletSetTranslation();
+	TacletSetTranslation translation = new DefaultTacletSetTranslation(getServices());
 	ImmutableSet<Taclet> set = DefaultImmutableSet.nil();
 	String[] tacletList = { "ex_bool", // has a bad replace pattern:
 					   // substitution
@@ -154,7 +154,7 @@ public class TestTacletTranslation extends TestTaclet {
 	Taclet t = getTacletByName("boolean_equal_2");
 	Assert.assertTrue("Taclet boolean_equal_2 not found.", t != null);
 
-	TacletTranslator translator = new RewriteTacletTranslator();
+	TacletTranslator translator = new RewriteTacletTranslator(getServices());
 	ImmutableSet<Sort> emptySet = DefaultImmutableSet.nil();
 	TacletFormula tf = translator.translate(t,emptySet);
 
@@ -184,7 +184,7 @@ public class TestTacletTranslation extends TestTaclet {
 	        .assertTrue("Taclet apply_eq_boolean_rigid not found.",
 	                t != null);
 
-	TacletTranslator translator = new RewriteTacletTranslator();
+	TacletTranslator translator = new RewriteTacletTranslator(getServices());
 	ImmutableSet<Sort> emptySet = DefaultImmutableSet.nil();
 	TacletFormula tf = translator.translate(t,emptySet);
 

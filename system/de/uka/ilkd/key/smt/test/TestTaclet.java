@@ -12,6 +12,7 @@ package de.uka.ilkd.key.smt.test;
 import java.io.File;
 
 import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.init.KeYUserProblemFile;
@@ -36,6 +37,12 @@ class TestTaclet extends TestCase {
 
     /** The set of taclets */
     private ImmutableSet<Taclet> taclets;
+    
+    private Services services;
+    
+    protected Services getServices(){
+	return services;
+    }
 
     /**
      * Returns a set of taclets that can be used for tests. REMARK: First you
@@ -81,6 +88,7 @@ class TestTaclet extends TestCase {
 	    pi.startProver(po, po);
 
 	    result = po.getPO();
+	    services = pi.prepare(po).getServices();
 	    taclets = pi.prepare(po).getTaclets();
 
 	} catch (Exception e) {

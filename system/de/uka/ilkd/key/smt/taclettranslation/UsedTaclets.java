@@ -33,7 +33,11 @@ final class UsedTaclets {
      * listed in <code>contains</code> are used (should be the normal
      * case).
      */
-    static final private String testTaclets[] = {//""
+    static final private String testTaclets[] = {//"",
+							//"array_length_short_javacard"
+	//"array_length_non_negative_2",
+						   //"array_length_non_negative",
+						
 						  //   ,"boolean_equal_2"
 						   //  ,"disjoint_repositories"
 						   //  ,"castDel"
@@ -142,7 +146,7 @@ final class UsedTaclets {
 	    //usedTaclets.add("all_integer_sorts_are_equals"); 
 	    
 	  //  usedTaclets.add("only_created_object_are_referenced");
-	    //usedTaclets.add("exact_instance_definition_reference"); 
+	    usedTaclets.add("exact_instance_definition_reference"); 
 	    usedTaclets.add("exact_instance_definition_integerDomain");
 	    usedTaclets.add("exact_instance_definition_int");
 	    usedTaclets.add("exact_instance_definition_jbyte");
@@ -156,10 +160,17 @@ final class UsedTaclets {
 	    usedTaclets.add("exact_instance_definition_known_eq");
 	    usedTaclets.add("exact_instance_definition_known_false");
 	   
+	    usedTaclets.add("exact_instance_for_interfaces_or_abstract_classes");
+	     
+	    usedTaclets.add("repository_object_non_null");
+	    
+	    //usedTaclets.add("system_invariant_for_created_2a_sym");
+	    
+	    //usedTaclets.add("only_created_object_are_referenced");
 	    
 	   
-	  
-	    
+	    //usedTaclets.add("array_length_non_negative_2");
+	   // usedTaclets.add("array_length_short_javacard");
 	    
 	    
 	    

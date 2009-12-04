@@ -8,6 +8,7 @@ import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
@@ -80,8 +81,8 @@ public final class DefaultTacletSetTranslation
     
     private HashSet<SchemaVariable> usedFormulaSV = new HashSet<SchemaVariable>();
 
-    public DefaultTacletSetTranslation() {
-	TacletTranslator tt = new RewriteTacletTranslator();
+    public DefaultTacletSetTranslation(Services services) {
+	TacletTranslator tt = new RewriteTacletTranslator(services);
 	tt.addListener(this);
 	translators = translators.append(tt);
 	

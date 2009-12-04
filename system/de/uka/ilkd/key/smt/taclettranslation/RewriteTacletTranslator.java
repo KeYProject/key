@@ -7,6 +7,7 @@ import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -33,14 +34,20 @@ import de.uka.ilkd.key.rule.conditions.TypeResolver;
  */
 public class RewriteTacletTranslator extends AbstractTacletTranslator {
 
+    /**
+     * @param services
+     */
+    public RewriteTacletTranslator(Services services) {
+	super(services);
+	// TODO Auto-generated constructor stub
+    }
+
     private static final Term STD_REPLACE = TermBuilder.DF.ff(),
 	    STD_ADD = TermBuilder.DF.ff(), STD_ASSUM = TermBuilder.DF.ff(),
 	    STD_FIND = TermBuilder.DF.ff();
    
 
-    public RewriteTacletTranslator() {
 
-    }
 
     /**
      * Translates the replace and add pattern of a goal template to:
@@ -55,11 +62,13 @@ public class RewriteTacletTranslator extends AbstractTacletTranslator {
      *            the find pattern of the taclet, already translated.
      * @return translation
      */
-    private Term translateReplaceAndAddTerm(RewriteTacletGoalTemplate template,
+    private Term translateReplaceAndAddTerm(TacletGoalTemplate template,
 	    Term find) {
 	TermBuilder tb = TermBuilder.DF;
-	Term replace = template.replaceWith() != null ? template.replaceWith()
-	        : STD_REPLACE;
+	Term replace = find;
+	if(template instanceof RewriteTacletGoalTemplate){
+	    replace = ((RewriteTacletGoalTemplate)template).replaceWith();
+	}
 	Term add = template.sequent() != null ? translate(template.sequent())
 	        : STD_ADD;
 	if (add == null)
@@ -85,10 +94,13 @@ public class RewriteTacletTranslator extends AbstractTacletTranslator {
      * @return translation
      */
     private Term translateReplaceAndAddFormula(
-	    RewriteTacletGoalTemplate template, Term find) {
+	    TacletGoalTemplate template, Term find) {
 	TermBuilder tb = TermBuilder.DF;
-	Term replace = template.replaceWith() != null ? template.replaceWith()
-	        : STD_REPLACE;
+	Term replace = find;
+	if(template instanceof RewriteTacletGoalTemplate){
+	    replace = ((RewriteTacletGoalTemplate)template).replaceWith();
+	}
+		 
 	Term add = template.sequent() != null ? translate(template.sequent())
 	        : STD_ADD;
 	if (add == null)
@@ -125,12 +137,12 @@ public class RewriteTacletTranslator extends AbstractTacletTranslator {
 	ImmutableList<Term> list = ImmutableSLList.nil();
 
 	for (TacletGoalTemplate template : rewriteTaclet.goalTemplates()) {
-	    if (rewriteTaclet.find().sort() == Sort.FORMULA) {
+	    if (rewriteTaclet.find().sort().equals(Sort.FORMULA)) {
 		list = list.append(translateReplaceAndAddFormula(
-		        (RewriteTacletGoalTemplate) template, find));
+		         template, find));
 	    } else {
 		list = list.append(translateReplaceAndAddTerm(
-		        (RewriteTacletGoalTemplate) template, find));
+		         template, find));
 	    }
 	}
 
@@ -158,10 +170,11 @@ public class RewriteTacletTranslator extends AbstractTacletTranslator {
     @Override
     public void checkGoalTemplate(TacletGoalTemplate template)
 	    throws IllegalTacletException {
-	if (!(template instanceof RewriteTacletGoalTemplate)) {
+	/*if (!(template instanceof RewriteTacletGoalTemplate)) {
 	    throw new IllegalTacletException(
-		    "GoalTemplate not of type RewriteTacletGoalTemplate.");
-	}
+		    "GoalTemplate not of type RewriteTacletGoalTemplate: "+ template.getClass());
+	}*/
+	if(template instanceof RewriteTacletGoalTemplate)
 	checkTerm(((RewriteTacletGoalTemplate) template).replaceWith());
 
     }

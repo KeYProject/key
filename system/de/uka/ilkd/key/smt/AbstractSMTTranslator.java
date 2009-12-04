@@ -1892,7 +1892,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 	    return result;
 	}
 	
-	tacletSetTranslation = new DefaultTacletSetTranslation();
+	tacletSetTranslation = new DefaultTacletSetTranslation(services);
 	
 	tacletSetTranslation.setTacletSet(taclets);
 	
