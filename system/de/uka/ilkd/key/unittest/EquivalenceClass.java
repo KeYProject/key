@@ -427,9 +427,10 @@ public class EquivalenceClass {
 	    return iValue;
 	}
 	Iterator<Term> it = members.iterator();
-	while (it.hasNext()) {
+	while (it.hasNext() && term2class!=null) {
 	    Term t = it.next();
 	    Operator op = t.op();
+	    //gladisch: What is going on here?
 	    if (op == serv.getTypeConverter().getIntLDT().getAdd()
 		    || op == serv.getTypeConverter().getLongLDT().getAdd()) {
 		Integer res = null;
@@ -474,6 +475,7 @@ public class EquivalenceClass {
 	// ...
     }
 
+    /**This value has a side-effect: it sets the fields iValue or bValue if possible */
     public boolean containsLiteral() {
 	Iterator<Term> it = members.iterator();
 	while (it.hasNext()) {

@@ -51,6 +51,9 @@ public class Model {
 	}
     }
 
+    /**Warning: this method does not set a value to the EquivalenceClass given as argument
+     * but instead an association is made between the equivalence class and the value.
+     * This Association is stored in a hashmap of this class and not of the equivalence class */
     public void setValue(EquivalenceClass ec, int i) {
 	class2value.put(ec, new IntValueContainer(new Integer(i)));
     }
