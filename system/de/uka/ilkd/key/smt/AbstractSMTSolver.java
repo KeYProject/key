@@ -226,6 +226,8 @@ public abstract class AbstractSMTSolver implements SMTSolver {
 	    logger.debug("The formula could not be translated.", e);
 	    //throw new RuntimeException("The formula could not be translated.\n" + e.getMessage());
 	}
+    	goal.node().addSMTData(toReturn);
+    	
        	return toReturn;
     }
     

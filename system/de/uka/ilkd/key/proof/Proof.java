@@ -114,9 +114,19 @@ public class Proof implements Named {
 //    implemented by mbender for jmltest
     private SpecExtPO specExtPO;
     
+    /** This field stores counter examples (in some format) or notes that 
+     * nodes are proved or falsifiable (and therefore not provable). 
+     * The objects of the vector may store information, e.g., from a decision procedure 
+     * or from the test generator.The runtime type of the vector elements maybe, e.g., SMTSolverResult. 
+     * Adding a field "counterExampleData" to every node would be a waste of memory
+     * as this information is used rather rarely.
+     * @author gladisch  */
+    public WeakHashMap<Node, Vector<Object>> nodeToSMTData;
+    
+   
 
     /** constructs a new empty proof with name */
-    private Proof(Name name, Services services, ProofSettings settings) {
+     private Proof(Name name, Services services, ProofSettings settings) {
         this.name = name;
         assert services != null : "Tried to create proof without valid services.";
 	this.services = services.copyProofSpecific(this);
@@ -664,6 +674,7 @@ public class Proof implements Named {
     /** fires the event that the proof has been pruned at the given node */
     protected void fireProofIsBeingPruned(Node node, Node removedNode) {
         ProofTreeEvent e = new ProofTreeRemovedNodeEvent(this, node, removedNode);
+        clearSMTData(removedNode);
         for (int i = 0; i<listenerList.size(); i++) {
             listenerList.get(i).proofIsBeingPruned(e);
         }
@@ -895,6 +906,87 @@ public class Proof implements Named {
      */
     public SpecExtPO getPO() {
         return specExtPO;
+    }
+
+    private static final Object nodeToSMTDataAltLock = new Object();
+    private Object nodeToSMTDataLock(){
+	if(nodeToSMTData!=null)
+	    return nodeToSMTData;
+	return nodeToSMTDataAltLock;
+    }
+    /**This method is meant to be invoked by {@code Node.setSMTData()}
+     * Be aware that this method fires events to listeners and may therefore have other side-effects.
+     * @see {@code nodeToSMTData}
+     * @author gladisch */
+    public  void addSMTData(Node n, Object data){
+	synchronized(nodeToSMTDataLock()){
+        	if(n.proof()!=this)//checking by the way against a null pointer
+        	    new RuntimeException("The referenced node does not belong to this proof");
+        	
+        	if(nodeToSMTData==null){
+        	    nodeToSMTData = new WeakHashMap<Node, Vector<Object>>();
+        	}
+        	Vector<Object> vect = nodeToSMTData.get(n);
+        	if(vect==null){
+        	    vect = new Vector<Object>();
+        	    nodeToSMTData.put(n, vect);
+        	}
+        	vect.add(data);
+        	
+        	//fireEvent
+        	ProofTreeEvent e = new ProofTreeEvent(this, n);
+        	for (int i = 0; i<listenerList.size(); i++) {
+        	    listenerList.get(i).smtDataUpdate(e);
+        	}
+	}
+    }
+    
+    /**If there is no SMT Data, then null is returned.
+     * This method is meant to be invoked by {@code Node.getSMTData()} 
+     * @author gladisch*/
+    public  Vector<Object> getSMTData(Node n){
+	synchronized(nodeToSMTDataLock()){
+        	if(n.proof()!=this)//checking by the way against a null pointer
+        	    new RuntimeException("The referenced node does not belong to this proof");
+        
+        	if(nodeToSMTData==null) return null;
+        	Vector<Object> vect = nodeToSMTData.get(n);
+        	if(vect!=null){
+        	    //This is just a check. Read the documentation of this method to understand this.
+        	    if(vect.size()==0)
+        		throw new RuntimeException("Map with counter example data is broken.");
+        	}
+        	return vect;
+	}
+    }
+    
+    public  void clearSMTData(Node n){
+	synchronized(nodeToSMTDataLock()){
+        	if(n.proof()!=this)//checking by the way against a null pointer
+        	    new RuntimeException("The referenced node does not belong to this proof");
+        
+        	if(nodeToSMTData==null) return;
+        	
+        	nodeToSMTData.remove(n);
+	}
+    }
+    
+    public  void clearSMTData(){
+	synchronized(nodeToSMTDataLock()){
+        	if(nodeToSMTData!=null){
+        	    nodeToSMTData.clear();
+        	}
+        	nodeToSMTData=null;
+	}
+    }
+    
+    /**@return returns the keys of the weak hashmap {@code nodeToSMTData}
+     * 	warning: null may be returend.
+     * @author gladisch */
+     public Set<Node> getNodesWithSMTData(){
+	if(nodeToSMTData==null)
+	    return null;
+	return 	nodeToSMTData.keySet();
     }
 
 }

@@ -149,6 +149,9 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         setupSplitting ( d );
 
         bindRuleSet ( d, "test_gen", inftyConst () );
+        bindRuleSet ( d, "test_gen_empty_modality_hide", inftyConst () );
+        bindRuleSet ( d, "test_gen_quan", inftyConst () );
+        bindRuleSet ( d, "test_gen_quan_num", inftyConst () );
 
         bindRuleSet ( d, "gamma",
                       add ( not ( isInstantiated ( "t" ) ),
@@ -1911,9 +1914,10 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         setupInEqSimpInstantiationWithoutRetry ( d, p_proof );
     }
 
+    public static final String JavaCardDLStrategy = "JavaCardDLStrategy";
     
     public Name name () {
-        return new Name("JavaCardDLStrategy");
+        return new Name(JavaCardDLStrategy);
     }
 
 
@@ -1960,7 +1964,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         }
         
         public Name name () {
-            return new Name("JavaCardDLStrategy");
+            return new Name(JavaCardDLStrategy);
         }
     }
 

@@ -62,13 +62,17 @@ public class NRFLHandler {
         trh = new TermRepHandler(serv, tce);
         uf = new UpdateFactory(serv, new UpdateSimplifier());
 
-        final Update identUp = createIdentUp(collectNRFLInPost(pos.subTerm()
-                .sub(0)));
-        final Update compUp = composeUpdate(getOrigUp(pos.constrainedFormula()
-                .formula()), identUp);
+        final HashSet<Term> NRFLsInPost = collectNRFLInPost(pos.subTerm().sub(0));
+        final Update identUp = createIdentUp(NRFLsInPost);
+        
+        final Update origUp = getOrigUp(pos.constrainedFormula().formula());
+        final Update compUp = composeUpdate(origUp, identUp);
+        
         initNRFL(compUp);
-        result = uf.apply(compUp, TermFactory.DEFAULT.createDiamondTerm(pos
-                .subTerm().javaBlock(), createNewPost(pos.subTerm().sub(0))));
+        final Term newPost = createNewPost(pos.subTerm().sub(0));
+        
+        result = uf.apply(compUp, TermFactory.DEFAULT.
+        		createDiamondTerm(pos.subTerm().javaBlock(),newPost));
     }
 
     /**
@@ -80,7 +84,7 @@ public class NRFLHandler {
      */
     private Term createNewPost(Term post) {
         if (post.op() instanceof NonRigidFunctionLocation) {
-            return trh.getReadRep(post.op());
+            return trh.getReadRep(post);
         } else {
             final int arity = post.arity();
             if (arity == 0) {
@@ -241,8 +245,8 @@ public class NRFLHandler {
         return Update.createUpdate(t);
     }
 
-    public Statement getWriteRep(Operator op) {
-        return trh.getWriteRep(op);
+    public Statement getWriteRep(Term left, Term right) {
+        return trh.getWriteRep(left, right);
     }
 
     public Term getResult() {

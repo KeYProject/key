@@ -23,7 +23,7 @@ import de.uka.ilkd.key.unittest.DecProdModelGenerator;
 import de.uka.ilkd.key.unittest.EquivalenceClass;
 import de.uka.ilkd.key.unittest.Model;
 
-public class CogentModelGenerator implements DecProdModelGenerator {
+public class CogentModelGenerator extends DecProdModelGenerator {
 
     private ImmutableSet<Term> locations;
 

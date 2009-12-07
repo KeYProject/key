@@ -23,11 +23,11 @@ import de.uka.ilkd.key.strategy.StrategyFactory;
 import de.uka.ilkd.key.strategy.VBTStrategy;
 import de.uka.ilkd.key.rule.metaconstruct.WhileLoopTransformation2;
 
-
+/** @see de.uka.ilkd.key.proof.init.JavaTestGenerationProfile2 */
 public class JavaTestGenerationProfile extends JavaProfile {
 
     private final static StrategyFactory DEFAULT =
-        new VBTStrategy.Factory();
+        new VBTStrategy.Factory(0);
 
     public JavaTestGenerationProfile(IMain main) {
         super("standardRules-testGen.key",

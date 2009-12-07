@@ -78,8 +78,10 @@ public class Node {
      */
     private ImmutableSet<NoPosTacletApp>  localIntroducedRules = DefaultImmutableSet.<NoPosTacletApp>nil();
     
+    
     /** creates an empty node that is root and leaf.
      */
+
     public Node(Proof proof) {
 	this.proof = proof;
 	rootSink = new BufferSink ( null );
@@ -731,6 +733,24 @@ public class Node {
 
     public int getUniqueTacletNr() {
         return getIntroducedRulesCount();
+    }
+
+    
+    /**@see {@code Proof.nodeToSMTData}
+     * The argument may be an {@code SMTSolverResult} or data from the test generator
+     * @author gladisch */
+    public void addSMTData(Object smtData) {
+	proof().addSMTData(this, smtData);
+    }
+    
+    /**If there is no smt Data associated with this node, then null is returned. 
+     * @author gladisch*/
+    public Vector<Object> getSMTData() {
+	return proof().getSMTData(this);
+    }
+    
+    public void clearSMTData(){
+	proof().clearSMTData(this);
     }
 
  }

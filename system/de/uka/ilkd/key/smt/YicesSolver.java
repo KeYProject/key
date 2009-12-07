@@ -15,11 +15,11 @@ import de.uka.ilkd.key.java.Services;
 
 public final class YicesSolver extends AbstractSMTSolver {
 
-
-
+    public static final String name = "Yices";
+    
 
     public String name() {
-	return "Yices";
+	return name;
     }
     
     
@@ -31,7 +31,9 @@ public final class YicesSolver extends AbstractSMTSolver {
     @Override
     protected String getExecutionCommand(String filename, String formula) {
 
-	String toReturn = "yices -tc -smt " + filename;
+	//String toReturn = "yices -tc -smt " + filename;
+	//The following command tells yices to return a model if possible 
+	String toReturn = "yices -tc -e -smt " + filename;
 
 	return toReturn;
     }
@@ -40,13 +42,22 @@ public final class YicesSolver extends AbstractSMTSolver {
     public SMTSolverResult interpretAnswer(String input, String error, int val) {
 	if (val == 0) {
 	    //no error occured
-	    if (input.equals("unsat\n")) {
-		return SMTSolverResult.createValidResult(input);
-	    } else if (input.equals("sat\n")) {
-		return SMTSolverResult.createInvalidResult(input);
+	    //The commented out code works if no models (counterexamples) interpreted
+//	    if (input.equals("unsat\n")) {
+//		return SMTSolverResult.createValidResult(input);
+//	    } else if (input.equals("sat\n")) {
+//		return SMTSolverResult.createInvalidResult(input);
+//	    } else {
+//		return SMTSolverResult.createUnknownResult(input);
+//	    }
+	    if (input.startsWith("unsat\n")) {
+		return SMTSolverResult.createValidResult(input,name());
+	    } else if (input.startsWith("sat\n")) {
+		return SMTSolverResult.createInvalidResult(input,name());
 	    } else {
-		return SMTSolverResult.createUnknownResult(input);
+		return SMTSolverResult.createUnknownResult(input,name());
 	    }
+
 	} else {
 	    throw new IllegalArgumentException(error);
 	}

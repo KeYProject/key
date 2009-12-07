@@ -53,7 +53,9 @@ import de.uka.ilkd.key.proof.mgt.TaskTreeNode;
 import de.uka.ilkd.key.proof.reuse.ReusePoint;
 import de.uka.ilkd.key.smt.DecProcRunner;
 import de.uka.ilkd.key.strategy.VBTStrategy;
+import de.uka.ilkd.key.unittest.TestExecuter;
 import de.uka.ilkd.key.unittest.UnitTestBuilder;
+import de.uka.ilkd.key.unittest.UnitTestBuilderGUIInterface;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.KeYExceptionHandler;
 import de.uka.ilkd.key.util.KeYResourceManager;
@@ -176,7 +178,7 @@ public class Main extends JFrame implements IMain {
     public static boolean testStandalone = false;
     
     /** Determines if the KeY prover is started in visible mode*/
-    public static boolean visible = true;
+    private static boolean visible = true;
 
     public static String statisticsFile = null;
 
@@ -231,6 +233,8 @@ public class Main extends JFrame implements IMain {
     /** The menu for the decproc options */
     private final JMenu decProcOptions = new JMenu("Decision Procedures");
     
+    public DecisionProcedureResultsDialog decProcResDialog;
+    
     
     /**
      * creates prover -- private, use getInstance()
@@ -257,6 +261,7 @@ public class Main extends JFrame implements IMain {
         layoutMain();
         initGoalList();
         initGUIProofTree();
+        decProcResDialog = DecisionProcedureResultsDialog.getInstance(mediator);
         
         SwingUtilities.updateComponentTreeUI(this);
         ToolTipManager.sharedInstance().setDismissDelay(30000);
@@ -309,7 +314,9 @@ public class Main extends JFrame implements IMain {
         if (instance == null) {
             instance = new Main("KeY -- Prover");
         }
-        if (!instance.isVisible()) {
+        if (!instance.isVisible() &&
+        	instance.isVisibleMode() 
+        	) {
             if (SwingUtilities.isEventDispatchThread()) {
                 instance.setVisible(visible); // XXX: enough?
             } else {
@@ -402,7 +409,7 @@ public class Main extends JFrame implements IMain {
     }
     
     public void setVisible(boolean v){
-        super.setVisible(v && visible);
+        super.setVisible(v && isVisibleMode());
     }
     
     /** paints empty view */
@@ -1523,6 +1530,7 @@ public class Main extends JFrame implements IMain {
 	}
     }
     
+    JCheckBoxMenuItem showSMTResDialog;
     JCheckBoxMenuItem saveSMTFile;
     private JCheckBoxMenuItem waitForAllProvers;
     private JCheckBoxMenuItem saveTacletTranslation;
@@ -1598,6 +1606,24 @@ public class Main extends JFrame implements IMain {
 	decProcOptions.add(setButton);
 	//dpButtonGroup.add(setButton);
 	
+	//add a checkbox for saving a created problem file
+	showSMTResDialog = new JCheckBoxMenuItem("Show SMT Progress Dialog");
+	showSMTResDialog.setSelected(dps.getShowSMTResDialog());
+	showSMTResDialog.addActionListener(new ActionListener() {
+	   public void actionPerformed(ActionEvent e) {
+	       boolean b = showSMTResDialog.isSelected();
+	       dps.setSMTResDialog(b);
+	       DecisionProcedureResultsDialog dia =DecisionProcedureResultsDialog.getInstance(null);
+	       if(dia!=null){
+		   if(b){
+		       dia.rebuildTableForProof();
+		   }
+		   dia.setVisible(b);
+	       }
+	   }
+	});
+	decProcOptions.add(showSMTResDialog);
+
 	//add a checkbox for saving a created problem file
 	saveSMTFile = new JCheckBoxMenuItem("Save created problemfile");
 	saveSMTFile.setSelected(dps.getSaveFile());
@@ -2200,7 +2226,7 @@ public class Main extends JFrame implements IMain {
     class MainListener extends WindowAdapter {
         public void windowClosing(WindowEvent e) {
             if(testStandalone){
-                visible = false;
+                setVisibleMode(false);
                 setVisible(false);
             }else{
                 exitMain();
@@ -2585,18 +2611,30 @@ public class Main extends JFrame implements IMain {
 		    GeneralSettings.disableSpecs = true;
 		} else if (opt[index].equals("AUTO")) {
 		    batchMode = true;
-                    visible = false;
+                    setVisibleMode(false);
 		} else if (opt[index].equals("DEPTHFIRST")) {		
 		    	System.out.println("DepthFirst GoalChooser ...");
 			Profile p = ProofSettings.DEFAULT_SETTINGS.getProfile();
 			p.setSelectedGoalChooserBuilder(DepthFirstGoalChooserBuilder.NAME);  
 			VBTStrategy.preferedGoalChooser = DepthFirstGoalChooserBuilder.NAME; 
-		} else if (opt[index].equals("TESTING") || opt[index].equals("UNIT")) {
-                    if(opt[index].equals("TESTING")){
+		} else if (opt[index].equals("TESTING") || opt[index].equals("UNIT") || opt[index].equals("UNIT2")) {
+		    int mode=-1;
+		    if(opt[index].equals("TESTING")){
+			mode=1;
+		    } else if(opt[index].equals("UNIT")) {
+			mode=2;
+		    } else if(opt[index].equals("UNIT2")){
+			mode=3;
+		    }
+                    if(mode==1){
                         testStandalone = true;
-                        visible = false;
+                        setVisibleMode(false);//Problem:Mixed semantics
                     }
-                    System.out.println("VBT optimizations enabled ...");                    
+                    if(mode==1||mode==2){
+                	System.out.println("VBT optimizations enabled ...");
+                    }else{
+                	System.out.println("VBT 2 optimizations enabled ...");
+                    }
                     
                     //Parameters of JavaTestGenerationProfile
                     boolean loop=false;
@@ -2618,8 +2656,13 @@ public class Main extends JFrame implements IMain {
                         if(loopBound>=0)System.out.println("Bounded loop unwinding. Unwinding bound:"+loopBound);
                         index++;
                     }
-                    ProofSettings.DEFAULT_SETTINGS.setProfile(
-                	    new JavaTestGenerationProfile(null,loop,loopBound));                   
+                    if(mode==1||mode==2){
+                	ProofSettings.DEFAULT_SETTINGS.setProfile(
+                	    new JavaTestGenerationProfile(null,loop,loopBound));
+                    } else if(mode==3){
+                	ProofSettings.DEFAULT_SETTINGS.setProfile(
+                    	    new JavaTestGenerationProfile2(null,loop,loopBound));                	
+                    }
                     testMode = true;
                     
 		} else if (opt[index].equals("DEBUGGER")) {                                     
@@ -2684,6 +2727,9 @@ public class Main extends JFrame implements IMain {
         	           "                    unit test generation mode. Optional arguments:\n"+
         	           "                    loop: to enable balanced loop unwinding\n"+
         	           "                    loopX: to allow at most X loop iterations");
+        System.out.println("  unit2 [loop] [loop0|loop1|loop2|loop3|loop4]: \n"+
+	           	   "                    unit test generation mode that is compatible with\n"+
+	           	   "                    the normal verification mode.");
 	System.out.println("  depthfirst      : constructs the proof tree in a depth first manner. Recommended for large proofs");
         System.out.println("  auto	          : start prove procedure after initialisation");
         System.out.println("  testing         : starts the prover with a simple test generation oriented user interface");
@@ -2844,7 +2890,7 @@ public class Main extends JFrame implements IMain {
         }
         
         public void actionPerformed(ActionEvent e) {
-            MethodSelectionDialog.getInstance(mediator);
+            TestGenerationDialog.getInstance(mediator);
         }
     }
     
@@ -3208,10 +3254,10 @@ public class Main extends JFrame implements IMain {
         
         // does no harm on non macs
         System.setProperty("apple.laf.useScreenMenuBar","true"); 
- 	
+        
         configureLogger();
         Main.evaluateOptions(args);        
- 	Main key = getInstance(visible);   
+ 	Main key = getInstance(isVisibleMode());   
  	key.loadCommandLineFile();
         if(testStandalone){
             key.unitKeY = new UnitTestGeneratorGui(key);
@@ -3242,7 +3288,9 @@ public class Main extends JFrame implements IMain {
         private JFrame proofList;
         private HashMap<StringBuffer, String> test2model;
         private boolean autoMode = false;
-		private JList testList;
+	//private JList testList;
+        //public static final JList testList = new JList();
+
         
         public static final String AUTO_MODE_TEXT = "Create Tests";
         
@@ -3303,131 +3351,6 @@ public class Main extends JFrame implements IMain {
             }
         }  
         
-        private void runTest(String testPath, String modelDir) throws IOException{
-            String testDir = testPath.substring(0, testPath.lastIndexOf(File.separator))+modelDir;
-            String test = testPath.substring(testPath.lastIndexOf(File.separator)+1);
-            Runtime.getRuntime().exec("cp "+testPath+" "+testDir);
-            File testDirFile = new File(testDir);
-            Runtime rt = Runtime.getRuntime();
-            Process compile = rt.exec("javac "+test, null, testDirFile);
-            String compileError = read(compile.getErrorStream()).trim();
-            if(!"".equals(compileError)){
-                throw new RuntimeException(compileError);
-            }
-            
-            Process runJUnit = rt.exec("java junit.swingui.TestRunner "+
-                    test.substring(0, test.lastIndexOf(".")), null, testDirFile);
-            String junitError = read(runJUnit.getErrorStream());
-            if(!"".equals(junitError)){
-                throw new RuntimeException(junitError);
-            }   
-        }
-        
-        private void createTestSelectionWindow(){
-            JDialog tsw = new JDialog(this, "Select Test Case");
-            tsw.getContentPane().setLayout(new BoxLayout(tsw.getContentPane(), 
-                 BoxLayout.Y_AXIS));
-            testList = new JList();
-            testList.setListData(bubbleSortTests(createTestArray()));
-            
-            JScrollPane testListScroll = new
-                JScrollPane(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED, 
-                        ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-            testListScroll.getViewport().setView(testList);
-            testListScroll.setBorder(
-                    new TitledBorder("Created Tests"));
-            testListScroll.setMinimumSize(new java.awt.Dimension(150, 400));
-            tsw.getContentPane().add(testListScroll);
-            
-            JButton test = new JButton("Run Test");
-            test.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    if(testList.getSelectedValue() == null){
-                        JOptionPane.showMessageDialog(
-                            null, "You must select a test first!",
-                            "No Test Selected", 
-                            JOptionPane.ERROR_MESSAGE);
-                    }else{
-                        TestAndModel tam = (TestAndModel) testList.getSelectedValue();
-                        try{
-                            runTest(tam.test, tam.model);
-                        }catch(Exception exc){
-                            new ExceptionDialog(testGui, exc);    
-                        }
-                    }
-                }
-            });
-            tsw.getContentPane().add(test);
-            tsw.pack();
-            tsw.setVisible(true);
-        }
-
-        public void updateTestSelection(){
-        	if(testList!=null){
-        		testList.setListData(bubbleSortTests(createTestArray()));
-        		testList.repaint();
-        	}        			
-        }
-        
-        private Object[] bubbleSortTests(Object[] tams){
-            boolean sorted = false;
-            while(!sorted){
-                sorted = true;
-                for(int i=0; i<tams.length-1; i++){
-                    if(tams[i].toString().compareTo(tams[i+1].toString())>0){
-                        Object temp = tams[i];
-                        tams[i] = tams[i+1];
-                        tams[i+1] = temp;
-                        sorted = false;
-                    }
-                }
-            }
-            return tams;
-        }
-        
-        private Object[] createTestArray(){
-            final Iterator<Map.Entry<StringBuffer, String>> it = 
-                test2model.entrySet().iterator();
-            Vector<TestAndModel> v = new Vector<TestAndModel>();
-            while(it.hasNext()){
-                final Map.Entry<StringBuffer, String> e = it.next();
-                String test = e.getKey().toString();
-                String model = e.getValue();
-                while(!"".equals(test.trim())){
-                    v.add(new TestAndModel(test.substring(0, test.indexOf(" ")), model));
-                    test = test.substring(test.indexOf(" ")+1);
-                }
-            }
-            return v.toArray();
-        }
-        
-        class TestAndModel{
-            public String test;
-            public String model;
-            
-            public TestAndModel(String test, String model){
-                this.test = test;
-                this.model = model;
-            }
-            
-            public String toString(){
-                return test;
-            }
-        }
-        
-        /** Read the input until end of file and return contents in a
-         * single string containing all line breaks. */
-        protected String read ( InputStream in ) throws IOException {
-            String lineSeparator = System.getProperty("line.separator");
-            BufferedReader reader = new BufferedReader
-                (new InputStreamReader(in));
-            StringBuffer sb = new StringBuffer();
-            String line;
-            while ((line = reader.readLine()) != null) {
-                sb.append(line).append(lineSeparator);
-            }
-            return sb.toString();
-        }
         
         protected JMenu createFileMenu() {
             JMenu fileMenu = new JMenu("File");
@@ -3483,9 +3406,9 @@ public class Main extends JFrame implements IMain {
                     (KeyEvent.VK_P, ActionEvent.CTRL_MASK));
             showProver.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    Main.visible = !Main.visible;
-                    main.setVisible(Main.visible);
-                    showProver.setText(Main.visible ? "Hide Prover" : "Show Prover");
+                    Main.setVisibleMode(!Main.isVisibleMode());
+                    main.setVisible(Main.isVisibleMode());
+                    showProver.setText(Main.isVisibleMode() ? "Hide Prover" : "Show Prover");
                 }});
             toolsMenu.add(showProver);
             
@@ -3493,7 +3416,7 @@ public class Main extends JFrame implements IMain {
                     IconFactory.junitLogo(toolbarIconSize));
             runTest.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    createTestSelectionWindow();    
+                    TestExecutionDialog.getInstance(main).setVisible(true);
                 }});
             toolsMenu.add(runTest);
             
@@ -3512,7 +3435,7 @@ public class Main extends JFrame implements IMain {
                 public void menuDeselected(MenuEvent arg0) {}
 
                 public void menuSelected(MenuEvent arg0) {
-                    showProver.setText(Main.visible ? "Hide Prover" : "Show Prover"); 
+                    showProver.setText(Main.isVisibleMode() ? "Hide Prover" : "Show Prover"); 
                     showRequirements.setText(proofList.isVisible() ? 
                             "Hide Test Requirements" : "Show Test Requirements"); 
                 }});
@@ -3686,25 +3609,29 @@ public class Main extends JFrame implements IMain {
                                     try{
                                         setEnabled(false);
                                         main.setStatusLine("Generating Tests");
-                                        StringBuffer testPath = new StringBuffer();
+                                        //StringBuffer testPath = new StringBuffer();
                                         String modelDir = associatedProof.getJavaModel().getModelDir();
-                                        test2model.put(testPath, modelDir);                                        
+                                        //test2model.put(testPath, modelDir);                                        
                                         buttonPressed = false;
                                         if(openDialog){
-                                            MethodSelectionDialog msd = MethodSelectionDialog.getInstance(mediator);
-                                            msd.setLatestTests(testPath);
+                                            TestGenerationDialog msd = TestGenerationDialog.getInstance(mediator);
+                                            //msd.setLatestTests(testPath);
                                         }else{
-                                            UnitTestBuilder testBuilder = 
-                                                new UnitTestBuilder(mediator.getServices(), 
-                                                        mediator.getProof());
-                                            testPath.append(testBuilder.createTestForProof(
-                                                    associatedProof)+" ");
+//					The ordinary UnitTestBuilder can be used as well.                                            
+//                                            UnitTestBuilder testBuilder = 
+//                                                new UnitTestBuilder(mediator.getServices(), 
+//                                                        mediator.getProof());
+                                            UnitTestBuilderGUIInterface testBuilder = 
+                                                new UnitTestBuilderGUIInterface(mediator);
+
+                                            String testfile = testBuilder.createTestForProof(associatedProof);
+                                            //TestExecutionDialog.addTest(testfile, null, null);
                                             
                                             main.setStatusLine("Test Generation Completed");
-                                            mediator.testCaseConfirmation(testPath.toString());
+                                            mediator.testCaseConfirmation(testfile);
                                         }
                                         main.setStatusLine("Test Generation Completed");
-                                        updateTestSelection();
+                                        //updateTestSelection();
                                     }catch(Exception exc){
                                         new ExceptionDialog(testGui, exc);
                                     }
@@ -3739,6 +3666,14 @@ public class Main extends JFrame implements IMain {
 
     public static boolean hasInstance() {
         return instance != null;
+    }
+
+    public static void setVisibleMode(boolean visible) {
+	Main.visible = visible;
+    }
+
+    public static boolean isVisibleMode() {
+	return visible;
     }
 
    

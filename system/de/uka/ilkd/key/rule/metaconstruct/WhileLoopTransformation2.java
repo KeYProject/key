@@ -51,7 +51,7 @@ import de.uka.ilkd.key.util.ExtList;
 public class WhileLoopTransformation2 extends WhileLoopTransformation {
 
     /** Global variable that determins how often to unwind the loop. */
-    public static int unwindings=2;
+    public static int unwindings=1;
 
 
     /** creates the WhileLoopTransformation for the transformation mode
@@ -122,7 +122,8 @@ public class WhileLoopTransformation2 extends WhileLoopTransformation {
                  if (_i<_j+1) break INNER_LABEL;
                  _j=_j+2;
                }
-               java.lang.Object.<loopAbstractionMethod>(hashCode);
+               if (_i<10)
+                  java.lang.Object.<loopAbstractionMethod>(hashCode);
              }
            }
             return 
@@ -153,6 +154,8 @@ public class WhileLoopTransformation2 extends WhileLoopTransformation {
 	    int hash = root().hashCode();
 	    ImmutableArray<Expression> args = new ImmutableArray<Expression>(new IntLiteral(""+hash));
 	    Statement res = new MethodReference(args, mn , typeRef);
+	    
+	    res = new If(guard, new Then(res));
 	    
 	    for(int i=0;i<unwindings;i++){
         	    /* 

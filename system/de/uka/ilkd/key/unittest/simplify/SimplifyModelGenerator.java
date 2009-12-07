@@ -31,7 +31,7 @@ import de.uka.ilkd.key.unittest.ModelGenerator;
 import de.uka.ilkd.key.unittest.simplify.ast.*;
 import de.uka.ilkd.key.util.ExtList;
 
-public class SimplifyModelGenerator implements DecProdModelGenerator {
+public class SimplifyModelGenerator extends DecProdModelGenerator {
 
     private Services serv;
 

@@ -415,7 +415,7 @@ public class SMTRuleMulti implements BuiltInRule, MakesProgress {
 		boolean finished = false;
 		
 		
-		while (!finished) {
+		while (!finished&&runningProcesses.size()>0) {
 		    //if there is a interruption signal, interrupt execWatch, 
 		    if (this.toBeInterrupted) {
 			this.toBeInterrupted = false;
@@ -489,7 +489,7 @@ public class SMTRuleMulti implements BuiltInRule, MakesProgress {
 		    SMTSolverResult res;
 		    if(sw.hasFinished()){
 		      	res = sw.getResult();
-		      	if(res.isValid() == SMTSolverResult.ThreeValuedTruth.FALSE) notValid = true;
+		      	if(res.isValid() == SMTSolverResult.ThreeValuedTruth.FALSIFIABLE) notValid = true;
 			if(res.isValid() == SMTSolverResult.ThreeValuedTruth.TRUE) valid = true;
 			
 			    

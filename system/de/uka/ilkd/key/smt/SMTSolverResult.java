@@ -13,34 +13,43 @@ package de.uka.ilkd.key.smt;
 
 public class SMTSolverResult {
     
-    public static enum ThreeValuedTruth {TRUE, FALSE, UNKNOWN}
+    /** In the context of proving nodes/sequents these values mean the following:
+     * TRUE iff negation of the sequent is unsatisfiable,
+     * FALSIFIABLE iff negation of the sequent is satisfiable (i.e. it has a counterexample),
+     * UNKNOWN otherwise (I'm not sure if this holds if an error occurs)
+     * Note: Currently (1.12.'09) the SMT Solvers do not check if a node is FALSE. */
+    public static enum ThreeValuedTruth {TRUE, FALSIFIABLE, UNKNOWN}
     
+    //We should get rid of this constant because it does not track the source (the solver) of the result.
     public static final SMTSolverResult NO_IDEA 
-    	= new SMTSolverResult("", ThreeValuedTruth.UNKNOWN);
+    	= new SMTSolverResult("", ThreeValuedTruth.UNKNOWN, "?");
     
     
     private final String text;
     private final ThreeValuedTruth isValid;
     
+    /**This is to identify where the result comes from. E.g. for user feedback. */
+    public final String solverName;
     
-    private SMTSolverResult(String text, ThreeValuedTruth isValid) {
+    private SMTSolverResult(String text, ThreeValuedTruth isValid, String solverName) {
+	this.solverName = solverName;
 	this.text = text;
 	this.isValid = isValid;
     }
     
     
-    public static SMTSolverResult createValidResult(String text) {
-	return new SMTSolverResult(text, ThreeValuedTruth.TRUE);
+    public static SMTSolverResult createValidResult(String text, String name) {
+	return new SMTSolverResult(text, ThreeValuedTruth.TRUE, name);
     }
     
     
-    public static SMTSolverResult createInvalidResult(String text) {
-	return new SMTSolverResult(text, ThreeValuedTruth.FALSE);
+    public static SMTSolverResult createInvalidResult(String text, String name) {
+	return new SMTSolverResult(text, ThreeValuedTruth.FALSIFIABLE, name);
     }
     
     
-    public static SMTSolverResult createUnknownResult(String text) {
-	return new SMTSolverResult(text, ThreeValuedTruth.UNKNOWN);
+    public static SMTSolverResult createUnknownResult(String text, String name) {
+	return new SMTSolverResult(text, ThreeValuedTruth.UNKNOWN, name);
     }
     
     

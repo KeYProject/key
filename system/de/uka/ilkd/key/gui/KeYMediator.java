@@ -289,9 +289,21 @@ public class KeYMediator {
     }
 
     public void testCaseConfirmation(String path){
-	JOptionPane.showMessageDialog(
-	    null, "A unittest was generated and written to "+path,
-	    "Unittest generated", JOptionPane.INFORMATION_MESSAGE);
+	TestExecutionDialog.addTest(path, null, null);
+	int n=JOptionPane.NO_OPTION;
+	if(Main.isVisibleMode() || Main.testStandalone){
+	n = JOptionPane.showConfirmDialog(
+		 Main.getInstance(),
+		"A unittest was generated and written to \n"+path+
+		"\nDo you want to compile and execute the test now?",
+		    "Unittest generated",
+		    JOptionPane.YES_NO_OPTION);
+	}
+	if(n==JOptionPane.YES_OPTION){
+	    TestExecutionDialog ted = TestExecutionDialog.getInstance(Main.getInstance());
+	    ted.setVisible(true);
+	}
+	
     }
     
     public void testCaseConfirmation(String path, int coverage){

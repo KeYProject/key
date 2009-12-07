@@ -511,6 +511,9 @@ public class GoalList extends JList {
                 add ( e.getSource ().openGoals () );
             }
 
+	    
+	    public void smtDataUpdate(ProofTreeEvent e) {}
+
 	}
     }
 

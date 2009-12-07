@@ -140,6 +140,7 @@ class SequentViewListener extends MouseInputAdapter
 		    } else {		    		    
 		    
 			menu = new TacletMenu(seqView,
+					      mediator.getSelectedGoal(),
 					      mediator.getFindTaclet(mousePos), 
 					      mediator.getRewriteTaclet(mousePos),
 					      mediator.getNoFindTaclet(),

@@ -14,6 +14,7 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.proof.DefaultGoalChooserBuilder;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.strategy.feature.NonDuplicateAppModPositionFeature;
+import de.uka.ilkd.key.strategy.feature.RuleSetDispatchFeature;
 
 
 /**
@@ -32,7 +33,12 @@ public class VBTStrategy extends JavaCardDLStrategy {
      * @see de.uka.ilkd.key.proof.init.JavaTestGenerationProfile */
     public static boolean loopUnwindBounded=false;
 
+    /**mode 0 is the more or less original version by engel, mode 1 is closer to the JavaCardDLStrategy and rule set.*/
+    private int vbtMode=0;
+    
+    /**Warning. The name VBTStrategy is used only if {@code vbtMode==0} */
     public static String VBTStrategy="VBTStrategy";
+    
     protected static StrategyProperties setupStrategyProperties() {
         final StrategyProperties res = new StrategyProperties ();
         res.setProperty( StrategyProperties.SPLITTING_OPTIONS_KEY,
@@ -51,65 +57,160 @@ public class VBTStrategy extends JavaCardDLStrategy {
         return res;
     }
     
-    protected VBTStrategy(Proof p_proof, StrategyProperties strategyProperties) {
+    protected VBTStrategy(Proof p_proof, StrategyProperties strategyProperties, final int mode) {
         super(p_proof, strategyProperties);
+        vbtMode = mode;
+        final RuleSetDispatchFeature rsd = getCostComputationDispatcher();
+        if(mode==0){
+            clearRuleSetBindings (rsd, "test_gen" );
+            bindRuleSet (rsd, "test_gen",
+                          add ( longConst ( -1000 ),
+                                NonDuplicateAppModPositionFeature.INSTANCE));
 
-        clearRuleSetBindings ( getCostComputationDispatcher (), "test_gen" );
-        bindRuleSet ( getCostComputationDispatcher (), "test_gen",
-                      add ( longConst ( -1000 ),
-                            NonDuplicateAppModPositionFeature.INSTANCE));
-        clearRuleSetBindings ( getCostComputationDispatcher (), "test_gen_quan_num" );
-        bindRuleSet ( getCostComputationDispatcher (), "test_gen_quan_num",
-                      add ( longConst ( 30000 ),
-                            NonDuplicateAppModPositionFeature.INSTANCE));
-        clearRuleSetBindings ( getCostComputationDispatcher (), "split_cond" );
-        bindRuleSet ( getCostComputationDispatcher (), "split_cond", -1000);
-        clearRuleSetBindings ( getCostComputationDispatcher (), "split" );
-        bindRuleSet ( getCostComputationDispatcher (), "split", -1000);
+            clearRuleSetBindings (rsd, "test_gen_empty_modality_hide" );
+            bindRuleSet (rsd, "test_gen_empty_modality_hide",
+                          add ( longConst ( -1000 ),
+                                NonDuplicateAppModPositionFeature.INSTANCE));
+            
+            clearRuleSetBindings (rsd, "test_gen_quan" );
+            bindRuleSet (rsd, "test_gen_quan",
+                          add ( longConst ( -1000 ),
+                                NonDuplicateAppModPositionFeature.INSTANCE));
 
-        clearRuleSetBindings ( getCostComputationDispatcher (), "beta" );
-        bindRuleSet ( getCostComputationDispatcher (), "beta", -1000);
+            
+            clearRuleSetBindings (rsd, "test_gen_quan_num" );
+            bindRuleSet (rsd, "test_gen_quan_num",
+                          add ( longConst ( 30000 ),
+                                NonDuplicateAppModPositionFeature.INSTANCE));
+            
+            clearRuleSetBindings (rsd, "split_cond" );
+            bindRuleSet (rsd, "split_cond", -1000);
+            
+            clearRuleSetBindings (rsd, "split" );
+            bindRuleSet (rsd, "split", -1000);
     
-        clearRuleSetBindings ( getCostComputationDispatcher (), "inReachableStateImplication" );
-        bindRuleSet ( getCostComputationDispatcher (), "inReachableStateImplication",
-                inftyConst () );
-        clearRuleSetBindings ( getCostComputationDispatcher (), "cut_direct" );
-        bindRuleSet ( getCostComputationDispatcher (), "cut_direct",
-                      inftyConst ());
-        clearRuleSetBindings ( getCostComputationDispatcher (), "simplify_prog" );
-        bindRuleSet ( getCostComputationDispatcher (), "simplify_prog",
-                      10000);
-        clearRuleSetBindings ( getCostComputationDispatcher (), "simplify_prog_subset" );
-        bindRuleSet ( getCostComputationDispatcher (), "simplify_prog_subset",
-                      10000);   
-    }
-    
-    protected VBTStrategy(Proof p_proof) {
+            clearRuleSetBindings (rsd, "beta" );
+            bindRuleSet (rsd, "beta", -1000);
         
-        this ( p_proof, setupStrategyProperties () );
+            clearRuleSetBindings (rsd, "inReachableStateImplication" );
+            bindRuleSet (rsd, "inReachableStateImplication", inftyConst());
+            clearRuleSetBindings (rsd, "cut_direct" );
+            bindRuleSet (rsd, "cut_direct",inftyConst());
+    
+            clearRuleSetBindings (rsd, "simplify_prog" );
+            bindRuleSet (rsd, "simplify_prog",10000);
+            
+            clearRuleSetBindings (rsd, "simplify_prog_subset" );
+            bindRuleSet (rsd, "simplify_prog_subset",10000);
+        }else if(mode==1){
+            boolean vbt_sym_ex = strategyProperties.getProperty(
+                    			StrategyProperties.VBT_PHASE).
+                    		equals(StrategyProperties.VBT_SYM_EX);
+            boolean vbt_quan_inst = strategyProperties.getProperty(
+					StrategyProperties.VBT_PHASE).
+					equals(StrategyProperties.VBT_QUAN_INST);
+            boolean vbt_model_gen = strategyProperties.getProperty(
+					StrategyProperties.VBT_PHASE).
+					equals(StrategyProperties.VBT_MODEL_GEN);
 
+            //System.out.println("VBTStrategy(1) sym_ex:"+vbt_sym_ex+" quan_inst:"+vbt_quan_inst+" model_gen:"+vbt_model_gen);
+
+            clearRuleSetBindings (rsd, "test_gen_empty_modality_hide" );
+            bindRuleSet (rsd, "test_gen_empty_modality_hide", inftyConst());
+            
+            clearRuleSetBindings (rsd, "test_gen" );
+            bindRuleSet (rsd, "test_gen",
+                          add ( longConst (-100 ),
+                                NonDuplicateAppModPositionFeature.INSTANCE));
+
+            clearRuleSetBindings (rsd, "test_gen_quan" );
+            bindRuleSet (rsd, "test_gen_quan",
+        	    		vbt_quan_inst?
+        	    			add( longConst ( -1000 ),NonDuplicateAppModPositionFeature.INSTANCE)
+            				:inftyConst());
+            
+            clearRuleSetBindings (rsd, "test_gen_quan_num" );
+            bindRuleSet (rsd, "test_gen_quan_num",
+                          	vbt_quan_inst?
+                          		add ( longConst ( -100 ),NonDuplicateAppModPositionFeature.INSTANCE)
+                          		:inftyConst());
+            
+            if(vbt_quan_inst || vbt_model_gen){
+                clearRuleSetBindings (rsd, "simplify_expression" );
+                bindRuleSet (rsd, "simplify_expression", inftyConst());        	
+
+                clearRuleSetBindings (rsd, "simplify_prog" );
+                bindRuleSet (rsd, "simplify_prog", inftyConst());        	
+
+                clearRuleSetBindings (rsd, "simplify_prog_subset" );
+                bindRuleSet (rsd, "simplify_prog_subset", inftyConst());
+                
+                clearRuleSetBindings (rsd, "simplify_autoname" );
+                bindRuleSet (rsd, "simplify_autoname", inftyConst());
+
+                clearRuleSetBindings (rsd, "loop_expand" );
+                bindRuleSet (rsd, "loop_expand", inftyConst());
+
+                clearRuleSetBindings (rsd, "loop_expand_bounded" );
+                bindRuleSet (rsd, "loop_expand_bounded", inftyConst());
+
+                clearRuleSetBindings (rsd, "method_expand" );
+                bindRuleSet (rsd, "method_expand", inftyConst());
+            }
+
+//            if(vbt_model_gen){
+//                clearRuleSetBindings (rsd, "split_cond" );
+//                bindRuleSet (rsd, "split_cond", -1000);
+//                
+//                clearRuleSetBindings (rsd, "split" );
+//                bindRuleSet (rsd, "split", -1000);
+//        
+//                clearRuleSetBindings (rsd, "beta" );
+//                bindRuleSet (rsd, "beta", -1000);
+//            }
+        }
     }
+    
 
     protected boolean arithDefOps() {
 	return true;
     }   
     
     public Name name () {
-        return new Name(VBTStrategy);
+        switch(vbtMode){
+        case 0: return new Name(VBTStrategy); 
+        case 1: return new Name(JavaCardDLStrategy); 
+        default: throw new RuntimeException("Unknwon VBT mode:"+vbtMode);
+        }
     }
 
     public static class Factory extends StrategyFactory {
 
-        public Factory () {
+	/**mode 0 is the more or less original version by engel, mode 1 is closer to the JavaCardDLStrategy and rule set.*/
+	private int vbtMode=0;
+	/**Version 0 is for verification-based testing as it was originally implemented and it differs from the normal JavaCardDLStrategy 
+	 * Version 1 is closer to the normal JavaCardDLStrategy*/
+        public Factory (int version) {
+            assert version==0||version==1;
+            this.vbtMode = version;
 	}
 
         public Strategy create ( Proof p_proof, 
                 StrategyProperties strategyProperties ) {
-            return new VBTStrategy ( p_proof);
+            if(vbtMode==0)
+        	return new VBTStrategy ( p_proof,setupStrategyProperties (), vbtMode);
+            else if(vbtMode==1)
+        	return new VBTStrategy ( p_proof, strategyProperties, vbtMode);
+            else 
+        	return null;
         }
         
         public Name name () {
-            return new Name(VBTStrategy);
+            switch(vbtMode){
+            case 0: return new Name(VBTStrategy); 
+            case 1: return new Name(JavaCardDLStrategy); 
+            default: throw new RuntimeException("Unknwon VBT mode:"+vbtMode);
+            }
         }
     }
 }

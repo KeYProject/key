@@ -11,11 +11,9 @@ package de.uka.ilkd.key.smt.taclettranslation;
 
 import java.util.Iterator;
 
-import sun.awt.image.OffScreenImage;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
-import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.VariableCondition;

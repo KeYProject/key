@@ -21,7 +21,7 @@ import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import java.io.StringReader;
 import java.util.*;
 
-public class OldSimplifyModelGenerator implements DecProdModelGenerator {
+public class OldSimplifyModelGenerator extends DecProdModelGenerator {
 
     private Services serv;
 
@@ -33,14 +33,16 @@ public class OldSimplifyModelGenerator implements DecProdModelGenerator {
 
     private String initialCounterExample;
 
-    // first element has to be 0. Only positive values at even indices.
-
-    private static final int[] genericTestValues = new int[] { 0, -1, 1, -10,
+    /** first element has to be 0. Only positive values at even indices. */
+    protected static int[] genericTestValues = new int[] { 0, -1, 1, -10,
 	    10, -1000, 1000, -1000000, 1000000, -2000000000, 2000000000 };
+    
+    /**In the original implementation the value was 1. But some examples are solved at depth 3 and it takes a long time until 3 is reached. */
+    public static int iterativeDeepeningStart = 1;
 
-    // Outputs of Simplify are stored in order to prevent Simplify
-    // from being called several times with the same formula -> saves execution
-    // time
+    /** Outputs of Simplify are cached in order to prevent Simplify
+     from being called several times with the same formula -> saves execution
+     time */
     private HashSet<String> simplifyOutputs;
 
     private ImmutableList<String> placeHoldersForClasses = ImmutableSLList.<String>nil();
@@ -100,22 +102,37 @@ public class OldSimplifyModelGenerator implements DecProdModelGenerator {
 
     public Set<Model> createModels() {
 	HashSet<Model> models = new HashSet<Model>();
-	int datCount = 1;
+	int datCount = iterativeDeepeningStart;
 	while (models.size() < getModelLimit()
 		&& datCount <= genericTestValues.length) {
-	    models.addAll(createModelsHelp(initialCounterExample, new Model(
-		    term2class), datCount++));
+	    createModels_ProgressNotification1(initialCounterExample,datCount);
 	    simplifyOutputs.clear();
+	    models.addAll(createModelsHelp(initialCounterExample, new Model(
+		    term2class), datCount++, 0));
 	}
 	return models;
     }
+    
+    /** Ment to be overwritten by OLDSimplifyMG_GUIInterface*/
+    protected void createModels_ProgressNotification1(String initCounterExample, int datCount){ }
 
+    public static final String[] POS = new String[]{"POS0","POS1","POS2","POS3","POS4"};
+
+
+    /** This method calls itself recursively and tries to create in each recursion step a more concrete
+     * model. Firstly inequations ("NEQ") are replaced by "<" then, then "<=" and "<" are replaced
+     * by equations.   */
     private Set<Model> createModelsHelp(String counterEx, Model model,
-	    int datCount) {
+	    int datCount, int recDepth) {
 	String counterExOLD = new String(counterEx);
+	createModelsHelp_ProgressNotification1(counterExOLD);
 	Set<Model> models = new HashSet<Model>();
 	if (counterEx.indexOf("Counterexample") == -1
-		|| models.size() >= getModelLimit()) {
+		|| models.size() >= getModelLimit()
+		|| terminateAsSoonAsPossible) {
+	    if(terminateAsSoonAsPossible){
+		System.out.println("Termianted");
+	    }
 	    return models;
 	}
 	counterEx = counterEx.replaceAll("_ ", "_");
@@ -125,8 +142,7 @@ public class OldSimplifyModelGenerator implements DecProdModelGenerator {
 	    return models;
 	}
 	StringReader stream = new StringReader(counterEx);
-	SimplifyParser parser = new SimplifyParser(new SimplifyLexer(stream),
-		serv);
+	SimplifyParser parser = new SimplifyParser(new SimplifyLexer(stream),serv);
 	Conjunction c = null;
 	try {
 	    c = parser.top();
@@ -141,27 +157,36 @@ public class OldSimplifyModelGenerator implements DecProdModelGenerator {
 	removeNegativeArrayIndices(c);
 	Equation[] eqs = c.getEquations();
 	if (eqs.length == c.arity()) {
+	    Vector<Equation> nonConcreteEquations = new Vector<Equation>(eqs.length);
 	    for (int i = 0; i < eqs.length; i++) {
 		de.uka.ilkd.key.unittest.simplify.ast.Term ft = eqs[i].sub(0);
 		EquivalenceClass ec = getEqvClass(ft);
 		if (ec != null && ec.getLocations().size() > 0
 			&& eqs[i].sub(1) instanceof NumberTerm) {
 		    model.setValue(ec, ((NumberTerm) eqs[i].sub(1)).getValue());
+		}else{
+		    nonConcreteEquations.add(eqs[i]);
 		}
 	    }
 	    if (model.size() == intClasses.size()) {
 		models.add(model);
+		createModelsHelp_ProgressNotificationX(POS[0], datCount, recDepth, "model.size() == intClasses.size() == "+model.size());
 	    } else {
-		for (int i = 0; i < eqs.length; i++) {
+		//The condition i<1 prevents that PERMUTATIONS of equations are enumerated.
+		//Enumeration of equations is done via recursive calls of this method.
+		//for (int i = 0; i < eqs.length && i < 1; i++) {
+		for(Equation eq: nonConcreteEquations){
 		    // set a subterm to an arbitrary value an test if
 		    // the system of equations has a unique solution now.
 		    for (int j = 0; j < datCount; j++) {
-			Equation e = createEquationForSubTerm(eqs[i],
+			Equation e = createEquationForSubTerm(eq, //eqs[i],
 				genericTestValues[j]);
 			if (e != null) {
 			    c.add(e);
-			    models.addAll(createModelsHelp(simplify(c), model
-				    .copy(), datCount));
+			    createModelsHelp_ProgressNotificationX(POS[1], datCount, 
+				    recDepth, //"createEquationForSubTerm("+eqs[i]+","+genericTestValues[j]+") = " + 
+				    e.toString());
+			    models.addAll(createModelsHelp(simplify(c), model.copy(), datCount, recDepth+1));
 			    if (models.size() >= getModelLimit()) {
 				return models;
 			    }
@@ -171,45 +196,81 @@ public class OldSimplifyModelGenerator implements DecProdModelGenerator {
 		}
 	    }
 	} else {
-	    LessEq[] leqs = c.getLessEq();
-	    for (int i = 0; i < leqs.length; i++) {
-		for (int j = 0; j < datCount; j += 2) {
-		    c.add(lessEqToEq(leqs[i], genericTestValues[j]));
-		    models.addAll(createModelsHelp(simplify(c), model.copy(),
-			    datCount));
-		    if (models.size() >= getModelLimit()) {
-			return models;
-		    }
-		    c.removeLast();
-		}
-	    }
-	    Less[] les = c.getLess();
-	    for (int i = 0; i < les.length; i++) {
-		for (int j = 2; j < datCount; j += 2) {
-		    c.add(lessToEq(les[i], genericTestValues[j]));
-		    models.addAll(createModelsHelp(simplify(c), model.copy(),
-			    datCount));
-		    if (models.size() >= getModelLimit()) {
-			return models;
-		    }
-		    c.removeLast();
-		}
-	    }
 	    Inequation[] neq = c.getInequations();
-	    for (int i = 0; i < neq.length; i++) {
-		for (int j = 1; j < datCount; j++) {
-		    c.add(ineqToEq(neq[i], genericTestValues[j]));
-		    models.addAll(createModelsHelp(simplify(c), model.copy(),
-			    datCount));
+	    for (int i = 0; i < neq.length && i < 1; i++) {
+//		for (int j = 1; j < datCount; j++) {
+//		    c.add(ineqToEq(neq[i], genericTestValues[j]));
+//		    createModelsHelp_ProgressNotificationX(POS[4], recDepth,
+//			    "ineqToEq("+genericTestValues[j]+", "+neq[i]+")");
+//		    models.addAll(createModelsHelp(simplify(c), model.copy(), datCount, recDepth+1));
+//		    if (models.size() >= getModelLimit()) {
+//			return models;
+//		    }
+//		    c.removeLast();
+//		}
+		//gladisch 14.11.2009 
+		for (int j = 0; j < 2 && j<datCount; j++) {
+		//This loop changes "(NEQ A B)" either to "(< A B)" or to "(< B A)"
+		    c.add(ineqToLess(neq[i], j==0));
+		    createModelsHelp_ProgressNotificationX(POS[4], datCount,
+			    recDepth, "ineqToLess("+(j==0)+", "+neq[i]+")");
+		    models.addAll(createModelsHelp(simplify(c), model.copy(), datCount, recDepth+1));
 		    if (models.size() >= getModelLimit()) {
 			return models;
 		    }
 		    c.removeLast();
 		}
+	    }
+	    //The following if-cascade prevents that all permutations of "NEQ"-constraints,
+	    //"<="-constraints, and "<"-constraints are enumerated. The permutations would be useless.
+	    if(c.getInequations().length==0){
+		//This branch is entered in a deeper recursion depth of createModelsHelp, when all inequations are replaced
+        	    LessEq[] leqs = c.getLessEq();
+        	    //Note, only one iteration is considered of the following loop (because of i<1)
+        	    //This is to prevent enumeration of permutations of "<=" constraints when the method is called recursively
+        	    for (int i = 0; i < leqs.length && i < 1; i++) {
+        		for (int j = 0; j < datCount*2 && j < genericTestValues.length; j += 2) {
+        		    c.add(lessEqToEq(leqs[i], 
+        			    genericTestValues[j]));
+        		    createModelsHelp_ProgressNotificationX(POS[2], datCount, 
+        			    recDepth, "lessEqToEq("+genericTestValues[j]+", "+leqs[i]+" ) ");
+        		    models.addAll(createModelsHelp(simplify(c), model.copy(), datCount, recDepth+1));
+        		    if (models.size() >= getModelLimit()) {
+        			return models;
+        		    }
+        		    c.removeLast();
+        		}
+        	    }
+        	    if(c.getLessEq().length==0){
+        		//This branch is entered in a deeper recursion depth of createModelsHelp, when all <= are solved
+                	    Less[] les = c.getLess();
+                	    //Note, only one iteration is considered of the following loop (because of i<1)
+                	    //This is to prevent enumeration of permutations of "<=" constraints when the method is called recursively
+                	    for (int i = 0; i < les.length && i < 1; i++) {
+                		for (int j = 2; j < 2 + datCount*2 && j < genericTestValues.length; j += 2) {
+                		    c.add(lessToEq(les[i], genericTestValues[j]));
+                		    createModelsHelp_ProgressNotificationX(POS[3], datCount,
+                			    recDepth, "lessToEq("+genericTestValues[j]+", "+les[i]+")");
+                		    models.addAll(createModelsHelp(simplify(c), model.copy(), datCount, recDepth+1));
+                		    if (models.size() >= getModelLimit()) {
+                			return models;
+                		    }
+                		    c.removeLast();
+                		}
+                	    }
+        	    }
 	    }
 	}
 	return models;
     }
+    
+    /**To be overwritten by OLDSimplifyMG_GUIInterface */
+    protected void createModelsHelp_ProgressNotification1(String counterExOld){   }
+
+    /**To be overwritten by OLDSimplifyMG_GUIInterface 
+     * @param iterativeDeepeningDepth TODO
+     * @param info TODO*/
+    protected void createModelsHelp_ProgressNotificationX(String codePos, int iterativeDeepeningDepth, int recDepth, String info){   }
 
     private String simplify(Conjunction c) {
 	try {
@@ -291,8 +352,7 @@ public class OldSimplifyModelGenerator implements DecProdModelGenerator {
     }
 
     /**
-     * Removes uninterpreted predicatesand extracts the formula provided by
-     * Simplify.
+     * Removes uninterpreted predicates and extracts the formula provided by Simplify.
      */
     private String removeIrrelevantSubformulas(String s) {
 	int index = s.indexOf("(AND");
@@ -358,6 +418,18 @@ public class OldSimplifyModelGenerator implements DecProdModelGenerator {
 	eq.setLeft(t.sub(0));
 	eq.setRight(plus(t.sub(1), i));
 	return eq;
+    }
+
+    private Less ineqToLess(Inequation t, boolean inverse) {
+	Less less = new Less();
+	if(!inverse){
+        	less.setLeft(t.sub(0));
+        	less.setRight(t.sub(1));
+	}else{
+    		less.setLeft(t.sub(1));
+    		less.setRight(t.sub(0));	    
+	}
+	return less;
     }
 
 }
