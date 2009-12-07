@@ -16,7 +16,7 @@ import java.util.HashSet;
  * for external provers. REMARK: Adding taclets at this point does not
  * automatically mean that the added taclets are used for external provers. It
  * also depends on: 1. the taclet fulfills the condition that are checked while
- * translating 2. the taclet has the right heuristic (determined by user).
+ * translating.
  * 
  */
 final class UsedTaclets {
@@ -170,7 +170,7 @@ final class UsedTaclets {
 	    
 	   
 	    //usedTaclets.add("array_length_non_negative_2");
-	   // usedTaclets.add("array_length_short_javacard");
+	    usedTaclets.add("array_length_short_javacard");
 	    
 	    
 	    
@@ -178,6 +178,7 @@ final class UsedTaclets {
 	     
 
 	}
+
 
 	boolean found = false;
 	if(testTaclets == null || testTaclets.length==0){found = true;}
