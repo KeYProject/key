@@ -738,7 +738,7 @@ public class ProofTreeView extends JPanel {
         private JMenuItem mark        = new JMenuItem("Mark for Re-Use");
         private JMenuItem visualize   = new JMenuItem("Visualize");
         private JMenuItem test        = new JMenuItem("Create Test For Node");
-	
+        private JMenuItem bugdetection= new JMenuItem("Bug Detection");
         private JMenuItem change      = new JMenuItem("Change This Node");
 
 	private TreePath path;
@@ -819,6 +819,9 @@ public class ProofTreeView extends JPanel {
 		this.add(test);
 		test.addActionListener(this);
 		test.setEnabled(true);
+		this.add(bugdetection);
+		bugdetection.addActionListener(this);
+		bugdetection.setEnabled(true);
 		if (proof != null) {
 		    if (proof.isGoal(invokedNode) || 
 		        proof.getSubtreeGoals(invokedNode).size()>0) {
@@ -952,6 +955,8 @@ public class ProofTreeView extends JPanel {
                 new ProofVisTreeView(mediator.visualizeProof().getVisualizationModel());                
             }else if (e.getSource() == test) {
 		mediator.generateTestCaseForSelectedNode();
+            } else if (e.getSource() == bugdetection) {
+		mediator.bugDetectionForSelectedNode();
             } else if (e.getSource() == change) {
                 mediator.changeNode(invokedNode);
             }

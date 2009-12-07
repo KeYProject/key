@@ -23,6 +23,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 import javax.swing.event.EventListenerList;
 
+import de.uka.ilkd.key.bugdetection.BugDetector;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
@@ -320,6 +321,17 @@ public class KeYMediator {
 	    try {
 		testCaseConfirmation(
 		    testBuilder.createTestForNode(getSelectedNode()));
+	    } catch(Exception e){
+		new ExceptionDialog(mainFrame(), e);
+	    }
+	}
+    }
+
+    public void bugDetectionForSelectedNode(){
+	if (ensureProofLoaded()) {
+	    BugDetector bugDetector = new BugDetector();
+	    try {
+		bugDetector.run(getSelectedNode());
 	    } catch(Exception e){
 		new ExceptionDialog(mainFrame(), e);
 	    }
