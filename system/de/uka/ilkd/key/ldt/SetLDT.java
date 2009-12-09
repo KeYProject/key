@@ -26,15 +26,18 @@ import de.uka.ilkd.key.util.ExtList;
 
 public final class SetLDT extends LDT {
     
-    public static final Name NAME = new Name("Set");    
+    public static final Name NAME = new Name("LocSet");    
        
     private final Function empty;
+    private final Function everything;
     private final Function singleton;
     private final Function union;
     private final Function intersect;
     private final Function setMinus;
-    private final Function setComprehension;
     private final Function infiniteUnion;
+    private final Function allFields;
+    private final Function allObjects;
+    private final Function freshLocs;    
     private final Function elementOf;
     private final Function subset;
     private final Function disjoint;    
@@ -43,12 +46,15 @@ public final class SetLDT extends LDT {
     public SetLDT(Services services) {
 	super(NAME, services);
         empty	         = addFunction(services, "empty");
+        everything       = addFunction(services, "everything");
         singleton        = addFunction(services, "singleton");
         union            = addFunction(services, "union");
         intersect        = addFunction(services, "intersect");
         setMinus         = addFunction(services, "setMinus");
-        setComprehension = addFunction(services, "setComprehension");
         infiniteUnion    = addFunction(services, "infiniteUnion");
+        allFields        = addFunction(services, "allFields");
+        allObjects       = addFunction(services, "allObjects");
+        freshLocs        = addFunction(services, "freshLocs");
         elementOf        = addFunction(services, "elementOf");
         subset           = addFunction(services, "subset");
         disjoint         = addFunction(services, "disjoint");
@@ -57,6 +63,11 @@ public final class SetLDT extends LDT {
     
     public Function getEmpty() {
 	return empty;
+    }
+    
+    
+    public Function getEverything() {
+	return everything;
     }
     
     
@@ -80,13 +91,23 @@ public final class SetLDT extends LDT {
     }
     
     
-    public Function getSetComprehension() {
-	return setComprehension;
+    public Function getInfiniteUnion() {
+	return infiniteUnion;
     }
     
     
-    public Function getInfiniteUnion() {
-	return infiniteUnion;
+    public Function getAllFields() {
+	return allFields;
+    }
+    
+    
+    public Function getAllObjects() {
+	return allObjects;
+    }    
+    
+    
+    public Function getFreshLocs() {
+	return freshLocs;
     }
     
     
@@ -157,7 +178,7 @@ public final class SetLDT extends LDT {
 	} else if(op instanceof SetMinus) {
 	    return setMinus;
 	} else if(op instanceof AllFields) {
-	    return serv.getTypeConverter().getHeapLDT().allFields();
+	    return allFields;
 	}
 	assert false;
 	return null;

@@ -221,7 +221,7 @@ public final class DLSpecFactory {
 					 pre,
 					 post, 
 					 modifies, 
-					 TB.allLocs(services),
+					 null,
 					 selfVar, 
 					 paramVars, 
 					 resultVar, 

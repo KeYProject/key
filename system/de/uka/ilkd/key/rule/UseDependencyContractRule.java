@@ -187,7 +187,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
 	    final Term h = heapTerm.sub(0);
 	    final Term o = heapTerm.sub(1);
 	    final Term f = heapTerm.sub(2);
-	    final Term locs = TB.pairSingleton(services, o, f);
+	    final Term locs = TB.singleton(services, o, f);
 	    final Pair<Term,ImmutableList<PosInOccurrence>> furtherLocs 
 	    	= getChangedLocsForStep(h, stepHeap, seq, services);
 	    return new Pair<Term,ImmutableList<PosInOccurrence>>(

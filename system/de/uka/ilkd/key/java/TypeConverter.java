@@ -42,7 +42,6 @@ public final class TypeConverter {
       
     private IntegerLDT integerLDT;
     private BooleanLDT booleanLDT;
-    private PairLDT pairLDT;
     private SetLDT setLDT;
     private HeapLDT heapLDT;
     private FloatLDT floatLDT;
@@ -66,8 +65,6 @@ public final class TypeConverter {
             this.integerLDT = (IntegerLDT)ldt;
         } else if (ldt instanceof BooleanLDT) {
             this.booleanLDT = (BooleanLDT)ldt;
-        } else if (ldt instanceof PairLDT) {
-            this.pairLDT = (PairLDT) ldt;
         } else if (ldt instanceof SetLDT) {
             this.setLDT = (SetLDT) ldt;
         } else if (ldt instanceof HeapLDT) {
@@ -120,11 +117,6 @@ public final class TypeConverter {
     }
 
  
-    public PairLDT getPairLDT() {
-	return pairLDT;
-    }
-
-    
     public SetLDT getSetLDT() {
 	return setLDT;
     }
@@ -149,7 +141,7 @@ public final class TypeConverter {
 	//hack: convert object singleton to location singleton
 	if(op instanceof Singleton) {
 	    assert heapLDT.getSortOfSelect(subs[0].op()) != null;
-	    return TB.pairSingleton(services, subs[0].sub(1), subs[0].sub(2));
+	    return TB.singleton(services, subs[0].sub(1), subs[0].sub(2));
 	}	
 	
 	LDT responsibleLDT = null;

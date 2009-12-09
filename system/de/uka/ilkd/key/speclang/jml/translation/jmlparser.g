@@ -54,7 +54,6 @@ options {
     private IntegerLDT intLDT;
     private HeapLDT heapLDT;
     private SetLDT setLDT;
-    private PairLDT pairLDT;
     private BooleanLDT booleanLDT;
     private SLTranslationExceptionManager excManager;
 
@@ -90,7 +89,6 @@ options {
 	this.intLDT         = services.getTypeConverter().getIntegerLDT();
 	this.heapLDT        = services.getTypeConverter().getHeapLDT();
 	this.setLDT         = services.getTypeConverter().getSetLDT();
-	this.pairLDT        = services.getTypeConverter().getPairLDT();
 	this.booleanLDT     = services.getTypeConverter().getBooleanLDT();
 	this.excManager     = new SLTranslationExceptionManager(this,
 				    				fileName, 
@@ -480,10 +478,8 @@ options {
             final Term sub0 = getFields(t.sub(0));
             final Term sub1 = getFields(t.sub(1));
             return TB.union(services, sub0, sub1);
-        } else if(t.op().equals(setLDT.getSingleton())
-                  && t.sub(0).op().equals(pairLDT.getPair())
-                  && t.sub(0).sub(1).sort().equals(heapLDT.getFieldSort())) {
-            return TB.singleton(services, t.sub(0).sub(1));
+        } else if(t.op().equals(setLDT.getSingleton())) {
+	    return TB.allObjects(services, t.sub(1));
         } else {
             raiseError("Inacceptable field expression: " + t);
             return null;
@@ -542,7 +538,7 @@ storerefexpression returns [Term result = null] throws SLTranslationException
 	    } else if(expr.isTerm() && heapLDT.getSortOfSelect(expr.getTerm().op()) != null) {
 	        final Term objTerm = expr.getTerm().sub(1);
 	        final Term fieldTerm = expr.getTerm().sub(2);
-	    	result = TB.pairSingleton(services, objTerm, fieldTerm);
+	    	result = TB.singleton(services, objTerm, fieldTerm);
 	    } else {
 	    	raiseError("Not a valid store-ref expression: " + expr.getTerm());
 	    }
@@ -582,7 +578,7 @@ specarrayrefexpr[SLExpression receiver, String fullyQualifiedName, Token lbrack]
 	if (rangeFrom == null) {
 	    // We have a star. A star includes all components of an array even
 	    // those out of bounds. This makes proving easier.	    
-	    Term t = TB.locComprehension(services,
+	    Term t = TB.setComprehension(services,
 	    				 new QuantifiableVariable[]{indexVar}, 
 	                                 receiver.getTerm(), 
 	                                 arrIndex);
@@ -592,11 +588,12 @@ specarrayrefexpr[SLExpression receiver, String fullyQualifiedName, Token lbrack]
 	    Term guardFormula 
 	    	= TB.and(TB.leq(rangeFrom.getTerm(), TB.var(indexVar), services),
 		         TB.leq(TB.var(indexVar), rangeTo.getTerm(), services));
-            Term t = TB.guardedLocComprehension(
+            Term t = TB.guardedSetComprehension(
 	    			services, 
 	                        new QuantifiableVariable[]{indexVar},
 	                        guardFormula,
-	                        TB.pair(services, receiver.getTerm(), arrIndex));
+	                        receiver.getTerm(), 
+	                        arrIndex);
 	    result = new SLExpression(t);
 	} else {
 	    // We have a regular array access
@@ -620,8 +617,8 @@ storerefkeyword returns [Term result = null] throws SLTranslationException
 }
 :
     NOTHING { result = TB.empty(services); }
-    | EVERYTHING { result = TB.allLocs(services); }
-    | NOT_SPECIFIED { result = TB.allLocs(services); }
+    | EVERYTHING { result = TB.everything(services); }
+    | NOT_SPECIFIED { result = TB.everything(services); }
 ;
 
 
@@ -1659,14 +1656,12 @@ jmlprimary returns [SLExpression result=null] throws SLTranslationException
 	    
 	    final LogicVariable fieldLV
 	    	= new LogicVariable(new Name("f"), heapLDT.getFieldSort());
-	    final Term a = TB.ife(reach,
-	                          TB.pair(services, o2, TB.var(fieldLV)), 
-	                          TB.zero(services));
 	    final Term locSet 
-	    	= TB.setComprehension(services, 
-	    	                      new LogicVariable[]{objLV, fieldLV}, 
-	    	                      a, 
-	    	                      TB.allLocs(services));
+	    	= TB.guardedSetComprehension(services, 
+	    	                             new LogicVariable[]{objLV, fieldLV},
+	    	                             reach, 
+	    	                      	     o2,
+	    	                      	     TB.var(fieldLV));
 	    
 	    result = new SLExpression(locSet, javaInfo.getPrimitiveKeYJavaType(PrimitiveType.JAVA_SET));
 	} 	
@@ -1750,7 +1745,7 @@ jmlprimary returns [SLExpression result=null] throws SLTranslationException
             	if(heapLDT.getSortOfSelect(t.op()) != null) {
 	            final Term objTerm = t.sub(1);
 	            final Term fieldTerm = t.sub(2);
-	    	    t = TB.pairSingleton(services, objTerm, fieldTerm);
+	    	    t = TB.singleton(services, objTerm, fieldTerm);
             	} else {
                     raiseError("Not a singleton: " + t);
                 }
@@ -1798,8 +1793,7 @@ jmlprimary returns [SLExpression result=null] throws SLTranslationException
 	    resolverManager.popLocalVariablesNamespace();
 	    result = new SLExpression(TB.infiniteUnion(services,
 	                                               declVars.second.toArray(new QuantifiableVariable[declVars.second.size()]),
-	                                               t,
-	                                               TB.allLocs(services)),
+	                                               t),
 	                              javaInfo.getPrimitiveKeYJavaType(PrimitiveType.JAVA_SET));        
         }        
 
@@ -2081,7 +2075,7 @@ builtintype returns [KeYJavaType type = null] throws SLTranslationException
 	    } 
         |   SET
             {
-                type = new KeYJavaType(setLDT.targetSort());
+                type = javaInfo.getKeYJavaType(PrimitiveType.JAVA_SET);
             }
 	)
 	

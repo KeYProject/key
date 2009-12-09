@@ -176,7 +176,7 @@ public final class DependencyContractPO extends AbstractPO
 		= TB.anon(services, 
 			              TB.heap(services), 
 				      TB.setMinus(services, 
-					          TB.allLocs(services), 
+					          TB.everything(services), 
 					          dep), 
 	                              anonHeap);
 	final Term update = TB.elementary(services, 

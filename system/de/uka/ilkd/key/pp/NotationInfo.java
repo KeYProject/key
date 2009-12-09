@@ -16,7 +16,6 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.TypeConverter;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.IntegerLDT;
-import de.uka.ilkd.key.ldt.PairLDT;
 import de.uka.ilkd.key.ldt.SetLDT;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -203,13 +202,8 @@ public final class NotationInfo {
 	tbl.put(setLDT.getUnion(), new Notation.Infix("\\cup", 130, 0, 0));
 	tbl.put(setLDT.getIntersect(), new Notation.Infix("\\cap", 130, 0, 0));
 	tbl.put(setLDT.getSetMinus(), new Notation.Infix("\\setMinus", 130, 0, 0));
-	tbl.put(setLDT.getSetComprehension(), new Notation.SetComprehensionNotation());
-	tbl.put(setLDT.getElementOf(), new Notation.Infix("\\in", 130, 0, 0));	
-	tbl.put(setLDT.getSubset(), new Notation.Infix("\\subset", 130, 0, 0));
-	
-	//pair operators
-	PairLDT pairLDT = services.getTypeConverter().getPairLDT();
-	tbl.put(pairLDT.getPair(), new Notation.PairNotation());
+	tbl.put(setLDT.getElementOf(), new Notation.ElementOfNotation());	
+	tbl.put(setLDT.getSubset(), new Notation.Infix("\\subset", 130, 0, 0));	
     }
     
 

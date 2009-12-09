@@ -40,11 +40,6 @@ public final class HeapLDT extends LDT {
     private final Function store;
     private final Function anon;
     private final Function memset;
-
-    //location sets
-    private final Function allLocs;
-    private final Function allFields;
-    private final Function freshLocs;
     
     //fields
     private final Function arr;
@@ -83,9 +78,6 @@ public final class HeapLDT extends LDT {
         store             = addFunction(services, "store");
         anon              = addFunction(services, "anon");
         memset            = addFunction(services, "memset");
-        allLocs           = addFunction(services, "allLocs");
-        allFields         = addFunction(services, "allFields");
-        freshLocs         = addFunction(services, "freshLocs");
         arr               = addFunction(services, "arr");
         length            = addFunction(services, "length");
         created           = addFunction(services, "java.lang.Object::<created>");
@@ -184,21 +176,6 @@ public final class HeapLDT extends LDT {
     public Function getMemset() {
 	return memset;
     }     
-    
-    
-    public Function allLocs() {
-	return allLocs;
-    }
-    
-    
-    public Function allFields() {
-	return allFields;
-    }
-    
-    
-    public Function getFreshLocs() {
-	return freshLocs;
-    }
     
     
     public Function getArr() {

@@ -180,7 +180,7 @@ public class JMLSpecFactory {
         //translate assignable
         Term assignable;
         if(originalAssignable.isEmpty()) {
-            assignable = TB.allLocs(services);
+            assignable = TB.everything(services);
         } else {
             assignable = TB.empty(services);
             for(PositionedString expr : originalAssignable) {
@@ -594,7 +594,7 @@ public class JMLSpecFactory {
         //translate assignable
         Term assignable;
         if(originalAssignable.isEmpty()) {
-            assignable = TB.allLocs(services);
+            assignable = TB.everything(services);
         } else {
             assignable = TB.empty(services);
             for(PositionedString expr : originalAssignable) {

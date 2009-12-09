@@ -426,38 +426,28 @@ public abstract class Notation {
 	public void print(Term t, LogicPrinter sp) throws IOException {
 	    sp.printSingleton(t);
 	}
+    }
+    
+    /**
+     * The standard concrete syntax for the element of operator.
+     */
+    public static final class ElementOfNotation extends Notation {
+
+	public ElementOfNotation() {
+	    super(130);
+	}
+
+	public void print(Term t, LogicPrinter sp) throws IOException {
+	    sp.printElementOf(t);
+	}
     }      
+    
     
     
     /**
      * The standard concrete syntax for set comprehension.
      */
-    public static final class SetComprehensionNotation extends Notation {
-
-	public SetComprehensionNotation() {
-	    super(130);
-	}
-
-	public void print(Term t, LogicPrinter sp) throws IOException {
-	    sp.printSetComprehension(t);
-	}
-    }          
     
-    
-    /**
-     * The standard concrete syntax for pairs.
-     */
-    public static final class PairNotation extends Notation {
-
-	public PairNotation() {
-	    super(130);
-	}
-
-	public void print(Term t, LogicPrinter sp) throws IOException {
-	    sp.printPair(t);
-	}
-    }        
-        
     
     /**
      * The standard concrete syntax for conditional terms

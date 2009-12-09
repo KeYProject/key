@@ -108,14 +108,14 @@ UNSIGNEDSHIFTRIGHT : ">>>";
 WORKINGSPACE : "\\working_space";
 XOR : "^";
 
-SET : "\\set";
+SET : "\\Set";
 EMPTYSET : "\\empty";
 SINGLETON : "\\singleton";
 UNION : "\\setUnion";
 INTERSECT : "\\intersect";
 SETMINUS : "\\setMinus";
 ALLFIELDS : "\\allFields";
-UNIONINF: "\\infiniteSetUnion";
+UNIONINF: "\\infiniteUnion";
 DISJOINT : "\\disjoint";
 SUBSET : "\\subset";
 NEWELEMSFRESH : "\\newElemsFresh";

@@ -1002,60 +1002,48 @@ public final class LogicPrinter {
     
     
     public void printSingleton(Term t) throws IOException {
-	assert t.arity() == 1;
-	startTerm(1);	 
-	layouter.print("{");
-
-	markStartSub();	 
-	printTerm(t.sub(0));
-	markEndSub();
-
-	layouter.print("}");
-    }  
-    
-    
-    public void printSetComprehension(Term t) throws IOException {
 	assert t.arity() == 2;
-	startTerm(2);
-	layouter.print("{");
+	startTerm(2);	 
+	layouter.print("{(").beginC(0);;
 
 	markStartSub();	 
 	printTerm(t.sub(0));
 	markEndSub();
 	
-	layouter.print(" \\in ");
+	layouter.print(",").brk(1,0);
 	
 	markStartSub();	 
 	printTerm(t.sub(1));
 	markEndSub();	
-	
-	layouter.print(" | ");
-	
-	printVariables(t.boundVars());
 
-	layouter.print("}");
-    }        
-
+	layouter.print(")}").end();
+    }  
     
-    public void printPair(Term t) throws IOException {
-	assert t.arity() == 2;
-	startTerm(2);	 
-	layouter.print("(");
-
+    
+    public void printElementOf(Term t) throws IOException {
+	assert t.arity() == 3;
+	startTerm(3);
+	
+	layouter.print("(").beginC(0);
+	
 	markStartSub();	 
 	printTerm(t.sub(0));
 	markEndSub();
-
-	layouter.print(",");
-
-	markStartSub();
+	
+	layouter.print(",").brk(1,0);
+	
+	markStartSub();	 
 	printTerm(t.sub(1));
 	markEndSub();
 
-	layouter.print(")");
-    }
-
-
+	layouter.print(")").end();
+	layouter.print(" \\in ");
+	
+	markStartSub();	 
+	printTerm(t.sub(2));
+	markEndSub();	
+    }      
+    
 
     /** Print a unary term in prefix style.  For instance
      * <code>!a</code>.  No line breaks are possible.

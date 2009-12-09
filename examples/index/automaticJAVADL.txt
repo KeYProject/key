@@ -59,6 +59,7 @@
 ./heap/simple/dependencies.key
 ./heap/simple/dependency_contracts.key
 ./heap/simple/invariant_preservation.key
+./heap/simple/locsets.key
 ./heap/simple/loop1.key
 ./heap/simple/loop2.key
 ./heap/simple/modifies_datagroup.key
@@ -67,7 +68,6 @@
 ./heap/simple/operation_contracts.key
 ./heap/simple/select_store.key
 ./heap/simple/selection_sort.key
-./heap/simple/sets_and_pairs.key
 ./heap/SmansEtAl/ArrayList_add.key
 ./heap/SmansEtAl/ArrayList_ArrayList.key
 ./heap/SmansEtAl/ArrayList_footprint.key
