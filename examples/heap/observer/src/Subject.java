@@ -1,0 +1,49 @@
+public abstract class Subject {
+    protected /*@spec_public@*/ Observer[] observers = new Observer[0];
+    
+    //@ public model \set footprint;
+    //@ depends <inv>: footprint, observers, observers.*, \infiniteSetUnion(int i; 0 <= i && i < observers.length ? observers[i].* : \empty);    
+    //@ depends footprint: footprint;
+    
+    /*@ public invariant \disjoint(footprint, \setUnion(observers, observers.*));
+      @ public invariant (\forall int i; 0 <= i && i < observers.length; 
+      @                                  observers[i].<inv> && observers[i] != this && \disjoint(observers[i].*, footprint));
+      @*/
+    
+
+    /*@ public normal_behaviour
+      @   requires o.<inv> && o != this && \disjoint(o.*, footprint);
+      @   assignable observers;
+      @   ensures observers.length == \old(observers.length) + 1;
+      @   ensures observers[observers.length - 1] == o;
+      @   ensures (\forall int i; 0 <= i && i < observers.length - 1; observers[i] == \old(observers[i]));
+      @*/
+    public final void addObserver(Observer o) {
+	final Observer[] newArr = new Observer[observers.length + 1];
+	/*@ loop_invariant 0 <= i && i <= observers.length
+	  @                && (\forall int x; 0 <= x && x < i; newArr[x] == observers[x]);
+	  @ assignable newArr[*];
+	  @*/
+	for(int i = 0; i < observers.length; i++) {
+	    newArr[i] = observers[i];
+	}
+	newArr[newArr.length - 1] = o;
+	observers = newArr;
+    }
+    
+
+    /*@ public normal_behaviour
+      @   assignable \infiniteSetUnion(int x; 0 <= x && x < observers.length ? observers[x].* : \empty);
+      @   ensures (\forall int i; 0 <= i && i < observers.length; observers[i].upToDate);
+      @*/
+    public final void notifyObservers() {
+	/*@ loop_invariant 0 <= i && i <= observers.length 
+	  @                && (\forall int x; 0 <= x && x < observers.length; observers[x].<inv>)
+	  @                && (\forall int x; 0 <= x && x < i; observers[x].upToDate);
+	  @ assignable \infiniteSetUnion(int x; 0 <= x && x < observers.length ? observers[x].* : \empty); 
+	  @*/
+	for(int i = 0; i < observers.length; i++) {
+	    observers[i].update();
+	}
+    }
+}

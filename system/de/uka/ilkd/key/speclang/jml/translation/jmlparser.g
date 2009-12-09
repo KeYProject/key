@@ -697,7 +697,11 @@ representsclause returns [Pair<ObserverFunction,Term> result=null] throws SLTran
                 if(!rhs.isTerm()) {
                     raiseError("Represents clause with unexpected rhs: " + rhs);
                 }
-                t = TB.equals(lhs.getTerm(), rhs.getTerm());
+                Term rhsTerm = rhs.getTerm();
+                if(rhsTerm.sort() == Sort.FORMULA) {
+                    rhsTerm = TB.ife(rhsTerm, TB.TRUE(services), TB.FALSE(services));
+                }
+                t = TB.equals(lhs.getTerm(), rhsTerm);
             }
         ) 
         |
@@ -1057,7 +1061,8 @@ relationalexpr returns [SLExpression result=null] throws SLTranslationException
 			if (right == null) {
 			    // instanceof-expression
 			    result = new SLExpression(
-				TB.func(f, result.getTerm()));
+				TB.and(TB.not(TB.equals(result.getTerm(), TB.NULL(services))),
+				       TB.equals(TB.func(f, result.getTerm()), TB.TRUE(services))));
 			} else {
 			    if (right.isType()) {
 			    raiseError("Cannot build relational expression from type " +
@@ -1069,7 +1074,7 @@ relationalexpr returns [SLExpression result=null] throws SLTranslationException
 				TB.func(f,result.getTerm(),right.getTerm()));
 			}
 		} catch (TermCreationException e) {
-		    raiseError("Error in relational expression.");
+		    raiseError("Error in relational expression: " + e.getMessage());
 		} catch (IllegalArgumentException e) {
 		    raiseError("Internal error.");
 		}
@@ -1339,10 +1344,10 @@ postfixexpr returns [SLExpression result=null] throws SLTranslationException
 	            raiseError("SLExpression without a type: " + expr);
 	        } else if (expr != null && expr.getType().getJavaType() instanceof PrimitiveType) {
 		    raiseError("Cannot build postfix expression from primitive type.");
-		}
+		}	    		
 	    }
 	    expr=primarysuffix[expr, fullyQualifiedName]
-	    {
+	    {	    
 		fullyQualifiedName += "." + LT(0).getText();
 	    }
 	)*
@@ -1427,7 +1432,8 @@ primarysuffix[SLExpression receiver, String fullyQualifiedName]
     |    
          DOT MULT
          {
-	     result = new SLExpression(TB.allFields(services, receiver.getTerm()));
+	     result = new SLExpression(TB.allFields(services, receiver.getTerm()),
+	                               javaInfo.getPrimitiveKeYJavaType(PrimitiveType.JAVA_SET));
          }
 	
 )	
@@ -1513,6 +1519,7 @@ jmlprimary returns [SLExpression result=null] throws SLTranslationException
     SLExpression e3 = null;
     KeYJavaType typ;
     Term t, t2;
+    Pair<KeYJavaType,ImmutableList<LogicVariable>> declVars = null;    
 }
 :
 	RESULT
@@ -1661,7 +1668,7 @@ jmlprimary returns [SLExpression result=null] throws SLTranslationException
 	    	                      a, 
 	    	                      TB.allLocs(services));
 	    
-	    result = new SLExpression(locSet);
+	    result = new SLExpression(locSet, javaInfo.getPrimitiveKeYJavaType(PrimitiveType.JAVA_SET));
 	} 	
 	
     |   DURATION LPAREN result=expression RPAREN 
@@ -1733,7 +1740,8 @@ jmlprimary returns [SLExpression result=null] throws SLTranslationException
 
     |   EMPTYSET
         {
-            result = new SLExpression(TB.empty(services));
+            result = new SLExpression(TB.empty(services),
+                                      javaInfo.getPrimitiveKeYJavaType(PrimitiveType.JAVA_SET));
         }
         
     |   SINGLETON LPAREN t=storeref RPAREN
@@ -1747,22 +1755,25 @@ jmlprimary returns [SLExpression result=null] throws SLTranslationException
                     raiseError("Not a singleton: " + t);
                 }
             }
-            result = new SLExpression(t);
+            result = new SLExpression(t, javaInfo.getPrimitiveKeYJavaType(PrimitiveType.JAVA_SET));
         }
         
     |   UNION LPAREN t=storeref COMMA t2 = storeref RPAREN
         {
-            result = new SLExpression(TB.union(services, t, t2));
+            result = new SLExpression(TB.union(services, t, t2),
+                                      javaInfo.getPrimitiveKeYJavaType(PrimitiveType.JAVA_SET));
         }
         
     |   INTERSECT LPAREN t=storeref COMMA t2=storeref RPAREN
         {
-            result = new SLExpression(TB.intersect(services, t, t2));
+            result = new SLExpression(TB.intersect(services, t, t2),
+                                      javaInfo.getPrimitiveKeYJavaType(PrimitiveType.JAVA_SET));
         }         
 
     |   SETMINUS LPAREN t=storeref COMMA t2=storeref RPAREN
         {
-            result = new SLExpression(TB.setMinus(services, t, t2));
+            result = new SLExpression(TB.setMinus(services, t, t2),
+                                      javaInfo.getPrimitiveKeYJavaType(PrimitiveType.JAVA_SET));
         } 
         
     |   ALLFIELDS LPAREN e1=expression RPAREN
@@ -1770,7 +1781,26 @@ jmlprimary returns [SLExpression result=null] throws SLTranslationException
             if(!e1.isTerm() || !e1.getTerm().sort().extendsTrans(services.getJavaInfo().objectSort())) {
                 raiseError("Invalid argument to \\allFields: " + e1);
             }
-            result = new SLExpression(TB.allFields(services, e1.getTerm()));
+            result = new SLExpression(TB.allFields(services, e1.getTerm()),
+                                      javaInfo.getPrimitiveKeYJavaType(PrimitiveType.JAVA_SET));
+        }        
+        
+    |   UNIONINF 
+        LPAREN 
+        declVars=quantifiedvardecls SEMI
+        {
+            resolverManager.pushLocalVariablesNamespace();
+            resolverManager.putIntoTopLocalVariablesNamespace(declVars.second, declVars.first);
+        } 
+        t=storeref 
+        RPAREN
+        {
+	    resolverManager.popLocalVariablesNamespace();
+	    result = new SLExpression(TB.infiniteUnion(services,
+	                                               declVars.second.toArray(new QuantifiableVariable[declVars.second.size()]),
+	                                               t,
+	                                               TB.allLocs(services)),
+	                              javaInfo.getPrimitiveKeYJavaType(PrimitiveType.JAVA_SET));        
         }        
 
     |   DISJOINT LPAREN t=storeref COMMA t2=storeref RPAREN

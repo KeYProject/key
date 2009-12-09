@@ -61,8 +61,11 @@ class Substitution {
     public boolean isGround() {
         final Iterator<QuantifiableVariable> it = varMap.keyIterator ();
         while ( it.hasNext () ) {
-            if ( getSubstitutedTerm( it.next () ).freeVars ().size () != 0 )
+            final Term t = getSubstitutedTerm(it.next ()); 
+            if ( t.freeVars ().size () != 0 ) {
+        	System.out.println("evil free vars in term: " + t);
                 return false;
+            }
         }
         return true;
     }   
@@ -70,7 +73,7 @@ class Substitution {
     
     public Term apply(Term t, Services services) {
         assert isGround() :
-            "non-ground substitutions are not yet implemented";
+            "non-ground substitutions are not yet implemented: " + this;
         final Iterator<QuantifiableVariable> it = varMap.keyIterator ();
         while ( it.hasNext () ) {
             final QuantifiableVariable var = it.next ();
@@ -96,7 +99,7 @@ class Substitution {
      */
     public Term applyWithoutCasts(Term t, Services services) {
         assert isGround() :
-            "non-ground substitutions are not yet implemented";
+            "non-ground substitutions are not yet implemented: " + this;
         final Iterator<QuantifiableVariable> it = varMap.keyIterator ();
         while ( it.hasNext () ) {
             final QuantifiableVariable var = it.next ();

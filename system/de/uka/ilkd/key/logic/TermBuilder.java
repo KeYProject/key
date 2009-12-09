@@ -860,6 +860,22 @@ public final class TermBuilder {
     }
     
     
+    public Term infiniteUnion(Services services, 
+	                      QuantifiableVariable[] qvs, 
+	                      Term s, 
+	                      Term s2) {
+	SetLDT ldt = services.getTypeConverter().getSetLDT();
+	if(s2.op() == ldt.getEmpty()) {
+	    return s2;
+	} else {
+	    return tf.createTerm(ldt.getInfiniteUnion(), 
+		                 new Term[]{s,s2}, 
+		                 new ImmutableArray<QuantifiableVariable>(qvs), 
+		                 null);
+	}
+    }    
+    
+    
     public Term elementOf(Services services, Term e, Term s) {
 	SetLDT ldt = services.getTypeConverter().getSetLDT();
 	if(s.op() == ldt.getEmpty()) {

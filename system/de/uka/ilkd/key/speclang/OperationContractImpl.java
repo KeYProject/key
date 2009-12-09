@@ -245,7 +245,7 @@ public final class OperationContractImpl implements OperationContract {
 	    while(it1.hasNext()) {
 		ProgramVariable originalParamVar = it1.next();
 		Term paramTerm                   = it2.next();
-		assert originalParamVar.sort().equals(paramTerm.sort());
+		assert paramTerm.sort().extendsTrans(originalParamVar.sort());
 		result.put(TB.var(originalParamVar), paramTerm);
 	    }
 	}

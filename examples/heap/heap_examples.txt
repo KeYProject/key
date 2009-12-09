@@ -7,6 +7,8 @@
 * list_ghost: A slightly modified subset of the "list" example, demonstrating 
   the use of ghost fields instead of model fields for framing.
   
+* observer: A version of the subject/observer design pattern.
+  
 * simple: A collection of small contrived examples demonstrating individual
   features of the system.
   

@@ -51,6 +51,9 @@ class PredictCostProver {
     public static long computerInstanceCost(Substitution sub, Term matrix,
 	    ImmutableSet<Term> assertList, Services services) {
 
+	//HACK
+	if(!sub.isGround()) return -1;
+	
 	final PredictCostProver prover = new PredictCostProver(sub
 		.applyWithoutCasts(matrix, services), assertList, services);
 	return prover.cost();

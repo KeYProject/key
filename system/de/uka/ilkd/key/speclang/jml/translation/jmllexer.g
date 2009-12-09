@@ -115,6 +115,7 @@ UNION : "\\setUnion";
 INTERSECT : "\\intersect";
 SETMINUS : "\\setMinus";
 ALLFIELDS : "\\allFields";
+UNIONINF: "\\infiniteSetUnion";
 DISJOINT : "\\disjoint";
 SUBSET : "\\subset";
 NEWELEMSFRESH : "\\newElemsFresh";

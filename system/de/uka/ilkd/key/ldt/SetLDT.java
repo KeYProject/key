@@ -34,9 +34,11 @@ public final class SetLDT extends LDT {
     private final Function intersect;
     private final Function setMinus;
     private final Function setComprehension;
+    private final Function infiniteUnion;
     private final Function elementOf;
     private final Function subset;
     private final Function disjoint;    
+    
     
     public SetLDT(Services services) {
 	super(NAME, services);
@@ -46,6 +48,7 @@ public final class SetLDT extends LDT {
         intersect        = addFunction(services, "intersect");
         setMinus         = addFunction(services, "setMinus");
         setComprehension = addFunction(services, "setComprehension");
+        infiniteUnion    = addFunction(services, "infiniteUnion");
         elementOf        = addFunction(services, "elementOf");
         subset           = addFunction(services, "subset");
         disjoint         = addFunction(services, "disjoint");
@@ -79,6 +82,11 @@ public final class SetLDT extends LDT {
     
     public Function getSetComprehension() {
 	return setComprehension;
+    }
+    
+    
+    public Function getInfiniteUnion() {
+	return infiniteUnion;
     }
     
     
