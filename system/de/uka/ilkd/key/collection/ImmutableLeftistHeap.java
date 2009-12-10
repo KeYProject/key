@@ -336,7 +336,7 @@ public abstract class ImmutableLeftistHeap<T extends Comparable<T>> implements I
 	Iterator<T> it=this.iterator();
 	StringBuffer str=new StringBuffer("[");
 	while (it.hasNext()) {
-	    str.append(""+it.next());
+	    str.append(it.next());
 	    if (it.hasNext()) {
 		str.append(",");
 	    }

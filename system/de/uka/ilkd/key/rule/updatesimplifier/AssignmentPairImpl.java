@@ -235,7 +235,7 @@ public class AssignmentPairImpl implements AssignmentPair {
 	if(boundVars().size() == 1){
 	   qvar = boundVars().get (0);
 	   if(qvar instanceof LogicVariable) {
-	     sb.append(qvar.sort()+" "+ qvar.name());
+           sb.append(qvar.sort()).append(" ").append(qvar.name());
 	   }else{
 	     sb.append(qvar);
 	   }
@@ -245,7 +245,7 @@ public class AssignmentPairImpl implements AssignmentPair {
 	   for(int i=0;i<boundVars().size();i++) {
 	     qvar = boundVars().get (i);
 	     if(qvar instanceof LogicVariable) {
-	       sb.append(qvar.sort()+" "+ qvar.name());
+             sb.append(qvar.sort()).append(" ").append(qvar.name());
 	     }else{
 	       sb.append(qvar);
 	     }

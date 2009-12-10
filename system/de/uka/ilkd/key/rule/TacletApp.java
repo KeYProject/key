@@ -621,11 +621,11 @@ public abstract class TacletApp implements RuleApp {
                         proposals = proposals.prepend(proposal);
                         try {
                             app = app.addCheckedInstantiation(sv, pe, services, true);
+                            nameclash = false;
                         } catch (IllegalInstantiationException iie) {
                             // name clash
                             nameclash=true;
                         }
-                        nameclash=false;
                     } while (nameclash);                    
                 } else if ( sv.isSkolemTermSV () ) {
                     // if the sort of the schema variable is generic,

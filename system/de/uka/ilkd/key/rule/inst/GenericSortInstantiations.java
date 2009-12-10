@@ -309,8 +309,7 @@ public class GenericSortInstantiations {
 	// subsorts given by the conditions (could be made faster
 	// by using a hash map for storing the conditions)
         {
-            for (GenericSortCondition p_condition : p_conditions) {
-                final GenericSortCondition c = p_condition;
+            for (final GenericSortCondition c : p_conditions) {
                 if (c.getGenericSort() == gs) {
                     if (c instanceof GenericSortCondition.GSCSupersort)
                         subsorts = subsorts.prepend
@@ -373,8 +372,7 @@ public class GenericSortInstantiations {
                                          GenericSort p_gs,
                                          ImmutableList<Sort> p_subsorts,
                                          ImmutableList<Sort> p_chosenList) {
-        for (Sort aP_chosenList : p_chosenList) {
-            final Sort chosen = aP_chosenList;
+        for (final Sort chosen : p_chosenList) {
             if (!isSupersortOf(chosen, p_subsorts) // this test is unnecessary in some cases
                     || !p_gs.isPossibleInstantiation(chosen)) continue;
 
@@ -654,8 +652,7 @@ public class GenericSortInstantiations {
             final Sort sort = it.next ();
 
             ImmutableList<Sort> res2 = ImmutableSLList.<Sort>nil();
-            for (Sort re : res) {
-                final Sort oldMinimal = re;
+            for (final Sort oldMinimal : res) {
 
                 if (oldMinimal.extendsTrans(sort))
                     continue mainloop;
@@ -676,8 +673,7 @@ public class GenericSortInstantiations {
      */
     private static void treatNullSorts (HashSet<Sort> p_inside, HashSet<Sort> p_emptySet) {
 
-        for (Sort aP_inside : p_inside) {
-            final Sort sort = aP_inside;
+        for (final Sort sort : p_inside) {
             if (Sort.NULL.extendsTrans(sort)) p_emptySet.add(sort);
         }
     }

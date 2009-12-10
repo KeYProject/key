@@ -90,16 +90,12 @@ public class UpdateSimplifier {
 
     
     public Term simplify(Update update, Term t, Services services) {
-	Term simplifiedTerm = t;
         for (IUpdateRule simplificationRule : simplificationRules) {
-            if (simplificationRule.isApplicable(update,
-                    simplifiedTerm)) {
-                return simplificationRule.apply(update,
-                        simplifiedTerm,
-                        services);
+            if (simplificationRule.isApplicable(update, t)) {
+                return simplificationRule.apply(update, t, services);
             }
         }
-	return simplifiedTerm;
+	return t;
     }
 
     /**

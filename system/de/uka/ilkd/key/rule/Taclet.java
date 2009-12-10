@@ -429,7 +429,7 @@ public abstract class Taclet implements Rule, Named {
 					     MatchConditions matchCond,
 					     Services services) {   
         MatchConditions result = matchCond;
-	Term t = null;
+	Term t;
 	try {
 	    t = result.getInstantiations ().
 		getTermInstantiation(sv, 
@@ -1074,11 +1074,9 @@ public abstract class Taclet implements Rule, Named {
 
 	if (!name.equals(t2.name)) return false;
 
-        for (Choice choice1 : choices) {
-            final Choice c1 = choice1;
-            for (Choice choice : t2.getChoices()) {
-                final Choice c2 = choice;
-                if (c1 != c2 && c1.category().equals(c2.category())) {
+        for (final Choice choice1 : choices) {
+            for (Choice choice2 : t2.getChoices()) {
+                if (choice1 != choice2 && choice1.category().equals(choice2.category())) {
                     return false;
                 }
             }

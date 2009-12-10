@@ -98,11 +98,10 @@ public class ContextStatementBlockInstantiation {
         if (isDifferent(prefixEnd, inst.prefixEnd)) return false;
 
         if (isDifferent(activeStatementContext, inst.activeStatementContext)) return false;
+
+        return !isDifferent(programElement, inst.programElement);
         
-        if (isDifferent(programElement, inst.programElement)) return false;
-        
-        return true;
-    }
+        }
 
     private boolean isDifferent(Object self, Object other) {
         if (self != null && other != null) {

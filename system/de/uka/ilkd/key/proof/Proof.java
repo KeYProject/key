@@ -775,15 +775,13 @@ public class Proof implements Named {
      * @return the goal that belongs to the given node or null if the
      * node is an inner one 
      */
-    public Goal getGoal(Node node) {	
-	Goal result = null;
+    public Goal getGoal(Node node) {
         for (Goal openGoal : openGoals) {
-            result = openGoal;
-            if (result.node() == node) {
-                return result;
+            if (openGoal.node() == node) {
+                return openGoal;
             }
         }
-	return null;
+	    return null;
     }
 
     /** returns the list of goals of the subtree starting with node 
@@ -793,12 +791,11 @@ public class Proof implements Named {
      */
     public ImmutableList<Goal> getSubtreeGoals(Node node) {	
 	ImmutableList<Goal> result = ImmutableSLList.<Goal>nil();
-        for (Goal openGoal : openGoals) {
-            final Goal goal = openGoal;
+        for (final Goal openGoal : openGoals) {
             final Iterator<Node> leavesIt = node.leavesIterator();
             while (leavesIt.hasNext()) {
-                if (leavesIt.next() == goal.node()) {
-                    result = result.prepend(goal);
+                if (leavesIt.next() == openGoal.node()) {
+                    result = result.prepend(openGoal);
                 }
             }
         }
@@ -912,7 +909,7 @@ public class Proof implements Named {
     public  void addSMTData(Node n, Object data){
 	synchronized(nodeToSMTDataLock()){
         	if(n.proof()!=this)//checking by the way against a null pointer
-        	    new RuntimeException("The referenced node does not belong to this proof");
+        	    throw new RuntimeException("The referenced node does not belong to this proof");
         	
         	if(nodeToSMTData==null){
         	    nodeToSMTData = new WeakHashMap<Node, Vector<Object>>();
@@ -938,7 +935,7 @@ public class Proof implements Named {
     public  Vector<Object> getSMTData(Node n){
 	synchronized(nodeToSMTDataLock()){
         	if(n.proof()!=this)//checking by the way against a null pointer
-        	    new RuntimeException("The referenced node does not belong to this proof");
+        	    throw new RuntimeException("The referenced node does not belong to this proof");
         
         	if(nodeToSMTData==null) return null;
         	Vector<Object> vect = nodeToSMTData.get(n);
@@ -954,7 +951,7 @@ public class Proof implements Named {
     public  void clearSMTData(Node n){
 	synchronized(nodeToSMTDataLock()){
         	if(n.proof()!=this)//checking by the way against a null pointer
-        	    new RuntimeException("The referenced node does not belong to this proof");
+        	    throw new RuntimeException("The referenced node does not belong to this proof");
         
         	if(nodeToSMTData==null) return;
         	

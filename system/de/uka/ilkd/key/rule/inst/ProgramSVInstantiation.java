@@ -80,8 +80,7 @@ public class ProgramSVInstantiation {
 					  JavaProgramElement prgElement) { 
 	ImmutableList<ProgramSVEntry> result = ImmutableSLList.<ProgramSVEntry>nil()
 	    .prepend(new ProgramSVEntry(sv, prgElement));
-        for (ProgramSVEntry aList : list) {
-            ProgramSVEntry entry = aList;
+        for (final ProgramSVEntry entry : list) {
             if (entry.key() != sv) {
                 result = result.prepend(entry);
             }
@@ -93,8 +92,7 @@ public class ProgramSVInstantiation {
      * @return true iff the sv has been instantiated already 
      */
     public boolean isInstantiated(SchemaVariable sv) {
-        for (ProgramSVEntry aList : list) {
-            ProgramSVEntry entry = aList;
+        for (ProgramSVEntry entry : list) {
             if (entry.key() == sv) {
                 return true;
             }
@@ -107,8 +105,7 @@ public class ProgramSVInstantiation {
      * instantiated with, null if no instantiation is stored
      */
     public JavaProgramElement getInstantiation(SchemaVariable sv) {
-        for (ProgramSVEntry aList : list) {
-            ProgramSVEntry entry = aList;
+        for (ProgramSVEntry entry : list) {
             if (entry.key() == sv) {
                 return entry.value();
             }
@@ -141,7 +138,7 @@ public class ProgramSVInstantiation {
      * listpings
      */ 
     public boolean equals(Object obj) {
-	ProgramSVInstantiation cmp = null;
+	ProgramSVInstantiation cmp;
 	if (!(obj instanceof ProgramSVInstantiation)) {
 	    return false;
 	} else {

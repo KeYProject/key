@@ -28,7 +28,7 @@ public abstract class ImmutableSLList<T> implements ImmutableList<T> {
 
 
     /** the empty list */
-    public static final <T> ImmutableSLList<T> nil() {
+    public static <T> ImmutableSLList<T> nil() {
 	return (ImmutableSLList<T>) NIL.NIL;
     }
 
@@ -254,7 +254,7 @@ public abstract class ImmutableSLList<T> implements ImmutableList<T> {
 	    S[]       res            = (S[]) new Object [ size () ];
 	    int         i              = 0;
 	    ImmutableSLList<S> rest           = this;
-	    ImmutableSLList<S> unmodifiedTail = this;
+	    ImmutableSLList<S> unmodifiedTail  ;
 	    S         t;
 	    while (!rest.isEmpty()) {
 		t    = rest.head ();
@@ -320,7 +320,7 @@ public abstract class ImmutableSLList<T> implements ImmutableList<T> {
 	    Iterator<S> it    = this.iterator();
 	    StringBuilder str = new StringBuilder("[");
 	    while (it.hasNext()) {
-		str.append(""+it.next());
+		str.append(it.next());
 		if (it.hasNext()) {
 		    str.append(",");
 		}
