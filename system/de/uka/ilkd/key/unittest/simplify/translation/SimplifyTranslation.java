@@ -363,7 +363,7 @@ public class SimplifyTranslation {
     private Term findDivITerm(Term t) {
 	if ((t.op().equals(integerLDT.getDiv()))) {
 	    return t;
-	} else if (!(t.op().name().toString().equals(
+	} else if (!(t.op().name().equals(
 		AbstractIntegerLDT.NUMBERS_NAME) || t.arity() == 0)) {
 	    Term res;
 	    for (int i = 0; i < t.arity(); i++) {
@@ -403,7 +403,7 @@ public class SimplifyTranslation {
 
     private Term replaceTerm(Term term, Term divTerm, Term newVar) {
 	if (term.arity() == 0
-		|| term.op().name().toString().equals(
+		|| term.op().name().equals(
 			AbstractIntegerLDT.NUMBERS_NAME)) {
 	    return term;
 	} else if (term.equals(divTerm)) {
