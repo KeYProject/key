@@ -277,8 +277,8 @@ public final class OneStepSimplifier implements BuiltInRule {
 	final PosInOccurrence pos = ruleApp.posInOccurrence();
 	assert pos != null && pos.isTopLevel();
 	
-	Instantiation inst = getInstantiation(services, 
-					      pos.constrainedFormula());
+	final Instantiation inst = getInstantiation(services, 
+					            pos.constrainedFormula());
 	assert inst.getNumAppliedRules() > 0;
 	
 	resultGoal.changeFormula(inst.getCf(), pos);

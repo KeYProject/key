@@ -48,6 +48,7 @@
 ./heap/observer/ExampleSubject_ExampleSubject.key
 ./heap/observer/ExampleSubject_footprint.key
 ./heap/observer/ExampleSubject_inv.key
+./heap/observer/ExampleSubject_notifyObservers.key
 ./heap/observer/ExampleSubject_value_dep.key
 ./heap/observer/ExampleSubject_value.key
 ./heap/simple/anonymise_datagroup.key

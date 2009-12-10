@@ -7,12 +7,15 @@ public abstract class Subject {
     
     /*@ public invariant \disjoint(footprint, \setUnion(observers, observers.*));
       @ public invariant (\forall int i; 0 <= i && i < observers.length; 
-      @                                  observers[i].<inv> && observers[i] != this && \disjoint(observers[i].*, footprint));
+      @                                  observers[i].<inv> 
+      @                                  && observers[i].subject == this
+      @                                  && observers[i] != this 
+      @                                  && \disjoint(observers[i].*, footprint));
       @*/
     
 
     /*@ public normal_behaviour
-      @   requires o.<inv> && o != this && \disjoint(o.*, footprint);
+      @   requires o.<inv> && o.subject == this && o != this && \disjoint(o.*, footprint);
       @   assignable observers;
       @   ensures observers.length == \old(observers.length) + 1;
       @   ensures observers[observers.length - 1] == o;
@@ -34,11 +37,12 @@ public abstract class Subject {
 
     /*@ public normal_behaviour
       @   assignable \infiniteUnion(int x; 0 <= x && x < observers.length ? observers[x].* : \empty);
-      @   ensures (\forall int i; 0 <= i && i < observers.length; observers[i].upToDate);
+      @   ensures (\forall int i; 0 <= i && i < observers.length; observers[i].upToDate && observers[i].<inv>);
       @*/
     public final void notifyObservers() {
-	/*@ loop_invariant 0 <= i && i <= observers.length 
+	/*@ loop_invariant 0 <= i && i <= observers.length
 	  @                && (\forall int x; 0 <= x && x < observers.length; observers[x].<inv>)
+	  @                && (\forall int x; 0 <= x && x < observers.length; observers[x].subject == this)
 	  @                && (\forall int x; 0 <= x && x < i; observers[x].upToDate);
 	  @ assignable \infiniteUnion(int x; 0 <= x && x < observers.length ? observers[x].* : \empty); 
 	  @*/

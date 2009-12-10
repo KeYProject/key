@@ -58,7 +58,8 @@ public class JavaProfile extends AbstractProfile {
         
         builtInRules = builtInRules.prepend(WhileInvariantRule.INSTANCE)
                                    .prepend(UseDependencyContractRule.INSTANCE)
-                                   .prepend(OneStepSimplifier.INSTANCE);
+                                   .prepend(OneStepSimplifier.INSTANCE)
+        			   .prepend(PullOutConditionalsRule.INSTANCE);
   
         //contract insertion rule, ATTENTION: ProofMgt relies on the fact 
         // that Contract insertion rule is the FIRST element of this list!

@@ -138,6 +138,7 @@ public final class JavaCardDLStrategy extends AbstractFeatureStrategy {
         final Feature oneStepSimplificationF 
         	= oneStepSimplificationFeature(longConst(-10000));
         
+        final Feature pullOutConditionalsF = pullOutConditionalsFeature(longConst(-10001));        
         
         final Feature smtF = smtFeature(inftyConst());
 	final Feature smtMultiF = smtMultiFeature(inftyConst());
@@ -150,6 +151,7 @@ public final class JavaCardDLStrategy extends AbstractFeatureStrategy {
 //              strengthenConstraints, 
               AgeFeature.INSTANCE,
               oneStepSimplificationF,
+              pullOutConditionalsF,
               smtF, 
               smtMultiF,
               methodSpecF, 
@@ -175,7 +177,13 @@ public final class JavaCardDLStrategy extends AbstractFeatureStrategy {
 	SetRuleFilter filter = new SetRuleFilter();
 	filter.addRuleToSet(OneStepSimplifier.INSTANCE);
         return ConditionalFeature.createConditional(filter, cost);        
-    } 
+    }
+    
+    private Feature pullOutConditionalsFeature(Feature cost) {
+	SetRuleFilter filter = new SetRuleFilter();
+	filter.addRuleToSet(PullOutConditionalsRule.INSTANCE);
+        return ConditionalFeature.createConditional(filter, cost);        
+    }     
     
     private Feature smtFeature(Feature cost) {
 	ClassRuleFilter filter = new ClassRuleFilter(SMTRule.class);
