@@ -81,9 +81,7 @@ public class TermTacletAppIndex {
                                                          RuleFilter      filter,
                                                          Services        services,
                                                          Constraint      userConstraint,
-                                                         TacletIndex     tacletIndex) { 
-
-        ImmutableList<NoPosTacletApp> result = ImmutableSLList.<NoPosTacletApp>nil();
+                                                         TacletIndex     tacletIndex) {
 
         Constraint c = pos.constrainedFormula().constraint();
 
@@ -93,13 +91,7 @@ public class TermTacletAppIndex {
             if ( !c.isSatisfiable () ) return ImmutableSLList.<NoPosTacletApp>nil();
         }
 
-        for (NoPosTacletApp noPosTacletApp : tacletIndex.getRewriteTaclet(pos, c, filter, services,
-                userConstraint)) {
-            NoPosTacletApp tacletApp = noPosTacletApp;
-            result = result.prepend(tacletApp);
-        }
-        
-        return result;
+        return tacletIndex.getRewriteTaclet(pos, c, filter, services, userConstraint);
     }
   
     /** 

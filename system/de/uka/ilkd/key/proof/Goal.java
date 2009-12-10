@@ -54,7 +54,7 @@ public class Goal  {
     private Node node;
 
     /** all possible rule applications at this node are managed with this index */ 
-    private RuleAppIndex ruleAppIndex;
+    private final RuleAppIndex ruleAppIndex;
 
     /** list of all applied rule applications at this branch */
     private ImmutableList<RuleApp> appliedRuleApps = ImmutableSLList.<RuleApp>nil();
@@ -228,9 +228,8 @@ public class Goal  {
         ImmutableSet<ProgramVariable> globalProgVars = getGlobalProgVars();
         Namespace ns = proof().getNamespaces().programVariables();
         for (ProgramVariable value : s) {
-            ProgramVariable pv = value;
-            if (!globalProgVars.contains(pv)) {
-                ns.addSafely(pv);
+            if (!globalProgVars.contains(value)) {
+                ns.addSafely(value);
             }
         }
 	node.setGlobalProgVars(s);
@@ -587,9 +586,7 @@ public class Goal  {
 	while (leavesIt.hasNext()) {
 	    Node n = leavesIt.next();
 
-        for (Goal aGoalList : goalList) {
-            final Goal g = aGoalList;
-
+        for (final Goal g : goalList) {
             if (g.node() == n && g != this) {
                 goalList = goalList.removeFirst(g);
             }
@@ -742,8 +739,7 @@ public class Goal  {
 
     /** toString */
     public String toString() {
-	String result = (node.sequent().prettyprint(proof().getServices()).toString());
-	return result;
+	return (node.sequent().prettyprint(proof().getServices()).toString());
     }
 
     /** make Taclet instantiations complete with regard to metavariables and

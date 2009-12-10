@@ -231,8 +231,7 @@ public class TacletAppIndex  {
     static ImmutableList<TacletApp> createTacletApps(ImmutableList<NoPosTacletApp> tacletInsts,
                                             PosInOccurrence pos) {
         ImmutableList<TacletApp> result = ImmutableSLList.<TacletApp>nil();
-        for (NoPosTacletApp tacletInst : tacletInsts) {
-            NoPosTacletApp tacletApp = tacletInst;
+        for (NoPosTacletApp tacletApp : tacletInsts) {
             if (tacletApp.taclet() instanceof FindTaclet) {
                 PosTacletApp newTacletApp = tacletApp.setPosInOccurrence(pos);
                 if (newTacletApp != null) {
