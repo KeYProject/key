@@ -290,7 +290,7 @@ public class DecisionProcedureResultsDialog extends JFrame {
 //	    if(rowIdx>=0){
 //		table.getSelectionModel().setSelectionInterval(rowIdx,rowIdx);
 //	    }
-	};
+	}
 
     }
     

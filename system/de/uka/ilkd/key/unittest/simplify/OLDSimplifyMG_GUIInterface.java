@@ -57,7 +57,7 @@ public class OLDSimplifyMG_GUIInterface extends OldSimplifyModelGenerator {
 	public CreateModelsInfo() {
 	    count= 0;
 	    info = null;
-	};
+	}
     }
 
     /** is called by createModelsHelp*/

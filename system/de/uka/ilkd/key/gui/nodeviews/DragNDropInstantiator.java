@@ -280,9 +280,7 @@ public class DragNDropInstantiator extends DropTargetAdapter {
             PosInSequent targetPos, final Services services,
             final Sequent sequent, final Constraint userConstraint) {
         
-        ImmutableList<PosTacletApp> applicableApps = ImmutableSLList.<PosTacletApp>nil();
-
-        applicableApps = getDirectionDependentApps(sourcePos, targetPos, services, 
+        ImmutableList<PosTacletApp> applicableApps = getDirectionDependentApps(sourcePos, targetPos, services, 
                 sequent, userConstraint).
                 prepend(getDirectionDependentApps(targetPos, sourcePos, services, 
                         sequent, userConstraint));

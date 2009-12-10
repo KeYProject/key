@@ -355,7 +355,6 @@ public abstract class AbstractSMTSolver implements SMTSolver {
 	try {
 	    //execute the external solver
 	    Process p = Runtime.getRuntime().exec(execCommand);
-	    final int temptimeout = timeout;
 	    execWatch = new ExecutionWatchDog(timeout, p);
 	    Timer t = new Timer();
 	    t.schedule(execWatch, new Date(System.currentTimeMillis()), 300);

@@ -66,7 +66,7 @@ public class AnonymousUpdate implements IUpdateOperator {
      * @return a new anonymous update
      */
     public static AnonymousUpdate getNewAnonymousOperator() {        
-        WeakReference anonymousUpdateReference = null;
+        WeakReference anonymousUpdateReference;
         Name uniqueName; 
         do { 
              globalCounter = globalCounter.add(BigInteger.ONE);

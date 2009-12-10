@@ -70,9 +70,9 @@ public class ThrownExceptionFeature extends BinaryFeature {
     }
 
     protected boolean filter(RuleApp app, PosInOccurrence pos, Goal goal) {
-        return app instanceof TacletApp ? filter(pos.subTerm(), goal.proof()
+        return app instanceof TacletApp && filter(pos.subTerm(), goal.proof()
                 .getServices(), ((TacletApp) app).instantiations()
-                .getExecutionContext()) : false;
+                .getExecutionContext());
     }
 
     protected boolean filter(Term term, Services services, ExecutionContext ec) {

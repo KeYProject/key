@@ -153,7 +153,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 	    throws IllegalFormulaException {
 
 	// translate
-	StringBuffer hb = new StringBuffer();
+	StringBuffer hb;
 	StringBuffer ante;
 	ante = translate(sequent.antecedent(), SMTTranslator.TERMPOSITION.ANTECEDENT, services);
 	StringBuffer succ;

@@ -66,8 +66,6 @@ public class ApplyStrategy {
     /** interrupted by the user? */
     private boolean autoModeActive = false;
 
-    private ProofListener proofListener = new ProofListener();
-    
     private boolean startedAsInteractive;
     
     private List<ProverTaskListener> proverTaskObservers = new ArrayList<ProverTaskListener> ();
@@ -84,8 +82,8 @@ public class ApplyStrategy {
     // Otherwise the addition/removal of the InteractiveProofListener
     // can cause a ConcurrentModificationException during ongoing operation
     public ApplyStrategy(KeYMediator medi) {
-	this.medi = medi;
-        medi.addRuleAppListener( proofListener );        
+	    this.medi = medi;
+        medi.addRuleAppListener( new ProofListener() );        
     }
     
     

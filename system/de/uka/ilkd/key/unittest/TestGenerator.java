@@ -198,7 +198,7 @@ public abstract class TestGenerator {
         	    //Read model
         	    final boolean createModelsFailed = models==null || (models.length == 0);// && mgs.size() != 1);//
         	    generateTestSuite_progressNotification2(count,totalCount,mg, models, !createModelsFailed, 
-        		    				(modelGeneration==null?false:modelGeneration.wasInterrupted()));
+        		    				(modelGeneration != null && modelGeneration.wasInterrupted()));
         	    if (createModelsFailed) {
         		mgs.remove(0);//This ModelGenerator has been used in this iteration and is not needed anymore
         		continue;

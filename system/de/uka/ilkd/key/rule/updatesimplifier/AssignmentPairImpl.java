@@ -231,7 +231,7 @@ public class AssignmentPairImpl implements AssignmentPair {
 
     private String printBoundVars() {
         StringBuffer sb = new StringBuffer();
-	QuantifiableVariable qvar = null;
+	QuantifiableVariable qvar;
 	if(boundVars().size() == 1){
 	   qvar = boundVars().get (0);
 	   if(qvar instanceof LogicVariable) {

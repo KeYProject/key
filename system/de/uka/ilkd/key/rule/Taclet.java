@@ -299,8 +299,7 @@ public abstract class Taclet implements Rule, Named {
      * @param v the bound variable to be searched 
      */
     protected boolean varIsBound(SchemaVariable v) {
-        return (v instanceof QuantifiableVariable) 
-        ? getBoundVariables().contains((QuantifiableVariable)v) : false;
+        return (v instanceof QuantifiableVariable) && getBoundVariables().contains((QuantifiableVariable) v);
     }
 
  

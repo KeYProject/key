@@ -323,15 +323,13 @@ public class TestGenFac {
 			try {
 			    src.close();
 			} catch (final IOException e) {
-			    ;
-			}
+            }
 		    }
 		    if (targ != null) {
 			try {
 			    targ.close();
 			} catch (final IOException e) {
-			    ;
-			}
+            }
 		    }
 		}
 	    } else {

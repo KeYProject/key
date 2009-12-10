@@ -179,7 +179,7 @@ public class KeYInstallerGUI extends KeYInstallerUI {
                             finish();
                             if (complete()) System.exit(0);
                         } catch(NotCompleteException nce) {
-                            ; // let the user take care of it
+                            // let the user take care of it
                         } finally {
                             installerFrame.setCursor(new java.awt.Cursor(
                                 java.awt.Cursor.DEFAULT_CURSOR));

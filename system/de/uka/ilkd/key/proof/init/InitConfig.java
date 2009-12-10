@@ -371,7 +371,7 @@ public class InitConfig {
 
     public ProofSettings mergedProofSettings() {
         ProofSettings defaultSettings = ProofSettings.DEFAULT_SETTINGS;
-        ProofAggregate someProof = null;
+        ProofAggregate someProof;
 	try {
             someProof = ((ProofAggregate)getProofEnv().getProofs().iterator().next());
 	}catch(NoSuchElementException ne){

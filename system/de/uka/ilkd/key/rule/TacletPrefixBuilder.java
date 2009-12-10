@@ -157,9 +157,8 @@ public class TacletPrefixBuilder {
 	// we have to descend into the addrules of the addrules
 
         for (TacletGoalTemplate tacletGoalTemplate : addRule.goalTemplates()) {
-            final Iterator<Taclet> moreRules = tacletGoalTemplate.rules().iterator();
-            while (moreRules.hasNext()) {
-                checkPrefixInAddRules(moreRules.next());
+            for (Taclet taclet : tacletGoalTemplate.rules()) {
+                checkPrefixInAddRules(taclet);
             }
         }
     }
