@@ -51,18 +51,17 @@ public class DepthFirstGoalChooser extends DefaultGoalChooser {
     }
     */
     protected ImmutableList<Goal> insertNewGoals (ImmutableList<Goal> newGoals, ImmutableList<Goal> prevGoalList) {
-        final Iterator<Goal> it = newGoals.iterator ();
-        
-        while ( it.hasNext () ) {
-            final Goal g = it.next ();
-            
-            if (proof.openGoals ().contains ( g )) {
-                if ( !allGoalsSatisfiable
-                        && g.getClosureConstraint ()
-                                .isSatisfiable () )
-                    goalList = goalList.prepend( g );
+
+        for (Goal newGoal : newGoals) {
+            final Goal g = newGoal;
+
+            if (proof.openGoals().contains(g)) {
+                if (!allGoalsSatisfiable
+                        && g.getClosureConstraint()
+                        .isSatisfiable())
+                    goalList = goalList.prepend(g);
                 else
-                    prevGoalList = prevGoalList.prepend ( g );
+                    prevGoalList = prevGoalList.prepend(g);
             }
         }
         return prevGoalList;

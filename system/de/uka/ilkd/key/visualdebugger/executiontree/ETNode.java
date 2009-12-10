@@ -139,7 +139,7 @@ public class ETNode {
      * @return the children
      */
     public ETNode[] getChildren() {
-        return (ETNode[]) children.toArray(new ETNode[children.size()]);
+        return children.toArray(new ETNode[children.size()]);
     }
 
     /**
@@ -157,7 +157,7 @@ public class ETNode {
      * @return the iT nodes array
      */
     public ITNode[] getITNodesArray() {
-        return (ITNode[]) itNodes.toArray(new ITNode[itNodes.size()]);
+        return itNodes.toArray(new ITNode[itNodes.size()]);
     }
 
     /**
@@ -328,8 +328,8 @@ public class ETNode {
      */
     public ImmutableList<Node> getProofTreeNodes() {
         ImmutableList<Node> result = ImmutableSLList.<Node>nil();
-        for (Iterator<ITNode> it = itNodes.iterator(); it.hasNext();) {
-            result = result.append(((ITNode) it.next()).getNode());
+        for (ITNode itNode : itNodes) {
+            result = result.append((itNode).getNode());
 
         }
         return result;
@@ -343,8 +343,8 @@ public class ETNode {
      * @return true, if successful
      */
     public boolean representsProofTreeNode(Node n) {
-        for (Iterator<ITNode> it = itNodes.iterator(); it.hasNext();) {
-            if (((ITNode) it.next()).getNode().equals(n))
+        for (ITNode itNode : itNodes) {
+            if ((itNode).getNode().equals(n))
                 return true;
 
         }

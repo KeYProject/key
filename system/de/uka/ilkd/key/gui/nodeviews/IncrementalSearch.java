@@ -75,8 +75,8 @@ public class IncrementalSearch implements KeyListener, FocusListener {
      */
     private boolean alreadyRegistered(JComponent comp) {
         KeyListener[] l = comp.getKeyListeners();
-        for (int i = 0; i < l.length; i++) {
-            if (l[i] instanceof IncrementalSearch) {
+        for (KeyListener aL : l) {
+            if (aL instanceof IncrementalSearch) {
                 return true;
             }
         }

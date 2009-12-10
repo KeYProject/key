@@ -181,8 +181,8 @@ public class NamespaceSet {
      * given namespaces, otherwise <tt>null</tt>
      */
     private Named lookup(Name name, final Namespace[] spaces) {
-        for (int i = 0; i<spaces.length; i++) {
-            final Named n = spaces[i].lookup(name);
+        for (Namespace space : spaces) {
+            final Named n = space.lookup(name);
             if (n != null) return n;
         } 
         return null;

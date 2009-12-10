@@ -656,7 +656,7 @@ public class TestTermParser extends TestCase {
            parseDecls("\\sorts { \\inter(AZ,Z); }");
         } catch (Exception e) {
             assertTrue("expected KeYSemanticException, but is " + e.getCause(),
-                       ((ExceptionHandlerException)(e.getCause())).getCause() 
+                       e.getCause().getCause()
                        instanceof KeYSemanticException);
             unneccessaryIntersectionSortDetected = true;
             

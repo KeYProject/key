@@ -289,9 +289,8 @@ public abstract class AbstractPO implements ProofOblInput {
 
 
     protected final void registerInNamespaces(ImmutableList<ProgramVariable> pvs) {
-        final Iterator<ProgramVariable> it = pvs.iterator();
-        while(it.hasNext()) {
-            initConfig.progVarNS().add(it.next());
+        for (ProgramVariable pv : pvs) {
+            initConfig.progVarNS().add(pv);
         }
     }
 

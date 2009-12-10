@@ -48,6 +48,6 @@ public abstract class AbstractCollectionSort
      * @return the sorts of the predecessors of this sort
      */
     public ImmutableSet<Sort> extendsSorts() {
-	return DefaultImmutableSet.<Sort>nil();
+	return DefaultImmutableSet.nil();
     }
 }

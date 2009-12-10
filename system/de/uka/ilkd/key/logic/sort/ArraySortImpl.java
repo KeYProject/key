@@ -103,8 +103,8 @@ public class ArraySortImpl extends AbstractCollectionSort implements ArraySort{
         // several environments (int, boolean)
         final SortKey sortKey = new SortKey(elemSort, objectSort, 
                 cloneableSort, serializableSort);
-        ArraySort as = aSH.containsKey(sortKey) ? 
-                (ArraySort) aSH.get(sortKey).get() : null;          
+        ArraySort as = aSH.containsKey(sortKey) ?
+                aSH.get(sortKey).get() : null;
 	
         if (as == null){ 
         // HACK: this simple handling of sort creation does not treat

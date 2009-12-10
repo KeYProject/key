@@ -309,15 +309,14 @@ public class GenericSortInstantiations {
 	// subsorts given by the conditions (could be made faster
 	// by using a hash map for storing the conditions)
         {
-            final Iterator<GenericSortCondition> itC = p_conditions.iterator ();
-            while ( itC.hasNext () ) {
-                final GenericSortCondition c = itC.next ();
-                if ( c.getGenericSort () == gs ) {
-                    if ( c instanceof GenericSortCondition.GSCSupersort )
+            for (GenericSortCondition p_condition : p_conditions) {
+                final GenericSortCondition c = p_condition;
+                if (c.getGenericSort() == gs) {
+                    if (c instanceof GenericSortCondition.GSCSupersort)
                         subsorts = subsorts.prepend
-                        ( ( (GenericSortCondition.GSCSupersort)c ).getSubsort () );
-                    else if ( c instanceof GenericSortCondition.GSCIdentity )
-                        idConditions = idConditions.prepend ( c );
+                                (((GenericSortCondition.GSCSupersort) c).getSubsort());
+                    else if (c instanceof GenericSortCondition.GSCIdentity)
+                        idConditions = idConditions.prepend(c);
                 }
             }
         }
@@ -374,18 +373,17 @@ public class GenericSortInstantiations {
                                          GenericSort p_gs,
                                          ImmutableList<Sort> p_subsorts,
                                          ImmutableList<Sort> p_chosenList) {
-        final Iterator<Sort> itChosen = p_chosenList.iterator ();
-        while ( itChosen.hasNext () ) {
-            final Sort chosen = itChosen.next ();
-            if ( !isSupersortOf ( chosen, p_subsorts ) // this test is unnecessary in some cases
-                 || !p_gs.isPossibleInstantiation ( chosen ) ) continue;
+        for (Sort aP_chosenList : p_chosenList) {
+            final Sort chosen = aP_chosenList;
+            if (!isSupersortOf(chosen, p_subsorts) // this test is unnecessary in some cases
+                    || !p_gs.isPossibleInstantiation(chosen)) continue;
 
-            final ImmutableMap<GenericSort,Sort> res = solveHelp ( p_remainingSorts,
-                                                             p_curRes.put ( p_gs,
-                                                                            chosen ),
-                                                             p_conditions,
-                                                             p_pushedBack );
-            if ( res != null ) return res;
+            final ImmutableMap<GenericSort, Sort> res = solveHelp(p_remainingSorts,
+                    p_curRes.put(p_gs,
+                            chosen),
+                    p_conditions,
+                    p_pushedBack);
+            if (res != null) return res;
         }
         return null;
     }
@@ -420,9 +418,7 @@ public class GenericSortInstantiations {
     private static ImmutableList<Sort> toList (ImmutableSet<Sort> p_set) {
         ImmutableList<Sort> res;
         res = ImmutableSLList.<Sort>nil();
-        final Iterator<Sort> it = p_set.iterator ();
-        while ( it.hasNext () )
-            res = res.prepend ( it.next () );
+        for (Sort aP_set : p_set) res = res.prepend(aP_set);
         return res;
     }
 
@@ -658,14 +654,13 @@ public class GenericSortInstantiations {
             final Sort sort = it.next ();
 
             ImmutableList<Sort> res2 = ImmutableSLList.<Sort>nil();
-            final Iterator<Sort> itSort = res.iterator ();
-            while ( itSort.hasNext () ) {
-                final Sort oldMinimal = itSort.next ();
+            for (Sort re : res) {
+                final Sort oldMinimal = re;
 
-                if ( oldMinimal.extendsTrans ( sort ) )
+                if (oldMinimal.extendsTrans(sort))
                     continue mainloop;
-                else if ( !sort.extendsTrans ( oldMinimal ) )
-                    res2 = res2.prepend ( oldMinimal );
+                else if (!sort.extendsTrans(oldMinimal))
+                    res2 = res2.prepend(oldMinimal);
             }
 
             res = res2.prepend ( sort );
@@ -680,11 +675,10 @@ public class GenericSortInstantiations {
      * sorts to the set <code>p_emptySet</code>
      */
     private static void treatNullSorts (HashSet<Sort> p_inside, HashSet<Sort> p_emptySet) {
-        final Iterator<Sort> it = p_inside.iterator ();
 
-        while ( it.hasNext () ) {
-            final Sort sort = it.next ();
-            if ( Sort.NULL.extendsTrans ( sort ) ) p_emptySet.add ( sort );
+        for (Sort aP_inside : p_inside) {
+            final Sort sort = aP_inside;
+            if (Sort.NULL.extendsTrans(sort)) p_emptySet.add(sort);
         }
     }
 
@@ -697,9 +691,7 @@ public class GenericSortInstantiations {
 
 
     private static void addSortsToSet (Set<Sort> p_set, ImmutableSet<Sort> p_sorts) {
-        final Iterator<Sort> itSort = p_sorts.iterator ();
-        while ( itSort.hasNext () )
-            p_set.add ( itSort.next () );
+        for (Sort p_sort : p_sorts) p_set.add(p_sort);
     }
 
 
@@ -728,12 +720,11 @@ public class GenericSortInstantiations {
      */
     private static boolean isSupersortOf ( Sort       p_s,
 					   ImmutableList<Sort> p_subsorts ) {
-	final Iterator<Sort> it = p_subsorts.iterator ();
 
-	while ( it.hasNext () ) {
-	    if ( !it.next ().extendsTrans ( p_s ) )
-		return false;
-	}
+        for (Sort p_subsort : p_subsorts) {
+            if (!p_subsort.extendsTrans(p_s))
+                return false;
+        }
 
 	return true;
     }

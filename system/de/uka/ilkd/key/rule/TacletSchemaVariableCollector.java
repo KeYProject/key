@@ -170,10 +170,9 @@ public class TacletSchemaVariableCollector extends Visitor {
      * @param semiseq the Semisequent to visit
      */
     private void visit(Semisequent semiseq) {
-	Iterator<ConstrainedFormula> it=semiseq.iterator();
-	while(it.hasNext()) {
-	    it.next().formula().execPostOrder(this);
-	}
+        for (ConstrainedFormula aSemiseq : semiseq) {
+            aSemiseq.formula().execPostOrder(this);
+        }
     }
 
     /** goes through the given sequent an collects all vars found
@@ -205,24 +204,22 @@ public class TacletSchemaVariableCollector extends Visitor {
     
     
     protected void visitGoalTemplates(Taclet taclet, boolean visitAddrules) {
-	Iterator<TacletGoalTemplate> it = taclet.goalTemplates().iterator();
-	while (it.hasNext()) {
-	    TacletGoalTemplate gt=it.next();
-	    visit(gt.sequent());
-	    if (gt instanceof RewriteTacletGoalTemplate) {
-		((RewriteTacletGoalTemplate)gt).replaceWith().execPostOrder(this);
-	    } else {
-		if(gt instanceof AntecSuccTacletGoalTemplate) {
-		    visit(((AntecSuccTacletGoalTemplate)gt).replaceWith());
-		}
-	    }
-	    if (visitAddrules) {
-		Iterator<Taclet> addruleIt = gt.rules().iterator();
-		while (addruleIt.hasNext()) {
-		    visit(addruleIt.next(), true);		    
-		}
-	    }
-	}
+        for (TacletGoalTemplate tacletGoalTemplate : taclet.goalTemplates()) {
+            TacletGoalTemplate gt = tacletGoalTemplate;
+            visit(gt.sequent());
+            if (gt instanceof RewriteTacletGoalTemplate) {
+                ((RewriteTacletGoalTemplate) gt).replaceWith().execPostOrder(this);
+            } else {
+                if (gt instanceof AntecSuccTacletGoalTemplate) {
+                    visit(((AntecSuccTacletGoalTemplate) gt).replaceWith());
+                }
+            }
+            if (visitAddrules) {
+                for (Taclet taclet1 : gt.rules()) {
+                    visit(taclet1, true);
+                }
+            }
+        }
     }
 
 

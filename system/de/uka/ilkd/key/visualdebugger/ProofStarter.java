@@ -142,9 +142,8 @@ public class ProofStarter {
      * @param progress the int counting the number of applied rules
      */
     private void informProgressMonitors(int progress) {
-        final Iterator it = progressMonitors.iterator();
-        while (it.hasNext()) {
-            ((ProgressMonitor)it.next()).setProgress(progress);
+        for (ProgressMonitor progressMonitor : progressMonitors) {
+            (progressMonitor).setProgress(progress);
         }        
     }
 
@@ -154,9 +153,8 @@ public class ProofStarter {
      * @param maxSteps an int indicating the maximal steps to be performed
      */
     private void initProgressMonitors(int maxSteps) {
-        final Iterator it = progressMonitors.iterator();
-        while (it.hasNext()) {
-            ((ProgressMonitor)it.next()).setMaximum(maxSteps);
+        for (ProgressMonitor progressMonitor : progressMonitors) {
+            (progressMonitor).setMaximum(maxSteps);
         }        
     }
     
@@ -269,14 +267,12 @@ public class ProofStarter {
      */
     private BuiltInRule findSimplifyRule() {
         BuiltInRule decisionProcedureRule = null;
-        final Iterator<BuiltInRule> builtinRules = 
-            proof.getSettings().getProfile().getStandardRules().getStandardBuiltInRules().iterator();
-        while (builtinRules.hasNext()) {
-            final BuiltInRule bir = builtinRules.next();
+        for (BuiltInRule builtInRule : proof.getSettings().getProfile().getStandardRules().getStandardBuiltInRules()) {
+            final BuiltInRule bir = builtInRule;
             //TODO: do we really want to hardcode "Simplify" here?
             if (bir instanceof SMTRule && bir.displayName().contains("Simplify")) {
-        	decisionProcedureRule = bir;
-        	break;
+                decisionProcedureRule = bir;
+                break;
             }
         }
         return decisionProcedureRule;

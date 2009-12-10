@@ -229,12 +229,11 @@ public class ClashFreeSubst {
     /** returns true if there is no object named <code>n</code> in the
      * set <code>s</code> */
     private boolean nameNewInSet(String n, ImmutableSet<QuantifiableVariable> qvars) {
-	Iterator<QuantifiableVariable> it = qvars.iterator();
-	while ( it.hasNext() ) {
-	    if ( it.next().name().toString().equals(n) ) {
-		return false;
-	    }
-	}
+        for (QuantifiableVariable qvar : qvars) {
+            if (qvar.name().toString().equals(n)) {
+                return false;
+            }
+        }
 	return true;
     }
 

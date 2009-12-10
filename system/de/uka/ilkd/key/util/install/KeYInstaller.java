@@ -165,10 +165,10 @@ public abstract class KeYInstaller {
      */
 
     public void mkdirs ( ) {
-	for ( int i = 0; i < subdirs.length; i++ ) {
-	    File f = new File ( keyHome () + File.separatorChar + subdirs[i] );	    
-	    f.mkdirs();
-	}			
+        for (String subdir : subdirs) {
+            File f = new File(keyHome() + File.separatorChar + subdir);
+            f.mkdirs();
+        }
     }
     
 

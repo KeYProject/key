@@ -88,9 +88,8 @@ public class TestProgramMetaConstructs extends TestCase {
 	Expression expr=(Expression)((Assignment)block.getStatementAt(2))
 	    .getChildAt(1);
 	ProgramMetaConstruct typeof = new TypeOf(expr);
-	assertTrue(((TypeRef)typeof.symbolicExecution(expr, services, 
-		 SVInstantiations.EMPTY_SVINSTANTIATIONS)).getName()
-	       .toString().equals("int"));
+	assertTrue(((TypeRef) typeof.symbolicExecution(expr, services,
+            SVInstantiations.EMPTY_SVINSTANTIATIONS)).getName().equals("int"));
     }
 
     public void testBugId183 () {

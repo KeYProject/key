@@ -211,10 +211,9 @@ public class ConstructableKeYJavaTypeCollector implements Visitor {
         supertypes1 = supertypes1.prepend(kjt1);
         ImmutableList<KeYJavaType> supertypes2 = javaInfo.getAllSupertypes(kjt2);
         supertypes2 = supertypes2.prepend(kjt2);
-        
-        Iterator<KeYJavaType> it = supertypes1.iterator();
-        while(it.hasNext()) {
-            if(supertypes2.contains(it.next())) {
+
+        for (KeYJavaType aSupertypes1 : supertypes1) {
+            if (supertypes2.contains(aSupertypes1)) {
                 return true;
             }
         }
@@ -254,11 +253,10 @@ public class ConstructableKeYJavaTypeCollector implements Visitor {
 
 
     private ProgramVariable getFormalResultVar(MethodReference mr) {
-        Iterator it = formalResultVars.keySet().iterator();
 
-        while(it.hasNext()) {
-            MethodReference mr2 = (MethodReference) it.next();
-            if(areInSameFamily(mr, mr2)) {
+        for (Object o : formalResultVars.keySet()) {
+            MethodReference mr2 = (MethodReference) o;
+            if (areInSameFamily(mr, mr2)) {
                 return (ProgramVariable) formalResultVars.get(mr2);
             }
         }
@@ -377,9 +375,9 @@ public class ConstructableKeYJavaTypeCollector implements Visitor {
         
         //walk children (either the adopted or the normal ones)
         if(adoptedChildren != null) {
-            ProgramElement[] ac = (ProgramElement[]) adoptedChildren.clone();
-            for(int i = 0; i < ac.length; i++) {
-                walk(ac[i]);
+            ProgramElement[] ac = adoptedChildren.clone();
+            for (ProgramElement anAc : ac) {
+                walk(anAc);
             }
             verbose(ascendingString);
         } else if(node instanceof NonTerminalProgramElement) {

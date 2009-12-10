@@ -86,7 +86,7 @@ public class KeYProgModelInfo{
 	    if (o instanceof KeYJavaType) {	        	   
 		KeYJavaType oKJT = (KeYJavaType)o;
 		if (oKJT.getSort() instanceof ObjectSort) {
-		    result.add((ObjectSort)oKJT.getSort());
+		    result.add((ObjectSort) oKJT.getSort());
 		}
 	    }
 	}
@@ -598,15 +598,14 @@ public class KeYProgModelInfo{
         final ImmutableList<Field> javaLangObjectField = 
             getAllVisibleFields((KeYJavaType)rec2key().
                                 toKeY(sc.getNameInfo().getJavaLangObject()));
-                
-        final Iterator<Field> it = javaLangObjectField.iterator();
-        while (it.hasNext()) {
-           final Field f = it.next();
-           
-           if (!((recoder.abstraction.Field)
-                   rec2key().toRecoder(f)).isPrivate()){
-               result = result.append(f);
-           }
+
+        for (Field aJavaLangObjectField : javaLangObjectField) {
+            final Field f = aJavaLangObjectField;
+
+            if (!((recoder.abstraction.Field)
+                    rec2key().toRecoder(f)).isPrivate()) {
+                result = result.append(f);
+            }
         }                          
         return result;
     }
@@ -773,8 +772,7 @@ public class KeYProgModelInfo{
             }
         });
 
-        for (int i = 0; i <classesArray.length; i++) {
-            recoder.abstraction.ClassType c = classesArray[i];
+        for (recoder.abstraction.ClassType c : classesArray) {
             result = recFindImplementations(c, name, signature, result);
         }
         return result;

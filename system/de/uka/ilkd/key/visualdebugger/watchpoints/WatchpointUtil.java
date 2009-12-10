@@ -603,10 +603,8 @@ public class WatchpointUtil {
             Map<SourceElement, Integer> map) {
 
         HashMap<Integer, SourceElement> newHashMap = new HashMap<Integer, SourceElement>();
-        Iterator<Entry<SourceElement, Integer>> it = map.entrySet().iterator();
-        while (it.hasNext()) {
-            Entry<SourceElement, Integer> entry = (Entry<SourceElement, Integer>) it
-            .next();
+        for (Object o : map.entrySet()) {
+            Entry<SourceElement, Integer> entry = (Entry<SourceElement, Integer>) (Map.Entry<SourceElement, Integer>) o;
             newHashMap.put(entry.getValue(), entry.getKey());
 
         }

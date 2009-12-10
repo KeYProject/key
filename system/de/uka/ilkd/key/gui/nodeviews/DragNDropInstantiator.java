@@ -316,12 +316,11 @@ public class DragNDropInstantiator extends DropTargetAdapter {
 
         ImmutableList<TacletApp> allTacletsAtFindPosition = ImmutableSLList.<TacletApp>nil();
 
-        final Iterator<TacletApp> it = seqView.mediator()
-                .getFindTaclet(findPos).iterator();
         // if in replaceWithMode only apps that contain at least one replacewith
         // are collected. Otherwise only those without a replacewith.
-        while (it.hasNext()) {
-            final TacletApp app = it.next();
+        for (TacletApp tacletApp : seqView.mediator()
+                .getFindTaclet(findPos)) {
+            final TacletApp app = tacletApp;
             if (filter.satisfiesFilterCondition(app.taclet())) {
                 allTacletsAtFindPosition = allTacletsAtFindPosition
                         .prepend(app);
@@ -349,9 +348,8 @@ public class DragNDropInstantiator extends DropTargetAdapter {
             ImmutableList<TacletApp> tacletApps, PosInOccurrence findPos) {
 
         ImmutableList<PosTacletApp> applicableApps = ImmutableSLList.<PosTacletApp>nil();
-        Iterator<TacletApp> it = tacletApps.iterator();
-        while (it.hasNext()) {
-            TacletApp app = it.next();
+        for (TacletApp tacletApp : tacletApps) {
+            TacletApp app = tacletApp;
             if (app instanceof NoPosTacletApp) {
                 app = PosTacletApp.createPosTacletApp(
                         (FindTaclet) app.taclet(), app.matchConditions(),
@@ -400,25 +398,24 @@ public class DragNDropInstantiator extends DropTargetAdapter {
                     .prepend(ifInst);
         }
 
-        final Iterator<PosTacletApp> it = apps.iterator();
-        while (it.hasNext()) {
-            PosTacletApp app = it.next();
+        for (PosTacletApp app1 : apps) {
+            PosTacletApp app = app1;
 
             final Sequent ifSequent = app.taclet().ifSequent();
             if (ifSequent != null && !ifSequent.isEmpty()) {
                 if (ifSequent.size() != 1) {
-                  // currently dnd is only supported for taclets with exact one formula
-                  // in the if sequent
-                  app = null;  
+                    // currently dnd is only supported for taclets with exact one formula
+                    // in the if sequent
+                    app = null;
                 } else if (ifFmlInst == null) {
                     // as either all taclets have an if sequent or none
                     // we can exit here
                     return ImmutableSLList.<PosTacletApp>nil();
-                } else {    
+                } else {
                     // the right side is not checked in tacletapp
                     // not sure where to incorporate the check...
-                    if (((IfFormulaInstSeq)ifFmlInst.head()).inAntec() == 
-                         (ifSequent.succedent().size() == 0)) {        	    
+                    if (((IfFormulaInstSeq) ifFmlInst.head()).inAntec() ==
+                            (ifSequent.succedent().size() == 0)) {
                         app = (PosTacletApp) app.setIfFormulaInstantiations(
                                 ifFmlInst, services, userConstraint);
                     }
@@ -455,27 +452,26 @@ public class DragNDropInstantiator extends DropTargetAdapter {
         if (missingSVPIO == null) {        
             return ImmutableSLList.<PosTacletApp>nil(); 
         }
-        
-        final Iterator<PosTacletApp> it = apps.iterator();
-        while (it.hasNext()) {
-            PosTacletApp app = it.next();
-            
+
+        for (PosTacletApp app1 : apps) {
+            PosTacletApp app = app1;
+
             final SchemaVariable missingSV;
             final Sequent ifSequent = app.taclet().ifSequent();
-            
+
             if ((ifSequent != null && !ifSequent.isEmpty()) ||
                     app.uninstantiatedVars().size() != 1) {
-               continue;
+                continue;
             } else {
                 missingSV = app.uninstantiatedVars().iterator().next();
-            }            
-	    try {
-		app = (PosTacletApp)app.addCheckedInstantiation(missingSV, 
-                      missingSVPIO.subTerm(), services, true);
-	    } catch (IllegalInstantiationException ie) {
-		app = null;
-	    }
-            
+            }
+            try {
+                app = (PosTacletApp) app.addCheckedInstantiation(missingSV,
+                        missingSVPIO.subTerm(), services, true);
+            } catch (IllegalInstantiationException ie) {
+                app = null;
+            }
+
             if (app != null && app.sufficientlyComplete()) {
                 result = result.prepend(app);
             }
@@ -621,10 +617,8 @@ public class DragNDropInstantiator extends DropTargetAdapter {
              */
             private boolean goalTemplatesContainAddrules(
                     ImmutableList<TacletGoalTemplate> goalDescriptions) {
-                final Iterator<TacletGoalTemplate> it = goalDescriptions
-                        .iterator();
-                while (it.hasNext()) {
-                    final TacletGoalTemplate tgt = it.next();
+                for (TacletGoalTemplate goalDescription : goalDescriptions) {
+                    final TacletGoalTemplate tgt = goalDescription;
                     if (tgt.rules().size() >= 1) {
                         return true;
                     }

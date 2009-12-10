@@ -608,19 +608,19 @@ public class JMLSpecFactory {
         ImmutableSet<Term> predicates = DefaultImmutableSet.<Term>nil();
         for(PositionedString ps : originalPredicates) {
             String[] exprs = ps.text.split(",", 0);
-            
-            for(int i = 0; i < exprs.length; i++) {
+
+            for (String expr : exprs) {
                 FormulaWithAxioms translated
-                    = translator.translateExpression(
-                            new PositionedString(exprs[i]), 
-                            programMethod.getContainerType(),
-                            selfVar, 
-                            paramVars.append(freeVars), 
-                            null, 
-                            null,
-                            atPreFunctions);
+                        = translator.translateExpression(
+                        new PositionedString(expr),
+                        programMethod.getContainerType(),
+                        selfVar,
+                        paramVars.append(freeVars),
+                        null,
+                        null,
+                        atPreFunctions);
                 assert translated.getAxioms().isEmpty();
-                predicates = predicates.add(translated.getFormula());                
+                predicates = predicates.add(translated.getFormula());
             }
         }
         

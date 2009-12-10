@@ -281,8 +281,8 @@ public class InitArrayCreation extends InitArray {
 
 	NewArray na = null;
 
-	if( pe instanceof MethodReference && 
-	    ((MethodReference)pe).getName().toString().startsWith("jvmMakeTransient")) {
+	if( pe instanceof MethodReference &&
+            ((MethodReference) pe).getName().startsWith("jvmMakeTransient")) {
 	    return arrayCreationTransient(array, (MethodReference)pe,
 	             services, svInst.getExecutionContext());
 	} else if ( pe instanceof NewArray ) {

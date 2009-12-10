@@ -133,9 +133,8 @@ public class DebuggerStrategy extends VBTStrategy {
         final Feature inUpdateFeature = InUpdateFeature.create(
                 isSplittingAllowed, inUpdateAndAssumes, inInitPhase);
 
-        final Iterator<Named> it = h.iterator();
-        while (it.hasNext()) {
-            final String ruleSetName = it.next().name().toString();
+        for (Named aH : h) {
+            final String ruleSetName = aH.name().toString();
             bindRuleSet(d, ruleSetName, ifZero(inUpdateFeature, inftyConst(),
                     longConst(0)));
         }

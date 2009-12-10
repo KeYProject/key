@@ -41,7 +41,7 @@ public class LVRCollector extends Visitor{
 	if (t.op() instanceof QuantifiableVariable) {
 	    varList=varList.prepend((QuantifiableVariable)t.op());
 	} else if (t.op() instanceof Quantifier) {
-	    for (int j = 0, ar = ((Quantifier)t.op()).arity(); j<ar; j++) {
+	    for (int j = 0, ar = t.op().arity(); j<ar; j++) {
 	        for (int i = 0, sz = t.varsBoundHere(j).size(); i<sz;i++) {		
 	            varList=varList.prepend
 	            (t.varsBoundHere(j).get(i));		

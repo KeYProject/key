@@ -62,9 +62,9 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
 	this.current = 0;
 	dataTable = new DataTable[model.length];
 
-	for (int i = 0; i < model.length; i++) {
-	    model[i].prepareUnmatchedInstantiation();
-	}
+        for (ApplyTacletDialogModel aModel : model) {
+            aModel.prepareUnmatchedInstantiation();
+        }
         
         setStatus();
 	
@@ -355,7 +355,7 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
 		}  catch (ExceptionHandlerException ex) { 
 		    Exception exc = (Exception) ((mediator().getExceptionHandler()).getExceptions()).get(0);
 		    if (exc instanceof SVInstantiationExceptionWithPosition) {
-                        errorPositionKnown(((SVInstantiationExceptionWithPosition) exc).getMessage(),
+                        errorPositionKnown(exc.getMessage(),
                                 ((SVInstantiationExceptionWithPosition) exc).getRow(),
                                 ((SVInstantiationExceptionWithPosition) exc).getColumn(),
                                 ((SVInstantiationExceptionWithPosition) exc).inIfSequent());
@@ -746,8 +746,8 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
             } else {
                 // Avoid resizing of HashMap
                 hm = new HashMap<String, List<List<String>>>(instFiles.length + 1, 1);
-                for (int i = 0; i < instFiles.length; i++) {
-                    hm.put(instFiles[i], null);
+                for (String instFile : instFiles) {
+                    hm.put(instFile, null);
                 }
             }
         }

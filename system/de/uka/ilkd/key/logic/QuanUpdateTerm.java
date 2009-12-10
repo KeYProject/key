@@ -50,9 +50,9 @@ class QuanUpdateTerm extends Term {
         Debug.assertTrue ( subs.length == op.arity () );
         
         int max_depth = -1;
-        for ( int i = 0; i < subs.length; i++ ) {
-            if ( subs[i].depth () > max_depth ) {
-                max_depth = subs[i].depth ();
+        for (Term sub : subs) {
+            if (sub.depth() > max_depth) {
+                max_depth = sub.depth();
             }
         }
         depth = max_depth + 1;
@@ -74,7 +74,7 @@ class QuanUpdateTerm extends Term {
 	    if(quanUpdateVars[i].size() == 1) {
                 qvar = quanUpdateVars[i].get(0);
 		if(qvar instanceof LogicVariable) {
-		  sb.append (((LogicVariable)qvar).sort()+" "+((LogicVariable)qvar).name());
+		  sb.append (qvar.sort()+" "+ qvar.name());
 		}else{
                   sb.append (qvar);
 		}
@@ -85,7 +85,7 @@ class QuanUpdateTerm extends Term {
 	          sb.append("(");
 		qvar = quanUpdateVars[i].get(j);
 		if(qvar instanceof LogicVariable) {
-		  sb.append (((LogicVariable)qvar).sort()+" "+((LogicVariable)qvar).name());
+		  sb.append (qvar.sort()+" "+ qvar.name());
 		}else{
                   sb.append (qvar);
 		}

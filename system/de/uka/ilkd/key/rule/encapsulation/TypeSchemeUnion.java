@@ -88,13 +88,11 @@ final class TypeSchemeUnion implements TypeSchemeTerm {
         ImmutableSet<TypeScheme> resultPossibilities 
                 = DefaultImmutableSet.<TypeScheme>nil();
 
-        Iterator<TypeScheme> it = possibilities.iterator();
-        while(it.hasNext()) {
-            TypeScheme myTs = it.next();
+        for (TypeScheme possibility1 : possibilities) {
+            TypeScheme myTs = possibility1;
 
-            Iterator<TypeScheme> it2 = tsu.possibilities.iterator();
-            while(it2.hasNext()) {
-                TypeScheme otherTs = it2.next();
+            for (TypeScheme possibility : tsu.possibilities) {
+                TypeScheme otherTs = possibility;
                 TypeScheme combinedTs = myTs.combineWith(otherTs);
                 resultPossibilities = resultPossibilities.add(combinedTs);
             }
@@ -105,14 +103,12 @@ final class TypeSchemeUnion implements TypeSchemeTerm {
 
     
     public boolean subSchemeOf(TypeSchemeUnion tsu) {
-        Iterator<TypeScheme> it = possibilities.iterator();
-        while(it.hasNext()) {
-            TypeScheme myTs = it.next();
+        for (TypeScheme possibility1 : possibilities) {
+            TypeScheme myTs = possibility1;
 
-            Iterator<TypeScheme> it2 = tsu.possibilities.iterator();
-            while(it2.hasNext()) {
-                TypeScheme otherTs = it2.next();
-                if(myTs.subSchemeOf(otherTs)) {
+            for (TypeScheme possibility : tsu.possibilities) {
+                TypeScheme otherTs = possibility;
+                if (myTs.subSchemeOf(otherTs)) {
                     return true;
                 }
             }
@@ -123,14 +119,12 @@ final class TypeSchemeUnion implements TypeSchemeTerm {
     
     
     public boolean equalTo(TypeSchemeUnion tsu) {
-        Iterator<TypeScheme> it = possibilities.iterator();
-        while(it.hasNext()) {
-            TypeScheme myTs = it.next();
-            
-            Iterator<TypeScheme> it2 = tsu.possibilities.iterator();
-            while(it2.hasNext()) {
-                TypeScheme otherTs = it2.next();
-                if(myTs.equalTo(otherTs)) {
+        for (TypeScheme possibility1 : possibilities) {
+            TypeScheme myTs = possibility1;
+
+            for (TypeScheme possibility : tsu.possibilities) {
+                TypeScheme otherTs = possibility;
+                if (myTs.equalTo(otherTs)) {
                     return true;
                 }
             }
@@ -152,9 +146,8 @@ final class TypeSchemeUnion implements TypeSchemeTerm {
     
     public String toString() {
         String result = "[";
-        Iterator<TypeScheme> it = possibilities.iterator();
-        while(it.hasNext()) {
-            result += it.next() + ",";
+        for (TypeScheme possibility : possibilities) {
+            result += possibility + ",";
         }
         
         if(possibilities.size() > 0) {

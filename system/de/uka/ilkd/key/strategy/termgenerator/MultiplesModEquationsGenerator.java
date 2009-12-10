@@ -108,19 +108,18 @@ public class MultiplesModEquationsGenerator implements TermGenerator {
             while ( polyIt.hasNext () ) {
                 CofactorPolynomial poly = polyIt.next ();
 
-                final Iterator<CofactorItem> monoIt = cofactorMonos.iterator ();
-                while ( monoIt.hasNext () ) {
-                    final CofactorMonomial mono = (CofactorMonomial)monoIt.next ();
-                    final CofactorItem reduced = poly.reduce ( mono );
-                    if ( reduced instanceof CofactorMonomial ) {
-                        polyIt.remove ();
-                        cofactorMonos.add ( reduced );
-                        res = addRes ( (CofactorMonomial)reduced, sourceM,
-                                       res, services );
+                for (CofactorItem cofactorMono : cofactorMonos) {
+                    final CofactorMonomial mono = (CofactorMonomial) cofactorMono;
+                    final CofactorItem reduced = poly.reduce(mono);
+                    if (reduced instanceof CofactorMonomial) {
+                        polyIt.remove();
+                        cofactorMonos.add(reduced);
+                        res = addRes((CofactorMonomial) reduced, sourceM,
+                                res, services);
                         changed = true;
                         break;
                     } else {
-                        poly = (CofactorPolynomial)reduced;
+                        poly = (CofactorPolynomial) reduced;
                     }
                 }
             }

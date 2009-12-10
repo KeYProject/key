@@ -164,9 +164,9 @@ public class ExpandDynamicType extends AbstractMetaOperator {
         final String[] typeNames = ensureArrayTypes(services, dimension,
                 componentSubtypes);
 
-        for (int i = 0; i < typeNames.length; i++) {
+        for (String typeName : typeNames) {
             KeYJavaType instType = services.getJavaInfo().getTypeByName(
-                    typeNames[i]);
+                    typeName);
             Debug.assertTrue(instType != null);
             instantiableSubTypes = instantiableSubTypes.prepend(instType);
         }
@@ -211,14 +211,13 @@ public class ExpandDynamicType extends AbstractMetaOperator {
      */
     private ImmutableList<KeYJavaType> getInstantiableTypes(ImmutableList<KeYJavaType> allSubtypes) {
         ImmutableList<KeYJavaType> result = ImmutableSLList.<KeYJavaType>nil();
-        final Iterator<KeYJavaType> it = allSubtypes.iterator();
-        while (it.hasNext()) {
-            final KeYJavaType kjt = it.next();
+        for (KeYJavaType allSubtype : allSubtypes) {
+            final KeYJavaType kjt = allSubtype;
             Type t = kjt.getJavaType();
             if (t instanceof ArrayType) {
                 result = result.prepend(kjt);
-            } else if (t instanceof ClassType && 
-                    !((ClassType) t).isAbstract() && 
+            } else if (t instanceof ClassType &&
+                    !((ClassType) t).isAbstract() &&
                     !((ClassType) t).isInterface()) {
                 result = result.prepend(kjt);
             }

@@ -544,8 +544,8 @@ public abstract class TestGenerator {
 	        .<Statement> nil();
 	for (int i = 0; i < testData.length; i++) {
 	    for (int k = 0; k < testLocation[i].length; k++) {
-		final Expression testDat = singleTuple ? (Expression) testArray[i]
-		        : (Expression) new ArrayReference(testArray[i], new Expression[] { partCounter });
+		final Expression testDat = singleTuple ? testArray[i]
+		        : new ArrayReference(testArray[i], new Expression[] { partCounter });
 		if (testLocation[i][k] instanceof FieldReference
 		        && ((FieldReference) testLocation[i][k])
 		                .getProgramVariable().name().toString().equals("length")) {
@@ -627,25 +627,22 @@ public abstract class TestGenerator {
 		}
 	    }
 	}
-	final Iterator<Expression> locIt = locationsOrdered.iterator();
-	while (locIt.hasNext()) {
-	    final Expression loc = locIt.next();
-	    final Expression constrCall = loc2constrCall.get(loc);
-	    final IndexReplaceVisitor irv = new IndexReplaceVisitor(loc,
-		    testLocation, singleTuple, partCounter, testArray, serv);
-	    irv.start();
-	    irv.result();
-	    assignments = assignments.append(ag.assignmentOrSet(
-		    (Expression) irv.result(), constrCall, serv));
-	}
+        for (Expression aLocationsOrdered : locationsOrdered) {
+            final Expression loc = aLocationsOrdered;
+            final Expression constrCall = loc2constrCall.get(loc);
+            final IndexReplaceVisitor irv = new IndexReplaceVisitor(loc,
+                    testLocation, singleTuple, partCounter, testArray, serv);
+            irv.start();
+            irv.result();
+            assignments = assignments.append(ag.assignmentOrSet(
+                    (Expression) irv.result(), constrCall, serv));
+        }
 	assignments = assignments.append(testDataAssignments);
 	final Statement[] ib = new Statement[6 + code.length];
 	// assignments = removeOutOfBounds(assignments);
 	ib[0] = new StatementBlock(assignments
 	        .toArray(new Statement[assignments.size()]));
-	for (int i = 0; i < code.length; i++) {
-	    ib[i + 1] = code[i];
-	}
+        System.arraycopy(code, 0, ib, 1, code.length);
 	final SyntacticalTypeRef stringBufferType = new SyntacticalTypeRef(
 	        new ClassDeclaration(new ProgramElementName("StringBuffer"),
 	                new ProgramElementName("java.lang.StringBuffer")));
@@ -681,8 +678,8 @@ public abstract class TestGenerator {
 	    for (int j = 0; j < testLocation[i].length; j++) {
 		final Expression assignment = new Plus(new StringLiteral("  "
 		        + testLocation[i][j].toString() + " = "),
-		        singleTuple ? (Expression) testArray[i]
-		                : (Expression) new ArrayReference(testArray[i],
+		        singleTuple ? testArray[i]
+		                : new ArrayReference(testArray[i],
 		                        new Expression[] { partCounter }));
 		failure = new Plus(failure, assignment);
 	    }
@@ -719,8 +716,8 @@ public abstract class TestGenerator {
 	    final LocalVariableDeclaration counterDecl = new LocalVariableDeclaration(
 		    new TypeRef(intType), counterSpec);
 	    final Expression guard = new LessThan(partCounter,
-		    testData.length == 0 ? (Expression) new IntLiteral(1)
-		            : (Expression) new FieldReference(
+		    testData.length == 0 ? new IntLiteral(1)
+		            : new FieldReference(
 		                    new LocationVariable(
 		                            new ProgramElementName("length"),
 		                            intType), testArray[0]));
@@ -1310,9 +1307,9 @@ public abstract class TestGenerator {
 	}
 
 	final Statement loopBody = new CopyAssignment(result,
-	        all ? (Expression) new LogicalAnd(result,
+	        all ? new LogicalAnd(result,
 	                getMethodReferenceForFormula(sub0.sub(1), buffer,
-	                        children)) : (Expression) new LogicalOr(result,
+	                        children)) : new LogicalOr(result,
 	                getMethodReferenceForFormula(sub0.sub(1), buffer,
 	                        children)));
 	final VariableSpecification vs = new VariableSpecification(pv,
@@ -1320,8 +1317,8 @@ public abstract class TestGenerator {
 	                new IntLiteral(1)), intType.getJavaType());
 	final LocalVariableDeclaration init = new LocalVariableDeclaration(
 	        new TypeRef(intType), vs);
-	final Expression guard = bounds[2] == null ? (Expression) new LessThan(
-	        pv, bounds[3]) : (Expression) new LessOrEquals(pv, bounds[2]);
+	final Expression guard = bounds[2] == null ? new LessThan(
+	        pv, bounds[3]) : new LessOrEquals(pv, bounds[2]);
 	final Expression update = new PostIncrement(pv);
 	body[1] = new For(new LoopInitializer[] { init }, guard,
 	        new Expression[] { update }, new StatementBlock(loopBody));
@@ -1359,13 +1356,12 @@ public abstract class TestGenerator {
 	final TermProgramVariableCollector pvColl = new TermProgramVariableCollector(
 	        serv);
 	t.execPreOrder(pvColl);
-	final Iterator<Location> itp = pvColl.result().iterator();
-	while (itp.hasNext()) {
-	    final ProgramVariable v = (ProgramVariable) itp.next();
-	    if (!v.isMember()) {
-		programVars = programVars.add(v);
-	    }
-	}
+        for (Location location : pvColl.result()) {
+            final ProgramVariable v = (ProgramVariable) location;
+            if (!v.isMember()) {
+                programVars = programVars.add(v);
+            }
+        }
 	programVars = removeDublicates(programVars);
 	final Iterator<ProgramVariable> it = programVars.iterator();
 	final ExtList args = new ExtList();
@@ -1379,28 +1375,27 @@ public abstract class TestGenerator {
     protected LinkedList<ParameterDeclaration> getParameterDeclarations(
 	    final ExtList l) {
 	final LinkedList<ParameterDeclaration> params = new LinkedList<ParameterDeclaration>();
-	final Iterator it = l.iterator();
-	while (it.hasNext()) {
-	    final IProgramVariable arg = (IProgramVariable) it.next();
-	    // Depending wether it's a ProgramVariable or
-	    // SyntacticalProgramVariable
-	    // the type has to be obtained in two different ways.
-	    if (arg instanceof ProgramVariable) {// chris
-		final KeYJavaType kjt = arg.getKeYJavaType();
-		params
-		        .add(new ParameterDeclaration(new Modifier[0],
-		                new TypeRef(kjt),
-		                new VariableSpecification(arg), false));
-	    } else if (arg instanceof SyntacticalProgramVariable) {
-		final SyntacticalProgramVariable syntArg = (SyntacticalProgramVariable) arg;
-		params.add(new ParameterDeclaration(new Modifier[0],
-		        new SyntacticalTypeRef(syntArg.type),
-		        new VariableSpecification(arg, syntArg.type), false));
-	    } else {
-		throw new RuntimeException(
-		        "Unexpected case: arg is instance of:" + arg);
-	    }
-	}
+        for (Object aL : l) {
+            final IProgramVariable arg = (IProgramVariable) aL;
+            // Depending wether it's a ProgramVariable or
+            // SyntacticalProgramVariable
+            // the type has to be obtained in two different ways.
+            if (arg instanceof ProgramVariable) {// chris
+                final KeYJavaType kjt = arg.getKeYJavaType();
+                params
+                        .add(new ParameterDeclaration(new Modifier[0],
+                                new TypeRef(kjt),
+                                new VariableSpecification(arg), false));
+            } else if (arg instanceof SyntacticalProgramVariable) {
+                final SyntacticalProgramVariable syntArg = (SyntacticalProgramVariable) arg;
+                params.add(new ParameterDeclaration(new Modifier[0],
+                        new SyntacticalTypeRef(syntArg.type),
+                        new VariableSpecification(arg, syntArg.type), false));
+            } else {
+                throw new RuntimeException(
+                        "Unexpected case: arg is instance of:" + arg);
+            }
+        }
 	return params;
     }
 

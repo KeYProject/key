@@ -24,11 +24,11 @@ public class TestSetAsListOfString extends junit.framework.TestCase {
 
     // test if String is SAME as one in the array arr
     private boolean isInArray(String str, String[] arr) {
-	for (int i=0;i<arr.length;i++) {
-	    if (arr[i]==str) {
-		return true;
-	    }
-	}
+        for (String anArr : arr) {
+            if (anArr == str) {
+                return true;
+            }
+        }
 	return false;
     }
 

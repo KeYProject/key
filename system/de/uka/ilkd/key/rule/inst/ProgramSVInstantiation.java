@@ -80,13 +80,12 @@ public class ProgramSVInstantiation {
 					  JavaProgramElement prgElement) { 
 	ImmutableList<ProgramSVEntry> result = ImmutableSLList.<ProgramSVEntry>nil()
 	    .prepend(new ProgramSVEntry(sv, prgElement));
-	Iterator<ProgramSVEntry> it = list.iterator();	
-	while (it.hasNext()) {
-	    ProgramSVEntry entry = it.next();
-	    if (entry.key() != sv) {
-		result = result.prepend(entry);
-	    }
-	}
+        for (ProgramSVEntry aList : list) {
+            ProgramSVEntry entry = aList;
+            if (entry.key() != sv) {
+                result = result.prepend(entry);
+            }
+        }
 	return new ProgramSVInstantiation(result);
     }    
 
@@ -94,13 +93,12 @@ public class ProgramSVInstantiation {
      * @return true iff the sv has been instantiated already 
      */
     public boolean isInstantiated(SchemaVariable sv) {
-	Iterator<ProgramSVEntry> it = list.iterator();	
-	while (it.hasNext()) {
-	    ProgramSVEntry entry = it.next();
-	    if (entry.key() == sv) {
-		return true;
-	    }
-	}
+        for (ProgramSVEntry aList : list) {
+            ProgramSVEntry entry = aList;
+            if (entry.key() == sv) {
+                return true;
+            }
+        }
 	return false;
     }
 
@@ -109,13 +107,12 @@ public class ProgramSVInstantiation {
      * instantiated with, null if no instantiation is stored
      */
     public JavaProgramElement getInstantiation(SchemaVariable sv) {
-	Iterator<ProgramSVEntry> it = list.iterator();	
-	while (it.hasNext()) {
-	    ProgramSVEntry entry = it.next();
-	    if (entry.key() == sv) {
-		return entry.value();
-	    }
-	}
+        for (ProgramSVEntry aList : list) {
+            ProgramSVEntry entry = aList;
+            if (entry.key() == sv) {
+                return entry.value();
+            }
+        }
 	return null;
     }
 

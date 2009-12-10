@@ -176,7 +176,7 @@ public class WhileInvRule extends AbstractMetaOperator {
         
         
         WhileInvariantTransformation w = 
-            new WhileInvariantTransformation((While)body, 
+            new WhileInvariantTransformation(body,
                                              (ProgramElementName)
                                              svInst.getInstantiation(outerLabel),
                                              (ProgramElementName)
@@ -248,7 +248,7 @@ public class WhileInvRule extends AbstractMetaOperator {
         
         stmnt.add(w.result());
         StatementBlock s = new StatementBlock
-        (stmnt.toArray(new Statement[0]));
+        (stmnt.toArray(new Statement[stmnt.size()]));
         Statement resSta;
         if (svInst.getExecutionContext() != null){
             resSta = new MethodFrame(null, svInst.getExecutionContext(), s);
@@ -399,7 +399,7 @@ public class WhileInvRule extends AbstractMetaOperator {
             tf.createProgramTerm
             (modality,
              addContext(root, new StatementBlock
-                        (breakIfCascade.toArray(new Statement[0]))),
+                        (breakIfCascade.toArray(new Statement[breakIfCascade.size()]))),
              post);
         return tf.createJunctorTerm
             (Op.IMP, 

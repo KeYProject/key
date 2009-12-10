@@ -183,56 +183,54 @@ public class ComputeSpecification {
 	Term postcondition = termFactory.createJunctorTerm(Op.TRUE);
 	       
         ImmutableList<Term> prestateLocations = ImmutableSLList.<Term>nil();
-	ImmutableList<Term> prestateValues = ImmutableSLList.<Term>nil(); 
-	for (Iterator<Named> i = programVariables.elements().iterator();
-	     i.hasNext();
-	     ) {
-	    final ProgramVariable v = (ProgramVariable) i.next();
-	    final Term v_term = termFactory
-		.createVariableTerm(v);
-	    Debug.out("program variable ", v, v.getKeYJavaType());
-	    if ("self".equals(v.name().toString())) {
-		// @xxx currently ignore modifications of object state, so no need to remember
-	    } else {
-		final Term vpre = termFactory
-		    .createVariableTerm(new LocationVariable(new ProgramElementName(v.name() + "pre"), v.getKeYJavaType()));
-		final Term vpost = termFactory
-		    .createVariableTerm(new LocationVariable(new ProgramElementName(v.name() + "post"), v.getKeYJavaType()));
+	ImmutableList<Term> prestateValues = ImmutableSLList.<Term>nil();
+        for (Named named : programVariables.elements()) {
+            final ProgramVariable v = (ProgramVariable) named;
+            final Term v_term = termFactory
+                    .createVariableTerm(v);
+            Debug.out("program variable ", v, v.getKeYJavaType());
+            if ("self".equals(v.name().toString())) {
+                // @xxx currently ignore modifications of object state, so no need to remember
+            } else {
+                final Term vpre = termFactory
+                        .createVariableTerm(new LocationVariable(new ProgramElementName(v.name() + "pre"), v.getKeYJavaType()));
+                final Term vpost = termFactory
+                        .createVariableTerm(new LocationVariable(new ProgramElementName(v.name() + "post"), v.getKeYJavaType()));
 
-		if ("result".equals(v.name().toString())) {
-		    // ignore result at prestate
-		} else {
-		    // prestate = prestate union {v:=vpre}
-		    prestateLocations = prestateLocations.append(v_term);
-		    prestateValues = prestateValues.append(vpre);
-		    // remember prestate of v
-		    precondition = termFactory
-			.createJunctorTermAndSimplify(Op.AND,
-						      precondition,
-						      termFactory
-						      .createEqualityTerm(
-									  v.sort().getEqualitySymbol(),
-									  termFactory
-									  .createVariableTerm(v),
-									  vpre
-									  )
-						      );
-		}
+                if ("result".equals(v.name().toString())) {
+                    // ignore result at prestate
+                } else {
+                    // prestate = prestate union {v:=vpre}
+                    prestateLocations = prestateLocations.append(v_term);
+                    prestateValues = prestateValues.append(vpre);
+                    // remember prestate of v
+                    precondition = termFactory
+                            .createJunctorTermAndSimplify(Op.AND,
+                                    precondition,
+                                    termFactory
+                                            .createEqualityTerm(
+                                            v.sort().getEqualitySymbol(),
+                                            termFactory
+                                                    .createVariableTerm(v),
+                                            vpre
+                                    )
+                            );
+                }
 
-		// construct poststate of v
-		postcondition = termFactory
-		    .createJunctorTermAndSimplify(Op.AND,
-				       postcondition,
-				       termFactory
-				       .createEqualityTerm(
-							   v.sort().getEqualitySymbol(),
-							   vpost,
-							   termFactory
-							   .createVariableTerm(v)
-							   )
-				       );
-	    }
-	}
+                // construct poststate of v
+                postcondition = termFactory
+                        .createJunctorTermAndSimplify(Op.AND,
+                                postcondition,
+                                termFactory
+                                        .createEqualityTerm(
+                                        v.sort().getEqualitySymbol(),
+                                        vpost,
+                                        termFactory
+                                                .createVariableTerm(v)
+                                )
+                        );
+            }
+        }
 
 	switch (getPoststateRemember()) {
 	case POSTSTATE_REMEMBER_EQUATIONS:
@@ -322,12 +320,12 @@ public class ComputeSpecification {
     public Term computeSpecification(Proof proof) {
 	Debug.out("Compute specification:\n");
 	List caseSpecs = new LinkedList();
-	for (Iterator<Goal> i = proof.openGoals().iterator(); i.hasNext(); ) {
-	    Sequent open = i.next().sequent();
-	    Term caseSpec = computeSpecification(open);
-	    Debug.out("Goal Case" , caseSpec);
-	    caseSpecs.add(caseSpec);
-	}
+        for (Goal goal : proof.openGoals()) {
+            Sequent open = goal.sequent();
+            Term caseSpec = computeSpecification(open);
+            Debug.out("Goal Case", caseSpec);
+            caseSpecs.add(caseSpec);
+        }
 	return createJunctorTermNAry(termFactory.createJunctorTerm(Op.TRUE),
 				     Op.AND,
 				     caseSpecs.iterator()

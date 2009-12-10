@@ -47,9 +47,8 @@ class Substitution {
     }
     
     public boolean isTotalOn(ImmutableSet<QuantifiableVariable> vars) {
-        Iterator<QuantifiableVariable> it = vars.iterator ();
-        while ( it.hasNext () ) {
-            if ( !varMap.containsKey ( it.next () ) ) return false;
+        for (QuantifiableVariable var : vars) {
+            if (!varMap.containsKey(var)) return false;
         }
         return true;
     }

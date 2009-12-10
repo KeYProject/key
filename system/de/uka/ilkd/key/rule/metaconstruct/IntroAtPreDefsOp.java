@@ -97,36 +97,35 @@ public class IntroAtPreDefsOp extends AbstractMetaOperator {
         //collect atPre-functions, update loop invariants
         Map<Operator, Function /*atPre*/> atPreFunctions = 
             new LinkedHashMap<Operator, Function>();
-        for(Iterator<LoopStatement> it = loops.iterator(); it.hasNext(); ) {
-            LoopStatement loop = it.next();
-            LoopInvariant inv 
-                = services.getSpecificationRepository().getLoopInvariant(loop);
-            if(inv != null) {
-                if(selfTerm != null && inv.getInternalSelfTerm() == null) {
+        for (LoopStatement loop : loops) {
+            LoopInvariant inv
+                    = services.getSpecificationRepository().getLoopInvariant(loop);
+            if (inv != null) {
+                if (selfTerm != null && inv.getInternalSelfTerm() == null) {
                     //we're calling a static method from an instance context
                     selfTerm = null;
                 }
-                Term newInvariant 
-                    = inv.getInvariant(selfTerm, atPreFunctions, services);
+                Term newInvariant
+                        = inv.getInvariant(selfTerm, atPreFunctions, services);
                 LoopPredicateSet newPredicates
-                    = inv.getPredicates(selfTerm, atPreFunctions, services);
+                        = inv.getPredicates(selfTerm, atPreFunctions, services);
                 LocationDescriptorSet newModifies
-                    = inv.getModifies(selfTerm, atPreFunctions, services);
+                        = inv.getModifies(selfTerm, atPreFunctions, services);
                 Term newVariant
-                    = inv.getVariant(selfTerm, atPreFunctions, services);
+                        = inv.getVariant(selfTerm, atPreFunctions, services);
                 boolean newPredicateHeuristicsAllowed
-                    = inv.getPredicateHeuristicsAllowed();
-                
-                LoopInvariant newInv 
-                    = new LoopInvariantImpl(loop, 
-                                            newInvariant, 
-                                            newPredicates,
-                                            newModifies, 
-                                            newVariant, 
-                                            selfTerm,
-                                            atPreFunctions,
-                                            newPredicateHeuristicsAllowed);
-                services.getSpecificationRepository().setLoopInvariant(newInv);                
+                        = inv.getPredicateHeuristicsAllowed();
+
+                LoopInvariant newInv
+                        = new LoopInvariantImpl(loop,
+                        newInvariant,
+                        newPredicates,
+                        newModifies,
+                        newVariant,
+                        selfTerm,
+                        atPreFunctions,
+                        newPredicateHeuristicsAllowed);
+                services.getSpecificationRepository().setLoopInvariant(newInv);
             }
         }
         

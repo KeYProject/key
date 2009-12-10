@@ -111,10 +111,9 @@ public class SimultaneousUpdateSimplifierSettings implements Settings {
     protected void fireSettingsChanged() {
 	updateSimplifier();
 
-	Iterator<SettingsListener> it = listenerList.iterator();
-	while (it.hasNext()) {
-	    it.next().settingsChanged(new GUIEvent(this));
-	}
+        for (SettingsListener aListenerList : listenerList) {
+            aListenerList.settingsChanged(new GUIEvent(this));
+        }
     }
 
     /** adds a listener to the settings object 

@@ -727,14 +727,14 @@ public class SimplifyTranslation {
     private String produceClosure(StringBuffer s) {
 	StringBuffer tmp = new StringBuffer("(");
 	tmp.append(ALL).append(" (");
-	for (Iterator<Metavariable> i = usedGlobalMv.iterator(); i.hasNext();) {
-	    tmp.append(' ').append(getUniqueVariableName(i.next()));
-	}
+        for (Metavariable anUsedGlobalMv : usedGlobalMv) {
+            tmp.append(' ').append(getUniqueVariableName(anUsedGlobalMv));
+        }
 	tmp.append(")");
 	tmp.append("(").append(EX).append(" (");
-	for (Iterator<Metavariable> i = usedLocalMv.iterator(); i.hasNext();) {
-	    tmp.append(' ').append(getUniqueVariableName(i.next()));
-	}
+        for (Metavariable anUsedLocalMv : usedLocalMv) {
+            tmp.append(' ').append(getUniqueVariableName(anUsedLocalMv));
+        }
 	tmp.append(")\n ");
 	tmp.append(s);
 	tmp.append("\n))");

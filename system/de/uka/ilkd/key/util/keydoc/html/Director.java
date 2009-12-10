@@ -85,26 +85,26 @@ class Director {
             if (rek) {
             	Director d;
             	String[] foldersInDir= currentFolder.list(new FolderFilenameFilter(docFolder));
-            	           	        	
-            	for (int i=0; i<foldersInDir.length; i++) {		
-            		if (!currentFolder/*.getCanonicalFile()*/.getName().equals(System.getProperty("user.dir")))
-            			d= new Director(args, new File(currentFolder, foldersInDir[i]), rek);
-            		else
-            			d= new Director(args, new File(foldersInDir[i]), rek);
-            		
-            		LinkedList[] returnValue= d.constructAndReturn();
-            		
-            		for (int j=0; j< returnValue[0].size(); j++) {
-            			ShortBox toSort= (ShortBox) returnValue[0].get(j);
-            			sortInProcessed(toSort);           			
-            		}   
-            		
-            		for (int j=0; j< returnValue[1].size(); j++) {
-            			File toSort= (File) returnValue[1].get(j);
-            			sortFileInLL(toSort, allFolders);           			
-            		}   
-                	
-            	}            	
+
+                for (String aFoldersInDir : foldersInDir) {
+                    if (!currentFolder/*.getCanonicalFile()*/.getName().equals(System.getProperty("user.dir")))
+                        d = new Director(args, new File(currentFolder, aFoldersInDir), rek);
+                    else
+                        d = new Director(args, new File(aFoldersInDir), rek);
+
+                    LinkedList[] returnValue = d.constructAndReturn();
+
+                    for (int j = 0; j < returnValue[0].size(); j++) {
+                        ShortBox toSort = (ShortBox) returnValue[0].get(j);
+                        sortInProcessed(toSort);
+                    }
+
+                    for (int j = 0; j < returnValue[1].size(); j++) {
+                        File toSort = (File) returnValue[1].get(j);
+                        sortFileInLL(toSort, allFolders);
+                    }
+
+                }
             	
 
             		
@@ -135,33 +135,33 @@ class Director {
             
 //          Building the documentation Files and sorting them into the processed LinkedList.
             loop:
-            for(int i=0; i<toProcess.length; i++) {
-            	
-            	System.out.println("Building file: " + toProcess[i].getName());
-            	htmlFile= KDKeYToHTMLBuilder.buildHTMLFile(toProcess[i]);
-            	  
-              	if (htmlFile==null) // an Error occured during parsing. Skip this file
-            		continue loop;
-              	
-              	String newFile= htmlFile.getFile().getName();
-              	
-              	// This monster extracts the first line of text out of the HTMLFile.
-            	String shortDescription= htmlFile.getHtmlFile().getHTMLFileAsString().substring(htmlFile.getFirstOffset(), htmlFile.getFirstOffset()+htmlFile.getFirstLength());
-            	
-            	// Write Documentation File
-            	// fileToWrite points to the file. It is relative to the path, there KeYDoc was started.
-            	String fileToWrite= docFolder + File.separator + currentFolder.getPath() + File.separator + newFile; // the file, which should be written. Attention: without the .html ending! Search the file for .html for more explanation.
-            	writeFile(fileToWrite + ".html", htmlFile.getHtmlFile().getHTMLFileAsString());
-        	
-            	String path= currentFolder.getPath() + File.separator + newFile;
-            	path= path.substring(1, path.length());
-            	
-            	// Create thisstart.html
+            for (File toProces : toProcess) {
+
+                System.out.println("Building file: " + toProces.getName());
+                htmlFile = KDKeYToHTMLBuilder.buildHTMLFile(toProces);
+
+                if (htmlFile == null) // an Error occured during parsing. Skip this file
+                    continue loop;
+
+                String newFile = htmlFile.getFile().getName();
+
+                // This monster extracts the first line of text out of the HTMLFile.
+                String shortDescription = htmlFile.getHtmlFile().getHTMLFileAsString().substring(htmlFile.getFirstOffset(), htmlFile.getFirstOffset() + htmlFile.getFirstLength());
+
+                // Write Documentation File
+                // fileToWrite points to the file. It is relative to the path, there KeYDoc was started.
+                String fileToWrite = docFolder + File.separator + currentFolder.getPath() + File.separator + newFile; // the file, which should be written. Attention: without the .html ending! Search the file for .html for more explanation.
+                writeFile(fileToWrite + ".html", htmlFile.getHtmlFile().getHTMLFileAsString());
+
+                String path = currentFolder.getPath() + File.separator + newFile;
+                path = path.substring(1, path.length());
+
+                // Create thisstart.html
                 thisstart.append("<tr><code><td class=\"left\" valign=\"top\"><code><a href=\"");
-                thisstart.append(path +  ".html"); 
+                thisstart.append(path + ".html");
                 thisstart.append("\">");
-                thisstart.append(newFile); 
-                thisstart.append("</a></td><td class=\"right\">");                
+                thisstart.append(newFile);
+                thisstart.append("</a></td><td class=\"right\">");
                 thisstart.append(shortDescription);
                 thisstart.append("</td></code></tr>");
 
@@ -171,9 +171,9 @@ class Director {
                 thislinks.append("\" target=\"start\">");
                 thislinks.append(newFile);
                 thislinks.append("</a><br>");
-                
-                ShortBox toSort= new ShortBox(new File(currentFolder.getPath() + File.separator + newFile), shortDescription);
-                sortInProcessed(toSort);           
+
+                ShortBox toSort = new ShortBox(new File(currentFolder.getPath() + File.separator + newFile), shortDescription);
+                sortInProcessed(toSort);
 
             }
             
@@ -226,37 +226,37 @@ class Director {
         makeFoldersHeader(folders);       
 	
         // Create folders.html
-        for(int i=0; i<allFolders.size(); i++) {
-        	File folder= (File) allFolders.get(i);
-        	folders.append("<a href=\""+ pathToName(folder.getPath()) + "index.html\" target=\"_parent\">" + folder.getName() + "</a><br>");
+        for (Object allFolder : allFolders) {
+            File folder = (File) allFolder;
+            folders.append("<a href=\"" + pathToName(folder.getPath()) + "index.html\" target=\"_parent\">" + folder.getName() + "</a><br>");
         }
         folders.append("</body></html>");
         writeFile(docFolder + File.separator + "folders.html", folders.toString());         
         
         // Writing links in start.html, links.html
         ShortBox currentFile=null;
-        for(int i=0; i<processed.size(); i++) {            
-        	
-        	currentFile= (ShortBox) processed.get(i);
-        	String path= currentFile.getFile().getPath();
-        	String name= currentFile.getFile().getName();
-        	            
-        	// Create start.html
+        for (Object aProcessed : processed) {
+
+            currentFile = (ShortBox) aProcessed;
+            String path = currentFile.getFile().getPath();
+            String name = currentFile.getFile().getName();
+
+            // Create start.html
             start.append("<tr><code><td class=\"left\" valign=\"top\"><code><a href=\"");
-            start.append(path.substring(1, path.length()) + ".html"); 
+            start.append(path.substring(1, path.length()) + ".html");
             start.append("\">");
             start.append(name); // This is why the .html ending isn't attached right to the file.
-            start.append("</a></td><td class=\"right\">");                
+            start.append("</a></td><td class=\"right\">");
             start.append(currentFile.getDescription());
             start.append("</td></code></tr>");
-            
+
             // Create links.html
             links.append("<a href=\"");
             links.append(path.substring(1, path.length()) + ".html");
             links.append("\" target=\"start\">");
             links.append(name);
             links.append("</a><br>");
-            
+
         }
            
         links.append("</body></html>");

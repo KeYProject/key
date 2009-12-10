@@ -87,7 +87,7 @@ public class ChoiceSettings implements Settings {
 	while(it.hasNext()){
 	    c=(Choice)it.next();
 	    if(c2C.containsKey(c.category())){
-		soc=c2C.get(c.category().toString());
+		soc=c2C.get(c.category());
 		soc.add(c.name().toString());
 		c2C.put(c.category(),soc);
 	    }else{
@@ -190,7 +190,7 @@ public class ChoiceSettings implements Settings {
 	    Set<String> soc = category2Choices.get(cat);
 	    choiceSequence += cat;
 	    for (final String choice : soc) {
-		choiceSequence += "-"+choice.toString();
+		choiceSequence += "-"+ choice;
 	    }
 	}
 	props.setProperty(CHOICES_KEY, choiceSequence);	

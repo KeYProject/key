@@ -142,9 +142,9 @@ public class TestSLListOfString extends junit.framework.TestCase {
 	    newList=newList.append(str[i-1]);
 	}
 	// test cascading tail
-	for (int i=0;i<str.length;i++) {
-	    assertTrue(newList.contains(str[i]));
-	}
+        for (String aStr : str) {
+            assertTrue(newList.contains(aStr));
+        }
     }
 
 
@@ -197,9 +197,9 @@ public class TestSLListOfString extends junit.framework.TestCase {
 
     public void testToString() {
 	ImmutableList<String> newList=ImmutableSLList.<String>nil();
-	for (int i=0;i<str.length;i++) {
-	    newList=newList.append(str[i]);
-	}
+        for (String aStr : str) {
+            newList = newList.append(aStr);
+        }
 	assertEquals("[Dies,ist,ein,Test]",newList.toString());
     }
 

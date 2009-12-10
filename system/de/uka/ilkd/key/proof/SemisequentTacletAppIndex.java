@@ -114,9 +114,7 @@ public class SemisequentTacletAppIndex {
      * Note: destructive, use only when constructing new index
      */
     private void removeTermIndices(ImmutableList<ConstrainedFormula> cfmas) {
-        final Iterator<ConstrainedFormula> it = cfmas.iterator ();
-        while ( it.hasNext () )
-            removeTermIndex ( it.next () );
+        for (ConstrainedFormula cfma : cfmas) removeTermIndex(cfma);
     }
 
     /**
@@ -139,24 +137,22 @@ public class SemisequentTacletAppIndex {
 
         ImmutableList<TermTacletAppIndex> oldIndices = ImmutableSLList.<TermTacletAppIndex>nil();
 
-        final Iterator<FormulaChangeInfo> infoIt = infos.iterator ();
-
-        while ( infoIt.hasNext () ) {
-            final FormulaChangeInfo info = infoIt.next ();
-            final ConstrainedFormula oldFor = info.getOriginalFormula ();
-            final ConstrainedFormula newFor = info.getNewFormula ();
+        for (FormulaChangeInfo info1 : infos) {
+            final FormulaChangeInfo info = info1;
+            final ConstrainedFormula oldFor = info.getOriginalFormula();
+            final ConstrainedFormula newFor = info.getNewFormula();
 
             TermTacletAppIndex oldIndex;
 
-            if ( oldFor.constraint ().equals ( newFor.constraint () ) ) {
-                oldIndex = termIndices.get ( oldFor );
+            if (oldFor.constraint().equals(newFor.constraint())) {
+                oldIndex = termIndices.get(oldFor);
             } else {
                 // modified constraint, thus we have to rebuild the whole term
                 // index
                 oldIndex = null;
             }
-            oldIndices = oldIndices.prepend ( oldIndex );
-            termIndices = termIndices.remove ( oldFor );
+            oldIndices = oldIndices.prepend(oldIndex);
+            termIndices = termIndices.remove(oldFor);
         }
 
         return oldIndices.reverse ();

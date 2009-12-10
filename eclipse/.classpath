@@ -8,5 +8,5 @@
 	<classpathentry kind="lib" path="key_lib/junit.jar"/>
 	<classpathentry kind="lib" path="key_lib/javacc.jar"/>
 	<classpathentry kind="lib" path="key_lib/antlr.jar"/>
-	<classpathentry kind="output" path="system/binary/"/>
+	<classpathentry kind="output" path="system/binary"/>
 </classpath>

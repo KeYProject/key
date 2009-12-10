@@ -67,8 +67,8 @@ public class IndexReplaceVisitor extends CreatingASTVisitor {
     private Expression tryToReplaceByTestDatum(final Expression e) {
 	final int i = findLocIndex(e);
 	if (i != -1) {
-	    final Expression testDat = singleTuple ? (Expression) testArray[i]
-		    : (Expression) new ArrayReference(testArray[i],
+	    final Expression testDat = singleTuple ? testArray[i]
+		    : new ArrayReference(testArray[i],
 		            new Expression[] { partCounter });
 	    return testDat;
 	}

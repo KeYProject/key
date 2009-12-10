@@ -35,12 +35,12 @@ class KDFilenameFilter implements FilenameFilter {
     
     public boolean accept(File dir, String name) {
 	boolean ret=false;
-	
 
-	for (int i=0; i<patterns.length; i++) {
-	    m= patterns[i].matcher(name);
-	    ret= ret || m.matches();
-	}
+
+        for (Pattern pattern : patterns) {
+            m = pattern.matcher(name);
+            ret = ret || m.matches();
+        }
 	
 	return ret;
     }

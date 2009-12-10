@@ -165,11 +165,9 @@ public class DecProcRunner extends SwingWorker {
         
         int cnt = 0;
 
-        
-        final Iterator<Goal> goals = proof.openGoals().iterator();
 
-        while (goals.hasNext()) {    
-            workOnGoal(goals.next(), ++cnt);
+        for (Goal goal : proof.openGoals()) {
+            workOnGoal(goal, ++cnt);
         }
     }
     

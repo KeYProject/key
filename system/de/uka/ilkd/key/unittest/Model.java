@@ -160,11 +160,10 @@ public class Model {
 
     public String toString() {
 	String result = "Model :\n{\n";
-	Iterator<EquivalenceClass> it = class2value.keySet().iterator();
-	while (it.hasNext()) {
-	    Object o = it.next();
-	    result += o + " = " + class2value.get(o) + "\n";
-	}
+        for (EquivalenceClass equivalenceClass : class2value.keySet()) {
+            Object o = equivalenceClass;
+            result += o + " = " + class2value.get(o) + "\n";
+        }
 	result += "}";
 	return result;
     }

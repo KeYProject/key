@@ -171,7 +171,7 @@ public class LoopInvariantProposer implements InstantiationProposer {
         Object inst = null;
         if (app instanceof PosTacletApp 
             && inLoopInvariantRuleSet(app.taclet())) {
-            final PosInOccurrence pos = ((PosTacletApp) app).posInOccurrence();
+            final PosInOccurrence pos = app.posInOccurrence();
             final LoopInvariant inv = getLoopInvariant(pos.subTerm(), services);
             if(inv == null) {
                 return null;

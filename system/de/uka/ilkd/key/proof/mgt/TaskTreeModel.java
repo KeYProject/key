@@ -49,11 +49,11 @@ public class TaskTreeModel extends DefaultTreeModel {
 
     public void removeTask(TaskTreeNode p) {
 	Proof[] allProofs = p.allProofs();
-	for (int i=0; i<allProofs.length; i++) {
-	    proofToTask.remove(allProofs[i]);
-            Node.clearReuseCandidates(allProofs[i]); // yes, listeners...
-	    p.decoupleFromEnv();
-	}
+        for (Proof allProof : allProofs) {
+            proofToTask.remove(allProof);
+            Node.clearReuseCandidates(allProof); // yes, listeners...
+            p.decoupleFromEnv();
+        }
 	if (p.getParent().getChildCount()==1) { // remove env if p is single
             GlobalProofMgt.getInstance().removeEnv(p.getProofEnv());
 	    p = (TaskTreeNode) p.getParent();
@@ -64,9 +64,9 @@ public class TaskTreeModel extends DefaultTreeModel {
 
     private void updateProofToTask(TaskTreeNode p) {
 	Proof[] proofs = p.allProofs();
-	for (int i=0; i<proofs.length; i++) {
-	    proofToTask.put(proofs[i], p);
-	}
+        for (Proof proof : proofs) {
+            proofToTask.put(proof, p);
+        }
     }
 
     public TaskTreeNode getTaskForProof(Proof p) {

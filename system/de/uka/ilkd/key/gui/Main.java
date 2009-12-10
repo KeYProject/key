@@ -250,9 +250,8 @@ public class Main extends JFrame implements IMain {
         guiListener = new MainGUIListener();
         constraintListener = new MainConstraintTableListener();
         
-        taskListener = (Main.batchMode ? (ProverTaskListener)
-                new MainTaskListenerBatchMode() : 
-            (ProverTaskListener) new MainTaskListener());
+        taskListener = (Main.batchMode ? new MainTaskListenerBatchMode() :
+                new MainTaskListener());
         
         setMediator(new KeYMediator(this));
         
@@ -2367,7 +2366,7 @@ public class Main extends JFrame implements IMain {
         
         /** invoked when the strategy of a proof has been changed */
         public synchronized void settingsChanged ( GUIEvent e ) {
-            if ( proof.getSettings().getStrategySettings() == (StrategySettings) e.getSource() ) {
+            if ( proof.getSettings().getStrategySettings() == e.getSource()) {
                 // updateAutoModeConfigButton();
             }         
         }

@@ -191,9 +191,8 @@ public class ApplyStrategy {
      * number of rules have been applied or the time out has been reached
      */
     private boolean maxRuleApplicationOrTimeoutExceeded() {
-        return countApplied >= maxApplications || 
-           timeout>=0 ? 
-                System.currentTimeMillis() - time >= timeout : false;
+        return countApplied >= maxApplications ||
+                timeout >= 0 && System.currentTimeMillis() - time >= timeout;
     }
 
 

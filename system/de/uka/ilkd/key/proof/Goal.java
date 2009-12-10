@@ -161,9 +161,8 @@ public class Goal  {
     
     public Namespace createGlobalProgVarNamespace() {
         final Namespace ns = new Namespace();
-        final Iterator<ProgramVariable> it = getGlobalProgVars().iterator();
-        while (it.hasNext()) {
-            ns.add(it.next());
+        for (ProgramVariable programVariable : getGlobalProgVars()) {
+            ns.add(programVariable);
         }
         return ns;
     }
@@ -228,9 +227,8 @@ public class Goal  {
     public void setGlobalProgVars(ImmutableSet<ProgramVariable> s) {
         ImmutableSet<ProgramVariable> globalProgVars = getGlobalProgVars();
         Namespace ns = proof().getNamespaces().programVariables();
-        Iterator<ProgramVariable> it = s.iterator();
-        while (it.hasNext()) {
-            ProgramVariable pv = it.next();
+        for (ProgramVariable value : s) {
+            ProgramVariable pv = value;
             if (!globalProgVars.contains(pv)) {
                 ns.addSafely(pv);
             }
@@ -533,8 +531,8 @@ public class Goal  {
         if (n>0) {
 	    Iterator<Sink> itSinks = parent.reserveSinks ( n );
 	    BranchRestricter br;
-	    Node newNode = null;
-	    Goal newGoal = null;
+	    Node newNode;
+	    Goal newGoal;
 
 	    for (int i=0;i<n;i++) {
 		if (i==0) { // first new goal is this one 
@@ -588,15 +586,14 @@ public class Goal  {
 	final Iterator<Node> leavesIt = parent.leavesIterator();
 	while (leavesIt.hasNext()) {
 	    Node n = leavesIt.next();
-	 
-	    final Iterator<Goal> goalIt = goalList.iterator();
-	    while (goalIt.hasNext()) {
-		final Goal g = goalIt.next();
-	
-		if (g.node()==n && g!=this) {
-		    goalList=goalList.removeFirst(g);		   
-		}
-	    }
+
+        for (Goal aGoalList : goalList) {
+            final Goal g = aGoalList;
+
+            if (g.node() == n && g != this) {
+                goalList = goalList.removeFirst(g);
+            }
+        }
 	}
 
 	//	ruleAppIndex.tacletIndex().setTaclets(parent.getNoPosTacletApps());
@@ -635,9 +632,8 @@ public class Goal  {
     }
 
     private void removeTaclets() {
-    	final Iterator<NoPosTacletApp> it = node.getNoPosTacletApps().iterator();
-    	while ( it.hasNext () )
-           ruleAppIndex.removeNoPosTacletApp(it.next ());
+        for (NoPosTacletApp noPosTacletApp : node.getNoPosTacletApps())
+            ruleAppIndex.removeNoPosTacletApp(noPosTacletApp);
     }
 
     
@@ -661,10 +657,9 @@ public class Goal  {
     /** fires the event that a rule has been applied */
     protected void fireRuleApplied( ProofEvent p_e ) {
 	synchronized(ruleAppListenerList) {
-	    Iterator<RuleAppListener> it = ruleAppListenerList.iterator();
-	    while (it.hasNext()) {
-		it.next().ruleApplied(p_e);
-	    }
+        for (RuleAppListener aRuleAppListenerList : ruleAppListenerList) {
+            aRuleAppListenerList.ruleApplied(p_e);
+        }
 	}
     }    
     
@@ -710,9 +705,8 @@ public class Goal  {
 
 
     public static void applyUpdateSimplifier( ImmutableList<Goal> goalList ) {
-        final Iterator<Goal> it = goalList.iterator();
-        while ( it.hasNext() ) {
-            it.next ().applyUpdateSimplifier();
+        for (Goal aGoalList : goalList) {
+            aGoalList.applyUpdateSimplifier();
         }
     }
     
@@ -726,22 +720,20 @@ public class Goal  {
 	    final Constraint userConstraint =
 	        proof().getUserConstraint ().getConstraint ();
 	    final BuiltInRule rule = UpdateSimplificationRule.INSTANCE;
-	    
-	    final Iterator<ConstrainedFormula> it = ( antec ? sequent().antecedent()
-	            : sequent().succedent()).iterator();
-	
-	    while ( it.hasNext () ) {
-	        final ConstrainedFormula cfma = it.next ();
-	        final PosInOccurrence pos = new PosInOccurrence(cfma,
-	                                                        PosInTerm.TOP_LEVEL,
-	                                                        antec );	
-	        if ( rule.isApplicable ( this, pos, userConstraint ) ) {
-	            BuiltInRuleApp app = new BuiltInRuleApp ( rule,
-	                                                      pos,
-	                                                      userConstraint );
-	            apply(app);
-	        }
-	    }
+
+        for (Object o : (antec ? sequent().antecedent()
+                : sequent().succedent())) {
+            final ConstrainedFormula cfma = (ConstrainedFormula) o;
+            final PosInOccurrence pos = new PosInOccurrence(cfma,
+                    PosInTerm.TOP_LEVEL,
+                    antec);
+            if (rule.isApplicable(this, pos, userConstraint)) {
+                BuiltInRuleApp app = new BuiltInRuleApp(rule,
+                        pos,
+                        userConstraint);
+                apply(app);
+            }
+        }
 	}
 
 

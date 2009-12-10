@@ -153,10 +153,9 @@ class FormulaBoolConverter {
      */
     private ImmutableList<Term> convertFormulasToBoolHelper(ImmutableList<Term> list) {
         ImmutableList<Term> result = ImmutableSLList.<Term>nil();
-        
-        Iterator<Term> it = list.iterator();
-        while(it.hasNext()) {
-            result = result.append(convertFormulaToBool(it.next()));
+
+        for (Term aList : list) {
+            result = result.append(convertFormulaToBool(aList));
         }
         
         return result;
@@ -169,10 +168,9 @@ class FormulaBoolConverter {
      */
     public ImmutableList<Term> convertFormulasToBool(ImmutableList<OCLExpression> list) {
         ImmutableList<Term> result = ImmutableSLList.<Term>nil();
-        
-        Iterator<OCLExpression> it = list.iterator();
-        while(it.hasNext()) {
-            result = result.append(it.next().getTerm());
+
+        for (OCLExpression aList : list) {
+            result = result.append(aList.getTerm());
         }
         
         return convertFormulasToBoolHelper(result);

@@ -141,7 +141,7 @@ public class SymbolicObject {
             this.instanceName = "<Class>";
 
         } else if (!vd.isStaticMethod()
-                && terms.contains((Term) VisualDebugger.getVisualDebugger()
+                && terms.contains(VisualDebugger.getVisualDebugger()
                         .getInputPV2term().get(vd.getSelfTerm()))) {
             this.instanceName = "self";
 
@@ -150,7 +150,7 @@ public class SymbolicObject {
         }
 
         else {
-            final String className = getType().getName().toString();
+            final String className = getType().getName();
             final String b = className.substring(0, 1).toLowerCase();
             instanceName = b + className.substring(1, className.length());
             instanceName += "_" + id;
@@ -165,8 +165,8 @@ public class SymbolicObject {
     public ImmutableSet<ProgramVariable> getAllModifiedPrimitiveAttributes() {
         ImmutableSet<ProgramVariable> result = DefaultImmutableSet.<ProgramVariable>nil();
         Set<ProgramVariable> s = attr2ValueTerm.keySet();
-        for (Iterator<ProgramVariable> it = s.iterator(); it.hasNext();) {
-            result = result.add(it.next());
+        for (ProgramVariable value : s) {
+            result = result.add(value);
         }
         return result;
     }
@@ -182,8 +182,8 @@ public class SymbolicObject {
     public ImmutableSet<ProgramVariable> getAttributes() {
         ImmutableSet<ProgramVariable> result = DefaultImmutableSet.<ProgramVariable>nil();
         Set<ProgramVariable> s = attr2Constraint.keySet();
-        for (Iterator<ProgramVariable> it = s.iterator(); it.hasNext();) {
-            result = result.add(it.next());
+        for (ProgramVariable value : s) {
+            result = result.add(value);
         }
         return result;
     }
@@ -203,8 +203,8 @@ public class SymbolicObject {
     public ImmutableSet<ProgramVariable> getNonPrimAttributes() {
         ImmutableSet<ProgramVariable> result = DefaultImmutableSet.<ProgramVariable>nil();
         Set<IProgramVariable> s = associations.keySet();
-        for (Iterator<IProgramVariable> it = s.iterator(); it.hasNext();) {
-            result = result.add((ProgramVariable) it.next());
+        for (IProgramVariable value : s) {
+            result = result.add((ProgramVariable) value);
         }
         return result;
     }

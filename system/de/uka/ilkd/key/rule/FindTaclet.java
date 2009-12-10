@@ -363,7 +363,7 @@ public abstract class FindTaclet extends Taclet {
     public ImmutableList<SchemaVariable> writeSet() {
 	Iterator<TacletGoalTemplate> it = goalTemplates().iterator();
 	ImmutableList<SchemaVariable> updateVar = ImmutableSLList.<SchemaVariable>nil(); 
-	Term replWith = null; 
+	Term replWith; 
 	
 	while (it.hasNext()){
 	    TacletGoalTemplate goalTemp = it.next();

@@ -91,14 +91,14 @@ public class UpdateSimplifier {
     
     public Term simplify(Update update, Term t, Services services) {
 	Term simplifiedTerm = t;
-	for (int i = 0; i<simplificationRules.length; i++) {	    
-	    if (simplificationRules[i].isApplicable(update, 
-	                                            simplifiedTerm)) {
-		return simplificationRules[i].apply(update, 
-						    simplifiedTerm, 
-						    services);		
-	    }
-	}
+        for (IUpdateRule simplificationRule : simplificationRules) {
+            if (simplificationRule.isApplicable(update,
+                    simplifiedTerm)) {
+                return simplificationRule.apply(update,
+                        simplifiedTerm,
+                        services);
+            }
+        }
 	return simplifiedTerm;
     }
 
@@ -122,9 +122,9 @@ public class UpdateSimplifier {
     public Term matchingCondition (Update update, 
 	    			   Term target, 
 	    			   Services services) {
-        for ( int i = 0; i < simplificationRules.length; i++ ) {
-            if ( simplificationRules[i].isApplicable ( update, target ) )
-                return simplificationRules[i].matchingCondition( update, target, services );
+        for (IUpdateRule simplificationRule : simplificationRules) {
+            if (simplificationRule.isApplicable(update, target))
+                return simplificationRule.matchingCondition(update, target, services);
         }
         Debug.fail("Don't know how to handle " + target);
         return null; // unreachable

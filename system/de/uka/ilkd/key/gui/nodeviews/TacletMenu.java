@@ -95,14 +95,13 @@ class TacletMenu extends JMenu {
      */
     private ImmutableList<TacletApp> removeRewrites(ImmutableList<TacletApp> list) {
 	ImmutableList<TacletApp> result = ImmutableSLList.<TacletApp>nil();
-	Iterator<TacletApp> it = list.iterator();
 
-	while(it.hasNext()) {
-	    TacletApp tacletApp = it.next();
-	    Taclet taclet=tacletApp.taclet();
-	    result = (taclet instanceof RewriteTaclet ? result :
-		      result.prepend(tacletApp));
-	}
+        for (TacletApp aList : list) {
+            TacletApp tacletApp = aList;
+            Taclet taclet = tacletApp.taclet();
+            result = (taclet instanceof RewriteTaclet ? result :
+                    result.prepend(tacletApp));
+        }
 	return result;
     }
 
@@ -150,11 +149,10 @@ class TacletMenu extends JMenu {
 				       MenuControl            control) {
 
 	if (!builtInList.isEmpty()) {
-	    addSeparator();	
-	    Iterator<BuiltInRule> it = builtInList.iterator();
-	    while (it.hasNext()) {
-		addBuiltInRuleItem(it.next(), control);
-	    }
+	    addSeparator();
+        for (BuiltInRule aBuiltInList : builtInList) {
+            addBuiltInRuleItem(aBuiltInList, control);
+        }
 	}
     }
 				      
@@ -270,9 +268,9 @@ class TacletMenu extends JMenu {
 
     /** adds array of TacletMenuItem to itself*/
     private void add(TacletMenuItem[] items) {
-	for (int i = 0; i < items.length; i++) {
-	    add((Component) items[i]);
-	}
+        for (TacletMenuItem item : items) {
+            add((Component) item);
+        }
     }
 
     /** creates new TacletMenuItems for each taclet in the list and set
@@ -512,18 +510,17 @@ class TacletMenu extends JMenu {
 	 */
 	private int measureGoalComplexity(ImmutableList<TacletGoalTemplate> l) {
 	    int result = 0;
-	    Iterator<TacletGoalTemplate> it = l.iterator();
-	    while (it.hasNext()) {
-		TacletGoalTemplate gt = it.next();
-		if (gt instanceof RewriteTacletGoalTemplate) {
-		    if (((RewriteTacletGoalTemplate)gt).replaceWith() != null) {
-			result += ((RewriteTacletGoalTemplate)gt).replaceWith().depth();
-		    }
-		} 
-		if (!gt.sequent().isEmpty()) {
-		    result += 10;
-		}
-	    }
+        for (TacletGoalTemplate aL : l) {
+            TacletGoalTemplate gt = aL;
+            if (gt instanceof RewriteTacletGoalTemplate) {
+                if (((RewriteTacletGoalTemplate) gt).replaceWith() != null) {
+                    result += ((RewriteTacletGoalTemplate) gt).replaceWith().depth();
+                }
+            }
+            if (!gt.sequent().isEmpty()) {
+                result += 10;
+            }
+        }
 	    return result;
 	}
 	

@@ -156,9 +156,8 @@ public class CreateArrayMethodBuilder extends KeYJavaASTFactory {
      */
     protected ImmutableList<Field> filterImplicitFields(ImmutableList<Field> list) {
         ImmutableList<Field> result = ImmutableSLList.<Field>nil();
-        Iterator<Field> it = list.iterator();
-        while (it.hasNext()) {
-            Field field = it.next();
+        for (Field aList : list) {
+            Field field = aList;
             if (field instanceof ImplicitFieldSpecification) {
                 result = result.append(field);
             }
@@ -176,9 +175,8 @@ public class CreateArrayMethodBuilder extends KeYJavaASTFactory {
      * @return the program variable of the given name or null if not found
      */
     protected ProgramVariable find(String name, ImmutableList<Field> fields) {
-        Iterator<Field> it = fields.iterator();
-        while (it.hasNext()) {
-            Field field = it.next();
+        for (Field field1 : fields) {
+            Field field = field1;
             final ProgramVariable fieldVar = (ProgramVariable) field
                     .getProgramVariable();
             if (name.equals(fieldVar.getProgramElementName().getProgramName())) {

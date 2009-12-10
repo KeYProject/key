@@ -59,10 +59,9 @@ public class SimpleTacletSelectionMenu extends JMenu {
      */
     private void addMenuEntries(ImmutableList<PosTacletApp> apps, 
             NotationInfo info, ActionListener listener) {
-        final Iterator<PosTacletApp> it = apps.iterator();
-        while (it.hasNext()) {
-            final DefaultTacletMenuItem item = 
-                new DefaultTacletMenuItem(this, it.next(), info);
+        for (PosTacletApp app : apps) {
+            final DefaultTacletMenuItem item =
+                    new DefaultTacletMenuItem(this, app, info);
             item.addActionListener(listener);
             add(item);
         }

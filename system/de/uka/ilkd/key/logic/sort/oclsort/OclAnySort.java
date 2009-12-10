@@ -56,12 +56,11 @@ public class OclAnySort implements OclSort {
 	    if (((GenericSort)s).getOneOf().size() == 0) {
 		return true;
 	    } else {
-		Iterator<Sort> iter = ((GenericSort)s).getOneOf().iterator();
-		while (iter.hasNext()) {
-		    if (this.extendsTrans(iter.next())) {
-			return true;
-		    }
-		}
+            for (Sort sort : ((GenericSort) s).getOneOf()) {
+                if (this.extendsTrans(sort)) {
+                    return true;
+                }
+            }
 		return false;
 	    }
 	} else {

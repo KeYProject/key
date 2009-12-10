@@ -182,7 +182,7 @@ public class SpecificationRepository {
         StringBuffer nameSB = new StringBuffer(contract.getName());
         StringBuffer displayNameSB = new StringBuffer(contract.getDisplayName());
         for(OperationContract other : others) {
-            nameSB.append(CONTRACT_COMBINATION_MARKER + other.getName());
+            nameSB.append(CONTRACT_COMBINATION_MARKER).append(other.getName());
             displayNameSB.append(", ").append(other.getDisplayName());
         }
         

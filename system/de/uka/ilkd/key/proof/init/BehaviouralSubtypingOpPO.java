@@ -50,16 +50,14 @@ public class BehaviouralSubtypingOpPO extends AbstractPO {
               subKJT);
         pairPOs = ImmutableSLList.<ProofOblInput>nil();
 
-        Iterator<Map.Entry<OperationContract, OperationContract>> it =
-            contractPairs.entrySet().iterator();
-        while(it.hasNext()) {
-            Map.Entry<OperationContract, OperationContract> e = it.next();
-            OperationContract subContract   = e.getKey();
+        for (Object o : contractPairs.entrySet()) {
+            Map.Entry<OperationContract, OperationContract> e = (Map.Entry<OperationContract, OperationContract>) o;
+            OperationContract subContract = e.getKey();
             OperationContract superContract = e.getValue();
             ProofOblInput pairPO
                     = new BehaviouralSubtypingOpPairPO(initConfig,
-                	    			       subContract,
-                                                       superContract);
+                    subContract,
+                    superContract);
             pairPOs = pairPOs.append(pairPO);
         }
         assert !pairPOs.isEmpty();

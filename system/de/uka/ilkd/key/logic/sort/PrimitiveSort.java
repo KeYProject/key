@@ -49,11 +49,10 @@ public class PrimitiveSort extends AbstractNonCollectionSort {
         if (!(sort instanceof PrimitiveSort)) {
             return false;
         }
-                             
-        final Iterator<Sort> it = extendsSorts().iterator();
-        while (it.hasNext()) {
-            final Sort s = it.next();
-            assert s!=null;
+
+        for (Sort sort1 : extendsSorts()) {
+            final Sort s = sort1;
+            assert s != null;
             if (s == sort || s.extendsTrans(sort)) {
                 return true;
             }

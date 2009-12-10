@@ -69,7 +69,7 @@ public class QuanUpdateOperator implements IUpdateOperator {
         public QuanUpdateSignature (final Location[] locations,
                                     final boolean[] guards) {
             this.locations = new ImmutableArray<Location> ( locations );
-            this.guards = (boolean[])guards.clone ();
+            this.guards = guards.clone ();
         }
         
         /* (non-Javadoc)
@@ -667,9 +667,7 @@ public class QuanUpdateOperator implements IUpdateOperator {
 
         public ImmutableSet<QuantifiableVariable> getBoundVarsAsSet () {
             ImmutableSet<QuantifiableVariable> res = DefaultImmutableSet.<QuantifiableVariable>nil();
-            final Iterator<QuantifiableVariable> it = getMinimizedVars ().iterator ();
-            while ( it.hasNext () )
-                res = res.add ( it.next () );
+            for (QuantifiableVariable quantifiableVariable : getMinimizedVars()) res = res.add(quantifiableVariable);
             return res;
         }
 
@@ -974,14 +972,13 @@ public class QuanUpdateOperator implements IUpdateOperator {
      */
     private static boolean isSubsumedAssignment(ElUpdateLocation elUpd,
                                                 List<ElUpdateLocation> laterAssignments) {
-        final Iterator<ElUpdateLocation> it = laterAssignments.iterator ();
-        while ( it.hasNext () ) {
-            final ElUpdateLocation laterAss = it.next ();
-            final Term subsumptionCond = laterAss.getSubsumptionCondition ( elUpd );
+        for (ElUpdateLocation laterAssignment : laterAssignments) {
+            final ElUpdateLocation laterAss = laterAssignment;
+            final Term subsumptionCond = laterAss.getSubsumptionCondition(elUpd);
             final GuardSatisfiabilityFormulaBuilder satisfiabilityBuilder =
-                new GuardSatisfiabilityFormulaBuilder (subsumptionCond,
-                                                       laterAss.getBoundVars () );
-            if ( satisfiabilityBuilder.isValidGuard () ) return true;
+                    new GuardSatisfiabilityFormulaBuilder(subsumptionCond,
+                            laterAss.getBoundVars());
+            if (satisfiabilityBuilder.isValidGuard()) return true;
         }
         return false;
     }

@@ -92,14 +92,11 @@ public class TermTacletAppIndex {
                           pos.termBelowMetavariable (), services );
             if ( !c.isSatisfiable () ) return ImmutableSLList.<NoPosTacletApp>nil();
         }
-		
-        final Iterator<NoPosTacletApp> rewriteIterator =
-            tacletIndex.getRewriteTaclet ( pos, c, filter, services,
-                                           userConstraint ).iterator();
 
-        while ( rewriteIterator.hasNext () ) {
-            NoPosTacletApp tacletApp = rewriteIterator.next ();
-            result = result.prepend ( tacletApp );
+        for (NoPosTacletApp noPosTacletApp : tacletIndex.getRewriteTaclet(pos, c, filter, services,
+                userConstraint)) {
+            NoPosTacletApp tacletApp = noPosTacletApp;
+            result = result.prepend(tacletApp);
         }
         
         return result;
@@ -778,10 +775,8 @@ public class TermTacletAppIndex {
     private static void fireRulesAdded(NewRuleListener listener,
                                        ImmutableList<NoPosTacletApp> taclets,
                                        PosInOccurrence pos) {
-        Iterator<NoPosTacletApp> it = taclets.iterator ();
 
-        while ( it.hasNext () )
-            listener.ruleAdded ( it.next (), pos );
+        for (NoPosTacletApp taclet : taclets) listener.ruleAdded(taclet, pos);
     }
 
 

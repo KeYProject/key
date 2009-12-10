@@ -1065,9 +1065,9 @@ public abstract class ProgramSVSort extends PrimitiveSort {
 	    }
 	    final KeYJavaType kjt = getKeYJavaType(check, ec, services);
             if (kjt != null) {
-                final Type type = kjt.getJavaType();            
-                for (int i=0; i<allowed_types.length; i++){
-                    if (type == allowed_types[i])
+                final Type type = kjt.getJavaType();
+                for (PrimitiveType allowed_type : allowed_types) {
+                    if (type == allowed_type)
                         return true;
                 }
             }
@@ -1101,11 +1101,11 @@ public abstract class ProgramSVSort extends PrimitiveSort {
             final KeYJavaType kjt = getKeYJavaType(check, ec, services);
 	    if (kjt != null) {
 	        final Type type = kjt.getJavaType();
-            
-	        for (int i=0; i<allowed_types.length; i++){
-	            if (type == allowed_types[i])
-	                return true;
-	        }
+
+            for (PrimitiveType allowed_type : allowed_types) {
+                if (type == allowed_type)
+                    return true;
+            }
             }
 	    return false;
 	}
@@ -1372,20 +1372,18 @@ public abstract class ProgramSVSort extends PrimitiveSort {
 
 	private ImmutableList<Name> reverse(ImmutableList<Name> names) {
 	    ImmutableList<Name> result = ImmutableSLList.<Name>nil();
-	    Iterator<Name> it = names.iterator();
-	    while (it.hasNext()) {
-		result = result.append(it.next());
-	    }
+        for (Name name1 : names) {
+            result = result.append(name1);
+        }
 	    return result;
 	}
 
 	private ImmutableList<Type> createSignature(Services services) {
 	    ImmutableList<Type> result = ImmutableSLList.<Type>nil();
-	    Iterator<Name> ownSig = reverseSignature.iterator();
-	    while (ownSig.hasNext()) {
-		result = result.prepend(services.getJavaInfo()
-					.getKeYJavaType(""+ownSig.next()));
-	    }
+        for (Name aReverseSignature : reverseSignature) {
+            result = result.prepend(services.getJavaInfo()
+                    .getKeYJavaType("" + aReverseSignature));
+        }
 	    return result;
 	}
 
@@ -1566,19 +1564,17 @@ public abstract class ProgramSVSort extends PrimitiveSort {
 		|| (pe instanceof SpecialConstructorReference));
     }
 
-    public ProgramElement getSVWithSort(ExtList l, Class alternative) {	
-	Iterator it=l.iterator();
-	while (it.hasNext()) {
-	    Object o=it.next();
-	    if (o instanceof SortedSchemaVariable
-		&& (((SortedSchemaVariable)o).sort()==this)) {
-		return (ProgramElement) o;
-	    }
-	    else if ((alternative.isInstance(o)) 
-		     && (! (o instanceof SchemaVariable))) {
-		return (ProgramElement) o;
-	    }
-	}
+    public ProgramElement getSVWithSort(ExtList l, Class alternative) {
+        for (Object aL : l) {
+            Object o = aL;
+            if (o instanceof SortedSchemaVariable
+                    && (((SortedSchemaVariable) o).sort() == this)) {
+                return (ProgramElement) o;
+            } else if ((alternative.isInstance(o))
+                    && (!(o instanceof SchemaVariable))) {
+                return (ProgramElement) o;
+            }
+        }
 	return null;
     }
 

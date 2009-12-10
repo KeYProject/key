@@ -759,11 +759,11 @@ public class Recoder2KeY implements JavaReader {
         };
 
         final ChangeHistory cHistory = servConf.getChangeHistory();
-        for (int i = 0; i < transformer.length; i++) {
+        for (RecoderModelTransformer aTransformer : transformer) {
             if (Debug.ENABLE_DEBUG) {
-                Debug.out("current transformer : " + transformer[i].toString());
+                Debug.out("current transformer : " + aTransformer.toString());
             }
-            transformer[i].execute();
+            aTransformer.execute();
         }
         
         converter.locClass2finalVar = cnb.getLocalClass2FinalVar();

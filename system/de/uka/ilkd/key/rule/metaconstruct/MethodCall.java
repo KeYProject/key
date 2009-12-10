@@ -118,7 +118,7 @@ public class MethodCall extends ProgramMetaConstruct {
 
     private KeYJavaType getStaticPrefixType(ReferencePrefix refPrefix, Services services) {
 	if (refPrefix==null || refPrefix instanceof ThisReference && 
-	        ((ThisReference) refPrefix).getReferencePrefix()==null){ 
+	        refPrefix.getReferencePrefix()==null){
 	    return execContext.getTypeReference().getKeYJavaType();
 	} else if(refPrefix instanceof ThisReference){
 	    return ((TypeReference) ((ThisReference) refPrefix).getReferencePrefix()).getKeYJavaType();

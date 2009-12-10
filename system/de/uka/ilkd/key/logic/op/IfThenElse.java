@@ -81,10 +81,9 @@ public class IfThenElse extends Op {
         Sort result = Sort.ANY;
         final ImmutableSet<Sort> set1 = s1.extendsSorts();
         final ImmutableSet<Sort> set2 = s2.extendsSorts();
-        
-        final Iterator<Sort> sort1It = set1.iterator();
-        while (sort1It.hasNext()) {
-            final Sort sort1 = sort1It.next();
+
+        for (Sort aSet1 : set1) {
+            final Sort sort1 = aSet1;
             if (set2.contains(sort1)) {
                 if (result == Sort.ANY) {
                     result = sort1;
@@ -92,7 +91,7 @@ public class IfThenElse extends Op {
                     // not uniquely determinable
                     return Sort.ANY;
                 }
-            } 
+            }
         }        
         return result;
     }

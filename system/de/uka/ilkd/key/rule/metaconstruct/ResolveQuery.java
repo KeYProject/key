@@ -193,11 +193,11 @@ public class ResolveQuery extends AbstractMetaOperator {
         String resultVarName = pm.getName();
         
         final String[] commonQueryPrefix = new String[]{"is", "has", "get"};
-        for (int i = 0; i<commonQueryPrefix.length; i++) {
-            if (resultVarName.startsWith(commonQueryPrefix[i])) {
-                if (resultVarName.length() > commonQueryPrefix[i].length()) {
+        for (String aCommonQueryPrefix : commonQueryPrefix) {
+            if (resultVarName.startsWith(aCommonQueryPrefix)) {
+                if (resultVarName.length() > aCommonQueryPrefix.length()) {
                     resultVarName = resultVarName.
-                        substring(commonQueryPrefix[i].length()).toLowerCase();                    
+                            substring(aCommonQueryPrefix.length()).toLowerCase();
                 }
                 break;
             }

@@ -61,7 +61,7 @@ public class ErrorMessages {
 		    while (!(cm instanceof Window)) {
 			cm=cm.getParent();
 		    }
-		    ((Window)cm).setVisible(false);
+		    cm.setVisible(false);
 		    ((Window)cm).dispose();
 		}
 	    };

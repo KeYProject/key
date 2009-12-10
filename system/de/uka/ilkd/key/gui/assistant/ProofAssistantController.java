@@ -343,9 +343,9 @@ public class ProofAssistantController {
 	 */
 	private void init(Container container) {
  	    Component[] comps = container.getComponents();
- 	    for (int i = 0; i<comps.length; i++) {
-		components.add(comps[i]);
-	    }
+        for (Component comp : comps) {
+            components.add(comp);
+        }
 	}
 
 	/**

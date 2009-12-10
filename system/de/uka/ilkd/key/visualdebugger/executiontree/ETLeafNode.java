@@ -56,7 +56,7 @@ public class ETLeafNode extends ETNode {
     public void setExceptionName(String exc) {
 
         if (exc != null) {
-            this.expression = ((ITNode) this.getITNodes().getFirst())
+            this.expression = this.getITNodes().getFirst()
                     .getLastExpressionId().getExprId();
         }
         exceptionName = exc;

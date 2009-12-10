@@ -97,10 +97,7 @@ public class TacletPORule implements BuiltInRule {
 	Namespace    funcNs    = globalNss.functions ();
 
 	{
-	    Iterator<Named> it =
-		p_pob.getFunctions ().allElements ().iterator ();
-	    while ( it.hasNext () )
-		funcNs.add ( it.next () );
+        for (Named named : p_pob.getFunctions().allElements()) funcNs.add(named);
 	}
 
 	{

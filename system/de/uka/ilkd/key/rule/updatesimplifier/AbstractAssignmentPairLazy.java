@@ -128,8 +128,8 @@ abstract class AbstractAssignmentPairLazy implements AssignmentPair {
         if ( locationHash == 0 ) {
             locationHash = location ().hashCode ();
             final Term[] locSubs = locationSubs ();
-            for ( int i = 0; i < locSubs.length; i++ ) {
-                locationHash += 17 * locSubs[i].hashCode ();
+            for (Term locSub : locSubs) {
+                locationHash += 17 * locSub.hashCode();
             }
             if ( locationHash == 0 ) {
                 locationHash = 1;

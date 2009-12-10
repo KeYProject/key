@@ -137,13 +137,12 @@ public class ExecutionTraceModel {
 		    MethodFrame.class);
 	    coll.start();
 	    ImmutableList<ProgramElement> l = coll.getNodes();
-	    Iterator<ProgramElement> it = l.iterator();
-	    while (it.hasNext()) {
-		MethodFrame mf = (MethodFrame) it.next();
-		if (mf.getProgramMethod() != null) {
-		    result = result.add(mf.getProgramMethod());
-		}
-	    }
+        for (ProgramElement aL : l) {
+            MethodFrame mf = (MethodFrame) aL;
+            if (mf.getProgramMethod() != null) {
+                result = result.add(mf.getProgramMethod());
+            }
+        }
 	    current = current.getNextInProof();
 	    // current = current.getNextExecuted();
 	}
@@ -256,9 +255,9 @@ public class ExecutionTraceModel {
 	if (cte instanceof ParentContextTraceElement) {
 	    ParentContextTraceElement pcte = (ParentContextTraceElement) cte;
 	    ContextTraceElement[] children = pcte.getChildren();
-	    for (int j = 0; j < children.length; j++) {
-		result += toStringTree(children[j], indention + "  ");
-	    }
+        for (ContextTraceElement aChildren : children) {
+            result += toStringTree(aChildren, indention + "  ");
+        }
 	}
 	return result;
     }

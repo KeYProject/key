@@ -322,10 +322,8 @@ public class Proof implements Named {
     
     private void updateStrategyOnGoals() {
         Strategy ourStrategy = getActiveStrategy();
-        
-        final Iterator<Goal> it = openGoals ().iterator ();
-        while ( it.hasNext () )
-            it.next ().setGoalStrategy(ourStrategy);
+
+        for (Goal goal : openGoals()) goal.setGoalStrategy(ourStrategy);
     }
 
     /** 
@@ -374,9 +372,7 @@ public class Proof implements Named {
     public void clearAndDetachRuleAppIndexes () {
         // Taclet indices of the particular goals have to
         // be rebuilt
-        final Iterator<Goal> it = openGoals ().iterator ();
-        while ( it.hasNext () )
-            it.next ().clearAndDetachRuleAppIndex ();
+        for (Goal goal : openGoals()) goal.clearAndDetachRuleAppIndex();
     }
     
     /** @return Deliverer of new metavariables (with unique names)*/
@@ -642,10 +638,9 @@ public class Proof implements Named {
 		}
 		//call setBack(Goal) on each element in the remove
 		//list. The former parents become the new goals
-		final Iterator<Goal> removeIt = removeList.iterator();
-		while (removeIt.hasNext()) {
-		    setBack(removeIt.next());
-		}
+            for (Goal aRemoveList : removeList) {
+                setBack(aRemoveList);
+            }
 		goal = getGoal(node);
 	    } else {
 	        return false;
@@ -666,42 +661,42 @@ public class Proof implements Named {
     /** fires the event that the proof has been expanded at the given node */
     protected void fireProofExpanded(Node node) {
 	ProofTreeEvent e = new ProofTreeEvent(this, node);
-	for (int i = 0; i<listenerList.size(); i++) {
-	    listenerList.get(i).proofExpanded(e);
-	}
+        for (ProofTreeListener aListenerList : listenerList) {
+            aListenerList.proofExpanded(e);
+        }
     }
 
     /** fires the event that the proof has been pruned at the given node */
     protected void fireProofIsBeingPruned(Node node, Node removedNode) {
         ProofTreeEvent e = new ProofTreeRemovedNodeEvent(this, node, removedNode);
         clearSMTData(removedNode);
-        for (int i = 0; i<listenerList.size(); i++) {
-            listenerList.get(i).proofIsBeingPruned(e);
+        for (ProofTreeListener aListenerList : listenerList) {
+            aListenerList.proofIsBeingPruned(e);
         }
     } 
 
     /** fires the event that the proof has been pruned at the given node */
     protected void fireProofPruned(Node node, Node removedNode) {
 	ProofTreeEvent e = new ProofTreeRemovedNodeEvent(this, node, removedNode);
-	for (int i = 0; i<listenerList.size(); i++) {
-	    listenerList.get(i).proofPruned(e);
-	}
+        for (ProofTreeListener aListenerList : listenerList) {
+            aListenerList.proofPruned(e);
+        }
     } 
 
     /** fires the event that the proof has been restructured */
     protected void fireProofStructureChanged() {
 	ProofTreeEvent e = new ProofTreeEvent(this);
-	for (int i = 0; i<listenerList.size(); i++) {
-	    listenerList.get(i).proofStructureChanged(e);
-	}    
+        for (ProofTreeListener aListenerList : listenerList) {
+            aListenerList.proofStructureChanged(e);
+        }
     }
 
     /** fires the event that a goal has been removed from the list of goals */
     protected void fireProofGoalRemoved(Goal goal) {
 	ProofTreeEvent e = new ProofTreeEvent(this, goal);
-	for (int i = 0; i<listenerList.size(); i++) {
-	    listenerList.get(i).proofGoalRemoved(e);
-	}	
+        for (ProofTreeListener aListenerList : listenerList) {
+            aListenerList.proofGoalRemoved(e);
+        }
     }
 
     /** fires the event that new goals have been added to the list of
@@ -709,9 +704,9 @@ public class Proof implements Named {
      */
     protected void fireProofGoalsAdded(ImmutableList<Goal> goals) {
 	ProofTreeEvent e = new ProofTreeEvent(this, goals);
-	for (int i = 0; i<listenerList.size(); i++) {
-	    listenerList.get(i).proofGoalsAdded(e);
-	}	
+        for (ProofTreeListener aListenerList : listenerList) {
+            aListenerList.proofGoalsAdded(e);
+        }
     }
 
     /** fires the event that new goals have been added to the list of
@@ -724,9 +719,9 @@ public class Proof implements Named {
     /** fires the event that the proof has been restructured */
     protected void fireProofGoalsChanged() {
 	ProofTreeEvent e = new ProofTreeEvent(this, openGoals());
-	for (int i = 0; i<listenerList.size(); i++) {
-	    listenerList.get(i).proofGoalsChanged(e);
-	}
+        for (ProofTreeListener aListenerList : listenerList) {
+            aListenerList.proofGoalsChanged(e);
+        }
     } 
 
     /** fires the event that the proof has closed. 
@@ -735,9 +730,9 @@ public class Proof implements Named {
      */
     protected void fireProofClosed() {
 	ProofTreeEvent e = new ProofTreeEvent(this);
-	for (int i = 0; i<listenerList.size(); i++) {
-	    listenerList.get(i).proofClosed(e);
-	}
+        for (ProofTreeListener aListenerList : listenerList) {
+            aListenerList.proofClosed(e);
+        }
     }
 
     /**
@@ -782,13 +777,12 @@ public class Proof implements Named {
      */
     public Goal getGoal(Node node) {	
 	Goal result = null;
-	Iterator<Goal> it = openGoals.iterator();
-	while (it.hasNext()) {
-	    result = it.next();
-	    if (result.node() == node) {
-		return result;
-	    }
-	}
+        for (Goal openGoal : openGoals) {
+            result = openGoal;
+            if (result.node() == node) {
+                return result;
+            }
+        }
 	return null;
     }
 
@@ -799,16 +793,15 @@ public class Proof implements Named {
      */
     public ImmutableList<Goal> getSubtreeGoals(Node node) {	
 	ImmutableList<Goal> result = ImmutableSLList.<Goal>nil();
-	final Iterator<Goal> goalsIt  = openGoals.iterator();
-	while (goalsIt.hasNext()) {
-	    final Goal goal = goalsIt.next();
-	    final Iterator<Node> leavesIt = node.leavesIterator();
-	    while (leavesIt.hasNext()) {
-		if (leavesIt.next() == goal.node()) {
-		    result = result.prepend(goal);
-		}
-	    }
-	}
+        for (Goal openGoal : openGoals) {
+            final Goal goal = openGoal;
+            final Iterator<Node> leavesIt = node.leavesIterator();
+            while (leavesIt.hasNext()) {
+                if (leavesIt.next() == goal.node()) {
+                    result = result.prepend(goal);
+                }
+            }
+        }
 	return result;
     }
     
@@ -847,17 +840,15 @@ public class Proof implements Named {
      * control the contents of the rule app index
      */
     public void setRuleAppIndexToAutoMode () {
-	Iterator<Goal> it = openGoals.iterator ();
-	while ( it.hasNext () ) {
-	    it.next ().ruleAppIndex ().autoModeStarted ();
-	}
+        for (Goal openGoal : openGoals) {
+            openGoal.ruleAppIndex().autoModeStarted();
+        }
     }
 
     public void setRuleAppIndexToInteractiveMode () {
-	Iterator<Goal> it = openGoals.iterator ();
-	while ( it.hasNext () ) {
-	    it.next ().ruleAppIndex ().autoModeStopped ();
-	}
+        for (Goal openGoal : openGoals) {
+            openGoal.ruleAppIndex().autoModeStopped();
+        }
     }
     
 
@@ -935,9 +926,9 @@ public class Proof implements Named {
         	
         	//fireEvent
         	ProofTreeEvent e = new ProofTreeEvent(this, n);
-        	for (int i = 0; i<listenerList.size(); i++) {
-        	    listenerList.get(i).smtDataUpdate(e);
-        	}
+        for (ProofTreeListener aListenerList : listenerList) {
+            aListenerList.smtDataUpdate(e);
+        }
 	}
     }
     

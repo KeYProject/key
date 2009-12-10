@@ -285,8 +285,6 @@ public class POBuilder {
     }
     
     private void copyNamespace(Namespace p_source, Namespace p_target) {
-	Iterator<Named> it = p_source.allElements ().iterator ();
-	while ( it.hasNext () )
-	    p_target.add ( it.next () );
+        for (Named named : p_source.allElements()) p_target.add(named);
     }
 }

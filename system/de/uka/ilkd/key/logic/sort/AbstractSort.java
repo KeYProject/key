@@ -60,7 +60,7 @@ public abstract class AbstractSort implements Sort, SortDefiningSymbols {
             return true;
         }
         
-        if (!(sort instanceof ObjectSort || sort instanceof GenericSort)) {
+        if (!(sort instanceof ObjectSort)) {
             return false;
         }
                              
@@ -74,10 +74,9 @@ public abstract class AbstractSort implements Sort, SortDefiningSymbols {
                }
            }
            return true;
-       } else {           
-           final Iterator<Sort> it = extendsSorts().iterator();
-           while (it.hasNext()) {
-               final Sort s = it.next();
+       } else {
+           for (Sort sort1 : extendsSorts()) {
+               final Sort s = sort1;
                assert s != null;
                if (s == sort || s.extendsTrans(sort)) {
                    return true;
@@ -179,9 +178,8 @@ public abstract class AbstractSort implements Sort, SortDefiningSymbols {
 
     
     protected void addSymbols(ImmutableList<SortDependingSymbol> p) {
-        final Iterator<SortDependingSymbol> it = p.iterator();        
-        while (it.hasNext()) {
-            final SortDependingSymbol s = it.next();
+        for (SortDependingSymbol aP : p) {
+            final SortDependingSymbol s = aP;
             definedSymbols = definedSymbols.put(s.getKind(), s);
         }
     }

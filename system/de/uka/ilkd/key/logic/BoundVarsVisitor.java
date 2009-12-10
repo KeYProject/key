@@ -50,11 +50,10 @@ public class BoundVarsVisitor extends Visitor{
     /**
      * visits a sequent
      */
-    public void visit(Sequent visited) {        
-        final Iterator<ConstrainedFormula> it = visited.iterator();
-        while (it.hasNext()) {
-            visit(it.next().formula());            
-        }        
+    public void visit(Sequent visited) {
+        for (ConstrainedFormula cf : visited) {
+            visit(cf.formula());
+        }
     }
     
     /**

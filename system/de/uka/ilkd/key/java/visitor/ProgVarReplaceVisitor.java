@@ -234,17 +234,16 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
     private Map /*Operator -> Function*/ replaceVariablesInMap(
                                         Map /*Operator -> Function*/ map) {
         Map result = new LinkedHashMap();
-        Iterator it = map.entrySet().iterator();
-        while(it.hasNext()) {
-            Map.Entry entry = (Map.Entry) it.next();
+        for (Object o : map.entrySet()) {
+            Map.Entry entry = (Map.Entry) o;
             Operator key = (Operator) entry.getKey();
             Function value = (Function) entry.getValue();
-            
+
             Operator newKey = (ProgramVariable) replaceMap.get(key);
-            if(newKey == null) {
+            if (newKey == null) {
                 newKey = key;
             }
-            
+
             result.put(newKey, value);
         }
         return result;

@@ -256,9 +256,8 @@ public class Recoder2KeYConverter {
                         "Could not find convert method for class "
                         + pe.getClass());
 
-            Iterator<Class<?>> it = l.iterator();
-            while (it.hasNext()) {
-                methodCache.put(it.next(), m);
+            for (Class<?> aL : l) {
+                methodCache.put(aL, m);
             }
         }
 
@@ -450,9 +449,8 @@ public class Recoder2KeYConverter {
      */
     private ImmutableList<Field> filterField(ExtList list) {
         ImmutableList<Field> result = ImmutableSLList.<Field>nil();
-        Iterator<?> it = list.iterator();
-        while (it.hasNext()) {
-            Object pe = it.next();
+        for (Object aList : list) {
+            Object pe = aList;
             if (pe instanceof FieldDeclaration) {
                 result = result.prepend(filterField((FieldDeclaration) pe));
             }
@@ -488,12 +486,11 @@ public class Recoder2KeYConverter {
      * @return the program variable of the given name or null if not found
      */
     private ProgramVariable find(String name, ImmutableList<Field> fields) {
-        Iterator<Field> it = fields.iterator();
-        while (it.hasNext()) {
-            Field field = it.next();
+        for (Field field1 : fields) {
+            Field field = field1;
             if (name.equals(field.getName())) {
                 return (ProgramVariable) ((FieldSpecification) field)
-                .getProgramVariable();
+                        .getProgramVariable();
             }
         }
         return null;
@@ -765,7 +762,7 @@ public class Recoder2KeYConverter {
             block = (StatementBlock) callConvert(rmcs.getBody());
         }
 
-        return new MethodFrame(resVar, (ExecutionContext) convert(rmcs
+        return new MethodFrame(resVar, convert(rmcs
                 .getExecutionContext()), block);
     }
 
@@ -1558,7 +1555,7 @@ public class Recoder2KeYConverter {
 
         if (rp == null) {
             return new New(arguments, maybeAnonClass,
-                    (ReferencePrefix) null);
+                    null);
         } else {
             return new New(arguments, maybeAnonClass,
                     (ReferencePrefix) callConvert(rp));

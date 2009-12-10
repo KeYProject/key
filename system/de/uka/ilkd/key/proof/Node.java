@@ -653,7 +653,7 @@ public class Node {
 	final LinkedList<Node> subTreeNodes = new LinkedList<Node>();
 	subTreeNodes.add(this);	
 	while (!subTreeNodes.isEmpty()) {
-	    final Node n = (Node)subTreeNodes.removeFirst();
+	    final Node n = subTreeNodes.removeFirst();
 	    n.closed = true;	    
 	    subTreeNodes.addAll(n.children);
 	}

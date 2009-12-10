@@ -318,10 +318,9 @@ public class ContextStatementBlock extends StatementBlock {
             for (int i = pos - 1; i>=0; i--) {
                 final ProgramPrefix prefixEl = prefix.getPrefixElementAt(i);                          
                 iterators[i] = prefixEl.getFirstActiveChildPos().iterator();               
-            }                    
-            
-            for (int i = 0; i<iterators.length; i++) {
-                final IntIterator it = iterators[i];
+            }
+
+            for (final IntIterator it : iterators) {
                 while (it.hasNext()) {
                     prefixEnd = prefixEnd.down(it.next());
                 }

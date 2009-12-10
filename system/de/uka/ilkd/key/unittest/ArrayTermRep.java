@@ -196,7 +196,7 @@ public class ArrayTermRep extends AbstractTermRepresentation {
 	        
 	        final Statement result = createArray==null ? 
 	        	forLoop :
-	        	new StatementBlock(new ImmutableArray<Statement>(new Statement[]{createArray, forLoop}));
+	        	new StatementBlock(new ImmutableArray<Statement>(createArray, forLoop));
 	        
 	        return result;
 
@@ -228,7 +228,7 @@ public class ArrayTermRep extends AbstractTermRepresentation {
 	        
 	        final Statement result = createArray==null ? 
 	        	assignment :
-	        	new StatementBlock(new ImmutableArray<Statement>(new Statement[]{createArray, assignment}));
+	        	new StatementBlock(new ImmutableArray<Statement>(createArray, assignment));
 	        
 	        return result;
 	}
