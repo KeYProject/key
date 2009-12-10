@@ -194,12 +194,8 @@ public class CollectionSort implements OclSort {
 	    return false;
 	}
 	CollectionSort cSort = (CollectionSort)obj;
-	if (this.collectionKind == cSort.collectionKind
-	    && this.elemSort == cSort.elemSort) {
-	    return true;
-	} else {
-	    return false;
-	}
+        return this.collectionKind == cSort.collectionKind
+                && this.elemSort == cSort.elemSort;
     }
 
     public int hashCode(){

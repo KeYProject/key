@@ -92,24 +92,27 @@ public class ContextStatementBlockInstantiation {
         }
         final ContextStatementBlockInstantiation inst = 
             (ContextStatementBlockInstantiation) o;
-        if (prefixEnd == null && inst.prefixEnd != null) return false;
-        if (suffixStart == null && inst.suffixStart != null) return false;
-        if (activeStatementContext == null && 
-                inst.activeStatementContext!=null) return false;
-        if (programElement == null && inst.programElement != null)
-            return false;
+
+        if (isDifferent(suffixStart, inst.suffixStart)) return false;
+
+        if (isDifferent(prefixEnd, inst.prefixEnd)) return false;
+
+        if (isDifferent(activeStatementContext, inst.activeStatementContext)) return false;
         
-        if (!suffixStart.equals(inst.suffixStart)) return false;
-        if (!prefixEnd.equals(inst.prefixEnd)) return false;        
-        
-        if (!activeStatementContext.
-                equals(inst.activeStatementContext)) return false;
-        
-        if (!(programElement.equals(inst.programElement))) return false;
+        if (isDifferent(programElement, inst.programElement)) return false;
         
         return true;
     }
-    
+
+    private boolean isDifferent(Object self, Object other) {
+        if (self != null && other != null) {
+            if (!self.equals(other)) return true;
+        } else if (self != other) {
+            return true;
+        }
+        return false;
+    }
+
     public int hashCode() {
         int hashCode = 1;
         if (prefixEnd != null) {

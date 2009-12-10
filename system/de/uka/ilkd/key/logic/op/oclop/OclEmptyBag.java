@@ -46,11 +46,8 @@ public class OclEmptyBag extends TermSymbol {
      * subterms that are suitable for this function.
      */
     public boolean validTopLevel(Term term){
-	if (term.arity()!=arity()) {
-	    return false;
-	}
-	
-        return true;
+        return term.arity() == arity();
+
     }
 
     public Sort sort(Term[] subTerm) {

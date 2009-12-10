@@ -216,7 +216,7 @@ public class Polynomial {
         final StringBuffer res = new StringBuffer ();
         res.append ( constantPart );
 
-        for (Monomial part : parts) res.append(" + " + part);
+        for (Monomial part : parts) res.append(" + ").append(part);
 
         return res.toString ();        
     }

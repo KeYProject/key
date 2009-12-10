@@ -229,7 +229,7 @@ public class Monomial {
         final StringBuffer res = new StringBuffer ();
         res.append ( coefficient );
 
-        for (Term part : parts) res.append(" * " + part);
+        for (Term part : parts) res.append(" * ").append(part);
 
         return res.toString ();
     }

@@ -407,11 +407,8 @@ public abstract class ProgramSVSort extends PrimitiveSort {
 	}
 
 	public boolean canStandFor(Term t) {
-	    if (t.op() instanceof ProgramVariable) {
-		return true;
+        return t.op() instanceof ProgramVariable;
 	    }
-	    return false;
-	}
 
 	protected boolean canStandFor(ProgramElement pe,
 				      Services services) {
@@ -1173,11 +1170,9 @@ public abstract class ProgramSVSort extends PrimitiveSort {
 
 	protected boolean canStandFor(ProgramElement pe,
 				      Services services) {
-	    if (pe instanceof VariableDeclaration &&
-		((VariableDeclaration)pe).getVariables().size() > 1) 
-		return true;	    
-	    return false;
-	}	
+        return pe instanceof VariableDeclaration &&
+                ((VariableDeclaration) pe).getVariables().size() > 1;
+	    }
 
     }
 
@@ -1189,15 +1184,12 @@ public abstract class ProgramSVSort extends PrimitiveSort {
 
 	protected boolean canStandFor(ProgramElement pe,
 				      Services services) {
-	    if (pe instanceof VariableDeclaration &&
-		((VariableDeclaration)pe).getVariables().size() == 1 &&
-		((VariableDeclaration)pe).getVariables().
-		get(0).getDimensions() > 0) {
-		return true;
-	    }
-		
-	    return false;
-	}	
+        return pe instanceof VariableDeclaration &&
+                ((VariableDeclaration) pe).getVariables().size() == 1 &&
+                ((VariableDeclaration) pe).getVariables().
+                        get(0).getDimensions() > 0;
+
+    }
 
     }
 
@@ -1437,11 +1429,8 @@ public abstract class ProgramSVSort extends PrimitiveSort {
 	    if (pe instanceof ProgramVariable) {
 		return super.allowed(pe, services);
 	    }
-	    if (pe instanceof ProgramSVProxy) {
- 		return true;
-	    }
-	    return false;
-	}
+        return pe instanceof ProgramSVProxy;
+    }
 
 
 	public boolean canStandFor(Term t) {
@@ -1583,9 +1572,7 @@ public abstract class ProgramSVSort extends PrimitiveSort {
     }
 
     static boolean excludedMethodName(Name name) {
-        if(((MethodNameReferenceSort)JCMAKETRANSIENTARRAY).compareNames(name) >= 0)
-	    return true;
-	return false;
+        return ((MethodNameReferenceSort) JCMAKETRANSIENTARRAY).compareNames(name) >= 0;
     }
 
     static boolean implicit(ProgramElement pe) {

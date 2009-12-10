@@ -79,9 +79,8 @@ public class OperatorSV extends SchemaVariableAdapter {
      * the {@link Term} is valid.
      */
     public boolean validTopLevel(Term term){
-        if (term.arity() != this.arity()) return false;       
-        return true;
-    }   
+        return term.arity() == this.arity();       
+        }
     
     /** returns the arity of this operator */
     public int arity() {

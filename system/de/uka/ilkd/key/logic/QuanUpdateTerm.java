@@ -74,7 +74,7 @@ class QuanUpdateTerm extends Term {
 	    if(quanUpdateVars[i].size() == 1) {
                 qvar = quanUpdateVars[i].get(0);
 		if(qvar instanceof LogicVariable) {
-		  sb.append (qvar.sort()+" "+ qvar.name());
+            sb.append(qvar.sort()).append(" ").append(qvar.name());
 		}else{
                   sb.append (qvar);
 		}
@@ -85,7 +85,7 @@ class QuanUpdateTerm extends Term {
 	          sb.append("(");
 		qvar = quanUpdateVars[i].get(j);
 		if(qvar instanceof LogicVariable) {
-		  sb.append (qvar.sort()+" "+ qvar.name());
+            sb.append(qvar.sort()).append(" ").append(qvar.name());
 		}else{
                   sb.append (qvar);
 		}

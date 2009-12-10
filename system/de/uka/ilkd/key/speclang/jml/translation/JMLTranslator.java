@@ -186,7 +186,6 @@ class JMLTranslator {
                                                null);
         
         ImmutableSet<LocationDescriptor> result;
-        DefaultImmutableSet.<LocationDescriptor>nil();
 
 //      System.out.println("JMLTranslator.translateAssignableExpression("+assignableExpr+") results: ");
 
@@ -212,7 +211,6 @@ class JMLTranslator {
                                                null);
         
         ImmutableList<LogicVariable> result;
-        ImmutableSLList.<LogicVariable>nil();
 
 //      System.out.println("JMLTranslator.translateVariableDeclaration("+variableDecl+") results: ");
 

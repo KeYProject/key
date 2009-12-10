@@ -394,7 +394,7 @@ public class IntersectionSort extends AbstractSort {
                if (s instanceof IntersectionSort && 
                        ((IntersectionSort)s).hasEmptyDomain(sorts)) {
                    continue;
-               } else if (extendsTransAll(s)) {               
+               } else if (extendsTransAll(s)) {
                    emptyDomain = false;
                    break;
                }           
@@ -428,7 +428,7 @@ public class IntersectionSort extends AbstractSort {
     
     // helper
     /**
-     * converts the given array of sorts into a {@link SetOfSort}
+     * converts the given array of sorts into a set
      */
     private static ImmutableSet<Sort> asSet(Sort[] s) {
         ImmutableSet<Sort> set = DefaultImmutableSet.<Sort>nil();

@@ -49,10 +49,7 @@ public class OclCollectionConversion extends TermSymbol {
 	if (term.arity()!=arity()) {
 	    return false;
 	}
-	if (!(term.sub(0).sort() instanceof CollectionSort)) {
-	    return false;
-	}
-        return true;
+        return term.sub(0).sort() instanceof CollectionSort;
     }
     
     public Sort sort(Term[] subTerm) {
