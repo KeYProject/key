@@ -66,7 +66,7 @@ public class NewVarcond {
     }
 
     public Object getSortDefiningObject() {
-	return isDefinedByType() ? (Object) getSort() : (Object)getPeerSchemaVariable();
+	return isDefinedByType() ? getSort() : getPeerSchemaVariable();
     }
 
     public String toString() {

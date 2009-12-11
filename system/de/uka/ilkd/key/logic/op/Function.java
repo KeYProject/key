@@ -133,7 +133,7 @@ public abstract class Function extends TermSymbol {
     }
     
     public String proofToString() {
-       String s = null;
+       String s;
        if (sort() != null) {
 	   s = (sort() == Sort.FORMULA ? "" : sort().toString()) + " ";
 	   s += name();

@@ -126,18 +126,17 @@ public class WrapperConstructor extends Thread {
 	// with the signature of the current method is added to l
 	// Correct constructor is created by CreateMethod(met.getParameters(),
 	// true)
-	final Iterator<ProgramMethod> iter = ji.getAllProgramMethods(
-	        supertypeKey).iterator();
-	while (iter.hasNext()) {
-	    final ProgramMethod met = iter.next();
-	    if (met.getTypeReference() != null) {
-		if (met.getTypeReference().equals(supertype)) {
-		    if (met.getFullName().equals("<init>")) {
-			l.add(createMethod(met.getParameters(), true));
-		    }
-		}
-	    }
-	}
+        for (ProgramMethod programMethod : ji.getAllProgramMethods(
+                supertypeKey)) {
+            final ProgramMethod met = programMethod;
+            if (met.getTypeReference() != null) {
+                if (met.getTypeReference().equals(supertype)) {
+                    if (met.getFullName().equals("<init>")) {
+                        l.add(createMethod(met.getParameters(), true));
+                    }
+                }
+            }
+        }
 
 	// Add the method to test
 	l.add(createMethod(pm.getParameters(), false));

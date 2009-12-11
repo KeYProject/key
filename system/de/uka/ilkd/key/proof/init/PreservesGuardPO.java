@@ -105,37 +105,35 @@ public class PreservesGuardPO extends EnsuresPO {
      */
     private ImmutableSet<LocationDescriptor> filterDependsClause(
                                             ImmutableSet<LocationDescriptor> clause) {
-       Iterator<LocationDescriptor> it = clause.iterator();
-       while(it.hasNext()) {
-           LocationDescriptor loc = it.next();
+        for (LocationDescriptor aClause : clause) {
+            LocationDescriptor loc = aClause;
 
-           if(loc instanceof BasicLocationDescriptor) {
-               Operator op = ((BasicLocationDescriptor) loc).getLocTerm().op();
+            if (loc instanceof BasicLocationDescriptor) {
+                Operator op = ((BasicLocationDescriptor) loc).getLocTerm().op();
 
-               KeYJavaType containingKjt = null;
-               if(op instanceof ProgramVariable) {
-                   containingKjt
-                       = ((ProgramVariable) op).getContainerType();
-               } else if (op instanceof AttributeOp) {
-                   AttributeOp aop = (AttributeOp) op;
-                   if(aop.attribute() instanceof ProgramVariable) {
-                       containingKjt
-                           = ((ProgramVariable) aop.attribute())
-                             .getContainerType();
-                   }
-               }
+                KeYJavaType containingKjt = null;
+                if (op instanceof ProgramVariable) {
+                    containingKjt
+                            = ((ProgramVariable) op).getContainerType();
+                } else if (op instanceof AttributeOp) {
+                    AttributeOp aop = (AttributeOp) op;
+                    if (aop.attribute() instanceof ProgramVariable) {
+                        containingKjt
+                                = ((ProgramVariable) aop.attribute())
+                                .getContainerType();
+                    }
+                }
 
-               if(containingKjt != null) {
-                   Iterator<KeYJavaType> it2 = guard.iterator();
-                   while(it2.hasNext()) {
-                       KeYJavaType guardKjt = it2.next();
-                       if(containingKjt.equals(guardKjt)) {
-                           clause = clause.remove(loc);
-                       }
-                   }
-               }
-           }
-       }
+                if (containingKjt != null) {
+                    for (KeYJavaType aGuard : guard) {
+                        KeYJavaType guardKjt = aGuard;
+                        if (containingKjt.equals(guardKjt)) {
+                            clause = clause.remove(loc);
+                        }
+                    }
+                }
+            }
+        }
 
        return clause;
     }
@@ -155,51 +153,50 @@ public class PreservesGuardPO extends EnsuresPO {
                                           Sort.FORMULA,
                                           new Sort[] {Sort.ANY});
 
-        Iterator<LocationDescriptor> it1 = locs1.iterator();
-        while(it1.hasNext()) {
-            LocationDescriptor loc1 = it1.next();
-            if(!(loc1 instanceof BasicLocationDescriptor)) {
+        for (LocationDescriptor aLocs1 : locs1) {
+            LocationDescriptor loc1 = aLocs1;
+            if (!(loc1 instanceof BasicLocationDescriptor)) {
                 continue;
             }
             BasicLocationDescriptor bloc1 = (BasicLocationDescriptor) loc1;
 
             Term predLoc1Term = TF.createFunctionTerm(pred,
-                                                      bloc1.getLocTerm());
+                    bloc1.getLocTerm());
             Term freeLoc1Term = TF.createJunctorTerm(Op.AND,
-                                                     bloc1.getFormula(),
-                                                     predLoc1Term);
+                    bloc1.getFormula(),
+                    predLoc1Term);
             Term boundLoc1Term
-                = TF.createQuantifierTerm(Op.ALL,
-                                          freeLoc1Term.freeVars().toArray(EMPTY_QV_ARRAY),
-                                          freeLoc1Term);
+                    = TF.createQuantifierTerm(Op.ALL,
+                    freeLoc1Term.freeVars().toArray(EMPTY_QV_ARRAY),
+                    freeLoc1Term);
 
             Iterator<LocationDescriptor> it2 = locs2.iterator();
             boolean found = false;
-            while(it2.hasNext()) {
+            while (it2.hasNext()) {
                 LocationDescriptor loc2 = it2.next();
-                if(!(loc2 instanceof BasicLocationDescriptor)) {
+                if (!(loc2 instanceof BasicLocationDescriptor)) {
                     continue;
                 }
                 BasicLocationDescriptor bloc2 = (BasicLocationDescriptor) loc2;
 
                 Term predLoc2Term = TF.createFunctionTerm(pred,
-                                                          bloc2.getLocTerm());
+                        bloc2.getLocTerm());
                 Term freeLoc2Term = TF.createJunctorTerm(Op.AND,
-                                                         bloc2.getFormula(),
-                                                         predLoc2Term);
+                        bloc2.getFormula(),
+                        predLoc2Term);
                 Term boundLoc2Term
-                    = TF.createQuantifierTerm(Op.ALL,
-                                              freeLoc2Term.freeVars().toArray(EMPTY_QV_ARRAY),
-                                              freeLoc2Term);
+                        = TF.createQuantifierTerm(Op.ALL,
+                        freeLoc2Term.freeVars().toArray(EMPTY_QV_ARRAY),
+                        freeLoc2Term);
 
-                if(boundLoc1Term.equalsModRenaming(boundLoc2Term)) {
+                if (boundLoc1Term.equalsModRenaming(boundLoc2Term)) {
                     locs2 = locs2.remove(loc2);
                     found = true;
                     break;
                 }
             }
 
-            if(!found) {
+            if (!found) {
                 return false;
             }
         }
@@ -264,84 +261,81 @@ public class PreservesGuardPO extends EnsuresPO {
         //get a depends clause
         ImmutableSet<LocationDescriptor> dependsClause
                 = DefaultImmutableSet.<LocationDescriptor>nil();
-        Iterator<ClassInvariant> it = guardedInvs.iterator();
-        while(it.hasNext()) {
-            ClassInvariant inv = it.next();
+        for (ClassInvariant guardedInv : guardedInvs) {
+            ClassInvariant inv = guardedInv;
             dependsClause = dependsClause.union(getDependsClauseForInv(inv));
         }
 
         //create the formula
         encapsulationFormula = TF.createJunctorTerm(Op.TRUE);
-        Iterator<LocationDescriptor> it2 = dependsClause.iterator();
-        while(it2.hasNext()) {
-            LocationDescriptor loc = it2.next();
+        for (LocationDescriptor aDependsClause : dependsClause) {
+            LocationDescriptor loc = aDependsClause;
             Debug.assertTrue(loc instanceof BasicLocationDescriptor);
             BasicLocationDescriptor bloc = (BasicLocationDescriptor) loc;
 
-            if(bloc.getLocTerm().arity() == 0) {
+            if (bloc.getLocTerm().arity() == 0) {
                 continue;
             }
 
             LogicVariable y = new LogicVariable(new Name("y"),
-                                                javaLangObjectSort);
+                    javaLangObjectSort);
             Term yTerm = TF.createVariableTerm(y);
             Term dTerm = bloc.getLocTerm().sub(0);
             Term phiTerm = bloc.getFormula();
 
             //create "Acc(y, d_k') & phi_k"
             Term accTerm = TF.createFunctionTerm(accPred,
-                                                 yTerm,
-                                                 dTerm);
+                    yTerm,
+                    dTerm);
             Term premiseTerm = TF.createJunctorTermAndSimplify(Op.AND,
-                                                               accTerm,
-                                                               phiTerm);
+                    accTerm,
+                    phiTerm);
 
             //create disjunction of "C::Instance(y)" for all guards C
             Term isGuardTerm = TF.createJunctorTerm(Op.FALSE);
-            Iterator<KeYJavaType> it3 = guard.iterator();
-            while(it3.hasNext()) {
-                KeYJavaType guardKJT = it3.next();
+            for (KeYJavaType aGuard : guard) {
+                KeYJavaType guardKJT = aGuard;
                 Term instanceOfTerm = createInstanceOf(guardKJT, yTerm);
                 isGuardTerm
-                    = TF.createJunctorTermAndSimplify(Op.OR,
-                                                      isGuardTerm,
-                                                      instanceOfTerm);
+                        = TF.createJunctorTermAndSimplify(Op.OR,
+                        isGuardTerm,
+                        instanceOfTerm);
             }
 
             //create "phi_k & y = d_k'"
             Term yEqualTerm = TF.createEqualityTerm(yTerm, dTerm);
             Term isWithinTerm = TF.createJunctorTermAndSimplify(Op.AND,
-                                                                phiTerm,
-                                                                yEqualTerm);
+                    phiTerm,
+                    yEqualTerm);
 
             //create implication
             Term impTerm
-                = TF.createJunctorTerm(Op.IMP,
-                                       premiseTerm,
-                                       TF.createJunctorTerm(Op.OR,
-                                                            isWithinTerm,
-                                                            isGuardTerm));
+                    = TF.createJunctorTerm(Op.IMP,
+                    premiseTerm,
+                    TF.createJunctorTerm(Op.OR,
+                            isWithinTerm,
+                            isGuardTerm));
 
             //create quantification
             Term quantifierTerm =
-                CreatedAttributeTermFactory.INSTANCE
-                                           .createCreatedNotNullQuantifierTerm(
-                             services,
-                             Op.ALL,
-                             new LogicVariable[] {y},
-                             impTerm);
+                    CreatedAttributeTermFactory.INSTANCE
+                            .createCreatedNotNullQuantifierTerm(
+                                    services,
+                                    Op.ALL,
+                                    new LogicVariable[]{y},
+                                    impTerm);
             ImmutableSet<QuantifiableVariable> freeVars
                     = bloc.getLocTerm().freeVars();
             quantifierTerm = (freeVars.size() == 0
-                              ? quantifierTerm
-                              : TF.createQuantifierTerm(Op.ALL,
-                                                        freeVars.toArray(EMPTY_QV_ARRAY),
-                                                        quantifierTerm));
+                    ? quantifierTerm
+                    : TF.createQuantifierTerm(Op.ALL,
+                    freeVars.toArray(EMPTY_QV_ARRAY),
+                    quantifierTerm));
 
             encapsulationFormula
                     = TF.createJunctorTermAndSimplify(Op.AND,
-                                                      encapsulationFormula,
-                                                      quantifierTerm);
+                    encapsulationFormula,
+                    quantifierTerm);
         }
     }
 

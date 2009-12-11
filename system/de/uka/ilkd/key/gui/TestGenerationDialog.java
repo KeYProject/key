@@ -83,7 +83,7 @@ public class TestGenerationDialog extends JDialog {
 	this.mediator = mediator;
 	simplifyDataTupleNumber = new JTextField("" + SimplifyModelGenerator.modelLimit, 2);
 	assert(TestGenerator.modelCreationTimeout<Integer.MAX_VALUE);
-	modelGenTimeout = new JTextField(Integer.toString((int)TestGenerator.modelCreationTimeout),7);
+	modelGenTimeout = new JTextField(Integer.toString(TestGenerator.modelCreationTimeout),7);
 	testData = new JTextField(OLDSimplifyMG_GUIInterface.getTestData(),40);
 	iterativeDeepeningStartValue = new JTextField(""+OLDSimplifyMG_GUIInterface.iterativeDeepeningStart,3);
 	layoutMethodSelectionDialog();
@@ -128,7 +128,7 @@ public class TestGenerationDialog extends JDialog {
 	        .setSelected(UnitTestBuilder.requireCompleteExecution);
 	instance.simplifyDataTupleNumber.setText(Integer
 	        .toString(SimplifyModelGenerator.modelLimit));
-	instance.modelGenTimeout.setText(Integer.toString((int)TestGenerator.modelCreationTimeout));
+	instance.modelGenTimeout.setText(Integer.toString(TestGenerator.modelCreationTimeout));
 	instance.testData.setText(OLDSimplifyMG_GUIInterface.getTestData());
 	instance.iterativeDeepeningStartValue.setText(""+OLDSimplifyMG_GUIInterface.iterativeDeepeningStart);
 

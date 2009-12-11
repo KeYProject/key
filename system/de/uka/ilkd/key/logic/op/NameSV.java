@@ -35,9 +35,9 @@ public class NameSV extends SchemaVariableAdapter {
 
         if (o instanceof NameSV) {
             if (toString() != null) {
-                return toString().equals(((NameSV) o).toString());
+                return toString().equals(o.toString());
             } else {
-                return ((NameSV) o).toString() == null;
+                return o.toString() == null;
             }
         } else {
             return false;

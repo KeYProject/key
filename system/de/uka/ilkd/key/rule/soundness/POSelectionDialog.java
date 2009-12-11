@@ -44,10 +44,8 @@ public class POSelectionDialog extends JDialog {
 
     private Object[] createTacletListContents () {
     	Vector res = new Vector ();
-    	Iterator<NoPosTacletApp> it = tacs.iterator ();
-    	
-    	while ( it.hasNext () )
-    	    res.add(it.next ());
+
+        for (NoPosTacletApp tac : tacs) res.add(tac);
     	    
     	Object[] taclets = res.toArray();
 	//  	Arrays.sort(taclets);

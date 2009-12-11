@@ -154,7 +154,7 @@ public class TacletInstantiationsTableModel extends AbstractTableModel {
 
     /** adds an instantiation of a schemavariable */
     public void addInstantiationEntry(int row, Term instantiation) {
-        ((Object[])entries.get(row))[1] = instantiation;
+	((Object[])entries.get(row))[1] = instantiation;
     }
 
     /** return the rule application which is the table models base
@@ -597,7 +597,7 @@ public class TacletInstantiationsTableModel extends AbstractTableModel {
     /** sets the Value of the cell */
     public void setValueAt(Object instantiation, int rowIndex,
                            int columnIndex) {
-        ((Object[])entries.get(rowIndex))[columnIndex] = instantiation;
+	((Object[])entries.get(rowIndex))[columnIndex] = instantiation;
     }
 
     /** get value at the specified row and col

@@ -81,7 +81,7 @@ public abstract class ScaleFeature implements Feature {
         if ( dom0 instanceof TopRuleAppCost ) {
             return firstDomInfty ( f, dom1, img0, img1 );
         } else {
-            if ( img1 instanceof TopRuleAppCost )
+            if ( dom1 instanceof TopRuleAppCost )
                 return firstDomInfty ( f, dom0, img1, img0 );
             else {
                 
@@ -90,7 +90,7 @@ public abstract class ScaleFeature implements Feature {
                     return firstImgInfty ( f, dom0, dom1, img1 );
                 } else {
                     if ( img1 instanceof TopRuleAppCost )
-                        return firstImgInfty ( f, dom1, img0, img1 );
+                        return firstImgInfty ( f, dom1, dom0, img0 );
                     else {
                         return realAffine ( f, dom0, dom1, img0, img1 );
                     }

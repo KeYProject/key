@@ -41,10 +41,10 @@ public class JMLNotationInfo extends NotationInfo {
         tbl.put(Op.TOUT, new Notation.Modality("\\[[", "\\]]", 60, 60));
         Modality modalities[] = { Op.DIATRC, Op.BOXTRC, Op.TOUTTRC, Op.DIATRA,
                 Op.BOXTRA, Op.TOUTTRA, Op.DIASUSP, Op.BOXSUSP, Op.TOUTSUSP };
-        for (int i = 0; i < modalities.length; i++)
+        for (Modality modality : modalities)
             tbl
-                    .put(modalities[i], new Notation.Modality("\\"
-                            + modalities[i].name().toString(), "\\endmodality",
+                    .put(modality, new Notation.Modality("\\"
+                            + modality.name().toString(), "\\endmodality",
                             60, 60));
 
         tbl.put(Op.IF_THEN_ELSE, new Notation.IfThenElse(130, "("));

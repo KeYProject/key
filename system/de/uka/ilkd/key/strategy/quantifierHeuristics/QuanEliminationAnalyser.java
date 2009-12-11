@@ -84,9 +84,8 @@ public class QuanEliminationAnalyser {
     }
     
     private boolean hasDefinitionShape(Term t, boolean ex) {
-        final Iterator<QuantifiableVariable> it = t.freeVars ().iterator ();
-        while ( it.hasNext () ) {
-            if ( isDefinition ( t, it.next (), ex ) ) return true;
+        for (QuantifiableVariable quantifiableVariable : t.freeVars()) {
+            if (isDefinition(t, quantifiableVariable, ex)) return true;
         }
         return false;
     }

@@ -64,11 +64,8 @@ public abstract class OclCollOpBound extends TermSymbol {
 	if (!collSort.getElemSort().extendsTrans(iterVariableSort)) {
 	    return false;
 	}
-	if (!exprSort.extendsTrans(this.expressionSort)) {
-	    return false;
-	}
-        return true;
-    } 
+        return exprSort.extendsTrans(this.expressionSort);
+    }
 
     public void helpSort(Term[] subTerm) {
 	if (subTerm.length != arity()) {

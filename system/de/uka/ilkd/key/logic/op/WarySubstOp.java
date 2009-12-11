@@ -29,7 +29,6 @@ public class WarySubstOp extends SubstOp {
     public Term apply ( Term term ) {
 	QuantifiableVariable v=term.varsBoundHere(1).get(0);
 	WaryClashFreeSubst cfSubst = new WaryClashFreeSubst(v, term.sub(0));
-	Term res = cfSubst.apply(term.sub(1));
-	return res;	
+	return cfSubst.apply(term.sub(1));	
     }    
 }

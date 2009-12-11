@@ -90,10 +90,9 @@ public class TestTacletIndex extends TestCase{
 
 
     private boolean isRuleIn(ImmutableList<? extends TacletApp> l, TacletApp rule) {
-	Iterator<? extends TacletApp> it=l.iterator();
-	while(it.hasNext()) {
-	    if (it.next().taclet()==rule.taclet()) return true;
-	}
+        for (TacletApp aL : l) {
+            if (aL.taclet() == rule.taclet()) return true;
+        }
 	return false;
     }
 

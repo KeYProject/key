@@ -57,9 +57,9 @@ public class SpecialConstructorCall extends ProgramMetaConstruct {
 	return new MethodReference
 	    (constructorReference.getArguments(), 
              NORMALFORM_IDENTIFIER, 
-	     constructorReference instanceof ThisConstructorReference ? 
-	     (ReferencePrefix)new ThisReference() : 
-	     (ReferencePrefix)new SuperReference());	
+	     constructorReference instanceof ThisConstructorReference ?
+                 new ThisReference() :
+                 new SuperReference());
 
     }
 

@@ -179,10 +179,9 @@ public class PosInTerm {
 	while (tker.hasMoreTokens()) 
 	    list = list.prepend(Integer.decode(tker.nextToken()));
 
-	Iterator<Integer> it = list.iterator();
-	while (it.hasNext()) {
-	    result = new PosInTerm(result, it.next().intValue());
-	}
+        for (Integer aList : list) {
+            result = new PosInTerm(result, aList.intValue());
+        }
 
 	return result;       
     }

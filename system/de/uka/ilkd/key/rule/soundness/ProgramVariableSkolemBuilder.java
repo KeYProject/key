@@ -88,10 +88,8 @@ public class ProgramVariableSkolemBuilder
 
     private Namespace toNamespace(HashSet p_usedVariables) {
         final Namespace vars = new Namespace ();
-        
-        final Iterator  it   = p_usedVariables.iterator ();
-        while ( it.hasNext () )
-            vars.add ( (Named)it.next () );
+
+        for (Object p_usedVariable : p_usedVariables) vars.add((Named) p_usedVariable);
 
         return vars;
     }
@@ -135,24 +133,22 @@ public class ProgramVariableSkolemBuilder
 					    SVInstantiations     p_currentSVI,
 					    HashSet              p_usedVars,
 					    ExtList              p_res ) {
-	final Iterator<IProgramVariable> nativeIt =
-	    rpvp.getFreeProgramVariables ().iterator ();
 
-	while ( nativeIt.hasNext () ) {
-	    final IProgramVariable pv = nativeIt.next ();
+        for (IProgramVariable iProgramVariable : rpvp.getFreeProgramVariables()) {
+            final IProgramVariable pv = iProgramVariable;
 
-	    if ( p_usedVars.contains ( pv ) || pv.getKeYJavaType() != p_type )
-		continue;
+            if (p_usedVars.contains(pv) || pv.getKeYJavaType() != p_type)
+                continue;
 
-	    final PVCandidate pvc =
-	        performInstantiation ( p_currentSVI,
-	                               p_svs, 
-				       pv,
-				       ProgramSkolemInstantiation
-				       .OCCURRING_VARIABLE );
+            final PVCandidate pvc =
+                    performInstantiation(p_currentSVI,
+                            p_svs,
+                            pv,
+                            ProgramSkolemInstantiation
+                                    .OCCURRING_VARIABLE);
 
-	    p_res.add ( pvc );
-	}
+            p_res.add(pvc);
+        }
     }
 
 

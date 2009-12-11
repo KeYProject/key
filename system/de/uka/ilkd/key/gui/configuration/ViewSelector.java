@@ -137,11 +137,11 @@ public class ViewSelector extends JDialog {
 		return;
 	    }
 	    char[] upper = str.toCharArray();
-	    for (int i = 0; i < upper.length; i++) {
-		if (upper[i] < '0' || upper[i] > '9') {
-		    return;
-		} 
-	    }
+        for (char anUpper : upper) {
+            if (anUpper < '0' || anUpper > '9') {
+                return;
+            }
+        }
 	    super.insertString(offs, new String(upper), a);
 	}
 	

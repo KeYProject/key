@@ -217,7 +217,7 @@ public class IntersectionSort extends AbstractSort {
                 }
             }
         }
-        return (Sort[])minimized.toArray(new Sort[0]);
+        return (Sort[]) minimized.toArray(new Sort[minimized.size()]);
     }
 
 
@@ -230,11 +230,11 @@ public class IntersectionSort extends AbstractSort {
      */
     private static Sort[] flatten(Sort[] sorts) {
         List result = new LinkedList();
-        for (int i=0; i<sorts.length; i++) {
-            if (!(sorts[i] instanceof IntersectionSort)) { 
-                result.add(sorts[i]);
+        for (Sort sort : sorts) {
+            if (!(sort instanceof IntersectionSort)) {
+                result.add(sort);
             } else {
-                final IntersectionSort sortsIntersect = (IntersectionSort)sorts[i];                                                
+                final IntersectionSort sortsIntersect = (IntersectionSort) sort;
                 result.addAll(Arrays.asList
                         (flatten(sortsIntersect.compositesAsArray())));
             }
@@ -394,7 +394,7 @@ public class IntersectionSort extends AbstractSort {
                if (s instanceof IntersectionSort && 
                        ((IntersectionSort)s).hasEmptyDomain(sorts)) {
                    continue;
-               } else if (extendsTransAll(s)) {               
+               } else if (extendsTransAll(s)) {
                    emptyDomain = false;
                    break;
                }           
@@ -428,12 +428,12 @@ public class IntersectionSort extends AbstractSort {
     
     // helper
     /**
-     * converts the given array of sorts into a {@link SetOfSort}
+     * converts the given array of sorts into a set
      */
     private static ImmutableSet<Sort> asSet(Sort[] s) {
         ImmutableSet<Sort> set = DefaultImmutableSet.<Sort>nil();
-        for (int i = 0; i<s.length;i++) {
-            set = set.add(s[i]);            
+        for (Sort value : s) {
+            set = set.add(value);
         }
         return set;
     }

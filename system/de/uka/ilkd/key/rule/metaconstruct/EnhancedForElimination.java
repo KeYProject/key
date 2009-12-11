@@ -148,7 +148,7 @@ public class EnhancedForElimination extends ProgramMetaConstruct {
         //
         // make local variable decl
         VariableSpecification orgSpec =
-                (VariableSpecification) lvd.getVariableSpecifications().get(0);
+                lvd.getVariableSpecifications().get(0);
         VariableSpecification newSpec =
                 new VariableSpecification(orgSpec.getProgramVariable(),
                         methodCall, orgSpec.getType());

@@ -127,10 +127,9 @@ public class TestHelper {
 
     public String methNames() {
 	String result = "";
-	final Iterator<ProgramMethod> iter = pms.iterator();
-	while (iter.hasNext()) {
-	    result = result.concat(iter.next().toString());
-	}
+        for (ProgramMethod pm : pms) {
+            result = result.concat(pm.toString());
+        }
 	return result;
     }
 

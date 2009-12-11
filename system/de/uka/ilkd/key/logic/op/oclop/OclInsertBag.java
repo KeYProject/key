@@ -64,11 +64,8 @@ public class OclInsertBag extends TermSymbol {
 	if (collSort.getCollectionKind() != CollectionSort.BAG) {
 	    return false;
 	}
-	if (!term.sub(0).sort().extendsTrans(collSort.getElemSort())) {
-	    return false;
-	}
-	
-        return true;
+        return term.sub(0).sort().extendsTrans(collSort.getElemSort());
+
     }
 
     public Sort sort(Term[] subTerm) {

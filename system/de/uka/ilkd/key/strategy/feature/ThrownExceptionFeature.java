@@ -50,9 +50,9 @@ public class ThrownExceptionFeature extends BinaryFeature {
 
         final JavaInfo javaInfo = services.getJavaInfo();
 
-        for (int i = 0; i < p_filteredExceptions.length; i++) {
+        for (String p_filteredException : p_filteredExceptions) {
             final KeYJavaType nullPointer = javaInfo
-                    .getKeYJavaType(p_filteredExceptions[i]);
+                    .getKeYJavaType(p_filteredException);
             if (nullPointer != null) {
                 filtered.add(nullPointer.getSort());
             }
@@ -61,8 +61,8 @@ public class ThrownExceptionFeature extends BinaryFeature {
     }
 
     private boolean blockedExceptions(Sort excType) {
-        for (int i = 0; i < filteredExceptions.length; i++) {
-            if (excType.extendsTrans(filteredExceptions[i])) {
+        for (Sort filteredException : filteredExceptions) {
+            if (excType.extendsTrans(filteredException)) {
                 return true;
             }
         }
@@ -70,9 +70,9 @@ public class ThrownExceptionFeature extends BinaryFeature {
     }
 
     protected boolean filter(RuleApp app, PosInOccurrence pos, Goal goal) {
-        return app instanceof TacletApp ? filter(pos.subTerm(), goal.proof()
+        return app instanceof TacletApp && filter(pos.subTerm(), goal.proof()
                 .getServices(), ((TacletApp) app).instantiations()
-                .getExecutionContext()) : false;
+                .getExecutionContext());
     }
 
     protected boolean filter(Term term, Services services, ExecutionContext ec) {
@@ -103,7 +103,7 @@ public class ThrownExceptionFeature extends BinaryFeature {
         if (jb instanceof ProgramPrefix) {
             final ProgramPrefix pp = ((ProgramPrefix) jb)
                     .getPrefixElementAt(((ProgramPrefix) jb).getPrefixLength() - 1);
-            fstActive = (Statement) PosInProgram.getProgramAt(pp
+            fstActive = PosInProgram.getProgramAt(pp
                     .getFirstActiveChildPos(), pp);
         } else {
             fstActive = jb;

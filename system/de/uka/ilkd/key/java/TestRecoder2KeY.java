@@ -171,9 +171,9 @@ public class TestRecoder2KeY extends TestCase {
      * blanks and line feeds
      */
     public void testJClasses() {
-	for (int i=0; i<jclasses.length; i++) {
-	    testClass(jclasses[i]);
-	}
+        for (String jclass : jclasses) {
+            testClass(jclass);
+        }
     }
 
 
@@ -203,7 +203,7 @@ public class TestRecoder2KeY extends TestCase {
 	    jb = c2k.recoderBlock("{int len; int[] i = new int[] {0,1,2} ;  len = i.length;}",
 				  c2k.createEmptyContext());
 	System.out.println("Read: "+jb);
-	recoder.java.StatementBlock block = (recoder.java.StatementBlock) jb;
+	recoder.java.StatementBlock block = jb;
 	recoder.java.ProgramElement pe = block.getChildAt(2);
 	System.out.println("Look at "+pe);
 	//	de.uka.ilkd.key.java.CopyAssignment ca = ;

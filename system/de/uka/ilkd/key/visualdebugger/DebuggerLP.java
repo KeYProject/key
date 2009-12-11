@@ -113,7 +113,7 @@ public class DebuggerLP extends LogicPrinter {
                     layouter.print(it.toString());
             } else {
                 if (t.op() instanceof SortDependingFunction
-                        && ((SortDependingFunction) t.op()).name().toString()
+                        && t.op().name().toString()
                                 .endsWith("<get>")) {
                     Term sub = t.sub(0);
                     if (sub.arity() > 1)

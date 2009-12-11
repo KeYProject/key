@@ -76,7 +76,7 @@ class JMLTranslator {
     					       excVar,
                                                atPreFunctions);
     	
-    	FormulaWithAxioms result = null;
+    	FormulaWithAxioms result;
     	
 //    	System.out.println("JMLTranslator.translateExpression("+expr+")" + " in " + expr.fileName);
     	
@@ -117,7 +117,7 @@ class JMLTranslator {
                                                excVar,
                                                atPreFunctions);
         
-        FormulaWithAxioms result = null;
+        FormulaWithAxioms result;
         
 //      System.out.println("JMLTranslator.translateSignalsExpression("+signalsExpr+") results: ");
 
@@ -151,7 +151,7 @@ class JMLTranslator {
                                                excVar,
                                                null);
         
-        FormulaWithAxioms result = null;
+        FormulaWithAxioms result;
         
 //          System.out.println("JMLTranslator.translateSignalsOnlyExpression("+signalsOnlyExpr+") results: ");
 
@@ -185,8 +185,8 @@ class JMLTranslator {
                                                null,
                                                null);
         
-        ImmutableSet<LocationDescriptor> result = DefaultImmutableSet.<LocationDescriptor>nil();
-        
+        ImmutableSet<LocationDescriptor> result;
+
 //      System.out.println("JMLTranslator.translateAssignableExpression("+assignableExpr+") results: ");
 
         result = parser.parseAssignable();
@@ -210,8 +210,8 @@ class JMLTranslator {
                                                null,
                                                null);
         
-        ImmutableList<LogicVariable> result = ImmutableSLList.<LogicVariable>nil();
-        
+        ImmutableList<LogicVariable> result;
+
 //      System.out.println("JMLTranslator.translateVariableDeclaration("+variableDecl+") results: ");
 
         result = parser.parseVariableDeclaration();

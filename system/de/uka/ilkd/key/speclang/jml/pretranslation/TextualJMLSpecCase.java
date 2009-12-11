@@ -120,31 +120,31 @@ public class TextualJMLSpecCase extends TextualJMLConstruct {
     public String toString() {
         StringBuffer sb = new StringBuffer();
         Iterator<PositionedString> it;
-        
-        sb.append(behavior + "\n");
+
+        sb.append(behavior).append("\n");
         it = requires.iterator();
         while(it.hasNext()) {
-            sb.append("requires: " + it.next() + "\n");
+            sb.append("requires: ").append(it.next()).append("\n");
         }
         it = assignable.iterator();
         while(it.hasNext()) {
-            sb.append("assignable: " + it.next() + "\n");
+            sb.append("assignable: ").append(it.next()).append("\n");
         }
         it = ensures.iterator();
         while(it.hasNext()) {
-            sb.append("ensures: " + it.next() + "\n");
+            sb.append("ensures: ").append(it.next()).append("\n");
         }
         it = signals.iterator();
         while(it.hasNext()) {
-            sb.append("signals: " + it.next() + "\n");
+            sb.append("signals: ").append(it.next()).append("\n");
         }
         it = signalsOnly.iterator();
         while(it.hasNext()) {
-            sb.append("signals_only: " + it.next() + "\n");
+            sb.append("signals_only: ").append(it.next()).append("\n");
         }
         it = diverges.iterator();
         while(it.hasNext()) {
-            sb.append("diverges: " + it.next() + "\n");
+            sb.append("diverges: ").append(it.next()).append("\n");
         }
         
         return sb.toString();

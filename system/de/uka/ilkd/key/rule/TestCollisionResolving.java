@@ -200,7 +200,7 @@ public class TestCollisionResolving extends TestCase {
     }
     
     public void testVarNamespaceCreationWithPrefix() {
-        TacletApp app = (NoPosTacletApp) TacletForTests.getTaclet
+        TacletApp app = TacletForTests.getTaclet
         ("TestCollisionResolving_ns2");
         TacletApp app1=app.prepareUserInstantiation();
         assertSame(app, app1);
@@ -283,7 +283,7 @@ public class TestCollisionResolving extends TestCase {
 
     public void testNameConflictAfterInput() {
 
-	TacletApp app = (NoPosTacletApp) TacletForTests.getTaclet
+	TacletApp app = TacletForTests.getTaclet
 	    ("TestCollisionResolving_name_conflict2");
 	TacletApp app1=app.prepareUserInstantiation();
 	assertSame(app, app1);

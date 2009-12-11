@@ -118,11 +118,10 @@ public class ReuseListenerImpl implements ReuseListener, KeYSelectionListener {
       Iterator<Node> markerIt = Node.reuseCandidatesIterator();
       while (markerIt.hasNext()) {
          Node marker = markerIt.next();
-            Iterator<Goal> goalIt = medi.getProof().openGoals().iterator();
-//         reuseLogger.info("***********************************************");
-            while (goalIt.hasNext()) {
-               analyzeCandidate(marker, goalIt.next());
-            }
+          //         reuseLogger.info("***********************************************");
+          for (Goal goal : medi.getProof().openGoals()) {
+              analyzeCandidate(marker, goal);
+          }
       }
    }
 
@@ -147,10 +146,9 @@ public class ReuseListenerImpl implements ReuseListener, KeYSelectionListener {
       Iterator<Node> markerIt = Node.reuseCandidatesIterator();
       while (markerIt.hasNext()) {
          Node marker = markerIt.next();
-         Iterator<Goal> goalIt = newGoals.iterator();
-         while (goalIt.hasNext()) {
-            analyzeCandidate(marker, goalIt.next());
-         }
+          for (Goal newGoal : newGoals) {
+              analyzeCandidate(marker, newGoal);
+          }
       }
    }
 
@@ -182,12 +180,10 @@ public class ReuseListenerImpl implements ReuseListener, KeYSelectionListener {
 //            n = n.child(0);
 //         }
          n.markReuseCandidate();
-         Iterator<Goal> goalIt = medi.getProof().openGoals().iterator();
-//         reuseLogger.info("***********************************************");
-         while (goalIt.hasNext()) {
-            Goal g = goalIt.next();
-            analyzeCandidate(n, g);
-         }
+          //         reuseLogger.info("***********************************************");
+          for (final Goal g : medi.getProof().openGoals()) {
+              analyzeCandidate(n, g);
+          }
       }
    }
    

@@ -55,8 +55,8 @@ public abstract class ProofAggregate {
 
     public void setProofEnv(ProofEnvironment env) {
         Proof[] proofs = getProofs();
-        for (int i=0; i<proofs.length; i++) {
-            proofs[i].setProofEnv(env);
+        for (Proof proof : proofs) {
+            proof.setProofEnv(env);
         }
     }
 

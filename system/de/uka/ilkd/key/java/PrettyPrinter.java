@@ -370,7 +370,7 @@ public class PrettyPrinter {
     protected Position getRelativePosition(SourceElement first) {
 	//	System.out.println(indentMap);
 	if (indentMap.containsKey(first)) {
-	    return (Position)indentMap.get(first);
+	    return indentMap.get(first);
 	} else {
 	    if (first!=null) return first.getRelativePosition();
 	    else return Position.UNDEFINED;
@@ -1324,9 +1324,9 @@ public class PrettyPrinter {
 	printHeader(x);
 	Comment[] c = x.getComments();
 	int m = c.length;
-	for (int i = 0; i < c.length; i++) {
-	    printComment(c[i]);
-	}
+        for (Comment aC : c) {
+            printComment(aC);
+        }
 	if (x.getModifiers() != null) {
 	    ImmutableArray<Modifier> mods = x.getModifiers();
 	    m += mods.size();

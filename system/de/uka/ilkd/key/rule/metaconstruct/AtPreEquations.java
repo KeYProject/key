@@ -61,29 +61,28 @@ public class AtPreEquations extends AbstractMetaOperator {
                         /*in*/ Map /*Operator -> Function */atPreFunctions) {
         Term result = TermBuilder.DF.tt();
 
-        Iterator it = atPreFunctions.entrySet().iterator();
-        while(it.hasNext()) {
-            Map.Entry entry = (Map.Entry)(it.next());
-            Operator f1 = (Operator)(entry.getKey());
-            Function f2 = (Function)(entry.getValue());
+        for (Object o : atPreFunctions.entrySet()) {
+            Map.Entry entry = (Map.Entry) (o);
+            Operator f1 = (Operator) (entry.getKey());
+            Function f2 = (Function) (entry.getValue());
 
             int arity = f1.arity();
             assert arity == f2.arity();
             LogicVariable[] args = new LogicVariable[arity];
-            for(int i = 0; i < arity; i++) {
+            for (int i = 0; i < arity; i++) {
                 args[i] = new LogicVariable(new Name("x" + i), f2.argSort(i));
             }
 
             Term[] argTerms = getTerms(new ImmutableArray<QuantifiableVariable>(args));
 
             TermFactory tf = TermBuilder.DF.tf();
-            Term f1Term = tf.createTerm(f1,   argTerms,
-                                        null,
-                                        null);
+            Term f1Term = tf.createTerm(f1, argTerms,
+                    null,
+                    null);
             Term f2Term = TermBuilder.DF.func(f2, argTerms);
             Term equalsTerm = tf.createJunctorTerm(Op.EQUALS, f1Term, f2Term);
             Term quantifTerm;
-            if(arity > 0) {
+            if (arity > 0) {
                 quantifTerm = TermBuilder.DF.all(args, equalsTerm);
             } else {
                 quantifTerm = equalsTerm;

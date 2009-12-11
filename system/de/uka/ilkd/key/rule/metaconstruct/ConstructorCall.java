@@ -114,8 +114,8 @@ public class ConstructorCall extends ProgramMetaConstruct {
 	                        services, ec);    
 	}
 	ProgramMethod method = services.getJavaInfo().
-	  getProgramMethod(classType, NORMALFORM_IDENTIFIER, 
-              (ProgramVariable[])argumentVariables, ec.
+	  getProgramMethod(classType, NORMALFORM_IDENTIFIER,
+              argumentVariables, ec.
               getTypeReference().getKeYJavaType());
 	
 	Debug.assertTrue(method != null, "Call to non-existent constructor.");
@@ -127,7 +127,7 @@ public class ConstructorCall extends ProgramMetaConstruct {
 	final Statement[] stmnts = new Statement[evaluatedArgs.size() + 1];
     
 	for (int i = 0, sz=evaluatedArgs.size(); i<sz; i++) {
-	    stmnts[i] = (Statement)evaluatedArgs.get(i); 
+	    stmnts[i] = evaluatedArgs.get(i);
 	}
 	
 	stmnts[stmnts.length-1] = mbs;

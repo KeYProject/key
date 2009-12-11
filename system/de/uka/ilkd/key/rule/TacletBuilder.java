@@ -195,11 +195,10 @@ public abstract class TacletBuilder {
     /** adds a list of <I>new</I> variables to the variable conditions of
      * the Taclet: v is new for all v's in the given list
      */
-    public void addVarsNew(ImmutableList<NewVarcond> list) {	
-	Iterator<NewVarcond> it = list.iterator();
-	while (it.hasNext()) {
-	    addVarsNew(it.next());
-	}
+    public void addVarsNew(ImmutableList<NewVarcond> list) {
+        for (NewVarcond aList : list) {
+            addVarsNew(aList);
+        }
     }
 
     /** adds a new <I>NotFreeIn</I> variable pair to the variable conditions of

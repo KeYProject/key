@@ -11,9 +11,9 @@ public class DepthFirstGoalChooserBuilder implements GoalChooserBuilder {
  
 	public static final String NAME = "Depth First Goal Chooser";
 	
-	public DepthFirstGoalChooserBuilder(){};
-	
-	public IGoalChooser create() {      
+	public DepthFirstGoalChooserBuilder(){}
+
+    public IGoalChooser create() {
         return new DepthFirstGoalChooser();
     }
     

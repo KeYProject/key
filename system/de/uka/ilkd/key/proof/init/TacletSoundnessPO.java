@@ -127,11 +127,11 @@ implements ProofOblInput{
         for (int i=0; i<app.length; i++) {
             final POBuilder pob = new POBuilder ( app[i], initConfig.getServices() );
             pob.build ();
-            for(Iterator<Goal> it2 = goals.iterator(); it2.hasNext(); ) {
-                it2.next().addTaclet(app[i].taclet(),
-                                     app[i].instantiations(),
-                                     app[i].constraint(),
-                                     false);
+            for (Goal goal : goals) {
+                goal.addTaclet(app[i].taclet(),
+                        app[i].instantiations(),
+                        app[i].constraint(),
+                        false);
             }
 
             updateNamespaces ( pob );
@@ -159,10 +159,7 @@ implements ProofOblInput{
         Namespace funcNs = globalNss.functions ();
 
         {
-            final Iterator<Named> it =
-                p_pob.getFunctions ().allElements ().iterator ();
-            while ( it.hasNext () )
-                funcNs.add ( it.next () );
+            for (Named named : p_pob.getFunctions().allElements()) funcNs.add(named);
         }
 
 //      {
@@ -207,19 +204,16 @@ implements ProofOblInput{
         String result = "";
 
         //includes of taclet file must be copied
-        Iterator it = super.readIncludes().getIncludes().iterator();
-        while(it.hasNext()) {
-            String fileName = (String) it.next();
+        for (String s : super.readIncludes().getIncludes()) {
+            String fileName = s;
             result += "\\include \"" + fileName + "\";\n";
         }
 
         //created SVSkolemFunctions must be declared
         result += "\n\\functions {\n";
-        Iterator<Named> it2
-            = initConfig.namespaces().functions().allElements().iterator();
-        while(it2.hasNext()) {
-            Function f = (Function) it2.next();
-            if(f instanceof SVSkolemFunction) {
+        for (Named named : initConfig.namespaces().functions().allElements()) {
+            Function f = (Function) named;
+            if (f instanceof SVSkolemFunction) {
                 result += f.proofToString();
             }
         }

@@ -217,13 +217,12 @@ public class TestCodeExtractor {
 		        Statement.class);
 		coll.start();
 		final ImmutableList<ProgramElement> l = coll.getNodes();
-		final Iterator<ProgramElement> it = l.iterator();
-		while (it.hasNext()) {
-		    final Statement next = (Statement) it.next();
-		    if (!(next instanceof StatementContainer)) {
-			result.add(next);
-		    }
-		}
+            for (ProgramElement aL : l) {
+                final Statement next = (Statement) aL;
+                if (!(next instanceof StatementContainer)) {
+                    result.add(next);
+                }
+            }
 	    } else {
 		result.add(s);
 	    }
@@ -319,10 +318,9 @@ public class TestCodeExtractor {
     public ImmutableSet<ProgramVariable> getNewProgramVariables() {
 	ImmutableSet<ProgramVariable> result = DefaultImmutableSet
 	        .<ProgramVariable> nil();
-	final Iterator<Named> it = newPVs.allElements().iterator();
-	while (it.hasNext()) {
-	    result = result.add((ProgramVariable) it.next());
-	}
+        for (Named named : newPVs.allElements()) {
+            result = result.add((ProgramVariable) named);
+        }
 	return result;
     }
 

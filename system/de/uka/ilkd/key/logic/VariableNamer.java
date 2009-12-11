@@ -427,14 +427,13 @@ public abstract class VariableNamer implements InstantiationProposer {
                 boolean collision;
                 do {
                     collision = false;
-                    Iterator<String> it = previousProposals.iterator();
-                    while(it.hasNext()) {
-                       String s = it.next();
-                       if(s.equals(result.toString())) {
-                           result = createName(basename, ++cnt, null);
-                           collision = true;
-                           break;
-                       }
+                    for (String previousProposal : previousProposals) {
+                        String s = previousProposal;
+                        if (s.equals(result.toString())) {
+                            result = createName(basename, ++cnt, null);
+                            collision = true;
+                            break;
+                        }
                     }
                 } while(collision);
             }

@@ -80,7 +80,7 @@ public class JMLExport {
             final StringBuffer result = new StringBuffer(translate(pairs
                     .get(0).locationAsTerm())
                     + " == \\old("
-                    + translate((Term) pairs.get(0).value())
+                    + translate(pairs.get(0).value())
                     + ")");
             for (int i = 1; i < pairs.size(); ++i) {
                 result
@@ -88,7 +88,7 @@ public class JMLExport {
                                 + translate(pairs.get(i)
                                         .locationAsTerm())
                                 + " == \\old("
-                                + translate((Term) pairs.get(i)
+                                + translate(pairs.get(i)
                                         .value()) + ")");
             }
             return result.toString();

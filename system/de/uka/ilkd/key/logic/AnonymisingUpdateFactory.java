@@ -248,9 +248,8 @@ public class AnonymisingUpdateFactory {
                 
                 //create quantified update
                 Update quantifiedUpdate = guardedUpdate;
-                Iterator<QuantifiableVariable> it = locTerm.freeVars().iterator();
-                while(it.hasNext()) {
-                    quantifiedUpdate = uf.quantify(it.next(), quantifiedUpdate);
+                for (QuantifiableVariable quantifiableVariable : locTerm.freeVars()) {
+                    quantifiedUpdate = uf.quantify(quantifiableVariable, quantifiedUpdate);
                 }
                 //add update to result update
                 result = uf.parallel(result, quantifiedUpdate);                

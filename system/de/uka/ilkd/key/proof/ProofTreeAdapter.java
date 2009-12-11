@@ -85,5 +85,5 @@ public abstract class ProofTreeAdapter implements ProofTreeListener {
      * this event occurs in order to monitor, e.g. by a dialog, the result
      * of the SMT solver. The data from the SMT solver can be accessed via.
      * {@code Node.getCounterExData()}*/
-    public void smtDataUpdate(ProofTreeEvent e){};
+    public void smtDataUpdate(ProofTreeEvent e){}
 }

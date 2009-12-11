@@ -35,9 +35,8 @@ public class BreakpointManager {
     }
 
     public boolean containsBp(SourceElementId id) {
-        Iterator it = bp.iterator();
-        while (it.hasNext()) {
-            SourceElementId currentId = ((Breakpoint) it.next()).getId();
+        for (Object aBp : bp) {
+            SourceElementId currentId = ((Breakpoint) aBp).getId();
             if (currentId.equals(id))
                 return true;
         }

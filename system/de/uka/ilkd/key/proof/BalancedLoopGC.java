@@ -66,9 +66,8 @@ public class BalancedLoopGC extends DefaultGoalChooser {
     }
 
     protected boolean ruleSetCriterion(Taclet t, String ruleSetName){
-        Iterator<RuleSet> it = t.getRuleSets().iterator();
-        while(it.hasNext()){
-            if(it.next().name().toString().equals(ruleSetName)){
+        for (RuleSet ruleSet : t.getRuleSets()) {
+            if (ruleSet.name().toString().equals(ruleSetName)) {
                 return true;
             }
         }

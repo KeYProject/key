@@ -65,7 +65,7 @@ class VariableSV extends SortedSchemaVariable {
         	getInstantiation(this);
         if (foundMapping == null) {            		
             return addInstantiation(subst, mc, services);
-        } else if (((QuantifiableVariable)foundMapping.op()) != subst.op()) {
+        } else if (foundMapping.op() != subst.op()) {
             return null; //FAILED;			    
         } 
         return mc;

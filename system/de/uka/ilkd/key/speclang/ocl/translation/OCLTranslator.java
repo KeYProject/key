@@ -115,10 +115,9 @@ class OCLTranslator {
 	Namespace extendedProgVars
 		= originalProgVars.copy();
 	extendedProgVars.add(selfVar);
-	Iterator<ParsableVariable> it = paramVars.iterator();
-	while(it.hasNext()) {
-	    extendedProgVars.add(it.next());
-	}
+        for (ParsableVariable paramVar : paramVars) {
+            extendedProgVars.add(paramVar);
+        }
 	services.getNamespaces().setProgramVariables(extendedProgVars);
 	
 	//create parser

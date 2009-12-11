@@ -161,12 +161,11 @@ public class MetaEquivalentUpdates extends AbstractMetaOperator {
         		// System.out.println("Locations:" + updatedLocs);
         
                 Term res = tb.tt ();
-                
-                final Iterator<Term> termIt = updatedLocTerms.iterator ();
-                while ( termIt.hasNext () ) {
-                    res = tb.and ( res, eqUpdWithRespectToTerm ( upd1, upd2,
-                                                                 termIt.next () ) );
-                }
+
+        for (Term updatedLocTerm : updatedLocTerms) {
+            res = tb.and(res, eqUpdWithRespectToTerm(upd1, upd2,
+                    updatedLocTerm));
+        }
         
 		return res;
 	}

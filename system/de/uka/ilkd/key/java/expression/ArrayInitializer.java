@@ -140,7 +140,7 @@ public class ArrayInitializer
     public KeYJavaType getKeYJavaType(Services javaServ, ExecutionContext ec) {
 	Expression i = this;
 	int n = 0;
-	Sort s=null;
+	Sort s;
 	for(;i instanceof ArrayInitializer && ((ArrayInitializer)i).getChildCount()!=0 ;
 	    i=((ArrayInitializer)i).getExpressionAt(0)){
 	    n++;

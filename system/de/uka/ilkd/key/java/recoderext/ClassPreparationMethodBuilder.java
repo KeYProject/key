@@ -118,23 +118,22 @@ public class ClassPreparationMethodBuilder
 
 	List<FieldSpecification> fields = typeDeclaration.getFieldsInScope();
 
-	for (int i = 0; i < fields.size(); i++) {
-	    FieldSpecification spec = fields.get(i);
-	    if (spec.isStatic() && !isConstantField(spec)) {
-		Identifier ident = spec.getIdentifier();
-		if (ident instanceof ImplicitIdentifier) {	    
-		    result.add(new CopyAssignment
-		            (new PassiveExpression
-		                    (new FieldReference(ident.deepClone())), 
-		                            getDefaultValue(spec.getType())));		    
-		} else {
-		   result.add(new CopyAssignment
-			(new PassiveExpression
-			 (new FieldReference(ident.deepClone())), 
-			 getDefaultValue(spec.getType())));
-		}
-	    }
-	}
+        for (FieldSpecification spec : fields) {
+            if (spec.isStatic() && !isConstantField(spec)) {
+                Identifier ident = spec.getIdentifier();
+                if (ident instanceof ImplicitIdentifier) {
+                    result.add(new CopyAssignment
+                            (new PassiveExpression
+                                    (new FieldReference(ident.deepClone())),
+                                    getDefaultValue(spec.getType())));
+                } else {
+                    result.add(new CopyAssignment
+                            (new PassiveExpression
+                                    (new FieldReference(ident.deepClone())),
+                                    getDefaultValue(spec.getType())));
+                }
+            }
+        }
 
 	result.add
 	    (new CopyAssignment

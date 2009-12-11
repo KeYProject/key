@@ -333,10 +333,9 @@ public class POBrowser extends JDialog {
 	    				    JavaInfo javaInfo) {
 	//collect supertypes
 	ImmutableSet<KeYJavaType> superKJTs = DefaultImmutableSet.<KeYJavaType>nil();
-	Iterator<KeYJavaType> it = javaInfo.getAllSupertypes(subKJT).iterator();
-	while(it.hasNext()) {
-	    superKJTs = superKJTs.add(it.next());
-	}
+        for (KeYJavaType keYJavaType : javaInfo.getAllSupertypes(subKJT)) {
+            superKJTs = superKJTs.add(keYJavaType);
+        }
 	
 	//ask user
         ClassSelectionDialog dlg = new ClassSelectionDialog(
@@ -515,9 +514,8 @@ public class POBrowser extends JDialog {
         if(dlg.wasSuccessful()) {
             //let the user select the guard classes
             ImmutableSet<KeYJavaType> allKJTs = DefaultImmutableSet.<KeYJavaType>nil();
-            final Iterator<KeYJavaType> it = javaInfo.getAllKeYJavaTypes().iterator();
-            while(it.hasNext()) {
-        	allKJTs = allKJTs.add(it.next());
+            for (KeYJavaType keYJavaType : javaInfo.getAllKeYJavaTypes()) {
+                allKJTs = allKJTs.add(keYJavaType);
             }
             ClassSelectionDialog dlg2
                     = new ClassSelectionDialog("Please select the guard",

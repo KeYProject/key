@@ -56,8 +56,8 @@ public class InnerVariableNamer extends VariableNamer {
         if (proposals == null) return;
         String[] props = proposals.toString().split(",|;");
 
-        for (int i = 0; i < props.length; i++) {
-            oldProgVarProposals = oldProgVarProposals.append(new Name(props[i]));
+        for (String prop : props) {
+            oldProgVarProposals = oldProgVarProposals.append(new Name(prop));
         }
 
     }

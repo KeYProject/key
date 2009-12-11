@@ -145,20 +145,19 @@ public class PrepareObjectBuilder
 	    return new ASTArrayList<Statement>(0);
 	} 
 	ASTList<Statement> result = new ASTArrayList<Statement>(fields.size());
-	for (int i = 0; i<fields.size(); i++) {
-	    Field field = fields.get(i);
-	    if (!field.isStatic()) {		
-		Identifier fieldId;
-		if (field.getName().charAt(0) != '<') {
-		    fieldId = new Identifier(field.getName());
-		    result.add
-			(assign((attribute(new ThisReference(), fieldId)),
-				getDefaultValue
-				(services.
-				 getCrossReferenceSourceInfo().getType(field))));
-		}
-	    }
-	}
+        for (Field field : fields) {
+            if (!field.isStatic()) {
+                Identifier fieldId;
+                if (field.getName().charAt(0) != '<') {
+                    fieldId = new Identifier(field.getName());
+                    result.add
+                            (assign((attribute(new ThisReference(), fieldId)),
+                                    getDefaultValue
+                                            (services.
+                                                    getCrossReferenceSourceInfo().getType(field))));
+                }
+            }
+        }
 	
 	return result;
     }

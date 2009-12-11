@@ -128,9 +128,8 @@ public class NonInterferencePO implements ProofOblInput {
 
         Goal firstGoal = p.openGoals().head();
         ImmutableList<Goal> newGoals = firstGoal.split(conditions.size());
-        Iterator<Goal> it = newGoals.iterator();
-        while (it.hasNext()) {
-            Goal g = it.next();
+        for (Goal newGoal : newGoals) {
+            Goal g = newGoal;
             ConditionContainer cc = (ConditionContainer) conditions.getFirst();
             g.addFormula(cc.getFormula(), false, false);
             g.setBranchLabel(cc.getLabel());
@@ -226,10 +225,9 @@ where p2' is the first assignment statement of p2.
         Term result = null;
 
         Term gamma = TermFactory.DEFAULT.createJunctorTerm(Op.TRUE);
-        for(Iterator<ConstrainedFormula> icf = s.antecedent().iterator();
-            icf.hasNext();) {
+        for (ConstrainedFormula constrainedFormula : (Iterable<ConstrainedFormula>) s.antecedent()) {
             gamma = TermFactory.DEFAULT.createJunctorTerm(Op.AND, gamma,
-                                        icf.next().formula());
+                    constrainedFormula.formula());
         }
 
         if (progTerm.op() instanceof IUpdateOperator) {
@@ -309,13 +307,12 @@ System.err.println(nr++);
     private Vector instantiate(ImmutableList<SchemaVariable> vlist, TacletApp tapp) {
 //System.err.print(vlist+"->");
         Vector result = new Vector(5);
-	Iterator<SchemaVariable> vit =  vlist.iterator();
-	while (vit.hasNext()) {
-            Object inst = tapp.instantiations().getInstantiation(vit.next());
-	    if (inst instanceof Literal) continue;
+        for (SchemaVariable aVlist : vlist) {
+            Object inst = tapp.instantiations().getInstantiation(aVlist);
+            if (inst instanceof Literal) continue;
             if (inst instanceof ProgramVariable) continue;
             if ((inst instanceof FieldReference) &&
-                (((FieldReference)inst).getProgramVariable().isImplicit())) continue;
+                    (((FieldReference) inst).getProgramVariable().isImplicit())) continue;
             result.add(inst);
         }
 //System.err.println(result);

@@ -215,11 +215,11 @@ public class ApplyTacletDialogModel {
     
     
     private void informListenerAboutModelChange() {
-	for (int i = 0; i < listeners.size(); i++) {
-	    if (listeners.get(i) != null) {
-		((ModelChangeListener)listeners.get(i)).modelChanged(changeEvent);
-	    }
-	}
+        for (Object listener : listeners) {
+            if (listener != null) {
+                ((ModelChangeListener) listener).modelChanged(changeEvent);
+            }
+        }
     }
 
     /** sets the manual if-input */

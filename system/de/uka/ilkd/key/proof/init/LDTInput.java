@@ -62,26 +62,26 @@ public class LDTInput implements EnvInput {
 
     public int getNumberOfChars() {
 	int sum=0;
-	for (int i=0; i<keyFiles.length; i++) {
-	    sum=sum+keyFiles[i].getNumberOfChars();
-	}
+        for (KeYFile keyFile : keyFiles) {
+            sum = sum + keyFile.getNumberOfChars();
+        }
 	return sum;
     }
 
 
     public void setInitConfig(InitConfig conf) {
 	this.initConfig=conf;
-	for(int i = 0; i < keyFiles.length; i++) {
-	    keyFiles[i].setInitConfig(conf);
-	}
+        for (KeYFile keyFile : keyFiles) {
+            keyFile.setInitConfig(conf);
+        }
     }
 
 
     public Includes readIncludes() throws ProofInputException {
 	Includes result = new Includes();
-	for(int i = 0; i < keyFiles.length; i++) {
-	    result.putAll(keyFiles[i].readIncludes());
-	}
+        for (KeYFile keyFile : keyFiles) {
+            result.putAll(keyFile.readIncludes());
+        }
 	return result;
     }
 
@@ -116,26 +116,25 @@ public class LDTInput implements EnvInput {
 	if (initConfig==null) {
 	    throw new IllegalStateException("LDTInput: InitConfig not set.");
 	}
-	for (int i=0; i<keyFiles.length; i++) {
-	    keyFiles[i].readSorts(mod);
-	}
-	for (int i=0; i<keyFiles.length; i++) {
-	    keyFiles[i].readFuncAndPred(mod);
-	}
-	for (int i=0; i<keyFiles.length; i++) {
-	    if (main != null) {
-		main.setStatusLine("Reading "+keyFiles[i].name(),
-				   keyFiles[i].getNumberOfChars());
-	    }
-	    keyFiles[i].readRulesAndProblem(mod);
-	}
+        for (KeYFile keyFile2 : keyFiles) {
+            keyFile2.readSorts(mod);
+        }
+        for (KeYFile keyFile1 : keyFiles) {
+            keyFile1.readFuncAndPred(mod);
+        }
+        for (KeYFile keyFile : keyFiles) {
+            if (main != null) {
+                main.setStatusLine("Reading " + keyFile.name(),
+                        keyFile.getNumberOfChars());
+            }
+            keyFile.readRulesAndProblem(mod);
+        }
 
 	//create LDTs
         Namespace sorts     = initConfig.sortNS();
         Namespace functions = new Namespace(initConfig.funcNS());
-        Iterator<Named> it = initConfig.choiceNS().allElements().iterator();
-        while(it.hasNext()) {
-            Choice c = (Choice) it.next();
+        for (Named named : initConfig.choiceNS().allElements()) {
+            Choice c = (Choice) named;
             functions.add(c.funcNS());
         }
         ImmutableList<LDT> ldts = ImmutableSLList.<LDT>nil()
@@ -163,16 +162,16 @@ public class LDTInput implements EnvInput {
 	    return false;
 	}
 
-        for(int i = 0; i < keyFiles.length; i++) {
+        for (KeYFile keyFile : keyFiles) {
             boolean found = false;
-            for(int j = 0; j < keyFiles.length; j++) {
-        	if(li.keyFiles[j].equals(keyFiles[i])) {
-        	    found = true;
-        	    break;
-        	}
+            for (int j = 0; j < keyFiles.length; j++) {
+                if (li.keyFiles[j].equals(keyFile)) {
+                    found = true;
+                    break;
+                }
             }
-            if(!found) {
-        	return false;
+            if (!found) {
+                return false;
             }
         }
 
@@ -182,9 +181,9 @@ public class LDTInput implements EnvInput {
 
     public int hashCode() {
 	int result = 0;
-	for(int i = 0; i < keyFiles.length; i++) {
-	    result += keyFiles[i].hashCode();
-	}
+        for (KeYFile keyFile : keyFiles) {
+            result += keyFile.hashCode();
+        }
 	return result;
     }
 

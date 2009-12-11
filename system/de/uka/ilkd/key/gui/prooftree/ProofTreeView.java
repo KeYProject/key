@@ -565,7 +565,7 @@ public class ProofTreeView extends JPanel {
 		((GUIAbstractTreeNode)e.getNewLeadSelectionPath().
 		 getLastPathComponent());
 	    if (treeNode instanceof GUIProofTreeNode) {		
-		Node node = ((GUIProofTreeNode)treeNode).getNode();
+		Node node = treeNode.getNode();
 		Goal selected = proof.getGoal(node);
 		if (selected != null) {
 		    mediator.goalChosen(selected);
@@ -576,7 +576,7 @@ public class ProofTreeView extends JPanel {
                 selectBranchNode((GUIBranchNode)treeNode);
             }
 	    // catching NullPointerException occurring when renaming root node
-	    if (treeNode instanceof GUIBranchNode && ((GUIBranchNode)treeNode)
+	    if (treeNode instanceof GUIBranchNode && treeNode
 			.getNode().parent() != null) {
 		delegateView.setEditable(true);
 	    } else {
@@ -1007,8 +1007,7 @@ public class ProofTreeView extends JPanel {
 	     */
             @Override
             public Iterable<Goal> getGoalList() {
-                ImmutableList<Goal> goals = proof.getSubtreeGoals(invokedNode);
-                return goals;
+                return proof.getSubtreeGoals(invokedNode);
             }
 
             /* 
@@ -1018,7 +1017,7 @@ public class ProofTreeView extends JPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 super.actionPerformed(e);
-                for (Goal goal : getGoalList()) {
+                for (final Goal goal : getGoalList()) {
                     delegateModel.updateTree(goal.node());
                 }
                 // trigger repainting the tree after the completion of this event.

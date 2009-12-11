@@ -363,7 +363,7 @@ public class SimplifyTranslation {
     private Term findDivITerm(Term t) {
 	if ((t.op().equals(integerLDT.getDiv()))) {
 	    return t;
-	} else if (!(t.op().name().toString().equals(
+	} else if (!(t.op().name().equals(
 		AbstractIntegerLDT.NUMBERS_NAME) || t.arity() == 0)) {
 	    Term res;
 	    for (int i = 0; i < t.arity(); i++) {
@@ -403,7 +403,7 @@ public class SimplifyTranslation {
 
     private Term replaceTerm(Term term, Term divTerm, Term newVar) {
 	if (term.arity() == 0
-		|| term.op().name().toString().equals(
+		|| term.op().name().equals(
 			AbstractIntegerLDT.NUMBERS_NAME)) {
 	    return term;
 	} else if (term.equals(divTerm)) {
@@ -727,14 +727,14 @@ public class SimplifyTranslation {
     private String produceClosure(StringBuffer s) {
 	StringBuffer tmp = new StringBuffer("(");
 	tmp.append(ALL).append(" (");
-	for (Iterator<Metavariable> i = usedGlobalMv.iterator(); i.hasNext();) {
-	    tmp.append(' ').append(getUniqueVariableName(i.next()));
-	}
+        for (Metavariable anUsedGlobalMv : usedGlobalMv) {
+            tmp.append(' ').append(getUniqueVariableName(anUsedGlobalMv));
+        }
 	tmp.append(")");
 	tmp.append("(").append(EX).append(" (");
-	for (Iterator<Metavariable> i = usedLocalMv.iterator(); i.hasNext();) {
-	    tmp.append(' ').append(getUniqueVariableName(i.next()));
-	}
+        for (Metavariable anUsedLocalMv : usedLocalMv) {
+            tmp.append(' ').append(getUniqueVariableName(anUsedLocalMv));
+        }
 	tmp.append(")\n ");
 	tmp.append(s);
 	tmp.append("\n))");

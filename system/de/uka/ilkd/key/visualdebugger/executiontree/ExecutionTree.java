@@ -170,8 +170,8 @@ public class ExecutionTree implements AutoModeListener {
         }
 
         ITNode[] childs = n.getChildren();
-        for (int i = 0; i < childs.length; i++) {
-            buildETree(childs[i], bc, branch, newExc);
+        for (ITNode child : childs) {
+            buildETree(child, bc, branch, newExc);
         }
 
     }
@@ -281,8 +281,8 @@ public class ExecutionTree implements AutoModeListener {
         }
 
         ETNode[] childs = n.getChildren();
-        for (int i = 0; i < childs.length; i++) {
-            buildSLETWithoutExpr(childs[i], branch, newBC);
+        for (ETNode child : childs) {
+            buildSLETWithoutExpr(child, branch, newBC);
         }
 
     }
@@ -364,9 +364,7 @@ public class ExecutionTree implements AutoModeListener {
 
     public boolean exceptionThrown(Node n) {
         final Sequent s = n.sequent();
-        for (Iterator<ConstrainedFormula> it = s.succedent().iterator(); it
-                .hasNext();) {
-            ConstrainedFormula cfm = it.next();
+        for (ConstrainedFormula cfm : (Iterable<ConstrainedFormula>) s.succedent()) {
             if (vd.modalityTopLevel(new PosInOccurrence(cfm,
                     PosInTerm.TOP_LEVEL, false)) != null)
                 return false;
@@ -377,9 +375,7 @@ public class ExecutionTree implements AutoModeListener {
 
     public boolean executionTerminatedNormal(Node n) {
         final Sequent s = n.sequent();
-        for (Iterator<ConstrainedFormula> it = s.succedent().iterator(); it
-                .hasNext();) {
-            ConstrainedFormula cfm = it.next();
+        for (ConstrainedFormula cfm : (Iterable<ConstrainedFormula>) s.succedent()) {
             final Term f = cfm.formula();
             if (f.op() instanceof QuanUpdateOperator) {
                 final Term subOp = ((QuanUpdateOperator) f.op()).target(f);
@@ -441,8 +437,7 @@ public class ExecutionTree implements AutoModeListener {
         ETNode[] childs = n.getChildren();
         LinkedList newChilds = new LinkedList();
 
-        for (int i = 0; i < childs.length; i++) {
-            ETNode child = childs[i];
+        for (ETNode child : childs) {
             if (child instanceof ETLeafNode
                     && ((ETLeafNode) child).getState() == ETLeafNode.INFEASIBLE) {
                 // System.out.println("asfasfasgag");
@@ -460,14 +455,12 @@ public class ExecutionTree implements AutoModeListener {
         ImmutableList<Goal> goals = mediator.getProof().getSubtreeGoals(
                 mediator.getProof().root());
 
-        Iterator<Goal> it = goals.iterator();
-        while (it.hasNext()) {
-            Goal g = it.next();
+        for (Goal goal : goals) {
+            Goal g = goal;
             Semisequent s = g.node().sequent().succedent();
-            Iterator<ConstrainedFormula> cfmIt = s.iterator();
 
-            while (cfmIt.hasNext()) {
-                ConstrainedFormula cfm = (ConstrainedFormula) cfmIt.next();
+            for (Object value : s) {
+                ConstrainedFormula cfm = (ConstrainedFormula) (ConstrainedFormula) value;
 
                 PosInOccurrence pio = new PosInOccurrence(cfm,
                         PosInTerm.TOP_LEVEL, false);
@@ -589,8 +582,8 @@ public class ExecutionTree implements AutoModeListener {
 
         LinkedList mergedChilds = new LinkedList();
 
-        for (int i = 0; i < childs.length; i++) {
-            mergedChilds.add(mergeTree(childs[i], newNode));
+        for (ETNode child : childs) {
+            mergedChilds.add(mergeTree(child, newNode));
         }
 
         newNode.setChildren(mergedChilds);
@@ -672,9 +665,8 @@ public class ExecutionTree implements AutoModeListener {
                 return false;
 
             if (tapp.ifFormulaInstantiations() != null)
-                for (Iterator<IfFormulaInstantiation> it = tapp
-                        .ifFormulaInstantiations().iterator(); it.hasNext();) {
-                    final IfFormulaInstantiation next = it.next();
+                for (final IfFormulaInstantiation next : tapp
+                        .ifFormulaInstantiations()) {
                     if (next instanceof IfFormulaInstSeq) {
                         IfFormulaInstSeq i = (IfFormulaInstSeq) next;
                         PosInOccurrence pio = new PosInOccurrence(i
@@ -699,14 +691,14 @@ public class ExecutionTree implements AutoModeListener {
     private void simplifyBC(ETNode n) {
         ETNode[] children = n.getChildren();
         if (children.length > 1)
-            for (int i = 0; i < children.length; i++) {
-                children[i].computeSimplifiedBC();
+            for (ETNode aChildren : children) {
+                aChildren.computeSimplifiedBC();
             }
 
         n.removeRedundandITNodes();
 
-        for (int i = 0; i < children.length; i++) {
-            simplifyBC(children[i]);
+        for (ETNode aChildren : children) {
+            simplifyBC(aChildren);
         }
     }
 

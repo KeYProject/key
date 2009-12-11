@@ -228,10 +228,8 @@ public class Monomial {
     public String toString() {
         final StringBuffer res = new StringBuffer ();
         res.append ( coefficient );
-        
-        final Iterator<Term> it = parts.iterator ();
-        while ( it.hasNext () )
-            res.append ( " * " + it.next () );
+
+        for (Term part : parts) res.append(" * ").append(part);
 
         return res.toString ();
     }
@@ -279,9 +277,7 @@ public class Monomial {
     
     public int hashCode() {
         int res = coefficient.hashCode ();
-        final Iterator<Term> it = parts.iterator ();
-        while ( it.hasNext () )
-            res += it.next ().hashCode ();
+        for (Term part : parts) res += part.hashCode();
         return res;
     }
     

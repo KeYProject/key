@@ -41,12 +41,10 @@ public abstract class AbstractConstraintStrengthenFeature extends
         
         final ImmutableList<IfFormulaInstantiation> insts = app.ifFormulaInstantiations ();
         if ( insts == null ) return c;
-        
-        final Iterator<IfFormulaInstantiation> it = insts.iterator ();
-        //      TODO: c will be unsatifiable if intersection sorts are required 
+
+        //      TODO: c will be unsatifiable if intersection sorts are required
         // (is this intended)? or rather new Namespace() 
-        while ( it.hasNext () )
-            c = c.join ( it.next ().getConstrainedFormula ().constraint (), services );
+        for (IfFormulaInstantiation inst : insts) c = c.join(inst.getConstrainedFormula().constraint(), services);
         return c;
     }
     

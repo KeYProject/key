@@ -279,9 +279,7 @@ public class ProblemLoader implements Runnable {
                } finally {
                     if (constraints.size() > 0) {
                         Term left, right;
-                        for (Iterator<PairOfString> it = constraints.iterator(); it
-                                .hasNext();) {
-                            PairOfString p = it.next();
+                        for (PairOfString p : constraints) {
                             left = parseTerm(p.left, proof);
                             right = parseTerm(p.right, proof);
 
@@ -456,8 +454,8 @@ public class ProblemLoader implements Runnable {
         case 'w' : //newnames
             final String[] newNames = s.split(",");
             ImmutableList<Name> l = ImmutableSLList.<Name>nil();
-            for (int in = 0; in < newNames.length; in++) {
-                l = l.append(new Name(newNames[in]));
+            for (String newName : newNames) {
+                l = l.append(new Name(newName));
             }
             proof.getServices().getNameRecorder().setProposals(l);
             break;
@@ -781,9 +779,8 @@ public class ProblemLoader implements Runnable {
 
 
     private SchemaVariable lookupName(ImmutableSet<SchemaVariable> set, String name) {
-        Iterator<SchemaVariable> it = set.iterator();
-        while (it.hasNext()) {
-            SchemaVariable v = it.next();
+        for (SchemaVariable aSet : set) {
+            SchemaVariable v = aSet;
             if (v.name().toString().equals(name)) return v;
         }
         return null; // handle this better!

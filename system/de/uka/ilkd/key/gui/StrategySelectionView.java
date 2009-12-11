@@ -957,24 +957,18 @@ thing. People were thinking it was a button.
     private void enableAll(boolean enable) {             
         maxSlider.setEnabled(enable);     
         timeoutSpinner.setEnabled(enable);
-        if (mediator != null) {                   
-            final Iterator<StrategyFactory> supportedStrategies = 
-               mediator.getProfile().supportedStrategies().iterator();
-            while (supportedStrategies.hasNext()) {                  
-                final StrategyFactory next = supportedStrategies.next();              
-                getStrategyButton(next.name().toString()).setEnabled(enable);               
+        if (mediator != null) {
+            for (StrategyFactory next : mediator.getProfile().supportedStrategies()) {
+                getStrategyButton(next.name().toString()).setEnabled(enable);
             }
         }
     }
 
     public Strategy getStrategy(String strategyName, Proof proof,
             StrategyProperties properties) {
-        if (mediator != null) {        
-            final Iterator<StrategyFactory> supportedStrategies = 
-               mediator.getProfile().supportedStrategies().iterator();
-            while (supportedStrategies.hasNext()) {                
-                final StrategyFactory s = supportedStrategies.next();
-                if (strategyName.equals(s.name().toString())) {                    
+        if (mediator != null) {
+            for (StrategyFactory s : mediator.getProfile().supportedStrategies()) {
+                if (strategyName.equals(s.name().toString())) {
                     return s.create(proof, properties);
                 }
             }

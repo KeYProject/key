@@ -255,9 +255,8 @@ public abstract class SLResolverManager {
      * localVariableNamespace
      */
     public boolean needVarDeclaration(String name2BeResolved) {
-        Iterator<SLExpressionResolver> it = resolvers.iterator();
-        while(it.hasNext()) {
-            if (it.next().needVarDeclaration(name2BeResolved)) {
+        for (SLExpressionResolver resolver : resolvers) {
+            if (resolver.needVarDeclaration(name2BeResolved)) {
                 return true;
             }
         }

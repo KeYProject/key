@@ -526,10 +526,10 @@ public class SmtLibTranslator extends AbstractSMTTranslator {
 	} else {
 	    toReturn.append("(");
 	    toReturn.append(name);
-	    for (int i = 0; i < args.size(); i++) {
-		toReturn.append(" ");
-		toReturn.append(args.get(i));
-	    }
+        for (StringBuffer arg : args) {
+            toReturn.append(" ");
+            toReturn.append(arg);
+        }
 	    toReturn.append(")");
 	}
 	return toReturn;

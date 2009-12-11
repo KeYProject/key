@@ -296,17 +296,16 @@ public class ConstructorNormalformBuilder
 	
 	if (!(cons instanceof ConstructorDeclaration)) {
 	    mods.add(new Public());
-	    parameters = new ASTArrayList<ParameterDeclaration>(0+j);
+	    parameters = new ASTArrayList<ParameterDeclaration>(j);
 	    recThrows = null;
 	    body =  new StatementBlock();    
 	} else {
 	    ConstructorDeclaration consDecl = (ConstructorDeclaration)cons;
-	    mods = (ASTList<DeclarationSpecifier>)
-		(consDecl.getDeclarationSpecifiers()==null ? null : consDecl.getDeclarationSpecifiers().deepClone());	    
+	    mods = consDecl.getDeclarationSpecifiers()==null ? null : consDecl.getDeclarationSpecifiers().deepClone();
 	    parameters = 
 		(ASTList<ParameterDeclaration>)consDecl.getParameters().deepClone();
-	    recThrows = (Throws) (consDecl.getThrown() == null ? null : 
-				  consDecl.getThrown().deepClone());
+	    recThrows = consDecl.getThrown() == null ? null :
+				  consDecl.getThrown().deepClone();
             
 	    StatementBlock origBody = consDecl.getBody();
             if(origBody == null) // may happen if a stub is defined with an empty constructor
@@ -442,11 +441,11 @@ public class ConstructorNormalformBuilder
 	        anonConstr = attachConstructorDecl(td);
 	    }
 	    if(anonConstr!=null) constructors.add(anonConstr);
-	    for (int i = 0; i < constructors.size(); i++) {
-		attach(normalform
-		       ((ClassDeclaration)td, 
-			constructors.get(i)), td, 0);
-	    }
+        for (Constructor constructor : constructors) {
+            attach(normalform
+                    ((ClassDeclaration) td,
+                            constructor), td, 0);
+        }
 
 	    ASTList<MethodDeclaration> mdl = class2methodDeclaration.get(td);
 	    for (int i = 0; i < mdl.size(); i++) {

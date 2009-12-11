@@ -51,6 +51,9 @@ public class Model {
 	}
     }
 
+    /**Warning: this method does not set a value to the EquivalenceClass given as argument
+     * but instead an association is made between the equivalence class and the value.
+     * This Association is stored in a hashmap of this class and not of the equivalence class */
     public void setValue(EquivalenceClass ec, int i) {
 	class2value.put(ec, new IntValueContainer(new Integer(i)));
     }
@@ -157,11 +160,10 @@ public class Model {
 
     public String toString() {
 	String result = "Model :\n{\n";
-	Iterator<EquivalenceClass> it = class2value.keySet().iterator();
-	while (it.hasNext()) {
-	    Object o = it.next();
-	    result += o + " = " + class2value.get(o) + "\n";
-	}
+        for (EquivalenceClass equivalenceClass : class2value.keySet()) {
+            Object o = equivalenceClass;
+            result += o + " = " + class2value.get(o) + "\n";
+        }
 	result += "}";
 	return result;
     }

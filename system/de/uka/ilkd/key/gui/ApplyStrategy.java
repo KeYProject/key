@@ -66,8 +66,6 @@ public class ApplyStrategy {
     /** interrupted by the user? */
     private boolean autoModeActive = false;
 
-    private ProofListener proofListener = new ProofListener();
-    
     private boolean startedAsInteractive;
     
     private List<ProverTaskListener> proverTaskObservers = new ArrayList<ProverTaskListener> ();
@@ -84,8 +82,8 @@ public class ApplyStrategy {
     // Otherwise the addition/removal of the InteractiveProofListener
     // can cause a ConcurrentModificationException during ongoing operation
     public ApplyStrategy(KeYMediator medi) {
-	this.medi = medi;
-        medi.addRuleAppListener( proofListener );        
+	    this.medi = medi;
+        medi.addRuleAppListener( new ProofListener() );        
     }
     
     
@@ -139,7 +137,6 @@ public class ApplyStrategy {
                     break;
             }
             if (app == null) return false;      
-            assert g != null;
             rl.removeRPConsumedGoal(g);                
             rl.addRPOldMarkersNewGoals(g.apply(app));
         }
@@ -191,9 +188,8 @@ public class ApplyStrategy {
      * number of rules have been applied or the time out has been reached
      */
     private boolean maxRuleApplicationOrTimeoutExceeded() {
-        return countApplied >= maxApplications || 
-           timeout>=0 ? 
-                System.currentTimeMillis() - time >= timeout : false;
+        return countApplied >= maxApplications ||
+                timeout >= 0 && System.currentTimeMillis() - time >= timeout;
     }
 
 
@@ -294,8 +290,7 @@ public class ApplyStrategy {
     private class AutoModeWorker extends SwingWorker {
          
         public Object construct() {
-            Object res = doWork();
-	    return res;
+            return  doWork();
         }
 
         public void finished() {

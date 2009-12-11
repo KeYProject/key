@@ -26,12 +26,11 @@ class TypeSchemeConstraintSolver {
         if(varPos >= vars.length) {
             return true;
         }
-        
-        Iterator<TypeScheme> it = vars[varPos].getValueRange().iterator();
-        while(it.hasNext()) {
-            vars[varPos].assignValue(it.next());
-            if(constraint.evaluate()) {
-                if(run(varPos + 1)) {
+
+        for (TypeScheme typeScheme : vars[varPos].getValueRange()) {
+            vars[varPos].assignValue(typeScheme);
+            if (constraint.evaluate()) {
+                if (run(varPos + 1)) {
                     return true;
                 }
             }
@@ -53,9 +52,9 @@ class TypeSchemeConstraintSolver {
         this.constraint = constraint;
         final ImmutableSet<TypeSchemeVariable> freeVars = constraint.getFreeVars();
         this.vars       = freeVars.toArray(new TypeSchemeVariable[freeVars.size()]);
-        
-        for(int i = 0; i < vars.length; i++) {
-            vars[i].assignDefaultValue();
+
+        for (TypeSchemeVariable var : vars) {
+            var.assignDefaultValue();
         }
         
         return run(0) && constraint.evaluate();

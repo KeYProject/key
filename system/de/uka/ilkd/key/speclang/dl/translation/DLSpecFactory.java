@@ -247,20 +247,19 @@ public class DLSpecFactory {
         }
         
         //atPre-functions may not occur in modifier set
-        Iterator<LocationDescriptor> it = modifies.iterator();
-        while(it.hasNext()) {
-            LocationDescriptor loc = it.next();
-            if(loc instanceof BasicLocationDescriptor) {
+        for (LocationDescriptor modify : modifies) {
+            LocationDescriptor loc = modify;
+            if (loc instanceof BasicLocationDescriptor) {
                 BasicLocationDescriptor bloc = (BasicLocationDescriptor) loc;
                 Term formula = bloc.getFormula();
                 Term locTerm = bloc.getLocTerm();
-                forbiddenAtPreFunctions = new LinkedHashMap<Operator, Function>(); 
+                forbiddenAtPreFunctions = new LinkedHashMap<Operator, Function>();
                 forbiddenAtPreFunctions.putAll(extractAtPreFunctions(formula));
                 forbiddenAtPreFunctions.putAll(extractAtPreFunctions(locTerm));
-                if(!forbiddenAtPreFunctions.isEmpty()) {
+                if (!forbiddenAtPreFunctions.isEmpty()) {
                     throw new ProofInputException(
-                       "@pre-function not allowed in modifier set: " 
-                       + forbiddenAtPreFunctions.values().iterator().next());
+                            "@pre-function not allowed in modifier set: "
+                                    + forbiddenAtPreFunctions.values().iterator().next());
                 }
             }
         }

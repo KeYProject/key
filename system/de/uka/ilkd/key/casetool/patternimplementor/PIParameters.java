@@ -79,7 +79,7 @@ public class PIParameters {
             get(i).getInternalName() + get(i).getName() + "\n";
 
             if (get(i) instanceof PIParameterGroup) {
-                retval = retval + ((PIParameterGroup) get(i)).toString();
+                retval = retval + get(i).toString();
             }
         }
 

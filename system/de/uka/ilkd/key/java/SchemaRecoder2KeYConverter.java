@@ -106,12 +106,12 @@ public class SchemaRecoder2KeYConverter extends Recoder2KeYConverter {
             ProgramSV[] svw = mc.getSV();
             ProgramSV execSV = null;
             ProgramSV returnSV = null;
-            for (int i = 0; i < svw.length; i++) {
-                if (svw[i].sort() == ProgramSVSort.VARIABLE) {
-                    returnSV = svw[i];
+            for (ProgramSV aSvw : svw) {
+                if (aSvw.sort() == ProgramSVSort.VARIABLE) {
+                    returnSV = aSvw;
                 }
-                if (svw[i].sort() == ProgramSVSort.EXECUTIONCONTEXT) {
-                    execSV = svw[i];
+                if (aSvw.sort() == ProgramSVSort.EXECUTIONCONTEXT) {
+                    execSV = aSvw;
                 }
             }
             if ("#method-call".equals(mcName)) {
@@ -325,7 +325,7 @@ public class SchemaRecoder2KeYConverter extends Recoder2KeYConverter {
                     varspecs);
         } else {
             // otherwise use the default case
-            return (LocalVariableDeclaration) super.convert(lvd);
+            return super.convert(lvd);
         }
     }
 

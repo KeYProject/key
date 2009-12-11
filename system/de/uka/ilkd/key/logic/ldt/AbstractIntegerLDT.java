@@ -468,7 +468,7 @@ public abstract class AbstractIntegerLDT extends LDT {
             identifier = charID;
         }
 
-        String literalString = ""; 
+        String literalString; 
         if (lit instanceof IntLiteral) {
             literalString = ((IntLiteral)lit).getValue();
         } else {

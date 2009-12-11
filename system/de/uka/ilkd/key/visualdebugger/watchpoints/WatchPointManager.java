@@ -64,24 +64,23 @@ public class WatchPointManager {
                 
                 Namespace progVarNS = new Namespace();
                 final JavaInfo ji = services.getJavaInfo();
-    
-                for (int i = 0; i < watchpoints.size(); i++) {
-                    
-                    WatchPoint wp = watchpoints.get(i);
+
+                for (WatchPoint wp : watchpoints) {
+
                     if (wp.isEnabled()) {
-    
+
                         String declaringType = wp.getDeclaringType();
-    
+
                         String nameOfSelf = "self_XY";
                         ProgramElementName selfName = new ProgramElementName(
                                 nameOfSelf);
-    
+
                         // check namespace
                         while (progVarNS.lookup(selfName) != null) {
                             nameOfSelf = nameOfSelf.concat("Z");
                             selfName = new ProgramElementName(nameOfSelf);
                         }
-    
+
                         ProgramVariable var_self = new LocationVariable(
                                 selfName, ji.getKeYJavaType(declaringType));
                         wp.setSelf(var_self);
@@ -90,13 +89,13 @@ public class WatchPointManager {
                                         .getTypeConverter().getBooleanType());
                         progVarNS.addSafely(var_self);
                         progVarNS.add(var_dummy);
-    
+
                         if (wp.getLocalVariables() != null
                                 && wp.getLocalVariables().size() > 0) {
                             translateLocalVariables(progVarNS, services, wp);
                             watchPointsContainLocals = true;
                         }
-    
+
                         wp.setRawTerm(createWatchpointTerm(services,
                                 progVarNS, wp, declaringType, selfName));
                     }

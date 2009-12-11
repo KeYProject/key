@@ -53,11 +53,8 @@ public class OclSubSequence extends TermSymbol {
 	if (!(collSort.extendsTrans(OclSort.SEQUENCE_OF_OCLANY))) {
 	    return false;
 	}
-	if ((term.sub(1).sort() != OclSort.INTEGER)
-	    || (term.sub(2).sort() != OclSort.INTEGER)) {
-	    return false;
-	}
-        return true;
+        return !((term.sub(1).sort() != OclSort.INTEGER)
+                || (term.sub(2).sort() != OclSort.INTEGER));
     }
     
     public Sort sort(Term[] subTerm) {

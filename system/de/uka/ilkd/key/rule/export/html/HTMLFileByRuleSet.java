@@ -192,13 +192,12 @@ public class HTMLFileByRuleSet extends HTMLFile {
             out.append ( "none" );
         } else {
             boolean first = true;
-            final Iterator<RuleSetModelInfo> it = ruleSets.iterator ();
-            while (it.hasNext ()) {
-                final RuleSetModelInfo ruleSet = it.next ();
+            for (RuleSetModelInfo ruleSet1 : ruleSets) {
+                final RuleSetModelInfo ruleSet = ruleSet1;
                 if (!first) {
-                    out.append ( ", " );
+                    out.append(", ");
                 }
-                writeRuleSetLink ( out, ruleSet );
+                writeRuleSetLink(out, ruleSet);
                 first = false;
             }
         }

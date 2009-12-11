@@ -415,10 +415,9 @@ public class GoalList extends JList {
 
 	public void add(ImmutableList<Goal> g) {
 	    if (!g.isEmpty()) {
-		final Iterator<Goal> it = g.iterator();
-		while (it.hasNext()) {
-		    goals.add(it.next());
-		}	
+            for (Goal aG : g) {
+                goals.add(aG);
+            }
 		fireIntervalAdded(this, goals.size()-g.size(), 
 				  goals.size()-1);
 	    }

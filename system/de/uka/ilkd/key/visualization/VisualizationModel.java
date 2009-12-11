@@ -40,10 +40,10 @@ public class VisualizationModel {
      */    
     public ExecutionTraceModel[] getInterestingExecutionTraces() {
         LinkedList result = new LinkedList();
-        for (int i = 0; i < traces.length; i++) {
-            if ((traces[i].getFirstContextTraceElement()!=TraceElement.END)&&
-                    traces[i].getType() == ExecutionTraceModel.TYPE1) {
-                result.add(traces[i]);
+        for (ExecutionTraceModel trace : traces) {
+            if ((trace.getFirstContextTraceElement() != TraceElement.END) &&
+                    trace.getType() == ExecutionTraceModel.TYPE1) {
+                result.add(trace);
             }
         }
         ExecutionTraceModel[] exTraceModels = new ExecutionTraceModel[result

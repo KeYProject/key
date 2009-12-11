@@ -56,14 +56,13 @@ public class CogentModelGenerator extends DecProdModelGenerator {
 		}
 		return models;
 	    }
-	    Iterator<Term> it = locations.iterator();
-	    while (it.hasNext()) {
-		Term t = it.next();
-		EquivalenceClass ec = term2class.get(t);
-		if (ec.isInt()) {
-		    model.setValue(ec, response.getValueForTerm(t, ct));
-		}
-	    }
+        for (Term location : locations) {
+            Term t = location;
+            EquivalenceClass ec = term2class.get(t);
+            if (ec.isInt()) {
+                model.setValue(ec, response.getValueForTerm(t, ct));
+            }
+        }
 	    models.add(model);
 	} catch (IOException e) {
 	    throw new CogentException(e);

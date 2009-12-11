@@ -49,8 +49,8 @@ public class MetaSub extends AbstractMetaOperator {
     public Term calculate(Term term, SVInstantiations svInst, Services services) {
 	Term arg1 = term.sub(0);
 	Term arg2 = term.sub(1);
-	BigInteger bigIntArg1=null;
-	BigInteger bigIntArg2=null;
+	BigInteger bigIntArg1;
+	BigInteger bigIntArg2;
 
 	bigIntArg1 = new
 	    BigInteger(convertToDecimalString(arg1, services));

@@ -36,11 +36,10 @@ public class BreakpointFeature extends BinaryFeature {
             if (app instanceof TacletApp) {
                 TacletApp tapp = (TacletApp) app;
                 if (bpManager.isNoEx())
-                    for(Iterator<RuleSet> it = tapp.taclet().getRuleSets().iterator();it.hasNext();){
-                        RuleSet next = it.next();
+                    for (RuleSet next : tapp.taclet().getRuleSets()) {
                         if (next.name().toString().startsWith("method_expand"))
                             return true;
-                }
+                    }
                 
                 SourceElementId id = VisualDebugger.getVisualDebugger().getProgramCounter(pos);
                 if(id!=null){

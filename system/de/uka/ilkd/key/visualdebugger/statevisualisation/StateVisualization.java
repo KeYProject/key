@@ -215,8 +215,7 @@ public class StateVisualization {
     }
 
     private synchronized void applyCutAndRun(ImmutableList<Goal> goals, Term inst) {
-        for (Iterator<Goal> it = goals.iterator(); it.hasNext();) {
-            final Goal g = it.next();
+        for (final Goal g : goals) {
             final NoPosTacletApp c = g.indexOfTaclets().lookup("cut");
             assert c != null;
             // c.
@@ -254,8 +253,8 @@ public class StateVisualization {
         
         final Proof proof = ps.getProof();
         final Node root = proof.root();
-        for (Iterator<Goal> it = proof.openGoals().iterator(); it.hasNext();) {
-            indexConf.add(getAppliedCutsSet(it.next().node(), root));
+        for (Goal goal : proof.openGoals()) {
+            indexConf.add(getAppliedCutsSet(goal.node(), root));
         }
         this.indexConfigurations[instanceConf] = new ImmutableSet[indexConf.size()];
         int i = 0;
@@ -270,8 +269,8 @@ public class StateVisualization {
 
         final Proof proof = ps.getProof();
         final Node root = proof.root();
-        for (Iterator<Goal> it = proof.openGoals().iterator(); it.hasNext();) {
-            indexConf.add(getAppliedCutsSet(it.next().node(), root));
+        for (Goal goal : proof.openGoals()) {
+            indexConf.add(getAppliedCutsSet(goal.node(), root));
         }
         this.instanceConfigurations = new ImmutableSet[indexConf.size()];
         int i = 0;
@@ -334,9 +333,8 @@ public class StateVisualization {
 
     private ImmutableList<Term> getPostState(Sequent s) {
         ImmutableList<Term> result = ImmutableSLList.<Term>nil();
-        for (final Iterator<ConstrainedFormula> it = s.succedent().iterator(); 
-             it.hasNext();) {
-            final Term formula = it.next().formula();
+        for (ConstrainedFormula constrainedFormula : (Iterable<ConstrainedFormula>) s.succedent()) {
+            final Term formula = constrainedFormula.formula();
             if (formula.op() == stateOp) {
                 for (int i = 0, ar = formula.arity(); i < ar; i++) {
                     result = result.append(formula.sub(i));
@@ -349,8 +347,8 @@ public class StateVisualization {
     private ImmutableSet<Term> getReferences(ImmutableList<Term> terms) {
         // IList<Term> pc = itNode.getPc();
         ImmutableSet<Term> result = DefaultImmutableSet.<Term>nil();
-        for (Iterator<Term> it = terms.iterator(); it.hasNext();) {
-            result = result.union(getReferences(it.next()));
+        for (Term term : terms) {
+            result = result.union(getReferences(term));
         }
         return result;
     }

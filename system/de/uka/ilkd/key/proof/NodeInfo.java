@@ -135,7 +135,7 @@ public class NodeInfo {
     public String getExecStatementParentClass() {
         determineFirstAndActiveStatement();
         if (activeStatement instanceof JavaSourceElement)
-            return ((JavaSourceElement) activeStatement).getPositionInfo()
+            return activeStatement.getPositionInfo()
                     .getFileName();
         return "<NONE>";
     }

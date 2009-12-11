@@ -327,11 +327,10 @@ public class UnitTestBuilder {
 	}
 	if (methodName == null) {
 	    String pmsStr = "";
-	    final Iterator<ProgramMethod> pmIt = pms.iterator();
-	    while (pmIt.hasNext()) {
-		final ProgramMethod pm = pmIt.next();
-		pmsStr += pm.getName() + "\n";
-	    }
+        for (ProgramMethod pm1 : pms) {
+            final ProgramMethod pm = pm1;
+            pmsStr += pm.getName() + "\n";
+        }
 	    
 	    //The following call throws an exception if it is not overwritten. 
 	    createTestForNodes_progressNotification2(new UnitTestException(

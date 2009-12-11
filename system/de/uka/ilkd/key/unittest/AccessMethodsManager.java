@@ -195,7 +195,7 @@ public class AccessMethodsManager {
     @SuppressWarnings("unchecked")
     public ArrayLengthReference arrayLength(final FieldReference fr) {
 	final ExtList l = new ExtList();
-	l.add((ReferencePrefix) objParam(fr.getReferencePrefix(), fr
+	l.add(objParam(fr.getReferencePrefix(), fr
 	        .getProgramVariable()));
 	return new ArrayLengthReference(l);
     }

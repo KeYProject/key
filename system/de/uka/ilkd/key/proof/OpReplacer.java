@@ -149,10 +149,9 @@ public class OpReplacer {
     public Map<Operator, Term> replace(/*in*/ Map<Operator, Term> map) {
         
         Map<Operator,Term> result = new HashMap<Operator, Term>();
-        
-        final Iterator<Map.Entry<Operator, Term>> it = map.entrySet().iterator();
-        while(it.hasNext()) {
-            final Map.Entry<Operator, Term> entry = it.next();
+
+        for (Object o : map.entrySet()) {
+            final Map.Entry<Operator, Term> entry = (Map.Entry<Operator, Term>) o;
             result.put(replace(entry.getKey()), replace(entry.getValue()));
         }        
         return result;

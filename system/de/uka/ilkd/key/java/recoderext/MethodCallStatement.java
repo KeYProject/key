@@ -63,7 +63,7 @@ public class MethodCallStatement extends JavaStatement implements
             resultVar = (Expression) proto.resultVar.deepClone();
         }
         if (proto.ec != null) {
-            ec = (ExecutionContext) proto.ec.deepClone();
+            ec = proto.ec.deepClone();
         }	
         if (proto.body != null) {
             body = (Statement) proto.body.deepClone();

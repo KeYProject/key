@@ -51,11 +51,8 @@ public class OclSetOp extends TermSymbol {
 	}
 	CollectionSort collSort = (CollectionSort)term.sub(0).sort();
 	OclSort elemSort = (OclSort)term.sub(1).sort();
-	if (!collSort.getElemSort().extendsTrans(elemSort)
-	    && !elemSort.extendsTrans(collSort.getElemSort())) {
-	    return false;
-	}
-        return true;
+        return !(!collSort.getElemSort().extendsTrans(elemSort)
+                && !elemSort.extendsTrans(collSort.getElemSort()));
     }
     
     public Sort sort(Term[] subTerm) {

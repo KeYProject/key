@@ -70,10 +70,8 @@ public class ExpressionSkolemBuilder extends StatementExpressionSkolemBuilder {
     }
 
     private Iterator<SkolemSet>
-	createSkolemExpressionSVs(ImmutableList<SchemaVariable> p_svs) {    
-	Iterator<SchemaVariable> it = p_svs.iterator ();
-	while ( it.hasNext () )
-	    createSkolemExpressionSV ( it.next () );
+	createSkolemExpressionSVs(ImmutableList<SchemaVariable> p_svs) {
+        for (SchemaVariable p_sv : p_svs) createSkolemExpressionSV(p_sv);
     
 	return toIterator
 	    ( getOriginalSkolemSet ()

@@ -52,8 +52,8 @@ public class PositionInfo {
     private static String simplifyPath(String path){
 	if(path==null || path.length()==0)
 	    return path;
-	int idx = path.indexOf("/../");;
-	while(idx > 0){
+	int idx = path.indexOf("/../");
+        while(idx > 0){
 	    int pre= path.lastIndexOf("/", idx-1);
 	    if(pre!=-1){
 		path = path.substring(0, pre) + path.substring(idx+3);

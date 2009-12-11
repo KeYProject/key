@@ -201,29 +201,28 @@ public class ModelGenerator {
      * The result is stored in {@code pvs}.
      */
     public void collectProgramVariables() {
-	Iterator<Term> it = locations.iterator();
-	while (it.hasNext()) {
-	    Term t = it.next();
-	    if ((t.op() instanceof ProgramVariable)
-		    && !((ProgramVariable) t.op()).isStatic()) {
-		pvs = pvs.add((ProgramVariable) t.op());
-	    } else if (t.op() instanceof RigidFunction) {
-		KeYJavaType kjt;
-		String sortName = t.sort().toString(); 
-		if (	   sortName.startsWith("jint")
-			|| sortName.startsWith("jshort")
-			|| sortName.startsWith("jbyte")
-			|| sortName.startsWith("jlong")
-			|| sortName.startsWith("jchar")) {
-		    kjt = serv.getJavaInfo().getKeYJavaType(sortName.substring(1));
-		} else {
-		    kjt = serv.getJavaInfo().getKeYJavaType(sortName);
-		}
-		assert kjt != null;
-		pvs = pvs.add(new LocationVariable(new ProgramElementName(t
-			.op().name().toString()), kjt));
-	    }
-	}
+        for (Term location : locations) {
+            Term t = location;
+            if ((t.op() instanceof ProgramVariable)
+                    && !((ProgramVariable) t.op()).isStatic()) {
+                pvs = pvs.add((ProgramVariable) t.op());
+            } else if (t.op() instanceof RigidFunction) {
+                KeYJavaType kjt;
+                String sortName = t.sort().toString();
+                if (sortName.startsWith("jint")
+                        || sortName.startsWith("jshort")
+                        || sortName.startsWith("jbyte")
+                        || sortName.startsWith("jlong")
+                        || sortName.startsWith("jchar")) {
+                    kjt = serv.getJavaInfo().getKeYJavaType(sortName.substring(1));
+                } else {
+                    kjt = serv.getJavaInfo().getKeYJavaType(sortName);
+                }
+                assert kjt != null;
+                pvs = pvs.add(new LocationVariable(new ProgramElementName(t
+                        .op().name().toString()), kjt));
+            }
+        }
     }
 
     public ImmutableSet<ProgramVariable> getProgramVariables() {
@@ -324,39 +323,37 @@ public class ModelGenerator {
     }
 
     protected void findDisjointClasses() {
-	Iterator<Term> it = succ.iterator();
-	while (it.hasNext()) {
-	    Term t = it.next();
-	    EquivalenceClass e0, e1;
-	    if (t.op() instanceof Equality && !containsImplicitAttr(t)) {
-		e0 = getEqvClass(t.sub(0));
-		e1 = getEqvClass(t.sub(1));
-		e0.addDisjoint(t.sub(1));
-		e1.addDisjoint(t.sub(0));
-	    }
-	}
+        for (Term aSucc : succ) {
+            Term t = aSucc;
+            EquivalenceClass e0, e1;
+            if (t.op() instanceof Equality && !containsImplicitAttr(t)) {
+                e0 = getEqvClass(t.sub(0));
+                e1 = getEqvClass(t.sub(1));
+                e0.addDisjoint(t.sub(1));
+                e1.addDisjoint(t.sub(0));
+            }
+        }
     }
 
     /**
      * Resets the concrete values of all EquivalenceClasses.
      */
     protected void resetAllClasses(LinkedList<EquivalenceClass> classes) {
-	for (int i = 0; i < classes.size(); i++) {
-	    (classes.get(i)).resetValue();
-	}
+        for (EquivalenceClass aClass : classes) {
+            aClass.resetValue();
+        }
     }
 
     /**
      * Obsolete. Checks whether the current partial model is consistent.
      */
     protected boolean consistencyCheck() {
-	Iterator<EquivalenceClass> it = term2class.values().iterator();
-	while (it.hasNext()) {
-	    EquivalenceClass ec = it.next();
-	    if (ec.isBoolean() && !ec.consistencyCheck(term2class)) {
-		return false;
-	    }
-	}
+        for (EquivalenceClass equivalenceClass : term2class.values()) {
+            EquivalenceClass ec = equivalenceClass;
+            if (ec.isBoolean() && !ec.consistencyCheck(term2class)) {
+                return false;
+            }
+        }
 	return true;
     }
 
@@ -397,9 +394,7 @@ public class ModelGenerator {
 	// try to merge some models
 	int merged = 0;
 	Model[] result = new Model[models.length - merged];
-	for (int i = 0; i < result.length; i++) {
-	    result[i] = models[i];
-	}
+        System.arraycopy(models, 0, result, 0, result.length);
 	createModels_progressNotification2(result);
 	dmg = null;
 	return result;
@@ -498,16 +493,14 @@ public class ModelGenerator {
 	term2class.values().toArray(oa);
 	EquivalenceClass[] temp = new EquivalenceClass[oa.length];
 	int l = 0;
-	for (int i = 0; i < oa.length; i++) {
-	    if (oa[i].getLocations().size() > 0
-		    && (oa[i].isInt() || oa[i].isBoolean())) {
-		temp[l++] = oa[i];
-	    }
-	}
+        for (EquivalenceClass anOa : oa) {
+            if (anOa.getLocations().size() > 0
+                    && (anOa.isInt() || anOa.isBoolean())) {
+                temp[l++] = anOa;
+            }
+        }
 	EquivalenceClass[] result = new EquivalenceClass[l];
-	for (int i = 0; i < l; i++) {
-	    result[i] = temp[i];
-	}
+        System.arraycopy(temp, 0, result, 0, l);
 	return result;
     }
 
@@ -520,16 +513,14 @@ public class ModelGenerator {
 	term2class.values().toArray(oa);
 	EquivalenceClass[] temp = new EquivalenceClass[oa.length];
 	int l = 0;
-	for (int i = 0; i < oa.length; i++) {
-	    if (oa[i].getLocations().size() > 0
-		    && (!oa[i].isInt() && !oa[i].isBoolean())) {
-		temp[l++] = oa[i];
-	    }
-	}
+        for (EquivalenceClass anOa : oa) {
+            if (anOa.getLocations().size() > 0
+                    && (!anOa.isInt() && !anOa.isBoolean())) {
+                temp[l++] = anOa;
+            }
+        }
 	EquivalenceClass[] result = new EquivalenceClass[l];
-	for (int i = 0; i < l; i++) {
-	    result[i] = temp[i];
-	}
+        System.arraycopy(temp, 0, result, 0, l);
 	return result;
     }
 

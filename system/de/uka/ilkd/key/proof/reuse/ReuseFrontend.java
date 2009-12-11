@@ -51,11 +51,11 @@ public class ReuseFrontend {
          p.UniDiff();
          DiffParser.MarkerHint[] hints;
          hints = p.getMarkers();
-         for (int i=0; i<hints.length; i++) {
-            Logger.getLogger("key.proof.mgt").debug(
-	       "Markup hint: "+  hints[i].file+":"+ hints[i].line); 
-            recMark(source.root(), hints[i]);
-         }
+          for (DiffParser.MarkerHint hint : hints) {
+              Logger.getLogger("key.proof.mgt").debug(
+                      "Markup hint: " + hint.file + ":" + hint.line);
+              recMark(source.root(), hint);
+          }
          markRoot(source);
          
          return null;

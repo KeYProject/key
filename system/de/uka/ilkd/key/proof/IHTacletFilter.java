@@ -47,7 +47,7 @@ public class IHTacletFilter extends TacletFilter {
      */
     public boolean filter ( Taclet taclet ) {
 	if (!interactive) {
-	    Boolean b = (Boolean) filterCache.get(taclet);
+	    Boolean b = filterCache.get(taclet);
             if (b == null) {
                 b = taclet.admissible ( interactive, heuristics ) ? 
                         Boolean.TRUE : Boolean.FALSE; 

@@ -73,9 +73,8 @@ public class LocationDependentFunction extends AbstractMetaOperator {
         Sort[] subSorts = new Sort[l.size()];
         int i=0;
         TermFactory tf = TermFactory.DEFAULT;
-        Iterator<ProgramVariable> it = l.iterator();
-        while(it.hasNext()){
-            ProgramVariable pv = it.next();
+        for (ProgramVariable aL : l) {
+            ProgramVariable pv = aL;
             subs[i] = tf.createVariableTerm(pv);
             subSorts[i++] = pv.sort();
         }
@@ -175,10 +174,9 @@ public class LocationDependentFunction extends AbstractMetaOperator {
          public ImmutableList<ProgramVariable> result() {
              //remove duplicates
              ImmutableList<ProgramVariable> result = ImmutableSLList.<ProgramVariable>nil();
-             Iterator<ProgramVariable> it = freePVs.iterator();
-             while(it.hasNext()) {
-                 ProgramVariable pv = it.next();
-                 if(!result.contains(pv)) {
+             for (ProgramVariable freePV : freePVs) {
+                 ProgramVariable pv = freePV;
+                 if (!result.contains(pv)) {
                      result = result.prepend(pv);
                  }
              }

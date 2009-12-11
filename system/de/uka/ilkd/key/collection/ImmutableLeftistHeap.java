@@ -119,7 +119,7 @@ public abstract class ImmutableLeftistHeap<T extends Comparable<T>> implements I
 		return new Node<S>(element, this);
 	    } else {
 		return new Node<S>(data,
-				(ImmutableLeftistHeap<S>)left,
+                left,
 				(ImmutableLeftistHeap<S>)right.insert(element));
 	    }
 	}
@@ -137,11 +137,11 @@ public abstract class ImmutableLeftistHeap<T extends Comparable<T>> implements I
 		Node<S> other = (Node<S>) h;
 		if (data.compareTo(other.data) <= 0) {
 		    return new Node<S>(data,
-                                    (ImmutableLeftistHeap<S>)left,
+                    left,
                                     (ImmutableLeftistHeap<S>)right.insert(other));
 		} else {
 		    return new Node<S>(other.data,
-			            (ImmutableLeftistHeap<S>)other.left,
+                    other.left,
 			            (ImmutableLeftistHeap<S>)insert(other.right));
 		}
 	    } else {
@@ -299,7 +299,7 @@ public abstract class ImmutableLeftistHeap<T extends Comparable<T>> implements I
 	while (elements.hasNext()) {
 	    ImmutableHeap<T> h = new Node<T>(elements.next());
 	    do {
-		ImmutableHeap<T> top = (ImmutableHeap<T>) s.peek();
+		ImmutableHeap<T> top = s.peek();
 		if (h.size() >= top.size()) {
 		    h = h.insert(top);
 		    s.pop();
@@ -309,9 +309,9 @@ public abstract class ImmutableLeftistHeap<T extends Comparable<T>> implements I
 	    } while (!s.isEmpty());
 	    s.push(h);
 	}
-	ImmutableHeap<T> res = (ImmutableHeap<T>) s.pop();
+	ImmutableHeap<T> res = s.pop();
 	while (!s.isEmpty()) {
-	    res = res.insert((ImmutableHeap<T>)s.pop());
+	    res = res.insert(s.pop());
 	}
 	return res;
     }
@@ -336,7 +336,7 @@ public abstract class ImmutableLeftistHeap<T extends Comparable<T>> implements I
 	Iterator<T> it=this.iterator();
 	StringBuffer str=new StringBuffer("[");
 	while (it.hasNext()) {
-	    str.append(""+it.next());
+	    str.append(it.next());
 	    if (it.hasNext()) {
 		str.append(",");
 	    }
@@ -371,7 +371,7 @@ public abstract class ImmutableLeftistHeap<T extends Comparable<T>> implements I
 				"Missing next element in " +
 				"UnsortedIterator.next()" );
 
-	    Node<T> heap = (Node<T>)remainder.pop ();
+	    Node<T> heap = remainder.pop ();
 	    // descend in right-first order, this helps to keep the stack small
 	    push ( heap.left );
 	    push ( heap.right );

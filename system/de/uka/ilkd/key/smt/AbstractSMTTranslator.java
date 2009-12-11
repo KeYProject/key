@@ -153,7 +153,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 	    throws IllegalFormulaException {
 
 	// translate
-	StringBuffer hb = new StringBuffer();
+	StringBuffer hb;
 	StringBuffer ante;
 	ante = translate(sequent.antecedent(), SMTTranslator.TERMPOSITION.ANTECEDENT, services);
 	StringBuffer succ;
@@ -271,10 +271,10 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 	    rightForm = this.translatePredicate(rightPred, tempList);
 	    
 	    StringBuffer form = this.translateLogicalImply(leftForm, rightForm);
-	    
-	    for (int i = 0; i < varList.size(); i++) {
-		form = this.translateLogicalAll(varList.get(i), this.getIntegerSort(), form);
-	    }
+
+        for (StringBuffer aVarList : varList) {
+            form = this.translateLogicalAll(aVarList, this.getIntegerSort(), form);
+        }
 	    
 	    toReturn.add(form);
 	}

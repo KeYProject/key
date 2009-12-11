@@ -41,7 +41,7 @@ import de.uka.ilkd.key.util.ExtList;
  */
 public class WhileLoopTransformation extends JavaASTVisitor {
 
-    protected static final Boolean CHANGED = new Boolean(true);
+    protected static final Boolean CHANGED = Boolean.TRUE;
     /** the replacement element */
     protected ProgramElement replacement;
     /** break outerlabel */

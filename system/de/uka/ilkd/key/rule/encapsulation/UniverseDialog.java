@@ -62,9 +62,8 @@ class UniverseDialog extends JDialog {
         //create variable labels and combo boxes
         ImmutableSet<TypeSchemeVariable> vars
                 = (new TypeSchemeAndConstraint(constraints)).getFreeVars();
-        Iterator<TypeSchemeVariable> it = vars.iterator();
-        while(it.hasNext()) {
-            TypeSchemeVariable var = it.next();
+        for (TypeSchemeVariable var1 : vars) {
+            TypeSchemeVariable var = var1;
 
             //prepare values
             ImmutableSet<TypeScheme> valueRange = var.getValueRange();
@@ -72,7 +71,7 @@ class UniverseDialog extends JDialog {
             values[0] = var.getDefaultValue();
             Iterator<TypeScheme> it2 = valueRange.iterator();
             int i = 1;
-            while(it2.hasNext()) {
+            while (it2.hasNext()) {
                 values[i++] = it2.next();
             }
 
@@ -100,9 +99,8 @@ class UniverseDialog extends JDialog {
         getContentPane().add(constraintsPane);
 
         //create constraints labels
-        Iterator<TypeSchemeConstraint> it2 = constraints.iterator();
-        while(it2.hasNext()) {
-            TypeSchemeConstraint constraint = it2.next();
+        for (TypeSchemeConstraint constraint1 : constraints) {
+            TypeSchemeConstraint constraint = constraint1;
 
             JLabel constraintLabel = new JLabel(constraint.toString());
             constraintLabels.add(constraintLabel);
@@ -120,9 +118,8 @@ class UniverseDialog extends JDialog {
 
     private boolean valueIsExact(TypeSchemeConstraint constraint) {
         ImmutableSet<TypeSchemeVariable> vars = constraint.getFreeVars();
-        Iterator<TypeSchemeVariable> it = vars.iterator();
-        while(it.hasNext()) {
-            if(!it.next().valueIsExact()) {
+        for (TypeSchemeVariable var : vars) {
+            if (!var.valueIsExact()) {
                 return false;
             }
         }
