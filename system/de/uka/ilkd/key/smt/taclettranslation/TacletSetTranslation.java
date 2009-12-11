@@ -12,6 +12,7 @@ package de.uka.ilkd.key.smt.taclettranslation;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.Taclet;
 
@@ -35,11 +36,13 @@ public interface TacletSetTranslation {
     /**
      * Builds the translation of the taclets given by calling the method
      * <code>setTacletSet()</code>.
-     * 
+     * @param sorts this sorts are used for the instantiation of generic types.
+     * @param attributeTerms this set of terms is used to translate program variables.
      * @return returns the resulting formulae of the taclets. Each formula of
      *         the resulting set is associated with one taclet.
      */
-    public ImmutableList<TacletFormula> getTranslation(ImmutableSet<Sort> sorts);
+    public ImmutableList<TacletFormula> getTranslation(ImmutableSet<Sort> sorts,
+	    ImmutableSet<Term> attributeTerms);
 
     /**
      * Returns all taclet that have not been translated. The reason can be got

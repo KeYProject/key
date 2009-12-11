@@ -146,6 +146,7 @@ public class RewriteTacletTranslator extends AbstractTacletTranslator {
 	    }
 	}
 
+
 	if (rewriteTaclet.ifSequent() != null) {
 	    if ((assum = translate(rewriteTaclet.ifSequent())) == null) {
 		assum = STD_ASSUM;

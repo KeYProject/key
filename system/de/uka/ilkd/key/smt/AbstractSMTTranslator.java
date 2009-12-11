@@ -110,8 +110,8 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 
     // used type predicates for constant values, e.g. 1, 2, ...
     private HashMap<Term, StringBuffer> constantTypePreds = new HashMap<Term, StringBuffer>();
-
-
+    
+    
     /** map used for storing predicates representing modalities or updates */
     private HashMap<Term, StringBuffer> modalityPredicates = new HashMap<Term, StringBuffer>();
     
@@ -127,6 +127,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
     
     private ImmutableSet<Taclet> taclets= DefaultImmutableSet.nil();
     
+    private HashSet<Term> usedAttributeTerms = new HashSet();
     
     
     /**Assumptions made of taclets - the translation of <code>tacletFormulae</code>*/
@@ -1359,7 +1360,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 		}
 
 		addFunction(op, new ArrayList<Sort>(), term.sort());
-
+	
 		return translateFunc(op, subterms);
 	    }
 	} else if (op instanceof Function) {
@@ -1497,7 +1498,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 			sorts.add(fun.argSort(i));
 		    }
 		    this.addFunction(fun, sorts, fun.sort());
-
+	
 		    return translateFunc(fun, subterms);
 		}
 	    }
@@ -1534,8 +1535,9 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 	    for (int i = 0; i < op.arity(); i++) {
 		sorts.add(term.sub(i).sort());
 	    }
+	    
 	    this.addFunction(atop, sorts, atop.sort());
-
+	    usedAttributeTerms.add(term);
 	    return translateFunc(atop, subterms);
 	} else {
 	    //if none of the above works, the symbol can be translated as uninterpreted function
@@ -1720,7 +1722,6 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 		    sorts.add(term.sub(i).sort());
 		}
 		this.addFunction(op, sorts, term.sort());
-
 		return translateFunc(op, subterms);
 	    }
     }
@@ -1734,6 +1735,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 	    usedVariableNames.put(op, var);
 	    return var;
 	}
+
     }
 
     /**
@@ -1904,7 +1906,12 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 	    sorts = sorts.add(sort);
 	}
 	
-	for(TacletFormula tf :  tacletSetTranslation.getTranslation(sorts)){
+	ImmutableSet<Term> terms = DefaultImmutableSet.nil();
+	for(Term term : usedAttributeTerms){
+	    terms = terms.add(term);
+	}
+	
+	for(TacletFormula tf :  tacletSetTranslation.getTranslation(sorts,terms)){
 	    StringBuffer term = translateTerm(tf.getFormula(),vector,services);
 	    result.add(term);
 	}

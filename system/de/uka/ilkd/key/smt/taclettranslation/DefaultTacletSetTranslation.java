@@ -69,6 +69,8 @@ public final class DefaultTacletSetTranslation
     
     private ImmutableSet<Sort> usedFormulaSorts = DefaultImmutableSet.nil();
     
+    private ImmutableSet<Term> usedAttributeTerms = DefaultImmutableSet.nil();
+    
     /**
      * Sorts that have been used while translating the set of taclets.
      */
@@ -108,7 +110,8 @@ public final class DefaultTacletSetTranslation
 	return false;
     }
 
-    public ImmutableList<TacletFormula> getTranslation(ImmutableSet<Sort> sorts) {
+    public ImmutableList<TacletFormula> getTranslation(ImmutableSet<Sort> sorts, 
+	    ImmutableSet<Term> attributeTerms) {
 
 	// only translate once a time.
 	if (!translate)
@@ -117,7 +120,13 @@ public final class DefaultTacletSetTranslation
 	usedSorts.clear();
 	notTranslated = ImmutableSLList.nil();
 	translation = ImmutableSLList.nil();
-
+       
+	ImmutableSet<Sort> emptySetSort = DefaultImmutableSet.nil();
+	ImmutableSet<Term> emptySetTerm = DefaultImmutableSet.nil();
+	usedFormulaSorts = (sorts == null ?emptySetSort :sorts);
+	usedAttributeTerms = (attributeTerms == null ? emptySetTerm :attributeTerms);
+	
+	
 	for (Taclet t : taclets) {
 	    if (!UsedTaclets.contains(t.name().toString())) {
 		// notTranslated = notTranslated.append(new
@@ -135,7 +144,7 @@ public final class DefaultTacletSetTranslation
 	    int i=0;
 	    for (TacletTranslator translator : translators) {
 		try { // check for the right translator 
-		    translation = translation.append(translator.translate(t,sorts));
+		    translation = translation.append(translator.translate(t,sorts,attributeTerms));
 		    break; // translate only once a time.
 		} catch (IllegalTacletException e) {
 		    if(i == translators.size()-1){
@@ -177,7 +186,7 @@ public final class DefaultTacletSetTranslation
     
     public void update() {
 	translate = true;
-	getTranslation(usedFormulaSorts);
+	getTranslation(usedFormulaSorts,usedAttributeTerms);
 
     }
 
@@ -186,7 +195,7 @@ public final class DefaultTacletSetTranslation
      * @param dest the path of the file.
      */
     public void storeToFile(String dest) {
-	storeToFile(getTranslation(usedFormulaSorts), dest);
+	storeToFile(getTranslation(usedFormulaSorts, usedAttributeTerms), dest);
     }
 
     private void storeToFile(ImmutableList<TacletFormula> list, String dest) {
