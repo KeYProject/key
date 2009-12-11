@@ -61,6 +61,10 @@ public class DecProcRunner extends SwingWorker {
     /**Warning: After analysing where the data for this field comes from, it seems that it is not really used.*/
     private Object construcResult = null; 
     
+    /**This field was a local variable {@code workOnGoal()}. 
+     * The variable has been changed to a field in order to do clean up 
+     * after the occurrence of an exception in different method(s) than {@code workOnGoal()}*/
+    private InterruptListener il = null;
 
     
 
@@ -148,20 +152,32 @@ public class DecProcRunner extends SwingWorker {
 
         proof.env().registerRule(simpRule,
                 de.uka.ilkd.key.proof.mgt.AxiomJustification.INSTANCE);
-                	
-        if(selectedGoal!=null){
-            main.setStatusLine("Running external decision procedure: " + simpRule.displayName(), 99); 
-            workOnGoal( selectedGoal,0);
-        }else{
-            totalGoals = proof.openGoals().size();
-            main.setStatusLine("Running external decision procedure: " +
-                    simpRule.displayName(), 99*totalGoals); 
-            workOnAllOpenGoals();
+        il = null;
+        try{	
+            if(selectedGoal!=null){
+                main.setStatusLine("Running external decision procedure: " + simpRule.displayName(), 99); 
+                workOnGoal( selectedGoal,1);
+            }else{
+                totalGoals = proof.openGoals().size();
+                main.setStatusLine("Running external decision procedure: " +
+                        simpRule.displayName(), 99*totalGoals); 
+                workOnAllOpenGoals();
+            }
+        } catch (ExceptionHandlerException ex){
+            main.setStatusLine("Running external decision procedure failed");
+            throw(ex);
+        } finally {
+            if (il != null) {
+        	mediator.removeInterruptListener(il);
+        	il = null;
+            }
+            mediator.startInterface(true);
         }
+
         return status; 
     }
 
-    private void workOnAllOpenGoals(){
+    private void workOnAllOpenGoals() throws ExceptionHandlerException{
         
         int cnt = 0;
 
@@ -173,9 +189,7 @@ public class DecProcRunner extends SwingWorker {
     
     /**Applies decision procedure rule on the goal g.
      * @param temp is just a counter for user feedback*/
-    private void workOnGoal(Goal g, final int temp){
-        InterruptListener il = null;
-	try {
+    private void workOnGoal(Goal g, final int temp) throws  ExceptionHandlerException{
             try {
 
         	BuiltInRuleApp birApp = new BuiltInRuleApp(simpRule, null, 
@@ -243,16 +257,6 @@ public class DecProcRunner extends SwingWorker {
             } catch (Throwable thr) {
                 exceptionHandler.reportException(thr);
             }
-        } catch (ExceptionHandlerException ex){
-            main.setStatusLine("Running external decision procedure failed");
-            throw(ex);
-        } finally {
-            if (il != null) {
-        	mediator.removeInterruptListener(il);
-        	il = null;
-            }
-            mediator.startInterface(true);
-        }
     }
     
     private BuiltInRule getIntegerDecisionProcedure() {
