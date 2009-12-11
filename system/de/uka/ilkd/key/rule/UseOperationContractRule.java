@@ -362,7 +362,7 @@ public class UseOperationContractRule implements BuiltInRule {
         if(cwi == null) {
             return null;
         }
-        assert cwi.contract.getProgramMethod().equals(pm);
+        assert cwi.contract.getProgramMethod().equals(pm) : "Tries to apply contract for " + cwi.contract.getProgramMethod() + " to " + pm;
 
         //create variables for self, parameters, result, exception, and a map 
         //for atPre-functions
