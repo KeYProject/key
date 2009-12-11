@@ -14,7 +14,6 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.collection.*;
 import de.uka.ilkd.key.util.ExtList;
 import de.uka.ilkd.key.parser.simplify.*;
-import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 
@@ -420,13 +419,6 @@ public class OldSimplifyModelGenerator extends DecProdModelGenerator {
 	l.add(new NumberTerm(i));
 	return new FunctionTerm(
 		de.uka.ilkd.key.unittest.simplify.ast.Function.PLUS, l);
-    }
-
-    private Equation ineqToEq(Inequation t, int i) {
-	Equation eq = new Equation();
-	eq.setLeft(t.sub(0));
-	eq.setRight(plus(t.sub(1), i));
-	return eq;
     }
 
     private Less ineqToLess(Inequation t, boolean inverse) {

@@ -439,7 +439,7 @@ public class ModelGenerator {
 	if (!consistencyCheck() || terminateAsSoonAsPossible) {
 	    return models;
 	}
-	classes = (LinkedList) classes.clone();
+	classes = (LinkedList<EquivalenceClass>) classes.clone();
 	Model m;
 	for (int i = classes.size() - 1; i >= 0; i--) {
 	    if (classes.get(i).getLocations().size() > 0

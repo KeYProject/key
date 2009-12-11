@@ -11,7 +11,6 @@
 package de.uka.ilkd.key.unittest.simplify.translation;
 
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Vector;
 
 import de.uka.ilkd.key.logic.ConstrainedFormula;
@@ -27,9 +26,9 @@ import de.uka.ilkd.key.proof.Goal;
  * partial sets can be chosen
  */
 public class ConstraintSet {
-    protected Vector constrainedFormulas;
+    protected Vector<ConstrainedFormula> constrainedFormulas;
     protected Constraint userConstraint;
-    protected HashSet usedConstrainedFormulas;
+    protected HashSet<ConstrainedFormula> usedConstrainedFormulas;
     protected Constraint chosenConstraint;
 
     /**
@@ -39,14 +38,14 @@ public class ConstraintSet {
      */
     public ConstraintSet(Goal g, Constraint userConstraint) {
 	constrainedFormulas = collectConstraints(g);
-	usedConstrainedFormulas = new HashSet();
+	usedConstrainedFormulas = new HashSet<ConstrainedFormula>();
 	chosenConstraint = Constraint.BOTTOM;
 	this.userConstraint = userConstraint;
     }
 
     public ConstraintSet(Sequent s, Constraint userConstraint) {
 	constrainedFormulas = collectConstraints(s);
-	usedConstrainedFormulas = new HashSet();
+	usedConstrainedFormulas = new HashSet<ConstrainedFormula>();
 	chosenConstraint = Constraint.BOTTOM;
 	this.userConstraint = userConstraint;
     }
@@ -57,7 +56,7 @@ public class ConstraintSet {
      * @param g The goal which's sequent's Constraints should 
      * get collected
      */
-    protected Vector collectConstraints(Goal g) {
+    protected Vector<ConstrainedFormula> collectConstraints(Goal g) {
 	return collectConstraints(g.sequent());
     }
 
@@ -67,8 +66,8 @@ public class ConstraintSet {
      * @param s The sequent from which the Constraints should 
      * get collected
      */
-    protected Vector collectConstraints(Sequent s) {
-	Vector vec = new Vector();
+    protected Vector<ConstrainedFormula> collectConstraints(Sequent s) {
+	Vector<ConstrainedFormula> vec = new Vector<ConstrainedFormula>();
 	vec = collectConstraints(s.antecedent());
 	vec.addAll(collectConstraints(s.succedent()));
 	return vec;
@@ -80,8 +79,8 @@ public class ConstraintSet {
      * @param g The SemiSequent from which the Constraints should 
      * get collected
      */
-    protected Vector collectConstraints(Semisequent g) {
-	Vector vec = new Vector();
+    protected Vector<ConstrainedFormula> collectConstraints(Semisequent g) {
+	Vector<ConstrainedFormula>vec = new Vector<ConstrainedFormula>();
 	for (int i = 0; i < g.size(); i++) {
 	    vec.add(g.get(i));
 	}
@@ -143,9 +142,7 @@ public class ConstraintSet {
 	Constraint usedConstraint = Constraint.BOTTOM;
 	//System.out.println("Amount of Constraints to choose: "+
 	//constraints.size());
-	Iterator i;
-	for ( i = constrainedFormulas.iterator(); i.hasNext(); ) {
- 	    ConstrainedFormula next = (ConstrainedFormula)i.next();
+	for (ConstrainedFormula next : constrainedFormulas) {
 	    //System.out.println("Next Constrait:     " + next.constraint());
 	    if (next.constraint().isSatisfiable()) {
 		tempConstraint = usedConstraint.join(next.constraint(), null);
@@ -155,7 +152,7 @@ public class ConstraintSet {
 		    this.usedConstrainedFormulas.add(next);
 		}
 	    }
-	}
+        }
 	this.chosenConstraint = usedConstraint;
 	return usedConstraint;
     }

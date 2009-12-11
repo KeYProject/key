@@ -23,7 +23,6 @@ public class DecisionProcedureCogent{
 	    System.out.println(e);
 	    //do nothing
 	}
-	File cogentOut = new File("/tmp/cogentOut");
 	File file = File.createTempFile("key-cogent", null);
 	PrintWriter out = new PrintWriter(new FileWriter(file));
 	out.println(input);

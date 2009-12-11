@@ -8,10 +8,8 @@
 package de.uka.ilkd.key.unittest;
 
 import java.util.HashMap;
-import java.util.Iterator;
 
 import de.uka.ilkd.key.java.Expression;
-import de.uka.ilkd.key.java.expression.literal.IntLiteral;
 import de.uka.ilkd.key.logic.Term;
 
 /**
@@ -38,7 +36,7 @@ public class Model {
     }
 
     public Model copy() {
-	return new Model((HashMap) class2value.clone(), term2class);
+	return new Model((HashMap<EquivalenceClass, ValueContainer>) class2value.clone(), term2class);
     }
 
     public void setValue(EquivalenceClass ec) {
