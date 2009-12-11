@@ -262,10 +262,9 @@ public class InteractiveProver {
     private void finishFocussedAutoMode () {
         applyStrategy.removeProverTaskObserver ( focussedAutoModeTaskListener );
 
-        for (Goal goal1 : proof.openGoals()) {
+        for (final Goal goal : proof.openGoals()) {
             // remove any filtering rule app managers that are left in the proof
             // goals
-            final Goal goal = goal1;
             if (goal.getRuleAppManager() instanceof FocussedRuleApplicationManager) {
                 final FocussedRuleApplicationManager focusManager =
                         (FocussedRuleApplicationManager) goal.getRuleAppManager();
@@ -341,11 +340,10 @@ public class InteractiveProver {
 	
 	ImmutableSet<RuleApp> result = DefaultImmutableSet.<RuleApp>nil();
 
-        for (RuleApp ruleApp : getInteractiveRuleAppIndex().
+        for (final RuleApp app : getInteractiveRuleAppIndex().
                 getBuiltInRule(focusedGoal,
                         pos,
                         userConstraint)) {
-            RuleApp app = ruleApp;
             if (app.rule() == rule) {
                 result = result.add(app);
             }
@@ -484,8 +482,7 @@ public class InteractiveProver {
 					         userConstraint );
 
         // filter fitting applications
-        for (TacletApp fittingApp : fittingApps) {
-            TacletApp app = fittingApp;
+        for (TacletApp app : fittingApps) {
             if (app.rule().name().toString().equals(name)) {
                 result = result.add(app);
             }
@@ -543,8 +540,7 @@ public class InteractiveProver {
     private ImmutableList<TacletApp> filterTaclet(ImmutableList<NoPosTacletApp> tacletInstances) {
         java.util.HashSet<Taclet> applicableRules = new java.util.HashSet<Taclet>();
         ImmutableList<TacletApp> result = ImmutableSLList.<TacletApp>nil();
-        for (NoPosTacletApp tacletInstance : tacletInstances) {
-            TacletApp app = tacletInstance;
+        for (NoPosTacletApp app : tacletInstances) {
             if (mediator().stupidMode()) {
                 ImmutableList<TacletApp> ifCandidates =
                         app.findIfFormulaInstantiations(

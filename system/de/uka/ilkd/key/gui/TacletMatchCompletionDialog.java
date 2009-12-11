@@ -437,9 +437,8 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
 					// now set the new entry in the table ...
 
 					if(droppedString != null){
-					    String s = droppedString;
 							   
-					    DataTable.this.setValueAt(s, row, column);
+					    DataTable.this.setValueAt(droppedString, row, column);
 					    DataTable.this.repaint();
 					}
 					event.getDropTargetContext().dropComplete(true);

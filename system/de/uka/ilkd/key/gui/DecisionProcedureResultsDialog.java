@@ -143,7 +143,7 @@ public class DecisionProcedureResultsDialog extends JFrame {
         	for(int i=1;i<tableModel.getColumnCount();i++){
         	    SMTSolverResultWrap val = (SMTSolverResultWrap)tableModel.getValueAt(idx, i);
         	    if(val!=null){
-        		sb.append("------------"+val.r.solverName+"----------\n"+val.r+"\n");
+                    sb.append("------------").append(val.r.solverName).append("----------\n").append(val.r).append("\n");
         	    }
         	}
         	textArea.setText(sb.toString());

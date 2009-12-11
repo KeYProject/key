@@ -972,8 +972,7 @@ public class QuanUpdateOperator implements IUpdateOperator {
      */
     private static boolean isSubsumedAssignment(ElUpdateLocation elUpd,
                                                 List<ElUpdateLocation> laterAssignments) {
-        for (ElUpdateLocation laterAssignment : laterAssignments) {
-            final ElUpdateLocation laterAss = laterAssignment;
+        for (ElUpdateLocation laterAss : laterAssignments) {
             final Term subsumptionCond = laterAss.getSubsumptionCondition(elUpd);
             final GuardSatisfiabilityFormulaBuilder satisfiabilityBuilder =
                     new GuardSatisfiabilityFormulaBuilder(subsumptionCond,

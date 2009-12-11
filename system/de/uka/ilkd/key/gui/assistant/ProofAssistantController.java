@@ -18,7 +18,7 @@ package de.uka.ilkd.key.gui.assistant;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.event.*;
-import java.util.LinkedList;
+import java.util.Arrays;import java.util.LinkedList;
 import java.util.List;
 
 import javax.swing.AbstractButton;
@@ -343,9 +343,7 @@ public class ProofAssistantController {
 	 */
 	private void init(Container container) {
  	    Component[] comps = container.getComponents();
-        for (Component comp : comps) {
-            components.add(comp);
-        }
+        components.addAll(Arrays.asList(comps));
 	}
 
 	/**

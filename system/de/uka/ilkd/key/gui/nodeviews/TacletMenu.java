@@ -96,10 +96,8 @@ class TacletMenu extends JMenu {
     private ImmutableList<TacletApp> removeRewrites(ImmutableList<TacletApp> list) {
 	ImmutableList<TacletApp> result = ImmutableSLList.<TacletApp>nil();
 
-        for (TacletApp aList : list) {
-            TacletApp tacletApp = aList;
-            Taclet taclet = tacletApp.taclet();
-            result = (taclet instanceof RewriteTaclet ? result :
+        for (final TacletApp tacletApp : list) {
+            result = (tacletApp.taclet() instanceof RewriteTaclet ? result :
                     result.prepend(tacletApp));
         }
 	return result;
@@ -197,7 +195,7 @@ class TacletMenu extends JMenu {
 
     private void createAbbrevSection(Term t, MenuControl control){
 	AbbrevMap scm = mediator.getNotationInfo().getAbbrevMap();
-	JMenuItem sc = null;
+	JMenuItem sc  ;
 	if(scm.containsTerm(t)){
 	    sc = new JMenuItem("Change abbreviation");
 	    sc.addActionListener(control);
@@ -510,8 +508,7 @@ class TacletMenu extends JMenu {
 	 */
 	private int measureGoalComplexity(ImmutableList<TacletGoalTemplate> l) {
 	    int result = 0;
-        for (TacletGoalTemplate aL : l) {
-            TacletGoalTemplate gt = aL;
+        for (final TacletGoalTemplate gt : l) {
             if (gt instanceof RewriteTacletGoalTemplate) {
                 if (((RewriteTacletGoalTemplate) gt).replaceWith() != null) {
                     result += ((RewriteTacletGoalTemplate) gt).replaceWith().depth();

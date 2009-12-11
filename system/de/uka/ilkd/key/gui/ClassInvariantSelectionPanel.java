@@ -387,8 +387,7 @@ class ClassInvariantSelectionPanel extends JPanel {
         //select all
         selectedInvs = DefaultImmutableSet.<ClassInvariant>nil();
 	final Set<KeYJavaType> kjts = services.getJavaInfo().getAllKeYJavaTypes();
-        for (KeYJavaType kjt1 : kjts) {
-            final KeYJavaType kjt = kjt1;
+        for (final KeYJavaType kjt : kjts) {
             selectedInvs = selectedInvs.union(getRelevantInvs(kjt));
         }
         

@@ -43,7 +43,7 @@ public abstract class ProgramSVSort extends PrimitiveSort {
     // Keeps the mapping of ProgramSVSort names to
     // ProgramSVSort instances (helpful in parsing
     // schema variable declarations)
-    private static HashMap<Name, ProgramSVSort> name2sort = 
+    private static final HashMap<Name, ProgramSVSort> name2sort =
         new HashMap<Name, ProgramSVSort>(60);
 
     //----------- Types of Expression Program SVs ----------------------------
@@ -964,7 +964,7 @@ public abstract class ProgramSVSort extends PrimitiveSort {
      */
     private static class SpecificMethodNameSort extends MethodNameSort{
 
-        private ProgramElementName methodName; 
+        private final ProgramElementName methodName;
         
         public SpecificMethodNameSort(Name sortName, 
 				      ProgramElementName methodName) {
@@ -1079,7 +1079,7 @@ public abstract class ProgramSVSort extends PrimitiveSort {
     private static class ExpressionSpecialPrimitiveTypeSort 
 	extends ExpressionSort{
 
-	private PrimitiveType[] allowed_types;
+	private final PrimitiveType[] allowed_types;
 
 	public ExpressionSpecialPrimitiveTypeSort
 	    (String name, PrimitiveType[] allowed_types) {
@@ -1330,7 +1330,7 @@ public abstract class ProgramSVSort extends PrimitiveSort {
 	extends NameMatchingSort {
 
 	private ImmutableList<Name> reverseSignature = ImmutableSLList.<Name>nil();
-	private String fullTypeName;
+	private final String fullTypeName;
 
 	public MethodNameReferenceSort(Name name,
 	                               String methodName, 
@@ -1548,14 +1548,12 @@ public abstract class ProgramSVSort extends PrimitiveSort {
     //-------------------helper methods ------------------------------------
     
     static boolean methodConstrReference(ProgramElement pe) {
-	return ((pe instanceof MethodReference)
-		|| (pe instanceof ConstructorReference)
-		|| (pe instanceof SpecialConstructorReference));
+	return (pe instanceof MethodReference)
+		|| (pe instanceof ConstructorReference);
     }
 
     public ProgramElement getSVWithSort(ExtList l, Class alternative) {
-        for (Object aL : l) {
-            Object o = aL;
+        for (final Object o : l) {
             if (o instanceof SortedSchemaVariable
                     && (((SortedSchemaVariable) o).sort() == this)) {
                 return (ProgramElement) o;

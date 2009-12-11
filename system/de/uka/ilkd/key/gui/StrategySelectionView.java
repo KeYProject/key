@@ -958,8 +958,7 @@ thing. People were thinking it was a button.
         maxSlider.setEnabled(enable);     
         timeoutSpinner.setEnabled(enable);
         if (mediator != null) {
-            for (StrategyFactory strategyFactory : mediator.getProfile().supportedStrategies()) {
-                final StrategyFactory next = strategyFactory;
+            for (StrategyFactory next : mediator.getProfile().supportedStrategies()) {
                 getStrategyButton(next.name().toString()).setEnabled(enable);
             }
         }
@@ -968,8 +967,7 @@ thing. People were thinking it was a button.
     public Strategy getStrategy(String strategyName, Proof proof,
             StrategyProperties properties) {
         if (mediator != null) {
-            for (StrategyFactory strategyFactory : mediator.getProfile().supportedStrategies()) {
-                final StrategyFactory s = strategyFactory;
+            for (StrategyFactory s : mediator.getProfile().supportedStrategies()) {
                 if (strategyName.equals(s.name().toString())) {
                     return s.create(proof, properties);
                 }

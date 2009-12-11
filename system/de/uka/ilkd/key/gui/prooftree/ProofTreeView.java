@@ -1002,8 +1002,7 @@ public class ProofTreeView extends JPanel {
 	     */
             @Override
             public Iterable<Goal> getGoalList() {
-                ImmutableList<Goal> goals = proof.getSubtreeGoals(invokedNode);
-                return goals;
+                return proof.getSubtreeGoals(invokedNode);
             }
 
             /* 
@@ -1013,7 +1012,7 @@ public class ProofTreeView extends JPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 super.actionPerformed(e);
-                for (Goal goal : getGoalList()) {
+                for (final Goal goal : getGoalList()) {
                     delegateModel.updateTree(goal.node());
                 }
                 // trigger repainting the tree after the completion of this event.

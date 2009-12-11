@@ -66,9 +66,8 @@ public class NRFunctionWithExplicitDependencies extends NonRigidFunction {
     public static NRFunctionWithExplicitDependencies
 	getSymbol(Name name, ImmutableArray<Location> dependencies) {
         HashMap mapDep2Op = (HashMap)pool.get(name);
-        NRFunctionWithExplicitDependencies op = 
+        return
             (NRFunctionWithExplicitDependencies) mapDep2Op.get(dependencies);
-        return op;
     }
     
     /**

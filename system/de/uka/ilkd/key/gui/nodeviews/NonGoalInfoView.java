@@ -246,8 +246,7 @@ public class NonGoalInfoView extends JTextArea {
 	throws BadLocationException {	 
 	final ImmutableList<IfFormulaInstantiation> ifs = tapp.ifFormulaInstantiations ();	 
 	if ( ifs == null ) return;
-        for (IfFormulaInstantiation anIf : ifs) {
-            final IfFormulaInstantiation inst2 = anIf;
+        for (final IfFormulaInstantiation inst2 : ifs) {
             if (!(inst2 instanceof IfFormulaInstSeq)) continue;
             final IfFormulaInstSeq inst = (IfFormulaInstSeq) inst2;
             final PosInOccurrence pos =

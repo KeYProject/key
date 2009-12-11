@@ -50,8 +50,7 @@ public class PrimitiveSort extends AbstractNonCollectionSort {
             return false;
         }
 
-        for (Sort sort1 : extendsSorts()) {
-            final Sort s = sort1;
+        for (final Sort s : extendsSorts()) {
             assert s != null;
             if (s == sort || s.extendsTrans(sort)) {
                 return true;

@@ -23,7 +23,7 @@ public abstract class AbstractSort implements Sort, SortDefiningSymbols {
     public static final Name OBJECT_REPOSITORY_NAME = new Name("<get>");
 
     /** name of the Sort */
-    protected Name name;
+    protected final Name name;
 
     /**
      * equality symbol for this sort
@@ -75,8 +75,7 @@ public abstract class AbstractSort implements Sort, SortDefiningSymbols {
            }
            return true;
        } else {
-           for (Sort sort1 : extendsSorts()) {
-               final Sort s = sort1;
+           for (final Sort s : extendsSorts()) {
                assert s != null;
                if (s == sort || s.extendsTrans(sort)) {
                    return true;

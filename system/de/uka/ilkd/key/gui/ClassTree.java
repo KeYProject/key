@@ -169,15 +169,14 @@ class ClassTree extends JTree {
             ImmutableList<ProgramMethod> pms 
             	= services.getJavaInfo()
                           .getAllProgramMethodsLocallyDeclared(kjt);
-            for (ProgramMethod pm1 : pms) {
-                ProgramMethod pm = pm1;
+            for (ProgramMethod pm : pms) {
                 if ((!pm.isImplicit() || pm.getName().equals(INIT_NAME))
                         && pm.getMethodDeclaration().getBody() != null) {
                     StringBuffer sb = new StringBuffer(pm.getName());
                     sb.append("(");
                     for (int i = 0, n = pm.getParameterDeclarationCount();
                          i < n; i++) {
-                        sb.append(pm.getParameterDeclarationAt(i) + ", ");
+                        sb.append(pm.getParameterDeclarationAt(i)).append(", ");
                     }
                     if (pm.getParameterDeclarationCount() > 0) {
                         sb.setLength(sb.length() - 2);

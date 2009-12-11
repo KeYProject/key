@@ -23,12 +23,12 @@ import de.uka.ilkd.key.collection.ImmutableSet;
 
 public class ArraySortImpl extends AbstractCollectionSort implements ArraySort{
 
-    private static WeakHashMap<SortKey, WeakReference<ArraySort>> aSH = 
+    private static final WeakHashMap<SortKey, WeakReference<ArraySort>> aSH = 
         new WeakHashMap<SortKey, WeakReference<ArraySort>>();
     
     private final ImmutableArray<Sort> commonJavaSorts;  
     
-    private ImmutableSet<Sort> extendsSorts;
+    private final ImmutableSet<Sort> extendsSorts;
     
     /** keeping this key is important to prevent for too early hashmap removal*/
     private final SortKey sk;

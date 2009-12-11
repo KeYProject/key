@@ -181,8 +181,7 @@ public class ReuseListenerImpl implements ReuseListener, KeYSelectionListener {
 //         }
          n.markReuseCandidate();
           //         reuseLogger.info("***********************************************");
-          for (Goal goal : medi.getProof().openGoals()) {
-              Goal g = goal;
+          for (final Goal g : medi.getProof().openGoals()) {
               analyzeCandidate(n, g);
           }
       }

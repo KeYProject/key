@@ -134,11 +134,8 @@ public class MethodCallInfo {
             list=al;
         }
         public boolean hasNext() {
-            if(list.size()>pos+1){
-                return true;
+            return list.size() > pos + 1;
             }
-            return false;
-        }
         public Object next() {
             return list.get(++pos);
         }

@@ -245,25 +245,13 @@ public class DecisionProcedureSettings implements Settings {
 	multProversSettings = props.getProperty(MULTIPLEPROVERS);
 	
 	String wfap = props.getProperty(WAITFORALLPROVERS);
-	if(wfap != null && wfap.equals("true")){
-	    waitForAllProvers = true;
-	}else {
-	    waitForAllProvers = false;
-	}
+    waitForAllProvers = wfap != null && wfap.equals("true");
 	
 	String sf = props.getProperty(SAVEFILE);
-	if (!(sf == null) && sf.equals("true")) {
-	    this.saveFile = true;
-	} else {
-	    this.saveFile = false;
-	}
+        this.saveFile = !(sf == null) && sf.equals("true");
 	
 	String sd = props.getProperty(SHOW_SMT_RES_DIA);
-	if (!(sd == null) && sf.equals("true")) {
-	    this.showSMTResDialog = true;
-	} else {
-	    this.showSMTResDialog = false;
-	}
+    this.showSMTResDialog = !(sd == null) && sf.equals("true");
 
     }
     

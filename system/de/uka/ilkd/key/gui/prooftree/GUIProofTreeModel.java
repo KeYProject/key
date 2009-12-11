@@ -78,8 +78,7 @@ class GUIProofTreeModel implements TreeModel, java.io.Serializable  {
          Goal g = e.getGoal();
          if (g != null) {
 	     updateTree(getProofTreeNode(g.node()));
-             return;
-         }
+             }
 
       }
       

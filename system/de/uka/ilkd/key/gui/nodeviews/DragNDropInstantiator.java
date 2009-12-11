@@ -280,12 +280,11 @@ public class DragNDropInstantiator extends DropTargetAdapter {
             PosInSequent targetPos, final Services services,
             final Sequent sequent, final Constraint userConstraint) {
         
-        ImmutableList<PosTacletApp> applicableApps = getDirectionDependentApps(sourcePos, targetPos, services, 
+        return getDirectionDependentApps(sourcePos, targetPos, services,
                 sequent, userConstraint).
                 prepend(getDirectionDependentApps(targetPos, sourcePos, services, 
                         sequent, userConstraint));
         
-        return applicableApps;
     }
 
 
@@ -316,9 +315,8 @@ public class DragNDropInstantiator extends DropTargetAdapter {
 
         // if in replaceWithMode only apps that contain at least one replacewith
         // are collected. Otherwise only those without a replacewith.
-        for (TacletApp tacletApp : seqView.mediator()
+        for (final TacletApp app : seqView.mediator()
                 .getFindTaclet(findPos)) {
-            final TacletApp app = tacletApp;
             if (filter.satisfiesFilterCondition(app.taclet())) {
                 allTacletsAtFindPosition = allTacletsAtFindPosition
                         .prepend(app);
@@ -615,8 +613,7 @@ public class DragNDropInstantiator extends DropTargetAdapter {
              */
             private boolean goalTemplatesContainAddrules(
                     ImmutableList<TacletGoalTemplate> goalDescriptions) {
-                for (TacletGoalTemplate goalDescription : goalDescriptions) {
-                    final TacletGoalTemplate tgt = goalDescription;
+                for (final TacletGoalTemplate tgt : goalDescriptions) {
                     if (tgt.rules().size() >= 1) {
                         return true;
                     }

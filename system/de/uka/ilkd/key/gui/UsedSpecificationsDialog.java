@@ -272,8 +272,7 @@ public class UsedSpecificationsDialog extends JDialog {
         }
         
         //try to find closed proof
-        for (Proof proof1 : proofs) {
-            Proof proof = proof1;
+        for (final Proof proof : proofs) {
             if (proof.mgt().getStatus().getProofClosed()) {
                 return proof;
             }

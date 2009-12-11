@@ -82,8 +82,7 @@ public class IfThenElse extends Op {
         final ImmutableSet<Sort> set1 = s1.extendsSorts();
         final ImmutableSet<Sort> set2 = s2.extendsSorts();
 
-        for (Sort aSet1 : set1) {
-            final Sort sort1 = aSet1;
+        for (final Sort sort1 : set1) {
             if (set2.contains(sort1)) {
                 if (result == Sort.ANY) {
                     result = sort1;

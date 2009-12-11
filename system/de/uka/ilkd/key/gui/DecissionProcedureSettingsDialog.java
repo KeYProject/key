@@ -306,7 +306,6 @@ public class DecissionProcedureSettingsDialog extends JDialog {
     
     /**
      * set the value fields according to the values of the selected decproc.
-     * @param selectedIndex the index which decproc is said to be selected.
      */
     private void setRuleVals() {
 	if(previousSelectedIndex >= 0){

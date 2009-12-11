@@ -137,7 +137,6 @@ public class ApplyStrategy {
                     break;
             }
             if (app == null) return false;      
-            assert g != null;
             rl.removeRPConsumedGoal(g);                
             rl.addRPOldMarkersNewGoals(g.apply(app));
         }
@@ -291,8 +290,7 @@ public class ApplyStrategy {
     private class AutoModeWorker extends SwingWorker {
          
         public Object construct() {
-            Object res = doWork();
-	    return res;
+            return  doWork();
         }
 
         public void finished() {

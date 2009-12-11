@@ -186,7 +186,7 @@ public class RecentFileMenu {
      */
     public void load(Properties p) {
         int i=maxNumberOfEntries;
-        String s = null;
+        String s  ;
         do {
             s = p.getProperty("RecentFile"+i);
             if (s != null) addRecentFile(s);

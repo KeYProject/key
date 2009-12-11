@@ -517,8 +517,7 @@ public class KeYMediator {
 	RuleApp app = set.iterator().next();
 	if (app != null && app.rule() == rule) {
 	    goal.apply(app);
-	    return;
-	}
+	    }
     }
      
       
@@ -970,7 +969,7 @@ public class KeYMediator {
       final boolean b = fullStop;
       Runnable interfaceSignaller = new Runnable() {
          public void run() {
-	     if (mainFrame() instanceof JFrame) mainFrame().setCursor
+	     if (mainFrame() != null) mainFrame().setCursor
 		 (new java.awt.Cursor(java.awt.Cursor.WAIT_CURSOR));
             if (b) {
                interactiveProver.fireAutoModeStarted(
@@ -987,7 +986,7 @@ public class KeYMediator {
          public void run() {
             if ( b )
                interactiveProver.fireAutoModeStopped (new ProofEvent(getProof()));
-            if (mainFrame() instanceof JFrame) mainFrame().setCursor
+            if (mainFrame() != null) mainFrame().setCursor
 		(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
             if (getProof() != null)
                 keySelectionModel.fireSelectedProofChanged();

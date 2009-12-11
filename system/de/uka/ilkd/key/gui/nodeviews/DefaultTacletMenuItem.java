@@ -107,7 +107,7 @@ class DefaultTacletMenuItem extends JMenuItem implements TacletMenuItem {
         StringBuffer result = new StringBuffer();
         for (String aSa : sa) {
             //logger.debug("'" + sa[i] + "'");
-            if (aSa == "") {
+            if ("".equals(aSa)) {
                 continue;
             }
             boolean onlySpaces = true;
