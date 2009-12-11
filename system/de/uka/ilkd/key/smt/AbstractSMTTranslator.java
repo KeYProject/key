@@ -708,10 +708,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
     private final StringBuffer translate(ConstrainedFormula cf, Services services)
 	    throws IllegalFormulaException {
 	StringBuffer hb = new StringBuffer();
-	Term t;
-	t = cf.formula();
-	Operator op = t.op();
-	hb.append(translateTerm(t, new Vector<QuantifiableVariable>(), services));
+	hb.append(translateTerm(cf.formula(), new Vector<QuantifiableVariable>(), services));
 	return hb;
     }
     
@@ -1820,10 +1817,8 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
     }
 
     private boolean isSomeIntegerSort(Sort s) {
-	if (s == jbyteSort || s == jshortSort || s == jintSort
-		|| s == jlongSort || s == jcharSort || s == integerSort)
-	    return true;
-	return false;
-    }
+        return s == jbyteSort || s == jshortSort || s == jintSort
+                || s == jlongSort || s == jcharSort || s == integerSort;
+	}
 
 }

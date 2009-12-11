@@ -277,7 +277,7 @@ public class Recoder2KeYTypeConverter {
     private void addKeYJavaType(recoder.abstraction.Type t, Sort s) {
         KeYJavaType result = null;
         if (!(t instanceof recoder.java.declaration.TypeDeclaration)) {
-            de.uka.ilkd.key.java.abstraction.Type type = null;
+            de.uka.ilkd.key.java.abstraction.Type type;
             if (t instanceof recoder.abstraction.PrimitiveType) {
                 type = PrimitiveType.getPrimitiveType(t.getFullName());
                 result = typeConverter.getKeYJavaType(type);

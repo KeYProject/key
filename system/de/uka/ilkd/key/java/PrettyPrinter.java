@@ -323,9 +323,9 @@ public class PrettyPrinter {
             char c = str.charAt(i);
             if (c >= 0x0100) {
                 if (c < 0x1000) {
-                    buf.append("\\u0" + Integer.toString(c, 16));
+                    buf.append("\\u0").append(Integer.toString(c, 16));
                 } else {
-                    buf.append("\\u" + Integer.toString(c, 16));
+                    buf.append("\\u").append(Integer.toString(c, 16));
                 }
             } else {
                 buf.append(c);

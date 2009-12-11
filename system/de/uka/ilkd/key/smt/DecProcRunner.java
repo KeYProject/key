@@ -168,8 +168,7 @@ public class DecProcRunner extends SwingWorker {
             throw(ex);
         } finally {
             if (il != null) {
-        	mediator.removeInterruptListener(il);
-        	il = null;
+        	mediator.removeInterruptListener(il);       	
             }
             mediator.startInterface(true);
         }
