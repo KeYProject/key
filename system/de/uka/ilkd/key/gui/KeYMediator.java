@@ -329,7 +329,7 @@ public class KeYMediator {
 
     public void bugDetectionForSelectedNode(){
 	if (ensureProofLoaded()) {
-	    BugDetector bugDetector = new BugDetector();
+	    BugDetector bugDetector = new BugDetector(getServices());
 	    try {
 		bugDetector.run(getSelectedNode());
 	    } catch(Exception e){

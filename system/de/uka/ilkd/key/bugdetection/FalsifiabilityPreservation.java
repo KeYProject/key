@@ -36,10 +36,11 @@ public class FalsifiabilityPreservation {
     public enum BranchType {FIRST, SECND, THRID};
     public enum RuleType {LOOP_INV, METH_CONTR};
     
-    protected final MsgMgt msgMgt;
+    /**Gives access to some utilities like Services and MsgMgt (MessageManagement) */
+    protected BugDetector bd;
 
-    public FalsifiabilityPreservation(MsgMgt msgMgt){
-	this.msgMgt = msgMgt;
+    public FalsifiabilityPreservation(BugDetector bd){
+	this.bd = bd;
     }
     
     /**Traverse a proof branch from node {@code n} towards the root and collect
@@ -61,9 +62,9 @@ public class FalsifiabilityPreservation {
 		    final BranchType branchType = getBranchType(ruleType,n);
 		    final FPCondition fpc;
 		    if(branchType == BranchType.THRID)
-			fpc = new SFPCondition(n, last, ruleType, branchType, msgMgt);
+			fpc = new SFPCondition(n, last, ruleType, branchType, bd);
 		    else
-			fpc = new FPCondition(n,ruleType, branchType, msgMgt);
+			fpc = new FPCondition(n,ruleType, branchType, bd);
 
 		    fpc.constructFPC();
 		    
@@ -115,7 +116,7 @@ public class FalsifiabilityPreservation {
     
     
     private void warning(String s, int severity){
-	msgMgt.warning(s, severity);
+	bd.msgMgt.warning(s, severity);
     }
     
     

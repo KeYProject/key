@@ -2,16 +2,21 @@ package de.uka.ilkd.key.bugdetection;
 
 import java.util.Vector;
 
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Node;
 
 public class BugDetector {
     
     MsgMgt msgMgt;
+    Services services;
 
+    public BugDetector(Services services){
+	this.services = services;
+    }
     public void run(Node n){
 	msgMgt = new MsgMgt();
-	FalsifiabilityPreservation fp = new FalsifiabilityPreservation(msgMgt);
+	FalsifiabilityPreservation fp = new FalsifiabilityPreservation(this);
 	fp.collectFPConditions(n);
     }
     

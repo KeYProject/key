@@ -11,6 +11,7 @@ import de.uka.ilkd.key.collection.ImmutableMapEntry;
 import de.uka.ilkd.key.logic.ConstrainedFormula;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.AnonymousUpdate;
 import de.uka.ilkd.key.logic.op.IUpdateOperator;
 import de.uka.ilkd.key.logic.op.Modality;
@@ -36,15 +37,18 @@ public class FPCondition {
 	 * This can be the Special Falsifiability Preservation condition (SFP) */
 	public Term fpCond;
 	
+	/**the parent {@code node} */
 	protected Node parent;
-	private final MsgMgt msgMgt;
+	/**Gives access to some utilities like Services and MsgMgt (MessageManagement) */
+	protected final BugDetector bd;
+	protected TermBuilder tb = TermBuilder.DF;
 
 	
-	public FPCondition(Node node, RuleType ruleType, BranchType branchType, MsgMgt msgMgt){
+	public FPCondition(Node node, RuleType ruleType, BranchType branchType, BugDetector bd){
 	    this.node = node;
 	    this.ruleType = ruleType;
 	    this.branchType = branchType;
-	    this.msgMgt = msgMgt;
+	    this.bd = bd;
 	    parent = node.parent();
 	}
 	
@@ -121,7 +125,7 @@ public class FPCondition {
 	
 
 	protected void warning(String s, int severity){
-	    msgMgt.warning(s, severity);
+	    bd.msgMgt.warning(s, severity);
 	}
 	
 }
