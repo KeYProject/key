@@ -63,7 +63,7 @@ class SolverWrapper
       
     Finished = finished;
     
-    if(Finished == true){
+    if(Finished){
 	
 	    InputStream in = Proc.getInputStream();
 	    Text = AbstractSMTSolver.read(in);

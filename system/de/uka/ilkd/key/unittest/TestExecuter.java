@@ -10,7 +10,6 @@ import java.util.Vector;
 
 import javax.swing.JOptionPane;
 
-import de.uka.ilkd.key.gui.ExceptionDialog;
 import de.uka.ilkd.key.gui.Main;
 
 /**
@@ -50,7 +49,6 @@ public class TestExecuter {
 	public static String[] testExecutionCommand(String testPath, boolean GUImode){
 	    	assert(testPath.indexOf('\n')==-1);
 		String test = testPath.substring(testPath.lastIndexOf(File.separator) + 1);
-		String testDir = testPath.substring(0, testPath.lastIndexOf(File.separator));
 
 		Vector<String> cmdAndArgs = new Vector<String>();
 	        cmdAndArgs.add("java");
@@ -70,7 +68,6 @@ public class TestExecuter {
 	    
 	    /**
 	     * @param testPath the full path to the test suite file
-	     * @param modelDir is currently not supported
 	     * @throws IOException
 	     */
 	public static void compileAndRunTest(String testPath, String workingDir, boolean compileOnlyGeneratedFiles,boolean GUImode) throws IOException{

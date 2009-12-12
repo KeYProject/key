@@ -1,22 +1,9 @@
 package de.uka.ilkd.key.unittest;
 
-import java.lang.ref.WeakReference;
-import java.util.List;
-
-import de.uka.ilkd.key.collection.ImmutableSet;
-import de.uka.ilkd.key.gui.KeYSelectionModel;
 import de.uka.ilkd.key.gui.Main;
 import de.uka.ilkd.key.gui.TestGenerationDialog;
-import de.uka.ilkd.key.gui.TaskFinishedInfo;
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.declaration.MethodDeclaration;
-import de.uka.ilkd.key.java.reference.PackageReference;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.unittest.AssGenFac.AssignmentGenerator;
-import de.uka.ilkd.key.util.ProgressMonitor;
 
 /**
  * Extend the TestGenerator with methods that send and receive messages with the MethodSelectionDialog.

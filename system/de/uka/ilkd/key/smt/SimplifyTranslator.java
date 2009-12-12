@@ -117,11 +117,11 @@ public class SimplifyTranslator extends AbstractSMTTranslator {
 		preds.append(commentPredicate[block.getType()]);
 		for(int j = block.getStart(); j <= block.getEnd(); j++){
 		    PredicatesToRemove.add(predicates.get(j));
-		    preds.append("(DEFPRED (" + predicates.get(j).get(0));
+            preds.append("(DEFPRED (").append(predicates.get(j).get(0));
 		    for (int i = 1; i < predicates.get(j).size(); i++) {
 			StringBuffer var = new StringBuffer("x");
 			var = this.makeUnique(var);
-			preds.append(" " + var);
+                preds.append(" ").append(var);
 		    	}
 		    preds.append("))\n");
 		}
@@ -134,11 +134,11 @@ public class SimplifyTranslator extends AbstractSMTTranslator {
 	{
 	    preds.append("\n;Other predicates:\n");
 	    for (ArrayList<StringBuffer> s : predicates) {
-		preds.append("(DEFPRED (" + s.get(0));
+            preds.append("(DEFPRED (").append(s.get(0));
 		for (int i = 1; i < s.size(); i++) {
 		    StringBuffer var = new StringBuffer("x");
 		    var = this.makeUnique(var);
-		    preds.append(" " + var);
+            preds.append(" ").append(var);
 		}
 		preds.append("))\n");
 	    }
@@ -335,7 +335,7 @@ public class SimplifyTranslator extends AbstractSMTTranslator {
     protected StringBuffer translateLogicalAll(StringBuffer var,
 	    StringBuffer type, StringBuffer form) {
 	StringBuffer toReturn = new StringBuffer("(" + ALLSTRING + " ");
-	toReturn.append("(" + var + ") " + form + ")");
+        toReturn.append("(").append(var).append(") ").append(form).append(")");
 	return toReturn;
     }
 
@@ -374,7 +374,7 @@ public class SimplifyTranslator extends AbstractSMTTranslator {
     protected StringBuffer translateLogicalExist(StringBuffer var,
 	    StringBuffer type, StringBuffer form) {
 	StringBuffer toReturn = new StringBuffer("(" + EXISTSTRING + " ");
-	toReturn.append("(" + var + ") " + form + ")");
+        toReturn.append("(").append(var).append(") ").append(form).append(")");
 	return toReturn;
     }
 

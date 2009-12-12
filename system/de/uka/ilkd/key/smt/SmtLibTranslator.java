@@ -247,8 +247,7 @@ public class SmtLibTranslator extends AbstractSMTTranslator {
      *         declarations, Argument2 is the sort used for type predicates
      */
     protected StringBuffer translateSort(String name, boolean isIntVal) {
-	StringBuffer uniqueName = makeUnique(new StringBuffer(name));
-	return uniqueName;
+	return makeUnique(new StringBuffer(name));
     }
 
     @Override
@@ -376,9 +375,7 @@ public class SmtLibTranslator extends AbstractSMTTranslator {
 
     @Override
     protected StringBuffer translateLogicalVar(StringBuffer name) {
-	StringBuffer toReturn = (new StringBuffer("?"))
-		.append(makeUnique(name));
-	return toReturn;
+	return new StringBuffer("?").append(makeUnique(name));
     }
 
     @Override

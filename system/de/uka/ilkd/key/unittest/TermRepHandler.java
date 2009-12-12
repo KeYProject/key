@@ -25,7 +25,6 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.NonRigidFunctionLocation;
-import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.rule.updatesimplifier.AssignmentPair;
 
 /**
@@ -92,8 +91,6 @@ public class TermRepHandler {
     /**
      * Returns the Write Representation for a given NRFL
      * @param right TODO
-     * @param op
-     *            the NRFL
      * 
      * @return the Write Representation
      */
@@ -106,8 +103,6 @@ public class TermRepHandler {
     /**
      * Returns the Read Representation for a given NRFL
      * 
-     * @param op
-     *            the NRFL
      * @return the Read Representation
      */
     public Term getReadRep(Term t) {

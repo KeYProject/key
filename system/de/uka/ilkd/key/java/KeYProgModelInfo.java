@@ -764,8 +764,8 @@ public class KeYProgModelInfo{
         List<recoder.abstraction.ClassType> classes = si.getSubtypes(ct);
 
         //alpha sorting to make order deterministic
-        recoder.abstraction.ClassType[] classesArray = 
-            classes.toArray(new recoder.abstraction.ClassType[0]);
+        recoder.abstraction.ClassType[] classesArray =
+                classes.toArray(new recoder.abstraction.ClassType[classes.size()]);
         java.util.Arrays.sort(classesArray, new java.util.Comparator<recoder.abstraction.ClassType>() {
             public int compare(ClassType o1, ClassType o2) {                
                 return -o1.getFullName().compareTo(o2.getFullName());

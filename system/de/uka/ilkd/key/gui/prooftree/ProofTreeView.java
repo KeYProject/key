@@ -179,7 +179,8 @@ public class ProofTreeView extends JPanel {
 	                JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
     }
     
-    protected void finalize() {
+    protected void finalize() throws Throwable {
+        super.finalize();
         Config.DEFAULT.removeConfigChangeListener(configChangeListener);
         configChangeListener = null;
     }

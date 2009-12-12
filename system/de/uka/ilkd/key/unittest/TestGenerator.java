@@ -4,7 +4,6 @@ import java.io.*;
 import java.util.*;
 
 import de.uka.ilkd.key.collection.*;
-import de.uka.ilkd.key.gui.Main;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.ArrayType;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -30,7 +29,6 @@ import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.ArraySort;
 import de.uka.ilkd.key.logic.sort.ArraySortImpl;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.ProofSaver;
 import de.uka.ilkd.key.rule.UpdateSimplifier;
 import de.uka.ilkd.key.rule.soundness.TermProgramVariableCollector;
@@ -41,6 +39,7 @@ import de.uka.ilkd.key.util.ExtList;
 import de.uka.ilkd.key.visualdebugger.VisualDebugger;
 
 public abstract class TestGenerator {
+
     protected static final String RESULT_NAME = "_oracleResult";
 
     protected final Services serv;
@@ -53,8 +52,7 @@ public abstract class TestGenerator {
 
     private final AssignmentGenerator ag;
 
-    // It should be possible to get rid of JavaInfo entirely if all
-    // KeYJavaTypes
+    // It should be possible to get rid of JavaInfo entirely if all KeYJavaTypes
     // are "replaced" by SyntacticalTypeRefs. This would make the class more
     // independent from the type system known by in JavaInfo.
     protected final JavaInfo ji;
@@ -72,12 +70,12 @@ public abstract class TestGenerator {
     private final HashMap<Term, Expression> translatedFormulas;
 
     private DataStorage data;
-    
-    public Thread modelGenThread=null;
 
-    /** Seconds to wait for modelGeneration for each node. -1 = infinitely.  */
-    public static volatile int modelCreationTimeout=100;
-    
+    public Thread modelGenThread = null;
+
+    /** Seconds to wait for modelGeneration for each node. -1 = infinitely. */
+    public static volatile int modelCreationTimeout = 100;
+
     public final TestGeneratorGUIInterface gui;
 
     /**
@@ -94,7 +92,9 @@ public abstract class TestGenerator {
      *            from the runTest regression testing script.
      * @param ag
      *            the AssignmentGenerator to use.
-     * @param gui is allowed to be null. Otherwise the gui interface is used to display test generation progress to the user.
+     * @param gui
+     *            is allowed to be null. Otherwise the gui interface is used to
+     *            display test generation progress to the user.
      */
     @SuppressWarnings("unchecked")
     protected TestGenerator(final Services serv, final String fileName,
@@ -131,13 +131,13 @@ public abstract class TestGenerator {
 	// JavaInfo doesn't provide it (as it should be in a clean
 	// typesystem for JavaCard).
 	intType = ji.getTypeByName("int");
-	
+
 	this.gui = gui;
     }
-    
+
     /**
-     * Generates the testcase and writes it to a file. 
-     * It uses background threads that access the field TestGenerator.modelCreationTimeout.
+     * Generates the testcase and writes it to a file. It uses background
+     * threads that access the field TestGenerator.modelCreationTimeout.
      * 
      * @param code
      *            the piece of code that is tested by the generated unittest.
@@ -156,8 +156,8 @@ public abstract class TestGenerator {
      * @return The string that show the path of the generated file
      */
     @SuppressWarnings("unchecked")
-    synchronized public String  generateTestSuite(final Statement[] code, Term oracle,
-	    final List<ModelGenerator> mgs,
+    synchronized public String generateTestSuite(final Statement[] code,
+	    Term oracle, final List<ModelGenerator> mgs,
 	    ImmutableSet<ProgramVariable> programVars, final String methodName,
 	    final PackageReference pr) {
 	oracle = new UpdateSimplifier().simplify(oracle, serv);
@@ -165,8 +165,6 @@ public abstract class TestGenerator {
 	    programVars = programVars.union(mg.getProgramVariables());
 	}
 	final ImmutableSet<ProgramVariable> reducedPVSet = removeDublicates(programVars);
-	// final ProgramVariable[] pvaNotDecl = reducedPVSet
-	// .toArray(new ProgramVariable[reducedPVSet.size()]);
 	data.setPvs2(reducedPVSet);
 	ExtList l = new ExtList();
 	l.add(createSuiteMethod());
@@ -174,71 +172,83 @@ public abstract class TestGenerator {
 	// used to increment a counter of the test methods for automatic
 	// unique naming.
 	final Vector<MethodDeclaration> testMethods = new Vector<MethodDeclaration>();
-	int count=0;
-	int totalCount= mgs.size();
+	int count = 0;
+	final int totalCount = mgs.size();
 	generateTestSuite_progressNotification0(totalCount);
-	while(mgs.size()>0){//for (final ModelGenerator mg : mgs) {  
-	    ModelGenerator mg = mgs.get(0); //modelGenerators are removed from the list (and hopefully destroyed) in order to save memory.
-	    Model[] models=null;
-	    MethodDeclaration methDec=null;
+	while (mgs.size() > 0) {
+	    // modelGenerators are removed from the list (and hopefully
+	    // destroyed) in order to save memory.
+	    final ModelGenerator mg = mgs.get(0); 
+	    Model[] models = null;
+	    MethodDeclaration methDec = null;
 	    count++;
-	    try{
-		    
-        	    generateTestSuite_progressNotification1(count,totalCount,mg);
-        	    ModelGeneratorRunnable modelGeneration=null;
-		    if(!testing){
-			//Model generation. The threads implement a timeout-feature for model generation.
-			modelGeneration = new ModelGeneratorRunnable(mg);
-	        	models = modelGeneration.createModels(); 
-		    }else{ 
-			//The following call does not run another thread
-			models = mg.createModels();
+	    try {
+
+		generateTestSuite_progressNotification1(count, totalCount, mg);
+		ModelGeneratorRunnable modelGeneration = null;
+		if (!testing) {
+		    // Model generation. The threads implement a timeout-feature
+		    // for model generation.
+		    modelGeneration = new ModelGeneratorRunnable(mg);
+		    models = modelGeneration.createModels();
+		} else {
+		    // The following call does not run another thread
+		    models = mg.createModels();
+		}
+
+		// Read model
+		final boolean createModelsFailed = models == null || (models.length == 0);
+		generateTestSuite_progressNotification2(count, totalCount, mg, models, !createModelsFailed,
+		        (modelGeneration != null && modelGeneration.wasInterrupted()));
+		if (createModelsFailed) {
+		    // This ModelGenerator has been used in this iteration and
+		    // is not needed anymore
+		    mgs.remove(0);
+		    continue;
+		}
+		final EquivalenceClass[] intOrBoolEqvArray = mg.getPrimitiveLocationEqvClasses();
+		final Expression[][] testLocation = new Expression[intOrBoolEqvArray.length][];
+		final Expression[][] testData = new Expression[intOrBoolEqvArray.length][models.length];
+		for (int i = 0; i < intOrBoolEqvArray.length; i++) {
+		    final ImmutableSet<Term> locs = intOrBoolEqvArray[i].getLocations();
+		    testLocation[i] = new Expression[locs.size()];
+		    int k = 0;
+		    for (final Term testLoc : locs) {
+			testLocation[i][k++] = translateTerm(testLoc, null, null);
 		    }
-        	    
-        	    //Read model
-        	    final boolean createModelsFailed = models==null || (models.length == 0);// && mgs.size() != 1);//
-        	    generateTestSuite_progressNotification2(count,totalCount,mg, models, !createModelsFailed, 
-        		    				(modelGeneration != null && modelGeneration.wasInterrupted()));
-        	    if (createModelsFailed) {
-        		mgs.remove(0);//This ModelGenerator has been used in this iteration and is not needed anymore
-        		continue;
-        	    }
-        	    final EquivalenceClass[] intOrBoolEqvArray = mg.getPrimitiveLocationEqvClasses();
-        	    final Expression[][] testLocation = new Expression[intOrBoolEqvArray.length][];
-        	    final Expression[][] testData = new Expression[intOrBoolEqvArray.length][models.length];
-        	    for (int i = 0; i < intOrBoolEqvArray.length; i++) {
-        		final ImmutableSet<Term> locs = intOrBoolEqvArray[i].getLocations();
-        		testLocation[i] = new Expression[locs.size()];
-        		int k = 0;
-        		for (final Term testLoc : locs) {
-        		    testLocation[i][k++] = translateTerm(testLoc, null, null);
-        		}
-        		for (int j = 0; j < models.length; j++) {
-        		    testData[i][j] = models[j].getValueAsExpression(intOrBoolEqvArray[i]);
-        		    if(testData[i][j]==null){
-        			testData[i][j]= new IntLiteral(15); //Emergency solution. Was earlier in Model.getValueAsExpressions()
-        			generateTestSuite_progressNotification2b(count,totalCount,mg,intOrBoolEqvArray[i]);
-        		    }
-        		}
-        	    }
-        	    // mbender: collect data for KeY junit tests (see
-        	    // TestTestGenerator,TestHelper)
-        	    data.addTestDat(testData);
-        	    data.addTestLoc(testLocation);
-        	    methDec = createTestMethod(code, oracle,
-        		    testLocation, testData, reducedPVSet, 
-        		    methodName + (testMethods.size()), l, mg, intOrBoolEqvArray);
-        	    l.add(methDec);
-        	    testMethods.add(methDec);
-        	    generateTestSuite_progressNotification3(count,totalCount,mg,models,methDec);
-	    }catch(Exception e){
-		generateTestSuite_progressNotification4(count,totalCount,e, mg,models,methDec);
+		    for (int j = 0; j < models.length; j++) {
+			testData[i][j] = models[j].getValueAsExpression(intOrBoolEqvArray[i]);
+			if (testData[i][j] == null) {
+			    // Emergency solution.
+			    // Was earlier in Model.getValueAsExpressions()
+			    testData[i][j] = new IntLiteral(15); 
+			    generateTestSuite_progressNotification2b(count, totalCount, mg, intOrBoolEqvArray[i]);
+			}
+		    }
+		}
+		// mbender: collect data for KeY junit tests (see
+		// TestTestGenerator,TestHelper)
+		data.addTestDat(testData);
+		data.addTestLoc(testLocation);
+		methDec = createTestMethod(code, oracle, testLocation,
+		        testData, reducedPVSet, methodName
+		                + (testMethods.size()), l, mg,
+		        intOrBoolEqvArray);
+		l.add(methDec);
+		testMethods.add(methDec);
+		generateTestSuite_progressNotification3(count, totalCount, mg,
+		        models, methDec);
+	    } catch (final Exception e) {
+		generateTestSuite_progressNotification4(count, totalCount, e,
+		        mg, models, methDec);
 	    }
-	//}//for
-	    mgs.remove(0);//This ModelGenerator has been used in this iteration and is not needed anymore
+	    // This ModelGenerator has been used in this iteration and is not
+	    // needed anymore
+	    mgs.remove(0);
 	}
 
-	l = createMain(l, testMethods);// Create main() method. Required for the KeYGenU Tool chain.
+	// Create main() method. Required for the KeYGenU Tool chain.
+	l = createMain(l, testMethods);
 
 	final ClassDeclaration suite = createSuiteClass(l);
 
@@ -273,120 +283,93 @@ public abstract class TestGenerator {
 	}
 	return path;
     }
-    
-    class ModelGeneratorRunnable implements Runnable {
-	/** stores the result of the model generation. 
-	 * If the result is null then either the thread has not finished computation or an error occurred. */
-	public Model[] models=null;
-	final ModelGenerator mg;
-	protected boolean interrupted=false;
 
-	ModelGeneratorRunnable(ModelGenerator mg){
-	    this.mg = mg;
-	    assert(mg!=null);
-	}
-	public void run(){
-	    models = mg.createModels();
-	}
-	
-	protected boolean timeoutIsActive(){
-	    return TestGenerator.modelCreationTimeout>=0;
-	}
-	
-	/**
-	 * Uses ModelGenerato.modelCreationTimeout in order to terminate threads when time is exceeded
-	 */
-	public Model[] createModels()throws InterruptedException{
-	    if(modelGenThread!=null){
-		modelGenThread.stop();
-	    }
-	    modelGenThread = new Thread(this, "Model generation thread for node "+ mg.node.serialNr()+" (leaf node was "+mg.originalNode.serialNr()+")");
-	    modelGenThread.start();
-	    boolean timeoutActive = timeoutIsActive();
-	    if(timeoutActive){
-		modelGenThread.join(((long)TestGenerator.modelCreationTimeout) * 1000l);
-		//In the mean time, during the execution of modelGenThread, the timeout 
-		//maybe set to infinity (i.e. -1) by e.g. ModelGenerationGUIInterface 
-		//in order to give the user time to investigate model generation.
-		timeoutActive = TestGenerator.modelCreationTimeout>=0;
-		if(!timeoutIsActive())
-		    modelGenThread.join();
-	    }else{
-		modelGenThread.join();
-	    }
-	    //models = modelGeneration.models; //read the generated model
-	    if(models==null && timeoutActive ){
-		mg.terminateAsSoonAsPossible();
-		modelGenThread.join(3000);//give the thread one more second before it gets terminated
-		//System.out.println("Contorlled termination");
-		modelGenThread.stop();
-		interrupted = true;
-	    }
-	    modelGenThread=null;
-
-	    return models;
-	}
-	
-	public boolean wasInterrupted(){
-	    return interrupted;
-	}
-    }
-    
-    /**When generateTestSuite() is executed on a separate thread, then this notification method
-     * is called in order to report the progress of computation to other threads.  */
-    protected void generateTestSuite_progressNotification0(int totalCount){
-	if(gui!=null){
+    /**
+     * When generateTestSuite() is executed on a separate thread, then this
+     * notification method is called in order to report the progress of
+     * computation to other threads.
+     */
+    protected void generateTestSuite_progressNotification0(final int totalCount) {
+	if (gui != null) {
 	    gui.generateTestSuite_progressNotification0(totalCount);
 	}
-	//else System.out.println("("+count+"/"+totalCount+") Generating test for node "+refMG.originalNode.serialNr());
     }
 
-    /**When generateTestSuite() is executed on a separate thread, then this notification method
-     * is called in order to report the progress of computation to other threads.  */
-    protected void generateTestSuite_progressNotification1(
-	    int count, int totalCount, ModelGenerator refMG){
-	if(gui!=null){
-	    gui.generateTestSuite_progressNotification1(count, totalCount,  refMG);
+    /**
+     * When generateTestSuite() is executed on a separate thread, then this
+     * notification method is called in order to report the progress of
+     * computation to other threads.
+     */
+    protected void generateTestSuite_progressNotification1(final int count,
+	    final int totalCount, final ModelGenerator refMG) {
+	if (gui != null) {
+	    gui.generateTestSuite_progressNotification1(count, totalCount,
+		    refMG);
 	}
-	//else System.out.println("("+count+"/"+totalCount+") Generating test for node "+refMG.originalNode.serialNr());
     }
 
-    /**When generateTestSuite() is executed on a separate thread, then this notification method
-     * is called in order to report the progress of computation to other threads.  */
-    protected void generateTestSuite_progressNotification2(
-	    int count, int totalCount, ModelGenerator refMG, Model[] models, 
-	    boolean createModelsSuccess, boolean terminated){
+    /**
+     * When generateTestSuite() is executed on a separate thread, then this
+     * notification method is called in order to report the progress of
+     * computation to other threads.
+     */
+    protected void generateTestSuite_progressNotification2(final int count,
+	    final int totalCount, final ModelGenerator refMG,
+	    final Model[] models, final boolean createModelsSuccess,
+	    final boolean terminated) {
+	// TODO This call seems to cause some trouble, therefore skipped
+	// if (gui != null) {
+	// gui.generateTestSuite_progressNotification2(count, totalCount, refMG,
+	// models, createModelsSuccess, terminated);
+	// }
 	return;
     }
 
-    /**When generateTestSuite() is executed on a separate thread, then this notification method
-     * is called in order to report the progress of computation to other threads.  */
-    protected void generateTestSuite_progressNotification2b(
-	    int count, int totalCount, ModelGenerator refMG,EquivalenceClass ec){
-	if(gui!=null){
-	    gui.generateTestSuite_progressNotification2b(count, totalCount, refMG, ec);
+    /**
+     * When generateTestSuite() is executed on a separate thread, then this
+     * notification method is called in order to report the progress of
+     * computation to other threads.
+     */
+    protected void generateTestSuite_progressNotification2b(final int count,
+	    final int totalCount, final ModelGenerator refMG,
+	    final EquivalenceClass ec) {
+	if (gui != null) {
+	    gui.generateTestSuite_progressNotification2b(count, totalCount,
+		    refMG, ec);
+	} else {
+	    System.err.println("No test data available for equivalence class:"
+		    + ec.toString());
 	}
-	else System.err.println("No test data available for equivalence class:"+ec.toString());
     }
 
-    /**When generateTestSuite() is executed on a separate thread, then this notification method
-     * is called in order to report the progress of computation to other threads. */
-    protected void generateTestSuite_progressNotification3(
-	    int count, int totalCount, ModelGenerator refMG, Model[] models, MethodDeclaration mDecl){
-	if(gui!=null){
-	    gui.generateTestSuite_progressNotification3(count, totalCount, refMG, models, mDecl);
+    /**
+     * When generateTestSuite() is executed on a separate thread, then this
+     * notification method is called in order to report the progress of
+     * computation to other threads.
+     */
+    protected void generateTestSuite_progressNotification3(final int count,
+	    final int totalCount, final ModelGenerator refMG,
+	    final Model[] models, final MethodDeclaration mDecl) {
+	if (gui != null) {
+	    gui.generateTestSuite_progressNotification3(count, totalCount,
+		    refMG, models, mDecl);
 	}
-	//else System.out.println("("+count+"/"+totalCount+") Test data generated for node "+refMG.originalNode.serialNr());
     }
 
-    /**When generateTestSuite() is executed on a separate thread, then this notification method
-     * is called in order to report the progress of computation to other threads. This method
-     * is overwritten by TestGeneratorGUIInterface */
-    protected void generateTestSuite_progressNotification4(
-	    int count, int totalCount, Exception e, ModelGenerator refMG, Model[] models, MethodDeclaration mDecl){
-	if(gui!=null){
-	    generateTestSuite_progressNotification4(count, totalCount, e, refMG, models, mDecl);
-	}else{
+    /**
+     * When generateTestSuite() is executed on a separate thread, then this
+     * notification method is called in order to report the progress of
+     * computation to other threads. This method is overwritten by
+     * TestGeneratorGUIInterface
+     */
+    protected void generateTestSuite_progressNotification4(final int count,
+	    final int totalCount, final Exception e,
+	    final ModelGenerator refMG, final Model[] models,
+	    final MethodDeclaration mDecl) {
+	if (gui != null) {
+	    generateTestSuite_progressNotification4(count, totalCount, e,
+		    refMG, models, mDecl);
+	} else {
 	    throw new RuntimeException(e);
 	}
     }
@@ -402,8 +385,7 @@ public abstract class TestGenerator {
     private ImmutableSet<ProgramVariable> removeDublicates(
 	    final ImmutableSet<ProgramVariable> pvs) {
 	final HashSet<String> names = new HashSet<String>();
-	ImmutableSet<ProgramVariable> result = DefaultImmutableSet
-	        .<ProgramVariable> nil();
+	ImmutableSet<ProgramVariable> result = DefaultImmutableSet.<ProgramVariable> nil();
 	for (final ProgramVariable pv : pvs) {
 	    if (names.add(pv.name().toString())) {
 		result = result.add(pv);
@@ -480,21 +462,19 @@ public abstract class TestGenerator {
     private KeYJavaType getArrayTypeAndEnsureExistence(
 	    final KeYJavaType baseType, final int dim) {
 	final Sort as = ArraySortImpl.getArraySortForDim(baseType.getSort(),
-	        dim, ji.getJavaLangObjectAsSort(), ji
-	                .getJavaLangCloneableAsSort(), ji
-	                .getJavaIoSerializableAsSort());
+		dim, ji.getJavaLangObjectAsSort(), 
+		ji.getJavaLangCloneableAsSort(),
+		ji.getJavaIoSerializableAsSort());
 	final KeYJavaType kjt = ji.getKeYJavaType(as);
 	if (kjt == null || baseType.getSort().toString().equals("int")) {
 	    final JavaBlock jb = ji.readJavaBlock("{" + as + " v;}");
-	    return ((VariableDeclaration) ((StatementBlock) jb.program())
-		    .getChildAt(0)).getTypeReference().getKeYJavaType();
+	    return ((VariableDeclaration) ((StatementBlock) jb.program()).getChildAt(0)).getTypeReference().getKeYJavaType();
 	}
 	return kjt;
     }
 
     protected KeYJavaType getBaseType(final KeYJavaType arrayType) {
-	return ((ArrayType) arrayType.getJavaType()).getBaseType()
-	        .getKeYJavaType();
+	return ((ArrayType) arrayType.getJavaType()).getBaseType().getKeYJavaType();
     }
 
     /**
@@ -526,10 +506,12 @@ public abstract class TestGenerator {
 	final boolean singleTuple = singleTuple(testData);
 
 	// put test data in array
-	final ProgramVariable[] testArray = initTestDataArr(testData.length, singleTuple, testLocEqvs);
+	final ProgramVariable[] testArray = initTestDataArr(testData.length,
+	        singleTuple, testLocEqvs);
 
 	// create Statements
-	s = appendStatements(testData.length, singleTuple, testLocEqvs, testArray, s, testData);
+	s = appendStatements(testData.length, singleTuple, testLocEqvs,
+	        testArray, s, testData);
 
 	final ExtList l = new ExtList();
 	l.add(new ProgramElementName(name));
@@ -540,29 +522,29 @@ public abstract class TestGenerator {
 
 	// initialization of arrays and creation of test data assignments
 	final HashMap<String, NewArray> array2Cons = new HashMap<String, NewArray>();
-	ImmutableList<Statement> testDataAssignments = ImmutableSLList
-	        .<Statement> nil();
+	ImmutableList<Statement> testDataAssignments = ImmutableSLList.<Statement> nil();
 	for (int i = 0; i < testData.length; i++) {
 	    for (int k = 0; k < testLocation[i].length; k++) {
 		final Expression testDat = singleTuple ? testArray[i]
-		        : new ArrayReference(testArray[i], new Expression[] { partCounter });
+		        : new ArrayReference(testArray[i],
+		                new Expression[] { partCounter });
 		if (testLocation[i][k] instanceof FieldReference
 		        && ((FieldReference) testLocation[i][k])
-		                .getProgramVariable().name().toString().equals("length")) {
-		    //Generate an array constructor call respecting the correct size/length of the array.
-		    //The size of the array is given by the test data "testDat".
+		                .getProgramVariable().name().toString().equals(
+		                        "length")) {
+		    // Generate an array constructor call respecting the correct
+		    // size/length of the array.
+		    // The size of the array is given by the test data
+		    // "testDat".
 		    final KeYJavaType arrType = ((Expression) ((FieldReference) testLocation[i][k])
-			    			.getReferencePrefix()).getKeYJavaType(serv, null);
+			    .getReferencePrefix()).getKeYJavaType(serv, null);
 		    if (arrType.getSort() instanceof ArraySort) {
 			final NewArray arrayConstructor = new NewArray(
-			        		new Expression[] { testDat }, 
-			        		new TypeRef( getBaseType(arrType)), arrType, null, 0);
-			// array2length.put(((FieldReference)
-			// testLocation[i][k]).
-			// getReferencePrefix().toString(),
-			// testDat);
-			array2Cons.put(((FieldReference) testLocation[i][k]).getReferencePrefix().toString(), 
-					arrayConstructor);
+			        new Expression[] { testDat }, new TypeRef(
+			                getBaseType(arrType)), arrType, null, 0);
+			array2Cons.put(((FieldReference) testLocation[i][k])
+			        .getReferencePrefix().toString(),
+			        arrayConstructor);
 			continue;
 		    }
 		}
@@ -578,7 +560,8 @@ public abstract class TestGenerator {
 	}
 
 	// initialization of other object references
-	final EquivalenceClass[] nonPrim = mg.getNonPrimitiveLocationEqvClasses();
+	final EquivalenceClass[] nonPrim = mg
+	        .getNonPrimitiveLocationEqvClasses();
 	final HashMap<Expression, Expression> loc2constrCall = new HashMap<Expression, Expression>();
 	final LinkedList<Expression> locationsOrdered = new LinkedList<Expression>();
 	// assignments of test data to locations + initialization of
@@ -593,21 +576,22 @@ public abstract class TestGenerator {
 		final Term nonPrimLocTerm = itt.next();
 		final Expression loc1 = translateTerm(nonPrimLocTerm, null,
 		        null);
-		final Expression constrCall = createConstructorCall(nonPrimLocTerm.sort(),
-		        array2Cons, loc1, nonPrimEqvClass.getKeYJavaType());
+		final Expression constrCall = createConstructorCall(
+		        nonPrimLocTerm.sort(), array2Cons, loc1,
+		        nonPrimEqvClass.getKeYJavaType());
 
 		if (locs.size() > 1) {
 		    final ProgramVariable pv = new LocationVariable(
-			    new ProgramElementName("_init" + i), 
-			    	nonPrimEqvClass.getKeYJavaType());
+			    new ProgramElementName("_init" + i),
+			    nonPrimEqvClass.getKeYJavaType());
 		    final VariableSpecification varSpec = new VariableSpecification(
 			    pv, constrCall, nonPrimEqvClass.getKeYJavaType());
-		    assignments = assignments
-			    .append(new LocalVariableDeclaration(
-				    	new TypeRef(nonPrimEqvClass.getKeYJavaType()), varSpec));
+		    assignments = assignments.append(new LocalVariableDeclaration(new TypeRef(
+			            nonPrimEqvClass.getKeYJavaType()), varSpec));
 		    loc2constrCall.put(loc1, pv);
 		    while (itt.hasNext()) {
-			final Expression loc2 = translateTerm(itt.next(), null, null);
+			final Expression loc2 = translateTerm(itt.next(), null,
+			        null);
 			addOrdered(loc2, locationsOrdered);
 			loc2constrCall.put(loc2, pv);
 		    }
@@ -627,22 +611,22 @@ public abstract class TestGenerator {
 		}
 	    }
 	}
-        for (Expression aLocationsOrdered : locationsOrdered) {
-            final Expression loc = aLocationsOrdered;
-            final Expression constrCall = loc2constrCall.get(loc);
-            final IndexReplaceVisitor irv = new IndexReplaceVisitor(loc,
-                    testLocation, singleTuple, partCounter, testArray, serv);
-            irv.start();
-            irv.result();
-            assignments = assignments.append(ag.assignmentOrSet(
-                    (Expression) irv.result(), constrCall, serv));
-        }
+	for (final Expression aLocationsOrdered : locationsOrdered) {
+	    final Expression loc = aLocationsOrdered;
+	    final Expression constrCall = loc2constrCall.get(loc);
+	    final IndexReplaceVisitor irv = new IndexReplaceVisitor(loc,
+		    testLocation, singleTuple, partCounter, testArray, serv);
+	    irv.start();
+	    irv.result();
+	    assignments = assignments.append(ag.assignmentOrSet(
+		    (Expression) irv.result(), constrCall, serv));
+	}
 	assignments = assignments.append(testDataAssignments);
 	final Statement[] ib = new Statement[6 + code.length];
 	// assignments = removeOutOfBounds(assignments);
 	ib[0] = new StatementBlock(assignments
 	        .toArray(new Statement[assignments.size()]));
-        System.arraycopy(code, 0, ib, 1, code.length);
+	System.arraycopy(code, 0, ib, 1, code.length);
 	final SyntacticalTypeRef stringBufferType = new SyntacticalTypeRef(
 	        new ClassDeclaration(new ProgramElementName("StringBuffer"),
 	                new ProgramElementName("java.lang.StringBuffer")));
@@ -655,32 +639,20 @@ public abstract class TestGenerator {
 
 	final ProgramVariable result = new LocationVariable(
 	        new ProgramElementName(RESULT_NAME), booleanType);
-	ib[code.length + 3] = new LocalVariableDeclaration(new TypeRef(booleanType),
-	        new VariableSpecification(result));
+	ib[code.length + 3] = new LocalVariableDeclaration(new TypeRef(
+	        booleanType), new VariableSpecification(result));
 	final MethodReference oracle = getOracle(post, buffer, children);
 	ib[code.length + 4] = new CopyAssignment(result, oracle);
-	/*
-	 * This variable seems to be unused. JavaInfo methods cannot be applied
-	 * on SyntacticalTypeReferences. This is on purpose. ProgramMethod
-	 * assertTrue = ji.getProgramMethod(testCase, "assertTrue",
-	 * ImmSLList.<KeYJavaType>nil(). append(ji.getKeYJavaTypeByClassName(
-	 * "java.lang.String")).append(b), testCase);
-	 */
 
+	// The "/" has caused a problem with GenUTest
 	Expression failure = new StringLiteral("\\nPost evaluated to false.\\n"
-	        + "Variable or Location Assignments:\\n");// The "/"
-	// has
-	// caused a
-	// problem
-	// with
-	// GenUTest
+	        + "Variable or Location Assignments:\\n");
 	for (int i = 0; i < testLocation.length; i++) {
 	    for (int j = 0; j < testLocation[i].length; j++) {
 		final Expression assignment = new Plus(new StringLiteral("  "
 		        + testLocation[i][j].toString() + " = "),
-		        singleTuple ? testArray[i]
-		                : new ArrayReference(testArray[i],
-		                        new Expression[] { partCounter }));
+		        singleTuple ? testArray[i] : new ArrayReference(
+		                testArray[i], new Expression[] { partCounter }));
 		failure = new Plus(failure, assignment);
 	    }
 	}
@@ -697,32 +669,17 @@ public abstract class TestGenerator {
 	// nested loops for executing the tested code with every possible
 	// combination of testdata in each partition
 	if (!singleTuple) {
-	    /*
-	     * for(int i=0; i<testData.length; i++){ VariableSpecification
-	     * counterSpec = new VariableSpecification(lCounter[i], new
-	     * IntLiteral(0), intType); LocalVariableDeclaration counterDecl =
-	     * new LocalVariableDeclaration(new TypeRef(intType), counterSpec);
-	     * Expression guard = new LessThan(lCounter[i], new FieldReference(
-	     * length, new ArrayReference( testArray[i], new
-	     * Expression[]{partCounter}))); Expression update = new
-	     * PostIncrement(lCounter[i]); body = new For(new
-	     * LoopInitializer[]{counterDecl}, guard, new Expression[]{update},
-	     * body); }
-	     */
+	  
 	    // loop over the number of partitions
-	    // int partCount = testData.length==0? 1 : testData[0].length;
 	    final VariableSpecification counterSpec = new VariableSpecification(
 		    partCounter, new IntLiteral(0), intType);
 	    final LocalVariableDeclaration counterDecl = new LocalVariableDeclaration(
 		    new TypeRef(intType), counterSpec);
 	    final Expression guard = new LessThan(partCounter,
 		    testData.length == 0 ? new IntLiteral(1)
-		            : new FieldReference(
-		                    new LocationVariable(
-		                            new ProgramElementName("length"),
-		                            intType), testArray[0]));
-	    // Expression guard =
-	    // new LessThan(partCounter, new IntLiteral(partCount));
+		            : new FieldReference(new LocationVariable(
+		                    new ProgramElementName("length"), intType),
+		                    testArray[0]));
 	    body = new For(new LoopInitializer[] { counterDecl }, guard,
 		    new Expression[] { new PostIncrement(partCounter) }, body);
 	}
@@ -740,17 +697,23 @@ public abstract class TestGenerator {
 
 	return tm;
     }
-    
-    /**@param array2Cons maps an array expression to a constructor call for the array with dimension initialized by test data */
+
+    /**
+     * @param array2Cons
+     *            maps an array expression to a constructor call for the array
+     *            with dimension initialized by test data
+     */
     protected Expression createConstructorCall(final Sort sort,
 	    final HashMap<String, NewArray> array2Cons, final Expression loc1,
 	    final KeYJavaType locKJT) {
 	if (sort instanceof ArraySort) {
-	    String arrayExpression = CompilableJavaCardPP.toString(loc1);
+	    final String arrayExpression = CompilableJavaCardPP.toString(loc1);
 	    final Expression cons = array2Cons.get(arrayExpression);
 	    if (cons == null) {
-		System.err.println("WARNING:Problem with generating an array constructor for "+arrayExpression+
-			"  An array of size 20 will be created but this is an emergency solution.");
+		System.err
+		        .println("WARNING:Problem with generating an array constructor for "
+		                + arrayExpression
+		                + "  An array of size 20 will be created but this is an emergency solution.");
 		return new NewArray(new Expression[] { new IntLiteral(20) },
 		        new TypeRef(getBaseType(locKJT)), locKJT, null, 0);
 	    } else {
@@ -786,7 +749,8 @@ public abstract class TestGenerator {
 		        new IntLiteral(0),
 		        new TypeRef(element.getKeYJavaType())), element
 		        .getKeYJavaType());
-	    } else if (element.getKeYJavaType().getSort() == booleanType.getSort()) {
+	    } else if (element.getKeYJavaType().getSort() == booleanType
+		    .getSort()) {
 		varSpec = new VariableSpecification(element,
 		        BooleanLiteral.TRUE, element.getKeYJavaType());
 	    } else {
@@ -857,8 +821,7 @@ public abstract class TestGenerator {
 
 		vs = new VariableSpecification(testArray[i], testDatum, kjt
 		        .getJavaType());
-		s = s
-		        .append(new LocalVariableDeclaration(new TypeRef(kjt),
+		s = s.append(new LocalVariableDeclaration(new TypeRef(kjt),
 		                vs));
 	    } else {
 		final KeYJavaType akjt = getArrayTypeAndEnsureExistence(kjt, 1);
@@ -878,8 +841,7 @@ public abstract class TestGenerator {
 		        new ArrayInitializer(ai), 1);
 		vs = new VariableSpecification(testArray[i], init, akjt
 		        .getJavaType());
-		s = s
-		        .append(new LocalVariableDeclaration(new TypeRef(akjt),
+		s = s.append(new LocalVariableDeclaration(new TypeRef(akjt),
 		                vs));
 	    }
 	}
@@ -919,7 +881,7 @@ public abstract class TestGenerator {
 	return 0;
     }
 
-    /*
+    /**
      * In order to combine KeY with GenUTest the test suite must have a main
      * method that calls the testmethods. This method extends the ExtList l with
      * a declaration of the main() method.
@@ -936,7 +898,6 @@ public abstract class TestGenerator {
 	final LinkedList<ParameterDeclaration> params = new LinkedList<ParameterDeclaration>();
 	final SyntacticalArrayType t = new SyntacticalArrayType("java.lang",
 	        "String", 1);
-	// Type t2=getArrayTypeAndEnsureExistence(t,1);
 	final SyntacticalProgramVariable syntArg = new SyntacticalProgramVariable(
 	        new ProgramElementName("arg"), t);
 	params.add(new ParameterDeclaration(new Modifier[0],
@@ -959,7 +920,6 @@ public abstract class TestGenerator {
 	ib[statementCount++] = new LocalVariableDeclaration(syntr2, varSpec);
 	ib[statementCount++] = new CopyAssignment(testSuiteObject, cons);
 	final ReferencePrefix pref = testSuiteObject;
-	// ReferencePrefix pref =null;
 
 	for (int i = 0; i < testMethods.size(); i++) {
 	    ib[statementCount++] = new MethodReference(
@@ -1073,11 +1033,15 @@ public abstract class TestGenerator {
 	final Expression f = translateFormula(post, buffer, children);
 	s[1] = new CopyAssignment(result, f);
 	StringLiteral sl = null;
-	try{
-	    //The following can go wrong because it uses the ordinary PrettyPrinter instead of CompilableJavaPP
-	    //The ordinary PrettyPrinter does not handle classes defined in the package ppAnJavaASTExtension
-	    sl = new StringLiteral("\\neval(" + ProofSaver.escapeCharacters(ProofSaver.printTerm(post, serv).toString()) + ") = ");
-	}catch(Exception ex){
+	try {
+	    // The following can go wrong because it uses the ordinary
+	    // PrettyPrinter instead of CompilableJavaPP
+	    // The ordinary PrettyPrinter does not handle classes defined in the
+	    // package ppAnJavaASTExtension
+	    sl = new StringLiteral("\\neval("
+		    + ProofSaver.escapeCharacters(ProofSaver.printTerm(post,
+		            serv).toString()) + ") = ");
+	} catch (final Exception ex) {
 	    sl = new StringLiteral("\\neval(" + post + ") = ");
 	}
 	final Plus str = new Plus(sl, result);
@@ -1282,15 +1246,13 @@ public abstract class TestGenerator {
 	                .equals("jint"))) {
 	    throw new NotTranslatableException("quantified Term " + t);
 	}
+	// The name used to be "result" causing a clash with the program
+	// variable representing JMLs "\result"
 	final ProgramVariable result = new LocationVariable(
-	        new ProgramElementName("subFormResult"), booleanType);// The name used
-	// to
-	// be "result"
-	// causing a
-	// clash with the program variable
-	// representing JMLs "\result"
+	        new ProgramElementName("subFormResult"), booleanType);
 	body[0] = new LocalVariableDeclaration(new TypeRef(booleanType),
-	        new VariableSpecification(result, resInit, booleanType.getJavaType()));
+	        new VariableSpecification(result, resInit, booleanType
+	                .getJavaType()));
 	final KeYJavaType lvType = intType;
 	final ProgramVariable pv = new LocationVariable(new ProgramElementName(
 	        "_" + lv.name() + (TestGenFac.counter++)), lvType);
@@ -1307,9 +1269,8 @@ public abstract class TestGenerator {
 	}
 
 	final Statement loopBody = new CopyAssignment(result,
-	        all ? new LogicalAnd(result,
-	                getMethodReferenceForFormula(sub0.sub(1), buffer,
-	                        children)) : new LogicalOr(result,
+	        all ? new LogicalAnd(result, getMethodReferenceForFormula(sub0
+	                .sub(1), buffer, children)) : new LogicalOr(result,
 	                getMethodReferenceForFormula(sub0.sub(1), buffer,
 	                        children)));
 	final VariableSpecification vs = new VariableSpecification(pv,
@@ -1317,17 +1278,21 @@ public abstract class TestGenerator {
 	                new IntLiteral(1)), intType.getJavaType());
 	final LocalVariableDeclaration init = new LocalVariableDeclaration(
 	        new TypeRef(intType), vs);
-	final Expression guard = bounds[2] == null ? new LessThan(
-	        pv, bounds[3]) : new LessOrEquals(pv, bounds[2]);
+	final Expression guard = bounds[2] == null ? new LessThan(pv, bounds[3])
+	        : new LessOrEquals(pv, bounds[2]);
 	final Expression update = new PostIncrement(pv);
 	body[1] = new For(new LoopInitializer[] { init }, guard,
 	        new Expression[] { update }, new StatementBlock(loopBody));
 	StringLiteral sl = null;
-	try{
-	    //The following can go wrong because it uses the ordinary PrettyPrinter instead of CompilableJavaPP
-	    //The ordinary PrettyPrinter does not handle classes defined in the package ppAnJavaASTExtension
-	    sl = new StringLiteral("\\neval(" + ProofSaver.escapeCharacters(ProofSaver.printTerm(t, serv).toString()) + ") = ");
-	}catch(Exception ex){
+	try {
+	    // The following can go wrong because it uses the ordinary
+	    // PrettyPrinter instead of CompilableJavaPP
+	    // The ordinary PrettyPrinter does not handle classes defined in the
+	    // package ppAnJavaASTExtension
+	    sl = new StringLiteral("\\neval("
+		    + ProofSaver.escapeCharacters(ProofSaver.printTerm(t, serv)
+		            .toString()) + ") = ");
+	} catch (final Exception ex) {
 	    sl = new StringLiteral("\\neval(" + t + ") = ");
 	}
 	final Plus str = new Plus(sl, result);
@@ -1339,8 +1304,8 @@ public abstract class TestGenerator {
 	args.add(buffer);
 	final LinkedList<ParameterDeclaration> params = getParameterDeclarations(args);
 
-	final MethodDeclaration md = buildMethodDeclaration(body,
-	        new TypeRef(booleanType), "quantifierTerm", params);
+	final MethodDeclaration md = buildMethodDeclaration(body, new TypeRef(
+	        booleanType), "quantifierTerm", params);
 	children.add(md);
 	return new MethodReference(args, new ProgramElementName(md.getName()),
 	        testTypeRef);
@@ -1356,12 +1321,12 @@ public abstract class TestGenerator {
 	final TermProgramVariableCollector pvColl = new TermProgramVariableCollector(
 	        serv);
 	t.execPreOrder(pvColl);
-        for (Location location : pvColl.result()) {
-            final ProgramVariable v = (ProgramVariable) location;
-            if (!v.isMember()) {
-                programVars = programVars.add(v);
-            }
-        }
+	for (final Location location : pvColl.result()) {
+	    final ProgramVariable v = (ProgramVariable) location;
+	    if (!v.isMember()) {
+		programVars = programVars.add(v);
+	    }
+	}
 	programVars = removeDublicates(programVars);
 	final Iterator<ProgramVariable> it = programVars.iterator();
 	final ExtList args = new ExtList();
@@ -1371,31 +1336,30 @@ public abstract class TestGenerator {
 	return args;
     }
 
-    @SuppressWarnings("unchecked")
     protected LinkedList<ParameterDeclaration> getParameterDeclarations(
 	    final ExtList l) {
 	final LinkedList<ParameterDeclaration> params = new LinkedList<ParameterDeclaration>();
-        for (Object aL : l) {
-            final IProgramVariable arg = (IProgramVariable) aL;
-            // Depending wether it's a ProgramVariable or
-            // SyntacticalProgramVariable
-            // the type has to be obtained in two different ways.
-            if (arg instanceof ProgramVariable) {// chris
-                final KeYJavaType kjt = arg.getKeYJavaType();
-                params
-                        .add(new ParameterDeclaration(new Modifier[0],
-                                new TypeRef(kjt),
-                                new VariableSpecification(arg), false));
-            } else if (arg instanceof SyntacticalProgramVariable) {
-                final SyntacticalProgramVariable syntArg = (SyntacticalProgramVariable) arg;
-                params.add(new ParameterDeclaration(new Modifier[0],
-                        new SyntacticalTypeRef(syntArg.type),
-                        new VariableSpecification(arg, syntArg.type), false));
-            } else {
-                throw new RuntimeException(
-                        "Unexpected case: arg is instance of:" + arg);
-            }
-        }
+	for (final Object aL : l) {
+	    final IProgramVariable arg = (IProgramVariable) aL;
+	    // Depending wether it's a ProgramVariable or
+	    // SyntacticalProgramVariable
+	    // the type has to be obtained in two different ways.
+	    if (arg instanceof ProgramVariable) {// chris
+		final KeYJavaType kjt = arg.getKeYJavaType();
+		params
+		        .add(new ParameterDeclaration(new Modifier[0],
+		                new TypeRef(kjt),
+		                new VariableSpecification(arg), false));
+	    } else if (arg instanceof SyntacticalProgramVariable) {
+		final SyntacticalProgramVariable syntArg = (SyntacticalProgramVariable) arg;
+		params.add(new ParameterDeclaration(new Modifier[0],
+		        new SyntacticalTypeRef(syntArg.type),
+		        new VariableSpecification(arg, syntArg.type), false));
+	    } else {
+		throw new RuntimeException(
+		        "Unexpected case: arg is instance of:" + arg);
+	    }
+	}
 	return params;
     }
 
@@ -1547,13 +1511,83 @@ public abstract class TestGenerator {
 	}
 	return result;
     }
-    
-    
-    public void clean(){
-	if(modelGenThread!=null){
+
+    public void clean() {
+	if (modelGenThread != null) {
 	    modelGenThread.stop();
-	    System.out.println("Thread killed:"+modelGenThread.getName());
-	    modelGenThread=null;
+	    System.out.println("Thread killed:" + modelGenThread.getName());
+	    modelGenThread = null;
+	}
+    }
+
+    class ModelGeneratorRunnable implements Runnable {
+	/**
+	 * stores the result of the model generation. If the result is null then
+	 * either the thread has not finished computation or an error occurred.
+	 */
+	public Model[] models = null;
+	final ModelGenerator mg;
+	protected boolean interrupted = false;
+
+	ModelGeneratorRunnable(final ModelGenerator mg) {
+	    this.mg = mg;
+	    assert (mg != null);
+	}
+
+	public void run() {
+	    models = mg.createModels();
+	}
+
+	protected boolean timeoutIsActive() {
+	    return TestGenerator.modelCreationTimeout >= 0;
+	}
+
+	/**
+	 * Uses ModelGenerato.modelCreationTimeout in order to terminate threads
+	 * when time is exceeded
+	 */
+	public Model[] createModels() throws InterruptedException {
+	    if (modelGenThread != null) {
+		modelGenThread.stop();
+	    }
+	    modelGenThread = new Thread(this,
+		    "Model generation thread for node " + mg.node.serialNr()
+		            + " (leaf node was " + mg.originalNode.serialNr()
+		            + ")");
+	    modelGenThread.start();
+	    boolean timeoutActive = timeoutIsActive();
+	    if (timeoutActive) {
+		modelGenThread
+		        .join(((long) TestGenerator.modelCreationTimeout) * 1000l);
+		// In the mean time, during the execution of modelGenThread, the
+		// timeout
+		// maybe set to infinity (i.e. -1) by e.g.
+		// ModelGenerationGUIInterface
+		// in order to give the user time to investigate model
+		// generation.
+		timeoutActive = TestGenerator.modelCreationTimeout >= 0;
+		if (!timeoutIsActive()) {
+		    modelGenThread.join();
+		}
+	    } else {
+		modelGenThread.join();
+	    }
+	    // models = modelGeneration.models; //read the generated model
+	    if (models == null && timeoutActive) {
+		mg.terminateAsSoonAsPossible();
+		modelGenThread.join(3000);// give the thread one more second
+					  // before it gets terminated
+		// System.out.println("Contorlled termination");
+		modelGenThread.stop();
+		interrupted = true;
+	    }
+	    modelGenThread = null;
+
+	    return models;
+	}
+
+	public boolean wasInterrupted() {
+	    return interrupted;
 	}
     }
 }

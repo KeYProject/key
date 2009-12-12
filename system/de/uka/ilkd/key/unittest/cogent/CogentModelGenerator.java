@@ -13,7 +13,6 @@ package de.uka.ilkd.key.unittest.cogent;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
 
 import de.uka.ilkd.key.collection.ImmutableSet;
