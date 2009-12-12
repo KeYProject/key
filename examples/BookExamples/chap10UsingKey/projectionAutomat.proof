@@ -12,11 +12,11 @@
 [General]StupidMode=true
 [Strategy]MaximumNumberOfAutomaticApplications=1000
 
-[Choice]DefaultChoices=transactions-transactions\:transactionsOn , programRules-programRules\:Java , initialisation-initialisation\:disableStaticInitialisation , transactionAbort-transactionAbort\:abortOn , throughout-throughout\:toutOn , intRules-intRules\:javaSemantics , nullPointerPolicy-nullPointerPolicy\:nullCheck
+[Choice]DefaultChoices=transactions-transactions\\:transactionsOn , programRules-programRules\\:Java , initialisation-initialisation\\:disableStaticInitialisation , transactionAbort-transactionAbort\\:abortOn , throughout-throughout\\:toutOn , intRules-intRules\\:javaSemantics , nullPointerPolicy-nullPointerPolicy\\:nullCheck
 [OCLRef]Null=false
 [OCLRef]ExcThrown=false
 [Model]Source=1
-[Choice]Choices=transactions-transactions\:transactionsOn-transactions\:transactionsOff , programRules-programRules\:ODL-programRules\:Java , throughout-throughout\:toutOff-throughout\:toutOn , initialisation-initialisation\:disableStaticInitialisation-initialisation\:enableStaticInitialisation , transactionAbort-transactionAbort\:abortOff-transactionAbort\:abortOn , intRules-intRules\:arithmeticSemanticsCheckingOF-intRules\:javaSemantics-intRules\:arithmeticSemanticsIgnoringOF , nullPointerPolicy-nullPointerPolicy\:noNullCheck-nullPointerPolicy\:nullCheck
+[Choice]Choices=transactions-transactions\\:transactionsOn-transactions\\:transactionsOff , programRules-programRules\\:ODL-programRules\\:Java , throughout-throughout\\:toutOff-throughout\\:toutOn , initialisation-initialisation\\:disableStaticInitialisation-initialisation\\:enableStaticInitialisation , transactionAbort-transactionAbort\\:abortOff-transactionAbort\\:abortOn , intRules-intRules\\:arithmeticSemanticsCheckingOF-intRules\\:javaSemantics-intRules\\:arithmeticSemanticsIgnoringOF , nullPointerPolicy-nullPointerPolicy\\:noNullCheck-nullPointerPolicy\\:nullCheck
 [OCLRef]Array=false
 [DecisionProcedure]=SIMPLIFY
 [General]OuterRenaming=true
