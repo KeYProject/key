@@ -86,6 +86,9 @@ public class TestHelper {
 	    }
 	}
 	proof = medi.getProof();
+	if(proof==null){
+	    throw new RuntimeException("KeY cannot load file:"+this.file);
+	}
 	// Proving
 	if (prove) {
 	    medi.setSimplifier(ProofSettings.DEFAULT_SETTINGS
