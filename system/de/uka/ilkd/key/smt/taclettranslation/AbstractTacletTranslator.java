@@ -149,7 +149,7 @@ abstract class AbstractTacletTranslator implements TacletTranslator {
 	usedGenericSorts = new HashSet<GenericSort>();
 	term = rebuildTerm(term);
 	// translate attributes
-	term = translateAttributes(t,term,attributeTerms);
+	term = AttributeTranslator.DEFAULT.translate(t,term,attributeTerms,services);
 	
 	// sixth step: quantify all free variables.
 	term = quantifyTerm(term);
@@ -170,208 +170,8 @@ abstract class AbstractTacletTranslator implements TacletTranslator {
 	return tf;
     }
     
-    /** TODO: write comment
-     * @param t
-     * @param attributeTerms
-     * @return
-     */
-    private Term translateAttributes(Taclet t, Term term, ImmutableSet<Term> attributeTerms) {
-	ImmutableSet<Term> result = DefaultImmutableSet.nil();
-	/*System.out.println("\t\t\tDest-Term:");
-	analyzeTerm(term,0,-1);
-	System.out.println("\t\t\tSrc-Term:");
-	for(Term src : attributeTerms){
-	  analyzeTerm(src,0,0); 
-	}*/
-	
-
-	
-	HashMap<Term,ImmutableSet<Term>> container = new HashMap<Term,ImmutableSet<Term>>(); 
-	
-	for(Term src : attributeTerms){
-	   Term temp =  getObject(src);
-	   ImmutableSet<Term> set = container.get(temp);
-	   if(set== null){
-	       set  = DefaultImmutableSet.nil();
-	       
-	   }
-	   set = set.add(src);
-	   container.put(temp, set);
-	}
-
-	
-	
-	for(ImmutableSet<Term> set : container.values()){
-		Term tmp = term; 
-		for(Term src : set){
-		    //analyzeTerm(src,0,-1);
-		    tmp = instantiateAttributes(src,tmp);
-		    if(tmp == null){
-			break;
-		    }
-		}
-		if(tmp != null && checkForNotInstantiatedAttributes(tmp))
-		result = result.add(tmp);
-	
-	}
-	if(!result.isEmpty()){
-	    Term [] array = new Term[result.size()];
-	    result.toArray(array);
-	    term = TermBuilder.DF.and(array);
-	}
-
-	
-	return term;
-    }
+       
    
-    private boolean checkForNotInstantiatedAttributes(Term term){
-	if(term.op() instanceof MetaCreated){
-	    return false;
-	}
-	if(term.op() instanceof AttributeOp){
-	    AttributeOp op = (AttributeOp) term.op();
-	    if(op.sort().equals(ProgramSVSort.IMPLICITCREATED)||
-		    op.sort().equals(ProgramSVSort.VARIABLE)){
-		return false;
-	    }
-
-	}
-
-	for (int i = 0; i < term.arity(); i++) {
-	    if(!checkForNotInstantiatedAttributes(term.sub(i)))
-		return false;
-
-	}
-
-
-	return true;
-    }
-    
-    
-   private Term getObject(Term src){
-       while(src.depth() != 0){
-	   src = src.sub(0);
-       }
-       return src;
-   }
-
-    /** TODO: write comment
-     * @param src
-     * @param dest the term to replace by <code>src</code>
-     * @return
-     */
-    private Term instantiateAttributes(Term src, Term dest) {
-	//System.out.println("src: "+ dest);
-	
-	// Do the work:
-	if(match(src,dest)){
-	    //System.out.println("match: "+src+" and "+dest) ;
-	   return src; 	    
-	}
-	
-	
-	if(isCreatedTerm(dest) || dest.op()instanceof AttributeOp) return dest;
-	
-	// Split the term
-	ImmutableArray<QuantifiableVariable> variables[] = new ImmutableArray[dest
-                                                                    .arity()];
-	boolean change = false;
-	Term[] subTerms = new Term[dest.arity()];
-	for (int i = 0; i < dest.arity(); i++) {
-	    variables[i] = dest.varsBoundHere(i);//subTerms[i].varsBoundHere(i);
-	    Term tmp = instantiateAttributes(src,dest.sub(i));
-	    subTerms[i] = (tmp == null ? dest.sub(i) : tmp);
-	    change = (tmp == null ? change : true);
-	}	
-	dest = tf.createTerm(dest.op(), subTerms, variables,
-		JavaBlock.EMPTY_JAVABLOCK);
-	
-	if(change){
-	    return dest;
-	}
-	
-	return null;
-    }
-    
-    
-    private boolean match(Term src, Term dest){
-	
-	
-	if( (!(dest.op() instanceof AttributeOp) &&
-              !(dest.op() instanceof MetaCreated) &&
-              !(dest.op() instanceof LogicVariable)) 
-              ||
-              dest.arity() != src.arity() ||
-              dest.depth() != src.depth()){
-	    return false;
-	}
-	
-		
-	if((dest.sort().equals(ProgramSVSort.VARIABLE) &&
-		    src.op() instanceof AttributeOp   &&
-		    ((AttributeOp)src.op()).sort() instanceof ClassInstanceSort) 
-		    ||
-	   (dest.sort() instanceof GenericSort &&
-		   isReferenceSort(src.sort()))	   
-		   ||
-            (isCreatedTerm(dest) && isCreatedTerm(src))
-	   ){
-	    for(int i=0; i < src.arity(); i++){
-		if(!match(src.sub(i),dest.sub(i))){
-		    return false;
-		}
-	    }
-	    
-	    return true;
-	    
-	    
-	}
-	
-	
-	
-	return false;
-
-    }
-    
-    private void analyzeTerm(Term term, int depth, int max_depth){
-	
-
-	
-	System.out.println("##"+depth+"##");
-	System.out.println("Term: " + term);
-	System.out.println("Term-Class: " + term.getClass());
-	System.out.println("Depth: " + term.depth());
-	System.out.println("Sort: " + term.sort());
-	System.out.println("Op: " + term.op());
-	System.out.println("Op-Class: "+ term.op().getClass());
-	
-	if(term.op() instanceof AttributeOp){
-	    AttributeOp op = (AttributeOp) term.op();
-	    System.out.println("is AttributeOp:");
-	    System.out.println("\tAttribute: "+op.attribute());
-	    System.out.println("\tClass: "+op.attribute().getClass());
-	    System.out.println("\tSort: "+op.attribute().sort());
-	    System.out.println("\tSort: "+op.sort().getClass());
-	    System.out.println("\tJavaType: "+op.attribute().getKeYJavaType());
-	    
-	
-	    
-	}
-	  if( isCreatedTerm(term)){
-		System.out.println("\tconains: <created>");
-		
-	    }
-	
-	System.out.println("#####");
-        
-	if(depth == max_depth) return;
-	depth++;
-	for (int i = 0; i < term.arity(); i++) {
-	     analyzeTerm(term.sub(i),depth,max_depth);
-	    
-	}
-    }
-    
     private void collectGenerics(Term term){
 	for (int i = 0; i < term.arity(); i++) {
 	    collectGenerics(term.sub(i));
@@ -798,16 +598,15 @@ abstract class AbstractTacletTranslator implements TacletTranslator {
     
     
 
-    private boolean isAbstractOrInterface(Sort sort){
+    static public boolean isAbstractOrInterface(Sort sort){
         if(!isReferenceSort(sort)) return false;
-        
-        
+             
         return    !(sort instanceof ArraySort) &&  
                ((ClassInstanceSort)sort).representAbstractClassOrInterface();
 	
     }
     
-    private boolean isReferenceSort(Sort sort){
+    static public boolean isReferenceSort(Sort sort){
 	return  ( sort instanceof ClassInstanceSort );
     }
     
