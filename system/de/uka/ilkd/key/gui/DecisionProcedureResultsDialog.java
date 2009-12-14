@@ -58,8 +58,8 @@ public class DecisionProcedureResultsDialog extends JFrame {
 	table.getSelectionModel().addListSelectionListener(new ListSelectionListener(){
 
 	    public void valueChanged(ListSelectionEvent arg0) {
-		assert arg0.getSource()==table;
-		assert table.getModel()==tableModel;
+		//assert arg0.getSource()==table:"arg0.getSource()!=table"; //A table cell may be the source
+		assert table.getModel()==tableModel:"table.getModel()!=tableModel";
 		int idx = table.getSelectedRow();
 		
 		if(idx < tableModel.getRowCount()){
