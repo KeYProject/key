@@ -275,8 +275,7 @@ public abstract class AbstractSMTSolver implements SMTSolver {
 		    ioe.initCause(e);
 		    throw ioe;
 		}
-	
-	
+
 	
 	 return toReturn;
     }

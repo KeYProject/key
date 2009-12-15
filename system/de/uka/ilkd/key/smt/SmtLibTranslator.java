@@ -549,7 +549,7 @@ public class SmtLibTranslator extends AbstractSMTTranslator {
     
     private StringBuffer makeUnique(StringBuffer name) {
 	StringBuffer toReturn = new StringBuffer(name);
-	
+
 	//build the replacement pairs
 	ArrayList<String> toReplace = new ArrayList<String>();
 	ArrayList<String> replacement = new ArrayList<String>();
@@ -582,6 +582,14 @@ public class SmtLibTranslator extends AbstractSMTTranslator {
 	
 	toReturn.append("_").append(counter);
 	counter++;
+
+	//CVC3 does not accept identifiers to start with an underscore.
+	//This happens, e.g., when translating ".create(self)", because the leading "." becomes "_dot_"
+	//Removing leading underscores.
+	while(toReturn.charAt(0)=='_'){
+	    toReturn = new StringBuffer(toReturn.substring(1)); //inefficient, but should occur seldom
+	}
+
 	return toReturn;
     }
 
