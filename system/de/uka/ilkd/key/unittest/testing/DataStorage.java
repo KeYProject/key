@@ -16,7 +16,6 @@ import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.unittest.ModelGenerator;
 import de.uka.ilkd.key.unittest.TestGenerator;
 import de.uka.ilkd.key.visualization.ExecutionTraceModel;
 
@@ -40,7 +39,7 @@ public class DataStorage {
 
     private Term oracle;
 
-    //private LinkedList<ModelGenerator> mgs;
+    // private LinkedList<ModelGenerator> mgs;
     private int numberOfModelGenerators;
 
     private ImmutableSet<ProgramVariable> pvs;

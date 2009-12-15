@@ -11,7 +11,6 @@ package de.uka.ilkd.key.unittest.testing;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.*;
@@ -86,6 +85,9 @@ public class TestHelper {
 	    }
 	}
 	proof = medi.getProof();
+	if(proof==null){
+	    throw new RuntimeException("KeY cannot load file:"+this.file);
+	}
 	// Proving
 	if (prove) {
 	    medi.setSimplifier(ProofSettings.DEFAULT_SETTINGS
@@ -127,9 +129,9 @@ public class TestHelper {
 
     public String methNames() {
 	String result = "";
-        for (ProgramMethod pm : pms) {
-            result = result.concat(pm.toString());
-        }
+	for (final ProgramMethod pm : pms) {
+	    result = result.concat(pm.toString());
+	}
 	return result;
     }
 

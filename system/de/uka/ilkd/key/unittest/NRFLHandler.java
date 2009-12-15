@@ -31,7 +31,6 @@ import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.UpdateFactory;
 import de.uka.ilkd.key.logic.op.Location;
 import de.uka.ilkd.key.logic.op.NonRigidFunctionLocation;
-import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.rule.UpdateSimplifier;
 import de.uka.ilkd.key.rule.updatesimplifier.AssignmentPair;

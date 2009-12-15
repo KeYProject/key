@@ -197,10 +197,6 @@ public class TestSMTBenchmark extends TestCase implements FilenameFilter{
     }
     
     public boolean accept(File f, String name) {
-	if (name.substring(name.length()-4, name.length()).equals(".key")) {
-	    return true;
-	} else {
-	    return false;
-	}
+        return name.substring(name.length() - 4, name.length()).equals(".key");
     }
 }

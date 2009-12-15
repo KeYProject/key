@@ -73,7 +73,7 @@ public class ProofSaver {
    }
 
    public String writeSettings(ProofSettings ps){
-    	return new String ("\\settings {\n\""+ps.settingsToString()+"\"\n}\n");
+    	return new String ("\\settings {\n\""+escapeCharacters(ps.settingsToString())+"\"\n}\n");
    }
    public String save() {
       String errorMsg = null;
