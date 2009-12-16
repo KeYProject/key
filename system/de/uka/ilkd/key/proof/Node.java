@@ -736,21 +736,21 @@ public class Node {
     }
 
     
-    /**@see {@code Proof.nodeToSMTData}
-     * The argument may be an {@code SMTSolverResult} or data from the test generator
+    /**@see {@code Proof.nodeToSMTandFPData}
+     * The argument may be an {@code SMTSolverResult} or data from the test generator or an {@code FPCondition}
      * @author gladisch */
-    public void addSMTData(Object smtData) {
-	proof().addSMTData(this, smtData);
+    public void addSMTandFPData(Object smtAndFPData) {
+	proof().addSMTandFPData(this, smtAndFPData);
     }
     
-    /**If there is no smt Data associated with this node, then null is returned. 
+    /**If there is no smt or fp (falsifiability preservation) Data associated with this node, then null is returned. 
      * @author gladisch*/
-    public Vector<Object> getSMTData() {
-	return proof().getSMTData(this);
+    public Vector<Object> getSMTandFPData() {
+	return proof().getSMTandFPData(this);
     }
     
     public void clearSMTData(){
-	proof().clearSMTData(this);
+	proof().clearSMTandFPData(this);
     }
 
  }

@@ -233,7 +233,7 @@ public class Main extends JFrame implements IMain {
     /** The menu for the decproc options */
     private final JMenu decProcOptions = new JMenu("Decision Procedures");
     
-    public DecisionProcedureResultsDialog decProcResDialog;
+    public SMTResultsAndBugDetectionDialog decProcResDialog;
     
     
     /**
@@ -260,7 +260,7 @@ public class Main extends JFrame implements IMain {
         layoutMain();
         initGoalList();
         initGUIProofTree();
-        decProcResDialog = DecisionProcedureResultsDialog.getInstance(mediator);
+        decProcResDialog = SMTResultsAndBugDetectionDialog.getInstance(mediator);
         
         SwingUtilities.updateComponentTreeUI(this);
         ToolTipManager.sharedInstance().setDismissDelay(30000);
@@ -1615,7 +1615,7 @@ public class Main extends JFrame implements IMain {
 	   public void actionPerformed(ActionEvent e) {
 	       boolean b = showSMTResDialog.isSelected();
 	       dps.setSMTResDialog(b);
-	       DecisionProcedureResultsDialog dia =DecisionProcedureResultsDialog.getInstance(null);
+	       SMTResultsAndBugDetectionDialog dia =SMTResultsAndBugDetectionDialog.getInstance(null);
 	       if(dia!=null){
 		   if(b){
 		       dia.rebuildTableForProof();

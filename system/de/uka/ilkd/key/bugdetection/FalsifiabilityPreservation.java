@@ -25,6 +25,8 @@ import de.uka.ilkd.key.logic.op.*;
 
 /**Implementation of the technique described in 
  * Christoph Gladisch. Could we have chosen a better Loop Invariant or Method Contract? In Proc. TAP 2009
+ * <br>
+ * This class represents the falsifiability preservation of a branch
  * @author gladisch 
  * */
 public class FalsifiabilityPreservation {
@@ -37,20 +39,24 @@ public class FalsifiabilityPreservation {
     public enum RuleType {LOOP_INV, METH_CONTR};
     
     /**Gives access to some utilities like Services and MsgMgt (MessageManagement) */
-    protected BugDetector bd;
-
-    public FalsifiabilityPreservation(BugDetector bd){
+    final protected BugDetector bd;
+    /**The branch between {@code branchNode} and the root node is considered by {@code this} object.
+     * This field identifies the branch that is considered here. */
+    final protected Node branchNode;
+    
+    public FalsifiabilityPreservation(BugDetector bd, Node branchNode){
 	this.bd = bd;
+	this.branchNode = branchNode;
     }
     
     /**Traverse a proof branch from node {@code n} towards the root and collect
      * Falsifiability preservation conditions at occurrences of loop invariant 
      * and method contract rule applications. The root may not be reached
      * (under certain circumstances e.g. when passing 1st or 2nd branch of a contract rule) */
-    public Vector<FPCondition> collectFPConditions(Node n){
+    public Vector<FPCondition> collectFPConditions(){
 	//Save the last known node of the branch. Alternatively, we could iterate 
 	//to select a deeper node if possible. Todo: The user should be notified if there are deeper nodes.
-	Node last = n; 
+	Node n = branchNode; 
 	Vector<FPCondition> res = new Vector();
 	while(!n.root()){
 	    Node parent = n.parent();
@@ -62,11 +68,13 @@ public class FalsifiabilityPreservation {
 		    final BranchType branchType = getBranchType(ruleType,n);
 		    final FPCondition fpc;
 		    if(branchType == BranchType.THRID)
-			fpc = new SFPCondition(n, last, ruleType, branchType, bd);
+			fpc = new SFPCondition(n, branchNode, ruleType, branchType, bd);
 		    else
 			fpc = new FPCondition(n,ruleType, branchType, bd);
 
+		    fpc.addFPCListener(this);
 		    fpc.constructFPC();
+		    fpc.check();
 		    
 //		    	PosTacletApp tacletApp = (PosTacletApp)ruleApp;
 //			System.out.println("\nparentNode:"+parent.serialNr()+" RuleApp:"+parentRuleAppName);
@@ -114,7 +122,15 @@ public class FalsifiabilityPreservation {
 	return res;
     }
     
+    /** Call this method to notify this receiver object that the
+     * falsifiability preservation condition has been updated. 
+     * A caller of this method is in {@code FPCondition}.
+     * Note: the node is accessible via fpc.node or fpc.parent*/
+    public void fpcUpdate(FPCondition fpc){
+	System.out.println("FP for node "+fpc.node.serialNr()+" is "+fpc.isValid());
+    }
     
+
     private void warning(String s, int severity){
 	bd.msgMgt.warning(s, severity);
     }

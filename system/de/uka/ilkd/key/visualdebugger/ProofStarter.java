@@ -36,7 +36,9 @@ public class ProofStarter {
 
     private int maxSteps = -1;
 
-    private ProofOblInput po;
+    /*The ProofOblInput is not needed but only a ProofAggregate that was accessed via po. */
+    //private ProofOblInput po;
+    private ProofAggregate pa;
 
     private Proof proof;
 
@@ -121,19 +123,28 @@ public class ProofStarter {
      *                started on the first proof)
      */
     public void init(ProofOblInput po) {
-
-        if (this.po != null) {
-            throw new IllegalStateException("Proofstarter has been already"
-                    + " instantiated.");
-        }
-
-        this.po = po;
         try {
-            this.proof = po.getPO().getFirstProof();
+            init(po.getPO());
         } catch(ProofInputException e) {
             System.err.println(e);
             e.printStackTrace();
         }
+    }
+    
+    /**
+     * initializes the proof starter, i.e. the proof is created and set up
+     * 
+     * @param pa
+     *                the ProofAggregate with the proof (proof attempt is only
+     *                started on the first proof)
+     */
+    public void init(ProofAggregate pa) {
+        if (this.pa != null) {
+            throw new IllegalStateException("Proofstarter has been already"
+                    + " instantiated.");
+        }
+        this.pa = pa;
+        this.proof = pa.getFirstProof();
     }
 
     /**
@@ -248,11 +259,7 @@ public class ProofStarter {
         } finally {            
             Goal.removeRuleAppListener(pl);
             Goal.setRuleAppListenerList(backup);
-            try {
-                env.removeProofList(po.getPO());
-            } catch (ProofInputException e) {
-                e.printStackTrace();
-            }
+            env.removeProofList(pa);
             proof.setActiveStrategy(oldStrategy);
         }
 

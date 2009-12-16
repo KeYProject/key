@@ -34,7 +34,7 @@ import de.uka.ilkd.key.smt.YicesSolver;
 import de.uka.ilkd.key.smt.Z3Solver;
 import de.uka.ilkd.key.util.Debug;
 
-public class DecisionProcedureResultsDialog extends JFrame {
+public class SMTResultsAndBugDetectionDialog extends JFrame {
 
     private final KeYMediator mediator;
     private JTextArea textArea;
@@ -43,11 +43,11 @@ public class DecisionProcedureResultsDialog extends JFrame {
     /**The current proof object in focus */
     private Proof proof;
     private final SMTSolverProofListener listener;
-    private static DecisionProcedureResultsDialog instance;
+    private static SMTResultsAndBugDetectionDialog instance;
     public final static Object[] columnNames = {"Node", CVC3Solver.name, YicesSolver.name, Z3Solver.name, SimplifySolver.name};
     
     /**The window is set visible by the ProofTree event smtDataUpdate */
-    protected DecisionProcedureResultsDialog(KeYMediator medi){
+    protected SMTResultsAndBugDetectionDialog(KeYMediator medi){
 	//super(mediator.mainFrame(), "SMT Solver Progress and Results");
 	super("SMT Solver Progress and Results");
 	this.mediator = medi;
@@ -82,12 +82,12 @@ public class DecisionProcedureResultsDialog extends JFrame {
      * The window is set visible by an smtDataUpdate event.
      * This method registers a KeYSelectionListener at the mediator and a
      * ProofTreeListener when a proof is selected. */
-    public static DecisionProcedureResultsDialog getInstance(KeYMediator medi){
+    public static SMTResultsAndBugDetectionDialog getInstance(KeYMediator medi){
 	if(instance==null){
 	    if(medi==null){
 		return null;
 	    }
-	    instance = new DecisionProcedureResultsDialog(medi);
+	    instance = new SMTResultsAndBugDetectionDialog(medi);
 	}
 	return instance;
     }
@@ -192,7 +192,7 @@ public class DecisionProcedureResultsDialog extends JFrame {
 	    }
 	    	    
 	    //Update the row
-	    Vector<Object> vect = n.getSMTData();
+	    Vector<Object> vect = n.getSMTandFPData();
 	    if(vect!=null){
 		for(Object o:vect){
 		    if(o instanceof SMTSolverResult){
@@ -220,7 +220,7 @@ public class DecisionProcedureResultsDialog extends JFrame {
         //	Strange, the commented out code didn't work for some reason.
         	tableModel.setRowCount(0);
         	if(proof!=null){
-                	Set<Node> nodes = proof.getNodesWithSMTData();
+                	Set<Node> nodes = proof.getNodesWithSMTandFPData();
                 	if(nodes!=null){
                 	    for(Node n:nodes){
                 		updateTableForNode(n);

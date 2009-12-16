@@ -115,13 +115,18 @@ public class Proof implements Named {
     private SpecExtPO specExtPO;
     
     /** This field stores counter examples (in some format) or notes that 
-     * nodes are proved or falsifiable (and therefore not provable). 
-     * The objects of the vector may store information, e.g., from a decision procedure 
-     * or from the test generator.The runtime type of the vector elements maybe, e.g., SMTSolverResult. 
-     * Adding a field "counterExampleData" to every node would be a waste of memory
-     * as this information is used rather rarely.
+     * nodes are proved or falsifiable (and therefore not provable)  or 
+     * Falsifiability Preservation information . 
+     * The objects of the vector may store information, e.g., from a decision procedure, 
+     * from the test generator, or from the BugDetector.The runtime type of the vector elements 
+     * maybe, e.g., SMTSolverResult or FPCondition. 
+     * Adding a field "nodeToSMTandFPData" to every node would be a waste of memory
+     * as this information is used rather rarely. Using NodeInfo is not good either,
+     * because the method getNodesWithSMTandFPData() would require traversal of the entire proof,
+     * everytime a different proof is selected 
+     * (and this happens often when proving falsifiability preservation interactively). 
      * @author gladisch  */
-    public WeakHashMap<Node, Vector<Object>> nodeToSMTData;
+    public WeakHashMap<Node, Vector<Object>> nodeToSMTandFPData;
     
    
 
@@ -669,7 +674,7 @@ public class Proof implements Named {
     /** fires the event that the proof has been pruned at the given node */
     protected void fireProofIsBeingPruned(Node node, Node removedNode) {
         ProofTreeEvent e = new ProofTreeRemovedNodeEvent(this, node, removedNode);
-        clearSMTData(removedNode);
+        clearSMTandFPData(removedNode);
         for (ProofTreeListener aListenerList : listenerList) {
             aListenerList.proofIsBeingPruned(e);
         }
@@ -896,28 +901,28 @@ public class Proof implements Named {
         return specExtPO;
     }
 
-    private static final Object nodeToSMTDataAltLock = new Object();
-    private Object nodeToSMTDataLock(){
-	if(nodeToSMTData!=null)
-	    return nodeToSMTData;
-	return nodeToSMTDataAltLock;
+    private static final Object nodeToSMTandFPDataAltLock = new Object();
+    private Object nodeToSMTandFPDataLock(){
+	if(nodeToSMTandFPData!=null)
+	    return nodeToSMTandFPData;
+	return nodeToSMTandFPDataAltLock;
     }
-    /**This method is meant to be invoked by {@code Node.setSMTData()}
+    /**This method is meant to be invoked by {@code Node.setSMTandFPData()}
      * Be aware that this method fires events to listeners and may therefore have other side-effects.
-     * @see {@code nodeToSMTData}
+     * @see {@code nodeToSMTandFPData}
      * @author gladisch */
-    public  void addSMTData(Node n, Object data){
-	synchronized(nodeToSMTDataLock()){
+    public  void addSMTandFPData(Node n, Object data){
+	synchronized(nodeToSMTandFPDataLock()){
         	if(n.proof()!=this)//checking by the way against a null pointer
         	    throw new RuntimeException("The referenced node does not belong to this proof");
         	
-        	if(nodeToSMTData==null){
-        	    nodeToSMTData = new WeakHashMap<Node, Vector<Object>>();
+        	if(nodeToSMTandFPData==null){
+        	    nodeToSMTandFPData = new WeakHashMap<Node, Vector<Object>>();
         	}
-        	Vector<Object> vect = nodeToSMTData.get(n);
+        	Vector<Object> vect = nodeToSMTandFPData.get(n);
         	if(vect==null){
         	    vect = new Vector<Object>();
-        	    nodeToSMTData.put(n, vect);
+        	    nodeToSMTandFPData.put(n, vect);
         	}
         	vect.add(data);
         	
@@ -930,15 +935,15 @@ public class Proof implements Named {
     }
     
     /**If there is no SMT Data, then null is returned.
-     * This method is meant to be invoked by {@code Node.getSMTData()} 
+     * This method is meant to be invoked by {@code Node.getSMTandFPData()} 
      * @author gladisch*/
-    public  Vector<Object> getSMTData(Node n){
-	synchronized(nodeToSMTDataLock()){
+    public  Vector<Object> getSMTandFPData(Node n){
+	synchronized(nodeToSMTandFPDataLock()){
         	if(n.proof()!=this)//checking by the way against a null pointer
         	    throw new RuntimeException("The referenced node does not belong to this proof");
         
-        	if(nodeToSMTData==null) return null;
-        	Vector<Object> vect = nodeToSMTData.get(n);
+        	if(nodeToSMTandFPData==null) return null;
+        	Vector<Object> vect = nodeToSMTandFPData.get(n);
         	if(vect!=null){
         	    //This is just a check. Read the documentation of this method to understand this.
         	    if(vect.size()==0)
@@ -948,33 +953,33 @@ public class Proof implements Named {
 	}
     }
     
-    public  void clearSMTData(Node n){
-	synchronized(nodeToSMTDataLock()){
+    public  void clearSMTandFPData(Node n){
+	synchronized(nodeToSMTandFPDataLock()){
         	if(n.proof()!=this)//checking by the way against a null pointer
         	    throw new RuntimeException("The referenced node does not belong to this proof");
         
-        	if(nodeToSMTData==null) return;
+        	if(nodeToSMTandFPData==null) return;
         	
-        	nodeToSMTData.remove(n);
+        	nodeToSMTandFPData.remove(n);
 	}
     }
     
-    public  void clearSMTData(){
-	synchronized(nodeToSMTDataLock()){
-        	if(nodeToSMTData!=null){
-        	    nodeToSMTData.clear();
+    public  void clearSMTandFPData(){
+	synchronized(nodeToSMTandFPDataLock()){
+        	if(nodeToSMTandFPData!=null){
+        	    nodeToSMTandFPData.clear();
         	}
-        	nodeToSMTData=null;
+        	nodeToSMTandFPData=null;
 	}
     }
     
-    /**@return returns the keys of the weak hashmap {@code nodeToSMTData}
+    /**@return returns the keys of the weak hashmap {@code nodeToSMTandFPData}
      * 	warning: null may be returend.
      * @author gladisch */
-     public Set<Node> getNodesWithSMTData(){
-	if(nodeToSMTData==null)
+     public Set<Node> getNodesWithSMTandFPData(){
+	if(nodeToSMTandFPData==null)
 	    return null;
-	return 	nodeToSMTData.keySet();
+	return 	nodeToSMTandFPData.keySet();
     }
 
 }

@@ -126,70 +126,7 @@ public class SFPCondition extends FPCondition {
 	        
 	        fpCond = tb.imp(tb.and(M1M2Sn, UM2post), Sn);
 	        
-	        Main main = Main.getInstance();
-	        KeYMediator mediator = main.mediator();
-	        
-	        Proof old = node.proof();
-//	        Proof p = new Proof() ;
-//	        mark(old.root());
-//
-//	        p.setProofEnv(old.env());
-//	        mainFrame.addProblem(new SingleProof(p, "XXX"));
-//	        changeWish = n;
-	        
-	        ConstrainedFormula cf2 = new ConstrainedFormula(fpCond);
-		Semisequent succ = Semisequent.EMPTY_SEMISEQUENT.insert(0,cf2).semisequent();
-		Sequent poSeq = Sequent.createSuccSequent(succ);
-			        
-		//Proof proof = new Proof("A Hand-made proof", bd.services);
-		Proof proof = new Proof("sdf", poSeq, "",
-				mediator.getProof().env().getInitConfig().createTacletIndex(), 
-				mediator.getProof().env().getInitConfig().createBuiltInRuleIndex(),
-				bd.services,
-				old.getSettings()); 
-		//proof.setNamespaces(old.getNamespaces());
-		proof.setProofEnv(old.env());
-
-//		Sequent seq = poSeq;
-//		Node rootNode = new Node(proof,seq);
-//		proof.setRoot(rootNode);
-	        main.addProblem(new SingleProof(proof, "XXX"));
-
-		//Goal firstGoal = new Goal(rootNode, proof.env().buildRuleAppIndex());
-		//proof.add(firstGoal);
-		/* In order to apply rules, the Namespaces need to be in place.*/
-
-//	        WatchpointPO po = new WatchpointPO("XXXX", poSeq);
-//		    //ProofOblInput po = poBrowser.getAndClearPO();
-//		    if(po != null) {
-//			ProblemInitializer pi = new ProblemInitializer(main);
-//			try {
-//			    pi.startProver(mediator.getProof().env(), po);
-//			} catch(ProofInputException e)  {
-//			    throw new RuntimeException(e);
-//			}
-//		    }
-
-//     	   	ProblemInitializer init = new ProblemInitializer(main);
-//    	    ProofEnvironment env = mediator.getSelectedProof().env();
-//            prob.setInitConfig(env.getInitConfig());
-//	    ProblemInitializer pi = new ProblemInitializer(Main.getInstance());
-//	    pi.startProver(env, prob);
-
-
-	        
-//	        //return auf.createAnonymisingUpdateTerm(locations, targetTerm, services);
-//
-//	        for(Term t : actualParams) {
-//	            ProgramVariable pv = (ProgramVariable) t.op();
-//	            modifies = modifies.add(new BasicLocationDescriptor(TB.var(pv)));
-//	        }
-//
-//	        LocationDescriptor[] locationsArray = locations.toArray(new LocationDescriptor[locations.size()]);
-//	        RigidFunction[] functions = createUninterpretedFunctions(locationsArray,
-//	        	bd.services);
-//	        return createAnonymisingUpdateTerm ( locationsArray, functions,
-//	                                             targetTerm, bd.services );
+	       
 	    
 	} else {
 	    throw new UnhandledCase("Special falsifiability preservation condition does not exist for branch:"+ branchType);

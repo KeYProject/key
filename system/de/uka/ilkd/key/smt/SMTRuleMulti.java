@@ -82,7 +82,7 @@ class SolverWrapper
 	    
 	    Result = interpretAnswer();
 	    //The following causes a notification of the DecisionProcedureResultsDialog
-	    goal.node().addSMTData(Result);
+	    goal.node().addSMTandFPData(Result);
     }
     else {
 	Text = "";
