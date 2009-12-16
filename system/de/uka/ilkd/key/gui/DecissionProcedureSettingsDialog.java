@@ -116,7 +116,7 @@ public class DecissionProcedureSettingsDialog extends JDialog {
 	final int labelHeight = 30;
 	final int fieldHeight = 30;
 	
-	this.setResizable(false);
+	this.setResizable(true);
 	
 	
 	JSplitPane tp = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
