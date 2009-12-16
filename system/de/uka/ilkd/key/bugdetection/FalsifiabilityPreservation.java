@@ -1,27 +1,11 @@
 package de.uka.ilkd.key.bugdetection;
 
-import java.util.Iterator;
 import java.util.Vector;
 
-import de.uka.ilkd.key.bugdetection.BugDetector.MsgMgt;
 import de.uka.ilkd.key.bugdetection.BugDetector.UnhandledCase;
-import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.collection.ImmutableMapEntry;
-import de.uka.ilkd.key.logic.ConstrainedFormula;
 import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Semisequent;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.UpdateTerm;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.rule.NoPosTacletApp;
-import de.uka.ilkd.key.rule.PosTacletApp;
 import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.rule.TacletApp;
-import de.uka.ilkd.key.rule.inst.InstantiationEntry;
-import de.uka.ilkd.key.rule.inst.SVInstantiations;
-import de.uka.ilkd.key.rule.updatesimplifier.Update;
-import de.uka.ilkd.key.logic.op.*;
 
 /**Implementation of the technique described in 
  * Christoph Gladisch. Could we have chosen a better Loop Invariant or Method Contract? In Proc. TAP 2009
@@ -47,6 +31,10 @@ public class FalsifiabilityPreservation {
     public FalsifiabilityPreservation(BugDetector bd, Node branchNode){
 	this.bd = bd;
 	this.branchNode = branchNode;
+	branchNode.addSMTandFPData(this);
+	if(!branchNode.getSMTandFPData().contains(this)){
+	    throw new RuntimeException("FalsifiabilityPreservation cannot associate itself with the node:"+branchNode.serialNr());
+	}
     }
     
     /**Traverse a proof branch from node {@code n} towards the root and collect
@@ -64,17 +52,29 @@ public class FalsifiabilityPreservation {
 	    if(ruleApp!=null){
 		Name parentRuleAppName = ruleApp.rule().name();
 		if(parentRuleAppName.toString().startsWith("whileInv")){
-		    final RuleType ruleType = RuleType.LOOP_INV;
-		    final BranchType branchType = getBranchType(ruleType,n);
-		    final FPCondition fpc;
-		    if(branchType == BranchType.THRID)
-			fpc = new SFPCondition(n, branchNode, ruleType, branchType, bd);
-		    else
-			fpc = new FPCondition(n,ruleType, branchType, bd);
+		    //First check if an FPCondition is already created for this node.
+		    FPCondition fpc=getFPCondition(n);
+		    if(fpc==null){
+        		    //If an FPCondition was not yet associated with the current node, then create new ones
+        
+        		    final RuleType ruleType = RuleType.LOOP_INV;
+        		    final BranchType branchType = getBranchType(ruleType,n);
+        		    if(branchType == BranchType.THRID){
+        			fpc = new SFPCondition(n, branchNode, ruleType, branchType, bd);
+        		    }else{
+        			fpc = new FPCondition(n,ruleType, branchType, bd);
+        		    }
+        		    fpc.addFPCListener(this);
+        		    fpc.constructFPC();
+        		    branchNode.addSMTandFPData(fpc);
+        		    if(getFPCondition(branchNode)!=fpc){
+        			throw new RuntimeException();
+        		    }
+        		    fpc.check();
 
-		    fpc.addFPCListener(this);
-		    fpc.constructFPC();
-		    fpc.check();
+		    }
+		    res.add(fpc);
+
 		    
 //		    	PosTacletApp tacletApp = (PosTacletApp)ruleApp;
 //			System.out.println("\nparentNode:"+parent.serialNr()+" RuleApp:"+parentRuleAppName);
@@ -122,6 +122,20 @@ public class FalsifiabilityPreservation {
 	return res;
     }
     
+    /**A utility method.
+     * @return the FPCondition associated with the given node or null if it does not exist. */
+    public FPCondition getFPCondition(Node n){
+	    Vector<Object> smtAndFPData = n.getSMTandFPData();
+	    if(smtAndFPData!=null){
+		for(Object o:smtAndFPData){
+		    if(o instanceof FPCondition){
+			return (FPCondition)o;
+		    }
+		}
+	    }	
+	    return null;
+    }
+    
     /** Call this method to notify this receiver object that the
      * falsifiability preservation condition has been updated. 
      * A caller of this method is in {@code FPCondition}.
@@ -130,7 +144,14 @@ public class FalsifiabilityPreservation {
 	System.out.println("FP for node "+fpc.node.serialNr()+" is "+fpc.isValid());
     }
     
-
+    /**This method is queried, e.g., by {@code SMTResultsAndBugDetectionDialog.updateTableForNode()} 
+     * @return the node closest to the root up to which falsifiability is preserved,
+     * when starting from the {@code branchNode}. */
+    public Node get_Upto_Node(){
+	//TODO: the branch has to be traversed and FPConditions have to be checked if they are valid.
+	return branchNode;
+    }
+    
     private void warning(String s, int severity){
 	bd.msgMgt.warning(s, severity);
     }

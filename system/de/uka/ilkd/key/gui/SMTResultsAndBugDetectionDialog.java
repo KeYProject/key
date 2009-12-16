@@ -19,6 +19,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 
+import de.uka.ilkd.key.bugdetection.FalsifiabilityPreservation;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -34,8 +35,22 @@ import de.uka.ilkd.key.smt.YicesSolver;
 import de.uka.ilkd.key.smt.Z3Solver;
 import de.uka.ilkd.key.util.Debug;
 
+
+/**This dialog (or window) displays a table that associates nodes with results from SMT solvers
+ * and falsifiability preservation information. If a node is falsifiable and 
+ * falsifiability is preserved from that node to the root, then also the root is falsifiable
+ * and the program has a bug. 
+ * <p>The data that is displayed by this dialog is stored in the currently selected {@code Proof}
+ * object. This class has a subclass that is derived from
+ * ProofTreeAdapter and KeYSelectionListener. Extend and/or register these listeners if 
+ * you want to update this Dialog. 
+ * <p>The visibility of this window is controlled via Main.decProcResDialog.
+ * @see de.uka.ilkd.key.bugdetection.BugDetector
+ * @author gladisch */
 public class SMTResultsAndBugDetectionDialog extends JFrame {
 
+
+    private static final long serialVersionUID = -355104767895519452L;
     private final KeYMediator mediator;
     private JTextArea textArea;
     private DefaultTableModel tableModel;
@@ -44,12 +59,18 @@ public class SMTResultsAndBugDetectionDialog extends JFrame {
     private Proof proof;
     private final SMTSolverProofListener listener;
     private static SMTResultsAndBugDetectionDialog instance;
-    public final static Object[] columnNames = {"Node", CVC3Solver.name, YicesSolver.name, Z3Solver.name, SimplifySolver.name};
+    
+    /**A column name abbreviating "Falsifiability Preservation up to Node ..."*/
+    private final static String FP_TO_NODE = "FP to Node";
+    
+    /**Warning: when modifying this array, be aware to update the code locations where
+     * this field is accessed. Some implicit assumptions are made on the content of this array. */
+    public final static Object[] columnNames = {"Node", CVC3Solver.name, YicesSolver.name, Z3Solver.name, SimplifySolver.name, FP_TO_NODE};
     
     /**The window is set visible by the ProofTree event smtDataUpdate */
     protected SMTResultsAndBugDetectionDialog(KeYMediator medi){
 	//super(mediator.mainFrame(), "SMT Solver Progress and Results");
-	super("SMT Solver Progress and Results");
+	super("SMT Solver Results and Bug Detection Dialog");
 	this.mediator = medi;
 	listener = new SMTSolverProofListener();
 	//mediator.addRuleAppListener(listener);
@@ -102,7 +123,12 @@ public class SMTResultsAndBugDetectionDialog extends JFrame {
 			"Note that weakening is performed, when the node contains<br>" +
 			"formulas or terms not directly translatable to FOL, such as<br>" +
 			"dynamic logic formulas. In this case the result FALSIFIABLE is <br>" +
-			"not sound and you should apply KeY rules to eliminate such formulas</html>");
+			"not sound and you should apply KeY rules to eliminate such formulas" +
+			"<p>The column \"FP to Node\" denotes the end-node up to which<br>" +
+			"falsifiability is preserved when starting from the leaf-node<br>" +
+			"denoted in the column \"Node\". Thus if \"Node\" is falsifiable<br>" +
+			"and falsifiability is preserved until the root (FP to Node = 1),<br>" +
+			"then the root node is falsifiable and the program has a bug.</html>");
 	
 	
 	JScrollPane tableScrollPane = new JScrollPane(table);
@@ -140,7 +166,7 @@ public class SMTResultsAndBugDetectionDialog extends JFrame {
         	    return;
         	}
         	StringBuffer sb=new StringBuffer();
-        	for(int i=1;i<tableModel.getColumnCount();i++){
+        	for(int i=1;i<columnNames.length-1;i++){
         	    SMTSolverResultWrap val = (SMTSolverResultWrap)tableModel.getValueAt(idx, i);
         	    if(val!=null){
                     sb.append("------------").append(val.r.solverName).append("----------\n").append(val.r).append("\n");
@@ -159,6 +185,13 @@ public class SMTResultsAndBugDetectionDialog extends JFrame {
 	}
 	System.err.println("Error DecisionProcedureResultsDialog: Unknown SMT solver: "+solver);
 	return -1;//error
+    }
+    
+    private int fpToNodeColumn(){
+	if(columnNames[5]!=FP_TO_NODE){
+	    throw new RuntimeException();
+	}
+	return 5;
     }
 
     /** Searches the {@code table} or {@code tableModel} for an entry of node {@code n}.
@@ -201,6 +234,10 @@ public class SMTResultsAndBugDetectionDialog extends JFrame {
 			if(i>0){
 			    tableModel.setValueAt(new SMTSolverResultWrap(res), rowIdx, i);
 			}
+		    }else if(o instanceof FalsifiabilityPreservation){
+			FalsifiabilityPreservation fp = (FalsifiabilityPreservation)o;
+			tableModel.setValueAt(new NodeWrap(fp.get_Upto_Node()), 
+								rowIdx, fpToNodeColumn());
 		    }
 		}
 	    }
@@ -285,6 +322,7 @@ public class SMTResultsAndBugDetectionDialog extends JFrame {
 	    setVisible(true);
 	    Node n = e.getNode();
 	    final int rowIdx = updateTableForNode(n);
+	    updateTextArea(rowIdx);
 //	The commented out code causes deadlocks.  It was supposed to do on-the-fly selection of table rows and nodes. 
 //	    updateTextArea(rowIdx);
 //	    if(rowIdx>=0){
