@@ -11,9 +11,6 @@ public class CVC3Solver extends AbstractSMTSolver {
     }
     
     
-    public SMTTranslator getTranslator(Services services) {
-	return new SmtLibTranslator(services);
-    }
 
 
     @Override

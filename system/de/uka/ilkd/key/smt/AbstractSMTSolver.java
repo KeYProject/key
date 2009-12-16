@@ -68,6 +68,20 @@ public abstract class AbstractSMTSolver implements SMTSolver {
     protected abstract String getExecutionCommand(String filename,
 	    				            String formula);
   
+    public SMTTranslator getTranslator(Services services) {
+	try{
+	    final DecisionProcedureSettings dps = ProofSettings.DEFAULT_SETTINGS.getDecisionProcedureSettings();
+	    if(dps.weakenSMTTranslation){
+		return new SmtLibTranslatorWeaker(services);
+	    }else{
+		return new SmtLibTranslator(services);
+	    }
+	}catch(Exception e){
+	    System.err.println("Error: An error occurred while obtaining an SmtLibTranslator. Trying to use the default translator...");
+	    return new SmtLibTranslator(services);
+	}
+    }
+
     
     private String getFinalExecutionCommand(String filename, String formula) {
 	//get the Command from user settings
@@ -261,8 +275,7 @@ public abstract class AbstractSMTSolver implements SMTSolver {
 		    ioe.initCause(e);
 		    throw ioe;
 		}
-	
-	
+
 	
 	 return toReturn;
     }

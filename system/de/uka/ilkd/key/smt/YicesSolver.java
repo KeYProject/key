@@ -21,11 +21,6 @@ public final class YicesSolver extends AbstractSMTSolver {
 	return name;
     }
     
-    
-    public SMTTranslator getTranslator(Services services) {
-	return new SmtLibTranslator(services);
-    }
-
 
     @Override
     protected String getExecutionCommand(String filename, String formula) {
