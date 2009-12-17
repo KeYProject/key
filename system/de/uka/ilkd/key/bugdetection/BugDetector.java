@@ -16,6 +16,7 @@ public class BugDetector {
     
     MsgMgt msgMgt;
     Services services;
+    
     /**If true then an interactive side proof will be created when running {@code FalsifiabilityPreservation.check()}. 
      * If false then a side-proof will be automatically run in the background when running {@code FalsifiabilityPreservation.check()}.*/
     boolean fpCheckInteractive=true;
@@ -23,10 +24,15 @@ public class BugDetector {
     public BugDetector(Services services){
 	this.services = services;
     }
+    
     public void run(Node n){
 	msgMgt = new MsgMgt();
 	FalsifiabilityPreservation fp = new FalsifiabilityPreservation(this,n);
-	fp.collectFPConditions();
+	Vector<FPCondition> fpcs = fp.collectFPConditions();
+	for(FPCondition fpc:fpcs){
+	    fpc.check();
+	}
+
     }
     
     

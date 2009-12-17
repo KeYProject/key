@@ -40,6 +40,8 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.ProofTreeAdapter;
+import de.uka.ilkd.key.proof.ProofTreeEvent;
 import de.uka.ilkd.key.proof.SingleProof;
 import de.uka.ilkd.key.proof.TacletIndex;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
@@ -55,6 +57,12 @@ import de.uka.ilkd.key.rule.updatesimplifier.Update;
 import de.uka.ilkd.key.visualdebugger.watchpoints.WatchPoint;
 import de.uka.ilkd.key.visualdebugger.watchpoints.WatchpointPO;
 
+/**Special Falsifiability Preservation Condition as described in the paper
+ * <br> 
+ * Christoph Gladisch. Could we have chosen a better Loop Invariant or Method Contract? In Proc. TAP 2009
+ * <br>
+ * Instances of this class are associated with Nodes in the hashmap {@code Proof.nodeToSMTandFPData}
+ * @author gladisch */
 public class SFPCondition extends FPCondition {
     
     /**This update is is extracted from the formula in the THIRD branch created by a contract rule.
@@ -72,11 +80,20 @@ public class SFPCondition extends FPCondition {
     private Term contractPost;
     
     private final Node last;
+    
+    /**Formula 2 according to the paper. The SFP formula. The condition if the FIRST and SECOND branches
+     * of the contract rule are closed is not expressed here. */
+    private Boolean form2isValid=null;
 
+    /**After calling the constructor also call {@code addFPListener()}, {@code constructFPC()}, {@code check()}, {@code validityUpdate}.
+     * <p>Warning: this constructor has a side-effect on the Proof-object because it adds the newly created object
+     * to the proof; it associates {@code node} with this object. This again triggers a notification to proofTreeListeners
+     * that smtAndFPdata has been added. */
     public SFPCondition(Node node, Node last, RuleType ruleType, BranchType branchType,
 	    BugDetector bd) {
 	super(node, ruleType, branchType, bd);
 	this.last = last;
+	node.proof().addProofTreeListener(new ProofTreeListener3());
     }
     
     /**
@@ -125,14 +142,12 @@ public class SFPCondition extends FPCondition {
 	        Term M1M2Sn = opRep.replace(Sn);
 	        
 	        fpCond = tb.imp(tb.and(M1M2Sn, UM2post), Sn);
-	        
-	       
-	    
 	} else {
 	    throw new UnhandledCase("Special falsifiability preservation condition does not exist for branch:"+ branchType);
 	}
     }
 
+    
     /**
      * Looks at the top-level operator and one operator below the top-level for
      * anonymous updates. This is where the prefix and anonymous update create in the THIRD
@@ -159,6 +174,7 @@ public class SFPCondition extends FPCondition {
 	throw new UnhandledCase("Can't determine prefix and anon updates");
     }
 
+    
     /**
      * Extracts the post condition form the applied contract rule. This method
      * is called by extractUpdatesAndPost For method contract this is clear; -
@@ -202,6 +218,25 @@ public class SFPCondition extends FPCondition {
 	}
 	throw new UnhandledCase("Unknown ruleType:"+ruleType);
     }
+    
+    public Boolean isValid() {
+	if(form2isValid==null||!form2isValid){
+	    return form2isValid; //null or false;
+	}
+	final Node parent = node.parent();
+	if(ruleType == RuleType.LOOP_INV){
+	    Node n0 = parent.child(0); //First branch,  invariant holds in the beginning
+	    Node n1 = parent.child(1); //Second branch, invariant is preserved
+	    return n0.isClosed() && n1.isClosed();
+	}else if(ruleType == RuleType.METH_CONTR){
+	    Node n0 = parent.child(0); //First branch, Contract precondition holds in the beginning
+	    return n0.isClosed();
+	}else{
+	    throw new UnknownCalculus("Unknown rule type:"+ruleType,null);
+	}
+	//return false;
+    }
+
 
     private Term sequentToFormula(Sequent seq){
 	Semisequent semi = seq.antecedent();
@@ -217,5 +252,63 @@ public class SFPCondition extends FPCondition {
 	    succ = tb.or(succ, it.next().formula());
 	}
 	return tb.imp(ante, succ);
+    }
+    
+    ProofTreeAdapter getFPProofTreeListener(){
+	return new FPProofTreeListener2();
+    }
+    
+    /**
+     * Used to listen to side-proofs created by {@code FPCondition.check()} and
+     * to update the return value of {@code FPCondition.isValid()}. If a
+     * side-proof is closed, then this falsifiability preservation condition is
+     * valid.
+     */
+    protected class FPProofTreeListener2 extends ProofTreeAdapter {
+	public void proofClosed(ProofTreeEvent e) {
+	    //System.out.println("form2isValid==true");
+	    form2isValid = true;
+	    validityUpdate();
+	}
+	
+    }
+    
+    /**This listener is not used for the proof of the SFP but for the verification proof (from which the SFP was constructed)
+     * We update the validity of SFP if the FIRST or SECOND branch of a contract rule closes. */
+    protected class ProofTreeListener3 extends ProofTreeAdapter {
+	/**This is to store the last state of the FIRST node in order to fire events
+	 * only if a change occured */
+	boolean n0closed=false;
+	
+	/**This is to store the last state of the SECOND node in order to fire events
+	 * only if a change occured */
+	boolean n1closed=false;
+	
+	/**For the case that the FIRST or SECOND branch of a contract rule has been closed. */
+	public void proofGoalRemoved(ProofTreeEvent e) {
+	    boolean isRelevant = false;
+	    final Node parent = node.parent();
+	    if (ruleType == RuleType.LOOP_INV) {
+		Node n0 = parent.child(0); // First branch, invariant holds in the beginning
+		Node n1 = parent.child(1); // Second branch, invariant is  preserved
+		if(n0.isClosed()!=n0closed){
+		    n0closed = !n0closed;
+		    isRelevant = true;
+		}
+		if(n1.isClosed()!=n1closed){
+		    n1closed = !n1closed;
+		    isRelevant = true;
+		}
+	    } else if (ruleType == RuleType.METH_CONTR) {
+		Node n0 = parent.child(0); // First branch, Contract precondition holds in the beginning
+		if(n0.isClosed()!=n0closed){
+		    n0closed = !n0closed;
+		    isRelevant = true;
+		}
+	    }
+	    if (isRelevant) {
+		validityUpdate();
+	    }
+	}
     }
 }

@@ -37,7 +37,9 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.updatesimplifier.Update;
 import de.uka.ilkd.key.visualdebugger.ProofStarter;
 
-/** Falsifiability preservation condition and informations for a node */
+/** Falsifiability preservation condition and informations for a node
+ * Instances of this class are associated with Nodes in the hashmap {@code Proof.nodeToSMTandFPData} 
+ * @author gladisch */
 public class FPCondition {
     /**
      * The falsifiability preservation is considered between this node and its
@@ -51,8 +53,10 @@ public class FPCondition {
 
     /**
      * The formula to be proved in order to guarantee falsifiability
-     * preservation. This can be the Special Falsifiability Preservation
-     * condition (SFP)
+     * preservation. 
+     * <p>If this can be the Special Falsifiability Preservation
+     * condition (SFP) then be aware that additionally the FIRST and SECOND branches 
+     * of contract rules have to be closed. Care should be taken by the method isValid(). 
      */
     public Term fpCond;
 
@@ -67,13 +71,20 @@ public class FPCondition {
 
     /**
      * Informs if the falsifiability preservation condition is valid. Null
-     * means, don't know.
+     * means, don't know. 
+     * <p>WARNING: In the special falsifiability preservation condition this field has a different meaning,
+     * it represents only formula (2) in the paper. Additionally the FIRST and SECOND branch have to be
+     * proved.
      */
     private Boolean isvalid = null;
     protected Vector<FalsifiabilityPreservation> fpListeners = 
 	new Vector<FalsifiabilityPreservation>();
 
 
+    /**After calling the constructor also call {@code addFPListener()}, {@code constructFPC()}, {@code check()}, {@code validityUpdate}.
+     * <p>Warning: this constructor has a side-effect on the Proof-object because it adds the newly created object
+     * to the proof; it associates {@code node} with this object. This again triggers a notification to proofTreeListeners
+     * that smtAndFPdata has been added. */
     public FPCondition(Node node, RuleType ruleType, BranchType branchType,
 	    BugDetector bd) {
 	this.node = node;
@@ -81,20 +92,30 @@ public class FPCondition {
 	this.branchType = branchType;
 	this.bd = bd;
 	parent = node.parent();
+	node.addSMTandFPData(this);
+	if(FalsifiabilityPreservation.getFPCondition(node)!=this){
+	    throw new RuntimeException();
+	}
+
     }
 
+    /**Call this method after the constructor.
+     * An FPCondition may be shared by multiple falsifiability preservations of branches, 
+     * because multiple branches may share common nodes.
+     * Adding the same object multiple times is allowed because a set is implemented.*/
     public void addFPCListener(FalsifiabilityPreservation fp){
 	if(fp == null){
 	    throw new NullPointerException();
 	}
-	fpListeners.add(fp);
+	if(!fpListeners.contains(fp)){
+	    fpListeners.add(fp);
+	}
     }
     
     /**
      * Call this method after initialization of this object to construct and
      * further initilizse the object the falsifiability preservation condition
      */
-
     public void constructFPC() {
 	final Vector<ConstrainedFormula> cfs = findNewFormulasInSucc(node);
 	final ConstrainedFormula cf = pickRelevantFormula(cfs);
@@ -150,8 +171,7 @@ public class FPCondition {
 	} else if (cfs.size() == 0) {
 	    return null;
 	} else {
-	    warning(
-		    "pickRelevantFormula() uses heuristics to determine the relevant formula. This may be unsound.",
+	    warning("pickRelevantFormula() uses heuristics to determine the relevant formula. This may be unsound.",
 		    0);
 	    int[] score = new int[cfs.size()];
 	    int i = 0;
@@ -206,7 +226,7 @@ public class FPCondition {
 					old.getSettings());
 	// proof.setNamespaces(old.getNamespaces());
 	proof.setProofEnv(old.env());
-	proof.addProofTreeListener(new FPProofTreeListener());
+	proof.addProofTreeListener(getFPProofTreeListener());
 	final ProofAggregate pa = new SingleProof(proof, "XXX");
 	
 	if (bd.fpCheckInteractive) {
@@ -234,29 +254,36 @@ public class FPCondition {
 	    }
 	    //The following line is probably not required because the proof 
 	    //has registered a FPProofTreeListener.
-	    isvalid = ps.getProof().closed();
+	    //isvalid = ps.getProof().closed();
 
 	}
 
     }
 
+    /**This method is overwritten by SFPCondition. isvalid has a different meaning there. */
     public Boolean isValid() {
 	return isvalid;
     }
 
+    /**Call ths method, when the return value of {@code isValid()} changes.
+     * The listeners are added via {@code addFPCListener}*/
     public void validityUpdate(){
 	for(FalsifiabilityPreservation fp:fpListeners){
 	    fp.fpcUpdate(this);
 	}
     }
     
+    ProofTreeAdapter getFPProofTreeListener(){
+	return new FPProofTreeListener();
+    }
+    
     /**
      * Used to listen to side-proofs created by {@code FPCondition.check()} and
-     * to update the return valid of {@code FPCondition.isValid()}. If a
+     * to update the return value of {@code FPCondition.isValid()}. If a
      * side-proof is closed, then this falsifiability preservation condition is
      * valid.
      */
-    public class FPProofTreeListener extends ProofTreeAdapter {
+    private class FPProofTreeListener extends ProofTreeAdapter {
 	public void proofClosed(ProofTreeEvent e) {
 	    isvalid = true;
 	    validityUpdate();

@@ -49,7 +49,6 @@ import de.uka.ilkd.key.util.Debug;
  * @author gladisch */
 public class SMTResultsAndBugDetectionDialog extends JFrame {
 
-
     private static final long serialVersionUID = -355104767895519452L;
     private final KeYMediator mediator;
     private JTextArea textArea;
@@ -119,20 +118,21 @@ public class SMTResultsAndBugDetectionDialog extends JFrame {
 	
 	tableModel = new DefaultTableModel(columnNames,0);
 	table = new JTable(tableModel);
-	table.setToolTipText("<html>Solver outputs are TRUE, UNKNOWN, FALSIFIABLE.<br> " +
+	table.setToolTipText("<html><p>Solver outputs are TRUE, UNKNOWN, FALSIFIABLE.<br> " +
 			"Note that weakening is performed, when the node contains<br>" +
 			"formulas or terms not directly translatable to FOL, such as<br>" +
 			"dynamic logic formulas. In this case the result FALSIFIABLE is <br>" +
-			"not sound and you should apply KeY rules to eliminate such formulas" +
-			"<p>The column \"FP to Node\" denotes the end-node up to which<br>" +
-			"falsifiability is preserved when starting from the leaf-node<br>" +
-			"denoted in the column \"Node\". Thus if \"Node\" is falsifiable<br>" +
-			"and falsifiability is preserved until the root (FP to Node = 1),<br>" +
-			"then the root node is falsifiable and the program has a bug.</html>");
+			"not sound and you should apply KeY rules to eliminate such formulas<br></p>" +
+			
+			"<p>The column \"FP to Node\" denotes the closest node to the root<br>" +
+			"(on the branch of \"Node\") up to which falsifiability is preserved.<br>" +
+			"Thus if \"Node\" is falsifiable and falsifiability is preserved from<br>" +
+			"the node in column \"Node\" up to the root (FP to Node = 1),<br>" +
+			"then the root node is falsifiable and the program has a bug.</p></html>");
 	
 	
 	JScrollPane tableScrollPane = new JScrollPane(table);
-	tableScrollPane.setPreferredSize(new Dimension(300, 350));
+	tableScrollPane.setPreferredSize(new Dimension(450, 350));
 	//tableScrollPane.setMinimumSize(minimumSize);
 	tableScrollPane.setBorder(new TitledBorder("Processed Nodes"));
 
@@ -151,7 +151,7 @@ public class SMTResultsAndBugDetectionDialog extends JFrame {
 	JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
 		tableScrollPane, modelScrollPane);
 		splitPane.setOneTouchExpandable(true);
-		splitPane.setDividerLocation(300);
+		splitPane.setDividerLocation(450);
 	
 	getContentPane().add(splitPane);
 	pack();
@@ -194,54 +194,76 @@ public class SMTResultsAndBugDetectionDialog extends JFrame {
 	return 5;
     }
 
-    /** Searches the {@code table} or {@code tableModel} for an entry of node {@code n}.
-     * If there is no entry/row of the node yet, then a new table row is created.
-     * {@code Node.getSMTData} is accessed to fill in the cells of the row
-     * with infos from the SMTSolverResults.
-     * @return the row index of the node in the table. -1 is returned if something went wrong
-     * @author gladisch*/
-    protected  int updateTableForNode(Node n){
-	synchronized(tableModel){
-	    if(n==null || n.proof()!=proof){
-		//The displayed proof might have changed by concurrent threads
+    /**
+     * Searches the {@code table} or {@code tableModel} for an entry of node
+     * {@code n}. If there is no entry/row of the node yet, then a new table row
+     * is created. {@code Node.getSMTData} is accessed to fill in the cells of
+     * the row with infos from the SMTSolverResults.
+     * 
+     * @return the row index of the node in the table. -1 is returned if
+     *         something went wrong
+     * @author gladisch
+     */
+    protected int updateTableForNode(Node n) {
+	synchronized (tableModel) {
+	    if (n == null || n.proof() != proof) {
+		// The displayed proof might have changed by concurrent threads
 		return -1;
 	    }
-	    int rowIdx=-1;
-	    //Try to find the row index for this node (if it exists) 
-	    for(int i = 0; i<tableModel.getRowCount();i++){
-		NodeWrap tmp = (NodeWrap)tableModel.getValueAt(i, 0);
-		if(tmp!=null && tmp.n == n){
-		    rowIdx=i;
+	    int rowIdx = -1;
+
+	    //First check if there is data for the node that should be displayed in the table
+	    //Data that should not be displayed is e.g. FPConditions.
+	    Vector<Object> vect = n.getSMTandFPData();
+	    if (vect == null) {
+		return -1;
+	    }
+	    boolean dataFound = false;
+	    for (Object o : vect) {
+		if (o instanceof SMTSolverResult
+		        || o instanceof FalsifiabilityPreservation) {
+		    dataFound = true;
 		    break;
 		}
 	    }
-	    
-	    if(rowIdx==-1){
-		//If no row index was found for the node, then create a new row and get its index
+	    if (!dataFound) {
+		return -1;
+	    }
+
+	    // Try to find the row index for this node (if it exists)
+	    for (int i = 0; i < tableModel.getRowCount(); i++) {
+		NodeWrap tmp = (NodeWrap) tableModel.getValueAt(i, 0);
+		if (tmp != null && tmp.n == n) {
+		    rowIdx = i;
+		    break;
+		}
+	    }
+
+	    if (rowIdx == -1) {
+		// If no row index was found for the node, then create a new row
+		// and get its index
 		Object[] row = new Object[columnNames.length];
 		row[0] = new NodeWrap(n);
 		tableModel.addRow(row);
-		rowIdx = tableModel.getRowCount()-1;
+		rowIdx = tableModel.getRowCount() - 1;
 	    }
-	    	    
-	    //Update the row
-	    Vector<Object> vect = n.getSMTandFPData();
-	    if(vect!=null){
-		for(Object o:vect){
-		    if(o instanceof SMTSolverResult){
-			SMTSolverResult res = (SMTSolverResult)o;
-			int i = solverNameToColumn(res.solverName);
-			if(i>0){
-			    tableModel.setValueAt(new SMTSolverResultWrap(res), rowIdx, i);
-			}
-		    }else if(o instanceof FalsifiabilityPreservation){
-			FalsifiabilityPreservation fp = (FalsifiabilityPreservation)o;
-			tableModel.setValueAt(new NodeWrap(fp.get_Upto_Node()), 
-								rowIdx, fpToNodeColumn());
+
+	    // Update the row
+	    for (Object o : vect) {
+		if (o instanceof SMTSolverResult) {
+		    SMTSolverResult res = (SMTSolverResult) o;
+		    int i = solverNameToColumn(res.solverName);
+		    if (i > 0) {
+			tableModel.setValueAt(new SMTSolverResultWrap(res),
+			        rowIdx, i);
 		    }
+		} else if (o instanceof FalsifiabilityPreservation) {
+		    FalsifiabilityPreservation fp = (FalsifiabilityPreservation) o;
+		    tableModel.setValueAt(new NodeWrap(fp.get_Upto_Node()),
+			    rowIdx, fpToNodeColumn());
 		}
 	    }
-	    
+
 	    return rowIdx;
 	}
     }
@@ -322,7 +344,11 @@ public class SMTResultsAndBugDetectionDialog extends JFrame {
 	    setVisible(true);
 	    Node n = e.getNode();
 	    final int rowIdx = updateTableForNode(n);
-	    updateTextArea(rowIdx);
+	    if(rowIdx!=-1){
+		//the method can handle -1 but it would delete the test in the text area. 
+		//Here we want to keep the text if the table was not updated.
+		updateTextArea(rowIdx);
+	    }
 //	The commented out code causes deadlocks.  It was supposed to do on-the-fly selection of table rows and nodes. 
 //	    updateTextArea(rowIdx);
 //	    if(rowIdx>=0){

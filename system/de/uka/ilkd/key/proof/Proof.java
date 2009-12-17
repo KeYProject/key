@@ -926,12 +926,16 @@ public class Proof implements Named {
         	}
         	vect.add(data);
         	
-        	//fireEvent
-        	ProofTreeEvent e = new ProofTreeEvent(this, n);
+        	fireSmtDataUpdate(n);
+	}
+    }
+    
+    /**A listener of {@code SMTResultsAndBugDetectionDialog} is meant to listen to this event. */
+    public void fireSmtDataUpdate(Node n){
+	ProofTreeEvent e = new ProofTreeEvent(this, n);
         for (ProofTreeListener aListenerList : listenerList) {
             aListenerList.smtDataUpdate(e);
-        }
-	}
+        }	
     }
     
     /**If there is no SMT Data, then null is returned.
@@ -961,6 +965,7 @@ public class Proof implements Named {
         	if(nodeToSMTandFPData==null) return;
         	
         	nodeToSMTandFPData.remove(n);
+        	//Should we call fireSmtDataUpdate()?
 	}
     }
     
@@ -970,6 +975,7 @@ public class Proof implements Named {
         	    nodeToSMTandFPData.clear();
         	}
         	nodeToSMTandFPData=null;
+        	//Should we call fireSmtDataUpdate()?
 	}
     }
     
