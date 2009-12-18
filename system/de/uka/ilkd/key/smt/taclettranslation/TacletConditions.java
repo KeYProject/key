@@ -14,10 +14,13 @@ import java.util.Iterator;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.VariableCondition;
 import de.uka.ilkd.key.rule.conditions.AbstractOrInterfaceType;
+import de.uka.ilkd.key.rule.conditions.ArrayComponentTypeCondition;
 import de.uka.ilkd.key.rule.conditions.TypeComparisionCondition;
 import de.uka.ilkd.key.rule.conditions.TypeCondition;
 import de.uka.ilkd.key.rule.conditions.TypeResolver.GenericSortResolver;
@@ -34,6 +37,8 @@ class TacletConditions {
     private ImmutableList<TypeCondition> typeCondition = ImmutableSLList.nil();
     private ImmutableList<AbstractOrInterfaceType> abstractInterfaceCondition 
     		= ImmutableSLList.nil();
+    private ImmutableList<ArrayComponentTypeCondition>
+    		arrayComponentCondition = ImmutableSLList.nil();  
     
     
   
@@ -60,7 +65,24 @@ class TacletConditions {
 		    abstractInterfaceCondition.append((
 			    AbstractOrInterfaceType) cond);
 	    }
+	    if(cond instanceof ArrayComponentTypeCondition){
+		arrayComponentCondition = 
+		    arrayComponentCondition.append(
+			    (ArrayComponentTypeCondition)cond);
+	    }
 	}
+    }
+    
+    public boolean containsIsReferenceArray(Term t){
+	
+	for(ArrayComponentTypeCondition cond : arrayComponentCondition){
+	    
+	    if(cond.isCheckReferenceType() ){
+		return true;
+	    }
+	    
+	}
+	return false;
     }
     
     /**

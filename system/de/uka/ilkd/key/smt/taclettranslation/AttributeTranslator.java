@@ -18,6 +18,7 @@ import java.util.LinkedList;
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
@@ -25,8 +26,10 @@ import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermFactory;
+import de.uka.ilkd.key.logic.op.ArrayOp;
 import de.uka.ilkd.key.logic.op.AttributeOp;
 import de.uka.ilkd.key.logic.op.LogicVariable;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.sort.ClassInstanceSort;
 import de.uka.ilkd.key.logic.sort.GenericSort;
@@ -46,7 +49,8 @@ interface AttributeTranslator {
      * @param attributeTerms
      * @return
      */
-    public Term translate(Taclet t, Term term, ImmutableSet<Term> attributeTerms, Services services);
+    public ImmutableSet<Term> translate(Taclet t, Term term, ImmutableSet<Term> attributeTerms, Services services
+	    ,TacletConditions cond);
     
     
 }
@@ -56,227 +60,192 @@ final class DefaultAttributeTranslator implements AttributeTranslator{
 
     
     
-    public Term translate(Taclet t, Term term, ImmutableSet<Term> attributeTerms, Services services) {
+    public ImmutableSet<Term> translate(Taclet t, Term term, 
+	    ImmutableSet<Term> attributeTerms, Services services,TacletConditions cond) {
 	ImmutableSet<Term> result = DefaultImmutableSet.nil();
-	/*System.out.println("\t\t\tDest-Term:");
-	analyzeTerm(term,0,-1);
-	System.out.println("\t\t\tSrc-Term:");
-	
-	*/for(Term src : attributeTerms){
-	  //System.out.println(src);
-	    //analyzeTerm(src,0,0,services); 
-	}
 	
 	
-	Collection<InstantiationContainer> containers = 
-	    createPossibleInstantiations(attributeTerms,services);
-
-	
-	for(InstantiationContainer container : containers){
-	     
-	     Term res = instantiateAttributes(container.essential, term, services);
-	     // only when at least one term of the essential container was used continue.
-	     if(res == null) continue;
-	     Term res2 = instantiateAttributes(container.possible,res,services);
-	     if(res2 != null){
-		 res = res2;
-	     }
-		
-	     if(res != null && checkForNotInstantiatedAttributes(res))
-		result = result.add(res);
-	    
-	}
-	
-	if(!result.isEmpty()){
-	    Term [] array = new Term[result.size()];
-	    result.toArray(array);
-	    term = TermBuilder.DF.and(array);
-	}
-	
-
-	/*
-	HashMap<Term,ImmutableSet<Term>> container = new HashMap<Term,ImmutableSet<Term>>(); 
-	
-	for(Term src : attributeTerms){
-	   Term temp =  getObject(src);
-	   ImmutableSet<Term> set = container.get(temp);
-	   if(set== null){
-	       set  = DefaultImmutableSet.nil();
-	       
-	   }
-	   set = set.add(src);
-	   container.put(temp, set);
-	}
-
-	
-	
-	
-	for(ImmutableSet<Term> set : container.values()){
-		System.out.println("set: " + set);
-		Term last = term; 
-		boolean change = false;
-		for(Term src : set){
-		    Term tmp;
-		    //analyzeTerm(src,0,-1);
-		    tmp = instantiateAttributes(src,last,services);
-		    if(tmp == null){
-			//tmp = term;
-			//break;
-		    }else{
-			last = tmp;
-			change = true;
-			System.out.println("adas");
-		    }
-		}
-		System.out.println(last);
-		if(change && checkForNotInstantiatedAttributes(last))
-		result = result.add(last);
-	
-	}
-	if(!result.isEmpty()){
-	    Term [] array = new Term[result.size()];
-	    result.toArray(array);
-	    term = TermBuilder.DF.and(array);
-	}
-*/
-	
-	return term;
-    }
-   
-    private boolean checkForNotInstantiatedAttributes(Term term){
-	if(term.op() instanceof MetaCreated){
-	    return false;
-	}
-	if(term.op() instanceof AttributeOp){
-	    AttributeOp op = (AttributeOp) term.op();
-	    if(op.sort().equals(ProgramSVSort.IMPLICITCREATED)||
-		    op.sort().equals(ProgramSVSort.VARIABLE)){
-		return false;
-	    }
-
-	}
-
-	for (int i = 0; i < term.arity(); i++) {
-	    if(!checkForNotInstantiatedAttributes(term.sub(i)))
-		return false;
-
-	}
+	Collection<Term> attributes=  createPossibleInstantiations(attributeTerms,services);
 
 
-	return true;
-    }
-    
-    
-   private Term getObject(Term src){
-       while(src.depth() != 0){
-	   src = src.sub(0);
-       }
-       return src;
-   }
-   
-    private Term instantiateAttributes(Collection<Term> attributes, Term dest, Services services){
-	Term res = dest; 
-	boolean used = false;
+	// find the term to replace.
+	Term toReplace = analyzeTaclet(term, services);
+	if(toReplace == null) return result;
+	
+	// instantiate all attributes that match the term 'toReplace'
 	for(Term src : attributes){
-	    Term tmp;
-	    
-	    //analyzeTerm(src,0,-1);
-	    tmp = instantiateAttributes(src,res,services);
-	    if(tmp != null){
-		res = tmp;
-		used = true;
+	    Term tmp=null;
 
+	    if(toReplace.op() instanceof ArrayOp && isArray(src,cond)){
+		tmp = instantiateArray(src,term,services,toReplace);
 	    }
-	}
-	if(!used) return null;
-	return res;
+	    else{
+	    tmp = instantiateAttributes(src, term, services, toReplace); 
+	    }
+            if(tmp != null){
+		result = result.add(tmp);
+	    }
+        }
+	
+	
+	
+	
+	return result;
     }
+    
+    
+    private boolean isArray(Term term, TacletConditions cond){
+	//if(term.)
+	//ArrayOp op = ArrayOp.getArrayOp(term.op().);
 
-    /** TODO: write comment
+	//cond.containsIsReferenceArray(term);
+	return false;
+    }
+    
+
+    
+   /**
      * @param src
-     * @param dest the term to replace by <code>src</code>
+     * @param term
+     * @param services
+     * @param toReplace
      * @return
      */
-    private Term instantiateAttributes(Term src, Term dest,Services services) {
-	//System.out.println("src: "+ dest);
+    private Term instantiateArray(Term array, Term dest, Services services,
+            Term toReplace) {
+	ImmutableArray<QuantifiableVariable> variables[] = new ImmutableArray[dest.arity()];
 	
-	// Do the work:
-	if(match(src,dest,services)){
-	    //System.out.println("match: "+src+" and "+dest) ;
-	   return src; 	    
+	if(dest.equals(toReplace)){
+	    return array;
 	}
 	
 	
-	if(isCreatedTerm(dest,services) || dest.op()instanceof AttributeOp) return null;
-	
-	// Split the term
-	ImmutableArray<QuantifiableVariable> variables[] = new ImmutableArray[dest
-                                                                    .arity()];
-	boolean change = false;
+	             
 	Term[] subTerms = new Term[dest.arity()];
 	for (int i = 0; i < dest.arity(); i++) {
-	    variables[i] = dest.varsBoundHere(i);//subTerms[i].varsBoundHere(i);
-	    Term tmp = instantiateAttributes(src,dest.sub(i),services);
-	    subTerms[i] = (tmp == null ? dest.sub(i) : tmp);
-	    change = (tmp == null ? change : true);
-	}	
-	dest = TermFactory.DEFAULT.createTerm(dest.op(), subTerms, variables,
-		JavaBlock.EMPTY_JAVABLOCK);
+	    
+	    variables[i] = dest.varsBoundHere(i);
+	    subTerms[i] = instantiateAttributes(array,dest.sub(i),services,toReplace);
+
+	} 
 	
-	if(change){
-	    return dest;
+	if(isCreatedTerm(dest, services)){
+	    dest = createCreatedTerm(subTerms[0], services);
+	}else{
+	    dest = TermFactory.DEFAULT.createTerm(dest.op(), subTerms, variables,
+			JavaBlock.EMPTY_JAVABLOCK);    
 	}
 	
-	return null;
+	return dest;
+	
     }
-    
-    
-    private boolean match(Term src, Term dest, Services services){
+
+
+
+/**
+    * Analyzes recursively the taclet term to find out which term 
+    * must be replaced.
+    * @param taclet the term to analyze
+    * @param services 
+    * @return returns the first term of the sort <code>ProgramSVSort.VARIABLE</code>.
+    * If the given term does not contain a term of sort <code>ProgramSVSort.VARIABLE</code> the
+    * method returns <code>null</code>. 
+    */
+   private Term analyzeTaclet(Term taclet, Services services){
+       
+       
+       
+       if(taclet.op() instanceof AttributeOp &&
+	  !isCreatedTerm(taclet, services)){
+	   AttributeOp op = (AttributeOp)taclet.op();
+	   if(op.sort().equals(ProgramSVSort.VARIABLE)){
+	       return taclet;    
+	   }
+	   
+	   
+       }
+       
+       if(taclet.op() instanceof ArrayOp){
+	   return taclet;
+       }
+       
+       for (int i = 0; i < taclet.arity(); i++) {
+	    Term tmp = analyzeTaclet(taclet.sub(i),services);
+	    if(tmp!= null) return tmp;
+	}       
+       return null;
+   }
+   
+     
+    /**
+     * Instantiates all attributes in <code>dest</code> that match <code>toReplace</code>.
+     * In case of matching <code>dest</code> is instantiated by <code>attribute</code>.
+     * There are two types of matching.<br>
+     * First: The attribute matches <code>dest</code>. Example:<br>
+     * A.attribute  matches obj.#a<br>
+     * Second: The object belonging to the attribut match <code>dest</code>. Example: <br>
+     * A matches obj. 
+     * @param attribute the substitution. 
+     * @param dest term to be scanned.
+     * @param services 
+     * @param toReplace term to replace.
+     * @return returns the instantiated term.
+     */
+    private Term instantiateAttributes(Term attribute, Term dest, Services services, Term toReplace){
+	ImmutableArray<QuantifiableVariable> variables[] = new ImmutableArray[dest.arity()];
+	Term object = null;
+	if(attribute.arity() >= 1){
+	    object = attribute.sub(0);   
+	}
+	 
 	
-	
-	if( (!(dest.op() instanceof AttributeOp) &&
-              !(dest.op() instanceof MetaCreated) &&
-              !(dest.op() instanceof LogicVariable)) 
-              ||
-              dest.arity() != src.arity()) //||
-        //      dest.depth() != src.depth())
-	{
-	    return false;
+	if(dest.equals(toReplace)){
+	    return attribute;
 	}
 	
-	
-	/*if(   (dest.sort() instanceof GenericSort &&
-		   AbstractTacletTranslator.isReferenceSort(src.sort()))	){
-	    return true;
-	}*/
-		
-	if((dest.sort().equals(ProgramSVSort.VARIABLE) &&
-		    src.op() instanceof AttributeOp   &&
-		    ((AttributeOp)src.op()).sort() instanceof ClassInstanceSort) 
-		    ||
-	   (dest.sort() instanceof GenericSort &&
-		   AbstractTacletTranslator.isReferenceSort(src.sort()))	   
-		   ||
-            (isCreatedTerm(dest,services) && isCreatedTerm(src,services))
-	   ){
-	    for(int i=0; i < src.arity(); i++){
-		if(!match(src.sub(i),dest.sub(i),services)){
-		    return false;
-		}
-	    }
-	    
-	    return true;
-	    
-	    
+	if(object!=null&&dest.equals(toReplace.sub(0))){
+	    return object;
 	}
 	
+	             
+	Term[] subTerms = new Term[dest.arity()];
+	for (int i = 0; i < dest.arity(); i++) {
+	    
+	    variables[i] = dest.varsBoundHere(i);
+	    subTerms[i] = instantiateAttributes(attribute,dest.sub(i),services,toReplace);
+
+	} 
 	
+	if(isCreatedTerm(dest, services)){
+	    dest = createCreatedTerm(subTerms[0], services);
+	}else{
+	    dest = TermFactory.DEFAULT.createTerm(dest.op(), subTerms, variables,
+			JavaBlock.EMPTY_JAVABLOCK);    
+	}
 	
-	return false;
+	return dest;
 
     }
+
+
+    /**
+     * Creates the term <code>objectTerm</code>.created.
+     * @param objectTerm
+     * @param services
+     * @return returns the created term.
+     */
+    private Term createCreatedTerm(Term objectTerm,Services services) {
+        JavaInfo javaInfo = services.getJavaInfo();
+        ProgramVariable createdAttribute
+                = javaInfo.getAttribute(ImplicitFieldAdder.IMPLICIT_CREATED,
+                                        javaInfo.getJavaLangObject());
+        Term createdTerm = TermBuilder.DF.dot(objectTerm, createdAttribute);
+        return createdTerm;
+    }
     
-    private  Collection<InstantiationContainer> createPossibleInstantiations
+    
+      
+    private  Collection<Term> createPossibleInstantiations
             (ImmutableSet<Term> attributeTerms, Services services){
 	TreeNode root = new TreeNode(null,null);
 	
@@ -285,67 +254,41 @@ final class DefaultAttributeTranslator implements AttributeTranslator{
 	for(Term content : attributeTerms){
 	    root.addContent(content);
 	}
-	System.out.println(root);
 	LinkedList<TreeNode> list = new LinkedList<TreeNode>();
 	root.getLeafsAndCrotches(list);
 	
-	LinkedList<InstantiationContainer> containers 
-		= new LinkedList<InstantiationContainer>();
+	
+	LinkedList<Term> container = new LinkedList<Term>();
+	
 	for(TreeNode node : list){
-	   InstantiationContainer container 
-	   = new InstantiationContainer();
+	   
 	   boolean essential = true;
 	   boolean start = true;
 	   TreeNode last = null;
 	   while(!node.isRoot()){
 	       
-	       if(node.isCrotch()&& !start){essential = false;}
+	       if((node.isCrotch()&& !start)){essential = false;}
 	       if(essential){
-		   container.essential.add(node.getContent());
-	       }
-	       else{
-		   
-		   if(node.isAttributeTerm()){
-		        container.possible.add(node.getContent());
-		       }
-		   if(last!=null && !isCreatedTerm(last.getContent(), services)){
-		       for(TreeNode node2 : node.getChildren()){
-			   if(isCreatedTerm(node2.getContent(), services)){
-			       container.possible.add(node2.getContent());
-			   }
-		   }
-	       }
-		   
-		 
-		
+		   if(!isCreatedTerm(node.getContent(),services))
+		   container.add(node.getContent());
+	       }else{
+		   break;		
 	       }
 	       last = node;
 	       node = node.getParent();
 	       start = false;
 	   }
-	   containers.add(container);
+	}
+	
 
-	}
-	
-	//System.out.println(node.getContent());
 	
 	
 	
 	
-	
-	return containers;
+	return container;
     }
     
-    private TreeNode getChildWithCreatedTerm(TreeNode node,Services services){
-	for(TreeNode node2 : node.getChildren()){
-	    if(isCreatedTerm(node2.getContent(), services)) return node2;
-	}
-	return null;
-    }
-    
-    private boolean containsAttributeTerm(TreeNode node){
-	       return node.getContent().op() instanceof AttributeOp;  
-	   }
+
     
     
     private void analyzeTerm(Term term, int depth, int max_depth, Services services){
@@ -407,20 +350,6 @@ final class DefaultAttributeTranslator implements AttributeTranslator{
 	}
 	return false;
     }
-    
-}
-
-/**
- * Every instance of <code>InstantiationContainer</code> is used for one 
- * instantiation of the taclet.
- */
-
-class InstantiationContainer{
-    /**At least one of this terms must be used for the instantiation of the taclet.*/
-    public HashSet<Term> essential = new HashSet<Term>(); 
-    /**It is not necessary to use one of this terms for instantiation.*/
-    public HashSet<Term> possible = new HashSet<Term>();
-    
     
 }
 

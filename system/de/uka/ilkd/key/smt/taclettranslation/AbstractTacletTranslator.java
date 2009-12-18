@@ -37,6 +37,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermCreationException;
 import de.uka.ilkd.key.logic.TermFactory;
+import de.uka.ilkd.key.logic.op.ArrayOp;
 import de.uka.ilkd.key.logic.op.AttributeOp;
 import de.uka.ilkd.key.logic.op.BoundedNumericalQuantifier;
 import de.uka.ilkd.key.logic.op.CastFunctionSymbol;
@@ -75,6 +76,7 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletGoalTemplate;
 import de.uka.ilkd.key.rule.VariableCondition;
 import de.uka.ilkd.key.rule.conditions.AbstractOrInterfaceType;
+import de.uka.ilkd.key.rule.conditions.ArrayComponentTypeCondition;
 import de.uka.ilkd.key.rule.conditions.TypeComparisionCondition;
 import de.uka.ilkd.key.rule.conditions.TypeCondition;
 import de.uka.ilkd.key.rule.metaconstruct.MetaCreated;
@@ -149,8 +151,30 @@ abstract class AbstractTacletTranslator implements TacletTranslator {
 	usedGenericSorts = new HashSet<GenericSort>();
 	term = rebuildTerm(term);
 	// translate attributes
-	term = AttributeTranslator.DEFAULT.translate(t,term,attributeTerms,services);
 	
+	ImmutableSet<Term>result  = AttributeTranslator.DEFAULT
+		.translate(t,term,attributeTerms,services,conditions);
+	
+	
+	
+	if(!result.isEmpty()){
+	    Term [] array = new Term[result.size()];
+	    result.toArray(array);
+	    term = TermBuilder.DF.tt();
+	    for(Term tmp : result){
+		if(checkForNotInstantiatedAttributes(tmp)){
+		    term = TermBuilder.DF.and(term,tmp);
+		}
+	    }
+	    if(term.equals(TermBuilder.DF.tt())){
+		throw new IllegalTacletException("There are some program schema" +
+				" variables that can not be translated.");
+	    }
+	  
+	} else if(!checkForNotInstantiatedAttributes(term)){
+	    throw new IllegalTacletException("There are some program schema " +
+	    		"variables that can not be translated.");
+	}
 	// sixth step: quantify all free variables.
 	term = quantifyTerm(term);
 	
@@ -168,6 +192,36 @@ abstract class AbstractTacletTranslator implements TacletTranslator {
 	
 	TacletFormula tf = new DefaultTacletFormula(t, term, "",conditions);
 	return tf;
+    }
+    
+    
+    /**
+     * Checks whether the term is correctly instantiated.
+     * @param term the term to be checked.
+     * @return <code>true</code> if the term is instantiated, otherwise
+     * <code>false</code>.
+     */   
+    private boolean checkForNotInstantiatedAttributes(Term term){
+	if(term.op() instanceof MetaCreated){
+	    return false;
+	}
+	if(term.op() instanceof AttributeOp){
+	    AttributeOp op = (AttributeOp) term.op();
+	    if(op.sort().equals(ProgramSVSort.IMPLICITCREATED)||
+		    op.sort().equals(ProgramSVSort.VARIABLE)){
+		return false;
+	    }
+
+	}
+
+	for (int i = 0; i < term.arity(); i++) {
+	    if(!checkForNotInstantiatedAttributes(term.sub(i)))
+		return false;
+
+	}
+
+
+	return true;
     }
     
        
@@ -260,11 +314,13 @@ abstract class AbstractTacletTranslator implements TacletTranslator {
 	    //TODO: uncomment this field - only for testing
 	    if(!(vc instanceof TypeComparisionCondition)&&
 	       !(vc instanceof TypeCondition) &&
-	       !(vc instanceof AbstractOrInterfaceType) )
+	       !(vc instanceof AbstractOrInterfaceType)&&
+	       !(vc instanceof ArrayComponentTypeCondition)
+	       )
 	       {
 		throw new IllegalTacletException(
 			"The taclet has at least one variable condition" +
-			" that is not supported: " + vc.toString() );
+			" that is not supported: " + vc.toString()+": " +Taclet.class.getName()  );
 	    }
 	}
 	
@@ -361,6 +417,7 @@ abstract class AbstractTacletTranslator implements TacletTranslator {
 	        || (op instanceof AttributeOp)
 	        || (op instanceof MetaCreated)
 	        || (op instanceof ProgramSV)
+	        || (op instanceof ArrayOp)
 	   
 
 	        

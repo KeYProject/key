@@ -36,7 +36,9 @@ final class UsedTaclets {
     static final private String testTaclets[] = {//"",
 							//"array_length_short_javacard"
 	//"array_length_non_negative_2",
-						   "only_created_object_are_referenced",
+						    "only_created_object_are_referenced",
+						    "only_created_object_are_referenced_by_arrays"
+	//"only_created_object_are_referenced_non_null"
 						
 						  //   ,"boolean_equal_2"
 						   //  ,"disjoint_repositories"
@@ -167,6 +169,8 @@ final class UsedTaclets {
 	    //usedTaclets.add("system_invariant_for_created_2a_sym");
 	    
 	    usedTaclets.add("only_created_object_are_referenced");
+	    usedTaclets.add("only_created_object_are_referenced_non_null");
+	    usedTaclets.add("only_created_object_are_referenced_by_arrays");
 	    
 	   
 	    //usedTaclets.add("array_length_non_negative_2");
