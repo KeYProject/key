@@ -9,6 +9,7 @@ package de.uka.ilkd.key.rule.metaconstruct;
 
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
@@ -34,7 +35,7 @@ public class AtPreEquations extends AbstractMetaOperator {
             return atPreMapping;
         }
         updateFormula = t;
-        atPreMapping = new HashMap();
+        atPreMapping = new LinkedHashMap();
         AtPreFactory.INSTANCE.createAtPreFunctionsForTerm(t, atPreMapping, services);
         return atPreMapping;
     }
