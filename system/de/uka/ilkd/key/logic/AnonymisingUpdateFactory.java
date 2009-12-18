@@ -11,7 +11,6 @@
 package de.uka.ilkd.key.logic;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 import de.uka.ilkd.key.collection.ImmutableSet;
