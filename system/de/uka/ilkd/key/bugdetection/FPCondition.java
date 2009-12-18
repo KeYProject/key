@@ -13,6 +13,7 @@ import de.uka.ilkd.key.bugdetection.FalsifiabilityPreservation.RuleType;
 import de.uka.ilkd.key.collection.ImmutableMapEntry;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.Main;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.ConstrainedFormula;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
@@ -207,11 +208,17 @@ public class FPCondition {
      * the method {@code isValid()}
      */
     public void check() {
-	if (fpCond == null) {
-	    throw new RuntimeException("Call constructFPC() before calling check()");
-	}
 	if(fpListeners.size()==0){
 	    System.out.println("Warning: FPCondition has no listeners. Normally a listener is notified when the FP condition is proved.");
+	}
+	if(isValid()!=null){
+	    //This case means that the FP condition has already been checked or at least created. 
+	    //There already exists a proof object for this so we don't create a new one.
+	    validityUpdate();
+	    return;
+	}
+	if (fpCond == null) {
+	    throw new RuntimeException("Call constructFPC() before calling check()");
 	}
 	final ConstrainedFormula cf2 = new ConstrainedFormula(fpCond);
 	final Semisequent succ = Semisequent.EMPTY_SEMISEQUENT.insert(0, cf2).semisequent();
@@ -242,6 +249,7 @@ public class FPCondition {
 	    try {
 		SwingUtilities.invokeAndWait(new Runnable() {
 		    public void run() {
+			System.out.println("Running FP-side-proof in background");
 			ps.run(proof.env());
 		    }
 		});
@@ -288,6 +296,10 @@ public class FPCondition {
 	    isvalid = true;
 	    validityUpdate();
 	}
+    }
+    
+    public Services getServices(){
+	return node.proof().getServices();
     }
 
 }

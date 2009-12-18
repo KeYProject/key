@@ -231,7 +231,7 @@ public class Main extends JFrame implements IMain {
     private final ArrayList<JRadioButtonMenuItem> showndecProcRadioItems = new ArrayList<JRadioButtonMenuItem>();
     
     /** The menu for the decproc options */
-    private final JMenu decProcOptions = new JMenu("Decision Procedures");
+    public final JMenu decProcOptions = new JMenu("Decision Procedures");
     
     public SMTResultsAndBugDetectionDialog decProcResDialog;
     

@@ -3,6 +3,7 @@ package de.uka.ilkd.key.bugdetection;
 import java.util.Vector;
 
 import de.uka.ilkd.key.bugdetection.BugDetector.UnhandledCase;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.rule.Rule;
@@ -34,6 +35,9 @@ public class FalsifiabilityPreservation {
      * This field identifies the branch that is considered here. */
     final protected Node branchNode;
     
+    /**The order of the names is important. */
+    public final static String[] criticalRuleNames = {"whileInv","Use Operation Contract"};
+    
     /**Warning this constructor has a side-effect on the proof object. It associates
      * the newly create object with the given branchNode
      * @param branchNode The branch between {@code branchNode} and the root node is considered by {@code this} object.
@@ -47,6 +51,8 @@ public class FalsifiabilityPreservation {
 	    throw new RuntimeException("FalsifiabilityPreservation cannot associate itself with the node:"+branchNode.serialNr());
 	}
     }
+    
+    
     
     /**Traverse a proof branch from node {@code n} towards the root and collect
      * Falsifiability preservation conditions at occurrences of loop invariant 
@@ -62,28 +68,32 @@ public class FalsifiabilityPreservation {
 	    Node parent = n.parent();
 	    RuleApp ruleApp = parent.getAppliedRuleApp();
 	    if(ruleApp!=null && isCriticalRule(ruleApp.rule())){
-		Name parentRuleAppName = ruleApp.rule().name();
-		if(parentRuleAppName.toString().startsWith("whileInv")){
-		    //First check if an FPCondition is already created for this node.
-		    FPCondition fpc=getFPCondition(n);
-		    if(fpc==null){
-        		    //If an FPCondition was not yet associated with the current node, then create new ones
-        
-        		    final RuleType ruleType = RuleType.LOOP_INV;
-        		    final BranchType branchType = getBranchType(ruleType,n);
-        		    if(branchType == BranchType.THRID){
-        			fpc = new SFPCondition(n, branchNode, ruleType, branchType, bd);
-        		    }else{
-        			fpc = new FPCondition(n,ruleType, branchType, bd);
-        		    }
-        		    //fpc.addFPCListener(this);
-        		    fpc.constructFPC();
+		//First check if an FPCondition is already created for this node.
+		FPCondition fpc=getFPCondition(n);
+		if (fpc == null) {
+		    // If an FPCondition was not yet associated with the current node, then create new ones
+		    Name parentRuleAppName = ruleApp.rule().name();
+		    final RuleType ruleType;
+		    if (parentRuleAppName.toString().startsWith(criticalRuleNames[0])) { // Loop Invariant
+			ruleType = RuleType.LOOP_INV;
+		    } else if (parentRuleAppName.toString().startsWith(criticalRuleNames[1])) {// Method Contract
+			ruleType = RuleType.METH_CONTR;
+		    } else {
+			throw new RuntimeException(
+			        "Case distinctions are missing a case that is considered by isCriticalRule().");
 		    }
-		    fpc.addFPCListener(this);
-		    res.add(fpc);
-		}else{
-		    throw new RuntimeException("Case distinctions are missing a case that is considered by isCriticalRule().");
+		    if(ruleType==RuleType.LOOP_INV || ruleType==RuleType.METH_CONTR){
+			final BranchType branchType = getBranchType(ruleType, n);
+			if (branchType == BranchType.THRID) {
+			    fpc = new SFPCondition(n, branchNode, ruleType,branchType, bd);
+			} else {
+			    fpc = new FPCondition(n, ruleType, branchType, bd);
+			}
+		    }
+		    fpc.constructFPC();
 		}
+		fpc.addFPCListener(this);
+		res.add(fpc);
 	    }
 	    n=parent;
 	}
@@ -92,7 +102,12 @@ public class FalsifiabilityPreservation {
     
     public static boolean isCriticalRule(Rule r){
 	String name = r.name().toString();
-	return name.startsWith("whileInv");
+	for(String s:criticalRuleNames){
+	    if(name.startsWith(s)){
+		return true;
+	    }
+	}
+	return false;
     }
     
     /**@param n is the child node of the loop invariant or method contract rule application
@@ -109,6 +124,16 @@ public class FalsifiabilityPreservation {
 	    }else{
 		throw new UnhandledCase("getBranchType("+rt+", "+n.serialNr()+")");
 	    }
+	}else if(rt==RuleType.METH_CONTR){
+	    if(n.siblingNr()==1||n.getNodeInfo().getBranchLabel().equalsIgnoreCase("Post")){
+		res = BranchType.THRID;
+		if(!(n.siblingNr()==1 && n.getNodeInfo().getBranchLabel().equalsIgnoreCase("Post"))){
+		    warning("Recognizing the branch type of node "+n.serialNr()+" may have failed.",2);
+		}
+	    }else{
+		throw new UnhandledCase("getBranchType("+rt+", "+n.serialNr()+")");
+	    }
+	    
 	}else{
 	    throw new UnhandledCase("getBranchType("+rt+", "+n.serialNr()+")");
 	}
@@ -169,4 +194,7 @@ public class FalsifiabilityPreservation {
     
     
 
+    public Services getServices(){
+	return branchNode.proof().getServices();
+    }
 }

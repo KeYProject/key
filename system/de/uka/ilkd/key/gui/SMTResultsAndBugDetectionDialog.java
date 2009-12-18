@@ -1,15 +1,22 @@
 package de.uka.ilkd.key.gui;
 
 import java.awt.Dimension;
+import java.awt.event.ActionEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.Vector;
 
+import javax.swing.AbstractAction;
+import javax.swing.ButtonGroup;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JList;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTable;
@@ -19,6 +26,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 
+import de.uka.ilkd.key.bugdetection.BugDetector;
 import de.uka.ilkd.key.bugdetection.FalsifiabilityPreservation;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.proof.Node;
@@ -66,6 +74,8 @@ public class SMTResultsAndBugDetectionDialog extends JFrame {
      * this field is accessed. Some implicit assumptions are made on the content of this array. */
     public final static Object[] columnNames = {"Node", CVC3Solver.name, YicesSolver.name, Z3Solver.name, SimplifySolver.name, FP_TO_NODE};
     
+    private BugDetector bd = BugDetector.DEFAULT;
+
     /**The window is set visible by the ProofTree event smtDataUpdate */
     protected SMTResultsAndBugDetectionDialog(KeYMediator medi){
 	//super(mediator.mainFrame(), "SMT Solver Progress and Results");
@@ -112,8 +122,40 @@ public class SMTResultsAndBugDetectionDialog extends JFrame {
 	return instance;
     }
     
+    
     private void layoutWindow(){
 	
+	this.setJMenuBar(new JMenuBar());
+        JMenuBar menuBar = getJMenuBar();
+        JMenu fpMenu = new JMenu("Falsifiability Preservation");
+        ButtonGroup group = new ButtonGroup();
+        String tooltip1 = "<html>In order to check falsifiability preservation of a branch,<br>" +
+				"right-click on a node in the proof tree and select \"Bug Detection\".</html>";
+        JRadioButtonMenuItem optFPInteractive = new JRadioButtonMenuItem("Prove interactively",bd.fpCheckInteractive);
+	    optFPInteractive.setToolTipText(tooltip1);
+	    fpMenu.add(optFPInteractive, 0);
+	    group.add(optFPInteractive);
+	JRadioButtonMenuItem optFPInBackground = new JRadioButtonMenuItem("Prove in background",!bd.fpCheckInteractive);
+            optFPInBackground.setToolTipText(tooltip1);
+	    fpMenu.add(optFPInBackground, 1);
+	    optFPInBackground.setActionCommand("FPbackground");
+	    group.add(optFPInBackground);	
+	    
+	    AbstractAction aAction = new AbstractAction(){
+		public void actionPerformed(ActionEvent arg0) {
+		    if(arg0.getActionCommand().equalsIgnoreCase("FPbackground")){
+			bd.fpCheckInteractive=false;
+			System.out.println("Prove FP in background");
+		    }else{
+			bd.fpCheckInteractive=true;
+			System.out.println("Prove FP interactively");
+		    }
+                }
+	    };
+	    optFPInteractive.addActionListener(aAction);
+	    optFPInBackground.addActionListener(aAction);
+        menuBar.add(fpMenu);
+
 	//Todo the columns could be extended dynamically instead of this static initialization
 	
 	tableModel = new DefaultTableModel(columnNames,0);

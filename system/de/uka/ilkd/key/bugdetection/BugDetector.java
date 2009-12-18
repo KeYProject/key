@@ -15,16 +15,13 @@ import de.uka.ilkd.key.proof.Node;
 public class BugDetector {
     
     MsgMgt msgMgt;
-    Services services;
+    public static final BugDetector DEFAULT = new BugDetector();
     
     /**If true then an interactive side proof will be created when running {@code FalsifiabilityPreservation.check()}. 
      * If false then a side-proof will be automatically run in the background when running {@code FalsifiabilityPreservation.check()}.*/
-    boolean fpCheckInteractive=true;
+    public boolean fpCheckInteractive=true;
 
-    public BugDetector(Services services){
-	this.services = services;
-    }
-    
+     
     public void run(Node n){
 	msgMgt = new MsgMgt();
 	FalsifiabilityPreservation fp = new FalsifiabilityPreservation(this,n);
@@ -42,6 +39,7 @@ public class BugDetector {
 
 	/**@param severity  0=comment, 1=minor, ..., 3=probably a bug	 */
 	public void warning(String s, int severity) {
+	    System.out.println("Warning: "+s);
 	    warnings.add(s);
 	}
     }
