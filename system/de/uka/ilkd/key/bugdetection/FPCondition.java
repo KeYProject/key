@@ -94,15 +94,15 @@ public class FPCondition {
 	this.bd = bd;
 	parent = node.parent();
 	node.addSMTandFPData(this);
-	if(FalsifiabilityPreservation.getFPCondition(node)!=this){
-	    throw new RuntimeException();
-	}
-
+//	if(FalsifiabilityPreservation.getFPCondition(node)!=this){
+//	    throw new RuntimeException();
+//	}
     }
 
     /**Call this method after the constructor.
      * An FPCondition may be shared by multiple falsifiability preservations of branches, 
-     * because multiple branches may share common nodes.
+     * because multiple branches may share common nodes. 
+     * However a special falsifiability preservation condition may belong only to one branch.
      * Adding the same object multiple times is allowed because a set is implemented.*/
     public void addFPCListener(FalsifiabilityPreservation fp){
 	if(fp == null){
@@ -137,7 +137,7 @@ public class FPCondition {
      * 
      * @author gladisch
      */
-    protected Vector<ConstrainedFormula> findNewFormulasInSucc(Node n) {
+    protected static Vector<ConstrainedFormula> findNewFormulasInSucc(Node n) {
 	Vector<ConstrainedFormula> res = new Vector<ConstrainedFormula>();
 	if (n == null) {
 	    return res;
@@ -165,14 +165,14 @@ public class FPCondition {
      * obligation (that contains e.g. the program). Warning this method uses
      * heuristics to determine the right formula
      */
-    protected ConstrainedFormula pickRelevantFormula(
+    protected static ConstrainedFormula pickRelevantFormula(
 	    Vector<ConstrainedFormula> cfs) {
 	if (cfs.size() == 1) {
 	    return cfs.firstElement();
 	} else if (cfs.size() == 0) {
 	    return null;
 	} else {
-	    warning("pickRelevantFormula() uses heuristics to determine the relevant formula. This may be unsound.",
+	    BugDetector.DEFAULT.msgMgt.warning("pickRelevantFormula() uses heuristics to determine the relevant formula. This may be unsound.",
 		    0);
 	    int[] score = new int[cfs.size()];
 	    int i = 0;
@@ -199,6 +199,15 @@ public class FPCondition {
 	bd.msgMgt.warning(s, severity);
     }
 
+    public String toString(){
+	String res = "Falsifiability preservation at node " + node.serialNr();
+	if(isValid()==null){
+	    return res;
+	}else{
+	    return res += " is "+isValid();
+	}
+    }
+    
     /**
      * Call this method to prove the falsifiability preservation condition. The
      * prove may happen either immediately or sometime later, e.g. by creating
@@ -211,12 +220,13 @@ public class FPCondition {
 	if(fpListeners.size()==0){
 	    System.out.println("Warning: FPCondition has no listeners. Normally a listener is notified when the FP condition is proved.");
 	}
-	if(isValid()!=null){
-	    //This case means that the FP condition has already been checked or at least created. 
-	    //There already exists a proof object for this so we don't create a new one.
-	    validityUpdate();
-	    return;
-	}
+//	if(isValid()!=null){
+//	    //This case means that the FP condition has already been checked or at least created. 
+//	    //There already exists a proof object for this so we don't create a new one.
+//	    //!!!  However the SFP differs depending on the end-node Sn that is used  !!!!
+//	    validityUpdate();
+//	    return;
+//	}
 	if (fpCond == null) {
 	    throw new RuntimeException("Call constructFPC() before calling check()");
 	}
@@ -225,7 +235,7 @@ public class FPCondition {
 	final Sequent poSeq = Sequent.createSuccSequent(succ);
 
 	final Proof old = node.proof();
-	final Proof proof = new Proof("Falsifiability preservation at node " + node.serialNr(), 
+	final Proof proof = new Proof(this.toString(), 
 					poSeq, "", 
 					old.env().getInitConfig().createTacletIndex(), 
 					old.env().getInitConfig().createBuiltInRuleIndex(), 
@@ -281,6 +291,12 @@ public class FPCondition {
 	}
     }
     
+    /**@return true if this FP condition belongs to the branch that fp represents. 
+     * Note that FPConditions can be shared by multiple branches in contrast to
+     * special falsifiability preservation conditions. */
+    public boolean belongsTo(FalsifiabilityPreservation fp){
+	return true;
+    }
     ProofTreeAdapter getFPProofTreeListener(){
 	return new FPProofTreeListener();
     }

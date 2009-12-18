@@ -9,6 +9,7 @@ import de.uka.ilkd.key.bugdetection.BugDetector.UnhandledCase;
 import de.uka.ilkd.key.bugdetection.BugDetector.UnknownCalculus;
 import de.uka.ilkd.key.bugdetection.FalsifiabilityPreservation.BranchType;
 import de.uka.ilkd.key.bugdetection.FalsifiabilityPreservation.RuleType;
+import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableMapEntry;
 import de.uka.ilkd.key.gui.ExceptionDialog;
 import de.uka.ilkd.key.gui.KeYMediator;
@@ -17,6 +18,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.AnonymisingUpdateFactory;
 import de.uka.ilkd.key.logic.BasicLocationDescriptor;
 import de.uka.ilkd.key.logic.ConstrainedFormula;
+import de.uka.ilkd.key.logic.EverythingLocationDescriptor;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.LocationDescriptor;
 import de.uka.ilkd.key.logic.NamespaceSet;
@@ -32,6 +34,7 @@ import de.uka.ilkd.key.logic.op.Location;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.Op;
 import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.op.ParsableVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.RigidFunction;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
@@ -49,11 +52,17 @@ import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.rule.PosTacletApp;
+import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.UpdateSimplifier;
+import de.uka.ilkd.key.rule.UseOperationContractRule;
+import de.uka.ilkd.key.rule.UseOperationContractRuleApp;
 import de.uka.ilkd.key.rule.inst.InstantiationEntry;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.updatesimplifier.AssignmentPair;
 import de.uka.ilkd.key.rule.updatesimplifier.Update;
+import de.uka.ilkd.key.speclang.OperationContract;
+import de.uka.ilkd.key.speclang.OperationContractImpl;
+import de.uka.ilkd.key.speclang.SignatureVariablesFactory;
 import de.uka.ilkd.key.visualdebugger.watchpoints.WatchPoint;
 import de.uka.ilkd.key.visualdebugger.watchpoints.WatchpointPO;
 
@@ -66,7 +75,7 @@ import de.uka.ilkd.key.visualdebugger.watchpoints.WatchpointPO;
 public class SFPCondition extends FPCondition {
     
     
-    private final Node last;
+    private final FalsifiabilityPreservation fp;
     
     /**Formula 2 according to the paper. The SFP formula. The condition if the FIRST and SECOND branches
      * of the contract rule are closed is not expressed here. */
@@ -75,12 +84,32 @@ public class SFPCondition extends FPCondition {
     /**After calling the constructor also call {@code addFPListener()}, {@code constructFPC()}, {@code check()}, {@code validityUpdate}.
      * <p>Warning: this constructor has a side-effect on the Proof-object because it adds the newly created object
      * to the proof; it associates {@code node} with this object. This again triggers a notification to proofTreeListeners
-     * that smtAndFPdata has been added. */
-    public SFPCondition(Node node, Node last, RuleType ruleType, BranchType branchType,
+     * that smtAndFPdata has been added. 
+     * @param fp the branch that the SFP condition belongs to. Be aware that SFPConditions are not shared
+     * between different branches because they differ depending on the last node of a branch. */
+    public SFPCondition(Node node, FalsifiabilityPreservation fp, RuleType ruleType, BranchType branchType,
 	    BugDetector bd) {
 	super(node, ruleType, branchType, bd);
-	this.last = last;
+	this.fp = fp;
 	node.proof().addProofTreeListener(new ProofTreeListener3());
+    }
+    
+    /**Call this method after the constructor.
+     * An FPCondition may be shared by multiple falsifiability preservations of branches, 
+     * because multiple branches may share common nodes. 
+     * However a special falsifiability preservation condition may belong only to one branch.
+     * Adding the same object multiple times is allowed because a set is implemented.*/
+    public void addFPCListener(FalsifiabilityPreservation fp){
+	if(fp == null){
+	    throw new NullPointerException();
+	}
+	if(fpListeners.contains(fp)){
+	    return;
+	}
+	if(fpListeners.size()>0){
+	    throw new RuntimeException("A Special Falsifiability Preservation condition may belong only to one branch.");
+	}
+	fpListeners.add(fp);
     }
     
     /**
@@ -88,13 +117,17 @@ public class SFPCondition extends FPCondition {
      * further initilizse the object the special falsifiability preservation condition
      */
     public void constructFPC() {
-	final Vector<ConstrainedFormula> cfs = findNewFormulasInSucc(node);
-	final ConstrainedFormula cf = pickRelevantFormula(cfs);
 	if (branchType == BranchType.THRID) {
-	    if (ruleType == RuleType.METH_CONTR) {
-		warning("This was programmed for the loop invariant rule. Method contracts may or may not work correctly.",0);
+	    ContractAppInfo cInfo=null;
+	    if(ruleType == RuleType.LOOP_INV){
+		cInfo = ContractAppInfo.LoopInvAppInfo.getContractAppInfo(node);
+	    }else if (ruleType == RuleType.METH_CONTR) {
+		cInfo = ContractAppInfo.MethContrAppInfo.getContractAppInfo(node);
+	    }else{
+		throw new RuntimeException("Unexpected ruleType while constructing SFP:"+ruleType);
 	    }
-	    ContractAppInfo cInfo = new ContractAppInfo(cf.formula(),ruleType);
+	    System.out.println(cInfo);
+
 	    assert cInfo.prefix!=null; 
 	    assert cInfo.anon!=null;
 	    assert cInfo.contractPost != null;
@@ -124,7 +157,7 @@ public class SFPCondition extends FPCondition {
 
 	        OpReplacer opRep = new OpReplacer(opToOp);
 
-	        Term Sn = sequentToFormula(last.sequent());
+	        Term Sn = sequentToFormula(getLast().sequent());
 	        
 	        Term M1M2Sn = opRep.replace(Sn);
 	        
@@ -175,6 +208,27 @@ public class SFPCondition extends FPCondition {
 	return new FPProofTreeListener2();
     }
     
+    private Node getLast() {
+	return fp.branchNode;
+    }
+    
+    /**@return true if this FP condition belongs to the branch that fp represents. 
+     * Note that special falsifiability preservation conditions differ depending
+     * on the last node they are constructed from. */
+    public boolean belongsTo(FalsifiabilityPreservation fp){
+	return getLast()==fp.branchNode;
+    }
+    
+    public String toString(){
+	String res = "Falsifiability preservation from node "+fp.branchNode.serialNr()+" to " + node.parent().serialNr();
+	if(isValid()==null){
+	    return res;
+	}else{
+	    return res += " is "+isValid();
+	}
+    }
+
+
     /**
      * Used to listen to side-proofs created by {@code FPCondition.check()} and
      * to update the return value of {@code FPCondition.isValid()}. If a
@@ -229,104 +283,7 @@ public class SFPCondition extends FPCondition {
 	}
     }
 
-    /**A tuple for collecting data about contract rule application 
-     * @see constructFPC
-     * @author gladisch*/
-    private class ContractAppInfo{
-	    /**This update is is extracted from the formula in the THIRD branch created by a contract rule.
-	     * This is the update that describes the state changed before the application of the contract 
-	     * @see extractUpdates*/
-	    public Update prefix;
-	    
-	    /**This update is is extracted from the formula in the THIRD branch created by a contract rule
-	     * This is the update that describes the state changed after the application of the contract  
-	     * @see extractUpdates*/
-	    public Update anon;
-	    
-	    /**Post condition of the contract that was applied at {@code parent}. 
-	     * This field is initialized by {@code extractUpdatesAndPost()}*/
-	    public Term contractPost;
-	    
-	    private RuleType ruleType;
-	    
-	    /**This class extracts information from a contract rule application.
-	     * @param the formula (of the THIRD branch) created by the contract rule app */
-	    public ContractAppInfo(Term t, RuleType ruleType){
-		this.ruleType = ruleType;
-		extractUpdatesAndPost(t);
-	    }
-	    
-	    /**
-	     * Looks at the top-level operator and one operator below the top-level for
-	     * anonymous updates. This is where the prefix and anonymous update create in the THIRD
-	     * branch of contract rules are expected. Warning: this works only with the
-	     * current form of contract rules (10.12.2009)
-	     */
-	    private void extractUpdatesAndPost(Term t) {
-		if (t.op() instanceof IUpdateOperator) {
-		    prefix = Update.createUpdate(t);
-		} 
-		Term sub = t.sub(t.arity()-1);
-		if (sub.op() instanceof IUpdateOperator) {
-		    // This is the case where the anonymous update is expected.
-		    //The expected form of t is: {upd}{anon}phi
-		    anon = Update.createUpdate(sub);
-		}
-		if(prefix!=null && anon !=null){
-		    Term subsub = sub.sub(sub.arity()-1);
-		    //subsub is below the anonymous update
-		    contractPost = getContractPostCond(subsub);
-		    return;
-		}
-		//warning("Didn't find anonymous update at the expected syntactical position. Now guessing starts", 1);
-		throw new UnhandledCase("Can't determine prefix and anon updates");
-	    }
+    
 
-	    
-	    /**
-	     * Extracts the post condition form the applied contract rule. This method
-	     * is called by extractUpdatesAndPost For method contract this is clear; -
-	     * For loop invariant the expected structure is INV->[b=cond](b=false->phi).
-	     * From this we extract (INV & [b=cond]b=false). The result is stored
-	     * as a side-effect on the field {@code contractPost}
-	     * */
-	    private Term getContractPostCond(Term f) {
-		if(ruleType==RuleType.LOOP_INV){
-		    //First, extract all subformulas etc from f and check if f has the expected form
-		    if(f.op()!=Op.IMP){
-			throw new UnknownCalculus("Expected implication as top level op.",f);
-		    }
-		    final Term inv = f.sub(0);
-		    final Term rightT = f.sub(1); // should represent [b=cond](b=false->phi)
-		    if(!(rightT.op() instanceof Modality)){
-			throw new UnknownCalculus("Expected modal operator as top level op.",rightT);
-		    }
-		    Modality guardMod = (Modality)rightT.op(); //should represent [..]
-		    JavaBlock guardStmt = rightT.javaBlock();
-		    final Term right2T = rightT.sub(0); //should represent  (b=false->phi)
-		    if(right2T.op()!=Op.IMP){
-			throw new UnknownCalculus("Expected implication as top level op.",f);		
-		    }
-		    final Term bIsFalse = right2T.sub(0);//should represent  (b=false)
-		    
-		    //Second, Construct now the post condition of the contract from the extracted informations
-		    Term res = tb.and(inv, tb.prog(guardMod, guardStmt, bIsFalse));
-		    
-//			PosTacletApp tacletApp = (PosTacletApp) parent.getAppliedRuleApp();
-//			SVInstantiations svInst = tacletApp.instantiations();
-//			Iterator<ImmutableMapEntry<SchemaVariable, InstantiationEntry>> entryIt = svInst
-//			        .pairIterator();
-//			while (entryIt.hasNext()) {
-//			    System.out.println(entryIt.next());
-//			}
-
-		    return res;	    
-		}else if (ruleType != RuleType.METH_CONTR) {
-		    throw new UnhandledCase("Extraction of method contract post condition is not implemented yet.");
-		}
-		throw new UnhandledCase("Unknown ruleType:"+ruleType);
-	    }
-
-    }
 
 }

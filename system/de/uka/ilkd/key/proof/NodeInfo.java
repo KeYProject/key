@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import de.uka.ilkd.key.bugdetection.ContractAppInfo;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.logic.Name;
@@ -55,7 +56,10 @@ public class NodeInfo {
     // where a separate mapping node <-> debugger status has to be maintained
     private final VisualDebuggerState visualDebuggerState = largeProofMode ? null : new VisualDebuggerState();
    
-    
+    /**Should be initialized when using loop invariant or operation (method) contract rules. 
+     * Is used by the package bugdetection. */
+    public ContractAppInfo cInfo;     
+
     public NodeInfo(Node node) {
         this.node = node;
     }

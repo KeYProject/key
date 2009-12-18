@@ -85,7 +85,7 @@ public class FalsifiabilityPreservation {
 		    if(ruleType==RuleType.LOOP_INV || ruleType==RuleType.METH_CONTR){
 			final BranchType branchType = getBranchType(ruleType, n);
 			if (branchType == BranchType.THRID) {
-			    fpc = new SFPCondition(n, branchNode, ruleType,branchType, bd);
+			    fpc = new SFPCondition(n, this, ruleType,branchType, bd);
 			} else {
 			    fpc = new FPCondition(n, ruleType, branchType, bd);
 			}
@@ -140,14 +140,18 @@ public class FalsifiabilityPreservation {
 	return res;
     }
     
+    
     /**A utility method.
-     * @return the FPCondition associated with the given node or null if it does not exist. */
-    public static FPCondition getFPCondition(Node n){
+     * @return the FPCondition associated with the given node and with this branch. Null is returned otherwise. */
+    public  FPCondition getFPCondition(Node n){
 	    Vector<Object> smtAndFPData = n.getSMTandFPData();
 	    if(smtAndFPData!=null){
 		for(Object o:smtAndFPData){
 		    if(o instanceof FPCondition){
-			return (FPCondition)o;
+			FPCondition fpc = (FPCondition)o;
+			if(fpc.belongsTo(this)){
+			    return (FPCondition)o;
+			}
 		    }
 		}
 	    }	

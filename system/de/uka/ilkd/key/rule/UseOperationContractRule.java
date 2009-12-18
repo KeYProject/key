@@ -14,6 +14,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import de.uka.ilkd.key.bugdetection.ContractAppInfo;
 import de.uka.ilkd.key.collection.*;
 import de.uka.ilkd.key.gui.ContractConfigurator;
 import de.uka.ilkd.key.gui.Main;
@@ -27,6 +28,8 @@ import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.AtPreFactory;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.NodeInfo;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.proof.init.CreatedAttributeTermFactory;
 import de.uka.ilkd.key.proof.mgt.ComplexRuleJustificationBySpec;
@@ -434,6 +437,10 @@ public class UseOperationContractRule implements BuiltInRule {
             modifies = modifies.add(new BasicLocationDescriptor(TB.var(pv)));
         }
         
+        
+        //Store the node info before the node is split
+        final NodeInfo ni = goal.node().getNodeInfo();
+
         //split goal into three branches
         ImmutableList<Goal> result = goal.split(3);
         Goal preGoal = result.tail().tail().head();
@@ -490,16 +497,17 @@ public class UseOperationContractRule implements BuiltInRule {
                 TB.inReachableState(services), 
                 CATF.createReachableVariableValueTerm(services, resultVar));
         StatementBlock postSB = replaceStatement(jb, new StatementBlock());
+        final Term contractPost = TB.and(new Term[]{excNullTerm,
+                			reachablePost,
+                			post.getAxiomsAsFormula(),
+                			post.getFormula()});
         Term postTermWithoutUpdate 
-            = TB.imp(TB.and(new Term[]{excNullTerm,
-                                       reachablePost,
-                                       post.getAxiomsAsFormula(),
-                                       post.getFormula()}),
+            = TB.imp(contractPost,
                      TB.prog(modality,
                              JavaBlock.createJavaBlock(postSB), 
                              pio.subTerm().sub(0)));
         
-        Update resultUpdate = (actualResult == null
+        final Update resultUpdate = (actualResult == null
                                ? uf.skip()
                                : uf.elementaryUpdate(TB.var(actualResult), 
                                                      TB.var(resultVar)));
@@ -549,6 +557,23 @@ public class UseOperationContractRule implements BuiltInRule {
             = (ComplexRuleJustificationBySpec)
               goal.proof().env().getJustifInfo().getJustification(this);
         cjust.add(ruleApp, just);
+        
+        ////////////////////////////////////////////////////////////////
+        // Store information about the contract rule application
+        // for later use by the bugdetection package. 
+        // author:gladisch
+            ContractAppInfo cInfo = new ContractAppInfo();
+            cInfo.anon = anonUpdate;
+            cInfo.contractPost = contractPost;
+            if(anonUpdate.isAnonymousUpdate()) {
+                cInfo.prefix = resultUpdate;
+            } else {
+                cInfo.prefix = uf.sequential(new Update[]{selfParamsUpdate,
+                                                               atPreUpdate,
+                                                               resultUpdate});
+            }
+            ni.cInfo = cInfo;
+        ////////////////////////////////////////////////////////////////
         
         return result;
     }
