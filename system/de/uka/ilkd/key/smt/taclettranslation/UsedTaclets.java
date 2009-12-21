@@ -36,8 +36,13 @@ final class UsedTaclets {
     static final private String testTaclets[] = {//"",
 							//"array_length_short_javacard"
 	//"array_length_non_negative_2",
-						    "only_created_object_are_referenced",
-						    "only_created_object_are_referenced_by_arrays"
+						  //  "only_created_object_are_referenced_right",
+						  //  "only_created_object_are_referenced_by_arrays",
+						  //  "only_created_object_are_referenced_non_null2"
+						  // "array_length_non_negative",
+						  // "array_length_non_negative_2",
+						  // "array_length_non_negative_3",
+						  // "array_length_short_javacard"
 	//"only_created_object_are_referenced_non_null"
 						
 						  //   ,"boolean_equal_2"
@@ -64,6 +69,7 @@ final class UsedTaclets {
 //	    // booleaRules.key
 //	    usedTaclets.add("boolean_test");
 //	    usedTaclets.add("all_bool");
+	
 	    usedTaclets.add("boolean_equal_2");
 	    usedTaclets.add("boolean_not_equal_1");
 	    usedTaclets.add("boolean_not_equal_2");
@@ -71,6 +77,10 @@ final class UsedTaclets {
 	    usedTaclets.add("false_to_not_true");
 	    usedTaclets.add("boolean_true_commute");
 	    usedTaclets.add("boolean_false_commute");
+	    usedTaclets.add("apply_eq_boolean");
+	    usedTaclets.add("apply_eq_boolean_2");
+	    usedTaclets.add("apply_eq_boolean_rigid");
+	    usedTaclets.add("apply_eq_boolean_rigid_2");
 //
 //	    // intRules
 	    usedTaclets.add("expand_inByte");
@@ -170,11 +180,25 @@ final class UsedTaclets {
 	    
 	    usedTaclets.add("only_created_object_are_referenced");
 	    usedTaclets.add("only_created_object_are_referenced_non_null");
+	    usedTaclets.add("only_created_object_are_referenced_right");
 	    usedTaclets.add("only_created_object_are_referenced_by_arrays");
+	    usedTaclets.add("only_created_object_are_referenced_by_arrays_right");
+	    usedTaclets.add("only_created_object_are_referenced_non_null2");
+	    usedTaclets.add("only_created_object_are_referenced_non_null3");
+	    usedTaclets.add("only_created_object_are_referenced_by_arrays_2");
+	    
+	    
+	    
+	    usedTaclets.add("only_created_object_are_referenced_by_arrays_non_null");
+	   
 	    
 	   
-	    //usedTaclets.add("array_length_non_negative_2");
-	    //usedTaclets.add("array_length_short_javacard");
+	    
+	    
+	    usedTaclets.add("array_length_non_negative"); 
+	    usedTaclets.add("array_length_non_negative_2");
+	    usedTaclets.add("array_length_non_negative_3");
+	    usedTaclets.add("array_length_short_javacard");
 	    
 	    
 	    

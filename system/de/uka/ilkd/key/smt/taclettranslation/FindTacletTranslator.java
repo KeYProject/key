@@ -1,43 +1,39 @@
 package de.uka.ilkd.key.smt.taclettranslation;
 
 import java.util.HashMap;
-import java.util.Iterator;
 
-import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.op.BoundedNumericalQuantifier;
 import de.uka.ilkd.key.logic.op.LogicVariable;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariableAdapter;
-import de.uka.ilkd.key.logic.op.SortedSchemaVariable;
-import de.uka.ilkd.key.logic.op.WarySubstOp;
-import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.rule.AntecSuccTacletGoalTemplate;
+import de.uka.ilkd.key.rule.AntecTaclet;
+import de.uka.ilkd.key.rule.FindTaclet;
 import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.RewriteTacletGoalTemplate;
+import de.uka.ilkd.key.rule.SuccTaclet;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletGoalTemplate;
-import de.uka.ilkd.key.rule.VariableCondition;
-import de.uka.ilkd.key.rule.conditions.TypeComparisionCondition;
-import de.uka.ilkd.key.rule.conditions.TypeResolver;
 
 /**
  * Translates a rewrite taclet to a formula.
  * 
  * 
  */
-public class RewriteTacletTranslator extends AbstractTacletTranslator {
+public class FindTacletTranslator extends AbstractTacletTranslator {
 
+
+    static private final int ANTE = 0;
+    static private final int SUCC = 1;
     /**
      * @param services
      */
-    public RewriteTacletTranslator(Services services) {
+    public FindTacletTranslator(Services services) {
 	super(services);
     }
 
@@ -109,6 +105,24 @@ public class RewriteTacletTranslator extends AbstractTacletTranslator {
 	Term term = tb.imp(tb.equiv(find, replace), add);
 	return term;
     }
+    
+    private Term translateReplaceAndAddSequent(TacletGoalTemplate template, int type){
+	
+	TermBuilder tb = TermBuilder.DF;
+	Sequent replace=null;
+	if(template instanceof AntecSuccTacletGoalTemplate){
+	    replace = ((AntecSuccTacletGoalTemplate)template).replaceWith();
+	}
+
+	Term add = template.sequent() != null ? translate(template.sequent())
+		: STD_ADD;
+	Term rep = replace == null ? STD_REPLACE : translate(replace);
+	if (add == null)
+	    add = STD_ADD;
+	
+	Term term = tb.or(rep, add);
+	return term;
+    }
 
     /**
      * Translates a RewriteTaclet to a formula.
@@ -121,7 +135,7 @@ public class RewriteTacletTranslator extends AbstractTacletTranslator {
 
 	usedVariables = new HashMap<String, LogicVariable>();
 
-	RewriteTaclet rewriteTaclet = (RewriteTaclet) t;
+	FindTaclet findTaclet = (FindTaclet) t;
 	TermBuilder tb = TermBuilder.DF;
 
 	// the standard translation of the patterns.
@@ -129,27 +143,46 @@ public class RewriteTacletTranslator extends AbstractTacletTranslator {
 	Term find = STD_FIND, assum = STD_ASSUM;
 
 	// translate the find pattern.
-	if (rewriteTaclet.find() != null)
-	    find = rewriteTaclet.find();
+	if (findTaclet.find() != null)
+	    find = findTaclet.find();
+	
 
 	// translate the replace and add patterns of the taclet.
 	ImmutableList<Term> list = ImmutableSLList.nil();
+
+	for (TacletGoalTemplate template : findTaclet.goalTemplates()) {
+	    
+	    if(findTaclet instanceof AntecTaclet){
+		list = list.append(translateReplaceAndAddSequent(template,ANTE));
+		
+	    }else if(findTaclet instanceof SuccTaclet){
+		list = list.append(translateReplaceAndAddSequent(template,SUCC));
+	    }else if(findTaclet instanceof RewriteTaclet){
+		    if (findTaclet.find().sort().equals(Sort.FORMULA)) {
+			list = list.append(translateReplaceAndAddFormula(
+			         template, find));
+		    } else {
+			list = list.append(translateReplaceAndAddTerm(
+			         template, find));
+		    }
+	    }else throw new IllegalTacletException("Not AntecTaclet, not SuccTaclet, not RewriteTaclet");
+	    
 	
-	for (TacletGoalTemplate template : rewriteTaclet.goalTemplates()) {
-	    if (rewriteTaclet.find().sort().equals(Sort.FORMULA)) {
-		list = list.append(translateReplaceAndAddFormula(
-		         template, find));
-	    } else {
-		list = list.append(translateReplaceAndAddTerm(
-		         template, find));
-	    }
 	}
 
 
-	if (rewriteTaclet.ifSequent() != null) {
-	    if ((assum = translate(rewriteTaclet.ifSequent())) == null) {
+	if (findTaclet.ifSequent() != null) {
+	    if ((assum = translate(findTaclet.ifSequent())) == null) {
 		assum = STD_ASSUM;
 	    }
+	}
+	
+	
+	if(findTaclet instanceof AntecTaclet || findTaclet instanceof SuccTaclet){
+	    if(findTaclet instanceof AntecTaclet){
+		find = tb.not(find); 
+	    }
+	    return tb.imp(tb.and(list),tb.or(find, assum));
 	}
 
 	//Term term;
@@ -170,13 +203,13 @@ public class RewriteTacletTranslator extends AbstractTacletTranslator {
     @Override
     public void checkGoalTemplate(TacletGoalTemplate template)
 	    throws IllegalTacletException {
-	/*if (!(template instanceof RewriteTacletGoalTemplate)) {
-	    throw new IllegalTacletException(
-		    "GoalTemplate not of type RewriteTacletGoalTemplate: "+ template.getClass());
-	}*/
+	
 	if(template instanceof RewriteTacletGoalTemplate)
-	checkTerm(((RewriteTacletGoalTemplate) template).replaceWith());
-
+	  checkTerm(((RewriteTacletGoalTemplate) template).replaceWith());
+	if(template instanceof AntecSuccTacletGoalTemplate){
+	    AntecSuccTacletGoalTemplate temp = (AntecSuccTacletGoalTemplate) template;
+	    checkSequent(temp.replaceWith());
+	}
     }
 
     /**
@@ -189,12 +222,13 @@ public class RewriteTacletTranslator extends AbstractTacletTranslator {
      */
     @Override
     protected void check(Taclet t) throws IllegalTacletException {
-	if (!(t instanceof RewriteTaclet)) {
+	if (!(t instanceof FindTaclet)) {
 	    throw new IllegalTacletException("Not a instance of "
-		    + RewriteTaclet.class.getName());
+		    + FindTaclet.class.getName());
 	}
 	checkGeneralConditions(t);
-	checkTerm(((RewriteTaclet) t).find());
+	checkTerm(((FindTaclet) t).find());
     }
 
 }
+

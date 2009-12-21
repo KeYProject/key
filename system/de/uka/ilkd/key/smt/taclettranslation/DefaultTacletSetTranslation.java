@@ -84,7 +84,7 @@ public final class DefaultTacletSetTranslation
     private HashSet<SchemaVariable> usedFormulaSV = new HashSet<SchemaVariable>();
 
     public DefaultTacletSetTranslation(Services services) {
-	TacletTranslator tt = new RewriteTacletTranslator(services);
+	TacletTranslator tt = new FindTacletTranslator(services);
 	tt.addListener(this);
 	translators = translators.append(tt);
 	

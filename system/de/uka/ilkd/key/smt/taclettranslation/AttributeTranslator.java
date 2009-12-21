@@ -23,16 +23,21 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
 import de.uka.ilkd.key.logic.JavaBlock;
+import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.ArrayOp;
 import de.uka.ilkd.key.logic.op.AttributeOp;
+import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+import de.uka.ilkd.key.logic.sort.ArraySort;
+import de.uka.ilkd.key.logic.sort.ArraySortImpl;
 import de.uka.ilkd.key.logic.sort.ClassInstanceSort;
 import de.uka.ilkd.key.logic.sort.GenericSort;
+import de.uka.ilkd.key.logic.sort.PrimitiveSort;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.metaconstruct.MetaCreated;
@@ -66,27 +71,43 @@ final class DefaultAttributeTranslator implements AttributeTranslator{
 	
 	
 	Collection<Term> attributes=  createPossibleInstantiations(attributeTerms,services);
+	Collection<Term> arrayTerms = createPossibleInstantiationsForArrays(attributeTerms,services);
 
 
 	// find the term to replace.
 	Term toReplace = analyzeTaclet(term, services);
 	if(toReplace == null) return result;
 	
-	// instantiate all attributes that match the term 'toReplace'
-	for(Term src : attributes){
+	if(toReplace.op() instanceof ArrayOp || 
+	   (toReplace.op() instanceof AttributeOp && 
+            ((AttributeOp)toReplace.op()).sort().equals(ProgramSVSort.ARRAYLENGTH))){
+	    toReplace = toReplace.sub(0);
+	    for(Term src : arrayTerms){
+		
+		Term tmp = instantiateArray(src,term,services,toReplace);
+		if(tmp != null){
+		   result = result.add(tmp);
+		}
+	    }
+	 
+	    
+	}else{
+	  // instantiate all attributes that match the term 'toReplace'
+	 for(Term src : attributes){
 	    Term tmp=null;
+		   //if(!isArray(src,cond) && !isArray(src,cond)){//Check this Line!!!!
+			
+		    tmp = instantiateAttributes(src, term, services, toReplace); 
+		    //}
+	            if(tmp != null){
+			result = result.add(tmp);
+		    }
+	        }
+		
+	    
+	}
 
-	    if(toReplace.op() instanceof ArrayOp && isArray(src,cond)){
-		tmp = instantiateArray(src,term,services,toReplace);
-	    }
-	    else{
-	    tmp = instantiateAttributes(src, term, services, toReplace); 
-	    }
-            if(tmp != null){
-		result = result.add(tmp);
-	    }
-        }
-	
+
 	
 	
 	
@@ -94,7 +115,36 @@ final class DefaultAttributeTranslator implements AttributeTranslator{
     }
     
     
+    /**
+     * @param attributeTerms
+     * @param services
+     * @return
+     */
+    private Collection<Term> createPossibleInstantiationsForArrays(
+            ImmutableSet<Term> attributeTerms, Services services) {
+	HashSet<Term> terms = new HashSet<Term>();
+	for(Term term: attributeTerms){
+	    
+	    do{
+		if(term.sort() instanceof ArraySort){
+		    terms.add(term);
+		}
+		if(term.arity() > 0){
+		    term = term.sub(0);
+		}else{
+		    term=null;
+		}
+	    }while(term != null);
+	}
+	return terms;
+    }
+
+
     private boolean isArray(Term term, TacletConditions cond){
+	if(term.sort() instanceof ArraySort || term.op() instanceof ArrayOp
+           || cond.containsIsReferenceArray(term)){
+	    return true;
+	}
 	//if(term.)
 	//ArrayOp op = ArrayOp.getArrayOp(term.op().);
 
@@ -125,14 +175,20 @@ final class DefaultAttributeTranslator implements AttributeTranslator{
 	for (int i = 0; i < dest.arity(); i++) {
 	    
 	    variables[i] = dest.varsBoundHere(i);
-	    subTerms[i] = instantiateAttributes(array,dest.sub(i),services,toReplace);
+	    subTerms[i] = instantiateArray(array,dest.sub(i),services,toReplace);
 
 	} 
-	
+	if(dest.op() instanceof ArrayOp && ((ArrayOp)dest.op()).getSortDependingOn()  instanceof GenericSort){
+	    
+	    dest = TermFactory.DEFAULT.createArrayTerm(ArrayOp.getArrayOp(subTerms[0].sort()),subTerms);
+	}else
 	if(isCreatedTerm(dest, services)){
 	    dest = createCreatedTerm(subTerms[0], services);
-	}else{
-	    dest = TermFactory.DEFAULT.createTerm(dest.op(), subTerms, variables,
+	}else if(dest.op() instanceof AttributeOp && ((AttributeOp)dest.op()).sort().equals(ProgramSVSort.ARRAYLENGTH)){
+	  dest = createLengthTerm(subTerms[0], services);  
+	}	
+	else{
+	     dest = TermFactory.DEFAULT.createTerm(dest.op(), subTerms, variables,
 			JavaBlock.EMPTY_JAVABLOCK);    
 	}
 	
@@ -160,6 +216,9 @@ final class DefaultAttributeTranslator implements AttributeTranslator{
 	   AttributeOp op = (AttributeOp)taclet.op();
 	   if(op.sort().equals(ProgramSVSort.VARIABLE)){
 	       return taclet;    
+	   }
+	   if(op.sort().equals(ProgramSVSort.ARRAYLENGTH)){
+	       return taclet;
 	   }
 	   
 	   
@@ -228,6 +287,14 @@ final class DefaultAttributeTranslator implements AttributeTranslator{
     }
 
 
+    private Term createLengthTerm(Term objectTerm, Services services){
+	 JavaInfo javaInfo = services.getJavaInfo();
+	 
+	 return TermBuilder.DF.dot(objectTerm, javaInfo.getArrayLength());
+    }
+    
+
+    
     /**
      * Creates the term <code>objectTerm</code>.created.
      * @param objectTerm
@@ -252,6 +319,7 @@ final class DefaultAttributeTranslator implements AttributeTranslator{
 
 	
 	for(Term content : attributeTerms){
+	    
 	    root.addContent(content);
 	}
 	LinkedList<TreeNode> list = new LinkedList<TreeNode>();
@@ -269,10 +337,14 @@ final class DefaultAttributeTranslator implements AttributeTranslator{
 	       
 	       if((node.isCrotch()&& !start)){essential = false;}
 	       if(essential){
-		   if(!isCreatedTerm(node.getContent(),services))
+		   if(!isCreatedTerm(node.getContent(),services)&&
+		      !(node.getContent().sort() instanceof PrimitiveSort))
 		   container.add(node.getContent());
 	       }else{
-		   break;		
+		   break;
+		   /*if(node.getContent().sort() instanceof ArraySort){
+		      container.add(node.getContent()); 
+		   }*/
 	       }
 	       last = node;
 	       node = node.getParent();
@@ -382,13 +454,19 @@ class TreeNode{
    
    public void addContent(Term t){
        LinkedList<Term> terms = new LinkedList<Term>();
-       terms.add(t);
-       while(t.arity() == 1){
-	   terms.add(t.sub(0));
-	   t = t.sub(0);
-       }
        
+       if(t.arity() == 0) return;
+       do{
+	  if(!(t.op() instanceof ArrayOp)){
+	      terms.add(t); 
+	  }
+	  if(t.arity() > 0){
+	      t = t.sub(0);
+	  }else    t = null;
        
+	  
+       }while(t != null);
+          
        addNodes(terms);
 
    }

@@ -227,9 +227,7 @@ abstract class AbstractTacletTranslator implements TacletTranslator {
        
    
     private void collectGenerics(Term term){
-	for (int i = 0; i < term.arity(); i++) {
-	    collectGenerics(term.sub(i));
-	    if(term.op() instanceof SortDependingFunction){	    
+	   if(term.op() instanceof SortDependingFunction){	    
 		SortDependingFunction func = (SortDependingFunction) term.op();
 		if(func.getSortDependingOn() instanceof GenericSort){
 		    usedGenericSorts.add((GenericSort)func.getSortDependingOn());
@@ -239,6 +237,8 @@ abstract class AbstractTacletTranslator implements TacletTranslator {
 	    if(term.sort() instanceof GenericSort){
 		usedGenericSorts.add((GenericSort) term.sort());   
 	    }
+	for (int i = 0; i < term.arity(); i++) {
+	    collectGenerics(term.sub(i));
 	}
     }
 
