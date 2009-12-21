@@ -21,10 +21,13 @@ import de.uka.ilkd.key.java.expression.literal.StringLiteral;
 import de.uka.ilkd.key.java.expression.operator.*;
 import de.uka.ilkd.key.java.reference.*;
 import de.uka.ilkd.key.java.statement.For;
+import de.uka.ilkd.key.java.statement.If;
 import de.uka.ilkd.key.java.statement.Return;
+import de.uka.ilkd.key.java.statement.Then;
 import de.uka.ilkd.key.java.visitor.FieldReplaceVisitor;
 import de.uka.ilkd.key.java.visitor.IndexReplaceVisitor;
 import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.ArraySort;
 import de.uka.ilkd.key.logic.sort.ArraySortImpl;
@@ -38,6 +41,18 @@ import de.uka.ilkd.key.unittest.testing.DataStorage;
 import de.uka.ilkd.key.util.ExtList;
 import de.uka.ilkd.key.visualdebugger.VisualDebugger;
 
+/**
+ * @author mbender
+ *
+ */
+/**
+ * @author mbender
+ *
+ */
+/**
+ * @author mbender
+ *
+ */
 public abstract class TestGenerator {
 
     protected static final String RESULT_NAME = "_oracleResult";
@@ -168,6 +183,9 @@ public abstract class TestGenerator {
 	data.setPvs2(reducedPVSet);
 	ExtList l = new ExtList();
 	l.add(createSuiteMethod());
+	// Add methods to compute min or max element of an array
+	l.add(createMinMaxMethod(true));
+	l.add(createMinMaxMethod(false));
 	// collect testmethods for use when creating the main() method. Also
 	// used to increment a counter of the test methods for automatic
 	// unique naming.
@@ -178,7 +196,7 @@ public abstract class TestGenerator {
 	while (mgs.size() > 0) {
 	    // modelGenerators are removed from the list (and hopefully
 	    // destroyed) in order to save memory.
-	    final ModelGenerator mg = mgs.get(0); 
+	    final ModelGenerator mg = mgs.get(0);
 	    Model[] models = null;
 	    MethodDeclaration methDec = null;
 	    count++;
@@ -221,7 +239,7 @@ public abstract class TestGenerator {
 			if (testData[i][j] == null) {
 			    // Emergency solution.
 			    // Was earlier in Model.getValueAsExpressions()
-			    testData[i][j] = new IntLiteral(15); 
+			    testData[i][j] = new IntLiteral(15);
 			    generateTestSuite_progressNotification2b(count, totalCount, mg, intOrBoolEqvArray[i]);
 			}
 		    }
@@ -289,7 +307,7 @@ public abstract class TestGenerator {
      * notification method is called in order to report the progress of
      * computation to other threads.
      */
-    protected void generateTestSuite_progressNotification0(final int totalCount) {
+    private void generateTestSuite_progressNotification0(final int totalCount) {
 	if (gui != null) {
 	    gui.generateTestSuite_progressNotification0(totalCount);
 	}
@@ -300,7 +318,7 @@ public abstract class TestGenerator {
      * notification method is called in order to report the progress of
      * computation to other threads.
      */
-    protected void generateTestSuite_progressNotification1(final int count,
+    private void generateTestSuite_progressNotification1(final int count,
 	    final int totalCount, final ModelGenerator refMG) {
 	if (gui != null) {
 	    gui.generateTestSuite_progressNotification1(count, totalCount,
@@ -313,7 +331,7 @@ public abstract class TestGenerator {
      * notification method is called in order to report the progress of
      * computation to other threads.
      */
-    protected void generateTestSuite_progressNotification2(final int count,
+    private void generateTestSuite_progressNotification2(final int count,
 	    final int totalCount, final ModelGenerator refMG,
 	    final Model[] models, final boolean createModelsSuccess,
 	    final boolean terminated) {
@@ -330,7 +348,7 @@ public abstract class TestGenerator {
      * notification method is called in order to report the progress of
      * computation to other threads.
      */
-    protected void generateTestSuite_progressNotification2b(final int count,
+    private void generateTestSuite_progressNotification2b(final int count,
 	    final int totalCount, final ModelGenerator refMG,
 	    final EquivalenceClass ec) {
 	if (gui != null) {
@@ -347,7 +365,7 @@ public abstract class TestGenerator {
      * notification method is called in order to report the progress of
      * computation to other threads.
      */
-    protected void generateTestSuite_progressNotification3(final int count,
+    private void generateTestSuite_progressNotification3(final int count,
 	    final int totalCount, final ModelGenerator refMG,
 	    final Model[] models, final MethodDeclaration mDecl) {
 	if (gui != null) {
@@ -362,12 +380,12 @@ public abstract class TestGenerator {
      * computation to other threads. This method is overwritten by
      * TestGeneratorGUIInterface
      */
-    protected void generateTestSuite_progressNotification4(final int count,
+    private void generateTestSuite_progressNotification4(final int count,
 	    final int totalCount, final Exception e,
 	    final ModelGenerator refMG, final Model[] models,
 	    final MethodDeclaration mDecl) {
 	if (gui != null) {
-	    generateTestSuite_progressNotification4(count, totalCount, e,
+	    gui.generateTestSuite_progressNotification4(count, totalCount, e,
 		    refMG, models, mDecl);
 	} else {
 	    throw new RuntimeException(e);
@@ -462,9 +480,9 @@ public abstract class TestGenerator {
     private KeYJavaType getArrayTypeAndEnsureExistence(
 	    final KeYJavaType baseType, final int dim) {
 	final Sort as = ArraySortImpl.getArraySortForDim(baseType.getSort(),
-		dim, ji.getJavaLangObjectAsSort(), 
-		ji.getJavaLangCloneableAsSort(),
-		ji.getJavaIoSerializableAsSort());
+	        dim, ji.getJavaLangObjectAsSort(),
+	        ji.getJavaLangCloneableAsSort(),
+	        ji.getJavaIoSerializableAsSort());
 	final KeYJavaType kjt = ji.getKeYJavaType(as);
 	if (kjt == null || baseType.getSort().toString().equals("int")) {
 	    final JavaBlock jb = ji.readJavaBlock("{" + as + " v;}");
@@ -669,7 +687,7 @@ public abstract class TestGenerator {
 	// nested loops for executing the tested code with every possible
 	// combination of testdata in each partition
 	if (!singleTuple) {
-	  
+
 	    // loop over the number of partitions
 	    final VariableSpecification counterSpec = new VariableSpecification(
 		    partCounter, new IntLiteral(0), intType);
@@ -941,7 +959,7 @@ public abstract class TestGenerator {
      */
     protected abstract void exportCodeUnderTest();
 
-    protected String clean(String s) {
+    private String clean(String s) {
 	while (s.indexOf(";.") != -1) {
 	    s = s.substring(0, s.indexOf(";."))
 		    + s.substring(s.indexOf(";.") + 1);
@@ -1206,7 +1224,7 @@ public abstract class TestGenerator {
      * o._a().
      */
     @SuppressWarnings("unchecked")
-    protected MethodDeclaration buildMethodDeclaration(final Statement[] body,
+    private MethodDeclaration buildMethodDeclaration(final Statement[] body,
 	    final TypeRef type, final String name,
 	    final LinkedList<ParameterDeclaration> params) {
 	final ExtList l = new ExtList();
@@ -1228,77 +1246,56 @@ public abstract class TestGenerator {
     @SuppressWarnings("unchecked")
     private Expression translateQuantifiedTerm(final boolean all, final Term t,
 	    final SyntacticalProgramVariable buffer, final ExtList children) {
-	de.uka.ilkd.key.logic.op.Operator junctor;
-	Expression resInit;
-	if (all) {
-	    junctor = Op.IMP;
-	    resInit = BooleanLiteral.TRUE;
-	} else {
-	    junctor = Op.AND;
-	    resInit = BooleanLiteral.FALSE;
-	}
-	// if(true ) return BooleanLiteral.TRUE;
-	final Statement[] body = new Statement[4];
-	final Expression[] bounds = new Expression[] { null, null, null, null };
 	final LogicVariable lv = (LogicVariable) t.varsBoundHere(0).last();
 	if (t.varsBoundHere(0).size() > 1
 	        || !(lv.sort() == intType.getSort() || lv.sort().toString()
 	                .equals("jint"))) {
 	    throw new NotTranslatableException("quantified Term " + t);
 	}
+	final ProgramVariable pv = new LocationVariable(new ProgramElementName(
+	        "_" + lv.name() + (TestGenFac.counter++)), intType);
+	final Term matrix = replaceLogicVariable(t.sub(0), lv, pv);
+	final ArrayList<Expression> lower = new ArrayList<Expression>();
+	final ArrayList<Expression> upper = new ArrayList<Expression>();
+	getRangeValues(matrix, buffer, children, pv, serv.getTypeConverter()
+	        .getIntegerLDT(), all, false, lower, upper);
+	if (lower.size() == 0 || upper.size() == 0) {
+	    throw new NotTranslatableException("quantified Term with matrix"
+		    + matrix + "\nseems to have no bounds");
+	}
+	// Type of int[]
+	final Type intArrType = new SyntacticalArrayType("",
+	        new ProgramElementName("int"), 1);
+
+	final Statement[] body = new Statement[6];
+	// Local variable storing the result
 	// The name used to be "result" causing a clash with the program
 	// variable representing JMLs "\result"
 	final ProgramVariable result = new LocationVariable(
 	        new ProgramElementName("subFormResult"), booleanType);
 	body[0] = new LocalVariableDeclaration(new TypeRef(booleanType),
-	        new VariableSpecification(result, resInit, booleanType
-	                .getJavaType()));
-	final KeYJavaType lvType = intType;
-	final ProgramVariable pv = new LocationVariable(new ProgramElementName(
-	        "_" + lv.name() + (TestGenFac.counter++)), lvType);
-	final Term sub0 = replaceLogicVariable(t.sub(0), lv, pv);
-	if (sub0.op() == junctor && sub0.sub(0).op() == Op.AND) {
-	    final Term range = sub0.sub(0);
-	    getBound(range.sub(0), bounds, pv, buffer, children);
-	    getBound(range.sub(1), bounds, pv, buffer, children);
-	} else if (sub0.op() == junctor && sub0.sub(1).op() == junctor) {
-	    getBound(sub0.sub(0), bounds, pv, buffer, children);
-	    getBound(sub0.sub(1).sub(0), bounds, pv, buffer, children);
-	} else {
-	    throw new NotTranslatableException("quantified Term " + t);
-	}
-
-	final Statement loopBody = new CopyAssignment(result,
-	        all ? new LogicalAnd(result, getMethodReferenceForFormula(sub0
-	                .sub(1), buffer, children)) : new LogicalOr(result,
-	                getMethodReferenceForFormula(sub0.sub(1), buffer,
-	                        children)));
-	final VariableSpecification vs = new VariableSpecification(pv,
-	        bounds[0] != null ? bounds[0] : new Plus(bounds[1],
-	                new IntLiteral(1)), intType.getJavaType());
-	final LocalVariableDeclaration init = new LocalVariableDeclaration(
-	        new TypeRef(intType), vs);
-	final Expression guard = bounds[2] == null ? new LessThan(pv, bounds[3])
-	        : new LessOrEquals(pv, bounds[2]);
-	final Expression update = new PostIncrement(pv);
-	body[1] = new For(new LoopInitializer[] { init }, guard,
-	        new Expression[] { update }, new StatementBlock(loopBody));
-	StringLiteral sl = null;
-	try {
-	    // The following can go wrong because it uses the ordinary
-	    // PrettyPrinter instead of CompilableJavaPP
-	    // The ordinary PrettyPrinter does not handle classes defined in the
-	    // package ppAnJavaASTExtension
-	    sl = new StringLiteral("\\neval("
-		    + ProofSaver.escapeCharacters(ProofSaver.printTerm(t, serv)
-		            .toString()) + ") = ");
-	} catch (final Exception ex) {
-	    sl = new StringLiteral("\\neval(" + t + ") = ");
-	}
-	final Plus str = new Plus(sl, result);
-	body[2] = new MethodReference(new ImmutableArray<Expression>(str),
-	        new ProgramElementName("append"), buffer);
-	body[3] = new Return(result);
+	        new VariableSpecification(result, (all ? BooleanLiteral.TRUE
+	                : BooleanLiteral.FALSE), booleanType.getJavaType()));
+	// Local variable storing all the lower bounds
+	final SyntacticalProgramVariable lowVar = new SyntacticalProgramVariable(
+	        new ProgramElementName("lows"), intArrType);
+	body[1] = new LocalVariableDeclaration(new SyntacticalTypeRef(intArrType),
+	        new VariableSpecification(lowVar, new ArrayInitializer(lower
+	                .toArray(new Expression[lower.size()])), intArrType));
+	// Local variable storing all the upper bounds
+	final SyntacticalProgramVariable upVar = new SyntacticalProgramVariable(
+	        new ProgramElementName("ups"), intArrType);
+	body[2] = new LocalVariableDeclaration(new SyntacticalTypeRef(intArrType),
+	        new VariableSpecification(upVar, new ArrayInitializer(upper
+	                .toArray(new Expression[upper.size()])), intArrType));
+	;
+	// Creating the loop
+	body[3] = createEvalLoop(matrix, all, pv, lowVar, upVar, result, buffer,
+	        children);
+	// Creating the description string
+	body[4] = createResString(result, buffer, t);
+	// The return statement
+	body[5] = new Return(result);
 
 	final ExtList args = getArguments(t);
 	args.add(buffer);
@@ -1312,10 +1309,315 @@ public abstract class TestGenerator {
     }
 
     /**
+     * Iterates through a formula and looks for a relation, that contains the
+     * quantified variabel
+     * 
+     * @param t
+     *            the insepcted term
+     * @param buffer
+     * @param children
+     * @param qv
+     *            the quantified variable
+     * @param iLDT
+     *            IntegerLDT
+     * @param all
+     *            a flag that distiguishes between forall and exists
+     * @param neg
+     *            a flag showing wether this formula is negated
+     * @param lower
+     *            the list of upper bounds
+     * @param upper
+     *            the list of lower bounds
+     */
+    private void getRangeValues(final Term t,
+	    final SyntacticalProgramVariable buffer, final ExtList children,
+	    final ProgramVariable qv, final IntegerLDT iLDT, final boolean all,
+	    final boolean neg, final ArrayList<Expression> lower,
+	    final ArrayList<Expression> upper) {
+	// Already traversed to deep
+	if (t.sort() != Sort.FORMULA) {
+	    return;
+	}
+	final Operator op = t.op();
+	// Quantifier are not wanted
+	if (op == Op.ALL || op == Op.EX) {
+	    return;
+	}
+	if (op instanceof Function) {
+	    // Tries to get the bounds
+	    getRelation(t, op, buffer, children, qv, iLDT, all, neg, lower,
+		    upper);
+	} else if (op instanceof Junctor) {
+	    // Avoid TRUE and FALSE
+	    if (op.arity() == 0) {
+		return;
+	    }
+	    if (op == Op.NOT) {
+		getRangeValues(t.sub(0), buffer, children, qv, iLDT, all, !neg,
+		        lower, upper);
+	    } else if (op == Op.AND && !neg || (op == Op.OR && neg)) {
+		if (!all) {
+		    getRangeValues(t.sub(0), buffer, children, qv, iLDT, all,
+			    neg, lower, upper);
+		    getRangeValues(t.sub(1), buffer, children, qv, iLDT, all,
+			    neg, lower, upper);
+		}
+	    } else if (op == Op.OR && !neg || (op == Op.AND && neg)) {
+		if (all) {
+		    getRangeValues(t.sub(0), buffer, children, qv, iLDT, all,
+			    neg, lower, upper);
+		    getRangeValues(t.sub(1), buffer, children, qv, iLDT, all,
+			    neg, lower, upper);
+		}
+	    } else if (op == Op.IMP) {
+		if (neg != all) {
+		    getRangeValues(t.sub(0), buffer, children, qv, iLDT, all,
+			    !neg, lower, upper);
+		    getRangeValues(t.sub(1), buffer, children, qv, iLDT, all,
+			    neg, lower, upper);
+		}
+	    }
+	}
+    }
+
+    /**
+     * If the current term is a relation and one of its subterms is the
+     * quantified variable this method add the other term to the list of upper-
+     * respectivly lower-bounds
+     * 
+     * @param t
+     *            the term to inspect
+     * @param op
+     *            the terms operator
+     * @param buffer
+     * @param children
+     * @param qv
+     *            the quantified variable
+     * @param iLDT
+     *            the IntegerLDT
+     * @param all
+     *            flag to distinguish forall ad exist
+     * @param neg
+     *            flag to show if this term is negated
+     * @param lower
+     *            list containing the lower bounds
+     * @param upper
+     *            list containing the upper bounds
+     */
+    private void getRelation(final Term t, final Operator op,
+	    final SyntacticalProgramVariable buffer, final ExtList children,
+	    final ProgramVariable qv, final IntegerLDT iLDT, final boolean all,
+	    final boolean neg, final ArrayList<Expression> lower,
+	    final ArrayList<Expression> upper) {
+	// At which position is the bound
+	final int bPos = (t.sub(0).op() == qv ? 1 : (t.sub(1).op() == qv ? 0
+	        : -1));
+	// If there isn't the qVar we don't continue
+	if (bPos < 0) {
+	    return;
+	}
+	// Is the qVar the first subterm (left)
+	final boolean isQvarLeft = bPos == 1;
+
+	// calculate the right situation
+	final RelOp opi;
+	if (op == iLDT.getLessThan()) {
+	    opi = new RelOp(true, false, isQvarLeft, (all != neg));
+	} else if (op == iLDT.getLessOrEquals()) {
+	    opi = new RelOp(true, true, isQvarLeft, (all != neg));
+	} else if (op == iLDT.getGreaterOrEquals()) {
+	    opi = new RelOp(false, true, isQvarLeft, (all != neg));
+	} else if (op == iLDT.getGreaterThan()) {
+	    opi = new RelOp(false, false, isQvarLeft, (all != neg));
+	} else {
+	    return;
+	}
+
+	// Add the bound to the appropriate List
+	if (opi.isLess()) {
+	    if (opi.isEquals()) {
+		upper.add(translateTerm(t.sub(bPos), buffer, children));
+	    } else {
+		upper.add(new Minus(
+		        translateTerm(t.sub(bPos), buffer, children),
+		        new IntLiteral(1)));
+	    }
+	} else {
+	    if (opi.isEquals()) {
+		lower.add(translateTerm(t.sub(bPos), buffer, children));
+	    } else {
+		lower.add(new Plus(
+		        translateTerm(t.sub(bPos), buffer, children),
+		        new IntLiteral(1)));
+	    }
+	}
+    }
+
+    
+    /**
+     * Create a Java method to calculate the min-/max-value of an array of values
+     * @param min falg to decide if min or max is wanted
+     * @return a Java method calculating the min-/max-element of an array
+     */
+    private MethodDeclaration createMinMaxMethod(final boolean min) {
+	// the int[] type
+	final Type intArrType = new SyntacticalArrayType("",
+	        new ProgramElementName("int"), 1);
+	// the parameter variable
+	final SyntacticalProgramVariable parVar = new SyntacticalProgramVariable(
+	        new ProgramElementName("elems"), intArrType);
+	// Declaring the methods parameter
+	final ParameterDeclaration param = new ParameterDeclaration(
+	        new Modifier[0], new SyntacticalTypeRef(intArrType),
+	        new VariableSpecification(parVar, intArrType), false);
+	// Creating and returning the method
+	return new MethodDeclaration(new Modifier[] { new Public(),
+	        new Static() }, new SyntacticalTypeRef(intType), new ProgramElementName("get"
+		        + (min ? "Min" : "Max") + "Element"),
+	        new ImmutableArray<ParameterDeclaration>(param), null,
+	        createBody(min, parVar), false);
+    }
+
+    private StatementBlock createBody(final boolean min,
+	    final SyntacticalProgramVariable elems) {
+	final Statement[] s = new Statement[4];
+	final SyntacticalProgramVariable resVar = new SyntacticalProgramVariable(
+	        new ProgramElementName("res"), intType);
+	final VariableSpecification resSpec = new VariableSpecification(resVar,
+	        intType);
+	final TypeReference intTypeRef = new SyntacticalTypeRef(intType);
+	s[0] = new LocalVariableDeclaration(intTypeRef, resSpec);
+	s[1] = new CopyAssignment(resVar, new ArrayReference(elems,
+	        new Expression[] { new IntLiteral(0) }));
+	s[2] = createLoop(min, resVar, elems);
+	s[3] = new Return(resVar);
+	return new StatementBlock(s);
+    }
+
+    /**
+     * Creates thecode for a loop to iterate through an array and return the
+     * min- or max-value
+     * 
+     * @param min
+     *            flag to decide if the minimum or maximum is wanted
+     * @param resVar
+     *            the Variable that is the min-/max-value
+     * @param elems
+     *            the array containing the values to iterate
+     * @return a Java-for-loop statement
+     */
+    private Statement createLoop(final boolean min,
+	    final SyntacticalProgramVariable resVar,
+	    final SyntacticalProgramVariable elems) {
+	// The loop variable
+	final SyntacticalProgramVariable iVar = new SyntacticalProgramVariable(
+	        new ProgramElementName("i"), intType);
+	// Initialise the loop variable
+	final LoopInitializer[] loopInit = { new LocalVariableDeclaration(
+	        new SyntacticalTypeRef(intType), new VariableSpecification(
+	                iVar, new IntLiteral(1), intType)) };
+	// The current element in the iteration
+	final Expression curElem = new ArrayReference(elems,
+	        new Expression[] { iVar });
+	// The condition that decides if the curElem is assigned as result
+	final Expression cond;
+	if (min) {
+	    cond = new LessThan(curElem, resVar);
+	} else {
+	    cond = new GreaterThan(curElem, resVar);
+	}
+	// Creates and returns the loop
+	return new For(loopInit, new LessThan(iVar,
+	        new FieldReference(new LocationVariable(new ProgramElementName(
+	                "length"), intType), elems)),
+	        new Expression[] { new PostIncrement(iVar) }, new If(cond,
+	                new Then(new CopyAssignment(resVar, curElem))));
+    }
+
+    /**
+     * @param min
+     *            a falg to decide if the getMax oder getMin method is wanted
+     * @param ranges
+     *            the set of lower/upper bounds
+     * @return the methodreference to the getMinElement-/GetMaxElement-method
+     *         with the appropriate parameter
+     */
+    private Expression callMinMax(final boolean min,
+	    final SyntacticalProgramVariable ranges) {
+	final ImmutableArray<Expression> params = new ImmutableArray<Expression>(
+	        ranges);
+	final ProgramElementName methName = new ProgramElementName("get"
+	        + (min ? "Min" : "Max") + "Element");
+	return new MethodReference(params, methName, testTypeRef);
+    }
+
+    /**
+     * Creates a for loop to simulate the behaviour of an quantified formula
+     * @param matrix the matrix of the quantifier
+     * @param all flag to distinguish forall end exist
+     * @param pv the loop variable
+     * @param lowVar an variable denoting an array which contains all lower bounds 
+     * @param upVar an variable denoting an array which contains all upper bounds
+     * @param result a variable denoting a variable that holds the result
+     * @param buffer
+     * @param children
+     * @return a Java-for-loop that evaluates a quantified formula
+     */
+    private Statement createEvalLoop(final Term matrix, final boolean all,
+	    final ProgramVariable pv, final SyntacticalProgramVariable lowVar,
+	    final SyntacticalProgramVariable upVar,
+	    final ProgramVariable result,
+	    final SyntacticalProgramVariable buffer, final ExtList children) {
+	// Initialise the loop variable
+	final LocalVariableDeclaration init = new LocalVariableDeclaration(
+	        new TypeRef(intType), new VariableSpecification(pv, callMinMax(
+	                false, lowVar), intType.getJavaType()));
+	// Create the body being executed by the loop
+	final Statement loopBody = new CopyAssignment(result,
+	        all ? new LogicalAnd(result, getMethodReferenceForFormula(
+	                matrix.sub(1), buffer, children)) : new LogicalOr(
+	                result, getMethodReferenceForFormula(matrix.sub(1),
+	                        buffer, children)));
+	// Create and return the for-loop
+	return new For(new LoopInitializer[] { init }, new LessOrEquals(pv,
+	        callMinMax(true, upVar)), new Expression[] { new PostIncrement(
+	        pv) }, new StatementBlock(loopBody));
+    }
+
+    /**
+     * Creates the representation of the string that describes which code is
+     * being tested
+     * 
+     * @param result
+     *            the string
+     * @param buffer
+     * @param t
+     * @return the append call to append a String
+     */
+    private Statement createResString(final ProgramVariable result,
+	    final SyntacticalProgramVariable buffer, final Term t) {
+	StringLiteral sl = null;
+	try {
+	    // The following can go wrong because it uses the ordinary
+	    // PrettyPrinter instead of CompilableJavaPP
+	    // The ordinary PrettyPrinter does not handle classes defined in the
+	    // package ppAnJavaASTExtension
+	    sl = new StringLiteral("\\neval("
+		    + ProofSaver.escapeCharacters(ProofSaver.printTerm(t, serv)
+		            .toString()) + ") = ");
+	} catch (final Exception ex) {
+	    sl = new StringLiteral("\\neval(" + t + ") = ");
+	}
+	final Plus str = new Plus(sl, result);
+	return new MethodReference(new ImmutableArray<Expression>(str),
+	        new ProgramElementName("append"), buffer);
+    }
+
+    /**
      * Returns the location variables occuring in t that are no attributes.
      */
     @SuppressWarnings("unchecked")
-    protected ExtList getArguments(final Term t) {
+    private ExtList getArguments(final Term t) {
 	ImmutableSet<ProgramVariable> programVars = DefaultImmutableSet
 	        .<ProgramVariable> nil();
 	final TermProgramVariableCollector pvColl = new TermProgramVariableCollector(
@@ -1336,7 +1638,7 @@ public abstract class TestGenerator {
 	return args;
     }
 
-    protected LinkedList<ParameterDeclaration> getParameterDeclarations(
+    private LinkedList<ParameterDeclaration> getParameterDeclarations(
 	    final ExtList l) {
 	final LinkedList<ParameterDeclaration> params = new LinkedList<ParameterDeclaration>();
 	for (final Object aL : l) {
@@ -1361,41 +1663,6 @@ public abstract class TestGenerator {
 	    }
 	}
 	return params;
-    }
-
-    /**
-     * Trys to extract bounds for the quantified integer variable.
-     */
-    private void getBound(Term t, final Expression[] bounds,
-	    final ProgramVariable pv, final SyntacticalProgramVariable buffer,
-	    final ExtList children) {
-	int ex = 0, less = 1;
-	if ((t.op().name().toString().equals("!") || t.op().name().toString()
-	        .equals("not"))
-	        && t.sub(0).op().name().toString().equals("lt")) {
-	    t = t.sub(0);
-	    less = 0;
-	} else if (t.op().name().toString().equals("lt")) {
-	    ex = 1;
-	} else if (t.op().name().toString().equals("leq")) {
-	} else if (t.op().name().toString().equals("geq")) {
-	    less = 0;
-	} else if (t.op().name().toString().equals("gt")) {
-	    ex = 1;
-	    less = 0;
-	} else {
-	    throw new NotTranslatableException("bound " + t
-		    + " for quantified variable");
-	}
-	if (t.sub(0).op() == pv) {
-	    bounds[2 * less + ex] = translateTerm(t.sub(1), buffer, children);
-	} else if (t.sub(1).op() == pv) {
-	    bounds[2 - 2 * less + ex] = translateTerm(t.sub(0), buffer,
-		    children);
-	} else {
-	    throw new NotTranslatableException("bound " + t
-		    + " for quantified variable");
-	}
     }
 
     /**
@@ -1427,7 +1694,7 @@ public abstract class TestGenerator {
      * (skolem)constant, a new identically named ProgramVariable of the same
      * sort is returned.
      */
-    protected Expression convertToProgramElement(Term t) {
+    private Expression convertToProgramElement(Term t) {
 	t = replaceConstants(t, serv, null);
 	return serv.getTypeConverter().convertToProgramElement(t);
     }
@@ -1520,7 +1787,7 @@ public abstract class TestGenerator {
 	}
     }
 
-    class ModelGeneratorRunnable implements Runnable {
+    private class ModelGeneratorRunnable implements Runnable {
 	/**
 	 * stores the result of the model generation. If the result is null then
 	 * either the thread has not finished computation or an error occurred.
@@ -1576,7 +1843,7 @@ public abstract class TestGenerator {
 	    if (models == null && timeoutActive) {
 		mg.terminateAsSoonAsPossible();
 		modelGenThread.join(3000);// give the thread one more second
-					  // before it gets terminated
+		// before it gets terminated
 		// System.out.println("Contorlled termination");
 		modelGenThread.stop();
 		interrupted = true;
@@ -1588,6 +1855,35 @@ public abstract class TestGenerator {
 
 	public boolean wasInterrupted() {
 	    return interrupted;
+	}
+    }
+
+    private class RelOp {
+
+	private boolean less;
+
+	private boolean equals;
+
+	private RelOp(final boolean less, final boolean equals,
+	        final boolean swapSign, final boolean negate) {
+	    if (swapSign == negate) {
+		this.less = !less;
+	    } else {
+		this.less = less;
+	    }
+	    if (negate) {
+		this.equals = !equals;
+	    } else {
+		this.equals = equals;
+	    }
+	}
+
+	private boolean isLess() {
+	    return less;
+	}
+
+	private boolean isEquals() {
+	    return equals;
 	}
     }
 }
