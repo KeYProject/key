@@ -83,6 +83,8 @@ public final class DefaultTacletSetTranslation
     
     private HashSet<SchemaVariable> usedFormulaSV = new HashSet<SchemaVariable>();
 
+    private boolean quitInstantiationFailuresWithException=false;
+
     public DefaultTacletSetTranslation(Services services) {
 	TacletTranslator tt = new FindTacletTranslator(services);
 	tt.addListener(this);
@@ -133,7 +135,6 @@ public final class DefaultTacletSetTranslation
 		// DefaultTacletFormula(t,null,"The taclet is not used for external provers."));
 		continue;
 	    }
-
 	    if (!heuristics.isEmpty() && !checkHeuristic(t)) {
 
 		notTranslated = notTranslated.append(new DefaultTacletFormula(
@@ -302,7 +303,7 @@ public final class DefaultTacletSetTranslation
 	s += "generic sort: " + dest + "\n";
 	s += "sort: "+ sort +"\n";
 	instantiationFailures = instantiationFailures.append(s);
-	return false;
+	return quitInstantiationFailuresWithException ;
     }
 
 

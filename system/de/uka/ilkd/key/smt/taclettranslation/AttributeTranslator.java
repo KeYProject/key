@@ -182,8 +182,8 @@ final class DefaultAttributeTranslator implements AttributeTranslator{
 	    
 	    dest = TermFactory.DEFAULT.createArrayTerm(ArrayOp.getArrayOp(subTerms[0].sort()),subTerms);
 	}else
-	if(isCreatedTerm(dest, services)){
-	    dest = createCreatedTerm(subTerms[0], services);
+	if(AbstractTacletTranslator.isCreatedTerm(dest, services)){
+	    dest = AbstractTacletTranslator.createCreatedTerm(subTerms[0], services);
 	}else if(dest.op() instanceof AttributeOp && ((AttributeOp)dest.op()).sort().equals(ProgramSVSort.ARRAYLENGTH)){
 	  dest = createLengthTerm(subTerms[0], services);  
 	}	
@@ -212,7 +212,7 @@ final class DefaultAttributeTranslator implements AttributeTranslator{
        
        
        if(taclet.op() instanceof AttributeOp &&
-	  !isCreatedTerm(taclet, services)){
+	  !AbstractTacletTranslator.isCreatedTerm(taclet, services)){
 	   AttributeOp op = (AttributeOp)taclet.op();
 	   if(op.sort().equals(ProgramSVSort.VARIABLE)){
 	       return taclet;    
@@ -275,8 +275,8 @@ final class DefaultAttributeTranslator implements AttributeTranslator{
 
 	} 
 	
-	if(isCreatedTerm(dest, services)){
-	    dest = createCreatedTerm(subTerms[0], services);
+	if(AbstractTacletTranslator.isCreatedTerm(dest, services)){
+	    dest = AbstractTacletTranslator.createCreatedTerm(subTerms[0], services);
 	}else{
 	    dest = TermFactory.DEFAULT.createTerm(dest.op(), subTerms, variables,
 			JavaBlock.EMPTY_JAVABLOCK);    
@@ -295,20 +295,7 @@ final class DefaultAttributeTranslator implements AttributeTranslator{
     
 
     
-    /**
-     * Creates the term <code>objectTerm</code>.created.
-     * @param objectTerm
-     * @param services
-     * @return returns the created term.
-     */
-    private Term createCreatedTerm(Term objectTerm,Services services) {
-        JavaInfo javaInfo = services.getJavaInfo();
-        ProgramVariable createdAttribute
-                = javaInfo.getAttribute(ImplicitFieldAdder.IMPLICIT_CREATED,
-                                        javaInfo.getJavaLangObject());
-        Term createdTerm = TermBuilder.DF.dot(objectTerm, createdAttribute);
-        return createdTerm;
-    }
+
     
     
       
@@ -337,7 +324,7 @@ final class DefaultAttributeTranslator implements AttributeTranslator{
 	       
 	       if((node.isCrotch()&& !start)){essential = false;}
 	       if(essential){
-		   if(!isCreatedTerm(node.getContent(),services)&&
+		   if(!AbstractTacletTranslator.isCreatedTerm(node.getContent(),services)&&
 		      !(node.getContent().sort() instanceof PrimitiveSort))
 		   container.add(node.getContent());
 	       }else{
@@ -387,7 +374,7 @@ final class DefaultAttributeTranslator implements AttributeTranslator{
 	
 	    
 	}
-	  if( isCreatedTerm(term,services)){
+	  if( AbstractTacletTranslator.isCreatedTerm(term,services)){
 		System.out.println("\tconains: <created>");
 		
 	    }
@@ -403,25 +390,7 @@ final class DefaultAttributeTranslator implements AttributeTranslator{
     }
     
     
-    private boolean isCreatedTerm(Term term, Services services){
-	if(term.op() instanceof MetaCreated){
-	    return true;
-	}
-	if(term.op() instanceof AttributeOp){
-	    AttributeOp op = (AttributeOp) term.op();
-	    if(op.sort().equals(ProgramSVSort.IMPLICITCREATED)){
-		return true;
-	    }
-	    final KeYJavaType objectKJT = services.getJavaInfo().getJavaLangObject();
-	    if(op.attribute().equals(
-		    services.getJavaInfo().
-		    getAttribute(ImplicitFieldAdder.IMPLICIT_CREATED, objectKJT))){
-		return true;
-	    }
-		
-	}
-	return false;
-    }
+
     
 }
 

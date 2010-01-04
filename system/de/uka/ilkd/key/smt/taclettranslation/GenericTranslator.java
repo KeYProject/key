@@ -16,6 +16,7 @@ import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -29,6 +30,7 @@ import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.logic.sort.AbstractSort;
 import de.uka.ilkd.key.logic.sort.GenericSort;
+import de.uka.ilkd.key.logic.sort.ObjectSort;
 import de.uka.ilkd.key.logic.sort.PrimitiveSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.logic.sort.SortDefiningSymbols;
@@ -41,6 +43,7 @@ class GenericTranslator {
     private boolean appendGenericTerm = false;
    // private HashSet<GenericSort> usedGenericSorts;
     private VariablePool pool;
+    private Services services;
     private ArrayList<TranslationListener> listener 
     		= new ArrayList<TranslationListener>(); 
     GenericTranslator(VariablePool pool){
@@ -56,8 +59,10 @@ class GenericTranslator {
      * @return
      * @throws IllegalTacletException
      */
-    public Term translate(Term term,ImmutableSet<Sort> sorts, Taclet t, TacletConditions conditions )
+    public Term translate(Term term,ImmutableSet<Sort> sorts, Taclet t, TacletConditions conditions,
+	    Services services)
     throws IllegalTacletException{
+	this.services = services;
 	return instantiateGeneric(term,collectGenerics(term),sorts,t,conditions);
     }
     
@@ -86,6 +91,8 @@ class GenericTranslator {
 	    }
 	    variables[i] = subTerms[i].varsBoundHere(i);
 	}
+	
+	
 
 
 	if (term.sort().equals(generic)) {
@@ -154,7 +161,18 @@ class GenericTranslator {
 	    }
 	    
 
-	}else{
+	}/*else if(AbstractTacletTranslator.isCreatedTerm(term, services)&&
+	     !(term.sub(0).sort() instanceof GenericSort) ){
+	   term= AbstractTacletTranslator.createCreatedTerm(term.sub(0), services);
+	}else if(AbstractTacletTranslator.isNextToCreateTerm(term) &&
+		!(term.sub(0).sort() instanceof GenericSort) ){
+	    if(!(term.sub(0).sort() instanceof ObjectSort)){
+
+	    }
+	 
+	    term.sub(0).sort();
+	    term = AbstractTacletTranslator.createNextToCreateTerm((ObjectSort)term.sub(0).sort(), services);
+	}*/else{
 	    term = TermFactory.DEFAULT.createTerm(term.op(), subTerms, variables,
 		        JavaBlock.EMPTY_JAVABLOCK);
 	}	

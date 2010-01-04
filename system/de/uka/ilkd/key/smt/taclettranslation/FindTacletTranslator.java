@@ -185,10 +185,7 @@ public class FindTacletTranslator extends AbstractTacletTranslator {
 	    return tb.imp(tb.and(list),tb.or(find, assum));
 	}
 
-	//Term term;
-	//term = 
-	
-	return tb.imp(tb.and(list), assum);
+	return tb.imp(tb.and(list),assum);
 
 
 

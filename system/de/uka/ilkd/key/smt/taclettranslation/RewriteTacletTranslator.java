@@ -155,7 +155,8 @@ public class RewriteTacletTranslator extends AbstractTacletTranslator {
 	//Term term;
 	//term = 
 	
-	return tb.imp(tb.and(list), assum);
+
+	return tb.imp(tb.and(list),assum);
 
 
 

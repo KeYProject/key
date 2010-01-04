@@ -33,23 +33,29 @@ final class UsedTaclets {
      * listed in <code>contains</code> are used (should be the normal
      * case).
      */
-    static final private String testTaclets[] = {//"",
-					"system_invariant_for_created_3" 
+    static final private String testTaclets[] = {//"identical_object_equal_index"
+					//"only_created_object_are_referenced_by_arrays",
+						   //"array_length_non_negative"
+	    					 //"only_created_object_are_referenced",
+	    					 //"created_add_known_index_in_bounds",
+	    					 //"created_add_known_index_in_bounds_sym",
+	    					 //"created_add_known_index_in_bounds_2"
+				
 							//"array_length_short_javacard"
-	//"array_length_non_negative_2",
-						  //  "only_created_object_are_referenced_right",
-						  //  "only_created_object_are_referenced_by_arrays",
-						  //  "only_created_object_are_referenced_non_null2"
+	//"array_length_non_negative"
+						//    "only_created_object_are_referenced_right",
+						//    "only_created_object_are_referenced_by_arrays",
+						//    "only_created_object_are_referenced_non_null2"
 						  // "array_length_non_negative",
 						  // "array_length_non_negative_2",
 						  // "array_length_non_negative_3",
 						  // "array_length_short_javacard"
 	//"only_created_object_are_referenced_non_null"
 						
-						  //   ,"boolean_equal_2"
-						   //  ,"disjoint_repositories"
+						    // ,"boolean_equal_2"
+						    // ,"disjoint_repositories"
 						   //  ,"castDel"
-						    //,"all_integer_sorts_are_equals"
+						    //,"boolean_not_equal_1"
 						     //,"exact_instance_definition_int"
 						     //, "exact_instance_definition_known"
 						   // ,"exact_instance_definition_known_false"
@@ -182,18 +188,35 @@ final class UsedTaclets {
 	    usedTaclets.add("only_created_object_are_referenced");
 	    usedTaclets.add("only_created_object_are_referenced_non_null");
 	    usedTaclets.add("only_created_object_are_referenced_right");
-	    usedTaclets.add("only_created_object_are_referenced_by_arrays");
-	    usedTaclets.add("only_created_object_are_referenced_by_arrays_right");
+	    //usedTaclets.add("only_created_object_are_referenced_by_arrays");
+	    //usedTaclets.add("only_created_object_are_referenced_by_arrays_right");
 	    usedTaclets.add("only_created_object_are_referenced_non_null2");
 	    usedTaclets.add("only_created_object_are_referenced_non_null3");
-	    usedTaclets.add("only_created_object_are_referenced_by_arrays_2");
+	    //usedTaclets.add("only_created_object_are_referenced_by_arrays_2");
 	    
 	    
 	    
-	    usedTaclets.add("only_created_object_are_referenced_by_arrays_non_null");
+	    //usedTaclets.add("only_created_object_are_referenced_by_arrays_non_null");
 	    
 	    
 	    usedTaclets.add("system_invariant_for_created_3");
+	    usedTaclets.add("system_invariant_for_created_2a_sym");
+	    usedTaclets.add("system_invariant_for_created_3_sym");
+	    
+	    usedTaclets.add("created_inv_index_in_bounds");
+	    usedTaclets.add("created_add_known_index_in_bounds");
+	    usedTaclets.add("created_add_known_index_in_bounds_sym");
+	    usedTaclets.add("created_add_known_index_in_bounds_2");
+	    
+	    
+	     
+	
+	    
+	 //   usedTaclets.add("nextToCreate_non_negative");
+	    
+	    
+	    
+	    
 	   
 	    
 	   

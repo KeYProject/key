@@ -66,6 +66,7 @@ import de.uka.ilkd.key.logic.sort.AbstractSort;
 import de.uka.ilkd.key.logic.sort.ArraySort;
 import de.uka.ilkd.key.logic.sort.ClassInstanceSort;
 import de.uka.ilkd.key.logic.sort.GenericSort;
+import de.uka.ilkd.key.logic.sort.ObjectSort;
 import de.uka.ilkd.key.logic.sort.PrimitiveSort;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -187,19 +188,22 @@ abstract class AbstractTacletTranslator implements TacletTranslator,VariablePool
 	
 
 	// seventh step: translate the generics sorts.
-	
-	term = genericTranslator.translate(term, sorts, t, conditions);
-	
+	term = genericTranslator.translate(term, sorts, t, conditions,services);
 
-	
-	
-	
 	if(!checkForNotInstantiatedAttributes(term)){
 	    throw new IllegalTacletException("There are some program schema " +
 	    		"variables that can not be translated.\n /*The result: "+
-	    		LogicPrinter.quickPrintTerm(term, services)+ "*/");
+	    		LogicPrinter.quickPrintTerm(term, services)+ "\n" +
+	    		"Normally there are not enough attribute terms to instantiate" +
+	    		"the taclet.*/");
 	}
 	
+
+	term = translateRemainingNextToCreateAndCreates(term);
+	
+	
+	
+
 	
 	
 	
@@ -208,6 +212,34 @@ abstract class AbstractTacletTranslator implements TacletTranslator,VariablePool
     }
     
     
+    private Term translateRemainingNextToCreateAndCreates(Term term){
+	ImmutableArray<QuantifiableVariable> variables[] = new ImmutableArray[term
+	                                                                      .arity()];
+	Term[] subTerms = new Term[term.arity()];
+	for (int i = 0; i < term.arity(); i++) {
+	    variables[i] = term.varsBoundHere(i);
+	    subTerms[i] = translateRemainingNextToCreateAndCreates(term.sub(i));
+	    
+	}
+	
+	if(AbstractTacletTranslator.isCreatedTerm(term, services)&&
+	     !(term.sub(0).sort() instanceof GenericSort) ){
+	   term= createCreatedTerm(term.sub(0), services);
+	}else if(isNextToCreateTerm(term) &&
+		!(term.sub(0).sort() instanceof GenericSort) ){
+	    if(!(term.sub(0).sort() instanceof ObjectSort)){
+	
+	    }
+	    
+	    term.sub(0).sort();
+	    term = createNextToCreateTerm((ObjectSort)term.sub(0).sort(), services);
+	}else{
+	    term = TermFactory.DEFAULT.createTerm(term.op(), subTerms, variables,
+		        JavaBlock.EMPTY_JAVABLOCK);
+	}
+	return term;
+    }
+    
     /**
      * Checks whether the term is correctly instantiated.
      * @param term the term to be checked.
@@ -215,13 +247,12 @@ abstract class AbstractTacletTranslator implements TacletTranslator,VariablePool
      * <code>false</code>.
      */   
     private boolean checkForNotInstantiatedAttributes(Term term){
-	if(term.op() instanceof MetaCreated){
+	/*if(term.op() instanceof MetaCreated){
 	    return false;
-	}
+	}*/
 	if(term.op() instanceof AttributeOp){
 	    AttributeOp op = (AttributeOp) term.op();
-	    if(op.sort().equals(ProgramSVSort.IMPLICITCREATED)||
-		    op.sort().equals(ProgramSVSort.VARIABLE)){
+	    if(  op.sort().equals(ProgramSVSort.VARIABLE)){
 		return false;
 	    }
 
@@ -538,6 +569,13 @@ abstract class AbstractTacletTranslator implements TacletTranslator,VariablePool
 	return  ( sort instanceof ClassInstanceSort );
     }
     
+    static public boolean isNextToCreateTerm(Term term){
+	if(term.op() instanceof MetaNextToCreate){
+	    return true;
+	}
+	return false;
+    }
+    
    
     
     /**
@@ -636,6 +674,53 @@ abstract class AbstractTacletTranslator implements TacletTranslator,VariablePool
 	}
 	
 	return template;
+    }
+    
+    
+    static public boolean isCreatedTerm(Term term, Services services){
+	if(term.op() instanceof MetaCreated){
+	    return true;
+	}
+	if(term.op() instanceof AttributeOp){
+	    AttributeOp op = (AttributeOp) term.op();
+	    if(op.sort().equals(ProgramSVSort.IMPLICITCREATED)){
+		return true;
+	    }
+	    final KeYJavaType objectKJT = services.getJavaInfo().getJavaLangObject();
+	    if(op.attribute().equals(
+		    services.getJavaInfo().
+		    getAttribute(ImplicitFieldAdder.IMPLICIT_CREATED, objectKJT))){
+		return true;
+	    }
+		
+	}
+	return false;
+    }
+    
+    /**
+     * Creates the term <code>objectTerm</code>.created.
+     * @param objectTerm
+     * @param services
+     * @return returns the created term.
+     */
+    static public Term createCreatedTerm(Term objectTerm,Services services) {
+        JavaInfo javaInfo = services.getJavaInfo();
+        ProgramVariable createdAttribute
+                = javaInfo.getAttribute(ImplicitFieldAdder.IMPLICIT_CREATED,
+                                        javaInfo.getJavaLangObject());
+        Term createdTerm = TermBuilder.DF.dot(objectTerm, createdAttribute);
+        return createdTerm;
+    }
+    
+    static public Term createNextToCreateTerm(ObjectSort sort, Services services){
+	JavaInfo javaInfo = services.getJavaInfo();
+	//javaInfo.getKeYJavaType(term)
+	ProgramVariable createdAttribute
+	         = javaInfo.getAttribute(ImplicitFieldAdder.IMPLICIT_NEXT_TO_CREATE,
+	                                     sort);
+	
+	Term createdTerm = TermFactory.DEFAULT.createVariableTerm(createdAttribute);
+	return createdTerm;
     }
     
 
