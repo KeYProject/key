@@ -34,6 +34,7 @@ final class UsedTaclets {
      * case).
      */
     static final private String testTaclets[] = {//"",
+					"system_invariant_for_created_3" 
 							//"array_length_short_javacard"
 	//"array_length_non_negative_2",
 						  //  "only_created_object_are_referenced_right",
@@ -190,6 +191,9 @@ final class UsedTaclets {
 	    
 	    
 	    usedTaclets.add("only_created_object_are_referenced_by_arrays_non_null");
+	    
+	    
+	    usedTaclets.add("system_invariant_for_created_3");
 	   
 	    
 	   
