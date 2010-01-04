@@ -14,7 +14,7 @@
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
 /** $Id: PersistentCondition.java 1.4.1.1 Tue, 26 Jun 2007 10:47:12 +0200 christian $
- * @(#)$RCSfile$ 1.1 2003-02-10 Andre Platzer
+ * (#)$RCSfile$ 1.1 2003-02-10 Andre Platzer
  *
  * Copyright (c) 2003 Andre Platzer. All Rights Reserved.
  */
