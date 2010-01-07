@@ -87,7 +87,7 @@ public class FalsifiabilityPreservation {
 			if (branchType == BranchType.THRID) {
 			    fpc = new SFPCondition(n, this, ruleType,branchType, bd);
 			} else {
-			    fpc = new FPCondition(n, ruleType, branchType, bd);
+			    fpc = new FPConditionFALSE(n, ruleType, branchType, bd);
 			}
 		    }
 		    fpc.constructFPC();
@@ -114,20 +114,41 @@ public class FalsifiabilityPreservation {
      * @see BranchType */
     private BranchType getBranchType(RuleType rt, Node n){
 	BranchType res;
+	int sibNr = n.siblingNr();
+	String bLabel = "";
+	try{ 
+	    bLabel = n.getNodeInfo().getBranchLabel();
+	}catch(Exception e){ }
+	
 	if(rt==RuleType.LOOP_INV){
 	    //System.out.println("childNode:"+n.serialNr()+ " SibblingNr:"+n.siblingNr()+ " Name:"+n.name()+ " NodeInfo.branchlabel:"+n.getNodeInfo().getBranchLabel());
-	    if(n.siblingNr()==2||n.getNodeInfo().getBranchLabel().equalsIgnoreCase("Use Case")){
+	    if(sibNr==0||bLabel.equalsIgnoreCase("Invariant Initially Valid")){
+		res = BranchType.FIRST;
+		if(!(sibNr==0 && bLabel.equalsIgnoreCase("Invariant Initially Valid"))){
+		    warning("Recognizing the branch type of node "+n.serialNr()+" may have failed.",2);
+		}
+	    }else if(sibNr==1||bLabel.equalsIgnoreCase("Body Preserves Invariant")){
+		res = BranchType.SECND;
+		if(!(sibNr==1 && bLabel.equalsIgnoreCase("Body Preserves Invariant"))){
+		    warning("Recognizing the branch type of node "+n.serialNr()+" may have failed.",2);
+		}
+	    }else if(sibNr==2||bLabel.equalsIgnoreCase("Use Case")){
 		res = BranchType.THRID;
-		if(!(n.siblingNr()==2 && n.getNodeInfo().getBranchLabel().equalsIgnoreCase("Use Case"))){
+		if(!(sibNr==2 && bLabel.equalsIgnoreCase("Use Case"))){
 		    warning("Recognizing the branch type of node "+n.serialNr()+" may have failed.",2);
 		}
 	    }else{
 		throw new UnhandledCase("getBranchType("+rt+", "+n.serialNr()+")");
 	    }
 	}else if(rt==RuleType.METH_CONTR){
-	    if(n.siblingNr()==1||n.getNodeInfo().getBranchLabel().equalsIgnoreCase("Post")){
+	    if(sibNr ==0 || bLabel.equalsIgnoreCase("Pre")){
+		res = BranchType.FIRST;
+		if(!(sibNr==0 && bLabel.equalsIgnoreCase("Pre"))){
+		    warning("Recognizing the branch type of node "+n.serialNr()+" may have failed.",2);
+		}
+	    }else if(sibNr ==1 || bLabel.equalsIgnoreCase("Post")){
 		res = BranchType.THRID;
-		if(!(n.siblingNr()==1 && n.getNodeInfo().getBranchLabel().equalsIgnoreCase("Post"))){
+		if(!(sibNr==1 && bLabel.equalsIgnoreCase("Post"))){
 		    warning("Recognizing the branch type of node "+n.serialNr()+" may have failed.",2);
 		}
 	    }else{
@@ -188,10 +209,76 @@ public class FalsifiabilityPreservation {
 	    }
 	    n = parent;
 	}
-
 	return n;
     }
     
+    /**@return the first FPCondition that is not provend to be valid when traversing 
+     * from the branch node towards the root. Null is returned if there is no FPCondition
+     * or if all FPConditions are valid.
+     * <br> Note that this method is a bit different than get_Upto_Node because this method
+     * may return null whereas get_Upto_Node returns a node != null.*/
+    protected FPCondition getUptoFPCondition(){
+	Node n = branchNode; 
+	while(!n.root()){
+	    Node parent = n.parent();
+	    RuleApp ruleApp = parent.getAppliedRuleApp();
+	    if(ruleApp!=null && isCriticalRule(ruleApp.rule())){
+		FPCondition fpc=getFPCondition(n);
+		if(fpc==null){
+		    throw new RuntimeException("The node "+n.serialNr()+" should already be associate with a FPCondition. Maybe the initialization is brocken.");
+		}
+		if( fpc.isValid()==null || !fpc.isValid()){
+		    //If falsifiability preservation is unknown or false, then this is the point up to which we know that fp is preserved.
+		    return fpc;
+		}
+	    }
+	    n = parent;
+	}
+
+	return null;
+    }
+    
+    /**@param falsifiable determins whether the branchNode is falsifiable. Null == unknown. 
+     * @return a message for the user that explains the meaning of this particular
+     * falsifiability preservation situation. This message is displayed by the 
+     * {@code SMTResultsAndBugDetectionDialog} */
+    public String getMessage(Boolean falsifiable){
+	Node uptoNode = get_Upto_Node();
+	String standard = "Falsifiability is preserved from node "+ branchNode.serialNr()+
+				" up to "+ (uptoNode.root()?"the root node":"node "+uptoNode.serialNr());
+	if(falsifiable == null){
+	    return standard+". \n Use SMT solvers to check if node "+branchNode.serialNr()+" is valid or falsifiable.";
+	}else if(falsifiable == true){
+	    if(uptoNode.root()){
+		return "The target program has a bug on the selected trace (proof branch).\n"+
+			"This is because the branch node is falsifiable and \n"+standard;
+	    }else{
+		FPCondition upto = getUptoFPCondition();
+		if(upto==null){
+		    return "Strange this case should have already be caught. It means the falsifiability is preserved upto the root node.";
+		}else if(upto.branchType == BranchType.FIRST){
+		    if(upto.ruleType == RuleType.LOOP_INV){
+			return "The loop invariant is not preserved a the beginning of the loop.";
+		    }else{
+			return "The precondition of the method contract is not satisfied before the method call";
+		    }
+		}else if(upto.branchType == BranchType.SECND){
+		    if(upto.ruleType == RuleType.LOOP_INV){
+			return "The loop invariant is not preserved during loop iteration.";
+		    }else{
+			return "The method contract is not correct.";
+		    }
+		}else{
+		    return standard;
+		}
+	    }
+	}else{
+	    return "The branch is closed.";
+	}
+	//return "Warning: unexpected case";
+    }
+    
+
     private void warning(String s, int severity){
 	bd.msgMgt.warning(s, severity);
     }

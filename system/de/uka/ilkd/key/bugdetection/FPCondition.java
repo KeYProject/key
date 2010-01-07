@@ -41,7 +41,7 @@ import de.uka.ilkd.key.visualdebugger.ProofStarter;
 /** Falsifiability preservation condition and informations for a node
  * Instances of this class are associated with Nodes in the hashmap {@code Proof.nodeToSMTandFPData} 
  * @author gladisch */
-public class FPCondition {
+public  class FPCondition {
     /**
      * The falsifiability preservation is considered between this node and its
      * parent node. Thus this node is the branch of the rule application in
@@ -318,4 +318,5 @@ public class FPCondition {
 	return node.proof().getServices();
     }
 
+   
 }

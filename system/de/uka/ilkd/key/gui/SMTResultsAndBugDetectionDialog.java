@@ -203,6 +203,7 @@ public class SMTResultsAndBugDetectionDialog extends JFrame {
      * that shall be displayed in {@code testArea}. If a number smaller than 0 is passed, then the textArea is cleared. */
     protected  void updateTextArea(int idx){
 	synchronized(tableModel){
+	    	Boolean falsifiable=null; //determines if at lease one SMTSolverResult is falsifiable.
         	if(idx<0){
         	    textArea.setText("");
         	    return;
@@ -211,9 +212,28 @@ public class SMTResultsAndBugDetectionDialog extends JFrame {
         	for(int i=1;i<columnNames.length-1;i++){
         	    SMTSolverResultWrap val = (SMTSolverResultWrap)tableModel.getValueAt(idx, i);
         	    if(val!=null){
-                    sb.append("------------").append(val.r.solverName).append("----------\n").append(val.r).append("\n");
+        		sb.append("------------").append(val.r.solverName).append("----------\n").append(val.r).append("\n");
+                    	if(val.r.isValid() == SMTSolverResult.ThreeValuedTruth.FALSIFIABLE){
+                    	    falsifiable = true;
+                    	}else if(val.r.isValid() == SMTSolverResult.ThreeValuedTruth.TRUE){
+                    	    falsifiable = false;
+                    	}
         	    }
         	}
+        	
+        	//NodeWrap uptoNode = (NodeWrap)tableModel.getValueAt(idx, columnNames.length-1);
+        	NodeWrap nw = (NodeWrap)tableModel.getValueAt(idx, 0);
+        	FalsifiabilityPreservation fp = getFPData(nw.n);
+        	if(fp!=null){
+        	    sb.insert(0, fp.getMessage(falsifiable)+"\n\n");
+//        	    Node uptoNode = fp.get_Upto_Node();
+//        	    if(uptoNode!=null && uptoNode.root() 
+//        		    && falsifiable){
+//        		sb.insert(0, "The target program has a bug on the selected trace!\n " +
+//        			"This is guaranteed because the node "+nw.n.serialNr()+" is falsifiable and fasifiability is preserved up to the root node.\n\n");
+//        	    }
+        	}
+        	
         	textArea.setText(sb.toString());
 	}
     }
@@ -236,6 +256,20 @@ public class SMTResultsAndBugDetectionDialog extends JFrame {
 	return 5;
     }
 
+    private static FalsifiabilityPreservation getFPData(Node n){
+	    Vector<Object> vect = n.getSMTandFPData();
+	    if (vect == null) {
+		return null;
+	    }
+	    for (Object o : vect) {
+		if (o instanceof SMTSolverResult
+		        || o instanceof FalsifiabilityPreservation) {
+		    return (FalsifiabilityPreservation)o;
+		}
+	    }
+	    return null;
+    }
+    
     /**
      * Searches the {@code table} or {@code tableModel} for an entry of node
      * {@code n}. If there is no entry/row of the node yet, then a new table row
@@ -260,15 +294,7 @@ public class SMTResultsAndBugDetectionDialog extends JFrame {
 	    if (vect == null) {
 		return -1;
 	    }
-	    boolean dataFound = false;
-	    for (Object o : vect) {
-		if (o instanceof SMTSolverResult
-		        || o instanceof FalsifiabilityPreservation) {
-		    dataFound = true;
-		    break;
-		}
-	    }
-	    if (!dataFound) {
+	    if(getFPData(n)==null){
 		return -1;
 	    }
 
