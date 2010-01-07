@@ -262,8 +262,7 @@ public class SMTResultsAndBugDetectionDialog extends JFrame {
 		return null;
 	    }
 	    for (Object o : vect) {
-		if (o instanceof SMTSolverResult
-		        || o instanceof FalsifiabilityPreservation) {
+		if (o instanceof FalsifiabilityPreservation) {
 		    return (FalsifiabilityPreservation)o;
 		}
 	    }
@@ -294,7 +293,15 @@ public class SMTResultsAndBugDetectionDialog extends JFrame {
 	    if (vect == null) {
 		return -1;
 	    }
-	    if(getFPData(n)==null){
+	    boolean dataToDisplay = false;
+	    for (Object o : vect) {
+		if (	o instanceof SMTSolverResult
+		     || o instanceof FalsifiabilityPreservation) {
+		    dataToDisplay = true;
+		    break;
+		}
+	    }
+	    if(!dataToDisplay){
 		return -1;
 	    }
 

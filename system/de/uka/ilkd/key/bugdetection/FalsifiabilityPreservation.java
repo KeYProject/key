@@ -265,15 +265,19 @@ public class FalsifiabilityPreservation {
 		    return "Strange this case should have already be caught. It means the falsifiability is preserved upto the root node.";
 		}else if(upto.branchType == BranchType.FIRST){
 		    if(upto.ruleType == RuleType.LOOP_INV){
-			return "The loop invariant is not preserved a the beginning of the loop.";
+			return "The loop invariant applied at node "+uptoNode.parent().serialNr()+" is not preserved a the beginning of the loop.";
+		    }else if(upto.ruleType == RuleType.METH_CONTR){
+			return "The precondition of the method contract applied at node "+uptoNode.parent().serialNr()+" is not satisfied before the method call";
 		    }else{
-			return "The precondition of the method contract is not satisfied before the method call";
+			return standard;
 		    }
 		}else if(upto.branchType == BranchType.SECND){
 		    if(upto.ruleType == RuleType.LOOP_INV){
-			return "The loop invariant is not preserved during loop iteration.";
+			return "The loop invariant applied at node "+uptoNode.parent().serialNr()+" is not preserved during loop iteration.";
+		    }else if(upto.ruleType == RuleType.METH_CONTR){
+			return "The method contract applied at node "+uptoNode.parent().serialNr()+" is not correct.";
 		    }else{
-			return "The method contract is not correct.";
+			return standard;
 		    }
 		}else{
 		    return standard;
