@@ -214,6 +214,8 @@ public class AccessMethodsManager {
 	    final Expression[] index = { lhs.getExpressionAt(lhs
 		    .getExpressionCount() - 1) };
 	    return new ArrayReference(reference, index);
+	} else if (refPre instanceof MethodReference){
+	    return lhs;
 	}
 	throw new RuntimeException("Missing type for refPre=\n" + refPre
 	        + " with class: " + refPre.getClass());
