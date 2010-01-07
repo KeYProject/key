@@ -254,7 +254,10 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 	// add the assumptions that that are made of taclets
 	start = toReturn.size();
 	toReturn.addAll(this.tacletAssumptions);
-	assumptionTypes.add(new ContextualBlock(start,toReturn.size()-1,ContextualBlock.ASSUMPTION_TACLET_TRANSLATION));
+	for(int i=0; i < tacletAssumptions.size(); i++){
+	    assumptionTypes.add(new ContextualBlock(start,start+i,ContextualBlock.ASSUMPTION_TACLET_TRANSLATION));    
+	}
+	
 	
 	
 	return toReturn;

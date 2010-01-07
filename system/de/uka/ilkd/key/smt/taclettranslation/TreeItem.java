@@ -14,7 +14,19 @@ public class TreeItem {
     private String text;
     private boolean checked = true;
     private boolean parentSelected = true;
+    /**
+     * Counts how many childs are checked 
+     */
+    private int     checkCount =-1; 
     
+    public int getCheckedCount() {
+        return checkCount;
+    }
+
+    public void setCheckedCount(int tacletCount) {
+        this.checkCount = tacletCount;
+    }
+
     TreeItem(String text){
 	this.text = text;
     }
@@ -48,6 +60,8 @@ public class TreeItem {
     public void setParentSelected(boolean b){
 	parentSelected = b;
     }
+    
+    
     
     
     

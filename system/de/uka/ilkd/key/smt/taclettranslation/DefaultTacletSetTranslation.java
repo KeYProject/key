@@ -135,6 +135,7 @@ public final class DefaultTacletSetTranslation
 		// DefaultTacletFormula(t,null,"The taclet is not used for external provers."));
 		continue;
 	    }
+	
 	    if (!heuristics.isEmpty() && !checkHeuristic(t)) {
 
 		notTranslated = notTranslated.append(new DefaultTacletFormula(

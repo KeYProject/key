@@ -152,7 +152,7 @@ public class SimplifyTranslator extends AbstractSMTTranslator {
         StringBuffer assump = new StringBuffer();
 	
         if(assumptions.size() > 0){
-           for(int k=0; k < commentAssumption.length; k++){
+           for(int k=0; k < assumptionBlocks.size(); k++){
                 ContextualBlock block = assumptionBlocks.get(k);
                 
                 if (block.getStart() <= block.getEnd()) {

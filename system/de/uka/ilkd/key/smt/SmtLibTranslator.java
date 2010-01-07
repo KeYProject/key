@@ -192,9 +192,9 @@ public class SmtLibTranslator extends AbstractSMTTranslator {
 	ArrayList<StringBuffer> AssumptionsToRemove = new ArrayList<StringBuffer>();
 	    StringBuffer assump = new StringBuffer();	
 	
-	for(int k=0; k < commentAssumption.length; k++){
+	for(int k=0; k < assumptionBlocks.size(); k++){
 	    ContextualBlock block = assumptionBlocks.get(k);
-	
+	    	
 	    if (block.getStart() <= block.getEnd()) {
 		assump.append(commentAssumption[block.getType()]);
 	    	    for(int i=block.getStart(); i <= block.getEnd(); i++){
