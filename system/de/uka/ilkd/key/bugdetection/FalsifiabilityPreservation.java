@@ -36,7 +36,7 @@ public class FalsifiabilityPreservation {
     final protected Node branchNode;
     
     /**The order of the names is important. */
-    public final static String[] criticalRuleNames = {"whileInv","Use Operation Contract"};
+    public final static String[] criticalRuleNames = {"whileInv","Use Operation Contract","hide_left", "hide_right"};
     
     /**Warning this constructor has a side-effect on the proof object. It associates
      * the newly create object with the given branchNode
@@ -78,7 +78,11 @@ public class FalsifiabilityPreservation {
 			ruleType = RuleType.LOOP_INV;
 		    } else if (parentRuleAppName.toString().startsWith(criticalRuleNames[1])) {// Method Contract
 			ruleType = RuleType.METH_CONTR;
-		    } else {
+		    } else if (parentRuleAppName.toString().startsWith(criticalRuleNames[2])) {// Hide Left
+			ruleType = RuleType.HIDE_LEFT;
+		    } else if (parentRuleAppName.toString().startsWith(criticalRuleNames[3])) {// Hide Left
+			ruleType = RuleType.HIDE_RIGHT;
+		    } else{
 			throw new RuntimeException(
 			        "Case distinctions are missing a case that is considered by isCriticalRule().");
 		    }
@@ -89,6 +93,9 @@ public class FalsifiabilityPreservation {
 			} else {
 			    fpc = new FPConditionFALSE(n, ruleType, branchType, bd);
 			}
+		    }else if(ruleType==RuleType.HIDE_LEFT || ruleType==RuleType.HIDE_RIGHT){
+			//The branch type has no meaning here
+			fpc = new FPCondition(n, ruleType, BranchType.FIRST, bd);
 		    }
 		    fpc.constructFPC();
 		}

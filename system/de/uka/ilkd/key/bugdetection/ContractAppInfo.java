@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.bugdetection;
 
+import java.util.Iterator;
 import java.util.Vector;
 
 import de.uka.ilkd.key.bugdetection.BugDetector.UnhandledCase;
@@ -7,11 +8,13 @@ import de.uka.ilkd.key.bugdetection.BugDetector.UnknownCalculus;
 import de.uka.ilkd.key.bugdetection.FalsifiabilityPreservation.RuleType;
 import de.uka.ilkd.key.logic.ConstrainedFormula;
 import de.uka.ilkd.key.logic.JavaBlock;
+import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.IUpdateOperator;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.Op;
+import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.rule.updatesimplifier.Update;
 
@@ -38,6 +41,71 @@ public class ContractAppInfo{
 	return "PREFIX:"+prefix + "\nANON:"+anon + "\nContractPost:"+contractPost;
     }
 
+    /**
+     * Returns formulas that are in succedent of node {@code n} that are not
+     * present in its parent node's succedent. This is a hack in order to find
+     * out what formulas have been added by rule application
+     * 
+     * @author gladisch
+     */
+    protected static Vector<ConstrainedFormula> findNewFormulasInSucc(Node n) {
+	Vector<ConstrainedFormula> res = new Vector<ConstrainedFormula>();
+	if (n == null) {
+	    return res;
+	}
+	final Node parent = n.parent();
+	Semisequent pSucc = null;
+	if (parent != null) {
+	    pSucc = parent.sequent().succedent();
+	}
+
+	final Iterator<ConstrainedFormula> succIt = n.sequent().succedent()
+	        .toList().iterator();
+	while (succIt.hasNext()) {
+	    ConstrainedFormula cf = succIt.next();
+	    if (pSucc == null || !pSucc.contains(cf)) {
+		res.add(cf);
+	    }
+	}
+	return res;
+    }
+
+    /**
+     * If findNewFormulasInSucc returns multiple formulas, then use this method
+     * to pick the formula that looks like the one to be the main prove
+     * obligation (that contains e.g. the program). Warning this method uses
+     * heuristics to determine the right formula
+     */
+    protected static ConstrainedFormula pickRelevantFormula(
+	    Vector<ConstrainedFormula> cfs) {
+	if (cfs.size() == 1) {
+	    return cfs.firstElement();
+	} else if (cfs.size() == 0) {
+	    return null;
+	} else {
+	    BugDetector.DEFAULT.msgMgt.warning("pickRelevantFormula() uses heuristics to determine the relevant formula. This may be unsound.",
+		    0);
+	    int[] score = new int[cfs.size()];
+	    int i = 0;
+	    for (ConstrainedFormula cf : cfs) {
+		Term f = cf.formula();
+		Operator op = f.op();
+		if (f.executableJavaBlock() != null) {
+		    score[i] += 100;
+		}
+		if (op instanceof Modality) {
+		    score[i] += 10;
+		}
+	    }
+	    int max = 0;
+	    for (int j : score) {
+		if (score[j] > score[max])
+		    max = j;
+	    }
+	    return cfs.get(score[max]);
+	}
+    }
+
     public static class  LoopInvAppInfo extends ContractAppInfo{
     	    
 	protected TermBuilder tb = TermBuilder.DF;
@@ -50,8 +118,8 @@ public class ContractAppInfo{
     	     * @param node must be the THIRD child node created by the loop invariant rule or method contract 
     	     * rule app from which information will be extracted */
     	    private LoopInvAppInfo(Node node){
-    		final Vector<ConstrainedFormula> cfs = FPCondition.findNewFormulasInSucc(node);
-    		final ConstrainedFormula cf = FPCondition.pickRelevantFormula(cfs);
+    		final Vector<ConstrainedFormula> cfs = findNewFormulasInSucc(node);
+    		final ConstrainedFormula cf = pickRelevantFormula(cfs);
     		extractUpdatesAndPost(cf.formula());
     	    }
     	    

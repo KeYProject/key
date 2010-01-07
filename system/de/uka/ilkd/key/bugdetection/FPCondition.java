@@ -113,46 +113,31 @@ public  class FPCondition {
 	}
     }
     
-    /**
-     * Call this method after initialization of this object to construct and
-     * further initilizse the object the falsifiability preservation condition
-     */
-    public void constructFPC() {
-	final Vector<ConstrainedFormula> cfs = findNewFormulasInSucc(node);
-	final ConstrainedFormula cf = pickRelevantFormula(cfs);
-	if (branchType == BranchType.THRID) {
-	    throw new UnhandledCase(
-		    "Handling of THIRD branch is not implemented in this FPCondition. Use SFPCondition instead.");
-	} else {
-	    throw new UnhandledCase("constructFPC does not handle branch type:"
-		    + branchType
-		    + " I think that FALSE should be returned as FP-condition.");
-	}
-    }
-
-    /**
-     * Returns formulas that are in succedent of node {@code n} that are not
-     * present in its parent node's succedent. This is a hack in order to find
-     * out what formulas have been added by rule application
-     * 
-     * @author gladisch
-     */
-    protected static Vector<ConstrainedFormula> findNewFormulasInSucc(Node n) {
+    /**This method is meant to be applied on the node that is the result of the application
+     * of the hide_left or hide_right rules.
+     * @param n the node that is the result of the rule application hide_left or hide_right.
+     * @param succ if true then only the succedent is analyzed, otherwise only the antecedent is analyzed.
+     * @return formulas that are contained in n.parent() but not in n. */
+    protected static Vector<ConstrainedFormula> findMissingFormulas(Node n, boolean succ) {
 	Vector<ConstrainedFormula> res = new Vector<ConstrainedFormula>();
 	if (n == null) {
 	    return res;
 	}
 	final Node parent = n.parent();
-	Semisequent pSucc = null;
-	if (parent != null) {
-	    pSucc = parent.sequent().succedent();
+	Semisequent nss=null; //semisequent of n
+	Semisequent pss=null; //parent semi-sequent
+	if(succ){
+	    pss = parent.sequent().succedent();
+	    nss  = n.sequent().succedent();
+	}else{
+	    pss = parent.sequent().antecedent();
+	    nss  = n.sequent().antecedent();
 	}
 
-	final Iterator<ConstrainedFormula> succIt = n.sequent().succedent()
-	        .toList().iterator();
-	while (succIt.hasNext()) {
-	    ConstrainedFormula cf = succIt.next();
-	    if (pSucc == null || !pSucc.contains(cf)) {
+	final Iterator<ConstrainedFormula> pssIt = pss.toList().iterator();
+	while (pssIt.hasNext()) {
+	    ConstrainedFormula cf = pssIt.next();
+	    if (!nss.contains(cf)) {
 		res.add(cf);
 	    }
 	}
@@ -160,41 +145,49 @@ public  class FPCondition {
     }
 
     /**
-     * If findNewFormulasInSucc returns multiple formulas, then use this method
-     * to pick the formula that looks like the one to be the main prove
-     * obligation (that contains e.g. the program). Warning this method uses
-     * heuristics to determine the right formula
+     * Call this method after initialization of this object to construct and
+     * further initilizse the object the falsifiability preservation condition
      */
-    protected static ConstrainedFormula pickRelevantFormula(
-	    Vector<ConstrainedFormula> cfs) {
-	if (cfs.size() == 1) {
-	    return cfs.firstElement();
-	} else if (cfs.size() == 0) {
-	    return null;
+    public void constructFPC() {
+	if(ruleType == RuleType.HIDE_LEFT || ruleType == RuleType.HIDE_RIGHT){
+	    	Sequent seq = node.sequent();
+		Semisequent semi = seq.antecedent();
+		Iterator<ConstrainedFormula> it = semi.iterator();
+		Term ante = tb.tt(); 
+		while(it.hasNext()){
+		    ante = tb.and(ante, it.next().formula());
+		}
+		semi = seq.succedent();
+		it = semi.iterator();
+		Term succ = tb.ff();
+		while(it.hasNext()){
+		    succ = tb.or(succ, it.next().formula());
+		}
+		if(ruleType == RuleType.HIDE_LEFT){
+		    Vector<ConstrainedFormula> missing = findMissingFormulas(node, false);
+		    if(missing.size()!=1){
+			throw new RuntimeException("Cannot determine the formula that was hidden by the rule application hide_left.");
+		    }
+		    succ = tb.or(succ, missing.get(0).formula());
+		}else{
+		    Vector<ConstrainedFormula> missing = findMissingFormulas(node, true);
+		    if(missing.size()!=1){
+			throw new RuntimeException("Cannot determine the formula that was hidden by the rule application hide_right.");
+		    }
+		    succ = tb.or(succ, tb.not(missing.get(0).formula()));		    
+		}
+		fpCond = tb.imp(ante, succ);
+	}else if (ruleType == RuleType.LOOP_INV || ruleType == RuleType.METH_CONTR) {
+	    throw new UnhandledCase(
+		    "Handling of contract rules is not implemented in this FPCondition. Use SFPCondition instead.");
 	} else {
-	    BugDetector.DEFAULT.msgMgt.warning("pickRelevantFormula() uses heuristics to determine the relevant formula. This may be unsound.",
-		    0);
-	    int[] score = new int[cfs.size()];
-	    int i = 0;
-	    for (ConstrainedFormula cf : cfs) {
-		Term f = cf.formula();
-		Operator op = f.op();
-		if (f.executableJavaBlock() != null) {
-		    score[i] += 100;
-		}
-		if (op instanceof Modality) {
-		    score[i] += 10;
-		}
-	    }
-	    int max = 0;
-	    for (int j : score) {
-		if (score[j] > score[max])
-		    max = j;
-	    }
-	    return cfs.get(score[max]);
+	    throw new UnhandledCase("constructFPC does not handle branch type:"
+		    + branchType
+		    + " I think that FALSE should be returned as FP-condition.");
 	}
     }
 
+ 
     protected void warning(String s, int severity) {
 	bd.msgMgt.warning(s, severity);
     }
