@@ -43,7 +43,7 @@ public class TestGenerationDialog extends JDialog {
 
     public JList methodList;
 
-    final static String OLD_SIMPLIFY = "Simplify (old interface)";
+    final static String OLD_SIMPLIFY = "Simplify";
 
     final static String SIMPLIFY = "Simplify (new interface)";
 
