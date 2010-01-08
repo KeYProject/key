@@ -275,9 +275,9 @@ public abstract class TestGenerator {
 	if (!testing) {
 	    final StringWriter w = new StringWriter();
 	    final PrettyPrinter pp;
-	    if (TestGenFac.testGenMode == TestGenFac.TG_JAVACARD) {
+	    if (TestGenFac.testGenMode == TestGenFac.TG_USE_SETGET) {
 		pp = new CompilableJavaCardPP(w, false);
-	    } else if (TestGenFac.testGenMode == TestGenFac.TG_JAVA) {
+	    } else if (TestGenFac.testGenMode == TestGenFac.TG_USE_REFL) {
 		pp = new CompilableJavaPP(w, false);
 	    } else {
 		pp = null;

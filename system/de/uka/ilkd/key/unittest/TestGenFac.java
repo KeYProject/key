@@ -45,19 +45,19 @@ import de.uka.ilkd.key.util.ExtList;
 
 public class TestGenFac {
 
-    public final static String TG_JAVA = "Reflection API";
+    public final static String TG_USE_REFL = "Reflection API";
 
-    public final static String TG_JAVACARD = "Setters & Getters";
+    public final static String TG_USE_SETGET = "Setters & Getters";
 
-    public static String testGenMode = TG_JAVA;
+    public static String testGenMode = TG_USE_REFL;
 
     public static int counter = 0;
 
     public TestGenerator create(final Services serv, final String fileName,
 	    final String directory, final boolean testing,
 	    final AssignmentGenerator ag, final TestGeneratorGUIInterface gui) {
-	assert (testGenMode == TG_JAVACARD || testGenMode == TG_JAVA) : "Unhandled case in AssignmentGenerator.";
-	if (testGenMode == TG_JAVACARD) {
+	assert (testGenMode == TG_USE_SETGET || testGenMode == TG_USE_REFL) : "Unhandled case in AssignmentGenerator.";
+	if (testGenMode == TG_USE_SETGET) {
 	    return new JavaCardTestGenerator(serv, fileName, directory,
 		    testing, ag, gui);
 	} else {

@@ -68,6 +68,14 @@ public class UnitTestBuilder {
 
     // iff true only terminated traces are considered for test case generation
     public static boolean requireCompleteExecution = false;
+    
+    /**The field determines which node to select for the path condition.
+     * When generating tests for a proof branch, a program trace is computed on that branch.
+     * If this field is false, then the original implementation from Christian Engel is used
+     * where the last node on the trace is used as path condition. If this field
+     * is true, then the node selected by the user (possibly end-node of the proof branch)
+     * will be used as path condition. */
+    public static boolean allowNonTraceNodeAsPathCond = false; 
 
     protected final Namespace pvn;
 
@@ -310,13 +318,17 @@ public class UnitTestBuilder {
 		}
 	    }//for
 	    if (maxRating != -1) {
-		Node pathConditionNode = tr[maxRating].getLastTraceElement().node();
+		Node pathConditionNode = null;
+		if(!allowNonTraceNodeAsPathCond){
+		    pathConditionNode = tr[maxRating].getLastTraceElement().node();
+		}else{
+		    pathConditionNode = originalNode;
+		}
 		createTestForNodes_progressNotification1(tr[maxRating], pathConditionNode, originalNode);
 		mgs.add(getModelGenerator(tr[maxRating].toString(),
 					  pathConditionNode, 
 					  originalNode));
-		nodesAlreadyProcessed.add(tr[maxRating].getLastTraceElement()
-		        .node());
+		nodesAlreadyProcessed.add(tr[maxRating].getLastTraceElement().node());
 	    }
 	}
 	if (methodName == null) {
