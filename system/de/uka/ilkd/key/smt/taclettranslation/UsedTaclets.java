@@ -43,6 +43,14 @@ public final class UsedTaclets {
     static final private String testTaclets[] = {// "identical_object_equal_index"
 
     };
+    
+    /**
+     * 
+     * @return returns the number of taclets that are supported.
+     */
+    static public int getCount(){
+	return taclets.size();
+    }
 
     /**
      * Checks whether a taclet specified by its name can be used for external
@@ -53,7 +61,7 @@ public final class UsedTaclets {
      * @return <code>true</code> if the taclet can be used for external provers.
      */
     static boolean contains(String tacletname) {
-
+	
 	getTreeModel();
 
 	boolean found = false;
@@ -204,7 +212,9 @@ public final class UsedTaclets {
 	addTaclet(node8, "boolean_is_no_int");
 	addTaclet(node8, "int_is_no_boolean");
 	addTaclet(node8, "repository_object_non_null");
-	// usedTaclets.add("all_integer_sorts_are_equals");
+	addTaclet(node8, "nextToCreate_non_negative");
+	addTaclet(node8,"nextToCreate_non_negative_2");
+	
 
 	// usedTaclets.add("only_created_object_are_referenced");
 	DefaultMutableTreeNode node9 = newNode(node6, "exact instance rules");
@@ -252,6 +262,11 @@ public final class UsedTaclets {
 	addTaclet(node14, "created_add_known_index_in_bounds");
 	addTaclet(node14, "created_add_known_index_in_bounds_sym");
 	addTaclet(node14, "created_add_known_index_in_bounds_2");
+	addTaclet(node14, "objects_with_index_geq_next_to_create_are_not_created");
+	addTaclet(node14, "objects_with_index_greater_next_to_create_are_not_createdsystem_invariant_for_created_2a_automated_use_3");
+	
+	
+	
 
 	DefaultMutableTreeNode node15 = newNode(node6, "array length");
 	addTaclet(node15, "array_length_non_negative");
@@ -259,8 +274,18 @@ public final class UsedTaclets {
 	addTaclet(node15, "array_length_non_negative_3");
 	addTaclet(node15, "array_length_short_javacard");
 
-	DefaultMutableTreeNode node16 = newNode(node6, "testing");
+	DefaultMutableTreeNode node16 = newNode(node6, "class initialisation");
 	addTaclet(node16, "class_being_initialized_is_prepared");
+	addTaclet(node16, "initialized_class_is_prepared");
+	addTaclet(node16, "initialized_class_is_not_erroneous");
+	addTaclet(node16, "class_initialized_excludes_class_init_in_progress");
+	addTaclet(node16, "class_erroneous_excludes_class_in_init");
+	addTaclet(node16, "erroneous_class_has_no_initialized_sub_class");
+	addTaclet(node16, "superclasses_of_initialized_classes_are_initialized");
+	addTaclet(node16, "superclasses_of_initialized_classes_are_initialized_2");
+	
+	
+	
 
 	// usedTaclets.add("nextToCreate_non_negative");
 

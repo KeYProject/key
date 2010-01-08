@@ -114,7 +114,7 @@ public final class DefaultTacletSetTranslation
 
     public ImmutableList<TacletFormula> getTranslation(ImmutableSet<Sort> sorts, 
 	    ImmutableSet<Term> attributeTerms) {
-
+	
 	// only translate once a time.
 	if (!translate)
 	    return translation;
@@ -298,12 +298,12 @@ public final class DefaultTacletSetTranslation
 
     public boolean eventInstantiationFailure(GenericSort dest, Sort sort,
             Taclet t, Term term) {
-	String s = "";
+	/*String s = "";
 	s += "taclet: " + t.name()+"\n";
 	s += "term: " + term +"\n"; 
 	s += "generic sort: " + dest + "\n";
 	s += "sort: "+ sort +"\n";
-	instantiationFailures = instantiationFailures.append(s);
+	instantiationFailures = instantiationFailures.append(s);*/
 	return quitInstantiationFailuresWithException ;
     }
 

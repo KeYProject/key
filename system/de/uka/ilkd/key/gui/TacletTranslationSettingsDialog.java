@@ -38,6 +38,7 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.JTree;
 import javax.swing.UIManager;
+import javax.swing.GroupLayout.Alignment;
 import javax.swing.border.Border;
 import javax.swing.event.CellEditorListener;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -93,38 +94,56 @@ public class TacletTranslationSettingsDialog extends JDialog implements
 
 	// Options
 
-	optionsPanel.setLayout(new BorderLayout());
+	//optionsPanel.setLayout(new BoxLayout(optionsPanel,BoxLayout.Y_AXIS));
 
-	optionsPanel.add(translatingOptions, BorderLayout.NORTH);
+	optionsPanel.add(translatingOptions);
 	translatingOptions.setBorder(BorderFactory
 	        .createTitledBorder("Translation:"));
 	translatingOptions.add(maxGenericField);
 
-	optionsPanel.add(saveFilePanel, BorderLayout.CENTER);
+	optionsPanel.add(saveFilePanel);
 
 	saveFilePanel.setLayout(new BoxLayout(saveFilePanel, BoxLayout.Y_AXIS));
 
 	saveFilePanel.setBorder(BorderFactory
 	        .createTitledBorder("Save to file:"));
 
-	setSize(saveToFileField, new Dimension(200, 30));
+	setSize(saveToFileBox, new Dimension(200, 20));
+	setSize(saveToFileField, new Dimension(200, 20));
 	Box b = Box.createVerticalBox();
-	b.add(saveToFileBox);
-	b.add(saveToFileField);
+	
+	Box b2 = Box.createHorizontalBox();
+	b2.add(saveToFileField);
+	b2.add(Box.createHorizontalStrut(10));
+	b2.add(new JButton("choose"));
+	
+
+	
+	
+	b.add(b2);
+	b2 = Box.createHorizontalBox();
+	b2.add(new JButton("adsads"));
+	b2.setAlignmentX(LEFT_ALIGNMENT);
+	b.add(Box.createVerticalStrut(10));
+	saveToFileBox.setAlignmentX(LEFT_ALIGNMENT);
+	//b.add(saveToFileBox);
+	saveFilePanel.setAlignmentX(LEFT_ALIGNMENT);
+	
 
 	saveFilePanel.add(b);
+	saveFilePanel.add(saveToFileBox);
 
 	southPanel.add(new JCheckBox(
 	        "Show this dialog every time using an external prover."));
 
-	this.getContentPane().add(tabbedPane, BorderLayout.CENTER);
-	this.getContentPane().add(southPanel, BorderLayout.PAGE_END);
+	this.getContentPane().add(tabbedPane);
+	//this.getContentPane().add(southPanel, BorderLayout.PAGE_END);
 
 	tree.setCellRenderer(new NodeRenderer());
 	tree.setCellEditor(this);
 	tree.setEditable(true);
 
-	tabbedPane.addTab("Taclet selection", selectionPane);
+	tabbedPane.addTab("taclets"+ " ("+UsedTaclets.getCount()+")", selectionPane);
 	tabbedPane.addTab("options", optionsPanel);
 
 	selectionBorderColor = UIManager.getColor("Tree.selectionBorderColor");
@@ -273,7 +292,7 @@ class SelectionPanel extends JPanel {
 	    public void mouseClicked(MouseEvent e) {
 		title.setSelected(true);
 		select(currentNode, true);
-
+		setSelectedToRoot(currentNode);
 		parentSelection(currentNode, title.isSelected());
 		tree.repaint();
 	    }

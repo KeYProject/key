@@ -10,7 +10,9 @@
 package de.uka.ilkd.key.smt.taclettranslation;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
+import java.util.LinkedList;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
@@ -36,6 +38,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.logic.sort.SortDefiningSymbols;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.rule.conditions.TypeComparisionCondition;
 
 class GenericTranslator {
 
@@ -59,15 +62,18 @@ class GenericTranslator {
      * @return
      * @throws IllegalTacletException
      */
-    public Term translate(Term term, ImmutableSet<Sort> sorts, Taclet t,
+    public Collection<Term> translate(Term term, ImmutableSet<Sort> sorts, Taclet t,
 	    TacletConditions conditions, Services services, int maxGeneric)
 	    throws IllegalTacletException {
 	this.services = services;
 	ImmutableList<Term> list = instantiateGeneric(term,
 	        collectGenerics(term), sorts, t, conditions, maxGeneric);
-
-	if (list == null)
-	    return term;
+	Collection<Term> result = new LinkedList<Term>();
+	if (list == null){
+	    result.add(term);
+	    return result;
+	}
+	    
 
 	if (list.isEmpty()) {
 	    throw new IllegalTacletException(
@@ -75,22 +81,18 @@ class GenericTranslator {
 		            + " because there are not enough different sorts.");
 	}
 
-	// quantify the term
-	ImmutableList<Term> genericTermsQuantified = ImmutableSLList.nil();
+	
 	if (list.size() > 0) {
 	    for (Term gt : list) {
-		genericTermsQuantified = genericTermsQuantified
-		        .append(AbstractTacletTranslator.quantifyTerm(gt));
+		result.add(AbstractTacletTranslator.quantifyTerm(gt));
 
 	    }
 	    if (appendGenericTerm) {
-		genericTermsQuantified = genericTermsQuantified.append(term);
+		result.add(term);
 	    }
-	    term = TermBuilder.DF.and(genericTermsQuantified);
-
 	}
 
-	return term;
+	return result;
 
 	// return
 	// instantiateGeneric(term,collectGenerics(term),sorts,t,conditions);
@@ -395,10 +397,10 @@ class GenericTranslator {
 	}
 	instTable = instSorts.toArray(instTable);
 
-	byte[][] referenceTable = generateReferenceTable(instSorts.size(),
+	byte[][] referenceTable = AbstractTacletTranslator.generateReferenceTable(instSorts.size(),
 	        genericSorts.size());
 
-	check(referenceTable, instTable, genericTable, conditions);
+	AbstractTacletTranslator.checkTable(referenceTable, instTable, genericTable, conditions);
 
 	for (int r = 0; r < referenceTable.length; r++) {
 	    Term temp = null;
@@ -438,85 +440,9 @@ class GenericTranslator {
 
     }
 
-    /**
-     * Checks the referenceTable whether there are rows that are not allowed.
-     * For example: the notSame-Condition is hurted.
-     * 
-     * @param referenceTable
-     * @param r
-     * @param instTable
-     * @param genericTable
-     */
-    private void check(byte[][] referenceTable, Sort[] instTable,
-	    GenericSort[] genericTable, TacletConditions conditions) {
+ 
 
-	for (int r = 0; r < referenceTable.length; r++) {
-	    for (int c = 0; c < referenceTable[r].length; c++) {
-		int index = referenceTable[r][c];
-		if (referenceTable[r][0] == -1)
-		    break;
 
-		if ((conditions.containsIsReferenceCondition(genericTable[c]) > 0 && !AbstractTacletTranslator
-		        .isReferenceSort(instTable[index]))
-		        || (conditions
-		                .containsAbstractInterfaceCondition(genericTable[c]) && !AbstractTacletTranslator
-		                .isAbstractOrInterface(instTable[index]))
-		        || (conditions
-		                .containsNotAbstractInterfaceCondition(genericTable[c]) && AbstractTacletTranslator
-		                .isAbstractOrInterface(instTable[index])))
-
-		{
-		    referenceTable[r][0] = -1;
-		    break;
-
-		}
-		for (int c2 = c + 1; c2 < referenceTable[r].length; c2++) {
-		    int index2 = referenceTable[r][c2]; // not same
-		    if ((conditions.containsNotSameCondition(genericTable[c],
-			    genericTable[c2]) && instTable[index]
-			    .equals(instTable[index2]))
-			    || // 
-			    (genericTable[c].extendsTrans(genericTable[c2]) && !instTable[index]
-			            .extendsTrans(instTable[index2]))
-
-		    ) {
-			referenceTable[r][0] = -1;
-			break;
-		    }
-
-		}
-
-	    }
-	}
-
-    }
-
-    private byte[][] generateReferenceTable(int instSize, int genSize) {
-
-	int colCount = genSize;
-	int rowCount = (int) Math.pow(instSize, genSize);
-	byte max = (byte) ((byte) instSize - 1);
-
-	byte table[][] = new byte[rowCount][colCount];
-
-	for (int r = 1; r < rowCount; r++) {
-	    int temp = 1;
-	    for (int c = 0; c < colCount; c++) {
-		byte newVal = (byte) (table[r - 1][c] + temp);
-		if (newVal > max) {
-		    newVal = 0;
-		    temp = 1;
-		} else {
-		    temp = 0;
-		}
-		table[r][c] = newVal;
-
-	    }
-
-	}
-
-	return table;
-    }
 
     private HashSet<GenericSort> collectGenerics(Term term) {
 	HashSet<GenericSort> genericSorts = new HashSet<GenericSort>();

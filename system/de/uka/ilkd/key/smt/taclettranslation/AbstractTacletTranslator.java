@@ -111,6 +111,7 @@ abstract class AbstractTacletTranslator implements TacletTranslator,
     private Services services;
 
     private GenericTranslator genericTranslator = new GenericTranslator(this);
+    private ProgramSVTranslator programSVTranslator = new ProgramSVTranslator();
 
     private int maxGeneric = 4;
 
@@ -161,16 +162,36 @@ abstract class AbstractTacletTranslator implements TacletTranslator,
 	term = rebuildTerm(term);
 	// translate attributes
 
-	ImmutableSet<Term> result = AttributeTranslator.DEFAULT.translate(t,
+	Collection<Term> result = new LinkedList<Term>();
+	result.add(term);
+	
+	
+	ImmutableSet<Term> tempResult = AttributeTranslator.DEFAULT.translate(t,
 	        term, attributeTerms, services, conditions);
 
-	if (!result.isEmpty()) {
-	    Term[] array = new Term[result.size()];
-	    result.toArray(array);
-	    term = TermBuilder.DF.tt();
-	    for (Term tmp : result) {
+	if(!tempResult.isEmpty()){
+	    result = new LinkedList<Term>();
+	    for (Term tmp : tempResult) {
 		if (checkForNotInstantiatedAttributes(tmp)) {
-		    term = TermBuilder.DF.and(term, tmp);
+		    result.add(tmp);		
+		}
+	
+	    }
+	    if (result.isEmpty()) {
+		throw new IllegalTacletException(
+		        "There are some program schema"
+		                + " variables that can not be translated.");
+	    }
+	}
+	
+	/*if (!tempResult.isEmpty()) {
+	    Term[] array = new Term[tempResult.size()];
+	    tempResult.toArray(array);
+	    term = TermBuilder.DF.tt();
+	    for (Term tmp : tempResult) {
+		if (checkForNotInstantiatedAttributes(tmp)) {
+		    result.add
+		    //term = TermBuilder.DF.and(term, tmp);
 		}
 	    }
 	    if (term.equals(TermBuilder.DF.tt())) {
@@ -179,28 +200,67 @@ abstract class AbstractTacletTranslator implements TacletTranslator,
 		                + " variables that can not be translated.");
 	    }
 
+	}*/
+	
+	Collection<Sort> temp = new LinkedList<Sort>();
+	
+	for(Sort sort: sorts){
+	    if(sort instanceof ObjectSort){
+		temp.add(sort);
+	    }
 	}
+
+	Collection<Term> res = new LinkedList();
+	for(Term te : result){
+		res.addAll(programSVTranslator.translate(te,temp.toArray(new Sort[temp.size()]),
+			    services,conditions));   
+	}
+
+	if(!res.isEmpty()){
+	    result = new LinkedList<Term>();
+	    for(Term te : res){
+		result.add(te);
+	    }
+	
+	}
+
+	
+	Collection<Term> result2 = new LinkedList<Term>();
 	// sixth step: quantify all free variables.
-	term = quantifyTerm(term);
+	for(Term te : result){
+	    te = quantifyTerm(te);
+	    result2.add(te);
+	}
+	
+	
+	
+	
 
 	// seventh step: translate the generics sorts.
-
-	term = genericTranslator.translate(term, sorts, t, conditions,
-	        services, maxGeneric);
-
-	if (!checkForNotInstantiatedAttributes(term)) {
-	    throw new IllegalTacletException(
-		    "There are some program schema "
-		            + "variables that can not be translated.\n /*The result: "
-		            + LogicPrinter.quickPrintTerm(term, services)
-		            + "\n"
-		            + "Normally there are not enough attribute terms to instantiate"
-		            + "the taclet.*/");
+	result = new LinkedList<Term>();
+	for(Term te : result2){
+	    result.addAll(genericTranslator.translate(te, sorts, t, conditions,
+	        services, maxGeneric));
+	}
+	
+	result2 = new LinkedList<Term>();
+	for(Term te: result){
+		if (!checkForNotInstantiatedAttributes(te)) {
+		    throw new IllegalTacletException(
+			    "There are some program schema "
+			            + "variables that can not be translated.\n /*The result: "
+			            + LogicPrinter.quickPrintTerm(te, services)
+			            + "\n"
+			            + "Normally there are not enough attribute terms to instantiate"
+			            + "the taclet.*/");
+		}
+		result2.add(translateRemainingNextToCreateAndCreates(te));
 	}
 
-	term = translateRemainingNextToCreateAndCreates(term);
 
-	TacletFormula tf = new DefaultTacletFormula(t, term, "", conditions);
+	
+
+	TacletFormula tf = new DefaultTacletFormula(t, result2, "", conditions);
 	return tf;
     }
 
@@ -264,6 +324,10 @@ abstract class AbstractTacletTranslator implements TacletTranslator,
 		    || op.sort().equals(ProgramSVSort.ARRAYLENGTH)) {
 		return false;
 	    }
+	}
+	
+	if(term.op() instanceof ProgramSV){
+	    return false;
 	}
 
 	for (int i = 0; i < term.arity(); i++) {
@@ -562,6 +626,116 @@ abstract class AbstractTacletTranslator implements TacletTranslator,
 	}
 	return false;
     }
+    
+    /**
+     * Creates an array containing objectCount^bucketCount rows. Each of this
+     * rows has bucketCount columns. 
+     * The method enumerates all possible variations of putting
+     *  <code>objectCount</code> different objects into <code>bucketCount</code>
+     *  buckets.<br>
+     *  Example<br>
+     * For <code>objects= 2</code> and <code>bucket =3</code> the method 
+     * returns:<br>
+     * 000<br>
+     * 001<br>
+     * 010<br>
+     * 011<br>
+     * 100<br>
+     * 101<br>
+     * 110<br>
+     * 111<br>
+     * @param objectCount  the number of objects.
+     * @param bucketCount  the number of buckets.
+     * @return an array of dimension objectCount^bucketCount x bucketCount
+     */
+    static public byte[][] generateReferenceTable(int objectCount, int bucketCount) {
+
+	int colCount = bucketCount;
+	int rowCount = (int) Math.pow(objectCount, bucketCount);
+	byte max = (byte) ((byte) objectCount - 1);
+
+	byte table[][] = new byte[rowCount][colCount];
+
+	for (int r = 1; r < rowCount; r++) {
+	    int temp = 1;
+	    for (int c = 0; c < colCount; c++) {
+		byte newVal = (byte) (table[r - 1][c] + temp);
+		if (newVal > max) {
+		    newVal = 0;
+		    temp = 1;
+		} else {
+		    temp = 0;
+		}
+		table[r][c] = newVal;
+
+	    }
+
+	}
+
+	return table;
+    }
+    
+    
+    /**
+     * Checks the referenceTable whether there are rows that are not allowed.
+     * For example: the notSame-Condition is hurted.
+     * 
+     * @param referenceTable
+     * @param r
+     * @param instTable
+     * @param genericTable
+     */
+    static public void checkTable(byte[][] referenceTable, Sort[] instTable,
+	    Sort[] genericTable, TacletConditions conditions) {
+
+	for (int r = 0; r < referenceTable.length; r++) {
+	    for (int c = 0; c < referenceTable[r].length; c++) {
+		int index = referenceTable[r][c];
+		if (referenceTable[r][0] == -1)
+		    break;
+
+		if ((conditions.containsIsReferenceCondition(genericTable[c]) > 0 
+			&& !isReferenceSort(instTable[index]))
+		        || (conditions
+		                .containsAbstractInterfaceCondition(genericTable[c]) && 
+		                !isAbstractOrInterface(instTable[index]))
+		        || (conditions
+		                .containsNotAbstractInterfaceCondition(genericTable[c]) &&
+		                 isAbstractOrInterface(instTable[index])))
+
+		{
+		    referenceTable[r][0] = -1;
+		    break;
+
+		}
+		for (int c2 = c + 1; c2 < referenceTable[r].length; c2++) {
+		    int index2 = referenceTable[r][c2]; // not same
+		    if ((conditions.containsNotSameCondition(genericTable[c],
+			    genericTable[c2]) && instTable[index]
+			    .equals(instTable[index2]))
+			    || // 
+			    (genericTable[c].extendsTrans(genericTable[c2]) && !instTable[index]
+			            .extendsTrans(instTable[index2]))
+			    || (conditions.containsComparisionCondition(
+			            genericTable[c], genericTable[c2],
+			            TypeComparisionCondition.SAME) && !instTable[index]
+			            .equals(instTable[index2]))
+			    || (conditions.containsComparisionCondition(
+			            genericTable[c], genericTable[c2],
+			            TypeComparisionCondition.IS_SUBTYPE) && !instTable[index]
+			            .extendsTrans(instTable[index2]))
+
+		    ) {
+			referenceTable[r][0] = -1;
+			break;
+		    }
+
+		}
+
+	    }
+	}
+
+    }
 
     /**
      * Quantifies a term, i.d. every free variable is bounded by a allquantor.
@@ -576,7 +750,7 @@ abstract class AbstractTacletTranslator implements TacletTranslator,
 
 	for (QuantifiableVariable qv : term.freeVars()) {
 	    // if(!term.sort().equals(Sort.FORMULA)){
-	    if (!(qv instanceof LogicVariable)) {
+	    if (!(qv instanceof LogicVariable) && !(qv instanceof ProgramSV)) {
 		throw new IllegalTacletException(
 		        "Error of translation: "
 		                + "There is a free variable that is not of type LogicVariable: "
@@ -697,14 +871,26 @@ abstract class AbstractTacletTranslator implements TacletTranslator,
     }
 
     static public Term createNextToCreateTerm(ObjectSort sort, Services services) {
-	JavaInfo javaInfo = services.getJavaInfo();
+	/*JavaInfo javaInfo = services.getJavaInfo();
 	// javaInfo.getKeYJavaType(term)
 	ProgramVariable createdAttribute = javaInfo.getAttribute(
 	        ImplicitFieldAdder.IMPLICIT_NEXT_TO_CREATE, sort);
 
 	Term createdTerm = TermFactory.DEFAULT
 	        .createVariableTerm(createdAttribute);
+	return createdTerm;*/
+	return createVariableTerm(sort, ImplicitFieldAdder.IMPLICIT_NEXT_TO_CREATE, services);
+    }
+    
+    static public Term createVariableTerm(ObjectSort sort,String field,Services services){
+	JavaInfo javaInfo = services.getJavaInfo();
+	// javaInfo.getKeYJavaType(term)
+	ProgramVariable createdAttribute = javaInfo.getAttribute(field, sort);
+
+	Term createdTerm = TermFactory.DEFAULT
+	        .createVariableTerm(createdAttribute);
 	return createdTerm;
+	
     }
 
     /**
@@ -720,6 +906,7 @@ abstract class AbstractTacletTranslator implements TacletTranslator,
 	TermBuilder tb = TermBuilder.DF;
 
 	if (term.op() instanceof SortedSchemaVariable) {
+	    SortedSchemaVariable ssv = (SortedSchemaVariable)term.op();
 
 	    if (term.sort().equals(Sort.FORMULA)) {
 
@@ -727,7 +914,7 @@ abstract class AbstractTacletTranslator implements TacletTranslator,
 		// tb.var(getLogicVariable(term.op().name(),Sort.FORMULA));
 		// term =
 		// tb.var(getLogicVariable(term.op().name(),term.sort()));
-	    } else // if(!(term.sort() instanceof GenericSort))
+	    } else if(!ssv.isProgramSV())
 	    {
 		term = tb.var(getLogicVariable(term.op().name(), term.sort()));
 
