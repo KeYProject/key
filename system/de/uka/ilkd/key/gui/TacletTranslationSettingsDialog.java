@@ -88,7 +88,7 @@ public class TacletTranslationSettingsDialog{
 	private JTree selectionTree = null;
 	private JPanel selectionInfo = null;
 	private JScrollPane scrollPane = null;
-	private JTextArea      infoLabel = null;
+	private JLabel      infoLabel = null;
 	/**
 	 * This method initializes optionsDialog	
 	 * 	
@@ -146,19 +146,22 @@ public class TacletTranslationSettingsDialog{
 			gridBagConstraints10.fill = GridBagConstraints.VERTICAL;
 			gridBagConstraints10.weightx = 0.0;
 			gridBagConstraints10.weighty = 0.0;
-			gridBagConstraints10.ipadx = 200;
+			gridBagConstraints10.ipadx = 100;
 			gridBagConstraints10.anchor = GridBagConstraints.NORTHEAST;
 			gridBagConstraints10.gridy = 0;
 			GridBagConstraints gridBagConstraints9 = new GridBagConstraints();
 			gridBagConstraints9.fill = GridBagConstraints.BOTH;
+			gridBagConstraints9.anchor = GridBagConstraints.NORTHWEST;
 			gridBagConstraints9.gridy = 0;
 			gridBagConstraints9.weightx = 1.0;
 			gridBagConstraints9.weighty = 1.0;
+			gridBagConstraints9.ipadx =100;
 			gridBagConstraints9.gridx = 0;
 			selectionPanel = new JPanel();
 			selectionPanel.setLayout(new GridBagLayout());
 			selectionPanel.add(getScrollPane(), gridBagConstraints9);
 			selectionPanel.add(getSelectionInfo(), gridBagConstraints10);
+		
 		}
 		return selectionPanel;
 	}
@@ -428,28 +431,32 @@ public class TacletTranslationSettingsDialog{
 		if (selectionInfo == null) {
 		      GridBagConstraints gridBagConstraints = new GridBagConstraints();
 		   
-			gridBagConstraints.gridx = 100;
-			gridBagConstraints.fill = GridBagConstraints.VERTICAL;
-			
-			gridBagConstraints.weightx = 1.0;
-			gridBagConstraints.weighty = 0.0;
-		
-			gridBagConstraints.anchor = GridBagConstraints.WEST;
+			gridBagConstraints.fill = GridBagConstraints.BOTH;
 			gridBagConstraints.gridy = 0;
+			gridBagConstraints.weightx = 1.0;
+			gridBagConstraints.weighty = 1.0;
+			gridBagConstraints.ipadx = 100;
+			gridBagConstraints.gridx = 1;
+			
 			selectionInfo = new JPanel();
+			
+			
 			selectionInfo.setLayout(new GridBagLayout());
+			//selectionInfo.setLayout(new BorderLayout());
 			selectionInfo.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
+			//selectionInfo.add(getInfoLabel(),BorderLayout.CENTER);
 			//selectionInfo.add(getInfoLabel(),gridBagConstraints);
 		}
 		return selectionInfo;
 	}
 	
-	private JTextArea getInfoLabel(){
+	private JLabel getInfoLabel(){
 	       if(infoLabel == null){
-		   infoLabel=new JTextArea();
-		   infoLabel.setEditable(false);
-		   infoLabel.setLineWrap(true);
-		   infoLabel.setText("Changes in this tab take effect immediately without pressing the OK-button.");
+		   infoLabel=new JLabel();
+		   
+		  // infoLabel.setLineWrap(true);
+		  
+		    infoLabel.setText("<html>Changes in this<br>tab take effect<br>immediately without<br>pressing the OK-button.</html>");
 	       }
 	       return infoLabel;
 	}

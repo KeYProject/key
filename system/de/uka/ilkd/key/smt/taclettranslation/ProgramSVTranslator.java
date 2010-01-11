@@ -35,6 +35,17 @@ import de.uka.ilkd.key.logic.sort.Sort;
  */
 class ProgramSVTranslator {
     
+    /**
+     * Translates all supported program schema variables by instantiating
+     * them with instSorts.
+     * @param term the term to translate
+     * @param instSorts the sorts, that are used for the instantiation.
+     * @param services 
+     * @param conditions the conditions of the taclet the term belongs to. 
+     * @return A collection of instantiated terms. If there are to less instantiation sorts
+     * the collection is empty.
+     * @throws IllegalTacletException
+     */
     public Collection<Term> translate(Term term,Sort [] instSorts
 	    ,Services services,TacletConditions conditions) 
 	    throws IllegalTacletException{
@@ -47,6 +58,15 @@ class ProgramSVTranslator {
     }
     
     
+    /**
+     * Instantiates all program schema variables.
+     * @param term
+     * @param instSorts
+     * @param services
+     * @param conditions
+     * @return the
+     * @throws IllegalTacletException
+     */
     private Collection<Term> instantiateVariables(Term term,
 	    Sort [] instSorts, Services services,TacletConditions conditions)
 	    throws IllegalTacletException{
@@ -138,29 +158,13 @@ class ProgramSVTranslator {
 	return term;
     }
     
-    
-    private void check(byte[][] referenceTable, Sort[] instTable,
-	    Term [] programSV, TacletConditions conditions) {
-
-	for (int r = 0; r < referenceTable.length; r++) {
-	    for (int c = 0; c < referenceTable[r].length; c++) {
-		int index = referenceTable[r][c];
-		if (referenceTable[r][0] == -1)
-		    break;
-
-	
-		for (int c2 = c + 1; c2 < referenceTable[r].length; c2++) {
-		    int index2 = referenceTable[r][c2]; 
-		
-
-		}
-
-	    }
-	}
-
-    }
-
-
+   
+    /**
+     * Collects all program schema variables in the given term 
+     * <code>source</code>.
+     * @param source
+     * @return Collection filled with program schema variables.
+     */
     private Term[] collectProgramSV(Term source){
 	Collection<Term> result = new HashSet<Term>();
 	collectProgramSV(source, result);
@@ -169,6 +173,12 @@ class ProgramSVTranslator {
 	return result.toArray(temp);
     }
     
+    /**
+     * 
+     * @param term
+     * @return true if the term is a program schema variable and this
+     * variable is supported.
+     */    
     private boolean isSupportedProgramsSV(Term term){
 	if(term.op() instanceof ProgramSV){
 	    ProgramSV sv = (ProgramSV)term.op();

@@ -69,6 +69,10 @@ public final class DefaultTacletSetTranslation
     
     private ImmutableSet<Sort> usedFormulaSorts = DefaultImmutableSet.nil();
     
+    
+    /**
+     * Attribute terms that have been used in the proof.
+     */
     private ImmutableSet<Term> usedAttributeTerms = DefaultImmutableSet.nil();
     
     /**

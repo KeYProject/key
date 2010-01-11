@@ -194,20 +194,7 @@ class GenericTranslator {
 		term = TermBuilder.DF.ex(copy, subTerms[0]);
 	    }
 
-	}/*
-	  * else if(AbstractTacletTranslator.isCreatedTerm(term, services)&&
-	  * !(term.sub(0).sort() instanceof GenericSort) ){ term=
-	  * AbstractTacletTranslator.createCreatedTerm(term.sub(0), services);
-	  * }else if(AbstractTacletTranslator.isNextToCreateTerm(term) &&
-	  * !(term.sub(0).sort() instanceof GenericSort) ){
-	  * if(!(term.sub(0).sort() instanceof ObjectSort)){
-	  * 
-	  * }
-	  * 
-	  * term.sub(0).sort(); term =
-	  * AbstractTacletTranslator.createNextToCreateTerm
-	  * ((ObjectSort)term.sub(0).sort(), services); }
-	  */else {
+	}else {
 	    term = TermFactory.DEFAULT.createTerm(term.op(), subTerms,
 		    variables, JavaBlock.EMPTY_JAVABLOCK);
 	}

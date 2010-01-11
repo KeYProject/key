@@ -100,8 +100,7 @@ abstract class AbstractTacletTranslator implements TacletTranslator,
     protected final static TermFactory tf = TermFactory.DEFAULT;
 
     protected HashMap<String, LogicVariable> usedVariables = new HashMap<String, LogicVariable>();
-    // protected HashMap<String, VariableSV> usedSchemaVariables = new
-    // HashMap<String, VariableSV>();
+
 
     private HashSet<GenericSort> usedGenericSorts = new HashSet<GenericSort>();
 
@@ -120,26 +119,6 @@ abstract class AbstractTacletTranslator implements TacletTranslator,
 
     }
 
-    private boolean isCreatedTerm(Term term) {
-	if (term.op() instanceof MetaCreated) {
-	    return true;
-	}
-	if (term.op() instanceof AttributeOp) {
-	    AttributeOp op = (AttributeOp) term.op();
-	    if (op.sort().equals(ProgramSVSort.IMPLICITCREATED)) {
-		return true;
-	    }
-	    final KeYJavaType objectKJT = services.getJavaInfo()
-		    .getJavaLangObject();
-	    if (op.attribute().equals(
-		    services.getJavaInfo().getAttribute(
-		            ImplicitFieldAdder.IMPLICIT_CREATED, objectKJT))) {
-		return true;
-	    }
-
-	}
-	return false;
-    }
 
     public TacletFormula translate(Taclet t, ImmutableSet<Sort> sorts,
 	    ImmutableSet<Term> attributeTerms) throws IllegalTacletException {
@@ -184,23 +163,7 @@ abstract class AbstractTacletTranslator implements TacletTranslator,
 	    }
 	}
 	
-	/*if (!tempResult.isEmpty()) {
-	    Term[] array = new Term[tempResult.size()];
-	    tempResult.toArray(array);
-	    term = TermBuilder.DF.tt();
-	    for (Term tmp : tempResult) {
-		if (checkForNotInstantiatedAttributes(tmp)) {
-		    result.add
-		    //term = TermBuilder.DF.and(term, tmp);
-		}
-	    }
-	    if (term.equals(TermBuilder.DF.tt())) {
-		throw new IllegalTacletException(
-		        "There are some program schema"
-		                + " variables that can not be translated.");
-	    }
 
-	}*/
 	
 	Collection<Sort> temp = new LinkedList<Sort>();
 	
@@ -210,7 +173,7 @@ abstract class AbstractTacletTranslator implements TacletTranslator,
 	    }
 	}
 
-	Collection<Term> res = new LinkedList();
+	Collection<Term> res = new LinkedList<Term>();
 	for(Term te : result){
 		res.addAll(programSVTranslator.translate(te,temp.toArray(new Sort[temp.size()]),
 			    services,conditions));   
@@ -264,6 +227,14 @@ abstract class AbstractTacletTranslator implements TacletTranslator,
 	return tf;
     }
 
+    /**
+     * Not every #create and #nextToCreate is translated by the Attribute translator.
+     * This method does this translation.
+     * @param term
+     * @return returns the new term where all #created and #nextToCreate
+     * are translated.
+     * @throws IllegalTacletException
+     */
     private Term translateRemainingNextToCreateAndCreates(Term term)
 	    throws IllegalTacletException {
 	ImmutableArray<QuantifiableVariable> variables[] = new ImmutableArray[term
@@ -409,10 +380,6 @@ abstract class AbstractTacletTranslator implements TacletTranslator,
 	    }
 	}
 
-	/*
-	 * if (t.varsNotFreeIn().hasNext()) { throw new IllegalTacletException(
-	 * "The taclet has \\notFreeIn conditions."); }
-	 */
 
 	// Check for addrules, they are in general not allowed.
 	checkGoalTemplates(t);
