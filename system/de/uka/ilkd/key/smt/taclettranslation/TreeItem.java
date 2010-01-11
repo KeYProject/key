@@ -12,8 +12,8 @@ package de.uka.ilkd.key.smt.taclettranslation;
 
 public class TreeItem {
     private String text;
-    private boolean checked = true;
-    private boolean parentSelected = true;
+    private boolean checked = false;
+    private boolean parentSelected = false;
     /**
      * Counts how many childs are checked 
      */

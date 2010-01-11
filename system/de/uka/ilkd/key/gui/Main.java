@@ -1665,7 +1665,7 @@ public class Main extends JFrame implements IMain {
 		});
 	decProcOptions.add(saveTacletTranslation);
 	
-	showTacletTranslationSettings = new JCheckBoxMenuItem("settings for taclet translation");
+	showTacletTranslationSettings = new JMenuItem("settings for taclet translation");
 	showTacletTranslationSettings.addActionListener(new ActionListener() {
 		   public void actionPerformed(ActionEvent e) {
 		       TacletTranslationSettingsDialog.showDialog();

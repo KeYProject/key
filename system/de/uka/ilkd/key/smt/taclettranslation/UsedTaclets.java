@@ -9,6 +9,7 @@
 //
 package de.uka.ilkd.key.smt.taclettranslation;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 
@@ -51,6 +52,11 @@ public final class UsedTaclets {
     static public int getCount(){
 	return taclets.size();
     }
+    
+    static public Collection<TreeItem> getTreeItems(){
+	getTreeModel();
+	return taclets.values();
+    }
 
     /**
      * Checks whether a taclet specified by its name can be used for external
@@ -80,6 +86,25 @@ public final class UsedTaclets {
 	// return usedTaclets.contains(tacletname);
 
     }
+    
+    public static void validateParentSelection(){
+	TreeModel model = getTreeModel();
+	
+	validateParentSelection((DefaultMutableTreeNode)model.getRoot(),true);
+    }
+    
+    private static void validateParentSelection(DefaultMutableTreeNode node,boolean parentSelected){
+	TreeItem item = (TreeItem) node.getUserObject();
+	item.setParentSelected(parentSelected);
+	if(parentSelected == true){
+	    parentSelected = item.isChecked();
+	  
+	}
+	for(int i=0; i < node.getChildCount(); i++){
+	    validateParentSelection((DefaultMutableTreeNode)node.getChildAt(i),parentSelected);
+	}
+	
+    }
 
     static void addTaclet(DefaultMutableTreeNode node, String taclet) {
 	addTaclet(node, taclet, true);
@@ -107,8 +132,11 @@ public final class UsedTaclets {
 	if (model != null)
 	    return model;
 
-	DefaultMutableTreeNode root = new DefaultMutableTreeNode(new TreeItem(
-	        "All supported taclets"));
+	TreeItem rootItem = new TreeItem(
+        "All supported taclets");
+	rootItem.setParentSelected(true);
+	DefaultMutableTreeNode root = new DefaultMutableTreeNode(rootItem);
+	
 
 	DefaultMutableTreeNode node1 = newNode(root, "proof independent");
 
