@@ -2,7 +2,7 @@ class MyClient {
     
     MyClass mc;
     int i;
-    //@ invariant mc.<inv> && \disjoint(this.*, mc.footprint);
+    //@ invariant mc.\inv && \disjoint(this.*, mc.footprint);
     
     
     //@ assignable \nothing;

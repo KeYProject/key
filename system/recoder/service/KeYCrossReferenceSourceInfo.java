@@ -79,7 +79,7 @@ public class KeYCrossReferenceSourceInfo
 	cfg.getChangeHistory().addChangeHistoryListener(this);
 	
 	//XXX
-	name2primitiveType.put("\\set", new PrimitiveType("\\set", this));
+	name2primitiveType.put("\\locset", new PrimitiveType("\\locset", this));
     }
 
     /**

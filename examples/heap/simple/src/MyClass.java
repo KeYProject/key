@@ -2,12 +2,12 @@ class MyClass {
     int attr;
     int attr2;
 
-    //@ model \set footprint;
+    //@ model \locset footprint;
     //@ represents footprint <- this.*;
     //@ depends footprint: footprint;
        
     //@ invariant attr2 != 0;
-    //@ depends <inv>: footprint;
+    //@ depends \inv: footprint;
 
     //@ assignable \nothing;
     //@ ensures \fresh(footprint);
@@ -19,7 +19,7 @@ class MyClass {
     /*@ normal_behavior
       @   assignable footprint;
       @   ensures \result == i + 27 && attr == \result;
-      @   ensures \newElemsFresh(footprint);
+      @   ensures \new_elems_fresh(footprint);
       @*/
     int add27(int i) {
 	attr = i + 27;
@@ -41,7 +41,7 @@ class MyClass {
 	if(attr2 == 358) {
 	    throw new RuntimeException();
 	}
-        /*@ loop_invariant 0 <= i && i <= 3 && (i > 0 ==> attr == 27) && <inv>;
+        /*@ loop_invariant 0 <= i && i <= 3 && (i > 0 ==> attr == 27) && \inv;
           @ assignable footprint;
           @*/
         for(int i = 0; i < 3; i++) {

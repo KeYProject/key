@@ -13,7 +13,7 @@ class Stack {
 
     /*@ assignable footprint;
       @ ensures size() == \old(size()) + 1;
-      @ ensures \newElemsFresh(footprint);
+      @ ensures \new_elems_fresh(footprint);
       @*/
     void push(/*@nullable@*/ Object o) {
 	contents.add(o);
@@ -29,26 +29,26 @@ class Stack {
     }
     
     
-    /*@ depends <inv>: footprint;
-      @ invariant contents.<inv>;
+    /*@ depends \inv: footprint;
+      @ invariant contents.\inv;
       @ invariant \disjoint(contents, contents.footprint);
       @*/
     
     
-    /*@ model \set footprint;
+    /*@ model \locset footprint;
       @ depends footprint: footprint;
       @ represents footprint <- contents, contents.footprint;
       @*/
     
     
-    /*@ requires other.<inv>;
+    /*@ requires other.\inv;
       @ requires \disjoint(footprint, other.footprint);
       @ requires \typeof(other) == \type(Stack);
       @ assignable footprint, other.footprint;
-      @ ensures other.<inv>;
+      @ ensures other.\inv;
       @ //ensures size() == \old(other.size()) && other.size() == \old(size());
       @ ensures \disjoint(footprint, other.footprint);
-      @ ensures \newElemsFresh(\setUnion(footprint, other.footprint));
+      @ ensures \new_elems_fresh(\set_union(footprint, other.footprint));
       @*/
     void switchContents(Stack other) {
         ArrayList tmp = contents;

@@ -3,7 +3,7 @@ final class ArrayList implements List {
     private /*@nullable@*/ Object[] array = new Object[10];
     private int size = 0;
     
-    //@ invariant footprint == \setUnion(this.*, array.*);                                      
+    //@ invariant footprint == \set_union(this.*, array.*);                                      
     
     //@ invariant array != null;
     //@ invariant 0 <= size && size <= array.length;
@@ -14,7 +14,7 @@ final class ArrayList implements List {
       @   ensures \fresh(footprint);
       @*/
     public /*@pure@*/ ArrayList() {
-	//@ set footprint = \setUnion(\allFields(this), \allFields(array)); 
+	//@ set footprint = \set_union(\all_fields(this), \all_fields(array)); 
     }
     
     
@@ -35,7 +35,7 @@ final class ArrayList implements List {
 	    newArray[i] = array[i];
 	}
 	array = newArray;
-	//@ set footprint = \setUnion(\allFields(this), \allFields(array));
+	//@ set footprint = \set_union(\all_fields(this), \all_fields(array));
     }
         
 

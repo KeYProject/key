@@ -1,15 +1,15 @@
 final class MySet {
     
-    //@ instance model \set footprint;
+    //@ instance model \locset footprint;
     //@ depends footprint: footprint;
-    //@ depends <inv>: footprint;
+    //@ depends \inv: footprint;
     
     private List list;
        
     //@ represents footprint <- this.*, list.footprint;
 
     
-    /*@ invariant list.<inv> && list.size() >= 0
+    /*@ invariant list.\inv && list.size() >= 0
       @           && \disjoint(list.footprint, this.*)
       @           && (\forall int x, y; 0 <= x && x < list.size() && 0 <= y 
       @                                   && y < list.size() && x != y; 
@@ -27,14 +27,14 @@ final class MySet {
         
     
     /*@ normal_behaviour
-      @   requires initial.<inv> && initial.size() >= 0;
+      @   requires initial.\inv && initial.size() >= 0;
       @   requires \disjoint(initial.footprint, this.*);
       @   requires (\forall int x, y; 0 <= x && x < initial.size() && 0 <= y 
       @                                && y < initial.size() && x != y; 
       @                               initial.get(x) != initial.get(y));
       @   ensures (\forall \nullable Object x; 
       @              contains(x) ==  (\exists int y; 0 <= y && y < initial.size(); initial.get(y) == x));
-      @   ensures \subset(footprint, \setUnion(this.*, initial.footprint));
+      @   ensures \subset(footprint, \set_union(this.*, initial.footprint));
       @*/
     public /*@pure@*/ MySet(List initial) {
 	this.list = initial;
@@ -44,7 +44,7 @@ final class MySet {
     /*@ normal_behaviour
       @   assignable footprint;
       @   ensures (\forall \nullable Object x; contains(x) == (\old(contains(x)) || o == x));
-      @   ensures \newElemsFresh(footprint);      
+      @   ensures \new_elems_fresh(footprint);      
       @*/
     public void add(Object o) {
 	if(!list.contains(o)) {
@@ -54,11 +54,11 @@ final class MySet {
     
     
     /*@ normal_behaviour
-      @   requires l.<inv> && l.size() >= 0;
+      @   requires l.\inv && l.size() >= 0;
       @   requires \disjoint(l.footprint, footprint);      
       @   assignable footprint;
       @   ensures (\forall \nullable Object x; contains(x) == (\old(contains(x)) || l.contains(x)));
-      @   ensures \newElemsFresh(footprint);
+      @   ensures \new_elems_fresh(footprint);
       @*/
     public void addAll(List l) {
 	final ListIterator it = l.iterator();
@@ -83,7 +83,7 @@ final class MySet {
     /*@ normal_behaviour
       @   assignable footprint;
       @   ensures !contains(o);
-      @   ensures \newElemsFresh(footprint);
+      @   ensures \new_elems_fresh(footprint);
       @*/
     public void remove(Object o) {
 	list.remove(o);

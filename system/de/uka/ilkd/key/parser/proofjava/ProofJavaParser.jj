@@ -1941,7 +1941,7 @@ TypeReference PrimitiveType() :
   | "long"
   | "float"
   | "double"
-  | "\\set"
+  | "\\locset"
   )
   {
     Identifier id = factory.createIdentifier(token.image);
@@ -2285,7 +2285,7 @@ Expression Expression() :
         setPrefixInfo(result);
     }
     |
-    "\\setUnion" "(" expr = Expression() "," result = Expression() ")"
+    "\\set_union" "(" expr = Expression() "," result = Expression() ")"
     {
         result = new SetUnion(expr, result);
         setPrefixInfo(result);
@@ -2297,13 +2297,13 @@ Expression Expression() :
         setPrefixInfo(result);
     }
     |
-    "\\setMinus" "(" expr = Expression() "," result = Expression() ")"
+    "\\set_minus" "(" expr = Expression() "," result = Expression() ")"
     {
         result = new SetMinus(expr, result);
         setPrefixInfo(result);
     }
     |
-    "\\allFields" "(" expr = Expression() ")"
+    "\\all_fields" "(" expr = Expression() ")"
     {
         result = new AllFields(expr);
         setPrefixInfo(result);

@@ -947,7 +947,7 @@ public class PrettyPrinter {
     public void printSetUnion(de.uka.ilkd.key.java.expression.operator.SetUnion x) throws java.io.IOException {
         printHeader(x);
         writeInternalIndentation(x);
-        writeToken(0, "\\setUnion", x);
+        writeToken(0, "\\set_union", x);
         write("(");
         writeElement(0, x.getChildAt(0));
         write(",");
@@ -971,7 +971,7 @@ public class PrettyPrinter {
     public void printSetMinus(de.uka.ilkd.key.java.expression.operator.SetMinus x) throws java.io.IOException {
         printHeader(x);
         writeInternalIndentation(x);
-        writeToken(0, "\\setMinus", x);
+        writeToken(0, "\\set_minus", x);
         write("(");
         writeElement(0, x.getChildAt(0));
         write(",");
@@ -983,7 +983,7 @@ public class PrettyPrinter {
     public void printAllFields(de.uka.ilkd.key.java.expression.operator.AllFields x) throws java.io.IOException {
         printHeader(x);
         writeInternalIndentation(x);
-        writeToken(0, "\\allFields", x);
+        writeToken(0, "\\all_fields", x);
         write("(");
         writeElement(0, x.getChildAt(0));
         write(")");

@@ -92,7 +92,7 @@ final class LinkedList implements List {
     
     //interactive proofs:
     //-footprint (apply reachDependenciesChangeHeapAtLocs)
-    //-<inv> (apply reachDependenciesChangeHeapAtLocs)
+    //-\inv (apply reachDependenciesChangeHeapAtLocs)
     
     //not yet verified: 
     //-add

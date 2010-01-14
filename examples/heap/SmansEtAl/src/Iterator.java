@@ -3,7 +3,7 @@ class Iterator {
     private int index;
     
     
-    /*@ requires l.<inv> && l.size() >= 0;
+    /*@ requires l.\inv && l.size() >= 0;
       @ assignable \nothing;
       @ ensures list() == l;
       @ ensures \fresh(footprint);
@@ -16,7 +16,7 @@ class Iterator {
     /*@ requires hasNext();
       @ assignable footprint;
       @ ensures list() == \old(list());
-      @ ensures \newElemsFresh(footprint);
+      @ ensures \new_elems_fresh(footprint);
       @*/
     /*@nullable@*/ Object next() {
 	return list.get(index++);
@@ -41,14 +41,14 @@ class Iterator {
     }
     
     
-    /*@ depends <inv>: footprint, list().footprint;
-      @ invariant list.<inv>;
+    /*@ depends \inv: footprint, list().footprint;
+      @ invariant list.\inv;
       @ invariant 0 <= index && index <= list.size(); 
       @ invariant \disjoint(this.*, list.footprint);
       @*/
     
     
-    /*@ model \set footprint;
+    /*@ model \locset footprint;
       @ depends footprint: footprint;
       @ represents footprint <- list, index;
       @*/    

@@ -1365,6 +1365,7 @@ primaryexpr returns [SLExpression result=null] throws SLTranslationException
 :
 	result=constant
     |   id:IDENT     { result = lookupIdentifier(id.getText(), null, null, id); }
+    |   INV          { result = new SLExpression(TB.inv(services, TB.var(selfVar)));}
     |   TRUE         { result = new SLExpression(TB.tt()); }
     |   FALSE        { result = new SLExpression(TB.ff()); }
     |   NULL         { result = new SLExpression(TB.NULL(services)); }
@@ -1414,6 +1415,11 @@ primarysuffix[SLExpression receiver, String fullyQualifiedName]
     							    javaInfo.getKeYJavaType(selfVar.sort()), 
     							    true),
                 receiver.getType());
+    }
+    |
+    DOT INV
+    {
+        result = new SLExpression(TB.inv(services, receiver.getTerm()));
     }
     |
 	l:LPAREN (params=expressionlist)? RPAREN
@@ -1544,16 +1550,8 @@ jmlprimary returns [SLExpression result=null] throws SLTranslationException
     |   
 	CREATED LPAREN result=expression RPAREN
 	{
-	    if(result.getTerm()
-	             .sort()
-	             .extendsTrans(services.getJavaInfo().objectSort())) {
-		result = new SLExpression(
-		    TB.created(services, result.getTerm()));
-	    } else {
-		raiseError("\\created only allowed for reference types.");
-	    }
+		raiseNotSupported("\\created is deliberately not supported in this KeY version, you should not need it");
 	}
-	
     |
 	NONNULLELEMENTS LPAREN result=expression RPAREN
 	{

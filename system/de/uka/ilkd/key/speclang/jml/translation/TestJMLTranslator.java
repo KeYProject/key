@@ -299,31 +299,6 @@ public class TestJMLTranslator extends TestCase {
     }
 
     
-    public void testCreated() {
-        Term result = null;
-
-        ProgramVariable selfVar = buildSelfVarAsProgVar();
-        Function instance = services.getTypeConverter()
-                                    .getHeapLDT()
-                                    .getFieldSymbolForPV((LocationVariable)javaInfo.getAttribute("testPackage.TestClass::instance"), 
-                                	                 services);
-
-        try {
-            result = translator.translateExpression(new PositionedString("\\created(this.instance)"),
-                    testClassType, selfVar, null, null, null, heapAtPre);
-        } catch (SLTranslationException e) {
-            assertTrue(false);
-        }
-
-        assertTrue(result != null);
-        assertTrue(termContains(result, instance));
-        //assertTrue(termContains(result.getFormula(), AttributeOp
-        //        .getAttributeOp(javaInfo.getAttribute(
-        //                ImplicitFieldAdder.IMPLICIT_CREATED, javaInfo
-        //                        .getJavaLangObject()))));
-    }
-
-    
     public void testNonNullElements() {
         Term result = null;
         

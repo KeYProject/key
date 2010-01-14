@@ -1,8 +1,8 @@
 final class ArrayList {
     
-    //@ model \set footprint;
+    //@ model \locset footprint;
     //@ depends footprint: footprint;
-    //@ depends <inv>: footprint;
+    //@ depends \inv: footprint;
     
     
     private /*@nullable@*/ Object[] array = new Object[10];
@@ -16,18 +16,18 @@ final class ArrayList {
     //@ invariant 0 <= size && size <= array.length;
     //@ invariant \typeof(array) == \type(Object[]);
     
-    //@ static ghost \set pcDep;     //buffer for dependencies of program counter 
-    //@ static ghost \set resultDep; //buffer for dependencies of return value
-    //@ static ghost \set paramDep;  //buffer for dependencies of first parameter
+    //@ static ghost \locset pcDep;     //buffer for dependencies of program counter 
+    //@ static ghost \locset resultDep; //buffer for dependencies of return value
+    //@ static ghost \locset paramDep;  //buffer for dependencies of first parameter
     
-    //@ ghost \set sizeDep;        //one dep field for every normal field
-    //@ ghost \set arrayDep;       //one dep field for every normal field    
-    //@ ghost \set arraySlotDep[]; //one dep field for every normal field
+    //@ ghost \locset sizeDep;        //one dep field for every normal field
+    //@ ghost \locset arrayDep;       //one dep field for every normal field    
+    //@ ghost \locset arraySlotDep[]; //one dep field for every normal field
     
         
     //contract encodes "accessible footprint;"
     /*@ normal_behaviour 
-      @   requires <inv>; 
+      @   requires \inv; 
       @   requires pcDep == \empty;
       @   requires paramDep == \empty;
       @   requires arrayDep == \singleton(array);
@@ -36,10 +36,10 @@ final class ArrayList {
       @   ensures \subset(resultDep, \old(footprint));
       @*/    
     public /*@helper@*/ boolean contains(/*@nullable@*/ Object o) {
-	//@ ghost \set iDep = pcDep; //assignment
+	//@ ghost \locset iDep = pcDep; //assignment
 	int i = 0;
 	
-	//@ set pcDep = \setUnion(pcDep, \setUnion(iDep, sizeDep)); //entering loop
+	//@ set pcDep = \set_union(pcDep, \set_union(iDep, sizeDep)); //entering loop
 	
 	/*@ loop_invariant 0 <= i && i <= size
 	  @    && \subset(pcDep, \old(footprint))
@@ -47,16 +47,16 @@ final class ArrayList {
 	  @ assignable \singleton(pcDep);
 	  @*/
 	while(i < size) {
-	    //@ set pcDep = \setUnion(pcDep, \setUnion(arrayDep, \setUnion(iDep, \setUnion(paramDep, arraySlotDep[i])))); //entering conditional
+	    //@ set pcDep = \set_union(pcDep, \set_union(arrayDep, \set_union(iDep, \set_union(paramDep, arraySlotDep[i])))); //entering conditional
 	    if(array[i] == o) {
 		//@ set resultDep = pcDep; //return
 		return true;
 	    }
 	    
-	    //@ set iDep = \setUnion(pcDep, iDep); //assignment
+	    //@ set iDep = \set_union(pcDep, iDep); //assignment
 	    i++;
 	    
-	    //@ set pcDep = \setUnion(pcDep, \setUnion(iDep, sizeDep)); //entering loop again
+	    //@ set pcDep = \set_union(pcDep, \set_union(iDep, sizeDep)); //entering loop again
 	    ; //workaround for RecodeR bug
 	}
 	
@@ -67,7 +67,7 @@ final class ArrayList {
     
     //contract encodes "accessible footprint" with precondition "0 <= index && index < size()"
     /*@ normal_behaviour
-      @   requires <inv>; 
+      @   requires \inv; 
       @   requires 0 <= index && index < size();
       @   requires pcDep == \empty;
       @   requires paramDep == \empty;
@@ -77,20 +77,20 @@ final class ArrayList {
       @   ensures \subset(resultDep, \old(footprint));
       @*/    
     public /*@nullable helper@*/ Object get(int index) {
-	//@ set pcDep = \setUnion(paramDep, sizeDep); //entering conditional
+	//@ set pcDep = \set_union(paramDep, sizeDep); //entering conditional
 	if(index < 0 || size <= index) {
 	    //@ set resultDep = pcDep; //return
 	    throw new IndexOutOfBoundsException();
 	}
 	
-	//@ set resultDep = \setUnion(pcDep, \setUnion(arrayDep, \setUnion(paramDep, arraySlotDep[index]))); //return
+	//@ set resultDep = \set_union(pcDep, \set_union(arrayDep, \set_union(paramDep, arraySlotDep[index]))); //return
 	return array[index];
     }
     
     
     //contract encodes "accessible footprint"
     /*@ normal_behaviour
-      @   requires <inv>;
+      @   requires \inv;
       @   requires pcDep == \empty;
       @   requires paramDep == \empty;            
       @   requires arrayDep == \singleton(array);
@@ -99,7 +99,7 @@ final class ArrayList {
       @   ensures \subset(resultDep, \old(footprint));
       @*/
     public /*@helper@*/ int size() {
-	//@ set resultDep = \setUnion(pcDep, sizeDep);
+	//@ set resultDep = \set_union(pcDep, sizeDep);
 	return size;
     }
 }

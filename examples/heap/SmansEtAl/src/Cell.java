@@ -21,16 +21,16 @@ class Cell {
     
     /*@ assignable footprint;
       @ ensures getX() == value;
-      @ ensures \newElemsFresh(footprint); 
+      @ ensures \new_elems_fresh(footprint); 
       @*/
     void setX(int value) {
 	x = value;
     }
     
-    /*@ model \set footprint;
+    /*@ model \locset footprint;
       @ depends footprint: footprint;
       @ represents footprint <- x;
       @*/
     
-    //@ depends <inv>: \nothing;
+    //@ depends \inv: \nothing;
 }

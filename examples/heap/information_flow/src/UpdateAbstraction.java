@@ -7,16 +7,16 @@ class UpdateAbstraction {
     static int l2;    
     static int h;
     
-    //@ static model \set LOW;           	//just an abbreviation
-    //@ static represents LOW <- \setUnion(l, l2);
-    //@ static model \set HIGH;           	//just an abbreviation
+    //@ static model \locset LOW;           	//just an abbreviation
+    //@ static represents LOW <- \set_union(l, l2);
+    //@ static model \locset HIGH;           	//just an abbreviation
     //@ static represents HIGH <- \singleton(h);
     
-    //@ static ghost \set pcDep;     //buffer for dependencies of program counter     
+    //@ static ghost \locset pcDep;     //buffer for dependencies of program counter     
     
-    //@ static ghost \set lDep;  //one dep field for every normal field
-    //@ static ghost \set l2Dep; //one dep field for every normal field    
-    //@ static ghost \set hDep;  //one dep field for every normal field
+    //@ static ghost \locset lDep;  //one dep field for every normal field
+    //@ static ghost \locset l2Dep; //one dep field for every normal field    
+    //@ static ghost \locset hDep;  //one dep field for every normal field
     
     
     /*@ requires pcDep == \empty;
@@ -26,7 +26,7 @@ class UpdateAbstraction {
       @ ensures \subset(lDep, LOW);
       @*/
     static void ex7_1_insecure() {
-	//@ set lDep = \setUnion(pcDep, hDep); //assignment
+	//@ set lDep = \set_union(pcDep, hDep); //assignment
 	l = h;
     }
     
@@ -38,7 +38,7 @@ class UpdateAbstraction {
       @ ensures \subset(lDep, LOW);
       @*/
     static void ex7_2_insecure() {
-	//@ set pcDep = \setUnion(pcDep, hDep); //entering conditional
+	//@ set pcDep = \set_union(pcDep, hDep); //entering conditional
 	if(h > 0) {
 	    //@ set lDep = pcDep; //assignment 
 	    l = 1;
@@ -56,7 +56,7 @@ class UpdateAbstraction {
       @ ensures \subset(lDep, LOW);
       @*/
     static void ex7_3_secure() {
-	//@ set pcDep = \setUnion(pcDep, hDep); //entering conditional
+	//@ set pcDep = \set_union(pcDep, hDep); //entering conditional
 	if(l > 0) {
 	    //@ set hDep = pcDep; //assignment 
 	    h = 1;
@@ -74,8 +74,8 @@ class UpdateAbstraction {
       @ ensures \subset(lDep, LOW);
       @*/
     static void ex7_4_secure() {
-	//@ ghost \set oldPcDep = pcDep;         //entering conditional
-	//@ set pcDep = \setUnion(pcDep, hDep); //entering conditional
+	//@ ghost \locset oldPcDep = pcDep;         //entering conditional
+	//@ set pcDep = \set_union(pcDep, hDep); //entering conditional
 	if(h > 0) {
 	    //@ set hDep = pcDep; //assignment 
 	    l = 1;
@@ -100,7 +100,7 @@ class UpdateAbstraction {
 	//@ set hDep = pcDep; //assignment
 	h = 0;
 	
-	//@ set lDep = \setUnion(pcDep, hDep); 
+	//@ set lDep = \set_union(pcDep, hDep); 
 	l = h;
     } 
     
@@ -113,7 +113,7 @@ class UpdateAbstraction {
       @*/
     static void ex7_6_secure() {
 	//ghost code for entering conditional----->
-	//@ ghost \set guardDep = hDep;
+	//@ ghost \locset guardDep = hDep;
 	int lOld = l;	
 	int hOld = h;
 	//<----------------------------------------
@@ -127,11 +127,11 @@ class UpdateAbstraction {
 	
 	//ghost code for leaving conditional------>
 	if(l != lOld) {
-	    //@ set lDep = \setUnion(lDep, guardDep);
+	    //@ set lDep = \set_union(lDep, guardDep);
 	    ;
 	}
 	if(h != hOld) {
-	    //@ set hDep = \setUnion(hDep, guardDep);
+	    //@ set hDep = \set_union(hDep, guardDep);
 	    ;
 	}
 	//<-----------------------------------------
@@ -146,7 +146,7 @@ class UpdateAbstraction {
       @*/
     static void ex7_7_secure() {
 	//ghost code for entering conditional----->
-	//@ ghost \set guardDep = hDep;
+	//@ ghost \locset guardDep = hDep;
 	int lOld = l;	
 	int hOld = h;
 	//<----------------------------------------	
@@ -165,11 +165,11 @@ class UpdateAbstraction {
 	
 	//ghost code for leaving conditional------>
 	if(l != lOld) {
-	    //@ set lDep = \setUnion(lDep, guardDep);
+	    //@ set lDep = \set_union(lDep, guardDep);
 	    ;
 	}
 	if(h != hOld) {
-	    //@ set hDep = \setUnion(hDep, guardDep);
+	    //@ set hDep = \set_union(hDep, guardDep);
 	    ;
 	}
 	//<-----------------------------------------
@@ -200,18 +200,18 @@ class UpdateAbstraction {
 	//@ set l2Dep = pcDep; //assignment
 	l2 = 0;
 	
-	//@ set pcDep = \setUnion(pcDep, hDep); //entering loop
+	//@ set pcDep = \set_union(pcDep, hDep); //entering loop
 	/*@ loop_invariant l2 >= 0;
 	  @ assignable l2, \singleton(l2Dep), h, \singleton(hDep), \singleton(pcDep);
 	  @*/
 	while(h < 0) {
-	    //@ set l2Dep = \setUnion(pcDep, l2Dep); //assignment
+	    //@ set l2Dep = \set_union(pcDep, l2Dep); //assignment
 	    l2++;
-	    //@ set hDep = \setUnion(pcDep, hDep);
+	    //@ set hDep = \set_union(pcDep, hDep);
 	    h++;
-	    //@ set pcDep = \setUnion(pcDep, hDep); //entering loop again	    
+	    //@ set pcDep = \set_union(pcDep, hDep); //entering loop again	    
 	}
-	//@ set pcDep = \setUnion(pcDep, l2Dep); //entering conditional
+	//@ set pcDep = \set_union(pcDep, l2Dep); //entering conditional
 	if(l2 < 0) {
 	    //@ set lDep = pcDep; //assignment
 	    l = 1;

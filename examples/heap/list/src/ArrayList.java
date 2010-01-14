@@ -108,12 +108,12 @@ final class ArrayList implements List {
 	//@ represents list <- arrayList;
 	//@ represents pos <- arrayPos;
 	
-	//@ invariant arrayList.<inv>;
+	//@ invariant arrayList.\inv;
 	//@ invariant 0 <= arrayPos && arrayPos <= arrayList.size;
 	//@ invariant \typeof(arrayList) == ArrayList;
 	
 	/*@ normal_behaviour
-	  @   requires l.<inv> && \typeof(l) == ArrayList;
+	  @   requires l.\inv && \typeof(l) == ArrayList;
 	  @   ensures list == l;
 	  @   ensures pos == 0; 
 	  @*/

@@ -1,13 +1,13 @@
 public abstract class Subject {
     protected /*@spec_public@*/ Observer[] observers = new Observer[0];
     
-    //@ public model \set footprint;
-    //@ depends <inv>: footprint, observers, observers.*, \infiniteUnion(int i; 0 <= i && i < observers.length ? observers[i].* : \empty);    
+    //@ public model \locset footprint;
+    //@ depends \inv: footprint, observers, observers.*, \infinite_union(int i; 0 <= i && i < observers.length ? observers[i].* : \empty);    
     //@ depends footprint: footprint;
     
-    /*@ public invariant \disjoint(footprint, \setUnion(observers, observers.*));
+    /*@ public invariant \disjoint(footprint, \set_union(observers, observers.*));
       @ public invariant (\forall int i; 0 <= i && i < observers.length; 
-      @                                  observers[i].<inv> 
+      @                                  observers[i].\inv 
       @                                  && observers[i].subject == this
       @                                  && observers[i] != this 
       @                                  && \disjoint(observers[i].*, footprint));
@@ -15,7 +15,7 @@ public abstract class Subject {
     
 
     /*@ public normal_behaviour
-      @   requires o.<inv> && o.subject == this && o != this && \disjoint(o.*, footprint);
+      @   requires o.\inv && o.subject == this && o != this && \disjoint(o.*, footprint);
       @   assignable observers;
       @   ensures observers.length == \old(observers.length) + 1;
       @   ensures observers[observers.length - 1] == o;
@@ -36,15 +36,15 @@ public abstract class Subject {
     
 
     /*@ public normal_behaviour
-      @   assignable \infiniteUnion(int x; 0 <= x && x < observers.length ? observers[x].* : \empty);
-      @   ensures (\forall int i; 0 <= i && i < observers.length; observers[i].upToDate && observers[i].<inv>);
+      @   assignable \infinite_union(int x; 0 <= x && x < observers.length ? observers[x].* : \empty);
+      @   ensures (\forall int i; 0 <= i && i < observers.length; observers[i].upToDate && observers[i].\inv);
       @*/
     public final void notifyObservers() {
 	/*@ loop_invariant 0 <= i && i <= observers.length
-	  @                && (\forall int x; 0 <= x && x < observers.length; observers[x].<inv>)
+	  @                && (\forall int x; 0 <= x && x < observers.length; observers[x].\inv)
 	  @                && (\forall int x; 0 <= x && x < observers.length; observers[x].subject == this)
 	  @                && (\forall int x; 0 <= x && x < i; observers[x].upToDate);
-	  @ assignable \infiniteUnion(int x; 0 <= x && x < observers.length ? observers[x].* : \empty); 
+	  @ assignable \infinite_union(int x; 0 <= x && x < observers.length ? observers[x].* : \empty); 
 	  @*/
 	for(int i = 0; i < observers.length; i++) {
 	    observers[i].update();

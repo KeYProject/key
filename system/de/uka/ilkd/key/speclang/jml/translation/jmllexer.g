@@ -61,6 +61,7 @@ IMPLIES : "==>";
 IMPLIESBACKWARD : "<==";
 INCLUSIVEOR : "|";
 INTO : "\\into";
+INV : "\\inv";
 INVARIANT_FOR : "\\invariant_for";
 IS_INITIALIZED : "\\is_initialized";
 LARROW : "<-";
@@ -108,17 +109,17 @@ UNSIGNEDSHIFTRIGHT : ">>>";
 WORKINGSPACE : "\\working_space";
 XOR : "^";
 
-SET : "\\Set";
+SET : "\\locset";
 EMPTYSET : "\\empty";
 SINGLETON : "\\singleton";
-UNION : "\\setUnion";
+UNION : "\\set_union";
 INTERSECT : "\\intersect";
-SETMINUS : "\\setMinus";
-ALLFIELDS : "\\allFields";
-UNIONINF: "\\infiniteUnion";
+SETMINUS : "\\set_minus";
+ALLFIELDS : "\\all_fields";
+UNIONINF: "\\infinite_union";
 DISJOINT : "\\disjoint";
 SUBSET : "\\subset";
-NEWELEMSFRESH : "\\newElemsFresh";
+NEWELEMSFRESH : "\\new_elems_fresh";
 
 LT_DISPATCH
      :

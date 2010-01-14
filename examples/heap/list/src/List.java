@@ -1,8 +1,8 @@
 interface List {
     
-    //@ model instance \set footprint;
+    //@ model instance \locset footprint;
     //@ depends footprint: footprint;
-    //@ depends <inv>: footprint;
+    //@ depends \inv: footprint;
     
     
     /*@ normal_behaviour
@@ -10,7 +10,7 @@ interface List {
       @   ensures size() == \old(size()) + 1;
       @   ensures get(size() - 1) == o;
       @   ensures (\forall int i; 0 <= i && i < size() - 1; get(i) == \old(get(i)));
-      @   ensures \newElemsFresh(footprint);
+      @   ensures \new_elems_fresh(footprint);
       @*/    
      public void add(/*@nullable@*/ Object o);
      
@@ -52,7 +52,7 @@ interface List {
       @   ensures (\exists int i; 0 <= i && i < \old(size()) && \old(get(i)) == o;
       @              (\forall int j; 0 <= j && j < i; get(j) == \old(get(j)))
       @              && (\forall int k; i <= k && k < size(); get(k) == \old(get(k+1))));
-      @   ensures \newElemsFresh(footprint);
+      @   ensures \new_elems_fresh(footprint);
       @*/
     public void remove(/*@nullable@*/ Object o);
     

@@ -16,7 +16,7 @@ class ArrayList {
       @ ensures size() == \old(size()) + 1;
       @ ensures get(size() - 1) == o;
       @ ensures (\forall int i; 0 <= i && i < size() - 1; get(i) == \old(get(i)));
-      @ ensures \newElemsFresh(footprint);
+      @ ensures \new_elems_fresh(footprint);
       @*/
     void add(/*@nullable@*/ Object o) {
 	if(count == items.length) {
@@ -54,14 +54,14 @@ class ArrayList {
     }
     
     
-    /*@ depends <inv>: footprint;
+    /*@ depends \inv: footprint;
       @ invariant items != null;
       @ invariant 0 <= count && count <= items.length;
       @ invariant \typeof(items) == \type(Object[]);
       @*/
 
     
-    /*@ model \set footprint;
+    /*@ model \locset footprint;
       @ depends footprint: footprint;
       @ represents footprint <- count, items, items[*], items.length;
       @*/    
