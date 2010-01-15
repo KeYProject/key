@@ -58,7 +58,7 @@ public class TestTacletTranslation extends TestTaclet {
 	ImmutableSet<Term> emptySetTerm = DefaultImmutableSet.nil();
 	TacletSetTranslation translation = new DefaultTacletSetTranslation(getServices());
 	translation.setTacletSet(getTaclets());
-	storeToFile(translation.getTranslation(emptySet,emptySetTerm), TestTaclet.folder
+	storeToFile(translation.getTranslation(emptySet,emptySetTerm,2), TestTaclet.folder
 	        + "TacletProofObligation.key");
 
 	// translation.addHeuristic("smt_axiom_not_verified");
@@ -135,7 +135,7 @@ public class TestTacletTranslation extends TestTaclet {
 	translation.setTacletSet(set);
 	ImmutableSet<Sort> emptySet = DefaultImmutableSet.nil();
 	ImmutableSet<Term> emptySetTerm = DefaultImmutableSet.nil();
-	ImmutableList<TacletFormula> list = translation.getTranslation(emptySet,emptySetTerm);
+	ImmutableList<TacletFormula> list = translation.getTranslation(emptySet,emptySetTerm,2);
 	String reason = "The following taclets were translated:\n";
 	for (TacletFormula tf : list) {
 	    reason = reason + tf.getTaclet().name().toString();
@@ -159,7 +159,7 @@ public class TestTacletTranslation extends TestTaclet {
 	TacletTranslator translator = new RewriteTacletTranslator(getServices());
 	ImmutableSet<Sort> emptySet = DefaultImmutableSet.nil();
 	ImmutableSet<Term> emptySetTerm = DefaultImmutableSet.nil();
-	TacletFormula tf = translator.translate(t,emptySet,emptySetTerm);
+	TacletFormula tf = translator.translate(t,emptySet,emptySetTerm,2);
 
 	Term term = tf.getFormula();
 	String s = "all({b1:boolean}all({b2:boolean}equiv(equiv(equals(b1,TRUE),equals(b2,TRUE)),equals(b1,b2))))";
@@ -190,7 +190,7 @@ public class TestTacletTranslation extends TestTaclet {
 	TacletTranslator translator = new RewriteTacletTranslator(getServices());
 	ImmutableSet<Sort> emptySet = DefaultImmutableSet.nil();
 	ImmutableSet<Term> emptySetTerm = DefaultImmutableSet.nil();
-	TacletFormula tf = translator.translate(t,emptySet,emptySetTerm);
+	TacletFormula tf = translator.translate(t,emptySet,emptySetTerm,2);
 
 	Term term = tf.getFormula();
 	String s = "all({br:boolean}imp(not(equals(br,FALSE)),equals(br,TRUE)))";

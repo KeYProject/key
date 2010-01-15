@@ -223,125 +223,7 @@ class GenericTranslator {
 	        .isAbstractOrInterface(inst)));
     }
 
-    /**
-     * Instantiates generic variables of the term. It instantiates the variables
-     * using all possibilities. This method supports two different generic
-     * variables and the following variable conditions: - \not\same(G,H)
-     * 
-     * @param term
-     *            the term to be instantiated.
-     * @param genericSorts
-     *            the generic sorts that should be replaced.
-     * @param instSorts
-     *            the instantiations
-     * @return returns a new term, where all generic variables are instantiated.
-     *         If there is no generic variable the original term is returned.
-     * @throws IllegalTacletException
-     */
-    // old version - only for comparing results
-    private Term instantiateGeneric(Term term,
-	    HashSet<GenericSort> genericSorts, ImmutableSet<Sort> instSorts,
-	    Taclet t, TacletConditions conditions)
-	    throws IllegalTacletException {
-	if (genericSorts.size() == 0) {
-	    return term;
-	}
-	if (genericSorts.size() > 2) {
-	    throw new IllegalTacletException("Can not translate taclets with "
-		    + "more than two generic sorts.");
-	}
 
-	ImmutableList<Term> genericTerms = ImmutableSLList.nil();
-
-	GenericSort gs[] = new GenericSort[2];
-	int i = 0;
-	for (GenericSort sort : genericSorts) {
-	    gs[i] = sort;
-	    i++;
-	}
-
-	// instantiate the first generic variable
-	for (Sort sort1 : instSorts) {
-
-	    if (!doInstantiation(gs[0], sort1, conditions)) {
-		continue;
-	    }
-
-	    Term temp = null;
-	    try {
-		temp = instantiateGeneric(term, gs[0], sort1, t);
-	    } catch (TermCreationException e) {
-		for (TranslationListener l : listener) {
-		    if (l.eventInstantiationFailure(gs[0], sort1, t, term))
-			throw e;
-		}
-	    }
-
-	    if (temp == null) {
-		continue;
-	    }
-
-	    // instantiate the second generic variable
-	    if (genericSorts.size() == 2) {
-		int instCount = 0;
-		for (Sort sort2 : instSorts) {
-		    if (!(conditions.containsNotSameCondition(gs[0], gs[1]) && sort1
-			    .equals(sort2))
-			    && doInstantiation(gs[1], sort2, conditions)) {
-			Term temp2 = null;
-			try {
-			    temp2 = instantiateGeneric(temp, gs[1], sort2, t);
-			} catch (TermCreationException e) {
-			    for (TranslationListener l : listener) {
-				if (l.eventInstantiationFailure(gs[1], sort2,
-				        t, term))
-				    throw e;
-			    }
-			}
-
-			if (temp2 != null) {
-			    instCount++;
-			    genericTerms = genericTerms.append(temp2);
-			}
-
-		    }
-
-		}
-		if (instCount == 0) {
-		    throw new IllegalTacletException(
-			    "Can not instantiate generic variables"
-			            + " because there are not enough different sorts.");
-		}
-
-	    } else {
-		genericTerms = genericTerms.append(temp);
-	    }
-
-	}
-
-	if (genericTerms.size() == 0) {
-	    throw new IllegalTacletException(
-		    "Can not instantiate generic variables"
-		            + " because there are not enough different sorts.");
-	}
-
-	// quantify the term
-	ImmutableList<Term> genericTermsQuantified = ImmutableSLList.nil();
-	if (genericTerms.size() > 0) {
-	    for (Term gt : genericTerms) {
-		genericTermsQuantified = genericTermsQuantified
-		        .append(AbstractTacletTranslator.quantifyTerm(gt));
-
-	    }
-	    if (appendGenericTerm) {
-		genericTermsQuantified = genericTermsQuantified.append(term);
-	    }
-	    term = TermBuilder.DF.and(genericTermsQuantified);
-
-	}
-
-	return term;
-    }
 
     /**
      * Instantiates generic variables of the term. It instantiates the variables
@@ -364,7 +246,7 @@ class GenericTranslator {
 	ImmutableList<Term> instantiatedTerms = ImmutableSLList.nil();
 	if (maxGeneric < genericSorts.size()) {
 	    throw new IllegalTacletException(
-		    "To many different generic sorts. Founded: "
+		    "To many different generic sorts. Found: "
 		            + genericSorts.size() + " Allowed: " + maxGeneric);
 
 	}
@@ -373,6 +255,7 @@ class GenericTranslator {
 
 	    return null;
 	}
+
 
 	GenericSort genericTable[] = new GenericSort[genericSorts.size()];
 	Sort instTable[] = new Sort[instSorts.size()];

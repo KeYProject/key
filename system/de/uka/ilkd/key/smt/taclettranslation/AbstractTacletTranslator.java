@@ -9,7 +9,6 @@
 // 
 package de.uka.ilkd.key.smt.taclettranslation;
 
-import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -17,18 +16,13 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 
-import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
-
 import de.uka.ilkd.key.java.JavaInfo;
-import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.expression.operator.ExactInstanceof;
-import de.uka.ilkd.key.java.expression.operator.Instanceof;
 import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
 import de.uka.ilkd.key.logic.ConstrainedFormula;
 import de.uka.ilkd.key.logic.JavaBlock;
@@ -37,17 +31,11 @@ import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.TermCreationException;
 import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.ArrayOp;
 import de.uka.ilkd.key.logic.op.AttributeOp;
-import de.uka.ilkd.key.logic.op.BoundedNumericalQuantifier;
-import de.uka.ilkd.key.logic.op.CastFunctionSymbol;
 import de.uka.ilkd.key.logic.op.Equality;
-import de.uka.ilkd.key.logic.op.ExactInstanceSymbol;
-import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IfThenElse;
-import de.uka.ilkd.key.logic.op.InstanceofSymbol;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.NonRigidHeapDependentFunction;
@@ -59,21 +47,15 @@ import de.uka.ilkd.key.logic.op.Quantifier;
 import de.uka.ilkd.key.logic.op.RigidFunction;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariableAdapter;
-import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.logic.op.SortedSchemaVariable;
 import de.uka.ilkd.key.logic.op.WarySubstOp;
-import de.uka.ilkd.key.logic.sort.AbstractSort;
 import de.uka.ilkd.key.logic.sort.ArraySort;
 import de.uka.ilkd.key.logic.sort.ClassInstanceSort;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.logic.sort.ObjectSort;
-import de.uka.ilkd.key.logic.sort.PrimitiveSort;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.logic.sort.SortDefiningSymbols;
-
 import de.uka.ilkd.key.pp.LogicPrinter;
-import de.uka.ilkd.key.proof.init.CreatedAttributeTermFactory;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletGoalTemplate;
 import de.uka.ilkd.key.rule.VariableCondition;
@@ -112,7 +94,7 @@ abstract class AbstractTacletTranslator implements TacletTranslator,
     private GenericTranslator genericTranslator = new GenericTranslator(this);
     private ProgramSVTranslator programSVTranslator = new ProgramSVTranslator();
 
-    private int maxGeneric = 4;
+    
 
     AbstractTacletTranslator(Services services) {
 	this.services = services;
@@ -121,7 +103,7 @@ abstract class AbstractTacletTranslator implements TacletTranslator,
 
 
     public TacletFormula translate(Taclet t, ImmutableSet<Sort> sorts,
-	    ImmutableSet<Term> attributeTerms) throws IllegalTacletException {
+	    ImmutableSet<Term> attributeTerms, int maxGeneric) throws IllegalTacletException {
 
 	// first step: check the taclet. If this translator is not able
 	// to translate the taclet throw IllegalTacletException.
@@ -223,8 +205,8 @@ abstract class AbstractTacletTranslator implements TacletTranslator,
 
 	
 
-	TacletFormula tf = new DefaultTacletFormula(t, result2, "", conditions);
-	return tf;
+	return new DefaultTacletFormula(t, result2, "", conditions);
+	
     }
 
     /**
@@ -572,6 +554,14 @@ abstract class AbstractTacletTranslator implements TacletTranslator,
 	}
 	return res;
     }
+    
+    static public Term getObject(Term attributeTerm){
+	if(attributeTerm.arity() > 0){
+	    attributeTerm = getObject(attributeTerm.sub(0));
+	}
+	
+	return attributeTerm;
+    }
 
     static public boolean isAbstractOrInterface(Sort sort) {
 	if (!isReferenceSort(sort))
@@ -853,7 +843,9 @@ abstract class AbstractTacletTranslator implements TacletTranslator,
 	JavaInfo javaInfo = services.getJavaInfo();
 	// javaInfo.getKeYJavaType(term)
 	ProgramVariable createdAttribute = javaInfo.getAttribute(field, sort);
-
+	if(createdAttribute == null){
+	    return null;
+	}
 	Term createdTerm = TermFactory.DEFAULT
 	        .createVariableTerm(createdAttribute);
 	return createdTerm;

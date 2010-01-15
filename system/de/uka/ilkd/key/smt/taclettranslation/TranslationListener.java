@@ -10,13 +10,10 @@
 package de.uka.ilkd.key.smt.taclettranslation;
 
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.op.TermSymbol;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.parser.SchemaVariableModifierSet.VariableSV;
 import de.uka.ilkd.key.rule.Taclet;
 
 /** 

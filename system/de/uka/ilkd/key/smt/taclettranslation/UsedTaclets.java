@@ -11,12 +11,9 @@ package de.uka.ilkd.key.smt.taclettranslation;
 
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
-
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeModel;
-import javax.swing.tree.TreeNode;
 
 /**
  * Change this file if you want to change the set of taclets that can be used
@@ -30,7 +27,7 @@ public final class UsedTaclets {
     /**
      * The taclets that could be used for external provers.
      */
-    static private HashSet<String> usedTaclets = null;
+
     static private HashMap<String, TreeItem> taclets = new HashMap<String, TreeItem>();
     private static TreeModel model = null;
 
@@ -44,16 +41,20 @@ public final class UsedTaclets {
     static final private String testTaclets[] = {// "identical_object_equal_index"
 
     };
-    
+
     /**
      * 
      * @return returns the number of taclets that are supported.
      */
-    static public int getCount(){
+    static public int getCount() {
 	return taclets.size();
     }
-    
-    static public Collection<TreeItem> getTreeItems(){
+
+    /**
+     * @return returns all taclets that are supported wrapped by
+     *         {@link TreeItem}
+     */
+    static public Collection<TreeItem> getTreeItems() {
 	getTreeModel();
 	return taclets.values();
     }
@@ -67,7 +68,7 @@ public final class UsedTaclets {
      * @return <code>true</code> if the taclet can be used for external provers.
      */
     static boolean contains(String tacletname) {
-	
+
 	getTreeModel();
 
 	boolean found = false;
@@ -86,31 +87,45 @@ public final class UsedTaclets {
 	// return usedTaclets.contains(tacletname);
 
     }
-    
-    public static void validateParentSelection(){
-	TreeModel model = getTreeModel();
-	
-	validateParentSelection((DefaultMutableTreeNode)model.getRoot(),true);
-    }
-    
-    private static void validateParentSelection(DefaultMutableTreeNode node,boolean parentSelected){
-	TreeItem item = (TreeItem) node.getUserObject();
-	item.setParentSelected(parentSelected);
-	if(parentSelected == true){
-	    parentSelected = item.isChecked();
-	  
-	}
-	for(int i=0; i < node.getChildCount(); i++){
-	    validateParentSelection((DefaultMutableTreeNode)node.getChildAt(i),parentSelected);
-	}
-	
+
+    /**
+     * Validates the parent selection field. Use this method after loading the
+     * assignment of the taclets.
+     */
+    public static void validateParentSelection() {
+
+	validateParentSelection((DefaultMutableTreeNode) getTreeModel()
+	        .getRoot(), true);
     }
 
-    static void addTaclet(DefaultMutableTreeNode node, String taclet) {
+    private static void validateParentSelection(DefaultMutableTreeNode node,
+	    boolean parentSelected) {
+	TreeItem item = (TreeItem) node.getUserObject();
+	item.setParentSelected(parentSelected);
+	if (parentSelected == true) {
+	    parentSelected = item.isChecked();
+
+	}
+	for (int i = 0; i < node.getChildCount(); i++) {
+	    validateParentSelection(
+		    (DefaultMutableTreeNode) node.getChildAt(i), parentSelected);
+	}
+
+    }
+
+    /**
+     * Adds a taclet to the list of supported taclets.
+     * 
+     * @param node
+     *            the TreeNode the taclet belongs to.
+     * @param taclet
+     *            the name of the taclet.
+     */
+    private static void addTaclet(DefaultMutableTreeNode node, String taclet) {
 	addTaclet(node, taclet, true);
     }
 
-    static void addTaclet(DefaultMutableTreeNode node, String taclet,
+    private static void addTaclet(DefaultMutableTreeNode node, String taclet,
 	    boolean checked) {
 	TreeItem child = new TreeItem(taclet, checked);
 	if (!taclets.containsKey(child.toString())) {
@@ -119,7 +134,17 @@ public final class UsedTaclets {
 	}
     }
 
-    static DefaultMutableTreeNode newNode(DefaultMutableTreeNode root,
+    /**
+     * Adds an inner node to the tree. Inner nodes do not represents taclets but
+     * the category taclets belonging to.
+     * 
+     * @param root
+     *            the parent of the node.
+     * @param text
+     *            the description of the node.
+     * @return returns the created node.
+     */
+    private static DefaultMutableTreeNode newNode(DefaultMutableTreeNode root,
 	    String text) {
 	DefaultMutableTreeNode node = new DefaultMutableTreeNode(new TreeItem(
 	        text));
@@ -127,16 +152,20 @@ public final class UsedTaclets {
 	return node;
     }
 
+    /**
+     * This is the real interesting method of this class. Change this method to
+     * change the range of supported taclets.
+     * 
+     * @return returns the tree model that contains all supported taclets.
+     */
     public static TreeModel getTreeModel() {
 
 	if (model != null)
 	    return model;
 
-	TreeItem rootItem = new TreeItem(
-        "All supported taclets");
+	TreeItem rootItem = new TreeItem("All supported taclets");
 	rootItem.setParentSelected(true);
 	DefaultMutableTreeNode root = new DefaultMutableTreeNode(rootItem);
-	
 
 	DefaultMutableTreeNode node1 = newNode(root, "proof independent");
 
@@ -152,6 +181,8 @@ public final class UsedTaclets {
 	addTaclet(node2, "apply_eq_boolean_2");
 	addTaclet(node2, "apply_eq_boolean_rigid");
 	addTaclet(node2, "apply_eq_boolean_rigid_2");
+	addTaclet(node2, "boolean_is_no_int");
+	addTaclet(node2, "int_is_no_boolean");
 	//
 	// // intRules
 	DefaultMutableTreeNode node3 = newNode(node1, "integer rules");
@@ -219,7 +250,7 @@ public final class UsedTaclets {
 	addTaclet(node5, "translateJavaBitwiseXOrInt");
 	addTaclet(node5, "translateJavaBitwiseXOrLong");
 
-	DefaultMutableTreeNode node6 = newNode(root, "proof depending");
+	DefaultMutableTreeNode node6 = newNode(root, "proof dependent");
 
 	DefaultMutableTreeNode node7 = newNode(node6, "cast operator");
 	addTaclet(node7, "castDel");
@@ -229,22 +260,15 @@ public final class UsedTaclets {
 	addTaclet(node7, "typeStatic");
 	addTaclet(node7, "castType");
 	addTaclet(node7, "castType2");
+	addTaclet(node7, "closeType");
+	addTaclet(node7, "closeTypeSwitched");
 
-	// addTaclet(node7,"castDel2");// not yet supported
-
-	// instanceAllocation.key
-
-	DefaultMutableTreeNode node8 = newNode(node6, "not yet described");
+	DefaultMutableTreeNode node8 = newNode(node6, "miscellaneous");
 	addTaclet(node8, "disjoint_repositories");
 	addTaclet(node8, "identical_object_equal_index");
-	addTaclet(node8, "boolean_is_no_int");
-	addTaclet(node8, "int_is_no_boolean");
-	addTaclet(node8, "repository_object_non_null");
-	addTaclet(node8, "nextToCreate_non_negative");
-	addTaclet(node8,"nextToCreate_non_negative_2");
-	
 
-	// usedTaclets.add("only_created_object_are_referenced");
+	addTaclet(node8, "repository_object_non_null");
+
 	DefaultMutableTreeNode node9 = newNode(node6, "exact instance rules");
 	addTaclet(node9, "exact_instance_definition_reference");
 	addTaclet(node9, "exact_instance_definition_integerDomain");
@@ -290,11 +314,13 @@ public final class UsedTaclets {
 	addTaclet(node14, "created_add_known_index_in_bounds");
 	addTaclet(node14, "created_add_known_index_in_bounds_sym");
 	addTaclet(node14, "created_add_known_index_in_bounds_2");
-	addTaclet(node14, "objects_with_index_geq_next_to_create_are_not_created");
-	addTaclet(node14, "objects_with_index_greater_next_to_create_are_not_createdsystem_invariant_for_created_2a_automated_use_3");
-	
-	
-	
+	addTaclet(node14,
+	        "objects_with_index_geq_next_to_create_are_not_created");
+	addTaclet(
+	        node14,
+	        "objects_with_index_greater_next_to_create_are_not_createdsystem_invariant_for_created_2a_automated_use_3");
+	addTaclet(node8, "nextToCreate_non_negative");
+	addTaclet(node8, "nextToCreate_non_negative_2");
 
 	DefaultMutableTreeNode node15 = newNode(node6, "array length");
 	addTaclet(node15, "array_length_non_negative");
@@ -310,12 +336,8 @@ public final class UsedTaclets {
 	addTaclet(node16, "class_erroneous_excludes_class_in_init");
 	addTaclet(node16, "erroneous_class_has_no_initialized_sub_class");
 	addTaclet(node16, "superclasses_of_initialized_classes_are_initialized");
-	addTaclet(node16, "superclasses_of_initialized_classes_are_initialized_2");
-	
-	
-	
-
-	// usedTaclets.add("nextToCreate_non_negative");
+	addTaclet(node16,
+	        "superclasses_of_initialized_classes_are_initialized_2");
 
 	model = new DefaultTreeModel(root);
 	return model;

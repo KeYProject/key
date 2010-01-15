@@ -89,6 +89,7 @@ public class TacletTranslationSettings implements Settings {
     private void tacletAssignmentFromString(String s){
 	tacletAssignmentFromString((TreeNode)UsedTaclets.getTreeModel().getRoot(),
 		s, 0);
+	UsedTaclets.validateParentSelection();
     }
     private int tacletAssignmentFromString(TreeNode node,String s, int index){
 	if(index >= s.length() || index < 0) return -1;

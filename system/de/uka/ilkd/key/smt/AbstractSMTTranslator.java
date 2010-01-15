@@ -21,6 +21,7 @@ import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
@@ -254,9 +255,9 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 	// add the assumptions that that are made of taclets
 	start = toReturn.size();
 	toReturn.addAll(this.tacletAssumptions);
-	for(int i=0; i < tacletAssumptions.size(); i++){
-	    assumptionTypes.add(new ContextualBlock(start,start+i,ContextualBlock.ASSUMPTION_TACLET_TRANSLATION));    
-	}
+	//for(int i=0; i < tacletAssumptions.size(); i++){
+	    assumptionTypes.add(new ContextualBlock(start,toReturn.size()-1,ContextualBlock.ASSUMPTION_TACLET_TRANSLATION));    
+	//}
 	
 	
 	
@@ -1905,19 +1906,40 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 	
 	Vector<QuantifiableVariable> vector = new Vector<QuantifiableVariable>();
 	ImmutableSet<Sort> sorts = DefaultImmutableSet.nil();
-	for(Sort sort : usedRealSort.keySet()){
+	HashSet<Sort> tempSorts = new HashSet<Sort>();
+	tempSorts.addAll(usedRealSort.keySet());
+	
+	for(Operator op : usedFunctionNames.keySet()){
+	    if(op instanceof SortDependingSymbol){
+		Sort s =((SortDependingSymbol)op).getSortDependingOn();
+		tempSorts.add(s);
+	    }
+	    if(op instanceof LocationVariable){
+		LocationVariable lv = (LocationVariable)op;
+		tempSorts.add(lv.getContainerType().getSort());
+	    }
+	}
+	
+	for(Sort sort : tempSorts){
 	    sorts = sorts.add(sort);
 	}
+	
+
 	
 	ImmutableSet<Term> terms = DefaultImmutableSet.nil();
 	for(Term term : usedAttributeTerms){
 	    terms = terms.add(term);
 	}
 	
-	for(TacletFormula tf :  tacletSetTranslation.getTranslation(sorts,terms)){
-	    StringBuffer term = translateTerm(tf.getFormula(),vector,services);
-	    result.add(term);
+	for(TacletFormula tf :  tacletSetTranslation.getTranslation(sorts,terms,
+		ProofSettings.DEFAULT_SETTINGS.getTacletTranslationSettings().getMaxGeneric())){
+	    for(Term subterm : tf.getInstantiations()){
+		 StringBuffer term = translateTerm(subterm,vector,services);
+		 result.add(term);
+	    }
+	   
 	}
+	
 
 	
 	

@@ -9,7 +9,7 @@
 //
 package de.uka.ilkd.key.smt.taclettranslation;
 
-import de.uka.ilkd.key.collection.ImmutableList;
+
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -32,7 +32,7 @@ public interface TacletTranslator {
      * @throw IllegalTacletException if the taclet is not translatable.
      */
     public TacletFormula translate(Taclet t, ImmutableSet<Sort> sortsForGeneric,
-	    ImmutableSet<Term> attributeTerms) throws IllegalTacletException;
+	    ImmutableSet<Term> attributeTerms, int maxGeneric) throws IllegalTacletException;
     
     /**
      * Adds a <code>TranslationListener</code> to the list of listener. For events that are called see <code>TranslationListener</code>.

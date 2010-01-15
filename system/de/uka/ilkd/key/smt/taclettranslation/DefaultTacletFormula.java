@@ -4,24 +4,22 @@ import java.util.Collection;
 
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.rule.Taclet;
 
 class DefaultTacletFormula implements TacletFormula {
 
     Taclet taclet;
-    Collection<Term>  formula;
+    Collection<Term> formula;
     String status;
     TacletConditions conditions;
-    
-        
+
     public TacletConditions getConditions() {
-        return conditions;
+	return conditions;
     }
-    
+
     public DefaultTacletFormula(Taclet taclet, Collection<Term> formula,
-	    			String status){
-	this(taclet,formula,status,new TacletConditions(taclet));
+	    String status) {
+	this(taclet, formula, status, new TacletConditions(taclet));
     }
 
     public DefaultTacletFormula(Taclet taclet, Collection<Term> formula,
@@ -30,14 +28,14 @@ class DefaultTacletFormula implements TacletFormula {
 	this.taclet = taclet;
 	this.formula = formula;
 	this.status = status;
-	this.conditions = 
-	    conditions == null ? new TacletConditions(taclet):conditions;
-	    
-    	}
+	this.conditions = conditions == null ? new TacletConditions(taclet)
+	        : conditions;
+
+    }
 
     public Term getFormula() {
 	return TermBuilder.DF.and(formula.toArray(new Term[formula.size()]));
-	//return formula;
+	// return formula;
     }
 
     public Taclet getTaclet() {
@@ -47,7 +45,10 @@ class DefaultTacletFormula implements TacletFormula {
     public String getStatus() {
 	return status;
     }
-    
-    
+
+    public Collection<Term> getInstantiations() {
+
+	return formula;
+    }
 
 }

@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.smt.taclettranslation;
 
+import java.util.Collection;
+
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.rule.Taclet;
 
@@ -21,7 +23,10 @@ public interface TacletFormula {
     /**
      * 
      * @return the formula of the instance if the taclet is translatable
-     *         otherwise <code>null</code>
+     *         otherwise <code>null</code>. If the translation of the taclet
+     *         consists of several instantiations (e.g. the taclet has some
+     *         generic sorts) the returned term is a conjunction of these 
+     *         instantiations.
      */
     Term getFormula();
 
@@ -31,4 +36,6 @@ public interface TacletFormula {
      */
     String getStatus();
 
+    Collection<Term> getInstantiations();
+    
 }

@@ -9,23 +9,17 @@
 //
 package de.uka.ilkd.key.smt.taclettranslation;
 
-
+/**
+ * TreeItem represents the user data in a tree model.
+ * 
+ */
 public class TreeItem {
     private String text;
     private boolean checked = false;
     private boolean parentSelected = false;
-    /**
-     * Counts how many childs are checked 
-     */
-    private int     checkCount =-1; 
-    
-    public int getCheckedCount() {
-        return checkCount;
-    }
 
-    public void setCheckedCount(int tacletCount) {
-        this.checkCount = tacletCount;
-    }
+    
+
 
     TreeItem(String text){
 	this.text = text;
@@ -53,6 +47,10 @@ public class TreeItem {
 	return text.hashCode();
     }
     
+    /**
+     * @return returns true iff all parents, i.d. father, grandfather, 
+     * grand-grand-father, are checked. 
+     */
     public boolean isParentSelected(){
 	return parentSelected;
     }

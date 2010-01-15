@@ -10,13 +10,10 @@ import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.op.TermSymbol;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.parser.SchemaVariableModifierSet.VariableSV;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.rule.Taclet;
@@ -85,14 +82,19 @@ public final class DefaultTacletSetTranslation
      */
     private HashSet<QuantifiableVariable> usedQuantifiedVariable = new HashSet<QuantifiableVariable>();
     
+    private Services services;
+    
     private HashSet<SchemaVariable> usedFormulaSV = new HashSet<SchemaVariable>();
 
     private boolean quitInstantiationFailuresWithException=false;
+    
+    private int maxGeneric =2;
 
     public DefaultTacletSetTranslation(Services services) {
 	TacletTranslator tt = new FindTacletTranslator(services);
 	tt.addListener(this);
 	translators = translators.append(tt);
+	this.services = services;
 	
     }
 
@@ -117,8 +119,8 @@ public final class DefaultTacletSetTranslation
     }
 
     public ImmutableList<TacletFormula> getTranslation(ImmutableSet<Sort> sorts, 
-	    ImmutableSet<Term> attributeTerms) {
-	
+	    ImmutableSet<Term> attributeTerms, int max) {
+	this.maxGeneric = max;
 	// only translate once a time.
 	if (!translate)
 	    return translation;
@@ -150,7 +152,7 @@ public final class DefaultTacletSetTranslation
 	    int i=0;
 	    for (TacletTranslator translator : translators) {
 		try { // check for the right translator 
-		    translation = translation.append(translator.translate(t,sorts,attributeTerms));
+		    translation = translation.append(translator.translate(t,sorts,attributeTerms,max));
 		    break; // translate only once a time.
 		} catch (IllegalTacletException e) {
 		    if(i == translators.size()-1){
@@ -192,7 +194,7 @@ public final class DefaultTacletSetTranslation
     
     public void update() {
 	translate = true;
-	getTranslation(usedFormulaSorts,usedAttributeTerms);
+	getTranslation(usedFormulaSorts,usedAttributeTerms,maxGeneric);
 
     }
 
@@ -201,29 +203,44 @@ public final class DefaultTacletSetTranslation
      * @param dest the path of the file.
      */
     public void storeToFile(String dest) {
-	storeToFile(getTranslation(usedFormulaSorts, usedAttributeTerms), dest);
+	storeToFile(getTranslation(usedFormulaSorts, usedAttributeTerms,maxGeneric), dest);
     }
+    
+   
 
     private void storeToFile(ImmutableList<TacletFormula> list, String dest) {
         String toStore = "";
         
+        String modelDir = services.getProof().env().getJavaModel().getModelDir();
+        
+        if(modelDir != ""){
+            toStore += "\\javaSource \""+modelDir+"\";\n\n";
+        }
+        
         if(usedSorts.size() > 0){
             toStore += "\\sorts{\n\n";
-            for(Sort sort : usedSorts){
-                toStore += sort.name().toString()+";\n";  
+            for(Sort sort : usedFormulaSorts){
+              	    toStore += sort.name().toString()+";\n";  
+        	
+               
             }
             toStore += "}\n\n\n";
     	
         }
 
         
-    /*    if(!usedQuantifiedVariable.isEmpty()){
-            toStore += "\\functions{\n\n";
-            for(QuantifiableVariable var : usedQuantifiedVariable){
-        	toStore += var.sort() + " "+ var.name().toString()+";\n";  
+
+        
+        if(usedAttributeTerms.size() > 0){
+            toStore+="\\programVariables{\n\n";
+            for(Term term : usedAttributeTerms){
+        	term = AbstractTacletTranslator.getObject(term);
+        	
+        	toStore += term.sort() + " "+term+";\n";
             }
-            toStore += "}\n\n\n";
-        }*/
+            toStore+="}\n\n"; 
+        }
+        
         
         if(!usedFormulaSV.isEmpty()){
             toStore += "\\predicates{\n\n";
@@ -233,6 +250,7 @@ public final class DefaultTacletSetTranslation
             toStore += "}\n\n\n";
         }
         
+      
      
 
       
@@ -278,7 +296,9 @@ public final class DefaultTacletSetTranslation
     }
 
     private String convertTerm(Term term) {
-	return LogicPrinter.quickPrintTerm(term, null);
+	String ret = LogicPrinter.quickPrintTerm(term, null);
+	ret = "("+ret+")";
+	return ret;
     }
 
 

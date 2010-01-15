@@ -14,7 +14,6 @@ import java.util.HashSet;
 import java.util.LinkedList;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
-import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
 import de.uka.ilkd.key.logic.JavaBlock;
@@ -22,7 +21,6 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.logic.sort.ObjectSort;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -99,13 +97,7 @@ class ProgramSVTranslator {
     }
     
     
-    /**
-     * @param term
-     * @param bs
-     * @param instSorts
-     * @return
-     * @throws IllegalTacletException 
-     */
+
     private Term instantiateVariables(Term term, byte[] refTable,Term []programSV, Sort[] instSorts,
 	    Services services) throws IllegalTacletException {
 	Term[] subTerms = new Term[term.arity()];
