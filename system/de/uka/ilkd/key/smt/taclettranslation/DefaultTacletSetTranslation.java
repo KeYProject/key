@@ -2,6 +2,7 @@ package de.uka.ilkd.key.smt.taclettranslation;
 
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Calendar;
 import java.util.HashSet;
 
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
@@ -210,6 +211,7 @@ public final class DefaultTacletSetTranslation
 
     private void storeToFile(ImmutableList<TacletFormula> list, String dest) {
         String toStore = "";
+        toStore = "\\\\"+Calendar.getInstance().getTime().toString()+"\n";
         
         String modelDir = services.getProof().env().getJavaModel().getModelDir();
         

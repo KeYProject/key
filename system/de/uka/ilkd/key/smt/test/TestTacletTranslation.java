@@ -11,13 +11,12 @@ package de.uka.ilkd.key.smt.test;
 
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
 
-import de.uka.ilkd.key.smt.*;
+
 import de.uka.ilkd.key.smt.taclettranslation.DefaultTacletSetTranslation;
 import de.uka.ilkd.key.smt.taclettranslation.IllegalTacletException;
-import de.uka.ilkd.key.smt.taclettranslation.RewriteTacletTranslator;
 import de.uka.ilkd.key.smt.taclettranslation.TacletFormula;
+import de.uka.ilkd.key.smt.taclettranslation.FindTacletTranslator;
 import de.uka.ilkd.key.smt.taclettranslation.TacletSetTranslation;
 import de.uka.ilkd.key.smt.taclettranslation.TacletTranslator;
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
@@ -156,7 +155,7 @@ public class TestTacletTranslation extends TestTaclet {
 	Taclet t = getTacletByName("boolean_equal_2");
 	Assert.assertTrue("Taclet boolean_equal_2 not found.", t != null);
 
-	TacletTranslator translator = new RewriteTacletTranslator(getServices());
+	TacletTranslator translator = new FindTacletTranslator(getServices());
 	ImmutableSet<Sort> emptySet = DefaultImmutableSet.nil();
 	ImmutableSet<Term> emptySetTerm = DefaultImmutableSet.nil();
 	TacletFormula tf = translator.translate(t,emptySet,emptySetTerm,2);
@@ -187,7 +186,7 @@ public class TestTacletTranslation extends TestTaclet {
 	        .assertTrue("Taclet apply_eq_boolean_rigid not found.",
 	                t != null);
 
-	TacletTranslator translator = new RewriteTacletTranslator(getServices());
+	TacletTranslator translator = new FindTacletTranslator(getServices());
 	ImmutableSet<Sort> emptySet = DefaultImmutableSet.nil();
 	ImmutableSet<Term> emptySetTerm = DefaultImmutableSet.nil();
 	TacletFormula tf = translator.translate(t,emptySet,emptySetTerm,2);

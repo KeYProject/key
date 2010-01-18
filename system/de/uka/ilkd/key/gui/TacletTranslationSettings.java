@@ -123,6 +123,12 @@ public class TacletTranslationSettings implements Settings {
 	UsedTaclets.validateParentSelection();
     }
     
+    public boolean isUsingTaclets(){
+	return ((TreeItem)((DefaultMutableTreeNode)UsedTaclets.getTreeModel()
+		.getRoot()).getUserObject()).isChecked();
+
+    }
+    
     
   
     public void addSettingsListener(SettingsListener l) {

@@ -1646,24 +1646,7 @@ public class Main extends JFrame implements IMain {
 		});
 	decProcOptions.add(waitForAllProvers);
 	
-	useTaclets = new JCheckBoxMenuItem("Use taclets");
-	useTaclets.setSelected(dps.isUsingTaclets());
-	useTaclets.addActionListener(new ActionListener() {
-		   public void actionPerformed(ActionEvent e) {
-		       dps.setUseTaclets(useTaclets.isSelected());
-		   }
-		});
-	
-	decProcOptions.add(useTaclets);
-	
-	saveTacletTranslation = new JCheckBoxMenuItem("Save taclet translation");
-	saveTacletTranslation.setSelected(dps.isSavingTacletTranslation());
-	saveTacletTranslation.addActionListener(new ActionListener() {
-		   public void actionPerformed(ActionEvent e) {
-		       dps.setSaveTacletTranslation(saveTacletTranslation.isSelected());
-		   }
-		});
-	decProcOptions.add(saveTacletTranslation);
+
 	
 	showTacletTranslationSettings = new JMenuItem("settings for taclet translation");
 	showTacletTranslationSettings.addActionListener(new ActionListener() {

@@ -554,7 +554,7 @@ public abstract class AbstractSMTSolver implements SMTSolver {
 	        && ProofSettings.DEFAULT_SETTINGS
 	                .getTacletTranslationSettings().isSaveToFile()
 	        && ProofSettings.DEFAULT_SETTINGS
-	                .getDecisionProcedureSettings().isUsingTaclets()) {
+	                .getTacletTranslationSettings().isUsingTaclets()) {
 
 	    DefaultTacletSetTranslation translation = (DefaultTacletSetTranslation) ((AbstractSMTTranslator) trans)
 		    .getTacletSetTranslation();
@@ -569,60 +569,13 @@ public abstract class AbstractSMTSolver implements SMTSolver {
     
     private void instantiateTaclets(Goal goal, SMTTranslator trans) throws IllegalFormulaException{
 	ImmutableSet<Taclet> emptySet = DefaultImmutableSet.nil();
-	if(!ProofSettings.DEFAULT_SETTINGS.getDecisionProcedureSettings().isUsingTaclets()){
+	if(!ProofSettings.DEFAULT_SETTINGS.getTacletTranslationSettings().isUsingTaclets()){
 	    trans.setTacletsForAssumptions(emptySet);
 	}else{
 	    trans.setTacletsForAssumptions(getTaclets(goal));
 	}
 	
 	
-	/* ImmutableSLList<TacletFormula> emptyList = ImmutableSLList.nil();
-	
-	 if(!ProofSettings.DEFAULT_SETTINGS.getDecisionProcedureSettings().isUsingTaclets()){
-	     trans.setTacletAssumptions(emptyList);	     
-	 }else{
-	     DefaultTacletSetTranslation tacletSetTranslation = new DefaultTacletSetTranslation();
-	     if(tacletsForTest == null){
-		 tacletSetTranslation.setTacletSet(getTaclets(goal)); 
-	     }else{
-		tacletSetTranslation.setTacletSet(tacletsForTest); 
-	     }
-	     
-	     tacletSetTranslation.getTranslation();
-	     if(tacletSetTranslation.getNotTranslated().size() > 0){
-		 String msg = "The following taclets could not be translated:\n";
-		 for(TacletFormula tf : tacletSetTranslation.getNotTranslated()){
-		     msg += tf.getTaclet().name().toString();
-		     msg += ": " +tf.getStatus()+"\n";
-		     
-		 }
-		 throw new IllegalFormulaException(msg);
-		
-		 
-		 
-		 
-	     }
-		 
-	     
-	     
-      	    // tacletSetTranslation.addHeuristic("smt_axiom_not_verified");
-	    
-	     trans.setTacletAssumptions(tacletSetTranslation.getTranslation());
-	     if(!this.inTestMode && ProofSettings.DEFAULT_SETTINGS.getDecisionProcedureSettings().isSavingTacletTranslation()){
-		 JFileChooser fc = new JFileChooser();
-		 fc.setDialogTitle("Select a file to save the taclet translation");
-		 fc.setMultiSelectionEnabled(false);
-		 int returnVal = fc.showOpenDialog(Main.getInstance());
-		 File target = fc.getSelectedFile();
-		 if (returnVal == JFileChooser.APPROVE_OPTION) {
-		     tacletSetTranslation.storeToFile(target.getAbsolutePath());   
-		    }
-		  
-		     
-	     }
-		    
-	     
-	 }*/
 	 
 	
 	

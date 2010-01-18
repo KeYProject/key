@@ -1916,7 +1916,10 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 	    }
 	    if(op instanceof LocationVariable){
 		LocationVariable lv = (LocationVariable)op;
-		tempSorts.add(lv.getContainerType().getSort());
+		if(lv.getContainerType() != null){
+		    tempSorts.add(lv.getContainerType().getSort()); 
+		}
+		
 	    }
 	}
 	

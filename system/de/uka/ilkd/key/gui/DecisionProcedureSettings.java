@@ -124,7 +124,7 @@ public class DecisionProcedureSettings implements Settings {
     
     private String multProversSettings=null;
     private boolean waitForAllProvers = false;
-    private boolean saveTacletTranslation = false;
+
     
     
     /**
@@ -513,7 +513,7 @@ public class DecisionProcedureSettings implements Settings {
     
     private boolean saveFile = false;
 
-    private boolean useTaclets = true;
+
     
     public void setSaveFile(boolean sf) {
 	if (sf != this.saveFile) {
@@ -605,39 +605,7 @@ public class DecisionProcedureSettings implements Settings {
 	
     }
 
-    /**
-     * @return <code>true</code> if the translation of the taclets should be saved in an extra file. In this case the user can choose the path of this file. 
-     *  
-     */
-    public boolean isSavingTacletTranslation() {
-	
-	return saveTacletTranslation;
-    }
 
-    /** 
-     * @param selected <code>true</code> if the taclet translation should be saved in a file. 
-     */
-    public void setSaveTacletTranslation(boolean selected) {
-	saveTacletTranslation = selected;
-	//TODO: Add code to store value permanently.
-	
-    }
-
-    /**
-     * @return
-     */
-    public boolean isUsingTaclets() {
-	
-	return useTaclets;
-    }
-
-    /**
-     * @param selected
-     */
-    public void setUseTaclets(boolean selected) {
-	useTaclets = selected;
-	//TODO: Add code to store value permanently.
-    }
 
  
 

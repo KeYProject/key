@@ -8,7 +8,7 @@
 //
 //
 
-import de.uka.ilkd.key.gui.Main;
+
 import junit.framework.TestCase;
 import junit.framework.TestResult;
 import junit.framework.TestSuite;
