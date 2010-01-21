@@ -29,15 +29,15 @@ class Stack {
     }
     
     
-    /*@ depends \inv: footprint;
+    /*@ accessible \inv: footprint;
       @ invariant contents.\inv;
       @ invariant \disjoint(contents, contents.footprint);
       @*/
     
     
     /*@ model \locset footprint;
-      @ depends footprint: footprint;
-      @ represents footprint <- contents, contents.footprint;
+      @ accessible footprint: footprint;
+      @ represents footprint = contents, contents.footprint;
       @*/
     
     

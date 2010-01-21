@@ -1,8 +1,8 @@
 final class ArrayList {
     
     //@ model \locset footprint;
-    //@ depends footprint: footprint;
-    //@ depends \inv: footprint;
+    //@ accessible footprint: footprint;
+    //@ accessible \inv: footprint;
     
     
     private /*@nullable@*/ Object[] array = new Object[10];
@@ -10,7 +10,7 @@ final class ArrayList {
     
     private int notPartOfFootprint;
     
-    //@ represents footprint <- array, array[*], array.length, size;    
+    //@ represents footprint = array, array[*], array.length, size;    
     
     //@ invariant array != null;
     //@ invariant 0 <= size && size <= array.length;

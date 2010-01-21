@@ -3,7 +3,7 @@ final class ArrayList implements List {
     private /*@nullable@*/ Object[] array = new Object[10];
     private int size = 0;
     
-    //@ represents footprint <- array, array[*], array.length, size;    
+    //@ represents footprint = array, array[*], array.length, size;    
     
     //@ invariant array != null;
     //@ invariant 0 <= size && size <= array.length;
@@ -105,8 +105,8 @@ final class ArrayList implements List {
 	private final ArrayList arrayList; //workaround; should be ArrayList.this
 	private int arrayPos = 0;
 	
-	//@ represents list <- arrayList;
-	//@ represents pos <- arrayPos;
+	//@ represents list = arrayList;
+	//@ represents pos = arrayPos;
 	
 	//@ invariant arrayList.\inv;
 	//@ invariant 0 <= arrayPos && arrayPos <= arrayList.size;

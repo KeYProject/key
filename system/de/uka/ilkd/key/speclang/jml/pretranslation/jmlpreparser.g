@@ -137,7 +137,7 @@ classlevel_element[ImmutableList<String> mods]
 	throws SLTranslationException
 :
         result=class_invariant[mods]
-    |   result=depends_clause[mods]        
+    |   (depends_clause[mods]) => result=depends_clause[mods]        
     |   result=method_specification[mods]
     |   (method_declaration[mods]) => result=method_declaration[mods]
     |   result=field_declaration[mods] 
@@ -830,19 +830,12 @@ depends_clause[ImmutableList<String> mods]
     PositionedString ps;
 }
 :
-    depends_keyword ps=expression
+    accessible_keyword ps=expression
     {
     	TextualJMLDepends d 
     		= new TextualJMLDepends(mods, ps);
 	result = ImmutableSLList.<TextualJMLConstruct>nil().prepend(d);
     }
-;
-
-
-depends_keyword
-:
-        DEPENDS
-    |   DEPENDS_REDUNDANTLY
 ;
 
 

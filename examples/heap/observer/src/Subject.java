@@ -2,8 +2,8 @@ public abstract class Subject {
     protected /*@spec_public@*/ Observer[] observers = new Observer[0];
     
     //@ public model \locset footprint;
-    //@ depends \inv: footprint, observers, observers.*, \infinite_union(int i; 0 <= i && i < observers.length ? observers[i].* : \empty);    
-    //@ depends footprint: footprint;
+    //@ accessible \inv: footprint, observers, observers.*, \infinite_union(int i; 0 <= i && i < observers.length ? observers[i].* : \empty);    
+    //@ accessible footprint: footprint;
     
     /*@ public invariant \disjoint(footprint, \set_union(observers, observers.*));
       @ public invariant (\forall int i; 0 <= i && i < observers.length; 

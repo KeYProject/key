@@ -50,8 +50,6 @@ tokens {
     DECREASES_REDUNDANTLY  	= "decreases_redundantly";
     DECREASING  		= "decreasing";
     DECREASING_REDUNDANTLY  	= "decreasing_redundantly";
-    DEPENDS                     = "depends";
-    DEPENDS_REDUNDANTLY         = "depends_redundantly";
     DIVERGES 			= "diverges";
     DIVERGES_RED 		= "diverges_redundantly";
     DURATION 			= "duration";

@@ -52,6 +52,7 @@ DOTDOT : "..";
 DURATION : "\\duration";
 ELEMTYPE : "\\elemtype";
 EQUAL : "==";
+EQUAL_SINGLE : "=";
 EQV : "<==>";
 EVERYTHING : "\\everything";
 FRESH : "\\fresh"; 

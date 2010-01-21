@@ -689,7 +689,7 @@ representsclause returns [Pair<ObserverFunction,Term> result=null] throws SLTran
     (
         {!lhs.getTerm().sort().equals(setLDT.targetSort())}?    
         (
-            (LARROW | "=") rhs=expression
+            (LARROW | EQUAL_SINGLE) rhs=expression
             {
                 if(!rhs.isTerm()) {
                     raiseError("Represents clause with unexpected rhs: " + rhs);
@@ -704,7 +704,7 @@ representsclause returns [Pair<ObserverFunction,Term> result=null] throws SLTran
         |
         {lhs.getTerm().sort().equals(setLDT.targetSort())}?        
         (
-            (LARROW | "=") t=storereflist
+            (LARROW | EQUAL_SINGLE) t=storereflist
             {
                 t = TB.equals(lhs.getTerm(), t);
             }            

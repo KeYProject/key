@@ -41,7 +41,7 @@ class Iterator {
     }
     
     
-    /*@ depends \inv: footprint, list().footprint;
+    /*@ accessible \inv: footprint, list().footprint;
       @ invariant list.\inv;
       @ invariant 0 <= index && index <= list.size(); 
       @ invariant \disjoint(this.*, list.footprint);
@@ -49,7 +49,7 @@ class Iterator {
     
     
     /*@ model \locset footprint;
-      @ depends footprint: footprint;
-      @ represents footprint <- list, index;
+      @ accessible footprint: footprint;
+      @ represents footprint = list, index;
       @*/    
 }

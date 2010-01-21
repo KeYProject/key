@@ -8,9 +8,9 @@ class UpdateAbstraction {
     static int h;
     
     //@ static model \locset LOW;           	//just an abbreviation
-    //@ static represents LOW <- \set_union(l, l2);
+    //@ static represents LOW = \set_union(l, l2);
     //@ static model \locset HIGH;           	//just an abbreviation
-    //@ static represents HIGH <- \singleton(h);
+    //@ static represents HIGH = \singleton(h);
     
     //@ static ghost \locset pcDep;     //buffer for dependencies of program counter     
     

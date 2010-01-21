@@ -3,11 +3,11 @@ class MyClass {
     int attr2;
 
     //@ model \locset footprint;
-    //@ represents footprint <- this.*;
-    //@ depends footprint: footprint;
+    //@ represents footprint = this.*;
+    //@ accessible footprint: footprint;
        
     //@ invariant attr2 != 0;
-    //@ depends \inv: footprint;
+    //@ accessible \inv: footprint;
 
     //@ assignable \nothing;
     //@ ensures \fresh(footprint);

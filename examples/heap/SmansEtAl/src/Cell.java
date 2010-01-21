@@ -28,9 +28,9 @@ class Cell {
     }
     
     /*@ model \locset footprint;
-      @ depends footprint: footprint;
-      @ represents footprint <- x;
+      @ accessible footprint: footprint;
+      @ represents footprint = x;
       @*/
     
-    //@ depends \inv: \nothing;
+    //@ accessible \inv: \nothing;
 }

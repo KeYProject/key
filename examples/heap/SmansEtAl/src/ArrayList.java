@@ -54,7 +54,7 @@ class ArrayList {
     }
     
     
-    /*@ depends \inv: footprint;
+    /*@ accessible \inv: footprint;
       @ invariant items != null;
       @ invariant 0 <= count && count <= items.length;
       @ invariant \typeof(items) == \type(Object[]);
@@ -62,7 +62,7 @@ class ArrayList {
 
     
     /*@ model \locset footprint;
-      @ depends footprint: footprint;
-      @ represents footprint <- count, items, items[*], items.length;
+      @ accessible footprint: footprint;
+      @ represents footprint = count, items, items[*], items.length;
       @*/    
 }

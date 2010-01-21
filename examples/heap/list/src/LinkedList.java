@@ -4,7 +4,7 @@ final class LinkedList implements List {
     private /*@nullable@*/ Node last;
     private int size;
     
-    //@ represents footprint <- first, last, size, \reachLocs(first.next, first);
+    //@ represents footprint = first, last, size, \reachLocs(first.next, first);
     
     /*@ invariant size == 0 && first == null && last == null
       @            || size > 0

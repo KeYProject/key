@@ -1,7 +1,7 @@
 interface List {
     
     //@ ghost instance \locset footprint;
-    //@ depends \inv: footprint;
+    //@ accessible \inv: footprint;
     
     /*@ normal_behaviour
       @   assignable footprint;

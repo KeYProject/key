@@ -1,7 +1,7 @@
 class MySubclass extends MyClass {
     
     Object o;
-    //@ represents footprint <- this.*, o.*;
+    //@ represents footprint = this.*, o.*;
     
     
     int add27(int i) {
@@ -12,7 +12,7 @@ class MySubclass extends MyClass {
     int x;
     int y;
     //@ model int modelField;    
-    //@ represents modelField <- x + y;
+    //@ represents modelField = x + y;
     int test;
     
     /*@ assignable x, y;

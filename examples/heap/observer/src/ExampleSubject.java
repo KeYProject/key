@@ -1,7 +1,7 @@
 public class ExampleSubject extends Subject {
     private int value;
     
-    //@ represents footprint <- value;
+    //@ represents footprint = value;
     
     /*@ public normal_behaviour
       @   ensures \fresh(footprint);

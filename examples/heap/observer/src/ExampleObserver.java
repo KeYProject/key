@@ -3,8 +3,8 @@ public class ExampleObserver implements Observer {
     private ExampleSubject subj;
     private int cache;
     
-    //@ represents subject <- subj;
-    //@ represents upToDate <- (cache == subj.value());
+    //@ represents subject = subj;
+    //@ represents upToDate = (cache == subj.value());
     
     /*@ public normal_behaviour
       @   ensures subject == s;            

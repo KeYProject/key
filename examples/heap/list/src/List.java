@@ -1,8 +1,8 @@
 interface List {
     
     //@ model instance \locset footprint;
-    //@ depends footprint: footprint;
-    //@ depends \inv: footprint;
+    //@ accessible footprint: footprint;
+    //@ accessible \inv: footprint;
     
     
     /*@ normal_behaviour
