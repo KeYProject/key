@@ -18,6 +18,7 @@
 package de.uka.ilkd.key.gui.nodeviews;
 
 import java.awt.Point;
+import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.dnd.DropTargetAdapter;
@@ -25,14 +26,17 @@ import java.awt.dnd.DropTargetDragEvent;
 import java.awt.dnd.DropTargetDropEvent;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 import java.io.IOException;
 import java.util.Iterator;
+import java.util.List;
 
 import javax.swing.JPopupMenu;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.gui.KeYMediator;
+import de.uka.ilkd.key.gui.Main;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Constraint;
@@ -101,6 +105,20 @@ public class DragNDropInstantiator extends DropTargetAdapter {
                     .isDataFlavorSupported(PosInSequentTransferable.POS_IN_SEQUENT_TRANSFER)) {
                 interpreteDragAndDropInstantiation(event, dropLocation,
                         transferable);
+            } else if (transferable
+	                    .isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
+	        	try {
+	                	event.acceptDrop(event.getSourceActions());
+	        	List files = (List) transferable.getTransferData(DataFlavor.javaFileListFlavor);
+	        	for (Iterator i = files.iterator(); i.hasNext(); ) {
+	        	    File f = (File) i.next();
+	        	    Main.getInstance().loadProblem(f);
+	        	}
+	        	event.dropComplete(true);
+	        	}
+	        	catch (ClassCastException ex) {
+	        	    event.rejectDrop();
+	        	}
             } else {
                 event.rejectDrop();
             }
