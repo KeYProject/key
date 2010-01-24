@@ -21,7 +21,10 @@ import java.awt.dnd.DropTargetListener;
 import java.awt.event.*;
 import java.io.*;
 import java.net.URL;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
@@ -37,7 +40,6 @@ import de.uka.ilkd.key.gui.assistant.ProofAssistantAI;
 import de.uka.ilkd.key.gui.assistant.ProofAssistantController;
 import de.uka.ilkd.key.gui.configuration.*;
 import de.uka.ilkd.key.gui.nodeviews.NonGoalInfoView;
-import de.uka.ilkd.key.gui.nodeviews.PosInSequentTransferable;
 import de.uka.ilkd.key.gui.nodeviews.SequentView;
 import de.uka.ilkd.key.gui.notification.NotificationManager;
 import de.uka.ilkd.key.gui.notification.events.ExitKeYEvent;
@@ -61,7 +63,6 @@ import de.uka.ilkd.key.proof.mgt.TaskTreeNode;
 import de.uka.ilkd.key.proof.reuse.ReusePoint;
 import de.uka.ilkd.key.smt.DecProcRunner;
 import de.uka.ilkd.key.strategy.VBTStrategy;
-import de.uka.ilkd.key.unittest.TestExecuter;
 import de.uka.ilkd.key.unittest.UnitTestBuilder;
 import de.uka.ilkd.key.unittest.UnitTestBuilderGUIInterface;
 import de.uka.ilkd.key.util.Debug;
@@ -614,10 +615,8 @@ public class Main extends JFrame implements IMain {
 	                    .isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
 	        	try {
 	                	event.acceptDrop(event.getSourceActions());
-	        	List files = (List) transferable.getTransferData(DataFlavor.javaFileListFlavor);
-	        	for (Iterator i = files.iterator(); i.hasNext(); ) {
-	        	    File f = (File) i.next();
-	        	    loadProblem(f);
+	        	for (Object file : (List) transferable.getTransferData(DataFlavor.javaFileListFlavor)) {
+	        	    loadProblem((File) file);
 	        	}
 	        	event.dropComplete(true);
 	        	}
