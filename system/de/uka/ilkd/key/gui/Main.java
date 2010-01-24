@@ -2001,16 +2001,19 @@ public class Main extends JFrame implements IMain {
         }
     }
     
-    protected void loadProblem(File file) {
-		if (file == null) 
-			return;
-		if (recentFiles != null) {
-			recentFiles.addRecentFile(file.getAbsolutePath());	
-		}
-        final ProblemLoader pl = 
-            new ProblemLoader(file, this, mediator.getProfile(), false);
-        pl.addTaskListener(getProverTaskListener());
-        pl.run();
+    public void loadProblem(File file) {
+	if (file == null)
+	    return;
+	if (recentFiles != null) {
+	    recentFiles.addRecentFile(file.getAbsolutePath());
+	}
+	if(unitKeY!=null){
+	    unitKeY.recent.addRecentFile(file.getAbsolutePath());
+	}
+	final ProblemLoader pl = 
+	    new ProblemLoader(file, this, mediator.getProfile(), false);
+	pl.addTaskListener(getProverTaskListener());
+	pl.run();
     }
     
     protected void closeTask() {
