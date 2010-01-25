@@ -27,6 +27,7 @@ import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.smt.taclettranslation.AbstractTacletTranslator;
 import de.uka.ilkd.key.smt.taclettranslation.DefaultTacletSetTranslation;
 import de.uka.ilkd.key.smt.taclettranslation.TacletFormula;
 import de.uka.ilkd.key.smt.taclettranslation.TacletSetTranslation;
@@ -126,7 +127,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
     /**Formulae made of taclets, used for assumptions.*/
     private TacletSetTranslation tacletSetTranslation = null;
     
-    private ImmutableSet<Taclet> taclets= DefaultImmutableSet.nil();
+    private Collection<Taclet> taclets= new LinkedList<Taclet>();
     
     private HashSet<Term> usedAttributeTerms = new HashSet();
     
@@ -1541,7 +1542,13 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 	    }
 	    
 	    this.addFunction(atop, sorts, atop.sort());
-	    usedAttributeTerms.add(term);
+	    
+	    
+	    Term object = AbstractTacletTranslator.getObject(term);
+	    if(!(object.op() instanceof LogicVariable) ){
+		usedAttributeTerms.add(term);
+	    }
+	    
 	    return translateFunc(atop, subterms);
 	} else {
 	    //if none of the above works, the symbol can be translated as uninterpreted function
@@ -1877,10 +1884,10 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
      * Sets the taclets which should be used for translation.
      * @param set set of taclets.
      */
-    public void setTacletsForAssumptions(ImmutableSet<Taclet> tacletSet){
+    public void setTacletsForAssumptions(Collection<Taclet> tacletSet){
 	
 	if(tacletSet == null) {
-	    taclets = DefaultImmutableSet.nil();
+	    taclets = new LinkedList<Taclet>();
 	}else{
 	taclets = tacletSet;
 	}

@@ -36,6 +36,7 @@ import de.uka.ilkd.key.smt.taclettranslation.DefaultTacletSetTranslation;
 import de.uka.ilkd.key.smt.taclettranslation.IllegalTacletException;
 import de.uka.ilkd.key.smt.taclettranslation.TacletFormula;
 import de.uka.ilkd.key.smt.taclettranslation.TacletSetTranslation;
+import de.uka.ilkd.key.smt.taclettranslation.UsedTaclets;
 import de.uka.ilkd.key.util.ProgressMonitor;
 
 
@@ -239,7 +240,7 @@ public abstract class AbstractSMTSolver implements SMTSolver {
 	
 
 
-
+	
 	SMTTranslator trans = this.getTranslator(services);
 	
 	instantiateTaclets(goal, trans);
@@ -536,16 +537,11 @@ public abstract class AbstractSMTSolver implements SMTSolver {
 	this.useTaclets = b;
     }
     
-    private ImmutableSet<Taclet> getTaclets(Goal goal){
+    private Collection<Taclet> getTaclets(Goal goal){
 	
-	 ImmutableSet<Taclet> res = DefaultImmutableSet.nil();
-	 final ImmutableSet<NoPosTacletApp> apps =  goal.ruleAppIndex().tacletIndex().allNoPosTacletApps();
-	 
-	 for (final NoPosTacletApp app : apps){
-	     res = res.add(app.taclet());
 	
-	 }
-	 return res;
+	 return ProofSettings.DEFAULT_SETTINGS.getTacletTranslationSettings()
+	            .initTaclets(goal.ruleAppIndex().tacletIndex());
     }
     
    
@@ -570,7 +566,8 @@ public abstract class AbstractSMTSolver implements SMTSolver {
     private void instantiateTaclets(Goal goal, SMTTranslator trans) throws IllegalFormulaException{
 	ImmutableSet<Taclet> emptySet = DefaultImmutableSet.nil();
 	if(!ProofSettings.DEFAULT_SETTINGS.getTacletTranslationSettings().isUsingTaclets()){
-	    trans.setTacletsForAssumptions(emptySet);
+	    trans.setTacletsForAssumptions(new LinkedList<Taclet>());
+	   
 	}else{
 	    trans.setTacletsForAssumptions(getTaclets(goal));
 	}

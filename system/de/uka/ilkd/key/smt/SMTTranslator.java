@@ -10,6 +10,7 @@
 
 package de.uka.ilkd.key.smt;
 
+import java.util.Collection;
 import java.util.Vector;
 
 import de.uka.ilkd.key.collection.ImmutableList;
@@ -50,7 +51,7 @@ public interface SMTTranslator {
      * Set the assumption before calling the general translate method. 
      * @param taclets 
      */
-    public void setTacletsForAssumptions(ImmutableSet<Taclet> taclets);
+    public void setTacletsForAssumptions(Collection<Taclet> taclets);
     
     //TODO remove after testing!!
     /**

@@ -14,9 +14,12 @@ package de.uka.ilkd.key.smt.taclettranslation;
  * 
  */
 public class TreeItem {
+    public enum SelectionMode {all,nothing,user};
     private String text;
-    private boolean checked = false;
-    private boolean parentSelected = false;
+
+    private SelectionMode mode = SelectionMode.nothing;
+    private int selectedChildCount = 0;
+    private int childCount = 0;
 
     
 
@@ -27,17 +30,39 @@ public class TreeItem {
     
     TreeItem(String text, boolean checked){
 	this.text = text;
-	this.checked = checked;
+
     
     }
     
-    public boolean isChecked(){
-	return checked;
-    }
     
-    public void setChecked(boolean b){
-	checked = b;
+    
+    
+    
+    public int getSelectedChildCount() {
+        return selectedChildCount;
     }
+
+    public void setSelectedChildCount(int selectedChildCount) {
+        this.selectedChildCount = selectedChildCount;
+    }
+
+    public int getChildCount() {
+        return childCount;
+    }
+
+    public void setChildCount(int childCount) {
+        this.childCount = childCount;
+    }
+
+    public SelectionMode getMode() {
+        return mode;
+    }
+
+    public void setMode(SelectionMode mode) {
+        this.mode = mode;
+    }
+
+
 
     public String toString(){
 	return text;
@@ -47,18 +72,7 @@ public class TreeItem {
 	return text.hashCode();
     }
     
-    /**
-     * @return returns true iff all parents, i.d. father, grandfather, 
-     * grand-grand-father, are checked. 
-     */
-    public boolean isParentSelected(){
-	return parentSelected;
-    }
-    
-    public void setParentSelected(boolean b){
-	parentSelected = b;
-    }
-    
+
     
     
     

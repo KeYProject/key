@@ -3,7 +3,9 @@ package de.uka.ilkd.key.smt.taclettranslation;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.HashSet;
+import java.util.LinkedList;
 
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableList;
@@ -50,7 +52,7 @@ public final class DefaultTacletSetTranslation
      * List of taclets that should be translated. The translation will be done
      * by calling <code>getTtranslation()</code>.
      */
-    private ImmutableSet<Taclet> taclets = DefaultImmutableSet.nil();
+    private Collection<Taclet> taclets = new LinkedList<Taclet>();
 
     /**
      * List of taclet translators. If you want to add translators use
@@ -114,7 +116,7 @@ public final class DefaultTacletSetTranslation
 		if (rs.name().toString().equals(h))
 		    return true;
 	    }
-
+	    
 	}
 	return false;
     }
@@ -169,7 +171,7 @@ public final class DefaultTacletSetTranslation
 	return translation;
     }
 
-    public void setTacletSet(ImmutableSet<Taclet> set) {
+    public void setTacletSet(Collection<Taclet> set) {
 	translate = true;
 	translation = ImmutableSLList.nil();
 	taclets = set;
@@ -208,14 +210,14 @@ public final class DefaultTacletSetTranslation
     }
     
    
-
+    
     private void storeToFile(ImmutableList<TacletFormula> list, String dest) {
         String toStore = "";
-        toStore = "\\\\"+Calendar.getInstance().getTime().toString()+"\n";
+        toStore = "//"+Calendar.getInstance().getTime().toString()+"\n";
         
         String modelDir = services.getProof().env().getJavaModel().getModelDir();
         
-        if(modelDir != ""){
+        if(modelDir != "" && modelDir != null){
             toStore += "\\javaSource \""+modelDir+"\";\n\n";
         }
         

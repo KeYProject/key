@@ -47,6 +47,7 @@ import de.uka.ilkd.key.logic.op.Quantifier;
 import de.uka.ilkd.key.logic.op.RigidFunction;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariableAdapter;
+import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.logic.op.SortedSchemaVariable;
 import de.uka.ilkd.key.logic.op.WarySubstOp;
 import de.uka.ilkd.key.logic.sort.ArraySort;
@@ -73,7 +74,7 @@ interface VariablePool {
     LogicVariable getLogicVariable(Name name, Sort sort);
 }
 
-abstract class AbstractTacletTranslator implements TacletTranslator,
+public abstract class AbstractTacletTranslator implements TacletTranslator,
         VariablePool {
 
     // only for testing.
@@ -582,6 +583,30 @@ abstract class AbstractTacletTranslator implements TacletTranslator,
 	    return true;
 	}
 	return false;
+    }
+    
+   static public HashSet<GenericSort> collectGenerics(Term term) {
+	HashSet<GenericSort> genericSorts = new HashSet<GenericSort>();
+	collectGenerics(term, genericSorts);
+	return genericSorts;
+    }
+    
+    static private void collectGenerics(Term term, HashSet<GenericSort> genericSorts) {
+
+	if (term.op() instanceof SortDependingFunction) {
+	    SortDependingFunction func = (SortDependingFunction) term.op();
+	    if (func.getSortDependingOn() instanceof GenericSort) {
+		genericSorts.add((GenericSort) func.getSortDependingOn());
+	    }
+	}
+
+	if (term.sort() instanceof GenericSort) {
+	    genericSorts.add((GenericSort) term.sort());
+	}
+	for (int i = 0; i < term.arity(); i++) {
+	    collectGenerics(term.sub(i), genericSorts);
+	}
+
     }
     
     /**

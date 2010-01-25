@@ -1651,7 +1651,14 @@ public class Main extends JFrame implements IMain {
 	showTacletTranslationSettings = new JMenuItem("settings for taclet translation");
 	showTacletTranslationSettings.addActionListener(new ActionListener() {
 		   public void actionPerformed(ActionEvent e) {
+		       if(mediator.getSelectedProof()!=null){
+			    ProofSettings.DEFAULT_SETTINGS.getTacletTranslationSettings().
+			    initTacletMap(mediator.getSelectedProof().env().getInitConfig().getTaclets());  
+		       }
+		
 		       TacletTranslationSettingsDialog.showDialog();
+		       
+		       
 		   }
 		});
 	decProcOptions.add(showTacletTranslationSettings);

@@ -14,6 +14,15 @@ import java.util.HashMap;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeModel;
+import javax.swing.tree.TreeNode;
+
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.TacletIndex;
+import de.uka.ilkd.key.rule.NoPosTacletApp;
+import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.smt.taclettranslation.TreeItem.SelectionMode;
 
 /**
  * Change this file if you want to change the set of taclets that can be used
@@ -28,7 +37,8 @@ public final class UsedTaclets {
      * The taclets that could be used for external provers.
      */
 
-    static private HashMap<String, TreeItem> taclets = new HashMap<String, TreeItem>();
+    static private HashMap<String, TreeItem> tacletNames = new HashMap<String, TreeItem>();
+
     private static TreeModel model = null;
 
     /**
@@ -47,7 +57,7 @@ public final class UsedTaclets {
      * @return returns the number of taclets that are supported.
      */
     static public int getCount() {
-	return taclets.size();
+	return tacletNames.size();
     }
 
     /**
@@ -56,7 +66,7 @@ public final class UsedTaclets {
      */
     static public Collection<TreeItem> getTreeItems() {
 	getTreeModel();
-	return taclets.values();
+	return tacletNames.values();
     }
 
     /**
@@ -82,36 +92,66 @@ public final class UsedTaclets {
 	}
 	if (found == false)
 	    return false;
-	TreeItem item = taclets.get(tacletname);
-	return item != null && item.isParentSelected() && item.isChecked();
+	TreeItem item = tacletNames.get(tacletname);
+	return item != null && item.getMode() == SelectionMode.all;
 	// return usedTaclets.contains(tacletname);
 
     }
 
-    /**
-     * Validates the parent selection field. Use this method after loading the
-     * assignment of the taclets.
-     */
-    public static void validateParentSelection() {
-
-	validateParentSelection((DefaultMutableTreeNode) getTreeModel()
-	        .getRoot(), true);
+    private static TreeItem treeItem(TreeNode node) {
+	return (TreeItem) ((DefaultMutableTreeNode) node).getUserObject();
     }
+    
 
-    private static void validateParentSelection(DefaultMutableTreeNode node,
-	    boolean parentSelected) {
-	TreeItem item = (TreeItem) node.getUserObject();
-	item.setParentSelected(parentSelected);
-	if (parentSelected == true) {
-	    parentSelected = item.isChecked();
+    public static void validateSelectionModes(){
+	TreeModel model = getTreeModel();
+	validateSelectionMode((TreeNode)model.getRoot());
+    }
+    
+    
 
+    
+    private static SelectionMode validateSelectionMode(TreeNode node){
+	TreeItem item = treeItem(node);
+	if(node.isLeaf()){
+	    if(item.getMode() == SelectionMode.all){
+		item.setSelectedChildCount(1);
+	    }else{
+		item.setSelectedChildCount(0);
+	    }
+	    
+	    return item.getMode();
 	}
-	for (int i = 0; i < node.getChildCount(); i++) {
-	    validateParentSelection(
-		    (DefaultMutableTreeNode) node.getChildAt(i), parentSelected);
+	item.setChildCount(0);
+	
+
+	int iAll=0, iNothing=0;
+	for(int i=0; i < node.getChildCount(); i++){
+	    
+	    TreeNode child = node.getChildAt(i);
+	    SelectionMode childMode = validateSelectionMode(child);
+	    if(childMode.equals(SelectionMode.all)){
+		iAll++;
+	    }else if(childMode.equals(SelectionMode.nothing)){
+		iNothing++;
+	    }
+	    TreeItem childItem = treeItem(child);
+	    item.setChildCount(item.getChildCount()+childItem.getChildCount());
+	    
+	    item.setSelectedChildCount(item.getSelectedChildCount()+childItem.getSelectedChildCount());
+	    
 	}
+	
+	if(iAll == node.getChildCount()){
+	    item.setMode(SelectionMode.all);
+	    
+	}else if(iNothing == node.getChildCount()){
+	    item.setMode(SelectionMode.nothing);
+	}	
+	return item.getMode();
 
     }
+    
 
     /**
      * Adds a taclet to the list of supported taclets.
@@ -128,8 +168,8 @@ public final class UsedTaclets {
     private static void addTaclet(DefaultMutableTreeNode node, String taclet,
 	    boolean checked) {
 	TreeItem child = new TreeItem(taclet, checked);
-	if (!taclets.containsKey(child.toString())) {
-	    taclets.put(child.toString(), child);
+	if (!tacletNames.containsKey(child.toString())) {
+	    tacletNames.put(child.toString(), child);
 	    node.add(new DefaultMutableTreeNode(child));
 	}
     }
@@ -151,6 +191,9 @@ public final class UsedTaclets {
 	root.add(node);
 	return node;
     }
+    
+
+
 
     /**
      * This is the real interesting method of this class. Change this method to
@@ -164,7 +207,7 @@ public final class UsedTaclets {
 	    return model;
 
 	TreeItem rootItem = new TreeItem("All supported taclets");
-	rootItem.setParentSelected(true);
+	
 	DefaultMutableTreeNode root = new DefaultMutableTreeNode(rootItem);
 
 	DefaultMutableTreeNode node1 = newNode(root, "proof independent");
@@ -217,7 +260,7 @@ public final class UsedTaclets {
 	addTaclet(node4, "replace_long_HALFRANGE");
 
 	DefaultMutableTreeNode node5 = newNode(node1,
-	        "translating of java operators");
+	        "translation of java operators");
 	addTaclet(node5, "translateJavaUnaryMinusInt");
 	addTaclet(node5, "translateJavaUnaryMinusLong");
 	addTaclet(node5, "translateJavaBitwiseNegation");
@@ -318,7 +361,8 @@ public final class UsedTaclets {
 	        "objects_with_index_geq_next_to_create_are_not_created");
 	addTaclet(
 	        node14,
-	        "objects_with_index_greater_next_to_create_are_not_createdsystem_invariant_for_created_2a_automated_use_3");
+	        "objects_with_index_greater_next_to_create_are_not_createdsystem" +
+	        "_invariant_for_created_2a_automated_use_3");
 	addTaclet(node8, "nextToCreate_non_negative");
 	addTaclet(node8, "nextToCreate_non_negative_2");
 

@@ -10,6 +10,8 @@
 
 package de.uka.ilkd.key.smt.taclettranslation;
 
+import java.util.Collection;
+
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.logic.Term;
@@ -31,7 +33,7 @@ public interface TacletSetTranslation {
      * @param set
      *            the set of taclets that should be translated.
      */
-    public void setTacletSet(ImmutableSet<Taclet> set);
+    public void setTacletSet(Collection<Taclet> set);
 
     /**
      * Builds the translation of the taclets given by calling the method

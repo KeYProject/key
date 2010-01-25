@@ -10,6 +10,7 @@
 package de.uka.ilkd.key.gui;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Properties;
@@ -17,13 +18,19 @@ import java.util.Properties;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeNode;
 
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.configuration.Settings;
 import de.uka.ilkd.key.gui.configuration.SettingsListener;
+import de.uka.ilkd.key.proof.TacletIndex;
+import de.uka.ilkd.key.rule.NoPosTacletApp;
+import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.smt.taclettranslation.TreeItem;
 import de.uka.ilkd.key.smt.taclettranslation.UsedTaclets;
+import de.uka.ilkd.key.smt.taclettranslation.TreeItem.SelectionMode;
 
 
 public class TacletTranslationSettings implements Settings {
+    private HashMap<String, Taclet> taclets =null;
     static private TacletTranslationSettings instance = new TacletTranslationSettings();
     public static TacletTranslationSettings getInstance(){
 	return instance;
@@ -75,12 +82,11 @@ public class TacletTranslationSettings implements Settings {
     }
     
     private void tacletAssignmentToString(TreeNode node, StringBuffer buf){
-	if(((TreeItem)((DefaultMutableTreeNode)node).getUserObject()).isChecked()){
-	    buf.append("1");
-	}
-	else{
-	    buf.append("0");
-	}
+	TreeItem item = ((TreeItem)((DefaultMutableTreeNode)node).getUserObject());
+	
+
+	buf.append(item.getMode().ordinal());
+	
 	for(int i=0; i < node.getChildCount(); i++){
 	    tacletAssignmentToString(node.getChildAt(i), buf);
 	}
@@ -89,12 +95,23 @@ public class TacletTranslationSettings implements Settings {
     private void tacletAssignmentFromString(String s){
 	tacletAssignmentFromString((TreeNode)UsedTaclets.getTreeModel().getRoot(),
 		s, 0);
-	UsedTaclets.validateParentSelection();
+	UsedTaclets.validateSelectionModes();
     }
     private int tacletAssignmentFromString(TreeNode node,String s, int index){
 	if(index >= s.length() || index < 0) return -1;
-	((TreeItem)((DefaultMutableTreeNode)node).getUserObject())
-		.setChecked(s.charAt(index)=='1'?true:false);
+	TreeItem item = ((TreeItem)((DefaultMutableTreeNode)node).getUserObject());
+	
+	String c = String.valueOf(s.charAt(index));
+
+	
+	if(Integer.valueOf(c) == SelectionMode.all.ordinal()){
+	    item.setMode(SelectionMode.all);
+	}else if(Integer.valueOf(c) == SelectionMode.user.ordinal()){
+	    item.setMode(SelectionMode.user);
+	}else{
+	    item.setMode(SelectionMode.nothing);
+	}
+
 	index++;
 	for(int i=0; i < node.getChildCount(); i++){
 	    index = tacletAssignmentFromString(node.getChildAt(i), s, index);
@@ -106,28 +123,57 @@ public class TacletTranslationSettings implements Settings {
     }
     
     
-    
-    private void convertTacletAssignment(String s){
-	Collection<TreeItem> items = UsedTaclets.getTreeItems();
-	int i=0; 
-	if(items.size() != s.length()) return;
-	for(TreeItem item : items){
-	  if(s.charAt(i)=='1'){
-	      item.setChecked(true);
-	  }
-	  else{
-	      item.setChecked(false);
-	  }
-	  i++;
-	}
-	UsedTaclets.validateParentSelection();
-    }
+
     
     public boolean isUsingTaclets(){
-	return ((TreeItem)((DefaultMutableTreeNode)UsedTaclets.getTreeModel()
-		.getRoot()).getUserObject()).isChecked();
+	TreeItem item = ((TreeItem)((DefaultMutableTreeNode)UsedTaclets.getTreeModel()
+		.getRoot()).getUserObject());
+	return item.getMode() == SelectionMode.all || item.getMode() == SelectionMode.user;
 
     }
+    
+    public Collection<Taclet> initTaclets(TacletIndex tacletIndex){
+	
+	
+	return initTacletMap(tacletIndex).values();
+    }
+    
+    public HashMap<String,Taclet> initTacletMap(TacletIndex tacletIndex){
+	if(taclets==null){
+	    taclets = new HashMap<String,Taclet>();
+
+
+	    final ImmutableSet<NoPosTacletApp> apps =  tacletIndex.allNoPosTacletApps();
+	    for (final NoPosTacletApp app : apps){
+		taclets.put(app.taclet().name().toString(),app.taclet());
+
+	    }
+
+	}
+	return taclets;
+    }
+    
+    public HashMap<String,Taclet> initTacletMap(ImmutableSet<Taclet> tac){
+	if(taclets==null){
+	    taclets = new HashMap<String,Taclet>();
+
+
+	    
+	    for (Taclet t : tac){
+		taclets.put(t.name().toString(),t);
+
+	    }
+
+	}
+	return taclets;
+    }
+    
+    public HashMap<String, Taclet> getTacletMap(){
+	return taclets;
+    }
+    
+    
+
     
     
   

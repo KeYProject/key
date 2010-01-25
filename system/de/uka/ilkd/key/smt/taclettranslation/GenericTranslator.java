@@ -67,7 +67,7 @@ class GenericTranslator {
 	    throws IllegalTacletException {
 	this.services = services;
 	ImmutableList<Term> list = instantiateGeneric(term,
-	        collectGenerics(term), sorts, t, conditions, maxGeneric);
+	        AbstractTacletTranslator.collectGenerics(term), sorts, t, conditions, maxGeneric);
 	Collection<Term> result = new LinkedList<Term>();
 	if (list == null){
 	    result.add(term);
@@ -314,29 +314,9 @@ class GenericTranslator {
 
 
 
-    private HashSet<GenericSort> collectGenerics(Term term) {
-	HashSet<GenericSort> genericSorts = new HashSet<GenericSort>();
-	collectGenerics(term, genericSorts);
-	return genericSorts;
-    }
+   
 
-    private void collectGenerics(Term term, HashSet<GenericSort> genericSorts) {
-
-	if (term.op() instanceof SortDependingFunction) {
-	    SortDependingFunction func = (SortDependingFunction) term.op();
-	    if (func.getSortDependingOn() instanceof GenericSort) {
-		genericSorts.add((GenericSort) func.getSortDependingOn());
-	    }
-	}
-
-	if (term.sort() instanceof GenericSort) {
-	    genericSorts.add((GenericSort) term.sort());
-	}
-	for (int i = 0; i < term.arity(); i++) {
-	    collectGenerics(term.sub(i), genericSorts);
-	}
-
-    }
+ 
 
     public void addListener(TranslationListener listener) {
 	this.listener.add(listener);

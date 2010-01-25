@@ -25,6 +25,7 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.ArrayOp;
 import de.uka.ilkd.key.logic.op.AttributeOp;
+import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.sort.ArraySort;
 import de.uka.ilkd.key.logic.sort.GenericSort;
@@ -183,7 +184,7 @@ final class DefaultAttributeTranslator implements AttributeTranslator {
 	if (taclet.op() instanceof AttributeOp
 	        && !AbstractTacletTranslator.isCreatedTerm(taclet, services)) {
 	    AttributeOp op = (AttributeOp) taclet.op();
-	    if (op.sort().equals(ProgramSVSort.VARIABLE)) {
+	    if (op.sort().equals(ProgramSVSort.VARIABLE) ) {
 		return taclet;
 	    }
 	    if (op.sort().equals(ProgramSVSort.ARRAYLENGTH)) {
@@ -281,6 +282,7 @@ final class DefaultAttributeTranslator implements AttributeTranslator {
 	TreeNode root = new TreeNode(null, null);
 
 	for (Term content : attributeTerms) {
+
 
 	    root.addContent(content);
 	}
