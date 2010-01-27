@@ -11,6 +11,8 @@ package de.uka.ilkd.key.java.recoderext;
 
 import java.util.HashMap;
 
+import org.apache.log4j.Logger;
+
 import recoder.ServiceConfiguration;
 import recoder.abstraction.*;
 import recoder.java.declaration.TypeDeclaration;
@@ -44,6 +46,8 @@ public class KeYCrossReferenceNameInfo extends DefaultNameInfo {
     // this somewhat doubles name2type in DefaultNameInfo to which we have no access
     private HashMap<String, ClassType> classtypes = new HashMap<String, ClassType>(); 
     
+    private Logger logger = Logger.getLogger(KeYCrossReferenceNameInfo.class);
+    
     public KeYCrossReferenceNameInfo(ServiceConfiguration config) {
         super(config);
     }
@@ -74,7 +78,8 @@ public class KeYCrossReferenceNameInfo extends DefaultNameInfo {
             } else {
                 d2 = old.toString();
             }
-            throw new ConvertException("Datatype " + name + " declared twice: Once in " + d1 + " and once in " + d2);
+            logger.warn("Datatype " + name + " declared twice: Once in " + d1 + " and once in " + d2+", Keeping one from " + d2);
+            return;
         }
         
         super.register(ct);

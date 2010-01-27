@@ -25,6 +25,8 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.apache.log4j.Logger;
+
 import recoder.ParserException;
 import recoder.ProgramFactory;
 import recoder.bytecode.ByteCodeParser;
@@ -163,6 +165,7 @@ public class Recoder2KeY implements JavaReader {
      */
     private Collection<? extends CompilationUnit> dynamicallyCreatedCompilationUnits;
 
+    private Logger logger = Logger.getLogger(Recoder2KeY.class);
 
     /**
      * create a new Recoder2KeY transformation object.
@@ -566,6 +569,24 @@ public class Recoder2KeY implements JavaReader {
 
         DataLocation currentDataLocation = null;
 
+        // -- read jml files --
+        for (FileCollection fc : sources) {
+            FileCollection.Walker walker = fc.createWalker(".jml");
+            while(walker.step()) {
+                try {
+                    currentDataLocation = walker.getCurrentDataLocation();
+                    InputStream is = walker.openCurrent();
+                    Reader f = new BufferedReader(new InputStreamReader(is));
+                    recoder.java.CompilationUnit rcu = pf.parseCompilationUnit(f);
+                    rcu.setDataLocation(currentDataLocation);
+                    removeCodeFromClasses(rcu, false);
+                    rcuList.add(rcu);
+                } catch(Exception ex) {
+                    throw new ConvertException("Error while loading: " + walker.getCurrentDataLocation(), ex);
+                }
+            }
+        }
+
         // -- read java files --
         for (FileCollection fc : sources) {
             FileCollection.Walker walker = fc.createWalker(".java");
@@ -575,8 +596,8 @@ public class Recoder2KeY implements JavaReader {
                     InputStream is = walker.openCurrent();
                     Reader f = new BufferedReader(new InputStreamReader(is));
                     recoder.java.CompilationUnit rcu = pf.parseCompilationUnit(f);
-                    removeCodeFromClasses(rcu);
                     rcu.setDataLocation(currentDataLocation);
+                    removeCodeFromClasses(rcu, true);
                     rcuList.add(rcu);
                 } catch(Exception ex) {
                     throw new ConvertException("Error while loading: " + walker.getCurrentDataLocation(), ex);
@@ -613,7 +634,7 @@ public class Recoder2KeY implements JavaReader {
 
     /*
      * removes code from a parsed compilation unit. This includes method bodies,
-     * inital assignments, compile-time constants, static blocks.
+     * initial assignments, compile-time constants, static blocks.
      * 
      * This is done for classes that are read in a classpath-context. For these
      * classes only contracts (if present) are to be considered.
@@ -625,22 +646,31 @@ public class Recoder2KeY implements JavaReader {
      * FIXME this does not work if jml set statements are last in a method
      * TODO leave it out all together?
      */
-    private void removeCodeFromClasses(CompilationUnit rcu) {
+    private void removeCodeFromClasses(CompilationUnit rcu, boolean allowed) {
         TreeWalker tw = new TreeWalker(rcu);
         
         while(tw.next()) {
             ProgramElement pe = tw.getProgramElement();
             if (pe instanceof MethodDeclaration) {
                 MethodDeclaration methDecl = (MethodDeclaration) pe;
+                if(!allowed && methDecl.getBody() != null) {
+                    logger.warn("Method body ("+methDecl.getName()+") should not be allowed: "+rcu.getDataLocation());
+                }
                 methDecl.setBody(null);
             }
             if (pe instanceof recoder.java.declaration.FieldSpecification) {
                 recoder.java.declaration.FieldSpecification fieldSpec = 
                     (recoder.java.declaration.FieldSpecification) pe;
+                if(!allowed && fieldSpec.getInitializer() != null) {
+                    logger.warn("Field initializer ("+fieldSpec.getName()+") should not be allowed: "+rcu.getDataLocation());
+                }
                 fieldSpec.setInitializer(null);
             }
             if (pe instanceof ClassInitializer) {
                 ClassInitializer classInit = (ClassInitializer) pe;
+                if(!allowed && classInit.getBody() != null) {
+                    logger.warn("There should be no class initializers: "+rcu.getDataLocation());
+                }
                 classInit.setBody(null);
             }
         }
