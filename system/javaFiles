@@ -299,6 +299,7 @@ de/uka/ilkd/key/java/declaration/LocalVariableDeclaration.java
 de/uka/ilkd/key/java/declaration/MemberDeclaration.java
 de/uka/ilkd/key/java/declaration/MethodDeclaration.java
 de/uka/ilkd/key/java/declaration/modifier/Abstract.java
+de/uka/ilkd/key/java/declaration/modifier/AnnotationUseSpecification.java
 de/uka/ilkd/key/java/declaration/modifier/Final.java
 de/uka/ilkd/key/java/declaration/modifier/Ghost.java
 de/uka/ilkd/key/java/declaration/Modifier.java
@@ -440,6 +441,7 @@ de/uka/ilkd/key/java/recoderext/InstanceAllocationMethodBuilder.java
 de/uka/ilkd/key/java/recoderext/JMLTransformer.java
 de/uka/ilkd/key/java/recoderext/JumpLabelSVWrapper.java
 de/uka/ilkd/key/java/recoderext/JVMIsTransientMethodBuilder.java
+de/uka/ilkd/key/java/recoderext/KeYAnnotationUseSpecification.java
 de/uka/ilkd/key/java/recoderext/KeYCrossReferenceNameInfo.java
 de/uka/ilkd/key/java/recoderext/KeYCrossReferenceServiceConfiguration.java
 de/uka/ilkd/key/java/recoderext/KeYCrossReferenceSourceFileRepository.java
@@ -449,7 +451,10 @@ de/uka/ilkd/key/java/recoderext/LabelSVWrapper.java
 de/uka/ilkd/key/java/recoderext/LocalClassTransformation.java
 de/uka/ilkd/key/java/recoderext/MethodBodyStatement.java
 de/uka/ilkd/key/java/recoderext/MethodCallStatement.java
+de/uka/ilkd/key/java/recoderext/MethodReferenceWrapper.java
 de/uka/ilkd/key/java/recoderext/Model.java
+de/uka/ilkd/key/java/recoderext/NewArrayWrapper.java
+de/uka/ilkd/key/java/recoderext/NewWrapper.java
 de/uka/ilkd/key/java/recoderext/ObjectTypeIdentifier.java
 de/uka/ilkd/key/java/recoderext/PassiveExpression.java
 de/uka/ilkd/key/java/recoderext/PrepareObjectBuilder.java
@@ -1027,6 +1032,7 @@ de/uka/ilkd/key/proof/init/NonInterferencePO.java
 de/uka/ilkd/key/proof/init/OCLInvSimplPO.java
 de/uka/ilkd/key/proof/init/OCLProofOblInput.java
 de/uka/ilkd/key/proof/init/OCLSimplificationPO.java
+de/uka/ilkd/key/proof/init/PercProfile.java
 de/uka/ilkd/key/proof/init/PreservesGuardPO.java
 de/uka/ilkd/key/proof/init/PreservesInvPO.java
 de/uka/ilkd/key/proof/init/PreservesOwnInvPO.java
@@ -1167,6 +1173,7 @@ de/uka/ilkd/key/rule/conditions/NewDepOnAnonUpdates.java
 de/uka/ilkd/key/rule/conditions/NewJumpLabelCondition.java
 de/uka/ilkd/key/rule/conditions/NonImplicitTypeCondition.java
 de/uka/ilkd/key/rule/conditions/ParentScopeCondition.java
+de/uka/ilkd/key/rule/conditions/ScopeStackCondition.java
 de/uka/ilkd/key/rule/conditions/StaticMethodCondition.java
 de/uka/ilkd/key/rule/conditions/StaticReferenceCondition.java
 de/uka/ilkd/key/rule/conditions/TestEqualWorkingSpaceOp.java
@@ -1293,11 +1300,18 @@ de/uka/ilkd/key/rule/metaconstruct/ArrayLength.java
 de/uka/ilkd/key/rule/metaconstruct/ArrayPostDecl.java
 de/uka/ilkd/key/rule/metaconstruct/ArraySize.java
 de/uka/ilkd/key/rule/metaconstruct/ArrayStoreStaticAnalyse.java
+de/uka/ilkd/key/rule/metaconstruct/AtLocalScope.java
 de/uka/ilkd/key/rule/metaconstruct/AtPreEquations.java
+de/uka/ilkd/key/rule/metaconstruct/AtReentrantScope.java
 de/uka/ilkd/key/rule/metaconstruct/BestCaseArraySize.java
 de/uka/ilkd/key/rule/metaconstruct/BreakToBeReplaced.java
+de/uka/ilkd/key/rule/metaconstruct/CallerAllocResContext.java
 de/uka/ilkd/key/rule/metaconstruct/ConstantValue.java
+de/uka/ilkd/key/rule/metaconstruct/ConstructedScopeSpec.java
 de/uka/ilkd/key/rule/metaconstruct/ConstructorCall.java
+de/uka/ilkd/key/rule/metaconstruct/ConsumedAtPre.java
+de/uka/ilkd/key/rule/metaconstruct/ConsumedLoopInvariants.java
+de/uka/ilkd/key/rule/metaconstruct/ConsumedLoopUpdate.java
 de/uka/ilkd/key/rule/metaconstruct/CreateInReachableStatePO.java
 de/uka/ilkd/key/rule/metaconstruct/CreateObject.java
 de/uka/ilkd/key/rule/metaconstruct/DoBreak.java
@@ -1305,8 +1319,11 @@ de/uka/ilkd/key/rule/metaconstruct/EnhancedForElimination.java
 de/uka/ilkd/key/rule/metaconstruct/EnhancedForInvRule.java
 de/uka/ilkd/key/rule/metaconstruct/EnumConstantValue.java
 de/uka/ilkd/key/rule/metaconstruct/EvaluateArgs.java
+de/uka/ilkd/key/rule/metaconstruct/ExactSizeScope.java
 de/uka/ilkd/key/rule/metaconstruct/ExpandDynamicType.java
 de/uka/ilkd/key/rule/metaconstruct/ExpandMethodBody.java
+de/uka/ilkd/key/rule/metaconstruct/ExpandMethodBodyPerc.java
+de/uka/ilkd/key/rule/metaconstruct/ExternallyConstructedScope.java
 de/uka/ilkd/key/rule/metaconstruct/ForToWhile.java
 de/uka/ilkd/key/rule/metaconstruct/ForToWhileTransformation.java
 de/uka/ilkd/key/rule/metaconstruct/HeapSpace.java
@@ -1317,6 +1334,7 @@ de/uka/ilkd/key/rule/metaconstruct/IntroAtPreDefsOp.java
 de/uka/ilkd/key/rule/metaconstruct/IntroNewAnonUpdateOp.java
 de/uka/ilkd/key/rule/metaconstruct/InTypeOperator.java
 de/uka/ilkd/key/rule/metaconstruct/IsStatic.java
+de/uka/ilkd/key/rule/metaconstruct/LocalScopeSpec.java
 de/uka/ilkd/key/rule/metaconstruct/LocationDependentFunction.java
 de/uka/ilkd/key/rule/metaconstruct/MetaAllSubtypes.java
 de/uka/ilkd/key/rule/metaconstruct/MetaAttribute.java
@@ -1329,6 +1347,9 @@ de/uka/ilkd/key/rule/metaconstruct/MetaInstance.java
 de/uka/ilkd/key/rule/metaconstruct/MetaLength.java
 de/uka/ilkd/key/rule/metaconstruct/MetaMemoryArea.java
 de/uka/ilkd/key/rule/metaconstruct/MetaNextToCreate.java
+de/uka/ilkd/key/rule/metaconstruct/MetaNextToCreateStack.java
+de/uka/ilkd/key/rule/metaconstruct/MetaReentrantScope.java
+de/uka/ilkd/key/rule/metaconstruct/MetaScopeAnnotation.java
 de/uka/ilkd/key/rule/metaconstruct/MetaShadow.java
 de/uka/ilkd/key/rule/metaconstruct/MetaTraInitialized.java
 de/uka/ilkd/key/rule/metaconstruct/MetaTransactionCounter.java
@@ -1337,6 +1358,7 @@ de/uka/ilkd/key/rule/metaconstruct/MethodCallContract.java
 de/uka/ilkd/key/rule/metaconstruct/MethodCall.java
 de/uka/ilkd/key/rule/metaconstruct/MethodCallToUpdate.java
 de/uka/ilkd/key/rule/metaconstruct/MultipleVarDecl.java
+de/uka/ilkd/key/rule/metaconstruct/NoLocalScope.java
 de/uka/ilkd/key/rule/metaconstruct/ObjectSize.java
 de/uka/ilkd/key/rule/metaconstruct/PostWork.java
 de/uka/ilkd/key/rule/metaconstruct/PreconditionForWS.java
@@ -1344,7 +1366,10 @@ de/uka/ilkd/key/rule/metaconstruct/PreValidInStateOfWS.java
 de/uka/ilkd/key/rule/metaconstruct/ProgramMetaConstruct.java
 de/uka/ilkd/key/rule/metaconstruct/ReplaceWhileLoop.java
 de/uka/ilkd/key/rule/metaconstruct/ResolveQuery.java
+de/uka/ilkd/key/rule/metaconstruct/ScopeSpec.java
 de/uka/ilkd/key/rule/metaconstruct/SpecialConstructorCall.java
+de/uka/ilkd/key/rule/metaconstruct/StackAtIndex.java
+de/uka/ilkd/key/rule/metaconstruct/StackForConstructedScope.java
 de/uka/ilkd/key/rule/metaconstruct/StaticInitialisation.java
 de/uka/ilkd/key/rule/metaconstruct/SwitchToIf.java
 de/uka/ilkd/key/rule/metaconstruct/TestProgramMetaConstructs.java
@@ -1353,11 +1378,13 @@ de/uka/ilkd/key/rule/metaconstruct/UniqueAnonUpdate.java
 de/uka/ilkd/key/rule/metaconstruct/Universes.java
 de/uka/ilkd/key/rule/metaconstruct/Unpack.java
 de/uka/ilkd/key/rule/metaconstruct/UnwindLoop.java
+de/uka/ilkd/key/rule/metaconstruct/UpdateScope.java
 de/uka/ilkd/key/rule/metaconstruct/WhileInvariantTransformation.java
 de/uka/ilkd/key/rule/metaconstruct/WhileInvRule.java
 de/uka/ilkd/key/rule/metaconstruct/WhileInvRuleWrapper.java
 de/uka/ilkd/key/rule/metaconstruct/WhileLoopTransformation.java
 de/uka/ilkd/key/rule/metaconstruct/WorstCaseArraySize.java
+de/uka/ilkd/key/rule/metaconstruct/WSAtPre.java
 de/uka/ilkd/key/rule/NewDependingOn.java
 de/uka/ilkd/key/rule/NewVarcond.java
 de/uka/ilkd/key/rule/NoFindTacletBuilder.java

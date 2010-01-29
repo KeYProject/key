@@ -195,8 +195,8 @@ public class InReachableStatePOBuilder extends TermBuilder {
                     }
                 }
             } else if (loc instanceof ArrayOp) {
-                final Sort elementSort =
-                        ((ArraySort) ((ArrayOp) loc).arraySort()).elementSort();
+                final ArraySort arraySort = (ArraySort) ((ArrayOp) loc).arraySort();
+            	final Sort elementSort = arraySort.elementSort();
                 if (elementSort instanceof ObjectSort) {
                     final LogicVariable[] vPre = atPre(pair);
                     final Term[] tPre = var(vPre);
@@ -385,7 +385,7 @@ public class InReachableStatePOBuilder extends TermBuilder {
     /**
      *  
      * @param update
-     * @return the formula \forall Object o; o.<created> = TRUE -> o.<memoryArea>!=null 
+     * @return the formula {update} \forall Object o; o.<created> = TRUE -> o.<memoryArea>!=null 
      */
     private Term scopeNotNull(Update update){
         final LogicVariable o =
@@ -399,7 +399,7 @@ public class InReachableStatePOBuilder extends TermBuilder {
      * 
      * @param update
      * @param attr
-     * @return the formula \forall typeof(attr) o; (o.<created>=TRUE & o.attr!=null & o!=null) ->
+     * @return the formula {update} \forall containertypeof(attr) o; (o.<created>=TRUE & o.attr!=null & o!=null) ->
      *                                              outerScope(o.attr.<memoryArea>.stack, o.<memoryArea>.stack)
      */
     private Term attrOuterRef(Update update, ProgramVariable attr){
@@ -413,14 +413,63 @@ public class InReachableStatePOBuilder extends TermBuilder {
         return update(update, all(o, imp(and(new Term[]{o_created, o_notNull, attr_notNull}), osAttr)));
     }
     
+    /**
+     * 
+     * @param update
+     * @param arraySort
+     * @return the formula {update} \forall arraySort o; \forall int i; (o.<created>=TRUE & o.[i]!=null & o!=null) ->
+     *                                              outerScope(o.[i].<memoryArea>.stack, o.<memoryArea>.stack)
+     */
+    private Term arraySlotOuterRef(Update update, Sort arraySort){
+        final LogicVariable o =
+            new LogicVariable(new Name("o"), arraySort);
+        final LogicVariable i =
+            new LogicVariable(new Name("i"), services.getTypeConverter().getIntegerLDT().targetSort());
+        final Term o_created = equals(dot(var(o), created), TRUE);
+        final Term o_notNull = not(equals(var(o), NULL(services)));
+        final Term arraySlot_notNull = not(equals(array(var(o), var(i)), NULL(services)));
+        final Term osArray = func(os, dot(dot(array(var(o), var(i)), ma), stack), dot(dot(var(o), ma), stack));
+        return update(update, all(o, all(i, imp(and(new Term[]{o_created, o_notNull, arraySlot_notNull}), osArray))));
+    }
+    
+    private Term newObjectRefsLegal(Update u, ObjectSort s){
+    	JavaInfo ji = services.getJavaInfo();
+    	ListOfField fields = ji.getKeYProgModelInfo().getAllFieldsLocallyDeclaredIn(ji.getKeYJavaType(s));
+    	IteratorOfField it = fields.iterator();
+    	Term result = tt();
+    	while(it.hasNext()){
+    		Field f = it.next();
+    		result = and(result, attrOuterRef(u, (ProgramVariable) f.getProgramVariable()));
+    	}
+    	if(s instanceof ArraySort){
+    		result = and(result, arraySlotOuterRef(u, s));
+    	}
+    	return result;
+    }
+    
+    /**
+     * 
+     * @param update
+     * @return the formula \forall Object o1,o2; o1.<created>=TRUE & o2.<created>=TRUE & outerScope(o1.<memoryArea>.stack, o2.<memoryArea>.stack) ->
+     * 											 {update}outerScope(o1.<memoryArea>.stack, o2.<memoryArea>.stack)
+     */
+    private Term legalReferencesRemainLegal(Update update){
+        final LogicVariable o1 =
+            new LogicVariable(new Name("o1"), services.getJavaInfo().getJavaLangObjectAsSort());
+        final LogicVariable o2 =
+            new LogicVariable(new Name("o2"), services.getJavaInfo().getJavaLangObjectAsSort());
+        final Term o1_created = equals(dot(var(o1), created), TRUE); 
+        final Term o2_created = equals(dot(var(o2), created), TRUE); 
+        final Term osO1O2 = func(os, dot(dot(var(o1), ma), stack), dot(dot(var(o2), ma), stack));
+        return all(o1, all(o2, imp(and(new Term[]{o1_created, o2_created, osO1O2}), update(update, osO1O2))));
+    }
+    
     private Term staticAttrImmortal(Update update, ProgramVariable attr){
         final Term attr_notNull = not(equals(var(attr), NULL(services)));
         final Term attr_created = equals(dot(var(attr), created), TRUE);
         final Term attrImmortal = func(im, dot(dot(var(attr), ma), stack));
         return update(update, imp(attr_notNull, and(attr_created, attrImmortal)));
     }
-    
-    //TODO: arrayOuterRef, memoryArea only changeable if it was null in pre state
 
     /**
      * Generates a formula checking that the given static field <tt>T.sv</tt>
