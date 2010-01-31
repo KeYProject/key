@@ -1459,20 +1459,19 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
      *            the new branch condition text
      */
     private void setBranchConditionText(ETNode etn) {
+	if (etn != null) {
+	    final ImmutableList<Term> simplifiedBc = etn.getSimplifiedBc();
 
-        final ImmutableList<Term> simplifiedBc = etn.getSimplifiedBc();
-	if (etn != null && simplifiedBc != null
-                && etn.getParent() != null
-                && etn.getParent().getChildrenList().size() > 1) {
-
-            final String[] termsString = new String[simplifiedBc.size()];
-            int i = 0;
-            for (Term bc : simplifiedBc) {
-                termsString[i++] = vd.prettyPrint(bc);
-            }
-
-            bcListControl.setItems(termsString);
-        } else
+	    if  (simplifiedBc != null && etn.getParent() != null
+		    && etn.getParent().getChildrenList().size() > 1) {
+		final String[] termsString = new String[simplifiedBc.size()];
+		int i = 0;
+		for (Term bc : simplifiedBc) {
+		    termsString[i++] = vd.prettyPrint(bc);
+		}
+		bcListControl.setItems(termsString);
+	    }
+	} else
             bcListControl.setItems(new String[0]);
 
     }
