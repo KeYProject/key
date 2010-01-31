@@ -10,10 +10,11 @@
 
 package de.uka.ilkd.key.smt;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Timer;
 
 import javax.swing.JFileChooser;
 
@@ -23,14 +24,10 @@ import de.uka.ilkd.key.gui.DecisionProcedureSettings;
 import de.uka.ilkd.key.gui.Main;
 import de.uka.ilkd.key.gui.configuration.PathConfig;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
-import de.uka.ilkd.key.gui.configuration.Settings;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.ProofAggregate;
-import de.uka.ilkd.key.util.HelperClassForTests;
 import de.uka.ilkd.key.util.ProgressMonitor;
 
 
@@ -413,7 +410,7 @@ public abstract class AbstractSMTSolver implements SMTSolver {
 		t.cancel();
 		this.execWatch = null;
 	    }
-	    
+
 	    if (interruptedByWatchdog) {
 		//the solving was interrupted. So return unknown
 		return SMTSolverResult.NO_IDEA;
@@ -423,7 +420,7 @@ public abstract class AbstractSMTSolver implements SMTSolver {
 		InputStream in = p.getInputStream();
 		String text = read(in);
 		in.close();
-		
+
 		in = p.getErrorStream();
 		String error = read(in);
 		in.close();
@@ -432,7 +429,10 @@ public abstract class AbstractSMTSolver implements SMTSolver {
 		} catch (IllegalArgumentException e) {
 		    //the interpretation found an error.
 		    throw new RuntimeException("Error while executing solver:\n" + e.getMessage());
+		} finally {
+		    p.destroy();
 		}
+
 	    }
 	} catch (IOException e) {
 	    String cmdStr = execCommand;
@@ -445,7 +445,7 @@ public abstract class AbstractSMTSolver implements SMTSolver {
 		    "\n 2. we expect a different name than your executable " +
 		    "(prior to KeY 1.5 and later we expected 'Simplify' instead of 'simplify')" +
 		    "\n\t Solution: Change the name to " + (execCommand != null ? 
-		        	execCommand : "expected name") +
+			    execCommand : "expected name") +
 		    "\n 3. you have not the permission to execute the decision procedure." +
 		    "\n\t Solution: *nix-like systems: try 'chmod u+x <path_to_executable>/<executable_filename>" +
 		    "\n 4. you use a too new or too old version of the decision procedure and the command " +
