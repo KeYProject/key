@@ -11,8 +11,10 @@ public final class ExecutionWatchDog extends TimerTask {
 
     private long starttime = -1;
     
-    private boolean wasInterrupted = false;
+    private boolean canceledByTimeout = false;
 
+    private boolean canceledByUser = false;
+    
     /**
      * Construct a new Watch dog.
      * @param timeout after this amount of seconds, p is canceled.
@@ -22,7 +24,7 @@ public final class ExecutionWatchDog extends TimerTask {
 	super();
 	this.timeout = timeout;
 	this.procList.add(p);
-	this.wasInterrupted = false;
+	this.canceledByTimeout = false;
     }
     
     /**
@@ -35,21 +37,21 @@ public final class ExecutionWatchDog extends TimerTask {
 	super();
 	this.timeout = timeout;
 	this.procList.addAll(pl);
-	this.wasInterrupted = false;
+	this.canceledByTimeout = false;
     }
 
     @Override
     public void run() {
 	
 	if (starttime < 0) {
-	    this.toBeInterrupted = false;
+	    this.canceledByUser = false;
 	    this.starttime = System.currentTimeMillis();
 	}
 
-	if (this.toBeInterrupted) {
+	if (this.canceledByUser) {
 	    destroyAllProcesses();
 	} else if (System.currentTimeMillis() - this.starttime > timeout) {
-	    this.wasInterrupted = true;
+	    this.canceledByTimeout = true;
 	    destroyUnfinishedProcesses();
 	}
 
@@ -75,17 +77,15 @@ public final class ExecutionWatchDog extends TimerTask {
     }
     
     public boolean wasInterruptedByTimeout() {
-	return this.wasInterrupted;
+	return this.canceledByTimeout;
     }
     
     public boolean wasInterruptedByUser() {
-	return this.toBeInterrupted;
+	return this.canceledByUser;
     }
-    
-    private boolean toBeInterrupted = false;
-    
+      
     public void interrupt() {
-	this.toBeInterrupted = true;
+	this.canceledByUser = true;
     }
     
     /**
