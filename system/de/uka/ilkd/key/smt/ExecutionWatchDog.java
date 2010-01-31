@@ -47,16 +47,31 @@ public final class ExecutionWatchDog extends TimerTask {
 	}
 
 	if (this.toBeInterrupted) {
-	    for(Process proc: procList)
-	    proc.destroy();
-	}
-	
-	if (System.currentTimeMillis() - this.starttime > timeout) {
+	    destroyAllProcesses();
+	} else if (System.currentTimeMillis() - this.starttime > timeout) {
 	    this.wasInterrupted = true;
-	    for(Process proc: procList)
-	    proc.destroy();
+	    destroyUnfinishedProcesses();
 	}
 
+    }
+
+    private void destroyAllProcesses() {
+	for(Process proc: procList) {
+	    proc.destroy();
+	}
+    }
+
+    /**
+     * destroys processes which are not yet finished
+     */
+    private void destroyUnfinishedProcesses() {
+	for(Process proc: procList) {
+	    try {
+		proc.exitValue();
+	    } catch (Throwable t) {
+		proc.destroy();
+	    }
+	}
     }
     
     public boolean wasInterruptedByTimeout() {
