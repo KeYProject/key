@@ -387,9 +387,7 @@ public abstract class TestGenerator {
 	if (gui != null) {
 	    gui.generateTestSuite_progressNotification4(count, totalCount, e,
 		    refMG, models, mDecl);
-	} else {
-	    throw new RuntimeException(e);
-	}
+	} 
     }
 
     /**
