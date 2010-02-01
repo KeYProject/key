@@ -1210,7 +1210,7 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
                 ImmutableList<Node> nodes = toList(vd.getMediator().getProof().root()
                         .leavesIterator());
                 VBTBuilder builder = new VBTBuilder(nodes,
-                        ModelGenerator.SIMPLIFY);
+                        ModelGenerator.OLD_SIMPLIFY);
 
                 if (!builder.succesful())
                     MessageDialog.openError(PlatformUI.getWorkbench()
