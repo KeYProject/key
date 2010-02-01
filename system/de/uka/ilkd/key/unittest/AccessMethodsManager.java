@@ -253,7 +253,7 @@ public class AccessMethodsManager {
     private Expression classParam(final ProgramVariable pv) {
 	final KeYJavaType classOfPv = pv.getContainerType();
 	return new SyntacticalProgramVariable(new ProgramElementName(classOfPv
-	        .getName()
+	        .getFullName()
 	        + ".class"), classOfPv);
     }
 
