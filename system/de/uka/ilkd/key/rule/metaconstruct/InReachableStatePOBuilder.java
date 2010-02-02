@@ -39,6 +39,7 @@ public class InReachableStatePOBuilder extends TermBuilder {
     private final ProgramVariable arraylength;
     private final boolean rtsj;
     private final boolean perc;
+    private final boolean rt;
     private final TermSymbol os;
     private final TermSymbol im;
     private final ProgramVariable ma;
@@ -65,6 +66,7 @@ public class InReachableStatePOBuilder extends TermBuilder {
         this.FALSE = FALSE(services);
         this.perc = (ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof PercProfile);
         this.rtsj = (ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof RTSJProfile);
+        this.rt = perc || rtsj;
     }
 
     /**
@@ -101,6 +103,7 @@ public class InReachableStatePOBuilder extends TermBuilder {
                         result = staticFieldLiveRef(update, pair);
                         if(EnumClassDeclaration.isEnumConstant(pv))
                             result = enumConstantPO(pv, update);
+                        if(rt) result = and(result, staticAttrImmortal(update, pv));
                     } else { // all implicit field are currently no reference
                         // fields
                         final ObjectSort containerType =
@@ -117,6 +120,10 @@ public class InReachableStatePOBuilder extends TermBuilder {
                             result = nextToCreateUpdatedSafely(update, pv);
                             if (pv.getContainerType().getJavaType() instanceof EnumClassDeclaration) {
                                 result = and(result, addNextToCreateEnumPO(pv, update));
+                            }
+                            if(rt) result = and(result, newObjectRefsLegal(update, containerType));
+                            if(containerType instanceof ArraySort && rt){
+                            	result = and(result, arraySlotOuterRef(update, containerType));
                             }
                         } else {
                             // if one of these fields is updated we need an
@@ -180,6 +187,9 @@ public class InReachableStatePOBuilder extends TermBuilder {
                                         createdOrNull(dot(tPre,
                                                 (AttributeOp) loc))));
                         result = all(vPre, imp(preAx, result));
+                        if(rt){
+                        	result = and(result, attrOuterRef(update, pv));
+                        }
                     } else if (pv == created) {
                         if (refPrefix.op() instanceof SortDependingFunction
                                 && ((SortDependingFunction) refPrefix.op()).getKind().equals(
@@ -212,6 +222,7 @@ public class InReachableStatePOBuilder extends TermBuilder {
                                     arrayStoreValid(tPre[0], atPreArrayTerm)));
 
                     result = all(vPre, imp(preAx, result));
+                    if(rt) result = and(result, arraySlotOuterRef(update, arraySort));
                 }
             }
             if (result != null) {
@@ -323,7 +334,12 @@ public class InReachableStatePOBuilder extends TermBuilder {
      * @return global invariants
      */
     private Term globalInvariants(Update update) {
-        return noObjectDeletion(update);
+        Term result = noObjectDeletion(update);
+        if(rt){
+        	result = and(new Term[]{result, scopeAllocInOuterScope(update), 
+        			scopeNotNull(update), stackInjective(update), legalReferencesRemainLegal(update)});
+        }
+        return result;
     }
 
     /**
