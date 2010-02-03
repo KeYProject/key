@@ -27,6 +27,7 @@ header {
 
 class KeYLexer extends Lexer;
 options {
+    charVocabulary='\u0000'..'\uFFFE';
     k=2;
     defaultErrorHandler = true;
 }
@@ -329,7 +330,8 @@ tokens {
 
 protected
 VOCAB
-   :       '\3'..'\377'
+   :
+   	'\u0000'..'\uFFFE'
    ;
 
 SEMI
