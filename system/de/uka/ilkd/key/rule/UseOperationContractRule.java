@@ -543,7 +543,8 @@ public class UseOperationContractRule implements BuiltInRule {
         //create "Pre" branch
         Term preF = pre.getFormula();
         Function leq = (Function) nss.functions().lookup(new Name("leq"));
-        if(services.getProof().getSettings().getProfile() instanceof RTSJProfile){
+        if(services.getProof().getSettings().getProfile() instanceof RTSJProfile && 
+        		((RTSJProfile) services.getProof().getSettings().getProfile()).memoryConsumption()){
             Term wsPre = cwi.contract.getWorkingSpace(selfVar, paramVars, services);
             wsPre = TB.tf().createFunctionTerm(leq, TB.tf().createFunctionTerm(add, mCons, wsPre),
                     TB.dot(mTerm, services.getJavaInfo().getAttribute(
@@ -609,7 +610,8 @@ public class UseOperationContractRule implements BuiltInRule {
         }
     
         Term wsEq = TB.tt();
-        if(services.getProof().getSettings().getProfile() instanceof RTSJProfile){    
+        if(services.getProof().getSettings().getProfile() instanceof RTSJProfile && 
+        		((RTSJProfile) services.getProof().getSettings().getProfile()).memoryConsumption()){    
             wsEq = TB.equals(ws, cwi.contract.getWorkingSpace(selfVar, paramVars, services));
             wsEq = uf.apply(uf.sequential(new Update[]{selfParamsUpdate,
                     atPreUpdate}),wsEq);

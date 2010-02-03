@@ -337,7 +337,8 @@ public class InReachableStatePOBuilder extends TermBuilder {
         Term result = noObjectDeletion(update);
         if(rt){
         	result = and(new Term[]{result, scopeAllocInOuterScope(update), 
-        			scopeNotNull(update), stackInjective(update), legalReferencesRemainLegal(update)});
+        			scopeNotNull(update), legalReferencesRemainLegal(update)});
+        	if(rtsj) result = and(result, stackInjective(update));
         }
         return result;
     }
@@ -455,7 +456,9 @@ public class InReachableStatePOBuilder extends TermBuilder {
     	Term result = tt();
     	while(it.hasNext()){
     		Field f = it.next();
-    		result = and(result, attrOuterRef(u, (ProgramVariable) f.getProgramVariable()));
+    		if(f.getProgramVariable().sort() instanceof ObjectSort){
+    			result = and(result, attrOuterRef(u, (ProgramVariable) f.getProgramVariable()));
+    		}
     	}
     	if(s instanceof ArraySort){
     		result = and(result, arraySlotOuterRef(u, s));

@@ -2586,8 +2586,13 @@ public class Main extends JFrame implements IMain {
 		    batchMode = true;
                     visible = false;
 		} else if (opt[index].equals("RTSJ")) {
-                    ProofSettings.DEFAULT_SETTINGS.setProfile(new RTSJProfile());
-                } else if (opt[index].equals("PERC")) {
+			boolean memory = false;
+            if (index + 1 < opt.length && 
+                    opt[index + 1].toUpperCase().equals("MEMORY")) {
+            	memory = true;
+            }
+            ProofSettings.DEFAULT_SETTINGS.setProfile(new RTSJProfile(memory));
+		} else if (opt[index].equals("PERC")) {
                     ProofSettings.DEFAULT_SETTINGS.setProfile(new PercProfile());
                     System.out.println("PERC Pico extensions enabled");
                 } else if (opt[index].equals("TESTING") || opt[index].equals("UNIT")) {

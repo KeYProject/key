@@ -63,6 +63,7 @@ header {
     import de.uka.ilkd.key.proof.OpReplacer;
     import de.uka.ilkd.key.proof.init.CreatedAttributeTermFactory;
     import de.uka.ilkd.key.proof.init.PercProfile;
+    import de.uka.ilkd.key.proof.init.RTSJProfile;
     import de.uka.ilkd.key.speclang.FormulaWithAxioms;
     import de.uka.ilkd.key.speclang.PositionedString;
     import de.uka.ilkd.key.speclang.SignatureVariablesFactory;
@@ -658,11 +659,14 @@ options {
 		= new BasicLocationDescriptor(guardFma, transientTerm);
 	result = result.add(transientLd);
 	
-	//initialMemoryArea.consumed
-	Term cons = tb.dot(tb.var(dma), consumed);
-	BasicLocationDescriptor cld
-		= new BasicLocationDescriptor(cons);
-	result = result.add(cld);
+	if((ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof RTSJProfile) && 
+                		((RTSJProfile) ProofSettings.DEFAULT_SETTINGS.getProfile()).memoryConsumption()){
+		//initialMemoryArea.consumed
+		Term cons = tb.dot(tb.var(dma), consumed);
+		BasicLocationDescriptor cld
+			= new BasicLocationDescriptor(cons);
+		result = result.add(cld);
+	}
 	
 	//objectTimesFinalized (a ghost field in java.lang.Object)
 	if(objectTimesFinalizedAttribute != null) {

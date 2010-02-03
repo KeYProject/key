@@ -33,8 +33,8 @@ public class ScopeStackCondition extends VariableConditionAdapter {
             return true;
         }
         boolean result = (pv.name().toString().indexOf(("stack"))!=-1);
-        if(pv.getContainerType()!=null){
-            result &= pv.getContainerType().getSort().extendsTrans(
+        if(pv.getContainerType()!=null && result){
+            result = pv.getContainerType().getSort().extendsTrans(
                     services.getJavaInfo().getJavaxRealtimeMemoryArea().getSort());
         }else{
             return true;

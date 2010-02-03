@@ -8,9 +8,14 @@ import de.uka.ilkd.key.gui.configuration.ProofSettings;
 
 public class RTSJProfile extends JavaProfile {
 
-    
-    public RTSJProfile() {
+	/**
+	 *  determines whether memory consumption is taken into account in proofs or not
+	 */
+	private boolean memory = false;
+	
+    public RTSJProfile(boolean memory) {
         this(null);
+        this.memory = memory;
     }
     
     public RTSJProfile(IMain main) {
@@ -22,7 +27,14 @@ public class RTSJProfile extends JavaProfile {
         HashMap<String, String> dcs = cs.getDefaultChoices();
         dcs.put("rtsj", "rtsj:on");
         dcs.put("perc", "perc:off");
+        if(memory){
+        	dcs.put("memoryConsumption", "memoryConsumption:on");
+        }
         cs.setDefaultChoices(dcs);
+    }
+    
+    public boolean memoryConsumption(){
+    	return memory;
     }
     
 }

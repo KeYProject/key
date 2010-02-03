@@ -13,6 +13,7 @@ package de.uka.ilkd.key.speclang.jml.translation;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.*;
@@ -20,6 +21,8 @@ import de.uka.ilkd.key.java.statement.*;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.proof.init.PercProfile;
+import de.uka.ilkd.key.proof.init.RTSJProfile;
 import de.uka.ilkd.key.speclang.*;
 import de.uka.ilkd.key.speclang.jml.pretranslation.*;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
@@ -260,45 +263,49 @@ public class JMLSpecFactory {
         }
         
         //translate working_space
-        Term workingSpace = null;
-        Term constructedWorkingSpace = null;
-        FormulaWithAxioms wsPost = new FormulaWithAxioms(TB.tt());
-        Term imCons=null;
-        ProgramVariable initialMemoryArea = services.getJavaInfo().
-        getDefaultMemoryArea();
-        Term imTerm = TB.var(initialMemoryArea);
-        imCons = TB.dot(imTerm, services.getJavaInfo().getAttribute(
-        "consumed", "javax.realtime.MemoryArea"));
         if(originalWorkingSpace==null){
             originalWorkingSpace = new PositionedString("0;");
         }
-        String ws = originalWorkingSpace.text.trim();
-        Term oldCons = translator.translateExpression(
-                new PositionedString("\\old(\\currentMemoryArea.consumed)",
-                        originalWorkingSpace.fileName,
-                        new Position(originalWorkingSpace.pos.getLine(), 
-                                originalWorkingSpace.pos.getColumn())),
-                                programMethod.getContainerType(),
-                                selfVar, 
-                                paramVars, 
-                                resultVar, 
-                                excVar,
-                                atPreFunctions).getFormula();
-        Term oldWS = translator.translateExpression(
-                new PositionedString("\\old("+ws.substring(0, ws.length()-1)+")",
-                        originalWorkingSpace.fileName,
-                        new Position(originalWorkingSpace.pos.getLine(), 
-                                originalWorkingSpace.pos.getColumn()-5)),
-                                programMethod.getContainerType(),
-                                selfVar, 
-                                paramVars, 
-                                resultVar, 
-                                excVar,
-                                atPreFunctions).getFormula();
-        Function add = (Function) services.getNamespaces().functions().lookup(new Name("add"));
-        Function leq = (Function) services.getNamespaces().functions().lookup(new Name("leq"));
-        wsPost = new FormulaWithAxioms(TB.func(leq, imCons, TB.func(add, oldCons, oldWS)));
-                
+        Term workingSpace = null;
+        Term imCons=null;
+        FormulaWithAxioms wsPost = new FormulaWithAxioms(TB.tt());
+        if((ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof RTSJProfile) && 
+        		((RTSJProfile) ProofSettings.DEFAULT_SETTINGS.getProfile()).memoryConsumption() ||
+        		(ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof PercProfile)){
+	        ProgramVariable initialMemoryArea = services.getJavaInfo().
+	        getDefaultMemoryArea();
+	        Term imTerm = TB.var(initialMemoryArea);
+	        imCons = TB.dot(imTerm, services.getJavaInfo().getAttribute(
+	        "consumed", "javax.realtime.MemoryArea"));
+	        String ws = originalWorkingSpace.text.trim();
+	        Term oldCons = translator.translateExpression(
+	                new PositionedString("\\old(\\currentMemoryArea.consumed)",
+	                        originalWorkingSpace.fileName,
+	                        new Position(originalWorkingSpace.pos.getLine(), 
+	                                originalWorkingSpace.pos.getColumn())),
+	                                programMethod.getContainerType(),
+	                                selfVar, 
+	                                paramVars, 
+	                                resultVar, 
+	                                excVar,
+	                                atPreFunctions).getFormula();
+	        Term oldWS = translator.translateExpression(
+	                new PositionedString("\\old("+ws.substring(0, ws.length()-1)+")",
+	                        originalWorkingSpace.fileName,
+	                        new Position(originalWorkingSpace.pos.getLine(), 
+	                                originalWorkingSpace.pos.getColumn()-5)),
+	                                programMethod.getContainerType(),
+	                                selfVar, 
+	                                paramVars, 
+	                                resultVar, 
+	                                excVar,
+	                                atPreFunctions).getFormula();
+	        Function add = (Function) services.getNamespaces().functions().lookup(new Name("add"));
+	        Function leq = (Function) services.getNamespaces().functions().lookup(new Name("leq"));
+	        wsPost = new FormulaWithAxioms(TB.func(leq, imCons, TB.func(add, oldCons, oldWS)));
+               
+    	}    
+	        
         workingSpace = translator.translateExpression(
                 originalWorkingSpace,
                 programMethod.getContainerType(),
@@ -313,6 +320,7 @@ public class JMLSpecFactory {
         if(originalConstructedWorkingSpace==null){
             originalConstructedWorkingSpace = new PositionedString("0;");
         }
+        Term constructedWorkingSpace = null;
         constructedWorkingSpace = translator.translateExpression(
                         originalConstructedWorkingSpace,
                         programMethod.getContainerType(),
@@ -364,7 +372,9 @@ public class JMLSpecFactory {
                                         paramVars);
                 assignable = assignable.union(translated);        
             }
-            if(assignable.size()!=0){
+            if(assignable.size()!=0 && ((ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof RTSJProfile) && 
+            		((RTSJProfile) ProofSettings.DEFAULT_SETTINGS.getProfile()).memoryConsumption() ||
+            		(ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof PercProfile))){
                 assignable = assignable.add(new BasicLocationDescriptor(imCons));
             }
         }

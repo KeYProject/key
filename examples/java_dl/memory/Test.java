@@ -321,7 +321,7 @@ public class Test extends SuperTest{
       @*/
     public void testLoop(int i){
 	/*@ loop_invariant i>=0;
-	  @ assignable i;
+	  @ assignable i, \object_creation(int[]);
 	  @ decreases i;
 	  @ working_space_single_iteration \space(int[3]);
 	  @*/
