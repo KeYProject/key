@@ -36,6 +36,7 @@ java/lang/NegativeArraySizeException.java
 java/lang/NoClassDefFoundError.java
 java/lang/NullPointerException.java
 java/lang/NumberFormatException.java
+java/lang/Runnable.java
 java/lang/RuntimeException.java
 java/lang/String.java
 java/lang/StringBuffer.java
