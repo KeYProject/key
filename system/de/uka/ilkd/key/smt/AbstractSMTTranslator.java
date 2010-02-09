@@ -1182,7 +1182,9 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
      *                there.
      */
 //  TODO make private again after testing!!
-    public final StringBuffer translateTerm (Term term, Vector<QuantifiableVariable> quantifiedVars,
+// gladisch: This method doesn't seem to be just for test reasons. It is used to generate output. 
+//    	      I need to modify the behavior of this method in SmtLibTranslatorWeaker. Let me know if you change the visibility of it.
+    public StringBuffer translateTerm (Term term, Vector<QuantifiableVariable> quantifiedVars,
 	    Services services) throws IllegalFormulaException {
 	
 	//added, because meatavariables should not be translated.
@@ -1764,7 +1766,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 	return translatePredicate(name, sub);
     }
 
-    private final StringBuffer translateSort(Sort s) {
+    protected final StringBuffer translateSort(Sort s) {
 	if (usedDisplaySort.containsKey(s)) {
 	    return usedDisplaySort.get(s);
 	} else {
