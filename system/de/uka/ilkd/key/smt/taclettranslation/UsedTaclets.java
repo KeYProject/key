@@ -152,6 +152,10 @@ public final class UsedTaclets {
 
     }
     
+    
+    private static void addTaclet(DefaultMutableTreeNode node, String taclet, int genericCount){
+	addTaclet(node,taclet,true,genericCount);
+    }
 
     /**
      * Adds a taclet to the list of supported taclets.
@@ -162,12 +166,12 @@ public final class UsedTaclets {
      *            the name of the taclet.
      */
     private static void addTaclet(DefaultMutableTreeNode node, String taclet) {
-	addTaclet(node, taclet, true);
+	addTaclet(node, taclet, 0);
     }
 
     private static void addTaclet(DefaultMutableTreeNode node, String taclet,
-	    boolean checked) {
-	TreeItem child = new TreeItem(taclet, checked);
+	    boolean checked, int genericCount) {
+	TreeItem child = new TreeItem(taclet, genericCount);
 	if (!tacletNames.containsKey(child.toString())) {
 	    tacletNames.put(child.toString(), child);
 	    node.add(new DefaultMutableTreeNode(child));
@@ -296,24 +300,24 @@ public final class UsedTaclets {
 	DefaultMutableTreeNode node6 = newNode(root, "proof dependent");
 
 	DefaultMutableTreeNode node7 = newNode(node6, "cast operator");
-	addTaclet(node7, "castDel");
-	addTaclet(node7, "typeEq");
-	addTaclet(node7, "typeEqDerived");
-	addTaclet(node7, "typeEqDerived2");
-	addTaclet(node7, "typeStatic");
-	addTaclet(node7, "castType");
-	addTaclet(node7, "castType2");
-	addTaclet(node7, "closeType");
-	addTaclet(node7, "closeTypeSwitched");
+	addTaclet(node7, "castDel",1);
+	addTaclet(node7, "typeEq",2);
+	addTaclet(node7, "typeEqDerived",2);
+	addTaclet(node7, "typeEqDerived2",2);
+	addTaclet(node7, "typeStatic",1);
+	addTaclet(node7, "castType",4);
+	addTaclet(node7, "castType2",4);
+	addTaclet(node7, "closeType",3);
+	addTaclet(node7, "closeTypeSwitched",3);
 
 	DefaultMutableTreeNode node8 = newNode(node6, "miscellaneous");
-	addTaclet(node8, "disjoint_repositories");
-	addTaclet(node8, "identical_object_equal_index");
+	addTaclet(node8, "disjoint_repositories",2);
+	addTaclet(node8, "identical_object_equal_index",1);
 
-	addTaclet(node8, "repository_object_non_null");
+	addTaclet(node8, "repository_object_non_null",1);
 
 	DefaultMutableTreeNode node9 = newNode(node6, "exact instance rules");
-	addTaclet(node9, "exact_instance_definition_reference");
+	addTaclet(node9, "exact_instance_definition_reference",2);
 	addTaclet(node9, "exact_instance_definition_integerDomain");
 	addTaclet(node9, "exact_instance_definition_int");
 	addTaclet(node9, "exact_instance_definition_jbyte");
@@ -322,55 +326,58 @@ public final class UsedTaclets {
 	addTaclet(node9, "exact_instance_definition_jlong");
 	addTaclet(node9, "exact_instance_definition_jchar");
 	addTaclet(node9, "exact_instance_definition_boolean");
-	addTaclet(node9, "exact_instance_definition_null");
-	addTaclet(node9, "exact_instance_definition_known");
-	addTaclet(node9, "exact_instance_definition_known_eq");
-	addTaclet(node9, "exact_instance_definition_known_false");
-	addTaclet(node9, "exact_instance_for_interfaces_or_abstract_classes");
-	addTaclet(node9, "exact_instance_definition_known_eq_false"); // n^3!!!
+	addTaclet(node9, "exact_instance_definition_null",1);
+	addTaclet(node9, "exact_instance_definition_known",1);
+	addTaclet(node9, "exact_instance_definition_known_eq",2);
+	addTaclet(node9, "exact_instance_definition_known_false",2);
+	addTaclet(node9, "exact_instance_for_interfaces_or_abstract_classes",2);
+	addTaclet(node9, "exact_instance_definition_known_eq_false",3); // n^3!!!
 
 	// usedTaclets.add("system_invariant_for_created_2a_sym");
 	DefaultMutableTreeNode node10 = newNode(node6,
 	        "only created objects are referenced...");
 
 	DefaultMutableTreeNode node11 = newNode(node10, "normal");
-	addTaclet(node11, "only_created_object_are_referenced");
-	addTaclet(node11, "only_created_object_are_referenced_non_null");
-	addTaclet(node11, "only_created_object_are_referenced_right");
-	addTaclet(node11, "only_created_object_are_referenced_non_null2");
-	addTaclet(node11, "only_created_object_are_referenced_non_null3");
-	DefaultMutableTreeNode node12 = newNode(node10, "array");
-	addTaclet(node12, "only_created_object_are_referenced_by_arrays");
-	addTaclet(node12, "only_created_object_are_referenced_by_arrays_right");
-	addTaclet(node12, "only_created_object_are_referenced_by_arrays_2");
-	addTaclet(node12,
-	        "only_created_object_are_referenced_by_arrays_non_null");
+	addTaclet(node11, "only_created_object_are_referenced",1);
+	addTaclet(node11, "only_created_object_are_referenced_non_null",1);
+	addTaclet(node11, "only_created_object_are_referenced_right",1);
+	addTaclet(node11, "only_created_object_are_referenced_non_null2",2);
+	addTaclet(node11, "only_created_object_are_referenced_non_null3",2);
+	
+	// Arrays are not supported yet: SMT-Translation does not work.
+	// Taclet translation works!
+//	DefaultMutableTreeNode node12 = newNode(node10, "array");
+//	addTaclet(node12, "only_created_object_are_referenced_by_arrays");
+//	addTaclet(node12, "only_created_object_are_referenced_by_arrays_right");
+//	addTaclet(node12, "only_created_object_are_referenced_by_arrays_2");
+//	addTaclet(node12,
+//	        "only_created_object_are_referenced_by_arrays_non_null");
 
 	DefaultMutableTreeNode node13 = newNode(node6, "system invariants");
 
-	addTaclet(node13, "system_invariant_for_created_3");
-	addTaclet(node13, "system_invariant_for_created_2a_sym");
-	addTaclet(node13, "system_invariant_for_created_3_sym");
+	addTaclet(node13, "system_invariant_for_created_3",2);
+	addTaclet(node13, "system_invariant_for_created_2a_sym",2);
+	addTaclet(node13, "system_invariant_for_created_3_sym",2);
 
 	DefaultMutableTreeNode node14 = newNode(node6, "nextToCreate");
-	addTaclet(node14, "created_inv_index_in_bounds");
-	addTaclet(node14, "created_add_known_index_in_bounds");
-	addTaclet(node14, "created_add_known_index_in_bounds_sym");
-	addTaclet(node14, "created_add_known_index_in_bounds_2");
+	addTaclet(node14, "created_inv_index_in_bounds",2);
+	addTaclet(node14, "created_add_known_index_in_bounds",2);
+	addTaclet(node14, "created_add_known_index_in_bounds_sym",2);
+	addTaclet(node14, "created_add_known_index_in_bounds_2",2);
 	addTaclet(node14,
-	        "objects_with_index_geq_next_to_create_are_not_created");
+	        "objects_with_index_geq_next_to_create_are_not_created",2);
 	addTaclet(
 	        node14,
 	        "objects_with_index_greater_next_to_create_are_not_createdsystem" +
-	        "_invariant_for_created_2a_automated_use_3");
+	        "_invariant_for_created_2a_automated_use_3",2);
 	addTaclet(node8, "nextToCreate_non_negative");
 	addTaclet(node8, "nextToCreate_non_negative_2");
 
 	DefaultMutableTreeNode node15 = newNode(node6, "array length");
-	addTaclet(node15, "array_length_non_negative");
-	addTaclet(node15, "array_length_non_negative_2");
-	addTaclet(node15, "array_length_non_negative_3");
-	addTaclet(node15, "array_length_short_javacard");
+	addTaclet(node15, "array_length_non_negative",1);
+	addTaclet(node15, "array_length_non_negative_2",1);
+	addTaclet(node15, "array_length_non_negative_3",1);
+	addTaclet(node15, "array_length_short_javacard",1);
 
 	DefaultMutableTreeNode node16 = newNode(node6, "class initialisation");
 	addTaclet(node16, "class_being_initialized_is_prepared");

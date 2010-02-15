@@ -106,19 +106,20 @@ public abstract class AbstractTacletTranslator implements TacletTranslator,
     public TacletFormula translate(Taclet t, ImmutableSet<Sort> sorts,
 	    ImmutableSet<Term> attributeTerms, int maxGeneric) throws IllegalTacletException {
 
-	// first step: check the taclet. If this translator is not able
+	// check the taclet. If this translator is not able
 	// to translate the taclet throw IllegalTacletException.
 	check(t);
 
-	// second step: determine the variable conditions.
+	// determine the variable conditions.
 	this.conditions = new TacletConditions(t);
 
-	// third step: translate the taclet, but do not translate generic
+	// translate the taclet, but do not translate generic
 	// variables
 	// and do not quantify the variables.
 	Term term = translateTaclet(t, sorts);
+	
 
-	// fourth step: rebuild the term to exchange schema variables with logic
+	// rebuild the term to exchange schema variables with logic
 	// varibales.
 	usedGenericSorts = new HashSet<GenericSort>();
 	term = rebuildTerm(term);
@@ -172,7 +173,7 @@ public abstract class AbstractTacletTranslator implements TacletTranslator,
 
 	
 	Collection<Term> result2 = new LinkedList<Term>();
-	// sixth step: quantify all free variables.
+	// step: quantify all free variables.
 	for(Term te : result){
 	    te = quantifyTerm(te);
 	    result2.add(te);
@@ -182,7 +183,7 @@ public abstract class AbstractTacletTranslator implements TacletTranslator,
 	
 	
 
-	// seventh step: translate the generics sorts.
+	// step: translate the generics sorts.
 	result = new LinkedList<Term>();
 	for(Term te : result2){
 	    result.addAll(genericTranslator.translate(te, sorts, t, conditions,
@@ -441,7 +442,7 @@ public abstract class AbstractTacletTranslator implements TacletTranslator,
 	        || ((op instanceof SchemaVariableAdapter) && ((SchemaVariableAdapter) op)
 	                .isFormulaSV())
 	        || ((op instanceof SchemaVariableAdapter) && ((SchemaVariableAdapter) op)
-	                .isVariableSV()) || ((op instanceof WarySubstOp))
+	                .isVariableSV()) 
 	        || (op instanceof MetaNextToCreate)
 	        || (op instanceof NonRigidHeapDependentFunction)
 	        || (op instanceof AttributeOp) || (op instanceof MetaCreated)
@@ -853,20 +854,11 @@ public abstract class AbstractTacletTranslator implements TacletTranslator,
     }
 
     static public Term createNextToCreateTerm(ObjectSort sort, Services services) {
-	/*JavaInfo javaInfo = services.getJavaInfo();
-	// javaInfo.getKeYJavaType(term)
-	ProgramVariable createdAttribute = javaInfo.getAttribute(
-	        ImplicitFieldAdder.IMPLICIT_NEXT_TO_CREATE, sort);
-
-	Term createdTerm = TermFactory.DEFAULT
-	        .createVariableTerm(createdAttribute);
-	return createdTerm;*/
 	return createVariableTerm(sort, ImplicitFieldAdder.IMPLICIT_NEXT_TO_CREATE, services);
     }
     
     static public Term createVariableTerm(ObjectSort sort,String field,Services services){
 	JavaInfo javaInfo = services.getJavaInfo();
-	// javaInfo.getKeYJavaType(term)
 	ProgramVariable createdAttribute = javaInfo.getAttribute(field, sort);
 	if(createdAttribute == null){
 	    return null;
@@ -879,7 +871,7 @@ public abstract class AbstractTacletTranslator implements TacletTranslator,
 
     /**
      * Override this method if you want to change the term, i.e. exchanging
-     * schema variables with logic variables. See <code>rebuildTerm</code>.
+     * schema variables for logic variables. See <code>rebuildTerm</code>.
      * 
      * @param term
      *            the term to be changed.
@@ -894,10 +886,6 @@ public abstract class AbstractTacletTranslator implements TacletTranslator,
 
 	    if (term.sort().equals(Sort.FORMULA)) {
 
-		// term =
-		// tb.var(getLogicVariable(term.op().name(),Sort.FORMULA));
-		// term =
-		// tb.var(getLogicVariable(term.op().name(),term.sort()));
 	    } else if(!ssv.isProgramSV())
 	    {
 		term = tb.var(getLogicVariable(term.op().name(), term.sort()));

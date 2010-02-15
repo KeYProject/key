@@ -442,9 +442,12 @@ public class TacletTranslationSettingsDialog{
 			gridBagConstraints7.weightx = 1.0;
 			gridBagConstraints7.insets = new Insets(0, 0, 5, 0);
 			gridBagConstraints7.gridy = 1;
+	
 			panelSelctionOptions = new JPanel();
 			panelSelctionOptions.setLayout(new GridBagLayout());
 			panelSelctionOptions.add(getOkButton(), gridBagConstraints7);
+			
+			
 			panelSelctionOptions.add(getTabbedPane(), gridBagConstraints8);
 		}
 		return panelSelctionOptions;
@@ -472,6 +475,8 @@ public class TacletTranslationSettingsDialog{
 		return okButton;
 	}
 	
+
+	
 	/**
 	 * This method initializes selectionTree	
 	 * 	
@@ -497,33 +502,7 @@ public class TacletTranslationSettingsDialog{
 		return selectionTree;
 	}
 
-	/**
-	 * This method initializes selectionInfo	
-	 * 	
-	 * @return javax.swing.JPanel	
-	 */
-	/*private JPanel getSelectionInfo() {
-		if (selectionInfo == null) {
-		      GridBagConstraints gridBagConstraints = new GridBagConstraints();
-		   
-			gridBagConstraints.fill = GridBagConstraints.BOTH;
-			gridBagConstraints.gridy = 0;
-			gridBagConstraints.weightx = 1.0;
-			gridBagConstraints.weighty = 1.0;
-			gridBagConstraints.ipadx = 100;
-			gridBagConstraints.gridx = 1;
-			
-			selectionInfo = new JPanel();
-			
-			
-			selectionInfo.setLayout(new GridBagLayout());
-			//selectionInfo.setLayout(new BorderLayout());
-			selectionInfo.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
-			//selectionInfo.add(getInfoLabel(),BorderLayout.CENTER);
-			//selectionInfo.add(getInfoLabel(),gridBagConstraints);
-		}
-		return selectionInfo;
-	}*/
+
 	
 	private JScrollPane getScrollPaneInfo(){
 	    if(scrollPaneInfo == null){
@@ -549,40 +528,18 @@ public class TacletTranslationSettingsDialog{
 		infoText.setLineWrap(true);
 		
 		infoText.setLayout(new GridBagLayout());
-		//selectionInfo.setLayout(new BorderLayout());
-		//infoText.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
-		//selectionInfo.add(getInfoLabel(),BorderLayout.CENTER);
-		//selectionInfo.add(getInfoLabel(),gridBagConstraints);
+
 	}
 	return infoText;
 	}
-	
-	private JLabel getInfoLabel(){
-	       if(infoLabel == null){
-		   infoLabel=new JLabel();
-		   
-		  // infoLabel.setLineWrap(true);
-		  
-		    infoLabel.setText("<html>Changes in this<br>tab take effect<br>immediately without<br>pressing the OK-button.</html>");
-	       }
-	       return infoLabel;
-	}
-	
+
 	private TreeCellEditor getTreeCellEditor() {
 	    return new DefaultTreeCellEditor(getSelectionTree(),getTreeCellRenderer()){
 		    public Component getTreeCellEditorComponent(JTree tree, Object value,
 			    boolean selected, boolean expanded, boolean leaf, int row) {
 
 			DefaultMutableTreeNode node = (DefaultMutableTreeNode) value;
-			/*return SelectionPanel.getForInteraction(node, leaf, tree,
-				new InfoListener(){
-				    public void eventShowInfo(TreeItem item, TreeNode node) {
-	                              showInfo(item,node);
-	                                
-                                    }
-
-					
-			});*/
+	
 			TreeNode root = (TreeNode)tree.getModel().getRoot();
 			return leaf ? treePanels[LEAF_PANEL][EDIT].init(node,root,tree) :
 			           treePanels[INNER_PANEL][EDIT].init(node,root,tree);
@@ -603,18 +560,9 @@ public class TacletTranslationSettingsDialog{
 			DefaultMutableTreeNode node = (DefaultMutableTreeNode) value;
 			TreeNode root = (TreeNode)tree.getModel().getRoot();
 
-			if(leaf){
-			    setToolTipText("This book is in the Tutorial series.");    
-			}
-			else {
-			    setToolTipText("adasd");
-			}
-			
-
 			
 			return leaf ? treePanels[LEAF_PANEL][PAINT].init(node,root,tree) :
 			           treePanels[INNER_PANEL][PAINT].init(node,root,tree);
-			//return SelectionPanel.getForPainting(node, leaf, tree);
 
 		    }
 	    };
@@ -847,6 +795,7 @@ class LeafPanel extends TreePanel{
     private TreeNode currentNode = null;
     private JCheckBox tacletName = new JCheckBox();
     private JLabel   infoButton = new JLabel("<html><U>info</html>");
+    private JLabel   genericLabel = new JLabel();
     private JTextArea textArea = null;
  
 
@@ -854,8 +803,9 @@ class LeafPanel extends TreePanel{
 	this.setBackground(UIManager.getColor("Tree.textBackground"));
 	addComponent(tacletName);
 	addComponent(infoButton);
+	addComponent(genericLabel);	
 	ToolTipManager.sharedInstance().registerComponent(tacletName);
-	
+	infoButton.setForeground(Color.BLUE);
 	this.textArea = textArea;
 	
 	
@@ -927,11 +877,25 @@ class LeafPanel extends TreePanel{
 
     @Override
     protected JPanel init(TreeNode node, TreeNode root, JTree tree) {
+	int max = ProofSettings.DEFAULT_SETTINGS
+	      	.getTacletTranslationSettings().getMaxGeneric();
 	currentNode = node;
 	this.tree = tree;
 	this.root        = root;
 	tacletName.setText(node.toString());
 	tacletName.setSelected(treeItem(node).getMode() == SelectionMode.all);
+	int count = treeItem(node).getGenericCount();
+	if(count > 0){
+	    if(max < count){
+		    genericLabel.setForeground(Color.RED);
+		    genericLabel.setText("too many generic sorts: "+ count);
+	    }else{
+		    genericLabel.setForeground(Color.GREEN);
+		    genericLabel.setText("generic sorts: "+ count);
+	    }
+	
+	}
+	
 
 	
 	return this;
@@ -941,438 +905,6 @@ class LeafPanel extends TreePanel{
 }
 
 
-//
-///**
-// * The SelectionPanel represents the graphical presentation of a
-// * TreeItem and handles the input of the user.
-// */
-//class SelectionPanel  {
-//    private  static SelectionPanel instanceForPainting = null;
-//    private  static SelectionPanel instanceForClick = null;
-//
-//    private JCheckBox title = new JCheckBox();
-//    private JLabel chooseAll = new JLabel("<html><U>all</html>");
-//    private JLabel chooseNothing = new JLabel("<html><U>nothing</html>");
-//    private JLabel infoLabel = new JLabel("<html><U>info</html>");
-//    
-//    private ButtonGroup radioGroup = new ButtonGroup();
-//    private JRadioButton radioAll = new JRadioButton("all");
-//    private JRadioButton radioNothing = new JRadioButton("nothing");
-//    private JRadioButton radioUserSelection = new JRadioButton("custom");
-//    private JLabel       tacletName = new JLabel();
-//    private JLabel       customLabel = new JLabel("(custom)");
-//    
-//    private JPanel panelInnerNode = new JPanel();
-//    private JPanel panelLeaf      = new JPanel();
-//    
-//
-//    protected TreeItem treeItem(TreeNode node) {
-//	return (TreeItem) ((DefaultMutableTreeNode) node).getUserObject();
-//    }
-//    
-//    
-//    private TreeItem currentItem = null;
-//    private DefaultMutableTreeNode currentNode = null;
-//    private JTree tree;
-//    private Collection<InfoListener> listener = new LinkedList<InfoListener>();
-//    
-//
-//    
-//    private JPanel getInnerNode(){
-//	return panelInnerNode;
-//    }
-//    
-//    private JPanel getLeaf(){
-//	return panelLeaf;
-//    }
-//    
-//
-//    private void addComponent(JComponent comp){
-//	comp.setBackground(UIManager.getColor("Tree.textBackground"));
-//	comp.setFont(UIManager.getFont("Tree.font"));
-//	//this.add(comp);
-//    }
-//    
-//    private SelectionPanel() {
-//	
-//
-//	radioGroup.add(radioAll);
-//	radioGroup.add(radioNothing);
-//	radioGroup.add(radioUserSelection);
-//	
-//	radioUserSelection.setEnabled(false);
-//	radioNothing.setSelected(true);
-//	
-//	
-//
-//	//this.setBackground(UIManager.getColor("Tree.textBackground"));
-//	/*title.setBackground(UIManager.getColor("Tree.textBackground"));
-//	title.setFont(UIManager.getFont("Tree.font"));
-//	chooseAll.setFont(UIManager.getFont("Tree.font"));
-//	chooseNothing.setFont(UIManager.getFont("Tree.font"));
-//	infoLabel.setFont(UIManager.getFont("Tree.font"));
-//	*/
-//	/*
-//	this.add(title);
-//	this.add(radioAll);
-//	this.add(radioNothing);
-//	this.add(radioUserSelection);*/
-//	//this.add(chooseAll);
-//	//this.add(chooseNothing);
-//	//this.add(infoLabel);
-//	// this.add(countTaclets);
-//	addComponent(title);
-//	addComponent(tacletName);
-//	addComponent(radioAll);
-//	addComponent(radioNothing);
-//	//addComponent(customLabel);
-//	addComponent(radioUserSelection);
-//	
-//	radioAll.addActionListener(new ActionListener() {
-//
-//	    public void actionPerformed(ActionEvent e) {
-//		propergateToChild(currentNode,SelectionMode.all);
-//		newMode(currentNode,SelectionMode.all);
-//	
-//	    }
-//	});
-//
-//	radioNothing.addActionListener(new ActionListener() {
-//
-//	    public void actionPerformed(ActionEvent e) {
-//		propergateToChild(currentNode,SelectionMode.nothing);
-//		newMode(currentNode,SelectionMode.nothing);
-//
-//	    }
-//	});
-//
-//	radioUserSelection.addActionListener(new ActionListener() {
-//
-//	    public void actionPerformed(ActionEvent e) {
-//		newMode(currentNode,SelectionMode.user);
-//	
-//
-//	    }
-//	});
-//
-//	title.addActionListener(new ActionListener() {
-//
-//	    public void actionPerformed(ActionEvent event) {
-//		newMode(currentNode,title.isSelected() ? SelectionMode.all : SelectionMode.nothing);
-//		//selected(title.isSelected());
-//		
-//
-//	    }
-//	});
-//
-//	chooseAll.addMouseListener(new MouseAdapter() {
-//	    public void mouseClicked(MouseEvent e) {
-//		title.setSelected(true);
-//		
-//		selectAllNothing(currentNode, true);
-//		selected(true);
-//		
-//	    }
-//	});
-//	
-//	infoLabel.addMouseListener(new MouseAdapter() {
-//	    
-//	 
-//	    @Override
-//	    public void mouseClicked(MouseEvent e) {
-//		showInfo(currentNode, currentItem);	
-//	    }
-//	    
-//	
-//	});
-//	
-//	infoLabel.addFocusListener(new FocusListener(){
-//
-//	    public void focusGained(FocusEvent arg0) {
-//		showInfo(currentNode, currentItem);
-//
-//	        
-//            }
-//
-//	    public void focusLost(FocusEvent arg0) {
-//	        // TODO Auto-generated method stub
-//	        
-//            }
-//	    
-//	});
-//	
-//	
-//
-//	chooseNothing.addMouseListener(new MouseAdapter() {
-//	    public void mouseClicked(MouseEvent e) {
-//		title.setSelected(false);
-//		
-//		selectAllNothing(currentNode, false);
-//		selected(false);
-//	    }
-//	});
-//	// title.setSize(title.getWidth(), 10);
-//
-//    }
-//    
-//    public void addInfoListener(InfoListener l){
-//	listener.add(l);
-//    }
-//
-//
-//    
-//    /**
-//     * call this method after the item was checked or unchecked.
-//     * @param b the new value of the selection.
-//     */
-//    private void selected(boolean b){
-//
-//        //setSelectedToRoot(currentNode);    
-//        if(title.isSelected()){
-//	    setSelectedToRoot(currentNode);
-//	  
-//	    setColor(Color.BLACK);
-//	}
-//        
-//            
-//        
-//        currentItem.setChecked(title.isSelected());
-//        parentSelection(currentNode, title.isSelected());
-//	tree.expandPath(tree.getEditingPath());
-//	
-//
-//	tree.repaint();
-//	
-//	
-//    }
-//    
-//    private void validateSelectionModes(){
-//	validateSelectionMode((TreeNode)tree.getModel().getRoot());
-//    }
-//    
-//    private void newMode(TreeNode node, SelectionMode mode){
-//	TreeItem item = treeItem(node);
-//	item.setMode(mode);
-//	
-//	propergateToRoot(node, SelectionMode.user);
-//	
-//	validateSelectionModes();
-//	
-//	tree.repaint();
-//	
-//    }
-//    
-//    private void validateSelection(SelectionMode mode){
-//	switch(mode){
-//	case all:
-//	    radioAll.setSelected(true);
-//	    break;
-//	case nothing: 
-//	    radioNothing.setSelected(true);
-//	    break;
-//	case user:
-//	    radioUserSelection.setSelected(true);
-//	    break;
-//	}
-//    }
-//    
-//    private void propergateToRoot(TreeNode node, SelectionMode mode){
-//	TreeNode parent = node.getParent();
-//	if(parent != null){
-//	    TreeItem parentItem = treeItem(parent);
-//	    parentItem.setMode(mode);
-//	    propergateToRoot(parent, mode);
-//	}
-//    }
-//    
-//    private void propergateToChild(TreeNode node, SelectionMode mode){
-//	
-//	for(int i=0; i < node.getChildCount(); i++){
-//	    propergateToChild(node.getChildAt(i), mode);
-//	    TreeItem item = treeItem(node.getChildAt(i));
-//	    item.setMode(mode);
-//	}
-//    }
-//    
-//    private SelectionMode validateSelectionMode(TreeNode node){
-//	TreeItem item = treeItem(node);
-//	if(node.isLeaf()){
-//	    if(item.getMode() == SelectionMode.all){
-//		item.setSelectedChildCount(1);
-//	    }else{
-//		item.setSelectedChildCount(0);
-//	    }
-//	    
-//	    return item.getMode();
-//	}
-//	item.setChildCount(0);
-//	
-//
-//	int iAll=0, iNothing=0;
-//	for(int i=0; i < node.getChildCount(); i++){
-//	    
-//	    TreeNode child = node.getChildAt(i);
-//	    SelectionMode childMode = validateSelectionMode(child);
-//	    if(childMode.equals(SelectionMode.all)){
-//		iAll++;
-//	    }else if(childMode.equals(SelectionMode.nothing)){
-//		iNothing++;
-//	    }
-//	    TreeItem childItem = treeItem(child);
-//	    item.setChildCount(item.getChildCount()+childItem.getChildCount());
-//	    
-//	    item.setSelectedChildCount(item.getSelectedChildCount()+childItem.getSelectedChildCount());
-//	    
-//	}
-//	
-//	if(iAll == node.getChildCount()){
-//	    item.setMode(SelectionMode.all);
-//	    
-//	}else if(iNothing == node.getChildCount()){
-//	    item.setMode(SelectionMode.nothing);
-//	}	
-//	return item.getMode();
-//
-//    }
-//    
-//
-//    /**
-//     * Checks all items on the path from <code>node</node>
-//     * to the root of the tree. 
-//     * @param node
-//     */
-//    private void setSelectedToRoot(TreeNode node) {
-//	TreeItem item = treeItem(node);
-//	parentSelection(node,true);
-//	item.setParentSelected(true);
-//	TreeNode parent = node.getParent();
-//
-//	if (parent != null) {
-//	    item = treeItem(parent);
-//	    item.setChecked(true);
-//	    setSelectedToRoot(parent);
-//	    
-//	}
-//
-//    }
-//    
-//    
-//    private void parentSelection(TreeNode node, boolean b) {
-//	for (int i = 0; i < node.getChildCount(); i++) {
-//	    parentSelection((DefaultMutableTreeNode) node.getChildAt(i), b);
-//	    TreeItem item = (TreeItem) ((DefaultMutableTreeNode) node
-//		    .getChildAt(i)).getUserObject();
-//	    item.setParentSelected(b);
-//	}
-//    }
-//    
-//    
-//
-//    private void selectAllNothing(DefaultMutableTreeNode node, boolean b) {
-//	TreeItem item = (TreeItem) node.getUserObject();
-//	item.setChecked(b);
-//	for (int i = 0; i < node.getChildCount(); i++) {
-//	    selectAllNothing((DefaultMutableTreeNode) node.getChildAt(i), b);
-//	}
-//    }
-//
-//    private void showSelection(boolean s) {
-//	radioAll.setVisible(s);
-//	radioNothing.setVisible(s);
-//	radioUserSelection.setVisible(s);
-//	customLabel.setVisible(s);
-//	tacletName.setVisible(s);
-//	title.setVisible(!s);
-//	
-//	
-//	//chooseAll.setVisible(s);
-//	//chooseNothing.setVisible(s);
-//
-//    }
-//    
-//    private void setColor(Color color){
-//	title.setForeground(color);
-//	chooseAll.setForeground(color);
-//	chooseNothing.setForeground(color);
-//	infoLabel.setForeground(color);
-//    }
-//
-//    private void init(DefaultMutableTreeNode node, boolean isLeaf, JTree tree) {
-//	currentNode = node;
-//	currentItem = (TreeItem) node.getUserObject();
-//	tacletName.setText(currentNode.toString());
-//	title.setText(currentNode.toString());
-//	radioUserSelection.setForeground(Color.BLACK);
-//	title.setSelected(currentItem.getMode()==SelectionMode.all ? true : false);
-//	radioUserSelection.setText("custom: "+ currentItem.getSelectedChildCount()+"/"+currentItem.getChildCount());
-//
-//
-//	
-//	
-//	switch(currentItem.getMode()){
-//	case all:
-//
-//	    radioAll.setSelected(true);
-//	    
-//	    
-//	    break;
-//	case nothing:
-//	    radioNothing.setSelected(true);
-//	  
-//
-//	    break;
-//	    
-//	case user:
-//	  
-//	    radioUserSelection.setSelected(true);
-//
-//	    
-//	    break;
-//	}
-//
-//	
-//	
-//	// title.setEnabled(currentItem.isParentSelected());
-//	if(currentItem.isParentSelected()){
-//	    setColor(Color.BLACK);
-//	}else{
-//	    setColor(Color.GRAY);
-//	}
-//	this.tree = tree;
-//	showSelection(!isLeaf);
-//
-//    }
-//    
-//    
-//    private void showInfo(DefaultMutableTreeNode node,
-//            TreeItem item) {
-//	for(InfoListener l : listener){
-//	    l.eventShowInfo(item,node);
-//	}
-//       
-//        
-//    }
-//
-//    static public JPanel getForPainting(DefaultMutableTreeNode item,
-//	    boolean isLeaf, JTree tree) {
-//	if(instanceForPainting == null){
-//	    instanceForPainting = new SelectionPanel();
-//
-//	}
-//	instanceForPainting.init(item, isLeaf, tree);
-//	return isLeaf ? instanceForPainting.getLeaf() : instanceForPainting.getInnerNode();
-//    }
-//
-//    static public JPanel getForInteraction(DefaultMutableTreeNode item,
-//	    boolean isLeaf, JTree tree, InfoListener listener) {
-//	
-//	if(instanceForClick == null){
-//	    instanceForClick = new SelectionPanel();
-//	    instanceForClick.addInfoListener(listener);
-//	}
-//	instanceForClick.init(item, isLeaf, tree);
-//	return isLeaf ? instanceForClick.getLeaf() : instanceForClick.getInnerNode();
-//    }
-//}
+
 
 

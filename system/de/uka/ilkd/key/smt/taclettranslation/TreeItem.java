@@ -20,9 +20,14 @@ public class TreeItem {
     private SelectionMode mode = SelectionMode.nothing;
     private int selectedChildCount = 0;
     private int childCount = 0;
+    private int genericCount =0;
 
     
 
+    TreeItem(String text, int genericCount){
+	this.text = text;
+	this.genericCount = genericCount;
+    }
 
     TreeItem(String text){
 	this.text = text;
@@ -36,7 +41,9 @@ public class TreeItem {
     
     
     
-    
+    public int getGenericCount(){
+	return genericCount;
+    }
     
     public int getSelectedChildCount() {
         return selectedChildCount;

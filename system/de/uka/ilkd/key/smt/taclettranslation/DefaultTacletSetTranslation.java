@@ -15,6 +15,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.sort.ArraySortImpl;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.pp.LogicPrinter;
@@ -224,7 +225,15 @@ public final class DefaultTacletSetTranslation
         if(usedSorts.size() > 0){
             toStore += "\\sorts{\n\n";
             for(Sort sort : usedFormulaSorts){
-              	    toStore += sort.name().toString()+";\n";  
+        	    String name;
+        	    if(sort instanceof ArraySortImpl){
+        		name = ((ArraySortImpl)sort).elementSort().toString();
+        	    }else{
+        		name = sort.name().toString();
+        	    }
+        		 
+        	
+              	    toStore += name+";\n";  
         	
                
             }
