@@ -24,6 +24,7 @@ import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.declaration.TypeDeclaration;
 import de.uka.ilkd.key.logic.op.ObserverFunction;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.*;
@@ -288,6 +289,10 @@ public final class ProofManagementDialog extends JDialog {
         	    }
         	});
         	outer: for(KeYJavaType kjt : kjtsarr) {
+        	    if(kjt.getJavaType() instanceof TypeDeclaration
+        	       && ((TypeDeclaration)kjt.getJavaType()).isLibraryClass()) {
+        		continue;
+        	    }
         	    ImmutableSet<ObserverFunction> targets
         	    	= services.getSpecificationRepository().getContractTargets(kjt);
         	    for(ObserverFunction target : targets) {
