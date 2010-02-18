@@ -18,6 +18,7 @@ import java.awt.dnd.DropTargetAdapter;
 import java.awt.dnd.DropTargetDropEvent;
 import java.awt.dnd.DropTargetListener;
 import java.awt.event.*;
+import java.awt.*;
 import java.io.*;
 import java.net.URL;
 import java.util.ArrayList;

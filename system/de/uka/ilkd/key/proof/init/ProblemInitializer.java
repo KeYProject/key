@@ -19,7 +19,6 @@ import org.apache.log4j.Logger;
 
 import recoder.io.PathList;
 import recoder.io.ProjectSettings;
-import de.uka.ilkd.key.collection.ListOfString;
 import de.uka.ilkd.key.gui.IMain;
 import de.uka.ilkd.key.gui.MethodCallInfo;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;

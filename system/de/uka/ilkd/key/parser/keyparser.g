@@ -50,7 +50,6 @@ header {
   import de.uka.ilkd.key.java.StatementBlock;
   import de.uka.ilkd.key.java.declaration.VariableDeclaration;
   import de.uka.ilkd.key.java.recoderext.*;
-  import de.uka.ilkd.key.java.declaration.ArrayOfParameterDeclaration;
   import de.uka.ilkd.key.pp.*;
 }
 
@@ -3145,8 +3144,8 @@ term130 returns [Term a = null]
 workingspaceterm returns [Term a=null]
 {
     Sort s1,s2;
-    ListOfKeYJavaType sig = SLListOfKeYJavaType.EMPTY_LIST;
-    ListOfTerm args = SLListOfTerm.EMPTY_LIST;
+    ImmutableList<KeYJavaType> sig = new ImmutableList<KeYJavaType>();
+    ImmutableList<Term> args = new ImmutableList<Term>();
     KeYJavaType classType = null;
     String methodName;
     Term self=null;
@@ -3217,8 +3216,8 @@ workingspaceterm returns [Term a=null]
 workingspacenonrigidterm returns [Term a=null]
 {
     Sort s1,s2;
-    ListOfKeYJavaType sig = SLListOfKeYJavaType.EMPTY_LIST;
-    ListOfTerm args = SLListOfTerm.EMPTY_LIST;
+    ImmutableList<KeYJavaType> sig = new ImmutableList<KeYJavaType>();
+    ImmutableList<Term> args = new ImmutableList<Term>();
     KeYJavaType classType = null;
     String methodName,s;
     Term pre, t1, t2;
@@ -4065,7 +4064,7 @@ semisequent returns [Semisequent ss]
 { 
     Term head = null, t=null;
     ss = Semisequent.EMPTY_SEMISEQUENT;
-    ListOfConstrainedFormula terms = SLListOfConstrainedFormula.EMPTY_LIST;
+    ImmutableList<ConstrainedFormula> terms = new ImmutableList<ConstrainedFormula>();
 }
     :
         /* empty */ | 
