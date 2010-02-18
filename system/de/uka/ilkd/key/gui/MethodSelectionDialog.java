@@ -16,11 +16,10 @@ import java.awt.event.ActionListener;
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
 
+import de.uka.ilkd.key.collection.*;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.declaration.MethodDeclaration;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
-import de.uka.ilkd.key.logic.op.SetAsListOfProgramMethod;
-import de.uka.ilkd.key.logic.op.SetOfProgramMethod;
 import de.uka.ilkd.key.unittest.ModelGenerator;
 import de.uka.ilkd.key.unittest.UnitTestBuilder;
 import de.uka.ilkd.key.unittest.simplify.SimplifyModelGenerator;
@@ -102,7 +101,7 @@ public class MethodSelectionDialog extends JDialog {
 			return this;
 		    }
 	    });
-	SetOfProgramMethod pms = 
+	ImmutableSet<ProgramMethod> pms = 
 	    testBuilder.getProgramMethods(mediator.getProof());
 	methodList.setListData(pms.toArray());
 	JScrollPane methodListScroll = new
@@ -236,7 +235,8 @@ public class MethodSelectionDialog extends JDialog {
                 latestTests.append(test+" ");
 		mediator.testCaseConfirmation(test);
 	    }else{
-		SetOfProgramMethod pmSet = SetAsListOfProgramMethod.EMPTY_SET;
+		ImmutableSet<ProgramMethod> pmSet = 
+		    new ImmutableSet<ProgramMethod>();
 		for(int i=0; i<pms.length; i++){
 		    pmSet = pmSet.add((ProgramMethod) pms[i]);
 		}

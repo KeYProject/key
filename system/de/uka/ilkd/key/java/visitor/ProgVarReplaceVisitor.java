@@ -229,14 +229,6 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
         return res;
     }
     
-    private ListOfTerm replaceVariablesInTerms(ListOfTerm terms) {
-        ListOfTerm res = SLListOfTerm.EMPTY_LIST;        
-        for (final Term term : terms) {
-            res = res.append(replaceVariablesInTerm(term));
-        }        
-        return res;
-    }
-    
     
     private Map /*Operator -> Function*/ replaceVariablesInMap(
                                         Map /*Operator -> Function*/ map) {

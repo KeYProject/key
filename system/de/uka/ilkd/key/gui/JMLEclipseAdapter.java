@@ -12,12 +12,9 @@ package de.uka.ilkd.key.gui;
 
 import java.util.Vector;
 
-import de.uka.ilkd.key.collection.ListOfString;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.abstraction.ListOfKeYJavaType;
-import de.uka.ilkd.key.java.abstraction.SLListOfKeYJavaType;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.proof.init.*;
 import de.uka.ilkd.key.strategy.Strategy;

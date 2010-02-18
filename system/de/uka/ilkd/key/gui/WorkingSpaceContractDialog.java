@@ -10,17 +10,17 @@ import javax.swing.border.TitledBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
+import de.uka.ilkd.key.collection.*;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IWorkingSpaceOp;
 import de.uka.ilkd.key.logic.op.WorkingSpaceRigidOp;
 import de.uka.ilkd.key.proof.ProofSaver;
 import de.uka.ilkd.key.speclang.OperationContract;
-import de.uka.ilkd.key.speclang.SetOfOperationContract;
 
 public class WorkingSpaceContractDialog extends JDialog {
 
-    LinkedList specs;
+    LinkedListqmake specs;
     boolean successful;
     OperationContract spec;
     int compare=1;
@@ -35,7 +35,7 @@ public class WorkingSpaceContractDialog extends JDialog {
         this.wso = wso;
     }
     
-    public void setSpecifications(SetOfOperationContract specSet){
+    public void setSpecifications(ImmutableSet<OperationContract> specSet){
         this.specs = new LinkedList();
         Iterator it = specSet.iterator();
         while(it.hasNext()){
