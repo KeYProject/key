@@ -13,14 +13,14 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import de.uka.ilkd.key.collection.ImmutableArray;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.logic.BoundVariableTools;
 import de.uka.ilkd.key.logic.ClashFreeSubst;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermFactory;
-import de.uka.ilkd.key.logic.op.ArrayOfQuantifiableVariable;
 import de.uka.ilkd.key.logic.op.Op;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.logic.op.SetOfQuantifiableVariable;
 import de.uka.ilkd.key.util.Debug;
 
 public class UpdateSimplifierTermFactory {
@@ -35,7 +35,7 @@ public class UpdateSimplifierTermFactory {
     public static interface IfExCascade {
         public Term getCondition ();
         
-        public ArrayOfQuantifiableVariable getMinimizedVars ();
+        public ImmutableArray<QuantifiableVariable> getMinimizedVars ();
         
         // Information about the current ifEx statement. These methods must only
         // be called after having invoked <code>next</code> at least once
@@ -86,12 +86,9 @@ public class UpdateSimplifierTermFactory {
         }
         
         Term res = defaultTerm;
-        
-        final Iterator<IfExCascadeEntryBuilder> it = statements.iterator ();
-        while ( it.hasNext () ) {
-            final IfExCascadeEntryBuilder builder =
-                it.next ();
-            res = builder.createTerm ( res );
+
+        for (final IfExCascadeEntryBuilder builder : statements) {
+            res = builder.createTerm(res);
         }
         
         return res;
@@ -103,7 +100,7 @@ public class UpdateSimplifierTermFactory {
      * @param target the term evaluated under the update
      * @return the update term <tt>{l1:=r1,...,ln:=rn}target</tt>
      */
-    public Term createUpdateTerm(ArrayOfAssignmentPair assignmentPairs,
+    public Term createUpdateTerm(ImmutableArray<AssignmentPair> assignmentPairs,
             Term target) {
 
         if (assignmentPairs.size() == 0) {
@@ -111,14 +108,12 @@ public class UpdateSimplifierTermFactory {
         }
 
         final Term[] lhss = new Term[assignmentPairs.size()];
-        final ArrayOfQuantifiableVariable[] boundVars = new ArrayOfQuantifiableVariable[assignmentPairs
-                .size()];
+        final ImmutableArray<QuantifiableVariable>[] boundVars = new ImmutableArray[assignmentPairs.size()];
         final Term[] guards = new Term[assignmentPairs.size()];
         final Term[] values = new Term[assignmentPairs.size()];
 
         for (int i = 0; i < assignmentPairs.size(); i++) {
-            final AssignmentPair assignmentPair = assignmentPairs
-                    .getAssignmentPair(i);
+            final AssignmentPair assignmentPair = assignmentPairs.get(i);
             boundVars[i] = assignmentPair.boundVars();
             guards   [i] = assignmentPair.guard();
             lhss     [i] = assignmentPair.locationAsTerm();
@@ -146,7 +141,7 @@ public class UpdateSimplifierTermFactory {
      */
     public Term createUpdateTerm(AssignmentPair[] update, Term target) 
     {
-        return createUpdateTerm(new ArrayOfAssignmentPair(update), 
+        return createUpdateTerm(new ImmutableArray<AssignmentPair>(update), 
                 target);
     }
     /**
@@ -188,9 +183,9 @@ public class UpdateSimplifierTermFactory {
     }
     
     private AssignmentPair renameBoundVars (AssignmentPair pair,
-                                            ArrayOfQuantifiableVariable newVars) {
+                                            ImmutableArray<QuantifiableVariable> newVars) {
         final BoundVariableTools bvt = BoundVariableTools.DEFAULT;
-        final ArrayOfQuantifiableVariable oldVars = pair.boundVars();
+        final ImmutableArray<QuantifiableVariable> oldVars = pair.boundVars();
         
         return new AssignmentPairImpl
             ( newVars,
@@ -244,11 +239,11 @@ public class UpdateSimplifierTermFactory {
                               Term substTerm) {
         if ( !update.freeVars ().contains ( var ) ) return update;        
         
-        final ArrayOfAssignmentPair pairs = update.getAllAssignmentPairs ();
+        final ImmutableArray<AssignmentPair> pairs = update.getAllAssignmentPairs ();
         AssignmentPair newPairs[] = new AssignmentPair[pairs.size ()];
 
         for (int i = 0; i != pairs.size(); ++i)
-            newPairs[i] = substitute ( pairs.getAssignmentPair ( i ),
+            newPairs[i] = substitute ( pairs.get ( i ),
                                        var,
                                        substTerm );
 
@@ -262,8 +257,8 @@ public class UpdateSimplifierTermFactory {
      * necessary, variables are renamed to this end
      */
     public AssignmentPair resolveCollisions (AssignmentPair pair,
-                                             SetOfQuantifiableVariable criticalVars) {
-        final ArrayOfQuantifiableVariable oldVars = pair.boundVars();
+                                             ImmutableSet<QuantifiableVariable> criticalVars) {
+        final ImmutableArray<QuantifiableVariable> oldVars = pair.boundVars();
         if ( oldVars.size() == 0 ) return pair;
 
         final BoundVariableTools bvt = BoundVariableTools.DEFAULT;
@@ -273,7 +268,7 @@ public class UpdateSimplifierTermFactory {
         if ( !bvt.resolveCollisions ( oldVars, newVars, criticalVars ) )
             return pair;
         
-        return renameBoundVars ( pair, new ArrayOfQuantifiableVariable ( newVars ) );
+        return renameBoundVars ( pair, new ImmutableArray<QuantifiableVariable> ( newVars ) );
     }
     
     /**
@@ -281,15 +276,15 @@ public class UpdateSimplifierTermFactory {
      * <code>update</code>. When necessary, variables are renamed to this end
      */
     public Update resolveCollisions (Update update,
-                                     SetOfQuantifiableVariable criticalVars) {
-        final ArrayOfAssignmentPair pairs = update.getAllAssignmentPairs ();
+                                     ImmutableSet<QuantifiableVariable> criticalVars) {
+        final ImmutableArray<AssignmentPair> pairs = update.getAllAssignmentPairs ();
         AssignmentPair newPairs[] = new AssignmentPair[pairs.size ()];
 
         boolean changed = false;
         for (int i = 0; i != pairs.size(); ++i) {
-            newPairs[i] = resolveCollisions ( pairs.getAssignmentPair ( i ),
+            newPairs[i] = resolveCollisions ( pairs.get ( i ),
                                               criticalVars );
-            changed = changed || newPairs[i] != pairs.getAssignmentPair ( i );
+            changed = changed || newPairs[i] != pairs.get ( i );
         }
         
         if ( !changed ) return update;

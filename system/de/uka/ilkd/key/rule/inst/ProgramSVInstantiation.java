@@ -10,11 +10,15 @@
 
 package de.uka.ilkd.key.rule.inst;
 
+import java.util.Iterator;
+
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.JavaProgramElement;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 
 
-/** this class wrapps a MapFromSchemaVariableToJavaProgramElement and
+/** this class wrapps a ImmMap<SchemaVariable,JavaProgramElement> and
  * is used to store instantiations of schemavariables. The class is
  * immutable, this means changing its content will result in creating
  * a new object. 
@@ -26,7 +30,7 @@ public class ProgramSVInstantiation {
 	EMPTY_PROGRAMSVINSTANTIATION = new ProgramSVInstantiation();
 
     /** the map with the instantiations */
-    private ListOfProgramSVEntry list = SLListOfProgramSVEntry.EMPTY_LIST;
+    private ImmutableList<ProgramSVEntry> list = ImmutableSLList.<ProgramSVEntry>nil();
     
     /** integer to cache the hashcode */
     private int hashcode = 0;
@@ -40,7 +44,7 @@ public class ProgramSVInstantiation {
      * @param list the ListFromSchemaVariableToJavaProgramElement with the
      * instantiations
      */
-    private ProgramSVInstantiation(ListOfProgramSVEntry list) {
+    private ProgramSVInstantiation(ImmutableList<ProgramSVEntry> list) {
 	this.list = list;
     }
 
@@ -74,15 +78,13 @@ public class ProgramSVInstantiation {
      */
     public ProgramSVInstantiation replace(SchemaVariable sv, 
 					  JavaProgramElement prgElement) { 
-	ListOfProgramSVEntry result = SLListOfProgramSVEntry.
-	    EMPTY_LIST.prepend(new ProgramSVEntry(sv, prgElement));
-	IteratorOfProgramSVEntry it = list.iterator();	
-	while (it.hasNext()) {
-	    ProgramSVEntry entry = it.next();
-	    if (entry.key() != sv) {
-		result = result.prepend(entry);
-	    }
-	}
+	ImmutableList<ProgramSVEntry> result = ImmutableSLList.<ProgramSVEntry>nil()
+	    .prepend(new ProgramSVEntry(sv, prgElement));
+        for (final ProgramSVEntry entry : list) {
+            if (entry.key() != sv) {
+                result = result.prepend(entry);
+            }
+        }
 	return new ProgramSVInstantiation(result);
     }    
 
@@ -90,13 +92,11 @@ public class ProgramSVInstantiation {
      * @return true iff the sv has been instantiated already 
      */
     public boolean isInstantiated(SchemaVariable sv) {
-	IteratorOfProgramSVEntry it = list.iterator();	
-	while (it.hasNext()) {
-	    ProgramSVEntry entry = it.next();
-	    if (entry.key() == sv) {
-		return true;
-	    }
-	}
+        for (ProgramSVEntry entry : list) {
+            if (entry.key() == sv) {
+                return true;
+            }
+        }
 	return false;
     }
 
@@ -105,13 +105,11 @@ public class ProgramSVInstantiation {
      * instantiated with, null if no instantiation is stored
      */
     public JavaProgramElement getInstantiation(SchemaVariable sv) {
-	IteratorOfProgramSVEntry it = list.iterator();	
-	while (it.hasNext()) {
-	    ProgramSVEntry entry = it.next();
-	    if (entry.key() == sv) {
-		return entry.value();
-	    }
-	}
+        for (ProgramSVEntry entry : list) {
+            if (entry.key() == sv) {
+                return entry.value();
+            }
+        }
 	return null;
     }
 
@@ -119,9 +117,9 @@ public class ProgramSVInstantiation {
     /** returns iterator of the listped pair (SchemaVariables,
      * JavaProgramElement) 
      * @return the
-     * IteratorOfEntryOfSchemaVariableAndJavaProgramElement 
+     * Iterator<IEntry<SchemaVariable,JavaProgramElement>> 
      */
-    public IteratorOfProgramSVEntry iterator() {
+    public Iterator<ProgramSVEntry> iterator() {
 	return list.iterator();
     }
 
@@ -140,7 +138,7 @@ public class ProgramSVInstantiation {
      * listpings
      */ 
     public boolean equals(Object obj) {
-	ProgramSVInstantiation cmp = null;
+	ProgramSVInstantiation cmp;
 	if (!(obj instanceof ProgramSVInstantiation)) {
 	    return false;
 	} else {
@@ -149,7 +147,7 @@ public class ProgramSVInstantiation {
 	if (size() != cmp.size()) {
 	    return false;
 	} else {
-	    final IteratorOfProgramSVEntry it = iterator();
+	    final Iterator<ProgramSVEntry> it = iterator();
 	    while (it.hasNext()) {
                 final ProgramSVEntry psv = it.next();
 		if (!psv.value().equals
@@ -164,7 +162,7 @@ public class ProgramSVInstantiation {
     public int hashCode(){
         if (hashcode == 0){
             int result = 17;
-            final IteratorOfProgramSVEntry it = iterator();
+            final Iterator<ProgramSVEntry> it = iterator();
             while (it.hasNext()) {
                 final ProgramSVEntry psv = it.next();
                 result = 37 * result + psv.key().hashCode() + 

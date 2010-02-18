@@ -14,6 +14,8 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.ListIterator;
 
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.expression.literal.BooleanLiteral;
@@ -38,7 +40,7 @@ public class WhileInvRule extends AbstractMetaOperator {
         SchemaVariableFactory.createProgramSV(new ProgramElementName("inner_label"),
                                        ProgramSVSort.LABEL, false);
     /** list of the labels */
-    private ListOfSchemaVariable instantiations  = null;
+    private ImmutableList<SchemaVariable> instantiations  = null;
 
     /** list of breaks that lead to abrupt termination
      * of the loop to be transformed. Is initialised by
@@ -174,7 +176,7 @@ public class WhileInvRule extends AbstractMetaOperator {
         
         
         WhileInvariantTransformation w = 
-            new WhileInvariantTransformation((While)body, 
+            new WhileInvariantTransformation(body,
                                              (ProgramElementName)
                                              svInst.getInstantiation(outerLabel),
                                              (ProgramElementName)
@@ -246,7 +248,7 @@ public class WhileInvRule extends AbstractMetaOperator {
         
         stmnt.add(w.result());
         StatementBlock s = new StatementBlock
-        (stmnt.toArray(new Statement[0]));
+        (stmnt.toArray(new Statement[stmnt.size()]));
         Statement resSta;
         if (svInst.getExecutionContext() != null){
             resSta = new MethodFrame(null, svInst.getExecutionContext(), s);
@@ -308,7 +310,7 @@ public class WhileInvRule extends AbstractMetaOperator {
      * Schemavariables in the loop that is why the found instantiations have to
      * be given.
      */
-    public ListOfSchemaVariable neededInstantiations(ProgramElement originalLoop,
+    public ImmutableList<SchemaVariable> neededInstantiations(ProgramElement originalLoop,
                                                      SVInstantiations svInst) {
         WhileInvariantTransformation w = 
 	    new WhileInvariantTransformation(originalLoop, 
@@ -317,7 +319,7 @@ public class WhileInvRule extends AbstractMetaOperator {
                                               ? null 
                                               : javaInfo.getServices());
         w.start();
-        instantiations = SLListOfSchemaVariable.EMPTY_LIST;
+        instantiations = ImmutableSLList.<SchemaVariable>nil();
         if (w.innerLabelNeeded()) {
             instantiations = instantiations.prepend(innerLabel);
         }
@@ -397,7 +399,7 @@ public class WhileInvRule extends AbstractMetaOperator {
             tf.createProgramTerm
             (modality,
              addContext(root, new StatementBlock
-                        (breakIfCascade.toArray(new Statement[0]))),
+                        (breakIfCascade.toArray(new Statement[breakIfCascade.size()]))),
              post);
         return tf.createJunctorTerm
             (Op.IMP, 

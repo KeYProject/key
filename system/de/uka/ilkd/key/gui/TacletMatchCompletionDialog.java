@@ -17,12 +17,7 @@ import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.dnd.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -37,7 +32,6 @@ import javax.swing.table.TableCellRenderer;
 
 import de.uka.ilkd.key.gui.configuration.PathConfig;
 import de.uka.ilkd.key.logic.NamespaceSet;
-import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
@@ -68,9 +62,9 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
 	this.current = 0;
 	dataTable = new DataTable[model.length];
 
-	for (int i = 0; i < model.length; i++) {
-	    model[i].prepareUnmatchedInstantiation();
-	}
+        for (ApplyTacletDialogModel aModel : model) {
+            aModel.prepareUnmatchedInstantiation();
+        }
         
         setStatus();
 	
@@ -213,8 +207,8 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
 	    instPanel.setBorder(indents);
 	    tabContent.add(instPanel);
 
-	    if (model[i].application().taclet().
-		ifSequent() != Sequent.EMPTY_SEQUENT) {
+	    if (!model[i].application().taclet().
+		ifSequent().isEmpty()) {
 
 		TacletIfSelectionDialog ifSelection = 
 		    new TacletIfSelectionDialog(model[i], this);		
@@ -253,9 +247,9 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
 	JPanel panel = new JPanel(new BorderLayout());
 	// show instantiation
 	dataTable[i] = new DataTable(this, i);
-	tablePane = new JScrollPane(dataTable[i]);
-	dataTable[i].setRowHeight(48);
-	adaptSizes(dataTable[i]);	
+        dataTable[i].setRowHeight(48);
+        tablePane = new JScrollPane(dataTable[i]);
+        adaptSizes(dataTable[i]);       
 	panel.add(tablePane, 
 		  BorderLayout.CENTER);
 	return panel;
@@ -267,9 +261,11 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
 	    dt.getRowCount();
 	int tableSize_y = (visible_rows + 1) * 48;  
 	Dimension tableDim = new Dimension(tableSize_x, tableSize_y);
- 	tablePane.setMinimumSize(tableDim);
+	// bugfix. march-09 m.u.:
+	// removed calls to tablePane.setMinimumSize and setMaximumSize
+	// because they prevented the scrollbar from appearing (esp. in
+	// low screen resolution)
  	tablePane.setPreferredSize(tableDim);
-	tablePane.setMaximumSize(tableDim);
 	validateTree();
     }
 
@@ -359,9 +355,10 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
 		}  catch (ExceptionHandlerException ex) { 
 		    Exception exc = (Exception) ((mediator().getExceptionHandler()).getExceptions()).get(0);
 		    if (exc instanceof SVInstantiationExceptionWithPosition) {
-			 errorPositionKnown(((SVInstantiationExceptionWithPosition)exc).getMessage(), 
-					    ((SVInstantiationExceptionWithPosition)exc).getRow(), 1, 
-					    ((SVInstantiationExceptionWithPosition) exc).inIfSequent());
+                        errorPositionKnown(exc.getMessage(),
+                                ((SVInstantiationExceptionWithPosition) exc).getRow(),
+                                ((SVInstantiationExceptionWithPosition) exc).getColumn(),
+                                ((SVInstantiationExceptionWithPosition) exc).inIfSequent());
 		    }
 		    new ExceptionDialog(TacletMatchCompletionDialog.this, 
 		            mediator().getExceptionHandler().getExceptions());
@@ -384,7 +381,8 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
     private static class DataTable extends JTable 
 	implements ModelChangeListener {
 
-	JTextArea inputArea=new JTextArea("Nothing",3,16);
+	//JTextArea inputArea=new JTextArea("Nothing",3,16);
+        JTextArea inputArea=new BracketMatchingTextArea("Nothing",3,16);
 	final InputEditor iEditor = new InputEditor(inputArea);
 	final InputCellRenderer iRenderer = new InputCellRenderer();
 	
@@ -439,9 +437,8 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
 					// now set the new entry in the table ...
 
 					if(droppedString != null){
-					    String s = droppedString;
 							   
-					    DataTable.this.setValueAt(s, row, column);
+					    DataTable.this.setValueAt(droppedString, row, column);
 					    DataTable.this.repaint();
 					}
 					event.getDropTargetContext().dropComplete(true);
@@ -748,8 +745,8 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
             } else {
                 // Avoid resizing of HashMap
                 hm = new HashMap<String, List<List<String>>>(instFiles.length + 1, 1);
-                for (int i = 0; i < instFiles.length; i++) {
-                    hm.put(instFiles[i], null);
+                for (String instFile : instFiles) {
+                    hm.put(instFile, null);
                 }
             }
         }

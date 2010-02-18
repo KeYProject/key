@@ -11,9 +11,14 @@
 
 package de.uka.ilkd.key.rule.soundness;
 
+import java.util.Iterator;
+
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.IteratorOfSchemaVariable;
+import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.Namespace;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.SortedSchemaVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -39,8 +44,8 @@ public class FunctionSkolemBuilder extends AbstractPVPrefixSkolemBuilder {
 	skolemFunctions = new Namespace ();
     }
 
-    public IteratorOfSkolemSet build () {
-	IteratorOfSchemaVariable it =
+    public Iterator<SkolemSet> build () {
+	Iterator<SchemaVariable> it =
 	    getOriginalSkolemSet ().getMissing ().iterator ();
 	SchemaVariable           sv;
 
@@ -81,9 +86,9 @@ public class FunctionSkolemBuilder extends AbstractPVPrefixSkolemBuilder {
     }
 
     // Very inefficient
-    private ListOfTerm createLogicArgs ( SortedSchemaVariable p_sv ) {
-	IteratorOfSchemaVariable it  = taclet.getPrefix ( p_sv ).iterator ();
-	ListOfTerm               res = SLListOfTerm.EMPTY_LIST;
+    private ImmutableList<Term> createLogicArgs ( SortedSchemaVariable p_sv ) {
+	Iterator<SchemaVariable> it  = taclet.getPrefix ( p_sv ).iterator ();
+	ImmutableList<Term>               res = ImmutableSLList.<Term>nil();
 
 	while ( it.hasNext () )
 	    res = res.append ( (Term)getSVI().getInstantiation ( it.next () ) );

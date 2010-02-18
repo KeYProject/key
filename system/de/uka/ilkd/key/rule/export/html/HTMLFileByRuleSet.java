@@ -5,22 +5,17 @@
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
-//
-//
-//This file is part of KeY - Integrated Deductive Software Design 
-//Copyright (C) 2001-2003 Universitaet Karlsruhe, Germany
-//                      and Chalmers University of Technology, Sweden
-//
-//The KeY system is protected by the GNU General Public License.
-//See LICENSE.TXT for details.
-//
 
 package de.uka.ilkd.key.rule.export.html;
 
 import java.io.IOException;
 import java.io.Writer;
+import java.util.Iterator;
 
-import de.uka.ilkd.key.rule.export.*;
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.rule.export.RuleExportModel;
+import de.uka.ilkd.key.rule.export.RuleSetModelInfo;
+import de.uka.ilkd.key.rule.export.TacletModelInfo;
 
 
 
@@ -42,7 +37,7 @@ public class HTMLFileByRuleSet extends HTMLFile {
     public void init ( RuleExportModel model ) {
         super.init(model);
         
-        final IteratorOfRuleSetModelInfo it = model.ruleSets ();
+        final Iterator<RuleSetModelInfo> it = model.ruleSets ();
         while ( it.hasNext () ){
             getFragmentAnchor ( it.next () );
         }
@@ -77,7 +72,7 @@ public class HTMLFileByRuleSet extends HTMLFile {
         }
         out.append ( "<ol>\n" );
 
-        final IteratorOfRuleSetModelInfo it = model.ruleSets();
+        final Iterator<RuleSetModelInfo> it = model.ruleSets();
         while ( it.hasNext () ) {
             // TOC entry
             final RuleSetModelInfo rs = it.next ();
@@ -93,7 +88,7 @@ public class HTMLFileByRuleSet extends HTMLFile {
     private void writeRuleSets ( StringBuffer out ) {
         writeTopLink ( out );
         
-        final IteratorOfRuleSetModelInfo it = model.ruleSets();
+        final Iterator<RuleSetModelInfo> it = model.ruleSets();
         while ( it.hasNext () ) {
             final RuleSetModelInfo rs = it.next ();
 
@@ -111,13 +106,13 @@ public class HTMLFileByRuleSet extends HTMLFile {
         out.append ( "<div class=\"ruleset\" id=\"" + anchor + "\">\n" );
         out.append ( "<h2>Rule set <em>" + escape ( rs.name () ) + "</em></h2>\n" );
 
-        final ListOfTacletModelInfo localTacletList =rs.getTaclets();
-        final IteratorOfTacletModelInfo it = localTacletList.iterator ();
+        final ImmutableList<TacletModelInfo> localTacletList =rs.getTaclets();
+        final Iterator<TacletModelInfo> it = localTacletList.iterator ();
         
-        final ListOfRuleSetModelInfo intersectingSets = rs.getIntersectingSets();
-        final ListOfRuleSetModelInfo superSets = rs.getSuperSets();
-        final ListOfRuleSetModelInfo subSets = rs.getSubSets();
-        final ListOfRuleSetModelInfo equalSets = rs.getEqualSets();
+        final ImmutableList<RuleSetModelInfo> intersectingSets = rs.getIntersectingSets();
+        final ImmutableList<RuleSetModelInfo> superSets = rs.getSuperSets();
+        final ImmutableList<RuleSetModelInfo> subSets = rs.getSubSets();
+        final ImmutableList<RuleSetModelInfo> equalSets = rs.getEqualSets();
         
         if (!intersectingSets.isEmpty () || !superSets.isEmpty ()
                 || !subSets.isEmpty () || !equalSets.isEmpty ()) {
@@ -185,18 +180,17 @@ public class HTMLFileByRuleSet extends HTMLFile {
         out.append ( "</div>\n\n" );
     }
     
-    private void writeRuleSetList ( StringBuffer out, ListOfRuleSetModelInfo ruleSets ) {
+    private void writeRuleSetList ( StringBuffer out, ImmutableList<RuleSetModelInfo> ruleSets ) {
         if (ruleSets.isEmpty ()) {
             out.append ( "none" );
         } else {
             boolean first = true;
-            final IteratorOfRuleSetModelInfo it = ruleSets.iterator ();
-            while (it.hasNext ()) {
-                final RuleSetModelInfo ruleSet = it.next ();
+            for (RuleSetModelInfo ruleSet1 : ruleSets) {
+                final RuleSetModelInfo ruleSet = ruleSet1;
                 if (!first) {
-                    out.append ( ", " );
+                    out.append(", ");
                 }
-                writeRuleSetLink ( out, ruleSet );
+                writeRuleSetLink(out, ruleSet);
                 first = false;
             }
         }

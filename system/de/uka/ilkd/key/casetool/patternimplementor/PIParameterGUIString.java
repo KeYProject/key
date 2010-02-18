@@ -58,6 +58,6 @@ public class PIParameterGUIString extends PIParameterGUI implements
 
     protected void updateGUI() {
         //System.out.println("GUI.updateGUI "+pip.getName());
-        ((JTextField) content).setText(((PIParameterString) pip).getValue());
+        ((JTextField) content).setText(pip.getValue());
     }
 }

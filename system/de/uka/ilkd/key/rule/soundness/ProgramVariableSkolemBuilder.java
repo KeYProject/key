@@ -14,11 +14,15 @@ package de.uka.ilkd.key.rule.soundness;
 import java.util.HashSet;
 import java.util.Iterator;
 
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.Namespace;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.op.IProgramVariable;
+import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.inst.ProgramSkolemInstantiation;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.Debug;
@@ -30,7 +34,7 @@ public class ProgramVariableSkolemBuilder
     extends AbstractSkolemBuilder {
 
     private final RawProgramVariablePrefixes rpvp;
-    private ListOfSkolemSet results = SLListOfSkolemSet.EMPTY_LIST;
+    private ImmutableList<SkolemSet> results = ImmutableSLList.<SkolemSet>nil();
 
     public ProgramVariableSkolemBuilder ( SkolemSet                  p_oriSkolemSet,
 					  RawProgramVariablePrefixes p_rpvp,
@@ -39,7 +43,7 @@ public class ProgramVariableSkolemBuilder
 	rpvp = p_rpvp;
     }
     
-    public IteratorOfSkolemSet build () {
+    public Iterator<SkolemSet> build () {
 	build ( 0,
 		new HashSet (),
 		getOriginalSkolemSet ().getInstantiations () );
@@ -84,10 +88,8 @@ public class ProgramVariableSkolemBuilder
 
     private Namespace toNamespace(HashSet p_usedVariables) {
         final Namespace vars = new Namespace ();
-        
-        final Iterator  it   = p_usedVariables.iterator ();
-        while ( it.hasNext () )
-            vars.add ( (Named)it.next () );
+
+        for (Object p_usedVariable : p_usedVariables) vars.add((Named) p_usedVariable);
 
         return vars;
     }
@@ -97,7 +99,7 @@ public class ProgramVariableSkolemBuilder
 			     SVInstantiations p_currentSVI,
 			     HashSet          p_usedVars ) {
 	final ExtList              res  = new ExtList ();
-	final ListOfSchemaVariable svs  =
+	final ImmutableList<SchemaVariable> svs  =
 	    getSVPartitioning().getPartition ( p_variableNumber );
 	final KeYJavaType          type = getPartitionType(p_variableNumber);
 
@@ -126,29 +128,27 @@ public class ProgramVariableSkolemBuilder
      * <code>p_res</code> within an <code>PVCandidate</code> object.
      * @param p_type the type the new variable is to be given
      */
-    private void createNativePVCandidates ( ListOfSchemaVariable p_svs,
+    private void createNativePVCandidates ( ImmutableList<SchemaVariable> p_svs,
 					    KeYJavaType          p_type,
 					    SVInstantiations     p_currentSVI,
 					    HashSet              p_usedVars,
 					    ExtList              p_res ) {
-	final IteratorOfIProgramVariable nativeIt =
-	    rpvp.getFreeProgramVariables ().iterator ();
 
-	while ( nativeIt.hasNext () ) {
-	    final IProgramVariable pv = nativeIt.next ();
+        for (IProgramVariable iProgramVariable : rpvp.getFreeProgramVariables()) {
+            final IProgramVariable pv = iProgramVariable;
 
-	    if ( p_usedVars.contains ( pv ) || pv.getKeYJavaType() != p_type )
-		continue;
+            if (p_usedVars.contains(pv) || pv.getKeYJavaType() != p_type)
+                continue;
 
-	    final PVCandidate pvc =
-	        performInstantiation ( p_currentSVI,
-	                               p_svs, 
-				       pv,
-				       ProgramSkolemInstantiation
-				       .OCCURRING_VARIABLE );
+            final PVCandidate pvc =
+                    performInstantiation(p_currentSVI,
+                            p_svs,
+                            pv,
+                            ProgramSkolemInstantiation
+                                    .OCCURRING_VARIABLE);
 
-	    p_res.add ( pvc );
-	}
+            p_res.add(pvc);
+        }
     }
 
 
@@ -160,7 +160,7 @@ public class ProgramVariableSkolemBuilder
      * <code>p_res</code> within an <code>PVCandidate</code> object.
      * @param p_type the type the new variable is to be given
      */
-    private void createNewPVCandidate ( ListOfSchemaVariable p_svs,
+    private void createNewPVCandidate ( ImmutableList<SchemaVariable> p_svs,
 					KeYJavaType          p_type,
 					SVInstantiations     p_currentSVI,
 					ExtList              p_res,
@@ -182,7 +182,7 @@ public class ProgramVariableSkolemBuilder
 
     private PVCandidate
 	performInstantiation ( SVInstantiations     p_currentSVI,
-			       ListOfSchemaVariable p_svs,
+			       ImmutableList<SchemaVariable> p_svs,
 			       IProgramVariable     p_pv,
 			       int                  p_instantiationType ) {
 

@@ -11,10 +11,15 @@
 
 package de.uka.ilkd.key.logic.sort.oclsort;
 
+import java.util.Iterator;
+
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Op;
-import de.uka.ilkd.key.logic.sort.*;
+import de.uka.ilkd.key.logic.sort.GenericSort;
+import de.uka.ilkd.key.logic.sort.Sort;
 
 public class CollectionSort implements OclSort {
 
@@ -145,8 +150,8 @@ public class CollectionSort implements OclSort {
      * undesired results when dealing with arraysorts! 
      * @return the sorts of the predecessors of this sort
      */
-    public SetOfSort extendsSorts() {
-	return SetAsListOfSort.EMPTY_SET;
+    public ImmutableSet<Sort> extendsSorts() {
+	return DefaultImmutableSet.<Sort>nil();
     }
 
     /**
@@ -160,12 +165,11 @@ public class CollectionSort implements OclSort {
 	    if (((GenericSort)sort).getOneOf().size() == 0) {
 		return true;
 	    } else {
-		IteratorOfSort iter = ((GenericSort)sort).getOneOf().iterator();
-		while (iter.hasNext()) {
-		    if (this.extendsTrans(iter.next())) {
-			return true;
-		    }
-		}
+            for (Sort sort1 : ((GenericSort) sort).getOneOf()) {
+                if (this.extendsTrans(sort1)) {
+                    return true;
+                }
+            }
 		return false;
 	    }
 	} else {
@@ -190,12 +194,8 @@ public class CollectionSort implements OclSort {
 	    return false;
 	}
 	CollectionSort cSort = (CollectionSort)obj;
-	if (this.collectionKind == cSort.collectionKind
-	    && this.elemSort == cSort.elemSort) {
-	    return true;
-	} else {
-	    return false;
-	}
+        return this.collectionKind == cSort.collectionKind
+                && this.elemSort == cSort.elemSort;
     }
 
     public int hashCode(){

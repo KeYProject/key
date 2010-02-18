@@ -59,17 +59,13 @@ public abstract class OclCollOpBound extends TermSymbol {
 	    return false;
 	}
 	CollectionSort collSort = (CollectionSort)term.sub(0).sort();
-	Sort iterVariableSort = term.varsBoundHere(1)
-	    .getQuantifiableVariable(0).sort();
+	Sort iterVariableSort = term.varsBoundHere(1).get(0).sort();
 	Sort exprSort = term.sub(1).sort();
 	if (!collSort.getElemSort().extendsTrans(iterVariableSort)) {
 	    return false;
 	}
-	if (!exprSort.extendsTrans(this.expressionSort)) {
-	    return false;
-	}
-        return true;
-    } 
+        return exprSort.extendsTrans(this.expressionSort);
+    }
 
     public void helpSort(Term[] subTerm) {
 	if (subTerm.length != arity()) {

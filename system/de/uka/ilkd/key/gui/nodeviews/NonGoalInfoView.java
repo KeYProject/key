@@ -13,6 +13,7 @@ package de.uka.ilkd.key.gui.nodeviews;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Rectangle;
+import java.util.Iterator;
 
 import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
@@ -23,19 +24,22 @@ import javax.swing.text.DefaultHighlighter;
 import javax.swing.text.Highlighter;
 import javax.swing.text.Highlighter.HighlightPainter;
 
+import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.gui.KeYMediator;
+import de.uka.ilkd.key.gui.Main;
+import de.uka.ilkd.key.gui.MethodCallInfo;
 import de.uka.ilkd.key.gui.configuration.Config;
-import de.uka.ilkd.key.gui.configuration.ConfigChangeEvent;
+import de.uka.ilkd.key.gui.configuration.ConfigChangeAdapter;
 import de.uka.ilkd.key.gui.configuration.ConfigChangeListener;
-import de.uka.ilkd.key.logic.ListOfInteger;
+import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.pp.*;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.rule.*;
+import de.uka.ilkd.key.rule.export.html.HTMLFileTaclet;
 import de.uka.ilkd.key.rule.inst.GenericSortInstantiations;
 import de.uka.ilkd.key.util.Debug;
-import de.uka.ilkd.key.rule.export.html.HTMLFileTaclet;
 
 
 public class NonGoalInfoView extends JTextArea {
@@ -43,8 +47,14 @@ public class NonGoalInfoView extends JTextArea {
     private LogicPrinter printer;	 
     private SequentPrintFilter filter;
     private InitialPositionTable posTable;
+    private ConfigChangeListener configChangeListener = new ConfigChangeAdapter(this);
     
     public NonGoalInfoView (Node node, KeYMediator mediator) {
+        if(MethodCallInfo.MethodCallCounterOn){
+            MethodCallInfo.Global.incForClass(this.getClass().toString(), MethodCallInfo.constructor);
+            MethodCallInfo.Local.incForClass(this.getClass().toString(), MethodCallInfo.constructor);
+        }
+
 	filter = new ConstraintSequentPrintFilter 
 	    ( node.sequent (), 
 	      mediator.getUserConstraint ().getConstraint () );
@@ -104,12 +114,7 @@ public class NonGoalInfoView extends JTextArea {
             s += "\n"+node.getReuseSource().scoringInfo();
         }
 
-	Config.DEFAULT.addConfigChangeListener(
-	    new ConfigChangeListener() {
-		    public void configChanged(ConfigChangeEvent e) {
-			updateUI();
-		    }
-		});
+	Config.DEFAULT.addConfigChangeListener(configChangeListener);
 
 	updateUI();
 	setText(s);
@@ -123,7 +128,43 @@ public class NonGoalInfoView extends JTextArea {
 	
 	setEditable(false);
     }
+    
+    public void addNotify() {
+        super.addNotify();
+        Config.DEFAULT.addConfigChangeListener(configChangeListener);
+    }
+    
+    public void removeNotify(){
+        super.removeNotify();
+        unregisterListener();
+        if(MethodCallInfo.MethodCallCounterOn){
+            MethodCallInfo.Local.incForClass(this.getClass().toString(), "removeNotify()");
+        }
+    }
 
+    public void unregisterListener(){
+        if(configChangeListener!=null){
+            Config.DEFAULT.removeConfigChangeListener(configChangeListener);            
+        }
+    }
+    
+    protected void finalize(){
+        try{
+            unregisterListener();
+            if(MethodCallInfo.MethodCallCounterOn){
+                MethodCallInfo.Global.incForClass(this.getClass().toString(), MethodCallInfo.finalize);
+                MethodCallInfo.Local.incForClass(this.getClass().toString(), MethodCallInfo.finalize);
+            }
+        } catch (Throwable e) {
+            Main.getInstance().notify(new GeneralFailureEvent(e.getMessage()));
+        }finally{
+                try {
+                    super.finalize();
+                } catch (Throwable e) {
+                    Main.getInstance().notify(new GeneralFailureEvent(e.getMessage()));
+                }
+        }
+    }
 
     static final Highlighter.HighlightPainter RULEAPP_HIGHLIGHTER =	 
 	new DefaultHighlighter	 
@@ -203,20 +244,18 @@ public class NonGoalInfoView extends JTextArea {
      */	 
     private void highlightIfFormulas (TacletApp tapp)	 
 	throws BadLocationException {	 
-	final ListOfIfFormulaInstantiation ifs = tapp.ifFormulaInstantiations ();	 
-	if ( ifs == null ) return;	 
-	final IteratorOfIfFormulaInstantiation it = ifs.iterator ();	 
-	while ( it.hasNext () ) {	 
-	    final IfFormulaInstantiation inst2 = it.next ();	 
-	    if ( !( inst2 instanceof IfFormulaInstSeq ) ) continue;	 
-	    final IfFormulaInstSeq inst = (IfFormulaInstSeq)inst2;	 
-	    final PosInOccurrence pos =	 
-		new PosInOccurrence ( inst.getConstrainedFormula (),	 
-				      PosInTerm.TOP_LEVEL,	 
-				      inst.inAntec () );	 
-	    final Range r = highlightPos ( pos, IF_FORMULA_HIGHLIGHTER );	 
-	    makeRangeVisible ( r );	 
-	}	 
+	final ImmutableList<IfFormulaInstantiation> ifs = tapp.ifFormulaInstantiations ();	 
+	if ( ifs == null ) return;
+        for (final IfFormulaInstantiation inst2 : ifs) {
+            if (!(inst2 instanceof IfFormulaInstSeq)) continue;
+            final IfFormulaInstSeq inst = (IfFormulaInstSeq) inst2;
+            final PosInOccurrence pos =
+                    new PosInOccurrence(inst.getConstrainedFormula(),
+                            PosInTerm.TOP_LEVEL,
+                            inst.inAntec());
+            final Range r = highlightPos(pos, IF_FORMULA_HIGHLIGHTER);
+            makeRangeVisible(r);
+        }
     }	 
  	 
     /**	 
@@ -228,7 +267,7 @@ public class NonGoalInfoView extends JTextArea {
     private Range highlightPos (PosInOccurrence pos,	 
 				HighlightPainter light)	 
 	throws BadLocationException {	 
-	ListOfInteger path = posTable.pathForPosition (pos, filter);	 
+	ImmutableList<Integer> path = posTable.pathForPosition (pos, filter);	 
 	Range r = posTable.rangeForPath(path);	 
 	getHighlighter().addHighlight(r.start(), r.end(), light);	 
 	return r;

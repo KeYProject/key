@@ -10,12 +10,14 @@
 
 package de.uka.ilkd.key.rule;
 
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.logic.BoundVarsVisitor;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.SetAsListOfSchemaVariable;
-import de.uka.ilkd.key.logic.op.SetOfQuantifiableVariable;
-import de.uka.ilkd.key.logic.op.SetOfSchemaVariable;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+import de.uka.ilkd.key.logic.op.SchemaVariable;
 
 /** this class inherits from TacletGoalTemplate. It is used if there is a
  * replacewith in the ruleGoals that replaces a term by another
@@ -28,25 +30,25 @@ public class RewriteTacletGoalTemplate extends TacletGoalTemplate {
 
     /** creates new Goaldescription 
      *@param addedSeq new Sequent to be added
-     *@param addedRules ListOfTaclet contains the new allowed rules
+     *@param addedRules IList<Taclet> contains the new allowed rules
      * at this branch 
      *@param replacewith the Term that replaces another one
      *@param pvs the set of schema variables
      */
     public RewriteTacletGoalTemplate(Sequent             addedSeq,
-				     ListOfTaclet        addedRules,				     
+				     ImmutableList<Taclet>        addedRules,				     
 				     Term                replacewith,
-				     SetOfSchemaVariable pvs) {
+				     ImmutableSet<SchemaVariable> pvs) {
 	super(addedSeq, addedRules, pvs);
 	TacletBuilder.checkContainsFreeVarSV(replacewith, null, "replacewith term");
 	this.replacewith = replacewith;
     }
 
     public RewriteTacletGoalTemplate(Sequent addedSeq,
-			   ListOfTaclet addedRules,
+			   ImmutableList<Taclet> addedRules,
 			   Term replacewith) {
 	this(addedSeq, addedRules, replacewith,
-	     SetAsListOfSchemaVariable.EMPTY_SET);
+	     DefaultImmutableSet.<SchemaVariable>nil());
     }
 
 
@@ -62,7 +64,7 @@ public class RewriteTacletGoalTemplate extends TacletGoalTemplate {
      * goal template
      * @return all variables that occur bound in this goal template
      */
-    protected SetOfQuantifiableVariable getBoundVariables() {
+    protected ImmutableSet<QuantifiableVariable> getBoundVariables() {
         final BoundVarsVisitor bvv = new BoundVarsVisitor();
         bvv.visit(replaceWith());
         return bvv.getBoundVariables().union(super.getBoundVariables());

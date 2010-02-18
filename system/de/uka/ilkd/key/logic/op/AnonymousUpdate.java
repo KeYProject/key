@@ -16,6 +16,7 @@ import java.lang.ref.WeakReference;
 import java.math.BigInteger;
 import java.util.WeakHashMap;
 
+import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
@@ -66,7 +67,7 @@ public class AnonymousUpdate implements IUpdateOperator {
      * @return a new anonymous update
      */
     public static AnonymousUpdate getNewAnonymousOperator() {        
-        WeakReference anonymousUpdateReference = null;
+        WeakReference anonymousUpdateReference;
         Name uniqueName; 
         do { 
              globalCounter = globalCounter.add(BigInteger.ONE);
@@ -158,8 +159,8 @@ public class AnonymousUpdate implements IUpdateOperator {
         return 0;
     }
     
-    public ArrayOfLocation locationsAsArray () {
-        return new ArrayOfLocation ();
+    public ImmutableArray<Location> locationsAsArray () {
+        return new ImmutableArray<Location> ();
     }
     
     public int locationSubtermsBegin (int locPos) {

@@ -11,6 +11,7 @@
 
 package de.uka.ilkd.key.java;
 
+import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.ExtList;
@@ -56,9 +57,9 @@ public abstract class JavaNonTerminalProgramElement extends JavaProgramElement
      * @param el the element to look for 
      * @return the index of the element (-1 if not found)
      */
-    protected int getArrayPos(ArrayOfProgramElement arr, ProgramElement el) {
+    protected int getArrayPos(ImmutableArray<ProgramElement> arr, ProgramElement el) {
 	for (int i = 0, sz = arr.size() ;i<sz; i++) {
-	    if (arr.getProgramElement(i) == el) { 
+	    if (arr.get(i) == el) { 
 		return i;
 	    }
 	} 

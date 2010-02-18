@@ -1,16 +1,25 @@
+// This file is part of KeY - Integrated Deductive Software Design
+// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General Public License. 
+// See LICENSE.TXT for details.
 package de.uka.ilkd.key.java;
 
 import java.util.List;
 
 import recoder.list.generic.ASTList;
+import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
-import de.uka.ilkd.key.java.declaration.*;
-import de.uka.ilkd.key.java.recoderext.*;
+import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
+import de.uka.ilkd.key.java.declaration.Modifier;
+import de.uka.ilkd.key.java.declaration.VariableSpecification;
+import de.uka.ilkd.key.java.recoderext.ProgramVariableSVWrapper;
+import de.uka.ilkd.key.java.recoderext.TypeSVWrapper;
 import de.uka.ilkd.key.java.reference.*;
-import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.statement.*;
-import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
@@ -68,6 +77,10 @@ public class SchemaRecoder2KeYConverter extends Recoder2KeYConverter {
             final ProgramSV[] labels = mc.getSV();
             return new UnwindLoop(labels[0], labels[1], (LoopStatement) list
                     .get(LoopStatement.class));
+        } else if ("#unwind-loop-bounded".equals(mcName)) { //chrisg
+            final ProgramSV[] labels = mc.getSV();
+            return new UnwindLoopBounded(labels[0], labels[1], (LoopStatement) list
+                    .get(LoopStatement.class));
         } else if ("#unpack".equals(mcName)) {
             return new Unpack((For) list.get(For.class));
         } else if ("#for-to-while".equals(mcName)) {
@@ -94,12 +107,12 @@ public class SchemaRecoder2KeYConverter extends Recoder2KeYConverter {
             ProgramSV[] svw = mc.getSV();
             ProgramSV execSV = null;
             ProgramSV returnSV = null;
-            for (int i = 0; i < svw.length; i++) {
-                if (svw[i].sort() == ProgramSVSort.VARIABLE) {
-                    returnSV = svw[i];
+            for (ProgramSV aSvw : svw) {
+                if (aSvw.sort() == ProgramSVSort.VARIABLE) {
+                    returnSV = aSvw;
                 }
-                if (svw[i].sort() == ProgramSVSort.EXECUTIONCONTEXT) {
-                    execSV = svw[i];
+                if (aSvw.sort() == ProgramSVSort.EXECUTIONCONTEXT) {
+                    execSV = aSvw;
                 }
             }
             if ("#method-call".equals(mcName)) {
@@ -317,7 +330,7 @@ public class SchemaRecoder2KeYConverter extends Recoder2KeYConverter {
                     varspecs);
         } else {
             // otherwise use the default case
-            return (LocalVariableDeclaration) super.convert(lvd);
+            return super.convert(lvd);
         }
     }
 
@@ -471,9 +484,9 @@ public class SchemaRecoder2KeYConverter extends Recoder2KeYConverter {
         
         if(mr instanceof MethodReferenceWrapper && ((MethodReferenceWrapper) mr).getScope()!=null){
             scope = (ProgramSV) callConvert(((MethodReferenceWrapper) mr).getScope());
-         }
+	}
         
-        return new MethodReference(new ArrayOfExpression(keyArgs), name, prefix, scope);
+	return new MethodReference(new ImmutableArray<Expression>(keyArgs), name, prefix, scope);
     }
 
     /**

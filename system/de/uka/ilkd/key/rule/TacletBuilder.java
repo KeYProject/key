@@ -11,13 +11,21 @@
 package de.uka.ilkd.key.rule;
 
 import java.util.HashMap;
+import java.util.Iterator;
 
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 
-/** subclasss build Schematic Theory Specific Rules (Taclets) */
+/** 
+ * abstract taclet builder class to be inherited from taclet builders
+ * specialised for their concrete taclet variant 
+ */
 public abstract class TacletBuilder {
 
     protected final static Name NONAME = new Name("unnamed");
@@ -26,19 +34,19 @@ public abstract class TacletBuilder {
 
     protected Name name                     = NONAME;
     protected Sequent ifseq                 = Sequent.EMPTY_SEQUENT; 
-    protected ListOfNewVarcond varsNew      = SLListOfNewVarcond.EMPTY_LIST;
-    protected ListOfNotFreeIn varsNotFreeIn = SLListOfNotFreeIn.EMPTY_LIST;
-    protected ListOfNewDependingOn varsNewDependingOn =
-	SLListOfNewDependingOn.EMPTY_LIST;
-    protected ListOfTacletGoalTemplate goals= SLListOfTacletGoalTemplate.EMPTY_LIST;
-    protected ListOfRuleSet ruleSets    = SLListOfRuleSet.EMPTY_LIST;
+    protected ImmutableList<NewVarcond> varsNew      = ImmutableSLList.<NewVarcond>nil();
+    protected ImmutableList<NotFreeIn> varsNotFreeIn = ImmutableSLList.<NotFreeIn>nil();
+    protected ImmutableList<NewDependingOn> varsNewDependingOn =
+	ImmutableSLList.<NewDependingOn>nil();
+    protected ImmutableList<TacletGoalTemplate> goals= ImmutableSLList.<TacletGoalTemplate>nil();
+    protected ImmutableList<RuleSet> ruleSets    = ImmutableSLList.<RuleSet>nil();
     protected TacletAttributes attrs        = new TacletAttributes(); 
     protected Constraint constraint         = Constraint.BOTTOM;
     /** List of additional generic conditions on the instantiations of
      * schema variables. */
-    protected ListOfVariableCondition variableConditions       = SLListOfVariableCondition.EMPTY_LIST; 
-    protected HashMap<TacletGoalTemplate, SetOfChoice> goal2Choices          = null;
-    protected SetOfChoice choices           = SetAsListOfChoice.EMPTY_SET;
+    protected ImmutableList<VariableCondition> variableConditions       = ImmutableSLList.<VariableCondition>nil(); 
+    protected HashMap<TacletGoalTemplate, ImmutableSet<Choice>> goal2Choices          = null;
+    protected ImmutableSet<Choice> choices           = DefaultImmutableSet.<Choice>nil();
 
 
     private static boolean containsFreeVarSV(Term t) {
@@ -124,25 +132,25 @@ public abstract class TacletBuilder {
     }
 
     /**
-     * adds a mapping from GoalTemplate <code>gt</code> to SetOfChoice 
+     * adds a mapping from GoalTemplate <code>gt</code> to SetOf<Choice> 
      * <code>soc</code>
      */
-    public void addGoal2ChoicesMapping(TacletGoalTemplate gt, SetOfChoice soc){
+    public void addGoal2ChoicesMapping(TacletGoalTemplate gt, ImmutableSet<Choice> soc){
 	if(goal2Choices==null){
-	    goal2Choices = new HashMap<TacletGoalTemplate, SetOfChoice>();
+	    goal2Choices = new HashMap<TacletGoalTemplate, ImmutableSet<Choice>>();
 	}
 	goal2Choices.put(gt, soc);
     }
 	
-    public HashMap<TacletGoalTemplate, SetOfChoice> getGoal2Choices(){
+    public HashMap<TacletGoalTemplate, ImmutableSet<Choice>> getGoal2Choices(){
 	return goal2Choices;
     }
 
-    public void setChoices(SetOfChoice choices){
+    public void setChoices(ImmutableSet<Choice> choices){
 	this.choices = choices;
     }
 
-    public SetOfChoice getChoices(){
+    public ImmutableSet<Choice> getChoices(){
 	return choices;
     }
 
@@ -187,11 +195,10 @@ public abstract class TacletBuilder {
     /** adds a list of <I>new</I> variables to the variable conditions of
      * the Taclet: v is new for all v's in the given list
      */
-    public void addVarsNew(ListOfNewVarcond list) {	
-	IteratorOfNewVarcond it = list.iterator();
-	while (it.hasNext()) {
-	    addVarsNew(it.next());
-	}
+    public void addVarsNew(ImmutableList<NewVarcond> list) {
+        for (NewVarcond aList : list) {
+            addVarsNew(aList);
+        }
     }
 
     /** adds a new <I>NotFreeIn</I> variable pair to the variable conditions of
@@ -205,7 +212,7 @@ public abstract class TacletBuilder {
     *conditions of
     * the Taclet: v0 is not free in v1 for all entries (v0,v1) in the given list.
     */
-    public void addVarsNotFreeIn(ListOfNotFreeIn list){	
+    public void addVarsNotFreeIn(ImmutableList<NotFreeIn> list){	
 	varsNotFreeIn=varsNotFreeIn.prepend(list);
     }
 
@@ -243,7 +250,7 @@ public abstract class TacletBuilder {
 	ruleSets = ruleSets.prepend(rs);
     }
 
-    public void setRuleSets(ListOfRuleSet rs) {
+    public void setRuleSets(ImmutableList<RuleSet> rs) {
 	ruleSets = rs;
     }
 
@@ -258,15 +265,15 @@ public abstract class TacletBuilder {
 	return ifseq;
     }
 
-    public ListOfTacletGoalTemplate goalTemplates() {
+    public ImmutableList<TacletGoalTemplate> goalTemplates() {
 	return goals;
     }
 
-    public IteratorOfNotFreeIn varsNotFreeIn() {
+    public Iterator<NotFreeIn> varsNotFreeIn() {
 	return varsNotFreeIn.iterator();
     }
 
-    public void setTacletGoalTemplates(ListOfTacletGoalTemplate g) {
+    public void setTacletGoalTemplates(ImmutableList<TacletGoalTemplate> g) {
 	goals=g;
     }
 
@@ -283,12 +290,12 @@ public abstract class TacletBuilder {
      */
     public abstract Taclet getTaclet();
 
-    public Taclet getTacletWithoutInactiveGoalTemplates(SetOfChoice active){
-	if(goal2Choices==null || goals == SLListOfTacletGoalTemplate.EMPTY_LIST){
+    public Taclet getTacletWithoutInactiveGoalTemplates(ImmutableSet<Choice> active){
+	if(goal2Choices==null || goals.isEmpty()){
 	    return getTaclet();
 	}else{
-	    ListOfTacletGoalTemplate oldGoals = goals;
-	    IteratorOfTacletGoalTemplate it = oldGoals.iterator();
+	    ImmutableList<TacletGoalTemplate> oldGoals = goals;
+	    Iterator<TacletGoalTemplate> it = oldGoals.iterator();
 	    Taclet result;
 	    while(it.hasNext()){
 		TacletGoalTemplate goal = it.next();
@@ -297,7 +304,7 @@ public abstract class TacletBuilder {
 		    goals = goals.removeAll(goal);
 		}
 	    }
-	    if(goals == SLListOfTacletGoalTemplate.EMPTY_LIST){
+	    if(goals.isEmpty()){
 		result = null;
 	    }else{
 		result = getTaclet();

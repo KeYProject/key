@@ -10,7 +10,7 @@
 
 package de.uka.ilkd.key.speclang.jml.pretranslation;
 
-import de.uka.ilkd.key.collection.ListOfString;
+import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.speclang.PositionedString;
 
 
@@ -20,7 +20,7 @@ public class TextualJMLMethodDecl extends TextualJMLConstruct {
     private final String methodName;
     
     
-    public TextualJMLMethodDecl(ListOfString mods, 
+    public TextualJMLMethodDecl(ImmutableList<String> mods, 
                                 PositionedString decl, 
                                 String methodName) {
         super(mods);

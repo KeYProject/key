@@ -11,6 +11,7 @@
 
 package de.uka.ilkd.key.java.expression;
 
+import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
@@ -38,7 +39,7 @@ public class ArrayInitializer
  *      Children.
      */
 
-    protected final ArrayOfExpression children;
+    protected final ImmutableArray<Expression> children;
 
 
     /**
@@ -52,7 +53,7 @@ public class ArrayInitializer
     public ArrayInitializer(ExtList list) {
 	super(list);
 	this.children = 
-	    new ArrayOfExpression((Expression[])list.collect(Expression.class));
+	    new ImmutableArray<Expression>((Expression[])list.collect(Expression.class));
     }
     
     /**
@@ -61,7 +62,7 @@ public class ArrayInitializer
      */
     public ArrayInitializer(Expression[] expressions) {
         super();
-        this.children = new ArrayOfExpression(expressions);
+        this.children = new ImmutableArray<Expression>(expressions);
     }
     
 
@@ -86,7 +87,7 @@ public class ArrayInitializer
 
     public ProgramElement getChildAt(int index) {
         if (children != null) {
-            return children.getExpression(index);
+            return children.get(index);
         }
         throw new ArrayIndexOutOfBoundsException();
     }
@@ -111,7 +112,7 @@ public class ArrayInitializer
 
     public Expression getExpressionAt(int index) {
         if (children != null) {
-            return children.getExpression(index);
+            return children.get(index);
         }
         throw new ArrayIndexOutOfBoundsException();
     }
@@ -132,14 +133,14 @@ public class ArrayInitializer
      *      Get arguments.
      *      @return the wrapped argument array
      */
-    public ArrayOfExpression getArguments() {
+    public ImmutableArray<Expression> getArguments() {
         return children;
     }
 
     public KeYJavaType getKeYJavaType(Services javaServ, ExecutionContext ec) {
 	Expression i = this;
 	int n = 0;
-	Sort s=null;
+	Sort s;
 	for(;i instanceof ArrayInitializer && ((ArrayInitializer)i).getChildCount()!=0 ;
 	    i=((ArrayInitializer)i).getExpressionAt(0)){
 	    n++;

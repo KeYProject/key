@@ -11,13 +11,15 @@
 package de.uka.ilkd.key.rule.encapsulation;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
+import de.uka.ilkd.key.collection.ImmutableArray;
+import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.op.ArrayOfLocation;
-import de.uka.ilkd.key.logic.op.IteratorOfProgramMethod;
-import de.uka.ilkd.key.logic.op.ListOfProgramMethod;
+import de.uka.ilkd.key.logic.op.Location;
+import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 
@@ -30,9 +32,9 @@ public class UniverseAnalyser {
     }
     
     
-    private void printStartup(ArrayOfLocation R, 
-                              ArrayOfLocation P, 
-                              ArrayOfLocation F,
+    private void printStartup(ImmutableArray<Location> R, 
+                              ImmutableArray<Location> P, 
+                              ImmutableArray<Location> F,
                               ProgramElement pi) {
         verbose("Universe analysis running with parameters...");
         verbose("R  = " + R);
@@ -42,9 +44,9 @@ public class UniverseAnalyser {
     }
 
 
-    private void printCoveredMethods(ListOfProgramMethod coveredMethods) {
+    private void printCoveredMethods(ImmutableList<ProgramMethod> coveredMethods) {
         verbose("The following method bodies have been analysed:");
-        IteratorOfProgramMethod it = coveredMethods.iterator();
+        Iterator<ProgramMethod> it = coveredMethods.iterator();
         int i = 1;
         while(it.hasNext()) {
             verbose("(" + i++ + ") " + it.next());
@@ -52,17 +54,17 @@ public class UniverseAnalyser {
     }
 
     
-    private void printConstraints(ListOfTypeSchemeConstraint constraints,
+    private void printConstraints(ImmutableList<TypeSchemeConstraint> constraints,
                                   TypeSchemeConstraint andConstraint) {
         verbose("The following constraints have been generated:");
-        IteratorOfTypeSchemeConstraint it = constraints.iterator();
+        Iterator<TypeSchemeConstraint> it = constraints.iterator();
         int i = 1;
         while(it.hasNext()) {
             verbose("(" + i++ + ") " + it.next());
         }
         
         verbose("The value ranges of the variables are:");
-        IteratorOfTypeSchemeVariable it2 
+        Iterator<TypeSchemeVariable> it2 
                         = andConstraint.getFreeVars().iterator();
         i = 1;
         while(it2.hasNext()) {
@@ -76,7 +78,7 @@ public class UniverseAnalyser {
         if(success) {
             verbose("A solution has been found:");
             
-            IteratorOfTypeSchemeVariable it = andConstraint.getFreeVars().iterator();
+            Iterator<TypeSchemeVariable> it = andConstraint.getFreeVars().iterator();
             int i = 1;
             while(it.hasNext()) {
                 TypeSchemeVariable var = it.next();
@@ -88,9 +90,9 @@ public class UniverseAnalyser {
     }
        
     
-    public boolean analyse(ArrayOfLocation R,
-		           ArrayOfLocation P, 
-		           ArrayOfLocation F,
+    public boolean analyse(ImmutableArray<Location> R,
+		           ImmutableArray<Location> P, 
+		           ImmutableArray<Location> F,
 		           ProgramElement pi, 
                            SVInstantiations svInst, 
                            Services services) {                 
@@ -113,22 +115,22 @@ public class UniverseAnalyser {
                     
         //annotate fields
 	for(int i = 0; i < R.size(); i++) {
-	    annotations.put(R.getLocation(i), TypeSchemeUnion.REP);
+	    annotations.put(R.get(i), TypeSchemeUnion.REP);
 	}
 
         for(int i = 0; i < P.size(); i++) {
-            annotations.put(P.getLocation(i), TypeSchemeUnion.PEER);
+            annotations.put(P.get(i), TypeSchemeUnion.PEER);
         }
 
         for(int i = 0; i < F.size(); i++) {
-            annotations.put(F.getLocation(i), TypeSchemeUnion.READONLY);
+            annotations.put(F.get(i), TypeSchemeUnion.READONLY);
         }
         
         //extract constraints
         verbose("Generating constraints...");
         TypeSchemeConstraintExtractor extractor
                         = new TypeSchemeConstraintExtractor(services);
-        ListOfTypeSchemeConstraint constraints = extractor.extract(pi, 
+        ImmutableList<TypeSchemeConstraint> constraints = extractor.extract(pi, 
                                                                    annotations, 
                                                                    svInst);
         TypeSchemeConstraint andConstraint

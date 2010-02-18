@@ -3,7 +3,7 @@
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
+// The KeY system is protected by the GNU General Public License.
 // See LICENSE.TXT for details.
 //
 //
@@ -14,8 +14,9 @@ import java.io.File;
 
 import javax.swing.JOptionPane;
 
+import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.gui.*;
-import de.uka.ilkd.key.proof.ListOfGoal;
+import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 
 /**
@@ -26,20 +27,20 @@ public class TacletSoundnessPOLoader implements Runnable {
     private final File file;
     private final IMain main;
     private final KeYMediator mediator;
-    
+
     private SwingWorker worker;
 
-    private final ListOfGoal openGoals;
+    private final ImmutableList<Goal> openGoals;
 
-    
-    public TacletSoundnessPOLoader(File file, IMain main, ListOfGoal openGoals) {
+
+    public TacletSoundnessPOLoader(File file, IMain main, ImmutableList<Goal> openGoals) {
        this.main = main;
        mediator  = main.mediator();
        this.file = file;
        this.openGoals = openGoals;
     }
 
-    
+
     public void run () {
         /*
          * Invoking start() on the SwingWorker causes a new Thread to be created
@@ -63,20 +64,20 @@ public class TacletSoundnessPOLoader implements Runnable {
                           msg,
                           "Error occurred while creating proof obligation",
                           JOptionPane.ERROR_MESSAGE );
-                } 
+                }
             }
         };
-        
+
         mediator.stopInterface ( true );
         worker.start ();
     }
 
     protected Object doWork () {
         final TacletSoundnessPO prob =
-                new TacletSoundnessPO (file.getName(), file, 
+                new TacletSoundnessPO (file.getName(), file,
 				       main.getProgressMonitor(),
                                        openGoals);
-    
+
         String status = "";
         try {
 	    ProofEnvironment env = mediator.getSelectedProof().env();
@@ -88,9 +89,6 @@ public class TacletSoundnessPOLoader implements Runnable {
 	    new ExceptionDialog(mediator.mainFrame(),
 		        mediator.getExceptionHandler().getExceptions());
 	    mediator.getExceptionHandler().clear();
-            main.setStatusLine ( "Exception occurred while creating proof obligation" );
-            status = e.toString ();
-            e.printStackTrace ();
         } finally {
             prob.close ();
         }

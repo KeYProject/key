@@ -15,10 +15,11 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Stack;
 
+import de.uka.ilkd.key.collection.ImmutableArray;
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.*;
-import de.uka.ilkd.key.java.abstraction.IteratorOfKeYJavaType;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.abstraction.ListOfKeYJavaType;
 import de.uka.ilkd.key.java.declaration.*;
 import de.uka.ilkd.key.java.expression.ArrayInitializer;
 import de.uka.ilkd.key.java.expression.ParenthesizedExpression;
@@ -92,7 +93,7 @@ class TypeSchemeConstraintExtractor implements Visitor {
     /**
      * The methods covered so far.
      */
-    private ListOfProgramMethod coveredMethods;
+    private ImmutableList<ProgramMethod> coveredMethods;
      
     /**
      * The sv instantiations, including an execution context suitable for 
@@ -143,14 +144,14 @@ class TypeSchemeConstraintExtractor implements Visitor {
      * @return a list of constraints describing what must hold for the program
      * to satisfy the type rules
      */
-    public ListOfTypeSchemeConstraint extract(ProgramElement root, 
+    public ImmutableList<TypeSchemeConstraint> extract(ProgramElement root, 
                                               Map annotations,
                                               SVInstantiations svInst) {
         //initialise members
         stack.clear();
         formalResultVars.clear();
         checker                    = new TypeSchemeChecker(annotations);
-        coveredMethods             = SLListOfProgramMethod.EMPTY_LIST;
+        coveredMethods             = ImmutableSLList.<ProgramMethod>nil();
         this.svInst                = svInst;
         contextFormalResultTerm    = null;
         errorString                = null;
@@ -180,7 +181,7 @@ class TypeSchemeConstraintExtractor implements Visitor {
      * Returns a list of the methods which have been analysed in the last run 
      * of extract().
      */
-    public ListOfProgramMethod getCoveredMethods() {
+    public ImmutableList<ProgramMethod> getCoveredMethods() {
         return coveredMethods;
     }
     
@@ -214,9 +215,8 @@ class TypeSchemeConstraintExtractor implements Visitor {
     
     private void printStack() {
         verbose("Current stack:");
-        Iterator it = stack.iterator();
-        while(it.hasNext()) {
-            verbose(it.next());
+        for (Object aStack : stack) {
+            verbose(aStack);
         }
     }
     
@@ -257,8 +257,8 @@ class TypeSchemeConstraintExtractor implements Visitor {
      * @return a list of the elements, whose the first element is the lowermost
      * element from the stack which is not LEVEL
      */
-    private ListOfTypeSchemeTerm popLevel() {
-        ListOfTypeSchemeTerm result = SLListOfTypeSchemeTerm.EMPTY_LIST;
+    private ImmutableList<TypeSchemeTerm> popLevel() {
+        ImmutableList<TypeSchemeTerm> result = ImmutableSLList.<TypeSchemeTerm>nil();
     
         Object o = stack.pop();
         while(o != LEVEL) {
@@ -283,14 +283,13 @@ class TypeSchemeConstraintExtractor implements Visitor {
             return false;
         }
         
-        ListOfKeYJavaType supertypes1 = javaInfo.getAllSupertypes(kjt1);
+        ImmutableList<KeYJavaType> supertypes1 = javaInfo.getAllSupertypes(kjt1);
         supertypes1 = supertypes1.prepend(kjt1);
-        ListOfKeYJavaType supertypes2 = javaInfo.getAllSupertypes(kjt2);
+        ImmutableList<KeYJavaType> supertypes2 = javaInfo.getAllSupertypes(kjt2);
         supertypes2 = supertypes2.prepend(kjt2);
-        
-        IteratorOfKeYJavaType it = supertypes1.iterator();
-        while(it.hasNext()) {
-            if(supertypes2.contains(it.next())) {
+
+        for (KeYJavaType aSupertypes1 : supertypes1) {
+            if (supertypes2.contains(aSupertypes1)) {
                 return true;
             }
         }
@@ -311,14 +310,14 @@ class TypeSchemeConstraintExtractor implements Visitor {
             return false;                                        
         }
         
-        ListOfKeYJavaType sig1 = mr1.getMethodSignature(services, ec);
-        ListOfKeYJavaType sig2 = mr2.getMethodSignature(services, ec);
+        ImmutableList<KeYJavaType> sig1 = mr1.getMethodSignature(services, ec);
+        ImmutableList<KeYJavaType> sig2 = mr2.getMethodSignature(services, ec);
         if(sig1.size() != sig2.size()) {
             return false;
         }
         
-        IteratorOfKeYJavaType it1 = sig1.iterator();
-        IteratorOfKeYJavaType it2 = sig2.iterator();
+        Iterator<KeYJavaType> it1 = sig1.iterator();
+        Iterator<KeYJavaType> it2 = sig2.iterator();
         while(it1.hasNext()) {
             if(!haveCommonSupertype(it1.next(), it2.next())) {
                 return false;
@@ -330,11 +329,10 @@ class TypeSchemeConstraintExtractor implements Visitor {
 
 
     private ProgramVariable getFormalResultVar(MethodReference mr) {
-        Iterator it = formalResultVars.keySet().iterator();
 
-        while(it.hasNext()) {
-            MethodReference mr2 = (MethodReference) it.next();
-            if(areInSameFamily(mr, mr2)) {
+        for (Object o : formalResultVars.keySet()) {
+            MethodReference mr2 = (MethodReference) o;
+            if (areInSameFamily(mr, mr2)) {
                 return (ProgramVariable) formalResultVars.get(mr2);
             }
         }
@@ -407,22 +405,22 @@ class TypeSchemeConstraintExtractor implements Visitor {
     }
 
 
-    private ArrayOfExpression simplifyExpressions(
-						ArrayOfExpression expressions) {
+    private ImmutableArray<Expression> simplifyExpressions(
+						ImmutableArray<Expression> expressions) {
 	Expression[] result = new Expression[expressions.size()];
 	for(int i = 0; i < expressions.size(); i++) {
-	    result[i] = simplifyExpression(expressions.getExpression(i));
+	    result[i] = simplifyExpression(expressions.get(i));
 	}
-	return new ArrayOfExpression(result);
+	return new ImmutableArray<Expression>(result);
     }
 
 
     private New simplifyNew(New n) {
         Debug.assertFalse(n.getReferencePrefix() instanceof Expression);
-	ArrayOfExpression simpleArgs = simplifyExpressions(n.getArguments());
+	ImmutableArray<Expression> simpleArgs = simplifyExpressions(n.getArguments());
 	Expression[] simpleArgsArray = new Expression[simpleArgs.size()];
 	for(int i = 0; i < simpleArgs.size(); i++) {
-	    simpleArgsArray[i] = simpleArgs.getExpression(i);
+	    simpleArgsArray[i] = simpleArgs.get(i);
 	}
 	return new New(simpleArgsArray, 
 		       n.getTypeReference(), 
@@ -477,9 +475,9 @@ class TypeSchemeConstraintExtractor implements Visitor {
         
         //walk children (either the adopted or the normal ones)
         if(adoptedChildren != null) {
-            ProgramElement[] ac = (ProgramElement[]) adoptedChildren.clone();
-            for(int i = 0; i < ac.length; i++) {
-                walk(ac[i]);
+            ProgramElement[] ac = adoptedChildren.clone();
+            for (ProgramElement anAc : ac) {
+                walk(anAc);
             }
             verbose(ascendingString);
         } else if(node instanceof NonTerminalProgramElement) {
@@ -563,7 +561,13 @@ class TypeSchemeConstraintExtractor implements Visitor {
         }
     }
     
-    
+    public void performActionOnIProgramVariable(IProgramVariable x) {
+        if(x instanceof ProgramVariable){
+            performActionOnProgramVariable(( ProgramVariable)x);
+        }else{
+            failUnexpected(x);
+        }
+    }
 
     
     public void performActionOnSchemaVariable(SchemaVariable x) {
@@ -823,7 +827,7 @@ class TypeSchemeConstraintExtractor implements Visitor {
             popLevel();
 
             //get actual and formal parameter terms
-            final ArrayOfParameterDeclaration parDecls = pm.getParameters();
+            final ImmutableArray<ParameterDeclaration> parDecls = pm.getParameters();
             final int numPars = parDecls.size();
             final TypeSchemeTerm actualParTerms[] = new TypeSchemeTerm[numPars];
             final TypeSchemeTerm formalParTerms[] = new TypeSchemeTerm[numPars];
@@ -831,7 +835,7 @@ class TypeSchemeConstraintExtractor implements Visitor {
                 actualParTerms[i] = pop();
                     
                 ParameterDeclaration parDecl
-                            = parDecls.getParameterDeclaration(i);
+                            = parDecls.get(i);
                 VariableSpecification parSpec
                             = parDecl.getVariableSpecification();
                 ProgramVariable formalParVar
@@ -1252,11 +1256,11 @@ class TypeSchemeConstraintExtractor implements Visitor {
 
             //descend into prefix, parameters and expansion instead of
             //normal children
-            final ArrayOfExpression args = x.getArguments();
+            final ImmutableArray<Expression> args = x.getArguments();
             adoptedChildren = new ProgramElement[args.size() + 2];
             adoptedChildren[0] = new ThisReference();
             for(int i = 0; i < args.size(); i++) {
-                adoptedChildren[i + 1] = args.getExpression(i);
+                adoptedChildren[i + 1] = args.get(i);
             }
             adoptedChildren[args.size() + 1] = expandedPe;
 
@@ -1264,7 +1268,7 @@ class TypeSchemeConstraintExtractor implements Visitor {
         } else {
             //get rid of superfluous terms on the stack, but leave the topmost
             //non-LEVEL element as result
-            ListOfTypeSchemeTerm resultTerms = popLevel();
+            ImmutableList<TypeSchemeTerm> resultTerms = popLevel();
             if(resultTerms.size() > 0) {
                 push(resultTerms.head());
             }
@@ -1400,13 +1404,13 @@ class TypeSchemeConstraintExtractor implements Visitor {
             //descend into prefix, parameters and expansion instead of
             //normal children
             final ReferencePrefix rp = x.getReferencePrefix();
-	    final ArrayOfExpression args = x.getArguments();
+	    final ImmutableArray<Expression> args = x.getArguments();
             adoptedChildren = new ProgramElement[args.size() + 2];
 	    adoptedChildren[0] = (rp instanceof Expression
                                   ? rp
                                   : new ThisReference());
 	    for(int i = 0; i < args.size(); i++) {
-		adoptedChildren[i + 1] = args.getExpression(i);
+		adoptedChildren[i + 1] = args.get(i);
 	    }
 	    adoptedChildren[args.size() + 1] = expandedPe;
 
@@ -1414,7 +1418,7 @@ class TypeSchemeConstraintExtractor implements Visitor {
         } else {
             //get rid of superfluous terms on the stack, but leave the topmost
             //non-LEVEL element as potential result
-            ListOfTypeSchemeTerm resultTerms = popLevel();
+            ImmutableList<TypeSchemeTerm> resultTerms = popLevel();
             if(resultTerms.size() > 0) {
                 push(resultTerms.head());
             }

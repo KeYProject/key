@@ -117,7 +117,7 @@ public class TacletIfSelectionDialog extends JPanel{
 	ifPanel.requestFocus();
 
 	JTextField tf = (JTextField) 
-	    ((JPanel)ifPanel.getComponent(field*2)).getComponent(2);
+	    ((JPanel)ifPanel.getComponent(field)).getComponent(2);
 	Debug.outIfEqual("tacletifselectiondialog:: none existing field"
 			 + " requested", null, tf);
 	if ( tf != null && col >=0 && col < tf.getColumns() ) {
@@ -137,22 +137,22 @@ public class TacletIfSelectionDialog extends JPanel{
 
     private void updateInputField(JPanel parent, JComboBox cb) {
 	IfChoiceModel icm = (IfChoiceModel)cb.getModel();
-	JTextField inp = new JTextField(40);
-	inp.addFocusListener(new FocusAdapter() {
-	    public void focusLost(FocusEvent e) {
-		pushAllInputToModel();
-		owner.setStatus();
-	    }
-	});
-	inp.addActionListener(new ActionListener() {
-	    public void actionPerformed(ActionEvent e) {
-		pushAllInputToModel();
-		owner.setStatus();
-	    }
-	});
-	
 	int nr = parent.getComponentCount();
 	if (cb.getSelectedItem() == icm.manualText() && (nr==2)) {
+            JTextField inp = new JTextField(40);
+            inp.addFocusListener(new FocusAdapter() {
+                public void focusLost(FocusEvent e) {
+                    pushAllInputToModel();
+                    owner.setStatus();
+                }
+            });
+            inp.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    pushAllInputToModel();
+                    owner.setStatus();
+                }
+            });
+
 	    parent.add(inp);
 	    inp.setEnabled(true);
 	}
@@ -205,9 +205,8 @@ public class TacletIfSelectionDialog extends JPanel{
 	        list.setToolTipText(valStr);                
 	    }
                        	 
-	    Component c = defaultRenderer.getListCellRendererComponent(
+	    return defaultRenderer.getListCellRendererComponent(
                 list, valStr, index, isSelected, cellHasFocus);
-            return c;
 	}
     }
 

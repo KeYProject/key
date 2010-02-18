@@ -63,13 +63,10 @@
 	    <classpath>
 	      <pathelement path="../KeYExternalLibraries/jcoverage.jar" />
 	      <pathelement path="../KeYExternalLibraries/antlr.jar" />
-	      <pathelement path="../KeYExternalLibraries/dresden-ocl-demo.jar" />
-	      <pathelement path="../KeYExternalLibraries/jargs.jar" />
 	      <pathelement path="../KeYExternalLibraries/javacc.jar" />
 	      <pathelement path="../KeYExternalLibraries/junit.jar" />
 	      <pathelement path="../KeYExternalLibraries/log4j.jar" />
 	      <pathelement path="../KeYExternalLibraries/recoderKey.jar" />
-	      <pathelement path="../KeYExternalLibraries/xerces.jar" />
 	      <pathelement path="../org.key-project.core/key.jar" />
 	      <pathelement location="../KeYPlugin"/>
 	      <pathelement location="${eclipse_home}/plugins/org.eclipse.ui_3.3.1.M20071128-0800.jar"/>

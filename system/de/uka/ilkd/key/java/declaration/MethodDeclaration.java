@@ -11,6 +11,7 @@
 
 package de.uka.ilkd.key.java.declaration;
 
+import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.Method;
 import de.uka.ilkd.key.java.declaration.modifier.AnnotationUseSpecification;
@@ -50,7 +51,7 @@ public class MethodDeclaration
  *      Parameters.
      */
 
-    protected final ArrayOfParameterDeclaration parameters;
+    protected final ImmutableArray<ParameterDeclaration> parameters;
 
     /**
  *      Exceptions.
@@ -83,16 +84,16 @@ public class MethodDeclaration
      * parent is an InterfaceDeclaration 
      */
     public MethodDeclaration(ExtList children, 
-                             boolean parentIsInterfaceDeclaration) {
-        super(children);
-        returnType=(TypeReference)children.get(TypeReference.class);
-        name=(ProgramElementName)children.get(ProgramElementName.class);
-        this.parameters=new
-            ArrayOfParameterDeclaration((ParameterDeclaration[])
-                                children.collect(ParameterDeclaration.class));  
-        exceptions=(Throws)children.get(Throws.class);
-        body=(StatementBlock)children.get(StatementBlock.class);
-        this.parentIsInterfaceDeclaration=parentIsInterfaceDeclaration;
+			     boolean parentIsInterfaceDeclaration) {
+	super(children);
+	returnType=(TypeReference)children.get(TypeReference.class);
+	name=(ProgramElementName)children.get(ProgramElementName.class);
+	this.parameters=new
+	    ImmutableArray<ParameterDeclaration>((ParameterDeclaration[])
+				children.collect(ParameterDeclaration.class));  
+	exceptions=(Throws)children.get(Throws.class);
+	body=(StatementBlock)children.get(StatementBlock.class);
+	this.parentIsInterfaceDeclaration=parentIsInterfaceDeclaration;
     }
 
     
@@ -109,13 +110,13 @@ public class MethodDeclaration
      */
 
     public MethodDeclaration(Modifier[] modifiers, TypeReference returnType, 
-                             ProgramElementName name,
-                             ParameterDeclaration[] parameters, 
-                             Throws exceptions, StatementBlock body, 
-                             boolean parentIsInterfaceDeclaration) { 
-        this(modifiers, returnType, name, 
-             new ArrayOfParameterDeclaration(parameters),
-             exceptions, body, parentIsInterfaceDeclaration);
+			     ProgramElementName name,
+			     ParameterDeclaration[] parameters, 
+			     Throws exceptions, StatementBlock body, 
+			     boolean parentIsInterfaceDeclaration) { 
+	this(modifiers, returnType, name, 
+	     new ImmutableArray<ParameterDeclaration>(parameters),
+	     exceptions, body, parentIsInterfaceDeclaration);
     }
     
     /**
@@ -132,7 +133,7 @@ public class MethodDeclaration
 
     public MethodDeclaration(Modifier[] modifiers, TypeReference returnType, 
 			     ProgramElementName name,
-			     ArrayOfParameterDeclaration parameters, 
+			     ImmutableArray<ParameterDeclaration> parameters, 
 			     Throws exceptions, StatementBlock body, 
 			     boolean parentIsInterfaceDeclaration) { 
 	super(modifiers);
@@ -188,7 +189,7 @@ public class MethodDeclaration
         if (modArray != null) {
             len = modArray.size();
             if (len > index) {
-                return modArray.getModifier(index);
+                return modArray.get(index);
             }
             index -= len;
         }
@@ -203,7 +204,7 @@ public class MethodDeclaration
         if (parameters != null) {
             len = parameters.size();
             if (len > index) {
-                return parameters.getParameterDeclaration(index);
+                return parameters.get(index);
             }
             index -= len;
         }
@@ -287,7 +288,7 @@ public class MethodDeclaration
     */
     public ParameterDeclaration getParameterDeclarationAt(int index) {
         if (parameters != null) {
-            return parameters.getParameterDeclaration(index);
+            return parameters.get(index);
         }
         throw new ArrayIndexOutOfBoundsException();
     }
@@ -313,7 +314,7 @@ public class MethodDeclaration
  *      @return the parameter declaration array wrapper.
      */
 
-    public ArrayOfParameterDeclaration getParameters() {
+    public ImmutableArray<ParameterDeclaration> getParameters() {
         return parameters;
     }
 
@@ -420,7 +421,7 @@ public class MethodDeclaration
     public boolean isVarArgMethod() {
         if (parameters == null || parameters.size() == 0)
             return false;
-        return parameters.getParameterDeclaration(parameters.size() - 1).isVarArg();
+        return parameters.get(parameters.size() - 1).isVarArg();
     }
 
     /**

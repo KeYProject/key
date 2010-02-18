@@ -5,15 +5,7 @@
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
-//
-//
-//This file is part of KeY - Integrated Deductive Software Design 
-//Copyright (C) 2001-2003 Universitaet Karlsruhe, Germany
-//                      and Chalmers University of Technology, Sweden
-//
-//The KeY system is protected by the GNU General Public License.
-//See LICENSE.TXT for details.
-//
+
 
 package de.uka.ilkd.key.rule.export.html;
 
@@ -21,15 +13,21 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.Iterator;
 
-import de.uka.ilkd.key.rule.export.*;
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.rule.export.CategoryModelInfo;
+import de.uka.ilkd.key.rule.export.OptionModelInfo;
+import de.uka.ilkd.key.rule.export.RuleExportModel;
+import de.uka.ilkd.key.rule.export.TacletModelInfo;
 
 
 
 public class HTMLFileByOption extends HTMLFile {
     
     private OptionModelInfo[][] options;
-    private ListOfCategoryModelInfo categories;
+    private ImmutableList<CategoryModelInfo> categories;
     private int numCombinations;
     private int[] strides;
     private int[] numActives;
@@ -49,7 +47,7 @@ public class HTMLFileByOption extends HTMLFile {
     public void init ( RuleExportModel model ) {
         super.init(model);
         
-        final IteratorOfOptionModelInfo it = model.options ();
+        final Iterator<OptionModelInfo> it = model.options ();
         while ( it.hasNext () ){
             getFragmentAnchor ( it.next () );
         }
@@ -94,17 +92,16 @@ public class HTMLFileByOption extends HTMLFile {
         
         out.append ( "<ul>\n" );
         
-        final IteratorOfCategoryModelInfo it = model.categories();
+        final Iterator<CategoryModelInfo> it = model.categories();
         while ( it.hasNext () ) {
             final CategoryModelInfo cat = it.next ();
             out.append ( "<li>" + cat + "\n" );
             out.append ( "<ol>\n" );
-            
-            final IteratorOfOptionModelInfo it2 = cat.getOptions().iterator();
-            while ( it2.hasNext () ) {
-                final OptionModelInfo opt = it2.next ();
-                final HTMLLink link = getFragmentLink ( opt );
-                out.append ( "<li>" + link.toTag ( opt.name () ) + "</li>\n" );
+
+            for (OptionModelInfo optionModelInfo : cat.getOptions()) {
+                final OptionModelInfo opt = optionModelInfo;
+                final HTMLLink link = getFragmentLink(opt);
+                out.append("<li>" + link.toTag(opt.name()) + "</li>\n");
             }
             
             out.append ( "</ol>\n" );
@@ -118,7 +115,7 @@ public class HTMLFileByOption extends HTMLFile {
     private void writeOptions ( StringBuffer out ) {
         writeTopLink ( out );
         
-        final IteratorOfOptionModelInfo it = model.options();
+        final Iterator<OptionModelInfo> it = model.options();
         while ( it.hasNext () ) {
             final OptionModelInfo opt = it.next ();
 
@@ -136,7 +133,7 @@ public class HTMLFileByOption extends HTMLFile {
         out.append ( "<div class=\"option\" id=\"" + anchor + "\">\n" );
         out.append ( "<h2>" + opt.name() + "</h2>\n" );
         
-        final ListOfTacletModelInfo taclets = opt.getTaclets();
+        final ImmutableList<TacletModelInfo> taclets = opt.getTaclets();
         if ( taclets.size () == 1 ) {
             out.append ( "There is 1 taclet belonging to this option.\n" );
         } else {
@@ -147,7 +144,7 @@ public class HTMLFileByOption extends HTMLFile {
         out.append ( "<dl>\n" );
         
         // alternative choices
-        ListOfOptionModelInfo alternatives = opt.getCategory().getOptions().removeAll(opt);
+        ImmutableList<OptionModelInfo> alternatives = opt.getCategory().getOptions().removeAll(opt);
         out.append ( "<dt>alternatives</dt><dd>" );
         if ( alternatives.size() == 0) {
             out.append ( "none" );
@@ -159,13 +156,12 @@ public class HTMLFileByOption extends HTMLFile {
         out.append ( "</dl>\n" );
         
         out.append ( "<ol>\n" );
-        
-        final IteratorOfTacletModelInfo it = taclets.iterator ();
-        while ( it.hasNext () ) {
-            final TacletModelInfo t = it.next ();
-            
-            out.append( "<li>" );
-            writeTacletLink ( out, t, true );
+
+        for (TacletModelInfo taclet : taclets) {
+            final TacletModelInfo t = taclet;
+
+            out.append("<li>");
+            writeTacletLink(out, t, true);
             out.append("</li>\n");
         }
         
@@ -175,15 +171,15 @@ public class HTMLFileByOption extends HTMLFile {
         out.append ( "</div>\n" );
     }
     
-    private ListOfCategoryModelInfo sortCategoriesByChoices ( ListOfCategoryModelInfo cats ) {
-        CategoryModelInfo[] catArray = cats.toArray();
+    private ImmutableList<CategoryModelInfo> sortCategoriesByChoices ( ImmutableList<CategoryModelInfo> cats ) {
+        CategoryModelInfo[] catArray = cats.toArray(new CategoryModelInfo[cats.size()]);
         Arrays.sort(catArray, new Comparator () {
            public int compare ( Object a, Object b ) {
                return ((CategoryModelInfo) a).getOptions().size()
                         - ((CategoryModelInfo) b).getOptions().size();
            }
         });
-        return SLListOfCategoryModelInfo.EMPTY_LIST.prepend(catArray);
+        return ImmutableSLList.<CategoryModelInfo>nil().prepend(catArray);
     }
    
     private void writeChoiceTable (StringBuffer out) {
@@ -196,13 +192,12 @@ public class HTMLFileByOption extends HTMLFile {
         out.append ( "<table border=\"1\">\n" );
         out.append ( "<caption>Number of active taclets</caption>\n" );
         out.append ( "<thead>\n<tr>\n" );
-        final IteratorOfCategoryModelInfo it = categories.iterator();
-        while ( it.hasNext () ) {
-            final CategoryModelInfo cat = it.next ();
-            options[n] = cat.getOptions().toArray();
+        for (CategoryModelInfo category : categories) {
+            final CategoryModelInfo cat = category;
+            options[n] = cat.getOptions().toArray(new OptionModelInfo[cat.getOptions().size()]);
             numChoices[n] = options[n].length;
             numCombinations *= numChoices[n];
-            out.append ( "<td>" + cat.name() + "</td>" );
+            out.append("<td>" + cat.name() + "</td>");
             n++;
         }
         
@@ -228,15 +223,15 @@ public class HTMLFileByOption extends HTMLFile {
     }
     
     private void analyzeTaclets () {
-        final IteratorOfTacletModelInfo it = model.taclets();
+        final Iterator<TacletModelInfo> it = model.taclets();
         while ( it.hasNext () ) {
             final TacletModelInfo t = it.next ();
-            final ListOfOptionModelInfo optionList = t.getOptions();
+            final ImmutableList<OptionModelInfo> optionList = t.getOptions();
             analyzeTaclet ( optionList, 0, 0 );
         }
     }
     
-    private void analyzeTaclet ( ListOfOptionModelInfo list, int line, int dim ) {
+    private void analyzeTaclet ( ImmutableList<OptionModelInfo> list, int line, int dim ) {
         if ( dim == options.length ) {
             numActives[line] += 1;
             return;

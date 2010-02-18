@@ -11,9 +11,11 @@
 package de.uka.ilkd.key.pp;
 
 import java.io.IOException;
+import java.util.Iterator;
 
 import org.apache.log4j.Logger;
 
+import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
@@ -21,8 +23,6 @@ import de.uka.ilkd.key.logic.ldt.AbstractIntegerLDT;
 import de.uka.ilkd.key.logic.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.rule.IteratorOfObject;
-import de.uka.ilkd.key.rule.ListOfObject;
 import de.uka.ilkd.key.util.Debug;
 
 /**
@@ -204,6 +204,58 @@ public abstract class Notation {
     }
 
     /**
+     * The standard concrete syntax for numerical quantifiers.
+     */
+    public static class NumericalQuantifier extends Notation {
+        String name;
+
+        int ass1, ass2;
+
+        public NumericalQuantifier(String name, int prio, int ass1, int ass2) {
+            super(prio);
+            this.name = name;
+            this.ass1 = ass1;
+            this.ass2 = ass2;
+        }
+
+        public void print(Term t, LogicPrinter sp) throws IOException {
+            if (sp.getNotationInfo().getAbbrevMap().isEnabled(t)) {
+                sp.printTerm(t);
+            } else {
+                sp.printNumericalQuantifierTerm(name, t.varsBoundHere(0), t.sub(0), 
+                        t.sub(1), ass1, ass2);
+            }
+        }
+
+    }       
+
+    /**
+     * The standard concrete syntax for bounded numerical quantifiers.
+     */
+    public static class BoundedNumericalQuantifier extends Notation {
+        String name;
+
+        int ass1, ass2;
+
+        public BoundedNumericalQuantifier(String name, int prio, int ass1, int ass2) {
+            super(prio);
+            this.name = name;
+            this.ass1 = ass1;
+            this.ass2 = ass2;
+        }
+
+        public void print(Term t, LogicPrinter sp) throws IOException {
+            if (sp.getNotationInfo().getAbbrevMap().isEnabled(t)) {
+                sp.printTerm(t);
+            } else {
+                sp.printBoundedNumericalQuantifierTerm(name, t.varsBoundHere(2), t.sub(0), 
+                        t.sub(1), t.sub(2), ass1, ass2);
+            }
+        }
+
+    }
+
+    /**
          * The standard concrete syntax for DL modalities box and diamond.
          */
     public static class Modality extends Notation {
@@ -358,7 +410,7 @@ public abstract class Notation {
 		final int depSize = func.dependencies().size();
 		for (int i = 0; i < depSize; i++) {
 
-		    Location loc = func.dependencies().getLocation(i);
+		    Location loc = func.dependencies().get(i);
 		    if (loc instanceof ProgramVariable
 			    && ((ProgramVariable) loc).isMember()) {
 			loc = AttributeOp.getAttributeOp((ProgramVariable) loc);
@@ -615,8 +667,8 @@ public abstract class Notation {
 		} else {
 		    // logger.debug("Instantiation of " + t+ " [" + t.op() +
                         // "]" + " known.");
-		    if (o instanceof ListOfObject) {
-			final IteratorOfObject it = ((ListOfObject) o)
+		    if (o instanceof ImmutableList) {
+			final Iterator<Object> it = ((ImmutableList<Object>) o)
 				.iterator();
 			sp.getLayouter().print("{");
 			while (it.hasNext()) {
@@ -737,7 +789,7 @@ public abstract class Notation {
 		return null;
 	    }
 
-	    return ("'" + new Character(charVal)).toString() + "'";
+	    return ("'" + new Character(charVal)) + "'";
 	}
 
 	public void print(Term t, LogicPrinter sp) throws IOException {
@@ -787,10 +839,8 @@ public abstract class Notation {
 	}
 
 	public void print(Term t, LogicPrinter sp) throws IOException {
-	    QuantifiableVariable iterVar = t.varsBoundHere(2)
-		    .getQuantifiableVariable(0);
-	    QuantifiableVariable accVar = t.varsBoundHere(2)
-		    .getQuantifiableVariable(1);
+	    QuantifiableVariable iterVar = t.varsBoundHere(2).get(0);
+	    QuantifiableVariable accVar = t.varsBoundHere(2).get(1);
 	    sp.printOCLIterateTerm(t.sub(0), "->", "iterate", "(", ""
 		    + iterVar.name() + ":" + iterVar.sort().name(), "; ", ""
 		    + accVar.name() + ":" + accVar.sort().name(), "=",
@@ -811,8 +861,7 @@ public abstract class Notation {
 	}
 
 	public void print(Term t, LogicPrinter sp) throws IOException {
-	    QuantifiableVariable iterVar = t.varsBoundHere(1)
-		    .getQuantifiableVariable(0);
+	    QuantifiableVariable iterVar = t.varsBoundHere(1).get(0);
 	    sp.printOCLCollOpBoundVarTerm(t.sub(0), "->", name, "(", ""
 		    + iterVar.name() + ":" + iterVar.sort().name(), " | ", t
 		    .sub(1), ")");
@@ -948,8 +997,7 @@ public abstract class Notation {
          * @return the quantified variable
          */
     protected QuantifiableVariable instQV(Term t, LogicPrinter sp, int subTerm) {
-	QuantifiableVariable v = t.varsBoundHere(subTerm)
-		.getQuantifiableVariable(0);
+	QuantifiableVariable v = t.varsBoundHere(subTerm).get(0);
 
 	if (v instanceof SchemaVariable) {
 	    Object object = (sp.getInstantiations()

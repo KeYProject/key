@@ -6,19 +6,11 @@
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
 //
-//
-//This file is part of KeY - Integrated Deductive Software Design 
-//Copyright (C) 2001-2003 Universitaet Karlsruhe, Germany
-//                      and Chalmers University of Technology, Sweden
-//
-//The KeY system is protected by the GNU General Public License.
-//See LICENSE.TXT for details.
-//
 
 package de.uka.ilkd.key.logic.op;
 
+import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.sort.ArrayOfSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 
 
@@ -39,7 +31,7 @@ public class RigidFunction extends Function {
 	 * @param sort
 	 * @param argSorts
 	 */
-	public RigidFunction(Name name, Sort sort, ArrayOfSort argSorts) {
+	public RigidFunction(Name name, Sort sort, ImmutableArray<Sort> argSorts) {
 	    super(name, sort, argSorts);            
 	}
 }

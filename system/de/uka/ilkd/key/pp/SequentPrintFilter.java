@@ -10,6 +10,7 @@
 
 package de.uka.ilkd.key.pp;
 
+import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.logic.Sequent;
 
 
@@ -28,8 +29,8 @@ public interface SequentPrintFilter {
      * Get the formulas of the filtered sequent and the constraints to
      * use for instantiating metavariables when printing
      */
-    ListOfSequentPrintFilterEntry getAntec       ();
+    ImmutableList<SequentPrintFilterEntry> getAntec       ();
 
-    ListOfSequentPrintFilterEntry getSucc        ();
+    ImmutableList<SequentPrintFilterEntry> getSucc        ();
     
 }

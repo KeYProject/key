@@ -36,7 +36,7 @@ public class TopRuleAppCost implements RuleAppCost {
         return 91879827;
     }
     
-    public RuleAppCost add (RuleAppCost cost2) {
+    public final RuleAppCost add (RuleAppCost cost2) {
         return INSTANCE;
     }
 

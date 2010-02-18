@@ -19,10 +19,8 @@ header {
   import java.util.*;
   import java.math.BigInteger;
 
-  import de.uka.ilkd.key.collection.ListOfString;
-  import de.uka.ilkd.key.collection.IteratorOfString;
-  import de.uka.ilkd.key.collection.SLListOfString;
-
+  import de.uka.ilkd.key.collection.*;
+  
   import de.uka.ilkd.key.logic.*;
   import de.uka.ilkd.key.logic.op.*;
   import de.uka.ilkd.key.logic.sort.*;
@@ -35,8 +33,8 @@ header {
   import de.uka.ilkd.key.rule.conditions.*;
   import de.uka.ilkd.key.rule.metaconstruct.*;
  
-  import de.uka.ilkd.key.speclang.SetAsListOfOperationContract;
-  import de.uka.ilkd.key.speclang.SetOfOperationContract;
+  import de.uka.ilkd.key.speclang.ClassInvariant;
+  import de.uka.ilkd.key.speclang.OperationContract;
   import de.uka.ilkd.key.speclang.dl.translation.DLSpecFactory;
 
   import de.uka.ilkd.key.util.*;
@@ -82,6 +80,7 @@ options {
       prooflabel2tag.put("formula", new Character('f'));
       prooflabel2tag.put("inst", new Character('i'));
       prooflabel2tag.put("ifseqformula", new Character('q'));
+      prooflabel2tag.put("ifdirectformula", new Character('d'));
       prooflabel2tag.put("heur", new Character('h'));
       prooflabel2tag.put("builtin", new Character('n'));
       prooflabel2tag.put("keyLog", new Character('l'));
@@ -90,14 +89,18 @@ options {
       prooflabel2tag.put("keySettings", new Character('s'));
       prooflabel2tag.put("contract", new Character('c'));	
       prooflabel2tag.put("userinteraction", new Character('a'));
+      prooflabel2tag.put("userconstraint", new Character('o'));
+      prooflabel2tag.put("matchconstraint", new Character('m'));
+      prooflabel2tag.put("newnames", new Character('w'));
+      prooflabel2tag.put("autoModeTime", new Character('e'));
    }
 
     private NamespaceSet nss;
     private Choice defaultChoice = null;
     private HashMap<String, String> category2Default = new HashMap<String, String>();
     private boolean onlyWith=false;
-    private SetOfChoice activatedChoices = SetAsListOfChoice.EMPTY_SET;
-    private SetOfChoice selectedChoices = SetAsListOfChoice.EMPTY_SET;
+    private ImmutableSet<Choice> activatedChoices = DefaultImmutableSet.<Choice>nil();
+    private ImmutableSet<Choice> selectedChoices = DefaultImmutableSet.<Choice>nil();
     private HashSet usedChoiceCategories = new HashSet();
     private HashMap taclet2Builder;
     private AbbrevMap scm;
@@ -133,8 +136,9 @@ options {
     private DeclPicker capturer = null;
     private ProgramMethod pm = null;
 
-    private SetOfTaclet taclets = SetAsListOfTaclet.EMPTY_SET; 
-    private SetOfOperationContract contracts = SetAsListOfOperationContract.EMPTY_SET;
+    private ImmutableSet<Taclet> taclets = DefaultImmutableSet.<Taclet>nil(); 
+    private ImmutableSet<OperationContract> contracts = DefaultImmutableSet.<OperationContract>nil();
+    private ImmutableSet<ClassInvariant> invs = DefaultImmutableSet.<ClassInvariant>nil();
 
     private ParserConfig schemaConfig;
     private ParserConfig normalConfig;
@@ -281,7 +285,7 @@ options {
     public KeYParser(ParserMode mode, TokenStream lexer, 
                      String filename, ParserConfig schemaConfig,
                      ParserConfig normalConfig, HashMap taclet2Builder,
-                     SetOfTaclet taclets, SetOfChoice selectedChoices) { 
+                     ImmutableSet<Taclet> taclets, ImmutableSet<Choice> selectedChoices) { 
         this(lexer, filename, null, null, null, mode);
         if (lexer instanceof DeclPicker) {
             this.capturer = (DeclPicker) lexer;
@@ -355,7 +359,7 @@ options {
         keh.reportException(ex);
     }
 
-    public SetOfChoice getActivatedChoices(){
+    public ImmutableSet<Choice> getActivatedChoices(){
         return activatedChoices;
     }
     
@@ -408,12 +412,16 @@ options {
         return namespaces().choices();
     }
 
-    public SetOfTaclet getTaclets(){
+    public ImmutableSet<Taclet> getTaclets(){
         return taclets;
     }
 
-    public SetOfOperationContract getContracts(){
+    public ImmutableSet<OperationContract> getContracts(){
         return contracts;
+    }
+    
+    public ImmutableSet<ClassInvariant> getInvariants(){
+    	return invs;
     }
     
     public HashMap<String, String> getCategory2Default(){
@@ -694,9 +702,9 @@ options {
             ((Function) functions.lookup(new Name("Z")), result); 
     }
 
-    private String getTypeList(ListOfProgramVariable vars) {
+    private String getTypeList(ImmutableList<ProgramVariable> vars) {
 	StringBuffer result = new StringBuffer("");
-	final IteratorOfProgramVariable it = vars.iterator();
+	final Iterator<ProgramVariable> it = vars.iterator();
 	while (it.hasNext()) {
          result.append(it.next().getContainerType().getFullName());
          if (it.hasNext()) result.append(", ");         
@@ -707,12 +715,26 @@ options {
     private TermSymbol getAttribute(Sort prefixSort, String attributeName) 
            throws SemanticException {
         final JavaInfo javaInfo = getJavaInfo();
-        TermSymbol result = null;
 
-        if (!inSchemaMode()) {
-            if (attributeName.indexOf(':') != -1) {     
+        TermSymbol result = null;
+        
+        if (inSchemaMode()) {
+            // if we are currently reading taclets we look for schema variables first
+            result = (SortedSchemaVariable)variables().lookup(new Name(attributeName));
+        }
+        
+        assert inSchemaMode() || result == null; 
+        if (result == null) {
+            
+            final boolean unambigousAttributeName = attributeName.indexOf(':') != -1;
+
+            if (unambigousAttributeName) {     
                 result = javaInfo.getAttribute(attributeName);
             } else {
+                if (inSchemaMode()) {
+                    semanticError("Either undeclared schmema variable '" + 
+                                  attributeName + "' or a not fully qualified attribute in taclet.");
+                }
                 final KeYJavaType prefixKJT = javaInfo.getKeYJavaType(prefixSort);
                 if (prefixKJT == null) {
                     semanticError("Could not find type '"+prefixSort+"'. Maybe mispelled or "+
@@ -728,7 +750,7 @@ options {
                             " @( delaredInType ) to the attribute name.");
                     }
 
-                    final ListOfProgramVariable vars = 	
+                    final ImmutableList<ProgramVariable> vars = 	
                     javaInfo.getAllAttributes(attributeName, prefixKJT);
                     
                     if (vars.size() == 0) {
@@ -750,9 +772,8 @@ options {
                     }
                 }              
             }
-        }else{
-            result = (SortedSchemaVariable)variables().lookup(new Name(attributeName));
         }
+
         if ( result == null && !("length".equals(attributeName)) ) {
             throw new NotDeclException ("Attribute ", attributeName,
                 getFilename(), getLine(), getColumn());
@@ -762,25 +783,30 @@ options {
 
    
     public Term createAttributeTerm(Term prefix, TermSymbol attribute,
-              Term shadowNumber) {
+                                    Term shadowNumber) throws SemanticException {
         Term result = prefix;
-	if (!inSchemaMode()) {
-          if (((ProgramVariable)attribute).isStatic()){
-              result = tf.createVariableTerm((ProgramVariable)attribute);
-          } else {
-              if (shadowNumber != null) {
-                  result = tf.createShadowAttributeTerm((ProgramVariable)attribute, 
-                                                        result, shadowNumber);
-              } else {
-                  result = tf.createAttributeTerm((ProgramVariable)attribute, result);
-              }
-          }
-	} else {
-        if (shadowNumber != null) {
+
+        if (attribute instanceof SchemaVariable) {
+            if (!inSchemaMode()) {
+                semanticError("Schemavariables may only occur inside taclets.");
+            }
+            if (shadowNumber != null) {
                 result = tf.createShadowAttributeTerm((SchemaVariable)attribute, result, shadowNumber);
-	    } else
+            } else {
                 result = tf.createAttributeTerm((SchemaVariable)attribute, result);         
-	}
+            }
+        } else {
+            if (((ProgramVariable)attribute).isStatic()){
+                result = tf.createVariableTerm((ProgramVariable)attribute);
+            } else {
+                if (shadowNumber != null) {
+                    result = tf.createShadowAttributeTerm((ProgramVariable)attribute, 
+                                                          result, shadowNumber);
+                } else {
+                    result = tf.createAttributeTerm((ProgramVariable)attribute, result);
+                }
+            }
+        }
         return result;
     }
 
@@ -829,7 +855,7 @@ options {
         return vars;
     }
 
-    public List /*ArrayOfLocation*/ extractPartitionedLocations(List /*List (String, KeYJavaType)*/ locListList)
+    public List /*ImmutableArrayLocation*/ extractPartitionedLocations(List /*List (String, KeYJavaType)*/ locListList)
     throws SemanticException {
         List result = new ArrayList();
         Iterator it = locListList.iterator();
@@ -837,7 +863,7 @@ options {
             List locNames = (List) it.next();
             de.uka.ilkd.key.logic.op.Location[] locs
                         = extractLocations(locNames);
-            result.add(new de.uka.ilkd.key.logic.op.ArrayOfLocation(locs));
+            result.add(new ImmutableArray<de.uka.ilkd.key.logic.op.Location>(locs));
         }
         return result;
     }
@@ -943,7 +969,7 @@ options {
           return pvc.result();
         }else 
   	  if(!isDeclParser()) {
-            if ((isTermParser() || isProblemParser()) && jb==JavaBlock.EMPTY_JAVABLOCK) {
+            if ((isTermParser() || isProblemParser()) && jb.isEmpty()) {
               return new HashSet();
             }   
             DeclarationProgramVariableCollector pvc
@@ -1118,6 +1144,14 @@ options {
 	    		(LT(n+2).getText().length()==1 || 
 	    		 LT(n+2).getText().charAt(1)<='z' && LT(n+2).getText().charAt(1)>='a'))){  	   
                 if (LA(n+1) != DOT && LA(n+1) != EMPTYBRACKETS) return false;
+                // maybe still an attribute starting with an uppercase letter followed by a lowercase letter
+                if(getTypeByClassName(className.toString())!=null){
+                    ProgramVariable maybeAttr = 
+                    javaInfo.getAttribute(LT(n+2).getText(), getTypeByClassName(className.toString()));
+                    if(maybeAttr!=null){
+                        return true;
+                    }
+                }
                 className.append(".");	       
                 className.append(LT(n+2).getText());
                 n+=2;
@@ -1174,7 +1208,7 @@ options {
         kjt = getTypeByClassName(className.toString());
         if (kjt != null) { 
            if (LA(n+1) == DOT && LA(n+3) == LPAREN) {
-               IteratorOfProgramMethod it = javaInfo.getAllProgramMethods(kjt).iterator();
+               Iterator<ProgramMethod> it = javaInfo.getAllProgramMethods(kjt).iterator();
                while(it.hasNext()) {
                  final ProgramMethod pm = it.next();
                  final String name = kjt.getFullName()+"::"+LT(n+2).getText();
@@ -1232,7 +1266,7 @@ options {
                 .setStateRestriction(stateRestriction);
         } else if ( find instanceof Sequent ) {
             Sequent findSeq = (Sequent) find;
-            if ( findSeq == Sequent.EMPTY_SEQUENT ) {
+            if ( findSeq.isEmpty() ) {
                 return new NoFindTacletBuilder();
             } else if (   findSeq.antecedent().size() == 1
                           && findSeq.succedent().size() == 0 ) {
@@ -1258,9 +1292,9 @@ options {
                                  String id,
                                  Object rwObj,
                                  Sequent addSeq,
-                                 ListOfTaclet addRList,
-                                 SetOfSchemaVariable pvs,
-                                 SetOfChoice soc) 
+                                 ImmutableList<Taclet> addRList,
+                                 ImmutableSet<SchemaVariable> pvs,
+                                 ImmutableSet<Choice> soc) 
         throws SemanticException
         {
             TacletGoalTemplate gt = null;
@@ -1335,24 +1369,20 @@ options {
         return pm;
     }
 
-    public void addSort(Sort s) {
-	sorts().add(s);
-    }
-
-    private void addSortAdditionals(Sort s) {
+    public static void addSortAdditionals(Sort s, Namespace functions, Namespace sorts) {
         if (s instanceof NonCollectionSort) {
             NonCollectionSort ns = (NonCollectionSort)s;
             final Sort[] addsort = {
                 ns.getSetSort(), ns.getSequenceSort(), ns.getBagSort() 
             };
-
+	    
             for (int i = 0; i<addsort.length; i++) {
-                addSort(addsort[i]);
-                addSortAdditionals(addsort[i]);
+                sorts.add(addsort[i]);
+                addSortAdditionals(addsort[i], functions, sorts);
             }
         }
         if ( s instanceof SortDefiningSymbols ) {                        
-           ((SortDefiningSymbols)s).addDefinedSymbols(defaultChoice.funcNS(), sorts());
+           ((SortDefiningSymbols)s).addDefinedSymbols(functions, sorts);
         }
     }
 
@@ -1360,10 +1390,10 @@ options {
         functions().add(f);
     }
 
-    private Sort getIntersectionSort(ListOfString composites) 
+    private Sort getIntersectionSort(ImmutableList<String> composites) 
                                             throws NotDeclException, KeYSemanticException {
-        SetOfSort compositeSorts = SetAsListOfSort.EMPTY_SET;
-        final IteratorOfString it = composites.iterator(); 
+        ImmutableSet<Sort> compositeSorts = DefaultImmutableSet.<Sort>nil();
+        final Iterator<String> it = composites.iterator(); 
         while ( it.hasNext () ) {
             final String sortName = it.next();
             final Sort sort = lookupSort(sortName);
@@ -1376,9 +1406,15 @@ options {
         }
         final Sort s = IntersectionSort.getIntersectionSort(compositeSorts, sorts(), functions());
         if (!(s instanceof IntersectionSort)) {
-            semanticError("Failed to create an intersection sort of " + composites + 
-                ". Usually intersection is not required in these cases as \n" + 
-                "it is equal to one composite. In this case " + s);            
+            String err = "Failed to create an intersection sort of " + composites;
+            if (s == null) {
+                err += " as the resulting intersection sort would be empty.";
+            } else {
+                err += ". Usually intersection is not required in these cases as \n" + 
+                "it is equal to one composite. In this case " + s;
+            }
+            semanticError(err);
+                            
         }        
         return s;
     }
@@ -1415,7 +1451,7 @@ options {
        return operators;
     }
 
-    private void setChoiceHelper(SetOfChoice choices, String section){
+    private void setChoiceHelper(ImmutableSet<Choice> choices, String section){
         if(choices.size() > 1) {
 	   Debug.fail("Don't know what to do with multiple"+
 		      "option declarations for "+section+".");
@@ -1450,7 +1486,7 @@ top {Term a;} : a=formula {
 decls : 
         (one_include_statement)* {
            if(parse_includes) return;
-           activatedChoices = SetAsListOfChoice.EMPTY_SET;  
+           activatedChoices = DefaultImmutableSet.<Choice>nil();  
 	}
         (options_choice)? { if(onlyWith) return; }
         (
@@ -1557,22 +1593,22 @@ choice_option[String cat]{
 
 sort_decls 
 {
-  ListOfSort lsorts = SLListOfSort.EMPTY_LIST;
-  ListOfSort multipleSorts = SLListOfSort.EMPTY_LIST;
+  ImmutableList<Sort> lsorts = ImmutableSLList.<Sort>nil();
+  ImmutableList<Sort> multipleSorts = ImmutableSLList.<Sort>nil();
 }
 : SORTS LBRACE 
        ( multipleSorts = one_sort_decl { lsorts = lsorts.prepend(multipleSorts); })* 
   RBRACE 
      {
-        final IteratorOfSort it = lsorts.iterator();
+        final Iterator<Sort> it = lsorts.iterator();
         while (it.hasNext()) {                   
-             addSortAdditionals ( it.next() ); 
+             addSortAdditionals ( it.next(), defaultChoice.funcNS(), sorts() ); 
          }
       }
 
 ;
 
-one_sort_decl returns [ListOfSort createdSorts = SLListOfSort.EMPTY_LIST] 
+one_sort_decl returns [ImmutableList<Sort> createdSorts = ImmutableSLList.<Sort>nil()] 
 {
     boolean isObjectSort  = false;
     boolean isGenericSort = false;
@@ -1581,7 +1617,7 @@ one_sort_decl returns [ListOfSort createdSorts = SLListOfSort.EMPTY_LIST]
     Sort[] sortExt=new Sort [0];
     Sort[] sortOneOf=new Sort [0];
     String firstSort;
-    ListOfString sortIds = SLListOfString.EMPTY_LIST; 
+    ImmutableList<String> sortIds = ImmutableSLList.<String>nil(); 
 } : 
         ( 
           OBJECT  {isObjectSort =true;} sortIds = objectSortIdentifiers
@@ -1599,9 +1635,9 @@ one_sort_decl returns [ListOfSort createdSorts = SLListOfSort.EMPTY_LIST]
                 if (isIntersectionSort) {                    
                     final Sort sort = getIntersectionSort(sortIds);
                     createdSorts = createdSorts.append(sort);
-                    addSort(sort); 
+                    sorts().add(sort); 
                 } else {
-                    IteratorOfString it = sortIds.iterator ();        
+                    Iterator<String> it = sortIds.iterator ();        
                     while ( it.hasNext () ) {
                         Name sort_name = new Name(it.next());   
                         // attention: no expand to java.lang here!       
@@ -1619,8 +1655,8 @@ one_sort_decl returns [ListOfSort createdSorts = SLListOfSort.EMPTY_LIST]
                                 }	
                             } else if (isGenericSort) {
                                 int i;
-                                SetOfSort  ext   = SetAsListOfSort.EMPTY_SET;
-                                SetOfSort  oneOf = SetAsListOfSort.EMPTY_SET;
+                                ImmutableSet<Sort>  ext   = DefaultImmutableSet.<Sort>nil();
+                                ImmutableSet<Sort>  oneOf = DefaultImmutableSet.<Sort>nil();
 
                                 for ( i = 0; i != sortExt.length; ++i )
                                 ext = ext.add ( sortExt[i] );
@@ -1637,7 +1673,7 @@ one_sort_decl returns [ListOfSort createdSorts = SLListOfSort.EMPTY_LIST]
                             } else if (new Name("any").equals(sort_name)) {
                                 s = Sort.ANY;
                             } else if (isSubSort) {
-                                SetOfSort  ext = SetAsListOfSort.EMPTY_SET;
+                                ImmutableSet<Sort>  ext = DefaultImmutableSet.<Sort>nil();
 
                                 for ( int i = 0; i != sortExt.length; ++i )
                                 ext = ext.add ( sortExt[i] );
@@ -1646,7 +1682,7 @@ one_sort_decl returns [ListOfSort createdSorts = SLListOfSort.EMPTY_LIST]
                             } else {
                                 s = new PrimitiveSort(sort_name);
                             }
-                            addSort ( s ); 
+                            sorts().add ( s ); 
 
                             createdSorts = createdSorts.append(s);
                         }
@@ -1655,9 +1691,9 @@ one_sort_decl returns [ListOfSort createdSorts = SLListOfSort.EMPTY_LIST]
             }
         };
 
-intersectionSortIdentifier returns [ListOfString composites = SLListOfString.EMPTY_LIST] 
+intersectionSortIdentifier returns [ImmutableList<String> composites = ImmutableSLList.<String>nil()] 
 {
-  ListOfString rightComposites;
+  ImmutableList<String> rightComposites;
   String left = ""; 
   String right = "";   
 }
@@ -1665,7 +1701,7 @@ intersectionSortIdentifier returns [ListOfString composites = SLListOfString.EMP
      INTERSECTIONSORT LPAREN 
         (left  = simple_ident_dots) COMMA 
         (rightComposites = intersectionSortIdentifier {            
-            final IteratorOfString it = rightComposites.iterator();
+            final Iterator<String> it = rightComposites.iterator();
             right = "\\inter(" + it.next() + "," + it.next() +")";
         } | right = simple_ident_dots) RPAREN 
      {
@@ -1673,7 +1709,7 @@ intersectionSortIdentifier returns [ListOfString composites = SLListOfString.EMP
      }
 ;
 
-objectSortIdentifiers returns [ListOfString ids = SLListOfString.EMPTY_LIST]
+objectSortIdentifiers returns [ImmutableList<String> ids = ImmutableSLList.<String>nil()]
 {
   String id;
 }
@@ -1762,7 +1798,7 @@ prog_var_decls
 {
     String var_name;
     KeYJavaType kjt = null;
-    ListOfString var_names = null;
+    ImmutableList<String> var_names = null;
 }
     :
         { switchToNormalMode();}
@@ -1772,7 +1808,7 @@ prog_var_decls
             kjt = keyjavatype
             var_names = simple_ident_comma_list
             {
-	        IteratorOfString it = var_names.iterator();
+	        Iterator<String> it = var_names.iterator();
 		while(it.hasNext()){
 		  var_name = it.next();
 		  ProgramElementName pvName = new ProgramElementName(var_name);
@@ -1811,7 +1847,7 @@ simple_ident returns [String ident = null]
      id:IDENT { ident = id.getText(); }
    ;
 
-simple_ident_comma_list returns [ListOfString ids = SLListOfString.EMPTY_LIST]
+simple_ident_comma_list returns [ImmutableList<String> ids = ImmutableSLList.<String>nil()]
 {
   String id = null;
 }
@@ -1836,7 +1872,7 @@ one_schema_var_decl
     boolean makeFunctionsSV  = false;
     boolean modalOpSV       = false;
     String id = null;
-    ListOfString ids = null;
+    ImmutableList<String> ids = null;
     SchemaVariableModifierSet mods = null;
 } :   
    ((MODALOPERATOR {modalOpSV = true;} | OPERATOR {modalOpSV = false;} ) 
@@ -1885,7 +1921,7 @@ one_schema_var_decl
     ids = simple_ident_comma_list 
   ) SEMI
    { 
-     IteratorOfString it = ids.iterator();
+     Iterator<String> it = ids.iterator();
      while(it.hasNext())
        schema_var_decl(it.next(),s,makeVariableSV,makeSkolemTermSV, 
        				   makeLocationsSV, makeFunctionsSV, mods);
@@ -1896,14 +1932,14 @@ one_schema_var_decl
 
 schema_modifiers[SchemaVariableModifierSet mods]
 {
-    ListOfString opts = null;
+    ImmutableList<String> opts = null;
 }
     :
         LBRACKET
         opts = simple_ident_comma_list         
         RBRACKET
         {
-            final IteratorOfString it = opts.iterator ();
+            final Iterator<String> it = opts.iterator ();
             while ( it.hasNext () ) {
                 final String option = it.next();
                 if (!mods.addModifier(option))
@@ -1918,7 +1954,7 @@ one_schema_op_decl[boolean modalOp]
     HashSet operators = new HashSet(50);
     String id = null;
     Sort sort = Sort.FORMULA;
-    ListOfString ids = null;
+    ImmutableList<String> ids = null;
 } 
     :
         (LPAREN sort = any_sortId_check[true] {
@@ -1930,7 +1966,7 @@ one_schema_op_decl[boolean modalOp]
 	{   if (skip_schemavariables) {	       
 	       return;
 	    }	        
-            IteratorOfString it1 = ids.iterator();
+            Iterator<String> it1 = ids.iterator();
             while(it1.hasNext()) {
   	      operators = opSVHelper(it1.next(), operators, modalOp);
   	    }
@@ -1990,7 +2026,7 @@ pred_decl
                     if (dependencyListList != null) {
                         p = NRFunctionWithExplicitDependencies.getSymbol
                             (predicate, Sort.FORMULA, 
-                             new ArrayOfSort(argSorts),
+                             new ImmutableArray<Sort>(argSorts),
                              extractPartitionedLocations(dependencyListList));
                     } else {
 	        	switch (location) {
@@ -2019,7 +2055,7 @@ pred_decl
 
 pred_decls 
 {
-    SetOfChoice choices = SetAsListOfChoice.EMPTY_SET;
+    ImmutableSet<Choice> choices = DefaultImmutableSet.<Choice>nil();
 }
     :
         PREDICATES (choices=option_list[choices])? 
@@ -2032,7 +2068,7 @@ pred_decls
         ) *
         RBRACE
     {
-           setChoiceHelper(SetAsListOfChoice.EMPTY_SET, "predicates");
+           setChoiceHelper(DefaultImmutableSet.<Choice>nil(), "predicates");
     }
     ;
 
@@ -2095,13 +2131,13 @@ func_decl
                     if (dependencyListList != null) {
                         f = NRFunctionWithExplicitDependencies.getSymbol
                             (fct_name, retSort, 
-                             new ArrayOfSort(argSorts),
+                             new ImmutableArray<Sort>(argSorts),
                              extractPartitionedLocations(dependencyListList));
                     } else {
                         switch (location) {
                            case NORMAL_NONRIGID: f = new NonRigidFunction(fct_name, retSort, argSorts);
                               break;
-                           case LOCATION_MODIFIER: f = new NonRigidFunctionLocation(fct_name, retSort, argSorts);
+                           case LOCATION_MODIFIER: f = new NonRigidFunctionLocation(fct_name, retSort, argSorts, true);
                               break;
                  	  case HEAP_DEPENDENT: f = new NonRigidHeapDependentFunction(fct_name, retSort, argSorts);      
                  	      break;
@@ -2121,7 +2157,7 @@ func_decl
 
 func_decls 
 {
-    SetOfChoice choices = SetAsListOfChoice.EMPTY_SET;
+    ImmutableSet<Choice> choices = DefaultImmutableSet.<Choice>nil();
 }
     :
         FUNCTIONS (choices=option_list[choices])? 
@@ -2134,7 +2170,7 @@ func_decls
         ) *
         RBRACE
     {
-           setChoiceHelper(SetAsListOfChoice.EMPTY_SET, "functions");
+           setChoiceHelper(DefaultImmutableSet.<Choice>nil(), "functions");
     }
     ;
 
@@ -2289,9 +2325,16 @@ array_set_decls[Sort p] returns [Sort s = null]
             if (n != 0){
                 final JavaInfo ji = getJavaInfo();
                 s = ArraySortImpl.getArraySortForDim(
-                    p, n, ji.getJavaLangObjectAsSort(),
-                    ji.getJavaLangCloneableAsSort(), 
-                    ji.getJavaIoSerializableAsSort());
+                                                     p, n, ji.getJavaLangObjectAsSort(),
+                                                     ji.getJavaLangCloneableAsSort(), 
+                                                     ji.getJavaIoSerializableAsSort());
+
+                Sort last = s;
+                do {
+                    final ArraySort as = (ArraySort) last;
+                    sorts().add(as);                        
+                    last = as.elementSort();
+                } while (last instanceof ArraySort && sorts().lookup(last.name()) == null);
             } else {
                 s = p;
             }
@@ -2413,7 +2456,7 @@ term returns [Term a = null]
     ;
 
     
-location_list returns [SetOfLocationDescriptor set = SetAsListOfLocationDescriptor.EMPTY_SET;]
+location_list returns [ImmutableSet<LocationDescriptor> set = DefaultImmutableSet.<LocationDescriptor>nil();]
 {
 	LocationDescriptor loc;
 }
@@ -2431,7 +2474,7 @@ location_list returns [SetOfLocationDescriptor set = SetAsListOfLocationDescript
 
 location_descriptor returns [LocationDescriptor loc = null]
 {
-	ListOfQuantifiableVariable boundVars = null;
+	ImmutableList<QuantifiableVariable> boundVars = null;
 	Term f = tf.createJunctorTerm(Op.TRUE);
 	Term t;
 }
@@ -2775,7 +2818,16 @@ staticAttributeOrQueryReference returns [String attrReference = ""]
             attrReference = id.getText(); 
             while (isPackage(attrReference) || LA(2)==NUM_LITERAL || 
                 (LT(2).getText().charAt(0)<='Z' && LT(2).getText().charAt(0)>='A' && 
-	    		(LT(2).getText().length()==1 || LT(2).getText().charAt(1)<='z' && LT(2).getText().charAt(1)>='a'))) {
+	    		(LT(2).getText().length()==1 || LT(2).getText().charAt(1)<='z' && LT(2).getText().charAt(1)>='a')) &&
+                LA(1) == DOT) {
+                if(getTypeByClassName(attrReference)!=null){
+                    ProgramVariable maybeAttr = 
+                    getJavaInfo().getAttribute(LT(2).getText(), getTypeByClassName(attrReference));
+                    if(maybeAttr!=null){
+                        break;
+                    }
+                }
+
                 match(DOT);
                 attrReference += "." + LT(1).getText();
                 if(LA(1)==NUM_LITERAL){
@@ -3066,6 +3118,8 @@ term130 returns [Term a = null]
     |   a = ifExThenElseTerm
     |   a = workingspaceterm
     |   a = workingspacenonrigidterm
+    |   a = sum_or_product_term
+    |   a = bounded_sum_term
     //Used for OCL Simplification.
     //WATCHOUT: Woj: some time we will need to have support for strings in Java DL too,
     // what then? This here is specific to OCL, isn't it?
@@ -3247,6 +3301,53 @@ abbreviation returns [Term a=null]
         )
     ;
 
+sum_or_product_term returns [Term result=null]
+{
+    Term cond, t;
+    NumericalQuantifier op=null;
+    ImmutableList<QuantifiableVariable> index = null;   
+}
+    :
+        (
+            SUM {op = Op.SUM;}
+        |
+            PRODUCT {op = Op.PRODUCT;}
+        )
+        index=bound_variables
+        LPAREN
+        cond=term 
+        SEMI t=term 
+        {
+            unbindVars();
+            result = tf.createNumericalQuantifierTerm(op, cond, t, 
+                new ImmutableArray<QuantifiableVariable>(index.toArray(new QuantifiableVariable[index.size()])));
+        }
+        RPAREN
+    ;
+    
+bounded_sum_term returns [Term result=null]
+{
+    Term a, b, t;
+    BoundedNumericalQuantifier op=null;
+    ImmutableList<QuantifiableVariable> index = null;   
+}
+    :
+        BSUM {op = Op.BSUM;}
+        index=bound_variables
+        LPAREN
+        a=term 
+        SEMI
+        b=term 
+        SEMI
+        t=term 
+        {
+            unbindVars();
+            result = tf.createBoundedNumericalQuantifierTerm(op, a, b, t, 
+                new ImmutableArray<QuantifiableVariable>(index.toArray(new QuantifiableVariable[index.size()])));
+        }
+        RPAREN
+    ;
+
 ifThenElseTerm returns [Term result = null]
 {
     Term condF, thenT, elseT;
@@ -3274,14 +3375,14 @@ ifThenElseTerm returns [Term result = null]
 ifExThenElseTerm returns [Term result = null]
 {
     Term condF, thenT, elseT;
-    ListOfQuantifiableVariable exVars = SLListOfQuantifiableVariable.EMPTY_LIST;
-    ArrayOfQuantifiableVariable exVarsAr = null;
+    ImmutableList<QuantifiableVariable> exVars = ImmutableSLList.<QuantifiableVariable>nil();
+    ImmutableArray<QuantifiableVariable> exVarsAr = null;
 }
     :
         IFEX exVars = bound_variables
                {
-                    exVarsAr = new ArrayOfQuantifiableVariable
-                                           ( exVars.toArray () );
+                    exVarsAr = new ImmutableArray<QuantifiableVariable>
+                                           ( exVars.toArray (new QuantifiableVariable[exVars.size()]) );
                }
         LPAREN condF = term RPAREN
         {
@@ -3315,7 +3416,7 @@ ifExThenElseTerm returns [Term result = null]
 
 argument returns [TermWithBoundVars p = null]
 {
-    ArrayOfQuantifiableVariable vars = null;
+    ImmutableArray<QuantifiableVariable> vars = null;
     Term a;
 }
 :
@@ -3334,20 +3435,20 @@ argument returns [TermWithBoundVars p = null]
  }
  ;
   
-ocl_bound_variables returns [ArrayOfQuantifiableVariable vars = null] 
+ocl_bound_variables returns [ImmutableArray<QuantifiableVariable> vars = null] 
 {
-   ListOfQuantifiableVariable vs = null;
+   ImmutableList<QuantifiableVariable> vs = null;
 }
 :
   BIND vs = bound_variables {
-     vars = new ArrayOfQuantifiableVariable(vs.toArray());
+     vars = new ImmutableArray<QuantifiableVariable>(vs.toArray(new QuantifiableVariable[vs.size()]));
   }
  ;
 
 quantifierterm returns [Term a = null]
 {
     Operator op = null;
-    ListOfQuantifiableVariable vs = null;
+    ImmutableList<QuantifiableVariable> vs = null;
     Term a1 = null;
 }
 :
@@ -3356,7 +3457,7 @@ quantifierterm returns [Term a = null]
         vs = bound_variables a1 = term60
         {
             a = tf.createQuantifierTerm((Quantifier)op,
-	       new ArrayOfQuantifiableVariable(vs.toArray()),a1);
+	       new ImmutableArray<QuantifiableVariable>(vs.toArray(new QuantifiableVariable[vs.size()])),a1);
             if(!isGlobalDeclTermParser())
               unbindVars();
         }
@@ -3459,8 +3560,8 @@ updateterm returns [Term result = null]
         {   
 
             result = tf.createQuanUpdateTerm
-		((ArrayOfQuantifiableVariable[])boundVars.toArray
-                     (new ArrayOfQuantifiableVariable[boundVars.size()]),
+		((ImmutableArray<QuantifiableVariable>[])boundVars.toArray
+                     (new ImmutableArray/*<QuantifiableVariable>*/[boundVars.size()]),
 		 (Term[])guards.toArray(new Term[guards.size()]),
 		 (Term[])locations.toArray(new Term[locations.size()]),
 		 (Term[])values.toArray(new Term[values.size()]),
@@ -3478,14 +3579,14 @@ singleupdate returns[SingleUpdateData sud=null]
     Term a0 = null;
     Term a1 = null;
     Term phi = null;
-    ListOfQuantifiableVariable boundVars = SLListOfQuantifiableVariable.EMPTY_LIST;
+    ImmutableList<QuantifiableVariable> boundVars = ImmutableSLList.<QuantifiableVariable>nil();
     sud = new SingleUpdateData();
 }  :
         (
             FOR boundVars = bound_variables
                    {
-                        sud.boundVars = new ArrayOfQuantifiableVariable
-                                               ( boundVars.toArray () );
+                        sud.boundVars = new ImmutableArray<QuantifiableVariable>
+                                               ( boundVars.toArray (new QuantifiableVariable[boundVars.size()]) );
                    }
         ) ?
         (
@@ -3514,7 +3615,7 @@ singleupdate returns[SingleUpdateData sud=null]
         }
     ;
    
-bound_variables returns[ListOfQuantifiableVariable list = SLListOfQuantifiableVariable.EMPTY_LIST]
+bound_variables returns[ImmutableList<QuantifiableVariable> list = ImmutableSLList.<QuantifiableVariable>nil()]
 {
   QuantifiableVariable var = null;
 }
@@ -3832,13 +3933,13 @@ varId returns [ParsableVariable v = null]
 
 varIds returns [LinkedList list = new LinkedList()]
 {
-   ListOfString ids = null;
+   ImmutableList<String> ids = null;
    ParsableVariable v = null;
    String id = null;
 }
     :
       ids = simple_ident_comma_list {
-         IteratorOfString it = ids.iterator();
+         Iterator<String> it = ids.iterator();
 	 while(it.hasNext()) {
 	    id = it.next();
             v = (ParsableVariable) variables().lookup(new Name(id));
@@ -3850,7 +3951,7 @@ varIds returns [LinkedList list = new LinkedList()]
       }
   ;
 
-taclet[SetOfChoice choices] returns [Taclet r] 
+taclet[ImmutableSet<Choice> choices] returns [Taclet r] 
 { 
     Sequent ifSeq = Sequent.EMPTY_SEQUENT;
     Object  find = null;
@@ -3997,6 +4098,7 @@ varexp[TacletBuilder b]
     | varcond_ws_non_rigid_op[b]
     | varcond_ws_op[b]
     | varcond_isupdated[b]    
+    | varcond_sameheapdeppred[b]
   ) 
   | 
   ( (NOT {negated = true;} )? 
@@ -4405,6 +4507,17 @@ varcond_scope_stack [TacletBuilder b, boolean negated]
 	LPAREN x=varId RPAREN {
      	   b.addVariableCondition(new ScopeStackCondition((SchemaVariable) x, negated));
         } 
+    ;
+
+varcond_sameheapdeppred [TacletBuilder b]
+{
+  ParsableVariable x = null, y = null;
+}
+:
+   SAMEHEAPDEPPRED LPAREN x=varId COMMA y=varId RPAREN {
+     b.addVariableCondition(new SameHeapDependentPredicateVariableCondition(
+       (SchemaVariable) x, (SchemaVariable) y));          
+   }
 ;
 
 varcond_freeLabelIn [TacletBuilder b, boolean negated]
@@ -4425,7 +4538,7 @@ goalspecs[TacletBuilder b] :
 
 goalspecwithoption[TacletBuilder b]
 {
-    SetOfChoice soc = SetAsListOfChoice.EMPTY_SET;
+    ImmutableSet<Choice> soc = DefaultImmutableSet.<Choice>nil();
 } :
         (( soc = option_list[soc]
                 LBRACE
@@ -4448,7 +4561,7 @@ option returns [Choice c=null]
         }
     ;
     
-option_list[SetOfChoice soc] returns [SetOfChoice result = null]
+option_list[ImmutableSet<Choice> soc] returns [ImmutableSet<Choice> result = null]
 {
    Choice c = null;
 }
@@ -4459,12 +4572,12 @@ LPAREN {result = soc; }
 RPAREN
 ;
 
-goalspec[TacletBuilder b, SetOfChoice soc] 
+goalspec[TacletBuilder b, ImmutableSet<Choice> soc] 
 {
     Object rwObj = null;
     Sequent addSeq = Sequent.EMPTY_SEQUENT;
-    ListOfTaclet addRList = SLListOfTaclet.EMPTY_LIST;
-    SetOfSchemaVariable addpv = SetAsListOfSchemaVariable.EMPTY_SET;
+    ImmutableList<Taclet> addRList = ImmutableSLList.<Taclet>nil();
+    ImmutableSet<SchemaVariable> addpv = DefaultImmutableSet.<SchemaVariable>nil();
     String name = null;
 }
     :
@@ -4489,26 +4602,26 @@ replacewith returns [Object o] { o = null; } :
 add returns [Sequent s] { s = null;} :
         ADD LPAREN s=seq RPAREN;
 
-addrules returns [ListOfTaclet lor] { lor = null; } :
+addrules returns [ImmutableList<Taclet> lor] { lor = null; } :
         ADDRULES LPAREN lor=tacletlist RPAREN;
 
-addprogvar returns [SetOfSchemaVariable pvs] {pvs = null; } :
+addprogvar returns [ImmutableSet<SchemaVariable> pvs] {pvs = null; } :
         ADDPROGVARS LPAREN pvs=pvset RPAREN;
 
-tacletlist returns [ListOfTaclet lor]
+tacletlist returns [ImmutableList<Taclet> lor]
 { 
     Taclet head = null;
-    lor = SLListOfTaclet.EMPTY_LIST; 
+    lor = ImmutableSLList.<Taclet>nil(); 
 }
     :
-        head=taclet[SetAsListOfChoice.EMPTY_SET]   
+        head=taclet[DefaultImmutableSet.<Choice>nil()]   
         ( /*empty*/ | COMMA lor=tacletlist ) { lor = lor.prepend(head); }
     ;
 
-pvset returns [SetOfSchemaVariable pvs] 
+pvset returns [ImmutableSet<SchemaVariable> pvs] 
 {
     ParsableVariable pv = null;
-    pvs = SetAsListOfSchemaVariable.EMPTY_SET;
+    pvs = DefaultImmutableSet.<SchemaVariable>nil();
 }
     :
         pv=varId
@@ -4582,7 +4695,7 @@ metaTerm returns [Term result = null]
 			(ex.getMessage(), getFilename(), getLine(), getColumn()));
         }
 
-contracts[SetOfChoice choices, Namespace funcNSForSelectedChoices]
+contracts[ImmutableSet<Choice> choices, Namespace funcNSForSelectedChoices]
 {
   Choice c = null;
 }
@@ -4590,7 +4703,7 @@ contracts[SetOfChoice choices, Namespace funcNSForSelectedChoices]
    CONTRACTS
        LBRACE {
 	    switchToNormalMode();
-	    IteratorOfChoice it = choices.iterator();
+	    Iterator<Choice> it = choices.iterator();
 	    Namespace funcNSForRules = funcNSForSelectedChoices;
 	    while(it.hasNext()){
 		c=it.next();
@@ -4606,10 +4719,35 @@ contracts[SetOfChoice choices, Namespace funcNSForSelectedChoices]
        }
 ;
 
+invariants[ImmutableSet<Choice> choices, Namespace funcNSForSelectedChoices]
+{
+  Choice c = null;
+  QuantifiableVariable selfVar;
+}
+:
+   INVARIANTS LPAREN selfVar=one_logic_bound_variable RPAREN
+       LBRACE {
+	    switchToNormalMode();
+	    Iterator<Choice> it = choices.iterator();
+	    Namespace funcNSForRules = funcNSForSelectedChoices;
+	    while(it.hasNext()){
+		c=it.next();
+		funcNSForRules = 
+		    funcNSForRules.extended(c.funcNS().allElements());
+	    }
+	    namespaces().setFunctions(funcNSForRules); 
+       }
+       ( one_invariant[(ParsableVariable)selfVar] )*
+       RBRACE  {
+           unbindVars();
+       }
+;
+
+
 one_contract 
 {
   Term fma = null;
-  SetOfLocationDescriptor modifiesClause = SetAsListOfLocationDescriptor.EMPTY_SET;
+  ImmutableSet<LocationDescriptor> modifiesClause = DefaultImmutableSet.<LocationDescriptor>nil();
   String displayName = null;
   String contractName = null;
   Vector rs = null;
@@ -4647,21 +4785,47 @@ one_contract
    }
 ;
 
+one_invariant[ParsableVariable selfVar]
+{
+  Term fma = null;
+  String displayName = null;
+  String invName = null;
+}
+:
+     invName = simple_ident LBRACE 
+     fma = formula
+     (DISPLAYNAME displayName = string_literal)?
+     {
+       DLSpecFactory dsf = new DLSpecFactory(getServices());
+       try {
+         invs = invs.add(dsf.createDLClassInvariant(invName,
+                                                    displayName,
+                                                    selfVar,
+                                                    fma));
+       } catch(ProofInputException e) {
+         semanticError(e.getMessage());
+       }
+     } RBRACE SEMI
+;
+
 problem returns [ Term a = null ]
 {
     Taclet s = null;
-    SetOfChoice choices=SetAsListOfChoice.EMPTY_SET;
+    ImmutableSet<Choice> choices=DefaultImmutableSet.<Choice>nil();
     Choice c = null;
-    ListOfString stlist = null;
+    ImmutableList<String> stlist = null;
+    String string = null;
     Namespace funcNSForSelectedChoices = new Namespace();
     String pref = null;
 }
     :
 
-
 	{ if (capturer != null) capturer.mark(); }
         (pref = preferences)
         { if ((pref!=null) && (capturer != null)) capturer.mark(); }
+        
+        string = bootClassPath
+        // the result is of no importance here (strange enough)        
         
         stlist = classPaths 
         // the result is not of importance here, so we use it twice
@@ -4670,12 +4834,11 @@ problem returns [ Term a = null ]
           if(stlist != null && stlist.size() > 1)
             Debug.fail("Don't know what to do with multiple java source entries.");
 	    }
-        
         decls
         { 
             if(parse_includes || onlyWith) return null;
             switchToNormalMode();
-            IteratorOfChoice it = selectedChoices.iterator(); 
+            Iterator<Choice> it = selectedChoices.iterator(); 
             while(it.hasNext()){
 	         Choice choice = (Choice)choices().lookup(it.next().name());
 		 if(choice != null) {
@@ -4690,11 +4853,12 @@ problem returns [ Term a = null ]
         // WATCHOUT: choices is always going to be an empty set here,
 	// isn't it?
 	( contracts[choices, funcNSForSelectedChoices] )*
+	( invariants[choices, funcNSForSelectedChoices] )*
         (  RULES (choices = option_list[choices])?
 	    LBRACE
             { 
                 switchToSchemaMode(); 
-                 IteratorOfChoice it = choices.iterator();
+                 Iterator<Choice> it = choices.iterator();
                  Namespace funcNSForRules = funcNSForSelectedChoices;
                  while(it.hasNext()){
                      c=it.next();
@@ -4718,7 +4882,7 @@ problem returns [ Term a = null ]
                     }
                 }
             )*
-            RBRACE {choices=SetAsListOfChoice.EMPTY_SET;}
+            RBRACE {choices=DefaultImmutableSet.<Choice>nil();}
         ) *
         ((PROBLEM LBRACE 
             {switchToNormalMode(); 
@@ -4730,11 +4894,14 @@ problem returns [ Term a = null ]
 	                chooseContract = true;
 		      })?
         {
-			setChoiceHelper(SetAsListOfChoice.EMPTY_SET, "");
+			setChoiceHelper(DefaultImmutableSet.<Choice>nil(), "");
         }
    ;
    
-classPaths returns [ListOfString ids = SLListOfString.EMPTY_LIST]
+bootClassPath returns [String id = null] :
+  ( BOOTCLASSPATH id=string_literal SEMI )? ;
+   
+classPaths returns [ImmutableList<String> ids = ImmutableSLList.<String>nil()]
 {
   String s = null;
 }
@@ -4749,14 +4916,14 @@ classPaths returns [ListOfString ids = SLListOfString.EMPTY_LIST]
   | 
     (
     NODEFAULTCLASSES {
-      ids = ids.append((String)null);
+      throw new RecognitionException("\\noDefaultClasses is no longer supported. Use \\bootclasspath. See docs/README.classpath");
     }
     SEMI
     )
   )*
   ;
 
-javaSource returns [ListOfString ids = SLListOfString.EMPTY_LIST]
+javaSource returns [ImmutableList<String> ids = ImmutableSLList.<String>nil()]
 { 
   String s = null;
 }

@@ -5,38 +5,27 @@
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
-//
-//
 
 package de.uka.ilkd.key.speclang.ocl.translation;
 
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.ldt.IntegerLDT;
-import de.uka.ilkd.key.logic.op.ArrayOp;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.IteratorOfLogicVariable;
-import de.uka.ilkd.key.logic.op.Junctor;
-import de.uka.ilkd.key.logic.op.LogicVariable;
-import de.uka.ilkd.key.logic.op.Op;
-import de.uka.ilkd.key.logic.op.ParsableVariable;
-import de.uka.ilkd.key.logic.op.Quantifier;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.AbstractSort;
 import de.uka.ilkd.key.logic.sort.CollectionSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.proof.init.CreatedAttributeTermFactory;
-import de.uka.ilkd.key.speclang.translation.SLResolverManager;
-import de.uka.ilkd.key.speclang.translation.SLExpression;
-import de.uka.ilkd.key.speclang.translation.SLExpressionResolver;
-import de.uka.ilkd.key.speclang.translation.SLParameters;
-import de.uka.ilkd.key.speclang.translation.SLTranslationException;
+import de.uka.ilkd.key.speclang.translation.*;
 
 
 
@@ -105,15 +94,16 @@ class BuiltInPropertyResolver extends SLExpressionResolver {
         }
         
         //allInstances---------------------------------------------------------
-        if(name.equals("allInstances")) {
+        final ImmutableList<LogicVariable> declaredVars = oclParameters.getDeclaredVars();
+	if(name.equals("allInstances")) {
             if(!receiver.isType() 
                || oclParameters == null
-               || !oclParameters.getDeclaredVars().isEmpty()
+               || !declaredVars.isEmpty()
                || !oclParameters.getEntities().isEmpty()) {
                 return null;
             }
 
-            return new OCLEntity(new OCLCollection(receiver.getKeYJavaType(javaInfo).getSort(), services));
+            return new OCLExpression(new OCLCollection(receiver.getKeYJavaType(javaInfo).getSort(), services));
         }
         
         
@@ -121,7 +111,7 @@ class BuiltInPropertyResolver extends SLExpressionResolver {
         if(name.equals("forAll") || name.equals("exists")) {
             if(!receiver.isCollection() 
                || oclParameters == null
-               || oclParameters.getDeclaredVars().isEmpty()
+               || declaredVars.isEmpty()
                || oclParameters.getEntities().size() != 1) {
                 return null;
             }
@@ -137,15 +127,13 @@ class BuiltInPropertyResolver extends SLExpressionResolver {
             }
             
             Term restrictions = trueTerm;
-            IteratorOfLogicVariable it 
-                    = oclParameters.getDeclaredVars().iterator();
-            while(it.hasNext()) {
+            for (LogicVariable declaredVar : declaredVars) {
                 Term t = replaceVar(((OCLCollection) receiver.getCollection()).getPredVar(),
-                                    it.next(),
-                                    ((OCLCollection) receiver.getCollection()).getPredicativeRestriction());
+                        declaredVar,
+                        ((OCLCollection) receiver.getCollection()).getPredicativeRestriction());
                 restrictions = tf.createJunctorTermAndSimplify(Op.AND,
-                                                               restrictions,
-                                                               t);
+                        restrictions,
+                        t);
             }
             
             Term subTerm 
@@ -155,10 +143,10 @@ class BuiltInPropertyResolver extends SLExpressionResolver {
             Term resTerm = createdFactory.createCreatedOrNullQuantifierTerm(
                             services,
                             q,
-                            oclParameters.getDeclaredVars().toArray(),
+                            declaredVars.toArray(new LogicVariable[declaredVars.size()]),
                             subTerm);
 
-            return new OCLEntity(resTerm);
+            return new OCLExpression(resTerm);
         }
         
         
@@ -166,14 +154,14 @@ class BuiltInPropertyResolver extends SLExpressionResolver {
         if(name.equals("select") || name.equals("reject")) {
             if(!receiver.isCollection() 
                || oclParameters == null
-               || oclParameters.getDeclaredVars().size() != 1
+               || declaredVars.size() != 1
                || oclParameters.getEntities().size() != 1) {
                 return null;
             }
 
             //Replace all occurrences of the new selectorVar with the 
             //appropriate collectionVar
-            Term selectTerm = replaceVar(oclParameters.getDeclaredVars().head(), 
+            Term selectTerm = replaceVar(declaredVars.head(), 
                                          ((OCLCollection) receiver.getCollection()).getPredVar(),
                                          oclParameters.getEntities().head().getTerm());
             
@@ -187,7 +175,7 @@ class BuiltInPropertyResolver extends SLExpressionResolver {
             OCLCollection resCollection;
             resCollection = ((OCLCollection) receiver.getCollection()).select(selectVar, selectTerm);
             
-            return new OCLEntity(resCollection);            
+            return new OCLExpression(resCollection);            
         }
         
         
@@ -195,7 +183,7 @@ class BuiltInPropertyResolver extends SLExpressionResolver {
         if(name.equals("collect")) {
             if(!receiver.isCollection()
                || oclParameters == null
-               || oclParameters.getDeclaredVars().size() > 1
+               || declaredVars.size() > 1
                || oclParameters.getEntities().size() != 1) {
                 return null;
             }
@@ -213,8 +201,8 @@ class BuiltInPropertyResolver extends SLExpressionResolver {
                 
             }
             
-            if(!oclParameters.getDeclaredVars().isEmpty()) {
-                collectTerm = replaceVar(oclParameters.getDeclaredVars().head(),
+            if(!declaredVars.isEmpty()) {
+                collectTerm = replaceVar(declaredVars.head(),
                                          ((OCLCollection) receiver.getCollection()).getPredVar(),
                                          collectTerm);
             }
@@ -222,7 +210,7 @@ class BuiltInPropertyResolver extends SLExpressionResolver {
             OCLCollection result
                 = ((OCLCollection) receiver.getCollection()).collect(services, collectTerm);
             
-            return new OCLEntity(result);
+            return new OCLExpression(result);
         } 
         
         
@@ -230,7 +218,7 @@ class BuiltInPropertyResolver extends SLExpressionResolver {
         if(name.equals("includes") || name.equals("excludes")) {
             if(!receiver.isCollection()
                || oclParameters == null
-               || !oclParameters.getDeclaredVars().isEmpty()
+               || !declaredVars.isEmpty()
                || oclParameters.getEntities().size() != 1) {
                 return null;
             }
@@ -262,7 +250,7 @@ class BuiltInPropertyResolver extends SLExpressionResolver {
                             vars,
                             opTerm);
             
-            return new OCLEntity(resTerm);
+            return new OCLExpression(resTerm);
         }
         
         
@@ -270,7 +258,7 @@ class BuiltInPropertyResolver extends SLExpressionResolver {
         if(name.equals("isEmpty") || name.equals("notEmpty")) {
             if(!receiver.isCollection()
                || oclParameters == null
-               || !oclParameters.getDeclaredVars().isEmpty()
+               || !declaredVars.isEmpty()
                || !oclParameters.getEntities().isEmpty()) {
                 return null;
             }
@@ -300,7 +288,7 @@ class BuiltInPropertyResolver extends SLExpressionResolver {
                             vars,
                             opTerm);
             
-            return new OCLEntity(resTerm);
+            return new OCLExpression(resTerm);
         }
         
 
@@ -308,13 +296,13 @@ class BuiltInPropertyResolver extends SLExpressionResolver {
         if(name.equals("isUnique")) {
             if(!receiver.isCollection() 
                || oclParameters == null
-               || oclParameters.getDeclaredVars().size() != 1
+               || declaredVars.size() != 1
                || oclParameters.getEntities().size() != 1) {
                 return null;
             }
                         
             Term restrictions = trueTerm;
-            LogicVariable temp = oclParameters.getDeclaredVars().head();
+            LogicVariable temp = declaredVars.head();
             LogicVariable lv1 
                     = new LogicVariable(new Name(temp.name()+"_1"),temp.sort());    
             LogicVariable lv2 
@@ -355,7 +343,7 @@ class BuiltInPropertyResolver extends SLExpressionResolver {
                             new LogicVariable[]{lv1,lv2},
                             subTerm);
             
-            return new OCLEntity(resTerm);
+            return new OCLExpression(resTerm);
 
         }
 
@@ -367,7 +355,7 @@ class BuiltInPropertyResolver extends SLExpressionResolver {
             
             if(!receiver.isCollection()
                || oclParameters == null
-               || oclParameters.getDeclaredVars().size() > 0
+               || declaredVars.size() > 0
                || oclParameters.getEntities().size() != 0) {
                 return null;
             }
@@ -381,7 +369,7 @@ class BuiltInPropertyResolver extends SLExpressionResolver {
             Function f = (Function) services.getNamespaces().functions().lookup(
                     new Name(ssort.name().toString()+"::"+name));  
             
-            return new OCLEntity(
+            return new OCLExpression(
                     tf.createFunctionTerm(
                             f,
                             ((OCLCollection) receiver.getCollection()).getFunctionalRestriction()));
@@ -392,7 +380,7 @@ class BuiltInPropertyResolver extends SLExpressionResolver {
         if(name.equals("oclIsKindOf")) {
             if(!receiver.isTerm() 
                || oclParameters == null
-               || !oclParameters.getDeclaredVars().isEmpty()
+               || !declaredVars.isEmpty()
                || !(oclParameters.getEntities().size() == 1)
                || !(oclParameters.getEntities().head().isType())) {
                 return null;
@@ -403,7 +391,7 @@ class BuiltInPropertyResolver extends SLExpressionResolver {
             
             Term result = tf.createFunctionTerm(instance,receiver.getTerm());
             
-            return new OCLEntity(result);
+            return new OCLExpression(result);
         }
 
         
@@ -411,7 +399,7 @@ class BuiltInPropertyResolver extends SLExpressionResolver {
         if(name.equals("oclIsTypeOf")) {
             if(!receiver.isTerm() 
                || oclParameters == null
-               || !oclParameters.getDeclaredVars().isEmpty()
+               || !declaredVars.isEmpty()
                || !(oclParameters.getEntities().size() == 1)
                || !(oclParameters.getEntities().head().isType())) {
                 return null;
@@ -422,7 +410,7 @@ class BuiltInPropertyResolver extends SLExpressionResolver {
             
             Term result = tf.createFunctionTerm(instance,receiver.getTerm());
             
-            return new OCLEntity(result);
+            return new OCLExpression(result);
         }
 
         
@@ -430,7 +418,7 @@ class BuiltInPropertyResolver extends SLExpressionResolver {
         if(name.equals("oclAsType")) {
             if(!receiver.isTerm() 
                || oclParameters == null
-               || !oclParameters.getDeclaredVars().isEmpty()
+               || !declaredVars.isEmpty()
                || !(oclParameters.getEntities().size() == 1)
                || !(oclParameters.getEntities().head().isType())) {
                 return null;
@@ -440,7 +428,7 @@ class BuiltInPropertyResolver extends SLExpressionResolver {
                     (AbstractSort)oclParameters.getEntities().head().getSort(),
                     receiver.getTerm());
             
-            return new OCLEntity(result);
+            return new OCLExpression(result);
         }
 
         
@@ -448,7 +436,7 @@ class BuiltInPropertyResolver extends SLExpressionResolver {
         if(name.equals("get")) {
             if(!receiver.isTerm() 
                || oclParameters == null
-               || !oclParameters.getDeclaredVars().isEmpty()
+               || !declaredVars.isEmpty()
                || !(oclParameters.getEntities().size() == 1)
                //|| !parameters.getEntities().head().getTerm().sort().name().toString().equals("int")
                //|| !(receiver.getSort() instanceof ArraySort)#
@@ -461,13 +449,13 @@ class BuiltInPropertyResolver extends SLExpressionResolver {
                     receiver.getTerm(),
                     oclParameters.getEntities().head().getTerm());
             
-            return new OCLEntity(res);
+            return new OCLExpression(res);
         }
         
         //signals (exception-handling)--------------------------------------------------
         if(name.equals("signals")) {
             if(oclParameters == null
-               || !oclParameters.getDeclaredVars().isEmpty()
+               || !declaredVars.isEmpty()
                || !(oclParameters.getEntities().size() == 1)
                || !oclParameters.getEntities().head().isType()
             ) {
@@ -482,7 +470,7 @@ class BuiltInPropertyResolver extends SLExpressionResolver {
                         tb.not(tb.equals(tb.var(excVar),tb.NULL(services))),
                         tb.equals(tb.func(instance,tb.var(excVar)),tb.TRUE(services)));
             
-            return new OCLEntity(res);
+            return new OCLExpression(res);
             
         }
         
@@ -498,7 +486,7 @@ class BuiltInPropertyResolver extends SLExpressionResolver {
                    || !(oclParameters.getEntities().head().getSort().extendsTrans(integerSort))) {                            
                 return null;
             }
-            return new OCLEntity(tb.func(integerLDT.getMod(), 
+            return new OCLExpression(tb.func(integerLDT.getMod(), 
                     receiver.getTerm(), 
                     oclParameters.getEntities().head().getTerm()));
         }
@@ -515,7 +503,7 @@ class BuiltInPropertyResolver extends SLExpressionResolver {
                    || !(oclParameters.getEntities().head().getSort().extendsTrans(integerSort))) {                            
                 return null;
             }
-            return new OCLEntity(tb.func(integerLDT.getDiv(), 
+            return new OCLExpression(tb.func(integerLDT.getDiv(), 
                     receiver.getTerm(), 
                     oclParameters.getEntities().head().getTerm()));
         }

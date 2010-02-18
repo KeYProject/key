@@ -10,6 +10,8 @@
 
 package de.uka.ilkd.key.rule.encapsulation;
 
+import de.uka.ilkd.key.collection.ImmutableSet;
+
 
 class TypeSchemeCombineTerm implements TypeSchemeTerm {
     private TypeSchemeTerm subTerm1, subTerm2;
@@ -27,7 +29,7 @@ class TypeSchemeCombineTerm implements TypeSchemeTerm {
     }
     
     
-    public SetOfTypeSchemeVariable getFreeVars() {
+    public ImmutableSet<TypeSchemeVariable> getFreeVars() {
         return subTerm1.getFreeVars().union(subTerm2.getFreeVars());
     }
     

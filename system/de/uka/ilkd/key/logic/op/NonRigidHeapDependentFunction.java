@@ -9,8 +9,8 @@
 //
 package de.uka.ilkd.key.logic.op;
 
+import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.sort.ArrayOfSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 
 
@@ -29,7 +29,7 @@ public class NonRigidHeapDependentFunction extends NonRigidFunction {
      * @param sort the Sort of the symbol
      * @param argSorts the array of Sort defining the argument sorts
      */
-    public NonRigidHeapDependentFunction(Name name, Sort sort, ArrayOfSort argSorts) {
+    public NonRigidHeapDependentFunction(Name name, Sort sort, ImmutableArray<Sort> argSorts) {
         super(name, sort, argSorts);     
     }
 

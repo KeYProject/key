@@ -14,11 +14,11 @@
 [SimultaneousUpdateSimplifier]EagerSimplification=false
 [General]StupidMode=false
 [Strategy]MaximumNumberOfAutomaticApplications=3000
-[Libraries]Default=acc.key-false, stringRules.key-false, deprecatedRules.key-false
+
 [StrategyProperty]QUERY_OPTIONS_KEY=QUERY_NONE
-[Choice]DefaultChoices=testGeneration-testGeneration\:testOff , transactions-transactions\:transactionsOn , programRules-programRules\:Java , initialisation-initialisation\:disableStaticInitialisation , transactionAbort-transactionAbort\:abortOn , throughout-throughout\:toutOn , intRules-intRules\:arithmeticSemanticsIgnoringOF , assertions-assertions\:on , nullPointerPolicy-nullPointerPolicy\:nullCheck
+[Choice]DefaultChoices=testGeneration-testGeneration\\:testOff , transactions-transactions\\:transactionsOn , programRules-programRules\\:Java , initialisation-initialisation\\:disableStaticInitialisation , transactionAbort-transactionAbort\\:abortOn , throughout-throughout\\:toutOn , intRules-intRules\\:arithmeticSemanticsIgnoringOF , assertions-assertions\\:on , nullPointerPolicy-nullPointerPolicy\\:nullCheck
 [Model]Source=1
-[Choice]Choices=transactions-transactions\:transactionsOn-transactions\:transactionsOff , testGeneration-testGeneration\:testOn-testGeneration\:testOff , programRules-programRules\:ODL-programRules\:Java , throughout-throughout\:toutOff-throughout\:toutOn , initialisation-initialisation\:disableStaticInitialisation-initialisation\:enableStaticInitialisation , transactionAbort-transactionAbort\:abortOff-transactionAbort\:abortOn , intRules-intRules\:arithmeticSemanticsCheckingOF-intRules\:javaSemantics-intRules\:arithmeticSemanticsIgnoringOF , assertions-assertions\:safe-assertions\:off-assertions\:on , nullPointerPolicy-nullPointerPolicy\:noNullCheck-nullPointerPolicy\:nullCheck
+[Choice]Choices=transactions-transactions\\:transactionsOn-transactions\\:transactionsOff , testGeneration-testGeneration\\:testOn-testGeneration\\:testOff , programRules-programRules\\:ODL-programRules\\:Java , throughout-throughout\\:toutOff-throughout\\:toutOn , initialisation-initialisation\\:disableStaticInitialisation-initialisation\\:enableStaticInitialisation , transactionAbort-transactionAbort\\:abortOff-transactionAbort\\:abortOn , intRules-intRules\\:arithmeticSemanticsCheckingOF-intRules\\:javaSemantics-intRules\\:arithmeticSemanticsIgnoringOF , assertions-assertions\\:safe-assertions\\:off-assertions\\:on , nullPointerPolicy-nullPointerPolicy\\:noNullCheck-nullPointerPolicy\\:nullCheck
 [DecisionProcedure]=SIMPLIFY
 [General]OuterRenaming=false
 [Strategy]ActiveStrategy=JavaCardDLStrategy

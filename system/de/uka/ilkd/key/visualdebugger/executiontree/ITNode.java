@@ -14,13 +14,16 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 
+import de.uka.ilkd.key.collection.ImmutableArray;
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.abstraction.ClassType;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
-import de.uka.ilkd.key.java.declaration.ArrayOfParameterDeclaration;
+import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
 import de.uka.ilkd.key.java.expression.Assignment;
 import de.uka.ilkd.key.java.expression.literal.IntLiteral;
 import de.uka.ilkd.key.java.expression.operator.CopyAssignment;
@@ -31,11 +34,16 @@ import de.uka.ilkd.key.java.reference.TypeRef;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.statement.Throw;
-import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermFactory;
+import de.uka.ilkd.key.logic.op.AttributeOp;
+import de.uka.ilkd.key.logic.op.IProgramVariable;
+import de.uka.ilkd.key.logic.op.ProgramMethod;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.ProgVarReplacer;
-import de.uka.ilkd.key.rule.ListOfRuleSet;
 import de.uka.ilkd.key.rule.PosTacletApp;
 import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.rule.Taclet;
@@ -46,7 +54,7 @@ import de.uka.ilkd.key.visualdebugger.VisualDebugger;
 public class ITNode {
     private SourceElement activeStatement;
 
-    ListOfTerm bc = SLListOfTerm.EMPTY_LIST;
+    ImmutableList<Term> bc = ImmutableSLList.<Term>nil();
 
     private LinkedList<ITNode> children = new LinkedList<ITNode>();
 
@@ -78,11 +86,11 @@ public class ITNode {
 
     private final Node node;
 
-    private ListOfProgramVariable parameter;
+    private ImmutableList<ProgramVariable> parameter;
 
     private final ITNode parent;
 
-    ListOfTerm pc = SLListOfTerm.EMPTY_LIST;
+    ImmutableList<Term> pc = ImmutableSLList.<Term>nil();
 
     private ProgramMethod programMethod;
 
@@ -90,11 +98,11 @@ public class ITNode {
 
     private SourceElementId statementId = null;
 
-    private ListOfTerm values = null;
+    private ImmutableList<Term> values = null;
 
     private VisualDebugger vd = VisualDebugger.getVisualDebugger();
 
-    public ITNode(ListOfTerm bc, ListOfTerm pc, Node n, ITNode parent) {
+    public ITNode(ImmutableList<Term> bc, ImmutableList<Term> pc, Node n, ITNode parent) {
         this.bc = bc;
         this.parent = parent;
         this.serv = n.proof().getServices();
@@ -149,7 +157,7 @@ public class ITNode {
                 if (mbs.getArguments().size() > 1) { // is expression sep, no
                     // statment sep
                     this.expressionResultVar = (ProgramVariable) mbs
-                            .getArguments().getExpression(1);
+                            .getArguments().get(1);
 
                     return true;
                 }
@@ -179,7 +187,7 @@ public class ITNode {
                     // for
                     // sep,
                     // eg.
-                    && node.getAppliedRuleApp().rule().displayName().toString()
+                    && node.getAppliedRuleApp().rule().displayName()
                             .equals("method_call_return"))
                 return true;
         }
@@ -299,22 +307,21 @@ public class ITNode {
             }
 
             HashSet set = vd.getParam(mbs);
-            ListOfProgramVariable inputPara = vd
+            ImmutableList<ProgramVariable> inputPara = vd
                     .arrayOfExpression2ListOfProgVar(mbs.getArguments(), 0);
-            ProgramVariable[] inputParaArray = inputPara.toArray();
+            ProgramVariable[] inputParaArray = inputPara.toArray(new ProgramVariable[inputPara.size()]);
 
-            ArrayOfParameterDeclaration paraDecl = mbs.getProgramMethod(serv)
-                    .getParameters();
+            ImmutableArray<ParameterDeclaration> paraDecl = mbs.getProgramMethod(serv).getParameters();
             final HashMap loc2val = vd.getValuesForLocation(set, vd
                     .getProgramPIO(node.sequent()));
 
-            ListOfProgramVariable paramDeclAsPVList = SLListOfProgramVariable.EMPTY_LIST;
+            ImmutableList<ProgramVariable> paramDeclAsPVList = ImmutableSLList.<ProgramVariable>nil();
 
-            this.values = SLListOfTerm.EMPTY_LIST;
+            this.values = ImmutableSLList.<Term>nil();
 
             for (int i = 0; i < paraDecl.size(); i++) {
                 ProgramVariable next = (ProgramVariable) paraDecl
-                        .getParameterDeclaration(i).getVariableSpecification()
+                        .get(i).getVariableSpecification()
                         .getProgramVariable();
                 Term val = (Term) loc2val.get(TermFactory.DEFAULT
                         .createVariableTerm(inputParaArray[i]));// TODO
@@ -407,12 +414,12 @@ public class ITNode {
         return activeStatement;
     }
 
-    public ListOfTerm getBc() {
+    public ImmutableList<Term> getBc() {
         return bc;
     }
 
     public ITNode[] getChildren() {
-        return (ITNode[]) children.toArray(new ITNode[children.size()]);
+        return children.toArray(new ITNode[children.size()]);
     }
 
     public ProgramVariable getExpressionResultVar() {
@@ -457,7 +464,7 @@ public class ITNode {
         return node;
     }
 
-    public ListOfProgramVariable getParameter() {
+    public ImmutableList<ProgramVariable> getParameter() {
         return parameter;
     }
 
@@ -465,19 +472,18 @@ public class ITNode {
         return parent;
     }
 
-    public ListOfTerm getPc() {
+    public ImmutableList<Term> getPc() {
         // remove implicit
         if (!VisualDebugger.showImpliciteAttr)
             return vd.removeImplicite(pc);
         return pc;
     }
 
-    public ListOfTerm getPc(boolean impl) {
+    public ImmutableList<Term> getPc(boolean impl) {
         // remove implicit
-        ListOfTerm result = SLListOfTerm.EMPTY_LIST;
+        ImmutableList<Term> result = ImmutableSLList.<Term>nil();
 
-        for (IteratorOfTerm it = pc.iterator(); it.hasNext();) {
-            final Term n = it.next();
+        for (final Term n : pc) {
             if (!VisualDebugger.containsImplicitAttr(n) || impl)
                 result = result.append(n);
 
@@ -504,7 +510,7 @@ public class ITNode {
         return statementId;
     }
 
-    public ListOfTerm getValues() {
+    public ImmutableList<Term> getValues() {
         return values;
     }
 
@@ -588,7 +594,7 @@ public class ITNode {
     }
 
     private boolean tacletIsInRuleSet(Taclet t, String ruleSet) {
-        ListOfRuleSet list = t.getRuleSets();
+        ImmutableList<RuleSet> list = t.getRuleSets();
         RuleSet rs;
         while (!list.isEmpty()) {
             rs = list.head();
@@ -603,9 +609,8 @@ public class ITNode {
     public String toString() {
         String result = "";
         result = result + " (( " + bc + " Node " + id + " ";
-        Iterator it = children.iterator();
-        while (it.hasNext()) {
-            result = result + it.next();
+        for (ITNode aChildren : children) {
+            result = result + aChildren;
         }
 
         result = result + " ))";

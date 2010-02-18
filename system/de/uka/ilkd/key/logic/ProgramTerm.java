@@ -10,16 +10,10 @@
 
 package de.uka.ilkd.key.logic;
 
-import de.uka.ilkd.key.logic.op.ArrayOfQuantifiableVariable;
+import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.logic.op.Op;
 import de.uka.ilkd.key.logic.op.Operator;
-/*
- * A ProgramTerm represents a term with a modality operator like
- * the diamond or box operator together with a JavaBlock. Instances
- * should never be accessed via this interface, use the interface of
- * the superclass Term and construct instances only via a TermFactory
- * instead. 
- */
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 
 class ProgramTerm extends Term {
     /** 
@@ -28,7 +22,7 @@ class ProgramTerm extends Term {
     private final JavaBlock javaBlock;
 
     /**  sub term */
-    private final ArrayOfTerm subTerm; 
+    private final ImmutableArray<Term> subTerm; 
 
     /** caches depth */
     private int depth=-1;
@@ -47,13 +41,13 @@ class ProgramTerm extends Term {
 		JavaBlock javaBlock, 
 		Term[] subTerm) {
 	super(op, op.sort(subTerm));
-	this.subTerm=new ArrayOfTerm(subTerm);
+	this.subTerm=new ImmutableArray<Term>(subTerm);
 	this.javaBlock=javaBlock;
     }
 
     /** @return n-th subterm (always the only one)*/    
     public Term sub(int n) {
-	return subTerm.getTerm(n);
+	return subTerm.get(n);
     }	
    
     /** @return arity of the quantifier term 1 as int */
@@ -66,8 +60,8 @@ class ProgramTerm extends Term {
 	if(this.depth == -1) {
 	    int localdepth = 0;
 	    for(int i=0;i<subTerm.size();i++) {
-		if(subTerm.getTerm(i).depth() > localdepth)
-		    localdepth = subTerm.getTerm(i).depth();
+		if(subTerm.get(i).depth() > localdepth)
+		    localdepth = subTerm.get(i).depth();
 	    }
 	    this.depth = localdepth + 1;
 	}
@@ -80,7 +74,7 @@ class ProgramTerm extends Term {
     }
     
     /** @return an empty variable list */
-    public ArrayOfQuantifiableVariable varsBoundHere(int n) {
+    public ImmutableArray<QuantifiableVariable> varsBoundHere(int n) {
 	return EMPTY_VAR_LIST;
     }
 
@@ -94,10 +88,10 @@ class ProgramTerm extends Term {
 	    sb.append("\\[[").append(javaBlock).append("\\]] ");
 	} else {
 	    //	    sb.append("???Some Strange Modality???").append(javaBlock);
-	    sb.append("\\modality{"+op().name()).append("}").append(javaBlock).append("\\endmodality ");
+        sb.append("\\modality{").append(op().name()).append("}").append(javaBlock).append("\\endmodality ");
 	}
 	for(int i=0; i<subTerm.size(); i++)
-           sb.append("(").append(subTerm.getTerm(i)).append(")");
+           sb.append("(").append(subTerm.get(i)).append(")");
 
 	return sb.toString();
     }

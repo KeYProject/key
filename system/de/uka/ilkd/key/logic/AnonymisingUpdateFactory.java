@@ -13,11 +13,12 @@ package de.uka.ilkd.key.logic;
 import java.util.HashMap;
 import java.util.Map;
 
-import de.uka.ilkd.key.collection.PairOfTermAndListOfName;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.proof.VariableNameProposer;
 import de.uka.ilkd.key.rule.updatesimplifier.Update;
 import de.uka.ilkd.key.util.Debug;
 
@@ -51,23 +52,6 @@ public class AnonymisingUpdateFactory {
         return result;
     }
     
-    
-    private static Name getNewName(Services services, Name baseName, Name proposal) {
-        NamespaceSet namespaces = services.getNamespaces();
-        
-        int i = 0;
-        Name name;
-        if (proposal != null && namespaces.lookup(proposal) == null) {
-            name = proposal;
-        } else {
-            do {
-                name = new Name(baseName + "_" + i++);
-            } while(namespaces.lookup(name) != null);
-        }
-
-        return name;
-    }
-       
     
     /**
      * Determines the arguments sorts of the passed operator
@@ -141,7 +125,7 @@ public class AnonymisingUpdateFactory {
                                 Term locTerm, 
                                 Sort[] commonArguments,
                                 Map<Operator, RigidFunction> functions,
-                                Services services, Name proposal) {
+                                Services services) {
         RigidFunction result = (RigidFunction) functions.get(locTerm.op());
         
         if (result == null) {
@@ -160,12 +144,21 @@ public class AnonymisingUpdateFactory {
                 baseName = new Name(s.substring(1, s.length() - 1));
             }
 
-            result = new RigidFunction ( getNewName ( services, baseName,
-                                         proposal ), locTerm.sort (),
-                                         getArgumentSorts ( locTerm.op (),
-                                                            commonArguments,
-                                                            services ) );
+            // reklov
+            // START TEMPORARY DOWNWARD COMPATIBILITY
+            // result = new RigidFunction(VariableNameProposer.DEFAULT.getNewName(
+            //         services, baseName), locTerm.sort(), getArgumentSorts(
+            //         locTerm.op(), commonArguments, services));
+            Name newName = VariableNameProposer.DEFAULT.
+                    getNewNameOldAnonUpdateCompatibility(services, baseName);
+            result = new RigidFunction(newName, locTerm.sort(),
+                    getArgumentSorts(locTerm.op(), commonArguments, services));
+            // END TEMPORARY DOWNWARD COMPATIBILITY
+
             services.getNamespaces().functions().add(result);
+            
+            services.addNameProposal(result.name());
+            
             functions.put(locTerm.op(), result);
         }
         
@@ -179,22 +172,18 @@ public class AnonymisingUpdateFactory {
     public static RigidFunction[] createUninterpretedFunctions(
                                             LocationDescriptor[] locations,
                                             Sort[] commonArguments,
-                                            Services services,
-                                            Name[] proposals) {
+                                            Services services) {
         RigidFunction[] result = new RigidFunction[locations.length];
         Map<Operator, RigidFunction> functions = new HashMap<Operator, RigidFunction>();
         
-        for(int i = 0, c = 0; i < locations.length; i++) {
+        for(int i = 0; i < locations.length; i++) {
             if(locations[i] instanceof BasicLocationDescriptor) {
                 BasicLocationDescriptor bloc 
                         = (BasicLocationDescriptor) locations[i];
-                Name proposal = null;
-                if (proposals != null && proposals.length > c) proposal = proposals[c++];
                 result[i] = getUninterpretedFunction(bloc.getLocTerm(),
                                                      commonArguments,
                                                      functions,
-                                                     services,
-                                                     proposal);
+                                                     services);
             } else {
                 Debug.assertTrue(
                         locations[i] instanceof EverythingLocationDescriptor
@@ -207,16 +196,6 @@ public class AnonymisingUpdateFactory {
         }
         
         return result;
-    }
-
-    /**
-     * Creates suitable uninterpreted functions for the passed locations.
-     */
-    public static RigidFunction[] createUninterpretedFunctions(
-                                            LocationDescriptor[] locations,
-                                            Sort[] commonArguments,
-                                            Services services) {
-        return createUninterpretedFunctions(locations, commonArguments, services, null);
     }
 
     /**
@@ -268,9 +247,8 @@ public class AnonymisingUpdateFactory {
                 
                 //create quantified update
                 Update quantifiedUpdate = guardedUpdate;
-                IteratorOfQuantifiableVariable it = locTerm.freeVars().iterator();
-                while(it.hasNext()) {
-                    quantifiedUpdate = uf.quantify(it.next(), quantifiedUpdate);
+                for (QuantifiableVariable quantifiableVariable : locTerm.freeVars()) {
+                    quantifiedUpdate = uf.quantify(quantifiableVariable, quantifiedUpdate);
                 }
                 //add update to result update
                 result = uf.parallel(result, quantifiedUpdate);                
@@ -292,16 +270,16 @@ public class AnonymisingUpdateFactory {
      * Creates the anonymising update for the passed locations using new
      * uninterpreted functions.
      */
-    public Update createAnonymisingUpdate(SetOfLocationDescriptor locations,
+    public Update createAnonymisingUpdate(ImmutableSet<LocationDescriptor> locations,
                                           Services services) {
         return createAnonymisingUpdate(locations, new Term[0], services);
     }
     
     
-    public Update createAnonymisingUpdate(SetOfLocationDescriptor locations,
+    public Update createAnonymisingUpdate(ImmutableSet<LocationDescriptor> locations,
                                           Term[] commonArguments,
                                           Services services) {
-        LocationDescriptor[] locationsArray = locations.toArray();
+        LocationDescriptor[] locationsArray = locations.toArray(new LocationDescriptor[locations.size()]);
         RigidFunction[] functions 
             = createUninterpretedFunctions(locationsArray,
                                            extractSorts(commonArguments),
@@ -331,10 +309,10 @@ public class AnonymisingUpdateFactory {
      * Creates the anonymising update for the passed locations using new
      * uninterpreted functions and applies it to the passed target term.
      */
-    public Term createAnonymisingUpdateTerm(SetOfLocationDescriptor locations,
+    public Term createAnonymisingUpdateTerm(ImmutableSet<LocationDescriptor> locations,
                                             Term targetTerm,
                                             Services services) {
-        LocationDescriptor[] locationsArray = locations.toArray();
+        LocationDescriptor[] locationsArray = locations.toArray(new LocationDescriptor[locations.size()]);
         RigidFunction[] functions = createUninterpretedFunctions(locationsArray,
                                                                  services);
         return createAnonymisingUpdateTerm ( locationsArray, functions,
@@ -348,35 +326,13 @@ public class AnonymisingUpdateFactory {
     public Term createAnonymisingUpdateAsFor(LocationDescriptor[] locationsArray,
                                              Term[] commonArguments,
                                              Services services) {
-        return createAnonymisingUpdateAsFor(locationsArray, commonArguments,
-                services, null).getTerm();
-    }
-
-    /**
-     * Creates the anonymising update for the passed locations using new
-     * uninterpreted functions and applies it to the passed target term.
-     */
-    public PairOfTermAndListOfName createAnonymisingUpdateAsFor(
-                                             LocationDescriptor[] locationsArray,
-                                             Term[] commonArguments,
-                                             Services services,
-                                             Name[] proposals) {
         RigidFunction[] functions =
             createUninterpretedFunctions ( locationsArray,
                                            extractSorts ( commonArguments ),
-                                           services,
-                                           proposals );
+                                           services );
         Update upd = createAnonymisingUpdate ( locationsArray, functions,
                                                commonArguments, services );
-        ListOfName genNames = SLListOfName.EMPTY_LIST;
-
-        for (int i = 0; i < functions.length; i++) {
-            if (functions[i] != null)
-                genNames = genNames.append(functions[i].name());
-        }
-
-        return new PairOfTermAndListOfName(uf.prepend ( upd, updateTarget ),
-                genNames);
+        return uf.prepend ( upd, updateTarget );
     }
     
     private Sort[] extractSorts(Term[] argTerms) {

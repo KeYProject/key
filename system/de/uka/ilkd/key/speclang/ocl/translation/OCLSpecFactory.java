@@ -12,6 +12,9 @@ package de.uka.ilkd.key.speclang.ocl.translation;
 
 import java.util.*;
 
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.*;
@@ -103,7 +106,7 @@ public class OCLSpecFactory {
     }        
     
     
-    public SetOfOperationContract createOCLOperationContracts(
+    public ImmutableSet<OperationContract> createOCLOperationContracts(
                                             ProgramMethod programMethod,
                                             String originalPre,
                                             String originalPost,
@@ -116,7 +119,7 @@ public class OCLSpecFactory {
         ParsableVariable selfVar = SVF.createSelfVar(services, 
                                                      programMethod, 
                                                      false);
-        ListOfParsableVariable paramVars = SVF.createParamVars(services, 
+        ImmutableList<ParsableVariable> paramVars = SVF.createParamVars(services, 
                                                                programMethod, 
                                                                false);
         ParsableVariable resultVar = SVF.createResultVar(services, 
@@ -156,7 +159,7 @@ public class OCLSpecFactory {
         }
         
         //translate modifies
-        SetOfLocationDescriptor modifies;
+        ImmutableSet<LocationDescriptor> modifies;
         if(originalModifies == null || originalModifies.equals("")) {
             modifies = EverythingLocationDescriptor.INSTANCE_AS_SET;
         } else {
@@ -188,7 +191,7 @@ public class OCLSpecFactory {
         FormulaWithAxioms wsPost = new FormulaWithAxioms(tb.tt(), new HashMap<Operator, Term>());
         
         //create contracts
-        SetOfOperationContract result = SetAsListOfOperationContract.EMPTY_SET;
+        ImmutableSet<OperationContract> result = DefaultImmutableSet.<OperationContract>nil();
         String name1 = getContractName();
         String name2 = getContractName();
         OperationContract contract1 

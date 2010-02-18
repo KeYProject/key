@@ -11,9 +11,11 @@
 package de.uka.ilkd.key.proof;
 
 import java.io.StringReader;
+import java.util.Iterator;
 
 import javax.swing.DefaultComboBoxModel;
 
+import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.Recoder2KeY;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
@@ -23,8 +25,6 @@ import de.uka.ilkd.key.parser.ParserMode;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.rule.IfFormulaInstDirect;
 import de.uka.ilkd.key.rule.IfFormulaInstantiation;
-import de.uka.ilkd.key.rule.IteratorOfIfFormulaInstantiation;
-import de.uka.ilkd.key.rule.ListOfIfFormulaInstantiation;
 
 
 public class IfChoiceModel extends DefaultComboBoxModel {
@@ -43,7 +43,7 @@ public class IfChoiceModel extends DefaultComboBoxModel {
 
 
     public IfChoiceModel ( Term                         p_ifFma,
-			   ListOfIfFormulaInstantiation p_candidates,
+			   ImmutableList<IfFormulaInstantiation> p_candidates,
 			   Services                     p_services,
 			   NamespaceSet                 nss,
 			   AbbrevMap                    scm) {
@@ -72,9 +72,9 @@ public class IfChoiceModel extends DefaultComboBoxModel {
     }
     
 
-    public static Object[] createIfInsts ( ListOfIfFormulaInstantiation p_candidates ) {
+    public static Object[] createIfInsts ( ImmutableList<IfFormulaInstantiation> p_candidates ) {
 	Object[]                         res = new Object [ p_candidates.size () ];
-	IteratorOfIfFormulaInstantiation it  = p_candidates.iterator ();
+	Iterator<IfFormulaInstantiation> it  = p_candidates.iterator ();
 	int                              i   = 0;
 
 	while ( it.hasNext () )
@@ -122,14 +122,14 @@ public class IfChoiceModel extends DefaultComboBoxModel {
  	    if (manualInput == null || "".equals(manualInput)) {
 		throw new MissingInstantiationException(
 		    "'\\assumes'-formula: " + 
-		    ProofSaver.printAnything(ifFma, services), pos+1, -1, true);
+		    ProofSaver.printAnything(ifFma, services), pos, -1, true);
 	    }
 
 	    return new IfFormulaInstDirect ( new ConstrainedFormula ( parseFormula(manualInput),
 								      Constraint.BOTTOM ) );
 	} catch (antlr.RecognitionException are) {
  	    throw new SVInstantiationParserException
- 		( manualInput, pos+are.getLine(), are.getColumn(), 
+ 		( manualInput, pos, are.getColumn(), 
 		  "Problem occured parsing a manual input"
  		  + " of an '\\assumes'-sequent.\n" +  are.getMessage(), true);
 	} catch (antlr.ANTLRException e) {

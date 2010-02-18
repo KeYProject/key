@@ -11,12 +11,15 @@
 
 package de.uka.ilkd.key.rule.soundness;
 
+import java.util.Iterator;
+
 import org.apache.log4j.Logger;
 
-import de.uka.ilkd.key.java.ArrayOfStatement;
+import de.uka.ilkd.key.collection.ImmutableArray;
+import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.op.IteratorOfSchemaVariable;
-import de.uka.ilkd.key.logic.op.ListOfIProgramVariable;
+import de.uka.ilkd.key.java.Statement;
+import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.SortedSchemaVariable;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
@@ -41,19 +44,17 @@ public class StatementSkolemBuilder
 		p_services );
     }
 
-    public IteratorOfSkolemSet build () {
-	IteratorOfSchemaVariable it =
-	    getOriginalSkolemSet ().getMissing ().iterator ();
+    public Iterator<SkolemSet> build () {
 
-	while ( it.hasNext () ) {
-	    final SchemaVariable sv = it.next ();
+        for (SchemaVariable schemaVariable : getOriginalSkolemSet().getMissing()) {
+            final SchemaVariable sv = schemaVariable;
 
-	    if ( sv.isProgramSV () &&
-		 ((SortedSchemaVariable)sv).sort () ==
-		     ProgramSVSort.STATEMENT &&
-		 !isInstantiated ( sv ) )
-	        createSkolemStatementSV ( sv );
-	}
+            if (sv.isProgramSV() &&
+                    ((SortedSchemaVariable) sv).sort() ==
+                            ProgramSVSort.STATEMENT &&
+                    !isInstantiated(sv))
+                createSkolemStatementSV(sv);
+        }
 
 	return toIterator
 	    ( getOriginalSkolemSet ()
@@ -77,8 +78,8 @@ public class StatementSkolemBuilder
 
     private ProgramSVProxy
 	createStatementSymbol ( String                 baseName,
-				ListOfIProgramVariable p_pvArgs,
-				ArrayOfStatement       jumpTable) {
+				ImmutableList<IProgramVariable> p_pvArgs,
+				ImmutableArray<Statement>       jumpTable) {
 	final StatementSkolemSymbolFactory f =
 	    new StatementSkolemSymbolFactory ( getServices() );
     

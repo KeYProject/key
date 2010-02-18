@@ -1,3 +1,10 @@
+// This file is part of KeY - Integrated Deductive Software Design
+// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General Public License. 
+// See LICENSE.TXT for details.
 package de.uka.ilkd.key.util.removegenerics;
 
 import java.util.ArrayList;
@@ -9,20 +16,8 @@ import recoder.ProgramFactory;
 import recoder.abstraction.ClassType;
 import recoder.abstraction.Method;
 import recoder.abstraction.Type;
-import recoder.java.Comment;
-import recoder.java.Expression;
-import recoder.java.Identifier;
-import recoder.java.SingleLineComment;
-import recoder.java.Statement;
-import recoder.java.StatementBlock;
-import recoder.java.declaration.ClassDeclaration;
-import recoder.java.declaration.DeclarationSpecifier;
-import recoder.java.declaration.InterfaceDeclaration;
-import recoder.java.declaration.MethodDeclaration;
-import recoder.java.declaration.ParameterDeclaration;
-import recoder.java.declaration.Throws;
-import recoder.java.declaration.TypeDeclaration;
-import recoder.java.declaration.TypeParameterDeclaration;
+import recoder.java.*;
+import recoder.java.declaration.*;
 import recoder.java.expression.operator.TypeCast;
 import recoder.java.reference.MethodReference;
 import recoder.java.reference.TypeReference;

@@ -12,6 +12,10 @@
  */
 package de.uka.ilkd.key.logic;
 
+import java.util.Iterator;
+
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.util.Debug;
 
 
@@ -131,7 +135,7 @@ public class PosInTerm {
      * get subterm/-formula information.  A PosInTerm defining the xn'th
      * subterm of the x(n-1)'th subterm of ... of the x1'th subterm of a
      * term returns an iterator subsequently resulting in the list xn...x1.
-     * @return IteratorOfInteger that iterates through the subterms
+     * @return Iterator<Integer> that iterates through the subterms
      * of a sequent in the reverse order as the PosInTerm has been defined.
      */ 
     public IntIterator reverseIterator() {
@@ -169,16 +173,15 @@ public class PosInTerm {
 	if ("".equals(s)) {
 	    return result;
 	}
-	ListOfInteger list = SLListOfInteger.EMPTY_LIST;
+	ImmutableList<Integer> list = ImmutableSLList.<Integer>nil();
 	java.util.StringTokenizer tker = 
 	    new java.util.StringTokenizer(s, ",", false);
 	while (tker.hasMoreTokens()) 
 	    list = list.prepend(Integer.decode(tker.nextToken()));
 
-	IteratorOfInteger it = list.iterator();
-	while (it.hasNext()) {
-	    result = new PosInTerm(result, it.next().intValue());
-	}
+        for (Integer aList : list) {
+            result = new PosInTerm(result, aList.intValue());
+        }
 
 	return result;       
     }

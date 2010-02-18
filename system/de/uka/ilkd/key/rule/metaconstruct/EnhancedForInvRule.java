@@ -188,10 +188,9 @@ public class EnhancedForInvRule extends AbstractMetaOperator {
         // the loop is an enhanced for loop
         arrayexp = loop.getGuardExpression();
         LocalVariableDeclaration lvd =
-                (LocalVariableDeclaration) loop.getILoopInit().getInits().getLoopInitializer(
-                        0);
+                (LocalVariableDeclaration) loop.getILoopInit().getInits().get(0);
         formalParam =
-                lvd.getVariableSpecifications().getVariableSpecification(0);
+                lvd.getVariableSpecifications().get(0);
 
         returnType = removeWhile.returnType();
     }
@@ -362,7 +361,7 @@ public class EnhancedForInvRule extends AbstractMetaOperator {
         stmnt.add((Statement) w.result());
         StatementBlock s =
                 new StatementBlock(
-                        stmnt.toArray(new Statement[0]));
+                        stmnt.toArray(new Statement[stmnt.size()]));
         Statement resSta;
         if (svInst.getExecutionContext() != null)
             resSta = new MethodFrame(null, svInst.getExecutionContext(), s);
@@ -507,7 +506,7 @@ public class EnhancedForInvRule extends AbstractMetaOperator {
                         addContext(
                                 root,
                                 new StatementBlock(
-                                        breakIfCascade.toArray(new Statement[0]))),
+                                        breakIfCascade.toArray(new Statement[breakIfCascade.size()]))),
                         post);
         return tf.createJunctorTerm(Op.IMP, tf.createEqualityTerm(Op.EQUALS,
                 typeConv.convertToLogicElement(breakFlag),

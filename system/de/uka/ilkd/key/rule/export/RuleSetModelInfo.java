@@ -5,18 +5,11 @@
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
-//
-//
-//This file is part of KeY - Integrated Deductive Software Design 
-//Copyright (C) 2001-2003 Universitaet Karlsruhe, Germany
-//                      and Chalmers University of Technology, Sweden
-//
-//The KeY system is protected by the GNU General Public License.
-//See LICENSE.TXT for details.
-//
 
 package de.uka.ilkd.key.rule.export;
 
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.rule.RuleSet;
 
@@ -26,10 +19,10 @@ public class RuleSetModelInfo extends AbstractTacletContainer {
     private RuleSet ruleSet;
     private String definition;
     private boolean isVirtual;
-    private ListOfRuleSetModelInfo intersectingSets = SLListOfRuleSetModelInfo.EMPTY_LIST;
-    private ListOfRuleSetModelInfo superSets = SLListOfRuleSetModelInfo.EMPTY_LIST;
-    private ListOfRuleSetModelInfo subSets = SLListOfRuleSetModelInfo.EMPTY_LIST;
-    private ListOfRuleSetModelInfo equalSets = SLListOfRuleSetModelInfo.EMPTY_LIST;
+    private ImmutableList<RuleSetModelInfo> intersectingSets = ImmutableSLList.<RuleSetModelInfo>nil();
+    private ImmutableList<RuleSetModelInfo> superSets = ImmutableSLList.<RuleSetModelInfo>nil();
+    private ImmutableList<RuleSetModelInfo> subSets = ImmutableSLList.<RuleSetModelInfo>nil();
+    private ImmutableList<RuleSetModelInfo> equalSets = ImmutableSLList.<RuleSetModelInfo>nil();
     
     public RuleSetModelInfo ( RuleSet ruleSet ) {
         this.ruleSet = ruleSet;
@@ -47,11 +40,11 @@ public class RuleSetModelInfo extends AbstractTacletContainer {
         return ruleSet;
     }
     
-    public ListOfRuleSetModelInfo getSuperSets () {
+    public ImmutableList<RuleSetModelInfo> getSuperSets () {
         return superSets;
     }
     
-    public void setSuperSets ( ListOfRuleSetModelInfo superSets ) {
+    public void setSuperSets ( ImmutableList<RuleSetModelInfo> superSets ) {
         this.superSets = superSets;
     }
     
@@ -59,11 +52,11 @@ public class RuleSetModelInfo extends AbstractTacletContainer {
         superSets = superSets.prepend ( set );
     }
     
-    public ListOfRuleSetModelInfo getEqualSets () {
+    public ImmutableList<RuleSetModelInfo> getEqualSets () {
         return equalSets;
     }
     
-    public void setEqualSets ( ListOfRuleSetModelInfo equalRuleSets ) {
+    public void setEqualSets ( ImmutableList<RuleSetModelInfo> equalRuleSets ) {
         this.equalSets = equalRuleSets;
     }
     
@@ -71,11 +64,11 @@ public class RuleSetModelInfo extends AbstractTacletContainer {
         equalSets = equalSets.prepend ( set );
     }
     
-    public ListOfRuleSetModelInfo getIntersectingSets () {
+    public ImmutableList<RuleSetModelInfo> getIntersectingSets () {
         return intersectingSets;
     }
     
-    public void setIntersectingSets ( ListOfRuleSetModelInfo intersectingRuleSets ) {
+    public void setIntersectingSets ( ImmutableList<RuleSetModelInfo> intersectingRuleSets ) {
         this.intersectingSets = intersectingRuleSets;
     }
     
@@ -83,11 +76,11 @@ public class RuleSetModelInfo extends AbstractTacletContainer {
         intersectingSets = intersectingSets.prepend ( set );
     }
     
-    public ListOfRuleSetModelInfo getSubSets () {
+    public ImmutableList<RuleSetModelInfo> getSubSets () {
         return subSets;
     }
     
-    public void setSubSets ( ListOfRuleSetModelInfo subSets ) {
+    public void setSubSets ( ImmutableList<RuleSetModelInfo> subSets ) {
         this.subSets = subSets;
     }
     

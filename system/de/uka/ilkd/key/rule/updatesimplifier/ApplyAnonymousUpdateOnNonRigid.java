@@ -12,6 +12,7 @@
  */
 package de.uka.ilkd.key.rule.updatesimplifier;
 
+import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.*;
@@ -50,12 +51,12 @@ public class ApplyAnonymousUpdateOnNonRigid extends AbstractUpdateRule {
      * @return the term after pushing the update to the subterms
      */
     private Term pushToSubterms(Update update, Term target, Services services) {
-	Term result = target;
+	Term result;
 	final PropagationResult pr = propagateUpdateToSubterms(update, 
 							       target, 
 							       services);        
 	final Term[] subs = pr.getSimplifiedSubterms();
-	final ArrayOfQuantifiableVariable[] vars = pr.getBoundVariables();
+	final ImmutableArray<QuantifiableVariable>[] vars = pr.getBoundVariables();
              
 	if (pr.hasChanged()) {
 	    result = UpdateSimplifierTermFactory.DEFAULT.getBasicTermFactory().

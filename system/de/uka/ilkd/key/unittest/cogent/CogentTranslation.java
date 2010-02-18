@@ -18,21 +18,21 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.ArraySort;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.proof.decproc.NumberTranslation;
+import de.uka.ilkd.key.smt.NumberTranslation;
 import de.uka.ilkd.key.unittest.ModelGenerator;
 
 public class CogentTranslation{
 
     private Sequent sequent;
 //    private ConstrainedSet cs;
-    private HashMap array2pointer;
+    private HashMap<Term,String> array2pointer;
     private String arrayAxioms = "";
     private String boundaryAxioms = "";
     private int pointerCounter = 0;
 
     public CogentTranslation(Sequent sequent){
 	this.sequent = sequent;
-	array2pointer = new HashMap();
+	array2pointer = new HashMap<Term,String>();
 //	this.cs = cs;
     }
 

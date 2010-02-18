@@ -1,11 +1,14 @@
+// This file is part of KeY - Integrated Deductive Software Design
+// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General Public License. 
+// See LICENSE.TXT for details.
 package de.uka.ilkd.key.rule.metaconstruct;
 
-import de.uka.ilkd.key.java.ArrayOfExpression;
-import de.uka.ilkd.key.java.Expression;
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.Statement;
-import de.uka.ilkd.key.java.StatementBlock;
+import de.uka.ilkd.key.collection.ImmutableArray;
+import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
 import de.uka.ilkd.key.java.declaration.VariableSpecification;
@@ -92,7 +95,7 @@ public class EnhancedForElimination extends ProgramMetaConstruct {
     }
 
     /*
-     * "{ <itinit>; while(<itguard>) <block> } "
+     * "{ ; while(<itguard>) <block> } "
      */
     private ProgramElement makeIterableForLoop(LocalVariableDeclaration lvd,
             Expression expression, Statement body) {
@@ -117,7 +120,7 @@ public class EnhancedForElimination extends ProgramMetaConstruct {
     }
 
     /*
-     * "<update>; <body>"
+     * "; <body>"
      */
     private StatementBlock makeBlock(ProgramElementName itName,
             LocalVariableDeclaration lvd, Statement body) {
@@ -140,13 +143,12 @@ public class EnhancedForElimination extends ProgramMetaConstruct {
         ProgramElementName nextMeth = new ProgramElementName("next");
         ProgramVariable itVar = new LocationVariable(itName, iteratorType);
         MethodReference methodCall =
-                new MethodReference(new ArrayOfExpression(), nextMeth, itVar);
+                new MethodReference(new ImmutableArray<Expression>(), nextMeth, itVar);
 
         //
         // make local variable decl
         VariableSpecification orgSpec =
-                (VariableSpecification) lvd.getVariableSpecifications().getProgramElement(
-                        0);
+                lvd.getVariableSpecifications().get(0);
         VariableSpecification newSpec =
                 new VariableSpecification(orgSpec.getProgramVariable(),
                         methodCall, orgSpec.getType());
@@ -167,7 +169,7 @@ public class EnhancedForElimination extends ProgramMetaConstruct {
         ProgramElementName hasNextMeth = new ProgramElementName("hasNext");
         ProgramVariable itVar = new LocationVariable(itName, iteratorType);
         MethodReference methodCall =
-                new MethodReference(new ArrayOfExpression(), hasNextMeth, itVar);
+                new MethodReference(new ImmutableArray<Expression>(), hasNextMeth, itVar);
 
         return methodCall;
     }
@@ -189,7 +191,7 @@ public class EnhancedForElimination extends ProgramMetaConstruct {
         // expression.iterator();
         MethodName iteratorMeth = new ProgramElementName("iterator");
         Expression methodcall =
-                new MethodReference(new ArrayOfExpression(), iteratorMeth,
+                new MethodReference(new ImmutableArray<Expression>(), iteratorMeth,
                         new ParenthesizedExpression(expression));
 
         //

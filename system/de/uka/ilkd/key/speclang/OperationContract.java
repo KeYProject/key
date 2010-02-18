@@ -7,20 +7,13 @@
 // See LICENSE.TXT for details.
 //
 //
-//This file is part of KeY - Integrated Deductive Software Design
-//Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
-//                      Universitaet Koblenz-Landau, Germany
-//                      Chalmers University of Technology, Sweden
-//
-//The KeY system is protected by the GNU General Public License. 
-//See LICENSE.TXT for details.
-//
-//
 
 package de.uka.ilkd.key.speclang;
 
 import java.util.Map;
 
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
@@ -57,21 +50,21 @@ public interface OperationContract {
      * Returns the precondition of the contract.
      */
     public FormulaWithAxioms getPre(ParsableVariable selfVar, 
-                                    ListOfParsableVariable paramVars,
+                                    ImmutableList<ParsableVariable> paramVars,
                                     Services services);
     
     /**
      * Returns the precondition of the contract.
      */
     public FormulaWithAxioms getPre(Term self, 
-                                    ListOfTerm params,
+                                    ImmutableList<Term> params,
                                     Services services);
     
     /**
      * Returns the precondition of the contract.
      */
     public FormulaWithAxioms getPre(ParsableVariable selfVar, 
-                                    ListOfParsableVariable paramVars,
+                                    ImmutableList<ParsableVariable> paramVars,
                                     Term memoryArea,
                                     Services services);
     
@@ -83,7 +76,7 @@ public interface OperationContract {
      *                       the map.˙
      */
     public FormulaWithAxioms getPost(ParsableVariable selfVar, 
-                                     ListOfParsableVariable paramVars, 
+                                     ImmutableList<ParsableVariable> paramVars, 
                                      ParsableVariable resultVar, 
                                      ParsableVariable excVar,
                                      /*inout*/ Map<Operator, Function/* at pre */> atPreFunctions,
@@ -97,7 +90,7 @@ public interface OperationContract {
      *                       the map.˙
      */
     public FormulaWithAxioms getPost(ParsableVariable selfVar, 
-            ListOfParsableVariable paramVars, 
+            ImmutableList<ParsableVariable> paramVars, 
             ParsableVariable resultVar, 
             ParsableVariable excVar,
             Term memoryArea,
@@ -105,31 +98,31 @@ public interface OperationContract {
             Services services);
     
     public Term getWorkingSpace(Term self, 
-                ListOfTerm params,
+                ImmutableList<Term> params,
                 Services services);
     
     public Term getWorkingSpace(ParsableVariable selfVar, 
-                ListOfParsableVariable paramVars,
+                ImmutableList<ParsableVariable> paramVars,
                 Services services);
     
     public Term getCallerWorkingSpace(ParsableVariable selfVar, 
-            ListOfParsableVariable paramVars,
+            ImmutableList<ParsableVariable> paramVars,
             Services services);
     
     public Term getReentrantWorkingSpace(ParsableVariable selfVar, 
-            ListOfParsableVariable paramVars,
+            ImmutableList<ParsableVariable> paramVars,
             Services services);
     
     public Term getConstructedWorkingSpace(Term self, 
-            ListOfTerm params,
+            ImmutableList<Term> params,
             Services services);
 
     public Term getConstructedWorkingSpace(ParsableVariable selfVar, 
-            ListOfParsableVariable paramVars,
+            ImmutableList<ParsableVariable> paramVars,
             Services services);
     
     public FormulaWithAxioms getWorkingSpacePost(ParsableVariable selfVar, 
-            ListOfParsableVariable paramVars, 
+            ImmutableList<ParsableVariable> paramVars, 
             ParsableVariable resultVar, 
             ParsableVariable excVar,
             /*inout*/ Map<Operator, Function/* at pre */> atPreFunctions,
@@ -138,16 +131,44 @@ public interface OperationContract {
     /**
      * Returns the modifier set of the contract.
      */
-    public SetOfLocationDescriptor getModifies(ParsableVariable selfVar, 
-                                               ListOfParsableVariable paramVars,
+    public ImmutableSet<LocationDescriptor> getModifies(ParsableVariable selfVar, 
+                                               ImmutableList<ParsableVariable> paramVars,
                                                Services services);
     
+
+    /**
+     * Returns the union of this contract and those in the passed array. 
+     * Probably you want to use SpecificationRepository.combineContracts()
+     * instead, which additionally takes care that the combined contract can be 
+     * loaded later.
+     */
+    public OperationContract union(OperationContract[] others, 
+                                   String name, 
+                                   String displayName, 
+                                   Services services);
+    
+    /**
+     * Returns another contract like this one, except that it refers to the 
+     * passed program method.
+     */
+    public OperationContract replaceProgramMethod(ProgramMethod pm,
+	    					  Services services);
+    
+    /**
+     * Returns another contract like this one, except that the passed term
+     * has been added as a precondition.
+     */
+    public OperationContract addPre(FormulaWithAxioms addedPre,
+	    			    ParsableVariable selfVar, 
+                                    ImmutableList<ParsableVariable> paramVars,
+                                    Services services);
+        
     /**
      * Returns the modifier set of the contract.
      */
-    public SetOfLocationDescriptor getModifies(ParsableVariable selfVar, 
+    public ImmutableSet<LocationDescriptor> getModifies(ParsableVariable selfVar, 
                                                Term memoryArea, 
-                                               ListOfParsableVariable paramVars,
+                                               ImmutableList<ParsableVariable> paramVars,
                                                Services services);
     
     /**

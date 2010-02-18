@@ -10,8 +10,9 @@
 
 package de.uka.ilkd.key.logic;
 
-import de.uka.ilkd.key.logic.op.ArrayOfQuantifiableVariable;
+import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.logic.op.IfExThenElse;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 
 
 /**
@@ -19,25 +20,25 @@ import de.uka.ilkd.key.logic.op.IfExThenElse;
  */
 class IfExThenElseTerm extends Term {
   
-    private final ArrayOfTerm subTerm;
+    private final ImmutableArray<Term> subTerm;
 
     /** depth of the term */
     private final int depth;
 
-    private final ArrayOfQuantifiableVariable exVariables;
+    private final ImmutableArray<QuantifiableVariable> exVariables;
     
     public IfExThenElseTerm (IfExThenElse op,
                              Term[] subs,
-                             ArrayOfQuantifiableVariable exVariables) {
+                             ImmutableArray<QuantifiableVariable> exVariables) {
         super ( op, op.sort ( subs ) );
 
         this.exVariables = exVariables;
-        this.subTerm = new ArrayOfTerm ( subs );
+        this.subTerm = new ImmutableArray<Term> ( subs );
         
         int max_depth = -1;
-        for ( int i = 0; i < subs.length; i++ ) {
-            if ( subs[i].depth () > max_depth ) {
-                max_depth = subs[i].depth ();
+        for (Term sub : subs) {
+            if (sub.depth() > max_depth) {
+                max_depth = sub.depth();
             }
         }
         depth = max_depth + 1;
@@ -46,9 +47,9 @@ class IfExThenElseTerm extends Term {
     /* (non-Javadoc)
      * @see de.uka.ilkd.key.logic.Term#varsBoundHere(int)
      */
-    public ArrayOfQuantifiableVariable varsBoundHere (int n) {
+    public ImmutableArray<QuantifiableVariable> varsBoundHere (int n) {
         if ( n == 0 || n == 1 ) return exVariables;
-        return new ArrayOfQuantifiableVariable ();
+        return new ImmutableArray<QuantifiableVariable> ();
     }    
 
     /* (non-Javadoc)
@@ -69,6 +70,6 @@ class IfExThenElseTerm extends Term {
      * @see de.uka.ilkd.key.logic.Term#sub(int)
      */
     public Term sub (int nr) {
-        return subTerm.getTerm ( nr );
+        return subTerm.get ( nr );
     }
 }

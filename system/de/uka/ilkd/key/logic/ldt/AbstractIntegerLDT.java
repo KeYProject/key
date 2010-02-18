@@ -123,6 +123,8 @@ public abstract class AbstractIntegerLDT extends LDT {
     protected final Function inInt;
     protected final Function inLong;
     protected final Function inChar;
+    private Term one;
+    private Term zero;
 
     
     //-------------------------------------------------------------------------
@@ -223,6 +225,11 @@ public abstract class AbstractIntegerLDT extends LDT {
         inInt               = addFunction(functions, "inInt");
         inLong              = addFunction(functions, "inLong");
         inChar              = addFunction(functions, "inChar");
+        
+        
+        // cache often used constants       
+        zero = translateLiteral(new IntLiteral(0));
+        one = translateLiteral(new IntLiteral(1));        
     }
     
     
@@ -461,7 +468,7 @@ public abstract class AbstractIntegerLDT extends LDT {
             identifier = charID;
         }
 
-        String literalString = ""; 
+        String literalString; 
         if (lit instanceof IntLiteral) {
             literalString = ((IntLiteral)lit).getValue();
         } else {
@@ -873,4 +880,13 @@ public abstract class AbstractIntegerLDT extends LDT {
     public Function getJavaUnsignedShiftRightLong() {
         return javaUnsignedShiftRightLong;
     }
+    
+    public Term zero() {	
+	return zero;
+    }
+
+    public Term one() {	
+	return one;
+    }
+
 } 

@@ -13,6 +13,9 @@ package de.uka.ilkd.key.gui;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Point;
+import java.awt.event.ActionEvent;
+import java.util.ArrayList;
+import java.util.Iterator;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -20,6 +23,9 @@ import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 import javax.swing.event.EventListenerList;
 
+import de.uka.ilkd.key.bugdetection.BugDetector;
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 import de.uka.ilkd.key.gui.notification.events.ProofClosedNotificationEvent;
@@ -34,6 +40,9 @@ import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.mgt.GlobalProofMgt;
 import de.uka.ilkd.key.proof.reuse.ReusePoint;
 import de.uka.ilkd.key.rule.*;
+import de.uka.ilkd.key.rule.updatesimplifier.ApplyOnModality;
+import de.uka.ilkd.key.strategy.feature.AbstractBetaFeature;
+import de.uka.ilkd.key.strategy.feature.IfThenElseMalusFeature;
 import de.uka.ilkd.key.unittest.UnitTestBuilder;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.KeYExceptionHandler;
@@ -53,9 +62,6 @@ public class KeYMediator {
 
     /** the notation info used to print sequents */
     private final NotationInfo notationInfo;
-
-    /** the proof the mediator handles with */
-    private Proof proof;
 
     /** listenerList with to gui listeners */
     private EventListenerList listenerList = new EventListenerList();
@@ -77,6 +83,8 @@ public class KeYMediator {
 
     private boolean autoMode; // autoModeStarted has been fired
     
+    private ArrayList<InterruptListener> interruptListener = new ArrayList<InterruptListener>();
+    
     /** creates the KeYMediator with a reference to the application's
      * main frame and the current proof settings
     */
@@ -94,6 +102,20 @@ public class KeYMediator {
 	defaultExceptionHandler = new KeYRecoderExcHandler();
     }
 
+    public void addinterruptListener(InterruptListener il) {
+	this.interruptListener.add(il);
+    }
+    
+    public void removeInterruptListener(InterruptListener il) {
+	this.interruptListener.remove(il);
+    }
+    
+    public void interrupted(ActionEvent e) {
+	for (InterruptListener il : interruptListener) {
+	    il.interruptionPerformed(e);
+	}
+    }
+    
     /** returns the used NotationInfo
      * @return the used NotationInfo
      */
@@ -193,14 +215,6 @@ public class KeYMediator {
 	    return getProof ().getMetavariableDeliverer ();
     }
 
-//     /** returns the proof settings
-//      * @return  the proof settings
-//      */
-//     public ProofSettings proofSettings() {
-// 	return proofSettings;
-//     }
-   
-
     /** simplified user interface? */
     public boolean stupidMode() {
        return stupidMode;
@@ -211,7 +225,7 @@ public class KeYMediator {
     }
 
     public boolean ensureProofLoadedSilent() {
-	return proof != null;
+	return getProof() != null;
     }
 
     public boolean ensureProofLoaded() {
@@ -233,19 +247,38 @@ public class KeYMediator {
 
     public void setBack(Node node) {
 	if (ensureProofLoaded()) {
-	    if (!proof.setBack(node)) {
-		popupWarning("Setting back at the chosen node is not possible.",
-			     "Oops...");	    
+	    if (getProof().setBack(node)) {
+                finishSetBack();
+	    }else{
+                popupWarning("Setting back at the chosen node is not possible.",
+                "Oops...");            
 	    }
 	}
     }    
     
     public void setBack(Goal goal) {
 	if (ensureProofLoaded()) {
-	    if (proof == null || !proof.setBack(goal))
-		popupWarning("Setting back the current goal is not possible.", 
-			     "Oops...");
+	    if (getProof() != null && getProof().setBack(goal)){
+                finishSetBack();
+	    }else{
+                popupWarning("Setting back the current goal is not possible.", 
+                "Oops...");
+	    }
 	}
+    }
+    private void finishSetBack(){
+        TermTacletAppIndexCacheSet.clearCache();
+        ApplyOnModality.clearCache();
+        TermFactory.clearCache();
+        AbstractBetaFeature.clearCache();
+        IfThenElseMalusFeature.clearCache();
+        
+        System.gc();//Runs Garbagecolletor
+        System.runFinalization();
+        if(MethodCallInfo.MethodCallCounterOn){
+            System.out.println(MethodCallInfo.Local.toString());
+            MethodCallInfo.Local.reset();
+        }
     }
 
     
@@ -257,9 +290,21 @@ public class KeYMediator {
     }
 
     public void testCaseConfirmation(String path){
-	JOptionPane.showMessageDialog(
-	    null, "A unittest was generated and written to "+path,
-	    "Unittest generated", JOptionPane.INFORMATION_MESSAGE);
+	TestExecutionDialog.addTest(path, null, null);
+	int n=JOptionPane.NO_OPTION;
+	if(Main.isVisibleMode() || Main.testStandalone){
+	n = JOptionPane.showConfirmDialog(
+		 Main.getInstance(),
+		"A unittest was generated and written to \n"+path+
+		"\nDo you want to compile and execute the test now?",
+		    "Unittest generated",
+		    JOptionPane.YES_NO_OPTION);
+	}
+	if(n==JOptionPane.YES_OPTION){
+	    TestExecutionDialog ted = TestExecutionDialog.getInstance(Main.getInstance());
+	    ted.setVisible(true);
+	}
+	
     }
     
     public void testCaseConfirmation(String path, int coverage){
@@ -276,6 +321,17 @@ public class KeYMediator {
 	    try {
 		testCaseConfirmation(
 		    testBuilder.createTestForNode(getSelectedNode()));
+	    } catch(Exception e){
+		new ExceptionDialog(mainFrame(), e);
+	    }
+	}
+    }
+
+    public void bugDetectionForSelectedNode(){
+	if (ensureProofLoaded()) {
+	    BugDetector bugDetector = new BugDetector();
+	    try {
+		bugDetector.run(getSelectedNode());
 	    } catch(Exception e){
 		new ExceptionDialog(mainFrame(), e);
 	    }
@@ -299,11 +355,11 @@ public class KeYMediator {
 
 
     private void setProofHelper(Proof p) {
-	if (proof != null) {
-	    proof.removeProofTreeListener(proofTreeListener);
+	if (getProof() != null) {
+	    getProof().removeProofTreeListener(proofTreeListener);
 	}
 	if (p!=null) notationInfo.setAbbrevMap(p.abbreviations());
-	proof = p;
+	Proof proof = p;
 	if (proof != null) {
 	    proof.addProofTreeListener(proofTreeListener);
 	    proof.mgt().setMediator(this);
@@ -321,8 +377,9 @@ public class KeYMediator {
     }
 
 
+    /** the proof the mediator handles with */
     public Proof getProof() {
-	return proof;
+	return keySelectionModel.getSelectedProof();
     }
     
 
@@ -331,8 +388,8 @@ public class KeYMediator {
      * @param steps an int setting the limit
      */
     public void setMaxAutomaticSteps(int steps) {
-       if (proof != null) {
-           proof.getSettings().getStrategySettings().setMaxSteps(steps);
+       if (getProof() != null) {
+           getProof().getSettings().getStrategySettings().setMaxSteps(steps);
        }
        ProofSettings.DEFAULT_SETTINGS.getStrategySettings().setMaxSteps(steps);
     }
@@ -343,20 +400,20 @@ public class KeYMediator {
      * automatic mode
      */
     public int getMaxAutomaticSteps() {
-        if (proof != null) {
-            return proof.getSettings().getStrategySettings().getMaxSteps();
+        if (getProof() != null) {
+            return getProof().getSettings().getStrategySettings().getMaxSteps();
         } else {
             return ProofSettings.DEFAULT_SETTINGS.getStrategySettings().getMaxSteps();
         }
     }
 
-    public SetOfTacletApp getTacletApplications(Goal g, String name,
+    public ImmutableSet<TacletApp> getTacletApplications(Goal g, String name,
                                                 PosInOccurrence p) {
        return interactiveProver.getAppsForName(g, name, p);
     }
 
 
-    public SetOfTacletApp getTacletApplications(Goal            goal, 
+    public ImmutableSet<TacletApp> getTacletApplications(Goal            goal, 
 						String          name,
                                                 PosInOccurrence pos,
                                                 TacletFilter    filter) {
@@ -371,9 +428,9 @@ public class KeYMediator {
      * @param pos
      * 				the position in the sequent where the BuiltInRule should be applied
      * @return
-     * 				a SetOfRuleApp with all possible applications of the rule
+     * 				a SetOf<RuleApp> with all possible applications of the rule
      */
-    public SetOfRuleApp getBuiltInRuleApplications(String name, PosInOccurrence pos)
+    public ImmutableSet<RuleApp> getBuiltInRuleApplications(String name, PosInOccurrence pos)
     {
     	return interactiveProver.getBuiltInRuleAppsForName(name, pos);
     }
@@ -393,7 +450,7 @@ public class KeYMediator {
 
     public boolean selectedTaclet(Taclet taclet, Goal goal, 
 				  PosInOccurrence pos) {
-	SetOfTacletApp applics = 
+	ImmutableSet<TacletApp> applics = 
            getTacletApplications(goal, taclet.name().toString(), pos);
         if (applics.size() == 0) {
 	   JOptionPane.showMessageDialog(mainFrame(), "Taclet application failed." 
@@ -401,13 +458,13 @@ public class KeYMediator {
 					 JOptionPane.ERROR_MESSAGE);
            return false;
         }
-	IteratorOfTacletApp it = applics.iterator();	
+	Iterator<TacletApp> it = applics.iterator();	
 	if (applics.size() == 1) {
 	    TacletApp firstApp = it.next();
             boolean ifSeqInteraction = 
-               firstApp.taclet().ifSequent() != Sequent.EMPTY_SEQUENT ;
+               !firstApp.taclet().ifSequent().isEmpty() ;
             if (stupidMode && !firstApp.complete()) {                
-                ListOfTacletApp ifSeqCandidates =
+                ImmutableList<TacletApp> ifSeqCandidates =
                     firstApp.findIfFormulaInstantiations(goal.sequent(),
 		        getServices(),
                         getUserConstraint().getConstraint());
@@ -458,7 +515,7 @@ public class KeYMediator {
 	Goal goal = keySelectionModel.getSelectedGoal();
 	assert goal != null;
 
-	SetOfRuleApp set = interactiveProver.
+	ImmutableSet<RuleApp> set = interactiveProver.
 	    getBuiltInRuleApp(rule, pos, getUserConstraint().getConstraint());
 	if (set.size() > 1) {
 	    System.err.println("keymediator:: Expected a single app. If " +
@@ -472,8 +529,7 @@ public class KeYMediator {
 	RuleApp app = set.iterator().next();
 	if (app != null && app.rule() == rule) {
 	    goal.apply(app);
-	    return;
-	}
+	    }
     }
      
     /**
@@ -530,23 +586,25 @@ public class KeYMediator {
                 final Goal currGoal = reusePoint.target(); // check proof!!!
                 assert currGoal != null : 
                     "Cannot apply this here. Forgot to unregister listener?";
-                final ReuseListener hook = getReuseListener();
-                hook.removeRPConsumedMarker(reusePoint.source());
+                final ReuseListener local_hook = getReuseListener();
+                local_hook.removeRPConsumedMarker(reusePoint.source());
                 RuleApp app = reusePoint.getReuseApp();
                 if (reusePoint.source() != changeWish) {
                     currGoal.node().setReuseSource(reusePoint);
-                    hook.removeRPConsumedGoal(currGoal);
-                    ListOfGoal goalList = currGoal.apply(app);
-                    hook.addRPOldMarkersNewGoals(goalList);
-                    hook.addRPNewMarkersAllGoals(reusePoint.source());
-                    reuseStarted = hook.reusePossible();
+                    local_hook.removeRPConsumedGoal(currGoal);
+                    getProof().getServices().getNameRecorder().setProposals(
+                            reusePoint.getNameProposals());
+                    ImmutableList<Goal> goalList = currGoal.apply(app);
+                    local_hook.addRPOldMarkersNewGoals(goalList);
+                    local_hook.addRPNewMarkersAllGoals(reusePoint.source());
+                    reuseStarted = local_hook.reusePossible();
                 } else {
                     // InteractiveProver will do the other 2 bookkeeping
                     reuseStarted=false;
                     changeWish=null;
-                    hook.addRPNewMarkersAllGoals(reusePoint.source());
+                    local_hook.addRPNewMarkersAllGoals(reusePoint.source());
                 }
-                hook.showState();
+                local_hook.showState();
                 if (reuseStarted) {
                     reusePoint = getReuseListener().getBestReusePoint();
                     if (!continuousReuse) {
@@ -609,7 +667,7 @@ public class KeYMediator {
      * @return a list of Taclets with all applicable FindTaclets
      */
 
-    public ListOfTacletApp getFindTaclet(PosInSequent pos) {
+    public ImmutableList<TacletApp> getFindTaclet(PosInSequent pos) {
     	return interactiveProver.getFindTaclet(pos);
     }
 
@@ -617,7 +675,7 @@ public class KeYMediator {
      * (called by the SequentViewer)
      * @return a list of Taclets with all applicable RewriteTaclets
      */
-    public ListOfTacletApp getRewriteTaclet(PosInSequent pos) {
+    public ImmutableList<TacletApp> getRewriteTaclet(PosInSequent pos) {
     	return interactiveProver.getRewriteTaclet(pos);    
     }
 
@@ -625,14 +683,14 @@ public class KeYMediator {
      * (called by the SequentViewer)
      * @return a list of Taclets with all applicable NoFindTaclets
      */
-    public ListOfTacletApp getNoFindTaclet() {	
+    public ImmutableList<TacletApp> getNoFindTaclet() {	
     	return interactiveProver.getNoFindTaclet();
     }
 
     /** collects all built-in rules 
      * @return a list of all applicable built-in rules 
      */
-    public ListOfBuiltInRule getBuiltInRule(PosInOccurrence pos) {
+    public ImmutableList<BuiltInRule> getBuiltInRule(PosInOccurrence pos) {
 	return interactiveProver.getBuiltInRule
 	    (pos, getUserConstraint().getConstraint());
     }
@@ -758,7 +816,7 @@ public class KeYMediator {
     /** sets the simultaneous update simplifier */
     public void setSimplifier(UpdateSimplifier s) {
 	upd_simplifier = s;
-	if (proof != null) proof.setSimplifier(s);
+	if (getProof() != null) getProof().setSimplifier(s);
     }
    
   
@@ -795,7 +853,7 @@ public class KeYMediator {
      */
     public void startAutoMode() {
 	if (ensureProofLoaded()) {
-	    startAutoMode(proof.openGoals());
+	    startAutoMode(getProof().openEnabledGoals());
 	}
     }
 
@@ -803,7 +861,7 @@ public class KeYMediator {
      * Start automatic application of rules on specified goals.
      * @param goals
      */
-    public void startAutoMode(ListOfGoal goals) {
+    public void startAutoMode(ImmutableList<Goal> goals) {
        interactiveProver.startAutoMode(goals);
     }
 
@@ -824,11 +882,11 @@ public class KeYMediator {
      */
     public void setInteractive ( boolean b ) {
         interactiveProver.setInteractive ( b );
-        if (proof != null) {
+        if (getProof() != null) {
             if ( b  ) {
-                proof.setRuleAppIndexToInteractiveMode ();
+                getProof().setRuleAppIndexToInteractiveMode ();
             } else {
-                proof.setRuleAppIndexToAutoMode ();
+                getProof().setRuleAppIndexToAutoMode ();
             }
         }
     }
@@ -922,7 +980,7 @@ public class KeYMediator {
       final boolean b = fullStop;
       Runnable interfaceSignaller = new Runnable() {
          public void run() {
-	     if (mainFrame() instanceof JFrame) mainFrame().setCursor
+	     if (mainFrame() != null) mainFrame().setCursor
 		 (new java.awt.Cursor(java.awt.Cursor.WAIT_CURSOR));
             if (b) {
                interactiveProver.fireAutoModeStarted(
@@ -939,7 +997,7 @@ public class KeYMediator {
          public void run() {
             if ( b )
                interactiveProver.fireAutoModeStopped (new ProofEvent(getProof()));
-            if (mainFrame() instanceof JFrame) mainFrame().setCursor
+            if (mainFrame() != null) mainFrame().setCursor
 		(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
             if (getProof() != null)
                 keySelectionModel.fireSelectedProofChanged();
@@ -991,7 +1049,7 @@ public class KeYMediator {
 	}
     
 	public void proofGoalsAdded(ProofTreeEvent e) {
-	    ListOfGoal newGoals = e.getGoals();
+	    ImmutableList<Goal> newGoals = e.getGoals();
 	    // Check for a closed goal ...
 	    if (newGoals.size() == 0){
 		// No new goals have been generated ...
@@ -1000,10 +1058,11 @@ public class KeYMediator {
 	}
 
 	public void proofStructureChanged(ProofTreeEvent e) {
+	    if (autoMode()) return;
 	    Proof p = e.getSource();
 	    if (p == getSelectedProof()) {
 		Node sel_node = getSelectedNode();
-		if (!(p.find(sel_node))) {
+		if (!p.find(sel_node)) {
 		    keySelectionModel.defaultSelection();
 		} else {
 		    // %%% hack does need to be done proper
@@ -1023,6 +1082,7 @@ public class KeYMediator {
         
 	/** invoked when a rule has been applied */
 	public void ruleApplied(ProofEvent e) {
+	    if (autoMode()) return;
 	    if (e.getSource() == getProof()) {
 	        keySelectionModel.defaultSelection();
 	    }
@@ -1033,7 +1093,7 @@ public class KeYMediator {
 	 */
 	public void autoModeStarted(ProofEvent e) {
               autoMode = true;
-              selectedBeforeAutoMode = getSelectedNode();
+              selectedBeforeAutoMode = getSelectedNode(); 
 //            if (proof == null) return; // there is no selection or anything
 	}
 	
@@ -1041,14 +1101,16 @@ public class KeYMediator {
 	 */
 	public void autoModeStopped(ProofEvent e) {
             autoMode = false;
-            if (proof == null) return; // there is no selection or anything
-	    if (selectedBeforeAutoMode != null) {
+            if (getProof() != null) {
+                if (selectedBeforeAutoMode!=null) {
 //XXX%%%%% This is way too slow for big proofs! 
                 // XXX Could you please check if it is still to slow?
-	        keySelectionModel.nearestOpenGoalSelection(selectedBeforeAutoMode);
-            } else {
-                keySelectionModel.defaultSelection();
+                    keySelectionModel.nearestOpenGoalSelection(selectedBeforeAutoMode);
+                } else {
+                    keySelectionModel.defaultSelection();
+                }
             }
+            selectedBeforeAutoMode = null; //Important to prevent memory leaking	    
 	}
     }
 
@@ -1063,8 +1125,6 @@ public class KeYMediator {
 	 */ 
 	public void selectedProofChanged(KeYSelectionEvent e) {
 	    setProof(e.getSource().getSelectedProof());
-	    //should be obsolete...
-	    //ProofSettings.DEFAULT_SETTINGS.setLDTSettings(proof.getLDTSettings());
 	}
 	
     }
@@ -1097,7 +1157,7 @@ public class KeYMediator {
      * @return the time in ms after which automatic rule application stops
      */
     public long getAutomaticApplicationTimeout() {      
-        if (proof != null) {
+        if (getProof() != null) {
             return getProof().getSettings().getStrategySettings().getTimeout();
         } else {
             return ProofSettings.DEFAULT_SETTINGS.getStrategySettings().getTimeout();
@@ -1109,12 +1169,14 @@ public class KeYMediator {
      * @param timeout a long specifying the timeout time in ms
      */
     public void setAutomaticApplicationTimeout(long timeout) {
-       if (proof != null) {
-           proof.getSettings().getStrategySettings().setTimeout(timeout);
+       if (getProof() != null) {
+           getProof().getSettings().getStrategySettings().setTimeout(timeout);
        }
        ProofSettings.DEFAULT_SETTINGS.getStrategySettings().setTimeout(timeout);
     }
 
+    
+    
     /** 
      * returns the prover task listener of the main frame
      */

@@ -10,13 +10,14 @@
 
 package de.uka.ilkd.key.rule.metaconstruct;
 
+import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.AbstractMetaOperator;
-import de.uka.ilkd.key.logic.op.ArrayOfLocation;
+import de.uka.ilkd.key.logic.op.Location;
 import de.uka.ilkd.key.logic.op.NRFunctionWithExplicitDependencies;
 import de.uka.ilkd.key.logic.op.Op;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -47,9 +48,9 @@ public class Universes extends AbstractMetaOperator {
         NRFunctionWithExplicitDependencies phiOp 
                 = (NRFunctionWithExplicitDependencies) phiTerm.op();
         Debug.assertTrue(phiOp.getNumPartitions() == 3);
-        ArrayOfLocation R = phiOp.getDependencies(0);
-        ArrayOfLocation P = phiOp.getDependencies(1);
-        ArrayOfLocation F = phiOp.getDependencies(2);
+        ImmutableArray<Location> R = phiOp.getDependencies(0);
+        ImmutableArray<Location> P = phiOp.getDependencies(1);
+        ImmutableArray<Location> F = phiOp.getDependencies(2);
         Debug.assertTrue(R != null && P != null && F != null);
                 
         //perform analysis

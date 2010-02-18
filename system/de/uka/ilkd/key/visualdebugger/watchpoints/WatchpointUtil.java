@@ -1,3 +1,10 @@
+// This file is part of KeY - Integrated Deductive Software Design
+// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General Public License. 
+// See LICENSE.TXT for details.
 package de.uka.ilkd.key.visualdebugger.watchpoints;
 
 import java.lang.reflect.InvocationTargetException;
@@ -6,10 +13,10 @@ import java.util.Map.Entry;
 
 import javax.swing.SwingUtilities;
 
+import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.proof.IteratorOfNode;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.InitConfig;
@@ -66,6 +73,8 @@ public class WatchpointUtil {
                     if (WatchpointUtil.evalutateWatchpoint(node, watchpoint,
                             node.sequent(), pos, node.proof(), 250, watchpoints)) {
                         temp.add(watchpoint);
+                        System.out.println("wp true in subset");
+                        etn.addWatchpointTrueInSubset(watchpoint);
                     }
                 }
             }
@@ -92,7 +101,7 @@ public class WatchpointUtil {
      */
     private static PosInOccurrence findPos(Semisequent seq) {
 
-        IteratorOfConstrainedFormula iter = seq.iterator();
+        Iterator<ConstrainedFormula> iter = seq.iterator();
         ConstrainedFormula constrainedFormula;
         PosInOccurrence pos = null;
         Term term;
@@ -156,22 +165,17 @@ public class WatchpointUtil {
      * 
      * @return the hash set< node>
      */
-    private static HashSet<Node> findLeaves(Node currentNode,
+    private static boolean hasChildrenInSet(Node currentNode,
             List<Node> proofnodes) {
 
-        HashSet<Node> result = new HashSet<Node>(3);
-        IteratorOfNode iter = currentNode.childrenIterator();
+        Iterator<Node> iter = currentNode.childrenIterator();
         while (iter.hasNext()) {
             Node child = (Node) iter.next();
             if (proofnodes.contains(child)) {
-                proofnodes.remove(child);
-                result.addAll(findLeaves(child, proofnodes));
+               return true;
             }
         }
-        if (result.isEmpty()) {
-            result.add(currentNode);
-        }
-        return result;
+        return false;
     }
 
     /**
@@ -193,45 +197,26 @@ public class WatchpointUtil {
             Sequent seq, PosInOccurrence pos, Proof proof, int maxsteps,
             List<WatchPoint> watchpoints) {
 
+        System.out.println(watchpoint.getRawTerm());
         if(!watchpoint.isEnabled()) return false;
-        Term wp = watchpoint.getWatchpointAsTerm();
-
+        VariableNameTracker vnt = new VariableNameTracker(node, watchpoints);
+        vnt.start();
+        if(watchpoint.isLocal() && !vnt.getActiveMethod().equals(watchpoint.getProgramMethod())) return false;
+       
         TermBuilder tb = TermBuilder.DF;
         UpdateFactory updateFactory = new UpdateFactory(proof.getServices(),
                 proof.simplifier());
 
         LinkedList<Update> updates = new LinkedList<Update>();
 
-        // start tracking names if necessary
-        if (watchpoint.getLocalVariables() != null
-                && watchpoint.getLocalVariables().size() > 0) {
-            VariableNameTracker vnt = new VariableNameTracker(node, watchpoints);
-            vnt.start();
-            updates.add(buildNameUpdates(updateFactory, vnt.result()));
-            updates.add(updateSelfVar(updateFactory, watchpoint, vnt
-                    .getSelfVar()));
-        } else {
-            LogicVariable lv = new LogicVariable(new Name(watchpoint.getSelf()
-                    .name()+ "_lv"), watchpoint.getSelf().getKeYJavaType().getSort());
-
-            watchpoint.setWatchpointTerm(updateFactory.prepend(updateFactory
-                    .elementaryUpdate(
-                            TermFactory.DEFAULT.createVariableTerm(watchpoint.getSelf()),
-                            TermFactory.DEFAULT.createVariableTerm(lv)),watchpoint.getWatchpointAsTerm()));
-            
-            wp = watchpoint.getWatchpointAsTerm();
-            // quantify according to users decision
-            if (watchpoint.getFlavor() == ALL) {
-                watchpoint.setWatchpointTerm(tb.all(lv, wp));
-            } else {
-                watchpoint.setWatchpointTerm(tb.ex(lv, wp));
-            }
-        }
-        wp = watchpoint.getWatchpointAsTerm();
+        composeWatchpointTerm(node, watchpoint, vnt, tb, updateFactory, updates);
+        
+        Term wp = watchpoint.getComposedTerm();
         updates.addAll(collectUpdates(pos));
         for (Update update : updates) {
             wp = updateFactory.prepend(update, wp);
         }
+        System.out.println("++++++ starting side proof with watchpoint: "+wp);
         boolean result = startSideProof(seq, pos, proof, maxsteps, wp);
         if (!watchpoint.testPossible()) {
             return result;
@@ -241,7 +226,44 @@ public class WatchpointUtil {
             wp = tb.not(wp);
             return !startSideProof(seq, pos, proof, maxsteps, wp);
         }
+    }
 
+    /**
+     * @param node
+     * @param watchpoint
+     * @param tb
+     * @param updateFactory
+     * @param updates
+     */
+    private static void composeWatchpointTerm(Node node, WatchPoint watchpoint,
+            VariableNameTracker vnt, TermBuilder tb,
+            UpdateFactory updateFactory, LinkedList<Update> updates) {
+        
+        Term wp;
+        // start tracking names if necessary (local watchpoints)
+        if (watchpoint.isLocal()) {
+
+            updates.add(buildNameUpdates(updateFactory, vnt.result()));
+            updates.add(updateSelfVar(updateFactory, watchpoint, vnt
+                    .getSelfVar()));
+            watchpoint.setComposedTerm(watchpoint.getRawTerm());
+        } else {
+            LogicVariable lv = new LogicVariable(new Name(watchpoint.getSelf()
+                    .name()+ "_lv"), watchpoint.getSelf().getKeYJavaType().getSort());
+            //update self variable
+            watchpoint.setComposedTerm(updateFactory.prepend(updateFactory
+                    .elementaryUpdate(
+                            TermFactory.DEFAULT.createVariableTerm(watchpoint.getSelf()),
+                            TermFactory.DEFAULT.createVariableTerm(lv)),watchpoint.getRawTerm()));
+            
+            wp = watchpoint.getComposedTerm();
+            // quantify term
+            if (watchpoint.getFlavor() == ALL) {
+                watchpoint.setComposedTerm(tb.all(lv, wp));
+            } else {
+                watchpoint.setComposedTerm(tb.ex(lv, wp));
+            }
+        }
     }
 
     /**
@@ -280,7 +302,7 @@ public class WatchpointUtil {
     }
 
     /**
-     * updateSelfVar updates the self variable of a local watchpoint 
+     * updateSelfVar updates the self variable of a local watchpoint.
      * 
      * @param uf
      * @param watchpoint
@@ -364,27 +386,26 @@ public class WatchpointUtil {
                 .toArray()[0];
                 return WatchpointUtil.evalutateWatchpoint(node, wp, seq, pos, proof, maxsteps, watchpoints);
             }
-            // start tracking names if necessary
-            if (WatchPointManager.existsWatchPointContainingLocals()) {
 
-                VariableNameTracker vnt = new VariableNameTracker(node, watchpoints);
-                vnt.start();
-                updates.add(
-                        buildNameUpdates(updateFactory,vnt.result()));
+            VariableNameTracker vnt = new VariableNameTracker(node,
+                    watchpoints);           
+            for (WatchPoint wp : watchpoints) {
+                if(wp.isEnabled()) {
+                    composeWatchpointTerm(node, wp, vnt, TermBuilder.DF, updateFactory, updates);
+                }
             }
-
             updates.addAll(collectUpdates(pos));
 
             final TermFactory tf = TermFactory.DEFAULT;
             Iterator<WatchPoint> iter = watchpoints.iterator();
 
             Term watchpoint = (Op.OR == junctor ? tf.createJunctorTerm(junctor,
-                    ((WatchPoint)iter.next()).getWatchpointAsTerm(), tf.createJunctorTerm(Op.FALSE)) : tf
-                    .createJunctorTerm(junctor, ((WatchPoint)iter.next()).getWatchpointAsTerm(), tf
+                    ((WatchPoint)iter.next()).getComposedTerm(), tf.createJunctorTerm(Op.FALSE)) : tf
+                    .createJunctorTerm(junctor, ((WatchPoint)iter.next()).getComposedTerm(), tf
                             .createJunctorTerm(Op.TRUE)));
 
             while (iter.hasNext()) {
-                watchpoint = tf.createJunctorTerm(junctor, ((WatchPoint)iter.next()).getWatchpointAsTerm(),
+                watchpoint = tf.createJunctorTerm(junctor, ((WatchPoint)iter.next()).getComposedTerm(),
                         watchpoint);
             }
             if (negateJunctor) {
@@ -490,7 +511,7 @@ public class WatchpointUtil {
         assert nodes != null : "The parameter Node[] (proof)nodes was null / in getLeafNodesInETNode()/ in WatchpointUtil!";
         assert nodes.length != 0 : "No nodes contained in the passed Array /in getLeafNodesInETNode() / in WatchpointUtil!";
         // create a collection from the array -> type conversion
-        // since getProofTreeNodes() only returns a ListOfNode which
+        // since getProofTreeNodes() only returns a IList<Node> which
         // does not implement the Collection interface
 
         // handle simple case
@@ -499,24 +520,29 @@ public class WatchpointUtil {
             theNode.add(nodes[0]);
             return theNode;
         }
+
         List<Node> proofnodes = new LinkedList<Node>(Arrays.asList(nodes));
         // not more than 4 children expected
         final int INITIALCAPACITY = 4;
-        HashSet<Node> candidates = new HashSet<Node>(INITIALCAPACITY);
+        HashSet<Node> result = new HashSet<Node>(INITIALCAPACITY);
+        
         while (!proofnodes.isEmpty()) {
 
             Node currentNode = proofnodes.get(0);
             proofnodes.remove(currentNode);
+            
+            if(!hasChildrenInSet(currentNode, proofnodes)){
+                result.add(currentNode);
+            }
             Node parentNode = currentNode.parent();
             while (parentNode != null && proofnodes.contains(parentNode)) {
                 proofnodes.remove(parentNode);
                 parentNode = parentNode.parent();
 
             }
-            candidates.addAll(findLeaves(currentNode, proofnodes));
         }
-        System.out.println("candiates.size: " + candidates.size());
-        return candidates;
+        System.out.println("result.size: " + result.size());
+        return result;
     }
 
     /**
@@ -532,8 +558,10 @@ public class WatchpointUtil {
         try {
             for (ETNode node : nodes) {
 
-                HashSet<Node> leafNodesInETNode = getLeafNodesInETNode(node
-                        .getProofTreeNodes().toArray());
+                final ImmutableList<Node> proofTreeNodes = node
+                        .getProofTreeNodes();
+		HashSet<Node> leafNodesInETNode = getLeafNodesInETNode(proofTreeNodes.
+			toArray(new Node[proofTreeNodes.size()]));
 
                 node.setWatchpoint(satisfiesWatchpoint(
                         leafNodesInETNode, watchpoints, node));
@@ -544,7 +572,8 @@ public class WatchpointUtil {
     }
 
     /**
-     * Gets the executiontree as list.
+     * Gets the executiontree as list. The method works top-down, 
+     * so pass the root node of the (sub) tree you need as list.
      * 
      * @param etn the ETNode containing the current ET
      * 
@@ -564,6 +593,7 @@ public class WatchpointUtil {
 
     /**
      * Value to key.
+     * Swaps the values of the given map to its keys.
      * 
      * @param map the map
      * 
@@ -573,10 +603,8 @@ public class WatchpointUtil {
             Map<SourceElement, Integer> map) {
 
         HashMap<Integer, SourceElement> newHashMap = new HashMap<Integer, SourceElement>();
-        Iterator<Entry<SourceElement, Integer>> it = map.entrySet().iterator();
-        while (it.hasNext()) {
-            Entry<SourceElement, Integer> entry = (Entry<SourceElement, Integer>) it
-            .next();
+        for (Object o : map.entrySet()) {
+            Entry<SourceElement, Integer> entry = (Entry<SourceElement, Integer>) (Map.Entry<SourceElement, Integer>) o;
             newHashMap.put(entry.getValue(), entry.getKey());
 
         }
@@ -595,11 +623,11 @@ public class WatchpointUtil {
      * @return the update
      */
     private static Update buildNameUpdates(UpdateFactory uf,
-            Map<ProgramMethod, ListOfRenamingTable> nameMaps) {
+            Map<ProgramMethod, ImmutableList<RenamingTable>> nameMaps) {
 
         List<Update> nameUpdates = new LinkedList<Update>();
         System.out.println(nameMaps);
-        for (ListOfRenamingTable lort : nameMaps.values()) {
+        for (ImmutableList<RenamingTable> lort : nameMaps.values()) {
 
             if(!lort.isEmpty()){
                 RenamingTable lastRT = lort.head();

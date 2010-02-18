@@ -4124,6 +4124,26 @@ RKeYMetaConstruct KeYMetaConstructStatement() :
 }
    )
      |
+     (
+   "#unwind-loop-bounded" "(" 
+   (innerLabel = JumpLabelSV() "," outerLabel = JumpLabelSV() ","
+      (  loopStat = WhileStatement()
+       | loopStat = ForStatement()
+       | loopStat = DoStatement()
+      )
+    )
+   ")" ";"
+{
+    result = factory.createRKeYMetaConstruct(); //chrisg
+    setPrefixInfo(result);
+    result.setChild(loopStat);
+    result.addSV(innerLabel);
+    result.addSV(outerLabel);
+    result.setName("#unwind-loop-bounded");
+    return result;
+}
+   )
+     |
    (
     <UNPACK> "(" 
     ( loopStat=ForStatement() )

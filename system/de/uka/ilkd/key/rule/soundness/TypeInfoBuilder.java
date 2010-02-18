@@ -11,11 +11,16 @@
 
 package de.uka.ilkd.key.rule.soundness;
 
+import java.util.Iterator;
+
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.IteratorOfKeYJavaType;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.op.IProgramVariable;
+import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.inst.ProgramSkolemInstantiation;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.ExtList;
@@ -28,7 +33,7 @@ import de.uka.ilkd.key.util.ExtList;
 public class TypeInfoBuilder extends AbstractSkolemBuilder {
 
     private final RawProgramVariablePrefixes rpvp;
-    private ListOfSkolemSet results = SLListOfSkolemSet.EMPTY_LIST;
+    private ImmutableList<SkolemSet> results = ImmutableSLList.<SkolemSet>nil();
 
     public TypeInfoBuilder ( SkolemSet                  p_oriSkolemSet,
 			     RawProgramVariablePrefixes p_rpvp,
@@ -37,7 +42,7 @@ public class TypeInfoBuilder extends AbstractSkolemBuilder {
 	rpvp = p_rpvp;
     }
 
-    public IteratorOfSkolemSet build() {
+    public Iterator<SkolemSet> build() {
 	build ( 0,
 		getOriginalSkolemSet ().getInstantiations (),
 		getOriginalSkolemSet ().getSVTypeInfos () );
@@ -75,7 +80,7 @@ public class TypeInfoBuilder extends AbstractSkolemBuilder {
 			     SVInstantiations p_currentSVI,
 			     SVTypeInfos      p_currentSVTI ) {
 	final ExtList              res  = new ExtList ();
-	final ListOfSchemaVariable svs  =
+	final ImmutableList<SchemaVariable> svs  =
 	    getSVPartitioning ().getPartition ( p_variableNumber );
 	final KeYJavaType          type = getPartitionType(p_variableNumber);
 
@@ -92,32 +97,30 @@ public class TypeInfoBuilder extends AbstractSkolemBuilder {
 	return (PVCandidate[])res.collect ( PVCandidate.class );
     }
 
-    private void createNativePVCandidates ( ListOfSchemaVariable p_svs,
+    private void createNativePVCandidates ( ImmutableList<SchemaVariable> p_svs,
 					    SVInstantiations     p_currentSVI,
 					    SVTypeInfos          p_currentSVTI,
 					    ExtList              p_res ) {
-	final IteratorOfIProgramVariable nativeIt =
-	    rpvp.getFreeProgramVariables ().iterator ();
 
-	while ( nativeIt.hasNext () ) {
-	    final IProgramVariable pv = nativeIt.next ();
+        for (IProgramVariable iProgramVariable : rpvp.getFreeProgramVariables()) {
+            final IProgramVariable pv = iProgramVariable;
 
-	    final PVCandidate pvc =
-	        isValidInstantiation ( p_currentSVI, p_currentSVTI, 
-				       p_svs, pv,
-				       ProgramSkolemInstantiation
-				       .OCCURRING_VARIABLE );
-	    if ( pvc != null )
-		p_res.add ( pvc );
-	}
+            final PVCandidate pvc =
+                    isValidInstantiation(p_currentSVI, p_currentSVTI,
+                            p_svs, pv,
+                            ProgramSkolemInstantiation
+                                    .OCCURRING_VARIABLE);
+            if (pvc != null)
+                p_res.add(pvc);
+        }
     }
 
 
-    private void createNewPVCandidates ( ListOfSchemaVariable p_svs,
+    private void createNewPVCandidates ( ImmutableList<SchemaVariable> p_svs,
 					 SVInstantiations     p_currentSVI,
 					 SVTypeInfos          p_currentSVTI,
 					 ExtList              p_res ) {
-	final IteratorOfKeYJavaType typeIt = createTypeCandidates ();
+	final Iterator<KeYJavaType> typeIt = createTypeCandidates ();
 
 	while ( typeIt.hasNext () )
 	    createNewPVCandidate ( p_svs,
@@ -128,7 +131,7 @@ public class TypeInfoBuilder extends AbstractSkolemBuilder {
 				   ProgramSkolemInstantiation.NEW_FREE_VARIABLE );
     }
 
-    private void createNewPVCandidate ( ListOfSchemaVariable p_svs,
+    private void createNewPVCandidate ( ImmutableList<SchemaVariable> p_svs,
 					KeYJavaType          p_type,
 					SVInstantiations     p_currentSVI,
 					SVTypeInfos          p_currentSVTI,
@@ -150,7 +153,7 @@ public class TypeInfoBuilder extends AbstractSkolemBuilder {
     private PVCandidate
 	isValidInstantiation ( SVInstantiations     p_currentSVI,
 			       SVTypeInfos          p_currentSVTI,
-			       ListOfSchemaVariable p_svs,
+			       ImmutableList<SchemaVariable> p_svs,
 			       IProgramVariable     p_pv,
 			       int                  p_instantiationType ) {
 
@@ -168,7 +171,7 @@ public class TypeInfoBuilder extends AbstractSkolemBuilder {
 	if ( svi == null )
 	    return null;
 
-	final IteratorOfSchemaVariable it   = p_svs.iterator ();
+	final Iterator<SchemaVariable> it   = p_svs.iterator ();
 	SVTypeInfos                    svti = p_currentSVTI;
 	while ( it.hasNext () )
 	    svti = svti.addInfo ( new SVTypeInfo ( it.next (),
@@ -182,9 +185,9 @@ public class TypeInfoBuilder extends AbstractSkolemBuilder {
      * Remove from the given set of skolem sets those which are
      * subsumed by others, return the remaining ones
      */
-    private IteratorOfSkolemSet	handleSubsumption ( IteratorOfSkolemSet p_it ) {
-	ListOfSkolemSet     res       = SLListOfSkolemSet.EMPTY_LIST;
-	IteratorOfSkolemSet compareIt;
+    private Iterator<SkolemSet>	handleSubsumption ( Iterator<SkolemSet> p_it ) {
+	ImmutableList<SkolemSet>     res       = ImmutableSLList.<SkolemSet>nil();
+	Iterator<SkolemSet> compareIt;
 	SkolemSet           ss;
 	SkolemSet           compareSS;
 	
@@ -192,7 +195,7 @@ public class TypeInfoBuilder extends AbstractSkolemBuilder {
         while ( p_it.hasNext () ) {
 	    ss        = p_it.next ();
 	    compareIt = res.iterator ();
-	    res       = SLListOfSkolemSet.EMPTY_LIST;
+	    res       = ImmutableSLList.<SkolemSet>nil();
 
 	    while ( compareIt.hasNext () ) {
 		compareSS = compareIt.next ();

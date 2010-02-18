@@ -22,14 +22,23 @@ http://java.sun.com/products/jfc/tsc/articles/threads/threads2.html
 package de.uka.ilkd.key.gui;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
+import javax.swing.JDialog;
+import javax.swing.JOptionPane;
+
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.gui.configuration.StrategySettings;
 import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
 import de.uka.ilkd.key.proof.*;
-import de.uka.ilkd.key.proof.proofevent.IteratorOfNodeReplacement;
+import de.uka.ilkd.key.proof.proofevent.NodeReplacement;
 import de.uka.ilkd.key.proof.proofevent.RuleAppInfo;
 import de.uka.ilkd.key.proof.reuse.ReusePoint;
 import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.strategy.StrategyProperties;
+import de.uka.ilkd.key.strategy.VBTStrategy;
 import de.uka.ilkd.key.util.Debug;
 
 /**
@@ -57,8 +66,6 @@ public class ApplyStrategy {
     /** interrupted by the user? */
     private boolean autoModeActive = false;
 
-    private ProofListener proofListener = new ProofListener();
-    
     private boolean startedAsInteractive;
     
     private List<ProverTaskListener> proverTaskObservers = new ArrayList<ProverTaskListener> ();
@@ -67,15 +74,16 @@ public class ApplyStrategy {
 
     /** time in ms after which rule application shall be aborted, -1 disables timeout */
     private long timeout = -1;
+    
+    private String usedCoalChooserOptionsKey="";
 
     
     // Please create this object beforehand and re-use it.
     // Otherwise the addition/removal of the InteractiveProofListener
     // can cause a ConcurrentModificationException during ongoing operation
     public ApplyStrategy(KeYMediator medi) {
-	this.medi = medi;
-        medi.addRuleAppListener( proofListener );
-        this.goalChooser = medi.getProfile().getSelectedGoalChooserBuilder().create();        
+	    this.medi = medi;
+        medi.addRuleAppListener( new ProofListener() );        
     }
     
     
@@ -95,21 +103,40 @@ public class ApplyStrategy {
             g.node().setReuseSource(reusePoint);
             rl.removeRPConsumedMarker(reusePoint.source());
             rl.removeRPConsumedGoal(g);
-            ListOfGoal goalList = g.apply(app);
+            proof.getServices().getNameRecorder().setProposals(
+                    reusePoint.getNameProposals());
+            ImmutableList<Goal> goalList = g.apply(app);
             rl.addRPOldMarkersNewGoals(goalList);
             rl.addRPNewMarkersAllGoals(reusePoint.source());
         } else {
             while ( ( g = goalChooser.getNextGoal () ) != null ) {
-
+                
                 app = g.getRuleAppManager().next();
 
-                if ( app == null )
-                    goalChooser.removeGoal ( g );
-                else
+                if (app == null) {
+                    if (medi.getProof().getSettings().getStrategySettings()
+                            .getActiveStrategyProperties().getProperty(
+                                    StrategyProperties.STOPMODE_OPTIONS_KEY)
+                            .equals(StrategyProperties.STOPMODE_NONCLOSE)) {
+                        // iff Stop on non-closeable Goal is selected a little
+                        // popup is generated and proof is stopped
+                        JOptionPane pane = new JOptionPane(
+                                "Couldn't close Goal Nr. "
+                                        + g.node().serialNr()
+                                        + " automatically",
+                                JOptionPane.INFORMATION_MESSAGE,
+                                JOptionPane.DEFAULT_OPTION);
+                        JDialog dialog = pane.createDialog(medi.mainFrame(),
+                                "The KeY Project");
+                        dialog.setVisible(true);
+			medi.goalChosen(g);
+			return false;
+                    }
+                    goalChooser.removeGoal(g);
+                }else
                     break;
             }
             if (app == null) return false;      
-            assert g != null;
             rl.removeRPConsumedGoal(g);                
             rl.addRPOldMarkersNewGoals(g.apply(app));
         }
@@ -161,9 +188,8 @@ public class ApplyStrategy {
      * number of rules have been applied or the time out has been reached
      */
     private boolean maxRuleApplicationOrTimeoutExceeded() {
-        return countApplied >= maxApplications || 
-           timeout>=0 ? 
-                System.currentTimeMillis() - time >= timeout : false;
+        return countApplied >= maxApplications ||
+                timeout >= 0 && System.currentTimeMillis() - time >= timeout;
     }
 
 
@@ -188,11 +214,26 @@ public class ApplyStrategy {
     }
 
 
-    private void init(Proof proof, ListOfGoal goals, int maxSteps, long timeout) {
+    private void init(Proof proof, ImmutableList<Goal> goals, int maxSteps, long timeout) {
         this.proof = proof;
         maxApplications = maxSteps;
         this.timeout = timeout;
-        countApplied = 0;
+        countApplied = 0; 
+        StrategySettings sSettings =medi.getProof().getSettings().getStrategySettings();
+        if(!(sSettings.getStrategy().toString().equals(VBTStrategy.VBTStrategy))){
+            if(usedCoalChooserOptionsKey.compareTo(sSettings.getActiveStrategyProperties().getProperty(StrategyProperties.GOALCHOOSER_OPTIONS_KEY))!=0){
+            	usedCoalChooserOptionsKey = sSettings.getActiveStrategyProperties().getProperty(StrategyProperties.GOALCHOOSER_OPTIONS_KEY);
+            	if(usedCoalChooserOptionsKey.equals(StrategyProperties.GOALCHOOSER_DEFAULT)){
+            		medi.getProfile().setSelectedGoalChooserBuilder(DefaultGoalChooserBuilder.NAME);
+            	}else if(usedCoalChooserOptionsKey.equals(StrategyProperties.GOALCHOOSER_DEPTH)){
+            		medi.getProfile().setSelectedGoalChooserBuilder(DepthFirstGoalChooserBuilder.NAME);
+            	}
+            }
+    	}else if(sSettings.getStrategy().toString().equals(VBTStrategy.VBTStrategy)){
+    	    medi.getProfile().setSelectedGoalChooserBuilder(VBTStrategy.preferedGoalChooser);
+    	}
+	this.goalChooser = medi.getProfile().getSelectedGoalChooserBuilder().create();//Use this independently of StrategyProperties.GOALCHOOSER_OPTIONS_KEY
+
         goalChooser.init ( proof, goals );
         setAutoModeActive(true);
         startedAsInteractive = !mediator().autoMode();
@@ -210,7 +251,7 @@ public class ApplyStrategy {
     
 
 
-    public void start(Proof proof, ListOfGoal goals, int maxSteps, long timeout) {
+    public void start(Proof proof, ImmutableList<Goal> goals, int maxSteps, long timeout) {
         assert proof != null;
         init(proof, goals, maxSteps, timeout);
 
@@ -224,7 +265,9 @@ public class ApplyStrategy {
      * method handles InterruptedExceptions cleanly.
      */
     public void stop () {
-        worker.interrupt();
+        if(worker!=null){
+            worker.interrupt();
+        }
     }
     
     
@@ -247,8 +290,7 @@ public class ApplyStrategy {
     private class AutoModeWorker extends SwingWorker {
          
         public Object construct() {
-            Object res = doWork();
-	    return res;
+            return  doWork();
         }
 
         public void finished() {
@@ -262,16 +304,29 @@ public class ApplyStrategy {
                 (new GeneralFailureEvent("An exception occurred during" 
                         + " strategy execution."));  
             } else {
-                if (startedAsInteractive) mediator().startInterface(true);
+                if (startedAsInteractive){
+                    if (medi.getProof().getSettings().getStrategySettings()
+			.getActiveStrategyProperties().getProperty(
+			       StrategyProperties.STOPMODE_OPTIONS_KEY)
+			.equals(StrategyProperties.STOPMODE_NONCLOSE)){
+			Goal g = mediator().getSelectedGoal();
+			mediator().startInterface(true);
+			if(g != null) {
+			    mediator().goalChosen(g);
+			}
+		    }else{
+			mediator().startInterface(true);
+		    }
+		}
             }
-
+            proof.addAutoModeTime(time);
             fireTaskFinished (new DefaultTaskFinishedInfo(ApplyStrategy.this, result, 
                     proof, time, 
                     countApplied, mediator().getNrGoalsClosedByAutoMode()));	  
-            
+
             mediator().resetNrGoalsClosedByHeuristics();
             
-            mediator().setInteractive( true );            
+            mediator().setInteractive( true );  
         }
     }
     
@@ -285,8 +340,8 @@ public class ApplyStrategy {
 		return;
 
 	    synchronized ( ApplyStrategy.this ) {
-		ListOfGoal                newGoals = SLListOfGoal.EMPTY_LIST;
-		IteratorOfNodeReplacement it       = rai.getReplacementNodes ();
+		ImmutableList<Goal>                newGoals = ImmutableSLList.<Goal>nil();
+		Iterator<NodeReplacement> it       = rai.getReplacementNodes ();
 		Node                      node;
 		Goal                      goal;          
                 
@@ -307,10 +362,18 @@ public class ApplyStrategy {
         return autoModeActive;
     }
 
-
-
     public void setAutoModeActive(boolean autoModeActive) {
         this.autoModeActive = autoModeActive;
     }    
 
+    /**Used by, e.g., {@code InteractiveProver.clear()} in order to prevent memory leaking. 
+     * When a proof obligation is abandoned all references to the proof must be reset.
+     * @author gladisch */
+    public void clear(){
+        stop();
+        proof = null;
+        if(goalChooser!=null){
+            goalChooser.init(null, ImmutableSLList.<Goal>nil());
+        }
+    }
 }

@@ -10,31 +10,18 @@
 
 package de.uka.ilkd.key.rule.metaconstruct;
 
+import java.util.Iterator;
+
+import de.uka.ilkd.key.collection.ImmutableArray;
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.TermFactory;
-import de.uka.ilkd.key.logic.UpdateFactory;
-import de.uka.ilkd.key.logic.op.AbstractMetaOperator;
-import de.uka.ilkd.key.logic.op.ArrayOp;
-import de.uka.ilkd.key.logic.op.AttributeOp;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.IUpdateOperator;
-import de.uka.ilkd.key.logic.op.IteratorOfLocation;
-import de.uka.ilkd.key.logic.IteratorOfTerm;
-import de.uka.ilkd.key.logic.op.Location;
-import de.uka.ilkd.key.logic.op.LogicVariable;
-import de.uka.ilkd.key.logic.op.SetAsListOfLocation;
-import de.uka.ilkd.key.logic.op.SetOfLocation;
-import de.uka.ilkd.key.logic.SetAsListOfTerm;
-import de.uka.ilkd.key.logic.SetOfTerm;
+import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.ArraySortImpl;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.UpdateSimplifier;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
-import de.uka.ilkd.key.rule.updatesimplifier.ArrayOfAssignmentPair;
 import de.uka.ilkd.key.rule.updatesimplifier.AssignmentPair;
 import de.uka.ilkd.key.rule.updatesimplifier.Update;
 import de.uka.ilkd.key.util.Debug;
@@ -124,7 +111,8 @@ public class MetaEquivalentUpdates extends AbstractMetaOperator {
         	final Term u1t = uf.apply ( upd1, locWithVars );
                 final Term u2t = uf.apply ( upd2, locWithVars );
         
-                return tb.all ( locWithVars.freeVars ().toArray (), tb.equals ( u1t, u2t ) );
+                final ImmutableSet<QuantifiableVariable> freeVars = locWithVars.freeVars ();
+		return tb.all ( freeVars.toArray (new QuantifiableVariable[freeVars.size()]), tb.equals ( u1t, u2t ) );
 	}
 
     private Location getUpdatedOp(AssignmentPair ap) {
@@ -149,11 +137,11 @@ public class MetaEquivalentUpdates extends AbstractMetaOperator {
         return serv.getJavaInfo ().getJavaLangObjectAsSort ();
     }
 
-    private SetOfTerm addLocTermsToSet(Update upd,
-                                            SetOfTerm updatedLocTerms) {
-        final ArrayOfAssignmentPair pairs = upd.getAllAssignmentPairs ();
+    private ImmutableSet<Term> addLocTermsToSet(Update upd,
+                                            ImmutableSet<Term> updatedLocTerms) {
+        final ImmutableArray<AssignmentPair> pairs = upd.getAllAssignmentPairs ();
         for ( int i = 0; i < pairs.size (); i++ ) {
-            updatedLocTerms = updatedLocTerms.add( pairs.getAssignmentPair ( i ).locationAsTerm());
+            updatedLocTerms = updatedLocTerms.add( pairs.get ( i ).locationAsTerm());
             /* updatedLocs = updatedLocs.add ( getUpdatedOp ( pairs.getAssignmentPair ( i ) ) ); BUG 0898*/
         }
         return updatedLocTerms;
@@ -165,7 +153,7 @@ public class MetaEquivalentUpdates extends AbstractMetaOperator {
 	 *  obl_fi  :=   \forall x1, x2, ... ; ({u1} fi(x1, x2, ...)) = ({u2} fi(x1, x2, ...))
 	 */
 	private Term eqivalentUpdates(Update upd1, Update upd2) {
-        	SetOfTerm updatedLocTerms = SetAsListOfTerm.EMPTY_SET;
+        	ImmutableSet<Term> updatedLocTerms = DefaultImmutableSet.<Term>nil();
                 
                 updatedLocTerms = addLocTermsToSet ( upd1, updatedLocTerms );
                 updatedLocTerms = addLocTermsToSet ( upd2, updatedLocTerms );
@@ -173,12 +161,11 @@ public class MetaEquivalentUpdates extends AbstractMetaOperator {
         		// System.out.println("Locations:" + updatedLocs);
         
                 Term res = tb.tt ();
-                
-                final IteratorOfTerm termIt = updatedLocTerms.iterator ();
-                while ( termIt.hasNext () ) {
-                    res = tb.and ( res, eqUpdWithRespectToTerm ( upd1, upd2,
-                                                                 termIt.next () ) );
-                }
+
+        for (Term updatedLocTerm : updatedLocTerms) {
+            res = tb.and(res, eqUpdWithRespectToTerm(upd1, upd2,
+                    updatedLocTerm));
+        }
         
 		return res;
 	}

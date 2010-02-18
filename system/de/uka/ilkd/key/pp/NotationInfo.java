@@ -177,16 +177,19 @@ public class NotationInfo {
 
     	tbl.put(Op.ALL,new Notation.Quantifier("\\forall", 60, 60));
 	tbl.put(Op.EX, new Notation.Quantifier("\\exists", 60, 60));
+	tbl.put(Op.SUM, new Notation.NumericalQuantifier("\\sum", 60, 60, 70));
+	tbl.put(Op.BSUM, new Notation.BoundedNumericalQuantifier("\\bSum", 60, 60, 70));
+	tbl.put(Op.PRODUCT, new Notation.NumericalQuantifier("\\product", 60, 60, 70));
 	tbl.put(Op.DIA,new Notation.Modality("\\<","\\>", 60, 60));
 	tbl.put(Op.BOX,new Notation.Modality("\\[","\\]", 60, 60));
 	tbl.put(Op.TOUT,new Notation.Modality("\\[[","\\]]", 60, 60));
 	Modality modalities[] = {Op.DIATRC, Op.BOXTRC, Op.TOUTTRC,
 	                         Op.DIATRA, Op.BOXTRA, Op.TOUTTRA,
 				 Op.DIASUSP, Op.BOXSUSP, Op.TOUTSUSP};
-	for(int i=0; i<modalities.length;i++)
-	  tbl.put(modalities[i],
-	      new Notation.Modality("\\"+modalities[i].name().toString(),
-	                            "\\endmodality",60, 60));
+        for (Modality modality : modalities)
+            tbl.put(modality,
+                    new Notation.Modality("\\" + modality.name().toString(),
+                            "\\endmodality", 60, 60));
 	tbl.put(Op.IF_THEN_ELSE, new Notation.IfThenElse(130, "\\if"));
 	tbl.put(Op.IF_EX_THEN_ELSE, new Notation.IfThenElse(130, "\\ifEx"));
 

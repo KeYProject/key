@@ -56,7 +56,7 @@ public class LibrariesConfiguration extends JDialog {
         java.util.Arrays.sort(l,0,size);
 
         for(int j=0;j<size;j++){
-            s[j]= ((Boolean)libToSel.get(l[j])).booleanValue();
+            s[j]= libToSel.get(l[j]).booleanValue();
         }
         
         setMediator(mediator);

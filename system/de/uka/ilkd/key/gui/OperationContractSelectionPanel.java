@@ -6,8 +6,6 @@
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
 //
-//
-//
 
 package de.uka.ilkd.key.gui;
 
@@ -16,27 +14,22 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.event.MouseListener;
+import java.util.Arrays;
+import java.util.Comparator;
 
-import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
-import javax.swing.DefaultListCellRenderer;
-import javax.swing.JLabel;
-import javax.swing.JList;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.ListSelectionModel;
-import javax.swing.SwingConstants;
+import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.Op;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.speclang.OperationContract;
-import de.uka.ilkd.key.speclang.SetOfOperationContract;
 
 
 /**
@@ -44,6 +37,7 @@ import de.uka.ilkd.key.speclang.SetOfOperationContract;
  */
 class OperationContractSelectionPanel extends JPanel {
     
+    private final Services services;
     private final JList contractList;
     
     
@@ -55,9 +49,11 @@ class OperationContractSelectionPanel extends JPanel {
      * Creates a contract selection panel containing the specified contracts.
      */
     public OperationContractSelectionPanel(Services services,
-                                           SetOfOperationContract contracts,
-                                           String title) {
-        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS)); 
+                                           ImmutableSet<OperationContract> contracts,
+                                           String title,
+                                           boolean multipleSelection) {
+        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+        this.services = services;
         
         //create scroll pane
         JScrollPane scrollPane = new JScrollPane();
@@ -67,10 +63,21 @@ class OperationContractSelectionPanel extends JPanel {
         scrollPane.setMinimumSize(scrollPaneDim);
         add(scrollPane);
         
+        //sort contracts alphabetically (for the user's convenience)
+        OperationContract[] contractsArray = contracts.toArray(new OperationContract[contracts.size()]);
+        Arrays.sort(contractsArray, new Comparator<OperationContract> () {
+            public int compare(OperationContract c1, OperationContract c2) {
+                return c1.getName().compareTo(c2.getName());
+            }
+        });
+        
         //create contract list
         contractList = new JList();
-        contractList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        contractList.setListData(contracts.toArray());
+        contractList.setSelectionMode(
+                multipleSelection 
+                ? ListSelectionModel.MULTIPLE_INTERVAL_SELECTION 
+                : ListSelectionModel.SINGLE_SELECTION);
+        contractList.setListData(contractsArray);
         contractList.setSelectedIndex(0);
         contractList.addListSelectionListener(new ListSelectionListener() {
             public void valueChanged(ListSelectionEvent e) {
@@ -125,12 +132,12 @@ class OperationContractSelectionPanel extends JPanel {
     }
     
     
-    private static SetOfOperationContract collectContracts(Services services,
+    private static ImmutableSet<OperationContract> collectContracts(Services services,
                                                            ProgramMethod pm, 
                                                            Modality modality) {
         SpecificationRepository specRepos 
                 = services.getSpecificationRepository();
-        SetOfOperationContract result;
+        ImmutableSet<OperationContract> result;
         if(modality != null) {
             result = specRepos.getOperationContracts(pm, modality);
             
@@ -153,13 +160,15 @@ class OperationContractSelectionPanel extends JPanel {
      */
     public OperationContractSelectionPanel(Services services,
                                            ProgramMethod pm,
-                                           Modality modality) {
+                                           Modality modality,
+                                           boolean multipleSelection) {
         this(services, 
              collectContracts(services, pm, modality),  
              "Contracts for \"" 
                 + pm.getFullName()
                 + "\""
-                + (modality != null ? " (" + modality + ")" : ""));
+                + (modality != null ? " (" + modality + ")" : ""),
+             multipleSelection);
     }
     
     
@@ -174,6 +183,13 @@ class OperationContractSelectionPanel extends JPanel {
     
     
     public OperationContract getOperationContract() {
-	return (OperationContract) contractList.getSelectedValue();
+        Object[] selection = contractList.getSelectedValues();
+        ImmutableSet<OperationContract> contracts 
+            = DefaultImmutableSet.<OperationContract>nil();
+        for(Object contract : selection) {
+            contracts = contracts.add((OperationContract) contract);
+        }        
+        return services.getSpecificationRepository()
+                       .combineContracts(contracts);
     }
 }

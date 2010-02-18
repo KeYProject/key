@@ -5,15 +5,6 @@
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
-//
-//
-//This file is part of KeY - Integrated Deductive Software Design 
-//Copyright (C) 2001-2003 Universitaet Karlsruhe, Germany
-//                      and Chalmers University of Technology, Sweden
-//
-//The KeY system is protected by the GNU General Public License.
-//See LICENSE.TXT for details.
-//
 
 package de.uka.ilkd.key.rule.export.html;
 
@@ -21,19 +12,23 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.Iterator;
 
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.logic.LocationDescriptor;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.ProgramPrinter;
 import de.uka.ilkd.key.rule.*;
-import de.uka.ilkd.key.rule.export.*;
+import de.uka.ilkd.key.rule.export.RuleExportModel;
+import de.uka.ilkd.key.rule.export.RuleSetModelInfo;
+import de.uka.ilkd.key.rule.export.TacletModelInfo;
 
 public class HTMLFileTaclet extends HTMLFile {
     
-    private ListOfTacletModelInfo tacletInfos;
+    private ImmutableList<TacletModelInfo> tacletInfos;
     
-    public HTMLFileTaclet(HTMLModel htmlModel, HTMLContainer htmlContainer, ListOfTacletModelInfo tinfos, int num) {
+    public HTMLFileTaclet(HTMLModel htmlModel, HTMLContainer htmlContainer, ImmutableList<TacletModelInfo> tinfos, int num) {
         super(htmlModel, htmlContainer, "taclets"+num+".html");
         tacletInfos = tinfos;
     }
@@ -48,10 +43,9 @@ public class HTMLFileTaclet extends HTMLFile {
     
     public void init(RuleExportModel model) {
         super.init(model);
-        
-        IteratorOfTacletModelInfo it = tacletInfos.iterator();
-        while (it.hasNext()) {
-            final TacletModelInfo tacletInfo = it.next();
+
+        for (TacletModelInfo tacletInfo1 : tacletInfos) {
+            final TacletModelInfo tacletInfo = tacletInfo1;
             getFragmentAnchor(tacletInfo);
         }
     }
@@ -73,10 +67,9 @@ public class HTMLFileTaclet extends HTMLFile {
     }
 
     private void writeTacletDetails ( StringBuffer out ) {
-        IteratorOfTacletModelInfo it = tacletInfos.iterator();
-        while (it.hasNext()) {
-            final TacletModelInfo tacletInfo = it.next();
-            writeTacletDetails( out, tacletInfo );
+        for (TacletModelInfo tacletInfo1 : tacletInfos) {
+            final TacletModelInfo tacletInfo = tacletInfo1;
+            writeTacletDetails(out, tacletInfo);
         }
     }
 
@@ -141,18 +134,17 @@ public class HTMLFileTaclet extends HTMLFile {
     }
 
     private void writeTacletRuleSets ( StringBuffer out, TacletModelInfo t ) {
-        final ListOfRuleSetModelInfo ruleSets = t.getRuleSets();
+        final ImmutableList<RuleSetModelInfo> ruleSets = t.getRuleSets();
         if (ruleSets.isEmpty ()) {
             out.append ( "none" );
         } else {
             boolean first = true;
-            final IteratorOfRuleSetModelInfo it = ruleSets.iterator ();
-            while (it.hasNext ()) {
-                final RuleSetModelInfo ruleSet = it.next ();
+            for (RuleSetModelInfo ruleSet1 : ruleSets) {
+                final RuleSetModelInfo ruleSet = ruleSet1;
                 if (!first) {
-                    out.append ( ", " );
+                    out.append(", ");
                 }
-                writeRuleSetLink ( out, ruleSet );
+                writeRuleSetLink(out, ruleSet);
                 first = false;
             }
         }
@@ -202,13 +194,13 @@ public class HTMLFileTaclet extends HTMLFile {
 
     public static void writeTacletSchemaVariablesHelper(StringBuffer out, 
                                                         final Taclet t) {
-	SetOfSchemaVariable schemaVars = t.getIfFindVariables();
-        ListOfNewVarcond lnew = t.varsNew();
+	ImmutableSet<SchemaVariable> schemaVars = t.getIfFindVariables();
+        ImmutableList<NewVarcond> lnew = t.varsNew();
 	while (!lnew.isEmpty()) {
 	    schemaVars = schemaVars.add(lnew.head().getSchemaVariable());
 	    lnew = lnew.tail();
 	}
-	IteratorOfNewDependingOn newDepIt = t.varsNewDependingOn();
+	Iterator<NewDependingOn> newDepIt = t.varsNewDependingOn();
 	while (newDepIt.hasNext()) {
 	    schemaVars = schemaVars.add(newDepIt.next().first());
 	}	
@@ -216,16 +208,14 @@ public class HTMLFileTaclet extends HTMLFile {
         if (schemaVars.size() > 0)
         {
             out.append ( "\\schemaVariables {\n" );
-            final IteratorOfSchemaVariable it = schemaVars.iterator();
-            while (it.hasNext())
-            {
-                final SchemaVariable schemaVar = it.next();
+            for (SchemaVariable schemaVar1 : schemaVars) {
+                final SchemaVariable schemaVar = schemaVar1;
                 // write indentation
-                out.append ( "  " );
+                out.append("  ");
                 // write declaration
                 writeTacletSchemaVariable(out, schemaVar);
                 // write newline
-                out.append ( ";\n" );
+                out.append(";\n");
             }
             out.append ( "}\n" );
         }

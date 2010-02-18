@@ -13,29 +13,29 @@ package de.uka.ilkd.key.logic;
 import java.util.Iterator;
 import java.util.List;
 
-import de.uka.ilkd.key.logic.op.ArrayOfQuantifiableVariable;
+import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 
 /** 
  * A structure for storing the arguments to an Operator
  * when creating a Term. Each argument, in form of a Term,
- * can have bound variables, in form of an ArrayOfQuantifiableVariable.
+ * can have bound variables, in form of an ArrayOf<QuantifiableVariable>.
  * This class allows efficient extraction of the different parts.  
  */
 public class PairOfTermArrayAndBoundVarsArray {
     private Term[] term;
-    private ArrayOfQuantifiableVariable[] var;
+    private ImmutableArray<QuantifiableVariable>[] var;
 
     public PairOfTermArrayAndBoundVarsArray(List list) {
 	term = new Term[list.size()];
-	var = new ArrayOfQuantifiableVariable[list.size()];
+	var = new ImmutableArray[list.size()];
 	boolean hasBoundVars = false;
 	Iterator iter = list.iterator();
 	for (int i=0; iter.hasNext(); i++) {
 	    TermWithBoundVars t = (TermWithBoundVars)iter.next();
 	    term[i] = t.term;
 	    if (t.boundVars == null) {
-		var[i] = new ArrayOfQuantifiableVariable
+		var[i] = new ImmutableArray<QuantifiableVariable>
 		    (new QuantifiableVariable[0]);
 	    } else {
 		var[i] = t.boundVars;
@@ -51,7 +51,7 @@ public class PairOfTermArrayAndBoundVarsArray {
 	return term;
     }
 
-    public ArrayOfQuantifiableVariable[] getBoundVars() {
+    public ImmutableArray<QuantifiableVariable>[] getBoundVars() {
 	return var;
     }
 

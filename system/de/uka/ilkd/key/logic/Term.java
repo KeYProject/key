@@ -10,7 +10,13 @@
 
 package de.uka.ilkd.key.logic;
 
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.collection.ImmutableArray;
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.logic.op.Metavariable;
+import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.util.Debug;
 
@@ -48,8 +54,8 @@ import de.uka.ilkd.key.util.Debug;
 public abstract class Term implements SVSubstitute {
 
     /** empty list of variables */
-    public static final ArrayOfQuantifiableVariable EMPTY_VAR_LIST = 
-	new ArrayOfQuantifiableVariable(new QuantifiableVariable[0]);
+    public static final ImmutableArray<QuantifiableVariable> EMPTY_VAR_LIST = 
+	new ImmutableArray<QuantifiableVariable>();
 
    /** the top level operator of this term */
     private final Operator op;
@@ -67,10 +73,10 @@ public abstract class Term implements SVSubstitute {
     /** 
      * caches the free variables of this term  
      */
-    private SetOfQuantifiableVariable freeVars = null; 
+    private ImmutableSet<QuantifiableVariable> freeVars = null; 
 
     /** caches the meta variables of this term */
-    private SetOfMetavariable metaVars = null;
+    private ImmutableSet<Metavariable> metaVars = null;
 
     /** 
      * creates a Term with top operator op
@@ -131,8 +137,8 @@ public abstract class Term implements SVSubstitute {
      * term and put them in a cache.
      */
     private void determineFreeVarsAndMetaVars() {
-	freeVars = SetAsListOfQuantifiableVariable.EMPTY_SET;
-        metaVars = SetAsListOfMetavariable.EMPTY_SET;
+	freeVars = DefaultImmutableSet.<QuantifiableVariable>nil();
+        metaVars = DefaultImmutableSet.<Metavariable>nil();
         if (op instanceof QuantifiableVariable) {
             freeVars = freeVars.add((QuantifiableVariable) op);
         } else if ( op instanceof Metavariable ) {
@@ -142,11 +148,10 @@ public abstract class Term implements SVSubstitute {
 	    if (sub(i) == null) {
                 Debug.fail("FREE "+op+" "+i);
 	    }	        
-	    SetOfQuantifiableVariable subFreeVars = sub(i).freeVars();
+	    ImmutableSet<QuantifiableVariable> subFreeVars = sub(i).freeVars();
 	    for (int j=0, sz = varsBoundHere(i).size(); j<sz; j++) {
 		subFreeVars = subFreeVars.
-		    remove(varsBoundHere(i)
-			   .getQuantifiableVariable(j));
+		    remove(varsBoundHere(i).get(j));
 	    }
 	    freeVars = freeVars.union(subFreeVars);
 	    metaVars = metaVars.union(sub(i).metaVars());
@@ -192,8 +197,8 @@ public abstract class Term implements SVSubstitute {
 		return false;
 	    }
 	    for (int j = 0, sz = varsBoundHere(i).size(); j<sz; j++) {
-		if (!varsBoundHere(i).getQuantifiableVariable(j).equals
-		    (t.varsBoundHere(i).getQuantifiableVariable(j))) {
+		if (!varsBoundHere(i).get(j).equals
+		    (t.varsBoundHere(i).get(j))) {
 		    return false;
 		}
 	    }
@@ -263,9 +268,9 @@ public abstract class Term implements SVSubstitute {
 
     /** 
      * returns the set of free quantifiable variables occuring in this term
-     * @return the SetOfFree 
+     * @return the SetOf<Free> 
      */
-    public SetOfQuantifiableVariable freeVars() {
+    public ImmutableSet<QuantifiableVariable> freeVars() {
         if (freeVars == null) {
             determineFreeVarsAndMetaVars();
         }
@@ -328,7 +333,7 @@ public abstract class Term implements SVSubstitute {
      * the variables in <code>freeVars</code> are bound by some quantifier above)
      * @return the set of metavariables
      */
-    public SetOfMetavariable metaVars () {
+    public ImmutableSet<Metavariable> metaVars () {
         if (metaVars == null) {
             determineFreeVarsAndMetaVars();
         }
@@ -375,7 +380,7 @@ public abstract class Term implements SVSubstitute {
      * sub term 
      * @return the bound variables for the n-th subterm 
      */
-    public abstract ArrayOfQuantifiableVariable varsBoundHere(int n);
+    public abstract ImmutableArray<QuantifiableVariable> varsBoundHere(int n);
 
 
     /**
@@ -390,7 +395,7 @@ public abstract class Term implements SVSubstitute {
                 if (j == 0) {
                     sb.append("{");
                 }
-                sb.append(varsBoundHere(i).getQuantifiableVariable(j));
+                sb.append(varsBoundHere(i).get(j));
                 if (j!=varsBoundHere(i).size()-1) {
                     sb.append(", ");
                 } else {

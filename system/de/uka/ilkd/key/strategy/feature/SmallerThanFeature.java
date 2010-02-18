@@ -11,7 +11,13 @@
 
 package de.uka.ilkd.key.strategy.feature;
 
-import de.uka.ilkd.key.logic.*;
+import java.util.Iterator;
+
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.logic.LexPathOrdering;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermOrdering;
 
 
 /**
@@ -34,14 +40,12 @@ public abstract class SmallerThanFeature extends BinaryTacletAppFeature {
      * @return <code>true</code> iff each element of <code>list1</code> is
      *         strictly smaller than all elements of <code>list2</code>
      */
-    protected final boolean lessThan(ListOfTerm list1, ListOfTerm list2) {
+    protected final boolean lessThan(ImmutableList<Term> list1, ImmutableList<Term> list2) {
         if ( list2.isEmpty () ) return false;
-        final IteratorOfTerm it1 = list1.iterator ();
-        while ( it1.hasNext () ) {
-            final Term te1 = it1.next ();
-            final IteratorOfTerm it2 = list2.iterator ();
-            while ( it2.hasNext () ) {
-                if ( !lessThan ( te1, it2.next () ) ) return false;
+        for (Term aList1 : list1) {
+            final Term te1 = aList1;
+            for (Term aList2 : list2) {
+                if (!lessThan(te1, aList2)) return false;
             }
         }
         return true;
@@ -49,13 +53,13 @@ public abstract class SmallerThanFeature extends BinaryTacletAppFeature {
 
     protected abstract static class Collector {
     
-        private ListOfTerm terms = SLListOfTerm.EMPTY_LIST;
+        private ImmutableList<Term> terms = ImmutableSLList.<Term>nil();
     
         protected void addTerm(Term mon) {
             terms = terms.prepend ( mon );
         }
     
-        public ListOfTerm getResult() {
+        public ImmutableList<Term> getResult() {
             return terms;
         }
         

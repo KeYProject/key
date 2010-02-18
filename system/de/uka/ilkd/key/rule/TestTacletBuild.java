@@ -14,6 +14,7 @@ package de.uka.ilkd.key.rule;
 import java.io.File;
 
 import junit.framework.TestCase;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.Op;
@@ -56,7 +57,7 @@ public class TestTacletBuild extends TestCase {
 	sb.setFind(t1);
 	sb.addTacletGoalTemplate
 	    (new RewriteTacletGoalTemplate(Sequent.EMPTY_SEQUENT,
-					 SLListOfTaclet.EMPTY_LIST,
+					 ImmutableSLList.<Taclet>nil(),
 					 t2));
 	boolean thrown=false;
 	try {

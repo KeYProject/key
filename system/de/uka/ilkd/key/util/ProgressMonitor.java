@@ -30,7 +30,7 @@ public interface ProgressMonitor {
      * 
      * @param progress number of steps completed */
     void setProgress(int progress);
-
+    
     /** Set the maximum number of steps for this task.
      *
      * @param maximum maximum number of steps, &gt;=0.

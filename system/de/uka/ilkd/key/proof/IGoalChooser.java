@@ -9,6 +9,8 @@
 //
 package de.uka.ilkd.key.proof;
 
+import de.uka.ilkd.key.collection.ImmutableList;
+
 /**
  * Interface to be implemented by classes in order to customize the goal selection
  * strategy of the automatic prover environment.
@@ -20,7 +22,7 @@ public interface IGoalChooser {
      * @param p_proof
      * *param p_goals the initial list of goals
      */
-    public abstract void init(Proof p_proof, ListOfGoal p_goals);
+    public abstract void init(Proof p_proof, ImmutableList<Goal> p_goals);
 
     /**
      * @return the next goal a taclet should be applied to
@@ -39,6 +41,6 @@ public interface IGoalChooser {
      * @param node
      * @param newGoals
      */
-    public abstract void updateGoalList(Node node, ListOfGoal newGoals);
+    public abstract void updateGoalList(Node node, ImmutableList<Goal> newGoals);
 
 }

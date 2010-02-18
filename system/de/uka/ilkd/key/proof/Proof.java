@@ -12,6 +12,8 @@ package de.uka.ilkd.key.proof;
 
 import java.util.*;
 
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.gui.GUIEvent;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.gui.configuration.SettingsListener;
@@ -61,7 +63,7 @@ public class Proof implements Named {
     private List<ProofTreeListener> listenerList = new ArrayList<ProofTreeListener>(10);
     
     /** list with the open goals of the proof */ 
-    private ListOfGoal openGoals = SLListOfGoal.EMPTY_LIST;
+    private ImmutableList<Goal> openGoals = ImmutableSLList.<Goal>nil();
 
     /** during closure this can be set by "subTreeCompletelyClosed" */
     private Node closedSubtree = null;
@@ -106,13 +108,30 @@ public class Proof implements Named {
      */
     public Vector<String> keyVersionLog;
    
+    private long autoModeTime = 0;
     
     private Strategy activeStrategy;
 //    implemented by mbender for jmltest
     private SpecExtPO specExtPO;
     
+    /** This field stores counter examples (in some format) or notes that 
+     * nodes are proved or falsifiable (and therefore not provable)  or 
+     * Falsifiability Preservation information . 
+     * The objects of the vector may store information, e.g., from a decision procedure, 
+     * from the test generator, or from the BugDetector.The runtime type of the vector elements 
+     * maybe, e.g., SMTSolverResult or FPCondition. 
+     * Adding a field "nodeToSMTandFPData" to every node would be a waste of memory
+     * as this information is used rather rarely. Using NodeInfo is not good either,
+     * because the method getNodesWithSMTandFPData() would require traversal of the entire proof,
+     * everytime a different proof is selected 
+     * (and this happens often when proving falsifiability preservation interactively). 
+     * @author gladisch  */
+    public WeakHashMap<Node, Vector<Object>> nodeToSMTandFPData;
+    
+   
+
     /** constructs a new empty proof with name */
-    private Proof(Name name, Services services, ProofSettings settings) {
+     private Proof(Name name, Services services, ProofSettings settings) {
         this.name = name;
         assert services != null : "Tried to create proof without valid services.";
 	this.services = services.copyProofSpecific(this);
@@ -263,6 +282,14 @@ public class Proof implements Named {
        return services;
     }
 
+    public long getAutoModeTime() {
+        return autoModeTime;
+    }
+
+    public void addAutoModeTime(long time) {
+        autoModeTime += time;
+    }
+
     /** sets the variable, function, sort, heuristics namespaces */
     public void setNamespaces(NamespaceSet ns) {
         getServices().setNamespaces(ns);
@@ -300,10 +327,8 @@ public class Proof implements Named {
     
     private void updateStrategyOnGoals() {
         Strategy ourStrategy = getActiveStrategy();
-        
-        final IteratorOfGoal it = openGoals ().iterator ();
-        while ( it.hasNext () )
-            it.next ().setGoalStrategy(ourStrategy);
+
+        for (Goal goal : openGoals()) goal.setGoalStrategy(ourStrategy);
     }
 
     /** 
@@ -349,12 +374,10 @@ public class Proof implements Named {
             });
     }
 
-    private void clearAndDetachRuleAppIndexes () {
+    public void clearAndDetachRuleAppIndexes () {
         // Taclet indices of the particular goals have to
         // be rebuilt
-        final IteratorOfGoal it = openGoals ().iterator ();
-        while ( it.hasNext () )
-            it.next ().clearAndDetachRuleAppIndex ();
+        for (Goal goal : openGoals()) goal.clearAndDetachRuleAppIndex();
     }
     
     /** @return Deliverer of new metavariables (with unique names)*/
@@ -409,17 +432,45 @@ public class Proof implements Named {
      * returns the list of open goals
      * @return list with the open goals
      */
-    public ListOfGoal openGoals() {
+    public ImmutableList<Goal> openGoals() {
 	return openGoals;
     }
+    
+    /**
+     * return the list of open and enabled goals
+     * @return list of open and enabled goals, never null
+     * @author mulbrich
+     */
+    public ImmutableList<Goal> openEnabledGoals() {
+        return filterEnabledGoals(openGoals);
+    }
+
+    /**
+     * filter those goals from a list which are enabled
+     * 
+     * @param goals non-null list of goals
+     * @return sublist such that every goal in the list is enabled
+     * @see Goal#isAutomatic()
+     * @author mulbrich
+     */
+    private ImmutableList<Goal> filterEnabledGoals(ImmutableList<Goal> goals) {
+        ImmutableList<Goal> enabledGoals = ImmutableSLList.<Goal>nil();
+        for(Goal g : goals) {
+            if(g.isAutomatic()) {
+                enabledGoals = enabledGoals.prepend(g);
+            }
+        }
+        return enabledGoals;
+    }    
+
 
     /** 
      * removes the given goal and adds the new goals in list 
      * @param oldGoal the old goal that has to be removed from list
-     * @param newGoals the ListOfGoal with the new goals that were
+     * @param newGoals the IList<Goal> with the new goals that were
      * result of a rule application on goal
      */
-    public void replace(Goal oldGoal, ListOfGoal newGoals) {
+    public void replace(Goal oldGoal, ImmutableList<Goal> newGoals) {
 	openGoals = openGoals.removeAll(oldGoal);
 
 	if ( closed () )
@@ -480,7 +531,7 @@ public class Proof implements Named {
 	    if ( b )
 		// For the moment it is necessary to fire the message ALWAYS
 		// in order to detect branch closing.
-		fireProofGoalsAdded ( SLListOfGoal.EMPTY_LIST );		
+		fireProofGoalsAdded ( ImmutableSLList.<Goal>nil() );		
 	}
 
 	closedSubtree = null;
@@ -491,7 +542,7 @@ public class Proof implements Named {
      * @param goal the Goal to be removed
      */
     public void remove(Goal goal) {
-	ListOfGoal newOpenGoals = openGoals.removeAll(goal);
+	ImmutableList<Goal> newOpenGoals = openGoals.removeAll(goal);
 	if (newOpenGoals != openGoals) {
 	    openGoals = newOpenGoals;	
 	    if (closed()) {
@@ -506,7 +557,7 @@ public class Proof implements Named {
      * @param goal the Goal to be added 
      */
     public void add(Goal goal) {
-	ListOfGoal newOpenGoals = openGoals.prepend(goal);
+	ImmutableList<Goal> newOpenGoals = openGoals.prepend(goal);
 	if (openGoals != newOpenGoals) {
 	    openGoals = newOpenGoals;
 	    fireProofGoalsAdded(goal);
@@ -514,10 +565,10 @@ public class Proof implements Named {
     }
 
     /** adds a list with new goals to the list of open goals 
-     * @param goals the ListOfGoal to be prepended 
+     * @param goals the IList<Goal> to be prepended 
      */
-    public void add(ListOfGoal goals) {
-	ListOfGoal newOpenGoals = openGoals.prepend(goals);
+    public void add(ImmutableList<Goal> goals) {
+	ImmutableList<Goal> newOpenGoals = openGoals.prepend(goals);
 	if (openGoals != newOpenGoals) {
 	    openGoals = newOpenGoals;
 	}
@@ -535,7 +586,7 @@ public class Proof implements Named {
     public boolean closed () {
 	if ( root ().getRootSink ().isSatisfiable () ) {
 	    Goal goal;
-	    while ( openGoals != SLListOfGoal.EMPTY_LIST ) {
+	    while ( !openGoals.isEmpty() ) {
 		goal      = openGoals.head ();
 		openGoals = openGoals.tail ();
 		fireProofGoalRemoved ( goal );
@@ -574,15 +625,15 @@ public class Proof implements Named {
     public boolean setBack(final Node node) {
 	Goal goal = getGoal(node);
 	while (goal == null) {	
-	    final ListOfGoal goalList = getSubtreeGoals(node);
+	    final ImmutableList<Goal> goalList = getSubtreeGoals(node);
 	    if (!goalList.isEmpty()) {
 		// The subtree goals (goalList) are scanned for common
 		// direct ancestors (parents). Afterwards the remove
 		// list is the greatest subset of the subtree goals such
 		// that the parents of the goals are disjoint.
 		final HashSet<Node> parentSet = new HashSet<Node>();		
-		final IteratorOfGoal goalIt = goalList.iterator();
-                ListOfGoal removeList = SLListOfGoal.EMPTY_LIST;
+		final Iterator<Goal> goalIt = goalList.iterator();
+                ImmutableList<Goal> removeList = ImmutableSLList.<Goal>nil();
 		while (goalIt.hasNext()) {
 		    final Goal nextGoal = goalIt.next();
 		    if (!parentSet.contains(nextGoal.node().parent())) {
@@ -592,10 +643,9 @@ public class Proof implements Named {
 		}
 		//call setBack(Goal) on each element in the remove
 		//list. The former parents become the new goals
-		final IteratorOfGoal removeIt = removeList.iterator();
-		while (removeIt.hasNext()) {
-		    setBack(removeIt.next());
-		}
+            for (Goal aRemoveList : removeList) {
+                setBack(aRemoveList);
+            }
 		goal = getGoal(node);
 	    } else {
 	        return false;
@@ -616,58 +666,67 @@ public class Proof implements Named {
     /** fires the event that the proof has been expanded at the given node */
     protected void fireProofExpanded(Node node) {
 	ProofTreeEvent e = new ProofTreeEvent(this, node);
-	for (int i = 0; i<listenerList.size(); i++) {
-	    listenerList.get(i).proofExpanded(e);
-	}
+        for (ProofTreeListener aListenerList : listenerList) {
+            aListenerList.proofExpanded(e);
+        }
     }
+
+    /** fires the event that the proof has been pruned at the given node */
+    protected void fireProofIsBeingPruned(Node node, Node removedNode) {
+        ProofTreeEvent e = new ProofTreeRemovedNodeEvent(this, node, removedNode);
+        clearSMTandFPData(removedNode);
+        for (ProofTreeListener aListenerList : listenerList) {
+            aListenerList.proofIsBeingPruned(e);
+        }
+    } 
 
     /** fires the event that the proof has been pruned at the given node */
     protected void fireProofPruned(Node node, Node removedNode) {
 	ProofTreeEvent e = new ProofTreeRemovedNodeEvent(this, node, removedNode);
-	for (int i = 0; i<listenerList.size(); i++) {
-	    listenerList.get(i).proofPruned(e);
-	}
+        for (ProofTreeListener aListenerList : listenerList) {
+            aListenerList.proofPruned(e);
+        }
     } 
 
     /** fires the event that the proof has been restructured */
     protected void fireProofStructureChanged() {
 	ProofTreeEvent e = new ProofTreeEvent(this);
-	for (int i = 0; i<listenerList.size(); i++) {
-	    listenerList.get(i).proofStructureChanged(e);
-	}    
+        for (ProofTreeListener aListenerList : listenerList) {
+            aListenerList.proofStructureChanged(e);
+        }
     }
 
     /** fires the event that a goal has been removed from the list of goals */
     protected void fireProofGoalRemoved(Goal goal) {
 	ProofTreeEvent e = new ProofTreeEvent(this, goal);
-	for (int i = 0; i<listenerList.size(); i++) {
-	    listenerList.get(i).proofGoalRemoved(e);
-	}	
+        for (ProofTreeListener aListenerList : listenerList) {
+            aListenerList.proofGoalRemoved(e);
+        }
     }
 
     /** fires the event that new goals have been added to the list of
      * goals 
      */
-    protected void fireProofGoalsAdded(ListOfGoal goals) {
+    protected void fireProofGoalsAdded(ImmutableList<Goal> goals) {
 	ProofTreeEvent e = new ProofTreeEvent(this, goals);
-	for (int i = 0; i<listenerList.size(); i++) {
-	    listenerList.get(i).proofGoalsAdded(e);
-	}	
+        for (ProofTreeListener aListenerList : listenerList) {
+            aListenerList.proofGoalsAdded(e);
+        }
     }
 
     /** fires the event that new goals have been added to the list of
      * goals 
      */
     protected void fireProofGoalsAdded(Goal goal) {
-	fireProofGoalsAdded(SLListOfGoal.EMPTY_LIST.prepend(goal));
+	fireProofGoalsAdded(ImmutableSLList.<Goal>nil().prepend(goal));
     }
 
     /** fires the event that the proof has been restructured */
     protected void fireProofGoalsChanged() {
 	ProofTreeEvent e = new ProofTreeEvent(this, openGoals());
-	for (int i = 0; i<listenerList.size(); i++) {
-	    listenerList.get(i).proofGoalsChanged(e);
-	}
+        for (ProofTreeListener aListenerList : listenerList) {
+            aListenerList.proofGoalsChanged(e);
+        }
     } 
 
     /** fires the event that the proof has closed. 
@@ -676,9 +735,9 @@ public class Proof implements Named {
      */
     protected void fireProofClosed() {
 	ProofTreeEvent e = new ProofTreeEvent(this);
-	for (int i = 0; i<listenerList.size(); i++) {
-	    listenerList.get(i).proofClosed(e);
-	}
+        for (ProofTreeListener aListenerList : listenerList) {
+            aListenerList.proofClosed(e);
+        }
     }
 
     /**
@@ -721,35 +780,40 @@ public class Proof implements Named {
      * @return the goal that belongs to the given node or null if the
      * node is an inner one 
      */
-    public Goal getGoal(Node node) {	
-	Goal result = null;
-	IteratorOfGoal it = openGoals.iterator();
-	while (it.hasNext()) {
-	    result = it.next();
-	    if (result.node() == node) {
-		return result;
-	    }
-	}
-	return null;
+    public Goal getGoal(Node node) {
+        for (Goal openGoal : openGoals) {
+            if (openGoal.node() == node) {
+                return openGoal;
+            }
+        }
+	    return null;
     }
 
     /** returns the list of goals of the subtree starting with node 
+     * 
      * @param node the Node where to start from
      * @return the list of goals of the subtree starting with node 
      */
-    public ListOfGoal getSubtreeGoals(Node node) {	
-	ListOfGoal result = SLListOfGoal.EMPTY_LIST;
-	final IteratorOfGoal goalsIt  = openGoals.iterator();
-	while (goalsIt.hasNext()) {
-	    final Goal goal = goalsIt.next();
-	    final Iterator<Node> leavesIt = node.leavesIterator();
-	    while (leavesIt.hasNext()) {
-		if (leavesIt.next() == goal.node()) {
-		    result = result.prepend(goal);
-		}
-	    }
-	}
+    public ImmutableList<Goal> getSubtreeGoals(Node node) {	
+	ImmutableList<Goal> result = ImmutableSLList.<Goal>nil();
+        for (final Goal openGoal : openGoals) {
+            final Iterator<Node> leavesIt = node.leavesIterator();
+            while (leavesIt.hasNext()) {
+                if (leavesIt.next() == openGoal.node()) {
+                    result = result.prepend(openGoal);
+                }
+            }
+        }
 	return result;
+    }
+    
+    /**
+     * get the list of goals of the subtree starting with node which are enabled.
+     * @param node the Node where to start from
+     * @return the list of enabled goals of the subtree starting with node 
+     */
+    public ImmutableList<Goal> getSubtreeEnabledGoals(Node node) {
+        return filterEnabledGoals(getSubtreeGoals(node));
     }
 
     /** returns true iff the given node is found in the proof tree 
@@ -778,17 +842,15 @@ public class Proof implements Named {
      * control the contents of the rule app index
      */
     public void setRuleAppIndexToAutoMode () {
-	IteratorOfGoal it = openGoals.iterator ();
-	while ( it.hasNext () ) {
-	    it.next ().ruleAppIndex ().autoModeStarted ();
-	}
+        for (Goal openGoal : openGoals) {
+            openGoal.ruleAppIndex().autoModeStarted();
+        }
     }
 
     public void setRuleAppIndexToInteractiveMode () {
-	IteratorOfGoal it = openGoals.iterator ();
-	while ( it.hasNext () ) {
-	    it.next ().ruleAppIndex ().autoModeStopped ();
-	}
+        for (Goal openGoal : openGoals) {
+            openGoal.ruleAppIndex().autoModeStopped();
+        }
     }
     
 
@@ -837,5 +899,93 @@ public class Proof implements Named {
      */
     public SpecExtPO getPO() {
         return specExtPO;
-    }    
+    }
+
+    private static final Object nodeToSMTandFPDataAltLock = new Object();
+    private Object nodeToSMTandFPDataLock(){
+	if(nodeToSMTandFPData!=null)
+	    return nodeToSMTandFPData;
+	return nodeToSMTandFPDataAltLock;
+    }
+    /**This method is meant to be invoked by {@code Node.setSMTandFPData()}
+     * Be aware that this method fires events to listeners and may therefore have other side-effects.
+     * @see {@code nodeToSMTandFPData}
+     * @author gladisch */
+    public  void addSMTandFPData(Node n, Object data){
+	synchronized(nodeToSMTandFPDataLock()){
+        	if(n.proof()!=this)//checking by the way against a null pointer
+        	    throw new RuntimeException("The referenced node does not belong to this proof");
+        	
+        	if(nodeToSMTandFPData==null){
+        	    nodeToSMTandFPData = new WeakHashMap<Node, Vector<Object>>();
+        	}
+        	Vector<Object> vect = nodeToSMTandFPData.get(n);
+        	if(vect==null){
+        	    vect = new Vector<Object>();
+        	    nodeToSMTandFPData.put(n, vect);
+        	}
+        	vect.add(data);
+        	
+        	fireSmtDataUpdate(n);
+	}
+    }
+    
+    /**A listener of {@code SMTResultsAndBugDetectionDialog} is meant to listen to this event. */
+    public void fireSmtDataUpdate(Node n){
+	ProofTreeEvent e = new ProofTreeEvent(this, n);
+        for (ProofTreeListener aListenerList : listenerList) {
+            aListenerList.smtDataUpdate(e);
+        }	
+    }
+    
+    /**If there is no SMT Data, then null is returned.
+     * This method is meant to be invoked by {@code Node.getSMTandFPData()} 
+     * @author gladisch*/
+    public  Vector<Object> getSMTandFPData(Node n){
+	synchronized(nodeToSMTandFPDataLock()){
+        	if(n.proof()!=this)//checking by the way against a null pointer
+        	    throw new RuntimeException("The referenced node does not belong to this proof");
+        
+        	if(nodeToSMTandFPData==null) return null;
+        	Vector<Object> vect = nodeToSMTandFPData.get(n);
+        	if(vect!=null){
+        	    //This is just a check. Read the documentation of this method to understand this.
+        	    if(vect.size()==0)
+        		throw new RuntimeException("Map with counter example data is broken.");
+        	}
+        	return vect;
+	}
+    }
+    
+    public  void clearSMTandFPData(Node n){
+	synchronized(nodeToSMTandFPDataLock()){
+        	if(n.proof()!=this)//checking by the way against a null pointer
+        	    throw new RuntimeException("The referenced node does not belong to this proof");
+        
+        	if(nodeToSMTandFPData==null) return;
+        	
+        	nodeToSMTandFPData.remove(n);
+        	//Should we call fireSmtDataUpdate()?
+	}
+    }
+    
+    public  void clearSMTandFPData(){
+	synchronized(nodeToSMTandFPDataLock()){
+        	if(nodeToSMTandFPData!=null){
+        	    nodeToSMTandFPData.clear();
+        	}
+        	nodeToSMTandFPData=null;
+        	//Should we call fireSmtDataUpdate()?
+	}
+    }
+    
+    /**@return returns the keys of the weak hashmap {@code nodeToSMTandFPData}
+     * 	warning: null may be returend.
+     * @author gladisch */
+     public Set<Node> getNodesWithSMTandFPData(){
+	if(nodeToSMTandFPData==null)
+	    return null;
+	return 	nodeToSMTandFPData.keySet();
+    }
+
 }

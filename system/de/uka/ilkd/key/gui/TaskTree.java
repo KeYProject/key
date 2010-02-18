@@ -9,7 +9,9 @@
 //
 package de.uka.ilkd.key.gui;
 
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Font;
 import java.awt.event.*;
 import java.io.File;
 import java.util.LinkedList;
@@ -65,8 +67,8 @@ public class TaskTree extends JPanel {
     public void addProof(de.uka.ilkd.key.proof.ProofAggregate plist) {
         TaskTreeNode bp = model.addProof(plist);
         Proof[] proofs = plist.getProofs();
-        for (int i=0; i<proofs.length; i++) {
-            proofs[i].addProofTreeListener(proofTreeListener);
+        for (Proof proof : proofs) {
+            proof.addProofTreeListener(proofTreeListener);
         }
         delegateView.validate();	
         delegateView.scrollPathToVisible(new TreePath(bp.getPath()));	
@@ -74,15 +76,17 @@ public class TaskTree extends JPanel {
         setVisible(true);
     }
 
-    public void removeTask(TaskTreeNode tn) {
+    public boolean removeTask(TaskTreeNode tn) {
 
         int option = JOptionPane.showConfirmDialog(
                 mediator.mainFrame(),"Are you sure?\n",
                 "Abandon Proof", JOptionPane.YES_NO_OPTION);
 
         if (option == JOptionPane.YES_OPTION) {
-	    removeTaskWithoutInteraction(tn);	    
+	    removeTaskWithoutInteraction(tn);
+	    return true;
         }
+        return false;
     }
 
     public void removeTaskWithoutInteraction(TaskTreeNode tn) {
@@ -97,6 +101,9 @@ public class TaskTree extends JPanel {
 	    //go to some other node, take the last leaf.
 	    TreePath path 
 		= delegateView.getPathForRow(delegateView.getRowCount()-1);
+	    if(mediator.getInteractiveProver()!=null){
+	        mediator.getInteractiveProver().clear();
+	    }
 	    if (path!=null) {
 		TaskTreeNode tn0 = (TaskTreeNode) path.getLastPathComponent();
 		mediator.setProof(tn0.proof());
@@ -133,11 +140,11 @@ public class TaskTree extends JPanel {
 	    = delegateView.getSelectionModel().getSelectionPaths();
 	if (paths==null) return new BasicTask[0];
         final List<BasicTask> result = new LinkedList<BasicTask>();
-	for (int i=0; i<paths.length; i++) {
-	    if (paths[i].getLastPathComponent() instanceof BasicTask) {
-		result.add((BasicTask) paths[i].getLastPathComponent());
-	    }
-	}
+        for (TreePath path : paths) {
+            if (path.getLastPathComponent() instanceof BasicTask) {
+                result.add((BasicTask)path.getLastPathComponent());
+            }
+        }
 	return result.toArray(new BasicTask[result.size()]);
     }
 
@@ -342,7 +349,7 @@ public class TaskTree extends JPanel {
                             mediator.getServices(), 
                             invokedNode.getUsedSpecs());
 	    } else if (e.getSource() == removeTask) {
-	        removeTask(invokedNode);
+	        Main.getInstance().closeTask(invokedNode);
             } else if (e.getSource() == loadProof) {
                 Main mainFrame = Main.getInstance();
                 KeYFileChooser localFileChooser = Main.getFileChooser(

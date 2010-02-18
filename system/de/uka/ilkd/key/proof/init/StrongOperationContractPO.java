@@ -3,16 +3,7 @@
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
-//
-//
-//This file is part of KeY - Integrated Deductive Software Design
-//Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
-//                      Universitaet Koblenz-Landau, Germany
-//                      Chalmers University of Technology, Sweden
-//
-//The KeY system is protected by the GNU General Public License. 
+//The KeY system is protected by the GNU General Public License.
 //See LICENSE.TXT for details.
 //
 //
@@ -22,32 +13,37 @@ package de.uka.ilkd.key.proof.init;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.op.ProgramMethod;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.rule.updatesimplifier.Update;
+import de.uka.ilkd.key.speclang.ClassInvariant;
 import de.uka.ilkd.key.speclang.OperationContract;
-import de.uka.ilkd.key.speclang.SetOfClassInvariant;
 
 
 /**
  * The "StrongOperationContract" proof obligation.
  */
 public class StrongOperationContractPO extends AbstractPO {
-    
-    private final OperationContract contract;
-    private final SetOfClassInvariant assumedInvs;
-    private final SetOfClassInvariant ensuredInvs;
 
-    
-    
+    private final OperationContract contract;
+    private final ImmutableSet<ClassInvariant> assumedInvs;
+    private final ImmutableSet<ClassInvariant> ensuredInvs;
+
+
+
     //-------------------------------------------------------------------------
     //constructors
     //-------------------------------------------------------------------------
-    
+
     public StrongOperationContractPO(InitConfig initConfig,
-	    			     OperationContract contract, 
-                                     SetOfClassInvariant assumedInvs,
-                                     SetOfClassInvariant ensuredInvs) {
+	    			     OperationContract contract,
+                                     ImmutableSet<ClassInvariant> assumedInvs,
+                                     ImmutableSet<ClassInvariant> ensuredInvs) {
         super(initConfig,
               "StrongOperationContract of " + contract.getProgramMethod(),
               contract.getProgramMethod().getContainerType());
@@ -55,56 +51,56 @@ public class StrongOperationContractPO extends AbstractPO {
         this.assumedInvs = assumedInvs;
         this.ensuredInvs = ensuredInvs;
     }
-    
-    
-    
+
+
+
     //-------------------------------------------------------------------------
     //methods of ProofOblInput interface
-    //-------------------------------------------------------------------------     
-    
+    //-------------------------------------------------------------------------
+
     public void readProblem(ModStrategy mod) throws ProofInputException {
         //prepare variables and container for @pre-functions
         ProgramMethod programMethod     = contract.getProgramMethod();
         ProgramVariable selfVar         = buildSelfVarAsProgVar();
-        ListOfProgramVariable paramVars = buildParamVars(programMethod);
+        ImmutableList<ProgramVariable> paramVars = buildParamVars(programMethod);
         ProgramVariable resultVar       = buildResultVar(programMethod);
         ProgramVariable exceptionVar    = buildExcVar();
-        Map<Operator, Function/*atPre*/> atPreFunctions = 
+        Map<Operator, Function/*atPre*/> atPreFunctions =
             new LinkedHashMap<Operator, Function/*atPre*/>();
-        
+
         //translate precondition
         Term preTerm = translatePre(contract, selfVar, toPV(paramVars));
-        
+
         //translate and conjoin assumed invariants
         Term assumedInvsTerm = translateInvs(assumedInvs);
-        
+
         //translate postcondition
-        Term postTerm = translatePost(contract, 
-                                      selfVar, 
-                                      toPV(paramVars), 
-                                      resultVar, 
+        Term postTerm = translatePost(contract,
+                                      selfVar,
+                                      toPV(paramVars),
+                                      resultVar,
                                       exceptionVar,
                                       atPreFunctions);
-        
+
         //translate and conjoin ensured invariants
         Term ensuredInvsTerm = translateInvs(ensuredInvs);
-        
+
         //build post implication with updates
         Term postImpTerm = TB.imp(postTerm, ensuredInvsTerm);
-        Term postUpdateTerm = translateModifies(contract, 
+        Term postUpdateTerm = translateModifies(contract,
                                                 postImpTerm,
-                                                selfVar, 
+                                                selfVar,
                                                 toPV(paramVars));
-        
+
         //build definitions for @pre-functions
-        Update atPreDefinitions 
+        Update atPreDefinitions
             = APF.createAtPreDefinitions(atPreFunctions, services);
-   
+
         //put everyhing together
-        Term poTerm = TB.imp(TB.and(preTerm, assumedInvsTerm), 
+        Term poTerm = TB.imp(TB.and(preTerm, assumedInvsTerm),
                              uf.apply(atPreDefinitions, postUpdateTerm));
         poTerms = new Term[]{poTerm};
-        
+
         //register everything in namespaces
         registerInNamespaces(selfVar);
         registerInNamespaces(paramVars);

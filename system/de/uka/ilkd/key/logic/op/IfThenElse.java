@@ -6,22 +6,15 @@
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
 //
-//
-// This file is part of KeY - Integrated Deductive Software Design 
-// Copyright (C) 2001-2003 Universitaet Karlsruhe, Germany
-//                         and Chalmers University of Technology, Sweden          
-//
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
-//
 
 package de.uka.ilkd.key.logic.op;
 
+import java.util.Iterator;
+
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.sort.IteratorOfSort;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
-import de.uka.ilkd.key.logic.sort.SetOfSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 
 
@@ -80,26 +73,24 @@ public class IfThenElse extends Op {
         else if (s2.extendsTrans(s1)) return s1;
         
         Sort result = Sort.ANY;
-        final SetOfSort set1 = transExtSorts(s1);
-        final SetOfSort set2 = transExtSorts(s2);
-        
-        final IteratorOfSort sort1It = set1.iterator();
-        while (sort1It.hasNext()) {
-            final Sort sort1 = sort1It.next();
+        final ImmutableSet<Sort> set1 = s1.extendsSorts();
+        final ImmutableSet<Sort> set2 = s2.extendsSorts();
+
+        for (final Sort sort1 : set1) {
             if (set2.contains(sort1)) {
                 if (result == Sort.ANY) {
                     result = sort1;
                 } else if(sort1.extendsTrans(result)){
                     result = sort1;
                 }
-            } 
+            }
         }        
         return result;
     }
     
-    private SetOfSort transExtSorts(Sort sort){
-        SetOfSort ext = sort.extendsSorts();
-        SetOfSort oldExt;
+    private ImmutableSet<Sort> transExtSorts(Sort sort){
+        ImmutableSet<Sort> ext = sort.extendsSorts();
+        ImmutableSet<Sort> oldExt;
         do{
             oldExt = ext;
             Sort[] ea = ext.toArray();

@@ -12,7 +12,8 @@ package de.uka.ilkd.key.proof;
 
 import java.util.HashMap;
 
-import de.uka.ilkd.key.rule.ListOfRuleSet;
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.rule.Taclet;
 
 /**
@@ -28,14 +29,14 @@ import de.uka.ilkd.key.rule.Taclet;
  */
 public class IHTacletFilter extends TacletFilter {
     private final boolean interactive;
-    private final ListOfRuleSet heuristics;
+    private final ImmutableList<RuleSet> heuristics;
 
     
     private final HashMap<Taclet, Boolean> filterCache = new HashMap<Taclet, Boolean>(2000);
     
     
     
-    public IHTacletFilter ( boolean interactive, ListOfRuleSet heuristics ) {
+    public IHTacletFilter ( boolean interactive, ImmutableList<RuleSet> heuristics ) {
 	this.interactive = interactive;
 	this.heuristics  = heuristics;
     }
@@ -46,7 +47,7 @@ public class IHTacletFilter extends TacletFilter {
      */
     public boolean filter ( Taclet taclet ) {
 	if (!interactive) {
-	    Boolean b = (Boolean) filterCache.get(taclet);
+	    Boolean b = filterCache.get(taclet);
             if (b == null) {
                 b = taclet.admissible ( interactive, heuristics ) ? 
                         Boolean.TRUE : Boolean.FALSE; 

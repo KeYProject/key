@@ -9,9 +9,10 @@
 //
 package de.uka.ilkd.key.rule.updatesimplifier;
 
+import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.AnonymousUpdate;
-import de.uka.ilkd.key.logic.op.ArrayOfQuantifiableVariable;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.util.Debug;
 
 /**
@@ -34,8 +35,8 @@ public class AssignmentPairLazy extends AbstractAssignmentPairLazy {
     /* (non-Javadoc)
      * @see de.uka.ilkd.key.rule.updatesimplifier.AssignmentPair#boundVars()
      */
-    public ArrayOfQuantifiableVariable boundVars () {
-        return new ArrayOfQuantifiableVariable ();
+    public ImmutableArray<QuantifiableVariable> boundVars () {
+        return new ImmutableArray ();
     }
     
     /* (non-Javadoc)

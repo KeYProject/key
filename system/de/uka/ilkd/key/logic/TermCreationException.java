@@ -17,7 +17,7 @@ package de.uka.ilkd.key.logic;
 
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.sort.*;
+import de.uka.ilkd.key.logic.sort.Sort;
 
 /**
  * 
@@ -61,9 +61,8 @@ public class TermCreationException extends RuntimeException {
 	private String argsToString(Function f) {
 	    StringBuffer sb = new StringBuffer();
       	    for(int i = 0; i < f.arity(); i++) {
-      		sb.append((i+1) + ".) ");
-    	        sb.append("sort: " + f.argSort(i) + 
-    	        	  ", sort hash: " + f.argSort(i).hashCode() + "\n");
+                  sb.append(i + 1).append(".) ");
+                  sb.append("sort: ").append(f.argSort(i)).append(", sort hash: ").append(f.argSort(i).hashCode()).append("\n");
       	    }
 	    return sb.toString();
 	}
@@ -72,14 +71,13 @@ public class TermCreationException extends RuntimeException {
         private String subsToString(Term[] subs) {
             StringBuffer sb = new StringBuffer();
             for (int i = 0; i<subs.length; i++) {
-                sb.append((i+1) + ".) ");
+                sb.append(i + 1).append(".) ");
                 Term subi = subs[i];
                 if(subi!=null){
                     sb.append(subi);
                     Sort subiSort = subi.sort();
                     if(subiSort!=null){
-                        sb.append("(sort: " + subi.sort()+
-                                  ", sort hash: "+ subi.sort().hashCode()+")\n");
+                        sb.append("(sort: ").append(subi.sort()).append(", sort hash: ").append(subi.sort().hashCode()).append(")\n");
                     }else{
                         sb.append("(Unknown sort, \"null pointer\")");
                     }

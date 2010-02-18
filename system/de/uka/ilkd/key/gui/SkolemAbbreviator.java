@@ -10,6 +10,8 @@
 
 package de.uka.ilkd.key.gui;
 
+import java.util.Iterator;
+
 import org.apache.log4j.Logger;
 
 import de.uka.ilkd.key.logic.Term;
@@ -17,7 +19,7 @@ import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.pp.AbbrevException;
 import de.uka.ilkd.key.proof.ProofEvent;
 import de.uka.ilkd.key.proof.proofevent.RuleAppInfo;
-import de.uka.ilkd.key.rule.IteratorOfNewDependingOn;
+import de.uka.ilkd.key.rule.NewDependingOn;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.TacletApp;
 
@@ -43,7 +45,7 @@ public class SkolemAbbreviator implements RuleAppListener {
         RuleApp ruleApp = rai.getRuleApp ();
         if ( ruleApp != null && ruleApp instanceof TacletApp ) {
             final TacletApp app = (TacletApp)ruleApp;
-            final IteratorOfNewDependingOn it = app.taclet ().varsNewDependingOn ();
+            final Iterator<NewDependingOn> it = app.taclet ().varsNewDependingOn ();
 
             while ( it.hasNext () ) {
                 final SchemaVariable sv = it.next ().first ();

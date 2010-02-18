@@ -53,7 +53,7 @@ public class LongRuleAppCost implements RuleAppCost {
         return (int)cost;
     }
     
-    public RuleAppCost add (RuleAppCost cost2) {
+    public final RuleAppCost add (RuleAppCost cost2) {
         if ( cost2 instanceof LongRuleAppCost ) {
 	    return add((LongRuleAppCost) cost2);
 	} else if ( cost2 instanceof TopRuleAppCost ) {
@@ -65,7 +65,7 @@ public class LongRuleAppCost implements RuleAppCost {
 	}
     }
 
-    public RuleAppCost add(LongRuleAppCost cost2) {
+    public final RuleAppCost add(LongRuleAppCost cost2) {
 	if ( cost == 0 ) {
 	    return cost2;
 	} else if ( cost2.cost == 0 ) {

@@ -5,8 +5,6 @@
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
-//
-//
 package de.uka.ilkd.key.gui.nodeviews;
 
 import java.io.StringWriter;
@@ -107,21 +105,21 @@ class DefaultTacletMenuItem extends JMenuItem implements TacletMenuItem {
         String s = sb.toString();
         String[] sa = s.split("\n");
         StringBuffer result = new StringBuffer();
-        for (int i = 0; i < sa.length; i ++) {
-    	//logger.debug("'" + sa[i] + "'");
-    	if (sa[i] == "") {
-    	    continue;
-    	}
-    	boolean onlySpaces = true;
-    	for (int j = 0; j < sa[i].length(); j++) {
-    	    if (sa[i].charAt(j) != ' ') {
-    		onlySpaces = false;
-    	    }
-    	}
-    	if (onlySpaces) {
-    	    continue;
-    	}
-    	result.append(sa[i]).append("\n");
+        for (String aSa : sa) {
+            //logger.debug("'" + sa[i] + "'");
+            if ("".equals(aSa)) {
+                continue;
+            }
+            boolean onlySpaces = true;
+            for (int j = 0; j < aSa.length(); j++) {
+                if (aSa.charAt(j) != ' ') {
+                    onlySpaces = false;
+                }
+            }
+            if (onlySpaces) {
+                continue;
+            }
+            result.append(aSa).append("\n");
         }
         if (result.charAt(result.length()-1) == '\n') {
     	result.setLength(result.length() - 1);

@@ -10,20 +10,19 @@
 
 package de.uka.ilkd.key.strategy;
 
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.IHTacletFilter;
-import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.TacletFilter;
-import de.uka.ilkd.key.proof.UpdateSimplificationRuleFilter;
-import de.uka.ilkd.key.rule.ListOfRuleSet;
+import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.RuleSet;
-import de.uka.ilkd.key.rule.SLListOfRuleSet;
 import de.uka.ilkd.key.strategy.feature.*;
-import de.uka.ilkd.key.strategy.feature.instantiator.*;
+import de.uka.ilkd.key.strategy.feature.instantiator.BackTrackingManager;
+import de.uka.ilkd.key.strategy.feature.instantiator.ForEachCP;
+import de.uka.ilkd.key.strategy.feature.instantiator.OneOfCP;
+import de.uka.ilkd.key.strategy.feature.instantiator.SVInstantiationCP;
 import de.uka.ilkd.key.strategy.termProjection.*;
 import de.uka.ilkd.key.strategy.termfeature.*;
 import de.uka.ilkd.key.strategy.termgenerator.TermGenerator;
@@ -195,7 +194,7 @@ public abstract class AbstractFeatureStrategy implements Strategy {
     }
 
     protected TacletFilter getFilterFor (String[] p_names) {
-        ListOfRuleSet heur = SLListOfRuleSet.EMPTY_LIST;
+        ImmutableList<RuleSet> heur = ImmutableSLList.<RuleSet>nil();
         for ( int i = 0; i != p_names.length; ++i )
             heur = heur.prepend ( getHeuristic ( p_names[i] ) );
         return new IHTacletFilter ( false, heur );

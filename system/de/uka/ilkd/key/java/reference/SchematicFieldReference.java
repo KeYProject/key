@@ -161,7 +161,7 @@ public class SchematicFieldReference extends FieldReference
      * pretty print 
      */
     public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
-        p.printFieldReference((FieldReference)this);
+        p.printFieldReference(this);
     }
 
     /** 

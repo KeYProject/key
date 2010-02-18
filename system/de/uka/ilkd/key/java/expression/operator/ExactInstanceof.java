@@ -72,7 +72,7 @@ public class ExactInstanceof extends TypeOperator {
         if (children != null) {
             len = children.size();
             if (len > index) {
-                return children.getExpression(index);
+                return children.get(index);
             }
             index -= len;
         }

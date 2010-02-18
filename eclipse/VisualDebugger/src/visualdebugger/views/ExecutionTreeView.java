@@ -1,9 +1,6 @@
 package visualdebugger.views;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.Map;
+import java.util.*;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.draw2d.*;
@@ -31,6 +28,7 @@ import org.eclipse.swt.layout.RowData;
 import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.*;
 import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.List;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.PartInitException;
@@ -38,12 +36,16 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.ViewPart;
 import org.eclipse.ui.texteditor.MarkerUtilities;
 
+import visualdebugger.Activator;
 import visualdebugger.VBTBuilder;
 import visualdebugger.draw2d.*;
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.gui.IMain;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.proof.*;
-import de.uka.ilkd.key.proof.decproc.DecProcRunner;
+import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.smt.DecProcRunner;
 import de.uka.ilkd.key.unittest.ModelGenerator;
 import de.uka.ilkd.key.util.ProgressMonitor;
 import de.uka.ilkd.key.visualdebugger.DebuggerEvent;
@@ -167,6 +169,8 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
     private Action recomputeWatchpoints;
 
     private List wpInfo;
+
+    private Action clearWatchpoints;
 
     /**
      * Instantiates a new execution tree view.
@@ -364,6 +368,7 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
      */
     private Figure createNode(ETNode etNode) {
         final java.util.List<WatchPoint> activeWPs = etNode.getWatchpointsSatisfied();
+        final java.util.List<WatchPoint> watchpointsTrueInSubset =etNode.getWatchpointsSatisfied();
         if (etNode instanceof ETStatementNode) {
             final SourceElementFigure node = new SourceElementFigure(
                     (ETStatementNode) etNode);
@@ -385,6 +390,13 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
                                 }else
                                 wpInfo.add(watchpoint.getExpression() +"@" + watchpoint.getMethod());
 
+                            }
+                        } else {
+                            if(watchpointsTrueInSubset != null && watchpointsTrueInSubset.size()>0){
+                                for (WatchPoint wp : watchpointsTrueInSubset) {
+                                    wpInfo.add("true in subset: " +wp.getExpression() +"@" + wp.getMethod());
+                                }
+                               
                             }
                         }
                     } catch (Throwable t) {
@@ -555,7 +567,7 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
                 // make sure that all information available is contained in the
                 // root node
                 currentETRootNode = null;
-                final ListOfGoal goals = getSubtreeGoalsForETNode(((SourceElementFigure) ExecutionTreeView.this.selected)
+                final ImmutableList<Goal> goals = getSubtreeGoalsForETNode(((SourceElementFigure) ExecutionTreeView.this.selected)
                         .getETNode());
                 vd.run(goals);
             }
@@ -572,7 +584,7 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
             public void widgetSelected(SelectionEvent event) {
                 ETNode node = ((SourceElementFigure) ExecutionTreeView.this.selected)
                         .getETNode();
-                final ListOfGoal goals = getSubtreeGoalsForETNode(node);
+                final ImmutableList<Goal> goals = getSubtreeGoalsForETNode(node);
                 vd.stepInto(goals);
             }
         });
@@ -585,7 +597,7 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
             }
 
             public void widgetSelected(SelectionEvent event) {
-                final ListOfGoal goals = getSubtreeGoalsForETNode(((SourceElementFigure) ExecutionTreeView.this.selected)
+                final ImmutableList<Goal> goals = getSubtreeGoalsForETNode(((SourceElementFigure) ExecutionTreeView.this.selected)
                         .getETNode());
                 vd.stepOver(goals);
             }
@@ -882,6 +894,8 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
         // manager.add(this.useBranchLabelsAction);
         manager.add(clearViewAction);
         manager.add(new Separator());
+        manager.add(clearWatchpoints);
+        manager.add(new Separator());
         manager.add(recomputeWatchpoints);
         manager.add(new Separator());
         manager.add(decisionProcedureAction);
@@ -927,11 +941,11 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
      * 
      * @return the subtree goals for et node
      */
-    private ListOfGoal getSubtreeGoalsForETNode(ETNode etNode) {
+    private ImmutableList<Goal> getSubtreeGoalsForETNode(ETNode etNode) {
         final ITNode[] itNodes = etNode.getITNodesArray();
-        ListOfGoal goals = SLListOfGoal.EMPTY_LIST;
+        ImmutableList<Goal> goals = ImmutableSLList.<Goal>nil();
         for (int i = 0; i < itNodes.length; i++) {
-            final ListOfGoal g = vd.getMediator().getProof().getSubtreeGoals(
+            final ImmutableList<Goal> g = vd.getMediator().getProof().getSubtreeGoals(
                     (itNodes[i].getNode()));
             goals = goals.prepend(g);
         }
@@ -1193,10 +1207,10 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
             public void run() {
                 if (vd.getMediator().getProof() == null)
                     return;
-                ListOfNode nodes = toList(vd.getMediator().getProof().root()
+                ImmutableList<Node> nodes = toList(vd.getMediator().getProof().root()
                         .leavesIterator());
                 VBTBuilder builder = new VBTBuilder(nodes,
-                        ModelGenerator.SIMPLIFY);
+                        ModelGenerator.OLD_SIMPLIFY);
 
                 if (!builder.succesful())
                     MessageDialog.openError(PlatformUI.getWorkbench()
@@ -1245,7 +1259,7 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
                     return;
                 new DecProcRunner((IMain)vd.getMediator().mainFrame(),
                         vd.getMediator().getProof(), 
-                        vd.getMediator().getUserConstraint().getConstraint()).run();
+                        vd.getMediator().getUserConstraint().getConstraint()).start();
             }
 
         };
@@ -1261,6 +1275,15 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
         };
         clearViewAction.setToolTipText("clears the view");
         clearViewAction.setText("Clear View");
+        
+        clearWatchpoints = new Action() {
+            public void run() {
+                clearWatchpoints();
+            }
+
+        };
+        clearWatchpoints.setToolTipText("removes all watchpoint markers (yellow borders)");
+        clearWatchpoints.setText("Clear Watchpoints");
 
         recomputeWatchpoints = new Action() {
             public void run() {
@@ -1436,21 +1459,19 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
      *            the new branch condition text
      */
     private void setBranchConditionText(ETNode etn) {
+	if (etn != null) {
+	    final ImmutableList<Term> simplifiedBc = etn.getSimplifiedBc();
 
-        if (etn != null && etn.getSimplifiedBc() != null
-                && etn.getParent() != null
-                && etn.getParent().getChildrenList().size() > 1) {
-
-            final Term[] bc = etn.getSimplifiedBc().toArray();
-            final String[] termsString = new String[bc.length];
-
-            for (int i = 0; i < bc.length; i++) {
-                termsString[i] = (vd.prettyPrint(bc[i]));
-
-            }
-
-            bcListControl.setItems(termsString);
-        } else
+	    if  (simplifiedBc != null && etn.getParent() != null
+		    && etn.getParent().getChildrenList().size() > 1) {
+		final String[] termsString = new String[simplifiedBc.size()];
+		int i = 0;
+		for (Term bc : simplifiedBc) {
+		    termsString[i++] = vd.prettyPrint(bc);
+		}
+		bcListControl.setItems(termsString);
+	    }
+	} else
             bcListControl.setItems(new String[0]);
 
     }
@@ -1478,9 +1499,9 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
 
         if (ln.getExpression() != null) {
             SourceElementId id = ln.getExpression();
-            Expression expr = visualdebugger.Activator.getDefault()
+            Expression expr = Activator.getDefault()
                     .getExpression(id);
-            ICompilationUnit unit = visualdebugger.Activator.getDefault()
+            ICompilationUnit unit = Activator.getDefault()
                     .getCompilationUnit(id);
             try {
                 IEditorPart ed = JavaUI.openInEditor(unit);
@@ -1587,8 +1608,8 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
      * 
      * @return the list of node
      */
-    private ListOfNode toList(IteratorOfNode it) {
-        ListOfNode result = SLListOfNode.EMPTY_LIST;
+    private ImmutableList<Node> toList(Iterator<Node> it) {
+        ImmutableList<Node> result = ImmutableSLList.<Node>nil();
         while (it.hasNext()) {
             result = result.append(it.next());
 
@@ -1662,6 +1683,16 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
             ((Figure) contents).removeAll();
             root.removeLabels();
         }
+    }
+    /**
+     * Removes the watchpoint markers(yellow borders) from the view.
+     */ 
+    private void clearWatchpoints() {
+       LinkedList<ETNode> executionTree = WatchpointUtil.getETasList(getCurrentETRootNode());
+       for (ETNode node : executionTree) {
+        node.setWatchpoint(false);
+    }
+        refresh();
     }
 
     /**

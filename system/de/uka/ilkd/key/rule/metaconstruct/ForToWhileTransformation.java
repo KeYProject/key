@@ -1,18 +1,20 @@
+// This file is part of KeY - Integrated Deductive Software Design
+// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General Public License. 
+// See LICENSE.TXT for details.
 package de.uka.ilkd.key.rule.metaconstruct;
 
-import de.uka.ilkd.key.java.ArrayOfStatement;
+import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.expression.ExpressionStatement;
 import de.uka.ilkd.key.java.expression.literal.BooleanLiteral;
-import de.uka.ilkd.key.java.statement.For;
-import de.uka.ilkd.key.java.statement.Guard;
-import de.uka.ilkd.key.java.statement.IForUpdates;
-import de.uka.ilkd.key.java.statement.ILoopInit;
-import de.uka.ilkd.key.java.statement.LabeledStatement;
-import de.uka.ilkd.key.java.statement.While;
+import de.uka.ilkd.key.java.statement.*;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.speclang.LoopInvariant;
 import de.uka.ilkd.key.util.ExtList;
@@ -92,14 +94,14 @@ public class ForToWhileTransformation extends WhileLoopTransformation {
 
             for (int copyStatements = 0; copyStatements < initSize; copyStatements++) {
                 outerBlockStatements[copyStatements] = inits.getInits()
-                        .getLoopInitializer(copyStatements);
+                        .get(copyStatements);
             }
             
             outerBlockStatements[initSize] = new While(guard.getExpression(),
-                    new StatementBlock(new ArrayOfStatement(
+                    new StatementBlock(new ImmutableArray<Statement>(
                             innerBlockStatements)), null);
 
-            Statement outerBlock = new StatementBlock(new ArrayOfStatement(
+            Statement outerBlock = new StatementBlock(new ImmutableArray<Statement>(
                     outerBlockStatements));
 
             if (outerLabelNeeded() && breakOuterLabel != null) {

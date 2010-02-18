@@ -16,16 +16,16 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.Vector;
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
 
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.abstraction.ClassType;
-import de.uka.ilkd.key.java.abstraction.IteratorOfKeYJavaType;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.abstraction.SetAsListOfKeYJavaType;
-import de.uka.ilkd.key.java.abstraction.SetOfKeYJavaType;
 
 
 /**
@@ -49,7 +49,7 @@ public class ClassSelectionDialog extends JDialog {
      */
     public ClassSelectionDialog(String dialogTitle,
                                 String classesTitle,
-                                SetOfKeYJavaType kjts,
+                                ImmutableSet<KeYJavaType> kjts,
                                 KeYJavaType defaultClass,
                                 boolean allowMultipleSelection) {
         super(new JFrame(), dialogTitle, true);
@@ -62,7 +62,7 @@ public class ClassSelectionDialog extends JDialog {
         } else {
             classList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         }
-        IteratorOfKeYJavaType it = kjts.iterator();
+        Iterator<KeYJavaType> it = kjts.iterator();
         Vector<WrappedKJT> v = new Vector<WrappedKJT>();
         while(it.hasNext()) {
             KeYJavaType kjt = (KeYJavaType) it.next();
@@ -136,7 +136,7 @@ public class ClassSelectionDialog extends JDialog {
     
     public ClassSelectionDialog(String dialogTitle,
                                 String classesTitle,
-                                SetOfKeYJavaType kjts,
+                                ImmutableSet<KeYJavaType> kjts,
                                 boolean allowMultipleSelection) {
         this(dialogTitle, 
              classesTitle, 
@@ -157,10 +157,10 @@ public class ClassSelectionDialog extends JDialog {
     /**
      * Returns the selected classes.
      */
-    public SetOfKeYJavaType getSelection() {
+    public ImmutableSet<KeYJavaType> getSelection() {
         Object[] selection = classList.getSelectedValues();
         
-        SetOfKeYJavaType result = SetAsListOfKeYJavaType.EMPTY_SET;
+        ImmutableSet<KeYJavaType> result = DefaultImmutableSet.<KeYJavaType>nil();
         for(int i = selection.length - 1; i >= 0; i--) {
             result = result.add(((WrappedKJT) selection[i]).kjt);
         }

@@ -14,6 +14,8 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.visitor.Visitor;
@@ -35,8 +37,8 @@ public class LoopInvariantImpl implements LoopInvariant {
     private final Term originalWorkingSpaceReentrant;
     private final Term originalWorkingSpaceConstructed;
     private final Term originalParametrizedWorkingSpaceTerms;
-    private final SetOfTerm originalPredicates;
-    private final SetOfLocationDescriptor originalModifies;
+    private final LoopPredicateSet originalPredicates;
+    private final LocationDescriptorSet originalModifies;
     private final Term originalVariant;
     private final Term originalSelfTerm;
     private final Map<Operator, Function /*(atPre)*/> originalAtPreFunctions;
@@ -61,8 +63,8 @@ public class LoopInvariantImpl implements LoopInvariant {
      */
     public LoopInvariantImpl(LoopStatement loop,
                              Term invariant,
-                             SetOfTerm predicates,
-                             SetOfLocationDescriptor modifies,  
+                             LoopPredicateSet predicates,
+                             LocationDescriptorSet modifies,  
                              Term variant, 
                              Term parametrizedWorkingSpaceTerms,
                              Term workingSpaceLocal,
@@ -97,8 +99,8 @@ public class LoopInvariantImpl implements LoopInvariant {
     public LoopInvariantImpl(LoopStatement loop, Term selfTerm) {
         this(loop, 
              null, 
-             SetAsListOfTerm.EMPTY_SET, 
-             SetAsListOfLocationDescriptor.EMPTY_SET, 
+             new LoopPredicateSet(DefaultImmutableSet.<Term>nil()), 
+             new LocationDescriptorSet(DefaultImmutableSet.<LocationDescriptor>nil()), 
              null, 
              null,
              null,
@@ -141,23 +143,21 @@ public class LoopInvariantImpl implements LoopInvariant {
 
         //atPre-functions
         if(atPreFunctions != null) {
-            Iterator<Map.Entry<Operator, Function>> it = 
-                originalAtPreFunctions.entrySet().iterator();
-            while(it.hasNext()) {
-                Map.Entry<Operator, Function> entry = it.next();
+            for (Object o : originalAtPreFunctions.entrySet()) {
+                Map.Entry<Operator, Function> entry = (Map.Entry<Operator, Function>) o;
                 Operator originalNormalOp = entry.getKey();
                 Function originalAtPreFunc = entry.getValue();
                 Operator normalOp = (Operator) result.get(originalNormalOp);
-                if(normalOp == null) {
+                if (normalOp == null) {
                     normalOp = originalNormalOp;
                 }
                 Function atPreFunc = atPreFunctions.get(normalOp);
-                if(atPreFunc == null) {
-                    atPreFunc 
-                        = AtPreFactory.INSTANCE.createAtPreFunction(normalOp, 
-                                                                    services);
+                if (atPreFunc == null) {
+                    atPreFunc
+                            = AtPreFactory.INSTANCE.createAtPreFunction(normalOp,
+                            services);
                     atPreFunctions.put(normalOp, atPreFunc);
-                    services.getNamespaces().functions().add(atPreFunc);                    
+                    services.getNamespaces().functions().add(atPreFunc);
                 }
                 assert originalAtPreFunc.sort().equals(atPreFunc.sort());
                 result.put(originalAtPreFunc, atPreFunc);
@@ -174,11 +174,10 @@ public class LoopInvariantImpl implements LoopInvariant {
             Services services) {
        Map result = new LinkedHashMap();
        Map replaceMap = getReplaceMap(selfTerm, null, atPreFunctions, services);
-       final Iterator<Map.Entry> it = replaceMap.entrySet().iterator();
-       while(it.hasNext()) {
-           Map.Entry entry = it.next();
-           result.put(entry.getValue(), entry.getKey());
-       }
+        for (Object o : replaceMap.entrySet()) {
+            Map.Entry entry = (Map.Entry) o;
+            result.put(entry.getValue(), entry.getKey());
+        }
        return result;
     }
     
@@ -213,17 +212,17 @@ public class LoopInvariantImpl implements LoopInvariant {
     }
     
     
-    public SetOfTerm getPredicates(Term selfTerm,
+    public LoopPredicateSet getPredicates(Term selfTerm,
             /*inout*/ Map<Operator, Function/* (atPre)*/> atPreFunctions,
             Services services) {
         assert (selfTerm == null) == (originalSelfTerm == null);
         Map replaceMap = getReplaceMap(selfTerm, null, atPreFunctions, services);
         OpReplacer or = new OpReplacer(replaceMap);
-        return or.replace(originalPredicates);
+        return new LoopPredicateSet(or.replace(originalPredicates.asSet()));
     }
 
     
-    public SetOfLocationDescriptor getModifies(
+    public LocationDescriptorSet getModifies(
             Term selfTerm,
             /*inout*/ Map<Operator, Function/* (atPre)*/> atPreFunctions,
             Services services) {
@@ -243,7 +242,7 @@ public class LoopInvariantImpl implements LoopInvariant {
         Map replaceMap = 
             getReplaceMap(selfTerm, memoryArea, atPreFunctions, services);
         OpReplacer or = new OpReplacer(replaceMap);
-        return or.replace(originalModifies);
+        return new LocationDescriptorSet(or.replaceLoc(originalModifies.asSet()));
     }
     
     public Term getVariant(Term selfTerm, 
@@ -352,7 +351,7 @@ public class LoopInvariantImpl implements LoopInvariant {
     }
     
 
-    public LoopInvariant setPredicates(SetOfTerm predicates, 
+    public LoopInvariant setPredicates(ImmutableSet<Term> predicates, 
             Term selfTerm,
             /*inout*/ Map <Operator, Function/* atPre */> atPreFunctions,
             Services services) {
@@ -362,7 +361,7 @@ public class LoopInvariantImpl implements LoopInvariant {
         OpReplacer or = new OpReplacer(inverseReplaceMap);
         return new LoopInvariantImpl(loop,
                                      originalInvariant,
-                                     or.replace(predicates),
+                                     new LoopPredicateSet(or.replace(predicates)),
                                      originalModifies,
                                      originalVariant,
                                      originalParametrizedWorkingSpaceTerms,

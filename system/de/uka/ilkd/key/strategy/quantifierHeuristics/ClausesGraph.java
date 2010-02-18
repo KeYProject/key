@@ -5,31 +5,19 @@
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
-//
-//
-//This file is part of KeY - Integrated Deductive Software Design
-//Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
-//                      Universitaet Koblenz-Landau, Germany
-//                      Chalmers University of Technology, Sweden
-//
-//The KeY system is protected by the GNU General Public License. 
-//See LICENSE.TXT for details.
-//
-//
 
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
-import de.uka.ilkd.key.logic.IteratorOfTerm;
-import de.uka.ilkd.key.logic.SetAsListOfTerm;
-import de.uka.ilkd.key.logic.SetOfTerm;
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Op;
 import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.SetAsListOfQuantifiableVariable;
-import de.uka.ilkd.key.logic.op.SetOfQuantifiableVariable;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.util.LRUCache;
 
 /**
@@ -44,14 +32,14 @@ class ClausesGraph {
      */
     private final static Map<Term, ClausesGraph> graphCache = new LRUCache<Term, ClausesGraph> (1000);
 
-    private final SetOfQuantifiableVariable exVars;
+    private final ImmutableSet<QuantifiableVariable> exVars;
     
     /**
      * Map from <code>Term</code> to <code>SetOfTerm</code>
      */
-    private final Map<Term, SetOfTerm> connections = new HashMap<Term, SetOfTerm>();
+    private final Map<Term, ImmutableSet<Term>> connections = new HashMap<Term, ImmutableSet<Term>>();
     
-    private final SetOfTerm clauses;
+    private final ImmutableSet<Term> clauses;
     
     static ClausesGraph create(Term quantifiedFormula) {
         ClausesGraph graph = graphCache.get ( quantifiedFormula );
@@ -74,26 +62,23 @@ class ClausesGraph {
         do {
             changed = false;
 
-            final IteratorOfTerm forIt = clauses.iterator ();
-            while ( forIt.hasNext () ) {
-                final Term formula = forIt.next ();
-                final SetOfTerm oldConnections = getConnections ( formula );
-                final SetOfTerm newConnections =
-                    getTransitiveConnections ( oldConnections );
+            for (Term clause : clauses) {
+                final Term formula = clause;
+                final ImmutableSet<Term> oldConnections = getConnections(formula);
+                final ImmutableSet<Term> newConnections =
+                        getTransitiveConnections(oldConnections);
 
-                if ( newConnections.size () > oldConnections.size () ) {
+                if (newConnections.size() > oldConnections.size()) {
                     changed = true;
-                    connections.put ( formula, newConnections );
+                    connections.put(formula, newConnections);
                 }
             }
 
         } while ( changed );
     }
 
-    private SetOfTerm getTransitiveConnections(SetOfTerm formulas) {
-        final IteratorOfTerm termIt = formulas.iterator ();
-        while ( termIt.hasNext () )
-            formulas = formulas.union ( getConnections ( termIt.next () ) );
+    private ImmutableSet<Term> getTransitiveConnections(ImmutableSet<Term> formulas) {
+        for (Term formula : formulas) formulas = formulas.union(getConnections(formula));
         return formulas;
     }
 
@@ -105,18 +90,17 @@ class ClausesGraph {
      *         are connected.
      */
     boolean connected(Term formula0, Term formula1) {
-        final SetOfTerm subFormulas1 = computeClauses ( formula1 );
-        final IteratorOfTerm it = computeClauses ( formula0 ).iterator ();
-        while ( it.hasNext () ) {
-            if ( intersect ( getConnections ( it.next () ),
-                             subFormulas1 )                .size () > 0 )
+        final ImmutableSet<Term> subFormulas1 = computeClauses ( formula1 );
+        for (Term term : computeClauses(formula0)) {
+            if (intersect(getConnections(term),
+                    subFormulas1).size() > 0)
                 return true;
         }
         return false;
     }
     
     boolean isFullGraph() {
-        final IteratorOfTerm it = clauses.iterator ();
+        final Iterator<Term> it = clauses.iterator ();
         if ( it.hasNext () ) {
             if ( getConnections ( it.next () ).size () < clauses.size () )
                 return false;
@@ -129,7 +113,7 @@ class ClausesGraph {
      * @param formula
      * @return set of terms that connect to the formula.
      */
-    private SetOfTerm getConnections(Term formula) {
+    private ImmutableSet<Term> getConnections(Term formula) {
         return connections.get ( formula );
     }
 
@@ -138,10 +122,9 @@ class ClausesGraph {
      * 
      */
     private void buildInitialGraph() {
-        final IteratorOfTerm it = clauses.iterator ();
-        while ( it.hasNext () ) {
-            final Term clause = it.next ();
-            connections.put ( clause, directConnections ( clause ) );
+        for (Term clause1 : clauses) {
+            final Term clause = clause1;
+            connections.put(clause, directConnections(clause));
         }
     }
 
@@ -150,13 +133,12 @@ class ClausesGraph {
      * @param formula
      * @return set of term that connect to formula.
      */
-    private SetOfTerm directConnections(Term formula) {
-        SetOfTerm res = SetAsListOfTerm.EMPTY_SET;
-        final IteratorOfTerm it = clauses.iterator ();
-        while ( it.hasNext () ) {
-            final Term clause = it.next ();
-            if ( directlyConnected ( clause, formula ) )
-                res = res.add ( clause );
+    private ImmutableSet<Term> directConnections(Term formula) {
+        ImmutableSet<Term> res = DefaultImmutableSet.<Term>nil();
+        for (Term clause1 : clauses) {
+            final Term clause = clause1;
+            if (directlyConnected(clause, formula))
+                res = res.add(clause);
         }
         return res;
     }
@@ -167,8 +149,8 @@ class ClausesGraph {
      * @return ture if set contains one or more exists varaible that are also in
      *         exVars
      */
-    private boolean containsExistentialVariables(SetOfQuantifiableVariable set) {
-        return intersect ( set, exVars ).size () > 0;
+    private boolean containsExistentialVariables(ImmutableSet<QuantifiableVariable> set) {
+        return intersectQV ( set, exVars ).size () > 0;
     }
 
     /**
@@ -178,8 +160,8 @@ class ClausesGraph {
      *         that are the same.
      */
     private boolean directlyConnected(Term formula0, Term formula1) {
-        return containsExistentialVariables ( intersect ( formula0.freeVars (),
-                                                          formula1.freeVars () ) );
+        return containsExistentialVariables ( intersectQV ( formula0.freeVars (),
+                                                            formula1.freeVars () ) );
     }
 
     /**
@@ -187,7 +169,7 @@ class ClausesGraph {
      * @return retrun set of terms of all clauses under the formula
      */
 
-    private SetOfTerm computeClauses(Term formula) {
+    private ImmutableSet<Term> computeClauses(Term formula) {
         final Operator op = formula.op ();
         if ( op == Op.NOT )
             return computeClauses ( formula.sub ( 0 ) );
@@ -195,7 +177,7 @@ class ClausesGraph {
             return computeClauses ( formula.sub ( 0 ) )
                    .union ( computeClauses ( formula.sub ( 1 ) ) );
         } else {
-            return SetAsListOfTerm.EMPTY_SET.add ( formula );
+            return DefaultImmutableSet.<Term>nil().add ( formula );
         }
     }
 
@@ -203,22 +185,22 @@ class ClausesGraph {
      * return the exists variables bound in the top level of 
      * a given cnf formula. 
      */
-    private SetOfQuantifiableVariable existentialVars(Term formula) {
+    private ImmutableSet<QuantifiableVariable> existentialVars(Term formula) {
         final Operator op = formula.op ();
         if ( op == Op.ALL ) return existentialVars ( formula.sub ( 0 ) );
         if ( op == Op.EX )
             return
                 existentialVars ( formula.sub ( 0 ) )
-                .add ( formula.varsBoundHere ( 0 ).lastQuantifiableVariable () );
-        return SetAsListOfQuantifiableVariable.EMPTY_SET;
+                .add ( formula.varsBoundHere ( 0 ).last () );
+        return DefaultImmutableSet.<QuantifiableVariable>nil();
     }
 
     /**
      * @return a set of quantifiableVariable which are belonged to 
      *          both set0 and set1 have
      */
-    private SetOfQuantifiableVariable intersect(SetOfQuantifiableVariable set0,
-                                                SetOfQuantifiableVariable set1) {
+    private ImmutableSet<QuantifiableVariable> intersectQV(ImmutableSet<QuantifiableVariable> set0,
+                                                ImmutableSet<QuantifiableVariable> set1) {
         return TriggerUtils.intersect ( set0, set1 );
     }
     
@@ -229,13 +211,12 @@ class ClausesGraph {
      * @param set1
      * @return a set of terms which are belonged to both set0 and set1.
      */
-    private SetOfTerm intersect(SetOfTerm set0, SetOfTerm set1) {
-        SetOfTerm res = SetAsListOfTerm.EMPTY_SET;
+    private ImmutableSet<Term> intersect(ImmutableSet<Term> set0, ImmutableSet<Term> set1) {
+        ImmutableSet<Term> res = DefaultImmutableSet.<Term>nil();
         if ( set0 == null || set1 == null ) return res;
-        final IteratorOfTerm it = set0.iterator ();
-        while ( it.hasNext () ) {
-            final Term el = it.next ();
-            if ( set1.contains ( el ) ) res = res.add ( el );
+        for (Term aSet0 : set0) {
+            final Term el = aSet0;
+            if (set1.contains(el)) res = res.add(el);
         }
         return res;
     }

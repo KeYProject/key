@@ -11,18 +11,25 @@
 
 package de.uka.ilkd.key.rule.soundness;
 
-import de.uka.ilkd.key.java.*;
+import java.util.Iterator;
+
+import de.uka.ilkd.key.collection.ImmutableArray;
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.java.Expression;
+import de.uka.ilkd.key.java.ProgramElement;
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.statement.JumpStatement;
 import de.uka.ilkd.key.java.statement.Return;
 import de.uka.ilkd.key.java.statement.Throw;
 import de.uka.ilkd.key.logic.Namespace;
-import de.uka.ilkd.key.logic.op.ListOfIProgramVariable;
+import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.rule.ListOfTacletApp;
-import de.uka.ilkd.key.rule.SLListOfTacletApp;
+import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.util.ExtList;
 
 
@@ -35,7 +42,7 @@ public abstract class StatementExpressionSkolemBuilder
     extends AbstractPVPrefixSkolemBuilder {
 
     private final Namespace skolemVariables = new Namespace ();
-    private ListOfTacletApp taclets         = SLListOfTacletApp.EMPTY_LIST;
+    private ImmutableList<TacletApp> taclets         = ImmutableSLList.<TacletApp>nil();
 
     private final JumpStatementPrefixes  jumpStatementPrefixes;
 
@@ -54,15 +61,15 @@ public abstract class StatementExpressionSkolemBuilder
 	return jumpStatementPrefixes;
     }
 
-    protected ListOfStatement getJumpStatementPrefix ( SchemaVariable p ) {
-	ListOfStatement res = getJumpStatementPrefixes ().getPrefix ( p );
+    protected ImmutableList<Statement> getJumpStatementPrefix ( SchemaVariable p ) {
+	ImmutableList<Statement> res = getJumpStatementPrefixes ().getPrefix ( p );
 	if ( res == null )
-	    res = SLListOfStatement.EMPTY_LIST;
+	    res = ImmutableSLList.<Statement>nil();
 	return res;
     }
 
 
-    protected ListOfTacletApp getTaclets() {
+    protected ImmutableList<TacletApp> getTaclets() {
         return taclets;
     }
 
@@ -81,8 +88,8 @@ public abstract class StatementExpressionSkolemBuilder
     protected class StatementSymbolArgBuilder {
 
 	private final SchemaVariable   sv;
-        private ListOfIProgramVariable pvp;
-	private ArrayOfStatement       jt;
+        private ImmutableList<IProgramVariable> pvp;
+	private ImmutableArray<Statement>       jt;
 
 	StatementSymbolArgBuilder ( SchemaVariable p_sv ) {
 	    sv  = p_sv;
@@ -90,15 +97,15 @@ public abstract class StatementExpressionSkolemBuilder
 	    jt  = createJumpTable();
 	}
 
-	ListOfIProgramVariable getInfluencingPVs () {
+	ImmutableList<IProgramVariable> getInfluencingPVs () {
 	    return pvp;
 	}
 
-        ArrayOfStatement getJumpTable() {
+        ImmutableArray<Statement> getJumpTable() {
             return jt;
         }
 
-	private ArrayOfStatement createJumpTable () {
+	private ImmutableArray<Statement> createJumpTable () {
 	    ExtList res = new ExtList ();
 
 	    //	try { // <-- why this??
@@ -116,7 +123,7 @@ public abstract class StatementExpressionSkolemBuilder
 	    }
 	    //	} catch ( RuntimeException e ) {}
 
-	    IteratorOfStatement it = getJumpStatementPrefix ( sv ).iterator ();
+	    Iterator<Statement> it = getJumpStatementPrefix ( sv ).iterator ();
 	    Statement           s;
 	    while ( it.hasNext () ) {
 		s = it.next ();
@@ -141,7 +148,7 @@ public abstract class StatementExpressionSkolemBuilder
 		res.add ( s );
 	    }
 
-	    return new ArrayOfStatement ( (Statement[])res.collect
+	    return new ImmutableArray<Statement> ( (Statement[])res.collect
 					  ( Statement.class ) );	
 	}
 

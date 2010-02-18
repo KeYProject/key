@@ -17,6 +17,7 @@
 
 package de.uka.ilkd.key.rule.metaconstruct;
 
+import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.ArrayType;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -47,7 +48,7 @@ public abstract class InitArray extends ProgramMetaConstruct {
     /**
      * Extract the variable initializers from the array initializer
      */
-    protected ArrayOfExpression
+    protected ImmutableArray<Expression>
 	extractInitializers ( Expression p_creationExpression ) {
 
 	Debug.assertTrue ( p_creationExpression instanceof NewArray,
@@ -83,7 +84,7 @@ public abstract class InitArray extends ProgramMetaConstruct {
     protected Expression
 	createArrayCreation ( Expression p_creationExpression ) {
 
-	ArrayOfExpression initializers =
+	ImmutableArray<Expression> initializers =
 	    extractInitializers ( p_creationExpression );
 
 	if ( initializers == null )
@@ -116,7 +117,7 @@ public abstract class InitArray extends ProgramMetaConstruct {
 	  Expression p_creationExpression,
 	  Services services ) {
 
-	ArrayOfExpression initializers =
+	ImmutableArray<Expression> initializers =
 	    extractInitializers ( p_creationExpression );
 
 	if ( initializers == null )
@@ -135,11 +136,11 @@ public abstract class InitArray extends ProgramMetaConstruct {
 	    ProgramVariable var = new LocationVariable(name, elementType);
 	    p_stmnts [i] = KeYJavaASTFactory.
 		declare ( var,
-			  initializers.getExpression ( i ),
+			  initializers.get ( i ),
 			  elementType);
 	    res [i] = (ProgramVariable)
 		((LocalVariableDeclaration)p_stmnts[i]).
-		getVariables ().getVariableSpecification ( 0 ).getProgramVariable ();
+		getVariables ().get ( 0 ).getProgramVariable ();
 	}
 
 	return res;

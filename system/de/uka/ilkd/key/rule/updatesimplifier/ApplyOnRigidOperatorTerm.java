@@ -15,11 +15,12 @@
  */
 package de.uka.ilkd.key.rule.updatesimplifier;
 
+import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.ArrayOfQuantifiableVariable;
 import de.uka.ilkd.key.logic.op.Location;
 import de.uka.ilkd.key.logic.op.NonRigid;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.rule.AbstractUpdateRule;
 import de.uka.ilkd.key.rule.UpdateSimplifier;
 import de.uka.ilkd.key.util.Debug;
@@ -58,7 +59,7 @@ public class ApplyOnRigidOperatorTerm extends AbstractUpdateRule {
         						       target, 
         						       services);        
         final Term[] subs = pr.getSimplifiedSubterms();
-        final ArrayOfQuantifiableVariable[] vars = pr.getBoundVariables();
+        final ImmutableArray<QuantifiableVariable>[] vars = pr.getBoundVariables();
              
         if (pr.hasChanged()) {
             result = UpdateSimplifierTermFactory.DEFAULT.getBasicTermFactory().

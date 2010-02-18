@@ -14,7 +14,6 @@ import java.util.HashSet;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.visitor.ProgramVariableCollector;
-import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.Visitor;
 import de.uka.ilkd.key.logic.op.Location;
@@ -53,7 +52,7 @@ public class TermProgramVariableCollector extends Visitor {
 	    result.add( (Location) t.op() );
 	}
 	
-	if ( t.javaBlock () != JavaBlock.EMPTY_JAVABLOCK ) {
+	if ( !t.javaBlock ().isEmpty() ) {
 	    ProgramVariableCollector pvc
 		= new ProgramVariableCollector ( t.javaBlock ().program (), services, collectFunctionLocations );
 	    pvc.start();

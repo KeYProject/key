@@ -3,6 +3,7 @@ package de.uka.ilkd.key.logic.op;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -73,8 +74,8 @@ public class WorkingSpaceRigidOp extends RigidFunction implements IWorkingSpaceO
         return null;
     }
     
-    public ListOfTerm getParameters(Term t){
-        ListOfTerm result = SLListOfTerm.EMPTY_LIST;
+    public ImmutableList<Term> getParameters(Term t){
+        ImmutableList<Term> result = new ImmutableList<Term>();
         int i = (getProgramMethod().isStatic() ? 0 : 1);
         for(; i<methodTerm.arity(); i++){
             result = result.append(methodTerm.sub(i));
@@ -83,7 +84,7 @@ public class WorkingSpaceRigidOp extends RigidFunction implements IWorkingSpaceO
     }
     
     public Term getPre(Term self, 
-            ListOfTerm params,
+            ImmutableList<Term> params,
             Services services){
         Map<Term, Term> map = new LinkedHashMap<Term, Term>();
         int i=0;
@@ -91,7 +92,7 @@ public class WorkingSpaceRigidOp extends RigidFunction implements IWorkingSpaceO
             map.put(methodTerm.sub(0), self);
             i++;
         }
-        IteratorOfTerm it = params.iterator();
+        Iterator<Term> it = params.iterator();
         while(it.hasNext()){
             map.put(methodTerm.sub(i++), it.next());
         }

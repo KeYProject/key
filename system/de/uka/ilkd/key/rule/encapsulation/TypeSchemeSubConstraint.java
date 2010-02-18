@@ -10,6 +10,7 @@
 
 package de.uka.ilkd.key.rule.encapsulation;
 
+import de.uka.ilkd.key.collection.ImmutableSet;
 
 class TypeSchemeSubConstraint implements TypeSchemeConstraint {
     private TypeSchemeTerm term1, term2;
@@ -26,7 +27,7 @@ class TypeSchemeSubConstraint implements TypeSchemeConstraint {
     }
 
         
-    public SetOfTypeSchemeVariable getFreeVars() {
+    public ImmutableSet<TypeSchemeVariable> getFreeVars() {
         return term1.getFreeVars().union(term2.getFreeVars());
     }
     

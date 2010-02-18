@@ -44,6 +44,9 @@ public interface Visitor {
      void performActionOnProgramVariable(
 			    ProgramVariable x);
 
+     void performActionOnIProgramVariable(
+             IProgramVariable x);
+
      void performActionOnSchemaVariable(
 			    SchemaVariable x);
     

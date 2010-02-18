@@ -10,8 +10,11 @@
 
 package de.uka.ilkd.key.proof.reuse;
 
+import java.util.Iterator;
 import java.util.List;
 
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
@@ -43,7 +46,7 @@ public class ReuseFindTaclet {
 
       final boolean inAntec = templateApp.posInOccurrence().isInAntec();
       
-      final IteratorOfConstrainedFormula formIter;
+      final Iterator<ConstrainedFormula> formIter;
 
       if (inAntec) {
          formIter = g.sequent().antecedent().iterator();         
@@ -83,21 +86,20 @@ public class ReuseFindTaclet {
    private void checkIfInstsAndRecord(ReusePoint blank, PosInOccurrence pos, 
                                       TacletApp tentativeApp) {
 
-         final ListOfTacletApp ifCandidates;
+         final ImmutableList<TacletApp> ifCandidates;
          if (!tentativeApp.ifInstsComplete()) {
              ifCandidates = tentativeApp.findIfFormulaInstantiations(
  	        blank.target().sequent(), services, userC);
          } else {
-             ifCandidates = SLListOfTacletApp.EMPTY_LIST.prepend(tentativeApp);
+             ifCandidates = ImmutableSLList.<TacletApp>nil().prepend(tentativeApp);
          }
-         
-         final IteratorOfTacletApp it = ifCandidates.iterator();
-         while (it.hasNext()) {
-             final ReusePoint p = blank.initialize(pos, it.next(), medi);
-             if ((p != null)){ // RuleApp can be transferred // && goodEnough!
-                reusePoints.add(p);
-             }
-         }
+
+       for (TacletApp ifCandidate : ifCandidates) {
+           final ReusePoint p = blank.initialize(pos, ifCandidate, medi);
+           if ((p != null)) { // RuleApp can be transferred // && goodEnough!
+               reusePoints.add(p);
+           }
+       }
    }
 
 

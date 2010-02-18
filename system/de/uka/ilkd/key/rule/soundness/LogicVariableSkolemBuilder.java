@@ -11,10 +11,11 @@
 
 package de.uka.ilkd.key.rule.soundness;
 
+import java.util.Iterator;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.IteratorOfSchemaVariable;
 import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.SortedSchemaVariable;
@@ -32,8 +33,8 @@ public class LogicVariableSkolemBuilder extends AbstractSkolemBuilder {
 	super ( p_oriSkolemSet, p_services );
     }
     
-    public IteratorOfSkolemSet build () {
-	IteratorOfSchemaVariable it =
+    public Iterator<SkolemSet> build () {
+	Iterator<SchemaVariable> it =
 	    getOriginalSkolemSet ().getMissing ().iterator ();
 	SchemaVariable           sv;
 

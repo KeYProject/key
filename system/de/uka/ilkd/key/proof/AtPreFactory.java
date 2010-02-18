@@ -10,28 +10,14 @@
 
 package de.uka.ilkd.key.proof;
 
-import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
+import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.NamespaceSet;
-import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.TermFactory;
-import de.uka.ilkd.key.logic.UpdateFactory;
-import de.uka.ilkd.key.logic.op.AccessOp;
-import de.uka.ilkd.key.logic.op.ArrayOfQuantifiableVariable;
-import de.uka.ilkd.key.logic.op.ArrayOp;
-import de.uka.ilkd.key.logic.op.AttributeOp;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.LogicVariable;
-import de.uka.ilkd.key.logic.op.NonRigidFunctionLocation;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.ProgramMethod;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.sort.ArrayOfSort;
+import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.UpdateSimplifier;
 import de.uka.ilkd.key.rule.updatesimplifier.Update;
@@ -62,14 +48,17 @@ public class AtPreFactory {
      * Returns an available name constructed by affixing a counter to the passed 
      * base name.
      */
-    private String getNewName(Name baseName, Services services) {
+    private String getNewName(String baseName, 
+                              Services services, 
+                              List<String> locallyUsedNames) {
         NamespaceSet namespaces = services.getNamespaces();
             
         int i = 0;
         String result;
         do {
             result = baseName + "_" + i++;
-        } while(namespaces.lookup(new Name(result)) != null);
+        } while(namespaces.lookup(new Name(result)) != null
+                || locallyUsedNames.contains(result));
         
         return result;
     }
@@ -87,7 +76,7 @@ public class AtPreFactory {
      * Returns the argument sorts of the passed operator 
      * (why is that so complicated?).
      */
-    private ArrayOfSort getArgSorts(Operator op, Services services) {
+    private ImmutableArray<Sort> getArgSorts(Operator op, Services services) {
         if(op instanceof Function) {
             return ((Function)op).argSort();
         } else if(op instanceof AttributeOp) {
@@ -99,31 +88,32 @@ public class AtPreFactory {
             //This hack works to a point, but it can lead to unparseable 
             //formulas, since the length attribute is not actually defined on 
             //java.lang.Object. We need a SuperArray sort! /BW
+            //(see also bug #875)
             if(aop.attribute().equals(services.getJavaInfo()
                                               .getArrayLength())) {
                 Sort objectSort 
                     = services.getJavaInfo().getJavaLangObjectAsSort();
-                return new ArrayOfSort(new Sort[]{objectSort});
+                return new ImmutableArray<Sort>(new Sort[]{objectSort});
             }
             
             if(((ProgramVariable)aop.attribute()).isStatic()) {
-                return new ArrayOfSort();
+                return new ImmutableArray<Sort>();
             }
             
             Sort selfSort = aop.getContainerType().getSort();            
             assert selfSort != null;
             Sort[] argSorts = new Sort[] {selfSort};
             
-            return new ArrayOfSort(argSorts);
+            return new ImmutableArray<Sort>(argSorts);
         } else if(op instanceof ArrayOp) {
             ArrayOp aop = (ArrayOp) op;
             Sort[] argSorts = new Sort[] {aop.arraySort(), 
                                           services.getTypeConverter()
                                                   .getIntegerLDT()
                                                   .targetSort()};
-            return new ArrayOfSort(argSorts);
+            return new ImmutableArray<Sort>(argSorts);
         } else if(op instanceof ProgramVariable && op.arity() == 0) {
-            return new ArrayOfSort();
+            return new ImmutableArray<Sort>();
         } else {
             assert false : "unexpected operator: " + op.name() 
                             + " (" + op.getClass() + ")";
@@ -135,17 +125,84 @@ public class AtPreFactory {
     /**
      * Helper for buildAtPreDefinition().
      */
-    private Term[] getTerms(ArrayOfQuantifiableVariable vars) {
+    private Term[] getTerms(ImmutableArray<LogicVariable> vars) {
         int numVars = vars.size();
         Term[] result = new Term[numVars];
 
         for(int i = 0; i < numVars; i++) {
-            LogicVariable var
-                    = (LogicVariable)(vars.getQuantifiableVariable(i));
-            result[i] = TB.var(var);
+            result[i] = TB.var(vars.get(i));
         }
 
         return result;
+    }
+    
+    
+
+    private Function createAtPreFunction(Operator normalOp, 
+                                         Services services,
+                                         List<String> locallyUsedNames) {
+        String baseName;
+        if(normalOp instanceof AttributeOp) {
+            AttributeOp aop = (AttributeOp) normalOp;
+            baseName = ((ProgramVariable)aop.attribute()).getProgramElementName()
+                                                         .getProgramName(); 
+        } else if(normalOp instanceof ArrayOp) {
+            baseName = "get";
+        } else {
+            baseName = normalOp.name() instanceof ProgramElementName
+                       ? ((ProgramElementName)normalOp.name()).getProgramName()
+                       : normalOp.name().toString();
+        }
+        
+        if (baseName.startsWith("<") && baseName.endsWith(">")) {
+            baseName = baseName.substring(1, baseName.length() - 1);
+        } else if(baseName.startsWith(".")) {
+            baseName = baseName.substring(1);
+        }
+        
+        baseName = baseName + "AtPre";
+        String uniqueName = getNewName(baseName, services, locallyUsedNames);
+
+        Function result 
+            = new NonRigidFunctionLocation(new Name(uniqueName),
+                                           getSort(normalOp),
+                                           getArgSorts(normalOp, 
+                                                       services), false);
+        return result;
+    }
+    
+    
+    /**
+     * Creates atPre-functions for all relevant operators in the passed term.
+     */
+    public void createAtPreFunctionsForTerm(
+            Term term,
+            /*inout*/ Map<Operator,Function/*atPre*/> atPreFunctions,
+            Services services,
+            List<String> locallyUsedNames) {
+        int arity = term.arity();
+        Sort[] subSorts = new Sort[arity];
+        for(int i = 0; i < arity; i++) {
+            Term subTerm = term.sub(i);
+            createAtPreFunctionsForTerm(subTerm, 
+                                        atPreFunctions, 
+                                        services, 
+                                        locallyUsedNames);
+            subSorts[i] = subTerm.sort();
+        }
+
+        if(term.op() instanceof AccessOp
+           || term.op() instanceof ProgramVariable
+           || term.op() instanceof ProgramMethod) {
+            Function atPreFunc = atPreFunctions.get(term.op());
+            if(atPreFunc == null) {
+                atPreFunc = createAtPreFunction(term.op(), 
+                                                services, 
+                                                locallyUsedNames);
+                atPreFunctions.put(term.op(), atPreFunc);
+                locallyUsedNames.add(atPreFunc.name().toString());
+            }
+        }
     }
     
     
@@ -159,32 +216,9 @@ public class AtPreFactory {
      * symbol with the same signature.
      */
     public Function createAtPreFunction(Operator normalOp, Services services) {
-        Name baseName = normalOp instanceof AttributeOp ? 
-                ((AttributeOp) normalOp).attribute().name()
-                : normalOp instanceof ArrayOp ? new Name("get")
-                        : normalOp.name();
-
-        if (baseName instanceof ProgramElementName) {
-            baseName = new 
-                Name(((ProgramElementName)baseName).getProgramName());
-        }
-        
-        String s = baseName.toString();
-        if (s.startsWith("<") && s.endsWith(">")) {
-            baseName = new Name(s.substring(1, s.length() - 1));
-        } else if(s.startsWith(".")) {
-            baseName = new Name(s.substring(1));
-        }
-        
-        baseName = new Name(baseName.toString() + "AtPre");        
-
-        Function result 
-            = new NonRigidFunctionLocation(new Name(getNewName(baseName, 
-                                                               services)),
-                                           getSort(normalOp),
-                                           getArgSorts(normalOp, 
-                                                       services));
-        return result;
+        return createAtPreFunction(normalOp, 
+                                   services, 
+                                   new LinkedList<String>());
     }
     
     
@@ -192,29 +226,15 @@ public class AtPreFactory {
      * Creates atPre-functions for all relevant operators in the passed term.
      */
     public void createAtPreFunctionsForTerm(
-                            Term term,
-                            /*inout*/ Map /*Operator (normal) 
-                            -> Function (atPre)*/ atPreFunctions,
-                            Services services) {
-        int arity = term.arity();
-        Sort[] subSorts = new Sort[arity];
-        for(int i = 0; i < arity; i++) {
-            Term subTerm = term.sub(i);
-            createAtPreFunctionsForTerm(subTerm, atPreFunctions, services);
-            subSorts[i] = subTerm.sort();
-        }
-
-        if(term.op() instanceof AccessOp
-           || term.op() instanceof ProgramVariable
-           || term.op() instanceof ProgramMethod) {
-            Function atPreFunc = (Function)(atPreFunctions.get(term.op()));
-            if(atPreFunc == null) {
-                atPreFunc = AtPreFactory.INSTANCE.createAtPreFunction(term.op(), 
-                                                                      services);
-                atPreFunctions.put(term.op(), atPreFunc);
-            }
-        }
+            Term term,
+            /*inout*/ Map<Operator,Function/*atPre*/> atPreFunctions,
+            Services services) {
+        createAtPreFunctionsForTerm(term,
+                                    atPreFunctions,
+                                    services,
+                                    new LinkedList<String>());
     }
+
     
 
     /**
@@ -256,7 +276,7 @@ public class AtPreFactory {
             }
         }
     
-        Term[] argTerms = getTerms(new ArrayOfQuantifiableVariable(args));
+        Term[] argTerms = getTerms(new ImmutableArray<LogicVariable>(args));
         Term atPreTerm = TB.func(atPreFunc, argTerms);        
         Term normalTerm = TermFactory.DEFAULT.createTerm(
                                     normalOp,
@@ -276,18 +296,16 @@ public class AtPreFactory {
      * Creates definitions for a set of atPre functions.
      */
     public Update createAtPreDefinitions(
-         /*in*/ Map /*Operator (normal) -> Function (atPre)*/ atPreFunctions, 
+         /*in*/ Map<Operator,Function/*atPre*/> atPreFunctions, 
          Services services) {
         assert atPreFunctions != null;
         
         UpdateFactory uf = new UpdateFactory(services, new UpdateSimplifier());
         Update result = uf.skip();
         
-        Iterator it = atPreFunctions.entrySet().iterator();
-        while(it.hasNext()) {
-            Map.Entry entry = (Map.Entry) it.next();
-            Operator normalOp = (Operator) entry.getKey();
-            Function atPreFunc = (Function) entry.getValue();
+        for(Map.Entry<Operator,Function> entry : atPreFunctions.entrySet()) {
+            Operator normalOp = entry.getKey();
+            Function atPreFunc = entry.getValue();
             Update def = createAtPreDefinition(normalOp, atPreFunc, services);
             result = uf.parallel(result, def);
         }

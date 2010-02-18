@@ -9,13 +9,13 @@
 //
 package de.uka.ilkd.key.rule.inst;
 
+import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.rule.ListOfObject;
 
 public class ListInstantiation extends InstantiationEntry {
 
     /** the pe the schemavariable is instantiated with */
-    private final ListOfObject list ;
+    private final ImmutableList<Object> list ;
 
    
     /** creates a new ContextInstantiationEntry 
@@ -24,7 +24,7 @@ public class ListInstantiation extends InstantiationEntry {
      * @param pes the List the 
      * SchemaVariable is instantiated with
      */
-    ListInstantiation(SchemaVariable sv, ListOfObject pes) {
+    ListInstantiation(SchemaVariable sv, ImmutableList<Object> pes) {
         super(sv);
         this.list = pes;
     }
@@ -40,7 +40,7 @@ public class ListInstantiation extends InstantiationEntry {
     /** returns the intantiation of the SchemaVariable 
      * @return  the intantiation of the SchemaVariable 
      */
-    public ListOfObject getList() {
+    public ImmutableList<Object> getList() {
         return list;
     }
 

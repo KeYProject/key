@@ -10,6 +10,8 @@
 
 package de.uka.ilkd.key.strategy;
 
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.BuiltInRule;
@@ -29,7 +31,7 @@ public class BuiltInRuleAppContainer extends RuleAppContainer {
      * Create a list of new RuleAppContainers that are to be 
      * considered for application.
      */
-    public ListOfRuleAppContainer createFurtherApps(
+    public ImmutableList<RuleAppContainer> createFurtherApps(
         Goal p_goal,
         Strategy p_strategy) {
         if (isStillApplicable(p_goal))
@@ -38,7 +40,7 @@ public class BuiltInRuleAppContainer extends RuleAppContainer {
                 null,
                 p_goal,
                 p_strategy);
-        return SLListOfRuleAppContainer.EMPTY_LIST;
+        return ImmutableSLList.<RuleAppContainer>nil();
     }
 
     /**
@@ -91,12 +93,12 @@ public class BuiltInRuleAppContainer extends RuleAppContainer {
      * @return list of containers for currently applicable BuiltInRuleApps,
      * the cost may be an instance of <code>TopRuleAppCost</code>.
      */
-    static ListOfRuleAppContainer createAppContainers
+    static ImmutableList<RuleAppContainer> createAppContainers
         ( BuiltInRuleApp p_app,
           PosInOccurrence p_pio,
           Goal p_goal,
           Strategy p_strategy ) {
-        ListOfRuleAppContainer result = SLListOfRuleAppContainer.EMPTY_LIST;
+        ImmutableList<RuleAppContainer> result = ImmutableSLList.<RuleAppContainer>nil();
 
         final RuleAppCost cost = p_strategy.computeCost(p_app, p_pio, p_goal);
 

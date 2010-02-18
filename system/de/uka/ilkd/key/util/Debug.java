@@ -12,9 +12,12 @@
  * on */
 package de.uka.ilkd.key.util;
 
+import java.lang.management.ManagementFactory;
+
+import javax.management.ObjectName;
 import javax.swing.JOptionPane;
 
-public final class Debug {
+public final class Debug implements DebugMBean {
 
 	private Debug() {
 	}
@@ -39,7 +42,7 @@ public final class Debug {
 	 * 
 	 * Stacktraces will always be printed.
 	 */
-	public static final String[] showOnlyPrefixes = 
+	public static String[] showOnlyPrefixes = 
 	    System.getProperty("key.debug.prefix", "").split(":");
 
 	/**
@@ -382,5 +385,44 @@ public final class Debug {
 	public static void waitForClick() {
 		JOptionPane.showMessageDialog(null, "Click to continue in " + getClassAndMethod(2), "Click to continue", JOptionPane.INFORMATION_MESSAGE);
 	}
+
+    //	
+    // Management functionality. Allows to set debug parameters dynamically using the JMX interface
+    //
+    // There are two setters and two getters to get and set the 
+    // debug related static flags in this class. An instance of
+    // this class is created and registered with a MBeanServer.
+    // It provides now an interface to set the debug parameters
+    // at runtime using for instance "jconsole".
+
+    public void setDebugState(boolean debug) {
+        Debug.ENABLE_DEBUG = debug;
+    }
+
+    public boolean getDebugState() {
+        return Debug.ENABLE_DEBUG;
+    }
+
+    static {
+        try {
+            ManagementFactory.getPlatformMBeanServer().registerMBean(
+                    new Debug(), new ObjectName("de.uka.ilkd.key:Type=Debug"));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public String getShowOnlyPrefixes() {
+        StringBuilder sb = new StringBuilder();
+        for (String s : showOnlyPrefixes) {
+            sb.append(s).append(":");
+        }
+        sb.deleteCharAt(sb.length()-1);
+        return sb.toString();
+    }
+
+    public void setShowOnlyPrefixes(String showOnlyPrefixes) {
+        Debug.showOnlyPrefixes = showOnlyPrefixes.split(":");
+    }
 
 }

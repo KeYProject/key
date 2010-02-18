@@ -5,8 +5,6 @@
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
-//
-//
 /**
  * 
  */
@@ -48,8 +46,8 @@ class ModalityClass {
      */
     public ModalityClass(Modality[] mods) {
         HashSet s = new HashSet();
-        for (int i=0; i<mods.length; i++) {
-            s.add(mods[i]);
+        for (Modality mod : mods) {
+            s.add(mod);
         }
         schema = (ModalOperatorSV) SchemaVariableFactory.createOperatorSV
         (new Name(mods[0].name()+"_schema"), Modality.class, Sort.FORMULA, 1, s);
@@ -62,9 +60,9 @@ class ModalityClass {
      * is returned
      */
     public static Modality getNormReprModality(Modality m) {
-        for (int i=0; i<DEFAULT_CLASSES.length; i++) {
-            if (DEFAULT_CLASSES[i].containsConcrete(m)) {
-                return DEFAULT_CLASSES[i].getNormRepr();
+        for (ModalityClass DEFAULT_CLASS : DEFAULT_CLASSES) {
+            if (DEFAULT_CLASS.containsConcrete(m)) {
+                return DEFAULT_CLASS.getNormRepr();
             }
         }
         return m;
@@ -76,9 +74,9 @@ class ModalityClass {
      * is returned
      */    
     public static Operator getSchemaModality(Modality m) {
-        for (int i=0; i<DEFAULT_CLASSES.length; i++) {
-            if (DEFAULT_CLASSES[i].containsConcrete(m)) {
-                return DEFAULT_CLASSES[i].getSchema();
+        for (ModalityClass DEFAULT_CLASS : DEFAULT_CLASSES) {
+            if (DEFAULT_CLASS.containsConcrete(m)) {
+                return DEFAULT_CLASS.getSchema();
             }
         }
         return m;      

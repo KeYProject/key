@@ -5,8 +5,6 @@
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
-//
-//
 /*
  * Created on 13.06.2005
  */
@@ -14,8 +12,6 @@ package de.uka.ilkd.key.logic.op;
 
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.sort.ObjectSort;
-import de.uka.ilkd.key.logic.sort.PrimitiveSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 
 /**
@@ -52,8 +48,7 @@ public class CastFunctionSymbol extends SortDependingFunction {
      */  
     public boolean possibleSub(int at, Term possibleSub) {        
         final Sort castTo = getSortDependingOn(); 
-        return super.possibleSub(at, possibleSub) && 
-        ((castTo instanceof PrimitiveSort) != (castTo instanceof ObjectSort)) ;
+        return super.possibleSub(at, possibleSub);
     }
     
     

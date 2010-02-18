@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -13,22 +13,21 @@ import java.io.File;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import junit.framework.TestCase;
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.abstraction.ListOfKeYJavaType;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
-import de.uka.ilkd.key.java.abstraction.SLListOfKeYJavaType;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.init.CreatedAttributeTermFactory;
 import de.uka.ilkd.key.speclang.FormulaWithAxioms;
-import de.uka.ilkd.key.speclang.ocl.translation.OCLTranslator;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.util.HelperClassForTests;
-import junit.framework.TestCase;
 
 public class TestOCLTranslator extends TestCase {
 
@@ -65,7 +64,7 @@ public class TestOCLTranslator extends TestCase {
 
     protected ProgramVariable buildExcVar() {
         KeYJavaType excType = javaInfo
-                .getTypeByClassName("java.lang.Exception");
+                .getTypeByClassName("java.lang.Throwable");
         ProgramElementName excPEN = new ProgramElementName("exc");
         return new LocationVariable(excPEN, excType);
     }
@@ -181,8 +180,7 @@ public class TestOCLTranslator extends TestCase {
         assertTrue(result.getFormula().op().equals(Op.ALL));
         assertTrue(result.getFormula().sub(0).op().equals(Op.IMP));
         assertTrue(result.getFormula().varsBoundHere(0).size() == 1);
-        LogicVariable q = (LogicVariable) result.getFormula().varsBoundHere(0)
-                .getQuantifiableVariable(0);
+        LogicVariable q = (LogicVariable) result.getFormula().varsBoundHere(0).get(0);
 
         Term subTerm = tb.imp(CreatedAttributeTermFactory.INSTANCE
                 .createCreatedOrNullTerm(services, tb.var(q)), tb.imp(tb.not(tb
@@ -259,7 +257,7 @@ public class TestOCLTranslator extends TestCase {
 
         ProgramVariable selfVar = buildSelfVarAsProgVar();
 
-        ListOfKeYJavaType signature = SLListOfKeYJavaType.EMPTY_LIST;
+        ImmutableList<KeYJavaType> signature = ImmutableSLList.<KeYJavaType>nil();
         signature = signature.append(javaInfo
                 .getKeYJavaType(PrimitiveType.JAVA_INT));
 
@@ -288,7 +286,7 @@ public class TestOCLTranslator extends TestCase {
 
         ProgramVariable selfVar = buildSelfVarAsProgVar();
 
-        ListOfKeYJavaType signature = SLListOfKeYJavaType.EMPTY_LIST;
+        ImmutableList<KeYJavaType> signature = ImmutableSLList.<KeYJavaType>nil();
         signature = signature.append(javaInfo
                 .getKeYJavaType(PrimitiveType.JAVA_LONG));
 

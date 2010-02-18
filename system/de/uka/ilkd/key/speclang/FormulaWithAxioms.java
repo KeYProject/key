@@ -5,17 +5,6 @@
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
-//
-//
-//This file is part of KeY - Integrated Deductive Software Design
-//Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
-//                      Universitaet Koblenz-Landau, Germany
-//                      Chalmers University of Technology, Sweden
-//
-//The KeY system is protected by the GNU General Public License. 
-//See LICENSE.TXT for details.
-//
-//
 
 package de.uka.ilkd.key.speclang;
 
@@ -23,10 +12,14 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.op.LogicVariable;
+import de.uka.ilkd.key.logic.op.Op;
+import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.proof.init.CreatedAttributeTermFactory;
 
 
@@ -71,9 +64,8 @@ public class FormulaWithAxioms {
     
     public Term getAxiomsAsFormula() {
         Term result = TB.tt();
-        Iterator<Term> it = axioms.values().iterator();
-        while(it.hasNext()) {
-            result = TB.and(result, it.next());
+        for (Object o : axioms.values()) {
+            result = TB.and(result, (Term) o);
         }
         return result;
     }
@@ -112,9 +104,9 @@ public class FormulaWithAxioms {
     
     
     public FormulaWithAxioms allClose(Services services) {
-        SetOfQuantifiableVariable freeVars = formula.freeVars();
+        ImmutableSet<QuantifiableVariable> freeVars = formula.freeVars();
         LogicVariable[] freeVarsArray = new LogicVariable[freeVars.size()];
-        IteratorOfQuantifiableVariable it = freeVars.iterator();
+        Iterator<QuantifiableVariable> it = freeVars.iterator();
         for(int i = 0; i < freeVarsArray.length; i++) {
             freeVarsArray[i] = (LogicVariable) it.next();
         }

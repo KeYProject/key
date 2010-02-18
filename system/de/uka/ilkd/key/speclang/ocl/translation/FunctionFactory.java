@@ -13,6 +13,8 @@ package de.uka.ilkd.key.speclang.ocl.translation;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
@@ -54,7 +56,7 @@ class FunctionFactory {
 
     private int axiomVarCounter = 0;
     private static final String axiomVarPrefix = "_oclAV";
-    private SetOfLogicVariable createdVars;
+    private ImmutableSet<LogicVariable> createdVars;
     
 	private Namespace functions;
     
@@ -75,7 +77,7 @@ class FunctionFactory {
         this.services = services;
         this.functions = services.getNamespaces().functions();
         this.axiomVarCounter = 0;
-        this.createdVars = SetAsListOfLogicVariable.EMPTY_SET;
+        this.createdVars = DefaultImmutableSet.<LogicVariable>nil();
         this.functionNS = new Namespace();
         this.axiomCollector = ac;
     }
@@ -182,7 +184,7 @@ class FunctionFactory {
             return f;
         }
         
-        SetOfQuantifiableVariable vars = selectTerm.freeVars();
+        ImmutableSet<QuantifiableVariable> vars = selectTerm.freeVars();
         // selectVar is NOT free in this sense.
         vars = vars.remove(selectVar);
         
@@ -192,12 +194,14 @@ class FunctionFactory {
         LogicVariable[] qvars1 = new LogicVariable[vars.size()];
         LogicVariable[] qvars2 = new LogicVariable[vars.size()+2];
         
-        for(int i=0;i<vars.size();i++) {
-            sorts[i+1] = vars.toArray()[i].sort();
-            varTerms1[i+1] = tb.var((LogicVariable) vars.toArray()[i]);
-            varTerms2[i+1] = tb.var((LogicVariable) vars.toArray()[i]);
-            qvars1[i] = (LogicVariable) vars.toArray()[i];
-            qvars2[i+2] = (LogicVariable) vars.toArray()[i];
+        int i=0;
+        for(QuantifiableVariable qvar : vars) {            
+            final LogicVariable var = (LogicVariable)qvar;
+            sorts[i+1] = var.sort();
+            varTerms1[i+1] = (varTerms2[i+1] = tb.var(var));
+            qvars1[i] = var;
+            qvars2[i+2] = var;
+            i++;
         }
         
         sorts[0] = csort;
@@ -314,7 +318,7 @@ class FunctionFactory {
             return f;
         }
         
-        SetOfQuantifiableVariable vars = collectTerm.freeVars();
+        ImmutableSet<QuantifiableVariable> vars = collectTerm.freeVars();
         
         // collectVar is NOT free in collectTerm in this sense
         vars = vars.remove(collectVar);
@@ -325,12 +329,13 @@ class FunctionFactory {
         LogicVariable[] qvars1 = new LogicVariable[vars.size()];
         LogicVariable[] qvars2 = new LogicVariable[vars.size()+2];
         
-        for(int i=0;i<vars.size();i++) {
-            signature[i+1] = vars.toArray()[i].sort();
-            varTerms1[i+1] = tb.var((LogicVariable) vars.toArray()[i]);
-            varTerms2[i+1] = tb.var((LogicVariable) vars.toArray()[i]);
-            qvars1[i] = (LogicVariable) vars.toArray()[i];
-            qvars2[i+2] = (LogicVariable) vars.toArray()[i];
+        int i=0;
+        for(QuantifiableVariable qvar : vars) {            
+            final LogicVariable var = (LogicVariable)qvar;
+            signature[i+1] = var.sort();
+            varTerms1[i+1] = (varTerms2[i+1] = tb.var(var));
+            qvars1[i] = var;
+            qvars2[i+2] = var;
         }
         
         signature[0] = csort;
@@ -427,8 +432,8 @@ class FunctionFactory {
      */
     public static Term buildAddTerm(Term[] subTerms) {
         Term result = tb.tt();
-        for (int i=0; i<subTerms.length; i++) {
-            result = tb.and( result, subTerms[i]);
+        for (Term subTerm : subTerms) {
+            result = tb.and(result, subTerm);
         }
         
         return result;
@@ -635,16 +640,19 @@ class FunctionFactory {
             raiseError("Set{"+lowerBound.toString()+".."+upperBound.toString()+"} : sorts don't match");
         }
         
-        SetOfQuantifiableVariable vars = lowerBound.freeVars().union(upperBound.freeVars());
+        ImmutableSet<QuantifiableVariable> vars = lowerBound.freeVars().union(upperBound.freeVars());
         
         Sort[] sorts = new Sort[vars.size()];
         Term[] varTerms = new Term[vars.size()];
         LogicVariable[] qvars = new LogicVariable[vars.size()+1];
         
-        for(int i=0;i<vars.size();i++) {
-            sorts[i] = vars.toArray()[i].sort();
-            varTerms[i] = tb.var((LogicVariable) vars.toArray()[i]);
-            qvars[i+1] = (LogicVariable) vars.toArray()[i];
+        int i=0;
+        for(QuantifiableVariable qvar : vars) {
+            LogicVariable var = (LogicVariable) qvar;
+            sorts[i] = var.sort();
+            varTerms[i] = tb.var(var);
+            qvars[i+1] = var;
+            i++;
         }
         
         //create new function
@@ -679,16 +687,19 @@ class FunctionFactory {
             raiseError("Bag{"+lowerBound.toString()+".."+upperBound.toString()+"} : sorts don't match");
         }
         
-        SetOfQuantifiableVariable vars = lowerBound.freeVars().union(upperBound.freeVars());
+        ImmutableSet<QuantifiableVariable> vars = lowerBound.freeVars().union(upperBound.freeVars());
         
         Sort[] sorts = new Sort[vars.size()];
         Term[] varTerms = new Term[vars.size()];
         LogicVariable[] qvars = new LogicVariable[vars.size()+1];
         
-        for(int i=0;i<vars.size();i++) {
-            sorts[i] = vars.toArray()[i].sort();
-            varTerms[i] = tb.var((LogicVariable) vars.toArray()[i]);
-            qvars[i+1] = (LogicVariable) vars.toArray()[i];
+        int i=0;
+        for(QuantifiableVariable qvar : vars) {
+            LogicVariable var = (LogicVariable) qvar;
+            sorts[i] = var.sort();
+            varTerms[i] = tb.var(var);
+            qvars[i+1] = var;
+            i++;
         }
         
         //create new function
@@ -731,18 +742,21 @@ class FunctionFactory {
             raiseError("Sequence{"+lowerBound.toString()+".."+upperBound.toString()+"} : sorts don't match");
         }
         
-        SetOfQuantifiableVariable vars = lowerBound.freeVars().union(upperBound.freeVars());
+        ImmutableSet<QuantifiableVariable> vars = lowerBound.freeVars().union(upperBound.freeVars());
         
         Sort[] sorts = new Sort[vars.size()];
         Term[] varTerms = new Term[vars.size()];
         LogicVariable[] qvars = new LogicVariable[vars.size()+1];
         LogicVariable[] qvars2 = new LogicVariable[vars.size()+2];
         
-        for(int i=0;i<vars.size();i++) {
-            sorts[i] = vars.toArray()[i].sort();
-            varTerms[i] = tb.var((LogicVariable) vars.toArray()[i]);
-            qvars[i+1] = (LogicVariable) vars.toArray()[i];
-            qvars2[i+2] = (LogicVariable) vars.toArray()[i];
+        int i=0;
+        for(QuantifiableVariable qvar : vars) {
+            LogicVariable var = (LogicVariable) qvar;
+            sorts[i] = var.sort();
+            varTerms[i] = tb.var(var);
+            qvars[i+1] = var;
+            qvars2[i+2] = var;
+            i++;
         }
         
         //create new function
@@ -915,7 +929,7 @@ class FunctionFactory {
     /**
      * returns the list of created variables which are used in the axioms
      */
-    public SetOfLogicVariable getCreatedVars() {
+    public ImmutableSet<LogicVariable> getCreatedVars() {
         return this.createdVars;
     }
     

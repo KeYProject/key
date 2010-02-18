@@ -1,64 +1,92 @@
+// This file is part of KeY - Integrated Deductive Software Design
+// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General Public License. 
+// See LICENSE.TXT for details.
+//
+
 package de.uka.ilkd.key.speclang.translation;
 
-import de.uka.ilkd.key.java.JavaInfo;
+
+import java.util.Iterator;
+
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.op.LogicVariable;
+import de.uka.ilkd.key.logic.op.ParsableVariable;
 import de.uka.ilkd.key.logic.sort.ObjectSort;
-import de.uka.ilkd.key.util.Debug;
 
+
+/**
+ * Resolves property calls of any kind. Keeps a list of resolvers doing the
+ * actual work, and a stack of namespaces to deal with several levels of local 
+ * variables (e.g. "self", or iterator variables in forall() or select() 
+ * subtrees).
+ */
 public abstract class SLResolverManager {
-
     
-    private static final TermBuilder tb = TermBuilder.DF;
+    public final SLTranslationExceptionManager excManager;
+    private static final TermBuilder TB = TermBuilder.DF;
 
-    protected final JavaInfo javaInfo;
-    
-    protected ListOfNamespace /*ParsableVariable*/
-        localVariablesNamespaces = SLListOfNamespace.EMPTY_LIST;
-
-    protected ListOfSLExpressionResolver
-        resolvers = SLListOfSLExpressionResolver.EMPTY_LIST;
-
-    protected final KeYJavaType specInClass;
-    protected final SLTranslationExceptionManager excManager;
-    
-    protected SLResolverManager(JavaInfo javaInfo,
-            KeYJavaType specInClass,
-            SLTranslationExceptionManager eManager,
-           boolean typeResolver, 
-           boolean methodResolver,
-           boolean attributeResolver) {
+    private ImmutableList<SLExpressionResolver> resolvers = ImmutableSLList.<SLExpressionResolver>nil();
+    private final KeYJavaType specInClass;
+    private final ParsableVariable selfVar;
+    private final boolean useLocalVarsAsImplicitReceivers;
         
-        Debug.assertTrue(javaInfo != null);
-        this.javaInfo = javaInfo;
+    private ImmutableList<Namespace> /*ParsableVariable*/
+        localVariablesNamespaces = ImmutableSLList.<Namespace>nil();
+
+    
+    
+    //-------------------------------------------------------------------------
+    //constructors
+    //------------------------------------------------------------------------- 
+    
+    protected SLResolverManager(SLTranslationExceptionManager excManager, 
+                                KeYJavaType specInClass,
+                                ParsableVariable selfVar,
+                                boolean useLocalVarsAsImplicitReceivers) {
+        assert excManager != null;
+        this.excManager = excManager;
         this.specInClass = specInClass;
-        this.excManager = eManager;
-        
-        if (typeResolver) {
-            resolvers = resolvers.prepend(new SLTypeResolver(javaInfo, this));            
-        }
-        
-        if (methodResolver) {
-            resolvers = resolvers.prepend(new SLMethodResolver(javaInfo, this));
-        }
-        
-        if (attributeResolver) {
-            resolvers = resolvers.prepend(new SLAttributeResolver(javaInfo, this));
-        }
+        this.selfVar = selfVar;
+        this.useLocalVarsAsImplicitReceivers = useLocalVarsAsImplicitReceivers;
     }
     
+    
+    
+    //-------------------------------------------------------------------------
+    //internal methods
+    //-------------------------------------------------------------------------
+    
+    protected void addResolver(SLExpressionResolver resolver) {
+        assert resolver != null;
+        resolvers = resolvers.append(resolver);
+    }
+    
+    private String getShortName(String name) {
+        return name.substring(name.lastIndexOf(".") + 1);
+    }
+
+
+    private boolean isFullyQualified(String name) {
+        return name.indexOf(".") > -1;
+    }
+
     
     /**
      * Tries to resolve a name as a local variable.
      */
     private SLExpression resolveLocal(String name) {
         Name n = new Name(name);
-        IteratorOfNamespace it = localVariablesNamespaces.iterator();
-        while(it.hasNext()) {   
-            ParsableVariable localVar = (ParsableVariable) it.next().lookup(n);
+        for(Namespace ns : localVariablesNamespaces) {
+            ParsableVariable localVar = (ParsableVariable) ns.lookup(n);
             if(localVar != null) {
-                Term varTerm = tb.var(localVar);
+                Term varTerm = TB.var(localVar);
                 return createSLExpression(varTerm);
             }
         }
@@ -70,44 +98,78 @@ public abstract class SLResolverManager {
     /**
      * Tries to resolve a name as a property call on any available implicit 
      * receiver.
-     * @throws SLTranslationException
      */
-    private SLExpression resolveImplicit(String name, SLParameters parameters) throws SLTranslationException {
-        IteratorOfNamespace it = localVariablesNamespaces.iterator();
-        while(it.hasNext()) {
-            Namespace ns = it.next();
-            ListOfNamed elements = ns.elements();
-            
-            IteratorOfNamed it2 = elements.iterator();
-            while(it2.hasNext()) {
-                ParsableVariable localVar = (ParsableVariable) it2.next();
-                if(localVar.sort() instanceof ObjectSort) {              
-                    Term recTerm = tb.var(localVar);
-                    SLExpression result 
-                           = resolveExplicit(createSLExpression(recTerm), 
-                                            name,
-                                            parameters);
-                    if(result != null) {
-                        return result;
+    private SLExpression resolveImplicit(String name, SLParameters parameters) 
+            throws SLTranslationException {
+        if(useLocalVarsAsImplicitReceivers) {
+            for(Namespace ns : localVariablesNamespaces) {
+                for(Named n : ns.elements()) {
+                    ParsableVariable localVar = (ParsableVariable) n;
+                    if(localVar.sort() instanceof ObjectSort) {              
+                        Term recTerm = TB.var(localVar);
+                        SLExpression result 
+                               = resolveExplicit(createSLExpression(recTerm), 
+                                                name,
+                                                parameters);
+                        if(result != null) {
+                            return result;
+                        }
                     }
                 }
             }
+        } else if(selfVar != null) {
+            SLExpression result
+                = resolveExplicit(createSLExpression(TB.var(selfVar)), 
+                                  name,
+                                  parameters);
+
+            if (result != null) {
+                return result;
+            }            
         }
+        
         // the class where the specification is written can be an implicit type receiver
         // (e.g. for static attributes or static methods)
-        SLExpression result = resolveExplicit(createSLExpression(specInClass),
-                                name,
-                                parameters);
-        if(result != null) {
-            return result;
+	if(specInClass != null) {
+	    SLExpression result 
+		= resolveExplicit(createSLExpression(specInClass),
+                                  name,
+                                  parameters);
+            if(result != null) {
+            	return result;
+            }
         }
 
         return null;
     }
+    
 
+    /**
+     * Tries to resolve a name as a property call on an explicitly given 
+     * receiver, by calling the registered resolvers.
+     */
+    private SLExpression resolveExplicit(SLExpression receiver, 
+                                         String name, 
+                                         SLParameters params) 
+            throws SLTranslationException {
+        for(SLExpressionResolver resolver : resolvers) {
+            SLExpression result = resolver.resolve(receiver, name, params);
+            if (result != null) {
+                return result;
+            }
+        }
+       
+        return null;
+    }
+    
+    
+    /**
+     * Helper for resolve().
+     */
     private SLExpression resolveIt(SLExpression receiver,
-                                String name, 
-                                SLParameters parameters) throws SLTranslationException {
+                                   String name, 
+                                   SLParameters parameters) 
+            throws SLTranslationException {
         SLExpression result = null;
         
         if(receiver != null) {
@@ -124,22 +186,13 @@ public abstract class SLResolverManager {
         
         return result;
     }
-
     
-    private SLExpression resolveExplicit(SLExpression receiver, String name, SLParameters params) throws SLTranslationException {
-        
-        IteratorOfSLExpressionResolver it = resolvers.iterator();
-        
-        while(it.hasNext()) {
-            SLExpression result = it.next().resolve(receiver, name, params);
-            if (result != null) {
-                return result;
-            }
-        }
-       
-        return null;
-    }
-
+    
+    
+    //-------------------------------------------------------------------------
+    //public interface
+    //------------------------------------------------------------------------- 
+    
     /**
      * Resolves arbitrary property calls.
      * @param receiver the specified explicit receiver, or null
@@ -150,9 +203,9 @@ public abstract class SLResolverManager {
      * @throws SLTranslationException 
      */
     public SLExpression resolve(SLExpression receiver,
-            String name, 
-            SLParameters parameters) throws SLTranslationException {
-
+                                String name, 
+                                SLParameters parameters) 
+            throws SLTranslationException {
         String shortName = name;
         
         if (isFullyQualified(name)) {
@@ -166,16 +219,7 @@ public abstract class SLResolverManager {
         return resolveIt(receiver, shortName, parameters);
     }
 
-    
-    private String getShortName(String name) {
-        return name.substring(name.lastIndexOf(".") + 1);
-    }
-
-
-    private boolean isFullyQualified(String name) {
-        return name.indexOf(".") > -1;
-    }
-
+   
 
     /**
      * Pushes a new, empty namespace onto the stack.
@@ -197,10 +241,9 @@ public abstract class SLResolverManager {
     /**
      * Puts a list of local variables into the topmost namespace on the stack. 
      */
-    public void putIntoTopLocalVariablesNamespace(ListOfLogicVariable pvs) {
-        IteratorOfLogicVariable it = pvs.iterator();
-        while(it.hasNext()) {
-            localVariablesNamespaces.head().addSafely(it.next());
+    public void putIntoTopLocalVariablesNamespace(ImmutableList<LogicVariable> pvs) {
+        for(LogicVariable pv : pvs) {
+            localVariablesNamespaces.head().addSafely(pv);
         }
     }
        
@@ -212,9 +255,8 @@ public abstract class SLResolverManager {
      * localVariableNamespace
      */
     public boolean needVarDeclaration(String name2BeResolved) {
-        IteratorOfSLExpressionResolver it = resolvers.iterator();
-        while(it.hasNext()) {
-            if (it.next().needVarDeclaration(name2BeResolved)) {
+        for (SLExpressionResolver resolver : resolvers) {
+            if (resolver.needVarDeclaration(name2BeResolved)) {
                 return true;
             }
         }
@@ -229,6 +271,7 @@ public abstract class SLResolverManager {
         localVariablesNamespaces = localVariablesNamespaces.tail();
     }
 
+    
     public abstract SLExpression createSLExpression(Term t);
     public abstract SLExpression createSLExpression(KeYJavaType t);
     public abstract SLExpression createSLExpression(SLCollection t);

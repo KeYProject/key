@@ -16,11 +16,12 @@
 //
 package de.uka.ilkd.key.rule.metaconstruct;
 
+import java.util.Iterator;
+
+import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.IteratorOfKeYJavaType;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.abstraction.ListOfKeYJavaType;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.Term;
@@ -70,12 +71,12 @@ public class MetaAllSubtypes extends AbstractMetaOperator {
 	String className = term.sub(0).op().name().toString();
 	KeYJavaType keyType 
 	    = javaInfo.getKeYJavaTypeByClassName(className);
-	ListOfKeYJavaType subtypes 
+	ImmutableList<KeYJavaType> subtypes 
 	    = javaInfo.getKeYProgModelInfo().getAllSubtypes(keyType);
 	subtypes = subtypes.append(keyType);
 
 	//Build replacewith-term
-	IteratorOfKeYJavaType iter = subtypes.iterator();
+	Iterator<KeYJavaType> iter = subtypes.iterator();
 	Term result = nilTerm;
 	for (int i=0; iter.hasNext(); i++) {
 	    Name theName = new Name(iter.next().getFullName());

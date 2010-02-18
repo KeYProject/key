@@ -1,6 +1,15 @@
+// This file is part of KeY - Integrated Deductive Software Design
+// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General Public License. 
+// See LICENSE.TXT for details.
 package de.uka.ilkd.key.cspec;
 
-import de.uka.ilkd.key.java.ArrayOfExpression;
+import de.uka.ilkd.key.collection.ImmutableArray;
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -15,12 +24,14 @@ import de.uka.ilkd.key.java.statement.Branch;
 import de.uka.ilkd.key.java.statement.Catch;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.java.statement.Try;
-import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.JavaBlock;
+import de.uka.ilkd.key.logic.ProgramElementName;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.init.AbstractPO;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ModStrategy;
 import de.uka.ilkd.key.proof.init.ProofInputException;
-import de.uka.ilkd.key.logic.op.*;
 
 
 public class ComputeSpecificationPO extends AbstractPO {
@@ -58,7 +69,7 @@ public class ComputeSpecificationPO extends AbstractPO {
 		= new MethodBodyStatement(programMethod,
 			  selfVar,
 			  resultVar,
-			  new ArrayOfExpression(formalParVars));
+			  new ImmutableArray<Expression>(formalParVars));
 		sb = new StatementBlock(call);
 		}
 		
@@ -95,7 +106,7 @@ public class ComputeSpecificationPO extends AbstractPO {
         }
 
         //prepare variables, program method and container for @pre-functions
-        ListOfProgramVariable paramVars = buildParamVars(programMethod);
+        ImmutableList<ProgramVariable> paramVars = buildParamVars(programMethod);
         ProgramVariable selfVar = null;
         if(programMethod != null && !programMethod.isStatic()) {
             selfVar = buildSelfVarAsProgVar();
@@ -104,7 +115,7 @@ public class ComputeSpecificationPO extends AbstractPO {
         ProgramVariable exceptionVar = buildExcVar();
 
         //create formal parameters
-        ProgramVariable[] parVars = paramVars.toArray();
+        ProgramVariable[] parVars = paramVars.toArray(new ProgramVariable[paramVars.size()]);
         ProgramVariable[] formalParVars = new ProgramVariable[parVars.length];
         for(int i = 0; i < parVars.length; i++) {
             ProgramElementName pen 

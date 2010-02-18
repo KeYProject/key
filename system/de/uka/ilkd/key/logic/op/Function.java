@@ -11,9 +11,9 @@
 
 package de.uka.ilkd.key.logic.op;
 
+import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.sort.ArrayOfSort;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 
@@ -22,7 +22,7 @@ public abstract class Function extends TermSymbol {
     /** 
      * sorts of arguments
      */
-    private ArrayOfSort argSorts;
+    private ImmutableArray<Sort> argSorts;
     
     /** creates a Function 
      * @param name String with name of the function
@@ -31,28 +31,28 @@ public abstract class Function extends TermSymbol {
      * the function's arguments  
      */   
     public Function(Name name, Sort sort, Sort[] argSorts) {
-	this(name, sort, new ArrayOfSort(argSorts));
+	this(name, sort, new ImmutableArray<Sort>(argSorts));
     }
 
 
     /** creates a Function 
      * @param name String with name of the function
      * @param sort the Sort of the function (result type)
-     * @param argSorts ArrayOfSort of the function's arguments
+     * @param argSorts ArrayOf<Sort> of the function's arguments
      */   
-    public Function(Name name, Sort sort, ArrayOfSort argSorts) {
+    public Function(Name name, Sort sort, ImmutableArray<Sort> argSorts) {
 	super(name, sort);
 	this.argSorts = argSorts;
     }
 
     /** @return array of allowed sorts of the function arguments */
-    public ArrayOfSort argSort() {
+    public ImmutableArray<Sort> argSort() {
 	return argSorts;
     }
 
     /** @return Sort of the n-th argument */
     public Sort argSort(int n) {
-	return argSorts.getSort(n);
+	return argSorts.get(n);
     }
     
     /** @return arity of the Function as int */
@@ -133,9 +133,10 @@ public abstract class Function extends TermSymbol {
     }
     
     public String proofToString() {
-       String s = null;
+       String s;
        if (sort() != null) {
-	   s = sort().toString()+" "+name();
+	   s = (sort() == Sort.FORMULA ? "" : sort().toString()) + " ";
+	   s += name();
        } else {
 	   s = "NO_SORT"+" "+name();
        }

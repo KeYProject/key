@@ -21,12 +21,14 @@ import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 
-import de.uka.ilkd.key.collection.ListOfString;
-import de.uka.ilkd.key.collection.SLListOfString;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
+import de.uka.ilkd.key.java.abstraction.*;
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.*;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.proof.init.*;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
@@ -226,7 +228,7 @@ public class POBrowser extends JDialog {
     //-------------------------------------------------------------------------
     
     private void showPOsFor(KeYJavaType kjt) {
-	ListOfString pos = SLListOfString.EMPTY_LIST;
+	ImmutableList<String> pos = ImmutableSLList.<String>nil();
 
 	//BehaviouralSubtypingInv
 	if(specRepos.getClassInvariants(kjt).size() > 0
@@ -236,8 +238,8 @@ public class POBrowser extends JDialog {
 
 /*        
 	//BehaviouralSubtypingOp
-	ListOfProgramMethod pms = javaInfo.getAllProgramMethods(kjt);
-	IteratorOfProgramMethod it = pms.iterator();
+	IList<ProgramMethod> pms = javaInfo.getAllProgramMethods(kjt);
+	Iterator<ProgramMethod> it = pms.iterator();
 	boolean foundContract = false;
 	while(it.hasNext()) {
 	    ProgramMethod pm = it.next();
@@ -252,7 +254,7 @@ public class POBrowser extends JDialog {
 */
         
 	//show
-	poList.setListData(pos.toArray());
+	poList.setListData(pos.toArray(new String[pos.size()]));
 	if(pos.size() > 0) {
 	    poList.setSelectedIndex(0);
 	    startButton.setEnabled(true);
@@ -263,7 +265,7 @@ public class POBrowser extends JDialog {
     
     
     private void showPOsFor(ProgramMethod pm) {
-	ListOfString pos = SLListOfString.EMPTY_LIST;
+	ImmutableList<String> pos = ImmutableSLList.<String>nil();
 
 /*        
 	//BehaviouralSubtypingOpPair
@@ -282,7 +284,7 @@ public class POBrowser extends JDialog {
 	pos = pos.append("PreservesInv");
 	
 	//PreservesOwnInv
-	if(specRepos.getClassInvariants(pm.getKeYJavaType()).size() > 0) {
+	if(specRepos.getClassInvariants(pm.getContainerType()).size() > 0) {
 	    pos = pos.append("PreservesOwnInv");
 	}
 	
@@ -313,7 +315,7 @@ public class POBrowser extends JDialog {
 	pos = pos.append("PreservesGuard");
 	
 	//show
-	poList.setListData(pos.toArray());
+	poList.setListData(pos.toArray(new String[pos.size()]));
 	if(pos.size() > 0) {
 	    poList.setSelectedValue("EnsuresPost", true);
 	    if(poList.getSelectedIndex() == -1) {
@@ -338,11 +340,10 @@ public class POBrowser extends JDialog {
     private KeYJavaType askUserForSupertype(KeYJavaType subKJT, 
 	    				    JavaInfo javaInfo) {
 	//collect supertypes
-	SetOfKeYJavaType superKJTs = SetAsListOfKeYJavaType.EMPTY_SET;
-	IteratorOfKeYJavaType it = javaInfo.getAllSupertypes(subKJT).iterator();
-	while(it.hasNext()) {
-	    superKJTs = superKJTs.add(it.next());
-	}
+	ImmutableSet<KeYJavaType> superKJTs = DefaultImmutableSet.<KeYJavaType>nil();
+        for (KeYJavaType keYJavaType : javaInfo.getAllSupertypes(subKJT)) {
+            superKJTs = superKJTs.add(keYJavaType);
+        }
 	
 	//ask user
         ClassSelectionDialog dlg = new ClassSelectionDialog(
@@ -355,7 +356,7 @@ public class POBrowser extends JDialog {
         }
         
         //return selection
-        SetOfKeYJavaType selectedKJTs = dlg.getSelection();
+        ImmutableSet<KeYJavaType> selectedKJTs = dlg.getSelection();
         if(selectedKJTs.size() == 0) {
             return null;
         } else {
@@ -437,6 +438,7 @@ public class POBrowser extends JDialog {
 						           pm,
 						           null,
 						           true,
+						           false,
 						           true,
 						           true);
 	if(cc.wasSuccessful()) {
@@ -455,7 +457,8 @@ public class POBrowser extends JDialog {
 						           services, 
 						           pm, 
 						           null, 
-						           false, 
+						           false,
+						           false,
 						           true, 
 						           true);
 	if(cc.wasSuccessful()) {
@@ -479,6 +482,7 @@ public class POBrowser extends JDialog {
 						           services, 
 						           pm, 
 						           null, 
+						           true,
 						           true,
 						           true,
 						           false);
@@ -515,6 +519,7 @@ public class POBrowser extends JDialog {
 						           pm,
 						           null,
 						           true,
+						           false,
 						           true,
 						           false);
 	if(cc.wasSuccessful()) {
@@ -536,10 +541,9 @@ public class POBrowser extends JDialog {
                                         pm.getContainerType());
         if(dlg.wasSuccessful()) {
             //let the user select the guard classes
-            SetOfKeYJavaType allKJTs = SetAsListOfKeYJavaType.EMPTY_SET;
-            final Iterator<KeYJavaType> it = javaInfo.getAllKeYJavaTypes().iterator();
-            while(it.hasNext()) {
-        	allKJTs = allKJTs.add(it.next());
+            ImmutableSet<KeYJavaType> allKJTs = DefaultImmutableSet.<KeYJavaType>nil();
+            for (KeYJavaType keYJavaType : javaInfo.getAllKeYJavaTypes()) {
+                allKJTs = allKJTs.add(keYJavaType);
             }
             ClassSelectionDialog dlg2
                     = new ClassSelectionDialog("Please select the guard",
@@ -566,6 +570,7 @@ public class POBrowser extends JDialog {
                                                            services, 
                                                            pm, 
                                                            null, 
+                                                           true,
                                                            true,
                                                            true,
                                                            false);

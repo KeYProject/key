@@ -16,7 +16,6 @@ import java.util.List;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.CastFunctionSymbol;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.pp.*;
 import de.uka.ilkd.key.visualdebugger.statevisualisation.SymbolicObject;
@@ -116,7 +115,7 @@ public class DebuggerLP extends LogicPrinter {
                     layouter.print(it.toString());
             } else {
                 if (t.op() instanceof SortDependingFunction
-                        && ((SortDependingFunction) t.op()).name().toString()
+                        && t.op().name().toString()
                                 .endsWith("<get>")) {
                     Term sub = t.sub(0);
                     if (sub.arity() > 1)

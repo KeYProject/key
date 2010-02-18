@@ -13,25 +13,17 @@ package de.uka.ilkd.key.gui;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Frame;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.awt.event.*;
 
-import javax.swing.BoxLayout;
-import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JPanel;
-import javax.swing.JTabbedPane;
-import javax.swing.KeyStroke;
+import javax.swing.*;
 
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.proof.mgt.ContractWithInvs;
+import de.uka.ilkd.key.speclang.ClassInvariant;
 import de.uka.ilkd.key.speclang.OperationContract;
-import de.uka.ilkd.key.speclang.SetOfClassInvariant;
 
 
 public class ContractConfigurator extends JDialog {
@@ -54,6 +46,7 @@ public class ContractConfigurator extends JDialog {
             ProgramMethod pm,
             Modality modality,
             boolean allowContract,
+            boolean allowMultipleContracts,
             boolean allowAssumedInvs,
             boolean allowEnsuredInvs) {
         super(owner, "Contract Configurator", true);
@@ -61,6 +54,7 @@ public class ContractConfigurator extends JDialog {
              pm, 
              modality, 
              allowContract, 
+             allowMultipleContracts,
              allowAssumedInvs, 
              allowEnsuredInvs);
     }
@@ -71,6 +65,7 @@ public class ContractConfigurator extends JDialog {
                                 ProgramMethod pm,
                                 Modality modality,
                                 boolean allowContract,
+                                boolean allowMultipleContracts,
                                 boolean allowAssumedInvs,
                                 boolean allowEnsuredInvs) {
         super(owner, "Contract Configurator", true);
@@ -78,6 +73,7 @@ public class ContractConfigurator extends JDialog {
              pm, 
              modality, 
              allowContract, 
+             allowMultipleContracts,
              allowAssumedInvs, 
              allowEnsuredInvs);
     }
@@ -89,6 +85,7 @@ public class ContractConfigurator extends JDialog {
                       ProgramMethod pm,
                       Modality modality,
                       boolean allowContract,
+                      boolean allowMultipleContracts,
                       boolean allowAssumedInvs,
                       boolean allowEnsuredInvs) {
         assert allowContract || allowAssumedInvs || allowEnsuredInvs;
@@ -97,9 +94,11 @@ public class ContractConfigurator extends JDialog {
         
         //create contract panel
         if(allowContract) {
-            contractPanel = new OperationContractSelectionPanel(services, 
-                                                                pm, 
-                                                                modality);
+            contractPanel 
+                = new OperationContractSelectionPanel(services, 
+                                                      pm, 
+                                                      modality,
+                                                      allowMultipleContracts);
             contractPanel.addMouseListener(new MouseAdapter() {
                 public void mouseClicked(MouseEvent e){                
                     if(e.getClickCount() == 2){
@@ -178,7 +177,7 @@ public class ContractConfigurator extends JDialog {
                             escapeListener,
                             "ESC",
                             KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
-                            JButton.WHEN_IN_FOCUSED_WINDOW);
+                            JComponent.WHEN_IN_FOCUSED_WINDOW);
 
         
         //show
@@ -214,7 +213,7 @@ public class ContractConfigurator extends JDialog {
     /**
      * Returns the selected set of assumed invariants.
      */
-    public SetOfClassInvariant getAssumedInvs() {
+    public ImmutableSet<ClassInvariant> getAssumedInvs() {
 	return assumedInvPanel.getClassInvariants();
     }
 
@@ -222,7 +221,7 @@ public class ContractConfigurator extends JDialog {
     /**
      * Returns the selected set of ensured invariants.
      */
-    public SetOfClassInvariant getEnsuredInvs() {
+    public ImmutableSet<ClassInvariant> getEnsuredInvs() {
 	return ensuredInvPanel.getClassInvariants();
     }
     

@@ -12,12 +12,7 @@ package de.uka.ilkd.key.casetool.eclipse;
 
 import java.io.File;
 
-import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.IResourceChangeEvent;
-import org.eclipse.core.resources.IResourceChangeListener;
-import org.eclipse.core.resources.IResourceDelta;
-import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.resources.*;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
@@ -26,18 +21,14 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.gui.Main;
 import de.uka.ilkd.key.gui.POBrowser;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.abstraction.ListOfKeYJavaType;
-import de.uka.ilkd.key.java.abstraction.SLListOfKeYJavaType;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
-import de.uka.ilkd.key.proof.init.EnvInput;
-import de.uka.ilkd.key.proof.init.InitConfig;
-import de.uka.ilkd.key.proof.init.ProblemInitializer;
-import de.uka.ilkd.key.proof.init.ProofInputException;
-import de.uka.ilkd.key.proof.init.ProofOblInput;
+import de.uka.ilkd.key.proof.init.*;
 import de.uka.ilkd.key.speclang.SLEnvInput;
 
 
@@ -79,9 +70,9 @@ public class KeYPlugin extends AbstractUIPlugin
     /**
      * Returns the parameter types of the passed method in KeY representation.
      */
-    private ListOfKeYJavaType getParameterKJTs(IMethod method, 
+    private ImmutableList<KeYJavaType> getParameterKJTs(IMethod method, 
 	    				       JavaInfo javaInfo) {
-	ListOfKeYJavaType result = SLListOfKeYJavaType.EMPTY_LIST;
+	ImmutableList<KeYJavaType> result = ImmutableSLList.<KeYJavaType>nil();
 	
 	IType declaringType         = method.getDeclaringType();
 	String[] parameterTypeNames = method.getParameterTypes();
@@ -120,7 +111,7 @@ public class KeYPlugin extends AbstractUIPlugin
 	    	= javaInfo.getTypeByClassName(containerTypeName);
 
 	    //determine parameter types
-	    ListOfKeYJavaType signature = getParameterKJTs(method, javaInfo);
+	    ImmutableList<KeYJavaType> signature = getParameterKJTs(method, javaInfo);
 
 	    //determine name ("<init>" for constructors)
 	    String methodName = method.isConstructor()

@@ -16,10 +16,11 @@
 // See LICENSE.TXT for details.
 package de.uka.ilkd.key.parser;
 
+import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermFactory;
-import de.uka.ilkd.key.logic.op.ArrayOfQuantifiableVariable;
 import de.uka.ilkd.key.logic.op.Op;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 
 class SingleUpdateData {
     public Term a0 = null;
@@ -28,7 +29,7 @@ class SingleUpdateData {
     public boolean shadow_a1 = false;
     public Term guard =
         TermFactory.DEFAULT.createJunctorTerm ( Op.TRUE );
-    public ArrayOfQuantifiableVariable boundVars =
-        new ArrayOfQuantifiableVariable ();
+    public ImmutableArray<QuantifiableVariable> boundVars =
+        new ImmutableArray<QuantifiableVariable> ();
 }
 

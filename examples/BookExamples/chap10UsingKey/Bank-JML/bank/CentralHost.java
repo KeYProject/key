@@ -1,3 +1,10 @@
+// This file is part of KeY - Integrated Deductive Software Design
+// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General Public License. 
+// See LICENSE.TXT for details.
 package bank;
 
 /**
@@ -23,7 +30,7 @@ public class CentralHost {
                                            ||
                                            accounts[i].accountNumber == i ));
       @*/
-    private /*@ spec_public @*/ final PermanentAccount[] accounts =
+    private /*@ spec_public, nullable @*/ final PermanentAccount[] accounts =
         new PermanentAccount [maxAccountNumber];
     
         
@@ -47,21 +54,6 @@ public class CentralHost {
         return accounts[accountNumber];
     }
 
-    
-    /**
-     * @return <code>true</code> iff there is an account with number
-     *         <code>accountNumber</code>
-     */
-    /*@
-        public normal_behavior
-        requires  accountNumber >= 0;
-        requires  accountNumber < maxAccountNumber;
-        ensures   \result <==> accounts[accountNumber] != null;
-      @*/
-    public /*@ pure @*/ boolean accountExists (int accountNumber) {
-        return getAccount ( accountNumber ) != null;
-    }
-    
     /** 
      * Retrieves the accountnumber with the maximal balance.
      * @return the accountnumber with maximal balance or <code>-1</code> if no accounts exists
@@ -102,6 +94,22 @@ public class CentralHost {
 	return account;
     }
 
+
+    
+    /**
+     * @return <code>true</code> iff there is an account with number
+     *         <code>accountNumber</code>
+     */
+    /*@
+        public normal_behavior
+        requires  accountNumber >= 0;
+        requires  accountNumber < maxAccountNumber;
+        ensures   \result <==> accounts[accountNumber] != null;
+      @*/
+    public /*@ pure @*/ boolean accountExists (int accountNumber) {
+        return getAccount ( accountNumber ) != null;
+    }
+    
     
     /**
      * Create a new account with account number <code>accountNumber</code>

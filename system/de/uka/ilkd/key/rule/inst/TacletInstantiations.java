@@ -8,22 +8,27 @@
 //
 //
 
-/** this class contains a Taclet together with its suggested
- * instantiations. */
 package de.uka.ilkd.key.rule.inst;
 
 
-import de.uka.ilkd.key.logic.op.MapFromSchemaVariableToTerm;
+import de.uka.ilkd.key.collection.ImmutableMap;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.Taclet;
+
+/** 
+ * this class contains a Taclet together with its suggested
+ * instantiations. 
+ */
 public class TacletInstantiations {
 
     /** the rule */
     private Taclet rule;
     /** the instantations */
-    private MapFromSchemaVariableToTerm instantiations;
+    private ImmutableMap<SchemaVariable,Term> instantiations;
 
     public TacletInstantiations(Taclet rule,
-			      MapFromSchemaVariableToTerm instantiations) 
+			      ImmutableMap<SchemaVariable,Term> instantiations) 
     {
 	this.rule=rule;
 	this.instantiations=instantiations;
@@ -33,7 +38,7 @@ public class TacletInstantiations {
 	return rule;
     }
 
-    public MapFromSchemaVariableToTerm instantiations()
+    public ImmutableMap<SchemaVariable,Term> instantiations()
     {
 	return instantiations;
     }

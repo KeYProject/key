@@ -11,14 +11,19 @@ package de.uka.ilkd.key.visualdebugger;
 
 import java.util.*;
 
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.gui.RuleAppListener;
 import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
-import de.uka.ilkd.key.proof.proofevent.IteratorOfNodeReplacement;
+import de.uka.ilkd.key.proof.proofevent.NodeReplacement;
 import de.uka.ilkd.key.proof.proofevent.RuleAppInfo;
-import de.uka.ilkd.key.rule.*;
+import de.uka.ilkd.key.rule.BuiltInRule;
+import de.uka.ilkd.key.rule.BuiltInRuleApp;
+import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.smt.SMTRule;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.util.ProgressMonitor;
 
@@ -33,7 +38,9 @@ public class ProofStarter {
 
     private int maxSteps = -1;
 
-    private ProofOblInput po;
+    /*The ProofOblInput is not needed but only a ProofAggregate that was accessed via po. */
+    //private ProofOblInput po;
+    private ProofAggregate pa;
 
     private Proof proof;
 
@@ -82,7 +89,7 @@ public class ProofStarter {
 
  
     // - Note: This should be removed
-    private void applySimplificationOnGoals(ListOfGoal goals, 
+    private void applySimplificationOnGoals(ImmutableList<Goal> goals, 
             BuiltInRule decisionProcedureRule) {
         if (goals.isEmpty()) {
             return;
@@ -90,7 +97,7 @@ public class ProofStarter {
 
         final Proof p = goals.head().node().proof();
 
-        final IteratorOfGoal i = goals.iterator();                      
+        final Iterator<Goal> i = goals.iterator();                      
         p.env().registerRule(decisionProcedureRule,
                 de.uka.ilkd.key.proof.mgt.AxiomJustification.INSTANCE);
         while (i.hasNext()) {
@@ -118,19 +125,28 @@ public class ProofStarter {
      *                started on the first proof)
      */
     public void init(ProofOblInput po) {
-
-        if (this.po != null) {
-            throw new IllegalStateException("Proofstarter has been already"
-                    + " instantiated.");
-        }
-
-        this.po = po;
         try {
-            this.proof = po.getPO().getFirstProof();
+            init(po.getPO());
         } catch(ProofInputException e) {
             System.err.println(e);
             e.printStackTrace();
         }
+    }
+    
+    /**
+     * initializes the proof starter, i.e. the proof is created and set up
+     * 
+     * @param pa
+     *                the ProofAggregate with the proof (proof attempt is only
+     *                started on the first proof)
+     */
+    public void init(ProofAggregate pa) {
+        if (this.pa != null) {
+            throw new IllegalStateException("Proofstarter has been already"
+                    + " instantiated.");
+        }
+        this.pa = pa;
+        this.proof = pa.getFirstProof();
     }
 
     /**
@@ -139,9 +155,8 @@ public class ProofStarter {
      * @param progress the int counting the number of applied rules
      */
     private void informProgressMonitors(int progress) {
-        final Iterator it = progressMonitors.iterator();
-        while (it.hasNext()) {
-            ((ProgressMonitor)it.next()).setProgress(progress);
+        for (ProgressMonitor progressMonitor : progressMonitors) {
+            (progressMonitor).setProgress(progress);
         }        
     }
 
@@ -151,9 +166,8 @@ public class ProofStarter {
      * @param maxSteps an int indicating the maximal steps to be performed
      */
     private void initProgressMonitors(int maxSteps) {
-        final Iterator it = progressMonitors.iterator();
-        while (it.hasNext()) {
-            ((ProgressMonitor)it.next()).setMaximum(maxSteps);
+        for (ProgressMonitor progressMonitor : progressMonitors) {
+            (progressMonitor).setMaximum(maxSteps);
         }        
     }
     
@@ -247,11 +261,7 @@ public class ProofStarter {
         } finally {            
             Goal.removeRuleAppListener(pl);
             Goal.setRuleAppListenerList(backup);
-            try {
-                env.removeProofList(po.getPO());
-            } catch (ProofInputException e) {
-                e.printStackTrace();
-            }
+            env.removeProofList(pa);
             proof.setActiveStrategy(oldStrategy);
         }
 
@@ -266,11 +276,10 @@ public class ProofStarter {
      */
     private BuiltInRule findSimplifyRule() {
         BuiltInRule decisionProcedureRule = null;
-        final IteratorOfBuiltInRule builtinRules = 
-            proof.getSettings().getProfile().getStandardRules().getStandardBuiltInRules().iterator();
-        while (builtinRules.hasNext()) {
-            final BuiltInRule bir = builtinRules.next();
-            if (bir instanceof SimplifyIntegerRule) {
+        for (BuiltInRule builtInRule : proof.getSettings().getProfile().getStandardRules().getStandardBuiltInRules()) {
+            final BuiltInRule bir = builtInRule;
+            //TODO: do we really want to hardcode "Simplify" here?
+            if (bir instanceof SMTRule && bir.displayName().contains("Simplify")) {
                 decisionProcedureRule = bir;
                 break;
             }
@@ -318,8 +327,8 @@ public class ProofStarter {
                 return;
 
             synchronized (ProofStarter.this) {
-                ListOfGoal newGoals = SLListOfGoal.EMPTY_LIST;
-                IteratorOfNodeReplacement it = rai.getReplacementNodes();
+                ImmutableList<Goal> newGoals = ImmutableSLList.<Goal>nil();
+                Iterator<NodeReplacement> it = rai.getReplacementNodes();
                 Node node;
                 Goal goal;
 

@@ -5,8 +5,6 @@
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
-//
-//
 package de.uka.ilkd.key.logic.util;
 
 import de.uka.ilkd.key.java.Services;
@@ -38,7 +36,7 @@ public class TermHelper {
      * @param services the Services object
      * @return the maximal sort allowed at the i-th position
      */
-    public static Sort getMaxSort(Term term, int i, Services services) {       
+    public static Sort getMaxSort(Term term, int i, Services services) {     
         if (term.sub(i).sort() == Sort.FORMULA) return Sort.FORMULA;
         
         if (term.op() instanceof IfThenElse && i > 0) {
@@ -65,6 +63,8 @@ public class TermHelper {
             newMaxSort = ((AttributeOp)op).getContainerType().getSort();
         } else if (i == 0 && op instanceof ArrayOp) {
             newMaxSort = ((ArrayOp)op).arraySort();
+        } else if (op instanceof BoundedNumericalQuantifier) {
+            newMaxSort = ((BoundedNumericalQuantifier)op).argSort(i);
         } else if (op instanceof AccessOp) {
             newMaxSort = 
         	services.getTypeConverter().getIntegerLDT().targetSort();

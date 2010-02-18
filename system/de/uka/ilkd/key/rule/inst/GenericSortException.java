@@ -10,6 +10,8 @@
 
 package de.uka.ilkd.key.rule.inst;
 
+import de.uka.ilkd.key.collection.ImmutableList;
+
 /** this exception thrown if there is no appropriate instantiation of
  * the generic sorts occurring within an "SVInstantiations"-object */
 public class GenericSortException extends SortException {
@@ -18,13 +20,21 @@ public class GenericSortException extends SortException {
      * often used singleton
      */
     public static final GenericSortException UNINSTANTIATED_GENERIC_SORT =
-        new GenericSortException("Generic sort is not yet instantiated");
+        new GenericSortException("Generic sort is not yet instantiated", null);
     
+    private ImmutableList<GenericSortCondition> conditions;
     
+    public GenericSortException(String description, ImmutableList<GenericSortCondition> pConditions) {
+	super(description);
+	this.conditions = pConditions;
+    } 
     
     public GenericSortException(String description) {
 	super(description);
     } 
 
+    public String getMessage() {
+	return super.getMessage() + (conditions == null ? "" : conditions);
+    }
 
 }

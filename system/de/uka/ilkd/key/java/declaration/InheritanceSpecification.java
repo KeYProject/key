@@ -11,10 +11,10 @@
 
 package de.uka.ilkd.key.java.declaration;
 
+import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.JavaNonTerminalProgramElement;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.java.reference.ArrayOfTypeReference;
 import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.java.reference.TypeReferenceContainer;
 import de.uka.ilkd.key.util.ExtList;
@@ -32,7 +32,7 @@ public abstract class InheritanceSpecification
  *      Supertypes.
      */
 
-    protected final ArrayOfTypeReference supertypes;
+    protected final ImmutableArray<TypeReference> supertypes;
 
 
     /**
@@ -49,7 +49,7 @@ public abstract class InheritanceSpecification
      */
 
     public InheritanceSpecification(TypeReference supertype) {
-	this.supertypes = new ArrayOfTypeReference
+	this.supertypes = new ImmutableArray<TypeReference>
 	    (new TypeReference[]{supertype});
     }
 
@@ -59,7 +59,7 @@ public abstract class InheritanceSpecification
      */
 
     public InheritanceSpecification(TypeReference[] supertypes) {
-	this.supertypes=new ArrayOfTypeReference(supertypes);
+	this.supertypes=new ImmutableArray<TypeReference>(supertypes);
     }
 
     /**
@@ -71,7 +71,7 @@ public abstract class InheritanceSpecification
     protected InheritanceSpecification(ExtList children) {
         super(children);
 	this.supertypes=new
-	    ArrayOfTypeReference((TypeReference[])
+	    ImmutableArray<TypeReference>((TypeReference[])
 				 children.collect(TypeReference.class)); 
     }
 
@@ -80,7 +80,7 @@ public abstract class InheritanceSpecification
         if (supertypes == null) {
             return this;
         }
-        return supertypes.getTypeReference(supertypes.size() - 1);
+        return supertypes.get(supertypes.size() - 1);
     }
 
 
@@ -106,7 +106,7 @@ public abstract class InheritanceSpecification
 
     public ProgramElement getChildAt(int index) {
         if (supertypes != null) {
-            return supertypes.getTypeReference(index);
+            return supertypes.get(index);
         }
         throw new ArrayIndexOutOfBoundsException();
     }
@@ -116,7 +116,7 @@ public abstract class InheritanceSpecification
  *      @return the type reference array wrapper.
      */
 
-    public ArrayOfTypeReference getSupertypes() {
+    public ImmutableArray<TypeReference> getSupertypes() {
         return supertypes;
     }
 
@@ -140,7 +140,7 @@ public abstract class InheritanceSpecification
 
     public TypeReference getTypeReferenceAt(int index) {
         if (supertypes != null) {
-            return supertypes.getTypeReference(index);
+            return supertypes.get(index);
         }
         throw new ArrayIndexOutOfBoundsException();
     }

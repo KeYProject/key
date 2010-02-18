@@ -20,6 +20,7 @@ com/percpico/util/sc/CallerAllocatedResult.java
 java/lang/ArithmeticException.java
 java/lang/ArrayIndexOutOfBoundsException.java
 java/lang/ArrayStoreException.java
+java/lang/AssertionError.java
 java/lang/Class.java
 java/lang/ClassCastException.java
 java/lang/CloneNotSupportedException.java
@@ -53,6 +54,7 @@ java/util/Map.java
 java/util/Set.java
 java/io/IOException.java
 java/io/Serializable.java
+<<<<<<< HEAD:system/resources/de/uka/ilkd/key/java/JavaRedux/JAVALANG.TXT
 javax/realtime/IllegalAssignmentError.java
 javax/realtime/ImmortalMemory.java
 javax/realtime/InaccessibleAreaException.java
@@ -70,3 +72,5 @@ junit/framework/Test.java
 junit/framework/TestCase.java
 junit/framework/TestSuite.java
 
+=======
+>>>>>>> 032cf20a49e1384b90316d02f35ce545b1a6d599:system/resources/de/uka/ilkd/key/java/JavaRedux/JAVALANG.TXT

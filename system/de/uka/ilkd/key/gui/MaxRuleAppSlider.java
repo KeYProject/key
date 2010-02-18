@@ -11,8 +11,8 @@
 package de.uka.ilkd.key.gui;
 
 import java.util.Hashtable;
-import java.util.LinkedList;
 import java.util.Iterator;
+import java.util.LinkedList;
 
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
@@ -89,10 +89,9 @@ public class MaxRuleAppSlider extends JSlider {
     }
 
     private void updateAllSliders(){
-	Iterator<MaxRuleAppSlider> it = allInstances.iterator();
-	while(it.hasNext()){
-	    it.next().refresh();
-	}
+        for (MaxRuleAppSlider allInstance : allInstances) {
+            allInstance.refresh();
+        }
     }
 
     public void setMediator(KeYMediator mediator) {

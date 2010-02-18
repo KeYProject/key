@@ -10,6 +10,7 @@
 
 package de.uka.ilkd.key.strategy;
 
+import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.BuiltInRuleApp;
@@ -48,7 +49,7 @@ public abstract class RuleAppContainer implements Comparable<RuleAppContainer> {
      * Create a list of new RuleAppContainers that are to be 
      * considered for application.
      */
-    public abstract ListOfRuleAppContainer createFurtherApps
+    public abstract ImmutableList<RuleAppContainer> createFurtherApps
 	( Goal p_goal, Strategy strategy );
 
     /**
@@ -72,7 +73,7 @@ public abstract class RuleAppContainer implements Comparable<RuleAppContainer> {
      * @return list of containers for currently applicable RuleApps, the cost
      * may be an instance of <code>TopRuleAppCost</code>.
      */
-    public static ListOfRuleAppContainer createAppContainers
+    public static ImmutableList<RuleAppContainer> createAppContainers
         ( RuleApp p_app, PosInOccurrence p_pio, Goal p_goal, Strategy p_strategy ) {
 
 	if ( p_app instanceof NoPosTacletApp )

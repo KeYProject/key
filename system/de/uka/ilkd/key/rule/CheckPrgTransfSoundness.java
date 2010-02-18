@@ -5,25 +5,25 @@
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
-//
-//
 package de.uka.ilkd.key.rule;
 
 import java.io.*;
 import java.util.*;
 
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.expression.Operator;
 import de.uka.ilkd.key.java.visitor.ProgramSVCollector;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.op.SVSubstitute;
+import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.op.SortedSchemaVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.proof.init.EnvInput;
-import de.uka.ilkd.key.proof.init.InitConfig;
-import de.uka.ilkd.key.proof.init.JavaProfile;
-import de.uka.ilkd.key.proof.init.KeYFileForTests;
-import de.uka.ilkd.key.proof.init.ProblemInitializer;
+import de.uka.ilkd.key.proof.init.*;
 import de.uka.ilkd.key.util.KeYResourceManager;
 
 
@@ -65,7 +65,7 @@ public class CheckPrgTransfSoundness {
 
     // This variable contains the list of new variables, when
     // applicable, depending on each taclet.
-    private static ListOfNewVarcond newvars = null;
+    private static ImmutableList<NewVarcond> newvars = null;
 
     // This is a Map from SchemaVariables to Restrictions.
     private static Map<SVSubstitute, Restriction> svToRestriction = new HashMap<SVSubstitute, Restriction>();
@@ -161,7 +161,7 @@ public class CheckPrgTransfSoundness {
 
     // This method parses the file which includes all taclets. It
     // creates a "SetOfTaclet" set which includes the taclets.
-    public static SetOfTaclet parseTaclets() {
+    public static ImmutableSet<Taclet> parseTaclets() {
 
         Set<String> checkTacsName = new HashSet<String>();
 
@@ -190,19 +190,19 @@ public class CheckPrgTransfSoundness {
             return null;
         }
 
-        SetOfTaclet rules = SetAsListOfTaclet.EMPTY_SET;
+        ImmutableSet<Taclet> rules = DefaultImmutableSet.<Taclet>nil();
         File allTacletsFile = null;
         try {
             allTacletsFile = File.createTempFile("allTaclets","tmp");
             PrintWriter out
                 = new PrintWriter(new BufferedWriter(new FileWriter(allTacletsFile)));
-            for (int i=0; i<ruleFiles.length; i++) {
+            for (String ruleFile : ruleFiles) {
                 //File f = new File(ruleFiles[i]);
                 File f = new File(KeYResourceManager.getManager().getResourceFile
-                                  (CheckPrgTransfSoundness.class,
-                                   ruleFiles[i]).getFile());
+                        (CheckPrgTransfSoundness.class,
+                                ruleFile).getFile());
                 BufferedReader r = new BufferedReader(new FileReader(f));
-                for (String jl = r.readLine();(jl != null); jl = r.readLine()) {
+                for (String jl = r.readLine(); (jl != null); jl = r.readLine()) {
                     if (!jl.startsWith("\\include")) out.println(jl);
                 }
             }
@@ -213,20 +213,18 @@ public class CheckPrgTransfSoundness {
             EnvInput envInput = new KeYFileForTests("Test", allTacletsFile);
             ProblemInitializer pi = new ProblemInitializer(JAVA_PROFILE);
             InitConfig ic = pi.prepare(envInput);
-            SetOfTaclet currentRules = ic.getTaclets();
+            ImmutableSet<Taclet> currentRules = ic.getTaclets();
             //filtern von currentRules mit obigen checkTacsName, treffer in rules hinzuf�gen
             // schleife �ber alle elemente von currentRules
 
 
-            IteratorOfTaclet currentRulesIt = currentRules.iterator();
-            while (currentRulesIt.hasNext()) {
-                Taclet cT = (Taclet) currentRulesIt.next();
+            for (Taclet currentRule : currentRules) {
+                Taclet cT = currentRule;
 
-                Iterator<String> checkTacsNameIt = checkTacsName.iterator();
-                while (checkTacsNameIt.hasNext()) {
-                    String tacName = checkTacsNameIt.next();
+                for (String aCheckTacsName : checkTacsName) {
+                    String tacName = aCheckTacsName;
                     if (cT.name().toString().equals(tacName)) {
-                        rules=rules.add(cT);
+                        rules = rules.add(cT);
                     }
                 }
             }
@@ -245,8 +243,8 @@ public class CheckPrgTransfSoundness {
 
     // This method iterates over all the taclets created by the parsing
     // process and feeds them to the "processTaclet" method.
-    public static void processAllTaclets(SetOfTaclet taclets) {
-        IteratorOfTaclet tacletIt = taclets.iterator();
+    public static void processAllTaclets(ImmutableSet<Taclet> taclets) {
+        Iterator<Taclet> tacletIt = taclets.iterator();
         int i = 1;
         while(tacletIt.hasNext()) {
             Taclet tac = tacletIt.next();
@@ -285,7 +283,7 @@ public class CheckPrgTransfSoundness {
         newvars = null;
 
         // Intermediate variable.
-        ListOfTacletGoalTemplate listTgt = taclet.goalTemplates();
+        ImmutableList<TacletGoalTemplate> listTgt = taclet.goalTemplates();
 
         if (taclet instanceof RewriteTaclet && listTgt.size() == 1) {
             findTerm = ((RewriteTaclet) taclet).find();
@@ -345,16 +343,15 @@ public class CheckPrgTransfSoundness {
         // Collects all SVs in the code of the find part.
         ProgramSVCollector PSVC =
             new ProgramSVCollector(findStatementBlock,
-                                   SLListOfSchemaVariable.EMPTY_LIST) ;
+                                   ImmutableSLList.<SchemaVariable>nil()) ;
         PSVC.start();
-        ListOfSchemaVariable list = PSVC.getSchemaVariables();
+        ImmutableList<SchemaVariable> list = PSVC.getSchemaVariables();
 
         // Creates a map with all the schema variables mapped to the no
         // restriction class.
         svToRestriction = new HashMap<SVSubstitute, Restriction>();
-        IteratorOfSchemaVariable listIt = list.iterator();
-        while (listIt.hasNext()) {
-            svToRestriction.put(listIt.next(), RESTRICTNONE);
+        for (SchemaVariable aList : list) {
+            svToRestriction.put(aList, RESTRICTNONE);
         }
 
         // going inside the statements, until terminalProgramElement
@@ -498,7 +495,7 @@ public class CheckPrgTransfSoundness {
             }
             else{
                 System.out.println("terminal found: " +
-                                   ((NonTerminalProgramElement) findStat)
+                                   findStat
                                    .getChildAt(countst));
                 System.out.println("this should not have happened, all "
                                    + "things we get by accessing "
@@ -1127,9 +1124,8 @@ public class CheckPrgTransfSoundness {
     // "addNewString"
     public static void createNewVarsAddString(Map<SchemaVariable, String> svToMaude) {
         addNewString = "";
-        IteratorOfNewVarcond newvarsIt = newvars.iterator();
-        while (newvarsIt.hasNext()) {
-            NewVarcond newVC =  newvarsIt.next();
+        for (NewVarcond newvar : newvars) {
+            NewVarcond newVC = newvar;
             SchemaVariable sv = newVC.getSchemaVariable();
             SchemaVariable svPeer = newVC.getPeerSchemaVariable();
             Sort svPeerSort = ((SortedSchemaVariable) svPeer).sort();
@@ -1137,57 +1133,54 @@ public class CheckPrgTransfSoundness {
 
             // New SV's name.
             String svName = sv.name().toString()
-                .substring(1,sv.name().toString().length());
+                    .substring(1, sv.name().toString().length());
             // Name of the SV which gives its type to the current new
             // SV.
             String svPeerName = svPeer.name().toString()
-                .substring(1,svPeer.name().toString().length());
+                    .substring(1, svPeer.name().toString().length());
 
             // Case for the new SV is stored in svToMaude.
             svToMaude.put(sv, svMaudeCase);
 
             // Depending on the case the add-String is extended.
             if (svMaudeCase == LOCALVARVAL
-                || svMaudeCase == ATTOBJWOTHISVAL
-                || svMaudeCase == ATTOBJWITHTHISVAL
-                || svMaudeCase == STATATTTYPEREFVAL
-                || svMaudeCase == STATATTOBJREFVAL
-                || svMaudeCase == LITERALVALUE
-                || svMaudeCase == EXPRESSIONVAL
-                || svMaudeCase == ATTRIBVAL) {
+                    || svMaudeCase == ATTOBJWOTHISVAL
+                    || svMaudeCase == ATTOBJWITHTHISVAL
+                    || svMaudeCase == STATATTTYPEREFVAL
+                    || svMaudeCase == STATATTOBJREFVAL
+                    || svMaudeCase == LITERALVALUE
+                    || svMaudeCase == EXPRESSIONVAL
+                    || svMaudeCase == ATTRIBVAL) {
                 addNewString = addNewString
-                    + createStringNewVarVal(svName);
-            }
-            else if (svMaudeCase == LOCALVARINT
-                     || svMaudeCase == ATTOBJWOTHISINT
-                     || svMaudeCase == ATTOBJWITHTHISINT
-                     || svMaudeCase == STATATTTYPEREFINT
-                     || svMaudeCase == STATATTOBJREFINT
-                     || svMaudeCase == LITERALINT
-                     || svMaudeCase == EXPRESSIONINT
-                     || svMaudeCase == ATTRIBINT) {
+                        + createStringNewVarVal(svName);
+            } else if (svMaudeCase == LOCALVARINT
+                    || svMaudeCase == ATTOBJWOTHISINT
+                    || svMaudeCase == ATTOBJWITHTHISINT
+                    || svMaudeCase == STATATTTYPEREFINT
+                    || svMaudeCase == STATATTOBJREFINT
+                    || svMaudeCase == LITERALINT
+                    || svMaudeCase == EXPRESSIONINT
+                    || svMaudeCase == ATTRIBINT) {
                 addNewString = addNewString
-                    + createStringNewVarInt(svName);
-            }
-            else if (svMaudeCase == LOCALVARBOOL
-                     || svMaudeCase == ATTOBJWOTHISBOOL
-                     || svMaudeCase == ATTOBJWITHTHISBOOL
-                     || svMaudeCase == STATATTTYPEREFBOOL
-                     || svMaudeCase == STATATTOBJREFBOOL
-                     || svMaudeCase == LITERALBOOL
-                     || svMaudeCase == EXPRESSIONBOOL
-                     || svMaudeCase == ATTRIBBOOL) {
+                        + createStringNewVarInt(svName);
+            } else if (svMaudeCase == LOCALVARBOOL
+                    || svMaudeCase == ATTOBJWOTHISBOOL
+                    || svMaudeCase == ATTOBJWITHTHISBOOL
+                    || svMaudeCase == STATATTTYPEREFBOOL
+                    || svMaudeCase == STATATTOBJREFBOOL
+                    || svMaudeCase == LITERALBOOL
+                    || svMaudeCase == EXPRESSIONBOOL
+                    || svMaudeCase == ATTRIBBOOL) {
                 addNewString = addNewString
-                    + createStringNewVarBool(svName);
-            }
-            else if (svMaudeCase == LOCALVARATT
-                     || svMaudeCase == ATTOBJWOTHISATT
-                     || svMaudeCase == ATTOBJWITHTHISATT
-                     || svMaudeCase == STATATTTYPEREFATT
-                     || svMaudeCase == STATATTOBJREFATT
-                     || svMaudeCase == EXPRESSIONATT) {
+                        + createStringNewVarBool(svName);
+            } else if (svMaudeCase == LOCALVARATT
+                    || svMaudeCase == ATTOBJWOTHISATT
+                    || svMaudeCase == ATTOBJWITHTHISATT
+                    || svMaudeCase == STATATTTYPEREFATT
+                    || svMaudeCase == STATATTOBJREFATT
+                    || svMaudeCase == EXPRESSIONATT) {
                 addNewString = addNewString
-                    + createStringNewVarAtt(svName, svPeerName);
+                        + createStringNewVarAtt(svName, svPeerName);
             }
         }
     }
@@ -1212,7 +1205,7 @@ public class CheckPrgTransfSoundness {
         // Transform every statement.
         for (int countStatements = 0;
              countStatements <
-                 ((NonTerminalProgramElement) findStatementBlock)
+                 findStatementBlock
                  .getChildCount();
              countStatements ++) {
 
@@ -1286,12 +1279,11 @@ public class CheckPrgTransfSoundness {
             // that sv is replaced in the code by
             // sv+"Name:TacletNewVarName" and it does not matter what
             // the type of the variable is!
-            IteratorOfNewVarcond newvarsIt = newvars.iterator();
-            while (newvarsIt.hasNext()) {
-                NewVarcond newVC = newvarsIt.next();
+            for (NewVarcond newvar : newvars) {
+                NewVarcond newVC = newvar;
                 SchemaVariable newSV = newVC.getSchemaVariable();
                 if (sv == newSV) {
-                    return svName+"Name:TacletNewVarName";
+                    return svName + "Name:TacletNewVarName";
                 }
             }
 
@@ -1593,12 +1585,11 @@ public class CheckPrgTransfSoundness {
             +"---- case for each SV: \n";
 
         Set<SchemaVariable> allSVs = svToMaude.keySet();
-        Iterator<SchemaVariable> allSVsIt = allSVs.iterator();
-        while (allSVsIt.hasNext()) {
-            SchemaVariable sv = allSVsIt.next();
+        for (SchemaVariable allSV : allSVs) {
+            SchemaVariable sv = allSV;
             String svCase = svToMaude.get(sv);
-            infoString = infoString + "---- SV: "+ sv +", Case:"
-                + svCase + " \n";
+            infoString = infoString + "---- SV: " + sv + ", Case:"
+                    + svCase + " \n";
         }
 
         try {
@@ -1631,7 +1622,7 @@ public class CheckPrgTransfSoundness {
             return;
         }
 
-        SetOfTaclet taclets = parseTaclets();
+        ImmutableSet<Taclet> taclets = parseTaclets();
         processAllTaclets(taclets);
 
         try {

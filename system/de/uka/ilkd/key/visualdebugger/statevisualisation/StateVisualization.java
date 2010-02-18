@@ -13,60 +13,66 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 
+import de.uka.ilkd.key.collection.*;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.java.JavaInfo;
-import de.uka.ilkd.key.java.SLListOfExpression;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.ClassType;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.sort.ListOfSort;
-import de.uka.ilkd.key.logic.sort.SLListOfSort;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.proof.*;
+import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.TacletApp;
-import de.uka.ilkd.key.rule.updatesimplifier.*;
+import de.uka.ilkd.key.rule.updatesimplifier.AssignmentPair;
+import de.uka.ilkd.key.rule.updatesimplifier.AssignmentPairImpl;
+import de.uka.ilkd.key.rule.updatesimplifier.Update;
+import de.uka.ilkd.key.rule.updatesimplifier.UpdateSimplifierTermFactory;
 import de.uka.ilkd.key.strategy.DebuggerStrategy;
 import de.uka.ilkd.key.strategy.StrategyFactory;
 import de.uka.ilkd.key.strategy.StrategyProperties;
-import de.uka.ilkd.key.visualdebugger.*;
+import de.uka.ilkd.key.visualdebugger.DebuggerEvent;
+import de.uka.ilkd.key.visualdebugger.DebuggerPO;
+import de.uka.ilkd.key.visualdebugger.ProofStarter;
+import de.uka.ilkd.key.visualdebugger.VisualDebugger;
 import de.uka.ilkd.key.visualdebugger.executiontree.ITNode;
 import de.uka.ilkd.key.visualdebugger.watchpoints.WatchPoint;
 
 public class StateVisualization {
 
-    private SetOfTerm arrayIndexTerms;
+    private ImmutableSet<Term> arrayIndexTerms;
 
-    private final SetOfTerm arrayLocations;
+    private final ImmutableSet<Term> arrayLocations;
 
-    private SetOfTerm[][] indexConfigurations;
+    private ImmutableSet<Term>[][] indexConfigurations;
 
-    private SetOfTerm[] instanceConfigurations;
+    private ImmutableSet<Term>[] instanceConfigurations;
 
     private final ITNode itNode;
 
-    private final ListOfTerm locations;
+    private final ImmutableList<Term> locations;
 
     private final KeYMediator mediator;
 
-    // ListOfTerm terms = SLListOfTerm.EMPTY_LIST;
+    // IList<Term> terms = ImmSLList.<Term>nil();
 
     private DebuggerPO po = new DebuggerPO("DebuggerPo");
 
     private Term[] postAttributes;
 
-    private ListOfTerm[][] postValues;
+    private ImmutableList<Term>[][] postValues;
 
     private PosInOccurrence programPio;
 
     private ProofStarter ps;
 
-    private SetOfTerm refInPC = SetAsListOfTerm.EMPTY_SET;
+    private ImmutableSet<Term> refInPC = DefaultImmutableSet.<Term>nil();
 
     private final Services serv;
 
@@ -120,16 +126,16 @@ public class StateVisualization {
         applyCuts(refInPC);
 
         computeInstanceConfigurations();
-        this.indexConfigurations = new SetOfTerm[this.instanceConfigurations.length][];
+        this.indexConfigurations = new ImmutableSet[this.instanceConfigurations.length][];
         for (int i = 0; i < instanceConfigurations.length; i++) {
             setUpProof(instanceConfigurations[i], null);
             applyCuts(arrayIndexTerms);            
             computeArrayConfigurations(i);
         }
 
-        postValues = new ListOfTerm[instanceConfigurations.length][];
+        postValues = new ImmutableList[instanceConfigurations.length][];
         for (int i = 0; i < instanceConfigurations.length; i++) {
-            postValues[i] = new ListOfTerm[indexConfigurations[i].length];
+            postValues[i] = new ImmutableList[indexConfigurations[i].length];
             for (int j = 0; j < indexConfigurations[i].length; j++) {
                 setUpProof(instanceConfigurations[i]
                     .union(indexConfigurations[i][j]), programPio2);
@@ -145,13 +151,13 @@ public class StateVisualization {
     }
 
     private Term addRememberPrestateUpdates(Term target) {
-        Term locs[] = locations.toArray();
+        Term locs[] = locations.toArray(new Term[locations.size()]);
         postAttributes = new Term[locs.length];  
         
         Update up = Update.createUpdate(target);
 
         LinkedList newAP = new LinkedList();
-        // for(IteratorOfTerm it= this.refsInPreState.iterator();it.hasNext();){
+        // for(Iterator<Term> it= this.refsInPreState.iterator();it.hasNext();){
         for (int i = 0; i < locs.length; i++) {
             if (locs[i].op() instanceof AttributeOp) {
                 final LocationVariable pv = new LocationVariable(
@@ -190,11 +196,11 @@ public class StateVisualization {
 
         }
 
-        ArrayOfAssignmentPair apOld = up.getAllAssignmentPairs();
+        ImmutableArray<AssignmentPair> apOld = up.getAllAssignmentPairs();
         AssignmentPair[] aps = new AssignmentPair[newAP.size() + apOld.size()];
 
         for (int i = newAP.size(); i < apOld.size() + newAP.size(); i++) {
-            aps[i] = apOld.getAssignmentPair(i - newAP.size());
+            aps[i] = apOld.get(i - newAP.size());
         }
 
         for (int i = 0; i < newAP.size(); i++) {
@@ -202,7 +208,7 @@ public class StateVisualization {
 
         }
 
-        statePred = createPredicate(SLListOfTerm.EMPTY_LIST
+        statePred = createPredicate(ImmutableSLList.<Term>nil()
                 .append(postAttributes));
 
         return UpdateSimplifierTermFactory.DEFAULT.createUpdateTerm(aps,
@@ -210,13 +216,12 @@ public class StateVisualization {
 
     }
 
-    private synchronized void applyCutAndRun(ListOfGoal goals, Term inst) {
-        for (IteratorOfGoal it = goals.iterator(); it.hasNext();) {
-            final Goal g = it.next();
+    private synchronized void applyCutAndRun(ImmutableList<Goal> goals, Term inst) {
+        for (final Goal g : goals) {
             final NoPosTacletApp c = g.indexOfTaclets().lookup("cut");
             assert c != null;
             // c.
-            SetOfSchemaVariable set2 = c.neededUninstantiatedVars();
+            ImmutableSet<SchemaVariable> set2 = c.neededUninstantiatedVars();
             SchemaVariable cutF = set2.iterator().next();
 
             TacletApp t2 = c.addInstantiation(cutF, inst, false);
@@ -228,9 +233,9 @@ public class StateVisualization {
 
     }
 
-    private void applyCuts(SetOfTerm terms) {
-        Term[] t1 = terms.toArray();
-        Term[] t2 = terms.toArray();
+    private void applyCuts(ImmutableSet<Term> terms) {
+        Term[] t1 = terms.toArray(new Term[terms.size()]);
+        Term[] t2 = terms.toArray(new Term[terms.size()]);
 
         for (int i1 = 0; i1 < t1.length; i1++) {
             for (int i2 = i1; i2 < t2.length; i2++) {
@@ -250,13 +255,13 @@ public class StateVisualization {
         
         final Proof proof = ps.getProof();
         final Node root = proof.root();
-        for (IteratorOfGoal it = proof.openGoals().iterator(); it.hasNext();) {
-            indexConf.add(getAppliedCutsSet(it.next().node(), root));
+        for (Goal goal : proof.openGoals()) {
+            indexConf.add(getAppliedCutsSet(goal.node(), root));
         }
-        this.indexConfigurations[instanceConf] = new SetOfTerm[indexConf.size()];
+        this.indexConfigurations[instanceConf] = new ImmutableSet[indexConf.size()];
         int i = 0;
         for (Iterator it = indexConf.iterator(); it.hasNext(); i++) {
-            indexConfigurations[instanceConf][i] = (SetOfTerm) it.next();           
+            indexConfigurations[instanceConf][i] = (ImmutableSet<Term>) it.next();           
         }
 
     }
@@ -266,36 +271,39 @@ public class StateVisualization {
 
         final Proof proof = ps.getProof();
         final Node root = proof.root();
-        for (IteratorOfGoal it = proof.openGoals().iterator(); it.hasNext();) {
-            indexConf.add(getAppliedCutsSet(it.next().node(), root));
+        for (Goal goal : proof.openGoals()) {
+            indexConf.add(getAppliedCutsSet(goal.node(), root));
         }
-        this.instanceConfigurations = new SetOfTerm[indexConf.size()];
+        this.instanceConfigurations = new ImmutableSet[indexConf.size()];
         int i = 0;
         for (Iterator it = indexConf.iterator(); it.hasNext();i++) {
-            instanceConfigurations[i] = (SetOfTerm) it.next();
+            instanceConfigurations[i] = (ImmutableSet<Term>) it.next();
         }
 
     }
 
-    private Term createPredicate(ListOfTerm locs) {
+    private Term createPredicate(ImmutableList<Term> locs) {
         Term result = null;
-        ListOfSort s = SLListOfSort.EMPTY_LIST;
 
-        for (IteratorOfTerm it = locs.iterator(); it.hasNext();) {
-            s = s.append(it.next().sort());
+        final Sort[] s = new Sort[locs.size()];
+        final Term[] locsArray = new Term[locs.size()];
+        
+        int i = 0;
+        for (Term t : locs) {
+            s[i] = t.sort();
+            locsArray[i] = t;
+            i++;
         }
 
-        stateOp = new RigidFunction(new Name("STATE"), Sort.FORMULA, s
-                .toArray());
+        stateOp = new RigidFunction(new Name("STATE"), Sort.FORMULA, s);
 
-        result = TermFactory.DEFAULT
-                .createFunctionTerm(stateOp, locs.toArray());
+        result = TermFactory.DEFAULT.createFunctionTerm(stateOp, locsArray);
 
         return result;
     }
 
-    private SetOfTerm getAppliedCutsSet(Node n, Node root) {      
-        SetOfTerm result = SetAsListOfTerm.EMPTY_SET;
+    private ImmutableSet<Term> getAppliedCutsSet(Node n, Node root) {      
+        ImmutableSet<Term> result = DefaultImmutableSet.<Term>nil();
         if (!root.find(n)) {
             throw new RuntimeException("node n ist not a childs of node root");
         }
@@ -320,16 +328,15 @@ public class StateVisualization {
 
     }
 
-    public SetOfTerm[] getPossibleIndexTermsForPcState(int i) {
+    public ImmutableSet<Term>[] getPossibleIndexTermsForPcState(int i) {
         return indexConfigurations[i];
 
     }
 
-    private ListOfTerm getPostState(Sequent s) {
-        ListOfTerm result = SLListOfTerm.EMPTY_LIST;
-        for (final IteratorOfConstrainedFormula it = s.succedent().iterator(); 
-             it.hasNext();) {
-            final Term formula = it.next().formula();
+    private ImmutableList<Term> getPostState(Sequent s) {
+        ImmutableList<Term> result = ImmutableSLList.<Term>nil();
+        for (ConstrainedFormula constrainedFormula : (Iterable<ConstrainedFormula>) s.succedent()) {
+            final Term formula = constrainedFormula.formula();
             if (formula.op() == stateOp) {
                 for (int i = 0, ar = formula.arity(); i < ar; i++) {
                     result = result.append(formula.sub(i));
@@ -339,17 +346,17 @@ public class StateVisualization {
         return result;
     }
 
-    private SetOfTerm getReferences(ListOfTerm terms) {
-        // ListOfTerm pc = itNode.getPc();
-        SetOfTerm result = SetAsListOfTerm.EMPTY_SET;
-        for (IteratorOfTerm it = terms.iterator(); it.hasNext();) {
-            result = result.union(getReferences(it.next()));
+    private ImmutableSet<Term> getReferences(ImmutableList<Term> terms) {
+        // IList<Term> pc = itNode.getPc();
+        ImmutableSet<Term> result = DefaultImmutableSet.<Term>nil();
+        for (Term term : terms) {
+            result = result.union(getReferences(term));
         }
         return result;
     }
 
-    private SetOfTerm getReferences(Term t) {
-        SetOfTerm result = SetAsListOfTerm.EMPTY_SET;
+    private ImmutableSet<Term> getReferences(Term t) {
+        ImmutableSet<Term> result = DefaultImmutableSet.<Term>nil();
         if (referenceSort(t.sort()) && t.freeVars().size() == 0)
             result = result.add(t);
         for (int i = 0; i < t.arity(); i++) {
@@ -358,11 +365,11 @@ public class StateVisualization {
         return result;
     }
 
-    public SymbolicObjectDiagram getSymbolicState(int i, SetOfTerm indexTerms,
+    public SymbolicObjectDiagram getSymbolicState(int i, ImmutableSet<Term> indexTerms,
             boolean pre) {
         for (int j = 0; j < indexConfigurations[i].length; j++) {
             if (indexTerms.subset(indexConfigurations[i][j])) {
-                final ListOfTerm pt = postValues[i][j];
+                final ImmutableList<Term> pt = postValues[i][j];
                 final SymbolicObjectDiagram s = new SymbolicObjectDiagram(itNode,
                         mediator.getServices(), itNode.getPc(), refInPC,
                         locations, pt, pre, this.arrayLocations,
@@ -396,7 +403,7 @@ public class StateVisualization {
         vd.setProofStrategy(ps.getProof(), true, false, new LinkedList<WatchPoint>());
     }
     
-    private void setUpProof(SetOfTerm indexConf, Term forPostValues) {
+    private void setUpProof(ImmutableSet<Term> indexConf, Term forPostValues) {
         po = new DebuggerPO("DebuggerPo");
         if (forPostValues != null) {
             po.setUp(vd.getPrecondition(), itNode, indexConf, forPostValues);
@@ -418,8 +425,7 @@ public class StateVisualization {
     }
 
     private void simplifyUpdate() {                        
-        this.setUpProof(SetAsListOfTerm.
-                EMPTY_SET.add(TB.not(programPio.constrainedFormula().formula())), 
+        this.setUpProof(DefaultImmutableSet.<Term>nil().add(TB.not(programPio.constrainedFormula().formula())), 
                 null);
         
         vd.setInitPhase(true);

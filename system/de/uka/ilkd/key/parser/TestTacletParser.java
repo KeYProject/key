@@ -15,6 +15,8 @@ import java.io.StringReader;
 import java.io.StringWriter;
 
 import junit.framework.TestCase;
+import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.java.ContextStatementBlock;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
@@ -160,7 +162,7 @@ public class TestTacletParser extends TestCase {
 	try {
 	    KeYParser p = stringTacletParser(s);
 	    
-	    return p.taclet(SetAsListOfChoice.EMPTY_SET);
+	    return p.taclet(DefaultImmutableSet.<Choice>nil());
 	} catch (Exception e) {
 	    StringWriter sw = new StringWriter();
 	    PrintWriter pw = new PrintWriter(sw);
@@ -181,12 +183,12 @@ public class TestTacletParser extends TestCase {
 	builder.setName(new Name("imp_left"));
 	builder.addTacletGoalTemplate(new
 	    AntecSuccTacletGoalTemplate(Sequent.EMPTY_SEQUENT,
-				      SLListOfTaclet.EMPTY_LIST,
+				      ImmutableSLList.<Taclet>nil(),
 				      sequent("b0",null)));
 	
 	builder.addTacletGoalTemplate(new
 	    AntecSuccTacletGoalTemplate(Sequent.EMPTY_SEQUENT,
-				      SLListOfTaclet.EMPTY_LIST,
+				      ImmutableSLList.<Taclet>nil(),
 				      sequent(null,"b")));
 	
 	Taclet impleft=builder.getAntecTaclet();
@@ -202,7 +204,7 @@ public class TestTacletParser extends TestCase {
 	builder.setFind(parseFma("b->b0"));
 	builder.addTacletGoalTemplate(new
 	    AntecSuccTacletGoalTemplate(Sequent.EMPTY_SEQUENT,
-				      SLListOfTaclet.EMPTY_LIST,
+				      ImmutableSLList.<Taclet>nil(),
 				      sequent("b","b0")));
 	builder.setName(new Name("imp_right"));
 	Taclet impright=builder.getSuccTaclet();
@@ -218,12 +220,12 @@ public class TestTacletParser extends TestCase {
 	NoFindTacletBuilder builder=new NoFindTacletBuilder();
 	builder.addTacletGoalTemplate(new
 	    TacletGoalTemplate(sequent("b",null),
-			     SLListOfTaclet.EMPTY_LIST
+			     ImmutableSLList.<Taclet>nil()
 			     ));
 	
 	builder.addTacletGoalTemplate(new
 	    TacletGoalTemplate(sequent(null,"b"),
-			     SLListOfTaclet.EMPTY_LIST
+			     ImmutableSLList.<Taclet>nil()
 			     ));
 	builder.setName(new Name("cut"));
 	
@@ -253,7 +255,7 @@ public class TestTacletParser extends TestCase {
 	builder.setFind(parseFma("b->b0"));
 	builder.addTacletGoalTemplate(new
 	    RewriteTacletGoalTemplate(Sequent.EMPTY_SEQUENT,
-				      SLListOfTaclet.EMPTY_LIST,
+				      ImmutableSLList.<Taclet>nil(),
 				      parseFma("!b0->!b")));
 	builder.setName(new Name("contraposition"));
        	Taclet contraposition=builder.getRewriteTaclet();
@@ -272,7 +274,7 @@ public class TestTacletParser extends TestCase {
 	builder.setFind(parseFma("\\forall z; b"));
 	builder.addTacletGoalTemplate(new
 	    AntecSuccTacletGoalTemplate(Sequent.EMPTY_SEQUENT,
-				      SLListOfTaclet.EMPTY_LIST,
+				      ImmutableSLList.<Taclet>nil(),
 				      sequent(null,"{\\subst z; sk}b")));
 	builder.addVarsNewDependingOn ( (SchemaVariable)lookup_var("sk"),
 					(SchemaVariable)lookup_var("b") );
@@ -294,7 +296,7 @@ public class TestTacletParser extends TestCase {
 	
 	builder.addTacletGoalTemplate(new
 	    TacletGoalTemplate(sequent("{\\subst z; x}b",null),
-			     SLListOfTaclet.EMPTY_LIST));
+			     ImmutableSLList.<Taclet>nil()));
 	builder.setName(new Name("all_left"));
        	Taclet allleft=builder.getAntecTaclet();
 	String allleftString = 
@@ -314,7 +316,7 @@ public class TestTacletParser extends TestCase {
 				   (SchemaVariable)lookup_var("b"));
 	builder.addTacletGoalTemplate(new
 	    RewriteTacletGoalTemplate(Sequent.EMPTY_SEQUENT,
-				    SLListOfTaclet.EMPTY_LIST,
+				    ImmutableSLList.<Taclet>nil(),
 				    parseFma("b & \\exists z; b0")));
 	builder.setName(new Name("exists_conj_split"));
 	Taclet exconjsplit = builder.getRewriteTaclet();
@@ -334,7 +336,7 @@ public class TestTacletParser extends TestCase {
 	builder.setFind(parseTerm("f(f(x))"));
 	builder.addTacletGoalTemplate(new
 	    RewriteTacletGoalTemplate(Sequent.EMPTY_SEQUENT,
-				    SLListOfTaclet.EMPTY_LIST,
+				    ImmutableSLList.<Taclet>nil(),
 				    parseTerm("f(x)")));
 	builder.setName(new Name("f_idempotent"));
 	Taclet fidempotent = builder.getRewriteTaclet();
@@ -351,7 +353,7 @@ public class TestTacletParser extends TestCase {
 	insertbuilder.setFind(parseTerm("x"));
 	insertbuilder.addTacletGoalTemplate(new
 	    RewriteTacletGoalTemplate(Sequent.EMPTY_SEQUENT,
-				    SLListOfTaclet.EMPTY_LIST,
+				    ImmutableSLList.<Taclet>nil(),
 				    parseTerm("x0")));
 	insertbuilder.setName(new Name("insert_eq"));
 	Taclet inserteq = insertbuilder.getTaclet();
@@ -361,7 +363,7 @@ public class TestTacletParser extends TestCase {
 	builder.setFind(parseFma("x=x0"));
 	builder.addTacletGoalTemplate(new
 	    TacletGoalTemplate(Sequent.EMPTY_SEQUENT,
-			     SLListOfTaclet.EMPTY_LIST.prepend(inserteq)));
+			     ImmutableSLList.<Taclet>nil().prepend(inserteq)));
 	builder.setName(new Name("make_insert_eq"));
 	Taclet makeinserteq = builder.getAntecTaclet();
 	String makeinserteqString = "make_insert_eq"
@@ -459,7 +461,7 @@ public class TestTacletParser extends TestCase {
         boolean builderExceptionThrown = false;
         try {
             stringTacletParser(brokenTacletString)
-                    .taclet(SetAsListOfChoice.EMPTY_SET);
+                    .taclet(DefaultImmutableSet.<Choice>nil());
         } catch ( Exception e ) {
             assertTrue ( "Expected IllegalArgumentException, but got " + e,
                          e instanceof IllegalArgumentException );

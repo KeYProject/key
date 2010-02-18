@@ -11,9 +11,13 @@
 
 package de.uka.ilkd.key.logic.op;
 
+import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.sort.*;
+import de.uka.ilkd.key.logic.sort.GenericSort;
+import de.uka.ilkd.key.logic.sort.IntersectionSort;
+import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.logic.sort.SortDefiningSymbols;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.inst.GenericSortCondition;
 import de.uka.ilkd.key.rule.inst.SortException;
@@ -51,7 +55,7 @@ public class SortDependingFunction extends RigidFunction
 
     public SortDependingFunction ( Name        name,
 				   Sort        sort,
-				   ArrayOfSort argSorts,
+				   ImmutableArray<Sort> argSorts,
 				   Name        kind,
 				   Sort        sortDependingOn ) {
 	super ( name, sort, argSorts );

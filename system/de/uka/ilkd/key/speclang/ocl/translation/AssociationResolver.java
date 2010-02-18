@@ -10,20 +10,16 @@
 
 package de.uka.ilkd.key.speclang.ocl.translation;
 
-import de.uka.ilkd.key.casetool.Association;
-import de.uka.ilkd.key.casetool.ListOfAssociation;
-import de.uka.ilkd.key.casetool.UMLInfo;
+import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.sort.AbstractCollectionSort;
-import de.uka.ilkd.key.speclang.translation.SLResolverManager;
-import de.uka.ilkd.key.speclang.translation.SLExpression;
-import de.uka.ilkd.key.speclang.translation.SLExpressionResolver;
-import de.uka.ilkd.key.speclang.translation.SLParameters;
-import de.uka.ilkd.key.speclang.translation.SLTranslationException;
+import de.uka.ilkd.key.speclang.ocl.Association;
+import de.uka.ilkd.key.speclang.ocl.UMLInfo;
+import de.uka.ilkd.key.speclang.translation.*;
 
 
 /**
@@ -80,7 +76,7 @@ class AssociationResolver extends SLExpressionResolver {
         }
         
         KeYJavaType containingKjt = receiver.getKeYJavaType(javaInfo);
-        ListOfAssociation assocs = umlInfo.getAssociations(containingKjt, name);
+        ImmutableList<Association> assocs = umlInfo.getAssociations(containingKjt, name);
         
         if(!assocs.isEmpty()) {            
             Term recTerm                = receiver.getTerm();
@@ -93,18 +89,18 @@ class AssociationResolver extends SLExpressionResolver {
                 if (assocFunc.sort() instanceof AbstractCollectionSort) {
                     // we have a binary association with multiplicity greater than 1
                     OCLCollection collection = new OCLCollection(recTerm,assoc,name);
-                    return new OCLEntity(collection);
+                    return new OCLExpression(collection);
                 } else {
                     // either the association-end has multiplicity 1 or it is no binary association
                     Term functionTerm = tf.createFunctionTerm(assocFunc,recTerm);
-                    return new OCLEntity(functionTerm);
+                    return new OCLExpression(functionTerm);
                 }
             } else if(recCollection != null) {
                 OCLCollection newCollection
                         = recCollection.collect(services,
                                                 assoc,
                                                 name);
-                return new OCLEntity(newCollection);
+                return new OCLExpression(newCollection);
             }
         } 
         

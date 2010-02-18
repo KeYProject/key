@@ -5,12 +5,10 @@
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
-//
-//
 package de.uka.ilkd.key.proof.mgt;
 
+import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.ArrayOfQuantifiableVariable;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 
 /**
@@ -49,7 +47,7 @@ public class UpdatePairWithGuard {
         return qvars;
     }
     
-    public ArrayOfQuantifiableVariable createArrayOfQuantifiedVars() {
-        return new ArrayOfQuantifiableVariable(qvars);
+    public ImmutableArray<QuantifiableVariable> createArrayOfQuantifiableVariable() {
+        return new ImmutableArray<QuantifiableVariable>(qvars);
     }
 }

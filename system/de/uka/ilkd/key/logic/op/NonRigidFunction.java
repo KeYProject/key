@@ -12,9 +12,9 @@
  */
 package de.uka.ilkd.key.logic.op;
 
+import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.sort.ArrayOfSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 
 /**
@@ -40,9 +40,9 @@ public class NonRigidFunction extends Function implements NonRigid {
      * creates a non rigid function with given signature
      * @param name the Name of the non-rigid function symbol
      * @param sort the Sort of the symbol
-     * @param argSorts the ArrayOfSort defining the argument sorts
+     * @param argSorts the ArrayOf<Sort> defining the argument sorts
      */
-    public NonRigidFunction(Name name, Sort sort, ArrayOfSort argSorts) {
+    public NonRigidFunction(Name name, Sort sort, ImmutableArray<Sort> argSorts) {
         super(name, sort, argSorts);      
     }
     

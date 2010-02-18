@@ -5,28 +5,23 @@
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
-//
-//
-// This file is part of KeY - Integrated Deductive Software Design
-//Copyright (C) 2001-2003 Universitaet Karlsruhe, Germany
-//                      and Chalmers University of Technology, Sweden
-//
-//The KeY system is protected by the GNU General Public License.
-//See LICENSE.TXT for details.
-//
 
 package de.uka.ilkd.key.rule.export;
 
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Iterator;
 
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.logic.Choice;
-import de.uka.ilkd.key.logic.IteratorOfChoice;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.proof.*;
-import de.uka.ilkd.key.rule.*;
+import de.uka.ilkd.key.rule.RuleSet;
+import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.rule.TacletGoalTemplate;
 
 public class RuleExportModel {
 
@@ -39,11 +34,11 @@ public class RuleExportModel {
     // keys: Choice, values: OptionModelInfo
     private HashMap choice2info = new HashMap ();
 
-    private ListOfTacletModelInfo      taclets;
-    private ListOfRuleSetModelInfo     ruleSets;
-    private ListOfDisplayNameModelInfo displayNames;
-    private ListOfOptionModelInfo      options;
-    private ListOfCategoryModelInfo    categories;
+    private ImmutableList<TacletModelInfo>      taclets;
+    private ImmutableList<RuleSetModelInfo>     ruleSets;
+    private ImmutableList<DisplayNameModelInfo> displayNames;
+    private ImmutableList<OptionModelInfo>      options;
+    private ImmutableList<CategoryModelInfo>    categories;
 	private final RuleFilter[] virtualRSFilterArray;
 	private final RuleSetModelInfo[] virtualRSModelInfoArray;
 	
@@ -52,10 +47,10 @@ public class RuleExportModel {
 	private static final String rsUnassignedDefinition = "Contains all taclets that are not assigned an explicit rule set.";
     
     public RuleExportModel () {
-        taclets = SLListOfTacletModelInfo.EMPTY_LIST;
-        ruleSets = SLListOfRuleSetModelInfo.EMPTY_LIST;
-        displayNames = SLListOfDisplayNameModelInfo.EMPTY_LIST;
-        options = SLListOfOptionModelInfo.EMPTY_LIST;
+        taclets = ImmutableSLList.<TacletModelInfo>nil();
+        ruleSets = ImmutableSLList.<RuleSetModelInfo>nil();
+        displayNames = ImmutableSLList.<DisplayNameModelInfo>nil();
+        options = ImmutableSLList.<OptionModelInfo>nil();
 		virtualRSFilterArray = new RuleFilter[] {
 				TacletFilterCloseGoal.INSTANCE,
 				TacletFilterSplitGoal.INSTANCE,
@@ -71,11 +66,10 @@ public class RuleExportModel {
     
     private void addIntroducedTaclets ( TacletModelInfo tinfo, String filename ) {
         final Taclet t = tinfo.getTaclet ();
-        IteratorOfTacletGoalTemplate it = t.goalTemplates ().iterator();
-        while ( it.hasNext () ) {
-            final TacletGoalTemplate gt = it.next ();
-            
-            addTaclets ( gt.rules(), filename, tinfo );
+        for (TacletGoalTemplate tacletGoalTemplate : t.goalTemplates()) {
+            final TacletGoalTemplate gt = tacletGoalTemplate;
+
+            addTaclets(gt.rules(), filename, tinfo);
         }
     }
     
@@ -116,10 +110,9 @@ public class RuleExportModel {
 
     private void addOptions ( TacletModelInfo tinfo ) {
         final Taclet t = tinfo.getTaclet ();
-        final IteratorOfChoice it = t.getChoices().iterator();
-        while ( it.hasNext() ) {
-            final Choice c = it.next ();
-            OptionModelInfo opt = addOption ( c );
+        for (Choice choice : t.getChoices()) {
+            final Choice c = choice;
+            OptionModelInfo opt = addOption(c);
             opt.addTaclet(tinfo);
             tinfo.addOption(opt);
         }
@@ -152,7 +145,7 @@ public class RuleExportModel {
     private void addRuleSets ( TacletModelInfo tinfo ) {
     	final Taclet t = tinfo.getTaclet ();
     	// handle regular rule sets
-        final IteratorOfRuleSet it = t.ruleSets();
+        final Iterator<RuleSet> it = t.ruleSets();
         while ( it.hasNext() ) {
             final RuleSet rs = it.next ();
             RuleSetModelInfo rsinfo = (RuleSetModelInfo) ruleSet2info.get ( rs );
@@ -174,16 +167,15 @@ public class RuleExportModel {
         }
     }
 
-    private void addTaclets ( ListOfTaclet tacletList, String filename,
+    private void addTaclets ( ImmutableList<Taclet> tacletList, String filename,
             TacletModelInfo introducer ) {
-        final IteratorOfTaclet it = tacletList.iterator();
-        while ( it.hasNext() ) {
-            final Taclet t = it.next ();
-            addTaclet ( t, filename, introducer );
+        for (Taclet aTacletList : tacletList) {
+            final Taclet t = aTacletList;
+            addTaclet(t, filename, introducer);
         }
     }
     
-    public void addTaclets ( ListOfTaclet tacletList, String filename ) {
+    public void addTaclets ( ImmutableList<Taclet> tacletList, String filename ) {
         addTaclets ( tacletList, filename, null );
     }
     
@@ -208,7 +200,7 @@ public class RuleExportModel {
     }
     
     private void analyzeTaclets () {
-        final IteratorOfTacletModelInfo it = taclets ();
+        final Iterator<TacletModelInfo> it = taclets ();
         while ( it.hasNext () ) {
             final TacletModelInfo t = it.next ();
             t.setOptions(sortOptions(t.getOptions()));
@@ -217,7 +209,7 @@ public class RuleExportModel {
     }
 
     private void analyzeOptions () {
-        final IteratorOfOptionModelInfo it = options();
+        final Iterator<OptionModelInfo> it = options();
         while ( it.hasNext () ) {
             final OptionModelInfo opt = it.next ();
             opt.setTaclets(sortTaclets(opt.getTaclets()));
@@ -225,7 +217,7 @@ public class RuleExportModel {
     }
 
     private void analyzeDisplayNames () {
-        final IteratorOfDisplayNameModelInfo it = displayNames();
+        final Iterator<DisplayNameModelInfo> it = displayNames();
         while ( it.hasNext () ) {
             final DisplayNameModelInfo dn = it.next ();
             dn.setTaclets(sortTaclets(dn.getTaclets()));
@@ -242,24 +234,23 @@ public class RuleExportModel {
             catArray[n] = (CategoryModelInfo) objArray[n];
         }
         Arrays.sort( catArray );
-        categories = SLListOfCategoryModelInfo.EMPTY_LIST.prepend ( catArray );
-        
-        IteratorOfCategoryModelInfo it = categories.iterator();
-        while ( it.hasNext () ) {
-            final CategoryModelInfo cat = it.next ();
+        categories = ImmutableSLList.<CategoryModelInfo>nil().prepend ( catArray );
+
+        for (CategoryModelInfo category : categories) {
+            final CategoryModelInfo cat = category;
             cat.setOptions(sortOptions(cat.getOptions()));
         }
     }
     
     private void analyzeRuleSets () {
-        ListOfRuleSetModelInfo outer = ruleSets;
+        ImmutableList<RuleSetModelInfo> outer = ruleSets;
         while ( !outer.isEmpty () ) {
             final RuleSetModelInfo ruleSet = outer.head ();
             outer = outer.tail ();
             
             ruleSet.setTaclets(sortTaclets(ruleSet.getTaclets()));
             
-            ListOfRuleSetModelInfo inner = outer;
+            ImmutableList<RuleSetModelInfo> inner = outer;
             while ( !inner.isEmpty () ) {
                 final RuleSetModelInfo ruleSet2 = inner.head ();
                 inner = inner.tail ();
@@ -271,8 +262,8 @@ public class RuleExportModel {
     }
 
     private void analyzeRuleSetRelationship ( RuleSetModelInfo rs, RuleSetModelInfo rs2 ) {
-        ListOfTacletModelInfo list = rs.getTaclets();
-        ListOfTacletModelInfo list2 = rs2.getTaclets();
+        ImmutableList<TacletModelInfo> list = rs.getTaclets();
+        ImmutableList<TacletModelInfo> list2 = rs2.getTaclets();
         
         int a = countOccurences ( list, list2 );
         int b = countOccurences ( list2, list );
@@ -303,80 +294,79 @@ public class RuleExportModel {
      * Counts the number of taclets from one list that are contained in a second
      * list.
      */
-    private int countOccurences ( ListOfTacletModelInfo a, ListOfTacletModelInfo b ) {
+    private int countOccurences ( ImmutableList<TacletModelInfo> a, ImmutableList<TacletModelInfo> b ) {
         int result = 0;
-        
-        final IteratorOfTacletModelInfo it = a.iterator();
-        while ( it.hasNext () ) {
-            final TacletModelInfo t = it.next ();
-            
-            if ( b.contains ( t ) ) result++;
+
+        for (TacletModelInfo anA : a) {
+            final TacletModelInfo t = anA;
+
+            if (b.contains(t)) result++;
         }
         
         return result;
     }
 
-    private ListOfRuleSetModelInfo sortRuleSets ( ListOfRuleSetModelInfo ruleSetList ) {
-        RuleSetModelInfo[] ruleSetArray = ruleSetList.toArray ();
+    private ImmutableList<RuleSetModelInfo> sortRuleSets ( ImmutableList<RuleSetModelInfo> ruleSetList ) {
+        RuleSetModelInfo[] ruleSetArray = ruleSetList.toArray (new RuleSetModelInfo[ruleSetList.size()]);
         Arrays.sort ( ruleSetArray, new NamedComparator () );
-        return SLListOfRuleSetModelInfo.EMPTY_LIST.prepend ( ruleSetArray );
+        return ImmutableSLList.<RuleSetModelInfo>nil().prepend ( ruleSetArray );
     }
 
-    private ListOfTacletModelInfo sortTaclets ( ListOfTacletModelInfo tacletList ) {
-        TacletModelInfo[] tacletArray = tacletList.toArray ();
+    private ImmutableList<TacletModelInfo> sortTaclets ( ImmutableList<TacletModelInfo> tacletList ) {
+        TacletModelInfo[] tacletArray = tacletList.toArray (new TacletModelInfo[tacletList.size()]);
         Arrays.sort ( tacletArray, new NamedComparator () );
-        return SLListOfTacletModelInfo.EMPTY_LIST.prepend ( tacletArray );
+        return ImmutableSLList.<TacletModelInfo>nil().prepend ( tacletArray );
     }
     
-    private ListOfOptionModelInfo sortOptions ( ListOfOptionModelInfo optionList ) {
-        OptionModelInfo[] optionArray = optionList.toArray();
+    private ImmutableList<OptionModelInfo> sortOptions ( ImmutableList<OptionModelInfo> optionList ) {
+        OptionModelInfo[] optionArray = optionList.toArray(new OptionModelInfo[optionList.size()]);
         Arrays.sort ( optionArray, new NamedComparator () );
-        return SLListOfOptionModelInfo.EMPTY_LIST.prepend(optionArray);
+        return ImmutableSLList.<OptionModelInfo>nil().prepend(optionArray);
     }
 
-    private ListOfDisplayNameModelInfo sortDisplayNames ( ListOfDisplayNameModelInfo displayNames ) {
-        DisplayNameModelInfo[] displayNameArray = displayNames.toArray ();
+    private ImmutableList<DisplayNameModelInfo> sortDisplayNames ( ImmutableList<DisplayNameModelInfo> displayNames ) {
+        DisplayNameModelInfo[] displayNameArray = displayNames.toArray (new DisplayNameModelInfo[displayNames.size()]);
         Arrays.sort ( displayNameArray );
-        return SLListOfDisplayNameModelInfo.EMPTY_LIST.prepend ( displayNameArray );
+        return ImmutableSLList.<DisplayNameModelInfo>nil().prepend ( displayNameArray );
     }
 
-    public ListOfTacletModelInfo getTaclets () {
+    public ImmutableList<TacletModelInfo> getTaclets () {
         return taclets;
     }
     
-    public IteratorOfTacletModelInfo taclets () {
+    public Iterator<TacletModelInfo> taclets () {
         return getTaclets ().iterator ();
     }
 
-    public ListOfRuleSetModelInfo getRuleSets () {
+    public ImmutableList<RuleSetModelInfo> getRuleSets () {
         return ruleSets;
     }
     
-    public IteratorOfRuleSetModelInfo ruleSets () {
+    public Iterator<RuleSetModelInfo> ruleSets () {
         return getRuleSets ().iterator ();
     }
 
-    public ListOfDisplayNameModelInfo getDisplayNames () {
+    public ImmutableList<DisplayNameModelInfo> getDisplayNames () {
         return displayNames;
     }
     
-    public IteratorOfDisplayNameModelInfo displayNames () {
+    public Iterator<DisplayNameModelInfo> displayNames () {
         return displayNames.iterator ();
     }
     
-    public ListOfOptionModelInfo getOptions () {
+    public ImmutableList<OptionModelInfo> getOptions () {
         return options;
     }
     
-    public IteratorOfOptionModelInfo options () {
+    public Iterator<OptionModelInfo> options () {
         return getOptions ().iterator ();
     }
     
-    public ListOfCategoryModelInfo getCategories () {
+    public ImmutableList<CategoryModelInfo> getCategories () {
         return categories;
     }
     
-    public IteratorOfCategoryModelInfo categories () {
+    public Iterator<CategoryModelInfo> categories () {
         return categories.iterator ();
     }
     

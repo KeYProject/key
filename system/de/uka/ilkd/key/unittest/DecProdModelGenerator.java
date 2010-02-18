@@ -5,14 +5,15 @@
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
-//
-//
 package de.uka.ilkd.key.unittest;
 
 import java.util.Set;
 
-public interface DecProdModelGenerator{
+public abstract class DecProdModelGenerator{
 
-    public Set createModels();
+    /** Stop model generation as soon as possible even if no model was created. (Otherwise this thread will be stopped)*/
+    public volatile boolean  terminateAsSoonAsPossible=false;
+
+    public Set<Model> createModels(){return null;}
 
 }

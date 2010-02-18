@@ -10,6 +10,11 @@
 
 package de.uka.ilkd.key.rule.encapsulation;
 
+import java.util.Iterator;
+
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableSet;
+
 
 final class TypeSchemeUnion implements TypeSchemeTerm {
     public static final TypeSchemeUnion PRIMITIVE
@@ -48,28 +53,28 @@ final class TypeSchemeUnion implements TypeSchemeTerm {
                                                     RootScheme.INSTANCE});
     
     
-    private SetOfTypeScheme possibilities;   
+    private ImmutableSet<TypeScheme> possibilities;   
     
     
     public TypeSchemeUnion(TypeScheme ts) {
-        possibilities = SetAsListOfTypeScheme.EMPTY_SET.add(ts);
+        possibilities = DefaultImmutableSet.<TypeScheme>nil().add(ts);
     }
     
     
-    public TypeSchemeUnion(SetOfTypeScheme possibilities) {
+    public TypeSchemeUnion(ImmutableSet<TypeScheme> possibilities) {
         this.possibilities = possibilities;
     }
     
     
     public TypeSchemeUnion(TypeScheme[] schemes) {
-        possibilities = SetAsListOfTypeScheme.EMPTY_SET;
+        possibilities = DefaultImmutableSet.<TypeScheme>nil();
         for(int i = schemes.length - 1; i >= 0; i--) {
             possibilities = possibilities.add(schemes[i]);
         }
     }
     
     
-    public SetOfTypeScheme getPossibilities() {
+    public ImmutableSet<TypeScheme> getPossibilities() {
         return possibilities;
     }
 
@@ -80,16 +85,14 @@ final class TypeSchemeUnion implements TypeSchemeTerm {
     
 
     public TypeSchemeUnion combineWith(TypeSchemeUnion tsu) {
-        SetOfTypeScheme resultPossibilities 
-                = SetAsListOfTypeScheme.EMPTY_SET;
+        ImmutableSet<TypeScheme> resultPossibilities 
+                = DefaultImmutableSet.<TypeScheme>nil();
 
-        IteratorOfTypeScheme it = possibilities.iterator();
-        while(it.hasNext()) {
-            TypeScheme myTs = it.next();
+        for (TypeScheme possibility1 : possibilities) {
+            TypeScheme myTs = possibility1;
 
-            IteratorOfTypeScheme it2 = tsu.possibilities.iterator();
-            while(it2.hasNext()) {
-                TypeScheme otherTs = it2.next();
+            for (TypeScheme possibility : tsu.possibilities) {
+                TypeScheme otherTs = possibility;
                 TypeScheme combinedTs = myTs.combineWith(otherTs);
                 resultPossibilities = resultPossibilities.add(combinedTs);
             }
@@ -100,14 +103,12 @@ final class TypeSchemeUnion implements TypeSchemeTerm {
 
     
     public boolean subSchemeOf(TypeSchemeUnion tsu) {
-        IteratorOfTypeScheme it = possibilities.iterator();
-        while(it.hasNext()) {
-            TypeScheme myTs = it.next();
+        for (TypeScheme possibility1 : possibilities) {
+            TypeScheme myTs = possibility1;
 
-            IteratorOfTypeScheme it2 = tsu.possibilities.iterator();
-            while(it2.hasNext()) {
-                TypeScheme otherTs = it2.next();
-                if(myTs.subSchemeOf(otherTs)) {
+            for (TypeScheme possibility : tsu.possibilities) {
+                TypeScheme otherTs = possibility;
+                if (myTs.subSchemeOf(otherTs)) {
                     return true;
                 }
             }
@@ -118,14 +119,12 @@ final class TypeSchemeUnion implements TypeSchemeTerm {
     
     
     public boolean equalTo(TypeSchemeUnion tsu) {
-        IteratorOfTypeScheme it = possibilities.iterator();
-        while(it.hasNext()) {
-            TypeScheme myTs = it.next();
-            
-            IteratorOfTypeScheme it2 = tsu.possibilities.iterator();
-            while(it2.hasNext()) {
-                TypeScheme otherTs = it2.next();
-                if(myTs.equalTo(otherTs)) {
+        for (TypeScheme possibility1 : possibilities) {
+            TypeScheme myTs = possibility1;
+
+            for (TypeScheme possibility : tsu.possibilities) {
+                TypeScheme otherTs = possibility;
+                if (myTs.equalTo(otherTs)) {
                     return true;
                 }
             }
@@ -140,16 +139,15 @@ final class TypeSchemeUnion implements TypeSchemeTerm {
     }
     
     
-    public SetOfTypeSchemeVariable getFreeVars() {
-        return SetAsListOfTypeSchemeVariable.EMPTY_SET;
+    public ImmutableSet<TypeSchemeVariable> getFreeVars() {
+        return DefaultImmutableSet.<TypeSchemeVariable>nil();
     }
     
     
     public String toString() {
         String result = "[";
-        IteratorOfTypeScheme it = possibilities.iterator();
-        while(it.hasNext()) {
-            result += it.next() + ",";
+        for (TypeScheme possibility : possibilities) {
+            result += possibility + ",";
         }
         
         if(possibilities.size() > 0) {

@@ -10,20 +10,22 @@
 
 package de.uka.ilkd.key.speclang.ocl.translation;
 
-import de.uka.ilkd.key.logic.op.IteratorOfLogicVariable;
-import de.uka.ilkd.key.logic.op.ListOfLogicVariable;
-import de.uka.ilkd.key.speclang.translation.ListOfSLExpression;
-import de.uka.ilkd.key.speclang.translation.SLListOfSLExpression;
+import java.util.Iterator;
+
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.logic.op.LogicVariable;
+import de.uka.ilkd.key.speclang.translation.SLExpression;
 import de.uka.ilkd.key.speclang.translation.SLParameters;
 import de.uka.ilkd.key.util.Debug;
 
 
 class OCLParameters extends SLParameters {
-    private final ListOfLogicVariable declaredVars;
-    private final ListOfOCLEntity entities;
+    private final ImmutableList<LogicVariable> declaredVars;
+    private final ImmutableList<OCLExpression> entities;
             
-    public OCLParameters(ListOfLogicVariable declaredVars,
-                         ListOfOCLEntity entities) {
+    public OCLParameters(ImmutableList<LogicVariable> declaredVars,
+                         ImmutableList<OCLExpression> entities) {
         super(convertToListOfSLExpression(entities));
         Debug.assertTrue(declaredVars != null);
         Debug.assertTrue(entities != null);
@@ -32,43 +34,39 @@ class OCLParameters extends SLParameters {
     }
     
     
-    private static ListOfSLExpression convertToListOfSLExpression(ListOfOCLEntity list) {
-        ListOfSLExpression result = SLListOfSLExpression.EMPTY_LIST;
-        
-        IteratorOfOCLEntity it = list.iterator();
-        
-        while(it.hasNext()) {
-            result = result.append(it.next());
+    private static ImmutableList<SLExpression> convertToListOfSLExpression(ImmutableList<OCLExpression> list) {
+        ImmutableList<SLExpression> result = ImmutableSLList.<SLExpression>nil();
+
+        for (OCLExpression aList : list) {
+            result = result.append(aList);
         }
         
         return result;
     }
 
 
-    public ListOfOCLEntity getEntities() {
+    public ImmutableList<OCLExpression> getEntities() {
         return entities;
     }
         
     
-    public ListOfLogicVariable getDeclaredVars() {
+    public ImmutableList<LogicVariable> getDeclaredVars() {
         return declaredVars;
     }
     
     
     public String toString() {
         String result = "(";
-        
-        IteratorOfLogicVariable it = declaredVars.iterator();
-        while(it.hasNext()) {
-            result += it.next() + ",";
+
+        for (LogicVariable declaredVar : declaredVars) {
+            result += declaredVar + ",";
         }
         if(!declaredVars.isEmpty()) {
             result = result.substring(0, result.length() - 1) + "|";
         }
-        
-        IteratorOfOCLEntity it2 = entities.iterator();
-        while(it2.hasNext()) {
-            result += it2.next() + ",";
+
+        for (OCLExpression entity : entities) {
+            result += entity + ",";
         }
         if(!entities.isEmpty()) {
             result = result.substring(0, result.length() - 1);

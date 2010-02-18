@@ -89,6 +89,16 @@ public class SLTranslationExceptionManager {
     
     
     /**
+     * Creates a string with the current absolute position information
+     */
+    public PositionedString createPositionedString(String text) {
+        return new PositionedString(text, 
+                                    fileName, 
+                                    getPosition());
+    }
+    
+    
+    /**
      * Creates an SLTranslationException with current absolute position 
      * information.
      */
@@ -97,7 +107,7 @@ public class SLTranslationExceptionManager {
                                           fileName, 
                                           getPosition());
     }
-    
+            
     
     /**
      * Creates an SLTranslationException with the position information of the
@@ -108,6 +118,17 @@ public class SLTranslationExceptionManager {
                                           fileName,
                                           createAbsolutePosition(t.getLine(),
                                                                  t.getColumn()));
+    }
+    
+    
+    /**
+     * Creates an SLWarningException with current absolute position 
+     * information.
+     */
+    public SLTranslationException createWarningException(String message) {
+        return new SLWarningException(message, 
+                                      fileName, 
+                                      getPosition());
     }
 
     

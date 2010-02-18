@@ -10,6 +10,9 @@
 
 package de.uka.ilkd.key.logic.sort;
 
+import java.util.Iterator;
+
+import de.uka.ilkd.key.collection.*;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.op.*;
@@ -20,7 +23,7 @@ public abstract class AbstractSort implements Sort, SortDefiningSymbols {
     public static final Name OBJECT_REPOSITORY_NAME = new Name("<get>");
 
     /** name of the Sort */
-    protected Name name;
+    protected final Name name;
 
     /**
      * equality symbol for this sort
@@ -33,8 +36,8 @@ public abstract class AbstractSort implements Sort, SortDefiningSymbols {
     private CastFunctionSymbol castSymbol;
             
     
-    protected MapFromNameToSortDependingSymbol definedSymbols = 
-        MapAsListFromNameToSortDependingSymbol.EMPTY_MAP;
+    protected ImmutableMap<Name,SortDependingSymbol> definedSymbols = 
+        DefaultImmutableMap.<Name,SortDependingSymbol>nilMap();
 
     protected boolean symbolsCreated = false;
 
@@ -46,7 +49,7 @@ public abstract class AbstractSort implements Sort, SortDefiningSymbols {
     /**
      * @return the sorts of the successors of this sort
      */
-    public abstract SetOfSort extendsSorts();
+    public abstract ImmutableSet<Sort> extendsSorts();
 
     /**
      * returns true iff given sort is a part of the transitive closure of the
@@ -57,7 +60,7 @@ public abstract class AbstractSort implements Sort, SortDefiningSymbols {
             return true;
         }
         
-        if (!(sort instanceof ObjectSort || sort instanceof GenericSort)) {
+        if (!(sort instanceof ObjectSort)) {
             return false;
         }
                              
@@ -71,10 +74,8 @@ public abstract class AbstractSort implements Sort, SortDefiningSymbols {
                }
            }
            return true;
-       } else {           
-           final IteratorOfSort it = extendsSorts().iterator();
-           while (it.hasNext()) {
-               final Sort s = it.next();
+       } else {
+           for (final Sort s : extendsSorts()) {
                assert s != null;
                if (s == sort || s.extendsTrans(sort)) {
                    return true;
@@ -113,7 +114,7 @@ public abstract class AbstractSort implements Sort, SortDefiningSymbols {
     /**
      * This method returns a cast into this sort.
      */
-    private SortDependingSymbol createCastSymbol(Namespace sort_ns) {
+    private SortDependingSymbol createCastSymbol() {
         Debug.assertTrue(castSymbol == null);
         castSymbol = new CastFunctionSymbol(Sort.ANY, this);
         return castSymbol;
@@ -131,9 +132,9 @@ public abstract class AbstractSort implements Sort, SortDefiningSymbols {
             if ( booleanSort == null || intSort == null ) {              
                 return; //create symbols later
             }
-            ListOfSortDependingSymbol l0 = 
-                SLListOfSortDependingSymbol.EMPTY_LIST;
-            l0 = l0.prepend(createCastSymbol(sort_ns)).prepend 
+            ImmutableList<SortDependingSymbol> l0 = 
+                ImmutableSLList.<SortDependingSymbol>nil();
+            l0 = l0.prepend(createCastSymbol()).prepend 
             ( new InstanceofSymbol (this, booleanSort)).prepend
             ( new ExactInstanceSymbol (this, booleanSort)).prepend
             ( new InstanceofSymbol(new Name("contains"), this));
@@ -175,10 +176,9 @@ public abstract class AbstractSort implements Sort, SortDefiningSymbols {
     }
 
     
-    protected void addSymbols(ListOfSortDependingSymbol p) {
-        final IteratorOfSortDependingSymbol it = p.iterator();        
-        while (it.hasNext()) {
-            final SortDependingSymbol s = it.next();
+    protected void addSymbols(ImmutableList<SortDependingSymbol> p) {
+        for (SortDependingSymbol aP : p) {
+            final SortDependingSymbol s = aP;
             definedSymbols = definedSymbols.put(s.getKind(), s);
         }
     }
@@ -191,7 +191,7 @@ public abstract class AbstractSort implements Sort, SortDefiningSymbols {
         if (!symbolsCreated) {
             createSymbols(functions, sorts);            
         } 
-        final IteratorOfSortDependingSymbol it = 
+        final Iterator<SortDependingSymbol> it = 
             definedSymbols.valueIterator();        
         while (it.hasNext()) {                  
             final SortDependingSymbol sds = it.next();

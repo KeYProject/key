@@ -5,8 +5,6 @@
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
-//
-//
 /*
  * Created on Apr 17, 2005
  */
@@ -17,8 +15,8 @@ import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
 
-import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.ProofSaver;
 
 /**

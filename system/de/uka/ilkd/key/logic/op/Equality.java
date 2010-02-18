@@ -14,7 +14,9 @@ package de.uka.ilkd.key.logic.op;
 
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.sort.*;
+import de.uka.ilkd.key.logic.sort.PrimitiveSort;
+import de.uka.ilkd.key.logic.sort.ProgramSVSort;
+import de.uka.ilkd.key.logic.sort.Sort;
 
 /**
  * This class represents an equality symbol for a given sort.

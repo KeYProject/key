@@ -12,10 +12,12 @@ package de.uka.ilkd.key.proof;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.PrintStream;
+import java.io.PrintWriter;
 import java.util.Iterator;
 import java.util.Vector;
 
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableMapEntry;
 import de.uka.ilkd.key.gui.IMain;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
@@ -23,8 +25,7 @@ import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.EntryOfSchemaVariableAndInstantiationEntry;
-import de.uka.ilkd.key.logic.op.IteratorOfEntryOfSchemaVariableAndInstantiationEntry;
+import de.uka.ilkd.key.logic.op.Metavariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
@@ -72,22 +73,22 @@ public class ProofSaver {
    }
 
    public String writeSettings(ProofSettings ps){
-    	return new String ("\\settings {\n\""+ps.settingsToString()+"\"\n}\n");
+    	return new String ("\\settings {\n\""+escapeCharacters(ps.settingsToString())+"\"\n}\n");
    }
    public String save() {
       String errorMsg = null;
       FileOutputStream fos = null;
-      PrintStream ps = null;
+      PrintWriter ps = null;
 
       try {
           fos = new FileOutputStream(filename);
-          ps = new PrintStream(fos);
+          ps = new PrintWriter(fos, true);
 
 
           Sequent problemSeq = proof.root().sequent();
           printer = createLogicPrinter(proof.getServices(), false);
 
-          ps.println(writeSettings(proof.getSettings()));
+          ps.println(writeSettings(proof.getSettings()));          
           ps.print(proof.header());
           ps.println("\\problem {");
           printer.printSemisequent(problemSeq.succedent());
@@ -96,6 +97,8 @@ public class ProofSaver {
    //                ps.println(mediator.sort_ns());
           ps.println("\\proof {");
           ps.println(writeLog(proof));
+          ps.println("(autoModeTime \"" + proof.getAutoModeTime() + "\")\n");
+          printUserConstraints(ps);
           ps.println(node2Proof(proof.root()));
           ps.println("}");
 
@@ -112,6 +115,10 @@ public class ProofSaver {
       } finally {
           try {
 	      if (fos != null) fos.close();
+	      if (ps != null) {
+		  ps.flush();
+		  ps.close();
+	      }
           } catch (IOException ioe) {
 	      mediator.notify(new GeneralFailureEvent(ioe.toString()));
           }          
@@ -119,7 +126,57 @@ public class ProofSaver {
       return errorMsg; // null if success
    }
    
+   private String mc2Proof(MatchConditions mc) {
+        if (mc != null) {
+            Constraint c = mc.getConstraint();
+            if (c instanceof EqualityConstraint && !c.isBottom()) {
+                Services s = mediator.getServices();
+                String res = "";
+                Iterator<Metavariable> it = ((EqualityConstraint) c)
+                        .restrictedMetavariables();
+                while (it.hasNext()) {
+                    Metavariable mv = it.next();
+                    res = res + " (matchconstraint \"" + mv.name() + "="
+                            + printTerm(c.getInstantiation(mv), s) + "\")";
+                }
+                return res;
+            }
+        }
+        return "";
+    }
 
+    private String newNames2Proof(Node n) {
+        String s = "";
+        NameRecorder rec = n.getNameRecorder();
+        if (rec == null) {
+            return s;
+        }
+        ImmutableList<Name> proposals = rec.getProposals();
+        if (proposals.isEmpty()) {
+            return s;
+        }
+        for (Name proposal : proposals) {
+            s += "," + proposal;
+        }
+        return " (newnames \"" + s.substring(1) + "\")";
+    }
+
+    private void printUserConstraints(PrintWriter ps) {
+        ConstraintTableModel uCons = proof.getUserConstraint();
+        Services s = mediator.getServices();
+
+        if (uCons.getRowCount() > 0) {
+
+            for (int i = 0; i < uCons.getRowCount(); i++) {
+                ps.println("(userconstraint \"" + printTerm((Term) uCons
+                        .getValueAt(i, 0), s)
+                        + "=" + printTerm((Term) uCons.getValueAt(i, 1), s)
+                        + "\")");
+            }
+
+        }
+
+    }
 
    private void printSingleNode(Node node, String prefix, StringBuffer tree) {
 
@@ -131,9 +188,7 @@ public class ProofSaver {
 	     createLogicPrinter(proof.getServices(), false);
 
          logicPrinter.printSequent(node.sequent());
-	 // WATCHOUT Woj: replaceAll... is necessary for the newly introduced backslash
-	 // notation in the parser
-         tree.append(printer.result().toString().replace('\n',' ').replaceAll("\\\\","\\\\\\\\"));
+         tree.append(escapeCharacters(printer.result().toString().replace('\n',' ')));
          tree.append("\")\n");
          return;
       }
@@ -145,8 +200,10 @@ public class ProofSaver {
          tree.append("\"");
          tree.append(posInOccurrence2Proof(node.sequent(),
                                            appliedRuleApp.posInOccurrence()));
+         tree.append(mc2Proof(((TacletApp)appliedRuleApp).matchConditions()));
+         tree.append(newNames2Proof(node));
          tree.append(getInteresting(((TacletApp)appliedRuleApp).instantiations()));
-         ListOfIfFormulaInstantiation l =
+         ImmutableList<IfFormulaInstantiation> l =
             ((TacletApp)appliedRuleApp).ifFormulaInstantiations();
          if (l != null) tree.append(ifFormulaInsts(node, l));
          tree.append("");
@@ -161,6 +218,7 @@ public class ProofSaver {
       	tree.append("\"");        
         tree.append(posInOccurrence2Proof(node.sequent(), 
                                           appliedRuleApp.posInOccurrence()));
+        tree.append(newNames2Proof(node));
 
         if (appliedRuleApp.rule() instanceof UseOperationContractRule) {
             RuleJustificationBySpec ruleJusti = (RuleJustificationBySpec) 
@@ -199,7 +257,7 @@ public class ProofSaver {
       while (childrenIt.hasNext()) {
          Node child = childrenIt.next();
          tree.append(prefix);            
-         tree.append("(branch \" "+child.getNodeInfo().getBranchLabel().replaceAll("\\\\","\\\\\\\\")+"\"\n");
+         tree.append("(branch \" " + escapeCharacters(child.getNodeInfo().getBranchLabel()) + "\"\n");
 	 collectProof(child, prefix+"   ", tree);
          tree.append(prefix+")\n");
       }
@@ -245,48 +303,51 @@ public class ProofSaver {
    public String getInteresting(SVInstantiations inst) {
 //System.err.println(inst);   
       String s = "";
-      IteratorOfEntryOfSchemaVariableAndInstantiationEntry pairIt =
+      Iterator<ImmutableMapEntry<SchemaVariable,InstantiationEntry>> pairIt =
          inst.interesting().entryIterator();
 
       while (pairIt.hasNext()) {
-         EntryOfSchemaVariableAndInstantiationEntry pair = pairIt.next();
+         ImmutableMapEntry<SchemaVariable,InstantiationEntry> pair = pairIt.next();
          SchemaVariable var = pair.key();
-	 s += " (inst \""+var.name()+"=";
+	 
+         String singleInstantiation = var.name()+ "="; 
 	 Object value = pair.value();
 	 if (value instanceof TermInstantiation) {
-	     s += printTerm(((TermInstantiation) value).getTerm(), 
+	     singleInstantiation += printTerm(((TermInstantiation) value).getTerm(), 
 	                    proof.getServices());
 	 }
          else
 	 if (value instanceof ProgramInstantiation) {
 	     ProgramElement pe = 
 		 ((ProgramInstantiation) value).getProgramElement();
-	     s += printProgramElement(pe);
+	     singleInstantiation += printProgramElement(pe);
 	 }
          else
 	 if (value instanceof NameInstantiationEntry) {
-	     s += ((NameInstantiationEntry) value).getInstantiation();
+	     singleInstantiation += ((NameInstantiationEntry) value).getInstantiation();
 	 }
          else 
          if (value instanceof ListInstantiation) {
-             ListOfObject l = (ListOfObject) ((ListInstantiation) value).getInstantiation();
-             s += printListInstantiation(l, proof.getServices());
+             ImmutableList<Object> l = (ImmutableList<Object>) ((ListInstantiation) value).getInstantiation();
+             singleInstantiation += printListInstantiation(l, proof.getServices());
          }
          else
              throw new RuntimeException("Saving failed.\n"+
            "FIXME: Unhandled instantiation type: " +  value.getClass());
-	 s += "\")";
+	 
+	 singleInstantiation = escapeCharacters(singleInstantiation);
+	
+	 s += " (inst \"" + singleInstantiation + "\")";
       }
-      // WATCHOUT: Woj: again, quote backslashes
-      s = s.replaceAll("\\\\","\\\\\\\\");
+      
       return s;
    }
    
    
 
-   public static String printListInstantiation(ListOfObject l, Services serv) {
+   public static String printListInstantiation(ImmutableList<Object> l, Services serv) {
        final StringBuffer sb = new StringBuffer("{");
-       final IteratorOfObject it = l.iterator();
+       final Iterator<Object> it = l.iterator();
        while (it.hasNext()) {
            final Object next = it.next();
            if (next instanceof LocationDescriptor) {
@@ -302,27 +363,45 @@ public class ProofSaver {
        return sb.toString();
    }
 
-   public String ifFormulaInsts(Node node, ListOfIfFormulaInstantiation l) {
+   public String ifFormulaInsts(Node node, ImmutableList<IfFormulaInstantiation> l) {
       String s ="";
-      IteratorOfIfFormulaInstantiation it = l.iterator();
-      while (it.hasNext()) {
-         IfFormulaInstantiation iff = it.next();
-         if (iff instanceof IfFormulaInstSeq) {
-            ConstrainedFormula f = iff.getConstrainedFormula();
-            s+= " (ifseqformula \"" + 
-                node.sequent().formulaNumberInSequent(
-                        ((IfFormulaInstSeq)iff).inAntec(),f) + 
-                        "\")";
-            }
-            else
-                if (iff instanceof IfFormulaInstDirect) {
-                    throw new RuntimeException("IfFormulaInstDirect not yet supported");
-                }
-                else throw new RuntimeException("Unknown If-Seq-Formula type");
-        }
+       for (IfFormulaInstantiation aL : l) {
+           IfFormulaInstantiation iff = aL;
+           if (iff instanceof IfFormulaInstSeq) {
+               ConstrainedFormula f = iff.getConstrainedFormula();
+               s += " (ifseqformula \"" +
+                       node.sequent().formulaNumberInSequent(
+                               ((IfFormulaInstSeq) iff).inAntec(), f) +
+                       "\")";
+           } else if (iff instanceof IfFormulaInstDirect) {
+
+               final String directInstantiation = printTerm(iff.getConstrainedFormula().formula(),
+                       node.proof().getServices()).toString();
+
+               s += " (ifdirectformula \"" + escapeCharacters(directInstantiation) + "\")";
+           } else throw new RuntimeException("Unknown If-Seq-Formula type");
+       }
+      
         return s;
     }
 
+
+    /**
+     * double escapes quotation marks and backslashes to be storeable in a text file 
+     * @param toEscape the String to double escape
+     * @return the escaped version of the string
+     */
+    public static String escapeCharacters(String toEscape) {
+	
+	String result = toEscape;	
+	
+	// first escape backslash
+	result = result.replaceAll("\\\\","\\\\\\\\");
+	// then escape quotation marks
+	result = result.replaceAll("\"", "\\\\\"");
+
+	return result;
+    }
 
     public static String printProgramElement(ProgramElement pe) {
         java.io.StringWriter sw = new java.io.StringWriter();

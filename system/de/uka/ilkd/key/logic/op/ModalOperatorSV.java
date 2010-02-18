@@ -13,7 +13,6 @@ package de.uka.ilkd.key.logic.op;
 import java.util.HashSet;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -56,7 +55,7 @@ public class ModalOperatorSV extends OperatorSV  {
      * changed by modalities
      */
     public boolean isRigid (Term term) {
-	return (term.javaBlock () == JavaBlock.EMPTY_JAVABLOCK);
+	return (term.javaBlock ().isEmpty());
     }    
     
     /**

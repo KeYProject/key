@@ -12,6 +12,7 @@ package de.uka.ilkd.key.speclang;
 
 import java.util.Map;
 
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.visitor.Visitor;
@@ -49,14 +50,14 @@ public interface LoopInvariant {
     /**
      * Returns the set of loop predicates.
      */
-    public SetOfTerm getPredicates(Term selfTerm, 
+    public LoopPredicateSet getPredicates(Term selfTerm, 
             /*inout*/ Map <Operator, Function/* (atPre)*/> atPreFunctions,
             Services services);
     
     /**
      * Returns the modifier set.
      */
-    public SetOfLocationDescriptor getModifies(
+    public LocationDescriptorSet getModifies(
             Term selfTerm,
             Term memoryArea,
             /*inout*/ Map <Operator, Function/* (atPre)*/> atPreFunctions,
@@ -64,8 +65,8 @@ public interface LoopInvariant {
     /**
      * Returns the modifier set.
      */
-    public SetOfLocationDescriptor getModifies(
-            Term selfTerm,
+    public LocationDescriptorSet getModifies(
+            Term selfTerm, 
             /*inout*/ Map <Operator, Function/* (atPre)*/> atPreFunctions,
             Services services);
     
@@ -138,7 +139,7 @@ public interface LoopInvariant {
      * Returns a new loop invariant where the loop predicates have been 
      * replaced with the passed ones.
      */
-    public LoopInvariant setPredicates(SetOfTerm predicates, 
+    public LoopInvariant setPredicates(ImmutableSet<Term> predicates, 
             Term selfTerm,
             /*inout*/ Map<Operator, Function/*atPre*/> atPreFunctions,
             Services services);

@@ -1,3 +1,10 @@
+// This file is part of KeY - Integrated Deductive Software Design
+// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General Public License. 
+// See LICENSE.TXT for details.
 package de.uka.ilkd.key.gui;
 
 import java.io.File;
@@ -20,11 +27,16 @@ public class SimpleStarter implements IMain {
 
     private KeYMediator mediator;
     private String fileNameOnStartUp;
-    private MainTaskListenerBatchMode ptl;
+    private ProverTaskListener ptl;
 
     public SimpleStarter(String file) {
+	this.fileNameOnStartUp = file;
+        this.ptl= new MainTaskListenerBatchMode();
+    }
+    
+    public SimpleStarter(String file, ProverTaskListener ptl ) {
         this.fileNameOnStartUp = file;
-        this.ptl = new MainTaskListenerBatchMode();
+        this.ptl = ptl;
     }
     
     public void setKeYMediator(KeYMediator mediator) {
@@ -71,6 +83,10 @@ public class SimpleStarter implements IMain {
             public void setProgress(int progress) {
                 // TODO Auto-generated method stub
                 
+            }
+            
+            public void setProgressImmediatly(int progress) {
+        	
             }
             
         };
@@ -152,17 +168,18 @@ public class SimpleStarter implements IMain {
         public void taskFinished(TaskFinishedInfo info) {
             System.out.println("DONE.");
             if (info.getSource() instanceof ApplyStrategy) {
-                finishedBatchMode ( info.getResult(), 
+                finishedBatchMode(info.getResult(), 
                         info.getProof(), info.getTime(), 
                         info.getAppliedRules());
                 Debug.fail ( "Control flow should not reach this point." );
             } else if (info.getSource() instanceof ProblemLoader) {
                 if (!"".equals(info.getResult())) {
-                        System.exit(-1);
-                } 
-                if(info.getProof().openGoals().size()==0) {
+                    System.out.println(info.getResult());    
+                    System.exit(-1);
+                }
+                if (info.getProof().openGoals().size()==0) {
                     System.out.println("proof.openGoals.size=" + 
-                            info.getProof().openGoals().size());              
+                            info.getProof().openGoals().size());
                     System.exit(0);
                 }
                 mediator.getProof().getActiveStrategy();         

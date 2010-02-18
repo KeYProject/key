@@ -13,6 +13,11 @@ package de.uka.ilkd.key.speclang.dl.translation;
 import java.util.*;
 
 import de.uka.ilkd.key.java.*;
+
+import de.uka.ilkd.key.collection.ImmutableArray;
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.statement.CatchAllStatement;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
@@ -30,6 +35,8 @@ import de.uka.ilkd.key.speclang.*;
 public class DLSpecFactory {
     
     private static final TermBuilder TB = TermBuilder.DF;
+    private static final SignatureVariablesFactory SVF 
+    	= SignatureVariablesFactory.INSTANCE;
     private final Services services;
     
 
@@ -78,12 +85,12 @@ public class DLSpecFactory {
     }
     
     
-    private ListOfParsableVariable extractParamVars(MethodBodyStatement mbs) {
-        ArrayOfExpression args = mbs.getArguments();
+    private ImmutableList<ParsableVariable> extractParamVars(MethodBodyStatement mbs) {
+        ImmutableArray<Expression> args = mbs.getArguments();
         
-        ListOfParsableVariable result = SLListOfParsableVariable.EMPTY_LIST;
+        ImmutableList<ParsableVariable> result = ImmutableSLList.<ParsableVariable>nil();
         for(int i = args.size() - 1; i >= 0; i--) {
-            result = result.prepend((ProgramVariable) args.getExpression(i));
+            result = result.prepend((ProgramVariable) args.get(i));
         }
         
         return result;
@@ -160,7 +167,33 @@ public class DLSpecFactory {
     //-------------------------------------------------------------------------
     //public interface
     //-------------------------------------------------------------------------
+    
+    /**
+     * Creates a class invariant from a formula and a designated "self".
+     */
+    public ClassInvariant createDLClassInvariant(String name, 
+                                                 String displayName,
+                                                 ParsableVariable selfVar,
+                                                 Term inv) 
+            throws ProofInputException {
+        assert name != null;
+        if(displayName == null) {
+            displayName = name;
+        }
+        assert selfVar != null;
+        assert inv != null;
+        
+        KeYJavaType kjt = services.getJavaInfo().getKeYJavaType(selfVar.sort());
+        assert kjt != null;
+        
+        return new ClassInvariantImpl(name, 
+                                      displayName, 
+                                      kjt, 
+                                      new FormulaWithAxioms(inv), 
+                                      selfVar);
+    }
   
+    
     /**
      * Creates an operation contract from an implication formula of the form
      * <code>pre -> \<p\> post</code> and a modifies clause (which is how
@@ -170,7 +203,7 @@ public class DLSpecFactory {
                                             String name, 
                                             String displayName, 
                                             Term fma, 
-                                            SetOfLocationDescriptor modifies) 
+                                            ImmutableSet<LocationDescriptor> modifies) 
             throws ProofInputException {
         assert name != null;
         if(displayName == null) {
@@ -191,7 +224,7 @@ public class DLSpecFactory {
         FormulaWithAxioms pre            = extractPre(fma);
         FormulaWithAxioms post           = extractPost(fma);
         ParsableVariable selfVar         = extractSelfVar(mbs);
-        ListOfParsableVariable paramVars = extractParamVars(mbs);
+        ImmutableList<ParsableVariable> paramVars = extractParamVars(mbs);
         ParsableVariable resultVar       = extractResultVar(mbs);
         ParsableVariable excVar          = extractExcVar(fma);
         Map<Operator, Function> atPreFunctions = extractAtPreFunctions(post.getFormula());
@@ -205,20 +238,19 @@ public class DLSpecFactory {
         }
         
         //atPre-functions may not occur in modifier set
-        IteratorOfLocationDescriptor it = modifies.iterator();
-        while(it.hasNext()) {
-            LocationDescriptor loc = it.next();
-            if(loc instanceof BasicLocationDescriptor) {
+        for (LocationDescriptor modify : modifies) {
+            LocationDescriptor loc = modify;
+            if (loc instanceof BasicLocationDescriptor) {
                 BasicLocationDescriptor bloc = (BasicLocationDescriptor) loc;
                 Term formula = bloc.getFormula();
                 Term locTerm = bloc.getLocTerm();
-                forbiddenAtPreFunctions = new LinkedHashMap<Operator, Function>(); 
+                forbiddenAtPreFunctions = new LinkedHashMap<Operator, Function>();
                 forbiddenAtPreFunctions.putAll(extractAtPreFunctions(formula));
                 forbiddenAtPreFunctions.putAll(extractAtPreFunctions(locTerm));
-                if(!forbiddenAtPreFunctions.isEmpty()) {
+                if (!forbiddenAtPreFunctions.isEmpty()) {
                     throw new ProofInputException(
-                       "@pre-function not allowed in modifier set: " 
-                       + forbiddenAtPreFunctions.values().iterator().next());
+                            "@pre-function not allowed in modifier set: "
+                                    + forbiddenAtPreFunctions.values().iterator().next());
                 }
             }
         }
@@ -231,11 +263,7 @@ public class DLSpecFactory {
 
         //exception variable may be omitted
 	if(excVar == null) {
-	    KeYJavaType excType
-                    = services.getJavaInfo()
-                              .getTypeByClassName("java.lang.Exception");
-            ProgramElementName excPEN = new ProgramElementName("exc");
-            excVar = new LocationVariable(excPEN, excType);
+            excVar = SVF.createExcVar(services, pm, false);
 	    Term excNullTerm = TB.equals(TB.var(excVar), TB.NULL(services));
             if(modality == Op.DIA) {
                 post = post.conjoin(new FormulaWithAxioms(excNullTerm));

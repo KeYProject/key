@@ -5,17 +5,6 @@
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
-//
-//
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General Public License.
-// See LICENSE.TXT for details.
-//
-//
 
 package de.uka.ilkd.key.proof;
 
@@ -28,12 +17,17 @@ import java.util.LinkedList;
 import java.util.Stack;
 import java.util.Vector;
 
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.*;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.op.LogicVariable;
+import de.uka.ilkd.key.logic.op.NameSV;
+import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.parser.*;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.proof.init.*;
@@ -44,7 +38,7 @@ import de.uka.ilkd.key.util.Array;
 import de.uka.ilkd.key.util.ExceptionHandlerException;
 import de.uka.ilkd.key.util.KeYExceptionHandler;
 import de.uka.ilkd.key.util.ProgressMonitor;
-import de.uka.ilkd.key.proof.decproc.DecisionProcedureSmtAuflia;
+
 
 public class ProblemLoader implements Runnable {
 
@@ -64,14 +58,24 @@ public class ProblemLoader implements Runnable {
     ContractWithInvs currContract = null;
     Stack stack = new Stack();
     LinkedList loadedInsts = null;
-    ListOfIfFormulaInstantiation ifSeqFormulaList =
-        SLListOfIfFormulaInstantiation.EMPTY_LIST;
+    ImmutableList<IfFormulaInstantiation> ifFormulaList =
+        ImmutableSLList.<IfFormulaInstantiation>nil();
+    Constraint matchConstraint = null;
+
+
+    /* Proofs with meta variables have a special issue.
+       When loading, rules are applied in an order different to the original
+       one, sometimes yielding shorter proofs. The goal we are looking
+       at might already have been closed. Then we need to ignore the
+       rest of the current branch in the proof script.
+    */
+    private int ignoreBranchRest;
 
 
     ProblemInitializer init;
     InitConfig iconfig;
 
-    /** if set uses the current problem instance instead of a new one */
+    /** if set, uses the current problem instance instead of a new one */
     boolean keepProblem;
 
     /** the profile to be used */
@@ -244,30 +248,56 @@ public class ProblemLoader implements Runnable {
                currNode = proof.root(); // initialize loader
                children = currNode.childrenIterator(); // --"--
                iconfig = proof.env().getInitConfig();
-               if (!keepProblem) {
-                   init.tryReadProof(this, po);
-               } else {
-                   setStatusLine("Loading proof", (int)file.length());
-                   CountingBufferedInputStream cinp =
-                       new CountingBufferedInputStream(
-                           new FileInputStream(file),
-                           pm,
-                           (int)file.length()/100);
-                   KeYLexer lexer = new KeYLexer(cinp,
-                       proof.getServices().getExceptionHandler());
-                   KeYParser parser = new KeYParser(ParserMode.PROBLEM, lexer, 
-                                                    proof.getServices());
-                   antlr.Token t;
-                   do { t = lexer.getSelector().nextToken();
-                   } while (t.getType() != KeYLexer.PROOF);
-                   parser.proofBody(this);
+               try {
+                   if (!keepProblem) {
+                       init.tryReadProof(this, po);
+                   } else {
+                       setStatusLine("Loading proof", (int)file.length());
+                       CountingBufferedInputStream cinp =
+                           new CountingBufferedInputStream(
+                                   new FileInputStream(file),
+                                   pm,
+                                   (int)file.length()/100);
+                       KeYLexer lexer = new KeYLexer(cinp,
+                               proof.getServices().getExceptionHandler());
+                       KeYParser parser = new KeYParser(ParserMode.PROBLEM, lexer, 
+                               proof.getServices());
+                       antlr.Token t;
+                       do { t = lexer.getSelector().nextToken();
+                       } while (t.getType() != KeYLexer.PROOF);
+                       parser.proofBody(this);
+                   }
+               } finally {
+                    if (constraints.size() > 0) {
+                        Term left, right;
+                        for (PairOfString p : constraints) {
+                            left = parseTerm(p.left, proof);
+                            right = parseTerm(p.right, proof);
+
+                            if (left == null || right == null) {
+                                continue;
+                            }
+
+                            if (!(left.sort().extendsTrans(right.sort()) || right
+                                    .sort().extendsTrans(left.sort()))) {
+                                continue;
+                            }
+
+                            if (!Constraint.BOTTOM.unify(left, right, null)
+                                    .isSatisfiable()) {
+                                continue;
+                            }
+
+                            proof.getUserConstraint().addEquality(left, right);
+                        }
+                    }
                }
 	       setStandardStatusLine();
            
            // Inform the decproc classes that a new problem has been loaded
            // This is done here because all benchmarks resulting from one loaded problem should be
            // stored in the same directory
-           DecisionProcedureSmtAuflia.fireNewProblemLoaded( file, proof );
+           //DecisionProcedureSmtAuflia.fireNewProblemLoaded( file, proof );
            
 	   } catch (ExceptionHandlerException e) {
 	       throw e;
@@ -295,9 +325,15 @@ public class ProblemLoader implements Runnable {
         proofSettings.loadSettingsFromString(preferences);
     }
 
+    private Vector<PairOfString> constraints = new Vector<PairOfString>();
+
     // note: Expressions without parameters only emit the endExpr signal
     public void beginExpr(char id, String s) {
         //System.out.println("start "+id+"="+s);
+        
+        //start no new commands until the ignored branch closes
+        //count sub-branches though
+        if ((ignoreBranchRest > 0)&&(id!='b')) return; 
         switch (id) {
         case 'b' :
             stack.push(children);
@@ -307,13 +343,20 @@ public class ProblemLoader implements Runnable {
             if (currNode == null) currNode = children.next();
             // otherwise we already fetched the node at branch point
             currGoal      = proof.getGoal(currNode);
+            // the goal may already have been closed due to the metavariable
+            // issue described in the declaration of ignoreBranchRest
+            if (currGoal==null) {
+                ignoreBranchRest = stack.size();
+                break;
+            }
             mediator.getSelectionModel().setSelectedGoal(currGoal);
             currTacletName= s;
             // set default state
             currFormula   = 0;
             currPosInTerm = PosInTerm.TOP_LEVEL;
             loadedInsts   = null;
-            ifSeqFormulaList = SLListOfIfFormulaInstantiation.EMPTY_LIST;
+            ifFormulaList = ImmutableSLList.<IfFormulaInstantiation>nil();
+            matchConstraint = Constraint.BOTTOM;
             break;
 
         case 'f' :
@@ -333,18 +376,14 @@ public class ProblemLoader implements Runnable {
 	    //             Debug.fail("Detected use of heuristics!");
 	    break;
 	case 'q' : // ifseqformula      
-	    // mu 2008-jan-09
-            // bugfix: without this if-check,
-	    // proofs with meta variables cannot be loaded.
-            // when loading, rules are applied in an order different to the original one
-            // Thus the goal might already have been closed.
-            // Just ignore this ifseqforumla then
-            if(currGoal != null) {
-                Sequent seq = currGoal.sequent();
-                ifSeqFormulaList = ifSeqFormulaList.append(
-                        new IfFormulaInstSeq(seq, Integer.parseInt(s)));    
-            }
-            
+            Sequent seq = currGoal.sequent();
+            ifFormulaList = ifFormulaList.append(
+                    new IfFormulaInstSeq(seq, Integer.parseInt(s)));    
+            break;
+        case 'd' : // ifdirectformula      
+            ifFormulaList = ifFormulaList.append(
+                new IfFormulaInstDirect(
+                    new ConstrainedFormula(parseTerm(s, proof))));
             break;
         case 'u' : //UserLog
             if(proof.userLog==null)
@@ -376,15 +415,61 @@ public class ProblemLoader implements Runnable {
                 throw new RuntimeException("Error loading proof: contract \"" + s + "\" not found.");
             }
             break;
+        case 'o' : //userconstraint
+            final int i = s.indexOf('=');
+
+            if (i < 0) {
+                break;
+            }
+
+            constraints.add(new PairOfString(s.substring(0, i),
+                    s.substring(i + 1)));
+            break;
+        case 'm' : //matchconstraint
+            final int index = s.indexOf('=');
+
+            if (index < 0) {
+                break;
+            }
+
+            final Term left = parseTerm(s.substring(0, index), proof);
+            final Term right = parseTerm(s.substring(index + 1), proof);
+
+            if (!(left.sort().extendsTrans(right.sort()) || right.sort()
+                    .extendsTrans(left.sort()))) {
+                break;
+            }
+
+            matchConstraint = matchConstraint.unify(left, right, null);
+            break;
+        case 'w' : //newnames
+            final String[] newNames = s.split(",");
+            ImmutableList<Name> l = ImmutableSLList.<Name>nil();
+            for (String newName : newNames) {
+                l = l.append(new Name(newName));
+            }
+            proof.getServices().getNameRecorder().setProposals(l);
+            break;
+        case 'e': //autoModeTime
+            try {
+                proof.addAutoModeTime(Long.parseLong(s));
+            } catch (NumberFormatException e) {
+                // ignore
+            }
+            break;
         }
     }
 
 
     public void endExpr(char id, int linenr) {
         //System.out.println("end "+id);
+        //read no new commands until ignored branch closes
+        if ((ignoreBranchRest > 0)&&(id!='b')) return; 
         switch (id) {
         case 'b' :
             children = (Iterator<Node>) stack.pop();
+            // reached end of ignored branch?
+            if (stack.size() < ignoreBranchRest) ignoreBranchRest = 0;
             break;
         case 'a' :
             if (currNode != null) {
@@ -392,14 +477,6 @@ public class ProblemLoader implements Runnable {
             }
             break;
         case 'r' :
-            // mu 2008-jan-09
-            // bugfix: without this, proofs with meta variables cannot be loaded.
-            // when loading, rules are applied in an order different to the original one
-            // Thus the goal might already have been closed.
-            // Just ignore this rule then
-            if(currGoal == null)
-                break;
-            
             try{
                currGoal.apply(constructApp());
                children = currNode.childrenIterator();
@@ -410,14 +487,6 @@ public class ProblemLoader implements Runnable {
             }
             break;
         case 'n' :
-            // mu 2008-jan-09
-            // bugfix: without this, proofs with meta variables cannot be loaded.
-            // when loading, rules are applied in an order different to the original one
-            // Thus the goal might already have been closed.
-            // Just ignore this rule then
-            if(currGoal == null)
-                break;
-
             try {
                 currGoal.apply(constructBuiltinApp());
                 children = currNode.childrenIterator();
@@ -461,7 +530,7 @@ public class ProblemLoader implements Runnable {
             return ourApp;
         }
 
-        final SetOfRuleApp ruleApps =
+        final ImmutableSet<RuleApp> ruleApps =
             mediator.getBuiltInRuleApplications(currTacletName, pos);
 
         if (ruleApps.size() != 1) {
@@ -494,6 +563,12 @@ public class ProblemLoader implements Runnable {
             ourApp = NoPosTacletApp.createNoPosTacletApp(t);
         }
 
+        if (matchConstraint != Constraint.BOTTOM) {
+            ourApp = ourApp.setMatchConditions(new MatchConditions(ourApp
+                    .instantiations(), matchConstraint, ourApp
+                    .newMetavariables(), RenameTable.EMPTY_TABLE));
+        }
+
         Constraint userC = mediator.getUserConstraint().getConstraint();
         Services services = mediator.getServices();
 
@@ -518,7 +593,7 @@ public class ProblemLoader implements Runnable {
 
         ourApp = constructInsts(ourApp, services);
 
-        ourApp = ourApp.setIfFormulaInstantiations(ifSeqFormulaList,
+        ourApp = ourApp.setIfFormulaInstantiations(ifFormulaList,
                                                    services, userC);
 
         if (!ourApp.sufficientlyComplete()) {
@@ -558,8 +633,8 @@ public class ProblemLoader implements Runnable {
         } else if ( sv.isSkolemTermSV() ) {
 	    result = app.createSkolemConstant ( value, sv, true, services );
         } else if (sv.isListSV()) {
-            SetOfLocationDescriptor s = parseLocationList(value, targetGoal);
-            result = app.addInstantiation(sv, Array.reverse(s.toArray()), true);
+            ImmutableSet<LocationDescriptor> s = parseLocationList(value, targetGoal);
+            result = app.addInstantiation(sv, Array.reverse(s.toArray(new LocationDescriptor[s.size()])), true);
         } else {
             Namespace varNS = p.getNamespaces().variables();
 	    varNS = app.extendVarNamespaceForSV(varNS, sv);
@@ -575,7 +650,7 @@ public class ProblemLoader implements Runnable {
 
     private TacletApp constructInsts(TacletApp app, Services services) {
         if (loadedInsts == null) return app;
-        SetOfSchemaVariable uninsts = app.uninstantiatedVars();
+        ImmutableSet<SchemaVariable> uninsts = app.uninstantiatedVars();
 
         // first pass: add variables
         Iterator it = loadedInsts.iterator();
@@ -584,10 +659,18 @@ public class ProblemLoader implements Runnable {
             int eq = s.indexOf('=');
             String varname = s.substring(0, eq);
             String value = s.substring(eq+1, s.length());
-            if (varname.startsWith(NameSV.NAME_PREFIX)) {
-                app = app.addInstantiation(new NameSV(varname), new Name(value));
+
+            // reklov
+            // START TEMPORARY DOWNWARD COMPATIBILITY
+
+            if (varname.startsWith("_NAME")) {
+                app = app.addInstantiation(de.uka.ilkd.key.rule.inst.
+                        SVInstantiations.EMPTY_SVINSTANTIATIONS.add(
+                        new NameSV(varname), new Name(value)));
                 continue;
             }
+
+            // END TEMPORARY DOWNWARD COMPATIBILITY
 
             SchemaVariable sv = lookupName(uninsts, varname);
             if (sv==null) {
@@ -652,8 +735,8 @@ public class ProblemLoader implements Runnable {
         }
     }
 
-    public static SetOfLocationDescriptor parseLocationList(String value, Goal targetGoal) {
-        SetOfLocationDescriptor result = null;
+    public static ImmutableSet<LocationDescriptor> parseLocationList(String value, Goal targetGoal) {
+        ImmutableSet<LocationDescriptor> result = null;
         Proof p = targetGoal.proof();
         Namespace varNS = p.getNamespaces().variables();
         NamespaceSet nss = new NamespaceSet(
@@ -686,10 +769,9 @@ public class ProblemLoader implements Runnable {
     }
 
 
-    private SchemaVariable lookupName(SetOfSchemaVariable set, String name) {
-        IteratorOfSchemaVariable it = set.iterator();
-        while (it.hasNext()) {
-            SchemaVariable v = it.next();
+    private SchemaVariable lookupName(ImmutableSet<SchemaVariable> set, String name) {
+        for (SchemaVariable aSet : set) {
+            SchemaVariable v = aSet;
             if (v.name().toString().equals(name)) return v;
         }
         return null; // handle this better!
@@ -720,6 +802,17 @@ public class ProblemLoader implements Runnable {
 
     public KeYExceptionHandler getExceptionHandler() {
         return exceptionHandler;
+    }
+
+    private static class PairOfString {
+        public String left;
+        public String right;
+
+        public PairOfString ( String p_left, String p_right ) {
+            left  = p_left;
+            right = p_right;
+        }
+
     }
 
 }

@@ -5,10 +5,12 @@
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
-//
-//
+
 package de.uka.ilkd.key.logic;
 
+import java.util.Iterator;
+
+import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.expression.literal.IntLiteral;
 import de.uka.ilkd.key.logic.ldt.IntegerLDT;
@@ -93,19 +95,18 @@ public class TermBuilder {
 
     public Term and(Term[] subTerms) {
         Term result = tt();
-        for (int i=0; i<subTerms.length; i++) {
-            result = and( result, subTerms[i]);
+        for (Term subTerm : subTerms) {
+            result = and(result, subTerm);
         }
 
         return result;
     }
     
-    public Term and(ListOfTerm subTerms) {
+    public Term and(ImmutableList<Term> subTerms) {
 	Term result = tt();
-	IteratorOfTerm it = subTerms.iterator();
-	while(it.hasNext()) {
-	    result = and(result, it.next());
-	}
+        for (Term subTerm : subTerms) {
+            result = and(result, subTerm);
+        }
 	return result;
     }
     
@@ -115,19 +116,18 @@ public class TermBuilder {
     
     public Term or(Term[] subTerms) {
         Term result = ff();
-        for (int i=0; i<subTerms.length; i++) {
-            result = or( result, subTerms[i]);
+        for (Term subTerm : subTerms) {
+            result = or(result, subTerm);
         }
 
         return result;
     }
     
-    public Term or(ListOfTerm subTerms) {
+    public Term or(ImmutableList<Term> subTerms) {
 	Term result = ff();
-	IteratorOfTerm it = subTerms.iterator();
-	while(it.hasNext()) {
-	    result = or(result, it.next());
-	}
+        for (Term subTerm : subTerms) {
+            result = or(result, subTerm);
+        }
 	return result;
     }
 
@@ -175,14 +175,12 @@ public class TermBuilder {
         return tf.createFunctionTerm(integerLDT.getLessOrEquals(), t1, t2);
     }    
     
-    public Term zero(Services services) {
-        final IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();
-        return integerLDT.translateLiteral(new IntLiteral(0));        
+    public Term zero(Services services) {       
+        return services.getTypeConverter().getIntegerLDT().zero();        
     }
 
-    public Term one(Services services) {
-        final IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();
-        return integerLDT.translateLiteral(new IntLiteral(1));        
+    public Term one(Services services) {       
+        return services.getTypeConverter().getIntegerLDT().one();        
     }
     
     public Term NULL(Services services) {
@@ -297,5 +295,9 @@ public class TermBuilder {
         t = func((Function)v,t);
         return t;
     }
-
+    
+    
+    public Term inReachableState(Services services) {
+        return func(services.getJavaInfo().getInReachableState());
+    }
 }

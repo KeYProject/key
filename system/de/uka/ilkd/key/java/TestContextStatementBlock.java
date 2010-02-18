@@ -60,7 +60,7 @@ public class TestContextStatementBlock extends TestCase {
 		   de.uka.ilkd.key.java.expression.operator.PostIncrement);
 	for (int i=size-2; i>=1; i--) {
 	    statementList.add
-		((Statement)stContainer.getChildAt(i));
+		(stContainer.getChildAt(i));
 	}	
 		
     }

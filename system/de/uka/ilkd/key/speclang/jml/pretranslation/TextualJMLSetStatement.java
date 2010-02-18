@@ -10,7 +10,7 @@
 
 package de.uka.ilkd.key.speclang.jml.pretranslation;
 
-import de.uka.ilkd.key.collection.ListOfString;
+import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.speclang.PositionedString;
 
 
@@ -19,7 +19,7 @@ public class TextualJMLSetStatement extends TextualJMLConstruct {
     private final PositionedString assignment;
     
     
-    public TextualJMLSetStatement(ListOfString mods, 
+    public TextualJMLSetStatement(ImmutableList<String> mods, 
                                   PositionedString assignment) {
         super(mods);
         assert assignment != null;

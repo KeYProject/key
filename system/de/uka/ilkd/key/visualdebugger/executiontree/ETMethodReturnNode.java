@@ -11,7 +11,7 @@ package de.uka.ilkd.key.visualdebugger.executiontree;
 
 import java.util.LinkedList;
 
-import de.uka.ilkd.key.logic.ListOfTerm;
+import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.logic.Term;
 
 /**
@@ -36,14 +36,14 @@ public class ETMethodReturnNode extends ETNode {
      * @param result
      * @param parent
      */
-    public ETMethodReturnNode(ListOfTerm bc, LinkedList itNodes, Term result,
+    public ETMethodReturnNode(ImmutableList<Term> bc, LinkedList itNodes, Term result,
             ETNode parent) {
         super(bc, itNodes, parent);
         this.result = result;
 
     }
 
-    public ETMethodReturnNode(ListOfTerm bc, Term result, ETNode parent) {
+    public ETMethodReturnNode(ImmutableList<Term> bc, Term result, ETNode parent) {
         super(bc, parent);
         this.result = result;
 

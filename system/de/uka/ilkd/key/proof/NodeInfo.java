@@ -5,8 +5,6 @@
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
-//
-//
 package de.uka.ilkd.key.proof;
 
 import java.util.ArrayList;
@@ -14,6 +12,8 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import de.uka.ilkd.key.bugdetection.ContractAppInfo;
+import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.ProgramPrefix;
@@ -56,7 +56,10 @@ public class NodeInfo {
     // where a separate mapping node <-> debugger status has to be maintained
     private final VisualDebuggerState visualDebuggerState = largeProofMode ? null : new VisualDebuggerState();
    
-    
+    /**Should be initialized when using loop invariant or operation (method) contract rules. 
+     * Is used by the package bugdetection. */
+    public ContractAppInfo cInfo;     
+
     public NodeInfo(Node node) {
         this.node = node;
     }
@@ -99,7 +102,7 @@ public class NodeInfo {
     }
     
     private boolean isSymbolicExecution(Taclet t) {
-        ListOfRuleSet list = t.getRuleSets();
+        ImmutableList<RuleSet> list = t.getRuleSets();
 	RuleSet       rs;
 	while (!list.isEmpty()) {
 	    rs = list.head ();
@@ -136,7 +139,7 @@ public class NodeInfo {
     public String getExecStatementParentClass() {
         determineFirstAndActiveStatement();
         if (activeStatement instanceof JavaSourceElement)
-            return ((JavaSourceElement) activeStatement).getPositionInfo()
+            return activeStatement.getPositionInfo()
                     .getFileName();
         return "<NONE>";
     }

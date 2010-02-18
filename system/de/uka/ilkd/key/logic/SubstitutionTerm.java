@@ -10,7 +10,7 @@
 
 package de.uka.ilkd.key.logic;
 
-import de.uka.ilkd.key.logic.op.ArrayOfQuantifiableVariable;
+import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 
@@ -28,7 +28,7 @@ class SubstitutionTerm extends Term {
     /** 
      * variable to substitute
      */
-    private final ArrayOfQuantifiableVariable substVar;
+    private final ImmutableArray<QuantifiableVariable> substVar;
     
     /** 
      * The two sub terms of the substitution term, where subs[0] is the term
@@ -36,7 +36,7 @@ class SubstitutionTerm extends Term {
      * which the substitution is applied. 
      * <code> {x/subs[0]}subs[1]</code>
      */
-    private final ArrayOfTerm subs;
+    private final ImmutableArray<Term> subs;
 
     /** depth of the term */
     private final int depth;
@@ -52,9 +52,9 @@ class SubstitutionTerm extends Term {
 			    Term[] subs) {
 	super(op, op.sort(subs));
 	
-	this.subs = new ArrayOfTerm(subs);
-	this.substVar  = new ArrayOfQuantifiableVariable
-	    (new QuantifiableVariable[] {substVar});
+	this.subs = new ImmutableArray<Term>(subs);
+	this.substVar  = new ImmutableArray<QuantifiableVariable>
+	    (substVar);
 	this.depth = 1+(subs[0].depth() > subs[1].depth() ? 
 			subs[0].depth() : subs[1].depth());
     }
@@ -64,7 +64,7 @@ class SubstitutionTerm extends Term {
      * @return n-th subterm ( e.g. {x s} t (0:s ,  1: t) 
      */    
     public Term sub(int n) {
-	return subs.getTerm(n);
+	return subs.get(n);
     }	
 
     /**
@@ -88,7 +88,7 @@ class SubstitutionTerm extends Term {
      * (attention: i.e. <code>n=1<code>) subterm
      * @return the bound variables of the n-th subterm 
      */
-    public ArrayOfQuantifiableVariable varsBoundHere(int n) {
+    public ImmutableArray<QuantifiableVariable> varsBoundHere(int n) {
 	return (n==0 ? EMPTY_VAR_LIST : substVar);
     }
 

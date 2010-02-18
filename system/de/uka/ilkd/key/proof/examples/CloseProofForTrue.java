@@ -9,14 +9,12 @@
 //
 package de.uka.ilkd.key.proof.examples;
 
+import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.Op;
 import de.uka.ilkd.key.proof.*;
-import de.uka.ilkd.key.rule.ListOfTacletApp;
-import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.rule.SuccTacletBuilder;
-import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.rule.*;
 
 /** The {@link #run} method of this class will construct a proof object
  * for the sequent that has the formula <code>true</code> in the succedent.  
@@ -48,7 +46,7 @@ public class CloseProofForTrue {
 
     public TacletIndex buildTacletIndex() {
 	TacletIndex tacInd = new TacletIndex();
-	tacInd.add(buildTaclet());
+	tacInd.add(NoPosTacletApp.createNoPosTacletApp(buildTaclet()));
 	return tacInd;
     }
 
@@ -102,7 +100,7 @@ public class CloseProofForTrue {
 				  false);	
 
 	/* now we get the list of rules applicable here... */
-	ListOfTacletApp rApplist = goal.ruleAppIndex().
+	ImmutableList<TacletApp> rApplist = goal.ruleAppIndex().
 	    getTacletAppAt(TacletFilter.TRUE, pos, null, Constraint.BOTTOM);
 	return rApplist.head();
     }

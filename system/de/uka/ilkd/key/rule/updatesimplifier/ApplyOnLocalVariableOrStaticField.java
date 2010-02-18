@@ -9,13 +9,15 @@
 //
 package de.uka.ilkd.key.rule.updatesimplifier;
 
+import de.uka.ilkd.key.collection.ImmutableArray;
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Location;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.NonRigidFunctionLocation;
-import de.uka.ilkd.key.logic.op.SetAsListOfQuantifiableVariable;
-import de.uka.ilkd.key.logic.op.SetOfQuantifiableVariable;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.rule.AbstractUpdateRule;
 import de.uka.ilkd.key.rule.UpdateSimplifier;
 
@@ -70,7 +72,7 @@ public class ApplyOnLocalVariableOrStaticField extends AbstractUpdateRule {
 
     private static class PVIfExCascade extends IterateAssignmentPairsIfExCascade {
         
-        public PVIfExCascade (ArrayOfAssignmentPair pairs) {
+        public PVIfExCascade (ImmutableArray<AssignmentPair> pairs) {
             super ( pairs );
         }
         
@@ -78,8 +80,8 @@ public class ApplyOnLocalVariableOrStaticField extends AbstractUpdateRule {
             return getCurrentPair ().guard ();
         }
         
-        protected SetOfQuantifiableVariable criticalVars () {
-            return SetAsListOfQuantifiableVariable.EMPTY_SET;
+        protected ImmutableSet<QuantifiableVariable> criticalVars () {
+            return DefaultImmutableSet.<QuantifiableVariable>nil();
         }
     }
     

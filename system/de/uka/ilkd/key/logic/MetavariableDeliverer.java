@@ -21,6 +21,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Counter;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.VariableNameProposer;
 
 public class MetavariableDeliverer {
 
@@ -68,8 +69,11 @@ public class MetavariableDeliverer {
     public Metavariable createNewVariable ( String name,
 					    Sort   p_sort ) {
 	if ( !checkSort ( p_sort, proof.getServices() ) ) return null;
-	Metavariable var = new Metavariable(new Name(name), p_sort);
+	final Name newName = VariableNameProposer.DEFAULT.getNewName(proof
+                .getServices(), new Name(name));
+        Metavariable var = new Metavariable(newName, p_sort);
 	proof.getNamespaces ().variables ().add ( var );
+	proof.getServices().addNameProposal(var.name());
 	return var;
     }
 

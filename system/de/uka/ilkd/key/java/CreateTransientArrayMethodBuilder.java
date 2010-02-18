@@ -11,8 +11,10 @@ package de.uka.ilkd.key.java;
 
 import java.util.LinkedList;
 
+import de.uka.ilkd.key.collection.ImmutableArray;
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.java.abstraction.Field;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.abstraction.ListOfField;
 import de.uka.ilkd.key.java.declaration.*;
 import de.uka.ilkd.key.java.declaration.modifier.Private;
 import de.uka.ilkd.key.java.declaration.modifier.Protected;
@@ -54,7 +56,7 @@ public class CreateTransientArrayMethodBuilder extends CreateArrayMethodBuilder 
     public ProgramMethod getCreateTransientArrayHelperMethod
 	(TypeReference arrayTypeReference,
 	 ProgramVariable length, 
-	 ListOfField fields) {
+	 ImmutableList<Field> fields) {
 	
 	final Modifier[] modifiers = new Modifier[] { new Private() };
 	final KeYJavaType arrayType = arrayTypeReference.getKeYJavaType();
@@ -101,7 +103,7 @@ public class CreateTransientArrayMethodBuilder extends CreateArrayMethodBuilder 
  	final LocalVariableDeclaration local = 
             declare(new ProgramElementName("newObject"), arrayRef);	
 	final ProgramVariable newObject      = (ProgramVariable) local.
-	    getVariables().getVariableSpecification(0).getProgramVariable();
+	    getVariables().get(0).getProgramVariable();
 	final LinkedList<Statement> body     = new LinkedList<Statement>();
 
 	body.addLast(local);
@@ -109,13 +111,13 @@ public class CreateTransientArrayMethodBuilder extends CreateArrayMethodBuilder 
         body.addLast
         (assign(newObject,
                 new MethodReference
-                 (new ArrayOfExpression(new Expression[]{}), 
+                 (new ImmutableArray<Expression>(new Expression[]{}), 
                       new ProgramElementName
                      (InstanceAllocationMethodBuilder.IMPLICIT_INSTANCE_ALLOCATE), 
                       arrayRef)));
    
  	body.add(new MethodReference
-		 (new ArrayOfExpression(new Expression[]
+		 (new ImmutableArray<Expression>(new Expression[]
 		     {paramLength, paramTransientType}), new ProgramElementName
 		  (IMPLICIT_ARRAY_TRANSIENT_CREATION_HELPER), 
 		  newObject));	
@@ -134,7 +136,7 @@ public class CreateTransientArrayMethodBuilder extends CreateArrayMethodBuilder 
     public ProgramMethod getCreateTransientArrayMethod(TypeReference arrayTypeReference, 
 						       ProgramVariable length,
 						       ProgramMethod prepare,
-						       ListOfField fields) {
+						       ImmutableList<Field> fields) {
 
 	final Modifier[] modifiers = new Modifier[] { new Protected(),
 						      new Static() };

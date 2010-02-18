@@ -10,14 +10,20 @@
 
 package de.uka.ilkd.key.rule.soundness;
 
+import java.util.Iterator;
+
 import org.apache.log4j.Logger;
 
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Constraint;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.op.IProgramVariable;
+import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.SyntacticalReplaceVisitor;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.Debug;
@@ -60,14 +66,14 @@ public class StaticCheckerSVI extends StaticChecker {
 					Services         p_services ) {
 	return isValidType ( p_formula,
 			     p_current, 
-			     SLListOfSchemaVariable.EMPTY_LIST.prepend ( p_sv ),
+			     ImmutableSLList.<SchemaVariable>nil().prepend ( p_sv ),
 			     p_type,
 			     p_services );
     }
 
     public static boolean isValidType ( Term                 p_formula,
 					SVInstantiations     p_current,
-					ListOfSchemaVariable p_svs,
+					ImmutableList<SchemaVariable> p_svs,
 					KeYJavaType          p_type,
 					Services             p_services ) {
 
@@ -81,7 +87,7 @@ public class StaticCheckerSVI extends StaticChecker {
 
     public static boolean isValidType ( Term                 p_formula,
 					SVInstantiations     p_current,
-					ListOfSchemaVariable p_svs,
+					ImmutableList<SchemaVariable> p_svs,
 					IProgramVariable     p_pv,
 					Services             p_services ) {
 
@@ -108,10 +114,10 @@ public class StaticCheckerSVI extends StaticChecker {
 
     public static SVInstantiations
 	addInstantiation ( SVInstantiations     p_current,
-			   ListOfSchemaVariable p_svs,
+			   ImmutableList<SchemaVariable> p_svs,
 			   IProgramVariable     p_pv,
 			   int                  p_instantiationType ) {
-	IteratorOfSchemaVariable svIt;
+	Iterator<SchemaVariable> svIt;
 	for ( svIt = p_svs.iterator (); svIt.hasNext (); )
 	    p_current = p_current.add ( svIt.next (), p_pv,
 					p_instantiationType );

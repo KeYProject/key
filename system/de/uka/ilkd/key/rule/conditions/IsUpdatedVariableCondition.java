@@ -5,9 +5,6 @@
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
-//
-//
-// This file is part of KeY - Integrated Deductive Software Design
 
 package de.uka.ilkd.key.rule.conditions;
 

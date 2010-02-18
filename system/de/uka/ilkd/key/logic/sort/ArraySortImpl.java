@@ -12,25 +12,30 @@ package de.uka.ilkd.key.logic.sort;
 
 
 import java.lang.ref.WeakReference;
+import java.util.Iterator;
 import java.util.WeakHashMap;
+
+import de.uka.ilkd.key.collection.ImmutableArray;
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableSet;
 
 
 
 public class ArraySortImpl extends AbstractCollectionSort implements ArraySort{
 
-    private static WeakHashMap<SortKey, WeakReference<ArraySort>> aSH = 
+    private static final WeakHashMap<SortKey, WeakReference<ArraySort>> aSH = 
         new WeakHashMap<SortKey, WeakReference<ArraySort>>();
     
-    private final ArrayOfSort commonJavaSorts;  
+    private final ImmutableArray<Sort> commonJavaSorts;  
     
-    private SetOfSort extendsSorts;
+    private final ImmutableSet<Sort> extendsSorts;
     
     /** keeping this key is important to prevent for too early hashmap removal*/
     private final SortKey sk;
     
 
 
-    private ArraySortImpl(SetOfSort extendsSorts, 			  
+    private ArraySortImpl(ImmutableSet<Sort> extendsSorts, 			  
                           SortKey sk) {
 	super(sk.elemSort.name()+"[]", sk.elemSort);
 	
@@ -40,9 +45,9 @@ public class ArraySortImpl extends AbstractCollectionSort implements ArraySort{
         commons[0] = this.sk.javaLangObjectSort;
 	commons[1] = this.sk.javaLangCloneable;
         commons[2] = this.sk.javaLangSerializable;
-        commonJavaSorts = new ArrayOfSort(commons);
+        commonJavaSorts = new ImmutableArray<Sort>(commons);
 	// uncommented because of ASMKeY:
-	//	Debug.assertTrue(extendsSorts!=SetAsListOfSort.EMPTY_SET);
+	//	Debug.assertTrue(extendsSorts!=SetAsListOf.<Sort>nil());
 	this.extendsSorts = extendsSorts;
     }
 
@@ -52,15 +57,22 @@ public class ArraySortImpl extends AbstractCollectionSort implements ArraySort{
      * incompatible sort).
      */
     public Sort cloneFor ( Sort p ) {
-	return getArraySort ( p, commonJavaSorts.getSort(0), 
-                commonJavaSorts.getSort(1), commonJavaSorts.getSort(2));
+	return getArraySort ( p, commonJavaSorts.get(0), 
+                commonJavaSorts.get(1), commonJavaSorts.get(2));
     }
 
     /**
      * @return the sorts of the predecessors of this sort
      */
-    public SetOfSort extendsSorts() {
+    public ImmutableSet<Sort> extendsSorts() {
 	return extendsSorts;
+    }
+
+    /**
+     * returns the element sort of the array
+     */
+    public Sort elementSort() {
+	return sk.elemSort;
     }
 
     
@@ -91,13 +103,13 @@ public class ArraySortImpl extends AbstractCollectionSort implements ArraySort{
         // several environments (int, boolean)
         final SortKey sortKey = new SortKey(elemSort, objectSort, 
                 cloneableSort, serializableSort);
-        ArraySort as = aSH.containsKey(sortKey) ? 
-                (ArraySort) aSH.get(sortKey).get() : null;          
+        ArraySort as = aSH.containsKey(sortKey) ?
+                aSH.get(sortKey).get() : null;
 	
         if (as == null){ 
         // HACK: this simple handling of sort creation does not treat
-        // depending symbols (i.e. ArrayOfS::instance)
-	    SetOfSort localExtendsSorts = getArraySuperSorts(elemSort, objectSort,
+        // depending symbols (i.e. ArrayOf<S>::instance)
+	    ImmutableSet<Sort> localExtendsSorts = getArraySuperSorts(elemSort, objectSort,
 							     cloneableSort, 
                                                              serializableSort);
 	    as = new ArraySortImpl(localExtendsSorts, sortKey);
@@ -107,7 +119,7 @@ public class ArraySortImpl extends AbstractCollectionSort implements ArraySort{
         return as;
     }
 
-    private static SetOfSort getArraySuperSorts(Sort elem, 
+    private static ImmutableSet<Sort> getArraySuperSorts(Sort elem, 
 						Sort objectSort,
 						Sort cloneableSort,
                                                 Sort serializableSort){
@@ -116,7 +128,7 @@ public class ArraySortImpl extends AbstractCollectionSort implements ArraySort{
 	    elem = ((ArraySort) elem).elementSort();
 	    i++;
 	}
-	SetOfSort superSorts = elem.extendsSorts();
+	ImmutableSet<Sort> superSorts = elem.extendsSorts();
 	
         if (elem instanceof PrimitiveSort || elem == objectSort){
 	    i--;
@@ -125,8 +137,8 @@ public class ArraySortImpl extends AbstractCollectionSort implements ArraySort{
 	}
         
 	if(i>0){
-	    final IteratorOfSort it = superSorts.iterator();
-	    superSorts = SetAsListOfSort.EMPTY_SET;
+	    final Iterator<Sort> it = superSorts.iterator();
+	    superSorts = DefaultImmutableSet.<Sort>nil();
 	    while(it.hasNext()){
 		Sort s = it.next();
 		superSorts = 

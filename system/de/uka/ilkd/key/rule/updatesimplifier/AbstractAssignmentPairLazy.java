@@ -10,11 +10,12 @@
 
 package de.uka.ilkd.key.rule.updatesimplifier;
 
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.IUpdateOperator;
 import de.uka.ilkd.key.logic.op.Location;
-import de.uka.ilkd.key.logic.op.SetOfQuantifiableVariable;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.sort.AbstractSort;
 
 
@@ -27,7 +28,7 @@ abstract class AbstractAssignmentPairLazy implements AssignmentPair {
      * term with the update operator as top level operator to which the modeled assignment pair belongs 
      */
     private final Term update;
-    private SetOfQuantifiableVariable freeVars = null;
+    private ImmutableSet<QuantifiableVariable> freeVars = null;
 
     /**
      * stores the location hash code 
@@ -127,8 +128,8 @@ abstract class AbstractAssignmentPairLazy implements AssignmentPair {
         if ( locationHash == 0 ) {
             locationHash = location ().hashCode ();
             final Term[] locSubs = locationSubs ();
-            for ( int i = 0; i < locSubs.length; i++ ) {
-                locationHash += 17 * locSubs[i].hashCode ();
+            for (Term locSub : locSubs) {
+                locationHash += 17 * locSub.hashCode();
             }
             if ( locationHash == 0 ) {
                 locationHash = 1;
@@ -196,15 +197,14 @@ abstract class AbstractAssignmentPairLazy implements AssignmentPair {
     /* (non-Javadoc)
      * @see de.uka.ilkd.key.rule.updatesimplifier.AssignmentPair#freeVars()
      */
-    public SetOfQuantifiableVariable freeVars () {
+    public ImmutableSet<QuantifiableVariable> freeVars () {
         if ( freeVars == null ) {
             freeVars = guard ().freeVars ().union ( valueUnsafe ().freeVars () );
             for ( int i = 0; i != locationSubs ().length; ++i )
                 freeVars = freeVars.union ( locationSubs ()[i].freeVars () );
 
             for ( int i = 0; i != boundVars ().size (); ++i )
-                freeVars = freeVars.remove ( boundVars ()
-                                             .getQuantifiableVariable ( i ) );
+                freeVars = freeVars.remove ( boundVars ().get ( i ) );
         }
         
         return freeVars;

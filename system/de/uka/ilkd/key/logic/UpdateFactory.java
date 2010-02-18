@@ -10,12 +10,16 @@
 
 package de.uka.ilkd.key.logic;
 
+import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.UpdateSimplifier;
-import de.uka.ilkd.key.rule.updatesimplifier.*;
+import de.uka.ilkd.key.rule.updatesimplifier.AssignmentPair;
+import de.uka.ilkd.key.rule.updatesimplifier.AssignmentPairImpl;
+import de.uka.ilkd.key.rule.updatesimplifier.Update;
+import de.uka.ilkd.key.rule.updatesimplifier.UpdateSimplifierTermFactory;
 
 
 
@@ -97,13 +101,13 @@ public class UpdateFactory {
      * Apply an update to another update
      */
     public Update apply(Update update, Update target) {
-        final ArrayOfAssignmentPair oldPairs = target.getAllAssignmentPairs ();
+        final ImmutableArray<AssignmentPair> oldPairs = target.getAllAssignmentPairs ();
 
         final AssignmentPair[] newPairs = new AssignmentPair[oldPairs.size ()];
         boolean changed = false;
         for ( int i = 0; i != oldPairs.size (); ++i ) {
-            newPairs[i] = apply ( update, oldPairs.getAssignmentPair ( i ) );
-            changed = changed || newPairs[i] != oldPairs.getAssignmentPair ( i );
+            newPairs[i] = apply ( update, oldPairs.get ( i ) );
+            changed = changed || newPairs[i] != oldPairs.get ( i );
         }
 
         if ( !changed ) return target;
@@ -180,8 +184,8 @@ public class UpdateFactory {
      * <tt>update1 | update2</tt>
      */
     public Update parallel (Update update1, Update update2) {
-        final ArrayOfAssignmentPair pairs1 = update1.getAllAssignmentPairs();
-        final ArrayOfAssignmentPair pairs2 = update2.getAllAssignmentPairs();
+        final ImmutableArray<AssignmentPair> pairs1 = update1.getAllAssignmentPairs();
+        final ImmutableArray<AssignmentPair> pairs2 = update2.getAllAssignmentPairs();
         
         final AssignmentPair[] resPairs =
             new AssignmentPair [pairs1.size() + pairs2.size()];
@@ -231,8 +235,8 @@ public class UpdateFactory {
     
     public Update quantify (QuantifiableVariable[] vars, Update update) {
         Update res = update;
-        for (int i = 0; i < vars.length; i++) {
-            res = quantify (vars[i], res);
+        for (QuantifiableVariable var : vars) {
+            res = quantify(var, res);
         }
         return res;
     }
@@ -246,12 +250,12 @@ public class UpdateFactory {
         // ensure that no collisions occur later on
         update = utf.resolveCollisions ( update, update.freeVars () );
         
-        final ArrayOfAssignmentPair oldPairs = update.getAllAssignmentPairs ();
+        final ImmutableArray<AssignmentPair> oldPairs = update.getAllAssignmentPairs ();
         
         // we create a copy of the update in which <tt>var</tt> is replaced with
         // a new variable <tt>var'</tt>
         final LogicVariable varP = createPrime ( var );
-        final ArrayOfAssignmentPair oldPairsP =
+        final ImmutableArray<AssignmentPair> oldPairsP =
             substitute ( update, var, varP ).getAllAssignmentPairs();
         
         // sanity check
@@ -280,11 +284,11 @@ public class UpdateFactory {
      */
     private Update quantify (QuantifiableVariable var,
                              LogicVariable varP,
-                             ArrayOfAssignmentPair oldPairs,
-                             ArrayOfAssignmentPair oldPairsP) {
+                             ImmutableArray<AssignmentPair> oldPairs,
+                             ImmutableArray<AssignmentPair> oldPairsP) {
         final AssignmentPair[] newPairs = new AssignmentPair [oldPairs.size ()];
         for ( int locNum = 0; locNum != oldPairs.size (); ++locNum ) {
-            final AssignmentPair pair = oldPairs.getAssignmentPair ( locNum );
+            final AssignmentPair pair = oldPairs.get ( locNum );
 
             assert oldPairs.size () == 1
             || !( pair.location () instanceof ShadowedOperator ):
@@ -318,7 +322,7 @@ public class UpdateFactory {
     /**
      * Add <code>var</code> as first bound variable of <code>pair</code>
      */
-    private ArrayOfQuantifiableVariable pushFront (QuantifiableVariable var,
+    private ImmutableArray<QuantifiableVariable> pushFront (QuantifiableVariable var,
                                                    AssignmentPair pair) {
         final int oldSize = pair.boundVars ().size ();
         final QuantifiableVariable[] newBoundVars =
@@ -326,7 +330,7 @@ public class UpdateFactory {
         newBoundVars[0] = var;
         pair.boundVars ().arraycopy ( 0, newBoundVars, 1, oldSize );
 
-        return new ArrayOfQuantifiableVariable ( newBoundVars );
+        return new ImmutableArray<QuantifiableVariable> ( newBoundVars );
     }
 
     /**
@@ -358,7 +362,7 @@ public class UpdateFactory {
         return tf.createQuantifierTerm ( Op.ALL, varP, res );
     }
 
-    private Update firstNPairs (ArrayOfAssignmentPair pairs, int n) {
+    private Update firstNPairs (ImmutableArray<AssignmentPair> pairs, int n) {
         final AssignmentPair[] criticalPairs = new AssignmentPair [n];
         pairs.arraycopy ( 0, criticalPairs, 0, n );
         return Update.createUpdate ( criticalPairs );
@@ -385,13 +389,13 @@ public class UpdateFactory {
         
         final Update cleanedUpdate =
             utf.resolveCollisions ( update, guard.freeVars () );
-        final ArrayOfAssignmentPair oldPairs =
+        final ImmutableArray<AssignmentPair> oldPairs =
             cleanedUpdate.getAllAssignmentPairs ();
         
         final AssignmentPair[] newPairs =
             new AssignmentPair [cleanedUpdate.locationCount ()];
         for ( int i = 0; i != oldPairs.size (); ++i ) {
-            final AssignmentPair pair = oldPairs.getAssignmentPair ( i );
+            final AssignmentPair pair = oldPairs.get ( i );
             final Term newGuard =
                 tf.createJunctorTermAndSimplify ( Op.AND, guard, pair.guard () );
             newPairs[i] = new AssignmentPairImpl ( pair.boundVars (),

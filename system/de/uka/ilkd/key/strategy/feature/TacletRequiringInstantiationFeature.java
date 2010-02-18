@@ -11,9 +11,11 @@
 
 package de.uka.ilkd.key.strategy.feature;
 
+import java.util.Iterator;
+
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.op.IteratorOfSchemaVariable;
-import de.uka.ilkd.key.logic.op.SetOfSchemaVariable;
+import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.TacletApp;
 
@@ -31,11 +33,10 @@ public class TacletRequiringInstantiationFeature extends BinaryTacletAppFeature 
     }
     
     protected boolean filter(TacletApp app, PosInOccurrence pos, Goal goal) {
-        final SetOfSchemaVariable neededVars = app.neededUninstantiatedVars ();
-        final SetOfSchemaVariable ifFindVars = app.taclet ().getIfFindVariables ();
-        final IteratorOfSchemaVariable it = neededVars.iterator ();
-        while ( it.hasNext () ) {
-            if ( !ifFindVars.contains ( it.next () ) ) return true;
+        final ImmutableSet<SchemaVariable> neededVars = app.neededUninstantiatedVars ();
+        final ImmutableSet<SchemaVariable> ifFindVars = app.taclet ().getIfFindVariables ();
+        for (SchemaVariable neededVar : neededVars) {
+            if (!ifFindVars.contains(neededVar)) return true;
         }
         return false;
     }

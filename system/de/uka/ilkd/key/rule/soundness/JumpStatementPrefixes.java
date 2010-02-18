@@ -11,13 +11,14 @@
 
 package de.uka.ilkd.key.rule.soundness;
 
-import de.uka.ilkd.key.java.ListOfStatement;
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 
 
 
 public interface JumpStatementPrefixes {
 
-    ListOfStatement getPrefix ( SchemaVariable p );
+    ImmutableList<Statement> getPrefix ( SchemaVariable p );
 
 }

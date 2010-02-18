@@ -12,11 +12,11 @@
 package de.uka.ilkd.key.strategy.termgenerator;
 
 import java.math.BigInteger;
+import java.util.Iterator;
 
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.IteratorOfTerm;
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.SLListOfTerm;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.ldt.IntegerLDT;
@@ -43,7 +43,7 @@ public class RootsGenerator implements TermGenerator {
 
     private final ProjectionToTerm powerRelation;
 
-    final TermBuilder tb = TermBuilder.DF;            
+    final TermBuilder tb = TermBuilder.DF;        
     private final BigInteger one = BigInteger.ONE;
     private final BigInteger two = BigInteger.valueOf ( 2 );
 
@@ -55,7 +55,7 @@ public class RootsGenerator implements TermGenerator {
         this.powerRelation = powerRelation;
     }
 
-    public IteratorOfTerm generate(RuleApp app, PosInOccurrence pos, Goal goal) {
+    public Iterator<Term> generate(RuleApp app, PosInOccurrence pos, Goal goal) {
         final Services services = goal.proof ().getServices ();
         final IntegerLDT numbers = services.getTypeConverter ().getIntegerLDT ();
         
@@ -90,18 +90,18 @@ public class RootsGenerator implements TermGenerator {
         return emptyIterator ();        
     }
 
-    private IteratorOfTerm emptyIterator() {
-        return SLListOfTerm.EMPTY_LIST.iterator ();
+    private Iterator<Term> emptyIterator() {
+        return ImmutableSLList.<Term>nil().iterator ();
     }
 
-    private IteratorOfTerm toIterator(Term res) {
+    private Iterator<Term> toIterator(Term res) {
         if ( res.equals ( tb.ff () ) ) return emptyIterator ();
-        return SLListOfTerm.EMPTY_LIST.prepend ( res ).iterator ();
+        return ImmutableSLList.<Term>nil().prepend ( res ).iterator ();
     }
 
     private Term breakDownEq(Term var, BigInteger lit, int pow,
                              Services services) {
-        final Term zero = tb.zTerm ( services, "0" );
+        final Term zero = tb.zero(services);
 
         if ( ( pow % 2 == 0 ) ) {
             // the even case
@@ -184,7 +184,7 @@ public class RootsGenerator implements TermGenerator {
                 // no solutions
                 return tb.ff ();
             case 0:
-                return tb.equals ( var, tb.zTerm ( services, "0" ) );
+                return tb.equals ( var, tb.zero( services ) );
             case 1:
                 final BigInteger r = root ( lit, pow );
                 final Term rTerm = tb.zTerm ( services, r.toString () );

@@ -13,6 +13,8 @@ import java.io.File;
 import java.util.*;
 
 import de.uka.ilkd.key.gui.GUIEvent;
+import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.util.KeYResourceManager;
 
 /** This class encapsulates the information about the active
  * libraries settings
@@ -20,7 +22,7 @@ import de.uka.ilkd.key.gui.GUIEvent;
 public class LibrariesSettings implements Settings {
 
    private static final String LIBRARIES_KEY = "[Libraries]Default";
-   private static final String LIBRARIES_PATH = "libraries"+File.separator;
+   private static final String LIBRARIES_PATH = PathConfig.KEY_CONFIG_DIR + File.separator + "libraries" + File.separator;
    private LinkedList<SettingsListener> listenerList = new LinkedList<SettingsListener>();
 
    /** keys:   the file names of the libraries,
@@ -37,12 +39,14 @@ public class LibrariesSettings implements Settings {
    
    private static String[] standardLibs= {"stringRules.key", "deprecatedRules.key", "acc.key"};
    
-   public LibrariesSettings(){
+   public LibrariesSettings() {
        /*adds the standard libraries to libToSel, maybe they will be
-         replaced by readSettings  */ 
-       for(int i=0;i<standardLibs.length;i++){
-               libToSel.put(standardLibs[i],new Boolean(false));
-           }     
+         replaced by readSettings  */
+       for (String standardLib : standardLibs) {
+           KeYResourceManager.getManager().copyIfNotExists(Proof.class,
+                   "rules/libraries/" + standardLib, LIBRARIES_PATH + standardLib);
+           libToSel.put(LIBRARIES_PATH + standardLib, Boolean.FALSE);
+       }     
    }
    
    
@@ -61,7 +65,7 @@ public class LibrariesSettings implements Settings {
                 int sepIndex = token.lastIndexOf("-"); 
                 if ((sepIndex > 0) && (sepIndex < token.length()-1))
                     libToSel.put(token.substring(0,sepIndex).trim(),
-                            new Boolean(token.substring(sepIndex+1).trim()));
+                            Boolean.valueOf(token.substring(sepIndex + 1).trim()));
             }
         } else emptyProperties=true;
     }
@@ -89,10 +93,9 @@ public class LibrariesSettings implements Settings {
      * changed to its registered listeners (not thread-safe)
      */
     protected void fireSettingsChanged() {
-        Iterator<SettingsListener> it = listenerList.iterator();
-	while (it.hasNext()) {
-	    it.next().settingsChanged(new GUIEvent(this));
-	}
+        for (SettingsListener aListenerList : listenerList) {
+            aListenerList.settingsChanged(new GUIEvent(this));
+        }
     }
 
     /** adds a listener to the settings object 
@@ -119,10 +122,4 @@ public class LibrariesSettings implements Settings {
     public boolean emptyProperties(){
         return emptyProperties;
     }
-    
-    /** @return the path of the libraries */
-    public static String getLibrariesPath(){
-        return LIBRARIES_PATH;
-    }
-
 }

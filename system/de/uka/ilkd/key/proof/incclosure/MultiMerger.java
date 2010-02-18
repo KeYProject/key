@@ -10,6 +10,10 @@
 
 package de.uka.ilkd.key.proof.incclosure;
 
+import java.util.Iterator;
+
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.util.Debug;
 
@@ -25,7 +29,7 @@ public class MultiMerger implements Merger {
      * sinks
      */
     private BinaryMerger rootMerger;
-    private ListOfSink   leafSinks  = SLListOfSink.EMPTY_LIST;
+    private ImmutableList<Sink>   leafSinks  = ImmutableSLList.<Sink>nil();
 
     private int          arity      = 0;
 
@@ -68,9 +72,9 @@ public class MultiMerger implements Merger {
 			   "Tried to shrink MultiMerger" );	
 	
 	BinaryMerger   r        = new BinaryMerger ( parent, services );
-	ListOfSink     sinkList = SLListOfSink.EMPTY_LIST;
-	ListOfSink     newList  = SLListOfSink.EMPTY_LIST;
-	IteratorOfSink it;
+	ImmutableList<Sink>     sinkList = ImmutableSLList.<Sink>nil();
+	ImmutableList<Sink>     newList  = ImmutableSLList.<Sink>nil();
+	Iterator<Sink> it;
 	int            i;
 
 	it       = r.getSinks ();
@@ -88,9 +92,9 @@ public class MultiMerger implements Merger {
 	arity      = p_arity;
 
 	while ( i-- != 0 ) {
-	    if ( sinkList == SLListOfSink.EMPTY_LIST ) {
+	    if ( sinkList.isEmpty() ) {
 		/** Increase the depth of the tree by one */
-		while ( newList != SLListOfSink.EMPTY_LIST ) {
+		while ( !newList.isEmpty() ) {
 		    sinkList = sinkList.prepend ( newList.head () );
 		    newList  = newList.tail ();
 		}
@@ -101,12 +105,12 @@ public class MultiMerger implements Merger {
 	    sinkList = sinkList.tail ();
 	}
 
-	while ( newList != SLListOfSink.EMPTY_LIST ) {
+	while ( !newList.isEmpty() ) {
 	    sinkList = sinkList.prepend ( newList.head () );
 	    newList  = newList.tail ();
 	}
 	
-	while ( sinkList != SLListOfSink.EMPTY_LIST ) {
+	while ( !sinkList.isEmpty() ) {
 	    leafSinks = leafSinks.append ( sinkList.head () );
 	    sinkList  = sinkList.tail ();
 	}
@@ -119,7 +123,7 @@ public class MultiMerger implements Merger {
     /**
      * Inputs offered by this merger
      */
-    public IteratorOfSink getSinks () {
+    public Iterator<Sink> getSinks () {
 	return leafSinks.iterator ();
     }
 

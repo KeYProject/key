@@ -10,13 +10,12 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.jdt.core.IClasspathEntry;
-import org.eclipse.jdt.core.IJavaProject;
-import org.eclipse.jdt.core.JavaCore;
-import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.jdt.core.*;
+import org.eclipse.jdt.internal.junit.buildpath.JUnitContainerInitializer;
 import org.eclipse.jdt.launching.JavaRuntime;
 
-import de.uka.ilkd.key.proof.ListOfNode;
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.unittest.ModelGenerator;
 import de.uka.ilkd.key.unittest.UnitTestBuilder;
 import de.uka.ilkd.key.visualdebugger.VisualDebugger;
@@ -24,7 +23,7 @@ import de.uka.ilkd.key.visualdebugger.VisualDebugger;
 public class VBTBuilder {
    
     VisualDebugger vd = VisualDebugger.getVisualDebugger();
-    ListOfNode nodes;
+    ImmutableList<Node> nodes;
     private boolean error=false;
     private String file=null;
     IProject testGenProject=null;
@@ -34,7 +33,7 @@ public class VBTBuilder {
     private int modelGenerator;
     
     
-    public VBTBuilder(ListOfNode nodes,int modelGenerator){
+    public VBTBuilder(ImmutableList<Node> nodes,int modelGenerator){
         this.nodes=nodes;
         this.modelGenerator=modelGenerator;
         this.createTestCase();
@@ -82,58 +81,64 @@ public class VBTBuilder {
         
     }
     
-    
-    
-public void createTestCase(){    
-    ModelGenerator.decProdForTestGen=this.modelGenerator;
-    UnitTestBuilder testBuilder = new UnitTestBuilder(vd.getMediator().getServices(), 
-             vd.getMediator().getProof());
 
-     try{
-         file = (testBuilder.createTestForNodes(nodes));
-     }catch(Exception e){
-         this.error=true;
-         e.printStackTrace();
-     }
-    if (file.lastIndexOf(File.separator)>0){
-        int last = file.lastIndexOf(File.separator);
-        fileName =file.substring(last,file.length());
-        path = file.substring(0, last);
+
+    public void createTestCase(){    
+	ModelGenerator.decProdForTestGen=this.modelGenerator;
+	UnitTestBuilder testBuilder = new UnitTestBuilder(vd.getMediator().getServices(), 
+		vd.getMediator().getProof());
+
+	try {
+	    file = testBuilder.createTestForNodes(nodes);
+	}catch(Exception e){
+	    this.error=true;
+	    e.printStackTrace();
+	}
+	
+	if (file.lastIndexOf(File.separator)>0){
+	    int last = file.lastIndexOf(File.separator);
+	    fileName =file.substring(last,file.length());
+	    path = file.substring(0, last);
+	}
+
     }
-    
-}
-         
+
      
     private IProject createTestCaseProject(String testFilePath) throws URISyntaxException, CoreException{
-        String projectName = "TestCases";
-        VisualDebugger.print("Creating new Project in path: "+testFilePath);
+     
+	String projectName = "TestCases";
+        
+	VisualDebugger.print("Creating new Project in path: "+testFilePath);
 
         IWorkspace workspace = ResourcesPlugin.getWorkspace();
         IProject project2 = workspace.getRoot().getProject(projectName);
+        
+        
         IProjectDescription projectDescription = null;
         if (!project2.exists())
         {
             URI projectLocationURI=null;
-                projectLocationURI = new URI("file:"+testFilePath);
-          projectDescription = ResourcesPlugin.getWorkspace().newProjectDescription(projectName);
+            projectLocationURI = new URI("file:"+testFilePath);
+            projectDescription = ResourcesPlugin.getWorkspace().newProjectDescription(projectName);
 
-          if (projectLocationURI != null)
-          {
-                projectDescription.setLocationURI(new java.net.URI(projectLocationURI.toString()));
-          }
+            if (projectLocationURI != null)
+            {
+        	projectDescription.setLocationURI(new java.net.URI(projectLocationURI.toString()));
+            }
             project2.create(projectDescription, null);
         }
-        
+
         if (!project2.isOpen()) {           
-                    project2.open(null);
-           
+            project2.open(null);
+
         }
+
         IJavaProject javaProject = JavaCore.create(project2);
         
+        addNatureToProject(project2, JavaCore.NATURE_ID, null);
   
-            addNatureToProject(project2, JavaCore.NATURE_ID, null);
-  
-            javaProject.setRawClasspath(new IClasspathEntry[0], null);
+        javaProject.setRawClasspath(new IClasspathEntry[0], null);
+        
         IPath projectPath = javaProject.getProject().getFullPath();
         VisualDebugger.print("ProjectPath "+projectPath);
         try {
@@ -141,21 +146,17 @@ public void createTestCase(){
             IClasspathEntry cpe; 
             Path[] dir= getDirectories(new File(VisualDebugger.tempDir));
             
-            for (int i=0;i< dir.length;i++){
-                String s = dir[i].toOSString();
-                //System.out.println("S "+ s.substring(1, s.length()));
-            cpe= JavaCore.newSourceEntry(projectPath.append(new Path(s.substring(1, s.length()))));
+            cpe= JavaCore.newSourceEntry(projectPath);
             addToClasspath(javaProject,cpe);
-            }
             
+            IPath junitPath = new Path(JUnitContainerInitializer.JUNIT_CONTAINER_ID+"/3");
+            ClasspathContainerInitializer initializer = 	
+        	JavaCore.getClasspathContainerInitializer(junitPath.segment(0));
+            initializer.initialize(junitPath,javaProject);
+           
             
-//            IPath[] ps = new Path[1];
-//            ps[0] = (new Path("home/**"));
-            
-            IPath[] ps = getExcludingDirectories(new File(testFilePath));
-            cpe = JavaCore.newSourceEntry(projectPath.append(new Path("")), ps);
-            addToClasspath(javaProject,cpe);
-            addContainerEntry(javaProject,new Path("org.eclipse.jdt.junit.JUNIT_CONTAINER/3.8.1"));
+            addContainerEntry(javaProject, junitPath);
+
         } catch (JavaModelException e1) {
             // TODO Auto-generated catch block
             e1.printStackTrace();
@@ -219,8 +220,8 @@ public void createTestCase(){
     }
     
  
-     private static void addToClasspath(IJavaProject jproject, IClasspathEntry cpe) throws JavaModelException {
-                IClasspathEntry[] oldEntries= jproject.getRawClasspath();
+     private static void addToClasspath(IJavaProject jproject, IClasspathEntry cpe) throws JavaModelException {	 	
+	 	IClasspathEntry[] oldEntries= jproject.getRawClasspath();
                 for (int i= 0; i < oldEntries.length; i++) {
                         if (oldEntries[i].equals(cpe)) {
                                 return;
@@ -234,7 +235,7 @@ public void createTestCase(){
         }
     
     public static void addContainerEntry(IJavaProject project, IPath container) throws JavaModelException {
-        IClasspathEntry cpe = JavaCore.newContainerEntry(container, false);
+	IClasspathEntry cpe = JavaCore.newContainerEntry(container, false);
         addToClasspath(project, cpe);
 }
     

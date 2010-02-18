@@ -9,12 +9,15 @@
 //
 package de.uka.ilkd.key.rule;
 
+import de.uka.ilkd.key.collection.ImmutableArray;
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.ConstrainedFormula;
 import de.uka.ilkd.key.logic.Constraint;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.ArrayOfQuantifiableVariable;
 import de.uka.ilkd.key.logic.op.IUpdateOperator;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.rule.updatesimplifier.*;
 import de.uka.ilkd.key.util.Debug;
 
@@ -58,7 +61,7 @@ public class UpdateSimplifier {
      */
     public UpdateSimplifier(boolean deletionEnabled, boolean eager) {
 	this.eager = eager;
-        ListOfIUpdateRule usRules = SLListOfIUpdateRule.EMPTY_LIST.  
+        ImmutableList<IUpdateRule> usRules = ImmutableSLList.<IUpdateRule>nil().
         append(new ApplyOnWorkingSpaceNonRigid(this)).
         append(new ApplyOnAnonymousUpdate(this)).
         append(new ApplyAnonymousUpdateOnNonRigid(this)).
@@ -80,25 +83,21 @@ public class UpdateSimplifier {
     /**
      * Uses the given rules for update simplification. The order is
      * important as the first applicable rule is taken.
-     * @param rules a ListOfUpdateRule to use for update
+     * @param rules a IList<UpdateRule> to use for update
      * simplification
      */
-    public void setSimplificationRules(ListOfIUpdateRule rules) {
-	simplificationRules = rules.toArray();
+    public void setSimplificationRules(ImmutableList<IUpdateRule> rules) {
+	simplificationRules = rules.toArray(new IUpdateRule[rules.size()]);
     }
 
     
     public Term simplify(Update update, Term t, Services services) {
-	Term simplifiedTerm = t;
-	for (int i = 0; i<simplificationRules.length; i++) {	    
-	    if (simplificationRules[i].isApplicable(update, 
-	                                            simplifiedTerm)) {
-		return simplificationRules[i].apply(update, 
-						    simplifiedTerm, 
-						    services);		
-	    }
-	}
-	return simplifiedTerm;
+        for (IUpdateRule simplificationRule : simplificationRules) {
+            if (simplificationRule.isApplicable(update, t)) {
+                return simplificationRule.apply(update, t, services);
+            }
+        }
+	return t;
     }
 
     /**
@@ -121,9 +120,9 @@ public class UpdateSimplifier {
     public Term matchingCondition (Update update, 
 	    			   Term target, 
 	    			   Services services) {
-        for ( int i = 0; i < simplificationRules.length; i++ ) {
-            if ( simplificationRules[i].isApplicable ( update, target ) )
-                return simplificationRules[i].matchingCondition( update, target, services );
+        for (IUpdateRule simplificationRule : simplificationRules) {
+            if (simplificationRule.isApplicable(update, target))
+                return simplificationRule.matchingCondition(update, target, services);
         }
         Debug.fail("Don't know how to handle " + target);
         return null; // unreachable
@@ -172,8 +171,8 @@ public class UpdateSimplifier {
         }
 
         final Term[] subs = new Term[target.arity()];
-        final ArrayOfQuantifiableVariable[] vars = 
-            new ArrayOfQuantifiableVariable[target.arity()];
+        final ImmutableArray<QuantifiableVariable>[] vars = 
+            new ImmutableArray[target.arity()];
         
         boolean changed = false;
         for (int i = 0; i<subs.length; i++) {

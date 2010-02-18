@@ -9,17 +9,16 @@
 //
 package de.uka.ilkd.key.rule;
 
+import de.uka.ilkd.key.collection.ImmutableArray;
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.ArrayOfTerm;
 import de.uka.ilkd.key.logic.BoundVariableTools;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.ArrayOfQuantifiableVariable;
-import de.uka.ilkd.key.logic.op.SetAsListOfQuantifiableVariable;
-import de.uka.ilkd.key.logic.op.SetOfQuantifiableVariable;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.sort.AbstractSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.logic.util.TermHelper;
-import de.uka.ilkd.key.rule.updatesimplifier.ArrayOfAssignmentPair;
 import de.uka.ilkd.key.rule.updatesimplifier.AssignmentPair;
 import de.uka.ilkd.key.rule.updatesimplifier.Update;
 import de.uka.ilkd.key.rule.updatesimplifier.UpdateSimplifierTermFactory;
@@ -76,8 +75,7 @@ public abstract class AbstractUpdateRule implements IUpdateRule {
 	    						  Term term, 
 	    						  Services services) {
         final Term[] subs = new Term[term.arity()];
-        final ArrayOfQuantifiableVariable[] vars = 
-            new ArrayOfQuantifiableVariable[subs.length];
+        final ImmutableArray<QuantifiableVariable>[] vars = new ImmutableArray[subs.length];
         
         boolean changed =
             BoundVariableTools.DEFAULT
@@ -115,10 +113,10 @@ public abstract class AbstractUpdateRule implements IUpdateRule {
     public static class PropagationResult {
         private final Term[] subs;
         private final boolean changeFlag;
-        private final ArrayOfQuantifiableVariable[] vars;
+        private final ImmutableArray<QuantifiableVariable>[] vars;
         
         public PropagationResult(Term[] subs, 
-				 ArrayOfQuantifiableVariable[] vars,
+				 ImmutableArray<QuantifiableVariable>[] vars,
 				 boolean changeFlag) {
             this.subs = subs;
             this.vars = vars;
@@ -132,7 +130,7 @@ public abstract class AbstractUpdateRule implements IUpdateRule {
             return subs;
         }
         
-        public ArrayOfQuantifiableVariable[] getBoundVariables() {
+        public ImmutableArray<QuantifiableVariable>[] getBoundVariables() {
             return vars;
         }
         /**
@@ -173,15 +171,15 @@ public abstract class AbstractUpdateRule implements IUpdateRule {
             UpdateSimplifierTermFactory.DEFAULT;
 
         private int locNum;
-        private final ArrayOfAssignmentPair pairs;
+        private final ImmutableArray<AssignmentPair> pairs;
         private AssignmentPair currentPair;
 
-        public IterateAssignmentPairsIfExCascade (ArrayOfAssignmentPair pairs) {
+        public IterateAssignmentPairsIfExCascade (ImmutableArray<AssignmentPair> pairs) {
             this.pairs = pairs;
             this.locNum = pairs.size ();
         }
 
-        public ArrayOfQuantifiableVariable getMinimizedVars () {
+        public ImmutableArray<QuantifiableVariable> getMinimizedVars () {
             return getCurrentPair ().boundVars ();
         }
 
@@ -196,7 +194,7 @@ public abstract class AbstractUpdateRule implements IUpdateRule {
         public void next () {
             --locNum;
             currentPair =
-                utf.resolveCollisions ( pairs.getAssignmentPair ( locNum ),
+                utf.resolveCollisions ( pairs.get ( locNum ),
                                         criticalVars () );
         }
 
@@ -210,12 +208,12 @@ public abstract class AbstractUpdateRule implements IUpdateRule {
          * by subclasses to give a hint about which variables that are bound in
          * the treated update have to be renamed
          */
-        protected abstract SetOfQuantifiableVariable criticalVars ();
+        protected abstract ImmutableSet<QuantifiableVariable> criticalVars ();
 
-        protected static SetOfQuantifiableVariable freeVars (ArrayOfTerm terms) {
-            SetOfQuantifiableVariable res = SetAsListOfQuantifiableVariable.EMPTY_SET;
+        protected static ImmutableSet<QuantifiableVariable> freeVars (ImmutableArray<Term> terms) {
+            ImmutableSet<QuantifiableVariable> res = DefaultImmutableSet.<QuantifiableVariable>nil();
             for ( int i = 0; i != terms.size (); ++i )
-                res = res.union ( terms.getTerm ( i ).freeVars () );
+                res = res.union ( terms.get ( i ).freeVars () );
             return res;
         }
     }

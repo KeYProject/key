@@ -17,8 +17,14 @@
  */
 package de.uka.ilkd.key.rule;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.Stack;
 
+import de.uka.ilkd.key.collection.ImmutableArray;
+import de.uka.ilkd.key.collection.ImmutableMap;
+import de.uka.ilkd.key.collection.DefaultImmutableMap;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.visitor.ProgramContextAdder;
@@ -39,8 +45,8 @@ public class SyntacticalReplaceVisitor extends Visitor {
 
     private final SVInstantiations svInst;
     private final Constraint metavariableInst;
-    private MapFromSchemaVariableToTerm newInstantiations =
-                                MapAsListFromSchemaVariableToTerm.EMPTY_MAP;
+    private ImmutableMap<SchemaVariable,Term> newInstantiations =
+                                DefaultImmutableMap.<SchemaVariable,Term>nilMap();
     private final boolean forceSVInst;
     private final Name svInstBasename;
     private Services services;
@@ -58,12 +64,12 @@ public class SyntacticalReplaceVisitor extends Visitor {
      */
     private final Stack<Object> subStack; //of Term (and Boolean)
     private final TermFactory tf = TermFactory.DEFAULT;
-    private final Boolean newMarker = new Boolean(true);
+    private final Boolean newMarker = Boolean.TRUE;
     
     /** used to indicate if variables have changed */
     private final BooleanContainer varsChanged = new BooleanContainer();
     
-    /** an empty array for resourse optimisation*/
+    /** an empty array for resource optimisation*/
     private static final 
       QuantifiableVariable[] EMPTY_QUANTIFIABLE_VARS = new QuantifiableVariable[0];
 
@@ -157,7 +163,7 @@ public class SyntacticalReplaceVisitor extends Visitor {
     }
 
     private JavaBlock replacePrg(SVInstantiations svInst, JavaBlock jb) {
-	if ( svInst == SVInstantiations.EMPTY_SVINSTANTIATIONS ) {
+        if ( svInst.isEmpty() ) {
 	    return jb;
 	}
 	ProgramReplaceVisitor trans;
@@ -221,9 +227,7 @@ public class SyntacticalReplaceVisitor extends Visitor {
      * are returned by the method <code>iterator</code>
      */
     private void push (Collection<Object> store) {
-        final Iterator<Object> it = store.iterator ();
-        while ( it.hasNext () )
-            subStack.push ( it.next () );
+        for (Object aStore : store) subStack.push(aStore);
     }
 
     private void pushNew(Object t) {
@@ -239,9 +243,9 @@ public class SyntacticalReplaceVisitor extends Visitor {
 	final LinkedList<Object> store = new LinkedList<Object>();
 	popN ( posFromTop, store );
 
-	for (int i = 0; i<t.length; i++) {
-	    pushNew(t[i]);	
-	}
+        for (Object aT : t) {
+            pushNew(aT);
+        }
 
         push ( store );
     }
@@ -256,9 +260,9 @@ public class SyntacticalReplaceVisitor extends Visitor {
 	popN ( length, new LinkedList<Object> () );
 
 	// add new 
-	for (int i = 0; i<t.length; i++) {	    
-	    pushNew(t[i]);	
-	}
+        for (Object aT : t) {
+            pushNew(aT);
+        }
 
         push ( store );
     }
@@ -364,7 +368,7 @@ public class SyntacticalReplaceVisitor extends Visitor {
 	    } else {
                 if (originalOp instanceof ArrayOp) {
                     final int posInStack = op.arity() - op.locationSubtermsEnd(i);
-                    newOps[i] = (Location) instantiateArrayOperator((ArrayOp) originalOp, posInStack);
+                    newOps[i] = instantiateArrayOperator((ArrayOp) originalOp, posInStack);
                 } else {
                     newOps[i] = (Location) instantiateOperator(originalOp);
                 }
@@ -450,10 +454,10 @@ public class SyntacticalReplaceVisitor extends Visitor {
     private Operator instantiateNRFunctionWithExplicitDependencies
     	(NRFunctionWithExplicitDependencies nrFunc) {
         final Location[] locs = new Location[nrFunc.dependencies().size()];
-        final ArrayOfLocation patternDeps = nrFunc.dependencies();
+        final ImmutableArray<Location> patternDeps = nrFunc.dependencies();
         boolean instantiationNecessary = false;
         for (int i = 0; i<locs.length; i++) {
-            Location loc = patternDeps.getLocation(i);            
+            Location loc = patternDeps.get(i);            
             if (loc instanceof SchemaVariable) {                
                 Object o = svInst.getInstantiation((SchemaVariable)loc); 
                 if (o instanceof Term) {
@@ -472,22 +476,23 @@ public class SyntacticalReplaceVisitor extends Visitor {
         // HACK
         String name = nrFunc.name().toString();
         name = name.substring(0, name.indexOf("[")+1);
-        for (int i = 0; i<locs.length; i++) {
-            name += locs[i].name();
+        for (Location loc : locs) {
+            name += loc.name();
             name += ";";
         }
         name += "]";
         return NRFunctionWithExplicitDependencies.
-        	getSymbol(new Name(name), new ArrayOfLocation(locs));
+        	getSymbol(new Name(name), new ImmutableArray<Location>(locs));
     }
     
-    private ArrayOfQuantifiableVariable[] instantiateBoundVariables(Term visited) {
+    private ImmutableArray<QuantifiableVariable>[] instantiateBoundVariables(Term visited) {
         boolean containsBoundVars = false;
-        ArrayOfQuantifiableVariable[] boundVars = 
-            new ArrayOfQuantifiableVariable[visited.arity()];
-        
+
+        ImmutableArray<QuantifiableVariable>[] boundVars = 
+            new ImmutableArray[visited.arity()];
+
         for (int i = 0, arity = visited.arity(); i < arity; i++) {
-            final ArrayOfQuantifiableVariable vBoundVars =
+            final ImmutableArray<QuantifiableVariable> vBoundVars =
                 visited.varsBoundHere(i);
            
         
@@ -495,9 +500,9 @@ public class SyntacticalReplaceVisitor extends Visitor {
                     new QuantifiableVariable[vBoundVars.size()]
                     : EMPTY_QUANTIFIABLE_VARS;
                     
-            for (int j = 0, size = vBoundVars.size(); j < size; j++) {                 
+            for (int j = 0, size = vBoundVars.size(); j < size; j++) {
                 containsBoundVars = true;
-                QuantifiableVariable boundVar = vBoundVars.getQuantifiableVariable(j);
+                QuantifiableVariable boundVar = vBoundVars.get(j);
                 if (boundVar instanceof SchemaVariable) {
                     final SortedSchemaVariable boundSchemaVariable = 
                         (SortedSchemaVariable) boundVar;
@@ -519,7 +524,7 @@ public class SyntacticalReplaceVisitor extends Visitor {
                 newVars[j] = boundVar;                    
             }
             boundVars[i] =  varsChanged.val() ?                     
-                    new ArrayOfQuantifiableVariable(newVars) : vBoundVars;                
+                    new ImmutableArray<QuantifiableVariable>(newVars) : vBoundVars;                
         }           
         
         if (!containsBoundVars) {
@@ -529,17 +534,24 @@ public class SyntacticalReplaceVisitor extends Visitor {
     }
     
 
+    /**
+     * if in forceSVInst mode and a metavariable could not be created, execution is 
+     * aborted by a thrown IllegalInstantiationException. If you start this visitor in
+     * forceSVInst mode you have to take care of catching this exception
+     */
     public void visit(Term visited) {
-        // Sort equality has to be ensured before calling this method
+	// Sort equality has to be ensured before calling this method
         final Operator visitedOp = visited.op();
         if (visitedOp instanceof SortedSchemaVariable
                 && svInst.isInstantiated((SchemaVariable) visitedOp)
                 && (!((SchemaVariable) visitedOp).isListSV())) {
             pushNew(toTerm(svInst.getInstantiation((SchemaVariable) visitedOp)));
         } else if (forceSVInst && visitedOp instanceof SortedSchemaVariable
-                && ((SchemaVariable) visitedOp).isTermSV()
-                && instantiateWithMV(visited)) {
-            // then we are done ...
+                && ((SchemaVariable) visitedOp).isTermSV()) {
+            	if (!instantiateWithMV(visited)) {
+            	    throw new IllegalInstantiationException("Could not force instantiation with metavariable");
+            	}
+                // then we are done ...
         } else if ((visitedOp instanceof Metavariable)
                 && metavariableInst.getInstantiation((Metavariable) visitedOp) != visitedOp) {
             pushNew(metavariableInst.getInstantiation((Metavariable) visitedOp));
@@ -572,7 +584,7 @@ public class SyntacticalReplaceVisitor extends Visitor {
             
            // instantiate bound variables            
            varsChanged.setVal(false); // reset variable change flag
-           final ArrayOfQuantifiableVariable[] boundVars = 
+           final ImmutableArray<QuantifiableVariable>[] boundVars = 
                instantiateBoundVariables(visited);
             
             Term[] neededsubs = neededSubs(newOp.arity());
@@ -695,7 +707,7 @@ public class SyntacticalReplaceVisitor extends Visitor {
      * variables, or null if some schema variables could not be
      * instantiated
      */
-    public MapFromSchemaVariableToTerm getNewInstantiations () {
+    public ImmutableMap<SchemaVariable,Term> getNewInstantiations () {
 	return newInstantiations;
     }
 

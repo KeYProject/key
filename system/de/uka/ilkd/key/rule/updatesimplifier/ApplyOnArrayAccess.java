@@ -9,8 +9,9 @@
 //
 package de.uka.ilkd.key.rule.updatesimplifier;
 
+import de.uka.ilkd.key.collection.ImmutableArray;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.ArrayOfTerm;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.*;
@@ -85,7 +86,7 @@ public class ApplyOnArrayAccess extends ApplyOnAccessTerm {
                                             Update update,
                                             Term target) {
         return new ArrayIfExCascade ( update.getAssignmentPairs ( (Location)target.op () ),
-                                      new ArrayOfTerm ( pr.getSimplifiedSubterms () ),
+                                      new ImmutableArray<Term> ( pr.getSimplifiedSubterms () ),
                                       (Location)target.op () );
     } 
 
@@ -103,11 +104,11 @@ public class ApplyOnArrayAccess extends ApplyOnAccessTerm {
                                IterateAssignmentPairsIfExCascade {
 
         private final Location                  targetLoc;
-        private final ArrayOfTerm               targetSubs;
-        private final SetOfQuantifiableVariable criticalVars;
+        private final ImmutableArray<Term>               targetSubs;
+        private final ImmutableSet<QuantifiableVariable> criticalVars;
 
-        public ArrayIfExCascade (ArrayOfAssignmentPair pairs,
-                                 ArrayOfTerm targetSubs,
+        public ArrayIfExCascade (ImmutableArray<AssignmentPair> pairs,
+                                 ImmutableArray<Term> targetSubs,
                                  Location targetLoc) {
             super ( pairs );
             this.targetSubs = targetSubs;
@@ -121,10 +122,10 @@ public class ApplyOnArrayAccess extends ApplyOnAccessTerm {
 
             Term res = getCurrentPair ().guard ();
             final Term eqObjects =
-                compareObjects ( targetSubs.getTerm ( 0 ),
+                compareObjects ( targetSubs.get ( 0 ),
                                  getCurrentPair ().locationSubs ()[0] );
             final Term eqIndex =
-                tf.createEqualityTerm ( targetSubs.getTerm ( 1 ),
+                tf.createEqualityTerm ( targetSubs.get ( 1 ),
                                         getCurrentPair ().locationSubs ()[1] );
             res = tf.createJunctorTermAndSimplify ( Op.AND, res, eqObjects );
             res = tf.createJunctorTermAndSimplify ( Op.AND, res, eqIndex );
@@ -134,7 +135,7 @@ public class ApplyOnArrayAccess extends ApplyOnAccessTerm {
                 // in this case a conjunction of conditions has to be used
                 // as the transaction number needs to be checked as well  
                 final Term eqTrans =
-                    tf.createEqualityTerm ( targetSubs.getTerm ( 2 ),
+                    tf.createEqualityTerm ( targetSubs.get ( 2 ),
                                             getCurrentPair ().locationSubs ()[2] );
                 res = tf.createJunctorTermAndSimplify ( Op.AND, res, eqTrans );
             }
@@ -142,7 +143,7 @@ public class ApplyOnArrayAccess extends ApplyOnAccessTerm {
             return res;
         }
         
-        protected SetOfQuantifiableVariable criticalVars () {
+        protected ImmutableSet<QuantifiableVariable> criticalVars () {
             return criticalVars;
         }
     }

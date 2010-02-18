@@ -10,27 +10,31 @@
 
 package de.uka.ilkd.key.logic.sort;
 
+import java.util.Iterator;
+
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.logic.Name;
 
 public class PrimitiveSort extends AbstractNonCollectionSort {
     
-    private static final SetOfSort EMPTY_SORT_SET 
-    = SetAsListOfSort.EMPTY_SET;
+    private static final ImmutableSet<Sort> EMPTY_SORT_SET 
+    = DefaultImmutableSet.<Sort>nil();
 
     /** direct supersorts */
-    SetOfSort ext = EMPTY_SORT_SET;
+    ImmutableSet<Sort> ext = EMPTY_SORT_SET;
     
     /** creates a Sort (with a new equality symbol for this sort) */
     public PrimitiveSort(Name name) {
         super(name);        
     }
     
-    public PrimitiveSort(Name name, SetOfSort ext) {
+    public PrimitiveSort(Name name, ImmutableSet<Sort> ext) {
         super( name );
         this.ext = ext;        
     }
    
-    public SetOfSort extendsSorts () {
+    public ImmutableSet<Sort> extendsSorts () {
         return ext;
     }
     
@@ -45,11 +49,9 @@ public class PrimitiveSort extends AbstractNonCollectionSort {
         if (!(sort instanceof PrimitiveSort)) {
             return false;
         }
-                             
-        final IteratorOfSort it = extendsSorts().iterator();
-        while (it.hasNext()) {
-            final Sort s = it.next();
-            assert s!=null;
+
+        for (final Sort s : extendsSorts()) {
+            assert s != null;
             if (s == sort || s.extendsTrans(sort)) {
                 return true;
             }

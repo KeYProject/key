@@ -11,15 +11,21 @@
 
 package de.uka.ilkd.key.proof;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.MutableTreeNode;
 
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.proof.mgt.ProofCorrectnessMgt;
 import de.uka.ilkd.key.proof.mgt.RuleJustification;
-import de.uka.ilkd.key.rule.*;
+import de.uka.ilkd.key.rule.BuiltInRule;
+import de.uka.ilkd.key.rule.NoPosTacletApp;
+import de.uka.ilkd.key.rule.Taclet;
 
 public class RuleTreeModel extends DefaultTreeModel {
     
@@ -97,7 +103,7 @@ public class RuleTreeModel extends DefaultTreeModel {
         }
     }
     
-    private List<NoPosTacletApp> sort(SetOfNoPosTacletApp apps) {
+    private List<NoPosTacletApp> sort(ImmutableSet<NoPosTacletApp> apps) {
         final ArrayList<NoPosTacletApp> l = 
             new ArrayList<NoPosTacletApp>(apps.size());
         

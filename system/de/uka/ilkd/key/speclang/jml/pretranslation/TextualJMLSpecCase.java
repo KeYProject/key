@@ -6,32 +6,19 @@
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
 //
-//
 
 package de.uka.ilkd.key.speclang.jml.pretranslation;
 
-import de.uka.ilkd.key.collection.ListOfString;
-import de.uka.ilkd.key.speclang.IteratorOfPositionedString;
-import de.uka.ilkd.key.speclang.ListOfPositionedString;
+import java.util.Iterator;
+
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.speclang.PositionedString;
-import de.uka.ilkd.key.speclang.SLListOfPositionedString;
 
 
 public class TextualJMLSpecCase extends TextualJMLConstruct {
 
     private final Behavior behavior;
-    private ListOfPositionedString requires     
-            = SLListOfPositionedString.EMPTY_LIST;
-    private ListOfPositionedString assignable   
-            = SLListOfPositionedString.EMPTY_LIST;
-    private ListOfPositionedString ensures      
-            = SLListOfPositionedString.EMPTY_LIST;
-    private ListOfPositionedString signals      
-            = SLListOfPositionedString.EMPTY_LIST;
-    private ListOfPositionedString signalsOnly 
-            = SLListOfPositionedString.EMPTY_LIST;
-    private ListOfPositionedString diverges     
-            = SLListOfPositionedString.EMPTY_LIST;
     private PositionedString workingSpace = null;
     private PositionedString constructedWorkingSpace = null;
     private PositionedString reentrantWorkingSpace = null;
@@ -39,19 +26,37 @@ public class TextualJMLSpecCase extends TextualJMLConstruct {
 
 
     
-    public TextualJMLSpecCase(ListOfString mods, Behavior behavior) {
+    private ImmutableList<PositionedString> requires     
+            = ImmutableSLList.<PositionedString>nil();
+    private ImmutableList<PositionedString> assignable   
+            = ImmutableSLList.<PositionedString>nil();
+    private ImmutableList<PositionedString> ensures      
+            = ImmutableSLList.<PositionedString>nil();
+    private ImmutableList<PositionedString> signals      
+            = ImmutableSLList.<PositionedString>nil();
+    private ImmutableList<PositionedString> signalsOnly 
+            = ImmutableSLList.<PositionedString>nil();
+    private ImmutableList<PositionedString> diverges     
+            = ImmutableSLList.<PositionedString>nil();
+    private PositionedString name = new PositionedString("");
+
+    
+    public TextualJMLSpecCase(ImmutableList<String> mods, Behavior behavior) {
         super(mods);
         assert behavior != null;
         this.behavior = behavior;
     }
     
-    
+    public void addName(PositionedString name) {
+	this.name = name;
+    }
+
     public void addRequires(PositionedString ps) {
         requires = requires.append(ps);
     }
     
 
-    public void addRequires(ListOfPositionedString l) {
+    public void addRequires(ImmutableList<PositionedString> l) {
         requires = requires.append(l);
     }
     
@@ -105,27 +110,30 @@ public class TextualJMLSpecCase extends TextualJMLConstruct {
     }
     
     
-    public ListOfPositionedString getRequires() {
+    public ImmutableList<PositionedString> getRequires() {
         return requires;
     }
 
     
-    public ListOfPositionedString getAssignable() {
+    public ImmutableList<PositionedString> getAssignable() {
         return assignable;
     }
 
     
-    public ListOfPositionedString getEnsures() {
+    public ImmutableList<PositionedString> getEnsures() {
         return ensures;
     }
-       
 
-    public ListOfPositionedString getSignals() {
+    public PositionedString getName() {
+	return name;
+    }
+
+    public ImmutableList<PositionedString> getSignals() {
         return signals;
     }
     
 
-    public ListOfPositionedString getSignalsOnly() {
+    public ImmutableList<PositionedString> getSignalsOnly() {
         return signalsOnly;
     }
     
@@ -149,39 +157,39 @@ public class TextualJMLSpecCase extends TextualJMLConstruct {
         return reentrantWorkingSpace;
     }
     
-    public ListOfPositionedString getDiverges() {
+    public ImmutableList<PositionedString> getDiverges() {
         return diverges;
     }
     
     
     public String toString() {
         StringBuffer sb = new StringBuffer();
-        IteratorOfPositionedString it;
-        
-        sb.append(behavior + "\n");
+        Iterator<PositionedString> it;
+
+        sb.append(behavior).append("\n");
         it = requires.iterator();
         while(it.hasNext()) {
-            sb.append("requires: " + it.next() + "\n");
+            sb.append("requires: ").append(it.next()).append("\n");
         }
         it = assignable.iterator();
         while(it.hasNext()) {
-            sb.append("assignable: " + it.next() + "\n");
+            sb.append("assignable: ").append(it.next()).append("\n");
         }
         it = ensures.iterator();
         while(it.hasNext()) {
-            sb.append("ensures: " + it.next() + "\n");
+            sb.append("ensures: ").append(it.next()).append("\n");
         }
         it = signals.iterator();
         while(it.hasNext()) {
-            sb.append("signals: " + it.next() + "\n");
+            sb.append("signals: ").append(it.next()).append("\n");
         }
         it = signalsOnly.iterator();
         while(it.hasNext()) {
-            sb.append("signals_only: " + it.next() + "\n");
+            sb.append("signals_only: ").append(it.next()).append("\n");
         }
         it = diverges.iterator();
         while(it.hasNext()) {
-            sb.append("diverges: " + it.next() + "\n");
+            sb.append("diverges: ").append(it.next()).append("\n");
         }
         
         return sb.toString();

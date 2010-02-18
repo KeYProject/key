@@ -31,7 +31,7 @@ public class TacletVariableSVCollector extends TacletSchemaVariableCollector {
 	for (int j=0; j<t.arity(); j++) {
 	    for (int i=0;i<t.varsBoundHere(j).size();i++) {
 		QuantifiableVariable boundVar = t.varsBoundHere(j).
-		    getQuantifiableVariable(i);
+		    get(i);
 		if (boundVar instanceof SchemaVariable) {
 		    varList = varList.prepend((SchemaVariable)boundVar);
 		}

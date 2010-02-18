@@ -7,25 +7,18 @@
 // See LICENSE.TXT for details.
 //
 //
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General Public License.
-// See LICENSE.TXT for details.
-//
-//
 
 package de.uka.ilkd.key.proof;
 
 import java.io.StringReader;
+import java.util.Iterator;
 import java.util.Vector;
 
 import javax.swing.table.AbstractTableModel;
 
-import de.uka.ilkd.key.collection.ListOfString;
-import de.uka.ilkd.key.collection.SLListOfString;
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.reference.TypeReference;
@@ -33,7 +26,6 @@ import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.*;
 import de.uka.ilkd.key.parser.*;
-import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.rule.NewVarcond;
 import de.uka.ilkd.key.rule.TacletApp;
@@ -98,7 +90,7 @@ public class TacletInstantiationsTableModel extends AbstractTableModel {
     */
     private Vector createEntryArray(TacletApp tacletApp) {
         Vector rowVec = new Vector();
-        IteratorOfSchemaVariable it = tacletApp.instantiations().svIterator();
+        Iterator<SchemaVariable> it = tacletApp.instantiations().svIterator();
         int count = 0;
 
         while (it.hasNext()) {
@@ -114,8 +106,8 @@ public class TacletInstantiationsTableModel extends AbstractTableModel {
 
         noEditRow = count - 1;
 
-        IteratorOfSchemaVariable varIt = tacletApp.uninstantiatedVars().iterator();
-        ListOfString proposals = SLListOfString.EMPTY_LIST;
+        Iterator<SchemaVariable> varIt = tacletApp.uninstantiatedVars().iterator();
+        ImmutableList<String> proposals = ImmutableSLList.<String>nil();
 
         while (varIt.hasNext()) {
             Object[] column = new Object[2];
@@ -148,7 +140,7 @@ public class TacletInstantiationsTableModel extends AbstractTableModel {
 
     /** adds an instantiation of a schemavariable */
     public void addInstantiationEntry(int row, Term instantiation) {
-        ((Object[])entries.get(row))[1] = instantiation;
+	((Object[])entries.get(row))[1] = instantiation;
     }
 
     /** return the rule application which is the table models base
@@ -253,12 +245,12 @@ public class TacletInstantiationsTableModel extends AbstractTableModel {
         return getValueAt(irow, 1) != null && ((String)getValueAt(irow,1)).length() != 0;
     }
 
-    private SetOfLocationDescriptor parseLocationList(int irow) throws ParserException{
+    private ImmutableSet<LocationDescriptor> parseLocationList(int irow) throws ParserException{
         String instantiation = (String) getValueAt(irow, 1);
         if (instantiation == null) {
             instantiation = "";
         }
-        SetOfLocationDescriptor result = null;
+        ImmutableSet<LocationDescriptor> result = null;
         try{
             result = (new KeYParser(ParserMode.TERM, new KeYLexer(new StringReader(instantiation),
                                              services.getExceptionHandler()),
@@ -541,8 +533,8 @@ public class TacletInstantiationsTableModel extends AbstractTableModel {
                     result = result.addCheckedInstantiation(sv, pe, services, true);
                 } else if (sv.isListSV()){
                     try{
-                        SetOfLocationDescriptor s = parseLocationList(irow);
-                        result = result.addInstantiation(sv, Array.reverse(s.toArray()), true);
+                        ImmutableSet<LocationDescriptor> s = parseLocationList(irow);
+                        result = result.addInstantiation(sv, Array.reverse(s.toArray(new LocationDescriptor[s.size()])), true);
                     }catch (ParserException pe) {
                         Location loc = pe.getLocation();
                         if (loc != null) {
@@ -595,7 +587,7 @@ public class TacletInstantiationsTableModel extends AbstractTableModel {
     /** sets the Value of the cell */
     public void setValueAt(Object instantiation, int rowIndex,
                            int columnIndex) {
-        ((Object[])entries.get(rowIndex))[columnIndex] = instantiation;
+	((Object[])entries.get(rowIndex))[columnIndex] = instantiation;
     }
 
     /** get value at the specified row and col
@@ -619,12 +611,11 @@ public class TacletInstantiationsTableModel extends AbstractTableModel {
     }
 
 
-    public static String getNameProposalForMetavariable(Goal goal,
+    public static String getBaseNameProposalForMetavariable(Goal goal,
                                                         TacletApp      p_app,
                                                         SchemaVariable p_var) {
         String s = VariableNameProposer.
             createBaseNameProposalBasedOnCorrespondence(p_app, p_var ).toUpperCase();
-        s += "_"+MetavariableDeliverer.mv_Counter(s, goal);
         return s;
     }
 

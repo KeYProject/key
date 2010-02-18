@@ -5,15 +5,13 @@
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
-//
-//
 package de.uka.ilkd.key.java;
 
 import java.io.File;
 
+import junit.framework.TestCase;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.util.HelperClassForTests;
-import junit.framework.TestCase;
 
 public class TestJavaCardDLJavaExtensions extends TestCase {
 

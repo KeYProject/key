@@ -10,20 +10,25 @@
 
 package de.uka.ilkd.key.rule.encapsulation;
 
+import java.util.Iterator;
+
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableSet;
+
 
 class TypeSchemeAndConstraint implements TypeSchemeConstraint {
-    private ListOfTypeSchemeConstraint constraints;
+    private ImmutableList<TypeSchemeConstraint> constraints;
     
     
-    public TypeSchemeAndConstraint(ListOfTypeSchemeConstraint constraints) {
+    public TypeSchemeAndConstraint(ImmutableList<TypeSchemeConstraint> constraints) {
         this.constraints = constraints;
     }
     
 
     public boolean evaluate() {
-        IteratorOfTypeSchemeConstraint it = constraints.iterator();
-        while(it.hasNext()) { 
-            if(!it.next().evaluate()) {
+        for (TypeSchemeConstraint constraint : constraints) {
+            if (!constraint.evaluate()) {
                 return false;
             }
         }
@@ -32,13 +37,12 @@ class TypeSchemeAndConstraint implements TypeSchemeConstraint {
     }
 
         
-    public SetOfTypeSchemeVariable getFreeVars() {
-        SetOfTypeSchemeVariable result 
-                        = SetAsListOfTypeSchemeVariable.EMPTY_SET;
-        
-        IteratorOfTypeSchemeConstraint it = constraints.iterator();
-        while(it.hasNext()) {
-             result = result.union(it.next().getFreeVars());
+    public ImmutableSet<TypeSchemeVariable> getFreeVars() {
+        ImmutableSet<TypeSchemeVariable> result 
+                        = DefaultImmutableSet.<TypeSchemeVariable>nil();
+
+        for (TypeSchemeConstraint constraint : constraints) {
+            result = result.union(constraint.getFreeVars());
         }
         
         return result;
@@ -47,10 +51,9 @@ class TypeSchemeAndConstraint implements TypeSchemeConstraint {
     
     public String toString() {
         String result = "and(";
-        
-        IteratorOfTypeSchemeConstraint it = constraints.iterator();
-        while(it.hasNext()) {
-            result += it.next() + ", ";
+
+        for (TypeSchemeConstraint constraint : constraints) {
+            result += constraint + ", ";
         }
         
         if(constraints.size() > 0) {

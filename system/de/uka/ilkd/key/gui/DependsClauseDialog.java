@@ -16,12 +16,13 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.io.StringReader;
+import java.util.Iterator;
 
 import javax.swing.*;
 
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.logic.EverythingLocationDescriptor;
-import de.uka.ilkd.key.logic.IteratorOfLocationDescriptor;
-import de.uka.ilkd.key.logic.SetOfLocationDescriptor;
+import de.uka.ilkd.key.logic.LocationDescriptor;
 import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.parser.KeYLexer;
 import de.uka.ilkd.key.parser.KeYParser;
@@ -40,15 +41,15 @@ public class DependsClauseDialog extends JDialog {
     private static final int LINE_WIDTH = 70;
     
     private final InitConfig initConfig;
-    private final SetOfLocationDescriptor defaultClause;
+    private final ImmutableSet<LocationDescriptor> defaultClause;
     private final JTextArea textArea;
-    private SetOfLocationDescriptor currentClause;
+    private ImmutableSet<LocationDescriptor> currentClause;
     private boolean successful = false;
 
 
     public DependsClauseDialog(ClassInvariant inv,
                                InitConfig ic,
-                               SetOfLocationDescriptor defaultClause) {
+                               ImmutableSet<LocationDescriptor> defaultClause) {
         super(new JFrame(),
               "Depends clause for \"" + inv 
               + "\"",
@@ -133,12 +134,11 @@ public class DependsClauseDialog extends JDialog {
                             initConfig.getServices(),
                             initConfig.namespaces());
         try {
-            SetOfLocationDescriptor locations = parser.location_list();
+            ImmutableSet<LocationDescriptor> locations = parser.location_list();
             
             //check for "*"-locations, which are not allowed here
-            IteratorOfLocationDescriptor it = locations.iterator();
-            while(it.hasNext()) {
-                if(it.next() instanceof EverythingLocationDescriptor) {
+            for (LocationDescriptor location : locations) {
+                if (location instanceof EverythingLocationDescriptor) {
                     throw new Exception(
                             "Please use a non-trivial depends clause.");
                 }
@@ -162,7 +162,7 @@ public class DependsClauseDialog extends JDialog {
     }
 
 
-    public SetOfLocationDescriptor getDependsClause() {
+    public ImmutableSet<LocationDescriptor> getDependsClause() {
         return currentClause;
     }
 }

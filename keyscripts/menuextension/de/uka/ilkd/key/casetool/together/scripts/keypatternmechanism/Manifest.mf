@@ -1,3 +1,0 @@
-Name: Generating KeYPattern-Menus
-Time: Startup
-Main-Class: de.uka.ilkd.key.casetool.together.scripts.patternmechanism.KeYPatternMechanism

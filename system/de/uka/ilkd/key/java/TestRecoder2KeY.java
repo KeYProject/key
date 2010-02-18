@@ -13,19 +13,17 @@ package de.uka.ilkd.key.java;
 import java.io.FileReader;
 import java.io.IOException;
 
-import org.apache.log4j.Logger;
-
 import junit.framework.TestCase;
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.expression.Operator;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.op.ListOfProgramVariable;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.SLListOfProgramVariable;
 import de.uka.ilkd.key.rule.TacletForTests;
 
 public class TestRecoder2KeY extends TestCase {
@@ -130,7 +128,7 @@ public class TestRecoder2KeY extends TestCase {
     public void testReadBlockWithContext() {
 	ProgramVariable pv = new LocationVariable
 	    (new ProgramElementName("i"), new KeYJavaType(PrimitiveType.JAVA_INT));
-	ListOfProgramVariable list = SLListOfProgramVariable.EMPTY_LIST.prepend(pv);	
+	ImmutableList<ProgramVariable> list = ImmutableSLList.<ProgramVariable>nil().prepend(pv);	
 	JavaBlock block = c2k.readBlock("{ i = 2; }", c2k.createContext(list));
 	ProgramVariable prgVarCmp = (ProgramVariable)	    
 	    ((Operator)((StatementBlock)block.program()).
@@ -173,9 +171,9 @@ public class TestRecoder2KeY extends TestCase {
      * blanks and line feeds
      */
     public void testJClasses() {
-	for (int i=0; i<jclasses.length; i++) {
-	    testClass(jclasses[i]);
-	}
+        for (String jclass : jclasses) {
+            testClass(jclass);
+        }
     }
 
 
@@ -205,7 +203,7 @@ public class TestRecoder2KeY extends TestCase {
 	    jb = c2k.recoderBlock("{int len; int[] i = new int[] {0,1,2} ;  len = i.length;}",
 				  c2k.createEmptyContext());
 	System.out.println("Read: "+jb);
-	recoder.java.StatementBlock block = (recoder.java.StatementBlock) jb;
+	recoder.java.StatementBlock block = jb;
 	recoder.java.ProgramElement pe = block.getChildAt(2);
 	System.out.println("Look at "+pe);
 	//	de.uka.ilkd.key.java.CopyAssignment ca = ;

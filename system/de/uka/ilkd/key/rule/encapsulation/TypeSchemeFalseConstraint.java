@@ -10,6 +10,9 @@
 
 package de.uka.ilkd.key.rule.encapsulation;
 
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableSet;
+
 
 class TypeSchemeFalseConstraint implements TypeSchemeConstraint {
     public boolean evaluate() {
@@ -17,8 +20,8 @@ class TypeSchemeFalseConstraint implements TypeSchemeConstraint {
     }
 
         
-    public SetOfTypeSchemeVariable getFreeVars() {
-        return SetAsListOfTypeSchemeVariable.EMPTY_SET;
+    public ImmutableSet<TypeSchemeVariable> getFreeVars() {
+        return DefaultImmutableSet.<TypeSchemeVariable>nil();
     }
     
     

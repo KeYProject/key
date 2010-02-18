@@ -56,11 +56,8 @@ public class OclDifference extends TermSymbol {
 	    || collSort1.getCollectionKind() != CollectionSort.SET) {
 	    return false;
 	}
-	if (!collSort0.getElemSort().extendsTrans(collSort1.getElemSort())
-	    && !collSort1.getElemSort().extendsTrans(collSort0.getElemSort())) {
-	    return false;
-	}
-        return true;
+        return !(!collSort0.getElemSort().extendsTrans(collSort1.getElemSort())
+                && !collSort1.getElemSort().extendsTrans(collSort0.getElemSort()));
     }
     
     public Sort sort(Term[] subTerm) {	

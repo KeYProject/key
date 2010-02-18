@@ -1,3 +1,10 @@
+// This file is part of KeY - Integrated Deductive Software Design
+// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General Public License. 
+// See LICENSE.TXT for details.
 package paycard;
 
 public class LogFile {
@@ -5,7 +12,7 @@ public class LogFile {
 
     /*@ public invariant logArray.length == logFileSize && 
       @     currentRecord < logFileSize && 
-      @     currentRecord >= 0 && \nonnullelements(logArray);
+      @     currentRecord >= 0;
       @*/
 
     private /*@ spec_public @*/ static final int logFileSize = 3;
@@ -23,6 +30,7 @@ public class LogFile {
 
     /*@ public normal_behavior
       @    requires balance >= 0;
+      @    name "Contract for addRecord";      
       @    assignable currentRecord, logArray[*].transactionId, 
       @               logArray[*].balance, logArray[*].empty, 
       @               LogRecord.transactionCounter;
@@ -39,13 +47,13 @@ public class LogFile {
 
     /*@ public normal_behavior
       @    ensures (\forall int i; 0 <= i && i<logArray.length;
-      @             logArray[i].balance <= \result.balance);      
+      @             logArray[i].balance <= \result.balance);
       @ */
     public /*@pure@*/ LogRecord getMaximumRecord(){
 	LogRecord max = logArray[0];
 	int i=1;    
 	/*@ loop_invariant 0<=i && i <= logArray.length 
-          @                && max!=null &&
+          @                && max!=null && \created(max) &&
 	  @   (\forall int j; 0 <= j && j<i; 
 	  @    max.balance >= logArray[j].balance);
 	  @ assignable max, i;

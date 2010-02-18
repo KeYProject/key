@@ -16,7 +16,9 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
-import de.uka.ilkd.key.proof.*;
+import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.Proof;
 
 
 
@@ -129,14 +131,14 @@ public class KeYSelectionModel {
     /** enumerate the possible goal selections, starting with the best
      * one
      */
-    protected class DefaultSelectionIterator implements IteratorOfGoal {
+    protected class DefaultSelectionIterator implements Iterator<Goal> {
 	private static final int POS_START     = 0;
 	private static final int POS_LEAVES    = 1;
 	private static final int POS_GOAL_LIST = 2;
 
 	private int            currentPos = POS_START;
 	private Goal           nextOne;
-	private IteratorOfGoal goalIt;
+	private Iterator<Goal> goalIt;
 	private Iterator<Node> nodeIt;
 
 	public  DefaultSelectionIterator () {
@@ -157,7 +159,7 @@ public class KeYSelectionModel {
 		case POS_LEAVES:
 		    if ( nodeIt == null || !nodeIt.hasNext () ) {
 			currentPos = POS_GOAL_LIST;
-			if ( proof.openGoals() != SLListOfGoal.EMPTY_LIST )
+			if ( !proof.openGoals().isEmpty() )
 			    goalIt = proof.openGoals().iterator();
 			else
 			    goalIt = null;
@@ -198,7 +200,7 @@ public class KeYSelectionModel {
     public void defaultSelection() {		
 	Goal           g       = null;
 	Goal           firstG  = null;
-	IteratorOfGoal it      = new DefaultSelectionIterator ();
+	Iterator<Goal> it      = new DefaultSelectionIterator ();
 	
 	while ( g == null && it.hasNext () ) {
 	    g = it.next ();
@@ -224,7 +226,7 @@ public class KeYSelectionModel {
 	}
 	/*
 	if (selectedNode != null) {
-	    IteratorOfNode nodeIt = selectedNode.leavesIterator();	
+	    Iterator<Node> nodeIt = selectedNode.leavesIterator();	
 	    while (nodeIt.hasNext()) {
 		g = proof.getGoal(nodeIt.next());
 		if (g != null) {
@@ -232,7 +234,7 @@ public class KeYSelectionModel {
 		}
 	    }
 	}
-	if (g == null && proof.openGoals() != SLListOfGoal.EMPTY_LIST ) {	       	    
+	if (g == null && !proof.openGoals().isEmpty() ) {	       	    
 	    g = proof.openGoals().iterator().next();
 	}
 	if (g != null) {

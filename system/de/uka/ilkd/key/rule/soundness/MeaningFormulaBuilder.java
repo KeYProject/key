@@ -10,7 +10,9 @@
 
 package de.uka.ilkd.key.rule.soundness;
 
-import de.uka.ilkd.key.logic.IteratorOfConstrainedFormula;
+import java.util.Iterator;
+
+import de.uka.ilkd.key.logic.ConstrainedFormula;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermFactory;
@@ -64,14 +66,11 @@ public class MeaningFormulaBuilder {
     private boolean isRewriteTacletWithRWorAdd () {
         if ( !isRewriteTaclet () ) return false;
         
-        if ( ( (RewriteTaclet)getTaclet () ).ifSequent () != Sequent.EMPTY_SEQUENT )
+        if ( !getTaclet ().ifSequent ().isEmpty() )
             return true;
 
-        final IteratorOfTacletGoalTemplate it =
-            getTaclet ().goalTemplates ().iterator ();
-            
-        while ( it.hasNext () ) {
-            if ( it.next().sequent () != Sequent.EMPTY_SEQUENT ) return true;
+        for (TacletGoalTemplate tacletGoalTemplate : getTaclet().goalTemplates()) {
+            if (!tacletGoalTemplate.sequent().isEmpty()) return true;
         }
 
         return false;
@@ -96,11 +95,9 @@ public class MeaningFormulaBuilder {
 
     private Term createPremisses() {
         Term res = True ();
-    	final IteratorOfTacletGoalTemplate it =
-    	    getTaclet ().goalTemplates().iterator ();
-    	    
-    	while ( it.hasNext () )
-    	    res = And ( res, createMF ( it.next () ) );
+
+        for (TacletGoalTemplate tacletGoalTemplate : getTaclet().goalTemplates())
+            res = And(res, createMF(tacletGoalTemplate));
     	    
     	return res;
     }
@@ -134,7 +131,7 @@ public class MeaningFormulaBuilder {
 
     private Term createMF ( Sequent p ){
 	Term antec = True ();
-	IteratorOfConstrainedFormula it = p.antecedent().iterator ();
+	Iterator<ConstrainedFormula> it = p.antecedent().iterator ();
     	
 	while ( it.hasNext () )
 	    antec = And ( antec, it.next ().formula () );

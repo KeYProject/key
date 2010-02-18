@@ -12,8 +12,8 @@ package de.uka.ilkd.key.gui.prooftree;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Stack;
+import java.util.WeakHashMap;
 
 import javax.swing.event.EventListenerList;
 import javax.swing.event.TreeModelEvent;
@@ -78,9 +78,43 @@ class GUIProofTreeModel implements TreeModel, java.io.Serializable  {
          Goal g = e.getGoal();
          if (g != null) {
 	     updateTree(getProofTreeNode(g.node()));
-             return;
-         }
+             }
 
+      }
+      
+      /** The proof tree under the node mentioned in the ProofTreeEvent
+       * is in pruning phase. The subtree of node will be removed after this
+       * call but at this point the subtree can still be
+       * traversed (e.g. in order to free the nodes in caches).
+       * The method proofPruned is called, when the nodes are disconnect from
+       * node.
+       */
+      public void proofIsBeingPruned(ProofTreeEvent e){
+          //Maybe the following should happen in GUIProofTreeModel.updateTree ?
+          //In the following all nodes of the pruned subtree are removed 
+          //from proofTreenodes and branchTreeNodes.
+          Node n = e.getNode();
+          final Stack<Node> workingList = new Stack<Node> ();
+          int ccount = n.childrenCount();
+          for(int i=0;i<ccount;i++){
+              Node node = n.child(i);
+              if(node!=null){
+                  workingList.add(node);
+              }
+          }
+          while ( !workingList.empty () ) {
+              Node node = workingList.pop ();
+              proofTreeNodes.remove(node);
+              branchNodes.remove(node);
+              ccount = node.childrenCount();
+              for(int i=0;i<ccount;i++){
+                  n = node.child(i);
+                  if(n!=null){
+                      workingList.add(n);
+                  }
+              }
+          }
+          
       }
 
         public void proofGoalRemoved (ProofTreeEvent e) {
@@ -159,17 +193,18 @@ class GUIProofTreeModel implements TreeModel, java.io.Serializable  {
 	listenerList.remove(TreeModelListener.class, l);
     }
     
-    private boolean hideSubtrees = false;
 
     public boolean hideClosedSubtrees () {
-        return hideSubtrees;
+        return ProofSettings.DEFAULT_SETTINGS.getViewSettings()
+            .getHideClosedSubtrees();
     }
 
-    public void setHideClosedSubtrees (boolean hideSubtrees) {
-        if ( this.hideSubtrees == hideSubtrees )
-            return;
-        this.hideSubtrees = hideSubtrees;
-        updateTree((TreeNode) null);
+    public void setHideClosedSubtrees (boolean hide) {
+        if ( hide != hideClosedSubtrees() ) {
+            ProofSettings.DEFAULT_SETTINGS.getViewSettings()
+                .setHideClosedSubtrees(hide);
+            updateTree((TreeNode) null);
+        }
     }
 
     public boolean isHidingIntermediateProofsteps() {
@@ -355,8 +390,8 @@ class GUIProofTreeModel implements TreeModel, java.io.Serializable  {
      */
     private void updateTree(TreeNode trn) {
         if (trn == null || trn == getRoot()) { // bigger change, redraw whole tree
-	    proofTreeNodes = new HashMap<Node, GUIProofTreeNode>();
-	    branchNodes    = new HashMap<Node, GUIBranchNode>();
+	    proofTreeNodes = new WeakHashMap<Node, GUIProofTreeNode>();
+	    branchNodes    = new WeakHashMap<Node, GUIBranchNode>();
             fireTreeStructureChanged(new Object[]{getRoot()});
             return;
         }
@@ -431,8 +466,8 @@ class GUIProofTreeModel implements TreeModel, java.io.Serializable  {
     // caches for the GUIProofTreeNode and GUIBranchNode objects
     // generated to represent the nodes resp. subtrees of the Proof.
     
-    private HashMap<Node, GUIProofTreeNode> proofTreeNodes = new HashMap<Node, GUIProofTreeNode>();
-    private HashMap<Node, GUIBranchNode> branchNodes    = new HashMap<Node, GUIBranchNode>();
+    private WeakHashMap<Node, GUIProofTreeNode> proofTreeNodes = new WeakHashMap<Node, GUIProofTreeNode>();
+    private WeakHashMap<Node, GUIBranchNode> branchNodes    = new WeakHashMap<Node, GUIBranchNode>();
     
     /** Return the GUIProofTreeNode corresponding to node n, if one
      * has already been generated, and null otherwise.

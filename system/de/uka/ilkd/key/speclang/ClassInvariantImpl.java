@@ -16,6 +16,8 @@ import java.util.Map;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.NamespaceSet;
+import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ParsableVariable;
@@ -27,10 +29,11 @@ import de.uka.ilkd.key.proof.OpReplacer;
 /**
  * Standard implementation of the ClassInvariant interface. 
  */
-public class ClassInvariantImpl implements ClassInvariant {
+public final class ClassInvariantImpl implements ClassInvariant {
     
-    protected static final SignatureVariablesFactory SVN 
+    private static final SignatureVariablesFactory SVN 
         = SignatureVariablesFactory.INSTANCE;
+    private static final TermBuilder TB = TermBuilder.DF;
     
     private final String name;
     private final String displayName;
@@ -78,11 +81,28 @@ public class ClassInvariantImpl implements ClassInvariant {
                 Services services) {
         Map<Operator, Operator> result = new LinkedHashMap<Operator, Operator>();
         
-        if(selfVar != null) {
+        if(selfVar != null && originalSelfVar != null) {
             assert selfVar.sort().extendsTrans(originalSelfVar.sort());
             result.put(originalSelfVar, selfVar);
         }
 
+        return result;
+    }
+    
+    
+    /**
+     * Returns an available name constructed by affixing a counter to the passed 
+     * base name.
+     */
+    private String getNewName(String baseName, Services services) {
+        NamespaceSet namespaces = services.getNamespaces();
+            
+        int i = 0;
+        String result;
+        do {
+            result = baseName + "_" + i++;
+        } while(namespaces.lookup(new Name(result)) != null);
+        
         return result;
     }
 
@@ -109,11 +129,27 @@ public class ClassInvariantImpl implements ClassInvariant {
 
     public FormulaWithAxioms getClosedInv(Services services) {
         Sort sort = getKJT().getSort();
-        String name = sort.name().toString().substring(0, 1).toLowerCase();
+        String baseName = sort.name().toString().substring(0, 1).toLowerCase();
+        String name = getNewName(baseName, services);
         LogicVariable selfVar = new LogicVariable(new Name(name), sort);
         return getOpenInv(selfVar, services).allClose(services);
     }
-  
+    
+    
+    public FormulaWithAxioms getClosedInvExcludingOne(
+	    				ParsableVariable excludedVar, 
+	                                Services services) {
+        Sort sort = getKJT().getSort();
+        String baseName = sort.name().toString().substring(0, 1).toLowerCase();
+        String name = getNewName(baseName, services);
+        LogicVariable quantifVar = new LogicVariable(new Name(name), sort);
+        FormulaWithAxioms openInv = getOpenInv(quantifVar, services);
+        FormulaWithAxioms notSelf 
+        	= new FormulaWithAxioms(TB.not(TB.equals(TB.var(quantifVar), 
+        		                                 TB.var(excludedVar))));        
+        return notSelf.imply(openInv).allClose(services);
+    }
+    
     
     public FormulaWithAxioms getOpenInv(ParsableVariable selfVar, 
                                         Services services) {

@@ -7,16 +7,10 @@
 // See LICENSE.TXT for details.
 //
 //
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2004 Universitaet Karlsruhe, Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
 package de.uka.ilkd.key.rule.metaconstruct;
 
 import de.uka.ilkd.key.java.*;
+import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
 import de.uka.ilkd.key.java.expression.operator.New;
 import de.uka.ilkd.key.java.recoderext.CreateObjectBuilder;
@@ -59,7 +53,7 @@ public class CreateObject extends ProgramMetaConstruct {
   	    return pe;
   	}	
  	
-        return new MethodReference(new ArrayOfExpression(), 
+        return new MethodReference(new ImmutableArray<Expression>(), 
 				   new ProgramElementName
                                    (CreateObjectBuilder.IMPLICIT_OBJECT_CREATE), 
 				   classReference,

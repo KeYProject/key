@@ -1,4 +1,11 @@
 // This file is part of KeY - Integrated Deductive Software Design
+// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General Public License. 
+// See LICENSE.TXT for details.
+// This file is part of KeY - Integrated Deductive Software Design
 
 package de.uka.ilkd.key.java.recoderext;
 
@@ -9,6 +16,7 @@ import recoder.abstraction.*;
 import recoder.java.declaration.TypeDeclaration;
 import recoder.kit.UnitKit;
 import recoder.service.DefaultNameInfo;
+import recoder.service.KeYCrossReferenceSourceInfo;
 import de.uka.ilkd.key.java.ConvertException;
 
 
@@ -20,6 +28,10 @@ import de.uka.ilkd.key.java.ConvertException;
  * 
  * If it records an attempt to register a declaration type twice, a verbose
  * conversion exception is thrown.
+ * 
+ * It also reports a missing "java.lang.Object" definition in a
+ * {@link ConvertException}. Recoder itself usually fails at a random point
+ * with a {@link NullPointerException}.
  * 
  * An instance of this class is created in
  * {@link KeYCrossReferenceServiceConfiguration}.
@@ -66,12 +78,12 @@ public class KeYCrossReferenceNameInfo extends DefaultNameInfo {
         }
         
         super.register(ct);
-        
+
         classtypes.put(name, ct);
     }
 
     /**
-     * unregister a class type. This happes for instance when removing an
+     * unregister a class type. This happens for instance when removing an
      * EnumDeclaration and inserting an EnumClassDeclaration instead
      * 
      * @param fullname
@@ -92,6 +104,24 @@ public class KeYCrossReferenceNameInfo extends DefaultNameInfo {
         if(t instanceof ClassType)
             classtypes.put(name, (ClassType)t);
         return t;
+    }
+    
+    /**
+     * {@inheritDoc}
+     * 
+     * This implementation checks whether an implementation is available and
+     * fails if not.
+     * 
+     * @throws ConvertException
+     *             if no implementation of java.lang.Object is available
+     *             presently.
+     */
+    @Override 
+    public ClassType getJavaLangObject() throws ConvertException {
+        ClassType result = super.getJavaLangObject();
+        if(result == null)
+            throw new ConvertException("Class type 'java.lang.Object' cannot be found");
+        return result;
     }
 
 }

@@ -5,8 +5,6 @@
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
-//
-//
 package de.uka.ilkd.key.unittest;
 
 import java.util.HashSet;
@@ -15,15 +13,15 @@ import de.uka.ilkd.key.java.Expression;
 
 public abstract class ValueContainer{
 
-    protected HashSet values;
+    protected HashSet<Object> values;
 
     public ValueContainer(Object v){
-	values = new HashSet();
+	values = new HashSet<Object>();
 	add(v);
     }
 
     public ValueContainer(Object o1, Object o2){
-	values = new HashSet();
+	values = new HashSet<Object>();
 	add(o1);
 	add(o2);
     }

@@ -10,11 +10,18 @@
 
 package de.uka.ilkd.key.rule;
 
+import java.util.Iterator;
+
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.logic.Constraint;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.op.Metavariable;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.Debug;
 
@@ -33,7 +40,7 @@ public class PosTacletApp extends TacletApp {
     /** stores the information where the Taclet is to be applied. This means where
      * the find section of the taclet matches
      */
-    private PosInOccurrence pos;
+    private final PosInOccurrence pos;
 
     /** creates a PosTacletApp for the given taclet 
      * and a position information and CHECKS variable conditions as well as it
@@ -68,7 +75,7 @@ public class PosTacletApp extends TacletApp {
 	return createPosTacletApp ( taclet,
 				    instantiations,
 				    Constraint.BOTTOM,
-				    SetAsListOfMetavariable.EMPTY_SET,
+				    DefaultImmutableSet.<Metavariable>nil(),
 				    null,
 				    pos );
     }
@@ -78,7 +85,7 @@ public class PosTacletApp extends TacletApp {
 	createPosTacletApp(FindTaclet         taclet, 
 			   SVInstantiations   instantiations,
 			   Constraint         matchConstraint,
-			   SetOfMetavariable  matchNewMetavariables,
+			   ImmutableSet<Metavariable>  matchNewMetavariables,
 			   PosInOccurrence    pos) { 
 	return createPosTacletApp ( taclet,
 				    instantiations,
@@ -92,8 +99,8 @@ public class PosTacletApp extends TacletApp {
 	createPosTacletApp(FindTaclet                   taclet, 
 			   SVInstantiations             instantiations,
 			   Constraint                   matchConstraint,
-			   SetOfMetavariable            matchNewMetavariables,
-			   ListOfIfFormulaInstantiation ifInstantiations,
+			   ImmutableSet<Metavariable>            matchNewMetavariables,
+			   ImmutableList<IfFormulaInstantiation> ifInstantiations,
 			   PosInOccurrence              pos) { 
 	Debug.assertTrue ( ifInstsCorrectSize ( taclet, ifInstantiations ),
 			   "If instantiations list has wrong size" );
@@ -148,8 +155,8 @@ public class PosTacletApp extends TacletApp {
     private PosTacletApp(FindTaclet                   taclet,
 			 SVInstantiations             instantiations,
 			 Constraint                   matchConstraint,
-			 SetOfMetavariable            matchNewMetavariables,
-			 ListOfIfFormulaInstantiation ifInstantiations,
+			 ImmutableSet<Metavariable>            matchNewMetavariables,
+			 ImmutableList<IfFormulaInstantiation> ifInstantiations,
 			 PosInOccurrence              pos) { 
 	super(taclet,
 	      instantiations,
@@ -169,26 +176,26 @@ public class PosTacletApp extends TacletApp {
      * @return the set of the logicvariables that are bound for the
      * indicated application position of the TacletApp.
      */
-    private static SetOfQuantifiableVariable varsBoundAboveFindPos
+    private static ImmutableSet<QuantifiableVariable> varsBoundAboveFindPos
 	(Taclet taclet, PosInOccurrence pos) {
 
 	if (!(taclet instanceof RewriteTaclet)) {
-	    return SetAsListOfQuantifiableVariable.EMPTY_SET;
+	    return DefaultImmutableSet.<QuantifiableVariable>nil();
 	}
 
 	return collectBoundVarsAbove ( pos );
     }
 
-    private static IteratorOfSchemaVariable allVariableSV(Taclet taclet) {
+    private static Iterator<SchemaVariable> allVariableSV(Taclet taclet) {
 	TacletVariableSVCollector coll = new TacletVariableSVCollector();
 	coll.visit(taclet, true); //__CHANGE__ true or false???
 	return coll.varIterator();
     }
 
 
-    protected SetOfQuantifiableVariable contextVars(SchemaVariable sv) {
+    protected ImmutableSet<QuantifiableVariable> contextVars(SchemaVariable sv) {
 	if (!taclet().getPrefix(sv).context()) {
-	    return SetAsListOfQuantifiableVariable.EMPTY_SET;
+	    return DefaultImmutableSet.<QuantifiableVariable>nil();
 	}
 	return varsBoundAboveFindPos(taclet(), posInOccurrence());
     }
@@ -205,8 +212,8 @@ public class PosTacletApp extends TacletApp {
 	(Taclet taclet, SVInstantiations insts, PosInOccurrence pos){	
 
 	if (taclet.isContextInPrefix()) {
-	    SetOfQuantifiableVariable k=varsBoundAboveFindPos(taclet, pos);
-	    IteratorOfSchemaVariable it=allVariableSV(taclet);
+	    ImmutableSet<QuantifiableVariable> k=varsBoundAboveFindPos(taclet, pos);
+	    Iterator<SchemaVariable> it=allVariableSV(taclet);
 	    while (it.hasNext()) {
 		SchemaVariable varSV=it.next();
 		Term inst=(Term) insts.getInstantiation(varSV);
@@ -326,7 +333,7 @@ public class PosTacletApp extends TacletApp {
      * instantiations, constraints and new metavariables given 
      * by the mc object and forget the old ones
      */
-    protected TacletApp setMatchConditions ( MatchConditions mc ) {
+    public TacletApp setMatchConditions ( MatchConditions mc ) {
 	return createPosTacletApp( (FindTaclet)taclet(),
 				   mc.getInstantiations   (),
 				   mc.getConstraint       (),
@@ -342,7 +349,7 @@ public class PosTacletApp extends TacletApp {
      * instantiations given and forget the old ones
      */
     protected TacletApp setAllInstantiations ( MatchConditions              mc,
-					       ListOfIfFormulaInstantiation ifInstantiations ) {
+					       ImmutableList<IfFormulaInstantiation> ifInstantiations ) {
 	return createPosTacletApp( (FindTaclet)taclet(),
 				   mc.getInstantiations   (),
 				   mc.getConstraint       (),
@@ -359,7 +366,7 @@ public class PosTacletApp extends TacletApp {
      */
     public boolean complete() {
 	return posInOccurrence() != null && 
-	    uninstantiatedVars() == SetAsListOfSchemaVariable.EMPTY_SET &&
+	    uninstantiatedVars().isEmpty() &&
 	    ifInstsComplete ();
     }
 
@@ -384,8 +391,11 @@ public class PosTacletApp extends TacletApp {
     }
 
     public boolean equals(Object o) {
-	return super.equals(o) 
-	    && ((PosTacletApp)o).posInOccurrence().equals(posInOccurrence());
+        if (o instanceof PosTacletApp) {
+	        return super.equals(o)
+	            && ((PosTacletApp)o).posInOccurrence().equals(posInOccurrence());
+        }
+        return false;
     }
     
     public int hashCode(){

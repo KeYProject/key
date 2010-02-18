@@ -72,9 +72,9 @@ public class AddAHead {
     }
 
     public boolean startsWithOne(String s0, String[] s) {
-	for (int i=0; i<s.length; i++) {
-	    if (s0.startsWith(s[i])) return true;
-	}
+        for (String value : s) {
+            if (s0.startsWith(value)) return true;
+        }
 	return false;
     }
 
@@ -149,9 +149,9 @@ public class AddAHead {
 		w.println(line);
 		line=b.readLine();
 	    }
-	    for (int i=0; i<header.length; i++) {
-		w.println(commentsstart[type]+header[i]+commentsend[type]);
-	    }
+        for (String aHeader : header) {
+            w.println(commentsstart[type] + aHeader + commentsend[type]);
+        }
 	    while (line!=null) {
 		w.println(line);
 		line=b.readLine();
@@ -207,9 +207,9 @@ public class AddAHead {
 	    if (ending(f.getName()).equals(endings[i])) {
 		if (endings[i].equals("")) {
 		    boolean ok=false;
-		    for (int j=0; j<noendingFiles.length; j++) {
-			if (noendingFiles[j].equals(f.getName())) ok=true;
-		    }
+            for (String noendingFile : noendingFiles) {
+                if (noendingFile.equals(f.getName())) ok = true;
+            }
 		    if (!ok) return;
 		}
 		countFile[i]++;
@@ -231,10 +231,10 @@ public class AddAHead {
 
 	if (currentFile.isDirectory()) {
 	    String[] fileList=currentFile.list();
-	    for (int i=0; i<fileList.length; i++) {
-		visitFile(new File(currentFile.getPath()
-				   +File.separator+fileList[i]));
-	    }
+        for (String aFileList : fileList) {
+            visitFile(new File(currentFile.getPath()
+                    + File.separator + aFileList));
+        }
 	} else {
 	    if (currentFile.isFile()) handleFile(currentFile);
 	}	
@@ -253,9 +253,9 @@ public class AddAHead {
 
     private static int sum(int[] is) {
 	int result=0;
-	for (int i=0; i<is.length; i++) {
-	    result=result+is[i];
-	}
+        for (int i1 : is) {
+            result = result + i1;
+        }
 	return result;
     }
     

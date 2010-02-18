@@ -14,12 +14,14 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.gui.AutoModeListener;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.proof.IteratorOfGoal;
+import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofEvent;
 import de.uka.ilkd.key.util.Debug;
@@ -28,10 +30,7 @@ import de.uka.ilkd.key.util.Debug;
  * This class is the <em>central</em> facade for computing the specification of a
  * program. It contains algorithms for and controls the computation of specifications.
  * <h3>Internals</h3>
- * Usually, the method {@link
- * de.uka.ilkd.key.casetool.together.FunctionalityOnModel#computeSpecification(de.uka.ilkd.key.casetool.ModelMethod)}
- * is triggered by the user interface, and will start the
- * specification construction process and thereby invoke {@link
+ * Usually, specification construction process is started by invoking {@link
  * de.uka.ilkd.key.proof.init.SpecExtPO} to construct the
  * specification computation proof obligation. Finally, the whole
  * system relies on the functionality of this class to
@@ -44,7 +43,6 @@ import de.uka.ilkd.key.util.Debug;
  * @version 0.1, 2003-01-28
  * @version-revision $Revision: 1.16.3.1.2.1.3.1.1.3.2.2 $, $Date: Mon, 22 Jan 2007 15:50:58 +0100 $
  * @see de.uka.ilkd.key.gui.ComputeSpecificationView
- * @see de.uka.ilkd.key.casetool.together.FunctionalityOnModel#computeSpecification(de.uka.ilkd.key.casetool.ModelMethod)
  */
 public class ComputeSpecification {
     /**
@@ -184,57 +182,55 @@ public class ComputeSpecification {
 	Term precondition = termFactory.createJunctorTerm(Op.TRUE);
 	Term postcondition = termFactory.createJunctorTerm(Op.TRUE);
 	       
-        ListOfTerm prestateLocations = SLListOfTerm.EMPTY_LIST;
-	ListOfTerm prestateValues = SLListOfTerm.EMPTY_LIST; 
-	for (IteratorOfNamed i = programVariables.elements().iterator();
-	     i.hasNext();
-	     ) {
-	    final ProgramVariable v = (ProgramVariable) i.next();
-	    final Term v_term = termFactory
-		.createVariableTerm(v);
-	    Debug.out("program variable ", v, v.getKeYJavaType());
-	    if ("self".equals(v.name().toString())) {
-		// @xxx currently ignore modifications of object state, so no need to remember
-	    } else {
-		final Term vpre = termFactory
-		    .createVariableTerm(new LocationVariable(new ProgramElementName(v.name() + "pre"), v.getKeYJavaType()));
-		final Term vpost = termFactory
-		    .createVariableTerm(new LocationVariable(new ProgramElementName(v.name() + "post"), v.getKeYJavaType()));
+        ImmutableList<Term> prestateLocations = ImmutableSLList.<Term>nil();
+	ImmutableList<Term> prestateValues = ImmutableSLList.<Term>nil();
+        for (Named named : programVariables.elements()) {
+            final ProgramVariable v = (ProgramVariable) named;
+            final Term v_term = termFactory
+                    .createVariableTerm(v);
+            Debug.out("program variable ", v, v.getKeYJavaType());
+            if ("self".equals(v.name().toString())) {
+                // @xxx currently ignore modifications of object state, so no need to remember
+            } else {
+                final Term vpre = termFactory
+                        .createVariableTerm(new LocationVariable(new ProgramElementName(v.name() + "pre"), v.getKeYJavaType()));
+                final Term vpost = termFactory
+                        .createVariableTerm(new LocationVariable(new ProgramElementName(v.name() + "post"), v.getKeYJavaType()));
 
-		if ("result".equals(v.name().toString())) {
-		    // ignore result at prestate
-		} else {
-		    // prestate = prestate union {v:=vpre}
-		    prestateLocations = prestateLocations.append(v_term);
-		    prestateValues = prestateValues.append(vpre);
-		    // remember prestate of v
-		    precondition = termFactory
-			.createJunctorTermAndSimplify(Op.AND,
-						      precondition,
-						      termFactory
-						      .createEqualityTerm(
-									  v.sort().getEqualitySymbol(),
-									  termFactory
-									  .createVariableTerm(v),
-									  vpre
-									  )
-						      );
-		}
+                if ("result".equals(v.name().toString())) {
+                    // ignore result at prestate
+                } else {
+                    // prestate = prestate union {v:=vpre}
+                    prestateLocations = prestateLocations.append(v_term);
+                    prestateValues = prestateValues.append(vpre);
+                    // remember prestate of v
+                    precondition = termFactory
+                            .createJunctorTermAndSimplify(Op.AND,
+                                    precondition,
+                                    termFactory
+                                            .createEqualityTerm(
+                                            v.sort().getEqualitySymbol(),
+                                            termFactory
+                                                    .createVariableTerm(v),
+                                            vpre
+                                    )
+                            );
+                }
 
-		// construct poststate of v
-		postcondition = termFactory
-		    .createJunctorTermAndSimplify(Op.AND,
-				       postcondition,
-				       termFactory
-				       .createEqualityTerm(
-							   v.sort().getEqualitySymbol(),
-							   vpost,
-							   termFactory
-							   .createVariableTerm(v)
-							   )
-				       );
-	    }
-	}
+                // construct poststate of v
+                postcondition = termFactory
+                        .createJunctorTermAndSimplify(Op.AND,
+                                postcondition,
+                                termFactory
+                                        .createEqualityTerm(
+                                        v.sort().getEqualitySymbol(),
+                                        vpost,
+                                        termFactory
+                                                .createVariableTerm(v)
+                                )
+                        );
+            }
+        }
 
 	switch (getPoststateRemember()) {
 	case POSTSTATE_REMEMBER_EQUATIONS:
@@ -258,7 +254,8 @@ public class ComputeSpecification {
 		//@internal createUpdateTerm does not work for empty update lists
 		? diamondTerm
 		// updates prestate (diamondTerm)
-		: termFactory.createUpdateTerm(prestateLocations.toArray(), prestateValues.toArray(), diamondTerm);
+		: termFactory.createUpdateTerm(prestateLocations.toArray(new Term[prestateLocations.size()]), 
+			prestateValues.toArray(new Term[prestateValues.size()]), diamondTerm);
 	    
 	case PRESTATE_REMEMBER_EQUATIONS:
 	    return termFactory.createJunctorTermAndSimplify(Op.IMP, precondition, diamondTerm);
@@ -323,12 +320,12 @@ public class ComputeSpecification {
     public Term computeSpecification(Proof proof) {
 	Debug.out("Compute specification:\n");
 	List caseSpecs = new LinkedList();
-	for (IteratorOfGoal i = proof.openGoals().iterator(); i.hasNext(); ) {
-	    Sequent open = i.next().sequent();
-	    Term caseSpec = computeSpecification(open);
-	    Debug.out("Goal Case" , caseSpec);
-	    caseSpecs.add(caseSpec);
-	}
+        for (Goal goal : proof.openGoals()) {
+            Sequent open = goal.sequent();
+            Term caseSpec = computeSpecification(open);
+            Debug.out("Goal Case", caseSpec);
+            caseSpecs.add(caseSpec);
+        }
 	return createJunctorTermNAry(termFactory.createJunctorTerm(Op.TRUE),
 				     Op.AND,
 				     caseSpecs.iterator()
@@ -345,14 +342,14 @@ public class ComputeSpecification {
     private Term computeSpecification(Sequent seq) {
 	Semisequent ante = seq.antecedent();
 	Debug.out("\nCase ");
-	Term ante2 = createJunctorTermNAry(termFactory.createJunctorTerm(Op.TRUE),
+	Term ante2 = createJunctorTermNAryCF(termFactory.createJunctorTerm(Op.TRUE),
 					   Op.AND,
 					   ante.iterator()
 					   );
 	Debug.out("", ante2);
 	Debug.out(" => ");
 	Semisequent succ = seq.succedent();
-	Term succ2 = createJunctorTermNAry(termFactory.createJunctorTerm(Op.FALSE),
+	Term succ2 = createJunctorTermNAryCF(termFactory.createJunctorTerm(Op.FALSE),
 					   Op.OR,
 					   succ.iterator()
 					   );
@@ -370,7 +367,7 @@ public class ComputeSpecification {
      * see orbital.logic.functor.Functionals#foldRight
      * @internal almost identical to @see #createJunctorTermNAry(Term,Junctor,IteratorOfTerm)
      */
-    private static final Term createJunctorTermNAry(Term c, Junctor op, IteratorOfConstrainedFormula i) {
+    private static final Term createJunctorTermNAryCF(Term c, Junctor op, Iterator<ConstrainedFormula> i) {
 	Term construct = c;
 	while (i.hasNext()) {
 	    ConstrainedFormula f = i.next();
@@ -388,10 +385,10 @@ public class ComputeSpecification {
      * de.uka.ilkd.key.logic.TermFactory#createJunctorTerm(Junctor,Term[])}.
      * see orbital.logic.functor.Functionals#foldRight
      */
-    private static final Term createJunctorTermNAry(Term c, Junctor op, Iterator i) {
+    private static final Term createJunctorTermNAry(Term c, Junctor op, Iterator<Term> i) {
 	Term construct = c;
 	while (i.hasNext()) {
-	    construct = termFactory.createJunctorTermAndSimplify(op, construct, (Term)i.next());
+	    construct = termFactory.createJunctorTermAndSimplify(op, construct, i.next());
 	}
 	return construct;
     }

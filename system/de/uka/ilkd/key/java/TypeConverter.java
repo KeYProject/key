@@ -11,8 +11,12 @@ package de.uka.ilkd.key.java;
 
 
 import java.util.HashMap;
+import java.util.Iterator;
 
 import recoder.service.ConstantEvaluator;
+import de.uka.ilkd.key.collection.ImmutableArray;
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.abstraction.*;
 import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.expression.ParenthesizedExpression;
@@ -20,10 +24,15 @@ import de.uka.ilkd.key.java.expression.literal.*;
 import de.uka.ilkd.key.java.expression.operator.*;
 import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
 import de.uka.ilkd.key.java.reference.*;
-import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.ProgramInLogic;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.ldt.*;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.sort.*;
+import de.uka.ilkd.key.logic.sort.ObjectSort;
+import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.logic.sort.SortDefiningSymbols;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.ExtList;
 
@@ -40,7 +49,10 @@ public class TypeConverter extends TermBuilder {
     private BooleanLDT booleanLDT;
     private IntegerLDT integerLDT;
     private IntegerDomainLDT integerDomainLDT;
-    private ListOfLDT models = SLListOfLDT.EMPTY_LIST;
+    private FloatLDT floatLDT;
+    private DoubleLDT doubleLDT;
+
+    private ImmutableList<LDT> models = ImmutableSLList.<LDT>nil();
 
     
     public static StringConverter stringConverter =new StringConverter();
@@ -72,19 +84,23 @@ public class TypeConverter extends TermBuilder {
             this.integerLDT = (IntegerLDT)ldt;
         } else if (ldt instanceof IntegerDomainLDT) {
             this.integerDomainLDT = (IntegerDomainLDT)ldt;
-        } 
+        } else if (ldt instanceof FloatLDT ) {
+            this.floatLDT = (FloatLDT)ldt;
+        } else if (ldt instanceof DoubleLDT) {
+            this.doubleLDT = (DoubleLDT)ldt;
+        }
+
         this.models = this.models.prepend(ldt);
         Debug.out("Initialize LDTs: ", ldt);
     }
     
-    public void init(ListOfLDT ldts) {
-        IteratorOfLDT it = ldts.iterator();
-        while (it.hasNext()) {
-            init(it.next());
+    public void init(ImmutableList<LDT> ldts) {
+        for (LDT ldt : ldts) {
+            init(ldt);
         }
     }
     
-    public ListOfLDT getModels() {
+    public ImmutableList<LDT> getModels() {
         return models;
     }
 
@@ -100,6 +116,7 @@ public class TypeConverter extends TermBuilder {
                 charLDT == null) {
             return  null;
         }
+
         if (byteLDT.javaType().equals(t)) {
             return byteLDT;
         } else if (shortLDT.javaType().equals(t)) {
@@ -112,6 +129,10 @@ public class TypeConverter extends TermBuilder {
             return charLDT;
         } else if (booleanLDT.javaType().equals(t)) {
             return booleanLDT;
+        } else if (floatLDT.javaType().equals(t)) {
+            return floatLDT;
+        } else if (doubleLDT.javaType().equals(t)) {
+            return doubleLDT;
         }
         Debug.out("typeconverter: No LDT found for ", t);
         return null;
@@ -185,7 +206,7 @@ public class TypeConverter extends TermBuilder {
 
         final Sort dummySort = services.getJavaInfo().getJavaLangObjectAsSort();       
         final Term tMCR = func(new RigidFunction(new Name(name), 
-                dummySort, new ArrayOfSort()));
+                dummySort, new ImmutableArray<Sort>()));
         mcrMap.put(name, tMCR);
         return tMCR;
     }
@@ -319,7 +340,7 @@ public class TypeConverter extends TermBuilder {
         final Term t = convertToLogicElement(ar.getReferencePrefix(), ec);
         for (int i=0; i<index.length; i++) { 
             index[i] = 
-                convertToLogicElement(ar.getDimensionExpressions().getExpression(i), ec);
+                convertToLogicElement(ar.getDimensionExpressions().get(i), ec);
         }
         return tf.createArrayTerm(ArrayOp.getArrayOp(t.sort()), t, index);
     }
@@ -422,6 +443,10 @@ public class TypeConverter extends TermBuilder {
             return intLDT.translateLiteral(lit);
         } else if (lit instanceof StringLiteral) {
             return stringConverter.translateLiteral(lit,intLDT,services);
+        } else if (lit instanceof FloatLiteral) {
+            return floatLDT.translateLiteral(lit);
+        } else if (lit instanceof DoubleLiteral) {
+            return doubleLDT.translateLiteral(lit);
         } else {
             Debug.fail("Unknown literal type", lit);                 
             return null;
@@ -505,7 +530,8 @@ public class TypeConverter extends TermBuilder {
     }
 
     public Sort getPrimitiveSort(Type t) {
-        LDT result = getModelFor(t);
+	LDT result = getModelFor(t);
+
 	Debug.out("LDT found", t, result);
         return (result == null ? null : result.targetSort());
     }
@@ -551,13 +577,11 @@ public class TypeConverter extends TermBuilder {
 	if (term.op()==Op.NULL) {
 	    return NullLiteral.NULL;
 	} else if (term.op() instanceof Function) {
-        final IteratorOfLDT it = models.iterator();
-        while (it.hasNext() ) {
-            final LDT model = it.next();
-            if (model.hasLiteralFunction((Function)term.op())) {
-                return model.translateTerm(term, null);	       
+	    for(LDT model : models) {
+                if (model.hasLiteralFunction((Function)term.op())) {
+                    return model.translateTerm(term, null);	       
+                }
             }
-        }
 	}
         
 	final ExtList children = new ExtList();
@@ -567,12 +591,10 @@ public class TypeConverter extends TermBuilder {
 	if (term.op() instanceof ProgramInLogic) {
 	    return ((ProgramInLogic)term.op()).convertToProgram(term, children);
 	} else if (term.op() instanceof Function) {
-        final IteratorOfLDT it = models.iterator();
-        while (it.hasNext() ) {
-            final LDT model = it.next();
-            if (model.containsFunction((Function)term.op())) {             
-                return model.translateTerm(term, children);
-            }  
+	    for(LDT model : models) {
+                if (model.containsFunction((Function)term.op())) {             
+                    return model.translateTerm(term, children);
+                }  
 	    }
 	} 
 	throw new RuntimeException("Cannot convert term to program: "+term

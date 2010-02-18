@@ -11,6 +11,7 @@
 
 package de.uka.ilkd.key.java.statement;
 
+import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.reference.*;
@@ -104,7 +105,7 @@ public class MethodBodyStatement extends JavaNonTerminalProgramElement
     public MethodBodyStatement(ProgramMethod method, 
             ReferencePrefix newContext, 
             IProgramVariable res, 
-            ArrayOfExpression args,
+            ImmutableArray<Expression> args,
             boolean useSpecification){
         this(method, newContext, res, args, useSpecification, null);
     }
@@ -112,7 +113,7 @@ public class MethodBodyStatement extends JavaNonTerminalProgramElement
     public MethodBodyStatement(ProgramMethod method, 
                                ReferencePrefix newContext, 
                                IProgramVariable res, 
-                               ArrayOfExpression args,
+                               ImmutableArray<Expression> args,
                                boolean useSpecification,
                                ProgramElement scope) {
         this.method = method;
@@ -139,9 +140,9 @@ public class MethodBodyStatement extends JavaNonTerminalProgramElement
 
 
 
-    private void checkOnlyProgramVarsAsArguments(ArrayOfExpression arguments) {
+    private void checkOnlyProgramVarsAsArguments(ImmutableArray<Expression> arguments) {
         for (int i = 0, sz = arguments.size(); i<sz; i++) {
-            final Expression argument = arguments.getExpression(i);
+            final Expression argument = arguments.get(i);
             if (!((argument instanceof LocationVariable && !((LocationVariable)argument).isMember()) || 
                     argument instanceof SchemaVariable)) {
                 throw new IllegalArgumentException("Only local variables or schemavariables " +
@@ -153,14 +154,14 @@ public class MethodBodyStatement extends JavaNonTerminalProgramElement
     public MethodBodyStatement(ProgramMethod method, 
             ReferencePrefix newContext, 
             IProgramVariable res, 
-            ArrayOfExpression args) {
+            ImmutableArray<Expression> args) {
         this(method, newContext, res, args, false);
     }
     
     public MethodBodyStatement(ProgramMethod method, 
             ReferencePrefix newContext, 
             IProgramVariable res, 
-            ArrayOfExpression args,
+            ImmutableArray<Expression> args,
             ProgramElement scope) {
         this(method, newContext, res, args, false, scope);
     }
@@ -192,7 +193,7 @@ public class MethodBodyStatement extends JavaNonTerminalProgramElement
         return methodReference.getReferencePrefix();
     }
     
-    public ArrayOfExpression getArguments() {
+    public ImmutableArray<Expression> getArguments() {
         return methodReference.getArguments();
     }
     
@@ -245,6 +246,9 @@ public class MethodBodyStatement extends JavaNonTerminalProgramElement
     public boolean isPure(Services services) {
         if (method == null) {
             resolveMethod(services);
+            if(method == null) {//HACK, seems to happen for anon-method
+                return true;
+            }
         }
         return services.getSpecificationRepository().isStrictlyPure(method);
     }

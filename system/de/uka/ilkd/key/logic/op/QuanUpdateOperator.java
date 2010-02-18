@@ -10,8 +10,10 @@
 
 package de.uka.ilkd.key.logic.op;
 
+import java.lang.ref.WeakReference;
 import java.util.*;
 
+import de.uka.ilkd.key.collection.*;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -60,14 +62,14 @@ public class QuanUpdateOperator implements IUpdateOperator {
      */
     private static class QuanUpdateSignature {
         /** the locations access operators used by the update op */
-        public final ArrayOfLocation locations;
+        public final ImmutableArray<Location> locations;
         /** which of the update entries are equipped with a guard? */
         public final boolean[] guards;
         
         public QuanUpdateSignature (final Location[] locations,
                                     final boolean[] guards) {
-            this.locations = new ArrayOfLocation ( locations );
-            this.guards = (boolean[])guards.clone ();
+            this.locations = new ImmutableArray<Location> ( locations );
+            this.guards = guards.clone ();
         }
         
         /* (non-Javadoc)
@@ -114,8 +116,8 @@ public class QuanUpdateOperator implements IUpdateOperator {
      * Map from <code>QuanUpdateSignature</code> to
      * <code>QuanUpdateOperator</code>
      */
-    private static final HashMap<QuanUpdateSignature, QuanUpdateOperator> updates = 
-        new HashMap<QuanUpdateSignature, QuanUpdateOperator>();
+    private static final WeakHashMap<QuanUpdateSignature, WeakReference<QuanUpdateOperator>> updates = 
+        new WeakHashMap<QuanUpdateSignature, WeakReference<QuanUpdateOperator>>();
 
     /**
      * returns the update operator for the given location order
@@ -138,10 +140,11 @@ public class QuanUpdateOperator implements IUpdateOperator {
     public static QuanUpdateOperator createUpdateOp(Location[] locs,
                                                     boolean[] guards) {
         final QuanUpdateSignature sig = new QuanUpdateSignature ( locs, guards );
-        QuanUpdateOperator result = updates.get(sig);
+        WeakReference<QuanUpdateOperator> qUpOp = updates.get(sig);
+        QuanUpdateOperator result = qUpOp!=null?qUpOp.get():null;
         if (result == null) {
             result = new QuanUpdateOperator(sig);
-            updates.put(sig, result);
+            updates.put(sig, new WeakReference<QuanUpdateOperator>(result));
         }
         return result;
     }
@@ -184,7 +187,7 @@ public class QuanUpdateOperator implements IUpdateOperator {
     /**
      * returns the array of location operators which are updated
      */
-    public ArrayOfLocation locationsAsArray() {
+    public ImmutableArray<Location> locationsAsArray() {
         return signature.locations;
     }
 
@@ -201,7 +204,7 @@ public class QuanUpdateOperator implements IUpdateOperator {
      * returns the operator of <tt>n</tt>-th location
      */
     public Location location(int n) {
-        return locationsAsArray().getLocation(n);
+        return locationsAsArray().get(n);
     }
 
     /**
@@ -273,7 +276,7 @@ public class QuanUpdateOperator implements IUpdateOperator {
      * @return the variables that are quantified for the elementary update
      *         <code>locPos</code>
      */
-    public ArrayOfQuantifiableVariable boundVars (Term t, int locPos) {
+    public ImmutableArray<QuantifiableVariable> boundVars (Term t, int locPos) {
         return t.varsBoundHere ( valuePos ( locPos ) );
     }
     
@@ -332,8 +335,7 @@ public class QuanUpdateOperator implements IUpdateOperator {
             sub[j] = t.sub(i);
         
         
-        final ArrayOfQuantifiableVariable[] vars = 
-            new ArrayOfQuantifiableVariable[sub.length];
+        final ImmutableArray<QuantifiableVariable>[] vars = new ImmutableArray[sub.length];
         Arrays.fill(vars, Term.EMPTY_VAR_LIST);
         
         return tf.createTerm ( location ( n ),
@@ -509,11 +511,10 @@ public class QuanUpdateOperator implements IUpdateOperator {
      *            are modified if bound renaming is necessary
      * @return the arrays of variables bound for each location
      */
-    public ArrayOfQuantifiableVariable[]
-        toBoundVarsPerAssignment (ArrayOfQuantifiableVariable[] boundVarsPerSub,
+    public ImmutableArray<QuantifiableVariable>[]
+        toBoundVarsPerAssignment (ImmutableArray<QuantifiableVariable>[] boundVarsPerSub,
                                   Term[] subs) {
-        final ArrayOfQuantifiableVariable[] res =
-            new ArrayOfQuantifiableVariable [locationCount()];
+        final ImmutableArray<QuantifiableVariable>[] res = new ImmutableArray [locationCount()];
 
         for ( int i = 0; i != locationCount (); ++i )
             res[i] = BoundVariableTools.DEFAULT
@@ -610,7 +611,7 @@ public class QuanUpdateOperator implements IUpdateOperator {
         public final int locationNum;
         
         public ElUpdateLocation (final Term guard,
-                                 final ArrayOfQuantifiableVariable boundVars,
+                                 final ImmutableArray<QuantifiableVariable> boundVars,
                                  final Term lhs,
                                  final Term value,
                                  final int locationNum) {
@@ -660,15 +661,13 @@ public class QuanUpdateOperator implements IUpdateOperator {
             return getLhs().sub ( subNum );
         }
 
-        public ArrayOfQuantifiableVariable getBoundVars () {
-            return new ArrayOfQuantifiableVariable ( getMinimizedVars ().toArray () );
+        public ImmutableArray<QuantifiableVariable> getBoundVars () {
+            return getMinimizedVars ();
         }
 
-        public SetOfQuantifiableVariable getBoundVarsAsSet () {
-            SetOfQuantifiableVariable res = SetAsListOfQuantifiableVariable.EMPTY_SET;
-            final IteratorOfQuantifiableVariable it = getMinimizedVars ().iterator ();
-            while ( it.hasNext () )
-                res = res.add ( it.next () );
+        public ImmutableSet<QuantifiableVariable> getBoundVarsAsSet () {
+            ImmutableSet<QuantifiableVariable> res = DefaultImmutableSet.<QuantifiableVariable>nil();
+            for (QuantifiableVariable quantifiableVariable : getMinimizedVars()) res = res.add(quantifiableVariable);
             return res;
         }
 
@@ -730,16 +729,17 @@ public class QuanUpdateOperator implements IUpdateOperator {
         private Term anonymiseVariables(Term t) {
             if ( t.freeVars ().size () == 0 ) return t;
             
-            final ArrayOfQuantifiableVariable oldFreeVars =
-                new ArrayOfQuantifiableVariable ( t.freeVars ().toArray () );
+            final ImmutableArray<QuantifiableVariable> oldFreeVars =
+                new ImmutableArray<QuantifiableVariable> ( t.freeVars ().
+                	toArray (new QuantifiableVariable[t.freeVars().size()]) );
             final QuantifiableVariable[] newFreeVarsTemp =
                 new QuantifiableVariable [oldFreeVars.size ()];
             
             bvt.resolveCollisions ( oldFreeVars, newFreeVarsTemp,
                                     getBoundVarsAsSet () );
             
-            final ArrayOfQuantifiableVariable newFreeVars =
-                new ArrayOfQuantifiableVariable ( newFreeVarsTemp );
+            final ImmutableArray<QuantifiableVariable> newFreeVars =
+                new ImmutableArray<QuantifiableVariable> ( newFreeVarsTemp );
             return bvt.renameVariables ( t, oldFreeVars, newFreeVars );
         }
     }
@@ -751,7 +751,7 @@ public class QuanUpdateOperator implements IUpdateOperator {
      * and removing trivial guards. The four array arguments are supposed to
      * have the same size.
      */
-    public static Term normalize (ArrayOfQuantifiableVariable[] boundVars,
+    public static Term normalize (ImmutableArray<QuantifiableVariable>[] boundVars,
                                   Term[] guards,
                                   Term[] leftHandSides,
                                   Term[] values,
@@ -773,7 +773,7 @@ public class QuanUpdateOperator implements IUpdateOperator {
      * a target term/formula. The only optimisation that is applied at this
      * point is the removal of trivial guards
      */
-    private static Term createTerm (ArrayOfQuantifiableVariable[] boundVars,
+    private static Term createTerm (ImmutableArray<QuantifiableVariable>[] boundVars,
                                     Term[] guards,
                                     Term[] locations,
                                     Term[] values,
@@ -782,7 +782,7 @@ public class QuanUpdateOperator implements IUpdateOperator {
         final QuanUpdateOperator op =
             QuanUpdateOperator.createUpdateOp ( locations, nontrivialGuards );
 
-        ListOfTerm resultSubs = SLListOfTerm.EMPTY_LIST.prepend ( target );
+        ImmutableList<Term> resultSubs = ImmutableSLList.<Term>nil().prepend ( target );
         for ( int i = locations.length - 1; i >= 0; i-- ) {
             resultSubs = resultSubs.prepend ( values[i] );
             
@@ -794,7 +794,7 @@ public class QuanUpdateOperator implements IUpdateOperator {
         }
         
         return tf.createQuanUpdateTermUnordered ( op,
-                                                  resultSubs.toArray (),
+                                                  resultSubs.toArray (new Term[resultSubs.size()]),
                                                   boundVars );
     }
 
@@ -804,7 +804,7 @@ public class QuanUpdateOperator implements IUpdateOperator {
             QuanUpdateOperator.createUpdateOp ( locations ( elUpdates ),
                                                 nontrivialGuards ( elUpdates ) );
 
-        ListOfTerm resultSubs = SLListOfTerm.EMPTY_LIST.prepend ( target );
+        ImmutableList<Term> resultSubs = ImmutableSLList.<Term>nil().prepend ( target );
         for ( int i = elUpdates.length - 1; i >= 0; i-- ) {
             resultSubs = resultSubs.prepend ( elUpdates[i].getValue() );
             
@@ -816,13 +816,12 @@ public class QuanUpdateOperator implements IUpdateOperator {
         }
         
         return tf.createQuanUpdateTermUnordered ( op,
-                                                  resultSubs.toArray (),
+                                                  resultSubs.toArray (new Term[resultSubs.size()]),
                                                   boundVars ( elUpdates ) );        
     }
     
-    private static ArrayOfQuantifiableVariable[] boundVars (ElUpdateLocation[] elUpdates) {
-        final ArrayOfQuantifiableVariable[] res =
-            new ArrayOfQuantifiableVariable [elUpdates.length];
+    private static ImmutableArray<QuantifiableVariable>[] boundVars (ElUpdateLocation[] elUpdates) {
+        final ImmutableArray<QuantifiableVariable>[] res = new ImmutableArray[elUpdates.length];
         for ( int i = 0; i != elUpdates.length; ++i )
             res[i] = elUpdates[i].getBoundVars();
         return res;
@@ -858,14 +857,14 @@ public class QuanUpdateOperator implements IUpdateOperator {
      * Given the update operator (<code>this</code>), the variables that are
      * bound and the subterms, create a new term. This applies the same
      * optimisations as
-     * <code>normalize (ArrayOfQuantifiableVariable[], Term[], Term[], Term[], Term )</code>
+     * <code>normalize (ArrayOf<QuantifiableVariable>[], Term[], Term[], Term[], Term )</code>
      */
-    public Term normalize(ArrayOfQuantifiableVariable[] boundVarsPerSub,
+    public Term normalize(ImmutableArray<QuantifiableVariable>[] boundVarsPerSub,
                           Term[] subs) {
 
         // could be implemented more efficiently
         
-        final ArrayOfQuantifiableVariable[] boundVars =
+        final ImmutableArray<QuantifiableVariable>[] boundVars =
             toBoundVarsPerAssignment ( boundVarsPerSub, subs );
         final Term[] guards = new Term [locationCount()];
         final Term[] lhss = new Term [locationCount()];
@@ -902,7 +901,7 @@ public class QuanUpdateOperator implements IUpdateOperator {
      * locations. Updates with obviously unsatisfiable guards and trivial
      * updates are removed (if possible)
      */
-    private static ElUpdateLocation[] normalize (ArrayOfQuantifiableVariable[] boundVars,
+    private static ElUpdateLocation[] normalize (ImmutableArray<QuantifiableVariable>[] boundVars,
                                                  Term[] guards,
                                                  Term[] locations,
                                                  Term[] values) {
@@ -973,14 +972,12 @@ public class QuanUpdateOperator implements IUpdateOperator {
      */
     private static boolean isSubsumedAssignment(ElUpdateLocation elUpd,
                                                 List<ElUpdateLocation> laterAssignments) {
-        final Iterator<ElUpdateLocation> it = laterAssignments.iterator ();
-        while ( it.hasNext () ) {
-            final ElUpdateLocation laterAss = it.next ();
-            final Term subsumptionCond = laterAss.getSubsumptionCondition ( elUpd );
+        for (ElUpdateLocation laterAss : laterAssignments) {
+            final Term subsumptionCond = laterAss.getSubsumptionCondition(elUpd);
             final GuardSatisfiabilityFormulaBuilder satisfiabilityBuilder =
-                new GuardSatisfiabilityFormulaBuilder (subsumptionCond,
-                                                       laterAss.getBoundVars () );
-            if ( satisfiabilityBuilder.isValidGuard () ) return true;
+                    new GuardSatisfiabilityFormulaBuilder(subsumptionCond,
+                            laterAss.getBoundVars());
+            if (satisfiabilityBuilder.isValidGuard()) return true;
         }
         return false;
     }

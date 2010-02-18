@@ -1,3 +1,19 @@
+// This file is part of KeY - Integrated Deductive Software Design
+// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General Public License. 
+// See LICENSE.TXT for details.
+//
+// This file is part of KeY - Integrated Deductive Software Design
+// Copyright (C) 2001-2004 Universitaet Karlsruhe, Germany
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General Public License. 
+// See LICENSE.TXT for details.
+
 package de.uka.ilkd.key.java.recoderext;
 
 import java.util.*;
@@ -13,9 +29,19 @@ import recoder.java.reference.VariableReference;
 import recoder.kit.ProblemReport;
 import recoder.service.CrossReferenceSourceInfo;
 
-
+/**
+ * Local (i.e. anonymous) classes may access variables from the creating context
+ * if they are declared final and initialised.
+ * 
+ * This transformation searches for such final variables and replaces them by 
+ * an implicit variable.
+ * 
+ * Additionally a pseudo name is assigned to anonymous classes to allow to
+ * access them despite all.
+ * 
+ * @author engelc
+ */
 public class LocalClassTransformation extends RecoderModelTransformer {
-    
     
     public LocalClassTransformation(
             CrossReferenceServiceConfiguration services, TransformerCache cache) {
@@ -34,6 +60,7 @@ public class LocalClassTransformation extends RecoderModelTransformer {
     protected void makeExplicit(TypeDeclaration td) {
         List<Variable> outerVars = getLocalClass2FinalVar().get(td);
         CrossReferenceSourceInfo si = services.getCrossReferenceSourceInfo();
+        
         if(outerVars!=null){
             for (final Variable v : outerVars) {
                 for (final VariableReference vr : si.getReferences(v)){
@@ -49,4 +76,5 @@ public class LocalClassTransformation extends RecoderModelTransformer {
             }
         }
     }
+
 }

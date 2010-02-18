@@ -1,6 +1,6 @@
 package de.uka.ilkd.key.logic.op;
 
-import de.uka.ilkd.key.logic.ListOfTerm;
+import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.logic.Term;
 
 public interface IWorkingSpaceOp {
@@ -9,7 +9,7 @@ public interface IWorkingSpaceOp {
     
     ProgramMethod getProgramMethod();
     
-    ListOfTerm getParameters(Term t);
+    ImmutableList<Term> getParameters(Term t);
     
     Term getSelf(Term t);
 

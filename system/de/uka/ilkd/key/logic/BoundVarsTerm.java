@@ -10,8 +10,9 @@
 
 package de.uka.ilkd.key.logic;
 
-import de.uka.ilkd.key.logic.op.ArrayOfQuantifiableVariable;
+import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 
 /** 
  * Used for OCL Simplification.
@@ -27,10 +28,10 @@ class BoundVarsTerm extends Term {
      * @supplierCardinality *
      * @supplierRole subterm
      */
-    private final ArrayOfTerm subTerm;
+    private final ImmutableArray<Term> subTerm;
 
     /** variables that are bound in this term*/
-    private final ArrayOfQuantifiableVariable[] boundVars;
+    private final ImmutableArray<QuantifiableVariable>[] boundVars;
 
     /** depth of the term */
     private final int depth;
@@ -45,16 +46,16 @@ class BoundVarsTerm extends Term {
      * @param boundVars An array containing the bound variables.
      */
     public BoundVarsTerm(Operator op, Term[] subTerm, 
-			 ArrayOfQuantifiableVariable[] boundVars) {
+			 ImmutableArray<QuantifiableVariable>[] boundVars) {
 	super(op, op.sort(subTerm));
-	this.subTerm = new ArrayOfTerm(subTerm);
+	this.subTerm = new ImmutableArray<Term>(subTerm);
 	this.boundVars = boundVars;
 	int max_depth = -1;
-	for (int i = 0; i < subTerm.length; i++) {
-	    if (subTerm[i].depth() > max_depth) {
-		max_depth = subTerm[i].depth();	
-	    }
-	}
+        for (Term aSubTerm : subTerm) {
+            if (aSubTerm.depth() > max_depth) {
+                max_depth = aSubTerm.depth();
+            }
+        }
 	depth = max_depth + 1;
 
     }  
@@ -71,13 +72,13 @@ class BoundVarsTerm extends Term {
 
     /** the nr-th subterm */
     public Term sub(int nr) {
-	return subTerm.getTerm(nr);
+	return subTerm.get(nr);
     }
 
     /** 
      * @return The array of variables bound for subterm n. 
      */
-    public ArrayOfQuantifiableVariable varsBoundHere(int n) {
+    public ImmutableArray<QuantifiableVariable> varsBoundHere(int n) {
 	if (n < 0 || n > boundVars.length-1) {
 	    return EMPTY_VAR_LIST;
 	} else {

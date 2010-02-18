@@ -11,7 +11,10 @@
 package de.uka.ilkd.key.proof;
 
 import java.util.HashMap;
+import java.util.Iterator;
 
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.util.Debug;
 
@@ -82,7 +85,7 @@ public class FormulaTagManager {
      * with the given tag since the creation of the tag, starting with the
      * most recent one
      */
-    public ListOfFormulaChangeInfo getModifications ( FormulaTag p_tag ) {
+    public ImmutableList<FormulaChangeInfo> getModifications ( FormulaTag p_tag ) {
 	return getFormulaInfo(p_tag).modifications;
     }
 
@@ -99,28 +102,22 @@ public class FormulaTagManager {
     }
 
     private void updateTags(SequentChangeInfo sci, boolean p_antec, Goal p_goal) {
-        final IteratorOfFormulaChangeInfo infoIt =
-            sci.modifiedFormulas(p_antec).iterator();
-        while ( infoIt.hasNext () )
-            updateTag(infoIt.next(), sci.sequent(), p_goal);
+        for (FormulaChangeInfo formulaChangeInfo : sci.modifiedFormulas(p_antec))
+            updateTag(formulaChangeInfo, sci.sequent(), p_goal);
     }
 
     private void addTags(SequentChangeInfo sci, boolean p_antec, Goal p_goal) {
-	final IteratorOfConstrainedFormula cfmaIt =
-	    sci.addedFormulas(p_antec).iterator();
-	while ( cfmaIt.hasNext () ) {
-	    final PosInOccurrence pio = new PosInOccurrence
-		( cfmaIt.next (), PosInTerm.TOP_LEVEL, p_antec );
-	    createNewTag(pio, p_goal);
-	}	
+        for (ConstrainedFormula constrainedFormula : sci.addedFormulas(p_antec)) {
+            final PosInOccurrence pio = new PosInOccurrence
+                    (constrainedFormula, PosInTerm.TOP_LEVEL, p_antec);
+            createNewTag(pio, p_goal);
+        }
     }
 
     private void removeTags(SequentChangeInfo sci, boolean p_antec, Goal p_goal) {
-	final IteratorOfConstrainedFormula cfmaIt =
-            sci.removedFormulas(p_antec).iterator();
-        while ( cfmaIt.hasNext () ) {
+        for (ConstrainedFormula constrainedFormula : sci.removedFormulas(p_antec)) {
             final PosInOccurrence pio = new PosInOccurrence
-                ( cfmaIt.next (), PosInTerm.TOP_LEVEL, p_antec );
+                    (constrainedFormula, PosInTerm.TOP_LEVEL, p_antec);
             removeTag(pio);
         }	
     }
@@ -155,13 +152,12 @@ public class FormulaTagManager {
     private void createNewTags (Goal p_goal, boolean p_antec) {
         final Sequent seq = p_goal.sequent ();
         final Semisequent ss = p_antec ? seq.antecedent () : seq.succedent ();
-        final IteratorOfConstrainedFormula cfmaIt = ss.iterator ();
 
-        while ( cfmaIt.hasNext () ) {
-            final PosInOccurrence pio = new PosInOccurrence ( cfmaIt.next (),
-                                                              PosInTerm.TOP_LEVEL,
-                                                              p_antec );
-            createNewTag ( pio, p_goal );
+        for (Object s : ss) {
+            final PosInOccurrence pio = new PosInOccurrence((ConstrainedFormula) s,
+                    PosInTerm.TOP_LEVEL,
+                    p_antec);
+            createNewTag(pio, p_goal);
         }
     }
 
@@ -236,7 +232,7 @@ public class FormulaTagManager {
 	/** All modifications that have been applied to the formula
 	 * since the creation of the tag. The most recent modification
 	 * is the first element of the list */
-    	public final ListOfFormulaChangeInfo modifications;
+    	public final ImmutableList<FormulaChangeInfo> modifications;
     	
         /**
          * The age (as obtained by <code>Goal.getTime()</code>) of the formula,
@@ -246,11 +242,11 @@ public class FormulaTagManager {
         public final long                    age;
         
     	public FormulaInfo ( PosInOccurrence p_pio, long p_age ) {
-	    this ( p_pio, SLListOfFormulaChangeInfo.EMPTY_LIST, p_age );
+	    this ( p_pio, ImmutableSLList.<FormulaChangeInfo>nil(), p_age );
 	}	
 
     	private FormulaInfo ( PosInOccurrence         p_pio,
-    	                      ListOfFormulaChangeInfo p_modifications,
+    	                      ImmutableList<FormulaChangeInfo> p_modifications,
                               long                    p_age ) {
     	    pio           = p_pio;
     	    modifications = p_modifications;

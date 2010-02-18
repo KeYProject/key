@@ -10,9 +10,12 @@
 
 package de.uka.ilkd.key.rule;
 
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import de.uka.ilkd.key.bugdetection.ContractAppInfo;
+import de.uka.ilkd.key.collection.*;
 import de.uka.ilkd.key.gui.ContractConfigurator;
 import de.uka.ilkd.key.gui.Main;
 import de.uka.ilkd.key.java.*;
@@ -27,9 +30,24 @@ import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.init.PercProfile;
 import de.uka.ilkd.key.proof.init.RTSJProfile;
 import de.uka.ilkd.key.proof.mgt.*;
+import de.uka.ilkd.key.java.recoderext.ConstructorNormalformBuilder;
+import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.proof.AtPreFactory;
+import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.NodeInfo;
+import de.uka.ilkd.key.proof.OpReplacer;
+import de.uka.ilkd.key.proof.init.CreatedAttributeTermFactory;
+import de.uka.ilkd.key.proof.mgt.ComplexRuleJustificationBySpec;
+import de.uka.ilkd.key.proof.mgt.ContractWithInvs;
+import de.uka.ilkd.key.proof.mgt.RuleJustificationBySpec;
 import de.uka.ilkd.key.rule.inst.ContextStatementBlockInstantiation;
 import de.uka.ilkd.key.rule.updatesimplifier.Update;
-import de.uka.ilkd.key.speclang.*;
+import de.uka.ilkd.key.speclang.ClassInvariant;
+import de.uka.ilkd.key.speclang.FormulaWithAxioms;
+import de.uka.ilkd.key.speclang.OperationContract;
+import de.uka.ilkd.key.speclang.SignatureVariablesFactory;
 
 
 /**
@@ -43,6 +61,11 @@ public class UseOperationContractRule implements BuiltInRule {
     private static final SignatureVariablesFactory SVF 
         = SignatureVariablesFactory.INSTANCE;
     private static final AtPreFactory APF = AtPreFactory.INSTANCE;
+    private static final CreatedAttributeTermFactory CATF 
+        = CreatedAttributeTermFactory.INSTANCE;
+    private static final String INIT_NAME 
+	= ConstructorNormalformBuilder.CONSTRUCTOR_NORMALFORM_IDENTIFIER;
+    
   
     public static final UseOperationContractRule INSTANCE 
                                             = new UseOperationContractRule();
@@ -99,8 +122,8 @@ public class UseOperationContractRule implements BuiltInRule {
     /**
      * Returns all meta variables occurring in the passed term.
      */
-    private SetOfMetavariable getAllMetavariables(Term term) {
-        SetOfMetavariable result = SetAsListOfMetavariable.EMPTY_SET;            
+    private ImmutableSet<Metavariable> getAllMetavariables(Term term) {
+        ImmutableSet<Metavariable> result = DefaultImmutableSet.<Metavariable>nil();            
         
         if(term.op() instanceof Metavariable) {
             result = result.add((Metavariable) term.op());
@@ -118,11 +141,11 @@ public class UseOperationContractRule implements BuiltInRule {
      * Returns the operation contracts which are applicable for the passed 
      * operation and the passed modality (at the passed PosInOccurrence).
      */
-    private SetOfOperationContract getApplicableContracts(Services services, 
+    private ImmutableSet<OperationContract> getApplicableContracts(Services services, 
                                                           ProgramMethod pm, 
                                                           Modality modality,
                                                           PosInOccurrence pio) {
-        SetOfOperationContract result 
+        ImmutableSet<OperationContract> result 
                 = services.getSpecificationRepository()
                           .getOperationContracts(pm, modality);
         
@@ -137,11 +160,9 @@ public class UseOperationContractRule implements BuiltInRule {
         if(getAllMetavariables(pio.topLevel().subTerm()).size() > 0) {
             ProgramVariable dummySelfVar 
                 = SVF.createSelfVar(services, pm, true);
-            ListOfParsableVariable dummyParamVars 
+            ImmutableList<ParsableVariable> dummyParamVars 
                 = SVF.createParamVars(services, pm, true);
-            IteratorOfOperationContract it = result.iterator();
-            while(it.hasNext()) {
-                OperationContract contract = it.next();
+            for(OperationContract contract : result) {
                 if(contract.getModifies(dummySelfVar, dummyParamVars, services)
                            .contains(EverythingLocationDescriptor.INSTANCE)) {
                     result = result.remove(contract);
@@ -162,18 +183,22 @@ public class UseOperationContractRule implements BuiltInRule {
                                                Modality modality,
                                                PosInOccurrence pio) {
         if(Main.getInstance().mediator().autoMode()) {
-            SetOfOperationContract contracts
+            ImmutableSet<OperationContract> contracts
                 = getApplicableContracts(services, pm, modality, pio);
             if(contracts.size() == 0) {
                 return null;
             }
+            OperationContract combinedContract 
+                = services.getSpecificationRepository()
+                          .combineContracts(contracts);
             
-            SetOfClassInvariant ownInvs
+            ImmutableSet<ClassInvariant> ownInvs
                 = services.getSpecificationRepository()
                           .getClassInvariants(pm.getContainerType());
             
-            //TODO: Apply *all* contracts here instead of a random one
-            return new ContractWithInvs(contracts.iterator().next(), 
+            //TODO: Allow user control over the used invariants, instead of 
+            //always using ownInvs (see bug #913)
+            return new ContractWithInvs(combinedContract,
                                         ownInvs, 
                                         ownInvs);
         } else {
@@ -182,6 +207,7 @@ public class UseOperationContractRule implements BuiltInRule {
                                                services,
                                                pm,
                                                modality,
+                                               true,
                                                true,
                                                true,
                                                true);
@@ -219,11 +245,11 @@ public class UseOperationContractRule implements BuiltInRule {
         if (pe instanceof ProgramPrefix) {
             ProgramPrefix curPrefix = (ProgramPrefix)pe;
        
-            final ArrayOfProgramPrefix prefix = curPrefix.getPrefixElements();
+            final ImmutableArray<ProgramPrefix> prefix = curPrefix.getPrefixElements();
             final int length = prefix.size();
                 
             // fail fast check      
-            curPrefix = prefix.getProgramPrefix(length-1);// length -1 >= 0 as prefix array 
+            curPrefix = prefix.get(length-1);// length -1 >= 0 as prefix array 
                                                           //contains curPrefix as first element
 
             pe = curPrefix.getFirstActiveChildPos().getProgram(curPrefix);
@@ -235,7 +261,7 @@ public class UseOperationContractRule implements BuiltInRule {
                 result = curPrefix.getFirstActiveChildPos().append(result);
                 i--;
                 if (i >= 0) {
-                    curPrefix = prefix.getProgramPrefix(i);
+                    curPrefix = prefix.get(i);
                 }
             } while (i >= 0);       
 
@@ -352,7 +378,7 @@ public class UseOperationContractRule implements BuiltInRule {
         //there must be applicable contracts for the operation
         MethodBodyStatement mbs = (MethodBodyStatement) activeStatement;
         ProgramMethod pm = mbs.getProgramMethod(services);
-        SetOfOperationContract contracts 
+        ImmutableSet<OperationContract> contracts 
                 = getApplicableContracts(services, pm, modality, pio);
         if(contracts.size() == 0) {
             return false;
@@ -368,7 +394,7 @@ public class UseOperationContractRule implements BuiltInRule {
     }
 
     
-    public ListOfGoal apply(Goal goal, Services services, RuleApp ruleApp) {
+    public ImmutableList<Goal> apply(Goal goal, Services services, RuleApp ruleApp) {
         //collect information about sequent
         PosInOccurrence pio = goBelowUpdates(ruleApp.posInOccurrence());
         Modality modality = (Modality) pio.subTerm().op();
@@ -381,12 +407,12 @@ public class UseOperationContractRule implements BuiltInRule {
                ? services.getTypeConverter()
                          .convertToLogicElement(mbs.getDesignatedContext())
                : null);
-        ListOfTerm actualParams = SLListOfTerm.EMPTY_LIST;
-        ArrayOfExpression args = mbs.getArguments();
+        ImmutableList<Term> actualParams = ImmutableSLList.<Term>nil();
+        ImmutableArray<Expression> args = mbs.getArguments();
         for(int i = 0; i < args.size(); i++) {
             actualParams = actualParams.append(
                     services.getTypeConverter()
-                            .convertToLogicElement(args.getProgramElement(i)));
+                            .convertToLogicElement(args.get(i)));
         }
         ProgramVariable actualResult 
             = (ProgramVariable) mbs.getResultVariable();
@@ -404,7 +430,7 @@ public class UseOperationContractRule implements BuiltInRule {
         if(cwi == null) {
             return null;
         }
-        assert cwi.contract.getProgramMethod().equals(pm);
+        assert cwi.contract.getProgramMethod().equals(pm) : "Tries to apply contract for " + cwi.contract.getProgramMethod() + " to " + pm;
 
         //create variables for self, parameters, result, exception, and a map 
         //for atPre-functions
@@ -412,25 +438,31 @@ public class UseOperationContractRule implements BuiltInRule {
         Namespace progVarNS = services.getNamespaces().programVariables();
         ProgramVariable selfVar          
             = SVF.createSelfVar(services, pm, true);
-        if(selfVar != null)
+        if(selfVar != null) {
             goal.addProgramVariable(selfVar);
+        }
         
-        ListOfParsableVariable paramVars 
+        ImmutableList<ParsableVariable> paramVars 
             = SVF.createParamVars(services, pm, true);
+        ImmutableList<ProgramVariable> paramVarsAsProgVars 
+            = ImmutableSLList.<ProgramVariable>nil();
         for (ParsableVariable pvar : paramVars) {
-            assert pvar instanceof ProgramVariable : pvar + " is not a ProgramVariable";
+            assert pvar instanceof ProgramVariable 
+                   : pvar + " is not a ProgramVariable";
+            paramVarsAsProgVars 
+                = paramVarsAsProgVars.append((ProgramVariable)pvar);
             goal.addProgramVariable((ProgramVariable)pvar);
         }
         
-        ProgramVariable resultVar 
-            = SVF.createResultVar(services, pm, true);
-        if(resultVar != null)
+        ProgramVariable resultVar = SVF.createResultVar(services, pm, true);
+        if(resultVar != null) {
             goal.addProgramVariable(resultVar);
+        }
         
-        ProgramVariable excVar 
-            = SVF.createExcVar(services, pm, true);
-        if(excVar != null)
+        ProgramVariable excVar = SVF.createExcVar(services, pm, true);
+        if(excVar != null) {
             progVarNS.addSafely(excVar);
+        }
         
         Map<Operator, Function> atPreFunctions               
             = new LinkedHashMap<Operator, Function>();
@@ -466,12 +498,18 @@ public class UseOperationContractRule implements BuiltInRule {
                                                       mTerm,
                                                       atPreFunctions,
                                                       services);
-        SetOfLocationDescriptor modifies = cwi.contract.getModifies(selfVar,
-                                                                    mTerm,
+        ImmutableSet<LocationDescriptor> modifies = cwi.contract.getModifies(selfVar, 
                                                                     paramVars, 
-                                                                    services);           
-        for (final ClassInvariant inv : cwi.assumedInvs) {
-            pre = pre.conjoin(inv.getClosedInv(services));
+                                                                    services);
+        
+        if(pm.getName().equals(INIT_NAME)) {
+            for (final ClassInvariant inv : cwi.assumedInvs) {
+                pre = pre.conjoin(inv.getClosedInvExcludingOne(selfVar, services));
+            }
+        } else {
+            for (final ClassInvariant inv : cwi.assumedInvs) {
+                pre = pre.conjoin(inv.getClosedInv(services));
+            }
         }
 
         for (final ClassInvariant inv : cwi.ensuredInvs) {
@@ -485,8 +523,12 @@ public class UseOperationContractRule implements BuiltInRule {
             modifies = modifies.add(new BasicLocationDescriptor(TB.var(pv)));
         }
         
+        
+        //Store the node info before the node is split
+        final NodeInfo ni = goal.node().getNodeInfo();
+
         //split goal into three branches
-        ListOfGoal result = goal.split(3);
+        ImmutableList<Goal> result = goal.split(3);
         Goal preGoal = result.tail().tail().head();
         preGoal.setBranchLabel("Pre");
         Goal postGoal = result.tail().head();
@@ -497,11 +539,12 @@ public class UseOperationContractRule implements BuiltInRule {
         //prepare common stuff for the three branches
         UpdateFactory uf = new UpdateFactory(services, goal.simplifier());
         AnonymisingUpdateFactory auf = new AnonymisingUpdateFactory(uf);
-        SetOfMetavariable mvs = getAllMetavariables(pio.topLevel().subTerm());
+        ImmutableSet<Metavariable> mvs = getAllMetavariables(pio.topLevel().subTerm());
         Term[] mvTerms = new Term[mvs.size()];
-        final IteratorOfMetavariable it2 = mvs.iterator();
+        final Iterator<Metavariable> it2 = mvs.iterator();
         for(int i = 0; i < mvTerms.length; i++) {
-            mvTerms[i] = TermBuilder.DF.func(it2.next());
+            assert it2.hasNext();
+            mvTerms[i] = TB.func(it2.next());
         }            
         Update anonUpdate = auf.createAnonymisingUpdate(modifies, 
                                                         mvTerms, 
@@ -513,12 +556,12 @@ public class UseOperationContractRule implements BuiltInRule {
                                    : uf.elementaryUpdate(TB.var(selfVar), 
                                                          actualSelf));
         
-        final IteratorOfTerm actualParamsIt = actualParams.iterator();
         Term[] argTerms = new Term[paramVars.size()+(pm.isStatic() ? 0 : 1)];
         int i = 0;
         if(!pm.isStatic()){
             argTerms[i++] = TB.var(selfVar);
         }
+        final Iterator<Term> actualParamsIt = actualParams.iterator();
         for (final ParsableVariable paramVar : paramVars) {
             assert actualParamsIt.hasNext();
             selfParamsUpdate 
@@ -571,23 +614,35 @@ public class UseOperationContractRule implements BuiltInRule {
             }
             preF = TB.and(wsPre, preF);
         }
-        Term preTerm = uf.apply(selfParamsUpdate, 
-                                TB.imp(pre.getAxiomsAsFormula(), 
-                                       preF));
+        Term reachablePre = TB.and(new Term[]{
+                TB.inReachableState(services),
+                selfVar != null ? CATF.createCreatedAndNotNullTerm(services, TB.var(selfVar)) : TB.tt(),
+                CATF.createReachableVariableValuesTerm(services, 
+                                                       paramVarsAsProgVars)});
+        Term preTerm = uf.prepend(
+                selfParamsUpdate, 
+                TB.and(reachablePre, TB.imp(pre.getAxiomsAsFormula(), 
+                                            preF)));
         replaceInGoal(preTerm, preGoal, pio);
         
         //create "Post" branch
+        Term reachablePost = TB.and(
+                TB.inReachableState(services), 
+                CATF.createReachableVariableValueTerm(services, resultVar));
         StatementBlock postSB = replaceStatement(jb, new StatementBlock());
 
+        final Term contractPost = TB.and(new Term[]{excNullTerm,
+                			reachablePost,
+                			post.getAxiomsAsFormula(),
+                			post.getFormula()});
+
         Term postTermWithoutUpdate 
-            = TB.imp(TB.and(new Term[]{excNullTerm,
-                                       post.getAxiomsAsFormula(),
-                                       post.getFormula()}),
+            = TB.imp(contractPost,
                      TB.prog(modality,
                              JavaBlock.createJavaBlock(postSB), 
                              pio.subTerm().sub(0)));
         
-        Update resultUpdate = (actualResult == null
+        final Update resultUpdate = (actualResult == null
                                ? uf.skip()
                                : uf.elementaryUpdate(TB.var(actualResult), 
                                                      TB.var(resultVar)));
@@ -597,12 +652,12 @@ public class UseOperationContractRule implements BuiltInRule {
         //anonym*ous* updates; replace by "else" case once this is fixed
         Term postTerm;
         if(anonUpdate.isAnonymousUpdate()) {
-            postTerm = uf.apply(resultUpdate, postTermWithoutUpdate);
+            postTerm = uf.prepend(resultUpdate, postTermWithoutUpdate);
             postTerm = TB.tf().createAnonymousUpdateTerm(
                                     AnonymousUpdate.getNewAnonymousOperator(), 
                                     postTerm);
         } else {
-            postTerm = uf.apply(uf.sequential(new Update[]{selfParamsUpdate,
+            postTerm = uf.prepend(uf.sequential(new Update[]{selfParamsUpdate,
                                                            atPreUpdate,
                                                            uf.parallel(anonUpdate, wsUpd),
                                                            resultUpdate}),
@@ -629,16 +684,19 @@ public class UseOperationContractRule implements BuiltInRule {
         replaceInGoal(postTerm, postGoal, pio);
         
         //create "Exceptional Post" branch
+        Term reachableExcPost = TB.and(
+                TB.inReachableState(services),
+                CATF.createCreatedAndNotNullTerm(services, TB.var(excVar)));
         StatementBlock excPostSB 
             = replaceStatement(jb, new StatementBlock(new Throw(excVar)));
         Term excPostTermWithoutUpdate
-            = TB.imp(TB.and(new Term[]{TB.not(excNullTerm),
+            = TB.imp(TB.and(new Term[]{reachableExcPost,
                                        post.getAxiomsAsFormula(),
                                        post.getFormula()}),
                      TB.prog(modality,
                              JavaBlock.createJavaBlock(excPostSB), 
                              pio.subTerm().sub(0)));
-        Term excPostTerm = uf.apply(uf.sequential(new Update[]{selfParamsUpdate,
+        Term excPostTerm = uf.prepend(uf.sequential(new Update[]{selfParamsUpdate,
                                                                atPreUpdate,
                                                                uf.parallel(anonUpdate, wsUpd)}),
                                     excPostTermWithoutUpdate);
@@ -652,6 +710,23 @@ public class UseOperationContractRule implements BuiltInRule {
             = (ComplexRuleJustificationBySpec)
               goal.proof().env().getJustifInfo().getJustification(this);
         cjust.add(ruleApp, just);
+        
+        ////////////////////////////////////////////////////////////////
+        // Store information about the contract rule application
+        // for later use by the bugdetection package. 
+        // author:gladisch
+            ContractAppInfo cInfo = new ContractAppInfo();
+            cInfo.anon = anonUpdate;
+            cInfo.contractPost = contractPost;
+            if(anonUpdate.isAnonymousUpdate()) {
+                cInfo.prefix = resultUpdate;
+            } else {
+                cInfo.prefix = uf.sequential(new Update[]{selfParamsUpdate,
+                                                               atPreUpdate,
+                                                               resultUpdate});
+            }
+            ni.cInfo = cInfo;
+        ////////////////////////////////////////////////////////////////
         
         return result;
     }

@@ -16,7 +16,8 @@
 
 package de.uka.ilkd.key.logic;
 
-import java.util.Iterator;
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -48,11 +49,25 @@ public class InnerVariableNamer extends VariableNamer {
 	return (maxInGlobals > maxInProgram ? maxInGlobals : maxInProgram);
     }
 
+    // reklov
+    // START TEMPORARY DOWNWARD COMPATIBILITY
+    private ImmutableList<Name> oldProgVarProposals = ImmutableSLList.<Name>nil();
+
+    public void setOldProgVarProposals(Name proposals) {
+        if (proposals == null) return;
+        String[] props = proposals.toString().split(",|;");
+
+        for (String prop : props) {
+            oldProgVarProposals = oldProgVarProposals.append(new Name(prop));
+        }
+
+    }
+
+    // END TEMPORARY DOWNWARD COMPATIBILITY
 
     public ProgramVariable rename(ProgramVariable var,
                                   Goal goal,
-                                  PosInOccurrence posOfFind,
-                                  Name proposal) {
+                                  PosInOccurrence posOfFind) {
 	ProgramElementName name = var.getProgramElementName();
 	BasenameAndIndex bai = getBasenameAndIndex(name);
 	Globals globals = wrapGlobals(goal.getGlobalProgVars());
@@ -61,6 +76,21 @@ public class InnerVariableNamer extends VariableNamer {
 	//prepare renaming of inner var
 	final NameCreationInfo nci = getMethodStack(posOfFind);
 	ProgramElementName newname = null;
+
+	// reklov
+	// START TEMPORARY DOWNWARD COMPATIBILITY
+	// Name proposal = services.getProof().getNameRecorder().getProposal();
+	Name proposal = null;
+
+	if (!oldProgVarProposals.isEmpty()) {
+	    proposal = oldProgVarProposals.head();
+	    oldProgVarProposals = oldProgVarProposals.tail();
+	} else {
+	    proposal = services.getNameRecorder().getProposal();
+	}
+
+	// END TEMPORARY DOWNWARD COMPATIBILITY
+
 	if (proposal != null) {
 	    newname = new ProgramElementName(proposal.toString(), nci);
 	}

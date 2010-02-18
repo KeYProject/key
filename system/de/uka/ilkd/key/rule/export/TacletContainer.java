@@ -5,8 +5,6 @@
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
-//
-//
 /*
  * Created on 07.12.2004
  *
@@ -15,6 +13,7 @@
  */
 package de.uka.ilkd.key.rule.export;
 
+import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.logic.Named;
 
 /**
@@ -24,5 +23,5 @@ import de.uka.ilkd.key.logic.Named;
  * like a rule set, a .key file, etc.
  */
 public interface TacletContainer extends Named {
-    ListOfTacletModelInfo getTaclets ();
+    ImmutableList<TacletModelInfo> getTaclets ();
 }

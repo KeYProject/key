@@ -27,6 +27,7 @@ header {
 
 class KeYLexer extends Lexer;
 options {
+    charVocabulary='\u0000'..'\uFFFE';
     k=2;
     defaultErrorHandler = true;
 }
@@ -97,6 +98,8 @@ tokens {
 	MEMORYAREA = "\\memoryArea";
 	PARENTSCOPE = "\\parentScope";
 	SCOPESTACK = "\\scopeStack";
+	SAMEHEAPDEPPRED = "\\sameHeapDepPred";
+
 
 	// Quantifiers, binding, substitution
 	BIND   = "\\bind";
@@ -108,6 +111,9 @@ tokens {
 	IF   = "\\if";
 	THEN = "\\then";
 	ELSE = "\\else";
+    SUM  = "\\sum";
+  	BSUM  = "\\bSum";
+    PRODUCT  = "\\product";
 	
 
         // inclusion and stuff, things that (usually) come at the beginnig 
@@ -115,6 +121,7 @@ tokens {
 	INCLUDE="\\include";
 	INCLUDELDTS="\\includeLDTs";
 	CLASSPATH="\\classpath";
+	BOOTCLASSPATH="\\bootclasspath";
 	NODEFAULTCLASSES="\\noDefaultClasses";
 	JAVASOURCE="\\javaSource";
         NOJAVAMODEL ="\\noJavaModel";
@@ -164,6 +171,7 @@ tokens {
         CHOOSECONTRACT = "\\chooseContract";
         PROOF = "\\proof";
         CONTRACTS = "\\contracts";
+        INVARIANTS = "\\invariants";
 
         // The first two guys are not really meta operators, treated separately
 	IN_TYPE = "\\inType";
@@ -331,7 +339,8 @@ tokens {
 
 protected
 VOCAB
-   :       '\3'..'\377'
+   :
+   	'\u0000'..'\uFFFE'
    ;
 
 SEMI
@@ -667,8 +676,6 @@ ESC
 	|	'"' { $setText("\""); }
 	|	'\'' { $setText("'"); }
 	|	'\\' { $setText("\\"); }
-	|	':' { $setText ("\\:"); }
-	|	' ' { $setText ("\\ "); }
     )
     ;
 

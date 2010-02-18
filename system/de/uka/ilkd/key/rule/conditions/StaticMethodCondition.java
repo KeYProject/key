@@ -10,10 +10,9 @@
 
 package de.uka.ilkd.key.rule.conditions;
 
-
-import de.uka.ilkd.key.java.ArrayOfExpression;
-import de.uka.ilkd.key.java.ArrayOfProgramElement;
+import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.Expression;
+import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
@@ -57,13 +56,12 @@ public class StaticMethodCondition extends VariableConditionAdapter {
 	this.args = args;
     }
 
-    private static ArrayOfExpression toArrayOfExpression
-	(ArrayOfProgramElement a) {
+    private static ImmutableArray<Expression> toExpArray(ImmutableArray<? extends ProgramElement> a) {
 	Expression[] result = new Expression[a.size()];
 	for (int i=0; i<a.size(); i++) {
-	    result[i]=(Expression)a.getProgramElement(i);
+	    result[i]=(Expression)a.get(i);
 	}
-	return new ArrayOfExpression(result);
+	return new ImmutableArray<Expression>(result);
     }
 
     /**
@@ -82,17 +80,14 @@ public class StaticMethodCondition extends VariableConditionAdapter {
 	
 	ReferencePrefix rp = (ReferencePrefix) svInst.getInstantiation(caller);
 	MethodName mn = (MethodName) svInst.getInstantiation(methname);
-	ArrayOfProgramElement ape = 
-	    (ArrayOfProgramElement) svInst.getInstantiation(args);
+	ImmutableArray<ProgramElement> ape = 
+	    (ImmutableArray<ProgramElement>) svInst.getInstantiation(args);
 
 	if (rp != null && mn != null && ape != null) {
-	    ArrayOfExpression ar 
-		= toArrayOfExpression((ArrayOfProgramElement) 
-				      svInst.getInstantiation(args));
-	    if (var==args) {
-                assert subst instanceof ArrayOfExpression : 
-                    "wrong use of StaticMethodCondition";
-		ar = (ArrayOfExpression) subst;
+	    ImmutableArray<Expression> ar 
+		= toExpArray((ImmutableArray<ProgramElement>)svInst.getInstantiation(args));
+	    if (var == args) {		
+		ar = toExpArray((ImmutableArray<? extends ProgramElement>)subst);
 	    }
 	    ExecutionContext ec 
 		= svInst.getContextInstantiation().activeStatementContext();

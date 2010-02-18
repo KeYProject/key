@@ -12,7 +12,6 @@ package de.uka.ilkd.key.logic.op;
 
 import java.util.HashMap;
 
-import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -22,7 +21,6 @@ import de.uka.ilkd.key.logic.sort.Sort;
  * preserves and throughout are possible in the future).
  * For further information see @see PrpgramTerm.
  */
-
 public class Modality extends Op implements NonRigid {
 
     private static final HashMap<String, Modality> nameMap = 
@@ -87,7 +85,7 @@ public class Modality extends Op implements NonRigid {
     public boolean isRigid (Term term) {
 	return
 	    super.isRigid ( term ) &&
-	    term.javaBlock () == JavaBlock.EMPTY_JAVABLOCK;
+	    term.javaBlock ().isEmpty();
     }
 
 }

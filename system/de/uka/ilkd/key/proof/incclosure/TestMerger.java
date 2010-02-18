@@ -10,6 +10,8 @@
 
 package de.uka.ilkd.key.proof.incclosure;
 
+import java.util.Iterator;
+
 import junit.framework.TestCase;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
@@ -144,7 +146,7 @@ public class TestMerger extends TestCase {
 	MultiMerger merger = new MultiMerger ( root, 3, services );
 
 	BufferSink[] sinks = new BufferSink [5];
-	IteratorOfSink it = merger.getSinks ();
+	Iterator<Sink> it = merger.getSinks ();
 	sinks[0] = new BufferSink ( it.next () );
 	sinks[1] = new BufferSink ( it.next () );
 	sinks[2] = new BufferSink ( it.next () );

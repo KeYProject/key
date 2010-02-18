@@ -1,22 +1,26 @@
+// This file is part of KeY - Integrated Deductive Software Design
+// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General Public License. 
+// See LICENSE.TXT for details.
 package de.uka.ilkd.key.visualdebugger.watchpoints;
 
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.abstraction.ListOfType;
-import de.uka.ilkd.key.java.abstraction.SLListOfType;
+import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.declaration.VariableSpecification;
-import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.java.reference.ReferencePrefix;
-import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.ProgramPrefix;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
@@ -60,24 +64,23 @@ public class WatchPointManager {
                 
                 Namespace progVarNS = new Namespace();
                 final JavaInfo ji = services.getJavaInfo();
-    
-                for (int i = 0; i < watchpoints.size(); i++) {
-                    
-                    WatchPoint wp = watchpoints.get(i);
+
+                for (WatchPoint wp : watchpoints) {
+
                     if (wp.isEnabled()) {
-    
+
                         String declaringType = wp.getDeclaringType();
-    
+
                         String nameOfSelf = "self_XY";
                         ProgramElementName selfName = new ProgramElementName(
                                 nameOfSelf);
-    
+
                         // check namespace
                         while (progVarNS.lookup(selfName) != null) {
                             nameOfSelf = nameOfSelf.concat("Z");
                             selfName = new ProgramElementName(nameOfSelf);
                         }
-    
+
                         ProgramVariable var_self = new LocationVariable(
                                 selfName, ji.getKeYJavaType(declaringType));
                         wp.setSelf(var_self);
@@ -85,15 +88,15 @@ public class WatchPointManager {
                                 new ProgramElementName(wp.getName()), services
                                         .getTypeConverter().getBooleanType());
                         progVarNS.addSafely(var_self);
-                        progVarNS.addSafely(var_dummy);
-    
+                        progVarNS.add(var_dummy);
+
                         if (wp.getLocalVariables() != null
                                 && wp.getLocalVariables().size() > 0) {
                             translateLocalVariables(progVarNS, services, wp);
                             watchPointsContainLocals = true;
                         }
-    
-                        wp.setWatchpointTerm(createWatchpointTerm(services,
+
+                        wp.setRawTerm(createWatchpointTerm(services,
                                 progVarNS, wp, declaringType, selfName));
                     }
                 }
@@ -143,7 +146,7 @@ public class WatchPointManager {
         List<LocalVariableDescriptor> locVars = wp.getLocalVariables();
         //reconstruct signature
         List<String> parameterTypes = wp.getParameterTypes();
-        ListOfType signature = SLListOfType.EMPTY_LIST;
+        ImmutableList<Type> signature = ImmutableSLList.<Type>nil();
         for (String type : parameterTypes) {
             signature = signature.append(ji.getKeYJavaType(type));
         }
@@ -213,10 +216,10 @@ public class WatchPointManager {
     
     /**
      * Gets the list of WatchPoints. This method never returns
-     * null. In case that there are no WatchPoints an empty ListOfTerm is
+     * null. In case that there are no WatchPoints an empty IList<Term> is
      * returned.
      * 
-     * @return the list of WatchPoints as ListOfTerm
+     * @return the list of WatchPoints as IList<Term>
      */
     public LinkedList<WatchPoint> getListOfWatchpoints(Services services) {
 

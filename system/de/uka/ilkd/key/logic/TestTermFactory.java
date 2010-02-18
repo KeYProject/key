@@ -12,11 +12,11 @@ package de.uka.ilkd.key.logic;
 
 import junit.framework.Assert;
 import junit.framework.TestCase;
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.ClassInstanceSortImpl;
 import de.uka.ilkd.key.logic.sort.PrimitiveSort;
-import de.uka.ilkd.key.logic.sort.SetAsListOfSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 
 /** class tests the term factory
@@ -33,7 +33,7 @@ public class TestTermFactory extends TestCase {
     private Sort osort2=new ClassInstanceSortImpl(new Name("os2"), osort1, false);
     private Sort osort3=new ClassInstanceSortImpl(new Name("os3"), osort1, false);
     private Sort osort4=new ClassInstanceSortImpl(new Name("os4"), 
-						  SetAsListOfSort.EMPTY_SET
+						  DefaultImmutableSet.<Sort>nil()
 						  .add(osort2).add(osort3), false);
     
     Function p=new RigidFunction(new Name("p"),Sort.FORMULA,new Sort[]{sort1});  

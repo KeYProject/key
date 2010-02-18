@@ -5,28 +5,25 @@
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
-//
-//
 
 package de.uka.ilkd.key.speclang.ocl.translation;
 
 import java.io.StringReader;
+import java.util.Iterator;
 import java.util.Map;
 
 import antlr.RecognitionException;
 import antlr.TokenStreamException;
-
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.logic.ListOfInteger;
-import de.uka.ilkd.key.logic.Namespace;
-import de.uka.ilkd.key.logic.SLListOfInteger;
-import de.uka.ilkd.key.logic.SetOfLocationDescriptor;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.TermFactory;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.op.ParsableVariable;
 import de.uka.ilkd.key.parser.KeYLexer;
 import de.uka.ilkd.key.parser.KeYParser;
 import de.uka.ilkd.key.parser.ParserMode;
@@ -40,7 +37,7 @@ import de.uka.ilkd.key.speclang.translation.SLTranslationException;
  */
 class OCLTranslator {
     private final Services services;
-    private ListOfInteger parserCounters = SLListOfInteger.EMPTY_LIST;
+    private ImmutableList<Integer> parserCounters = ImmutableSLList.<Integer>nil();
     
     
     public OCLTranslator(Services services) {
@@ -55,7 +52,7 @@ class OCLTranslator {
 	    				String expr,
                                         KeYJavaType specInClass,
 	    				ParsableVariable selfVar,
-	    				ListOfParsableVariable paramVars,
+	    				ImmutableList<ParsableVariable> paramVars,
 	    				ParsableVariable resultVar,
 	    				ParsableVariable excVar,
                                         Map<Operator, Function> /*(atPre)*/ atPreFunctions) 
@@ -105,10 +102,10 @@ class OCLTranslator {
     /**
      * Translates an expression as it occurs in KeY-OCL modifies expressions.
      */
-    public SetOfLocationDescriptor translateModifiesExpression(
+    public ImmutableSet<LocationDescriptor> translateModifiesExpression(
                                           String modifiesExpr,
                                           ParsableVariable selfVar, 
-                                          ListOfParsableVariable paramVars)
+                                          ImmutableList<ParsableVariable> paramVars)
 		throws SLTranslationException {
 	assert modifiesExpr != null && !modifiesExpr.equals("");
 		
@@ -118,10 +115,9 @@ class OCLTranslator {
 	Namespace extendedProgVars
 		= originalProgVars.copy();
 	extendedProgVars.add(selfVar);
-	IteratorOfParsableVariable it = paramVars.iterator();
-	while(it.hasNext()) {
-	    extendedProgVars.add(it.next());
-	}
+        for (ParsableVariable paramVar : paramVars) {
+            extendedProgVars.add(paramVar);
+        }
 	services.getNamespaces().setProgramVariables(extendedProgVars);
 	
 	//create parser

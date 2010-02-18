@@ -130,6 +130,15 @@ public abstract class Op implements Operator {
 
     /** the 'ifEx-then-else' operator */
     public static final IfExThenElse IF_EX_THEN_ELSE = new IfExThenElse ();
+
+    /** the sum operator */
+    public static final NumericalQuantifier SUM = new NumericalQuantifier(new Name("\\sum"));
+    
+    /** the bounded sum operator */
+    public static final BoundedNumericalQuantifier BSUM = new BoundedNumericalQuantifier(new Name("\\bSum"));
+    
+    /** the product operator */
+    public static final NumericalQuantifier PRODUCT = new NumericalQuantifier(new Name("\\product"));
     
     protected final Name name;
    	
@@ -142,7 +151,7 @@ public abstract class Op implements Operator {
      * @param str name of the modality to return
      */
     public static Modality getModality(String str) {
-	return (Modality)Modality.getNameMap().get(str);
+	return Modality.getNameMap().get(str);
     }
 
     /**

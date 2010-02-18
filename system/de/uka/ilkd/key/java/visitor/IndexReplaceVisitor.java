@@ -10,76 +10,92 @@
 
 package de.uka.ilkd.key.java.visitor;
 
-import de.uka.ilkd.key.java.ArrayOfExpression;
-import de.uka.ilkd.key.java.Expression;
-import de.uka.ilkd.key.java.PositionInfo;
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.Services;
+import java.io.StringWriter;
+
+import de.uka.ilkd.key.collection.ImmutableArray;
+import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.reference.ArrayReference;
 import de.uka.ilkd.key.java.reference.ReferencePrefix;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.unittest.ppAndJavaASTExtension.CompilableJavaCardPP;
 import de.uka.ilkd.key.util.ExtList;
 
-/** Replaces array references a[expr] by a[dat] where dat is the concrete 
- * value for expr. This is needed for unit test generation.
+/**
+ * Replaces array references a[expr] by a[dat] where dat is the concrete value
+ * for expr. This is needed for unit test generation.
  */
-public class IndexReplaceVisitor extends CreatingASTVisitor{
+public class IndexReplaceVisitor extends CreatingASTVisitor {
 
-    private ProgramElement result=null;
-//    private KeYJavaType containingKJT=null
-    private Expression[][] testLocation;
-    private boolean singleTuple;
-    private ProgramVariable partCounter;
-//    private ProgramVariable[] lCounter;
-    private ProgramVariable[] testArray;
+    private ProgramElement result = null;
+    // private KeYJavaType containingKJT=null
+    private final Expression[][] testLocation;
+    private final boolean singleTuple;
+    private final ProgramVariable partCounter;
+    // private ProgramVariable[] lCounter;
+    private final ProgramVariable[] testArray;
 
-    public IndexReplaceVisitor(ProgramElement pe, 
-			       Expression[][] testLocation, 
-			       boolean singleTuple, 
-			       ProgramVariable partCounter, 
-//			       ProgramVariable[] lCounter, 
-			       ProgramVariable[] testArray,
-                               Services services){
+    public IndexReplaceVisitor(final ProgramElement pe,
+	    final Expression[][] testLocation, final boolean singleTuple,
+	    final ProgramVariable partCounter,
+	    // ProgramVariable[] lCounter,
+	    final ProgramVariable[] testArray, final Services services) {
 	super(pe, true, services);
 	this.testLocation = testLocation;
 	this.singleTuple = singleTuple;
 	this.partCounter = partCounter;
-//	this.lCounter = lCounter;
+	// this.lCounter = lCounter;
 	this.testArray = testArray;
     }
 
-    /** starts the walker*/
-    public void start() {	
-	stack.push(new ExtList());		
+    /** starts the walker */
+    @Override
+    public void start() {
+	stack.push(new ExtList());
 	walk(root());
-	ExtList el= stack.peek();
-	int i=0;
+	final ExtList el = stack.peek();
+	int i = 0;
 	while (!(el.get(i) instanceof ProgramElement)) {
 	    i++;
 	}
-	result=(ProgramElement) stack.peek().get(i);
+	result = (ProgramElement) stack.peek().get(i);
     }
 
-    public ProgramElement result() { 	
+    public ProgramElement result() {
 	return result;
     }
 
-    private Expression tryToReplaceByTestDatum(Expression e){
-	int i = findLocIndex(e);
-	if(i!=-1){
-	    Expression testDat = singleTuple ? (Expression) testArray[i] : 
-		(Expression) new ArrayReference(
-		    testArray[i], 
-		    new Expression[]{partCounter});
+    private Expression tryToReplaceByTestDatum(final Expression e) {
+	final int i = findLocIndex(e);
+	if (i != -1) {
+	    final Expression testDat = singleTuple ? testArray[i]
+		    : new ArrayReference(testArray[i],
+		            new Expression[] { partCounter });
 	    return testDat;
 	}
 	return e;
     }
 
-    private int findLocIndex(Expression e){
-	for(int i = 0; i<testLocation.length; i++){
-	    for(int j = 0; j<testLocation[i].length; j++){
-		if(testLocation[i][j].toString().equals(e.toString())){
+    private int findLocIndex(final Expression e) {
+	final StringWriter sw = new StringWriter();
+	final CompilableJavaCardPP cjpp = new CompilableJavaCardPP(sw, true);
+	for (int i = 0; i < testLocation.length; i++) {
+	    for (int j = 0; j < testLocation[i].length; j++) {
+		final Expression testLoc = testLocation[i][j];
+		String testLocStr, eStr;
+		if (testLoc instanceof JavaSourceElement) {
+		    testLocStr = ((JavaSourceElement) testLoc).toString(cjpp,
+			    sw);
+		} else {
+		    testLocStr = testLoc.toString();
+		}
+
+		if (e instanceof JavaSourceElement) {
+		    eStr = ((JavaSourceElement) e).toString(cjpp, sw);
+		} else {
+		    eStr = e.toString();
+		}
+
+		if (testLocStr.equals(eStr)) {
 		    return i;
 		}
 	    }
@@ -87,19 +103,20 @@ public class IndexReplaceVisitor extends CreatingASTVisitor{
 	return -1;
     }
 
-    public void performActionOnArrayReference(ArrayReference x) {
-        ExtList changeList = stack.peek();
-        if (changeList.getFirst() == CHANGED) {
-            changeList.removeFirst();
+    @Override
+    public void performActionOnArrayReference(final ArrayReference x) {
+	final ExtList changeList = stack.peek();
+	if (changeList.getFirst() == CHANGED) {
+	    changeList.removeFirst();
 	}
 	changeList.removeFirstOccurrence(PositionInfo.class);
-	ReferencePrefix rp = (ReferencePrefix) changeList.get(0);
-	ArrayOfExpression aoe = x.getDimensionExpressions();
-	Expression[] indices = new Expression[aoe.size()];
-	for(int i=0; i<aoe.size(); i++){
-	    indices[i] = tryToReplaceByTestDatum(aoe.getExpression(i));
+	final ReferencePrefix rp = (ReferencePrefix) changeList.get(0);
+	final ImmutableArray<Expression> aoe = x.getDimensionExpressions();
+	final Expression[] indices = new Expression[aoe.size()];
+	for (int i = 0; i < aoe.size(); i++) {
+	    indices[i] = tryToReplaceByTestDatum(aoe.get(i));
 	}
-	ArrayReference ar = new ArrayReference(rp, indices);
+	final ArrayReference ar = new ArrayReference(rp, indices);
 	addChild(ar);
 	changed();
     }

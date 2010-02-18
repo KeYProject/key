@@ -17,7 +17,9 @@ class KeYJMLPreLexer extends Lexer;
 
 
 options {
-    charVocabulary = '\3'..'\377';
+    charVocabulary='\u0003'..'\ufffe';
+    codeGenMakeSwitchThreshold = 2;  // Some optimizations
+    codeGenBitsetTestThreshold = 3;
     k=2;
 }
 
@@ -25,6 +27,10 @@ options {
 tokens {
     ABSTRACT 			= "abstract";
     ALSO 			= "also";
+    ASSERT                      = "assert";
+    ASSERT_REDUNDANTLY          = "assert_redundantly";
+    ASSUME                      = "assume";
+    ASSUME_REDUNDANTLY          = "assume_redundantly";
     ASSIGNABLE 			= "assignable";
     ASSIGNABLE_RED 		= "assignable_redundantly";
     BEHAVIOR 			= "behavior";
@@ -79,6 +85,7 @@ tokens {
     NON_NULL 			= "non_null";
     NORMAL_BEHAVIOR 		= "normal_behavior";
     NORMAL_BEHAVIOUR 		= "normal_behaviour";
+    NOWARN			= "nowarn";
     NULLABLE 			= "nullable";
     NULLABLE_BY_DEFAULT 	= "nullable_by_default";
     OLD				= "old";
@@ -104,6 +111,7 @@ tokens {
     SPEC_JAVA_MATH 		= "spec_java_math";
     SPEC_PROTECTED 		= "spec_protected";
     SPEC_PUBLIC 		= "spec_public";
+    SPEC_NAME           = "name";
     SPEC_SAFE_MATH 		= "spec_safe_math";
     STATIC 			= "static";
     STRICTFP 			= "strictfp";
@@ -322,6 +330,7 @@ options {
     	|  {braceCounter > 0}? '}'  { braceCounter--; ignoreAt = false; }
     	|  '\n'                     { newline(); ignoreAt = true; } 
     	|  ' '
+    	|  '\u000C'
     	|  '\t'
     	|  '\r'
     	|  {!ignoreAt}? '@'
@@ -335,6 +344,9 @@ options {
 INITIALISER
 options {
     paraphrase = "an initialiser";
+}
+{
+    assert inputState.guessing == 0;
 }
 :
     {!expressionMode}?
@@ -354,6 +366,28 @@ options {
     ';'
 ;
 
+STRING_LITERAL
+options {
+  paraphrase = "a string in double quotes";
+}
+    : '"'! ( ESC | ~('"'|'\\') )* '"'! 
+    ;
+
+protected
+ESC
+    :	'\\'
+    (	'n'         { $setText("\n"); }
+	|	'r' { $setText("\r"); }
+	|	't' { $setText("\t"); }
+	|	'b' { $setText("\b"); }
+	|	'f' { $setText("\f"); }
+	|	'"' { $setText("\""); }
+	|	'\'' { $setText("'"); }
+	|	'\\' { $setText("\\"); }
+	|	':' { $setText ("\\:"); }
+	|	' ' { $setText ("\\ "); }
+    )
+    ;
 
 
 EXPRESSION
@@ -370,7 +404,4 @@ EXPRESSION
         |    ~';'
     )* 
     {parenthesesCounter == 0}? ';'
-    {
-    	setExpressionMode(false);
-    }
 ;

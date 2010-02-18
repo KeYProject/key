@@ -17,6 +17,10 @@ import java.util.Stack;
 
 import org.apache.log4j.Logger;
 
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.VariableDeclaration;
@@ -32,11 +36,11 @@ import de.uka.ilkd.key.util.ExtList;
 
 public class SVPrefixCollector extends TacletVisitor {
 
-    private final Stack prefixStack = new Stack ();
+    private final Stack<Integer> prefixStack = new Stack<Integer> ();
 
-    private static final Boolean LEVEL       = new Boolean ( true );
-    private static final Boolean SCOPE_LEVEL = new Boolean ( true );
-    private static final Boolean HORIZON     = new Boolean ( true );
+    private static final Integer LEVEL       = new Integer(0);
+    private static final Integer SCOPE_LEVEL = new Integer(1);
+    private static final Integer HORIZON     = new Integer(2);
 
     private SVTypeInfos svTypeInfos;
     private final Services    services;
@@ -70,19 +74,9 @@ public class SVPrefixCollector extends TacletVisitor {
 	} while ( o != LEVEL );
     }
 
-    private static ListOfIProgramVariable toList ( SetOfIProgramVariable p ) {
-	IteratorOfIProgramVariable it  = p.iterator ();
-	ListOfIProgramVariable     res = SLListOfIProgramVariable.EMPTY_LIST;
-
-	while ( it.hasNext () )
-	    res = res.prepend ( it.next () );
-
-	return res;
-    }
-
-    private static ListOfSchemaVariable toList ( SetOfSchemaVariable p ) {
-	IteratorOfSchemaVariable it  = p.iterator ();
-	ListOfSchemaVariable     res = SLListOfSchemaVariable.EMPTY_LIST;
+    private static <T> ImmutableList<T> toList ( ImmutableSet<T> p ) {
+	Iterator<T> it  = p.iterator ();
+	ImmutableList<T>     res = ImmutableSLList.<T>nil();
 
 	while ( it.hasNext () )
 	    res = res.prepend ( it.next () );
@@ -115,7 +109,7 @@ public class SVPrefixCollector extends TacletVisitor {
 	    SchemaVariable sv = (SchemaVariable)t.op ();
 
 	    programVariablePrefixes
-		.addPrefix ( sv, SLListOfIProgramVariable.EMPTY_LIST );
+		.addPrefix ( sv, ImmutableSLList.<IProgramVariable>nil() );
 
 	    if ( sv.isProgramSV () &&
 		 ((SortedSchemaVariable)sv).sort () == ProgramSVSort.VARIABLE )
@@ -151,7 +145,7 @@ public class SVPrefixCollector extends TacletVisitor {
     private class ProgramCollector
 	extends de.uka.ilkd.key.java.visitor.JavaASTVisitor {
 
-	private Stack prefixStack = new Stack ();
+	private Stack<Object> prefixStack = new Stack<Object> ();
 
 	private int     startAtChild;
 	private boolean enter;
@@ -219,8 +213,8 @@ public class SVPrefixCollector extends TacletVisitor {
 	    push ( o );
 	}
 
-	private SetOfIProgramVariable getProgramVariablePrefix () {
-	    SetOfIProgramVariable prefix = SetAsListOfIProgramVariable.EMPTY_SET;
+	private ImmutableSet<IProgramVariable> getProgramVariablePrefix () {
+	    ImmutableSet<IProgramVariable> prefix = DefaultImmutableSet.<IProgramVariable>nil();
 
 	    if ( !empty () ) {
 		Object o = pop ();
@@ -229,10 +223,7 @@ public class SVPrefixCollector extends TacletVisitor {
 		    prefix   = getProgramVariablePrefix ();
 
 		    if ( o instanceof VariableDeclarationUnit ) {
-			IteratorOfIProgramVariable it =
-			    ((VariableDeclarationUnit)o).vars.iterator ();
-			while ( it.hasNext () )
-			    prefix = prefix.add ( it.next () );
+                for (IProgramVariable var : ((VariableDeclarationUnit) o).vars) prefix = prefix.add(var);
 		    }
 		}
 
@@ -271,12 +262,12 @@ public class SVPrefixCollector extends TacletVisitor {
 	    walk(root());	
 	}
 
-	public ListOfStatement createJumpTable ( SchemaVariable x ) {
+	public ImmutableList<Statement> createJumpTable ( SchemaVariable x ) {
 	    int             i             = prefixStack.size ();
 	    boolean         emptyBreak    = false;
 	    boolean         emptyContinue = false;
 	    Object          o;
-	    ListOfStatement res           = SLListOfStatement.EMPTY_LIST;
+	    ImmutableList<Statement> res           = ImmutableSLList.<Statement>nil();
 	    
 	    if ( x.isProgramSV () &&
 		 ((SortedSchemaVariable)x).sort () == ProgramSVSort.STATEMENT ) {
@@ -398,8 +389,8 @@ public class SVPrefixCollector extends TacletVisitor {
 	}
 
 	private void computeJumpStatementPrefix ( SortedSchemaVariable x ) {
-	    ListOfStatement prefix    = createJumpTable ( x );
-	    ListOfStatement oldPrefix =	jumpStatementPrefixes.getPrefix ( x );
+	    ImmutableList<Statement> prefix    = createJumpTable ( x );
+	    ImmutableList<Statement> oldPrefix =	jumpStatementPrefixes.getPrefix ( x );
 
 	    if ( oldPrefix == null )
 		jumpStatementPrefixes.addPrefix ( x, prefix );
@@ -407,8 +398,8 @@ public class SVPrefixCollector extends TacletVisitor {
 		if ( prefix.size () != oldPrefix.size () )
 		    prefixWarning ( x, oldPrefix, prefix );
 
-		ListOfStatement     res = SLListOfStatement.EMPTY_LIST;
-		IteratorOfStatement it  = oldPrefix.iterator ();
+		ImmutableList<Statement>     res = ImmutableSLList.<Statement>nil();
+		Iterator<Statement> it  = oldPrefix.iterator ();
 		Statement           st;
 
 		while ( it.hasNext () ) {
@@ -425,8 +416,8 @@ public class SVPrefixCollector extends TacletVisitor {
 	}
 
 	private void prefixWarning ( SchemaVariable  x,
-				     ListOfStatement p_old,
-				     ListOfStatement p_new ) {
+				     ImmutableList<Statement> p_old,
+				     ImmutableList<Statement> p_new ) {
 	    logger.error ( "*** Warning: Prefixes of schema variable " + x
                     + " differ ***: " );
             logger.error ( "        Old Prefix: " + p_old );
@@ -434,8 +425,8 @@ public class SVPrefixCollector extends TacletVisitor {
 	}
 
 	private void prefixWarning ( SchemaVariable         x,
-				     ListOfIProgramVariable p_old,
-				     SetOfIProgramVariable  p_new ) {
+				     ImmutableList<IProgramVariable> p_old,
+				     ImmutableSet<IProgramVariable>  p_new ) {
 	    logger.error ( "*** Warning: Prefixes of schema variable " + x
                     + " differ ***: " );
             logger.error ( "        Old Prefix: " + p_old );
@@ -444,10 +435,10 @@ public class SVPrefixCollector extends TacletVisitor {
 
 	// only because the equals-methods of jump statement do not
 	// work
-	private boolean containsModRenaming ( ListOfStatement      p_list,
+	private boolean containsModRenaming ( ImmutableList<Statement>      p_list,
 					      Statement            p_st,
 					      NameAbstractionTable p_nat ) {
-	    if ( p_list == SLListOfStatement.EMPTY_LIST )
+	    if ( p_list.isEmpty() )
 		return false;
 	    else
 		return
@@ -456,13 +447,13 @@ public class SVPrefixCollector extends TacletVisitor {
 	}
 
 	private void computeProgramVariablePrefix ( SortedSchemaVariable x ) {
-	    SetOfIProgramVariable  prefix    = getProgramVariablePrefix ();
+	    ImmutableSet<IProgramVariable>  prefix    = getProgramVariablePrefix ();
 
 	    if ( x.sort () == ProgramSVSort.VARIABLE &&
 		 !prefix.contains ( (ProgramSV)x ) )
 		programVariablePrefixes.addFreeSchemaVariable ( x );
 
-	    ListOfIProgramVariable oldPrefix =
+	    ImmutableList<IProgramVariable> oldPrefix =
 		programVariablePrefixes.getPrefix ( x );
 
 	    if ( oldPrefix == null )
@@ -471,9 +462,9 @@ public class SVPrefixCollector extends TacletVisitor {
 		if ( prefix.size () != oldPrefix.size () )
 		    prefixWarning ( x, oldPrefix, prefix );
 
-		ListOfIProgramVariable     res =
-		    SLListOfIProgramVariable.EMPTY_LIST;
-		IteratorOfIProgramVariable it  =
+		ImmutableList<IProgramVariable>     res =
+		    ImmutableSLList.<IProgramVariable>nil();
+		Iterator<IProgramVariable> it  =
 		    oldPrefix.iterator ();
 		IProgramVariable pv;
 
@@ -492,8 +483,8 @@ public class SVPrefixCollector extends TacletVisitor {
     }
 
     private static class VariableDeclarationUnit {
-	public ListOfIProgramVariable vars =
-	    SLListOfIProgramVariable.EMPTY_LIST;
+	public ImmutableList<IProgramVariable> vars =
+	    ImmutableSLList.<IProgramVariable>nil();
 	public KeYJavaType type;
 
 	public VariableDeclarationUnit ( KeYJavaType p_type ) {
@@ -505,15 +496,15 @@ public class SVPrefixCollector extends TacletVisitor {
     private static class JumpStatementPrefixesImpl
 	implements JumpStatementPrefixes {
 
-	private HashMap prefixes = new HashMap ();
+	private HashMap<SchemaVariable, ImmutableList<Statement>> prefixes = new HashMap<SchemaVariable, ImmutableList<Statement>> ();
 
 	private void addPrefix ( SchemaVariable  p_sv,
-				 ListOfStatement p_prefix ) {
+				 ImmutableList<Statement> p_prefix ) {
 	    prefixes.put ( p_sv, p_prefix );
 	}
 
-	public ListOfStatement getPrefix ( SchemaVariable p ) {
-	    return (ListOfStatement)prefixes.get ( p );
+	public ImmutableList<Statement> getPrefix ( SchemaVariable p ) {
+	    return prefixes.get ( p );
 	}
 
     }
@@ -521,14 +512,14 @@ public class SVPrefixCollector extends TacletVisitor {
     private static class RawProgramVariablePrefixesImpl
 	implements RawProgramVariablePrefixes {
 
-	private HashMap                prefixes             = new HashMap ();
+	private HashMap<SchemaVariable, ImmutableList<IProgramVariable>>                prefixes             = new HashMap<SchemaVariable, ImmutableList<IProgramVariable>> ();
 
-	private SetOfIProgramVariable freeProgramVariables =
-	    SetAsListOfIProgramVariable.EMPTY_SET;
-	private SetOfSchemaVariable   freeSchemaVariables  =
-	    SetAsListOfSchemaVariable.EMPTY_SET;
-	private SetOfSchemaVariable   boundSchemaVariables =
-	    SetAsListOfSchemaVariable.EMPTY_SET;
+	private ImmutableSet<IProgramVariable> freeProgramVariables =
+	    DefaultImmutableSet.<IProgramVariable>nil();
+	private ImmutableSet<SchemaVariable>   freeSchemaVariables  =
+	    DefaultImmutableSet.<SchemaVariable>nil();
+	private ImmutableSet<SchemaVariable>   boundSchemaVariables =
+	    DefaultImmutableSet.<SchemaVariable>nil();
 
 	public void addFreeProgramVariable ( IProgramVariable p ) {
 	    freeProgramVariables = freeProgramVariables.add ( p );
@@ -553,30 +544,30 @@ public class SVPrefixCollector extends TacletVisitor {
 	}
 
 	private void addPrefix ( SchemaVariable         p_sv,
-				 ListOfIProgramVariable p_prefix ) {
+				 ImmutableList<IProgramVariable> p_prefix ) {
 	    prefixes.put ( p_sv, p_prefix );
 	}
 
-	public ListOfIProgramVariable getFreeProgramVariables () {
+	public ImmutableList<IProgramVariable> getFreeProgramVariables () {
 	    return toList ( freeProgramVariables );
 	}
 
-	public ListOfSchemaVariable   getFreeSchemaVariables  () {
+	public ImmutableList<SchemaVariable>   getFreeSchemaVariables  () {
 	    return toList ( freeSchemaVariables );
 	}
 
-	public ListOfSchemaVariable   getBoundSchemaVariables () {
+	public ImmutableList<SchemaVariable>   getBoundSchemaVariables () {
 	    return toList ( boundSchemaVariables );
 	}
 
-	public ListOfIProgramVariable getPrefix ( SchemaVariable p ) {
-	    return (ListOfIProgramVariable)prefixes.get ( p );
+	public ImmutableList<IProgramVariable> getPrefix ( SchemaVariable p ) {
+	    return prefixes.get ( p );
 	}
 
 	public ProgramVariablePrefixes instantiate ( SVInstantiations p ) {
-	    ListOfIProgramVariable freePV  =
+	    ImmutableList<IProgramVariable> freePV  =
 		getFreeProgramVariables ()
-		.prepend ( toPV ( getFreeSchemaVariables (), p ) );
+		.prepend ( RawProgramVariablePrefixesImpl.<SchemaVariable>toPV ( getFreeSchemaVariables (), p ) );
 
 	    HashMap                res     = new HashMap ();
 	    Iterator               entryIt = prefixes.entrySet ().iterator ();
@@ -585,7 +576,7 @@ public class SVPrefixCollector extends TacletVisitor {
 	    while ( entryIt.hasNext () ) {
 		entry = (Map.Entry)entryIt.next ();
 		res.put ( entry.getKey (),
-			  freePV.prepend ( toPV ( (ListOfIProgramVariable)
+			  freePV.prepend ( RawProgramVariablePrefixesImpl.<IProgramVariable>toPV ( (ImmutableList<IProgramVariable>)
 						  entry.getValue (),
 						  p ) ) );
 	    }
@@ -593,29 +584,16 @@ public class SVPrefixCollector extends TacletVisitor {
 	    return new ProgramVariablePrefixesImpl ( res );
 	}
 
-	private IProgramVariable toPV ( SchemaVariable   p_sv,
+	private static IProgramVariable toPV ( SchemaVariable   p_sv,
 					SVInstantiations p_svi ) {
 	    return (IProgramVariable)p_svi.getInstantiation ( p_sv );
 	}
 
-	private ListOfIProgramVariable toPV ( ListOfSchemaVariable p_svs,
+	private static <T> ImmutableList<IProgramVariable> toPV ( ImmutableList<T> p_svs,
 					      SVInstantiations     p_svi ) {
-	    ListOfIProgramVariable   res = SLListOfIProgramVariable.EMPTY_LIST;
-	    IteratorOfSchemaVariable it  = p_svs.iterator ();
+	    ImmutableList<IProgramVariable>   res = ImmutableSLList.<IProgramVariable>nil();
 
-	    while ( it.hasNext () )
-		res = res.prepend ( toPV ( it.next (), p_svi ) );
-
-	    return res;
-	}
-
-	private ListOfIProgramVariable toPV ( ListOfIProgramVariable p_svs,
-					      SVInstantiations       p_svi ) {
-	    ListOfIProgramVariable     res = SLListOfIProgramVariable.EMPTY_LIST;
-	    IteratorOfIProgramVariable it  = p_svs.iterator ();
-
-	    while ( it.hasNext () )
-		res = res.prepend ( toPV ( (SchemaVariable)it.next (), p_svi ) );
+        for (T p_sv : p_svs) res = res.prepend(toPV((SchemaVariable) p_sv, p_svi));
 
 	    return res;
 	}
@@ -631,8 +609,8 @@ public class SVPrefixCollector extends TacletVisitor {
 	    prefixes = p_prefixes;
 	}
 
-	public ListOfIProgramVariable getPrefix ( SchemaVariable p ) {
-	    return (ListOfIProgramVariable)prefixes.get ( p );
+	public ImmutableList<IProgramVariable> getPrefix ( SchemaVariable p ) {
+	    return (ImmutableList<IProgramVariable>) prefixes.get ( p );
 	}
 	
     }

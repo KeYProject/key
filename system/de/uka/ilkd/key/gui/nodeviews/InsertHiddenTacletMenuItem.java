@@ -5,18 +5,17 @@
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
-//
-//
 package de.uka.ilkd.key.gui.nodeviews;
 
 import javax.swing.JFrame;
 
+import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.pp.NotationInfo;
-import de.uka.ilkd.key.rule.ListOfTacletGoalTemplate;
 import de.uka.ilkd.key.rule.NoFindTaclet;
 import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.rule.TacletGoalTemplate;
 
 /**
  * This item groups all insert hidden taclets and offers a
@@ -52,7 +51,7 @@ public class InsertHiddenTacletMenuItem extends InsertionTacletBrowserMenuItem {
             return null;
         }
         
-        final ListOfTacletGoalTemplate goalTemplates = t.goalTemplates(); 
+        final ImmutableList<TacletGoalTemplate> goalTemplates = t.goalTemplates(); 
         if (goalTemplates.size() != 1) return null;
         return goalTemplates.head().sequent();
     }

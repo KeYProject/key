@@ -5,12 +5,10 @@
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
-//
-//
 package de.uka.ilkd.key.java.recoderext;
 
 /** 
- * an extended identifier that excepts hash symbols in its name
+ * an extended identifier that accepts hash symbols in its name
  * but not as first character
  */
 public class ExtendedIdentifier extends recoder.java.Identifier {

@@ -5,22 +5,17 @@
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
-//
-//
-//This file is part of KeY - Integrated Deductive Software Design 
-//Copyright (C) 2001-2003 Universitaet Karlsruhe, Germany
-//                      and Chalmers University of Technology, Sweden
-//
-//The KeY system is protected by the GNU General Public License.
-//See LICENSE.TXT for details.
-//
 
 package de.uka.ilkd.key.rule.export.html;
 
 import java.io.IOException;
 import java.io.Writer;
+import java.util.Iterator;
 
-import de.uka.ilkd.key.rule.export.*;
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.rule.export.DisplayNameModelInfo;
+import de.uka.ilkd.key.rule.export.RuleExportModel;
+import de.uka.ilkd.key.rule.export.TacletModelInfo;
 
 
 
@@ -40,7 +35,7 @@ public class HTMLFileByDisplayName extends HTMLFile {
     protected void init ( RuleExportModel model ) {
         super.init(model);
         
-        final IteratorOfDisplayNameModelInfo it = model.displayNames();
+        final Iterator<DisplayNameModelInfo> it = model.displayNames();
         while ( it.hasNext () ) {
             final DisplayNameModelInfo dn = it.next ();
             getFragmentAnchor(dn);
@@ -72,12 +67,12 @@ public class HTMLFileByDisplayName extends HTMLFile {
         }
         out.append ( "<ol>\n" );
 
-        final IteratorOfDisplayNameModelInfo it = model.displayNames();
+        final Iterator<DisplayNameModelInfo> it = model.displayNames();
         while ( it.hasNext () ) {
             // TOC entry
             final DisplayNameModelInfo dn = it.next ();
             
-            final ListOfTacletModelInfo taclets = dn.getTaclets();
+            final ImmutableList<TacletModelInfo> taclets = dn.getTaclets();
             int tacletCount = taclets.size();
 
             out.append ( "<li>" );
@@ -97,9 +92,9 @@ public class HTMLFileByDisplayName extends HTMLFile {
         out.append ( "</ol>\n</div>\n\n" );
     }
     
-    private String getDifferences ( ListOfTacletModelInfo taclets ) {
+    private String getDifferences ( ImmutableList<TacletModelInfo> taclets ) {
         TacletModelInfo t0 = taclets.head ();
-        final IteratorOfTacletModelInfo it = taclets.tail ().iterator ();
+        final Iterator<TacletModelInfo> it = taclets.tail ().iterator ();
         boolean differentOptions = false;
         boolean differentIntroducer = false;
         while (it.hasNext ()) {
@@ -126,7 +121,7 @@ public class HTMLFileByDisplayName extends HTMLFile {
 
     private void writeDisplayNames(StringBuffer out) {
         writeTopLink(out);
-        final IteratorOfDisplayNameModelInfo it = model.displayNames();
+        final Iterator<DisplayNameModelInfo> it = model.displayNames();
         while ( it.hasNext () ) {
             final DisplayNameModelInfo dn = it.next ();
             
@@ -144,7 +139,7 @@ public class HTMLFileByDisplayName extends HTMLFile {
         out.append ( "<div class=\"displayname\" id=\"" + anchor + "\">\n" );
         out.append ( "<h2>" + dn + "</h2>\n" );
         
-        final ListOfTacletModelInfo taclets = dn.getTaclets();
+        final ImmutableList<TacletModelInfo> taclets = dn.getTaclets();
         if ( taclets.size () == 1 ) {
             out.append ( "There is 1 taclet with this display name.\n" );
         } else {
@@ -152,13 +147,12 @@ public class HTMLFileByDisplayName extends HTMLFile {
                     + " taclets with this display name.\n" );
         }
         out.append ( "<ol>\n" );
-        
-        final IteratorOfTacletModelInfo it = taclets.iterator ();
-        while ( it.hasNext () ) {
-            final TacletModelInfo t = it.next ();
-            
-            out.append( "<li>" );
-            writeTacletLink ( out, t, true );
+
+        for (TacletModelInfo taclet : taclets) {
+            final TacletModelInfo t = taclet;
+
+            out.append("<li>");
+            writeTacletLink(out, t, true);
             out.append("</li>\n");
         }
         

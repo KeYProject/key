@@ -186,10 +186,9 @@ public abstract class RecoderModelTransformer extends TwoPassTransformation {
      */
     public void makeExplicit() {
 	Set<ClassDeclaration> s = classDeclarations();
-	Iterator<ClassDeclaration> it = s.iterator();
-	while(it.hasNext()) {
-	    TypeDeclaration cd = (TypeDeclaration) it.next();
-  //          System.out.println("RecoderModelTransformer: classdecl: "+cd.getFullName());
+        for (ClassDeclaration value : s) {
+            ClassDeclaration cd = value;
+            //          System.out.println("RecoderModelTransformer: classdecl: "+cd.getFullName());
             makeExplicit(cd);
         }
     }
@@ -248,8 +247,7 @@ public abstract class RecoderModelTransformer extends TwoPassTransformation {
         public Set<ClassDeclaration> getClassDeclarations(){
             if(classDeclarations==null){
                 ClassDeclarationCollector cdc = new ClassDeclarationCollector();
-                for (int i = 0; i < cUnits.size(); i++) {
-                CompilationUnit unit = cUnits.get(i);
+                for (CompilationUnit unit : cUnits) {
                     cdc.walk(unit);
                 }
                 classDeclarations = cdc.result();

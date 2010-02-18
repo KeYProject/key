@@ -10,9 +10,9 @@
 
 package de.uka.ilkd.key.java.statement;
 
+import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.visitor.Visitor;
-import de.uka.ilkd.key.logic.ArrayOfProgramPrefix;
 import de.uka.ilkd.key.logic.PosInProgram;
 import de.uka.ilkd.key.logic.ProgramPrefix;
 import de.uka.ilkd.key.util.ExtList;
@@ -36,7 +36,7 @@ public class SynchronizedBlock extends JavaStatement
 
     protected final StatementBlock body;
     
-    private final ArrayOfProgramPrefix prefixElementArray;
+    private final ImmutableArray<ProgramPrefix> prefixElementArray;
     
     private PosInProgram firstActiveChildPos = null;
 
@@ -79,7 +79,7 @@ public class SynchronizedBlock extends JavaStatement
 
 
 
-    private ArrayOfProgramPrefix computePrefix(StatementBlock b) {
+    private ImmutableArray<ProgramPrefix> computePrefix(StatementBlock b) {
         return StatementBlock.
            computePrefixElements(b.getBody(), 0, this);                
 }
@@ -89,10 +89,10 @@ public class SynchronizedBlock extends JavaStatement
     }
 
     public ProgramPrefix getPrefixElementAt(int i) {       
-        return prefixElementArray.getProgramPrefix(i);
+        return prefixElementArray.get(i);
     }
 
-    public ArrayOfProgramPrefix getPrefixElements() {
+    public ImmutableArray<ProgramPrefix> getPrefixElements() {
         return prefixElementArray;
     }
     

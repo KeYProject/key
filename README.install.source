@@ -1,35 +1,30 @@
 		*********************************
 		* KeY Source Code Installation  * 
-		* Version 1.2.0                 *
-		*********************************
-
+		*        Version 1.5.x         *
+		*        Nightly Builds        *
+                *     (Development Version)    *
+		********************************
 
 (1) Requirements: 
 -------------------------------------
 
-Operating System: Linux/Unix 
+Operating System: Linux/Unix, MacOSX, Windows (untested) 
 
-Java 2 SDK, Version 1.4.x or newer (already installed)
-
-For optional UML/OCL support: Together Control Center, Version 6.2 
-                                                      (already installed)
+Java 2 SDK, Version 1.5.x or newer (already installed)
 
 Needed additional Libraries:
 	antlr.jar Version >= 2.7.2: parser generator
 	javacc.jar Version >= 3.0 : parser generator
-	dresden-ocl-demo.jar: ocl parser
-	xerces.jar version 1.4.4: used by tudresden.jar
 	recoderKey.jar 
                  a transformation framework for java patched by the KeY group
 	junit.jar version 3.8.1: test framework
-	jargs.jar
 	log4j.jar
 
 Optionally, KeY can make use of the following binaries:
-	Grammatical Framework
-	ESC Java's decision procedure `Simplify´
+	ESC Java's decision procedure 'Simplify'
         SMT-LIB provers: bindings exist currently for Yices, CVCLite, CVC3 and SVC
               (export to SMT input file possible)        
+
 
 (2) Contents of the KeY-Distribution
 -------------------------------------
@@ -37,7 +32,6 @@ Optionally, KeY can make use of the following binaries:
   At the KeY-Homepage you can find the following parts:
 
    * README.xxx-src.txt: this file
-
    * KeY-xxx-src.tgz: the source code version of KeY-system
    * KeYExtLib_xxx.tgz: contains the external libraries
    * quicktour_xxx.ps.gz: a short tutorial
@@ -60,34 +54,23 @@ Optionally, KeY can make use of the following binaries:
            in. If you use csh and all the needed libraries are in
            ~/key_lib use, e.g.
 
-				setenv KEY_LIB ~/key_lib
+				   setenv KEY_LIB ~/key_lib
+                     or (bash)     export KEY_LIB=~/key_lib                  
+                     or (Windows)  set KEY_LIB=<path to libraries>
 
-
-	4) Optional (for UML/OCL support only): Tell the system where
-	   the Together Control Center installation is. Do this by
-	   setting the environment variable TOGETHER_HOME, e.g. (using
-	   csh and Together in ~togetherj/vers6.2/linux) by
-	
-			setenv TOGETHER_HOME ~togetherj/vers6.2/linux
-
-
-	5) (This step is only necessary if you want to make use of the
-	    authoring tool Grammatical Framework and/or the decision
-	    procedure Simplify.)
+	4) Optional: Install Simplify and/or SMT-LIB provers.
 
            If you download Simplify not from the KeY-website but
-           elsewhere e.g. directly from Compaq (as part of ESC/Java)
-           follow the intallation instructions given there. Then
-           rename the Simplify binary which could be named something like
-           Simplify Simplify-1.5.4.linux (Linux version) or 
-           Simplify-1.5.4.exe (Windows) to just 'Simplify' resp. 
-           'Simplify.exe'. When using Linux make sure that the file is
+           elsewhere (e.g. as part of ESC/Java), follow the intallation 
+           instructions given there. Then rename the Simplify binary which 
+           could be named something like Simplify Simplify-1.5.4.linux 
+           (Linux version) or Simplify-1.5.4.exe (Windows) to just 'Simplify' 
+           resp. 'Simplify.exe'. When using Linux make sure that the file is
            is executable (you can make a file executable by issuing the
            command 'chmod a+x filename').
 
-	   Make sure that the path where the binaries `Simplify´ and
-	   `gf´ (Grammatical Framework) reside is included in your PATH
-	   environment variable or in the KEY_LIB environment
+	   Make sure that the path where the binaries reside is included in 
+           your PATH environment variable or in the KEY_LIB environment
 	   variable. If not, use (e.g., in the csh to include Simplify
 	   which is assumed to be located in ~/simplify):
 
@@ -97,47 +80,46 @@ Optionally, KeY can make use of the following binaries:
        
                 export PATH=$PATH:~/simplify
 
-          (analog procedure for all other supported SMT-LIB provers)
+          (analog procedure for SMT-LIB provers)
 
 
-	6) Change to the subdirectory ./system
+	5) Change to the subdirectory ./system
 
 		cd system
 
-	7) Compile KeY:
+	6) Compile KeY:
 
 		 make all (or gmake all)
+             or 
+                 export ANT_OPTS="-Xmx512m"
+                 ant
 
-	   As standard Java compiler `jikes´ is the default. If you
-	   want to use javac as compiler please use
+           (compilation via 'ant' should work under Windows too, but you need to set the ANT_OPTS
+            environment variable most likely via
+                           set ANT_OPTS = "-Xmx512m"
+            )                   
 
-	     	make JAVAC=javac all
-
-           If you do not have Together, please use one of the
-           following:
-
-                make keybase
-                make JAVAC=javac keybase 
 	
 
 (4) Start KeY 
 -------------------------------
 	
-	Assuming you are still in the `system´ directory, run:
-
-		../bin/startkey
-
-	TogetherCC with the KeY extensions should then start up.
-
-	For using the KeY prover standalone use:
+	Assuming you are still in the 'system' directory, run:
 
 		../bin/runProver
 
 
+(5) Start KeY in Test Generation Mode
+-------------------------------------
+
+	Run 'startProver unit' or if you wish a simpler GUI run 'startProver testing'
+	  (Windows: 'startProver.bat unit' or 'startProver.bat testing')
+	
+	The library objenesis.jar may be required to run the generated tests.
+
+
 -------------------------------
 
-If you encounter problems please send a message to
+If you encounter problems, please send a message to
 
 		support@key-project.org
-
-

@@ -14,8 +14,12 @@ import java.util.Stack;
 
 import org.apache.log4j.Logger;
 
+import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.*;
-import de.uka.ilkd.key.java.abstraction.*;
+import de.uka.ilkd.key.java.abstraction.ArrayType;
+import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.abstraction.PrimitiveType;
+import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
 import de.uka.ilkd.key.java.declaration.VariableDeclaration;
 import de.uka.ilkd.key.java.declaration.VariableSpecification;
@@ -86,10 +90,10 @@ public class StaticProgramChecker
      * Check an element of an array using the method
      * <code>checkNonVoidType</code>
      */
-    private boolean checkNonVoidType ( ArrayOfKeYJavaType p_array,
+    private boolean checkNonVoidType ( ImmutableArray<KeYJavaType> p_array,
 				       int                p_pos,
 				       boolean            p_push ) {
-	return checkNonVoidType ( p_array.getKeYJavaType ( p_pos ), p_push );
+	return checkNonVoidType ( p_array.get(p_pos), p_push );
     }
 
     /**
@@ -129,7 +133,7 @@ public class StaticProgramChecker
      * constant, true if all elements of the array are legal (real)
      * Java types
      */
-    private boolean checkNonVoidTypeArray ( ArrayOfKeYJavaType p_array,
+    private boolean checkNonVoidTypeArray ( ImmutableArray<KeYJavaType> p_array,
 					    boolean            p_push ) {
 	int     i   = p_array.size ();
 	boolean ret = true;
@@ -148,21 +152,21 @@ public class StaticProgramChecker
      * statement
      */
     private void checkStatement ( NonTerminalProgramElement p_progEl,
-				  ArrayOfKeYJavaType        p_array,
+				  ImmutableArray<KeYJavaType>        p_array,
 				  int                       p_pos ) {
-	if ( !( p_array.getKeYJavaType ( p_pos ) == VOID ||
-		p_array.getKeYJavaType ( p_pos ) == UNKNOWN ||
+	if ( !( p_array.get(p_pos) == VOID ||
+		p_array.get(p_pos) == UNKNOWN ||
 		p_progEl.getChildAt ( p_pos ) instanceof ExpressionStatement ) )
 	    raiseTypeError ();	    
     }
 
     public void doAssignment () {
 	// narrowing of constant expressions is not yet performed
-	final ArrayOfKeYJavaType types = popAndCheckType ( 2, true );
+	final ImmutableArray<KeYJavaType> types = popAndCheckType ( 2, true );
 	if ( types != null ) {
 	    if ( getTypeConverter ().isAssignableTo
-		 ( types.getKeYJavaType ( 1 ), types.getKeYJavaType ( 0 ) ) )
-		pushResult ( types.getKeYJavaType ( 0 ) );
+		 ( types.get(1), types.get(0) ) )
+		pushResult ( types.get(0) );
 	    else
 		raiseTypeError ();
 	}
@@ -174,13 +178,13 @@ public class StaticProgramChecker
      * which has to have length <code>2</code>. The result in pushed
      * on the type stack
      */
-    private void doBinaryPromotion(ArrayOfKeYJavaType p_types) {
+    private void doBinaryPromotion(ImmutableArray<KeYJavaType> p_types) {
 	Debug.assertTrue ( p_types.size() == 2,
 	                   "doBinaryPromotion: Don't know what to do " +
 	                   "with array of length " + p_types.size() );
 
-        doBinaryPromotion(p_types.getKeYJavaType ( 0 ),
-			  p_types.getKeYJavaType ( 1 ));
+        doBinaryPromotion(p_types.get(0),
+			  p_types.get(1));
     }
 
     /**
@@ -200,16 +204,16 @@ public class StaticProgramChecker
     }
 
     private void doBitwisePromotion ( Operator x ) {
-	final ArrayOfKeYJavaType types = popAndCheckType ( 2, true );
+	final ImmutableArray<KeYJavaType> types = popAndCheckType ( 2, true );
 	if ( types != null ) {
 	    if ( !( getTypeConverter ().isArithmeticType
-		    ( types.getKeYJavaType ( 0 ) ) &&
+		    ( types.get(0) ) &&
 		    getTypeConverter ().isArithmeticType
-		    ( types.getKeYJavaType ( 1 ) ) ||
+		    ( types.get(1) ) ||
 		    getTypeConverter ().isBooleanType
-		    ( types.getKeYJavaType ( 0 ) ) &&
+		    ( types.get(0) ) &&
 		    getTypeConverter ().isBooleanType
-		    ( types.getKeYJavaType ( 1 ) ) ) )
+		    ( types.get(1) ) ) )
 		raiseTypeError ();
             doBinaryPromotion(types);
 	}
@@ -222,10 +226,10 @@ public class StaticProgramChecker
      */
     private void doCast ( KeYJavaType p_targetType ) {
 	checkNonVoidType ( p_targetType, false );
-	final ArrayOfKeYJavaType types = popAndCheckType ( 1, false );
+	final ImmutableArray<KeYJavaType> types = popAndCheckType ( 1, false );
 	if ( types != null ) {
 	    if ( getTypeConverter ().isCastingTo
-		 ( types.getKeYJavaType ( 0 ), p_targetType ) )
+		 ( types.get(0), p_targetType ) )
 		pushResult ( p_targetType );
 	    else
 		raiseTypeError ();		
@@ -234,15 +238,15 @@ public class StaticProgramChecker
     }
 
     private void doComparison ( ComparativeOperator x ) {
-	final ArrayOfKeYJavaType types = popKeYJavaTypes ( 2 );
+	final ImmutableArray<KeYJavaType> types = popKeYJavaTypes ( 2 );
 	if ( checkNonVoidType ( types, 0, false ) ) {
 	    if ( !getTypeConverter ().isArithmeticType
-		 ( types.getKeYJavaType ( 0 ) ) )
+		 ( types.get(0) ) )
 		raiseTypeError ();
 	}
 	if ( checkNonVoidType ( types, 1, false ) ) {
 	    if ( !getTypeConverter ().isArithmeticType
-		 ( types.getKeYJavaType ( 1 ) ) )
+		 ( types.get(1) ) )
 		raiseTypeError ();
 	}
 	pushBoolean ();
@@ -250,18 +254,18 @@ public class StaticProgramChecker
 
     private void doCompoundAssignment ( Assignment x ) {
 	popLevelMark ();
-	final ArrayOfKeYJavaType types = popKeYJavaTypes ( 2 );
-	push ( types.getKeYJavaType ( 1 ) );
-	doCast ( types.getKeYJavaType ( 0 ) );
+	final ImmutableArray<KeYJavaType> types = popKeYJavaTypes ( 2 );
+	push ( types.get(1) );
+	doCast ( types.get(0) );
     }
 
     private void doDecrementsIncrements ( Assignment x ) {
-	final ArrayOfKeYJavaType types = popAndCheckType ( 1, true );
+	final ImmutableArray<KeYJavaType> types = popAndCheckType ( 1, true );
 	if ( types != null ) {
 	    if ( !getTypeConverter ().isArithmeticType
-		 ( types.getKeYJavaType ( 0 ) ) )
+		 ( types.get(0) ) )
 		raiseTypeError ();
-	    pushResult ( types.getKeYJavaType ( 0 ) );
+	    pushResult ( types.get(0) );
 	}
     }
 
@@ -280,47 +284,46 @@ public class StaticProgramChecker
     }
 
     private void doEquals ( ComparativeOperator x ) {
-	final ArrayOfKeYJavaType types = popKeYJavaTypes ( 2 );
+	final ImmutableArray<KeYJavaType> types = popKeYJavaTypes ( 2 );
 	if ( checkNonVoidType ( types, 0, false ) ) {
 	    if ( checkNonVoidType ( types, 1, false ) ) {
 		if ( !( getTypeConverter ().isArithmeticType
-			( types.getKeYJavaType ( 0 ) ) &&
+			( types.get(0) ) &&
 			getTypeConverter ().isArithmeticType
-			( types.getKeYJavaType ( 1 ) ) ||
+			( types.get(1) ) ||
 			getTypeConverter ().isBooleanType
-			( types.getKeYJavaType ( 0 ) ) &&
+			( types.get(0) ) &&
 			getTypeConverter ().isBooleanType
-			( types.getKeYJavaType ( 1 ) ) ||
+			( types.get(1) ) ||
 			( getTypeConverter ().isReferenceType
-			  ( types.getKeYJavaType ( 0 ) ) ||
+			  ( types.get(0) ) ||
 			  getTypeConverter ().isNullType
-			  ( types.getKeYJavaType ( 0 ) ) ) &&
+			  ( types.get(0) ) ) &&
 			( getTypeConverter ().isReferenceType
-			  ( types.getKeYJavaType ( 1 ) ) ||
+			  ( types.get(1) ) ||
 			  getTypeConverter ().isNullType
-			  ( types.getKeYJavaType ( 1 ) ) ) ) )
+			  ( types.get(1) ) ) ) )
 		    raiseTypeError ();
 	    } else {
 		if ( !( getTypeConverter ().isArithmeticType
-			( types.getKeYJavaType ( 0 ) ) ||
+			( types.get(0) ) ||
 			getTypeConverter ().isBooleanType
-			( types.getKeYJavaType ( 0 ) ) ||
+			( types.get(0) ) ||
 			getTypeConverter ().isReferenceType
-			( types.getKeYJavaType ( 0 ) ) ||
+			( types.get(0) ) ||
 			getTypeConverter ().isNullType
-			( types.getKeYJavaType ( 
-			0 ) ) ) )
+			( types.get(0) ) ) )
 		    raiseTypeError ();
 	    }
 	} else if ( checkNonVoidType ( types, 1, false ) ) {
 	    if ( !( getTypeConverter ().isArithmeticType
-		    ( types.getKeYJavaType ( 1 ) ) ||
+		    ( types.get(1) ) ||
 		    getTypeConverter ().isBooleanType
-		    ( types.getKeYJavaType ( 1 ) ) ||
+		    ( types.get(1) ) ||
 		    getTypeConverter ().isReferenceType
-		    ( types.getKeYJavaType ( 1 ) ) ||
+		    ( types.get(1) ) ||
 		    getTypeConverter ().isNullType
-		    ( types.getKeYJavaType ( 1 ) ) ) )
+		    ( types.get(1) ) ) )
 		raiseTypeError ();
 	}
 	pushBoolean ();
@@ -330,24 +333,24 @@ public class StaticProgramChecker
      * Check an <code>instanceof</code> expression
      */
     private void doInstanceof ( TypeOperator x ) {
-	final ArrayOfKeYJavaType types = popKeYJavaTypes ( 2 );
+	final ImmutableArray<KeYJavaType> types = popKeYJavaTypes ( 2 );
 	if ( checkNonVoidType ( types, 0, false ) ) {
 	    if ( !( getTypeConverter ().isReferenceType
-		    ( types.getKeYJavaType ( 0 ) ) ||
+		    ( types.get(0) ) ||
 		    getTypeConverter ().isNullType
-		    ( types.getKeYJavaType ( 0 ) ) ) )
+		    ( types.get(0) ) ) )
 		raiseTypeError ();
 	}
 	if ( checkNonVoidType ( types, 1, false ) ) {
 	    if ( !getTypeConverter ().isReferenceType
-		 ( types.getKeYJavaType ( 1 ) ) )
+		 ( types.get(1) ) )
 		raiseTypeError ();
 	}
 	if ( checkNonVoidType ( types, 0, false ) &&
 	     checkNonVoidType ( types, 1, false ) ) {
 	    if ( !getTypeConverter ().isCastingTo
-		 ( types.getKeYJavaType ( 0 ),
-		   types.getKeYJavaType ( 1 ) ) )
+		 ( types.get(0),
+		   types.get(1) ) )
 		raiseTypeError ();		
 	}
 	pushBoolean ();
@@ -358,34 +361,34 @@ public class StaticProgramChecker
     }
 
     private void doLogicalPromotion ( Operator x ) {
-	final ArrayOfKeYJavaType types = popAndCheckType ( 2, true );
+	final ImmutableArray<KeYJavaType> types = popAndCheckType ( 2, true );
 	if ( types != null ) {
 	    if ( !getTypeConverter ().isBooleanType
-		 ( types.getKeYJavaType ( 0 ) ) ||
+		 ( types.get(0) ) ||
 		 !getTypeConverter ().isBooleanType
-		 ( types.getKeYJavaType ( 1 ) ) )
+		 ( types.get(1) ) )
 		raiseTypeError ();
 	    doBinaryPromotion(types);
 	}
     }
 
     private void doNumericPromotion ( Operator x ) {
-	final ArrayOfKeYJavaType types = popAndCheckType ( 2, true );
+	final ImmutableArray<KeYJavaType> types = popAndCheckType ( 2, true );
 	if ( types != null ) {
 	    if ( !getTypeConverter ().isArithmeticType
-		 ( types.getKeYJavaType ( 0 ) ) ||
+		 ( types.get(0) ) ||
 		 !getTypeConverter ().isArithmeticType
-		 ( types.getKeYJavaType ( 1 ) ) )
+		 ( types.get(1) ) )
 		raiseTypeError ();		
 	    doBinaryPromotion(types);
 	}
     }
 
     private void doPositiveNegative ( Operator x ) {
-	final ArrayOfKeYJavaType types = popAndCheckType ( 1, true );
+	final ImmutableArray<KeYJavaType> types = popAndCheckType ( 1, true );
 	if ( types != null ) {
 	    if ( !getTypeConverter ().isArithmeticType
-		 ( types.getKeYJavaType ( 0 ) ) )
+		 ( types.get(0) ) )
 		raiseTypeError ();
             doUnaryPromotion(types);
 	}
@@ -396,16 +399,16 @@ public class StaticProgramChecker
     }
 
     private void doShiftPromotion ( Operator x ) {
-	final ArrayOfKeYJavaType types = popKeYJavaTypes ( 2 );
+	final ImmutableArray<KeYJavaType> types = popKeYJavaTypes ( 2 );
 	if ( checkNonVoidType ( types, 0, true ) ) {
 	    if ( !getTypeConverter ().isIntegralType
-		 ( types.getKeYJavaType ( 0 ) ) )
+		 ( types.get(0) ) )
 		raiseTypeError ();
             doUnaryPromotion(types);
 	}
 	if ( checkNonVoidType ( types, 1, false ) ) {
 	    if ( !getTypeConverter ().isIntegralType
-		 ( types.getKeYJavaType ( 1 ) ) )
+		 ( types.get(1) ) )
 		raiseTypeError ();
 	}
     }
@@ -421,7 +424,7 @@ public class StaticProgramChecker
      * <code>x</code>
      */
     private void doStatements ( NonTerminalProgramElement x ) {
-	final ArrayOfKeYJavaType types = popChildrenWithArityCheck (x);
+	final ImmutableArray<KeYJavaType> types = popChildrenWithArityCheck (x);
 	int                      i     = types.size ();
 	
 	while ( i-- != 0 )
@@ -435,12 +438,12 @@ public class StaticProgramChecker
      * to have length <code>1</code>. The result in pushed on the type
      * stack
      */
-    private void doUnaryPromotion(ArrayOfKeYJavaType p_types) {
+    private void doUnaryPromotion(ImmutableArray<KeYJavaType> p_types) {
 	Debug.assertTrue ( p_types.size() == 1,
 	                   "doUnaryPromotion: Don't know what to do " +
 	                   "with array of length " + p_types.size() );
 
-        final KeYJavaType type = p_types.getKeYJavaType ( 0 );
+        final KeYJavaType type = p_types.get(0);
 	KeYJavaType promotedType = null;
         try {
             promotedType = getTypeConverter ().getPromotedType ( type );
@@ -460,20 +463,20 @@ public class StaticProgramChecker
      * given variable declaration
      */
     private KeYJavaType doVariableDeclarationHelp(VariableDeclaration x) {
-        final ArrayOfKeYJavaType types = popChildrenWithArityCheck(x);
+        final ImmutableArray<KeYJavaType> types = popChildrenWithArityCheck(x);
         int                      i;
         KeYJavaType              type  = null;
 
         for ( i = 0; i != types.size (); ++i ) {
             if ( x.getChildAt ( i ) instanceof VariableSpecification ) {
         	if ( checkNonVoidType ( types, i, false ) && type != null ) {
-        	    if ( !validSpecificationType ( types.getKeYJavaType ( i ),
+        	    if ( !validSpecificationType ( types.get(i),
         					   type ) )
         		raiseTypeError ();
         	}
             } else if ( x.getChildAt ( i ) instanceof TypeReference ) {
         	if ( checkNonVoidType ( types, i, false ) )
-        	    type = types.getKeYJavaType ( i );
+        	    type = types.get(i);
             }
         }
         return type;
@@ -508,10 +511,10 @@ public class StaticProgramChecker
     }
 
     public void performActionOnBinaryNot(BinaryNot x)     {
-	ArrayOfKeYJavaType types = popAndCheckType ( 1, true );
+	ImmutableArray<KeYJavaType> types = popAndCheckType ( 1, true );
 	if ( types != null ) {
 	    if ( !getTypeConverter ().isArithmeticType
-		 ( types.getKeYJavaType ( 0 ) ) )
+		 ( types.get(0) ) )
 		raiseTypeError ();
             doUnaryPromotion(types);
 	}
@@ -542,12 +545,12 @@ public class StaticProgramChecker
     }
 
     public void performActionOnCatch(Catch x)     {
-	ArrayOfKeYJavaType types = popKeYJavaTypes ( 2 );
+	ImmutableArray<KeYJavaType> types = popKeYJavaTypes ( 2 );
 	if ( checkNonVoidType ( types, 0, false ) ) {
 	    KeYJavaType     th      =
 		getJavaInfo ().getTypeByClassName ( "java.lang.Throwable" );
 	    Sort            thSort  = th.getSort ();
-	    Sort            parSort = types.getKeYJavaType ( 0 ).getSort ();
+	    Sort            parSort = types.get(0).getSort ();
 
 	    if ( !parSort.extendsTrans ( thSort ) )
 		raiseTypeError ();
@@ -557,16 +560,16 @@ public class StaticProgramChecker
     }
 
     public void performActionOnConditional(Conditional x)     {
-	ArrayOfKeYJavaType types = popKeYJavaTypes ( 3 );
+	ImmutableArray<KeYJavaType> types = popKeYJavaTypes ( 3 );
 	if ( checkNonVoidType ( types, 0, false ) ) {
 	    if ( !getTypeConverter ().isBooleanType
-		 ( types.getKeYJavaType ( 0 ) ) )
+		 ( types.get(0) ) )
 		raiseTypeError ();
 	}
 	if ( checkNonVoidType ( types, 1, true ) &&
 	     checkNonVoidType ( types, 2, true ) ) {
-	    KeYJavaType a   = types.getKeYJavaType ( 1 );
-	    KeYJavaType b   = types.getKeYJavaType ( 2 );
+	    KeYJavaType a   = types.get(1);
+	    KeYJavaType b   = types.get(2);
 	    Type        ajt = a.getJavaType ();
 	    Type        bjt = b.getJavaType ();
 	    if ( a == b ) {
@@ -631,10 +634,10 @@ public class StaticProgramChecker
     }
 
     public void performActionOnDo(Do x)     {
-	ArrayOfKeYJavaType types = popKeYJavaTypes ( 2 );
+	ImmutableArray<KeYJavaType> types = popKeYJavaTypes ( 2 );
 	if ( checkNonVoidType ( types, 1, false ) ) {
 	    if ( !getTypeConverter ().isBooleanType
-		 ( types.getKeYJavaType ( 1 ) ) )
+		 ( types.get(1) ) )
 		raiseTypeError ();
 	}
 	checkStatement ( x, types, 0 );
@@ -674,11 +677,11 @@ public class StaticProgramChecker
     }
 
     public void performActionOnFor(For x) {
-	ArrayOfKeYJavaType types = popKeYJavaTypes ( 4 );
+	ImmutableArray<KeYJavaType> types = popKeYJavaTypes ( 4 );
 	checkStatement ( x, types, 0 );
 	if ( checkNonVoidType ( types, 1, false ) ) {
 	    if ( !getTypeConverter ().isBooleanType
-		 ( types.getKeYJavaType ( 1 ) ) )
+		 ( types.get(1) ) )
 		raiseTypeError ();
 	}
 	checkStatement ( x, types, 2 );
@@ -699,15 +702,15 @@ public class StaticProgramChecker
     } 
 
     public void performActionOnGuard(Guard x)     {
-	ArrayOfKeYJavaType types = popChildren ();
-	pushResult ( types.getKeYJavaType ( 0 ) );
+	ImmutableArray<KeYJavaType> types = popChildren ();
+	pushResult ( types.get(0) );
     }
 
     public void performActionOnIf(If x)     {
-	ArrayOfKeYJavaType types = popChildrenWithArityCheck (x);
+	ImmutableArray<KeYJavaType> types = popChildrenWithArityCheck (x);
 	if ( checkNonVoidType ( types, 0, false ) ) {
 	    if ( !getTypeConverter ().isBooleanType
-		 ( types.getKeYJavaType ( 0 ) ) )
+		 ( types.get(0) ) )
 		raiseTypeError ();
 	}
 	checkStatement ( x, types, 1 );
@@ -741,10 +744,10 @@ public class StaticProgramChecker
     }
 
     public void performActionOnLogicalNot(LogicalNot x)     {
-	ArrayOfKeYJavaType types = popAndCheckType ( 1, true );
+	ImmutableArray<KeYJavaType> types = popAndCheckType ( 1, true );
 	if ( types != null ) {
 	    if ( !getTypeConverter ().isBooleanType
-		 ( types.getKeYJavaType ( 0 ) ) )
+		 ( types.get(0) ) )
 		raiseTypeError ();
             doUnaryPromotion(types);
 	}
@@ -887,11 +890,11 @@ public class StaticProgramChecker
 	    if ( frameType == VOID )
 		raiseTypeError ();
 	    
-	    ArrayOfKeYJavaType types = popAndCheckType ( 1, false );
+	    ImmutableArray<KeYJavaType> types = popAndCheckType ( 1, false );
 	    if ( checkNonVoidType ( frameType, false ) && types != null ) {
 		    // narrowing of constant expressions is not yet performed
 		    if ( !getTypeConverter ().isAssignableTo
-			 ( types.getKeYJavaType ( 0 ), frameType ) )
+			 ( types.get(0), frameType ) )
 			raiseTypeError ();
 	    }
 	}
@@ -928,11 +931,11 @@ public class StaticProgramChecker
     }
  
     public void performActionOnSwitch(Switch x)     {
-	ArrayOfKeYJavaType types = popChildrenWithArityCheck (x);
+	ImmutableArray<KeYJavaType> types = popChildrenWithArityCheck (x);
 	int                i     = types.size ();
 	
 	if ( checkNonVoidType ( types, 0, false ) ) {
-	    Type t = types.getKeYJavaType ( 0 ).getJavaType ();
+	    Type t = types.get(0).getJavaType ();
 	    if ( !( t == PrimitiveType.JAVA_CHAR  ||
 		    t == PrimitiveType.JAVA_BYTE  ||
 		    t == PrimitiveType.JAVA_SHORT ||
@@ -952,12 +955,12 @@ public class StaticProgramChecker
 
     public void performActionOnThrow(Throw x)     {
 	// incomplete
-	ArrayOfKeYJavaType types = popAndCheckType ( 1, false );
+	ImmutableArray<KeYJavaType> types = popAndCheckType ( 1, false );
 	if ( types != null ) {
 	    if ( !( getTypeConverter ().isReferenceType
-		    ( types.getKeYJavaType ( 0 ) ) &&
+		    ( types.get(0) ) &&
 		    getTypeConverter ().isAssignableTo
-		    ( types.getKeYJavaType ( 0 ),
+		    ( types.get(0),
 		      getJavaInfo ().getTypeByClassName
 		      ( "java.lang.Throwable" ) ) ) )
 		 raiseTypeError ();
@@ -980,9 +983,9 @@ public class StaticProgramChecker
     }
 
     public void performActionOnTypeCast(TypeCast x)     {
-	ArrayOfKeYJavaType types = popKeYJavaTypes ( 2 );
-	push ( types.getKeYJavaType ( 1 ) );
-	doCast ( types.getKeYJavaType ( 0 ) );
+	ImmutableArray<KeYJavaType> types = popKeYJavaTypes ( 2 );
+	push ( types.get(1) );
+	doCast ( types.get(0) );
     }
 
     public void performActionOnTypeReference(TypeReference x) {
@@ -1001,8 +1004,8 @@ public class StaticProgramChecker
     }
 
     public void performActionOnVariableReference(VariableReference x) {
-    	ArrayOfKeYJavaType types = popKeYJavaTypes ( 1 );
-	pushResult ( types.getKeYJavaType ( 0 ) );
+    	ImmutableArray<KeYJavaType> types = popKeYJavaTypes ( 1 );
+	pushResult ( types.get(0) );
     }
 
     public void performActionOnVariableSpecification(VariableSpecification x)     {
@@ -1013,10 +1016,10 @@ public class StaticProgramChecker
     }
 
     public void performActionOnWhile(While x)     {
-	ArrayOfKeYJavaType types = popKeYJavaTypes ( 2 );
+	ImmutableArray<KeYJavaType> types = popKeYJavaTypes ( 2 );
 	if ( checkNonVoidType ( types, 0, false ) ) {
 	    if ( !getTypeConverter ().isBooleanType
-		 ( types.getKeYJavaType ( 0 ) ) )
+		 ( types.get(0) ) )
 		raiseTypeError ();
 	}
 	checkStatement ( x, types, 1 );
@@ -1037,9 +1040,9 @@ public class StaticProgramChecker
      * <code>checkNonVoidTypeArray</code> returns true,
      * <code>null</code> otherwise
      */
-    private ArrayOfKeYJavaType popAndCheckType ( int     p_num,
+    private ImmutableArray<KeYJavaType> popAndCheckType ( int     p_num,
 						 boolean p_push ) {
-	final ArrayOfKeYJavaType t = popKeYJavaTypes ( p_num );
+	final ImmutableArray<KeYJavaType> t = popKeYJavaTypes ( p_num );
 	if ( checkNonVoidTypeArray ( t, p_push ) )
 	    return t;
 	return null;
@@ -1052,7 +1055,7 @@ public class StaticProgramChecker
      * level mark as an array, with the first element of the array
      * being the lowest element removed from the stack
      */
-    private ArrayOfKeYJavaType popChildren () {
+    private ImmutableArray<KeYJavaType> popChildren () {
 	final ExtList res = new ExtList ();
 	Object o;
 	while ( true ) {
@@ -1063,13 +1066,13 @@ public class StaticProgramChecker
 	    }
 	    res.addFirst ( o );
 	}
-	return new ArrayOfKeYJavaType
+	return new ImmutableArray<KeYJavaType>
 	    ( (KeYJavaType[])res.collect ( KeYJavaType.class ) );
     }
 
-    private ArrayOfKeYJavaType popChildrenWithArityCheck
+    private ImmutableArray<KeYJavaType> popChildrenWithArityCheck
 	(NonTerminalProgramElement x) {
-        final ArrayOfKeYJavaType types = popChildren ();
+        final ImmutableArray<KeYJavaType> types = popChildren ();
         Debug.assertTrue ( types.size() == x.getChildCount(),
                            "AST node arity mismatch: Number of subtrees " +
                            "processed differs from arity of operator\n" +
@@ -1084,7 +1087,7 @@ public class StaticProgramChecker
      * with the first element of the array being the lowest element
      * removed from the stack
      */
-    private ArrayOfKeYJavaType popKeYJavaTypes ( int p_num ) {
+    private ImmutableArray<KeYJavaType> popKeYJavaTypes ( int p_num ) {
 	final KeYJavaType[] res = new KeYJavaType [ p_num ];
 	while ( p_num-- != 0 ) {
 	    final Object stackEl = pop ();
@@ -1092,7 +1095,7 @@ public class StaticProgramChecker
 	                       "Found an element of wrong kind on type stack" );
             res[p_num] = (KeYJavaType)stackEl;
 	}
-	return new ArrayOfKeYJavaType ( res );
+	return new ImmutableArray<KeYJavaType> ( res );
     }
 
     /**
@@ -1112,11 +1115,11 @@ public class StaticProgramChecker
 
     private void prepareCompoundAssignment ( Assignment x ) {
 	// insert a virtual level mark for binary operator
-	final ArrayOfKeYJavaType types = popKeYJavaTypes ( 2 );
-	push ( types.getKeYJavaType ( 0 ) );
+	final ImmutableArray<KeYJavaType> types = popKeYJavaTypes ( 2 );
+	push ( types.get(0) );
 	pushLevelMark ();
-	push ( types.getKeYJavaType ( 0 ) );
-	push ( types.getKeYJavaType ( 1 ) );
+	push ( types.get(0) );
+	push ( types.get(1) );
     }
 
     private void printTypeStack () {

@@ -12,6 +12,8 @@ package de.uka.ilkd.key.proof.mgt;
 
 import java.util.Iterator;
 
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Op;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
@@ -51,7 +53,7 @@ public class QuantifierPrefixEntry {
         return new QuantifierPrefixEntry ( getVariable (), !isUniversal () );
     }
     
-    public static ListOfQuantifierPrefixEntry invert (ListOfQuantifierPrefixEntry list) {
+    public static ImmutableList<QuantifierPrefixEntry> invert (ImmutableList<QuantifierPrefixEntry> list) {
         if ( list.isEmpty () ) return list;
 
         return invert ( list.tail () ).prepend ( list.head ().invert () );
@@ -68,7 +70,7 @@ public class QuantifierPrefixEntry {
                            && t.op () instanceof Quantifier );
         
         return new QuantifierPrefixEntry ( t.varsBoundHere ( 0 )
-                                           .getQuantifiableVariable ( 0 ),
+                                           .get ( 0 ),
                                            t.op () == Op.ALL );
     }
     
@@ -77,10 +79,10 @@ public class QuantifierPrefixEntry {
      *
      * @pre t.sort() == Sort.FORMULA
      */
-    public static ListOfQuantifierPrefixEntry extractPrefix (Term t) {
+    public static ImmutableList<QuantifierPrefixEntry> extractPrefix (Term t) {
         Debug.assertTrue ( t.sort () == Sort.FORMULA );
 
-        ListOfQuantifierPrefixEntry res = SLListOfQuantifierPrefixEntry.EMPTY_LIST;
+        ImmutableList<QuantifierPrefixEntry> res = ImmutableSLList.<QuantifierPrefixEntry>nil();
         while ( t.op () instanceof Quantifier ) {
             res = res.append ( QuantifierPrefixEntry.createFor ( t ) );
             t = t.sub ( 0 );
@@ -92,8 +94,8 @@ public class QuantifierPrefixEntry {
     /**
      * Convert a sequence of <code>QuantifiableVariable</code>s to a prefix list
      */
-    public static ListOfQuantifierPrefixEntry toUniversalList (Iterator it) {
-        ListOfQuantifierPrefixEntry res = SLListOfQuantifierPrefixEntry.EMPTY_LIST;
+    public static ImmutableList<QuantifierPrefixEntry> toUniversalList (Iterator it) {
+        ImmutableList<QuantifierPrefixEntry> res = ImmutableSLList.<QuantifierPrefixEntry>nil();
         while ( it.hasNext () ) {
             final QuantifiableVariable var = (QuantifiableVariable)it.next ();
             res = res.append ( new QuantifierPrefixEntry ( var, true ) );

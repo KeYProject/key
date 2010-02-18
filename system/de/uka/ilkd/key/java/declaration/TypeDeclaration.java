@@ -11,6 +11,9 @@
 
 package de.uka.ilkd.key.java.declaration;
 
+import de.uka.ilkd.key.collection.ImmutableArray;
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.*;
 import de.uka.ilkd.key.java.expression.Literal;
@@ -40,7 +43,7 @@ public abstract class TypeDeclaration extends JavaDeclaration
     /**
      *      Members.
      */
-    protected final ArrayOfMemberDeclaration members;
+    protected final ImmutableArray<MemberDeclaration> members;
 
     protected final boolean parentIsInterfaceDeclaration;
 
@@ -73,7 +76,7 @@ public abstract class TypeDeclaration extends JavaDeclaration
 	super(mods);
 	this.name    = name;
 	this.fullName = fullName;
-	this.members = new ArrayOfMemberDeclaration(members);
+	this.members = new ImmutableArray<MemberDeclaration>(members);
 	this.parentIsInterfaceDeclaration = parentIsInterfaceDeclaration;
 	this.isLibrary = isLibrary;
     }
@@ -93,7 +96,7 @@ public abstract class TypeDeclaration extends JavaDeclaration
 	super(children);
 	this.name = name;
 	this.fullName = fullName;
-	this.members = new ArrayOfMemberDeclaration
+	this.members = new ImmutableArray<MemberDeclaration>
 	    ((MemberDeclaration[])children.collect(MemberDeclaration.class));
 	ParentIsInterfaceDeclaration piid=(ParentIsInterfaceDeclaration)
 	    children.get(ParentIsInterfaceDeclaration.class);
@@ -123,7 +126,7 @@ public abstract class TypeDeclaration extends JavaDeclaration
 
     public SourceElement getFirstElement() {
         if (modArray != null && (modArray.size()>0)) {
-            return modArray.getModifier(0);
+            return modArray.get(0);
         } else {
             return this;
         }
@@ -173,7 +176,7 @@ public abstract class TypeDeclaration extends JavaDeclaration
      * @return the member declaration array.
      */
 
-    public ArrayOfMemberDeclaration getMembers() {
+    public ImmutableArray<MemberDeclaration> getMembers() {
         return members;
     }
 
@@ -191,12 +194,12 @@ public abstract class TypeDeclaration extends JavaDeclaration
     /** 
      * returns the local declared supertypes
      */
-    public abstract ListOfKeYJavaType getSupertypes();
+    public abstract ImmutableList<KeYJavaType> getSupertypes();
 
     /** 
      * TO BE IMPLEMENTED
      */
-    public ListOfClassType getAllSupertypes(Services services) {
+    public ImmutableList<ClassType> getAllSupertypes(Services services) {
 	System.err.println("Method in class TypeDeclaration not implemented." );     
 	return null;
     }
@@ -204,7 +207,7 @@ public abstract class TypeDeclaration extends JavaDeclaration
     /** 
      * TO BE IMPLEMENTED
      */
-    public ListOfField getFields(Services services) {
+    public ImmutableList<Field> getFields(Services services) {
         System.err.println("Method in class TypeDeclaration not implemented." );
         return null;
     }
@@ -212,21 +215,18 @@ public abstract class TypeDeclaration extends JavaDeclaration
     /**
      * [dlohner] The given parameter is obsolete with this implementation.
      */
-    public ListOfField getAllFields(Services services) {
+    public ImmutableList<Field> getAllFields(Services services) {
 
         if (members == null) {
-            return SLListOfField.EMPTY_LIST;
+            return ImmutableSLList.<Field>nil();
         }
 
-        ListOfField result = SLListOfField.EMPTY_LIST;
+        ImmutableList<Field> result = ImmutableSLList.<Field>nil();
 
-        for (int i = 0; i < members.size(); i++) {
-            if (members.getMemberDeclaration(i) instanceof FieldDeclaration) {
-                FieldDeclaration fds = (FieldDeclaration) members
-                        .getMemberDeclaration(i);
-                ArrayOfFieldSpecification aofs = fds.getFieldSpecifications();
-                for (int j = 0; j < aofs.size(); j++) {
-                    result = result.append(aofs.getFieldSpecification(j));
+        for (MemberDeclaration member : members) {
+            if (member instanceof FieldDeclaration) {                
+                for (FieldSpecification field : ((FieldDeclaration) member).getFieldSpecifications()) {
+                    result = result.append(field);
                 }
             }
         }
@@ -236,7 +236,7 @@ public abstract class TypeDeclaration extends JavaDeclaration
 
     /** TO BE IMPLEMENTED
      */
-    public ListOfMethod getMethods(Services services) {     
+    public ImmutableList<Method> getMethods(Services services) {     
 	System.err.println("Method in class TypeDeclaration not implemented." );
 	return null;
     }
@@ -244,28 +244,28 @@ public abstract class TypeDeclaration extends JavaDeclaration
 
     /** TO BE IMPLEMENTED
      */
-    public ListOfMethod getAllMethods(Services services) {
+    public ImmutableList<Method> getAllMethods(Services services) {
 	System.err.println("Method in class TypeDeclaration not implemented." );
 	return null;
     }
 
     /** TO BE IMPLEMENTED
      */
-    public ListOfConstructor getConstructors(Services services) {
+    public ImmutableList<Constructor> getConstructors(Services services) {
       	System.err.println("Method in class TypeDeclaration not implemented." );
 	return null;
     }
 
     /** TO BE IMPLEMENTED
      */
-    public ListOfClassType getTypes(Services services) {
+    public ImmutableList<ClassType> getTypes(Services services) {
 	System.err.println("Method in class TypeDeclaration not implemented." );
 	return null;
     }
 
     /** TO BE IMPLEMENTED
      */
-    public ListOfClassType getAllTypes(Services services) {
+    public ImmutableList<ClassType> getAllTypes(Services services) {
 	System.err.println("Method in class TypeDeclaration not implemented." );
 	return null;
     }
@@ -280,7 +280,7 @@ public abstract class TypeDeclaration extends JavaDeclaration
         int count = 0;
         if (members != null) {
             for (int i = members.size() - 1; i >= 0; i -= 1) {
-                if (members.getMemberDeclaration(i) instanceof TypeDeclaration) {
+                if (members.get(i) instanceof TypeDeclaration) {
                     count += 1;
                 }
             }
@@ -301,7 +301,7 @@ public abstract class TypeDeclaration extends JavaDeclaration
         if (members != null) {
             int s = members.size();
             for (int i = 0; i < s && index >= 0; i += 1) {
-                MemberDeclaration md = members.getMemberDeclaration(i);
+                MemberDeclaration md = members.get(i);
                 if (md instanceof TypeDeclaration) {
                     if (index == 0) {
                         return (TypeDeclaration)md;

@@ -1,5 +1,6 @@
 package visualdebugger.draw2d;
 
+import java.util.Iterator;
 import java.util.LinkedList;
 
 import org.eclipse.draw2d.*;
@@ -11,15 +12,16 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.widgets.Display;
 
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.abstraction.ArrayType;
 import de.uka.ilkd.key.java.abstraction.ClassType;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.logic.IteratorOfTerm;
-import de.uka.ilkd.key.logic.ListOfTerm;
-import de.uka.ilkd.key.logic.SLListOfTerm;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.op.ProgramMethod;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.visualdebugger.VisualDebugger;
 import de.uka.ilkd.key.visualdebugger.statevisualisation.SymbolicObject;
@@ -126,16 +128,16 @@ public ObjectFigure(SymbolicObject so, MouseListener listener,
 
         
         if (!pre){
-        final ListOfProgramVariable parameters =so.getParameter();
+        final ImmutableList<ProgramVariable> parameters =so.getParameter();
         if (parameters!=null){
         this.paramColumns = new Label[parameters.size()];
         
-        for(IteratorOfProgramVariable it=parameters.iterator();it.hasNext();){
+        for(Iterator<ProgramVariable> it=parameters.iterator();it.hasNext();){
             ProgramVariable p = it.next();
             Object  val = so.getValueOfParameter(p);
             if (val instanceof Term){
                 Term t = (Term) val;
-                Label pvLabel = new Label(p.toString()+" := "+VisualDebugger.getVisualDebugger().prettyPrint(SLListOfTerm.EMPTY_LIST.append(t),sos,so));
+                Label pvLabel = new Label(p.toString()+" := "+VisualDebugger.getVisualDebugger().prettyPrint(ImmutableSLList.<Term>nil().append(t),sos,so));
                 
                  //= new AttributeLabel(so, p, sos);
                 //System.out.println("AAAAAAAAAAA");
@@ -152,17 +154,17 @@ public ObjectFigure(SymbolicObject so, MouseListener listener,
             
         }else{
             
-            final ListOfTerm parameters = VisualDebugger.getVisualDebugger().getSymbolicInputValuesAsList();
+            final ImmutableList<Term> parameters = VisualDebugger.getVisualDebugger().getSymbolicInputValuesAsList();
 
             this.paramColumns = new Label[parameters.size()];
             method.getParameterDeclarationCount();
-            IteratorOfTerm it = parameters.iterator();
+            Iterator<Term> it = parameters.iterator();
             for(int i =0; i<method.getParameterDeclarationCount();i++){
                 Term p = it.next();
                     Label pvLabel =// new Label(method.getParameterDeclarationAt(i).getVariables().getVariableSpecification(0).toString()
-                            //+" := "+vd.prettyPrint(SLListOfTerm.EMPTY_LIST.append(p),sos,so));
-                       //= new Label(p.toString()+" := "+VisualDebugger.getVisualDebugger().prettyPrint(SLListOfTerm.EMPTY_LIST.append(t),sos,so));                        
-                         new AttributeLabel(so, (ProgramVariable)method.getParameterDeclarationAt(i).getVariables().getVariableSpecification(0).getProgramVariable(),p, sos);
+                            //+" := "+vd.prettyPrint(ImmSLList.<Term>nil().append(p),sos,so));
+                       //= new Label(p.toString()+" := "+VisualDebugger.getVisualDebugger().prettyPrint(ImmSLList.<Term>nil().append(t),sos,so));                        
+                         new AttributeLabel(so, (ProgramVariable)method.getParameterDeclarationAt(i).getVariables().get(0).getProgramVariable(),p, sos);
                     //if ()   
                     if(!referenceSort(p.sort()))
                     pvLabel.addMouseListener(listener);
@@ -247,12 +249,12 @@ public ObjectFigure(SymbolicObject so, MouseListener listener,
             return;
 
         } 
-        SetOfProgramVariable attributes = so.getAttributes().union(
+        ImmutableSet<ProgramVariable> attributes = so.getAttributes().union(
                 so.getAllModifiedPrimitiveAttributes());
         attrColumns = new Label[attributes.size()];
         compAttributes = new Figure();
         int i = 0;
-        for (IteratorOfProgramVariable it = attributes.iterator(); it.hasNext();) {
+        for (Iterator<ProgramVariable> it = attributes.iterator(); it.hasNext();) {
             final ProgramVariable pv = it.next();
             attrColumns[i] = new AttributeLabel(so, pv, sos);
             attrColumns[i].addMouseListener(listener);
@@ -261,8 +263,8 @@ public ObjectFigure(SymbolicObject so, MouseListener listener,
         }
         
         //add ref attributes that are null
-        final SetOfProgramVariable pvs = so.getNonPrimAttributes();
-        for (IteratorOfProgramVariable it = pvs.iterator(); it.hasNext();) {
+        final ImmutableSet<ProgramVariable> pvs = so.getNonPrimAttributes();
+        for (Iterator<ProgramVariable> it = pvs.iterator(); it.hasNext();) {
             final ProgramVariable pv=it.next();
             if (so.getAssociationEnd(pv).isNull()){
                 final Label l = new Label(pv.getProgramElementName().getProgramName() +" := null");
@@ -378,9 +380,9 @@ public class UnderlineBorder extends MarginBorder {
            this.pv = pv;
            String text = pv.getProgramElementName().getProgramName();
            if (so.getAllModifiedPrimitiveAttributes().contains(pv)){
-               text = text+ " := "+VisualDebugger.getVisualDebugger().prettyPrint(SLListOfTerm.EMPTY_LIST.append(so.getValueTerm(pv)),sos,so);
+               text = text+ " := "+VisualDebugger.getVisualDebugger().prettyPrint(ImmutableSLList.<Term>nil().append(so.getValueTerm(pv)),sos,so);
            }   else if (so.getValueOfParameter(pv)!=null)
-               text = text+ " := "+VisualDebugger.getVisualDebugger().prettyPrint(SLListOfTerm.EMPTY_LIST.append(so.getValueOfParameter(pv)),sos,so);
+               text = text+ " := "+VisualDebugger.getVisualDebugger().prettyPrint(ImmutableSLList.<Term>nil().append(so.getValueOfParameter(pv)),sos,so);
            setText(text);
            setFont( Display.getCurrent().getSystemFont() );
         }

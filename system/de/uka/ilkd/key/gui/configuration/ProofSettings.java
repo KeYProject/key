@@ -15,7 +15,6 @@ import java.util.Properties;
 
 import de.uka.ilkd.key.gui.DecisionProcedureSettings;
 import de.uka.ilkd.key.gui.GUIEvent;
-import de.uka.ilkd.key.gui.ModelSourceSettings;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.util.Debug;
@@ -69,17 +68,16 @@ public class ProofSettings {
     public ProofSettings() {       	
 	settings = new Settings[] {
             new StrategySettings(),
-	    new ModelSourceSettings(),
 	    new SimultaneousUpdateSimplifierSettings(),
             new GeneralSettings(),
 	    new ChoiceSettings(),
-	    new DecisionProcedureSettings(),
+	    DecisionProcedureSettings.getInstance(),
 	    new ViewSettings(),
             new LibrariesSettings()
 	};
-	for (int i = 0; i < settings.length; i++) { 
-	    settings[i].addSettingsListener(listener);
-	}        
+        for (Settings setting : settings) {
+            setting.addSettingsListener(listener);
+        }
     }
     
     /* copy constructor - substitutes .clone() in classes implementing Settings */
@@ -89,8 +87,8 @@ public class ProofSettings {
         Properties result = new Properties();
         Settings[] s = toCopy.settings;
 
-        for (int i = 0; i < s.length; i++) {
-            s[i].writeSettings(result);
+        for (Settings value : s) {
+            value.writeSettings(result);
         }
         
         for (int i = settings.length - 1; i >= 0; i--) {
@@ -110,15 +108,16 @@ public class ProofSettings {
     
     
     public void setProfile(Profile profile) {
-        ensureInitialized();
-        profile.updateSettings(this);
         this.profile = profile;
+        profile.updateSettings(this);
+        ensureInitialized();
     }
 
     public Profile getProfile() {                
         if (profile == null) {
             //the following line should be removed
-            profile = new JavaProfile();
+            setProfile(new JavaProfile());
+            
         }
         return profile;
     }
@@ -129,9 +128,9 @@ public class ProofSettings {
     public void settingsToStream(Settings[] s,OutputStream out) {
     try {
         Properties result = new Properties();
-	    for (int i = 0; i < s.length; i++) {
-	    s[i].writeSettings(result);
-	    }
+        for (Settings value : s) {
+            value.writeSettings(result);
+        }
 	    result.store(out, "Proof-Settings-Config-File");
 	} catch (IOException e){
 	    System.err.println("Warning: could not save proof-settings.");
@@ -231,11 +230,11 @@ public class ProofSettings {
      */
     public ChoiceSettings getChoiceSettings() {
 	ensureInitialized();
-	return (ChoiceSettings) settings[4];
+	return (ChoiceSettings) settings[3];
     }
 
     public ProofSettings setChoiceSettings(ChoiceSettings cs) {
-	settings[4] = cs;
+	settings[3] = cs;
         return this;
     }
 
@@ -244,33 +243,28 @@ public class ProofSettings {
      */
     public DecisionProcedureSettings getDecisionProcedureSettings() {
 	ensureInitialized();
-	return (DecisionProcedureSettings) settings[5];
-    }
-
-    public ModelSourceSettings getModelSourceSettings() {
-	ensureInitialized();
-	return (ModelSourceSettings) settings[1];
+	return (DecisionProcedureSettings) settings[4];
     }
 
     public SimultaneousUpdateSimplifierSettings 
 	getSimultaneousUpdateSimplifierSettings() {
 	ensureInitialized();
-	return (SimultaneousUpdateSimplifierSettings) settings[2];    
+	return (SimultaneousUpdateSimplifierSettings) settings[1];    
     }
     
     public LibrariesSettings getLibrariesSettings() {
         ensureInitialized();
-        return (LibrariesSettings) settings[7];    
+        return (LibrariesSettings) settings[6];    
     }
 
     public GeneralSettings getGeneralSettings() {
 	ensureInitialized();
-	return (GeneralSettings) settings[3];
+	return (GeneralSettings) settings[2];
     }
 
     public ViewSettings getViewSettings() {
 	ensureInitialized();
-	return (ViewSettings) settings[6];
+	return (ViewSettings) settings[5];
     }
 
     private class ProofSettingsListener implements SettingsListener {

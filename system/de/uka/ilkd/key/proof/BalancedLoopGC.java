@@ -5,12 +5,12 @@
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
-//
-//
 package de.uka.ilkd.key.proof;
 
-import de.uka.ilkd.key.rule.IteratorOfRuleSet;
+import java.util.Iterator;
+
 import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.rule.Taclet;
 
 /**
@@ -33,7 +33,6 @@ public class BalancedLoopGC extends DefaultGoalChooser {
      */
     public Goal getNextGoal () {
         Goal result;
-        
         if(selectedList.isEmpty()) return null;
         selectedList = rotateList ( selectedList );
         Goal first = selectedList.head();
@@ -67,9 +66,8 @@ public class BalancedLoopGC extends DefaultGoalChooser {
     }
 
     protected boolean ruleSetCriterion(Taclet t, String ruleSetName){
-        IteratorOfRuleSet it = t.getRuleSets().iterator();
-        while(it.hasNext()){
-            if(it.next().name().toString().equals(ruleSetName)){
+        for (RuleSet ruleSet : t.getRuleSets()) {
+            if (ruleSet.name().toString().equals(ruleSetName)) {
                 return true;
             }
         }

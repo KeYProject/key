@@ -37,7 +37,7 @@ public class PIParameterGUIGroup extends PIParameterGUI {
         //System.out.println("GUI.updateGUI "+pip.getName());
         content.setVisible(false);
 
-        ((JPanel) content).removeAll();
+        content.removeAll();
         content.setBorder(BorderFactory.createTitledBorder(pip.getName()));
         this.add(content);
         content.setLayout(new BoxLayout(content, BoxLayout.Y_AXIS));

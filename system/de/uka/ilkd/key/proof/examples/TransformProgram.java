@@ -9,6 +9,7 @@
 //
 package de.uka.ilkd.key.proof.examples;
 
+import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.proof.*;
@@ -101,7 +102,7 @@ public class TransformProgram {
 				  false);	
 
 	/* now we get the list of rules applicable here... */
-	ListOfTacletApp rApplist = goal.ruleAppIndex().
+	ImmutableList<TacletApp> rApplist = goal.ruleAppIndex().
 	    getTacletAppAt(TacletFilter.TRUE, pos, null, Constraint.BOTTOM);
 	return rApplist.head();
     }

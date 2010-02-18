@@ -5,51 +5,35 @@
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
-//
-//
-//This file is part of KeY - Integrated Deductive Software Design
-//Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
-//                    Universitaet Koblenz-Landau, Germany
-//                    Chalmers University of Technology, Sweden
-//
-//The KeY system is protected by the GNU General Public License. 
-//See LICENSE.TXT for details.
-//
-//
+
 
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
 
 
+import java.util.Iterator;
+
+import de.uka.ilkd.key.collection.*;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.IteratorOfTerm;
-import de.uka.ilkd.key.logic.ListOfTerm;
-import de.uka.ilkd.key.logic.SLListOfTerm;
-import de.uka.ilkd.key.logic.SetOfTerm;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.IteratorOfQuantifiableVariable;
-import de.uka.ilkd.key.logic.op.ListOfQuantifiableVariable;
-import de.uka.ilkd.key.logic.op.MapFromQuantifiableVariableToTerm;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.Quantifier;
-import de.uka.ilkd.key.logic.op.SLListOfQuantifiableVariable;
-import de.uka.ilkd.key.logic.op.SetOfQuantifiableVariable;
 import de.uka.ilkd.key.util.LRUCache;
 
 
-class UniTrigger extends Trigger {
+class UniTrigger implements Trigger {
   
     private final Term trigger;
-    private final SetOfQuantifiableVariable uqvs;
+    private final ImmutableSet<QuantifiableVariable> uqvs;
     
     private final TriggersSet triggerSetThisBelongsTo;
     
     private final boolean onlyUnify;
     private final boolean isElementOfMultitrigger;
    
-    private final LRUCache<Term, SetOfSubstitution> matchResults = new LRUCache<Term, SetOfSubstitution> ( 1000 );
+    private final LRUCache<Term, ImmutableSet<Substitution>> matchResults = new LRUCache<Term, ImmutableSet<Substitution>> ( 1000 );
     
-    UniTrigger(Term trigger,SetOfQuantifiableVariable uqvs,
+    UniTrigger(Term trigger,ImmutableSet<QuantifiableVariable> uqvs,
                boolean isUnify,boolean isElementOfMultitrigger,
                TriggersSet triggerSetThisBelongsTo){
         this.trigger = trigger;
@@ -59,17 +43,15 @@ class UniTrigger extends Trigger {
         this.triggerSetThisBelongsTo = triggerSetThisBelongsTo;
     }
         
-    public SetOfSubstitution getSubstitutionsFromTerms(SetOfTerm targetTerm, 
+    public ImmutableSet<Substitution> getSubstitutionsFromTerms(ImmutableSet<Term> targetTerm, 
             Services services) {
-        SetOfSubstitution allsubs = SetAsListOfSubstitution.EMPTY_SET;
-        final IteratorOfTerm it = targetTerm.iterator ();
-        while ( it.hasNext () )
-            allsubs = allsubs.union ( getSubstitutionsFromTerm ( it.next (), services ) );
+        ImmutableSet<Substitution> allsubs = DefaultImmutableSet.<Substitution>nil();
+        for (Term aTargetTerm : targetTerm) allsubs = allsubs.union(getSubstitutionsFromTerm(aTargetTerm, services));
         return allsubs;
     }
 
-    private SetOfSubstitution getSubstitutionsFromTerm(Term t, Services services) {
-        SetOfSubstitution res = matchResults.get ( t );
+    private ImmutableSet<Substitution> getSubstitutionsFromTerm(Term t, Services services) {
+        ImmutableSet<Substitution> res = matchResults.get ( t );
         if ( res == null ) {
             res = getSubstitutionsFromTermHelp ( t, services );
             matchResults.put ( t, res );
@@ -77,8 +59,8 @@ class UniTrigger extends Trigger {
         return res;
     }
 
-    private SetOfSubstitution getSubstitutionsFromTermHelp(Term t, Services services) {
-        SetOfSubstitution newSubs = SetAsListOfSubstitution.EMPTY_SET;
+    private ImmutableSet<Substitution> getSubstitutionsFromTermHelp(Term t, Services services) {
+        ImmutableSet<Substitution> newSubs = DefaultImmutableSet.<Substitution>nil();
         if ( t.freeVars ().size () > 0 || t.op () instanceof Quantifier )
             newSubs = Matching.twoSidedMatching ( this, t, services );
         else if ( !onlyUnify )
@@ -103,7 +85,7 @@ class UniTrigger extends Trigger {
         return "" + trigger;
     }
 
-    SetOfQuantifiableVariable getUniVariables() {
+    ImmutableSet<QuantifiableVariable> getUniVariables() {
         return uqvs;
     }
 
@@ -120,13 +102,12 @@ class UniTrigger extends Trigger {
      * @param searchTerm
      */
     public static boolean passedLoopTest(Term candidate, Term searchTerm) {
-        final SetOfSubstitution substs =
+        final ImmutableSet<Substitution> substs =
             BasicMatching.getSubstitutions ( candidate, searchTerm );
 
-        final IteratorOfSubstitution it = substs.iterator ();
-        while ( it.hasNext () ) {
-            final Substitution subst = it.next ();
-            if ( containsLoop ( subst ) ) return false;
+        for (Substitution subst1 : substs) {
+            final Substitution subst = subst1;
+            if (containsLoop(subst)) return false;
         }
         return true;
     }
@@ -136,7 +117,7 @@ class UniTrigger extends Trigger {
      * It is mainly used for unitrigger's loop test.
      */
     private static boolean containsLoop(Substitution subst) {
-        final IteratorOfQuantifiableVariable it = subst.getVarMap().keyIterator ();
+        final Iterator<QuantifiableVariable> it = subst.getVarMap().keyIterator ();
         while ( it.hasNext () ) {
             if ( containsLoop ( subst.getVarMap(), it.next () ) ) return true;
         }
@@ -146,35 +127,33 @@ class UniTrigger extends Trigger {
     /**
      * Code copied from logic.EqualityConstraint
      */
-    private static boolean containsLoop(MapFromQuantifiableVariableToTerm varMap,
+    private static boolean containsLoop(ImmutableMap<QuantifiableVariable,Term> varMap,
                                         QuantifiableVariable var) {
-        ListOfQuantifiableVariable body          =
-            SLListOfQuantifiableVariable.EMPTY_LIST;
-        ListOfTerm                 fringe        = SLListOfTerm.EMPTY_LIST;
+        ImmutableList<QuantifiableVariable> body          =
+            ImmutableSLList.<QuantifiableVariable>nil();
+        ImmutableList<Term>                 fringe        = ImmutableSLList.<Term>nil();
         Term                       checkForCycle = varMap.get( var );
         
         if ( checkForCycle.op () == var ) return false;
         
         while ( true ) {
-            final IteratorOfQuantifiableVariable it =
-                                checkForCycle.freeVars ().iterator ();
-            while ( it.hasNext () ) {
-                final QuantifiableVariable termVar = it.next ();
-                if ( !body.contains ( termVar ) ) {
-                    final Term termVarterm = varMap.get( termVar );
-                    if ( termVarterm != null ) {
-                        if ( termVarterm.freeVars ().contains ( var ) )
+            for (QuantifiableVariable quantifiableVariable : checkForCycle.freeVars()) {
+                final QuantifiableVariable termVar = quantifiableVariable;
+                if (!body.contains(termVar)) {
+                    final Term termVarterm = varMap.get(termVar);
+                    if (termVarterm != null) {
+                        if (termVarterm.freeVars().contains(var))
                             return true;
-                        fringe = fringe.prepend ( termVarterm );                        
+                        fringe = fringe.prepend(termVarterm);
                     }
-                    
-                    if ( termVar == var ) return true;
 
-                    body = body.prepend ( termVar );
+                    if (termVar == var) return true;
+
+                    body = body.prepend(termVar);
                 }
             }
 
-            if ( fringe == SLListOfTerm.EMPTY_LIST ) return false;
+            if ( fringe.isEmpty() ) return false;
 
             checkForCycle = fringe.head ();
             fringe        = fringe.tail ();

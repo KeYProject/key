@@ -12,7 +12,11 @@ package de.uka.ilkd.key.rule;
 
 import java.util.HashSet;
 
-import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.logic.ConstrainedFormula;
+import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 
 /**
@@ -29,7 +33,7 @@ import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 public class BoundUniquenessChecker {
 
     private HashSet<QuantifiableVariable> boundVars = new HashSet<QuantifiableVariable>();
-    private ListOfTerm terms = SLListOfTerm.EMPTY_LIST;
+    private ImmutableList<Term> terms = ImmutableSLList.<Term>nil();
 
     public BoundUniquenessChecker(Sequent seq) {
         addAll(seq);
@@ -70,7 +74,7 @@ public class BoundUniquenessChecker {
         for (int i = 0, ar = t.arity(); i<ar; i++) {
             for (int j=0, sz = t.varsBoundHere(i).size(); j<sz; j++) {
                 final QuantifiableVariable qv
-                = t.varsBoundHere(i).getQuantifiableVariable(j);
+                = t.varsBoundHere(i).get(j);
                 if (boundVars.contains(qv)) {
                     return false;
                 } else {

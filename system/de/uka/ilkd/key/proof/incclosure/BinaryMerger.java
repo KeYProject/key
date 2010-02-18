@@ -10,6 +10,9 @@
 
 package de.uka.ilkd.key.proof.incclosure;
 
+import java.util.Iterator;
+
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Constraint;
 import de.uka.ilkd.key.logic.ConstraintContainer;
@@ -54,9 +57,9 @@ public class BinaryMerger implements Merger {
     /**
      * Inputs offered by this merger
      */
-    public IteratorOfSink getSinks () {
+    public Iterator<Sink> getSinks () {
 	return
-	    SLListOfSink.EMPTY_LIST
+	    ImmutableSLList.<Sink>nil()
 	    .prepend ( rightSink )
 	    .prepend ( leftSink )
 	    .iterator ();
@@ -111,7 +114,9 @@ public class BinaryMerger implements Merger {
 	 *
 	 * Restrictions should not leave its branches
 	 */
-	public void       addRestriction     ( Metavariable p_mv ) {}
+	public void       addRestriction     ( Metavariable p_mv ) {
+	    parent.addRestriction(p_mv);
+        }
 
 	/**
 	 * @return a constraint that restores the current state of this

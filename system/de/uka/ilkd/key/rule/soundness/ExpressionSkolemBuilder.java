@@ -11,11 +11,18 @@
 
 package de.uka.ilkd.key.rule.soundness;
 
-import de.uka.ilkd.key.java.ArrayOfStatement;
+import java.util.Iterator;
+
+import de.uka.ilkd.key.collection.ImmutableArray;
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.op.IProgramVariable;
+import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.op.SortedSchemaVariable;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.rule.inst.ProgramSkolemInstantiation;
 
@@ -38,18 +45,18 @@ public class ExpressionSkolemBuilder extends StatementExpressionSkolemBuilder {
 		p_services );
     }
 
-    public IteratorOfSkolemSet build () {
-	ListOfSchemaVariable todo =
+    public Iterator<SkolemSet> build () {
+	ImmutableList<SchemaVariable> todo =
 	    findExpressionSVs ( getOriginalSkolemSet () );
 
 	return createSkolemExpressionSVs ( todo );
     }
 
-    public static ListOfSchemaVariable findExpressionSVs ( SkolemSet p_ss ) {
-	IteratorOfSchemaVariable it =
+    public static ImmutableList<SchemaVariable> findExpressionSVs ( SkolemSet p_ss ) {
+	Iterator<SchemaVariable> it =
 	    p_ss.getMissing ().iterator ();
 	SchemaVariable           sv;
-	ListOfSchemaVariable     res = SLListOfSchemaVariable.EMPTY_LIST;
+	ImmutableList<SchemaVariable>     res = ImmutableSLList.<SchemaVariable>nil();
 
 	while ( it.hasNext () ) {
 	    sv = it.next ();
@@ -62,11 +69,9 @@ public class ExpressionSkolemBuilder extends StatementExpressionSkolemBuilder {
 	return res;
     }
 
-    private IteratorOfSkolemSet
-	createSkolemExpressionSVs(ListOfSchemaVariable p_svs) {    
-	IteratorOfSchemaVariable it = p_svs.iterator ();
-	while ( it.hasNext () )
-	    createSkolemExpressionSV ( it.next () );
+    private Iterator<SkolemSet>
+	createSkolemExpressionSVs(ImmutableList<SchemaVariable> p_svs) {
+        for (SchemaVariable p_sv : p_svs) createSkolemExpressionSV(p_sv);
     
 	return toIterator
 	    ( getOriginalSkolemSet ()
@@ -102,8 +107,8 @@ public class ExpressionSkolemBuilder extends StatementExpressionSkolemBuilder {
     private ProgramSVProxy
 	createSkolemExpressionSV(ProgramElementName     p_name,
 				 KeYJavaType            p_type,
-				 ListOfIProgramVariable p_influencingPVs,
-				 ArrayOfStatement       p_jumpTable) {
+				 ImmutableList<IProgramVariable> p_influencingPVs,
+				 ImmutableArray<Statement>       p_jumpTable) {
 	final ExpressionSkolemSymbolFactory f =
 	    new ExpressionSkolemSymbolFactory ( getServices() );
     

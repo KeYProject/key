@@ -32,7 +32,7 @@ public class SourceElementId {
     private boolean isStatement = true;
 
     public SourceElementId(String id) {
-        this("", new Integer(id).intValue());
+        this("", Integer.parseInt(id));
     }
 
     public SourceElementId(String cl, int id) {

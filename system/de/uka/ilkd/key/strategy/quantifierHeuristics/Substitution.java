@@ -11,16 +11,16 @@
 
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
+import java.util.Iterator;
+
+import de.uka.ilkd.key.collection.ImmutableMap;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.logic.ClashFreeSubst;
-import de.uka.ilkd.key.logic.IteratorOfTerm;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermCreationException;
 import de.uka.ilkd.key.logic.op.CastFunctionSymbol;
-import de.uka.ilkd.key.logic.op.IteratorOfQuantifiableVariable;
-import de.uka.ilkd.key.logic.op.MapFromQuantifiableVariableToTerm;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.logic.op.SetOfQuantifiableVariable;
 import de.uka.ilkd.key.logic.sort.AbstractSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 
@@ -32,13 +32,13 @@ class Substitution {
 
     private final TermBuilder tb = TermBuilder.DF;
     
-    private MapFromQuantifiableVariableToTerm varMap;
+    private ImmutableMap<QuantifiableVariable,Term> varMap;
     
-    public Substitution(MapFromQuantifiableVariableToTerm map){
+    public Substitution(ImmutableMap<QuantifiableVariable,Term> map){
         varMap = map;
     }
     
-    public MapFromQuantifiableVariableToTerm getVarMap(){
+    public ImmutableMap<QuantifiableVariable,Term> getVarMap(){
         return varMap;
     }
     
@@ -46,10 +46,9 @@ class Substitution {
     	return varMap.get(var);
     }
     
-    public boolean isTotalOn(SetOfQuantifiableVariable vars) {
-        IteratorOfQuantifiableVariable it = vars.iterator ();
-        while ( it.hasNext () ) {
-            if ( !varMap.containsKey ( it.next () ) ) return false;
+    public boolean isTotalOn(ImmutableSet<QuantifiableVariable> vars) {
+        for (QuantifiableVariable var : vars) {
+            if (!varMap.containsKey(var)) return false;
         }
         return true;
     }
@@ -59,7 +58,7 @@ class Substitution {
      * @return true if every instance in the varMap does not contain variable. 
      */
     public boolean isGround() {
-        final IteratorOfQuantifiableVariable it = varMap.keyIterator ();
+        final Iterator<QuantifiableVariable> it = varMap.keyIterator ();
         while ( it.hasNext () ) {
             if ( getSubstitutedTerm( it.next () ).freeVars ().size () != 0 )
                 return false;
@@ -71,7 +70,7 @@ class Substitution {
     public Term apply(Term t) {
         assert isGround() :
             "non-ground substitutions are not yet implemented";
-        final IteratorOfQuantifiableVariable it = varMap.keyIterator ();
+        final Iterator<QuantifiableVariable> it = varMap.keyIterator ();
         while ( it.hasNext () ) {
             final QuantifiableVariable var = it.next ();
             final Sort quantifiedVarSort = var.sort ();
@@ -97,7 +96,7 @@ class Substitution {
     public Term applyWithoutCasts(Term t) {
         assert isGround() :
             "non-ground substitutions are not yet implemented";
-        final IteratorOfQuantifiableVariable it = varMap.keyIterator ();
+        final Iterator<QuantifiableVariable> it = varMap.keyIterator ();
         while ( it.hasNext () ) {
             final QuantifiableVariable var = it.next ();
             Term instance = getSubstitutedTerm( var );
@@ -105,7 +104,7 @@ class Substitution {
             try {
                 t = applySubst ( var, instance, t );
             } catch (TermCreationException e) {
-                final Sort quantifiedVarSort = var.sort ();
+                final Sort quantifiedVarSort = var.sort ();                
                 if ( !instance.sort ().extendsTrans ( quantifiedVarSort ) ) {
                     final CastFunctionSymbol quantifiedVarSortCast =
                         ( (AbstractSort)quantifiedVarSort ).getCastSymbol ();
@@ -134,7 +133,7 @@ class Substitution {
     }
     
     public boolean termContainsValue(Term term) {
-        IteratorOfTerm it = varMap.valueIterator ();
+        Iterator<Term> it = varMap.valueIterator ();
         while ( it.hasNext () ) {
             if ( recOccurCheck ( it.next (), term ) ) return true;
         }

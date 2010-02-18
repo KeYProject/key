@@ -11,10 +11,14 @@ package de.uka.ilkd.key.visualdebugger.statevisualisation;
 
 import java.util.*;
 
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.ClassType;
 import de.uka.ilkd.key.java.declaration.ArrayDeclaration;
-import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Equality;
 
 public class SymbolicArrayObject extends SymbolicObject {
@@ -27,20 +31,20 @@ public class SymbolicArrayObject extends SymbolicObject {
 
     private final HashMap index2term = new HashMap();
 
-    private SetOfTerm indexConfiguration;
+    private ImmutableSet<Term> indexConfiguration;
 
     private HashMap indexTerm2EquClass;
 
     private LinkedList possibleIndexTermConfigurations;
 
-    public SymbolicArrayObject(SetOfTerm cl, ClassType t, Services s) {
+    public SymbolicArrayObject(ImmutableSet<Term> cl, ClassType t, Services s) {
         super(cl, t, s);
         assert (t instanceof ArrayDeclaration);
     }
 
     public SymbolicArrayObject(Term cl, ClassType t, Services s,
-            SetOfTerm possibleIndexTerms) {
-        super(SetAsListOfTerm.EMPTY_SET.add(cl), t, s);
+            ImmutableSet<Term> possibleIndexTerms) {
+        super(DefaultImmutableSet.<Term>nil().add(cl), t, s);
         // this.possibleIndexTerms=possibleIndexTerms;
     }
 
@@ -55,13 +59,13 @@ public class SymbolicArrayObject extends SymbolicObject {
             f = (Term) equClass2Repr.get(indexTerm2EquClass.get(g));
 
         if (index2term.containsKey(f)) {
-            ListOfTerm t = (ListOfTerm) index2term.get(f);
+            ImmutableList<Term> t = (ImmutableList<Term>) index2term.get(f);
             t = t.append(o);
             index2term.remove(f);
             index2term.put(f, t);
 
         } else {
-            ListOfTerm t = SLListOfTerm.EMPTY_LIST.append(o);
+            ImmutableList<Term> t = ImmutableSLList.<Term>nil().append(o);
             index2term.put(f, t);
         }
 
@@ -71,8 +75,8 @@ public class SymbolicArrayObject extends SymbolicObject {
      * return all index terms used in this array object figures
      */
 
-    public SetOfTerm getAllIndexTerms() {
-        SetOfTerm result = SetAsListOfTerm.EMPTY_SET;
+    public ImmutableSet<Term> getAllIndexTerms() {
+        ImmutableSet<Term> result = DefaultImmutableSet.<Term>nil();
         // System.out.println("PRIM "+this.isPrimitiveType());
         // System.out.println(index2term);
         // System.out.println(this.index2S0);
@@ -81,17 +85,17 @@ public class SymbolicArrayObject extends SymbolicObject {
         HashSet val = new HashSet(this.equClass2Repr.values());
         s.addAll(val);
 
-        for (Iterator it = s.iterator(); it.hasNext();) {
-            result = result.add((Term) it.next());
+        for (Object value : s) {
+            result = result.add((Term) value);
         }
         return result;
     }
 
-    public SetOfTerm getAllPostIndex() {
-        SetOfTerm result = SetAsListOfTerm.EMPTY_SET;
+    public ImmutableSet<Term> getAllPostIndex() {
+        ImmutableSet<Term> result = DefaultImmutableSet.<Term>nil();
         Set s = index2post.keySet();
-        for (Iterator it = s.iterator(); it.hasNext();) {
-            result = result.add((Term) it.next());
+        for (Object value : s) {
+            result = result.add((Term) value);
         }
         return result;
     }
@@ -101,16 +105,16 @@ public class SymbolicArrayObject extends SymbolicObject {
         return (SymbolicObject) index2SO.get(index);
     }
 
-    public ListOfTerm getConstraintsForIndex(Term index) {
-        return (ListOfTerm) index2term.get(index);
+    public ImmutableList<Term> getConstraintsForIndex(Term index) {
+        return (ImmutableList<Term>) index2term.get(index);
     }
 
     /**
      * return the index configuration
      * 
-     * @return the SetOfTerm representing the index config.
+     * @return the SetOf<Term> representing the index config.
      */
-    public SetOfTerm getIndexConfiguration() {
+    public ImmutableSet<Term> getIndexConfiguration() {
         return this.indexConfiguration;
 
     }
@@ -133,8 +137,7 @@ public class SymbolicArrayObject extends SymbolicObject {
      */
     private Term getRepres(EquClass cl) {
         Term result = cl.getMembers().iterator().next();
-        for (IteratorOfTerm it = cl.getMembers().iterator(); it.hasNext();) {
-            Term next = it.next();
+        for (Term next : cl.getMembers()) {
             if (isNumberLiteral(next)) {
                 result = next;
             }
@@ -162,13 +165,12 @@ public class SymbolicArrayObject extends SymbolicObject {
      * 
      * @param constraints
      */
-    public void setIndexConfiguration(SetOfTerm constraints) {
+    public void setIndexConfiguration(ImmutableSet<Term> constraints) {
         indexTerm2EquClass = new HashMap();
         // s.i
-        IteratorOfTerm it = constraints.iterator();
-        while (it.hasNext()) {
+        for (Term constraint : constraints) {
             EquClass ec = null;
-            Term t = it.next();
+            Term t = constraint;
             if (t.op() instanceof Equality /* && !containsImplicitAttr(t) */) {
                 if (indexTerm2EquClass.containsKey(t.sub(0))) {
                     ec = (EquClass) indexTerm2EquClass.get(t.sub(0));
@@ -183,9 +185,8 @@ public class SymbolicArrayObject extends SymbolicObject {
                 } else {
                     ec = new EquClass(t.sub(0), t.sub(1));
                 }
-                IteratorOfTerm ecIt = ec.getMembers().iterator();
-                while (ecIt.hasNext()) {
-                    indexTerm2EquClass.put(ecIt.next(), ec);
+                for (Term term : ec.getMembers()) {
+                    indexTerm2EquClass.put(term, ec);
                 }
             } else {
                 if (!indexTerm2EquClass.containsKey(t.sub(0).sub(1))) {
@@ -202,15 +203,15 @@ public class SymbolicArrayObject extends SymbolicObject {
         }
 
         this.equClass2Repr = new HashMap();
-        for (Iterator it2 = this.indexTerm2EquClass.values().iterator(); it2
-                .hasNext();) {
+        for (Object o : this.indexTerm2EquClass.values()) {
 
-            EquClass cl = (EquClass) it2.next();
+            EquClass cl = (EquClass) o;
             this.equClass2Repr.put(cl, getRepres(cl));
             /*
              * System.out.println("AAAAAAAAAAA"); System.out.println("Class
              * "+cl.members ); System.out.println("Repr "+this.getRepres(cl));
-             */}
+             */
+        }
 
         this.indexConfiguration = constraints;
 
@@ -236,21 +237,21 @@ public class SymbolicArrayObject extends SymbolicObject {
     }
 
     private class EquClass {
-        private SetOfTerm disjointRep = SetAsListOfTerm.EMPTY_SET;
+        private ImmutableSet<Term> disjointRep = DefaultImmutableSet.<Term>nil();
 
-        private SetOfTerm members;
+        private ImmutableSet<Term> members;
 
-        public EquClass(SetOfTerm members) {
+        public EquClass(ImmutableSet<Term> members) {
             this.members = members;
 
         }
 
         public EquClass(Term t) {
-            this(SetAsListOfTerm.EMPTY_SET.add(t));
+            this(DefaultImmutableSet.<Term>nil().add(t));
         }
 
         public EquClass(Term t1, Term t2) {
-            this(SetAsListOfTerm.EMPTY_SET.add(t1).add(t2));
+            this(DefaultImmutableSet.<Term>nil().add(t1).add(t2));
         }
 
         public void add(EquClass ec) {
@@ -265,11 +266,11 @@ public class SymbolicArrayObject extends SymbolicObject {
             disjointRep = disjointRep.add(t);
         }
 
-        public SetOfTerm getDisjoints() {
+        public ImmutableSet<Term> getDisjoints() {
             return disjointRep;
         }
 
-        public SetOfTerm getMembers() {
+        public ImmutableSet<Term> getMembers() {
             return members;
         }
 

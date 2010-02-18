@@ -4,7 +4,9 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedList;
 
 import javax.swing.SwingUtilities;
 
@@ -12,7 +14,6 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.*;
 import org.eclipse.jdt.core.dom.*;
-import org.eclipse.jdt.core.formatter.CodeFormatterApplication;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.text.BadLocationException;
@@ -28,6 +29,8 @@ import org.eclipse.ui.PlatformUI;
 import visualdebugger.views.InsertSepVisitor;
 import de.uka.ilkd.key.casetool.eclipse.KeYPlugin;
 import de.uka.ilkd.key.casetool.eclipse.MethodPOSelectionDialog;
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.Main;
 import de.uka.ilkd.key.gui.ProverTaskListener;
 import de.uka.ilkd.key.gui.TaskFinishedInfo;
@@ -36,7 +39,9 @@ import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.*;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
-import de.uka.ilkd.key.speclang.*;
+import de.uka.ilkd.key.speclang.ClassInvariant;
+import de.uka.ilkd.key.speclang.OperationContract;
+import de.uka.ilkd.key.speclang.SLEnvInput;
 import de.uka.ilkd.key.strategy.DebuggerStrategy;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyFactory;
@@ -648,12 +653,12 @@ public class StartVisualDebuggerAction implements IObjectActionDelegate {
 
         final SpecificationRepository specRepos = services.getSpecificationRepository();
 
-        final SetOfClassInvariant assumedInvariants = 
+        final ImmutableSet<ClassInvariant> assumedInvariants = 
             assumeClassInvariants ? specRepos.getClassInvariants(pm.getContainerType()) : 
-                SetAsListOfClassInvariant.EMPTY_SET;	   	 
+                DefaultImmutableSet.<ClassInvariant>nil();	   	 
 
 
-            final SetOfOperationContract operationContracts = specRepos.getOperationContracts(pm);
+            final ImmutableSet<OperationContract> operationContracts = specRepos.getOperationContracts(pm);
             
             if (operationContracts.size() == 0) {
                 throw new ProofInputException("No contract found for "+pm.getFullName());

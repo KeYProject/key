@@ -41,7 +41,7 @@ public class SubstOp extends Op {
 	if (term.varsBoundHere(1).size() != 1) return false;
 	if (term.varsBoundHere(0).size() != 0) return false;
 	Sort substSort=term.sub(0).sort();
-	Sort varSort=term.varsBoundHere(1).getQuantifiableVariable(0).sort();       
+	Sort varSort=term.varsBoundHere(1).get(0).sort();       
 	return substSort.extendsTrans(varSort);
     }
 
@@ -66,9 +66,8 @@ public class SubstOp extends Op {
      * has this operator as top-level operator
      */
     public Term apply ( Term term ) {
-	QuantifiableVariable v=term.varsBoundHere(1).getQuantifiableVariable(0);
+	QuantifiableVariable v=term.varsBoundHere(1).get(0);
 	ClashFreeSubst cfSubst = new ClashFreeSubst(v, term.sub(0));
-	Term res = cfSubst.apply(term.sub(1));
-	return res;
+	return cfSubst.apply(term.sub(1));
     }
 }

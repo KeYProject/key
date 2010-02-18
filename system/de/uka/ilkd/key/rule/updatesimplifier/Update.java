@@ -12,12 +12,11 @@ package de.uka.ilkd.key.rule.updatesimplifier;
 import java.util.HashMap;
 import java.util.HashSet;
 
+import de.uka.ilkd.key.collection.*;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.AbstractSort;
-import de.uka.ilkd.key.logic.sort.SetAsListOfSort;
-import de.uka.ilkd.key.logic.sort.SetOfSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.util.Debug;
 
@@ -31,8 +30,8 @@ public abstract class Update {
     // it as to be taken care that this sort does not escape
     private static final Sort SPECIAL_SORT = 
         new AbstractSort(new Name("special_sort")) {
-            public SetOfSort extendsSorts() {              
-                return SetAsListOfSort.EMPTY_SET;
+            public ImmutableSet<Sort> extendsSorts() {              
+                return DefaultImmutableSet.<Sort>nil();
             }
     	};
     
@@ -41,24 +40,24 @@ public abstract class Update {
      */
     public static class UpdateInParts extends Update {
 
-        private final HashMap<Location, ArrayOfAssignmentPair> loc2assignmentPairs;
+        private final HashMap<Location, ImmutableArray<AssignmentPair>> loc2assignmentPairs;
 
         private final HashSet<Location> locationCache;
 
-        private final ArrayOfAssignmentPair pairs;
+        private final ImmutableArray<AssignmentPair> pairs;
 
-        private SetOfQuantifiableVariable freeVars = null;
+        private ImmutableSet<QuantifiableVariable> freeVars = null;
         
         /**
          * @param pairs
          */
-        public UpdateInParts(final ArrayOfAssignmentPair pairs) {
+        public UpdateInParts(final ImmutableArray<AssignmentPair> pairs) {
             this.pairs = pairs;
-            loc2assignmentPairs = new HashMap<Location, ArrayOfAssignmentPair>();
+            loc2assignmentPairs = new HashMap<Location, ImmutableArray<AssignmentPair>>();
             this.locationCache = new HashSet<Location>();
 
             for (int i = 0; i < pairs.size(); i++) {
-                locationCache.add(pairs.getAssignmentPair(i).location());
+                locationCache.add(pairs.get(i).location());
             }
 
         }
@@ -68,7 +67,7 @@ public abstract class Update {
          * 
          * @see de.uka.ilkd.key.rule.updatesimplifier.Update#getAllAssignmentPairs()
          */
-        public ArrayOfAssignmentPair getAllAssignmentPairs() {
+        public ImmutableArray<AssignmentPair> getAllAssignmentPairs() {
             return pairs;
         }
 
@@ -77,19 +76,19 @@ public abstract class Update {
          * 
          * @see de.uka.ilkd.key.rule.updatesimplifier.Update#getAssignmentPairs(de.uka.ilkd.key.logic.op.Operator)
          */
-        public ArrayOfAssignmentPair getAssignmentPairs(Location loc) {
+        public ImmutableArray<AssignmentPair> getAssignmentPairs(Location loc) {
             if (!loc2assignmentPairs.containsKey(loc)) {
-                ListOfAssignmentPair result = SLListOfAssignmentPair.EMPTY_LIST;
+                ImmutableList<AssignmentPair> result = ImmutableSLList.<AssignmentPair>nil();
                 for (int i = pairs.size() - 1; i >= 0; i--) {
-                    AssignmentPair assignmentPair = pairs.getAssignmentPair(i);
+                    AssignmentPair assignmentPair = pairs.get(i);
                     final Location op = assignmentPair.location();
                     if (loc.mayBeAliasedBy(op)) {
                         result = result.prepend(assignmentPair);
                     }
                 }
 
-                loc2assignmentPairs.put(loc, new ArrayOfAssignmentPair(result
-                        .toArray()));
+                loc2assignmentPairs.put(loc, new ImmutableArray<AssignmentPair>(result
+                        .toArray(new AssignmentPair[result.size()])));
             }
             return loc2assignmentPairs.get(loc);
         }
@@ -109,7 +108,7 @@ public abstract class Update {
          * @see de.uka.ilkd.key.rule.updatesimplifier.Update#location(int)
          */
         public Location location(int n) {
-            return pairs.getAssignmentPair(n).location();
+            return pairs.get(n).location();
         }
 
         /*
@@ -124,12 +123,12 @@ public abstract class Update {
         /* (non-Javadoc)
          * @see de.uka.ilkd.key.rule.updatesimplifier.Update#freeVars()
          */
-        public SetOfQuantifiableVariable freeVars () {
+        public ImmutableSet<QuantifiableVariable> freeVars () {
             if ( freeVars == null ) {
-                freeVars = SetAsListOfQuantifiableVariable.EMPTY_SET;
+                freeVars = DefaultImmutableSet.<QuantifiableVariable>nil();
                 for ( int i = 0; i != pairs.size (); ++i )
                     freeVars = freeVars.union
-                                ( pairs.getAssignmentPair ( i ).freeVars () );
+                                ( pairs.get ( i ).freeVars () );
             }
             return freeVars;
         }
@@ -138,13 +137,13 @@ public abstract class Update {
          * @see de.uka.ilkd.key.rule.updatesimplifier.Update#getAssignmentPair(int)
          */
         public AssignmentPair getAssignmentPair (int locPos) {
-            return pairs.getAssignmentPair ( locPos );
+            return pairs.get ( locPos );
         }
     }
 
     private static class UpdateWithUpdateTerm extends Update {
 
-        private final HashMap<Location, ArrayOfAssignmentPair> loc2assignmentPairs;
+        private final HashMap<Location, ImmutableArray<AssignmentPair>> loc2assignmentPairs;
 
         private HashSet<Location> locationCache;
 
@@ -152,12 +151,12 @@ public abstract class Update {
 
         private final IUpdateOperator updateOp;
 
-        private SetOfQuantifiableVariable freeVars = null;        
+        private ImmutableSet<QuantifiableVariable> freeVars = null;        
 
         public UpdateWithUpdateTerm(Term update) {
             this.update = update;	    
             this.updateOp = (IUpdateOperator) update.op();
-            this.loc2assignmentPairs = new HashMap<Location, ArrayOfAssignmentPair>();
+            this.loc2assignmentPairs = new HashMap<Location, ImmutableArray<AssignmentPair>>();
             
             for ( int i = 0; i < updateOp.locationCount (); i++ ) {
                 if ( updateOp.location ( i ) == StarLocation.ALL )
@@ -170,13 +169,13 @@ public abstract class Update {
         /**
          * @return the assignment pairs making up the update
          */
-        public ArrayOfAssignmentPair getAllAssignmentPairs() {
+        public ImmutableArray<AssignmentPair> getAllAssignmentPairs() {
             final AssignmentPair[] result = 
                 new AssignmentPair[locationCount()];
             for (int i = 0; i < locationCount(); i++) {
                 result[i] = getAssignmentPair ( i );
             }
-            return new ArrayOfAssignmentPair(result);
+            return new ImmutableArray<AssignmentPair>(result);
         }
 
         public AssignmentPair getAssignmentPair (int locPos) {
@@ -193,16 +192,16 @@ public abstract class Update {
          * determines and returns all assignment pairs whose location part may 
          * be an alias of <code>loc</code>
          */
-        public ArrayOfAssignmentPair getAssignmentPairs(Location loc) {
+        public ImmutableArray<AssignmentPair> getAssignmentPairs(Location loc) {
             if (!loc2assignmentPairs.containsKey(loc)) {
-                ListOfAssignmentPair result = SLListOfAssignmentPair.EMPTY_LIST;
+                ImmutableList<AssignmentPair> result = ImmutableSLList.<AssignmentPair>nil();
                 for (int i = updateOp.locationCount() - 1; i >= 0; i--) {
                     if ( loc.mayBeAliasedBy ( updateOp.location(i) ) )
                         result = result.prepend ( getAssignmentPair ( i ) );
                 }
 
                 loc2assignmentPairs.put(loc, 
-                        new ArrayOfAssignmentPair(result.toArray()));
+                        new ImmutableArray<AssignmentPair>(result.toArray(new AssignmentPair[result.size()])));
             }
             return loc2assignmentPairs.get(loc);
         }
@@ -234,12 +233,12 @@ public abstract class Update {
         /* (non-Javadoc)
          * @see de.uka.ilkd.key.rule.updatesimplifier.Update#freeVars()
          */
-        public SetOfQuantifiableVariable freeVars () {
+        public ImmutableSet<QuantifiableVariable> freeVars () {
             if ( freeVars == null ) {
                 if ( update.sub ( update.arity () - 1 ).freeVars ().size () == 0 ) {
                     freeVars = update.freeVars ();
                 } else {
-                    freeVars = SetAsListOfQuantifiableVariable.EMPTY_SET;
+                    freeVars = DefaultImmutableSet.<QuantifiableVariable>nil();
                     for ( int i = 0; i != locationCount (); ++i )
                         freeVars = freeVars.union ( getAssignmentPair ( i )
                                                     .freeVars () );
@@ -254,7 +253,7 @@ public abstract class Update {
      * given update term
      */
     public static Update createUpdate(AssignmentPair[] pairs) {
-        return new UpdateInParts(new ArrayOfAssignmentPair(pairs));
+        return new UpdateInParts(new ImmutableArray<AssignmentPair>(pairs));
     }
 
     /**
@@ -281,13 +280,13 @@ public abstract class Update {
     /**
      * @return all assignment pairs of the update
      */
-    public abstract ArrayOfAssignmentPair getAllAssignmentPairs();
+    public abstract ImmutableArray<AssignmentPair> getAllAssignmentPairs();
 
     /**
      * determines and returns all assignment pairs whose location part has the
      * same top level operator as the given one
      */
-    public abstract ArrayOfAssignmentPair getAssignmentPairs(Location loc);
+    public abstract ImmutableArray<AssignmentPair> getAssignmentPairs(Location loc);
 
     /**
      * returns true if the given location is updated by this update
@@ -328,13 +327,13 @@ public abstract class Update {
      *         update (when applying the update, it might happen that such
      *         variables have to be renaming to avoid collisions)
      */
-    public abstract SetOfQuantifiableVariable freeVars();
+    public abstract ImmutableSet<QuantifiableVariable> freeVars();
     
     public String toString() {
         StringBuffer result = new StringBuffer("{");
-        ArrayOfAssignmentPair pairs = getAllAssignmentPairs();
+        ImmutableArray<AssignmentPair> pairs = getAllAssignmentPairs();
         for (int i = 0; i<pairs.size(); i++) {           
-            result.append(pairs.getAssignmentPair(i).toString());
+            result.append(pairs.get(i).toString());
             if (i<pairs.size()-1) result.append(" || ");
         }
         result.append("}");

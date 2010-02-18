@@ -10,18 +10,21 @@
 
 package de.uka.ilkd.key.proof;
 
+import java.util.Iterator;
+
+import de.uka.ilkd.key.collection.*;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.rule.ListOfNoPosTacletApp;
-import de.uka.ilkd.key.rule.ListOfTacletApp;
+import de.uka.ilkd.key.rule.NoPosTacletApp;
+import de.uka.ilkd.key.rule.TacletApp;
 
 /**
  * This class holds <code>TermTacletAppIndex</code>s for all formulas of
  * a semisequent.
  */
 public class SemisequentTacletAppIndex {
-    private MapFromConstrainedFormulaToTermTacletAppIndex
-	termIndices = MapAsListFromConstrainedFormulaToTermTacletAppIndex.EMPTY_MAP;
+    private ImmutableMap<ConstrainedFormula,TermTacletAppIndex>
+	termIndices = DefaultImmutableMap.<ConstrainedFormula,TermTacletAppIndex>nilMap();
 
     private TermTacletAppIndexCacheSet indexCaches;
     
@@ -36,13 +39,13 @@ public class SemisequentTacletAppIndex {
      * the new indices.
      * Note: destructive, use only when constructing new index
      */
-    private void addTermIndices ( ListOfConstrainedFormula cfmas,
+    private void addTermIndices ( ImmutableList<ConstrainedFormula> cfmas,
                                   Sequent                  s,
                                   Services                 services,
                                   Constraint               userConstraint,
                                   TacletIndex              tacletIndex,
                                   NewRuleListener          listener ) {
-        while ( cfmas != SLListOfConstrainedFormula.EMPTY_LIST ) {
+        while ( !cfmas.isEmpty() ) {
             final ConstrainedFormula cfma = cfmas.head ();
             cfmas = cfmas.tail ();
             addTermIndex ( cfma, s, services, userConstraint, tacletIndex,
@@ -110,10 +113,8 @@ public class SemisequentTacletAppIndex {
      * <code>termIndices</code>.
      * Note: destructive, use only when constructing new index
      */
-    private void removeTermIndices(ListOfConstrainedFormula cfmas) {
-        final IteratorOfConstrainedFormula it = cfmas.iterator ();
-        while ( it.hasNext () )
-            removeTermIndex ( it.next () );
+    private void removeTermIndices(ImmutableList<ConstrainedFormula> cfmas) {
+        for (ConstrainedFormula cfma : cfmas) removeTermIndex(cfma);
     }
 
     /**
@@ -132,28 +133,26 @@ public class SemisequentTacletAppIndex {
      * <code>infos</code>
      * Note: destructive, use only when constructing new index
      */
-    private ListOfTermTacletAppIndex removeFormulas(ListOfFormulaChangeInfo infos) {
+    private ImmutableList<TermTacletAppIndex> removeFormulas(ImmutableList<FormulaChangeInfo> infos) {
 
-        ListOfTermTacletAppIndex oldIndices = SLListOfTermTacletAppIndex.EMPTY_LIST;
+        ImmutableList<TermTacletAppIndex> oldIndices = ImmutableSLList.<TermTacletAppIndex>nil();
 
-        final IteratorOfFormulaChangeInfo infoIt = infos.iterator ();
-
-        while ( infoIt.hasNext () ) {
-            final FormulaChangeInfo info = infoIt.next ();
-            final ConstrainedFormula oldFor = info.getOriginalFormula ();
-            final ConstrainedFormula newFor = info.getNewFormula ();
+        for (FormulaChangeInfo info1 : infos) {
+            final FormulaChangeInfo info = info1;
+            final ConstrainedFormula oldFor = info.getOriginalFormula();
+            final ConstrainedFormula newFor = info.getNewFormula();
 
             TermTacletAppIndex oldIndex;
 
-            if ( oldFor.constraint ().equals ( newFor.constraint () ) ) {
-                oldIndex = termIndices.get ( oldFor );
+            if (oldFor.constraint().equals(newFor.constraint())) {
+                oldIndex = termIndices.get(oldFor);
             } else {
                 // modified constraint, thus we have to rebuild the whole term
                 // index
                 oldIndex = null;
             }
-            oldIndices = oldIndices.prepend ( oldIndex );
-            termIndices = termIndices.remove ( oldFor );
+            oldIndices = oldIndices.prepend(oldIndex);
+            termIndices = termIndices.remove(oldFor);
         }
 
         return oldIndices.reverse ();
@@ -166,16 +165,16 @@ public class SemisequentTacletAppIndex {
      * indices are inserted in the map <code>termIndices</code>.
      * Note: destructive, use only when constructing new index
      */
-    private void updateTermIndices ( ListOfTermTacletAppIndex oldIndices,
-                                     ListOfFormulaChangeInfo  infos,
+    private void updateTermIndices ( ImmutableList<TermTacletAppIndex> oldIndices,
+                                     ImmutableList<FormulaChangeInfo>  infos,
                                      Sequent                  newSeq,
                                      Services                 services,
                                      Constraint               userConstraint,
                                      TacletIndex              tacletIndex,
                                      NewRuleListener          listener ) {
 
-	final IteratorOfFormulaChangeInfo infoIt = infos.iterator ();
-        final IteratorOfTermTacletAppIndex oldIndexIt = oldIndices.iterator ();
+	final Iterator<FormulaChangeInfo> infoIt = infos.iterator ();
+        final Iterator<TermTacletAppIndex> oldIndexIt = oldIndices.iterator ();
 
         while ( infoIt.hasNext () ) {
             final FormulaChangeInfo info = infoIt.next ();
@@ -200,7 +199,7 @@ public class SemisequentTacletAppIndex {
         }
     }
 
-    private void updateTermIndices ( ListOfFormulaChangeInfo infos,
+    private void updateTermIndices ( ImmutableList<FormulaChangeInfo> infos,
                                      Sequent                 newSeq,
                                      Services                services,
                                      Constraint              userConstraint,
@@ -208,7 +207,7 @@ public class SemisequentTacletAppIndex {
                                      NewRuleListener         listener ) {
 
         // remove original indices
-        final ListOfTermTacletAppIndex oldIndices = removeFormulas ( infos );
+        final ImmutableList<TermTacletAppIndex> oldIndices = removeFormulas ( infos );
 
         updateTermIndices ( oldIndices, infos, newSeq, services,
                             userConstraint, tacletIndex, listener );
@@ -259,7 +258,7 @@ public class SemisequentTacletAppIndex {
     /**
      * @return all taclet apps for the given position
      */
-    public ListOfNoPosTacletApp getTacletAppAt(PosInOccurrence pos,
+    public ImmutableList<NoPosTacletApp> getTacletAppAt(PosInOccurrence pos,
                                                RuleFilter filter) {
         return getTermIndex ( pos ).getTacletAppAt ( pos, filter );
     }
@@ -267,7 +266,7 @@ public class SemisequentTacletAppIndex {
     /**
      * @return all taclet apps for or below the given position
      */
-    public ListOfTacletApp getTacletAppAtAndBelow(PosInOccurrence pos,
+    public ImmutableList<TacletApp> getTacletAppAtAndBelow(PosInOccurrence pos,
                                                   RuleFilter filter) {
         return getTermIndex ( pos ).getTacletAppAtAndBelow ( pos, filter );
     }
@@ -309,7 +308,7 @@ public class SemisequentTacletAppIndex {
                                                   TacletIndex     tacletIndex,
                                                   NewRuleListener listener) {
         final SemisequentTacletAppIndex result = copy();
-        final IteratorOfConstrainedFormula it = termIndices.keyIterator ();
+        final Iterator<ConstrainedFormula> it = termIndices.keyIterator ();
 
         while ( it.hasNext () )
             result.addTaclets ( filter, it.next (), s, services,
@@ -324,11 +323,11 @@ public class SemisequentTacletAppIndex {
      * every cached taclet app.
      */
     public void reportRuleApps ( NewRuleListener l ) {
-        final IteratorOfEntryOfConstrainedFormulaAndTermTacletAppIndex it =
+        final Iterator<ImmutableMapEntry<ConstrainedFormula,TermTacletAppIndex>> it =
             termIndices.entryIterator();
         
         while ( it.hasNext() ) {
-            final EntryOfConstrainedFormulaAndTermTacletAppIndex entry = it.next();
+            final ImmutableMapEntry<ConstrainedFormula,TermTacletAppIndex> entry = it.next();
             final ConstrainedFormula cfma = entry.key (); 
             final TermTacletAppIndex index = entry.value ();
             final PosInOccurrence pio = 

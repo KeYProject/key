@@ -11,6 +11,7 @@
 
 package de.uka.ilkd.key.java.declaration;
 
+import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.reference.TypeReference;
@@ -29,7 +30,7 @@ public class FieldDeclaration extends VariableDeclaration implements MemberDecla
      *      Field specs.
      */
 
-    protected final ArrayOfFieldSpecification fieldSpecs;
+    protected final ImmutableArray<FieldSpecification> fieldSpecs;
 
     /**
      *      Field declaration.
@@ -45,7 +46,7 @@ public class FieldDeclaration extends VariableDeclaration implements MemberDecla
 			    boolean parentIsInterfaceDeclaration) { 
         super(mods,typeRef,parentIsInterfaceDeclaration);	
 	fieldSpecs = new
-	    ArrayOfFieldSpecification(vars); 
+	    ImmutableArray<FieldSpecification>(vars); 
     }
 
     /**
@@ -61,16 +62,15 @@ public class FieldDeclaration extends VariableDeclaration implements MemberDecla
 			    boolean parentIsInterfaceDeclaration) {
         super(children, parentIsInterfaceDeclaration);
 	fieldSpecs = new
-	    ArrayOfFieldSpecification((FieldSpecification[])
+	    ImmutableArray<FieldSpecification>((FieldSpecification[])
 				      children.collect(FieldSpecification.class));
     }
-
-
-    public ArrayOfFieldSpecification getFieldSpecifications() {
+    
+    public ImmutableArray<FieldSpecification> getFieldSpecifications() {
         return fieldSpecs;
     }
 
-    public ArrayOfVariableSpecification getVariables() {
+    public ImmutableArray<? extends VariableSpecification> getVariables() {
         return fieldSpecs;
     }
 
@@ -100,7 +100,7 @@ public class FieldDeclaration extends VariableDeclaration implements MemberDecla
         if (modArray != null) {
             len = modArray.size();
             if (len > index) {
-                return modArray.getModifier(index);
+                return modArray.get(index);
             }
             index -= len;
         }
@@ -109,7 +109,7 @@ public class FieldDeclaration extends VariableDeclaration implements MemberDecla
             index--;
         }
         if (fieldSpecs != null) {
-            return fieldSpecs.getFieldSpecification(index);
+            return fieldSpecs.get(index);
         }
         throw new ArrayIndexOutOfBoundsException();
     }

@@ -1,15 +1,24 @@
+// This file is part of KeY - Integrated Deductive Software Design
+// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General Public License. 
+// See LICENSE.TXT for details.
 package de.uka.ilkd.key.speclang.translation;
 
+import java.util.Iterator;
+
+import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.abstraction.ListOfKeYJavaType;
 import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 
-class SLMethodResolver extends SLExpressionResolver {
+public class SLMethodResolver extends SLExpressionResolver {
 
     private TermBuilder tb = TermBuilder.DF;
     
@@ -31,7 +40,7 @@ class SLMethodResolver extends SLExpressionResolver {
             return null;
         }
         
-        ListOfKeYJavaType signature = parameters.getSignature(javaInfo.getServices());
+        ImmutableList<KeYJavaType> signature = parameters.getSignature(javaInfo.getServices());
         
         ProgramMethod pm = null;
         Term recTerm = receiver.getTerm(); 
@@ -76,11 +85,10 @@ class SLMethodResolver extends SLExpressionResolver {
             subs = new Term[parameters.getParameters().size()];
             i = 0;
         }
-        
-        IteratorOfSLExpression it = parameters.getParameters().iterator();
-        while(it.hasNext()) {
+
+        for (SLExpression slExpression : parameters.getParameters()) {
             //Remember: parameters.isLisOfTerm() is true!
-            subs[i++] = it.next().getTerm();
+            subs[i++] = slExpression.getTerm();
         }
         
         if (pm.getKeYJavaType() == null) {

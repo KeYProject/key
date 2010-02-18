@@ -10,10 +10,11 @@
 
 package de.uka.ilkd.key.logic;
 
-import de.uka.ilkd.key.logic.op.IteratorOfMetavariable;
-import de.uka.ilkd.key.logic.op.ListOfMetavariable;
+import java.util.Iterator;
+
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.logic.op.Metavariable;
-import de.uka.ilkd.key.logic.op.SLListOfMetavariable;
 /** This class is used to collect all appearing metavariables in a
  * term. Duplicates are not removed becaues the use of persistent
  * datastructure and up to now we just have a SetAsList-implementaion
@@ -22,11 +23,11 @@ import de.uka.ilkd.key.logic.op.SLListOfMetavariable;
 
 public class MVCollector extends Visitor{
     /** collects all found Metavraibles */
-    private ListOfMetavariable mvList;
+    private ImmutableList<Metavariable> mvList;
 
     /** creates the metavariable collector */
     public MVCollector() {
-	mvList=SLListOfMetavariable.EMPTY_LIST;
+	mvList=ImmutableSLList.<Metavariable>nil();
     }
 
     /** is called by the execPostOrder-method of a term 
@@ -40,7 +41,7 @@ public class MVCollector extends Visitor{
     }
 
     /** @return iterator of the found metavariables */
-    public IteratorOfMetavariable mv() {
+    public Iterator<Metavariable> mv() {
 	return mvList.iterator();
     }
 }

@@ -71,14 +71,13 @@ public class ErrorHandler {
     public void printErrorsAndWarnings() {
 	
 	// print
-	Iterator it = errorStack.iterator();
-	while (it.hasNext()) {
-	    Exception ex = (Exception) it.next();
-	    if (ex instanceof WarningException) {		
-		System.out.println("Warning: " + ex.getMessage());
-	    } else 
-		System.out.println("Error: " + ex.getMessage());
-	}
+        for (Object anErrorStack : errorStack) {
+            Exception ex = (Exception) anErrorStack;
+            if (ex instanceof WarningException) {
+                System.out.println("Warning: " + ex.getMessage());
+            } else
+                System.out.println("Error: " + ex.getMessage());
+        }
 	
     }
 

@@ -16,9 +16,9 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
+import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.visitor.ProgramVariableCollector;
-import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.*;
@@ -70,7 +70,7 @@ public class ApplyOnModality extends AbstractUpdateRule {
      */
     public Term apply(Update update, Term target, Services services) {
 
-        final ArrayOfAssignmentPair pairs = deletionEnabled ? new ArrayOfAssignmentPair(
+        final ImmutableArray<AssignmentPair> pairs = deletionEnabled ? new ImmutableArray<AssignmentPair>(
                 remove(update, target, services))
         : update.getAllAssignmentPairs();
   
@@ -84,12 +84,12 @@ public class ApplyOnModality extends AbstractUpdateRule {
      * @author bubel         
      */
     public AssignmentPair[] remove(Update up, Term target, Services services) {
-        final ArrayOfAssignmentPair pairs = up.getAllAssignmentPairs();        
+        final ImmutableArray<AssignmentPair> pairs = up.getAllAssignmentPairs();        
         final HashSet<Object> protectedProgVars = collectProgramVariables(target, services);
         final List<AssignmentPair> result = new ArrayList<AssignmentPair>(pairs.size());
 
         for (int i = 0, size=pairs.size(); i<size; i++) {
-            final AssignmentPair pair =  pairs.getAssignmentPair(i);            
+            final AssignmentPair pair =  pairs.get(i);            
             final Location loc = pair.location();
                        
             if ( protectedLocation ( loc, protectedProgVars ) )
@@ -105,7 +105,7 @@ public class ApplyOnModality extends AbstractUpdateRule {
      * @return true if the given location is protected
      */
     private boolean protectedLocation(Location loc, 
-            HashSet<? extends Object> protectedProgVars) {
+            HashSet<?> protectedProgVars) {
         // currently it would be safe to comment the PROTECTED_HEAP part out as 
         // heap locations are generally not thrown away. But in principle one can think
         // of a more finegrained control
@@ -124,7 +124,8 @@ public class ApplyOnModality extends AbstractUpdateRule {
      */
     private boolean isHeapLocation(Location loc) {        
         return (!(loc instanceof ProgramVariable) || ((ProgramVariable)loc).isMember())
-               && !(loc instanceof NonRigidFunctionLocation);
+               && (!(loc instanceof NonRigidFunctionLocation) || 
+        	       ((NonRigidFunctionLocation)loc).isHeap());
     }
 
     /**
@@ -144,15 +145,15 @@ public class ApplyOnModality extends AbstractUpdateRule {
         if (targetOp instanceof ProgramVariable
             || targetOp instanceof NonRigidFunctionLocation) {
             foundProgVars.add(targetOp);
-        } else if (targetOp instanceof NonRigidHeapDependentFunction) {
+        } else if (targetOp instanceof NonRigidHeapDependentFunction ||
+        	targetOp instanceof ProgramMethod) {
             foundProgVars.add(PROTECT_HEAP);
-        } else if (targetOp instanceof NonRigidFunction && 
-                   !(targetOp instanceof ProgramMethod)) {
+        } else if (targetOp instanceof NonRigidFunction) {
             foundProgVars.add(PROTECT_ALL);
             return foundProgVars;
         }
         
-        if (target.javaBlock() != JavaBlock.EMPTY_JAVABLOCK) {
+        if (!target.javaBlock().isEmpty()) {
             ProgramVariableCollector pvc = 
                 new ProgramVariableCollector(target.javaBlock().program(), 
                                              services,
@@ -176,5 +177,9 @@ public class ApplyOnModality extends AbstractUpdateRule {
         // a modality is not a location
         assert false : "matchingCondition(...) must not be called for target " + target;
         return null; // unreachable
+    }
+
+    public static void clearCache(){
+        protectedVarsCache.clear();
     }
 }

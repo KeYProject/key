@@ -6,14 +6,6 @@
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
 //
-//
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2003 Universitaet Karlsruhe, Germany
-//                         and Chalmers University of Technology, Sweden          
-//
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
-//
 
 /* -*-Antlr-*- */
 
@@ -24,143 +16,105 @@ header {
 class KeYJMLLexer extends Lexer;
 
 options {
-    charVocabulary = '\3'..'\377';  
+ 	charVocabulary='\3'..'\ufffe';
+ 	codeGenMakeSwitchThreshold = 2;  // Some optimizations
+	codeGenBitsetTestThreshold = 3;
 	k=7;
 }
 
 tokens {
-    SET = "set";
-    NEW = "new";
-    BYTE = "byte";
-    SHORT = "short";
-    INT = "int";
-    LONG = "long";
     BOOLEAN = "boolean";
-    AT = "@";
-    PLUS = "+";
-    MINUS = "-";
-    IMPLIES = "==>";
-    IMPLIESBACKWARD = "<==";
-    LOGICALOR = "||";
-    LOGICALAND = "&&";
-    INCLUSIVEOR = "|";
-    XOR = "^";
-    AND = "&";
-    EQUAL = "==";
-    NOTEQUAL = "!=";
-    ALSO = "also";
-//    MULT = "*";
-//    DIV = "/";
-    MOD = "%";
-    TRUE = "true";
+    BYTE = "byte";
     FALSE = "false";
-    EQV = "<==>";
-    ANTIV = "<=!=>";
-    NOT = "!";
-    BITWISENOT = "~";
-    SEMI = ";";
-    COMMA = ",";
-    LPAREN = "(";
-    RPAREN = ")";
-    LBRACKET = "[";
-    RBRACKET = "]";
-    SHIFTRIGHT = ">>";
-    SHIFTLEFT = "<<";
-    UNSIGNEDSHIFTRIGHT = ">>>";
-    NULL = "null";
-    IF = "if";
-    INSTANCEOF = "instanceof";
-    COLON = ":";
-    QUESTIONMARK = "?";
+    INSTANCEOF = "instanceof";        
+    INT = "int";
+    LONG = "long";        
+    NEW = "new";
+    NULL = "null";    
+    SHORT = "short";
+    SUPER = "super";    
     THIS = "this";
-    SUPER = "super";
-    MODEL = "model";
-    RETURNS = "returns";
-    UNINITIALIZED = "uninitialized";
-    SPEC_JAVA_MATH = "spec_java_math";
-    SPEC_SAVE_MATH = "spec_safe_math";
-    SPEC_BIGINT_MATH = "spec_bigint_math";
-    CODE_JAVA_MATH = "code_java_math"; 
-    CODE_SAFE_MATH = "code_safe_math"; 
-    CODE_BIGINT_MATH = "code_bigint_math";
-    CODE_CONTRACT = "code_contract";
+    TRUE = "true";    
+    VOID = "void";
 }
 
-LARROW : "<-";
-NOT : "!";
-BITWISENOT : "~";
-LT : "<";
-GT : ">";
-LEQ : "<=";
-GEQ : ">=";
-ST : "<:";
-PLUS : "+";
-MINUS : "-";
-IMPLIES : "==>";
-IMPLIESBACKWARD : "<==";
-LOGICALOR : "||";
-LOGICALAND : "&&";
-INCLUSIVEOR : "|";
-SHIFTRIGHT : ">>";
-SHIFTLEFT : "<<";
-UNSIGNEDSHIFTRIGHT : ">>>";
-XOR : "^";
 AND : "&";
-EQUAL : "==";
-NOTEQUAL : "!=";
-MULT : "*";
-DIV : "/";
-MOD : "%";
-EQV : "<==>";
 ANTIV : "<=!=>";
-SEMI : ";";
-SUCH_THAT : "\\such_that";
-NOT_SPECIFIED : "\\not_specified";
-RESULT : "\\result";
-NOTHING : "\\nothing";
-EVERYTHING : "\\everything"; 
-PRIVATEDATA : "\\private_data";
-OBJECT_CREATION: "\\object_creation"; //KeY extension, not official JML
-INTO : "\\into";
-OLD : "\\old";
-PRE : "\\pre";
-CREATED : "\\created";
 BIGINT : "\\bigint";
+BITWISENOT : "~";
+BSUM : "\\bsum";  //KeY extension, not official JML
+COLON : ":";
 COMMA : ",";
+CREATED : "\\created";
+CURRENT_MEMORY_AREA : "\\currentMemoryArea"; //KeY extension, not official JML
+DIV : "/";
 DOT : ".";
 DOTDOT : "..";
-COLON : ":";
-QUESTIONMARK : "?";
-NOT_MODIFIED : "\\not_modified";
-NONNULLELEMENTS : "\\nonnullelements";
-OTHER : "\\other";
-LBRACE : "{";
-RBRACE : "}";
-
-FRESH : "\\fresh";
-REACH : "\\reach";
-REAL : "\\real";
 DURATION : "\\duration";
-SPACE : "\\space";
-MAX_SPACE : "\\max_space"; //KeY extension, not official JML
-WORKINGSPACE : "\\working_space";
-RIGIDWORKINGSPACE : "\\rigid_working_space"; //KeY extension, not official JML
-TYPEOF : "\\typeof";
 ELEMTYPE : "\\elemtype";
-TYPE_SMALL : "\\type";
-LOCKSET : "\\lockset";
-IS_INITIALIZED : "\\is_initialized";
+EQUAL : "==";
+EQV : "<==>";
+EVERYTHING : "\\everything";
+FRESH : "\\fresh"; 
+GEQ : ">=";
+GT : ">";
+IMPLIES : "==>";
+IMPLIESBACKWARD : "<==";
+IN_IMMORTAL_MEMORY : "\\inImmortalMemory"; //KeY extension, not official JML
+IN_OUTER_SCOPE : "\\inOuterScope"; //KeY extension, not official JML
+INCLUSIVEOR : "|";
+INTO : "\\into";
 INVARIANT_FOR : "\\invariant_for";
+IS_INITIALIZED : "\\is_initialized";
+LARROW : "<-";
 LBLNEG : "\\lblneg";
 LBLPOS : "\\lblpos";
-TYPE : "\\TYPE";
-NOWARN : "\\nowarn";
-CURRENT_MEMORY_AREA : "\\currentMemoryArea"; //KeY extension, not official JML
-IN_IMMORTAL_MEMORY : "\\inImmortalMemory"; //KeY extension, not official JML
+LBRACE : "{";
+LEQ : "<=";
+LOCKSET : "\\lockset";
+LOGICALAND : "&&";
+LOGICALOR : "||";
+LT : "<";
+MAX_SPACE : "\\max_space"; //KeY extension, not official JML
 MEMORY_AREA : "\\memoryArea"; //KeY extension, not official JML
+MINUS : "-";
+MOD : "%";
+MULT : "*";
+NONNULLELEMENTS : "\\nonnullelements";
+NOT : "!";
+NOT_MODIFIED : "\\not_modified";
+NOT_SPECIFIED : "\\not_specified";
+NOTEQUAL : "!=";
+NOTHING : "\\nothing";
+NOWARN : "\\nowarn";
+OBJECT_CREATION: "\\object_creation"; //KeY extension, not official JML
+OLD : "\\old";
+OTHER : "\\other";
 OUTER_SCOPE : "\\outerScope"; //KeY extension, not official JML
-IN_OUTER_SCOPE : "\\inOuterScope"; //KeY extension, not official JML
+PLUS : "+";
+PRE : "\\pre";
+PRIVATEDATA : "\\private_data";
+QUESTIONMARK : "?";
+RBRACE : "}";
+REACH : "\\reach";
+REAL : "\\real";
 REENTRANT_SCOPE : "\\reentrantScope"; //KeY extension, not official JML
+RESULT : "\\result";
+RIGIDWORKINGSPACE : "\\rigid_working_space"; //KeY extension, not official JML
+SAME : "\\same";
+SEMI : ";";
+SHIFTLEFT : "<<";
+SHIFTRIGHT : ">>";
+SPACE : "\\space";
+TYPEOF : "\\typeof";
+TYPE_SMALL : "\\type";
+TYPE : "\\TYPE";
+ST : "<:";
+SUCH_THAT : "\\such_that";
+UNSIGNEDSHIFTRIGHT : ">>>";
+WORKINGSPACE : "\\working_space";
+XOR : "^";
+
 
 
 LPAREN
@@ -304,7 +258,8 @@ options {
 	|	'\t'
 	|	'\n'  { newline(); }
 	|	'\r'
-    |   '@')
+        |       '\u000C'
+        |       '@')
 		{ $setType(Token.SKIP); }
 	;
 

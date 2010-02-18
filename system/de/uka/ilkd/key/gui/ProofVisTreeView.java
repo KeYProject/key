@@ -5,8 +5,6 @@
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
-//
-//
 package de.uka.ilkd.key.gui;
 
 import java.awt.Color;
@@ -149,10 +147,7 @@ public class ProofVisTreeView extends JFrame implements java.io.Serializable {
                 .getLastContextTraceElement());
         ContextTraceElement[] pathResult = new ContextTraceElement[1 + path.length];
         pathResult[0] = (ContextTraceElement) jTree.getModel().getRoot();
-        for (int i = 0; i < path.length; i++) {
-            pathResult[i + 1] = path[i];
-
-        }
+        System.arraycopy(path, 0, pathResult, 1, path.length);
 
         return new TreePath(pathResult);
     }

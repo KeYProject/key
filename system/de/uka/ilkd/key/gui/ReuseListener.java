@@ -10,8 +10,8 @@
 
 package de.uka.ilkd.key.gui;
 
+import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.ListOfGoal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.reuse.ReusePoint;
 
@@ -30,7 +30,7 @@ interface ReuseListener extends KeYSelectionListener {
 
 
 //add: old markers - new goals; call after removeRPConsumedMarker()
-    void addRPOldMarkersNewGoals(ListOfGoal newGoals);
+    void addRPOldMarkersNewGoals(ImmutableList<Goal> newGoals);
 
 
    

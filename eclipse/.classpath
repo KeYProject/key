@@ -1,18 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry excluding="aspects/|binary/|genSrc/|proofExamples/|proofExamples/arrays/classes/|proofExamples/challenges/jacobsEtAl/abruptTermination/|proofExamples/challenges/jacobsEtAl/aliasing/|proofExamples/challenges/jacobsEtAl/sideeffects/|proofExamples/challenges/jacobsEtAl/static_initialisation/classes/|proofExamples/dev/|proofExamples/dev/aroth_java/|proofExamples/dev/bugs_java/|proofExamples/dev/schemamodal_java/|proofExamples/dev/transactions_java/|proofExamples/generic/classes/|proofExamples/initialisation/java/|proofExamples/instanceCreation/classes/|proofExamples/java_dl/SimpleAttributes_java/|proofExamples/java_dl/attributes_java/|proofExamples/java_dl/compileTimeConstants_java/|proofExamples/java_dl/exceptions_java/|proofExamples/java_dl/methodcall_java/|proofExamples/java_dl/testcontext_java/|proofExamples/ocl/classes/|proofExamples/simplifier/|proofExamples/staticInitialisation/java/|resources/" including="TestKey.java|de/|tudresden/" kind="src" path="system"/>
+	<classpathentry excluding="aspects/|binary/|genSrc/|proofExamples/|proofExamples/arrays/classes/|proofExamples/challenges/jacobsEtAl/abruptTermination/|proofExamples/challenges/jacobsEtAl/aliasing/|proofExamples/challenges/jacobsEtAl/sideeffects/|proofExamples/challenges/jacobsEtAl/static_initialisation/classes/|proofExamples/dev/|proofExamples/dev/aroth_java/|proofExamples/dev/bugs_java/|proofExamples/dev/schemamodal_java/|proofExamples/dev/transactions_java/|proofExamples/generic/classes/|proofExamples/initialisation/java/|proofExamples/instanceCreation/classes/|proofExamples/java_dl/SimpleAttributes_java/|proofExamples/java_dl/attributes_java/|proofExamples/java_dl/compileTimeConstants_java/|proofExamples/java_dl/exceptions_java/|proofExamples/java_dl/methodcall_java/|proofExamples/java_dl/testcontext_java/|proofExamples/ocl/classes/|proofExamples/simplifier/|proofExamples/staticInitialisation/java/|resources/" including="TestKey.java|de/|recoder/" kind="src" path="system"/>
 	<classpathentry kind="src" path="system/genSrc"/>
 	<classpathentry exported="true" kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="key_lib/xerces.jar"/>
 	<classpathentry kind="lib" path="key_lib/recoderKey.jar"/>
 	<classpathentry kind="lib" path="key_lib/log4j.jar"/>
 	<classpathentry kind="lib" path="key_lib/junit.jar"/>
 	<classpathentry kind="lib" path="key_lib/javacc.jar"/>
-	<classpathentry kind="lib" path="key_lib/jargs.jar"/>
-	<classpathentry kind="lib" path="key_lib/dresden-ocl-demo.jar"/>
 	<classpathentry kind="lib" path="key_lib/antlr.jar"/>
-	<classpathentry kind="lib" path="tcc_modules/lib/openapi.jar"/>
-	<classpathentry kind="lib" path="tcc_modules/lib/together.jar"/>
-	<classpathentry kind="lib" path="tcc_modules/modules"/>
-	<classpathentry kind="output" path="system/binary/"/>
+	<classpathentry kind="output" path="system/binary"/>
 </classpath>

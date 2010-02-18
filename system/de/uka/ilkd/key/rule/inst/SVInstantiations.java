@@ -10,7 +10,9 @@
 
 package de.uka.ilkd.key.rule.inst;
 
-import de.uka.ilkd.key.java.ArrayOfProgramElement;
+import java.util.Iterator;
+
+import de.uka.ilkd.key.collection.*;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
@@ -18,30 +20,21 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInProgram;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.op.OperatorSV;
+import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
-import de.uka.ilkd.key.rule.ListOfUpdatePair;
-import de.uka.ilkd.key.rule.SLListOfObject;
-import de.uka.ilkd.key.rule.SLListOfUpdatePair;
 import de.uka.ilkd.key.rule.UpdatePair;
 import de.uka.ilkd.key.util.Debug;
 
 /**
- * This class wraps a MapFromSchemaVariableToInstantiationEntry and is used to
+ * This class wraps a ImmMap<SchemaVariable,InstantiationEntry> and is used to
  * store instantiations of schemavariables. The class is immutable, this means
  * changing its content will result in creating a new object.
  */
 public class SVInstantiations {
     /** the empty instantiation */
     public static final SVInstantiations EMPTY_SVINSTANTIATIONS = new SVInstantiations();
-    
-
-    /**
-     * this dummy schemavariable is used to retrieve and store name proposals
-     * for newly added program variables
-     */
-    private static final SchemaVariable PROGVAR_SV = new NameSV(
-            NameSV.NAME_PREFIX + "_PROG_VARS");
     
     /**
      * the context itself is not realised as a schemavariable, therefore we need
@@ -58,59 +51,59 @@ public class SVInstantiations {
 
 
     /** the map with the instantiations to logic terms */
-    private final MapFromSchemaVariableToInstantiationEntry map;
+    private final ImmutableMap<SchemaVariable,InstantiationEntry> map;
 
     /**
      * just a list of "interesting" instantiations: these instantiations are not
      * 100% predetermined and worth saving in a proof
      */
-    private final MapFromSchemaVariableToInstantiationEntry interesting;
+    private final ImmutableMap<SchemaVariable,InstantiationEntry> interesting;
     
     /**
      * updates may be ignored when matching, therefore they need to be added
      * after the application around the added/replaced parts. These are stored
      * in this list
      */
-    private final ListOfUpdatePair updateContext;
+    private final ImmutableList<UpdatePair> updateContext;
 
     /** instantiations of generic sorts */
     private GenericSortInstantiations genericSortInstantiations = GenericSortInstantiations.EMPTY_INSTANTIATIONS;
 
     /** additional conditions for the generic sorts */
-    private final ListOfGenericSortCondition genericSortConditions;
+    private final ImmutableList<GenericSortCondition> genericSortConditions;
 
     /** integer to cache the hashcode */
     private int hashcode = 0;
 
     /** creates a new SVInstantions object with an empty map */
     private SVInstantiations() {
-	genericSortConditions = SLListOfGenericSortCondition.EMPTY_LIST;
-	updateContext = SLListOfUpdatePair.EMPTY_LIST;
-        map = MapAsListFromSchemaVariableToInstantiationEntry.EMPTY_MAP;
-	interesting = MapAsListFromSchemaVariableToInstantiationEntry.EMPTY_MAP;
+	genericSortConditions = ImmutableSLList.<GenericSortCondition>nil();
+	updateContext = ImmutableSLList.<UpdatePair>nil();
+        map = DefaultImmutableMap.<SchemaVariable,InstantiationEntry>nilMap();
+	interesting = DefaultImmutableMap.<SchemaVariable,InstantiationEntry>nilMap();
     }
 
     /**
      * creates a new SVInstantions object using the given map
      * 
      * @param map
-     *            the MapFromSchemaVariableToInstantiationEntry with the
+     *            the ImmMap<SchemaVariable,InstantiationEntry> with the
      *            instantiations
      */
-    private SVInstantiations(MapFromSchemaVariableToInstantiationEntry map,
-            MapFromSchemaVariableToInstantiationEntry interesting,
-            ListOfUpdatePair updateContext,
-            ListOfGenericSortCondition genericSortConditions) {
+    private SVInstantiations(ImmutableMap<SchemaVariable,InstantiationEntry> map,
+            ImmutableMap<SchemaVariable,InstantiationEntry> interesting,
+            ImmutableList<UpdatePair> updateContext,
+            ImmutableList<GenericSortCondition> genericSortConditions) {
         this(map, interesting, updateContext,
                 GenericSortInstantiations.EMPTY_INSTANTIATIONS,
                 genericSortConditions);
     }
 
-    private SVInstantiations(MapFromSchemaVariableToInstantiationEntry map,
-            MapFromSchemaVariableToInstantiationEntry interesting,
-            ListOfUpdatePair updateContext,
+    private SVInstantiations(ImmutableMap<SchemaVariable,InstantiationEntry> map,
+            ImmutableMap<SchemaVariable,InstantiationEntry> interesting,
+            ImmutableList<UpdatePair> updateContext,
             GenericSortInstantiations genericSortInstantiations,
-            ListOfGenericSortCondition genericSortConditions) {
+            ImmutableList<GenericSortCondition> genericSortConditions) {
         this.map = map;
         this.interesting = interesting;
         this.updateContext = updateContext;
@@ -122,7 +115,7 @@ public class SVInstantiations {
         return genericSortInstantiations;
     }
 
-    public ListOfGenericSortCondition getGenericSortConditions() {
+    public ImmutableList<GenericSortCondition> getGenericSortConditions() {
         return genericSortConditions;
     }
 
@@ -166,7 +159,7 @@ public class SVInstantiations {
 
     public SVInstantiations addList(SchemaVariable sv,  Object[] list) {
         return add(sv, new ListInstantiation(sv, 
-                SLListOfObject.EMPTY_LIST.prepend(list)));
+                ImmutableSLList.<Object>nil().prepend(list)));
     }
 
     
@@ -190,7 +183,7 @@ public class SVInstantiations {
     
     public SVInstantiations addInterestingList(SchemaVariable sv,  Object[] list) {
         return addInteresting(sv, 
-                new ListInstantiation(sv,SLListOfObject.EMPTY_LIST.prepend(list)));
+                new ListInstantiation(sv,ImmutableSLList.<Object>nil().prepend(list)));
     }
 
 
@@ -300,27 +293,23 @@ public class SVInstantiations {
         return addInteresting ( sv, new NameInstantiationEntry(sv, name) );
     }
 
+    // reklov
+    // START TEMPORARY DOWNWARD COMPATIBILITY
 
-    /**
-     * adds name proposals for added program variables to the instantiation
-     * (encoding: comma separated list for variables added at one goal. Semicolon separates
-     * list of name proposals of different goals)
-     * @param listOfNames the Name containing the name proposals in a String 
-     *  encoding
-     * @return the SVInstantiations with the added name proposals
-     */
-    public SVInstantiations addNameProposals(Name listOfNames) {
-        try {
-            return addInteresting(PROGVAR_SV, listOfNames);
-        } catch (IllegalStateException e) {
-            System.out.println(e.getMessage());
-            System.out.println("Replacing instead");
-            e.printStackTrace();
-            return replace(PROGVAR_SV, new NameInstantiationEntry(
-                    PROGVAR_SV, listOfNames));
-        }
+    public SVInstantiations add(SchemaVariable sv, 
+            Name name) {
+        SchemaVariable existingSV = lookupVar(sv.name());
+        Name oldValue = (Name) getInstantiation(existingSV);
+        if (name.equals(oldValue)) return this; // already have it
+        if (oldValue!=null) throw new IllegalStateException(
+                "Trying to add a second name proposal for "+sv+
+                ": "+oldValue+"->"+name);
+//      otherwise (nothing here yet) add it    
+        return add ( sv, new NameInstantiationEntry(sv, name) );
     }
-    
+
+    // END TEMPORARY DOWNWARD COMPATIBILITY
+
     /**
      * replaces the given pair in the instantiations. If the given
      * SchemaVariable has been instantiated already, the new pair is taken
@@ -392,10 +381,10 @@ public class SVInstantiations {
      * @param sv
      *            the SchemaVariable to be instantiated
      * @param pes
-     *            the ArrayOfProgramElement the SchemaVariable is instantiated
+     *            the ArrayOf<t> the SchemaVariable is instantiated
      *            with
      */
-    public SVInstantiations replace(SchemaVariable sv, ArrayOfProgramElement pes) {
+    public SVInstantiations replace(SchemaVariable sv, ImmutableArray<ProgramElement> pes) {
         return replace(sv, new ProgramListInstantiation(sv, pes));
     }
 
@@ -481,14 +470,14 @@ public class SVInstantiations {
                 getGenericSortInstantiations(), getGenericSortConditions());
     }
 
-    public SVInstantiations addUpdateList(ListOfUpdatePair updates) {
+    public SVInstantiations addUpdateList(ImmutableList<UpdatePair> updates) {
         return new SVInstantiations(map, interesting(), updates,
                 getGenericSortInstantiations(), getGenericSortConditions());
     }
 
     public SVInstantiations clearUpdateContext() {
         return new SVInstantiations(map, interesting(),
-                SLListOfUpdatePair.EMPTY_LIST, getGenericSortInstantiations(),
+                ImmutableSLList.<UpdatePair>nil(), getGenericSortInstantiations(),
                 getGenericSortConditions());
     }
 
@@ -506,16 +495,16 @@ public class SVInstantiations {
      * 
      * @return the IteratorOfSchemaVariable
      */
-    public IteratorOfSchemaVariable svIterator() {
+    public Iterator<SchemaVariable> svIterator() {
         return map.keyIterator();
     }
 
     /**
      * returns iterator of the mapped pair (SchemaVariables, InstantiationEntry)
      * 
-     * @return the IteratorOfEntryOfSchemaVariableAndInstantiationEntry
+     * @return the IteratorOfIEntry<SchemaVariable,InstantiationEntry>
      */
-    public IteratorOfEntryOfSchemaVariableAndInstantiationEntry pairIterator() {
+    public Iterator<ImmutableMapEntry<SchemaVariable,InstantiationEntry>> pairIterator() {
         return map.entryIterator();
     }
 
@@ -530,11 +519,18 @@ public class SVInstantiations {
     }
 
     /**
+     * returns true iff no instantiation of SchemaVariables are known
+     */
+    public boolean isEmpty() {
+        return map.isEmpty();
+    }
+
+    /**
      * returns the update context
      * 
      * @return the update context
      */
-    public ListOfUpdatePair getUpdateContext() {
+    public ImmutableList<UpdatePair> getUpdateContext() {
         return updateContext;
     }
 
@@ -555,9 +551,9 @@ public class SVInstantiations {
             return false;
         }
       
-        final IteratorOfEntryOfSchemaVariableAndInstantiationEntry it = pairIterator();
+        final Iterator<ImmutableMapEntry<SchemaVariable,InstantiationEntry>> it = pairIterator();
         while (it.hasNext()) {
-            final EntryOfSchemaVariableAndInstantiationEntry e = it.next();
+            final ImmutableMapEntry<SchemaVariable,InstantiationEntry> e = it.next();
             final Object inst = e.value().getInstantiation();
             assert inst != null : "Illegal null instantiation.";
             if (!inst.equals(cmp.getInstantiation(e.key()))) {
@@ -571,10 +567,10 @@ public class SVInstantiations {
     public int hashCode() {
         if (hashcode == 0) {
             int result = 37 * getUpdateContext().hashCode() + size();
-            final IteratorOfEntryOfSchemaVariableAndInstantiationEntry it = 
+            final Iterator<ImmutableMapEntry<SchemaVariable,InstantiationEntry>> it = 
                 pairIterator();
             while (it.hasNext()) {
-                final EntryOfSchemaVariableAndInstantiationEntry e = it.next(); 
+                final ImmutableMapEntry<SchemaVariable,InstantiationEntry> e = it.next(); 
                 result = 37 * result + e.value().getInstantiation().hashCode() + 
                   e.key().hashCode();
             }
@@ -584,21 +580,21 @@ public class SVInstantiations {
     }
 
     public SVInstantiations union(SVInstantiations other) {
-        MapFromSchemaVariableToInstantiationEntry result = map;
+        ImmutableMap<SchemaVariable,InstantiationEntry> result = map;
 
-        final IteratorOfEntryOfSchemaVariableAndInstantiationEntry 
+        final Iterator<ImmutableMapEntry<SchemaVariable,InstantiationEntry>> 
 	    it = other.map.entryIterator();
         
         while (it.hasNext()) {
-            final EntryOfSchemaVariableAndInstantiationEntry entry = it.next();
+            final ImmutableMapEntry<SchemaVariable,InstantiationEntry> entry = it.next();
             result = result.put(entry.key(), entry.value());
         }
         
-        ListOfUpdatePair updates = SLListOfUpdatePair.EMPTY_LIST;
+        ImmutableList<UpdatePair> updates = ImmutableSLList.<UpdatePair>nil();
         
-        if (other.getUpdateContext() == SLListOfUpdatePair.EMPTY_LIST) {
+        if (other.getUpdateContext().isEmpty()) {
             updates = getUpdateContext();
-        } else if (getUpdateContext() == SLListOfUpdatePair.EMPTY_LIST) {
+        } else if (getUpdateContext().isEmpty()) {
             updates = other.getUpdateContext();
         } else if (!getUpdateContext().equals(other.getUpdateContext())) {
             Debug.fail("The update context of one of"
@@ -610,7 +606,7 @@ public class SVInstantiations {
                 getGenericSortConditions()).rebuildSorts();
     }
 
-    public MapFromSchemaVariableToInstantiationEntry interesting() {
+    public ImmutableMap<SchemaVariable,InstantiationEntry> interesting() {
         return interesting;
     }
 
@@ -638,34 +634,26 @@ public class SVInstantiations {
 	}
     }
     
-    public EntryOfSchemaVariableAndInstantiationEntry lookupEntryForSV(Name name) {
-        final IteratorOfEntryOfSchemaVariableAndInstantiationEntry it = 
+    public ImmutableMapEntry<SchemaVariable,InstantiationEntry> lookupEntryForSV(Name name) {
+        final Iterator<ImmutableMapEntry<SchemaVariable,InstantiationEntry>> it = 
             map.entryIterator();
         while (it.hasNext()) {
-            final EntryOfSchemaVariableAndInstantiationEntry e = it.next();
+            final ImmutableMapEntry<SchemaVariable,InstantiationEntry> e = it.next();
             if (e.key().name().equals(name)) return e;
         }
         return null; // handle this better!
     }
     
     public SchemaVariable lookupVar(Name name) {
-	final EntryOfSchemaVariableAndInstantiationEntry e = 
+	final ImmutableMapEntry<SchemaVariable,InstantiationEntry> e = 
             lookupEntryForSV(name);
 	return e == null ? null : e.key(); // handle this better!
     }
     
     public Object lookupValue(Name name) {
-        final EntryOfSchemaVariableAndInstantiationEntry e = 
+        final ImmutableMapEntry<SchemaVariable,InstantiationEntry> e = 
             lookupEntryForSV(name);
         return e == null ? null : e.value().getInstantiation(); 
-    }
-
-    /**
-     * retrieves name proposals for program variables to be introduced (if available)
-     * @return name proposal for program variables to be introduced
-     */
-    public Object getNameProposalsForNewProgramVariables() {
-        return getInstantiation(PROGVAR_SV);
     }
     
 

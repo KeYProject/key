@@ -12,6 +12,8 @@ package de.uka.ilkd.key.gui.prooftree;
 /** this class implements a TreeModel that can be displayed using the
  * JTree class framework 
  */
+import java.lang.ref.WeakReference;
+
 import javax.swing.tree.TreeNode;
 
 import de.uka.ilkd.key.proof.ConstraintTableModel;
@@ -20,14 +22,14 @@ import de.uka.ilkd.key.proof.Node;
 class GUIBranchNode extends GUIAbstractTreeNode 
                     implements TreeNode {
 
-    private Node   subTree;
+    private WeakReference<Node>   subTreeRef;
     private Object label;
     
     public GUIBranchNode(GUIProofTreeModel tree,
 			 Node subTree,
 			 Object   label) {
 	super ( tree );
-	this.subTree = subTree;
+	this.subTreeRef = new WeakReference<Node>(subTree);
 	this.label = label;
     }
 
@@ -63,7 +65,10 @@ class GUIBranchNode extends GUIAbstractTreeNode
         if ( childrenCache.length == 0 || childrenCache[0] != null ) return;
             
         int count = 0;
-        Node n = subTree;
+        Node n = subTreeRef.get();
+        if(n==null){
+            return;
+        }
         while ( true ) {
             childrenCache[count] = getProofTreeModel ().getProofTreeNode(n);
             count++;
@@ -95,7 +100,10 @@ class GUIBranchNode extends GUIAbstractTreeNode
 
     private int getChildCountHelp() {
         int count = 0;
-        Node n = subTree;
+        Node n = subTreeRef.get();
+        if(n==null){
+            return 0;
+        }
         while ( true ) {
             count++;
             final Node nextN = findChild ( n );
@@ -115,7 +123,10 @@ class GUIBranchNode extends GUIAbstractTreeNode
 
     
     public TreeNode getParent() {
-	Node n = subTree.parent();
+        Node self = subTreeRef.get();
+        if(self==null)
+            return null;
+	Node n = self.parent();
 	if ( n==null ) {
 	    return null;
 	} else {
@@ -128,12 +139,15 @@ class GUIBranchNode extends GUIAbstractTreeNode
     }
 
     public Node getNode() {
-	return subTree;
+	return subTreeRef.get();
     }
 
     // signalled by GUIProofTreeModel when the user has altered the value
     public void setLabel(String s) {
-	subTree.getNodeInfo().setBranchLabel(s);
+	Node n = subTreeRef.get();
+	if(n!=null){
+	    n.getNodeInfo().setBranchLabel(s);
+	}
     }
 
     public boolean isLeaf() {
@@ -141,10 +155,16 @@ class GUIBranchNode extends GUIAbstractTreeNode
     }
 
     public String toString() {
-	String res = subTree.getNodeInfo().getBranchLabel();
-	if ( res == null )
-	    return label.toString();
-	return res;
+        Node n = subTreeRef.get();
+        String res;
+        if(n!=null){
+            res = n.getNodeInfo().getBranchLabel();
+            if ( res == null )
+        	return label.toString();
+        }else{
+            res = "null";
+        }
+    	return res;
     }
 
 

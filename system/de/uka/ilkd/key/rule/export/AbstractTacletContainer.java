@@ -5,30 +5,23 @@
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
-//
-//
-//This file is part of KeY - Integrated Deductive Software Design 
-//Copyright (C) 2001-2003 Universitaet Karlsruhe, Germany
-//                      and Chalmers University of Technology, Sweden
-//
-//The KeY system is protected by the GNU General Public License.
-//See LICENSE.TXT for details.
-//
 
 package de.uka.ilkd.key.rule.export;
 
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.logic.Name;
 
 
 
 public abstract class AbstractTacletContainer implements TacletContainer {
-    private ListOfTacletModelInfo taclets = SLListOfTacletModelInfo.EMPTY_LIST;
+    private ImmutableList<TacletModelInfo> taclets = ImmutableSLList.<TacletModelInfo>nil();
 
-    public ListOfTacletModelInfo getTaclets () {
+    public ImmutableList<TacletModelInfo> getTaclets () {
         return taclets;
     }
     
-    public void setTaclets ( ListOfTacletModelInfo p_taclets ) {
+    public void setTaclets ( ImmutableList<TacletModelInfo> p_taclets ) {
         taclets = p_taclets;
     }
     

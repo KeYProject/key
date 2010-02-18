@@ -11,10 +11,16 @@
 
 package de.uka.ilkd.key.rule.soundness;
 
+import java.util.Iterator;
+
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.*;
+import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.abstraction.PrimitiveType;
+import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
@@ -64,8 +70,8 @@ public abstract class AbstractSkolemBuilder implements SkolemBuilder {
 	return oriSkolemSet;
     }
 
-    protected IteratorOfSkolemSet toIterator ( SkolemSet p ) {
-	return SLListOfSkolemSet.EMPTY_LIST.prepend ( p ).iterator ();
+    protected Iterator<SkolemSet> toIterator ( SkolemSet p ) {
+	return ImmutableSLList.<SkolemSet>nil().prepend ( p ).iterator ();
     }
 
     protected KeYJavaType getObjectKeYJavaType () {
@@ -115,7 +121,7 @@ public abstract class AbstractSkolemBuilder implements SkolemBuilder {
      * variables. Currently only primitive types and the object type
      * are returned
      */
-    protected IteratorOfKeYJavaType createTypeCandidates () {
+    protected Iterator<KeYJavaType> createTypeCandidates () {
 	final Type[] primitiveTypes = new Type[] {
 	    PrimitiveType.JAVA_BYTE,
 	    PrimitiveType.JAVA_SHORT,
@@ -128,7 +134,7 @@ public abstract class AbstractSkolemBuilder implements SkolemBuilder {
 	    //	    NullType.JAVA_NULL
 	};
 	
-	ListOfKeYJavaType list = SLListOfKeYJavaType.EMPTY_LIST;
+	ImmutableList<KeYJavaType> list = ImmutableSLList.<KeYJavaType>nil();
 	int               i;
 
 	for ( i = 0; i != primitiveTypes.length; ++i )

@@ -10,9 +10,16 @@
 
 package de.uka.ilkd.key.rule;
 
+import java.util.Iterator;
+
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.logic.BoundVarsVisitor;
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+import de.uka.ilkd.key.logic.op.SchemaVariable;
 
 /** 
  * this class contains the goals of the schematic theory specific
@@ -26,26 +33,26 @@ public class TacletGoalTemplate {
     private Sequent addedSeq = Sequent.EMPTY_SEQUENT;     
 
     /** stores list of Taclet which are introduced*/
-    private ListOfTaclet addedRules = SLListOfTaclet.EMPTY_LIST;
+    private ImmutableList<Taclet> addedRules = ImmutableSLList.<Taclet>nil();
 
     /** program variables added by this taclet to the namespace */
-    private SetOfSchemaVariable addedProgVars
-	= SetAsListOfSchemaVariable.EMPTY_SET;
+    private ImmutableSet<SchemaVariable> addedProgVars
+	= DefaultImmutableSet.<SchemaVariable>nil();
         
     private String name = null;
         
 
     /** creates new Goaldescription 
      *@param addedSeq new Sequent to be added
-     *@param addedRules ListOfTaclet contains the new allowed rules
+     *@param addedRules IList<Taclet> contains the new allowed rules
      * at this branch 
-     *@param addedProgVars a SetOfSchemaVariable which will be instantiated with
+     *@param addedProgVars a SetOf<SchemaVariable> which will be instantiated with
      * a application time unused (new) program variables that are introduced by 
      * an application of this template
      */
     public TacletGoalTemplate(Sequent addedSeq,
-			      ListOfTaclet addedRules,
-			      SetOfSchemaVariable addedProgVars) {
+			      ImmutableList<Taclet> addedRules,
+			      ImmutableSet<SchemaVariable> addedProgVars) {
 	TacletBuilder.checkContainsFreeVarSV(addedSeq, null, "add sequent");
 	   
 	this.addedRules=addedRules;	
@@ -57,16 +64,16 @@ public class TacletGoalTemplate {
      * creates new Goaldescription
      * same effect as <code>new TacletGoalTemplate(addedSeq, 
      *                                             addedRules,
-     *                                             SetAsListOfSchemaVariable.EMPTY_SET)
+     *                                             SetAsListOf.<SchemaVariable>nil())
      *                                             </code>
      *                                               
      * @param addedSeq new Sequent to be added
-     * @param addedRules ListOfTaclet contains the new allowed rules
+     * @param addedRules IList<Taclet> contains the new allowed rules
      *  at this branch
      */ 
     public TacletGoalTemplate(Sequent addedSeq,
-			      ListOfTaclet addedRules) {		
-	this(addedSeq, addedRules, SetAsListOfSchemaVariable.EMPTY_SET);
+			      ImmutableList<Taclet> addedRules) {		
+	this(addedSeq, addedRules, DefaultImmutableSet.<SchemaVariable>nil());
     }
 
 
@@ -91,16 +98,16 @@ public class TacletGoalTemplate {
 
     /** the goal of a Taclet may introduce new rules. Call this method
      * to get them 
-     * @return ListOfTaclet contains new introduced rules
+     * @return IList<Taclet> contains new introduced rules
      */
-    public ListOfTaclet rules() {
+    public ImmutableList<Taclet> rules() {
 	return addedRules;
     }
 
    
     /** returns the set of schemavaroable whos einstantiations will be
      * added to the sequent namespace */
-    public SetOfSchemaVariable addedProgVars() {
+    public ImmutableSet<SchemaVariable> addedProgVars() {
 	return addedProgVars;
     }
 
@@ -110,15 +117,13 @@ public class TacletGoalTemplate {
      * goal template
      * @return all variables that occur bound in this goal template
      */
-    protected SetOfQuantifiableVariable getBoundVariables() {
-	SetOfQuantifiableVariable result
-	    =SetAsListOfQuantifiableVariable.EMPTY_SET;
-	
-        final IteratorOfTaclet tacletIt=rules().iterator();
-	
-        while (tacletIt.hasNext()) {
-	    result=result.union(tacletIt.next().getBoundVariables());
-	}	    
+    protected ImmutableSet<QuantifiableVariable> getBoundVariables() {
+	ImmutableSet<QuantifiableVariable> result
+	    =DefaultImmutableSet.<QuantifiableVariable>nil();
+
+        for (Taclet taclet : rules()) {
+            result = result.union(taclet.getBoundVariables());
+        }
 	
         final BoundVarsVisitor bvv = new BoundVarsVisitor();
         bvv.visit(sequent());
@@ -157,9 +162,9 @@ public class TacletGoalTemplate {
     /** toString */
     public String toString() {
 	String result="";
-	if (sequent()!=Sequent.EMPTY_SEQUENT) result+="\\add "+sequent()+" "; 
-	if (rules()!=SLListOfTaclet.EMPTY_LIST) result+="\\addrules "+rules()+" ";
-	if (addedProgVars().size()>0) result+="\\addprogvars "+addedProgVars()+" ";	
+	if (!sequent().isEmpty()) result+="\\add "+sequent()+" "; 
+	if (!rules().isEmpty()) result+="\\addrules "+rules()+" ";
+	if (!addedProgVars().isEmpty()) result+="\\addprogvars "+addedProgVars()+" ";	
 	return result;
     }
 

@@ -10,7 +10,7 @@
 
 package de.uka.ilkd.key.rule.soundness;
 
-import de.uka.ilkd.key.logic.IteratorOfConstrainedFormula;
+import de.uka.ilkd.key.logic.ConstrainedFormula;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Visitor;
@@ -23,10 +23,9 @@ public abstract class TacletVisitor extends Visitor {
      * @param semiseq the Semisequent to visit
      */
     private void visit(Semisequent semiseq) {
-	IteratorOfConstrainedFormula it=semiseq.iterator();
-	while(it.hasNext()) {
-	    it.next().formula().execPostOrder(this);
-	}
+        for (ConstrainedFormula aSemiseq : semiseq) {
+            aSemiseq.formula().execPostOrder(this);
+        }
     }
 
     /** goes through the given sequent an collects all vars found
@@ -46,25 +45,23 @@ public abstract class TacletVisitor extends Visitor {
 	visit(taclet.ifSequent());
 	if (taclet instanceof FindTaclet) {
 	    (((FindTaclet)taclet).find()).execPostOrder(this);
-	}	
-	IteratorOfTacletGoalTemplate it = taclet.goalTemplates().iterator();
-	while (it.hasNext()) {
-	    TacletGoalTemplate gt=it.next();
-	    visit(gt.sequent());
-	    if (gt instanceof RewriteTacletGoalTemplate) {
-		((RewriteTacletGoalTemplate)gt).replaceWith().execPostOrder(this);
-	    } else {
-		if(gt instanceof AntecSuccTacletGoalTemplate) {
-		    visit(((AntecSuccTacletGoalTemplate)gt).replaceWith());
-		}
-	    }
-	    if (visitAddrules) {
-		IteratorOfTaclet addruleIt = gt.rules().iterator();
-		while (addruleIt.hasNext()) {
-		    visit(addruleIt.next(), true);		    
-		}
-	    }
 	}
+        for (TacletGoalTemplate tacletGoalTemplate : taclet.goalTemplates()) {
+            TacletGoalTemplate gt = tacletGoalTemplate;
+            visit(gt.sequent());
+            if (gt instanceof RewriteTacletGoalTemplate) {
+                ((RewriteTacletGoalTemplate) gt).replaceWith().execPostOrder(this);
+            } else {
+                if (gt instanceof AntecSuccTacletGoalTemplate) {
+                    visit(((AntecSuccTacletGoalTemplate) gt).replaceWith());
+                }
+            }
+            if (visitAddrules) {
+                for (Taclet taclet1 : gt.rules()) {
+                    visit(taclet1, true);
+                }
+            }
+        }
     }
 
 }

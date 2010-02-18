@@ -20,117 +20,31 @@ resolve_symlink  ()
 UNAME=`uname -s 2>/dev/null | tr '[:upper:]' '[:lower:]'`
 ARCH=`uname -pm 2>/dev/null | tr '[:upper:]' '[:lower:]' | tr ' ' '-'`
 
-
 if [ -z "$JAVA_HOME" ] ; then
+    JAVA=`which java`
+    if [ -z "$JAVA" ] ; then
+	echo "Cannot find JAVA. Please set your PATH or \$JAVA_HOME."
+	exit 1
+    fi
+else
     if [ "$UNAME" = "darwin" ] ; then
-	JAVA_HOME="/System/Library/Frameworks/JavaVM.framework"
+	JRE=$JAVA_HOME/Home
+	JAVA=$JRE/bin/java
+# other OS
     else
-	JAVA=`which java`
-	if [ -z "$JAVA" ] ; then
-	    echo "Cannot find JAVA. Please set your PATH or \$JAVA_HOME."
-	    exit 1
-	fi
-	JAVA_BIN=`dirname $JAVA`
-	JAVA_HOME="$JAVA_BIN/.."
+	JRE=$JAVA_HOME/jre
+	JAVA=$JRE/bin/java
     fi
 fi
 echo "Using JDK installation from:      $JAVA_HOME"
 
 
 # For debugging reasons disable JIT (otherwise strace doesn't work)
-#JAVA_OPTIONS="-Djava.library.path=/home/vladimir/lib -Xrunjprofiler:port=8887 -Xbootclasspath/a:/home/vladimir/jprofiler3/bin/agent.jar"
 JAVA_OPTIONS=
 #JAVA_OPTIONS=-classic
 
 # Uncomment the following definition for remote debugging on port 1234
-#JAVA_OPTIONS='-Xdebug -Xnoagent -Djava.compiler=NONE -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=1234'
-
-# Uncomment the following definition for profiling
-#JAVA_OPTIONS=-Xrunhprof:cpu=samples,format=a,thread=y,file=log.txt,depth=20
-#JAVA_OPTIONS="-Djava.library.path=/home/vladimir/lib -Xrunjprofiler:port=8887 -Xbootclasspath/a:/home/vladimir/jprofiler3/bin/agent.jar"
-#JAVA_OPTIONS="-Xint -Xrunjprofiler:port=8849  -Xbootclasspath/a:/usr/local/java/jprofiler3/bin/agent.jar"
-
-# Change that, if your java interpreter is different
-#
-# MAC OS X
-if [ "$UNAME" = "darwin" ] ; then
-    JRE=$JAVA_HOME/Home
-    JDK_RT_JAR=$JAVA_HOME/Classes/classes.jar
-    JDK_UI_JAR=$JAVA_HOME/Classes/ui.jar
-    # we do not need it in macosX
-    #JDK_TOOLS_JAR=$JAVA_HOME/Home/lib/ext/jpda.jar
-    JAVA=$JRE/bin/java
-    JAVA_OPTIONS=$JAVA_OPTIONS\ -Xdock:name="KeY"
-# other OS
-else
-    JRE=$JAVA_HOME/jre
-    JDK_RT_JAR=$JRE/lib/rt.jar
-    JDK_TOOLS_JAR=$JAVA_HOME/lib/tools.jar
-    JAVA=$JRE/bin/java
-fi
-
-#LD_LIBRARY_PATH=$JAVA_HOME/lib/i386:$LD_LIBRARY_PATH
-#export LD_LIBRARY_PATH
-
-if [ "D""$JAVA_HOME" = "D" ]
-then
-    echo
-    echo Please provide a valid path to the recommended JDK by
-    echo either configuring the file "$0" or defining the
-    echo JAVA_HOME environment variable from the command line.
-    echo
-    echo If you have any problems or questions, please contact
-    echo "technical support (http://www.togethersoft.com/support/)"
-    exit
-else
-    if [ ! -x $JAVA ] ; then
-        echo Please be sure you have properly set the JAVA_HOME variable.
-        echo The executable file $JAVA is not found.
-        exit
-    fi
-
-    if [ ! -r $JDK_RT_JAR ] ; then
-        echo Please be sure you have properly set the JDK_RT_JAR variable.
-        echo The file $JDK_RT_JAR is not found.
-        echo
-        echo If you have any problems or questions, please contact
-        echo "technical support (http://www.togethersoft.com/support/)"
-        exit
-    fi
-
-    # we do not need this in MacOS X
-    if [ "$UNAME" != "darwin" ] ; then
-	if [ ! -r $JDK_TOOLS_JAR ] ; then
-            echo The file $JDK_TOOLS_JAR was not found. This is probably
-            echo because you are using a JRE instead of a JDK. You will
-            echo not be able to run javac or javadoc. This is probably OK.
-	fi
-    fi
-
-    if [ "$UNAME" = "darwin" ] ; then
-        if [ ! -r $JDK_UI_JAR ] ; then
-            echo Please be sure you have properly installed JDK 1.3.
-            echo The file $JDK_UI_JAR is not found.  
-            echo
-            echo If you have any problems or questions, please contact
-            echo "technical support (http://www.togethersoft.com/support/)"
-            exit
-        fi
-        JDK_RT_JAR=$JDK_RT_JAR:$JDK_UI_JAR 
-    fi
-fi
-
-
-# fixing of possible linux glibc bug for jdk 1.3.1
-# http://developer.java.sun.com/developer/bugParade/bugs/4466587.html
-if [ "$UNAME" = "linux" ] ; then
-    VERSION=`$JAVA -version 2>&1 | awk 'BEGIN {FS="\""}\
-    { for(i = 2; i<NF; i++) printf "%s", \$i }'`
-    if expr "$VERSION" : "1\\.3\\.1.*" > /dev/null 2>&1; then
-       ulimit -s 2048
-    fi
-fi
-
+#JAVA_OPTIONS='-DKeyDebugFlag=on -Xdebug -Xnoagent -Djava.compiler=NONE -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=1234'
 
 #
 # Now $KEY_HOME  
@@ -156,7 +70,7 @@ fi
 # KeY CLASSPATH
 #
 
-key_ext_jars="antlr.jar jargs.jar recoderKey.jar dresden-ocl-demo.jar xerces.jar log4j.jar"
+key_ext_jars="antlr.jar recoderKey.jar log4j.jar"
 
 keyclasspath="$KEY_HOME/system/binary/"
 
@@ -209,10 +123,6 @@ while [ $# -ne 0 ]; do
 done	
 
 
-#
-# User specific Together configuration
-#
-
 if [ ! -d "$HOME/.key" ]
 then
 mkdir "$HOME/.key"
@@ -230,11 +140,11 @@ export PATH
 #-server \
 #-XX:CompileThreshold=1500 \
 
-$JAVA $JAVA_OPTIONS $keysysprops $hpfix \
--ea:de.uka.ilkd.key... -noverify -Djvm.dir=$JVM_DIR -Xms64m -Xmx1024m \
+
+$JAVA $JAVA_OPTIONS $keysysprops \
+-ea:de.uka.ilkd.key... -Xms64m -Xmx512m \
 -Dkey.home=$KEY_HOME \
--Dkey.pattern.path=$HOME/.key/keypatterns/ \
 -Dkey.simplify.logdir=$KEY_SIMPLIFY_LOG_DIR \
 -Dkey.ics.logdir=$KEY_ICS_LOG_DIR \
 -Dsun.awt.exception.handler=de.uka.ilkd.key.gui.ExceptionalHandler \
--classpath $keyclasspath:$togetherclasspath:$JDK_RT_JAR de.uka.ilkd.key.gui.Main $keyarg
+-classpath $keyclasspath de.uka.ilkd.key.gui.Main $keyarg

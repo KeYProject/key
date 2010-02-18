@@ -7,13 +7,6 @@
 // See LICENSE.TXT for details.
 //
 //
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2004 Universitaet Karlsruhe, Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
 package de.uka.ilkd.key.java.recoderext;
 
 import java.util.HashMap;
@@ -25,7 +18,7 @@ import recoder.java.declaration.modifier.Public;
 import recoder.java.declaration.modifier.Static;
 import recoder.java.reference.*;
 import recoder.java.statement.Return;
-import recoder.kit.ProblemReport;
+import recoder.kit.*;
 import recoder.list.generic.ASTArrayList;
 import recoder.list.generic.ASTList;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
@@ -91,18 +84,50 @@ public class CreateObjectBuilder extends RecoderModelTransformer {
             scopeForObj = de.uka.ilkd.key.java.reference.MethodReference.LOCAL_SCOPE;
         }
         
-	result.add
-	    (new MethodReferenceWrapper(new VariableReference
+	MethodReference createRef = 
+	    (new MethodReference(new VariableReference
 				 (new Identifier(NEW_OBJECT_VAR_NAME)), 
 				 new ImplicitIdentifier
 				 (CreateBuilder.IMPLICIT_CREATE),
                                  new Identifier(scopeForObj)));
-
+	
+	// July 08 - mulbrich: wraps createRef into a method body statement to
+	// avoid unnecessary dynamic dispatch.
+	// Method body statement are not possible for anonymous classes, however.
+	// Use a method call there
+	if(recoderClass.getIdentifier() == null) {
+	    // anonymous
+	    result.add
+        (new MethodReference(new VariableReference
+                             (new Identifier(NEW_OBJECT_VAR_NAME)),
+                             new ImplicitIdentifier
+                             (CreateBuilder.IMPLICIT_CREATE),
+                                 new Identifier(scopeForObj)));
+	} else {
+	    TypeReference tyref;
+	    tyref = makeTyRef(recoderClass); 
+	    result.add(new MethodBodyStatement(tyref, null, createRef));
+	}
+	
+	// TODO why does the method return a value? Is the result ever used??
 	result.add(new Return
 		 (new VariableReference(new Identifier(NEW_OBJECT_VAR_NAME))));
 
 	return new StatementBlock(result);
 	
+    }
+
+    /* 
+     * make a type reference. There are special classes which need to be handled 
+     * differently. (<Default> for instance) 
+     */
+    private TypeReference makeTyRef(ClassDeclaration recoderClass) {
+        TypeReference tyref;
+        Identifier id = recoderClass.getIdentifier();
+        if(id instanceof ImplicitIdentifier) 
+            return new TypeReference(id);
+        else 
+            return TypeKit.createTypeReference(getProgramFactory(), recoderClass);
     }
     
 

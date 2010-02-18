@@ -16,8 +16,15 @@ import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.*;
 import de.uka.ilkd.key.java.declaration.*;
 import de.uka.ilkd.key.java.reference.*;
+
+import java.util.Iterator;
+
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.statement.*;
-import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.Constraint;
+import de.uka.ilkd.key.logic.PosInProgram;
+import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.proof.init.PercProfile;
@@ -37,16 +44,16 @@ public class ContextSkolemBuilder extends AbstractSkolemBuilder {
     
     // Variables that describe the try-frame
     private final Statement      tryStatement;
-    private ListOfSchemaVariable tryVariables =
-    	SLListOfSchemaVariable.EMPTY_LIST;
+    private ImmutableList<SchemaVariable> tryVariables =
+    	ImmutableSLList.<SchemaVariable>nil();
 
     // Variables that describe the method frame
     private Statement            resultStatement  = null;
-    private ListOfSchemaVariable resultVariables  = null;
+    private ImmutableList<SchemaVariable> resultVariables  = null;
     private SVTypeInfo           resultSVTypeInfo = null;
 
     // The insertion point of the whole frame
-    private ListOfInteger        insertionPoint   = SLListOfInteger.EMPTY_LIST;
+    private ImmutableList<Integer>        insertionPoint   = ImmutableSLList.<Integer>nil();
 
     public ContextSkolemBuilder ( SkolemSet p_oriSkolemSet,
 				  Services  p_services ) {
@@ -56,10 +63,10 @@ public class ContextSkolemBuilder extends AbstractSkolemBuilder {
         tryStatement = createTryStatement();
     }
 
-    public IteratorOfSkolemSet build () {
-	ListOfSkolemSet res = SLListOfSkolemSet.EMPTY_LIST;
+    public Iterator<SkolemSet> build () {
+	ImmutableList<SkolemSet> res = ImmutableSLList.<SkolemSet>nil();
 
-	IteratorOfKeYJavaType typeIt = getTypeCandidates ();
+	Iterator<KeYJavaType> typeIt = getTypeCandidates ();
 	while ( typeIt.hasNext () ) {
 	    setupFrame ( typeIt.next () );
 	    res = res.append ( createSkolemSet () );
@@ -94,8 +101,8 @@ public class ContextSkolemBuilder extends AbstractSkolemBuilder {
 	return res;
     }
 
-    private PosInProgram toPosInProgram ( ListOfInteger p ) {
-	IteratorOfInteger it  = p.iterator ();
+    private PosInProgram toPosInProgram ( ImmutableList<Integer> p ) {
+	Iterator<Integer> it  = p.iterator ();
 	PosInProgram      res = PosInProgram.TOP;
 
 	while ( it.hasNext () )
@@ -117,14 +124,14 @@ public class ContextSkolemBuilder extends AbstractSkolemBuilder {
      * frame to be created; <code>null</code> means that the method frame
      * should not have a result variable
      */
-    private IteratorOfKeYJavaType getTypeCandidates () {
+    private Iterator<KeYJavaType> getTypeCandidates () {
 	final Type[] primitiveTypes = new Type[] {
 	    PrimitiveType.JAVA_LONG,
 	    //	    PrimitiveType.JAVA_DOUBLE,
 	    PrimitiveType.JAVA_BOOLEAN
 	};
 	
-	ListOfKeYJavaType list = SLListOfKeYJavaType.EMPTY_LIST;
+	ImmutableList<KeYJavaType> list = ImmutableSLList.<KeYJavaType>nil();
 	int               i;
 
 	for ( i = 0; i != primitiveTypes.length; ++i )

@@ -15,15 +15,7 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.ldt.IntegerLDT;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.IUpdateOperator;
-import de.uka.ilkd.key.logic.op.IfThenElse;
-import de.uka.ilkd.key.logic.op.Junctor;
-import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.Op;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.ProgramMethod;
-import de.uka.ilkd.key.logic.op.TermSymbol;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
@@ -66,7 +58,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         
         this.strategyProperties =
             (StrategyProperties)strategyProperties.clone ();
-        
+      
         this.tf = new ArithTermFeatures ( p_proof.getServices ()
                                           .getTypeConverter ().getIntegerLDT () );
         this.ff = new FormulaTermFeatures ();        
@@ -157,6 +149,9 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         setupSplitting ( d );
 
         bindRuleSet ( d, "test_gen", inftyConst () );
+        bindRuleSet ( d, "test_gen_empty_modality_hide", inftyConst () );
+        bindRuleSet ( d, "test_gen_quan", inftyConst () );
+        bindRuleSet ( d, "test_gen_quan_num", inftyConst () );
 
         bindRuleSet ( d, "gamma",
                       add ( not ( isInstantiated ( "t" ) ),
@@ -193,6 +188,22 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         bindRuleSet ( d, "simplify_instanceof_static",
                       add ( EqNonDuplicateAppFeature.INSTANCE,
                             longConst ( -500 ) ) );
+
+        bindRuleSet ( d, "update_equivalence",
+                      add ( NonDuplicateAppModPositionFeature.INSTANCE,
+                            longConst ( 30 ) ) );
+
+        bindRuleSet ( d, "comprehensions",
+                      add ( NonDuplicateAppModPositionFeature.INSTANCE,
+                            longConst ( 1000 ) ) );
+        
+        bindRuleSet ( d, "comprehensions_high_costs",
+                add ( NonDuplicateAppModPositionFeature.INSTANCE,
+                      longConst ( 10000 ) ) );
+
+        bindRuleSet ( d, "comprehensions_low_costs",
+                add ( NonDuplicateAppModPositionFeature.INSTANCE,
+                      longConst ( -5000 ) ) );
         
         bindRuleSet ( d, "evaluate_instanceof", longConst ( -500 ) );
         
@@ -228,6 +239,11 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         boolean useLoopExpand = strategyProperties.getProperty(
                 StrategyProperties.LOOP_OPTIONS_KEY).
                     equals(StrategyProperties.LOOP_EXPAND);
+        
+        boolean useLoopExpandBounded = strategyProperties.getProperty( //chrisg
+                StrategyProperties.LOOP_OPTIONS_KEY).
+                    equals(StrategyProperties.LOOP_EXPAND_BOUNDED);
+        
         boolean useLoopInvariant = strategyProperties.getProperty(
                 StrategyProperties.LOOP_OPTIONS_KEY).
                     equals(StrategyProperties.LOOP_INVARIANT);
@@ -253,6 +269,10 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                       useLoopExpand ? longConst ( 0 )
                                     : inftyConst () );
         
+        bindRuleSet ( d, "loop_expand_bounded", //chrisg
+                useLoopExpandBounded ? longConst ( 0 )
+                              : inftyConst () );
+
         bindRuleSet  ( d, "loop_invariant", 
                        useLoopInvariant ? longConst ( 100 )  
                                         : inftyConst () );
@@ -357,12 +377,24 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         // attention: usually this application is against the term order but
         // does not interfere as only applied below updates
         bindRuleSet ( d, "query_normalize", 
-               ifZero ( add ( DirectlyBelowOpClassFeature.create
-                              ( ProgramMethod.class ),
-                              applyTF (FocusProjection.create(2), ff.update),
-                              applyTF("t", IsNonRigidTermFeature.INSTANCE) ),
-                        longConst (-10),
-                        inftyConst () ) );
+	    SumFeature.createSum ( new Feature [] {
+                DirectlyBelowOpClassFeature.create ( ProgramMethod.class ),
+                applyTF(FocusProjection.create(2), ff.update),
+                applyTF("t", IsNonRigidTermFeature.INSTANCE),
+		// we actually have to be in the scope of an update,
+		// not only within an update
+		not(NotInScopeOfModalityFeature.INSTANCE),
+                longConst (-10) } ));
+
+        bindRuleSet ( d, "query_normalize_high_costs", 
+	    SumFeature.createSum ( new Feature [] {
+                SomeWhereBelowOpClassFeature.create ( ProgramMethod.class ),
+                SomeWhereBelowOpClassFeature.create ( IUpdateOperator.class ),
+                applyTF("t", IsNonRigidTermFeature.INSTANCE),
+		// we actually have to be in the scope of an update,
+		// not only within an update
+		not(NotInScopeOfModalityFeature.INSTANCE),
+                longConst (10) } ));
 
         if ( expandQueries () )
             bindRuleSet ( d, "queries",
@@ -1895,9 +1927,10 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         setupInEqSimpInstantiationWithoutRetry ( d, p_proof );
     }
 
+    public static final String JavaCardDLStrategy = "JavaCardDLStrategy";
     
     public Name name () {
-        return new Name("JavaCardDLStrategy");
+        return new Name(JavaCardDLStrategy);
     }
 
 
@@ -1944,7 +1977,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         }
         
         public Name name () {
-            return new Name("JavaCardDLStrategy");
+            return new Name(JavaCardDLStrategy);
         }
     }
 

@@ -1,6 +1,8 @@
 		********************************
 		* KeY Byte Code Installation   * 
-		* Version 1.2.0                *
+		*        Version 1.5.x         *
+		*        Nightly Builds        *
+                *     (Development Version)    *
 		********************************
 
 
@@ -8,28 +10,22 @@
 -----------------
 
 Operating Systems: Linux/Unix 
-                   Windows NT, 2000 or XP
+                   Mac OS X
+                   Windows NT, 2000, XP or Vista
 
-Java 2 SDK, Version 1.4.x or newer (already installed)
-
-For optional UML/OCL support: Together Control Center, Version 6.2 
-                                                      (already installed)
+Java 2 SDK, Version 1.5.x or newer (already installed)
 
 Needed additional Libraries:
 	antlr.jar Version >= 2.7.2: parser generator
-	dresden-ocl-demo.jar: ocl parser
-	xerces.jar version 1.4.4: used by tudresden.jar
 	recoderKey.jar
                  a transformation framework for java patched by the KeY group
-	jargs.jar
 	log4j.jar
 
-
 Optionally, KeY can make use of the following binaries:
-	Grammatical Framework
-	ESC Java's decision procedure `Simplify´
+	ESC Java's decision procedure 'Simplify'
         SMT-LIB provers: bindings exist currently for Yices, CVCLite, CVC3 and SVC
               (export to SMT input file possible)        
+
 
 (2) Contents of the KeY-Distribution
 -------------------------------------
@@ -46,7 +42,8 @@ Optionally, KeY can make use of the following binaries:
 
 (3) Installation (Byte Code)
 ----------------------------
-	1) Copy the KeY.tgz to a temporary directory; 
+
+	1) Copy the KeY-xxx.tgz to a temporary directory; 
 	   Here: tmp/
 
 	2) Unpack KeY.tgz 
@@ -55,7 +52,7 @@ Optionally, KeY can make use of the following binaries:
 		   tar -xzvf KeY-xxx.tgz 
 
 		Windows ( use your favorite unpack program that can handle
-			  tar-gzipped archives , e.g. WinZip) 
+			  tar-gzipped archives, e.g. WinZip) 
 
 	3) The following files should be found in the directory (tmp/):
 		setup.jar key.jar LICENSE.TXT
@@ -66,34 +63,29 @@ Optionally, KeY can make use of the following binaries:
 
 	5) Follow the instructions of the wizard.
 
-	   
-	6) (This step is only necessary if you want to make use of the
-	    authoring tool Grammatical Framework and/or the decision
-	    procedure Simplify.)
+	6) Optional: Install Simplify and/or SMT-LIB provers.
 
            If you download Simplify not from the KeY-website but
-           elsewhere e.g. directly from Compaq (as part of ESC/Java)
-           follow the intallation instructions given there. Then
-           rename the Simplify binary which could be named something like
-           Simplify Simplify-1.5.4.linux (Linux version) or 
-           Simplify-1.5.4.exe (Windows) to just 'Simplify' resp. 
-           'Simplify.exe'. When using Linux make sure that the file is
+           elsewhere (e.g. as part of ESC/Java), follow the intallation 
+           instructions given there. Then rename the Simplify binary which 
+           could be named something like Simplify Simplify-1.5.4.linux 
+           (Linux version) or Simplify-1.5.4.exe (Windows) to just 'Simplify' 
+           resp. 'Simplify.exe'. When using Linux make sure that the file is
            is executable (you can make a file executable by issuing the
            command 'chmod a+x filename').
 
-	   Make sure that the path where the binaries `Simplify´ and
-	   `gf´ (Grammatical Framework) reside is included in your PATH
-	   environment variable. If not, use (e.g., in the csh to
-	   include Simplify which is assumed to be located in
-	   ~/simplify):
+	   Make sure that the path where the binaries reside is included in 
+           your PATH environment variable or in the KEY_LIB environment
+	   variable. If not, use (e.g., in the csh to include Simplify
+	   which is assumed to be located in ~/simplify):
 
 		setenv PATH ~/simplify:$PATH
 
            In bash-syntax the above command is
        
                 export PATH=$PATH:~/simplify
-	   
-          (analog procedure for all other supported SMT-LIB provers)
+
+          (analog procedure for SMT-LIB provers)
 
 
 (4) Start KeY 
@@ -101,14 +93,20 @@ Optionally, KeY can make use of the following binaries:
 
 	Change to the chosen installation directory 
 
-	Go to subdirectory bin and run 'startkey' (Windows: 'startkey.bat')
+	Go to subdirectory bin and run 'startProver' (Windows: 'startProver.bat')
 
-	If you want to start the standalone prover (JavaDL or JML
-	front-end) without Together, run 'startProver' (Windows:
-	'startProver.bat') instead.	
+
+(5) Start KeY in Test Generation Mode
+-------------------------------------
+
+	Run 'startProver unit' or if you wish a simpler GUI run 'startProver testing'
+	  (Windows: 'startProver.bat unit' or 'startProver.bat testing')
+	
+	The library objenesis.jar may be required to run the generated tests.
+
 
 -------------------------------
 
-If you encounter problems please send a message to
+If you encounter problems, please send a message to
 
 		support@key-project.org

@@ -10,19 +10,15 @@
 
 package de.uka.ilkd.key.speclang.ocl;
 
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Comment;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.TypeDeclaration;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
-import de.uka.ilkd.key.speclang.ClassInvariant;
-import de.uka.ilkd.key.speclang.LoopInvariant;
-import de.uka.ilkd.key.speclang.SetAsListOfClassInvariant;
-import de.uka.ilkd.key.speclang.SetAsListOfOperationContract;
-import de.uka.ilkd.key.speclang.SetOfClassInvariant;
-import de.uka.ilkd.key.speclang.SetOfOperationContract;
-import de.uka.ilkd.key.speclang.SpecExtractor;
+import de.uka.ilkd.key.speclang.*;
 import de.uka.ilkd.key.speclang.ocl.translation.OCLSpecFactory;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 
@@ -93,31 +89,31 @@ public class OCLSpecExtractor implements SpecExtractor {
     //public interface
     //-------------------------------------------------------------------------
    
-    public SetOfOperationContract extractOperationContracts(ProgramMethod pm) 
+    public ImmutableSet<OperationContract> extractOperationContracts(ProgramMethod pm) 
             throws SLTranslationException {
         if(((TypeDeclaration) pm.getContainerType()
                                 .getJavaType()).isLibraryClass()) {
-            return SetAsListOfOperationContract.EMPTY_SET;
+            return DefaultImmutableSet.<OperationContract>nil();
         }
         
-        SetOfOperationContract result = SetAsListOfOperationContract.EMPTY_SET;
+        ImmutableSet<OperationContract> result = DefaultImmutableSet.<OperationContract>nil();
 
         Comment[] comments = pm.getComments();
-        for(int i = 0; i < comments.length; i++) {
-            String originalPre = extractProperty(comments[i].getText(),
-                                                 "@preconditions");
-            String originalPost = extractProperty(comments[i].getText(),
-                                                  "@postconditions");
-            String originalModifies = extractProperty(comments[i].getText(),
-                                                      "@modifies");
-            if(originalPre != null 
-               || originalPost != null 
-               || originalModifies != null) {
-                SetOfOperationContract contracts 
-                    = osf.createOCLOperationContracts(pm, 
-                                                      originalPre, 
-                                                      originalPost, 
-                                                      originalModifies);
+        for (Comment comment : comments) {
+            String originalPre = extractProperty(comment.getText(),
+                    "@preconditions");
+            String originalPost = extractProperty(comment.getText(),
+                    "@postconditions");
+            String originalModifies = extractProperty(comment.getText(),
+                    "@modifies");
+            if (originalPre != null
+                    || originalPost != null
+                    || originalModifies != null) {
+                ImmutableSet<OperationContract> contracts
+                        = osf.createOCLOperationContracts(pm,
+                        originalPre,
+                        originalPost,
+                        originalModifies);
                 result = result.union(contracts);
             }
         }
@@ -127,28 +123,28 @@ public class OCLSpecExtractor implements SpecExtractor {
     
     
 
-    public SetOfClassInvariant extractClassInvariants(KeYJavaType kjt) 
+    public ImmutableSet<ClassInvariant> extractClassInvariants(KeYJavaType kjt) 
             throws SLTranslationException {
         if(!(kjt.getJavaType() instanceof TypeDeclaration)) {
-            return SetAsListOfClassInvariant.EMPTY_SET;
+            return DefaultImmutableSet.<ClassInvariant>nil();
         }
         TypeDeclaration td = (TypeDeclaration) kjt.getJavaType(); 
         if(td.isLibraryClass()) {
-            return SetAsListOfClassInvariant.EMPTY_SET;
+            return DefaultImmutableSet.<ClassInvariant>nil();
         } 
                 
-        SetOfClassInvariant result = SetAsListOfClassInvariant.EMPTY_SET;
+        ImmutableSet<ClassInvariant> result = DefaultImmutableSet.<ClassInvariant>nil();
         
         int numChildren = td.getChildCount();        
         for(int i = 0; i < numChildren; i++) {
             Comment[] comments = ((TypeDeclaration)kjt.getJavaType()).getChildAt(i).getComments();
-            for(int j = 0; j < comments.length; j++) {
-                String originalInv = extractProperty(comments[j].getText(), 
-                                                     "@invariants");
-                
-                if(originalInv != null) {
-                    ClassInvariant inv 
-                        = osf.createOCLClassInvariant(kjt, originalInv);
+            for (Comment comment : comments) {
+                String originalInv = extractProperty(comment.getText(),
+                        "@invariants");
+
+                if (originalInv != null) {
+                    ClassInvariant inv
+                            = osf.createOCLClassInvariant(kjt, originalInv);
                     result = result.add(inv);
                 }
             }
@@ -161,5 +157,12 @@ public class OCLSpecExtractor implements SpecExtractor {
     public LoopInvariant extractLoopInvariant(ProgramMethod pm, LoopStatement loop) 
             throws SLTranslationException {
         return null; //OCL has no loop invariants
+    }
+
+
+
+    public ImmutableSet<PositionedString> getWarnings() {
+        //graceful treatment of unsupported features for OCL not implemented
+        return DefaultImmutableSet.<PositionedString>nil(); 
     }
 }

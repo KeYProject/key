@@ -15,12 +15,11 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.ConstrainedFormula;
-import de.uka.ilkd.key.logic.IteratorOfTerm;
-import de.uka.ilkd.key.logic.ListOfTerm;
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.SLListOfTerm;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.op.Op;
@@ -62,7 +61,7 @@ public class MultiplesModEquationsGenerator implements TermGenerator {
         return new MultiplesModEquationsGenerator ( source, target );
     }
     
-    public IteratorOfTerm generate(RuleApp app, PosInOccurrence pos, Goal goal) {
+    public Iterator<Term> generate(RuleApp app, PosInOccurrence pos, Goal goal) {
         final Services services = goal.proof ().getServices ();
         
         final Monomial sourceM =
@@ -76,14 +75,14 @@ public class MultiplesModEquationsGenerator implements TermGenerator {
         final List<CofactorPolynomial> cofactorPolys = extractPolys ( goal, services );
 
         if ( cofactorPolys.isEmpty () )
-            return SLListOfTerm.EMPTY_LIST.iterator ();
+            return ImmutableSLList.<Term>nil().iterator ();
         
         return computeMultiples(sourceM, targetM, cofactorPolys, services)
                .iterator();
     }
 
-    private IteratorOfTerm toIterator(Term quotient) {
-        return SLListOfTerm.EMPTY_LIST.prepend ( quotient ).iterator ();
+    private Iterator<Term> toIterator(Term quotient) {
+        return ImmutableSLList.<Term>nil().prepend ( quotient ).iterator ();
     }
 
     /**
@@ -94,9 +93,9 @@ public class MultiplesModEquationsGenerator implements TermGenerator {
      * 
      * This method will change the object <code>cofactorPolys</code>.
      */
-    private ListOfTerm computeMultiples(Monomial sourceM, Monomial targetM,
+    private ImmutableList<Term> computeMultiples(Monomial sourceM, Monomial targetM,
                                         List<CofactorPolynomial> cofactorPolys, Services services) {
-        ListOfTerm res = SLListOfTerm.EMPTY_LIST;
+        ImmutableList<Term> res = ImmutableSLList.<Term>nil();
         
         final List<CofactorItem> cofactorMonos = new ArrayList<CofactorItem> ();
         cofactorMonos.add ( new CofactorMonomial ( targetM, Polynomial.ONE ) );
@@ -109,19 +108,18 @@ public class MultiplesModEquationsGenerator implements TermGenerator {
             while ( polyIt.hasNext () ) {
                 CofactorPolynomial poly = polyIt.next ();
 
-                final Iterator<CofactorItem> monoIt = cofactorMonos.iterator ();
-                while ( monoIt.hasNext () ) {
-                    final CofactorMonomial mono = (CofactorMonomial)monoIt.next ();
-                    final CofactorItem reduced = poly.reduce ( mono );
-                    if ( reduced instanceof CofactorMonomial ) {
-                        polyIt.remove ();
-                        cofactorMonos.add ( reduced );
-                        res = addRes ( (CofactorMonomial)reduced, sourceM,
-                                       res, services );
+                for (CofactorItem cofactorMono : cofactorMonos) {
+                    final CofactorMonomial mono = (CofactorMonomial) cofactorMono;
+                    final CofactorItem reduced = poly.reduce(mono);
+                    if (reduced instanceof CofactorMonomial) {
+                        polyIt.remove();
+                        cofactorMonos.add(reduced);
+                        res = addRes((CofactorMonomial) reduced, sourceM,
+                                res, services);
                         changed = true;
                         break;
                     } else {
-                        poly = (CofactorPolynomial)reduced;
+                        poly = (CofactorPolynomial) reduced;
                     }
                 }
             }
@@ -130,8 +128,8 @@ public class MultiplesModEquationsGenerator implements TermGenerator {
         return res;
     }
 
-    private ListOfTerm addRes(CofactorMonomial newMono, Monomial sourceM,
-                              ListOfTerm res, Services services) {
+    private ImmutableList<Term> addRes(CofactorMonomial newMono, Monomial sourceM,
+                              ImmutableList<Term> res, Services services) {
         final Monomial mono = newMono.mono;
         final Polynomial cofactor = newMono.cofactor;
 

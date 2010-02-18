@@ -21,7 +21,10 @@ import javax.swing.event.ListSelectionListener;
 
 import org.apache.log4j.Logger;
 
-import de.uka.ilkd.key.proof.*;
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.reuse.ReuseFindTaclet;
 import de.uka.ilkd.key.proof.reuse.ReusePoint;
 import de.uka.ilkd.key.proof.reuse.ReuseUpdateSimplificationRule;
@@ -115,11 +118,10 @@ public class ReuseListenerImpl implements ReuseListener, KeYSelectionListener {
       Iterator<Node> markerIt = Node.reuseCandidatesIterator();
       while (markerIt.hasNext()) {
          Node marker = markerIt.next();
-            IteratorOfGoal goalIt = medi.getProof().openGoals().iterator();
-//         reuseLogger.info("***********************************************");
-            while (goalIt.hasNext()) {
-               analyzeCandidate(marker, goalIt.next());
-            }
+          //         reuseLogger.info("***********************************************");
+          for (Goal goal : medi.getProof().openGoals()) {
+              analyzeCandidate(marker, goal);
+          }
       }
    }
 
@@ -139,15 +141,14 @@ public class ReuseListenerImpl implements ReuseListener, KeYSelectionListener {
 
 
 //add: old markers - new goals; call after removeRPConsumedMarker()
-   public void addRPOldMarkersNewGoals(ListOfGoal newGoals) {
+   public void addRPOldMarkersNewGoals(ImmutableList<Goal> newGoals) {
       if (newGoals==null) return; // dec. proc. return null as goal list
       Iterator<Node> markerIt = Node.reuseCandidatesIterator();
       while (markerIt.hasNext()) {
          Node marker = markerIt.next();
-         IteratorOfGoal goalIt = newGoals.iterator();
-         while (goalIt.hasNext()) {
-            analyzeCandidate(marker, goalIt.next());
-         }
+          for (Goal newGoal : newGoals) {
+              analyzeCandidate(marker, newGoal);
+          }
       }
    }
 
@@ -179,12 +180,10 @@ public class ReuseListenerImpl implements ReuseListener, KeYSelectionListener {
 //            n = n.child(0);
 //         }
          n.markReuseCandidate();
-         IteratorOfGoal goalIt = medi.getProof().openGoals().iterator();
-//         reuseLogger.info("***********************************************");
-         while (goalIt.hasNext()) {
-            Goal g = goalIt.next();
-            analyzeCandidate(n, g);
-         }
+          //         reuseLogger.info("***********************************************");
+          for (final Goal g : medi.getProof().openGoals()) {
+              analyzeCandidate(n, g);
+          }
       }
    }
    

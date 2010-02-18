@@ -11,14 +11,15 @@
 
 package de.uka.ilkd.key.rule.soundness;
 
+import java.util.Iterator;
+
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.IteratorOfSchemaVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.op.SetAsListOfSchemaVariable;
-import de.uka.ilkd.key.logic.op.SetOfSchemaVariable;
-import de.uka.ilkd.key.rule.ListOfTacletApp;
-import de.uka.ilkd.key.rule.SLListOfTacletApp;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
@@ -35,9 +36,9 @@ public interface SkolemSet {
 
     Namespace           getVariables      ();
 
-    ListOfTacletApp     getTaclets        ();
+    ImmutableList<TacletApp>     getTaclets        ();
 
-    SetOfSchemaVariable getMissing        ();
+    ImmutableSet<SchemaVariable> getMissing        ();
 
     Term                getFormula        ();
 
@@ -51,9 +52,9 @@ public interface SkolemSet {
 
     SkolemSet           addVariables ( Namespace p_variables );
 
-    SkolemSet           addTaclets   ( ListOfTacletApp p_taclets );
+    SkolemSet           addTaclets   ( ImmutableList<TacletApp> p_taclets );
 
-    SkolemSet           addMissing   ( IteratorOfSchemaVariable p_missing );
+    SkolemSet           addMissing   ( Iterator<SchemaVariable> p_missing );
 
     SkolemSet           setFormula   ( Term p_formula );
 
@@ -66,8 +67,8 @@ public interface SkolemSet {
 	private SVInstantiations    inst;
 	private Namespace           functions;
 	private Namespace           variables;
-	private ListOfTacletApp     taclets;
-	private SetOfSchemaVariable miss;
+	private ImmutableList<TacletApp>     taclets;
+	private ImmutableSet<SchemaVariable> miss;
 	private Term                formula;
 	private SVTypeInfos         svTypeInfos;
 	private SVPartitioning      svPartitioning;
@@ -75,8 +76,8 @@ public interface SkolemSet {
 	private DefaultSkolemSet ( SVInstantiations    p_inst,
 				   Namespace           p_functions,
 				   Namespace           p_variables,
-				   ListOfTacletApp     p_taclets,
-				   SetOfSchemaVariable p_miss,
+				   ImmutableList<TacletApp>     p_taclets,
+				   ImmutableSet<SchemaVariable> p_miss,
 				   Term                p_formula,
 				   SVTypeInfos         p_svTypeInfos,
 				   SVPartitioning      p_svPartitioning ) {
@@ -95,7 +96,7 @@ public interface SkolemSet {
 	    this ( p_app.instantiations (),
 		   new Namespace (),
 		   new Namespace (),
-		   SLListOfTacletApp.EMPTY_LIST,
+		   ImmutableSLList.<TacletApp>nil(),
 		   p_app.uninstantiatedVars (),
 		   p_formula,
 		   SVTypeInfos.EMPTY_SVTYPEINFOS,
@@ -128,7 +129,7 @@ public interface SkolemSet {
 					  getSVPartitioning () );
 	}
 
-	public SkolemSet           addTaclets ( ListOfTacletApp p_taclets ) {
+	public SkolemSet           addTaclets ( ImmutableList<TacletApp> p_taclets ) {
 	    return new DefaultSkolemSet ( getInstantiations (),
 					  getFunctions      (),
 					  getVariables      (),
@@ -141,8 +142,8 @@ public interface SkolemSet {
 	}
 
 	public SkolemSet add ( SVInstantiations p_inst ) {
-	    SetOfSchemaVariable      m  = SetAsListOfSchemaVariable.EMPTY_SET;
-	    IteratorOfSchemaVariable it = getMissing ().iterator ();
+	    ImmutableSet<SchemaVariable>      m  = DefaultImmutableSet.<SchemaVariable>nil();
+	    Iterator<SchemaVariable> it = getMissing ().iterator ();
 	    SchemaVariable           v;
 
 	    while ( it.hasNext () ) {
@@ -161,8 +162,8 @@ public interface SkolemSet {
 					  getSVPartitioning () );
 	}
 
-	public SkolemSet           addMissing   ( IteratorOfSchemaVariable p_missing ) {
-	    SetOfSchemaVariable m = getMissing ();
+	public SkolemSet           addMissing   ( Iterator<SchemaVariable> p_missing ) {
+	    ImmutableSet<SchemaVariable> m = getMissing ();
 	    while ( p_missing.hasNext () )
 		m = m.add ( p_missing.next () );
 	    return new DefaultSkolemSet ( getInstantiations (),
@@ -209,11 +210,11 @@ public interface SkolemSet {
 	    return variables;
 	}	
 
-	public ListOfTacletApp     getTaclets        () {
+	public ImmutableList<TacletApp>     getTaclets        () {
 	    return taclets;
 	}
 
-	public SetOfSchemaVariable getMissing        () {
+	public ImmutableSet<SchemaVariable> getMissing        () {
 	    return miss;
 	}
 

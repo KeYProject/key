@@ -5,14 +5,14 @@
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
-//
-//
 package de.uka.ilkd.key.rule.metaconstruct;
 
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
+import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
@@ -35,7 +35,7 @@ public class AtPreEquations extends AbstractMetaOperator {
             return atPreMapping;
         }
         updateFormula = t;
-        atPreMapping = new HashMap();
+        atPreMapping = new LinkedHashMap();
         AtPreFactory.INSTANCE.createAtPreFunctionsForTerm(t, atPreMapping, services);
         return atPreMapping;
     }
@@ -43,13 +43,12 @@ public class AtPreEquations extends AbstractMetaOperator {
     /**
      * Helper for buildAtPreDefinitions().
      */
-    private static Term[] getTerms(ArrayOfQuantifiableVariable vars) {
+    private static Term[] getTerms(ImmutableArray<QuantifiableVariable> vars) {
         int numVars = vars.size();
         Term[] result = new Term[numVars];
 
         for(int i = 0; i < numVars; i++) {
-            LogicVariable var
-                    = (LogicVariable)(vars.getQuantifiableVariable(i));
+            LogicVariable var = (LogicVariable) vars.get(i);
             result[i] = TermBuilder.DF.var(var);
         }
 
@@ -63,29 +62,28 @@ public class AtPreEquations extends AbstractMetaOperator {
                         /*in*/ Map /*Operator -> Function */atPreFunctions) {
         Term result = TermBuilder.DF.tt();
 
-        Iterator it = atPreFunctions.entrySet().iterator();
-        while(it.hasNext()) {
-            Map.Entry entry = (Map.Entry)(it.next());
-            Operator f1 = (Operator)(entry.getKey());
-            Function f2 = (Function)(entry.getValue());
+        for (Object o : atPreFunctions.entrySet()) {
+            Map.Entry entry = (Map.Entry) (o);
+            Operator f1 = (Operator) (entry.getKey());
+            Function f2 = (Function) (entry.getValue());
 
             int arity = f1.arity();
             assert arity == f2.arity();
             LogicVariable[] args = new LogicVariable[arity];
-            for(int i = 0; i < arity; i++) {
+            for (int i = 0; i < arity; i++) {
                 args[i] = new LogicVariable(new Name("x" + i), f2.argSort(i));
             }
 
-            Term[] argTerms = getTerms(new ArrayOfQuantifiableVariable(args));
+            Term[] argTerms = getTerms(new ImmutableArray<QuantifiableVariable>(args));
 
             TermFactory tf = TermBuilder.DF.tf();
-            Term f1Term = tf.createTerm(f1,   argTerms,
-                                        null,
-                                        null);
+            Term f1Term = tf.createTerm(f1, argTerms,
+                    null,
+                    null);
             Term f2Term = TermBuilder.DF.func(f2, argTerms);
             Term equalsTerm = tf.createJunctorTerm(Op.EQUALS, f1Term, f2Term);
             Term quantifTerm;
-            if(arity > 0) {
+            if (arity > 0) {
                 quantifTerm = TermBuilder.DF.all(args, equalsTerm);
             } else {
                 quantifTerm = equalsTerm;

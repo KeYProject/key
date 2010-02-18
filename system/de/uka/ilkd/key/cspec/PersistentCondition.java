@@ -2,19 +2,11 @@
 // Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-//
+// Copyright (c) 2003 Andre Platzer. All Rights Reserved.
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
 //
-//
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2004 Universitaet Karlsruhe, Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
-/** $Id: PersistentCondition.java 1.4.1.1 Tue, 26 Jun 2007 10:47:12 +0200 christian $
+/** 
  * (#)$RCSfile$ 1.1 2003-02-10 Andre Platzer
  *
  * Copyright (c) 2003 Andre Platzer. All Rights Reserved.
@@ -31,7 +23,6 @@ package de.uka.ilkd.key.cspec;
  *
  * @author Andr&eacute; Platzer
  * @version 1.1, 2003-02-10
- * @version-revision $Revision: 1.4.1.1 $, $Date: Tue, 26 Jun 2007 10:47:12 +0200 $
  */
 public class PersistentCondition {
     private final Object synchronization;

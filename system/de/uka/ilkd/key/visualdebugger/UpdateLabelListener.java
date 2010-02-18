@@ -10,7 +10,9 @@
 package de.uka.ilkd.key.visualdebugger;
 
 import java.util.HashMap;
+import java.util.Iterator;
 
+import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.gui.RuleAppListener;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.SourceElement;
@@ -22,7 +24,10 @@ import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.ProofEvent;
 import de.uka.ilkd.key.proof.proofevent.*;
-import de.uka.ilkd.key.rule.*;
+import de.uka.ilkd.key.rule.IfFormulaInstSeq;
+import de.uka.ilkd.key.rule.IfFormulaInstantiation;
+import de.uka.ilkd.key.rule.PosTacletApp;
+import de.uka.ilkd.key.rule.RuleApp;
 
 public class UpdateLabelListener implements RuleAppListener {
 
@@ -31,7 +36,7 @@ public class UpdateLabelListener implements RuleAppListener {
 
     private void analyseNodeChanges(NodeReplacement nr, int id,
             boolean looking, HashMap<PosInOccurrence, Label> labels) {
-        final IteratorOfNodeChange it = nr.getNodeChanges();
+        final Iterator<NodeChange> it = nr.getNodeChanges();
         while (it.hasNext()) {
             NodeChange nc = it.next();
             if (nc instanceof NodeChangeAddFormula) {
@@ -111,7 +116,7 @@ public class UpdateLabelListener implements RuleAppListener {
         setStepInfos(info);
         if (info != null) {
             Node parent = info.getOriginalNode();
-            IteratorOfNodeReplacement it = info.getReplacementNodes();
+            Iterator<NodeReplacement> it = info.getReplacementNodes();
             while (it.hasNext()) {
                 NodeReplacement nr = it.next();
                 updateLabels(parent, nr, false);
@@ -121,15 +126,14 @@ public class UpdateLabelListener implements RuleAppListener {
 
     private HashMap<PosInOccurrence, Label> setAssumeLabel(
             HashMap<PosInOccurrence, Label> labels, Node n,
-            ListOfIfFormulaInstantiation inst) {
+            ImmutableList<IfFormulaInstantiation> inst) {
         HashMap<PosInOccurrence, Label> l = labels;
         if (inst == null) {
             return l;
         }
-        IteratorOfIfFormulaInstantiation it = inst.iterator();
-        while (it.hasNext()) {
+        for (IfFormulaInstantiation anInst : inst) {
             // TODO case assume=find
-            IfFormulaInstantiation next = it.next();
+            IfFormulaInstantiation next = anInst;
             if (next instanceof IfFormulaInstSeq) {
                 IfFormulaInstSeq i = (IfFormulaInstSeq) next;
                 PosInOccurrence pio = new PosInOccurrence(i
@@ -157,7 +161,7 @@ public class UpdateLabelListener implements RuleAppListener {
             newCount--;
         }
 
-        final IteratorOfNodeReplacement repl = info.getReplacementNodes();
+        final Iterator<NodeReplacement> repl = info.getReplacementNodes();
         while (repl.hasNext()) {
             NodeReplacement nr = repl.next();
             final VisualDebuggerState visualDebuggerState = nr.getNode()

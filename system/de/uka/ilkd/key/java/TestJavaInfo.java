@@ -5,15 +5,13 @@
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
-//
-//
 package de.uka.ilkd.key.java;
 
 import java.io.File;
 
 import junit.framework.TestCase;
+import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.abstraction.ListOfKeYJavaType;
 import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.util.HelperClassForTests;
@@ -80,7 +78,7 @@ public class TestJavaInfo extends TestCase {
     public void testGetAllSupertypes() {
         KeYJavaType rte = javaInfo.getKeYJavaType("java.lang.RuntimeException");
         assertTrue("Did not find class java.lang.RuntimeException", rte != null);
-        final ListOfKeYJavaType allSupertypes = javaInfo.getAllSupertypes(rte);
+        final ImmutableList<KeYJavaType> allSupertypes = javaInfo.getAllSupertypes(rte);
         
         assertTrue("No supertypes of java.lang.RuntimeException?", 
                 allSupertypes != null);
@@ -120,31 +118,31 @@ public class TestJavaInfo extends TestCase {
                 "attribute for arrays.", 
                 javaInfo.getAttribute(ImplicitFieldAdder.IMPLICT_ARRAY_TRA_INITIALIZED, 
                         objarray) != null);
-   
-        for (int i = 0; i<generalImplicitFields.length; i++) {
-            assertTrue("Could not find " + generalImplicitFields[i] + 
-                    "attribute for arrays.", 
-                    javaInfo.lookupVisibleAttribute(generalImplicitFields[i], 
+
+        for (String generalImplicitField : generalImplicitFields) {
+            assertTrue("Could not find " + generalImplicitField +
+                    "attribute for arrays.",
+                    javaInfo.lookupVisibleAttribute(generalImplicitField,
                             intarray) != null);
-            assertTrue("Could not find " + generalImplicitFields[i] + 
-                    "attribute for arrays.", 
-                    javaInfo.lookupVisibleAttribute(generalImplicitFields[i], 
+            assertTrue("Could not find " + generalImplicitField +
+                    "attribute for arrays.",
+                    javaInfo.lookupVisibleAttribute(generalImplicitField,
                             objarray) != null);
         }    
     }
     
     public void testFindImplicitAttributesForClassTypesOnly() {
         KeYJavaType obj = javaInfo.getKeYJavaType("java.lang.Object");
-        for (int i = 0; i<generalImplicitFields.length; i++) {           
-            assertTrue("Could not find " + generalImplicitFields[i] + 
-                    "attribute for arrays.", 
-                    javaInfo.lookupVisibleAttribute(generalImplicitFields[i], 
+        for (String generalImplicitField : generalImplicitFields) {
+            assertTrue("Could not find " + generalImplicitField +
+                    "attribute for arrays.",
+                    javaInfo.lookupVisibleAttribute(generalImplicitField,
                             obj) != null);
-        }    
-        for (int i = 0; i<implictFieldsClassOnly.length; i++) {           
-            assertTrue("Could not find " + implictFieldsClassOnly[i] + 
-                    "attribute for arrays.", 
-                    javaInfo.lookupVisibleAttribute(implictFieldsClassOnly[i], 
+        }
+        for (String anImplictFieldsClassOnly : implictFieldsClassOnly) {
+            assertTrue("Could not find " + anImplictFieldsClassOnly +
+                    "attribute for arrays.",
+                    javaInfo.lookupVisibleAttribute(anImplictFieldsClassOnly,
                             obj) != null);
         }    
     }
@@ -185,7 +183,7 @@ public class TestJavaInfo extends TestCase {
         
         long start = System.currentTimeMillis();
 
-        final ListOfKeYJavaType commons = javaInfo.getCommonSubtypes(obj, rte);        
+        final ImmutableList<KeYJavaType> commons = javaInfo.getCommonSubtypes(obj, rte);        
         assertTrue(commons.equals(javaInfo.getAllSubtypes(rte).prepend(rte)));             
 
         
@@ -196,7 +194,7 @@ public class TestJavaInfo extends TestCase {
         long durationCache = 0;
         for (int i = 0; i<1000; i++) {          
             start = System.currentTimeMillis();
-            final ListOfKeYJavaType commonsCache = 
+            final ImmutableList<KeYJavaType> commonsCache = 
                 javaInfo.getCommonSubtypes(obj, rte);
             end = System.currentTimeMillis();            
             assertTrue("Cache inconsistence", commonsCache.equals(commons));
@@ -215,10 +213,10 @@ public class TestJavaInfo extends TestCase {
         final String[] primitiveTypeNames = new String[]{
                "long", "int", "short", "byte", "char", "boolean"
         };
-        
-        for (int i = 0; i<primitiveTypeNames.length; i++) {
-            assertNotNull("Type" + primitiveTypeNames[i] +" not found", 
-                    javaInfo.getPrimitiveKeYJavaType(primitiveTypeNames[i]));
+
+        for (String primitiveTypeName : primitiveTypeNames) {
+            assertNotNull("Type" + primitiveTypeName + " not found",
+                    javaInfo.getPrimitiveKeYJavaType(primitiveTypeName));
         }
         
         assertNull("Ooops, non primitive type found",

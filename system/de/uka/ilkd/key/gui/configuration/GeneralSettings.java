@@ -203,10 +203,9 @@ public class GeneralSettings implements Settings {
      * changed to its registered listeners (not thread-safe)
      */
     protected void fireSettingsChanged() {
-	Iterator<SettingsListener> it = listenerList.iterator();
-	while (it.hasNext()) {
-	    it.next().settingsChanged(new GUIEvent(this));
-	}
+        for (SettingsListener aListenerList : listenerList) {
+            aListenerList.settingsChanged(new GUIEvent(this));
+        }
     }
 
     

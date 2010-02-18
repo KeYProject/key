@@ -1,16 +1,15 @@
-//This file is part of KeY - Integrated Deductive Software Design
-//Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
-//Universitaet Koblenz-Landau, Germany
-//Chalmers University of Technology, Sweden
-
-//The KeY system is private by the GNU General private License. 
-//See LICENSE.TXT for details.
+// This file is part of KeY - Integrated Deductive Software Design
+// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General Public License. 
+// See LICENSE.TXT for details.
 
 
 
 package de.uka.ilkd.key.java;
 
-import java.lang.reflect.*;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.*;
@@ -21,8 +20,11 @@ import recoder.abstraction.Type;
 import recoder.java.NonTerminalProgramElement;
 import recoder.list.generic.ASTList;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
-import de.uka.ilkd.key.java.abstraction.*;
+import de.uka.ilkd.key.collection.ImmutableArray;
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.abstraction.Field;
+import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.*;
 import de.uka.ilkd.key.java.declaration.modifier.*;
 import de.uka.ilkd.key.java.declaration.modifier.Ghost;
@@ -44,6 +46,7 @@ import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.init.PercProfile;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.ExtList;
+
 
 /**
  * Objects of this class can be used to transform an AST returned by the recoder
@@ -102,13 +105,14 @@ public class Recoder2KeYConverter {
     /**
      * caches access to methods for reflection. It is a HashMap<Class, Method>
      */
-    private final HashMap methodCache = new HashMap(400);
+    private final HashMap<Class<?>, Method> methodCache = new HashMap<Class<?>, Method>(400);
 
     /**
      * caches constructor access for reflection. It is a HashMap<Class,
      * Constructor>
      */
-    private final HashMap constructorCache = new HashMap(400);
+    private final HashMap<Class<? extends recoder.java.JavaProgramElement>, Constructor<?>> constructorCache = 
+	new HashMap<Class<? extends recoder.java.JavaProgramElement>, Constructor<?>>(400);
 
     /**
      * Hashmap from <code>recoder.java.declaration.FieldSpecification</code>
@@ -116,20 +120,22 @@ public class Recoder2KeYConverter {
      * when converting initializers. Access to this map is performed via the
      * method <code>getProgramVariableForFieldSpecification</code>
      */
-    private HashMap fieldSpecificationMapping = new HashMap();
+    private HashMap<recoder.java.declaration.FieldSpecification, ProgramVariable> fieldSpecificationMapping = 
+	new HashMap<recoder.java.declaration.FieldSpecification, ProgramVariable>();
 
     /**
      * methodsDeclaring contains the recoder method declarations as keys that
      * have been started to convert but are not yet finished. The mapped value
      * is the reference to the later completed ProgramMethod.
      */
-    private HashMap methodsDeclaring = new HashMap();
+    private HashMap<recoder.java.declaration.MethodDeclaration, ProgramMethod> methodsDeclaring = 
+	new HashMap<recoder.java.declaration.MethodDeclaration, ProgramMethod>();
 
     /**
      * locClass2finalVar stores the final variables that need to be passed
      * to the constructor of an anonymous class. 
      */
-    protected HashMap locClass2finalVar = null;
+    protected HashMap<?, ?> locClass2finalVar = null;
     
     /**
      * stores the class that is currently processed
@@ -218,15 +224,15 @@ public class Recoder2KeYConverter {
         if (pe == null)
             throw new ConvertException("cannot convert 'null'");
 
-        Class contextClass = pe.getClass();
-        Method m = (Method) methodCache.get(contextClass);
+        Class<?> contextClass = pe.getClass();
+        Method m = methodCache.get(contextClass);
 
         // if not in cache, search it - and fill the cache
         if (m == null) {
             Class[] context = new Class[] { contextClass };
 
             // remember all superclasses for the cache
-            LinkedList l = new LinkedList();
+            LinkedList<Class<?>> l = new LinkedList<Class<?>>();
 
             while (m == null && context[0] != null) {
                 l.add(contextClass);
@@ -244,9 +250,8 @@ public class Recoder2KeYConverter {
                         "Could not find convert method for class "
                         + pe.getClass());
 
-            Iterator it = l.iterator();
-            while (it.hasNext()) {
-                methodCache.put(it.next(), m);
+            for (Class<?> aL : l) {
+                methodCache.put(aL, m);
             }
         }
 
@@ -433,14 +438,13 @@ public class Recoder2KeYConverter {
      * 
      * @param list
      *            the ExtList with the members of a type declaration
-     * @return a ListOfField the includes all field specifications found int the
+     * @return a IList<Field> the includes all field specifications found int the
      *         field declaration of the given list
      */
-    private ListOfField filterField(ExtList list) {
-        ListOfField result = SLListOfField.EMPTY_LIST;
-        Iterator it = list.iterator();
-        while (it.hasNext()) {
-            Object pe = it.next();
+    private ImmutableList<Field> filterField(ExtList list) {
+        ImmutableList<Field> result = ImmutableSLList.<Field>nil();
+        for (Object aList : list) {
+            Object pe = aList;
             if (pe instanceof FieldDeclaration) {
                 result = result.prepend(filterField((FieldDeclaration) pe));
             }
@@ -454,14 +458,14 @@ public class Recoder2KeYConverter {
      * @param field
      *            the FieldDeclaration of which the field specifications have to
      *            be extracted
-     * @return a ListOfField the includes all field specifications found int the
+     * @return a IList<Field> the includes all field specifications found int the
      *         field declaration of the given list
      */
-    private ListOfField filterField(FieldDeclaration field) {
-        ListOfField result = SLListOfField.EMPTY_LIST;
-        ArrayOfFieldSpecification spec = field.getFieldSpecifications();
+    private ImmutableList<Field> filterField(FieldDeclaration field) {
+        ImmutableList<Field> result = ImmutableSLList.<Field>nil();
+        ImmutableArray<FieldSpecification> spec = field.getFieldSpecifications();
         for (int i = spec.size() - 1; i >= 0; i--) {
-            result = result.prepend(spec.getFieldSpecification(i));
+            result = result.prepend(spec.get(i));
         }
         return result;
     }
@@ -472,16 +476,15 @@ public class Recoder2KeYConverter {
      * @param name
      *            a String with the name of the field to be looked for
      * @param fields
-     *            the ListOfField where we have to look for the field
+     *            the IList<Field> where we have to look for the field
      * @return the program variable of the given name or null if not found
      */
-    private ProgramVariable find(String name, ListOfField fields) {
-        IteratorOfField it = fields.iterator();
-        while (it.hasNext()) {
-            Field field = it.next();
+    private ProgramVariable find(String name, ImmutableList<Field> fields) {
+        for (Field field1 : fields) {
+            Field field = field1;
             if (name.equals(field.getName())) {
                 return (ProgramVariable) ((FieldSpecification) field)
-                .getProgramVariable();
+                        .getProgramVariable();
             }
         }
         return null;
@@ -540,7 +543,7 @@ public class Recoder2KeYConverter {
      * @throws ConvertException
      *             for various reasons
      */
-    private Class getKeYClass(Class recoderClass) {
+    private Class<?> getKeYClass(Class<? extends recoder.java.JavaProgramElement> recoderClass) {
         String className = getKeYName(recoderClass);
         try {
             return Class.forName(className);
@@ -566,7 +569,7 @@ public class Recoder2KeYConverter {
      *            Class that is the original recoder
      * @return String containing the KeY-Classname
      */
-    private String getKeYName(Class recoderClass) {
+    private String getKeYName(Class<? extends recoder.java.JavaProgramElement> recoderClass) {
         return "de.uka.ilkd.key."
         + recoderClass.getName().substring(RECODER_PREFIX_LENGTH);
     }
@@ -580,10 +583,10 @@ public class Recoder2KeYConverter {
      *            the Class of the recoder AST object
      * @return the Constructor of the right KeY-Class
      */
-    private Constructor getKeYClassConstructor(Class recoderClass) {
-        Constructor result = null;
+    private Constructor<?> getKeYClassConstructor(Class<? extends recoder.java.JavaProgramElement> recoderClass) {
+        Constructor<?> result = null;
         try {
-            result = (Constructor) constructorCache.get(recoderClass);
+            result = constructorCache.get(recoderClass);
 
             if (result == null) {
                 result = getKeYClass(recoderClass).getConstructor(
@@ -761,7 +764,7 @@ public class Recoder2KeYConverter {
             block = (StatementBlock) callConvert(rmcs.getBody());
         }
 
-        return new MethodFrame(resVar, (ExecutionContext) convert(rmcs
+        return new MethodFrame(resVar, convert(rmcs
                 .getExecutionContext()), block);
     }
 
@@ -788,7 +791,7 @@ public class Recoder2KeYConverter {
             keyArgs = new Expression[0];
         }
 
-        final MethodReference mr = new MethodReference(new ArrayOfExpression(
+        final MethodReference mr = new MethodReference(new ImmutableArray<Expression>(
                 keyArgs), methodName, invocationTarget, rmbs.getScope()==null ? null : rmbs.getScope().getText());
 
         return new MethodBodyStatement(bodySource, resultVar, mr);
@@ -1015,7 +1018,7 @@ public class Recoder2KeYConverter {
         // ProgramMethod.
         if (methodsDeclaring.containsKey(md)) {
             // a recursive call from a method reference
-            return (ProgramMethod) methodsDeclaring.get(md);
+            return methodsDeclaring.get(md);
             // reference that will later be set.
         }
 
@@ -1085,7 +1088,7 @@ public class Recoder2KeYConverter {
             return null;
         }
 
-        ProgramVariable pv = (ProgramVariable) fieldSpecificationMapping
+        ProgramVariable pv = fieldSpecificationMapping
         .get(recoderVarSpec);
 
         if (pv == null) {
@@ -1541,9 +1544,9 @@ public class Recoder2KeYConverter {
         final recoder.java.reference.TypeReference tr = n.getTypeReference();
         final recoder.java.declaration.ClassDeclaration cd = n.getClassDeclaration();
         
-        LinkedList outerVars = null;
+        LinkedList<?> outerVars = null;
         if(locClass2finalVar != null){
-            outerVars = (LinkedList) locClass2finalVar.get(cd);
+            outerVars = (LinkedList<?>) locClass2finalVar.get(cd);
         }
         
         int numVars = outerVars!=null? outerVars.size() : 0;

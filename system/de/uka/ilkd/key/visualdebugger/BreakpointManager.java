@@ -12,17 +12,16 @@ package de.uka.ilkd.key.visualdebugger;
 import java.util.Iterator;
 import java.util.LinkedList;
 
-import de.uka.ilkd.key.proof.IteratorOfNode;
-import de.uka.ilkd.key.proof.ListOfNode;
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.proof.SLListOfNode;
 
 public class BreakpointManager {
     private LinkedList bp = new LinkedList();
 
     private boolean noEx = false;
 
-    private ListOfNode st = SLListOfNode.EMPTY_LIST;
+    private ImmutableList<Node> st = ImmutableSLList.<Node>nil();
 
     private VisualDebugger vd;
 
@@ -38,9 +37,8 @@ public class BreakpointManager {
     }
 
     public boolean containsBp(SourceElementId id) {
-        Iterator it = bp.iterator();
-        while (it.hasNext()) {
-            SourceElementId currentId = ((Breakpoint) it.next()).getId();
+        for (Object aBp : bp) {
+            SourceElementId currentId = ((Breakpoint) aBp).getId();
             if (currentId.equals(id))
                 return true;
         }
@@ -51,7 +49,7 @@ public class BreakpointManager {
         return bp.toArray();
     }
 
-    public ListOfNode getSteps() {
+    public ImmutableList<Node> getSteps() {
         return st;
     }
 
@@ -59,8 +57,8 @@ public class BreakpointManager {
         return noEx;
     }
 
-    private String print(ListOfNode lon) {
-        IteratorOfNode it = lon.iterator();
+    private String print(ImmutableList<Node> lon) {
+        Iterator<Node> it = lon.iterator();
         String result = "";
         while (it.hasNext()) {
             result += it.next().serialNr() + " ";

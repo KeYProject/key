@@ -1,7 +1,14 @@
+// This file is part of KeY - Integrated Deductive Software Design
+// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General Public License. 
+// See LICENSE.TXT for details.
 public class BubbleSort{
- 
+
+	//@ghost int[] b;
     /*@ public normal_behavior
-      @  forall int[] b;
       @  requires a!=null && a.length>1 && a.length<5;
       @  requires a.length == b.length && 
       @           (\forall int i; 0<=i && i<a.length; b[i]==a[i]);
@@ -9,7 +16,7 @@ public class BubbleSort{
       @                        a[i]<=a[i+1]) &&
       @                      equalsModOrdering(a, b); 
       @*/
-    public static void sort(int[] a){
+    public void sort(int[] a){
 	if(a==null) return;
 	boolean sorted = false;
 	int help;

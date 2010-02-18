@@ -12,6 +12,10 @@ package de.uka.ilkd.key.speclang.jml.translation;
 
 import java.util.Map;
 
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.*;
@@ -42,7 +46,7 @@ class JMLTranslator {
 	    				PositionedString expr,
                                         KeYJavaType specInClass,
                                         ParsableVariable selfVar, 
-                                        ListOfParsableVariable paramVars,
+                                        ImmutableList<ParsableVariable> paramVars,
                                         ParsableVariable resultVar,
                                         ParsableVariable excVar,
                                         Map<Operator,Function/*(atPre)*/> atPreFunctions) 
@@ -62,7 +66,7 @@ class JMLTranslator {
     					       excVar,
                                                atPreFunctions);
     	
-    	FormulaWithAxioms result = null;
+    	FormulaWithAxioms result;
     	
 //    	System.out.println("JMLTranslator.translateExpression("+expr+")" + " in " + expr.fileName);
     	
@@ -85,7 +89,7 @@ class JMLTranslator {
 	    				PositionedString signalsExpr,
                                         KeYJavaType specInClass,
                                         ParsableVariable selfVar, 
-                                        ListOfParsableVariable paramVars, 
+                                        ImmutableList<ParsableVariable> paramVars, 
                                         ParsableVariable resultVar, 
                                         ParsableVariable excVar,
                                         Map<Operator, Function/* atPre */> atPreFunctions)
@@ -102,7 +106,7 @@ class JMLTranslator {
                                                excVar,
                                                atPreFunctions);
         
-        FormulaWithAxioms result = null;
+        FormulaWithAxioms result;
         
 //      System.out.println("JMLTranslator.translateSignalsExpression("+signalsExpr+") results: ");
 
@@ -136,7 +140,7 @@ class JMLTranslator {
                                                excVar,
                                                null);
         
-        FormulaWithAxioms result = null;
+        FormulaWithAxioms result;
         
 //          System.out.println("JMLTranslator.translateSignalsOnlyExpression("+signalsOnlyExpr+") results: ");
 
@@ -152,11 +156,11 @@ class JMLTranslator {
     /**
      * Translates an expression as it occurs in JML assignable-clauses.
      */
-    public SetOfLocationDescriptor translateAssignableExpression(
+    public ImmutableSet<LocationDescriptor> translateAssignableExpression(
                                     	PositionedString assignableExpr,
                                         KeYJavaType specInClass,
                                         ParsableVariable selfVar, 
-                                        ListOfParsableVariable paramVars)
+                                        ImmutableList<ParsableVariable> paramVars)
             throws SLTranslationException {        
         AxiomCollector axiomCollector = new AxiomCollector();
             
@@ -170,8 +174,8 @@ class JMLTranslator {
                                                null,
                                                null);
         
-        SetOfLocationDescriptor result = SetAsListOfLocationDescriptor.EMPTY_SET;
-        
+        ImmutableSet<LocationDescriptor> result;
+
 //      System.out.println("JMLTranslator.translateAssignableExpression("+assignableExpr+") results: ");
 
         result = parser.parseAssignable();
@@ -183,7 +187,7 @@ class JMLTranslator {
     }
     
     
-    public ListOfLogicVariable translateVariableDeclaration(PositionedString variableDecl) 
+    public ImmutableList<LogicVariable> translateVariableDeclaration(PositionedString variableDecl) 
             throws SLTranslationException {
         KeYJMLParser parser = new KeYJMLParser(variableDecl,
                                                services,
@@ -195,8 +199,8 @@ class JMLTranslator {
                                                null,
                                                null);
         
-        ListOfLogicVariable result = SLListOfLogicVariable.EMPTY_LIST;
-        
+        ImmutableList<LogicVariable> result;
+
 //      System.out.println("JMLTranslator.translateVariableDeclaration("+variableDecl+") results: ");
 
         result = parser.parseVariableDeclaration();

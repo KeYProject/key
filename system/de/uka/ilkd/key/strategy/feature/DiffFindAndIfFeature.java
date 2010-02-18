@@ -10,12 +10,14 @@
 
 package de.uka.ilkd.key.strategy.feature;
 
+import java.util.Iterator;
+
+import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.logic.ConstrainedFormula;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.IfFormulaInstSeq;
-import de.uka.ilkd.key.rule.IteratorOfIfFormulaInstantiation;
-import de.uka.ilkd.key.rule.ListOfIfFormulaInstantiation;
+import de.uka.ilkd.key.rule.IfFormulaInstantiation;
 import de.uka.ilkd.key.rule.TacletApp;
 
 /**
@@ -34,19 +36,18 @@ public class DiffFindAndIfFeature extends BinaryTacletAppFeature {
     protected boolean filter ( TacletApp app, PosInOccurrence pos, Goal goal ) {
         assert pos != null : "Feature is only applicable to rules with find";
         
-        ListOfIfFormulaInstantiation list = app.ifFormulaInstantiations();
+        ImmutableList<IfFormulaInstantiation> list = app.ifFormulaInstantiations();
         
         assert list != null;
-                            
-        final IteratorOfIfFormulaInstantiation it = list.iterator();
-        while (it.hasNext()) {
-            final IfFormulaInstSeq iffi = (IfFormulaInstSeq) it.next();
+
+        for (IfFormulaInstantiation aList : list) {
+            final IfFormulaInstSeq iffi = (IfFormulaInstSeq) aList;
             assert iffi != null;
-            final ConstrainedFormula findFormula = pos.constrainedFormula ();
-            final ConstrainedFormula ifFormula   = iffi.getConstrainedFormula();
-            
-            final boolean result = pos.isInAntec () != iffi.inAntec ()
-            || !findFormula.equals ( ifFormula );
+            final ConstrainedFormula findFormula = pos.constrainedFormula();
+            final ConstrainedFormula ifFormula = iffi.getConstrainedFormula();
+
+            final boolean result = pos.isInAntec() != iffi.inAntec()
+                    || !findFormula.equals(ifFormula);
             if (!result) {
                 return false;
             }

@@ -10,10 +10,12 @@
 
 package de.uka.ilkd.key.strategy.feature;
 
+import java.util.Iterator;
+
+import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Constraint;
-import de.uka.ilkd.key.rule.IteratorOfIfFormulaInstantiation;
-import de.uka.ilkd.key.rule.ListOfIfFormulaInstantiation;
+import de.uka.ilkd.key.rule.IfFormulaInstantiation;
 import de.uka.ilkd.key.rule.TacletApp;
 
 
@@ -37,14 +39,12 @@ public abstract class AbstractConstraintStrengthenFeature extends
     protected static Constraint getIfConstraint (TacletApp app, Services services) {
         Constraint c = Constraint.BOTTOM;
         
-        final ListOfIfFormulaInstantiation insts = app.ifFormulaInstantiations ();
+        final ImmutableList<IfFormulaInstantiation> insts = app.ifFormulaInstantiations ();
         if ( insts == null ) return c;
-        
-        final IteratorOfIfFormulaInstantiation it = insts.iterator ();
-        //      TODO: c will be unsatifiable if intersection sorts are required 
+
+        //      TODO: c will be unsatifiable if intersection sorts are required
         // (is this intended)? or rather new Namespace() 
-        while ( it.hasNext () )
-            c = c.join ( it.next ().getConstrainedFormula ().constraint (), services );
+        for (IfFormulaInstantiation inst : insts) c = c.join(inst.getConstrainedFormula().constraint(), services);
         return c;
     }
     

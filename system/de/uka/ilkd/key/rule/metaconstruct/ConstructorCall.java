@@ -7,17 +7,11 @@
 // See LICENSE.TXT for details.
 //
 //
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2004 Universitaet Karlsruhe, Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
 package de.uka.ilkd.key.rule.metaconstruct;
 
 import java.util.ArrayList;
 
+import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
@@ -86,7 +80,7 @@ public class ConstructorCall extends ProgramMetaConstruct {
 	    return pe;
 	}
 	
-	final ArrayOfExpression arguments = 
+	final ImmutableArray<Expression> arguments = 
 	    constructorReference.getArguments();
 	
 	final ArrayList<Statement> evaluatedArgs = new ArrayList<Statement>();
@@ -100,7 +94,7 @@ public class ConstructorCall extends ProgramMetaConstruct {
                
 	for (int i = 0, sz = arguments.size(); i<sz; i++) {
 	    argumentVariables[i] = 
-	        EvaluateArgs.evaluate(arguments.getExpression(i), evaluatedArgs, 
+	        EvaluateArgs.evaluate(arguments.get(i), evaluatedArgs, 
 	                services, ec);	  
 	}
         
@@ -115,14 +109,14 @@ public class ConstructorCall extends ProgramMetaConstruct {
 	                        services, ec);    
 	}
 	ProgramMethod method = services.getJavaInfo().
-	  getProgramMethod(classType, NORMALFORM_IDENTIFIER, 
-              (ProgramVariable[])argumentVariables, ec.
+	  getProgramMethod(classType, NORMALFORM_IDENTIFIER,
+              argumentVariables, ec.
               getTypeReference().getKeYJavaType());
 	
 	Debug.assertTrue(method != null, "Call to non-existent constructor.");
     
 	final MethodBodyStatement mbs = new MethodBodyStatement(method, newObject, null, 
-               new ArrayOfExpression(argumentVariables), constructorReference.getScope()); 
+               new ImmutableArray<Expression>(argumentVariables), constructorReference.getScope()); 
 	
         //   the assignment statements + the method body statement + <allocateArea> for memory areas  
         Statement[] stmnts;
@@ -137,7 +131,7 @@ public class ConstructorCall extends ProgramMetaConstruct {
 	stmnts[stmnts.length-1] = mbs; 
 	
 	for (int i = 0, sz=evaluatedArgs.size(); i<sz; i++) {
-	    stmnts[i] = (Statement)evaluatedArgs.get(i); 
+	    stmnts[i] = evaluatedArgs.get(i);
 	}
     
 	return new StatementBlock(stmnts);

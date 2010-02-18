@@ -9,6 +9,7 @@
 //
 package de.uka.ilkd.key.java;
 
+import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
 import de.uka.ilkd.key.java.declaration.Modifier;
@@ -210,7 +211,7 @@ public abstract class KeYJavaASTFactory {
 					  stmnt.length];
 	System.arraycopy(stmnt, 0, block, 0, stmnt.length);
 	b.getBody().arraycopy(0, block, stmnt.length, b.getStatementCount());
-	return new StatementBlock(new ArrayOfStatement(block));	
+	return new StatementBlock(new ImmutableArray<Statement>(block));	
     }
 
     /** inserts the given statements at the begin of the block 

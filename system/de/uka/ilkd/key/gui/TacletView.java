@@ -78,7 +78,7 @@ public class TacletView implements ActionListener{
     }
 
     public void showTacletView(DefaultMutableTreeNode node){
-        Taclet tac = null;
+        Taclet tac  ;
         if (node.getUserObject() instanceof Taclet) {
             tac = (Taclet) node.getUserObject();        
         } else return;
@@ -93,13 +93,12 @@ public class TacletView implements ActionListener{
     }
 
     private String getDisplayName(Taclet tac){
-        String title = tac.displayName();	   
-        return title;
+        return tac.displayName();
     }
 
 
     private String getTacletByName(Taclet tac){
-        String rule = "";
+        String rule  ;
         LogicPrinter lp = 
             new LogicPrinter(new ProgramPrinter(), new NotationInfo(), null, true);
         lp.printTaclet(tac);

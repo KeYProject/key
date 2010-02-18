@@ -5,20 +5,19 @@
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
-//
-//
 /*
  * Created on Apr 18, 2005
  */
 package de.uka.ilkd.key.gui.nodeviews;
 
 import java.awt.event.ActionListener;
+import java.util.Iterator;
 
 import javax.swing.JMenu;
 
+import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.pp.NotationInfo;
-import de.uka.ilkd.key.rule.IteratorOfPosTacletApp;
-import de.uka.ilkd.key.rule.ListOfPosTacletApp;
+import de.uka.ilkd.key.rule.PosTacletApp;
 
 /**
  * This simple taclet menu displays the user a list of applicable taclets
@@ -37,13 +36,13 @@ public class SimpleTacletSelectionMenu extends JMenu {
     /**
      * creates an instance of this menu displaying the applications stored in
      * <tt>apps</tt>
-     * @param apps the ListOfPosTacletApp to be displayed
+     * @param apps the IList<PosTacletApp> to be displayed
      * @param info the NotationInfo used to pretty print the taclets in 
      * tooltips
      * @param listener the ActionListener which is registered at each 
      * menu item 
      */
-    public SimpleTacletSelectionMenu(ListOfPosTacletApp apps, 
+    public SimpleTacletSelectionMenu(ImmutableList<PosTacletApp> apps, 
             NotationInfo info, ActionListener listener) {
         super("Select Rule to Apply");        
                     
@@ -52,18 +51,17 @@ public class SimpleTacletSelectionMenu extends JMenu {
 
     /**
      * adds the given applications to the menu
-     * @param apps the ListOfPosTacletApp to be displayed
+     * @param apps the IList<PosTacletApp> to be displayed
      * @param info the NotationInfo used to pretty print the taclets in 
      * tooltips
      * @param listener the ActionListener which is registered at each 
      * menu item 
      */
-    private void addMenuEntries(ListOfPosTacletApp apps, 
+    private void addMenuEntries(ImmutableList<PosTacletApp> apps, 
             NotationInfo info, ActionListener listener) {
-        final IteratorOfPosTacletApp it = apps.iterator();
-        while (it.hasNext()) {
-            final DefaultTacletMenuItem item = 
-                new DefaultTacletMenuItem(this, it.next(), info);
+        for (PosTacletApp app : apps) {
+            final DefaultTacletMenuItem item =
+                    new DefaultTacletMenuItem(this, app, info);
             item.addActionListener(listener);
             add(item);
         }

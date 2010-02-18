@@ -13,13 +13,12 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
+import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.java.abstraction.IteratorOfKeYJavaType;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.abstraction.ListOfKeYJavaType;
 import de.uka.ilkd.key.java.reference.*;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -102,7 +101,7 @@ public class ProgramTypeCollector extends JavaASTVisitor {
 		     currentType);		   
 	    }
 	
-	    ListOfKeYJavaType imps = 
+	    ImmutableList<KeYJavaType> imps = 
 		services.getJavaInfo().getKeYProgModelInfo()
 		.findImplementations
 		(currentType,
@@ -112,63 +111,60 @@ public class ProgramTypeCollector extends JavaASTVisitor {
 		  new ExecutionContext(new TypeRef(currentType), 
 		          null, currentSelf)));
 
-	    IteratorOfKeYJavaType impsIt = imps.iterator();
-	    while (impsIt.hasNext()) {
-		currentType = impsIt.next();
-		    
-		ProgramMethod currentPM =
-		    services.getJavaInfo().getProgramMethod
-		    (currentType,
-		     currentMR.getMethodName().toString(),
-		     currentMR.getMethodSignature(services,
-						  new ExecutionContext
-						  (new TypeRef(currentType),
-						          null,
-						   currentSelf)),
-		     currentSelf.getKeYJavaType());
-		//System.out.println("pm: " + currentPM);
-		    
-		if (!alreadyVisitedProgramMethods.contains(currentPM)) {
-		    alreadyVisitedProgramMethods.add(currentPM);
-		    //System.out.println("pm building new ptc: " + currentPM);
-		    if (services.getJavaInfo().getKeYJavaType
-			(currentPM.getContainerType()) != null) {
-			result.add
-			    (services.getJavaInfo().getKeYJavaType
-			     (currentPM.getContainerType()));
-		    }
-			
-		    ProgramTypeCollector mCollector = 
-			new ProgramTypeCollector
-			(currentPM, currentSelf, 
-			 currentType, services,
-			 alreadyVisitedProgramMethods);
-			
-		    mCollector.start();
-		    Iterator it = mCollector.getResult().iterator();
-		    while (it.hasNext()) {
-			result.add(it.next());
-		    }
-		}
-		    
-		// ACHTUNG: getProgramMethods ist unnoetig in der jetzigen Implementierung
-		// Allerdings ist keine Ueberpruefung ob ggf. eine programmethod mehrfach wiederholt wird
+        for (KeYJavaType imp : imps) {
+            currentType = imp;
 
-		/*
-		  it = mCollector.getProgramMethods().iterator();
+            ProgramMethod currentPM =
+                    services.getJavaInfo().getProgramMethod
+                            (currentType,
+                                    currentMR.getMethodName().toString(),
+                                    currentMR.getMethodSignature(services,
+                                            new ExecutionContext
+                                                    (new TypeRef(currentType),
+                                                            currentSelf)),
+                                    currentSelf.getKeYJavaType());
+            //System.out.println("pm: " + currentPM);
+
+            if (!alreadyVisitedProgramMethods.contains(currentPM)) {
+                alreadyVisitedProgramMethods.add(currentPM);
+                //System.out.println("pm building new ptc: " + currentPM);
+                if (services.getJavaInfo().getKeYJavaType
+                        (currentPM.getContainerType()) != null) {
+                    result.add
+                            (services.getJavaInfo().getKeYJavaType
+                                    (currentPM.getContainerType()));
+                }
+
+                ProgramTypeCollector mCollector =
+                        new ProgramTypeCollector
+                                (currentPM, currentSelf,
+                                        currentType, services,
+                                        alreadyVisitedProgramMethods);
+
+                mCollector.start();
+                for (Object o : mCollector.getResult()) {
+                    result.add(o);
+                }
+            }
+
+            // ACHTUNG: getProgramMethods ist unnoetig in der jetzigen Implementierung
+            // Allerdings ist keine Ueberpruefung ob ggf. eine programmethod mehrfach wiederholt wird
+
+            /*
+             it = mCollector.getProgramMethods().iterator();
 		      
-		  Set addToMethodRefs = mCollector.getMethodRefs();
-		  Iterator addToMethodRefsIt = addToMethodRefs.iterator();
-		  while (addToMethodRefsIt.hasNext()) {
-		  MethodReference mR = (MethodReference) addToMethodRefsIt.next();
-		  // only add those methodReferences which have not been visited
-		  // to the set of methodReferences which need to be visited
-		  if (!visitedMethodRefs.contains(mR)) {
-		  methodRefs.add(mR);
-		  }
-		  }
-		*/
-	    }
+             Set addToMethodRefs = mCollector.getMethodRefs();
+             Iterator addToMethodRefsIt = addToMethodRefs.iterator();
+             while (addToMethodRefsIt.hasNext()) {
+             MethodReference mR = (MethodReference) addToMethodRefsIt.next();
+             // only add those methodReferences which have not been visited
+             // to the set of methodReferences which need to be visited
+             if (!visitedMethodRefs.contains(mR)) {
+             methodRefs.add(mR);
+             }
+             }
+           */
+        }
 	}
     }
 

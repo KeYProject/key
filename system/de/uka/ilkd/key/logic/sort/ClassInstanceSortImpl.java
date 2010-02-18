@@ -12,19 +12,21 @@
 
 package de.uka.ilkd.key.logic.sort;
 
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.logic.Name;
 
 public class ClassInstanceSortImpl extends AbstractNonCollectionSort 
     implements ClassInstanceSort {
 
 
-    final SetOfSort ext;
+    final ImmutableSet<Sort> ext;
     /** this field indicates if a <get> function shall be created or not */
     final boolean representsAbstractJavaOrInterfaceSort;
     
     
     /** creates a ClassInstanceSort*/
-    public ClassInstanceSortImpl(Name name, SetOfSort ext, boolean abs) {
+    public ClassInstanceSortImpl(Name name, ImmutableSet<Sort> ext, boolean abs) {
 	super(name);
 	this.ext = ext;	
         this.representsAbstractJavaOrInterfaceSort = abs;
@@ -33,20 +35,20 @@ public class ClassInstanceSortImpl extends AbstractNonCollectionSort
     /** creates a ClassInstanceSort*/
     public ClassInstanceSortImpl(Name name, de.uka.ilkd.key.logic.sort.Sort ext,
             boolean abs) {
-	this(name, SetAsListOfSort.EMPTY_SET.add(ext), abs);
+	this(name, DefaultImmutableSet.<Sort>nil().add(ext), abs);
     }
 
 
     /** creates a ClassInstanceSort*/
     public ClassInstanceSortImpl(Name name, boolean abs) {
-	this(name, SetAsListOfSort.EMPTY_SET, abs);
+	this(name, DefaultImmutableSet.<Sort>nil(), abs);
     }
 
    
     /**
      * @return the sorts of the predecessors of this sort
      */
-    public SetOfSort extendsSorts() {
+    public ImmutableSet<Sort> extendsSorts() {
         return ext;
     }
 

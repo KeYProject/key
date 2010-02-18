@@ -200,7 +200,7 @@ public class TestCollisionResolving extends TestCase {
     }
     
     public void testVarNamespaceCreationWithPrefix() {
-        TacletApp app = (NoPosTacletApp) TacletForTests.getTaclet
+        TacletApp app = TacletForTests.getTaclet
         ("TestCollisionResolving_ns2");
         TacletApp app1=app.prepareUserInstantiation();
         assertSame(app, app1);
@@ -265,7 +265,7 @@ public class TestCollisionResolving extends TestCase {
 	( seq, services, Constraint.BOTTOM ).head ();
 	TacletApp app = app0.setPosInOccurrence ( pos );
 	/*
-	ListOfSVInstantiations sviList=taclet.matchIf
+	IList<SVInstantiations> sviList=taclet.matchIf
 	    (seq, taclet.match(semiseq.get(0).formula(), taclet.find(),
 			       MatchConditions.EMPTY_MATCHCONDITIONS,
 			       null, Constraint.BOTTOM), null);
@@ -283,7 +283,7 @@ public class TestCollisionResolving extends TestCase {
 
     public void testNameConflictAfterInput() {
 
-	TacletApp app = (NoPosTacletApp) TacletForTests.getTaclet
+	TacletApp app = TacletForTests.getTaclet
 	    ("TestCollisionResolving_name_conflict2");
 	TacletApp app1=app.prepareUserInstantiation();
 	assertSame(app, app1);
@@ -367,7 +367,7 @@ public class TestCollisionResolving extends TestCase {
 	PosInOccurrence pos=new PosInOccurrence(semiseq.get(1),
 						PosInTerm.TOP_LEVEL.down(0),
 						seq);
-	ListOfSVInstantiations sviList=taclet.matchIf
+	IList<SVInstantiations> sviList=taclet.matchIf
 	    (seq, taclet.match(semiseq.get(1).formula().sub(0), taclet.find(),
 			     taclet.createInitialInstantiation()));
 	TacletApp app 

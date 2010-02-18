@@ -10,6 +10,8 @@
 
 package de.uka.ilkd.key.java.declaration;
 
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.abstraction.*;
@@ -108,7 +110,7 @@ public class ArrayDeclaration
         if (modArray != null) {
             len = modArray.size();
             if (len > index) {
-                return modArray.getModifier(index);
+                return modArray.get(index);
             }
             index -= len;
         }
@@ -121,7 +123,7 @@ public class ArrayDeclaration
             index--;
         }
         if (members != null) {
-            return members.getMemberDeclaration(index);
+            return members.get(index);
         }
         throw new ArrayIndexOutOfBoundsException();
     }
@@ -204,7 +206,7 @@ public class ArrayDeclaration
 	}
 	if(javaBasetype instanceof ArrayDeclaration){
 	    return new ProgramElementName
-		("["+((ArrayType)javaBasetype).getFullName());	    
+		("["+ javaBasetype.getFullName());
 	} else if (javaBasetype instanceof TypeDeclaration) {
 	    return new ProgramElementName("[L"+javaBasetype.getFullName());
 	} else if (javaBasetype instanceof PrimitiveType) {
@@ -224,7 +226,7 @@ public class ArrayDeclaration
                         getAlternativeNameRepresentation());                
             } else {
                 if (baseType instanceof ClassType) {
-                    alt.append(((ClassType)baseType).getFullName());
+                    alt.append(baseType.getFullName());
                 } else {                   
                     alt.append(baseType.getName());
                 }
@@ -239,8 +241,8 @@ public class ArrayDeclaration
     /** 
      * returns the local declared supertypes
      */
-    public ListOfKeYJavaType getSupertypes() {
-	return SLListOfKeYJavaType.EMPTY_LIST.append(superType);
+    public ImmutableList<KeYJavaType> getSupertypes() {
+	return ImmutableSLList.<KeYJavaType>nil().append(superType);
     }
 
     /** 

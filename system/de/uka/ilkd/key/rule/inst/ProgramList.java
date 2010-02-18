@@ -16,21 +16,22 @@
 // See LICENSE.TXT for details.
 package de.uka.ilkd.key.rule.inst;
 
-import de.uka.ilkd.key.java.ArrayOfProgramElement;
+import de.uka.ilkd.key.collection.ImmutableArray;
+import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
 
 public class ProgramList implements SVSubstitute {
 
-    private final ArrayOfProgramElement list;
+    private final ImmutableArray<ProgramElement> list;
 
 
-    public ProgramList(ArrayOfProgramElement list) {
+    public ProgramList(ImmutableArray<ProgramElement> list) {
 	assert list != null : "Constructor of ProgramList must"+
             " not be called with null argument";
         this.list = list;
     }
 
-    public ArrayOfProgramElement getList() {
+    public ImmutableArray<ProgramElement> getList() {
 	return list;
     }
     

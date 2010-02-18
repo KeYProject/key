@@ -5,15 +5,6 @@
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
-//
-//
-//This file is part of KeY - Integrated Deductive Software Design 
-//Copyright (C) 2001-2003 Universitaet Karlsruhe, Germany
-//                      and Chalmers University of Technology, Sweden
-//
-//The KeY system is protected by the GNU General Public License.
-//See LICENSE.TXT for details.
-//
 
 package de.uka.ilkd.key.rule.export.html;
 
@@ -25,6 +16,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.zip.GZIPOutputStream;
 
+import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.gui.Main;
 import de.uka.ilkd.key.rule.export.*;
 import de.uka.ilkd.key.util.KeYResourceManager;
@@ -268,13 +260,13 @@ public abstract class HTMLFile extends HTMLContainer {
     }
 
     protected void writeTacletOptions ( StringBuffer out, TacletModelInfo t ) {
-        final ListOfOptionModelInfo options = t.getOptions ();
+        final ImmutableList<OptionModelInfo> options = t.getOptions ();
         
         writeOptionList ( out, options );
     }
 
-    protected void writeOptionList ( StringBuffer out, ListOfOptionModelInfo options ) {
-        final IteratorOfOptionModelInfo it = options.iterator();
+    protected void writeOptionList ( StringBuffer out, ImmutableList<OptionModelInfo> options ) {
+        final Iterator<OptionModelInfo> it = options.iterator();
         boolean first = true;
         while ( it.hasNext() ) {
             final OptionModelInfo opt = it.next ();

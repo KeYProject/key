@@ -19,24 +19,24 @@
 
 package de.uka.ilkd.key.logic;
 
-import de.uka.ilkd.key.logic.op.IteratorOfProgramMethod;
-import de.uka.ilkd.key.logic.op.ListOfProgramMethod;
+import java.util.Iterator;
+
+import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
 
 public class MethodStackInfo implements NameCreationInfo {
 
-    ListOfProgramMethod methods;
+    ImmutableList<ProgramMethod> methods;
     
-    public MethodStackInfo(ListOfProgramMethod methods) {
+    public MethodStackInfo(ImmutableList<ProgramMethod> methods) {
         this.methods = methods;
     }
 
     public String infoAsString() {
         String result = "Method stack:\n";
 
-        IteratorOfProgramMethod it = methods.iterator();
-        while(it.hasNext()) {
-            ProgramMethod m = it.next();
+        for (ProgramMethod method : methods) {
+            ProgramMethod m = method;
             result += "- " + m.getProgramElementName().toString() + "\n";
         }
 

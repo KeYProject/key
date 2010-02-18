@@ -11,6 +11,10 @@ package de.uka.ilkd.key.visualization;
 
 import java.util.*;
 
+import de.uka.ilkd.key.collection.ImmutableArray;
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.gui.Main;
+import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.reference.IExecutionContext;
 import de.uka.ilkd.key.java.reference.MethodReference;
@@ -22,7 +26,6 @@ import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.AbstractSort;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.proof.IteratorOfNode;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.ProgVarReplacer;
 import de.uka.ilkd.key.rule.*;
@@ -35,6 +38,10 @@ import de.uka.ilkd.key.util.ExtList;
 public class SimpleVisualizationStrategy implements VisualizationStrategy {
 
     static boolean DEBUG = false;
+    /**Set this to true if you want to show a warning to the user. If this field
+     * is true already, then don't show a warning to the user. In this way we
+     * can reduce number of warning popups shown to the user. */
+    private boolean warningOccured = false;
 
     /** used to extract branch labels
      */
@@ -73,11 +80,11 @@ public class SimpleVisualizationStrategy implements VisualizationStrategy {
             final ContextTraceElement[] children = cte.getParent().getChildren();
             
             int n = 0;
-            for (int i = 0; i < children.length; i++) {
-                if (pos.equals(children[i].getSrcElement().getPositionInfo())) {
+            for (ContextTraceElement aChildren : children) {
+                if (pos.equals(aChildren.getSrcElement().getPositionInfo())) {
                     n++;
                 }
-                if (children[i] == cte) {
+                if (aChildren == cte) {
                     break;
                 }
             }
@@ -153,7 +160,14 @@ public class SimpleVisualizationStrategy implements VisualizationStrategy {
    
     private int countJavaBlocks(Term t) {
         int p = 0;
-        if (t.javaBlock() != JavaBlock.EMPTY_JAVABLOCK){
+        // mbender
+        // 'if (!t.javaBlock().isEmpty())' had to be switched back as it behaves
+        // differently than
+        // 'if (t.javaBlock() != JavaBlock.EMPTY_JAVABLOCK)'
+        // That is if a JavaBlock contains an empty StatementBlock
+        // 't.javaBlock() != JavaBlock.EMPTY_JAVABLOCK' is true but
+        // '!t.javaBlock().isEmpty()' is false
+        if (t.javaBlock() != JavaBlock.EMPTY_JAVABLOCK) {
             p++;
         }
         for (int i = 0; i < t.arity(); i++) {
@@ -196,15 +210,14 @@ public class SimpleVisualizationStrategy implements VisualizationStrategy {
         if (getJavaBlocks(currentNode.sequent(), ignoreAntec).length>0){
             Occ[] javaBlocks = getJavaBlocks(currentNode.sequent(), ignoreAntec);
 	    jbInLastNode = true;
-            for (int i = 0; i < javaBlocks.length; i++) {
-                ExecutionTraceModel etm = 
-                    getExecutionTraceModel(currentNode, javaBlocks[i],ExecutionTraceModel.TYPE1);
-                if (etm!=null) {
+            for (Occ javaBlock : javaBlocks) {
+                ExecutionTraceModel etm =
+                        getExecutionTraceModel(currentNode, javaBlock, ExecutionTraceModel.TYPE1);
+                if (etm != null) {
                     executionTraceModelsList.add(etm);
                 }
             }
         }
-
         // traces of modalities that ended "on the way" to Node node
         while (!currentNode.root() && !ignoreNodes.contains(currentNode)) {
             final LinkedList types = new LinkedList();
@@ -223,11 +236,9 @@ public class SimpleVisualizationStrategy implements VisualizationStrategy {
 	    ignoreNodes.add(currentNode);
             currentNode = currentNode.parent();
        }
-
         final ExecutionTraceModel[] exTraceModels = 
             removeRedundandTraces((ExecutionTraceModel[])executionTraceModelsList.
                     toArray(new ExecutionTraceModel[executionTraceModelsList.size()]));
-        
         printTraces(exTraceModels);
         
         return new VisualizationModel(node, exTraceModels);
@@ -238,7 +249,7 @@ public class SimpleVisualizationStrategy implements VisualizationStrategy {
      * sequent of Node n
      */
 
-    private ExecutionTraceModel extractExecutionTrace(Node node, Occ occ,
+    protected ExecutionTraceModel extractExecutionTrace(Node node, Occ occ,
             Integer type) {              
         TraceElement firstTraceElement = null;
         TraceElement lastTraceElement = TraceElement.END;        
@@ -321,7 +332,7 @@ public class SimpleVisualizationStrategy implements VisualizationStrategy {
         if (lastTraceElement != TraceElement.END) {
             return new ExecutionTraceModel(lastTraceElement, firstTraceElement,
                     (ContextTraceElement) lastSource, rating, currentNode,
-                    node, type, occ);
+                    node, type);
         }
         return null;
     }
@@ -340,12 +351,16 @@ public class SimpleVisualizationStrategy implements VisualizationStrategy {
      *            offset that is added to the occurrences, needed for recursion
      * @return a list containing the occurrences of the java blocks in the term   
      */
-    private LinkedList findJavaBlocks(boolean ant, int cfm, Term t, int pos) {
+    protected LinkedList findJavaBlocks(boolean ant, int cfm, Term t, int pos) {
         LinkedList ll = new LinkedList();
-
         int p = pos;
-        if (t.javaBlock() != JavaBlock.EMPTY_JAVABLOCK) {
-            ll.add(new Occ(ant,cfm,p));
+        if (!t.javaBlock().isEmpty()) {
+            /*Occ objects additionally store the term with the javablock
+             * that shall be traced. This information is important for the
+             * implementation of extractExecutionTrace in class
+             * VisualizationStrategyForTesting.
+             */
+            ll.add(new Occ(ant,cfm,p, t));
             p++;        
         }
         
@@ -368,7 +383,7 @@ public class SimpleVisualizationStrategy implements VisualizationStrategy {
     }
 
 
-    private SourceElement getActStatement(Node n) {
+    protected SourceElement getActStatement(Node n) {
         SourceElement statement = n.getNodeInfo().getActiveStatement();
         while ((statement instanceof ProgramPrefix)||
                 statement instanceof ProgramElementName) {
@@ -380,7 +395,7 @@ public class SimpleVisualizationStrategy implements VisualizationStrategy {
         return statement;
     }
       
-    private IExecutionContext getExecutionContext(SourceElement cp) {
+    protected IExecutionContext getExecutionContext(SourceElement cp) {
         MethodFrame frame = getMethodFrame(cp);
         if (frame != null) {
             return frame.getExecutionContext();
@@ -421,9 +436,9 @@ public class SimpleVisualizationStrategy implements VisualizationStrategy {
             // if parent is null then nodeIndex has been set to -1 and 
             // this branch is not entered
             if (parent.getAppliedRuleApp() instanceof TacletApp) {
-                final ListOfTacletGoalTemplate l = 
+                final ImmutableList<TacletGoalTemplate> l = 
                     ((TacletApp) parent.getAppliedRuleApp()).taclet().goalTemplates();
-                final TacletGoalTemplate[] gt = l.toArray();
+                final TacletGoalTemplate[] gt = l.toArray(new TacletGoalTemplate[l.size()]);
                 if (gt == null || gt.length == 0) {
                     return null;
                 }
@@ -442,13 +457,13 @@ public class SimpleVisualizationStrategy implements VisualizationStrategy {
     private Occ[] getJavaBlocks(Sequent sequent, boolean ignoreAntec) {
         LinkedList list = new LinkedList();
         
-        final IteratorOfConstrainedFormula iterator = sequent.succedent().iterator();        
+        final Iterator<ConstrainedFormula> iterator = sequent.succedent().iterator();        
         for (int i = 0; iterator.hasNext(); i++) {            
             list.addAll(findJavaBlocks(false, i , iterator.next().formula(), 0));
         } 
 
         if (!ignoreAntec) {
-            final IteratorOfConstrainedFormula antec = sequent.antecedent().iterator();
+            final Iterator<ConstrainedFormula> antec = sequent.antecedent().iterator();
             for (int i = 0; antec.hasNext(); i++) {
                 list.addAll(findJavaBlocks(true, i, antec.next().formula(), 0));              
             }
@@ -469,7 +484,7 @@ public class SimpleVisualizationStrategy implements VisualizationStrategy {
     private ExtList getList(TacletGoalTemplate tgt){
         ExtList templateList = new ExtList();
                
-        List sequents = new LinkedList();
+        List<Sequent> sequents = new LinkedList<Sequent>();
         
         if (tgt instanceof RewriteTacletGoalTemplate) {           
             templateList.addAll(getList(((RewriteTacletGoalTemplate) tgt).replaceWith()));
@@ -480,12 +495,10 @@ public class SimpleVisualizationStrategy implements VisualizationStrategy {
         assert tgt.sequent() != null : "Sequent should always be != null"; 
         
         sequents.add(tgt.sequent());
-        
-        for (Iterator sequentIt = sequents.iterator(); sequentIt.hasNext(); ) {
-            final Sequent seq = (Sequent) sequentIt.next();            
-            final IteratorOfConstrainedFormula it = seq.iterator();
-            while (it.hasNext()) {              
-                templateList.addAll(getList(it.next().formula()));
+
+        for (Sequent seq : sequents) {
+            for (final ConstrainedFormula cf : seq) {
+                templateList.addAll(getList(cf.formula()));
             }
         }
         return templateList;
@@ -525,7 +538,7 @@ public class SimpleVisualizationStrategy implements VisualizationStrategy {
      * <tt>context</tt> 
      * @param context the SourceElement 
      */
-    private MethodFrame getMethodFrame(SourceElement context) {
+    protected MethodFrame getMethodFrame(SourceElement context) {
         SourceElement se = context;
         MethodFrame frame = null;
        
@@ -608,7 +621,7 @@ public class SimpleVisualizationStrategy implements VisualizationStrategy {
     	if (!(n.getAppliedRuleApp()instanceof PosTacletApp)) {
             return null;
 	}
-        final PosInOccurrence pio = ((PosTacletApp)n.getAppliedRuleApp()).posInOccurrence();
+        final PosInOccurrence pio = n.getAppliedRuleApp().posInOccurrence();
 
         final Semisequent semisequent;
 
@@ -622,27 +635,26 @@ public class SimpleVisualizationStrategy implements VisualizationStrategy {
         final int jb = getSubformulaOccurrence(pio.constrainedFormula().formula(),
 					       pio.posInTerm().iterator());
 
-        return new Occ(pio.isInAntec(), formulaIndex, jb);
+        return new Occ(pio.isInAntec(), formulaIndex, jb, pio.subTerm());
     }
     
 
 
-    /**
-     * 
-     * @param t
+    /**@param t
      * @param inst
      * @return the occurrence of the first Java block in the instantiation of 
      *          term t
+     * @note gladisch: It is unclear if an occurrence according to Def 4.
+     * or according to Def. 5 is returned (see Minor Thesis of Markus Baum).
      */
     private int getOccurrenceOfJavaBlock(Term t, SVInstantiations inst){       
         int p = 0;
-        final Iterator it = getList(t).iterator();        
-        while (it.hasNext()) {
-            final Object next = it.next();            
+        for (Object o : getList(t)) {
+            final Object next = o;
             int jbs = 0;
-            if (next instanceof SchemaVariable) {             
-                Object instantiation = 
-                    inst.getInstantiation((SchemaVariable) next);
+            if (next instanceof SchemaVariable) {
+                Object instantiation =
+                        inst.getInstantiation((SchemaVariable) next);
                 if (instantiation instanceof Term) {
                     jbs = countJavaBlocks((Term) instantiation);
                 }
@@ -655,6 +667,44 @@ public class SimpleVisualizationStrategy implements VisualizationStrategy {
         return -1;
     }
 
+    /**This method is a variant of method {@code getOccurrenceOfJavaBlock}.
+     * The purpose of this method in the class is to compute the field{@code jbt}
+     * of {@code Occ}.
+     * @param t term with Schema Variables
+     * @param inst Instantiation of the Schema Variables
+     * @return Should return the first term with a JavaBlock because
+     * it is analogously implemented to {@code getOccurrenceOfJavaBlock}.
+     * @author gladisch
+     */
+    private Term getTermWithJavaBlock(Term t, SVInstantiations inst){
+        int p = 0;
+        for (Object o : getList(t)) {
+            final Object next = o;
+            int jbs = 0;
+            if (next instanceof SchemaVariable) {
+                Object instantiation =
+                        inst.getInstantiation((SchemaVariable) next);
+                if (instantiation instanceof Term) {
+                    jbs = countJavaBlocks((Term) instantiation);
+                }
+            } else {
+                Term subt = t;
+                if (subt.javaBlock() == null && !warningOccured) {
+                    warningOccured = true;
+                    String tStr = t.toString();
+                    tStr = tStr.length() > 160 ? tStr.substring(0, 160) + " ..." : tStr;
+                    String subtStr = subt.toString();
+                    subtStr = subtStr.length() > 160 ? subtStr.substring(0, 160) + " ..." : subtStr;
+                    Main.getInstance().notify(new GeneralFailureEvent("Warning: SimpleVisualizationStrategy.getTermWithJavaBlock " +
+                            "returns a term without a JavaBlock.\n Variable p=" + p + "\n Given term=" + subtStr));
+                }
+                return (Term) next;
+            }
+            p += jbs;
+        }
+        
+        return null;
+    }
   
     
     /**
@@ -730,26 +780,24 @@ public class SimpleVisualizationStrategy implements VisualizationStrategy {
         // index to schematic formula
         final HashMap index2cfm = new HashMap();
  
-        final TacletApp tacletApp = (TacletApp)n.parent().getAppliedRuleApp();        
-        final IteratorOfConstrainedFormula it = 
-            (antec ? schemaSeq.antecedent() : schemaSeq.succedent()).iterator();
-       
-        while (it.hasNext()) {
-            final ConstrainedFormula cfm = it.next();
-            
+        final TacletApp tacletApp = (TacletApp)n.parent().getAppliedRuleApp();
 
-            final ConstrainedFormula newCfm = 
-                instantiateReplacement(cfm, tacletApp.matchConditions(), 
-                    services);
-            
+        for (Object o : (antec ? schemaSeq.antecedent() : schemaSeq.succedent())) {
+            final ConstrainedFormula cfm = (ConstrainedFormula) o;
+
+
+            final ConstrainedFormula newCfm =
+                    instantiateReplacement(cfm, tacletApp.matchConditions(),
+                            services);
+
             int index = antec ? indexOf(n.sequent().antecedent(), newCfm) :
-                indexOf(n.sequent().succedent(), newCfm);
-           
-            if (index==-1) {
-                 print("Proof Visualization WARNING: CFM INST NOT FOUND: ", cfm);
-                 print("instantiated with ", newCfm);
+                    indexOf(n.sequent().succedent(), newCfm);
+
+            if (index == -1) {
+                print("Proof Visualization WARNING: CFM INST NOT FOUND: ", cfm);
+                print("instantiated with ", newCfm);
             } else {
-                index2cfm.put(new Integer(index),cfm);
+                index2cfm.put(new Integer(index), cfm);
             }
         }
         
@@ -815,7 +863,7 @@ public class SimpleVisualizationStrategy implements VisualizationStrategy {
     private int getSubformulaOccurrence(Term t, IntIterator it){
         int result = 0;
         if (it.hasNext()) {
-            if (t.javaBlock() != JavaBlock.EMPTY_JAVABLOCK){
+            if (!t.javaBlock().isEmpty()){
                 result++;
             }
             
@@ -926,11 +974,9 @@ public class SimpleVisualizationStrategy implements VisualizationStrategy {
                     return new Occ[0];
                 }               
                 
-                ExtList otherTgts = new ExtList();     
-                final IteratorOfTacletGoalTemplate it = 
-                    tacletApp.taclet().goalTemplates().iterator();
-                while (it.hasNext()) {
-                    final TacletGoalTemplate currentTgt = it.next();
+                ExtList otherTgts = new ExtList();
+                for (TacletGoalTemplate tacletGoalTemplate : tacletApp.taclet().goalTemplates()) {
+                    final TacletGoalTemplate currentTgt = tacletGoalTemplate;
                     if (!currentTgt.equals(tgt)) {
                         otherTgts.addAll(getList(currentTgt));
                     }
@@ -945,30 +991,30 @@ public class SimpleVisualizationStrategy implements VisualizationStrategy {
                 final Occ occOfFind = getOccOfFind(parent);
                 
                 final SVInstantiations inst = tacletApp.instantiations();
-                final Iterator findIterator = findList.iterator();                
-                while (findIterator.hasNext()) {
-                    Object current = findIterator.next();
+                for (Object aFindList : findList) {
+                    Object current = aFindList;
                     if (current instanceof SchemaVariable) {
                         SchemaVariable sv = (SchemaVariable) current;
                         int occOfSV = getOccurrenceOfSV(findTerm, sv, inst);
                         if (occOfSV > -1
                                 && inst.getInstantiation(sv) instanceof Term) {
-                            
-                            int jbCount = 
-                                countJavaBlocks((Term) inst.getInstantiation(sv));
-                            
-                            final Integer type = otherTgts.contains(sv) ? 
-                                    ExecutionTraceModel.TYPE2 
-                                    : ExecutionTraceModel.TYPE1;                          
-                            
+
+                            int jbCount =
+                                    countJavaBlocks((Term) inst.getInstantiation(sv));
+
+                            final Integer type = otherTgts.contains(sv) ?
+                                    ExecutionTraceModel.TYPE2
+                                    : ExecutionTraceModel.TYPE1;
+
                             for (int i = 0; i < jbCount; i++) {
-                                Occ newOcc = new Occ(occOfFind.ant, 
-                                        occOfFind.cfm, occOfFind.jb + occOfSV + i);                                
+                                Occ newOcc = new Occ(occOfFind.ant,
+                                        occOfFind.cfm, occOfFind.jb + occOfSV + i,
+                                        (Term) inst.getInstantiation(sv));  //chrisg                              
                                 result.add(newOcc);
                                 types.add(type);
                             }
                         }
-                    } else {                                
+                    } else {
                         result.add(occOfFind.copy());
                         types.add(ExecutionTraceModel.TYPE1);
                     }
@@ -989,11 +1035,10 @@ public class SimpleVisualizationStrategy implements VisualizationStrategy {
      * @return returns findList (attention same object as first parameter)
      */
     private ExtList removeCommonSVsOrPrograms(ExtList findList, ExtList templateList) {
-        final JavaBlock first = (JavaBlock) findList.get(JavaBlock.class);               
-        final Iterator iterator = templateList.iterator();
-                          
-        while (iterator.hasNext()) {
-            Object current = iterator.next();
+        final JavaBlock first = (JavaBlock) findList.get(JavaBlock.class);
+
+        for (Object aTemplateList : templateList) {
+            Object current = aTemplateList;
             print(current);
             if (current instanceof SchemaVariable) {
                 if (findList.contains(current)) {
@@ -1020,7 +1065,7 @@ public class SimpleVisualizationStrategy implements VisualizationStrategy {
      */
  
     private int indexOf(Semisequent semi, ConstrainedFormula toFind){
-        final IteratorOfConstrainedFormula iterator = semi.iterator();        
+        final Iterator<ConstrainedFormula> iterator = semi.iterator();        
         int i=0;
         while (iterator.hasNext()) {
             final ConstrainedFormula cfm = iterator.next();
@@ -1072,7 +1117,7 @@ public class SimpleVisualizationStrategy implements VisualizationStrategy {
      * @return true iff se is associated with a ParentContextTraceElment.
      *         This means that se contains statements or a method invokation
      */    
-    private boolean isParentContextTE(SourceElement se) {
+    protected boolean isParentContextTE(SourceElement se) {
         if (se instanceof MethodReference 
                 || se instanceof LoopStatement
                 || se instanceof BranchStatement) {
@@ -1105,7 +1150,7 @@ public class SimpleVisualizationStrategy implements VisualizationStrategy {
      *         and the occurrence result of the Java block in the parent node 
      */
     
-    private boolean occInParent(Node n, Occ occ, Occ result){
+    protected boolean occInParent(Node n, Occ occ, Occ result){
       
         print("Node "+n.serialNr()+ "  Occ: ", occ);
         final Node parent = n.parent();          
@@ -1144,7 +1189,7 @@ public class SimpleVisualizationStrategy implements VisualizationStrategy {
             }
             // otherwise occ occurres in parent
             result.set(occ.ant, 
-                    getIndexOfUnchangedFormula(n, occ.ant, occ.cfm), occ.jb);           
+                    getIndexOfUnchangedFormula(n, occ.ant, occ.cfm), occ.jb, occ.jbt);           
             print("Occ was not changed or added");
             return false;
         }
@@ -1162,7 +1207,7 @@ public class SimpleVisualizationStrategy implements VisualizationStrategy {
                     pta, index2cfmAnt, index2cfmSuc);
         }
         
-        result.set(occ.ant, occ.cfm, occ.jb);       
+        result.set(occ.ant, occ.cfm, occ.jb, occ.jbt);       
         return false;
   }
 
@@ -1190,7 +1235,7 @@ public class SimpleVisualizationStrategy implements VisualizationStrategy {
         if (newCfm == -1) {
             newCfm = indexOfUpSimpl;
         }
-        result.set(occ.ant, newCfm, occ.jb);
+        result.set(occ.ant, newCfm, occ.jb, occ.jbt);
         return false;
     }
 
@@ -1253,8 +1298,23 @@ public class SimpleVisualizationStrategy implements VisualizationStrategy {
                 print("Occurrence in Schema Variable: " + occInSV.sv
                         + "   occ ", occInSV.occ);
                 if (occInSV.isJavaBlock) {
-                    result.set(occOfFind.ant, occOfFind.cfm, 
-                            getOccurrenceOfJavaBlock(findTerm, inst));                   
+		    // author: mbender
+		    // Bugfix implemented by Christoph Gladisch caused an
+		    // exception (Cannot cast JavaBlock to Term) if the proof
+		    // tree contained the application of the invariant rule
+                    
+		    // result.set(occOfFind.ant, occOfFind.cfm,
+		    // getOccurrenceOfJavaBlock(findTerm, inst),
+		    // getTermWithJavaBlock(findTerm, inst));
+
+		    // This looks like a solution for the above mentioned bug,
+		    // but due to the complexity code we are not
+		    // sure if findTerm really equals the javablock-term in all
+		    // cases
+                    
+		    result.set(occOfFind.ant, occOfFind.cfm,
+			    getOccurrenceOfJavaBlock(findTerm, inst),
+			    findTerm);
                     return true;
                 } else {
                     occOfSV = getOccurrenceOfSV(findTerm, occInSV.sv, inst);
@@ -1271,7 +1331,7 @@ public class SimpleVisualizationStrategy implements VisualizationStrategy {
             }
             
             print("Occurrence of sv in find ", occOfSV);
-            result.set(occOfFind.ant, occOfFind.cfm, occOfSV + occInSV.occ);            
+            result.set(occOfFind.ant, occOfFind.cfm, occOfSV + occInSV.occ, occOfFind.jbt);            
             return false;
         } else {
             // Case 1
@@ -1283,7 +1343,7 @@ public class SimpleVisualizationStrategy implements VisualizationStrategy {
                 newCfm = occ.cfm;
             }
 
-            result.set(occ.ant, newCfm, occ.jb);            
+            result.set(occ.ant, newCfm, occ.jb, occ.jbt);            
             return false;
         }
     }
@@ -1394,7 +1454,7 @@ public class SimpleVisualizationStrategy implements VisualizationStrategy {
                     if (occ.jb >= occOfFind.jb+javaBlocksInRepl) {
                         print("occ after replace");
                         result.set(occOfFind.ant, occOfFind.cfm, 
-                                occ.jb+(javaBlocksInFind-javaBlocksInRepl));                       
+                                occ.jb+(javaBlocksInFind-javaBlocksInRepl),occOfFind.jbt);                       
                         return false;
                     }
                     
@@ -1414,7 +1474,7 @@ public class SimpleVisualizationStrategy implements VisualizationStrategy {
             } else {
                 // Case 1
                 result.set(occ.ant, 
-                        getIndexOfUnchangedFormula(n, occ.ant, occ.cfm), occ.jb);
+                        getIndexOfUnchangedFormula(n, occ.ant, occ.cfm), occ.jb, occ.jbt);
                 print("Occ was not changed or added");
                 return false;
             }
@@ -1422,19 +1482,19 @@ public class SimpleVisualizationStrategy implements VisualizationStrategy {
         }
     }
     
-    private void  print(Object o, Object o2){
+    protected void  print(Object o, Object o2){
         if (DEBUG) {
             System.out.println(o+""+o2);
         }
     }   
     
-    private void  print(Object o, int i){
+    protected void  print(Object o, int i){
         if (DEBUG) {
             System.out.println(o+""+i);
         }
     }  
 
-    private void  print(Object o){
+    protected void  print(Object o){
         if (DEBUG) {
             System.out.println(o);
         }
@@ -1446,12 +1506,12 @@ public class SimpleVisualizationStrategy implements VisualizationStrategy {
     private void printTraces(ExecutionTraceModel[] exTraceModels) {        
         if (DEBUG) {
             print("Number of traces ", exTraceModels.length);
-            for(int i=0;i<exTraceModels.length;i++){
-                print("Trace Start ", exTraceModels[i].getFirstNode().serialNr());
-                print("      End "  , exTraceModels[i].getLastNode().serialNr());
-                print("Type ", exTraceModels[i].getType());
-                TraceElement te= exTraceModels[i].getFirstTraceElement();
-                while(te!=TraceElement.END){
+            for (ExecutionTraceModel exTraceModel : exTraceModels) {
+                print("Trace Start ", exTraceModel.getFirstNode().serialNr());
+                print("      End ", exTraceModel.getLastNode().serialNr());
+                print("Type ", exTraceModel.getType());
+                TraceElement te = exTraceModel.getFirstTraceElement();
+                while (te != TraceElement.END) {
                     print("", te.node().serialNr());
                     te = te.getNextInProof();
                 }
@@ -1525,14 +1585,13 @@ public class SimpleVisualizationStrategy implements VisualizationStrategy {
      * @return a sequent that is the result of renaming variables in the order
      *          the renamings appear in the list;
      */
-    private Semisequent rename(Semisequent semi, ListOfRenamingTable renamings){
+    private Semisequent rename(Semisequent semi, ImmutableList<RenamingTable> renamings){
         if (renamings!=null){
-            IteratorOfRenamingTable it = renamings.iterator();
-            while (it.hasNext()){
-                RenamingTable rt =  it.next();
+            for (RenamingTable renaming : renamings) {
+                RenamingTable rt = renaming;
                 HashMap hm = rt.getHashMap();
                 ProgVarReplacer pvr = new ProgVarReplacer(hm, services);
-                SemisequentChangeInfo sci =pvr.replace(semi);
+                SemisequentChangeInfo sci = pvr.replace(semi);
                 semi = sci.semisequent();
             }
         }
@@ -1541,14 +1600,13 @@ public class SimpleVisualizationStrategy implements VisualizationStrategy {
 
     
     
-    private Term rename(Term formula,ListOfRenamingTable renamings){
+    private Term rename(Term formula,ImmutableList<RenamingTable> renamings){
         if (renamings!=null){
-            IteratorOfRenamingTable it = renamings.iterator();
-            while (it.hasNext()){
-                RenamingTable rt = it.next();
-		HashMap hm = rt.getHashMap();
-		ProgVarReplacer pvr = new ProgVarReplacer(hm, services);
-		formula = pvr.replace(formula);
+            for (RenamingTable renaming : renamings) {
+                RenamingTable rt = renaming;
+                HashMap hm = rt.getHashMap();
+                ProgVarReplacer pvr = new ProgVarReplacer(hm, services);
+                formula = pvr.replace(formula);
             }
         }
         return formula;
@@ -1580,7 +1638,7 @@ public class SimpleVisualizationStrategy implements VisualizationStrategy {
     private boolean tacletWithLabel(Node n, String ruleSet) {
         if (n.getAppliedRuleApp() instanceof TacletApp) {
             final Name ruleSetName = new Name(ruleSet); 
-            final IteratorOfRuleSet rs =  ((TacletApp) n.getAppliedRuleApp()).taclet().ruleSets();
+            final Iterator<RuleSet> rs =  ((TacletApp) n.getAppliedRuleApp()).taclet().ruleSets();
     
             while (rs.hasNext()) {
                 if (rs.next().name().equals(ruleSetName)) {
@@ -1649,8 +1707,8 @@ public class SimpleVisualizationStrategy implements VisualizationStrategy {
         if (it.hasNext()) {         
             int sub = it.next();
             
-            ArrayOfQuantifiableVariable[] origvars = 
-                new ArrayOfQuantifiableVariable[term.arity()];
+            ImmutableArray<QuantifiableVariable>[] origvars = 
+                new ImmutableArray[term.arity()];
             final Term[] subs = new Term[term.arity()];
             
             boolean containsBoundVar = false;
@@ -1745,21 +1803,43 @@ public class SimpleVisualizationStrategy implements VisualizationStrategy {
     public class Occ{
 
         public boolean ant;
-        public int cfm, jb;
-
+        /**Occurrence of the formula in the subsequent*/
+        public int cfm;
+        /**This is unclear. Is this the "Subformula Occurence" of the term
+         * with the JavaBlock (according to Def. 4) or is it rather a 
+         * "Java Block Occurence in a Formula" (according to Def. 5). 
+         * getSubformulaOccurrence seems to give a "Java Block Occurence in a formula"
+         * but getOccurrenceOfJavaBlock seems to give a "Subformula Occurrence".
+         * See Minor Thesis of Markus Baum.*/
+        public int jb;
+        /** The term containing the JavaBlock that is described by this occurence object. 
+         * This term should have the runtime type ProgramTerm, but ProgramTerm is not
+         * visible in this package (There is maybe a reason for it). */
+        public Term jbt; 
+        
         /** @param ant determines if the Java block occures in 
          *         the antecedent or succedent of the sequent
          *  @param cfm the index of the formula in the semisequent
          *  @param jb determines the occurrence of the Java block
          *         in the formula
-         */
-        
+         */  
         public Occ(boolean ant, int cfm, int jb){
             set(ant, cfm, jb);
         }
+       
+        /**This is an extended constructor that is used by 
+         * VisualizationStrategyForTesting. 
+         * @author gladisch*/
+        public Occ(boolean ant, int cfm, int jb, Term jbt){
+            this(ant,cfm,jb);
+            if(jbt==null){
+                throw new RuntimeException("Term with JavaBlock is not specified.");
+            }
+            this.jbt = jbt;
+        }
         
         public void copy(Occ occ) {
-            set(occ.ant, occ.cfm, occ.jb);            
+            set(occ.ant, occ.cfm, occ.jb, occ.jbt);            
         }
 
         public void set(boolean p_ant, int p_cfm, int p_jb) {
@@ -1768,8 +1848,20 @@ public class SimpleVisualizationStrategy implements VisualizationStrategy {
             this.jb  = p_jb;
         }
 
+        public void set(boolean p_ant, int p_cfm, int p_jb, Term p_jbt) {
+            set(p_ant,p_cfm,p_jb);
+            this.jbt  = p_jbt;
+        }
+
         public Occ copy() {
-            return new Occ(ant, cfm, jb);
+            if(jbt==null){
+                //it is allowed to not instantiate jbt in the new occ if this original occ didn't have jbt instantiated.
+                return new Occ(ant, cfm, jb);
+            }else{
+                //If this occ has jbt instantiated then its copy has to have jbt instantiated as well.
+                //Otherwise the constructor throws an exception.
+                return new Occ(ant, cfm, jb, jbt);
+            }
         }
         
         public String toString(){

@@ -19,7 +19,12 @@
 
 package de.uka.ilkd.key.logic;
 
+import java.util.Iterator;
+
 import junit.framework.TestCase;
+import de.uka.ilkd.key.collection.ImmutableMapEntry;
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.StatementBlock;
@@ -29,14 +34,18 @@ import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.PrimitiveSort;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.proof.*;
-import de.uka.ilkd.key.rule.*;
+import de.uka.ilkd.key.rule.AntecTaclet;
+import de.uka.ilkd.key.rule.AntecTacletBuilder;
+import de.uka.ilkd.key.rule.NoPosTacletApp;
+import de.uka.ilkd.key.rule.UpdateSimplifier;
+import de.uka.ilkd.key.rule.inst.InstantiationEntry;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 
 public class TestVariableNamer extends TestCase {
 
-    private final Services services = new Services();
-    private final Proof proof = new Proof(services);
+    private final Proof proof = new Proof(new Services());
+    private final Services services = proof.getServices();
     private final ProgramVariable x     = constructProgramVariable("x");
     private final ProgramVariable xx    = constructProgramVariable("x");
     private final ProgramVariable y     = constructProgramVariable("y");
@@ -106,18 +115,17 @@ public class TestVariableNamer extends TestCase {
 
 
     private void addGlobal(Goal goal, ProgramVariable globalVar) {
- 	SetOfProgramVariable globals = goal.getGlobalProgVars().add(globalVar);
+ 	ImmutableSet<ProgramVariable> globals = goal.getGlobalProgVars().add(globalVar);
 	goal.setGlobalProgVars(globals);
     }
 
 
     private boolean inGlobals(Goal goal, ProgramVariable globalVar) {
-    	IteratorOfProgramVariable it = goal.getGlobalProgVars().iterator();
-	while(it.hasNext()) {
-	    if(it.next() == globalVar) {
-	    	return true;
-	    }
-	}
+        for (ProgramVariable programVariable : goal.getGlobalProgVars()) {
+            if (programVariable == globalVar) {
+                return true;
+            }
+        }
 	return false;
     }
     
@@ -143,23 +151,22 @@ public class TestVariableNamer extends TestCase {
     private boolean inTacletApps(Goal goal, ProgramVariable containedVar) {
 	RuleAppIndex ruleAppIndex = goal.ruleAppIndex();
 	TacletIndex tacletIndex = ruleAppIndex.tacletIndex();
-	ListOfNoPosTacletApp noPosTacletApps
+	ImmutableList<NoPosTacletApp> noPosTacletApps
 		= tacletIndex.getPartialInstantiatedApps();
 
-	IteratorOfNoPosTacletApp it = noPosTacletApps.iterator();
-	while(it.hasNext()) {
-	    SVInstantiations insts = it.next().instantiations();
-    	    IteratorOfEntryOfSchemaVariableAndInstantiationEntry it2;
-	    it2 = insts.pairIterator();
-	    while(it2.hasNext()) {
-	        EntryOfSchemaVariableAndInstantiationEntry e = it2.next();
-		Object inst = e.value().getInstantiation();
-		if(inst instanceof PostIncrement 
-		   && ((PostIncrement)inst).getFirstElement() == containedVar){
-		    return true;
-		}
-	    }
-	}
+        for (NoPosTacletApp noPosTacletApp : noPosTacletApps) {
+            SVInstantiations insts = noPosTacletApp.instantiations();
+            Iterator<ImmutableMapEntry<SchemaVariable, InstantiationEntry>> it2;
+            it2 = insts.pairIterator();
+            while (it2.hasNext()) {
+                ImmutableMapEntry<SchemaVariable, InstantiationEntry> e = it2.next();
+                Object inst = e.value().getInstantiation();
+                if (inst instanceof PostIncrement
+                        && ((PostIncrement) inst).getFirstElement() == containedVar) {
+                    return true;
+                }
+            }
+        }
 	
 	return false;
     }

@@ -10,8 +10,11 @@
 
 package de.uka.ilkd.key.rule.encapsulation;
 
+import java.util.Iterator;
 import java.util.Map;
 
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.logic.op.ArrayOp;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.sort.ObjectSort;
@@ -25,8 +28,8 @@ class TypeSchemeChecker {
                 = TypeSchemeUnion.ROOT;
 
     private final Map /*Location -> TypeSchemeTerm*/ annotations;
-    private ListOfTypeSchemeConstraint constraints
-                = SLListOfTypeSchemeConstraint.EMPTY_LIST;
+    private ImmutableList<TypeSchemeConstraint> constraints
+                = ImmutableSLList.<TypeSchemeConstraint>nil();
     private boolean failed = false;
 
     private int stringLitNameCounter   = 0;
@@ -74,15 +77,14 @@ class TypeSchemeChecker {
     }
 
     
-    private ListOfTypeSchemeConstraint dropTriviallyTrueConstraints(
-                                                ListOfTypeSchemeConstraint c) {
-        ListOfTypeSchemeConstraint result
-                        = SLListOfTypeSchemeConstraint.EMPTY_LIST;
-                        
-        IteratorOfTypeSchemeConstraint it = c.iterator();
-        while(it.hasNext()) {
-            TypeSchemeConstraint constraint = it.next();
-            if(constraint.getFreeVars().size() > 0 || !constraint.evaluate()) {
+    private ImmutableList<TypeSchemeConstraint> dropTriviallyTrueConstraints(
+                                                ImmutableList<TypeSchemeConstraint> c) {
+        ImmutableList<TypeSchemeConstraint> result
+                        = ImmutableSLList.<TypeSchemeConstraint>nil();
+
+        for (TypeSchemeConstraint aC : c) {
+            TypeSchemeConstraint constraint = aC;
+            if (constraint.getFreeVars().size() > 0 || !constraint.evaluate()) {
                 result = result.prepend(constraint);
             }
         }
@@ -101,10 +103,10 @@ class TypeSchemeChecker {
     }
 
      
-    public ListOfTypeSchemeConstraint getConstraints() {
+    public ImmutableList<TypeSchemeConstraint> getConstraints() {
         if(failed) {
             TypeSchemeConstraint fc = new TypeSchemeFalseConstraint();
-            return SLListOfTypeSchemeConstraint.EMPTY_LIST.append(fc);
+            return ImmutableSLList.<TypeSchemeConstraint>nil().append(fc);
         } else {
             return dropTriviallyTrueConstraints(constraints);
         }

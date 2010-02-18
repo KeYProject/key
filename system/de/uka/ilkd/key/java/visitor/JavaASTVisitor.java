@@ -499,6 +499,10 @@ public abstract class JavaASTVisitor extends JavaASTWalker
     public void performActionOnProgramVariable(ProgramVariable x) {
 	doDefaultAction(x);
     }
+    
+    public void performActionOnIProgramVariable(IProgramVariable x) {
+        doDefaultAction(x);
+    }
  
     public void performActionOnReturn(Return x) {
 	doDefaultAction(x);
