@@ -123,8 +123,8 @@ public class TacletTranslationSettingsDialog{
 	private static final int EDIT = 1;
 	
 	private static final String INFO_TEXT = 
-	    "Choose in this tab the taclets that should be passed" +
-	    " to the external prover. Changes in this tab have immediately " +
+	    "In this tab you can choose the taclets that should be passed" +
+	    " to the external provers. Changes in this tab have immediately " +
 	    "an effect" +
 	    " without pressing the OK-button.";
 	
@@ -488,7 +488,7 @@ public class TacletTranslationSettingsDialog{
 		if (selectionTree == null) {
 		    
 			selectionTree = new JTree();
-			selectionTree.setModel(UsedTaclets.getTreeModel());
+			selectionTree.setModel(UsedTaclets.INSTANCE.getTreeModel());
 			selectionTree.setCellRenderer(getTreeCellRenderer());
 			selectionTree.setCellEditor(getTreeCellEditor());
 			selectionTree.setEditable(true);
@@ -653,7 +653,7 @@ abstract class TreePanel extends JPanel{
 	
 	propergateToRoot(node, SelectionMode.user);
 	
-	UsedTaclets.validateSelectionModes();
+	UsedTaclets.INSTANCE.validateSelectionModes();
 
 	
 	

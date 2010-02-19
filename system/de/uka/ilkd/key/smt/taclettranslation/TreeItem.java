@@ -9,6 +9,8 @@
 //
 package de.uka.ilkd.key.smt.taclettranslation;
 
+import javax.jws.soap.SOAPBinding.Use;
+
 /**
  * TreeItem represents the user data in a tree model.
  * 
@@ -21,7 +23,7 @@ public class TreeItem {
     private int selectedChildCount = 0;
     private int childCount = 0;
     private int genericCount =0;
-
+    private UsedTaclets.Category category = UsedTaclets.Category.NO_CATEGORY;
     
 
     TreeItem(String text, int genericCount){
@@ -29,8 +31,9 @@ public class TreeItem {
 	this.genericCount = genericCount;
     }
 
-    TreeItem(String text){
+    TreeItem(String text, UsedTaclets.Category cat){
 	this.text = text;
+	this.category = cat;
     }
     
     TreeItem(String text, boolean checked){
@@ -41,6 +44,10 @@ public class TreeItem {
     
     
     
+    public UsedTaclets.Category getCategory() {
+        return category;
+    }
+
     public int getGenericCount(){
 	return genericCount;
     }

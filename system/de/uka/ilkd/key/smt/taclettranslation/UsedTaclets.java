@@ -11,6 +11,8 @@ package de.uka.ilkd.key.smt.taclettranslation;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
+
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeModel;
@@ -33,13 +35,21 @@ import de.uka.ilkd.key.smt.taclettranslation.TreeItem.SelectionMode;
  * 
  */
 public final class UsedTaclets {
+    
+    
+    public static final UsedTaclets INSTANCE = new UsedTaclets();
+    
     /**
      * The taclets that could be used for external provers.
      */
 
-    static private HashMap<String, TreeItem> tacletNames = new HashMap<String, TreeItem>();
+    private HashMap<String, TreeItem> tacletNames = new HashMap<String, TreeItem>();
+    
+    private UsedTaclets(){
+	getTreeModel();
+    }
 
-    private static TreeModel model = null;
+    private TreeModel model = null;
 
     /**
      * Use this field, to allow only special taclets that are listed in the
@@ -48,7 +58,7 @@ public final class UsedTaclets {
      * taclets listed in <code>contains</code> are used (should be the normal
      * case).
      */
-    static final private String testTaclets[] = {// "identical_object_equal_index"
+    final private String testTaclets[] = {// "identical_object_equal_index"
 
     };
 
@@ -56,7 +66,7 @@ public final class UsedTaclets {
      * 
      * @return returns the number of taclets that are supported.
      */
-    static public int getCount() {
+    public int getCount() {
 	return tacletNames.size();
     }
 
@@ -64,10 +74,23 @@ public final class UsedTaclets {
      * @return returns all taclets that are supported wrapped by
      *         {@link TreeItem}
      */
-    static public Collection<TreeItem> getTreeItems() {
-	getTreeModel();
+    public Collection<TreeItem> getTreeItems() {
 	return tacletNames.values();
     }
+    
+    /**
+     * 
+     */
+    public HashSet<String> getTacletNamesAsHash(){
+	HashSet<String> names = new HashSet<String>();
+	names.addAll(tacletNames.keySet());
+	return names;
+    }
+    
+    public Collection<String> getTacletNames(){
+	return tacletNames.keySet();
+    }
+    
 
     /**
      * Checks whether a taclet specified by its name can be used for external
@@ -77,9 +100,8 @@ public final class UsedTaclets {
      *            the name of the taclet
      * @return <code>true</code> if the taclet can be used for external provers.
      */
-    static boolean contains(String tacletname) {
+    boolean contains(String tacletname) {
 
-	getTreeModel();
 
 	boolean found = false;
 	if (testTaclets == null || testTaclets.length == 0) {
@@ -98,12 +120,44 @@ public final class UsedTaclets {
 
     }
 
-    private static TreeItem treeItem(TreeNode node) {
+    private TreeItem treeItem(TreeNode node) {
 	return (TreeItem) ((DefaultMutableTreeNode) node).getUserObject();
     }
     
+    private void selectNothing(){
+	for(TreeItem item : tacletNames.values()){
+	    item.setMode(SelectionMode.nothing);
+	}
+	
+    }
+    
+    public void selectCategory(Category cat){
+	selectNothing();
+	selectCategory(cat,(TreeNode)model.getRoot());
+	validateSelectionModes();
+    }
+    
+    private boolean selectCategory(Category cat, TreeNode node){
+	if(treeItem(node).getCategory() == cat){
+	    selectAll(node);
+	    return true;
+	}
+	for(int i=0; i < node.getChildCount(); i++){
+	    if(selectCategory(cat, node.getChildAt(i))){
+		return true;
+	    }
+	}
+	return false;
+    }
+    
+    private void selectAll(TreeNode node){
+	treeItem(node).setMode(SelectionMode.all);
+	for(int i=0; i < node.getChildCount(); i ++){
+	    selectAll(node.getChildAt(i));
+	}
+    }
 
-    public static void validateSelectionModes(){
+    public void validateSelectionModes(){
 	TreeModel model = getTreeModel();
 	validateSelectionMode((TreeNode)model.getRoot());
     }
@@ -111,7 +165,7 @@ public final class UsedTaclets {
     
 
     
-    private static SelectionMode validateSelectionMode(TreeNode node){
+    private SelectionMode validateSelectionMode(TreeNode node){
 	TreeItem item = treeItem(node);
 	if(node.isLeaf()){
 	    if(item.getMode() == SelectionMode.all){
@@ -153,7 +207,7 @@ public final class UsedTaclets {
     }
     
     
-    private static void addTaclet(DefaultMutableTreeNode node, String taclet, int genericCount){
+    private void addTaclet(DefaultMutableTreeNode node, String taclet, int genericCount){
 	addTaclet(node,taclet,true,genericCount);
     }
 
@@ -165,11 +219,11 @@ public final class UsedTaclets {
      * @param taclet
      *            the name of the taclet.
      */
-    private static void addTaclet(DefaultMutableTreeNode node, String taclet) {
+    private void addTaclet(DefaultMutableTreeNode node, String taclet) {
 	addTaclet(node, taclet, 0);
     }
 
-    private static void addTaclet(DefaultMutableTreeNode node, String taclet,
+    private  void addTaclet(DefaultMutableTreeNode node, String taclet,
 	    boolean checked, int genericCount) {
 	TreeItem child = new TreeItem(taclet, genericCount);
 	if (!tacletNames.containsKey(child.toString())) {
@@ -188,16 +242,36 @@ public final class UsedTaclets {
      *            the description of the node.
      * @return returns the created node.
      */
-    private static DefaultMutableTreeNode newNode(DefaultMutableTreeNode root,
-	    String text) {
+    private  DefaultMutableTreeNode newNode(DefaultMutableTreeNode root,
+	    String text, Category cat) {
 	DefaultMutableTreeNode node = new DefaultMutableTreeNode(new TreeItem(
-	        text));
+	        text,cat));
 	root.add(node);
 	return node;
     }
     
-
-
+    /** The category of taclets.*/
+    public enum Category  { ALL_SUPPORTED,
+	                     PROOF_DEPENDENT,
+	                     PROOF_INDEPENDENT,
+	                     BOOLEAN_RULES,
+	                     INTEGER_RULES,
+	                     CONSTANT_REPLACEMENT_RULES,
+	                     TRANSLATION_JAVA_OPERATOR,
+	                     CAST_OPERATOR,
+	                     MISCELLANEOUS,
+	                     EXACT_INSTANCE_RULES,
+	                     ONLY_CREATED_OBJECTS_ARE_REFERENCED,
+	                     ONLY_CREATED_OBJECTS_ARE_REFERENCED_NORMAL,
+	                     ONLY_CREATED_OBJECTS_ARE_REFERENCED_ARRAY,
+	                     SYTEM_INVARIANTS,
+	                     NEXT_TO_CREATE,
+	                     ARRAY_LENGTH,
+	                     CLASS_INITIALISATION,
+	                     NO_CATEGORY
+	            
+	                     
+	                };
 
     /**
      * This is the real interesting method of this class. Change this method to
@@ -205,18 +279,20 @@ public final class UsedTaclets {
      * 
      * @return returns the tree model that contains all supported taclets.
      */
-    public static TreeModel getTreeModel() {
+    public TreeModel getTreeModel() {
 
-	if (model != null)
+	if (model != null){
 	    return model;
+	}
+	    
 
-	TreeItem rootItem = new TreeItem("All supported taclets");
+	TreeItem rootItem = new TreeItem("Supported taclets",Category.ALL_SUPPORTED);
 	
 	DefaultMutableTreeNode root = new DefaultMutableTreeNode(rootItem);
 
-	DefaultMutableTreeNode node1 = newNode(root, "proof independent");
+	DefaultMutableTreeNode node1 = newNode(root, "proof independent",Category.PROOF_INDEPENDENT);
 
-	DefaultMutableTreeNode node2 = newNode(node1, "boolean rules");
+	DefaultMutableTreeNode node2 = newNode(node1, "boolean rules",Category.BOOLEAN_RULES);
 	addTaclet(node2, "boolean_equal_2");
 	addTaclet(node2, "boolean_not_equal_1");
 	addTaclet(node2, "boolean_not_equal_2");
@@ -232,7 +308,7 @@ public final class UsedTaclets {
 	addTaclet(node2, "int_is_no_boolean");
 	//
 	// // intRules
-	DefaultMutableTreeNode node3 = newNode(node1, "integer rules");
+	DefaultMutableTreeNode node3 = newNode(node1, "integer rules",Category.INTEGER_RULES);
 	addTaclet(node3, "expand_inByte");
 	addTaclet(node3, "expand_inChar");
 	addTaclet(node3, "expand_inShort");
@@ -240,7 +316,7 @@ public final class UsedTaclets {
 	addTaclet(node3, "expand_inLong");
 
 	DefaultMutableTreeNode node4 = newNode(node1,
-	        "constant replacement rules");
+	        "constant replacement rules",Category.CONSTANT_REPLACEMENT_RULES);
 	addTaclet(node4, "replace_byte_MAX");
 	addTaclet(node4, "replace_byte_MIN");
 	addTaclet(node4, "replace_char_MAX");
@@ -257,14 +333,13 @@ public final class UsedTaclets {
 	addTaclet(node4, "replace_short_RANGE");
 	addTaclet(node4, "replace_short_HALFRANGE");
 	addTaclet(node4, "replace_char_RANGE");
-	addTaclet(node4, "replace_char_HALFRANGE");
 	addTaclet(node4, "replace_int_RANGE");
 	addTaclet(node4, "replace_int_HALFRANGE");
 	addTaclet(node4, "replace_long_RANGE");
 	addTaclet(node4, "replace_long_HALFRANGE");
 
 	DefaultMutableTreeNode node5 = newNode(node1,
-	        "translation of java operators");
+	        "translation of java operators",Category.TRANSLATION_JAVA_OPERATOR);
 	addTaclet(node5, "translateJavaUnaryMinusInt");
 	addTaclet(node5, "translateJavaUnaryMinusLong");
 	addTaclet(node5, "translateJavaBitwiseNegation");
@@ -297,9 +372,9 @@ public final class UsedTaclets {
 	addTaclet(node5, "translateJavaBitwiseXOrInt");
 	addTaclet(node5, "translateJavaBitwiseXOrLong");
 
-	DefaultMutableTreeNode node6 = newNode(root, "proof dependent");
+	DefaultMutableTreeNode node6 = newNode(root, "proof dependent",Category.PROOF_DEPENDENT);
 
-	DefaultMutableTreeNode node7 = newNode(node6, "cast operator");
+	DefaultMutableTreeNode node7 = newNode(node6, "cast operator",Category.CAST_OPERATOR);
 	addTaclet(node7, "castDel",1);
 	addTaclet(node7, "typeEq",2);
 	addTaclet(node7, "typeEqDerived",2);
@@ -310,13 +385,13 @@ public final class UsedTaclets {
 	addTaclet(node7, "closeType",3);
 	addTaclet(node7, "closeTypeSwitched",3);
 
-	DefaultMutableTreeNode node8 = newNode(node6, "miscellaneous");
+	DefaultMutableTreeNode node8 = newNode(node6, "miscellaneous",Category.MISCELLANEOUS);
 	addTaclet(node8, "disjoint_repositories",2);
 	addTaclet(node8, "identical_object_equal_index",1);
 
 	addTaclet(node8, "repository_object_non_null",1);
 
-	DefaultMutableTreeNode node9 = newNode(node6, "exact instance rules");
+	DefaultMutableTreeNode node9 = newNode(node6, "exact instance rules",Category.EXACT_INSTANCE_RULES);
 	addTaclet(node9, "exact_instance_definition_reference",2);
 	addTaclet(node9, "exact_instance_definition_integerDomain");
 	addTaclet(node9, "exact_instance_definition_int");
@@ -335,9 +410,9 @@ public final class UsedTaclets {
 
 	// usedTaclets.add("system_invariant_for_created_2a_sym");
 	DefaultMutableTreeNode node10 = newNode(node6,
-	        "only created objects are referenced...");
+	        "only created objects are referenced...",Category.ONLY_CREATED_OBJECTS_ARE_REFERENCED);
 
-	DefaultMutableTreeNode node11 = newNode(node10, "normal");
+	DefaultMutableTreeNode node11 = newNode(node10, "normal",Category.ONLY_CREATED_OBJECTS_ARE_REFERENCED_NORMAL);
 	addTaclet(node11, "only_created_object_are_referenced",1);
 	addTaclet(node11, "only_created_object_are_referenced_non_null",1);
 	addTaclet(node11, "only_created_object_are_referenced_right",1);
@@ -353,13 +428,13 @@ public final class UsedTaclets {
 //	addTaclet(node12,
 //	        "only_created_object_are_referenced_by_arrays_non_null");
 
-	DefaultMutableTreeNode node13 = newNode(node6, "system invariants");
+	DefaultMutableTreeNode node13 = newNode(node6, "system invariants",Category.SYTEM_INVARIANTS);
 
 	addTaclet(node13, "system_invariant_for_created_3",2);
 	addTaclet(node13, "system_invariant_for_created_2a_sym",2);
 	addTaclet(node13, "system_invariant_for_created_3_sym",2);
 
-	DefaultMutableTreeNode node14 = newNode(node6, "nextToCreate");
+	DefaultMutableTreeNode node14 = newNode(node6, "nextToCreate",Category.NEXT_TO_CREATE);
 	addTaclet(node14, "created_inv_index_in_bounds",2);
 	addTaclet(node14, "created_add_known_index_in_bounds",2);
 	addTaclet(node14, "created_add_known_index_in_bounds_sym",2);
@@ -373,13 +448,13 @@ public final class UsedTaclets {
 	addTaclet(node8, "nextToCreate_non_negative");
 	addTaclet(node8, "nextToCreate_non_negative_2");
 
-	DefaultMutableTreeNode node15 = newNode(node6, "array length");
+	DefaultMutableTreeNode node15 = newNode(node6, "array length",Category.ARRAY_LENGTH);
 	addTaclet(node15, "array_length_non_negative",1);
 	addTaclet(node15, "array_length_non_negative_2",1);
 	addTaclet(node15, "array_length_non_negative_3",1);
 	addTaclet(node15, "array_length_short_javacard",1);
 
-	DefaultMutableTreeNode node16 = newNode(node6, "class initialisation");
+	DefaultMutableTreeNode node16 = newNode(node6, "class initialisation",Category.CLASS_INITIALISATION);
 	addTaclet(node16, "class_being_initialized_is_prepared");
 	addTaclet(node16, "initialized_class_is_prepared");
 	addTaclet(node16, "initialized_class_is_not_erroneous");

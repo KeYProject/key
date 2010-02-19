@@ -76,7 +76,7 @@ public class TacletTranslationSettings implements Settings {
 
     private String tacletAssignmentToString(){
 	StringBuffer s= new StringBuffer();
-	tacletAssignmentToString((TreeNode)UsedTaclets.getTreeModel().getRoot()
+	tacletAssignmentToString((TreeNode)UsedTaclets.INSTANCE.getTreeModel().getRoot()
 		  , s);
 	return s.toString();
     }
@@ -93,9 +93,9 @@ public class TacletTranslationSettings implements Settings {
     }
     
     private void tacletAssignmentFromString(String s){
-	tacletAssignmentFromString((TreeNode)UsedTaclets.getTreeModel().getRoot(),
+	tacletAssignmentFromString((TreeNode)UsedTaclets.INSTANCE.getTreeModel().getRoot(),
 		s, 0);
-	UsedTaclets.validateSelectionModes();
+	UsedTaclets.INSTANCE.validateSelectionModes();
     }
     private int tacletAssignmentFromString(TreeNode node,String s, int index){
 	if(index >= s.length() || index < 0) return -1;
@@ -126,7 +126,7 @@ public class TacletTranslationSettings implements Settings {
 
     
     public boolean isUsingTaclets(){
-	TreeItem item = ((TreeItem)((DefaultMutableTreeNode)UsedTaclets.getTreeModel()
+	TreeItem item = ((TreeItem)((DefaultMutableTreeNode)UsedTaclets.INSTANCE.getTreeModel()
 		.getRoot()).getUserObject());
 	return item.getMode() == SelectionMode.all || item.getMode() == SelectionMode.user;
 

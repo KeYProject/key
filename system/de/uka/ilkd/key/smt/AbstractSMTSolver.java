@@ -67,7 +67,7 @@ public abstract class AbstractSMTSolver implements SMTSolver {
     /** determines whether taclets are used for this solver.*/
     private boolean useTaclets = true;
     /** Only for testing*/
-    private ImmutableSet<Taclet> tacletsForTest = null;
+    private Collection<Taclet> tacletsForTest = null;
     /** true, if the solver should save the translated taclets to file. */
     private boolean saveTacletTranslation = true;
     
@@ -539,7 +539,9 @@ public abstract class AbstractSMTSolver implements SMTSolver {
     
     private Collection<Taclet> getTaclets(Goal goal){
 	
-	
+	 if(tacletsForTest != null){
+	     return tacletsForTest;
+	 }
 	 return ProofSettings.DEFAULT_SETTINGS.getTacletTranslationSettings()
 	            .initTaclets(goal.ruleAppIndex().tacletIndex());
     }
@@ -565,7 +567,7 @@ public abstract class AbstractSMTSolver implements SMTSolver {
     
     private void instantiateTaclets(Goal goal, SMTTranslator trans) throws IllegalFormulaException{
 	ImmutableSet<Taclet> emptySet = DefaultImmutableSet.nil();
-	if(!ProofSettings.DEFAULT_SETTINGS.getTacletTranslationSettings().isUsingTaclets()){
+	if(!ProofSettings.DEFAULT_SETTINGS.getTacletTranslationSettings().isUsingTaclets() && !useTaclets ){
 	    trans.setTacletsForAssumptions(new LinkedList<Taclet>());
 	   
 	}else{
@@ -578,7 +580,7 @@ public abstract class AbstractSMTSolver implements SMTSolver {
 	
     }
     
-    public void setTacletsForTest(ImmutableSet<Taclet> set){
+    public void setTacletsForTest(Collection<Taclet> set){
 	tacletsForTest = set;
     }
 

@@ -140,7 +140,7 @@ public final class DefaultTacletSetTranslation
 	
 	
 	for (Taclet t : taclets) {
-	    if (!UsedTaclets.contains(t.name().toString())) {
+	    if (!UsedTaclets.INSTANCE.contains(t.name().toString())) {
 		// notTranslated = notTranslated.append(new
 		// DefaultTacletFormula(t,null,"The taclet is not used for external provers."));
 		continue;

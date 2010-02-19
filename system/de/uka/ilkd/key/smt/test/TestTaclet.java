@@ -10,10 +10,14 @@
 package de.uka.ilkd.key.smt.test;
 
 import java.io.File;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.LinkedList;
 
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.ProofAggregate;
+import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.init.KeYUserProblemFile;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
@@ -32,11 +36,11 @@ class TestTaclet extends TestCase {
 
     protected static String folder = System.getProperty("key.home")
 	    + File.separator + "examples" + File.separator + "_testcase"
-	    + File.separator + "smt" + File.separator + "TacletTranslation"
+	    + File.separator + "smt" + File.separator + "tacletTranslation"
 	    + File.separator;
 
     /** The set of taclets */
-    private ImmutableSet<Taclet> taclets;
+    private Collection<Taclet> taclets= new LinkedList<Taclet>();
     
     private Services services;
     
@@ -50,8 +54,20 @@ class TestTaclet extends TestCase {
      * 
      * @return set of taclets.
      */
-    protected ImmutableSet<Taclet> getTaclets() {
+    protected Collection<Taclet> getTaclets() {
+	if(taclets.isEmpty()){
+	    parse();
+	}
 	return taclets;
+    }
+    
+    protected HashSet<String> getTacletNames(){
+	Collection<Taclet> set = getTaclets();
+	HashSet<String> names = new HashSet<String>();
+	for(Taclet taclet : set){
+	    names.add(taclet.name().toString());
+	}
+	return names;
     }
 
     /**
@@ -82,20 +98,24 @@ class TestTaclet extends TestCase {
 	ProofAggregate result = null;
 
 	try {
-	    KeYUserProblemFile po = new KeYUserProblemFile("UpdatetermTest",
+	    KeYUserProblemFile po = new KeYUserProblemFile("test",
 		    file, null);
+	    
 	    pi = new ProblemInitializer(profile);
-	    pi.startProver(po, po);
-
+	
+	    
+	    InitConfig initConfig = pi.prepare(po);
+	    pi.startProver(initConfig, po);
+	    
 	    result = po.getPO();
-	    services = pi.prepare(po).getServices();
-	    taclets = pi.prepare(po).getTaclets();
+	    services = initConfig.getServices();
+	    taclets.clear();
+	    for(Taclet t : initConfig.getTaclets() ){
+		taclets.add(t);
+	    }
 
 	} catch (Exception e) {
-	    System.err.println("Exception occurred while parsing " + file
-		    + "\n");
-	    e.printStackTrace();
-	    System.exit(-1);
+	   assertTrue("Error while loading problem file "+ file+ ":\n\n" + e.getMessage(),false);
 	}
 	return result;
     }
