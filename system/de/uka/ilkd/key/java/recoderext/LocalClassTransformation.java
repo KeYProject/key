@@ -51,7 +51,7 @@ public class LocalClassTransformation extends RecoderModelTransformer {
     public ProblemReport analyze() {
          for (final ClassDeclaration cd : classDeclarations()) {
              if(cd.getName() == null || cd.getStatementContainer() !=null){
-                 (new FinalOuterVarsCollector()).walk(cd);
+        	 (new FinalOuterVarsCollector()).walk(cd);
              }
          }     
          return super.analyze();
