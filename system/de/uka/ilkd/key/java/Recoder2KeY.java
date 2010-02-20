@@ -73,11 +73,7 @@ import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.util.Debug;
-import de.uka.ilkd.key.util.DirectoryFileCollection;
-import de.uka.ilkd.key.util.FileCollection;
-import de.uka.ilkd.key.util.KeYRecoderExcHandler;
-import de.uka.ilkd.key.util.ZipFileCollection;
+import de.uka.ilkd.key.util.*;
 
 /**
  * This class is the bridge between recoder ast data structures and KeY data
@@ -1170,20 +1166,26 @@ public class Recoder2KeY implements JavaReader {
      * 
      * @param message
      *            message to be used.
-     * @param e
+     * @param t
      *            the cause of the exceptional case
      * @throws ConvertException
      *             always
      */
-    public static void reportError(String message, Throwable e) {
+    public static void reportError(String message, Throwable t) {
         // Attention: this highly depends on Recoders exception messages!
-        int[] pos = extractPositionInfo(e.toString());
+	Throwable cause = t;
+	if  (t instanceof ExceptionHandlerException) {
+	    if (t.getCause() != null) {
+		cause = t.getCause();
+	    } 
+	}
+	int[] pos = extractPositionInfo(cause.toString());
         final RuntimeException rte;
         if (pos.length > 0) {
             rte = new PosConvertException(message, pos[0], pos[1]);
-            rte.initCause(e);
+            rte.initCause(cause);
         } else {
-            rte = new ConvertException(message, e);
+            rte = new ConvertException(message, cause);
         }
 
         throw rte;
