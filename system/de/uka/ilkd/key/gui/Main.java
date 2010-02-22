@@ -751,7 +751,7 @@ public class Main extends JFrame implements IMain {
     
     private JComponent createOpenMostRecentFile() {
         final JButton button = new JButton();
-        button.setAction(new OpenMostRecentFile());
+        button.setAction(new OpenMostRecentFile(""));
         return button;
     }
     
@@ -1217,14 +1217,16 @@ public class Main extends JFrame implements IMain {
         JMenu fileMenu = new JMenu("File");
         fileMenu.setMnemonic(KeyEvent.VK_F);
         
+        
         JMenuItem load = new JMenuItem();
         load.setAction(openFileAction);
         
         JMenuItem save = new JMenuItem();
         save.setAction(saveFileAction);
         
-        registerAtMenu(fileMenu, load);
+        registerAtMenu(fileMenu, load);                
         registerAtMenu(fileMenu, save);
+                
         
         JMenuItem tacletPOItem = new JMenuItem("Load Non-Axiom Lemma ...");
         tacletPOItem.addActionListener(new ActionListener() {
@@ -1245,6 +1247,9 @@ public class Main extends JFrame implements IMain {
         });
         
         addSeparator(fileMenu);
+        
+        JMenuItem loadLastOpened = new JMenuItem(new OpenMostRecentFile("Reload"));
+        registerAtMenu(fileMenu, loadLastOpened);
         
         recentFiles = new RecentFileMenu(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -1334,6 +1339,10 @@ public class Main extends JFrame implements IMain {
     protected JMenu createProofMenu() {
         JMenu proof = new JMenu("Proof");
         proof.setMnemonic(KeyEvent.VK_P);
+        
+	JMenuItem runStrategy = new JMenuItem(autoModeAction);
+	registerAtMenu(proof, runStrategy);
+
         JMenuItem close = new JMenuItem("Abandon Task");
         close.setAccelerator(KeyStroke.getKeyStroke
                 (KeyEvent.VK_W, ActionEvent.CTRL_MASK));
@@ -2170,9 +2179,14 @@ public class Main extends JFrame implements IMain {
      */
     private final class OpenMostRecentFile extends AbstractAction {
         
-        public OpenMostRecentFile() {
+        public OpenMostRecentFile(String itemName) {
+            if (itemName.length() > 0) {
+        	putValue(NAME, itemName);
+            }
             putValue(SMALL_ICON, IconFactory.openMostRecent(TOOLBAR_ICON_SIZE));
             putValue(SHORT_DESCRIPTION, "Load last opened file.");
+            putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_R, 
+        	    Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         }
         
         public void actionPerformed(ActionEvent e) {
@@ -2193,7 +2207,8 @@ public class Main extends JFrame implements IMain {
             putValue(NAME, "Load ...");
             putValue(SMALL_ICON, IconFactory.openKeYFile(TOOLBAR_ICON_SIZE));
             putValue(SHORT_DESCRIPTION, "Browse and load problem or proof files.");
-            putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_O, ActionEvent.CTRL_MASK));
+            putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_O, 
+        	    Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
             
         }
         
@@ -2218,7 +2233,8 @@ public class Main extends JFrame implements IMain {
             putValue(NAME, "Save ...");
             putValue(SMALL_ICON, IconFactory.saveFile(TOOLBAR_ICON_SIZE));
             putValue(SHORT_DESCRIPTION, "Save current proof.");
-            putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_S, ActionEvent.CTRL_MASK));
+            putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_S,  
+        	    Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
             
             setEnabled(mediator.getProof() != null);
             
@@ -3206,10 +3222,14 @@ public class Main extends JFrame implements IMain {
             setEnabled(associatedProof != null && !associatedProof.closed());            
         }
         
-        public AutoModeAction() {
+        public AutoModeAction() {            
             putValue("hideActionText", Boolean.TRUE);
+            putValue(Action.NAME, "Start");
             putValue(Action.SHORT_DESCRIPTION, AUTO_MODE_TEXT);
             putValue(Action.SMALL_ICON, startLogo);
+            putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_E,
+        	    Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+            
             
             associatedProof = mediator.getProof();        
             
@@ -3251,7 +3271,10 @@ public class Main extends JFrame implements IMain {
                     if (associatedProof != null) {
                         associatedProof.removeProofTreeListener(ptl);                        
                     }
+                    putValue(Action.NAME, "Stop");
                     putValue(Action.SMALL_ICON, stopLogo);
+                    putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_H,
+                	    Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
                 }
                 
                 /**
@@ -3263,7 +3286,10 @@ public class Main extends JFrame implements IMain {
                             !associatedProof.containsProofTreeListener(ptl) ) {
                         associatedProof.addProofTreeListener(ptl);
                     }
+                    putValue(Action.NAME, "Start");
                     putValue(Action.SMALL_ICON, startLogo);
+                    putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_E,
+                	    Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
                 }
                 
             });
