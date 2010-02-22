@@ -600,8 +600,10 @@ public class Main extends JFrame implements IMain {
         tabbedPane.addTab("Rules", null, new JScrollPane(ruleView), "All available rules");
         tabbedPane.setSelectedIndex(0);
         tabbedPane.setPreferredSize(new java.awt.Dimension(250, 440));
-        tabbedPane.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).getParent().remove(KeyStroke.getKeyStroke(KeyEvent.VK_UP, ActionEvent.CTRL_MASK));
-        tabbedPane.getInputMap(JComponent.WHEN_FOCUSED).getParent().remove(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, ActionEvent.CTRL_MASK));
+        tabbedPane.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).getParent().
+        	remove(KeyStroke.getKeyStroke(KeyEvent.VK_UP, ActionEvent.CTRL_MASK));
+        tabbedPane.getInputMap(JComponent.WHEN_FOCUSED).getParent().
+        	remove(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, ActionEvent.CTRL_MASK));
         
         proofListView.setPreferredSize(new java.awt.Dimension(250, 100));
         paintEmptyViewComponent(proofListView, "Tasks");
@@ -1322,8 +1324,7 @@ public class Main extends JFrame implements IMain {
 	
 	final JMenuItem tacletOptionsView = new JMenuItem(TACLET_OPTIONS_MENU_STRING);
 
-	tacletOptionsView.setAccelerator(KeyStroke.getKeyStroke
-			    (KeyEvent.VK_M, ActionEvent.CTRL_MASK));
+	tacletOptionsView.setMnemonic(KeyEvent.VK_M);
 	tacletOptionsView.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
 		    selectMaxTooltipLines();
@@ -3551,8 +3552,7 @@ public class Main extends JFrame implements IMain {
             JMenu options = new JMenu("Options");
             options.setMnemonic(KeyEvent.VK_O);
             JMenuItem choiceItem = new JMenuItem("Taclet options defaults");
-            choiceItem.setAccelerator(KeyStroke.getKeyStroke
-                    (KeyEvent.VK_T, ActionEvent.CTRL_MASK));
+            choiceItem.setMnemonic(KeyEvent.VK_T);
 
             choiceItem.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
