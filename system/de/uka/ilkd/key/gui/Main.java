@@ -3309,8 +3309,6 @@ public class Main extends JFrame implements IMain {
                     }
                     putValue(Action.NAME, "Stop");
                     putValue(Action.SMALL_ICON, stopLogo);
-                    putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_H,
-                	    Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
                 }
                 
                 /**
@@ -3324,8 +3322,6 @@ public class Main extends JFrame implements IMain {
                     }
                     putValue(Action.NAME, "Start");
                     putValue(Action.SMALL_ICON, startLogo);
-                    putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_E,
-                	    Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
                 }
                 
             });
