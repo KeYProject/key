@@ -72,7 +72,7 @@ import de.uka.ilkd.key.util.ProgressMonitor;
 
 
 public class Main extends JFrame implements IMain {
-
+   
     public static final String INTERNAL_VERSION = 
 	KeYResourceManager.getManager().getSHA1();
 
@@ -1343,13 +1343,7 @@ public class Main extends JFrame implements IMain {
 	JMenuItem runStrategy = new JMenuItem(autoModeAction);
 	registerAtMenu(proof, runStrategy);
 
-        JMenuItem close = new JMenuItem("Abandon Task");
-        close.setAccelerator(KeyStroke.getKeyStroke
-                (KeyEvent.VK_W, ActionEvent.CTRL_MASK));
-        close.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                closeTask();
-            }});
+        JMenuItem close = new JMenuItem(new AbandonTask());
         registerAtMenu(proof, close);	
         
         JMenuItem choiceItem = new JMenuItem("Show Active Taclet Options");
@@ -3181,6 +3175,38 @@ public class Main extends JFrame implements IMain {
 	}
     }
     
+    
+    private final class AbandonTask extends AbstractAction  {
+	
+	public AbandonTask() {
+	    putValue(NAME, "Abandon Task");
+	    putValue(ACCELERATOR_KEY, KeyStroke.
+		    getKeyStroke(KeyEvent.VK_W, 
+			    Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+	    
+	    setEnabled(mediator.getProof() != null);
+            
+            mediator.addKeYSelectionListener(new KeYSelectionListener() {
+                /** focused node has changed */
+                public void selectedNodeChanged(KeYSelectionEvent e) {
+                }
+                
+                /**
+                 * the selected proof has changed. Enable or disable action depending whether a proof is
+                 * available or not
+                 */ 
+                public void selectedProofChanged(KeYSelectionEvent e) {
+                    setEnabled(e.getSource().getSelectedProof() != null);
+                }
+            });
+	}
+			      
+	public void actionPerformed(ActionEvent e) {
+	    closeTask();
+	}
+
+    }
+
   
     private final class AutoModeAction extends AbstractAction {
         
