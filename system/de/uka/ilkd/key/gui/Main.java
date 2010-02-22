@@ -1793,8 +1793,6 @@ public class Main extends JFrame implements IMain {
 	getJMenuBar().add(tools);
 
 	JMenuItem extractSpecification = new JMenuItem("Extract Specification");
-	extractSpecification.setAccelerator(KeyStroke.getKeyStroke
-			    (KeyEvent.VK_E, ActionEvent.CTRL_MASK));
 
 	extractSpecification.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
