@@ -538,6 +538,8 @@ public class Main extends JFrame implements IMain {
         toolBar.addSeparator();
         
         JToolBar fileOperations = new JToolBar("File Operations");
+        fileOperations.setRollover(true);
+        
         fileOperations.add(createOpenFile());
         fileOperations.add(createOpenMostRecentFile());
         fileOperations.add(createSaveFile());
