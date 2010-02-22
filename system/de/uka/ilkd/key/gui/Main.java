@@ -1275,7 +1275,8 @@ public class Main extends JFrame implements IMain {
                 Config.DEFAULT.smaller();
             }
         });
-        smaller.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, InputEvent.CTRL_DOWN_MASK));
+        smaller.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 
+        	Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         
         final JMenuItem larger = new JMenuItem("Larger");
         larger.addActionListener(new ActionListener() {
@@ -1283,7 +1284,8 @@ public class Main extends JFrame implements IMain {
                 Config.DEFAULT.larger();
             }
         });
-        larger.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_UP, InputEvent.CTRL_DOWN_MASK));
+        larger.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_UP, 
+        	Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         
         Config.DEFAULT.addConfigChangeListener(new ConfigChangeListener() {
             public void configChanged(ConfigChangeEvent e) {
@@ -1421,8 +1423,7 @@ public class Main extends JFrame implements IMain {
 	
 	// default taclet options
 	JMenuItem choiceItem = new JMenuItem("Default Taclet Options...");
-	choiceItem.setAccelerator(KeyStroke.getKeyStroke
-			    (KeyEvent.VK_T, ActionEvent.CTRL_MASK));
+	choiceItem.setMnemonic(KeyEvent.VK_T);
 
 	choiceItem.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
@@ -1432,8 +1433,7 @@ public class Main extends JFrame implements IMain {
 
 	// update simplifier
 	JMenuItem updateSimplifierItem = new JMenuItem("Update Simplifier...");
-	updateSimplifierItem.setAccelerator(KeyStroke.getKeyStroke
-			    (KeyEvent.VK_U, ActionEvent.CTRL_MASK));
+	updateSimplifierItem.setMnemonic(KeyEvent.VK_U);
 
 	updateSimplifierItem.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
@@ -1821,8 +1821,8 @@ public class Main extends JFrame implements IMain {
 	JMenuItem specificationBrowser = 
 	    new JMenuItem("Proof Obligation Browser...");
 	specificationBrowser.setAccelerator(KeyStroke.getKeyStroke
-					    (KeyEvent.VK_B, 
-					     ActionEvent.CTRL_MASK));
+		(KeyEvent.VK_B, 
+			Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 	specificationBrowser.addActionListener(new ActionListener() {
 	    public void actionPerformed(ActionEvent e) {
     	        showPOBrowser();
@@ -1854,7 +1854,7 @@ public class Main extends JFrame implements IMain {
         
         createWrapper.setAccelerator(KeyStroke.getKeyStroke
                 (KeyEvent.VK_J, 
-                 ActionEvent.CTRL_MASK));
+                	Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 
         createWrapper.setEnabled(mediator.getProof() != null);
 
@@ -3497,8 +3497,8 @@ public class Main extends JFrame implements IMain {
             JMenuItem specificationBrowser = 
                 new JMenuItem("Proof Obligation Browser...");
             specificationBrowser.setAccelerator(KeyStroke.getKeyStroke
-                                                (KeyEvent.VK_B, 
-                                                ActionEvent.CTRL_MASK));
+        	    (KeyEvent.VK_B, 
+        		    Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
             specificationBrowser.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     main.showPOBrowser();
