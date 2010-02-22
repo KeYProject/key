@@ -698,7 +698,7 @@ public class Main extends JFrame implements IMain {
         
         
         goalView.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW ).put(
-                KeyStroke.getKeyStroke(KeyEvent.VK_Z, ActionEvent.CTRL_MASK), 
+                KeyStroke.getKeyStroke(KeyEvent.VK_P, ActionEvent.CTRL_MASK), 
         "show_tree");
         goalView.getActionMap().put("show_tree", new AbstractAction() {
             
@@ -1333,8 +1333,9 @@ public class Main extends JFrame implements IMain {
 	registerAtMenu(view, tacletOptionsView);
         
         
-        return view;
+        return view; 
     }
+        
     
     protected JMenu createProofMenu() {
         JMenu proof = new JMenu("Proof");
@@ -1343,9 +1344,14 @@ public class Main extends JFrame implements IMain {
 	JMenuItem runStrategy = new JMenuItem(autoModeAction);
 	registerAtMenu(proof, runStrategy);
 
-        JMenuItem close = new JMenuItem(new AbandonTask());
-        registerAtMenu(proof, close);	
+	JMenuItem undo = new JMenuItem(undoAction);
+	registerAtMenu(proof, undo);
+
+	JMenuItem close = new JMenuItem(new AbandonTask());
+	registerAtMenu(proof, close);	
         
+	addSeparator(proof);
+	
         JMenuItem choiceItem = new JMenuItem("Show Active Taclet Options");
         choiceItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -2955,7 +2961,7 @@ public class Main extends JFrame implements IMain {
     private final class UndoLastStep extends AbstractAction {
 
         public UndoLastStep() {            
-            setBackMode();         
+            setBackMode();
         }
 
         /** 
@@ -3018,6 +3024,8 @@ public class Main extends JFrame implements IMain {
             putValue(SMALL_ICON, 
                     IconFactory.goalBackLogo(TOOLBAR_ICON_SIZE));
             putValue(SHORT_DESCRIPTION, "Undo the last rule application.");
+            putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_Z,
+        	    Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         }
 
         private void pruneMode() {
@@ -3025,6 +3033,9 @@ public class Main extends JFrame implements IMain {
             putValue(SMALL_ICON, IconFactory.goalBackLogo(TOOLBAR_ICON_SIZE));
             putValue(SHORT_DESCRIPTION, 
                     "Prune the tree below the selected node.");
+            putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_Z,
+        	    Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+
         }
         
         public void actionPerformed(ActionEvent e) {            
