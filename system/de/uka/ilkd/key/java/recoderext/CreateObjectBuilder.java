@@ -84,12 +84,12 @@ public class CreateObjectBuilder extends RecoderModelTransformer {
             scopeForObj = de.uka.ilkd.key.java.reference.MethodReference.LOCAL_SCOPE;
         }
         
-	MethodReference createRef = 
-	    (new MethodReference(new VariableReference
+	MethodReferenceWrapper createRef = 
+	    new MethodReferenceWrapper(new VariableReference
 				 (new Identifier(NEW_OBJECT_VAR_NAME)), 
 				 new ImplicitIdentifier
 				 (CreateBuilder.IMPLICIT_CREATE),
-                                 new Identifier(scopeForObj)));
+                                 new Identifier(scopeForObj));
 	
 	// July 08 - mulbrich: wraps createRef into a method body statement to
 	// avoid unnecessary dynamic dispatch.
@@ -98,7 +98,7 @@ public class CreateObjectBuilder extends RecoderModelTransformer {
 	if(recoderClass.getIdentifier() == null) {
 	    // anonymous
 	    result.add
-        (new MethodReference(new VariableReference
+        (new MethodReferenceWrapper(new VariableReference
                              (new Identifier(NEW_OBJECT_VAR_NAME)),
                              new ImplicitIdentifier
                              (CreateBuilder.IMPLICIT_CREATE),

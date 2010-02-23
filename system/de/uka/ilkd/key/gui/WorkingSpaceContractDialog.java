@@ -20,7 +20,7 @@ import de.uka.ilkd.key.speclang.OperationContract;
 
 public class WorkingSpaceContractDialog extends JDialog {
 
-    LinkedListqmake specs;
+    LinkedList specs;
     boolean successful;
     OperationContract spec;
     int compare=1;

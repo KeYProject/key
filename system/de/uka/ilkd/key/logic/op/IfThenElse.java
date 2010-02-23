@@ -93,7 +93,7 @@ public class IfThenElse extends Op {
         ImmutableSet<Sort> oldExt;
         do{
             oldExt = ext;
-            Sort[] ea = ext.toArray();
+            Sort[] ea = ext.toArray(new Sort[ext.size()]);
             for(Sort s:ea){
                 ext = ext.union(s.extendsSorts());
             }

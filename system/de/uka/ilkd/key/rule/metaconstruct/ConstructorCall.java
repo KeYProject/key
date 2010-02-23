@@ -122,7 +122,7 @@ public class ConstructorCall extends ProgramMetaConstruct {
         Statement[] stmnts;
 	if(classType == services.getJavaInfo().getKeYJavaType("javax.realtime.PhysicalMemoryArea")){
 	    stmnts = new Statement[evaluatedArgs.size() + 2];
-	    stmnts[stmnts.length-2] = new MethodReference(new ArrayOfExpression(argumentVariables[0]),
+	    stmnts[stmnts.length-2] = new MethodReference(new ImmutableArray<Expression>(argumentVariables[0]),
 	            new ProgramElementName(AreaAllocationMethodBuilder.IMPLICIT_AREA_ALLOCATE), 
 	            constructorReference.getTypeReference());
 	}else{

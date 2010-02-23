@@ -1,5 +1,5 @@
 # This file is part of KeY - Integrated Deductive Software Design
-# Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
+# Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
 #                         Universitaet Koblenz-Landau, Germany
 #                         Chalmers University of Technology, Sweden
 #
@@ -54,7 +54,6 @@ java/util/Map.java
 java/util/Set.java
 java/io/IOException.java
 java/io/Serializable.java
-<<<<<<< HEAD:system/resources/de/uka/ilkd/key/java/JavaRedux/JAVALANG.TXT
 javax/realtime/IllegalAssignmentError.java
 javax/realtime/ImmortalMemory.java
 javax/realtime/InaccessibleAreaException.java
@@ -68,9 +67,3 @@ javax/realtime/ScopedMemory.java
 javax/realtime/ScopedCycleException.java
 javax/realtime/ThrowBoundaryError.java
 javax/realtime/VTMemory.java
-junit/framework/Test.java
-junit/framework/TestCase.java
-junit/framework/TestSuite.java
-
-=======
->>>>>>> 032cf20a49e1384b90316d02f35ce545b1a6d599:system/resources/de/uka/ilkd/key/java/JavaRedux/JAVALANG.TXT

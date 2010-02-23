@@ -221,7 +221,6 @@ public class LoopInvariantImpl implements LoopInvariant {
         return new LoopPredicateSet(or.replace(originalPredicates.asSet()));
     }
 
-    
     public LocationDescriptorSet getModifies(
             Term selfTerm,
             /*inout*/ Map<Operator, Function/* (atPre)*/> atPreFunctions,
@@ -230,10 +229,11 @@ public class LoopInvariantImpl implements LoopInvariant {
         Map replaceMap = 
             getReplaceMap(selfTerm, null, atPreFunctions, services);
         OpReplacer or = new OpReplacer(replaceMap);
-        return or.replace(originalModifies);
+        return new LocationDescriptorSet(or.replaceLoc(originalModifies.asSet()));
     }
+
     
-    public SetOfLocationDescriptor getModifies(
+    public LocationDescriptorSet getModifies(
             Term selfTerm,
             Term memoryArea,
             /*inout*/ Map<Operator, Function/* (atPre)*/> atPreFunctions,
@@ -244,6 +244,18 @@ public class LoopInvariantImpl implements LoopInvariant {
         OpReplacer or = new OpReplacer(replaceMap);
         return new LocationDescriptorSet(or.replaceLoc(originalModifies.asSet()));
     }
+    
+    /*    public ImmutableSet<LocationDescriptor> getModifies(
+            Term selfTerm,
+            Term memoryArea,
+            Map<Operator, Function> atPreFunctions,
+            Services services) {
+        assert (selfTerm == null) == (originalSelfTerm == null);
+        Map replaceMap = 
+            getReplaceMap(selfTerm, memoryArea, atPreFunctions, services);
+        OpReplacer or = new OpReplacer(replaceMap);
+        return new LocationDescriptorSet(or.replaceLoc(originalModifies.asSet()));
+    }*/
     
     public Term getVariant(Term selfTerm, 
             /*inout*/ Map <Operator, Function/* (atPre)*/> atPreFunctions,

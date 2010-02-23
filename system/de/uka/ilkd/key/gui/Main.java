@@ -2653,9 +2653,11 @@ public class Main extends JFrame implements IMain {
                     visible = false;
 		} else if (opt[index].equals("RTSJ")) {
 		    boolean memory = false;
+		    System.out.println("RTSJ extensions enabled");
 		    if (index + 1 < opt.length && 
 			opt[index + 1].toUpperCase().equals("MEMORY")) {
 			memory = true;
+			System.out.println("Memory consumption calculus enabled");
 		    }
 		    ProofSettings.DEFAULT_SETTINGS.setProfile(new RTSJProfile(memory));
 		} else if (opt[index].equals("PERC")) {
@@ -2782,6 +2784,8 @@ public class Main extends JFrame implements IMain {
 	System.out.println("  depthfirst      : constructs the proof tree in a depth first manner. Recommended for large proofs");
         System.out.println("  auto	          : start prove procedure after initialisation");
         System.out.println("  testing         : starts the prover with a simple test generation oriented user interface");
+	System.out.println(" rtsj [memory] : enables rtsj extensions (optional argument memory for enabling extensions for reasoning over memory consumption)");
+	System.out.println(" perc : enables PERC Pico extensions");
         System.out.println("  print_statistics <filename>" );
         System.out.println("                  : in auto mode, output nr. of rule applications and time spent");
         System.out.println("  fol             : use FOL profile (no program or update rules)");
@@ -3354,7 +3358,7 @@ public class Main extends JFrame implements IMain {
             setLocation(70, 70);
             addWindowListener(new UnitTestGeneratorGuiListener());
             pack();     
-            Dimension d = getSize();
+            java.awt.Dimension d = getSize();
             d.setSize(400, (int) d.getHeight()+3);
             setSize(d);
             setVisible(true);

@@ -14,7 +14,6 @@ import java.util.HashMap;
 import de.uka.ilkd.key.gui.IMain;
 import de.uka.ilkd.key.gui.configuration.ChoiceSettings;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
-import de.uka.ilkd.key.proof.SetOfGoalChooserBuilder;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
@@ -121,7 +120,8 @@ public class JavaProfile extends AbstractProfile {
         return DEFAULT;
     }
     
-    public void updateSettings(ProofSettings settings) {        
+    public void updateSettings(ProofSettings settings) {
+	super.updateSettings(settings);
         ChoiceSettings cs = settings.getChoiceSettings();
         HashMap<String, String> dcs = cs.getDefaultChoices();
         dcs.put("rtsj", "rtsj:off");

@@ -106,7 +106,7 @@ public abstract class SpecialConstructorReference
             return scope;
         }
         if (arguments != null) {
-            return arguments.getExpression(index-1);
+            return arguments.get(index-1);
         }
         throw new ArrayIndexOutOfBoundsException();
     }

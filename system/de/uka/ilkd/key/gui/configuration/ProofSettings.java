@@ -109,8 +109,8 @@ public class ProofSettings {
     
     public void setProfile(Profile profile) {
         this.profile = profile;
-        profile.updateSettings(this);
         ensureInitialized();
+        profile.updateSettings(this);
     }
 
     public Profile getProfile() {                

@@ -300,11 +300,11 @@ public class UseOperationContractRule implements BuiltInRule {
 
             ProgramPrefix curPrefix = (ProgramPrefix)activeStatement;
 
-            final ArrayOfProgramPrefix prefix = curPrefix.getPrefixElements();
+            final ImmutableArray<ProgramPrefix> prefix = curPrefix.getPrefixElements();
             final int length = prefix.size();
             
             // fail fast check      
-            curPrefix = prefix.getProgramPrefix(length-1);// length -1 >= 0 as prefix array 
+            curPrefix = prefix.get(length-1);// length -1 >= 0 as prefix array 
                                                           //contains curPrefix as first element
 
             activeStatement = curPrefix.getFirstActiveChildPos().getProgram(curPrefix);
@@ -320,7 +320,7 @@ public class UseOperationContractRule implements BuiltInRule {
                 }
                 i--;
                 if (i >= 0) {
-                    curPrefix = prefix.getProgramPrefix(i);
+                    curPrefix = prefix.get(i);
                 }
             } while (i >= 0);       
 

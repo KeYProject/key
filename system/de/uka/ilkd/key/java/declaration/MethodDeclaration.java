@@ -352,7 +352,7 @@ public class MethodDeclaration
     
     public boolean isAnnotatedWith(String s) {
         for (int i = modArray.size() - 1; i >= 0; i -= 1) {
-            Modifier m = modArray.getModifier(i);
+            Modifier m = modArray.get(i);
             if (m instanceof AnnotationUseSpecification &&
                     ((AnnotationUseSpecification)m).getText().equals(s)) {
                 return true;

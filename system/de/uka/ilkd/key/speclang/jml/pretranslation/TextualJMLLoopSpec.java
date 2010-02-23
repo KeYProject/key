@@ -18,6 +18,15 @@ import de.uka.ilkd.key.speclang.PositionedString;
 
 public class TextualJMLLoopSpec extends TextualJMLConstruct {
 
+    private ImmutableList<PositionedString> invariant          
+            = ImmutableSLList.<PositionedString>nil();
+    private ImmutableList<PositionedString> skolemDeclarations 
+            = ImmutableSLList.<PositionedString>nil();
+    private ImmutableList<PositionedString> predicates         
+            = ImmutableSLList.<PositionedString>nil();
+    private ImmutableList<PositionedString> assignable         
+            = ImmutableSLList.<PositionedString>nil();
+
     private ImmutableList<PositionedString> parametrizedWS        
             = ImmutableSLList.<PositionedString>nil();
     private PositionedString workingSpaceLocal = null;
@@ -102,7 +111,7 @@ public class TextualJMLLoopSpec extends TextualJMLConstruct {
         return variant;
     }
     
-    public ListOfPositionedString getParametrizedWorkingspace(){
+    public ImmutableList<PositionedString> getParametrizedWorkingspace(){
         return parametrizedWS;
     }
     

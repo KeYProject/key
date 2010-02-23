@@ -10,8 +10,7 @@
 
 package de.uka.ilkd.key.java;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Method;
+import java.lang.reflect.*;
 import java.util.*;
 
 import recoder.CrossReferenceServiceConfiguration;

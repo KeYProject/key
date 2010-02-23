@@ -461,8 +461,8 @@ public class InReachableStatePOBuilder extends TermBuilder {
     
     private Term newObjectRefsLegal(Update u, ObjectSort s){
     	JavaInfo ji = services.getJavaInfo();
-    	ListOfField fields = ji.getKeYProgModelInfo().getAllFieldsLocallyDeclaredIn(ji.getKeYJavaType(s));
-    	IteratorOfField it = fields.iterator();
+    	ImmutableList<Field> fields = ji.getKeYProgModelInfo().getAllFieldsLocallyDeclaredIn(ji.getKeYJavaType(s));
+    	Iterator<Field> it = fields.iterator();
     	Term result = tt();
     	while(it.hasNext()){
     		Field f = it.next();

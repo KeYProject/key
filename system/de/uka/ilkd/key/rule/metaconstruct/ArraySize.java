@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.rule.metaconstruct;
 
+import java.util.Iterator;
+
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.ArrayType;
@@ -31,7 +33,7 @@ public class ArraySize extends AbstractMetaOperator {
      */
     public Term calculate(Term term, SVInstantiations svInst, Services services) {
 //        ProgramVariable v0 = (ProgramVariable) term.sub(0).op();
-        IteratorOfSchemaVariable it = svInst.svIterator();
+        Iterator<SchemaVariable> it = svInst.svIterator();
         TermFactory tf = TermFactory.DEFAULT;
         NewArray na=null;
         while(it.hasNext()){
@@ -46,10 +48,10 @@ public class ArraySize extends AbstractMetaOperator {
 //        System.out.println(na.getArguments().getExpression(0).getClass());
         Term dim=null;
 
-        if(ProgramSVSort.SIMPLEEXPRESSION.canStandFor((ProgramElement) na.getArguments().getExpression(0), 
+        if(ProgramSVSort.SIMPLEEXPRESSION.canStandFor((ProgramElement) na.getArguments().get(0), 
                 svInst.getExecutionContext(), services)){
             dim = services.getTypeConverter().convertToLogicElement(
-                    na.getArguments().getExpression(0), svInst.getExecutionContext());
+                    na.getArguments().get(0), svInst.getExecutionContext());
         }else{
             return term.sub(0);
         }

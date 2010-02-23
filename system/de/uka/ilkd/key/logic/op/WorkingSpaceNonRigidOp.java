@@ -1,6 +1,6 @@
 package de.uka.ilkd.key.logic.op;
 
-import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.*;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 
@@ -104,7 +104,7 @@ public class WorkingSpaceNonRigidOp extends NonRigidFunction implements IWorking
 
     public ImmutableList<Term> getParameters(Term t) {
         assert t.op() == this;
-        ImmutableList<Term> result = new ImmutableList<Term>();
+        ImmutableList<Term> result =  ImmutableSLList.<Term>nil();
         int i = (getProgramMethod().isStatic() ? 0 : 1);
         for(; i<t.arity(); i++){
             result = result.append(t.sub(i));

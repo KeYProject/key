@@ -2,6 +2,7 @@ package de.uka.ilkd.key.rule.metaconstruct;
 
 import java.util.HashMap;
 
+import de.uka.ilkd.key.collection.*;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.MethodDeclaration;
@@ -60,14 +61,14 @@ public class ExpandMethodBodyPerc extends ProgramMetaConstruct {
 //      result = prettyNewObjectNames(result, methDecl, classContext);
 
         // at this point all arguments should be program variables
-        ArrayOfExpression argsAsParam = mbs.getArguments();
+        ImmutableArray<Expression> argsAsParam = mbs.getArguments();
 
         final HashMap<IProgramVariable, Expression> map = 
             new HashMap<IProgramVariable, Expression>();        
         for (int i = 0; i < argsAsParam.size(); i++) {
             map.put(methDecl.getParameterDeclarationAt(i).
                     getVariableSpecification().getProgramVariable(), 
-                    argsAsParam.getExpression(i));
+                    argsAsParam.get(i));
         }
         ProgVarReplaceVisitor paramRepl = 
             new ProgVarReplaceVisitor(result, map, services); 

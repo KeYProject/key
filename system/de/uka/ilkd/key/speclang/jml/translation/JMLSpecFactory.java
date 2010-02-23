@@ -13,6 +13,7 @@ package de.uka.ilkd.key.speclang.jml.translation;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import de.uka.ilkd.key.collection.*;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -603,6 +604,10 @@ public class JMLSpecFactory {
                                            originalSignals,
                                            originalSignalsOnly,
                                            originalDiverges,
+					   null,
+                                           null,
+                                           null,
+                                           null,
                                            null);
     }
     
@@ -812,7 +817,7 @@ public class JMLSpecFactory {
         } else {
             assignable = DefaultImmutableSet.<LocationDescriptor>nil();
             for(PositionedString expr : originalAssignable) {
-                ImmutableSet<LocationDescriptor> translated 
+                ImmutableSet<LocationDescriptor> translatedL 
                     = translator.translateAssignableExpression(
                                         expr, 
                                         programMethod.getContainerType(),

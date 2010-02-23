@@ -148,13 +148,13 @@ public class InitArrayCreation extends InitArray {
 					 KeYJavaType arrayType,
 					 ProgramVariable[] dimensions,
 					 Services services,
-                                         ArrayOfExpression args,
+                                         ImmutableArray<Expression> args,
                                          ProgramElement scope) {
 	TypeReference baseTypeRef =
 	    ((ArrayType)arrayType.getJavaType()).getBaseType();
 	KeYJavaType baseType = baseTypeRef.getKeYJavaType();
 
-        if(ProgramSVSort.SIMPLEEXPRESSION.canStandFor(args.getProgramElement(0),
+        if(ProgramSVSort.SIMPLEEXPRESSION.canStandFor(args.get(0),
                 null, services)){
             bodyStmnts.add(assign(resultVar,
                     new MethodReference

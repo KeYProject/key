@@ -110,9 +110,9 @@ public class IntroAtPreDefsOp extends AbstractMetaOperator {
 
                 Term newInvariant 
                     = inv.getInvariant(selfTerm, memoryArea, atPreFunctions, services);
-                SetOfTerm newPredicates
+                LoopPredicateSet newPredicates
                     = inv.getPredicates(selfTerm, atPreFunctions, services);
-                SetOfLocationDescriptor newModifies
+                LocationDescriptorSet newModifies
                     = inv.getModifies(selfTerm, memoryArea, atPreFunctions, services);
                 Term newVariant
                     = inv.getVariant(selfTerm, atPreFunctions, services);

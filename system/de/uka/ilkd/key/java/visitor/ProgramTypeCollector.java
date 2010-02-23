@@ -119,8 +119,7 @@ public class ProgramTypeCollector extends JavaASTVisitor {
                             (currentType,
                                     currentMR.getMethodName().toString(),
                                     currentMR.getMethodSignature(services,
-                                            new ExecutionContext
-                                                    (new TypeRef(currentType),
+                                            new ExecutionContext(new TypeRef(currentType), null,
                                                             currentSelf)),
                                     currentSelf.getKeYJavaType());
             //System.out.println("pm: " + currentPM);

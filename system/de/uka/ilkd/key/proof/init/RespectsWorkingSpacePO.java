@@ -2,11 +2,12 @@ package de.uka.ilkd.key.proof.init;
 
 import java.util.Map;
 
+import de.uka.ilkd.key.collection.*;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.speclang.ClassInvariant;
 import de.uka.ilkd.key.speclang.OperationContract;
-import de.uka.ilkd.key.speclang.SetOfClassInvariant;
 
 public class RespectsWorkingSpacePO extends EnsuresPostPO {
 
@@ -14,7 +15,7 @@ public class RespectsWorkingSpacePO extends EnsuresPostPO {
     
     public RespectsWorkingSpacePO(InitConfig initConfig,
                          OperationContract contract, 
-                         SetOfClassInvariant assumedInvs) {
+                         ImmutableSet<ClassInvariant> assumedInvs) {
         super(initConfig, 
               "RespectsWorkingSpace", 
               contract,
@@ -24,7 +25,7 @@ public class RespectsWorkingSpacePO extends EnsuresPostPO {
     
     @Override
     protected Term getPostTerm(ProgramVariable selfVar,
-            ListOfProgramVariable paramVars, ProgramVariable resultVar,
+            ImmutableList<ProgramVariable> paramVars, ProgramVariable resultVar,
             ProgramVariable exceptionVar, Map<Operator, Function> atPreFunctions)
             throws ProofInputException {
         Term result = translateWorkingSpacePost(contract, 
@@ -38,7 +39,7 @@ public class RespectsWorkingSpacePO extends EnsuresPostPO {
 
     @Override
     protected Term getPreTerm(ProgramVariable selfVar,
-            ListOfProgramVariable paramVars, ProgramVariable resultVar,
+            ImmutableList<ProgramVariable> paramVars, ProgramVariable resultVar,
             ProgramVariable exceptionVar, Map<Operator, Function> atPreFunctions)
             throws ProofInputException {
         Term result = translatePre(contract, selfVar, toPV(paramVars));

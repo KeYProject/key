@@ -1,9 +1,8 @@
 package de.uka.ilkd.key.logic.op;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 
-import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.*;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -75,7 +74,7 @@ public class WorkingSpaceRigidOp extends RigidFunction implements IWorkingSpaceO
     }
     
     public ImmutableList<Term> getParameters(Term t){
-        ImmutableList<Term> result = new ImmutableList<Term>();
+        ImmutableList<Term> result = ImmutableSLList.<Term>nil();
         int i = (getProgramMethod().isStatic() ? 0 : 1);
         for(; i<methodTerm.arity(); i++){
             result = result.append(methodTerm.sub(i));

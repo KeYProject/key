@@ -3144,8 +3144,8 @@ term130 returns [Term a = null]
 workingspaceterm returns [Term a=null]
 {
     Sort s1,s2;
-    ImmutableList<KeYJavaType> sig = new ImmutableList<KeYJavaType>();
-    ImmutableList<Term> args = new ImmutableList<Term>();
+    ImmutableList<KeYJavaType> sig = ImmutableSLList.<KeYJavaType>nil();
+    ImmutableList<Term> args = ImmutableSLList.<Term>nil();
     KeYJavaType classType = null;
     String methodName;
     Term self=null;
@@ -3198,7 +3198,7 @@ workingspaceterm returns [Term a=null]
         LBRACE pre=term RBRACE
         {
             unbindProgVars();
-            Term[] argTerms = args.toArray();
+            Term[] argTerms = args.toArray(AN_ARRAY_OF_TERMS);
             Term methodTerm = getServices().getJavaInfo().getProgramMethodTerm
                 (null, methodName, argTerms, classType.getSort().toString());
             WorkingSpaceRigidOp op = (WorkingSpaceRigidOp) functions().lookup(
@@ -3216,8 +3216,8 @@ workingspaceterm returns [Term a=null]
 workingspacenonrigidterm returns [Term a=null]
 {
     Sort s1,s2;
-    ImmutableList<KeYJavaType> sig = new ImmutableList<KeYJavaType>();
-    ImmutableList<Term> args = new ImmutableList<Term>();
+    ImmutableList<KeYJavaType> sig = ImmutableSLList.<KeYJavaType>nil();
+    ImmutableList<Term> args = ImmutableSLList.<Term>nil();
     KeYJavaType classType = null;
     String methodName,s;
     Term pre, t1, t2;
@@ -3273,7 +3273,7 @@ workingspacenonrigidterm returns [Term a=null]
         )?
         RPAREN
         {
-        	Term[] argArray = args.toArray();
+        	Term[] argArray = args.toArray(AN_ARRAY_OF_TERMS);
         	if(op!=null){
         		a = tf.createWorkingSpaceNonRigidTerm(op, argArray);
         	}else{
@@ -4064,7 +4064,7 @@ semisequent returns [Semisequent ss]
 { 
     Term head = null, t=null;
     ss = Semisequent.EMPTY_SEMISEQUENT;
-    ImmutableList<ConstrainedFormula> terms = new ImmutableList<ConstrainedFormula>();
+    ImmutableList<ConstrainedFormula> terms = ImmutableSLList.<ConstrainedFormula>nil();
 }
     :
         /* empty */ | 

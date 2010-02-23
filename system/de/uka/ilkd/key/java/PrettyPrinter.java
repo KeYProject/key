@@ -2197,7 +2197,7 @@ public class PrettyPrinter {
         writeInternalIndentation(x);
         write("new ");
         
-        if(!fileWriterMode && ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof PercProfile && x.getScope()!=null){
+        if(ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof PercProfile && x.getScope()!=null){
             write("@<");
             writeElement(x.getScope());
             write(">");
@@ -2284,7 +2284,7 @@ public class PrettyPrinter {
         writeInternalIndentation(x);
         write("new ");
         
-        if(!fileWriterMode && ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof PercProfile && x.getScope()!=null){
+        if(ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof PercProfile && x.getScope()!=null){
             write("@<");
             writeElement(x.getScope());
             write(">");
@@ -2466,7 +2466,7 @@ public class PrettyPrinter {
             writeCommaList(x.getArguments());
         }	
 	write(")");
-        if(!fileWriterMode && ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof PercProfile && x.getScope()!=null){
+        if(ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof PercProfile && x.getScope()!=null){
             write("@<");
             writeElement(x.getScope());
             write(">");

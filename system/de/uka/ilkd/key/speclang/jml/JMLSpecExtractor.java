@@ -12,7 +12,6 @@ package de.uka.ilkd.key.speclang.jml;
 
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.*;
-import de.uka.ilkd.key.java.reference.ArrayOfTypeReference;
 import de.uka.ilkd.key.collection.*;
 import de.uka.ilkd.key.java.Comment;
 import de.uka.ilkd.key.java.Position;
@@ -341,7 +340,7 @@ public class JMLSpecExtractor implements SpecExtractor {
             JMLInfoExtractor.isScopeSafe(pm.getContainerType());
         if(isScopeSafe) {
             TextualJMLSpecCase sc 
-                = new TextualJMLSpecCase(SLListOfString.EMPTY_LIST, 
+                = new TextualJMLSpecCase(ImmutableSLList.<String>nil(), 
                                          Behavior.BEHAVIOR);
 /*            if(pm.getKeYJavaType()!=null && 
                     !(pm.getKeYJavaType().getSort() instanceof PrimitiveSort)){
@@ -352,7 +351,7 @@ public class JMLSpecExtractor implements SpecExtractor {
                     "e instanceof javax.realtime.ScopedCycleException || "+
                     "e instanceof javax.realtime.InaccessibleAreaException ||"+
                     "e instanceof javax.realtime.ThrowBoundaryError)"));
-            SetOfOperationContract contracts
+            ImmutableSet<OperationContract> contracts
                 = jsf.createJMLOperationContractsAndInherit(pm, sc);
             result = result.union(contracts);
         }
@@ -420,14 +419,18 @@ public class JMLSpecExtractor implements SpecExtractor {
                     for (PositionedString nonNull : nonNullParams) {
                 	specCase.addRequires(nonNull);
                     }
-		    if(!JMLInfoExtractor.parameterInArbitraryScope(pm, j)){
-                       String outerScope = "\\outerScope(\\memoryArea("+param_name+"),\\currentMemoryArea)";
-                       specCase.addRequires(new PositionedString(
-                               outerScope, 
-                               fileName, 
-                               pm.getStartPosition()));
-                   }
-                }
+		}
+		String param_name = paramDecl.getName();
+                Type t = pm.getParameterDeclarationAt(j).
+                            getTypeReference().
+                            getKeYJavaType();
+		if(services.getTypeConverter().isReferenceType(t) &&
+		   !JMLInfoExtractor.parameterInArbitraryScope(pm, j)){
+		    String outerScope = "\\outerScope(\\memoryArea("+param_name+"),\\currentMemoryArea)";
+		    specCase.addRequires(new PositionedString(outerScope, 
+							      fileName, 
+							      pm.getStartPosition()));
+		}
                  
             }
 

@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.rule.metaconstruct;
 
+import de.uka.ilkd.key.collection.*;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.expression.literal.IntLiteral;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
@@ -7,7 +8,6 @@ import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.speclang.OperationContract;
-import de.uka.ilkd.key.speclang.SetOfOperationContract;
 
 public abstract class ScopeSpec extends AbstractMetaOperator {
 
@@ -18,7 +18,7 @@ public abstract class ScopeSpec extends AbstractMetaOperator {
     public Term calculate(Term term, SVInstantiations svInst, Services services, boolean localScope) {
         MethodBodyStatement mb = getMethodBodyStatement(term.sub(0));
         ProgramMethod pm = mb.getProgramMethod(services);
-        SetOfOperationContract contracts = services.getSpecificationRepository()
+        ImmutableSet<OperationContract> contracts = services.getSpecificationRepository()
                   .getOperationContracts(pm, Op.DIA);
         if(contracts.size() == 0) {
             IntLiteral lit = new IntLiteral("0");
@@ -30,12 +30,12 @@ public abstract class ScopeSpec extends AbstractMetaOperator {
            ? services.getTypeConverter()
                      .convertToLogicElement(mb.getDesignatedContext())
            : null);
-        ListOfTerm actualParams = SLListOfTerm.EMPTY_LIST;
-        ArrayOfExpression args = mb.getArguments();
+        ImmutableList<Term> actualParams = ImmutableSLList.<Term>nil();
+        ImmutableArray<Expression> args = mb.getArguments();
         for(int i = 0; i < args.size(); i++) {
             actualParams = actualParams.append(
                     services.getTypeConverter()
-                            .convertToLogicElement(args.getProgramElement(i)));
+                            .convertToLogicElement(args.get(i)));
         }
         
 

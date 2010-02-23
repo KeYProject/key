@@ -180,15 +180,14 @@ class JMLInfoExtractor {
         MethodDeclaration md = pm.getMethodDeclaration();
         ParameterDeclaration pd = md.getParameterDeclarationAt(pos);
 
-        ListOfComment comments = SLListOfComment.EMPTY_LIST;
+        ImmutableList<Comment> comments = ImmutableSLList.<Comment>nil();
         comments = comments.prepend(pd.getComments());
         comments = comments.prepend(pd.getTypeReference().getComments());
         comments = comments.prepend(pd.getVariableSpecification().getComments());
         for (int j=0; j < pd.getModifiers().size(); j++) {
-            comments = comments.prepend(pd.getModifiers().getModifier(j).getComments());
+            comments = comments.prepend(pd.getModifiers().get(j).getComments());
         }
-        for (IteratorOfComment it = comments.iterator(); it.hasNext(); ) {
-            Comment c = it.next();
+        for (Comment c : comments ) {
             if (checkFor("arbitraryScope",c.getText())){
                 return true;
             }
@@ -208,13 +207,13 @@ class JMLInfoExtractor {
     }
     
     private static boolean hasJMLModifier(ClassDeclaration cd, String mod){
-        ListOfComment coms = SLListOfComment.EMPTY_LIST;
-        ArrayOfModifier mods = cd.getModifiers();
+        ImmutableList<Comment> coms = ImmutableSLList.<Comment>nil();
+        ImmutableArray<Modifier> mods = cd.getModifiers();
         for (int i=0; i < mods.size(); i++) {
-            coms = coms.prepend(mods.getModifier(i).getComments());
+            coms = coms.prepend(mods.get(i).getComments());
         }  
-        for (IteratorOfComment it = coms.iterator(); it.hasNext(); ) {
-            if (checkFor(mod, it.next().getText()))
+        for (Comment c : coms) {
+            if (checkFor(mod, c.getText()))
                 return true;
         }
         return false;
@@ -225,8 +224,8 @@ class JMLInfoExtractor {
         MethodDeclaration method = pm.getMethodDeclaration();
         
         // Either mod is attached to a modifier ....
-        for (final Modifier mod : method.getModifiers()) {
-            coms = coms.prepend(mod.getComments());
+        for (final Modifier mo : method.getModifiers()) {
+            coms = coms.prepend(mo.getComments());
         }      
         
         // .... or to the return type ....

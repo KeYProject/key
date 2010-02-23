@@ -14,7 +14,6 @@ import java.io.IOException;
 import java.util.Iterator;
 import java.util.Map;
 
-import de.uka.ilkd.key.collection.ListOfString;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.reference.*;
 import de.uka.ilkd.key.java.statement.LoopStatement;
@@ -53,6 +52,7 @@ import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.speclang.LocationDescriptorSet;
 import de.uka.ilkd.key.speclang.LoopInvariant;
 import de.uka.ilkd.key.speclang.LoopPredicateSet;
+import de.uka.ilkd.key.speclang.LocationDescriptorSet;
 
 
 public class LoopInvariantProposer implements InstantiationProposer {
@@ -212,7 +212,7 @@ public class LoopInvariantProposer implements InstantiationProposer {
             } else if(varName.equals("#modifies")) {
                 assert var.isListSV();
                 assert var.matchType() == LocationDescriptor.class;
-                SetOfLocationDescriptor locs = inv.getModifies(selfTerm, atPreFunctions, services);
+                LocationDescriptorSet locs = inv.getModifies(selfTerm, atPreFunctions, services);
                 if(services.getProof().getSettings().getProfile() instanceof RTSJProfile ||
                         services.getProof().getSettings().getProfile() instanceof PercProfile){
                     Term mCons = TermBuilder.DF.dot(mTerm, services.getJavaInfo().getAttribute(
@@ -222,7 +222,7 @@ public class LoopInvariantProposer implements InstantiationProposer {
                             TermBuilder.DF.var((ProgramVariable)
                             services.getNamespaces().programVariables().
                             lookup(new Name(ProblemInitializer.heapSpaceName))));
-                    locs = locs.add(heap).add(cons);
+                    locs = new LocationDescriptorSet(locs.asSet().add(heap).add(cons));
                 }
                 inst = locs;
             } else if(varName.equals("ws")){ 

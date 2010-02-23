@@ -319,6 +319,7 @@ public class CreateArrayMethodBuilder extends KeYJavaASTFactory {
     public ProgramMethod getCreateArrayHelperMethod(
             TypeReference arrayTypeReference, ProgramVariable length,
             ImmutableList<Field> fields, 
+            AnnotationUseSpecification ecs, 
             AnnotationUseSpecification nls) {
 
         final Modifier[] modifiers = new Modifier[] { new Private(), ecs, nls };

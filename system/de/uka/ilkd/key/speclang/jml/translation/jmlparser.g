@@ -312,7 +312,7 @@ options {
         }
     }
     
-    private Term createArraySizeTerm(int size, ListOfTerm l){
+    private Term createArraySizeTerm(int size, ImmutableList<Term> l){
         Term elSize = l.tail().isEmpty() ?
         services.getTypeConverter().convertToLogicElement(
             new IntLiteral(""+size)) :
@@ -712,9 +712,8 @@ options {
 	    //fields of java.lang.Object
 	    
 	    ClassDeclaration cd = (ClassDeclaration) javaInfo.getJavaLangObject().getJavaType();
-	    ListOfField fields = javaInfo.getAllFields(cd);
-	    for(IteratorOfField it = fields.iterator(); it.hasNext(); ) {
-        	Field f = it.next();
+	    ImmutableList<Field> fields = javaInfo.getAllFields(cd);
+	    for(Field f:fields) {
             ProgramVariable pv = (ProgramVariable) f.getProgramVariable();
             if(!pv.isStatic()) {
             	Term fieldTerm = tb.dot(objectTerm, pv);
@@ -1778,7 +1777,7 @@ decimalnumeral returns [Term result=null] throws SLTranslationException
 jmlprimary returns [JMLExpression result=null] throws SLTranslationException
 {
     Term t=null, o1=null, o2=null, pre=null, dimTerm;
-    ListOfTerm dimTerms = SLListOfTerm.EMPTY_LIST;
+    ImmutableList<Term> dimTerms = ImmutableSLList.<Term>nil();
     ImmutableList<Term> sl;
     KeYJavaType typ;
     ProgramMethod method;
@@ -2133,7 +2132,7 @@ methodsignature[LinkedList args] returns [ProgramMethod pm=null] throws SLTransl
     String prefix=null;
     String methodName=null;
     KeYJavaType kjt, classType=null;
-    ListOfKeYJavaType sig = SLListOfKeYJavaType.EMPTY_LIST;
+    ImmutableList<KeYJavaType> sig = ImmutableSLList.<KeYJavaType>nil();
     String argName=null;
 }:
         prefix=name

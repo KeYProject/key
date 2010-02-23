@@ -70,7 +70,7 @@ public class EnsuresPostPO extends EnsuresPO {
         result = TB.and(result, TB.not(TB.equals(TB.dot(t_mem,stack), TB.NULL(services))));
         
         Term initialMemCreatedAndNotNullTerm
-            = createdFactory.createCreatedAndNotNullTerm(services, t_mem);
+            = CreatedAttributeTermFactory.INSTANCE.createCreatedAndNotNullTerm(services, t_mem);
         result = TB.and(result, initialMemCreatedAndNotNullTerm);
         
         Term workingSpace=null;

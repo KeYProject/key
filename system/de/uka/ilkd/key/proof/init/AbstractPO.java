@@ -159,7 +159,7 @@ public abstract class AbstractPO implements ProofOblInput {
      */
     protected Term translateWorkingSpacePost(OperationContract contract,
                                  ParsableVariable selfVar,
-                                 ImmutableList<ProgramVariable> paramVars,
+                                 ImmutableList<ParsableVariable> paramVars,
                                  ParsableVariable resultVar,
                                  ParsableVariable excVar,
                                  /*inout*/ Map<Operator, Function/*(atPre)*/> atPreFunctions) 

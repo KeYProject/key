@@ -1,5 +1,8 @@
 package de.uka.ilkd.key.rule;
 
+import java.util.Iterator;
+
+import de.uka.ilkd.key.collection.*;
 import de.uka.ilkd.key.gui.Main;
 import de.uka.ilkd.key.gui.WorkingSpaceContractDialog;
 import de.uka.ilkd.key.java.Services;
@@ -57,8 +60,8 @@ public class UseWorkingSpaceContractRule implements BuiltInRule {
         }
     }    
     
-    public SetOfOperationContract getSpecs(ProgramMethod pm, Services services){
-        SetOfOperationContract result = services.getSpecificationRepository()
+    public ImmutableSet<OperationContract> getSpecs(ProgramMethod pm, Services services){
+        ImmutableSet<OperationContract> result = services.getSpecificationRepository()
                   .getOperationContracts(pm, Modality.DIA);
         return result;
     }
@@ -83,7 +86,7 @@ public class UseWorkingSpaceContractRule implements BuiltInRule {
         return name.toString();
     }
 
-    public ListOfGoal apply(Goal goal, Services services, RuleApp ruleApp) {
+    public ImmutableList<Goal> apply(Goal goal, Services services, RuleApp ruleApp) {
         
         Term ws = ruleApp.posInOccurrence().subTerm();
         Term wsNoUpd = goBelowUpdates(ruleApp.posInOccurrence()).subTerm();
@@ -98,9 +101,9 @@ public class UseWorkingSpaceContractRule implements BuiltInRule {
         
         if(spec==null) return null;
     
-        final ListOfGoal result = goal.split(2);            
+        final ImmutableList<Goal> result = goal.split(2);            
            
-        final IteratorOfGoal goalIt = result.iterator();
+	final Iterator<Goal> goalIt = result.iterator();
         
         if(!(ws.op() instanceof WorkingSpaceRigidOp) || !ws.op().isRigid(ws)) {
             Goal g = goalIt.next();
