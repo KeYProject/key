@@ -49,7 +49,7 @@ public class Unpack extends ProgramMetaConstruct {
 	}
 
 	loopInitStatementList
-	[loopInitStatementList.length - 1] = new For((LoopInit)null, 
+	[loopInitStatementList.length - 1] = new For(null,
 		astFor.getGuard(), 
 		astFor.getIForUpdates(), 
 		astFor.getBody());

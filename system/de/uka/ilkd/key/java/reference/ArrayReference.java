@@ -74,7 +74,7 @@ public class ArrayReference extends JavaNonTerminalProgramElement
 	Expression[] e = (Expression[])children.collect(Expression.class);
 	if(e.length>1){
 	    Expression[] e1 = new Expression[e.length-1];
-	    for(int i=0; i<e1.length; i++) e1[i] = e[i];
+        System.arraycopy(e, 0, e1, 0, e1.length);
 	    this.prefix=new ArrayReference(e1, accessPath);
 	    e1= new Expression[1];
 	    e1[0]=e[e.length-1];
@@ -103,7 +103,7 @@ public class ArrayReference extends JavaNonTerminalProgramElement
     private ArrayReference(Expression[] e, ReferencePrefix accessPath) {
 	Expression[] e1 = new Expression[e.length-1];
 	if(e.length>1){
-	    for(int i=0; i<e1.length; i++) e1[i] = e[i];
+        System.arraycopy(e, 0, e1, 0, e1.length);
 	    this.prefix=new ArrayReference(e1, accessPath);
 	    e1[0]=e[e.length-1];
 	    this.inits=new ImmutableArray<Expression>(e1);

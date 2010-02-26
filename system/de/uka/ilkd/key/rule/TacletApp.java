@@ -244,7 +244,7 @@ public abstract class TacletApp implements RuleApp {
 	    if (pair.key().isVariableSV()) {
 		SchemaVariable varSV = pair.key();		
 		Term value = ((TermInstantiation)pair.value()).getTerm();
-		if (!collMap.containsKey((LogicVariable)value.op())) {
+		if (!collMap.containsKey(value.op())) {
 		    collMap.put((LogicVariable)value.op(), varSV);
 		} else {
 		    insts = replaceInstantiation(taclet, insts, varSV);	
@@ -286,13 +286,12 @@ public abstract class TacletApp implements RuleApp {
      * the Taclet
      */
     private static Term getTermBelowQuantifier(Taclet taclet, SchemaVariable varSV) {
-	Iterator<ConstrainedFormula> it=taclet.ifSequent().iterator();
-	while (it.hasNext()) {
-	    Term result=getTermBelowQuantifier(varSV, it.next().formula());
-	    if (result!=null) {
-		return result;
-	    }
-	}
+        for (ConstrainedFormula cf : taclet.ifSequent()) {
+            Term result = getTermBelowQuantifier(varSV, cf.formula());
+            if (result != null) {
+                return result;
+            }
+        }
 
 	if (taclet instanceof FindTaclet) {
 	    return getTermBelowQuantifier(varSV, ((FindTaclet)taclet).find());
@@ -531,7 +530,7 @@ public abstract class TacletApp implements RuleApp {
         MatchConditions cond = matchConditions();
         
         if (sv instanceof SortedSchemaVariable) {
-            cond = ((SortedSchemaVariable)sv).match(term, cond, services);
+            cond = sv.match(term, cond, services);
         } else {
             cond = sv.match(term.op(), cond, services);
         }
@@ -622,11 +621,11 @@ public abstract class TacletApp implements RuleApp {
                         proposals = proposals.prepend(proposal);
                         try {
                             app = app.addCheckedInstantiation(sv, pe, services, true);
+                            nameclash = false;
                         } catch (IllegalInstantiationException iie) {
                             // name clash
                             nameclash=true;
                         }
-                        nameclash=false;
                     } while (nameclash);                    
                 } else if ( sv.isSkolemTermSV () ) {
                     // if the sort of the schema variable is generic,
@@ -1205,7 +1204,7 @@ public abstract class TacletApp implements RuleApp {
         MatchConditions cond = matchConditions();
         
         if (sv instanceof ProgramSV) {
-            cond = ((ProgramSV)sv).match(pe, cond, services);
+            cond = sv.match(pe, cond, services);
         } else {
             throw new IllegalInstantiationException("Cannot match program element '"+ pe +
                     "'("+(pe == null ? null : pe.getClass().getName())+") to non program sv " + sv);
@@ -1405,9 +1404,7 @@ public abstract class TacletApp implements RuleApp {
     private ImmutableList<ConstrainedFormula> createSemisequentList ( Semisequent p_ss ) {
 	ImmutableList<ConstrainedFormula> res = ImmutableSLList.<ConstrainedFormula>nil();
 
-	Iterator<ConstrainedFormula> it  = p_ss.iterator ();
-	while ( it.hasNext () )
-	    res = res.prepend ( it.next () );
+        for (Object p_s : p_ss) res = res.prepend((ConstrainedFormula) p_s);
 
 	return res;	
     }
@@ -1536,18 +1533,15 @@ public abstract class TacletApp implements RuleApp {
     public Namespace extendVarNamespaceForSV(Namespace var_ns, 
 					     SchemaVariable sv) {
 	Namespace ns=new Namespace(var_ns);
-        Iterator<SchemaVariable> it=taclet().getPrefix(sv).prefix().iterator();
-	while (it.hasNext()) {
-	    LogicVariable var = (LogicVariable) 
-		((Term)instantiations().getInstantiation(it.next())).op();
-	    ns.add(var);
-	}
-	if (taclet().getPrefix(sv).context()) {	    
-	    Iterator<QuantifiableVariable> lit
-		= contextVars(sv).iterator();
-	    while (lit.hasNext()) {
-		ns.add(lit.next());
-	    }
+        for (SchemaVariable schemaVariable : taclet().getPrefix(sv).prefix()) {
+            LogicVariable var = (LogicVariable)
+                    ((Term) instantiations().getInstantiation(schemaVariable)).op();
+            ns.add(var);
+        }
+	if (taclet().getPrefix(sv).context()) {
+        for (QuantifiableVariable quantifiableVariable : contextVars(sv)) {
+            ns.add(quantifiableVariable);
+        }
 	}
 	return ns;
     }
@@ -1583,35 +1577,32 @@ public abstract class TacletApp implements RuleApp {
      * conflict-causing bound SchemaVariables
      */
     public SchemaVariable varSVNameConflict() {
-	Iterator<SchemaVariable> svIt=uninstantiatedVars().iterator();
-	while (svIt.hasNext()) { 
-	    SchemaVariable sv=svIt.next();
-	    if (sv.isTermSV() || sv.isFormulaSV()) {
-		TacletPrefix prefix=taclet().getPrefix(sv);
-		HashSet<Name> names=new HashSet<Name>();	    
-		if (prefix.context()) {
-		    Iterator<QuantifiableVariable> contextIt
-			= contextVars(sv).iterator();
-		    while (contextIt.hasNext()) {
-			names.add(contextIt.next().name());
-		    }
-		}
-		Iterator<SchemaVariable> varSVIt=prefix.iterator();
-		while(varSVIt.hasNext()) {
-		    SchemaVariable varSV=varSVIt.next();
-		    Term inst = (Term)
-			instantiations().getInstantiation(varSV);
-		    if (inst!=null) {
-			Name name = inst.op().name();
-			if (!names.contains(name)) {
-			    names.add(name);
-			} else {
-			    return varSV;
-			}
-		    }
-		}
-	    }
-	}
+        for (SchemaVariable schemaVariable : uninstantiatedVars()) {
+            SchemaVariable sv = schemaVariable;
+            if (sv.isTermSV() || sv.isFormulaSV()) {
+                TacletPrefix prefix = taclet().getPrefix(sv);
+                HashSet<Name> names = new HashSet<Name>();
+                if (prefix.context()) {
+                    for (QuantifiableVariable quantifiableVariable : contextVars(sv)) {
+                        names.add(quantifiableVariable.name());
+                    }
+                }
+                Iterator<SchemaVariable> varSVIt = prefix.iterator();
+                while (varSVIt.hasNext()) {
+                    SchemaVariable varSV = varSVIt.next();
+                    Term inst = (Term)
+                            instantiations().getInstantiation(varSV);
+                    if (inst != null) {
+                        Name name = inst.op().name();
+                        if (!names.contains(name)) {
+                            names.add(name);
+                        } else {
+                            return varSV;
+                        }
+                    }
+                }
+            }
+        }
 	return null;
     }
 

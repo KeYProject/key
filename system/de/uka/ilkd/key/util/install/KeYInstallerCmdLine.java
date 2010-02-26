@@ -200,10 +200,10 @@ public class KeYInstallerCmdLine extends KeYInstallerUI {
 
 	    StringBuffer missing = 
 		new StringBuffer ( "The following libraries are missing:\n" );
-	    for ( int i = 0; i < missingLibs.length; i++ ) {
-		missing.append ( missingLibs [i] );
-		missing.append ( "\n" );
-	    }
+        for (String missingLib : missingLibs) {
+            missing.append(missingLib);
+            missing.append("\n");
+        }
 	    
 	    missing.append ( "Please copy them to " );
 	    missing.append ( keyLib () );

@@ -17,9 +17,9 @@ import java.util.Stack;
 
 import org.apache.log4j.Logger;
 
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
-import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -36,11 +36,11 @@ import de.uka.ilkd.key.util.ExtList;
 
 public class SVPrefixCollector extends TacletVisitor {
 
-    private final Stack<Boolean> prefixStack = new Stack<Boolean> ();
+    private final Stack<Integer> prefixStack = new Stack<Integer> ();
 
-    private static final Boolean LEVEL       = new Boolean ( true );
-    private static final Boolean SCOPE_LEVEL = new Boolean ( true );
-    private static final Boolean HORIZON     = new Boolean ( true );
+    private static final Integer LEVEL       = new Integer(0);
+    private static final Integer SCOPE_LEVEL = new Integer(1);
+    private static final Integer HORIZON     = new Integer(2);
 
     private SVTypeInfos svTypeInfos;
     private final Services    services;
@@ -223,10 +223,7 @@ public class SVPrefixCollector extends TacletVisitor {
 		    prefix   = getProgramVariablePrefix ();
 
 		    if ( o instanceof VariableDeclarationUnit ) {
-			Iterator<IProgramVariable> it =
-			    ((VariableDeclarationUnit)o).vars.iterator ();
-			while ( it.hasNext () )
-			    prefix = prefix.add ( it.next () );
+                for (IProgramVariable var : ((VariableDeclarationUnit) o).vars) prefix = prefix.add(var);
 		    }
 		}
 
@@ -595,10 +592,8 @@ public class SVPrefixCollector extends TacletVisitor {
 	private static <T> ImmutableList<IProgramVariable> toPV ( ImmutableList<T> p_svs,
 					      SVInstantiations     p_svi ) {
 	    ImmutableList<IProgramVariable>   res = ImmutableSLList.<IProgramVariable>nil();
-	    Iterator<T> it  = p_svs.iterator ();
 
-	    while ( it.hasNext () )
-		res = res.prepend ( toPV ( (SchemaVariable)it.next (), p_svi ) );
+        for (T p_sv : p_svs) res = res.prepend(toPV((SchemaVariable) p_sv, p_svi));
 
 	    return res;
 	}

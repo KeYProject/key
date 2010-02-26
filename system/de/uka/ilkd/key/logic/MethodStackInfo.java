@@ -34,9 +34,8 @@ public class MethodStackInfo implements NameCreationInfo {
     public String infoAsString() {
         String result = "Method stack:\n";
 
-        Iterator<ProgramMethod> it = methods.iterator();
-        while(it.hasNext()) {
-            ProgramMethod m = it.next();
+        for (ProgramMethod method : methods) {
+            ProgramMethod m = method;
             result += "- " + m.getProgramElementName().toString() + "\n";
         }
 

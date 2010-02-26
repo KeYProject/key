@@ -55,9 +55,8 @@ public class Association {
         
         if(name == null) {
             name = "";
-            Iterator<AssociationEnd> it = ends.iterator();
-            while(it.hasNext()) {
-                name += it.next().getRoleName() + "_";
+            for (AssociationEnd end : ends) {
+                name += end.getRoleName() + "_";
             }
             name = name.substring(0, name.length() - 1);
         } 

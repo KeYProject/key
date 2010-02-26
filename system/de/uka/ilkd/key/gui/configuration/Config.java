@@ -118,11 +118,10 @@ public class Config {
 
     public synchronized void fireConfigChange() {
 	synchronized(listenerList) {
-	    Iterator<ConfigChangeListener> it = listenerList.iterator();
-	    while (it.hasNext()) {
-		it.next().
-		    configChanged(configChangeEvent);
-	    }
+        for (ConfigChangeListener aListenerList : listenerList) {
+            aListenerList.
+                    configChanged(configChangeEvent);
+        }
 	}
     }
 

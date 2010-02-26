@@ -195,7 +195,7 @@ public class AccessMethodsManager {
     @SuppressWarnings("unchecked")
     public ArrayLengthReference arrayLength(final FieldReference fr) {
 	final ExtList l = new ExtList();
-	l.add((ReferencePrefix) objParam(fr.getReferencePrefix(), fr
+	l.add(objParam(fr.getReferencePrefix(), fr
 	        .getProgramVariable()));
 	return new ArrayLengthReference(l);
     }
@@ -214,6 +214,8 @@ public class AccessMethodsManager {
 	    final Expression[] index = { lhs.getExpressionAt(lhs
 		    .getExpressionCount() - 1) };
 	    return new ArrayReference(reference, index);
+	} else if (refPre instanceof MethodReference){
+	    return lhs;
 	}
 	throw new RuntimeException("Missing type for refPre=\n" + refPre
 	        + " with class: " + refPre.getClass());
@@ -251,7 +253,7 @@ public class AccessMethodsManager {
     private Expression classParam(final ProgramVariable pv) {
 	final KeYJavaType classOfPv = pv.getContainerType();
 	return new SyntacticalProgramVariable(new ProgramElementName(classOfPv
-	        .getName()
+	        .getFullName()
 	        + ".class"), classOfPv);
     }
 

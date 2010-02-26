@@ -131,7 +131,7 @@ public class StrategyProperties extends Properties {
      * @param p
      */
     private static Object readSingleOption(Properties p, String key) {
-        Object o = (String) p.get("[StrategyProperty]"+key);
+        Object o = p.get("[StrategyProperty]"+key);
         if (o == null) o = defaultMap.get(key);
         return o;
     }

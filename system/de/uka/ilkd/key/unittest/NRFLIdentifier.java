@@ -17,10 +17,8 @@
 
 package de.uka.ilkd.key.unittest;
 
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.NonRigidFunctionLocation;
-import de.uka.ilkd.key.logic.op.Operator;
 
 /**
  * Class is needed to be able to distinguish NonRigidFunctionLocations while

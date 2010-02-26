@@ -44,6 +44,7 @@ public class HelperClassForTests {
             KeYUserProblemFile po 
             	= new KeYUserProblemFile("UpdatetermTest", file, null); 
             pi = new ProblemInitializer(profile);
+           
             pi.startProver(po, po);
             result = po.getPO();                            
 

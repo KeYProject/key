@@ -5,13 +5,6 @@
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
-//This file is part of KeY - Integrated Deductive Software Design
-//Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
-//                      Universitaet Koblenz-Landau, Germany
-//                      Chalmers University of Technology, Sweden
-//
-//The KeY system is protected by the GNU General Public License. 
-//See LICENSE.TXT for details.
 //
 //
 
@@ -608,19 +601,19 @@ public class JMLSpecFactory {
         ImmutableSet<Term> predicates = DefaultImmutableSet.<Term>nil();
         for(PositionedString ps : originalPredicates) {
             String[] exprs = ps.text.split(",", 0);
-            
-            for(int i = 0; i < exprs.length; i++) {
+
+            for (String expr : exprs) {
                 FormulaWithAxioms translated
-                    = translator.translateExpression(
-                            new PositionedString(exprs[i]), 
-                            programMethod.getContainerType(),
-                            selfVar, 
-                            paramVars.append(freeVars), 
-                            null, 
-                            null,
-                            atPreFunctions);
+                        = translator.translateExpression(
+                        new PositionedString(expr),
+                        programMethod.getContainerType(),
+                        selfVar,
+                        paramVars.append(freeVars),
+                        null,
+                        null,
+                        atPreFunctions);
                 assert translated.getAxioms().isEmpty();
-                predicates = predicates.add(translated.getFormula());                
+                predicates = predicates.add(translated.getFormula());
             }
         }
         

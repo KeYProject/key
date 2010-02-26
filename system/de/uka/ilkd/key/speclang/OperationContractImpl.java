@@ -159,23 +159,21 @@ public final class OperationContractImpl implements OperationContract {
         
         //atPre-functions
         if(atPreFunctions != null) {
-            Iterator<Map.Entry<Operator, Function>> it = 
-                originalAtPreFunctions.entrySet().iterator();
-            while(it.hasNext()) {
-                Map.Entry<Operator,Function> entry = it.next();
+            for (Object o : originalAtPreFunctions.entrySet()) {
+                Map.Entry<Operator, Function> entry = (Map.Entry<Operator, Function>) o;
                 Operator originalNormalOp = entry.getKey();
                 Function originalAtPreFunc = entry.getValue();
                 Operator normalOp = result.get(originalNormalOp);
-                if(normalOp == null) {
+                if (normalOp == null) {
                     normalOp = originalNormalOp;
                 }
                 Function atPreFunc = atPreFunctions.get(normalOp);
-                if(atPreFunc == null) {
-                    atPreFunc 
-                        = AtPreFactory.INSTANCE.createAtPreFunction(normalOp, 
-                                                                    services);
+                if (atPreFunc == null) {
+                    atPreFunc
+                            = AtPreFactory.INSTANCE.createAtPreFunction(normalOp,
+                            services);
                     atPreFunctions.put(normalOp, atPreFunc);
-                    services.getNamespaces().functions().add(atPreFunc);                    
+                    services.getNamespaces().functions().add(atPreFunc);
                 }
                 assert originalAtPreFunc.sort().equals(atPreFunc.sort());
                 result.put(originalAtPreFunc, atPreFunc);

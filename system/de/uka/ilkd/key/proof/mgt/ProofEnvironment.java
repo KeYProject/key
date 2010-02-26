@@ -130,10 +130,9 @@ public class ProofEnvironment {
      * justification. 
      */
     public void registerRules(ImmutableSet<Taclet> s, RuleJustification j) {
-	Iterator<Taclet> it = s.iterator();
-	while (it.hasNext()) {
-	    registerRule(it.next(), j);
-	}
+        for (Taclet value : s) {
+            registerRule(value, j);
+        }
     }
 
     /** registers a list of rules with the given justification at the
@@ -142,11 +141,10 @@ public class ProofEnvironment {
      * justification. 
      */
     public void registerRules(ImmutableList<BuiltInRule> s, RuleJustification j) {
-	Iterator<BuiltInRule> it = s.iterator();
-	while (it.hasNext()) {
-	    Rule r=it.next();
-	    registerRule(r, j);
-	}
+        for (BuiltInRule value : s) {
+            Rule r = value;
+            registerRule(r, j);
+        }
     }
 
     /** retrieves all proofs registered at this environment 

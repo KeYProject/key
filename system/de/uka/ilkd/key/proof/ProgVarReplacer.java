@@ -134,25 +134,24 @@ public class ProgVarReplacer {
 	appsToBeRemoved = DefaultImmutableSet.<NoPosTacletApp>nil();
 	appsToBeAdded   = DefaultImmutableSet.<NoPosTacletApp>nil();
 
-	Iterator<NoPosTacletApp> it = noPosTacletApps.iterator();
-	while(it.hasNext()) {
-	    NoPosTacletApp noPosTacletApp = it.next();
-	    SVInstantiations insts = noPosTacletApp.instantiations();
+        for (NoPosTacletApp noPosTacletApp1 : noPosTacletApps) {
+            NoPosTacletApp noPosTacletApp = noPosTacletApp1;
+            SVInstantiations insts = noPosTacletApp.instantiations();
 
-	    SVInstantiations newInsts = replace(insts);
+            SVInstantiations newInsts = replace(insts);
 
-	    if(newInsts != insts) {
-	    	NoPosTacletApp newNoPosTacletApp
-		 	= NoPosTacletApp.createNoPosTacletApp(
-				noPosTacletApp.taclet(),
-		    		newInsts,
-				noPosTacletApp.constraint(),
-				noPosTacletApp.newMetavariables(),
-				noPosTacletApp.ifFormulaInstantiations());
-		appsToBeRemoved = appsToBeRemoved.add(noPosTacletApp);
-		appsToBeAdded   = appsToBeAdded.add(newNoPosTacletApp);
-	    }
-	}
+            if (newInsts != insts) {
+                NoPosTacletApp newNoPosTacletApp
+                        = NoPosTacletApp.createNoPosTacletApp(
+                        noPosTacletApp.taclet(),
+                        newInsts,
+                        noPosTacletApp.constraint(),
+                        noPosTacletApp.newMetavariables(),
+                        noPosTacletApp.ifFormulaInstantiations());
+                appsToBeRemoved = appsToBeRemoved.add(noPosTacletApp);
+                appsToBeAdded = appsToBeAdded.add(newNoPosTacletApp);
+            }
+        }
 
 	tacletIndex.removeTaclets(appsToBeRemoved);
 	tacletIndex.addTaclets(appsToBeAdded);

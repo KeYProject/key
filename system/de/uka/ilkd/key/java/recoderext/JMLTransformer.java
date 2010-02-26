@@ -136,7 +136,7 @@ public class JMLTransformer extends RecoderModelTransformer {
         
         for(String mod : mods) {
             if(!javaMods.contains(mod)) {
-                sb.append(mod + " ");
+                sb.append(mod).append(" ");
             }
         }
         
@@ -196,8 +196,8 @@ public class JMLTransformer extends RecoderModelTransformer {
         }
         
         Comment[] result = pe.getComments().toArray(new Comment[0]);
-        for (int i = 0; i < result.length; i++) {
-            result[i].setParent(pe);
+        for (Comment aResult : result) {
+            aResult.setParent(pe);
         }
 
         return result;
@@ -453,8 +453,8 @@ public class JMLTransformer extends RecoderModelTransformer {
                                                 throws SLTranslationException {
         //recurse to all pre-existing children
         ProgramElement[] children = getChildren(pe);
-        for(int i = 0; i < children.length; i++) {
-            transformMethodlevelCommentsHelper(children[i], fileName);
+        for (ProgramElement aChildren : children) {
+            transformMethodlevelCommentsHelper(aChildren, fileName);
         }
         
         if(pe instanceof MethodDeclaration) return;

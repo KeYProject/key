@@ -167,12 +167,12 @@ public class TermFactory {
 	}
         final Term[] t1 = new Term[3];
         t1[0] = t;
-        
-        for(int i=0;i<index.length;i++){
-	    t1[1] = index[i];
-	    t1[2] = shadownum;
-	    t1[0] = OpTerm.createOpTerm(op, t1).checked();
-	}
+
+        for (Term anIndex : index) {
+            t1[1] = anIndex;
+            t1[2] = shadownum;
+            t1[0] = OpTerm.createOpTerm(op, t1).checked();
+        }
 	
         return t1[0];
     }
@@ -191,10 +191,9 @@ public class TermFactory {
 	    throw new IllegalArgumentException("null-Operator at TermFactory"); 
 	}
         Term array = t;
-        for(int i=0;i<index.length;i++){
-	    final Term idx = index[i];
-	    array = OpTerm.createBinaryOpTerm(op, array, idx).checked();
-	}
+        for (final Term idx : index) {
+            array = OpTerm.createBinaryOpTerm(op, array, idx).checked();
+        }
 	return array;
     }
 
@@ -682,7 +681,7 @@ public class TermFactory {
             return createAnonymousUpdateTerm
 	    ((AnonymousUpdate)op, subTerms[0]);
 	} else if (op instanceof Modality) {
-	    return createProgramTerm((Modality)op, javaBlock, subTerms[0]); 
+	    return createProgramTerm(op, javaBlock, subTerms[0]);
 	} else if (op instanceof AccessOp) {
 	    if (op instanceof ShadowAttributeOp) {
 		return createShadowAttributeTerm((ShadowAttributeOp)op, 

@@ -77,9 +77,9 @@ public class ProofSettings {
             new LibrariesSettings(),
             TacletTranslationSettings.getInstance()
 	};
-	for (int i = 0; i < settings.length; i++) { 
-	    settings[i].addSettingsListener(listener);
-	}        
+        for (Settings setting : settings) {
+            setting.addSettingsListener(listener);
+        }
     }
     
     /* copy constructor - substitutes .clone() in classes implementing Settings */
@@ -89,8 +89,8 @@ public class ProofSettings {
         Properties result = new Properties();
         Settings[] s = toCopy.settings;
 
-        for (int i = 0; i < s.length; i++) {
-            s[i].writeSettings(result);
+        for (Settings value : s) {
+            value.writeSettings(result);
         }
         
         for (int i = settings.length - 1; i >= 0; i--) {
@@ -130,9 +130,9 @@ public class ProofSettings {
     public void settingsToStream(Settings[] s,OutputStream out) {
     try {
         Properties result = new Properties();
-	    for (int i = 0; i < s.length; i++) {
-	    s[i].writeSettings(result);
-	    }
+        for (Settings value : s) {
+            value.writeSettings(result);
+        }
 	    result.store(out, "Proof-Settings-Config-File");
 	} catch (IOException e){
 	    System.err.println("Warning: could not save proof-settings.");

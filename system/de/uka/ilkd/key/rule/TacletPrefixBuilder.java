@@ -73,7 +73,7 @@ public class TacletPrefixBuilder {
     private void visit(Term t) {
 	if (t.op() instanceof SortedSchemaVariable && 
 	    !((SchemaVariable)t.op()).isVariableSV() &&
-	    !((SchemaVariable)t.op()).isProgramSV() &&
+	    !((SchemaVariable)t.op()).isProgramSV()  &&
 	    !((SchemaVariable)t.op()).isSkolemTermSV()) {    // see below /AR
 	    SchemaVariable sv = (SchemaVariable)t.op();
 	    ImmutableSet<SchemaVariable> relevantBoundVars = removeNotFreeIn(sv);
@@ -97,10 +97,9 @@ public class TacletPrefixBuilder {
     
 
     private void visit(Sequent s) {
-	Iterator<ConstrainedFormula> it=s.iterator();
-	while (it.hasNext()) {
-	    visit(it.next().formula());
-	}
+        for (final ConstrainedFormula cf : s) {
+            visit(cf.formula());
+        }
     }
 
     private void visit(TacletGoalTemplate templ) {
@@ -157,13 +156,11 @@ public class TacletPrefixBuilder {
 
 	// we have to descend into the addrules of the addrules
 
-	final Iterator<TacletGoalTemplate> templateIt = addRule.goalTemplates().iterator();
-	while (templateIt.hasNext()) {
-	    final Iterator<Taclet> moreRules = templateIt.next().rules().iterator();
-	    while (moreRules.hasNext()) {
-		checkPrefixInAddRules(moreRules.next());
-	    }
-	}	
+        for (TacletGoalTemplate tacletGoalTemplate : addRule.goalTemplates()) {
+            for (Taclet taclet : tacletGoalTemplate.rules()) {
+                checkPrefixInAddRules(taclet);
+            }
+        }
     }
     
 
@@ -188,18 +185,15 @@ public class TacletPrefixBuilder {
 	RewriteTacletBuilder rwtacletBuilder=(RewriteTacletBuilder)tacletBuilder;
 	TacletSchemaVariableCollector svc=new TacletSchemaVariableCollector();
 	svc.visit(rwtacletBuilder.ifSequent());
-	Iterator<TacletGoalTemplate> it
-	    = rwtacletBuilder.goalTemplates().iterator();
-	while (it.hasNext()) {
-	    TacletGoalTemplate tmpl = it.next();
+        for (TacletGoalTemplate tacletGoalTemplate : rwtacletBuilder.goalTemplates()) {
+            TacletGoalTemplate tmpl = tacletGoalTemplate;
 //	    if (tmpl instanceof RewriteTacletGoalTemplate) {	    
 //		RewriteTacletGoalTemplate
 //		    gt=(RewriteTacletGoalTemplate)tmpl; 
-		svc.visit(tmpl.sequent());   
-		Iterator<Taclet> addRuleIt = tmpl.rules().iterator();
-		while (addRuleIt.hasNext()) { // addrules
-		    svc.visit(addRuleIt.next(), true);
-		}
+            svc.visit(tmpl.sequent());
+            for (Taclet taclet : tmpl.rules()) { // addrules
+                svc.visit(taclet, true);
+            }
         }
         //	    }	
 	return !svc.contains(sv);

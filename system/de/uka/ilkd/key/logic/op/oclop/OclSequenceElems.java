@@ -56,10 +56,7 @@ public class OclSequenceElems extends TermSymbol {
 	if (!(collSort.extendsTrans(OclSort.SEQUENCE_OF_OCLANY))) {
 	    return false;
 	}
-	if (arity() == 2 && (term.sub(1).sort() != OclSort.INTEGER)) {
-	    return false;
-	}
-        return true;
+        return !(arity() == 2 && (term.sub(1).sort() != OclSort.INTEGER));
     }
     
     public Sort sort(Term[] subTerm) {

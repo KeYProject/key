@@ -116,7 +116,7 @@ public class DecissionProcedureSettingsDialog extends JDialog {
 	final int labelHeight = 30;
 	final int fieldHeight = 30;
 	
-	this.setResizable(false);
+	this.setResizable(true);
 	
 	
 	JSplitPane tp = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
@@ -306,7 +306,6 @@ public class DecissionProcedureSettingsDialog extends JDialog {
     
     /**
      * set the value fields according to the values of the selected decproc.
-     * @param selectedIndex the index which decproc is said to be selected.
      */
     private void setRuleVals() {
 	if(previousSelectedIndex >= 0){

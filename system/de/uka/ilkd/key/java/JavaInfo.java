@@ -392,7 +392,7 @@ public class JavaInfo {
 	final Set<KeYJavaType> result  = new HashSet<KeYJavaType>();
         for (final Object o : kpmi.allElements()) {     
 	    if (o instanceof KeYJavaType) {		
-	        result.add((KeYJavaType) o);
+	        result.add((KeYJavaType)o);
 	    }
 	}
 	return result;
@@ -420,7 +420,7 @@ public class JavaInfo {
     public KeYJavaType getKeYJavaType(String fullName) {
         KeYJavaType result = getPrimitiveKeYJavaType(fullName);
         return (result == null ?
-            (KeYJavaType)getTypeByName(fullName) :
+                getTypeByName(fullName) :
             result);
     }
 
@@ -634,13 +634,12 @@ public class JavaInfo {
 	}
 	
 	if(result == null && ((ClassDeclaration) javaType).isAnonymousClass()){
-	    Iterator<Sort> sit = type.getSort().extendsSorts().iterator();
-	    while(sit.hasNext()){
-	        Sort s = sit.next();
-	        if(!((ClassType) getKeYJavaType(s).getJavaType()).isInterface()){
-	            return getKeYJavaType(s);
-	        }
-	    }
+        for (Sort sort : type.getSort().extendsSorts()) {
+            Sort s = sort;
+            if (!((ClassType) getKeYJavaType(s).getJavaType()).isInterface()) {
+                return getKeYJavaType(s);
+            }
+        }
 	}
 
 	if (result == null) {
@@ -811,14 +810,13 @@ public class JavaInfo {
      */
     private final ProgramVariable find(String programName, 
                                        ImmutableList<Field> fields) {
-	Iterator<Field> it = fields.iterator();
-	while (it.hasNext()) {
-	    Field field = it.next();
-	    if (programName.equals(field.getProgramName())) {
-		return (ProgramVariable)
-		    ((FieldSpecification)field).getProgramVariable();
-	    }
-	}
+        for (Field field1 : fields) {
+            Field field = field1;
+            if (programName.equals(field.getProgramName())) {
+                return (ProgramVariable)
+                        ((FieldSpecification) field).getProgramVariable();
+            }
+        }
 	return null;
     }
 
@@ -917,15 +915,14 @@ public class JavaInfo {
             return res;
 	} else {
 	    final ImmutableList<Field> list   = kpmi.getAllFieldsLocallyDeclaredIn(classType);
-	    final Iterator<Field> it = list.iterator();	   
-            while (it.hasNext()) {
-		final Field f = it.next();
-		if (f!=null && (f.getName().equals(name) || 
-		                f.getProgramName().equals(name))) {
-		    return (ProgramVariable)((VariableSpecification)f).
-                    getProgramVariable();
-		}
-	    }
+        for (Field aList : list) {
+            final Field f = aList;
+            if (f != null && (f.getName().equals(name) ||
+                    f.getProgramName().equals(name))) {
+                return (ProgramVariable) ((VariableSpecification) f).
+                        getProgramVariable();
+            }
+        }
 	}
 	return null;
     }
@@ -981,17 +978,16 @@ public class JavaInfo {
         
         hierarchie = hierarchie.prepend(kpmi.getAllSupertypes(type));        
         assert hierarchie.head() == type;
-        
-        
-        final Iterator<KeYJavaType> it = hierarchie.iterator();
-        while (it.hasNext()) {
-	    KeYJavaType st = it.next();
-	    if(st != null){
-		final ProgramVariable var = getAttribute(programName, st);
-		if (var != null) {
-		    result = result.prepend(var);
-		}            
-	    }
+
+
+        for (KeYJavaType aHierarchie : hierarchie) {
+            KeYJavaType st = aHierarchie;
+            if (st != null) {
+                final ProgramVariable var = getAttribute(programName, st);
+                if (var != null) {
+                    result = result.prepend(var);
+                }
+            }
         }
         
         return result;        
@@ -1071,8 +1067,8 @@ public class JavaInfo {
         if (!commonTypesCacheValid) { 
             fillCommonTypesCache();
         }
-        for (int i = 0; i<commonTypes.length; i++) {
-            if (commonTypes[i].getSort() == sort) {
+        for (KeYJavaType commonType : commonTypes) {
+            if (commonType.getSort() == sort) {
                 return true;
             }
         }        
@@ -1139,10 +1135,8 @@ public class JavaInfo {
     public ImmutableList<KeYJavaType> getAllSupertypes(KeYJavaType type) {
         if (type.getJavaType() instanceof ArrayType) {
             ImmutableList<KeYJavaType> arraySupertypes = ImmutableSLList.<KeYJavaType>nil();
-            final Iterator<Sort> it = 
-                ((ArraySort)type.getSort()).extendsSorts().iterator();
-            while (it.hasNext()) {
-                arraySupertypes.append(getKeYJavaType(it.next()));
+            for (Sort sort : type.getSort().extendsSorts()) {
+                arraySupertypes.append(getKeYJavaType(sort));
             }
             return arraySupertypes;
         }
@@ -1203,10 +1197,8 @@ public class JavaInfo {
             final ImmutableList<KeYJavaType> l1 = getAllSubtypes(k1);                
             final ImmutableList<KeYJavaType> l2 = getAllSubtypes(k2);
 
-            final Iterator<KeYJavaType> it = l1.iterator();
-
-            while (it.hasNext()) {
-                final KeYJavaType next = it.next();
+            for (KeYJavaType aL1 : l1) {
+                final KeYJavaType next = aL1;
                 if (l2.contains(next)) {
                     result = result.prepend(next);
                 }

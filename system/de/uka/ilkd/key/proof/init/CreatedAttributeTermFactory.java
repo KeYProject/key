@@ -60,16 +60,16 @@ public class CreatedAttributeTermFactory {
         //create conjunction of guard terms for all variables of a
         //non-primitive type
         Term guardConjunctionTerm = TB.tt();
-        for(int i = 0; i < vars.length; i++) {
-            if(!(vars[i].sort() instanceof PrimitiveSort) &&
-               !(vars[i].sort() instanceof AbstractCollectionSort)) {
-                Term variableTerm = TB.var(vars[i]);
+        for (LogicVariable var : vars) {
+            if (!(var.sort() instanceof PrimitiveSort) &&
+                    !(var.sort() instanceof AbstractCollectionSort)) {
+                Term variableTerm = TB.var(var);
                 Term guardTerm
                         = (nullForbidden
-                           ? createCreatedAndNotNullTerm(services, variableTerm)
-                           : createCreatedOrNullTerm(services, variableTerm));
+                        ? createCreatedAndNotNullTerm(services, variableTerm)
+                        : createCreatedOrNullTerm(services, variableTerm));
                 guardConjunctionTerm
-                       = TB.and(guardConjunctionTerm, guardTerm);
+                        = TB.and(guardConjunctionTerm, guardTerm);
             }
         }
 

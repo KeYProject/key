@@ -178,10 +178,9 @@ public class ImplicitFieldAdder extends RecoderModelTransformer {
     private void addFieldsForFinalVars(TypeDeclaration td){
         List<Variable> vars = getLocalClass2FinalVar().get(td);
         if(vars!=null){
-            Iterator<Variable> it = vars.iterator();
-            while(it.hasNext()){
-                Variable v = it.next();
-                attach(createImplicitRecoderField(v.getType().getName(), FINAL_VAR_PREFIX+v.getName(), false, true), td, 0);
+            for (Variable var : vars) {
+                Variable v = var;
+                attach(createImplicitRecoderField(v.getType().getName(), FINAL_VAR_PREFIX + v.getName(), false, true), td, 0);
             }
         }
     }

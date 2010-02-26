@@ -39,7 +39,7 @@ public class AtPreNamespace extends Namespace {
         if (n==null && name.toString().endsWith("@pre")) {
             Name atPostName = new Name(name.toString().substring
                                   (0, name.toString().length()-4));
-            Named atPost = (Named) super.lookup(atPostName);
+            Named atPost = super.lookup(atPostName);
             if (atPost==null) {
                 if (atPostName.toString().indexOf("::")>=0) {
                     atPost = javaInfo.getAttribute(atPostName.toString());

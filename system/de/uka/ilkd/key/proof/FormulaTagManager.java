@@ -11,7 +11,6 @@
 package de.uka.ilkd.key.proof;
 
 import java.util.HashMap;
-import java.util.Iterator;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
@@ -102,28 +101,22 @@ public class FormulaTagManager {
     }
 
     private void updateTags(SequentChangeInfo sci, boolean p_antec, Goal p_goal) {
-        final Iterator<FormulaChangeInfo> infoIt =
-            sci.modifiedFormulas(p_antec).iterator();
-        while ( infoIt.hasNext () )
-            updateTag(infoIt.next(), sci.sequent(), p_goal);
+        for (FormulaChangeInfo formulaChangeInfo : sci.modifiedFormulas(p_antec))
+            updateTag(formulaChangeInfo, sci.sequent(), p_goal);
     }
 
     private void addTags(SequentChangeInfo sci, boolean p_antec, Goal p_goal) {
-	final Iterator<ConstrainedFormula> cfmaIt =
-	    sci.addedFormulas(p_antec).iterator();
-	while ( cfmaIt.hasNext () ) {
-	    final PosInOccurrence pio = new PosInOccurrence
-		( cfmaIt.next (), PosInTerm.TOP_LEVEL, p_antec );
-	    createNewTag(pio, p_goal);
-	}	
+        for (ConstrainedFormula constrainedFormula : sci.addedFormulas(p_antec)) {
+            final PosInOccurrence pio = new PosInOccurrence
+                    (constrainedFormula, PosInTerm.TOP_LEVEL, p_antec);
+            createNewTag(pio, p_goal);
+        }
     }
 
     private void removeTags(SequentChangeInfo sci, boolean p_antec, Goal p_goal) {
-	final Iterator<ConstrainedFormula> cfmaIt =
-            sci.removedFormulas(p_antec).iterator();
-        while ( cfmaIt.hasNext () ) {
+        for (ConstrainedFormula constrainedFormula : sci.removedFormulas(p_antec)) {
             final PosInOccurrence pio = new PosInOccurrence
-                ( cfmaIt.next (), PosInTerm.TOP_LEVEL, p_antec );
+                    (constrainedFormula, PosInTerm.TOP_LEVEL, p_antec);
             removeTag(pio);
         }	
     }
@@ -158,13 +151,12 @@ public class FormulaTagManager {
     private void createNewTags (Goal p_goal, boolean p_antec) {
         final Sequent seq = p_goal.sequent ();
         final Semisequent ss = p_antec ? seq.antecedent () : seq.succedent ();
-        final Iterator<ConstrainedFormula> cfmaIt = ss.iterator ();
 
-        while ( cfmaIt.hasNext () ) {
-            final PosInOccurrence pio = new PosInOccurrence ( cfmaIt.next (),
-                                                              PosInTerm.TOP_LEVEL,
-                                                              p_antec );
-            createNewTag ( pio, p_goal );
+        for (Object s : ss) {
+            final PosInOccurrence pio = new PosInOccurrence((ConstrainedFormula) s,
+                    PosInTerm.TOP_LEVEL,
+                    p_antec);
+            createNewTag(pio, p_goal);
         }
     }
 

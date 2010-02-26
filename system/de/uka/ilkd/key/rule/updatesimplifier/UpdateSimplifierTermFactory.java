@@ -85,12 +85,9 @@ public class UpdateSimplifierTermFactory {
         }
         
         Term res = defaultTerm;
-        
-        final Iterator<IfExCascadeEntryBuilder> it = statements.iterator ();
-        while ( it.hasNext () ) {
-            final IfExCascadeEntryBuilder builder =
-                it.next ();
-            res = builder.createTerm ( res );
+
+        for (final IfExCascadeEntryBuilder builder : statements) {
+            res = builder.createTerm(res);
         }
         
         return res;

@@ -129,10 +129,9 @@ public class UpdateLabelListener implements RuleAppListener {
         if (inst == null) {
             return l;
         }
-        Iterator<IfFormulaInstantiation> it = inst.iterator();
-        while (it.hasNext()) {
+        for (IfFormulaInstantiation anInst : inst) {
             // TODO case assume=find
-            IfFormulaInstantiation next = it.next();
+            IfFormulaInstantiation next = anInst;
             if (next instanceof IfFormulaInstSeq) {
                 IfFormulaInstSeq i = (IfFormulaInstSeq) next;
                 PosInOccurrence pio = new PosInOccurrence(i

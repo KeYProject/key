@@ -7,8 +7,6 @@
 // See LICENSE.TXT for details.
 package de.uka.ilkd.key.unittest;
 
-import java.util.Iterator;
-
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.expression.literal.IntLiteral;
 
@@ -29,10 +27,9 @@ public class IntValueContainer extends ValueContainer{
     public Expression[] getValuesAsExpressions(){
 	Expression[] res = new Expression[values.size()];
 	int i = 0;
-	Iterator it = values.iterator();
-	while(it.hasNext()){
-	    res[i++] = new IntLiteral(((Integer) it.next()).intValue());
-	}
+        for (Object value : values) {
+            res[i++] = new IntLiteral(((Integer) value).intValue());
+        }
 	return res;
     }
 }

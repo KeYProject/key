@@ -87,7 +87,7 @@ public class StaticMethodCondition extends VariableConditionAdapter {
 	    ImmutableArray<Expression> ar 
 		= toExpArray((ImmutableArray<ProgramElement>)svInst.getInstantiation(args));
 	    if (var == args) {		
-		ar = (ImmutableArray<Expression>) toExpArray((ImmutableArray<? extends ProgramElement>)subst);
+		ar = toExpArray((ImmutableArray<? extends ProgramElement>)subst);
 	    }
 	    ExecutionContext ec 
 		= svInst.getContextInstantiation().activeStatementContext();

@@ -94,8 +94,8 @@ public class TermBuilder {
 
     public Term and(Term[] subTerms) {
         Term result = tt();
-        for (int i=0; i<subTerms.length; i++) {
-            result = and( result, subTerms[i]);
+        for (Term subTerm : subTerms) {
+            result = and(result, subTerm);
         }
 
         return result;
@@ -103,10 +103,9 @@ public class TermBuilder {
     
     public Term and(ImmutableList<Term> subTerms) {
 	Term result = tt();
-	Iterator<Term> it = subTerms.iterator();
-	while(it.hasNext()) {
-	    result = and(result, it.next());
-	}
+        for (Term subTerm : subTerms) {
+            result = and(result, subTerm);
+        }
 	return result;
     }
     
@@ -116,8 +115,8 @@ public class TermBuilder {
     
     public Term or(Term[] subTerms) {
         Term result = ff();
-        for (int i=0; i<subTerms.length; i++) {
-            result = or( result, subTerms[i]);
+        for (Term subTerm : subTerms) {
+            result = or(result, subTerm);
         }
 
         return result;
@@ -125,10 +124,9 @@ public class TermBuilder {
     
     public Term or(ImmutableList<Term> subTerms) {
 	Term result = ff();
-	Iterator<Term> it = subTerms.iterator();
-	while(it.hasNext()) {
-	    result = or(result, it.next());
-	}
+        for (Term subTerm : subTerms) {
+            result = or(result, subTerm);
+        }
 	return result;
     }
 

@@ -41,11 +41,11 @@ public class LibrariesSettings implements Settings {
    
    public LibrariesSettings() {
        /*adds the standard libraries to libToSel, maybe they will be
-         replaced by readSettings  */ 
-       for (int i = 0; i < standardLibs.length; i++) {
-           KeYResourceManager.getManager().copyIfNotExists(Proof.class, 
-                   "rules/libraries/"+standardLibs[i], LIBRARIES_PATH + standardLibs[i]);
-           libToSel.put(LIBRARIES_PATH + standardLibs[i],new Boolean(false));
+         replaced by readSettings  */
+       for (String standardLib : standardLibs) {
+           KeYResourceManager.getManager().copyIfNotExists(Proof.class,
+                   "rules/libraries/" + standardLib, LIBRARIES_PATH + standardLib);
+           libToSel.put(LIBRARIES_PATH + standardLib, Boolean.FALSE);
        }     
    }
    
@@ -65,7 +65,7 @@ public class LibrariesSettings implements Settings {
                 int sepIndex = token.lastIndexOf("-"); 
                 if ((sepIndex > 0) && (sepIndex < token.length()-1))
                     libToSel.put(token.substring(0,sepIndex).trim(),
-                            new Boolean(token.substring(sepIndex+1).trim()));
+                            Boolean.valueOf(token.substring(sepIndex + 1).trim()));
             }
         } else emptyProperties=true;
     }
@@ -93,10 +93,9 @@ public class LibrariesSettings implements Settings {
      * changed to its registered listeners (not thread-safe)
      */
     protected void fireSettingsChanged() {
-        Iterator<SettingsListener> it = listenerList.iterator();
-	while (it.hasNext()) {
-	    it.next().settingsChanged(new GUIEvent(this));
-	}
+        for (SettingsListener aListenerList : listenerList) {
+            aListenerList.settingsChanged(new GUIEvent(this));
+        }
     }
 
     /** adds a listener to the settings object 

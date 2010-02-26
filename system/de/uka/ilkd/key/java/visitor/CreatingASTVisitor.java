@@ -35,7 +35,7 @@ import de.uka.ilkd.key.util.ExtList;
  */
 public abstract class CreatingASTVisitor extends JavaASTVisitor {
 
-    protected static final Boolean CHANGED = new Boolean(true);
+    protected static final Boolean CHANGED = Boolean.TRUE;
 
     boolean preservesPositionInfo = true;
 

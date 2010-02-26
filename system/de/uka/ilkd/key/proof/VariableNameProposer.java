@@ -95,8 +95,8 @@ public class VariableNameProposer implements InstantiationProposer {
         if (proposals == null) return;
         String[] props = proposals.toString().split(",|;");
 
-        for (int i = 0; i < props.length; i++) {
-            oldAnonUpdateProposals = oldAnonUpdateProposals.append(new Name(props[i]));
+        for (String prop : props) {
+            oldAnonUpdateProposals = oldAnonUpdateProposals.append(new Name(prop));
         }
 
     }

@@ -49,11 +49,8 @@ public class OclIf extends TermSymbol {
 	if (term.sub(0).sort() != OclSort.BOOLEAN) {
 	    return false;
 	}
-	if (!(term.sub(1).sort().extendsTrans(term.sub(2).sort()))
-	    && !(term.sub(2).sort().extendsTrans(term.sub(1).sort()))) {
-	    return false;
-	}
-        return true;
+        return !(!(term.sub(1).sort().extendsTrans(term.sub(2).sort()))
+                && !(term.sub(2).sort().extendsTrans(term.sub(1).sort())));
     }
 
     public Sort sort(Term[] subTerm) {

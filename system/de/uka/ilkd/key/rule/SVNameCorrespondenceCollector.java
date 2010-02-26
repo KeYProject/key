@@ -10,10 +10,8 @@
 
 package de.uka.ilkd.key.rule;
 
-import java.util.Iterator;
-
-import de.uka.ilkd.key.collection.ImmutableMap;
 import de.uka.ilkd.key.collection.DefaultImmutableMap;
+import de.uka.ilkd.key.collection.ImmutableMap;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
@@ -79,10 +77,9 @@ public class SVNameCorrespondenceCollector extends Visitor {
      * @param semiseq the Semisequent to visit
      */
     private void visit(Semisequent semiseq) {
-	Iterator<ConstrainedFormula> it=semiseq.iterator();
-	while(it.hasNext()) {
-	    it.next().formula().execPostOrder(this);
-	}
+        for (ConstrainedFormula cf : semiseq) {
+            cf.formula().execPostOrder(this);
+        }
     }
 
     /** collects all correspondences in a sequent
@@ -107,30 +104,28 @@ public class SVNameCorrespondenceCollector extends Visitor {
             findTerm.execPostOrder ( this );
             if ( findTerm.op () instanceof SchemaVariable )
                 findSV = (SchemaVariable)findTerm.op ();
-	}	
-	Iterator<TacletGoalTemplate> it = taclet.goalTemplates().iterator();
-	while (it.hasNext()) {
-	    TacletGoalTemplate gt=it.next();
-	    visit(gt.sequent());
-	    if (gt instanceof RewriteTacletGoalTemplate) {
-		final Term replaceWithTerm = ((RewriteTacletGoalTemplate)gt).replaceWith();
-		replaceWithTerm.execPostOrder(this);
-                if ( findSV != null
-                     && replaceWithTerm.op () instanceof SchemaVariable )
-                    addNameCorrespondence ( (SchemaVariable)replaceWithTerm.op (),
-                                            findSV );
-	    } else {
-		if(gt instanceof AntecSuccTacletGoalTemplate) {
-		    visit(((AntecSuccTacletGoalTemplate)gt).replaceWith());
-		}
-	    }
-	    if (visitAddrules) {
-		Iterator<Taclet> addruleIt = gt.rules().iterator();
-		while (addruleIt.hasNext()) {
-		    visit(addruleIt.next(), true);		    
-		}
-	    }
 	}
+        for (TacletGoalTemplate tacletGoalTemplate : taclet.goalTemplates()) {
+            TacletGoalTemplate gt = tacletGoalTemplate;
+            visit(gt.sequent());
+            if (gt instanceof RewriteTacletGoalTemplate) {
+                final Term replaceWithTerm = ((RewriteTacletGoalTemplate) gt).replaceWith();
+                replaceWithTerm.execPostOrder(this);
+                if (findSV != null
+                        && replaceWithTerm.op() instanceof SchemaVariable)
+                    addNameCorrespondence((SchemaVariable) replaceWithTerm.op(),
+                            findSV);
+            } else {
+                if (gt instanceof AntecSuccTacletGoalTemplate) {
+                    visit(((AntecSuccTacletGoalTemplate) gt).replaceWith());
+                }
+            }
+            if (visitAddrules) {
+                for (Taclet taclet1 : gt.rules()) {
+                    visit(taclet1, true);
+                }
+            }
+        }
     }
 
 

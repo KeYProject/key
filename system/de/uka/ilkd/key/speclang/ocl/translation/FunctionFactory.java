@@ -439,8 +439,8 @@ class FunctionFactory {
      */
     public static Term buildAddTerm(Term[] subTerms) {
         Term result = tb.tt();
-        for (int i=0; i<subTerms.length; i++) {
-            result = tb.and( result, subTerms[i]);
+        for (Term subTerm : subTerms) {
+            result = tb.and(result, subTerm);
         }
         
         return result;

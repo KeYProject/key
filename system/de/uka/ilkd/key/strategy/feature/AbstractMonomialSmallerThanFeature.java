@@ -46,7 +46,7 @@ public abstract class AbstractMonomialSmallerThanFeature
 
     protected int introductionTime(Operator op) {
         if ( op == add || op == mul || op == Z ) return -1;
-        Integer res = (Integer)introductionTimeCache.get ( op );
+        Integer res = introductionTimeCache.get ( op );
         if ( res == null ) {
             res = new Integer ( introductionTimeHelp ( op ) );
             introductionTimeCache.put ( op, res );

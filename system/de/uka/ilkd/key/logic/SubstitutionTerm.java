@@ -54,7 +54,7 @@ class SubstitutionTerm extends Term {
 	
 	this.subs = new ImmutableArray<Term>(subs);
 	this.substVar  = new ImmutableArray<QuantifiableVariable>
-	    (new QuantifiableVariable[] {substVar});
+	    (substVar);
 	this.depth = 1+(subs[0].depth() > subs[1].depth() ? 
 			subs[0].depth() : subs[1].depth());
     }

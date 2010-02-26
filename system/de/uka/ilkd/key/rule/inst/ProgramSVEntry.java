@@ -52,12 +52,9 @@ public class ProgramSVEntry implements Serializable {
 	    return false;
 	} 
 	final ProgramSVEntry cmp = (ProgramSVEntry) o;
-	if (!(key().equals(cmp.key())) ||
-	    !(value().equals(cmp.value()))) {
-	    return false;
+        return key().equals(cmp.key()) &&
+                value().equals(cmp.value());
 	}
-	return true;	
-    }
     
     public int hashCode(){
     	int result = 17;

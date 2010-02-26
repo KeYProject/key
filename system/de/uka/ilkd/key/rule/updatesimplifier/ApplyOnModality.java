@@ -104,7 +104,7 @@ public class ApplyOnModality extends AbstractUpdateRule {
      * @return true if the given location is protected
      */
     private boolean protectedLocation(Location loc, 
-            HashSet<? extends Object> protectedProgVars) {
+            HashSet<?> protectedProgVars) {
         // currently it would be safe to comment the PROTECTED_HEAP part out as 
         // heap locations are generally not thrown away. But in principle one can think
         // of a more finegrained control

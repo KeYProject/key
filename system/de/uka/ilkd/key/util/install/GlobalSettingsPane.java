@@ -62,9 +62,9 @@ public class GlobalSettingsPane extends InstallationPane {
 	      keyHome (), 
 	      JFileChooser.DIRECTORIES_ONLY);
 
-	for (int i = 0; i < installPath.length; i++) {
-	    entries.add ( installPath [i] );	
-	}
+        for (InstallationPathChooser anInstallPath : installPath) {
+            entries.add(anInstallPath);
+        }
 	
 	add ( entries, BorderLayout.NORTH );
     }
@@ -96,15 +96,15 @@ public class GlobalSettingsPane extends InstallationPane {
 				      
 
     private boolean checkModel () {
-	for ( int i = 0; i < installPath.length; i++ ) {
-	    if ( ! installPath [ i ].updateModel () ) {
-		JOptionPane.showMessageDialog 
-		    ( null, 
-		      "Wrong path for " + installPath [ i ].label (),
-		      "Wong Path", JOptionPane.ERROR_MESSAGE );
-		return false;	    
-	    }
-	}
+        for (InstallationPathChooser anInstallPath : installPath) {
+            if (!anInstallPath.updateModel()) {
+                JOptionPane.showMessageDialog
+                        (null,
+                                "Wrong path for " + anInstallPath.label(),
+                                "Wong Path", JOptionPane.ERROR_MESSAGE);
+                return false;
+            }
+        }
 	return true;
     }
 

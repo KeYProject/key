@@ -44,9 +44,9 @@ public class TestSMTBenchmark extends TestCase implements FilenameFilter{
 	ArrayList<ArrayList<Proof>> toProof = this.loadGoals(rules.size(), files,folderPath);
 	ArrayList<ArrayList<String>> results = new ArrayList<ArrayList<String>>();
 	System.out.println();
-	for (int i = 0; i < toProof.size(); i++) {
-	    results.add(proofOneGoal(toProof.get(i), rules));
-	}
+        for (ArrayList<Proof> aToProof : toProof) {
+            results.add(proofOneGoal(aToProof, rules));
+        }
 	this.printResults(files, rules, results);
     }
     
@@ -54,9 +54,9 @@ public class TestSMTBenchmark extends TestCase implements FilenameFilter{
 	String output = "";
 	//print header
 	output = "Problem\tFile\t";
-	for (int i = 0; i < solver.size(); i++) {
-	    output = output + solver.get(i).name() + "\t\t";
-	}
+        for (SMTSolver aSolver : solver) {
+            output = output + aSolver.name() + "\t\t";
+        }
 	output = output + "\n";
 	
 	//print one line for each problem
@@ -70,10 +70,10 @@ public class TestSMTBenchmark extends TestCase implements FilenameFilter{
 	    }
 	    output = output + sources[i] + "\t";
 	    //print the results for the solver
-	    
-	    for (int j = 0; j < problemResults.size(); j++) {
-		output = output + problemResults.get(j) + "\t";
-	    }
+
+        for (String problemResult : problemResults) {
+            output = output + problemResult + "\t";
+        }
 	    output = output + "\n";
 	}
 	storeResults(output,folderPath + "smtBenchmarkResults.csv");
@@ -95,13 +95,13 @@ public class TestSMTBenchmark extends TestCase implements FilenameFilter{
     protected boolean hasProblem(ArrayList<String> results) {
 	boolean hasValid = false;
 	boolean hasInvalid = false;
-	for (int i = 0; i < results.size(); i++) {
-	    if (results.get(i).equals(VALID)) {
-		hasValid = true;
-	    } else if (results.get(i).equals(INVALID)) {
-		hasInvalid = true;
-	    }
-	}
+        for (String result : results) {
+            if (result.equals(VALID)) {
+                hasValid = true;
+            } else if (result.equals(INVALID)) {
+                hasInvalid = true;
+            }
+        }
 	return hasValid && hasInvalid;
     }
     
@@ -148,10 +148,10 @@ public class TestSMTBenchmark extends TestCase implements FilenameFilter{
     
     protected ArrayList<ArrayList<Proof>> loadGoals(int multiplicity, String[] sources, String folder) {
 	ArrayList<ArrayList<Proof>> toReturn = new ArrayList<ArrayList<Proof>>();
-	for (int i = 0; i < sources.length; i++) {
-	    String path = folder + sources[i];
-	    toReturn.add(getSingleGoal(path, multiplicity));
-	}
+        for (String source : sources) {
+            String path = folderPath + source;
+            toReturn.add(getSingleGoal(path, multiplicity));
+        }
 	return toReturn;
     }
     
@@ -197,10 +197,6 @@ public class TestSMTBenchmark extends TestCase implements FilenameFilter{
     }
     
     public boolean accept(File f, String name) {
-	if (name.substring(name.length()-4, name.length()).equals(".key")) {
-	    return true;
-	} else {
-	    return false;
-	}
+        return name.substring(name.length() - 4, name.length()).equals(".key");
     }
 }

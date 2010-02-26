@@ -323,9 +323,9 @@ public class PrettyPrinter {
             char c = str.charAt(i);
             if (c >= 0x0100) {
                 if (c < 0x1000) {
-                    buf.append("\\u0" + Integer.toString(c, 16));
+                    buf.append("\\u0").append(Integer.toString(c, 16));
                 } else {
-                    buf.append("\\u" + Integer.toString(c, 16));
+                    buf.append("\\u").append(Integer.toString(c, 16));
                 }
             } else {
                 buf.append(c);
@@ -370,7 +370,7 @@ public class PrettyPrinter {
     protected Position getRelativePosition(SourceElement first) {
 	//	System.out.println(indentMap);
 	if (indentMap.containsKey(first)) {
-	    return (Position)indentMap.get(first);
+	    return indentMap.get(first);
 	} else {
 	    if (first!=null) return first.getRelativePosition();
 	    else return Position.UNDEFINED;
@@ -1324,9 +1324,9 @@ public class PrettyPrinter {
 	printHeader(x);
 	Comment[] c = x.getComments();
 	int m = c.length;
-	for (int i = 0; i < c.length; i++) {
-	    printComment(c[i]);
-	}
+        for (Comment aC : c) {
+            printComment(aC);
+        }
 	if (x.getModifiers() != null) {
 	    ImmutableArray<Modifier> mods = x.getModifiers();
 	    m += mods.size();

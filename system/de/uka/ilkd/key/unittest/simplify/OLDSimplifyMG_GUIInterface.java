@@ -1,7 +1,6 @@
 package de.uka.ilkd.key.unittest.simplify;
 
 import java.util.HashMap;
-import java.util.Map;
 
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.Main;
@@ -9,12 +8,11 @@ import de.uka.ilkd.key.gui.TestGenerationInspectionDialog;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.unittest.EquivalenceClass;
-import de.uka.ilkd.key.unittest.Model;
 import de.uka.ilkd.key.unittest.simplify.translation.DecisionProcedureSimplify;
 
 public class OLDSimplifyMG_GUIInterface extends OldSimplifyModelGenerator {
 	
-    private HashMap<String,CreateModelsInfo> createModelsHelpStat=new HashMap();
+    private HashMap<String,CreateModelsInfo> createModelsHelpStat=new HashMap<String,CreateModelsInfo>();
     public OLDSimplifyMG_GUIInterface(DecisionProcedureSimplify dps,
             Services serv, HashMap<Term, EquivalenceClass> term2class,
             ImmutableSet<Term> locations) {
@@ -57,7 +55,7 @@ public class OLDSimplifyMG_GUIInterface extends OldSimplifyModelGenerator {
 	public CreateModelsInfo() {
 	    count= 0;
 	    info = null;
-	};
+	}
     }
 
     /** is called by createModelsHelp*/

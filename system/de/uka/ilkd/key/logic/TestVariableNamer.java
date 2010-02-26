@@ -120,12 +120,11 @@ public class TestVariableNamer extends TestCase {
 
 
     private boolean inGlobals(Goal goal, ProgramVariable globalVar) {
-    	Iterator<ProgramVariable> it = goal.getGlobalProgVars().iterator();
-	while(it.hasNext()) {
-	    if(it.next() == globalVar) {
-	    	return true;
-	    }
-	}
+        for (ProgramVariable programVariable : goal.getGlobalProgVars()) {
+            if (programVariable == globalVar) {
+                return true;
+            }
+        }
 	return false;
     }
     
@@ -154,20 +153,19 @@ public class TestVariableNamer extends TestCase {
 	ImmutableList<NoPosTacletApp> noPosTacletApps
 		= tacletIndex.getPartialInstantiatedApps();
 
-	Iterator<NoPosTacletApp> it = noPosTacletApps.iterator();
-	while(it.hasNext()) {
-	    SVInstantiations insts = it.next().instantiations();
-    	    Iterator<ImmutableMapEntry<SchemaVariable,InstantiationEntry>> it2;
-	    it2 = insts.pairIterator();
-	    while(it2.hasNext()) {
-	        ImmutableMapEntry<SchemaVariable,InstantiationEntry> e = it2.next();
-		Object inst = e.value().getInstantiation();
-		if(inst instanceof PostIncrement 
-		   && ((PostIncrement)inst).getFirstElement() == containedVar){
-		    return true;
-		}
-	    }
-	}
+        for (NoPosTacletApp noPosTacletApp : noPosTacletApps) {
+            SVInstantiations insts = noPosTacletApp.instantiations();
+            Iterator<ImmutableMapEntry<SchemaVariable, InstantiationEntry>> it2;
+            it2 = insts.pairIterator();
+            while (it2.hasNext()) {
+                ImmutableMapEntry<SchemaVariable, InstantiationEntry> e = it2.next();
+                Object inst = e.value().getInstantiation();
+                if (inst instanceof PostIncrement
+                        && ((PostIncrement) inst).getFirstElement() == containedVar) {
+                    return true;
+                }
+            }
+        }
 	
 	return false;
     }

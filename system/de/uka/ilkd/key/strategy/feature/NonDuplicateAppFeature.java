@@ -39,9 +39,8 @@ public class NonDuplicateAppFeature extends AbstractNonDuplicateAppFeature {
                                        TacletApp rapp,
                                        PosInOccurrence pio) {
 
-        final Iterator<RuleApp> it = list.iterator ();
-        while ( it.hasNext () ) {
-            if ( sameApplication ( it.next (), rapp, pio ) ) return true;
+        for (RuleApp aList : list) {
+            if (sameApplication(aList, rapp, pio)) return true;
         }
 
         return false;

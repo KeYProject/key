@@ -22,10 +22,7 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.proof.AtPreFactory;
-import de.uka.ilkd.key.proof.OpReplacer;
-import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.ProofAggregate;
+import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.UpdateSimplifier;
@@ -289,9 +286,8 @@ public abstract class AbstractPO implements ProofOblInput {
 
 
     protected final void registerInNamespaces(ImmutableList<ProgramVariable> pvs) {
-        final Iterator<ProgramVariable> it = pvs.iterator();
-        while(it.hasNext()) {
-            initConfig.progVarNS().add(it.next());
+        for (ProgramVariable pv : pvs) {
+            initConfig.progVarNS().add(pv);
         }
     }
 
@@ -333,7 +329,7 @@ public abstract class AbstractPO implements ProofOblInput {
         }
 
         if(initConfig.getOriginalKeYFileName() == null) {
-            header = "\\javaSource \""+javaPath+"\";\n\n";
+            header = "\\javaSource \""+ProofSaver.escapeCharacters(javaPath)+"\";\n\n";
         } else {
             header = "\\include \"./" + initConfig.getOriginalKeYFileName() + "\";";
         }

@@ -52,7 +52,7 @@ public class SimplifyReplaceKnownCandidateFeature
         
         assert ifSeq.size () == 1 : "Wrong number of if-formulas.";
                 
-        final Boolean pol = polarity ( pos, new Boolean ( pos.isInAntec () ) );
+        final Boolean pol = polarity ( pos, Boolean.valueOf(pos.isInAntec()) );
 
         final boolean ifForInAntec =
             ifSeq.succedent ().isEmpty();        

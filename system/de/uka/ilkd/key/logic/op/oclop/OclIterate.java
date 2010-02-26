@@ -65,10 +65,7 @@ public class OclIterate extends TermSymbol {
 	if (!initAccValueSort.extendsTrans(accVariableSort)) {
 	    return false;
 	}
-	if (!exprSort.extendsTrans(accVariableSort)) {
-	    return false;
-	}
-        return true;
+        return exprSort.extendsTrans(accVariableSort);
     }
 
     public Sort sort(Term[] subTerm) {

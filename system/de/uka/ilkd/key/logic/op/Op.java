@@ -151,7 +151,7 @@ public abstract class Op implements Operator {
      * @param str name of the modality to return
      */
     public static Modality getModality(String str) {
-	return (Modality)Modality.getNameMap().get(str);
+	return Modality.getNameMap().get(str);
     }
 
     /**

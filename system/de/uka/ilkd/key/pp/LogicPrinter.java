@@ -559,9 +559,9 @@ public class LogicPrinter {
     protected void printRules (ImmutableList<Taclet> rules) throws IOException{
         layouter.brk().beginC(2).print("\\addrules (");
         SVInstantiations svi = instantiations;
-        for (Iterator<Taclet> it = rules.iterator(); it.hasNext();) {
+        for (Taclet rule : rules) {
             layouter.brk();
-            Taclet t = it.next();
+            Taclet t = rule;
             printTaclet(t, instantiations, true);
             instantiations = svi;
         }

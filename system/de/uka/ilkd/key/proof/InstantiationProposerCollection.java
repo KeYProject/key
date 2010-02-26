@@ -10,8 +10,6 @@
 
 package de.uka.ilkd.key.proof;
 
-import java.util.Iterator;
-
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Services;
@@ -40,18 +38,17 @@ public class InstantiationProposerCollection implements InstantiationProposer {
 			      Services services,
 			      Node undoAnchor,
 			      ImmutableList<String> previousProposals) {
-	Iterator<InstantiationProposer> it = proposers.iterator();
-	while(it.hasNext()) {
-	    InstantiationProposer proposer = it.next();
-	    String proposal = proposer.getProposal(app, 
-	    					   var, 
-						   services, 
-						   undoAnchor,
-						   previousProposals);
-	    if(proposal != null) {
-	    	return proposal;
-	    }
-	}
+        for (InstantiationProposer proposer1 : proposers) {
+            InstantiationProposer proposer = proposer1;
+            String proposal = proposer.getProposal(app,
+                    var,
+                    services,
+                    undoAnchor,
+                    previousProposals);
+            if (proposal != null) {
+                return proposal;
+            }
+        }
 	
 	return null;
     }

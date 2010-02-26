@@ -194,8 +194,8 @@ public class AssignmentPairImpl implements AssignmentPair {
     public int locationHashCode() {      
         if (cachedLocationHashCode == 0) {
             cachedLocationHashCode = accessOp.hashCode();
-            for (int i = 0; i<locSubs.length; i++) {
-                cachedLocationHashCode += 17*locSubs[i].hashCode();
+            for (Term locSub : locSubs) {
+                cachedLocationHashCode += 17 * locSub.hashCode();
             }        
             if (cachedLocationHashCode == 0) {
                 cachedLocationHashCode = 1;
@@ -231,11 +231,11 @@ public class AssignmentPairImpl implements AssignmentPair {
 
     private String printBoundVars() {
         StringBuffer sb = new StringBuffer();
-	QuantifiableVariable qvar = null;
+	QuantifiableVariable qvar;
 	if(boundVars().size() == 1){
 	   qvar = boundVars().get (0);
 	   if(qvar instanceof LogicVariable) {
-	     sb.append(((LogicVariable)qvar).sort()+" "+((LogicVariable)qvar).name());
+           sb.append(qvar.sort()).append(" ").append(qvar.name());
 	   }else{
 	     sb.append(qvar);
 	   }
@@ -245,7 +245,7 @@ public class AssignmentPairImpl implements AssignmentPair {
 	   for(int i=0;i<boundVars().size();i++) {
 	     qvar = boundVars().get (i);
 	     if(qvar instanceof LogicVariable) {
-	       sb.append(((LogicVariable)qvar).sort()+" "+((LogicVariable)qvar).name());
+             sb.append(qvar.sort()).append(" ").append(qvar.name());
 	     }else{
 	       sb.append(qvar);
 	     }

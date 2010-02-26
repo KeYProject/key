@@ -247,8 +247,7 @@ public class SmtLibTranslator extends AbstractSMTTranslator {
      *         declarations, Argument2 is the sort used for type predicates
      */
     protected StringBuffer translateSort(String name, boolean isIntVal) {
-	StringBuffer uniqueName = makeUnique(new StringBuffer(name));
-	return uniqueName;
+	return makeUnique(new StringBuffer(name));
     }
 
     @Override
@@ -389,9 +388,7 @@ public class SmtLibTranslator extends AbstractSMTTranslator {
 
     @Override
     protected StringBuffer translateLogicalVar(StringBuffer name) {
-	StringBuffer toReturn = (new StringBuffer("?"))
-		.append(makeUnique(name));
-	return toReturn;
+	return new StringBuffer("?").append(makeUnique(name));
     }
 
     @Override
@@ -539,10 +536,10 @@ public class SmtLibTranslator extends AbstractSMTTranslator {
 	} else {
 	    toReturn.append("(");
 	    toReturn.append(name);
-	    for (int i = 0; i < args.size(); i++) {
-		toReturn.append(" ");
-		toReturn.append(args.get(i));
-	    }
+        for (StringBuffer arg : args) {
+            toReturn.append(" ");
+            toReturn.append(arg);
+        }
 	    toReturn.append(")");
 	}
 	return toReturn;
@@ -565,7 +562,7 @@ public class SmtLibTranslator extends AbstractSMTTranslator {
     
     private StringBuffer makeUnique(StringBuffer name) {
 	StringBuffer toReturn = new StringBuffer(name);
-	
+
 	//build the replacement pairs
 	ArrayList<String> toReplace = new ArrayList<String>();
 	ArrayList<String> replacement = new ArrayList<String>();
@@ -598,6 +595,14 @@ public class SmtLibTranslator extends AbstractSMTTranslator {
 	
 	toReturn.append("_").append(counter);
 	counter++;
+
+	//CVC3 does not accept identifiers to start with an underscore.
+	//This happens, e.g., when translating ".create(self)", because the leading "." becomes "_dot_"
+	//Removing leading underscores.
+	while(toReturn.charAt(0)=='_'){
+	    toReturn = new StringBuffer(toReturn.substring(1)); //inefficient, but should occur seldom
+	}
+
 	return toReturn;
     }
 

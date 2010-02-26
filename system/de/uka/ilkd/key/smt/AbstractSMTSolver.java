@@ -12,7 +12,12 @@ package de.uka.ilkd.key.smt;
 
 
 import java.io.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collection;
+import java.util.Date;
+import java.util.LinkedList;
+import java.util.Timer;
 
 import javax.management.ImmutableDescriptor;
 import javax.swing.JFileChooser;
@@ -85,6 +90,20 @@ public abstract class AbstractSMTSolver implements SMTSolver {
     protected abstract String getExecutionCommand(String filename,
 	    				            String formula);
   
+    public SMTTranslator getTranslator(Services services) {
+	try{
+	    final DecisionProcedureSettings dps = ProofSettings.DEFAULT_SETTINGS.getDecisionProcedureSettings();
+	    if(dps.weakenSMTTranslation){
+		return new SmtLibTranslatorWeaker(services);
+	    }else{
+		return new SmtLibTranslator(services);
+	    }
+	}catch(Exception e){
+	    System.err.println("Error: An error occurred while obtaining an SmtLibTranslator. Trying to use the default translator...");
+	    return new SmtLibTranslator(services);
+	}
+    }
+
     
     private String getFinalExecutionCommand(String filename, String formula) {
 	//get the Command from user settings
@@ -129,16 +148,15 @@ public abstract class AbstractSMTSolver implements SMTSolver {
 	StringBuffer sb = new StringBuffer();
 	String dateSeparator = "-";
 	String dateTimeSeparator = "_";
-	sb.append(toStringLeadingZeros(c.get(Calendar.YEAR), 4)).append(
-		dateSeparator).append(
-		toStringLeadingZeros(c.get(Calendar.MONTH) + 1, 2)).append(
-		dateSeparator).append(
-		toStringLeadingZeros(c.get(Calendar.DATE), 2)).append(
-		dateTimeSeparator).append(
-		toStringLeadingZeros(c.get(Calendar.HOUR_OF_DAY), 2) + "h")
-		.append(toStringLeadingZeros(c.get(Calendar.MINUTE), 2) + "m")
-		.append(toStringLeadingZeros(c.get(Calendar.SECOND), 2) + "s")
-		.append('.').append(
+        sb.append(toStringLeadingZeros(c.get(Calendar.YEAR), 4)).append(
+                dateSeparator).append(
+                toStringLeadingZeros(c.get(Calendar.MONTH) + 1, 2)).append(
+                dateSeparator).append(
+                toStringLeadingZeros(c.get(Calendar.DATE), 2)).append(
+                dateTimeSeparator).append(toStringLeadingZeros(c.get(Calendar.HOUR_OF_DAY), 2)).
+                append("h").append(toStringLeadingZeros(c.get(Calendar.MINUTE), 2)).append("m").
+                append(toStringLeadingZeros(c.get(Calendar.SECOND), 2)).append("s")
+		        .append('.').append(
 			toStringLeadingZeros(c.get(Calendar.MILLISECOND), 2));
 	return sb.toString();
     }
@@ -227,7 +245,7 @@ public abstract class AbstractSMTSolver implements SMTSolver {
 	    logger.debug("The formula could not be translated.", e);
 	    //throw new RuntimeException("The formula could not be translated.\n" + e.getMessage());
 	}
-    	goal.node().addSMTData(toReturn);
+    	goal.node().addSMTandFPData(toReturn);
     	
        	return toReturn;
     }
@@ -293,9 +311,8 @@ public abstract class AbstractSMTSolver implements SMTSolver {
 		    ioe.initCause(e);
 		    throw ioe;
 		}
-	
+
 	 
-	
 	 return toReturn;
     }
 
@@ -434,7 +451,7 @@ public abstract class AbstractSMTSolver implements SMTSolver {
 		t.cancel();
 		this.execWatch = null;
 	    }
-	    
+
 	    if (interruptedByWatchdog) {
 		//the solving was interrupted. So return unknown
 		return SMTSolverResult.NO_IDEA;
@@ -444,7 +461,7 @@ public abstract class AbstractSMTSolver implements SMTSolver {
 		InputStream in = p.getInputStream();
 		String text = read(in);
 		in.close();
-		
+
 		in = p.getErrorStream();
 		String error = read(in);
 		in.close();
@@ -453,7 +470,10 @@ public abstract class AbstractSMTSolver implements SMTSolver {
 		} catch (IllegalArgumentException e) {
 		    //the interpretation found an error.
 		    throw new RuntimeException("Error while executing solver:\n" + e.getMessage());
+		} finally {
+		    p.destroy();
 		}
+
 	    }
 	} catch (IOException e) {
 	    String cmdStr = execCommand;
@@ -466,7 +486,7 @@ public abstract class AbstractSMTSolver implements SMTSolver {
 		    "\n 2. we expect a different name than your executable " +
 		    "(prior to KeY 1.5 and later we expected 'Simplify' instead of 'simplify')" +
 		    "\n\t Solution: Change the name to " + (execCommand != null ? 
-		        	execCommand : "expected name") +
+			    execCommand : "expected name") +
 		    "\n 3. you have not the permission to execute the decision procedure." +
 		    "\n\t Solution: *nix-like systems: try 'chmod u+x <path_to_executable>/<executable_filename>" +
 		    "\n 4. you use a too new or too old version of the decision procedure and the command " +

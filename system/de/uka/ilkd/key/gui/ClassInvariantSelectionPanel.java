@@ -315,9 +315,8 @@ class ClassInvariantSelectionPanel extends JPanel {
         ClassTree.Entry te = (ClassTree.Entry) node.getUserObject();
         if(te.kjt != null) {
             ImmutableSet<ClassInvariant> invs = getRelevantInvs(te.kjt);
-            Iterator<ClassInvariant> it = invs.iterator();
-            while(it.hasNext()) {
-                if(selectedInvs.contains(it.next())) {
+            for (ClassInvariant inv : invs) {
+                if (selectedInvs.contains(inv)) {
                     numSelectedMembers++;
                 }
             }
@@ -338,13 +337,13 @@ class ClassInvariantSelectionPanel extends JPanel {
         
         //update selection counters in tree
         Object[] nodes = classTree.getSelectionPath().getPath();
-        for(int i = 0; i < nodes.length; i++) {
-            DefaultMutableTreeNode node = (DefaultMutableTreeNode)(nodes[i]);
+        for (Object node1 : nodes) {
+            DefaultMutableTreeNode node = (DefaultMutableTreeNode) (node1);
             ClassTree.Entry te = (ClassTree.Entry) node.getUserObject();
             te.numSelectedMembers++;
-            assert te.numSelectedMembers > 0 
-                   && te.numSelectedMembers <= te.numMembers;
-            
+            assert te.numSelectedMembers > 0
+                    && te.numSelectedMembers <= te.numMembers;
+
         }
         classTree.repaint();
     }
@@ -361,12 +360,12 @@ class ClassInvariantSelectionPanel extends JPanel {
         
         //update selection counters in tree
         Object[] nodes = classTree.getSelectionPath().getPath();
-        for(int i = 0; i < nodes.length; i++) {
-            DefaultMutableTreeNode node = (DefaultMutableTreeNode)(nodes[i]);
+        for (Object node1 : nodes) {
+            DefaultMutableTreeNode node = (DefaultMutableTreeNode) (node1);
             ClassTree.Entry te = (ClassTree.Entry) node.getUserObject();
             te.numSelectedMembers--;
-            assert te.numSelectedMembers >= 0 
-                   && te.numSelectedMembers < te.numMembers;
+            assert te.numSelectedMembers >= 0
+                    && te.numSelectedMembers < te.numMembers;
         }
         classTree.repaint();
     }
@@ -388,9 +387,7 @@ class ClassInvariantSelectionPanel extends JPanel {
         //select all
         selectedInvs = DefaultImmutableSet.<ClassInvariant>nil();
 	final Set<KeYJavaType> kjts = services.getJavaInfo().getAllKeYJavaTypes();
-	final Iterator<KeYJavaType> it = kjts.iterator();
-        while (it.hasNext()) {
-            final KeYJavaType kjt = it.next();            
+        for (final KeYJavaType kjt : kjts) {
             selectedInvs = selectedInvs.union(getRelevantInvs(kjt));
         }
         

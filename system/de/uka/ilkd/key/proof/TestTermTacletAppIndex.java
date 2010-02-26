@@ -274,9 +274,7 @@ public class TestTermTacletAppIndex extends TestCase{
     private void checkTacletList ( ImmutableList<NoPosTacletApp> p_toCheck,
 				   ImmutableList<Taclet>         p_template ) {
 	assertTrue ( p_toCheck.size () == p_template.size () );
-	Iterator<NoPosTacletApp> it = p_toCheck.iterator ();
-	while ( it.hasNext () )
-	    assertTrue ( p_template.contains(it.next ().taclet ()) );
+        for (NoPosTacletApp aP_toCheck : p_toCheck) assertTrue(p_template.contains(aP_toCheck.taclet()));
     }
 
     /**

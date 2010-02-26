@@ -45,18 +45,16 @@ public class StatementSkolemBuilder
     }
 
     public Iterator<SkolemSet> build () {
-	Iterator<SchemaVariable> it =
-	    getOriginalSkolemSet ().getMissing ().iterator ();
 
-	while ( it.hasNext () ) {
-	    final SchemaVariable sv = it.next ();
+        for (SchemaVariable schemaVariable : getOriginalSkolemSet().getMissing()) {
+            final SchemaVariable sv = schemaVariable;
 
-	    if ( sv.isProgramSV () &&
-		 ((SortedSchemaVariable)sv).sort () ==
-		     ProgramSVSort.STATEMENT &&
-		 !isInstantiated ( sv ) )
-	        createSkolemStatementSV ( sv );
-	}
+            if (sv.isProgramSV() &&
+                    ((SortedSchemaVariable) sv).sort() ==
+                            ProgramSVSort.STATEMENT &&
+                    !isInstantiated(sv))
+                createSkolemStatementSV(sv);
+        }
 
 	return toIterator
 	    ( getOriginalSkolemSet ()

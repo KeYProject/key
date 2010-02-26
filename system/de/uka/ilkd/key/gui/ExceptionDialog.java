@@ -189,7 +189,7 @@ public class ExceptionDialog extends JDialog {
 	lTextField.setEditable(false);
 	cTextField.setEditable(false);
 	if (!(loc==null)) {
-	    if ( !( (loc.getFilename()==null) || (loc.getFilename()== ""))){
+	    if ( !( loc.getFilename()==null || "".equals(loc.getFilename()))) {
 		fTextField.setText("File: "+loc.getFilename());
 		lPanel.add(fTextField);
 	    } 

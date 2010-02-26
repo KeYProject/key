@@ -119,23 +119,21 @@ public class LoopInvariantImpl implements LoopInvariant {
 
         //atPre-functions
         if(atPreFunctions != null) {
-            Iterator<Map.Entry<Operator, Function>> it = 
-                originalAtPreFunctions.entrySet().iterator();
-            while(it.hasNext()) {
-                Map.Entry<Operator, Function> entry = it.next();
+            for (Object o : originalAtPreFunctions.entrySet()) {
+                Map.Entry<Operator, Function> entry = (Map.Entry<Operator, Function>) o;
                 Operator originalNormalOp = entry.getKey();
                 Function originalAtPreFunc = entry.getValue();
                 Operator normalOp = (Operator) result.get(originalNormalOp);
-                if(normalOp == null) {
+                if (normalOp == null) {
                     normalOp = originalNormalOp;
                 }
                 Function atPreFunc = atPreFunctions.get(normalOp);
-                if(atPreFunc == null) {
-                    atPreFunc 
-                        = AtPreFactory.INSTANCE.createAtPreFunction(normalOp, 
-                                                                    services);
+                if (atPreFunc == null) {
+                    atPreFunc
+                            = AtPreFactory.INSTANCE.createAtPreFunction(normalOp,
+                            services);
                     atPreFunctions.put(normalOp, atPreFunc);
-                    services.getNamespaces().functions().add(atPreFunc);                    
+                    services.getNamespaces().functions().add(atPreFunc);
                 }
                 assert originalAtPreFunc.sort().equals(atPreFunc.sort());
                 result.put(originalAtPreFunc, atPreFunc);
@@ -152,11 +150,10 @@ public class LoopInvariantImpl implements LoopInvariant {
             Services services) {
        Map result = new LinkedHashMap();
        Map replaceMap = getReplaceMap(selfTerm, atPreFunctions, services);
-       final Iterator<Map.Entry> it = replaceMap.entrySet().iterator();
-       while(it.hasNext()) {
-           Map.Entry entry = it.next();
-           result.put(entry.getValue(), entry.getKey());
-       }
+        for (Object o : replaceMap.entrySet()) {
+            Map.Entry entry = (Map.Entry) o;
+            result.put(entry.getValue(), entry.getKey());
+        }
        return result;
     }
     

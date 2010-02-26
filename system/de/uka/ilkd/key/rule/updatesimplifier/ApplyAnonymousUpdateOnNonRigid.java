@@ -50,7 +50,7 @@ public class ApplyAnonymousUpdateOnNonRigid extends AbstractUpdateRule {
      * @return the term after pushing the update to the subterms
      */
     private Term pushToSubterms(Update update, Term target, Services services) {
-	Term result = target;
+	Term result;
 	final PropagationResult pr = propagateUpdateToSubterms(update, 
 							       target, 
 							       services);        

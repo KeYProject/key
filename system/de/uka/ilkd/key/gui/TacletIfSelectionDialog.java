@@ -205,9 +205,8 @@ public class TacletIfSelectionDialog extends JPanel{
 	        list.setToolTipText(valStr);                
 	    }
                        	 
-	    Component c = defaultRenderer.getListCellRendererComponent(
+	    return defaultRenderer.getListCellRendererComponent(
                 list, valStr, index, isSelected, cellHasFocus);
-            return c;
 	}
     }
 

@@ -73,9 +73,8 @@ public class FormulaWithAxioms {
     
     public Term getAxiomsAsFormula() {
         Term result = TB.tt();
-        Iterator<Term> it = axioms.values().iterator();
-        while(it.hasNext()) {
-            result = TB.and(result, it.next());
+        for (Object o : axioms.values()) {
+            result = TB.and(result, (Term) o);
         }
         return result;
     }

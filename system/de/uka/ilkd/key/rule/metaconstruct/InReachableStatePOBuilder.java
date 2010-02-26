@@ -684,9 +684,8 @@ public class InReachableStatePOBuilder extends TermBuilder {
         final ImmutableList<KeYJavaType> allSubTypes =
                 javaInfo.getAllSubtypes(currentType);
 
-        final Iterator<KeYJavaType> subTypes = allSubTypes.iterator();
-        while (subTypes.hasNext()) {
-            final KeYJavaType subtype = subTypes.next();
+        for (KeYJavaType allSubType : allSubTypes) {
+            final KeYJavaType subtype = allSubType;
             final ImmutableList<KeYJavaType> subsDirectSuper =
                     javaInfo.getDirectSuperTypes(subtype);
             if (subsDirectSuper.contains(currentType)) {

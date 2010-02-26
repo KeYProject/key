@@ -235,8 +235,8 @@ public class UpdateFactory {
     
     public Update quantify (QuantifiableVariable[] vars, Update update) {
         Update res = update;
-        for (int i = 0; i < vars.length; i++) {
-            res = quantify (vars[i], res);
+        for (QuantifiableVariable var : vars) {
+            res = quantify(var, res);
         }
         return res;
     }

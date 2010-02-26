@@ -68,9 +68,8 @@ public class CorrectDependsPO extends AbstractPO {
     private Update createUpdate(UpdateFactory uf, Map<Operator, Function> atPreFunctions) {
         Update result = uf.skip();
 
-        Iterator<LocationDescriptor> it = dependsClause.iterator();
-        while(it.hasNext()) {
-            LocationDescriptor loc = it.next();
+        for (LocationDescriptor aDependsClause : dependsClause) {
+            LocationDescriptor loc = aDependsClause;
             assert loc instanceof BasicLocationDescriptor;
             BasicLocationDescriptor bloc = (BasicLocationDescriptor) loc;
 
@@ -78,35 +77,34 @@ public class CorrectDependsPO extends AbstractPO {
             Term locTerm = bloc.getLocTerm();
 
             APF.createAtPreFunctionsForTerm(guardTerm,
-                                            atPreFunctions,
-                                            services);
+                    atPreFunctions,
+                    services);
             APF.createAtPreFunctionsForTerm(locTerm,
-                                            atPreFunctions,
-                                            services);
+                    atPreFunctions,
+                    services);
 
             Term[] subTermsAtPre = new Term[locTerm.arity()];
             ImmutableArray<QuantifiableVariable>[] boundVars
-                = new ImmutableArray[locTerm.arity()];
-            for(int i = 0; i < locTerm.arity(); i++) {
+                    = new ImmutableArray[locTerm.arity()];
+            for (int i = 0; i < locTerm.arity(); i++) {
                 subTermsAtPre[i] = replaceOps(atPreFunctions, locTerm.sub(i));
                 boundVars[i] = locTerm.varsBoundHere(i);
             }
             Term locAtIntermediateTerm = TF.createTerm(locTerm.op(),
-                                                       subTermsAtPre,
-                                                       boundVars,
-                                                       null);
+                    subTermsAtPre,
+                    boundVars,
+                    null);
 
             Term locAtPreTerm = replaceOps(atPreFunctions, locTerm);
             Update elementaryUpdate = uf.elementaryUpdate(locAtIntermediateTerm,
-                                                          locAtPreTerm);
+                    locAtPreTerm);
 
             Term guardAtPreTerm = replaceOps(atPreFunctions, guardTerm);
             Update guardedUpdate = uf.guard(guardAtPreTerm, elementaryUpdate);
 
             Update quantifiedUpdate = guardedUpdate;
-            Iterator<QuantifiableVariable> it2 = locTerm.freeVars().iterator();
-            while(it2.hasNext()) {
-                quantifiedUpdate = uf.quantify(it2.next(), quantifiedUpdate);
+            for (QuantifiableVariable quantifiableVariable : locTerm.freeVars()) {
+                quantifiedUpdate = uf.quantify(quantifiableVariable, quantifiedUpdate);
             }
 
             result = uf.sequential(result, quantifiedUpdate);

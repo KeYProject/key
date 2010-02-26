@@ -118,13 +118,11 @@ class Instantiation {
     private void addArbitraryInstance(Services services) {
         ImmutableMap<QuantifiableVariable,Term> varMap =
             DefaultImmutableMap.<QuantifiableVariable,Term>nilMap();
-        
-        final Iterator<QuantifiableVariable> it =
-            triggersSet.getUniQuantifiedVariables().iterator();
-        while ( it.hasNext () ) {
-            final QuantifiableVariable v = it.next();
-            final Term inst = createArbitraryInstantiation ( v, services );
-            varMap = varMap.put ( v, inst );
+
+        for (QuantifiableVariable quantifiableVariable : triggersSet.getUniQuantifiedVariables()) {
+            final QuantifiableVariable v = quantifiableVariable;
+            final Term inst = createArbitraryInstantiation(v, services);
+            varMap = varMap.put(v, inst);
         }
         
         addInstance ( new Substitution ( varMap ), services );

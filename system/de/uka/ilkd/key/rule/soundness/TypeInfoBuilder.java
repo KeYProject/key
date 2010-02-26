@@ -101,20 +101,18 @@ public class TypeInfoBuilder extends AbstractSkolemBuilder {
 					    SVInstantiations     p_currentSVI,
 					    SVTypeInfos          p_currentSVTI,
 					    ExtList              p_res ) {
-	final Iterator<IProgramVariable> nativeIt =
-	    rpvp.getFreeProgramVariables ().iterator ();
 
-	while ( nativeIt.hasNext () ) {
-	    final IProgramVariable pv = nativeIt.next ();
+        for (IProgramVariable iProgramVariable : rpvp.getFreeProgramVariables()) {
+            final IProgramVariable pv = iProgramVariable;
 
-	    final PVCandidate pvc =
-	        isValidInstantiation ( p_currentSVI, p_currentSVTI, 
-				       p_svs, pv,
-				       ProgramSkolemInstantiation
-				       .OCCURRING_VARIABLE );
-	    if ( pvc != null )
-		p_res.add ( pvc );
-	}
+            final PVCandidate pvc =
+                    isValidInstantiation(p_currentSVI, p_currentSVTI,
+                            p_svs, pv,
+                            ProgramSkolemInstantiation
+                                    .OCCURRING_VARIABLE);
+            if (pvc != null)
+                p_res.add(pvc);
+        }
     }
 
 

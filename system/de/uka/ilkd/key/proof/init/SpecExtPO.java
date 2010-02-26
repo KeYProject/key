@@ -61,10 +61,10 @@ public class SpecExtPO extends EnsuresPostPO {
 
     public ProofAggregate getPO() {
         Proof[] proofs = super.getPO().getProofs();
-        for (int i = 0; i < proofs.length; i++) {
-            if (proofs[i].name().toString().equals(
+        for (Proof proof : proofs) {
+            if (proof.name().toString().equals(
                     "ExtractSpec of " + getProgramMethod())) {
-                proofs[i].setPO(this);
+                proof.setPO(this);
             }
 
         }

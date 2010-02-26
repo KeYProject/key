@@ -92,22 +92,22 @@ public class TextualJMLLoopSpec extends TextualJMLConstruct {
         
         it = invariant.iterator();
         while(it.hasNext()) {
-            sb.append("invariant: " + it.next() + "\n");
+            sb.append("invariant: ").append(it.next()).append("\n");
         }
         it = skolemDeclarations.iterator();
         while(it.hasNext()) {
-            sb.append("skolem_constant: " + it.next() + "\n");
+            sb.append("skolem_constant: ").append(it.next()).append("\n");
         }
         it = predicates.iterator();
         while(it.hasNext()) {
-            sb.append("loop_predicate: " + it.next() + "\n");
+            sb.append("loop_predicate: ").append(it.next()).append("\n");
         }
         it = assignable.iterator();
         while(it.hasNext()) {
-            sb.append("assignable: " + it.next() + "\n");
+            sb.append("assignable: ").append(it.next()).append("\n");
         }
         if(variant != null) {
-            sb.append("decreases: " + variant);
+            sb.append("decreases: ").append(variant);
         }
         
         return sb.toString();

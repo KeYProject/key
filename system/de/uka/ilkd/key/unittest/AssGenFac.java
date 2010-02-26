@@ -35,8 +35,8 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 public class AssGenFac {
 
     public AssignmentGenerator create() {
-	assert (TestGenFac.testGenMode == TestGenFac.TG_JAVACARD || TestGenFac.testGenMode == TestGenFac.TG_JAVA) : "Unhandled case in AssGenFac.";
-	if (TestGenFac.testGenMode == TestGenFac.TG_JAVACARD) {
+	assert (TestGenFac.testGenMode == TestGenFac.TG_USE_SETGET || TestGenFac.testGenMode == TestGenFac.TG_USE_REFL) : "Unhandled case in AssGenFac.";
+	if (TestGenFac.testGenMode == TestGenFac.TG_USE_SETGET) {
 	    return new JavaCardAssignmentGenerator();
 	} else {
 	    return new JavaAssignmentGenerator();

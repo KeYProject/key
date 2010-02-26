@@ -18,7 +18,6 @@
 package de.uka.ilkd.key.unittest;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
-import de.uka.ilkd.key.gui.Main;
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.LoopInitializer;
 import de.uka.ilkd.key.java.Services;
@@ -26,8 +25,6 @@ import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.ArrayType;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
-import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.expression.literal.IntLiteral;
 import de.uka.ilkd.key.java.expression.literal.NullLiteral;
 import de.uka.ilkd.key.java.expression.operator.CopyAssignment;
@@ -42,12 +39,10 @@ import de.uka.ilkd.key.java.reference.TypeRef;
 import de.uka.ilkd.key.java.statement.For;
 import de.uka.ilkd.key.java.statement.If;
 import de.uka.ilkd.key.java.statement.Then;
-import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.rule.updatesimplifier.AssignmentPair;
-import de.uka.ilkd.key.unittest.ppAndJavaASTExtension.SyntacticalArrayType;
-import de.uka.ilkd.key.java.reference.FieldReference;
+
 /**
  * This class represents a NonRigidFunctionLocation beeing an array
  * 
@@ -57,7 +52,6 @@ import de.uka.ilkd.key.java.reference.FieldReference;
 public class ArrayTermRep extends AbstractTermRepresentation {
 
     private ProgramVariable pvRead;
-    private ProgramVariable pvWrite;
     final KeYJavaType intType;
 
 
@@ -196,7 +190,7 @@ public class ArrayTermRep extends AbstractTermRepresentation {
 	        
 	        final Statement result = createArray==null ? 
 	        	forLoop :
-	        	new StatementBlock(new ImmutableArray<Statement>(new Statement[]{createArray, forLoop}));
+	        	new StatementBlock(new ImmutableArray<Statement>(createArray, forLoop));
 	        
 	        return result;
 
@@ -228,7 +222,7 @@ public class ArrayTermRep extends AbstractTermRepresentation {
 	        
 	        final Statement result = createArray==null ? 
 	        	assignment :
-	        	new StatementBlock(new ImmutableArray<Statement>(new Statement[]{createArray, assignment}));
+	        	new StatementBlock(new ImmutableArray<Statement>(createArray, assignment));
 	        
 	        return result;
 	}

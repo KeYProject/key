@@ -7,8 +7,6 @@
 // See LICENSE.TXT for details.
 package de.uka.ilkd.key.unittest;
 
-import java.util.Iterator;
-
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.expression.literal.BooleanLiteral;
 
@@ -29,11 +27,10 @@ public class BooleanValueContainer extends ValueContainer{
     public Expression[] getValuesAsExpressions(){
 	Expression[] res = new Expression[values.size()];
 	int i = 0;
-	Iterator it = values.iterator();
-	while(it.hasNext()){
-	    res[i++] = ((Boolean) it.next()).booleanValue() ? 
-		BooleanLiteral.TRUE : BooleanLiteral.FALSE;
-	}
+        for (Object value : values) {
+            res[i++] = ((Boolean) value).booleanValue() ?
+                    BooleanLiteral.TRUE : BooleanLiteral.FALSE;
+        }
 	return res;
     }
 

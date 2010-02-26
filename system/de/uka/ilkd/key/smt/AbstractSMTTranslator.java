@@ -64,7 +64,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
     private Sort integerSort;
     
     /** The string used as standard sort for translations */
-    private final StringBuffer standardSort = new StringBuffer("u");
+    protected final StringBuffer standardSort = new StringBuffer("u");
 
     // private static long counter = 0;   
     protected static final int YESNOT = 2;
@@ -108,7 +108,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 
     private HashMap<Sort, StringBuffer> usedRealSort = new HashMap<Sort, StringBuffer>();
 
-    private HashMap<Sort, StringBuffer> typePredicates = new HashMap<Sort, StringBuffer>();
+    protected HashMap<Sort, StringBuffer> typePredicates = new HashMap<Sort, StringBuffer>();
 
     // used type predicates for constant values, e.g. 1, 2, ...
     private HashMap<Term, StringBuffer> constantTypePreds = new HashMap<Term, StringBuffer>();
@@ -117,9 +117,9 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
     /** map used for storing predicates representing modalities or updates */
     private HashMap<Term, StringBuffer> modalityPredicates = new HashMap<Term, StringBuffer>();
     
-    private StringBuffer nullString = new StringBuffer();
+    protected StringBuffer nullString = new StringBuffer();
 
-    private boolean nullUsed = false;
+    protected boolean nullUsed = false;
 
     //assumptions. they have to be added to the formula!
     private ArrayList<StringBuffer> assumptions = new ArrayList<StringBuffer>();
@@ -178,7 +178,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 	    throws IllegalFormulaException {
 
 	// translate
-	StringBuffer hb = new StringBuffer();
+	StringBuffer hb;
 	StringBuffer ante;
 	ante = translate(sequent.antecedent(), SMTTranslator.TERMPOSITION.ANTECEDENT, services);
 	StringBuffer succ;
@@ -270,7 +270,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
      * typing
      * @return ArrayList of formulas, assuring the assumption.
      */
-    private ArrayList<StringBuffer> getSpecialSortPredicates(Services services) throws IllegalFormulaException{
+    protected ArrayList<StringBuffer> getSpecialSortPredicates(Services services) throws IllegalFormulaException{
 	ArrayList<StringBuffer> toReturn = new ArrayList<StringBuffer>();
 	
 	for (Function o : this.specialFunctions) {
@@ -279,7 +279,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 	    ArrayList<StringBuffer> predList = new ArrayList<StringBuffer>();
 	    //build the variables and typepredicates for quantification
 	    for (int i = 0; i < o.arity(); i++) {
-		StringBuffer var = this.translateLogicalVar(new StringBuffer("tvar" + i));
+		StringBuffer var = this.translateLogicalVar(new StringBuffer("tvar1" + i));
 		varList.add(var);
 		ArrayList<StringBuffer> templist = new ArrayList<StringBuffer>();
 		templist.add(var);
@@ -313,10 +313,10 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 	    rightForm = this.translatePredicate(rightPred, tempList);
 	    
 	    StringBuffer form = this.translateLogicalImply(leftForm, rightForm);
-	    
-	    for (int i = 0; i < varList.size(); i++) {
-		form = this.translateLogicalAll(varList.get(i), this.getIntegerSort(), form);
-	    }
+
+        for (StringBuffer aVarList : varList) {
+            form = this.translateLogicalAll(aVarList, this.getIntegerSort(), form);
+        }
 	    
 	    toReturn.add(form);
 	}
@@ -361,7 +361,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
      * 
      * @return a sort hierarchy for the sorts
      */
-    private SortHierarchy buildSortHierarchy() {
+    protected SortHierarchy buildSortHierarchy() {
 	return new SortHierarchy(this.usedDisplaySort, this.typePredicates);
     }
 
@@ -370,7 +370,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
      * Also the null type is added to the formula if used before.
      * @return The well defined formula.
      */
-    private ArrayList<StringBuffer> getSortHierarchyPredicates() {
+    protected ArrayList<StringBuffer> getSortHierarchyPredicates() {
 	SortHierarchy sh = this.buildSortHierarchy();
 	ArrayList<StringBuffer> toReturn = new ArrayList<StringBuffer>();
 	
@@ -381,7 +381,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 	    StringBuffer form = new StringBuffer();
 	    for (StringBuffer rightPred : predMap.get(leftPred)) {
 		StringBuffer var = this.translateLogicalVar(new StringBuffer(
-			"tvar"));
+			"tvar2"));
 		ArrayList<StringBuffer> varlist = new ArrayList<StringBuffer>();
 		varlist.add(var);
 		StringBuffer leftForm = this.translatePredicate(leftPred,
@@ -455,7 +455,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
      * 		Last element is the return type.
      * @return well formed expression that defines the type of the function.
      */
-    private StringBuffer getSingleFunctionDef(StringBuffer funName,
+    protected StringBuffer getSingleFunctionDef(StringBuffer funName,
 	    ArrayList<Sort> sorts) {
 	StringBuffer toReturn = new StringBuffer();
 
@@ -477,7 +477,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 	    // collect the quantify vars
 	    ArrayList<StringBuffer> qVar = new ArrayList<StringBuffer>();
 	    for (int i = 0; i < sorts.size() - 1; i++) {
-		qVar.add(this.translateLogicalVar(new StringBuffer("tvar")));
+		qVar.add(this.translateLogicalVar(new StringBuffer("tvar3")));
 	    }
 
 	    // left hand side of the type implication
@@ -750,9 +750,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
     private final StringBuffer translate(ConstrainedFormula cf, Services services)
 	    throws IllegalFormulaException {
 	StringBuffer hb = new StringBuffer();
-	Term t;
-	t = cf.formula();
-	hb.append(translateTerm(t,new Vector<QuantifiableVariable>() , services));
+	hb.append(translateTerm(cf.formula(), new Vector<QuantifiableVariable>(), services));
 	return hb;
     }
     
@@ -1228,7 +1226,9 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
      *                there.
      */
 //  TODO make private again after testing!!
-    public final StringBuffer translateTerm (Term term, Vector<QuantifiableVariable> quantifiedVars,
+// gladisch: This method doesn't seem to be just for test reasons. It is used to generate output. 
+//    	      I need to modify the behavior of this method in SmtLibTranslatorWeaker. Let me know if you change the visibility of it.
+    public StringBuffer translateTerm (Term term, Vector<QuantifiableVariable> quantifiedVars,
 	    Services services) throws IllegalFormulaException {
 	
 	//added, because meatavariables should not be translated.
@@ -1816,7 +1816,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 	return translatePredicate(name, sub);
     }
 
-    private final StringBuffer translateSort(Sort s) {
+    protected final StringBuffer translateSort(Sort s) {
 	if (usedDisplaySort.containsKey(s)) {
 	    return usedDisplaySort.get(s);
 	} else {
@@ -1870,10 +1870,8 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
     }
 
     private boolean isSomeIntegerSort(Sort s) {
-	if (s == jbyteSort || s == jshortSort || s == jintSort
-		|| s == jlongSort || s == jcharSort || s == integerSort)
-	    return true;
-	return false;
+        return s == jbyteSort || s == jshortSort || s == jintSort
+                || s == jlongSort || s == jcharSort || s == integerSort;
     }
     
     /*
@@ -1954,6 +1952,6 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 	
 	
 	return result;	
-    }
+	}
 
 }

@@ -77,9 +77,9 @@ public class ImmutableArray<S> implements java.lang.Iterable<S>, java.io.Seriali
 
     public int hashCode() {
 	if (hashCode == -1) {
-	    for(int i = 0; i < content.length; i++) {
-		hashCode += 17 * content[i].hashCode();
-	    }
+        for (S aContent : content) {
+            hashCode += 17 * aContent.hashCode();
+        }
 	    if(hashCode == -1) {
 		hashCode = -2;
 	    }
@@ -114,7 +114,7 @@ public class ImmutableArray<S> implements java.lang.Iterable<S>, java.io.Seriali
 	StringBuilder sb = new StringBuilder();
 	sb.append("[");
 	for (int i = 0, sz = size(); i < sz; i++) {
-	    sb.append(""+content[i]);
+        sb.append(content[i]);
 	    if (i<sz-1) sb.append(",");
 	}
 	sb.append("]");

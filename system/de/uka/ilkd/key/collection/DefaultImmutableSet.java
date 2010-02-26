@@ -43,7 +43,7 @@ public class DefaultImmutableSet<T> implements ImmutableSet<T> {
      * PRECONDITION: elementList has no duplicates
      * @param elementList IList<T> contains all elements of the new Set
      */
-    protected DefaultImmutableSet(ImmutableList<T> elementList) {
+    private DefaultImmutableSet(ImmutableList<T> elementList) {
 	this.elementList=elementList;
     }
 
@@ -160,7 +160,7 @@ public class DefaultImmutableSet<T> implements ImmutableSet<T> {
 	Iterator<T> it=this.iterator();
 	StringBuffer str=new StringBuffer("{");
 	while (it.hasNext()) {
-	    str.append(""+it.next());
+	    str.append(it.next());
 	    if (it.hasNext()) {
 		str.append(",");
 	    }

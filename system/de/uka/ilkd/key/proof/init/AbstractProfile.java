@@ -61,9 +61,8 @@ public abstract class AbstractProfile implements Profile {
 
         ImmutableSet<String> result = DefaultImmutableSet.<String>nil();
 
-        final Iterator<GoalChooserBuilder> it = supportedGCB.iterator();
-        while (it.hasNext()) {
-            result  = result.add(it.next().name());
+        for (GoalChooserBuilder aSupportedGCB : supportedGCB) {
+            result = result.add(aSupportedGCB.name());
         }
 
         return result;
@@ -123,9 +122,8 @@ public abstract class AbstractProfile implements Profile {
     }
 
     public StrategyFactory getStrategyFactory(Name n) {
-        Iterator<StrategyFactory> it = getStrategyFactories().iterator();
-        while (it.hasNext()) {
-            final StrategyFactory sf = it.next();
+        for (StrategyFactory strategyFactory : getStrategyFactories()) {
+            final StrategyFactory sf = strategyFactory;
             if (sf.name().equals(n)) {
                 return sf;
             }
@@ -174,13 +172,12 @@ public abstract class AbstractProfile implements Profile {
       * demanded chooser is not supported
       */
      public GoalChooserBuilder lookupGC(String name) {
-        final Iterator<GoalChooserBuilder> it  = supportedGCB.iterator();
-        while (it.hasNext()) {
-            final GoalChooserBuilder supprotedGCB = it.next();
-            if (supprotedGCB.name().equals(name)) {
-                return supprotedGCB.copy();
-            }
-        }
+         for (GoalChooserBuilder aSupportedGCB : supportedGCB) {
+             final GoalChooserBuilder supprotedGCB = aSupportedGCB;
+             if (supprotedGCB.name().equals(name)) {
+                 return supprotedGCB.copy();
+             }
+         }
         return null;
     }
 

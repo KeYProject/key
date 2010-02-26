@@ -7,17 +7,11 @@
 // See LICENSE.TXT for details.
 package de.uka.ilkd.key.unittest;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.*;
 
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
-import de.uka.ilkd.key.gui.Main;
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.Statement;
@@ -74,6 +68,14 @@ public class UnitTestBuilder {
 
     // iff true only terminated traces are considered for test case generation
     public static boolean requireCompleteExecution = false;
+    
+    /**The field determines which node to select for the path condition.
+     * When generating tests for a proof branch, a program trace is computed on that branch.
+     * If this field is false, then the original implementation from Christian Engel is used
+     * where the last node on the trace is used as path condition. If this field
+     * is true, then the node selected by the user (possibly end-node of the proof branch)
+     * will be used as path condition. */
+    public static boolean allowNonTraceNodeAsPathCond = false; 
 
     protected final Namespace pvn;
 
@@ -134,6 +136,7 @@ public class UnitTestBuilder {
 	    final ExecutionTraceModel[] tr = getTraces(n);
 	    result = result.union(getProgramMethods(tr));
 	}
+	
 	return result;
     }
 
@@ -316,22 +319,25 @@ public class UnitTestBuilder {
 		}
 	    }//for
 	    if (maxRating != -1) {
-		Node pathConditionNode = tr[maxRating].getLastTraceElement().node();
+		Node pathConditionNode = null;
+		if(!allowNonTraceNodeAsPathCond){
+		    pathConditionNode = tr[maxRating].getLastTraceElement().node();
+		}else{
+		    pathConditionNode = originalNode;
+		}
 		createTestForNodes_progressNotification1(tr[maxRating], pathConditionNode, originalNode);
 		mgs.add(getModelGenerator(tr[maxRating].toString(),
 					  pathConditionNode, 
 					  originalNode));
-		nodesAlreadyProcessed.add(tr[maxRating].getLastTraceElement()
-		        .node());
+		nodesAlreadyProcessed.add(tr[maxRating].getLastTraceElement().node());
 	    }
 	}
 	if (methodName == null) {
 	    String pmsStr = "";
-	    final Iterator<ProgramMethod> pmIt = pms.iterator();
-	    while (pmIt.hasNext()) {
-		final ProgramMethod pm = pmIt.next();
-		pmsStr += pm.getName() + "\n";
-	    }
+        for (ProgramMethod pm1 : pms) {
+            final ProgramMethod pm = pm1;
+            pmsStr += pm.getName() + "\n";
+        }
 	    
 	    //The following call throws an exception if it is not overwritten. 
 	    createTestForNodes_progressNotification2(new UnitTestException(
@@ -394,8 +400,7 @@ public class UnitTestBuilder {
     }
 
     public String createTestForNodes(final ImmutableList<Node> l) {
-	return createTestForNodes(Arrays.asList(l.toArray(new Node[l.size()]))
-	        .iterator(), getProgramMethods(l));
+	return createTestForNodes(l.iterator(), getProgramMethods(l));
     }
 
     // protected void computeStatementCoverage(HashSet<Position>

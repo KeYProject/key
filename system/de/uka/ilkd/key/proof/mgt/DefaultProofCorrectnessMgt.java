@@ -52,11 +52,10 @@ public class DefaultProofCorrectnessMgt implements ProofCorrectnessMgt {
     //-------------------------------------------------------------------------
     
     private boolean atLeastOneClosed(ImmutableSet<Proof> proofs) {
-        Iterator<Proof> it = proofs.iterator();
-        while(it.hasNext()) {
-            Proof proof = it.next();
+        for (Proof proof1 : proofs) {
+            Proof proof = proof1;
             proof.mgt().updateProofStatus();
-            if(proof.mgt().getStatus().getProofClosed()) {
+            if (proof.mgt().getStatus().getProofClosed()) {
                 return true;
             }
         }
@@ -96,29 +95,26 @@ public class DefaultProofCorrectnessMgt implements ProofCorrectnessMgt {
             
             while(it.hasNext()) {
                 Proof proof = it.next();
-                Iterator<RuleApp> cachedRuleAppsIt 
-                    = proof.mgt().getNonAxiomApps().iterator();
-                while(cachedRuleAppsIt.hasNext()) {
-                    RuleApp ruleApp = cachedRuleAppsIt.next();
+                for (RuleApp ruleApp1 : proof.mgt().getNonAxiomApps()) {
+                    RuleApp ruleApp = ruleApp1;
                     RuleJustification ruleJusti = getJustification(ruleApp);
-                    if(ruleJusti instanceof RuleJustificationBySpec) {
-                        ContractWithInvs cwi 
-                            = ((RuleJustificationBySpec) ruleJusti).getSpec();
-                        ImmutableSet<Proof> proofsForPm 
-                            = specRepos.getProofs(cwi.contract
-                                                     .getProgramMethod());
+                    if (ruleJusti instanceof RuleJustificationBySpec) {
+                        ContractWithInvs cwi
+                                = ((RuleJustificationBySpec) ruleJusti).getSpec();
+                        ImmutableSet<Proof> proofsForPm
+                                = specRepos.getProofs(cwi.contract
+                                .getProgramMethod());
                         newProofs = newProofs.union(proofsForPm);
                         proofs = proofs.union(proofsForPm);
-                    }   
+                    }
                 }
             }
         }
         
         //is one of those proofs about the operation under verification? 
-        Iterator<Proof> it = proofs.iterator();
-        while(it.hasNext()) {
-            ProgramMethod pm2 = specRepos.getOperationForProof(it.next());
-            if(pm2.equals(pmUnderVerification)) {
+        for (Proof proof1 : proofs) {
+            ProgramMethod pm2 = specRepos.getOperationForProof(proof1);
+            if (pm2.equals(pmUnderVerification)) {
                 return false;
             }
         }
@@ -135,41 +131,40 @@ public class DefaultProofCorrectnessMgt implements ProofCorrectnessMgt {
         }
 	
         //used, but yet unproven specifications?
-        Iterator<RuleApp> cachedRuleAppsIt = cachedRuleApps.iterator();
-        while(cachedRuleAppsIt.hasNext()) {
-            RuleApp ruleApp = cachedRuleAppsIt.next();
+        for (RuleApp cachedRuleApp : cachedRuleApps) {
+            RuleApp ruleApp = cachedRuleApp;
             RuleJustification ruleJusti = getJustification(ruleApp);
-            if(ruleJusti instanceof RuleJustificationBySpec) {
-                ContractWithInvs cwi 
-                    = ((RuleJustificationBySpec) ruleJusti).getSpec();
-                for(OperationContract atomicContract 
-                    : proof.getServices().getSpecificationRepository()
-                                         .splitContract(cwi.contract)) {
-                
+            if (ruleJusti instanceof RuleJustificationBySpec) {
+                ContractWithInvs cwi
+                        = ((RuleJustificationBySpec) ruleJusti).getSpec();
+                for (OperationContract atomicContract
+                        : proof.getServices().getSpecificationRepository()
+                        .splitContract(cwi.contract)) {
+
                     InitConfig initConfig = proof.env().getInitConfig();
-                    ProofOblInput ensuresPostPO 
-                        = new EnsuresPostPO(initConfig, 
-                                            atomicContract, 
-                                            cwi.assumedInvs);
-                    ImmutableSet<Proof> ensuresPostProofs 
-                        = specRepos.getProofs(ensuresPostPO);
+                    ProofOblInput ensuresPostPO
+                            = new EnsuresPostPO(initConfig,
+                            atomicContract,
+                            cwi.assumedInvs);
+                    ImmutableSet<Proof> ensuresPostProofs
+                            = specRepos.getProofs(ensuresPostPO);
                     ProofOblInput preservesInvPO
-                        = new PreservesInvPO(initConfig, 
-                                             atomicContract.getProgramMethod(), 
-                                             cwi.assumedInvs, 
-                                             cwi.ensuredInvs);
-                    ImmutableSet<Proof> preservesInvProofs 
-                        = specRepos.getProofs(preservesInvPO);
+                            = new PreservesInvPO(initConfig,
+                            atomicContract.getProgramMethod(),
+                            cwi.assumedInvs,
+                            cwi.ensuredInvs);
+                    ImmutableSet<Proof> preservesInvProofs
+                            = specRepos.getProofs(preservesInvPO);
                     ProofOblInput respectsModifiesPO
-                        = new RespectsModifiesPO(initConfig, 
-                                                 atomicContract, 
-                                                 cwi.assumedInvs);
+                            = new RespectsModifiesPO(initConfig,
+                            atomicContract,
+                            cwi.assumedInvs);
                     ImmutableSet<Proof> respectsModifiesProofs
-                        = specRepos.getProofs(respectsModifiesPO);
-                    
-                    if(!(atLeastOneClosed(ensuresPostProofs)
-                         && atLeastOneClosed(preservesInvProofs)
-                         && atLeastOneClosed(respectsModifiesProofs))) {
+                            = specRepos.getProofs(respectsModifiesPO);
+
+                    if (!(atLeastOneClosed(ensuresPostProofs)
+                            && atLeastOneClosed(preservesInvProofs)
+                            && atLeastOneClosed(respectsModifiesProofs))) {
                         proofStatus = ProofStatus.CLOSED_BUT_LEMMAS_LEFT;
                         return;
                     }

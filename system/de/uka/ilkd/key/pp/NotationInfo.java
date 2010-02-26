@@ -166,10 +166,10 @@ public class NotationInfo {
 	Modality modalities[] = {Op.DIATRC, Op.BOXTRC, Op.TOUTTRC,
 	                         Op.DIATRA, Op.BOXTRA, Op.TOUTTRA,
 				 Op.DIASUSP, Op.BOXSUSP, Op.TOUTSUSP};
-	for(int i=0; i<modalities.length;i++)
-	  tbl.put(modalities[i],
-	      new Notation.Modality("\\"+modalities[i].name().toString(),
-	                            "\\endmodality",60, 60));
+        for (Modality modality : modalities)
+            tbl.put(modality,
+                    new Notation.Modality("\\" + modality.name().toString(),
+                            "\\endmodality", 60, 60));
 	tbl.put(Op.IF_THEN_ELSE, new Notation.IfThenElse(130, "\\if"));
 	tbl.put(Op.IF_EX_THEN_ELSE, new Notation.IfThenElse(130, "\\ifEx"));
 

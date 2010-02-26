@@ -36,7 +36,9 @@ public class ProofStarter {
 
     private int maxSteps = -1;
 
-    private ProofOblInput po;
+    /*The ProofOblInput is not needed but only a ProofAggregate that was accessed via po. */
+    //private ProofOblInput po;
+    private ProofAggregate pa;
 
     private Proof proof;
 
@@ -121,19 +123,28 @@ public class ProofStarter {
      *                started on the first proof)
      */
     public void init(ProofOblInput po) {
-
-        if (this.po != null) {
-            throw new IllegalStateException("Proofstarter has been already"
-                    + " instantiated.");
-        }
-
-        this.po = po;
         try {
-            this.proof = po.getPO().getFirstProof();
+            init(po.getPO());
         } catch(ProofInputException e) {
             System.err.println(e);
             e.printStackTrace();
         }
+    }
+    
+    /**
+     * initializes the proof starter, i.e. the proof is created and set up
+     * 
+     * @param pa
+     *                the ProofAggregate with the proof (proof attempt is only
+     *                started on the first proof)
+     */
+    public void init(ProofAggregate pa) {
+        if (this.pa != null) {
+            throw new IllegalStateException("Proofstarter has been already"
+                    + " instantiated.");
+        }
+        this.pa = pa;
+        this.proof = pa.getFirstProof();
     }
 
     /**
@@ -142,9 +153,8 @@ public class ProofStarter {
      * @param progress the int counting the number of applied rules
      */
     private void informProgressMonitors(int progress) {
-        final Iterator it = progressMonitors.iterator();
-        while (it.hasNext()) {
-            ((ProgressMonitor)it.next()).setProgress(progress);
+        for (ProgressMonitor progressMonitor : progressMonitors) {
+            (progressMonitor).setProgress(progress);
         }        
     }
 
@@ -154,9 +164,8 @@ public class ProofStarter {
      * @param maxSteps an int indicating the maximal steps to be performed
      */
     private void initProgressMonitors(int maxSteps) {
-        final Iterator it = progressMonitors.iterator();
-        while (it.hasNext()) {
-            ((ProgressMonitor)it.next()).setMaximum(maxSteps);
+        for (ProgressMonitor progressMonitor : progressMonitors) {
+            (progressMonitor).setMaximum(maxSteps);
         }        
     }
     
@@ -250,11 +259,7 @@ public class ProofStarter {
         } finally {            
             Goal.removeRuleAppListener(pl);
             Goal.setRuleAppListenerList(backup);
-            try {
-                env.removeProofList(po.getPO());
-            } catch (ProofInputException e) {
-                e.printStackTrace();
-            }
+            env.removeProofList(pa);
             proof.setActiveStrategy(oldStrategy);
         }
 
@@ -269,14 +274,12 @@ public class ProofStarter {
      */
     private BuiltInRule findSimplifyRule() {
         BuiltInRule decisionProcedureRule = null;
-        final Iterator<BuiltInRule> builtinRules = 
-            proof.getSettings().getProfile().getStandardRules().getStandardBuiltInRules().iterator();
-        while (builtinRules.hasNext()) {
-            final BuiltInRule bir = builtinRules.next();
+        for (BuiltInRule builtInRule : proof.getSettings().getProfile().getStandardRules().getStandardBuiltInRules()) {
+            final BuiltInRule bir = builtInRule;
             //TODO: do we really want to hardcode "Simplify" here?
             if (bir instanceof SMTRule && bir.displayName().contains("Simplify")) {
-        	decisionProcedureRule = bir;
-        	break;
+                decisionProcedureRule = bir;
+                break;
             }
         }
         return decisionProcedureRule;

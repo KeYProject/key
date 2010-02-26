@@ -231,16 +231,14 @@ public class TacletAppIndex  {
     static ImmutableList<TacletApp> createTacletApps(ImmutableList<NoPosTacletApp> tacletInsts,
                                             PosInOccurrence pos) {
         ImmutableList<TacletApp> result = ImmutableSLList.<TacletApp>nil();
-        Iterator<NoPosTacletApp> it = tacletInsts.iterator ();
-        while ( it.hasNext () ) {
-            NoPosTacletApp tacletApp = it.next ();
-            if ( tacletApp.taclet () instanceof FindTaclet ) {
-                PosTacletApp newTacletApp = tacletApp.setPosInOccurrence ( pos );
-                if ( newTacletApp != null ) {
-                    result = result.prepend ( newTacletApp );
+        for (NoPosTacletApp tacletApp : tacletInsts) {
+            if (tacletApp.taclet() instanceof FindTaclet) {
+                PosTacletApp newTacletApp = tacletApp.setPosInOccurrence(pos);
+                if (newTacletApp != null) {
+                    result = result.prepend(newTacletApp);
                 }
             } else {
-                result = result.prepend ( tacletApp );
+                result = result.prepend(tacletApp);
             }
         }
         return result;
@@ -426,9 +424,8 @@ public class TacletAppIndex  {
     // helper because IList<NoPosTacletApp> is no IList<TacletApp>
     private static ImmutableList<TacletApp> prepend(ImmutableList<TacletApp> l1,
                                            ImmutableList<NoPosTacletApp> l2) {
-        Iterator<NoPosTacletApp> it = l2.iterator ();
-        while ( it.hasNext () ) {
-            l1 = l1.prepend ( it.next () );
+        for (NoPosTacletApp aL2 : l2) {
+            l1 = l1.prepend(aL2);
         }
         return l1;
     }
@@ -475,11 +472,9 @@ public class TacletAppIndex  {
         if ( antecIndex != null ) antecIndex.reportRuleApps ( l );
         if ( succIndex != null ) succIndex.reportRuleApps ( l );
 
-        final Iterator<NoPosTacletApp> it =
-            getNoFindTaclet ( TacletFilter.TRUE,
-                              services,
-                              userConstraint ).iterator ();
-        while ( it.hasNext () )
-            l.ruleAdded ( it.next (), null );
+        for (NoPosTacletApp noPosTacletApp : getNoFindTaclet(TacletFilter.TRUE,
+                services,
+                userConstraint))
+            l.ruleAdded(noPosTacletApp, null);
     }
 }

@@ -183,72 +183,72 @@ public class SimplifyModelGenerator extends DecProdModelGenerator {
 	removeNegativeArrayIndices(c);
 	Equation[] eqs = c.getEquations();
 	if (eqs.length == c.arity()) {
-	    for (int i = 0; i < eqs.length; i++) {
-		de.uka.ilkd.key.unittest.simplify.ast.Term ft = eqs[i].sub(0);
-		EquivalenceClass ec = getEqvClass(ft);
-		if (ec != null && ec.getLocations().size() > 0
-			&& eqs[i].sub(1) instanceof NumberTerm) {
-		    model.setValue(ec, ((NumberTerm) eqs[i].sub(1)).getValue());
-		}
-	    }
+        for (Equation eq1 : eqs) {
+            de.uka.ilkd.key.unittest.simplify.ast.Term ft = eq1.sub(0);
+            EquivalenceClass ec = getEqvClass(ft);
+            if (ec != null && ec.getLocations().size() > 0
+                    && eq1.sub(1) instanceof NumberTerm) {
+                model.setValue(ec, ((NumberTerm) eq1.sub(1)).getValue());
+            }
+        }
 	    if (model.size() == intClasses.size()) {
 		models.add(model);
 	    } else {
-		for (int i = 0; i < eqs.length; i++) {
-		    // set a subterm to an arbitrary value an test if
-		    // the system of equations has a unique solution now.
-		    for (int j = 0; j < datCount; j++) {
-			Equation e = createEquationForSubTerm(eqs[i],
-				genericTestValues[j]);
-			if (e != null) {
-			    c.add(e);
-			    models.addAll(createModelsHelp(simplify(c), model
-				    .copy(), datCount));
-			    if (models.size() >= modelLimit) {
-				return models;
-			    }
-			    c.removeLast();
-			}
-		    }
-		}
+            for (Equation eq : eqs) {
+                // set a subterm to an arbitrary value an test if
+                // the system of equations has a unique solution now.
+                for (int j = 0; j < datCount; j++) {
+                    Equation e = createEquationForSubTerm(eq,
+                            genericTestValues[j]);
+                    if (e != null) {
+                        c.add(e);
+                        models.addAll(createModelsHelp(simplify(c), model
+                                .copy(), datCount));
+                        if (models.size() >= modelLimit) {
+                            return models;
+                        }
+                        c.removeLast();
+                    }
+                }
+            }
 	    }
 	} else {
 	    LessEq[] leqs = c.getLessEq();
-	    for (int i = 0; i < leqs.length; i++) {
-		for (int j = 0; j < datCount; j += 2) {
-		    c.add(lessEqToEq(leqs[i], genericTestValues[j]));
-		    models.addAll(createModelsHelp(simplify(c), model.copy(),
-			    datCount));
-		    if (models.size() >= modelLimit) {
-			return models;
-		    }
-		    c.removeLast();
-		}
-	    }
+        for (LessEq leq : leqs) {
+            for (int j = 0; j < datCount; j += 2) {
+                c.add(lessEqToEq(leq, genericTestValues[j]));
+                models.addAll(createModelsHelp(simplify(c), model.copy(),
+                        datCount));
+                if (models.size() >= modelLimit) {
+                    return models;
+                }
+                c.removeLast();
+            }
+        }
 	    Less[] les = c.getLess();
-	    for (int i = 0; i < les.length; i++) {
-		for (int j = 2; j < datCount; j += 2) {
-		    c.add(lessToEq(les[i], genericTestValues[j]));
-		    models.addAll(createModelsHelp(simplify(c), model.copy(),
-			    datCount));
-		    if (models.size() >= modelLimit) {
-			return models;
-		    }
-		    c.removeLast();
-		}
-	    }
+        for (Less le : les) {
+            for (int j = 2; j < datCount; j += 2) {
+                c.add(lessToEq(le, genericTestValues[j]));
+                models.addAll(createModelsHelp(simplify(c), model.copy(),
+                        datCount));
+                if (models.size() >= modelLimit) {
+                    return models;
+                }
+                c.removeLast();
+            }
+        }
 	    Inequation[] neq = c.getInequations();
-	    for (int i = 0; i < neq.length; i++) {
-		for (int j = 1; j < datCount; j++) {
-		    c.add(ineqToEq(neq[i], genericTestValues[j]));
-		    models.addAll(createModelsHelp(simplify(c), model.copy(),
-			    datCount));
-		    if (models.size() >= modelLimit) {
-			return models;
-		    }
-		    c.removeLast();
-		}
-	    }
+        for (Inequation aNeq : neq) {
+            for (int j = 1; j < datCount; j++) {
+                c.add(ineqToEq(aNeq, genericTestValues[j]));
+                models.addAll(createModelsHelp(simplify(c), model.copy(),
+                        datCount));
+                if (models.size() >= modelLimit) {
+                    return models;
+                }
+                c.removeLast();
+            }
+        }
 	}
 	return models;
     }

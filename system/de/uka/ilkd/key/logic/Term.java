@@ -260,7 +260,7 @@ public abstract class Term implements SVSubstitute {
     /** 
      * The primary diamond in this formula. Note that the default
      * implementation is the same as <code>javaBlock()</code> but
-     * the semantics is different. See <code>SimultaneousUpdateTerm</code>.
+     * the semantics is different. See {@link QuanUpdateTerm}
      */
     public JavaBlock executableJavaBlock() {
         return javaBlock();

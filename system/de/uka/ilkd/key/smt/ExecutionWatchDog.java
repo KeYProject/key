@@ -11,8 +11,10 @@ public final class ExecutionWatchDog extends TimerTask {
 
     private long starttime = -1;
     
-    private boolean wasInterrupted = false;
+    private boolean canceledByTimeout = false;
 
+    private boolean canceledByUser = false;
+    
     /**
      * Construct a new Watch dog.
      * @param timeout after this amount of seconds, p is canceled.
@@ -22,7 +24,7 @@ public final class ExecutionWatchDog extends TimerTask {
 	super();
 	this.timeout = timeout;
 	this.procList.add(p);
-	this.wasInterrupted = false;
+	this.canceledByTimeout = false;
     }
     
     /**
@@ -35,42 +37,55 @@ public final class ExecutionWatchDog extends TimerTask {
 	super();
 	this.timeout = timeout;
 	this.procList.addAll(pl);
-	this.wasInterrupted = false;
+	this.canceledByTimeout = false;
     }
 
     @Override
     public void run() {
 	
 	if (starttime < 0) {
-	    this.toBeInterrupted = false;
+	    this.canceledByUser = false;
 	    this.starttime = System.currentTimeMillis();
 	}
 
-	if (this.toBeInterrupted) {
-	    for(Process proc: procList)
-	    proc.destroy();
-	}
-	
-	if (System.currentTimeMillis() - this.starttime > timeout) {
-	    this.wasInterrupted = true;
-	    for(Process proc: procList)
-	    proc.destroy();
+	if (this.canceledByUser) {
+	    destroyAllProcesses();
+	} else if (System.currentTimeMillis() - this.starttime > timeout) {
+	    this.canceledByTimeout = true;
+	    destroyUnfinishedProcesses();
 	}
 
     }
+
+    private void destroyAllProcesses() {
+	for(Process proc: procList) {
+	    proc.destroy();
+	}
+    }
+
+    /**
+     * destroys processes which are not yet finished
+     */
+    private void destroyUnfinishedProcesses() {
+	for(Process proc: procList) {
+	    try {
+		proc.exitValue();
+	    } catch (Throwable t) {
+		proc.destroy();
+	    }
+	}
+    }
     
     public boolean wasInterruptedByTimeout() {
-	return this.wasInterrupted;
+	return this.canceledByTimeout;
     }
     
     public boolean wasInterruptedByUser() {
-	return this.toBeInterrupted;
+	return this.canceledByUser;
     }
-    
-    private boolean toBeInterrupted = false;
-    
+      
     public void interrupt() {
-	this.toBeInterrupted = true;
+	this.canceledByUser = true;
     }
     
     /**

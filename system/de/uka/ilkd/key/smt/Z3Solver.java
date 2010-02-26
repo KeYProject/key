@@ -24,10 +24,6 @@ public final class Z3Solver extends AbstractSMTSolver {
     }
     
     
-    public SMTTranslator getTranslator(Services services) {
-	return new SmtLibTranslator(services);
-    }
-    
     
     @Override
     protected String getExecutionCommand(String filename, String formula) {

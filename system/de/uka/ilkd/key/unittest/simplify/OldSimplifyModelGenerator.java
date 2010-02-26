@@ -14,7 +14,6 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.collection.*;
 import de.uka.ilkd.key.util.ExtList;
 import de.uka.ilkd.key.parser.simplify.*;
-import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 
@@ -158,16 +157,25 @@ public class OldSimplifyModelGenerator extends DecProdModelGenerator {
 	Equation[] eqs = c.getEquations();
 	if (eqs.length == c.arity()) {
 	    Vector<Equation> nonConcreteEquations = new Vector<Equation>(eqs.length);
-	    for (int i = 0; i < eqs.length; i++) {
-		de.uka.ilkd.key.unittest.simplify.ast.Term ft = eqs[i].sub(0);
-		EquivalenceClass ec = getEqvClass(ft);
-		if (ec != null && ec.getLocations().size() > 0
-			&& eqs[i].sub(1) instanceof NumberTerm) {
-		    model.setValue(ec, ((NumberTerm) eqs[i].sub(1)).getValue());
-		}else{
-		    nonConcreteEquations.add(eqs[i]);
-		}
-	    }
+        for (Equation eq1 : eqs) {
+            de.uka.ilkd.key.unittest.simplify.ast.Term ft = eq1.sub(0);
+            EquivalenceClass ec = getEqvClass(ft);
+            if (ec != null && ec.getLocations().size() > 0) {
+                if (eq1.sub(1) instanceof NumberTerm) {
+                    model.setValue(ec, ((NumberTerm) eq1.sub(1)).getValue());
+                } else {
+                    //This is the "fall-back" strategy. Maybe the equivalence class already has a concrete value
+                    //Warning: the argument "term2class" plays only an unimportant role. look into the implementation of ec.getConcreteIntValue() with all its side-effects etc.
+                    Integer concrVal = ec.getConcreteIntValue(term2class);
+                    if (concrVal != null) {
+                        model.setValue(ec, concrVal);
+                    }
+                }
+            }
+            if (model.getValueAsExpression(ec) == null) {
+                nonConcreteEquations.add(eq1);
+            }
+        }
 	    if (model.size() == intClasses.size()) {
 		models.add(model);
 		createModelsHelp_ProgressNotificationX(POS[0], datCount, recDepth, "model.size() == intClasses.size() == "+model.size());
@@ -411,13 +419,6 @@ public class OldSimplifyModelGenerator extends DecProdModelGenerator {
 	l.add(new NumberTerm(i));
 	return new FunctionTerm(
 		de.uka.ilkd.key.unittest.simplify.ast.Function.PLUS, l);
-    }
-
-    private Equation ineqToEq(Inequation t, int i) {
-	Equation eq = new Equation();
-	eq.setLeft(t.sub(0));
-	eq.setRight(plus(t.sub(1), i));
-	return eq;
     }
 
     private Less ineqToLess(Inequation t, boolean inverse) {

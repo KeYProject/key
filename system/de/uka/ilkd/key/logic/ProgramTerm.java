@@ -88,7 +88,7 @@ class ProgramTerm extends Term {
 	    sb.append("\\[[").append(javaBlock).append("\\]] ");
 	} else {
 	    //	    sb.append("???Some Strange Modality???").append(javaBlock);
-	    sb.append("\\modality{"+op().name()).append("}").append(javaBlock).append("\\endmodality ");
+        sb.append("\\modality{").append(op().name()).append("}").append(javaBlock).append("\\endmodality ");
 	}
 	for(int i=0; i<subTerm.size(); i++)
            sb.append("(").append(subTerm.get(i)).append(")");

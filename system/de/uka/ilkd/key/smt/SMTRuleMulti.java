@@ -4,7 +4,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Timer;
+import java.util.WeakHashMap;
 
 import org.apache.log4j.Logger;
 
@@ -43,6 +45,10 @@ class SolverWrapper
   private int    exitValue =0; 
   /**When the external prover has finished <code>Finished</code> should be set by calling <code>setFinished(true)</code>*/  
   private boolean        Finished=false;
+  
+  /**For user feedback we want to know on which node (goal) a decision procedure was working on when it finishes.
+   * {@see de.uka.ilkd.key.gui.DecisionProcedureResultsDialog} */
+  private Goal goal=null; 
 
   /**Remark: Whether the variable <code>Finished</code> is set to <code>true</code> depends on whether the user of this class has called <code>setFinished(true)</code>.<br>
    * There isn't any mechanism inside this class to check the status of the external prover.
@@ -63,7 +69,7 @@ class SolverWrapper
       
     Finished = finished;
     
-    if(Finished == true){
+    if(Finished){
 	
 	    InputStream in = Proc.getInputStream();
 	    Text = AbstractSMTSolver.read(in);
@@ -75,6 +81,8 @@ class SolverWrapper
 	    exitValue = Proc.exitValue();
 	    
 	    Result = interpretAnswer();
+	    //The following causes a notification of the DecisionProcedureResultsDialog
+	    goal.node().addSMTandFPData(Result);
     }
     else {
 	Text = "";
@@ -133,6 +141,7 @@ class SolverWrapper
 
   
   public void run(Goal goal, Services services) throws IOException, IllegalFormulaException{
+      this.goal = goal;
       Proc = Solver.run(goal, services);
   }
   

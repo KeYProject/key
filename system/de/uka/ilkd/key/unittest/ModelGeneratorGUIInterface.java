@@ -13,7 +13,6 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.unittest.cogent.CogentModelGenerator;
 import de.uka.ilkd.key.unittest.cogent.CogentTranslation;
 import de.uka.ilkd.key.unittest.simplify.OLDSimplifyMG_GUIInterface;
-import de.uka.ilkd.key.unittest.simplify.OldSimplifyModelGenerator;
 import de.uka.ilkd.key.unittest.simplify.SimplifyModelGenerator;
 import de.uka.ilkd.key.unittest.simplify.translation.DecisionProcedureSimplify;
 
@@ -61,7 +60,7 @@ public class ModelGeneratorGUIInterface extends ModelGenerator {
 		TestGenerationInspectionDialog dialog=TestGenerationInspectionDialog.getInstance(Main.getInstance());
 		dialog.setVisible(true);
 		StringBuffer sb = new StringBuffer();
-		String txt = dialog.createModelsHelp.getText();
+		String txt = TestGenerationInspectionDialog.createModelsHelp.getText();
 		sb.append("\n"+txt+"\n");
 		sb.append("----------------------\n");
 		if(intModelSet!=null){

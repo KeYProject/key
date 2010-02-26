@@ -69,8 +69,7 @@ public class IconFactory {
 
     public static Image getImage(String s) {
 	ImageIcon ii=resManager.createImageIcon(IconFactory.class, s);
-	Image im=ii.getImage();
-	return im;
+	return ii.getImage();
     }
 
     public static ImageIcon scaleIcon(Image im, int x, int y) {

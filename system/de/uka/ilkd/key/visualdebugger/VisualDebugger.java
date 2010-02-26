@@ -351,10 +351,9 @@ public class VisualDebugger {
         while (itAntec.hasNext()) {
             result = result.append(itAntec.next().formula());
         }
-        final Iterator<ConstrainedFormula> itSucc = s.succedent().iterator();
-        while (itSucc.hasNext()) {
+        for (ConstrainedFormula cf : s.succedent()) {
             result = result.append(TermFactory.DEFAULT.createJunctorTerm(
-                    Op.NOT, itSucc.next().formula()));
+                    Op.NOT, cf.formula()));
         }
 
         return result;
@@ -498,9 +497,8 @@ public class VisualDebugger {
                 currentState = (StateVisualization) event.getSubject();
             }
 
-            Iterator<DebuggerListener> it = listeners.iterator();
-            while (it.hasNext()) {
-                it.next().update(event);
+            for (DebuggerListener listener : listeners) {
+                listener.update(event);
             }
         }
     }
@@ -629,9 +627,7 @@ public class VisualDebugger {
      */
     public PosInOccurrence getExecutionTerminatedNormal(Node n) {
         final Sequent s = n.sequent();
-        for (Iterator<ConstrainedFormula> it = s.succedent().iterator(); it
-                .hasNext();) {
-            ConstrainedFormula cfm = it.next();
+        for (ConstrainedFormula cfm : (Iterable<ConstrainedFormula>) s.succedent()) {
             final Term f = cfm.formula();
             if (f.op() instanceof QuanUpdateOperator) {
                 final Term subOp = f.sub(f.arity() - 1);
@@ -906,9 +902,8 @@ public class VisualDebugger {
      * @return the program pio
      */
     public PosInOccurrence getProgramPIO(Sequent s) {
-        Iterator<ConstrainedFormula> it = s.succedent().iterator();
-        while (it.hasNext()) {
-            PosInOccurrence pio = new PosInOccurrence(it.next(),
+        for (Object o : s.succedent()) {
+            PosInOccurrence pio = new PosInOccurrence((ConstrainedFormula) o,
                     PosInTerm.TOP_LEVEL, false);
 
             if (modalityTopLevel(pio) != null) {
@@ -953,8 +948,8 @@ public class VisualDebugger {
      */
     public ImmutableSet<Term> getSymbolicInputValues() {
         ImmutableSet<Term> result = DefaultImmutableSet.<Term>nil();
-        for (Iterator<Term> it = this.term2InputPV.keySet().iterator(); it.hasNext();) {
-            result = result.add(it.next());
+        for (Term term : this.term2InputPV.keySet()) {
+            result = result.add(term);
         }
         return result;
 
@@ -1328,8 +1323,7 @@ public class VisualDebugger {
     public ImmutableList<Term> removeImplicite(ImmutableList<Term> list) {
         ImmutableList<Term> result = ImmutableSLList.<Term>nil();
 
-        for (Iterator<Term> it = list.iterator(); it.hasNext();) {
-            final Term n = it.next();
+        for (final Term n : list) {
             if (!VisualDebugger.containsImplicitAttr(n))
                 result = result.append(n);
 
@@ -1356,9 +1350,8 @@ public class VisualDebugger {
      *                the goals
      */
     private void removeStepOver(ImmutableList<Goal> goals) {
-        Iterator<Goal> it = goals.iterator();
-        while (it.hasNext()) {
-            Node next = it.next().node();
+        for (Goal goal : goals) {
+            Node next = goal.node();
             next.getNodeInfo().getVisualDebuggerState().setStepOver(-1);
             next.getNodeInfo().getVisualDebuggerState().setStepOverFrom(-1);
             print("StepOver of " + next.serialNr() + " set to -1");
@@ -1483,9 +1476,8 @@ public class VisualDebugger {
      *                the new step over
      */
     private void setStepOver(ImmutableList<Goal> goals) {
-        Iterator<Goal> it = goals.iterator();
-        while (it.hasNext()) {
-            Node next = it.next().node();
+        for (Goal goal : goals) {
+            Node next = goal.node();
             final int size = this.getMethodStackSize(next);
             next.getNodeInfo().getVisualDebuggerState().setStepOver(size);
             next.getNodeInfo().getVisualDebuggerState().setStepOverFrom(
@@ -1505,9 +1497,8 @@ public class VisualDebugger {
      *                the steps
      */
     private void setSteps(ImmutableList<Goal> goals, int steps) {
-        Iterator<Goal> it = goals.iterator();
-        while (it.hasNext()) {
-            Node next = it.next().node();
+        for (Goal goal : goals) {
+            Node next = goal.node();
             if (!next.root())
                 next.parent().getNodeInfo().getVisualDebuggerState()
                         .setStatementIdcount(steps);

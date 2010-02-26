@@ -93,7 +93,7 @@ public abstract class ProgramMetaConstruct extends JavaNonTerminalProgramElement
      * this element, may be equals to this element.
     */
     public SourceElement getLastElement() {
-        return (body != null) ? body : (SourceElement)this;
+        return (body != null) ? body : this;
     }
 
     /**

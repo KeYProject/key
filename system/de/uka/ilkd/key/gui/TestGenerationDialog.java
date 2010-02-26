@@ -43,19 +43,21 @@ public class TestGenerationDialog extends JDialog {
 
     public JList methodList;
 
-    final static String OLD_SIMPLIFY = "Simplify (old interface)";
+    final static String OLD_SIMPLIFY = "Simplify";
 
     final static String SIMPLIFY = "Simplify (new interface)";
 
     final static String COGENT = "Cogent";
 
     final JComboBox solverChoice = new JComboBox(new String[] { OLD_SIMPLIFY,
-	    SIMPLIFY, COGENT });
+	    /* SIMPLIFY , */ COGENT });
 
     final JComboBox testGenChoice = new JComboBox(new String[] {
-	    TestGenFac.TG_JAVACARD, TestGenFac.TG_JAVA });
+	    TestGenFac.TG_USE_SETGET, TestGenFac.TG_USE_REFL });
 
     final JCheckBox completeEx = new JCheckBox("Only completely executed traces");
+    
+    final JCheckBox allowNonTraceNodes = new JCheckBox("Allow deriving path conditions from non-program-nodes");
     
     /**The proof view is shows the current node which is progressed by test generation */
     final public JCheckBox trackProgressInViewport = new JCheckBox("Track progress in proof view");
@@ -83,7 +85,7 @@ public class TestGenerationDialog extends JDialog {
 	this.mediator = mediator;
 	simplifyDataTupleNumber = new JTextField("" + SimplifyModelGenerator.modelLimit, 2);
 	assert(TestGenerator.modelCreationTimeout<Integer.MAX_VALUE);
-	modelGenTimeout = new JTextField(Integer.toString((int)TestGenerator.modelCreationTimeout),7);
+	modelGenTimeout = new JTextField(Integer.toString(TestGenerator.modelCreationTimeout),7);
 	testData = new JTextField(OLDSimplifyMG_GUIInterface.getTestData(),40);
 	iterativeDeepeningStartValue = new JTextField(""+OLDSimplifyMG_GUIInterface.iterativeDeepeningStart,3);
 	layoutMethodSelectionDialog();
@@ -124,19 +126,19 @@ public class TestGenerationDialog extends JDialog {
 	    throw new RuntimeException(
 		    "Unhandled case in MethodSelecitonDialog.");
 	}
-	instance.completeEx
-	        .setSelected(UnitTestBuilder.requireCompleteExecution);
+	instance.completeEx.setSelected(UnitTestBuilder.requireCompleteExecution);
+	instance.allowNonTraceNodes.setSelected(UnitTestBuilder.allowNonTraceNodeAsPathCond);
 	instance.simplifyDataTupleNumber.setText(Integer
 	        .toString(SimplifyModelGenerator.modelLimit));
-	instance.modelGenTimeout.setText(Integer.toString((int)TestGenerator.modelCreationTimeout));
+	instance.modelGenTimeout.setText(Integer.toString(TestGenerator.modelCreationTimeout));
 	instance.testData.setText(OLDSimplifyMG_GUIInterface.getTestData());
 	instance.iterativeDeepeningStartValue.setText(""+OLDSimplifyMG_GUIInterface.iterativeDeepeningStart);
 
-	assert (TestGenFac.testGenMode == TestGenFac.TG_JAVACARD || TestGenFac.testGenMode == TestGenFac.TG_JAVA) : "Unhandled case in MethodSelectionDialog.";
-	if (TestGenFac.testGenMode == TestGenFac.TG_JAVACARD) {
-	    instance.testGenChoice.setSelectedItem(TestGenFac.TG_JAVACARD);
+	assert (TestGenFac.testGenMode == TestGenFac.TG_USE_SETGET || TestGenFac.testGenMode == TestGenFac.TG_USE_REFL) : "Unhandled case in MethodSelectionDialog.";
+	if (TestGenFac.testGenMode == TestGenFac.TG_USE_SETGET) {
+	    instance.testGenChoice.setSelectedItem(TestGenFac.TG_USE_SETGET);
 	} else {
-	    instance.testGenChoice.setSelectedItem(TestGenFac.TG_JAVA);
+	    instance.testGenChoice.setSelectedItem(TestGenFac.TG_USE_REFL);
 	}
 	return instance;
     }
@@ -255,6 +257,21 @@ public class TestGenerationDialog extends JDialog {
 		        .isSelected();
 	    }
 	});
+	
+	allowNonTraceNodes.addActionListener(new ActionListener() {
+	    public void actionPerformed(final ActionEvent e) {
+		UnitTestBuilder.allowNonTraceNodeAsPathCond = allowNonTraceNodes.isSelected();
+	    }
+	});
+	allowNonTraceNodes.setToolTipText("<html>Controls which node to select for deriving the path condition.<br>" +
+		"When generating tests for a proof branch, a program trace is computed on that branch.<br>" +
+		"If this item unselected, then the latest node on the program trace is selected as<br>" +
+		"the path condition. This is a node occurring during symbolic execution.<br>" +
+		"If this item is selected, then the node selected by the user (possibly end-node of <br>" +
+		"the proof branch) will be used as the path condition. In this way information from<br>" +
+		"the post condition will be used for test generation as well other information obtained <br>" +
+		"after symbolic execution. Use this option when using invariants and contracts</html>");
+	
 	final JButton exit = new JButton("Exit");
 	exit.addActionListener(new ActionListener() {
 	    public void actionPerformed(final ActionEvent e) {
@@ -298,10 +315,10 @@ public class TestGenerationDialog extends JDialog {
         
         	testGenChoice.addActionListener(new ActionListener() {
         	    public void actionPerformed(final ActionEvent e) {
-        		if (testGenChoice.getSelectedItem() == TestGenFac.TG_JAVACARD) {
-        		    TestGenFac.testGenMode = TestGenFac.TG_JAVACARD;
-        		} else if (testGenChoice.getSelectedItem() == TestGenFac.TG_JAVA) {
-        		    TestGenFac.testGenMode = TestGenFac.TG_JAVA;
+        		if (testGenChoice.getSelectedItem() == TestGenFac.TG_USE_SETGET) {
+        		    TestGenFac.testGenMode = TestGenFac.TG_USE_SETGET;
+        		} else if (testGenChoice.getSelectedItem() == TestGenFac.TG_USE_REFL) {
+        		    TestGenFac.testGenMode = TestGenFac.TG_USE_REFL;
         		} else {
         		    throw new RuntimeException(
         			    "Not implemented case in MethodSelectionDialog");
@@ -317,6 +334,7 @@ public class TestGenerationDialog extends JDialog {
 		timeoutPanel.add(modelGenTimeout);
 	settingsPanel.add(timeoutPanel);
 	settingsPanel.add(completeEx);
+	settingsPanel.add(allowNonTraceNodes);
 	//controlPanel.add(Box.createVerticalGlue());
 	settingsPanel.add(trackProgressInViewport);
 		trackProgressInViewport.setSelected(false);

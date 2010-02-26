@@ -265,7 +265,7 @@ public class CvsRunner {
     
     private String print(String[] arr) {
         StringBuffer s = new StringBuffer(300);
-        for (int i=0; i<arr.length; i++) s.append(arr[i]);
+        for (String anArr : arr) s.append(anArr);
         return s.toString();
     }
     

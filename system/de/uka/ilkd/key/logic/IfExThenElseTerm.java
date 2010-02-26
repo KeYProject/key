@@ -36,9 +36,9 @@ class IfExThenElseTerm extends Term {
         this.subTerm = new ImmutableArray<Term> ( subs );
         
         int max_depth = -1;
-        for ( int i = 0; i < subs.length; i++ ) {
-            if ( subs[i].depth () > max_depth ) {
-                max_depth = subs[i].depth ();
+        for (Term sub : subs) {
+            if (sub.depth() > max_depth) {
+                max_depth = sub.depth();
             }
         }
         depth = max_depth + 1;

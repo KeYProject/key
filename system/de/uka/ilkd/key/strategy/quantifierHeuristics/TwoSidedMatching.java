@@ -90,15 +90,14 @@ class TwoSidedMatching {
         if ( c.isSatisfiable () ) {
             ImmutableMap<QuantifiableVariable,Term> sub =
                 DefaultImmutableMap.<QuantifiableVariable,Term>nilMap();
-            Iterator<QuantifiableVariable> it = trigger.getUniVariables().iterator ();
-            while ( it.hasNext () ) {
-                QuantifiableVariable q = it.next ();
-                Term mv = triggerSubstWithMVs.getSubstitutedTerm ( q );
-                Term t = c.getInstantiation ( (Metavariable)( mv.op () ) );
-                if ( t == null || t.op () instanceof Metavariable )
+            for (QuantifiableVariable quantifiableVariable : trigger.getUniVariables()) {
+                QuantifiableVariable q = quantifiableVariable;
+                Term mv = triggerSubstWithMVs.getSubstitutedTerm(q);
+                Term t = c.getInstantiation((Metavariable) (mv.op()));
+                if (t == null || t.op() instanceof Metavariable)
                     return null;
-                if ( isGround ( t ) )
-                    sub = sub.put ( q, t );
+                if (isGround(t))
+                    sub = sub.put(q, t);
             }
             if ( sub.size () > 0 ) return new Substitution ( sub );
         }

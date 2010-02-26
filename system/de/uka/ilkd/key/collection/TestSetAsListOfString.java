@@ -24,11 +24,11 @@ public class TestSetAsListOfString extends junit.framework.TestCase {
 
     // test if String is SAME as one in the array arr
     private boolean isInArray(String str, String[] arr) {
-	for (int i=0;i<arr.length;i++) {
-	    if (arr[i]==str) {
-		return true;
-	    }
-	}
+        for (String anArr : arr) {
+            if (anArr == str) {
+                return true;
+            }
+        }
 	return false;
     }
 
@@ -87,7 +87,7 @@ public class TestSetAsListOfString extends junit.framework.TestCase {
 	ImmutableSet<String> hal = DefaultImmutableSet.<String>nil().add("H").add("a").add("l");
 	
 	assertEquals("Union of two sets should be symmetric", empty.union(hal), hal.union(empty));
-	assertEquals("Wrong size.", empty.union(hal).size(), 3);	;	
+	assertEquals("Wrong size.", empty.union(hal).size(), 3);
     }
 
     public void testUnionRemoveDuplicates() {
@@ -95,7 +95,7 @@ public class TestSetAsListOfString extends junit.framework.TestCase {
 	ImmutableSet<String> lo = DefaultImmutableSet.<String>nil().add("l").add("o");
 	
 	assertEquals("Union of two sets should be symmetric", hal.union(lo), lo.union(hal));
-	assertEquals("Wrong size.", hal.union(lo).size(), 4);	;	
+	assertEquals("Wrong size.", hal.union(lo).size(), 4);
     }
 
     

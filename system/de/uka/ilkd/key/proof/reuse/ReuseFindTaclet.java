@@ -93,14 +93,13 @@ public class ReuseFindTaclet {
          } else {
              ifCandidates = ImmutableSLList.<TacletApp>nil().prepend(tentativeApp);
          }
-         
-         final Iterator<TacletApp> it = ifCandidates.iterator();
-         while (it.hasNext()) {
-             final ReusePoint p = blank.initialize(pos, it.next(), medi);
-             if ((p != null)){ // RuleApp can be transferred // && goodEnough!
-                reusePoints.add(p);
-             }
-         }
+
+       for (TacletApp ifCandidate : ifCandidates) {
+           final ReusePoint p = blank.initialize(pos, ifCandidate, medi);
+           if ((p != null)) { // RuleApp can be transferred // && goodEnough!
+               reusePoints.add(p);
+           }
+       }
    }
 
 

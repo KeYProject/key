@@ -196,14 +196,14 @@ public class Recoder2KeYTypeConverter {
 
         	Throwable stack = new Throwable(); 
         	stack.fillInStackTrace();
-        	StackTraceElement[] elements = stack.getStackTrace(); 
-        	for (int i = 0; i<elements.length;i++) {
-        	    if (elements[i] != null && elements[i].getClassName().equals("junit.textui.TestRunner")) {
-        		s = new PrimitiveSort(new Name(t.getFullName()));
-        		throwError = false; 
-        		break;
-        	    }
-        	}
+        	StackTraceElement[] elements = stack.getStackTrace();
+                for (StackTraceElement element : elements) {
+                    if (element != null && element.getClassName().equals("junit.textui.TestRunner")) {
+                        s = new PrimitiveSort(new Name(t.getFullName()));
+                        throwError = false;
+                        break;
+                    }
+                }
         	// END Workaround
         	
         	if (throwError) {
@@ -277,7 +277,7 @@ public class Recoder2KeYTypeConverter {
     private void addKeYJavaType(recoder.abstraction.Type t, Sort s) {
         KeYJavaType result = null;
         if (!(t instanceof recoder.java.declaration.TypeDeclaration)) {
-            de.uka.ilkd.key.java.abstraction.Type type = null;
+            de.uka.ilkd.key.java.abstraction.Type type;
             if (t instanceof recoder.abstraction.PrimitiveType) {
                 type = PrimitiveType.getPrimitiveType(t.getFullName());
                 result = typeConverter.getKeYJavaType(type);
@@ -320,7 +320,7 @@ public class Recoder2KeYTypeConverter {
         if (t instanceof recoder.abstraction.ArrayType) {
             result.setJavaType(createArrayType(
                     getKeYJavaType(((recoder.abstraction.ArrayType) t)
-                            .getBaseType()), (KeYJavaType) lookupInCache(t)));
+                            .getBaseType()), lookupInCache(t)));
         }
 
         // return was never used, so it is removed and method changed to void (mu)
@@ -350,8 +350,8 @@ public class Recoder2KeYTypeConverter {
 
         List<recoder.abstraction.ClassType> supers = classType.getSupertypes();
         ImmutableSet<Sort> ss = DefaultImmutableSet.<Sort>nil();
-        for (int i = 0; i < supers.size(); i++) {
-            ss = ss.add(getKeYJavaType(supers.get(i)).getSort());
+        for (recoder.abstraction.ClassType aSuper : supers) {
+            ss = ss.add(getKeYJavaType(aSuper).getSort());
         }       
 
         /* ??
@@ -588,9 +588,8 @@ public class Recoder2KeYTypeConverter {
      */
     private ImmutableList<Field> filterField(ExtList list) {
         ImmutableList<Field> result = ImmutableSLList.<Field>nil();
-        Iterator it = list.iterator();
-        while (it.hasNext()) {
-            Object pe = it.next();
+        for (Object aList : list) {
+            Object pe = aList;
             if (pe instanceof FieldDeclaration) {
                 result = result.prepend(filterField((FieldDeclaration) pe));
             }

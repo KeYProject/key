@@ -211,7 +211,7 @@ public class LexPathOrdering implements TermOrdering {
      *         completely messed up, but you get the idea
      */
     private int getSortDepth(Sort s) {
-        Integer res = (Integer)sortDepthCache.get ( s );
+        Integer res = sortDepthCache.get ( s );
         if ( res == null ) {
             res = new Integer ( getSortDepthHelp ( s ) );
             sortDepthCache.put ( s, res );
@@ -227,9 +227,7 @@ public class LexPathOrdering implements TermOrdering {
         if ( "int".equals ( sName ) ) res = 10000;
         if ( "boolean".equals ( sName ) ) res = 20000;
 
-        final Iterator<Sort> it = s.extendsSorts ().iterator ();
-        while ( it.hasNext () )
-            res = Math.max ( res, getSortDepth ( it.next () ) );
+        for (Sort sort : s.extendsSorts()) res = Math.max(res, getSortDepth(sort));
 
         return res + 1;
     }

@@ -64,11 +64,8 @@ public class OclInsertSet extends TermSymbol {
 	if (collSort.getCollectionKind() != CollectionSort.SET) {
 	    return false;
 	}
-	if (!term.sub(0).sort().extendsTrans(collSort.getElemSort())) {
-	    return false;
-	}
-	
-        return true;
+        return term.sub(0).sort().extendsTrans(collSort.getElemSort());
+
     }
 
     public Sort sort(Term[] subTerm) {

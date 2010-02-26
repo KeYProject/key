@@ -71,7 +71,7 @@ public class AttributeOp extends AccessOp {
 	super(new Name("." + attribute.name().toString()));
 	this.attribute = attribute;
 	this.sort = attribute  instanceof ProgramSV ? 
-	    ((ProgramSV)attribute).sort() : ((ProgramVariable)attribute).sort();
+	    attribute.sort() : attribute.sort();
     }
 
     /**
@@ -130,7 +130,7 @@ public class AttributeOp extends AccessOp {
      * @return the KeYJavaType of this access operator
      */
     public KeYJavaType getKeYJavaType(Term t) {
-	return ((ProgramVariable)attribute).getKeYJavaType();
+	return attribute.getKeYJavaType();
     }
 
     /**
