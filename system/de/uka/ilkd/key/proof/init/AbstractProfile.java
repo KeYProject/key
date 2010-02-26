@@ -90,12 +90,13 @@ public abstract class AbstractProfile implements Profile {
     protected ImmutableList<BuiltInRule> initBuiltInRules() {
         ImmutableList<BuiltInRule> builtInRules = ImmutableSLList.<BuiltInRule>nil();
 	ArrayList<SMTSolver> solverList = new ArrayList<SMTSolver>();
-        
 
 	solverList.add(new Z3Solver());
 	solverList.add(new YicesSolver());
         solverList.add(new SimplifySolver());
 	solverList.add(new CVC3Solver());
+	
+	
         
 	// init builtIRule for using several provers at the same time
 	builtInRules = builtInRules.prepend(new SMTRuleMulti(solverList));
@@ -105,8 +106,19 @@ public abstract class AbstractProfile implements Profile {
           builtInRules = builtInRules.prepend(new SMTRule(s));
        
 	}        
-
-      
+	
+        SMTSolver z3 = new Z3Solver();
+        SMTSolver simplify = new SimplifySolver();
+        SMTSolver yices = new YicesSolver();
+        SMTSolver cvc3 = new CVC3Solver();
+        
+        
+        builtInRules = builtInRules.prepend(new SMTRuleNew(z3));
+        builtInRules = builtInRules.prepend(new SMTRuleNew(simplify));
+        builtInRules = builtInRules.prepend(new SMTRuleNew(yices));
+        builtInRules = builtInRules.prepend(new SMTRuleNew(cvc3));
+        builtInRules = builtInRules.prepend(new SMTRuleNew(z3,simplify,yices,cvc3));
+        
         
         
         return builtInRules;

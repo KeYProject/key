@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Timer;
 
@@ -37,6 +38,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.smt.launcher.AbstractProcess;
 import de.uka.ilkd.key.smt.taclettranslation.DefaultTacletSetTranslation;
 import de.uka.ilkd.key.smt.taclettranslation.IllegalTacletException;
 import de.uka.ilkd.key.smt.taclettranslation.TacletFormula;
@@ -45,9 +47,11 @@ import de.uka.ilkd.key.smt.taclettranslation.UsedTaclets;
 import de.uka.ilkd.key.util.ProgressMonitor;
 
 
-public abstract class AbstractSMTSolver implements SMTSolver {
+public abstract class AbstractSMTSolver extends AbstractProcess implements SMTSolver {
 
     
+
+
     private static final Logger logger = Logger
 	    .getLogger(AbstractSMTSolver.class.getName());
 
@@ -76,7 +80,9 @@ public abstract class AbstractSMTSolver implements SMTSolver {
     /** true, if the solver should save the translated taclets to file. */
     private boolean saveTacletTranslation = true;
     
+    private SolverSession session = null;
     
+    public SolverSession getSession(){return session;}
 
 
 
@@ -99,7 +105,8 @@ public abstract class AbstractSMTSolver implements SMTSolver {
 		return new SmtLibTranslator(services);
 	    }
 	}catch(Exception e){
-	    System.err.println("Error: An error occurred while obtaining an SmtLibTranslator. Trying to use the default translator...");
+	    System.err.println("Error: An error occurred while obtaining an SmtLibTranslator: Trying to use the default translator...");
+	    e.printStackTrace();
 	    return new SmtLibTranslator(services);
 	}
     }
@@ -500,6 +507,41 @@ public abstract class AbstractSMTSolver implements SMTSolver {
 	return toReturn;
     }
     
+    public String run(String formula) throws IOException{
+	final File loc;
+	try {
+	    //store the translation to a file                                
+	    loc = this.storeToFile(formula);
+	} catch (IOException e) {
+	    logger.error("The file with the formula could not be written.", e);
+	    final IOException io = new IOException("Could not create or write the input file " +
+		    "for the external prover. Received error message:\n" + e.getMessage());
+	    io.initCause(e);
+	    throw io;
+	} 
+
+	//get the commands for execution
+	return this.getFinalExecutionCommand(loc.getAbsolutePath(), formula);
+	
+    }
+    
+    
+    public String translateToCommand(Goal goal, Services services) throws IllegalFormulaException, IOException {
+	
+	SMTTranslator trans = this.getTranslator(services);
+	instantiateTaclets(goal, trans);
+	
+	  
+	String s = trans.translate(goal.sequent(), services).toString();
+	saveTacletTranslation(trans);
+	
+	
+
+	return run(s);
+    	
+    }
+    
+    
     private boolean toBeInterrupted = false;
     
     public void interrupt() {
@@ -602,6 +644,58 @@ public abstract class AbstractSMTSolver implements SMTSolver {
     
     public void setTacletsForTest(Collection<Taclet> set){
 	tacletsForTest = set;
+    }
+    
+    public void prepareSolver(Collection<Goal> goals, Services services) {
+	session = new SolverSession(goals, services);
+
+        
+    }
+    
+    
+    @Override
+    public String[] atStart() throws Exception{
+	String [] result =  new String [1];
+	LinkedList<String> list = new LinkedList<String>();
+	Goal goal = session.nextGoal();
+	if(goal != null){
+	    System.out.println("Translate to command");
+	    String s = translateToCommand(goal, session.getServices()); 
+	    
+	    while(s.indexOf(' ')!=-1){
+		int index = s.indexOf(' ');
+		list.add(s.substring(0,s.indexOf(' ')));
+		s = s.substring(index+1,s.length());
+	    }
+	    list.add(s);
+	    System.out.println(list);
+	    
+	}else{
+	    throw new RuntimeException("This should not happen.");
+	}
+	System.out.println("Start the solver: ");
+	return list.toArray(new String[list.size()]);
+    }
+    
+    @Override
+    public boolean atEnd(InputStream result, InputStream error, int exitStatus) throws Exception{
+	
+	String text = read(result);
+	result.close();
+
+	
+	String err = read(error);
+	error.close();
+	SMTSolverResult res = interpretAnswer(text, err, exitStatus);
+	if(session.currentGoal()!= null){
+	   session.currentGoal().node().addSMTandFPData(res);
+	}
+	session.addResult(res);
+	return !session.hasNextGoal();
+    }
+    
+    public String toString(){
+	return name();
     }
 
     

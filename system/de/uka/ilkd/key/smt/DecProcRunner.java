@@ -145,9 +145,10 @@ public class DecProcRunner extends SwingWorker {
     
     /**@return the return value is probably meaningless */
     private Object doWork() {	
+	
+	
         String status = "";//Warning status is not used
         main.mediator().stopInterface(true);
-              
         mediator.resetNrGoalsClosedByHeuristics();
 
         proof.env().registerRule(simpRule,
@@ -190,8 +191,8 @@ public class DecProcRunner extends SwingWorker {
      * @param temp is just a counter for user feedback*/
     private void workOnGoal(Goal g, final int temp) throws  ExceptionHandlerException{
             try {
-
-        	BuiltInRuleApp birApp = new BuiltInRuleApp(simpRule, null, 
+        	
+               	BuiltInRuleApp birApp = new BuiltInRuleApp(simpRule, null, 
                         userConstraint);                    						
         
         

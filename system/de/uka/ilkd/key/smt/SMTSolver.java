@@ -11,6 +11,7 @@
 package de.uka.ilkd.key.smt;
 
 import java.io.IOException;
+import java.util.Collection;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
@@ -19,7 +20,8 @@ import de.uka.ilkd.key.smt.taclettranslation.TacletSetTranslation;
 import de.uka.ilkd.key.util.ProgressMonitor;
 
 
-public interface SMTSolver {
+
+public interface SMTSolver extends de.uka.ilkd.key.smt.launcher.Process{
     
     /**
      * This solver's name.
@@ -147,4 +149,6 @@ public interface SMTSolver {
      * @param b <code>true</code> if taclets should be used.
      */
     public void useTaclets(boolean b);
+    
+    public void prepareSolver(Collection<Goal> goals, Services services);
 }
