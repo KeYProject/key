@@ -35,7 +35,7 @@ import de.uka.ilkd.key.smt.taclettranslation.TacletSetTranslation;
  * @author niederma
  * 
  */
-public class TestSMTWithTaclets extends TestTaclet {
+public class TestSMTWithTaclets extends TestCommons {
 
     private static String VALID = "valid";
     private static String INVALID = "not valid";

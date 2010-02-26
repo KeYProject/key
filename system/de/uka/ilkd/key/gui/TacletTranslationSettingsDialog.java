@@ -12,35 +12,22 @@ package de.uka.ilkd.key.gui;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.ComponentOrientation;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.GridLayout;
 import java.awt.Insets;
-import java.awt.Point;
-import java.awt.ScrollPane;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
-import java.util.Collection;
 import java.util.EventObject;
 import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Properties;
 
 import javax.swing.BorderFactory;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -59,26 +46,15 @@ import javax.swing.JTextField;
 import javax.swing.JTree;
 import javax.swing.ToolTipManager;
 import javax.swing.UIManager;
-import javax.swing.GroupLayout.Alignment;
-import javax.swing.border.Border;
-import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
-import javax.swing.event.AncestorEvent;
-import javax.swing.event.AncestorListener;
-import javax.swing.event.CellEditorListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellEditor;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreeCellEditor;
-import javax.swing.tree.TreeCellRenderer;
 import javax.swing.tree.TreeNode;
 
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
-import de.uka.ilkd.key.gui.configuration.Settings;
-import de.uka.ilkd.key.gui.configuration.SettingsListener;
-import de.uka.ilkd.key.java.reference.ThisConstructorReference;
 import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.smt.taclettranslation.AbstractTacletTranslator;
 import de.uka.ilkd.key.smt.taclettranslation.TreeItem;
 import de.uka.ilkd.key.smt.taclettranslation.UsedTaclets;
 import de.uka.ilkd.key.smt.taclettranslation.TreeItem.SelectionMode;
@@ -96,7 +72,6 @@ public class TacletTranslationSettingsDialog{
 	private JTabbedPane tabbedPane = null;
 	private JPanel selectionPanel = null;
 	private JPanel optionsPanel = null;
-	private JPanel saveFilePanel = null;
 	private JPanel saveToFilePanel = null;
 	private JTextField saveToFileField = null;
 	private JButton saveToFileButton = null;
@@ -107,9 +82,7 @@ public class TacletTranslationSettingsDialog{
 	private JPanel panelSelctionOptions = null;
 	private JButton okButton = null;
 	private JTree selectionTree = null;
-	private JPanel selectionInfo = null;
 	private JScrollPane scrollPane = null;
-	private JLabel      infoLabel = null;
 	private JTextArea   infoText  = null;
 	private JSplitPane  splitPane = null;
 	private JScrollPane scrollPaneInfo = null;
@@ -635,6 +608,8 @@ public class TacletTranslationSettingsDialog{
 }
 
 abstract class TreePanel extends JPanel{
+  
+    private static final long serialVersionUID = 1L;
     protected TreeNode root;
     protected JTree    tree;
     protected void addComponent(JComponent comp){
@@ -666,7 +641,7 @@ abstract class TreePanel extends JPanel{
     
 
     
-    protected abstract JPanel init(TreeNode node, TreeNode rootNode, JTree tree);
+    protected abstract JPanel init(TreeNode node, TreeNode rootNode, JTree t);
     
     protected void propergateToRoot(TreeNode node, SelectionMode mode){
 	TreeNode parent = node.getParent();
@@ -691,13 +666,13 @@ abstract class TreePanel extends JPanel{
 }
 
 class InnerPanel extends TreePanel{
-    private static InnerPanel instance = new InnerPanel();
-    
+
+
+    private static final long serialVersionUID = 1L;
     private JLabel       title    = new JLabel();
     private JRadioButton radioAll = new JRadioButton("all");
     private JRadioButton radioNothing= new JRadioButton("nothing");
     private JRadioButton radioUser  = new JRadioButton("custom");
-    private JLabel       customLabel = new JLabel();
     private TreeNode	  currentNode = null;
     private ButtonGroup  buttonGroup = new ButtonGroup();
     
@@ -751,11 +726,11 @@ class InnerPanel extends TreePanel{
 
 
     @Override
-    protected JPanel init(TreeNode node, TreeNode rootNode, JTree tree) {
+    protected JPanel init(TreeNode node, TreeNode rootNode, JTree t) {
 	
 	currentNode = node;
 	root = rootNode;
-	this.tree = tree;
+	this.tree = t;
 	title.setText(currentNode.toString()+": ");
 	TreeItem currentItem = treeItem(node);
 	
@@ -792,6 +767,8 @@ class InnerPanel extends TreePanel{
 
 class LeafPanel extends TreePanel{
 
+
+    private static final long serialVersionUID = 1L;
     private TreeNode currentNode = null;
     private JCheckBox tacletName = new JCheckBox();
     private JLabel   infoButton = new JLabel("<html><U>info</html>");
@@ -831,44 +808,37 @@ class LeafPanel extends TreePanel{
 
     }
     
-    
     private void showInfo(TreeItem item) {
-	
-		  HashMap<String,Taclet> map =
-			    ProofSettings.DEFAULT_SETTINGS.getTacletTranslationSettings()
-			    .getTacletMap();
-		  if(map == null){
-		      if(textArea != null){
-			  textArea.setText("Information is not available: No proof loaded.");
-		      }
-		
-		  }else{
-		      Taclet t = map.get(item.toString());
-		      if(t != null){
-			  
-			 
-			  if(textArea != null){
-			      String text = t.name()+":\n\n"+
-			      t.toString()+"\n\n";
-			      text+= t.getBoundVariables();
-			      
-			      
-			      textArea.setText(text);
-			  }
-			  
-			  
-			  
-		      }else{
-			  if(textArea != null){
-				  textArea.setText
-				  ("The taclet is not available for this proof.");
-			  }
-		
-		      }
-		     
-		  }
 
-        }	
+	HashMap<String, Taclet> map = ProofSettings.DEFAULT_SETTINGS
+	.getTacletTranslationSettings().getTacletMap();
+	if (map == null) {
+	    if (textArea != null) {
+		textArea
+		.setText("Information is not available: No proof loaded.");
+	    }
+
+	} else {
+	    Taclet t = map.get(item.toString());
+	    if (t != null) {
+
+		if (textArea != null) {
+		    String text = t.name() + ":\n\n" + t.toString();
+
+		    textArea.setText(text);
+		}
+
+	    } else {
+		if (textArea != null) {
+		    textArea
+		    .setText("The taclet is not available for this proof.");
+		}
+
+	    }
+
+	}
+
+    }
     
 
     
@@ -876,12 +846,12 @@ class LeafPanel extends TreePanel{
 
 
     @Override
-    protected JPanel init(TreeNode node, TreeNode root, JTree tree) {
+    protected JPanel init(TreeNode node, TreeNode r, JTree t) {
 	int max = ProofSettings.DEFAULT_SETTINGS
 	      	.getTacletTranslationSettings().getMaxGeneric();
 	currentNode = node;
-	this.tree = tree;
-	this.root        = root;
+	this.tree = t;
+	this.root        = r;
 	tacletName.setText(node.toString());
 	tacletName.setSelected(treeItem(node).getMode() == SelectionMode.all);
 	int count = treeItem(node).getGenericCount();

@@ -294,7 +294,7 @@ public abstract class AbstractSMTSolver implements SMTSolver {
 		    throw ioe;
 		}
 	
-	
+	 
 	
 	 return toReturn;
     }
@@ -567,7 +567,7 @@ public abstract class AbstractSMTSolver implements SMTSolver {
     
     private void instantiateTaclets(Goal goal, SMTTranslator trans) throws IllegalFormulaException{
 	ImmutableSet<Taclet> emptySet = DefaultImmutableSet.nil();
-	if(!ProofSettings.DEFAULT_SETTINGS.getTacletTranslationSettings().isUsingTaclets() && !useTaclets ){
+	if(!ProofSettings.DEFAULT_SETTINGS.getTacletTranslationSettings().isUsingTaclets() || !useTaclets ){
 	    trans.setTacletsForAssumptions(new LinkedList<Taclet>());
 	   
 	}else{

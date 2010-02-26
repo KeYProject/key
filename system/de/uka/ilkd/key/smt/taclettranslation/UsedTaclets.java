@@ -201,7 +201,10 @@ public final class UsedTaclets {
 	    
 	}else if(iNothing == node.getChildCount()){
 	    item.setMode(SelectionMode.nothing);
-	}	
+	}else {
+	    item.setMode(SelectionMode.user);
+	}
+	
 	return item.getMode();
 
     }
@@ -467,6 +470,22 @@ public final class UsedTaclets {
 
 	model = new DefaultTreeModel(root);
 	return model;
+    }
+    
+    public String toString(){
+	String s = "+";
+	return toString((TreeNode)getTreeModel().getRoot(),s);
+    }
+    
+    private String toString(TreeNode node,String s){
+	String result;
+	
+	result = "\n"+s+treeItem(node).toComplexString();
+	for(int i=0; i < node.getChildCount(); i ++){
+	    result+= toString(node.getChildAt(i),s+"+");
+	}
+	
+	return result;
     }
 
 }

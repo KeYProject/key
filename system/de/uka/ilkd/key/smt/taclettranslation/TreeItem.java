@@ -77,6 +77,9 @@ public class TreeItem {
     }
 
 
+    public String toComplexString(){
+	return mode.name()+";"+category.name()+";"+text;
+    }
 
     public String toString(){
 	return text;

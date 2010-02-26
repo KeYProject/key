@@ -6,10 +6,12 @@ import de.uka.ilkd.key.smt.Z3Solver;
 public class TestZ3 extends TestSMTSolver {
 
     private static boolean z3NotInstalled = false;
+    private SMTSolver z3 = new Z3Solver();
 
     @Override
     public SMTSolver getSolver() {
-	return new Z3Solver();
+	
+	return z3;
     }
 
     @Override

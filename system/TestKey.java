@@ -125,8 +125,10 @@ public class TestKey extends TestCase {
 	suite.addTest(createSuite(javaTests, "Testing Java Datastructures"));
 	suite.addTest(createSuite(logicModelTests, "Testing Logic Engine"));
         suite.addTest(createSuite(speclangTests, "Testing JML/OCL support"));
-        suite.addTest(createSuite(vbtTests, "Testing Verification-based Testing"));
-        suite.addTest(createSuite(smtTests, "Testing integration of external SMT solvers"));
+ 	suite.addTest(createSuite(vbtTests, "Testing Verification-based Testing"));
+	suite.addTest(createSuite(smtTests, "Testing integration of external SMT solvers"));
+        
+       
         
 	return suite;
     }

@@ -6,10 +6,11 @@ import de.uka.ilkd.key.smt.SMTSolver;
 public class TestCvc3 extends TestSMTSolver {
 
     private static boolean cvc3NotInstalled = false;
+    private SMTSolver cvc3 = new CVC3Solver();
 
     @Override
     public SMTSolver getSolver() {
-	return new CVC3Solver();
+	return cvc3;
     }
 
     @Override
