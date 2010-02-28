@@ -131,6 +131,11 @@ public class SmtLibTranslatorWeaker extends SmtLibTranslator {
      * </p>
      * {@inheritDoc} 
      * */
+    /* When this smt-lib translator is used, then the commented out code may introduce unsoundness
+     * when a non-flat class hierarchy is used. On the other hand some other solution has
+     * to be found. The code below is kept to remember the interesting position in source code for
+     * further investigation.
+       
     public StringBuffer translateTerm (Term term, Vector<QuantifiableVariable> quantifiedVars,
 	    Services services) throws IllegalFormulaException {
 	
@@ -197,4 +202,6 @@ public class SmtLibTranslatorWeaker extends SmtLibTranslator {
 		    return super.translateTerm(term, quantifiedVars, services);
 	}
     }
+    
+    */
 }
