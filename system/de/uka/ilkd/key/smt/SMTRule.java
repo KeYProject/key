@@ -94,7 +94,7 @@ public class SMTRule implements BuiltInRule, MakesProgress {
      * During execution, all registered monitors are set to values between 0 and 99.
      * @param p
      */
-    public void addProgressMonitor(ProgressMonitor p) {
+    public void addProgressMonitor(SMTProgressMonitor p) {
 	this.solver.addProgressMonitor(p);
     }
     
@@ -103,7 +103,7 @@ public class SMTRule implements BuiltInRule, MakesProgress {
      * @param p
      * @return true, if remove was successful.
      */
-    public boolean removeProgressMonitor(ProgressMonitor p) {
+    public boolean removeProgressMonitor(SMTProgressMonitor p) {
 	return this.solver.removeProgressMonitor(p);
     }
     
@@ -154,5 +154,13 @@ public class SMTRule implements BuiltInRule, MakesProgress {
      */
     public void interrupt() {
 	this.solver.interrupt();
+    }
+
+    /* (non-Javadoc)
+     * @see de.uka.ilkd.key.smt.MakesProgress#getTitle()
+     */
+    public String getTitle() {
+	// TODO Auto-generated method stub
+	return null;
     }
 }

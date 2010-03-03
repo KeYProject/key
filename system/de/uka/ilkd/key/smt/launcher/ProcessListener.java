@@ -1,6 +1,6 @@
 package de.uka.ilkd.key.smt.launcher;
 
-interface ProcessListener {
+public interface ProcessListener {
 	void eventException(Process p , Exception e);
 	void eventInterruption(Process p);
 	void eventFinished(Process p);
@@ -8,6 +8,6 @@ interface ProcessListener {
 	/**
          * @param abstractProcess
          */
-        void eventCycleFinished(Process process);
+        void eventCycleFinished(Process process, Object userObject);
 	
 }

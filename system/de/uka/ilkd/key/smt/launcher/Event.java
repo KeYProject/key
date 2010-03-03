@@ -1,20 +1,25 @@
 package de.uka.ilkd.key.smt.launcher;
 
 public class Event {
-	public final static int PROCESS_START = 0;
-	public final static int PROCESS_INTERRUPTION = 1;
-	public final static int PROCESS_FINISHED = 2;
-	public final static int PROCESS_EXCEPTION = 3;
-	public final static int WORK_DONE = 4;
-	public final static int PROCESS_STATUS = 5;
-	public final static int PROCESS_CYCLE_FINISHED = 6;
+        public enum Type  {
+	PROCESS_START,PROCESS_INTERRUPTION,
+	PROCESS_FINISHED,PROCESS_EXCEPTION,
+	WORK_DONE,PROCESS_STATUS,PROCESS_CYCLE_FINISHED,
+	INTERRUP_PROCESS};
 	private ProcessLauncher launcher;
-	private Process 		process;
-	private int				type;
-	public Event(ProcessLauncher l, Process p, int type){
+	private ProcessLaunch   launch;
+	private Type		 type;
+	private Object          userObject;
+	public Event(ProcessLauncher l, ProcessLaunch launch, Type type){
 		launcher = l;
-		process = p;
+		this.launch = launch;
 		this.type = type;
+	}
+	
+	public  Event(ProcessLauncher l, ProcessLaunch launch, Type type, Object object){
+	    this(l, launch, type);
+	    userObject = object;
+	    
 	}
 
 	public ProcessLauncher getLauncher() {
@@ -22,13 +27,17 @@ public class Event {
 	}
 
 
-	public Process getProcess() {
-		return process;
+	public ProcessLaunch getLaunch() {
+		return launch;
 	}
 
 
-	public int getType() {
+	public Type getType() {
 		return type;
+	}
+	
+	public Object getUserObject(){
+	    return userObject; 
 	}
 
 	

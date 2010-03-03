@@ -1,26 +1,46 @@
-package gui;
+package de.uka.ilkd.key.gui.smt;
 
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.Graphics;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.Shape;
+import java.util.Collection;
+import java.util.LinkedList;
 
 import javax.swing.AbstractButton;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
+import javax.swing.SwingUtilities;
 import javax.swing.border.TitledBorder;
 import javax.swing.plaf.ProgressBarUI;
 
+import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.smt.MakesProgress;
+import de.uka.ilkd.key.smt.SMTProgressMonitor;
+import de.uka.ilkd.key.util.ProgressMonitor;
+
 import sun.font.CreatedFontTracker;
 
-public class ProgressPanel {
+class ProgressPanel implements SMTProgressMonitor {
 
+    	class InternGoal{
+    	    Goal goal;
+    	    SolveType type = SolveType.UNKOWN;
+    	    public InternGoal(Goal goal){
+    		this.goal = goal;
+    	    }
+    	    
+    	}
+    
 	// The KeY-Colors
 	private static final Color PROGRESS_COLOR = new Color(0,153,49);
 	private static final Color TIME_COLOR = new Color(0,0,98);
@@ -35,22 +55,40 @@ public class ProgressPanel {
 	private JPanel progressPanel = null;
 	private JProgressBar progressBar = null;
 	private JButton progressButton = null;
-	private Object  userObject=null;
+	private MakesProgress process = null;
+	private JComponent  parent;
+	
+	
+	private LinkedList<InternGoal> goals = new LinkedList<InternGoal>();
+	
+	
+
 	
 	
 	
-	public ProgressPanel(String title,Object user){
-		userObject = user;
+	public ProgressPanel(MakesProgress process, JComponent parent, Collection<Goal> goals){
+	    	this.process = process;
+	    	this.parent = parent;
+	    	for(Goal goal : goals){
+	    	    this.goals.add(new InternGoal(goal));
+	    	}
+	    	
+	    	
+	    	process.removeAllProgressMonitors();
+	    	process.addProgressMonitor(this);
+	    	
 		getProgressBarTime().setMaximum(1000);
-		getProgressBar().setMaximum(1000);
 		getProgressBarTime().setForeground(TIME_COLOR);
 		getProgressBar().setForeground(PROGRESS_COLOR);
-		getProgressBar().setValue(100);
+		getProgressBar().setStringPainted(true);
+		getProgressBar().setString("");
+		getProgressBar().setMaximum(goals.size());
+		
 		
 		
 		
 		getProgressButton().setIcon(ICON_UNKNOWN);
-		((TitledBorder)getComponent().getBorder()).setTitle(title);
+		((TitledBorder)getComponent().getBorder()).setTitle(process.getTitle());
 		
 	}
 	
@@ -71,14 +109,21 @@ public class ProgressPanel {
 		
 	}
 	
+	private String buildString(int progress, int max){
+	    return "Goals: "+ progress+"/"+max;
+	}
+	
 	public void setProgress(int progress){
+	    	getProgressBar().setString(buildString(progress,getProgressBar().getMaximum()));	    
 		getProgressBar().setValue(progress);
+		parent.repaint();
 		
 		//getProgressBar().paint(getProgressBar().getGraphics());
 	}
 	
 	public void setTimeProgress(int progress){
 		getProgressBarTime().setValue(progress);
+		parent.repaint();
 		
 	
 	}
@@ -136,7 +181,7 @@ public class ProgressPanel {
 			progressPanel.setBorder(BorderFactory.createTitledBorder(null, "ProgressPanel", TitledBorder.DEFAULT_JUSTIFICATION, TitledBorder.DEFAULT_POSITION, new Font("Dialog", Font.BOLD, 12), new Color(51, 51, 51)));
 			progressPanel.add(getProgressBar(), gridBagConstraints);
 			
-			progressPanel.add(getProgressButton(), gridBagConstraints1);
+			//progressPanel.add(getProgressButton(), gridBagConstraints1);
 			progressPanel.add(getProgressBarTime(), gridBagConstraints6);
 			progressPanel.add(jLabel, gridBagConstraints7);
 			progressPanel.add(jLabel1, gridBagConstraints8);
@@ -151,9 +196,67 @@ public class ProgressPanel {
 	 */
 	private JProgressBar getProgressBar() {
 		if (progressBar == null) {
-			progressBar = new JProgressBar();
+			progressBar = new JProgressBar(){
+				@Override
+				protected void paintComponent(Graphics g) {
+				    int i =0;
+				    for(InternGoal goal : goals){
+					paintGoal(g,this,i,goal.type);
+					i++;
+				    }
+				    
+			    	   
+				}  
+			};
+			
+			
+			
 		}
 		return progressBar;
+	}
+	
+	private void paintGoal(Graphics g,JProgressBar bar,int number,SolveType solved){
+	
+	    Graphics gc = g.create();
+	    
+	   if(solved == SolveType.UNKOWN){
+	       gc.setColor(bar.getBackground());
+	   }else if(solved == SolveType.UNSOLVABLE){
+	       gc.setColor(Color.RED);
+	   }else {
+	       gc.setColor(PROGRESS_COLOR);
+	   }
+	   
+	   int max = bar.getMaximum();
+	   int fw = bar.getWidth() / max;
+	   
+	   String s = ((int)number+1)+". Goal"+" "+solved.name();
+	   
+	   int width = SwingUtilities.computeStringWidth(g.getFontMetrics(), s);
+	  
+	   
+	   
+	   gc.fillRect(fw*number, 0, fw, bar.getHeight()); 
+	   
+	   if(solved == SolveType.UNKOWN){
+	       gc.setColor(Color.GRAY);
+	   }else if(solved == SolveType.SOLVABLE){
+	       gc.setColor(Color.WHITE);
+	   }else {
+	       gc.setColor(Color.WHITE);
+	   }
+	   
+	  
+	   
+	   Shape old = gc.getClip();
+	   
+	   gc.setClip(fw*number+1, 0+1, fw-2,bar.getHeight()-2);
+	   //gc.drawString("Hallo", 5, 5);
+	   gc.drawString(s,fw*number+ (fw-width)/2 , bar.getHeight()-4);
+	   gc.setClip(old);
+	   gc.drawRect(fw*number, 0, fw, bar.getHeight()); 
+	  
+	   gc.dispose();
 	}
 
 	/**
@@ -186,4 +289,32 @@ public class ProgressPanel {
 		}
 		return progressBarTime;
 	}
+
+
+        public void setMaximum(int maximum) {
+    	    getProgressBar().setString(buildString(getProgressBar().getValue(),maximum));
+        }
+
+
+        public void setTimeMaximum(int maximum) {
+            getProgressBarTime().setMaximum(maximum);
+	    
+        }
+
+        private InternGoal findGoal(Goal goal){
+            for(InternGoal g: goals){
+        	if(goal == g.goal){
+        	    return g;
+        	}
+            }
+            return null;
+        }
+
+        public void setGoalProgress(Goal goal, SolveType type) {
+            InternGoal ig = findGoal(goal);
+            if(ig != null){
+        	ig.type = type;
+            }
+           parent.repaint();
+        }
 }

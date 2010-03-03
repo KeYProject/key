@@ -218,7 +218,7 @@ public class DecProcRunner extends SwingWorker {
             	int step = 99;
         		int base = (temp-1) * step;
         		pm = new BaseProgressMonitor(base, main.getProgressMonitor());
-            	prog.addProgressMonitor(pm);
+            	//prog.addProgressMonitor(pm);
         		//rule.addProgressMonitor(pm);
                 }
                 ProofTreeListener ptl = new ProofTreeListener() {
@@ -247,7 +247,7 @@ public class DecProcRunner extends SwingWorker {
                 //remove the progress monitor again
                 if (pm != null) {
             	
-            	((MakesProgress)simpRule).removeProgressMonitor(pm);
+            	//((MakesProgress)simpRule).removeProgressMonitor(pm);
                 }
         
                 proof.removeProofTreeListener(ptl);

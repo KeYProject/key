@@ -1,9 +1,10 @@
 package de.uka.ilkd.key.smt.launcher;
 
-class ProcessLaunch{
+public class ProcessLaunch{
 	private Process process;
 	private Thread  thread;
 	private long    startTime = 0;
+	
 
 	
 	
@@ -17,6 +18,7 @@ class ProcessLaunch{
 	}
 	
 	void start(){
+	        process.init();
 		thread = new Thread(process,process.getTitle());
 		
 		thread.start();
@@ -38,12 +40,14 @@ class ProcessLaunch{
 
 	}
 	
-	long runningTime(long currentTime){
-		
+	public long runningTime(long currentTime){
+		if(!process.running()){
+		    return 0;
+		}
 		return currentTime - startTime;
 	}
 	
-	Process getProcess(){
+	public Process getProcess(){
 		return process;
 	}
 	

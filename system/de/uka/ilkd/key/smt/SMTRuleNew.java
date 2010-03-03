@@ -10,6 +10,8 @@
 package de.uka.ilkd.key.smt;
 
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 
 import de.uka.ilkd.key.collection.ImmutableList;
@@ -23,8 +25,12 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.BuiltInRuleApp;
 import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.smt.SMTProgressMonitor.SolveType;
+import de.uka.ilkd.key.smt.launcher.Event;
 import de.uka.ilkd.key.smt.launcher.Process;
+import de.uka.ilkd.key.smt.launcher.ProcessLaunch;
 import de.uka.ilkd.key.smt.launcher.ProcessLauncher;
+import de.uka.ilkd.key.util.ProgressMonitor;
 
 class BuiltInRuleAppSMT extends BuiltInRuleApp{
     final SMTSolverResult result;
@@ -43,7 +49,12 @@ public class SMTRuleNew  extends ProcessLauncher implements BuiltInRule{
     private Collection<SMTSolver> solvers = new LinkedList<SMTSolver>();
     private Constraint 	           userConstraint = null;
     private Proof		   proof;
-    
+ 
+    public void init(){
+	userConstraint = null;
+	proof = null;
+	super.init();
+    }
     
     
     public SMTRuleNew(SMTSolver ... list){
@@ -59,6 +70,15 @@ public class SMTRuleNew  extends ProcessLauncher implements BuiltInRule{
 	return pio == null;
     }
 
+    public Collection<SMTSolver> getInstalledSolvers(){
+	Collection<SMTSolver> installed = new LinkedList<SMTSolver>();
+	for(SMTSolver solver : solvers){
+	    if(solver.isInstalled(false)){
+		installed.add(solver);
+	    }
+	}
+	return installed;
+    }
 
     public ImmutableList<Goal> apply(Goal goal, Services services,
             RuleApp ruleApp) {
@@ -76,16 +96,22 @@ public class SMTRuleNew  extends ProcessLauncher implements BuiltInRule{
 
     private void addSolver(SMTSolver solver, Collection<Goal> goals, Services services){
 	solver.prepareSolver(goals, services);
+
 	addProcess(solver);	
     }
     
+    public void stop(){
+	this.cancelMe();
+    }
+    
     private void prepareSolvers(Collection<Goal> goals, Services services){
-	for(SMTSolver solver : solvers){
+	for(SMTSolver solver : getInstalledSolvers()){
 	    addSolver(solver,goals,services);
 	}
     }
     
     public void start(Goal goal, Constraint constraint){
+	init();
 	LinkedList<Goal> goals = new LinkedList<Goal>();
 	goals.add(goal);
 	proof = goal.proof();
@@ -93,6 +119,7 @@ public class SMTRuleNew  extends ProcessLauncher implements BuiltInRule{
     }
     
     public void start(Proof proof, Constraint constraint){
+	init();
 	LinkedList<Goal> goals = new LinkedList<Goal>();
 	this.proof = proof;
 	for (Goal goal : proof.openGoals()) {
@@ -116,7 +143,7 @@ public class SMTRuleNew  extends ProcessLauncher implements BuiltInRule{
 
     public String displayName() {
 	String s = "NEW: ";
-	for(SMTSolver solver : solvers){
+	for(SMTSolver solver : getInstalledSolvers()){
 	    s += solver.name()+" ";
 	}
 	return s;
@@ -132,20 +159,88 @@ public class SMTRuleNew  extends ProcessLauncher implements BuiltInRule{
 	return  displayName();
     }
     
+    public void applyResults(){
+	
+	HashSet<SolverSession.InternResult> result = new HashSet<SolverSession.InternResult>();
+	
+	for(SMTSolver solver : getInstalledSolvers()){
+	    AbstractSMTSolver s = (AbstractSMTSolver) solver;
 
-    @Override
-    public void eventCycleFinished(Process p) {
-        AbstractSMTSolver solver = (AbstractSMTSolver)p;
-        SMTSolverResult result = solver.getSession().getResults().getLast();
-        BuiltInRuleApp birApp = new BuiltInRuleAppSMT(this, null, 
-                userConstraint,result); 
-        solver.getSession().currentGoal().apply(birApp);
-        super.eventCycleFinished(p);
+	    result.addAll(s.getSession().getResults());
+	}
+	for(SolverSession.InternResult res  : result ){
+	    BuiltInRuleApp birApp = new BuiltInRuleAppSMT(this, null, 
+	                userConstraint,res.result); 
+	    res.goal.apply(birApp);
+	}
     }
     
-    
- 
-    
+
+
+
+
+    @Override
+    protected void publish(Event e) {
+	// System.out.println(e.getType().toString());
+	if(e.getType().equals(Event.Type.WORK_DONE)){
+	    
+	    return;
+	}
+	
+	
+	SMTProgressMonitor monitor = null;
+	ProcessLaunch      launch  = e.getLaunch();
+	ProcessLauncher    launcher = e.getLauncher();
+	if(launch == null){
+	     System.out.println("launch==null");
+	     return;
+	}
+	
+	Process            process = launch.getProcess(); 
+	if(process.getMonitors().isEmpty()){
+	    System.out.println("no monitor: " + launch.getProcess().getTitle()+ " " + e.getType().toString()); 
+	    return ;
+	}
+	monitor = process.getMonitors().iterator().next();
+	
+	
+	 
+	 
+	 switch(e.getType()){
+	 case PROCESS_START:
+	     monitor.setMaximum(process.getMaxCycle());
+	     monitor.setProgress(0);
+	     break;
+	 case PROCESS_STATUS:
+	     monitor.setTimeProgress((int)((double)launch.runningTime(System.currentTimeMillis())/launcher.getMaxTime()*1000));    
+	     break;
+	 case INTERRUP_PROCESS:
+	     monitor.setTimeProgress(1000);
+	     break;
+	 case PROCESS_CYCLE_FINISHED:
+	       AbstractSMTSolver solver = (AbstractSMTSolver)process;
+	        SMTSolverResult result = (SMTSolverResult)e.getUserObject();
+	      /*  BuiltInRuleApp birApp = new BuiltInRuleAppSMT(this, null, 
+	                userConstraint,result); 
+	        solver.getSession().currentGoal().apply(birApp);
+	     */   
+	
+	        System.out.println("Result " + process.getTitle()+": "+ result.toString());
+	        if(result.isValid() == SMTSolverResult.ThreeValuedTruth.TRUE){
+	            monitor.setGoalProgress(solver.getSession().currentGoal(), SolveType.SOLVABLE);
+	        }
+	     break;
+	     
+	     
+	     
+	 default:
+	     break;
+	 }
+	 
+	
+    }
+
+  
     
 
  

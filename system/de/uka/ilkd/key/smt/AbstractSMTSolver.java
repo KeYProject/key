@@ -50,7 +50,7 @@ import de.uka.ilkd.key.util.ProgressMonitor;
 public abstract class AbstractSMTSolver extends AbstractProcess implements SMTSolver {
 
     
-
+    private static int fileCounter = 0;
 
     private static final Logger logger = Logger
 	    .getLogger(AbstractSMTSolver.class.getName());
@@ -180,7 +180,8 @@ public abstract class AbstractSMTSolver extends AbstractProcess implements SMTSo
 	smtFileDir.deleteOnExit();
 	
 	// create the actual file marked as delete on exit
-	final File smtFile = new File(smtFileDir, FILE_BASE_NAME + getCurrentDateString());
+	final File smtFile = new File(smtFileDir, FILE_BASE_NAME +"_"+fileCounter+"_"+ getCurrentDateString());
+	fileCounter++;
 	smtFile.deleteOnExit();
 	
 	// write the content out to the created file
@@ -373,9 +374,9 @@ public abstract class AbstractSMTSolver extends AbstractProcess implements SMTSo
     }
     
     public void removeAllProgressMonitors() {
-	while (progressMonitors.size() > 0) {
-	    progressMonitors.remove(0);
-	}
+	progressMonitors.clear();
+	
+	super.removeAllProgressMonitors();
     }
     
     /**
@@ -647,6 +648,7 @@ public abstract class AbstractSMTSolver extends AbstractProcess implements SMTSo
     }
     
     public void prepareSolver(Collection<Goal> goals, Services services) {
+	init();
 	session = new SolverSession(goals, services);
 
         
@@ -655,6 +657,7 @@ public abstract class AbstractSMTSolver extends AbstractProcess implements SMTSo
     
     @Override
     public String[] atStart() throws Exception{
+	System.out.println("Start: " + this.getTitle() + " " + session.getGoalSize());
 	String [] result =  new String [1];
 	LinkedList<String> list = new LinkedList<String>();
 	Goal goal = session.nextGoal();
@@ -689,14 +692,28 @@ public abstract class AbstractSMTSolver extends AbstractProcess implements SMTSo
 	SMTSolverResult res = interpretAnswer(text, err, exitStatus);
 	if(session.currentGoal()!= null){
 	   session.currentGoal().node().addSMTandFPData(res);
+	   session.addResult(res,session.currentGoal());
 	}
-	session.addResult(res);
+	listener.eventCycleFinished(this,res);
+	
 	return !session.hasNextGoal();
+    }
+    
+    
+
+    public int getMaxCycle() {
+
+        return session.getGoalSize();
     }
     
     public String toString(){
 	return name();
     }
+    
+    public String getTitle(){
+	return name();
+    }
+
 
     
     

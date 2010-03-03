@@ -188,11 +188,11 @@ public class SMTRuleMulti implements BuiltInRule, MakesProgress {
     /**List of all listeners which watch the progress of proving.*/
     private ArrayList<ProgressMonitor> progressMonitors = new ArrayList<ProgressMonitor>();
     
-    public void addProgressMonitor(ProgressMonitor p) {
+    public void addProgressMonitor(SMTProgressMonitor p) {
 	progressMonitors.add(p);
     }
     
-    public boolean removeProgressMonitor(ProgressMonitor p) {
+    public boolean removeProgressMonitor(SMTProgressMonitor p) {
 	return progressMonitors.remove(p);
     }
     
@@ -534,6 +534,14 @@ public class SMTRuleMulti implements BuiltInRule, MakesProgress {
 
     public Name name() {
 	return new Name(displayName());
+    }
+
+    /* (non-Javadoc)
+     * @see de.uka.ilkd.key.smt.MakesProgress#getTitle()
+     */
+    public String getTitle() {
+	// TODO Auto-generated method stub
+	return null;
     }
 
 }

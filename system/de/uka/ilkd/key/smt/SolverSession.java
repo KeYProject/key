@@ -15,12 +15,64 @@ import java.util.LinkedList;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Goal;
-
+import de.uka.ilkd.key.smt.taclettranslation.TreeItem.SelectionMode;
 
 
 class SolverSession {
+    
+    public class InternResult{
+	SMTSolverResult result;
+	Goal            goal;
+	public InternResult(SMTSolverResult result, Goal goal) {
+	    super();
+	    this.result = result;
+	    this.goal = goal;
+        }
+	
+		@Override
+	public int hashCode() {
+	   
+	    return goal.hashCode();
+	}
+		
+	@Override
+	public boolean equals(Object obj) {
+	    if(!(obj instanceof InternResult)){
+		return false;
+	    }
+	    InternResult r = ((InternResult)obj);
+	    
+	    if(goal.equals(r.goal)){
+		if(r.result.isValid() == result.isValid()){
+		    return true;
+		}
+		if((r.result.isValid() == SMTSolverResult.ThreeValuedTruth.TRUE &&
+			result.isValid() == SMTSolverResult.ThreeValuedTruth.UNKNOWN) ||
+			(r.result.isValid() == SMTSolverResult.ThreeValuedTruth.FALSIFIABLE &&
+				result.isValid() == SMTSolverResult.ThreeValuedTruth.UNKNOWN))
+		{
+		    result = r.result;
+		}
+
+		if(result.isValid() == SMTSolverResult.ThreeValuedTruth.TRUE &&
+			r.result.isValid() == SMTSolverResult.ThreeValuedTruth.UNKNOWN ||
+			(result.isValid() == SMTSolverResult.ThreeValuedTruth.FALSIFIABLE &&
+				r.result.isValid() == SMTSolverResult.ThreeValuedTruth.UNKNOWN))
+		{
+		    r.result = result;
+		}
+
+		return true;
+	    }
+
+	    return false;
+
+	}
+	
+    }
+     
     private Collection<Goal> goals;
-    private LinkedList<SMTSolverResult> results = new LinkedList<SMTSolverResult>();
+    private LinkedList<InternResult> results = new LinkedList<InternResult>();
     private Services         services;
     private Iterator<Goal>   it;
     private Goal	      current = null;
@@ -55,12 +107,16 @@ class SolverSession {
 	return it.hasNext();
     }
     
-    public void addResult(SMTSolverResult result){
-	results.add(result);
+    public void addResult(SMTSolverResult result, Goal goal){
+	results.add(new InternResult(result,goal));
     }
     
-    public LinkedList<SMTSolverResult> getResults(){
+    public LinkedList<InternResult> getResults(){
 	return results;
+    }
+    
+    public int getGoalSize(){
+	return goals.size();
     }
 
 }

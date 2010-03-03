@@ -1,4 +1,4 @@
-package gui;
+package de.uka.ilkd.key.gui.smt;
 
 
 
@@ -20,6 +20,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.Collection;
 
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.DefaultListModel;
@@ -31,8 +32,14 @@ import javax.swing.JScrollPane;
 import javax.swing.ListCellRenderer;
 import javax.swing.ListModel;
 
-public class ProgressDialog extends JFrame{
+import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.smt.MakesProgress;
+import de.uka.ilkd.key.smt.SMTRuleNew;
+import de.uka.ilkd.key.smt.SMTSolver;
 
+public class ProgressDialog extends JDialog{
+
+	public static final ProgressDialog INSTANCE = new ProgressDialog();
 	
 
 	private JPanel panelDialog = null;  //  @jve:decl-index=0:visual-constraint="498,19"
@@ -41,7 +48,10 @@ public class ProgressDialog extends JFrame{
 	private JButton okButton = null;
 	private JButton cancelButton = null;
 	private JScrollPane scrollPane = null;
+	private SMTRuleNew rule = null;
 
+
+	
 	
 	public void setProgress(int i, int progress){
 		ProgressPanel panel = (ProgressPanel)list.getModel().getElementAt(i);
@@ -49,22 +59,26 @@ public class ProgressDialog extends JFrame{
 		getList().repaint();
 	}
 	
+	public void prepare(Collection<SMTSolver> solvers, Collection<Goal> goals, SMTRuleNew r){
+	    this.rule = r;
+	    
+	    DefaultListModel model = new DefaultListModel();
+	    for(SMTSolver solver : solvers){
+		model.addElement(new ProgressPanel(solver,getList(),goals));
+		
+	    }
+	    getList().setModel(model);
+	}
 	
 	
-	ProgressDialog(){
+	
+	private ProgressDialog(){
+	    	setSize(300, 200);
 		setLayout(new BorderLayout());
-		getCancelButton().addActionListener(new ActionListener(){
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				System.exit(0);
-				
-			}
-			
-		});
+	
 		getList().setCellRenderer(new ListCellRenderer(){
 
-			@Override
+			
 			public Component getListCellRendererComponent(JList arg0,
 					Object object, int arg2, boolean arg3, boolean arg4) {
 				return ((ProgressPanel)object).getComponent();
@@ -78,10 +92,16 @@ public class ProgressDialog extends JFrame{
 		this.repaint();
 	}
 	
-	void showDialog(ListModel model){
-		getList().setModel(model);
-		this.setSize(300, 300);
-		this.setVisible(true);
+	public void showDialog(){
+	    
+		setVisible(true);
+		
+	}
+	
+	public void setVisible(boolean b){
+		this.setModal(b);
+		//getOkButton().setEnabled(false);
+		super.setVisible(b);
 	}
 	
 	
@@ -183,6 +203,16 @@ public class ProgressDialog extends JFrame{
 		if (okButton == null) {
 			okButton = new JButton();
 			okButton.setText("OK");
+			okButton.addActionListener(new ActionListener() {
+			    
+			    public void actionPerformed(ActionEvent arg0) {
+				setVisible(false);
+				rule.stop();
+				rule.applyResults();
+				
+			    }
+			});
+			
 		}
 		return okButton;
 	}
@@ -196,6 +226,14 @@ public class ProgressDialog extends JFrame{
 		if (cancelButton == null) {
 			cancelButton = new JButton();
 			cancelButton.setText("Cancel");
+			cancelButton.addActionListener(new ActionListener() {
+			    
+			    public void actionPerformed(ActionEvent e) {
+				setVisible(false);
+				rule.stop();
+				
+			    }
+			});
 		}
 		return cancelButton;
 	}

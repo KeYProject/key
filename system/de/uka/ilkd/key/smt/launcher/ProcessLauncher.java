@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.smt.launcher;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.ConcurrentModificationException;
 import java.util.Iterator;
@@ -11,22 +12,31 @@ import java.util.TimerTask;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 
+import de.uka.ilkd.key.smt.MakesProgress;
+import de.uka.ilkd.key.smt.SMTProgressMonitor;
 
 
-public  class ProcessLauncher  extends TimerTask implements ProcessListener{
-    	private final static int SLEEP = 100;
+
+public abstract  class ProcessLauncher  implements ProcessListener, Runnable{
+    	private final static int SLEEP = 10;
     
 	private LinkedList<Process> queue = new LinkedList<Process>();
 	private LinkedList<ProcessLauncherListener> listener = new LinkedList<ProcessLauncherListener>();
 	private List<ProcessLaunch> running = Collections.synchronizedList(new LinkedList<ProcessLaunch>());
+
 	
-	private synchronized List<ProcessLaunch> getRunning(){
+	private List<ProcessLaunch> getRunning(){
 	    return running;
 	}
 	
 	private long maxTime = 10000;
 	private int counter =0;
 	private boolean cancel = false;
+	
+	public void init(){
+	    queue.clear();
+	    running.clear();
+	}
 	
 	public ProcessLauncher(){
 		
@@ -37,7 +47,11 @@ public  class ProcessLauncher  extends TimerTask implements ProcessListener{
 		cancel = false;
 	}
 	
-	private synchronized void cancelMe(){
+	protected synchronized void cancelMe(){
+	    	for(ProcessLaunch launch : running){
+	    	    launch.stop();
+	    	}
+	    	running.clear();
 		cancel = true;
 	}
 	
@@ -86,36 +100,49 @@ public  class ProcessLauncher  extends TimerTask implements ProcessListener{
 	}*/
 	
 	protected void executeNextProcesses(){
-		
+		if(queue.isEmpty() || !running.isEmpty()){
+		    return;
+		}
 		for(Process process : queue){
 			ProcessLaunch launch = new ProcessLaunch(process);
-			launch.start();
 			getRunning().add(launch);
+                        
+		
 		}
 		queue.clear();
+		//synchronized(running){
+			for(ProcessLaunch launch : running){
+			    launch.start();
+			}
+		//}
+	
 		
 	}
 	
 	protected void checkTime(){
+	    	synchronized(getRunning()){
 		Iterator<ProcessLaunch> it = getRunning().iterator();
 		while(it.hasNext()){
 			ProcessLaunch launch = it.next();
 			long currentTime = System.currentTimeMillis();
 			if(!launch.checkTime(currentTime, maxTime)|| !launch.running()){
-		
+			    	boolean time = launch.running();
 				launch.stop();
+				if(time){
+				    publish(new Event(this,launch,Event.Type.INTERRUP_PROCESS));	    
+				}
+				
 				try{
 					it.remove();		
 				}catch( ConcurrentModificationException e){
-					
+				    eventException(launch.getProcess(), e);
 				}
 						
 			}else{
-			
-				publish(new Event(this,launch.getProcess(),Event.PROCESS_STATUS));		
+			     publish(new Event(this,launch,Event.Type.PROCESS_STATUS));		
 			}
 		}
-		
+	    	}
 
 	}
 	
@@ -133,16 +160,28 @@ public  class ProcessLauncher  extends TimerTask implements ProcessListener{
 	
 	private void runningIsEmpty(){
 		cancelMe();
-		publish(new Event(this,null,Event.PROCESS_FINISHED));
+		//publish(new Event(this,null,Event.Type.PROCESS_FINISHED));
 	
 		
 		
 	}
+	
+	private ProcessLaunch findLaunch(Process p){
+	    synchronized(running){
+	    for(ProcessLaunch launch : running){
+		if(launch.getProcess() == p){
+		    return launch;
+		}
+	    }
+	    }
+	   return null;
+	}
 
 
 	public void eventException(Process p, Exception e) {
+	    	ProcessLaunch launch = findLaunch(p);
 		remove(p);	
-		publish(new Event(this,p,Event.PROCESS_EXCEPTION));
+		publish(new Event(this,launch,Event.Type.PROCESS_EXCEPTION));
 		System.out.println("exception "+e);
 		e.printStackTrace(System.out);
 		
@@ -150,23 +189,27 @@ public  class ProcessLauncher  extends TimerTask implements ProcessListener{
 
 
 	public void eventFinished(Process p) {
+	    	ProcessLaunch launch = findLaunch(p);
 		remove(p);
-		publish(new Event(this,p,Event.PROCESS_FINISHED));
+		publish(new Event(this,launch,Event.Type.PROCESS_FINISHED));
 
 	}
 
 
 	public void eventInterruption(Process p) {
+	    	ProcessLaunch launch = findLaunch(p);
 		remove(p);
-		publish(new Event(this,p,Event.PROCESS_INTERRUPTION));
+		publish(new Event(this,launch,Event.Type.PROCESS_INTERRUPTION));
 
 	}
 
 
 	public void eventStarted(Process p) {
-		publish(new Event(this,p,Event.PROCESS_START));
+	    	ProcessLaunch launch = findLaunch(p);
+		publish(new Event(this,launch,Event.Type.PROCESS_START));
 		
 	}
+
 	
 	
 
@@ -191,6 +234,7 @@ public  class ProcessLauncher  extends TimerTask implements ProcessListener{
 			
 			
 		}
+		publish(new Event(this, null,Event.Type.WORK_DONE));
 			
 
 		
@@ -198,26 +242,19 @@ public  class ProcessLauncher  extends TimerTask implements ProcessListener{
 
 	}
 	
-	private void publish(final Event e){
-		
-		for(ProcessLauncherListener l : listener){
-			l.eventOccured(e);
-		}
-		/*SwingUtilities.invokeLater(new Runnable() {  
-			public void run() {
-			
-			}
-		});*/
-	}
+	abstract protected void publish(final Event e);
 
 
-	/* (non-Javadoc)
-         * @see de.uka.ilkd.key.smt.launcher.ProcessListener#eventCycleFinished(de.uka.ilkd.key.smt.launcher.Process)
-         */
-        public void eventCycleFinished(Process process) {
-            publish(new Event(this,process,Event.PROCESS_CYCLE_FINISHED));
+	
+        public void eventCycleFinished(Process p,Object userObject) {
+            ProcessLaunch launch = findLaunch(p);
+            publish(new Event(this,launch,Event.Type.PROCESS_CYCLE_FINISHED,userObject));
 	    
         }
+        
+
+
+        
 	
 
 
