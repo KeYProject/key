@@ -640,7 +640,9 @@ public class KeYProgModelInfo{
         for (int i=rctl.size()-1; i>=0 ; i--){
             final recoder.abstraction.ClassType rct = rctl.get(i);
             final KeYJavaType kct = (KeYJavaType)rec2key().toKeY(rct);
-            result = result.prepend(kct);
+	    if(kct!=null){
+		result = result.prepend(kct);
+	    }
         }
         return result;
     }

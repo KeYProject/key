@@ -499,21 +499,24 @@ public class Recoder2KeYTypeConverter {
                     initArrayMethodBuilder();
                 }
 
+		//disabled PERC Pico extensions from side branch engelcMemoryConsumption
+		/*
                 AnnotationUseSpecification ecs = 
                     new AnnotationUseSpecification(new TypeRef(getKeYJavaType("ExternallyConstructedScope")));
                 AnnotationUseSpecification nls = 
                     new AnnotationUseSpecification(new TypeRef(getKeYJavaType("NoLocalScope")));
+		*/
 
                 final ProgramMethod prepare = arrayMethodBuilder.getPrepareArrayMethod(
-										       parentReference, length, defaultValue, fields, ecs, nls);
+										       parentReference, length, defaultValue, fields);
 
                 members.add(arrayMethodBuilder
                         .getArrayInstanceAllocatorMethod(parentReference));
                 members.add(prepare);
                 members.add(arrayMethodBuilder.getCreateArrayHelperMethod(
-                        parentReference, length, fields, ecs, nls));
+                        parentReference, length, fields));
                 members.add(arrayMethodBuilder.getCreateArrayMethod(parentReference,
-                        prepare, fields, ecs, nls));
+                        prepare, fields));
                 members.add(transientArrayMethodBuilder
                         .getCreateTransientArrayHelperMethod(parentReference, length,
                                 fields));

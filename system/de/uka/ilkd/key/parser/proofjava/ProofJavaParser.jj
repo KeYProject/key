@@ -3614,7 +3614,18 @@ MethodBodyStatement MethodBodyStatement() :
 ExecutionContext ExecutionContext() :
 {
   TypeReference classContext;
-  Expression runtimeInstance = null, memoryArea = null, callerScope=null, constructedScope=null;
+
+Expression initial = factory.createThisReference();
+//  Identifier id = factory.createIdentifier("MemoryArea");    
+//  setPrefixInfo(id);
+//  setPostfixInfo(id);
+//  UncollatedReferenceQualifier tmpResult = factory.createUncollatedReferenceQualifier(id);
+//  id = factory.createIdentifier("currentMemoryArea");	
+//  UncollatedReferenceQualifier initial = factory.createUncollatedReferenceQualifier(tmpResult,id);
+//          setPrefixInfo(initial);
+//	  setPostfixInfo(initial);
+
+  Expression runtimeInstance = null, memoryArea = initial, callerScope=initial, constructedScope=initial;
 } 
 {
 
@@ -3625,7 +3636,8 @@ ExecutionContext ExecutionContext() :
   [ ",<constructedScope>=" constructedScope = Expression() ]
   [ ",this=" runtimeInstance = Expression() ]
   
-  { return new ExecutionContext
+  { 
+    return new ExecutionContext
 	(classContext, (ReferencePrefix)memoryArea,
         (ReferencePrefix)runtimeInstance, (ReferencePrefix)callerScope, (ReferencePrefix)constructedScope);
   }

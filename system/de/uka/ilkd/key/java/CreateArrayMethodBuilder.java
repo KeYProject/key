@@ -318,11 +318,9 @@ public class CreateArrayMethodBuilder extends KeYJavaASTFactory {
      */
     public ProgramMethod getCreateArrayHelperMethod(
             TypeReference arrayTypeReference, ProgramVariable length,
-            ImmutableList<Field> fields, 
-            AnnotationUseSpecification ecs, 
-            AnnotationUseSpecification nls) {
+            ImmutableList<Field> fields) {
 
-        final Modifier[] modifiers = new Modifier[] { new Private(), ecs, nls };
+        final Modifier[] modifiers = new Modifier[] { new Private()};
         final KeYJavaType arrayType = arrayTypeReference.getKeYJavaType();
 
         final ProgramVariable paramLength = new LocationVariable(
@@ -349,11 +347,10 @@ public class CreateArrayMethodBuilder extends KeYJavaASTFactory {
      * addition it sets the arrays length and calls the prepare method
      */
     public ProgramMethod getCreateArrayMethod(TypeReference arrayTypeReference,
-            ProgramMethod prepare, ImmutableList<Field> fields, AnnotationUseSpecification ecs, 
-            AnnotationUseSpecification nls) {
+            ProgramMethod prepare, ImmutableList<Field> fields) {
 
         final Modifier[] modifiers = new Modifier[] { new Protected(),
-                new Static(), ecs, nls };
+                new Static() };
 
         final KeYJavaType arrayType = arrayTypeReference.getKeYJavaType();
 
@@ -391,8 +388,7 @@ public class CreateArrayMethodBuilder extends KeYJavaASTFactory {
      * their default value
      */
     public ProgramMethod getPrepareArrayMethod(TypeRef arrayRef,
-            ProgramVariable length, Expression defaultValue, ImmutableList<Field> fields, 
-            AnnotationUseSpecification ecs, AnnotationUseSpecification nls) {
+            ProgramVariable length, Expression defaultValue, ImmutableList<Field> fields) {
 
         final KeYJavaType arrayType = arrayRef.getKeYJavaType();
 
@@ -416,7 +412,7 @@ public class CreateArrayMethodBuilder extends KeYJavaASTFactory {
                 new Statement[] { forLoop });
 
         final MethodDeclaration md = new MethodDeclaration(
-                new Modifier[] { new Private(), ecs, nls }, arrayRef,
+                new Modifier[] { new Private()}, arrayRef,
                 new ProgramElementName(
                         PrepareObjectBuilder.IMPLICIT_OBJECT_PREPARE),
                 new ParameterDeclaration[0], null, body, false);

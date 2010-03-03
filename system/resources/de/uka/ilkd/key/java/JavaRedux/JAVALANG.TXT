@@ -14,9 +14,11 @@
 
 java/lang/Object.java
 
-com/percpico/util/sc/ExternallyConstructedScope.java
-com/percpico/util/sc/NoLocalScope.java
-com/percpico/util/sc/CallerAllocatedResult.java
+#commented PERC Pico extensions as they are currently not parseable with recoder
+#com/percpico/util/sc/ExternallyConstructedScope.java
+#com/percpico/util/sc/NoLocalScope.java
+#com/percpico/util/sc/CallerAllocatedResult.java
+java/lang/annotation/Annotation.java
 java/lang/ArithmeticException.java
 java/lang/ArrayIndexOutOfBoundsException.java
 java/lang/ArrayStoreException.java
@@ -45,6 +47,7 @@ java/lang/Runnable.java
 java/lang/RuntimeException.java
 java/lang/String.java
 java/lang/StringBuffer.java
+java/lang/Thread.java
 java/lang/Throwable.java
 java/util/Collection.java
 java/util/Iterator.java

@@ -7,13 +7,6 @@
 // See LICENSE.TXT for details.
 //
 //
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2004 Universitaet Karlsruhe, Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
 package de.uka.ilkd.key.java.recoderext;
 
 import java.util.*;
@@ -179,12 +172,10 @@ public class PrepareObjectBuilder
     public MethodDeclaration createMethod(TypeDeclaration type) {
 	ASTList<DeclarationSpecifier> modifiers = new ASTArrayList<DeclarationSpecifier>(1);
 	modifiers.add(new Protected());	
-        
-        modifiers.add(new KeYAnnotationUseSpecification(new TypeReference(
-                new Identifier("ExternallyConstructedScope"))));
-        modifiers.add(new KeYAnnotationUseSpecification(new TypeReference(
-                new Identifier("NoLocalScope"))));
-        
+	//	modifiers.add(new KeYAnnotationUseSpecification(new TypeReference(
+	//                new Identifier("ExternallyConstructedScope"))));
+	//        modifiers.add(new KeYAnnotationUseSpecification(new TypeReference(
+	//                new Identifier("NoLocalScope"))));
 	MethodDeclaration md =  new MethodDeclaration
 	    (modifiers, 
 	     null, 
@@ -207,10 +198,10 @@ public class PrepareObjectBuilder
 	ASTList<DeclarationSpecifier> modifiers = new ASTArrayList<DeclarationSpecifier>(1);
 	modifiers.add(new Private());	
         
-        modifiers.add(new KeYAnnotationUseSpecification(new TypeReference(
-                new Identifier("ExternallyConstructedScope"))));
-        modifiers.add(new KeYAnnotationUseSpecification(new TypeReference(
-                new Identifier("NoLocalScope"))));
+	//        modifiers.add(new KeYAnnotationUseSpecification(new TypeReference(
+  	//              new Identifier("ExternallyConstructedScope"))));
+ 	//       modifiers.add(new KeYAnnotationUseSpecification(new TypeReference(
+ 	//               new Identifier("NoLocalScope"))));
         
 	MethodDeclaration md =  new MethodDeclaration
 	    (modifiers, 

@@ -1755,11 +1755,12 @@ public abstract class TestGenerator {
 	        && !"TRUE".equals(t.op().name().toString())
 	        && !"FALSE".equals(t.op().name().toString())
 	        && t.op() != Op.NULL) {
-	    KeYJavaType kjt = serv.getJavaInfo().getKeYJavaType(
-		    t.sort().toString());
+	    KeYJavaType kjt;
 	    if (t.sort().toString().startsWith("jint")) {
 		kjt = serv.getJavaInfo().getKeYJavaType(
 		        t.sort().toString().substring(1));
+	    }else{
+		kjt = serv.getJavaInfo().getKeYJavaType(t.sort().toString());
 	    }
 	    final ProgramVariable pv = new LocationVariable(
 		    new ProgramElementName(t.op().name().toString()), kjt);

@@ -34,6 +34,7 @@ import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.pp.Range;
 import de.uka.ilkd.key.proof.init.PercProfile;
+import de.uka.ilkd.key.proof.init.RTSJProfile;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.metaconstruct.ProgramMetaConstruct;
 import de.uka.ilkd.key.rule.soundness.ProgramSVProxy;
@@ -2493,7 +2494,10 @@ public class PrettyPrinter {
 	throws java.io.IOException {
 	write("source=");
 	writeElement(x.getTypeReference());
-	if(x.getMemoryArea() != null){
+	if(x.getMemoryArea() != null && 
+	   (ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof PercProfile ||
+	    ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof RTSJProfile)
+	   ){
             if(ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof PercProfile){
                 write(",<localScope>=");
             }else{
@@ -2501,11 +2505,13 @@ public class PrettyPrinter {
             }
 	    writeElement(x.getMemoryArea());
 	}
-        if(x.getCallerMemoryArea() != null){
+        if(x.getCallerMemoryArea() != null && 
+	   ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof PercProfile){
             write(",<callerScope>=");
             writeElement(x.getCallerMemoryArea());
         }
-        if(x.getConstructedMemoryArea() != null){
+        if(x.getConstructedMemoryArea() != null  &&
+	   ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof PercProfile){
             write(",<constructedScope>=");
             writeElement(x.getConstructedMemoryArea());
         }

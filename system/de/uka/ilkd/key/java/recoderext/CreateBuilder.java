@@ -93,10 +93,10 @@ public class CreateBuilder extends RecoderModelTransformer {
 	ASTList<DeclarationSpecifier> modifiers = new ASTArrayList<DeclarationSpecifier>(2);
 	modifiers.add(new Public());   
         
-        modifiers.add(new KeYAnnotationUseSpecification(new TypeReference(
-                new Identifier("ExternallyConstructedScope"))));
-        modifiers.add(new KeYAnnotationUseSpecification(new TypeReference(
-                new Identifier("NoLocalScope"))));
+	//        modifiers.add(new KeYAnnotationUseSpecification(new TypeReference(
+	//                new Identifier("ExternallyConstructedScope"))));
+	//        modifiers.add(new KeYAnnotationUseSpecification(new TypeReference(
+	//                new Identifier("NoLocalScope"))));
         
 	MethodDeclaration md =  new MethodDeclaration
 	    (modifiers, 

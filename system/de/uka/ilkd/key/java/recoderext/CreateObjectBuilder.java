@@ -143,10 +143,10 @@ public class CreateObjectBuilder extends RecoderModelTransformer {
 	modifiers.add(new Public());
 	modifiers.add(new Static());
         
-        modifiers.add(new KeYAnnotationUseSpecification(new TypeReference(
-                new Identifier("ExternallyConstructedScope"))));
-        modifiers.add(new KeYAnnotationUseSpecification(new TypeReference(
-                new Identifier("NoLocalScope"))));
+	//        modifiers.add(new KeYAnnotationUseSpecification(new TypeReference(
+	//                new Identifier("ExternallyConstructedScope"))));
+	//        modifiers.add(new KeYAnnotationUseSpecification(new TypeReference(
+	//                new Identifier("NoLocalScope"))));
 
 	MethodDeclaration md =  new MethodDeclaration
 	    (modifiers, 

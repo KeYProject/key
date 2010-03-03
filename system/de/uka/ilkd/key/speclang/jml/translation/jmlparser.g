@@ -1898,7 +1898,7 @@ jmlprimary returns [JMLExpression result=null] throws SLTranslationException
     		result = new JMLExpression(t);
     	}
     |   SPACE // \\space(t): the space an object of exact type t consumes
-    	"(" (
+    	LPAREN (
     		(type) => 
     		(	typ = type 
             	(
@@ -1934,14 +1934,14 @@ jmlprimary returns [JMLExpression result=null] throws SLTranslationException
 					result = new JMLExpression(tb.func(f, t));
 				}
             )
-    	")"
+    	RPAREN
 
     |   MAX_SPACE 
     	// \max_space(t): the space an object of static type t consumes at most
         // \max_space(o): the space an object o consumes
         // o instanceof t ==> \max_space(o) <= \max_space(t)
         // t2<:t1 ==> \max_space(t2)<=\max_space(t1)
-    	"("
+    	LPAREN
     		(
 				(type) => typ = type 
     			{
@@ -1955,8 +1955,8 @@ jmlprimary returns [JMLExpression result=null] throws SLTranslationException
 					result = new JMLExpression(tb.func(f, t));
 				}
 			)
-    	")"
-    |   WORKINGSPACE "(" t=expression ")"
+    	RPAREN
+    |   WORKINGSPACE LPAREN t=expression RPAREN
         {
             if(!(t.op() instanceof ProgramMethod)){
             	raiseNotSupported("Only method calls are allowed in \\working_space");
@@ -1972,7 +1972,7 @@ jmlprimary returns [JMLExpression result=null] throws SLTranslationException
             result = new JMLExpression(t);
         }
     |   RIGIDWORKINGSPACE {args=new LinkedList<LocationVariable>();}
-        "(" method = methodsignature[args] 
+        LPAREN method = methodsignature[args] 
         {
             resolverManager.pushLocalVariablesNamespace();
             Iterator it = args.iterator();
@@ -1984,7 +1984,7 @@ jmlprimary returns [JMLExpression result=null] throws SLTranslationException
         }
         (COMMA (o1 = expression)?)
         (COMMA pre = expression)?
-        ")"
+        RPAREN
         {
             if(pre==null){
                 pre = tb.tt();
@@ -2025,7 +2025,7 @@ jmlprimary returns [JMLExpression result=null] throws SLTranslationException
             resolverManager.popLocalVariablesNamespace();
             result = new JMLExpression(t);
         } 
-	|  	IN_OUTER_SCOPE "("o1 = specexpression "," o2 = specexpression ")"
+	|  	IN_OUTER_SCOPE LPAREN o1 = specexpression COMMA o2 = specexpression RPAREN
         {
             TermSymbol ios = (TermSymbol) services.getNamespaces().functions().lookup(new Name("outerScope"));
             ProgramVariable ma = javaInfo.getAttribute(ImplicitFieldAdder.IMPLICIT_MEMORY_AREA, javaInfo.getJavaLangObject());
@@ -2033,7 +2033,7 @@ jmlprimary returns [JMLExpression result=null] throws SLTranslationException
             t = tb.func(ios, tb.dot(tb.dot(o1, ma), stack), tb.dot(tb.dot(o2, ma), stack));
             result = new JMLExpression(t);
         }
-    |   OUTER_SCOPE "("o1 = specexpression "," o2 = specexpression ")"
+    |   OUTER_SCOPE LPAREN o1 = specexpression COMMA o2 = specexpression RPAREN
         {
             TermSymbol ios = (TermSymbol) services.getNamespaces().functions().lookup(new Name("outerScope"));
             ProgramVariable ma = javaInfo.getAttribute(ImplicitFieldAdder.IMPLICIT_MEMORY_AREA, javaInfo.getJavaLangObject());
@@ -2041,7 +2041,7 @@ jmlprimary returns [JMLExpression result=null] throws SLTranslationException
             t = tb.func(ios, tb.dot(o1, stack), tb.dot(o2, stack));
             result = new JMLExpression(t);
         }
-    |   IN_IMMORTAL_MEMORY "(" t = expression ")" 
+    |   IN_IMMORTAL_MEMORY LPAREN t = expression RPAREN 
     	{
     		TermSymbol im = (TermSymbol) services.getNamespaces().functions().lookup(new Name("immortal"));
     		ProgramVariable ma = javaInfo.getAttribute(ImplicitFieldAdder.IMPLICIT_MEMORY_AREA, javaInfo.getJavaLangObject());
@@ -2050,7 +2050,7 @@ jmlprimary returns [JMLExpression result=null] throws SLTranslationException
     		t = tb.func(im, t);
     		result = new JMLExpression(t);
     	}
-    |   MEMORY_AREA "(" t = expression ")"
+    |   MEMORY_AREA LPAREN t = expression RPAREN
     	{
     		t = tb.dot(t, javaInfo.getAttribute(ImplicitFieldAdder.IMPLICIT_MEMORY_AREA, javaInfo.getJavaLangObject()));
     		result = new JMLExpression(t);
@@ -2085,7 +2085,7 @@ jmlprimary returns [JMLExpression result=null] throws SLTranslationException
 		tb.TRUE(services));
 	    result = new JMLExpression(resTerm);
 	} 
-	|   REENTRANT_SCOPE "(" t=specexpression ")"
+	|   REENTRANT_SCOPE LPAREN t=specexpression RPAREN
 	{
 		Term resTerm = tb.dot(t, javaInfo.getAttribute(
     				ImplicitFieldAdder.IMPLICIT_REENTRANT_SCOPE, 
@@ -2146,7 +2146,7 @@ methodsignature[LinkedList args] returns [ProgramMethod pm=null] throws SLTransl
                 methodName = prefix.substring(i);
             }
         }
-        "("
+        LPAREN
         (
             kjt=type (argName=name)?
             {
@@ -2172,7 +2172,7 @@ methodsignature[LinkedList args] returns [ProgramMethod pm=null] throws SLTransl
                 }
             )*
         )?
-        ")"
+        RPAREN
         {
             pm = javaInfo.getProgramMethod(classType,
                 methodName, sig, classType);
