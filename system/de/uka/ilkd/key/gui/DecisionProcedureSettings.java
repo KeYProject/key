@@ -127,6 +127,7 @@ public class DecisionProcedureSettings implements Settings {
     
     private String multProversSettings=null;
     private boolean waitForAllProvers = false;
+
     
     
     /**
@@ -504,6 +505,8 @@ public class DecisionProcedureSettings implements Settings {
     }
     
     private boolean saveFile = false;
+
+
     
     public void setSaveFile(boolean sf) {
 	if (sf != this.saveFile) {
@@ -603,6 +606,8 @@ public class DecisionProcedureSettings implements Settings {
 	}
 	
     }
+
+
 
  
 

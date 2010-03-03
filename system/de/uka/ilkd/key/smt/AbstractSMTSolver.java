@@ -10,16 +10,23 @@
 
 package de.uka.ilkd.key.smt;
 
+
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.Timer;
 
+import javax.management.ImmutableDescriptor;
 import javax.swing.JFileChooser;
 
 import org.apache.log4j.Logger;
 
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.DecisionProcedureSettings;
 import de.uka.ilkd.key.gui.Main;
 import de.uka.ilkd.key.gui.configuration.PathConfig;
@@ -28,6 +35,13 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.rule.NoPosTacletApp;
+import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.smt.taclettranslation.DefaultTacletSetTranslation;
+import de.uka.ilkd.key.smt.taclettranslation.IllegalTacletException;
+import de.uka.ilkd.key.smt.taclettranslation.TacletFormula;
+import de.uka.ilkd.key.smt.taclettranslation.TacletSetTranslation;
+import de.uka.ilkd.key.smt.taclettranslation.UsedTaclets;
 import de.uka.ilkd.key.util.ProgressMonitor;
 
 
@@ -54,7 +68,18 @@ public abstract class AbstractSMTSolver implements SMTSolver {
     private boolean isinstalled = false;
     /** true, if the current run is for test uss only (for example checking, if the Solver is installed) */
     private boolean inTestMode = false;
+
+    /** determines whether taclets are used for this solver.*/
+    private boolean useTaclets = true;
+    /** Only for testing*/
+    private Collection<Taclet> tacletsForTest = null;
+    /** true, if the solver should save the translated taclets to file. */
+    private boolean saveTacletTranslation = true;
     
+    
+
+
+
     /**
      * Get the command for executing the external prover.
      * This is a hardcoded default value. It might be overridden by user settings
@@ -92,6 +117,8 @@ public abstract class AbstractSMTSolver implements SMTSolver {
 	}
 	return toReturn;
     }
+    
+   
     
   /*  /**
      * Interpret the answer of the program.
@@ -198,24 +225,29 @@ public abstract class AbstractSMTSolver implements SMTSolver {
      * @param services the service object belonging to this goal.
      * @throws IOException if the external prover could not be found, executed or if the SMT translation
      * could not be written to a file
-     */
+     */ 
     public final SMTSolverResult run(Goal goal, int timeout, Services services) throws IOException {
 	SMTSolverResult toReturn;
-		
 	SMTTranslator trans = this.getTranslator(services);
-	
-	try {
+	try {		
+	    
+	instantiateTaclets(goal, trans);
+	}catch(IllegalFormulaException e){
+	    logger.error(e.getMessage());
+	}
+	  
+	try{
 	    String s = trans.translate(goal.sequent(), services).toString();
+	    saveTacletTranslation(trans);
 	    toReturn = this.run(s, timeout, services);
     	} catch (IllegalFormulaException e) {
 	    toReturn = SMTSolverResult.NO_IDEA;
 	    logger.debug("The formula could not be translated.", e);
 	    //throw new RuntimeException("The formula could not be translated.\n" + e.getMessage());
 	}
-    	
     	goal.node().addSMTandFPData(toReturn);
     	
-    	return toReturn;
+       	return toReturn;
     }
     
     
@@ -223,10 +255,17 @@ public abstract class AbstractSMTSolver implements SMTSolver {
     public Process run(Goal goal, Services services) throws IOException,IllegalFormulaException{
 	Process toReturn;
 	
+	
+
+
+	
 	SMTTranslator trans = this.getTranslator(services);
 	
+	instantiateTaclets(goal, trans);
+
 	String formula = trans.translate(goal.sequent(), services).toString();
-	
+
+	saveTacletTranslation(trans);
 	
 
 	
@@ -273,7 +312,7 @@ public abstract class AbstractSMTSolver implements SMTSolver {
 		    throw ioe;
 		}
 
-	
+	 
 	 return toReturn;
     }
 
@@ -293,6 +332,7 @@ public abstract class AbstractSMTSolver implements SMTSolver {
 	SMTTranslator trans = this.getTranslator(services);
 	
 	try {
+
 	    String s = trans.translate(t, services).toString();
 	    toReturn = this.run(s, timeout, services);
     	} catch (IllegalFormulaException e) {
@@ -345,6 +385,7 @@ public abstract class AbstractSMTSolver implements SMTSolver {
 	    	                     int timeout, 
 	    			     Services services) throws IOException {
 	SMTSolverResult toReturn;
+	
 	
 	final File loc;
 	try {
@@ -507,6 +548,62 @@ public abstract class AbstractSMTSolver implements SMTSolver {
     public String getDefaultExecutionCommand() {
 	return this.getExecutionCommand("%f", "%p");
     }
+    
+    
+    
+  
+    
+    public void useTaclets(boolean b){
+	this.useTaclets = b;
+    }
+    
+    private Collection<Taclet> getTaclets(Goal goal){
+	
+	 if(tacletsForTest != null){
+	     return tacletsForTest;
+	 }
+	 return ProofSettings.DEFAULT_SETTINGS.getTacletTranslationSettings()
+	            .initTaclets(goal.ruleAppIndex().tacletIndex());
+    }
+    
+   
+    private void saveTacletTranslation(SMTTranslator trans) {
+	if (!this.inTestMode
+	        && ProofSettings.DEFAULT_SETTINGS
+	                .getTacletTranslationSettings().isSaveToFile()
+	        && ProofSettings.DEFAULT_SETTINGS
+	                .getTacletTranslationSettings().isUsingTaclets()) {
+
+	    DefaultTacletSetTranslation translation = (DefaultTacletSetTranslation) ((AbstractSMTTranslator) trans)
+		    .getTacletSetTranslation();
+
+	    if (translation != null) {
+		translation.storeToFile(ProofSettings.DEFAULT_SETTINGS
+		        .getTacletTranslationSettings().getFilename());
+	    }
+
+	}
+    }
+    
+    private void instantiateTaclets(Goal goal, SMTTranslator trans) throws IllegalFormulaException{
+	ImmutableSet<Taclet> emptySet = DefaultImmutableSet.nil();
+	if(!ProofSettings.DEFAULT_SETTINGS.getTacletTranslationSettings().isUsingTaclets() || !useTaclets ){
+	    trans.setTacletsForAssumptions(new LinkedList<Taclet>());
+	   
+	}else{
+	    trans.setTacletsForAssumptions(getTaclets(goal));
+	}
+	
+	
+	 
+	
+	
+    }
+    
+    public void setTacletsForTest(Collection<Taclet> set){
+	tacletsForTest = set;
+    }
+
     
     
 }

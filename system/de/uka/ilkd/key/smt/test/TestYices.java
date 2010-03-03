@@ -6,10 +6,11 @@ import de.uka.ilkd.key.smt.YicesSolver;
 public class TestYices extends TestSMTSolver {
 
     private static boolean yicesNotInstalled = false;
+    private SMTSolver yices = new YicesSolver();
 
     @Override
     public SMTSolver getSolver() {
-	return new YicesSolver();
+	return yices;
     }
 
     @Override

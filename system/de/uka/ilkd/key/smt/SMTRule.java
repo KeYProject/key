@@ -22,6 +22,8 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.smt.taclettranslation.DefaultTacletSetTranslation;
+import de.uka.ilkd.key.smt.taclettranslation.TacletSetTranslation;
 import de.uka.ilkd.key.util.ProgressMonitor;
 
 public class SMTRule implements BuiltInRule, MakesProgress {
@@ -65,7 +67,8 @@ public class SMTRule implements BuiltInRule, MakesProgress {
 	int timeout = ProofSettings.DEFAULT_SETTINGS
 	                           .getDecisionProcedureSettings()
 	                           .getTimeout()*100;
-	
+
+		
 	SMTSolverResult result = SMTSolverResult.NO_IDEA;	
 	try {
 	    result = this.solver.run(goal, timeout, services);
@@ -77,7 +80,8 @@ public class SMTRule implements BuiltInRule, MakesProgress {
 		re.initCause(ioe);
 		throw re;
 	    }	    
-	}
+	} 	 
+	
 	if (result.isValid() == SMTSolverResult.ThreeValuedTruth.TRUE) {
 	    return ImmutableSLList.<Goal>nil();
 	} else {

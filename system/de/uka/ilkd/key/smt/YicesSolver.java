@@ -17,6 +17,7 @@ public final class YicesSolver extends AbstractSMTSolver {
 
     public static final String name = "Yices";
     
+
     public String name() {
 	return name;
     }

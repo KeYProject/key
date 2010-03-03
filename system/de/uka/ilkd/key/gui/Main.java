@@ -1585,9 +1585,13 @@ public class Main extends JFrame implements IMain {
     JCheckBoxMenuItem showSMTResDialog;
     JCheckBoxMenuItem saveSMTFile;
     private JCheckBoxMenuItem waitForAllProvers;
+    private JCheckBoxMenuItem saveTacletTranslation;
+    private JCheckBoxMenuItem useTaclets;
+    private JMenuItem showTacletTranslationSettings;
     /**@see {@link de.uka.ilkd.key.smt.SmtLibTranslatorWeaker} */
     JCheckBoxMenuItem weakerSMTTranslation;
 
+    
     
     /**
      * creates a menu allowing to choose the external prover to be used
@@ -1698,6 +1702,29 @@ public class Main extends JFrame implements IMain {
 		   }
 		});
 	decProcOptions.add(waitForAllProvers);
+	
+
+	
+	showTacletTranslationSettings = new JMenuItem("settings for taclet translation");
+	showTacletTranslationSettings.addActionListener(new ActionListener() {
+		   public void actionPerformed(ActionEvent e) {
+		       if(mediator.getSelectedProof()!=null){
+			    ProofSettings.DEFAULT_SETTINGS.getTacletTranslationSettings().
+			    initTacletMap(mediator.getSelectedProof().env().getInitConfig().getTaclets());  
+		       }
+		
+		       TacletTranslationSettingsDialog.showDialog();
+		       
+		       
+		   }
+		});
+	decProcOptions.add(showTacletTranslationSettings);
+	
+	
+	
+	
+	
+
 	
 	weakerSMTTranslation = new JCheckBoxMenuItem("Weaken Typesystem Translation");
 	weakerSMTTranslation.setSelected(dps.weakenSMTTranslation);

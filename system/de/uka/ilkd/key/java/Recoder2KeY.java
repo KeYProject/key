@@ -513,6 +513,10 @@ public class Recoder2KeY implements JavaReader {
                 ParseException e2 = new ParseException("Error while parsing " + loc);
                 e2.initCause(ex);
                 throw e2;
+            } catch(Exception ex){
+    	        ConvertException e2 = new ConvertException("While parsing "+loc+"\n"+ex.getMessage());
+                e2.initCause(ex);
+                throw e2;
             }
             
             if (Debug.ENABLE_DEBUG) {
