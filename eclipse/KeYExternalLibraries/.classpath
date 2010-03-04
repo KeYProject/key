@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry exported="true" kind="lib" path="antlr.jar"/>
-	<classpathentry exported="true" kind="lib" path="junit.jar"/>
-	<classpathentry exported="true" kind="lib" path="log4j.jar"/>
-	<classpathentry exported="true" kind="lib" path="recoderKey.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
+	<classpathentry kind="lib" path="key_lib/antlr.jar"/>
+	<classpathentry kind="lib" path="key_lib/junit.jar"/>
+	<classpathentry kind="lib" path="key_lib/log4j.jar"/>
+	<classpathentry kind="lib" path="key_lib/recoderKey.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

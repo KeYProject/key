@@ -3,10 +3,11 @@ Bundle-ManifestVersion: 2
 Bundle-Name: KeYExternalLibraries Plug-in
 Bundle-SymbolicName: KeYExternalLibraries
 Bundle-Version: 1.1.13
-Bundle-ClassPath: antlr.jar,
- junit.jar,
- log4j.jar,
- recoderKey.jar
+Bundle-ClassPath: key_lib/antlr.jar,
+ key_lib/jargs.jar,
+ key_lib/junit.jar,
+ key_lib/log4j.jar,
+ key_lib/recoderKey.jar
 Bundle-Localization: plugin
 Export-Package: .,
  antlr,
