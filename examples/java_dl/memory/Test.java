@@ -3,6 +3,7 @@ import javax.realtime.*;
 public class Test extends SuperTest{
 
     //@ public invariant oArr!=null && oArr.length>1 && next!=null;
+    //@ private invariant \typeof(oArr) == \type(Object[]);
 
     int attr=3;
     int[] arr;
@@ -11,6 +12,7 @@ public class Test extends SuperTest{
     Test next;
     public static Object sa; 
     public static Test st;
+
 
     /*@ public normal_behavior
       @  requires \memoryArea(oArr) == \currentMemoryArea;
@@ -267,7 +269,7 @@ public class Test extends SuperTest{
 
     /*@ public normal_behavior
       @  requires next.next!=null && next.next.next!=null && 
-      @           \inOuterScope(this, oArr);
+      @           \inOuterScope(next, oArr);
       @  ensures true;
       @*/
     public void outerScopeTransitive(){
@@ -306,7 +308,7 @@ public class Test extends SuperTest{
     }
 
     /*@ public normal_behavior
-      @  requires \outerScope(\currentMemoryArea,\memoryArea(this));
+      @  requires \outerScope(\currentMemoryArea,\memoryArea(this)) && \outerScope(\currentMemoryArea, \memoryArea(oArr));
       @  assignable \nothing;
       @  working_space 50;
       @*/

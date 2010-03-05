@@ -446,7 +446,7 @@ public class JMLSpecExtractor implements SpecExtractor {
         	for (PositionedString nonNull : resultNonNull) {
         	    specCase.addEnsures(nonNull);
         	}               
-		if(!JMLInfoExtractor.resultArbitraryScope(pm) &&
+		if(!JMLInfoExtractor.resultArbitraryScope(pm) && services.getTypeConverter().isReferenceType(resultType) &&
                         ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof RTSJProfile){
                     String outerScope = "\\outerScope(\\memoryArea(\\result),\\currentMemoryArea)";
                     specCase.addEnsures(new PositionedString(
