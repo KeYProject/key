@@ -61,18 +61,23 @@ public class EnsuresPostPO extends EnsuresPO {
     protected Term buildGeneralMemoryAssumption(ProgramVariable selfVar,
             ImmutableList<ProgramVariable> paramVars) 
         throws ProofInputException {
+	if(!(ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof PercProfile || 
+	     ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof RTSJProfile)){
+	    return TB.tt();
+	}
         Term result = TB.tt();
-        
-        final ProgramVariable stack = services.getJavaInfo().getAttribute(
-                "stack", "javax.realtime.MemoryArea");
-        ProgramVariable initialMemoryArea = services.getJavaInfo().getDefaultMemoryArea();
-        Term t_mem = TB.var(initialMemoryArea);
-        result = TB.and(result, TB.not(TB.equals(TB.dot(t_mem,stack), TB.NULL(services))));
-        
-        Term initialMemCreatedAndNotNullTerm
-            = CreatedAttributeTermFactory.INSTANCE.createCreatedAndNotNullTerm(services, t_mem);
-        result = TB.and(result, initialMemCreatedAndNotNullTerm);
-        
+        Term t_mem = null;
+
+	final ProgramVariable stack = services.getJavaInfo().getAttribute(
+					     "stack", "javax.realtime.MemoryArea");
+	ProgramVariable initialMemoryArea = services.getJavaInfo().getDefaultMemoryArea();
+	t_mem = TB.var(initialMemoryArea);
+	result = TB.and(result, TB.not(TB.equals(TB.dot(t_mem,stack), TB.NULL(services))));
+	    
+	Term initialMemCreatedAndNotNullTerm
+	    = CreatedAttributeTermFactory.INSTANCE.createCreatedAndNotNullTerm(services, t_mem);
+	result = TB.and(result, initialMemCreatedAndNotNullTerm);
+	        
         Term workingSpace=null;
         final ProgramVariable size = services.getJavaInfo().getAttribute(
                 "size", "javax.realtime.MemoryArea");
