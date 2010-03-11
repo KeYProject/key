@@ -76,7 +76,7 @@ public class JavaInfo {
      *    java.lang.Object, java.lang.Clonable, java.io.Serializable
      * in </em>in this order</em>
      */
-    private KeYJavaType[] commonTypes = new KeYJavaType[4];
+    private KeYJavaType[] commonTypes = new KeYJavaType[6];
 
     //some caches for the getKeYJavaType methods.
     private HashMap<Sort, KeYJavaType> sort2KJTCache = null;
@@ -1064,7 +1064,9 @@ public class JavaInfo {
         if (commonTypesCacheValid) return;
         final String[] fullNames = {"java.lang.Object", 
                 "java.lang.Cloneable", "java.io.Serializable",
-                "javax.realtime.MemoryArea"};
+                "javax.realtime.MemoryArea",
+                "javax.realtime.ScopedMemory",
+                "javax.realtime.ImmortalMemory"};
         
         for (int i = 0; i<fullNames.length; i++) {
             commonTypes[i] = getKeYJavaTypeByClassName(fullNames[i]);            
@@ -1113,6 +1115,25 @@ public class JavaInfo {
         return commonTypes[3];
     }
 
+    /**
+     * returns the KeYJavaType for class <tt>java.realtime.ScopedMemory</tt>
+     */
+    public KeYJavaType getJavaxRealtimeScopedMemory() {
+        if (commonTypes[4] == null) {
+            commonTypes[4] = getKeYJavaTypeByClassName("javax.realtime.ScopedMemory");
+        }
+        return commonTypes[4];
+    }
+
+    /**
+     * returns the KeYJavaType for class <tt>java.realtime.ImmortalMemory</tt>
+     */
+    public KeYJavaType getJavaxRealtimeImmortalMemory() {
+        if (commonTypes[5] == null) {
+            commonTypes[5] = getKeYJavaTypeByClassName("javax.realtime.ImmortalMemory");
+        }
+        return commonTypes[5];
+    }
 
     
     /**

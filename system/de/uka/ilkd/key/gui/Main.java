@@ -2658,6 +2658,7 @@ public class Main extends JFrame implements IMain {
 			opt[index + 1].toUpperCase().equals("MEMORY")) {
 			memory = true;
 			System.out.println("Memory consumption calculus enabled");
+			index++;
 		    }
 		    ProofSettings.DEFAULT_SETTINGS.setProfile(new RTSJProfile(memory));
 		} else if (opt[index].equals("PERC")) {

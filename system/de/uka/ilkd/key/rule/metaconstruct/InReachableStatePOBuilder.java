@@ -376,7 +376,7 @@ public class InReachableStatePOBuilder extends TermBuilder {
      * Generates a formula ensuring that the update does not lead to a state in which
      * a memory scope is allocated in one of its inner scopes
      * The formula is:
-     *    \forall MemoryArea m; m.<created> = TRUE -> ¬ outerScope(m.stack, m.<memoryArea>.stack)
+     *    \forall MemoryArea m; ((m.<created> = TRUE & outerScope(m.stack, m.<memoryArea>.stack)) -> m=ImmortalMemory.instance
      * @param update
      * @return a formula that evaluates to true if no memory scope is allocated in one of its inner scopes
      */
@@ -385,7 +385,11 @@ public class InReachableStatePOBuilder extends TermBuilder {
             new LogicVariable(new Name("m"),
                     services.getJavaInfo().getJavaxRealtimeMemoryArea().getSort()); 
         final Term m_created = equals(dot(var(m), created), TRUE);
-        return update(update, all(m, imp(m_created, not(func(os, dot(var(m), stack), dot(dot(var(m), ma), stack))))));
+        return update(update, all(m, imp(and(m_created, func(os, dot(var(m), stack), dot(dot(var(m), ma), stack))), 
+					 equals(var(m), var(services.getJavaInfo().getAttribute("instance", 
+											    services.getJavaInfo().
+												getJavaxRealtimeImmortalMemory())
+							    )))));
     }
     
     /**
