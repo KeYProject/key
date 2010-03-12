@@ -23,6 +23,9 @@ import de.uka.ilkd.key.util.ProgressMonitor;
 
 public interface SMTSolver extends de.uka.ilkd.key.smt.launcher.Process{
     
+
+
+    
     /**
      * This solver's name.
      */
@@ -111,6 +114,11 @@ public interface SMTSolver extends de.uka.ilkd.key.smt.launcher.Process{
      * @return the command used for execution of the programm on default
      */
     public String getDefaultExecutionCommand();
+    
+    
+
+    
+
     
     /**
      * add a monitor to watch the Progress in the execution.

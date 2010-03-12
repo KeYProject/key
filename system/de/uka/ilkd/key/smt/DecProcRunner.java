@@ -260,13 +260,13 @@ public class DecProcRunner extends SwingWorker {
     }
     
     private BuiltInRule getIntegerDecisionProcedure() {
-	final Name simpRuleName = proof.getSettings().getDecisionProcedureSettings().getActiveRule().getRuleName();
+	/*final Name simpRuleName = proof.getSettings().getDecisionProcedureSettings().getActiveRule().getRuleName();
 	final ImmutableList<BuiltInRule> rules = proof.getSettings().getProfile().getStandardRules().getStandardBuiltInRules();
         for (BuiltInRule r : rules) {
             if (r.name().equals(simpRuleName)) {
         	return r;
             }
-        }	
+        }*/	
         return null;
     }	
 

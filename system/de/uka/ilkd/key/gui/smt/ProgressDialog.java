@@ -73,7 +73,8 @@ public class ProgressDialog extends JDialog{
 	
 	
 	private ProgressDialog(){
-	    	setSize(300, 200);
+	    	setSize(500, 200);
+	    	setLocationByPlatform(true);
 		setLayout(new BorderLayout());
 	
 		getList().setCellRenderer(new ListCellRenderer(){

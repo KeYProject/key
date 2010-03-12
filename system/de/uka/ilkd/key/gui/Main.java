@@ -22,6 +22,7 @@ import java.awt.event.*;
 import java.io.*;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -34,7 +35,6 @@ import javax.swing.text.JTextComponent;
 import org.apache.log4j.Logger;
 
 import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.gui.DecisionProcedureSettings.RuleDescriptor;
 import de.uka.ilkd.key.gui.assistant.ProofAssistant;
 import de.uka.ilkd.key.gui.assistant.ProofAssistantAI;
 import de.uka.ilkd.key.gui.assistant.ProofAssistantController;
@@ -47,6 +47,7 @@ import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
 import de.uka.ilkd.key.gui.notification.events.GeneralInformationEvent;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 import de.uka.ilkd.key.gui.prooftree.ProofTreeView;
+import de.uka.ilkd.key.gui.smt.RuleLauncher;
 import de.uka.ilkd.key.java.NonTerminalProgramElement;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Statement;
@@ -62,6 +63,7 @@ import de.uka.ilkd.key.proof.mgt.NonInterferenceCheck;
 import de.uka.ilkd.key.proof.mgt.TaskTreeNode;
 import de.uka.ilkd.key.proof.reuse.ReusePoint;
 import de.uka.ilkd.key.smt.DecProcRunner;
+import de.uka.ilkd.key.smt.SMTRuleNew;
 import de.uka.ilkd.key.strategy.VBTStrategy;
 import de.uka.ilkd.key.unittest.UnitTestBuilder;
 import de.uka.ilkd.key.unittest.UnitTestBuilderGUIInterface;
@@ -237,7 +239,7 @@ public class Main extends JFrame implements IMain {
     private NotificationManager notificationManager;
 
     /** The radio items shown in the decproc menu for the different available solver */
-    private final ArrayList<JRadioButtonMenuItem> showndecProcRadioItems = new ArrayList<JRadioButtonMenuItem>();
+    private ButtonGroup  decProcRadioItems = new ButtonGroup();
     
     /** The menu for the decproc options */
     public final JMenu decProcOptions = new JMenu("Decision Procedures");
@@ -681,7 +683,7 @@ public class Main extends JFrame implements IMain {
 
     private JButton createDecisionProcedureButton() {	
 	decisionProcedureInvocationButton = new JButton();	
-	RuleDescriptor r = ProofSettings.DEFAULT_SETTINGS.getDecisionProcedureSettings().getActiveRule();
+	SMTRuleNew r = ProofSettings.DEFAULT_SETTINGS.getDecisionProcedureSettings().getActiveSMTRule();
 	decisionProcedureInvocationButton.setAction(new DPInvokeAction(r));
 	return decisionProcedureInvocationButton;
     }
@@ -1566,22 +1568,43 @@ public class Main extends JFrame implements IMain {
 //	 the button group which takes care of selecting and unselecting not 
         // activated entries
         //final ButtonGroup dpButtonGroup = new ButtonGroup();
-	for (JRadioButtonMenuItem rbm : showndecProcRadioItems)
+	/*for (JRadioButtonMenuItem rbm : showndecProcRadioItems)
 	    decProcOptions.remove(rbm);
+	*/
+	//showndecProcRadioItems.removeAll(showndecProcRadioItems);
 	
-	showndecProcRadioItems.removeAll(showndecProcRadioItems);
+
+	Enumeration<AbstractButton> en = decProcRadioItems.getElements();
+	while(en.hasMoreElements()){
+	    decProcOptions.remove(en.nextElement());
+	    
+	}
+
+	
+	decProcRadioItems =  new ButtonGroup();
+	
 	
 	final DecisionProcedureSettings dps = ProofSettings.DEFAULT_SETTINGS.getDecisionProcedureSettings();
 	
 	int targetIndex = 0;
-	for (RuleDescriptor r : dps.getAvailableRules()) {
+	for(SMTRuleNew rule : dps.getInstalledRules()){
+	    
+	    final JRadioButtonMenuItem b = new JRadioButtonMenuItem();
+	    decProcRadioItems.add(b);
+	    b.setAction(new DPSelectionAction(rule, b));
+	    decProcOptions.add(b, targetIndex);
+	    
+	    targetIndex++;
+	    
+	}
+	/*for (RuleDescriptor r : dps.getAvailableRules()) {
 	    final JRadioButtonMenuItem b = new JRadioButtonMenuItem();
 	    b.setAction(new DPSelectionAction(r, b, showndecProcRadioItems));
 	    decProcOptions.add(b, targetIndex);
 	    targetIndex++;
 	    showndecProcRadioItems.add(b);
 	    //dpButtonGroup.add(b);
-	}
+	}*/
     }
     
     JCheckBoxMenuItem showSMTResDialog;
@@ -1696,14 +1719,14 @@ public class Main extends JFrame implements IMain {
 	decProcOptions.add(saveSMTFile);
 	
 	// add a checkbox for setting the 'waitForAllProvers'-Option
-	waitForAllProvers = new JCheckBoxMenuItem("Wait for all provers");
+	/*waitForAllProvers = new JCheckBoxMenuItem("Wait for all provers");
 	waitForAllProvers.setSelected(dps.isWaitingForAllProvers());
 	waitForAllProvers.addActionListener(new ActionListener() {
 		   public void actionPerformed(ActionEvent e) {
 		       dps.setWaitForAllProvers(waitForAllProvers.isSelected());
 		   }
 		});
-	decProcOptions.add(waitForAllProvers);
+	decProcOptions.add(waitForAllProvers);*/
 	
 
 	
@@ -2172,7 +2195,7 @@ public class Main extends JFrame implements IMain {
 	
 	public void update() {	   
 	    if (settings != null) {
-		RuleDescriptor activeRule = settings.getActiveRule();				
+		SMTRuleNew activeRule = settings.getActiveSMTRule();				
 		decisionProcedureInvocationButton.
 				
 		setAction(new DPInvokeAction(activeRule));
@@ -3121,18 +3144,19 @@ public class Main extends JFrame implements IMain {
      */
     private final class DPInvokeAction extends AbstractAction {
 
-	private final RuleDescriptor decisionProcedure;
+	private final SMTRuleNew decisionProcedure;
 	
-	public DPInvokeAction(RuleDescriptor decisionProcedure) {
+	public DPInvokeAction(SMTRuleNew decisionProcedure) {
 	    assert decisionProcedure != null;
 	    this.decisionProcedure = decisionProcedure;
+	
 
-	    putValue(SMALL_ICON, IconFactory.simplifyLogo(TOOLBAR_ICON_SIZE));	    
+	   // putValue(SMALL_ICON, IconFactory.simplifyLogo(TOOLBAR_ICON_SIZE));	    
 	  
-	    putValue(NAME, decisionProcedure.getDisplayName());
+	    putValue(NAME, decisionProcedure.displayName());
 		
-	    if (!DecisionProcedureSettings.NOT_A_RULE.equals(decisionProcedure)) {
-		putValue(SHORT_DESCRIPTION, "Invokes " + decisionProcedure.getDisplayName());
+	    if (decisionProcedure != SMTRuleNew.EMPTY_RULE) {
+		putValue(SHORT_DESCRIPTION, "Invokes " + decisionProcedure.displayName());
 	    } else {		
 		putValue(SHORT_DESCRIPTION, "Please select an external prover under Options | Decision Procedures.");
 	    }
@@ -3140,15 +3164,14 @@ public class Main extends JFrame implements IMain {
 	}
 	
 	public boolean isEnabled() {
-	    return super.isEnabled() && !decisionProcedure.equals(DecisionProcedureSettings.NOT_A_RULE) && 
+	    return super.isEnabled() && decisionProcedure != SMTRuleNew.EMPTY_RULE && 
  	      mediator != null && mediator.getProof() != null && !mediator.getProof().closed();
 	}
 	  
 	public void actionPerformed(ActionEvent e) {
 	    if (!mediator.ensureProofLoaded()) return;
 	    final Proof proof = mediator.getProof();
-	    new DecProcRunner(Main.this, proof, 
-			proof.getUserConstraint().getConstraint()).start();
+	    RuleLauncher.INSTANCE.start(decisionProcedure, proof,proof.getUserConstraint().getConstraint());
 	}	
     }
     
@@ -3158,18 +3181,17 @@ public class Main extends JFrame implements IMain {
      * updates the decision procedure settings of the current proof settings. 
      */
     private final class DPSelectionAction extends AbstractAction {
-	private final RuleDescriptor decisionProcedure;
+	private final SMTRuleNew decisionProcedure;
 	// currently necessary as property SELECTED_KEY support first since JDK >= 1.6
 	private final JRadioButtonMenuItem radioButton;
-	private final ArrayList<JRadioButtonMenuItem> allRadios;
+	
 
-	public DPSelectionAction(RuleDescriptor decisionProcedure, JRadioButtonMenuItem radioButton
-		, ArrayList<JRadioButtonMenuItem> allbutt) {	    
+	public DPSelectionAction(SMTRuleNew decisionProcedure, JRadioButtonMenuItem radioButton) {	    
 	    this.decisionProcedure = decisionProcedure;
 	    this.radioButton = radioButton;  
-	    this.allRadios = allbutt;
 	    
-	    final RuleDescriptor activeRule = getCurrentDPSettings().getActiveRule();
+	    
+	    final SMTRuleNew activeRule = getCurrentDPSettings().getActiveSMTRule();
 	    
 	    if (activeRule.equals(decisionProcedure)) {
 		radioButton.setSelected(true);
@@ -3177,11 +3199,11 @@ public class Main extends JFrame implements IMain {
 		radioButton.setSelected(false);
 	    }
 
-	    putValue(SMALL_ICON, IconFactory.simplifyLogo(TOOLBAR_ICON_SIZE));	    
+	   
 
-	    putValue(NAME, decisionProcedure.getDisplayName());
-	    if (!decisionProcedure.equals(DecisionProcedureSettings.NOT_A_RULE)) {		
-		putValue(SHORT_DESCRIPTION, "Use '" + decisionProcedure.getDisplayName() + "' as external prover.");
+	    putValue(NAME, decisionProcedure.displayName());
+	    if (decisionProcedure != SMTRuleNew.EMPTY_RULE) {		
+		putValue(SHORT_DESCRIPTION, "Use '" + decisionProcedure.displayName() + "' as external prover.");
 	    } else {
 		putValue(SHORT_DESCRIPTION, "Do not use any external prover.");
 	    }
@@ -3193,12 +3215,9 @@ public class Main extends JFrame implements IMain {
 	}
 	
 	public void actionPerformed(ActionEvent e) {
-	    getCurrentDPSettings().setActiveRule(decisionProcedure.getRuleName());
-	    //set all radiobutton as unselected. so in the end, only one is selected.
-	    for (JRadioButtonMenuItem rbmi : allRadios) {
-		rbmi.setSelected(false);
-	    }
-	    radioButton.setSelected(true); // if we change to Java 6 delete radioButton and add here putValue(SELECTED_KEY, true)
+	    
+	    getCurrentDPSettings().setActiveSMTRule(decisionProcedure);
+
 	}
 
 	private DecisionProcedureSettings getCurrentDPSettings() {

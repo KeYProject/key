@@ -14,6 +14,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 
+import com.sun.org.apache.bcel.internal.generic.GETSTATIC;
+
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Services;
@@ -44,11 +46,21 @@ class BuiltInRuleAppSMT extends BuiltInRuleApp{
 }
 
 
+
+
 public class SMTRuleNew  extends ProcessLauncher implements BuiltInRule{
 
+    
+    
+
+
+    public final static SMTRuleNew EMPTY_RULE = new EmptyRule();
+    
     private Collection<SMTSolver> solvers = new LinkedList<SMTSolver>();
     private Constraint 	           userConstraint = null;
     private Proof		   proof;
+    private Name 	           name;
+    private final boolean 	   multiRule;
  
     public void init(){
 	userConstraint = null;
@@ -56,11 +68,23 @@ public class SMTRuleNew  extends ProcessLauncher implements BuiltInRule{
 	super.init();
     }
     
-    
-    public SMTRuleNew(SMTSolver ... list){
+    public SMTRuleNew(Name name,boolean multi ,SMTSolver ... list){
+	multiRule = multi;
+	
 	for(SMTSolver solver : list){
-	   solvers.add(solver);   
+		   solvers.add(solver);   
 	}
+	this.name = name;
+    
+    }
+    
+    public SMTRuleNew(Name name, SMTSolver ... list){
+	this(name,list.length>1,list);
+	
+    }
+    
+    public boolean isUsable(){
+	return getInstalledSolvers().size() > 0;
     }
     
 
@@ -73,9 +97,14 @@ public class SMTRuleNew  extends ProcessLauncher implements BuiltInRule{
     public Collection<SMTSolver> getInstalledSolvers(){
 	Collection<SMTSolver> installed = new LinkedList<SMTSolver>();
 	for(SMTSolver solver : solvers){
-	    if(solver.isInstalled(false)){
+	    if(solver.isInstalled(false) && 
+		    (((((AbstractSMTSolver)solver).useForMultipleRule() && multiRule)) || !multiRule)){
+		
 		installed.add(solver);
 	    }
+	}
+	if(multiRule && installed.size() == 1){
+	    installed.clear();
 	}
 	return installed;
     }
@@ -118,17 +147,14 @@ public class SMTRuleNew  extends ProcessLauncher implements BuiltInRule{
 	startThread(goals,constraint);
     }
     
-    public void start(Proof proof, Constraint constraint){
+    
+    public void start(Collection<Goal> goals, Proof proof, Constraint constraint){
 	init();
-	LinkedList<Goal> goals = new LinkedList<Goal>();
 	this.proof = proof;
-	for (Goal goal : proof.openGoals()) {
-	     goals.add(goal);
-	}
-	
-	
 	startThread(goals,constraint);
     }
+    
+
     
     private void startThread(Collection<Goal> goals,Constraint constraint){
 	userConstraint = constraint;
@@ -142,9 +168,32 @@ public class SMTRuleNew  extends ProcessLauncher implements BuiltInRule{
     
 
     public String displayName() {
-	String s = "NEW: ";
-	for(SMTSolver solver : getInstalledSolvers()){
-	    s += solver.name()+" ";
+	String s = "";
+	int i=0; 
+	
+	if(multiRule && !isUsable()){
+	    return "multiple provers: disabled";
+	}
+	
+	for(SMTSolver solver : solvers){
+	    if(!solver.isInstalled(false) && multiRule){
+		i++;
+		continue;
+	    }
+	  
+	    if(multiRule){
+	
+		    
+		 i++;
+		 if(i > 1){
+		     s += ", ";
+		    }else{
+			s += " ";
+		    }
+	    }
+	    
+	    s += solver.name();
+
 	}
 	return s;
     }
@@ -152,7 +201,7 @@ public class SMTRuleNew  extends ProcessLauncher implements BuiltInRule{
     
     public Name name() {
 	
-	return new Name(displayName());
+	return name;
     }
     
     public String getTitle(){
@@ -173,6 +222,10 @@ public class SMTRuleNew  extends ProcessLauncher implements BuiltInRule{
 	                userConstraint,res.result); 
 	    res.goal.apply(birApp);
 	}
+    }
+    
+    public String toString(){
+	return displayName();
     }
     
 
@@ -239,11 +292,71 @@ public class SMTRuleNew  extends ProcessLauncher implements BuiltInRule{
 	 
 	
     }
+    
+   
 
+}
+
+
+class EmptyRule extends SMTRuleNew{
+    public void init(){
+    }
+    
+    
+    public EmptyRule(){
+	super(new Name("EMPTY_RULE"));
+    }
+    
+
+    public boolean isApplicable(Goal goal, PosInOccurrence pio,
+            Constraint userConstraint) {
+	return false;
+    }
+
+    public Collection<SMTSolver> getInstalledSolvers(){
+	Collection<SMTSolver> installed = new LinkedList<SMTSolver>();
+	return installed;
+    }
+
+    public ImmutableList<Goal> apply(Goal goal, Services services,
+            RuleApp ruleApp) {
+	return null;
+    }
+
+
+    public void stop(){
+	this.cancelMe();
+    }
+    
   
     
-
- 
+    public void start(Goal goal, Constraint constraint){
+    }
+    
+    public void start(Proof proof, Constraint constraint){
+    }
     
 
+    
+
+    public String displayName() {
+	return "N/A";
+
+    }
+
+    
+  
+    
+ 
+    
+    public void applyResults(){
+    }
+    
+
+
+
+
+    @Override
+    protected void publish(Event e) {
+    }
 }

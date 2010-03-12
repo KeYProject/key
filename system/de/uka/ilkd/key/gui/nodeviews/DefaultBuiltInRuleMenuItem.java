@@ -12,6 +12,7 @@ import javax.swing.JMenuItem;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.smt.SMTRule;
 import de.uka.ilkd.key.smt.SMTRuleMulti;
+import de.uka.ilkd.key.smt.SMTRuleNew;
 
 /** 
  * equal to TacletMenuItem but for BuiltInRules
@@ -21,7 +22,7 @@ class DefaultBuiltInRuleMenuItem extends JMenuItem implements BuiltInRuleMenuIte
     private BuiltInRule connectedTo;
     
     public DefaultBuiltInRuleMenuItem(BuiltInRule connectedTo) {
-        super(connectedTo.name().toString());
+        super(connectedTo.displayName());
         this.connectedTo = connectedTo;
         //if the rule is not installed, don't make it usable.
         // check the SMTRule
@@ -33,6 +34,12 @@ class DefaultBuiltInRuleMenuItem extends JMenuItem implements BuiltInRuleMenuIte
         // check the SMTRule for multiple provers
         if (connectedTo instanceof SMTRuleMulti) {
             if (!((SMTRuleMulti)connectedTo).isUsable()) {
+        	this.setEnabled(false);
+            }
+        }
+        
+        if (connectedTo instanceof SMTRuleNew) {
+            if (!((SMTRuleNew)connectedTo).isUsable()) {
         	this.setEnabled(false);
             }
         }

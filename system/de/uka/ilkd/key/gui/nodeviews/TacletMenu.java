@@ -23,6 +23,7 @@ import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.Main;
 import de.uka.ilkd.key.gui.smt.ProgressDialog;
+import de.uka.ilkd.key.gui.smt.RuleLauncher;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
@@ -356,15 +357,8 @@ class TacletMenu extends JMenu {
         	    ((BuiltInRuleMenuItem) e.getSource()).connectedTo() instanceof SMTRuleNew) {
         	    
         	    SMTRuleNew rule = (SMTRuleNew) ((BuiltInRuleMenuItem) e.getSource()).connectedTo();
-        	    System.out.println("Start");
-        	
-        	   
-        	    rule.start(selectedGoal,
+        	    RuleLauncher.INSTANCE.start(rule, selectedGoal,
         		    Main.getInstance().mediator().getProof().getUserConstraint().getConstraint());
-        	    LinkedList<Goal> list = new LinkedList<Goal>();
-        	    list.add(selectedGoal);
-        	    ProgressDialog.INSTANCE.prepare(rule.getInstalledSolvers(),list,rule);
-        	    ProgressDialog.INSTANCE.showDialog();
         	   /* new DecProcRunner(Main.getInstance()
         		, selectedGoal//Main.getInstance().mediator().getProof()
         		, Main.getInstance().mediator().getProof().getUserConstraint().getConstraint()

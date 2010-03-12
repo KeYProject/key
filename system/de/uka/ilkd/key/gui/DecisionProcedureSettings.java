@@ -17,58 +17,21 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.smt.AbstractSMTSolver;
+import de.uka.ilkd.key.smt.CVC3Solver;
 import de.uka.ilkd.key.smt.SMTRule;
 import de.uka.ilkd.key.smt.SMTRuleMulti;
+import de.uka.ilkd.key.smt.SMTRuleNew;
 import de.uka.ilkd.key.smt.SMTSolver;
+import de.uka.ilkd.key.smt.SimplifySolver;
+import de.uka.ilkd.key.smt.YicesSolver;
+import de.uka.ilkd.key.smt.Z3Solver;
 
 /** This class encapsulates the information which 
  *  decision procedure should be used.
  */
 public class DecisionProcedureSettings implements Settings {
     
-    public static final RuleDescriptor NOT_A_RULE = 
-	    new RuleDescriptor(new Name("N/A"), "None Selected");
-    
-    /**
-     * Small data container wrapping name and display name of a rule     
-     */
-    public static class RuleDescriptor implements Comparable<RuleDescriptor> {		
-	
-	private final Name ruleName;
-	private final String displayName;
-	
-	public RuleDescriptor(Name ruleName, String displayName) {
-	    this.ruleName    = ruleName;
-	    this.displayName = displayName; 
-	}
-	public String getDisplayName() {
-	    return displayName;
-	}
-
-	public Name getRuleName() {
-	    return ruleName;
-	}
-	
-	public boolean equals(Object o) {
-	    if (o instanceof RuleDescriptor) {
-		return ((RuleDescriptor) o).ruleName.equals(ruleName);
-	    }
-	    return false;
-	}
-	
-	public String toString() {
-	    return ruleName + "(" + displayName + ")";
-	}
-	
-	public int hashCode() {
-	    return ruleName.hashCode();
-	}
-	
-	public int compareTo(RuleDescriptor rd) {
-	    return ruleName.compareTo(rd.ruleName);
-	}
-    }
-    
+   
     /** String used in the Settings to store the active rule */
     private static final String ACTIVE_RULE  = "[DecisionProcedure]ActiveRule";
     
@@ -79,8 +42,7 @@ public class DecisionProcedureSettings implements Settings {
     private static final String SHOW_SMT_RES_DIA="[DecisionProcedure]showSMTResDialog";
     
     private static final String MULTIPLEPROVERS="[DecisionProcedure]multprovers";
-    
-    private static final String WAITFORALLPROVERS = "[DecisionProcedure]WaitForAllProvers";
+
     
     /**@see {@link de.uka.ilkd.key.smt.SmtLibTranslatorWeaker} */
     private static final String WEAKENSMTTRANSLATION = "[DecisionProcedure]WeakenSMTTranslation";
@@ -88,20 +50,17 @@ public class DecisionProcedureSettings implements Settings {
     /** the list of registered SettingListener */
     private LinkedList<SettingsListener> listenerList = new LinkedList<SettingsListener>();
     
-    /** the list of RuleDescriptors of available SMTRules */
-    private ArrayList<RuleDescriptor> rules = new ArrayList<RuleDescriptor>();
+
     
-    private HashMap<RuleDescriptor, SMTRule> descriptorToRule = new HashMap<RuleDescriptor, SMTRule>();
+    private LinkedList<SMTRuleNew> smtRules = new LinkedList<SMTRuleNew>();
+   
     
     
-    /** stores a reference on the 'MultipleProverRule'*/
-    private SMTRuleMulti ruleMultipleProvers = null;
     
-    /** the list of all ruledescriptors of all rules that are installed */
-    private ArrayList<RuleDescriptor> installedrules = new ArrayList<RuleDescriptor>();
+    private static Collection<AbstractSMTSolver>  solvers = new LinkedList<AbstractSMTSolver>();
     
-    /** the currently active rule */
-    private Name activeRule = NOT_A_RULE.getRuleName();
+    /** the currently active rule */    
+    private SMTRuleNew activeSMTRule = SMTRuleNew.EMPTY_RULE;
     
     /** the value of the timeout in tenth of seconds.*/
     private int timeout = 600;
@@ -126,7 +85,7 @@ public class DecisionProcedureSettings implements Settings {
     
     
     private String multProversSettings=null;
-    private boolean waitForAllProvers = false;
+
 
     
     
@@ -150,26 +109,29 @@ public class DecisionProcedureSettings implements Settings {
      * @param ruleName the String unambiguously specifying a rule 
      * @return the found SMTRule or <code>null</code> 
      */
-    public RuleDescriptor findRuleByName(String ruleName) {
-	for (RuleDescriptor r : rules) {	
-	    Name descNameObj = r.getRuleName();
-	    String descName = descNameObj.toString();
-	    if (descName.equals(ruleName)) {
-		return r;
+    public SMTRuleNew findRuleByName(String name){
+	
+	for(SMTRuleNew rule : getSMTRules()){
+	    if(rule.name().equals(name)){
+		return rule;
 	    }
 	}
-	return NOT_A_RULE;
+	return SMTRuleNew.EMPTY_RULE;
     }
     
-    /**
-     * retrieves the rule of the specified name or returns <code>null</code> if
-     * no such rule exists
-     * @param ruleName the String unambiguously specifying a rule 
-     * @return the found SMTRule or <code>null</code> 
-     */
-    public RuleDescriptor findRuleByName(Name ruleName) {
-	return this.findRuleByName(ruleName.toString());
+    
+    public AbstractSMTSolver findSolverByName(String name){
+	for(AbstractSMTSolver solver : getSolvers()){
+		    if(solver.name().equals(name)){
+			return solver;
+		    }
+		} 
+	
+
+	return null;
     }
+
+
     
     
     /** sends the message that the state of this setting has been
@@ -181,42 +143,45 @@ public class DecisionProcedureSettings implements Settings {
         }
     }
     
+
+    
+    public SMTRuleNew getActiveSMTRule(){
+	return activeSMTRule;
+    }
+
+    
+    public void setSolvers(Collection<AbstractSMTSolver> s){
+	
+	
+	solvers = s;
+	
+    }
+    
+    public final Collection<AbstractSMTSolver> getSolvers(){
+	
+	return solvers;
+    }
+    
+    
+    public Collection<SMTRuleNew> getSMTRules(){
+
+	return smtRules;
+    }
+    
+
     /**
-     * returns the active rule
-     * @return the active rule
+     * Returns a list of all installed rules, sorted alphabetically by rule name.
      */
-    public RuleDescriptor getActiveRule() {
-	RuleDescriptor rd = this.findRuleByName(this.activeRule);
-	if (this.installedrules.contains(rd)) {
-	    return rd;
-	} else if (this.installedrules.size() == 0) {
-	    this.activeRule = NOT_A_RULE.getRuleName();
-	    return NOT_A_RULE;
-	} else {
-	    rd = this.installedrules.get(0);
-	    this.setActiveRule(rd.getRuleName());
-	    return this.findRuleByName(this.activeRule);
+    public Collection<SMTRuleNew> getInstalledRules(){
+	Collection<SMTRuleNew> toReturn = new LinkedList<SMTRuleNew>();
+	
+	for(SMTRuleNew rule : getSMTRules()){
+	    if(rule.getInstalledSolvers().size() > 0){
+		toReturn.add(rule);
+	    }
 	}
-    }
-    
-    /**
-     * Returns a list of all installed rules, sorted alphabetically by rule name.
-     */
-    public List<RuleDescriptor> getAllRules() {
-	List<RuleDescriptor> sortedRules = new ArrayList<RuleDescriptor>();
-	sortedRules.addAll(rules);
-	Collections.sort(sortedRules);
-	return Collections.unmodifiableList(sortedRules);
-    }
-    
-    /**
-     * Returns a list of all installed rules, sorted alphabetically by rule name.
-     */
-    public List<RuleDescriptor> getAvailableRules() {
-	List<RuleDescriptor> toReturn = new ArrayList<RuleDescriptor>();
-	toReturn.addAll(this.installedrules);
-	Collections.sort(toReturn);
-	return Collections.unmodifiableList(toReturn);
+	
+	return toReturn;
     }
     
     /**
@@ -234,7 +199,9 @@ public class DecisionProcedureSettings implements Settings {
      */
     public void readSettings(Properties props) {	
 	String ruleString = props.getProperty(ACTIVE_RULE);
-	this.activeRule = new Name(ruleString);
+	System.out.println("rule: " +  ruleString);
+	this.activeSMTRule = findRuleByName(ruleString);
+	System.out.println("finish: " +  ruleString);
 	
 	String timeoutstring = props.getProperty(TIMEOUT);
 	if (timeoutstring != null) {
@@ -247,9 +214,8 @@ public class DecisionProcedureSettings implements Settings {
 	this.readExecutionString(props);
 	
 	multProversSettings = props.getProperty(MULTIPLEPROVERS);
+	readMultProversString();
 	
-	String wfap = props.getProperty(WAITFORALLPROVERS);
-    waitForAllProvers = wfap != null && wfap.equals("true");
 	
 	String sf = props.getProperty(SAVEFILE);
         this.saveFile = !(sf == null) && sf.equals("true");
@@ -276,9 +242,11 @@ public class DecisionProcedureSettings implements Settings {
 	    for (String s : valuepairs) {
 		String[] vals = s.split(execSeperator2);
 		if (vals.length == 2) {
-		    //if vals does not contain exactly two items, the entry in the settingsfile is not valid
-		    //RuleDescriptor rd = findRuleByName(vals[0]);
-		    execCommands.put(vals[0], vals[1]);
+		    AbstractSMTSolver solver = findSolverByName(vals[0]);
+		    if(solver != null){
+			setExecutionCommand(solver,vals[1]);
+			solver.isInstalled(true);
+		    }
 		}
 	    }
 	}
@@ -291,16 +259,20 @@ public class DecisionProcedureSettings implements Settings {
     private void readMultProversString()
     {
 	
+	
 	if(multProversSettings != null){
 	    String[] valuepairs = multProversSettings.split(multSeparator1);
 	    for(String s : valuepairs){
 		String[] vals = s.split(multSeparator2);
 		if(vals.length == 2){
-		    if(ruleMultipleProvers != null)
-		    {
-			if(vals[1].equals("true")) ruleMultipleProvers.useSMTSolver(vals[0], true);
-			else		   ruleMultipleProvers.useSMTSolver(vals[0], false);
+		    AbstractSMTSolver solver = findSolverByName(vals[0]);
+		    if(solver != null){
+			solver.useForMultipleRule(vals[1].equals("true"));
 		    }
+			
+			
+			
+		   
 		}
 	    }
 	}
@@ -312,17 +284,15 @@ public class DecisionProcedureSettings implements Settings {
      */
     private void writeExecutionString(Properties prop) {
 	String toStore = "";
-	for (String s : execCommands.keySet()) {
-	    RuleDescriptor rd = this.findRuleByName(s);
-	    if (rd != NOT_A_RULE) {
-		//do not save the execcommand for the not_a_rule dummy
-		String comm = execCommands.get(s);
+	for (AbstractSMTSolver solver : getSolvers()) {
+	     
+	     String comm = solver.getExecutionCommand();
 	    	if (comm == null) {
 			comm = "";
 	    	}
-	    	toStore = toStore + rd.ruleName.toString() + execSeperator2 + comm + execSeperator1;
+	    	toStore = toStore + solver.name() + execSeperator2 + comm + execSeperator1;
 	    }
-	}
+	
 	//remove the las two || again
 	if (toStore.length() >= execSeperator1.length()){
 	    //if the program comes here, a the end ad extra || was added.
@@ -337,14 +307,11 @@ public class DecisionProcedureSettings implements Settings {
     private void writeMultipleProversString(Properties prop) {
 	String toStore = "";
 	
-	ArrayList<String> listNames = ruleMultipleProvers.getNamesOfSolvers(); 
-	
-	for(String name : listNames){
-	    String value = ruleMultipleProvers.SMTSolverIsUsed(name) ? "true" : "false";
-	    toStore = toStore + name + multSeparator2 + value + multSeparator1;
-	    
+	for(AbstractSMTSolver solver : solvers){
+	    String value = solver.useForMultipleRule()? "true" : "false";
+	    toStore = toStore + solver.name() + multSeparator2 + value + multSeparator1; 
 	}
-	
+
 
 	if (toStore.length() >= multSeparator1.length()){
 	    toStore = toStore.substring(0, toStore.length()-multSeparator1.length());
@@ -352,37 +319,17 @@ public class DecisionProcedureSettings implements Settings {
 	prop.setProperty(MULTIPLEPROVERS, toStore);
     }
     
-    /**
-     * Set a execution command for a certain rule.
-     * @param rd the ruledescriptor, which uses this command.
-     * @param command the command to use
-     */
-    public void setExecutionCommand(RuleDescriptor rd, String command, boolean fire) {
-	SMTRule r = this.descriptorToRule.get(rd);
-	this.execCommands.put(rd.ruleName.toString(), command);
-	if (r.isInstalled(true)) {
-	    //add the rule to the installed rules (if not there yet)
-	    if (!this.installedrules.contains(rd)) {
-		this.installedrules.add(rd);
-	    }
-	} else {
-	    //remove from the installed rules
-	    if (this.installedrules.contains(rd)) {
-		this.installedrules.remove(rd);
-	    }
-	}
-	if(fire)
-	this.fireSettingsChanged();
-    }
+
     
     /**
-     * Set a execution command for a certain rule.
-     * @param r the rule, which uses this command.
+     * Set a execution command for a certain solver.
+     * @param s the solver, which uses this command.
      * @param command the command to use
      */
-    public void setExecutionCommand(AbstractSMTSolver r, String command) {
-	RuleDescriptor rd = this.findRuleByName(r.name());
-	this.setExecutionCommand(rd, command,true);
+    public void setExecutionCommand(AbstractSMTSolver s, String command) {
+	
+	s.setExecutionCommand(command);
+	
     }
     
     /**
@@ -390,55 +337,35 @@ public class DecisionProcedureSettings implements Settings {
      * @param r the rule
      * @return the execution command
      */
-    public String getExecutionCommand(AbstractSMTSolver r) {
-	return this.execCommands.get(this.findRuleByName(r.name()).ruleName.toString());
+    public String getExecutionCommand(AbstractSMTSolver solver) {
+	return solver.getExecutionCommand();
     }
     
 
 
-    /**
-     * recheck, if the rule is installed
-     * @param rd the ruleDescriptor
-     * @return true, if the given command results in executeable result.
-     */
-    public boolean checkCommand(RuleDescriptor rd, String Command) {
-	SMTRule r = descriptorToRule.get(rd);
-	String oldCommand = this.execCommands.get(rd); 
-	this.execCommands.put(rd.ruleName.toString(), Command);
-	boolean toReturn = r.isInstalled(true);
-	//remove the new connad again, as this is ust a test, no store
-	this.execCommands.put(rd.ruleName.toString(), oldCommand);
-	r.isInstalled(true);
-	return toReturn;
-    }
+
     
-    public boolean isInstalled(RuleDescriptor rd) {
-	return this.installedrules.contains(rd);
-    }
+
+
     
-    public String getExecutionCommand(RuleDescriptor rd) {
-	String toReturn = this.execCommands.get(rd.ruleName.toString());
-	if (toReturn == null || toReturn.length()==0) {
-	    //the default setting is used. Read this one from the DecProc
-	    toReturn = this.descriptorToRule.get(rd).defaultExecutionCommand();
-	}
-	return toReturn;
+    public boolean getMultipleUse(AbstractSMTSolver solver){
+	return solver.useForMultipleRule();
     }
     
     
-    public boolean getMultipleUse(RuleDescriptor rd)  {
+   /* public boolean getMultipleUse(RuleDescriptor rd)  {
 	SMTRule rule = descriptorToRule.get(rd);
 	SMTSolver s = rule.getSolver();
 	return this.ruleMultipleProvers.SMTSolverIsUsed(s);
-    }
+    }*/
     
-    public void setMultipleUse(RuleDescriptor rd, boolean multipleuse, boolean fire) {
+   /* public void setMultipleUse(RuleDescriptor rd, boolean multipleuse, boolean fire) {
 	SMTRule rule = descriptorToRule.get(rd);
 	SMTSolver s = rule.getSolver();
 	ruleMultipleProvers.useSMTSolver(s, multipleuse);
 	if(fire)
 	fireSettingsChanged();
-    }
+    }*/
     
     
     /**
@@ -453,13 +380,18 @@ public class DecisionProcedureSettings implements Settings {
      * if the specified rule is known it is set as active rule, otherwise or specifying <code>null</code>
      * deactivates the rule. 
      */
-    public void setActiveRule(Name ruleName) {
-	final RuleDescriptor rule = ruleName == null ? 
-		NOT_A_RULE : findRuleByName(ruleName.toString());
-	if (rule != findRuleByName(""+activeRule)) {
-	    this.activeRule = rule.getRuleName();
+    public void setActiveSMTRule(SMTRuleNew rule){
+	if(activeSMTRule != rule){
+	    if(rule == null){
+		activeSMTRule = SMTRuleNew.EMPTY_RULE;
+	    }else{
+		this.activeSMTRule = rule;
+	    }
+	 
 	    fireSettingsChanged();
 	}
+	
+
     }
 
 
@@ -479,26 +411,11 @@ public class DecisionProcedureSettings implements Settings {
      * @param profile the active Profile 
      */
     public void updateSMTRules(Profile profile) {
-	//Load the available Solver	
-	rules = new ArrayList<RuleDescriptor>();
-	this.installedrules = new ArrayList<RuleDescriptor>();
+	//Load the available SMTRules...	
 	for (Rule r : profile.
 		getStandardRules().getStandardBuiltInRules()) {
-	    if (r instanceof SMTRule) {
-		RuleDescriptor rd = new RuleDescriptor(r.name(),r.displayName());
-		rules.add(rd);
-		SMTRule smtr = (SMTRule)r;
-		this.descriptorToRule.put(rd, smtr);
-		if (smtr.isInstalled(false)) {
-		    installedrules.add(rd);
-		}
-	    }
-	    if(r instanceof SMTRuleMulti){
-		
-		ruleMultipleProvers = (SMTRuleMulti) r;
-		this.readMultProversString();
-		this.setWaitForAllProvers(waitForAllProvers);
-
+	    if(r instanceof SMTRuleNew){
+		this.smtRules.add((SMTRuleNew)r);
 	    }
 	}
 	
@@ -555,7 +472,7 @@ public class DecisionProcedureSettings implements Settings {
      * @param props the Properties object where to write the settings as (key, value) pair
      */
     public void writeSettings(Properties props) {	
-        props.setProperty(ACTIVE_RULE, "" + activeRule);
+        props.setProperty(ACTIVE_RULE, "" + activeSMTRule.name());
         props.setProperty(TIMEOUT, "" + this.timeout);
       
         if (this.saveFile)
@@ -575,7 +492,7 @@ public class DecisionProcedureSettings implements Settings {
             props.setProperty(WEAKENSMTTRANSLATION, "false");
         }
 
-        props.setProperty(WAITFORALLPROVERS, ruleMultipleProvers.isWaitingForAllProvers() ? "true":"false");
+       
         this.writeExecutionString(props);
         this.writeMultipleProversString(props);
     }
@@ -588,24 +505,7 @@ public class DecisionProcedureSettings implements Settings {
 	return instance;
     }
 
-    public boolean isWaitingForAllProvers() {
-	if(ruleMultipleProvers == null)	return waitForAllProvers;
-	return ruleMultipleProvers.isWaitingForAllProvers();
-    }
 
-    public void setWaitForAllProvers(boolean selected) {
-	
-	if(ruleMultipleProvers != null)
-	{
-	    if(ruleMultipleProvers.isWaitingForAllProvers() != selected){
-		ruleMultipleProvers.setWaitForAllProvers(selected);
-		this.fireSettingsChanged();
-	    }
-	    
-	    
-	}
-	
-    }
 
 
 

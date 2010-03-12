@@ -83,7 +83,16 @@ public abstract class AbstractSMTSolver extends AbstractProcess implements SMTSo
     private SolverSession session = null;
     
     public SolverSession getSession(){return session;}
-
+    
+    private boolean useForMultipleRule = false;
+    
+    private String   executionCommand = getDefaultExecutionCommand();
+    
+    
+    
+    public AbstractSMTSolver(){
+	//isInstalled(true);
+    }
 
 
     /**
@@ -409,6 +418,7 @@ public abstract class AbstractSMTSolver extends AbstractProcess implements SMTSo
 
 	//get the commands for execution
 	String execCommand = this.getFinalExecutionCommand(loc.getAbsolutePath(), formula);
+	System.out.println(execCommand);
 
 	try {
 	    //execute the external solver
@@ -549,6 +559,22 @@ public abstract class AbstractSMTSolver extends AbstractProcess implements SMTSo
 	this.toBeInterrupted = true;
     }
     
+    
+    private boolean checkEnvVariable(String cmd){
+	String filesep = System.getProperty("file.separator");
+	String path =  System.getenv("PATH");
+	String [] res = path.split(System.getProperty("path.separator"));
+	for(String s : res){
+	    File file = new File(s+ filesep + cmd);
+	    if(file.exists()){
+		return true;
+	    }
+	}
+	
+	return false;
+
+    }
+    
     /**
      * check, if this solver is installed and can be used.
      * @param recheck if false, the solver is not checked again, if a cached value for this exists.
@@ -556,7 +582,29 @@ public abstract class AbstractSMTSolver extends AbstractProcess implements SMTSo
      */
     public boolean isInstalled(boolean recheck) {
 	if (recheck | !installwaschecked) {
-	    this.inTestMode = true;
+	    
+	    System.out.println(getExecutionCommand());
+	    
+	    String cmd = getExecutionCommand();
+	    int first = cmd.indexOf(" ");
+	    if(first >= 0){
+		cmd = cmd.substring(0, first);
+	    }
+	    
+	    if(checkEnvVariable(cmd)){
+		isinstalled = true;
+	    } else{
+		File file = new File(cmd);
+		isinstalled = file.exists();
+		if(isinstalled){
+		    installwaschecked = true;
+		    return true;
+		}
+	    }
+
+	    
+	    
+	    /*this.inTestMode = true;
 	    try {
 		//This will cause an error, but no IOException, if installed.
 		//avoid to call the translator. A fakeds service element will
@@ -571,7 +619,8 @@ public abstract class AbstractSMTSolver extends AbstractProcess implements SMTSo
 		isinstalled = true;
 	    }
 	    this.inTestMode = false;
-	    installwaschecked = true;
+	    installwaschecked = true;*/
+	   
 	}
 	return isinstalled;
     }
@@ -713,6 +762,27 @@ public abstract class AbstractSMTSolver extends AbstractProcess implements SMTSo
     public String getTitle(){
 	return name();
     }
+
+    public boolean useForMultipleRule() {
+        return useForMultipleRule;
+    }
+    
+
+    public void useForMultipleRule(boolean b) {
+	useForMultipleRule = b;
+        
+    }
+
+
+    public void setExecutionCommand(String s) {
+        
+        executionCommand = s;
+    }
+    
+    public String getExecutionCommand(){
+	return executionCommand;
+    }
+    
 
 
     

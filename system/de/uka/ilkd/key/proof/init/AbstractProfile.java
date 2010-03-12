@@ -9,11 +9,13 @@ package de.uka.ilkd.key.proof.init;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.LinkedList;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.gui.DecisionProcedureSettings;
 import de.uka.ilkd.key.gui.IMain;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
@@ -89,35 +91,39 @@ public abstract class AbstractProfile implements Profile {
 
     protected ImmutableList<BuiltInRule> initBuiltInRules() {
         ImmutableList<BuiltInRule> builtInRules = ImmutableSLList.<BuiltInRule>nil();
-	ArrayList<SMTSolver> solverList = new ArrayList<SMTSolver>();
+	LinkedList<AbstractSMTSolver> solverList = new LinkedList<AbstractSMTSolver>();
 
-	solverList.add(new Z3Solver());
-	solverList.add(new YicesSolver());
-        solverList.add(new SimplifySolver());
-	solverList.add(new CVC3Solver());
+	AbstractSMTSolver z3 = new Z3Solver();
+	AbstractSMTSolver simplify = new SimplifySolver();
+	AbstractSMTSolver yices = new YicesSolver();
+	AbstractSMTSolver cvc3 = new CVC3Solver();
 	
+	solverList.add(z3);    
+	solverList.add(simplify);
+	solverList.add(yices);
+	solverList.add(cvc3);
+	
+	DecisionProcedureSettings.getInstance().setSolvers(solverList);
+	
+	 SMTRuleNew rules[] = {new SMTRuleNew(new Name("MULTIPLE_PROVER"),z3),
+	 		       new SMTRuleNew(new Name("YICES_PROVER"),yices),
+	 		      new SMTRuleNew(new Name("SIMPLIFY_PROVER"),simplify),
+	 		     new SMTRuleNew(new Name("CVC3_PROVER"),cvc3),
+	 		    new SMTRuleNew(new Name("MULTIPLE_PROVERS"),z3,
+	 			    	simplify,
+	 			    	yices,
+	 			    	cvc3)};
 	
         
-	// init builtIRule for using several provers at the same time
-	builtInRules = builtInRules.prepend(new SMTRuleMulti(solverList));
-        
-	// builtInRules for single use of provers
-	for(SMTSolver s : solverList){
-          builtInRules = builtInRules.prepend(new SMTRule(s));
-       
-	}        
+	for(SMTRuleNew rule : rules){
+	    builtInRules = builtInRules.prepend(rule);  
+	}
 	
-        SMTSolver z3 = new Z3Solver();
-        SMTSolver simplify = new SimplifySolver();
-        SMTSolver yices = new YicesSolver();
-        SMTSolver cvc3 = new CVC3Solver();
+
+	
         
         
-        builtInRules = builtInRules.prepend(new SMTRuleNew(z3));
-        builtInRules = builtInRules.prepend(new SMTRuleNew(simplify));
-        builtInRules = builtInRules.prepend(new SMTRuleNew(yices));
-        builtInRules = builtInRules.prepend(new SMTRuleNew(cvc3));
-        builtInRules = builtInRules.prepend(new SMTRuleNew(z3,simplify,yices,cvc3));
+     
         
         
         
@@ -213,7 +219,7 @@ public abstract class AbstractProfile implements Profile {
       * sets the given settings to some default depending on the profile
       */
      public void updateSettings(ProofSettings settings) {
-	 settings.getDecisionProcedureSettings().updateSMTRules(this);
+	settings.getDecisionProcedureSettings().updateSMTRules(this);
      }
 
      /**
