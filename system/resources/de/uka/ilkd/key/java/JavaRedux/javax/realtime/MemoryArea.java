@@ -4,9 +4,9 @@ public abstract class MemoryArea{
 
     public static MemoryArea currentMemoryArea;
 
-    public static MemoryArea callerScope;
-
-    public static MemoryArea constructedScope;
+    // PERC Pico specific
+    //    public static MemoryArea callerScope;
+    //    public static MemoryArea constructedScope;
 
     // public invariant stack!=null ==> (stack.top()==this && stack._stack.length>0);
     public MemoryStack /*@nullable@*/ stack;

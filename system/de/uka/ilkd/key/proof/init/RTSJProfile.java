@@ -28,8 +28,10 @@ public class RTSJProfile extends JavaProfile {
         dcs.put("rtsj", "rtsj:on");
         dcs.put("perc", "perc:off");
         if(memory){
-        	dcs.put("memoryConsumption", "memoryConsumption:on");
-        }
+	    dcs.put("memory", "memory:on");
+        }else{
+	    dcs.put("memory", "memory:off");
+	}
         cs.setDefaultChoices(dcs);
     }
     

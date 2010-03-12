@@ -54,6 +54,7 @@ public class InReachableStatePOBuilder extends TermBuilder {
     private final TermSymbol im;
     private final ProgramVariable ma;
     private final ProgramVariable stack;
+    private final ProgramVariable parent;
 
     public InReachableStatePOBuilder(Services services) {
         uf = new UpdateFactory(services, new UpdateSimplifier());
@@ -68,6 +69,9 @@ public class InReachableStatePOBuilder extends TermBuilder {
                         services.getJavaInfo().getJavaLangObject());
         this.stack = services.getJavaInfo().getAttribute(
                 "stack",
+                services.getJavaInfo().getJavaxRealtimeMemoryArea());
+        this.parent = services.getJavaInfo().getAttribute(
+                "parent",
                 services.getJavaInfo().getJavaxRealtimeMemoryArea());
         this.arraylength = services.getJavaInfo().getArrayLength();
         os = (TermSymbol) services.getNamespaces().functions().lookup(new Name("outerScope"));
@@ -86,6 +90,8 @@ public class InReachableStatePOBuilder extends TermBuilder {
      * to a legal pointer structure reachable from the current state.
      */
     public Term generatePO(Term updateInReachableState) {
+
+	boolean ax[] = new boolean[4];
 
         if (!(updateInReachableState.op() instanceof IUpdateOperator)) {
             return updateInReachableState;
@@ -131,8 +137,22 @@ public class InReachableStatePOBuilder extends TermBuilder {
                             if (pv.getContainerType().getJavaType() instanceof EnumClassDeclaration) {
                                 result = and(result, addNextToCreateEnumPO(pv, update));
                             }
-                            if(rt) result = and(result, newObjectRefsLegal(update, containerType));
-                            if(containerType instanceof ArraySort && rt){
+                            if(rt){
+				result = and(result, newObjectRefsLegal(update, containerType));
+				
+				if(containerType.extendsTrans(services.getJavaInfo().
+							      getJavaxRealtimeMemoryArea().getSort()) &&
+				   !ax[0]){
+				    scopeAllocInOuterScope(update);
+				    ax[0] = true;
+				}
+				if(!ax[1]){
+				    scopeNotNull(update);
+				    ax[1] = true;
+				}
+			    }
+                            if(containerType instanceof ArraySort && rt && 
+			       ((ArraySort) containerType).elementSort() instanceof ObjectSort){
                             	result = and(result, arraySlotOuterRef(update, containerType));
                             }
                         } else {
@@ -198,7 +218,26 @@ public class InReachableStatePOBuilder extends TermBuilder {
                                                 (AttributeOp) loc))));
                         result = all(vPre, imp(preAx, result));
                         if(rt){
-                        	result = and(result, attrOuterRef(update, pv));
+			    if(!pv.equals(parent) && !pv.equals(ma)){
+				result = and(result, attrOuterRef(update, pv));
+			    }
+			    if(pv.equals(stack) || pv.equals(ma)){
+				if(!ax[2]){
+				    result = and(result, legalReferencesRemainLegal(update));
+				    ax[2] = true;
+				}
+				if(!ax[0]){
+				    scopeAllocInOuterScope(update);
+				}
+				if((pv.equals(stack)) && !ax[3]){
+				    result = and(result, stackInjective(update));
+				    ax[3] = true;
+				}
+				if((pv.equals(ma)) && !ax[1]){
+				    scopeNotNull(update);
+				    ax[1] = true;
+				}
+			    }
                         }
                     } else if (pv == created) {
                         if (refPrefix.op() instanceof SortDependingFunction
@@ -345,11 +384,11 @@ public class InReachableStatePOBuilder extends TermBuilder {
      */
     private Term globalInvariants(Update update) {
         Term result = noObjectDeletion(update);
-        if(rt){
+	/* if(rt){
         	result = and(new Term[]{result, scopeAllocInOuterScope(update), 
         			scopeNotNull(update), legalReferencesRemainLegal(update)});
         	if(rtsj) result = and(result, stackInjective(update));
-        }
+		}*/
         return result;
     }
 
@@ -469,13 +508,16 @@ public class InReachableStatePOBuilder extends TermBuilder {
     	Iterator<Field> it = fields.iterator();
     	Term result = tt();
     	while(it.hasNext()){
-    		Field f = it.next();
-    		if(f.getProgramVariable().sort() instanceof ObjectSort){
-    			result = and(result, attrOuterRef(u, (ProgramVariable) f.getProgramVariable()));
-    		}
+	    Field f = it.next();
+	    if(f.getProgramVariable().sort() instanceof ObjectSort && 
+	       !((ProgramVariable) f.getProgramVariable()).isStatic() &&
+	       !(f.getProgramVariable().equals(parent) || f.getProgramVariable().equals(ma)) &&
+	       !((ProgramVariable) f.getProgramVariable()).isImplicit()){
+		result = and(result, attrOuterRef(u, (ProgramVariable) f.getProgramVariable()));
+	    }
     	}
-    	if(s instanceof ArraySort){
-    		result = and(result, arraySlotOuterRef(u, s));
+    	if(s instanceof ArraySort && ((ArraySort) s).elementSort() instanceof ObjectSort){
+	    result = and(result, arraySlotOuterRef(u, s));
     	}
     	return result;
     }

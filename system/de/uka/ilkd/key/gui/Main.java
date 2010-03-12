@@ -2653,11 +2653,11 @@ public class Main extends JFrame implements IMain {
                     visible = false;
 		} else if (opt[index].equals("RTSJ")) {
 		    boolean memory = false;
-		    System.out.println("RTSJ extensions enabled");
+		    System.out.println("RTSJ extensions enabled ...");
 		    if (index + 1 < opt.length && 
 			opt[index + 1].toUpperCase().equals("MEMORY")) {
 			memory = true;
-			System.out.println("Memory consumption calculus enabled");
+			System.out.println("Memory consumption calculus enabled ...");
 			index++;
 		    }
 		    ProofSettings.DEFAULT_SETTINGS.setProfile(new RTSJProfile(memory));

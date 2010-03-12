@@ -16,6 +16,7 @@ import de.uka.ilkd.key.collection.*;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.AtPreFactory;
 import de.uka.ilkd.key.proof.OpReplacer;
@@ -571,8 +572,28 @@ public final class OperationContractImpl implements OperationContract {
         FormulaWithAxioms post = atPreify(originalPre, 
                                           newAtPreFunctions, 
                                           services).imply(originalPost);
+
+	FormulaWithAxioms wsPost = atPreify(originalPre, 
+                                          newAtPreFunctions, 
+					    services).imply(originalWorkingSpacePost);
         ImmutableSet<LocationDescriptor> modifies = addGuard(originalModifies, 
                                                     originalPre.getFormula());
+	
+	Term[] argTerms = new Term[originalParamVars.size()+(programMethod.isStatic()?0:1)];
+	int i = 0;
+	if(!programMethod.isStatic()){
+	    argTerms[i++] = TB.var((ProgramVariable) originalSelfVar);
+	}
+	for(ParsableVariable var : originalParamVars){
+	    argTerms[i++] = TB.var((ProgramVariable) var);
+	}
+	
+	Term ws = TB.tf().createWorkingSpaceNonRigidTerm(programMethod, 
+							 (Sort) services.getNamespaces().
+							 sorts().lookup(new Name("int")),
+							 argTerms);
+	ws = TB.ife(pre.getFormula(), originalWorkingSpace, ws);
+
         for(OperationContract other : others) {
             FormulaWithAxioms otherPre = other.getPre(originalSelfVar, 
                                                       originalParamVars, 
@@ -583,6 +604,19 @@ public final class OperationContractImpl implements OperationContract {
                                                         originalExcVar, 
                                                         newAtPreFunctions, 
                                                         services);
+
+            FormulaWithAxioms otherWSPost = other.getWorkingSpacePost(originalSelfVar, 
+								      originalParamVars, 
+								      originalResultVar, 
+								      originalExcVar, 
+								      newAtPreFunctions, 
+								      services);
+
+	    Term otherWS = other.getWorkingSpace(originalSelfVar, 
+						 originalParamVars, 
+						 services);
+	    ws = TB.ife(otherPre.getFormula(), otherWS, ws);
+
             ImmutableSet<LocationDescriptor> otherModifies 
                     = other.getModifies(originalSelfVar, 
                                         originalParamVars, 
@@ -592,8 +626,12 @@ public final class OperationContractImpl implements OperationContract {
             post = post.conjoin(atPreify(otherPre, 
                                          newAtPreFunctions, 
                                          services).imply(otherPost));
+            wsPost = wsPost.conjoin(atPreify(otherPre, 
+					     newAtPreFunctions, 
+					     services).imply(otherWSPost));
             modifies = modifies.union(addGuard(otherModifies, 
                                       otherPre.getFormula()));
+
         }
 
         return new OperationContractImpl(p_name,
@@ -602,9 +640,9 @@ public final class OperationContractImpl implements OperationContract {
                                          modality,
                                          pre,
                                          post,
-					 null,
+					 wsPost,
                                          modifies,
-					 null,
+					 ws,
 					 null,
 					 null,
 					 null,

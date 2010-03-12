@@ -24,6 +24,8 @@ import recoder.java.reference.TypeReference;
 import recoder.kit.ProblemReport;
 import recoder.list.generic.ASTArrayList;
 import recoder.list.generic.ASTList;
+import de.uka.ilkd.key.gui.configuration.ProofSettings;
+import de.uka.ilkd.key.proof.init.PercProfile;
 import de.uka.ilkd.key.util.Debug;
 
 
@@ -152,12 +154,14 @@ public class ImplicitFieldAdder extends RecoderModelTransformer {
                 new Identifier("MemoryArea")), new ImplicitIdentifier(IMPLICIT_MEMORY_AREA), null);
         fd.makeAllParentRolesValid();
         attach(fd, td, 0);
-        fd = new FieldDeclaration
-        (modifiers, new TypeReference(
-                new PackageReference(new PackageReference(new Identifier("javax")), new Identifier("realtime")),
-                new Identifier("MemoryArea")), new ImplicitIdentifier(IMPLICIT_REENTRANT_SCOPE), null);
-        fd.makeAllParentRolesValid();
-        attach(fd, td, 0);
+	if(ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof PercProfile){
+	    fd = new FieldDeclaration
+		(modifiers, new TypeReference(
+		         new PackageReference(new PackageReference(new Identifier("javax")), new Identifier("realtime")),
+			 new Identifier("MemoryArea")), new ImplicitIdentifier(IMPLICIT_REENTRANT_SCOPE), null);
+	    fd.makeAllParentRolesValid();
+	    attach(fd, td, 0);
+	}
     }
     
 
