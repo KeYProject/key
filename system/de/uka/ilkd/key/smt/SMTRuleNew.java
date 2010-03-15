@@ -20,15 +20,21 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.gui.DecisionProcedureSettings;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.ConstrainedFormula;
 import de.uka.ilkd.key.logic.Constraint;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.TacletIndex;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.BuiltInRuleApp;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.smt.SMTProgressMonitor.SolveType;
+import de.uka.ilkd.key.smt.SolverSession.InternResult;
 import de.uka.ilkd.key.smt.launcher.Event;
 import de.uka.ilkd.key.smt.launcher.Process;
 import de.uka.ilkd.key.smt.launcher.ProcessLaunch;
@@ -79,6 +85,8 @@ public class SMTRuleNew  extends ProcessLauncher implements BuiltInRule{
      */
     private final boolean 	   multiRule;
     
+    private final boolean background;
+    
     
  
   
@@ -88,9 +96,9 @@ public class SMTRuleNew  extends ProcessLauncher implements BuiltInRule{
 	super.init();
     }
     
-    private SMTRuleNew(Name name,boolean multi ,SMTSolver ... list){
+    private SMTRuleNew(Name name,boolean multi, boolean background ,SMTSolver ... list){
 	multiRule = multi;
-	
+	this.background = background;
 	for(SMTSolver solver : list){
 		   solvers.add(solver);   
 	}
@@ -104,9 +112,11 @@ public class SMTRuleNew  extends ProcessLauncher implements BuiltInRule{
      * by the rule.
      */
     public SMTRuleNew(Name name, SMTSolver ... list){
-	this(name,list.length>1,list);
+	this(name,list.length>1,false,list);
 	
     }
+    
+
     
     /**
      * @return <code>true</code> iff the rule contains enough 
@@ -164,20 +174,16 @@ public class SMTRuleNew  extends ProcessLauncher implements BuiltInRule{
     }
 
     
-    private void addSolver(SMTSolver solver, Collection<Goal> goals, Services services){
-	solver.prepareSolver(goals, services);
 
-	addProcess(solver);	
-    }
-    
     /** Interrupts the current execution of the solvers. */
     public void stop(){
 	this.cancelMe();
     }
     
-    private void prepareSolvers(Collection<Goal> goals, Services services){
+    private void prepareSolvers(LinkedList<InternResult> terms, Services services, TacletIndex index){
 	for(SMTSolver solver : getInstalledSolvers()){
-	    addSolver(solver,goals,services);
+	    solver.prepareSolver(terms, services, index);
+	    addProcess(solver);
 	}
     }
     
@@ -188,11 +194,21 @@ public class SMTRuleNew  extends ProcessLauncher implements BuiltInRule{
      * @param constraint
      */
     public void start(Goal goal, Constraint constraint){
+	start(goal, constraint, true);
+    }
+    
+    /**
+     * Start the rule. 
+     * @param goal
+     * @param constraint
+     * @param useThread <code>true</code> if you want to start this rule in a new thread.
+     */
+    public void start(Goal goal, Constraint constraint, boolean useThread){
 	init();
 	LinkedList<Goal> goals = new LinkedList<Goal>();
 	goals.add(goal);
 	proof = goal.proof();
-	startThread(goals,constraint);
+	start(goals,proof,constraint,useThread);
     }
     
     /**
@@ -203,22 +219,81 @@ public class SMTRuleNew  extends ProcessLauncher implements BuiltInRule{
      * @param constraint
      */
     public void start(Collection<Goal> goals, Proof proof, Constraint constraint){
+	start(goals, proof, constraint,true);
+    }
+    
+    public void start(Collection<Goal> goals, Proof proof, Constraint constraint,
+	    boolean useThread){
 	init();
 	this.proof = proof;
-	startThread(goals,constraint);
+	LinkedList<InternResult> terms = new LinkedList<InternResult>();
+	TacletIndex index=null;
+	for(Goal goal : goals){
+	    Term term = goalToTerm(goal);
+	    terms.add(new InternResult(term,goal));
+	    index = goal.indexOfTaclets();
+	}
+	
+	startThread(terms,constraint,useThread,index,proof.getServices());
+
+	
+    }
+    
+    private Term goalToTerm(Goal goal){
+	Sequent s = goal.sequent();
+	
+	ImmutableList<Term> ante = ImmutableSLList.nil();
+	ante.append(TermBuilder.DF.tt());
+	for(ConstrainedFormula f : s.antecedent()){
+	    ante = ante.append(f.formula());
+	}
+	
+	ImmutableList<Term> succ = ImmutableSLList.nil();
+	succ.append(TermBuilder.DF.ff());
+	for(ConstrainedFormula f : s.succedent()){
+	    succ = succ.append(f.formula());
+	}
+	
+	
+	return TermBuilder.DF.imp(TermBuilder.DF.and(ante), TermBuilder.DF.and(succ));
+	
+    }
+    
+    public void start(Term term, Services services, Constraint constraint, boolean useThread,
+	    TacletIndex index){
+	LinkedList<Term> list = new LinkedList<Term>();
+	list.add(term);
+	start(list, services, constraint, useThread, index);
+    }
+    
+    public void start(Collection<Term> terms, Services services, Constraint constraint, boolean useThread,
+	    TacletIndex index){
+	LinkedList<InternResult> internTerms = new LinkedList<InternResult>();
+	for(Term term : terms){
+	    internTerms.add(new InternResult(term, null));
+	}
+	startThread(internTerms,constraint,useThread,index,services);
     }
     
 
     
-    private void startThread(Collection<Goal> goals,Constraint constraint){
-	this.setMaxTime(DecisionProcedureSettings.getInstance().getTimeout()*100);
+    private void startThread(LinkedList<InternResult> terms,Constraint constraint, boolean useThread, TacletIndex index,
+	      Services services){
+	init();
 	userConstraint = constraint;
-        proof.env().registerRule(this,
-                de.uka.ilkd.key.proof.mgt.AxiomJustification.INSTANCE);
-	prepareSolvers(goals,proof.getServices());	
-	Thread thread = new Thread(this,displayName());
-	thread.setDaemon(true);
-	thread.start();
+      //  proof.env().registerRule(this,
+        //        de.uka.ilkd.key.proof.mgt.AxiomJustification.INSTANCE);
+	prepareSolvers(terms,services,index);	
+	if(useThread){
+		Thread thread = new Thread(this,displayName());
+		thread.setDaemon(true);
+		thread.start();
+	}else{
+	    this.run();
+	    //applyResults();
+	    
+	}
+
     }
     
     
@@ -268,8 +343,9 @@ public class SMTRuleNew  extends ProcessLauncher implements BuiltInRule{
     
     
     /**
-     * After executing the external provers you must call this method to apply the results
-     * to the proved goals.
+     * Applies the results to the proved goals.
+     * If you use an own thread for this rule (see <code>start(...)<code>), you
+     * must call this method after executing the external provers.
      */
     public void applyResults(){
 	
@@ -279,12 +355,34 @@ public class SMTRuleNew  extends ProcessLauncher implements BuiltInRule{
 	    AbstractSMTSolver s = (AbstractSMTSolver) solver;
 
 	    result.addAll(s.getSession().getResults());
+	    System.out.println(s.name()+": " + s.getSession().getResults());
 	}
 	for(SolverSession.InternResult res  : result ){
 	    BuiltInRuleApp birApp = new BuiltInRuleAppSMT(this, null, 
 	                userConstraint,res.result); 
-	    res.goal.apply(birApp);
+	    if(res.goal != null){
+		res.goal.apply(birApp);
+	    }
+	    
 	}
+    }
+    
+    public LinkedList<SMTSolverResult> getResults(){
+	HashSet<SolverSession.InternResult> result = new HashSet<SolverSession.InternResult>();
+	
+	for(SMTSolver solver : getInstalledSolvers()){
+	    AbstractSMTSolver s = (AbstractSMTSolver) solver;
+
+	    result.addAll(s.getSession().getResults());
+	  
+	}
+	LinkedList<SMTSolverResult> toReturn = new LinkedList<SMTSolverResult>();
+	
+	for(SolverSession.InternResult res  : result ){
+	    toReturn.add(res.getResult());
+	}
+	return toReturn;
+	
     }
     
     public String toString(){
@@ -335,13 +433,17 @@ public class SMTRuleNew  extends ProcessLauncher implements BuiltInRule{
 	        SMTSolverResult result = (SMTSolverResult)e.getUserObject();
 	
 	        if(result.isValid() == SMTSolverResult.ThreeValuedTruth.TRUE){
-	            monitor.setGoalProgress(solver.getSession().currentGoal(), SolveType.SOLVABLE);
+	            monitor.setGoalProgress(solver.getSession().currentTerm().getGoal(), SolveType.SOLVABLE);
 	        }
 	     break;
 	     
 	 case PROCESS_EXCEPTION:
+	     if(background){
+		 throw new RuntimeException(e.getException());
+	     }else{
 	     monitor.exceptionOccurred("Error while executing " + process.getTitle()+"."
 		     ,e.getException());
+	     }
 	     break;
 	 
 	 

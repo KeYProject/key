@@ -12,10 +12,13 @@ package de.uka.ilkd.key.smt;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.LinkedList;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.TacletIndex;
+import de.uka.ilkd.key.smt.SolverSession.InternResult;
 import de.uka.ilkd.key.smt.taclettranslation.TacletSetTranslation;
 import de.uka.ilkd.key.util.ProgressMonitor;
 
@@ -51,7 +54,7 @@ public interface SMTSolver extends de.uka.ilkd.key.smt.launcher.Process{
      * @throws IOException if the external prover could not be found, executed or if the SMT translation
      * could not be written to a file
      */
-    public SMTSolverResult run(String formula, int timeout, Services services) throws IOException;
+  //  public SMTSolverResult run(String formula, int timeout, Services services) throws IOException;
 
     
     /**
@@ -63,7 +66,7 @@ public interface SMTSolver extends de.uka.ilkd.key.smt.launcher.Process{
      * @throws IOException if the external prover could not be found, executed or if the SMT translation
      * could not be written to a file
      */
-    public SMTSolverResult run(Goal goal, int timeout, Services services) throws IOException;
+ //   public SMTSolverResult run(Goal goal, int timeout, Services services) throws IOException;
     
 
     /**
@@ -75,7 +78,7 @@ public interface SMTSolver extends de.uka.ilkd.key.smt.launcher.Process{
      * @throws IOException if the external prover could not be found, executed or if the SMT translation
      * could not be written to a file
      */
-    public SMTSolverResult run(Term formula, int timeout, Services services) throws IOException;
+   //public SMTSolverResult run(Term formula, int timeout, Services services) throws IOException;
     
     /**
      * Check if the valid formula is valid. This method is used for using multiple provers. 
@@ -86,7 +89,7 @@ public interface SMTSolver extends de.uka.ilkd.key.smt.launcher.Process{
      * @throws IOException if the external prover could not be found, executed or if the SMT translation
      * could not be written to a file
      */
-    public Process run(Goal goal, Services services) throws IOException, IllegalFormulaException;
+    //public Process run(Goal goal, Services services) throws IOException, IllegalFormulaException;
     
     
     /**
@@ -158,5 +161,7 @@ public interface SMTSolver extends de.uka.ilkd.key.smt.launcher.Process{
      */
     public void useTaclets(boolean b);
     
-    public void prepareSolver(Collection<Goal> goals, Services services);
+    public void prepareSolver(LinkedList<InternResult> goals, Services services, TacletIndex tacletIndex);
+    
+   
 }

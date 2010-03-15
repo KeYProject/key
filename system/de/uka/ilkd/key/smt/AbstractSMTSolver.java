@@ -36,8 +36,10 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.TacletIndex;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.smt.SolverSession.InternResult;
 import de.uka.ilkd.key.smt.launcher.AbstractProcess;
 import de.uka.ilkd.key.smt.taclettranslation.DefaultTacletSetTranslation;
 import de.uka.ilkd.key.smt.taclettranslation.IllegalTacletException;
@@ -248,7 +250,7 @@ public abstract class AbstractSMTSolver extends AbstractProcess implements SMTSo
 	SMTTranslator trans = this.getTranslator(services);
 	try {		
 	    
-	instantiateTaclets(goal, trans);
+	instantiateTaclets(trans);
 	}catch(IllegalFormulaException e){
 	    logger.error(e.getMessage());
 	}
@@ -278,7 +280,7 @@ public abstract class AbstractSMTSolver extends AbstractProcess implements SMTSo
 	
 	SMTTranslator trans = this.getTranslator(services);
 	
-	instantiateTaclets(goal, trans);
+	instantiateTaclets(trans);
 
 	String formula = trans.translate(goal.sequent(), services).toString();
 
@@ -537,13 +539,13 @@ public abstract class AbstractSMTSolver extends AbstractProcess implements SMTSo
     }
     
     
-    public String translateToCommand(Goal goal, Services services) throws IllegalFormulaException, IOException {
+    public String translateToCommand(Term term, Services services) throws IllegalFormulaException, IOException {
 	
 	SMTTranslator trans = this.getTranslator(services);
-	instantiateTaclets(goal, trans);
+	instantiateTaclets(trans);
 	
 	  
-	String s = trans.translate(goal.sequent(), services).toString();
+	String s = trans.translate(term, services).toString();
 	saveTacletTranslation(trans);
 	
 	
@@ -648,14 +650,17 @@ public abstract class AbstractSMTSolver extends AbstractProcess implements SMTSo
     public void useTaclets(boolean b){
 	this.useTaclets = b;
     }
+   
+
     
-    private Collection<Taclet> getTaclets(Goal goal){
+    
+    private Collection<Taclet> getTaclets(){
 	
 	 if(tacletsForTest != null){
 	     return tacletsForTest;
 	 }
 	 return ProofSettings.DEFAULT_SETTINGS.getTacletTranslationSettings()
-	            .initTaclets(goal.ruleAppIndex().tacletIndex());
+	            .initTaclets(session.getTacletIndex());
     }
     
    
@@ -677,13 +682,13 @@ public abstract class AbstractSMTSolver extends AbstractProcess implements SMTSo
 	}
     }
     
-    private void instantiateTaclets(Goal goal, SMTTranslator trans) throws IllegalFormulaException{
+    private void instantiateTaclets(SMTTranslator trans) throws IllegalFormulaException{
 	ImmutableSet<Taclet> emptySet = DefaultImmutableSet.nil();
 	if(!ProofSettings.DEFAULT_SETTINGS.getTacletTranslationSettings().isUsingTaclets() || !useTaclets ){
 	    trans.setTacletsForAssumptions(new LinkedList<Taclet>());
 	   
 	}else{
-	    trans.setTacletsForAssumptions(getTaclets(goal));
+	    trans.setTacletsForAssumptions(getTaclets());
 	}
 	
 	
@@ -696,9 +701,10 @@ public abstract class AbstractSMTSolver extends AbstractProcess implements SMTSo
 	tacletsForTest = set;
     }
     
-    public void prepareSolver(Collection<Goal> goals, Services services) {
+    public void prepareSolver(LinkedList<InternResult> terms, Services services, TacletIndex tacletIndex) {
 	init();
-	session = new SolverSession(goals, services);
+	
+	session = new SolverSession(terms, services, tacletIndex);
 
         
     }
@@ -709,10 +715,11 @@ public abstract class AbstractSMTSolver extends AbstractProcess implements SMTSo
 
 	String [] result =  new String [1];
 	LinkedList<String> list = new LinkedList<String>();
-	Goal goal = session.nextGoal();
-	if(goal != null){
+	InternResult term = session.nextTerm();
+	//session.addResult(SMTSolverResult.createUnknownResult("",name()),session.currentTerm());
+	if(term != null){
 
-	    String s = translateToCommand(goal, session.getServices()); 
+	    String s = translateToCommand(term.getRealTerm(), session.getServices()); 
 	    
 	    while(s.indexOf(' ')!=-1){
 		int index = s.indexOf(' ');
@@ -739,20 +746,21 @@ public abstract class AbstractSMTSolver extends AbstractProcess implements SMTSo
 	String err = read(error);
 	error.close();
 	SMTSolverResult res = interpretAnswer(text, err, exitStatus);
-	if(session.currentGoal()!= null){
-	   session.currentGoal().node().addSMTandFPData(res);
-	   session.addResult(res,session.currentGoal());
+	if(session.currentTerm()!= null){
+	   //session.currentTerm().node().addSMTandFPData(res); // TODO: move
+	   session.currentTerm().result = res;
+	
 	}
 	listener.eventCycleFinished(this,res);
 	
-	return !session.hasNextGoal();
+	return !session.hasNextTerm();
     }
     
     
 
     public int getMaxCycle() {
 
-        return session.getGoalSize();
+        return session.getTermSize();
     }
     
     public String toString(){

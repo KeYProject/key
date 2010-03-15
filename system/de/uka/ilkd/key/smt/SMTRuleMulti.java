@@ -142,7 +142,7 @@ class SolverWrapper
   
   public void run(Goal goal, Services services) throws IOException, IllegalFormulaException{
       this.goal = goal;
-      Proc = Solver.run(goal, services);
+     // Proc = Solver.run(goal, services);
   }
   
   /** Interprets the result of the process.  

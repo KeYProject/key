@@ -13,18 +13,20 @@ package de.uka.ilkd.key.smt.test;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.LinkedList;
 
 import junit.framework.Assert;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
+import de.uka.ilkd.key.smt.SMTRuleNew;
 import de.uka.ilkd.key.smt.SMTSolver;
 import de.uka.ilkd.key.smt.SMTSolverResult;
 
 public abstract class TestSMTSolver extends TestCommons {
 
-    private SMTSolver solver;
+    private SMTRuleNew rule;
 
     
 
@@ -37,8 +39,11 @@ public abstract class TestSMTSolver extends TestCommons {
     + File.separator;
 
     protected void setUp() {
-	solver = this.getSolver();
-	solver.useTaclets(false);
+	rule = this.getSolver();
+	for(SMTSolver solver : rule.getInstalledSolvers()){
+	    solver.useTaclets(false);    
+	}
+	
 	ProofSettings.DEFAULT_SETTINGS.getDecisionProcedureSettings().setSaveFile(false);
 
 	//System.gc();
@@ -56,7 +61,7 @@ public abstract class TestSMTSolver extends TestCommons {
      * returns the solver that should be tested.
      * @return the solver to be tested.
      */
-    public abstract SMTSolver getSolver();
+    public abstract SMTRuleNew getSolver();
 
     protected abstract boolean toolNotInstalledChecked();
 
@@ -69,7 +74,7 @@ public abstract class TestSMTSolver extends TestCommons {
     
     private boolean toolNotInstalled() {
 	if (!toolNotInstalledChecked()) {    
-	    isinstalled = this.getSolver().isInstalled(true);
+	    isinstalled = this.getSolver().isUsable();
 	    setToolNotInstalledChecked(true);
 	}
 	
@@ -229,10 +234,11 @@ public abstract class TestSMTSolver extends TestCommons {
 	Goal g = proof.openGoals().iterator().next();
 
 	
+	rule.setMaxTime(2000);
+	rule.start(g, proof.getUserConstraint().getConstraint(),false);
+	LinkedList<SMTSolverResult> toReturn = rule.getResults();
 	
-	SMTSolverResult toReturn = solver.run(g, 20, proof.getServices());
-	
-	return toReturn;
+	return toReturn.getFirst();
     }
     
 }

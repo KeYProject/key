@@ -14,26 +14,51 @@ import java.util.Iterator;
 import java.util.LinkedList;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.TacletIndex;
 import de.uka.ilkd.key.smt.taclettranslation.TreeItem.SelectionMode;
 
 
 class SolverSession {
     
-    public class InternResult{
+
+    
+    public static class InternResult{
 	SMTSolverResult result;
-	Goal            goal;
-	public InternResult(SMTSolverResult result, Goal goal) {
+	Term            term;
+	Goal 		goal;
+	public InternResult(SMTSolverResult result, Term term) {
 	    super();
 	    this.result = result;
-	    this.goal = goal;
+	    this.term = term;
         }
+	
+	public Goal getGoal(){
+	    return goal;
+	}
+	
+	public Term getRealTerm(){
+	    return term;
+	}
+	
+	public InternResult(Term term, Goal belongingTo){
+	    this(SMTSolverResult.createUnknownResult("", ""),term);
+	    goal = belongingTo;
+	}
+	
 	
 		@Override
 	public int hashCode() {
-	   
+	    if(goal != null)
 	    return goal.hashCode();
+	    else return super.hashCode();
 	}
+		
+	public SMTSolverResult getResult(){
+	    return result;
+	}
+	
 		
 	@Override
 	public boolean equals(Object obj) {
@@ -41,7 +66,9 @@ class SolverSession {
 		return false;
 	    }
 	    InternResult r = ((InternResult)obj);
-	    
+	    if(goal == null || r.goal == null){
+		return false;
+	    }
 	    if(goal.equals(r.goal)){
 		if(r.result.isValid() == result.isValid()){
 		    return true;
@@ -69,29 +96,45 @@ class SolverSession {
 
 	}
 	
+	public String toString(){
+	    return goal == null ? "" : goal +":" +result;
+	}
+	
     }
      
-    private Collection<Goal> goals;
-    private LinkedList<InternResult> results = new LinkedList<InternResult>();
+    private LinkedList<InternResult> terms;
+    //private LinkedList<InternResult> results = new LinkedList<InternResult>();
     private Services         services;
-    private Iterator<Goal>   it;
-    private Goal	      current = null;
+    private Iterator<InternResult>   it;
+    private InternResult      current = null;
+    private TacletIndex      tacletIndex;
     
-    public Collection<Goal> getGoals() {
-        return goals;
+    public Collection<InternResult> getTerms() {
+        return terms;
     }
     public Services getServices() {
         return services;
     }
     
-    public SolverSession(Collection<Goal> goals, Services services) {
+    
+    
+    public SolverSession(LinkedList<InternResult> terms, Services services, TacletIndex index) {
 	super();
-	this.goals = goals;
+	this.terms = terms;
 	this.services = services;
-	it = goals.iterator();
+	tacletIndex = index;
+	it = terms.iterator();
     }
     
-    public Goal nextGoal(){
+    public TacletIndex getTacletIndex(){
+	return tacletIndex;
+    }
+    
+    public InternResult getLastResult(){
+	return current;
+    }
+    
+    public InternResult nextTerm(){
 	if(it.hasNext()){
 	    current = it.next();
 	    return current;
@@ -99,24 +142,24 @@ class SolverSession {
 	return null;
     }
     
-    public Goal currentGoal(){
+    public InternResult currentTerm(){
 	return current;
     }
     
-    public boolean hasNextGoal(){
+    public boolean hasNextTerm(){
 	return it.hasNext();
     }
     
-    public void addResult(SMTSolverResult result, Goal goal){
-	results.add(new InternResult(result,goal));
-    }
+    /*public void addResult(SMTSolverResult result, Term term){
+	results.add(new InternResult(result,term));
+    }*/
     
     public LinkedList<InternResult> getResults(){
-	return results;
+	return terms;
     }
     
-    public int getGoalSize(){
-	return goals.size();
+    public int getTermSize(){
+	return terms.size();
     }
 
 }

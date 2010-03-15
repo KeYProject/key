@@ -19,12 +19,14 @@ import junit.framework.Assert;
 
 
 import de.uka.ilkd.key.gui.TacletTranslationSettings;
+import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.smt.AbstractSMTSolver;
 import de.uka.ilkd.key.smt.CVC3Solver;
+import de.uka.ilkd.key.smt.SMTRuleNew;
 import de.uka.ilkd.key.smt.SMTSolver;
 import de.uka.ilkd.key.smt.SMTSolverResult;
 import de.uka.ilkd.key.smt.SimplifySolver;
@@ -42,11 +44,11 @@ public class TestTacletTranslation extends TestCommons {
     /*
      * If you want to add further external provers, this is the right place.
      */
-    private final static SMTSolver simplify = new SimplifySolver();
-    private final static SMTSolver cvc3 = new CVC3Solver();
-    private final static SMTSolver z3 = new Z3Solver();
-    private final static SMTSolver yices = new YicesSolver();
-    private final static SMTSolver rules[] = { simplify, cvc3, z3, yices };
+    private final static SMTRuleNew simplify = new SMTRuleNew(new Name("TEST_SIMPLIFY"), new SimplifySolver());
+    private final static SMTRuleNew cvc3 = new SMTRuleNew(new Name("TEST_CVC3"),new CVC3Solver());
+    private final static SMTRuleNew z3 = new SMTRuleNew(new Name("TEST_Z3"),new Z3Solver());
+    private final static SMTRuleNew yices = new SMTRuleNew(new Name("TEST_YICES"), new YicesSolver());
+    private final static SMTRuleNew rules[] = { simplify, cvc3, z3, yices };
 
     private static boolean installingTest = false;
 
@@ -120,8 +122,8 @@ public class TestTacletTranslation extends TestCommons {
 	TacletTranslationSettings.getInstance().setSaveToFile(false);
 	if (!installingTest) {
 
-	    for (SMTSolver solver : rules) {
-		solver.isInstalled(true);
+	    for (SMTRuleNew solver : rules) {
+		solver.isUsable();
 
 	    }
 
@@ -130,22 +132,22 @@ public class TestTacletTranslation extends TestCommons {
     }
 
     private void test(String filename, SolveType type, UsedTaclets.Category cat) {
-	test(filename, type, cat, (SMTSolver[]) null);
+	test(filename, type, cat, (SMTRuleNew[]) null);
     }
 
     private void test(String filename, SolveType type,
-	    UsedTaclets.Category cat, SMTSolver... only) {
+	    UsedTaclets.Category cat, SMTRuleNew... only) {
 
-	ArrayList<SMTSolver> solvers = getInstalledRules(only);
-	if (solvers.isEmpty()) {
+	ArrayList<SMTRuleNew> rules = getInstalledRules(only);
+	if (rules.isEmpty()) {
 	    return;
 	}
 
 	UsedTaclets.INSTANCE.selectCategory(cat);
-	checkFile(solvers, folder + filename, type);
+	checkFile(rules, folder + filename, type);
     }
 
-    private void checkFile(ArrayList<SMTSolver> solvers, String filepath,
+    private void checkFile(ArrayList<SMTRuleNew> rules, String filepath,
 	    SolveType type) {
 	ProofAggregate p = parse(new File(filepath));
 
@@ -159,25 +161,31 @@ public class TestTacletTranslation extends TestCommons {
 	boolean use[] = { false, true };
 
 	for (int i = 0; i < 2; i++) {
-	    for (SMTSolver solver : solvers) {
-		if (!solver.isInstalled(false)) {
+	    for (SMTRuleNew rule : rules) {
+		if (!rule.isUsable()) {
 		    continue;
 		}
 		boolean solvable = (type == SolveType.WITH_TACLETS_ONLY && use[i])
 		        || (type == SolveType.WITHOUT_TACLETS && !use[i]);
 
 		String error = "\n\n" + "problem:" + filepath + "\n"
-		        + "solver: " + solver.name() + "\n" +
+		        + "solver: " + rule.name() + "\n" +
 
 		        "taclets were used: " + use + "\n" + "solve type: "
 		        + type.toString() + "\n" + "-> solvable: " + solvable
 		        + "\n";
 
-		solver.useTaclets(use[i]);
-		((AbstractSMTSolver) solver).setTacletsForTest(taclets);
+		for(SMTSolver solver : rule.getInstalledSolvers()){
+		    solver.useTaclets(use[i]);  
+		    ((AbstractSMTSolver) solver).setTacletsForTest(taclets);
+		}
+		
+		
 
 		try {
-		    result = solver.run(g, 5000, proof.getServices());
+		    rule.setMaxTime(5000);
+		    rule.start(g, proof.getUserConstraint().getConstraint(), false);
+		    result = rule.getResults().getFirst();
 		} catch (Exception e) {
 		    e.printStackTrace();
 		    assertTrue("Error while executing the solver: " + error
@@ -206,8 +214,8 @@ public class TestTacletTranslation extends TestCommons {
 
    
 
-    private ArrayList<SMTSolver> getInstalledRules(SMTSolver[] only) {
-	ArrayList<SMTSolver> toReturn = new ArrayList<SMTSolver>();
+    private ArrayList<SMTRuleNew> getInstalledRules(SMTRuleNew[] only) {
+	ArrayList<SMTRuleNew> toReturn = new ArrayList<SMTRuleNew>();
 
 	for (int i = 0; i < rules.length; i++) {
 	    add(toReturn, only, rules[i]);
@@ -216,15 +224,15 @@ public class TestTacletTranslation extends TestCommons {
 	return toReturn;
     }
 
-    private boolean add(ArrayList<SMTSolver> toReturn, SMTSolver[] only,
-	    SMTSolver o) {
-	if (!o.isInstalled(false)) {
+    private boolean add(ArrayList<SMTRuleNew> toReturn, SMTRuleNew[] only,
+	    SMTRuleNew o) {
+	if (!o.isUsable()) {
 	    return false;
 	}
 
 	if (only != null) {
-	    for (SMTSolver solver : only) {
-		if (solver == o) {
+	    for (SMTRuleNew rule : only) {
+		if (rule == o) {
 		    toReturn.add(o);
 
 		    return true;

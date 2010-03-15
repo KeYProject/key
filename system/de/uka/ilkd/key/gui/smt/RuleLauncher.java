@@ -12,6 +12,7 @@ package de.uka.ilkd.key.gui.smt;
 import java.util.Collection;
 import java.util.LinkedList;
 
+import de.uka.ilkd.key.gui.DecisionProcedureSettings;
 import de.uka.ilkd.key.gui.Main;
 import de.uka.ilkd.key.gui.nodeviews.BuiltInRuleMenuItem;
 import de.uka.ilkd.key.logic.Constraint;
@@ -38,24 +39,32 @@ public class RuleLauncher {
     	     * @param goal 
     	     * @param constraint
     	     */
-    	    public void start(SMTRuleNew rule, Goal goal, Constraint constraint){
+    	    public void start(SMTRuleNew rule, Goal goal, Constraint constraint, boolean useOwnThread){
     		LinkedList<Goal> goals = new LinkedList<Goal>();
+    		rule.setMaxTime(DecisionProcedureSettings.getInstance().getTimeout()*100);
     		goals.add(goal);
-    		rule.start(goal,constraint);
-    		startProgressDialog(rule,goals);
+    		rule.start(goal,constraint,useOwnThread);
+    		if(useOwnThread){
+    		    startProgressDialog(rule,goals);    
+    		}
+    		
     	    }
     	    
-    	    public void start(SMTRuleNew rule, Proof proof, Constraint constraint){
+    	    public void start(SMTRuleNew rule, Proof proof, Constraint constraint, boolean useOwnThread){
     		LinkedList<Goal> goals = new LinkedList<Goal>();
-    		
+    		rule.setMaxTime(DecisionProcedureSettings.getInstance().getTimeout()*100);
     		for (Goal goal : proof.openGoals()) {
     		     goals.add(goal);
     		}
     		
-    		rule.start(goals,proof,constraint);
-    		startProgressDialog(rule,goals);
+    		rule.start(goals,proof,constraint,useOwnThread);
+    		if(useOwnThread){
+    		    startProgressDialog(rule,goals);
+    		}
     		
     	    }
+    	    
+    	    
     	    
     	    private void startProgressDialog(SMTRuleNew rule, Collection<Goal> goals){
     		ProgressDialog.INSTANCE.prepare(rule.getInstalledSolvers(),goals,rule);

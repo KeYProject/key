@@ -35,8 +35,6 @@ import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.*;
-import de.uka.ilkd.key.smt.DecProcRunner;
-import de.uka.ilkd.key.smt.SMTRule;
 import de.uka.ilkd.key.smt.SMTRuleMulti;
 import de.uka.ilkd.key.smt.SMTRuleNew;
 
@@ -358,7 +356,7 @@ class TacletMenu extends JMenu {
         	    
         	    SMTRuleNew rule = (SMTRuleNew) ((BuiltInRuleMenuItem) e.getSource()).connectedTo();
         	    RuleLauncher.INSTANCE.start(rule, selectedGoal,
-        		    Main.getInstance().mediator().getProof().getUserConstraint().getConstraint());
+        		    Main.getInstance().mediator().getProof().getUserConstraint().getConstraint(),true);
         	   /* new DecProcRunner(Main.getInstance()
         		, selectedGoal//Main.getInstance().mediator().getProof()
         		, Main.getInstance().mediator().getProof().getUserConstraint().getConstraint()

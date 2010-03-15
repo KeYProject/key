@@ -18,7 +18,6 @@ import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.smt.AbstractSMTSolver;
 import de.uka.ilkd.key.smt.CVC3Solver;
-import de.uka.ilkd.key.smt.SMTRule;
 import de.uka.ilkd.key.smt.SMTRuleMulti;
 import de.uka.ilkd.key.smt.SMTRuleNew;
 import de.uka.ilkd.key.smt.SMTSolver;

@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.smt.test;
 
+import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.smt.SMTRuleNew;
 import de.uka.ilkd.key.smt.SMTSolver;
 import de.uka.ilkd.key.smt.SimplifySolver;
 
@@ -22,8 +24,8 @@ public class TestSimplify extends TestSMTSolver {
     }
 
     @Override
-    public SMTSolver getSolver() {
-	return simplify;
+    public SMTRuleNew getSolver() {
+	return new SMTRuleNew(new Name("TEST_SIMPLIFY"),simplify);
     }
 
     @Override

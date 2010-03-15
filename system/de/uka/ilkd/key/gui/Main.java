@@ -62,7 +62,6 @@ import de.uka.ilkd.key.proof.mgt.BasicTask;
 import de.uka.ilkd.key.proof.mgt.NonInterferenceCheck;
 import de.uka.ilkd.key.proof.mgt.TaskTreeNode;
 import de.uka.ilkd.key.proof.reuse.ReusePoint;
-import de.uka.ilkd.key.smt.DecProcRunner;
 import de.uka.ilkd.key.smt.SMTRuleNew;
 import de.uka.ilkd.key.strategy.VBTStrategy;
 import de.uka.ilkd.key.unittest.UnitTestBuilder;
@@ -3189,7 +3188,7 @@ public class Main extends JFrame implements IMain {
 	public void actionPerformed(ActionEvent e) {
 	    if (!mediator.ensureProofLoaded()) return;
 	    final Proof proof = mediator.getProof();
-	    RuleLauncher.INSTANCE.start(decisionProcedure, proof,proof.getUserConstraint().getConstraint());
+	    RuleLauncher.INSTANCE.start(decisionProcedure, proof,proof.getUserConstraint().getConstraint(),true);
 	}	
     }
     

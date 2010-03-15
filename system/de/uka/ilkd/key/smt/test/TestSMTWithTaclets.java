@@ -173,7 +173,7 @@ public class TestSMTWithTaclets extends TestCommons {
 	Assert.assertTrue(proof.openGoals().size() == 1);
 
 	Goal g = proof.openGoals().iterator().next();
-	SMTSolverResult result = solver.run(g, 50, proof.getServices());
+	SMTSolverResult result = null;// solver.run(g, 50, proof.getServices());
 	return translateResult(result);
 
     }
