@@ -16,6 +16,7 @@ import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
@@ -23,6 +24,10 @@ import javax.swing.SwingUtilities;
 import javax.swing.border.TitledBorder;
 import javax.swing.plaf.ProgressBarUI;
 
+
+
+import de.uka.ilkd.key.gui.ErrorMessages;
+import de.uka.ilkd.key.gui.ExceptionDialog;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.smt.MakesProgress;
 import de.uka.ilkd.key.smt.SMTProgressMonitor;
@@ -44,10 +49,6 @@ class ProgressPanel implements SMTProgressMonitor {
 	// The KeY-Colors
 	private static final Color PROGRESS_COLOR = new Color(0,153,49);
 	private static final Color TIME_COLOR = new Color(0,0,98);
-	public static final ImageIcon ICON_CANCEL = createImageIcon("cancel.jpg");
-	public static final ImageIcon ICON_UNKNOWN = createImageIcon("unknown.jpg");
-	public static final ImageIcon ICON_SOLVABLE = createImageIcon("solvable.jpg");
-	public static final ImageIcon ICON_NOT_SOLVABLE = createImageIcon("unsolvable.jpg");
 	
 	private JProgressBar progressBarTime = null;
 	private JLabel jLabel = null;
@@ -77,31 +78,21 @@ class ProgressPanel implements SMTProgressMonitor {
 	    	process.removeAllProgressMonitors();
 	    	process.addProgressMonitor(this);
 	    	
-		getProgressBarTime().setMaximum(1000);
+		getProgressBarTime().setMaximum(MAX_TIME);
 		getProgressBarTime().setForeground(TIME_COLOR);
 		getProgressBar().setForeground(PROGRESS_COLOR);
 		getProgressBar().setStringPainted(true);
+		getProgressBarTime().setStringPainted(true);
+		
 		getProgressBar().setString("");
 		getProgressBar().setMaximum(goals.size());
 		
-		
-		
-		
-		getProgressButton().setIcon(ICON_UNKNOWN);
+
 		((TitledBorder)getComponent().getBorder()).setTitle(process.getTitle());
 		
 	}
 	
-	private static ImageIcon createImageIcon(String path) {
-		java.net.URL imgURL = ProgressPanel.class.getResource(path);
-		if (imgURL != null) {
-			ImageIcon icon = new ImageIcon(imgURL);
-			return icon;
-		} else {
-			System.err.println("Couldn't find file: " + path);
-			return null;
-		}
-	}
+
 
 	
 	public void setResultIcon(ImageIcon icon){
@@ -251,7 +242,7 @@ class ProgressPanel implements SMTProgressMonitor {
 	   Shape old = gc.getClip();
 	   
 	   gc.setClip(fw*number+1, 0+1, fw-2,bar.getHeight()-2);
-	   //gc.drawString("Hallo", 5, 5);
+
 	   gc.drawString(s,fw*number+ (fw-width)/2 , bar.getHeight()-4);
 	   gc.setClip(old);
 	   gc.drawRect(fw*number, 0, fw, bar.getHeight()); 
@@ -316,5 +307,20 @@ class ProgressPanel implements SMTProgressMonitor {
         	ig.type = type;
             }
            parent.repaint();
+        }
+
+
+        public void exceptionOccurred(String s,Exception e) {
+            ErrorMessages.showBugMessage(ProgressDialog.INSTANCE, s, e);
+           
+            
+            
+	    
+        }
+
+	
+        public void setSolverFinished(long time) {
+            getProgressBarTime().setString("Stoped after "+ ((double)time)/1000 + " sec.");
+	    
         }
 }

@@ -8,6 +8,7 @@
 package de.uka.ilkd.key.proof.init;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
 
@@ -93,33 +94,14 @@ public abstract class AbstractProfile implements Profile {
         ImmutableList<BuiltInRule> builtInRules = ImmutableSLList.<BuiltInRule>nil();
 	LinkedList<AbstractSMTSolver> solverList = new LinkedList<AbstractSMTSolver>();
 
-	AbstractSMTSolver z3 = new Z3Solver();
-	AbstractSMTSolver simplify = new SimplifySolver();
-	AbstractSMTSolver yices = new YicesSolver();
-	AbstractSMTSolver cvc3 = new CVC3Solver();
+
 	
-	solverList.add(z3);    
-	solverList.add(simplify);
-	solverList.add(yices);
-	solverList.add(cvc3);
 	
-	DecisionProcedureSettings.getInstance().setSolvers(solverList);
-	
-	 SMTRuleNew rules[] = {new SMTRuleNew(new Name("MULTIPLE_PROVER"),z3),
-	 		       new SMTRuleNew(new Name("YICES_PROVER"),yices),
-	 		      new SMTRuleNew(new Name("SIMPLIFY_PROVER"),simplify),
-	 		     new SMTRuleNew(new Name("CVC3_PROVER"),cvc3),
-	 		    new SMTRuleNew(new Name("MULTIPLE_PROVERS"),z3,
-	 			    	simplify,
-	 			    	yices,
-	 			    	cvc3)};
-	
+	Collection<SMTRuleNew> rules = DecisionProcedureSettings.getInstance().getSMTRules();
         
 	for(SMTRuleNew rule : rules){
 	    builtInRules = builtInRules.prepend(rule);  
 	}
-	
-
 	
         
         

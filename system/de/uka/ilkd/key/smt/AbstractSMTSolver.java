@@ -418,7 +418,7 @@ public abstract class AbstractSMTSolver extends AbstractProcess implements SMTSo
 
 	//get the commands for execution
 	String execCommand = this.getFinalExecutionCommand(loc.getAbsolutePath(), formula);
-	System.out.println(execCommand);
+
 
 	try {
 	    //execute the external solver
@@ -583,7 +583,7 @@ public abstract class AbstractSMTSolver extends AbstractProcess implements SMTSo
     public boolean isInstalled(boolean recheck) {
 	if (recheck | !installwaschecked) {
 	    
-	    System.out.println(getExecutionCommand());
+	
 	    
 	    String cmd = getExecutionCommand();
 	    int first = cmd.indexOf(" ");
@@ -706,12 +706,12 @@ public abstract class AbstractSMTSolver extends AbstractProcess implements SMTSo
     
     @Override
     public String[] atStart() throws Exception{
-	System.out.println("Start: " + this.getTitle() + " " + session.getGoalSize());
+
 	String [] result =  new String [1];
 	LinkedList<String> list = new LinkedList<String>();
 	Goal goal = session.nextGoal();
 	if(goal != null){
-	    System.out.println("Translate to command");
+
 	    String s = translateToCommand(goal, session.getServices()); 
 	    
 	    while(s.indexOf(' ')!=-1){
@@ -720,12 +720,12 @@ public abstract class AbstractSMTSolver extends AbstractProcess implements SMTSo
 		s = s.substring(index+1,s.length());
 	    }
 	    list.add(s);
-	    System.out.println(list);
+
 	    
 	}else{
 	    throw new RuntimeException("This should not happen.");
 	}
-	System.out.println("Start the solver: ");
+
 	return list.toArray(new String[list.size()]);
     }
     

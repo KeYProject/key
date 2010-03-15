@@ -112,7 +112,7 @@ public class DecisionProcedureSettings implements Settings {
     public SMTRuleNew findRuleByName(String name){
 	
 	for(SMTRuleNew rule : getSMTRules()){
-	    if(rule.name().equals(name)){
+	    if(rule.name().toString().equals(name)){
 		return rule;
 	    }
 	}
@@ -150,10 +150,24 @@ public class DecisionProcedureSettings implements Settings {
     }
 
     
-    public void setSolvers(Collection<AbstractSMTSolver> s){
+    private void setSolversAndRules(){
 	
+	AbstractSMTSolver z3 = new Z3Solver();
+	AbstractSMTSolver simplify = new SimplifySolver();
+	AbstractSMTSolver yices = new YicesSolver();
+	AbstractSMTSolver cvc3 = new CVC3Solver();
+
+	solvers.add(z3);
+	solvers.add(simplify);
+	solvers.add(yices);
+	solvers.add(cvc3);
+	smtRules.add(new SMTRuleNew(new Name("Z3_PROVER"),z3));
+	smtRules.add(new SMTRuleNew(new Name("YICES_PROVER"),yices));
+	smtRules.add(new SMTRuleNew(new Name("SIMPLIFY_PROVER"),simplify));
+	smtRules.add(new SMTRuleNew(new Name("CVC3_PROVER"),cvc3));
+	smtRules.add(new SMTRuleNew(new Name("MULTIPLE_PROVERS"),z3,simplify,yices,cvc3));
 	
-	solvers = s;
+	//solvers = s;
 	
     }
     
@@ -184,6 +198,8 @@ public class DecisionProcedureSettings implements Settings {
 	return toReturn;
     }
     
+    
+    
     /**
      * returns the timeout specifying the maximal amount of time an external prover
      * is run
@@ -193,15 +209,15 @@ public class DecisionProcedureSettings implements Settings {
 	return this.timeout;
     }
     
+
     /** gets a Properties object and has to perform the necessary
      * steps in order to change this object in a way that it
      * represents the stored settings
      */
-    public void readSettings(Properties props) {	
-	String ruleString = props.getProperty(ACTIVE_RULE);
-	System.out.println("rule: " +  ruleString);
-	this.activeSMTRule = findRuleByName(ruleString);
-	System.out.println("finish: " +  ruleString);
+    public void readSettings(Properties props) {
+	
+
+	
 	
 	String timeoutstring = props.getProperty(TIMEOUT);
 	if (timeoutstring != null) {
@@ -225,6 +241,18 @@ public class DecisionProcedureSettings implements Settings {
     
     	String wt = props.getProperty(WEAKENSMTTRANSLATION);
     	this.weakenSMTTranslation = !(wt == null) && wt.equals("true");
+    	
+    	
+    	// Read the active rule at the end of the method to guarantee
+    	// that the execution commands have been read yet.
+	String ruleString = props.getProperty(ACTIVE_RULE);
+
+	this.activeSMTRule = findRuleByName(ruleString);
+	// Use only the rule if the corresponding solvers 
+	// are installed.
+	if(!activeSMTRule.isUsable()){
+	    this.activeSMTRule = SMTRuleNew.EMPTY_RULE;
+	}
 
     }
     
@@ -412,12 +440,12 @@ public class DecisionProcedureSettings implements Settings {
      */
     public void updateSMTRules(Profile profile) {
 	//Load the available SMTRules...	
-	for (Rule r : profile.
+	/*for (Rule r : profile.
 		getStandardRules().getStandardBuiltInRules()) {
 	    if(r instanceof SMTRuleNew){
 		this.smtRules.add((SMTRuleNew)r);
 	    }
-	}
+	}*/
 	
     }
     
@@ -500,6 +528,7 @@ public class DecisionProcedureSettings implements Settings {
     public static DecisionProcedureSettings getInstance() {
 	if (instance == null) {
 	    instance = new DecisionProcedureSettings();
+	    instance.setSolversAndRules();
 	}
 	
 	return instance;

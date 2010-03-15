@@ -1,6 +1,16 @@
 package de.uka.ilkd.key.smt.launcher;
+//This file is part of KeY - Integrated Deductive Software Design
+//Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+//                  Universitaet Koblenz-Landau, Germany
+//                  Chalmers University of Technology, Sweden
+//
+//The KeY system is protected by the GNU General Public License. 
+//See LICENSE.TXT for details.
+//
+//
 
 import java.io.IOException;
+
 import java.io.InputStream;
 import java.util.Collection;
 import java.util.LinkedList;
@@ -9,9 +19,10 @@ import de.uka.ilkd.key.smt.MakesProgress;
 import de.uka.ilkd.key.smt.SMTProgressMonitor;
 
 
+
 abstract public class AbstractProcess implements  Process, MakesProgress
 {
-	private static ProcessBuilder builder = new ProcessBuilder();
+	
 	protected Collection<SMTProgressMonitor> monitors = new LinkedList<SMTProgressMonitor>();
 
 	private java.lang.Process   process;
@@ -59,7 +70,7 @@ abstract public class AbstractProcess implements  Process, MakesProgress
 		return getTitle();
 	}
 
-
+	
 	public void run() {
 	        
 		int exitCode =0;
@@ -68,7 +79,7 @@ abstract public class AbstractProcess implements  Process, MakesProgress
 	            do{
 	            try {
 	            	String [] command = atStart();
-	            	
+	            	ProcessBuilder builder = new ProcessBuilder();
 	            	builder.command(command);
 	            	
 	            	process = builder.start();

@@ -19,7 +19,11 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.smt.SMTRuleNew;
 
-
+/**
+ * Use this class to start SMTRules.
+ * It belongs to de.uka.ilkd.gui... because it also contains the mechanism 
+ * to start SMTRules in combination with <code>ProgressDialog</code>
+ */
 public class RuleLauncher {
     
     	    public static final RuleLauncher INSTANCE = new RuleLauncher();
@@ -28,7 +32,12 @@ public class RuleLauncher {
     		
     	    }
     	    
-    	    
+    	    /**
+    	     * Launches first the SMTRule and then the ProgressDialog is shown.
+    	     * @param rule the rule to be launched
+    	     * @param goal 
+    	     * @param constraint
+    	     */
     	    public void start(SMTRuleNew rule, Goal goal, Constraint constraint){
     		LinkedList<Goal> goals = new LinkedList<Goal>();
     		goals.add(goal);

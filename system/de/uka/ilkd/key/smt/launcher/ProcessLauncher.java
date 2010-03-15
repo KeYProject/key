@@ -14,13 +14,23 @@ import javax.swing.SwingWorker;
 
 import de.uka.ilkd.key.smt.MakesProgress;
 import de.uka.ilkd.key.smt.SMTProgressMonitor;
+//This file is part of KeY - Integrated Deductive Software Design
+//Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+//                    Universitaet Koblenz-Landau, Germany
+//                    Chalmers University of Technology, Sweden
+//
+//The KeY system is protected by the GNU General Public License. 
+//See LICENSE.TXT for details.
+//
+//
 
-
-
+/** This class is used to start several processes in the same time. 
+ *  
+ */
 public abstract  class ProcessLauncher  implements ProcessListener, Runnable{
     	private final static int SLEEP = 10;
     
-	private LinkedList<Process> queue = new LinkedList<Process>();
+	private List<Process> queue = Collections.synchronizedList(new LinkedList<Process>()); 
 	private LinkedList<ProcessLauncherListener> listener = new LinkedList<ProcessLauncherListener>();
 	private List<ProcessLaunch> running = Collections.synchronizedList(new LinkedList<ProcessLaunch>());
 
@@ -28,6 +38,8 @@ public abstract  class ProcessLauncher  implements ProcessListener, Runnable{
 	private List<ProcessLaunch> getRunning(){
 	    return running;
 	}
+	
+	
 	
 	private long maxTime = 10000;
 	private int counter =0;
@@ -60,6 +72,11 @@ public abstract  class ProcessLauncher  implements ProcessListener, Runnable{
 		return cancel;
 	}
 	
+	/**
+	 * adds a process to the list of processes 
+	 * that will be started by the <code>ProcessLauncher</code>
+	 * @param process 
+	 */
 	public void addProcess(Process process){
 	    	
 		process.setProcessListener(this);
@@ -82,22 +99,13 @@ public abstract  class ProcessLauncher  implements ProcessListener, Runnable{
 	}
 
 	/**
-	 * @param maxTime the maxTime to set
+	 * @param maxTime the maxTime to be set
 	 */
 	public void setMaxTime(long maxTime) {
 		this.maxTime = maxTime;
 	}
 
-	/*@Override
-	public void run() {
 
-		counter++;
-		executeNextProcesses();
-		
-		
-		checkTime();
-	
-	}*/
 	
 	protected void executeNextProcesses(){
 		if(queue.isEmpty() || !running.isEmpty()){
@@ -110,11 +118,11 @@ public abstract  class ProcessLauncher  implements ProcessListener, Runnable{
 		
 		}
 		queue.clear();
-		//synchronized(running){
+	
 			for(ProcessLaunch launch : running){
 			    launch.start();
 			}
-		//}
+	
 	
 		
 	}
@@ -150,19 +158,13 @@ public abstract  class ProcessLauncher  implements ProcessListener, Runnable{
 	
 	private void remove(Process process){
 		process.stop();
-		//System.out.println(getRunning().size());
-		//getRunning().remove(process);
-		//System.out.println(getRunning().size());
-		if(running.isEmpty()){
+		if(running.isEmpty() && queue.isEmpty()){
 			runningIsEmpty();
 		}
 	}
 	
 	private void runningIsEmpty(){
 		cancelMe();
-		//publish(new Event(this,null,Event.Type.PROCESS_FINISHED));
-	
-		
 		
 	}
 	
@@ -178,12 +180,11 @@ public abstract  class ProcessLauncher  implements ProcessListener, Runnable{
 	}
 
 
+	
 	public void eventException(Process p, Exception e) {
 	    	ProcessLaunch launch = findLaunch(p);
 		remove(p);	
-		publish(new Event(this,launch,Event.Type.PROCESS_EXCEPTION));
-		System.out.println("exception "+e);
-		e.printStackTrace(System.out);
+		publish(new Event(this,launch,Event.Type.PROCESS_EXCEPTION,e));
 		
 	}
 
@@ -215,7 +216,6 @@ public abstract  class ProcessLauncher  implements ProcessListener, Runnable{
 
 	
 	public void run() {
-		System.out.println(queue);
 		start();
 		while(!getCancel()){
 			executeNextProcesses();

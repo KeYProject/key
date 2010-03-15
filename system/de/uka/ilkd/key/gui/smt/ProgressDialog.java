@@ -20,6 +20,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
+import java.awt.event.WindowStateListener;
 import java.util.Collection;
 
 import javax.swing.DefaultListCellRenderer;
@@ -75,7 +79,19 @@ public class ProgressDialog extends JDialog{
 	private ProgressDialog(){
 	    	setSize(500, 200);
 	    	setLocationByPlatform(true);
+	    	
+	    	this.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+	    	this.addWindowListener(new WindowAdapter() {
+	    	    @Override
+	    	    public void windowClosing(WindowEvent e) {
+	    		setVisible(false);
+			rule.stop();
+	    	    }
+	    	});
+	    	
 		setLayout(new BorderLayout());
+		setTitle("Progress of Decicion Procedures");
+	
 	
 		getList().setCellRenderer(new ListCellRenderer(){
 

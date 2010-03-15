@@ -116,7 +116,7 @@ public class DecissionProcedureSettingsDialog extends JDialog {
 		String cmd = dps.getExecutionCommand(solver);
 		boolean b = dps.getMultipleUse(solver);
 		proverSettings.add(new Settings(b,cmd,solver));
-		System.out.println(solver.name()+ ": "+ solver.isInstalled(false));
+
 	
 	}
 	this.setRuleVals();
@@ -309,11 +309,11 @@ public class DecissionProcedureSettingsDialog extends JDialog {
 	
 	
 
-	System.out.println("update");
+
 	Main.instance.updateDecisionProcedureSelectMenu();
-	System.out.println("rules");
+
 	this.setRuleVals();
-	System.out.println("finish");
+
     }
     
 /*    private void performTest() {

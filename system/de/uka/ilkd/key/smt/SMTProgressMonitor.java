@@ -12,16 +12,18 @@ package de.uka.ilkd.key.smt;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.util.ProgressMonitor;
 
-/**
- * @author niederma
- *
- */
+
 public interface SMTProgressMonitor extends ProgressMonitor{
+    public final static int MAX_TIME = 1000;
 
     public enum SolveType {UNKOWN,SOLVABLE,UNSOLVABLE};
     
     public void setTimeProgress(int progress);
     public void setTimeMaximum(int maximum);
     public void setGoalProgress(Goal goal, SolveType type);
+    public void setSolverFinished(long time);
+    
+    
+    public void exceptionOccurred(String text, Exception e);
     
 }	
