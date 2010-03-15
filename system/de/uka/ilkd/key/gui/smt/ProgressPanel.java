@@ -16,24 +16,23 @@ import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
-import javax.swing.JFrame;
+
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.SwingUtilities;
 import javax.swing.border.TitledBorder;
-import javax.swing.plaf.ProgressBarUI;
+
 
 
 
 import de.uka.ilkd.key.gui.ErrorMessages;
-import de.uka.ilkd.key.gui.ExceptionDialog;
+
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.smt.MakesProgress;
 import de.uka.ilkd.key.smt.SMTProgressMonitor;
-import de.uka.ilkd.key.util.ProgressMonitor;
 
-import sun.font.CreatedFontTracker;
+
 
 class ProgressPanel implements SMTProgressMonitor {
 
