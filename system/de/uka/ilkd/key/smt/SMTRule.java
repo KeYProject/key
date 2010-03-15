@@ -22,8 +22,6 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.smt.taclettranslation.DefaultTacletSetTranslation;
-import de.uka.ilkd.key.smt.taclettranslation.TacletSetTranslation;
 import de.uka.ilkd.key.util.ProgressMonitor;
 
 public class SMTRule implements BuiltInRule, MakesProgress {

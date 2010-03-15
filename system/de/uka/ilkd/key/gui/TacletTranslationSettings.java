@@ -42,7 +42,7 @@ public class TacletTranslationSettings implements Settings {
     private static final String KEY_MAX_GENERIC = "[TacletTranslation]maxGeneric";
     private static final String KEY_ASSIGNMENT  = "[TacletTranslation]assignment";
     private int maxGeneric=2;
-    private String filename;
+    private String filename="";
     private boolean saveToFile= false;
     
     public int getMaxGeneric() {
@@ -194,10 +194,7 @@ public class TacletTranslationSettings implements Settings {
 	saveToFile = Boolean.valueOf(props.getProperty(KEY_SAVE_TO_FILE,"false"));
 	maxGeneric = Integer.valueOf(props.getProperty(KEY_MAX_GENERIC,"2"));
 	filename = props.getProperty(KEY_FILENAME,"");
-	tacletAssignmentFromString(props.getProperty(KEY_ASSIGNMENT, ""));
-	
-	
-	
+	tacletAssignmentFromString(props.getProperty(KEY_ASSIGNMENT, ""));			
     }
     
 
