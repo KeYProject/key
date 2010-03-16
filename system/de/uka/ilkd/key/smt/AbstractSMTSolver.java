@@ -45,6 +45,11 @@ public abstract class AbstractSMTSolver extends AbstractProcess implements SMTSo
 
     
     private static int fileCounter = 0;
+    
+    private static synchronized int getNextFileID(){
+	fileCounter++;
+	return fileCounter;
+    }
 
     private static final Logger logger = Logger
 	    .getLogger(AbstractSMTSolver.class.getName());
@@ -169,12 +174,14 @@ public abstract class AbstractSMTSolver extends AbstractProcess implements SMTSo
 	smtFileDir.deleteOnExit();
 	
 	// create the actual file marked as delete on exit
-	final File smtFile = new File(smtFileDir, FILE_BASE_NAME +"_"+fileCounter+"_"+ getCurrentDateString());
-	fileCounter++;
+	final File smtFile = new File(smtFileDir, FILE_BASE_NAME +"_"+name()+"_"+"_"+getNextFileID()+"_"+ getCurrentDateString());
+	
+	
 	smtFile.deleteOnExit();
 	
 	// write the content out to the created file
-	final BufferedWriter out = new BufferedWriter(new FileWriter(smtFile));
+	//final BufferedWriter out = new BufferedWriter(new FileWriter(smtFile));
+	final FileWriter out = new FileWriter(smtFile);
 	out.write(text);
 	out.close();
 
@@ -330,12 +337,11 @@ public abstract class AbstractSMTSolver extends AbstractProcess implements SMTSo
     
     
     private Collection<Taclet> getTaclets(){
-	
+	 
 	 if(tacletsForTest != null){
 	     return tacletsForTest;
 	 }
-	 return ProofSettings.DEFAULT_SETTINGS.getTacletTranslationSettings()
-	            .initTaclets(session.getTacletIndex());
+	 return session.getTaclets();
     }
     
    
@@ -376,10 +382,10 @@ public abstract class AbstractSMTSolver extends AbstractProcess implements SMTSo
 	tacletsForTest = set;
     }
     
-    public void prepareSolver(LinkedList<InternResult> terms, Services services, TacletIndex tacletIndex) {
+    public void prepareSolver(LinkedList<InternResult> terms, Services services, Collection<Taclet> taclets) {
 	init();
 	
-	session = new SolverSession(terms, services, tacletIndex);
+	session = new SolverSession(terms, services, taclets);
 
         
     }

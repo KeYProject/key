@@ -17,6 +17,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.TacletIndex;
+import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.smt.SMTSolverResult.ThreeValuedTruth;
 
 
@@ -128,7 +129,7 @@ class SolverSession {
     private Services         services;
     private Iterator<InternResult>   it;
     private InternResult      current = null;
-    private TacletIndex      tacletIndex;
+    private Collection<Taclet>    taclets;
     
     public Collection<InternResult> getTerms() {
         return terms;
@@ -139,16 +140,16 @@ class SolverSession {
     
     
     
-    public SolverSession(LinkedList<InternResult> terms, Services services, TacletIndex index) {
+    public SolverSession(LinkedList<InternResult> terms, Services services, Collection<Taclet> taclets) {
 	super();
 	this.terms = terms;
 	this.services = services;
-	tacletIndex = index;
+	this.taclets = taclets;
 	it = terms.iterator();
     }
     
-    public TacletIndex getTacletIndex(){
-	return tacletIndex;
+    public Collection<Taclet> getTaclets(){
+	return taclets;
     }
     
     public InternResult getLastResult(){

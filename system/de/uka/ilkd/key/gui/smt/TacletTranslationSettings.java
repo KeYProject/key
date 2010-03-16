@@ -45,6 +45,10 @@ public class TacletTranslationSettings implements Settings {
     private String filename="";
     private boolean saveToFile= false;
     
+    private TacletTranslationSettings(){
+	
+    }
+    
     public int getMaxGeneric() {
         return maxGeneric;
     }

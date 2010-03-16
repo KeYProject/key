@@ -39,7 +39,6 @@ import de.uka.ilkd.key.rule.Taclet;
  */
 interface AttributeTranslator {
 
-    public final AttributeTranslator DEFAULT = new DefaultAttributeTranslator();
 
     /**
      * Translates all attributes in <code>term</code>. <code>term</code> belongs

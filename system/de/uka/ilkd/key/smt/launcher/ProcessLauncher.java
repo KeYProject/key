@@ -183,24 +183,27 @@ public abstract  class ProcessLauncher  implements ProcessListener, Runnable{
 	
 	public void eventException(Process p, Exception e) {
 	    	ProcessLaunch launch = findLaunch(p);
-		remove(p);	
+			
 		publish(new Event(this,launch,Event.Type.PROCESS_EXCEPTION,e));
+		remove(p);
 		
 	}
 
 
 	public void eventFinished(Process p) {
 	    	ProcessLaunch launch = findLaunch(p);
-		remove(p);
+	
 		publish(new Event(this,launch,Event.Type.PROCESS_FINISHED));
+		remove(p);
 
 	}
 
 
 	public void eventInterruption(Process p) {
 	    	ProcessLaunch launch = findLaunch(p);
-		remove(p);
+		
 		publish(new Event(this,launch,Event.Type.PROCESS_INTERRUPTION));
+		remove(p);
 
 	}
 

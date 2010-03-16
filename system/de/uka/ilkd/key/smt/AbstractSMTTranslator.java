@@ -196,7 +196,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 	}
 	
 	tacletAssumptions = translateTaclets(services);
-	
+
 	return buildComplText(services, hb);
     }
 
@@ -1838,7 +1838,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 	if(taclets.isEmpty() || taclets == null){
 	    return result;
 	}
-	
+
 	tacletSetTranslation = new DefaultTacletSetTranslation(services);
 	
 	tacletSetTranslation.setTacletSet(taclets);

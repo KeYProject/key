@@ -9,7 +9,10 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.Shape;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedList;
+import java.util.List;
+
 
 import javax.swing.AbstractButton;
 import javax.swing.BorderFactory;
@@ -31,12 +34,13 @@ import de.uka.ilkd.key.gui.ErrorMessages;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.smt.MakesProgress;
 import de.uka.ilkd.key.smt.SMTProgressMonitor;
+import de.uka.ilkd.key.smt.launcher.Process;
 
 
 
 class ProgressPanel implements SMTProgressMonitor {
 
-    	class InternGoal{
+    	static class InternGoal{
     	    Goal goal;
     	    SolveType type = SolveType.UNKOWN;
     	    public InternGoal(Goal goal){
@@ -58,8 +62,8 @@ class ProgressPanel implements SMTProgressMonitor {
 	private MakesProgress process = null;
 	private JComponent  parent;
 	
+	private List<InternGoal> goals = Collections.synchronizedList(new LinkedList<InternGoal>()); 
 	
-	private LinkedList<InternGoal> goals = new LinkedList<InternGoal>();
 	
 	
 
@@ -306,10 +310,12 @@ class ProgressPanel implements SMTProgressMonitor {
         }
 
         private InternGoal findGoal(Goal goal){
+            synchronized(goals){
             for(InternGoal g: goals){
         	if(goal == g.goal){
         	    return g;
         	}
+            }
             }
             return null;
         }

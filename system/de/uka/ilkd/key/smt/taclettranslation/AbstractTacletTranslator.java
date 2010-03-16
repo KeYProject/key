@@ -94,6 +94,7 @@ public abstract class AbstractTacletTranslator implements TacletTranslator,
 
     private GenericTranslator genericTranslator = new GenericTranslator(this);
     private ProgramSVTranslator programSVTranslator = new ProgramSVTranslator();
+    private AttributeTranslator attributeTranslator = new DefaultAttributeTranslator();
 
     
 
@@ -129,7 +130,7 @@ public abstract class AbstractTacletTranslator implements TacletTranslator,
 	result.add(term);
 	
 	
-	ImmutableSet<Term> tempResult = AttributeTranslator.DEFAULT.translate(t,
+	ImmutableSet<Term> tempResult = attributeTranslator.translate(t,
 	        term, attributeTerms, services, conditions);
 
 	if(!tempResult.isEmpty()){
