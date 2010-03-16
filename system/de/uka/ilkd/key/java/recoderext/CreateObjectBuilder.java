@@ -6,22 +6,13 @@
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
 //
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2004 Universitaet Karlsruhe, Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
 package de.uka.ilkd.key.java.recoderext;
 
-import java.util.*;
+import java.util.HashMap;
 
 import recoder.CrossReferenceServiceConfiguration;
-import recoder.java.Expression;
-import recoder.java.Identifier;
-import recoder.java.Statement;
-import recoder.java.StatementBlock;
+import recoder.java.*;
 import recoder.java.declaration.*;
 import recoder.java.declaration.modifier.Public;
 import recoder.java.declaration.modifier.Static;
@@ -30,6 +21,8 @@ import recoder.java.statement.Return;
 import recoder.kit.*;
 import recoder.list.generic.ASTArrayList;
 import recoder.list.generic.ASTList;
+import de.uka.ilkd.key.gui.configuration.ProofSettings;
+import de.uka.ilkd.key.proof.init.PercProfile;
 
 /**
  * If an allocation expression <code>new Class(...)</code> occurs, a new object
@@ -69,6 +62,10 @@ public class CreateObjectBuilder extends RecoderModelTransformer {
 	result.add(local);
 
 	final ASTList<Expression> arguments = new ASTArrayList<Expression>(0);
+        
+//        arguments.add(new FieldReference(new TypeReference(new PackageReference(new PackageReference(new Identifier("javax")), 
+//                new Identifier("realtime")), new Identifier("MemoryArea")), 
+//                new Identifier("callerScope")));
        
         result.add
             (assign(new VariableReference
@@ -79,11 +76,20 @@ public class CreateObjectBuilder extends RecoderModelTransformer {
                          (InstanceAllocationMethodBuilder.IMPLICIT_INSTANCE_ALLOCATE),
                          arguments)));
 
-	MethodReference createRef = 
-	    (new MethodReference(new VariableReference
+        String scopeForObj;
+        
+        if(ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof PercProfile){
+            scopeForObj = de.uka.ilkd.key.java.reference.MethodReference.CALLER_SCOPE;
+        }else{
+            scopeForObj = de.uka.ilkd.key.java.reference.MethodReference.LOCAL_SCOPE;
+        }
+        
+	MethodReferenceWrapper createRef = 
+	    new MethodReferenceWrapper(new VariableReference
 				 (new Identifier(NEW_OBJECT_VAR_NAME)), 
 				 new ImplicitIdentifier
-				 (CreateBuilder.IMPLICIT_CREATE)));
+				 (CreateBuilder.IMPLICIT_CREATE),
+                                 new Identifier(scopeForObj));
 	
 	// July 08 - mulbrich: wraps createRef into a method body statement to
 	// avoid unnecessary dynamic dispatch.
@@ -92,10 +98,11 @@ public class CreateObjectBuilder extends RecoderModelTransformer {
 	if(recoderClass.getIdentifier() == null) {
 	    // anonymous
 	    result.add
-        (new MethodReference(new VariableReference
+        (new MethodReferenceWrapper(new VariableReference
                              (new Identifier(NEW_OBJECT_VAR_NAME)),
                              new ImplicitIdentifier
-                             (CreateBuilder.IMPLICIT_CREATE)));
+                             (CreateBuilder.IMPLICIT_CREATE),
+                                 new Identifier(scopeForObj)));
 	} else {
 	    TypeReference tyref;
 	    tyref = makeTyRef(recoderClass); 
@@ -134,7 +141,12 @@ public class CreateObjectBuilder extends RecoderModelTransformer {
     public MethodDeclaration createMethod(ClassDeclaration type) {
 	ASTList<DeclarationSpecifier> modifiers = new ASTArrayList<DeclarationSpecifier>(2);
 	modifiers.add(new Public());
-	modifiers.add(new Static());	
+	modifiers.add(new Static());
+        
+	//        modifiers.add(new KeYAnnotationUseSpecification(new TypeReference(
+	//                new Identifier("ExternallyConstructedScope"))));
+	//        modifiers.add(new KeYAnnotationUseSpecification(new TypeReference(
+	//                new Identifier("NoLocalScope"))));
 
 	MethodDeclaration md =  new MethodDeclaration
 	    (modifiers, 

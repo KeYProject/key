@@ -3,8 +3,10 @@
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License.
+// The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
+//
+//
 package de.uka.ilkd.key.proof.init;
 
 import java.util.HashMap;
@@ -54,5 +56,4 @@ public class  DebuggerProfile extends JavaProfile {
         cs.setDefaultChoices(dcs);
         settings.getStrategySettings().setStrategy(new Name("DebuggerStrategy"));
     }
-
 }

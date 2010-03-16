@@ -6,6 +6,7 @@
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
 //
+//
 
 /** represents a name that is part of a program
  */

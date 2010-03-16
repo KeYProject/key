@@ -10,6 +10,12 @@
 
 package de.uka.ilkd.key.proof.init;
 
+import java.util.*;
+
+import de.uka.ilkd.key.gui.configuration.ProofSettings;
+import de.uka.ilkd.key.java.*;
+import de.uka.ilkd.key.java.abstraction.*;
+import de.uka.ilkd.key.java.declaration.*;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -28,10 +34,7 @@ import de.uka.ilkd.key.java.expression.operator.New;
 import de.uka.ilkd.key.java.recoderext.ConstructorNormalformBuilder;
 import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
 import de.uka.ilkd.key.java.reference.TypeReference;
-import de.uka.ilkd.key.java.statement.Branch;
-import de.uka.ilkd.key.java.statement.Catch;
-import de.uka.ilkd.key.java.statement.MethodBodyStatement;
-import de.uka.ilkd.key.java.statement.Try;
+import de.uka.ilkd.key.java.statement.*;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.mgt.AxiomJustification;
@@ -190,8 +193,16 @@ public abstract class EnsuresPO extends AbstractPO {
 
         return result;
     }
-
-
+  
+    /**
+     * Builds the "general assumption" about the amount of available memory. 
+     */
+    protected Term buildGeneralMemoryAssumption(ProgramVariable selfVar,
+                                        ImmutableList<ProgramVariable> pvars) 
+                throws ProofInputException {
+        return TB.tt();
+    }
+    
     /**
      * Builds the "general assumption" for a set of assumed invariants.
      */
@@ -278,7 +289,10 @@ public abstract class EnsuresPO extends AbstractPO {
         Catch catchStat = new Catch(excDecl, new StatementBlock(assignStat));
         Try tryStat = new Try(sb, new Branch[]{catchStat});
         sb = new StatementBlock(new Statement[]{nullStat, tryStat});
-
+        if(ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof PercProfile){
+            sb = new StatementBlock(new MethodFrame(null, 
+                    services.getJavaInfo().getDefaultExecutionContext(), sb));
+        }
         //create java block
         JavaBlock result = JavaBlock.createJavaBlock(sb);
 
@@ -344,6 +358,9 @@ public abstract class EnsuresPO extends AbstractPO {
 
         //build general assumption
         Term gaTerm = buildGeneralAssumption(selfVar, paramVars);
+        
+        Term gaMTerm = buildGeneralMemoryAssumption(selfVar, paramVars);
+        
         //get precondition defined by subclass
         Term preTerm = getPreTerm(selfVar,
                                   paramVars,
@@ -371,7 +388,7 @@ public abstract class EnsuresPO extends AbstractPO {
                                                              services);
 
         //put everything together
-        Term result = TB.imp(TB.and(gaTerm, uf.apply(atPreDefinitions, preTerm)),
+        Term result = TB.imp(TB.and(TB.and(gaTerm, gaMTerm), uf.apply(atPreDefinitions, preTerm)), 
                              uf.apply(atPreDefinitions, programTerm));
 
         //save in field

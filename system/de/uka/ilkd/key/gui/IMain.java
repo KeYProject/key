@@ -7,6 +7,7 @@
 // See LICENSE.TXT for details.
 package de.uka.ilkd.key.gui;
 
+import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 import de.uka.ilkd.key.proof.reuse.ReusePoint;
 import de.uka.ilkd.key.util.ProgressMonitor;
@@ -93,5 +94,10 @@ public interface IMain {
      * invoked when currently no reuse is possible
      */
     public abstract void indicateNoReuse();
+    
+    /**
+     * @return the settings of the currently active proof
+     */
+    public abstract ProofSettings getSettings();
     
 }

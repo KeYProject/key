@@ -10,7 +10,6 @@
 
 package de.uka.ilkd.key.gui;
 
-import java.awt.*;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
@@ -19,6 +18,7 @@ import java.awt.dnd.DropTargetAdapter;
 import java.awt.dnd.DropTargetDropEvent;
 import java.awt.dnd.DropTargetListener;
 import java.awt.event.*;
+import java.awt.*;
 import java.io.*;
 import java.net.URL;
 import java.util.ArrayList;
@@ -34,37 +34,26 @@ import javax.swing.text.JTextComponent;
 
 import org.apache.log4j.Logger;
 
+import de.uka.ilkd.key.gui.assistant.*;
 import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.gui.assistant.ProofAssistant;
-import de.uka.ilkd.key.gui.assistant.ProofAssistantAI;
-import de.uka.ilkd.key.gui.assistant.ProofAssistantController;
 import de.uka.ilkd.key.gui.configuration.*;
 import de.uka.ilkd.key.gui.nodeviews.NonGoalInfoView;
 import de.uka.ilkd.key.gui.nodeviews.SequentView;
 import de.uka.ilkd.key.gui.notification.NotificationManager;
-import de.uka.ilkd.key.gui.notification.events.ExitKeYEvent;
-import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
-import de.uka.ilkd.key.gui.notification.events.GeneralInformationEvent;
-import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
+import de.uka.ilkd.key.gui.notification.events.*;
 import de.uka.ilkd.key.gui.prooftree.ProofTreeView;
 import de.uka.ilkd.key.gui.smt.DecisionProcedureSettings;
 import de.uka.ilkd.key.gui.smt.DecissionProcedureSettingsDialog;
 import de.uka.ilkd.key.gui.smt.RuleLauncher;
 import de.uka.ilkd.key.gui.smt.SMTResultsAndBugDetectionDialog;
 import de.uka.ilkd.key.gui.smt.TacletTranslationSettingsDialog;
-import de.uka.ilkd.key.java.NonTerminalProgramElement;
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.Statement;
-import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.jmltest.JMLTestFileCreator;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.pp.*;
 import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.init.*;
-import de.uka.ilkd.key.proof.mgt.BasicTask;
-import de.uka.ilkd.key.proof.mgt.NonInterferenceCheck;
-import de.uka.ilkd.key.proof.mgt.TaskTreeNode;
+import de.uka.ilkd.key.proof.mgt.*;
 import de.uka.ilkd.key.proof.reuse.ReusePoint;
 import de.uka.ilkd.key.smt.SMTRule;
 import de.uka.ilkd.key.strategy.VBTStrategy;
@@ -2703,6 +2692,11 @@ public class Main extends JFrame implements IMain {
         }
     }
     
+    public ProofSettings getSettings(){
+        if(mediator.getProof() == null) return ProofSettings.DEFAULT_SETTINGS;
+        return mediator.getProof().getSettings();
+    }
+    
     public static void evaluateOptions(String[] opt) {
 	int index = 0;
 	ProofSettings.DEFAULT_SETTINGS.setProfile(new JavaProfile());
@@ -2723,12 +2717,25 @@ public class Main extends JFrame implements IMain {
 		    GeneralSettings.disableSpecs = true;
 		} else if (opt[index].equals("AUTO")) {
 		    batchMode = true;
-                    setVisibleMode(false);
-		} else if (opt[index].equals("DEPTHFIRST")) {		
-		    	System.out.println("DepthFirst GoalChooser ...");
-			Profile p = ProofSettings.DEFAULT_SETTINGS.getProfile();
-			p.setSelectedGoalChooserBuilder(DepthFirstGoalChooserBuilder.NAME);  
-			VBTStrategy.preferedGoalChooser = DepthFirstGoalChooserBuilder.NAME; 
+                    visible = false;
+		} else if (opt[index].equals("RTSJ")) {
+		    boolean memory = false;
+		    System.out.println("RTSJ extensions enabled ...");
+		    if (index + 1 < opt.length && 
+			opt[index + 1].toUpperCase().equals("MEMORY")) {
+			memory = true;
+			System.out.println("Memory consumption calculus enabled ...");
+			index++;
+		    }
+		    ProofSettings.DEFAULT_SETTINGS.setProfile(new RTSJProfile(memory));
+		} else if (opt[index].equals("PERC")) {
+                    ProofSettings.DEFAULT_SETTINGS.setProfile(new PercProfile());
+                    System.out.println("PERC Pico extensions enabled");
+                } else if (opt[index].equals("DEPTHFIRST")) {		
+		    System.out.println("DepthFirst GoalChooser ...");
+		    Profile p = ProofSettings.DEFAULT_SETTINGS.getProfile();
+		    p.setSelectedGoalChooserBuilder(DepthFirstGoalChooserBuilder.NAME);  
+		    VBTStrategy.preferedGoalChooser = DepthFirstGoalChooserBuilder.NAME; 
 		} else if (opt[index].equals("TESTING") || opt[index].equals("UNIT") || opt[index].equals("UNIT2")) {
 		    int mode=-1;
 		    if(opt[index].equals("TESTING")){
@@ -2738,60 +2745,60 @@ public class Main extends JFrame implements IMain {
 		    } else if(opt[index].equals("UNIT2")){
 			mode=3;
 		    }
-                    if(mode==1){
-                        testStandalone = true;
-                        setVisibleMode(false);//Problem:Mixed semantics
-                    }
-                    if(mode==1||mode==2){
-                	System.out.println("VBT optimizations enabled ...");
-                    }else{
-                	System.out.println("VBT 2 optimizations enabled ...");
-                    }
+		    if(mode==1){
+			testStandalone = true;
+			setVisibleMode(false);//Problem:Mixed semantics
+		    }
+		    if(mode==1||mode==2){
+			System.out.println("VBT optimizations enabled ...");
+		    }else{
+			System.out.println("VBT 2 optimizations enabled ...");
+		    }
                     
-                    //Parameters of JavaTestGenerationProfile
-                    boolean loop=false;
-                    int loopBound=-1;
-                    
-                    if (index + 1 < opt.length){
-                        if(opt[index + 1].equalsIgnoreCase("loop")) {
-                        loop=true;
-                        System.out.println("Balanced loop unwinding ...");
-                        index ++;
-                        }
-                    }
-                    if (index + 1 < opt.length){
-                        if(opt[index + 1].equalsIgnoreCase("loop0"))loopBound=0;
-                        else if(opt[index + 1].equalsIgnoreCase("loop1"))loopBound=1;
-                        else if(opt[index + 1].equalsIgnoreCase("loop2"))loopBound=2;
-                        else if(opt[index + 1].equalsIgnoreCase("loop3"))loopBound=3;
-                        else if(opt[index + 1].equalsIgnoreCase("loop4"))loopBound=4;
-                        if(loopBound>=0)System.out.println("Bounded loop unwinding. Unwinding bound:"+loopBound);
-                        index++;
-                    }
-                    if(mode==1||mode==2){
-                	ProofSettings.DEFAULT_SETTINGS.setProfile(
-                	    new JavaTestGenerationProfile(null,loop,loopBound));
-                    } else if(mode==3){
-                	ProofSettings.DEFAULT_SETTINGS.setProfile(
-                    	    new JavaTestGenerationProfile2(null,loop,loopBound));                	
-                    }
-                    testMode = true;
+		    //Parameters of JavaTestGenerationProfile
+		    boolean loop=false;
+		    int loopBound=-1;
+		    
+		    if (index + 1 < opt.length){
+			if(opt[index + 1].equalsIgnoreCase("loop")) {
+			    loop=true;
+			    System.out.println("Balanced loop unwinding ...");
+			    index ++;
+			}
+		    }
+		    if (index + 1 < opt.length){
+			if(opt[index + 1].equalsIgnoreCase("loop0"))loopBound=0;
+			else if(opt[index + 1].equalsIgnoreCase("loop1"))loopBound=1;
+			else if(opt[index + 1].equalsIgnoreCase("loop2"))loopBound=2;
+			else if(opt[index + 1].equalsIgnoreCase("loop3"))loopBound=3;
+			else if(opt[index + 1].equalsIgnoreCase("loop4"))loopBound=4;
+			if(loopBound>=0)System.out.println("Bounded loop unwinding. Unwinding bound:"+loopBound);
+			index++;
+		    }
+		    if(mode==1||mode==2){
+			ProofSettings.DEFAULT_SETTINGS.setProfile(
+								  new JavaTestGenerationProfile(null,loop,loopBound));
+		    } else if(mode==3){
+			ProofSettings.DEFAULT_SETTINGS.setProfile(
+								  new JavaTestGenerationProfile2(null,loop,loopBound));                	
+		    }
+		    testMode = true;
                     
 		} else if (opt[index].equals("DEBUGGER")) {                                     
-                    System.out.println("Symbolic Execution Debugger Mode enabled ...");                                        
-                    final Profile p = new DebuggerProfile(null);                    
-                    if (index + 1 < opt.length && 
-                            opt[index + 1].equals("LOOP")) {
-                        p.setSelectedGoalChooserBuilder(BalancedGoalChooserBuilder.NAME);
-                        //System.out.println("Balanced loop unwinding ...");
-                        index ++;
-                    }
-                    ProofSettings.DEFAULT_SETTINGS.setProfile(p);                    
-                    testMode = true;
-                }                                                 
-                else if (opt[index].equals("FOL")) {                     
-                   ProofSettings.DEFAULT_SETTINGS.setProfile(new PureFOLProfile());
-                } else if (opt[index].equals("TIMEOUT")) {
+		    System.out.println("Symbolic Execution Debugger Mode enabled ...");                                        
+		    final Profile p = new DebuggerProfile(null);                    
+		    if (index + 1 < opt.length && 
+			opt[index + 1].equals("LOOP")) {
+			p.setSelectedGoalChooserBuilder(BalancedGoalChooserBuilder.NAME);
+			//System.out.println("Balanced loop unwinding ...");
+			index ++;
+		    }
+		    ProofSettings.DEFAULT_SETTINGS.setProfile(p);                    
+		    testMode = true;
+		}                                                 
+		else if (opt[index].equals("FOL")) {                     
+		    ProofSettings.DEFAULT_SETTINGS.setProfile(new PureFOLProfile());
+		} else if (opt[index].equals("TIMEOUT")) {
                     long timeout = -1;
                     try {
                         timeout = Long.parseLong(opt[index + 1]);
@@ -2805,11 +2812,11 @@ public class Main extends JFrame implements IMain {
                     }
                     index++;                   
                     ProofSettings.DEFAULT_SETTINGS.getStrategySettings().setTimeout(timeout);
-        } else if (opt[index].equals("PRINT_STATISTICS")) {                     
-            if ( !( opt.length > index + 1 ) ) printUsageAndExit ();
-            statisticsFile = opt[index + 1];
-            ++index;
-        } else {
+		} else if (opt[index].equals("PRINT_STATISTICS")) {                     
+		    if ( !( opt.length > index + 1 ) ) printUsageAndExit ();
+		    statisticsFile = opt[index + 1];
+		    ++index;
+		} else {
 		    printUsageAndExit ();
 		}		
 	    }
@@ -2845,6 +2852,8 @@ public class Main extends JFrame implements IMain {
 	System.out.println("  depthfirst      : constructs the proof tree in a depth first manner. Recommended for large proofs");
         System.out.println("  auto	          : start prove procedure after initialisation");
         System.out.println("  testing         : starts the prover with a simple test generation oriented user interface");
+	System.out.println(" rtsj [memory] : enables rtsj extensions (optional argument memory for enabling extensions for reasoning over memory consumption)");
+	//	System.out.println(" perc : enables PERC Pico extensions");
         System.out.println("  print_statistics <filename>" );
         System.out.println("                  : in auto mode, output nr. of rule applications and time spent");
         System.out.println("  fol             : use FOL profile (no program or update rules)");
@@ -3476,7 +3485,7 @@ public class Main extends JFrame implements IMain {
             setLocation(70, 70);
             addWindowListener(new UnitTestGeneratorGuiListener());
             pack();     
-            Dimension d = getSize();
+            java.awt.Dimension d = getSize();
             d.setSize(400, (int) d.getHeight()+3);
             setSize(d);
             setVisible(true);

@@ -1,3 +1,12 @@
+// This file is part of KeY - Integrated Deductive Software Design
+// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General Public License. 
+// See LICENSE.TXT for details.
+//
+//
 package de.uka.ilkd.key.unittest;
 
 import java.io.*;
@@ -1746,11 +1755,12 @@ public abstract class TestGenerator {
 	        && !"TRUE".equals(t.op().name().toString())
 	        && !"FALSE".equals(t.op().name().toString())
 	        && t.op() != Op.NULL) {
-	    KeYJavaType kjt = serv.getJavaInfo().getKeYJavaType(
-		    t.sort().toString());
+	    KeYJavaType kjt;
 	    if (t.sort().toString().startsWith("jint")) {
 		kjt = serv.getJavaInfo().getKeYJavaType(
 		        t.sort().toString().substring(1));
+	    }else{
+		kjt = serv.getJavaInfo().getKeYJavaType(t.sort().toString());
 	    }
 	    final ProgramVariable pv = new LocationVariable(
 		    new ProgramElementName(t.op().name().toString()), kjt);

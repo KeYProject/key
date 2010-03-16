@@ -5,51 +5,44 @@
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
-//This file is part of KeY - Integrated Deductive Software Design
-//Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
-//Universitaet Koblenz-Landau, Germany
-//Chalmers University of Technology, Sweden
-
-//The KeY system is private by the GNU General private License. 
-//See LICENSE.TXT for details.
 
 
 
 package de.uka.ilkd.key.java;
 
-
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
+import java.lang.reflect.*;
+import java.util.*;
 
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.abstraction.ClassType;
 import recoder.abstraction.Type;
 import recoder.java.NonTerminalProgramElement;
 import recoder.list.generic.ASTList;
+import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.abstraction.Field;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.*;
+import de.uka.ilkd.key.java.declaration.modifier.*;
 import de.uka.ilkd.key.java.declaration.modifier.Ghost;
 import de.uka.ilkd.key.java.declaration.modifier.Model;
-import de.uka.ilkd.key.java.expression.ArrayInitializer;
-import de.uka.ilkd.key.java.expression.Literal;
-import de.uka.ilkd.key.java.expression.ParenthesizedExpression;
+import de.uka.ilkd.key.java.expression.*;
 import de.uka.ilkd.key.java.expression.PassiveExpression;
 import de.uka.ilkd.key.java.expression.literal.*;
 import de.uka.ilkd.key.java.expression.operator.*;
-import de.uka.ilkd.key.java.recoderext.ImplicitIdentifier;
+import de.uka.ilkd.key.java.expression.operator.SetAssignment;
+import de.uka.ilkd.key.java.recoderext.*;
 import de.uka.ilkd.key.java.reference.*;
+import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.statement.*;
+import de.uka.ilkd.key.java.statement.CatchAllStatement;
+import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.VariableNamer;
 import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.proof.init.PercProfile;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.ExtList;
 
@@ -647,8 +640,16 @@ public class Recoder2KeYConverter {
         recoder.abstraction.Type javaType = getServiceConfiguration()
         .getCrossReferenceSourceInfo().getType(newArr);
 
+        ProgramElement scope = null;
+        String s = (newArr instanceof NewArrayWrapper &&  
+                ((NewArrayWrapper) newArr).getScope()!=null ? 
+                ((NewArrayWrapper) newArr).getScope().toSource() : null);
+        if(s!=null && (ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof PercProfile)){
+            scope = new ProgramElementName(s);
+        }        
+        
         return new NewArray(children, getKeYJavaType(javaType), arrInit, newArr
-                .getDimensions());
+                .getDimensions(), scope);
     }
 
     // ------------------- literals --------------------------------------
@@ -790,7 +791,7 @@ public class Recoder2KeYConverter {
         }
 
         final MethodReference mr = new MethodReference(new ImmutableArray<Expression>(
-                keyArgs), methodName, invocationTarget);
+                keyArgs), methodName, invocationTarget, rmbs.getScope()==null ? null : rmbs.getScope().getText());
 
         return new MethodBodyStatement(bodySource, resultVar, mr);
     }
@@ -1335,10 +1336,19 @@ public class Recoder2KeYConverter {
             prefix = (ReferencePrefix) children.get(prefixPos);
             children.remove(prefixPos);
         }
-
+        
+        String scope = (mr instanceof MethodReferenceWrapper &&  
+                ((MethodReferenceWrapper) mr).getScope()!=null ? 
+                ((MethodReferenceWrapper) mr).getScope().toSource() : null);
+        
+        if(!(ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof PercProfile)){
+            scope = null;
+        }
+        
         return new MethodReference(children,
                 pm == null ? new ProgramElementName(mr.getName()) : pm
-                        .getProgramElementName(), prefix, positionInfo(mr));
+                        .getProgramElementName(), prefix, positionInfo(mr), 
+                        scope);
     }
 
     // --------------Special treatment because of ambiguities ----------
@@ -1369,6 +1379,10 @@ public class Recoder2KeYConverter {
         return new For(convertLoopInitializers(f), convertGuard(f),
                 convertUpdates(f), convertBody(f), collectComments(f),
                 positionInfo(f));
+    }
+    
+    public AnnotationUseSpecification convert(recoder.java.declaration.AnnotationUseSpecification aus){
+        return new AnnotationUseSpecification((TypeReference) callConvert(aus.getTypeReference()));
     }
 
     /**
@@ -1552,13 +1566,21 @@ public class Recoder2KeYConverter {
             KeYJavaType kjt = getKeYJavaType(n.getClassDeclaration());
             maybeAnonClass = new TypeRef(kjt);
         }
+        
+        ProgramElementName scope = null;
+        String s = (n instanceof NewWrapper &&  
+                ((NewWrapper) n).getScope()!=null ? 
+                ((NewWrapper) n).getScope().toSource() : null);
+        if(s!=null && (ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof PercProfile)){
+            scope = new ProgramElementName(s);
+        }
 
         if (rp == null) {
             return new New(arguments, maybeAnonClass,
-                    null);
+                    (ReferencePrefix) null, scope);
         } else {
             return new New(arguments, maybeAnonClass,
-                    (ReferencePrefix) callConvert(rp));
+                    (ReferencePrefix) callConvert(rp), scope);
         }
     }
 

@@ -9,10 +9,7 @@
 //
 package de.uka.ilkd.key.java;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
+import java.util.*;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
@@ -20,18 +17,11 @@ import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.abstraction.*;
 import de.uka.ilkd.key.java.declaration.*;
 import de.uka.ilkd.key.java.expression.literal.NullLiteral;
-import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.java.reference.TypeRef;
-import de.uka.ilkd.key.java.reference.TypeReference;
+import de.uka.ilkd.key.java.reference.*;
 import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.ldt.LDT;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.Op;
-import de.uka.ilkd.key.logic.op.ProgramMethod;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.sort.ArraySort;
-import de.uka.ilkd.key.logic.sort.ObjectSort;
-import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.logic.ldt.*;
+import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.sort.*;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.LRUCache;
 
@@ -58,7 +48,7 @@ public class JavaInfo {
         
         public boolean equals(Object o) {
             if (o instanceof CacheKey) {
-                final CacheKey snd = (CacheKey)o;                
+                final CacheKey snd = (CacheKey)o;               
                 return snd.o1.equals(o1) && snd.o2.equals(o2);
             } 
             return false;
@@ -86,7 +76,7 @@ public class JavaInfo {
      *    java.lang.Object, java.lang.Clonable, java.io.Serializable
      * in </em>in this order</em>
      */
-    private KeYJavaType[] commonTypes = new KeYJavaType[3];
+    private KeYJavaType[] commonTypes = new KeYJavaType[6];
 
     //some caches for the getKeYJavaType methods.
     private HashMap<Sort, KeYJavaType> sort2KJTCache = null;
@@ -115,7 +105,9 @@ public class JavaInfo {
      */
     private ExecutionContext defaultExecutionContext;
                 
-
+    private LocationVariable defaultMemoryArea;    
+    private LocationVariable immortalMemoryArea;    
+    
     /**
      * a term with the constant 'null'
      */
@@ -138,7 +130,7 @@ public class JavaInfo {
      */
     JavaInfo(KeYProgModelInfo kpmi, Services s) {
 	this.kpmi 	= kpmi;
-	services	= s;	  	
+	services	= s;	 
     }
 
     private JavaInfo(JavaInfo proto, Services s) {
@@ -342,6 +334,12 @@ public class JavaInfo {
 		sName2KJTCache = null;
 		return getTypeByClassName(className);
 	    }
+            // maybe a not yet known array type
+            if(className.endsWith("]")){
+                readJavaBlock("{" + className + " k;}");
+                result = getKeYJavaType(className);
+                if(result!=null) return result;
+            }
 	    Debug.out("javaInfo: type not found. Looked for:", className);
 	    throw new RuntimeException("TYPE NOT FOUND: " + className);
 	}
@@ -420,7 +418,7 @@ public class JavaInfo {
     public KeYJavaType getKeYJavaType(String fullName) {
         KeYJavaType result = getPrimitiveKeYJavaType(fullName);
         return (result == null ?
-                getTypeByName(fullName) :
+            (KeYJavaType)getTypeByClassName(fullName) :
             result);
     }
 
@@ -455,7 +453,11 @@ public class JavaInfo {
 		 }
 	     }
 	 }	
-	 return sort2KJTCache.get(sort);
+	 KeYJavaType result = (KeYJavaType) sort2KJTCache.get(sort);
+         if(result==null && sort instanceof ArraySort){
+             result = getKeYJavaType(sort.name().toString());
+         }
+         return result;
      }
 
     /** returns the KeYJavaType of the expression if it can be
@@ -893,6 +895,15 @@ public class JavaInfo {
 	if (qualifiedClassName == null || qualifiedClassName.length() == 0) {
             throw new IllegalArgumentException("Missing qualified classname");
         }
+        KeYJavaType kjt=null;
+        try{
+            kjt = getKeYJavaTypeByClassName(qualifiedClassName);
+        }catch(Exception e){
+            if(qualifiedClassName.endsWith("]")){
+                readJavaBlock("{" + qualifiedClassName + " k;}");
+                kjt = getKeYJavaType(qualifiedClassName);
+            }
+        }
         return getAttribute(programName, 
 			    getKeYJavaTypeByClassName(qualifiedClassName));
     }
@@ -925,6 +936,61 @@ public class JavaInfo {
         }
 	}
 	return null;
+    }
+
+    public int getSizeInBytes(KeYJavaType type){
+        if(type.getSort() instanceof ObjectSort){
+            int size = 8;
+            if(type.toString().indexOf("[")!=-1) return 0;
+            size += getSizeInBytesRec(type);
+            if(size % 8 == 0){
+                return size;
+            }else{
+                return (size/8+1)*8;
+            }
+        }else{
+            return getSizeInBytesForPrimitiveType(type);
+        }
+    }
+    
+    private int getSizeInBytesRec(KeYJavaType classType){
+        if(classType == getJavaLangObject() || classType == null) return 0;
+        int size = 0;
+        ImmutableList<Field> l = kpmi.getAllFieldsLocallyDeclaredIn(classType);
+        size += sizeInBytes(l);
+        size += getSizeInBytesRec(getSuperclass(classType));
+        return size;
+    }
+    
+    private int getSizeInBytesForPrimitiveType(KeYJavaType pType){
+        String name = pType.getSort().toString();
+        if(name.equals("jbyte") || name.equals("boolean")){
+            return 1;
+        }else if(name.equals("jshort") || name.equals("jchar")){
+            return 2;
+        }else if(name.equals("jlong")){
+            return 8;
+        }else{
+            return 4;
+        }
+    }
+    
+    private int sizeInBytes(ImmutableList<Field> l){
+        int size = 0;
+        while(!l.isEmpty()){
+            if(l.head() instanceof ImplicitFieldSpecification){
+                l = l.tail();
+                continue;
+            }
+            KeYJavaType fType = l.head().getProgramVariable().getKeYJavaType();
+            l = l.tail();
+            if(fType.getSort() instanceof ObjectSort){
+                size += 4;
+            }else{
+                size += getSizeInBytesForPrimitiveType(fType);
+            }
+        }
+        return size;
     }
 
     /**
@@ -997,7 +1063,10 @@ public class JavaInfo {
     private void fillCommonTypesCache() {
         if (commonTypesCacheValid) return;
         final String[] fullNames = {"java.lang.Object", 
-                "java.lang.Cloneable", "java.lang.Serializable"};
+                "java.lang.Cloneable", "java.io.Serializable",
+                "javax.realtime.MemoryArea",
+                "javax.realtime.ScopedMemory",
+                "javax.realtime.ImmortalMemory"};
         
         for (int i = 0; i<fullNames.length; i++) {
             commonTypes[i] = getKeYJavaTypeByClassName(fullNames[i]);            
@@ -1035,7 +1104,36 @@ public class JavaInfo {
         }
         return commonTypes[2];
     }
+    
+    /**
+     * returns the KeYJavaType for class <tt>java.realtime.MemoryArea</tt>
+     */
+    public KeYJavaType getJavaxRealtimeMemoryArea() {
+        if (commonTypes[3] == null) {
+            commonTypes[3] = getKeYJavaTypeByClassName("javax.realtime.MemoryArea");
+        }
+        return commonTypes[3];
+    }
 
+    /**
+     * returns the KeYJavaType for class <tt>java.realtime.ScopedMemory</tt>
+     */
+    public KeYJavaType getJavaxRealtimeScopedMemory() {
+        if (commonTypes[4] == null) {
+            commonTypes[4] = getKeYJavaTypeByClassName("javax.realtime.ScopedMemory");
+        }
+        return commonTypes[4];
+    }
+
+    /**
+     * returns the KeYJavaType for class <tt>java.realtime.ImmortalMemory</tt>
+     */
+    public KeYJavaType getJavaxRealtimeImmortalMemory() {
+        if (commonTypes[5] == null) {
+            commonTypes[5] = getKeYJavaTypeByClassName("javax.realtime.ImmortalMemory");
+        }
+        return commonTypes[5];
+    }
 
     
     /**
@@ -1102,9 +1200,48 @@ public class JavaInfo {
             final KeYJavaType kjt = 
                 getKeYJavaTypeByClassName(DEFAULT_EXECUTION_CONTEXT_CLASS);                     
             defaultExecutionContext = 
-                new ExecutionContext(new TypeRef(kjt), null);
+                new ExecutionContext(new TypeRef(kjt), getDefaultMemoryArea(),
+                        null, getDefaultMemoryArea(), getDefaultMemoryArea());
         }
         return defaultExecutionContext;
+    }
+    
+    public LocationVariable getDefaultMemoryArea(){
+        if(defaultMemoryArea==null){
+            // ensure that default classes are available
+            if (!kpmi.rec2key().parsedSpecial()) {
+                readJava("{}");                
+            }
+            defaultMemoryArea = (LocationVariable) services.getNamespaces().
+                programVariables().lookup(new Name("initialMemoryArea"));
+            KeYJavaType kjt = getTypeByClassName("javax.realtime.LTMemory");
+            if(defaultMemoryArea == null){
+                defaultMemoryArea = 
+                    new LocationVariable(new ProgramElementName("initialMemoryArea"),
+                            kjt);
+                services.getNamespaces().programVariables().add(defaultMemoryArea);
+            }
+        }
+        return defaultMemoryArea;
+    }
+    
+    public LocationVariable getImmortalMemoryArea(){
+        if(immortalMemoryArea==null){
+            // ensure that default classes are available
+            if (!kpmi.rec2key().parsedSpecial()) {
+                readJava("{}");                
+            }
+            immortalMemoryArea = (LocationVariable) services.getNamespaces().
+                programVariables().lookup(new Name("immortalMemoryArea"));
+            KeYJavaType kjt = getTypeByClassName("javax.realtime.MemoryArea");
+            if(immortalMemoryArea == null){
+                immortalMemoryArea = 
+                    new LocationVariable(new ProgramElementName("immortalMemoryArea"),
+                            kjt);
+                services.getNamespaces().programVariables().add(immortalMemoryArea);
+            }
+        }
+        return immortalMemoryArea;
     }
     
     

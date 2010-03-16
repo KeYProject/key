@@ -42,11 +42,73 @@ public abstract class AbstractMetaOperator extends Op implements MetaOperator {
     public static final AbstractMetaOperator META_LENGTH = new MetaLength();
 
     public static final AbstractMetaOperator META_ATTRIBUTE = new MetaAttribute();
+    
+    public static final AbstractMetaOperator META_INSTANCE = new MetaInstance();
 
     public static final AbstractMetaOperator META_CREATED = new MetaCreated();
     
+    public static final AbstractMetaOperator META_MEMORY_AREA = new MetaMemoryArea();
+    
+    public static final AbstractMetaOperator META_REENTRANT_SCOPE = new MetaReentrantScope();
+    
     public static final AbstractMetaOperator META_NEXT_TO_CREATE = new MetaNextToCreate();
 
+    public static final AbstractMetaOperator META_ARRAY_SIZE = new ArraySize();
+    
+    public static final AbstractMetaOperator META_OBJECT_SIZE = new ObjectSize();
+    
+    public static final AbstractMetaOperator META_HEAP_SPACE = new HeapSpace();
+    
+    public static final AbstractMetaOperator META_NEXT_TO_CREATE_STACK = new MetaNextToCreateStack();
+    
+    public static final AbstractMetaOperator META_NO_LOCAL_SCOPE = new NoLocalScope();
+    
+    public static final AbstractMetaOperator META_AT_LOCAL_SCOPE = new AtLocalScope();
+    
+    public static final AbstractMetaOperator META_CALLER_ALLOC_RESULT_CONTEXT = new CallerAllocResContext();
+    
+    public static final AbstractMetaOperator META_EXACT_SIZE_SCOPE = new ExactSizeScope();
+    
+    public static final AbstractMetaOperator META_AT_REENTRANT_SCOPE = new AtReentrantScope();
+    
+    public static final AbstractMetaOperator META_CONSUMED_AT_PRE = new ConsumedAtPre();
+    
+    public static final AbstractMetaOperator META_WS_AT_PRE = new WSAtPre();
+    
+    public static final AbstractMetaOperator META_CONSUMED_LOOP_UPDATE = new ConsumedLoopUpdate();
+    
+    public static final AbstractMetaOperator META_CONSUMED_LOOP_INVARIANT = new ConsumedLoopInvariants();
+    
+    public static final AbstractMetaOperator META_EXTERNALLY_CONSTRUCTED_SCOPE = new ExternallyConstructedScope();
+    
+    public static final AbstractMetaOperator META_STACK_AT_INDEX = new StackAtIndex();
+    
+    public static final AbstractMetaOperator META_UPDATE_SCOPE = new UpdateScope();
+    
+    public static final AbstractMetaOperator META_UNIQUE_ANON_UPDATE = new UniqueAnonUpdate(); 
+    
+    public static final AbstractMetaOperator META_STACK_FOR_CONSTRUCTED_SCOPE = new StackForConstructedScope();
+    
+    public static final AbstractMetaOperator META_CALCULATE_ARRAY_SIZE = 
+        new CalculateArraySize();
+    
+    public static final AbstractMetaOperator META_WC_ARRAY_SIZE = 
+        new WorstCaseArraySize();
+    
+    public static final AbstractMetaOperator META_BC_ARRAY_SIZE = 
+        new BestCaseArraySize();
+    
+    public static final AbstractMetaOperator META_LOCAL_SCOPE_SPEC = 
+        new LocalScopeSpec();
+    
+    public static final AbstractMetaOperator META_CONSTRUCTED_SCOPE_SPEC = 
+        new ConstructedScopeSpec();
+    
+    public static final AbstractMetaOperator META_PRECONDITION_FOR_WS = 
+        new PreconditionForWS();
+    
+    public static final AbstractMetaOperator META_PRE_VALID_IN_STATE_OF_WS = 
+        new PreValidInStateOfWS();
 
     public static final AbstractMetaOperator META_TRAINITIALIZED = new MetaTraInitialized();
 

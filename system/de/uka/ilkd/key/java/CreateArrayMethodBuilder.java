@@ -6,6 +6,7 @@
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
 //
+//
 package de.uka.ilkd.key.java;
 
 import java.util.*;
@@ -18,24 +19,16 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.declaration.*;
-import de.uka.ilkd.key.java.declaration.modifier.Private;
-import de.uka.ilkd.key.java.declaration.modifier.Protected;
-import de.uka.ilkd.key.java.declaration.modifier.Static;
-import de.uka.ilkd.key.java.expression.literal.BooleanLiteral;
-import de.uka.ilkd.key.java.expression.literal.IntLiteral;
-import de.uka.ilkd.key.java.expression.literal.NullLiteral;
+import de.uka.ilkd.key.java.declaration.modifier.*;
+import de.uka.ilkd.key.java.expression.literal.*;
 import de.uka.ilkd.key.java.expression.operator.LessThan;
 import de.uka.ilkd.key.java.expression.operator.PostIncrement;
-import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
-import de.uka.ilkd.key.java.recoderext.InstanceAllocationMethodBuilder;
-import de.uka.ilkd.key.java.recoderext.PrepareObjectBuilder;
+import de.uka.ilkd.key.java.recoderext.*;
 import de.uka.ilkd.key.java.reference.*;
 import de.uka.ilkd.key.java.statement.For;
 import de.uka.ilkd.key.java.statement.Return;
 import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.ProgramMethod;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.*;
 
 /**
  * This class creates the <code>&lt;createArray&gt;</code> method for array
@@ -191,6 +184,8 @@ public class CreateArrayMethodBuilder extends KeYJavaASTFactory {
         if (var == null && objectType.getJavaType() != null) {
             final ImmutableList<Field> objectFields = filterImplicitFields(filterField(((ClassDeclaration) objectType
                     .getJavaType()).getMembers()));
+//            final ListOfField objectFields = filterField(((ClassDeclaration) objectType
+//                    .getJavaType()).getMembers());
             var = find(name, objectFields);
             if (var != null) { // may be null if object is currently created
                 cache.put(name, var);
@@ -311,7 +306,7 @@ public class CreateArrayMethodBuilder extends KeYJavaASTFactory {
         body.add(assign(attribute(thisRef,
                 findInObjectFields(ImplicitFieldAdder.IMPLICIT_INITIALIZED)),
                 BooleanLiteral.TRUE));
-
+        
         body.add(new Return(thisRef));
 
         return new StatementBlock(body.toArray(new Statement[body.size()]));
@@ -325,7 +320,7 @@ public class CreateArrayMethodBuilder extends KeYJavaASTFactory {
             TypeReference arrayTypeReference, ProgramVariable length,
             ImmutableList<Field> fields) {
 
-        final Modifier[] modifiers = new Modifier[] { new Private() };
+        final Modifier[] modifiers = new Modifier[] { new Private()};
         final KeYJavaType arrayType = arrayTypeReference.getKeYJavaType();
 
         final ProgramVariable paramLength = new LocationVariable(
@@ -417,7 +412,7 @@ public class CreateArrayMethodBuilder extends KeYJavaASTFactory {
                 new Statement[] { forLoop });
 
         final MethodDeclaration md = new MethodDeclaration(
-                new Modifier[] { new Private() }, arrayRef,
+                new Modifier[] { new Private()}, arrayRef,
                 new ProgramElementName(
                         PrepareObjectBuilder.IMPLICIT_OBJECT_PREPARE),
                 new ParameterDeclaration[0], null, body, false);

@@ -8,9 +8,11 @@
 package de.uka.ilkd.key.java.recoderext;
 
 import recoder.CrossReferenceServiceConfiguration;
+import recoder.java.Identifier;
 import recoder.java.declaration.*;
 import recoder.java.declaration.modifier.Public;
 import recoder.java.declaration.modifier.Static;
+import recoder.java.reference.PackageReference;
 import recoder.java.reference.TypeReference;
 import recoder.list.generic.ASTArrayList;
 import recoder.list.generic.ASTList;
@@ -36,7 +38,12 @@ public class InstanceAllocationMethodBuilder extends RecoderModelTransformer {
         modifiers.add(new Public());
         modifiers.add(new Static());    
         
-        ASTArrayList<ParameterDeclaration> pdal = new ASTArrayList<ParameterDeclaration>(0);
+        ASTArrayList<ParameterDeclaration> pdal = new ASTArrayList<ParameterDeclaration>(1);
+        
+/*        pdal.add(new ParameterDeclaration(
+                new TypeReference(new PackageReference(new PackageReference(new Identifier("javax")), 
+                        new Identifier("realtime")), new Identifier("MemoryArea")), 
+                new Identifier("scope")));*/
   
         MethodDeclaration md =  new MethodDeclaration
             (modifiers, 

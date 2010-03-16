@@ -20,19 +20,15 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.declaration.*;
-import de.uka.ilkd.key.java.expression.ArrayInitializer;
-import de.uka.ilkd.key.java.expression.Literal;
+import de.uka.ilkd.key.java.expression.*;
 import de.uka.ilkd.key.java.expression.PassiveExpression;
 import de.uka.ilkd.key.java.expression.literal.StringLiteral;
-import de.uka.ilkd.key.java.expression.operator.Instanceof;
-import de.uka.ilkd.key.java.expression.operator.Negative;
-import de.uka.ilkd.key.java.expression.operator.New;
-import de.uka.ilkd.key.java.expression.operator.NewArray;
-import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
-import de.uka.ilkd.key.java.recoderext.InstanceAllocationMethodBuilder;
-import de.uka.ilkd.key.java.recoderext.JVMIsTransientMethodBuilder;
+import de.uka.ilkd.key.java.expression.operator.*;
+import de.uka.ilkd.key.java.recoderext.*;
 import de.uka.ilkd.key.java.reference.*;
+import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.statement.*;
+import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.rule.soundness.ProgramSVProxy;
@@ -57,7 +53,9 @@ public abstract class ProgramSVSort extends PrimitiveSort {
 
     public static final ProgramSVSort STATICVARIABLE
 	= new StaticVariableSort();
-
+    
+    public static final ProgramSVSort LOCALVARIABLE
+        = new LocalVariableSort();
 
     public static final ProgramSVSort SIMPLEEXPRESSION 
 	= new SimpleExpressionSort();
@@ -122,6 +120,9 @@ public abstract class ProgramSVSort extends PrimitiveSort {
 
     public static final ProgramSVSort METHODNAME
 	= new MethodNameSort();
+    
+    public static final ProgramSVSort SCOPENAME
+        = new ScopeNameSort();
     
     public static final ProgramSVSort LABEL
 	= new LabelSort();
@@ -289,6 +290,14 @@ public abstract class ProgramSVSort extends PrimitiveSort {
         = new ImplicitFieldSort(new Name("ImplicitCreated"),
                                 ImplicitFieldAdder.IMPLICIT_CREATED, true);
     
+    public static final ProgramSVSort IMPLICITSIZE
+    = new ImplicitFieldSort(new Name("ImplicitSize"),
+                            ImplicitFieldAdder.IMPLICIT_SIZE, true);
+    
+    public static final ProgramSVSort IMPLICITEXACTSIZE
+    = new ImplicitFieldSort(new Name("ImplicitExactSize"),
+                            ImplicitFieldAdder.IMPLICIT_EXACT_SIZE, true);
+    
     public static final ProgramSVSort IMPLICITENLOSINGTHIS
     = new ImplicitFieldSort(new Name("ImplicitEnclosingThis"),
                             ImplicitFieldAdder.IMPLICIT_ENCLOSING_THIS, true);
@@ -347,6 +356,16 @@ public abstract class ProgramSVSort extends PrimitiveSort {
     public static final ProgramSVSort ALLOCATE
         = new SpecificMethodNameSort(new ProgramElementName
                 (InstanceAllocationMethodBuilder.IMPLICIT_INSTANCE_ALLOCATE));
+    
+    public static final ProgramSVSort PUSH
+    = new SpecificMethodNameSort(new ProgramElementName("push"));
+    
+    public static final ProgramSVSort DELETE
+    = new SpecificMethodNameSort(new ProgramElementName("delete"));
+    
+    public static final ProgramSVSort ALLOCATEAREA
+    = new SpecificMethodNameSort(new ProgramElementName
+            (AreaAllocationMethodBuilder.IMPLICIT_AREA_ALLOCATE));
     
     public static final ProgramSVSort SEP //TODO
         = new SpecificMethodNameSort(new ProgramElementName("sep"));
@@ -445,7 +464,6 @@ public abstract class ProgramSVSort extends PrimitiveSort {
 	}
     }
 
-
     /**
      * This sort represents a type of program schema variables that match
      * only on <ul> <li>program variables or <li>static field references with
@@ -529,6 +547,25 @@ public abstract class ProgramSVSort extends PrimitiveSort {
 
     }
     
+    private static class LocalVariableSort 
+        extends LeftHandSideSort {
+
+        public LocalVariableSort() {
+            super (new Name("LocalVariable"));
+        }
+
+        public boolean canStandFor(Term t) {       
+            return t.op() instanceof ProgramVariable &&
+            !((ProgramVariable)t.op()).isStatic();
+        }
+
+        protected boolean canStandFor(ProgramElement pe,
+                Services services) {
+            return pe instanceof ProgramVariable && !((ProgramVariable) pe).isStatic();
+        }
+
+    }
+    
 
 
     /**
@@ -571,6 +608,10 @@ public abstract class ProgramSVSort extends PrimitiveSort {
 	    if (pe instanceof ThisReference) {
 		return true;
 	    }
+
+/*	    if(pe instanceof CurrentMemoryAreaReference){
+		return true;
+	    }*/
 
 	    return VARIABLE.canStandFor(pe, services);    
 	}
@@ -956,6 +997,27 @@ public abstract class ProgramSVSort extends PrimitiveSort {
 	    }
 	    return false;
 	}
+
+    }
+    
+    private static class ScopeNameSort extends ProgramSVSort{
+        
+        public ScopeNameSort() {
+            super(new Name("ScopeName"));
+        }
+
+        protected ScopeNameSort(Name n) {
+            super(n);
+        }
+        
+        protected boolean canStandFor(ProgramElement pe,
+                                      Services services) {          
+            if(pe instanceof ProgramElementName && pe!=null) {
+                Name name = (ProgramElementName) pe;
+                return MethodReference.isLegalScopeAnnotation(name.toString());
+            }
+            return false;
+        }
 
     }
 

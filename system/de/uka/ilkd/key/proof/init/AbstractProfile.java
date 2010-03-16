@@ -5,6 +5,7 @@
 //
 // The KeY system is protected by the GNU General Public License.
 // See LICENSE.TXT for details.
+
 package de.uka.ilkd.key.proof.init;
 
 import java.util.ArrayList;
@@ -27,11 +28,10 @@ import de.uka.ilkd.key.proof.GoalChooserBuilder;
 import de.uka.ilkd.key.proof.RuleSource;
 import de.uka.ilkd.key.proof.mgt.AxiomJustification;
 import de.uka.ilkd.key.proof.mgt.RuleJustification;
-import de.uka.ilkd.key.rule.BuiltInRule;
-import de.uka.ilkd.key.rule.Rule;
-import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.rule.*;
+import de.uka.ilkd.key.strategy.*;
+import de.uka.ilkd.key.util.ProgressMonitor;
 import de.uka.ilkd.key.smt.*;
-import de.uka.ilkd.key.strategy.StrategyFactory;
 
 public abstract class AbstractProfile implements Profile {
 

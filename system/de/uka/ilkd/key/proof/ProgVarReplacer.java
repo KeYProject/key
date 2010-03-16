@@ -6,6 +6,7 @@
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
 //
+//
 // This file is part of KeY - Integrated Deductive Software Design
 // Copyright (C) 2001-2004 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
@@ -40,7 +41,7 @@ public class ProgVarReplacer {
     /**
      * map specifying the replacements to be done
      */
-    private final Map map;
+    protected final Map map;
     
     
     /**
@@ -407,5 +408,9 @@ public class ProgVarReplacer {
                                                                services);
 	pvrv.start();
 	return pvrv.result();
+    }
+
+    public String toString(){
+	return map.toString();
     }
 }

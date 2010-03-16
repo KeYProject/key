@@ -77,6 +77,9 @@ tokens {
 	STATIC = "\\static";
 	ENUM_CONST = "\\enumConstant";
 	NOTSAMELITERAL="\\notSameLiteral";
+    EQUALWORKINGSPACEOP="\\equalWorkingSpaceOp";
+    TESTWORKINGSPACENONRIGIDOP = "\\testWorkingSpaceNonRigidOp";
+    TESTWORKINGSPACEOP = "\\testWorkingSpaceOp";
 	ISREFERENCEARRAY="\\isReferenceArray";
 	ISARRAY="\\isArray";
 	ISREFERENCE="\\isReference";
@@ -89,7 +92,12 @@ tokens {
 	HASSORT = "\\hasSort";
 	ISLOCALVARIABLE = "\\isLocalVariable";
 	NOTISLOCALVARIABLE = "\\notIsLocalVariable";
+    WORKINGSPACE = "\\workingSpace";
+    WORKINGSPACENONRIGID = "\\workingSpaceNonRigid";
 	ISUPDATED = "\\isUpdated";
+	MEMORYAREA = "\\memoryArea";
+	PARENTSCOPE = "\\parentScope";
+	SCOPESTACK = "\\scopeStack";
 	SAMEHEAPDEPPRED = "\\sameHeapDepPred";
 
 
@@ -169,6 +177,7 @@ tokens {
 	IN_TYPE = "\\inType";
 	ISINREACHABLESTATE = "\\isInReachableState";
         IS_ABSTRACT_OR_INTERFACE = "\\isAbstractOrInterface";
+        IS_INTERFACE = "\\isInterface";
         CONTAINERTYPE = "\\containerType";
 }
 

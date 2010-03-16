@@ -14,6 +14,16 @@ import java.io.IOException;
 import java.util.Iterator;
 import java.util.Map;
 
+import de.uka.ilkd.key.java.*;
+import de.uka.ilkd.key.java.reference.*;
+import de.uka.ilkd.key.java.statement.LoopStatement;
+import de.uka.ilkd.key.java.statement.MethodFrame;
+import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
+import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.pp.*;
+import de.uka.ilkd.key.proof.init.*;
+import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
@@ -42,6 +52,7 @@ import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.speclang.LocationDescriptorSet;
 import de.uka.ilkd.key.speclang.LoopInvariant;
 import de.uka.ilkd.key.speclang.LoopPredicateSet;
+import de.uka.ilkd.key.speclang.LocationDescriptorSet;
 
 
 public class LoopInvariantProposer implements InstantiationProposer {
@@ -121,6 +132,21 @@ public class LoopInvariantProposer implements InstantiationProposer {
      * @param services The services object. 
      */
     public Term getInnermostSelfTerm(Term term, Services services) {
+        ExecutionContext ec = getInnermostExecutionContext(term, services);
+        ReferencePrefix rp = ec.getRuntimeInstance();
+        if(!(rp instanceof TypeReference) && rp != null) {
+            return services.getTypeConverter()
+                             .convertToLogicElement(rp);
+        }
+        return null;
+    }
+    
+    public Term getInnermostMemoryArea(Term term, Services services) {
+        ExecutionContext ec = getInnermostExecutionContext(term, services);
+        return services.getTypeConverter().convertToLogicElement(ec.getMemoryArea());
+    }
+    
+    public ExecutionContext getInnermostExecutionContext(Term term, Services services) {
         //ignore updates
         while(term.op() instanceof IUpdateOperator) {
             term = term.sub(((IUpdateOperator)term.op()).targetPos());
@@ -130,23 +156,17 @@ public class LoopInvariantProposer implements InstantiationProposer {
         final ProgramElement pe = term.javaBlock().program();
                 
         //fetch "self" from innermost method-frame
-        Term result = new JavaASTVisitor(pe, services) {
-            private Term result;
+        ExecutionContext result = new JavaASTVisitor(pe, services) {
+            private ExecutionContext result;
             private boolean done = false;
             protected void doDefaultAction(SourceElement node) {
                 if(node instanceof MethodFrame && !done) {
                     done = true;
                     MethodFrame mf = (MethodFrame) node;
-                    ExecutionContext ec 
-                        = (ExecutionContext) mf.getExecutionContext();
-                    ReferencePrefix rp = ec.getRuntimeInstance();
-                    if(!(rp instanceof TypeReference) && rp != null) {
-                        result = services.getTypeConverter()
-                                         .convertToLogicElement(rp);
-                    }
+                    result = (ExecutionContext) mf.getExecutionContext();
                 }
             }
-            public Term run() {
+            public ExecutionContext run() {
                 walk(pe);
                 return result;
             }
@@ -169,7 +189,7 @@ public class LoopInvariantProposer implements InstantiationProposer {
                                    SchemaVariable var, 
                                    Services services) {
         Object inst = null;
-        if (app instanceof PosTacletApp 
+        if (app instanceof PosTacletApp
             && inLoopInvariantRuleSet(app.taclet())) {
             final PosInOccurrence pos = app.posInOccurrence();
             final LoopInvariant inv = getLoopInvariant(pos.subTerm(), services);
@@ -181,9 +201,10 @@ public class LoopInvariantProposer implements InstantiationProposer {
             final Term selfTerm = getInnermostSelfTerm(pos.subTerm(), services);
             final Map<Operator, Function> atPreFunctions = inv.getInternalAtPreFunctions();
             final String varName = var.name().toString();
+            Term mTerm = getInnermostMemoryArea(pos.subTerm(), services);
             if (varName.equals("inv")) {
                 assert var.isFormulaSV();
-                inst = inv.getInvariant(selfTerm, atPreFunctions, services);
+                inst = inv.getInvariant(selfTerm, mTerm, atPreFunctions, services);
             } else if(varName.equals("predicates")) {
                 assert var.isListSV();
                 assert var.matchType() == Term.class;
@@ -191,10 +212,37 @@ public class LoopInvariantProposer implements InstantiationProposer {
             } else if(varName.equals("#modifies")) {
                 assert var.isListSV();
                 assert var.matchType() == LocationDescriptor.class;
-                inst = inv.getModifies(selfTerm, atPreFunctions, services);
+                LocationDescriptorSet locs = inv.getModifies(selfTerm, atPreFunctions, services);
+                if(services.getProof().getSettings().getProfile() instanceof RTSJProfile ||
+                        services.getProof().getSettings().getProfile() instanceof PercProfile){
+                    Term mCons = TermBuilder.DF.dot(mTerm, services.getJavaInfo().getAttribute(
+                            "consumed", "javax.realtime.MemoryArea"));
+                    LocationDescriptor cons = new BasicLocationDescriptor(mCons);
+                    LocationDescriptor heap = new BasicLocationDescriptor(
+                            TermBuilder.DF.var((ProgramVariable)
+                            services.getNamespaces().programVariables().
+                            lookup(new Name(ProblemInitializer.heapSpaceName))));
+                    locs = new LocationDescriptorSet(locs.asSet().add(heap).add(cons));
+                }
+                inst = locs;
+            } else if(varName.equals("ws")){ 
+                inst = inv.getParametrizedWorkingSpaceTerms(selfTerm, atPreFunctions, services);
             } else if(varName.equals("variant")) {
                 assert var.isTermSV();
                 inst = inv.getVariant(selfTerm, atPreFunctions, services);
+	    } else if(varName.equals("wsOneIt")
+                    && inv.getWorkingSpace(selfTerm, atPreFunctions, services) != null) {
+                inst = inv.getWorkingSpace(selfTerm, atPreFunctions, services);
+            } else if(varName.equals("wsOneItCons")
+                    && inv.getWorkingSpaceConstructed(selfTerm, atPreFunctions, services) != null) {
+                inst = inv.getWorkingSpaceConstructed(selfTerm, atPreFunctions, services);
+            } else if(varName.equals("wsOneItReent")
+                    && inv.getWorkingSpaceReentrant(selfTerm, atPreFunctions, services) != null) {
+                inst = inv.getWorkingSpaceReentrant(selfTerm, atPreFunctions, services);
+            } else if(varName.equals("heapSpace")){
+                inst = TermBuilder.DF.var((ProgramVariable)
+                        services.getNamespaces().programVariables().
+                        lookup(new Name(ProblemInitializer.heapSpaceName)));
             }
         }
         

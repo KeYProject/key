@@ -620,7 +620,7 @@ public class TestMatchTaclet extends TestCase {
 	ExecutionContext ec = new ExecutionContext
 	    (new TypeRef(new KeYJavaType
 		(PrimitiveType.JAVA_BYTE, 
-		 new PrimitiveSort(new Name("byte")))),
+		 new PrimitiveSort(new Name("byte")))), null,
 	     new LocationVariable(new ProgramElementName("testVar"),
 				 new PrimitiveSort(new Name("testSort"))));
 	MethodFrame mframe = new MethodFrame(null, ec, prg);

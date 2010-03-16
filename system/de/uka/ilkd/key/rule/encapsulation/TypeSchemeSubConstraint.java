@@ -12,7 +12,6 @@ package de.uka.ilkd.key.rule.encapsulation;
 
 import de.uka.ilkd.key.collection.ImmutableSet;
 
-
 class TypeSchemeSubConstraint implements TypeSchemeConstraint {
     private TypeSchemeTerm term1, term2;
 

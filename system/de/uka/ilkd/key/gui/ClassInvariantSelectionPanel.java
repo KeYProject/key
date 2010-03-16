@@ -5,13 +5,6 @@
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General Public License.
-// See LICENSE.TXT for details.
 //
 //
 
@@ -26,19 +19,18 @@ import java.util.Set;
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
-import javax.swing.event.TreeSelectionEvent;
-import javax.swing.event.TreeSelectionListener;
+import javax.swing.event.*;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
 
+import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.proof.init.*;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
-import de.uka.ilkd.key.speclang.ClassInvariant;
+import de.uka.ilkd.key.speclang.*;
 
 
 /**
@@ -260,6 +252,11 @@ class ClassInvariantSelectionPanel extends JPanel {
         //set default selection
         if(selectDefaultInvs) {
             selectAllForClass(defaultClass);
+            Profile prof = services.getProof()!=null ? services.getProof().getSettings().getProfile() :
+                ProofSettings.DEFAULT_SETTINGS.getProfile();
+            if(prof instanceof RTSJProfile || prof instanceof PercProfile){
+                addAllRealtimeInvs();
+            }
         }
         updateInvList();
     }
@@ -389,6 +386,25 @@ class ClassInvariantSelectionPanel extends JPanel {
 	final Set<KeYJavaType> kjts = services.getJavaInfo().getAllKeYJavaTypes();
         for (final KeYJavaType kjt : kjts) {
             selectedInvs = selectedInvs.union(getRelevantInvs(kjt));
+        }
+        
+        //update selection counters in tree
+        DefaultMutableTreeNode rootNode
+                = (DefaultMutableTreeNode) classTree.getModel().getRoot();
+        setSelectedInvCounters(rootNode);
+        classTree.repaint();
+    }
+    
+    private void addAllRealtimeInvs() {
+        //select all invariants in javax.realtime and for java.lang.Object.*
+        final Set<KeYJavaType> kjts = services.getJavaInfo().getAllKeYJavaTypes();
+        final Iterator<KeYJavaType> it = kjts.iterator();
+        while (it.hasNext()) {
+            final KeYJavaType kjt = it.next();     
+            if(kjt.getFullName().indexOf("javax.realtime")!=-1 || 
+                    kjt.getFullName().indexOf("java.lang.Object")!=-1){
+                selectedInvs = selectedInvs.union(getRelevantInvs(kjt));
+            }
         }
         
         //update selection counters in tree

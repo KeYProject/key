@@ -49,25 +49,7 @@ import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.declaration.FieldSpecification;
 import de.uka.ilkd.key.java.declaration.VariableSpecification;
-import de.uka.ilkd.key.java.recoderext.ClassFileDeclarationManager;
-import de.uka.ilkd.key.java.recoderext.ClassInitializeMethodBuilder;
-import de.uka.ilkd.key.java.recoderext.ClassPreparationMethodBuilder;
-import de.uka.ilkd.key.java.recoderext.ConstructorNormalformBuilder;
-import de.uka.ilkd.key.java.recoderext.CreateBuilder;
-import de.uka.ilkd.key.java.recoderext.CreateObjectBuilder;
-import de.uka.ilkd.key.java.recoderext.EnumClassBuilder;
-import de.uka.ilkd.key.java.recoderext.ExtendedIdentifier;
-import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
-import de.uka.ilkd.key.java.recoderext.ImplicitIdentifier;
-import de.uka.ilkd.key.java.recoderext.InstanceAllocationMethodBuilder;
-import de.uka.ilkd.key.java.recoderext.JMLTransformer;
-import de.uka.ilkd.key.java.recoderext.JVMIsTransientMethodBuilder;
-import de.uka.ilkd.key.java.recoderext.KeYCrossReferenceServiceConfiguration;
-import de.uka.ilkd.key.java.recoderext.LocalClassTransformation;
-import de.uka.ilkd.key.java.recoderext.ObjectTypeIdentifier;
-import de.uka.ilkd.key.java.recoderext.PrepareObjectBuilder;
-import de.uka.ilkd.key.java.recoderext.RecoderModelTransformer;
-import de.uka.ilkd.key.java.recoderext.TestGenerationModelTransformer;
+import de.uka.ilkd.key.java.recoderext.*;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.Namespace;
@@ -749,6 +731,7 @@ public class Recoder2KeY implements JavaReader {
                 new InstanceAllocationMethodBuilder(servConf, cache),
                 cnb = new ConstructorNormalformBuilder(servConf, cache),
                 new ClassPreparationMethodBuilder(servConf, cache),
+                new AreaAllocationMethodBuilder(servConf, cache),
                 new ClassInitializeMethodBuilder(servConf, cache), 
                 new PrepareObjectBuilder(servConf, cache), 
                 new CreateBuilder(servConf, cache),

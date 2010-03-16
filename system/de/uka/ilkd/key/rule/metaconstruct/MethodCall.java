@@ -6,6 +6,7 @@
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
 //
+//
 
 package de.uka.ilkd.key.rule.metaconstruct;
 
@@ -52,6 +53,7 @@ public class MethodCall extends ProgramMetaConstruct {
     private ProgramMethod pm;
     protected ReferencePrefix newContext;
     protected ProgramVariable pvar;
+    protected ProgramElement scope;
     private IExecutionContext execContextSV;
     private ExecutionContext execContext;
     protected ImmutableArray<Expression> arguments;
@@ -202,6 +204,12 @@ public class MethodCall extends ProgramMetaConstruct {
 	}
 
 	methRef = (MethodReference) pe;
+        
+	if(methRef.getScope() instanceof SchemaVariable){
+            scope = (ProgramElement) svInst.getInstantiation((ProgramSV) methRef.getScope());
+        }else{
+            scope = (ProgramElement) methRef.getScope();
+        }
 
 	ReferencePrefix refPrefix = methRef.getReferencePrefix();
 	if (refPrefix == null) {
@@ -214,9 +222,9 @@ public class MethodCall extends ProgramMetaConstruct {
 	
 	staticPrefixType = getStaticPrefixType(methRef.getReferencePrefix(), services);
 	if(execContext != null){
-	    pm = assertImplementationPresent
-		(methRef.method(services, staticPrefixType, execContext),
-		 staticPrefixType);
+            pm = assertImplementationPresent
+                (methRef.method(services, staticPrefixType, execContext), 
+                 staticPrefixType);
 	}else{
 	    pm = assertImplementationPresent
 		(methRef.method(services, staticPrefixType, 
@@ -253,7 +261,7 @@ public class MethodCall extends ProgramMetaConstruct {
             newContext = null;
 	    ProgramMethod staticMethod = getMethod(staticPrefixType, methRef, services);	                
             result = new MethodBodyStatement(staticMethod, newContext,
-					     pvar, arguments); 
+					     pvar, arguments, scope); 
 	} else if (refPrefix instanceof SuperReference) {
 	    Debug.out("method-call: super invocation of method detected." + 
 		      "Requires static resolving.");
@@ -261,7 +269,7 @@ public class MethodCall extends ProgramMetaConstruct {
 						       methRef, services);
 	    result = new MethodBodyStatement
 		(superMethod, execContext.getRuntimeInstance(), pvar,
-		 arguments);
+		 arguments, scope);
 	} else {    // Instance invocation mode
 	    if (pm.isPrivate()) { // private methods are bound statically
 		Debug.out("method-call: invocation of private method detected." + 
@@ -303,7 +311,7 @@ public class MethodCall extends ProgramMetaConstruct {
     private Statement makeMbs(KeYJavaType t, Services services) {
 	ProgramMethod meth = getMethod(t, methRef, services);
 	return new MethodBodyStatement(meth, newContext,
-				       pvar, arguments);
+				       pvar, arguments, scope);
     }
 
     public Expression makeIOf(Type t) {

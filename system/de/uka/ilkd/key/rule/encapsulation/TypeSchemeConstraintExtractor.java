@@ -707,7 +707,10 @@ class TypeSchemeConstraintExtractor implements Visitor {
     public void performActionOnParameterDeclaration(ParameterDeclaration x) {
         //nothing to do
     }
-
+    
+/*    public void performActionOnCurrentMemoryAreaReference(CurrentMemoryAreaReference x){
+        //nothing to do
+    }*/
     
     public void performActionOnMethodDeclaration(MethodDeclaration x) {
         failUnexpected(x);
@@ -885,7 +888,7 @@ class TypeSchemeConstraintExtractor implements Visitor {
                 final ReferencePrefix runtimeInstance 
                                 = x.getDesignatedContext();
                 final ExecutionContext executionContext 
-                                = new ExecutionContext(classContext, 
+                                = new ExecutionContext(classContext, null,
                                                        runtimeInstance);
                                                        
                 //save context information

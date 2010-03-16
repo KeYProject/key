@@ -15,6 +15,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Map;
 
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.logic.op.*;
@@ -698,7 +699,11 @@ public class TermFactory {
 	    return createIfThenElseTerm ( subTerms[0], subTerms[1], subTerms[2] );
 	} else if (op instanceof MetaOperator) {
 	    return createMetaTerm((MetaOperator)op, subTerms);
-	} else {
+	} else if(op instanceof WorkingSpaceRigidOp){
+            return createWorkingSpaceTerm((WorkingSpaceRigidOp) op);  
+        } else if(op instanceof WorkingSpaceNonRigidOp){
+            return createWorkingSpaceNonRigidTerm((WorkingSpaceNonRigidOp) op, subTerms);  
+        } else {
 	    de.uka.ilkd.key.util.Debug.fail("Should never be"+
 					    " reached. Missing case for class", 
 					    op.getClass());
@@ -968,6 +973,30 @@ public class TermFactory {
         return varTerm;
     }
 
+    /**
+     * Creates a working_space term for the working space of method pm
+     * under precondition pre.
+     * @param mt
+     * @param pre
+     * @param sort the sort workingSpace
+     */
+    public Term createWorkingSpaceTerm(Term mt, Term pre, Sort sort, Services serv){
+        return createWorkingSpaceTerm(
+                new WorkingSpaceRigidOp(mt, sort, pre, serv)).checked();
+    }
+    
+    public Term createWorkingSpaceTerm(WorkingSpaceRigidOp op){
+        return OpTerm.createOpTerm(op, new Term[0]).checked();
+    }
+    
+    public Term createWorkingSpaceNonRigidTerm(ProgramMethod pm, Sort sort, Term[] args){
+        return createWorkingSpaceNonRigidTerm(
+                new WorkingSpaceNonRigidOp(pm, sort), args).checked();
+    }
+    
+    public Term createWorkingSpaceNonRigidTerm(WorkingSpaceNonRigidOp op, Term[] args){
+        return OpTerm.createOpTerm(op, args).checked();
+    }
 
     /**
      * creates an anonymous update applied to the given target term 

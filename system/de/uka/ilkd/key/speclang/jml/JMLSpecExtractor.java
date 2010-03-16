@@ -5,18 +5,13 @@
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
-//This file is part of KeY - Integrated Deductive Software Design
-//Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
-//                      Universitaet Koblenz-Landau, Germany
-//                      Chalmers University of Technology, Sweden
-//
-//The KeY system is protected by the GNU General Public License. 
-//See LICENSE.TXT for details.
 //
 //
 
 package de.uka.ilkd.key.speclang.jml;
 
+import de.uka.ilkd.key.gui.configuration.ProofSettings;
+import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.collection.*;
 import de.uka.ilkd.key.java.Comment;
 import de.uka.ilkd.key.java.Position;
@@ -33,6 +28,7 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.op.NonRigidHeapDependentFunction;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.proof.init.RTSJProfile;
 import de.uka.ilkd.key.speclang.*;
 import de.uka.ilkd.key.speclang.jml.pretranslation.*;
 import de.uka.ilkd.key.speclang.jml.translation.JMLSpecFactory;
@@ -338,6 +334,27 @@ public class JMLSpecExtractor implements SpecExtractor {
                 = jsf.createJMLOperationContractsAndInherit(pm, sc);
             result = result.union(contracts);
         }
+        
+        //determine scope safety, add scope safety contract
+        final boolean isScopeSafe = JMLInfoExtractor.isScopeSafe(pm) || 
+            JMLInfoExtractor.isScopeSafe(pm.getContainerType());
+        if(isScopeSafe) {
+            TextualJMLSpecCase sc 
+                = new TextualJMLSpecCase(ImmutableSLList.<String>nil(), 
+                                         Behavior.BEHAVIOR);
+/*            if(pm.getKeYJavaType()!=null && 
+                    !(pm.getKeYJavaType().getSort() instanceof PrimitiveSort)){
+                sc.addEnsures(new PositionedString("\\result!=null ==> \\inImmortalMemory(\\result)"));
+            }*/
+	    //            sc.addDiverges(new PositionedString("true"));
+            sc.addSignals(new PositionedString("(Throwable e) !(e instanceof javax.realtime.IllegalAssignmentError || "+
+                    "e instanceof javax.realtime.ScopedCycleException || "+
+                    "e instanceof javax.realtime.InaccessibleAreaException ||"+
+                    "e instanceof javax.realtime.ThrowBoundaryError)"));
+            ImmutableSet<OperationContract> contracts
+                = jsf.createJMLOperationContractsAndInherit(pm, sc);
+            result = result.union(contracts);
+        }
 
         //get textual JML constructs
         Comment[] comments = pm.getComments();
@@ -380,7 +397,14 @@ public class JMLSpecExtractor implements SpecExtractor {
                     specCase.addAssignable(new PositionedString("\\nothing"));//TODO: should be "this.*", but this is not yet supported
                 }
             }
-
+            
+            if(!JMLInfoExtractor.arbitraryScopeThis(pm) && !pm.isStatic() &&
+	       ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof RTSJProfile){
+                specCase.addRequires(new PositionedString("\\outerScope(\\memoryArea(this),\\currentMemoryArea)", 
+                        fileName, 
+                        pm.getStartPosition()));
+            }
+            
             //add non-null preconditions
             for(int j = 0, n = pm.getParameterDeclarationCount(); j < n; j++) {
                 //no additional precondition for primitive types!
@@ -395,11 +419,24 @@ public class JMLSpecExtractor implements SpecExtractor {
                     for (PositionedString nonNull : nonNullParams) {
                 	specCase.addRequires(nonNull);
                     }
-                }
+		}
+		String param_name = paramDecl.getName();
+                Type t = pm.getParameterDeclarationAt(j).
+                            getTypeReference().
+                            getKeYJavaType();
+		if(services.getTypeConverter().isReferenceType(t) &&
+		   !JMLInfoExtractor.parameterInArbitraryScope(pm, j)){
+		    String outerScope = "\\outerScope(\\memoryArea("+param_name+"),\\currentMemoryArea)";
+		    specCase.addRequires(new PositionedString(outerScope, 
+							      fileName, 
+							      pm.getStartPosition()));
+		}
+                 
             }
 
             //add non-null postcondition
             KeYJavaType resultType = pm.getKeYJavaType();
+
             if(resultType != null &&
         	    !JMLInfoExtractor.resultIsNullable(pm) &&
         	    specCase.getBehavior() != Behavior.EXCEPTIONAL_BEHAVIOR) {
@@ -408,7 +445,15 @@ public class JMLSpecExtractor implements SpecExtractor {
         		    fileName, pm.getStartPosition());
         	for (PositionedString nonNull : resultNonNull) {
         	    specCase.addEnsures(nonNull);
-        	}
+        	}               
+		if(!JMLInfoExtractor.resultArbitraryScope(pm) && services.getTypeConverter().isReferenceType(resultType) &&
+                        ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof RTSJProfile){
+                    String outerScope = "\\outerScope(\\memoryArea(\\result),\\currentMemoryArea)";
+                    specCase.addEnsures(new PositionedString(
+                            outerScope, 
+                            fileName, 
+                            pm.getStartPosition()));            
+                }
             }
 
             //add implicit signals-only if omitted

@@ -532,7 +532,6 @@ public class KeYMediator {
 	    }
     }
      
-      
     /**
      * Apply a RuleApp and continue with update simplification or strategy
      * application according to current settings.

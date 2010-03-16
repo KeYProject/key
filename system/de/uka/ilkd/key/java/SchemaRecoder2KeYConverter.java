@@ -16,15 +16,13 @@ import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
 import de.uka.ilkd.key.java.declaration.Modifier;
 import de.uka.ilkd.key.java.declaration.VariableSpecification;
+import de.uka.ilkd.key.java.recoderext.MethodReferenceWrapper;
 import de.uka.ilkd.key.java.recoderext.ProgramVariableSVWrapper;
 import de.uka.ilkd.key.java.recoderext.TypeSVWrapper;
 import de.uka.ilkd.key.java.reference.*;
 import de.uka.ilkd.key.java.statement.*;
 import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.op.IProgramVariable;
-import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.ProgramSV;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.rule.metaconstruct.*;
 import de.uka.ilkd.key.util.ExtList;
@@ -101,6 +99,10 @@ public class SchemaRecoder2KeYConverter extends Recoder2KeYConverter {
         } else if ("#expand-method-body".equals(mcName)) {
             return new ExpandMethodBody((SchemaVariable) list
                     .get(SchemaVariable.class));
+        } else if ("#expand-method-body-perc".equals(mcName)) {
+            ProgramSV[] svw = mc.getSV();
+            return new ExpandMethodBodyPerc((SchemaVariable) list
+                    .get(SchemaVariable.class), svw[0], svw[1]);
         } else if ("#method-call".equals(mcName)
                 || "#method-call-contract".equals(mcName)) {
             ProgramSV[] svw = mc.getSV();
@@ -239,7 +241,11 @@ public class SchemaRecoder2KeYConverter extends Recoder2KeYConverter {
     public ExecutionContext convert(
             de.uka.ilkd.key.java.recoderext.ExecutionContext ec) {
         return new ExecutionContext((TypeReference) callConvert(ec.getTypeReference()), 
-				    ec.getRuntimeInstance()!=null? (ReferencePrefix)callConvert(ec.getRuntimeInstance()) : null);
+                                    ec.getMemoryArea()!=null? (ReferencePrefix)callConvert(ec.getMemoryArea()) : null,
+                                    ec.getRuntimeInstance()!=null? (ReferencePrefix)callConvert(ec.getRuntimeInstance()) : null,
+                                    ec.getCallerMemoryArea()!=null? (ReferencePrefix)callConvert(ec.getCallerMemoryArea()) : null,
+                                    ec.getConstructedMemoryArea()!=null? (ReferencePrefix)callConvert(ec.getConstructedMemoryArea()) : null
+				    );
     }
 
     // ----- Schema Variables
@@ -366,14 +372,23 @@ public class SchemaRecoder2KeYConverter extends Recoder2KeYConverter {
         recoder.java.reference.PackageReference result = null;
         while (rp != null) {
             if (prefix == null) {
-                result = new recoder.java.reference.PackageReference(
-                        ((recoder.java.reference.UncollatedReferenceQualifier) rp)
-                        .getIdentifier());
+                if(rp instanceof recoder.java.reference.PackageReference){
+                    result = (recoder.java.reference.PackageReference) rp;
+                }else{
+                    result = new recoder.java.reference.PackageReference(
+                            ((recoder.java.reference.UncollatedReferenceQualifier) rp)
+                            .getIdentifier());
+                }
                 prefix = result;
             } else {
-                recoder.java.reference.PackageReference prefix2 = new recoder.java.reference.PackageReference(
-                        ((recoder.java.reference.UncollatedReferenceQualifier) rp)
-                        .getIdentifier());
+                recoder.java.reference.PackageReference prefix2;
+                if(rp instanceof recoder.java.reference.PackageReference){
+                    prefix2 = (recoder.java.reference.PackageReference) rp;
+                }else{
+                    prefix2 = new recoder.java.reference.PackageReference(
+                            ((recoder.java.reference.UncollatedReferenceQualifier) rp)
+                            .getIdentifier());
+                }
                 prefix.setReferencePrefix(prefix2);
                 prefix = prefix2;
             }
@@ -465,8 +480,14 @@ public class SchemaRecoder2KeYConverter extends Recoder2KeYConverter {
         for (int i = 0, sz = keyArgs.length; i < sz; i++) {
             keyArgs[i] = (Expression) callConvert(recoderArgs.get(i));
         }
-
-        return new MethodReference(new ImmutableArray<Expression>(keyArgs), name, prefix);
+        
+        ProgramSV scope = null;
+        
+        if(mr instanceof MethodReferenceWrapper && ((MethodReferenceWrapper) mr).getScope()!=null){
+            scope = (ProgramSV) callConvert(((MethodReferenceWrapper) mr).getScope());
+	}
+        
+	return new MethodReference(new ImmutableArray<Expression>(keyArgs), name, prefix, scope);
     }
 
     /**

@@ -12,6 +12,7 @@ package de.uka.ilkd.key.proof.init;
 
 import java.io.File;
 import java.util.*;
+import java.util.List;
 import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
@@ -21,6 +22,9 @@ import recoder.io.ProjectSettings;
 import de.uka.ilkd.key.gui.IMain;
 import de.uka.ilkd.key.gui.MethodCallInfo;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
+import de.uka.ilkd.key.java.*;
+import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.java.CompilationUnit;
 import de.uka.ilkd.key.java.Recoder2KeY;
 import de.uka.ilkd.key.java.Services;
@@ -34,9 +38,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.logic.sort.SortDefiningSymbols;
 import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.mgt.*;
-import de.uka.ilkd.key.rule.BuiltInRule;
-import de.uka.ilkd.key.rule.Rule;
-import de.uka.ilkd.key.rule.UpdateSimplifier;
+import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.util.ProgressMonitor;
 
 
@@ -51,6 +53,9 @@ public class ProblemInitializer {
     private final UpdateSimplifier simplifier;
 
     private final ProgressMonitor pm;
+
+    private ProgramVariable heapSpace;
+    public static final String heapSpaceName = "heapSpace";
 
     private final HashSet<EnvInput> alreadyParsed = new LinkedHashSet<EnvInput>();
 
@@ -365,6 +370,13 @@ public class ProblemInitializer {
      */
     private void populateNamespaces(Proof proof) {
 	NamespaceSet namespaces = proof.getNamespaces();
+        heapSpace = 
+            new LocationVariable((new ProgramElementName(heapSpaceName)),
+                    lastBaseConfig.getServices().getJavaInfo().
+                    getKeYJavaType("int"));
+	namespaces.programVariables().add(heapSpace);
+//	namespaces.programVariables().add(proof.getServices().
+//	        getJavaInfo().getDefaultMemoryArea());
         for (Object o : proof.root().sequent()) {
             ConstrainedFormula cf = (ConstrainedFormula) o;
             populateNamespaces(cf.formula(), namespaces);
@@ -488,6 +500,25 @@ public class ProblemInitializer {
                 in.put(fileName, RuleSource.initRuleFile(new File(fileName)));
             }
         }
+
+        if(heapSpace==null){
+            heapSpace = 
+                    new LocationVariable((new ProgramElementName(heapSpaceName)),
+                            lastBaseConfig.getServices().getJavaInfo().
+                            getKeYJavaType("int"));
+        }
+        initConfig.namespaces().programVariables().add(heapSpace);  
+//        initConfig.namespaces().programVariables().add(initConfig.getServices().
+//                getJavaInfo().getDefaultMemoryArea());  
+        
+	//read envInput
+	readEnvInput(envInput, initConfig);
+	
+	initConfig.namespaces().programVariables().add(initConfig.getServices().
+	        getJavaInfo().getDefaultMemoryArea()); 
+	initConfig.namespaces().programVariables().add(initConfig.getServices().
+	        getJavaInfo().getImmortalMemoryArea()); 
+	
         // read in libraries as includes
         readIncludes(envInput, initConfig);
 

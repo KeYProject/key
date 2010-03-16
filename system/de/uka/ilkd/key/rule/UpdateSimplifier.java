@@ -6,6 +6,7 @@
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
 //
+//
 package de.uka.ilkd.key.rule;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
@@ -60,7 +61,8 @@ public class UpdateSimplifier {
      */
     public UpdateSimplifier(boolean deletionEnabled, boolean eager) {
 	this.eager = eager;
-        ImmutableList<IUpdateRule> usRules = ImmutableSLList.<IUpdateRule>nil().    
+        ImmutableList<IUpdateRule> usRules = ImmutableSLList.<IUpdateRule>nil().
+        append(new ApplyOnWorkingSpaceNonRigid(this)).
         append(new ApplyOnAnonymousUpdate(this)).
         append(new ApplyAnonymousUpdateOnNonRigid(this)).
         append(new ApplyOnUpdate(this)).

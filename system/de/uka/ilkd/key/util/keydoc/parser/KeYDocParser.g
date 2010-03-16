@@ -5,6 +5,8 @@
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
+//
+//
 header { package de.uka.ilkd.key.util.keydoc.parser; import java.util.LinkedList; }
 
 class KeYDocParser extends Parser;

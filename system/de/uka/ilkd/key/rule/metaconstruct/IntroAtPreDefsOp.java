@@ -5,14 +5,7 @@
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General Public License.
-// See LICENSE.TXT for details.
-//
+
 
 package de.uka.ilkd.key.rule.metaconstruct;
 
@@ -20,6 +13,13 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import de.uka.ilkd.key.java.*;
+import de.uka.ilkd.key.java.reference.*;
+import de.uka.ilkd.key.java.statement.*;
+import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
+import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.ProgramElement;
@@ -93,6 +93,8 @@ public class IntroAtPreDefsOp extends AbstractMetaOperator {
         } else {
             selfTerm = services.getTypeConverter().convertToLogicElement(rp);
         }
+        
+        Term memoryArea = services.getTypeConverter().convertToLogicElement(ec.getMemoryArea());
 
         //collect atPre-functions, update loop invariants
         Map<Operator, Function /*atPre*/> atPreFunctions = 
@@ -105,27 +107,40 @@ public class IntroAtPreDefsOp extends AbstractMetaOperator {
                     //we're calling a static method from an instance context
                     selfTerm = null;
                 }
-                Term newInvariant
-                        = inv.getInvariant(selfTerm, atPreFunctions, services);
-                LoopPredicateSet newPredicates
-                        = inv.getPredicates(selfTerm, atPreFunctions, services);
-                LocationDescriptorSet newModifies
-                        = inv.getModifies(selfTerm, atPreFunctions, services);
-                Term newVariant
-                        = inv.getVariant(selfTerm, atPreFunctions, services);
-                boolean newPredicateHeuristicsAllowed
-                        = inv.getPredicateHeuristicsAllowed();
 
-                LoopInvariant newInv
-                        = new LoopInvariantImpl(loop,
-                        newInvariant,
-                        newPredicates,
-                        newModifies,
-                        newVariant,
-                        selfTerm,
-                        atPreFunctions,
-                        newPredicateHeuristicsAllowed);
-                services.getSpecificationRepository().setLoopInvariant(newInv);
+                Term newInvariant 
+                    = inv.getInvariant(selfTerm, memoryArea, atPreFunctions, services);
+                LoopPredicateSet newPredicates
+                    = inv.getPredicates(selfTerm, atPreFunctions, services);
+                LocationDescriptorSet newModifies
+                    = inv.getModifies(selfTerm, memoryArea, atPreFunctions, services);
+                Term newVariant
+                    = inv.getVariant(selfTerm, atPreFunctions, services);
+                Term newWorkingSpace
+                    = inv.getWorkingSpace(selfTerm, atPreFunctions, services);
+                Term newParametrizedWS
+                    = inv.getParametrizedWorkingSpaceTerms(selfTerm, atPreFunctions, services);
+                Term newWorkingSpaceConstructed
+                    = inv.getWorkingSpaceConstructed(selfTerm, atPreFunctions, services);
+                Term newWorkingSpaceReentrant
+                    = inv.getWorkingSpaceReentrant(selfTerm, atPreFunctions, services);
+                boolean newPredicateHeuristicsAllowed
+                    = inv.getPredicateHeuristicsAllowed();
+                
+                LoopInvariant newInv 
+                    = new LoopInvariantImpl(loop, 
+                                            newInvariant, 
+                                            newPredicates,
+                                            newModifies, 
+                                            newVariant, 
+                                            newParametrizedWS,
+                                            newWorkingSpace,
+                                            newWorkingSpaceConstructed,
+                                            newWorkingSpaceReentrant,
+                                            selfTerm,
+                                            atPreFunctions,
+                                            newPredicateHeuristicsAllowed);
+                services.getSpecificationRepository().setLoopInvariant(newInv);                
             }
         }
         
@@ -136,4 +151,9 @@ public class IntroAtPreDefsOp extends AbstractMetaOperator {
             = APF.createAtPreDefinitions(atPreFunctions, services);
         return uf.apply(atPreUpdate, target);
     }
+    
+    public Sort sort(Term[] term) {
+        return Sort.FORMULA;
+    }
+    
 }

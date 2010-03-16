@@ -6,13 +6,8 @@
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
 //
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2004 Universitaet Karlsruhe, Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
+
 package de.uka.ilkd.key.java.recoderext;
 
 import java.util.*;
@@ -23,12 +18,16 @@ import recoder.java.*;
 import recoder.java.declaration.*;
 import recoder.java.declaration.modifier.Private;
 import recoder.java.declaration.modifier.Public;
-import recoder.java.expression.operator.CopyAssignment;
-import recoder.java.expression.operator.New;
+import recoder.java.expression.Assignment;
+import recoder.java.expression.literal.NullLiteral;
+import recoder.java.expression.operator.*;
 import recoder.java.reference.*;
+import recoder.java.statement.If;
 import recoder.kit.ProblemReport;
 import recoder.list.generic.ASTArrayList;
 import recoder.list.generic.ASTList;
+import de.uka.ilkd.key.gui.configuration.ProofSettings;
+import de.uka.ilkd.key.proof.init.PercProfile;
 import de.uka.ilkd.key.util.Debug;
 
 /**
@@ -119,6 +118,8 @@ public class ConstructorNormalformBuilder
 
 		ASTList<DeclarationSpecifier> mods = new ASTArrayList<DeclarationSpecifier>(1);
 		mods.add(new Private());
+		//	        mods.add(new KeYAnnotationUseSpecification(new TypeReference(
+		//	                new Identifier("CallerAllocatedResult"))));
 		String name = OBJECT_INITIALIZER_IDENTIFIER + mdl.size();
 		MethodDeclaration initializerMethod = 
 		    new MethodDeclaration
@@ -320,8 +321,11 @@ public class ConstructorNormalformBuilder
             }
 	    
 	    for (final Variable v : outerVars) {
+                String typeName = ((Type) v2t.get(v)).getName();
+                String baseType = typeName.substring(0, typeName.indexOf("[")==-1 ? 
+                        typeName.length() : typeName.indexOf("["));
 	        parameters.add(new ParameterDeclaration(
-	                new TypeReference(new Identifier(v2t.get(v).getName())), 
+	                new TypeReference(new Identifier(baseType), (typeName.length()-baseType.length())/2), 
 	                new Identifier(v.getName())));
 	    }
 	}
@@ -338,21 +342,23 @@ public class ConstructorNormalformBuilder
 	    Statement first = body.getStatementCount() > 0 ?
 		body.getStatementAt(0) : null;
 	    
+	    Identifier cs = new Identifier(de.uka.ilkd.key.java.reference.MethodReference.CONSTRUCTED_SCOPE.toString());
+		
 	    // first statement has to be a this or super constructor call	
 	    if (!(first instanceof SpecialConstructorReference)) {
 		if (body.getBody() == null) {
 		    body.setBody(new ASTArrayList<Statement>());
 		}
-		attach(new MethodReference
+		attach(new MethodReferenceWrapper(new MethodReference
 		    (new SuperReference(), new ImplicitIdentifier
-			(CONSTRUCTOR_NORMALFORM_IDENTIFIER)), body, 0);
+			(CONSTRUCTOR_NORMALFORM_IDENTIFIER)), cs), body, 0);
 	    } else {
 		body.getBody().remove(0);
 		if(first instanceof ThisConstructorReference){
-		    attach(new MethodReference
+		    attach(new MethodReferenceWrapper(new MethodReference
 		            (new ThisReference(), new ImplicitIdentifier
 		                    (CONSTRUCTOR_NORMALFORM_IDENTIFIER), 
-		                    ((SpecialConstructorReference)first).getArguments()), body, 0);
+		                    ((SpecialConstructorReference)first).getArguments()), cs), body, 0);
 		}else{
 		    ReferencePrefix referencePrefix = ((SuperConstructorReference) first).getReferencePrefix();
 		    ASTList<Expression> args = ((SpecialConstructorReference)first).getArguments();
@@ -363,13 +369,53 @@ public class ConstructorNormalformBuilder
 		        if(args==null) args = new ASTArrayList<Expression>(1);
 		        args.add(new VariableReference(new Identifier(etId)));        
 		    }
-		    attach(new MethodReference
+		    attach(new MethodReferenceWrapper(new MethodReference
 		            (new SuperReference(), new ImplicitIdentifier
 		                    (CONSTRUCTOR_NORMALFORM_IDENTIFIER), 
-		                    args),
+		                    args), cs),
 		                    body, 0);	    
 		}
 	    }
+	    
+	    // initialize reentrant scope:
+	    // if(this.<rs>!=<coma>){
+	    //     if(this.<rs>!=null){
+	    //       <coma>.size += this.<rs>.size;
+	    //       <coma>.consumed += this.<rs>.consumed;
+	    //     }
+	    //     this.<rs> = <coma>;
+	    // }
+	    // -----------------------------------------------------------------------
+	    if(ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof PercProfile){
+	        ThisReference thisRef = new ThisReference();
+	        ImplicitIdentifier rs = new ImplicitIdentifier(ImplicitFieldAdder.IMPLICIT_REENTRANT_SCOPE);
+	        FieldReference thisRS = new FieldReference(thisRef, rs);
+	        Identifier size = new Identifier("size");
+	        Identifier consumed = new Identifier("consumed");
+	        FieldReference rsSize = new FieldReference(thisRS, size);
+	        FieldReference rsConsumed = new FieldReference(thisRS, consumed);
+	        FieldReference constrRef = new FieldReference(new TypeReference(
+	                new PackageReference(new PackageReference(new Identifier("javax")), new Identifier("realtime")),
+	                new Identifier("MemoryArea")), new Identifier("constructedScope"));
+	        FieldReference consSize = new FieldReference(constrRef, size);
+	        FieldReference consConsumed = new FieldReference(constrRef, consumed);
+	        Assignment assSize = new PlusAssignment(consSize, rsSize);
+	        Assignment assCons = new PlusAssignment(consConsumed, rsConsumed);
+	        Assignment assRS = new CopyAssignment(thisRS, constrRef);
+	        Expression neqCons = new NotEquals(thisRS, constrRef);
+	        Expression neqNull = new NotEquals(thisRS, new NullLiteral());
+	        ASTList<Statement> ifBody1 = new ASTArrayList<Statement>(2);
+	        ifBody1.add(assSize);
+	        ifBody1.add(assCons);
+	        Statement result = new If(neqNull, new StatementBlock(ifBody1));
+	        ASTList<Statement> ifBody2 = new ASTArrayList<Statement>(2);
+	        ifBody2.add(result);
+	        ifBody2.add(assRS);
+	        result = new If(neqCons, new StatementBlock(ifBody2));
+	        attach(result, body, 1);
+	    }	    
+	    // -----------------------------------------------------------------------
+	    
 	    // if the first statement is not a this constructor reference
 	    // the instance initializers have to be added in source code
 	    // order
@@ -392,7 +438,14 @@ public class ConstructorNormalformBuilder
 		}
 
 	    }
-	}
+	}else if(cd == javaLangObject && body != null) {
+	    ASTList<Statement> initializers = (ASTList<Statement>) class2initializers.get(cd);
+	    for (int i = 0; i<initializers.size(); i++) {
+	        attach((Statement) 
+	                initializers.get(i).deepClone(),
+	                body, i);
+	    }
+        }
 
 	
 	MethodDeclaration nf =  new MethodDeclaration
@@ -402,6 +455,9 @@ public class ConstructorNormalformBuilder
 	     parameters,
 	     recThrows,
 	     body);
+        if(cons instanceof ConstructorDeclaration){
+            nf.setComments(((ConstructorDeclaration)cons).getComments());
+        }
 	nf.makeAllParentRolesValid();
 	return nf;
     }

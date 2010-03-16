@@ -19,8 +19,7 @@ import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.visitor.Visitor;
-import de.uka.ilkd.key.logic.LocationDescriptor;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.proof.AtPreFactory;
@@ -34,6 +33,10 @@ public class LoopInvariantImpl implements LoopInvariant {
     
     private final LoopStatement loop;
     private final Term originalInvariant;
+    private final Term originalWorkingSpaceLocal;
+    private final Term originalWorkingSpaceReentrant;
+    private final Term originalWorkingSpaceConstructed;
+    private final Term originalParametrizedWorkingSpaceTerms;
     private final LoopPredicateSet originalPredicates;
     private final LocationDescriptorSet originalModifies;
     private final Term originalVariant;
@@ -63,6 +66,10 @@ public class LoopInvariantImpl implements LoopInvariant {
                              LoopPredicateSet predicates,
                              LocationDescriptorSet modifies,  
                              Term variant, 
+                             Term parametrizedWorkingSpaceTerms,
+                             Term workingSpaceLocal,
+                             Term workingSpaceConstructed,
+                             Term workingSpaceReentrant,
                              Term selfTerm,
                              /*in*/ Map<Operator, Function /*(atPre)*/> atPreFunctions,
                              boolean predicateHeuristicsAllowed) {
@@ -74,6 +81,10 @@ public class LoopInvariantImpl implements LoopInvariant {
 	this.originalInvariant          = invariant;
         this.originalPredicates         = predicates;
         this.originalVariant            = variant;
+        this.originalParametrizedWorkingSpaceTerms = parametrizedWorkingSpaceTerms;
+        this.originalWorkingSpaceLocal  = workingSpaceLocal;
+        this.originalWorkingSpaceConstructed = workingSpaceConstructed;
+        this.originalWorkingSpaceReentrant = workingSpaceReentrant;
         this.originalModifies           = modifies;
         this.originalSelfTerm           = selfTerm;   
         this.predicateHeuristicsAllowed = predicateHeuristicsAllowed;
@@ -91,6 +102,10 @@ public class LoopInvariantImpl implements LoopInvariant {
              new LoopPredicateSet(DefaultImmutableSet.<Term>nil()), 
              new LocationDescriptorSet(DefaultImmutableSet.<LocationDescriptor>nil()), 
              null, 
+             null,
+             null,
+             null,
+             null,
              selfTerm,
              new LinkedHashMap<Operator, Function>(),
              true);
@@ -104,14 +119,23 @@ public class LoopInvariantImpl implements LoopInvariant {
     
     private Map /*Operator, Operator, Term -> Term*/ getReplaceMap(
             Term selfTerm,
+            Term memoryArea,
             /*inout*/ Map<Operator, Function/*atpre*/> atPreFunctions,
             Services services) {
         Map result = new LinkedHashMap();
+        TermBuilder tb = TermBuilder.DF;   
         
         //self
         if(selfTerm != null) {
-            assert selfTerm.sort().extendsTrans(originalSelfTerm.sort());
+            assert (selfTerm.sort().extendsTrans(originalSelfTerm.sort()) || 
+                originalSelfTerm.sort().extendsTrans(selfTerm.sort()));
             result.put(originalSelfTerm, selfTerm);
+        }
+        
+        //memory area
+        if(memoryArea != null) {
+            assert memoryArea.sort().extendsTrans(services.getJavaInfo().getDefaultMemoryArea().sort());
+            result.put(tb.var(services.getJavaInfo().getDefaultMemoryArea()), memoryArea);
         }
         
         //-parameters and other local variables are always kept up to
@@ -149,7 +173,7 @@ public class LoopInvariantImpl implements LoopInvariant {
             /*inout*/ Map <Operator, Function/* atPre*/> atPreFunctions,
             Services services) {
        Map result = new LinkedHashMap();
-       Map replaceMap = getReplaceMap(selfTerm, atPreFunctions, services);
+       Map replaceMap = getReplaceMap(selfTerm, null, atPreFunctions, services);
         for (Object o : replaceMap.entrySet()) {
             Map.Entry entry = (Map.Entry) o;
             result.put(entry.getValue(), entry.getKey());
@@ -169,10 +193,20 @@ public class LoopInvariantImpl implements LoopInvariant {
 
     
     public Term getInvariant(Term selfTerm,
+            Term memoryArea,
             /*inout*/Map <Operator, Function/* (atPre)*/> atPreFunctions,
             Services services) {
         assert (selfTerm == null) == (originalSelfTerm == null);
-        Map replaceMap = getReplaceMap(selfTerm, atPreFunctions, services);
+        Map replaceMap = getReplaceMap(selfTerm, memoryArea, atPreFunctions, services);
+        OpReplacer or = new OpReplacer(replaceMap);
+        return or.replace(originalInvariant);
+    }
+    
+    public Term getInvariant(Term selfTerm,
+            /*inout*/Map <Operator, Function/* (atPre)*/> atPreFunctions,
+            Services services) {
+        assert (selfTerm == null) == (originalSelfTerm == null);
+        Map replaceMap = getReplaceMap(selfTerm, null, atPreFunctions, services);
         OpReplacer or = new OpReplacer(replaceMap);
         return or.replace(originalInvariant);
     }
@@ -182,34 +216,95 @@ public class LoopInvariantImpl implements LoopInvariant {
             /*inout*/ Map<Operator, Function/* (atPre)*/> atPreFunctions,
             Services services) {
         assert (selfTerm == null) == (originalSelfTerm == null);
-        Map replaceMap = getReplaceMap(selfTerm, atPreFunctions, services);
+        Map replaceMap = getReplaceMap(selfTerm, null, atPreFunctions, services);
         OpReplacer or = new OpReplacer(replaceMap);
         return new LoopPredicateSet(or.replace(originalPredicates.asSet()));
     }
 
-    
     public LocationDescriptorSet getModifies(
             Term selfTerm,
             /*inout*/ Map<Operator, Function/* (atPre)*/> atPreFunctions,
             Services services) {
         assert (selfTerm == null) == (originalSelfTerm == null);
         Map replaceMap = 
-            getReplaceMap(selfTerm, atPreFunctions, services);
+            getReplaceMap(selfTerm, null, atPreFunctions, services);
+        OpReplacer or = new OpReplacer(replaceMap);
+        return new LocationDescriptorSet(or.replaceLoc(originalModifies.asSet()));
+    }
+
+    
+    public LocationDescriptorSet getModifies(
+            Term selfTerm,
+            Term memoryArea,
+            /*inout*/ Map<Operator, Function/* (atPre)*/> atPreFunctions,
+            Services services) {
+        assert (selfTerm == null) == (originalSelfTerm == null);
+        Map replaceMap = 
+            getReplaceMap(selfTerm, memoryArea, atPreFunctions, services);
         OpReplacer or = new OpReplacer(replaceMap);
         return new LocationDescriptorSet(or.replaceLoc(originalModifies.asSet()));
     }
     
-
+    /*    public ImmutableSet<LocationDescriptor> getModifies(
+            Term selfTerm,
+            Term memoryArea,
+            Map<Operator, Function> atPreFunctions,
+            Services services) {
+        assert (selfTerm == null) == (originalSelfTerm == null);
+        Map replaceMap = 
+            getReplaceMap(selfTerm, memoryArea, atPreFunctions, services);
+        OpReplacer or = new OpReplacer(replaceMap);
+        return new LocationDescriptorSet(or.replaceLoc(originalModifies.asSet()));
+    }*/
+    
     public Term getVariant(Term selfTerm, 
             /*inout*/ Map <Operator, Function/* (atPre)*/> atPreFunctions,
             Services services) {
         assert (selfTerm == null) == (originalSelfTerm == null);
         Map replaceMap = 
-            getReplaceMap(selfTerm, atPreFunctions, services);
+            getReplaceMap(selfTerm, null, atPreFunctions, services);
         OpReplacer or = new OpReplacer(replaceMap);
         return or.replace(originalVariant);
     }
     
+    public Term getWorkingSpace(Term selfTerm, 
+            /*inout*/ Map <Operator, Function/* (atPre)*/> atPreFunctions,
+            Services services){
+        assert (selfTerm == null) == (originalSelfTerm == null);
+        Map replaceMap = 
+            getReplaceMap(selfTerm, null, atPreFunctions, services);
+        OpReplacer or = new OpReplacer(replaceMap);
+        return or.replace(originalWorkingSpaceLocal);   
+    }
+    
+    public Term getParametrizedWorkingSpaceTerms(Term selfTerm, 
+            /*inout*/Map<Operator, Function/* (atPre)*/> atPreFunctions,
+            Services services){
+        assert (selfTerm == null) == (originalSelfTerm == null);
+        Map replaceMap = getReplaceMap(selfTerm, null, atPreFunctions, services);
+        OpReplacer or = new OpReplacer(replaceMap);
+        return or.replace(originalParametrizedWorkingSpaceTerms);
+    }
+    
+    public Term getWorkingSpaceConstructed(Term selfTerm, 
+            /*inout*/ Map <Operator, Function/* (atPre)*/> atPreFunctions,
+            Services services){
+        assert (selfTerm == null) == (originalSelfTerm == null);
+        Map replaceMap = 
+            getReplaceMap(selfTerm, null, atPreFunctions, services);
+        OpReplacer or = new OpReplacer(replaceMap);
+        return or.replace(originalWorkingSpaceConstructed);   
+    }
+    
+    public Term getWorkingSpaceReentrant(Term selfTerm, 
+            /*inout*/ Map <Operator, Function/* (atPre)*/> atPreFunctions,
+            Services services){
+        assert (selfTerm == null) == (originalSelfTerm == null);
+        Map replaceMap = 
+            getReplaceMap(selfTerm, null, atPreFunctions, services);
+        OpReplacer or = new OpReplacer(replaceMap);
+        return or.replace(originalWorkingSpaceReentrant);   
+    }
     
     public boolean getPredicateHeuristicsAllowed() {
         return predicateHeuristicsAllowed;
@@ -235,6 +330,10 @@ public class LoopInvariantImpl implements LoopInvariant {
                                      originalPredicates,
                                      originalModifies,
                                      originalVariant,
+                                     originalParametrizedWorkingSpaceTerms,
+                                     originalWorkingSpaceLocal,
+                                     originalWorkingSpaceConstructed,
+                                     originalWorkingSpaceReentrant,
                                      originalSelfTerm,
                                      originalAtPreFunctions,
                                      predicateHeuristicsAllowed);
@@ -253,7 +352,11 @@ public class LoopInvariantImpl implements LoopInvariant {
                                      or.replace(invariant), 
                                      originalPredicates,  
                                      originalModifies, 
-                                     originalVariant, 
+                                     originalVariant,
+                                     originalParametrizedWorkingSpaceTerms,
+                                     originalWorkingSpaceLocal,
+                                     originalWorkingSpaceConstructed,
+                                     originalWorkingSpaceReentrant,
                                      originalSelfTerm,
                                      originalAtPreFunctions,
                                      predicateHeuristicsAllowed);
@@ -273,6 +376,10 @@ public class LoopInvariantImpl implements LoopInvariant {
                                      new LoopPredicateSet(or.replace(predicates)),
                                      originalModifies,
                                      originalVariant,
+                                     originalParametrizedWorkingSpaceTerms,
+                                     originalWorkingSpaceLocal,
+                                     originalWorkingSpaceConstructed,
+                                     originalWorkingSpaceReentrant,
                                      originalSelfTerm,
                                      originalAtPreFunctions,
                                      predicateHeuristicsAllowed);
@@ -286,6 +393,10 @@ public class LoopInvariantImpl implements LoopInvariant {
                                      originalPredicates,
                                      originalModifies,
                                      originalVariant,
+                                     originalParametrizedWorkingSpaceTerms,
+                                     originalWorkingSpaceLocal,
+                                     originalWorkingSpaceConstructed,
+                                     originalWorkingSpaceReentrant,
                                      originalSelfTerm,
                                      originalAtPreFunctions,
                                      predicateHeuristicsAllowed);

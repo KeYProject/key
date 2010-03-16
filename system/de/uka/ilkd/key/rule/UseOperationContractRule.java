@@ -19,11 +19,18 @@ import de.uka.ilkd.key.collection.*;
 import de.uka.ilkd.key.gui.ContractConfigurator;
 import de.uka.ilkd.key.gui.Main;
 import de.uka.ilkd.key.java.*;
-import de.uka.ilkd.key.java.recoderext.ConstructorNormalformBuilder;
-import de.uka.ilkd.key.java.statement.LabeledStatement;
-import de.uka.ilkd.key.java.statement.MethodBodyStatement;
-import de.uka.ilkd.key.java.statement.Throw;
+import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
+import de.uka.ilkd.key.java.reference.ExecutionContext;
+import de.uka.ilkd.key.java.statement.*;
 import de.uka.ilkd.key.java.visitor.ProgramContextAdder;
+import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.proof.*;
+import de.uka.ilkd.key.proof.init.PercProfile;
+import de.uka.ilkd.key.proof.init.RTSJProfile;
+import de.uka.ilkd.key.proof.mgt.*;
+import de.uka.ilkd.key.java.recoderext.ConstructorNormalformBuilder;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.AtPreFactory;
@@ -264,6 +271,64 @@ public class UseOperationContractRule implements BuiltInRule {
         return result;
     }
     
+    private ExecutionContext getExecutionContext(PosInOccurrence pio){
+        if (pio==null) {
+            return null;
+        }
+        
+        Term t = pio.subTerm();        
+        
+        while (t.op() instanceof IUpdateOperator) {
+            pio = pio.down(((IUpdateOperator)t.op()).targetPos());
+            t = pio.subTerm();
+        }
+
+        if (!(t.op() instanceof Modality)) {
+            return null;
+        }
+
+        final ProgramElement pe = t.executableJavaBlock().program();        
+
+        if (pe == null) {
+            return null;
+        }
+
+        ProgramElement activeStatement = (Statement) pe;
+        ExecutionContext ec = null;
+        
+        if (activeStatement instanceof ProgramPrefix) {
+
+            ProgramPrefix curPrefix = (ProgramPrefix)activeStatement;
+
+            final ImmutableArray<ProgramPrefix> prefix = curPrefix.getPrefixElements();
+            final int length = prefix.size();
+            
+            // fail fast check      
+            curPrefix = prefix.get(length-1);// length -1 >= 0 as prefix array 
+                                                          //contains curPrefix as first element
+
+            activeStatement = curPrefix.getFirstActiveChildPos().getProgram(curPrefix);
+
+            if (!(activeStatement instanceof MethodBodyStatement)) {
+                return null;
+            }
+        
+            int i = length - 1;
+            do {
+                if (ec == null && curPrefix instanceof MethodFrame) {
+                    ec = (ExecutionContext)((MethodFrame)curPrefix).getExecutionContext(); 
+                }
+                i--;
+                if (i >= 0) {
+                    curPrefix = prefix.get(i);
+                }
+            } while (i >= 0);       
+
+        } else if (!(activeStatement instanceof MethodBodyStatement)) {
+            return null;
+        } 
+        return ec;
+    }
     
     private StatementBlock replaceStatement(JavaBlock jb, 
                                             StatementBlock replacement) {
@@ -402,14 +467,34 @@ public class UseOperationContractRule implements BuiltInRule {
         Map<Operator, Function> atPreFunctions               
             = new LinkedHashMap<Operator, Function>();
         
+        ExecutionContext ec = getExecutionContext(pio);
+        Term mTerm=null;
+	if(services.getProof().getSettings().getProfile() instanceof RTSJProfile ||
+	   services.getProof().getSettings().getProfile() instanceof PercProfile){ 
+	    if(mbs.getMethodReference().callerScope()){
+		mTerm = services.getTypeConverter().convertToLogicElement(ec.getCallerMemoryArea(), ec);
+	    }else if(mbs.getMethodReference().constructedScope()){
+		mTerm = services.getTypeConverter().convertToLogicElement(ec.getConstructedMemoryArea(), ec);
+	    }else if(mbs.getMethodReference().reentrantScope()){
+		mTerm = TB.dot(
+			       services.getTypeConverter().convertToLogicElement(ec.getRuntimeInstance(), ec),
+			       services.getJavaInfo().getAttribute
+			       ("memoryArea", services.getJavaInfo().getJavaLangObject()));
+	    }else{
+		mTerm = services.getTypeConverter().convertToLogicElement(ec.getMemoryArea(), ec);
+	    }
+	}
+            
         //translate the contract and the invariants
         FormulaWithAxioms pre = cwi.contract.getPre(selfVar, 
                                                     paramVars, 
+                                                    mTerm,
                                                     services);
         FormulaWithAxioms post = cwi.contract.getPost(selfVar, 
                                                       paramVars, 
                                                       resultVar, 
-                                                      excVar, 
+                                                      excVar,
+                                                      mTerm,
                                                       atPreFunctions,
                                                       services);
         ImmutableSet<LocationDescriptor> modifies = cwi.contract.getModifies(selfVar, 
@@ -470,6 +555,11 @@ public class UseOperationContractRule implements BuiltInRule {
                                    : uf.elementaryUpdate(TB.var(selfVar), 
                                                          actualSelf));
         
+        Term[] argTerms = new Term[paramVars.size()+(pm.isStatic() ? 0 : 1)];
+        int i = 0;
+        if(!pm.isStatic()){
+            argTerms[i++] = TB.var(selfVar);
+        }
         final Iterator<Term> actualParamsIt = actualParams.iterator();
         for (final ParsableVariable paramVar : paramVars) {
             assert actualParamsIt.hasNext();
@@ -477,10 +567,57 @@ public class UseOperationContractRule implements BuiltInRule {
                 = uf.parallel(selfParamsUpdate, 
                               uf.elementaryUpdate(TB.var(paramVar), 
                                                   actualParamsIt.next()));
+            argTerms[i++] = TB.var(paramVar);
         }
+	Term mCons=null, ws=null;
+	Update wsUpd=null;
+	NamespaceSet nss = services.getNamespaces();
+        Function add = (Function) nss.functions().lookup(new Name("add"));
+	if(services.getProof().getSettings().getProfile() instanceof RTSJProfile &&
+	   ((RTSJProfile) services.getProof().getSettings().getProfile()).memoryConsumption()  || 
+	   services.getProof().getSettings().getProfile() instanceof PercProfile){
+	    mCons = TB.dot(mTerm, services.getJavaInfo().getAttribute(
+				"consumed", "javax.realtime.MemoryArea"));
+	    ws = TB.tf().createWorkingSpaceNonRigidTerm(pm, 
+			   (Sort) nss.sorts().lookup(new Name("int")),
+							argTerms);
+	    nss.functions().add(ws.op());
+	    wsUpd = uf.elementaryUpdate(mCons, TB.tf().createFunctionTerm(add, mCons, ws));
+	}
+        
         Term excNullTerm = TB.equals(TB.var(excVar), TB.NULL(services));
        
         //create "Pre" branch
+        Term preF = pre.getFormula();
+        Function leq = (Function) nss.functions().lookup(new Name("leq"));
+        if(services.getProof().getSettings().getProfile() instanceof RTSJProfile && 
+        		((RTSJProfile) services.getProof().getSettings().getProfile()).memoryConsumption()){
+            Term wsPre = cwi.contract.getWorkingSpace(selfVar, paramVars, services);
+            wsPre = TB.tf().createFunctionTerm(leq, TB.tf().createFunctionTerm(add, mCons, wsPre),
+                    TB.dot(mTerm, services.getJavaInfo().getAttribute(
+                            "size", "javax.realtime.MemoryArea")));
+            preF = TB.and(wsPre, preF);
+        }else if(services.getProof().getSettings().getProfile() instanceof PercProfile){
+            Term wsPre = cwi.contract.getCallerWorkingSpace(selfVar, paramVars, services);
+            wsPre = TB.tf().createFunctionTerm(leq, TB.tf().createFunctionTerm(add, mCons, wsPre),
+                    TB.dot(mTerm, services.getJavaInfo().getAttribute(
+                            "size", "javax.realtime.MemoryArea")));
+            if(!pm.isStatic()){
+                Term wsReent = cwi.contract.getReentrantWorkingSpace(selfVar, paramVars, services);
+                Term rs = TB.dot(TB.var(selfVar), 
+                        services.getJavaInfo().getAttribute(ImplicitFieldAdder.IMPLICIT_REENTRANT_SCOPE, 
+                                services.getJavaInfo().getJavaLangObject()));
+                Term rsCons = TB.dot(rs, services.getJavaInfo().getAttribute(
+                        "consumed", "javax.realtime.MemoryArea"));
+                Term wsPreReent = TB.tf().createFunctionTerm(leq, TB.tf().createFunctionTerm(add, rsCons, wsReent),
+                        TB.dot(rs, services.getJavaInfo().getAttribute(
+                                "size", "javax.realtime.MemoryArea")));
+                wsPre = TB.and(wsPre, wsPreReent);
+                Update rsUpd = uf.elementaryUpdate(rsCons, TB.tf().createFunctionTerm(add, rsCons, wsReent));
+                wsUpd = uf.parallel(wsUpd, rsUpd);
+            }
+            preF = TB.and(wsPre, preF);
+        }
         Term reachablePre = TB.and(new Term[]{
                 TB.inReachableState(services),
                 selfVar != null ? CATF.createCreatedAndNotNullTerm(services, TB.var(selfVar)) : TB.tt(),
@@ -489,7 +626,7 @@ public class UseOperationContractRule implements BuiltInRule {
         Term preTerm = uf.prepend(
                 selfParamsUpdate, 
                 TB.and(reachablePre, TB.imp(pre.getAxiomsAsFormula(), 
-                                            pre.getFormula())));
+                                            preF)));
         replaceInGoal(preTerm, preGoal, pio);
         
         //create "Post" branch
@@ -497,10 +634,12 @@ public class UseOperationContractRule implements BuiltInRule {
                 TB.inReachableState(services), 
                 CATF.createReachableVariableValueTerm(services, resultVar));
         StatementBlock postSB = replaceStatement(jb, new StatementBlock());
+
         final Term contractPost = TB.and(new Term[]{excNullTerm,
                 			reachablePost,
                 			post.getAxiomsAsFormula(),
                 			post.getFormula()});
+
         Term postTermWithoutUpdate 
             = TB.imp(contractPost,
                      TB.prog(modality,
@@ -523,12 +662,29 @@ public class UseOperationContractRule implements BuiltInRule {
                                     postTerm);
         } else {
             postTerm = uf.prepend(uf.sequential(new Update[]{selfParamsUpdate,
-                                                           atPreUpdate,
-                                                           anonUpdate,
-                                                           resultUpdate}),
+							     atPreUpdate,
+							     wsUpd==null ? anonUpdate : uf.parallel(anonUpdate, wsUpd),
+							     resultUpdate}),
                                 postTermWithoutUpdate);
         }
-                                                        
+    
+        Term wsEq = TB.tt();
+        if(services.getProof().getSettings().getProfile() instanceof RTSJProfile && 
+        		((RTSJProfile) services.getProof().getSettings().getProfile()).memoryConsumption()){    
+            wsEq = TB.equals(ws, cwi.contract.getWorkingSpace(selfVar, paramVars, services));
+            wsEq = uf.apply(uf.sequential(new Update[]{selfParamsUpdate,
+                    atPreUpdate}),wsEq);
+        }else if(services.getProof().getSettings().getProfile() instanceof PercProfile){
+//                Term size = TB.var(services.getJavaInfo().
+//                        getAttribute(ImplicitFieldAdder.IMPLICIT_SIZE, pm.getKeYJavaType()));
+//                wsEq = TB.equals(ws, size);
+            wsEq = TB.equals(ws, cwi.contract.getCallerWorkingSpace(selfVar, paramVars, services));
+            wsEq = uf.apply(uf.sequential(new Update[]{selfParamsUpdate,
+                    atPreUpdate}),wsEq);
+        }
+            
+        postTerm = TB.imp(wsEq, postTerm);
+        
         replaceInGoal(postTerm, postGoal, pio);
         
         //create "Exceptional Post" branch
@@ -545,10 +701,11 @@ public class UseOperationContractRule implements BuiltInRule {
                              JavaBlock.createJavaBlock(excPostSB), 
                              pio.subTerm().sub(0)));
         Term excPostTerm = uf.prepend(uf.sequential(new Update[]{selfParamsUpdate,
-                                                               atPreUpdate,
-                                                               anonUpdate}),
-                                    excPostTermWithoutUpdate);
-                                                            
+								 atPreUpdate,
+								 wsUpd==null ? anonUpdate : uf.parallel(anonUpdate, wsUpd)}),
+	    excPostTermWithoutUpdate);
+        excPostTerm = TB.imp(wsEq, excPostTerm);
+        
         replaceInGoal(excPostTerm, excPostGoal, pio);
         
         //create justification

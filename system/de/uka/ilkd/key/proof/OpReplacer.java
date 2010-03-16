@@ -10,14 +10,10 @@
 
 package de.uka.ilkd.key.proof;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 
-import de.uka.ilkd.key.collection.ImmutableArray;
-import de.uka.ilkd.key.collection.DefaultImmutableSet;
-import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.collection.*;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.speclang.FormulaWithAxioms;
@@ -109,6 +105,17 @@ public class OpReplacer {
         ImmutableSet<Term> result = DefaultImmutableSet.<Term>nil();
         for (final Term term : terms) {
             result = result.add(replace(term));
+        }
+        return result;
+    }
+    
+    /**
+     * Replaces in a list of terms.
+     */
+    public ImmutableList<Term> replace(ImmutableList<Term> terms) {
+        ImmutableList<Term> result = ImmutableSLList.<Term>nil();
+        for (final Term term : terms) {
+            result = result.append(replace(term));
         }
         return result;
     }
