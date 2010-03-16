@@ -22,7 +22,7 @@ import de.uka.ilkd.key.proof.proofevent.RuleAppInfo;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.BuiltInRuleApp;
 import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.smt.SMTRuleNew;
+import de.uka.ilkd.key.smt.SMTRule;
 import de.uka.ilkd.key.smt.SimplifySolver;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.util.ProgressMonitor;
@@ -90,7 +90,7 @@ public class ProofStarter {
  
     // - Note: This should be removed
     private void applySimplificationOnGoals(ImmutableList<Goal> goals, 
-            SMTRuleNew decisionProcedureRule) {
+            SMTRule decisionProcedureRule) {
         if (goals.isEmpty()) {
             return;
 	}
@@ -243,7 +243,7 @@ public class ProofStarter {
             // take default settings
             setMaxSteps(proof.getSettings().getStrategySettings().getMaxSteps());
         }
-        final SMTRuleNew decisionProcedureRule;
+        final SMTRule decisionProcedureRule;
         if (useDecisionProcedures) {
             decisionProcedureRule = findSimplifyRule();
         } else {
@@ -295,8 +295,8 @@ public class ProofStarter {
      */
     // TODO: Change this method!!! At the moment this method returns null to guarantee 
     // that KeY works.
-    private SMTRuleNew findSimplifyRule() {
-	return new SMTRuleNew(new Name("SIMPLIFY"),new SimplifySolver());
+    private SMTRule findSimplifyRule() {
+	return new SMTRule(new Name("SIMPLIFY"),new SimplifySolver());
 	
        /* BuiltInRule decisionProcedureRule = null;
         for (BuiltInRule builtInRule : proof.getSettings().getProfile().getStandardRules().getStandardBuiltInRules()) {

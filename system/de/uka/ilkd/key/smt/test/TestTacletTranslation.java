@@ -26,7 +26,7 @@ import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.smt.AbstractSMTSolver;
 import de.uka.ilkd.key.smt.CVC3Solver;
-import de.uka.ilkd.key.smt.SMTRuleNew;
+import de.uka.ilkd.key.smt.SMTRule;
 import de.uka.ilkd.key.smt.SMTSolver;
 import de.uka.ilkd.key.smt.SMTSolverResult;
 import de.uka.ilkd.key.smt.SimplifySolver;
@@ -44,11 +44,11 @@ public class TestTacletTranslation extends TestCommons {
     /*
      * If you want to add further external provers, this is the right place.
      */
-    private final static SMTRuleNew simplify = new SMTRuleNew(new Name("TEST_SIMPLIFY"), new SimplifySolver());
-    private final static SMTRuleNew cvc3 = new SMTRuleNew(new Name("TEST_CVC3"),new CVC3Solver());
-    private final static SMTRuleNew z3 = new SMTRuleNew(new Name("TEST_Z3"),new Z3Solver());
-    private final static SMTRuleNew yices = new SMTRuleNew(new Name("TEST_YICES"), new YicesSolver());
-    private final static SMTRuleNew rules[] = { simplify, cvc3, z3, yices };
+    private final static SMTRule simplify = new SMTRule(new Name("TEST_SIMPLIFY"), new SimplifySolver());
+    private final static SMTRule cvc3 = new SMTRule(new Name("TEST_CVC3"),new CVC3Solver());
+    private final static SMTRule z3 = new SMTRule(new Name("TEST_Z3"),new Z3Solver());
+    private final static SMTRule yices = new SMTRule(new Name("TEST_YICES"), new YicesSolver());
+    private final static SMTRule rules[] = { simplify, cvc3, z3, yices };
 
     private static boolean installingTest = false;
 
@@ -122,7 +122,7 @@ public class TestTacletTranslation extends TestCommons {
 	TacletTranslationSettings.getInstance().setSaveToFile(false);
 	if (!installingTest) {
 
-	    for (SMTRuleNew solver : rules) {
+	    for (SMTRule solver : rules) {
 		solver.isUsable();
 
 	    }
@@ -132,13 +132,13 @@ public class TestTacletTranslation extends TestCommons {
     }
 
     private void test(String filename, SolveType type, UsedTaclets.Category cat) {
-	test(filename, type, cat, (SMTRuleNew[]) null);
+	test(filename, type, cat, (SMTRule[]) null);
     }
 
     private void test(String filename, SolveType type,
-	    UsedTaclets.Category cat, SMTRuleNew... only) {
+	    UsedTaclets.Category cat, SMTRule... only) {
 
-	ArrayList<SMTRuleNew> rules = getInstalledRules(only);
+	ArrayList<SMTRule> rules = getInstalledRules(only);
 	if (rules.isEmpty()) {
 	    return;
 	}
@@ -147,7 +147,7 @@ public class TestTacletTranslation extends TestCommons {
 	checkFile(rules, folder + filename, type);
     }
 
-    private void checkFile(ArrayList<SMTRuleNew> rules, String filepath,
+    private void checkFile(ArrayList<SMTRule> rules, String filepath,
 	    SolveType type) {
 	ProofAggregate p = parse(new File(filepath));
 
@@ -161,7 +161,7 @@ public class TestTacletTranslation extends TestCommons {
 	boolean use[] = { false, true };
 
 	for (int i = 0; i < 2; i++) {
-	    for (SMTRuleNew rule : rules) {
+	    for (SMTRule rule : rules) {
 		if (!rule.isUsable()) {
 		    continue;
 		}
@@ -214,8 +214,8 @@ public class TestTacletTranslation extends TestCommons {
 
    
 
-    private ArrayList<SMTRuleNew> getInstalledRules(SMTRuleNew[] only) {
-	ArrayList<SMTRuleNew> toReturn = new ArrayList<SMTRuleNew>();
+    private ArrayList<SMTRule> getInstalledRules(SMTRule[] only) {
+	ArrayList<SMTRule> toReturn = new ArrayList<SMTRule>();
 
 	for (int i = 0; i < rules.length; i++) {
 	    add(toReturn, only, rules[i]);
@@ -224,14 +224,14 @@ public class TestTacletTranslation extends TestCommons {
 	return toReturn;
     }
 
-    private boolean add(ArrayList<SMTRuleNew> toReturn, SMTRuleNew[] only,
-	    SMTRuleNew o) {
+    private boolean add(ArrayList<SMTRule> toReturn, SMTRule[] only,
+	    SMTRule o) {
 	if (!o.isUsable()) {
 	    return false;
 	}
 
 	if (only != null) {
-	    for (SMTRuleNew rule : only) {
+	    for (SMTRule rule : only) {
 		if (rule == o) {
 		    toReturn.add(o);
 

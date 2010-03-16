@@ -66,7 +66,7 @@ import de.uka.ilkd.key.proof.mgt.BasicTask;
 import de.uka.ilkd.key.proof.mgt.NonInterferenceCheck;
 import de.uka.ilkd.key.proof.mgt.TaskTreeNode;
 import de.uka.ilkd.key.proof.reuse.ReusePoint;
-import de.uka.ilkd.key.smt.SMTRuleNew;
+import de.uka.ilkd.key.smt.SMTRule;
 import de.uka.ilkd.key.strategy.VBTStrategy;
 import de.uka.ilkd.key.unittest.UnitTestBuilder;
 import de.uka.ilkd.key.unittest.UnitTestBuilderGUIInterface;
@@ -686,7 +686,7 @@ public class Main extends JFrame implements IMain {
 
     private JButton createDecisionProcedureButton() {	
 	decisionProcedureInvocationButton = new JButton();	
-	SMTRuleNew r = ProofSettings.DEFAULT_SETTINGS.getDecisionProcedureSettings().getActiveSMTRule();
+	SMTRule r = ProofSettings.DEFAULT_SETTINGS.getDecisionProcedureSettings().getActiveSMTRule();
 	decisionProcedureInvocationButton.setAction(new DPInvokeAction(r));
 	return decisionProcedureInvocationButton;
     }
@@ -1590,7 +1590,7 @@ public class Main extends JFrame implements IMain {
 	final DecisionProcedureSettings dps = ProofSettings.DEFAULT_SETTINGS.getDecisionProcedureSettings();
 	
 	int targetIndex = 0;
-	for(SMTRuleNew rule : dps.getInstalledRules()){
+	for(SMTRule rule : dps.getInstalledRules()){
 	    
 	    final JRadioButtonMenuItem b = new JRadioButtonMenuItem();
 	    decProcRadioItems.add(b);
@@ -2198,7 +2198,7 @@ public class Main extends JFrame implements IMain {
 	
 	public void update() {	   
 	    if (settings != null) {
-		SMTRuleNew activeRule = settings.getActiveSMTRule();				
+		SMTRule activeRule = settings.getActiveSMTRule();				
 		decisionProcedureInvocationButton.
 				
 		setAction(new DPInvokeAction(activeRule));
@@ -3167,9 +3167,9 @@ public class Main extends JFrame implements IMain {
      */
     private final class DPInvokeAction extends AbstractAction {
 
-	private final SMTRuleNew decisionProcedure;
+	private final SMTRule decisionProcedure;
 	
-	public DPInvokeAction(SMTRuleNew decisionProcedure) {
+	public DPInvokeAction(SMTRule decisionProcedure) {
 	    assert decisionProcedure != null;
 	    this.decisionProcedure = decisionProcedure;
 	
@@ -3178,7 +3178,7 @@ public class Main extends JFrame implements IMain {
 	  
 	    putValue(NAME, decisionProcedure.displayName());
 		
-	    if (decisionProcedure != SMTRuleNew.EMPTY_RULE) {
+	    if (decisionProcedure != SMTRule.EMPTY_RULE) {
 		putValue(SHORT_DESCRIPTION, "Invokes " + decisionProcedure.displayName());
 	    } else {		
 		putValue(SHORT_DESCRIPTION, "Please select an external prover under Options | Decision Procedures.");
@@ -3187,7 +3187,7 @@ public class Main extends JFrame implements IMain {
 	}
 	
 	public boolean isEnabled() {
-	    return super.isEnabled() && decisionProcedure != SMTRuleNew.EMPTY_RULE && 
+	    return super.isEnabled() && decisionProcedure != SMTRule.EMPTY_RULE && 
  	      mediator != null && mediator.getProof() != null && !mediator.getProof().closed();
 	}
 	  
@@ -3204,17 +3204,17 @@ public class Main extends JFrame implements IMain {
      * updates the decision procedure settings of the current proof settings. 
      */
     private final class DPSelectionAction extends AbstractAction {
-	private final SMTRuleNew decisionProcedure;
+	private final SMTRule decisionProcedure;
 	// currently necessary as property SELECTED_KEY support first since JDK >= 1.6
 	private final JRadioButtonMenuItem radioButton;
 	
 
-	public DPSelectionAction(SMTRuleNew decisionProcedure, JRadioButtonMenuItem radioButton) {	    
+	public DPSelectionAction(SMTRule decisionProcedure, JRadioButtonMenuItem radioButton) {	    
 	    this.decisionProcedure = decisionProcedure;
 	    this.radioButton = radioButton;  
 	    
 	    
-	    final SMTRuleNew activeRule = getCurrentDPSettings().getActiveSMTRule();
+	    final SMTRule activeRule = getCurrentDPSettings().getActiveSMTRule();
 	    
 	    if (activeRule.equals(decisionProcedure)) {
 		radioButton.setSelected(true);
@@ -3225,7 +3225,7 @@ public class Main extends JFrame implements IMain {
 	   
 
 	    putValue(NAME, decisionProcedure.displayName());
-	    if (decisionProcedure != SMTRuleNew.EMPTY_RULE) {		
+	    if (decisionProcedure != SMTRule.EMPTY_RULE) {		
 		putValue(SHORT_DESCRIPTION, "Use '" + decisionProcedure.displayName() + "' as external prover.");
 	    } else {
 		putValue(SHORT_DESCRIPTION, "Do not use any external prover.");

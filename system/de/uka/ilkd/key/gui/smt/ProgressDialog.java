@@ -40,7 +40,7 @@ import javax.swing.ListModel;
 
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.smt.MakesProgress;
-import de.uka.ilkd.key.smt.SMTRuleNew;
+import de.uka.ilkd.key.smt.SMTRule;
 import de.uka.ilkd.key.smt.SMTSolver;
 
 public class ProgressDialog extends JDialog{
@@ -54,7 +54,7 @@ public class ProgressDialog extends JDialog{
 	private JButton okButton = null;
 	private JButton cancelButton = null;
 	private JScrollPane scrollPane = null;
-	private SMTRuleNew rule = null;
+	private SMTRule rule = null;
 
 
 	
@@ -65,7 +65,7 @@ public class ProgressDialog extends JDialog{
 		getList().repaint();
 	}
 	
-	public void prepare(Collection<SMTSolver> solvers, Collection<Goal> goals, SMTRuleNew r){
+	public void prepare(Collection<SMTSolver> solvers, Collection<Goal> goals, SMTRule r){
 	    this.rule = r;
 	    int width=0;
 	    int height =0;

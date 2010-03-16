@@ -42,7 +42,7 @@ public class TestSMTBenchmark extends TestCase implements FilenameFilter{
     
     public void testBenchmarks() {
 	String[] files = this.collectFilenames();
-	Collection<SMTRuleNew> rules = getRules();
+	Collection<SMTRule> rules = getRules();
 	
 	ArrayList<ArrayList<Proof>> toProof = this.loadGoals(rules.size(), files,folderPath);
 	ArrayList<ArrayList<String>> results = new ArrayList<ArrayList<String>>();
@@ -53,11 +53,11 @@ public class TestSMTBenchmark extends TestCase implements FilenameFilter{
 	this.printResults(files, rules, results);
     }
     
-    private void printResults(String[] sources, Collection<SMTRuleNew> rules, ArrayList<ArrayList<String>> results) {
+    private void printResults(String[] sources, Collection<SMTRule> rules, ArrayList<ArrayList<String>> results) {
 	String output = "";
 	//print header
 	output = "Problem\tFile\t";
-        for (SMTRuleNew rule : rules) {
+        for (SMTRule rule : rules) {
             output = output + rule.name() + "\t\t";
         }
 	output = output + "\n";
@@ -108,10 +108,10 @@ public class TestSMTBenchmark extends TestCase implements FilenameFilter{
 	return hasValid && hasInvalid;
     }
     
-    protected ArrayList<String> proofOneGoal(ArrayList<Proof> goals, Collection<SMTRuleNew> rules) {
+    protected ArrayList<String> proofOneGoal(ArrayList<Proof> goals, Collection<SMTRule> rules) {
 	ArrayList<String> toReturn = new ArrayList<String>();
 	int i=0; 
-	for(SMTRuleNew rule : rules){
+	for(SMTRule rule : rules){
 	    
 	    System.out.print(".");	
 	    Proof p = goals.get(i);
@@ -185,7 +185,7 @@ public class TestSMTBenchmark extends TestCase implements FilenameFilter{
      * create all Solver, that should be tested
      * @return the Rules, that should be tested.
      */
-    protected Collection<SMTRuleNew> getRules() {
+    protected Collection<SMTRule> getRules() {
 	
 	return DecisionProcedureSettings.getInstance().getSMTRules();
 	

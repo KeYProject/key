@@ -2,7 +2,7 @@ package de.uka.ilkd.key.smt.test;
 
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.smt.CVC3Solver;
-import de.uka.ilkd.key.smt.SMTRuleNew;
+import de.uka.ilkd.key.smt.SMTRule;
 import de.uka.ilkd.key.smt.SMTSolver;
 
 public class TestCvc3 extends TestSMTSolver {
@@ -11,8 +11,8 @@ public class TestCvc3 extends TestSMTSolver {
     private SMTSolver cvc3 = new CVC3Solver();
 
     @Override
-    public SMTRuleNew getSolver() {
-	return new SMTRuleNew(new Name("TEST_CVC3"),cvc3);
+    public SMTRule getSolver() {
+	return new SMTRule(new Name("TEST_CVC3"),cvc3);
     }
 
     @Override

@@ -58,7 +58,7 @@ public class SimplifyModelGenerator extends DecProdModelGenerator {
     private ImmutableList<String> placeHoldersForClasses = ImmutableSLList.<String>nil();
 
     private SMTSolver solver = new SimplifySolver();
-    private SMTRuleNew smtRule = new SMTRuleNew(new Name("SIMPLIFY"),solver);
+    private SMTRule smtRule = new SMTRule(new Name("SIMPLIFY"),solver);
 
     private static Term toFormula(Sequent s) {
 	TermBuilder tb = TermBuilder.DF;

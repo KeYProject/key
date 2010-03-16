@@ -17,7 +17,7 @@ import de.uka.ilkd.key.gui.nodeviews.BuiltInRuleMenuItem;
 import de.uka.ilkd.key.logic.Constraint;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.smt.SMTRuleNew;
+import de.uka.ilkd.key.smt.SMTRule;
 
 /**
  * Use this class to start SMTRules.
@@ -38,7 +38,7 @@ public class RuleLauncher {
     	     * @param goal 
     	     * @param constraint
     	     */
-    	    public void start(SMTRuleNew rule, Goal goal, Constraint constraint, boolean useOwnThread){
+    	    public void start(SMTRule rule, Goal goal, Constraint constraint, boolean useOwnThread){
     		LinkedList<Goal> goals = new LinkedList<Goal>();
     		rule.setMaxTime(DecisionProcedureSettings.getInstance().getTimeout()*100);
     		goals.add(goal);
@@ -49,7 +49,7 @@ public class RuleLauncher {
     		
     	    }
     	    
-    	    public void start(SMTRuleNew rule, Proof proof, Constraint constraint, boolean useOwnThread){
+    	    public void start(SMTRule rule, Proof proof, Constraint constraint, boolean useOwnThread){
     		LinkedList<Goal> goals = new LinkedList<Goal>();
     		rule.setMaxTime(DecisionProcedureSettings.getInstance().getTimeout()*100);
     		for (Goal goal : proof.openGoals()) {
@@ -65,7 +65,7 @@ public class RuleLauncher {
     	    
     	    
     	    
-    	    private void startProgressDialog(SMTRuleNew rule, Collection<Goal> goals){
+    	    private void startProgressDialog(SMTRule rule, Collection<Goal> goals){
     		ProgressDialog.INSTANCE.prepare(rule.getInstalledSolvers(),goals,rule);
     		ProgressDialog.INSTANCE.showDialog();
     	    }

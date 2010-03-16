@@ -97,9 +97,9 @@ public abstract class AbstractProfile implements Profile {
 
 	
 	
-	Collection<SMTRuleNew> rules = DecisionProcedureSettings.getInstance().getSMTRules();
+	Collection<SMTRule> rules = DecisionProcedureSettings.getInstance().getSMTRules();
         
-	for(SMTRuleNew rule : rules){
+	for(SMTRule rule : rules){
 	    builtInRules = builtInRules.prepend(rule);  
 	}
 	

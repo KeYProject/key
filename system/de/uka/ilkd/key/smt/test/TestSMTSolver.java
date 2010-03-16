@@ -20,13 +20,13 @@ import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
-import de.uka.ilkd.key.smt.SMTRuleNew;
+import de.uka.ilkd.key.smt.SMTRule;
 import de.uka.ilkd.key.smt.SMTSolver;
 import de.uka.ilkd.key.smt.SMTSolverResult;
 
 public abstract class TestSMTSolver extends TestCommons {
 
-    private SMTRuleNew rule;
+    private SMTRule rule;
 
     
 
@@ -61,7 +61,7 @@ public abstract class TestSMTSolver extends TestCommons {
      * returns the solver that should be tested.
      * @return the solver to be tested.
      */
-    public abstract SMTRuleNew getSolver();
+    public abstract SMTRule getSolver();
 
     protected abstract boolean toolNotInstalledChecked();
 

@@ -19,7 +19,7 @@ import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.smt.AbstractSMTSolver;
 import de.uka.ilkd.key.smt.CVC3Solver;
-import de.uka.ilkd.key.smt.SMTRuleNew;
+import de.uka.ilkd.key.smt.SMTRule;
 import de.uka.ilkd.key.smt.SMTSolver;
 import de.uka.ilkd.key.smt.SimplifySolver;
 import de.uka.ilkd.key.smt.YicesSolver;
@@ -51,7 +51,7 @@ public class DecisionProcedureSettings implements Settings {
     
 
     
-    private LinkedList<SMTRuleNew> smtRules = new LinkedList<SMTRuleNew>();
+    private LinkedList<SMTRule> smtRules = new LinkedList<SMTRule>();
    
     
     
@@ -59,7 +59,7 @@ public class DecisionProcedureSettings implements Settings {
     private static Collection<AbstractSMTSolver>  solvers = new LinkedList<AbstractSMTSolver>();
     
     /** the currently active rule */    
-    private SMTRuleNew activeSMTRule = SMTRuleNew.EMPTY_RULE;
+    private SMTRule activeSMTRule = SMTRule.EMPTY_RULE;
     
     /** the value of the timeout in tenth of seconds.*/
     private int timeout = 600;
@@ -108,14 +108,14 @@ public class DecisionProcedureSettings implements Settings {
      * @param ruleName the String unambiguously specifying a rule 
      * @return the found SMTRule or <code>null</code> 
      */
-    public SMTRuleNew findRuleByName(String name){
+    public SMTRule findRuleByName(String name){
 	
-	for(SMTRuleNew rule : getSMTRules()){
+	for(SMTRule rule : getSMTRules()){
 	    if(rule.name().toString().equals(name)){
 		return rule;
 	    }
 	}
-	return SMTRuleNew.EMPTY_RULE;
+	return SMTRule.EMPTY_RULE;
     }
     
     
@@ -144,7 +144,7 @@ public class DecisionProcedureSettings implements Settings {
     
 
     
-    public SMTRuleNew getActiveSMTRule(){
+    public SMTRule getActiveSMTRule(){
 	return activeSMTRule;
     }
 
@@ -160,11 +160,11 @@ public class DecisionProcedureSettings implements Settings {
 	solvers.add(simplify);
 	solvers.add(yices);
 	solvers.add(cvc3);
-	smtRules.add(new SMTRuleNew(new Name("Z3_PROVER"),z3));
-	smtRules.add(new SMTRuleNew(new Name("YICES_PROVER"),yices));
-	smtRules.add(new SMTRuleNew(new Name("SIMPLIFY_PROVER"),simplify));
-	smtRules.add(new SMTRuleNew(new Name("CVC3_PROVER"),cvc3));
-	smtRules.add(new SMTRuleNew(new Name("MULTIPLE_PROVERS"),z3,simplify,yices,cvc3));
+	smtRules.add(new SMTRule(new Name("Z3_PROVER"),z3));
+	smtRules.add(new SMTRule(new Name("YICES_PROVER"),yices));
+	smtRules.add(new SMTRule(new Name("SIMPLIFY_PROVER"),simplify));
+	smtRules.add(new SMTRule(new Name("CVC3_PROVER"),cvc3));
+	smtRules.add(new SMTRule(new Name("MULTIPLE_PROVERS"),z3,simplify,yices,cvc3));
 	
 	//solvers = s;
 	
@@ -176,7 +176,7 @@ public class DecisionProcedureSettings implements Settings {
     }
     
     
-    public Collection<SMTRuleNew> getSMTRules(){
+    public Collection<SMTRule> getSMTRules(){
 
 	return smtRules;
     }
@@ -185,10 +185,10 @@ public class DecisionProcedureSettings implements Settings {
     /**
      * Returns a list of all installed rules, sorted alphabetically by rule name.
      */
-    public Collection<SMTRuleNew> getInstalledRules(){
-	Collection<SMTRuleNew> toReturn = new LinkedList<SMTRuleNew>();
+    public Collection<SMTRule> getInstalledRules(){
+	Collection<SMTRule> toReturn = new LinkedList<SMTRule>();
 	
-	for(SMTRuleNew rule : getSMTRules()){
+	for(SMTRule rule : getSMTRules()){
 	    if(rule.getInstalledSolvers().size() > 0){
 		toReturn.add(rule);
 	    }
@@ -250,7 +250,7 @@ public class DecisionProcedureSettings implements Settings {
 	// Use only the rule if the corresponding solvers 
 	// are installed.
 	if(!activeSMTRule.isUsable()){
-	    this.activeSMTRule = SMTRuleNew.EMPTY_RULE;
+	    this.activeSMTRule = SMTRule.EMPTY_RULE;
 	}
 
     }
@@ -407,10 +407,10 @@ public class DecisionProcedureSettings implements Settings {
      * if the specified rule is known it is set as active rule, otherwise or specifying <code>null</code>
      * deactivates the rule. 
      */
-    public void setActiveSMTRule(SMTRuleNew rule){
+    public void setActiveSMTRule(SMTRule rule){
 	if(activeSMTRule != rule){
 	    if(rule == null){
-		activeSMTRule = SMTRuleNew.EMPTY_RULE;
+		activeSMTRule = SMTRule.EMPTY_RULE;
 	    }else{
 		this.activeSMTRule = rule;
 	    }
