@@ -573,7 +573,8 @@ public class UseOperationContractRule implements BuiltInRule {
 	Update wsUpd=null;
 	NamespaceSet nss = services.getNamespaces();
         Function add = (Function) nss.functions().lookup(new Name("add"));
-	if(services.getProof().getSettings().getProfile() instanceof RTSJProfile || 
+	if(services.getProof().getSettings().getProfile() instanceof RTSJProfile &&
+	   ((RTSJProfile) services.getProof().getSettings().getProfile()).memoryConsumption()  || 
 	   services.getProof().getSettings().getProfile() instanceof PercProfile){
 	    mCons = TB.dot(mTerm, services.getJavaInfo().getAttribute(
 				"consumed", "javax.realtime.MemoryArea"));

@@ -65,6 +65,7 @@ public class EnsuresPostPO extends EnsuresPO {
 	     ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof RTSJProfile)){
 	    return TB.tt();
 	}
+
         Term result = TB.tt();
         Term t_mem = null;
 
@@ -88,14 +89,16 @@ public class EnsuresPostPO extends EnsuresPO {
         
         if(ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof PercProfile){
             workingSpace = contract.getCallerWorkingSpace(selfVar, toPV(paramVars), services);
-//            workingSpace = TB.var(services.getJavaInfo().
-//                    getAttribute(ImplicitFieldAdder.IMPLICIT_SIZE, contract.getProgramMethod().getKeYJavaType()));
-        }else if(contract.getWorkingSpace(selfVar, toPV(paramVars), services)!=null){
-            workingSpace = contract.getWorkingSpace(selfVar, toPV(paramVars), services);
             if(contract.getProgramMethod().getMethodDeclaration().externallyConstructedScope()){
                 workingSpace = TB.func(add, workingSpace, 
                         contract.getConstructedWorkingSpace(selfVar, toPV(paramVars), services));
             }
+//            workingSpace = TB.var(services.getJavaInfo().
+//                    getAttribute(ImplicitFieldAdder.IMPLICIT_SIZE, contract.getProgramMethod().getKeYJavaType()));
+        }else if(ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof RTSJProfile &&
+		 ((RTSJProfile) ProofSettings.DEFAULT_SETTINGS.getProfile()).memoryConsumption() &&
+		 contract.getWorkingSpace(selfVar, toPV(paramVars), services)!=null){
+            workingSpace = contract.getWorkingSpace(selfVar, toPV(paramVars), services);
         }
         if(workingSpace!=null){
             result = TB.and(result, TB.func(leq, TB.func(add, TB.dot(t_mem,consumed), 
