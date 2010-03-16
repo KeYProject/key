@@ -7,10 +7,11 @@
 // See LICENSE.TXT for details.
 //
 //
-package de.uka.ilkd.key.gui;
+package de.uka.ilkd.key.gui.smt;
 
 import java.util.*;
 
+import de.uka.ilkd.key.gui.GUIEvent;
 import de.uka.ilkd.key.gui.configuration.Settings;
 import de.uka.ilkd.key.gui.configuration.SettingsListener;
 import de.uka.ilkd.key.logic.Name;
@@ -18,7 +19,6 @@ import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.smt.AbstractSMTSolver;
 import de.uka.ilkd.key.smt.CVC3Solver;
-import de.uka.ilkd.key.smt.SMTRuleMulti;
 import de.uka.ilkd.key.smt.SMTRuleNew;
 import de.uka.ilkd.key.smt.SMTSolver;
 import de.uka.ilkd.key.smt.SimplifySolver;

@@ -18,7 +18,7 @@ import java.util.HashSet;
 import junit.framework.Assert;
 
 
-import de.uka.ilkd.key.gui.TacletTranslationSettings;
+import de.uka.ilkd.key.gui.smt.TacletTranslationSettings;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;

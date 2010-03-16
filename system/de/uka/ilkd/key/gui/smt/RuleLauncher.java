@@ -12,7 +12,6 @@ package de.uka.ilkd.key.gui.smt;
 import java.util.Collection;
 import java.util.LinkedList;
 
-import de.uka.ilkd.key.gui.DecisionProcedureSettings;
 import de.uka.ilkd.key.gui.Main;
 import de.uka.ilkd.key.gui.nodeviews.BuiltInRuleMenuItem;
 import de.uka.ilkd.key.logic.Constraint;

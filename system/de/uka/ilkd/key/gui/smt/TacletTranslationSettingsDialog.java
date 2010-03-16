@@ -7,7 +7,7 @@
 // See LICENSE.TXT for details.
 //
 //
-package de.uka.ilkd.key.gui;
+package de.uka.ilkd.key.gui.smt;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -53,6 +53,7 @@ import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreeCellEditor;
 import javax.swing.tree.TreeNode;
 
+import de.uka.ilkd.key.gui.Main;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.smt.taclettranslation.TreeItem;

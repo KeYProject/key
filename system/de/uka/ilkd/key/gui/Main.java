@@ -47,7 +47,11 @@ import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
 import de.uka.ilkd.key.gui.notification.events.GeneralInformationEvent;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 import de.uka.ilkd.key.gui.prooftree.ProofTreeView;
+import de.uka.ilkd.key.gui.smt.DecisionProcedureSettings;
+import de.uka.ilkd.key.gui.smt.DecissionProcedureSettingsDialog;
 import de.uka.ilkd.key.gui.smt.RuleLauncher;
+import de.uka.ilkd.key.gui.smt.SMTResultsAndBugDetectionDialog;
+import de.uka.ilkd.key.gui.smt.TacletTranslationSettingsDialog;
 import de.uka.ilkd.key.java.NonTerminalProgramElement;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Statement;
@@ -228,7 +232,8 @@ public class Main extends JFrame implements IMain {
     private Action createUnitTestAction = null;
     
     
-    protected static Main instance = null;    
+    public static Main instance = null;    
+   
     
     private ProverTaskListener taskListener;
     
@@ -282,6 +287,7 @@ public class Main extends JFrame implements IMain {
         }
     }
     
+       
     
     /**
      * returns an instance of Main and creates one if necessary

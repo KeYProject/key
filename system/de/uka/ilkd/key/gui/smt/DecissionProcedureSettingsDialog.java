@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.gui;
+package de.uka.ilkd.key.gui.smt;
 
 import java.awt.Component;
 import java.awt.Dimension;
@@ -14,6 +14,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 ///import de.uka.ilkd.key.gui.DecisionProcedureSettings.RuleDescriptor;
+import de.uka.ilkd.key.gui.Main;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.smt.AbstractSMTSolver;
 import de.uka.ilkd.key.smt.SMTSolver;
