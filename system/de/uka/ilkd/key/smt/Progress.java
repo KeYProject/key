@@ -2,7 +2,7 @@ package de.uka.ilkd.key.smt;
 
 import de.uka.ilkd.key.util.ProgressMonitor;
 
-interface Progress {
+/*interface Progress {
     
     public void addProgressMonitor(ProgressMonitor p);
     
@@ -13,4 +13,4 @@ interface Progress {
     
     public void interrupt();
 
-}
+}*/

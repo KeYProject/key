@@ -8,6 +8,8 @@ import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.GridBagLayout;
 import java.awt.Dimension;
+import java.awt.Toolkit;
+
 import javax.swing.BorderFactory;
 import javax.swing.border.TitledBorder;
 import java.awt.Font;
@@ -65,12 +67,25 @@ public class ProgressDialog extends JDialog{
 	
 	public void prepare(Collection<SMTSolver> solvers, Collection<Goal> goals, SMTRuleNew r){
 	    this.rule = r;
-	    
+	    int width=0;
+	    int height =0;
 	    DefaultListModel model = new DefaultListModel();
 	    for(SMTSolver solver : solvers){
-		model.addElement(new ProgressPanel(solver,getList(),goals));
-		
+		ProgressPanel panel =new ProgressPanel(solver,getList(),goals); 
+		model.addElement(panel);
+		width = Math.max(width, panel.necessaryPanelWidth(goals.size()));
+		height += panel.necessaryPanelHeight();
 	    }
+	    
+	    
+	
+		width += 120;
+		height += 100;
+	    Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
+	    width = Math.max(500, Math.min(width, dim.width*3/4));
+	    height = Math.min(height,dim.height/2);
+	    
+	    this.setSize(width,height);
 	    getList().setModel(model);
 	}
 	

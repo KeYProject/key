@@ -205,6 +205,20 @@ class ProgressPanel implements SMTProgressMonitor {
 		return progressBar;
 	}
 	
+	private String goalString(int number, SolveType type){
+	    return number+". Goal"+" "+type.name();
+	}
+	
+	public int necessaryPanelWidth(int goals){
+	    
+	    return SwingUtilities.computeStringWidth(
+		    getProgressBar().getFontMetrics(getProgressBar().getFont()), goalString(1,SolveType.UNSOLVABLE))*goals;
+	}
+	
+	public int necessaryPanelHeight(){
+	    return getComponent().getHeight();
+	}
+	
 	private void paintGoal(Graphics g,JProgressBar bar,int number,SolveType solved){
 	
 	    Graphics gc = g.create();
@@ -220,9 +234,9 @@ class ProgressPanel implements SMTProgressMonitor {
 	   int max = bar.getMaximum();
 	   int fw = bar.getWidth() / max;
 	   
-	   String s = ((int)number+1)+". Goal"+" "+solved.name();
-	   
+	   String s = goalString(number+1,solved);
 	   int width = SwingUtilities.computeStringWidth(g.getFontMetrics(), s);
+	
 	  
 	   
 	   

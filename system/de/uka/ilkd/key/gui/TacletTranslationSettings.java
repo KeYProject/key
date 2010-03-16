@@ -11,7 +11,6 @@ package de.uka.ilkd.key.gui;
 
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Properties;
 

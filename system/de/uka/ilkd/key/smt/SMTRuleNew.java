@@ -10,15 +10,12 @@
 package de.uka.ilkd.key.smt;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
-
-
+import java.util.TreeSet;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
-import de.uka.ilkd.key.gui.DecisionProcedureSettings;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.ConstrainedFormula;
 import de.uka.ilkd.key.logic.Constraint;
@@ -34,12 +31,12 @@ import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.BuiltInRuleApp;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.smt.SMTProgressMonitor.SolveType;
+import de.uka.ilkd.key.smt.SMTSolverResult.ThreeValuedTruth;
 import de.uka.ilkd.key.smt.SolverSession.InternResult;
 import de.uka.ilkd.key.smt.launcher.Event;
 import de.uka.ilkd.key.smt.launcher.Process;
 import de.uka.ilkd.key.smt.launcher.ProcessLaunch;
 import de.uka.ilkd.key.smt.launcher.ProcessLauncher;
-import de.uka.ilkd.key.util.ProgressMonitor;
 
 
 /**
@@ -74,8 +71,6 @@ public class SMTRuleNew  extends ProcessLauncher implements BuiltInRule{
     private Collection<SMTSolver> solvers = new LinkedList<SMTSolver>();
     /**Important for applying the results to goals.*/
     private Constraint 	           userConstraint = null;
-    /**The current proof*/
-    private Proof		   proof;
     /**The name of the rule. Important to identify rules while reading and 
      * writting the settings.*/
     private Name 	           name;
@@ -92,7 +87,6 @@ public class SMTRuleNew  extends ProcessLauncher implements BuiltInRule{
   
     public void init(){
 	userConstraint = null;
-	proof = null;
 	super.init();
     }
     
@@ -152,7 +146,7 @@ public class SMTRuleNew  extends ProcessLauncher implements BuiltInRule{
     
 
     public boolean isApplicable(Goal goal, PosInOccurrence pio,
-            Constraint userConstraint) {
+            Constraint uc) {
 	//only make applicable, if the complete goal should be proved
 	return pio == null;
     }
@@ -182,7 +176,15 @@ public class SMTRuleNew  extends ProcessLauncher implements BuiltInRule{
     
     private void prepareSolvers(LinkedList<InternResult> terms, Services services, TacletIndex index){
 	for(SMTSolver solver : getInstalledSolvers()){
-	    solver.prepareSolver(terms, services, index);
+	    LinkedList<InternResult> temp = new LinkedList<InternResult>();
+	    for(InternResult ir : terms){
+		try {
+	            temp.add((InternResult) ir.clone());
+                } catch (CloneNotSupportedException e) {
+	           throw new RuntimeException(e);
+                }
+	    }
+	    solver.prepareSolver(temp, services, index);
 	    addProcess(solver);
 	}
     }
@@ -207,8 +209,7 @@ public class SMTRuleNew  extends ProcessLauncher implements BuiltInRule{
 	init();
 	LinkedList<Goal> goals = new LinkedList<Goal>();
 	goals.add(goal);
-	proof = goal.proof();
-	start(goals,proof,constraint,useThread);
+	start(goals,goal.proof(),constraint,useThread);
     }
     
     /**
@@ -225,7 +226,7 @@ public class SMTRuleNew  extends ProcessLauncher implements BuiltInRule{
     public void start(Collection<Goal> goals, Proof proof, Constraint constraint,
 	    boolean useThread){
 	init();
-	this.proof = proof;
+
 	LinkedList<InternResult> terms = new LinkedList<InternResult>();
 	TacletIndex index=null;
 	for(Goal goal : goals){
@@ -243,19 +244,20 @@ public class SMTRuleNew  extends ProcessLauncher implements BuiltInRule{
 	Sequent s = goal.sequent();
 	
 	ImmutableList<Term> ante = ImmutableSLList.nil();
-	ante.append(TermBuilder.DF.tt());
+	
+	ante = ante.append(TermBuilder.DF.tt());
 	for(ConstrainedFormula f : s.antecedent()){
 	    ante = ante.append(f.formula());
 	}
 	
 	ImmutableList<Term> succ = ImmutableSLList.nil();
-	succ.append(TermBuilder.DF.ff());
+	succ = succ.append(TermBuilder.DF.ff());
 	for(ConstrainedFormula f : s.succedent()){
 	    succ = succ.append(f.formula());
 	}
 	
 	
-	return TermBuilder.DF.imp(TermBuilder.DF.and(ante), TermBuilder.DF.and(succ));
+	return TermBuilder.DF.imp(TermBuilder.DF.and(ante), TermBuilder.DF.or(succ));
 	
     }
     
@@ -275,14 +277,28 @@ public class SMTRuleNew  extends ProcessLauncher implements BuiltInRule{
 	startThread(internTerms,constraint,useThread,index,services);
     }
     
+    /**
+     * DO NOT USE THIS METHOD IF THERE IS ANOTHER WAY TO SOLVE YOUR PROBLEM.
+     * This method was introduced to guarantee that SimplifyModelGenerator
+     * works further on.
+     * Use the method only with SMTRules, that consists of only one solver.
+     * @param formula
+     * @param services
+     * @param constraint
+     * @param useThread
+     */
+    public void start(String formula, Services services, Constraint constraint, boolean useThread){
+	LinkedList<InternResult> list = new LinkedList<InternResult>();
+	list.add(new InternResult(formula));
+	startThread(list,constraint,useThread,null,services);
+    }
+    
 
     
     private void startThread(LinkedList<InternResult> terms,Constraint constraint, boolean useThread, TacletIndex index,
 	      Services services){
 	init();
 	userConstraint = constraint;
-      //  proof.env().registerRule(this,
-        //        de.uka.ilkd.key.proof.mgt.AxiomJustification.INSTANCE);
 	prepareSolvers(terms,services,index);	
 	if(useThread){
 		Thread thread = new Thread(this,displayName());
@@ -290,8 +306,7 @@ public class SMTRuleNew  extends ProcessLauncher implements BuiltInRule{
 		thread.start();
 	}else{
 	    this.run();
-	    //applyResults();
-	    
+    
 	}
 
     }
@@ -310,7 +325,6 @@ public class SMTRuleNew  extends ProcessLauncher implements BuiltInRule{
 	
 	for(SMTSolver solver : solvers){
 	    if(!solver.isInstalled(false) && multiRule){
-		i++;
 		continue;
 	    }
 	  
@@ -349,22 +363,41 @@ public class SMTRuleNew  extends ProcessLauncher implements BuiltInRule{
      */
     public void applyResults(){
 	
-	HashSet<SolverSession.InternResult> result = new HashSet<SolverSession.InternResult>();
+	LinkedList<SolverSession.InternResult> result = new LinkedList<SolverSession.InternResult>();
 	
 	for(SMTSolver solver : getInstalledSolvers()){
 	    AbstractSMTSolver s = (AbstractSMTSolver) solver;
 
 	    result.addAll(s.getSession().getResults());
-	    System.out.println(s.name()+": " + s.getSession().getResults());
 	}
+	
+	if(result.size() == 0){
+	    return;
+	}
+	InternResult ir = result.getFirst();
+	Proof proof = null;
+	
+	if(ir.getGoal() != null){
+	    proof = ir.getGoal().proof();
+	  //  proof.env().registerRule(this, de.uka.ilkd.key.proof.mgt.AxiomJustification.INSTANCE);
+	}
+	
+	
 	for(SolverSession.InternResult res  : result ){
 	    BuiltInRuleApp birApp = new BuiltInRuleAppSMT(this, null, 
-	                userConstraint,res.result); 
-	    if(res.goal != null){
-		res.goal.apply(birApp);
+	                userConstraint,res.getResult()); 
+	
+	    if(res.getGoal() != null){
+		 res.getGoal().node().addSMTandFPData(res.getResult());
+		if(res.getResult().isValid() == ThreeValuedTruth.TRUE && res.getGoal().proof().openGoals().contains(res.getGoal())){
+		   
+		    res.getGoal().apply(birApp);
+		
+		}
 	    }
 	    
 	}
+
     }
     
     public LinkedList<SMTSolverResult> getResults(){

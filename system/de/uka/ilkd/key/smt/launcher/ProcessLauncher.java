@@ -41,7 +41,7 @@ public abstract  class ProcessLauncher  implements ProcessListener, Runnable{
 	
 	
 	
-	private long maxTime = 10000;
+	private long maxTime = 5000;
 	private int counter =0;
 	private boolean cancel = false;
 	

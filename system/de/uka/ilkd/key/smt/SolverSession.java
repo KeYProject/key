@@ -17,36 +17,82 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.TacletIndex;
-import de.uka.ilkd.key.smt.taclettranslation.TreeItem.SelectionMode;
+import de.uka.ilkd.key.smt.SMTSolverResult.ThreeValuedTruth;
 
 
+/**
+ * Because instances of SMTSolvers are stateless all
+ * data of this instances is stored in SolverSession.
+ */
 class SolverSession {
     
 
-    
-    public static class InternResult{
-	SMTSolverResult result;
-	Term            term;
-	Goal 		goal;
-	public InternResult(SMTSolverResult result, Term term) {
+    /**
+     * This class is used to associated the goal with its term and result.
+     * 
+     */
+    public static class InternResult implements Cloneable {
+	private SMTSolverResult result = SMTSolverResult.createUnknownResult("", "");
+	private Term            term;
+	private Goal 		goal;
+	private String 		formula = null;
+	
+	
+
+	public InternResult(Term term, Goal belongsTo){
+	    this(term);
+	    goal = belongsTo;
+	}
+	
+	/**
+	 * Sometimes there is no goal.
+	 * @param term
+	 */
+	public InternResult(Term term) {
 	    super();
-	    this.result = result;
 	    this.term = term;
         }
 	
+	InternResult(Term term, Goal goal, String formula){
+	    this(term,goal);
+	    this.formula = formula;
+	}
+	
+	
+	
+	public InternResult(String formula){
+	    this(null,null);
+	    this.formula = formula;
+	}
+	
+	/**
+	 * @return the goal associated with the term.
+	 */
 	public Goal getGoal(){
 	    return goal;
 	}
 	
+	/**
+	 * @return the term that belongs to that instance.
+	 */
 	public Term getRealTerm(){
 	    return term;
 	}
 	
-	public InternResult(Term term, Goal belongingTo){
-	    this(SMTSolverResult.createUnknownResult("", ""),term);
-	    goal = belongingTo;
+	void setResult(SMTSolverResult res){
+	    if(result.isValid() == ThreeValuedTruth.UNKNOWN){
+		result = res;
+	    }
+	    
 	}
 	
+	
+
+	
+	String getFormula(){
+	   return formula; 
+	}
+
 	
 		@Override
 	public int hashCode() {
@@ -59,51 +105,26 @@ class SolverSession {
 	    return result;
 	}
 	
-		
+	/* (non-Javadoc)
+	 * @see java.lang.Object#clone()
+	 */
 	@Override
-	public boolean equals(Object obj) {
-	    if(!(obj instanceof InternResult)){
-		return false;
-	    }
-	    InternResult r = ((InternResult)obj);
-	    if(goal == null || r.goal == null){
-		return false;
-	    }
-	    if(goal.equals(r.goal)){
-		if(r.result.isValid() == result.isValid()){
-		    return true;
-		}
-		if((r.result.isValid() == SMTSolverResult.ThreeValuedTruth.TRUE &&
-			result.isValid() == SMTSolverResult.ThreeValuedTruth.UNKNOWN) ||
-			(r.result.isValid() == SMTSolverResult.ThreeValuedTruth.FALSIFIABLE &&
-				result.isValid() == SMTSolverResult.ThreeValuedTruth.UNKNOWN))
-		{
-		    result = r.result;
-		}
-
-		if(result.isValid() == SMTSolverResult.ThreeValuedTruth.TRUE &&
-			r.result.isValid() == SMTSolverResult.ThreeValuedTruth.UNKNOWN ||
-			(result.isValid() == SMTSolverResult.ThreeValuedTruth.FALSIFIABLE &&
-				r.result.isValid() == SMTSolverResult.ThreeValuedTruth.UNKNOWN))
-		{
-		    r.result = result;
-		}
-
-		return true;
-	    }
-
-	    return false;
-
+	protected Object clone() throws CloneNotSupportedException {
+	    return new InternResult(term , goal ,formula);
 	}
+	
+		
+
 	
 	public String toString(){
 	    return goal == null ? "" : goal +":" +result;
 	}
+
+	
 	
     }
      
     private LinkedList<InternResult> terms;
-    //private LinkedList<InternResult> results = new LinkedList<InternResult>();
     private Services         services;
     private Iterator<InternResult>   it;
     private InternResult      current = null;
@@ -137,9 +158,11 @@ class SolverSession {
     public InternResult nextTerm(){
 	if(it.hasNext()){
 	    current = it.next();
-	    return current;
+	    
+	} else {
+	    current = null;
 	}
-	return null;
+	return current;
     }
     
     public InternResult currentTerm(){
@@ -150,9 +173,7 @@ class SolverSession {
 	return it.hasNext();
     }
     
-    /*public void addResult(SMTSolverResult result, Term term){
-	results.add(new InternResult(result,term));
-    }*/
+
     
     public LinkedList<InternResult> getResults(){
 	return terms;

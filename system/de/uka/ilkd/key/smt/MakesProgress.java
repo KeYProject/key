@@ -1,6 +1,5 @@
 package de.uka.ilkd.key.smt;
 
-import de.uka.ilkd.key.util.ProgressMonitor;
 /**This interface was introduced to minimize redundant code for handling the process of showing the progress. 
  * Both SMTRule and SMTRuleMulti should implement this interface to have the same basis for showing the current progress.
  */

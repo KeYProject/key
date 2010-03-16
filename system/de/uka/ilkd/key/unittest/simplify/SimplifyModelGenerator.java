@@ -252,8 +252,8 @@ public class SimplifyModelGenerator extends DecProdModelGenerator {
 	try {
 	    // Term t = (new TermFactory()).createJunctorTerm(Op.NOT, c);
 	    // return this.simplify.run(t, 60, serv).text();
-	    return new SimplifySolver().run("(NOT " + c.toSimplify() + ")", 60,
-		    serv).text();
+	    this.smtRule.start("(NOT " + c.toSimplify() + ")", serv, serv.getProof().getUserConstraint().getConstraint(),false);
+	    return smtRule.getResults().getLast().text();
 	} catch (Exception e) {
 	    throw new RuntimeException(e);
 	}

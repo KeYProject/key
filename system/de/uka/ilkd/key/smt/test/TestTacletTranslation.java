@@ -171,7 +171,7 @@ public class TestTacletTranslation extends TestCommons {
 		String error = "\n\n" + "problem:" + filepath + "\n"
 		        + "solver: " + rule.name() + "\n" +
 
-		        "taclets were used: " + use + "\n" + "solve type: "
+		        "taclets were used: " + use[i] + "\n" + "solve type: "
 		        + type.toString() + "\n" + "-> solvable: " + solvable
 		        + "\n";
 
