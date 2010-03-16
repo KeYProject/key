@@ -15,6 +15,7 @@ import java.io.IOException;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.smt.taclettranslation.TacletSetTranslation;
 import de.uka.ilkd.key.util.ProgressMonitor;
 
 
@@ -139,4 +140,11 @@ public interface SMTSolver {
      * interrupt a running SMT solver.
      */
     public void interrupt();
+    
+    
+    /**
+     * Determines whether taclets are used for this solver.
+     * @param b <code>true</code> if taclets should be used.
+     */
+    public void useTaclets(boolean b);
 }

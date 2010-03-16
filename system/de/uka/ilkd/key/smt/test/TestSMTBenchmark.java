@@ -30,7 +30,7 @@ public class TestSMTBenchmark extends TestCase implements FilenameFilter{
     private static String UNKNOWN = "unknown";
     private static String NOTAVAILABLE = "not installed";
     private static String ERROR = "error";
-    private int maxExecutionTime = 10;
+    private int maxExecutionTime = 100;
     
     public static final String folderPath = System.getProperty("key.home")
     + File.separator + "examples"
@@ -41,7 +41,7 @@ public class TestSMTBenchmark extends TestCase implements FilenameFilter{
 	String[] files = this.collectFilenames();
 	ArrayList<SMTSolver> rules = getRules();
 	
-	ArrayList<ArrayList<Proof>> toProof = this.loadGoals(rules.size(), files);
+	ArrayList<ArrayList<Proof>> toProof = this.loadGoals(rules.size(), files,folderPath);
 	ArrayList<ArrayList<String>> results = new ArrayList<ArrayList<String>>();
 	System.out.println();
         for (ArrayList<Proof> aToProof : toProof) {
@@ -76,22 +76,23 @@ public class TestSMTBenchmark extends TestCase implements FilenameFilter{
         }
 	    output = output + "\n";
 	}
-	storeResults(output);
+	storeResults(output,folderPath + "smtBenchmarkResults.csv");
     }
     
-    private void storeResults(String result) {
+    protected void storeResults(String result, String file) {
 	FileWriter fw;
 	try {
-	    fw = new FileWriter(folderPath + "smtBenchmarkResults.csv");
+	    fw = new FileWriter(file);
 	    fw.write(result);
 	    fw.close();
 	} catch (IOException e) {
 	    System.out.println("Error while writing result file");
 	}
 	
+	
     }
     
-    private boolean hasProblem(ArrayList<String> results) {
+    protected boolean hasProblem(ArrayList<String> results) {
 	boolean hasValid = false;
 	boolean hasInvalid = false;
         for (String result : results) {
@@ -104,11 +105,11 @@ public class TestSMTBenchmark extends TestCase implements FilenameFilter{
 	return hasValid && hasInvalid;
     }
     
-    private ArrayList<String> proofOneGoal(ArrayList<Proof> goals, ArrayList<SMTSolver> rules) {
+    protected ArrayList<String> proofOneGoal(ArrayList<Proof> goals, ArrayList<SMTSolver> rules) {
 	ArrayList<String> toReturn = new ArrayList<String>();
 	for (int i = 0; i < goals.size(); i++) {
-	    System.out.print(".");
 	    SMTSolver s = rules.get(i);
+	    System.out.print(".");	
 	    Proof p = goals.get(i);
 	    if (s.isInstalled(false)) {
 		try {
@@ -126,7 +127,6 @@ public class TestSMTBenchmark extends TestCase implements FilenameFilter{
 		toReturn.add(NOTAVAILABLE);
 		toReturn.add(NOTAVAILABLE);
 	    }
-	    
 	    
 	}
 	return toReturn;
@@ -146,7 +146,7 @@ public class TestSMTBenchmark extends TestCase implements FilenameFilter{
 	}
     }
     
-    private ArrayList<ArrayList<Proof>> loadGoals(int multiplicity, String[] sources) {
+    protected ArrayList<ArrayList<Proof>> loadGoals(int multiplicity, String[] sources, String folder) {
 	ArrayList<ArrayList<Proof>> toReturn = new ArrayList<ArrayList<Proof>>();
         for (String source : sources) {
             String path = folderPath + source;
@@ -178,7 +178,7 @@ public class TestSMTBenchmark extends TestCase implements FilenameFilter{
      * create all Solver, that should be tested
      * @return the Rules, that should be tested.
      */
-    private ArrayList<SMTSolver> getRules() {
+    protected ArrayList<SMTSolver> getRules() {
 	ArrayList<SMTSolver> toReturn = new ArrayList<SMTSolver>();
 	toReturn.add(new SimplifySolver());
 	toReturn.add(new Z3Solver());

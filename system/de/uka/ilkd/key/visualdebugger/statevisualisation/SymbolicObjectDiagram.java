@@ -68,7 +68,6 @@ public class SymbolicObjectDiagram {
         final Function boolTRUE = bLDT.getTrueConst();
         final Function boolFALSE = bLDT.getFalseConst();
         
-        
         final Operator op = t.op();
         return op instanceof AttributeOp
                 && checkIndices(t, serv)
@@ -84,7 +83,7 @@ public class SymbolicObjectDiagram {
                 && boolTRUE != op
                 && boolFALSE != op
                 // TODO remove string comparison in next line
-                && op.name().toString().indexOf("undef(") == -1;
+                && op.name().toString().indexOf("undef(") == -1; 
     }
 
     private ImmutableList<Term> ante = ImmutableSLList.<Term>nil();

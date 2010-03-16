@@ -80,4 +80,15 @@ public class ArrayComponentTypeCondition extends VariableConditionAdapter {
 	  "\\isReferenceArray(" + var + ")";
     }
 
+    public SchemaVariable getVar() {
+        return var;
+    }
+
+
+    public boolean isCheckReferenceType() {
+        return checkReferenceType;
+    }
+
+    
+
 }

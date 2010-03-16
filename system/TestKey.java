@@ -8,7 +8,7 @@
 //
 //
 
-import de.uka.ilkd.key.gui.Main;
+
 import junit.framework.TestCase;
 import junit.framework.TestResult;
 import junit.framework.TestSuite;
@@ -91,7 +91,8 @@ public class TestKey extends TestCase {
 	  de.uka.ilkd.key.smt.test.TestZ3.class,
 	  de.uka.ilkd.key.smt.test.TestYices.class,
 	  de.uka.ilkd.key.smt.test.TestCvc3.class,
-	  de.uka.ilkd.key.smt.test.TestExecutionWatchDog.class
+	  de.uka.ilkd.key.smt.test.TestExecutionWatchDog.class,
+ 	  de.uka.ilkd.key.smt.test.TestTacletTranslation.class,
       };
 
      
@@ -124,8 +125,10 @@ public class TestKey extends TestCase {
 	suite.addTest(createSuite(javaTests, "Testing Java Datastructures"));
 	suite.addTest(createSuite(logicModelTests, "Testing Logic Engine"));
         suite.addTest(createSuite(speclangTests, "Testing JML/OCL support"));
-        suite.addTest(createSuite(vbtTests, "Testing Verification-based Testing"));
-        suite.addTest(createSuite(smtTests, "Testing integration of external SMT solvers"));
+ 	suite.addTest(createSuite(vbtTests, "Testing Verification-based Testing"));
+	suite.addTest(createSuite(smtTests, "Testing integration of external SMT solvers"));
+        
+       
         
 	return suite;
     }

@@ -62,7 +62,7 @@ import de.uka.ilkd.key.util.ProgressMonitor;
 
 
 public class Main extends JFrame implements IMain {
-
+   
     public static final String INTERNAL_VERSION = 
 	KeYResourceManager.getManager().getSHA1();
 
@@ -194,9 +194,6 @@ public class Main extends JFrame implements IMain {
     private JPopupMenu reusePopup = new JPopupMenu();
 
     
-    /** undo the last proof step on the currently selected branch */
-    private UndoLastStep undoAction = new UndoLastStep();
-
     /** external prover GUI elements */
     private DPSettingsListener dpSettingsListener;
     private JSlider ruletimeout;
@@ -495,8 +492,7 @@ public class Main extends JFrame implements IMain {
         toolBar.addSeparator();
         
         final JButton goalBackButton = new JButton();
-        undoAction.init();
-        goalBackButton.setAction(undoAction);
+        goalBackButton.setAction(new UndoLastStep(false));        
         
         toolBar.add(goalBackButton);
         toolBar.addSeparator();
@@ -532,6 +528,8 @@ public class Main extends JFrame implements IMain {
         toolBar.addSeparator();
         
         JToolBar fileOperations = new JToolBar("File Operations");
+        fileOperations.setRollover(true);
+        
         fileOperations.add(createOpenFile());
         fileOperations.add(createOpenMostRecentFile());
         fileOperations.add(createSaveFile());
@@ -590,8 +588,10 @@ public class Main extends JFrame implements IMain {
         tabbedPane.addTab("Rules", null, new JScrollPane(ruleView), "All available rules");
         tabbedPane.setSelectedIndex(0);
         tabbedPane.setPreferredSize(new java.awt.Dimension(250, 440));
-        tabbedPane.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).getParent().remove(KeyStroke.getKeyStroke(KeyEvent.VK_UP, ActionEvent.CTRL_MASK));
-        tabbedPane.getInputMap(JComponent.WHEN_FOCUSED).getParent().remove(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, ActionEvent.CTRL_MASK));
+        tabbedPane.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).getParent().
+        	remove(KeyStroke.getKeyStroke(KeyEvent.VK_UP, ActionEvent.CTRL_MASK));
+        tabbedPane.getInputMap(JComponent.WHEN_FOCUSED).getParent().
+        	remove(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, ActionEvent.CTRL_MASK));
         
         proofListView.setPreferredSize(new java.awt.Dimension(250, 100));
         paintEmptyViewComponent(proofListView, "Tasks");
@@ -688,7 +688,7 @@ public class Main extends JFrame implements IMain {
         
         
         goalView.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW ).put(
-                KeyStroke.getKeyStroke(KeyEvent.VK_Z, ActionEvent.CTRL_MASK), 
+                KeyStroke.getKeyStroke(KeyEvent.VK_P, ActionEvent.CTRL_MASK), 
         "show_tree");
         goalView.getActionMap().put("show_tree", new AbstractAction() {
             
@@ -741,7 +741,7 @@ public class Main extends JFrame implements IMain {
     
     private JComponent createOpenMostRecentFile() {
         final JButton button = new JButton();
-        button.setAction(new OpenMostRecentFile());
+        button.setAction(new OpenMostRecentFile(""));
         return button;
     }
     
@@ -1207,14 +1207,16 @@ public class Main extends JFrame implements IMain {
         JMenu fileMenu = new JMenu("File");
         fileMenu.setMnemonic(KeyEvent.VK_F);
         
+        
         JMenuItem load = new JMenuItem();
         load.setAction(openFileAction);
         
         JMenuItem save = new JMenuItem();
         save.setAction(saveFileAction);
         
-        registerAtMenu(fileMenu, load);
+        registerAtMenu(fileMenu, load);                
         registerAtMenu(fileMenu, save);
+                
         
         JMenuItem tacletPOItem = new JMenuItem("Load Non-Axiom Lemma ...");
         tacletPOItem.addActionListener(new ActionListener() {
@@ -1235,6 +1237,9 @@ public class Main extends JFrame implements IMain {
         });
         
         addSeparator(fileMenu);
+        
+        JMenuItem loadLastOpened = new JMenuItem(new OpenMostRecentFile("Reload"));
+        registerAtMenu(fileMenu, loadLastOpened);
         
         recentFiles = new RecentFileMenu(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -1260,7 +1265,8 @@ public class Main extends JFrame implements IMain {
                 Config.DEFAULT.smaller();
             }
         });
-        smaller.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, InputEvent.CTRL_DOWN_MASK));
+        smaller.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 
+        	Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         
         final JMenuItem larger = new JMenuItem("Larger");
         larger.addActionListener(new ActionListener() {
@@ -1268,7 +1274,8 @@ public class Main extends JFrame implements IMain {
                 Config.DEFAULT.larger();
             }
         });
-        larger.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_UP, InputEvent.CTRL_DOWN_MASK));
+        larger.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_UP, 
+        	Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         
         Config.DEFAULT.addConfigChangeListener(new ConfigChangeListener() {
             public void configChanged(ConfigChangeEvent e) {
@@ -1305,8 +1312,7 @@ public class Main extends JFrame implements IMain {
 	
 	final JMenuItem tacletOptionsView = new JMenuItem(TACLET_OPTIONS_MENU_STRING);
 
-	tacletOptionsView.setAccelerator(KeyStroke.getKeyStroke
-			    (KeyEvent.VK_M, ActionEvent.CTRL_MASK));
+	tacletOptionsView.setMnemonic(KeyEvent.VK_M);
 	tacletOptionsView.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
 		    selectMaxTooltipLines();
@@ -1318,21 +1324,25 @@ public class Main extends JFrame implements IMain {
 	registerAtMenu(view, tacletOptionsView);
         
         
-        return view;
+        return view; 
     }
+        
     
     protected JMenu createProofMenu() {
         JMenu proof = new JMenu("Proof");
         proof.setMnemonic(KeyEvent.VK_P);
-        JMenuItem close = new JMenuItem("Abandon Task");
-        close.setAccelerator(KeyStroke.getKeyStroke
-                (KeyEvent.VK_W, ActionEvent.CTRL_MASK));
-        close.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                closeTask();
-            }});
-        registerAtMenu(proof, close);	
         
+	JMenuItem runStrategy = new JMenuItem(autoModeAction);
+	registerAtMenu(proof, runStrategy);
+
+	JMenuItem undo = new JMenuItem(new UndoLastStep(true));
+	registerAtMenu(proof, undo);
+
+	JMenuItem close = new JMenuItem(new AbandonTask());
+	registerAtMenu(proof, close);	
+        
+	addSeparator(proof);
+	
         JMenuItem choiceItem = new JMenuItem("Show Active Taclet Options");
         choiceItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -1402,8 +1412,7 @@ public class Main extends JFrame implements IMain {
 	
 	// default taclet options
 	JMenuItem choiceItem = new JMenuItem("Default Taclet Options...");
-	choiceItem.setAccelerator(KeyStroke.getKeyStroke
-			    (KeyEvent.VK_T, ActionEvent.CTRL_MASK));
+	choiceItem.setMnemonic(KeyEvent.VK_T);
 
 	choiceItem.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
@@ -1413,8 +1422,7 @@ public class Main extends JFrame implements IMain {
 
 	// update simplifier
 	JMenuItem updateSimplifierItem = new JMenuItem("Update Simplifier...");
-	updateSimplifierItem.setAccelerator(KeyStroke.getKeyStroke
-			    (KeyEvent.VK_U, ActionEvent.CTRL_MASK));
+	updateSimplifierItem.setMnemonic(KeyEvent.VK_U);
 
 	updateSimplifierItem.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
@@ -1567,9 +1575,13 @@ public class Main extends JFrame implements IMain {
     JCheckBoxMenuItem showSMTResDialog;
     JCheckBoxMenuItem saveSMTFile;
     private JCheckBoxMenuItem waitForAllProvers;
+    private JCheckBoxMenuItem saveTacletTranslation;
+    private JCheckBoxMenuItem useTaclets;
+    private JMenuItem showTacletTranslationSettings;
     /**@see {@link de.uka.ilkd.key.smt.SmtLibTranslatorWeaker} */
     JCheckBoxMenuItem weakerSMTTranslation;
 
+    
     
     /**
      * creates a menu allowing to choose the external prover to be used
@@ -1681,6 +1693,29 @@ public class Main extends JFrame implements IMain {
 		});
 	decProcOptions.add(waitForAllProvers);
 	
+
+	
+	showTacletTranslationSettings = new JMenuItem("settings for taclet translation");
+	showTacletTranslationSettings.addActionListener(new ActionListener() {
+		   public void actionPerformed(ActionEvent e) {
+		       if(mediator.getSelectedProof()!=null){
+			    ProofSettings.DEFAULT_SETTINGS.getTacletTranslationSettings().
+			    initTacletMap(mediator.getSelectedProof().env().getInitConfig().getTaclets());  
+		       }
+		
+		       TacletTranslationSettingsDialog.showDialog();
+		       
+		       
+		   }
+		});
+	decProcOptions.add(showTacletTranslationSettings);
+	
+	
+	
+	
+	
+
+	
 	weakerSMTTranslation = new JCheckBoxMenuItem("Weaken Typesystem Translation");
 	weakerSMTTranslation.setSelected(dps.weakenSMTTranslation);
 	weakerSMTTranslation.setToolTipText("<html>When activated, the axiomatization of KeY's type system<br>" +
@@ -1780,8 +1815,6 @@ public class Main extends JFrame implements IMain {
 	getJMenuBar().add(tools);
 
 	JMenuItem extractSpecification = new JMenuItem("Extract Specification");
-	extractSpecification.setAccelerator(KeyStroke.getKeyStroke
-			    (KeyEvent.VK_E, ActionEvent.CTRL_MASK));
 
 	extractSpecification.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
@@ -1804,8 +1837,8 @@ public class Main extends JFrame implements IMain {
 	JMenuItem specificationBrowser = 
 	    new JMenuItem("Proof Obligation Browser...");
 	specificationBrowser.setAccelerator(KeyStroke.getKeyStroke
-					    (KeyEvent.VK_B, 
-					     ActionEvent.CTRL_MASK));
+		(KeyEvent.VK_B, 
+			Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 	specificationBrowser.addActionListener(new ActionListener() {
 	    public void actionPerformed(ActionEvent e) {
     	        showPOBrowser();
@@ -1837,7 +1870,7 @@ public class Main extends JFrame implements IMain {
         
         createWrapper.setAccelerator(KeyStroke.getKeyStroke
                 (KeyEvent.VK_J, 
-                 ActionEvent.CTRL_MASK));
+                	Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 
         createWrapper.setEnabled(mediator.getProof() != null);
 
@@ -2160,9 +2193,14 @@ public class Main extends JFrame implements IMain {
      */
     private final class OpenMostRecentFile extends AbstractAction {
         
-        public OpenMostRecentFile() {
+        public OpenMostRecentFile(String itemName) {
+            if (itemName.length() > 0) {
+        	putValue(NAME, itemName);
+            }
             putValue(SMALL_ICON, IconFactory.openMostRecent(TOOLBAR_ICON_SIZE));
             putValue(SHORT_DESCRIPTION, "Load last opened file.");
+            putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_R, 
+        	    Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         }
         
         public void actionPerformed(ActionEvent e) {
@@ -2183,7 +2221,8 @@ public class Main extends JFrame implements IMain {
             putValue(NAME, "Load ...");
             putValue(SMALL_ICON, IconFactory.openKeYFile(TOOLBAR_ICON_SIZE));
             putValue(SHORT_DESCRIPTION, "Browse and load problem or proof files.");
-            putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_O, ActionEvent.CTRL_MASK));
+            putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_O, 
+        	    Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
             
         }
         
@@ -2208,7 +2247,8 @@ public class Main extends JFrame implements IMain {
             putValue(NAME, "Save ...");
             putValue(SMALL_ICON, IconFactory.saveFile(TOOLBAR_ICON_SIZE));
             putValue(SHORT_DESCRIPTION, "Save current proof.");
-            putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_S, ActionEvent.CTRL_MASK));
+            putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_S,  
+        	    Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
             
             setEnabled(mediator.getProof() != null);
             
@@ -2956,8 +2996,16 @@ public class Main extends JFrame implements IMain {
      */
     private final class UndoLastStep extends AbstractAction {
 
-        public UndoLastStep() {            
-            setBackMode();         
+	private boolean longName = false;
+	
+	/**
+	 * creates an undo action
+	 * @param longName a boolean true iff the long name should be shown (e.g. in MenuItems)
+	 */
+        public UndoLastStep(boolean longName) {            
+            this.longName = longName;
+            init();
+            setBackMode();
         }
 
         /** 
@@ -3016,10 +3064,24 @@ public class Main extends JFrame implements IMain {
         }
         
         private void setBackMode() {
-            putValue(NAME, "Goal Back");
+            String appliedRule = "";
+
+            if (longName && mediator != null) {
+        	final Node nd = mediator.getSelectedNode();
+            
+        	if (nd != null && nd.parent() != null 
+        		&&  nd.parent().getAppliedRuleApp() != null) {
+        	    appliedRule = 
+        		" (" + nd.parent().getAppliedRuleApp().rule().displayName() + ")";
+        	}
+            }
+            putValue(NAME, "Goal Back" + appliedRule );
+            
             putValue(SMALL_ICON, 
                     IconFactory.goalBackLogo(TOOLBAR_ICON_SIZE));
             putValue(SHORT_DESCRIPTION, "Undo the last rule application.");
+            putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_Z,
+        	    Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         }
 
         private void pruneMode() {
@@ -3027,6 +3089,9 @@ public class Main extends JFrame implements IMain {
             putValue(SMALL_ICON, IconFactory.goalBackLogo(TOOLBAR_ICON_SIZE));
             putValue(SHORT_DESCRIPTION, 
                     "Prune the tree below the selected node.");
+            putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_Z,
+        	    Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+
         }
         
         public void actionPerformed(ActionEvent e) {            
@@ -3175,6 +3240,38 @@ public class Main extends JFrame implements IMain {
 	}
     }
     
+    
+    private final class AbandonTask extends AbstractAction  {
+	
+	public AbandonTask() {
+	    putValue(NAME, "Abandon Task");
+	    putValue(ACCELERATOR_KEY, KeyStroke.
+		    getKeyStroke(KeyEvent.VK_W, 
+			    Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+	    
+	    setEnabled(mediator.getProof() != null);
+            
+            mediator.addKeYSelectionListener(new KeYSelectionListener() {
+                /** focused node has changed */
+                public void selectedNodeChanged(KeYSelectionEvent e) {
+                }
+                
+                /**
+                 * the selected proof has changed. Enable or disable action depending whether a proof is
+                 * available or not
+                 */ 
+                public void selectedProofChanged(KeYSelectionEvent e) {
+                    setEnabled(e.getSource().getSelectedProof() != null);
+                }
+            });
+	}
+			      
+	public void actionPerformed(ActionEvent e) {
+	    closeTask();
+	}
+
+    }
+
   
     private final class AutoModeAction extends AbstractAction {
         
@@ -3216,10 +3313,14 @@ public class Main extends JFrame implements IMain {
             setEnabled(associatedProof != null && !associatedProof.closed());            
         }
         
-        public AutoModeAction() {
+        public AutoModeAction() {            
             putValue("hideActionText", Boolean.TRUE);
+            putValue(Action.NAME, "Start");
             putValue(Action.SHORT_DESCRIPTION, AUTO_MODE_TEXT);
             putValue(Action.SMALL_ICON, startLogo);
+            putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_E,
+        	    Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+            
             
             associatedProof = mediator.getProof();        
             
@@ -3261,6 +3362,7 @@ public class Main extends JFrame implements IMain {
                     if (associatedProof != null) {
                         associatedProof.removeProofTreeListener(ptl);                        
                     }
+                    putValue(Action.NAME, "Stop");
                     putValue(Action.SMALL_ICON, stopLogo);
                 }
                 
@@ -3273,6 +3375,7 @@ public class Main extends JFrame implements IMain {
                             !associatedProof.containsProofTreeListener(ptl) ) {
                         associatedProof.addProofTreeListener(ptl);
                     }
+                    putValue(Action.NAME, "Start");
                     putValue(Action.SMALL_ICON, startLogo);
                 }
                 
@@ -3446,8 +3549,8 @@ public class Main extends JFrame implements IMain {
             JMenuItem specificationBrowser = 
                 new JMenuItem("Proof Obligation Browser...");
             specificationBrowser.setAccelerator(KeyStroke.getKeyStroke
-                                                (KeyEvent.VK_B, 
-                                                ActionEvent.CTRL_MASK));
+        	    (KeyEvent.VK_B, 
+        		    Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
             specificationBrowser.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     main.showPOBrowser();
@@ -3500,8 +3603,7 @@ public class Main extends JFrame implements IMain {
             JMenu options = new JMenu("Options");
             options.setMnemonic(KeyEvent.VK_O);
             JMenuItem choiceItem = new JMenuItem("Taclet options defaults");
-            choiceItem.setAccelerator(KeyStroke.getKeyStroke
-                    (KeyEvent.VK_T, ActionEvent.CTRL_MASK));
+            choiceItem.setMnemonic(KeyEvent.VK_T);
 
             choiceItem.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {

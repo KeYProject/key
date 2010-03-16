@@ -65,7 +65,8 @@ public class SMTRule implements BuiltInRule, MakesProgress {
 	int timeout = ProofSettings.DEFAULT_SETTINGS
 	                           .getDecisionProcedureSettings()
 	                           .getTimeout()*100;
-	
+
+		
 	SMTSolverResult result = SMTSolverResult.NO_IDEA;	
 	try {
 	    result = this.solver.run(goal, timeout, services);
@@ -77,7 +78,8 @@ public class SMTRule implements BuiltInRule, MakesProgress {
 		re.initCause(ioe);
 		throw re;
 	    }	    
-	}
+	} 	 
+	
 	if (result.isValid() == SMTSolverResult.ThreeValuedTruth.TRUE) {
 	    return ImmutableSLList.<Goal>nil();
 	} else {

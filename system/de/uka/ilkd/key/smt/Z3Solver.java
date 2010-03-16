@@ -18,6 +18,7 @@ import de.uka.ilkd.key.java.Services;
 public final class Z3Solver extends AbstractSMTSolver {
 
     public static final String name="Z3";
+
     public String name() {
         return name;
     }

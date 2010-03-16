@@ -52,7 +52,7 @@ public class DeclPicker implements TokenStream {
   }
   
   public String getText() {
-     return text;
+      return text;
   }
   
 

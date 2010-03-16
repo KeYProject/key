@@ -198,7 +198,7 @@ public class ProofStarter {
             progressMonitors.remove(pm);
         }
     }
-    
+
     /**
      * starts a proof attempt
      * @param env the ProofEnvironment to which the proof object will be registered
@@ -210,8 +210,23 @@ public class ProofStarter {
             throw new IllegalStateException(
                     "Proofstarter must be initialized before.");
         }
-        
-        proof.setProofEnv(env);
+	return run (env, proof.openGoals());
+    }
+    
+    /**
+     * starts a proof attempt
+     * @param env the ProofEnvironment to which the proof object will be registered
+     * @param goals list of goals on which to run the proof search strategy
+     * @return <code>true</code> if the proof attempt terminated normally (i.e. no error has occured).
+     * In particular <code>true</code> does <em>not</em> mean that the proof has been closed.
+     */
+    public boolean run(ProofEnvironment env, ImmutableList<Goal> goals) {
+	if (goals.size() == 0) {
+	    return true;
+	} 
+	assert goals.head().proof() == proof;
+	
+	proof.setProofEnv(env);
         
         final Strategy oldStrategy = proof.getActiveStrategy();
         if (strategy == null) {
@@ -232,7 +247,7 @@ public class ProofStarter {
         }
 
 
-        goalChooser.init(proof, proof.openGoals());
+        goalChooser.init(proof, goals);
         final ProofListener pl = new ProofListener();
 
         //%%% HACK !!!! Remove as soon as possible
