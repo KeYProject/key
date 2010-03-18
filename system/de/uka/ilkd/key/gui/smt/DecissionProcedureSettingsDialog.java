@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.gui;
+package de.uka.ilkd.key.gui.smt;
 
 import java.awt.Component;
 import java.awt.Dimension;
@@ -13,8 +13,11 @@ import javax.swing.border.TitledBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-import de.uka.ilkd.key.gui.DecisionProcedureSettings.RuleDescriptor;
+///import de.uka.ilkd.key.gui.DecisionProcedureSettings.RuleDescriptor;
+import de.uka.ilkd.key.gui.Main;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
+import de.uka.ilkd.key.smt.AbstractSMTSolver;
+import de.uka.ilkd.key.smt.SMTSolver;
 
 /**
  * This Dialog is used to make changes in the configuration of Decision Procedures.
@@ -26,7 +29,7 @@ public class DecissionProcedureSettingsDialog extends JDialog {
 
     private static DecissionProcedureSettingsDialog instance;
     
-    private List <RuleDescriptor> allrules;
+  ///  private List <RuleDescriptor> allrules;
     private JTextField nameField;
     private JTextField availableField;
     private JTextField executionField;
@@ -39,12 +42,21 @@ public class DecissionProcedureSettingsDialog extends JDialog {
     
     /** Used for saving the settings temporally.*/
     class Settings{
+	public AbstractSMTSolver solver;
 	public boolean multipleProver;
 	public String   executionCommand;
-	public Settings(boolean multipleProver, String executionCommand) {
+	
+	public void apply(){
+	    solver.useForMultipleRule(multipleProver);
+	    solver.setExecutionCommand(executionCommand);
+	    solver.isInstalled(true);
+	}
+	
+	public Settings(boolean multipleProver, String executionCommand, AbstractSMTSolver solver) {
 	    super();
 	    this.multipleProver = multipleProver;
 	    this.executionCommand = executionCommand;
+	    this.solver 	= solver;
 	}
 	    }
     
@@ -98,10 +110,14 @@ public class DecissionProcedureSettingsDialog extends JDialog {
     private void reset(){
 	previousSelectedIndex = -1;
 	proverSettings.clear();
-	for (RuleDescriptor rd : this.allrules) {
-		String cmd = ProofSettings.DEFAULT_SETTINGS.getDecisionProcedureSettings().getExecutionCommand(rd);
-		boolean b = ProofSettings.DEFAULT_SETTINGS.getDecisionProcedureSettings().getMultipleUse(rd);
-		proverSettings.add(new Settings(b,cmd));
+	DecisionProcedureSettings dps = DecisionProcedureSettings.getInstance();
+	
+	for (AbstractSMTSolver solver : dps.getSolvers()) {
+	    
+		String cmd = dps.getExecutionCommand(solver);
+		boolean b = dps.getMultipleUse(solver);
+		proverSettings.add(new Settings(b,cmd,solver));
+
 	
 	}
 	this.setRuleVals();
@@ -136,7 +152,7 @@ public class DecissionProcedureSettingsDialog extends JDialog {
 	
 	tp.setLeftComponent(lc);
 	tp.setRightComponent(rc);
-	this.allrules = ProofSettings.DEFAULT_SETTINGS.getDecisionProcedureSettings().getAllRules();
+	
 	
 	
 	lc.add(buildDecprocList());
@@ -273,24 +289,32 @@ public class DecissionProcedureSettingsDialog extends JDialog {
     private void storeCommand() {
 	
 	int selectedIndex = ruleDisplayList.getSelectedIndex();
-	Settings  set = proverSettings.get(selectedIndex);
+	if(selectedIndex >= 0 && selectedIndex < proverSettings.size()){
+	    Settings  set = proverSettings.get(selectedIndex);
 	    set.multipleProver = this.multiuseBox.isSelected();
 	    set.executionCommand = this.executionField.getText();
-		
-	for(int i=0; i<allrules.size(); i++){
-	        RuleDescriptor rd = allrules.get(i);
-		String command = proverSettings.get(i).executionCommand;
-		boolean multipleuse = proverSettings.get(i).multipleProver;
-		boolean fire = i == allrules.size()-1;
-		ProofSettings.DEFAULT_SETTINGS.getDecisionProcedureSettings().setMultipleUse(rd,multipleuse,false);
-		ProofSettings.DEFAULT_SETTINGS.getDecisionProcedureSettings().setExecutionCommand(rd, command,fire); 
-	}
+	    DecisionProcedureSettings dps = DecisionProcedureSettings.getInstance();
+	    
+	    
+	    
+	    for(Settings settings  : proverSettings){
+			settings.apply();
+         	}
 	
+	    dps.fireSettingsChanged();
+	  
+		  
+	}
 	
 
 	
+	
+
+
 	Main.instance.updateDecisionProcedureSelectMenu();
+
 	this.setRuleVals();
+
     }
     
 /*    private void performTest() {
@@ -308,6 +332,7 @@ public class DecissionProcedureSettingsDialog extends JDialog {
      * set the value fields according to the values of the selected decproc.
      */
     private void setRuleVals() {
+	
 	if(previousSelectedIndex >= 0){
 	    Settings  set = proverSettings.get(previousSelectedIndex);
 	    set.multipleProver = this.multiuseBox.isSelected();
@@ -317,15 +342,23 @@ public class DecissionProcedureSettingsDialog extends JDialog {
 	
 	int selectedIndex = ruleDisplayList.getSelectedIndex();
 	previousSelectedIndex = selectedIndex;
-	RuleDescriptor rd = this.allrules.get(selectedIndex);
-	this.nameField.setText(rd.getDisplayName());
-	if (ProofSettings.DEFAULT_SETTINGS.getDecisionProcedureSettings().isInstalled(rd)) {
-	    this.availableField.setText("Yes");
-	} else {
-	    this.availableField.setText("No");
+	
+	
+	if(selectedIndex >= 0 && selectedIndex < proverSettings.size()){
+	    Settings settings = proverSettings.get(selectedIndex);
+	    
+	    this.nameField.setText(settings.solver.name());
+	    if (settings.solver.isInstalled(false)) {
+			    this.availableField.setText("Yes");
+			} else {
+			    this.availableField.setText("No");
+			}
+	    
+	    
+	   this.executionField.setText(settings.executionCommand);
+	   this.multiuseBox.setSelected(settings.multipleProver); 
 	}
-	this.executionField.setText(proverSettings.get(selectedIndex).executionCommand);
-	this.multiuseBox.setSelected(proverSettings.get(selectedIndex).multipleProver);
+
 	
 
     }
@@ -336,9 +369,11 @@ public class DecissionProcedureSettingsDialog extends JDialog {
      */
     private JList buildDecprocList() {
 	ArrayList<String> rulenames = new ArrayList<String>();
-	for (RuleDescriptor rd : this.allrules) {
-		rulenames.add(rd.getDisplayName());
-		
+	DecisionProcedureSettings dps = DecisionProcedureSettings.getInstance();
+	
+	for (SMTSolver solver : dps.getSolvers()) {
+		rulenames.add(solver.name());
+				
 	}
 	ruleDisplayList = new JList(rulenames.toArray());
 	ruleDisplayList.setBorder(new TitledBorder("Decision Procedures"));

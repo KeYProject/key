@@ -41,11 +41,13 @@ import visualdebugger.VBTBuilder;
 import visualdebugger.draw2d.*;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
-import de.uka.ilkd.key.gui.IMain;
+import de.uka.ilkd.key.gui.configuration.ProofSettings;
+import de.uka.ilkd.key.gui.smt.RuleLauncher;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.smt.DecProcRunner;
+import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.smt.SMTRule;
 import de.uka.ilkd.key.unittest.ModelGenerator;
 import de.uka.ilkd.key.util.ProgressMonitor;
 import de.uka.ilkd.key.visualdebugger.DebuggerEvent;
@@ -1257,9 +1259,11 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
                     return;
                 if (!vd.getMediator().ensureProofLoaded())
                     return;
-                new DecProcRunner((IMain)vd.getMediator().mainFrame(),
-                        vd.getMediator().getProof(), 
-                        vd.getMediator().getUserConstraint().getConstraint()).start();
+                
+                SMTRule r = ProofSettings.DEFAULT_SETTINGS.getDecisionProcedureSettings().getActiveSMTRule();
+                final Proof proof = vd.getMediator().getProof();
+                RuleLauncher.INSTANCE.start(ProofSettings.DEFAULT_SETTINGS.getDecisionProcedureSettings().getActiveSMTRule(),
+                	proof, proof.getUserConstraint().getConstraint(), true);
             }
 
         };

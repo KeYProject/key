@@ -22,6 +22,8 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.Main;
+import de.uka.ilkd.key.gui.smt.ProgressDialog;
+import de.uka.ilkd.key.gui.smt.RuleLauncher;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
@@ -33,9 +35,7 @@ import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.*;
-import de.uka.ilkd.key.smt.DecProcRunner;
 import de.uka.ilkd.key.smt.SMTRule;
-import de.uka.ilkd.key.smt.SMTRuleMulti;
 
 /**
  *  This class creates a menu with Taclets as entries. The invoker has
@@ -349,12 +349,17 @@ class TacletMenu extends JMenu {
 		    .selectedTaclet(((TacletMenuItem) e.getSource()).connectedTo(), 
 				    pos);
             } else if (e.getSource() instanceof BuiltInRuleMenuItem) {
-        	if (((BuiltInRuleMenuItem) e.getSource()).connectedTo() instanceof SMTRule ||
-        	    ((BuiltInRuleMenuItem) e.getSource()).connectedTo() instanceof SMTRuleMulti) {
-        	    new DecProcRunner(Main.getInstance()
+        	if (//((BuiltInRuleMenuItem) e.getSource()).connectedTo() instanceof SMTRule ||
+        	    //((BuiltInRuleMenuItem) e.getSource()).connectedTo() instanceof SMTRuleMulti||
+        	    ((BuiltInRuleMenuItem) e.getSource()).connectedTo() instanceof SMTRule) {
+        	    
+        	    SMTRule rule = (SMTRule) ((BuiltInRuleMenuItem) e.getSource()).connectedTo();
+        	    RuleLauncher.INSTANCE.start(rule, selectedGoal,
+        		    Main.getInstance().mediator().getProof().getUserConstraint().getConstraint(),true);
+        	   /* new DecProcRunner(Main.getInstance()
         		, selectedGoal//Main.getInstance().mediator().getProof()
         		, Main.getInstance().mediator().getProof().getUserConstraint().getConstraint()
-        		, ((BuiltInRuleMenuItem) e.getSource()).connectedTo()).start();
+        		, ((BuiltInRuleMenuItem) e.getSource()).connectedTo()).start();*/
         	} else {
                         mediator.selectedBuiltInRule
                     (((BuiltInRuleMenuItem) e.getSource()).connectedTo(), 

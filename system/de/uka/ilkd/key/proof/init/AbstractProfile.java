@@ -9,7 +9,9 @@
 package de.uka.ilkd.key.proof.init;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
+import java.util.LinkedList;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
@@ -18,6 +20,7 @@ import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.IMain;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
+import de.uka.ilkd.key.gui.smt.DecisionProcedureSettings;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.proof.DefaultGoalChooserBuilder;
 import de.uka.ilkd.key.proof.DepthFirstGoalChooserBuilder;
@@ -89,24 +92,21 @@ public abstract class AbstractProfile implements Profile {
 
     protected ImmutableList<BuiltInRule> initBuiltInRules() {
         ImmutableList<BuiltInRule> builtInRules = ImmutableSLList.<BuiltInRule>nil();
-	ArrayList<SMTSolver> solverList = new ArrayList<SMTSolver>();
-        
+	LinkedList<AbstractSMTSolver> solverList = new LinkedList<AbstractSMTSolver>();
 
-	solverList.add(new Z3Solver());
-	solverList.add(new YicesSolver());
-        solverList.add(new SimplifySolver());
-	solverList.add(new CVC3Solver());
-        
-	// init builtIRule for using several provers at the same time
-	builtInRules = builtInRules.prepend(new SMTRuleMulti(solverList));
-        
-	// builtInRules for single use of provers
-	for(SMTSolver s : solverList){
-          builtInRules = builtInRules.prepend(new SMTRule(s));
-       
-	}        
 
-      
+	
+	
+	Collection<SMTRule> rules = DecisionProcedureSettings.getInstance().getSMTRules();
+        
+	for(SMTRule rule : rules){
+	    builtInRules = builtInRules.prepend(rule);  
+	}
+	
+        
+        
+     
+        
         
         
         return builtInRules;
@@ -201,7 +201,7 @@ public abstract class AbstractProfile implements Profile {
       * sets the given settings to some default depending on the profile
       */
      public void updateSettings(ProofSettings settings) {
-	 settings.getDecisionProcedureSettings().updateSMTRules(this);
+	settings.getDecisionProcedureSettings().updateSMTRules(this);
      }
 
      /**

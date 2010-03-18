@@ -7,11 +7,10 @@
 // See LICENSE.TXT for details.
 //
 //
-package de.uka.ilkd.key.gui;
+package de.uka.ilkd.key.gui.smt;
 
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Properties;
 
@@ -19,6 +18,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeNode;
 
 import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.gui.GUIEvent;
 import de.uka.ilkd.key.gui.configuration.Settings;
 import de.uka.ilkd.key.gui.configuration.SettingsListener;
 import de.uka.ilkd.key.proof.TacletIndex;
@@ -44,6 +44,10 @@ public class TacletTranslationSettings implements Settings {
     private int maxGeneric=2;
     private String filename="";
     private boolean saveToFile= false;
+    
+    private TacletTranslationSettings(){
+	
+    }
     
     public int getMaxGeneric() {
         return maxGeneric;

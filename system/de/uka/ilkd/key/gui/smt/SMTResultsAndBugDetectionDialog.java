@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.gui;
+package de.uka.ilkd.key.gui.smt;
 
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
@@ -29,14 +29,16 @@ import javax.swing.table.DefaultTableModel;
 import de.uka.ilkd.key.bugdetection.BugDetector;
 import de.uka.ilkd.key.bugdetection.FalsifiabilityPreservation;
 import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.gui.KeYMediator;
+import de.uka.ilkd.key.gui.KeYSelectionEvent;
+import de.uka.ilkd.key.gui.KeYSelectionListener;
+import de.uka.ilkd.key.gui.Main;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofEvent;
 import de.uka.ilkd.key.proof.ProofTreeAdapter;
 import de.uka.ilkd.key.proof.ProofTreeEvent;
 import de.uka.ilkd.key.smt.CVC3Solver;
-import de.uka.ilkd.key.smt.SMTRule;
-import de.uka.ilkd.key.smt.SMTRuleMulti;
 import de.uka.ilkd.key.smt.SMTSolverResult;
 import de.uka.ilkd.key.smt.SimplifySolver;
 import de.uka.ilkd.key.smt.YicesSolver;

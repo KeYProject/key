@@ -10,7 +10,6 @@
 
 package de.uka.ilkd.key.smt;
 
-import de.uka.ilkd.key.java.Services;
 
 /**Hint: In order to run Z3 on Linux or Mac use wine. 
  * On {@link http://www4.in.tum.de/~boehmes/z3.html} you can find useful script for that. 
