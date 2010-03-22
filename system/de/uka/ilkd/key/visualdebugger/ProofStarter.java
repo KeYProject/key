@@ -295,8 +295,6 @@ public class ProofStarter {
      * is returned
      * @return the decision procedure calling Simplify or null if none has been found
      */
-    // TODO: Change this method!!! At the moment this method returns null to guarantee 
-    // that KeY works.
     private SMTRule findSimplifyRule() {
 	return new SMTRule(new Name("SIMPLIFY"),new SimplifySolver());
 	
