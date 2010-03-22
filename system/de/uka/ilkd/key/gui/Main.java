@@ -42,6 +42,7 @@ import de.uka.ilkd.key.gui.nodeviews.SequentView;
 import de.uka.ilkd.key.gui.notification.NotificationManager;
 import de.uka.ilkd.key.gui.notification.events.*;
 import de.uka.ilkd.key.gui.prooftree.ProofTreeView;
+import de.uka.ilkd.key.gui.smt.DPSDialog;
 import de.uka.ilkd.key.gui.smt.DecisionProcedureSettings;
 import de.uka.ilkd.key.gui.smt.DecissionProcedureSettingsDialog;
 import de.uka.ilkd.key.gui.smt.RuleLauncher;
@@ -1740,6 +1741,18 @@ public class Main extends JFrame implements IMain {
 		   }
 		});
 	decProcOptions.add(showTacletTranslationSettings);
+	
+	
+	JMenuItem item = new JMenuItem("test dialog");
+	item.addActionListener(new ActionListener() {
+		   public void actionPerformed(ActionEvent e) {
+		  
+		       DPSDialog.INSTANCE.showDialog(ProofSettings.DEFAULT_SETTINGS.getDecisionProcedureSettings());
+		       
+		       
+		   }
+		});
+	decProcOptions.add(item);
 	
 	
 	
