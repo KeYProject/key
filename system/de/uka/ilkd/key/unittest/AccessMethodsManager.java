@@ -98,7 +98,7 @@ public class AccessMethodsManager {
      * @return a method reference to call the approrpiate new-method
      */
     public MethodReference callNew(final New rhs) {
-	final Sort sort = ((TypeRef) rhs.getLastElement()).getKeYJavaType()
+	final Sort sort = ((TypeRef) rhs.getTypeReference()).getKeYJavaType()
 	        .getSort();
 	usedObjectSorts.add(sort);
 	return new MethodReference(new ImmutableArray<Expression>(),
@@ -253,7 +253,7 @@ public class AccessMethodsManager {
     private Expression classParam(final ProgramVariable pv) {
 	final KeYJavaType classOfPv = pv.getContainerType();
 	return new SyntacticalProgramVariable(new ProgramElementName(classOfPv
-	        .getName()
+	        .getFullName()
 	        + ".class"), classOfPv);
     }
 

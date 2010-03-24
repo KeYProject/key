@@ -12,12 +12,12 @@ package de.uka.ilkd.key.proof;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.PrintStream;
+import java.io.PrintWriter;
 import java.util.Iterator;
 import java.util.Vector;
 
-import de.uka.ilkd.key.collection.ImmutableMapEntry;
 import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableMapEntry;
 import de.uka.ilkd.key.gui.IMain;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
@@ -78,17 +78,17 @@ public class ProofSaver {
    public String save() {
       String errorMsg = null;
       FileOutputStream fos = null;
-      PrintStream ps = null;
+      PrintWriter ps = null;
 
       try {
           fos = new FileOutputStream(filename);
-          ps = new PrintStream(fos);
+          ps = new PrintWriter(fos, true);
 
 
           Sequent problemSeq = proof.root().sequent();
           printer = createLogicPrinter(proof.getServices(), false);
 
-          ps.println(writeSettings(proof.getSettings()));
+          ps.println(writeSettings(proof.getSettings()));          
           ps.print(proof.header());
           ps.println("\\problem {");
           printer.printSemisequent(problemSeq.succedent());
@@ -115,6 +115,10 @@ public class ProofSaver {
       } finally {
           try {
 	      if (fos != null) fos.close();
+	      if (ps != null) {
+		  ps.flush();
+		  ps.close();
+	      }
           } catch (IOException ioe) {
 	      mediator.notify(new GeneralFailureEvent(ioe.toString()));
           }          
@@ -157,7 +161,7 @@ public class ProofSaver {
         return " (newnames \"" + s.substring(1) + "\")";
     }
 
-    private void printUserConstraints(PrintStream ps) {
+    private void printUserConstraints(PrintWriter ps) {
         ConstraintTableModel uCons = proof.getUserConstraint();
         Services s = mediator.getServices();
 

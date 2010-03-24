@@ -9,8 +9,11 @@
 //
 package de.uka.ilkd.key.rule.metaconstruct;
 
+
 import java.util.Iterator;
 
+import de.uka.ilkd.key.gui.configuration.ProofSettings;
+import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Expression;
@@ -21,15 +24,14 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
 import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.expression.operator.CopyAssignment;
-import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.java.reference.MethodReference;
-import de.uka.ilkd.key.java.reference.TypeRef;
+import de.uka.ilkd.key.java.reference.*;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.NullSort;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.proof.init.PercProfile;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 public class ResolveQuery extends AbstractMetaOperator {
@@ -137,8 +139,12 @@ public class ResolveQuery extends AbstractMetaOperator {
             mbs = new CopyAssignment(res, (Expression) mbs);
             
             final ExecutionContext ec; 
+            boolean perc = ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof PercProfile;
             if (pm.getContainerType() != null) {
-                ec = new ExecutionContext(new TypeRef(pm.getContainerType()), null);
+                ec = new ExecutionContext(new TypeRef(pm.getContainerType()), 
+                        services.getJavaInfo().getDefaultMemoryArea(), null,
+                        perc ? services.getJavaInfo().getDefaultMemoryArea() : null,
+                        perc ? services.getJavaInfo().getDefaultMemoryArea() : null);
             } else {
                 ec = services.getJavaInfo().getDefaultExecutionContext();
             }

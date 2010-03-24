@@ -6,6 +6,7 @@
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
 //
+//
 // 
 package de.uka.ilkd.key.java.recoderext;
 
@@ -16,17 +17,15 @@ import recoder.CrossReferenceServiceConfiguration;
 import recoder.abstraction.ClassType;
 import recoder.abstraction.Variable;
 import recoder.java.Identifier;
-import recoder.java.declaration.ClassDeclaration;
-import recoder.java.declaration.DeclarationSpecifier;
-import recoder.java.declaration.FieldDeclaration;
-import recoder.java.declaration.TypeDeclaration;
-import recoder.java.declaration.modifier.Private;
-import recoder.java.declaration.modifier.Public;
-import recoder.java.declaration.modifier.Static;
+import recoder.java.declaration.*;
+import recoder.java.declaration.modifier.*;
+import recoder.java.reference.PackageReference;
 import recoder.java.reference.TypeReference;
 import recoder.kit.ProblemReport;
 import recoder.list.generic.ASTArrayList;
 import recoder.list.generic.ASTList;
+import de.uka.ilkd.key.gui.configuration.ProofSettings;
+import de.uka.ilkd.key.proof.init.PercProfile;
 import de.uka.ilkd.key.util.Debug;
 
 
@@ -52,6 +51,13 @@ public class ImplicitFieldAdder extends RecoderModelTransformer {
 
     public static final String IMPLICIT_NEXT_TO_CREATE = "<nextToCreate>";
     public static final String IMPLICIT_CREATED = "<created>";
+   
+    public static final String IMPLICIT_MEMORY_AREA = "<memoryArea>";
+    public static final String IMPLICIT_REENTRANT_SCOPE = "<reentrantScope>";
+       
+    public static final String IMPLICIT_SIZE = "<size>";
+    
+    public static final String IMPLICIT_EXACT_SIZE = "<sizeExactInstance>";
     
     public static final String IMPLICIT_INITIALIZED = "<initialized>";
     public static final String IMPLICIT_TRANSIENT = "<transient>";
@@ -89,8 +95,14 @@ public class ImplicitFieldAdder extends RecoderModelTransformer {
      * @return the new created field declaration
      */
     public static FieldDeclaration createImplicitRecoderField
+        (String typeName, String fieldName, 
+         boolean isStatic, boolean isPrivate) {
+        return createImplicitRecoderField(typeName, fieldName, isStatic, isPrivate, false);
+    }
+    
+    public static FieldDeclaration createImplicitRecoderField
 	(String typeName, String fieldName, 
-	 boolean isStatic, boolean isPrivate) {
+	 boolean isStatic, boolean isPrivate, boolean isFinal) {
 	
 	ASTList<DeclarationSpecifier> modifiers = new ASTArrayList<DeclarationSpecifier>
 	    (1 + (isStatic ? 1 : 0));
@@ -103,12 +115,19 @@ public class ImplicitFieldAdder extends RecoderModelTransformer {
 	} else {
 	    modifiers.add(new Public());
 	}
+        
+        if(isFinal){
+            modifiers.add(new Final());
+        }
 	
+        String baseType = typeName.substring(0, typeName.indexOf("[")==-1 ? 
+                typeName.length() : typeName.indexOf("["));
+        
 	Identifier id = typeName.charAt(0) == '<' ? 
-	    new ImplicitIdentifier(typeName) : new Identifier(typeName);
+	    new ImplicitIdentifier(baseType) : new Identifier(baseType);
 	
 	FieldDeclaration fd = new FieldDeclaration
-	    (modifiers, new TypeReference(id), 
+	    (modifiers, new TypeReference(id, (typeName.length()-baseType.length())/2), 
 	     new ImplicitIdentifier(fieldName), null);
 	
 	fd.makeAllParentRolesValid();
@@ -127,6 +146,22 @@ public class ImplicitFieldAdder extends RecoderModelTransformer {
         attach(createImplicitRecoderField("byte", IMPLICIT_TRANSIENT, false, false), td, 0);
 	attach(createImplicitRecoderField("boolean", IMPLICIT_INITIALIZED, false, false), td, 0);
         attach(createImplicitRecoderField("boolean", IMPLICIT_CREATED, false, false), td, 0);
+        ASTList<DeclarationSpecifier> modifiers = new ASTArrayList<DeclarationSpecifier>(1);
+        modifiers.add(new Public());
+        FieldDeclaration fd = new FieldDeclaration
+        (modifiers, new TypeReference(
+                new PackageReference(new PackageReference(new Identifier("javax")), new Identifier("realtime")),
+                new Identifier("MemoryArea")), new ImplicitIdentifier(IMPLICIT_MEMORY_AREA), null);
+        fd.makeAllParentRolesValid();
+        attach(fd, td, 0);
+	if(ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof PercProfile){
+	    fd = new FieldDeclaration
+		(modifiers, new TypeReference(
+		         new PackageReference(new PackageReference(new Identifier("javax")), new Identifier("realtime")),
+			 new Identifier("MemoryArea")), new ImplicitIdentifier(IMPLICIT_REENTRANT_SCOPE), null);
+	    fd.makeAllParentRolesValid();
+	    attach(fd, td, 0);
+	}
     }
     
 
@@ -149,6 +184,9 @@ public class ImplicitFieldAdder extends RecoderModelTransformer {
 	attach(createImplicitRecoderField("boolean", IMPLICIT_CLASS_ERRONEOUS, true, true), td, 0);
 	attach(createImplicitRecoderField("boolean", IMPLICIT_CLASS_INITIALIZED, true, true), td, 0);
 	attach(createImplicitRecoderField("boolean", IMPLICIT_CLASS_PREPARED, true, true), td, 0);
+        
+        attach(createImplicitRecoderField("long", IMPLICIT_SIZE, true, true, true), td, 0);
+        attach(createImplicitRecoderField("long", IMPLICIT_EXACT_SIZE, true, true, true), td, 0);
 	
 	if(td instanceof ClassDeclaration && 
 	        (td.getName()==null || 
@@ -168,7 +206,7 @@ public class ImplicitFieldAdder extends RecoderModelTransformer {
 	    attach(fd, td, 0);
 	}
 	  
-        
+
 	if (!td.isInterface() && !td.isAbstract()) {	  
 	    attach(createImplicitRecoderField("int", 
 					      IMPLICIT_NEXT_TO_CREATE, true, true), td, 0);
@@ -191,14 +229,14 @@ public class ImplicitFieldAdder extends RecoderModelTransformer {
 	 if (!(javaLangObject instanceof ClassDeclaration)) {
 	     Debug.fail("Could not find class java.lang.Object or only as bytecode");
 	 }
-	 for (final ClassDeclaration cd : classDeclarations()) {
-	     if(cd.getName()==null || cd.getStatementContainer() !=null){
+	 for (final TypeDeclaration cd : classDeclarations()) {
+	     if(cd instanceof ClassDeclaration && 
+                     (cd.getName()==null || ((ClassDeclaration) cd).getStatementContainer()!=null)){
 	         (new FinalOuterVarsCollector()).walk(cd);
 	     }
 	 }     
 	 return super.analyze();
     }
-    
     
     protected void makeExplicit(TypeDeclaration td) {
 
@@ -219,4 +257,5 @@ public class ImplicitFieldAdder extends RecoderModelTransformer {
 // 	    try { sw.close(); } catch (Exception e) {}	   
 // 	}
     }
+    
 }

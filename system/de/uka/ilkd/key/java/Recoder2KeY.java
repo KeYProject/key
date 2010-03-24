@@ -51,35 +51,13 @@ import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.declaration.FieldSpecification;
 import de.uka.ilkd.key.java.declaration.VariableSpecification;
-import de.uka.ilkd.key.java.recoderext.ClassFileDeclarationManager;
-import de.uka.ilkd.key.java.recoderext.ClassInitializeMethodBuilder;
-import de.uka.ilkd.key.java.recoderext.ClassPreparationMethodBuilder;
-import de.uka.ilkd.key.java.recoderext.ConstructorNormalformBuilder;
-import de.uka.ilkd.key.java.recoderext.CreateBuilder;
-import de.uka.ilkd.key.java.recoderext.CreateObjectBuilder;
-import de.uka.ilkd.key.java.recoderext.EnumClassBuilder;
-import de.uka.ilkd.key.java.recoderext.ExtendedIdentifier;
-import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
-import de.uka.ilkd.key.java.recoderext.ImplicitIdentifier;
-import de.uka.ilkd.key.java.recoderext.InstanceAllocationMethodBuilder;
-import de.uka.ilkd.key.java.recoderext.JMLTransformer;
-import de.uka.ilkd.key.java.recoderext.JVMIsTransientMethodBuilder;
-import de.uka.ilkd.key.java.recoderext.KeYCrossReferenceServiceConfiguration;
-import de.uka.ilkd.key.java.recoderext.LocalClassTransformation;
-import de.uka.ilkd.key.java.recoderext.ObjectTypeIdentifier;
-import de.uka.ilkd.key.java.recoderext.PrepareObjectBuilder;
-import de.uka.ilkd.key.java.recoderext.RecoderModelTransformer;
-import de.uka.ilkd.key.java.recoderext.TestGenerationModelTransformer;
+import de.uka.ilkd.key.java.recoderext.*;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.util.Debug;
-import de.uka.ilkd.key.util.DirectoryFileCollection;
-import de.uka.ilkd.key.util.FileCollection;
-import de.uka.ilkd.key.util.KeYRecoderExcHandler;
-import de.uka.ilkd.key.util.ZipFileCollection;
+import de.uka.ilkd.key.util.*;
 
 /**
  * This class is the bridge between recoder ast data structures and KeY data
@@ -520,6 +498,10 @@ public class Recoder2KeY implements JavaReader {
                 ParseException e2 = new ParseException("Error while parsing " + loc);
                 e2.initCause(ex);
                 throw e2;
+            } catch(Exception ex){
+    	        ConvertException e2 = new ConvertException("While parsing "+loc+"\n"+ex.getMessage());
+                e2.initCause(ex);
+                throw e2;
             }
             
             if (Debug.ENABLE_DEBUG) {
@@ -779,6 +761,7 @@ public class Recoder2KeY implements JavaReader {
                 new InstanceAllocationMethodBuilder(servConf, cache),
                 cnb = new ConstructorNormalformBuilder(servConf, cache),
                 new ClassPreparationMethodBuilder(servConf, cache),
+                new AreaAllocationMethodBuilder(servConf, cache),
                 new ClassInitializeMethodBuilder(servConf, cache), 
                 new PrepareObjectBuilder(servConf, cache), 
                 new CreateBuilder(servConf, cache),
@@ -1200,20 +1183,26 @@ public class Recoder2KeY implements JavaReader {
      * 
      * @param message
      *            message to be used.
-     * @param e
+     * @param t
      *            the cause of the exceptional case
      * @throws ConvertException
      *             always
      */
-    public static void reportError(String message, Throwable e) {
+    public static void reportError(String message, Throwable t) {
         // Attention: this highly depends on Recoders exception messages!
-        int[] pos = extractPositionInfo(e.toString());
+	Throwable cause = t;
+	if  (t instanceof ExceptionHandlerException) {
+	    if (t.getCause() != null) {
+		cause = t.getCause();
+	    } 
+	}
+	int[] pos = extractPositionInfo(cause.toString());
         final RuntimeException rte;
         if (pos.length > 0) {
             rte = new PosConvertException(message, pos[0], pos[1]);
-            rte.initCause(e);
+            rte.initCause(cause);
         } else {
-            rte = new ConvertException(message, e);
+            rte = new ConvertException(message, cause);
         }
 
         throw rte;

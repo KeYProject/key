@@ -6,6 +6,12 @@
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
 //
+/** 
+ * (#)$RCSfile$ 1.1 2003-02-10 Andre Platzer
+ *
+ * Copyright (c) 2003 Andre Platzer. All Rights Reserved.
+ */
+
 package de.uka.ilkd.key.cspec;
 
 /**

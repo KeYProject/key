@@ -136,6 +136,7 @@ public class UnitTestBuilder {
 	    final ExecutionTraceModel[] tr = getTraces(n);
 	    result = result.union(getProgramMethods(tr));
 	}
+	
 	return result;
     }
 
@@ -399,8 +400,7 @@ public class UnitTestBuilder {
     }
 
     public String createTestForNodes(final ImmutableList<Node> l) {
-	return createTestForNodes(Arrays.asList(l.toArray(new Node[l.size()]))
-	        .iterator(), getProgramMethods(l));
+	return createTestForNodes(l.iterator(), getProgramMethods(l));
     }
 
     // protected void computeStatementCoverage(HashSet<Position>

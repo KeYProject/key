@@ -6,13 +6,7 @@
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
 //
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2004 Universitaet Karlsruhe, Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
 package de.uka.ilkd.key.rule.metaconstruct;
 
 import java.util.ArrayList;
@@ -22,13 +16,14 @@ import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
 import de.uka.ilkd.key.java.expression.operator.New;
+import de.uka.ilkd.key.java.recoderext.AreaAllocationMethodBuilder;
 import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
+import de.uka.ilkd.key.java.reference.MethodReference;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.op.ProgramMethod;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.ProgramElementName;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.Debug;
@@ -121,16 +116,23 @@ public class ConstructorCall extends ProgramMetaConstruct {
 	Debug.assertTrue(method != null, "Call to non-existent constructor.");
     
 	final MethodBodyStatement mbs = new MethodBodyStatement(method, newObject, null, 
-               new ImmutableArray<Expression>(argumentVariables)); 
-    
-	//   the assignment statements + the method body statement
-	final Statement[] stmnts = new Statement[evaluatedArgs.size() + 1];
-    
+               new ImmutableArray<Expression>(argumentVariables), constructorReference.getScope()); 
+	
+        //   the assignment statements + the method body statement + <allocateArea> for memory areas  
+        Statement[] stmnts;
+	if(classType == services.getJavaInfo().getKeYJavaType("javax.realtime.PhysicalMemoryArea")){
+	    stmnts = new Statement[evaluatedArgs.size() + 2];
+	    stmnts[stmnts.length-2] = new MethodReference(new ImmutableArray<Expression>(argumentVariables[0]),
+	            new ProgramElementName(AreaAllocationMethodBuilder.IMPLICIT_AREA_ALLOCATE), 
+	            constructorReference.getTypeReference());
+	}else{
+            stmnts = new Statement[evaluatedArgs.size() + 1];	    
+	}
+	stmnts[stmnts.length-1] = mbs; 
+	
 	for (int i = 0, sz=evaluatedArgs.size(); i<sz; i++) {
 	    stmnts[i] = evaluatedArgs.get(i);
 	}
-	
-	stmnts[stmnts.length-1] = mbs;
     
 	return new StatementBlock(stmnts);
     	

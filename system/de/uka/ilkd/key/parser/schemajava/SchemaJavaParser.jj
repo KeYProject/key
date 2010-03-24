@@ -177,6 +177,7 @@ public class SchemaJavaParser {
     private static boolean isLeftHandSide(Sort s) {
 	return  s == ProgramSVSort.VARIABLE ||
 	    s == ProgramSVSort.STATICVARIABLE ||
+	    s == ProgramSVSort.LOCALVARIABLE ||
 	    s == ProgramSVSort.IMPLICITVARIABLE ||
 	    s == ProgramSVSort.EXPLICITVARIABLE ||
 	    s == ProgramSVSort.LEFTHANDSIDE  ||
@@ -378,6 +379,9 @@ public class SchemaJavaParser {
     
 	/** valid iff <tt>type</tt> is <tt>ARGUMENTS</tt> */
 	ASTList<Expression> args = null;
+	
+	/** valid iff <tt>type</tt> is <tt>ARGUMENTS</tt> */
+	Identifier            scope  = null;
         
         /** valid iff <tt>type</tt> is <tt>IDENTIFIER</tt> and 
          *  it is an explicit generic method invocation
@@ -412,6 +416,7 @@ public class SchemaJavaParser {
 	static final int QUALIFIED_NAME   =  6;
 	/** production was <pre>"@(" Expression ")"</pre> */
 	static final int PASSIVE_EXPR =  7;    
+//	static final int CURRENT_MEMORY_AREA = 8; 
     
 	/** indicates the type of the result */
 	int           type    = UNDEFINED;
@@ -577,6 +582,7 @@ TOKEN :
 		    | < TYPEOF: "#typeof" >
 		    | < SWITCHTOIF: "#switch-to-if" >
 		    | < UNPACK: "#unpack" >
+//		    | < CURRENTMEMORYAREA: "<currentMemoryArea>" >
 		    | < SET: "#set" >
 		    }
 
@@ -2016,11 +2022,15 @@ ExecutionContext ExecutionContext() :
     ExecutionContext ctxt = null;
     TypeSVWrapper tr = null;
     ExpressionSVWrapper instance = null;
+    ExpressionSVWrapper memoryArea = null;
+    ExpressionSVWrapper callerScope = null;
+    ExpressionSVWrapper constructedScope = null;
 }
 {
-    tr = TypeSV() "(" (instance = ExpressionSV())? ")" 
+    tr = TypeSV() "(" ( memoryArea = ExpressionSV() ("," callerScope = ExpressionSV()  ("," constructedScope = ExpressionSV() 
+    	(","  instance = ExpressionSV())?)?)?)? ")"  
     {
-	return new ExecutionContext(tr, instance);
+	return new ExecutionContext(tr, memoryArea, instance, callerScope, constructedScope);
     } 
 } 
 
@@ -3018,25 +3028,25 @@ Expression PrimaryExpression() :
 	    // method call -determine the kind of method
 	    if (tmpResult instanceof UncollatedReferenceQualifier) {
 		// this is a normal method call
-		tmpResult = factory.createMethodReference
+		tmpResult = factory.createMethodReferenceWrapper
 		    (((UncollatedReferenceQualifier)tmpResult).getReferencePrefix(),
 		     ((UncollatedReferenceQualifier)tmpResult).getIdentifier(),
-               suffix.args, ((UncollatedReferenceQualifier)tmpResult).getTypeArguments());
+               suffix.args, ((UncollatedReferenceQualifier)tmpResult).getTypeArguments(), suffix.scope);
               
 		setPrefixInfo(tmpResult);
 	    } else if (tmpResult instanceof MethodReference &&
 		       ((MethodReference)tmpResult).getIdentifier()
 		       instanceof ProgramVariableSVWrapper) {
 			   // this is a method call with svidentifier
-			   tmpResult = factory.createMethodReference
+			   tmpResult = factory.createMethodReferenceWrapper
 			   (((MethodReference)tmpResult).getReferencePrefix(),
-			    ((MethodReference)tmpResult).getIdentifier(), suffix.args);
+			    ((MethodReference)tmpResult).getIdentifier(), suffix.args, suffix.scope);
 		       } else if (ProgramSVSort.METHODNAME.
 		       		getClass().isInstance(((SortedSchemaVariable)
 				   ((SVWrapper)tmpResult).getSV()).sort())) {
 				       // this is a method call with svidentifier
-				       tmpResult = factory.createMethodReference
-				       (null, new LabelSVWrapper(((SVWrapper)tmpResult).getSV()), suffix.args);
+				       tmpResult = factory.createMethodReferenceWrapper
+				       (null, new LabelSVWrapper(((SVWrapper)tmpResult).getSV()), suffix.args, suffix.scope);
 				   } else {
 				       throw new ParseException("Arguments without method name?");
 				   }
@@ -3094,6 +3104,11 @@ PrimaryPrefixReturnValue PrimaryPrefix() :
     {
 	prefix.type = PrimaryPrefixReturnValue.THIS;      
     }
+/*    |
+    "<currentMemoryArea>"
+    {
+        prefix.type = PrimaryPrefixReturnValue.CURRENT_MEMORY_AREA;   
+    }*/
       | 
       LOOKAHEAD(3) lit = Literal()
 	{
@@ -3183,6 +3198,7 @@ PrimarySuffixReturnValue PrimarySuffix() :
     Expression               expr;
     ASTList<Expression>    args;
     Identifier               id;
+    Identifier               scope;
     ASTList<TypeArgumentDeclaration> typeArgs;
     Literal                  lit;
 }
@@ -3244,9 +3260,10 @@ PrimarySuffixReturnValue PrimarySuffix() :
 	 }
 	)
      |
-     args = Arguments()
-	{
-	    suffix.type = PrimarySuffixReturnValue.ARGUMENTS;
+     args = Arguments() {suffix.scope=null;} 
+     [LOOKAHEAD(2)  "@"  <SVIDENTIFIER>  {suffix.scope = factory.getProgramVariableSV(token.image);}] 
+ 	{
+            suffix.type = PrimarySuffixReturnValue.ARGUMENTS;
 	    suffix.args = args;
 	}
      )
@@ -3673,22 +3690,24 @@ StatementBlock StartBlock() :
     StatementBlock result = null;
     ASTList<Statement> sl = new ASTArrayList<Statement>();
     Statement stat;
-    ExecCtxtSVWrapper ec = null;
+    ExecutionContext ec = null;
     TypeSVWrapper tr = null;
-    ExpressionSVWrapper sv = null;
+    ExpressionSVWrapper sv = null, sv1 = null;
 }
 { 
    "{" (   LOOKAHEAD(2)
            ( <DOT> ( LOOKAHEAD(2) 
-		     tr = TypeSV() "(" (sv = ExpressionSV())? ")" |  
+		//     tr = TypeSV() "(" (sv = ExpressionSV() (","
+		//			sv1 = ExpressionSV())?)? ")" |  
+		     ec = ExecutionContext()  |
 	             ec = ExecutionContextSV() ))? 
             <CONTEXTSTART> 
             {
-              if (tr == null) {
+//              if (tr == null) {
                  result = factory.createContextStatementBlock(ec);
-	      } else { 
-                 result = factory.createContextStatementBlock(tr, sv);
-	      }
+//	      } else { 
+//                 result = factory.createContextStatementBlock(tr, sv, sv1);
+//	      }
               setPrefixInfo(result);
             }        
            (stat = BlockStatement() { sl.add(stat); } )*
@@ -4253,6 +4272,24 @@ RKeYMetaConstruct KeYMetaConstructStatement() :
 		  return result;
 	      }
 	   ) 
+	  |
+	  (
+	   "#expand-method-body-perc" "(" stat = Statement()
+	      {
+		  result = factory.createRKeYMetaConstruct();
+		  setPrefixInfo(result);
+		  result.setChild(stat);
+		  result.setName("#expand-method-body-perc");
+	      }
+	      ("," sv = VariableSV()
+	      {
+	      	result.addSV(sv);
+	      }
+	      )*   ")" ";" 
+	      {
+	      	return result;
+	      }
+	   ) 	   
 	  |  
 	  (
 	   "#constructor-call" "("	

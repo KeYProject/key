@@ -5,6 +5,8 @@
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
+//
+//
 package de.uka.ilkd.key.util.keydoc.html;
 
 import java.io.DataInputStream;

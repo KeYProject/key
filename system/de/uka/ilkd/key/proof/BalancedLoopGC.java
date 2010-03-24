@@ -7,8 +7,6 @@
 // See LICENSE.TXT for details.
 package de.uka.ilkd.key.proof;
 
-import java.util.Iterator;
-
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.rule.Taclet;

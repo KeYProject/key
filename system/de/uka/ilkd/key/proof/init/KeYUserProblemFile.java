@@ -198,7 +198,11 @@ public class KeYUserProblemFile extends KeYFile implements ProofOblInput{
                     || td.getTypeDeclarationAt(i) instanceof ClassDeclaration) {
                 result = result.append(td.getTypeDeclarationAt(i));
                 result = result.append(getInnerClasses(td.getTypeDeclarationAt(i)));
-            }
+            result = result.append(ji.getKeYJavaType("javax.realtime.MemoryStack")
+                    .getJavaType());    
+            result = result.append(ji.getKeYJavaType("javax.realtime.ScopedMemory")
+                    .getJavaType()); 
+            }      
     }*/
 
 

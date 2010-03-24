@@ -102,13 +102,20 @@ public class MethodBodyStatement extends JavaNonTerminalProgramElement
         checkOnlyProgramVarsAsArguments(methodReference.getArguments());
     }    
 
-
+    public MethodBodyStatement(ProgramMethod method, 
+            ReferencePrefix newContext, 
+            IProgramVariable res, 
+            ImmutableArray<Expression> args,
+            boolean useSpecification){
+        this(method, newContext, res, args, useSpecification, null);
+    }
 
     public MethodBodyStatement(ProgramMethod method, 
                                ReferencePrefix newContext, 
                                IProgramVariable res, 
                                ImmutableArray<Expression> args,
-                               boolean useSpecification) {
+                               boolean useSpecification,
+                               ProgramElement scope) {
         this.method = method;
         this.bodySource = 
             new TypeRef(method.getContainerType());
@@ -127,7 +134,7 @@ public class MethodBodyStatement extends JavaNonTerminalProgramElement
         checkOnlyProgramVarsAsArguments(args);
         this.methodReference = new MethodReference(args, 
                                                    method.getProgramElementName(), 
-                                                   newContext);
+                                                   newContext, scope);
 
     }
 
@@ -149,6 +156,14 @@ public class MethodBodyStatement extends JavaNonTerminalProgramElement
             IProgramVariable res, 
             ImmutableArray<Expression> args) {
         this(method, newContext, res, args, false);
+    }
+    
+    public MethodBodyStatement(ProgramMethod method, 
+            ReferencePrefix newContext, 
+            IProgramVariable res, 
+            ImmutableArray<Expression> args,
+            ProgramElement scope) {
+        this(method, newContext, res, args, false, scope);
     }
     
     /**

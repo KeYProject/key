@@ -14,6 +14,7 @@ package de.uka.ilkd.key.java.declaration;
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.Method;
+import de.uka.ilkd.key.java.declaration.modifier.AnnotationUseSpecification;
 import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.java.reference.TypeReferenceContainer;
 import de.uka.ilkd.key.java.visitor.Visitor;
@@ -39,7 +40,7 @@ public class MethodDeclaration
      */
 
     protected final TypeReference returnType;
-
+    
     /**
  *      Name.
      */
@@ -95,8 +96,7 @@ public class MethodDeclaration
 	this.parentIsInterfaceDeclaration=parentIsInterfaceDeclaration;
     }
 
-
-
+    
     /**
      * Method declaration.
      * @param modifiers a modifier array
@@ -118,7 +118,7 @@ public class MethodDeclaration
 	     new ImmutableArray<ParameterDeclaration>(parameters),
 	     exceptions, body, parentIsInterfaceDeclaration);
     }
-
+    
     /**
      * Method declaration.
      * @param modifiers a modifier array
@@ -348,6 +348,29 @@ public class MethodDeclaration
 
     public boolean isFinal() {
         return super.isFinal();
+    }
+    
+    public boolean isAnnotatedWith(String s) {
+        for (int i = modArray.size() - 1; i >= 0; i -= 1) {
+            Modifier m = modArray.get(i);
+            if (m instanceof AnnotationUseSpecification &&
+                    ((AnnotationUseSpecification)m).getText().equals(s)) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    public boolean externallyConstructedScope(){
+        return isAnnotatedWith("@ExternallyConstructedScope");
+    }
+    
+    public boolean noLocalScope(){
+        return isAnnotatedWith("@NoLocalScope");
+    }
+    
+    public boolean callerAllocatedResult(){
+        return isAnnotatedWith("@CallerAllocatedResult");
     }
 
     /**

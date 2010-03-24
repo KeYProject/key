@@ -10,7 +10,6 @@
 
 package de.uka.ilkd.key.gui;
 
-import java.awt.*;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
@@ -19,9 +18,11 @@ import java.awt.dnd.DropTargetAdapter;
 import java.awt.dnd.DropTargetDropEvent;
 import java.awt.dnd.DropTargetListener;
 import java.awt.event.*;
+import java.awt.*;
 import java.io.*;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -33,20 +34,19 @@ import javax.swing.text.JTextComponent;
 
 import org.apache.log4j.Logger;
 
+import de.uka.ilkd.key.gui.assistant.*;
 import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.gui.DecisionProcedureSettings.RuleDescriptor;
-import de.uka.ilkd.key.gui.assistant.ProofAssistant;
-import de.uka.ilkd.key.gui.assistant.ProofAssistantAI;
-import de.uka.ilkd.key.gui.assistant.ProofAssistantController;
 import de.uka.ilkd.key.gui.configuration.*;
 import de.uka.ilkd.key.gui.nodeviews.NonGoalInfoView;
 import de.uka.ilkd.key.gui.nodeviews.SequentView;
 import de.uka.ilkd.key.gui.notification.NotificationManager;
-import de.uka.ilkd.key.gui.notification.events.ExitKeYEvent;
-import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
-import de.uka.ilkd.key.gui.notification.events.GeneralInformationEvent;
-import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
+import de.uka.ilkd.key.gui.notification.events.*;
 import de.uka.ilkd.key.gui.prooftree.ProofTreeView;
+import de.uka.ilkd.key.gui.smt.DecisionProcedureSettings;
+import de.uka.ilkd.key.gui.smt.DecissionProcedureSettingsDialog;
+import de.uka.ilkd.key.gui.smt.RuleLauncher;
+import de.uka.ilkd.key.gui.smt.SMTResultsAndBugDetectionDialog;
+import de.uka.ilkd.key.gui.smt.TacletTranslationSettingsDialog;
 import de.uka.ilkd.key.java.NonTerminalProgramElement;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Statement;
@@ -57,11 +57,9 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.pp.*;
 import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.init.*;
-import de.uka.ilkd.key.proof.mgt.BasicTask;
-import de.uka.ilkd.key.proof.mgt.NonInterferenceCheck;
-import de.uka.ilkd.key.proof.mgt.TaskTreeNode;
+import de.uka.ilkd.key.proof.mgt.*;
 import de.uka.ilkd.key.proof.reuse.ReusePoint;
-import de.uka.ilkd.key.smt.DecProcRunner;
+import de.uka.ilkd.key.smt.SMTRule;
 import de.uka.ilkd.key.strategy.VBTStrategy;
 import de.uka.ilkd.key.unittest.UnitTestBuilder;
 import de.uka.ilkd.key.unittest.UnitTestBuilderGUIInterface;
@@ -72,7 +70,7 @@ import de.uka.ilkd.key.util.ProgressMonitor;
 
 
 public class Main extends JFrame implements IMain {
-
+   
     public static final String INTERNAL_VERSION = 
 	KeYResourceManager.getManager().getSHA1();
 
@@ -204,9 +202,6 @@ public class Main extends JFrame implements IMain {
     private JPopupMenu reusePopup = new JPopupMenu();
 
     
-    /** undo the last proof step on the currently selected branch */
-    private UndoLastStep undoAction = new UndoLastStep();
-
     /** external prover GUI elements */
     private DPSettingsListener dpSettingsListener;
     private JSlider ruletimeout;
@@ -230,14 +225,15 @@ public class Main extends JFrame implements IMain {
     private Action createUnitTestAction = null;
     
     
-    protected static Main instance = null;    
+    public static Main instance = null;    
+   
     
     private ProverTaskListener taskListener;
     
     private NotificationManager notificationManager;
 
     /** The radio items shown in the decproc menu for the different available solver */
-    private final ArrayList<JRadioButtonMenuItem> showndecProcRadioItems = new ArrayList<JRadioButtonMenuItem>();
+    private ButtonGroup  decProcRadioItems = new ButtonGroup();
     
     /** The menu for the decproc options */
     public final JMenu decProcOptions = new JMenu("Decision Procedures");
@@ -284,6 +280,7 @@ public class Main extends JFrame implements IMain {
         }
     }
     
+       
     
     /**
      * returns an instance of Main and creates one if necessary
@@ -505,8 +502,7 @@ public class Main extends JFrame implements IMain {
         toolBar.addSeparator();
         
         final JButton goalBackButton = new JButton();
-        undoAction.init();
-        goalBackButton.setAction(undoAction);
+        goalBackButton.setAction(new UndoLastStep(false));        
         
         toolBar.add(goalBackButton);
         toolBar.addSeparator();
@@ -542,6 +538,8 @@ public class Main extends JFrame implements IMain {
         toolBar.addSeparator();
         
         JToolBar fileOperations = new JToolBar("File Operations");
+        fileOperations.setRollover(true);
+        
         fileOperations.add(createOpenFile());
         fileOperations.add(createOpenMostRecentFile());
         fileOperations.add(createSaveFile());
@@ -600,8 +598,10 @@ public class Main extends JFrame implements IMain {
         tabbedPane.addTab("Rules", null, new JScrollPane(ruleView), "All available rules");
         tabbedPane.setSelectedIndex(0);
         tabbedPane.setPreferredSize(new java.awt.Dimension(250, 440));
-        tabbedPane.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).getParent().remove(KeyStroke.getKeyStroke(KeyEvent.VK_UP, ActionEvent.CTRL_MASK));
-        tabbedPane.getInputMap(JComponent.WHEN_FOCUSED).getParent().remove(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, ActionEvent.CTRL_MASK));
+        tabbedPane.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).getParent().
+        	remove(KeyStroke.getKeyStroke(KeyEvent.VK_UP, ActionEvent.CTRL_MASK));
+        tabbedPane.getInputMap(JComponent.WHEN_FOCUSED).getParent().
+        	remove(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, ActionEvent.CTRL_MASK));
         
         proofListView.setPreferredSize(new java.awt.Dimension(250, 100));
         paintEmptyViewComponent(proofListView, "Tasks");
@@ -679,7 +679,7 @@ public class Main extends JFrame implements IMain {
 
     private JButton createDecisionProcedureButton() {	
 	decisionProcedureInvocationButton = new JButton();	
-	RuleDescriptor r = ProofSettings.DEFAULT_SETTINGS.getDecisionProcedureSettings().getActiveRule();
+	SMTRule r = ProofSettings.DEFAULT_SETTINGS.getDecisionProcedureSettings().getActiveSMTRule();
 	decisionProcedureInvocationButton.setAction(new DPInvokeAction(r));
 	return decisionProcedureInvocationButton;
     }
@@ -698,7 +698,7 @@ public class Main extends JFrame implements IMain {
         
         
         goalView.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW ).put(
-                KeyStroke.getKeyStroke(KeyEvent.VK_Z, ActionEvent.CTRL_MASK), 
+                KeyStroke.getKeyStroke(KeyEvent.VK_P, ActionEvent.CTRL_MASK), 
         "show_tree");
         goalView.getActionMap().put("show_tree", new AbstractAction() {
             
@@ -751,7 +751,7 @@ public class Main extends JFrame implements IMain {
     
     private JComponent createOpenMostRecentFile() {
         final JButton button = new JButton();
-        button.setAction(new OpenMostRecentFile());
+        button.setAction(new OpenMostRecentFile(""));
         return button;
     }
     
@@ -1217,14 +1217,16 @@ public class Main extends JFrame implements IMain {
         JMenu fileMenu = new JMenu("File");
         fileMenu.setMnemonic(KeyEvent.VK_F);
         
+        
         JMenuItem load = new JMenuItem();
         load.setAction(openFileAction);
         
         JMenuItem save = new JMenuItem();
         save.setAction(saveFileAction);
         
-        registerAtMenu(fileMenu, load);
+        registerAtMenu(fileMenu, load);                
         registerAtMenu(fileMenu, save);
+                
         
         JMenuItem tacletPOItem = new JMenuItem("Load Non-Axiom Lemma ...");
         tacletPOItem.addActionListener(new ActionListener() {
@@ -1245,6 +1247,9 @@ public class Main extends JFrame implements IMain {
         });
         
         addSeparator(fileMenu);
+        
+        JMenuItem loadLastOpened = new JMenuItem(new OpenMostRecentFile("Reload"));
+        registerAtMenu(fileMenu, loadLastOpened);
         
         recentFiles = new RecentFileMenu(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -1270,7 +1275,8 @@ public class Main extends JFrame implements IMain {
                 Config.DEFAULT.smaller();
             }
         });
-        smaller.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, InputEvent.CTRL_DOWN_MASK));
+        smaller.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 
+        	Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         
         final JMenuItem larger = new JMenuItem("Larger");
         larger.addActionListener(new ActionListener() {
@@ -1278,7 +1284,8 @@ public class Main extends JFrame implements IMain {
                 Config.DEFAULT.larger();
             }
         });
-        larger.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_UP, InputEvent.CTRL_DOWN_MASK));
+        larger.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_UP, 
+        	Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         
         Config.DEFAULT.addConfigChangeListener(new ConfigChangeListener() {
             public void configChanged(ConfigChangeEvent e) {
@@ -1315,8 +1322,7 @@ public class Main extends JFrame implements IMain {
 	
 	final JMenuItem tacletOptionsView = new JMenuItem(TACLET_OPTIONS_MENU_STRING);
 
-	tacletOptionsView.setAccelerator(KeyStroke.getKeyStroke
-			    (KeyEvent.VK_M, ActionEvent.CTRL_MASK));
+	tacletOptionsView.setMnemonic(KeyEvent.VK_M);
 	tacletOptionsView.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
 		    selectMaxTooltipLines();
@@ -1328,21 +1334,25 @@ public class Main extends JFrame implements IMain {
 	registerAtMenu(view, tacletOptionsView);
         
         
-        return view;
+        return view; 
     }
+        
     
     protected JMenu createProofMenu() {
         JMenu proof = new JMenu("Proof");
         proof.setMnemonic(KeyEvent.VK_P);
-        JMenuItem close = new JMenuItem("Abandon Task");
-        close.setAccelerator(KeyStroke.getKeyStroke
-                (KeyEvent.VK_W, ActionEvent.CTRL_MASK));
-        close.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                closeTask();
-            }});
-        registerAtMenu(proof, close);	
         
+	JMenuItem runStrategy = new JMenuItem(autoModeAction);
+	registerAtMenu(proof, runStrategy);
+
+	JMenuItem undo = new JMenuItem(new UndoLastStep(true));
+	registerAtMenu(proof, undo);
+
+	JMenuItem close = new JMenuItem(new AbandonTask());
+	registerAtMenu(proof, close);	
+        
+	addSeparator(proof);
+	
         JMenuItem choiceItem = new JMenuItem("Show Active Taclet Options");
         choiceItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -1412,8 +1422,7 @@ public class Main extends JFrame implements IMain {
 	
 	// default taclet options
 	JMenuItem choiceItem = new JMenuItem("Default Taclet Options...");
-	choiceItem.setAccelerator(KeyStroke.getKeyStroke
-			    (KeyEvent.VK_T, ActionEvent.CTRL_MASK));
+	choiceItem.setMnemonic(KeyEvent.VK_T);
 
 	choiceItem.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
@@ -1423,8 +1432,7 @@ public class Main extends JFrame implements IMain {
 
 	// update simplifier
 	JMenuItem updateSimplifierItem = new JMenuItem("Update Simplifier...");
-	updateSimplifierItem.setAccelerator(KeyStroke.getKeyStroke
-			    (KeyEvent.VK_U, ActionEvent.CTRL_MASK));
+	updateSimplifierItem.setMnemonic(KeyEvent.VK_U);
 
 	updateSimplifierItem.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
@@ -1556,30 +1564,55 @@ public class Main extends JFrame implements IMain {
 //	 the button group which takes care of selecting and unselecting not 
         // activated entries
         //final ButtonGroup dpButtonGroup = new ButtonGroup();
-	for (JRadioButtonMenuItem rbm : showndecProcRadioItems)
+	/*for (JRadioButtonMenuItem rbm : showndecProcRadioItems)
 	    decProcOptions.remove(rbm);
+	*/
+	//showndecProcRadioItems.removeAll(showndecProcRadioItems);
 	
-	showndecProcRadioItems.removeAll(showndecProcRadioItems);
+
+	Enumeration<AbstractButton> en = decProcRadioItems.getElements();
+	while(en.hasMoreElements()){
+	    decProcOptions.remove(en.nextElement());
+	    
+	}
+
+	
+	decProcRadioItems =  new ButtonGroup();
+	
 	
 	final DecisionProcedureSettings dps = ProofSettings.DEFAULT_SETTINGS.getDecisionProcedureSettings();
 	
 	int targetIndex = 0;
-	for (RuleDescriptor r : dps.getAvailableRules()) {
+	for(SMTRule rule : dps.getInstalledRules()){
+	    
+	    final JRadioButtonMenuItem b = new JRadioButtonMenuItem();
+	    decProcRadioItems.add(b);
+	    b.setAction(new DPSelectionAction(rule, b));
+	    decProcOptions.add(b, targetIndex);
+	    
+	    targetIndex++;
+	    
+	}
+	/*for (RuleDescriptor r : dps.getAvailableRules()) {
 	    final JRadioButtonMenuItem b = new JRadioButtonMenuItem();
 	    b.setAction(new DPSelectionAction(r, b, showndecProcRadioItems));
 	    decProcOptions.add(b, targetIndex);
 	    targetIndex++;
 	    showndecProcRadioItems.add(b);
 	    //dpButtonGroup.add(b);
-	}
+	}*/
     }
     
     JCheckBoxMenuItem showSMTResDialog;
     JCheckBoxMenuItem saveSMTFile;
     private JCheckBoxMenuItem waitForAllProvers;
+    private JCheckBoxMenuItem saveTacletTranslation;
+    private JCheckBoxMenuItem useTaclets;
+    private JMenuItem showTacletTranslationSettings;
     /**@see {@link de.uka.ilkd.key.smt.SmtLibTranslatorWeaker} */
     JCheckBoxMenuItem weakerSMTTranslation;
 
+    
     
     /**
      * creates a menu allowing to choose the external prover to be used
@@ -1682,14 +1715,37 @@ public class Main extends JFrame implements IMain {
 	decProcOptions.add(saveSMTFile);
 	
 	// add a checkbox for setting the 'waitForAllProvers'-Option
-	waitForAllProvers = new JCheckBoxMenuItem("Wait for all provers");
+	/*waitForAllProvers = new JCheckBoxMenuItem("Wait for all provers");
 	waitForAllProvers.setSelected(dps.isWaitingForAllProvers());
 	waitForAllProvers.addActionListener(new ActionListener() {
 		   public void actionPerformed(ActionEvent e) {
 		       dps.setWaitForAllProvers(waitForAllProvers.isSelected());
 		   }
 		});
-	decProcOptions.add(waitForAllProvers);
+	decProcOptions.add(waitForAllProvers);*/
+	
+
+	
+	showTacletTranslationSettings = new JMenuItem("settings for taclet translation");
+	showTacletTranslationSettings.addActionListener(new ActionListener() {
+		   public void actionPerformed(ActionEvent e) {
+		       if(mediator.getSelectedProof()!=null){
+			    ProofSettings.DEFAULT_SETTINGS.getTacletTranslationSettings().
+			    initTacletMap(mediator.getSelectedProof().env().getInitConfig().getTaclets());  
+		       }
+		
+		       TacletTranslationSettingsDialog.showDialog();
+		       
+		       
+		   }
+		});
+	decProcOptions.add(showTacletTranslationSettings);
+	
+	
+	
+	
+	
+
 	
 	weakerSMTTranslation = new JCheckBoxMenuItem("Weaken Typesystem Translation");
 	weakerSMTTranslation.setSelected(dps.weakenSMTTranslation);
@@ -1790,8 +1846,6 @@ public class Main extends JFrame implements IMain {
 	getJMenuBar().add(tools);
 
 	JMenuItem extractSpecification = new JMenuItem("Extract Specification");
-	extractSpecification.setAccelerator(KeyStroke.getKeyStroke
-			    (KeyEvent.VK_E, ActionEvent.CTRL_MASK));
 
 	extractSpecification.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
@@ -1814,8 +1868,8 @@ public class Main extends JFrame implements IMain {
 	JMenuItem specificationBrowser = 
 	    new JMenuItem("Proof Obligation Browser...");
 	specificationBrowser.setAccelerator(KeyStroke.getKeyStroke
-					    (KeyEvent.VK_B, 
-					     ActionEvent.CTRL_MASK));
+		(KeyEvent.VK_B, 
+			Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 	specificationBrowser.addActionListener(new ActionListener() {
 	    public void actionPerformed(ActionEvent e) {
     	        showPOBrowser();
@@ -1847,7 +1901,7 @@ public class Main extends JFrame implements IMain {
         
         createWrapper.setAccelerator(KeyStroke.getKeyStroke
                 (KeyEvent.VK_J, 
-                 ActionEvent.CTRL_MASK));
+                	Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 
         createWrapper.setEnabled(mediator.getProof() != null);
 
@@ -2137,7 +2191,7 @@ public class Main extends JFrame implements IMain {
 	
 	public void update() {	   
 	    if (settings != null) {
-		RuleDescriptor activeRule = settings.getActiveRule();				
+		SMTRule activeRule = settings.getActiveSMTRule();				
 		decisionProcedureInvocationButton.
 				
 		setAction(new DPInvokeAction(activeRule));
@@ -2170,9 +2224,14 @@ public class Main extends JFrame implements IMain {
      */
     private final class OpenMostRecentFile extends AbstractAction {
         
-        public OpenMostRecentFile() {
+        public OpenMostRecentFile(String itemName) {
+            if (itemName.length() > 0) {
+        	putValue(NAME, itemName);
+            }
             putValue(SMALL_ICON, IconFactory.openMostRecent(TOOLBAR_ICON_SIZE));
             putValue(SHORT_DESCRIPTION, "Load last opened file.");
+            putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_R, 
+        	    Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         }
         
         public void actionPerformed(ActionEvent e) {
@@ -2193,7 +2252,8 @@ public class Main extends JFrame implements IMain {
             putValue(NAME, "Load ...");
             putValue(SMALL_ICON, IconFactory.openKeYFile(TOOLBAR_ICON_SIZE));
             putValue(SHORT_DESCRIPTION, "Browse and load problem or proof files.");
-            putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_O, ActionEvent.CTRL_MASK));
+            putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_O, 
+        	    Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
             
         }
         
@@ -2218,7 +2278,8 @@ public class Main extends JFrame implements IMain {
             putValue(NAME, "Save ...");
             putValue(SMALL_ICON, IconFactory.saveFile(TOOLBAR_ICON_SIZE));
             putValue(SHORT_DESCRIPTION, "Save current proof.");
-            putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_S, ActionEvent.CTRL_MASK));
+            putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_S,  
+        	    Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
             
             setEnabled(mediator.getProof() != null);
             
@@ -2635,6 +2696,11 @@ public class Main extends JFrame implements IMain {
         }
     }
     
+    public ProofSettings getSettings(){
+        if(mediator.getProof() == null) return ProofSettings.DEFAULT_SETTINGS;
+        return mediator.getProof().getSettings();
+    }
+    
     public static void evaluateOptions(String[] opt) {
 	int index = 0;
 	ProofSettings.DEFAULT_SETTINGS.setProfile(new JavaProfile());
@@ -2655,12 +2721,25 @@ public class Main extends JFrame implements IMain {
 		    GeneralSettings.disableSpecs = true;
 		} else if (opt[index].equals("AUTO")) {
 		    batchMode = true;
-                    setVisibleMode(false);
-		} else if (opt[index].equals("DEPTHFIRST")) {		
-		    	System.out.println("DepthFirst GoalChooser ...");
-			Profile p = ProofSettings.DEFAULT_SETTINGS.getProfile();
-			p.setSelectedGoalChooserBuilder(DepthFirstGoalChooserBuilder.NAME);  
-			VBTStrategy.preferedGoalChooser = DepthFirstGoalChooserBuilder.NAME; 
+                    visible = false;
+		} else if (opt[index].equals("RTSJ")) {
+		    boolean memory = false;
+		    System.out.println("RTSJ extensions enabled ...");
+		    if (index + 1 < opt.length && 
+			opt[index + 1].toUpperCase().equals("MEMORY")) {
+			memory = true;
+			System.out.println("Memory consumption calculus enabled ...");
+			index++;
+		    }
+		    ProofSettings.DEFAULT_SETTINGS.setProfile(new RTSJProfile(memory));
+		} else if (opt[index].equals("PERC")) {
+                    ProofSettings.DEFAULT_SETTINGS.setProfile(new PercProfile());
+                    System.out.println("PERC Pico extensions enabled");
+                } else if (opt[index].equals("DEPTHFIRST")) {		
+		    System.out.println("DepthFirst GoalChooser ...");
+		    Profile p = ProofSettings.DEFAULT_SETTINGS.getProfile();
+		    p.setSelectedGoalChooserBuilder(DepthFirstGoalChooserBuilder.NAME);  
+		    VBTStrategy.preferedGoalChooser = DepthFirstGoalChooserBuilder.NAME; 
 		} else if (opt[index].equals("TESTING") || opt[index].equals("UNIT") || opt[index].equals("UNIT2")) {
 		    int mode=-1;
 		    if(opt[index].equals("TESTING")){
@@ -2670,60 +2749,60 @@ public class Main extends JFrame implements IMain {
 		    } else if(opt[index].equals("UNIT2")){
 			mode=3;
 		    }
-                    if(mode==1){
-                        testStandalone = true;
-                        setVisibleMode(false);//Problem:Mixed semantics
-                    }
-                    if(mode==1||mode==2){
-                	System.out.println("VBT optimizations enabled ...");
-                    }else{
-                	System.out.println("VBT 2 optimizations enabled ...");
-                    }
+		    if(mode==1){
+			testStandalone = true;
+			setVisibleMode(false);//Problem:Mixed semantics
+		    }
+		    if(mode==1||mode==2){
+			System.out.println("VBT optimizations enabled ...");
+		    }else{
+			System.out.println("VBT 2 optimizations enabled ...");
+		    }
                     
-                    //Parameters of JavaTestGenerationProfile
-                    boolean loop=false;
-                    int loopBound=-1;
-                    
-                    if (index + 1 < opt.length){
-                        if(opt[index + 1].equalsIgnoreCase("loop")) {
-                        loop=true;
-                        System.out.println("Balanced loop unwinding ...");
-                        index ++;
-                        }
-                    }
-                    if (index + 1 < opt.length){
-                        if(opt[index + 1].equalsIgnoreCase("loop0"))loopBound=0;
-                        else if(opt[index + 1].equalsIgnoreCase("loop1"))loopBound=1;
-                        else if(opt[index + 1].equalsIgnoreCase("loop2"))loopBound=2;
-                        else if(opt[index + 1].equalsIgnoreCase("loop3"))loopBound=3;
-                        else if(opt[index + 1].equalsIgnoreCase("loop4"))loopBound=4;
-                        if(loopBound>=0)System.out.println("Bounded loop unwinding. Unwinding bound:"+loopBound);
-                        index++;
-                    }
-                    if(mode==1||mode==2){
-                	ProofSettings.DEFAULT_SETTINGS.setProfile(
-                	    new JavaTestGenerationProfile(null,loop,loopBound));
-                    } else if(mode==3){
-                	ProofSettings.DEFAULT_SETTINGS.setProfile(
-                    	    new JavaTestGenerationProfile2(null,loop,loopBound));                	
-                    }
-                    testMode = true;
+		    //Parameters of JavaTestGenerationProfile
+		    boolean loop=false;
+		    int loopBound=-1;
+		    
+		    if (index + 1 < opt.length){
+			if(opt[index + 1].equalsIgnoreCase("loop")) {
+			    loop=true;
+			    System.out.println("Balanced loop unwinding ...");
+			    index ++;
+			}
+		    }
+		    if (index + 1 < opt.length){
+			if(opt[index + 1].equalsIgnoreCase("loop0"))loopBound=0;
+			else if(opt[index + 1].equalsIgnoreCase("loop1"))loopBound=1;
+			else if(opt[index + 1].equalsIgnoreCase("loop2"))loopBound=2;
+			else if(opt[index + 1].equalsIgnoreCase("loop3"))loopBound=3;
+			else if(opt[index + 1].equalsIgnoreCase("loop4"))loopBound=4;
+			if(loopBound>=0)System.out.println("Bounded loop unwinding. Unwinding bound:"+loopBound);
+			index++;
+		    }
+		    if(mode==1||mode==2){
+			ProofSettings.DEFAULT_SETTINGS.setProfile(
+								  new JavaTestGenerationProfile(null,loop,loopBound));
+		    } else if(mode==3){
+			ProofSettings.DEFAULT_SETTINGS.setProfile(
+								  new JavaTestGenerationProfile2(null,loop,loopBound));                	
+		    }
+		    testMode = true;
                     
 		} else if (opt[index].equals("DEBUGGER")) {                                     
-                    System.out.println("Symbolic Execution Debugger Mode enabled ...");                                        
-                    final Profile p = new DebuggerProfile(null);                    
-                    if (index + 1 < opt.length && 
-                            opt[index + 1].equals("LOOP")) {
-                        p.setSelectedGoalChooserBuilder(BalancedGoalChooserBuilder.NAME);
-                        //System.out.println("Balanced loop unwinding ...");
-                        index ++;
-                    }
-                    ProofSettings.DEFAULT_SETTINGS.setProfile(p);                    
-                    testMode = true;
-                }                                                 
-                else if (opt[index].equals("FOL")) {                     
-                   ProofSettings.DEFAULT_SETTINGS.setProfile(new PureFOLProfile());
-                } else if (opt[index].equals("TIMEOUT")) {
+		    System.out.println("Symbolic Execution Debugger Mode enabled ...");                                        
+		    final Profile p = new DebuggerProfile(null);                    
+		    if (index + 1 < opt.length && 
+			opt[index + 1].equals("LOOP")) {
+			p.setSelectedGoalChooserBuilder(BalancedGoalChooserBuilder.NAME);
+			//System.out.println("Balanced loop unwinding ...");
+			index ++;
+		    }
+		    ProofSettings.DEFAULT_SETTINGS.setProfile(p);                    
+		    testMode = true;
+		}                                                 
+		else if (opt[index].equals("FOL")) {                     
+		    ProofSettings.DEFAULT_SETTINGS.setProfile(new PureFOLProfile());
+		} else if (opt[index].equals("TIMEOUT")) {
                     long timeout = -1;
                     try {
                         timeout = Long.parseLong(opt[index + 1]);
@@ -2737,11 +2816,11 @@ public class Main extends JFrame implements IMain {
                     }
                     index++;                   
                     ProofSettings.DEFAULT_SETTINGS.getStrategySettings().setTimeout(timeout);
-        } else if (opt[index].equals("PRINT_STATISTICS")) {                     
-            if ( !( opt.length > index + 1 ) ) printUsageAndExit ();
-            statisticsFile = opt[index + 1];
-            ++index;
-        } else {
+		} else if (opt[index].equals("PRINT_STATISTICS")) {                     
+		    if ( !( opt.length > index + 1 ) ) printUsageAndExit ();
+		    statisticsFile = opt[index + 1];
+		    ++index;
+		} else {
 		    printUsageAndExit ();
 		}		
 	    }
@@ -2777,6 +2856,8 @@ public class Main extends JFrame implements IMain {
 	System.out.println("  depthfirst      : constructs the proof tree in a depth first manner. Recommended for large proofs");
         System.out.println("  auto	          : start prove procedure after initialisation");
         System.out.println("  testing         : starts the prover with a simple test generation oriented user interface");
+	System.out.println(" rtsj [memory] : enables rtsj extensions (optional argument memory for enabling extensions for reasoning over memory consumption)");
+	//	System.out.println(" perc : enables PERC Pico extensions");
         System.out.println("  print_statistics <filename>" );
         System.out.println("                  : in auto mode, output nr. of rule applications and time spent");
         System.out.println("  fol             : use FOL profile (no program or update rules)");
@@ -2946,8 +3027,16 @@ public class Main extends JFrame implements IMain {
      */
     private final class UndoLastStep extends AbstractAction {
 
-        public UndoLastStep() {            
-            setBackMode();         
+	private boolean longName = false;
+	
+	/**
+	 * creates an undo action
+	 * @param longName a boolean true iff the long name should be shown (e.g. in MenuItems)
+	 */
+        public UndoLastStep(boolean longName) {            
+            this.longName = longName;
+            init();
+            setBackMode();
         }
 
         /** 
@@ -3006,10 +3095,24 @@ public class Main extends JFrame implements IMain {
         }
         
         private void setBackMode() {
-            putValue(NAME, "Goal Back");
+            String appliedRule = "";
+
+            if (longName && mediator != null) {
+        	final Node nd = mediator.getSelectedNode();
+            
+        	if (nd != null && nd.parent() != null 
+        		&&  nd.parent().getAppliedRuleApp() != null) {
+        	    appliedRule = 
+        		" (" + nd.parent().getAppliedRuleApp().rule().displayName() + ")";
+        	}
+            }
+            putValue(NAME, "Goal Back" + appliedRule );
+            
             putValue(SMALL_ICON, 
                     IconFactory.goalBackLogo(TOOLBAR_ICON_SIZE));
             putValue(SHORT_DESCRIPTION, "Undo the last rule application.");
+            putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_Z,
+        	    Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         }
 
         private void pruneMode() {
@@ -3017,6 +3120,9 @@ public class Main extends JFrame implements IMain {
             putValue(SMALL_ICON, IconFactory.goalBackLogo(TOOLBAR_ICON_SIZE));
             putValue(SHORT_DESCRIPTION, 
                     "Prune the tree below the selected node.");
+            putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_Z,
+        	    Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+
         }
         
         public void actionPerformed(ActionEvent e) {            
@@ -3074,18 +3180,19 @@ public class Main extends JFrame implements IMain {
      */
     private final class DPInvokeAction extends AbstractAction {
 
-	private final RuleDescriptor decisionProcedure;
+	private final SMTRule decisionProcedure;
 	
-	public DPInvokeAction(RuleDescriptor decisionProcedure) {
+	public DPInvokeAction(SMTRule decisionProcedure) {
 	    assert decisionProcedure != null;
 	    this.decisionProcedure = decisionProcedure;
+	
 
-	    putValue(SMALL_ICON, IconFactory.simplifyLogo(TOOLBAR_ICON_SIZE));	    
+	   // putValue(SMALL_ICON, IconFactory.simplifyLogo(TOOLBAR_ICON_SIZE));	    
 	  
-	    putValue(NAME, decisionProcedure.getDisplayName());
+	    putValue(NAME, decisionProcedure.displayName());
 		
-	    if (!DecisionProcedureSettings.NOT_A_RULE.equals(decisionProcedure)) {
-		putValue(SHORT_DESCRIPTION, "Invokes " + decisionProcedure.getDisplayName());
+	    if (decisionProcedure != SMTRule.EMPTY_RULE) {
+		putValue(SHORT_DESCRIPTION, "Invokes " + decisionProcedure.displayName());
 	    } else {		
 		putValue(SHORT_DESCRIPTION, "Please select an external prover under Options | Decision Procedures.");
 	    }
@@ -3093,15 +3200,14 @@ public class Main extends JFrame implements IMain {
 	}
 	
 	public boolean isEnabled() {
-	    return super.isEnabled() && !decisionProcedure.equals(DecisionProcedureSettings.NOT_A_RULE) && 
+	    return super.isEnabled() && decisionProcedure != SMTRule.EMPTY_RULE && 
  	      mediator != null && mediator.getProof() != null && !mediator.getProof().closed();
 	}
 	  
 	public void actionPerformed(ActionEvent e) {
 	    if (!mediator.ensureProofLoaded()) return;
 	    final Proof proof = mediator.getProof();
-	    new DecProcRunner(Main.this, proof, 
-			proof.getUserConstraint().getConstraint()).start();
+	    RuleLauncher.INSTANCE.start(decisionProcedure, proof,proof.getUserConstraint().getConstraint(),true);
 	}	
     }
     
@@ -3111,18 +3217,17 @@ public class Main extends JFrame implements IMain {
      * updates the decision procedure settings of the current proof settings. 
      */
     private final class DPSelectionAction extends AbstractAction {
-	private final RuleDescriptor decisionProcedure;
+	private final SMTRule decisionProcedure;
 	// currently necessary as property SELECTED_KEY support first since JDK >= 1.6
 	private final JRadioButtonMenuItem radioButton;
-	private final ArrayList<JRadioButtonMenuItem> allRadios;
+	
 
-	public DPSelectionAction(RuleDescriptor decisionProcedure, JRadioButtonMenuItem radioButton
-		, ArrayList<JRadioButtonMenuItem> allbutt) {	    
+	public DPSelectionAction(SMTRule decisionProcedure, JRadioButtonMenuItem radioButton) {	    
 	    this.decisionProcedure = decisionProcedure;
 	    this.radioButton = radioButton;  
-	    this.allRadios = allbutt;
 	    
-	    final RuleDescriptor activeRule = getCurrentDPSettings().getActiveRule();
+	    
+	    final SMTRule activeRule = getCurrentDPSettings().getActiveSMTRule();
 	    
 	    if (activeRule.equals(decisionProcedure)) {
 		radioButton.setSelected(true);
@@ -3130,11 +3235,11 @@ public class Main extends JFrame implements IMain {
 		radioButton.setSelected(false);
 	    }
 
-	    putValue(SMALL_ICON, IconFactory.simplifyLogo(TOOLBAR_ICON_SIZE));	    
+	   
 
-	    putValue(NAME, decisionProcedure.getDisplayName());
-	    if (!decisionProcedure.equals(DecisionProcedureSettings.NOT_A_RULE)) {		
-		putValue(SHORT_DESCRIPTION, "Use '" + decisionProcedure.getDisplayName() + "' as external prover.");
+	    putValue(NAME, decisionProcedure.displayName());
+	    if (decisionProcedure != SMTRule.EMPTY_RULE) {		
+		putValue(SHORT_DESCRIPTION, "Use '" + decisionProcedure.displayName() + "' as external prover.");
 	    } else {
 		putValue(SHORT_DESCRIPTION, "Do not use any external prover.");
 	    }
@@ -3146,12 +3251,9 @@ public class Main extends JFrame implements IMain {
 	}
 	
 	public void actionPerformed(ActionEvent e) {
-	    getCurrentDPSettings().setActiveRule(decisionProcedure.getRuleName());
-	    //set all radiobutton as unselected. so in the end, only one is selected.
-	    for (JRadioButtonMenuItem rbmi : allRadios) {
-		rbmi.setSelected(false);
-	    }
-	    radioButton.setSelected(true); // if we change to Java 6 delete radioButton and add here putValue(SELECTED_KEY, true)
+	    
+	    getCurrentDPSettings().setActiveSMTRule(decisionProcedure);
+
 	}
 
 	private DecisionProcedureSettings getCurrentDPSettings() {
@@ -3165,6 +3267,38 @@ public class Main extends JFrame implements IMain {
 	}
     }
     
+    
+    private final class AbandonTask extends AbstractAction  {
+	
+	public AbandonTask() {
+	    putValue(NAME, "Abandon Task");
+	    putValue(ACCELERATOR_KEY, KeyStroke.
+		    getKeyStroke(KeyEvent.VK_W, 
+			    Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+	    
+	    setEnabled(mediator.getProof() != null);
+            
+            mediator.addKeYSelectionListener(new KeYSelectionListener() {
+                /** focused node has changed */
+                public void selectedNodeChanged(KeYSelectionEvent e) {
+                }
+                
+                /**
+                 * the selected proof has changed. Enable or disable action depending whether a proof is
+                 * available or not
+                 */ 
+                public void selectedProofChanged(KeYSelectionEvent e) {
+                    setEnabled(e.getSource().getSelectedProof() != null);
+                }
+            });
+	}
+			      
+	public void actionPerformed(ActionEvent e) {
+	    closeTask();
+	}
+
+    }
+
   
     private final class AutoModeAction extends AbstractAction {
         
@@ -3206,10 +3340,14 @@ public class Main extends JFrame implements IMain {
             setEnabled(associatedProof != null && !associatedProof.closed());            
         }
         
-        public AutoModeAction() {
+        public AutoModeAction() {            
             putValue("hideActionText", Boolean.TRUE);
+            putValue(Action.NAME, "Start");
             putValue(Action.SHORT_DESCRIPTION, AUTO_MODE_TEXT);
             putValue(Action.SMALL_ICON, startLogo);
+            putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_E,
+        	    Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+            
             
             associatedProof = mediator.getProof();        
             
@@ -3251,6 +3389,7 @@ public class Main extends JFrame implements IMain {
                     if (associatedProof != null) {
                         associatedProof.removeProofTreeListener(ptl);                        
                     }
+                    putValue(Action.NAME, "Stop");
                     putValue(Action.SMALL_ICON, stopLogo);
                 }
                 
@@ -3263,6 +3402,7 @@ public class Main extends JFrame implements IMain {
                             !associatedProof.containsProofTreeListener(ptl) ) {
                         associatedProof.addProofTreeListener(ptl);
                     }
+                    putValue(Action.NAME, "Start");
                     putValue(Action.SMALL_ICON, startLogo);
                 }
                 
@@ -3349,7 +3489,7 @@ public class Main extends JFrame implements IMain {
             setLocation(70, 70);
             addWindowListener(new UnitTestGeneratorGuiListener());
             pack();     
-            Dimension d = getSize();
+            java.awt.Dimension d = getSize();
             d.setSize(400, (int) d.getHeight()+3);
             setSize(d);
             setVisible(true);
@@ -3436,8 +3576,8 @@ public class Main extends JFrame implements IMain {
             JMenuItem specificationBrowser = 
                 new JMenuItem("Proof Obligation Browser...");
             specificationBrowser.setAccelerator(KeyStroke.getKeyStroke
-                                                (KeyEvent.VK_B, 
-                                                ActionEvent.CTRL_MASK));
+        	    (KeyEvent.VK_B, 
+        		    Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
             specificationBrowser.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     main.showPOBrowser();
@@ -3490,8 +3630,7 @@ public class Main extends JFrame implements IMain {
             JMenu options = new JMenu("Options");
             options.setMnemonic(KeyEvent.VK_O);
             JMenuItem choiceItem = new JMenuItem("Taclet options defaults");
-            choiceItem.setAccelerator(KeyStroke.getKeyStroke
-                    (KeyEvent.VK_T, ActionEvent.CTRL_MASK));
+            choiceItem.setMnemonic(KeyEvent.VK_T);
 
             choiceItem.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {

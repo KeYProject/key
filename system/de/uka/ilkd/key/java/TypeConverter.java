@@ -232,7 +232,7 @@ public class TypeConverter extends TermBuilder {
 	    Debug.out("typeconverter: no data type model "+
 		      "available to convert:", op, op.getClass());		
 	    throw new IllegalArgumentException("TypeConverter could not handle"
-					       +" this");
+					       +" this: "+op);
 	}
 	return func(responsibleLDT.getFunctionFor(op, services, ec), subs);
     }
@@ -265,7 +265,9 @@ public class TypeConverter extends TermBuilder {
 	        return findThisForSortExact(kjt.getSort(), ec);
 	    }
 	    return convertToLogicElement(ec.getRuntimeInstance());
-	} else {            
+	} /*else if (prefix instanceof CurrentMemoryAreaReference) {   
+            return convertToLogicElement(ec.getMemoryArea());
+        } */else {            
 	    Debug.out("typeconverter: WARNING: unknown reference prefix:", 
 		      prefix, prefix == null ? null : prefix.getClass());
 	    throw new IllegalArgumentException("TypeConverter failed to convert "
@@ -305,7 +307,16 @@ public class TypeConverter extends TermBuilder {
 	Debug.out("TypeConverter: FieldReference: ",fr);
 	final ReferencePrefix prefix = fr.getReferencePrefix();
 	final ProgramVariable var = fr.getProgramVariable();
-	if (var.isStatic()) {
+	if("javax.realtime.MemoryArea::currentMemoryArea".
+	               equals(fr.getName().toString())){
+	    return convertToLogicElement(ec.getMemoryArea());
+	}else if("javax.realtime.MemoryArea::callerScope".
+                       equals(fr.getName().toString())){
+            return convertToLogicElement(ec.getCallerMemoryArea());
+        }else if("javax.realtime.MemoryArea::constructedScope".
+                       equals(fr.getName().toString())){
+            return convertToLogicElement(ec.getConstructedMemoryArea());
+        }else if (var.isStatic()) {
 	    return var(var);
 	} else if (prefix == null) {
 	    if (var.isMember()) {
@@ -392,7 +403,9 @@ public class TypeConverter extends TermBuilder {
 	    }
 	} else if (pe instanceof ThisReference) {
 	    return convertReferencePrefix((ThisReference)pe, ec);
-	} else if (pe instanceof ParenthesizedExpression) {
+	} /*else if (pe instanceof CurrentMemoryAreaReference) {   
+            return convertToLogicElement(ec.getMemoryArea());
+        } */else if (pe instanceof ParenthesizedExpression) {
             return convertToLogicElement
                 (((ParenthesizedExpression)pe).getChildAt(0), ec);
         } else if (pe instanceof Instanceof) {
@@ -593,7 +606,11 @@ public class TypeConverter extends TermBuilder {
 	    return services.getJavaInfo().getKeYJavaType(t.sort());
 	}
         
-        KeYJavaType result = services.getJavaInfo().getKeYJavaType(t.sort());        
+        KeYJavaType result = services.getJavaInfo().getKeYJavaType(t.sort());  
+        if (result == null) {
+            //HACK
+            result = services.getJavaInfo().getKeYJavaType(t.sort().toString()); 
+        }
         if (result == null) {
            result = getKeYJavaType(convertToProgramElement(t));
         }

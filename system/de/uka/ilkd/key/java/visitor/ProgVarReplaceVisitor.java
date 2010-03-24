@@ -154,7 +154,6 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
 	    doDefaultAction(pv);
 	}
     }
-
     
     private Term replaceVariablesInTerm(Term t){  
      	if(t==null) return null;
@@ -294,6 +293,27 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
                                                     atPreFunctions, 
                                                     services));
         
+        //working spaces
+        Term newWorkingSpaceLocal
+            = replaceVariablesInTerm(inv.getWorkingSpace(selfTerm, 
+                                                    atPreFunctions, 
+                                                    services));
+        
+        Term newParametrizedWS
+            = replaceVariablesInTerm(inv.getParametrizedWorkingSpaceTerms(selfTerm, 
+                    atPreFunctions, 
+                    services));
+        
+        Term newWorkingSpaceConstructed
+            = replaceVariablesInTerm(inv.getWorkingSpaceConstructed(selfTerm, 
+                    atPreFunctions, 
+                    services));
+        
+        Term newWorkingSpaceReentrant
+            = replaceVariablesInTerm(inv.getWorkingSpaceReentrant(selfTerm, 
+                    atPreFunctions, 
+                    services));
+        
         Term newSelfTerm = replaceVariablesInTerm(selfTerm); 
         Map newAtPreFunctions = replaceVariablesInMap(atPreFunctions);
         boolean newPredicateHeuristicsAllowed
@@ -305,6 +325,10 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
                                     new LoopPredicateSet(newPredicates),
                                     new LocationDescriptorSet(newModifies), 
                                     newVariant, 
+                                    newParametrizedWS,
+                                    newWorkingSpaceLocal,
+                                    newWorkingSpaceConstructed,
+                                    newWorkingSpaceReentrant,
                                     newSelfTerm,
                                     newAtPreFunctions,
                                     newPredicateHeuristicsAllowed);

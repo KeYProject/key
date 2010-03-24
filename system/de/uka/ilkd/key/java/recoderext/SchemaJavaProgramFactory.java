@@ -25,13 +25,10 @@ import recoder.convenience.TreeWalker;
 import recoder.java.*;
 import recoder.java.SourceElement.Position;
 import recoder.java.declaration.*;
-import recoder.java.reference.MethodReference;
-import recoder.java.reference.ReferencePrefix;
-import recoder.java.reference.TypeReference;
-import recoder.list.generic.*;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Named;
-import de.uka.ilkd.key.logic.Namespace;
+import recoder.java.reference.*;
+import recoder.list.generic.ASTArrayList;
+import recoder.list.generic.ASTList;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.SortedSchemaVariable;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
@@ -100,11 +97,31 @@ public class SchemaJavaProgramFactory extends JavaProgramFactory {
     }
 
     public ContextStatementBlock createContextStatementBlock(TypeSVWrapper typeRef,
-							     ExpressionSVWrapper var) {
-	return new ContextStatementBlock(typeRef, var);
+            ExpressionSVWrapper memoryArea,
+            ExpressionSVWrapper runtime,
+            ExpressionSVWrapper callerMemoryArea,
+            ExpressionSVWrapper constructedMemoryArea) {
+	return new ContextStatementBlock(typeRef, memoryArea, runtime, callerMemoryArea, constructedMemoryArea);
+    }
+    
+    public MethodReferenceWrapper createMethodReferenceWrapper(ReferencePrefix accessPath, 
+            Identifier name, ASTList<Expression> args, 
+            ASTList<TypeArgumentDeclaration> typeArgs, Identifier scope){
+        return new MethodReferenceWrapper(accessPath, name, args, typeArgs, scope);
+    }
+    
+    public MethodReferenceWrapper createMethodReferenceWrapper(ReferencePrefix accessPath, 
+            Identifier name, ASTList<Expression> args, Identifier scope){
+        return new MethodReferenceWrapper(accessPath, name, args, scope);
+    }
+    
+    public ContextStatementBlock createContextStatementBlock(TypeSVWrapper typeRef,
+            ExpressionSVWrapper memoryArea,
+            ExpressionSVWrapper runtime) {
+        return new ContextStatementBlock(typeRef, memoryArea, runtime, null, null);
     }
 
-    public ContextStatementBlock createContextStatementBlock(ExecCtxtSVWrapper ec) {
+    public ContextStatementBlock createContextStatementBlock(ExecutionContext ec) {
 	return new ContextStatementBlock(ec);
     }
 

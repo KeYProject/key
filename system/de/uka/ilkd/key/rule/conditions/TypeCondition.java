@@ -78,5 +78,19 @@ public class TypeCondition extends VariableConditionAdapter {
         }               
         return (isReference ? "" : "\\not" ) + prefix + "( " + resolver + " )";            
     }
+    
+    /** 
+     * @return returns value of <code>isReference</code>.
+     */
+    public boolean getIsReference() {return isReference;}
+    
+    /** 
+     * @return returns value of <code>nonNull</code>.
+     */
+    public boolean getNonNull() {return nonNull;}
+    /**
+     * @return returns value of <code>resolver</code>.
+     */
+    public TypeResolver getTypeResolver() {return resolver;}
 
 }

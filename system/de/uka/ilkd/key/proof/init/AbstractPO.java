@@ -3,7 +3,7 @@
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License.
+// The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
 //
 //
@@ -150,6 +150,26 @@ public abstract class AbstractPO implements ProofOblInput {
         					 excVar,
                                                  atPreFunctions,
         					 services);
+        axioms.putAll(fwa.getAxioms());
+        return fwa.getFormula();
+    }
+    
+    /**
+     * Translates a postcondition out of an operation contract. 
+     */
+    protected Term translateWorkingSpacePost(OperationContract contract,
+                                 ParsableVariable selfVar,
+                                 ImmutableList<ParsableVariable> paramVars,
+                                 ParsableVariable resultVar,
+                                 ParsableVariable excVar,
+                                 /*inout*/ Map<Operator, Function/*(atPre)*/> atPreFunctions) 
+                throws ProofInputException {
+        FormulaWithAxioms fwa = contract.getWorkingSpacePost(selfVar, 
+                                                 paramVars, 
+                                                 resultVar, 
+                                                 excVar, 
+                                                 atPreFunctions,
+                                                 services);
         axioms.putAll(fwa.getAxioms());
         return fwa.getFormula();
     }

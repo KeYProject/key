@@ -11,7 +11,6 @@
 package de.uka.ilkd.key.proof;
 
 import java.util.HashMap;
-import java.util.Iterator;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;

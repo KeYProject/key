@@ -5,6 +5,8 @@
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
+//
+//
 package de.uka.ilkd.key.rule.metaconstruct;
 
 import java.util.Iterator;

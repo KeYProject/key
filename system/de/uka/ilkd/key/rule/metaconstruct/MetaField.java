@@ -14,6 +14,7 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.AbstractMetaOperator;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
+import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
@@ -65,5 +66,9 @@ public abstract class MetaField extends AbstractMetaOperator {
     /** calculates the resulting term. */
     public abstract Term calculate(Term term, SVInstantiations svInst,
 			  Services services);
+    
+    public Sort sort() {        
+        return METASORT;
+    }
 
 }

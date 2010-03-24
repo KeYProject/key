@@ -34,6 +34,18 @@ public class ExecutionContext
      */
     private ReferencePrefix runtimeInstance;
     
+    private ReferencePrefix memoryArea;
+    
+    /**
+     * PERC Pico specific: the memory area for creating the returned object in
+     */
+    protected ReferencePrefix callerMemoryArea;
+    
+    /**
+     * PERC Pico specific: the constructed memory area
+     */
+    protected ReferencePrefix constructedMemoryArea;
+
     protected ExecutionContext() {}
 
     /**
@@ -44,10 +56,29 @@ public class ExecutionContext
      * is currently active/executed
      */
     public ExecutionContext(TypeReference classContext, 
-			    ReferencePrefix runtimeInstance) {
+            ReferencePrefix memoryArea,
+            ReferencePrefix runtimeInstance,
+            ReferencePrefix callerMemoryArea,
+            ReferencePrefix constructedMemoryArea) {
 	this.classContext = classContext;
 	this.runtimeInstance  = runtimeInstance;
+	this.memoryArea = memoryArea;
+        this.callerMemoryArea = callerMemoryArea; 
+        this.constructedMemoryArea = constructedMemoryArea; 
 	makeParentRoleValid();
+    }
+    
+    /**
+     * creates an execution context reference
+     * @param classContext the TypeReference refering to the next enclosing
+     * class 
+     * @param runtimeInstance a ReferencePrefix to the object that
+     * is currently active/executed
+     */
+    public ExecutionContext(TypeReference classContext, 
+            ReferencePrefix memoryArea,
+            ReferencePrefix runtimeInstance) {
+        this(classContext, memoryArea, runtimeInstance, null, null);
     }
     
     /**
@@ -58,6 +89,9 @@ public class ExecutionContext
 	int count = 0;
 	if (runtimeInstance != null) count++;
 	if (classContext != null) count++;
+	if (memoryArea != null) count++;
+        if (constructedMemoryArea != null) count++;
+        if (callerMemoryArea != null) count++;
 	return count;
     }
 
@@ -74,11 +108,23 @@ public class ExecutionContext
 	    if (index == 0) return classContext;
 	    index--;
 	}
-	if (runtimeInstance != null) {
-	    if (index == 0) return runtimeInstance;
+	if (memoryArea != null) {
+	    if (index == 0) return memoryArea;
 	    index--;
 	}
-	throw new ArrayIndexOutOfBoundsException();
+        if (callerMemoryArea != null) {
+            if (index == 0) return callerMemoryArea;
+            index--;
+        }
+        if (constructedMemoryArea != null) {
+            if (index == 0) return constructedMemoryArea;
+            index--;
+        }
+        if (runtimeInstance != null) {
+            if (index == 0) return runtimeInstance;
+            index--;
+        }
+        throw new ArrayIndexOutOfBoundsException();
     }
 
     /**
@@ -91,8 +137,17 @@ public class ExecutionContext
 	    if (child == classContext) return 0;
 	}
 	if (runtimeInstance != null) {
-	    if (child == runtimeInstance) return (1 << 4 | 1);
+	    if (child == runtimeInstance) return (1 << 7 | 1);
 	}
+	if (memoryArea != null) {
+	    if (child == memoryArea) return (1 << 4 | 1);
+	}
+        if (callerMemoryArea != null) {
+            if (child == callerMemoryArea) return (1 << 5 | 1);
+        }
+        if (constructedMemoryArea != null) {
+            if (child == constructedMemoryArea) return (1 << 6 | 1);
+        }
 	return -1;
     }
 
@@ -100,7 +155,8 @@ public class ExecutionContext
     }
 
     public ExecutionContext deepClone() {
-	return new ExecutionContext(classContext, runtimeInstance);
+	return new ExecutionContext(classContext, memoryArea, runtimeInstance, 
+                callerMemoryArea, constructedMemoryArea);
     }
 
     public NonTerminalProgramElement getASTParent() {
@@ -117,7 +173,13 @@ public class ExecutionContext
 	    classContext = (TypeReference) newChild;
 	} else if (child == runtimeInstance) {
 	    runtimeInstance = (ReferencePrefix)newChild;
-	} else {
+	} else if (child == memoryArea) {
+            memoryArea = (ReferencePrefix)newChild;
+        } else if (child == callerMemoryArea) {
+            callerMemoryArea = (ReferencePrefix)newChild;
+        } else if (child == constructedMemoryArea) {
+            constructedMemoryArea = (ReferencePrefix)newChild;
+        } else {
 	    return false;
 	}
 	makeParentRoleValid();
@@ -134,6 +196,15 @@ public class ExecutionContext
         }
         if (runtimeInstance != null) {
             ((Expression)runtimeInstance).setExpressionContainer(this);
+        }
+        if (memoryArea != null) {
+            ((Expression)memoryArea).setExpressionContainer(this);
+        }
+        if (callerMemoryArea != null) {
+            ((Expression)callerMemoryArea).setExpressionContainer(this);
+        }
+        if (constructedMemoryArea != null) {
+            ((Expression) constructedMemoryArea).setExpressionContainer(this);
         }
     }
     
@@ -152,14 +223,32 @@ public class ExecutionContext
 
 
     public Expression getExpressionAt(int index) {
-	if (runtimeInstance != null && index == 0) {
-	    return (Expression) runtimeInstance;
-	}
+        if (memoryArea != null) {
+            if (index == 0) return (Expression) memoryArea;
+            index--;
+        }
+        if (runtimeInstance != null) {
+            if (index == 0) return (Expression) runtimeInstance;
+            index--;
+        }
+        if (callerMemoryArea != null) {
+            if (index == 0) return (Expression) callerMemoryArea;
+            index--;
+        }
+        if (constructedMemoryArea != null) {
+            if (index == 0) return (Expression) constructedMemoryArea;
+            index--;
+        }
 	throw new ArrayIndexOutOfBoundsException();
     }
 
     public int getExpressionCount() {
-	return runtimeInstance == null ? 0 : 1;    
+        int count = 0;
+        if (memoryArea != null) count++;
+        if (runtimeInstance != null) count++;
+        if (constructedMemoryArea != null) count++;
+        if (callerMemoryArea != null) count++;
+        return count;
     }
 
 
@@ -177,6 +266,18 @@ public class ExecutionContext
      */
     public ReferencePrefix getRuntimeInstance() {
 	return runtimeInstance;
+    }
+    
+    public ReferencePrefix getMemoryArea() {
+        return memoryArea;
+    }
+    
+    public ReferencePrefix getCallerMemoryArea() {
+        return callerMemoryArea;
+    }
+    
+    public ReferencePrefix getConstructedMemoryArea() {
+        return constructedMemoryArea;
     }
 
     public void prettyPrint(PrettyPrinter p) throws java.io.IOException {

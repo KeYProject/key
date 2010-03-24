@@ -58,6 +58,17 @@ public class ContextStatementBlock extends StatementBlock {
 	this.executionContext = executionContext;
     }
 
+    public ContextStatementBlock(Statement s, 
+               IExecutionContext executionContext) {
+        super(s);
+        this.executionContext = executionContext;
+    }
+    
+    public ContextStatementBlock(Statement[] body, 
+               IExecutionContext executionContext) {
+        super(body);
+        this.executionContext = executionContext;
+    }
 
     public boolean requiresExplicitExecutionContextMatch() {
 	return executionContext != null;

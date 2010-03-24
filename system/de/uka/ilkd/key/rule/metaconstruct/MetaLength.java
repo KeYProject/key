@@ -28,7 +28,7 @@ public class MetaLength extends MetaField {
     }
 
     /** calculates the resulting term. */
-    public Term calculate(Term term, SVInstantiations svInst, Services services) {	
+    public Term calculate(Term term, SVInstantiations svInst, Services services) {
         return termFactory.createAttributeTerm
 	    (services.getJavaInfo().getAttribute
 	     ("length", services.getJavaInfo().getKeYJavaType(term.sub(0).sort())),

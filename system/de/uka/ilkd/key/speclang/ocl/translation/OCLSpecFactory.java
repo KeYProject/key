@@ -5,29 +5,19 @@
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
-//This file is part of KeY - Integrated Deductive Software Design
-//Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
-//                      Universitaet Koblenz-Landau, Germany
-//                      Chalmers University of Technology, Sweden
-//
-//The KeY system is protected by the GNU General Public License. 
-//See LICENSE.TXT for details.
 //
 //
 
 package de.uka.ilkd.key.speclang.ocl.translation;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.logic.EverythingLocationDescriptor;
-import de.uka.ilkd.key.logic.LocationDescriptor;
-import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.speclang.*;
@@ -178,6 +168,28 @@ public class OCLSpecFactory {
                                                               paramVars);
         }
         
+        TermBuilder tb = TermBuilder.DF;
+        TermFactory tf = tb.tf();
+        
+        Term[] argTerms = new Term[programMethod.getParameterDeclarationCount()+(programMethod.isStatic() ? 0 : 1)];
+        int i=0;
+        if(!programMethod.isStatic()){
+                argTerms[0] = tb.var(selfVar);
+        }
+
+        for(; i<argTerms.length; i++){
+            argTerms[i] = tb.var((ProgramVariable) programMethod.getParameterDeclarationAt(i).
+                    getVariableSpecification().getProgramVariable());
+        }
+        
+        Term ws = tf.createWorkingSpaceNonRigidTerm(programMethod,
+            (Sort) services.getNamespaces().sorts().lookup(new Name("int")),
+            argTerms
+            );
+        services.getNamespaces().functions().add(ws.op());
+        
+        FormulaWithAxioms wsPost = new FormulaWithAxioms(tb.tt(), new HashMap<Operator, Term>());
+        
         //create contracts
         ImmutableSet<OperationContract> result = DefaultImmutableSet.<OperationContract>nil();
         String name1 = getContractName();
@@ -189,7 +201,12 @@ public class OCLSpecFactory {
                                          Modality.DIA,
                                          pre,
                                          post,
+                                         wsPost,
                                          modifies,
+                                         ws,
+                                         ws,
+                                         ws,
+                                         ws,
                                          selfVar,
                                          paramVars,
                                          resultVar,
@@ -202,7 +219,12 @@ public class OCLSpecFactory {
                                          Modality.BOX,
                                          pre,
                                          post,
+                                         wsPost,
                                          modifies,
+                                         ws,
+                                         ws,
+                                         ws,
+                                         ws,
                                          selfVar,
                                          paramVars,
                                          resultVar,

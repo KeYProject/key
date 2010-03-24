@@ -16,7 +16,7 @@ import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.visitor.Visitor;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.Operator;
 
@@ -36,6 +36,14 @@ public interface LoopInvariant {
      * Returns the invariant formula.
      */
     public Term getInvariant(Term selfTerm, 
+            Term memoryArea,
+            /*inout*/ Map<Operator, Function/* (atPre)*/> atPreFunctions,
+            Services services);
+    
+    /**
+     * Returns the invariant formula.
+     */
+    public Term getInvariant(Term selfTerm, 
             /*inout*/ Map<Operator, Function/* (atPre)*/> atPreFunctions,
             Services services);
     
@@ -50,6 +58,14 @@ public interface LoopInvariant {
      * Returns the modifier set.
      */
     public LocationDescriptorSet getModifies(
+            Term selfTerm,
+            Term memoryArea,
+            /*inout*/ Map <Operator, Function/* (atPre)*/> atPreFunctions,
+            Services services);
+    /**
+     * Returns the modifier set.
+     */
+    public LocationDescriptorSet getModifies(
             Term selfTerm, 
             /*inout*/ Map <Operator, Function/* (atPre)*/> atPreFunctions,
             Services services);
@@ -58,6 +74,31 @@ public interface LoopInvariant {
      * Returns the variant term. 
      */
     public Term getVariant(Term selfTerm, 
+            /*inout*/Map<Operator, Function/* (atPre)*/> atPreFunctions,
+            Services services);
+    
+    /**
+     * Returns the working space term (for the local scope). 
+     */
+    public Term getWorkingSpace(Term selfTerm, 
+            /*inout*/Map<Operator, Function/* (atPre)*/> atPreFunctions,
+            Services services);
+    
+    /**
+     * Returns the working space term for the constructed scope. 
+     */
+    public Term getWorkingSpaceConstructed(Term selfTerm, 
+            /*inout*/Map<Operator, Function/* (atPre)*/> atPreFunctions,
+            Services services);
+    
+    /**
+     * Returns the working space term for the reentrant scope. 
+     */
+    public Term getWorkingSpaceReentrant(Term selfTerm, 
+            /*inout*/Map<Operator, Function/* (atPre)*/> atPreFunctions,
+            Services services);
+    
+    public Term getParametrizedWorkingSpaceTerms(Term selfTerm, 
             /*inout*/Map<Operator, Function/* (atPre)*/> atPreFunctions,
             Services services);
     

@@ -21,13 +21,14 @@ import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 
+import de.uka.ilkd.key.gui.configuration.ProofSettings;
+import de.uka.ilkd.key.java.abstraction.*;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.proof.init.*;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
@@ -291,7 +292,14 @@ public class POBrowser extends JDialog {
 	if(specRepos.getOperationContracts(pm).size() > 0) {
 	    pos = pos.append("EnsuresPost");
 	}
-	
+
+        //RespectsWorkingSpace
+        if(specRepos.getOperationContracts(pm).size() > 0 && 
+                (ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof RTSJProfile && 
+                		((RTSJProfile) ProofSettings.DEFAULT_SETTINGS.getProfile()).memoryConsumption())) {
+            pos = pos.append("RespectsWorkingSpace");           
+        }
+        
 	//RespectsModifies
 	if(specRepos.getOperationContracts(pm).size() > 0) {
 	    pos = pos.append("RespectsModifies");	    
@@ -382,6 +390,9 @@ public class POBrowser extends JDialog {
         } else if (poString.equals("EnsuresPost")) {
             assert selectedEntry.pm != null;
             return createEnsuresPostPO(selectedEntry.pm);
+        } else if (poString.equals("RespectsWorkingSpace")) {
+            assert selectedEntry.pm != null;
+            return createRespectsWorkingSpacePO(selectedEntry.pm);
         } else if (poString.equals("RespectsModifies")) {
             assert selectedEntry.pm != null;
             return createRespectsModifiesPO(selectedEntry.pm);
@@ -484,6 +495,24 @@ public class POBrowser extends JDialog {
 	}
     }
     
+    private ProofOblInput createRespectsWorkingSpacePO(ProgramMethod pm) {
+        ContractConfigurator cc = new ContractConfigurator(this,
+                                                           services, 
+                                                           pm, 
+                                                           null, 
+                                                           true,
+							   false,
+                                                           true,
+                                                           false);
+        if(cc.wasSuccessful()) {
+            return new RespectsWorkingSpacePO(initConfig, 
+                                     cc.getContract(), 
+                                     cc.getAssumedInvs());
+        } else {
+            return null;
+        }
+    }
+    
     
     private ProofOblInput createRespectsModifiesPO(ProgramMethod pm) {
 	ContractConfigurator cc = new ContractConfigurator(this,
@@ -565,4 +594,5 @@ public class POBrowser extends JDialog {
         po = null; //to prevent memory leaks
         return result;
     }
+    
 }

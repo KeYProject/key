@@ -5,13 +5,6 @@
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General Public License.
-// See LICENSE.TXT for details.
 //
 //
 
@@ -28,7 +21,7 @@ import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
@@ -36,14 +29,12 @@ import de.uka.ilkd.key.logic.op.SortedSchemaVariable;
 import de.uka.ilkd.key.logic.sort.ArraySort;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.parser.*;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.rule.NewVarcond;
 import de.uka.ilkd.key.rule.TacletApp;
-import de.uka.ilkd.key.rule.inst.ContextInstantiationEntry;
-import de.uka.ilkd.key.rule.inst.IllegalInstantiationException;
-import de.uka.ilkd.key.rule.inst.RigidnessException;
-import de.uka.ilkd.key.rule.inst.SortException;
+import de.uka.ilkd.key.rule.inst.*;
 import de.uka.ilkd.key.util.Array;
 
 
@@ -372,14 +363,18 @@ public class TacletInstantiationsTableModel extends AbstractTableModel {
 	            final TypeConverter tc = services.getTypeConverter();
 		    final SchemaVariable peerSV=(SchemaVariable)o;
 		    final Object peerInst = app.instantiations().getInstantiation(peerSV);
-		    Expression peerInstExpr;
-		    if (peerInst instanceof Term) {
-			peerInstExpr=tc.convertToProgramElement((Term)peerInst);
-		    } else {
-			peerInstExpr=(Expression)peerInst;
-		    }
-		    kjt = tc.getKeYJavaType(peerInstExpr, app.instantiations().
-					    getContextInstantiation().activeStatementContext());
+                    if(peerInst instanceof TypeReference){
+                        kjt = ((TypeReference) peerInst).getKeYJavaType();
+                    }else{
+                        Expression peerInstExpr;
+                        if (peerInst instanceof Term) {
+                            peerInstExpr=tc.convertToProgramElement((Term)peerInst);
+                        } else{
+                            peerInstExpr=(Expression)peerInst;
+                        }
+                        kjt = tc.getKeYJavaType(peerInstExpr, app.instantiations().
+                                getContextInstantiation().activeStatementContext());
+                    }
 		    if(nvc.isDefinedByElementSort()){
 		        Sort s = kjt.getSort();
 			if(s instanceof ArraySort) s = ((ArraySort)s).elementSort();              

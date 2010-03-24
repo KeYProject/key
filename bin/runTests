@@ -117,10 +117,11 @@ else
 fi
 
 COMPLETEOPTIONS="$JAVA_OPTIONS $keysysprops \
--ea:de.uka.ilkd.key... -noverify -Djvm.dir=$JVM_DIR -Xms64m -Xmx512m \
+-ea:de.uka.ilkd.key... -noverify -Djvm.dir=$JVM_DIR -Xms64m -Xmx1024m \
 -Dkey.home=$KEY_HOME \
 -Dkey.pattern.path=$HOME/.key/keypatterns/ \
 -classpath $keyclasspath"
+
 
 $JAVA $COMPLETEOPTIONS junit.textui.TestRunner $testcase
 

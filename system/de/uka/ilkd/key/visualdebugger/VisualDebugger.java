@@ -5,6 +5,8 @@
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
+//
+//
 package de.uka.ilkd.key.visualdebugger;
 
 import java.io.File;
@@ -528,20 +530,19 @@ public class VisualDebugger {
     /**
      * Gets the array index.
      * 
-     * @param pio2
-     *                the pio2
+     * @param pio
+     *                the pio
      * 
      * @return the array index
      */
-    public ImmutableSet<Term> getArrayIndex(PosInOccurrence pio2) {
+    public ImmutableSet<Term> getArrayIndex(final PosInOccurrence pio) {
         ImmutableSet<Term> result = DefaultImmutableSet.<Term>nil();
-        PosInOccurrence pio = pio2;
-        if (pio.constrainedFormula().formula().op() instanceof QuanUpdateOperator) {
-            QuanUpdateOperator op = (QuanUpdateOperator) pio
-                    .constrainedFormula().formula().op();
+        final Operator op = pio.constrainedFormula().formula().op();
+	if (op instanceof QuanUpdateOperator) {
+            QuanUpdateOperator update = (QuanUpdateOperator) op;
             Term f = pio.constrainedFormula().formula();
-            for (int i = 0; i < op.locationCount(); i++) {
-                Term t = (op.location(f, i));
+            for (int i = 0; i < update.locationCount(); i++) {
+                Term t = update.location(f, i);
 
                 if (t.op() instanceof ArrayOp) {
                     result = result.add(t.sub(1));
@@ -561,15 +562,14 @@ public class VisualDebugger {
      * 
      * @return the array locations
      */
-    public ImmutableSet<Term> getArrayLocations(PosInOccurrence pio2) {
+    public ImmutableSet<Term> getArrayLocations(final PosInOccurrence pio) {
         ImmutableSet<Term> result = DefaultImmutableSet.<Term>nil();
-        PosInOccurrence pio = pio2;
-        if (pio.constrainedFormula().formula().op() instanceof QuanUpdateOperator) {
-            QuanUpdateOperator op = (QuanUpdateOperator) pio
-                    .constrainedFormula().formula().op();
+        final Operator op = pio.constrainedFormula().formula().op();
+	if (op instanceof QuanUpdateOperator) {
+            QuanUpdateOperator update = (QuanUpdateOperator) op;
             Term f = pio.constrainedFormula().formula();
-            for (int i = 0; i < op.locationCount(); i++) {
-                Term t = (op.location(f, i));
+            for (int i = 0; i < update.locationCount(); i++) {
+                Term t = update.location(f, i);
 
                 if (t.op() instanceof ArrayOp) {
                     result = result.add(t);
@@ -651,21 +651,20 @@ public class VisualDebugger {
     /**
      * Gets the locations.
      * 
-     * @param pio2
-     *                the pio2
+     * @param pio
+     *                the pio
      * 
      * @return the locations
      */
-    public ImmutableList<Term> getLocations(PosInOccurrence pio2) {
+    public ImmutableList<Term> getLocations(final PosInOccurrence pio) {
         ImmutableList<Term> result = ImmutableSLList.<Term>nil();
-        PosInOccurrence pio = pio2;
 
-        if (pio.constrainedFormula().formula().op() instanceof QuanUpdateOperator) {
-            QuanUpdateOperator op = (QuanUpdateOperator) pio
-                    .constrainedFormula().formula().op();
+        final Operator op = pio.constrainedFormula().formula().op();
+	if (op instanceof QuanUpdateOperator) {
+            QuanUpdateOperator update = (QuanUpdateOperator) op;
             Term f = pio.constrainedFormula().formula();
-            for (int i = 0; i < op.locationCount(); i++) {
-                Term t = op.location(f, i);
+            for (int i = 0; i < update.locationCount(); i++) {
+                Term t = update.location(f, i);
                 if (t.op() instanceof AttributeOp /*
                                                      * && !((ProgramVariable)
                                                      * ((AttributeOp)
@@ -1103,15 +1102,10 @@ public class VisualDebugger {
      * 
      * @return true, if is symbolic execution
      */
-    private boolean isSymbolicExecution(Taclet t) {
-        ImmutableList<RuleSet> list = t.getRuleSets();
-        RuleSet rs;
-        while (!list.isEmpty()) {
-            rs = list.head();
-            Name name = rs.name();
-            if (symbolicExecNames.contains(name))
+    public static boolean isSymbolicExecution(Taclet t) {
+        for (final RuleSet rs : t.getRuleSets()) {
+            if (symbolicExecNames.contains(rs.name()))
                 return true;
-            list = list.tail();
         }
         return false;
     }
@@ -1563,6 +1557,7 @@ public class VisualDebugger {
 
         setProofStrategy(proof, false, false, new LinkedList<WatchPoint>());
         ps.setUseDecisionProcedure(useDecisionProcedures);
+        
         ps.run(proofEnvironment);
 
         setProofStrategy(proof, true, false, new LinkedList<WatchPoint>());

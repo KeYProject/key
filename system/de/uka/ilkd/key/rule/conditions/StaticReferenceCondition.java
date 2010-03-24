@@ -60,8 +60,10 @@ public class StaticReferenceCondition extends VariableConditionAdapter {
 	    ProgramVariable attribute;
 	    if (subst instanceof FieldReference) {
 		attribute = ((FieldReference)subst).getProgramVariable();
-	    } else {
+	    } else if (subst instanceof ProgramVariable){
 		attribute = (ProgramVariable)subst;
+	    } else{
+	        return !negation;
 	    }
 	    return (negation ^ attribute.isStatic()) && 
 		!(attribute instanceof ProgramConstant);

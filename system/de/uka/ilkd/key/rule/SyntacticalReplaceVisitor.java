@@ -487,18 +487,20 @@ public class SyntacticalReplaceVisitor extends Visitor {
     
     private ImmutableArray<QuantifiableVariable>[] instantiateBoundVariables(Term visited) {
         boolean containsBoundVars = false;
+
         ImmutableArray<QuantifiableVariable>[] boundVars = 
             new ImmutableArray[visited.arity()];
 
         for (int i = 0, arity = visited.arity(); i < arity; i++) {
             final ImmutableArray<QuantifiableVariable> vBoundVars =
                 visited.varsBoundHere(i);
+           
         
             final QuantifiableVariable[] newVars = (vBoundVars.size() > 0)? 
                     new QuantifiableVariable[vBoundVars.size()]
                     : EMPTY_QUANTIFIABLE_VARS;
                     
-            for (int j = 0, size = vBoundVars.size(); j < size; j++) {                 
+            for (int j = 0, size = vBoundVars.size(); j < size; j++) {
                 containsBoundVars = true;
                 QuantifiableVariable boundVar = vBoundVars.get(j);
                 if (boundVar instanceof SchemaVariable) {

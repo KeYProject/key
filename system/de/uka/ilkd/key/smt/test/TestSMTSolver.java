@@ -12,21 +12,25 @@ package de.uka.ilkd.key.smt.test;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.LinkedList;
 
 import junit.framework.Assert;
-import junit.framework.TestCase;
+import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
+import de.uka.ilkd.key.smt.SMTRule;
 import de.uka.ilkd.key.smt.SMTSolver;
 import de.uka.ilkd.key.smt.SMTSolverResult;
-import de.uka.ilkd.key.util.HelperClassForTests;
 
-public abstract class TestSMTSolver extends TestCase {
+public abstract class TestSMTSolver extends TestCommons {
 
-    private SMTSolver solver;
+    private SMTRule rule;
+
     
-    private HelperClassForTests helper;
+
+    private static HashMap<String,ProofAggregate> proofs = new HashMap<String,ProofAggregate>();
    
     public static final String testFile = System.getProperty("key.home")
     + File.separator + "examples"
@@ -35,15 +39,29 @@ public abstract class TestSMTSolver extends TestCase {
     + File.separator;
 
     protected void setUp() {
-	solver = this.getSolver();
-	helper = new HelperClassForTests();
+	rule = this.getSolver();
+	for(SMTSolver solver : rule.getInstalledSolvers()){
+	    solver.useTaclets(false);    
+	}
+	
+	ProofSettings.DEFAULT_SETTINGS.getDecisionProcedureSettings().setSaveFile(false);
+
+	//System.gc();
     }
+    
+
+    @Override
+    protected void tearDown() throws Exception {
+
+	//System.gc();
+    }
+    
     
     /**
      * returns the solver that should be tested.
      * @return the solver to be tested.
      */
-    public abstract SMTSolver getSolver();
+    public abstract SMTRule getSolver();
 
     protected abstract boolean toolNotInstalledChecked();
 
@@ -56,7 +74,7 @@ public abstract class TestSMTSolver extends TestCase {
     
     private boolean toolNotInstalled() {
 	if (!toolNotInstalledChecked()) {    
-	    isinstalled = this.getSolver().isInstalled(false);
+	    isinstalled = this.getSolver().isUsable();
 	    setToolNotInstalledChecked(true);
 	}
 	
@@ -68,6 +86,7 @@ public abstract class TestSMTSolver extends TestCase {
     
     public void testAndnot() {
 	Assert.assertTrue(correctResult(testFile + "andnot.key", false));
+
     }
     
     public void testOrnot() {
@@ -163,29 +182,32 @@ public abstract class TestSMTSolver extends TestCase {
 	if (toolNotInstalled()) {
 	    return true;
 	}
-	
+
 	SMTSolverResult result;
-	
 	try {
 	    result = checkFile(filepath);
 	} catch (IOException e) {
-	    //System.out.println();
+
 	    //must not happen!!
 	    System.out.println("Warning: " + this.getSolver().name() 
                                + " produced error!!.");
-	    //System.out.println();
+	
 	    e.printStackTrace();
 	    //setToolNotInstalled(true);
 	    return true;
 	}
 	
+	//System.gc();
+	
 	//unknown is always allowed. But wrong answers are not allowed
-	if (isValid) {
+	if (isValid && result != null) {
 	    return result.isValid() != SMTSolverResult.ThreeValuedTruth.FALSIFIABLE; 
 	} else {
 	    return result.isValid() != SMTSolverResult.ThreeValuedTruth.TRUE;
 	}
     }
+    
+
     
     /**
      * check a problem file
@@ -193,13 +215,30 @@ public abstract class TestSMTSolver extends TestCase {
      * @return the resulttype of the external solver 
      */
     private SMTSolverResult checkFile(String filepath) throws IOException {
-	ProofAggregate p = helper.parse(new File(filepath));
+	ProofAggregate p;
+        
+  
+  
+       
+        if(!proofs.containsKey(filepath)){
+            File file =  new File(filepath);
+            p = parse(file);
+            proofs.put(filepath, p);
+        }else{
+            p = proofs.get(filepath);
+        }
+	
 	Assert.assertTrue(p.getProofs().length == 1);
 	Proof proof = p.getProofs()[0];	    
 	Assert.assertTrue(proof.openGoals().size() == 1);		
 	Goal g = proof.openGoals().iterator().next();
-	SMTSolverResult toReturn = solver.run(g, 20, proof.getServices());
-	return toReturn;
+
+	
+	rule.setMaxTime(2000);
+	rule.start(g, proof.getUserConstraint().getConstraint(),false);
+	LinkedList<SMTSolverResult> toReturn = rule.getResults();
+	
+	return toReturn.getFirst();
     }
     
 }

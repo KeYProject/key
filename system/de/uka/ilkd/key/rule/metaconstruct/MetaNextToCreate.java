@@ -38,7 +38,7 @@ public class MetaNextToCreate extends MetaField implements Location {
         final Term t = term.sub(0);
         
         final Sort s = t.sort();      
-          
+
         if (!(s instanceof ObjectSort)) {
             throw new RuntimeException("Wrong usage of meta operator " + this +
                     ". Sort of subterm is not an ObjectSort, but "+s);

@@ -13,8 +13,9 @@ import java.io.*;
 import java.net.URL;
 import java.util.Properties;
 
-import de.uka.ilkd.key.gui.DecisionProcedureSettings;
 import de.uka.ilkd.key.gui.GUIEvent;
+import de.uka.ilkd.key.gui.smt.DecisionProcedureSettings;
+import de.uka.ilkd.key.gui.smt.TacletTranslationSettings;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.util.Debug;
@@ -73,7 +74,8 @@ public class ProofSettings {
 	    new ChoiceSettings(),
 	    DecisionProcedureSettings.getInstance(),
 	    new ViewSettings(),
-            new LibrariesSettings()
+            new LibrariesSettings(),
+            TacletTranslationSettings.getInstance()
 	};
         for (Settings setting : settings) {
             setting.addSettingsListener(listener);
@@ -109,8 +111,8 @@ public class ProofSettings {
     
     public void setProfile(Profile profile) {
         this.profile = profile;
-        profile.updateSettings(this);
         ensureInitialized();
+        profile.updateSettings(this);
     }
 
     public Profile getProfile() {                
@@ -244,6 +246,11 @@ public class ProofSettings {
     public DecisionProcedureSettings getDecisionProcedureSettings() {
 	ensureInitialized();
 	return (DecisionProcedureSettings) settings[4];
+    }
+    
+    public TacletTranslationSettings getTacletTranslationSettings(){
+	ensureInitialized();
+	return (TacletTranslationSettings) settings[7];
     }
 
     public SimultaneousUpdateSimplifierSettings 

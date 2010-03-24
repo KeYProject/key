@@ -10,20 +10,18 @@
 
 package de.uka.ilkd.key.proof;
 
-import java.io.BufferedInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 
 import de.uka.ilkd.key.util.ProgressMonitor;
 
-public class CountingBufferedInputStream extends BufferedInputStream {
+public class CountingBufferedInputStream extends BufferedReader {
 
     private int chars;
     private int step=0;
     private ProgressMonitor monitor=ProgressMonitor.Empty.getInstance();
 
     public CountingBufferedInputStream(InputStream in) {
-	super(in);
+	super(new InputStreamReader(in));
 	chars = 0;
 	step  = 1;
     }
@@ -45,7 +43,7 @@ public class CountingBufferedInputStream extends BufferedInputStream {
     }
 
     public CountingBufferedInputStream(InputStream in, int size, int step) {
-	super(in, size);
+	super(new InputStreamReader(in), size);
 	this.step=(step == 0 ? 1 : step);
 	chars=0;
     }

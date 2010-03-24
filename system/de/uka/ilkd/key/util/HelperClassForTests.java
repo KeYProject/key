@@ -6,6 +6,7 @@
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
 //
+//
 /*
  * Created on 18.12.2004
  */
@@ -44,6 +45,7 @@ public class HelperClassForTests {
             KeYUserProblemFile po 
             	= new KeYUserProblemFile("UpdatetermTest", file, null); 
             pi = new ProblemInitializer(profile);
+           
             pi.startProver(po, po);
             result = po.getPO();                            
 

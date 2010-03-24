@@ -5,12 +5,6 @@
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
-// This file is part of KeY - Integrated Deductive Software Design 
-// Copyright (C) 2001-2003 Universitaet Karlsruhe, Germany
-//                         and Chalmers University of Technology, Sweden          
-//
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
 //
 
 package de.uka.ilkd.key.logic.op;
@@ -86,13 +80,25 @@ public class IfThenElse extends Op {
             if (set2.contains(sort1)) {
                 if (result == Sort.ANY) {
                     result = sort1;
-                } else {
-                    // not uniquely determinable
-                    return Sort.ANY;
+                } else if(sort1.extendsTrans(result)){
+                    result = sort1;
                 }
             }
         }        
         return result;
+    }
+    
+    private ImmutableSet<Sort> transExtSorts(Sort sort){
+        ImmutableSet<Sort> ext = sort.extendsSorts();
+        ImmutableSet<Sort> oldExt;
+        do{
+            oldExt = ext;
+            Sort[] ea = ext.toArray(new Sort[ext.size()]);
+            for(Sort s:ea){
+                ext = ext.union(s.extendsSorts());
+            }
+        }while(!oldExt.equals(ext));
+        return ext;
     }
     
     public int arity () {

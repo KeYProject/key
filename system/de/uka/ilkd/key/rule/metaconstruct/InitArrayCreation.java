@@ -6,13 +6,6 @@
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
 //
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2004 Universitaet Karlsruhe, Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
 
 package de.uka.ilkd.key.rule.metaconstruct;
 
@@ -38,6 +31,7 @@ import de.uka.ilkd.key.logic.VariableNamer;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 /**
@@ -153,13 +147,28 @@ public class InitArrayCreation extends InitArray {
 					 Expression resultVar,
 					 KeYJavaType arrayType,
 					 ProgramVariable[] dimensions,
-					 Services services) {
-	bodyStmnts.add
-	    (assign(resultVar,
-		    new MethodReference
-		    (new ImmutableArray<Expression>(dimensions[0]),
-		     new ProgramElementName(createArrayName),
-		     new TypeRef(arrayType))));
+					 Services services,
+                                         ImmutableArray<Expression> args,
+                                         ProgramElement scope) {
+	TypeReference baseTypeRef =
+	    ((ArrayType)arrayType.getJavaType()).getBaseType();
+	KeYJavaType baseType = baseTypeRef.getKeYJavaType();
+
+        if(ProgramSVSort.SIMPLEEXPRESSION.canStandFor(args.get(0),
+                null, services)){
+            bodyStmnts.add(assign(resultVar,
+                    new MethodReference
+                    (new ImmutableArray<Expression>(dimensions[0]),
+                            new ProgramElementName(createArrayName),
+                            new TypeRef(arrayType),
+                            scope)));
+        }else{
+            Expression[] dim = new Expression[1];
+            dim[0] = dimensions[0];
+            bodyStmnts.add(assign(resultVar,
+                       new NewArray
+                       (dim, baseTypeRef, arrayType, null, 0)));  
+        }
 
 	if (dimensions.length > 1) {
 	    Expression[] baseDim = new Expression[dimensions.length-1];
@@ -178,14 +187,10 @@ public class InitArrayCreation extends InitArray {
 	    final ProgramVariable pv = (ProgramVariable)forInit.getVariables().
 	    get(0).getProgramVariable();
 
-	    TypeReference baseTypeRef =
-		((ArrayType)arrayType.getJavaType()).getBaseType();
-
-	    KeYJavaType baseType = baseTypeRef.getKeYJavaType();
-            
             for(int i=0; i<dimensions.length-1; i++){
-                baseTypeRef = ((ArrayType) baseType.getJavaType()).getBaseType();
-                baseType = baseTypeRef.getKeYJavaType();                  
+                baseTypeRef = ((ArrayType) baseTypeRef.getKeYJavaType().
+			       getJavaType()).getBaseType();
+		//                baseType = baseTypeRef.getKeYJavaType();                  
             }
 
 	    final For forLoop = 
@@ -196,8 +201,10 @@ public class InitArrayCreation extends InitArray {
 			       ((ReferencePrefix)resultVar, new Expression[]{pv}),
 			       new NewArray
 			       (baseDim, baseTypeRef, baseType, null, 
-				(baseType.getJavaType() instanceof ArrayType)?
-                                        ((ArrayType)baseType.getJavaType()).getDimension() : 0)
+				//				(baseType.getJavaType() instanceof ArrayType)?
+				//                                        ((ArrayType)baseType.getJavaType()).
+				//				getDimension() : 
+				0)
 			       )
 			);
 
@@ -237,7 +244,7 @@ public class InitArrayCreation extends InitArray {
  	final KeYJavaType arrayType = na.getKeYJavaType(services);
 
 	createNDimensionalArray(bodyStmnts, newObject, arrayType, 
-				dimensions, services);
+				dimensions, services, na.getArguments(), na.getScope());
 
  	return new StatementBlock(bodyStmnts.toArray
 				  (new Statement[bodyStmnts.size()]));

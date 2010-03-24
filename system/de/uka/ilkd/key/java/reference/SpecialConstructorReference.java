@@ -11,11 +11,9 @@
 
 package de.uka.ilkd.key.java.reference;
 
+import de.uka.ilkd.key.java.*;
+import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.collection.ImmutableArray;
-import de.uka.ilkd.key.java.Expression;
-import de.uka.ilkd.key.java.JavaNonTerminalProgramElement;
-import de.uka.ilkd.key.java.PositionInfo;
-import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.util.ExtList;
 
 /**
@@ -33,7 +31,7 @@ public abstract class SpecialConstructorReference
      */
     protected final ImmutableArray<Expression> arguments;
 
-
+    protected final ProgramElement scope=new ProgramElementName(MethodReference.CALLER_SCOPE);
     
     /**
      * Special constructor reference.
@@ -92,7 +90,7 @@ public abstract class SpecialConstructorReference
      *      @return an int giving the number of children of this node
      */
     public int getChildCount() {
-        return (arguments != null) ? arguments.size() : 0;
+        return (arguments != null) ? arguments.size()+1 : 1;
     }
 
     /**
@@ -104,10 +102,17 @@ public abstract class SpecialConstructorReference
      *                 of bounds
      */
     public ProgramElement getChildAt(int index) {
+        if(index==0){
+            return scope;
+        }
         if (arguments != null) {
-            return arguments.get(index);
+            return arguments.get(index-1);
         }
         throw new ArrayIndexOutOfBoundsException();
+    }
+    
+    public ProgramElement getScope(){
+        return scope;
     }
 
     /**

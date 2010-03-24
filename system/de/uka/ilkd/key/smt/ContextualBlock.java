@@ -47,6 +47,12 @@ class ContextualBlock {
      *  The block contains assumptions for dummy variables. 
      */
     public static final int ASSUMPTION_DUMMY_IMPLEMENTATION = 3;
+    
+    /**
+     * The block contains assumptions made up from taclets.
+     */
+    public static final int ASSUMPTION_TACLET_TRANSLATION = 4;
+    
     /**
      *  The block contains predicates which appear in the formula. 
      */

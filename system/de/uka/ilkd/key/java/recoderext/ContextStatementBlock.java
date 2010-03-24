@@ -37,8 +37,12 @@ public class ContextStatementBlock
     /**
      Statement block.
      */
-    public ContextStatementBlock(TypeSVWrapper tr, ExpressionSVWrapper runtime) {
-	this(tr != null ? new ExecutionContext(tr, runtime) : null);
+    public ContextStatementBlock(TypeSVWrapper tr, ExpressionSVWrapper memoryArea,
+            ExpressionSVWrapper runtime,
+            ExpressionSVWrapper callerMemoryArea,
+            ExpressionSVWrapper constructedMemoryArea) {
+	this(tr != null ? new ExecutionContext(tr, memoryArea, runtime, 
+                callerMemoryArea, constructedMemoryArea) : null);
     }
 
     /**
@@ -52,11 +56,15 @@ public class ContextStatementBlock
      Statement block.
      @param block a statement mutable list.
      */
-    public ContextStatementBlock(TypeSVWrapper tr, ExpressionSVWrapper runtime, 
-				 ASTList<Statement> block) {
+    public ContextStatementBlock(TypeSVWrapper tr, ExpressionSVWrapper memoryArea,
+                ExpressionSVWrapper runtime, 
+                ASTList<Statement> block,
+                ExpressionSVWrapper callerMemoryArea,
+                ExpressionSVWrapper constructedMemoryArea){
 	super(block);
 	if (tr != null) {
-	    this.ec = new ExecutionContext(tr, runtime);
+	    this.ec = new ExecutionContext(tr, memoryArea, runtime, 
+                    callerMemoryArea, constructedMemoryArea);
 	} else {
 	    this.ec = null;
 	}

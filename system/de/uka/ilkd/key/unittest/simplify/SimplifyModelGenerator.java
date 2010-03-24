@@ -16,6 +16,7 @@ import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.ConstrainedFormula;
+import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -56,7 +57,8 @@ public class SimplifyModelGenerator extends DecProdModelGenerator {
 
     private ImmutableList<String> placeHoldersForClasses = ImmutableSLList.<String>nil();
 
-    private SMTSolver simplify = new SimplifySolver();
+    private SMTSolver solver = new SimplifySolver();
+    private SMTRule smtRule = new SMTRule(new Name("SIMPLIFY"),solver);
 
     private static Term toFormula(Sequent s) {
 	TermBuilder tb = TermBuilder.DF;
@@ -82,24 +84,17 @@ public class SimplifyModelGenerator extends DecProdModelGenerator {
 	SMTSolverResult res = SMTSolverResult.NO_IDEA;
 
 	// Get a result for the Problem
-	try {
-	    res = simplify.run(toFormula(node.sequent()), 60, serv);
-	} catch (IOException ioe) {
-	    if (serv.getExceptionHandler() != null) {
-		serv.getExceptionHandler().reportException(ioe);
-	    } else {
-		RuntimeException re = new RuntimeException(ioe.getMessage());
-		re.initCause(ioe);
-		throw re;
-	    }
-	}
+	smtRule.start(toFormula(node.sequent()),serv,
+		    serv.getProof().getUserConstraint().getConstraint(),false, null);
+	res = smtRule.getResults().getFirst();
+	
 
 	initialCounterExample = res.text();
 	this.simplifyOutputs = new HashSet<String>();
 	string2class = new HashMap<String, EquivalenceClass>();
 	Iterator<Term> it = locations.iterator();
 
-	SMTTranslator st = simplify.getTranslator(serv);
+	SMTTranslator st = solver.getTranslator(serv);
 
 	// build the translated terms for each location
 	try {
@@ -257,8 +252,8 @@ public class SimplifyModelGenerator extends DecProdModelGenerator {
 	try {
 	    // Term t = (new TermFactory()).createJunctorTerm(Op.NOT, c);
 	    // return this.simplify.run(t, 60, serv).text();
-	    return new SimplifySolver().run("(NOT " + c.toSimplify() + ")", 60,
-		    serv).text();
+	    this.smtRule.start("(NOT " + c.toSimplify() + ")", serv, serv.getProof().getUserConstraint().getConstraint(),false);
+	    return smtRule.getResults().getLast().text();
 	} catch (Exception e) {
 	    throw new RuntimeException(e);
 	}

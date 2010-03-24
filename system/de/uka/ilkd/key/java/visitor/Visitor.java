@@ -271,6 +271,8 @@ public interface Visitor {
      void performActionOnSuperReference(SuperReference x); 
 
      void performActionOnThisReference(ThisReference x); 
+     
+//     void performActionOnCurrentMemoryAreaReference(CurrentMemoryAreaReference x); 
 
      void performActionOnArrayLengthReference(ArrayLengthReference x); 
 

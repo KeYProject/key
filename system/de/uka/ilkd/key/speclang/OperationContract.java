@@ -15,7 +15,7 @@ import java.util.Map;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.LocationDescriptor;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 
 
@@ -52,7 +52,22 @@ public interface OperationContract {
     public FormulaWithAxioms getPre(ParsableVariable selfVar, 
                                     ImmutableList<ParsableVariable> paramVars,
                                     Services services);
-
+    
+    /**
+     * Returns the precondition of the contract.
+     */
+    public FormulaWithAxioms getPre(Term self, 
+                                    ImmutableList<Term> params,
+                                    Services services);
+    
+    /**
+     * Returns the precondition of the contract.
+     */
+    public FormulaWithAxioms getPre(ParsableVariable selfVar, 
+                                    ImmutableList<ParsableVariable> paramVars,
+                                    Term memoryArea,
+                                    Services services);
+    
     /**
      * Returns the postcondition of the contract.
      * @param atPreFunctions map containing functions to use as atPre-functions.
@@ -66,6 +81,52 @@ public interface OperationContract {
                                      ParsableVariable excVar,
                                      /*inout*/ Map<Operator, Function/* at pre */> atPreFunctions,
                                      Services services);
+    
+    /**
+     * Returns the postcondition of the contract.
+     * @param atPreFunctions map containing functions to use as atPre-functions.
+     *                       If the method needs an atPre-function which is not
+     *                       in this map, it creates a fresh one and adds it to 
+     *                       the map.˙
+     */
+    public FormulaWithAxioms getPost(ParsableVariable selfVar, 
+            ImmutableList<ParsableVariable> paramVars, 
+            ParsableVariable resultVar, 
+            ParsableVariable excVar,
+            Term memoryArea,
+            /*inout*/ Map<Operator, Function/* at pre */> atPreFunctions,
+            Services services);
+    
+    public Term getWorkingSpace(Term self, 
+                ImmutableList<Term> params,
+                Services services);
+    
+    public Term getWorkingSpace(ParsableVariable selfVar, 
+                ImmutableList<ParsableVariable> paramVars,
+                Services services);
+    
+    public Term getCallerWorkingSpace(ParsableVariable selfVar, 
+            ImmutableList<ParsableVariable> paramVars,
+            Services services);
+    
+    public Term getReentrantWorkingSpace(ParsableVariable selfVar, 
+            ImmutableList<ParsableVariable> paramVars,
+            Services services);
+    
+    public Term getConstructedWorkingSpace(Term self, 
+            ImmutableList<Term> params,
+            Services services);
+
+    public Term getConstructedWorkingSpace(ParsableVariable selfVar, 
+            ImmutableList<ParsableVariable> paramVars,
+            Services services);
+    
+    public FormulaWithAxioms getWorkingSpacePost(ParsableVariable selfVar, 
+            ImmutableList<ParsableVariable> paramVars, 
+            ParsableVariable resultVar, 
+            ParsableVariable excVar,
+            /*inout*/ Map<Operator, Function/* at pre */> atPreFunctions,
+            Services services);
 
     /**
      * Returns the modifier set of the contract.
@@ -102,6 +163,14 @@ public interface OperationContract {
                                     ImmutableList<ParsableVariable> paramVars,
                                     Services services);
         
+    /**
+     * Returns the modifier set of the contract.
+     */
+    public ImmutableSet<LocationDescriptor> getModifies(ParsableVariable selfVar, 
+                                               Term memoryArea, 
+                                               ImmutableList<ParsableVariable> paramVars,
+                                               Services services);
+    
     /**
      * Returns the contract in pretty HTML format.
      */

@@ -16,7 +16,7 @@ import de.uka.ilkd.key.logic.op.AnonymousUpdate;
  * for general (quantified) updates that is an own class 
  * <code>QuanUpdateTerm</code>
  */
-public class UpdateTerm extends OpTerm.UnaryOpTerm {
+class UpdateTerm extends OpTerm.UnaryOpTerm {
 
     /** 
      * creates a UpdateTerm

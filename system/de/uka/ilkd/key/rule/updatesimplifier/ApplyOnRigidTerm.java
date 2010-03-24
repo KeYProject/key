@@ -6,6 +6,7 @@
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
 //
+//
 package de.uka.ilkd.key.rule.updatesimplifier;
 
 import de.uka.ilkd.key.java.Services;

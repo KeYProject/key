@@ -77,8 +77,16 @@ public class JavaBlock {
             return true;
         } else if (!(o instanceof JavaBlock)) {
             return false;
-        }       
-        return ((JavaBlock)o).program().equals(program());
+        } else {
+            JavaBlock block = (JavaBlock)o;
+            
+            if(block.program() == null){
+        	return program()==null;
+            }
+            else{
+        	return block.program().equals(program());
+            }
+        } 
     }
 
     /** returns true if the given ProgramElement is equal to the

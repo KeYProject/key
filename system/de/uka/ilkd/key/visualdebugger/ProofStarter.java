@@ -5,6 +5,8 @@
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
+//
+//
 package de.uka.ilkd.key.visualdebugger;
 
 import java.util.*;
@@ -12,6 +14,7 @@ import java.util.*;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.gui.RuleAppListener;
+import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
@@ -22,6 +25,7 @@ import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.BuiltInRuleApp;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.smt.SMTRule;
+import de.uka.ilkd.key.smt.SimplifySolver;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.util.ProgressMonitor;
 
@@ -88,7 +92,7 @@ public class ProofStarter {
  
     // - Note: This should be removed
     private void applySimplificationOnGoals(ImmutableList<Goal> goals, 
-            BuiltInRule decisionProcedureRule) {
+            SMTRule decisionProcedureRule) {
         if (goals.isEmpty()) {
             return;
 	}
@@ -100,10 +104,14 @@ public class ProofStarter {
                 de.uka.ilkd.key.proof.mgt.AxiomJustification.INSTANCE);
         while (i.hasNext()) {
             final Goal g = i.next();
-            final BuiltInRuleApp birApp = new BuiltInRuleApp(decisionProcedureRule, null, p
-                    .getUserConstraint().getConstraint());
-            g.apply(birApp);
+            decisionProcedureRule.start(g,p.getUserConstraint().getConstraint(), false);
+            
+            
+           // final BuiltInRuleApp birApp = new BuiltInRuleApp(decisionProcedureRule, null, p
+             //       .getUserConstraint().getConstraint());
+            //g.apply(birApp);
         }
+        decisionProcedureRule.applyResults();
     }
 
     /**
@@ -196,7 +204,7 @@ public class ProofStarter {
             progressMonitors.remove(pm);
         }
     }
-    
+
     /**
      * starts a proof attempt
      * @param env the ProofEnvironment to which the proof object will be registered
@@ -208,8 +216,23 @@ public class ProofStarter {
             throw new IllegalStateException(
                     "Proofstarter must be initialized before.");
         }
-        
-        proof.setProofEnv(env);
+	return run (env, proof.openGoals());
+    }
+    
+    /**
+     * starts a proof attempt
+     * @param env the ProofEnvironment to which the proof object will be registered
+     * @param goals list of goals on which to run the proof search strategy
+     * @return <code>true</code> if the proof attempt terminated normally (i.e. no error has occured).
+     * In particular <code>true</code> does <em>not</em> mean that the proof has been closed.
+     */
+    public boolean run(ProofEnvironment env, ImmutableList<Goal> goals) {
+	if (goals.size() == 0) {
+	    return true;
+	} 
+	assert goals.head().proof() == proof;
+	
+	proof.setProofEnv(env);
         
         final Strategy oldStrategy = proof.getActiveStrategy();
         if (strategy == null) {
@@ -222,7 +245,7 @@ public class ProofStarter {
             // take default settings
             setMaxSteps(proof.getSettings().getStrategySettings().getMaxSteps());
         }
-        final BuiltInRule decisionProcedureRule;
+        final SMTRule decisionProcedureRule;
         if (useDecisionProcedures) {
             decisionProcedureRule = findSimplifyRule();
         } else {
@@ -230,7 +253,7 @@ public class ProofStarter {
         }
 
 
-        goalChooser.init(proof, proof.openGoals());
+        goalChooser.init(proof, goals);
         final ProofListener pl = new ProofListener();
 
         //%%% HACK !!!! Remove as soon as possible
@@ -272,17 +295,23 @@ public class ProofStarter {
      * is returned
      * @return the decision procedure calling Simplify or null if none has been found
      */
-    private BuiltInRule findSimplifyRule() {
-        BuiltInRule decisionProcedureRule = null;
+    // TODO: Change this method!!! At the moment this method returns null to guarantee 
+    // that KeY works.
+    private SMTRule findSimplifyRule() {
+	return new SMTRule(new Name("SIMPLIFY"),new SimplifySolver());
+	
+       /* BuiltInRule decisionProcedureRule = null;
         for (BuiltInRule builtInRule : proof.getSettings().getProfile().getStandardRules().getStandardBuiltInRules()) {
             final BuiltInRule bir = builtInRule;
             //TODO: do we really want to hardcode "Simplify" here?
-            if (bir instanceof SMTRule && bir.displayName().contains("Simplify")) {
+            if (bir instanceof SMTRuleNew && bir.displayName().contains("Simplify")) {
                 decisionProcedureRule = bir;
                 break;
             }
         }
-        return decisionProcedureRule;
+        
+        return null;
+        //return decisionProcedureRule;*/
     }
 
 

@@ -49,5 +49,8 @@ public class AbstractOrInterfaceType extends VariableConditionAdapter {
         String prefix = negated ? "\\not" : "";
         return prefix+"\\isAbstractOrInterface (" + resolver + ")";
     }
+    
+    public TypeResolver getTypeResolver(){return resolver;}
+    public boolean isNegated() {return negated;}
 
 }

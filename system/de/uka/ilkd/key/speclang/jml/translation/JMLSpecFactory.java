@@ -14,25 +14,18 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import de.uka.ilkd.key.collection.*;
-import de.uka.ilkd.key.java.JavaInfo;
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.Statement;
-import de.uka.ilkd.key.java.StatementContainer;
+import de.uka.ilkd.key.gui.configuration.ProofSettings;
+import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
-import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
-import de.uka.ilkd.key.java.declaration.VariableSpecification;
-import de.uka.ilkd.key.java.statement.BranchStatement;
-import de.uka.ilkd.key.java.statement.For;
-import de.uka.ilkd.key.java.statement.LoopStatement;
+import de.uka.ilkd.key.java.declaration.*;
+import de.uka.ilkd.key.java.statement.*;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.proof.init.PercProfile;
+import de.uka.ilkd.key.proof.init.RTSJProfile;
 import de.uka.ilkd.key.speclang.*;
-import de.uka.ilkd.key.speclang.jml.pretranslation.Behavior;
-import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLClassInv;
-import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLLoopSpec;
-import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase;
+import de.uka.ilkd.key.speclang.jml.pretranslation.*;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 
 
@@ -188,7 +181,10 @@ public class JMLSpecFactory {
                                 ImmutableList<PositionedString> originalEnsures,
                                 ImmutableList<PositionedString> originalSignals,
                                 ImmutableList<PositionedString> originalSignalsOnly,
-                                ImmutableList<PositionedString> originalDiverges,
+                                ImmutableList<PositionedString> originalDiverges,                               PositionedString originalWorkingSpace,
+                                PositionedString originalConstructedWorkingSpace,
+                                PositionedString originalCallerWorkingSpace,
+	PositionedString originalReentrantWorkingSpace,
                                 ImmutableList<ParsableVariable> paramVars) 
             throws SLTranslationException {
         assert programMethod != null;
@@ -231,7 +227,102 @@ public class JMLSpecFactory {
                     null);
             requires = requires.conjoin(translated);        
         }
-
+        
+        //translate working_space
+        if(originalWorkingSpace==null){
+            originalWorkingSpace = new PositionedString("0;");
+        }
+        Term workingSpace = null;
+        Term imCons=null;
+        FormulaWithAxioms wsPost = new FormulaWithAxioms(TB.tt());
+        if((ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof RTSJProfile) && 
+        		((RTSJProfile) ProofSettings.DEFAULT_SETTINGS.getProfile()).memoryConsumption() ||
+        		(ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof PercProfile)){
+	        ProgramVariable initialMemoryArea = services.getJavaInfo().
+	        getDefaultMemoryArea();
+	        Term imTerm = TB.var(initialMemoryArea);
+	        imCons = TB.dot(imTerm, services.getJavaInfo().getAttribute(
+	        "consumed", "javax.realtime.MemoryArea"));
+	        String ws = originalWorkingSpace.text.trim();
+	        Term oldCons = translator.translateExpression(
+	                new PositionedString("\\old(\\currentMemoryArea.consumed)",
+	                        originalWorkingSpace.fileName,
+	                        new Position(originalWorkingSpace.pos.getLine(), 
+	                                originalWorkingSpace.pos.getColumn())),
+	                                programMethod.getContainerType(),
+	                                selfVar, 
+	                                paramVars, 
+	                                resultVar, 
+	                                excVar,
+	                                atPreFunctions).getFormula();
+	        Term oldWS = translator.translateExpression(
+	                new PositionedString("\\old("+ws.substring(0, ws.length()-1)+")",
+	                        originalWorkingSpace.fileName,
+	                        new Position(originalWorkingSpace.pos.getLine(), 
+	                                originalWorkingSpace.pos.getColumn()-5)),
+	                                programMethod.getContainerType(),
+	                                selfVar, 
+	                                paramVars, 
+	                                resultVar, 
+	                                excVar,
+	                                atPreFunctions).getFormula();
+	        Function add = (Function) services.getNamespaces().functions().lookup(new Name("add"));
+	        Function leq = (Function) services.getNamespaces().functions().lookup(new Name("leq"));
+	        wsPost = new FormulaWithAxioms(TB.func(leq, imCons, TB.func(add, oldCons, oldWS)));
+               
+    	}    
+	        
+        workingSpace = translator.translateExpression(
+                originalWorkingSpace,
+                programMethod.getContainerType(),
+                selfVar, 
+                paramVars, 
+                resultVar, 
+                excVar,
+                atPreFunctions).getFormula();
+             
+        
+        
+        if(originalConstructedWorkingSpace==null){
+            originalConstructedWorkingSpace = new PositionedString("0;");
+        }
+        Term constructedWorkingSpace = null;
+        constructedWorkingSpace = translator.translateExpression(
+                        originalConstructedWorkingSpace,
+                        programMethod.getContainerType(),
+                        selfVar, 
+                        paramVars, 
+                        resultVar, 
+                        excVar,
+                        atPreFunctions).getFormula();
+        
+        Term callerWorkingSpace = null;
+        if(originalCallerWorkingSpace==null){
+            originalCallerWorkingSpace = new PositionedString("0;");
+        }
+        callerWorkingSpace = translator.translateExpression(
+                        originalCallerWorkingSpace,
+                        programMethod.getContainerType(),
+                        selfVar, 
+                        paramVars, 
+                        resultVar, 
+                        excVar,
+                        atPreFunctions).getFormula();
+        
+        Term reentrantWorkingSpace = null;
+        if(originalReentrantWorkingSpace==null){
+            originalReentrantWorkingSpace = new PositionedString("0;");
+        }
+        reentrantWorkingSpace = translator.translateExpression(
+                        originalReentrantWorkingSpace,
+                        programMethod.getContainerType(),
+                        selfVar, 
+                        paramVars, 
+                        resultVar, 
+                        excVar,
+                        atPreFunctions).getFormula();
+         
+        
         //translate assignable
         ImmutableSet<LocationDescriptor> assignable;
         if(originalAssignable.isEmpty()) {
@@ -246,6 +337,11 @@ public class JMLSpecFactory {
                         selfVar, 
                         paramVars);
                 assignable = assignable.union(translated);        
+            }
+            if(assignable.size()!=0 && ((ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof RTSJProfile) && 
+            		((RTSJProfile) ProofSettings.DEFAULT_SETTINGS.getProfile()).memoryConsumption() ||
+            		(ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof PercProfile))){
+                assignable = assignable.add(new BasicLocationDescriptor(imCons));
             }
         }
 
@@ -344,7 +440,12 @@ public class JMLSpecFactory {
                                             Modality.DIA,
                                             requires,
                                             post,
+                                            wsPost,
                                             assignable,
+                                            workingSpace,
+                                            constructedWorkingSpace,
+                                            reentrantWorkingSpace,
+                                            callerWorkingSpace,
                                             selfVar,
                                             paramVars,
                                             resultVar,
@@ -359,7 +460,12 @@ public class JMLSpecFactory {
                                             Modality.BOX,
                                             requires,
                                             post,
+                                            wsPost,
                                             assignable,
+                                            workingSpace,
+                                            constructedWorkingSpace,
+                                            reentrantWorkingSpace,
+                                            callerWorkingSpace,
                                             selfVar,
                                             paramVars,
                                             resultVar,
@@ -378,7 +484,12 @@ public class JMLSpecFactory {
                                             Modality.DIA,
                                             requires.conjoin(diverges.negate()),
                                             post,
+                                            wsPost,
                                             assignable,
+                                            workingSpace,
+                                            constructedWorkingSpace,
+                                            reentrantWorkingSpace,
+                                            callerWorkingSpace,
                                             selfVar,
                                             paramVars,
                                             resultVar,
@@ -391,7 +502,12 @@ public class JMLSpecFactory {
                                             Modality.BOX,
                                             requires,
                                             post,
+                                            wsPost,
                                             assignable,
+                                            workingSpace,
+                                            constructedWorkingSpace,
+                                            reentrantWorkingSpace,
+                                            callerWorkingSpace,
                                             selfVar,
                                             paramVars,
                                             resultVar,
@@ -419,6 +535,10 @@ public class JMLSpecFactory {
                                     textualSpecCase.getSignals(),
                                     textualSpecCase.getSignalsOnly(),
                                     textualSpecCase.getDiverges(),
+                                    textualSpecCase.getWorkingSpace(),
+                                    textualSpecCase.getConstructedWorkingSpace(),
+                                    textualSpecCase.getCallerWorkingSpace(),
+                                    textualSpecCase.getReentrantWorkingSpace(),
                                     paramVars);
     }
 
@@ -484,6 +604,10 @@ public class JMLSpecFactory {
                                            originalSignals,
                                            originalSignalsOnly,
                                            originalDiverges,
+					   null,
+                                           null,
+                                           null,
+                                           null,
                                            null);
     }
     
@@ -535,7 +659,11 @@ public class JMLSpecFactory {
                             ImmutableList<PositionedString> originalSkolemDeclarations,
                             ImmutableList<PositionedString> originalPredicates,
                             ImmutableList<PositionedString> originalAssignable,
-                            PositionedString originalVariant) 
+	PositionedString originalVariant,
+	ImmutableList<PositionedString> originalParametrizedWorkingspace,
+                            PositionedString originalWorkingSpaceLocal,
+                            PositionedString originalWorkingSpaceConstructed,
+                            PositionedString originalWorkingSpaceReentrant) 
             throws SLTranslationException {                
         assert programMethod != null;
         assert loop != null;
@@ -587,6 +715,26 @@ public class JMLSpecFactory {
         }
 
         
+        Term parametrizedWS = TB.tt();
+        for(PositionedString expr : originalParametrizedWorkingspace) {
+            String s = expr.toString();
+            String param = s.substring(s.indexOf("{")+1, s.indexOf("}"));
+            String ws = s.substring(s.indexOf("}")+1);
+            // HACK
+            ws = param.trim() +".consumed  <"+ ws;
+            FormulaWithAxioms translatedWS
+            = translator.translateExpression(
+                                    new PositionedString(ws, expr.fileName, expr.pos), 
+                                    programMethod.getContainerType(),
+                                    selfVar, 
+                                    paramVars, 
+                                    null, 
+                                    null,
+                                    atPreFunctions);
+            assert translatedWS.getAxioms().isEmpty();
+            parametrizedWS = TB.and(translatedWS.getFormula(), parametrizedWS);
+        }
+        
         //translate skolem declarations
         ImmutableList<ParsableVariable> freeVars = ImmutableSLList.<ParsableVariable>nil();
         for(PositionedString expr : originalSkolemDeclarations) {
@@ -617,21 +765,67 @@ public class JMLSpecFactory {
             }
         }
         
-        //translate assignable
+        Term workingSpaceLocal = null;
+        if(originalWorkingSpaceLocal == null)
+            originalWorkingSpaceLocal = new PositionedString("0;");
+        FormulaWithAxioms translated = translator.translateExpression(
+                originalWorkingSpaceLocal,
+                programMethod.getContainerType(),
+                selfVar,
+                paramVars,
+                null,
+                null,
+                atPreFunctions);
+        assert translated.getAxioms().isEmpty();
+        workingSpaceLocal = translated.getFormula(); 
+                
+        Term workingSpaceConstructed = null;
+        if(originalWorkingSpaceConstructed == null)
+            originalWorkingSpaceConstructed = new PositionedString("0;");
+        translated = translator.translateExpression(
+                originalWorkingSpaceConstructed,
+                programMethod.getContainerType(),
+                selfVar,
+                paramVars,
+                null,
+                null,
+                atPreFunctions);
+        workingSpaceConstructed = translated.getFormula(); 
+        
+        Term workingSpaceReentrant = null;
+        if(originalWorkingSpaceReentrant == null)
+            originalWorkingSpaceReentrant = new PositionedString("0;");
+        translated = translator.translateExpression(
+                originalWorkingSpaceReentrant,
+                programMethod.getContainerType(),
+                selfVar,
+                paramVars,
+                null,
+                null,
+                atPreFunctions);
+        workingSpaceReentrant = translated.getFormula(); 
+                
+        /*        Term imCons=null;
+        ProgramVariable initialMemoryArea = services.getJavaInfo().
+        getDefaultMemoryArea();
+        Term imTerm = TB.var(initialMemoryArea);
+        imCons = TB.dot(imTerm, services.getJavaInfo().getAttribute(
+                "consumed", "javax.realtime.MemoryArea"));*/
         ImmutableSet<LocationDescriptor> assignable;
         if(originalAssignable.isEmpty()) {
             assignable = EverythingLocationDescriptor.INSTANCE_AS_SET;
         } else {
             assignable = DefaultImmutableSet.<LocationDescriptor>nil();
             for(PositionedString expr : originalAssignable) {
-                ImmutableSet<LocationDescriptor> translated 
+                ImmutableSet<LocationDescriptor> translatedL 
                     = translator.translateAssignableExpression(
                                         expr, 
                                         programMethod.getContainerType(),
                                         selfVar, 
                                         paramVars);
-                assignable = assignable.union(translated);        
+                assignable = assignable.union(translatedL);        
             }
+//            if(imCons!=null) assignable = assignable.add(new BasicLocationDescriptor(imCons));
         }
         
         //translate variant
@@ -639,7 +833,7 @@ public class JMLSpecFactory {
         if(originalVariant == null) {
             variant = null;
         } else {
-            FormulaWithAxioms translated 
+            translated 
                 = translator.translateExpression(
                                         originalVariant,
                                         programMethod.getContainerType(),
@@ -659,6 +853,10 @@ public class JMLSpecFactory {
                                      new LoopPredicateSet(predicates),
                                      new LocationDescriptorSet(assignable),
                                      variant,
+                                     parametrizedWS,
+                                     workingSpaceLocal,
+                                     workingSpaceConstructed,
+                                     workingSpaceReentrant,
                                      selfTerm,
                                      atPreFunctions,
                                      true);
@@ -676,6 +874,10 @@ public class JMLSpecFactory {
                                       textualLoopSpec.getSkolemDeclarations(),
                                       textualLoopSpec.getPredicates(),
                                       textualLoopSpec.getAssignable(),
-                                      textualLoopSpec.getVariant());
+                                      textualLoopSpec.getVariant(),
+                                      textualLoopSpec.getParametrizedWorkingspace(),
+                                      textualLoopSpec.getWorkingSpaceLocal(),
+                                      textualLoopSpec.getWorkingSpaceConstructed(),
+                                      textualLoopSpec.getWorkingSpaceReentrant());
     }
 }
