@@ -1747,7 +1747,8 @@ public class Main extends JFrame implements IMain {
 	item.addActionListener(new ActionListener() {
 		   public void actionPerformed(ActionEvent e) {
 		  
-		       DPSDialog.INSTANCE.showDialog(ProofSettings.DEFAULT_SETTINGS.getDecisionProcedureSettings());
+		       DPSDialog.INSTANCE.showDialog(ProofSettings.DEFAULT_SETTINGS.getDecisionProcedureSettings(),
+			        ProofSettings.DEFAULT_SETTINGS.getTacletTranslationSettings());
 		       
 		       
 		   }

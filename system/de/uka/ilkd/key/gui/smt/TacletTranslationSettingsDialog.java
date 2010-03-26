@@ -66,7 +66,7 @@ interface InfoListener{
 
 public class TacletTranslationSettingsDialog{
 
-        private final static TacletTranslationSettingsDialog instance = new TacletTranslationSettingsDialog();
+        public final static TacletTranslationSettingsDialog INSTANCE = new TacletTranslationSettingsDialog();
         private DefaultTreeCellRenderer cellRenderer = null;
 	private JDialog optionsDialog = null;  //  @jve:decl-index=0:visual-constraint="40,9"
 	private JPanel contentPane = null;
@@ -171,7 +171,7 @@ public class TacletTranslationSettingsDialog{
 	 * 	
 	 * @return javax.swing.JPanel	
 	 */
-	private JPanel getSelectionPanel() {
+	public JPanel getSelectionPanel() {
 		if (selectionPanel == null) {
 			GridBagConstraints gridBagConstraints10 = new GridBagConstraints();
 			gridBagConstraints10.gridx = 1;
@@ -597,8 +597,8 @@ public class TacletTranslationSettingsDialog{
 	 * Shows the settings dialog for taclet translation. 
 	 */
 	public static void showDialog(){
-	    instance.init();
-	    instance.getOptionsDialog().setVisible(true);
+	    INSTANCE.init();
+	    INSTANCE.getOptionsDialog().setVisible(true);
 	}
 	
 	

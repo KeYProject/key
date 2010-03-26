@@ -52,6 +52,11 @@ public class DecisionProcedureSettings implements Settings {
 
     
     private LinkedList<SMTRule> smtRules = new LinkedList<SMTRule>();
+    
+    public final static String    PROGRESS_MODE_USER = "Progress dialog remains open afer executing solvers.";
+    public final static String    PROGRESS_MODE_CLOSE = "Close progress dialog after executing sovlers";
+    public final static String    PROGRESS_MODE_NO_DIALOG = "Do not show a progress dialog.";
+    public final static String    PROGRESS_MODE_CLOSE_FIRST = "Close progress dialog after all goals are closed.";
    
     
     
@@ -84,7 +89,36 @@ public class DecisionProcedureSettings implements Settings {
     
     
     private String multProversSettings=null;
+    
+    private String progressDialogMode = PROGRESS_MODE_USER;
+    
+    private String file = "";
+    
+    private boolean cacheGoals=false;
+    
+    public String getProgressDialogMode(){
+	return progressDialogMode;
+    }
+    
+    public void setProgressDialogMode(String mode){
+	progressDialogMode = mode;
+    }
+    
+    public void setSaveToFile(String f){
+	file = f;
+    }
+    
+    public String getSaveToFile(){
+	return file;
+    }
+    
+    public boolean isCachingGoals(){
+	return cacheGoals;
+    }
 
+    public void setCacheGoals(boolean b){
+	cacheGoals = b;
+    }
 
     
     

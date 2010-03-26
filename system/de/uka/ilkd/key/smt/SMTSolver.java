@@ -67,6 +67,10 @@ public interface SMTSolver extends de.uka.ilkd.key.smt.launcher.Process{
      */
     public String getDefaultExecutionCommand();
     
+    public String getExecutionCommand();
+    
+    public boolean useForMultipleRule();
+    
 
     /**
      * Determines whether taclets are used for this solver.

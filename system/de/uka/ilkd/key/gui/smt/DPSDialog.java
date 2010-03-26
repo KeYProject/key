@@ -34,405 +34,17 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 import javax.swing.AbstractCellEditor;
+import javax.swing.Box;
 import javax.swing.DefaultCellEditor;
+import javax.swing.JComboBox;
 import javax.swing.JTextArea;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JSlider;
 import javax.swing.JLabel;
 
+import de.uka.ilkd.key.smt.SMTSolver;
 
-interface TableComponent{
-	int getHeight();
-	Component getRendererComponent();
-	Component getEditorComponent();
-	boolean prepare();
-	void eventChange();
-	
-	
-}
-
-abstract class AbstractTableComponent<T> implements TableComponent{
-   
-    protected final int R =0;
-    protected final int E   =1;
-    protected final int COUNT = 2;
-    protected T comp[] ;
-
-  
-    
-
-    
-    protected void set(T renderer, T editor){
-	comp[R] = renderer;
-	comp[E] = editor;
-    }
-
-    public Component getEditorComponent() {
-	return (Component) comp[E];
-    }
-
-    public int getHeight() {
-	return ((Component)comp[R]).getPreferredSize().height;
-    }
-
-    public Component getRendererComponent() {
-	return (Component)comp[R];
-    }
-}
-
-abstract class TableCheckBox extends AbstractTableComponent<JCheckBox>{
-	
-	public void setSelected(boolean b){
-	    for(int i=0; i < COUNT; i ++){
-		comp[i].setSelected(b);
-	    }
-	}
-	
-	public void setTitle(String title){
-	    for(int i=0; i < COUNT; i ++){
-		comp[i].setText(title);
-	    }    
-	}
-	
-	public boolean isSelected(){
-	    return comp[E].isSelected();
-	}
-	
-	public abstract void eventChange();
-	
-	TableCheckBox(){
-	    	comp = new JCheckBox[2];
-	    	set(new JCheckBox(),new JCheckBox());
-	        comp[E].addActionListener(new ActionListener() {
-	        
-	        public void actionPerformed(ActionEvent arg0) {
-	         //   eventChange();
-	        }
-	    });
-	}
-	
-	
-}
-	 
-
-
-abstract class TableSaveToFile extends AbstractTableComponent<SaveToFilePanel>{
-  
-   
-    
-    
-    public TableSaveToFile() {
-	comp = new SaveToFilePanel[2];
-	set(new SaveToFilePanel(),new SaveToFilePanel());
-	
-    }
-    
-    public void setTitle(String title){
-	for(int i=0; i < 2; i ++){
-	    comp[i].setBorder(BorderFactory.createTitledBorder(null, title
-		    , TitledBorder.DEFAULT_JUSTIFICATION
-		    , TitledBorder.DEFAULT_POSITION, null, null));
-	}
-    }
-    
-    public void setActivated(boolean b){
-	for(int i=0; i < 2; i ++){
-	    comp[i].getSaveToFileBox().setSelected(b);
-	}
-    }
-    
-    public void setFolder(String text){
-	for(int i=0; i < 2; i ++){
-	    comp[i].getFolderField().setText(text);
-	}
-    }
-    
-
-    
-       
-}
-
-abstract class TableSlider extends AbstractTableComponent<SliderPanel>{
-  
-   
-    
-    
-    public TableSlider() {
-	comp = new SliderPanel[2];
-	set(new SliderPanel(),new SliderPanel());
-	
-    }
-    
-    public void setTitle(String title){
-	for(int i=0; i < 2; i ++){
-	    comp[i].setBorder(BorderFactory.createTitledBorder(null, title
-		    , TitledBorder.DEFAULT_JUSTIFICATION
-		    , TitledBorder.DEFAULT_POSITION, null, null));
-	}
-    }
-    
-    public void setTimeout(int timeout){
-	
-    }
-    
-    public int getTimeout(){
-	return 0;
-    }
-    
-
-    
-
-    
-
-    
-       
-}
-
-abstract class TableProperty extends AbstractTableComponent<PropertyPanel>{
-    public TableProperty() {
-	comp = new PropertyPanel[2];
-	set(new PropertyPanel(),new PropertyPanel());
-	comp[E].getValueField().addKeyListener(new KeyAdapter() {
-	    @Override
-	    public void keyTyped(KeyEvent e) {
-		comp[R].getValueField().setText(comp[E].getValueField().getText());
-	    }
-	});
-	
-    }
-    
-    public void setTitle(String title){
-	for(int i=0; i < 2; i ++){
-	   comp[i].propertyLabel.setText(title);
-	}
-    }
-    
-    public void setValue(String value){
-	for(int i=0; i < 2; i ++){
-	   comp[i].getValueField().setText(value);
-	}
-    }
-    
-}
-
-class TableSeperator extends AbstractTableComponent<JPanel>{
-    public void eventChange() {
-    }
-    public boolean prepare() {
-	return true;
-    }
-    
-    public TableSeperator() {
-	comp = new JPanel[2];
-	set(createSeperator(),createSeperator());
-	
-    }
-    
-    private static  JPanel createSeperator(){
-		JPanel label = new JPanel();
-		label.setPreferredSize(new Dimension(10,10));
-		return label;
-	}
-    
-    
-    
-}
-
-class PropertyPanel extends JPanel {
-    JLabel propertyLabel = null;
-    JTextField valueField = null;
-
-    public PropertyPanel() {
-
-	GridBagConstraints gridBagConstraints13 = new GridBagConstraints();
-	gridBagConstraints13.fill = GridBagConstraints.BOTH;
-	gridBagConstraints13.gridy = 0;
-	gridBagConstraints13.weightx = 0.7;
-	gridBagConstraints13.anchor = GridBagConstraints.NORTHEAST;
-	gridBagConstraints13.weighty = 1.0;
-	gridBagConstraints13.gridx = 1;
-	GridBagConstraints gridBagConstraints12 = new GridBagConstraints();
-	gridBagConstraints12.gridx = 0;
-	gridBagConstraints12.anchor = GridBagConstraints.WEST;
-	gridBagConstraints12.weightx = 0.3;
-	gridBagConstraints12.weighty = 1.0;
-	gridBagConstraints12.gridy = 0;
-	gridBagConstraints12.insets = new Insets(0,5,0,0); 
-	propertyLabel = new JLabel();
-	propertyLabel.setText("Property Name");
-	setLayout(new GridBagLayout());
-	setSize(new Dimension(289, 23));
-	add(propertyLabel, gridBagConstraints12);
-	add(getValueField(), gridBagConstraints13);
-
-    }
-
-    /**
-     * This method initializes valueField
-     * 
-     * @return javax.swing.JTextField
-     */
-    public JTextField getValueField() {
-	if (valueField == null) {
-	    valueField = new JTextField();
-	}
-	return valueField;
-    }
-}
-
-class SliderPanel extends JPanel{
-    	private JSlider slider = null;
-    	public SliderPanel() {
-		 GridBagConstraints gridBagConstraints7 = new GridBagConstraints();
-		 gridBagConstraints7.fill = GridBagConstraints.BOTH;
-		 gridBagConstraints7.gridy = 0;
-			gridBagConstraints7.weightx = 1.0;
-			gridBagConstraints7.weighty = 1.0;
-			gridBagConstraints7.insets = new Insets(5, 0, 5, 0);
-			gridBagConstraints7.gridx = 0;
-			
-			setLayout(new GridBagLayout());
-			setSize(new Dimension(397, 68));
-			setBorder(BorderFactory.createTitledBorder(null, "Timeout:",
-				TitledBorder.DEFAULT_JUSTIFICATION,
-				TitledBorder.DEFAULT_POSITION, null, null));
-			add(getTimeoutSlider(), gridBagConstraints7);
-	
-		
-	}
-
-
-	private JSlider getTimeoutSlider() {
-		slider = new JSlider();
-		
-		slider = new JSlider();
-		slider.setPaintLabels(true);
-		
-		return slider;
-	}
-}
-
-
-class SaveToFilePanel extends JPanel{
-	private JCheckBox saveToFileBox = null;
-	private JTextField folderField = null;
-	private JButton chooseButton = null;
-	private JTextArea saveToFileExplanation = null;
-	
-
-	
-	
-	public SaveToFilePanel() {
-
-	    GridBagConstraints gridBagConstraints3 = new GridBagConstraints();
-	    gridBagConstraints3.fill = GridBagConstraints.BOTH;
-	    gridBagConstraints3.gridy = 1;
-	    gridBagConstraints3.weightx = 1.0;
-	    gridBagConstraints3.weighty = 1.0;
-	    gridBagConstraints3.gridwidth = 2;
-	    gridBagConstraints3.ipady = 34;
-	    gridBagConstraints3.anchor = GridBagConstraints.CENTER;
-	    gridBagConstraints3.insets = new Insets(5, 0, 2, 0);
-	    gridBagConstraints3.gridx = 0;
-	    GridBagConstraints gridBagConstraints = new GridBagConstraints();
-	    gridBagConstraints.gridx = 1;
-	    gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-	    gridBagConstraints.weightx = 0.1;
-	    gridBagConstraints.insets = new Insets(0, 6, 0, 0);
-	    gridBagConstraints.gridy = 0;
-	    GridBagConstraints gridBagConstraints2 = new GridBagConstraints();
-	    gridBagConstraints2.fill = GridBagConstraints.BOTH;
-	    gridBagConstraints2.gridy = 0;
-	    gridBagConstraints2.weightx = 0.5;
-	    gridBagConstraints2.anchor = GridBagConstraints.NORTHWEST;
-	    gridBagConstraints2.ipadx = 100;
-	    gridBagConstraints2.gridx = 0;
-	    GridBagConstraints gridBagConstraints1 = new GridBagConstraints();
-	    gridBagConstraints1.gridx = 0;
-	    gridBagConstraints1.anchor = GridBagConstraints.NORTHWEST;
-	    gridBagConstraints1.fill = GridBagConstraints.HORIZONTAL;
-	    gridBagConstraints1.weightx = 1.0;
-	    gridBagConstraints1.gridy = 2;
-
-	    setLayout(new GridBagLayout());
-	    setBorder(BorderFactory.createTitledBorder(null, "Save translated problem to file:",
-		    TitledBorder.DEFAULT_JUSTIFICATION, TitledBorder.DEFAULT_POSITION, null, null));
-	    setSize(new Dimension(456, 129));
-	    add(getSaveToFileBox(), gridBagConstraints1);
-	    add(getFolderField(), gridBagConstraints2);
-	    add(getChooseButton(), gridBagConstraints);
-	    add(getSaveToFileExplanation(), gridBagConstraints3);
-	    getSaveToFileExplanation().setEditable(false);
-	    getSaveToFileExplanation().setBackground(this.getBackground());
-	    getSaveToFileBox().addActionListener(new ActionListener() {
-	        
-	        public void actionPerformed(ActionEvent arg0) {
-	    		boolean b = getSaveToFileBox().isSelected();
-	    		
-	    		getChooseButton().setEnabled(b);
-	    		getFolderField().setEnabled(b);
-	    		getSaveToFileExplanation().setEnabled(b);
-	    		
-	    	
-	        }
-	    });
-
-
-	}
-
-	/**
-	 * This method initializes saveToFileBox	
-	 * 	
-	 * @return javax.swing.JCheckBox	
-	 */
-	public JCheckBox getSaveToFileBox() {
-		if (saveToFileBox == null) {
-			saveToFileBox = new JCheckBox();
-			saveToFileBox.setText("activated");
-		}
-		return saveToFileBox;
-	}
-
-	/**
-	 * This method initializes folderField	
-	 * 	
-	 * @return javax.swing.JTextField	
-	 */
-	public JTextField getFolderField() {
-		if (folderField == null) {
-			folderField = new JTextField();
-		}
-		return folderField;
-	}
-
-	/**
-	 * This method initializes chooseButton	
-	 * 	
-	 * @return javax.swing.JButton	
-	 */
-	public JButton getChooseButton() {
-		if (chooseButton == null) {
-			chooseButton = new JButton();
-			chooseButton.setText("choose folder");
-		}
-		return chooseButton;
-	}
-
-	/**
-	 * This method initializes saveToFileExplanation	
-	 * 	
-	 * @return javax.swing.JTextArea	
-	 */
-	public JTextArea getSaveToFileExplanation() {
-		if (saveToFileExplanation == null) {
-			saveToFileExplanation = new JTextArea();
-			saveToFileExplanation.setLineWrap(true);
-			saveToFileExplanation.setText("Explanation of this field....");
-		}
-		return saveToFileExplanation;
-	}
-}
 
 
 
@@ -440,17 +52,53 @@ class SaveToFilePanel extends JPanel{
 public class DPSDialog {
     	public final static DPSDialog INSTANCE = new DPSDialog();
     	public final static Component    EMPTY_LINE = createSeperator();
+
     	TemporarySettings settings;
     	
-    	public void showDialog(DecisionProcedureSettings set){
-    	     settings = new TemporarySettings(set);
+    	DecisionProcedureSettings decSettings ;
+    	TacletTranslationSettings tacletSettings;
+    	
+    	
+    	public void showDialog(DecisionProcedureSettings set, TacletTranslationSettings tacletSet){
+    	     settings = new TemporarySettings(set, tacletSet);
+    	     
+    	     decSettings = set;
+    	     tacletSettings = tacletSet;
+    	   init();
     	     getJDialog().setVisible(true);
+    	    
+    	    
     	}
     	
 
-    private TableComponent[] getSolverData(){
+    private TableComponent[] getSolverData(TemporarySolverSettings tss){
 	TableComponent data[] = {
-	
+		new TableProperty("Name:",tss.solver.name(),tss,false),
+		new TableProperty("Installed:",tss.solver.isInstalled(false),tss,false),
+		new TableProperty("Command:",tss.command,tss){
+		    public void eventChange() {
+			((TemporarySolverSettings)getUserObject()).command=getValue();
+                    }    
+		    protected boolean prepareProperty(){
+			setValue(((TemporarySolverSettings)getUserObject()).command);
+						
+			return true;
+		    }
+		},
+		
+		new TableCheckBox(tss) {
+		    
+		    public boolean prepare() {
+			setTitle("Use this prover for the rule 'multiple provers'.");
+			setSelected(((TemporarySolverSettings)getUserObject()).useForMulitpleProvers);
+			return true;
+		    }
+		    
+		    @Override
+		    public void eventChange() {
+			((TemporarySolverSettings)getUserObject()).useForMulitpleProvers = isSelected();	
+		    }
+		}
 		
 	};
 	return data;
@@ -505,18 +153,57 @@ public class DPSDialog {
 	    }
 
 	},
+	new TableComboBox(){
 
-	new TableSaveToFile() {
+	    public void eventChange() {
+		settings.progressDialogMode =(String) getSelectedItem();	        
+            }
 
 	    public boolean prepare() {
-		setTitle("Save translation to file:");
+		
+		setItems(DecisionProcedureSettings.PROGRESS_MODE_USER,
+			 DecisionProcedureSettings.PROGRESS_MODE_CLOSE,
+			 DecisionProcedureSettings.PROGRESS_MODE_CLOSE_FIRST,
+			 DecisionProcedureSettings.PROGRESS_MODE_NO_DIALOG);
+		setSelectedItem(settings.progressDialogMode);
+	        return true;
+            }
+	    
+	}
+	
+	,
+	
+	new TableCheckBox() {
+	    
+	    public boolean prepare() {
+		setTitle("Cache goals.");
+		setSelected(settings.cacheGoals);
+		return true;
+	    }
+	    
+	    @Override
+	    public void eventChange() {
+		settings.cacheGoals = isSelected();
+		
+	    }
+	}
+	
+	,
+
+	new TableSaveToFile("Save translation to file:") {
+
+	    public boolean prepareProperties() {
 		setFolder(settings.folder);
 		setActivated(settings.storeToFile);
+		enable(settings.storeToFile);
 		return true;
 	    }
 
 	    public void eventChange() {
-
+		settings.folder = getFolder();
+		settings.storeToFile = isActivated();
+		enable(isActivated());
+		
 	    }
 	}
 
@@ -533,32 +220,36 @@ public class DPSDialog {
 
 
 
-	new TableSaveToFile() {
+	new TableSaveToFile("Save taclet translation to file:") {
 
-	    public boolean prepare() {
-		setTitle("Save taclet translation to file:");
-		setFolder(settings.folder);
-		setActivated(settings.storeToFile);
+	    public boolean prepareProperties() {
+		setFolder(settings.tacletFolder);
+		setActivated(settings.storeTacletsToFile);
+		enable(settings.storeTacletsToFile);
 		return true;
 	    }
 
 	    public void eventChange() {
-
+		settings.tacletFolder = getFolder();
+		settings.storeTacletsToFile = isActivated();
+		enable(isActivated());
+		
 	    }
 	},
-	new TableProperty() {
-
-
+	new TableProperty("Maximum number of different generic sorts:",settings.maxGenerics,settings) {
 	    public void eventChange() {
-	
-
+		int value;
+		try{
+		    value = Integer.parseInt(getValue()); 
+		} catch(NumberFormatException e){
+		    value = settings.maxGenerics;
+		}
+		settings.maxGenerics = value;
 	    }
-
-	    public boolean prepare() {
-		setTitle("Maximum number of different generic sorts:");
-	
+	    protected boolean prepareProperty() {
+		setValue(settings.maxGenerics);
 		return true;
-	    }
+	    };
 
 	}
 
@@ -570,9 +261,12 @@ public class DPSDialog {
     
     
 	
-	abstract class OptionItem{
+	class OptionItem{
 	
-	    String title;
+	    private String title;
+	    private Component component;
+	    private DefaultTableModel model;
+	    
 	    public String toString(){
 		return title;
 	    }
@@ -581,47 +275,94 @@ public class DPSDialog {
 	        this.title = title;
             }
 	    
-	    abstract public void eventClicked();
+	    public OptionItem(String title,Component component){
+		this(title);
+		this.component = component;
+	    }
+	    
+	    public OptionItem(String title, DefaultTableModel model){
+		this(title);
+		this.model = model;
+	    }
+	    
+	    public void init(){
+		if(model!= null)
+		for(int i=0; i < model.getRowCount(); i++){
+		    Object o = model.getValueAt(i,0);
+		    if(o instanceof TableComponent){
+			((TableComponent)o).prepare();
+		    }
+		}
+	    }
+	    
+	    
+	    
+	    public void eventClicked(){
+		if(model != null){
+		    setModel(model);
+		    getJScrollPane1().setViewportView(getOptionTable()); 
+		}else if(component != null){
+		    getJScrollPane1().setViewportView(component);
+		}
+		   
+	    }
 	    
 	}
 	
-	
-	private DefaultTreeModel getContentData(){
+    private DefaultTreeModel getContentData() {
+	if (contentModel == null) {
 	    DefaultMutableTreeNode root = new DefaultMutableTreeNode();
 	    root.setUserObject("Options");
-	    
+	    DefaultTableModel model = buildModel(
+		    "General", getGeneralOptionsData());
 	    DefaultMutableTreeNode generalOptions = new DefaultMutableTreeNode();
-	    generalOptions.setUserObject(new OptionItem("General"){
-		@Override
-                public void eventClicked() {
-		    setModel(getGeneralModel(title));
-		    getJScrollPane1().setViewportView(getOptionTable());
-                }		
-	       }
-	    );
-	    
+	    generalOptions.setUserObject(new OptionItem("General", model));
+
 	    DefaultMutableTreeNode solverOptions = new DefaultMutableTreeNode();
 	    solverOptions.setUserObject("Solvers");
-	    
+	    for (TemporarySolverSettings tss : settings.solverSettings) {
+		DefaultMutableTreeNode solver = new DefaultMutableTreeNode();
+		solver.setUserObject(new OptionItem(tss.toString(), buildModel(
+		        tss.toString(), getSolverData(tss))));
+		solverOptions.add(solver);
+	    }
+
 	    DefaultMutableTreeNode tacletOptions = new DefaultMutableTreeNode();
-	    tacletOptions.setUserObject(new OptionItem("Taclets"){
-		@Override
-                public void eventClicked() {
-		    setModel(getTacletModel(title));
-		    getJScrollPane1().setViewportView(getOptionTable());
-                }		
-	       }
-	    );
+	    tacletOptions.setUserObject("Taclets");
+	   
+	    DefaultMutableTreeNode tacletSettings = new DefaultMutableTreeNode();
+	    tacletSettings.setUserObject(new OptionItem("Settings", buildModel(
+		    "Taclets", getTacletOptionsData())));
 	    
+	    DefaultMutableTreeNode tacletSelection = new DefaultMutableTreeNode();
+	    tacletSelection.setUserObject(new OptionItem("Selection",
+		    TacletTranslationSettingsDialog.INSTANCE.getSelectionPanel()));
+	    tacletOptions.add(tacletSelection);
+	    tacletOptions.add(tacletSettings);
 	    
+
 	    root.add(generalOptions);
 	    root.add(solverOptions);
 	    root.add(tacletOptions);
+
+	    contentModel = new DefaultTreeModel(root);
+	    setModel(model);
 	    
-	    
-	    DefaultTreeModel model = new DefaultTreeModel(root);
-	    return model;  
+	}else{
+	    init((DefaultMutableTreeNode)contentModel.getRoot());
 	}
+	return contentModel;
+    }
+    
+    void init(DefaultMutableTreeNode node){
+	for(int i=0; i < node.getChildCount(); i ++){
+	   init((DefaultMutableTreeNode)node.getChildAt(i));
+	}
+	if(node.getUserObject() instanceof OptionItem){
+	    ((OptionItem)node.getUserObject()).init();
+	}
+    }
+    
 
 	private JDialog jDialog = null;  //  @jve:decl-index=0:visual-constraint="123,23"
 	private JPanel jContentPane = null;
@@ -646,6 +387,7 @@ public class DPSDialog {
 	private JTextArea propertyExplanation = null;
 	private DefaultTableModel generalOptionsModel = null;
 	private DefaultTableModel tacletOptionsModel  = null;
+	private DefaultTreeModel  contentModel = null;
 	private static final Component SEPERATOR_COMP = createSeperator();
 	private static final InternComponent SEPERATOR = new InternComponent(SEPERATOR_COMP, SEPERATOR_COMP);
 	/**
@@ -654,12 +396,20 @@ public class DPSDialog {
 	 * @return javax.swing.JDialog	
 	 */
 	private JDialog getJDialog() {
+	     
 		if (jDialog == null) {
 			jDialog = new JDialog();
-			jDialog.setSize(new Dimension(329, 170));
+			
+			int left = getOptionTree().getPreferredSize().width, 
+			    right= 600,
+			    height = getOptionTable().getPreferredScrollableViewportSize().height;
+			
+			jDialog.setSize(new Dimension(left+right,(int) (1.25*height)));
 			jDialog.setTitle("Decision Procedure Settings");
 			jDialog.setContentPane(getJContentPane());
-			init();
+			jDialog.setLocationByPlatform(true);
+			getSplitPane().setDividerLocation((int)(1.5*getOptionTree().getPreferredSize().width));
+			
 		}
 		return jDialog;
 	}
@@ -746,7 +496,7 @@ public class DPSDialog {
 				   o = ((DefaultMutableTreeNode)o).getUserObject();
 				   if(o instanceof OptionItem){
 				   ((OptionItem) o).eventClicked();
-				   System.out.println("hallo");
+				
 				   }
 			       }
 			   }
@@ -816,7 +566,7 @@ public class DPSDialog {
 			    if(!(value instanceof TableComponent)){
 				return (Component) value;
 			    }
-			    ((TableComponent) value).eventChange();
+			   // ((TableComponent) value).eventChange();
 			    
 			    setToolTipText("This is a tooltip");
 			    // TODO Auto-generated method stub
@@ -841,7 +591,7 @@ public class DPSDialog {
 				return (Component) value;
 			    }
 			    currentValue = value;
-			    ((TableComponent) value).eventChange();
+			    //((TableComponent) value).eventChange();
 			    if(((TableComponent) value).prepare()){
 				return ((TableComponent) value).getEditorComponent();
 			    }else{
@@ -1023,6 +773,12 @@ public class DPSDialog {
 		if (applyButton == null) {
 			applyButton = new JButton();
 			applyButton.setText("Apply");
+			applyButton.addActionListener(new ActionListener() {
+			    
+			    public void actionPerformed(ActionEvent e) {
+				applyChanges();
+			    }
+			});
 		}
 		return applyButton;
 	}
@@ -1036,9 +792,22 @@ public class DPSDialog {
 		if (okButton == null) {
 			okButton = new JButton();
 			okButton.setText("OK");
+			okButton.addActionListener(new ActionListener() {
+			    
+			    public void actionPerformed(ActionEvent e) {
+				getJDialog().setVisible(false);
+				applyChanges();
+			    }
+			});
 		}
 		return okButton;
 	}
+	
+	private void  applyChanges(){
+	    settings.apply(decSettings,tacletSettings);
+	    decSettings.fireSettingsChanged();
+	}
+	
 
 	/**
 	 * This method initializes cancelButton	
@@ -1049,6 +818,12 @@ public class DPSDialog {
 		if (cancelButton == null) {
 			cancelButton = new JButton();
 			cancelButton.setText("Cancel");
+			cancelButton.addActionListener(new ActionListener() {
+			    
+			    public void actionPerformed(ActionEvent arg0) {
+				getJDialog().setVisible(false);
+			   }
+			});
 		}
 		return cancelButton;
 	}
@@ -1206,7 +981,7 @@ public class DPSDialog {
 	private void init(){
 	    	getOptionTree().setModel(getContentData());
 
-		setModel(buildModel("General",getGeneralOptionsData()));
+		//setModel(buildModel("General",getGeneralOptionsData()));
 
 
 		getJScrollPane1().setViewportView(getOptionTable());
