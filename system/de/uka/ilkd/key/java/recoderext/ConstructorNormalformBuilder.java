@@ -189,7 +189,8 @@ public class ConstructorNormalformBuilder
              
              class2enclosingThis.put(cd, getImplicitEnclosingThis(cd));
              
-             if(cd.getAllSupertypes().size()>1 && (cd.getStatementContainer()!=null || cd.getName()==null)){
+             if(cd.getAllSupertypes().size()>1 && !cd.getAllSupertypes().get(1).isStatic() && 
+		(cd.getStatementContainer()!=null || cd.getName()==null)){
                  class2superContainer.put(cd, cd.getAllSupertypes().get(1).getContainingClassType());
              }
              

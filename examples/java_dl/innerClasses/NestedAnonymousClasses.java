@@ -8,10 +8,21 @@ public class NestedAnonymousClasses{
 	final Executer e2 = new Executer();
 	e1.execute(new Runnable(){
 		public void run(){
+		    final Executer e3 = new Executer();
 		    e2.execute(new Runnable(){
 			    public void run(){
-				e1.execute(new Runnable(){
-					public void run(){}
+				e2.execute(new Runnable(){
+					public void run(){
+					    e1.execute(new Runnable(){
+						    public void run(){
+							e3.execute(new Runnable(){
+								public void run(){}
+							    }
+							    );
+						    }
+						}
+						);
+					}
 				    }
 				    );
 			    }
