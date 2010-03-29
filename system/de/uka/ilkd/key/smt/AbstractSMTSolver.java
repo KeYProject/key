@@ -188,23 +188,31 @@ public abstract class AbstractSMTSolver extends AbstractProcess implements SMTSo
 	//store the text permanent to a file 
 	if (!this.inTestMode && ProofSettings.DEFAULT_SETTINGS.getDecisionProcedureSettings().getSaveFile() &&
 		Main.getInstance() != null) {
-	    JFileChooser fc = new JFileChooser();
-	    fc.setDialogTitle("Select a file to save the created problem");
-	    fc.setMultiSelectionEnabled(false);
-	    int returnVal = fc.showOpenDialog(Main.getInstance());
-	    File target = fc.getSelectedFile();
-	    if (returnVal == JFileChooser.APPROVE_OPTION) {
+	    String path = ProofSettings.DEFAULT_SETTINGS.getDecisionProcedureSettings().getSaveToFile();
+	    	path = finalizePath(path);
 		try {
-		    final BufferedWriter out2 = new BufferedWriter(new FileWriter(target));
+		    final BufferedWriter out2 = new BufferedWriter(new FileWriter(path));
 		    out2.write(text);
 		    out2.close();
 		} catch (IOException e) {
-		    throw new RuntimeException("Could not store to file " + target.getAbsolutePath() + ".");
+		    throw new RuntimeException("Could not store to file " + path + ".");
 		}
-	    }
+	   
 	}
 	
 	return smtFile;
+    }
+    
+    private String finalizePath(String path){
+	Calendar c = Calendar.getInstance();
+	String date = c.get(Calendar.YEAR)+"-"+c.get(Calendar.MONTH)+"-"+c.get(Calendar.DATE);
+	String time = c.get(Calendar.HOUR_OF_DAY)+"-"+c.get(Calendar.MINUTE)+"-"+c.get(Calendar.SECOND);
+	
+        path = path.replaceAll("%d", date);
+        path = path.replaceAll("%s", this.getTitle());
+        path = path.replaceAll("%t", time);
+        path = path.replaceAll("%i", Integer.toString(this.getNextFileID()));
+        return path;
     }
 
 
@@ -356,8 +364,10 @@ public abstract class AbstractSMTSolver extends AbstractProcess implements SMTSo
 		    .getTacletSetTranslation();
 
 	    if (translation != null) {
-		translation.storeToFile(ProofSettings.DEFAULT_SETTINGS
-		        .getTacletTranslationSettings().getFilename());
+		String path = ProofSettings.DEFAULT_SETTINGS
+	        .getTacletTranslationSettings().getFilename();
+		path = finalizePath(path);
+		translation.storeToFile(path);
 	    }
 
 	}

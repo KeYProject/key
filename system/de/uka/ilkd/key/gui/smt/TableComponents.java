@@ -13,19 +13,17 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 
 import javax.swing.BorderFactory;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
+import javax.swing.JTextArea;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.table.DefaultTableModel;
 
 interface TableComponent {
     int getHeight();
@@ -36,7 +34,15 @@ interface TableComponent {
 
     boolean prepare();
 
+    public boolean prepareValues();
+
     void eventChange();
+
+    String getInfo();
+
+    void setShowInfo(boolean b);
+
+    boolean isShowingInfo();
 
 }
 
@@ -46,71 +52,94 @@ abstract class AbstractTableComponent<T> implements TableComponent {
     protected final int E = 1;
     protected final int COUNT = 2;
     protected Object userObject;
+    private boolean showInfo = false;
 
-    protected T comp[];
-
-    protected void set(T renderer, T editor) {
-	comp[R] = renderer;
-	comp[E] = editor;
-    }
-    
-    AbstractTableComponent(Object userObject){
+    AbstractTableComponent(Object userObject) {
 	this.userObject = userObject;
     }
-    
-    AbstractTableComponent(){
+
+    AbstractTableComponent() {
 	this(null);
     }
 
     public Component getEditorComponent() {
-	return (Component) comp[E];
+	return (Component) getComp(E);
     }
 
     public int getHeight() {
-	return ((Component) comp[R]).getPreferredSize().height;
+	if (((Component) getComp(E)) == null) {
+	    return 10;
+	}
+	return ((Component) getComp(E)).getPreferredSize().height;
     }
 
     public Component getRendererComponent() {
-	return (Component) comp[R];
+	return (Component) getComp(R);
     }
-    
-    public Object getUserObject(){
+
+    public Object getUserObject() {
 	return userObject;
     }
+
+    abstract T getComp(int i);
+
+    public boolean prepare() {
+	return prepareValues();
+    }
+
+    public String getInfo() {
+	return null;
+    }
+
+    public void setShowInfo(boolean b) {
+	showInfo = b;
+    }
+
+    public boolean isShowingInfo() {
+	return showInfo;
+    }
+
 }
 
 abstract class TableCheckBox extends AbstractTableComponent<JCheckBox> {
+    private JCheckBox comp[] = { new JCheckBox(), new JCheckBox() };
+    private ActionListener listener = new ActionListener() {
+	public void actionPerformed(ActionEvent e) {
+	    eventChange();
+	}
+    };
 
-    
+    public JCheckBox getComp(int i) {
+	return comp[i];
+    }
+
     public void setSelected(boolean b) {
 	for (int i = 0; i < COUNT; i++) {
 	    comp[i].setSelected(b);
 	}
+
     }
 
     public void setTitle(String title) {
 	for (int i = 0; i < COUNT; i++) {
 	    comp[i].setText(title);
 	}
+
     }
 
     public boolean isSelected() {
 	return comp[E].isSelected();
     }
 
+    public boolean prepare() {
+	return prepareValues();
+    }
+
     public abstract void eventChange();
-    
-    TableCheckBox(Object userObject){
+
+    TableCheckBox(Object userObject) {
 	super(userObject);
-	comp = new JCheckBox[2];
-	set(new JCheckBox(), new JCheckBox());
-	comp[E].addActionListener(new ActionListener() {
-
-	    public void actionPerformed(ActionEvent arg0) {
-		 eventChange();
-	    }
-	});
-
+	comp[E].addActionListener(listener);
     }
 
     TableCheckBox() {
@@ -120,62 +149,57 @@ abstract class TableCheckBox extends AbstractTableComponent<JCheckBox> {
 }
 
 abstract class TableSaveToFile extends AbstractTableComponent<SaveToFilePanel> {
+    private SaveToFilePanel comp[] = { new SaveToFilePanel(),
+	    new SaveToFilePanel() };
 
-    private String title;
-    
-    public TableSaveToFile(String title) {
-	this.title = title;
-        comp = new SaveToFilePanel[2];
-	set(new SaveToFilePanel(), new SaveToFilePanel());
-	comp[E].getSaveToFileBox().addActionListener(new ActionListener() {
-	    
-	    public void actionPerformed(ActionEvent e) {
-	
-		eventChange();
-		
- 
-		
-	    }
-	});
+    private ActionListener actionListener = new ActionListener() {
+	public void actionPerformed(ActionEvent e) {
+	    eventChange();
+	}
+    };
 
-	comp[E].getFolderField().getDocument().addDocumentListener(new DocumentListener(){
+    private DocumentListener documentListener = new DocumentListener() {
 
-	    public void changedUpdate(DocumentEvent e) {
-	        eventChange();
-	        
-            }
+	public void changedUpdate(DocumentEvent e) {
+	    eventChange();
 
-	    public void insertUpdate(DocumentEvent e) {
-	        eventChange();
-	        
-            }
+	}
 
-	    public void removeUpdate(DocumentEvent e) {
-	        eventChange();
-	        
-            }
-	    
-	});
-	
-	
+	public void insertUpdate(DocumentEvent e) {
+	    eventChange();
 
-	
+	}
+
+	public void removeUpdate(DocumentEvent e) {
+	    eventChange();
+
+	}
+
+    };
+
+    public TableSaveToFile() {
+	comp[E].getSaveToFileBox().addActionListener(actionListener);
+	comp[E].getFolderField().getDocument().addDocumentListener(
+	        documentListener);
     }
-    
-    protected void enable(boolean b){
-	for (int i = 0; i < 2; i++) {	    
+
+    public boolean prepare() {
+
+	return prepareValues();
+
+    }
+
+    public SaveToFilePanel getComp(int i) {
+	return comp[i];
+    }
+
+    protected void enable(boolean b) {
+	for (int i = 0; i < 2; i++) {
 	    comp[i].getChooseButton().setEnabled(b);
 	    comp[i].getFolderField().setEnabled(b);
 	    comp[i].getSaveToFileExplanation().setEnabled(b);
 	}
     }
-    
-    public boolean prepare() {
-	setTitle(title);
-	return prepareProperties();
-    }
-    
-    abstract protected boolean prepareProperties();
 
     public void setTitle(String title) {
 	for (int i = 0; i < 2; i++) {
@@ -189,6 +213,7 @@ abstract class TableSaveToFile extends AbstractTableComponent<SaveToFilePanel> {
 	for (int i = 0; i < 2; i++) {
 	    comp[i].getSaveToFileBox().setSelected(b);
 	}
+	//enable(b);
     }
 
     public void setFolder(String text) {
@@ -196,24 +221,22 @@ abstract class TableSaveToFile extends AbstractTableComponent<SaveToFilePanel> {
 	    comp[i].getFolderField().setText(text);
 	}
     }
-    
-    public boolean isActivated(){
+
+    public boolean isActivated() {
 	return comp[E].getSaveToFileBox().isSelected();
     }
-    
-    public String getFolder(){
+
+    public String getFolder() {
 	return comp[E].getFolderField().getText();
     }
 
 }
 
 abstract class TableSlider extends AbstractTableComponent<JSlider> {
+    private JSlider[] comp = { new JSlider(), new JSlider() };
 
-    public TableSlider() {
-	comp = new JSlider[2];
-	set(new JSlider(), new JSlider());
-	
-
+    public JSlider getComp(int i) {
+	return comp[i];
     }
 
     public void setTitle(String title) {
@@ -224,6 +247,9 @@ abstract class TableSlider extends AbstractTableComponent<JSlider> {
 	 * null, null)); }
 	 */
     }
+
+    public void clean() {
+    };
 
     public void setTimeout(int timeout) {
 
@@ -236,21 +262,19 @@ abstract class TableSlider extends AbstractTableComponent<JSlider> {
 }
 
 abstract class TableComboBox extends AbstractTableComponent<JComboBox> {
-    public TableComboBox() {
-	comp = new JComboBox[2];
-	set(new JComboBox(), new JComboBox());
+    private JComboBox[] comp = { new JComboBox(), new JComboBox() };
+    ActionListener listener = new ActionListener() {
+	public void actionPerformed(ActionEvent e) {
+	    eventChange();
+	}
+    };
 
-	comp[E].addActionListener(new ActionListener() {
-
-	    public void actionPerformed(ActionEvent e) {
-		//comp[R].setSelectedItem(comp[E].getSelectedItem());
-		eventChange();
-	    }
-	});
-
+    public JComboBox getComp(int i) {
+	return comp[i];
     }
 
     public void setItems(Object... items) {
+
 	for (JComboBox box : comp) {
 	    box.removeAllItems();
 	    for (Object o : items) {
@@ -260,86 +284,72 @@ abstract class TableComboBox extends AbstractTableComponent<JComboBox> {
 	}
     }
 
-    public Object getSelectedItem() {
-	return comp[E].getSelectedItem();
+    public TableComboBox(Object... items) {
+	comp[E].addActionListener(listener);
+	setItems(items);
     }
-    
-    public void setSelectedItem(Object o){
-	for(JComboBox box : comp){
-	    box.setSelectedItem(o);
+
+    public boolean prepare() {
+	return prepareValues();
+    }
+
+    public int getSelectedItemIndex() {
+	return comp[E].getSelectedIndex();
+    }
+
+    public void setSelectedItem(int index) {
+	for (JComboBox box : comp) {
+	    box.setSelectedIndex(index);
 	}
     }
 }
 
-class TableProperty extends AbstractTableComponent<PropertyPanel> {
+abstract class TableProperty extends AbstractTableComponent<PropertyPanel> {
+    private PropertyPanel comp[] = { new PropertyPanel(), new PropertyPanel() };
 
-    
-    private String name;
-    private boolean editable;
+    private DocumentListener documentListener = new DocumentListener() {
 
-    private Object value;
+	public void changedUpdate(DocumentEvent e) {
+	    eventChange();
 
-    public TableProperty(String name, Object value, Object userObject) {
-	this(name, value,userObject, true);
+	}
+
+	public void insertUpdate(DocumentEvent e) {
+	    eventChange();
+
+	}
+
+	public void removeUpdate(DocumentEvent e) {
+	    eventChange();
+
+	}
+
+    };
+
+    public PropertyPanel getComp(int i) {
+	return comp[i];
     }
 
-    public TableProperty(String name, Object value,Object userObject,  boolean enabled) {
-	comp = new PropertyPanel[2];
-	this.value = value;
-	this.name = name;
-	this.editable = enabled;
+    public TableProperty(Object userObject) {
 	this.userObject = userObject;
-	set(new PropertyPanel(), new PropertyPanel());
-	comp[E].getValueField().getDocument().addDocumentListener(new DocumentListener(){
-
-	    public void changedUpdate(DocumentEvent e) {
-	        eventChange();
-	        
-            }
-
-	    public void insertUpdate(DocumentEvent e) {
-	        eventChange();
-	        
-            }
-
-	    public void removeUpdate(DocumentEvent e) {
-	        eventChange();
-	        
-            }
-	    
-	});
-
+	comp[E].valueField.getDocument().addDocumentListener(documentListener);
     }
-    
-    public String getValue(){
+
+    public String getValue() {
 	return comp[E].valueField.getText();
     }
 
-   
-    protected boolean prepareProperty(){
-	return true;
-    }
-    
     public boolean prepare() {
-	setTitle(name);
-	setValue(value);
-	setEditable(editable);
-	return  prepareProperty();
-    }
-    
-
-    public void eventChange() {
-        // TODO Auto-generated method stub
-        
+	return prepareValues();
     }
 
-    private void setTitle(String title) {
+    protected void setTitle(String title) {
 	for (int i = 0; i < 2; i++) {
 	    comp[i].propertyLabel.setText(title);
 	}
     }
 
-    private void setEditable(boolean editable) {
+    protected void setEditable(boolean editable) {
 	for (int i = 0; i < 2; i++) {
 	    comp[i].valueField.setEditable(editable);
 	}
@@ -353,7 +363,78 @@ class TableProperty extends AbstractTableComponent<PropertyPanel> {
 
 }
 
+abstract class TableInfoButton extends AbstractTableComponent<InfoPanel> {
+    private InfoPanel comp[] = { new InfoPanel(), new InfoPanel() };
+    private JTextArea textArea = new JTextArea();
+    private ActionListener listener = new ActionListener() {
+	public void actionPerformed(ActionEvent e) {
+	    eventChange();
+	}
+    };
+
+    public InfoPanel getComp(int i) {
+	return comp[i];
+    }
+
+    public void setSelected(boolean b) {
+	for (int i = 0; i < COUNT; i++) {
+	    comp[i].setSelected(b);
+	}
+
+    }
+
+    public void setTitle(String title) {
+	for (int i = 0; i < COUNT; i++) {
+	    comp[i].getToogleButton().setText(title);
+	}
+
+    }
+
+    public boolean isSelected() {
+	return comp[E].isSelected();
+    }
+
+    public boolean prepare() {
+	return prepareValues();
+    }
+
+    @Override
+    public int getHeight() {
+	return comp[E].getToogleButton().getPreferredSize().height + 5;
+    }
+
+    public Component getExplanation() {
+	if (client.getInfo() != null) {
+	    textArea.setText(client.getInfo());
+	    textArea.setRows(textArea.getLineCount() + 1);
+	}
+	return textArea;
+    }
+
+    public TableComponent getClient() {
+	return client;
+    }
+
+    public abstract void eventChange();
+
+    private TableComponent client;
+
+    TableInfoButton(DefaultTableModel model, TableComponent client) {
+	super(model);
+
+	comp[E].getToogleButton().addActionListener(listener);
+	this.client = client;
+    }
+
+}
+
 class TableSeperator extends AbstractTableComponent<JPanel> {
+    private static JPanel comp[] = { createSeperator(), createSeperator() };
+
+    public JPanel getComp(int i) {
+	return comp[i];
+    }
+
     public void eventChange() {
     }
 
@@ -361,16 +442,24 @@ class TableSeperator extends AbstractTableComponent<JPanel> {
 	return true;
     }
 
-    public TableSeperator() {
-	comp = new JPanel[2];
-	set(createSeperator(), createSeperator());
-
+    @Override
+    public int getHeight() {
+	return 10;
     }
 
     private static JPanel createSeperator() {
 	JPanel label = new JPanel();
 	label.setPreferredSize(new Dimension(10, 10));
 	return label;
+    }
+
+    public boolean prepareValues() {
+
+	return true;
+    }
+
+    public void clean() {
+
     }
 
 }

@@ -19,12 +19,16 @@ import java.awt.event.ActionListener;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.JToggleButton;
 import javax.swing.border.TitledBorder;
+
+import de.uka.ilkd.key.gui.IconFactory;
 
 
 
@@ -37,14 +41,14 @@ class PropertyPanel extends JPanel {
 	GridBagConstraints gridBagConstraints13 = new GridBagConstraints();
 	gridBagConstraints13.fill = GridBagConstraints.BOTH;
 	gridBagConstraints13.gridy = 0;
-	gridBagConstraints13.weightx = 0.7;
-	gridBagConstraints13.anchor = GridBagConstraints.NORTHEAST;
+	gridBagConstraints13.weightx = 1.0;
+	gridBagConstraints13.anchor = GridBagConstraints.NORTHWEST;
 	gridBagConstraints13.weighty = 1.0;
 	gridBagConstraints13.gridx = 1;
 	GridBagConstraints gridBagConstraints12 = new GridBagConstraints();
 	gridBagConstraints12.gridx = 0;
 	gridBagConstraints12.anchor = GridBagConstraints.WEST;
-	gridBagConstraints12.weightx = 0.3;
+	gridBagConstraints12.weightx = 1.0;
 	gridBagConstraints12.weighty = 1.0;
 	gridBagConstraints12.gridy = 0;
 	gridBagConstraints12.insets = new Insets(0,5,0,0); 
@@ -67,6 +71,55 @@ class PropertyPanel extends JPanel {
 	    valueField = new JTextField();
 	}
 	return valueField;
+    }
+}
+
+
+class InfoPanel extends JPanel {
+    JLabel propertyLabel = null;
+    JToggleButton toggleButton= null;
+
+    public InfoPanel() {
+
+	GridBagConstraints gridBagConstraints13 = new GridBagConstraints();
+	//gridBagConstraints13.fill = GridBagConstraints.BOTH;
+	gridBagConstraints13.gridy = 0;
+	gridBagConstraints13.weightx = 1.0;
+	gridBagConstraints13.anchor = GridBagConstraints.SOUTH;
+	gridBagConstraints13.weighty = 1.0;
+	gridBagConstraints13.gridx = 0;
+
+
+	setLayout(new GridBagLayout());
+	//setSize(new Dimension(289, 23));
+
+	add(getToogleButton(), gridBagConstraints13);
+
+    }
+
+    /**
+     * This method initializes valueField
+     * 
+     * @return javax.swing.JTextField
+     */
+    public JToggleButton getToogleButton() {
+	if (toggleButton == null) {
+	    toggleButton = new JToggleButton();
+	   // toggleButton.setIcon(IconFactory.saveFile(20));
+	    toggleButton.setText("?");
+	    toggleButton.setBorderPainted(false);
+	    toggleButton.setBackground(this.getBackground());
+	    
+	}
+	return toggleButton;
+    }
+    
+    public boolean isSelected(){
+	return getToogleButton().isSelected();
+    }
+    
+    public void setSelected(boolean b){
+	getToogleButton().setSelected(b);
     }
 }
 
@@ -201,6 +254,16 @@ class SaveToFilePanel extends JPanel{
 		if (chooseButton == null) {
 			chooseButton = new JButton();
 			chooseButton.setText("choose folder");
+			chooseButton.addActionListener(new ActionListener() {
+			    
+			    public void actionPerformed(ActionEvent e) {
+				JFileChooser chooser = new JFileChooser();
+				chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+				chooser.showDialog(SaveToFilePanel.this, "Choose folder");
+				getFolderField().setText(chooser.getSelectedFile().getAbsolutePath()+
+					"/%d_%t_%i_%s");
+			    }
+			});
 		}
 		return chooseButton;
 	}

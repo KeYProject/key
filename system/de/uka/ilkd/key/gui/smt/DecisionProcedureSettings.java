@@ -37,10 +37,16 @@ public class DecisionProcedureSettings implements Settings {
     private static final String TIMEOUT="[DecisionProcedure]Timeout";
     
     private static final String SAVEFILE="[DecisionProcedure]savefile";
+    private static final String SAVEFILE_PATH="[DecisionProcedure]savefile_path";
+    
     
     private static final String SHOW_SMT_RES_DIA="[DecisionProcedure]showSMTResDialog";
     
     private static final String MULTIPLEPROVERS="[DecisionProcedure]multprovers";
+    
+    private static final String CACHE_GOALS = "[DecisionProcedure]cache_goals";
+    
+    private static final String PROGRESS_DIALOG_MODE = "[DecisionProcedure]pd_mode";
 
     
     /**@see {@link de.uka.ilkd.key.smt.SmtLibTranslatorWeaker} */
@@ -53,10 +59,9 @@ public class DecisionProcedureSettings implements Settings {
     
     private LinkedList<SMTRule> smtRules = new LinkedList<SMTRule>();
     
-    public final static String    PROGRESS_MODE_USER = "Progress dialog remains open afer executing solvers.";
-    public final static String    PROGRESS_MODE_CLOSE = "Close progress dialog after executing sovlers";
-    public final static String    PROGRESS_MODE_NO_DIALOG = "Do not show a progress dialog.";
-    public final static String    PROGRESS_MODE_CLOSE_FIRST = "Close progress dialog after all goals are closed.";
+    public final static int    PROGRESS_MODE_USER = 0;
+    public final static int    PROGRESS_MODE_CLOSE = 1;
+    public final static int    PROGRESS_MODE_CLOSE_FIRST = 2;
    
     
     
@@ -90,17 +95,17 @@ public class DecisionProcedureSettings implements Settings {
     
     private String multProversSettings=null;
     
-    private String progressDialogMode = PROGRESS_MODE_USER;
+    private int progressDialogMode = PROGRESS_MODE_USER;
     
     private String file = "";
     
     private boolean cacheGoals=false;
     
-    public String getProgressDialogMode(){
+    public int getProgressDialogMode(){
 	return progressDialogMode;
     }
     
-    public void setProgressDialogMode(String mode){
+    public void setProgressDialogMode(int mode){
 	progressDialogMode = mode;
     }
     
@@ -274,6 +279,21 @@ public class DecisionProcedureSettings implements Settings {
     
     	String wt = props.getProperty(WEAKENSMTTRANSLATION);
     	this.weakenSMTTranslation = !(wt == null) && wt.equals("true");
+    	
+    	String cg = props.getProperty(CACHE_GOALS);
+    	this.cacheGoals = !(cg == null) && cg.equals("true");
+    	
+    	file = props.getProperty(SAVEFILE_PATH);
+    	
+    	String pd = props.getProperty(PROGRESS_DIALOG_MODE);
+    	int mode;
+    	try{
+    	    mode = Integer.parseInt(pd);
+    	}catch(NumberFormatException e){
+    	   mode = PROGRESS_MODE_USER;
+    	}
+    	
+    	progressDialogMode = mode;
     	
     	
     	// Read the active rule at the end of the method to guarantee
@@ -552,6 +572,19 @@ public class DecisionProcedureSettings implements Settings {
         else {
             props.setProperty(WEAKENSMTTRANSLATION, "false");
         }
+        
+        if (this.cacheGoals)
+            props.setProperty(CACHE_GOALS, "true");
+        else {
+            props.setProperty(CACHE_GOALS, "false");
+        }
+        
+        props.setProperty(PROGRESS_DIALOG_MODE,Integer.toString(progressDialogMode));
+        
+        props.setProperty(SAVEFILE_PATH,this.file);
+        
+        
+        
 
        
         this.writeExecutionString(props);
