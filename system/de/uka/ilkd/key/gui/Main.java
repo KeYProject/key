@@ -545,7 +545,7 @@ public class Main extends JFrame implements IMain {
         fileOperations.add(createSaveFile());
         
         goalView.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW ).put(
-                KeyStroke.getKeyStroke(KeyEvent.VK_R, ActionEvent.CTRL_MASK),
+                KeyStroke.getKeyStroke(KeyEvent.VK_R, ActionEvent.ALT_MASK),
         "show_reuse_state");
         goalView.getActionMap().put("show_reuse_state", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
@@ -2230,7 +2230,8 @@ public class Main extends JFrame implements IMain {
             }
             putValue(SMALL_ICON, IconFactory.openMostRecent(TOOLBAR_ICON_SIZE));
             putValue(SHORT_DESCRIPTION, "Load last opened file.");
-            putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_F5, 0));
+            putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_R, 
+        	    Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         }
         
         public void actionPerformed(ActionEvent e) {
