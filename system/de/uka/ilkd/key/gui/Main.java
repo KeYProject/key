@@ -2230,8 +2230,7 @@ public class Main extends JFrame implements IMain {
             }
             putValue(SMALL_ICON, IconFactory.openMostRecent(TOOLBAR_ICON_SIZE));
             putValue(SHORT_DESCRIPTION, "Load last opened file.");
-            putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_R, 
-        	    Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+            putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_F5, 0));
         }
         
         public void actionPerformed(ActionEvent e) {
