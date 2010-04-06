@@ -28,7 +28,7 @@ import de.uka.ilkd.key.rule.Taclet;
 
 public class TacletView implements ActionListener{
 
-    private JFrame frame;
+    private JDialog frame;
     private JTextArea content;
     private JScrollPane scrollPane;
 
@@ -44,7 +44,9 @@ public class TacletView implements ActionListener{
 
     private TacletView(){
 
-        frame = new JFrame("Taclet View");	    	            
+        frame = new JDialog();
+        frame.setTitle("Taclet View");
+        frame.setLocationByPlatform(true);
 
         frame.getContentPane().setLayout(new BorderLayout());
 
@@ -76,12 +78,9 @@ public class TacletView implements ActionListener{
     public void actionPerformed(ActionEvent e){
         frame.setVisible(false);
     }
-
-    public void showTacletView(DefaultMutableTreeNode node){
-        Taclet tac  ;
-        if (node.getUserObject() instanceof Taclet) {
-            tac = (Taclet) node.getUserObject();        
-        } else return;
+    
+    public void showTacletView(Taclet tac, boolean modal){
+	frame.setModal(modal);
         scrollPane.setBorder(BorderFactory.createTitledBorder
                 (getDisplayName(tac)));
         content.setText(getTacletByName(tac));
@@ -90,6 +89,15 @@ public class TacletView implements ActionListener{
 
         frame.validate();
         frame.setVisible(true);	
+    }
+
+    public void showTacletView(DefaultMutableTreeNode node){
+        Taclet tac  ;
+        if (node.getUserObject() instanceof Taclet) {
+            tac = (Taclet) node.getUserObject();        
+        } else return;
+        showTacletView(tac,false);
+
     }
 
     private String getDisplayName(Taclet tac){

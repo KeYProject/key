@@ -39,6 +39,7 @@ import de.uka.ilkd.key.smt.launcher.Event;
 import de.uka.ilkd.key.smt.launcher.Process;
 import de.uka.ilkd.key.smt.launcher.ProcessLaunch;
 import de.uka.ilkd.key.smt.launcher.ProcessLauncher;
+import de.uka.ilkd.key.smt.launcher.ProcessLauncherListener;
 
 
 /**
@@ -88,18 +89,23 @@ public class SMTRule  extends ProcessLauncher implements BuiltInRule{
     private Collection<SMTSolver> solvers = new LinkedList<SMTSolver>();
     /**Important for applying the results to goals.*/
     private Constraint 	           userConstraint = null;
-    /**The name of the rule. Important to identify rules while reading and 
+    /**The name of the rule. Important to identify rules while reading and   
      * writting the settings.*/
     private Name 	           name;
     /**
      * <code>true</code> if <code>solvers.size()>1</code>,
-     *  otherwise <code>false</code>
+     *  otherwise <code>false</code> 
      */
     private final boolean 	   multiRule;
     
     private final boolean background;
+    private ApplyPolicy applyPolicy = ApplyPolicy.MANUAL;
     
     
+    
+    
+    
+    public enum ApplyPolicy {AUTOMATICALLY_ALL,AUTOMATICALLY_FIRST,MANUAL};
  
   
     public void init(){
@@ -195,11 +201,8 @@ public class SMTRule  extends ProcessLauncher implements BuiltInRule{
 	for(SMTSolver solver : getInstalledSolvers()){
 	    LinkedList<InternResult> temp = new LinkedList<InternResult>();
 	    for(InternResult ir : terms){
-		try {
-	            temp.add((InternResult) ir.clone());
-                } catch (CloneNotSupportedException e) {
-	           throw new RuntimeException(e);
-                }
+		temp.add((InternResult) ir.clone(solver));
+	      
 	    }
 	    solver.prepareSolver(temp, services, taclets);
 	    addProcess(solver);
@@ -213,7 +216,11 @@ public class SMTRule  extends ProcessLauncher implements BuiltInRule{
      * @param constraint
      */
     public void start(Goal goal, Constraint constraint){
-	start(goal, constraint, true);
+	start(goal, constraint, true,ApplyPolicy.MANUAL);
+    }
+    
+    public void start(Goal goal, Constraint constraint, boolean useThread){
+	start(goal, constraint, useThread, ApplyPolicy.MANUAL);
     }
     
     /**
@@ -222,11 +229,11 @@ public class SMTRule  extends ProcessLauncher implements BuiltInRule{
      * @param constraint
      * @param useThread <code>true</code> if you want to start this rule in a new thread.
      */
-    public void start(Goal goal, Constraint constraint, boolean useThread){
+    public void start(Goal goal, Constraint constraint, boolean useThread, ApplyPolicy applyPolicy){
 	init();
 	LinkedList<Goal> goals = new LinkedList<Goal>();
 	goals.add(goal);
-	start(goals,goal.proof(),constraint,useThread);
+	start(goals,goal.proof(),constraint,useThread,applyPolicy);
     }
     
     /**
@@ -237,11 +244,17 @@ public class SMTRule  extends ProcessLauncher implements BuiltInRule{
      * @param constraint
      */
     public void start(Collection<Goal> goals, Proof proof, Constraint constraint){
-	start(goals, proof, constraint,true);
+	start(goals, proof, constraint,true,ApplyPolicy.MANUAL);
     }
+    
     
     public void start(Collection<Goal> goals, Proof proof, Constraint constraint,
 	    boolean useThread){
+	start(goals,proof,constraint,useThread, ApplyPolicy.MANUAL);
+    }
+    
+    public void start(Collection<Goal> goals, Proof proof, Constraint constraint,
+	    boolean useThread, ApplyPolicy applyPolicy){
 	init();
 
 	LinkedList<InternResult> terms = new LinkedList<InternResult>();
@@ -252,7 +265,7 @@ public class SMTRule  extends ProcessLauncher implements BuiltInRule{
 	    index = goal.indexOfTaclets();
 	}
 	
-	startThread(terms,constraint,useThread,index,proof.getServices());
+	startThread(terms,constraint,useThread,index,proof.getServices(), applyPolicy);
 
 	
     }
@@ -291,7 +304,7 @@ public class SMTRule  extends ProcessLauncher implements BuiltInRule{
 	for(Term term : terms){
 	    internTerms.add(new InternResult(term, null));
 	}
-	startThread(internTerms,constraint,useThread,index,services);
+	startThread(internTerms,constraint,useThread,index,services,ApplyPolicy.MANUAL);
     }
     
     
@@ -310,14 +323,16 @@ public class SMTRule  extends ProcessLauncher implements BuiltInRule{
     private void start(String formula, Services services, Constraint constraint, boolean useThread){
 	LinkedList<InternResult> list = new LinkedList<InternResult>();
 	list.add(new InternResult(formula));
-	startThread(list,constraint,useThread,null,services);
+	startThread(list,constraint,useThread,null,services,ApplyPolicy.MANUAL);
     }
     
 
     
     private void startThread(LinkedList<InternResult> terms,Constraint constraint, boolean useThread, TacletIndex index,
-	      Services services){
+	      Services services, ApplyPolicy applyPolicy){
 	init();
+	this.applyPolicy = applyPolicy;
+	this.setFirstClosePolicy(applyPolicy == ApplyPolicy.AUTOMATICALLY_FIRST);
 	userConstraint = constraint;
 	Collection<Taclet>  taclets = TacletTranslationSettings.getInstance().initTaclets(index);
 	
@@ -359,7 +374,7 @@ public class SMTRule  extends ProcessLauncher implements BuiltInRule{
      * @param constraint
      */
     public SMTSolverResult run(Goal goal, Services services, Constraint constraint){
-	start(goal,constraint,false);
+	start(goal,constraint,false,ApplyPolicy.MANUAL);
 	return this.getResults().getFirst();
     }
     
@@ -400,7 +415,7 @@ public class SMTRule  extends ProcessLauncher implements BuiltInRule{
 	}
 	
 	for(SMTSolver solver : solvers){
-	    if(!solver.isInstalled(false) && multiRule){
+	    if((!solver.isInstalled(true) || !solver.useForMultipleRule()) && multiRule){
 		continue;
 	    }
 	  
@@ -440,34 +455,43 @@ public class SMTRule  extends ProcessLauncher implements BuiltInRule{
     public void applyResults(){
 	
 	LinkedList<SolverSession.InternResult> result = new LinkedList<SolverSession.InternResult>();
-	
+	System.out.println("Step1");
 	for(SMTSolver solver : getInstalledSolvers()){
-	    AbstractSMTSolver s = (AbstractSMTSolver) solver;
+	    //if(	!solver.running()){
+		    AbstractSMTSolver s = (AbstractSMTSolver) solver;
 
-	    result.addAll(s.getSession().getResults());
+		    result.addAll(s.getSession().getResults());
+	    //}
+
 	}
-	
+	System.out.println("Step2");
 	if(result.size() == 0){
 	    return;
 	}
 
 	
 	
-	for(SolverSession.InternResult res  : result ){
-	    BuiltInRuleApp birApp = new BuiltInRuleAppSMT(this, null, 
+	for(final SolverSession.InternResult res  : result ){
+	    final BuiltInRuleApp birApp = new BuiltInRuleAppSMT(this, null, 
 	                userConstraint,res.getResult()); 
-	
+	    System.out.println("Step3.1");  
 	    if(res.getGoal() != null){
-		 res.getGoal().node().addSMTandFPData(res.getResult());
-		if(res.getResult().isValid() == ThreeValuedTruth.TRUE && res.getGoal().proof().openGoals().contains(res.getGoal())){
-		   
-		    res.getGoal().apply(birApp);
-		
+		System.out.println("Step3.2");
+		//res.getGoal().node().addSMTandFPData(res.getResult());
+		if(res.getGoal().proof().openGoals().contains(res.getGoal())){
+		    System.out.println("Step3.3");
+		    if(res.getResult().isValid() == ThreeValuedTruth.TRUE  ){
+			System.out.println("Step3.4: "+ res.getResult().solverName);
+		            res.getGoal().apply(birApp);
+			    System.out.println("Step3.5");
+			}
 		}
+		    
+		
 	    }
 	    
 	}
-
+	
     }
     
     
@@ -506,7 +530,15 @@ public class SMTRule  extends ProcessLauncher implements BuiltInRule{
     protected void publish(Event e) {
 
 	if(e.getType().equals(Event.Type.WORK_DONE)){
-	    
+	    System.out.println("Work done");
+	    for(ProcessLauncherListener l : listener){
+		l.workDone();
+	    }
+	    System.out.println("apply results");
+	    if(applyPolicy != ApplyPolicy.MANUAL){
+		applyResults();
+	    }
+	    System.out.println("applied");
 	    return;
 	}
 	
@@ -566,7 +598,7 @@ public class SMTRule  extends ProcessLauncher implements BuiltInRule{
 	case PROCESS_FINISHED:
 	     monitor.setSolverFinished(launch.usedTime());
 	     break;
-	     
+
 	 
 	     
 	 default:
@@ -620,7 +652,7 @@ class EmptyRule extends SMTRule{
     
 
     public String displayName() {
-	return "N/A";
+	return "No prover available";
 
     }
 

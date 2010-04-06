@@ -41,7 +41,7 @@ public class TacletTranslationSettings implements Settings {
     private static final String KEY_SAVE_TO_FILE = "[TacletTranslation]saveToFile";
     private static final String KEY_MAX_GENERIC = "[TacletTranslation]maxGeneric";
     private static final String KEY_ASSIGNMENT  = "[TacletTranslation]assignment";
-    private int maxGeneric=2;
+    private int maxGeneric=3;
     private String filename="";
     private boolean saveToFile= false;
     
@@ -142,7 +142,7 @@ public class TacletTranslationSettings implements Settings {
 	return initTacletMap(tacletIndex).values();
     }
     
-    public HashMap<String,Taclet> initTacletMap(TacletIndex tacletIndex){
+   public HashMap<String,Taclet> initTacletMap(TacletIndex tacletIndex){
 	if(taclets==null){
 	    taclets = new HashMap<String,Taclet>();
 

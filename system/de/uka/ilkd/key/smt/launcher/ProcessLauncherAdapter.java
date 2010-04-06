@@ -18,6 +18,14 @@ public class ProcessLauncherAdapter implements ProcessLauncherListener{
 		
 	}
 
+	/* (non-Javadoc)
+         * @see de.uka.ilkd.key.smt.launcher.ProcessLauncherListener#workDone()
+         */
+        public void workDone() {
+	    // TODO Auto-generated method stub
+	    
+        }
+
 
 
 

@@ -47,6 +47,8 @@ public interface Process extends Runnable,MakesProgress {
 	 * returns the number of goals.
 	 */
 	int getMaxCycle();
+	
+	boolean wasSuccessful();
 
 	
 }

@@ -36,6 +36,8 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.TacletIndex;
 import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.rule.export.DisplayNameModelInfo;
+import de.uka.ilkd.key.smt.SMTSolverResult.ThreeValuedTruth;
 import de.uka.ilkd.key.smt.SolverSession.InternResult;
 import de.uka.ilkd.key.smt.launcher.AbstractProcess;
 import de.uka.ilkd.key.smt.taclettranslation.DefaultTacletSetTranslation;
@@ -81,7 +83,7 @@ public abstract class AbstractSMTSolver extends AbstractProcess implements SMTSo
     
     public SolverSession getSession(){return session;}
     
-    private boolean useForMultipleRule = false;
+    private boolean useForMultipleRule = true;
     
     private String   executionCommand = getDefaultExecutionCommand();
     
@@ -221,6 +223,7 @@ public abstract class AbstractSMTSolver extends AbstractProcess implements SMTSo
     static String read(InputStream in) throws IOException {
 	BufferedReader reader = new BufferedReader(new InputStreamReader(in));
 	StringBuffer sb = new StringBuffer();
+
 	int x = reader.read();
 	while (x > -1) {
 	    sb.append((char) x);
@@ -254,8 +257,9 @@ public abstract class AbstractSMTSolver extends AbstractProcess implements SMTSo
 	SMTTranslator trans = this.getTranslator(services);
 	instantiateTaclets(trans);
 	
-	  
+ 
 	String formula = trans.translateProblem(term, services).toString();
+
 	saveTacletTranslation(trans);
 	
 	return translateToCommand(formula, services);
@@ -269,7 +273,7 @@ public abstract class AbstractSMTSolver extends AbstractProcess implements SMTSo
     
 
     
-    private boolean checkEnvVariable(String cmd){
+    private static boolean checkEnvVariable(String cmd){
 	String filesep = System.getProperty("file.separator");
 	String path =  System.getenv("PATH");
 	String [] res = path.split(System.getProperty("path.separator"));
@@ -284,6 +288,23 @@ public abstract class AbstractSMTSolver extends AbstractProcess implements SMTSo
 
     }
     
+    
+    public static boolean isInstalled(String cmd){
+	    
+	    int first = cmd.indexOf(" ");
+	    if(first >= 0){
+		cmd = cmd.substring(0, first);
+	    }
+	    
+	    if(checkEnvVariable(cmd)){
+		return true;
+	    } else{
+		File file = new File(cmd);
+		return file.exists();
+		
+	    }
+    }
+    
     /**
      * check, if this solver is installed and can be used.
      * @param recheck if false, the solver is not checked again, if a cached value for this exists.
@@ -291,27 +312,11 @@ public abstract class AbstractSMTSolver extends AbstractProcess implements SMTSo
      */
     public boolean isInstalled(boolean recheck) {
 	if (recheck | !installwaschecked) {
-	    
-	
-	    
 	    String cmd = getExecutionCommand();
-	    int first = cmd.indexOf(" ");
-	    if(first >= 0){
-		cmd = cmd.substring(0, first);
+	    isinstalled = isInstalled(cmd); 
+	    if(isinstalled){
+		 installwaschecked = true;		      
 	    }
-	    
-	    if(checkEnvVariable(cmd)){
-		isinstalled = true;
-	    } else{
-		File file = new File(cmd);
-		isinstalled = file.exists();
-		if(isinstalled){
-		    installwaschecked = true;
-		    return true;
-		}
-	    }
-
-	    
 
 	}
 	return isinstalled;
@@ -404,7 +409,6 @@ public abstract class AbstractSMTSolver extends AbstractProcess implements SMTSo
     @Override
     public String[] atStart() throws Exception{
 
-
 	LinkedList<String> list = new LinkedList<String>();
 	InternResult term = session.nextTerm();
 	//session.addResult(SMTSolverResult.createUnknownResult("",name()),session.currentTerm());
@@ -446,6 +450,9 @@ public abstract class AbstractSMTSolver extends AbstractProcess implements SMTSo
 	if(session.currentTerm()!= null){
 	     
 	   session.currentTerm().setResult(res);
+	   if(res.isValid() == ThreeValuedTruth.TRUE){
+	       session.incrementSolved();
+	   }
 	   
 	
 	}
@@ -455,6 +462,11 @@ public abstract class AbstractSMTSolver extends AbstractProcess implements SMTSo
 	return !session.hasNextTerm();
     }
     
+
+    public boolean wasSuccessful() {
+ 
+        return session.getTermSize() == session.getSolved();
+    }
     
 
     public int getMaxCycle() {

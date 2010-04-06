@@ -35,6 +35,7 @@ import javax.swing.JFrame;
 import javax.swing.JList;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 import javax.swing.ListCellRenderer;
 import javax.swing.ListModel;
 
@@ -42,8 +43,9 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.smt.MakesProgress;
 import de.uka.ilkd.key.smt.SMTRule;
 import de.uka.ilkd.key.smt.SMTSolver;
+import de.uka.ilkd.key.smt.launcher.ProcessLauncherListener;
 
-public class ProgressDialog extends JDialog{
+public class ProgressDialog extends JDialog implements ProcessLauncherListener{
 
 	public static final ProgressDialog INSTANCE = new ProgressDialog();
 	
@@ -54,7 +56,11 @@ public class ProgressDialog extends JDialog{
 	private JButton okButton = null;
 	private JButton cancelButton = null;
 	private JScrollPane scrollPane = null;
+	private JTextArea   infoText = null;
 	private SMTRule rule = null;
+	private int processFinishedCounter = 0;
+	private int numberOfProcesses =0;
+	private boolean stopRunning = false;
 
 
 	
@@ -67,16 +73,21 @@ public class ProgressDialog extends JDialog{
 	
 	public void prepare(Collection<SMTSolver> solvers, Collection<Goal> goals, SMTRule r){
 	    this.rule = r;
+	    rule.addListener(this);
 	    int width=0;
 	    int height =0;
 	    DefaultListModel model = new DefaultListModel();
+	    numberOfProcesses = 0;
 	    for(SMTSolver solver : solvers){
-		ProgressPanel panel =new ProgressPanel(solver,getList(),goals); 
+		ProgressPanel panel =new ProgressPanel(solver,getList(),this,goals); 
 		model.addElement(panel);
 		width = Math.max(width, panel.necessaryPanelWidth(goals.size()));
 		height += panel.necessaryPanelHeight();
+		numberOfProcesses++;
 	    }
 	    
+	    height += getInfoText().getPreferredSize().height+10;
+	    stopRunning = false;
 	    
 	
 		width += 120;
@@ -87,6 +98,8 @@ public class ProgressDialog extends JDialog{
 	    
 	    this.setSize(width,height);
 	    getList().setModel(model);
+	    processFinishedCounter =0;
+	   
 	}
 	
 	
@@ -138,7 +151,9 @@ public class ProgressDialog extends JDialog{
 	
 	
 	
-		
+	public boolean getStopRunning(){
+	    return stopRunning;
+	}
 
 	
 
@@ -159,20 +174,44 @@ public class ProgressDialog extends JDialog{
 			gridBagConstraints3.weightx = 1.0;
 			gridBagConstraints3.ipadx = 0;
 			gridBagConstraints3.insets = new Insets(5, 0, 5, 0);
-			gridBagConstraints3.gridy = 1;
+			gridBagConstraints3.gridy = 2;
 			GridBagConstraints gridBagConstraints2 = new GridBagConstraints();
 			gridBagConstraints2.fill = GridBagConstraints.BOTH;
 			gridBagConstraints2.gridy = 0;
 			gridBagConstraints2.weightx = 1.0;
 			gridBagConstraints2.weighty = 1.0;
 			gridBagConstraints2.gridx = 0;
+			
+			GridBagConstraints gridBagConstraints4 = new GridBagConstraints();
+			gridBagConstraints4.gridx = 0;
+			gridBagConstraints4.weighty = 0.0;
+			gridBagConstraints4.fill = GridBagConstraints.BOTH;
+			gridBagConstraints4.weightx = 1.0;
+			gridBagConstraints4.ipadx = 0;
+			gridBagConstraints4.insets = new Insets(5, 5, 5, 5);
+			gridBagConstraints4.gridy = 1;
+			
 			panelDialog = new JPanel();
 			panelDialog.setLayout(new GridBagLayout());
 			panelDialog.setSize(new Dimension(300, 195));
 			panelDialog.add(getScrollPane(), gridBagConstraints2);
+			panelDialog.add(getInfoText(),gridBagConstraints4);
 			panelDialog.add(getButtonPanel(), gridBagConstraints3);
+			getInfoText().setBackground(panelDialog.getBackground());
 		}
 		return panelDialog;
+	}
+	
+	
+	private JTextArea getInfoText(){
+	    if(infoText == null){
+		infoText = new JTextArea();
+		infoText.setEditable(false);
+		infoText.setRows(2);
+		infoText.setText("You can change the behavior of this dialog in:\n" +
+				"Options/Decision Procedures/Settings");
+	    }
+	    return infoText;
 	}
 
 	
@@ -238,9 +277,7 @@ public class ProgressDialog extends JDialog{
 			okButton.addActionListener(new ActionListener() {
 			    
 			    public void actionPerformed(ActionEvent arg0) {
-				setVisible(false);
-				rule.stop();
-				rule.applyResults();
+				applyAndClose();
 				
 			    }
 			});
@@ -262,6 +299,7 @@ public class ProgressDialog extends JDialog{
 			    
 			    public void actionPerformed(ActionEvent e) {
 				setVisible(false);
+				stopRunning = true;
 				rule.stop();
 				
 			    }
@@ -269,6 +307,39 @@ public class ProgressDialog extends JDialog{
 		}
 		return cancelButton;
 	}
+	
+	private void applyAndClose(){
+	    	stopRunning = true;
+		setVisible(false);	
+	    	rule.stop();	    	
+		rule.applyResults();
+		
+		
+		 
+		
+	}
+	
+        void processHasFinished(ProgressPanel panel,int goalcount, int solved){
+         
+	    if(stopRunning){
+		return;
+	    }
+
+
+	    
+	    
+	}
+
+	
+        public void workDone() {
+	    int mode = DecisionProcedureSettings.getInstance().getProgressDialogMode();
+	    if(mode == DecisionProcedureSettings.PROGRESS_MODE_CLOSE ||
+	       mode == DecisionProcedureSettings.PROGRESS_MODE_CLOSE_FIRST){
+		setVisible(false);
+	    }
+	    repaint();
+	    
+        }
 
 
 

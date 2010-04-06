@@ -26,8 +26,8 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 
-public class DPSDialog {
-    public final static DPSDialog INSTANCE = new DPSDialog();
+public class SettingsDialog {
+    public final static SettingsDialog INSTANCE = new SettingsDialog();
     public final static Component EMPTY_LINE = createSeperator();
 
     Settings settings;
@@ -36,7 +36,9 @@ public class DPSDialog {
 	this.settings = set;
 
 	init();
+	getJDialog().setModal(true);
 	getJDialog().setVisible(true);
+	
 
     }
 
@@ -326,6 +328,7 @@ public class DPSDialog {
 
 		public void actionPerformed(ActionEvent e) {
 		    applyChanges();
+		    SettingsDialog.this.getJScrollPane1().repaint();
 		}
 	    });
 	}
@@ -397,7 +400,10 @@ public class DPSDialog {
 		        .getValueAt(i, Settings.OPTIONCOL));
 
 		int height = 0;
-		if (component.getInfo() != null) {
+		if (component.getInfo() != null && 
+		    !(getOptionTable().getModel().getValueAt( i,
+			    Settings.OPTIONCOL + 1) instanceof TableInfoButton)) {
+		    
 		    TableInfoButton button = new TableInfoButton(model,
 			    component) {
 
@@ -413,15 +419,14 @@ public class DPSDialog {
 				    Object o[] = { Settings.seperator,
 					    getExplanation(),
 					    Settings.seperator };
-				    getExplanation().setBackground(
+				    getExplanation().getRendererComponent().setBackground(
 					    getOptionTable().getBackground());
 
 				    m.insertRow(row + 1, o);
 				    getOptionTable()
 					    .setRowHeight(
 					            row + 1,
-					            getExplanation()
-					                    .getPreferredSize().height);
+					            getExplanation().getHeight());
 
 				} else if (row != -1) {
 				    m.removeRow(row + 1);
@@ -438,11 +443,20 @@ public class DPSDialog {
 			}
 
 		    };
-		    height = button.getHeight();
-		    width = Math.max(button.getEditorComponent()
-			    .getPreferredSize().width + 5, width);
+		    
+		
+		 
+		   
 		    getOptionTable().getModel().setValueAt(button, i,
 			    Settings.OPTIONCOL + 1);
+		}
+		
+		if((getOptionTable().getModel().getValueAt( i,
+			    Settings.OPTIONCOL + 1) instanceof TableInfoButton)){
+		    TableInfoButton button =  ((TableInfoButton)getOptionTable().getModel().getValueAt( i,Settings.OPTIONCOL + 1));
+		    height =button.getHeight();	
+		    width = Math.max(button.getEditorComponent()
+			    .getPreferredSize().width + 5, width);
 		}
 
 		getOptionTable().setRowHeight(i,
@@ -451,6 +465,7 @@ public class DPSDialog {
 	    }
 
 	}
+	
 	for (int i = 0; i < getOptionTable().getColumnModel().getColumnCount(); i++) {
 	    if (Settings.OPTIONCOL != i) {
 		int w = width;
@@ -464,6 +479,15 @@ public class DPSDialog {
 
 	}
 
+    }
+    
+    void removeModel(DefaultTableModel model){
+	for (int i = 0; i < model.getRowCount(); i++) {
+	    if (model.getValueAt(i, Settings.OPTIONCOL+1) instanceof TableComponent) {
+		
+		
+	    }
+	}
     }
 
     void viewOptions(ContentItem item) {

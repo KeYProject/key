@@ -29,6 +29,7 @@ abstract public class AbstractProcess implements  Process, MakesProgress
 	protected ProcessListener listener;
 	private long runningTime = 0;
 	boolean running = false;
+	boolean interrupted = false;
 	private int currentCycle = 0;
 	public synchronized boolean running(){
 	   return running; 
@@ -51,11 +52,15 @@ abstract public class AbstractProcess implements  Process, MakesProgress
 
 
 
+	public boolean getInterrupted(){
+	    return interrupted;
+	}
 
 
 
 	public void init(){
 	    running = true;
+	    interrupted = false;
 	    currentCycle = 0;
 	}
 
@@ -78,10 +83,12 @@ abstract public class AbstractProcess implements  Process, MakesProgress
 		try {
 	            do{
 	            try {
+	        	
 	            	String [] command = atStart();
+	          
 	            	ProcessBuilder builder = new ProcessBuilder();
 	            	builder.command(command);
-	            	
+	        
 	            	process = builder.start();
 	            	listener.eventStarted(this);
 	            	
@@ -95,19 +102,26 @@ abstract public class AbstractProcess implements  Process, MakesProgress
 	            	
 	            
 	            } catch (InterruptedException e) {
-	            	listener.eventInterruption(this);
+	        	running = false;
+	        	interrupted = true;
+	            	//listener.eventInterruption(this);
 	            	return;
 	            }catch (Exception e) {
 	            	listener.eventException(this, e);
+	            	running = false;
 	            	return;
 	            } 
 	            
 	          
 	            }while(!end);
                 } catch (Exception e) {
+                    
                     listener.eventException(this, e);
+                    running = false;
                     return;
                 }
+                running = false;
+                
 		listener.eventFinished(this);				
 	}
 	

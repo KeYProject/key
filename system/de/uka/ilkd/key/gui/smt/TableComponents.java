@@ -284,9 +284,10 @@ abstract class TableComboBox extends AbstractTableComponent<JComboBox> {
 	}
     }
 
-    public TableComboBox(Object... items) {
+    public TableComboBox(int selected,Object... items) {
 	comp[E].addActionListener(listener);
 	setItems(items);
+	setSelectedItem(selected);
     }
 
     public boolean prepare() {
@@ -333,6 +334,7 @@ abstract class TableProperty extends AbstractTableComponent<PropertyPanel> {
     public TableProperty(Object userObject) {
 	this.userObject = userObject;
 	comp[E].valueField.getDocument().addDocumentListener(documentListener);
+	
     }
 
     public String getValue() {
@@ -365,7 +367,7 @@ abstract class TableProperty extends AbstractTableComponent<PropertyPanel> {
 
 abstract class TableInfoButton extends AbstractTableComponent<InfoPanel> {
     private InfoPanel comp[] = { new InfoPanel(), new InfoPanel() };
-    private JTextArea textArea = new JTextArea();
+    private TableExplanation textArea = new TableExplanation();
     private ActionListener listener = new ActionListener() {
 	public void actionPerformed(ActionEvent e) {
 	    eventChange();
@@ -403,10 +405,9 @@ abstract class TableInfoButton extends AbstractTableComponent<InfoPanel> {
 	return comp[E].getToogleButton().getPreferredSize().height + 5;
     }
 
-    public Component getExplanation() {
+    public TableComponent getExplanation() {
 	if (client.getInfo() != null) {
-	    textArea.setText(client.getInfo());
-	    textArea.setRows(textArea.getLineCount() + 1);
+	    textArea.init(client.getInfo());
 	}
 	return textArea;
     }
@@ -414,8 +415,8 @@ abstract class TableInfoButton extends AbstractTableComponent<InfoPanel> {
     public TableComponent getClient() {
 	return client;
     }
-
-    public abstract void eventChange();
+    
+      public abstract void eventChange();
 
     private TableComponent client;
 
@@ -426,6 +427,33 @@ abstract class TableInfoButton extends AbstractTableComponent<InfoPanel> {
 	this.client = client;
     }
 
+}
+
+class TableExplanation extends AbstractTableComponent<JTextArea>{
+    JTextArea textArea = new JTextArea();
+    
+    void init(String text){
+	    textArea.setText(text);
+	    textArea.setRows(textArea.getLineCount() + 1);
+    }
+    
+ 
+    @Override
+    public int getHeight() {
+	return textArea.getPreferredSize().height;
+    }
+    
+    @Override
+    JTextArea getComp(int i) {
+	
+	return i==R? textArea : null;
+    }
+    public void eventChange() {
+    }
+    public boolean prepareValues() {
+	return true;
+    }
+    
 }
 
 class TableSeperator extends AbstractTableComponent<JPanel> {

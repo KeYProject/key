@@ -12,6 +12,7 @@ package de.uka.ilkd.key.gui.smt;
 import java.util.*;
 
 import de.uka.ilkd.key.gui.GUIEvent;
+import de.uka.ilkd.key.gui.Main;
 import de.uka.ilkd.key.gui.configuration.Settings;
 import de.uka.ilkd.key.gui.configuration.SettingsListener;
 import de.uka.ilkd.key.logic.Name;
@@ -72,7 +73,7 @@ public class DecisionProcedureSettings implements Settings {
     private SMTRule activeSMTRule = SMTRule.EMPTY_RULE;
     
     /** the value of the timeout in tenth of seconds.*/
-    private int timeout = 600;
+    private int timeout = 60;
     
     private static DecisionProcedureSettings instance;
     
@@ -176,9 +177,11 @@ public class DecisionProcedureSettings implements Settings {
      * changed to its registered listeners (not thread-safe)
      */
     protected void fireSettingsChanged() {
+	
         for (SettingsListener aListenerList : listenerList) {
             aListenerList.settingsChanged(new GUIEvent(this));
         }
+        Main.instance.updateDecisionProcedureSelectMenu();
     }
     
 

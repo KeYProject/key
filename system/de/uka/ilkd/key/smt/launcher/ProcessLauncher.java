@@ -31,10 +31,20 @@ public abstract  class ProcessLauncher  implements ProcessListener, Runnable{
     	private final static int SLEEP = 10;
     
 	private List<Process> queue = Collections.synchronizedList(new LinkedList<Process>()); 
-	private LinkedList<ProcessLauncherListener> listener = new LinkedList<ProcessLauncherListener>();
+	protected LinkedList<ProcessLauncherListener> listener = new LinkedList<ProcessLauncherListener>();
 	private List<ProcessLaunch> running = Collections.synchronizedList(new LinkedList<ProcessLaunch>());
+	private boolean firstClosePolicy = true;
+	
 
 	
+	public boolean isFirstClosePolicy() {
+            return firstClosePolicy;
+        }
+
+	public void setFirstClosePolicy(boolean firstClosePolicy) {
+            this.firstClosePolicy = firstClosePolicy;
+        }
+
 	private List<ProcessLaunch> getRunning(){
 	    return running;
 	}
@@ -45,6 +55,7 @@ public abstract  class ProcessLauncher  implements ProcessListener, Runnable{
 	private int counter =0;
 	private boolean cancel = false;
 	
+	
 	public void init(){
 	    queue.clear();
 	    running.clear();
@@ -54,17 +65,18 @@ public abstract  class ProcessLauncher  implements ProcessListener, Runnable{
 		
 	}
 	
-
+	
 	private synchronized void start(){
 		cancel = false;
 	}
 	
 	protected synchronized void cancelMe(){
+	        cancel = true;
 	    	for(ProcessLaunch launch : running){
 	    	    launch.stop();
 	    	}
 	    	running.clear();
-		cancel = true;
+		
 	}
 	
 	
@@ -84,7 +96,10 @@ public abstract  class ProcessLauncher  implements ProcessListener, Runnable{
 	}
 	
 	public void addListener(ProcessLauncherListener l){
-		listener.add(l);
+	        if(!listener.contains(l)){
+	    		listener.add(l);
+	        }
+	
 	}
 	
 	public void removeListener(ProcessLauncherListener l){
@@ -127,31 +142,42 @@ public abstract  class ProcessLauncher  implements ProcessListener, Runnable{
 		
 	}
 	
-	protected void checkTime(){
-	    	synchronized(getRunning()){
+	protected void checkProcesses(){
+	     try{
+	      synchronized(getRunning()){
 		Iterator<ProcessLaunch> it = getRunning().iterator();
+		
 		while(it.hasNext()){
 			ProcessLaunch launch = it.next();
 			long currentTime = System.currentTimeMillis();
 			if(!launch.checkTime(currentTime, maxTime)|| !launch.running()){
 			    	boolean time = launch.running();
 				launch.stop();
-				if(time){
+				if(time || launch.getInterrupted()){
 				    publish(new Event(this,launch,Event.Type.INTERRUP_PROCESS));	    
+				} else {
+				    processFinished(launch);
+				    publish(new Event(this,launch,Event.Type.PROCESS_FINISHED));
 				}
+				it.remove();		
 				
-				try{
-					it.remove();		
-				}catch( ConcurrentModificationException e){
-				    eventException(launch.getProcess(), e);
-				}
 						
 			}else{
 			     publish(new Event(this,launch,Event.Type.PROCESS_STATUS));		
 			}
 		}
 	    	}
+	     }catch( ConcurrentModificationException e){
+		    eventException(null, e);
+	      }
+	     
 
+	}
+	
+	private void processFinished(ProcessLaunch launch){
+	    if(launch.getProcess().wasSuccessful() && firstClosePolicy){
+		cancel = true;
+	    }
 	}
 	
 	
@@ -185,7 +211,10 @@ public abstract  class ProcessLauncher  implements ProcessListener, Runnable{
 	    	ProcessLaunch launch = findLaunch(p);
 			
 		publish(new Event(this,launch,Event.Type.PROCESS_EXCEPTION,e));
-		remove(p);
+		/*if(p!= null){
+		    remove(p);    
+		}*/
+		
 		
 	}
 
@@ -193,8 +222,8 @@ public abstract  class ProcessLauncher  implements ProcessListener, Runnable{
 	public void eventFinished(Process p) {
 	    	ProcessLaunch launch = findLaunch(p);
 	
-		publish(new Event(this,launch,Event.Type.PROCESS_FINISHED));
-		remove(p);
+		//publish(new Event(this,launch,Event.Type.PROCESS_FINISHED));
+		//remove(p);
 
 	}
 
@@ -202,15 +231,15 @@ public abstract  class ProcessLauncher  implements ProcessListener, Runnable{
 	public void eventInterruption(Process p) {
 	    	ProcessLaunch launch = findLaunch(p);
 		
-		publish(new Event(this,launch,Event.Type.PROCESS_INTERRUPTION));
-		remove(p);
+		//publish(new Event(this,launch,Event.Type.PROCESS_INTERRUPTION));
+		//remove(p);
 
 	}
 
 
 	public void eventStarted(Process p) {
 	    	ProcessLaunch launch = findLaunch(p);
-		publish(new Event(this,launch,Event.Type.PROCESS_START));
+		//publish(new Event(this,launch,Event.Type.PROCESS_START));
 		
 	}
 
@@ -222,7 +251,7 @@ public abstract  class ProcessLauncher  implements ProcessListener, Runnable{
 		start();
 		while(!getCancel()){
 			executeNextProcesses();
-			checkTime();
+			checkProcesses();
 			try {
 				Thread.currentThread().sleep(SLEEP);
 			} catch (InterruptedException e) {
@@ -238,7 +267,7 @@ public abstract  class ProcessLauncher  implements ProcessListener, Runnable{
 			
 		}
 		publish(new Event(this, null,Event.Type.WORK_DONE));
-			
+		
 
 		
 		
@@ -246,7 +275,7 @@ public abstract  class ProcessLauncher  implements ProcessListener, Runnable{
 	}
 	
 	abstract protected void publish(final Event e);
-
+	
 
 	
         public void eventCycleFinished(Process p,Object userObject) {

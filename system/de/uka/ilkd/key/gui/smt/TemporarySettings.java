@@ -23,21 +23,29 @@ import de.uka.ilkd.key.smt.AbstractSMTSolver;
 class TemporarySolverSettings {
     public SMTSolver solver;
     public String command = "";
+    public boolean isInstalled = false;
     public boolean useForMulitpleProvers = false;
-
-    public TemporarySolverSettings(SMTSolver solver) {
+    
+    TemporarySolverSettings(SMTSolver solver) {
 	this.solver = solver;
-	this.command = solver.getExecutionCommand();
-	useForMulitpleProvers = solver.useForMultipleRule();
+	newSession();
     }
 
     public String toString() {
 	return solver.getTitle();
     }
+    
+    void newSession(){
 
-    public void apply() {
+	this.command = solver.getExecutionCommand();
+	isInstalled = solver.isInstalled(true);
+	useForMulitpleProvers = solver.useForMultipleRule();
+    }
+
+    void apply() {
 	((AbstractSMTSolver) solver).setExecutionCommand(command);
 	((AbstractSMTSolver) solver).useForMultipleRule(useForMulitpleProvers);
+	solver.isInstalled(true);
 
     }
 
@@ -69,8 +77,8 @@ public class TemporarySettings extends Settings {
     public LinkedList<TemporarySolverSettings> solverSettings = new LinkedList<TemporarySolverSettings>();
     
     public final static String    PROGRESS_MODE_USER = "Progress dialog remains open after executing solvers.";
-    public final static String    PROGRESS_MODE_CLOSE ="Close progress dialog after all solver finished.";
-    public final static String    PROGRESS_MODE_CLOSE_FIRST = "Close progress dialog after the first solver finished.";
+    public final static String    PROGRESS_MODE_CLOSE ="Close progress dialog after all solver have finished.";
+    public final static String    PROGRESS_MODE_CLOSE_FIRST = "Close progress dialog after the first solver has finished.";
     
     public String getProgressMode(int index){
 	switch(index){
@@ -94,9 +102,17 @@ public class TemporarySettings extends Settings {
 	useWeakenTypeSystem = settings.weakenSMTTranslation;
 	timeout = settings.getTimeout();
 	folder = settings.getSaveToFile();
-	for (SMTSolver solver : settings.getSolvers()) {
-	    solverSettings.add(new TemporarySolverSettings(solver));
+	
+	if(solverSettings.isEmpty()){
+	    for (SMTSolver solver : settings.getSolvers()) {
+		solverSettings.add(new TemporarySolverSettings(solver));
+	    }
+	}else{
+	    for(TemporarySolverSettings set : solverSettings){
+		set.newSession();
+	    }
 	}
+
 
 	maxGenerics = tacletSettings.getMaxGeneric();
 	storeTacletsToFile = tacletSettings.isSaveToFile();
@@ -110,23 +126,7 @@ public class TemporarySettings extends Settings {
 
     }
 
-    void apply(DecisionProcedureSettings settings,
-	    TacletTranslationSettings tacletSettings) {
-	settings.weakenSMTTranslation = useWeakenTypeSystem;
-	settings.setTimeout(timeout);
-	settings.setSaveFile(storeToFile);
-	settings.setProgressDialogMode(progressDialogMode);
-	settings.setSaveToFile(folder);
-	settings.setSMTResDialog(showResultsAfterExecuting);
-	settings.setCacheGoals(cacheGoals);
-	tacletSettings.setFilename(tacletFolder);
-	tacletSettings.setMaxGeneric(maxGenerics);
-	tacletSettings.setSaveToFile(storeTacletsToFile);
-	for (TemporarySolverSettings setSolver : solverSettings) {
-	    setSolver.apply();
-	}
 
-    }
 
     public void applyChanges() {
 	decSettings.weakenSMTTranslation = useWeakenTypeSystem;
@@ -174,8 +174,8 @@ public class TemporarySettings extends Settings {
 
 	    DefaultMutableTreeNode tacletSelection = new DefaultMutableTreeNode();
 	    tacletSelection.setUserObject(new ContentItem("Selection",
-		    TacletTranslationSettingsDialog.INSTANCE
-		            .getSelectionPanel()));
+		    TacletTranslationSelection.INSTANCE
+		            .getSelectionTree()));
 	    tacletOptions.add(tacletSelection);
 	
 
@@ -215,10 +215,11 @@ public class TemporarySettings extends Settings {
 
 	
                     public boolean prepareValues() {
-			 this.setTitle("Installed:");
+			 this.setTitle("Installed:");			 
 			 this.setValue(((TemporarySolverSettings)this.getUserObject())
-				 .solver.isInstalled(false));
+				 .solver.isInstalled(true));
 			 this.setEditable(false);
+			 
 	                return true;
                     }
 
@@ -293,7 +294,7 @@ public class TemporarySettings extends Settings {
 
 	new TableCheckBox() {
 	    public boolean prepareValues() {
-		setTitle("Show results after executing solvers.");
+		setTitle("Show results in a dialog after executing the solvers.");
 		setSelected(showResultsAfterExecuting);
 		return true;
 	    }
@@ -305,7 +306,10 @@ public class TemporarySettings extends Settings {
 	    
 	    @Override
 	    public String getInfo() {
-		return "After executing the solvers a dialog is shown.";
+		return "If you activate this option, a dialog " +
+		"will pop up showing results\nafter executing the solvers.\n"+
+		"This dialog may help you to relate the results to the corresponding\n" +
+		"goals.";
 	    }
 	},
 
@@ -398,7 +402,7 @@ public class TemporarySettings extends Settings {
 	
 	
 	
-	 new TableComboBox(getProgressMode(DecisionProcedureSettings.PROGRESS_MODE_USER),
+	 new TableComboBox(progressDialogMode,getProgressMode(DecisionProcedureSettings.PROGRESS_MODE_USER),
 	         getProgressMode(DecisionProcedureSettings.PROGRESS_MODE_CLOSE),
 	         getProgressMode(DecisionProcedureSettings.PROGRESS_MODE_CLOSE_FIRST)) {
 
@@ -410,6 +414,20 @@ public class TemporarySettings extends Settings {
 		setSelectedItem(progressDialogMode);
 		return true;
 	    }
+	    
+	    public String getInfo(){
+		return "1. Option: The progress dialog remains open\n" +
+			"after executing the solvers so that the user\n" +
+			"can decide whether he wants to accept the results.\n" +
+			"\n" +
+			"2. Option: The progress dialog is closed once the\n" +
+			"external provers have done their work or the time limit\n" +
+			"has been exceeded.\n"+
+			"\n"+
+			"3. Option: The progress dialog is closed once the first\n" +
+			"external prover has successfully solved all given goals\n" +
+			"or the time limit has been exceeded.";
+	    }
       
 	},
 
@@ -418,7 +436,8 @@ public class TemporarySettings extends Settings {
 	    public void eventChange() {
 	        int value;
 	        try {
-		    value = Integer.parseInt(getValue());
+		    float val = Float.parseFloat(getValue());
+		    value = (int)(val*10);
 	        } catch (NumberFormatException e) {
 		    value = timeout;
 	        }
@@ -430,12 +449,13 @@ public class TemporarySettings extends Settings {
 	
             public boolean prepareValues() {
 		setTitle("Timeout:");
-		setValue(timeout);
+		setValue(((float)timeout/10));
 	        return true;
             }
             
             public String getInfo() {
-        	return "Timeout for the external solvers in ms.";
+        	return "Timeout for the external solvers in seconds.\nFractions of a second are allowed.\n" +
+        		"Example: 6.5";
             };
 
 

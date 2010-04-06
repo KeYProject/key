@@ -42,12 +42,11 @@ import de.uka.ilkd.key.gui.nodeviews.SequentView;
 import de.uka.ilkd.key.gui.notification.NotificationManager;
 import de.uka.ilkd.key.gui.notification.events.*;
 import de.uka.ilkd.key.gui.prooftree.ProofTreeView;
-import de.uka.ilkd.key.gui.smt.DPSDialog;
+import de.uka.ilkd.key.gui.smt.SettingsDialog;
 import de.uka.ilkd.key.gui.smt.DecisionProcedureSettings;
-import de.uka.ilkd.key.gui.smt.DecissionProcedureSettingsDialog;
 import de.uka.ilkd.key.gui.smt.RuleLauncher;
 import de.uka.ilkd.key.gui.smt.SMTResultsAndBugDetectionDialog;
-import de.uka.ilkd.key.gui.smt.TacletTranslationSettingsDialog;
+import de.uka.ilkd.key.gui.smt.TacletTranslationSelection;
 import de.uka.ilkd.key.gui.smt.TemporarySettings;
 import de.uka.ilkd.key.java.NonTerminalProgramElement;
 import de.uka.ilkd.key.java.ProgramElement;
@@ -269,6 +268,7 @@ public class Main extends JFrame implements IMain {
         initGoalList();
         initGUIProofTree();
         decProcResDialog = SMTResultsAndBugDetectionDialog.getInstance(mediator);
+        mediator.addKeYSelectionListener(TacletTranslationSelection.getSelectionListener());
         
         SwingUtilities.updateComponentTreeUI(this);
         ToolTipManager.sharedInstance().setDismissDelay(30000);
@@ -501,8 +501,9 @@ public class Main extends JFrame implements IMain {
         toolBar.addSeparator();                        
         toolBar.addSeparator();
         toolBar.addSeparator();
-        toolBar.add(createDecisionProcedureSelection());
         toolBar.add(createDecisionProcedureButton());
+        toolBar.add(createDecisionProcedureSelection());
+      
         toolBar.addSeparator();
         
         final JButton goalBackButton = new JButton();
@@ -690,9 +691,8 @@ public class Main extends JFrame implements IMain {
     
     private JComboBox createDecisionProcedureSelection() {	
 	decisionProcedureInvocationSelection = new JComboBox();	
-	for(SMTRule rule : ProofSettings.DEFAULT_SETTINGS.getDecisionProcedureSettings().getInstalledRules()){
-	    decisionProcedureInvocationSelection.addItem(rule); 
-	}
+	this.updateDecisionProcedureSelectMenu();
+
 	
 	decisionProcedureInvocationSelection.setAction(new DPSelectionAction()); 
 	//SMTRule r = ProofSettings.DEFAULT_SETTINGS.getDecisionProcedureSettings().getActiveSMTRule();
@@ -1576,57 +1576,40 @@ public class Main extends JFrame implements IMain {
      * Remove those, that are not installed anymore, add those, that got installed.
      */
     public void updateDecisionProcedureSelectMenu() {
-	
-//	 the button group which takes care of selecting and unselecting not 
-        // activated entries
-        //final ButtonGroup dpButtonGroup = new ButtonGroup();
-	/*for (JRadioButtonMenuItem rbm : showndecProcRadioItems)
-	    decProcOptions.remove(rbm);
-	*/
-	//showndecProcRadioItems.removeAll(showndecProcRadioItems);
-	
 
-	Enumeration<AbstractButton> en = decProcRadioItems.getElements();
-	while(en.hasMoreElements()){
-	    decProcOptions.remove(en.nextElement());
-	    
+	Action action = decisionProcedureInvocationSelection.getAction();
+	decisionProcedureInvocationSelection.setAction(null);
+	decisionProcedureInvocationSelection.removeAllItems();
+	
+	for(SMTRule rule : ProofSettings.DEFAULT_SETTINGS.getDecisionProcedureSettings().getInstalledRules()){
+	    decisionProcedureInvocationSelection.addItem(rule); 
+	}
+	
+	if(decisionProcedureInvocationSelection.getItemCount() == 0){
+	    decisionProcedureInvocationSelection.addItem(SMTRule.EMPTY_RULE);
 	}
 
-	
-	decProcRadioItems =  new ButtonGroup();
-	
-	
-	final DecisionProcedureSettings dps = ProofSettings.DEFAULT_SETTINGS.getDecisionProcedureSettings();
-	
-	int targetIndex = 0;
-	for(SMTRule rule : dps.getInstalledRules()){
+	SMTRule active = ProofSettings.DEFAULT_SETTINGS.getDecisionProcedureSettings().getActiveSMTRule();
+	boolean found = false;
+	for(int i=0; i < decisionProcedureInvocationSelection.getItemCount(); i++){
 	    
-	    final JRadioButtonMenuItem b = new JRadioButtonMenuItem();
-	    decProcRadioItems.add(b);
-	//    b.setAction(new DPSelectionAction(rule, b));
-	    decProcOptions.add(b, targetIndex);
-	    
-	    targetIndex++;
-	    
+	    if(decisionProcedureInvocationSelection.getItemAt(i) == active){
+		decisionProcedureInvocationSelection.setSelectedIndex(i);
+		found = true;
+		break;
+	    }
 	}
-	/*for (RuleDescriptor r : dps.getAvailableRules()) {
-	    final JRadioButtonMenuItem b = new JRadioButtonMenuItem();
-	    b.setAction(new DPSelectionAction(r, b, showndecProcRadioItems));
-	    decProcOptions.add(b, targetIndex);
-	    targetIndex++;
-	    showndecProcRadioItems.add(b);
-	    //dpButtonGroup.add(b);
-	}*/
+	if(!found && decisionProcedureInvocationSelection.getItemCount() >0){
+	    ProofSettings.DEFAULT_SETTINGS.getDecisionProcedureSettings().setActiveSMTRule(
+		    (SMTRule)decisionProcedureInvocationSelection.getSelectedItem());
+	}
+	decisionProcedureInvocationSelection.setAction(action);
+
     }
     
-    JMenuItem showSMTResDialog;
-    JCheckBoxMenuItem saveSMTFile;
-    private JCheckBoxMenuItem waitForAllProvers;
-    private JCheckBoxMenuItem saveTacletTranslation;
-    private JCheckBoxMenuItem useTaclets;
-    private JMenuItem showTacletTranslationSettings;
-    /**@see {@link de.uka.ilkd.key.smt.SmtLibTranslatorWeaker} */
-    JCheckBoxMenuItem weakerSMTTranslation;
+   private JMenuItem showSMTResDialog;
+   
+
 
     
     
@@ -1636,131 +1619,35 @@ public class Main extends JFrame implements IMain {
      */
     private JMenu createDecisionProcedureMenu() {
 	/** menu for configuration of decision procedure */
-        //final JMenu decisionProcedureOption = new JMenu("Decision Procedures");
-        
-       // this.updateDecisionProcedureSelectMenu();
-        
-        //decisionProcedureOption.add(this.decProcSelectionMenu);
         
         final DecisionProcedureSettings dps = ProofSettings.DEFAULT_SETTINGS.getDecisionProcedureSettings();
-	/*
-	ruletimeoutlabel = new JLabel();
-	int time = dps.getTimeout();
-	
-	int h = time/(10*60*60);
-	int min = (time - 10*60*60* h)/(10*60);
-	int sec = (time - 10*60*min)/10;
-	ruletimeoutlabel.setText("timeout: " + h + "h " + min + "min " + sec + "." + time%10 + " s");
-	//ruletimeoutlabel.setText("timeout: " + time/10 + "." + time%10 + " s");
 
-	decProcOptions.add(ruletimeoutlabel);
-
-	
-	ruletimeout = new JSlider(0, 100);
-	//the slider is exponentially scaled. So find the correct position for the slider.
-	int sliderval = 0;
-	double temp = 1.0;
-	while (temp < time) {
-	    temp = temp*1.15;
-	    sliderval++;
-	}
-	ruletimeout.setValue(sliderval);	
-	ruletimeout.addChangeListener(new ChangeListener() {
-	    public void stateChanged(ChangeEvent e) {
-		final int sliderpos =((JSlider) e.getSource()).getValue();
-		
-		//scale the timeout value exponentially. This way small values can be set exactly
-		//bigger ones
-		double timeout = 1.0;
-		for (int i = 0; i < sliderpos; i++) {
-		    timeout = timeout * 1.15;
-		}
-		int newTimeout = (int)timeout;
-		ProofSettings ps = ProofSettings.DEFAULT_SETTINGS;
-		if (mediator().getProof() != null) {
-		    ps = mediator.getProof().getSettings();
-		}
-		ps.getDecisionProcedureSettings().setTimeout(newTimeout);
-	    }	    
-	});
-	
-	// add ruletimeout slider to menu
-	decProcOptions.add(ruletimeout);
-	
-	decProcOptions.add(new JSeparator());
-	
-//	add the button for settings
-	final JMenuItem setButton = new JMenuItem("Decision Procedure Settings");
-	setButton.addActionListener(new ActionListener() {
-	    public void actionPerformed(ActionEvent a) {
-		DecissionProcedureSettingsDialog.getInstance().resetInstance();
-		
-	    }
-	});
-	decProcOptions.add(setButton);
-	//dpButtonGroup.add(setButton);*/
-	
-	//add a checkbox for saving a created problem file
 	showSMTResDialog = new JMenuItem("Show SMT Result Dialog");
 	showSMTResDialog.addActionListener(new ActionListener() {
 	   public void actionPerformed(ActionEvent e) {
-	        SMTResultsAndBugDetectionDialog dia =SMTResultsAndBugDetectionDialog.getInstance(null);
+	        SMTResultsAndBugDetectionDialog dia =SMTResultsAndBugDetectionDialog.getInstance(mediator);
 	       if(dia!=null){
 		   dia.rebuildTableForProof();
-		   dia.setVisible(dps.getShowSMTResDialog());
+		   dia.setVisible(true);
 	       }
 	   }
 	});
 	
-	SMTResultsAndBugDetectionDialog dia =SMTResultsAndBugDetectionDialog.getInstance(null);
+	SMTResultsAndBugDetectionDialog dia =SMTResultsAndBugDetectionDialog.getInstance(mediator);
 	if(dia == null){
 	    showSMTResDialog.setEnabled(false);
+	}else{
+	    showSMTResDialog.setEnabled(true);
 	}
 	decProcOptions.add(showSMTResDialog);
-        /*
-	//add a checkbox for saving a created problem file
-	saveSMTFile = new JCheckBoxMenuItem("Save created problemfile");
-	saveSMTFile.setSelected(dps.getSaveFile());
-	saveSMTFile.addActionListener(new ActionListener() {
-	   public void actionPerformed(ActionEvent e) {
-	       dps.setSaveFile(saveSMTFile.isSelected());
-	   }
-	});
-	decProcOptions.add(saveSMTFile);*/
-	
-	// add a checkbox for setting the 'waitForAllProvers'-Option
-	/*waitForAllProvers = new JCheckBoxMenuItem("Wait for all provers");
-	waitForAllProvers.setSelected(dps.isWaitingForAllProvers());
-	waitForAllProvers.addActionListener(new ActionListener() {
-		   public void actionPerformed(ActionEvent e) {
-		       dps.setWaitForAllProvers(waitForAllProvers.isSelected());
-		   }
-		});
-	decProcOptions.add(waitForAllProvers);*/
-	
 
-	
-	/*showTacletTranslationSettings = new JMenuItem("settings for taclet translation");
-	showTacletTranslationSettings.addActionListener(new ActionListener() {
-		   public void actionPerformed(ActionEvent e) {
-		       if(mediator.getSelectedProof()!=null){
-			    ProofSettings.DEFAULT_SETTINGS.getTacletTranslationSettings().
-			    initTacletMap(mediator.getSelectedProof().env().getInitConfig().getTaclets());  
-		       }
-		
-		       TacletTranslationSettingsDialog.showDialog();
-		       
-		       
-		   }
-		});
-	decProcOptions.add(showTacletTranslationSettings);*/
 	
 	
 	JMenuItem item = new JMenuItem("Settings");
 	item.addActionListener(new ActionListener() {
 		   public void actionPerformed(ActionEvent e) {
 		  
-		       DPSDialog.INSTANCE.showDialog(TemporarySettings.getInstance(
+		       SettingsDialog.INSTANCE.showDialog(TemporarySettings.getInstance(
 			       ProofSettings.DEFAULT_SETTINGS.getDecisionProcedureSettings(),
 			       ProofSettings.DEFAULT_SETTINGS.getTacletTranslationSettings()));
 		       
@@ -1769,27 +1656,7 @@ public class Main extends JFrame implements IMain {
 		});
 	decProcOptions.add(item);
 	
-	
-	
-	
-	
-	/*
-	
-	weakerSMTTranslation = new JCheckBoxMenuItem("Weaken Typesystem Translation");
-	weakerSMTTranslation.setSelected(dps.weakenSMTTranslation);
-	weakerSMTTranslation.setToolTipText("<html>When activated, the axiomatization of KeY's type system<br>" +
-						"is weakend during export to the SMT format. In particular<br>"+
-						"axioms with quantifiers are removed or instantiated.<br>" +
-						"This does not destroy soundness for verification, however,<br>" +
-						"counter examples generated by SMT solvers may not fully satisfy<br>" +
-						"the type system.</html>");
-	weakerSMTTranslation.addActionListener(new ActionListener() {
-		   public void actionPerformed(ActionEvent e) {
-		       dps.weakenSMTTranslation = weakerSMTTranslation.isSelected();
-		   }
-		});
 
-	decProcOptions.add(weakerSMTTranslation);*/
 	
 	return decProcOptions;
     }    
@@ -2219,7 +2086,13 @@ public class Main extends JFrame implements IMain {
 	
 	public void update() {	   
 	    if (settings != null) {
-		SMTRule activeRule = settings.getActiveSMTRule();				
+		SMTRule activeRule = settings.getActiveSMTRule();
+		if(activeRule == SMTRule.EMPTY_RULE){
+		    activeRule = (SMTRule) decisionProcedureInvocationSelection.getSelectedItem();
+		    if(activeRule == null){
+			activeRule = SMTRule.EMPTY_RULE;
+		    }
+		}
 		decisionProcedureInvocationButton.
 				
 		setAction(new DPInvokeAction(activeRule));
@@ -3216,12 +3089,13 @@ public class Main extends JFrame implements IMain {
 	}
 	
 	public boolean isEnabled() {
-	    return super.isEnabled() &&  
+	    Object item = decisionProcedureInvocationSelection.getSelectedItem();
+	    return super.isEnabled() && item instanceof SMTRule && item != SMTRule.EMPTY_RULE &&
  	      mediator != null && mediator.getProof() != null && !mediator.getProof().closed();
 	}
 	  
 	public void actionPerformed(ActionEvent e) {
-		Object item = decisionProcedureInvocationSelection.getSelectedItem();
+	 	Object item = decisionProcedureInvocationSelection.getSelectedItem();
 		if(item != null && item instanceof SMTRule){
 		    ProofSettings.DEFAULT_SETTINGS.getDecisionProcedureSettings().setActiveSMTRule((SMTRule)item);
 		}
