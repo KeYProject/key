@@ -10,8 +10,6 @@
 
 package de.uka.ilkd.key.proof.init;
 
-import java.util.Iterator;
-
 import de.uka.ilkd.key.collection.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Name;
@@ -103,32 +101,7 @@ public final class DependencyContractPO extends AbstractPO
         			   TB.forallHeaps(services, 
         				   	  ax.getAxiom(services)));
             }
-        }
-        
-        //connection between any::select and other::select
-        for(Taclet taclet : initConfig.activatedTaclets()) {
-            if(taclet.name().toString().equals("selectToAnySelect")) {
-        	RewriteTaclet rt = (RewriteTaclet) taclet; 
-        	RewriteTacletBuilder tb = new RewriteTacletBuilder();
-        	tb.setFind(rt.find());
-        	Iterator<VariableCondition> it = rt.getVariableConditions();
-        	while(it.hasNext()) {
-        	    tb.addVariableCondition(it.next());
-        	}
-        	for(TacletGoalTemplate template : rt.goalTemplates()) {
-        	    tb.addTacletGoalTemplate(template);
-        	}
-        	tb.setName(new Name("selectToAnySelectAuto"));
-        	tb.addRuleSet(new RuleSet(
-        		  new Name("inReachableStateImplication")));
-        	final Taclet autoTaclet = tb.getTaclet();
-        	taclets = taclets.add(NoPosTacletApp.createNoPosTacletApp(
-        						autoTaclet));
-        	initConfig.getProofEnv()
-        	          .registerRule(autoTaclet,
-        	        	        AxiomJustification.INSTANCE);        	
-            }
-        }             
+        }  
         
         return TB.and(new Term[]{TB.inReachableState(services), 
         	       		 selfNotNull,
@@ -225,7 +198,6 @@ public final class DependencyContractPO extends AbstractPO
         return contract;
     }
    
-    
     
     @Override
     public boolean equals(Object o) {
