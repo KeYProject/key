@@ -3171,7 +3171,7 @@ funcpredvarterm returns [Term a = null]
                 
         {  
             if(varfuncid.equals("inReachableState") && args == null) {
-	        a = TermBuilder.DF.inReachableState(getServices());
+	        a = TermBuilder.DF.wellFormedHeap(getServices());
 	    } else if(varfuncid.equals("skip") && args == null) {
 	        a = tf.createTerm(UpdateJunctor.SKIP);
 	    } else {

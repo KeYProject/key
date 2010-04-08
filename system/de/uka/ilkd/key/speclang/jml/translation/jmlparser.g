@@ -1843,16 +1843,14 @@ specquantifiedexpression returns [Term result = null] throws SLTranslationExcept
 	    p = convertToFormula(p);
 	    Term t = convertToFormula(expr.getTerm());
 	    
-	    //add implicit "non-null" guards for reference types, 
+	    //add implicit "non-null and created" guards for reference types, 
 	    //"in-bounds" guards for integer types
 	    Term nullTerm = TB.NULL(services);
 	    for(LogicVariable lv : declVars.second) {
+	        p = TB.and(p, TB.reachableValue(services, TB.var(lv), declVars.first));
 	    	if(lv.sort().extendsTrans(services.getJavaInfo().objectSort()) && !nullable) {
 		    p = TB.and(p, TB.not(TB.equals(TB.var(lv), nullTerm)));
-		} else if(lv.sort().equals(intLDT.targetSort())) {
-		    Function inBounds = intLDT.getInBounds(declVars.first.getJavaType());
-		    p = TB.and(p, TB.func(inBounds, TB.var(lv)));
-	    	}
+		}
 	    }	    
 
 	    if (q.getText().equals("\\forall")) {

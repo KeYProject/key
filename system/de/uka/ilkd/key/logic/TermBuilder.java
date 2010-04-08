@@ -938,7 +938,7 @@ public final class TermBuilder {
     }
     
 
-    public Term inReachableState(Services services) {
+    public Term wellFormedHeap(Services services) {
         return wellFormed(services, heap(services));
     }
     
@@ -1122,7 +1122,7 @@ public final class TermBuilder {
 	} else {
 	    return tt();
 	}
-    }    
+    }
     
     
     public Term reachableValue(Services services, ProgramVariable pv) {

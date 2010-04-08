@@ -33,7 +33,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.metaconstruct.WhileInvRule;
 import de.uka.ilkd.key.speclang.LoopInvariant;
 import de.uka.ilkd.key.util.InvInferenceTools;
-import de.uka.ilkd.key.util.Pair;
+import de.uka.ilkd.key.util.Triple;
 
 
 public final class WhileInvariantRule implements BuiltInRule {
@@ -131,9 +131,13 @@ public final class WhileInvariantRule implements BuiltInRule {
     }
 
     
-    private Pair<Term,Term> createAnonUpdate(While loop, 
-	    				     Term mod, 
-	    				     Services services) {
+    /**
+     * @return (anon update, anon heap, local vars)
+     */
+    private Triple<Term,Term,ImmutableSet<ProgramVariable>> createAnonUpdate(
+	    					    While loop, 
+	    				     	    Term mod, 
+	    				     	    Services services) {
 	//heap
 	final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
 	final Name anonHeapName 
@@ -159,7 +163,9 @@ public final class WhileInvariantRule implements BuiltInRule {
 	    anonUpdate = TB.parallel(anonUpdate, elemUpd);
 	}
 	
-	return new Pair<Term,Term>(anonUpdate, anonHeapTerm);
+	return new Triple<Term,Term,ImmutableSet<ProgramVariable>>(anonUpdate, 
+							           anonHeapTerm, 
+							           localVars);
     }
     
     
@@ -215,10 +221,13 @@ public final class WhileInvariantRule implements BuiltInRule {
 						        TB.heap(services));
 	
 	//prepare anon update, frame condition
-	final Pair<Term,Term> anonUpdateAndHeap 
-		= createAnonUpdate(inst.loop, mod, services);
-	final Term anonUpdate = anonUpdateAndHeap.first;
-	final Term anonHeap   = anonUpdateAndHeap.second;
+	final Triple<Term,Term,ImmutableSet<ProgramVariable>> 
+		anonUpdateAndHeapAndLocals 
+			= createAnonUpdate(inst.loop, mod, services);
+	final Term anonUpdate = anonUpdateAndHeapAndLocals.first;
+	final Term anonHeap   = anonUpdateAndHeapAndLocals.second;
+	final ImmutableSet<ProgramVariable> locals 
+			      = anonUpdateAndHeapAndLocals.third;
 	final Term frameCondition = TB.frame(services,
 		                             TB.var(heapBeforeLoop), 
 		                             mod);
@@ -276,19 +285,33 @@ public final class WhileInvariantRule implements BuiltInRule {
 					      TB.FALSE(services));
 	
 	//prepare common assumption
+	Term reachableLocals = TB.tt();
+	for(ProgramVariable pv : locals) {
+	    reachableLocals = TB.and(reachableLocals, 
+		                     TB.reachableValue(services, pv));
+	}	
 	final Term[] uAnon 
 		= new Term[]{inst.u, anonUpdate};
 	final Term[] uBeforeLoopDefAnonVariant 
-		= new Term[]{inst.u, heapBeforeLoopUpdate, anonUpdate, variantUpdate};
+		= new Term[]{inst.u, 
+		             heapBeforeLoopUpdate, 
+		             anonUpdate, 
+		             variantUpdate};
 	final Term uAnonInv 
-		= TB.applySequential(uAnon, invTerm);
+		= TB.applySequential(uAnon, TB.and(invTerm, reachableLocals));
 	final Term uAnonInvVariantNonNeg
-		= TB.applySequential(uAnon, TB.and(invTerm, variantNonNeg));
+		= TB.applySequential(uAnon, TB.and(new Term[]{invTerm, 
+			                                      reachableLocals, 
+			                                      variantNonNeg}));
 	
 	//"Invariant Initially Valid":
 	// \replacewith (==> inv );
-	initGoal.changeFormula(new ConstrainedFormula(TB.apply(inst.u, invTerm)),
-			       ruleApp.posInOccurrence());
+	final Term reachableState = TB.and(TB.wellFormedHeap(services), 
+		                           reachableLocals);
+	initGoal.changeFormula(new ConstrainedFormula(
+		                 TB.apply(inst.u, 
+		                         TB.and(invTerm, reachableState))),
+			         ruleApp.posInOccurrence());
 
 	//"Body Preserves Invariant":
         // \replacewith (==>  #atPreEqs(anon1) 
@@ -321,9 +344,9 @@ public final class WhileInvariantRule implements BuiltInRule {
 	}
 	Term bodyTerm = TB.tf().createTerm(wir, 
 					   inst.progPost,
-					   TB.and(invTerm, 
-						  TB.and(frameCondition,
-							 variantPO)));
+					   TB.and(new Term[]{invTerm,
+						   	     frameCondition,
+						   	     variantPO}));
 	bodyTerm = wir.calculate(bodyTerm, svInst, services);
 	final Term guardTrueBody = TB.box(guardJb, 
 					  TB.imp(guardTrueTerm, bodyTerm)); 

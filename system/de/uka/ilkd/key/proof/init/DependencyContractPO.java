@@ -52,7 +52,8 @@ public final class DependencyContractPO extends AbstractPO
     
     private Term buildFreePre(ProgramVariable selfVar,
 	                      KeYJavaType selfKJT,
-	                      ImmutableList<ProgramVariable> paramVars) 
+	                      ImmutableList<ProgramVariable> paramVars,
+	                      Term anonHeap) 
     		throws ProofInputException {
         //"self != null"
 	final Term selfNotNull 
@@ -103,7 +104,8 @@ public final class DependencyContractPO extends AbstractPO
             }
         }  
         
-        return TB.and(new Term[]{TB.inReachableState(services), 
+        return TB.and(new Term[]{TB.wellFormedHeap(services), 
+        			 TB.wellFormed(services, anonHeap),
         	       		 selfNotNull,
         	       		 selfCreated,
         	       		 selfExactType,
@@ -131,20 +133,23 @@ public final class DependencyContractPO extends AbstractPO
 		= TB.selfVar(services, contract.getKJT(), true);
 	final ImmutableList<ProgramVariable> paramVars
 		= TB.paramVars(services, target, true);
+
+	//prepare anon heap
+	final Name anonHeapName 
+		= new Name(TB.newName(services, "anonHeap"));
+	final Function anonHeapFunc = new Function(anonHeapName,
+		heapLDT.targetSort());
+	final Term anonHeap = TB.func(anonHeapFunc);
 	
 	//translate contract
 	final Term pre = TB.and(buildFreePre(selfVar, 
 			                     contract.getKJT(), 
-					     paramVars),
+					     paramVars,
+					     anonHeap),
 			        contract.getPre(selfVar, paramVars, services));
 	final Term dep = contract.getDep(selfVar, paramVars, services);
 	
 	//prepare update
-	final Name anonHeapName 
-		= new Name(TB.newName(services, "anonHeap"));
-	final Function anonHeapFunc = new Function(anonHeapName,
-					           heapLDT.targetSort());
-	final Term anonHeap = TB.func(anonHeapFunc);
 	final Term changedHeap 
 		= TB.anon(services, 
 			              TB.heap(services), 

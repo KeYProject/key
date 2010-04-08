@@ -652,10 +652,17 @@ public final class UseOperationContractRule implements BuiltInRule {
                                 	     	             post}))));
        
         //create "Pre" branch
+	Term reachableState = TB.wellFormedHeap(services);
+	int i = 0;
+	for(Term arg : contractParams) {
+	    KeYJavaType argKJT = contract.getTarget().getParameterType(i++);
+	    reachableState = TB.and(reachableState,
+		                    TB.reachableValue(services, arg, argKJT));
+	}
         preGoal.changeFormula(new ConstrainedFormula(
         			TB.applySequential(new Term[]{inst.u, 
         						      heapAtPreUpdate}, 
-        	                                   pre)),
+        	                                   TB.and(pre, reachableState))),
                               ruleApp.posInOccurrence());
        
         //create "Post" branch

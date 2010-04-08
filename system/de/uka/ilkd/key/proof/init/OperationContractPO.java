@@ -118,7 +118,7 @@ public final class OperationContractPO extends AbstractPO
             }
         }
         
-        return TB.and(new Term[]{TB.inReachableState(services), 
+        return TB.and(new Term[]{TB.wellFormedHeap(services), 
         	       		 selfNotNull,
         	       		 selfCreated,
         	       		 selfExactType,

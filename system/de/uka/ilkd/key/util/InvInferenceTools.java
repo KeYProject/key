@@ -426,7 +426,7 @@ public class InvInferenceTools {
     
     public ImmutableSet<ProgramVariable> getWrittenPVs(ProgramElement pe, 
 	    			              Services services) {
-	WrittenPVCollector wpvc = new WrittenPVCollector(pe, services);
+	final WrittenPVCollector wpvc = new WrittenPVCollector(pe, services);
 	wpvc.start();
 	return wpvc.result();
     }
@@ -464,6 +464,7 @@ public class InvInferenceTools {
 		if(!pv.isMember()) {
 		    assert !declaredPVs.contains(pv);
 		    assert !result.contains(pv);
+		    declaredPVs = declaredPVs.add(pv);
 		}
 	    }
 	}
