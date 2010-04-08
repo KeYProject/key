@@ -113,11 +113,6 @@ public final class JavaCardDLStrategy extends AbstractFeatureStrategy {
         final SetRuleFilter depFilter = new SetRuleFilter();
         depFilter.addRuleToSet(UseDependencyContractRule.INSTANCE);
         if(depProp.equals(StrategyProperties.DEP_ON)) {
-//            depSpecF = ConditionalFeature.createConditional(
-//        	    		depFilter,
-//        	    		ifZero(new DependencyContractFeature(), 
-//        	    		       longConst(5000),
-//        	    		       inftyConst()));
             depSpecF = ConditionalFeature.createConditional(depFilter, 
         	    					    longConst(5000));            
         } else {
@@ -337,26 +332,6 @@ public final class JavaCardDLStrategy extends AbstractFeatureStrategy {
         bindRuleSet ( d, "inReachableStateImplication",
                       add ( NonDuplicateAppModPositionFeature.INSTANCE,
                             longConst ( 100 ) ) );
-        
-        bindRuleSet ( d, "inReachableStateExpandAntec", -200 );
-
-        bindRuleSet ( d, "inReachableStateExpandRewrite",
-		      add ( not ( TopLevelFindFeature.ANTEC ),
-		            NonDuplicateAppModPositionFeature.INSTANCE,
-		            longConst ( -100 ) ) );
-        
-        //dependencies
-        final String depProp
-        	= strategyProperties.getProperty(
-        			StrategyProperties.DEP_OPTIONS_KEY);
-        if(depProp.equals(StrategyProperties.DEP_ON)) {
-            bindRuleSet(d, 
-        	        "dependencies", 
-        	        add(NonDuplicateAppModPositionFeature.INSTANCE, 
-        	            longConst(50)));
-        } else {
-            bindRuleSet(d, "dependencies", inftyConst());
-        }                
 
         bindRuleSet ( d, "type_hierarchy_def", -6500 );
         
@@ -1892,8 +1867,7 @@ public final class JavaCardDLStrategy extends AbstractFeatureStrategy {
             setupInEqCaseDistinctionsApproval ( d );
         
         bindRuleSet ( d, "inReachableStateImplication",
-                      NonDuplicateAppModPositionFeature.INSTANCE );
-        bindRuleSet(d, "dependencies", NonDuplicateAppModPositionFeature.INSTANCE);
+        	      NonDuplicateAppModPositionFeature.INSTANCE );
         
 
         setupQuantifierInstantiationApproval ( d );

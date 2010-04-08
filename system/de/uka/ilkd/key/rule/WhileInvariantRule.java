@@ -33,6 +33,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.metaconstruct.WhileInvRule;
 import de.uka.ilkd.key.speclang.LoopInvariant;
 import de.uka.ilkd.key.util.InvInferenceTools;
+import de.uka.ilkd.key.util.Pair;
 
 
 public final class WhileInvariantRule implements BuiltInRule {
@@ -130,7 +131,9 @@ public final class WhileInvariantRule implements BuiltInRule {
     }
 
     
-    private Term createAnonUpdate(While loop, Term mod, Services services) {
+    private Pair<Term,Term> createAnonUpdate(While loop, 
+	    				     Term mod, 
+	    				     Services services) {
 	//heap
 	final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
 	final Name anonHeapName 
@@ -138,7 +141,8 @@ public final class WhileInvariantRule implements BuiltInRule {
 	final Function anonHeapFunc = new Function(anonHeapName,
 					     heapLDT.targetSort());
 	services.getNamespaces().functions().addSafely(anonHeapFunc);
-	Term result = TB.anonUpd(services, mod, TB.func(anonHeapFunc));
+	final Term anonHeapTerm = TB.func(anonHeapFunc);
+	Term anonUpdate = TB.anonUpd(services, mod, anonHeapTerm);
 	
 	//local vars
 	final ImmutableSet<ProgramVariable> localVars 
@@ -152,10 +156,10 @@ public final class WhileInvariantRule implements BuiltInRule {
 	    final Term elemUpd = TB.elementary(services, 
 		                               (LocationVariable)pv, 
 		                               TB.func(anonFunc));
-	    result = TB.parallel(result, elemUpd);
+	    anonUpdate = TB.parallel(anonUpdate, elemUpd);
 	}
 	
-	return result;
+	return new Pair<Term,Term>(anonUpdate, anonHeapTerm);
     }
     
     
@@ -211,7 +215,10 @@ public final class WhileInvariantRule implements BuiltInRule {
 						        TB.heap(services));
 	
 	//prepare anon update, frame condition
-	final Term anon = createAnonUpdate(inst.loop, mod, services);
+	final Pair<Term,Term> anonUpdateAndHeap 
+		= createAnonUpdate(inst.loop, mod, services);
+	final Term anonUpdate = anonUpdateAndHeap.first;
+	final Term anonHeap   = anonUpdateAndHeap.second;
 	final Term frameCondition = TB.frame(services,
 		                             TB.var(heapBeforeLoop), 
 		                             mod);
@@ -270,19 +277,14 @@ public final class WhileInvariantRule implements BuiltInRule {
 	
 	//prepare common assumption
 	final Term[] uAnon 
-		= new Term[]{inst.u, anon};
+		= new Term[]{inst.u, anonUpdate};
 	final Term[] uBeforeLoopDefAnonVariant 
-		= new Term[]{inst.u, heapBeforeLoopUpdate, anon, variantUpdate};
+		= new Term[]{inst.u, heapBeforeLoopUpdate, anonUpdate, variantUpdate};
 	final Term uAnonInv 
-		= TB.applySequential(uAnon, 
-				     TB.and(invTerm, 
-					    TB.inReachableState(services)));
+		= TB.applySequential(uAnon, invTerm);
 	final Term uAnonInvVariantNonNeg
-		= TB.applySequential(uAnon, 
-				     TB.and(TB.and(invTerm, 
-					           TB.inReachableState(services)),
-					    variantNonNeg));
-
+		= TB.applySequential(uAnon, TB.and(invTerm, variantNonNeg));
+	
 	//"Invariant Initially Valid":
 	// \replacewith (==> inv );
 	initGoal.changeFormula(new ConstrainedFormula(TB.apply(inst.u, invTerm)),
@@ -294,6 +296,10 @@ public final class WhileInvariantRule implements BuiltInRule {
         //                         (\[{ method-frame(#ex):{#typeof(#e) #v1 = #e;} }\]#v1=TRUE ->
         //                          #whileInvRule(\[{.. while (#e) #s ...}\]post, 
         //                               #locDepFunc(anon1, \[{.. while (#e) #s ...}\]post) & inv)),anon1));
+	bodyGoal.addFormula(new ConstrainedFormula(TB.wellFormed(services, 
+		 	    					 anonHeap)), 
+		 	    true, 
+		 	    false);		
 	bodyGoal.addFormula(new ConstrainedFormula(uAnonInvVariantNonNeg), 
 			    true, 
 			    false);
@@ -331,6 +337,10 @@ public final class WhileInvariantRule implements BuiltInRule {
 	// \replacewith (==> #introNewAnonUpdate(#modifies, inv ->
 	// (\[{ method-frame(#ex):{#typeof(#e) #v1 = #e;} }\]
 	// (#v1=FALSE -> \[{.. ...}\]post)),anon2))
+	useGoal.addFormula(new ConstrainedFormula(TB.wellFormed(services, 
+		 						anonHeap)), 
+		 	   true, 
+		 	   false);		
 	useGoal.addFormula(new ConstrainedFormula(uAnonInv), true, false);
 
 	Term restPsi = TB.prog(dia ? Modality.DIA : Modality.BOX,

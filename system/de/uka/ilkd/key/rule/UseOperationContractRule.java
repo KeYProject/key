@@ -34,6 +34,7 @@ import de.uka.ilkd.key.rule.inst.ContextStatementBlockInstantiation;
 import de.uka.ilkd.key.speclang.OperationContract;
 import de.uka.ilkd.key.util.InvInferenceTools;
 import de.uka.ilkd.key.util.Pair;
+import de.uka.ilkd.key.util.Triple;
 
 
 /**
@@ -343,37 +344,36 @@ public final class UseOperationContractRule implements BuiltInRule {
     
     
     /**
-     * @return (assumption, update)
+     * @return (assumption, anon update, anon heap)
      */
-    private Pair<Term,Term> createAnonUpdate(ProgramMethod pm, 
-	                                     Term mod, 
-	                                     Services services) {
+    private Triple<Term,Term,Term> createAnonUpdate(ProgramMethod pm, 
+	                                     	    Term mod, 
+	                                     	    Services services) {
 	assert pm != null;
 	assert mod != null;
-	Term assumption;
-	Term update;
 	
 	final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
-	final Name loopHeapName 
+	final Name methodHeapName 
 		= new Name(TB.newName(services, "heapAfter_" + pm.getName()));
-	final Function loopHeapFunc
-		= new Function(loopHeapName, heapLDT.targetSort());
-	services.getNamespaces().functions().addSafely(loopHeapFunc);
+	final Function methodHeapFunc
+		= new Function(methodHeapName, heapLDT.targetSort());
+	services.getNamespaces().functions().addSafely(methodHeapFunc);
 	final Name anonHeapName 
 		= new Name(TB.newName(services, "anonHeap_" + pm.getName()));
 	final Function anonHeapFunc = new Function(anonHeapName,
 					           heapLDT.targetSort());
 	services.getNamespaces().functions().addSafely(anonHeapFunc);
-	assumption = TB.equals(TB.anon(services, 
-		                	    	   TB.heap(services), 
-		                	    	   mod,
-		                	    	   TB.func(anonHeapFunc)),
-		               TB.func(loopHeapFunc)); 
-	update = TB.elementary(services,
-		               heapLDT.getHeap(),
-		               TB.func(loopHeapFunc));
+	final Term anonHeap = TB.func(anonHeapFunc);	
+	final Term assumption = TB.equals(TB.anon(services, 
+				          TB.heap(services), 
+				          mod,
+				          anonHeap),
+		               TB.func(methodHeapFunc)); 
+	final Term anonUpdate = TB.elementary(services,
+		               		      heapLDT.getHeap(),
+		               		      TB.func(methodHeapFunc));
 	
-	return new Pair<Term,Term>(assumption, update);
+	return new Triple<Term,Term,Term>(assumption, anonUpdate, anonHeap);
     } 
     
     
@@ -402,7 +402,7 @@ public final class UseOperationContractRule implements BuiltInRule {
         } else {
             result = TB.tt();
         }
-        return TB.and(TB.inReachableState(services), result);
+        return result;
     }
     
     
@@ -615,8 +615,11 @@ public final class UseOperationContractRule implements BuiltInRule {
         excPostGoal.setBranchLabel("Exceptional Post");
         
         //prepare common stuff for the three branches
-        final Pair<Term,Term> anonAssumptionAndUpdate 
-        	= createAnonUpdate(inst.pm, mod, services);        	  
+        final Triple<Term,Term,Term> anonAssumptionAndUpdateAndHeap 
+        	= createAnonUpdate(inst.pm, mod, services);
+        final Term anonAssumption = anonAssumptionAndUpdateAndHeap.first;
+        final Term anonUpdate     = anonAssumptionAndUpdateAndHeap.second;
+        final Term anonHeap       = anonAssumptionAndUpdateAndHeap.third;
         final Term heapAtPreUpdate = TB.elementary(services, 
         					   heapAtPreVar, 
         					   TB.heap(services));
@@ -631,18 +634,18 @@ public final class UseOperationContractRule implements BuiltInRule {
 	    		     		  services);  
         final Term freeExcPost = inst.pm.isConstructor() 
                                  ? freePost 
-                                 : TB.inReachableState(services);        
+                                 : TB.tt();        
         final Term postAssumption 
         	= TB.applySequential(new Term[]{inst.u, heapAtPreUpdate}, 
-        		   	     TB.and(anonAssumptionAndUpdate.first,
-        		   		    TB.apply(anonAssumptionAndUpdate.second,
+        		   	     TB.and(anonAssumption,
+        		   		    TB.apply(anonUpdate,
         		   	                     TB.and(new Term[]{excNull, 
                                 	     	                       freePost, 
                                 	     	                       post}))));
         final Term excPostAssumption 
         	= TB.applySequential(new Term[]{inst.u, heapAtPreUpdate}, 
-        		   TB.and(anonAssumptionAndUpdate.first,
-                                  TB.apply(anonAssumptionAndUpdate.second,
+        		   TB.and(anonAssumption,
+                                  TB.apply(anonUpdate,
                                            TB.and(new Term[]{TB.not(excNull),
                                 	     	             excCreated, 
                                 	     	             freeExcPost, 
@@ -667,10 +670,14 @@ public final class UseOperationContractRule implements BuiltInRule {
         final StatementBlock postSB 
         	= replaceStatement(jb, resultAssign);
         final Term normalPost 
-            	= TB.apply(anonAssumptionAndUpdate.second,
+            	= TB.apply(anonUpdate,
                            TB.prog(inst.mod,
                                    JavaBlock.createJavaBlock(postSB),
                                    inst.progPost.sub(0)));
+        postGoal.addFormula(new ConstrainedFormula(TB.wellFormed(services, 
+        	                                                 anonHeap)), 
+        	            true, 
+        	            false);
         postGoal.changeFormula(new ConstrainedFormula(TB.apply(inst.u, 
         						       normalPost)),
         	               ruleApp.posInOccurrence());
@@ -682,10 +689,14 @@ public final class UseOperationContractRule implements BuiltInRule {
         final StatementBlock excPostSB 
             = replaceStatement(jb, new StatementBlock(new Throw(excVar)));
         final Term excPost
-            = TB.apply(anonAssumptionAndUpdate.second,
+            = TB.apply(anonUpdate,
                        TB.prog(inst.mod,
                                JavaBlock.createJavaBlock(excPostSB), 
                                inst.progPost.sub(0)));
+        excPostGoal.addFormula(new ConstrainedFormula(TB.wellFormed(services, 
+                				                    anonHeap)), 
+                	       true, 
+                	       false);        
         excPostGoal.changeFormula(new ConstrainedFormula(TB.apply(inst.u, 
         						          excPost)),
         	                  ruleApp.posInOccurrence());        

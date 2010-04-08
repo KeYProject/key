@@ -23,13 +23,11 @@ public final class ObserverCondition implements VariableCondition {
 
     private final TermSV obs;
     private final TermSV heap;
-    private final TermSV obj;
     
     
-    public ObserverCondition(TermSV obs, TermSV heap, TermSV obj) {
+    public ObserverCondition(TermSV obs, TermSV heap) {
         this.obs = obs;
         this.heap = heap;
-        this.obj = obj;
     }
 
       
@@ -40,27 +38,19 @@ public final class ObserverCondition implements VariableCondition {
 	    		  	 Services services) {
 	SVInstantiations svInst = mc.getInstantiations();
 	final Term obsInst  = (Term) svInst.getInstantiation(obs);
-	final Term heapInst = (Term) svInst.getInstantiation(heap);
-	if(obsInst == null || heapInst == null) {
+	
+	if(obsInst == null) {
 	    return mc;
-	}
-	
-	if(!(obsInst.op() instanceof ObserverFunction) 
-	   || !obsInst.sub(0).equals(heapInst)) {
+	} else if(!(obsInst.op() instanceof ObserverFunction)) { 
 	    return null;
-	}
-	final ObserverFunction of = (ObserverFunction) obsInst.op();
+	} 
 	
-	if(of.isStatic()) {
-	    return null;//TODO
-	}
-	
-	final Term objInst = (Term) svInst.getInstantiation(obj);
-	final Term properObjInst = obsInst.sub(1);
-	if(objInst == null) {
-	    svInst = svInst.add(obj, properObjInst, services);
+	final Term heapInst = (Term) svInst.getInstantiation(heap);
+	final Term properHeapInst = obsInst.sub(0);
+	if(heapInst == null) {
+	    svInst = svInst.add(heap, properHeapInst, services);
 	    return mc.setInstantiations(svInst);
-	} else if(objInst.equals(properObjInst)) {
+	} else if(heapInst.equals(properHeapInst)) {
 	    return mc;
 	} else {
 	    return null;
@@ -70,6 +60,6 @@ public final class ObserverCondition implements VariableCondition {
     
     @Override
     public String toString () {
-        return "\\isObserver (" + obs + ", " + heap + ", " + obj + ")";
+        return "\\isObserver (" + obs + ", " + heap + ")";
     }
 }

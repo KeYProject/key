@@ -35,9 +35,9 @@ public final class OneStepSimplifier implements BuiltInRule {
     
     private static final ImmutableList<String> ruleSets 
     	= ImmutableSLList.<String>nil().append("concrete")
-    	                           .append("simplify_literals")
-    	                           .append("elimQuantifier")
-    	                           .append("simplify");
+    	                               .append("simplify_literals")
+    	                               .append("elimQuantifier")
+    	                               .append("simplify");
   
     private final Map<ConstrainedFormula, Instantiation> cache 
     		= new LRUCache<ConstrainedFormula, Instantiation>(1000);

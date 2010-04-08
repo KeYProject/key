@@ -3739,10 +3739,9 @@ varcond_observer [TacletBuilder b]
 }
 :
    ISOBSERVER 
-	LPAREN obs=varId COMMA heap=varId COMMA obj=varId RPAREN {
+	LPAREN obs=varId COMMA heap=varId  RPAREN {
      	   b.addVariableCondition(new ObserverCondition((TermSV)obs, 
-     	                                                (TermSV)heap,
-     	                                                (TermSV)obj));
+     	                                                (TermSV)heap));
         } 
 ;
 
