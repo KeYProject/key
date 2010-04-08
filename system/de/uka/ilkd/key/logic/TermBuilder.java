@@ -787,8 +787,8 @@ public final class TermBuilder {
     }
     
     
-    public Term everything(Services services) {
-	return func(services.getTypeConverter().getSetLDT().getEverything());
+    public Term allLocs(Services services) {
+	return func(services.getTypeConverter().getSetLDT().getAllLocs());
     }    
     
     
@@ -915,6 +915,13 @@ public final class TermBuilder {
 	    return func(ldt.getDisjoint(), s1, s2);
 	}
     }
+    
+    
+    public Term createdLocs(Services services) {
+        return setMinus(services, 
+        	        allLocs(services), 
+                        freshLocs(services, heap(services))); 
+    }    
     
     
     

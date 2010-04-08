@@ -152,11 +152,11 @@ public final class DependencyContractPO extends AbstractPO
 	//prepare update
 	final Term changedHeap 
 		= TB.anon(services, 
-			              TB.heap(services), 
-				      TB.setMinus(services, 
-					          TB.everything(services), 
-					          dep), 
-	                              anonHeap);
+			  TB.heap(services), 
+			  TB.setMinus(services, 
+				      TB.allLocs(services), 
+				      dep), 
+                          anonHeap);
 	final Term update = TB.elementary(services, 
 					  heapLDT.getHeap(), 
 					  changedHeap);

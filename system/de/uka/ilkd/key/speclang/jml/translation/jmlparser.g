@@ -617,8 +617,8 @@ storerefkeyword returns [Term result = null] throws SLTranslationException
 }
 :
     NOTHING { result = TB.empty(services); }
-    | EVERYTHING { result = TB.everything(services); }
-    | NOT_SPECIFIED { result = TB.everything(services); }
+    | EVERYTHING { result = TB.createdLocs(services); }
+    | NOT_SPECIFIED { result = TB.createdLocs(services); }
 ;
 
 

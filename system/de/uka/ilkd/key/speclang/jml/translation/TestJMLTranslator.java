@@ -518,13 +518,22 @@ public class TestJMLTranslator extends TestCase {
         assertTrue(result != null);
         final LogicVariable qv = new LogicVariable(new Name("a"),selfVar.sort());
         final Function fieldSymbol = services.getTypeConverter().getHeapLDT().getFieldSymbolForPV(array, services);
-        Term expected = TB.all(qv,
-                TB.imp(TB.and(
-                        TB.equals(TB.dot(services, array.sort(), TB.var(qv), fieldSymbol),
-                        	  TB.dot(services, array.sort(), TB.var(selfVar), fieldSymbol)),
-                        TB.not(TB.equals(TB.var(qv), TB.NULL(services))) // implicit non null
-                        ),
-                        TB.equals(TB.var(qv), TB.var(selfVar))));
+        Term expected 
+        	= TB.all(qv,
+        		 TB.imp(TB.and(TB.and(TB.equals(TB.dot(services, 
+        			 			       array.sort(), 
+        			 			       TB.var(qv), 
+        			 			       fieldSymbol),
+        			 			TB.dot(services, 
+        			 			       array.sort(), 
+        			 			       TB.var(selfVar), 
+        			 			       fieldSymbol)),
+        			               TB.reachableValue(services, 
+        			        	       		 TB.var(qv), 
+        			        	       		 selfVar.getKeYJavaType())), 
+        			       TB.not(TB.equals(TB.var(qv), 
+        				                TB.NULL(services)))), // implicit non null
+        		 	TB.equals(TB.var(qv), TB.var(selfVar))));
         assertTrue("Expected:"+ProofSaver.printTerm(expected,services)+"\n Was:"+
                 ProofSaver.printTerm(result,services),
                 result.equalsModRenaming(expected));

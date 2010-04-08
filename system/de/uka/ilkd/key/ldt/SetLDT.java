@@ -29,7 +29,7 @@ public final class SetLDT extends LDT {
     public static final Name NAME = new Name("LocSet");    
        
     private final Function empty;
-    private final Function everything;
+    private final Function allLocs;
     private final Function singleton;
     private final Function union;
     private final Function intersect;
@@ -46,7 +46,7 @@ public final class SetLDT extends LDT {
     public SetLDT(Services services) {
 	super(NAME, services);
         empty	         = addFunction(services, "empty");
-        everything       = addFunction(services, "everything");
+        allLocs          = addFunction(services, "allLocs");
         singleton        = addFunction(services, "singleton");
         union            = addFunction(services, "union");
         intersect        = addFunction(services, "intersect");
@@ -66,8 +66,8 @@ public final class SetLDT extends LDT {
     }
     
     
-    public Function getEverything() {
-	return everything;
+    public Function getAllLocs() {
+	return allLocs;
     }
     
     
