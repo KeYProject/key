@@ -10,6 +10,10 @@
 
 package de.uka.ilkd.key.rule;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
@@ -19,11 +23,17 @@ import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.op.Junctor;
+import de.uka.ilkd.key.logic.op.Modality;
+import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.TacletFilter;
 import de.uka.ilkd.key.proof.TacletIndex;
 import de.uka.ilkd.key.util.LRUCache;
+import de.uka.ilkd.key.util.Pair;
 
 
 public final class OneStepSimplifier implements BuiltInRule {
@@ -32,6 +42,7 @@ public final class OneStepSimplifier implements BuiltInRule {
                                             = new OneStepSimplifier();
     
     private static final Name NAME = new Name("One Step Simplification");
+    private static final TermBuilder TB = TermBuilder.DF;
     
     private static final ImmutableList<String> ruleSets 
     	= ImmutableSLList.<String>nil().append("concrete")
@@ -182,11 +193,63 @@ public final class OneStepSimplifier implements BuiltInRule {
 	notSimplifiableCaches[indexNr].put(term, term);
 	return null;
     }
+    
+    
+    private Term replaceKnownHelper(Map<Term,PosInOccurrence> map, 
+	                            Term in,
+	                            /*out*/ List<PosInOccurrence> ifInsts) {
+	final PosInOccurrence pos = map.get(in);
+	if(pos != null) {
+	    ifInsts.add(pos);
+	    return pos.isInAntec() ? TB.tt() : TB.ff();
+	} else if(in.op() instanceof Modality 
+                  || in.op() instanceof UpdateApplication) {
+	    return in;
+	} else {
+	    Term[] subs = new Term[in.arity()];
+	    boolean changed = false;
+	    for(int i = 0; i < subs.length; i++) {
+		subs[i] = replaceKnownHelper(map, in.sub(i), ifInsts);
+		if(subs[i] != in.sub(i)) {
+		    changed = true;
+		}
+	    }
+	    if(changed) {
+		return TB.tf().createTerm(in.op(), 
+					  subs, 
+					  in.boundVars(), 
+					  in.javaBlock());
+	    } else {
+		return in;
+	    }
+	}
+    }
+    
+    
+    private ConstrainedFormula replaceKnown(
+	    				Services services, 
+	                             	ConstrainedFormula cf,
+	                             	Map<Term,PosInOccurrence> context,
+	                             	/*out*/ List<PosInOccurrence> ifInsts) {
+	if(context == null) {
+	    return null;
+	}
+	final Term formula = cf.formula();
+	final Term simplifiedFormula 
+		= replaceKnownHelper(context, formula, ifInsts);
+	if(simplifiedFormula.equals(formula)) {
+	    return null; 
+	} else {
+	    return new ConstrainedFormula(simplifiedFormula);
+	}
+    }
     	   
     
     private ConstrainedFormula simplifyConstrainedFormula(
-	    				    Services services,
-	    				    ConstrainedFormula cf) {
+	    				Services services,
+	    				ConstrainedFormula cf,
+	    				Map<Term,PosInOccurrence> context,
+	    				/*out*/ List<PosInOccurrence> ifInsts) {
 	for(int i = 0; i < indices.length; i++) {
 	    PosInOccurrence pos = new PosInOccurrence(cf,
 	    		              		      PosInTerm.TOP_LEVEL,
@@ -197,36 +260,92 @@ public final class OneStepSimplifier implements BuiltInRule {
 	    }
 	}
 	
-	return null;
+	return replaceKnown(services, cf, context, ifInsts);
+    }
+    
+    
+    private Instantiation computeInstantiation(Services services,
+	    				       ConstrainedFormula cf,
+	    				       Sequent seq) {
+	//try one simplification step without replace-known
+	//give up if this does not work
+	ConstrainedFormula simplifiedCf 
+		= simplifyConstrainedFormula(services, cf, null, null);
+	if(simplifiedCf == null || simplifiedCf.equals(cf)) {
+	    return new Instantiation(cf, 
+		                     0, 
+		                     ImmutableSLList.<PosInOccurrence>nil());
+	}
+	
+	//collect context formulas (potential if-insts for replace-known)
+	final Map<Term,PosInOccurrence> context 
+		= new HashMap<Term,PosInOccurrence>();
+	for(ConstrainedFormula ante : seq.antecedent()) {
+	    if(!ante.equals(cf) && ante.formula().op() != Junctor.TRUE) {
+		context.put(ante.formula(), 
+			new PosInOccurrence(ante, PosInTerm.TOP_LEVEL, true));
+	    }
+	}
+	for(ConstrainedFormula succ : seq.succedent()) {
+	    if(!succ.equals(cf) && succ.formula().op() != Junctor.FALSE) {
+		context.put(succ.formula(), 
+			new PosInOccurrence(succ, PosInTerm.TOP_LEVEL, false));
+	    }
+	}
+	final List<PosInOccurrence> ifInsts 
+		= new ArrayList<PosInOccurrence>(seq.size());
+	
+	//simplify as long as possible
+	ImmutableList<ConstrainedFormula> list 
+		= ImmutableSLList.<ConstrainedFormula>nil()
+				 .prepend(simplifiedCf);
+	while(true) {
+	    simplifiedCf = simplifyConstrainedFormula(services, 
+		    				      simplifiedCf,
+		    				      context,
+		    				      ifInsts);
+	    if(simplifiedCf != null && !list.contains(simplifiedCf)) {
+		list = list.prepend(simplifiedCf);
+	    } else {
+		break;
+	    }
+	}
+
+	//return
+	PosInOccurrence[] ifInstsArr = ifInsts.toArray(new PosInOccurrence[0]);
+	ImmutableList<PosInOccurrence> immutableIfInsts
+		= ImmutableSLList.<PosInOccurrence>nil().append(ifInstsArr);
+	return new Instantiation(list.head(), 
+		                 list.size(),
+		                 immutableIfInsts);	
     }
     
     
     private Instantiation getInstantiation(Services services, 
-	                                   ConstrainedFormula cf) {
+	                                   ConstrainedFormula cf,
+	                                   Sequent seq) {
 	Instantiation result = cache.get(cf);
 	
-	if(result == null) {
-	    ImmutableList<ConstrainedFormula> list 
-	    	= ImmutableSLList.<ConstrainedFormula>nil().prepend(cf);
-	    while(true) {
-		ConstrainedFormula nextCF 
-			= simplifyConstrainedFormula(services, list.head());
-		if(nextCF != null && !list.contains(nextCF)) {
-		    list = list.prepend(nextCF);
-		} else {
+	//check whether if-insts still available	
+	if(result != null) {
+	    for(PosInOccurrence pos : result.ifInsts) {
+		if(pos.isInAntec()) { 
+	            if(!seq.antecedent().contains(pos.constrainedFormula())) {
+		    	result = null;
+			break;
+		    }
+		} else if(!seq.succedent().contains(pos.constrainedFormula())) {
+		    result = null;
 		    break;
 		}
 	    }
-	    
-	    cache.put(list.head(), Instantiation.EMPTY_INSTANTIATION);
-	    int i = 1;
-	    for(ConstrainedFormula listEntry : list.tail()) {
-		Instantiation inst = new Instantiation(list.head(), i++);
-		cache.put(listEntry, inst);
-	    }
-	    
-	    result = cache.get(cf);
-	} 
+	}
+	
+	//(re)compute if needed
+	if(result == null) {
+	    result = computeInstantiation(services, cf, seq);
+	    cache.put(cf, result);
+	}
 	
 	assert result != null;
 	return result;
@@ -245,7 +364,7 @@ public final class OneStepSimplifier implements BuiltInRule {
 	//abort if not top level constrained formula
 	if(pio == null || !pio.isTopLevel()) {
 	    return false;
-	}	
+	}
 	
 	//abort if switched off
 	if(!ProofSettings.DEFAULT_SETTINGS
@@ -257,11 +376,12 @@ public final class OneStepSimplifier implements BuiltInRule {
 		
 	//initialize if needed
 	initIndices(goal);
-	
+		
 	//get instantiation
 	Services services = goal.proof().getServices();	
 	Instantiation inst = getInstantiation(services, 
-					      pio.constrainedFormula());
+					      pio.constrainedFormula(),
+					      goal.sequent());
 
 	//tell whether the instantiation is interesting
 	return inst.getNumAppliedRules() > 0;
@@ -276,13 +396,16 @@ public final class OneStepSimplifier implements BuiltInRule {
 	final Goal resultGoal = result.head();
 	final PosInOccurrence pos = ruleApp.posInOccurrence();
 	assert pos != null && pos.isTopLevel();
-	
+		
+	//get instantiation
 	final Instantiation inst = getInstantiation(services, 
-					            pos.constrainedFormula());
-	assert inst.getNumAppliedRules() > 0;
+					            pos.constrainedFormula(),
+					            goal.sequent());
 	
+	//change goal, set if-insts
 	resultGoal.changeFormula(inst.getCf(), pos);
 	goal.setBranchLabel(inst.getNumAppliedRules() + " rules");
+	((BuiltInRuleApp)ruleApp).setIfInsts(inst.getIfInsts());
 	
 	return result;
     }
@@ -314,14 +437,15 @@ public final class OneStepSimplifier implements BuiltInRule {
     private static final class Instantiation {	
 	private final ConstrainedFormula cf;
 	private final int numAppliedRules;
-	
-	public static final Instantiation EMPTY_INSTANTIATION 
-		= new Instantiation(null, 0);
-	
-	public Instantiation(ConstrainedFormula cf, int numAppliedRules) {
+	private final ImmutableList<PosInOccurrence> ifInsts;
+		
+	public Instantiation(ConstrainedFormula cf, 
+		             int numAppliedRules,
+		             ImmutableList<PosInOccurrence> ifInsts) {
 	    assert numAppliedRules >= 0;
 	    this.cf = cf;
 	    this.numAppliedRules = numAppliedRules;
+	    this.ifInsts = ifInsts;
 	}
 	
 	public ConstrainedFormula getCf() {
@@ -330,6 +454,10 @@ public final class OneStepSimplifier implements BuiltInRule {
 	
 	public int getNumAppliedRules() {
 	    return numAppliedRules;
+	}
+	
+	public ImmutableList<PosInOccurrence> getIfInsts() {
+	    return ifInsts;
 	}
 	
 	public String toString() {
