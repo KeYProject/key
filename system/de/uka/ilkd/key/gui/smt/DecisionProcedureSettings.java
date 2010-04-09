@@ -181,7 +181,10 @@ public class DecisionProcedureSettings implements Settings {
         for (SettingsListener aListenerList : listenerList) {
             aListenerList.settingsChanged(new GUIEvent(this));
         }
-        Main.instance.updateDecisionProcedureSelectMenu();
+        if(Main.instance != null){
+            Main.instance.updateDecisionProcedureSelectMenu();
+        }
+      
     }
     
 
@@ -286,7 +289,7 @@ public class DecisionProcedureSettings implements Settings {
     	String cg = props.getProperty(CACHE_GOALS);
     	this.cacheGoals = !(cg == null) && cg.equals("true");
     	
-    	file = props.getProperty(SAVEFILE_PATH);
+    	file = props.getProperty(SAVEFILE_PATH,"");
     	
     	String pd = props.getProperty(PROGRESS_DIALOG_MODE);
     	int mode;
@@ -583,7 +586,7 @@ public class DecisionProcedureSettings implements Settings {
         }
         
         props.setProperty(PROGRESS_DIALOG_MODE,Integer.toString(progressDialogMode));
-        
+
         props.setProperty(SAVEFILE_PATH,this.file);
         
         

@@ -336,7 +336,7 @@ public class TemporarySettings extends Settings {
 		"the type system.";
 	    }
 
-	},	new TableCheckBox() {
+	}/*,	new TableCheckBox() {
 
 	    public boolean prepareValues() {
 		setTitle("Cache goals.");
@@ -355,7 +355,7 @@ public class TemporarySettings extends Settings {
 	    
 	
 	
-	}
+	}*/
 
 
 

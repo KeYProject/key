@@ -429,8 +429,6 @@ public abstract class AbstractSMTSolver extends AbstractProcess implements SMTSo
 	    list.add(s);
 
 	    
-	}else{
-	    throw new RuntimeException("This should not happen.");
 	}
 
 	return list.toArray(new String[list.size()]);

@@ -320,29 +320,12 @@ class ProgressPanel implements SMTProgressMonitor {
 	    
         }
 
-        private int countSolveType(List<InternGoal> goals, SolveType type){
-            int counter =0;
-            for(InternGoal goal : goals){
-        	if(goal.type == type){
-        	    counter++;
-        	}
-            }
-            return counter;
-        }
+
 	
         public void setSolverFinished(long time) {
             getProgressBarTime().setString("Stoped after "+ ((double)time)/1000 + " sec.");
             parent.repaint();
-            int count, solved;
-           
-            synchronized(dialog){
-       	 	synchronized (goals) {
-       	 	    count = goals.size();
-       	 	    solved = countSolveType(goals,SolveType.SOLVABLE);
-                }
-       	 	System.out.println(process.getTitle());
-        	dialog.processHasFinished(this, count, solved);
-        
-            }
+      
+
         }
 }

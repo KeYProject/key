@@ -501,6 +501,7 @@ public class Main extends JFrame implements IMain {
         toolBar.addSeparator();                        
         toolBar.addSeparator();
         toolBar.addSeparator();
+   
         toolBar.add(createDecisionProcedureButton());
         toolBar.add(createDecisionProcedureSelection());
       
@@ -686,17 +687,22 @@ public class Main extends JFrame implements IMain {
 	decisionProcedureInvocationButton = new JButton();	
 	SMTRule r = ProofSettings.DEFAULT_SETTINGS.getDecisionProcedureSettings().getActiveSMTRule();
 	decisionProcedureInvocationButton.setAction(new DPInvokeAction(r));
+	decisionProcedureInvocationButton.getAction().setEnabled(false);
 	return decisionProcedureInvocationButton;
     }
     
     private JComboBox createDecisionProcedureSelection() {	
-	decisionProcedureInvocationSelection = new JComboBox();	
+		
+	
+	DPSelectionAction action = new DPSelectionAction();
+	decisionProcedureInvocationSelection = new JComboBox();
+	
+	decisionProcedureInvocationSelection.setAction(action);
+	action.setEnabled(false);
+	
+	mediator.addKeYSelectionListener(new DPEnableControl());
 	this.updateDecisionProcedureSelectMenu();
 
-	
-	decisionProcedureInvocationSelection.setAction(new DPSelectionAction()); 
-	//SMTRule r = ProofSettings.DEFAULT_SETTINGS.getDecisionProcedureSettings().getActiveSMTRule();
-	//decisionProcedureInvocationButton.setAction(new DPInvokeAction(r));
 	return decisionProcedureInvocationSelection;
     }
 
@@ -3079,19 +3085,47 @@ public class Main extends JFrame implements IMain {
     }
     
     
+    private final class DPEnableControl implements KeYSelectionListener{
+
+	private void enable(boolean b){
+	    decisionProcedureInvocationSelection.getAction().setEnabled(b);
+	    decisionProcedureInvocationButton.getAction().setEnabled(b);
+	}
+
+        public void selectedProofChanged(KeYSelectionEvent e) {
+	    if(e.getSource().getSelectedProof() != null){
+              	  enable(!e.getSource().getSelectedProof().closed());
+	       }else{
+		   enable(false);
+	       }
+    	
+        }
+        
+        public void selectedNodeChanged(KeYSelectionEvent e) {
+            selectedProofChanged(e);
+    	
+        }
+	
+    }
+    
+    /**
+     * This action controls the selection of external provers.
+     */
 
     private final class DPSelectionAction extends AbstractAction {
 
-	//private final SMTRule decisionProcedure;
+
+
 	
-	public DPSelectionAction() {
-	    
-	}
+
 	
 	public boolean isEnabled() {
+	    
 	    Object item = decisionProcedureInvocationSelection.getSelectedItem();
-	    return super.isEnabled() && item instanceof SMTRule && item != SMTRule.EMPTY_RULE &&
- 	      mediator != null && mediator.getProof() != null && !mediator.getProof().closed();
+	    
+	    
+	    return super.isEnabled() && item instanceof SMTRule && item != SMTRule.EMPTY_RULE
+	    && mediator != null && mediator.getSelectedProof() != null && !mediator.getSelectedProof().closed();
 	}
 	  
 	public void actionPerformed(ActionEvent e) {
@@ -3114,8 +3148,7 @@ public class Main extends JFrame implements IMain {
 	    assert decisionProcedure != null;
 	    this.decisionProcedure = decisionProcedure;
 	
-
-	   // putValue(SMALL_ICON, IconFactory.simplifyLogo(TOOLBAR_ICON_SIZE));	    
+	    
 	  
 	    putValue(NAME, "Run");
 		
@@ -3127,9 +3160,11 @@ public class Main extends JFrame implements IMain {
 	    
 	}
 	
+	
+	
 	public boolean isEnabled() {
 	    return super.isEnabled() && decisionProcedure != SMTRule.EMPTY_RULE && 
- 	      mediator != null && mediator.getProof() != null && !mediator.getProof().closed();
+ 	      mediator != null && mediator.getSelectedProof() != null && !mediator.getSelectedProof().closed();
 	}
 	  
 	public void actionPerformed(ActionEvent e) {
@@ -3139,61 +3174,7 @@ public class Main extends JFrame implements IMain {
 	}	
     }
     
-    /**
-     * This action controls the selection of external provers. It provides the properties for the buttons 
-     * displayed in the radio button group and if an external prover is selected this action is invoked and
-     * updates the decision procedure settings of the current proof settings. 
-     */
-   /* private final class DPSelectionAction extends AbstractAction {
-	private final SMTRule decisionProcedure;
-	// currently necessary as property SELECTED_KEY support first since JDK >= 1.6
-	private final JRadioButtonMenuItem radioButton;
-	
 
-	public DPSelectionAction(SMTRule decisionProcedure, JRadioButtonMenuItem radioButton) {	    
-	    this.decisionProcedure = decisionProcedure;
-	    this.radioButton = radioButton;  
-	    
-	    
-	    final SMTRule activeRule = getCurrentDPSettings().getActiveSMTRule();
-	    
-	    if (activeRule.equals(decisionProcedure)) {
-		radioButton.setSelected(true);
-	    } else {
-		radioButton.setSelected(false);
-	    }
-
-	   
-
-	    putValue(NAME, decisionProcedure.displayName());
-	    if (decisionProcedure != SMTRule.EMPTY_RULE) {		
-		putValue(SHORT_DESCRIPTION, "Use '" + decisionProcedure.displayName() + "' as external prover.");
-	    } else {
-		putValue(SHORT_DESCRIPTION, "Do not use any external prover.");
-	    }
-
-	}
-	
-	public boolean isEnabled() {
-	    return super.isEnabled();
-	}
-	
-	public void actionPerformed(ActionEvent e) {
-	    
-	    getCurrentDPSettings().setActiveSMTRule(decisionProcedure);
-
-	}
-
-	private DecisionProcedureSettings getCurrentDPSettings() {
-	    DecisionProcedureSettings dpSettings;
-	    if (mediator.getProof() != null) {
-		dpSettings = mediator.getProof().getSettings().getDecisionProcedureSettings();
-	    } else {
-		dpSettings = ProofSettings.DEFAULT_SETTINGS.getDecisionProcedureSettings();
-	    }
-	    return dpSettings;
-	}
-    }*/
     
     
     private final class AbandonTask extends AbstractAction  {

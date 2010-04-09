@@ -860,7 +860,12 @@ public abstract class AbstractTacletTranslator implements TacletTranslator,
     
     static public Term createVariableTerm(ObjectSort sort,String field,Services services){
 	JavaInfo javaInfo = services.getJavaInfo();
-	ProgramVariable createdAttribute = javaInfo.getAttribute(field, sort);
+	ProgramVariable createdAttribute = null;
+	try{
+	  createdAttribute = javaInfo.getAttribute(field, sort);
+	}
+	catch(NullPointerException e){
+	}
 	if(createdAttribute == null){
 	    return null;
 	}

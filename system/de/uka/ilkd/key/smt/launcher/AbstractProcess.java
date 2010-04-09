@@ -119,6 +119,10 @@ abstract public class AbstractProcess implements  Process, MakesProgress
                     listener.eventException(this, e);
                     running = false;
                     return;
+                }finally{
+                    if(process != null){
+                	process.destroy();
+                    }
                 }
                 running = false;
                 

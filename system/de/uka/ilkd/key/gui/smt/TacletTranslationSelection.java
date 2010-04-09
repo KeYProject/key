@@ -310,7 +310,7 @@ class LeafPanel extends TreePanel {
 	}
 	
 	private void react(KeYSelectionEvent e){
-	    if (e.getSource().getSelectedGoal() != null) {
+	    if (e.getSource().getSelectedProof() != null && e.getSource().getSelectedGoal() != null) {
 		index = e.getSource().getSelectedGoal().indexOfTaclets();
 	    } else {
 		index = null;

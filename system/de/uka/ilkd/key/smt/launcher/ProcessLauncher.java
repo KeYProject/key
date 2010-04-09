@@ -34,6 +34,7 @@ public abstract  class ProcessLauncher  implements ProcessListener, Runnable{
 	protected LinkedList<ProcessLauncherListener> listener = new LinkedList<ProcessLauncherListener>();
 	private List<ProcessLaunch> running = Collections.synchronizedList(new LinkedList<ProcessLaunch>());
 	private boolean firstClosePolicy = true;
+	private int runningCounter =0;
 	
 
 	
@@ -132,11 +133,15 @@ public abstract  class ProcessLauncher  implements ProcessListener, Runnable{
                         
 		
 		}
+
 		queue.clear();
 	
 			for(ProcessLaunch launch : running){
+			    runningCounter++;
 			    launch.start();
+			    
 			}
+	
 	
 	
 		
@@ -150,6 +155,7 @@ public abstract  class ProcessLauncher  implements ProcessListener, Runnable{
 		while(it.hasNext()){
 			ProcessLaunch launch = it.next();
 			long currentTime = System.currentTimeMillis();
+		
 			if(!launch.checkTime(currentTime, maxTime)|| !launch.running()){
 			    	boolean time = launch.running();
 				launch.stop();
@@ -211,39 +217,23 @@ public abstract  class ProcessLauncher  implements ProcessListener, Runnable{
 	    	ProcessLaunch launch = findLaunch(p);
 			
 		publish(new Event(this,launch,Event.Type.PROCESS_EXCEPTION,e));
-		/*if(p!= null){
-		    remove(p);    
-		}*/
+	
 		
 		
 	}
 
 
 	public void eventFinished(Process p) {
-	    	ProcessLaunch launch = findLaunch(p);
-	
-		//publish(new Event(this,launch,Event.Type.PROCESS_FINISHED));
-		//remove(p);
-
 	}
 
 
 	public void eventInterruption(Process p) {
-	    	ProcessLaunch launch = findLaunch(p);
-		
-		//publish(new Event(this,launch,Event.Type.PROCESS_INTERRUPTION));
-		//remove(p);
-
 	}
 
 
 	public void eventStarted(Process p) {
-	    	ProcessLaunch launch = findLaunch(p);
-		//publish(new Event(this,launch,Event.Type.PROCESS_START));
-		
 	}
 
-	
 	
 
 	
@@ -259,13 +249,14 @@ public abstract  class ProcessLauncher  implements ProcessListener, Runnable{
 				eventException(null, e);
 				
 			}
-			if(getRunning().isEmpty()){
+			if(getRunning().isEmpty()||runningCounter==0){
 				runningIsEmpty();
 				
 			}
 			
 			
 		}
+		cancelMe();
 		publish(new Event(this, null,Event.Type.WORK_DONE));
 		
 

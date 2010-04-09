@@ -489,9 +489,9 @@ public class Proof implements Named {
 	p_goal.addClosureConstraint ( p_c );
 
 	removeClosedSubtree ();
-
-	if ( closed () )
+	if ( closed () ){
 	    fireProofClosed();
+	}
     }
 
     /**
@@ -515,7 +515,7 @@ public class Proof implements Named {
 	    closedSubtree.setClosed();
 
 	if ( !closed () && closedSubtree != null ) {
-
+	
 	    boolean        b    = false;
 	    Iterator<Node> it   = closedSubtree.leavesIterator ();
 	    Goal           goal;
@@ -525,13 +525,15 @@ public class Proof implements Named {
 		if ( goal != null ) {
 		    b = true;
 		    remove ( goal );
+
 		}
 	    }
 
-	    if ( b )
+	    if ( b ){
 		// For the moment it is necessary to fire the message ALWAYS
 		// in order to detect branch closing.
-		fireProofGoalsAdded ( ImmutableSLList.<Goal>nil() );		
+		fireProofGoalsAdded ( ImmutableSLList.<Goal>nil() );	
+	    }
 	}
 
 	closedSubtree = null;

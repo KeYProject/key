@@ -26,6 +26,8 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.awt.event.WindowStateListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.Collection;
 
 import javax.swing.DefaultListCellRenderer;
@@ -61,6 +63,7 @@ public class ProgressDialog extends JDialog implements ProcessLauncherListener{
 	private int processFinishedCounter = 0;
 	private int numberOfProcesses =0;
 	private boolean stopRunning = false;
+	private boolean applyResults = false;
 
 
 	
@@ -115,6 +118,14 @@ public class ProgressDialog extends JDialog implements ProcessLauncherListener{
 	    		setVisible(false);
 			rule.stop();
 	    	    }
+	    	    
+	    	    @Override
+		    public void windowDeactivated(WindowEvent e) {
+		        if(applyResults){
+		            rule.applyResults();
+		            applyResults = false;
+		        }
+		     }
 	    	});
 	    	
 		setLayout(new BorderLayout());
@@ -130,6 +141,9 @@ public class ProgressDialog extends JDialog implements ProcessLauncherListener{
 			}
 			
 		});
+
+
+		
 		this.getContentPane().add(getPanelDialog(),BorderLayout.CENTER);
 	}
 	
@@ -319,23 +333,19 @@ public class ProgressDialog extends JDialog implements ProcessLauncherListener{
 		
 	}
 	
-        void processHasFinished(ProgressPanel panel,int goalcount, int solved){
-         
-	    if(stopRunning){
-		return;
-	    }
 
 
-	    
-	    
-	}
-
-	
+	// This method is called by the Boss-Thread of the SMTRule. 
+        // Because it is important to apply the results in the AWT-Thread, 
+        // the following mechanism is introduced.
         public void workDone() {
-	    int mode = DecisionProcedureSettings.getInstance().getProgressDialogMode();
+            
+            int mode = DecisionProcedureSettings.getInstance().getProgressDialogMode();
 	    if(mode == DecisionProcedureSettings.PROGRESS_MODE_CLOSE ||
 	       mode == DecisionProcedureSettings.PROGRESS_MODE_CLOSE_FIRST){
+		applyResults = true;
 		setVisible(false);
+		
 	    }
 	    repaint();
 	    

@@ -183,7 +183,7 @@ public class TestTacletTranslation extends TestCommons {
 		
 
 		try {
-		    rule.setMaxTime(5000);
+		    rule.setMaxTime(3000);
 		    rule.start(g, proof.getUserConstraint().getConstraint(), false);
 		    result = rule.getResults().getFirst();
 		} catch (Exception e) {

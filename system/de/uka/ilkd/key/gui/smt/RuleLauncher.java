@@ -16,7 +16,7 @@ import de.uka.ilkd.key.logic.Constraint;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.smt.SMTRule;
-import de.uka.ilkd.key.smt.SMTRule.ApplyPolicy;
+import de.uka.ilkd.key.smt.SMTRule.WaitingPolicy;
 
 /**
  * Use this class to start SMTRules, if you want to use SMTSolver in KeY
@@ -32,14 +32,12 @@ public class RuleLauncher {
     		
     	    }
     	    
-    	    public ApplyPolicy getApplyPolicy(){
-    		if(DecisionProcedureSettings.getInstance().getProgressDialogMode()
-    			== DecisionProcedureSettings.PROGRESS_MODE_CLOSE)
-    		return ApplyPolicy.AUTOMATICALLY_ALL;
+    	    public WaitingPolicy getApplyPolicy(){
+    
     		if(DecisionProcedureSettings.getInstance().getProgressDialogMode()
     			== DecisionProcedureSettings.PROGRESS_MODE_CLOSE_FIRST)
-    		return ApplyPolicy.AUTOMATICALLY_FIRST;
-    		return ApplyPolicy.MANUAL;
+    		return WaitingPolicy.STOP_FIRST;
+    		return WaitingPolicy.WAIT_FOR_ALL;
     		
     	    }
     	    
