@@ -188,6 +188,21 @@ public class Test extends SuperTest{
     /*@ public normal_behavior
       @  ensures true;
       @*/
+    public void testNested(){
+	final ScopedMemory sm1 = new LTMemory(3000000);
+	final ScopedMemory sm2 = new LTMemory(3000000);
+	sm1.enter( new Runnable(){
+		public void run(){
+		    sm2.enter(new Runnable(){
+			    public void run(){}
+			});
+		}
+	    });
+    }
+
+    /*@ public normal_behavior
+      @  ensures true;
+      @*/
     public void assignToInstanceFieldNull2(){
 	next.next = null;
     }

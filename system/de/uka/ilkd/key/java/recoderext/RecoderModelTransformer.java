@@ -294,14 +294,18 @@ public abstract class RecoderModelTransformer extends TwoPassTransformation {
            Variable v = si.getVariable(vr.getName(), vr);
            if((v instanceof VariableSpecification) && !(v instanceof FieldSpecification) &&
                    si.getContainingClassType((ProgramElement) v) != si.getContainingClassType(vr)){
-               List<Variable> vars = lc2fv.get(si.getContainingClassType(vr));
-               if(vars == null){
-                   vars = new LinkedList<Variable>();
-               }
-               if(!vars.contains(v)){
-                   vars.add(v);
-               }
-               lc2fv.put(si.getContainingClassType(vr), vars);
+	       ClassType ct = si.getContainingClassType(vr);
+	       while(ct instanceof ClassDeclaration && ct != si.getContainingClassType((ProgramElement) v)){
+		   List<Variable> vars = lc2fv.get(ct);
+		   if(vars == null){
+		       vars = new LinkedList<Variable>();
+		   }
+		   if(!vars.contains(v)){
+		       vars.add(v);
+		   }
+		   lc2fv.put(ct, vars);
+		   ct = si.getContainingClassType(ct);
+	       }
            }
        }
         

@@ -1540,6 +1540,7 @@ public class Recoder2KeYConverter {
         ASTList<recoder.java.Expression> args = n.getArguments();
         final recoder.java.reference.ReferencePrefix rp = n
         .getReferencePrefix();
+	recoder.service.CrossReferenceSourceInfo si = getServiceConfiguration().getCrossReferenceSourceInfo();
         final recoder.java.reference.TypeReference tr = n.getTypeReference();
         final recoder.java.declaration.ClassDeclaration cd = n.getClassDeclaration();
         
@@ -1555,9 +1556,17 @@ public class Recoder2KeYConverter {
         }
         
         for (int i = arguments.length-numVars; i<arguments.length; i++) {
-            arguments[i] = (ProgramVariable) convert(
-                    (recoder.java.declaration.VariableSpecification)
-                        outerVars.get(i-arguments.length + numVars)).getProgramVariable();
+	    recoder.java.declaration.VariableSpecification v = (recoder.java.declaration.VariableSpecification) 
+		outerVars.get(i-arguments.length + numVars);
+	    if (si.getContainingClassType(v) != si.getContainingClassType(n)){
+		recoder.java.declaration.FieldSpecification fs = 
+		    (recoder.java.declaration.FieldSpecification) si.getVariable(ImplicitFieldAdder.FINAL_VAR_PREFIX+v.getName(), 
+										 (recoder.java.declaration.ClassDeclaration) 
+										 si.getContainingClassType(n));
+		arguments[i] = new FieldReference(getProgramVariableForFieldSpecification(fs), new ThisReference());
+	    }else{
+		arguments[i] = (ProgramVariable) convert(v).getProgramVariable();
+	    }
         }
         
         TypeReference maybeAnonClass = (TypeReference) callConvert(tr);

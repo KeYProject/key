@@ -425,7 +425,8 @@ public class JMLSpecExtractor implements SpecExtractor {
                             getTypeReference().
                             getKeYJavaType();
 		if(services.getTypeConverter().isReferenceType(t) &&
-		   !JMLInfoExtractor.parameterInArbitraryScope(pm, j)){
+		   !JMLInfoExtractor.parameterInArbitraryScope(pm, j) &&
+		   ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof RTSJProfile){
 		    String outerScope = "\\outerScope(\\memoryArea("+param_name+"),\\currentMemoryArea)";
 		    specCase.addRequires(new PositionedString(outerScope, 
 							      fileName, 

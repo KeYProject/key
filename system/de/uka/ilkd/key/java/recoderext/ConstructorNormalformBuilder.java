@@ -189,7 +189,8 @@ public class ConstructorNormalformBuilder
              
              class2enclosingThis.put(cd, getImplicitEnclosingThis(cd));
              
-             if(cd.getAllSupertypes().size()>1 && (cd.getStatementContainer()!=null || cd.getName()==null)){
+             if(cd.getAllSupertypes().size()>1 && !cd.getAllSupertypes().get(1).isStatic() && 
+		(cd.getStatementContainer()!=null || cd.getName()==null)){
                  class2superContainer.put(cd, cd.getAllSupertypes().get(1).getContainingClassType());
              }
              
@@ -288,9 +289,13 @@ public class ConstructorNormalformBuilder
         CopyAssignment ca = null;
         String etId = "_ENCLOSING_THIS";
 	if(et!=null){
-	    pd = new ParameterDeclaration(
-	            new TypeReference((Identifier) td.getIdentifier().deepClone()), 
-	            new Identifier(etId));
+	    if(td!=null && td.getIdentifier()!=null){
+		pd = new ParameterDeclaration(new TypeReference((Identifier) td.getIdentifier().deepClone()), 
+					      new Identifier(etId));
+	    }else{
+		pd = new ParameterDeclaration(new TypeReference(new Identifier(javaLangObject.getName())), 
+					      new Identifier(etId));
+	    }
 	    ca = new CopyAssignment(new FieldReference(new ThisReference(), new ImplicitIdentifier(et.getName())),
 	                new VariableReference(new Identifier(etId)));
 	}

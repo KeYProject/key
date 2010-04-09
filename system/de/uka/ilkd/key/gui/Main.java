@@ -551,7 +551,7 @@ public class Main extends JFrame implements IMain {
         fileOperations.add(createSaveFile());
         
         goalView.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW ).put(
-                KeyStroke.getKeyStroke(KeyEvent.VK_R, ActionEvent.CTRL_MASK),
+                KeyStroke.getKeyStroke(KeyEvent.VK_R, ActionEvent.ALT_MASK),
         "show_reuse_state");
         goalView.getActionMap().put("show_reuse_state", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
@@ -3249,16 +3249,24 @@ public class Main extends JFrame implements IMain {
             setEnabled(associatedProof != null && !associatedProof.closed());            
         }
         
+        private String getStartCommand() {
+            if (associatedProof != null && !associatedProof.root().leaf()) {
+        	return "Continue";
+            } else {
+        	return "Start";
+            }
+        }
+        
         public AutoModeAction() {            
+            associatedProof = mediator.getProof();        
             putValue("hideActionText", Boolean.TRUE);
-            putValue(Action.NAME, "Start");
+            putValue(Action.NAME, getStartCommand());
             putValue(Action.SHORT_DESCRIPTION, AUTO_MODE_TEXT);
             putValue(Action.SMALL_ICON, startLogo);
             putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_E,
         	    Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
             
             
-            associatedProof = mediator.getProof();        
             
             enable();
             
@@ -3311,7 +3319,7 @@ public class Main extends JFrame implements IMain {
                             !associatedProof.containsProofTreeListener(ptl) ) {
                         associatedProof.addProofTreeListener(ptl);
                     }
-                    putValue(Action.NAME, "Start");
+                    putValue(Action.NAME, getStartCommand());
                     putValue(Action.SMALL_ICON, startLogo);
                 }
                 
