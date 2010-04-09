@@ -66,6 +66,7 @@ tokens {
         FREELABELIN = "\\freeLabelIn";
 	HASSORT = "\\hasSort";        
 	ISARRAY="\\isArray";
+	ISARRAYLENGTH="\\isArrayLength";	
         ISENUMTYPE="\\isEnumType";
 	ISLOCALVARIABLE = "\\isLocalVariable";
 	ISOBSERVER = "\\isObserver";

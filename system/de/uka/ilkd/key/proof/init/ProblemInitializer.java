@@ -22,6 +22,7 @@ import de.uka.ilkd.key.java.Recoder2KeY;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
@@ -327,8 +328,15 @@ public final class ProblemInitializer {
 	if(term.op() instanceof Function) {
 	    namespaces.functions().add(term.op());
 	} else if(term.op() instanceof ProgramVariable) {
-	    if(namespaces.programVariables().lookup(term.op().name()) == null) {
+	    final ProgramVariable pv = (ProgramVariable) term.op();
+	    if(namespaces.programVariables().lookup(pv.name()) == null) {
 		rootGoal.addProgramVariable((ProgramVariable)term.op());
+	    }
+	} else if(term.op() instanceof ElementaryUpdate) {
+	    final ProgramVariable pv 
+	    	= (ProgramVariable)((ElementaryUpdate)term.op()).lhs();
+	    if(namespaces.programVariables().lookup(pv.name()) == null) {	    
+		rootGoal.addProgramVariable(pv);
 	    }
 	}
     }

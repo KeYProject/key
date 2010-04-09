@@ -191,9 +191,11 @@ public final class NotationInfo {
 	tbl.put(TypeConverter.stringConverter.getStringSymbol(), new Notation.StringLiteral());
 	
 	//heap operators
+	HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
 	tbl.put(HeapLDT.SELECT_NAME, new Notation.SelectNotation());
 	tbl.put(ObserverFunction.class, new Notation.ObserverNotation());
-	tbl.put(ProgramMethod.class, new Notation.ObserverNotation());	
+	tbl.put(ProgramMethod.class, new Notation.ObserverNotation());
+	tbl.put(heapLDT.getLength(), new Notation.LengthNotation());
 	
 	//set operators
 	SetLDT setLDT = services.getTypeConverter().getSetLDT();

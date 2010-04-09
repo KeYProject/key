@@ -395,7 +395,21 @@ public abstract class Notation {
 	public void print(Term t, LogicPrinter sp) throws IOException {
 	    sp.printSelect(t);
 	}
-    }   
+    }
+    
+    
+    /**
+     * The standard concrete syntax for length.
+     */
+    public static final class LengthNotation extends Notation {
+	public LengthNotation() {
+	    super(130);
+	}
+
+	public void print(Term t, LogicPrinter sp) throws IOException {
+	    sp.printLength(t);
+	}
+    }       
     
     
     /**

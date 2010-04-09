@@ -800,6 +800,8 @@ options {
             ProgramVariable pv = (ProgramVariable) attribute;
             if(pv instanceof ProgramConstant) {
                 result = tf.createTerm(pv);
+            } else if(pv == getServices().getJavaInfo().getArrayLength()) {
+                result = TermBuilder.DF.dotLength(getServices(), result);
             } else {
             	Function fieldSymbol 
             		= getServices().getTypeConverter()
@@ -3412,12 +3414,13 @@ varexp[TacletBuilder b]
     | varcond_newlabel[b] 
     | varcond_observer[b]
     | varcond_different[b]
-    | varcond_metadisjoint[b]    
+    | varcond_metadisjoint[b]
   ) 
   | 
   ( (NOT {negated = true;} )? 
       (   varcond_abstractOrInterface[b, negated]
 	| varcond_array[b, negated]
+        | varcond_array_length[b, negated]	
         | varcond_enumtype[b, negated]
         | varcond_freeLabelIn[b,negated]         
         | varcond_localvariable[b, negated]        
@@ -3682,6 +3685,17 @@ varcond_array [TacletBuilder b, boolean negated]
 :
    ISARRAY LPAREN x=varId RPAREN {
      b.addVariableCondition(new ArrayTypeCondition(
+       (SchemaVariable)x, negated));
+   }
+;
+
+varcond_array_length [TacletBuilder b, boolean negated]
+{
+  ParsableVariable x = null;
+}
+:
+   ISARRAYLENGTH LPAREN x=varId RPAREN {
+     b.addVariableCondition(new ArrayLengthCondition (
        (SchemaVariable)x, negated));
    }
 ;

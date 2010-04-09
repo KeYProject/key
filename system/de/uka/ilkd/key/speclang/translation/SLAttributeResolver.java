@@ -87,6 +87,9 @@ public final class SLAttributeResolver extends SLExpressionResolver {
             } else if(attribute instanceof ProgramConstant) {
         	return new SLExpression(TB.var(attribute), 
         				attribute.getKeYJavaType());
+            } else if(attribute == javaInfo.getArrayLength()) {
+        	return new SLExpression(TB.dotLength(services, recTerm), 
+        		                attribute.getKeYJavaType());
             } else {
         	try {
         	    final Function fieldSymbol 

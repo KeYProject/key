@@ -1025,10 +1025,7 @@ public final class TermBuilder {
     
     public Term dotLength(Services services, Term a) {
 	final TypeConverter tc = services.getTypeConverter();
-	return dot(services, 
-		   tc.getIntegerLDT().targetSort(), 
-		   a, 
-		   tc.getHeapLDT().getLength());
+	return func(tc.getHeapLDT().getLength(), a); 
     }
     
     

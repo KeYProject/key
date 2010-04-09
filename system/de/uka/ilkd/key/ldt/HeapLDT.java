@@ -43,13 +43,15 @@ public final class HeapLDT extends LDT {
     
     //fields
     private final Function arr;
-    private final Function length;
     private final Function created;
     private final Function initialized;
     private final SortDependingFunction classPrepared;
     private final SortDependingFunction classInitialized;
     private final SortDependingFunction classInitializationInProgress;
     private final SortDependingFunction classErroneous;
+    
+    //length
+    private final Function length;
     
     //null
     private final Function nullFunc;
@@ -79,7 +81,6 @@ public final class HeapLDT extends LDT {
         anon              = addFunction(services, "anon");
         memset            = addFunction(services, "memset");
         arr               = addFunction(services, "arr");
-        length            = addFunction(services, "length");
         created           = addFunction(services, "java.lang.Object::<created>");
         initialized       = addFunction(services, "java.lang.Object::<initialized>");
         classPrepared     = addSortDependingFunction(services, "<classPrepared>");
@@ -87,6 +88,7 @@ public final class HeapLDT extends LDT {
         classInitializationInProgress  
                           = addSortDependingFunction(services, "<classInitializationInProgress>");
         classErroneous    = addSortDependingFunction(services, "<classErroneous>");
+        length            = addFunction(services, "length");        
         nullFunc          = addFunction(services, "null");
         wellFormed        = addFunction(services, "wellFormed");
         acc               = addFunction(services, "acc");
@@ -183,11 +185,6 @@ public final class HeapLDT extends LDT {
     }
     
     
-    public Function getLength() {
-	return length;
-    }
-    
-    
     public Function getCreated() {
 	return created;
     }
@@ -217,6 +214,11 @@ public final class HeapLDT extends LDT {
     
     public Function getClassErroneous(Sort instanceSort, Services services) {
 	return classErroneous.getInstanceFor(instanceSort, services);
+    }
+    
+    
+    public Function getLength() {
+	return length;
     }    
     
     
@@ -248,9 +250,7 @@ public final class HeapLDT extends LDT {
     public Function getFieldSymbolForPV(LocationVariable fieldPV, 
 	    				Services services) {
 	assert fieldPV.isMember();	
-	if(fieldPV == services.getJavaInfo().getArrayLength()) {
-	    return getLength();
-	}
+	assert fieldPV != services.getJavaInfo().getArrayLength();
 	
 	final Name name = new Name(getFieldSymbolName(fieldPV));
 	Function result = (Function) services.getNamespaces()

@@ -955,6 +955,24 @@ public final class LogicPrinter {
     }
     
     
+    public void printLength(Term t) throws IOException {
+	final HeapLDT heapLDT = services == null 
+        			? null 
+        			: services.getTypeConverter().getHeapLDT();
+	if(NotationInfo.PRETTY_SYNTAX && heapLDT != null) {
+	    assert t.op() == heapLDT.getLength();
+	    startTerm(t.arity());
+	    
+	    markStartSub();
+	    printTerm(t.sub(0));
+	    markEndSub();
+	    layouter.print(".length");
+	} else {
+	    printFunctionTerm(t.op().name().toString(), t);            
+	}	
+    }
+    
+    
     public void printObserver(Term t) throws IOException {
 	assert t.op() instanceof ObserverFunction;
 	assert t.boundVars().isEmpty();

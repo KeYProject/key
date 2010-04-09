@@ -10,7 +10,7 @@ final class ArrayList {
     
     private int notPartOfFootprint;
     
-    //@ represents footprint = array, array[*], array.length, size;    
+    //@ represents footprint = array, array[*], size;    
     
     //@ invariant array != null;
     //@ invariant 0 <= size && size <= array.length;

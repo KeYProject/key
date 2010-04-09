@@ -241,6 +241,8 @@ public final class TypeConverter {
 	final ProgramVariable var = fr.getProgramVariable();
 	if(var instanceof ProgramConstant) {
 	    return TB.var(var);
+	} else if(var == services.getJavaInfo().getArrayLength()) {
+	    return TB.dotLength(services, convertReferencePrefix(prefix, ec));
 	} else if(var.isStatic()) {
 	    final Function fieldSymbol 
 	    	= heapLDT.getFieldSymbolForPV((LocationVariable)var, services);
