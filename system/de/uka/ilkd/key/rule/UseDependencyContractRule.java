@@ -104,6 +104,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
 	final Operator op = heapTerm.op();
 	assert heapTerm.sort().equals(heapLDT.targetSort());
 	if(op == heapLDT.getStore()
+	   || op == heapLDT.getCreate()
            || op == heapLDT.getAnon() 
 	   || op == heapLDT.getMemset()) {
 	   return true;
@@ -127,13 +128,12 @@ public final class UseDependencyContractRule implements BuiltInRule {
 	final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
 	final Operator op = heapTerm.op();
 	assert heapTerm.sort().equals(heapLDT.targetSort());
-	if(op == heapLDT.getStore()) {
+	if(op == heapLDT.getStore()
+           || op == heapLDT.getCreate()
+  	   || op == heapLDT.getAnon()
+           || op == heapLDT.getMemset()) {
 	    final Term h = heapTerm.sub(0);
 	    result.add(h);	    
-	    getRawSteps(h, seq, services, result);
-	} else if(op == heapLDT.getAnon() || op == heapLDT.getMemset()) {
-	    final Term h = heapTerm.sub(0);
-	    result.add(h);
 	    getRawSteps(h, seq, services, result);
 	} else if(op.arity() == 0) {
 	    final Term def = getEqualityDef(heapTerm, seq);
@@ -193,6 +193,11 @@ public final class UseDependencyContractRule implements BuiltInRule {
 	    return new Pair<Term,ImmutableList<PosInOccurrence>>(
 		    	    TB.union(services, locs, furtherLocs.first), 
 		    	    furtherLocs.second);	    
+	} else if(op == heapLDT.getCreate()) {
+	    final Term h = heapTerm.sub(0);
+	    final Pair<Term,ImmutableList<PosInOccurrence>> furtherLocs 
+	    	= getChangedLocsForStep(h, stepHeap, seq, services);
+	    return furtherLocs;
 	} else if(op == heapLDT.getAnon() || op == heapLDT.getMemset()) {
 	    final Term h = heapTerm.sub(0);
 	    final Term s = heapTerm.sub(1);
@@ -516,14 +521,20 @@ public final class UseDependencyContractRule implements BuiltInRule {
         }
         
         //get precondition, dependency term
-        final Term freePre = TB.and(new Term[]{//TB.wellFormed(services, baseHeapAndChangedLocs.first),
-        	                    	       TB.not(TB.equals(selfTerm, TB.NULL(services))),
-        	                    	       TB.equals(TB.select(services,
-        	                    		                   services.getTypeConverter().getBooleanLDT().targetSort(), 
-        	                    		                   baseHeapAndChangedLocs.first, 
-        	                    		                   selfTerm, 
-        	                    		                   TB.func(heapLDT.getCreated())), 
-        	                    		         TB.TRUE(services))});
+        Term freePre = TB.wellFormed(services, baseHeapAndChangedLocs.first);
+	if(!target.isStatic()) {
+	    freePre = TB.and(freePre, TB.not(TB.equals(selfTerm, TB.NULL(services))));
+	    freePre = TB.and(freePre, TB.created(services,
+				                 baseHeapAndChangedLocs.first,
+        	                    		 selfTerm));
+	}
+	int i = 0;
+	for(Term paramTerm : paramTerms) {
+	    freePre = TB.and(freePre, TB.reachableValue(services,
+					       		baseHeapAndChangedLocs.first,
+					       		paramTerm, 
+					       		target.getParamType(i++)));
+	}
         final Term pre = contract.getPre(baseHeapAndChangedLocs.first,
         	                         selfTerm, 
         	                         paramTerms, 

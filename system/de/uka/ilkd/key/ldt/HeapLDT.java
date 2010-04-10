@@ -38,6 +38,7 @@ public final class HeapLDT extends LDT {
     //select/store
     private final SortDependingFunction select;
     private final Function store;
+    private final Function create;
     private final Function anon;
     private final Function memset;
     
@@ -78,6 +79,7 @@ public final class HeapLDT extends LDT {
         fieldSort         = (Sort) sorts.lookup(new Name("Field"));	
         select            = addSortDependingFunction(services, SELECT_NAME.toString());
         store             = addFunction(services, "store");
+        create            = addFunction(services, "create");
         anon              = addFunction(services, "anon");
         memset            = addFunction(services, "memset");
         arr               = addFunction(services, "arr");
@@ -167,6 +169,11 @@ public final class HeapLDT extends LDT {
     
     public Function getStore() {
 	return store;
+    }
+
+
+    public Function getCreate() {
+	return create;
     }
     
 

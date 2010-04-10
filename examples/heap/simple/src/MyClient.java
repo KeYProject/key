@@ -20,6 +20,7 @@ class MyClient {
     void dependencyContracts() {
 	mc = new MyClass();
 	i++;
+	new Object();
     }
 
     

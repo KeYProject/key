@@ -1029,14 +1029,21 @@ public final class TermBuilder {
     }
     
     
-    public Term created(Services services, Term o) {
+    public Term created(Services services, Term h, Term o) {
 	final TypeConverter tc = services.getTypeConverter();	
-	return equals(dot(services,
-		          tc.getBooleanLDT().targetSort(),
-		          o,
-		          tc.getHeapLDT().getCreated()),
-		      TRUE(services));
+	return equals(select(services,
+		              tc.getBooleanLDT().targetSort(),
+			      h,
+		              o,
+		              func(tc.getHeapLDT().getCreated())),
+		       TRUE(services));
     }
+
+
+    public Term created(Services services, Term o) {
+	return created(services, heap(services), o);
+    }
+
     
     
     public Term initialized(Services services, Term o) {
@@ -1093,7 +1100,13 @@ public final class TermBuilder {
         return func(services.getTypeConverter().getHeapLDT().getStore(), 
         	    new Term[]{h, o, f, v});
     }
-    
+
+
+    public Term create(Services services, Term h, Term o) {
+        return func(services.getTypeConverter().getHeapLDT().getCreate(), 
+        	     new Term[]{h, o});
+    }
+
     
     public Term anon(Services services, Term h1, Term s, Term h2) {
 	return func(services.getTypeConverter().getHeapLDT().getAnon(), 
@@ -1116,16 +1129,21 @@ public final class TermBuilder {
     }        
     
     
-    public Term reachableValue(Services services, Term t, KeYJavaType kjt) {
+    public Term reachableValue(Services services, Term h, Term t, KeYJavaType kjt) {
 	assert t.sort().equals(kjt.getSort());
 	final IntegerLDT intLDT = services.getTypeConverter().getIntegerLDT();
 	if(t.sort().extendsTrans(services.getJavaInfo().objectSort())) {
-	    return or(created(services, t), equals(t, NULL(services)));
+	    return or(created(services, h, t), equals(t, NULL(services)));
 	} else if(t.sort().equals(intLDT.targetSort())) {
 	    return func(intLDT.getInBounds(kjt.getJavaType()), t);
 	} else {
 	    return tt();
 	}
+    }
+
+
+    public Term reachableValue(Services services, Term t, KeYJavaType kjt) {
+	return reachableValue(services, heap(services), t, kjt);
     }
     
     
