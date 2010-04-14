@@ -118,6 +118,7 @@ public class TemporarySettings extends Settings {
 	storeTacletsToFile = tacletSettings.isSaveToFile();
 	tacletFolder = tacletSettings.getFilename();
 	progressDialogMode = settings.getProgressDialogMode();
+	
 	storeToFile = settings.getSaveFile();
 	cacheGoals = settings.isCachingGoals();
 
@@ -392,7 +393,9 @@ public class TemporarySettings extends Settings {
 				"\t%t: time\n"+
 				"\t%i: the goal's number\n"+
 			"\n\n"+
-			"Example: /home/translations/%d_%t_%i_%s.txt";
+			"Example: /home/translations/%d_%t_%i_%s.txt"+"\n\n"+
+			"Remark: After every restart of KeY this option\n"+
+			"is deactivated.";
 	    }
 
 	}
@@ -498,7 +501,9 @@ public class TemporarySettings extends Settings {
 					"\t%t: time\n"+
 					"\t%i: the goal's number\n"+
 				"\n\n"+
-				"Example: ./home/translations/Taclet%d_%t_%i_%s.txt";
+				"Example: ./home/translations/Taclet%d_%t_%i_%s.txt"+"\n\n"+
+				"Remark: After every restart of KeY this option\n"+
+				"is deactivated.";
 		    }
 	        },
 	        new TableProperty(this) {

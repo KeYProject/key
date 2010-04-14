@@ -195,7 +195,7 @@ public class TacletTranslationSettings implements Settings {
 
 
     public void readSettings(Properties props) {
-	saveToFile = Boolean.valueOf(props.getProperty(KEY_SAVE_TO_FILE,"false"));
+	//saveToFile = Boolean.valueOf(props.getProperty(KEY_SAVE_TO_FILE,"false"));
 	maxGeneric = Integer.valueOf(props.getProperty(KEY_MAX_GENERIC,"2"));
 	filename = props.getProperty(KEY_FILENAME,"");
 	tacletAssignmentFromString(props.getProperty(KEY_ASSIGNMENT, ""));			
@@ -204,7 +204,7 @@ public class TacletTranslationSettings implements Settings {
 
 
     public void writeSettings(Properties props) {
-	props.setProperty(KEY_SAVE_TO_FILE,Boolean.toString(saveToFile));
+	//props.setProperty(KEY_SAVE_TO_FILE,Boolean.toString(saveToFile));
 	props.setProperty(KEY_MAX_GENERIC,Integer.toString(maxGeneric));
 	props.setProperty(KEY_FILENAME, filename);
 	props.setProperty(KEY_ASSIGNMENT,tacletAssignmentToString());

@@ -278,7 +278,7 @@ public class DecisionProcedureSettings implements Settings {
 	
 	
 	String sf = props.getProperty(SAVEFILE);
-        this.saveFile = !(sf == null) && sf.equals("true");
+      //  this.saveFile = !(sf == null) && sf.equals("true");
 	
         String sd = props.getProperty(SHOW_SMT_RES_DIA);
         this.showSMTResDialog = !(sd == null) && sd.equals("true");
@@ -440,19 +440,6 @@ public class DecisionProcedureSettings implements Settings {
     }
     
     
-   /* public boolean getMultipleUse(RuleDescriptor rd)  {
-	SMTRule rule = descriptorToRule.get(rd);
-	SMTSolver s = rule.getSolver();
-	return this.ruleMultipleProvers.SMTSolverIsUsed(s);
-    }*/
-    
-   /* public void setMultipleUse(RuleDescriptor rd, boolean multipleuse, boolean fire) {
-	SMTRule rule = descriptorToRule.get(rd);
-	SMTSolver s = rule.getSolver();
-	ruleMultipleProvers.useSMTSolver(s, multipleuse);
-	if(fire)
-	fireSettingsChanged();
-    }*/
     
     
     /**
@@ -562,11 +549,11 @@ public class DecisionProcedureSettings implements Settings {
         props.setProperty(ACTIVE_RULE, "" + activeSMTRule.name());
         props.setProperty(TIMEOUT, "" + this.timeout);
       
-        if (this.saveFile)
+        /*if (this.saveFile)
             props.setProperty(SAVEFILE, "true");
         else {
             props.setProperty(SAVEFILE, "false");
-        }
+        }*/
         if (this.showSMTResDialog)
             props.setProperty(SHOW_SMT_RES_DIA, "true");
         else {
