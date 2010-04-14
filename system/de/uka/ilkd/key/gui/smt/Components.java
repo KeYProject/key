@@ -28,11 +28,11 @@ import javax.swing.JTextField;
 import javax.swing.JToggleButton;
 import javax.swing.border.TitledBorder;
 
-import de.uka.ilkd.key.gui.IconFactory;
-
 
 
 class PropertyPanel extends JPanel {
+
+    private static final long serialVersionUID = 1L;
     JLabel propertyLabel = null;
     JTextField valueField = null;
 
@@ -76,6 +76,7 @@ class PropertyPanel extends JPanel {
 
 
 class InfoPanel extends JPanel {
+    private static final long serialVersionUID = 1L;
     JLabel propertyLabel = null;
     JToggleButton toggleButton= null;
 
@@ -124,6 +125,7 @@ class InfoPanel extends JPanel {
 }
 
 class SliderPanel extends JPanel{
+    private static final long serialVersionUID = 1L;
     	private JSlider slider = null;
     	public SliderPanel() {
 		 GridBagConstraints gridBagConstraints7 = new GridBagConstraints();
@@ -157,6 +159,7 @@ class SliderPanel extends JPanel{
 
 
 class SaveToFilePanel extends JPanel{
+    private static final long serialVersionUID = 1L;
 	private JCheckBox saveToFileBox = null;
 	private JTextField folderField = null;
 	private JButton chooseButton = null;
@@ -207,15 +210,7 @@ class SaveToFilePanel extends JPanel{
 	   // add(getSaveToFileExplanation(), gridBagConstraints3);
 	    getSaveToFileExplanation().setEditable(false);
 	    getSaveToFileExplanation().setBackground(this.getBackground());
-	    getSaveToFileBox().addActionListener(new ActionListener() {
-	        
-	        public void actionPerformed(ActionEvent arg0) {
-	    		boolean b = getSaveToFileBox().isSelected();
-	    	
-	    		
-	    	
-	        }
-	    });
+
 
 
 	}
@@ -259,9 +254,11 @@ class SaveToFilePanel extends JPanel{
 			    public void actionPerformed(ActionEvent e) {
 				JFileChooser chooser = new JFileChooser();
 				chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-				chooser.showDialog(SaveToFilePanel.this, "Choose folder");
-				getFolderField().setText(chooser.getSelectedFile().getAbsolutePath()+
+				if(chooser.showDialog(SaveToFilePanel.this, "Choose folder") 
+					== JFileChooser.APPROVE_OPTION){
+				    getFolderField().setText(chooser.getSelectedFile().getAbsolutePath()+
 					"/%d_%t_%i_%s");
+				}
 			    }
 			});
 		}
@@ -282,4 +279,5 @@ class SaveToFilePanel extends JPanel{
 		return saveToFileExplanation;
 	}
 }
+
 

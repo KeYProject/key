@@ -35,7 +35,7 @@ public class DecisionProcedureSettings implements Settings {
     /** String used in the Settings to store the active rule */
     private static final String ACTIVE_RULE  = "[DecisionProcedure]ActiveRule";
     
-    private static final String TIMEOUT="[DecisionProcedure]Timeout";
+    private static final String TIMEOUT="[DecisionProcedure]SolverTimeout";
     
     private static final String SAVEFILE="[DecisionProcedure]savefile";
     private static final String SAVEFILE_PATH="[DecisionProcedure]savefile_path";

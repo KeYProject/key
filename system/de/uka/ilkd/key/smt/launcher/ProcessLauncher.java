@@ -188,12 +188,6 @@ public abstract  class ProcessLauncher  implements ProcessListener, Runnable{
 	
 	
 	
-	private void remove(Process process){
-		process.stop();
-		if(running.isEmpty() && queue.isEmpty()){
-			runningIsEmpty();
-		}
-	}
 	
 	private void runningIsEmpty(){
 		cancelMe();

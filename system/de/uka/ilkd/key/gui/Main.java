@@ -22,6 +22,7 @@ import java.awt.*;
 import java.io.*;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -42,6 +43,7 @@ import de.uka.ilkd.key.gui.nodeviews.SequentView;
 import de.uka.ilkd.key.gui.notification.NotificationManager;
 import de.uka.ilkd.key.gui.notification.events.*;
 import de.uka.ilkd.key.gui.prooftree.ProofTreeView;
+import de.uka.ilkd.key.gui.smt.ComplexButton;
 import de.uka.ilkd.key.gui.smt.SettingsDialog;
 import de.uka.ilkd.key.gui.smt.DecisionProcedureSettings;
 import de.uka.ilkd.key.gui.smt.RuleLauncher;
@@ -205,10 +207,10 @@ public class Main extends JFrame implements IMain {
     
     /** external prover GUI elements */
     private DPSettingsListener dpSettingsListener;
-    private JSlider ruletimeout;
-    private JLabel ruletimeoutlabel;
-    private JButton decisionProcedureInvocationButton;
-    private JComboBox decisionProcedureInvocationSelection;
+
+
+    private ComplexButton decProcComponent;
+
 
     
     private JButton testButton;
@@ -501,9 +503,14 @@ public class Main extends JFrame implements IMain {
         toolBar.addSeparator();                        
         toolBar.addSeparator();
         toolBar.addSeparator();
-   
-        toolBar.add(createDecisionProcedureButton());
-        toolBar.add(createDecisionProcedureSelection());
+        ComplexButton comp = createDecisionProcedureComponent();
+        toolBar.add(comp.getActionComponent());
+        toolBar.add(comp.getSelectionComponent());
+        //toolBar.add(createDecisionProcedureButton());
+        
+        
+        
+        //toolBar.add(createDecisionProcedureSelection());
       
         toolBar.addSeparator();
         
@@ -683,28 +690,34 @@ public class Main extends JFrame implements IMain {
     }
     
 
-    private JButton createDecisionProcedureButton() {	
-	decisionProcedureInvocationButton = new JButton();	
-	SMTRule r = ProofSettings.DEFAULT_SETTINGS.getDecisionProcedureSettings().getActiveSMTRule();
-	decisionProcedureInvocationButton.setAction(new DPInvokeAction(r));
-	decisionProcedureInvocationButton.getAction().setEnabled(false);
-	return decisionProcedureInvocationButton;
+    private ComplexButton createDecisionProcedureComponent(){
+	decProcComponent= new ComplexButton(TOOLBAR_ICON_SIZE);
+	decProcComponent.setEmptyItem("No prover available","<html>No prover is applicable for KeY.<br><br>If a prover is installed on your system," +
+		"<br>please configure the KeY-System accordingly:\n" +
+		"<br>Options|Decision Procedures|Settings</html>");
+
+	decProcComponent.setPrefix("Run ");
+	
+	decProcComponent.addListener(new ChangeListener() {
+	    
+	    public void stateChanged(ChangeEvent e) {
+		ComplexButton but = (ComplexButton) e.getSource();
+		if(but.getSelectedItem() instanceof DPInvokeAction){
+		    DPInvokeAction action = (DPInvokeAction) but.getSelectedItem(); 
+		    DecisionProcedureSettings.getInstance().setActiveSMTRule(action.rule);
+		}
+	
+	    }
+	});
+	
+
+
+	updateDecisionProcedureSelectMenu();
+	mediator.addKeYSelectionListener(new DPEnableControl());
+	return decProcComponent;
     }
     
-    private JComboBox createDecisionProcedureSelection() {	
-		
-	
-	DPSelectionAction action = new DPSelectionAction();
-	decisionProcedureInvocationSelection = new JComboBox();
-	
-	decisionProcedureInvocationSelection.setAction(action);
-	action.setEnabled(false);
-	
-	mediator.addKeYSelectionListener(new DPEnableControl());
-	this.updateDecisionProcedureSelectMenu();
 
-	return decisionProcedureInvocationSelection;
-    }
 
     /**
      * *********************** UGLY INSPECTION CODE **********************
@@ -1582,36 +1595,62 @@ public class Main extends JFrame implements IMain {
      * Remove those, that are not installed anymore, add those, that got installed.
      */
     public void updateDecisionProcedureSelectMenu() {
-
-	Action action = decisionProcedureInvocationSelection.getAction();
-	decisionProcedureInvocationSelection.setAction(null);
-	decisionProcedureInvocationSelection.removeAllItems();
 	
-	for(SMTRule rule : ProofSettings.DEFAULT_SETTINGS.getDecisionProcedureSettings().getInstalledRules()){
-	    decisionProcedureInvocationSelection.addItem(rule); 
+	Collection<SMTRule> rules = ProofSettings.DEFAULT_SETTINGS.
+	                               getDecisionProcedureSettings().getInstalledRules();
+	
+	if(rules == null || rules.size() == 0){
+	    updateDPSelectionMenu();
+	}else{
+	    updateDPSelectionMenu(rules);
 	}
 	
-	if(decisionProcedureInvocationSelection.getItemCount() == 0){
-	    decisionProcedureInvocationSelection.addItem(SMTRule.EMPTY_RULE);
-	}
 
-	SMTRule active = ProofSettings.DEFAULT_SETTINGS.getDecisionProcedureSettings().getActiveSMTRule();
-	boolean found = false;
-	for(int i=0; i < decisionProcedureInvocationSelection.getItemCount(); i++){
-	    
-	    if(decisionProcedureInvocationSelection.getItemAt(i) == active){
-		decisionProcedureInvocationSelection.setSelectedIndex(i);
-		found = true;
-		break;
-	    }
-	}
-	if(!found && decisionProcedureInvocationSelection.getItemCount() >0){
-	    ProofSettings.DEFAULT_SETTINGS.getDecisionProcedureSettings().setActiveSMTRule(
-		    (SMTRule)decisionProcedureInvocationSelection.getSelectedItem());
-	}
-	decisionProcedureInvocationSelection.setAction(action);
+
 
     }
+    
+   private void updateDPSelectionMenu(){
+       decProcComponent.setItems(null);
+   }
+   
+   private DPInvokeAction findAction(DPInvokeAction [] actions, SMTRule rule){
+       for(DPInvokeAction action : actions){
+	   if(action.rule.equals(rule)){
+	       return action;
+	   }
+       }
+       return null;
+   }
+   
+   private void updateDPSelectionMenu(Collection<SMTRule> rules){
+	DPInvokeAction actions[] = new DPInvokeAction[rules.size()];
+        
+	int i=0; 
+	for(SMTRule rule : rules){
+	    actions[i] = new DPInvokeAction(rule);
+	    i++;
+	}
+	
+	decProcComponent.setItems(actions);
+            	
+	SMTRule active = ProofSettings.DEFAULT_SETTINGS.getDecisionProcedureSettings().getActiveSMTRule();
+	 
+	DPInvokeAction activeAction = findAction(actions, active);
+	
+	boolean found = activeAction != null;
+	if(!found){
+	    Object item = decProcComponent.getTopItem();
+	    if(item instanceof DPInvokeAction){
+		active = ((DPInvokeAction)item).rule;
+		ProofSettings.DEFAULT_SETTINGS.getDecisionProcedureSettings().setActiveSMTRule(active);
+	    }else{
+		activeAction = null;
+	    }
+
+	}
+	decProcComponent.setSelectedItem(activeAction); 
+   }
     
    private JMenuItem showSMTResDialog;
    
@@ -2091,21 +2130,24 @@ public class Main extends JFrame implements IMain {
 	}
 	
 	public void update() {	   
+	    
 	    if (settings != null) {
-		SMTRule activeRule = settings.getActiveSMTRule();
+		updateDecisionProcedureSelectMenu();
+
+		/*	SMTRule activeRule = settings.getActiveSMTRule();
 		if(activeRule == SMTRule.EMPTY_RULE){
 		    activeRule = (SMTRule) decisionProcedureInvocationSelection.getSelectedItem();
 		    if(activeRule == null){
 			activeRule = SMTRule.EMPTY_RULE;
 		    }
-		}
-		decisionProcedureInvocationButton.
+		}*/
+		/*decisionProcedureInvocationButton.
 				
 		setAction(new DPInvokeAction(activeRule));
 		
 		decisionProcedureInvocationSelection.setAction(
 			new DPSelectionAction());
-		
+		*/
 		
 		/*int timeout = settings.getTimeout();
 		int h = timeout/(10*60*60);
@@ -3088,11 +3130,11 @@ public class Main extends JFrame implements IMain {
     private final class DPEnableControl implements KeYSelectionListener{
 
 	private void enable(boolean b){
-	    decisionProcedureInvocationSelection.getAction().setEnabled(b);
-	    decisionProcedureInvocationButton.getAction().setEnabled(b);
+	    decProcComponent.setEnabled(b);
 	}
 
         public void selectedProofChanged(KeYSelectionEvent e) {
+            
 	    if(e.getSource().getSelectedProof() != null){
               	  enable(!e.getSource().getSelectedProof().closed());
 	       }else{
@@ -3108,33 +3150,9 @@ public class Main extends JFrame implements IMain {
 	
     }
     
-    /**
-     * This action controls the selection of external provers.
-     */
+    
+    
 
-    private final class DPSelectionAction extends AbstractAction {
-
-
-
-	
-
-	
-	public boolean isEnabled() {
-	    
-	    Object item = decisionProcedureInvocationSelection.getSelectedItem();
-	    
-	    
-	    return super.isEnabled() && item instanceof SMTRule && item != SMTRule.EMPTY_RULE
-	    && mediator != null && mediator.getSelectedProof() != null && !mediator.getSelectedProof().closed();
-	}
-	  
-	public void actionPerformed(ActionEvent e) {
-	 	Object item = decisionProcedureInvocationSelection.getSelectedItem();
-		if(item != null && item instanceof SMTRule){
-		    ProofSettings.DEFAULT_SETTINGS.getDecisionProcedureSettings().setActiveSMTRule((SMTRule)item);
-		}
-	}	
-    }
     
     /**
      * This action is responsible for the invocation of a decision procedure.
@@ -3142,36 +3160,44 @@ public class Main extends JFrame implements IMain {
      */
     private final class DPInvokeAction extends AbstractAction {
 
-	private final SMTRule decisionProcedure;
+	SMTRule rule;
 	
-	public DPInvokeAction(SMTRule decisionProcedure) {
-	    assert decisionProcedure != null;
-	    this.decisionProcedure = decisionProcedure;
-	
-	    
-	  
-	    putValue(NAME, "Run");
-		
-	    if (decisionProcedure != SMTRule.EMPTY_RULE) {
-		putValue(SHORT_DESCRIPTION, "Invokes " + decisionProcedure.displayName());
-	    } else {		
-		putValue(SHORT_DESCRIPTION, "Please select an external prover under Options | Decision Procedures.");
-	    }
+	public DPInvokeAction(SMTRule rule) {
+	    this.rule = rule;
+	    if (rule != SMTRule.EMPTY_RULE) {
+		putValue(SHORT_DESCRIPTION, "Invokes " + rule.displayName());
+	    } 
 	    
 	}
 	
+
 	
 	
 	public boolean isEnabled() {
-	    return super.isEnabled() && decisionProcedure != SMTRule.EMPTY_RULE && 
+	    
+	    boolean b= super.isEnabled() && rule != SMTRule.EMPTY_RULE && 
  	      mediator != null && mediator.getSelectedProof() != null && !mediator.getSelectedProof().closed();
+	    return b;
 	}
 	  
 	public void actionPerformed(ActionEvent e) {
-	    if (!mediator.ensureProofLoaded() || decisionProcedure ==SMTRule.EMPTY_RULE) return;
+	    if (!mediator.ensureProofLoaded() || rule ==SMTRule.EMPTY_RULE) return;
 	    final Proof proof = mediator.getProof();
-	    RuleLauncher.INSTANCE.start(decisionProcedure, proof,proof.getUserConstraint().getConstraint(),true);
-	}	
+	    RuleLauncher.INSTANCE.start(rule, proof,proof.getUserConstraint().getConstraint(),true);
+	}
+	
+	public String toString(){
+	    return rule.displayName();
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+	    if(!(obj instanceof DPInvokeAction)){
+		return false;
+	    }
+	    
+	    return this.rule.equals(((DPInvokeAction)obj).rule);
+	}
     }
     
 

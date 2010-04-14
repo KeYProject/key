@@ -423,6 +423,7 @@ public abstract class AbstractSMTSolver extends AbstractProcess implements SMTSo
 	    
 	    while(s.indexOf(' ')!=-1){
 		int index = s.indexOf(' ');
+
 		list.add(s.substring(0,s.indexOf(' ')));
 		s = s.substring(index+1,s.length());
 	    }

@@ -77,7 +77,7 @@ public class TemporarySettings extends Settings {
     public LinkedList<TemporarySolverSettings> solverSettings = new LinkedList<TemporarySolverSettings>();
     
     public final static String    PROGRESS_MODE_USER = "Progress dialog remains open after executing solvers.";
-    public final static String    PROGRESS_MODE_CLOSE ="Close progress dialog after all solver have finished.";
+    public final static String    PROGRESS_MODE_CLOSE ="Close progress dialog after all solvers have finished.";
     public final static String    PROGRESS_MODE_CLOSE_FIRST = "Close progress dialog after the first solver has finished.";
     
     public String getProgressMode(int index){

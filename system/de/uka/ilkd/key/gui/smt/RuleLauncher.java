@@ -48,6 +48,9 @@ public class RuleLauncher {
     	     * @param constraint
     	     */
     	    public void start(SMTRule rule, Goal goal, Constraint constraint, boolean useOwnThread){
+    		if(!rule.isUsable()){
+    		    return;
+    		}
     		LinkedList<Goal> goals = new LinkedList<Goal>();
     		rule.setMaxTime(DecisionProcedureSettings.getInstance().getTimeout()*100);
     		goals.add(goal);
@@ -59,6 +62,9 @@ public class RuleLauncher {
     	    }
     	    
     	    public void start(SMTRule rule, Proof proof, Constraint constraint, boolean useOwnThread){
+    		if(!rule.isUsable()){
+    		    return;
+    		}
     		LinkedList<Goal> goals = new LinkedList<Goal>();
     		rule.setMaxTime(DecisionProcedureSettings.getInstance().getTimeout()*100);
     		for (Goal goal : proof.openGoals()) {

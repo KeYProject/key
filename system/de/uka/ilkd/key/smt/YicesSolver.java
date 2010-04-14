@@ -36,6 +36,7 @@ public final class YicesSolver extends AbstractSMTSolver {
     
     public SMTSolverResult interpretAnswer(String input, String error, int val) {
 	if (val == 0) {
+	
 	    //no error occured
 	    //The commented out code works if no models (counterexamples) interpreted
 //	    if (input.equals("unsat\n")) {
