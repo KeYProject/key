@@ -14,10 +14,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 
-import javax.swing.AbstractButton;
 import javax.swing.BorderFactory;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
 import javax.swing.JComponent;
 
 import javax.swing.JLabel;
@@ -34,7 +31,6 @@ import de.uka.ilkd.key.gui.ErrorMessages;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.smt.MakesProgress;
 import de.uka.ilkd.key.smt.SMTProgressMonitor;
-import de.uka.ilkd.key.smt.launcher.Process;
 
 
 
@@ -58,10 +54,8 @@ class ProgressPanel implements SMTProgressMonitor {
 	private JLabel jLabel1 = null;
 	private JPanel progressPanel = null;
 	private JProgressBar progressBar = null;
-	private JButton progressButton = null;
 	private JComponent  parent;
 	private ProgressDialog dialog;
-	private MakesProgress process;
 	
 	private List<InternGoal> goals = Collections.synchronizedList(new LinkedList<InternGoal>()); 
 	
@@ -93,8 +87,6 @@ class ProgressPanel implements SMTProgressMonitor {
 		
 
 		((TitledBorder)getComponent().getBorder()).setTitle(process.getTitle());
-		this.process = process;
-		
 	}
 	
 
@@ -323,7 +315,7 @@ class ProgressPanel implements SMTProgressMonitor {
 
 	
         public void setSolverFinished(long time) {
-            getProgressBarTime().setString("Stoped after "+ ((double)time)/1000 + " sec.");
+            getProgressBarTime().setString("Stopped after "+ ((double)time)/1000 + " sec.");
             parent.repaint();
       
 
