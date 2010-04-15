@@ -35,6 +35,8 @@ public interface TacletFormula {
      *         empty string.
      */
     String getStatus();
+    
+
 
     Collection<Term> getInstantiations();
     

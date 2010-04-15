@@ -82,6 +82,7 @@ public class SimplifyTranslator extends AbstractSMTTranslator {
 	super(services);
     }
     
+    
     @Override
     protected StringBuffer buildCompleteText(StringBuffer formula,
 	    ArrayList<StringBuffer> assumptions,
@@ -220,6 +221,19 @@ public class SimplifyTranslator extends AbstractSMTTranslator {
 	logger.info(toReturn);
 	
 	return toReturn;
+    }
+    
+
+ 
+
+    @Override
+    protected boolean numberIsSupported(long number) {
+	//Simplify supports only numbers within the following range.
+	// Theoretically Simplify supports numbers up to 2147483647, but
+	// for some cases it is important that the negation of a number
+	// is supported, too. Therefore the biggest number is 
+	// 2147483646
+	return number <= 2147483646 && number >= -2147483646;
     }
 
     @Override

@@ -303,7 +303,7 @@ public final class DefaultTacletSetTranslation
 	    fw.write(toStore);
 	    fw.close();
 	} catch (IOException e) {
-	    // TODO: handling the exception
+	    throw new RuntimeException(e);
 	}
 
     }

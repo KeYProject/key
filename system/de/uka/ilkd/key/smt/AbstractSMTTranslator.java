@@ -195,8 +195,10 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 	    this.translateFunc(l, new ArrayList<StringBuffer>());
 	}
 	
+
 	tacletAssumptions = translateTaclets(services);
 
+	
 	return buildComplText(services, hb);
     }
 
@@ -1117,6 +1119,14 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 
     }
     
+    /**
+     * @param number number to be checked.
+     * @return <code>true</code> if the given number is supported by the translator.
+     */
+    protected boolean numberIsSupported(long number){
+	return true;
+    }
+    
     private final StringBuffer translateTermIte (Term iteTerm, Vector<QuantifiableVariable> quantifiedVars,
 	    Services services) throws IllegalFormulaException {
 	
@@ -1416,6 +1426,9 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 		    Debug.assertTrue(term.arity() == 1);
 		    long num = NumberTranslation.translate(term.sub(0))
 			    .longValue();
+		    if(!numberIsSupported(num)){
+			throw new IllegalFormulaException("The number " + num + "is not supported");
+		    }
 		    StringBuffer numVal = translateIntegerValue(num);
 		    
 		    // add the type predicate for this
@@ -1878,8 +1891,16 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 	for(TacletFormula tf :  tacletSetTranslation.getTranslation(sorts,terms,
 		ProofSettings.DEFAULT_SETTINGS.getTacletTranslationSettings().getMaxGeneric())){
 	    for(Term subterm : tf.getInstantiations()){
-		 StringBuffer term = translateTerm(subterm,vector,services);
-		 result.add(term);
+		 try{
+		     StringBuffer term = translateTerm(subterm,vector,services);    
+		     result.add(term);
+		 }catch(IllegalFormulaException e){
+		     // don't interrupt the translation, because only one taclet
+		     // cannot be translated. This exception can occur if the translator
+		     // of Simplify tries to translate numbers that are to high.		     
+		 }
+		 
+		 
 	    }
 	   
 	}
