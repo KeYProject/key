@@ -9,6 +9,7 @@
 //
 package de.uka.ilkd.key.gui.smt;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -17,6 +18,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JFileChooser;
@@ -26,39 +29,72 @@ import javax.swing.JSlider;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.JToggleButton;
+import javax.swing.SwingUtilities;
 import javax.swing.border.TitledBorder;
 
 
 
 class PropertyPanel extends JPanel {
 
+    private static final int MAX_LABEL_LENGTH = 10;
     private static final long serialVersionUID = 1L;
     JLabel propertyLabel = null;
     JTextField valueField = null;
+    
+    private int getMaxWidth(){
+	String s ="";
+	for(int i=0; i < MAX_LABEL_LENGTH; i++){
+	    s+="W";
+	}
+	return SwingUtilities.computeStringWidth(this.getFontMetrics(this.getFont()),s);
+    }
+    
 
     public PropertyPanel() {
 
-	GridBagConstraints gridBagConstraints13 = new GridBagConstraints();
+	/*GridBagConstraints gridBagConstraints13 = new GridBagConstraints();
 	gridBagConstraints13.fill = GridBagConstraints.BOTH;
 	gridBagConstraints13.gridy = 0;
 	gridBagConstraints13.weightx = 1.0;
-	gridBagConstraints13.anchor = GridBagConstraints.NORTHWEST;
+	gridBagConstraints13.anchor = GridBagConstraints.NORTHEAST;
 	gridBagConstraints13.weighty = 1.0;
 	gridBagConstraints13.gridx = 1;
+	
 	GridBagConstraints gridBagConstraints12 = new GridBagConstraints();
 	gridBagConstraints12.gridx = 0;
 	gridBagConstraints12.anchor = GridBagConstraints.WEST;
-	gridBagConstraints12.weightx = 1.0;
+	gridBagConstraints12.weightx = 0.0;
 	gridBagConstraints12.weighty = 1.0;
 	gridBagConstraints12.gridy = 0;
+	
 	gridBagConstraints12.insets = new Insets(0,5,0,0); 
 	propertyLabel = new JLabel();
+	
 	propertyLabel.setText("Property Name");
+	
 	setLayout(new GridBagLayout());
 	setSize(new Dimension(289, 23));
 	add(propertyLabel, gridBagConstraints12);
-	add(getValueField(), gridBagConstraints13);
+	add(getValueField(), gridBagConstraints13);*/
+	propertyLabel = new JLabel();
+	setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
+	
+	add(propertyLabel);
+	add(Box.createVerticalGlue());
+	add(getValueField());
+	
 
+	
+
+    }
+    
+    public void setLabel(String text){
+	propertyLabel.setText(text);
+	int width = propertyLabel.getPreferredSize().width;
+	width = Math.max(getMaxWidth(),width);
+	propertyLabel.setPreferredSize(new Dimension(width,propertyLabel.getPreferredSize().height));
+
+	
     }
 
     /**

@@ -461,7 +461,10 @@ public abstract class AbstractSMTSolver extends AbstractProcess implements SMTSo
 	return !session.hasNextTerm();
     }
     
-
+    public String getInfo() {
+        return "";
+    }
+    
     public boolean wasSuccessful() {
  
         return session.getTermSize() == session.getSolved();

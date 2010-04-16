@@ -71,6 +71,12 @@ public interface SMTSolver extends de.uka.ilkd.key.smt.launcher.Process{
     
     public boolean useForMultipleRule();
     
+    /**
+     * @return Returns some information for the solver. If no information
+     * is provided an empty String is returned. 
+     */
+    String getInfo();
+    
 
     /**
      * Determines whether taclets are used for this solver.

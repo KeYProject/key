@@ -252,6 +252,16 @@ public class DecisionProcedureSettings implements Settings {
     public int getTimeout() {
 	return this.timeout;
     }
+
+    private final static String EQUALITY = "#####";
+    
+    private String decode(String s){
+	return s.replaceAll(EQUALITY, "=");
+    }
+    
+    private String encode(String s){
+	return s.replaceAll("=", EQUALITY);
+    }
     
 
     /** gets a Properties object and has to perform the necessary
@@ -331,7 +341,7 @@ public class DecisionProcedureSettings implements Settings {
 		if (vals.length == 2) {
 		    AbstractSMTSolver solver = findSolverByName(vals[0]);
 		    if(solver != null){
-			setExecutionCommand(solver,vals[1]);
+			setExecutionCommand(solver,decode(vals[1]));
 			solver.isInstalled(true);
 		    }
 		}
@@ -373,7 +383,7 @@ public class DecisionProcedureSettings implements Settings {
 	String toStore = "";
 	for (AbstractSMTSolver solver : getSolvers()) {
 	     
-	     String comm = solver.getExecutionCommand();
+	     String comm = encode(solver.getExecutionCommand());
 	    	if (comm == null) {
 			comm = "";
 	    	}

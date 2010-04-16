@@ -8,6 +8,8 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
@@ -57,7 +59,7 @@ public class SettingsDialog {
     private JTree optionTree = null;
     private JScrollPane jScrollPane = null;
     private JScrollPane jScrollPane1 = null;
-    private JTable optionTable = null; // @jve:decl-index=0:visual-constraint="885,171"
+    private OptionTable optionTable = null; // @jve:decl-index=0:visual-constraint="885,171"
     private JPanel panel = null;
     private JButton applyButton = null;
     private JButton okButton = null;
@@ -191,82 +193,12 @@ public class SettingsDialog {
 
     }
 
-    JTable getOptionTable() {
+    OptionTable getOptionTable() {
 	if (optionTable == null) {
-	    optionTable = new JTable() {
-		private static final long serialVersionUID = 1L;
-
-		DefaultTableCellRenderer renderer = new DefaultTableCellRenderer() {
-		    private static final long serialVersionUID = 1L;
-		
-
-		    @Override
-		    public Component getTableCellRendererComponent(
-			    JTable table, Object value, boolean isSelected,
-			    boolean hasFocus, int row, int column) {
-
-			if (!(value instanceof TableComponent)) {
-			    return (Component) value;
-			}
-			// ((TableComponent) value).eventChange();
-
-			setToolTipText("This is a tooltip");
-			// TODO Auto-generated method stub
-			if (((TableComponent) value).prepareValues()) {
-			    return ((TableComponent) value)
-				    .getRendererComponent();
-			} else {
-			    return EMPTY_LINE;
-			}
-		    }
-		};
-
-		TableCellEditor editor = new CellEditor() {
-		    private static final long serialVersionUID = 1L;
-		    TableComponent currentValue = null;
-
-		    public Object getCellEditorValue() {
-
-			return currentValue;
-		    }
-
-		    public Component getTableCellEditorComponent(JTable table,
-			    Object value, boolean isSelected, int row,
-			    int column) {
-
-			if (!(value instanceof TableComponent)) {
-			    return null;
-			}
-
-			currentValue = (TableComponent) value;
-			// ((TableComponent) value).eventChange();
-			if (currentValue.prepare()) {
-			    return currentValue.getEditorComponent();
-			} else {
-			    return EMPTY_LINE;
-			}
-		    }
-
-		};
-
-		@Override
-		public TableCellRenderer getCellRenderer(int row, int column) {
-
-		    return renderer;
-		    // return super.getCellRenderer(row, column);
-		}
-
-		@Override
-		public TableCellEditor getCellEditor(int row, int column) {
-
-		    return editor;
-		}
-	    };
-	    optionTable.setShowGrid(false);
-
+	    optionTable = new OptionTable();
+	    
 	    optionTable.setBackground(getPanel().getBackground());
 
-	    optionTable.setTableHeader(null);
 
 	}
 	return optionTable;
@@ -419,8 +351,8 @@ public class SettingsDialog {
 				    Object o[] = { Settings.seperator,
 					    getExplanation(),
 					    Settings.seperator };
-				    getExplanation().getRendererComponent().setBackground(
-					    getOptionTable().getBackground());
+				  //  getExplanation().getRendererComponent().setBackground(
+					//    getOptionTable().getBackground());
 
 				    m.insertRow(row + 1, o);
 				    getOptionTable()
@@ -459,12 +391,14 @@ public class SettingsDialog {
 			    .getPreferredSize().width + 5, width);
 		}
 
-		getOptionTable().setRowHeight(i,
-		        Math.max(component.getHeight(), height));
+		//getOptionTable().setRowHeight(i,
+		  //      Math.max(component.getHeight(), height));
 
 	    }
 
 	}
+	
+	getOptionTable().setRowHeight();
 	
 	for (int i = 0; i < getOptionTable().getColumnModel().getColumnCount(); i++) {
 	    if (Settings.OPTIONCOL != i) {
@@ -504,6 +438,122 @@ public class SettingsDialog {
 	getOptionTree().setModel(settings.getContent());
 	viewOptions(settings.getDefaultItem());
 	getJScrollPane1().setViewportView(getOptionTable());
+
+    }
+    
+    class OptionTable extends JTable{
+	
+	DefaultTableCellRenderer renderer; 
+	TableCellEditor editor;
+	
+	public OptionTable() {
+	    setShowGrid(false);
+	    setTableHeader(null);
+	    renderer = new DefaultTableCellRenderer() {
+		private static final long serialVersionUID = 1L;
+
+
+		@Override
+		public Component getTableCellRendererComponent(
+			JTable table, Object value, boolean isSelected,
+			boolean hasFocus, int row, int column) {
+
+		    if (!(value instanceof TableComponent)) {
+			return (Component) value;
+		    }
+		    // ((TableComponent) value).eventChange();
+
+		    setToolTipText("This is a tooltip");
+	
+		    ((TableComponent) value).setParent(table);
+		    if (((TableComponent) value).prepareValues()) {
+			return ((TableComponent) value)
+			.getRendererComponent();
+		    } else {
+			return EMPTY_LINE;
+		    }
+		}
+	    };
+
+	    editor = new CellEditor() {
+		private static final long serialVersionUID = 1L;
+		TableComponent currentValue = null;
+
+		public Object getCellEditorValue() {
+
+		    return currentValue;
+		}
+
+		public Component getTableCellEditorComponent(JTable table,
+			Object value, boolean isSelected, int row,
+			int column) {
+
+		    if (!(value instanceof TableComponent)) {
+			return null;
+		    }
+
+		    currentValue = (TableComponent) value;
+		    // ((TableComponent) value).eventChange();
+		    currentValue.setParent(table);
+		    if (currentValue.prepare()) {
+			return currentValue.getEditorComponent();
+		    } else {
+			return EMPTY_LINE;
+		    }
+		}
+
+	    };
+	    
+	    
+	    addComponentListener(new ComponentListener() {
+	        
+	        
+	        
+	        public void componentResized(ComponentEvent e) {
+	         	setRowHeight();
+	        
+	        }
+	        
+	        public void componentMoved(ComponentEvent e) {}	        
+	        public void componentHidden(ComponentEvent e) {}
+	        public void componentShown(ComponentEvent e) {}
+	    });
+
+
+	};
+	@Override
+	public TableCellRenderer getCellRenderer(int row, int column) {
+	    return renderer;
+	}
+
+	@Override
+	public TableCellEditor getCellEditor(int row, int column) {
+	    return editor;
+	}
+	
+	private int getHeight(Object o){
+	    if(o instanceof TableComponent){
+		TableComponent comp = ((TableComponent)o);
+		return comp.visible() ? comp.getHeight():0;
+	    }
+	    if(o instanceof Component){
+		return ((Component)o).getPreferredSize().height;
+	    }
+	    return 0;
+	}
+	
+	public void setRowHeight(){
+	    for (int row = 0; row < getModel().getRowCount(); row++){
+		int height =0;
+		for(int col =0; col < getModel().getColumnCount(); col++){
+		   Object obj = getValueAt(row, col);
+		   height = Math.max(height, getHeight(obj));    
+		}	
+		setRowHeight(row,height);
+	    }
+	}
+	
+	
 
     }
 

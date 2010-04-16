@@ -11,6 +11,7 @@ package de.uka.ilkd.key.gui.smt;
 
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -20,10 +21,16 @@ import javax.swing.JComboBox;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
 import javax.swing.JTextArea;
+import javax.swing.JTextPane;
+import javax.swing.SwingUtilities;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.text.StyledEditorKit;
+import javax.swing.text.View;
+
+import sun.swing.SwingUtilities2;
 
 interface TableComponent {
     int getHeight();
@@ -43,6 +50,14 @@ interface TableComponent {
     void setShowInfo(boolean b);
 
     boolean isShowingInfo();
+    
+    boolean visible();
+    
+    /**
+     * Invoked before the component is used by its parent.
+     * @param component
+     */
+    public void setParent(Component component);
 
 }
 
@@ -86,6 +101,10 @@ abstract class AbstractTableComponent<T> implements TableComponent {
     public boolean prepare() {
 	return prepareValues();
     }
+    
+    public boolean visible(){
+	return true;
+    }
 
     public String getInfo() {
 	return null;
@@ -97,6 +116,10 @@ abstract class AbstractTableComponent<T> implements TableComponent {
 
     public boolean isShowingInfo() {
 	return showInfo;
+    }
+    
+    public void setParent(Component component) {
+       
     }
 
 }
@@ -347,7 +370,7 @@ abstract class TableProperty extends AbstractTableComponent<PropertyPanel> {
 
     protected void setTitle(String title) {
 	for (int i = 0; i < 2; i++) {
-	    comp[i].propertyLabel.setText(title);
+	    comp[i].setLabel(title);
 	}
     }
 
@@ -402,7 +425,7 @@ abstract class TableInfoButton extends AbstractTableComponent<InfoPanel> {
 
     @Override
     public int getHeight() {
-	return comp[E].getToogleButton().getPreferredSize().height + 5;
+	return client.visible() ? comp[E].getToogleButton().getPreferredSize().height + 5:0;
     }
 
     public TableComponent getExplanation() {
@@ -429,28 +452,57 @@ abstract class TableInfoButton extends AbstractTableComponent<InfoPanel> {
 
 }
 
-class TableExplanation extends AbstractTableComponent<JTextArea>{
-    JTextArea textArea = new JTextArea();
+class TableExplanation extends AbstractTableComponent<JTextPane>{
+    JTextPane textArea = new JTextPane();
+    
+    
+    
     
     void init(String text){
 	    textArea.setText(text);
-	    textArea.setRows(textArea.getLineCount() + 1);
+    }
+    
+    public TableExplanation(){
+	this(null,null);
+    }
+    
+    public TableExplanation(Object userObject, String border){
+	super(userObject);
+	StyledEditorKit kit = new StyledEditorKit();
+	textArea.setEditorKit(kit);
+	if(border != null && border.length()>0){
+	    
+	    textArea.setBorder(
+		    BorderFactory.createTitledBorder(border));
+	}
+
+    }
+    
+       
+
+    @Override
+    public void setParent(Component component) {
+       textArea.setBackground(component.getBackground());
     }
     
  
     @Override
     public int getHeight() {
-	return textArea.getPreferredSize().height;
+	int height = textArea.getFontMetrics(textArea.getFont()).getHeight();
+	Insets sets = textArea.getBorder().getBorderInsets(textArea);
+	height += sets.bottom +sets.top;
+	return (int)textArea.getUI().getRootView(textArea).getPreferredSpan(View.Y_AXIS)+height;
     }
     
     @Override
-    JTextArea getComp(int i) {
+    JTextPane getComp(int i) {
 	
 	return i==R? textArea : null;
     }
     public void eventChange() {
     }
     public boolean prepareValues() {
+	//textArea.setRows(textArea.getLineCount() + 1);
 	return true;
     }
     
