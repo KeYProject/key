@@ -20,9 +20,7 @@ import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
-import javax.swing.JTextArea;
 import javax.swing.JTextPane;
-import javax.swing.SwingUtilities;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -30,7 +28,6 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.text.StyledEditorKit;
 import javax.swing.text.View;
 
-import sun.swing.SwingUtilities2;
 
 interface TableComponent {
     int getHeight();

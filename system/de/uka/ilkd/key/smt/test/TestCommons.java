@@ -43,7 +43,12 @@ class TestCommons extends TestCase {
     
     InitConfig initConfig = null;
     static protected ProblemInitializer initializer = null;
-    static protected Profile profile = new JavaProfile();
+    static protected Profile profile = init();
+    
+    static Profile init(){
+	Profile p = new JavaProfile();
+	return p;
+    }
     
     
     private Services services;

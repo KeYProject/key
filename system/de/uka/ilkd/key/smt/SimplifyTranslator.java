@@ -64,6 +64,12 @@ public class SimplifyTranslator extends AbstractSMTTranslator {
     private static StringBuffer NULLSORTSTRING = new StringBuffer("NULLSORT");
     
     
+    private static int MAX_INTEGER = 2147483646;
+ 
+    private static int MIN_INTEGER = -2147483646;
+
+    
+    
     /**
      * Just a constructor which starts the conversion to Simplify syntax.
      * The result can be fetched with
@@ -233,7 +239,7 @@ public class SimplifyTranslator extends AbstractSMTTranslator {
 	// for some cases it is important that the negation of a number
 	// is supported, too. Therefore the biggest number is 
 	// 2147483646
-	return number <= 2147483646 && number >= -2147483646;
+	return number <= MAX_INTEGER && number >= MIN_INTEGER;
     }
 
     @Override
