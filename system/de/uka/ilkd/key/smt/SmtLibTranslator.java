@@ -366,19 +366,8 @@ public class SmtLibTranslator extends AbstractSMTTranslator {
 	   arg = translateIntegerUnaryMinus(arg);
 	}
 	
-	return arg;
-	
-	/* TODO: Delete
-	 * This code does not work for val = Long.MIN_VALUE
-	StringBuffer arg;
-	if (val < 0) {
-	    arg = translateIntegerValue(val * (-1));
-	    arg = translateIntegerUnaryMinus(arg);
-	} else {
-	    arg = new StringBuffer(Long.toString(val));
-	}
+	return arg;	
 
-	return arg;*/
     }
 
     @Override

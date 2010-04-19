@@ -1427,7 +1427,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 		    long num = NumberTranslation.translate(term.sub(0))
 			    .longValue();
 		    if(!numberIsSupported(num)){
-			throw new IllegalFormulaException("The number " + num + "is not supported");
+			throw new IllegalNumberException("The number " + num + "is not supported");
 		    }
 		    StringBuffer numVal = translateIntegerValue(num);
 		    
@@ -1894,10 +1894,12 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 		 try{
 		     StringBuffer term = translateTerm(subterm,vector,services);    
 		     result.add(term);
-		 }catch(IllegalFormulaException e){
+		     
+		 }
+		 catch(IllegalNumberException e){
 		     // don't interrupt the translation, because only one taclet
 		     // cannot be translated. This exception can occur if the translator
-		     // of Simplify tries to translate numbers that are to high.		     
+		     // tries to translate numbers that are not supported.		     
 		 }
 		 
 		 

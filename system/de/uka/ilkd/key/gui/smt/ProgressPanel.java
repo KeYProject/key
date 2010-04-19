@@ -81,6 +81,7 @@ class ProgressPanel implements SMTProgressMonitor {
 		getProgressBar().setForeground(PROGRESS_COLOR);
 		getProgressBar().setStringPainted(true);
 		getProgressBarTime().setStringPainted(true);
+		setTimeProgress("", 0);
 		
 		getProgressBar().setString("");
 		getProgressBar().setMaximum(goals.size());
@@ -97,20 +98,17 @@ class ProgressPanel implements SMTProgressMonitor {
 	    return "Goals: "+ progress+"/"+max;
 	}
 	
-	public void setProgress(int progress){
-	    	getProgressBar().setString(buildString(progress,getProgressBar().getMaximum()));	    
-		getProgressBar().setValue(progress);
-		parent.repaint();
-		
-		//getProgressBar().paint(getProgressBar().getGraphics());
-	}
 	
-	public void setTimeProgress(int progress){
-		getProgressBarTime().setValue(progress);
+	public void setTimeProgress(String title, long time){
+		getProgressBarTime().setString(title);
+		getProgressBarTime().setValue((int)time);
 		parent.repaint();
 		
 	
 	}
+	
+	
+
 	
 	/**
 	 * This method initializes progressPanel	
@@ -162,7 +160,9 @@ class ProgressPanel implements SMTProgressMonitor {
 			progressPanel = new JPanel();
 			progressPanel.setLayout(new GridBagLayout());
 			progressPanel.setSize(new Dimension(353, 63));
-			progressPanel.setBorder(BorderFactory.createTitledBorder(null, "ProgressPanel", TitledBorder.DEFAULT_JUSTIFICATION, TitledBorder.DEFAULT_POSITION, new Font("Dialog", Font.BOLD, 12), new Color(51, 51, 51)));
+			progressPanel.setBorder(BorderFactory.createTitledBorder(null, "ProgressPanel",
+				TitledBorder.DEFAULT_JUSTIFICATION, TitledBorder.DEFAULT_POSITION,
+				new Font("Dialog", Font.BOLD, 12), new Color(51, 51, 51)));
 			progressPanel.add(getProgressBar(), gridBagConstraints);
 			
 			//progressPanel.add(getProgressButton(), gridBagConstraints1);
@@ -181,6 +181,8 @@ class ProgressPanel implements SMTProgressMonitor {
 	private JProgressBar getProgressBar() {
 		if (progressBar == null) {
 			progressBar = new JProgressBar(){
+		                private static final long serialVersionUID = 1L;
+
 				@Override
 				protected void paintComponent(Graphics g) {
 				    int i =0;
@@ -203,10 +205,11 @@ class ProgressPanel implements SMTProgressMonitor {
 	    return number+". Goal"+" "+type.name();
 	}
 	
-	public int necessaryPanelWidth(int goals){
+	public int necessaryPanelWidth(int numberOfGoals){
 	    
 	    return SwingUtilities.computeStringWidth(
-		    getProgressBar().getFontMetrics(getProgressBar().getFont()), goalString(1,SolveType.UNSOLVABLE))*goals;
+		    getProgressBar().getFontMetrics(getProgressBar().getFont()), goalString(1,SolveType.UNSOLVABLE))
+		     *numberOfGoals;
 	}
 	
 	public int necessaryPanelHeight(){
@@ -273,7 +276,7 @@ class ProgressPanel implements SMTProgressMonitor {
 	}
 
 
-        public void setMaximum(int maximum) {
+        public void setGoalMaximum(int maximum) {
     	    getProgressBar().setString(buildString(getProgressBar().getValue(),maximum));
         }
 
@@ -313,11 +316,5 @@ class ProgressPanel implements SMTProgressMonitor {
         }
 
 
-	
-        public void setSolverFinished(long time) {
-            getProgressBarTime().setString("Stopped after "+ ((double)time)/1000 + " sec.");
-            parent.repaint();
-      
 
-        }
 }

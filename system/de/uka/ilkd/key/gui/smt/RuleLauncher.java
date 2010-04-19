@@ -21,7 +21,7 @@ import de.uka.ilkd.key.smt.SMTRule.WaitingPolicy;
 /**
  * Use this class to start SMTRules, if you want to use SMTSolver in KeY
  * by user interaction.
- * It belongs to de.uka.ilkd.gui... because it also contains the mechanism 
+ * It belongs to de.uka.ilkd.gui... because it contains the mechanism 
  * to start SMTRules in combination with <code>ProgressDialog</code>
  */
 public class RuleLauncher {
@@ -54,7 +54,7 @@ public class RuleLauncher {
     		LinkedList<Goal> goals = new LinkedList<Goal>();
     		rule.setMaxTime(DecisionProcedureSettings.getInstance().getTimeout()*100);
     		goals.add(goal);
-    		rule.start(goal,constraint,useOwnThread,getApplyPolicy());
+       		rule.start(goal,constraint,useOwnThread,getApplyPolicy());
     		if(useOwnThread){
     		    startProgressDialog(rule,goals);    
     		}
@@ -70,11 +70,12 @@ public class RuleLauncher {
     		for (Goal goal : proof.openGoals()) {
     		     goals.add(goal);
     		}
-    		
+  
     		rule.start(goals,proof,constraint,useOwnThread,getApplyPolicy());
     		if(useOwnThread){
     		    startProgressDialog(rule,goals);
     		}
+    		
     		
     	    }
     	    

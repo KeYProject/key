@@ -10,3 +10,4 @@ public class IllegalFormulaException extends Exception {
 	super(msg);
     }
 }
+

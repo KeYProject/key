@@ -2,52 +2,37 @@ package de.uka.ilkd.key.gui.smt;
 
 
 
-import javax.swing.JPanel;
-
 import java.awt.BorderLayout;
-import java.awt.Component;
-import java.awt.GridBagLayout;
-import java.awt.Dimension;
-import java.awt.Toolkit;
-
-import javax.swing.BorderFactory;
-import javax.swing.border.TitledBorder;
-import java.awt.Font;
 import java.awt.Color;
-import javax.swing.JProgressBar;
+import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
-import javax.swing.JButton;
+import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
-import java.awt.event.WindowStateListener;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.util.Collection;
 
-import javax.swing.DefaultListCellRenderer;
 import javax.swing.DefaultListModel;
+import javax.swing.JButton;
 import javax.swing.JDialog;
-import javax.swing.JFrame;
 import javax.swing.JList;
-import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.ListCellRenderer;
-import javax.swing.ListModel;
 
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.smt.MakesProgress;
 import de.uka.ilkd.key.smt.SMTRule;
 import de.uka.ilkd.key.smt.SMTSolver;
 import de.uka.ilkd.key.smt.launcher.ProcessLauncherListener;
 
 public class ProgressDialog extends JDialog implements ProcessLauncherListener{
+    	private static final long serialVersionUID = 1L;
+
 
 	public static final ProgressDialog INSTANCE = new ProgressDialog();
 	
@@ -60,20 +45,11 @@ public class ProgressDialog extends JDialog implements ProcessLauncherListener{
 	private JScrollPane scrollPane = null;
 	private JTextArea   infoText = null;
 	private SMTRule rule = null;
-	private int processFinishedCounter = 0;
 	private int numberOfProcesses =0;
 	private boolean stopRunning = false;
 	private boolean applyResults = false;
 
-
-	
-	
-	public void setProgress(int i, int progress){
-		ProgressPanel panel = (ProgressPanel)list.getModel().getElementAt(i);
-		panel.setProgress(progress);
-		getList().repaint();
-	}
-	
+		
 	public void prepare(Collection<SMTSolver> solvers, Collection<Goal> goals, SMTRule r){
 	    this.rule = r;
 	    rule.addListener(this);
@@ -81,6 +57,7 @@ public class ProgressDialog extends JDialog implements ProcessLauncherListener{
 	    int height =0;
 	    DefaultListModel model = new DefaultListModel();
 	    numberOfProcesses = 0;
+	    getList().setModel(model);
 	    for(SMTSolver solver : solvers){
 		ProgressPanel panel =new ProgressPanel(solver,getList(),this,goals); 
 		model.addElement(panel);
@@ -100,9 +77,8 @@ public class ProgressDialog extends JDialog implements ProcessLauncherListener{
 	    height = Math.min(height,dim.height/2);
 	    
 	    this.setSize(width,height);
-	    getList().setModel(model);
-	    processFinishedCounter =0;
 	   
+   
 	}
 	
 	

@@ -239,8 +239,7 @@ public abstract  class ProcessLauncher  implements ProcessListener, Runnable{
 			try {
 				Thread.currentThread().sleep(SLEEP);
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				eventException(null, e);
+			    eventException(null, e);
 				
 			}
 			if(getRunning().isEmpty()||runningCounter==0){
