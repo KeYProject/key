@@ -64,6 +64,12 @@ public class SimplifyTranslator extends AbstractSMTTranslator {
     private static StringBuffer NULLSORTSTRING = new StringBuffer("NULLSORT");
     
     
+    private static int MAX_INTEGER = 2147483646;
+ 
+    private static int MIN_INTEGER = -2147483646;
+
+    
+    
     /**
      * Just a constructor which starts the conversion to Simplify syntax.
      * The result can be fetched with
@@ -81,6 +87,7 @@ public class SimplifyTranslator extends AbstractSMTTranslator {
     public SimplifyTranslator(Services services) {
 	super(services);
     }
+    
     
     @Override
     protected StringBuffer buildCompleteText(StringBuffer formula,
@@ -220,6 +227,19 @@ public class SimplifyTranslator extends AbstractSMTTranslator {
 	logger.info(toReturn);
 	
 	return toReturn;
+    }
+    
+
+ 
+
+    @Override
+    protected boolean numberIsSupported(long number) {
+	//Simplify supports only numbers within the following range.
+	// Theoretically Simplify supports numbers up to 2147483647, but
+	// for some cases it is important that the negation of a number
+	// is supported, too. Therefore the biggest number is 
+	// 2147483646
+	return number <= MAX_INTEGER && number >= MIN_INTEGER;
     }
 
     @Override

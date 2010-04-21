@@ -677,12 +677,12 @@ public class Goal  {
                 proof.getServices());
 
         proof.getServices().saveNameRecorder(n);
-        
+
         if ( goalList == null ) {
             // this happens for the simplify decision procedure
             // we do nothing in this case
         } else if ( goalList.isEmpty() ) {
-            proof.closeGoal ( this, ruleApp.constraint () );           
+            proof.closeGoal ( this, ruleApp.constraint () );    
         } else {
             proof.replace ( this, goalList );
             if ( ruleApp instanceof TacletApp &&
@@ -690,6 +690,7 @@ public class Goal  {
                 // the first new goal is the one to be closed
                 proof.closeGoal ( goalList.head (), ruleApp.constraint () );
         }
+
 
         final RuleAppInfo ruleAppInfo = journal.getRuleAppInfo(p_ruleApp);
 

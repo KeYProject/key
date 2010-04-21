@@ -12,7 +12,7 @@ package de.uka.ilkd.key.smt;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedList;
-import java.util.TreeSet;
+
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
@@ -39,6 +39,7 @@ import de.uka.ilkd.key.smt.launcher.Event;
 import de.uka.ilkd.key.smt.launcher.Process;
 import de.uka.ilkd.key.smt.launcher.ProcessLaunch;
 import de.uka.ilkd.key.smt.launcher.ProcessLauncher;
+import de.uka.ilkd.key.smt.launcher.ProcessLauncherListener;
 
 
 /**
@@ -59,8 +60,23 @@ class BuiltInRuleAppSMT extends BuiltInRuleApp{
 
 
 /**
- *  Use this class to apply external provers to goals. Do not use directly
- *  the solver classes.
+ *  Use this class to apply external provers to goals. Do not directly use
+ *  the solver classes.<br>
+ *  The SMTRule manages the executing of the solvers. There are two ways
+ *  to execute solvers:<br><br>
+ *  1. start(...): Starts and monitors the solvers belonging to the rule. (Boss-Worker-Model)<br>
+ *  You can decide whether the starting and monitoring (Boss) should be executed
+ *  in a new thread or not.<br> Be aware of the fact that in both cases the solvers (workers)
+ *  are executed in new threads.<br>
+    After executing the solvers their results are collected, 
+ *  which can be read by <code>getResults()</code> or can be applied to their 
+ *  corresponding goals by <code>applyGoals()</code>.<br>
+ *  2. run(...): Makes use of the 1.<br>
+ *  If you want to run the solvers without applying the results to the corresponding 
+ *  goals you can use these methods. They are practical if you want to run solvers
+ *  on single goals or formulae in a sequential way: The methods do not create
+ *  threads for starting and monitoring the solvers.<br>
+ *  (The solvers (workers )themselves use new threads and run concurrently.)
  */
 public class SMTRule  extends ProcessLauncher implements BuiltInRule{
 
@@ -73,18 +89,23 @@ public class SMTRule  extends ProcessLauncher implements BuiltInRule{
     private Collection<SMTSolver> solvers = new LinkedList<SMTSolver>();
     /**Important for applying the results to goals.*/
     private Constraint 	           userConstraint = null;
-    /**The name of the rule. Important to identify rules while reading and 
+    /**The name of the rule. Important to identify rules while reading and   
      * writting the settings.*/
     private Name 	           name;
     /**
      * <code>true</code> if <code>solvers.size()>1</code>,
-     *  otherwise <code>false</code>
+     *  otherwise <code>false</code> 
      */
     private final boolean 	   multiRule;
     
     private final boolean background;
+
     
     
+    
+    
+    
+    public enum WaitingPolicy {STOP_FIRST,WAIT_FOR_ALL};
  
   
     public void init(){
@@ -180,11 +201,8 @@ public class SMTRule  extends ProcessLauncher implements BuiltInRule{
 	for(SMTSolver solver : getInstalledSolvers()){
 	    LinkedList<InternResult> temp = new LinkedList<InternResult>();
 	    for(InternResult ir : terms){
-		try {
-	            temp.add((InternResult) ir.clone());
-                } catch (CloneNotSupportedException e) {
-	           throw new RuntimeException(e);
-                }
+		temp.add((InternResult) ir.clone(solver));
+	      
 	    }
 	    solver.prepareSolver(temp, services, taclets);
 	    addProcess(solver);
@@ -193,40 +211,50 @@ public class SMTRule  extends ProcessLauncher implements BuiltInRule{
     
     /**
      * Starts the rule, i.e. a new thread for the rule is created and the 
-     * external prover, belonging to this rule, will be started.
+     * external prover, belonging to this rule, will be started in new threads.
      * @param goal 
      * @param constraint
      */
     public void start(Goal goal, Constraint constraint){
-	start(goal, constraint, true);
+	start(goal, constraint, true,WaitingPolicy.WAIT_FOR_ALL);
+    }
+    
+    public void start(Goal goal, Constraint constraint, boolean useThread){
+	start(goal, constraint, useThread, WaitingPolicy.WAIT_FOR_ALL);
     }
     
     /**
-     * Start the rule. 
+     * Starts the rule. 
      * @param goal
      * @param constraint
      * @param useThread <code>true</code> if you want to start this rule in a new thread.
      */
-    public void start(Goal goal, Constraint constraint, boolean useThread){
+    public void start(Goal goal, Constraint constraint, boolean useThread, WaitingPolicy applyPolicy){
 	init();
 	LinkedList<Goal> goals = new LinkedList<Goal>();
 	goals.add(goal);
-	start(goals,goal.proof(),constraint,useThread);
+	start(goals,goal.proof(),constraint,useThread,applyPolicy);
     }
     
     /**
      * Starts the rule, i.e. a new thread for the rule is created and the 
-     * external prover, belonging to this rule, will be started.
+     * external prover, belonging to this rule, will be started in new threads.
      * @param goals
      * @param proof proof the goals belonging to.
      * @param constraint
      */
     public void start(Collection<Goal> goals, Proof proof, Constraint constraint){
-	start(goals, proof, constraint,true);
+	start(goals, proof, constraint,true,WaitingPolicy.WAIT_FOR_ALL);
     }
+    
     
     public void start(Collection<Goal> goals, Proof proof, Constraint constraint,
 	    boolean useThread){
+	start(goals,proof,constraint,useThread, WaitingPolicy.WAIT_FOR_ALL);
+    }
+    
+    public void start(Collection<Goal> goals, Proof proof, Constraint constraint,
+	    boolean useThread, WaitingPolicy applyPolicy){
 	init();
 
 	LinkedList<InternResult> terms = new LinkedList<InternResult>();
@@ -237,7 +265,7 @@ public class SMTRule  extends ProcessLauncher implements BuiltInRule{
 	    index = goal.indexOfTaclets();
 	}
 	
-	startThread(terms,constraint,useThread,index,proof.getServices());
+	startThread(terms,constraint,useThread,index,proof.getServices(), applyPolicy);
 
 	
     }
@@ -276,8 +304,11 @@ public class SMTRule  extends ProcessLauncher implements BuiltInRule{
 	for(Term term : terms){
 	    internTerms.add(new InternResult(term, null));
 	}
-	startThread(internTerms,constraint,useThread,index,services);
+	startThread(internTerms,constraint,useThread,index,services,WaitingPolicy.WAIT_FOR_ALL);
     }
+    
+    
+
     
     /**
      * DO NOT USE THIS METHOD IF THERE IS ANOTHER WAY TO SOLVE YOUR PROBLEM.
@@ -289,17 +320,19 @@ public class SMTRule  extends ProcessLauncher implements BuiltInRule{
      * @param constraint
      * @param useThread
      */
-    public void start(String formula, Services services, Constraint constraint, boolean useThread){
+    private void start(String formula, Services services, Constraint constraint, boolean useThread){
 	LinkedList<InternResult> list = new LinkedList<InternResult>();
 	list.add(new InternResult(formula));
-	startThread(list,constraint,useThread,null,services);
+	startThread(list,constraint,useThread,null,services,WaitingPolicy.WAIT_FOR_ALL);
     }
     
 
     
     private void startThread(LinkedList<InternResult> terms,Constraint constraint, boolean useThread, TacletIndex index,
-	      Services services){
+	      Services services, WaitingPolicy applyPolicy){
 	init();
+
+	this.setFirstClosePolicy(applyPolicy == WaitingPolicy.STOP_FIRST);
 	userConstraint = constraint;
 	Collection<Taclet>  taclets = TacletTranslationSettings.getInstance().initTaclets(index);
 	
@@ -315,6 +348,60 @@ public class SMTRule  extends ProcessLauncher implements BuiltInRule{
 
     }
     
+    /**
+     * Use this method if you only want to run the solvers that belong to the rule without
+     * applying the results to goals. This method does not start an extra thread for starting
+     * the solvers. 
+     * On account of this the method returns not until the solvers have finished their jobs. 
+     * @param term the term to be solved
+     * @param services 
+     * @param constraint
+     * @param tacletIndex
+     */
+    public SMTSolverResult run(Term term , Services services, Constraint constraint,
+	    TacletIndex tacletIndex){
+	start(term,services,constraint,false, tacletIndex);
+	return this.getResults().getFirst();
+    }
+    
+    /**
+     * Use this method if you only want to run the solvers that belong to the rule without
+     * applying the results to the goals. This method does not start an extra thread for starting
+     * the solvers. 
+     * On account of this the method returns not until the solvers have finished their jobs. 
+     * @param goal the goal to be proofed
+     * @param services 
+     * @param constraint
+     */
+    public SMTSolverResult run(Goal goal, Services services, Constraint constraint){
+	start(goal,constraint,false,WaitingPolicy.WAIT_FOR_ALL);
+	return this.getResults().getFirst();
+    }
+    
+
+    /**
+     * Use this method if you only want to run the solvers that belong to the rule without
+     * applying the results to goals. This method does not start an extra thread for starting
+     * the solvers. 
+     * On account of this the method returns not until the solvers have finished their jobs. 
+     * IMPORTANT: Use this method only if it consists of only one prover.
+     * @param formula the formula to be proofed. The formula must use the format of the solver
+     * that belongs to this rule. 
+     * @param services 
+     * @param constraint
+     * @return the result of the executed proofer. If the rule consists of multiple provers
+     * the method returns <code>null</code>.
+     */
+    public SMTSolverResult run(String formula, Services services, Constraint constraint){
+	if(multiRule){
+	    return null;
+	}
+	start(formula,services,constraint,false);
+	return this.getResults().getFirst();
+    }
+    
+    
+    
     
     /**
      * Returns the title of the rule used by the GUI. 
@@ -328,7 +415,7 @@ public class SMTRule  extends ProcessLauncher implements BuiltInRule{
 	}
 	
 	for(SMTSolver solver : solvers){
-	    if(!solver.isInstalled(false) && multiRule){
+	    if((!solver.isInstalled(true) || !solver.useForMultipleRule()) && multiRule){
 		continue;
 	    }
 	  
@@ -365,45 +452,51 @@ public class SMTRule  extends ProcessLauncher implements BuiltInRule{
      * If you use an own thread for this rule (see <code>start(...)<code>), you
      * must call this method after executing the external provers.
      */
-    public void applyResults(){
-	
+    public void applyResults() {
+
 	LinkedList<SolverSession.InternResult> result = new LinkedList<SolverSession.InternResult>();
-	
-	for(SMTSolver solver : getInstalledSolvers()){
+	for (SMTSolver solver : getInstalledSolvers()) {
+	    // if( !solver.running()){
 	    AbstractSMTSolver s = (AbstractSMTSolver) solver;
 
 	    result.addAll(s.getSession().getResults());
+	    // }
+
 	}
-	
-	if(result.size() == 0){
+	if (result.size() == 0) {
 	    return;
 	}
-	InternResult ir = result.getFirst();
-	Proof proof = null;
-	
-	if(ir.getGoal() != null){
-	    proof = ir.getGoal().proof();
-	  //  proof.env().registerRule(this, de.uka.ilkd.key.proof.mgt.AxiomJustification.INSTANCE);
-	}
-	
-	
-	for(SolverSession.InternResult res  : result ){
-	    BuiltInRuleApp birApp = new BuiltInRuleAppSMT(this, null, 
-	                userConstraint,res.getResult()); 
-	
-	    if(res.getGoal() != null){
-		 res.getGoal().node().addSMTandFPData(res.getResult());
-		if(res.getResult().isValid() == ThreeValuedTruth.TRUE && res.getGoal().proof().openGoals().contains(res.getGoal())){
-		   
-		    res.getGoal().apply(birApp);
-		
+
+	for (final SolverSession.InternResult res : result) {
+	    final BuiltInRuleApp birApp = new BuiltInRuleAppSMT(this, null,
+		    userConstraint, res.getResult());
+	    Goal goal = res.getGoal();
+
+	    if (goal != null) {
+
+		res.getGoal().node().addSMTandFPData(res.getResult());
+		if (!goal.proof().closed() &&goal.proof().openGoals().contains(goal)) {
+
+		    if (res.getResult().isValid() == ThreeValuedTruth.TRUE) {
+
+			goal.apply(birApp);
+
+		    }
 		}
+
+	
 	    }
-	    
+
 	}
 
     }
     
+    
+    /**
+     * @return returns the results of the last execution. <br>
+     * If the rule consists of multiple provers: The method does not merge the results in a semantic way,
+     * but add them all to the returned list.
+     */
     public LinkedList<SMTSolverResult> getResults(){
 	HashSet<SolverSession.InternResult> result = new HashSet<SolverSession.InternResult>();
 	
@@ -434,7 +527,9 @@ public class SMTRule  extends ProcessLauncher implements BuiltInRule{
     protected void publish(Event e) {
 
 	if(e.getType().equals(Event.Type.WORK_DONE)){
-	    
+	    for(ProcessLauncherListener l : listener){
+		l.workDone();
+	    }
 	    return;
 	}
 	
@@ -494,7 +589,7 @@ public class SMTRule  extends ProcessLauncher implements BuiltInRule{
 	case PROCESS_FINISHED:
 	     monitor.setSolverFinished(launch.usedTime());
 	     break;
-	     
+
 	 
 	     
 	 default:
@@ -548,7 +643,7 @@ class EmptyRule extends SMTRule{
     
 
     public String displayName() {
-	return "N/A";
+	return "No prover available";
 
     }
 

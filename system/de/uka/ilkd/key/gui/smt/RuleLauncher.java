@@ -16,9 +16,11 @@ import de.uka.ilkd.key.logic.Constraint;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.smt.SMTRule;
+import de.uka.ilkd.key.smt.SMTRule.WaitingPolicy;
 
 /**
- * Use this class to start SMTRules.
+ * Use this class to start SMTRules, if you want to use SMTSolver in KeY
+ * by user interaction.
  * It belongs to de.uka.ilkd.gui... because it also contains the mechanism 
  * to start SMTRules in combination with <code>ProgressDialog</code>
  */
@@ -30,6 +32,15 @@ public class RuleLauncher {
     		
     	    }
     	    
+    	    public WaitingPolicy getApplyPolicy(){
+    
+    		if(DecisionProcedureSettings.getInstance().getProgressDialogMode()
+    			== DecisionProcedureSettings.PROGRESS_MODE_CLOSE_FIRST)
+    		return WaitingPolicy.STOP_FIRST;
+    		return WaitingPolicy.WAIT_FOR_ALL;
+    		
+    	    }
+    	    
     	    /**
     	     * Launches first the SMTRule and then the ProgressDialog is shown.
     	     * @param rule the rule to be launched
@@ -37,10 +48,13 @@ public class RuleLauncher {
     	     * @param constraint
     	     */
     	    public void start(SMTRule rule, Goal goal, Constraint constraint, boolean useOwnThread){
+    		if(!rule.isUsable()){
+    		    return;
+    		}
     		LinkedList<Goal> goals = new LinkedList<Goal>();
     		rule.setMaxTime(DecisionProcedureSettings.getInstance().getTimeout()*100);
     		goals.add(goal);
-    		rule.start(goal,constraint,useOwnThread);
+    		rule.start(goal,constraint,useOwnThread,getApplyPolicy());
     		if(useOwnThread){
     		    startProgressDialog(rule,goals);    
     		}
@@ -48,13 +62,16 @@ public class RuleLauncher {
     	    }
     	    
     	    public void start(SMTRule rule, Proof proof, Constraint constraint, boolean useOwnThread){
+    		if(!rule.isUsable()){
+    		    return;
+    		}
     		LinkedList<Goal> goals = new LinkedList<Goal>();
     		rule.setMaxTime(DecisionProcedureSettings.getInstance().getTimeout()*100);
     		for (Goal goal : proof.openGoals()) {
     		     goals.add(goal);
     		}
     		
-    		rule.start(goals,proof,constraint,useOwnThread);
+    		rule.start(goals,proof,constraint,useOwnThread,getApplyPolicy());
     		if(useOwnThread){
     		    startProgressDialog(rule,goals);
     		}

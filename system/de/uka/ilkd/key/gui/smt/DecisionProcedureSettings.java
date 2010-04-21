@@ -12,6 +12,7 @@ package de.uka.ilkd.key.gui.smt;
 import java.util.*;
 
 import de.uka.ilkd.key.gui.GUIEvent;
+import de.uka.ilkd.key.gui.Main;
 import de.uka.ilkd.key.gui.configuration.Settings;
 import de.uka.ilkd.key.gui.configuration.SettingsListener;
 import de.uka.ilkd.key.logic.Name;
@@ -34,13 +35,19 @@ public class DecisionProcedureSettings implements Settings {
     /** String used in the Settings to store the active rule */
     private static final String ACTIVE_RULE  = "[DecisionProcedure]ActiveRule";
     
-    private static final String TIMEOUT="[DecisionProcedure]Timeout";
+    private static final String TIMEOUT="[DecisionProcedure]SolverTimeout";
     
     private static final String SAVEFILE="[DecisionProcedure]savefile";
+    private static final String SAVEFILE_PATH="[DecisionProcedure]savefile_path";
+    
     
     private static final String SHOW_SMT_RES_DIA="[DecisionProcedure]showSMTResDialog";
     
     private static final String MULTIPLEPROVERS="[DecisionProcedure]multprovers";
+    
+    private static final String CACHE_GOALS = "[DecisionProcedure]cache_goals";
+    
+    private static final String PROGRESS_DIALOG_MODE = "[DecisionProcedure]pd_mode";
 
     
     /**@see {@link de.uka.ilkd.key.smt.SmtLibTranslatorWeaker} */
@@ -52,6 +59,10 @@ public class DecisionProcedureSettings implements Settings {
 
     
     private LinkedList<SMTRule> smtRules = new LinkedList<SMTRule>();
+    
+    public final static int    PROGRESS_MODE_USER = 0;
+    public final static int    PROGRESS_MODE_CLOSE = 1;
+    public final static int    PROGRESS_MODE_CLOSE_FIRST = 2;
    
     
     
@@ -62,7 +73,7 @@ public class DecisionProcedureSettings implements Settings {
     private SMTRule activeSMTRule = SMTRule.EMPTY_RULE;
     
     /** the value of the timeout in tenth of seconds.*/
-    private int timeout = 600;
+    private int timeout = 60;
     
     private static DecisionProcedureSettings instance;
     
@@ -84,7 +95,36 @@ public class DecisionProcedureSettings implements Settings {
     
     
     private String multProversSettings=null;
+    
+    private int progressDialogMode = PROGRESS_MODE_USER;
+    
+    private String file = "";
+    
+    private boolean cacheGoals=false;
+    
+    public int getProgressDialogMode(){
+	return progressDialogMode;
+    }
+    
+    public void setProgressDialogMode(int mode){
+	progressDialogMode = mode;
+    }
+    
+    public void setSaveToFile(String f){
+	file = f;
+    }
+    
+    public String getSaveToFile(){
+	return file;
+    }
+    
+    public boolean isCachingGoals(){
+	return cacheGoals;
+    }
 
+    public void setCacheGoals(boolean b){
+	cacheGoals = b;
+    }
 
     
     
@@ -137,9 +177,14 @@ public class DecisionProcedureSettings implements Settings {
      * changed to its registered listeners (not thread-safe)
      */
     protected void fireSettingsChanged() {
+	
         for (SettingsListener aListenerList : listenerList) {
             aListenerList.settingsChanged(new GUIEvent(this));
         }
+        if(Main.instance != null){
+            Main.instance.updateDecisionProcedureSelectMenu();
+        }
+      
     }
     
 
@@ -207,6 +252,16 @@ public class DecisionProcedureSettings implements Settings {
     public int getTimeout() {
 	return this.timeout;
     }
+
+    private final static String EQUALITY = "#####";
+    
+    private String decode(String s){
+	return s.replaceAll(EQUALITY, "=");
+    }
+    
+    private String encode(String s){
+	return s.replaceAll("=", EQUALITY);
+    }
     
 
     /** gets a Properties object and has to perform the necessary
@@ -233,13 +288,28 @@ public class DecisionProcedureSettings implements Settings {
 	
 	
 	String sf = props.getProperty(SAVEFILE);
-        this.saveFile = !(sf == null) && sf.equals("true");
+      //  this.saveFile = !(sf == null) && sf.equals("true");
 	
         String sd = props.getProperty(SHOW_SMT_RES_DIA);
         this.showSMTResDialog = !(sd == null) && sd.equals("true");
     
     	String wt = props.getProperty(WEAKENSMTTRANSLATION);
     	this.weakenSMTTranslation = !(wt == null) && wt.equals("true");
+    	
+    	String cg = props.getProperty(CACHE_GOALS);
+    	this.cacheGoals = !(cg == null) && cg.equals("true");
+    	
+    	file = props.getProperty(SAVEFILE_PATH,"");
+    	
+    	String pd = props.getProperty(PROGRESS_DIALOG_MODE);
+    	int mode;
+    	try{
+    	    mode = Integer.parseInt(pd);
+    	}catch(NumberFormatException e){
+    	   mode = PROGRESS_MODE_USER;
+    	}
+    	
+    	progressDialogMode = mode;
     	
     	
     	// Read the active rule at the end of the method to guarantee
@@ -271,7 +341,7 @@ public class DecisionProcedureSettings implements Settings {
 		if (vals.length == 2) {
 		    AbstractSMTSolver solver = findSolverByName(vals[0]);
 		    if(solver != null){
-			setExecutionCommand(solver,vals[1]);
+			setExecutionCommand(solver,decode(vals[1]));
 			solver.isInstalled(true);
 		    }
 		}
@@ -313,7 +383,7 @@ public class DecisionProcedureSettings implements Settings {
 	String toStore = "";
 	for (AbstractSMTSolver solver : getSolvers()) {
 	     
-	     String comm = solver.getExecutionCommand();
+	     String comm = encode(solver.getExecutionCommand());
 	    	if (comm == null) {
 			comm = "";
 	    	}
@@ -380,19 +450,6 @@ public class DecisionProcedureSettings implements Settings {
     }
     
     
-   /* public boolean getMultipleUse(RuleDescriptor rd)  {
-	SMTRule rule = descriptorToRule.get(rd);
-	SMTSolver s = rule.getSolver();
-	return this.ruleMultipleProvers.SMTSolverIsUsed(s);
-    }*/
-    
-   /* public void setMultipleUse(RuleDescriptor rd, boolean multipleuse, boolean fire) {
-	SMTRule rule = descriptorToRule.get(rd);
-	SMTSolver s = rule.getSolver();
-	ruleMultipleProvers.useSMTSolver(s, multipleuse);
-	if(fire)
-	fireSettingsChanged();
-    }*/
     
     
     /**
@@ -502,11 +559,11 @@ public class DecisionProcedureSettings implements Settings {
         props.setProperty(ACTIVE_RULE, "" + activeSMTRule.name());
         props.setProperty(TIMEOUT, "" + this.timeout);
       
-        if (this.saveFile)
+        /*if (this.saveFile)
             props.setProperty(SAVEFILE, "true");
         else {
             props.setProperty(SAVEFILE, "false");
-        }
+        }*/
         if (this.showSMTResDialog)
             props.setProperty(SHOW_SMT_RES_DIA, "true");
         else {
@@ -518,6 +575,19 @@ public class DecisionProcedureSettings implements Settings {
         else {
             props.setProperty(WEAKENSMTTRANSLATION, "false");
         }
+        
+        if (this.cacheGoals)
+            props.setProperty(CACHE_GOALS, "true");
+        else {
+            props.setProperty(CACHE_GOALS, "false");
+        }
+        
+        props.setProperty(PROGRESS_DIALOG_MODE,Integer.toString(progressDialogMode));
+
+        props.setProperty(SAVEFILE_PATH,this.file);
+        
+        
+        
 
        
         this.writeExecutionString(props);

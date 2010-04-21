@@ -89,6 +89,10 @@ public class ProcessLaunch{
 		return process;
 	}
 	
+	public boolean getInterrupted(){
+	    return ((AbstractProcess)process).getInterrupted();
+	}
+	
 	public boolean equals(Object o){
 		if(o instanceof ProcessLaunch){
 			return o == this;

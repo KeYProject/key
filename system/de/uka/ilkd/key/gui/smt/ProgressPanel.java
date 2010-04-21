@@ -14,10 +14,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 
-import javax.swing.AbstractButton;
 import javax.swing.BorderFactory;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
 import javax.swing.JComponent;
 
 import javax.swing.JLabel;
@@ -34,7 +31,6 @@ import de.uka.ilkd.key.gui.ErrorMessages;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.smt.MakesProgress;
 import de.uka.ilkd.key.smt.SMTProgressMonitor;
-import de.uka.ilkd.key.smt.launcher.Process;
 
 
 
@@ -58,9 +54,8 @@ class ProgressPanel implements SMTProgressMonitor {
 	private JLabel jLabel1 = null;
 	private JPanel progressPanel = null;
 	private JProgressBar progressBar = null;
-	private JButton progressButton = null;
-	private MakesProgress process = null;
 	private JComponent  parent;
+	private ProgressDialog dialog;
 	
 	private List<InternGoal> goals = Collections.synchronizedList(new LinkedList<InternGoal>()); 
 	
@@ -70,9 +65,9 @@ class ProgressPanel implements SMTProgressMonitor {
 	
 	
 	
-	public ProgressPanel(MakesProgress process, JComponent parent, Collection<Goal> goals){
-	    	this.process = process;
+	public ProgressPanel(MakesProgress process, JComponent parent, ProgressDialog dialog, Collection<Goal> goals){
 	    	this.parent = parent;
+	    	this.dialog = dialog;
 	    	for(Goal goal : goals){
 	    	    this.goals.add(new InternGoal(goal));
 	    	}
@@ -92,16 +87,11 @@ class ProgressPanel implements SMTProgressMonitor {
 		
 
 		((TitledBorder)getComponent().getBorder()).setTitle(process.getTitle());
-		
 	}
 	
 
 
-	
-	public void setResultIcon(ImageIcon icon){
-		getProgressButton().setIcon(icon);
-		
-	}
+
 	
 	private String buildString(int progress, int max){
 	    return "Goals: "+ progress+"/"+max;
@@ -267,23 +257,7 @@ class ProgressPanel implements SMTProgressMonitor {
 	   gc.dispose();
 	}
 
-	/**
-	 * This method initializes progressButton	
-	 * 	
-	 * @return javax.swing.JButton	
-	 */
-	private JButton getProgressButton() {
-		if (progressButton == null) {
-			progressButton = new JButton();
-			progressButton.setBackground(Color.WHITE);
-			progressButton.setMargin(new Insets(0,0,0,0));
-			progressButton.setVerticalAlignment(AbstractButton.CENTER);
-			progressButton.setMaximumSize(new Dimension(30,30));
-			progressButton.setMinimumSize(new Dimension(30,30));
-			progressButton.setPreferredSize(new Dimension(30,30));
-		}
-		return progressButton;
-	}
+
 	
 	/**
 	 * This method initializes progressBarTime	
@@ -330,16 +304,20 @@ class ProgressPanel implements SMTProgressMonitor {
 
 
         public void exceptionOccurred(String s,Exception e) {
-            ErrorMessages.showBugMessage(ProgressDialog.INSTANCE, s, e);
-           
+            if(!dialog.getStopRunning()){
+        	ErrorMessages.showBugMessage(ProgressDialog.INSTANCE, s, e);
+            }
             
             
 	    
         }
 
+
 	
         public void setSolverFinished(long time) {
-            getProgressBarTime().setString("Stoped after "+ ((double)time)/1000 + " sec.");
-	    
+            getProgressBarTime().setString("Stopped after "+ ((double)time)/1000 + " sec.");
+            parent.repaint();
+      
+
         }
 }

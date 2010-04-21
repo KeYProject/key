@@ -84,9 +84,10 @@ public class SimplifyModelGenerator extends DecProdModelGenerator {
 	SMTSolverResult res = SMTSolverResult.NO_IDEA;
 
 	// Get a result for the Problem
-	smtRule.start(toFormula(node.sequent()),serv,
-		    serv.getProof().getUserConstraint().getConstraint(),false, null);
-	res = smtRule.getResults().getFirst();
+	res = smtRule.run(toFormula(node.sequent()), 
+		           serv,serv.getProof().
+		           getUserConstraint().getConstraint(),null);
+
 	
 
 	initialCounterExample = res.text();
@@ -252,8 +253,9 @@ public class SimplifyModelGenerator extends DecProdModelGenerator {
 	try {
 	    // Term t = (new TermFactory()).createJunctorTerm(Op.NOT, c);
 	    // return this.simplify.run(t, 60, serv).text();
-	    this.smtRule.start("(NOT " + c.toSimplify() + ")", serv, serv.getProof().getUserConstraint().getConstraint(),false);
-	    return smtRule.getResults().getLast().text();
+	    return this.smtRule.run("(NOT " + c.toSimplify() + ")", serv, 
+		    serv.getProof().getUserConstraint().getConstraint()).text();
+
 	} catch (Exception e) {
 	    throw new RuntimeException(e);
 	}

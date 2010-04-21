@@ -34,6 +34,7 @@ class SolverSession {
      */
     public static class InternResult implements Cloneable {
 	private SMTSolverResult result = SMTSolverResult.createUnknownResult("", "");
+	
 	private Term            term;
 	private Goal 		goal;
 	private String 		formula = null;
@@ -43,6 +44,7 @@ class SolverSession {
 	public InternResult(Term term, Goal belongsTo){
 	    this(term);
 	    goal = belongsTo;
+	    
 	}
 	
 	/**
@@ -109,9 +111,11 @@ class SolverSession {
 	/* (non-Javadoc)
 	 * @see java.lang.Object#clone()
 	 */
-	@Override
-	protected Object clone() throws CloneNotSupportedException {
-	    return new InternResult(term , goal ,formula);
+	
+	protected Object clone(SMTSolver solver)  {
+	    InternResult result = new InternResult(term , goal ,formula);
+	    result.result=SMTSolverResult.createUnknownResult("",solver.name());
+	    return result;
 	}
 	
 		
@@ -130,6 +134,7 @@ class SolverSession {
     private Iterator<InternResult>   it;
     private InternResult      current = null;
     private Collection<Taclet>    taclets;
+    private int solved =0;
     
     public Collection<InternResult> getTerms() {
         return terms;
@@ -172,6 +177,14 @@ class SolverSession {
     
     public boolean hasNextTerm(){
 	return it.hasNext();
+    }
+    
+    public int getSolved(){
+	return solved;
+    }
+    
+    public void incrementSolved(){
+	solved++;
     }
     
 

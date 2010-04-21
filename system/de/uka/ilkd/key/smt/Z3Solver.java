@@ -53,4 +53,21 @@ public final class Z3Solver extends AbstractSMTSolver {
 	    throw new IllegalArgumentException(error);
 	}
     }
+    
+
+    @Override
+    public String getInfo() {
+     
+        return "Z3 does not use quantifier elimination by default. This means for example that" +
+        	" the following problem cannot be solved automatically by default:\n\n"
+        	+"\\functions{\n"+
+        	 "\tint n;\n"+
+         	 "}\n\n"+
+                 "\\problem{\n"+
+         	   "\t((\\forall int x;(x<=0 | x >= n+1)) & n >= 1)->false\n"+
+    		 "}"+
+    		 "\n\n"+
+    		 "You can activate quantifier elimination by appending QUANT_FM=true to"+
+    		 " the execution command."; 
+    }
 }

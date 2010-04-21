@@ -36,6 +36,8 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.TacletIndex;
 import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.rule.export.DisplayNameModelInfo;
+import de.uka.ilkd.key.smt.SMTSolverResult.ThreeValuedTruth;
 import de.uka.ilkd.key.smt.SolverSession.InternResult;
 import de.uka.ilkd.key.smt.launcher.AbstractProcess;
 import de.uka.ilkd.key.smt.taclettranslation.DefaultTacletSetTranslation;
@@ -81,7 +83,7 @@ public abstract class AbstractSMTSolver extends AbstractProcess implements SMTSo
     
     public SolverSession getSession(){return session;}
     
-    private boolean useForMultipleRule = false;
+    private boolean useForMultipleRule = true;
     
     private String   executionCommand = getDefaultExecutionCommand();
     
@@ -188,23 +190,31 @@ public abstract class AbstractSMTSolver extends AbstractProcess implements SMTSo
 	//store the text permanent to a file 
 	if (!this.inTestMode && ProofSettings.DEFAULT_SETTINGS.getDecisionProcedureSettings().getSaveFile() &&
 		Main.getInstance() != null) {
-	    JFileChooser fc = new JFileChooser();
-	    fc.setDialogTitle("Select a file to save the created problem");
-	    fc.setMultiSelectionEnabled(false);
-	    int returnVal = fc.showOpenDialog(Main.getInstance());
-	    File target = fc.getSelectedFile();
-	    if (returnVal == JFileChooser.APPROVE_OPTION) {
+	    String path = ProofSettings.DEFAULT_SETTINGS.getDecisionProcedureSettings().getSaveToFile();
+	    	path = finalizePath(path);
 		try {
-		    final BufferedWriter out2 = new BufferedWriter(new FileWriter(target));
+		    final BufferedWriter out2 = new BufferedWriter(new FileWriter(path));
 		    out2.write(text);
 		    out2.close();
 		} catch (IOException e) {
-		    throw new RuntimeException("Could not store to file " + target.getAbsolutePath() + ".");
+		    throw new RuntimeException("Could not store to file " + path + ".");
 		}
-	    }
+	   
 	}
 	
 	return smtFile;
+    }
+    
+    private String finalizePath(String path){
+	Calendar c = Calendar.getInstance();
+	String date = c.get(Calendar.YEAR)+"-"+c.get(Calendar.MONTH)+"-"+c.get(Calendar.DATE);
+	String time = c.get(Calendar.HOUR_OF_DAY)+"-"+c.get(Calendar.MINUTE)+"-"+c.get(Calendar.SECOND);
+	
+        path = path.replaceAll("%d", date);
+        path = path.replaceAll("%s", this.getTitle());
+        path = path.replaceAll("%t", time);
+        path = path.replaceAll("%i", Integer.toString(this.getNextFileID()));
+        return path;
     }
 
 
@@ -213,6 +223,7 @@ public abstract class AbstractSMTSolver extends AbstractProcess implements SMTSo
     static String read(InputStream in) throws IOException {
 	BufferedReader reader = new BufferedReader(new InputStreamReader(in));
 	StringBuffer sb = new StringBuffer();
+
 	int x = reader.read();
 	while (x > -1) {
 	    sb.append((char) x);
@@ -246,8 +257,9 @@ public abstract class AbstractSMTSolver extends AbstractProcess implements SMTSo
 	SMTTranslator trans = this.getTranslator(services);
 	instantiateTaclets(trans);
 	
-	  
+ 
 	String formula = trans.translateProblem(term, services).toString();
+
 	saveTacletTranslation(trans);
 	
 	return translateToCommand(formula, services);
@@ -261,7 +273,7 @@ public abstract class AbstractSMTSolver extends AbstractProcess implements SMTSo
     
 
     
-    private boolean checkEnvVariable(String cmd){
+    private static boolean checkEnvVariable(String cmd){
 	String filesep = System.getProperty("file.separator");
 	String path =  System.getenv("PATH");
 	String [] res = path.split(System.getProperty("path.separator"));
@@ -276,6 +288,23 @@ public abstract class AbstractSMTSolver extends AbstractProcess implements SMTSo
 
     }
     
+    
+    public static boolean isInstalled(String cmd){
+	    
+	    int first = cmd.indexOf(" ");
+	    if(first >= 0){
+		cmd = cmd.substring(0, first);
+	    }
+	    
+	    if(checkEnvVariable(cmd)){
+		return true;
+	    } else{
+		File file = new File(cmd);
+		return file.exists();
+		
+	    }
+    }
+    
     /**
      * check, if this solver is installed and can be used.
      * @param recheck if false, the solver is not checked again, if a cached value for this exists.
@@ -283,27 +312,11 @@ public abstract class AbstractSMTSolver extends AbstractProcess implements SMTSo
      */
     public boolean isInstalled(boolean recheck) {
 	if (recheck | !installwaschecked) {
-	    
-	
-	    
 	    String cmd = getExecutionCommand();
-	    int first = cmd.indexOf(" ");
-	    if(first >= 0){
-		cmd = cmd.substring(0, first);
+	    isinstalled = isInstalled(cmd); 
+	    if(isinstalled){
+		 installwaschecked = true;		      
 	    }
-	    
-	    if(checkEnvVariable(cmd)){
-		isinstalled = true;
-	    } else{
-		File file = new File(cmd);
-		isinstalled = file.exists();
-		if(isinstalled){
-		    installwaschecked = true;
-		    return true;
-		}
-	    }
-
-	    
 
 	}
 	return isinstalled;
@@ -356,8 +369,10 @@ public abstract class AbstractSMTSolver extends AbstractProcess implements SMTSo
 		    .getTacletSetTranslation();
 
 	    if (translation != null) {
-		translation.storeToFile(ProofSettings.DEFAULT_SETTINGS
-		        .getTacletTranslationSettings().getFilename());
+		String path = ProofSettings.DEFAULT_SETTINGS
+	        .getTacletTranslationSettings().getFilename();
+		path = finalizePath(path);
+		translation.storeToFile(path);
 	    }
 
 	}
@@ -394,7 +409,6 @@ public abstract class AbstractSMTSolver extends AbstractProcess implements SMTSo
     @Override
     public String[] atStart() throws Exception{
 
-
 	LinkedList<String> list = new LinkedList<String>();
 	InternResult term = session.nextTerm();
 	//session.addResult(SMTSolverResult.createUnknownResult("",name()),session.currentTerm());
@@ -409,14 +423,13 @@ public abstract class AbstractSMTSolver extends AbstractProcess implements SMTSo
 	    
 	    while(s.indexOf(' ')!=-1){
 		int index = s.indexOf(' ');
+
 		list.add(s.substring(0,s.indexOf(' ')));
 		s = s.substring(index+1,s.length());
 	    }
 	    list.add(s);
 
 	    
-	}else{
-	    throw new RuntimeException("This should not happen.");
 	}
 
 	return list.toArray(new String[list.size()]);
@@ -436,6 +449,9 @@ public abstract class AbstractSMTSolver extends AbstractProcess implements SMTSo
 	if(session.currentTerm()!= null){
 	     
 	   session.currentTerm().setResult(res);
+	   if(res.isValid() == ThreeValuedTruth.TRUE){
+	       session.incrementSolved();
+	   }
 	   
 	
 	}
@@ -445,6 +461,14 @@ public abstract class AbstractSMTSolver extends AbstractProcess implements SMTSo
 	return !session.hasNextTerm();
     }
     
+    public String getInfo() {
+        return "";
+    }
+    
+    public boolean wasSuccessful() {
+ 
+        return session.getTermSize() == session.getSolved();
+    }
     
 
     public int getMaxCycle() {

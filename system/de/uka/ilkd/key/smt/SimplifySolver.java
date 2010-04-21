@@ -89,5 +89,10 @@ public final class SimplifySolver extends AbstractSMTSolver {
 	}
 	return toReturn;
     }
+
+    @Override
+    public String getInfo() {
+       return "Simplify only supports integers within the interval [-2147483646,2147483646]=[-2^31+2,2^31-2].";
+    }
     
 }

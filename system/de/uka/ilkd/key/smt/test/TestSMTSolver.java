@@ -45,7 +45,6 @@ public abstract class TestSMTSolver extends TestCommons {
 	}
 	
 	ProofSettings.DEFAULT_SETTINGS.getDecisionProcedureSettings().setSaveFile(false);
-
 	//System.gc();
     }
     
@@ -56,12 +55,16 @@ public abstract class TestSMTSolver extends TestCommons {
 	//System.gc();
     }
     
+
+    
     
     /**
      * returns the solver that should be tested.
      * @return the solver to be tested.
      */
     public abstract SMTRule getSolver();
+	
+    
 
     protected abstract boolean toolNotInstalledChecked();
 
