@@ -65,9 +65,6 @@ public class KeYCrossReferenceNameInfo extends DefaultNameInfo {
     public void register(ClassType ct) {
         
         String name = ct.getFullName();
-        if(ct instanceof TypeDeclaration) {
-          System.out.println("Registering class from: "+UnitKit.getCompilationUnit((TypeDeclaration) ct).getOriginalDataLocation().toString());
-        }
         ClassType old = classtypes.get(name);
         if(old != null && ct != old) {
             String d1, d2;
