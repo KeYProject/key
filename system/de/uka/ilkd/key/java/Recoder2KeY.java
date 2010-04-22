@@ -477,12 +477,15 @@ public class Recoder2KeY implements JavaReader {
                     throws IOException, ParseException, ParserException {
         
         FileCollection bootCollection;
-        if(bootClassPath == null)
+        FileCollection.Walker walker = null;
+        if(bootClassPath == null) {
             bootCollection = new JavaReduxFileCollection();
-        else
+            walker = bootCollection.createWalker(".java");
+        } else {
             bootCollection = new DirectoryFileCollection(bootClassPath);
+            walker = bootCollection.createWalker(new String[] {".java", ".jml"} );
+        }
         
-        FileCollection.Walker walker = bootCollection.createWalker(".java");
         
         while(walker.step()) {
             DataLocation loc = walker.getCurrentDataLocation();
