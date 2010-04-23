@@ -578,10 +578,7 @@ specarrayrefexpr[SLExpression receiver, String fullyQualifiedName, Token lbrack]
 	if (rangeFrom == null) {
 	    // We have a star. A star includes all components of an array even
 	    // those out of bounds. This makes proving easier.	    
-	    Term t = TB.setComprehension(services,
-	    				 new QuantifiableVariable[]{indexVar}, 
-	                                 receiver.getTerm(), 
-	                                 arrIndex);
+	    Term t = TB.allFields(services, receiver.getTerm());
 	    result = new SLExpression(t);
 	} else if (rangeTo != null) {
 	    // We have "rangeFrom .. rangeTo"
