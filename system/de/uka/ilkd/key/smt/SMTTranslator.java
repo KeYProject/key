@@ -56,7 +56,7 @@ public interface SMTTranslator {
      */
     public void setTacletsForAssumptions(Collection<Taclet> taclets);
     
-    //TODO remove after testing!!
+    
     /**
      * Caution! This Method is just for testing!! Do not use it, it might be removed very soon!!
      */
