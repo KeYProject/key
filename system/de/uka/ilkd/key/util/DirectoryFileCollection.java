@@ -108,6 +108,22 @@ public class DirectoryFileCollection implements FileCollection {
         sortFiles(files);
         return new Walker(files.iterator());
     }
+
+
+    /*
+     * enumerate all files in a list and store that list in the walker.
+     * 
+     * @see de.uka.ilkd.key.util.FileCollection#createWalker(java.lang.String[])
+     */
+    public Walker createWalker(String[] extensions) {
+        List<File> files = new ArrayList<File>();
+        for(String extension : extensions) {
+    	    addAllFiles(directory, extension, files);
+        }
+        sortFiles(files);
+        return new Walker(files.iterator());
+    }
+
     /*
      * This class keeps an internal list of files to be iterated that is created at
      * construction time.

@@ -99,6 +99,21 @@ class JavaReduxFileCollection implements FileCollection {
 
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * This class only supports walker for a single file type: .java
+     */
+    public Walker createWalker(String[] extensions) throws IOException {
+        if (extensions == null || extensions.length < 1 || !".java".equals(extensions[0])) {
+            throw new IllegalStateException(
+                    "This collection can only list .java files");
+        }
+
+        return new Walker(resources.iterator());
+
+    }
+
     /*
      * The Class Walker wraps a string iterator and creates URL, streams and
      * DataLocation elements on demand.
