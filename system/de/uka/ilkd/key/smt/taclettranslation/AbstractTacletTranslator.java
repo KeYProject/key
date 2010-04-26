@@ -353,7 +353,7 @@ public abstract class AbstractTacletTranslator implements TacletTranslator,
 	Iterator<VariableCondition> it = t.getVariableConditions();
 	while (it.hasNext()) {
 	    VariableCondition vc = it.next();
-	    // TODO: uncomment this field - only for testing
+	 
 	    if (!(vc instanceof TypeComparisionCondition)
 		    && !(vc instanceof TypeCondition)
 		    && !(vc instanceof AbstractOrInterfaceType)

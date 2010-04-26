@@ -520,8 +520,25 @@ public class SMTRule  extends ProcessLauncher implements BuiltInRule{
     }
     
 
-
-
+    private long getCurrentProgress(long time, long maxTime){
+	   return (long)  
+	   ((double)time/maxTime*SMTProgressMonitor.MAX_TIME);  
+    }
+    
+    private double cut(double time, int digits){
+	long temp = (long) (time*(double)Math.pow(10, digits));
+	return ((double)temp)/Math.pow(10, digits);
+    }
+    
+    private void showTimeStatus(SMTProgressMonitor mon, long time, long maxTime, boolean finished){
+	
+	double t = cut(((double)time)/1000,1);
+	
+	String s = (finished ? "Stopped after " : "") +t+" sec.";
+	mon.setTimeProgress(s, getCurrentProgress(time, maxTime));
+    }
+    
+ 
 
     @Override
     protected void publish(Event e) {
@@ -547,17 +564,16 @@ public class SMTRule  extends ProcessLauncher implements BuiltInRule{
 	}
 	monitor = process.getMonitors().iterator().next();
 	
-	
+	long runningTime =  launch.runningTime(
+		     System.currentTimeMillis());
 	 
 	 
 	 switch(e.getType()){
 	 case PROCESS_START:
-	     monitor.setMaximum(process.getMaxCycle());
-	     monitor.setProgress(0);
+	     monitor.setGoalMaximum(process.getMaxCycle());
 	     break;
 	 case PROCESS_STATUS:
-	     monitor.setTimeProgress((int)((double)launch.runningTime(
-		     System.currentTimeMillis())/launcher.getMaxTime()*SMTProgressMonitor.MAX_TIME));    
+	     showTimeStatus(monitor,runningTime ,launcher.getMaxTime(), false);
 	     break;
 
 	 case PROCESS_CYCLE_FINISHED:
@@ -584,10 +600,11 @@ public class SMTRule  extends ProcessLauncher implements BuiltInRule{
 	 
 	 
 	 case INTERRUP_PROCESS:
-	     monitor.setTimeProgress(SMTProgressMonitor.MAX_TIME);
-	    //$FALL-THROUGH$
+	      showTimeStatus(monitor,launcher.getMaxTime(),launcher.getMaxTime(), true);
+	      
+	      break;
 	case PROCESS_FINISHED:
-	     monitor.setSolverFinished(launch.usedTime());
+	     showTimeStatus(monitor,launch.usedTime() ,launcher.getMaxTime(), true);
 	     break;
 
 	 

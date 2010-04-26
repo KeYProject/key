@@ -22,8 +22,6 @@ import java.util.Calendar;
 import java.util.Collection;
 import java.util.LinkedList;
 
-import javax.swing.JFileChooser;
-
 import org.apache.log4j.Logger;
 
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
@@ -34,9 +32,7 @@ import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.gui.smt.DecisionProcedureSettings;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.proof.TacletIndex;
 import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.rule.export.DisplayNameModelInfo;
 import de.uka.ilkd.key.smt.SMTSolverResult.ThreeValuedTruth;
 import de.uka.ilkd.key.smt.SolverSession.InternResult;
 import de.uka.ilkd.key.smt.launcher.AbstractProcess;

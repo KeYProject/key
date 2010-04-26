@@ -60,4 +60,11 @@ public final class YicesSolver extends AbstractSMTSolver {
 	
 	
     }
+    
+
+    @Override
+    public String getInfo() {
+       return "Use the newest release of version 1.x instead of version 2. Yices 2 does not support the " +
+       	       "required logic AUFLIA.";
+    }
 }
