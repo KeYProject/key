@@ -10,6 +10,9 @@
 
 package de.uka.ilkd.key.rule;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
@@ -33,7 +36,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.metaconstruct.WhileInvRule;
 import de.uka.ilkd.key.speclang.LoopInvariant;
 import de.uka.ilkd.key.util.InvInferenceTools;
-import de.uka.ilkd.key.util.Triple;
+import de.uka.ilkd.key.util.Pair;
 
 
 public final class WhileInvariantRule implements BuiltInRule {
@@ -132,12 +135,13 @@ public final class WhileInvariantRule implements BuiltInRule {
 
     
     /**
-     * @return (anon update, anon heap, local vars)
+     * @return (anon update, anon heap)
      */
-    private Triple<Term,Term,ImmutableSet<ProgramVariable>> createAnonUpdate(
-	    					    While loop, 
-	    				     	    Term mod, 
-	    				     	    Services services) {
+    private Pair<Term,Term> createAnonUpdate(
+	    			While loop, 
+	    			Term mod,
+	    			ImmutableSet<ProgramVariable> localOuts,
+	    			Services services) {
 	//heap
 	final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
 	final Name anonHeapName 
@@ -148,10 +152,8 @@ public final class WhileInvariantRule implements BuiltInRule {
 	final Term anonHeapTerm = TB.func(anonHeapFunc);
 	Term anonUpdate = TB.anonUpd(services, mod, anonHeapTerm);
 	
-	//local vars
-	final ImmutableSet<ProgramVariable> localVars 
-		= IIT.getWrittenPVs(loop, services);
-	for(ProgramVariable pv : localVars) {
+	//local output vars
+	for(ProgramVariable pv : localOuts) {
 	    final String anonFuncName 
 	    	= TB.newName(services, pv.name().toString());
 	    final Function anonFunc 
@@ -163,9 +165,7 @@ public final class WhileInvariantRule implements BuiltInRule {
 	    anonUpdate = TB.parallel(anonUpdate, elemUpd);
 	}
 	
-	return new Triple<Term,Term,ImmutableSet<ProgramVariable>>(anonUpdate, 
-							           anonHeapTerm, 
-							           localVars);
+	return new Pair<Term,Term>(anonUpdate, anonHeapTerm);
     }
     
     
@@ -212,24 +212,53 @@ public final class WhileInvariantRule implements BuiltInRule {
 						 heapAtMethodPre, 
 						 services);
 	
-	//prepare heapBeforeLoop
+	//collect input and output local variables, 
+	//prepare reachableIn and reachableOut
+	final ImmutableSet<ProgramVariable> localIns 
+		= IIT.getLocalIns(inst.loop, services);
+	final ImmutableSet<ProgramVariable> localOuts 
+		= IIT.getLocalOuts(inst.loop, services);
+	Term reachableIn = TB.tt();
+	for(ProgramVariable pv : localIns) {
+	    reachableIn = TB.and(reachableIn, 
+		                 TB.reachableValue(services, pv));
+	}	
+	Term reachableOut = TB.tt();
+	for(ProgramVariable pv : localOuts) {
+	    reachableOut = TB.and(reachableOut, 
+		                  TB.reachableValue(services, pv));
+	}
+	
+	//prepare heapBeforeLoop, localOutBeforeLoop
 	final LocationVariable heapBeforeLoop 
 		= TB.heapAtPreVar(services, "heapBeforeLoop", true);
 	services.getNamespaces().programVariables().addSafely(heapBeforeLoop);
-	final Term heapBeforeLoopUpdate = TB.elementary(services, 
-						        heapBeforeLoop, 
-						        TB.heap(services));
+	Term beforeLoopUpdate = TB.elementary(services, 
+					      heapBeforeLoop, 
+				              TB.heap(services));
+	final Map<Term,Term> normalToBeforeLoop = new HashMap<Term,Term>();
+	normalToBeforeLoop.put(TB.heap(services), TB.var(heapBeforeLoop));
+	for(ProgramVariable pv : localOuts) {
+	    final String pvBeforeLoopName 
+	    	= TB.newName(services, pv.name().toString() + "BeforeLoop");
+	    final LocationVariable pvBeforeLoop 
+	    	= new LocationVariable(new ProgramElementName(pvBeforeLoopName), 
+	    			       pv.getKeYJavaType());
+	    services.getNamespaces().programVariables().addSafely(pvBeforeLoop);
+	    beforeLoopUpdate = TB.parallel(beforeLoopUpdate, 
+		    			   TB.elementary(services, 
+		    				   	 pvBeforeLoop, 
+		    				   	 TB.var(pv)));
+	    normalToBeforeLoop.put(TB.var(pv), TB.var(pvBeforeLoop));
+	}
 	
 	//prepare anon update, frame condition
-	final Triple<Term,Term,ImmutableSet<ProgramVariable>> 
-		anonUpdateAndHeapAndLocals 
-			= createAnonUpdate(inst.loop, mod, services);
-	final Term anonUpdate = anonUpdateAndHeapAndLocals.first;
-	final Term anonHeap   = anonUpdateAndHeapAndLocals.second;
-	final ImmutableSet<ProgramVariable> locals 
-			      = anonUpdateAndHeapAndLocals.third;
+	final Pair<Term,Term> anonUpdateAndHeap 
+		= createAnonUpdate(inst.loop, mod, localOuts, services);
+	final Term anonUpdate = anonUpdateAndHeap.first;
+	final Term anonHeap   = anonUpdateAndHeap.second;
 	final Term frameCondition = TB.frame(services,
-		                             TB.var(heapBeforeLoop), 
+		                             normalToBeforeLoop, 
 		                             mod);
 	
 	//prepare variant
@@ -285,29 +314,24 @@ public final class WhileInvariantRule implements BuiltInRule {
 					      TB.FALSE(services));
 	
 	//prepare common assumption
-	Term reachableLocals = TB.tt();
-	for(ProgramVariable pv : locals) {
-	    reachableLocals = TB.and(reachableLocals, 
-		                     TB.reachableValue(services, pv));
-	}	
 	final Term[] uAnon 
 		= new Term[]{inst.u, anonUpdate};
 	final Term[] uBeforeLoopDefAnonVariant 
 		= new Term[]{inst.u, 
-		             heapBeforeLoopUpdate, 
+		             beforeLoopUpdate, 
 		             anonUpdate, 
 		             variantUpdate};
 	final Term uAnonInv 
-		= TB.applySequential(uAnon, TB.and(invTerm, reachableLocals));
+		= TB.applySequential(uAnon, TB.and(invTerm, reachableOut));
 	final Term uAnonInvVariantNonNeg
 		= TB.applySequential(uAnon, TB.and(new Term[]{invTerm, 
-			                                      reachableLocals, 
+							      reachableOut, 
 			                                      variantNonNeg}));
 	
 	//"Invariant Initially Valid":
 	// \replacewith (==> inv );
 	final Term reachableState = TB.and(TB.wellFormedHeap(services), 
-		                           reachableLocals);
+		                           reachableIn);
 	initGoal.changeFormula(new ConstrainedFormula(
 		                 TB.apply(inst.u, 
 		                         TB.and(invTerm, reachableState))),

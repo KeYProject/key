@@ -10,7 +10,9 @@
 
 package de.uka.ilkd.key.proof.init;
 
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 
 import de.uka.ilkd.key.collection.*;
 import de.uka.ilkd.key.java.Expression;
@@ -244,6 +246,8 @@ public final class OperationContractPO extends AbstractPO
      	final LocationVariable heapAtPreVar 
 		= TB.heapAtPreVar(services, "heapAtPre", true);
         final Term heapAtPre = TB.var(heapAtPreVar);
+        final Map<Term,Term> normalToAtPre = new HashMap<Term,Term>();
+        normalToAtPre.put(TB.heap(services), heapAtPre);
 
         //build precondition
         final Term pre = TB.and(buildFreePre(selfVar, 
@@ -259,7 +263,7 @@ public final class OperationContractPO extends AbstractPO
                                     	   	  heapAtPre,
                                     	   	  services),
                                  TB.frame(services, 
-                                	  heapAtPre, 
+                                	  normalToAtPre, 
                                 	  contract.getMod(selfVar, 
                                 		  	  paramVars, 
                                 		  	  services)));

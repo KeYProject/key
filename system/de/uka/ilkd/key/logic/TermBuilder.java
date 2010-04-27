@@ -1153,7 +1153,7 @@ public final class TermBuilder {
     
     
     public Term frame(Services services,
-	    	      Term heapAtPre, 
+	    	      Map<Term,Term> normalToAtPre, 
 	    	      Term mod) {
 	final Sort objectSort = services.getJavaInfo().objectSort();
 	final Sort fieldSort = services.getTypeConverter()
@@ -1169,9 +1169,7 @@ public final class TermBuilder {
 	final Term objVarTerm = var(objVar);
 	final Term fieldVarTerm = var(fieldVar);
 	
-	final Map<Term,Term> map = new HashMap<Term,Term>();
-	map.put(heap(services), heapAtPre);
-	final OpReplacer or = new OpReplacer(map);
+	final OpReplacer or = new OpReplacer(normalToAtPre);
 	final Term modAtPre = or.replace(mod);
 	final Term createdAtPre = or.replace(created(services, objVarTerm));
 	
@@ -1189,7 +1187,7 @@ public final class TermBuilder {
 			   		       fieldVarTerm),
 			   		select(services,
 			   		       Sort.ANY,
-			   		       heapAtPre,
+			   		       or.replace(heap(services)),
 			   		       objVarTerm,
 			   		       fieldVarTerm))}));
     }
