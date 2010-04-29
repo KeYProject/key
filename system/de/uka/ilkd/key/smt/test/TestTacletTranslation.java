@@ -138,13 +138,13 @@ public class TestTacletTranslation extends TestCommons {
     private void test(String filename, SolveType type,
 	    UsedTaclets.Category cat, SMTRule... only) {
 
-	ArrayList<SMTRule> rules = getInstalledRules(only);
-	if (rules.isEmpty()) {
+	ArrayList<SMTRule> rul = getInstalledRules(only);
+	if (rul.isEmpty()) {
 	    return;
 	}
 
 	UsedTaclets.INSTANCE.selectCategory(cat);
-	checkFile(rules, folder + filename, type);
+	checkFile(rul, folder + filename, type);
     }
 
     private void checkFile(ArrayList<SMTRule> rules, String filepath,

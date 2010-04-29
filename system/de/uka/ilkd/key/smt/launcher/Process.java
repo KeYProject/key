@@ -8,9 +8,9 @@ package de.uka.ilkd.key.smt.launcher;
 //See LICENSE.TXT for details.
 //
 //
-import java.io.IOException;
+
 import java.util.Collection;
-import java.util.TimerTask;
+
 
 import de.uka.ilkd.key.smt.MakesProgress;
 import de.uka.ilkd.key.smt.SMTProgressMonitor;

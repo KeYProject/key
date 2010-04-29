@@ -1,28 +1,10 @@
 package de.uka.ilkd.key.smt.launcher;
 
-import java.util.Collection;
 import java.util.Collections;
 import java.util.ConcurrentModificationException;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
-
-import javax.swing.SwingUtilities;
-import javax.swing.SwingWorker;
-
-import de.uka.ilkd.key.smt.MakesProgress;
-import de.uka.ilkd.key.smt.SMTProgressMonitor;
-//This file is part of KeY - Integrated Deductive Software Design
-//Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
-//                    Universitaet Koblenz-Landau, Germany
-//                    Chalmers University of Technology, Sweden
-//
-//The KeY system is protected by the GNU General Public License. 
-//See LICENSE.TXT for details.
-//
-//
 
 /** This class is used to start several processes in the same time. 
  *  
@@ -53,7 +35,6 @@ public abstract  class ProcessLauncher  implements ProcessListener, Runnable{
 	
 	
 	private long maxTime = 5000;
-	private int counter =0;
 	private boolean cancel = false;
 	
 	
@@ -237,7 +218,7 @@ public abstract  class ProcessLauncher  implements ProcessListener, Runnable{
 			executeNextProcesses();
 			checkProcesses();
 			try {
-				Thread.currentThread().sleep(SLEEP);
+				Thread.sleep(SLEEP);
 			} catch (InterruptedException e) {
 			    eventException(null, e);
 				

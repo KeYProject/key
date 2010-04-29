@@ -32,6 +32,7 @@ import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.ArrayOp;
 import de.uka.ilkd.key.logic.op.AttributeOp;
 import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.IUpdateOperator;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.Metavariable;
@@ -185,15 +186,19 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 
     
     public final StringBuffer translateProblem(Term problem, Services services) throws IllegalFormulaException{
-	
+
 	StringBuffer hb = translateTerm(problem,new Vector<QuantifiableVariable>(),services);
-	
+
 	//add one variable for each sort
 	for (Sort s : this.usedRealSort.keySet()) {
-	    LogicVariable l = new LogicVariable(new Name("dummy_" + s.name().toString()), s);
-	    this.addFunction(l, new ArrayList<Sort>(), s);
-	    this.translateFunc(l, new ArrayList<StringBuffer>());
+	  //  System.out.println("Sort: " + s.toString()+ " " + s.name());
+	    //if(!s.equals(Sort.FORMULA)){
+		LogicVariable l = new LogicVariable(new Name("dummy_" + s.name().toString()), s);
+		this.addFunction(l, new ArrayList<Sort>(), s);
+		this.translateFunc(l, new ArrayList<StringBuffer>());
+	    //}
 	}
+
 	
 
 	tacletAssumptions = translateTaclets(services);
@@ -1230,7 +1235,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 	    //op is a modality. So translate it as an uninterpreted predicate.
 	    //equal modalities are translated with the same predicate
 	    return this.getModalityPredicate(term, quantifiedVars, services);
-	} else if (op instanceof QuanUpdateOperator) {
+	} else if (op instanceof IUpdateOperator) {
 	    //op is a update. So translate it as an uninterpreted predicate.
 	    //equal updates are translated with the same predicate.
 	    return this.getModalityPredicate(term, quantifiedVars, services);
@@ -1316,7 +1321,6 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 		    subterms.add(translateTerm(term.sub(i), quantifiedVars,
 			    services));
 		}
-
 		addFunction(op, new ArrayList<Sort>(), term.sort());
 	
 		return translateFunc(op, subterms);
@@ -1370,7 +1374,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 		    for (int i = 0; i < fun.arity(); i++) {
 			sorts.add(fun.argSort(i));
 		    }
-		    this.addPredicate(fun, sorts);
+		    this.addPredicate(fun, sorts,term);
 
 		    return translatePred(op, subterms);
 		}
@@ -1673,7 +1677,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 		for (int i = 0; i < op.arity(); i++) {
 		    sorts.add(term.sub(i).sort());
 		}
-		this.addPredicate(op, sorts);
+		this.addPredicate(op, sorts,term);
 
 		return translatePred(op, subterms);
 	    } else {
@@ -1744,9 +1748,10 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 	}
     }
 
-    private void addPredicate(Operator op, ArrayList<Sort> sorts) {
+    private void addPredicate(Operator op, ArrayList<Sort> sorts,Term term) {
 	if (!this.predicateDecls.containsKey(op)) {
 	    this.predicateDecls.put(op, sorts);
+	    
 	    //add all sorts
 	    for (Sort s : sorts) {
 		this.translateSort(s);
