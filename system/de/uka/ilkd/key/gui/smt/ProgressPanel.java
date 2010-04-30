@@ -46,8 +46,10 @@ class ProgressPanel implements SMTProgressMonitor {
     	}
     
 	// The KeY-Colors
-	private static final Color PROGRESS_COLOR = new Color(0,153,49);
+	private static final Color SOLVED_COLOR = new Color(0,153,49);
 	private static final Color TIME_COLOR = new Color(0,0,98);
+	private static final Color UNKOWN_COLOR = new Color(255,255,255);
+	
 	
 	private JProgressBar progressBarTime = null;
 	private JLabel jLabel = null;
@@ -78,7 +80,7 @@ class ProgressPanel implements SMTProgressMonitor {
 	    	
 		getProgressBarTime().setMaximum(MAX_TIME);
 		getProgressBarTime().setForeground(TIME_COLOR);
-		getProgressBar().setForeground(PROGRESS_COLOR);
+		getProgressBar().setForeground(SOLVED_COLOR);
 		getProgressBar().setStringPainted(true);
 		getProgressBarTime().setStringPainted(true);
 		setTimeProgress("", 0);
@@ -201,15 +203,34 @@ class ProgressPanel implements SMTProgressMonitor {
 		return progressBar;
 	}
 	
+	private String typeToName(SolveType type){
+	    switch(type){
+	    case SOLVABLE:
+		return "solvable";
+	    case UNKOWN:
+		return "unknown";
+	    case UNSOLVABLE:
+		return "unsolvable";
+	    	
+	    }
+	    return "";
+	}
+	
 	private String goalString(int number, SolveType type){
-	    return number+". Goal"+" "+type.name();
+	    return number+". Goal:"+" "+typeToName(type);
+	}
+	private int getStringWidth(String s){
+	    return SwingUtilities.computeStringWidth(
+		    getProgressBar().getFontMetrics(getProgressBar().getFont()),s);
 	}
 	
 	public int necessaryPanelWidth(int numberOfGoals){
-	    
-	    return SwingUtilities.computeStringWidth(
-		    getProgressBar().getFontMetrics(getProgressBar().getFont()), goalString(1,SolveType.UNSOLVABLE))
-		     *numberOfGoals;
+	    int w1 = Math.max(Math.max(getStringWidth(goalString(1,SolveType.SOLVABLE))
+		               ,getStringWidth(goalString(1,SolveType.UNSOLVABLE))),
+		               getStringWidth(goalString(1,SolveType.UNKOWN)))
+		               * numberOfGoals;
+	    int w2 = getStringWidth(jLabel.getText());
+	    return w1+w2+400;
 	}
 	
 	public int necessaryPanelHeight(){
@@ -225,7 +246,7 @@ class ProgressPanel implements SMTProgressMonitor {
 	   }else if(solved == SolveType.UNSOLVABLE){
 	       gc.setColor(Color.RED);
 	   }else {
-	       gc.setColor(PROGRESS_COLOR);
+	       gc.setColor(SOLVED_COLOR);
 	   }
 	   
 	   int max = bar.getMaximum();

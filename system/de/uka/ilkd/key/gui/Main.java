@@ -1448,6 +1448,27 @@ public class Main extends JFrame implements IMain {
             }});
         registerAtMenu(proof, typeHierInfo);
         
+   
+        
+	showSMTResDialog = new JMenuItem("Show SMT Result Dialog");
+	showSMTResDialog.addActionListener(new ActionListener() {
+	   public void actionPerformed(ActionEvent e) {
+	        SMTResultsAndBugDetectionDialog dia =SMTResultsAndBugDetectionDialog.getInstance(mediator);
+	       if(dia!=null){
+		   dia.rebuildTableForProof();
+		   dia.setVisible(true);
+	       }
+	   }
+	});
+	
+	SMTResultsAndBugDetectionDialog dia =SMTResultsAndBugDetectionDialog.getInstance(mediator);
+	if(dia == null){
+	    showSMTResDialog.setEnabled(false);
+	}else{
+	    showSMTResDialog.setEnabled(true);
+	}
+	registerAtMenu(proof,showSMTResDialog);
+        
         return proof;
     }
 
@@ -1485,7 +1506,8 @@ public class Main extends JFrame implements IMain {
         registerAtMenu(options, librariesItem);
         
         // decision procedures
-        registerAtMenu(options, createDecisionProcedureMenu());
+        createDecisionProcedureMenu(options);
+        
 	dpSettingsListener = 
 	    new DPSettingsListener(ProofSettings.DEFAULT_SETTINGS.getDecisionProcedureSettings());
        
@@ -1662,33 +1684,16 @@ public class Main extends JFrame implements IMain {
      * creates a menu allowing to choose the external prover to be used
      * @return the menu with a list of all available provers that can be used
      */
-    private JMenu createDecisionProcedureMenu() {
+    private void createDecisionProcedureMenu(JMenu parent) {
 	/** menu for configuration of decision procedure */
         
         final DecisionProcedureSettings dps = ProofSettings.DEFAULT_SETTINGS.getDecisionProcedureSettings();
 
-	showSMTResDialog = new JMenuItem("Show SMT Result Dialog");
-	showSMTResDialog.addActionListener(new ActionListener() {
-	   public void actionPerformed(ActionEvent e) {
-	        SMTResultsAndBugDetectionDialog dia =SMTResultsAndBugDetectionDialog.getInstance(mediator);
-	       if(dia!=null){
-		   dia.rebuildTableForProof();
-		   dia.setVisible(true);
-	       }
-	   }
-	});
-	
-	SMTResultsAndBugDetectionDialog dia =SMTResultsAndBugDetectionDialog.getInstance(mediator);
-	if(dia == null){
-	    showSMTResDialog.setEnabled(false);
-	}else{
-	    showSMTResDialog.setEnabled(true);
-	}
-	decProcOptions.add(showSMTResDialog);
+
 
 	
 	
-	JMenuItem item = new JMenuItem("Settings");
+	JMenuItem item = new JMenuItem("Decision Procedure Settings");
 	item.addActionListener(new ActionListener() {
 		   public void actionPerformed(ActionEvent e) {
 		  
@@ -1699,11 +1704,11 @@ public class Main extends JFrame implements IMain {
 		       
 		   }
 		});
-	decProcOptions.add(item);
+	registerAtMenu(parent, item);
 	
 
 	
-	return decProcOptions;
+	
     }    
     
     

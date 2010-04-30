@@ -263,7 +263,7 @@ public class ProgressDialog extends JDialog implements ProcessLauncherListener{
 	private JButton getOkButton() {
 		if (okButton == null) {
 			okButton = new JButton();
-			okButton.setText("OK");
+			okButton.setText("Apply Results");
 			okButton.addActionListener(new ActionListener() {
 			    
 			    public void actionPerformed(ActionEvent arg0) {
@@ -284,7 +284,7 @@ public class ProgressDialog extends JDialog implements ProcessLauncherListener{
 	private JButton getCancelButton() {
 		if (cancelButton == null) {
 			cancelButton = new JButton();
-			cancelButton.setText("Cancel");
+			cancelButton.setText("Discard Results");
 			cancelButton.addActionListener(new ActionListener() {
 			    
 			    public void actionPerformed(ActionEvent e) {
