@@ -535,6 +535,9 @@ public class SMTRule  extends ProcessLauncher implements BuiltInRule{
 	double t = cut(((double)time)/1000,1);
 	
 	String s = (finished ? "Stopped after " : "") +t+" sec.";
+	if(finished){
+	    mon.setFinished();
+	}
 	mon.setTimeProgress(s, getCurrentProgress(time, maxTime));
     }
     

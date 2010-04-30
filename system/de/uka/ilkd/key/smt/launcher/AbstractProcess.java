@@ -86,8 +86,7 @@ abstract public class AbstractProcess implements  Process, MakesProgress
 	          
 	            	ProcessBuilder builder = new ProcessBuilder();
 	            	builder.command(command);
-	        
-	            	process = builder.start();
+	               	process = builder.start();
 	            	listener.eventStarted(this);
 	            	
 	            	exitCode = process.waitFor();

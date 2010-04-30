@@ -5,7 +5,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.Set;
 import java.util.Vector;
 
@@ -345,6 +348,31 @@ public class SMTResultsAndBugDetectionDialog extends JFrame {
 	}
     }
     
+    private LinkedList<Node> sortNodes(Set<Node> nodes){
+	Comparator<Node> comparator = new Comparator<Node>() {
+	    
+	    private int getMaxTimeStamp(Node node){
+		int max = 0;
+		for(Object obj : node.getSMTandFPData()){
+		    if(obj instanceof SMTSolverResult){
+			max = Math.max(max,
+				((SMTSolverResult)obj).getID());
+		    }
+		}
+		return max;
+	    }
+	    
+	    public int compare(Node o1, Node o2) {
+		return getMaxTimeStamp(o1)<getMaxTimeStamp(o2)?-1 : 
+		        (getMaxTimeStamp(o1)==getMaxTimeStamp(o2)?0 :1);
+	    }
+	};
+	LinkedList<Node> list = new LinkedList<Node>();
+	list.addAll(nodes);
+	Collections.sort(list, comparator);
+	return list;
+    }
+    
     /**Call this method when the field {@code proof} changes.
      * @author gladisch*/
     public  int rebuildTableForProof(){
@@ -357,8 +385,10 @@ public class SMTResultsAndBugDetectionDialog extends JFrame {
         	tableModel.setRowCount(0);
         	if(proof!=null){
                 	Set<Node> nodes = proof.getNodesWithSMTandFPData();
+                	
                 	if(nodes!=null){
-                	    for(Node n:nodes){
+                	    LinkedList<Node> list = sortNodes(nodes);
+                	    for(Node n:list){
                 		updateTableForNode(n);
                 	    }
                 	}
@@ -455,7 +485,7 @@ public class SMTResultsAndBugDetectionDialog extends JFrame {
 	}
 	
 	public String toString(){
-	    return ""+ r.isValid();
+	    return ""+ r.isValid()+r.getID();
 	}
     }
 

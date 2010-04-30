@@ -38,9 +38,11 @@ class ProgressPanel implements SMTProgressMonitor {
 
     	static class InternGoal{
     	    Goal goal;
+    	    int index;
     	    SolveType type = SolveType.UNKOWN;
-    	    public InternGoal(Goal goal){
+    	    public InternGoal(Goal goal,int index){
     		this.goal = goal;
+    		this.index = index;
     	    }
     	    
     	}
@@ -49,6 +51,8 @@ class ProgressPanel implements SMTProgressMonitor {
 	private static final Color SOLVED_COLOR = new Color(0,153,49);
 	private static final Color TIME_COLOR = new Color(0,0,98);
 	private static final Color UNKOWN_COLOR = new Color(255,255,255);
+	
+	private static final int MAX_DOTS = 3;
 	
 	
 	private JProgressBar progressBarTime = null;
@@ -60,7 +64,9 @@ class ProgressPanel implements SMTProgressMonitor {
 	private ProgressDialog dialog;
 	
 	private List<InternGoal> goals = Collections.synchronizedList(new LinkedList<InternGoal>()); 
-	
+	private int currentGoal =0;
+	private long time = System.currentTimeMillis();
+	private int dots =0;
 	
 	
 
@@ -70,10 +76,13 @@ class ProgressPanel implements SMTProgressMonitor {
 	public ProgressPanel(MakesProgress process, JComponent parent, ProgressDialog dialog, Collection<Goal> goals){
 	    	this.parent = parent;
 	    	this.dialog = dialog;
+	    	int i=0;
 	    	for(Goal goal : goals){
-	    	    this.goals.add(new InternGoal(goal));
+	    	    this.goals.add(new InternGoal(goal,i));
+	    	    i++;
 	    	}
 	    	
+	    	    	
 	    	
 	    	process.removeAllProgressMonitors();
 	    	process.addProgressMonitor(this);
@@ -92,8 +101,27 @@ class ProgressPanel implements SMTProgressMonitor {
 		((TitledBorder)getComponent().getBorder()).setTitle(process.getTitle());
 	}
 	
+	String [] s = {"   ",".  ",".. ","..."};
 
-
+	private String getDotString(){
+	    if(System.currentTimeMillis()-time > 500){
+		dots++;
+		if(dots == s.length){
+		    dots=0;
+		}
+		time = System.currentTimeMillis();
+	    }
+	    String temp="";
+	    /*for(int i=0; i < s.length; i++){
+		if(i <= dots-1){
+		    temp += ".";    
+		}
+		else temp+=" ";
+		
+	    }*/
+	    return s[dots];
+	    
+	}
 
 	
 	private String buildString(int progress, int max){
@@ -217,7 +245,9 @@ class ProgressPanel implements SMTProgressMonitor {
 	}
 	
 	private String goalString(int number, SolveType type){
-	    return number+". Goal:"+" "+typeToName(type);
+	    String temp =number+". Goal";
+	    temp += number-1 == currentGoal ? ": "+getDotString() : number-1>currentGoal ? "" : ": "+typeToName(type);
+	    return temp;
 	}
 	private int getStringWidth(String s){
 	    return SwingUtilities.computeStringWidth(
@@ -225,12 +255,11 @@ class ProgressPanel implements SMTProgressMonitor {
 	}
 	
 	public int necessaryPanelWidth(int numberOfGoals){
-	    int w1 = Math.max(Math.max(getStringWidth(goalString(1,SolveType.SOLVABLE))
-		               ,getStringWidth(goalString(1,SolveType.UNSOLVABLE))),
-		               getStringWidth(goalString(1,SolveType.UNKOWN)))
+	    
+	    int w1 = getStringWidth("10. Goal: unsolvable")
 		               * numberOfGoals;
 	    int w2 = getStringWidth(jLabel.getText());
-	    return w1+w2+400;
+	    return w1+w2;
 	}
 	
 	public int necessaryPanelHeight(){
@@ -321,8 +350,10 @@ class ProgressPanel implements SMTProgressMonitor {
         public void setGoalProgress(Goal goal, SolveType type) {
             InternGoal ig = findGoal(goal);
             if(ig != null){
-        	ig.type = type;
+          	ig.type = type;
+        	currentGoal = ig.index+1;
             }
+         
            parent.repaint();
         }
 
@@ -333,6 +364,15 @@ class ProgressPanel implements SMTProgressMonitor {
             }
             
             
+	    
+        }
+
+
+	/* (non-Javadoc)
+         * @see de.uka.ilkd.key.smt.SMTProgressMonitor#setFinished()
+         */
+        public void setFinished() {
+	    currentGoal = goals.size();
 	    
         }
 

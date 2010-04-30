@@ -45,12 +45,12 @@ public final class Z3Solver extends AbstractSMTSolver {
 	    } else {
 		return SMTSolverResult.createUnknownResult(text,name());
 	    }
-	} else if (val == 112 && text.contains("unknown")) {
+	} else if ((val == 112 && text.contains("unknown")) || val ==139) {
 	    //the result was unknown
 	    return SMTSolverResult.createUnknownResult(text,name());
 	} else {
 	    //something went wrong
-	    throw new IllegalArgumentException(error);
+	    throw new IllegalArgumentException("Code "+ val+": " + error);
 	}
     }
     

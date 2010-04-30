@@ -199,7 +199,7 @@ public class ProgressDialog extends JDialog implements ProcessLauncherListener{
 		infoText.setEditable(false);
 		infoText.setRows(2);
 		infoText.setText("You can change the behavior of this dialog in:\n" +
-				"Options/Decision Procedures/Settings");
+				"Options/Decision Procedures");
 	    }
 	    return infoText;
 	}

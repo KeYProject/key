@@ -27,6 +27,8 @@ public class SMTSolverResult {
     
     private final String text;
     private final ThreeValuedTruth isValid;
+    private static int idCounter = 0;
+    private final int id = ++idCounter;
     
     /**This is to identify where the result comes from. E.g. for user feedback. */
     public final String solverName;
@@ -35,6 +37,10 @@ public class SMTSolverResult {
 	this.solverName = solverName;
 	this.text = text;
 	this.isValid = isValid;
+    }
+    
+    public int getID(){
+	return id;
     }
     
     

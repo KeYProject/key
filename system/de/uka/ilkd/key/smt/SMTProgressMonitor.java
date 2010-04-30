@@ -21,4 +21,5 @@ public interface SMTProgressMonitor {
     public void setGoalProgress(Goal goal, SolveType type);  
     public void setGoalMaximum(int maximum);
     public void exceptionOccurred(String text, Exception e);    
+    public void setFinished();
 }	

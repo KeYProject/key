@@ -240,7 +240,7 @@ public class Main extends JFrame implements IMain {
     private ButtonGroup  decProcRadioItems = new ButtonGroup();
     
     /** The menu for the decproc options */
-    public final JMenu decProcOptions = new JMenu("Decision Procedures");
+    public final JMenu decProcOptions = new JMenu("Decision Procedures...");
     
     public SMTResultsAndBugDetectionDialog decProcResDialog;
     
@@ -694,7 +694,7 @@ public class Main extends JFrame implements IMain {
 	decProcComponent= new ComplexButton(TOOLBAR_ICON_SIZE);
 	decProcComponent.setEmptyItem("No prover available","<html>No prover is applicable for KeY.<br><br>If a prover is installed on your system," +
 		"<br>please configure the KeY-System accordingly:\n" +
-		"<br>Options|Decision Procedures|Settings</html>");
+		"<br>Options|Decision Procedures</html>");
 
 	decProcComponent.setPrefix("Run ");
 	
@@ -1693,7 +1693,7 @@ public class Main extends JFrame implements IMain {
 
 	
 	
-	JMenuItem item = new JMenuItem("Decision Procedure Settings");
+	JMenuItem item = new JMenuItem("Decision Procedures...");
 	item.addActionListener(new ActionListener() {
 		   public void actionPerformed(ActionEvent e) {
 		  
@@ -2138,27 +2138,6 @@ public class Main extends JFrame implements IMain {
 	    
 	    if (settings != null) {
 		updateDecisionProcedureSelectMenu();
-
-		/*	SMTRule activeRule = settings.getActiveSMTRule();
-		if(activeRule == SMTRule.EMPTY_RULE){
-		    activeRule = (SMTRule) decisionProcedureInvocationSelection.getSelectedItem();
-		    if(activeRule == null){
-			activeRule = SMTRule.EMPTY_RULE;
-		    }
-		}*/
-		/*decisionProcedureInvocationButton.
-				
-		setAction(new DPInvokeAction(activeRule));
-		
-		decisionProcedureInvocationSelection.setAction(
-			new DPSelectionAction());
-		*/
-		
-		/*int timeout = settings.getTimeout();
-		int h = timeout/(10*60*60);
-		int min = (timeout - 10*60*60* h)/(10*60);
-		int sec = (timeout - 10*60*min)/10;
-		ruletimeoutlabel.setText("timeout: " + h + "h " + min + "min " + sec + "." + timeout%10 + " s");*/
 
 	    } else {
 		assert false;
