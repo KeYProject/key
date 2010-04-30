@@ -485,7 +485,7 @@ public class SMTResultsAndBugDetectionDialog extends JFrame {
 	}
 	
 	public String toString(){
-	    return ""+ r.isValid()+r.getID();
+	    return ""+ r.isValid();
 	}
     }
 
