@@ -879,7 +879,13 @@ public final class TermBuilder {
     
     public Term allObjects(Services services, Term f) {
 	return func(services.getTypeConverter().getSetLDT().getAllObjects(), f);
-    }    
+    }
+    
+    
+    public Term arrayRange(Services services, Term o, Term lower, Term upper) {
+	return func(services.getTypeConverter().getSetLDT().getArrayRange(), 
+		    new Term[]{o, lower, upper});
+    }        
     
     
     public Term freshLocs(Services services, Term h) {

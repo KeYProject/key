@@ -37,6 +37,7 @@ public final class SetLDT extends LDT {
     private final Function infiniteUnion;
     private final Function allFields;
     private final Function allObjects;
+    private final Function arrayRange;
     private final Function freshLocs;    
     private final Function elementOf;
     private final Function subset;
@@ -54,6 +55,7 @@ public final class SetLDT extends LDT {
         infiniteUnion    = addFunction(services, "infiniteUnion");
         allFields        = addFunction(services, "allFields");
         allObjects       = addFunction(services, "allObjects");
+        arrayRange       = addFunction(services, "arrayRange");
         freshLocs        = addFunction(services, "freshLocs");
         elementOf        = addFunction(services, "elementOf");
         subset           = addFunction(services, "subset");
@@ -103,6 +105,11 @@ public final class SetLDT extends LDT {
     
     public Function getAllObjects() {
 	return allObjects;
+    }    
+
+    
+    public Function getArrayRange() {
+	return arrayRange;
     }    
     
     

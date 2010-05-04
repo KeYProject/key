@@ -571,10 +571,6 @@ specarrayrefexpr[SLExpression receiver, String fullyQualifiedName, Token lbrack]
 	    raiseError("Cannot access " + receiver.getTerm() + " as an array.");
 	}
     
-        LogicVariable indexVar 
-	    = new LogicVariable(new Name("i"), intLDT.targetSort());
-	Term arrIndex = TB.arr(services, TB.var(indexVar));
-
 	if (rangeFrom == null) {
 	    // We have a star. A star includes all components of an array even
 	    // those out of bounds. This makes proving easier.	    
@@ -582,15 +578,10 @@ specarrayrefexpr[SLExpression receiver, String fullyQualifiedName, Token lbrack]
 	    result = new SLExpression(t);
 	} else if (rangeTo != null) {
 	    // We have "rangeFrom .. rangeTo"
-	    Term guardFormula 
-	    	= TB.and(TB.leq(rangeFrom.getTerm(), TB.var(indexVar), services),
-		         TB.leq(TB.var(indexVar), rangeTo.getTerm(), services));
-            Term t = TB.guardedSetComprehension(
-	    			services, 
-	                        new QuantifiableVariable[]{indexVar},
-	                        guardFormula,
-	                        receiver.getTerm(), 
-	                        arrIndex);
+	    Term t = TB.arrayRange(services, 
+	    			   receiver.getTerm(), 
+	    			   rangeFrom.getTerm(), 
+	    			   rangeTo.getTerm());
 	    result = new SLExpression(t);
 	} else {
 	    // We have a regular array access
