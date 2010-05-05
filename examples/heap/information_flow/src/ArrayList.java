@@ -34,6 +34,7 @@ final class ArrayList {
       @   requires sizeDep == \singleton(size);
       @   requires (\forall int i; arraySlotDep[i] == \singleton(array[i]));
       @   ensures \subset(resultDep, \old(footprint));
+      @   diverges true;
       @*/    
     public /*@helper@*/ boolean contains(/*@nullable@*/ Object o) {
 	//@ ghost \locset iDep = pcDep; //assignment
@@ -45,6 +46,7 @@ final class ArrayList {
 	  @    && \subset(pcDep, \old(footprint))
 	  @    && \subset(iDep, \old(footprint));
 	  @ assignable \singleton(pcDep);
+	  @ decreases size - i;
 	  @*/
 	while(i < size) {
 	    //@ set pcDep = \set_union(pcDep, \set_union(arrayDep, \set_union(iDep, \set_union(paramDep, arraySlotDep[i])))); //entering conditional

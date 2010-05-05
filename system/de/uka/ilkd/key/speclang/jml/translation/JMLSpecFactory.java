@@ -253,7 +253,7 @@ public class JMLSpecFactory {
         }
 
         //translate diverges
-        Term diverges = TB.tt();
+        Term diverges = TB.ff();
         for(PositionedString expr : originalDiverges) {
             Term translated 
                 = translator.translateExpression(
@@ -264,7 +264,7 @@ public class JMLSpecFactory {
                     null, 
                     null,
                     null);
-            diverges = TB.and(diverges, translated);        
+            diverges = TB.or(diverges, translated);        
         }
 
         //translate normal_behavior / exceptional_behavior

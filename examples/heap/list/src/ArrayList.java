@@ -30,6 +30,7 @@ final class ArrayList implements List {
 	/*@ loop_invariant 0 <= i && i <= size 
 	  @  && (\forall int x; 0 <= x && x < i; newArray[x] == array[x]);
 	  @ assignable newArray[*];
+	  @ decreases size - i;
 	  @*/
 	for(int i = 0; i < size; i++) {
 	    newArray[i] = array[i];
@@ -50,6 +51,7 @@ final class ArrayList implements List {
 	/*@ loop_invariant 0 <= i && i <= size
 	  @  && (\forall int x; 0 <= x && x < i; array[x] != o);
 	  @ assignable \nothing;
+	  @ decreases size - i;
 	  @*/
 	for(int i = 0; i < size; i++) {
 	    if(array[i] == o) {
@@ -77,6 +79,7 @@ final class ArrayList implements List {
 	/*@ loop_invariant 0 <= i && i <= size
 	  @  && (\forall int x; 0 <= x && x < i; array[x] != o);
 	  @ assignable \nothing;
+	  @ decreases size - i;
 	  @*/
 	for(int i = 0; i < size; i++) {
 	    if(array[i] == o) {

@@ -17,6 +17,7 @@ class ArrayList {
       @ ensures get(size() - 1) == o;
       @ ensures (\forall int i; 0 <= i && i < size() - 1; get(i) == \old(get(i)));
       @ ensures \new_elems_fresh(footprint);
+      @ diverges true;
       @*/
     void add(/*@nullable@*/ Object o) {
 	if(count == items.length) {

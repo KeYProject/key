@@ -26,6 +26,7 @@ public abstract class Subject {
 	/*@ loop_invariant 0 <= i && i <= observers.length
 	  @                && (\forall int x; 0 <= x && x < i; newArr[x] == observers[x]);
 	  @ assignable newArr[*];
+	  @ decreases observers.length - i;
 	  @*/
 	for(int i = 0; i < observers.length; i++) {
 	    newArr[i] = observers[i];
@@ -44,7 +45,8 @@ public abstract class Subject {
 	  @                && (\forall int x; 0 <= x && x < observers.length; observers[x].\inv)
 	  @                && (\forall int x; 0 <= x && x < observers.length; observers[x].subject == this)
 	  @                && (\forall int x; 0 <= x && x < i; observers[x].upToDate);
-	  @ assignable \infinite_union(int x; 0 <= x && x < observers.length ? observers[x].* : \empty); 
+	  @ assignable \infinite_union(int x; 0 <= x && x < observers.length ? observers[x].* : \empty);
+	  @ decreases observers.length - i; 
 	  @*/
 	for(int i = 0; i < observers.length; i++) {
 	    observers[i].update();

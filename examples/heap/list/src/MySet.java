@@ -62,9 +62,10 @@ final class MySet {
       @*/
     public void addAll(List l) {
 	final ListIterator it = l.iterator();
-	/*@ loop_invariant 0 <= it.pos && it.pos < l.size()
-	  @   && (\forall int x; 0 <= x && x < \old(list.size()) - 1; list.get(x) == \old(list.get(x)));
+	/*@ loop_invariant 0 <= it.pos && it.pos <= l.size()
+	  @   && (\forall int x; 0 <= x && x < \old(list.size()); list.get(x) == \old(list.get(x)));
           @ assignable l.footprint;
+          @ decreases l.size() - it.pos;
 	  @*/
 	while(it.hasNext()) {
 	    add(it.next());

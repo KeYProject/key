@@ -193,6 +193,7 @@ class UpdateAbstraction {
       @ requires l2Dep == \singleton(l2);       
       @ requires hDep == \singleton(h);
       @ ensures \subset(lDep, LOW);
+      @ diverges true;
       @*/    
     static void ex9_secure() {
 	//@ set lDep = pcDep; //assignment

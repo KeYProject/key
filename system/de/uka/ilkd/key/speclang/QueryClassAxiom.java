@@ -179,7 +179,7 @@ public final class QueryClassAxiom implements ClassAxiom {
 	
 	//create added sequent
 	final Term addedFormula 
-		= TB.apply(update, TB.prog(Modality.DIA, jb, post));
+		= TB.apply(update, TB.prog(Modality.BOX, jb, post));
 	final ConstrainedFormula addedCf = new ConstrainedFormula(addedFormula);
 	final Semisequent addedSemiSeq = Semisequent.EMPTY_SEMISEQUENT
 	                                            .insertFirst(addedCf)

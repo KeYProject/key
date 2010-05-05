@@ -14,6 +14,7 @@ class Stack {
     /*@ assignable footprint;
       @ ensures size() == \old(size()) + 1;
       @ ensures \new_elems_fresh(footprint);
+      @ diverges true;
       @*/
     void push(/*@nullable@*/ Object o) {
 	contents.add(o);
