@@ -335,6 +335,9 @@ public final class JavaCardDLStrategy extends AbstractFeatureStrategy {
 
         bindRuleSet ( d, "type_hierarchy_def", -6500 );
         
+        //class axioms
+        bindRuleSet ( d, "classAxiom", longConst(-150) );        
+        
         if ( programsToRight )
             bindRuleSet ( d, "boxDiamondConv",
                           TopLevelFindFeature.ANTEC_WITH_UPDATE );

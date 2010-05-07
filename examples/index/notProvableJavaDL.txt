@@ -1,3 +1,5 @@
+./heap/inconsistent_represents/MyClass_m.key
+./heap/inconsistent_represents/MyClass_n.key
 ./heap/information_flow/UpdateAbstraction_ex7_1_insecure.key
 ./heap/information_flow/UpdateAbstraction_ex7_2_insecure.key
 ./standard_key/arrays/arrayStoreException/array2Dim.key

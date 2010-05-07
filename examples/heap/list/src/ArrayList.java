@@ -3,7 +3,7 @@ final class ArrayList implements List {
     private /*@nullable@*/ Object[] array = new Object[10];
     private int size = 0;
     
-    //@ represents footprint = array, array[*], size;    
+    //@ represents footprint = array, array[*], size;
     
     //@ invariant array != null;
     //@ invariant 0 <= size && size <= array.length;

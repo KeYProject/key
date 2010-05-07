@@ -278,6 +278,7 @@ public final class HeapLDT extends LDT {
 		    result = new ObserverFunction(
 			    		kind.toString(), 
 			                fieldPV.sort(),
+			                fieldPV.getKeYJavaType(),
 			                targetSort(),
 			                fieldPV.getContainerType(),
 			                fieldPV.isStatic(),

@@ -29,8 +29,8 @@ public class SchemaVariableFactory {
      * used to represent
      * @return the SchemaVariable
      */
-    public static SchemaVariable createVariableSV(Name name,
-						  Sort sort) {
+    public static VariableSV createVariableSV(Name name,
+				              Sort sort) {
 	return new VariableSV(name, sort);
     }
 

@@ -26,7 +26,6 @@ public final class SkolemTermSV extends AbstractSV {
      */    
     SkolemTermSV(Name name, Sort sort) {
 	super(name, sort, true, false);	
-	assert sort != Sort.FORMULA;
 	assert sort != Sort.UPDATE;
     }
 	

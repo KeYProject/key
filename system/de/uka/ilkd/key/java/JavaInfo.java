@@ -1252,6 +1252,7 @@ public final class JavaInfo {
 	if(inv == null) {
 	    inv = new ObserverFunction("<inv>",
         			       Sort.FORMULA,
+        			       null,
         			       services.getTypeConverter().getHeapLDT().targetSort(),
         			       getJavaLangObject(),
         			       false,

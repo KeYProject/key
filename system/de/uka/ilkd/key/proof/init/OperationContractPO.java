@@ -114,9 +114,7 @@ public final class OperationContractPO extends AbstractPO
         	          .registerRule(axiomTaclet,
         	        	        AxiomJustification.INSTANCE);
             } else {
-        	axiomTerm = TB.and(axiomTerm, 
-        			   TB.forallHeaps(services, 
-        				   	  ax.getAxiom(services)));
+        	axiomTerm = TB.and(axiomTerm, ax.getAxiom(services));
             }
         }
         

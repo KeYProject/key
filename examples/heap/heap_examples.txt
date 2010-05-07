@@ -1,3 +1,6 @@
+* inconsistent_represents: An incorrect program, which should not be verifiable
+  despite its unsatisfiable represents clauses.
+
 * information_flow: A collection of examples for modelling secure information
   flow using ghost state.
 

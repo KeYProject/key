@@ -22,6 +22,7 @@ public class ObserverFunction extends Function {
     private final KeYJavaType container;
     private final boolean isStatic;
     private final ImmutableArray<KeYJavaType> paramTypes;
+    private final KeYJavaType type;
 
     
     //-------------------------------------------------------------------------
@@ -29,7 +30,8 @@ public class ObserverFunction extends Function {
     //-------------------------------------------------------------------------     
 
     public ObserverFunction(String baseName, 
-	            	    Sort sort, 
+	            	    Sort sort,
+	            	    KeYJavaType type,	            	    
 	            	    Sort heapSort,
 	            	    KeYJavaType container,
 	            	    boolean isStatic,	            	    
@@ -38,7 +40,9 @@ public class ObserverFunction extends Function {
 		                     container.getSort().toString()),
               sort, 
               getArgSorts(heapSort, container, isStatic, paramTypes));
-	assert container != null;
+	assert type == null || type.getSort() == sort;
+	assert container != null;	
+	this.type = type;
 	this.container = container;
 	this.isStatic = isStatic;
 	this.paramTypes = paramTypes;
@@ -78,9 +82,15 @@ public class ObserverFunction extends Function {
     }
 
     
+    
     //-------------------------------------------------------------------------
     //public interface
     //-------------------------------------------------------------------------
+    
+    public final KeYJavaType getType() {
+	return type;
+    }
+    
     
     public final KeYJavaType getContainerType() {
 	return container;

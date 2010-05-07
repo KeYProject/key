@@ -57,6 +57,7 @@ public final class ProgramMethod extends ObserverFunction
                          Sort heapSort) {
         super(method.getProgramElementName().toString(), 
               kjt == null ? Sort.ANY : kjt.getSort(),
+              kjt,
               heapSort,
               container,
               method.isStatic(),

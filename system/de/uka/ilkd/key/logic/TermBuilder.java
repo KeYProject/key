@@ -923,6 +923,16 @@ public final class TermBuilder {
     }
     
     
+    public Term createdInHeap(Services services, Term s, Term h) {
+	final SetLDT ldt = services.getTypeConverter().getSetLDT();
+	if(s.op() == ldt.getEmpty()) {
+	    return tt();
+	} else {
+	    return func(ldt.getCreatedInHeap(), s, h);
+	}
+    }    
+    
+    
     public Term createdLocs(Services services) {
         return setMinus(services, 
         	        allLocs(services), 
@@ -1075,8 +1085,8 @@ public final class TermBuilder {
 	final TypeConverter tc = services.getTypeConverter();	
 	return equals(staticDot(services,
 		                tc.getBooleanLDT().targetSort(),
-		                 tc.getHeapLDT().getClassInitialized(classSort, 
-		        	 			             services)),
+		                tc.getHeapLDT().getClassInitialized(classSort, 
+		        				            services)),
 		      TRUE(services));
     }
 
@@ -1131,15 +1141,25 @@ public final class TermBuilder {
     
     
     public Term arrayStore(Services services, Term o, Term i, Term v) {
-        return store(services, heap(services), o, func(services.getTypeConverter().getHeapLDT().getArr(), i), v);
+        return store(services, 
+        	     heap(services), 
+        	     o, 
+        	     func(services.getTypeConverter().getHeapLDT().getArr(), i),
+        	     v);
     }        
     
     
-    public Term reachableValue(Services services, Term h, Term t, KeYJavaType kjt) {
+    public Term reachableValue(Services services, 
+	    		       Term h, 
+	    		       Term t, 
+	    		       KeYJavaType kjt) {
 	assert t.sort().equals(kjt.getSort());
 	final IntegerLDT intLDT = services.getTypeConverter().getIntegerLDT();
+	final SetLDT setLDT = services.getTypeConverter().getSetLDT();
 	if(t.sort().extendsTrans(services.getJavaInfo().objectSort())) {
 	    return or(created(services, h, t), equals(t, NULL(services)));
+	} else if(t.sort().equals(setLDT.targetSort())) {
+	    return createdInHeap(services, t, h);
 	} else if(t.sort().equals(intLDT.targetSort())) {
 	    return func(intLDT.getInBounds(kjt.getJavaType()), t);
 	} else {

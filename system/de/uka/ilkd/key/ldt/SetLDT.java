@@ -42,6 +42,7 @@ public final class SetLDT extends LDT {
     private final Function elementOf;
     private final Function subset;
     private final Function disjoint;    
+    private final Function createdInHeap;    
     
     
     public SetLDT(Services services) {
@@ -60,6 +61,7 @@ public final class SetLDT extends LDT {
         elementOf        = addFunction(services, "elementOf");
         subset           = addFunction(services, "subset");
         disjoint         = addFunction(services, "disjoint");
+        createdInHeap    = addFunction(services, "createdInHeap");
     }
     
     
@@ -131,6 +133,11 @@ public final class SetLDT extends LDT {
     public Function getDisjoint() {
 	return disjoint;
     }
+    
+    
+    public Function getCreatedInHeap() {
+	return createdInHeap;
+    }    
     
     
     @Override

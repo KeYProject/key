@@ -98,11 +98,9 @@ public final class DependencyContractPO extends AbstractPO
         	          .registerRule(axiomTaclet,
         	        	        AxiomJustification.INSTANCE);
             } else {
-        	axiomTerm = TB.and(axiomTerm, 
-        			   TB.forallHeaps(services, 
-        				   	  ax.getAxiom(services)));
+        	axiomTerm = TB.and(axiomTerm, ax.getAxiom(services));
             }
-        }  
+        } 
         
         return TB.and(new Term[]{TB.wellFormedHeap(services), 
         			 TB.wellFormed(services, anonHeap),
