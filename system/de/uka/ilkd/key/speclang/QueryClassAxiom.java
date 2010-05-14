@@ -129,7 +129,10 @@ public final class QueryClassAxiom implements ClassAxiom {
 		                	       paramVars[i], 
 		                	       TB.var(paramSVs[i])));
 	}
-	final Term post = TB.equals(TB.var(skolemSV), TB.var(resultVar));
+	final Term post = TB.imp(TB.reachableValue(services, 
+						   TB.var(resultVar), 
+						   target.getKeYJavaType()),
+	                  	 TB.equals(TB.var(skolemSV), TB.var(resultVar)));
 	
 	//create java block
     	final ImmutableList<KeYJavaType> sig 
