@@ -18,6 +18,10 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
 import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
 import de.uka.ilkd.key.java.declaration.VariableSpecification;
+import de.uka.ilkd.key.java.declaration.modifier.Private;
+import de.uka.ilkd.key.java.declaration.modifier.Protected;
+import de.uka.ilkd.key.java.declaration.modifier.Public;
+import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.java.statement.BranchStatement;
 import de.uka.ilkd.key.java.statement.For;
 import de.uka.ilkd.key.java.statement.LoopStatement;
@@ -373,6 +377,21 @@ public class JMLSpecFactory {
 
         return result;
     }
+    
+    
+    private VisibilityModifier getVisibility(
+	    				TextualJMLConstruct textualConstruct) {
+	for(String mod : textualConstruct.getMods()) {
+	    if(mod.equals("private")) {
+		return new Private();
+	    } else if(mod.equals("protected")) {
+		return new Protected();
+	    } else if(mod.equals("public")) {
+		return new Public();
+	    }
+	}	
+	return null;
+    }
         
     
     
@@ -381,7 +400,8 @@ public class JMLSpecFactory {
     //public interface
     //-------------------------------------------------------------------------
        
-    public ClassInvariant createJMLClassInvariant(KeYJavaType kjt, 
+    public ClassInvariant createJMLClassInvariant(KeYJavaType kjt,
+	    					  VisibilityModifier visibility,
                                                   PositionedString originalInv) 
             throws SLTranslationException {
         assert kjt != null;
@@ -403,6 +423,7 @@ public class JMLSpecFactory {
         return new ClassInvariantImpl(name,
                                       name,
                                       kjt, 
+                                      visibility,
                                       inv,
                                       selfVar);
     }
@@ -412,11 +433,14 @@ public class JMLSpecFactory {
                                         KeYJavaType kjt,
                                         TextualJMLClassInv textualInv) 
             throws SLTranslationException {
-        return createJMLClassInvariant(kjt, textualInv.getInv());
+        return createJMLClassInvariant(kjt,
+        			       getVisibility(textualInv),
+        			       textualInv.getInv());
     }
     
     
-    public ClassAxiom createJMLRepresents(KeYJavaType kjt, 
+    public ClassAxiom createJMLRepresents(KeYJavaType kjt,
+	    				  VisibilityModifier visibility,
                                           PositionedString originalRep,
                                           boolean isStatic) 
             throws SLTranslationException {
@@ -433,10 +457,11 @@ public class JMLSpecFactory {
         					  	   kjt,
         					  	   selfVar);
         //create class axiom
-        return new ClassAxiomImpl("JML represents clause for " 
+        return new RepresentsAxiom("JML represents clause for " 
         	                     + rep.first.name(),
-        	                  kjt,        	
-        		          rep.first,
+        	                  rep.first,
+        	                  kjt,        
+        	                  visibility,
         	                  rep.second,
         	                  selfVar);
     }
@@ -446,6 +471,7 @@ public class JMLSpecFactory {
 	    				  TextualJMLRepresents textualRep)
     	throws SLTranslationException {
 	return createJMLRepresents(kjt, 
+				   getVisibility(textualRep),
 		                   textualRep.getRepresents(), 
 		                   textualRep.getMods().contains("static"));
     }

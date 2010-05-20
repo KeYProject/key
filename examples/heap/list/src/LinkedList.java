@@ -4,14 +4,15 @@ final class LinkedList implements List {
     private /*@nullable@*/ Node last;
     private int size;
     
-    //@ represents footprint = first, last, size, \reachLocs(first.next, first);
+    //@ private represents footprint = first, last, size, \reachLocs(first.next, first);
     
-    /*@ invariant size == 0 && first == null && last == null
-      @            || size > 0
-      @               && first != null 
-      @               && last != null 
-      @               && last.next == null
-      @               && \reach(first.next, first, last, size - 1);
+    /*@ private invariant size == 0 && first == null && last == null
+      @                   || size > 0
+      @                      && first != null 
+      @                      && last != null 
+      @                      && last.next == null
+      @                      && \reach(first.next, first, last, size - 1);
+      @ private invariant (\forall int i; 0 <= i && i < size; (\forall Node n; \reach(first.next, first, n, i); n.data != null));
       @*/
    
     
@@ -22,19 +23,28 @@ final class LinkedList implements List {
     public /*@pure@*/ LinkedList() {
     }
     
-
-    public void add(Object o) {
-	Node node = new Node();
-	node.data = o;
-	if(size == 0) {
-	    first = node;
-	    last = node;
-	} else {
-	    last.next = node;
-	    last = node;
-	}
-	size++;
+    
+    public int size() {
+	return size;
     }
+    
+    
+    public Object get(int index) {
+	if(index < 0 || size <= index) {
+	    throw new IndexOutOfBoundsException();
+	}
+	
+	Node node = first;
+	/*@ loop_invariant 0 <= i && i <= index && \reach(first.next, first, node, i);
+	  @ assignable \nothing;
+	  @ decreases index - i;
+	  @*/
+	for(int i = 0; i < index; i++) {
+	    node = node.next;
+	}
+	
+	return node.data;
+    }    
     
     
     public boolean contains(Object o) {
@@ -57,23 +67,19 @@ final class LinkedList implements List {
 	
 	return node.data == o;
     }    
-
     
-    public Object get(int index) {
-	if(index < 0 || size <= index) {
-	    throw new IndexOutOfBoundsException();
+
+    public void add(Object o) {
+	Node node = new Node();
+	node.data = o;
+	if(size == 0) {
+	    first = node;
+	    last = node;
+	} else {
+	    last.next = node;
+	    last = node;
 	}
-	
-	Node node = first;
-	/*@ loop_invariant 0 <= i && i <= index && \reach(first.next, first, node, i);
-	  @ assignable \nothing;
-	  @ decreases index - i;
-	  @*/
-	for(int i = 0; i < index; i++) {
-	    node = node.next;
-	}
-	
-	return node.data;
+	size++;
     }
     
     
@@ -86,12 +92,7 @@ final class LinkedList implements List {
 	//TODO
     }
     
-    
-    public int size() {
-	return size;
-    }
-    
-    
+        
     //interactive proofs:
     //-footprint (apply reachDependenciesChangeHeapAtLocs)
     //-\inv (apply reachDependenciesChangeHeapAtLocs)

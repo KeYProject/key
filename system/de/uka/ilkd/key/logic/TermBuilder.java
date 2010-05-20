@@ -966,10 +966,15 @@ public final class TermBuilder {
     }
     
     
-    public Term inv(Services services, Term o) {
+    public Term inv(Services services, Term h, Term o) {
 	return func(services.getJavaInfo().getInv(),
-		    heap(services),
+		    h,
 		    o);
+    }    
+    
+    
+    public Term inv(Services services, Term o) {
+	return inv(services, heap(services),  o);
     }
 
     
@@ -1153,7 +1158,7 @@ public final class TermBuilder {
 	    		       Term h, 
 	    		       Term t, 
 	    		       KeYJavaType kjt) {
-	assert t.sort().equals(kjt.getSort());
+	assert t.sort().extendsTrans(kjt.getSort());
 	final IntegerLDT intLDT = services.getTypeConverter().getIntegerLDT();
 	final SetLDT setLDT = services.getTypeConverter().getSetLDT();
 	if(t.sort().extendsTrans(services.getJavaInfo().objectSort())) {

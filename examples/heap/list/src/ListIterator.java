@@ -1,7 +1,7 @@
 interface ListIterator {
     
-    //@ model instance List list;
-    //@ model instance int pos;
+    //@ public model instance List list;
+    //@ public model instance int pos;
     
     
     /*@ normal_behaviour

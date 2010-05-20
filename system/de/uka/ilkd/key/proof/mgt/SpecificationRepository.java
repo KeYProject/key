@@ -17,8 +17,13 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.abstraction.ClassType;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
+import de.uka.ilkd.key.java.declaration.modifier.Private;
+import de.uka.ilkd.key.java.declaration.modifier.Protected;
+import de.uka.ilkd.key.java.declaration.modifier.Public;
+import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -190,6 +195,45 @@ public final class SpecificationRepository {
 	} else {
 	    return null;
 	}
+    }
+    
+    
+    private boolean axiomIsVisible(ClassAxiom ax, KeYJavaType visibleTo) {
+	final KeYJavaType kjt = ax.getKJT();
+	final String kjtPackage = "x"; //TODO: package information not yet available
+	final String visibleToPackage = "y";
+	final VisibilityModifier visibility = ax.getVisibility();
+	if(visibility == null) {
+	    return kjtPackage.equals(visibleToPackage);
+	} else if(visibility instanceof Public) {
+	    return true;
+	} else if(visibility instanceof Private) {
+	    return kjt.equals(visibleTo);
+	} else if(visibility instanceof Protected) {
+	    return kjtPackage.equals(visibleToPackage)
+	           || visibleTo.getSort().extendsTrans(kjt.getSort());
+	} else {
+	    assert false;
+	    return false;
+	}
+    }
+    
+    
+    private ImmutableSet<ClassAxiom> getVisibleAxiomsOfOtherClasses(
+	    						KeYJavaType visibleTo) {
+	ImmutableSet<ClassAxiom> result = DefaultImmutableSet.<ClassAxiom>nil();
+	for(Map.Entry<KeYJavaType, ImmutableSet<ClassAxiom>> e 
+							: axioms.entrySet()) {
+	    if(e.getKey().equals(visibleTo)) {
+		continue;
+	    }
+	    for(ClassAxiom ax : e.getValue()) {
+		if(axiomIsVisible(ax, visibleTo)) {
+		    result = result.add(ax);
+		}
+	    }
+	}
+	return result;
     }
     
     
@@ -454,6 +498,8 @@ public final class SpecificationRepository {
         final KeYJavaType kjt = inv.getKJT();
         invs.put(kjt, getClassInvariants(kjt).add(inv));
         
+        addClassAxiom(new PartialInvAxiom(inv, services));
+        
         if(!inv.isStatic()) {
             final ImmutableList<KeYJavaType> subs 
             	= services.getJavaInfo().getAllSubtypes(kjt);
@@ -476,17 +522,24 @@ public final class SpecificationRepository {
     
     
     /**
-     * Returns all class axioms registered for the passed class, including
-     * the one defined by the class invariants registered for the class.
+     * Returns all class axioms visible in the passed class, including
+     * the axioms induced by invariant declarations.
      */
     public ImmutableSet<ClassAxiom> getClassAxioms(KeYJavaType kjt) {
-	//get registered axioms
-	ImmutableSet<ClassAxiom> result = axioms.get(kjt);
-	if(result == null) {
-	    result = DefaultImmutableSet.<ClassAxiom>nil();
+	//get visible registered axioms of other classes
+	ImmutableSet<ClassAxiom> result = getVisibleAxiomsOfOtherClasses(kjt);	
+	
+	//add registered axioms of own class (except partial inv axioms)
+	ImmutableSet<ClassAxiom> ownAxioms = axioms.get(kjt);
+	if(ownAxioms != null) {
+	    for(ClassAxiom ax : ownAxioms) {
+		if(!(ax instanceof PartialInvAxiom)) {
+		    result = result.add(ax);
+		}
+	    }
 	}
 	
-	//add invariant axiom
+	//add invariant axiom for own class
 	final ImmutableSet<ClassInvariant> myInvs = getClassInvariants(kjt);
 	final ProgramVariable selfVar = TB.selfVar(services, kjt, false);
 	Term invDef = TB.tt();
@@ -497,24 +550,25 @@ public final class SpecificationRepository {
 		                    TB.inv(services, TB.var(selfVar)), 
 		                    invDef);
 	final ObserverFunction invSymbol = services.getJavaInfo().getInv();
-	final ClassAxiom invAxiom 
-		= new ClassAxiomImpl("Class invariant axiom for " 
+	final ClassAxiom invRepresentsAxiom 
+		= new RepresentsAxiom("Class invariant axiom for " 
 			                 + kjt.getFullName(),
-				     kjt,		
-				     invSymbol,
+			             invSymbol,
+				     kjt,	
+				     new Private(),
 				     invDef,
 				     selfVar);
-	result = result.add(invAxiom);
-	
-	//add query axioms
+	result = result.add(invRepresentsAxiom);
+		
+	//add query axioms for own class
 	for(ProgramMethod pm : services.getJavaInfo()
 		                       .getAllProgramMethods(kjt)) {
 	    if(pm.getKeYJavaType() != null) {
 		pm = services.getJavaInfo().getToplevelPM(kjt, pm);		
 		final ClassAxiom queryAxiom 
-		    = new QueryClassAxiom("Query axiom for " + pm.getFullName(),
-			                  kjt, 
-			                  pm);
+		    = new QueryAxiom("Query axiom for " + pm.getFullName(),
+			             pm, 
+			             kjt);
 		result = result.add(queryAxiom);
 	    }
 	}

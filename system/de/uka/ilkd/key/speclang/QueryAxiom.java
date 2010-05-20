@@ -15,6 +15,8 @@ import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.declaration.modifier.Private;
+import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.*;
@@ -22,22 +24,22 @@ import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.rule.*;
 
 
-public final class QueryClassAxiom implements ClassAxiom {
+public final class QueryAxiom implements ClassAxiom {
     
     private static final TermBuilder TB = TermBuilder.DF;
     
     private final String name;
+    private final ProgramMethod target;    
     private final KeYJavaType kjt;        
-    private final ProgramMethod target;
     
-    public QueryClassAxiom(String name, KeYJavaType kjt, ProgramMethod target) {
+    public QueryAxiom(String name, ProgramMethod target, KeYJavaType kjt) {
 	assert name != null;
-	assert kjt != null;
 	assert target != null;
-	assert target.getKeYJavaType() != null;
+	assert target.getKeYJavaType() != null;	
+	assert kjt != null;
 	this.name = name;
+	this.target = target;	
 	this.kjt = kjt;
-	this.target = target;
     }
     
 
@@ -45,6 +47,12 @@ public final class QueryClassAxiom implements ClassAxiom {
     public String getName() {
 	return name;
     }
+    
+    
+    @Override
+    public ObserverFunction getTarget() {
+	return target;
+    }    
     
 
     @Override
@@ -54,11 +62,11 @@ public final class QueryClassAxiom implements ClassAxiom {
     
     
     @Override
-    public ObserverFunction getTarget() {
-	return target;
+    public VisibilityModifier getVisibility() {
+	return new Private();
     }
-
     
+        
     @Override
     public Term getAxiom(Services services) {
 	throw new UnsupportedOperationException();

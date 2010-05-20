@@ -10,8 +10,8 @@ package java.lang;
 public class Throwable extends java.lang.Object implements java.io.Serializable
 {
 
-   //@ protected ghost String message = null;
-   //@ protected ghost Throwable cause = null;
+   //@ protected nullable ghost String message = null;
+   //@ protected nullable ghost Throwable cause = null;
 
    /*@ public normal_behavior
      @    requires true;

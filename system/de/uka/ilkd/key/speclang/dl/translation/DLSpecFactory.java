@@ -17,6 +17,7 @@ import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.declaration.modifier.Private;
 import de.uka.ilkd.key.java.statement.CatchAllStatement;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.logic.ProgramElementName;
@@ -147,7 +148,12 @@ public final class DLSpecFactory {
 	KeYJavaType kjt = services.getJavaInfo().getKeYJavaType(selfVar.sort());
 	assert kjt != null;
 
-	return new ClassInvariantImpl(name, displayName, kjt, inv, selfVar);
+	return new ClassInvariantImpl(name, 
+				      displayName, 
+				      kjt,
+				      new Private(),
+				      inv, 
+				      selfVar);
     }
 
     /**

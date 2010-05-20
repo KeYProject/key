@@ -1,24 +1,24 @@
-final class MySet {
+public class MySet {
     
-    //@ instance model \locset footprint;
-    //@ accessible footprint: footprint;
-    //@ accessible \inv: footprint;
+    //@ public model \locset footprint;
+    //@ public accessible \inv: footprint;    
+    //@ public accessible footprint: footprint;
     
     private List list;
        
-    //@ represents footprint = this.*, list.footprint;
+    //@ private represents footprint = this.*, list.footprint;
 
     
-    /*@ invariant list.\inv && list.size() >= 0
-      @           && \disjoint(list.footprint, this.*)
-      @           && (\forall int x, y; 0 <= x && x < list.size() && 0 <= y 
-      @                                   && y < list.size() && x != y; 
-      @                                 list.get(x) != list.get(y));
+    /*@ private invariant list.\inv;
+      @ private invariant \disjoint(list.footprint, this.*);
+      @ private invariant (\forall int x, y; 0 <= x && x < list.size() && 0 <= y
+      @                                             && y < list.size() && x != y; 
+      @                                      list.get(x) != list.get(y));
       @*/
     
     
-    /*@ normal_behaviour
-      @   ensures (\forall \nullable Object x; !contains(x));
+    /*@ public normal_behaviour
+      @   ensures (\forall Object x; !contains(x));
       @   ensures \fresh(footprint);
       @*/
     public /*@pure@*/ MySet() {
@@ -26,24 +26,33 @@ final class MySet {
     }   
         
     
-    /*@ normal_behaviour
-      @   requires initial.\inv && initial.size() >= 0;
+    /*@ public normal_behaviour
+      @   requires initial.\inv;
       @   requires \disjoint(initial.footprint, this.*);
       @   requires (\forall int x, y; 0 <= x && x < initial.size() && 0 <= y 
       @                                && y < initial.size() && x != y; 
       @                               initial.get(x) != initial.get(y));
-      @   ensures (\forall \nullable Object x; 
+      @   ensures (\forall Object x; 
       @              contains(x) ==  (\exists int y; 0 <= y && y < initial.size(); initial.get(y) == x));
       @   ensures \subset(footprint, \set_union(this.*, initial.footprint));
       @*/
     public /*@pure@*/ MySet(List initial) {
 	this.list = initial;
     }
-
+    
     
     /*@ normal_behaviour
+      @   accessible footprint;
+      @   ensures \result == contains(o);
+      @*/
+    public /*@pure@*/ boolean contains(Object o) {
+	return list.contains(o);
+    }
+      
+
+    /*@ public normal_behaviour
       @   assignable footprint;
-      @   ensures (\forall \nullable Object x; contains(x) == (\old(contains(x)) || o == x));
+      @   ensures (\forall Object x; contains(x) == (\old(contains(x)) || o == x));
       @   ensures \new_elems_fresh(footprint);      
       @*/
     public void add(Object o) {
@@ -54,10 +63,10 @@ final class MySet {
     
     
     /*@ normal_behaviour
-      @   requires l.\inv && l.size() >= 0;
+      @   requires l.\inv;
       @   requires \disjoint(l.footprint, footprint);      
       @   assignable footprint;
-      @   ensures (\forall \nullable Object x; contains(x) == (\old(contains(x)) || l.contains(x)));
+      @   ensures (\forall Object x; contains(x) == (\old(contains(x)) || l.contains(x)));
       @   ensures \new_elems_fresh(footprint);
       @*/
     public void addAll(List l) {
@@ -72,14 +81,6 @@ final class MySet {
 	}
     }
 
-
-    /*@ normal_behaviour
-      @   ensures \result == contains(o);
-      @*/
-    public /*@pure@*/ boolean contains(Object o) {
-	return list.contains(o);
-    }
-    
     
     /*@ normal_behaviour
       @   assignable footprint;

@@ -12,6 +12,7 @@ package de.uka.ilkd.key.speclang;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.ParsableVariable;
 
@@ -38,6 +39,11 @@ public interface ClassInvariant extends SpecificationElement {
     public KeYJavaType getKJT();
     
     /**
+     * Returns the visibility of the invariant (null for default visibility)
+     */
+    public VisibilityModifier getVisibility();     
+    
+    /**
      * Returns the invariant formula without implicit all-quantification over
      * the receiver object.
      */
@@ -45,10 +51,10 @@ public interface ClassInvariant extends SpecificationElement {
     
     /**
      * Tells whether the invariant is static (i.e., does not refer to a
-     * receiver object)..
+     * receiver object).
      */
-    public boolean isStatic();    
-    
+    public boolean isStatic();
+        
     /**
      * Returns another class invariant like this one, except that it refers to the 
      * passed KeYJavaType.

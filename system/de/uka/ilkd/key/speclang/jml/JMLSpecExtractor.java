@@ -18,6 +18,7 @@ import de.uka.ilkd.key.java.abstraction.ArrayType;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.declaration.*;
+import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.java.recoderext.JMLTransformer;
 import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.java.statement.LoopStatement;
@@ -191,6 +192,13 @@ public final class JMLSpecExtractor implements SpecExtractor {
         //add invariants for non_null fields        
         for(MemberDeclaration member : td.getMembers()) {
             if(member instanceof FieldDeclaration) {
+        	VisibilityModifier visibility = null;
+        	for(Modifier mod : member.getModifiers()) {
+        	    if(mod instanceof VisibilityModifier) {
+        		visibility = (VisibilityModifier)mod;
+        		break;
+        	    }
+        	}
                 for(FieldSpecification field 
                       : ((FieldDeclaration) member).getFieldSpecifications()) {
                     
@@ -204,6 +212,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
                 		    fileName, member.getEndPosition());
                 	for(PositionedString classInv : nonNullInvs) {
                 	    result = result.add(jsf.createJMLClassInvariant(kjt,
+                		    					    visibility,
                 		            				    classInv));
                 	}
                     }

@@ -15,6 +15,7 @@ import java.util.Map;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ParsableVariable;
@@ -31,6 +32,7 @@ public final class ClassInvariantImpl implements ClassInvariant {
     private final String name;
     private final String displayName;
     private final KeYJavaType kjt;
+    private final VisibilityModifier visibility;    
     private final Term originalInv;
     private final ParsableVariable originalSelfVar;
     private final boolean isStatic;
@@ -45,12 +47,15 @@ public final class ClassInvariantImpl implements ClassInvariant {
      * @param name the unique internal name of the invariant
      * @param displayName the displayed name of the invariant
      * @param kjt the KeYJavaType to which the invariant belongs
+     * @param visibility the visibility of the invariant 
+     *        (null for default visibility)
      * @param inv the invariant formula itself
      * @param selfVar the variable used for the receiver object
      */
     public ClassInvariantImpl(String name, 
                               String displayName,
                               KeYJavaType kjt, 
+                              VisibilityModifier visibility,                              
                               Term inv,
                               ParsableVariable selfVar) {
         assert name != null && !name.equals("");
@@ -60,6 +65,7 @@ public final class ClassInvariantImpl implements ClassInvariant {
         this.name            = name;
         this.displayName     = displayName;
 	this.kjt             = kjt;
+        this.visibility      = visibility;
         this.originalInv     = inv;
         this.originalSelfVar = selfVar;
         final OpCollector oc = new OpCollector();
@@ -126,10 +132,17 @@ public final class ClassInvariantImpl implements ClassInvariant {
     
     
     @Override
+    public VisibilityModifier getVisibility() {
+	return visibility;
+    }
+    
+    
+    @Override
     public ClassInvariant setKJT(KeYJavaType newKjt) {
 	return new ClassInvariantImpl(name, 
                                       displayName,
                                       newKjt, 
+                                      visibility,
                                       originalInv,
                                       originalSelfVar);
     }

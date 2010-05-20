@@ -1,27 +1,28 @@
-final class ArrayList implements List {
+public class ArrayList implements List {
     
     private /*@nullable@*/ Object[] array = new Object[10];
     private int size = 0;
     
-    //@ represents footprint = array, array[*], size;
+    //@ private represents footprint = array, array[*], size;
     
-    //@ invariant array != null;
-    //@ invariant 0 <= size && size <= array.length;
-    //@ invariant \typeof(array) == \type(Object[]);
+    /*@ private invariant array != null;
+      @ private invariant 0 <= size && size <= array.length;
+      @ private invariant (\forall int i; 0 <= i && i < size; array[i] != null);
+      @ private invariant \typeof(array) == \type(Object[]);
+      @*/
     
     
-    /*@ normal_behaviour
-      @   ensures size() == 0;
-      @   ensures \fresh(footprint);
+    /*@ public normal_behaviour
+      @   ensures size() == 0 && \fresh(footprint);
       @*/
     public /*@pure@*/ ArrayList() {
     }
     
     
-    /*@ normal_behavior
+    /*@ private normal_behavior
       @   assignable array;
       @   ensures \fresh(array);
-      @   ensures array.length > \old(array.length);
+      @   ensures \old(array.length) < array.length;
       @   ensures (\forall int x; 0 <= x && x < size; array[x] == \old(array[x]));
       @*/
     private void enlarge() {
@@ -37,14 +38,19 @@ final class ArrayList implements List {
 	}
 	array = newArray;
     }
-        
 
-    public void add(Object o) {
-	if(size == array.length) {
-	    enlarge();
-	}
-	array[size++] = o;
+    
+    public int size() {
+	return size;
     }
+    
+    
+    public Object get(int index) {
+	if(index < 0 || size <= index) {
+	    throw new IndexOutOfBoundsException();
+	}
+	return array[index];
+    }   
     
     
     public boolean contains(Object o) {
@@ -59,14 +65,14 @@ final class ArrayList implements List {
 	    }
 	}
 	return false;
-    }    
+    }  
+        
 
-    
-    public Object get(int index) {
-	if(index < 0 || size <= index) {
-	    throw new IndexOutOfBoundsException();
+    public void add(Object o) {
+	if(size == array.length) {
+	    enlarge();
 	}
-	return array[index];
+	array[size++] = o;
     }
     
     
@@ -88,6 +94,7 @@ final class ArrayList implements List {
 		  @  && (\forall int x; i <= x && x < j; array[x] == \old(array[x+1]))
 		  @  && (\forall int x; j <= x && x < size; array[x] == \old(array[x]));
 		  @ assignable array[*];
+		  @ decreases size - 1 - j;
 		  @*/
 		for(int j = i; j < size - 1; j++) {
 		    array[j] = array[j+1];
@@ -98,24 +105,20 @@ final class ArrayList implements List {
 	}
     }
     
-    
-    public int size() {
-	return size;
-    }
-    
         
     private static class ArrayListIterator implements ListIterator {
 	private final ArrayList arrayList; //workaround; should be ArrayList.this
 	private int arrayPos = 0;
 	
-	//@ represents list = arrayList;
-	//@ represents pos = arrayPos;
+	//@ private represents list = arrayList;
+	//@ private represents pos = arrayPos;
 	
-	//@ invariant arrayList.\inv;
-	//@ invariant 0 <= arrayPos && arrayPos <= arrayList.size;
-	//@ invariant \typeof(arrayList) == ArrayList;
+	/*@ private invariant arrayList.\inv;
+	  @ private invariant 0 <= arrayPos && arrayPos <= arrayList.size;
+	  @ private invariant \typeof(arrayList) == ArrayList;
+	  @*/
 	
-	/*@ normal_behaviour
+	/*@ public normal_behaviour
 	  @   requires l.\inv && \typeof(l) == ArrayList;
 	  @   ensures list == l;
 	  @   ensures pos == 0; 

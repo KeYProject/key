@@ -18,6 +18,7 @@ import java.util.Set;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
@@ -30,30 +31,33 @@ import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.rule.Taclet;
 
 
-public final class ClassAxiomImpl implements ClassAxiom {
+public final class RepresentsAxiom implements ClassAxiom {
     
     private static final TermBuilder TB = TermBuilder.DF;
     
     private final String name;
+    private final ObserverFunction target;    
     private final KeYJavaType kjt;        
-    private final ObserverFunction target;
-    private final Term originalAxiom;
+    private final VisibilityModifier visibility;
+    private final Term originalRep;
     private final ProgramVariable originalSelfVar;
     
-    public ClassAxiomImpl(String name,
-	                  KeYJavaType kjt, 	    
-	    		  ObserverFunction target, 
-	                  Term axiom,
-	                  ProgramVariable selfVar) {
+    public RepresentsAxiom(String name,
+	    		   ObserverFunction target, 
+	                   KeYJavaType kjt,
+	                   VisibilityModifier visibility,
+	                   Term rep,
+	                   ProgramVariable selfVar) {
 	assert name != null;
 	assert kjt != null;
 	assert target != null;
-	assert axiom.sort() == Sort.FORMULA;
+	assert rep.sort() == Sort.FORMULA;
 	assert (selfVar == null) == target.isStatic();
 	this.name = name;
 	this.target = target;
 	this.kjt = kjt;
-	this.originalAxiom = axiom;
+	this.visibility = visibility;
+	this.originalRep = rep;
 	this.originalSelfVar = selfVar;
     }
     
@@ -69,7 +73,7 @@ public final class ClassAxiomImpl implements ClassAxiom {
 	    map.put(originalSelfVar, selfVar);
 	}
 	final OpReplacer or = new OpReplacer(map);
-	return or.replace(originalAxiom);
+	return or.replace(originalRep);
     }
     
     
@@ -97,6 +101,12 @@ public final class ClassAxiomImpl implements ClassAxiom {
 	return name;
     }
     
+    
+    @Override
+    public ObserverFunction getTarget() {
+	return target;
+    }    
+    
 
     @Override
     public KeYJavaType getKJT() {
@@ -105,8 +115,8 @@ public final class ClassAxiomImpl implements ClassAxiom {
     
     
     @Override
-    public ObserverFunction getTarget() {
-	return target;
+    public VisibilityModifier getVisibility() {
+	return visibility;
     }
 
     
@@ -170,17 +180,17 @@ public final class ClassAxiomImpl implements ClassAxiom {
     @Override
     public Taclet getAxiomAsTaclet(Services services) {
 	//abort if axiom not equational
-	if(!(originalAxiom.op() instanceof Equality
-	     && originalAxiom.sub(0).op() == target
+	if(!(originalRep.op() instanceof Equality
+	     && originalRep.sub(0).op() == target
 	     && (target.isStatic() 
-		 || originalAxiom.sub(0).sub(1).op().equals(originalSelfVar)))) {
+		 || originalRep.sub(0).sub(1).op().equals(originalSelfVar)))) {
 	    return null;
 	}
 	
 	//abort if axiom is obviously recursive (TODO: catch mutual recursion)
 	final Set<ObserverFunction> usedObservers 
 		= new HashSet<ObserverFunction>();
-	collectObserversForSort(originalAxiom.sub(1), 
+	collectObserversForSort(originalRep.sub(1), 
 			        target.isStatic() 
 			          ? target.getContainerType().getSort() 
 			          : originalSelfVar.sort(), 
@@ -291,6 +301,6 @@ public final class ClassAxiomImpl implements ClassAxiom {
     
     @Override
     public String toString() {
-	return originalAxiom.toString();
+	return originalRep.toString();
     }
 }

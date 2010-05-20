@@ -12,6 +12,7 @@ package de.uka.ilkd.key.speclang;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.rule.Taclet;
@@ -34,6 +35,11 @@ public interface ClassAxiom extends SpecificationElement {
      * axiom belongs.
      */
     public KeYJavaType getKJT();
+    
+    /**
+     * Returns the visibility of the invariant (null for default visibility)
+     */    
+    public VisibilityModifier getVisibility();
     
     /**
      * The axiom as a formula.
