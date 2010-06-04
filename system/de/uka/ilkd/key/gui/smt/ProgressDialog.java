@@ -25,6 +25,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.ListCellRenderer;
 
+import de.uka.ilkd.key.gui.IconFactory;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.smt.SMTRule;
 import de.uka.ilkd.key.smt.SMTSolver;
@@ -42,12 +43,15 @@ public class ProgressDialog extends JDialog implements ProcessLauncherListener{
 	private JPanel buttonPanel = null;
 	private JButton okButton = null;
 	private JButton cancelButton = null;
+	private JButton stopButton = null;
 	private JScrollPane scrollPane = null;
 	private JTextArea   infoText = null;
 	private SMTRule rule = null;
 	private int numberOfProcesses =0;
 	private boolean stopRunning = false;
 	private boolean applyResults = false;
+
+	
 
 		
 	public void prepare(Collection<SMTSolver> solvers, Collection<Goal> goals, SMTRule r){
@@ -58,6 +62,7 @@ public class ProgressDialog extends JDialog implements ProcessLauncherListener{
 	    DefaultListModel model = new DefaultListModel();
 	    numberOfProcesses = 0;
 	    getList().setModel(model);
+	    getStopButton().setEnabled(true);
 	    for(SMTSolver solver : solvers){
 		ProgressPanel panel =new ProgressPanel(solver,getList(),this,goals); 
 		model.addElement(panel);
@@ -65,7 +70,7 @@ public class ProgressDialog extends JDialog implements ProcessLauncherListener{
 		height += panel.necessaryPanelHeight();
 		numberOfProcesses++;
 	    }
-	    
+
 	    height += getInfoText().getPreferredSize().height+10;
 	    stopRunning = false;
 	    
@@ -233,6 +238,12 @@ public class ProgressDialog extends JDialog implements ProcessLauncherListener{
 	 */
 	private JPanel getButtonPanel() {
 		if (buttonPanel == null) {
+			GridBagConstraints gridBagConstraints3 = new GridBagConstraints();
+			gridBagConstraints3.gridx = 2;
+			gridBagConstraints3.insets = new Insets(0, 0, 0, 5);
+			gridBagConstraints3.anchor = GridBagConstraints.EAST;
+			gridBagConstraints3.weightx = 0.1;
+			gridBagConstraints3.gridy = 0;
 			GridBagConstraints gridBagConstraints5 = new GridBagConstraints();
 			gridBagConstraints5.gridx = 1;
 			gridBagConstraints5.insets = new Insets(0, 0, 0, 5);
@@ -249,8 +260,9 @@ public class ProgressDialog extends JDialog implements ProcessLauncherListener{
 			buttonPanel = new JPanel();
 			buttonPanel.setLayout(new GridBagLayout());
 			buttonPanel.setForeground(Color.green);
-			buttonPanel.add(getOkButton(), gridBagConstraints4);
-			buttonPanel.add(getCancelButton(), gridBagConstraints5);
+			buttonPanel.add(getStopButton(),gridBagConstraints3);
+			buttonPanel.add(getCancelButton(), gridBagConstraints4);
+			buttonPanel.add(getOkButton(), gridBagConstraints5);
 		}
 		return buttonPanel;
 	}
@@ -298,6 +310,23 @@ public class ProgressDialog extends JDialog implements ProcessLauncherListener{
 		return cancelButton;
 	}
 	
+	private JButton getStopButton() {
+		if (stopButton == null) {
+			stopButton = new JButton();
+			stopButton.setText("Stop");
+			stopButton.setIcon(IconFactory.autoModeStopLogo(15));
+			stopButton.addActionListener(new ActionListener() {
+			    
+			    public void actionPerformed(ActionEvent e) {
+				stopRunning = true;
+				rule.stop();
+				
+			    }
+			});
+		}
+		return stopButton;
+	}
+	
 	private void applyAndClose(){
 	    	stopRunning = true;
 		setVisible(false);	
@@ -315,10 +344,10 @@ public class ProgressDialog extends JDialog implements ProcessLauncherListener{
         // Because it is important to apply the results in the AWT-Thread, 
         // the following mechanism is introduced.
         public void workDone() {
-            
+            getStopButton().setEnabled(false);
             int mode = DecisionProcedureSettings.getInstance().getProgressDialogMode();
-	    if(mode == DecisionProcedureSettings.PROGRESS_MODE_CLOSE ||
-	       mode == DecisionProcedureSettings.PROGRESS_MODE_CLOSE_FIRST){
+	    if((mode == DecisionProcedureSettings.PROGRESS_MODE_CLOSE ||
+	       mode == DecisionProcedureSettings.PROGRESS_MODE_CLOSE_FIRST)){
 		applyResults = true;
 		setVisible(false);
 		

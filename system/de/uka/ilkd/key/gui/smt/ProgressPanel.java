@@ -4,9 +4,11 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.RenderingHints;
 import java.awt.Shape;
 import java.util.Collection;
 import java.util.Collections;
@@ -50,7 +52,8 @@ class ProgressPanel implements SMTProgressMonitor {
 	// The KeY-Colors
 	private static final Color SOLVED_COLOR = new Color(0,153,49);
 	private static final Color TIME_COLOR = new Color(0,0,98);
-	private static final Color UNKOWN_COLOR = new Color(255,255,255);
+	private static final Color UNKOWN_COLOR = Color.GRAY;
+	private static final Color UNSOLVED_COLOR = new Color(200,0,0);
 	
 	private static final int MAX_DOTS = 3;
 	
@@ -244,11 +247,17 @@ class ProgressPanel implements SMTProgressMonitor {
 	    return "";
 	}
 	
-	private String goalString(int number, SolveType type){
+	private String goalName(int number, SolveType type){
 	    String temp =number+". Goal";
-	    temp += number-1 == currentGoal ? ": "+getDotString() : number-1>currentGoal ? "" : ": "+typeToName(type);
+	    temp += number-1 == currentGoal ? ": "+getDotString() : number-1>currentGoal ? "" : ": ";
 	    return temp;
 	}
+	
+	private String goalResult(int number, SolveType type){
+            return  number-1>=currentGoal ? "" : typeToName(type);
+
+	}
+	
 	private int getStringWidth(String s){
 	    return SwingUtilities.computeStringWidth(
 		    getProgressBar().getFontMetrics(getProgressBar().getFont()),s);
@@ -270,41 +279,53 @@ class ProgressPanel implements SMTProgressMonitor {
 	
 	    Graphics gc = g.create();
 	    
-	   if(solved == SolveType.UNKOWN){
-	       gc.setColor(bar.getBackground());
-	   }else if(solved == SolveType.UNSOLVABLE){
-	       gc.setColor(Color.RED);
-	   }else {
-	       gc.setColor(SOLVED_COLOR);
-	   }
+	    Graphics2D g2 = (Graphics2D)gc;
+	    g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+	                         RenderingHints.VALUE_ANTIALIAS_ON);
+
+
+	   
+	   if(currentGoal <= number){
+		   gc.setColor(Color.WHITE);   
+	       }else{
+		   gc.setColor(bar.getBackground());
+	       }
 	   
 	   int max = bar.getMaximum();
 	   int fw = bar.getWidth() / max;
 	   
-	   String s = goalString(number+1,solved);
-	   int width = SwingUtilities.computeStringWidth(g.getFontMetrics(), s);
-	
+	   String name = goalName(number+1,solved);
+	   String result = goalResult(number+1,solved);
+	   int widthName = SwingUtilities.computeStringWidth(g.getFontMetrics(), name);
+
 	  
 	   
 	   
 	   gc.fillRect(fw*number, 0, fw, bar.getHeight()); 
 	   
-	   if(solved == SolveType.UNKOWN){
-	       gc.setColor(Color.GRAY);
-	   }else if(solved == SolveType.SOLVABLE){
-	       gc.setColor(Color.WHITE);
-	   }else {
-	       gc.setColor(Color.WHITE);
-	   }
-	   
-	  
+
+
+	       
+	       gc.setColor(Color.BLACK);
 	   
 	   Shape old = gc.getClip();
 	   
 	   gc.setClip(fw*number+1, 0+1, fw-2,bar.getHeight()-2);
-
-	   gc.drawString(s,fw*number+ (fw-width)/2 , bar.getHeight()-4);
+	   
+	   gc.drawString(name,fw*number+2 , bar.getHeight()-4);
+	 
+	   if(solved == SolveType.UNKOWN){
+	        gc.setColor(UNKOWN_COLOR);       
+	   }else if(solved == SolveType.SOLVABLE){
+	       gc.setColor(SOLVED_COLOR);
+	   }else {
+	       gc.setColor(UNSOLVED_COLOR);
+	   }
+	   
+	   gc.drawString(result,fw*number+2+widthName , bar.getHeight()-4);
+	   
 	   gc.setClip(old);
+	      gc.setColor(Color.GRAY);
 	   gc.drawRect(fw*number, 0, fw, bar.getHeight()); 
 	  
 	   gc.dispose();
