@@ -265,9 +265,9 @@ public class AccessMethodsManager {
 	for (final Sort var : usedObjectSorts) {
 	    final String sort = var.toString();
 	    // We only want Object-Types
-	    if (" jbyte jint jlong jfloat jdouble jboolean jchar ".indexOf(" "
-		    + sort + " ") == -1) {
-		if (" jbyte[] jint[] jlong[] jfloat[] jdouble[] jboolean[] jchar[] "
+	    if (" jbyte jint jlong jfloat jdouble jboolean jchar byte int long float double boolean char "
+		    .indexOf(" " + sort + " ") == -1) {
+		if (" jbyte[] jint[] jlong[] jfloat[] jdouble[] jboolean[] jchar[] byte[] int[] long[] float[] double[] boolean[] char[] "
 		        .indexOf(" " + sort + " ") != -1) {
 		    result.add(sort.substring(1));
 		} else {
