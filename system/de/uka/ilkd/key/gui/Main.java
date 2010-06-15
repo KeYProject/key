@@ -1441,6 +1441,16 @@ public class Main extends JFrame implements IMain {
         });
         registerAtMenu(proof, statisticsInfo);
         
+        JMenuItem keyMgtItem = 
+	    new JMenuItem("Show Dependencies (key-mgt.ps)");
+        keyMgtItem.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                mediator.getServices().getSpecificationRepository().
+		    drawGraph(mediator.getProof());
+            }});
+        registerAtMenu(proof, keyMgtItem);
+
+
         final JMenuItem typeHierInfo = new JMenuItem("Show Known Types");
         typeHierInfo.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {

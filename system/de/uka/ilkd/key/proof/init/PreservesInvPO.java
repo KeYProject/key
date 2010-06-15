@@ -87,6 +87,11 @@ public class PreservesInvPO extends EnsuresPO {
         return super.equals(po)
                && ensuredInvs.equals(po.ensuredInvs);
     }
+    
+
+    public ImmutableSet<ClassInvariant> getInvs() {
+        return ensuredInvs;
+    }
 
 
     public int hashCode() {

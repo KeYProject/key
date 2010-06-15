@@ -196,6 +196,7 @@ class ClassTree extends JTree {
     private static DefaultMutableTreeNode createTree(boolean addOperations,
 	    					     boolean skipLibraryClasses,
 	    					     Services services) {
+
 	//get all classes
 	final Set<KeYJavaType> kjts 
 		= services.getJavaInfo().getAllKeYJavaTypes();
