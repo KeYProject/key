@@ -74,7 +74,7 @@ public class MgtGraph {
         gv.addln(proofRank+"}");
         gv.addln(specRank+"}");
 	gv.addln(gv.end_graph());
-	System.out.println(gv.getDotSource());
+//	System.out.println(gv.getDotSource());
 	java.io.File out = new java.io.File("key-mgt.ps");
 	gv.writeGraphToFile(gv.getGraph(gv.getDotSource()), out);
     }
@@ -183,7 +183,7 @@ public class MgtGraph {
 	    return "\""+((ClassInvariant)o).getDisplayName().
 	        replace("class invariant","inv")+"\"";
 	else if (o instanceof KeYJavaType) 
-	    return ((KeYJavaType)o).getName();
+	    return "\""+((KeYJavaType)o).getName()+"\"";
 	else if (o instanceof ProofOblInput)
 	    return "\""+((ProofOblInput)o).name().
 	        replace(", JML normal_behavior operation contract","")+"\"";

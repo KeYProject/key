@@ -575,10 +575,15 @@ public class SpecificationRepository {
     
     private File getFile(KeYJavaType kjt) throws IOException {
         KeYRecoderMapping r2k =services.getJavaInfo().rec2key();
-        recoder.java.declaration.ClassDeclaration cd =
-            (recoder.java.declaration.ClassDeclaration)r2k.toRecoder(kjt);
+        recoder.java.declaration.TypeDeclaration td =
+            (recoder.java.declaration.TypeDeclaration)r2k.toRecoder(kjt);
+        recoder.java.NonTerminalProgramElement parent = td;
+        do {            
+            parent = parent.getASTParent();
+        } while (!(parent instanceof recoder.java.CompilationUnit)&&
+                 parent!=null);
         recoder.java.CompilationUnit cu = 
-            (recoder.java.CompilationUnit) cd.getParent();
+            (recoder.java.CompilationUnit) parent;
         recoder.io.DataFileLocation loc =
             (recoder.io.DataFileLocation) cu.getDataLocation();
         return loc.getFile().getCanonicalFile();
