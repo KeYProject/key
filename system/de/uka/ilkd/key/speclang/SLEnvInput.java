@@ -122,7 +122,6 @@ public final class SLEnvInput extends AbstractEnvInput {
         button.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 dialog.setVisible(false);
-                dialog.dispose();
             }
         });
         Dimension buttonDim = new Dimension(100, 27);
@@ -148,6 +147,7 @@ public final class SLEnvInput extends AbstractEnvInput {
         dialog.setSize(700, 300);
         dialog.setLocationRelativeTo(Main.getInstance());
         dialog.setVisible(true);
+        dialog.dispose();
     }
     
     
