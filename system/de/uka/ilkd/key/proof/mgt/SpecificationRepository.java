@@ -519,7 +519,10 @@ public class SpecificationRepository {
                     p.getBasicTask().getUsedSpecs().iterator();
                 while (usedSpecIt.hasNext()) {
                     OperationContract ct = usedSpecIt.next().contract();
-                    gra.addEdge(ct,p);
+                    // now some contracts are combinations
+                    Iterator<OperationContract> atomcit =
+                        splitContract(ct).iterator();
+                    while (atomcit.hasNext()) gra.addEdge(atomcit.next(),p);
                 }
 
 
