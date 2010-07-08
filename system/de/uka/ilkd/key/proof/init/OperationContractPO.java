@@ -106,13 +106,15 @@ public final class OperationContractPO extends AbstractPO
         	= specRepos.getClassAxioms(selfKJT);
         Term axiomTerm = TB.tt();
         for(ClassAxiom ax : axioms) {            
-            Taclet axiomTaclet = ax.getAxiomAsTaclet(services);            
-            if(axiomTaclet != null) {
-        	taclets = taclets.add(NoPosTacletApp.createNoPosTacletApp(
-        							axiomTaclet));
-        	initConfig.getProofEnv()
-        	          .registerRule(axiomTaclet,
-        	        	        AxiomJustification.INSTANCE);
+            ImmutableSet<Taclet> axiomTaclets = ax.getAxiomAsTaclet(services);            
+            if(axiomTaclets != null) {
+        	for(Taclet axiomTaclet : axiomTaclets) {
+            	    taclets = taclets.add(NoPosTacletApp.createNoPosTacletApp(
+            							axiomTaclet));
+            	    initConfig.getProofEnv()
+            	              .registerRule(axiomTaclet,
+            	        	            AxiomJustification.INSTANCE);
+        	}
             } else {
         	axiomTerm = TB.and(axiomTerm, ax.getAxiom(services));
             }

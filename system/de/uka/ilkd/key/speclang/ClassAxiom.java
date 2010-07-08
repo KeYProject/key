@@ -10,6 +10,7 @@
 
 package de.uka.ilkd.key.speclang;
 
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
@@ -47,7 +48,7 @@ public interface ClassAxiom extends SpecificationElement {
     public Term getAxiom(Services services);
     
     /**
-     * The axiom as a taclet.
+     * The axiom as taclet(s).
      */
-    public Taclet getAxiomAsTaclet(Services services);
+    public ImmutableSet<Taclet> getAxiomAsTaclet(Services services);
 }

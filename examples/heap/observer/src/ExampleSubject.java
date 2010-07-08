@@ -23,6 +23,7 @@ public class ExampleSubject extends Subject {
     
     /*@ public normal_behaviour
       @   assignable footprint;
+      @   ensures footprint == \old(footprint);
       @*/
     public void change() {
 	value += 981;

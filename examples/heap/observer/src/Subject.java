@@ -5,7 +5,7 @@ public abstract class Subject {
     //@ accessible \inv: footprint, observers, observers.*, \infinite_union(int i; 0 <= i && i < observers.length ? observers[i].* : \empty);    
     //@ accessible footprint: footprint;
     
-    /*@ public invariant \disjoint(footprint, \set_union(observers, observers.*));
+    /*@ public invariant \disjoint(footprint, \set_union(observers, observers[*]));
       @ public invariant (\forall int i; 0 <= i && i < observers.length; 
       @                                  observers[i].\inv 
       @                                  && observers[i].subject == this

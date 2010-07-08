@@ -46,6 +46,8 @@ public interface List {
       @   ensures \fresh(\result);
       @   ensures \result.list == this;
       @   ensures \result.pos == 0;
+      @   ensures \result.\inv;
+      @   ensures \disjoint(footprint, \result.*);
       @*/
     public /*@pure@*/ ListIterator iterator();
     
@@ -64,4 +66,12 @@ public interface List {
       @   ensures \new_elems_fresh(footprint);
       @*/
     public void remove(Object o);
+    
+    
+    /*@ public normal_behaviour 
+      @   requires l.\inv && \disjoint(footprint, l.footprint);
+      @   assignable footprint;
+      @   ensures \new_elems_fresh(\set_minus(footprint, l.footprint));
+      @*/
+    public void concatenate(List l);
 }

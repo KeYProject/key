@@ -15,7 +15,9 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
@@ -178,7 +180,7 @@ public final class RepresentsAxiom implements ClassAxiom {
     
     
     @Override
-    public Taclet getAxiomAsTaclet(Services services) {
+    public ImmutableSet<Taclet> getAxiomAsTaclet(Services services) {
 	//abort if axiom not equational
 	if(!(originalRep.op() instanceof Equality
 	     && originalRep.sub(0).op() == target
@@ -295,7 +297,7 @@ public final class RepresentsAxiom implements ClassAxiom {
 	tacletBuilder.setStateRestriction(RewriteTaclet.SAME_UPDATE_LEVEL);
 	
 	//return
-	return tacletBuilder.getTaclet();
+	return DefaultImmutableSet.<Taclet>nil().add(tacletBuilder.getTaclet());
     }    
     
     

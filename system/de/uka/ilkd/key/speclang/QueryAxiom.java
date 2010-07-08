@@ -74,7 +74,7 @@ public final class QueryAxiom implements ClassAxiom {
     
     
     @Override
-    public Taclet getAxiomAsTaclet(Services services) {
+    public ImmutableSet<Taclet> getAxiomAsTaclet(Services services) {
 	final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
 	
 	//create schema variables
@@ -216,7 +216,7 @@ public final class QueryAxiom implements ClassAxiom {
 	tacletBuilder.setName(new Name(name));
 	tacletBuilder.addRuleSet(new RuleSet(new Name("simplify")));
 	
-	return tacletBuilder.getTaclet();
+	return DefaultImmutableSet.<Taclet>nil().add(tacletBuilder.getTaclet());
     }    
     
     

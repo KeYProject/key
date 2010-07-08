@@ -10,7 +10,9 @@
 
 package de.uka.ilkd.key.speclang;
 
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
@@ -19,6 +21,7 @@ import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.rule.AntecTacletBuilder;
+import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletGoalTemplate;
@@ -92,42 +95,77 @@ public final class PartialInvAxiom implements ClassAxiom {
     
     
     @Override
-    public Taclet getAxiomAsTaclet(Services services) {
-	//instantiate axiom with schema variables
-	final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
-	final SchemaVariable heapSV 
-		= SchemaVariableFactory.createTermSV(new Name("h"), 
-						     heapLDT.targetSort(), 
-						     false, 
-						     false);
-	final SchemaVariable selfSV
-		= target.isStatic()
-		  ? null
-	          : SchemaVariableFactory.createTermSV(new Name("self"), 
-						       inv.getKJT().getSort());
-	final Term schemaAxiom 
-		= OpReplacer.replace(TB.heap(services), 
-				     TB.var(heapSV), 
-				     inv.getInv(selfSV, services));
+    public ImmutableSet<Taclet> getAxiomAsTaclet(Services services) {
+	ImmutableSet<Taclet> result = DefaultImmutableSet.<Taclet>nil();
 	
-	//create added sequent
-	final ConstrainedFormula addedCf = new ConstrainedFormula(schemaAxiom);	    
-	final Semisequent addedSemiSeq 
-	    	= Semisequent.EMPTY_SEMISEQUENT.insertFirst(addedCf)
-	    	                               .semisequent();
-	final Sequent addedSeq = Sequent.createAnteSequent(addedSemiSeq);	
+	for(int i = 0; i < 2; i++) {
+	    //instantiate axiom with schema variables
+	    final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+	    final SchemaVariable heapSV 
+	    	= SchemaVariableFactory.createTermSV(new Name("h"), 
+	    				             heapLDT.targetSort(), 
+	    				             false, 
+	    				             false);
+	    final SchemaVariable selfSV 
+	    	= target.isStatic()
+	    	  ? null
+		  : SchemaVariableFactory.createTermSV(new Name("self"), 
+			    			       inv.getKJT().getSort());
+	    final SchemaVariable eqSV 
+	    	= target.isStatic()
+	    	  ? null
+		  : SchemaVariableFactory.createTermSV(
+			  		new Name("EQ"), 
+			    		services.getJavaInfo().objectSort());	    
+	    final Term schemaAxiom 
+	    	= OpReplacer.replace(TB.heap(services), 
+	    			     TB.var(heapSV), 
+	    			     inv.getInv(selfSV, services));
 
-	//create taclet
-	final AntecTacletBuilder tacletBuilder = new AntecTacletBuilder();
-	tacletBuilder.setFind(TB.inv(services, TB.var(heapSV), TB.var(selfSV)));
-	tacletBuilder.addTacletGoalTemplate(
-			new TacletGoalTemplate(addedSeq,
-					       ImmutableSLList.<Taclet>nil()));
-	tacletBuilder.setName(new Name("Partial inv axiom for " + inv.getName()));
-	tacletBuilder.addRuleSet(new RuleSet(new Name("inReachableStateImplication")));
+	    //create added sequent
+	    final ConstrainedFormula addedCf = new ConstrainedFormula(schemaAxiom);	    
+	    final Semisequent addedSemiSeq 
+	    	= Semisequent.EMPTY_SEMISEQUENT.insertFirst(addedCf) 
+	    	                               .semisequent();
+	    final Sequent addedSeq = Sequent.createAnteSequent(addedSemiSeq);	
+
+	    //create taclet
+	    final AntecTacletBuilder tacletBuilder = new AntecTacletBuilder();
+	    tacletBuilder.setFind(TB.inv(services, 
+		    		  TB.var(heapSV), 
+		    		  i == 0 ? TB.var(selfSV) : TB.var(eqSV)));
+	    tacletBuilder.addTacletGoalTemplate(
+		    new TacletGoalTemplate(addedSeq,
+			    ImmutableSLList.<Taclet>nil()));
+	    tacletBuilder.setName(new Name("Partial inv axiom for " 
+		    			   + inv.getName()
+		    			   + (i == 0 ? "" : " EQ")));
+	    tacletBuilder.addRuleSet(
+		    	new RuleSet(new Name("inReachableStateImplication")));
+	    
+	    //\assumes(self = EQ ==>)
+	    if(i == 1) {
+		assert !target.isStatic();
+		final Term ifFormula = TB.equals(TB.var(selfSV), TB.var(eqSV));
+		final ConstrainedFormula ifCf 
+			= new ConstrainedFormula(ifFormula);
+		final Semisequent ifSemiSeq 
+		    	= Semisequent.EMPTY_SEMISEQUENT.insertFirst(ifCf)
+		                                       .semisequent();
+		final Sequent ifSeq = Sequent.createAnteSequent(ifSemiSeq);
+		tacletBuilder.setIfSequent(ifSeq);
+	    }
+	    
+	    result = result.add(tacletBuilder.getTaclet());
+	    
+	    //EQ taclet only for non-static invariants
+	    if(target.isStatic()) {
+		break;
+	    }
+	}
 	
 	//return
-	return tacletBuilder.getTaclet();
+	return result;
     }
     
     

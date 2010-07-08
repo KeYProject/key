@@ -529,13 +529,11 @@ public final class SpecificationRepository {
 	//get visible registered axioms of other classes
 	ImmutableSet<ClassAxiom> result = getVisibleAxiomsOfOtherClasses(kjt);	
 	
-	//add registered axioms of own class (except partial inv axioms)
+	//add registered axioms of own class
 	ImmutableSet<ClassAxiom> ownAxioms = axioms.get(kjt);
 	if(ownAxioms != null) {
 	    for(ClassAxiom ax : ownAxioms) {
-		if(!(ax instanceof PartialInvAxiom)) {
-		    result = result.add(ax);
-		}
+		result = result.add(ax);
 	    }
 	}
 	

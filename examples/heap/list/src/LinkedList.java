@@ -92,6 +92,11 @@ final class LinkedList implements List {
 	//TODO
     }
     
+    
+    public void concatenate(List l) {
+	//TODO
+    }    
+    
         
     //interactive proofs:
     //-footprint (apply reachDependenciesChangeHeapAtLocs)
@@ -100,4 +105,5 @@ final class LinkedList implements List {
     //not yet verified: 
     //-add
     //-contains
+    //-some depends clauses
 }

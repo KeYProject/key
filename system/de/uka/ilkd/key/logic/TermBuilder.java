@@ -503,7 +503,8 @@ public final class TermBuilder {
     
     
     public Term instance(Services services, Sort s, Term t) {
-	return func(s.getInstanceofSymbol(services), t);
+	return equals(func(s.getInstanceofSymbol(services), t),
+		      TRUE(services));
     }
     
     

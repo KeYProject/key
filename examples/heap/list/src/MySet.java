@@ -97,6 +97,7 @@ public class MySet {
     //-add (relatively obvious quantifier instantiations [self.list.size()])
     //-contains (obvious quantifier instantiation)
     //-remove (manual case split before applying method contract)
+    //-\inv (obvious quantifier instantiations)
     
     //not yet verified:
     //-addAll

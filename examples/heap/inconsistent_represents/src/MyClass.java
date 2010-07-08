@@ -1,6 +1,4 @@
 class MyClass {
-    //@ invariant !\inv;
-    
     //@ model int size;
     //@ represents size = size + 1;
     

@@ -8,6 +8,7 @@
 ./heap/information_flow/UpdateAbstraction_ex9_secure.key
 ./heap/list/ArrayList_add.key
 ./heap/list/ArrayList_ArrayList.key
+./heap/list/ArrayList_concatenate.key
 ./heap/list/ArrayList_contains_dep.key
 ./heap/list/ArrayList_enlarge.key
 ./heap/list/ArrayList_footprint.key
@@ -21,14 +22,19 @@
 ./heap/list/ArrayList.ArrayListIterator_ArrayListIterator.key
 ./heap/list/ArrayList.ArrayListIterator_hasNext_dep.key
 ./heap/list/ArrayList.ArrayListIterator_hasNext.key
+./heap/list/ArrayList.ArrayListIterator_inv.key
+./heap/list/ArrayList.ArrayListIterator_list.key
 ./heap/list/ArrayList.ArrayListIterator_next_exceptional.key
 ./heap/list/ArrayList.ArrayListIterator_next_normal.key
+./heap/list/ArrayList.ArrayListIterator_pos.key
 ./heap/list/Client_m.key
 ./heap/list/Client_n.key
 ./heap/list/LinkedList_get_exceptional.key
 ./heap/list/LinkedList_get_normal.key
 ./heap/list/LinkedList_LinkedList.key
+./heap/list/LinkedList_size_dep.key
 ./heap/list/LinkedList_size.key
+./heap/list/MySet_footprint.key
 ./heap/list/MySet_MySet.key
 ./heap/list_ghost/ArrayList_add.key
 ./heap/list_ghost/ArrayList_ArrayList.key
