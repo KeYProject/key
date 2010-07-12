@@ -234,6 +234,9 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                              longConst ( 200 ), longConst ( -100 ) ) ) );
                 
         
+        bindRuleSet (d, "simplify_prog_subset",	longConst(-9000));
+        bindRuleSet (d, "modal_tautology",	longConst(-10000));
+        
         // features influenced by the strategy options
         
         boolean useLoopExpand = strategyProperties.getProperty(
