@@ -10,27 +10,37 @@
 
 package de.uka.ilkd.key.proof.mgt;
 
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
+import java.io.File;
+import java.io.IOException;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.KeYRecoderMapping;
+import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.JavaModel;
 import de.uka.ilkd.key.proof.init.EnsuresPO;
+import de.uka.ilkd.key.proof.init.EnsuresPostPO;
+import de.uka.ilkd.key.proof.init.PreservesInvPO;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.speclang.ClassInvariant;
 import de.uka.ilkd.key.speclang.LoopInvariant;
 import de.uka.ilkd.key.speclang.OperationContract;
 import de.uka.ilkd.key.speclang.SignatureVariablesFactory;
+import de.uka.ilkd.key.java.declaration.ClassDeclaration;
+import de.uka.ilkd.key.java.declaration.InterfaceDeclaration;
+import de.uka.ilkd.key.java.declaration.TypeDeclaration;
+import de.uka.ilkd.key.java.recoderext.ConstructorNormalformBuilder;
 
 
 public class SpecificationRepository {
@@ -421,4 +431,166 @@ public class SpecificationRepository {
 	strictPurityCache.put(pm, result);
 	return result;
     }
+    
+    
+    public void drawGraph(Proof currentProof) {
+        MgtGraph gra = new MgtGraph();
+        dirtyFiles = null; //clear last time's dirtiness cache
+
+	//get all classes
+	final Set<KeYJavaType> kjts 
+		= services.getJavaInfo().getAllKeYJavaTypes();
+	Iterator<KeYJavaType> it = kjts.iterator();
+	while(it.hasNext()) {
+	    KeYJavaType kjt = it.next();
+	    if(!(kjt.getJavaType() instanceof ClassDeclaration 
+		 || kjt.getJavaType() instanceof InterfaceDeclaration) 
+	       || ((TypeDeclaration) kjt.getJavaType()).isLibraryClass()) {
+	        it.remove();
+            }
+        }
+	it = kjts.iterator();
+	while(it.hasNext()) {
+	    KeYJavaType kjt = it.next();
+            String dirty = isDirty(kjt,currentProof) ? "style=dashed" : "";
+
+	    StringBuffer methods = new StringBuffer();
+            ImmutableList<ProgramMethod> pms 
+            	= services.getJavaInfo()
+                          .getAllProgramMethodsLocallyDeclared(kjt);
+            for (ProgramMethod pm : pms) {
+                if ((!pm.isImplicit() || pm.getName().equals(
+		    ConstructorNormalformBuilder.
+			CONSTRUCTOR_NORMALFORM_IDENTIFIER))
+                        && pm.getMethodDeclaration().getBody() != null) {
+
+		    if (methods.length()>0) methods.append(" | ");
+		    methods.append(gra.recordLabel(pm));
+
+		    // now the contracts
+		    Iterator<OperationContract> cit = 
+		        getOperationContracts(pm).iterator();
+		    while (cit.hasNext()) { 
+                        OperationContract ct = cit.next();
+                        gra.addNode(pm,dirty);
+                        gra.addEdge(pm,ct);
+		    }
+
+                }
+            }
+
+            gra.addNode(kjt, "shape=record",
+                "label="+gra.recordLabel(kjt)+"| {"+methods+"}",dirty);
+
+            // class invs
+	    Iterator<ClassInvariant> iit =
+		getClassInvariants(kjt).iterator();
+	    while (iit.hasNext()) {
+                ClassInvariant inv = iit.next();
+                gra.addEdge(kjt,inv);
+	    }
+	}
+
+
+        //POs
+	for(Map.Entry<ProofOblInput,ImmutableSet<Proof>> entry : proofs.entrySet()) {
+	    ProofOblInput po = entry.getKey();
+            gra.addNode(po, "shape=parallelogram");
+            ImmutableSet<Proof> sop = entry.getValue();
+	    if(po instanceof EnsuresPO) {
+		ProgramMethod pm = ((EnsuresPO)po).getProgramMethod();
+	        if(po instanceof EnsuresPostPO) {
+                    gra.addEdge(((EnsuresPostPO)po).getContract(), po);
+	        }
+	        if(po instanceof PreservesInvPO) {
+                    ImmutableSet<ClassInvariant> invs = 
+                        ((PreservesInvPO)po).getInvs();
+                    for (ClassInvariant i : invs) {
+                        gra.addEdge(i, po);
+                        gra.addEdge(pm, po);
+                    }
+	        }
+	    }
+            for (Proof p: sop) {
+                gra.addNode(p, "label="+gra.label(p),"shape=house", 
+                    p.closed() ? "color=green" : "");
+                gra.addEdge(p, po, "style=dotted");
+                Iterator<ContractWithInvs> usedSpecIt = 
+                    p.getBasicTask().getUsedSpecs().iterator();
+                while (usedSpecIt.hasNext()) {
+                    OperationContract ct = usedSpecIt.next().contract();
+                    // now some contracts are combinations
+                    Iterator<OperationContract> atomcit =
+                        splitContract(ct).iterator();
+                    while (atomcit.hasNext()) gra.addEdge(atomcit.next(),p);
+                }
+
+
+            }
+	}
+        gra.visualize();
+    }
+    
+    
+    private Set<File> dirtyFiles;
+    
+    private boolean isDirty(KeYJavaType kjt, Proof currentProof) {
+	try{
+            if (dirtyFiles == null) buildDirtyFileCache(currentProof);
+            return dirtyFiles.contains(getFile(kjt));
+	} catch(CvsException cvse) {
+            System.err.println(cvse);
+            dirtyFiles = null;
+            return true;
+//	    Logger.getLogger("key.proof.mgt").
+//                error("Dumping Model into CVS failed: "+cvse);
+	} catch(IOException ioe) {
+            System.err.println(ioe);
+            dirtyFiles = null;
+            return true;
+        }
+    }
+
+    
+    private void buildDirtyFileCache(Proof currentProof) 
+                                        throws CvsException, IOException {
+        String tempTag = "KeY_MGT_"+new Long((new java.util.Date()).getTime());
+        JavaModel jModel = currentProof.getJavaModel();
+        CvsRunner cvs = new CvsRunner();
+        boolean importOK =
+	    cvs.cvsImport(jModel.getCVSModule(), jModel.getModelDir(),
+		          System.getProperty("user.name"), tempTag);
+        if (!importOK) throw new CvsException(
+            "Import of temp model failed for\n"+jModel);
+        String diff = cvs.cvsDiff(jModel.getCVSModule(),
+			          jModel.getModelTag(),
+			          tempTag);
+        System.out.println(diff);
+        Pattern p = Pattern.compile("^Index: "+jModel.getCVSModule()+
+            ".(.*?java)$", Pattern.MULTILINE);
+        Matcher m = p.matcher(diff);
+        dirtyFiles = new HashSet();
+        while (m.find()) {
+            dirtyFiles.add(new File(m.group(1)).getCanonicalFile());
+        }
+    }
+
+    
+    private File getFile(KeYJavaType kjt) throws IOException {
+        KeYRecoderMapping r2k =services.getJavaInfo().rec2key();
+        recoder.java.declaration.TypeDeclaration td =
+            (recoder.java.declaration.TypeDeclaration)r2k.toRecoder(kjt);
+        recoder.java.NonTerminalProgramElement parent = td;
+        do {            
+            parent = parent.getASTParent();
+        } while (!(parent instanceof recoder.java.CompilationUnit)&&
+                 parent!=null);
+        recoder.java.CompilationUnit cu = 
+            (recoder.java.CompilationUnit) parent;
+        recoder.io.DataFileLocation loc =
+            (recoder.io.DataFileLocation) cu.getDataLocation();
+        return loc.getFile().getCanonicalFile();
+    }
+
+    
 }

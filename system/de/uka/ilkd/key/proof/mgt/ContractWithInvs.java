@@ -111,6 +111,18 @@ public class ContractWithInvs {
                + "</html>";
     }
     
+
+    public OperationContract contract() {
+    	return contract;
+    }
+    
+    public ImmutableSet<ClassInvariant> assumedInvs() {
+        return assumedInvs;
+    }
+    
+    public ImmutableSet<ClassInvariant> ensuredInvs() {
+        return ensuredInvs;
+    }
     
     
     public String toString() {

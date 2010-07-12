@@ -52,10 +52,13 @@ public abstract  class ProcessLauncher  implements ProcessListener, Runnable{
 		cancel = false;
 	}
 	
-	protected synchronized void cancelMe(){
+	protected synchronized void cancelMe(boolean user){
 	        cancel = true;
 	    	for(ProcessLaunch launch : running){
 	    	    launch.stop();
+	    	    if(user){
+	    	      publish(new Event(this,launch,Event.Type.USER_INTERRUPTION));
+	    	    }
 	    	}
 	    	running.clear();
 		
@@ -171,7 +174,7 @@ public abstract  class ProcessLauncher  implements ProcessListener, Runnable{
 	
 	
 	private void runningIsEmpty(){
-		cancelMe();
+		cancelMe(false);
 		
 	}
 	
@@ -189,7 +192,9 @@ public abstract  class ProcessLauncher  implements ProcessListener, Runnable{
 
 	
 	public void eventException(Process p, Exception e) {
-	    	ProcessLaunch launch = findLaunch(p);
+	     p.stop();	
+	    ProcessLaunch launch = findLaunch(p);
+	    	
 			
 		publish(new Event(this,launch,Event.Type.PROCESS_EXCEPTION,e));
 	
@@ -230,7 +235,7 @@ public abstract  class ProcessLauncher  implements ProcessListener, Runnable{
 			
 			
 		}
-		cancelMe();
+		cancelMe(false);
 		publish(new Event(this, null,Event.Type.WORK_DONE));
 		
 

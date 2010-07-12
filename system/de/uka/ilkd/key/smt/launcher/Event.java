@@ -23,7 +23,7 @@ public class Event {
             /**
              * After interrupting the process. 
              */
-            PROCESS_INTERRUPTION,
+            USER_INTERRUPTION,
             /**
              * The process has been destroyed.
              */

@@ -46,6 +46,7 @@ import de.uka.ilkd.key.smt.SMTSolverResult;
 import de.uka.ilkd.key.smt.SimplifySolver;
 import de.uka.ilkd.key.smt.YicesSolver;
 import de.uka.ilkd.key.smt.Z3Solver;
+import de.uka.ilkd.key.smt.SMTSolverResult.ThreeValuedTruth;
 import de.uka.ilkd.key.util.Debug;
 
 
@@ -485,7 +486,14 @@ public class SMTResultsAndBugDetectionDialog extends JFrame {
 	}
 	
 	public String toString(){
-	    return ""+ r.isValid();
+	    String result = "unknown";
+	    if(r.isValid() == ThreeValuedTruth.FALSIFIABLE){
+		result = "unsolvable";
+	    }
+	    if(r.isValid() == ThreeValuedTruth.TRUE){
+		result = "solvable";
+	    }
+	    return result;
 	}
     }
 

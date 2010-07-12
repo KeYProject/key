@@ -80,7 +80,7 @@ class BuiltInRuleAppSMT extends BuiltInRuleApp{
  */
 public class SMTRule  extends ProcessLauncher implements BuiltInRule{
 
-    
+	private enum Status {USER_INTERRUPTION,EXCEPTION,NORMAL,TIME,RUNNING};
     
 
     /**Used for consistency.*/
@@ -99,6 +99,8 @@ public class SMTRule  extends ProcessLauncher implements BuiltInRule{
     private final boolean 	   multiRule;
     
     private final boolean background;
+    
+
 
     
     
@@ -194,7 +196,7 @@ public class SMTRule  extends ProcessLauncher implements BuiltInRule{
 
     /** Interrupts the current execution of the solvers. */
     public void stop(){
-	this.cancelMe();
+	this.cancelMe(true);
     }
     
     private void prepareSolvers(LinkedList<InternResult> terms, Services services, Collection<Taclet> taclets){
@@ -530,15 +532,35 @@ public class SMTRule  extends ProcessLauncher implements BuiltInRule{
 	return ((double)temp)/Math.pow(10, digits);
     }
     
-    private void showTimeStatus(SMTProgressMonitor mon, long time, long maxTime, boolean finished){
-	
+    private void showTimeStatus(SMTProgressMonitor mon, long time, long maxTime,  
+	    Status interrupt){
+	String text="";
 	double t = cut(((double)time)/1000,1);
+	String ts = t+ " sec.";
+	switch(interrupt){
+	case EXCEPTION:
+	    text = "Interrupted by exception after " + ts;
+	    break;
+	case NORMAL:
+	    text = "Stopped after "+ ts;
+	    break;
+	    
+	case RUNNING:
+	    text = ts;
+	    break;
+	case TIME:
+	    text = "Timeout after "+ ts;
+	    break;
+	    
+	case USER_INTERRUPTION:
+	    text = "Interrupted by user after "+ ts;
+	    break;
 	
-	String s = (finished ? "Stopped after " : "") +t+" sec.";
-	if(finished){
+	}
+	if(interrupt!= Status.RUNNING){
 	    mon.setFinished();
 	}
-	mon.setTimeProgress(s, getCurrentProgress(time, maxTime));
+	mon.setTimeProgress(text, getCurrentProgress(time, maxTime));
     }
     
  
@@ -576,7 +598,7 @@ public class SMTRule  extends ProcessLauncher implements BuiltInRule{
 	     monitor.setGoalMaximum(process.getMaxCycle());
 	     break;
 	 case PROCESS_STATUS:
-	     showTimeStatus(monitor,runningTime ,launcher.getMaxTime(), false);
+	     showTimeStatus(monitor,runningTime ,launcher.getMaxTime(), Status.RUNNING);
 	     break;
 
 	 case PROCESS_CYCLE_FINISHED:
@@ -596,20 +618,26 @@ public class SMTRule  extends ProcessLauncher implements BuiltInRule{
 	     if(background){
 		 throw new RuntimeException(e.getException());
 	     }else{
+		
 	     monitor.exceptionOccurred("Error while executing " + process.getTitle()+"."
 		     ,e.getException());
+	        showTimeStatus(monitor,launch.usedTime(),launcher.getMaxTime(), Status.EXCEPTION);
 	     }
 	     break;
 	 
 	 
 	 case INTERRUP_PROCESS:
-	      showTimeStatus(monitor,launcher.getMaxTime(),launcher.getMaxTime(), true);
+	
+	      showTimeStatus(monitor,launcher.getMaxTime(),launcher.getMaxTime(), Status.TIME);
 	      
 	      break;
 	case PROCESS_FINISHED:
-	     showTimeStatus(monitor,launch.usedTime() ,launcher.getMaxTime(), true);
+	
+	     showTimeStatus(monitor,launch.usedTime() ,launcher.getMaxTime(), Status.NORMAL);
 	     break;
-
+	case USER_INTERRUPTION:
+	     showTimeStatus(monitor,launch.usedTime() ,launcher.getMaxTime(), Status.USER_INTERRUPTION);
+	     break;
 	 
 	     
 	 default:

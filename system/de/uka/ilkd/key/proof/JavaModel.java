@@ -75,4 +75,9 @@ public class JavaModel {
 	return getModelTag().hashCode();
     }
     
+    public String toString() {
+        return "---Program model---\nModel dir: "+modelDir+
+	    "\nModel tag: "+modelTag+"\nDescription: "+descr;
+    }
+    
 }

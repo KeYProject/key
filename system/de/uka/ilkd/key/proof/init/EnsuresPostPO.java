@@ -174,4 +174,9 @@ public class EnsuresPostPO extends EnsuresPO {
     public int hashCode() {
         return super.hashCode() + contract.hashCode();
     }
+    
+
+    public OperationContract getContract() {
+        return contract;
+    }
 }
