@@ -52,19 +52,19 @@ java/util/Map.java
 java/util/Set.java
 java/io/IOException.java
 java/io/Serializable.java
-javax/realtime/IllegalAssignmentError.java
-javax/realtime/ImmortalMemory.java
-javax/realtime/InaccessibleAreaException.java
-javax/realtime/LTMemory.java
-javax/realtime/MemoryArea.java
-javax/realtime/MemoryStack.java
-javax/realtime/PhysicalMemoryArea.java
-javax/realtime/RealtimeSystem.java
-javax/realtime/SizeEstimator.java
-javax/realtime/ScopedMemory.java
-javax/realtime/ScopedCycleException.java
-javax/realtime/ThrowBoundaryError.java
-javax/realtime/VTMemory.java
+rtsjperc/javax/realtime/IllegalAssignmentError.java
+rtsjperc/javax/realtime/ImmortalMemory.java
+rtsjperc/javax/realtime/InaccessibleAreaException.java
+rtsjperc/javax/realtime/LTMemory.java
+rtsjperc/javax/realtime/MemoryArea.java
+rtsjperc/javax/realtime/MemoryStack.java
+rtsjperc/javax/realtime/PhysicalMemoryArea.java
+rtsjperc/javax/realtime/RealtimeSystem.java
+rtsjperc/javax/realtime/SizeEstimator.java
+rtsjperc/javax/realtime/ScopedMemory.java
+rtsjperc/javax/realtime/ScopedCycleException.java
+rtsjperc/javax/realtime/ThrowBoundaryError.java
+rtsjperc/javax/realtime/VTMemory.java
 
 
 junit/framework/Test.java

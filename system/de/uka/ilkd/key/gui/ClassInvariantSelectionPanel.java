@@ -19,18 +19,22 @@ import java.util.Set;
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
-import javax.swing.event.*;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import javax.swing.event.TreeSelectionEvent;
+import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
 
-import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.proof.init.*;
+import de.uka.ilkd.key.proof.init.Profile;
+import de.uka.ilkd.key.proof.init.RTSJProfile;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
-import de.uka.ilkd.key.speclang.*;
+import de.uka.ilkd.key.speclang.ClassInvariant;
 
 
 /**
@@ -254,7 +258,7 @@ class ClassInvariantSelectionPanel extends JPanel {
             selectAllForClass(defaultClass);
             Profile prof = services.getProof()!=null ? services.getProof().getSettings().getProfile() :
                 ProofSettings.DEFAULT_SETTINGS.getProfile();
-            if(prof instanceof RTSJProfile || prof instanceof PercProfile){
+            if(prof instanceof RTSJProfile){
                 addAllRealtimeInvs();
             }
         }

@@ -41,6 +41,12 @@ class JavaReduxFileCollection implements FileCollection {
     private static String JAVA_SRC_DIR = "JavaRedux";
 
     /**
+     * The resource location
+     */
+    private String resourceLocation;
+
+    
+    /**
      * This list stores all resources to be retrieved. It is fed by the
      * constructor.
      */
@@ -57,14 +63,19 @@ class JavaReduxFileCollection implements FileCollection {
      */
     public JavaReduxFileCollection() throws IOException {
 
-        String resourceString = JAVA_SRC_DIR
-                + "/"
-                + ProofSettings.DEFAULT_SETTINGS.getProfile()
-                        .getInternalClasslistFilename();
+	resourceLocation = JAVA_SRC_DIR
+	        + "/"
+	        + ProofSettings.DEFAULT_SETTINGS.getProfile()
+	                .getInternalClassDirectory();
 
-        URL jlURL = KeYResourceManager.getManager().getResourceFile(
-                Recoder2KeY.class, resourceString);
+	String resourceString = resourceLocation
+	        + "/"
+	        + ProofSettings.DEFAULT_SETTINGS.getProfile()
+	                .getInternalClasslistFilename();
 
+	URL jlURL = KeYResourceManager.getManager().getResourceFile(
+	        Recoder2KeY.class, resourceString);
+	
         if (jlURL == null) {
             throw new FileNotFoundException("Resource " + resourceString
                     + " cannot be opened.");
@@ -118,7 +129,7 @@ class JavaReduxFileCollection implements FileCollection {
      * The Class Walker wraps a string iterator and creates URL, streams and
      * DataLocation elements on demand.
      */
-    private static class Walker implements FileCollection.Walker {
+    private class Walker implements FileCollection.Walker {
 
         /**
          * The iterator to wrap, it iterates the resources to open.
@@ -162,7 +173,8 @@ class JavaReduxFileCollection implements FileCollection {
                 throw new NoSuchElementException();
 
             if (currentURL == null) {
-                throw new FileNotFoundException("cannot find " + JAVA_SRC_DIR
+                throw new FileNotFoundException("cannot find "  
+                	+ resourceLocation 
                         + "/" + current);
             }
 
@@ -180,7 +192,7 @@ class JavaReduxFileCollection implements FileCollection {
 
             // may be null!
             currentURL = KeYResourceManager.getManager().getResourceFile(
-                    Recoder2KeY.class, JAVA_SRC_DIR + "/" + current);
+                    Recoder2KeY.class, resourceLocation + "/" + current);
 
             return true;
         }

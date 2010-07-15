@@ -289,10 +289,6 @@ public abstract class EnsuresPO extends AbstractPO {
         Catch catchStat = new Catch(excDecl, new StatementBlock(assignStat));
         Try tryStat = new Try(sb, new Branch[]{catchStat});
         sb = new StatementBlock(new Statement[]{nullStat, tryStat});
-        if(ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof PercProfile){
-            sb = new StatementBlock(new MethodFrame(null, 
-                    services.getJavaInfo().getDefaultExecutionContext(), sb));
-        }
         //create java block
         JavaBlock result = JavaBlock.createJavaBlock(sb);
 

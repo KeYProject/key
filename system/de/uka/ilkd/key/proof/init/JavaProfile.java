@@ -125,7 +125,6 @@ public class JavaProfile extends AbstractProfile {
         ChoiceSettings cs = settings.getChoiceSettings();
         HashMap<String, String> dcs = cs.getDefaultChoices();
         dcs.put("rtsj", "rtsj:off");
-        dcs.put("perc", "perc:off");
         cs.setDefaultChoices(dcs);
     }
 

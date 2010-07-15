@@ -10,7 +10,6 @@
 // 
 package de.uka.ilkd.key.java.recoderext;
 
-import java.util.Iterator;
 import java.util.List;
 
 import recoder.CrossReferenceServiceConfiguration;
@@ -25,7 +24,7 @@ import recoder.kit.ProblemReport;
 import recoder.list.generic.ASTArrayList;
 import recoder.list.generic.ASTList;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
-import de.uka.ilkd.key.proof.init.PercProfile;
+import de.uka.ilkd.key.proof.init.RTSJProfile;
 import de.uka.ilkd.key.util.Debug;
 
 
@@ -53,7 +52,6 @@ public class ImplicitFieldAdder extends RecoderModelTransformer {
     public static final String IMPLICIT_CREATED = "<created>";
    
     public static final String IMPLICIT_MEMORY_AREA = "<memoryArea>";
-    public static final String IMPLICIT_REENTRANT_SCOPE = "<reentrantScope>";
        
     public static final String IMPLICIT_SIZE = "<size>";
     
@@ -146,21 +144,17 @@ public class ImplicitFieldAdder extends RecoderModelTransformer {
         attach(createImplicitRecoderField("byte", IMPLICIT_TRANSIENT, false, false), td, 0);
 	attach(createImplicitRecoderField("boolean", IMPLICIT_INITIALIZED, false, false), td, 0);
         attach(createImplicitRecoderField("boolean", IMPLICIT_CREATED, false, false), td, 0);
-        ASTList<DeclarationSpecifier> modifiers = new ASTArrayList<DeclarationSpecifier>(1);
-        modifiers.add(new Public());
-        FieldDeclaration fd = new FieldDeclaration
-        (modifiers, new TypeReference(
-                new PackageReference(new PackageReference(new Identifier("javax")), new Identifier("realtime")),
-                new Identifier("MemoryArea")), new ImplicitIdentifier(IMPLICIT_MEMORY_AREA), null);
-        fd.makeAllParentRolesValid();
-        attach(fd, td, 0);
-	if(ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof PercProfile){
-	    fd = new FieldDeclaration
-		(modifiers, new TypeReference(
-		         new PackageReference(new PackageReference(new Identifier("javax")), new Identifier("realtime")),
-			 new Identifier("MemoryArea")), new ImplicitIdentifier(IMPLICIT_REENTRANT_SCOPE), null);
+
+	if (ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof RTSJProfile){
+	    ASTList<DeclarationSpecifier> modifiers = new ASTArrayList<DeclarationSpecifier>(1);
+
+	    modifiers.add(new Public());
+	    FieldDeclaration fd = new FieldDeclaration
+	    (modifiers, new TypeReference(
+		    new PackageReference(new PackageReference(new Identifier("javax")), new Identifier("realtime")),
+		    new Identifier("MemoryArea")), new ImplicitIdentifier(IMPLICIT_MEMORY_AREA), null);
 	    fd.makeAllParentRolesValid();
-	    attach(fd, td, 0);
+	    attach(fd, td, 0);	  
 	}
     }
     
@@ -185,8 +179,12 @@ public class ImplicitFieldAdder extends RecoderModelTransformer {
 	attach(createImplicitRecoderField("boolean", IMPLICIT_CLASS_INITIALIZED, true, true), td, 0);
 	attach(createImplicitRecoderField("boolean", IMPLICIT_CLASS_PREPARED, true, true), td, 0);
         
-        attach(createImplicitRecoderField("long", IMPLICIT_SIZE, true, true, true), td, 0);
-        attach(createImplicitRecoderField("long", IMPLICIT_EXACT_SIZE, true, true, true), td, 0);
+	if (ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof RTSJProfile){
+
+	    attach(createImplicitRecoderField("long", IMPLICIT_SIZE, true, true, true), td, 0);
+	    attach(createImplicitRecoderField("long", IMPLICIT_EXACT_SIZE, true, true, true), td, 0);
+	    
+	}
 	
 	if(td instanceof ClassDeclaration && 
 	        (td.getName()==null || 

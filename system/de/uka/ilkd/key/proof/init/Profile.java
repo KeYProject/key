@@ -98,6 +98,13 @@ public interface Profile {
      */
     void updateSettings(ProofSettings settings);
 
+    
+    /**
+     * returns the file name of the internal class directory relative to JavaRedux
+     * @return the file name of the internal class directory relative to JavaRedux
+     */
+    String getInternalClassDirectory();
+	
     /**
      * returns the file name of the internal class list
      * @return the file name of the internal class list

@@ -2679,10 +2679,7 @@ public class Main extends JFrame implements IMain {
 			index++;
 		    }
 		    ProofSettings.DEFAULT_SETTINGS.setProfile(new RTSJProfile(memory));
-		} else if (opt[index].equals("PERC")) {
-                    ProofSettings.DEFAULT_SETTINGS.setProfile(new PercProfile());
-                    System.out.println("PERC Pico extensions enabled");
-                } else if (opt[index].equals("DEPTHFIRST")) {		
+		} else if (opt[index].equals("DEPTHFIRST")) {		
 		    System.out.println("DepthFirst GoalChooser ...");
 		    Profile p = ProofSettings.DEFAULT_SETTINGS.getProfile();
 		    p.setSelectedGoalChooserBuilder(DepthFirstGoalChooserBuilder.NAME);  
@@ -2804,7 +2801,6 @@ public class Main extends JFrame implements IMain {
         System.out.println("  auto	          : start prove procedure after initialisation");
         System.out.println("  testing         : starts the prover with a simple test generation oriented user interface");
 	System.out.println(" rtsj [memory] : enables rtsj extensions (optional argument memory for enabling extensions for reasoning over memory consumption)");
-	//	System.out.println(" perc : enables PERC Pico extensions");
         System.out.println("  print_statistics <filename>" );
         System.out.println("                  : in auto mode, output nr. of rule applications and time spent");
         System.out.println("  fol             : use FOL profile (no program or update rules)");

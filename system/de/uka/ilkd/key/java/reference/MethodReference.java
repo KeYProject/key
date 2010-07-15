@@ -41,16 +41,6 @@ public class MethodReference extends JavaNonTerminalProgramElement
     */
     protected final ReferencePrefix prefix;
     
-    protected final ProgramElement scope;
-
-    public static final String LOCAL_SCOPE = "localScope";
-    
-    public static final String CALLER_SCOPE = "callerScope";
-    
-    public static final String CONSTRUCTED_SCOPE = "constructedScope";
-    
-    public static final String REENTRANT_SCOPE = "reentrantScope";
-    
     /**
      *      Name.
      */
@@ -61,86 +51,44 @@ public class MethodReference extends JavaNonTerminalProgramElement
      */
     protected final ImmutableArray<Expression> arguments;
     
-    public MethodReference(ImmutableArray<Expression> args, MethodName n, 
-			   ReferencePrefix p, String scope) {
-	this.prefix = p;
-	name = n;
-	Debug.assertTrue(name != null, "Tried to reference unnamed method.");
-	this.arguments = args;
-        if(scope == null){
-            this.scope = new ProgramElementName(LOCAL_SCOPE);
-            // this.scope = null;
-        }else{
-            Debug.assertTrue(isLegalScopeAnnotation(scope),
-                    "Unknown scope annotation.");
-            this.scope = new ProgramElementName(scope);
-        }
-	checkArguments();
-    }
-    
     public MethodReference(ExtList args, MethodName n, 
-                   ReferencePrefix p, PositionInfo pos, ProgramElement scope) {
+                   ReferencePrefix p, PositionInfo pos) {
         super(pos);
         this.prefix = p;
         name = n;
         Debug.assertTrue(name != null, "Tried to reference unnamed method.");
-        this.arguments = new ImmutableArray<Expression>((Expression[]) args.collect(Expression.class));
-        if(scope == null){
-            this.scope = new ProgramElementName(LOCAL_SCOPE);
-        }else{
-            this.scope = scope;
-        }
+        this.arguments = new ImmutableArray<Expression>((Expression[]) args.collect(Expression.class));       
     }
     
     public MethodReference(ImmutableArray<Expression> args, MethodName n, 
-            ReferencePrefix p, ProgramElement scope) {
+            ReferencePrefix p) {
         this.prefix = p;
         name = n;
         Debug.assertTrue(name != null, "Tried to reference unnamed method.");
-        this.arguments = args;
-        if(scope == null){
-            this.scope = new ProgramElementName(LOCAL_SCOPE);
-        }else{
-            this.scope = scope;
-        }
+        this.arguments = args;        
 	checkArguments();
     }
     
     public MethodReference(ImmutableArray<Expression> args, MethodName n, 
-                   ReferencePrefix p) {
-        this(args, n, p, (String) null);
-    }
-    
-    
-
-    public MethodReference(ImmutableArray<Expression> args, MethodName n, 
-			   ReferencePrefix p, PositionInfo pos, String scope) {
+			   ReferencePrefix p, PositionInfo pos) {
 	super(pos);
 	this.prefix=p;
 	name = n;
 	Debug.assertTrue(name != null, "Tried to reference unnamed method.");
-	this.arguments=args;
-        if(scope == null){
-            this.scope = new ProgramElementName(LOCAL_SCOPE);
-//            this.scope = null;
-        }else{
-            Debug.assertTrue(isLegalScopeAnnotation(scope),
-                    "Unknown scope annotation.");
-            this.scope = new ProgramElementName(scope);
-        }
+	this.arguments=args;        
 	checkArguments();
     }
 
    public MethodReference(ExtList children, MethodName n, ReferencePrefix p) {
 	this(new ImmutableArray<Expression>((Expression[]) 
 				   children.collect(Expression.class)),
-	     n, p, (PositionInfo) children.get(PositionInfo.class), (String) null);
+	     n, p, (PositionInfo) children.get(PositionInfo.class));
     }
 
      public MethodReference(ExtList children, MethodName n, ReferencePrefix p,PositionInfo pos, String scope) {
 	this(new ImmutableArray<Expression>((Expression[]) 
 				   children.collect(Expression.class)),
-	     n, p, pos, scope);
+	     n, p, pos);
     }
 
     protected void checkArguments(){
@@ -166,41 +114,6 @@ public class MethodReference extends JavaNonTerminalProgramElement
     }
     
     /**
-     * @return the scope for allocating the object returned by this method reference.
-     */
-    public ProgramElement getScope(){
-        return scope;
-    }
-    
-    /**
-     * @return true iff the returned object is allocated in the current reentrant scope
-     */
-    public boolean reentrantScope(){
-        return REENTRANT_SCOPE.equals(getScope().toString());
-    }
-    
-    /**
-     * @return true iff the returned object is allocated in the current constructed scope
-     */
-    public boolean constructedScope(){
-        return CONSTRUCTED_SCOPE.equals(getScope().toString());
-    }
-    
-    /**
-     * @return true iff the returned object is allocated in the current local scope
-     */
-    public boolean localScope(){
-        return LOCAL_SCOPE.equals(getScope().toString());
-    }
-    
-    /**
-     * @return true iff the returned object is allocated in the current caller scope
-     */
-    public boolean callerScope(){
-        return CALLER_SCOPE.equals(getScope().toString());
-    }
-
-    /**
      *      Returns the number of children of this node.
      *      @return an int giving the number of children of this node
      */
@@ -210,7 +123,6 @@ public class MethodReference extends JavaNonTerminalProgramElement
         if (prefix     != null) result++;
         if (name       != null) result++;
         if (arguments  != null) result += arguments.size();
-        if (scope  != null) result ++;
         return result;
     }
     
@@ -229,10 +141,6 @@ public class MethodReference extends JavaNonTerminalProgramElement
         }
         if (name != null) {
             if (index == 0) return name;
-            index--;
-        }
-        if (scope != null) {
-            if (index == 0) return scope;
             index--;
         }
         if (arguments != null) {
@@ -357,11 +265,6 @@ public class MethodReference extends JavaNonTerminalProgramElement
 	return signature;
     }
     
-    public static boolean isLegalScopeAnnotation(String s){
-        return s!=null && (s.equals(CALLER_SCOPE) || s.equals(CONSTRUCTED_SCOPE) ||
-                s.equals(LOCAL_SCOPE) || s.equals(REENTRANT_SCOPE));
-    }
-
     /**
      * returns the static KeYJavaType of the methods prefix
      */

@@ -12,13 +12,10 @@ package de.uka.ilkd.key.proof.init;
 
 import java.util.Map;
 
-import de.uka.ilkd.key.gui.configuration.ProofSettings;
-import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.gui.configuration.ProofSettings;
+import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.Operator;
@@ -61,8 +58,7 @@ public class EnsuresPostPO extends EnsuresPO {
     protected Term buildGeneralMemoryAssumption(ProgramVariable selfVar,
             ImmutableList<ProgramVariable> paramVars) 
         throws ProofInputException {
-	if(!(ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof PercProfile || 
-	     ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof RTSJProfile)){
+	if(!(ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof RTSJProfile)){
 	    return TB.tt();
 	}
 
@@ -79,45 +75,22 @@ public class EnsuresPostPO extends EnsuresPO {
 	    = CreatedAttributeTermFactory.INSTANCE.createCreatedAndNotNullTerm(services, t_mem);
 	result = TB.and(result, initialMemCreatedAndNotNullTerm);
 	        
-        Term workingSpace=null;
-        final ProgramVariable size = services.getJavaInfo().getAttribute(
-                "size", "javax.realtime.MemoryArea");
-        final ProgramVariable consumed = services.getJavaInfo().getAttribute(
-                "consumed", "javax.realtime.MemoryArea");
-        Function add = (Function) services.getNamespaces().functions().lookup(new Name("add"));
-        Function leq = (Function) services.getNamespaces().functions().lookup(new Name("leq")); 
         
-        if(ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof PercProfile){
-            workingSpace = contract.getCallerWorkingSpace(selfVar, toPV(paramVars), services);
-            if(contract.getProgramMethod().getMethodDeclaration().externallyConstructedScope()){
-                workingSpace = TB.func(add, workingSpace, 
-                        contract.getConstructedWorkingSpace(selfVar, toPV(paramVars), services));
-            }
-//            workingSpace = TB.var(services.getJavaInfo().
-//                    getAttribute(ImplicitFieldAdder.IMPLICIT_SIZE, contract.getProgramMethod().getKeYJavaType()));
-        }else if(ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof RTSJProfile &&
+        
+        if(ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof RTSJProfile &&
 		 ((RTSJProfile) ProofSettings.DEFAULT_SETTINGS.getProfile()).memoryConsumption() &&
 		 contract.getWorkingSpace(selfVar, toPV(paramVars), services)!=null){
-            workingSpace = contract.getWorkingSpace(selfVar, toPV(paramVars), services);
-        }
-        if(workingSpace!=null){
+            final ProgramVariable size = services.getJavaInfo().getAttribute(
+                    "size", "javax.realtime.MemoryArea");
+            final ProgramVariable consumed = services.getJavaInfo().getAttribute(
+                    "consumed", "javax.realtime.MemoryArea");
+            Function add = (Function) services.getNamespaces().functions().lookup(new Name("add"));
+            Function leq = (Function) services.getNamespaces().functions().lookup(new Name("leq")); 
+            Term workingSpace = contract.getWorkingSpace(selfVar, toPV(paramVars), services);
             result = TB.and(result, TB.func(leq, TB.func(add, TB.dot(t_mem,consumed), 
                     workingSpace), TB.dot(t_mem, size)));
         }
-        
-        if(ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof PercProfile){
-            if( !contract.getProgramMethod().isStatic()){
-                final ProgramVariable reentrantScope = services.getJavaInfo().getAttribute(
-                        ImplicitFieldAdder.IMPLICIT_REENTRANT_SCOPE, services.getJavaInfo().getJavaLangObject());
-                Term reentrantWorkingSpace = contract.getReentrantWorkingSpace(selfVar, toPV(paramVars), services);
-                Term reentCons = TB.dot(TB.dot(TB.var(selfVar), reentrantScope), consumed);
-                Term reentSize = TB.dot(TB.dot(TB.var(selfVar), reentrantScope), size);
-                result = TB.and(result, TB.func(leq, TB.func(add, reentCons, 
-                        reentrantWorkingSpace), reentSize));
-            }
-
-        }
-
+                
         return result;
     }
     

@@ -12,17 +12,21 @@ package de.uka.ilkd.key.java.recoderext;
 import java.util.HashMap;
 
 import recoder.CrossReferenceServiceConfiguration;
-import recoder.java.*;
+import recoder.java.Expression;
+import recoder.java.Identifier;
+import recoder.java.Statement;
+import recoder.java.StatementBlock;
 import recoder.java.declaration.*;
 import recoder.java.declaration.modifier.Public;
 import recoder.java.declaration.modifier.Static;
-import recoder.java.reference.*;
+import recoder.java.reference.MethodReference;
+import recoder.java.reference.TypeReference;
+import recoder.java.reference.VariableReference;
 import recoder.java.statement.Return;
-import recoder.kit.*;
+import recoder.kit.ProblemReport;
+import recoder.kit.TypeKit;
 import recoder.list.generic.ASTArrayList;
 import recoder.list.generic.ASTList;
-import de.uka.ilkd.key.gui.configuration.ProofSettings;
-import de.uka.ilkd.key.proof.init.PercProfile;
 
 /**
  * If an allocation expression <code>new Class(...)</code> occurs, a new object
@@ -75,21 +79,12 @@ public class CreateObjectBuilder extends RecoderModelTransformer {
                          new ImplicitIdentifier
                          (InstanceAllocationMethodBuilder.IMPLICIT_INSTANCE_ALLOCATE),
                          arguments)));
-
-        String scopeForObj;
-        
-        if(ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof PercProfile){
-            scopeForObj = de.uka.ilkd.key.java.reference.MethodReference.CALLER_SCOPE;
-        }else{
-            scopeForObj = de.uka.ilkd.key.java.reference.MethodReference.LOCAL_SCOPE;
-        }
-        
+                
 	MethodReferenceWrapper createRef = 
 	    new MethodReferenceWrapper(new VariableReference
 				 (new Identifier(NEW_OBJECT_VAR_NAME)), 
 				 new ImplicitIdentifier
-				 (CreateBuilder.IMPLICIT_CREATE),
-                                 new Identifier(scopeForObj));
+				 (CreateBuilder.IMPLICIT_CREATE));
 	
 	// July 08 - mulbrich: wraps createRef into a method body statement to
 	// avoid unnecessary dynamic dispatch.
@@ -101,8 +96,7 @@ public class CreateObjectBuilder extends RecoderModelTransformer {
         (new MethodReferenceWrapper(new VariableReference
                              (new Identifier(NEW_OBJECT_VAR_NAME)),
                              new ImplicitIdentifier
-                             (CreateBuilder.IMPLICIT_CREATE),
-                                 new Identifier(scopeForObj)));
+                             (CreateBuilder.IMPLICIT_CREATE)));
 	} else {
 	    TypeReference tyref;
 	    tyref = makeTyRef(recoderClass); 

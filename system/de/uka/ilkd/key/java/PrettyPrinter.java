@@ -18,12 +18,14 @@ import java.util.LinkedList;
 
 import org.apache.log4j.Logger;
 
-import de.uka.ilkd.key.gui.configuration.ProofSettings;
-import de.uka.ilkd.key.java.abstraction.ArrayType;
 import de.uka.ilkd.key.collection.ImmutableArray;
+import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.declaration.*;
-import de.uka.ilkd.key.java.declaration.modifier.*;
+import de.uka.ilkd.key.java.declaration.modifier.Final;
+import de.uka.ilkd.key.java.declaration.modifier.Private;
+import de.uka.ilkd.key.java.declaration.modifier.Protected;
+import de.uka.ilkd.key.java.declaration.modifier.Public;
 import de.uka.ilkd.key.java.expression.*;
 import de.uka.ilkd.key.java.expression.Operator;
 import de.uka.ilkd.key.java.expression.literal.*;
@@ -33,7 +35,6 @@ import de.uka.ilkd.key.java.statement.*;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.pp.Range;
-import de.uka.ilkd.key.proof.init.PercProfile;
 import de.uka.ilkd.key.proof.init.RTSJProfile;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.metaconstruct.ProgramMetaConstruct;
@@ -1053,15 +1054,7 @@ public class PrettyPrinter {
                 "javax.realtime.MemoryArea::currentMemoryArea".
                 equals(x.getName().toString())){
             write("<currentMemoryArea>");
-        }else if (x.getName()!=null && 
-                "javax.realtime.MemoryArea::callerScope".
-                equals(x.getName().toString())){
-            write("<callerScope>");
-        }else if (x.getName()!=null && 
-                "javax.realtime.MemoryArea::constructedScope".
-                equals(x.getName().toString())){
-            write("<construcedScope>");
-        }else{
+        } else {
             if (x.getReferencePrefix() != null) {     
                 boolean wasNoSemicolons = noSemicolons;
                 noSemicolons = true;
@@ -2197,13 +2190,7 @@ public class PrettyPrinter {
         }
         writeInternalIndentation(x);
         write("new ");
-        
-        if(ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof PercProfile && x.getScope()!=null){
-            write("@<");
-            writeElement(x.getScope());
-            write(">");
-        }
-        
+                
         writeElement(1, x.getTypeReference());
         int i = 0;
         if (x.getArguments() != null) {
@@ -2284,12 +2271,6 @@ public class PrettyPrinter {
         }
         writeInternalIndentation(x);
         write("new ");
-        
-        if(ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof PercProfile && x.getScope()!=null){
-            write("@<");
-            writeElement(x.getScope());
-            write(">");
-        }
         
         writeElement(1, x.getTypeReference());
 	write(" (");
@@ -2467,11 +2448,6 @@ public class PrettyPrinter {
             writeCommaList(x.getArguments());
         }	
 	write(")");
-        if(ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof PercProfile && x.getScope()!=null){
-            write("@<");
-            writeElement(x.getScope());
-            write(">");
-        }
 	if (withSemicolon) {
             write(";");           
         }
@@ -2494,27 +2470,11 @@ public class PrettyPrinter {
 	throws java.io.IOException {
 	write("source=");
 	writeElement(x.getTypeReference());
-	if(x.getMemoryArea() != null && 
-	   (ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof PercProfile ||
-	    ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof RTSJProfile)
-	   ){
-            if(ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof PercProfile){
-                write(",<localScope>=");
-            }else{
-                write(",<currentMemoryArea>=");
-            }
+	if (x.getMemoryArea() != null
+	        && (ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof RTSJProfile)) {
+	    write(",<currentMemoryArea>=");
 	    writeElement(x.getMemoryArea());
 	}
-        if(x.getCallerMemoryArea() != null && 
-	   ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof PercProfile){
-            write(",<callerScope>=");
-            writeElement(x.getCallerMemoryArea());
-        }
-        if(x.getConstructedMemoryArea() != null  &&
-	   ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof PercProfile){
-            write(",<constructedScope>=");
-            writeElement(x.getConstructedMemoryArea());
-        }
         if (x.getRuntimeInstance() != null) {
             write(",this=");
             writeElement(x.getRuntimeInstance());

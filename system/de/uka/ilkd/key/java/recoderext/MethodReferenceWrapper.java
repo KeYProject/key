@@ -9,37 +9,27 @@ import recoder.list.generic.ASTList;
 
 public class MethodReferenceWrapper extends MethodReference {
 
-    private Identifier scope;
     
     public MethodReferenceWrapper(ReferencePrefix accessPath, Identifier name, 
-            ASTList<Expression> args, ASTList<TypeArgumentDeclaration> typeArgs, Identifier scope){
+            ASTList<Expression> args, ASTList<TypeArgumentDeclaration> typeArgs){
         super(accessPath, name, args, typeArgs);
-        this.scope = scope;
     }
     
     public MethodReferenceWrapper(ReferencePrefix accessPath, Identifier name, 
-            ASTList<Expression> args, Identifier scope){
-        super(accessPath, name, args);
-        this.scope = scope;
+            ASTList<Expression> args){
+        super(accessPath, name, args);  
     }
     
-    public MethodReferenceWrapper(ReferencePrefix accessPath, Identifier name, 
-            Identifier scope){
+    public MethodReferenceWrapper(ReferencePrefix accessPath, Identifier name){
         super(accessPath, name);
-        this.scope = scope;
     }
     
-    public MethodReferenceWrapper(MethodReference proto, Identifier scope){
+    public MethodReferenceWrapper(MethodReference proto){
         super(proto);
-        this.scope = scope;
     }
     
     public MethodReferenceWrapper deepClone(){
-        return new MethodReferenceWrapper(super.deepClone(), scope==null ? null : scope.deepClone());
+        return new MethodReferenceWrapper(super.deepClone());
     }
-    
-    public Identifier getScope(){
-        return scope;
-    }
-    
+        
 }

@@ -1,13 +1,14 @@
 package de.uka.ilkd.key.rule.metaconstruct;
 
-import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.expression.literal.IntLiteral;
-import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
-import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.sort.ObjectSort;
-import de.uka.ilkd.key.proof.init.PercProfile;
+import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.Namespace;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermFactory;
+import de.uka.ilkd.key.logic.op.AbstractMetaOperator;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.TermSymbol;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 public class ObjectSize extends AbstractMetaOperator {
@@ -26,21 +27,13 @@ public class ObjectSize extends AbstractMetaOperator {
 //        Term heapSpaceTerm = tf.createVariableTerm(heapSpace);
         Term heapSpaceTerm = tf.createAttributeTerm(consumed, term.sub(2));
         Term objSize;
-        if(ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof PercProfile &&
-                services.getJavaInfo().getSizeInBytes(
-                        ((ProgramVariable) term.sub(0).op()).getKeYJavaType())!=0){
-            objSize = termFactory.createAttributeTerm(services.getJavaInfo().
-                    getAttribute(ImplicitFieldAdder.IMPLICIT_EXACT_SIZE, (ObjectSort) term.sub(0).sort()), 
-                    term.sub(0));
-        }else{
-            IntLiteral objSizeLit = 
-                new IntLiteral(services.getJavaInfo().getSizeInBytes(
-                        ((ProgramVariable) term.sub(0).op()).getKeYJavaType())+"");
-            objSize = services.getTypeConverter().convertToLogicElement(objSizeLit);
-        }
+        IntLiteral objSizeLit = 
+            new IntLiteral(services.getJavaInfo().getSizeInBytes(
+        	    ((ProgramVariable) term.sub(0).op()).getKeYJavaType())+"");
+        objSize = services.getTypeConverter().convertToLogicElement(objSizeLit);
         return tf.createUpdateTerm(heapSpaceTerm,
-                tf.createFunctionTerm((TermSymbol) funcs.lookup(new Name("add")),
-                        heapSpaceTerm, objSize), term.sub(1));
+        	tf.createFunctionTerm((TermSymbol) funcs.lookup(new Name("add")),
+        		heapSpaceTerm, objSize), term.sub(1));
     }
 
 }

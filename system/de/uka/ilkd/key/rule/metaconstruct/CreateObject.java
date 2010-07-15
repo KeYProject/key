@@ -56,7 +56,6 @@ public class CreateObject extends ProgramMetaConstruct {
         return new MethodReference(new ImmutableArray<Expression>(), 
 				   new ProgramElementName
                                    (CreateObjectBuilder.IMPLICIT_OBJECT_CREATE), 
-				   classReference,
-                                   ((New)pe).getScope());					   
+				   classReference);					   
     }
 }

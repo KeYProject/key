@@ -11,7 +11,6 @@ package de.uka.ilkd.key.java;
 
 
 import java.util.HashMap;
-import java.util.Iterator;
 
 import recoder.service.ConstantEvaluator;
 import de.uka.ilkd.key.collection.ImmutableArray;
@@ -315,13 +314,7 @@ public class TypeConverter extends TermBuilder {
 	if("javax.realtime.MemoryArea::currentMemoryArea".
 	               equals(fr.getName().toString())){
 	    return convertToLogicElement(ec.getMemoryArea());
-	}else if("javax.realtime.MemoryArea::callerScope".
-                       equals(fr.getName().toString())){
-            return convertToLogicElement(ec.getCallerMemoryArea());
-        }else if("javax.realtime.MemoryArea::constructedScope".
-                       equals(fr.getName().toString())){
-            return convertToLogicElement(ec.getConstructedMemoryArea());
-        }else if (var.isStatic()) {
+	} else if (var.isStatic()) {
 	    return var(var);
 	} else if (prefix == null) {
 	    if (var.isMember()) {

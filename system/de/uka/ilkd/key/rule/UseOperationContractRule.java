@@ -19,26 +19,22 @@ import de.uka.ilkd.key.collection.*;
 import de.uka.ilkd.key.gui.ContractConfigurator;
 import de.uka.ilkd.key.gui.Main;
 import de.uka.ilkd.key.java.*;
-import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
+import de.uka.ilkd.key.java.recoderext.ConstructorNormalformBuilder;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.java.statement.*;
+import de.uka.ilkd.key.java.statement.LabeledStatement;
+import de.uka.ilkd.key.java.statement.MethodBodyStatement;
+import de.uka.ilkd.key.java.statement.MethodFrame;
+import de.uka.ilkd.key.java.statement.Throw;
 import de.uka.ilkd.key.java.visitor.ProgramContextAdder;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.proof.*;
-import de.uka.ilkd.key.proof.init.PercProfile;
-import de.uka.ilkd.key.proof.init.RTSJProfile;
-import de.uka.ilkd.key.proof.mgt.*;
-import de.uka.ilkd.key.java.recoderext.ConstructorNormalformBuilder;
-import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.AtPreFactory;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.NodeInfo;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.proof.init.CreatedAttributeTermFactory;
+import de.uka.ilkd.key.proof.init.RTSJProfile;
 import de.uka.ilkd.key.proof.mgt.ComplexRuleJustificationBySpec;
 import de.uka.ilkd.key.proof.mgt.ContractWithInvs;
 import de.uka.ilkd.key.proof.mgt.RuleJustificationBySpec;
@@ -468,21 +464,9 @@ public class UseOperationContractRule implements BuiltInRule {
             = new LinkedHashMap<Operator, Function>();
         
         ExecutionContext ec = getExecutionContext(pio);
-        Term mTerm=null;
-	if(services.getProof().getSettings().getProfile() instanceof RTSJProfile ||
-	   services.getProof().getSettings().getProfile() instanceof PercProfile){ 
-	    if(mbs.getMethodReference().callerScope()){
-		mTerm = services.getTypeConverter().convertToLogicElement(ec.getCallerMemoryArea(), ec);
-	    }else if(mbs.getMethodReference().constructedScope()){
-		mTerm = services.getTypeConverter().convertToLogicElement(ec.getConstructedMemoryArea(), ec);
-	    }else if(mbs.getMethodReference().reentrantScope()){
-		mTerm = TB.dot(
-			       services.getTypeConverter().convertToLogicElement(ec.getRuntimeInstance(), ec),
-			       services.getJavaInfo().getAttribute
-			       ("memoryArea", services.getJavaInfo().getJavaLangObject()));
-	    }else{
-		mTerm = services.getTypeConverter().convertToLogicElement(ec.getMemoryArea(), ec);
-	    }
+        Term mTerm = null;
+	if(services.getProof().getSettings().getProfile() instanceof RTSJProfile){ 
+	    mTerm = services.getTypeConverter().convertToLogicElement(ec.getMemoryArea(), ec);
 	}
             
         //translate the contract and the invariants
@@ -571,11 +555,12 @@ public class UseOperationContractRule implements BuiltInRule {
         }
 	Term mCons=null, ws=null;
 	Update wsUpd=null;
+	
 	NamespaceSet nss = services.getNamespaces();
         Function add = (Function) nss.functions().lookup(new Name("add"));
-	if(services.getProof().getSettings().getProfile() instanceof RTSJProfile &&
-	   ((RTSJProfile) services.getProof().getSettings().getProfile()).memoryConsumption()  || 
-	   services.getProof().getSettings().getProfile() instanceof PercProfile){
+	
+        if(services.getProof().getSettings().getProfile() instanceof RTSJProfile &&
+	   ((RTSJProfile) services.getProof().getSettings().getProfile()).memoryConsumption()){
 	    mCons = TB.dot(mTerm, services.getJavaInfo().getAttribute(
 				"consumed", "javax.realtime.MemoryArea"));
 	    ws = TB.tf().createWorkingSpaceNonRigidTerm(pm, 
@@ -590,6 +575,7 @@ public class UseOperationContractRule implements BuiltInRule {
         //create "Pre" branch
         Term preF = pre.getFormula();
         Function leq = (Function) nss.functions().lookup(new Name("leq"));
+        
         if(services.getProof().getSettings().getProfile() instanceof RTSJProfile && 
         		((RTSJProfile) services.getProof().getSettings().getProfile()).memoryConsumption()){
             Term wsPre = cwi.contract.getWorkingSpace(selfVar, paramVars, services);
@@ -597,27 +583,8 @@ public class UseOperationContractRule implements BuiltInRule {
                     TB.dot(mTerm, services.getJavaInfo().getAttribute(
                             "size", "javax.realtime.MemoryArea")));
             preF = TB.and(wsPre, preF);
-        }else if(services.getProof().getSettings().getProfile() instanceof PercProfile){
-            Term wsPre = cwi.contract.getCallerWorkingSpace(selfVar, paramVars, services);
-            wsPre = TB.tf().createFunctionTerm(leq, TB.tf().createFunctionTerm(add, mCons, wsPre),
-                    TB.dot(mTerm, services.getJavaInfo().getAttribute(
-                            "size", "javax.realtime.MemoryArea")));
-            if(!pm.isStatic()){
-                Term wsReent = cwi.contract.getReentrantWorkingSpace(selfVar, paramVars, services);
-                Term rs = TB.dot(TB.var(selfVar), 
-                        services.getJavaInfo().getAttribute(ImplicitFieldAdder.IMPLICIT_REENTRANT_SCOPE, 
-                                services.getJavaInfo().getJavaLangObject()));
-                Term rsCons = TB.dot(rs, services.getJavaInfo().getAttribute(
-                        "consumed", "javax.realtime.MemoryArea"));
-                Term wsPreReent = TB.tf().createFunctionTerm(leq, TB.tf().createFunctionTerm(add, rsCons, wsReent),
-                        TB.dot(rs, services.getJavaInfo().getAttribute(
-                                "size", "javax.realtime.MemoryArea")));
-                wsPre = TB.and(wsPre, wsPreReent);
-                Update rsUpd = uf.elementaryUpdate(rsCons, TB.tf().createFunctionTerm(add, rsCons, wsReent));
-                wsUpd = uf.parallel(wsUpd, rsUpd);
-            }
-            preF = TB.and(wsPre, preF);
         }
+        
         Term reachablePre = TB.and(new Term[]{
                 TB.inReachableState(services),
                 selfVar != null ? CATF.createCreatedAndNotNullTerm(services, TB.var(selfVar)) : TB.tt(),
@@ -672,13 +639,6 @@ public class UseOperationContractRule implements BuiltInRule {
         if(services.getProof().getSettings().getProfile() instanceof RTSJProfile && 
         		((RTSJProfile) services.getProof().getSettings().getProfile()).memoryConsumption()){    
             wsEq = TB.equals(ws, cwi.contract.getWorkingSpace(selfVar, paramVars, services));
-            wsEq = uf.apply(uf.sequential(new Update[]{selfParamsUpdate,
-                    atPreUpdate}),wsEq);
-        }else if(services.getProof().getSettings().getProfile() instanceof PercProfile){
-//                Term size = TB.var(services.getJavaInfo().
-//                        getAttribute(ImplicitFieldAdder.IMPLICIT_SIZE, pm.getKeYJavaType()));
-//                wsEq = TB.equals(ws, size);
-            wsEq = TB.equals(ws, cwi.contract.getCallerWorkingSpace(selfVar, paramVars, services));
             wsEq = uf.apply(uf.sequential(new Update[]{selfParamsUpdate,
                     atPreUpdate}),wsEq);
         }

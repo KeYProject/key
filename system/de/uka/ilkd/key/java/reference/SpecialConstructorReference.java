@@ -30,8 +30,6 @@ public abstract class SpecialConstructorReference
      *      Arguments
      */
     protected final ImmutableArray<Expression> arguments;
-
-    protected final ProgramElement scope=new ProgramElementName(MethodReference.CALLER_SCOPE);
     
     /**
      * Special constructor reference.
@@ -102,19 +100,12 @@ public abstract class SpecialConstructorReference
      *                 of bounds
      */
     public ProgramElement getChildAt(int index) {
-        if(index==0){
-            return scope;
-        }
         if (arguments != null) {
-            return arguments.get(index-1);
+            return arguments.get(index);
         }
         throw new ArrayIndexOutOfBoundsException();
     }
     
-    public ProgramElement getScope(){
-        return scope;
-    }
-
     /**
      *      Get the number of expressions in this container.
      *      @return the number of expressions.

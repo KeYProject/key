@@ -42,7 +42,6 @@ import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.VariableNamer;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.proof.init.PercProfile;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.ExtList;
 
@@ -644,12 +643,9 @@ public class Recoder2KeYConverter {
         String s = (newArr instanceof NewArrayWrapper &&  
                 ((NewArrayWrapper) newArr).getScope()!=null ? 
                 ((NewArrayWrapper) newArr).getScope().toSource() : null);
-        if(s!=null && (ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof PercProfile)){
-            scope = new ProgramElementName(s);
-        }        
         
         return new NewArray(children, getKeYJavaType(javaType), arrInit, newArr
-                .getDimensions(), scope);
+                .getDimensions());
     }
 
     // ------------------- literals --------------------------------------
@@ -791,7 +787,7 @@ public class Recoder2KeYConverter {
         }
 
         final MethodReference mr = new MethodReference(new ImmutableArray<Expression>(
-                keyArgs), methodName, invocationTarget, rmbs.getScope()==null ? null : rmbs.getScope().getText());
+                keyArgs), methodName, invocationTarget);
 
         return new MethodBodyStatement(bodySource, resultVar, mr);
     }
@@ -1337,18 +1333,10 @@ public class Recoder2KeYConverter {
             children.remove(prefixPos);
         }
         
-        String scope = (mr instanceof MethodReferenceWrapper &&  
-                ((MethodReferenceWrapper) mr).getScope()!=null ? 
-                ((MethodReferenceWrapper) mr).getScope().toSource() : null);
-        
-        if(!(ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof PercProfile)){
-            scope = null;
-        }
-        
         return new MethodReference(children,
                 pm == null ? new ProgramElementName(mr.getName()) : pm
                         .getProgramElementName(), prefix, positionInfo(mr), 
-                        scope);
+                        (String)null);
     }
 
     // --------------Special treatment because of ambiguities ----------
@@ -1576,20 +1564,12 @@ public class Recoder2KeYConverter {
             maybeAnonClass = new TypeRef(kjt);
         }
         
-        ProgramElementName scope = null;
-        String s = (n instanceof NewWrapper &&  
-                ((NewWrapper) n).getScope()!=null ? 
-                ((NewWrapper) n).getScope().toSource() : null);
-        if(s!=null && (ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof PercProfile)){
-            scope = new ProgramElementName(s);
-        }
-
         if (rp == null) {
             return new New(arguments, maybeAnonClass,
-                    (ReferencePrefix) null, scope);
+                    (ReferencePrefix) null);
         } else {
             return new New(arguments, maybeAnonClass,
-                    (ReferencePrefix) callConvert(rp), scope);
+                    (ReferencePrefix) callConvert(rp));
         }
     }
 

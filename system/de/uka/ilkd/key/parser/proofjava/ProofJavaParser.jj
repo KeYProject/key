@@ -293,10 +293,6 @@ public class ProofJavaParser {
          */
         ASTList<TypeArgumentDeclaration> typeArgs = null;
         
-        /**
-         * valid iff <tt>type</tt> is <tt>ARGUMENTS</tt>
-         */
-        Identifier scope = null;
     }
 
 
@@ -327,8 +323,6 @@ public class ProofJavaParser {
         /** production was <pre>"@(" Expression ")"</pre> */
         static final int PASSIVE_EXPR =  7;    
 	static final int CURRENT_MEMORY_AREA = 8; 
-	static final int CALLER_SCOPE = 9; 
-	static final int CONSTRUCTED_SCOPE = 10; 
     
         /** indicates the type of the result */
         int           type    = UNDEFINED;
@@ -487,10 +481,6 @@ TOKEN :
 | < VARARGDENOTER: "..." >
 | < STRICTFP: "strictfp" >
 | < CURRENTMEMORYAREA: "<currentMemoryArea>" >
-| < LOCALSCOPE: "<localScope>" >
-| < CALLERSCOPE: "<callerScope>" >
-| < CONSTRUCTEDSCOPE: "<constructedScope>" >
-| < REENTRANTSCOPE: "<reentrantScope>" >
 }
 
 /* LITERALS */
@@ -2850,26 +2840,6 @@ Expression PrimaryExpression() :
           setPrefixInfo(tmpResult);
 	  setPostfixInfo(tmpResult);
           break;
-      case PrimaryPrefixReturnValue.CALLER_SCOPE:
-    	  id = factory.createIdentifier("MemoryArea");    
-    	  setPrefixInfo(id);
-    	  setPostfixInfo(id);
-          tmpResult = factory.createUncollatedReferenceQualifier(id);
-	  id = factory.createIdentifier("callerScope");	
-          tmpResult = factory.createUncollatedReferenceQualifier(tmpResult,id);
-          setPrefixInfo(tmpResult);
-	  setPostfixInfo(tmpResult);
-          break;
-       case PrimaryPrefixReturnValue.CONSTRUCTED_SCOPE:
-    	  id = factory.createIdentifier("MemoryArea");    
-    	  setPrefixInfo(id);
-    	  setPostfixInfo(id);
-          tmpResult = factory.createUncollatedReferenceQualifier(id);
-	  id = factory.createIdentifier("constructedScope");	
-          tmpResult = factory.createUncollatedReferenceQualifier(tmpResult,id);
-          setPrefixInfo(tmpResult);
-	  setPostfixInfo(tmpResult);
-          break;
       case PrimaryPrefixReturnValue.SUPER_MEMBER:
           tmpResult = prefix.name;
           break;
@@ -2983,7 +2953,7 @@ Expression PrimaryExpression() :
               tmpResult = factory.createMethodReferenceWrapper
               (((UncollatedReferenceQualifier)tmpResult).getReferencePrefix(),
                ((UncollatedReferenceQualifier)tmpResult).getIdentifier(),
-               suffix.args, ((UncollatedReferenceQualifier)tmpResult).getTypeArguments(), suffix.scope);
+               suffix.args, ((UncollatedReferenceQualifier)tmpResult).getTypeArguments());
               
               setPrefixInfo(tmpResult);
               setPostfixInfo(tmpResult);
@@ -3045,16 +3015,6 @@ PrimaryPrefixReturnValue PrimaryPrefix() :
   "<currentMemoryArea>"
   {
       prefix.type = PrimaryPrefixReturnValue.CURRENT_MEMORY_AREA;   
-  }
-|
-  "<callerScope>"
-  {
-      prefix.type = PrimaryPrefixReturnValue.CALLER_SCOPE;   
-  }
-|
-  "<constructedScope>"
-  {
-      prefix.type = PrimaryPrefixReturnValue.CONSTRUCTED_SCOPE;   
   }
 |
   "super" {
@@ -3174,25 +3134,9 @@ PrimarySuffixReturnValue PrimarySuffix() :
   }
 |
   args = Arguments() 
-  [LOOKAHEAD(2)  "@" 
-  	(
-  		"<localScope>" {id=factory.createIdentifier(de.uka.ilkd.key.java.reference.MethodReference.LOCAL_SCOPE);}
-  		|
-  		"<callerScope>" {id=factory.createIdentifier(de.uka.ilkd.key.java.reference.MethodReference.CALLER_SCOPE);}
-  		|
-  		"<constructedScope>" {id=factory.createIdentifier(de.uka.ilkd.key.java.reference.MethodReference.CONSTRUCTED_SCOPE);}
-  		|
-  		"<reentrantScope>" {id=factory.createIdentifier(de.uka.ilkd.key.java.reference.MethodReference.REENTRANT_SCOPE);}
-  	)
-  ]
   {
       suffix.type = PrimarySuffixReturnValue.ARGUMENTS;
       suffix.args = args;
-//      if(id!=null){
-      	suffix.scope = id;
-//      }else{
-//       	suffix.scope = factory.createIdentifier(de.uka.ilkd.key.java.reference.MethodReference.LOCAL_SCOPE);
-//      }
   }
 )
   {
@@ -3325,17 +3269,6 @@ TypeOperator AllocationExpression() :
 (
   LOOKAHEAD(4)
   "new" 
-      [LOOKAHEAD(3)  "@" 
-  	(
-  		"<localScope>" {id=factory.createIdentifier(de.uka.ilkd.key.java.reference.MethodReference.LOCAL_SCOPE);}
-  		|
-  		"<callerScope>" {id=factory.createIdentifier(de.uka.ilkd.key.java.reference.MethodReference.CALLER_SCOPE);}
-  		|
-  		"<constructedScope>" {id=factory.createIdentifier(de.uka.ilkd.key.java.reference.MethodReference.CONSTRUCTED_SCOPE);}
-  		|
-  		"<reentrantScope>" {id=factory.createIdentifier(de.uka.ilkd.key.java.reference.MethodReference.REENTRANT_SCOPE);}
-  	)
-  ]  
     {
         na = factory.createNewArrayWrapper(id);
         setPrefixInfo(na);
@@ -3347,17 +3280,6 @@ TypeOperator AllocationExpression() :
     result = ArrayDimsAndInits(na)
 |
   "new"
-    [LOOKAHEAD(2)  "@" 
-  	(
-  		"<localScope>" {id=factory.createIdentifier(de.uka.ilkd.key.java.reference.MethodReference.LOCAL_SCOPE);}
-  		|
-  		"<callerScope>" {id=factory.createIdentifier(de.uka.ilkd.key.java.reference.MethodReference.CALLER_SCOPE);}
-  		|
-  		"<constructedScope>" {id=factory.createIdentifier(de.uka.ilkd.key.java.reference.MethodReference.CONSTRUCTED_SCOPE);}
-  		|
-  		"<reentrantScope>" {id=factory.createIdentifier(de.uka.ilkd.key.java.reference.MethodReference.REENTRANT_SCOPE);}
-  	)
-  ]  
   {
       result = factory.createNewWrapper(id);
       setPrefixInfo(result);
@@ -3616,30 +3538,18 @@ ExecutionContext ExecutionContext() :
   TypeReference classContext;
 
 Expression initial = factory.createThisReference();
-//  Identifier id = factory.createIdentifier("MemoryArea");    
-//  setPrefixInfo(id);
-//  setPostfixInfo(id);
-//  UncollatedReferenceQualifier tmpResult = factory.createUncollatedReferenceQualifier(id);
-//  id = factory.createIdentifier("currentMemoryArea");	
-//  UncollatedReferenceQualifier initial = factory.createUncollatedReferenceQualifier(tmpResult,id);
-//          setPrefixInfo(initial);
-//	  setPostfixInfo(initial);
-
-  Expression runtimeInstance = null, memoryArea = initial, callerScope=initial, constructedScope=initial;
+  Expression runtimeInstance = null, memoryArea = initial;
 } 
 {
 
   "source="
   classContext = Type() 
-  [",<currentMemoryArea>=" memoryArea = Expression() | ",<localScope>=" memoryArea = Expression()]
-  [ ",<callerScope>=" callerScope = Expression() ]
-  [ ",<constructedScope>=" constructedScope = Expression() ]
+  [",<currentMemoryArea>=" memoryArea = Expression()]
   [ ",this=" runtimeInstance = Expression() ]
   
   { 
     return new ExecutionContext
-	(classContext, (ReferencePrefix)memoryArea,
-        (ReferencePrefix)runtimeInstance, (ReferencePrefix)callerScope, (ReferencePrefix)constructedScope);
+	(classContext, (ReferencePrefix)memoryArea, (ReferencePrefix)runtimeInstance);
   }
 }
 

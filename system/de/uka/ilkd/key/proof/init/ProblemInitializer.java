@@ -12,7 +12,6 @@ package de.uka.ilkd.key.proof.init;
 
 import java.io.File;
 import java.util.*;
-import java.util.List;
 import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
@@ -22,23 +21,20 @@ import recoder.io.ProjectSettings;
 import de.uka.ilkd.key.gui.IMain;
 import de.uka.ilkd.key.gui.MethodCallInfo;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
-import de.uka.ilkd.key.java.*;
-import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.java.CompilationUnit;
 import de.uka.ilkd.key.java.Recoder2KeY;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.ConstrainedFormula;
-import de.uka.ilkd.key.logic.Named;
-import de.uka.ilkd.key.logic.NamespaceSet;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.logic.sort.SortDefiningSymbols;
 import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.mgt.*;
-import de.uka.ilkd.key.rule.*;
+import de.uka.ilkd.key.rule.BuiltInRule;
+import de.uka.ilkd.key.rule.Rule;
+import de.uka.ilkd.key.rule.UpdateSimplifier;
 import de.uka.ilkd.key.util.ProgressMonitor;
 
 
@@ -501,23 +497,27 @@ public class ProblemInitializer {
             }
         }
 
-        if(heapSpace==null){
-            heapSpace = 
-                    new LocationVariable((new ProgramElementName(heapSpaceName)),
-                            lastBaseConfig.getServices().getJavaInfo().
-                            getKeYJavaType("int"));
+        if (ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof RTSJProfile) {
+            if(heapSpace==null){
+        	heapSpace = 
+        	    new LocationVariable((new ProgramElementName(heapSpaceName)),
+        		    lastBaseConfig.getServices().getJavaInfo().
+        		    getKeYJavaType("int"));
+            }
+            initConfig.namespaces().programVariables().add(heapSpace);  
+            //        initConfig.namespaces().programVariables().add(initConfig.getServices().
+            //                getJavaInfo().getDefaultMemoryArea());  
         }
-        initConfig.namespaces().programVariables().add(heapSpace);  
-//        initConfig.namespaces().programVariables().add(initConfig.getServices().
-//                getJavaInfo().getDefaultMemoryArea());  
         
 	//read envInput
 	readEnvInput(envInput, initConfig);
 	
-	initConfig.namespaces().programVariables().add(initConfig.getServices().
-	        getJavaInfo().getDefaultMemoryArea()); 
-	initConfig.namespaces().programVariables().add(initConfig.getServices().
-	        getJavaInfo().getImmortalMemoryArea()); 
+        if (ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof RTSJProfile) {
+            initConfig.namespaces().programVariables().add(initConfig.getServices().
+        	    getJavaInfo().getDefaultMemoryArea()); 
+            initConfig.namespaces().programVariables().add(initConfig.getServices().
+        	    getJavaInfo().getImmortalMemoryArea());
+        }
 	
         // read in libraries as includes
         readIncludes(envInput, initConfig);

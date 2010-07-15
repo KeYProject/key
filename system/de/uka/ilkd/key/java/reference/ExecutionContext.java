@@ -36,15 +36,6 @@ public class ExecutionContext
      */
     protected final ReferencePrefix memoryArea;
     
-    /**
-     * PERC Pico specific: the memory area for creating the returned object in
-     */
-    protected final ReferencePrefix callerMemoryArea;
-    
-    /**
-     * PERC Pico specific: the constructed memory area
-     */
-    protected final ReferencePrefix constructedMemoryArea;
     
     /**
      * creates an execution context reference
@@ -58,33 +49,10 @@ public class ExecutionContext
     public ExecutionContext(TypeReference classContext, 
             ReferencePrefix memoryArea,
             ReferencePrefix runtimeInstance) {
-        this(classContext, memoryArea, runtimeInstance, null, null); 
-    }
-    
-   
-    /**
-     * creates an execution context reference
-     * @param classContext the TypeReference refering to the next enclosing
-     * class 
-     * @param memoryArea the memory area used for allocation within this execution
-     * context
-     * @param runtimeInstance a ReferencePrefix to the object that
-     * is currently active/executed
-     * @param callerMemoryArea the memory area used for allocation of the returned
-     * object (PERC Pico)
-     * @param constructedMemoryArea the constructed scope (PERC Pico)
-     */
-    public ExecutionContext(TypeReference classContext, 
-            ReferencePrefix memoryArea,
-            ReferencePrefix runtimeInstance,
-            ReferencePrefix callerMemoryArea,
-            ReferencePrefix constructedMemoryArea) {
         if (classContext == null) Debug.printStackTrace();
         this.classContext = classContext;
         this.runtimeInstance = runtimeInstance;
-        this.memoryArea = memoryArea;
-        this.callerMemoryArea = callerMemoryArea; 
-        this.constructedMemoryArea = constructedMemoryArea; 
+        this.memoryArea = memoryArea;       
     }
     
     /**
@@ -99,11 +67,7 @@ public class ExecutionContext
 
 	children.remove(this.classContext);
         this.memoryArea = (ReferencePrefix) children.removeFirstOccurrence(
-                ReferencePrefix.class); 
-        this.callerMemoryArea = (ReferencePrefix) children.removeFirstOccurrence(
-                ReferencePrefix.class); 
-        this.constructedMemoryArea = (ReferencePrefix) children.removeFirstOccurrence(
-                ReferencePrefix.class); 
+                ReferencePrefix.class);         
         this.runtimeInstance = (ReferencePrefix) children.removeFirstOccurrence(
                 ReferencePrefix.class);
     }
@@ -118,9 +82,7 @@ public class ExecutionContext
 	int count = 0;
 	if (classContext != null) count++;
         if (memoryArea != null) count++;
-        if (runtimeInstance != null) count++;
-        if (constructedMemoryArea != null) count++;
-        if (callerMemoryArea != null) count++;
+        if (runtimeInstance != null) count++;       
 	return count;
     }
 
@@ -141,14 +103,6 @@ public class ExecutionContext
 	    if (index == 0) return memoryArea;
 	    index--;
 	}
-        if (callerMemoryArea != null) {
-            if (index == 0) return callerMemoryArea;
-            index--;
-        }
-        if (constructedMemoryArea != null) {
-            if (index == 0) return constructedMemoryArea;
-            index--;
-        }
         if (runtimeInstance != null) {
             if (index == 0) return runtimeInstance;
             index--;
@@ -176,14 +130,6 @@ public class ExecutionContext
         return memoryArea;
     }
     
-    public ReferencePrefix getConstructedMemoryArea() {
-        return constructedMemoryArea;
-    }
-    
-    public ReferencePrefix getCallerMemoryArea() {
-        return callerMemoryArea;
-    }
-
     /** calls the corresponding method of a visitor in order to
      * perform some action/transformation on this element
      * @param v the Visitor
@@ -197,10 +143,7 @@ public class ExecutionContext
     }
 
     public String toString() {
-        return "Context: "+classContext+" MemoryArea: "+memoryArea+
-        " CallerMemoryArea: "+callerMemoryArea+
-        " ConstructedMemoryArea: "+constructedMemoryArea+
-        " Instance: "+runtimeInstance;
+        return "Context: " + classContext + " MemoryArea: " + memoryArea + " Instance: "+runtimeInstance;
     }
     
 }

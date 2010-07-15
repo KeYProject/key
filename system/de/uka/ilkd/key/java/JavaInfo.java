@@ -14,6 +14,7 @@ import java.util.*;
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.abstraction.*;
 import de.uka.ilkd.key.java.declaration.*;
 import de.uka.ilkd.key.java.expression.literal.NullLiteral;
@@ -22,6 +23,7 @@ import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.ldt.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.*;
+import de.uka.ilkd.key.proof.init.RTSJProfile;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.LRUCache;
 
@@ -1200,13 +1202,15 @@ public class JavaInfo {
             final KeYJavaType kjt = 
                 getKeYJavaTypeByClassName(DEFAULT_EXECUTION_CONTEXT_CLASS);                     
             defaultExecutionContext = 
-                new ExecutionContext(new TypeRef(kjt), getDefaultMemoryArea(),
-                        null, getDefaultMemoryArea(), getDefaultMemoryArea());
+                new ExecutionContext(new TypeRef(kjt), getDefaultMemoryArea(), null);
         }
         return defaultExecutionContext;
     }
     
     public LocationVariable getDefaultMemoryArea(){
+        if (!(ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof RTSJProfile)) {
+            return null;
+        }
         if(defaultMemoryArea==null){
             // ensure that default classes are available
             if (!kpmi.rec2key().parsedSpecial()) {
@@ -1226,6 +1230,9 @@ public class JavaInfo {
     }
     
     public LocationVariable getImmortalMemoryArea(){
+        if (!(ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof RTSJProfile)) {
+            return null;
+        }
         if(immortalMemoryArea==null){
             // ensure that default classes are available
             if (!kpmi.rec2key().parsedSpecial()) {

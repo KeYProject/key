@@ -17,15 +17,21 @@ import de.uka.ilkd.key.collection.*;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.declaration.*;
-import de.uka.ilkd.key.java.statement.*;
+import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
+import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
+import de.uka.ilkd.key.java.declaration.VariableSpecification;
+import de.uka.ilkd.key.java.statement.BranchStatement;
+import de.uka.ilkd.key.java.statement.For;
+import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.proof.init.PercProfile;
 import de.uka.ilkd.key.proof.init.RTSJProfile;
 import de.uka.ilkd.key.speclang.*;
-import de.uka.ilkd.key.speclang.jml.pretranslation.*;
+import de.uka.ilkd.key.speclang.jml.pretranslation.Behavior;
+import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLClassInv;
+import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLLoopSpec;
+import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 
 
@@ -236,8 +242,7 @@ public class JMLSpecFactory {
         Term imCons=null;
         FormulaWithAxioms wsPost = new FormulaWithAxioms(TB.tt());
         if((ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof RTSJProfile) && 
-        		((RTSJProfile) ProofSettings.DEFAULT_SETTINGS.getProfile()).memoryConsumption() ||
-        		(ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof PercProfile)){
+        		((RTSJProfile) ProofSettings.DEFAULT_SETTINGS.getProfile()).memoryConsumption()) {
 	        ProgramVariable initialMemoryArea = services.getJavaInfo().
 	        getDefaultMemoryArea();
 	        Term imTerm = TB.var(initialMemoryArea);
@@ -339,8 +344,7 @@ public class JMLSpecFactory {
                 assignable = assignable.union(translated);        
             }
             if(assignable.size()!=0 && ((ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof RTSJProfile) && 
-            		((RTSJProfile) ProofSettings.DEFAULT_SETTINGS.getProfile()).memoryConsumption() ||
-            		(ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof PercProfile))){
+            		((RTSJProfile) ProofSettings.DEFAULT_SETTINGS.getProfile()).memoryConsumption())){
                 assignable = assignable.add(new BasicLocationDescriptor(imCons));
             }
         }

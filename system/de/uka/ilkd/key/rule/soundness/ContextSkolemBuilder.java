@@ -27,7 +27,6 @@ import de.uka.ilkd.key.logic.PosInProgram;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
-import de.uka.ilkd.key.proof.init.PercProfile;
 import de.uka.ilkd.key.rule.SyntacticalReplaceVisitor;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
@@ -270,13 +269,8 @@ public class ContextSkolemBuilder extends AbstractSkolemBuilder {
 	ProgramVariable    refVar  = new LocationVariable
 	    ( refName, getJavaInfo ().getJavaLangObject () );
 	VariableReference  ref     = new VariableReference  ( refVar );
-        boolean perc = ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof PercProfile;
 	ExecutionContext  context = new ExecutionContext
-	    ( new TypeRef ( getJavaInfo ().getJavaLangObject () ), 
-	            perc ? getJavaInfo().getDefaultMemoryArea() : null, 
-	            ref,
-	            perc ? getJavaInfo().getDefaultMemoryArea() : null,
-                    perc ? getJavaInfo().getDefaultMemoryArea() : null);
+	    ( new TypeRef ( getJavaInfo ().getJavaLangObject () ), null, ref);
 	return context;
     }
 

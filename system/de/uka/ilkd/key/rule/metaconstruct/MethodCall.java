@@ -205,12 +205,6 @@ public class MethodCall extends ProgramMetaConstruct {
 
 	methRef = (MethodReference) pe;
         
-	if(methRef.getScope() instanceof SchemaVariable){
-            scope = (ProgramElement) svInst.getInstantiation((ProgramSV) methRef.getScope());
-        }else{
-            scope = (ProgramElement) methRef.getScope();
-        }
-
 	ReferencePrefix refPrefix = methRef.getReferencePrefix();
 	if (refPrefix == null) {
 	    if (execContext.getRuntimeInstance() == null) {

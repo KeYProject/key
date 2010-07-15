@@ -143,7 +143,7 @@ public class LoopInvariantProposer implements InstantiationProposer {
     
     public Term getInnermostMemoryArea(Term term, Services services) {
         ExecutionContext ec = getInnermostExecutionContext(term, services);
-        return services.getTypeConverter().convertToLogicElement(ec.getMemoryArea());
+        return ec.getMemoryArea() == null ? null : services.getTypeConverter().convertToLogicElement(ec.getMemoryArea());
     }
     
     public ExecutionContext getInnermostExecutionContext(Term term, Services services) {
@@ -201,7 +201,11 @@ public class LoopInvariantProposer implements InstantiationProposer {
             final Term selfTerm = getInnermostSelfTerm(pos.subTerm(), services);
             final Map<Operator, Function> atPreFunctions = inv.getInternalAtPreFunctions();
             final String varName = var.name().toString();
+
+            final boolean mem = services.getProof().getSettings().getProfile() instanceof RTSJProfile;
+
             Term mTerm = getInnermostMemoryArea(pos.subTerm(), services);
+            
             if (varName.equals("inv")) {
                 assert var.isFormulaSV();
                 inst = inv.getInvariant(selfTerm, mTerm, atPreFunctions, services);
@@ -213,8 +217,8 @@ public class LoopInvariantProposer implements InstantiationProposer {
                 assert var.isListSV();
                 assert var.matchType() == LocationDescriptor.class;
                 LocationDescriptorSet locs = inv.getModifies(selfTerm, atPreFunctions, services);
-                if(services.getProof().getSettings().getProfile() instanceof RTSJProfile ||
-                        services.getProof().getSettings().getProfile() instanceof PercProfile){
+		
+                if (mem) {
                     Term mCons = TermBuilder.DF.dot(mTerm, services.getJavaInfo().getAttribute(
                             "consumed", "javax.realtime.MemoryArea"));
                     LocationDescriptor cons = new BasicLocationDescriptor(mCons);

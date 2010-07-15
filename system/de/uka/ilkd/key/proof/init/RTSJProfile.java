@@ -19,14 +19,13 @@ public class RTSJProfile extends JavaProfile {
     }
     
     public RTSJProfile(IMain main) {
-        super(main);
+        super("standardRules-RTSJ.key", main);
     }
     
     public void updateSettings(ProofSettings settings) {        
         ChoiceSettings cs = settings.getChoiceSettings();
         HashMap<String, String> dcs = cs.getDefaultChoices();
         dcs.put("rtsj", "rtsj:on");
-        dcs.put("perc", "perc:off");
         if(memory){
 	    dcs.put("memory", "memory:on");
         }else{
@@ -35,8 +34,31 @@ public class RTSJProfile extends JavaProfile {
         cs.setDefaultChoices(dcs);
     }
     
+    
+    /**
+     * the name of the profile
+     */
+    public String name() {
+        return "Realtime Java (RTSJ) Profile";
+    }
+    
     public boolean memoryConsumption(){
     	return memory;
     }
     
+    /**
+     * returns the file name of the internal class directory relative to JavaRedux
+     * @return the file name of the internal class directory relative to JavaRedux
+     */
+    public String getInternalClassDirectory() {
+	return "rtsjperc";
+    }
+    
+    /**
+     * returns the file name of the internal class list
+     * @return the file name of the internal class list
+     */
+    public String getInternalClasslistFilename() {
+	 return "JAVALANGRTSJ.TXT";
+    }
 }

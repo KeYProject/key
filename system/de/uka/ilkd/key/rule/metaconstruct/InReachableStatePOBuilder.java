@@ -27,7 +27,6 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.UpdateFactory;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.*;
-import de.uka.ilkd.key.proof.init.PercProfile;
 import de.uka.ilkd.key.proof.init.RTSJProfile;
 import de.uka.ilkd.key.rule.UpdateSimplifier;
 import de.uka.ilkd.key.rule.updatesimplifier.*;
@@ -48,7 +47,6 @@ public class InReachableStatePOBuilder extends TermBuilder {
     private final Term FALSE;
     private final ProgramVariable arraylength;
     private final boolean rtsj;
-    private final boolean perc;
     private final boolean rt;
     private final TermSymbol os;
     private final TermSymbol im;
@@ -78,9 +76,8 @@ public class InReachableStatePOBuilder extends TermBuilder {
         im = (TermSymbol) services.getNamespaces().functions().lookup(new Name("immortal"));
         this.TRUE = TRUE(services);
         this.FALSE = FALSE(services);
-        this.perc = (ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof PercProfile);
         this.rtsj = (ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof RTSJProfile);
-        this.rt = perc || rtsj;
+        this.rt = rtsj;
     }
 
     /**
