@@ -180,7 +180,7 @@ public class ImplicitFieldAdder extends RecoderModelTransformer {
 	if (ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof RTSJProfile){
 
 	    attach(createImplicitRecoderField("long", IMPLICIT_SIZE, true, true, true), td, 0);	
-	    
+
 	}
 	
 	if(td instanceof ClassDeclaration && 
@@ -217,7 +217,6 @@ public class ImplicitFieldAdder extends RecoderModelTransformer {
             }
         }
     }
-
     
     public ProblemReport analyze() {
         javaLangObject = services.getNameInfo().getJavaLangObject();

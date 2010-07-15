@@ -15,7 +15,6 @@ import java.util.Map;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.Operator;
@@ -84,8 +83,10 @@ public class EnsuresPostPO extends EnsuresPO {
                     "size", "javax.realtime.MemoryArea");
             final ProgramVariable consumed = services.getJavaInfo().getAttribute(
                     "consumed", "javax.realtime.MemoryArea");
-            Function add = (Function) services.getNamespaces().functions().lookup(new Name("add"));
-            Function leq = (Function) services.getNamespaces().functions().lookup(new Name("leq")); 
+            
+            Function add = services.getTypeConverter().getIntegerLDT().getAdd();            
+            Function leq = services.getTypeConverter().getIntegerLDT().getLessOrEquals();
+            
             Term workingSpace = contract.getWorkingSpace(selfVar, toPV(paramVars), services);
             result = TB.and(result, TB.func(leq, TB.func(add, TB.dot(t_mem,consumed), 
                     workingSpace), TB.dot(t_mem, size)));
