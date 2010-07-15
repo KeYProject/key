@@ -121,11 +121,9 @@ public class InReachableStatePOBuilder extends TermBuilder {
                 final ProgramVariable pv = (ProgramVariable) loc;
                 if (pv.isStatic()) {
                     if (pv.sort() instanceof ObjectSort) {
-                        result = staticFieldLiveRef(update, pair);
-                        if(EnumClassDeclaration.isEnumConstant(pv))
-                            result = enumConstantPO(pv, update);
-                        if(rtsj) result = and(result, staticAttrImmortal(update, pv));
-                    } else { // all implicit field are currently no reference
+                        result = validateStaticReferenceTypedFieldUpdate(update, pair, pv);
+                    } else { 
+                	// all implicit field are currently no reference
                         // fields
                         final ObjectSort containerType =
                                 (ObjectSort) pv.getContainerType().getSort();
@@ -137,28 +135,8 @@ public class InReachableStatePOBuilder extends TermBuilder {
                                         cPrepared(containerType),
                                         ntc(containerType) };
 
-                        if (pv == implicitFields[4]) {
-                            result = nextToCreateUpdatedSafely(update, pv);
-                            if (pv.getContainerType().getJavaType() instanceof EnumClassDeclaration) {
-                                result = and(result, addNextToCreateEnumPO(pv, update));
-                            }
-                            if(rtsj){
-                        	result = and(result, newObjectRefsLegal(update, containerType));
-
-                        	if(containerType.extendsTrans(services.getJavaInfo().
-                        		getJavaxRealtimeMemoryArea().getSort()) && !ax[0]){
-                        	    scopeAllocInOuterScope(update);
-                        	    ax[0] = true;
-                        	}
-                        	if(!ax[1]){
-                        	    scopeNotNull(update);
-                        	    ax[1] = true;
-                        	}
-                        	if(containerType instanceof ArraySort && 
-                        		((ArraySort) containerType).elementSort() instanceof ObjectSort){
-                        	    result = and(result, arraySlotOuterRef(update, containerType));
-                        	}
-                            }
+                        if (pv == implicitFields[4]) {                           
+                            result = validateNextToCreateUpdate(ax, update, pv, containerType);
                         } else {
                             // if one of these fields is updated we need an
                             // additional axiom
@@ -212,37 +190,8 @@ public class InReachableStatePOBuilder extends TermBuilder {
 
                 if (refPrefix.sort() != Sort.NULL) {
                     if (loc.sort() instanceof ObjectSort) {
-                        final LogicVariable[] vPre = atPre(pair);
-                        final Term[] tPre = var(vPre);
-                        final Term preAx = preAx(tPre, pair.locationSubs());
-                        result =
-                                update(update, imp(equals(
-                                        dot(tPre[0], created), TRUE),
-                                        createdOrNull(dot(tPre,
-                                                (AttributeOp) loc))));
-                        result = all(vPre, imp(preAx, result));
-                        if(rtsj){
-			    if(!pv.equals(parent) && !pv.equals(ma)){
-				result = and(result, attrOuterRef(update, pv));
-			    }
-			    if(pv.equals(stack) || pv.equals(ma)){
-				if(!ax[2]){
-				    result = and(result, legalReferencesRemainLegal(update));
-				    ax[2] = true;
-				}
-				if(!ax[0]){
-				    scopeAllocInOuterScope(update);
-				}
-				if((pv.equals(stack)) && !ax[3]){
-				    result = and(result, stackInjective(update));
-				    ax[3] = true;
-				}
-				if((pv.equals(ma)) && !ax[1]){
-				    scopeNotNull(update);
-				    ax[1] = true;
-				}
-			    }
-                        }
+                        result = validateInstanceReferenceTypedFieldUpdate(ax,
+                                update, pair, loc, pv);
                     } else if (pv == created) {
                         if (refPrefix.op() instanceof SortDependingFunction
                                 && ((SortDependingFunction) refPrefix.op()).getKind().equals(
@@ -292,6 +241,84 @@ public class InReachableStatePOBuilder extends TermBuilder {
         Debug.assertTrue(po.freeVars().size() == 0);
 
         return po;
+    }
+
+    private Term validateInstanceReferenceTypedFieldUpdate(boolean[] ax,
+            final Update update, final AssignmentPair pair, final Location loc,
+            final ProgramVariable pv) {
+	Term result;
+	final LogicVariable[] vPre = atPre(pair);
+	final Term[] tPre = var(vPre);
+	final Term preAx = preAx(tPre, pair.locationSubs());
+	result =
+	        update(update, imp(equals(
+	                dot(tPre[0], created), TRUE),
+	                createdOrNull(dot(tPre,
+	                        (AttributeOp) loc))));
+	result = all(vPre, imp(preAx, result));
+	if(rtsj){
+	    if(!pv.equals(parent) && !pv.equals(ma)){
+		result = and(result, attrOuterRef(update, pv));
+	    }
+	    if(pv.equals(stack) || pv.equals(ma)){
+		if(!ax[2]){
+		    result = and(result, legalReferencesRemainLegal(update));
+		    ax[2] = true;
+		}
+		if(!ax[0]){
+		    scopeAllocInOuterScope(update);
+		}
+		if((pv.equals(stack)) && !ax[3]){
+		    result = and(result, stackInjective(update));
+		    ax[3] = true;
+		}
+		if((pv.equals(ma)) && !ax[1]){
+		    scopeNotNull(update);
+		    ax[1] = true;
+		}
+	    }
+	}
+	return result;
+    }
+
+    private Term validateStaticReferenceTypedFieldUpdate(final Update update,
+            final AssignmentPair pair, final ProgramVariable pv) {
+	Term result;
+	result = staticFieldLiveRef(update, pair);
+	if(EnumClassDeclaration.isEnumConstant(pv))
+	    result = enumConstantPO(pv, update);
+	if (rtsj) result = and(result, staticAttrImmortal(update, pv));
+	return result;
+    }
+
+    private Term validateNextToCreateUpdate(boolean[] ax, final Update update,
+            final ProgramVariable pv, final ObjectSort containerType) {
+	Term result;
+	result = nextToCreateUpdatedSafely(update, pv);
+	
+	if (pv.getContainerType().getJavaType() instanceof EnumClassDeclaration) {
+	    result = and(result, addNextToCreateEnumPO(pv, update));
+	}
+	
+	
+	if(rtsj){
+	result = and(result, newObjectRefsLegal(update, containerType));
+
+	if(containerType.extendsTrans(services.getJavaInfo().
+		getJavaxRealtimeMemoryArea().getSort()) && !ax[0]){
+	    scopeAllocInOuterScope(update);
+	    ax[0] = true;
+	}
+	if(!ax[1]){
+	    scopeNotNull(update);
+	    ax[1] = true;
+	}
+	if(containerType instanceof ArraySort && 
+		((ArraySort) containerType).elementSort() instanceof ObjectSort){
+	    result = and(result, arraySlotOuterRef(update, containerType));
+	}
+	}
+	return result;
     }
 
     private Term arrayStoreValid(Term arrayRef, Term arrayValue) {
