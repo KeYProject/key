@@ -10,13 +10,13 @@ package de.uka.ilkd.key.rule.metaconstruct;
 
 import java.util.Iterator;
 
-import de.uka.ilkd.key.gui.configuration.ProofSettings;
-import de.uka.ilkd.key.java.abstraction.*;
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.abstraction.Field;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.EnumClassDeclaration;
 import de.uka.ilkd.key.java.expression.literal.IntLiteral;
@@ -29,7 +29,8 @@ import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.*;
 import de.uka.ilkd.key.proof.init.RTSJProfile;
 import de.uka.ilkd.key.rule.UpdateSimplifier;
-import de.uka.ilkd.key.rule.updatesimplifier.*;
+import de.uka.ilkd.key.rule.updatesimplifier.AssignmentPair;
+import de.uka.ilkd.key.rule.updatesimplifier.Update;
 import de.uka.ilkd.key.util.Debug;
 
 /**
@@ -47,7 +48,6 @@ public class InReachableStatePOBuilder extends TermBuilder {
     private final Term FALSE;
     private final ProgramVariable arraylength;
     private final boolean rtsj;
-    private final boolean rt;
     private final TermSymbol os;
     private final TermSymbol im;
     private final ProgramVariable ma;
@@ -62,22 +62,30 @@ public class InReachableStatePOBuilder extends TermBuilder {
                 services.getJavaInfo().getAttribute(
                         ImplicitFieldAdder.IMPLICIT_CREATED,
                         services.getJavaInfo().getJavaLangObject());
-        this.ma = services.getJavaInfo().getAttribute(
-                        ImplicitFieldAdder.IMPLICIT_MEMORY_AREA,
-                        services.getJavaInfo().getJavaLangObject());
-        this.stack = services.getJavaInfo().getAttribute(
-                "stack",
-                services.getJavaInfo().getJavaxRealtimeMemoryArea());
-        this.parent = services.getJavaInfo().getAttribute(
-                "parent",
-                services.getJavaInfo().getJavaxRealtimeMemoryArea());
         this.arraylength = services.getJavaInfo().getArrayLength();
-        os = (TermSymbol) services.getNamespaces().functions().lookup(new Name("outerScope"));
-        im = (TermSymbol) services.getNamespaces().functions().lookup(new Name("immortal"));
+
+        this.rtsj = (ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof RTSJProfile);
+        if (rtsj) {
+            this.stack = services.getJavaInfo().getAttribute(
+                    "stack",
+                    services.getJavaInfo().getJavaxRealtimeMemoryArea());
+            this.parent = services.getJavaInfo().getAttribute(
+                    "parent",
+                    services.getJavaInfo().getJavaxRealtimeMemoryArea());
+            this.ma = services.getJavaInfo().getAttribute(
+        	    ImplicitFieldAdder.IMPLICIT_MEMORY_AREA,
+        	    services.getJavaInfo().getJavaLangObject());
+            os = (TermSymbol) services.getNamespaces().functions().lookup(new Name("outerScope"));
+            im = (TermSymbol) services.getNamespaces().functions().lookup(new Name("immortal"));
+        } else {
+            this.stack  = null;
+            this.parent = null;
+            this.ma = null;
+            this.os = null;
+            this.im = null;
+        }
         this.TRUE = TRUE(services);
         this.FALSE = FALSE(services);
-        this.rtsj = (ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof RTSJProfile);
-        this.rt = rtsj;
     }
 
     /**
@@ -116,7 +124,7 @@ public class InReachableStatePOBuilder extends TermBuilder {
                         result = staticFieldLiveRef(update, pair);
                         if(EnumClassDeclaration.isEnumConstant(pv))
                             result = enumConstantPO(pv, update);
-                        if(rt) result = and(result, staticAttrImmortal(update, pv));
+                        if(rtsj) result = and(result, staticAttrImmortal(update, pv));
                     } else { // all implicit field are currently no reference
                         // fields
                         final ObjectSort containerType =
@@ -134,23 +142,22 @@ public class InReachableStatePOBuilder extends TermBuilder {
                             if (pv.getContainerType().getJavaType() instanceof EnumClassDeclaration) {
                                 result = and(result, addNextToCreateEnumPO(pv, update));
                             }
-                            if(rt){
-				result = and(result, newObjectRefsLegal(update, containerType));
-				
-				if(containerType.extendsTrans(services.getJavaInfo().
-							      getJavaxRealtimeMemoryArea().getSort()) &&
-				   !ax[0]){
-				    scopeAllocInOuterScope(update);
-				    ax[0] = true;
-				}
-				if(!ax[1]){
-				    scopeNotNull(update);
-				    ax[1] = true;
-				}
-			    }
-                            if(containerType instanceof ArraySort && rt && 
-			       ((ArraySort) containerType).elementSort() instanceof ObjectSort){
-                            	result = and(result, arraySlotOuterRef(update, containerType));
+                            if(rtsj){
+                        	result = and(result, newObjectRefsLegal(update, containerType));
+
+                        	if(containerType.extendsTrans(services.getJavaInfo().
+                        		getJavaxRealtimeMemoryArea().getSort()) && !ax[0]){
+                        	    scopeAllocInOuterScope(update);
+                        	    ax[0] = true;
+                        	}
+                        	if(!ax[1]){
+                        	    scopeNotNull(update);
+                        	    ax[1] = true;
+                        	}
+                        	if(containerType instanceof ArraySort && 
+                        		((ArraySort) containerType).elementSort() instanceof ObjectSort){
+                        	    result = and(result, arraySlotOuterRef(update, containerType));
+                        	}
                             }
                         } else {
                             // if one of these fields is updated we need an
@@ -214,7 +221,7 @@ public class InReachableStatePOBuilder extends TermBuilder {
                                         createdOrNull(dot(tPre,
                                                 (AttributeOp) loc))));
                         result = all(vPre, imp(preAx, result));
-                        if(rt){
+                        if(rtsj){
 			    if(!pv.equals(parent) && !pv.equals(ma)){
 				result = and(result, attrOuterRef(update, pv));
 			    }
@@ -268,7 +275,7 @@ public class InReachableStatePOBuilder extends TermBuilder {
                                     arrayStoreValid(tPre[0], atPreArrayTerm)));
 
                     result = all(vPre, imp(preAx, result));
-                    if(rt) result = and(result, arraySlotOuterRef(update, arraySort));
+                    if(rtsj) result = and(result, arraySlotOuterRef(update, arraySort));
                 }
             }
             if (result != null) {
@@ -381,11 +388,6 @@ public class InReachableStatePOBuilder extends TermBuilder {
      */
     private Term globalInvariants(Update update) {
         Term result = noObjectDeletion(update);
-	/* if(rt){
-        	result = and(new Term[]{result, scopeAllocInOuterScope(update), 
-        			scopeNotNull(update), legalReferencesRemainLegal(update)});
-        	if(rtsj) result = and(result, stackInjective(update));
-		}*/
         return result;
     }
 
