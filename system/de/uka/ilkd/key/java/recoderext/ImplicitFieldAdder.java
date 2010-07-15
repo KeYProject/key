@@ -54,9 +54,7 @@ public class ImplicitFieldAdder extends RecoderModelTransformer {
     public static final String IMPLICIT_MEMORY_AREA = "<memoryArea>";
        
     public static final String IMPLICIT_SIZE = "<size>";
-    
-    public static final String IMPLICIT_EXACT_SIZE = "<sizeExactInstance>";
-    
+        
     public static final String IMPLICIT_INITIALIZED = "<initialized>";
     public static final String IMPLICIT_TRANSIENT = "<transient>";
     
@@ -181,8 +179,7 @@ public class ImplicitFieldAdder extends RecoderModelTransformer {
         
 	if (ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof RTSJProfile){
 
-	    attach(createImplicitRecoderField("long", IMPLICIT_SIZE, true, true, true), td, 0);
-	    attach(createImplicitRecoderField("long", IMPLICIT_EXACT_SIZE, true, true, true), td, 0);
+	    attach(createImplicitRecoderField("long", IMPLICIT_SIZE, true, true, true), td, 0);	
 	    
 	}
 	
