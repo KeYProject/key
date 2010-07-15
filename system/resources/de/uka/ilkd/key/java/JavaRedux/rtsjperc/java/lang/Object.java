@@ -7,6 +7,7 @@ import javax.realtime.*;
 
 public class Object {  
 
+    /*@ public invariant \memoryArea(this)!=null && \memoryArea(this).stack!=null; @*/
 
     /*@ public normal_behavior
       @   assignable \nothing;
