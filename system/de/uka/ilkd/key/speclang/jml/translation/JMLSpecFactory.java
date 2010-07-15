@@ -562,14 +562,24 @@ public class JMLSpecFactory {
         Sort sort = kjt.getSort();
         ParsableVariable selfVar = new LogicVariable(new Name("self"), sort);
         
+        
         //translate expression
-        FormulaWithAxioms inv = translator.translateExpression(originalInv,
+        FormulaWithAxioms inv;
+        try{
+         inv = translator.translateExpression(originalInv,
                                                                kjt,
                                                                selfVar,
                                                                null,
                                                                null,
                                                                null,
                                                                null);        
+        } catch (SLTranslationException sle) {
+            throw sle;
+        } catch (Exception e) {                   
+            throw new SLTranslationException("Unexpected error when translating invariant of class " 
+        	    + kjt.getFullName() + "\nInvariant to parse: " + originalInv  + "\nError:" + e, originalInv.fileName, 
+        	    originalInv.pos);
+        }
         //create invariant
         String name = getInvName();
         return new ClassInvariantImpl(name,

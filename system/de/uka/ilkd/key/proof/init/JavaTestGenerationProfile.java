@@ -29,7 +29,7 @@ public class JavaTestGenerationProfile extends JavaProfile {
 
     private final static StrategyFactory DEFAULT =
         new VBTStrategy.Factory(0);
-
+  
     public JavaTestGenerationProfile(IMain main) {
         super("standardRules-testGen.key",
                 DefaultImmutableSet.<GoalChooserBuilder>nil().
@@ -37,6 +37,7 @@ public class JavaTestGenerationProfile extends JavaProfile {
                 add(new DepthFirstGoalChooserBuilder()).
                 add(new BalancedGoalChooserBuilder()),
                 main);
+            
     }
     
     /** @param main can be null. It is not used
@@ -44,7 +45,7 @@ public class JavaTestGenerationProfile extends JavaProfile {
      *  @param loopBound - if the value is smaller than 0 then it has no effect (unbounded loop unwinding is used). 
      *  Otherwise if @loopBound is equal or greater than 0 then this is the number of loop iterations considered. 
      */
-    public JavaTestGenerationProfile(IMain main, boolean loop, int loopBound ) {
+    public JavaTestGenerationProfile(IMain main, boolean loop, int loopBound) {
 	this(main);
 	if(loop){
 	    VBTStrategy.preferedGoalChooser = BalancedGoalChooserBuilder.NAME;
@@ -73,9 +74,11 @@ public class JavaTestGenerationProfile extends JavaProfile {
         ChoiceSettings cs = settings.getChoiceSettings();
         HashMap<String, String> dcs = cs.getDefaultChoices();
         dcs.put("testGeneration", "testGeneration:testOn");
+        
         cs.setDefaultChoices(dcs);
         settings.getStrategySettings().setStrategy(new Name("VBTStrategy"));
     }
+
 
     /**
      * returns the file name of the internal class list

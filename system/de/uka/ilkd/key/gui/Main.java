@@ -2723,6 +2723,7 @@ public class Main extends JFrame implements IMain {
 			if(loopBound>=0)System.out.println("Bounded loop unwinding. Unwinding bound:"+loopBound);
 			index++;
 		    }
+		    		    
 		    if(mode==1||mode==2){
 			ProofSettings.DEFAULT_SETTINGS.setProfile(
 								  new JavaTestGenerationProfile(null,loop,loopBound));

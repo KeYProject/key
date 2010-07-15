@@ -193,7 +193,7 @@ class JavaReduxFileCollection implements FileCollection {
             // may be null!
             currentURL = KeYResourceManager.getManager().getResourceFile(
                     Recoder2KeY.class, resourceLocation + "/" + current);
-
+            
             return true;
         }
 
