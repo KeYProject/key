@@ -619,10 +619,7 @@ options {
 		= javaInfo.getAttribute("objectTimesFinalized", 
                                         javaInfo.getJavaLangObject());
                                         
-    LocationVariable dma = javaInfo.getDefaultMemoryArea();
-    
-    ProgramVariable consumed
-		= javaInfo.getAttribute("consumed", "javax.realtime.MemoryArea");
+    	
 		
 	//create logic variable, guard
         Sort integerSort 
@@ -663,6 +660,11 @@ options {
 	if((ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof RTSJProfile) && 
                 		((RTSJProfile) ProofSettings.DEFAULT_SETTINGS.getProfile()).memoryConsumption()){
 		//initialMemoryArea.consumed
+		LocationVariable dma = javaInfo.getDefaultMemoryArea();
+    
+    		ProgramVariable consumed
+		= javaInfo.getAttribute("consumed", "javax.realtime.MemoryArea");
+		
 		Term cons = tb.dot(tb.var(dma), consumed);
 		BasicLocationDescriptor cld
 			= new BasicLocationDescriptor(cons);
