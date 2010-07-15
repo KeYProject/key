@@ -175,8 +175,11 @@ public abstract class AbstractMetaOperator extends Op implements MetaOperator {
     public static final AbstractMetaOperator DIVIDE_LCR_MONOMIALS = new DivideLCRMonomials ();
 
     public static final AbstractMetaOperator CREATE_IN_REACHABLE_STATE_PO = 
-        new CreateInReachableStatePO ();
-    
+        new CreateInReachableStatePO ("#createInReachableStatePO", InReachableStatePOBuilder.class);
+
+    public static final AbstractMetaOperator CREATE_IN_REACHABLE_STATE_PO_RTSJ = 
+        new CreateInReachableStatePO("#createInReachableStateRTSJPO", InReachableStateRTSJPOBuilder.class);
+
     public static final AbstractMetaOperator INTRODUCE_ATPRE_DEFINITIONS = new IntroAtPreDefsOp();
     
     public static final AbstractMetaOperator AT_PRE_EQUATIONS = new AtPreEquations();
