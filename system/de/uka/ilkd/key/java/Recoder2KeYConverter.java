@@ -1765,7 +1765,12 @@ public class Recoder2KeYConverter {
     }
 
     public ExecutionContext convert(de.uka.ilkd.key.java.recoderext.ExecutionContext arg) {
-        return new ExecutionContext(collectChildrenAndComments(arg));
+        final recoder.java.reference.TypeReference tr = arg.getTypeReference();
+        final recoder.java.reference.ReferencePrefix mem = arg.getMemoryArea();
+        final recoder.java.reference.ReferencePrefix runtime = arg.getRuntimeInstance();
+	return new ExecutionContext((TypeReference)convert(tr), 
+		(ReferencePrefix)(mem != null ? convert((recoder.java.JavaProgramElement) mem) : null),
+		(ReferencePrefix)(runtime != null ? convert((recoder.java.JavaProgramElement) runtime) : null));
     }
 
     public ThisConstructorReference convert(recoder.java.reference.ThisConstructorReference arg) {

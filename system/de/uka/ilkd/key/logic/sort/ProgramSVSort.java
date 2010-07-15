@@ -86,9 +86,6 @@ public abstract class ProgramSVSort extends PrimitiveSort {
     
     //----------- Expressions with restrictions on kind of type -------------
 
-//    public static final ModelMethodSort MODELMETHOD
-//	= new ModelMethodSort();
-
     public static final NonSimpleMethodReferenceSort NONSIMPLEMETHODREFERENCE
 	= new NonSimpleMethodReferenceSort();
 
@@ -372,9 +369,6 @@ public abstract class ProgramSVSort extends PrimitiveSort {
     public static final ProgramSVSort SEP //TODO
         = new SpecificMethodNameSort(new ProgramElementName("sep"));
 
-    public static final ProgramSVSort  DEBUGGERTYPEREF
-    = new  DebuggerTypeReferenceSort();
-    
     //---------------REFERENCE SORTS ------------------------
     public static final ProgramSVSort EXECUTIONCONTEXT = new ExecutionContextSort();
 
@@ -613,10 +607,6 @@ public abstract class ProgramSVSort extends PrimitiveSort {
 	    if (pe instanceof ThisReference) {
 		return true;
 	    }
-
-/*	    if(pe instanceof CurrentMemoryAreaReference){
-		return true;
-	    }*/
 
 	    return VARIABLE.canStandFor(pe, services);    
 	}
@@ -959,27 +949,6 @@ public abstract class ProgramSVSort extends PrimitiveSort {
 	}
     }
     
-    
-    /**
-     * This sort represents a type of program schema variables that
-     * match only on type references.
-     */    
-    private static class DebuggerTypeReferenceSort extends ProgramSVSort {
-
-        public DebuggerTypeReferenceSort() {
-            super(new Name("DebuggerType"));
-        }
-
-        protected boolean canStandFor(ProgramElement check, Services services) {
-            if (check instanceof TypeReference){
-               TypeReference tr = (TypeReference)check;
-               System.out.println(tr.getReferencePrefix());
-                
-            } 
-            return false;
-        }
-    }
-
 
     /**
      * This sort represents a type of program schema variables that

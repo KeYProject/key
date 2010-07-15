@@ -2023,7 +2023,7 @@ ExecutionContext ExecutionContext() :
     ExpressionSVWrapper memoryArea = null;
 }
 {
-    tr = TypeSV() "(" ( memoryArea = ExpressionSV() (","  instance = ExpressionSV() )? )? ")"  
+    tr = TypeSV() "(" ( ( memoryArea = ExpressionSV() (","  instance = ExpressionSV() )? ) | instance = ExpressionSV() )? ")"  
     {
 	return new ExecutionContext(tr, memoryArea, instance);
     } 
@@ -3690,8 +3690,6 @@ StatementBlock StartBlock() :
 { 
    "{" (   LOOKAHEAD(2)
            ( <DOT> ( LOOKAHEAD(2) 
-		//     tr = TypeSV() "(" (sv = ExpressionSV() (","
-		//			sv1 = ExpressionSV())?)? ")" |  
 		     ec = ExecutionContext()  |
 	             ec = ExecutionContextSV() ))? 
             <CONTEXTSTART> 

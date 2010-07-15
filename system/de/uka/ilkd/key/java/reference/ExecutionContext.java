@@ -51,8 +51,8 @@ public class ExecutionContext
             ReferencePrefix runtimeInstance) {
         if (classContext == null) Debug.printStackTrace();
         this.classContext = classContext;
-        this.runtimeInstance = runtimeInstance;
         this.memoryArea = memoryArea;       
+        this.runtimeInstance = runtimeInstance;
     }
     
     /**
@@ -66,10 +66,22 @@ public class ExecutionContext
 	    { System.out.println("||||"+children); Debug.printStackTrace(); }
 
 	children.remove(this.classContext);
-        this.memoryArea = (ReferencePrefix) children.removeFirstOccurrence(
+	
+	ReferencePrefix one = (ReferencePrefix) children.removeFirstOccurrence(
                 ReferencePrefix.class);         
-        this.runtimeInstance = (ReferencePrefix) children.removeFirstOccurrence(
+        ReferencePrefix two = (ReferencePrefix) children.removeFirstOccurrence(
                 ReferencePrefix.class);
+        
+                
+        if (two == null) {
+            this.memoryArea = null;
+            this.runtimeInstance = one;            
+        } else {
+            this.memoryArea = one;
+            this.runtimeInstance = two;                        
+        }
+        
+        assert (memoryArea == null || runtimeInstance != null);
     }
 
 
@@ -142,7 +154,7 @@ public class ExecutionContext
         p.printExecutionContext(this);
     }
 
-    public String toString() {
+    public String toString() {	
         return "Context: " + classContext + " MemoryArea: " + memoryArea + " Instance: "+runtimeInstance;
     }
     

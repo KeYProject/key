@@ -967,8 +967,8 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
 
     public void performActionOnExecutionContext(ExecutionContext x) {
         DefaultAction def = new DefaultAction(x) {
-            ProgramElement createNewElement(ExtList changeList) {
-                return new ExecutionContext(changeList);
+            ProgramElement createNewElement(ExtList changeList) {        	
+        	return new ExecutionContext(changeList);
             }
         };
         def.doAction(x);

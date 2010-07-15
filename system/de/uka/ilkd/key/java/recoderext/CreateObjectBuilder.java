@@ -67,10 +67,6 @@ public class CreateObjectBuilder extends RecoderModelTransformer {
 
 	final ASTList<Expression> arguments = new ASTArrayList<Expression>(0);
         
-//        arguments.add(new FieldReference(new TypeReference(new PackageReference(new PackageReference(new Identifier("javax")), 
-//                new Identifier("realtime")), new Identifier("MemoryArea")), 
-//                new Identifier("callerScope")));
-       
         result.add
             (assign(new VariableReference
                     (new Identifier(NEW_OBJECT_VAR_NAME)),
