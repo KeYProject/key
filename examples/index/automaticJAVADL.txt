@@ -107,6 +107,14 @@
 ./heap/SmansEtAl/Stack_size.key
 ./heap/SmansEtAl/Stack_Stack.key
 ./heap/SmansEtAl/Stack_switchContents.key
+./heap/vacid0_sparse_array/Harness_sparseArrayTestHarness1.key
+./heap/vacid0_sparse_array/Harness_sparseArrayTestHarness2.key
+./heap/vacid0_sparse_array/MemoryAllocator_alloc_unsigned.key
+./heap/vacid0_sparse_array/MemoryAllocator_alloc.key
+./heap/vacid0_sparse_array/SparseArray_get_dep.key
+./heap/vacid0_sparse_array/SparseArray_get.key
+./heap/vacid0_sparse_array/SparseArray_inv.key
+./heap/vacid0_sparse_array/SparseArray_SparseArray.key
 ./standard_key/arith/binomial1.key
 ./standard_key/arith/binomial2.key
 ./standard_key/arith/check_jdiv.key

@@ -227,7 +227,8 @@ public final class UseDependencyContractRule implements BuiltInRule {
 	    return false;
 	}
 	for(int i = 1, n = candidate.arity(); i < n; i++) {
-	    if(!candidate.sub(i).equals(focus.sub(i))) {
+	    if(!(candidate.sub(i).equals(focus.sub(i)) 
+		 || candidate.sub(i).op() instanceof LogicVariable)) {
 		return false;
 	    }
 	}
@@ -240,7 +241,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
     				       Map<Term, PosInOccurrence> result) {
 	final Term candidate = pos.subTerm();
 	if(isBaseOcc(focus, candidate)) {
-	    result.put(pos.subTerm().sub(0), pos);
+	    result.put(candidate.sub(0), pos);
 	}
 	for(int i = 0, n = candidate.arity(); i < n; i++) {
 	    collectBaseOccsHelper(focus, pos.down(i), result);

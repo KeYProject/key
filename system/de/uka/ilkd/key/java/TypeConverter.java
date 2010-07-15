@@ -140,7 +140,8 @@ public final class TypeConverter {
 	
 	//hack: convert object singleton to location singleton
 	if(op instanceof Singleton) {
-	    assert heapLDT.getSortOfSelect(subs[0].op()) != null;
+	    assert heapLDT.getSortOfSelect(subs[0].op()) != null 
+	           : "unexpected argument of \\singleton: " + subs[0];
 	    return TB.singleton(services, subs[0].sub(1), subs[0].sub(2));
 	}	
 	
