@@ -466,7 +466,7 @@ public class UseOperationContractRule implements BuiltInRule {
         ExecutionContext ec = getExecutionContext(pio);
         Term mTerm = null;
 	if(services.getProof().getSettings().getProfile() instanceof RTSJProfile){ 
-	    mTerm = services.getTypeConverter().convertToLogicElement(ec.getMemoryArea(), ec);
+	    mTerm = services.getTypeConverter().convertToLogicElement(ec.getMemoryAreaAsRef(), ec);
 	}
             
         //translate the contract and the invariants

@@ -82,14 +82,15 @@ public class IntroAtPreDefsOp extends AbstractMetaOperator {
         //determine "self"
         Term selfTerm;
         ExecutionContext ec = (ExecutionContext) frame.getExecutionContext();
-        ReferencePrefix rp = ec.getRuntimeInstance();
+        ReferencePrefix rp = ec.getRuntimeInstanceAsRef();
         if(rp == null || rp instanceof TypeReference) {
             selfTerm = null;
         } else {
             selfTerm = services.getTypeConverter().convertToLogicElement(rp);
         }
         
-        Term memoryArea = ec.getMemoryArea() == null ? null : services.getTypeConverter().convertToLogicElement(ec.getMemoryArea());
+        Term memoryArea = ec.getMemoryAreaAsRef() == null ? null : 
+            services.getTypeConverter().convertToLogicElement(ec.getMemoryAreaAsRef());
 
         //collect atPre-functions, update loop invariants
         Map<Operator, Function /*atPre*/> atPreFunctions = 

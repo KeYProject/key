@@ -1201,8 +1201,9 @@ public class JavaInfo {
             }
             final KeYJavaType kjt = 
                 getKeYJavaTypeByClassName(DEFAULT_EXECUTION_CONTEXT_CLASS);                     
+            final LocationVariable memArea = getDefaultMemoryArea();
             defaultExecutionContext = 
-                new ExecutionContext(new TypeRef(kjt), getDefaultMemoryArea(), null);
+                new ExecutionContext(new TypeRef(kjt), memArea != null ? new MemoryAreaEC(memArea) : null, null);
         }
         return defaultExecutionContext;
     }

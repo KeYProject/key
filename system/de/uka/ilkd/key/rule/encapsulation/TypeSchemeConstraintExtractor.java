@@ -134,6 +134,59 @@ class TypeSchemeConstraintExtractor implements Visitor {
     }
     
     
+    private String addSpaces(String s) {
+        while(s.length() < 45) {
+             s += " ";
+        }
+        return s;
+    }
+
+
+    private boolean areInSameFamily(MethodReference mr1, MethodReference mr2) {
+        ExecutionContext ec = svInst.getExecutionContext();
+        
+        if(!mr1.getProgramElementName().equals(mr2.getProgramElementName())) {
+            return false;
+        }
+        
+        if(!haveCommonSupertype(mr1.determineStaticPrefixType(services, ec),
+                                mr2.determineStaticPrefixType(services, ec))) {
+            return false;                                        
+        }
+        
+        ImmutableList<KeYJavaType> sig1 = mr1.getMethodSignature(services, ec);
+        ImmutableList<KeYJavaType> sig2 = mr2.getMethodSignature(services, ec);
+        if(sig1.size() != sig2.size()) {
+            return false;
+        }
+        
+        Iterator<KeYJavaType> it1 = sig1.iterator();
+        Iterator<KeYJavaType> it2 = sig2.iterator();
+        while(it1.hasNext()) {
+            if(!haveCommonSupertype(it1.next(), it2.next())) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+    
+    
+    
+    //-------------------------------------------------------------------------
+    //helper methods
+    //-------------------------------------------------------------------------
+    
+    /**
+     * Tells whether the current context is static or not.
+     */
+    private boolean contextIsStatic() {
+        ExecutionContext executionContext = svInst.getExecutionContext();
+        return (executionContext == null 
+                || !(executionContext.getRuntimeInstanceAsRef() instanceof Expression));
+    }
+    
+
     /**
      * Compares a program with the universe type rules.
      * @param root the program
@@ -178,25 +231,6 @@ class TypeSchemeConstraintExtractor implements Visitor {
 
 
     /**
-     * Returns a list of the methods which have been analysed in the last run 
-     * of extract().
-     */
-    public ImmutableList<ProgramMethod> getCoveredMethods() {
-        return coveredMethods;
-    }
-    
-    
-    
-    //-------------------------------------------------------------------------
-    //helper methods
-    //-------------------------------------------------------------------------
-    
-    private void verbose(Object o) {
-        //System.out.println(o);
-    }
-    
-
-    /**
      * Marks the current run as failed. Ensures that the resulting constraints
      * cannot be fulfilled.
      */
@@ -206,71 +240,44 @@ class TypeSchemeConstraintExtractor implements Visitor {
         checker.fail();
     }
 
-
+    
     private void failUnexpected(ProgramElement pe) {
         fail("Encountered an unexpected type of program element: " + pe
              + " (" + pe.getClass() + ")");
     }
+    
+    
+    /**
+     * Returns a list of the methods which have been analysed in the last run 
+     * of extract().
+     */
+    public ImmutableList<ProgramMethod> getCoveredMethods() {
+        return coveredMethods;
+    }
+    
+    
+    private ProgramVariable getFormalResultVar(MethodReference mr) {
 
-    
-    private void printStack() {
-        verbose("Current stack:");
-        for (Object aStack : stack) {
-            verbose(aStack);
+        for (Object o : formalResultVars.keySet()) {
+            MethodReference mr2 = (MethodReference) o;
+            if (areInSameFamily(mr, mr2)) {
+                return (ProgramVariable) formalResultVars.get(mr2);
+            }
         }
-    }
     
-    
-    /**
-     * Pushes a term onto the stack.
-     */
-    private void push(TypeSchemeTerm term) {
-        Debug.assertTrue(term != null);
-        verbose("Pushing:    " + term);
-        stack.push(term);
-    }
-    
-    
-    /**
-     * Pops a term off the stack.
-     */
-    private TypeSchemeTerm pop() {
-        verbose("Popping:    " + stack.peek());
-        if(stack.peek() == LEVEL) {
-            printStack();
-        }
-        return (TypeSchemeTerm) stack.pop();
+        KeYJavaType resultType
+                        = mr.getKeYJavaType(services,
+                                            svInst.getExecutionContext());
+        ProgramElementName resultName
+                        = new ProgramElementName("res_" + mr.getName());
+        ProgramVariable formalResultVar = new LocationVariable(resultName,
+                                                              resultType);
+        formalResultVars.put(mr, formalResultVar);
+
+        return formalResultVar;
     }
         
     
-    /**
-     * Pushes the LEVEL constant onto the stack.
-     */
-    private void pushLevel() {
-        stack.push(LEVEL);
-    }
-    
-    
-    /**
-     * Pops all elements until the next LEVEL constant (inclusive) from the 
-     * stack.
-     * @return a list of the elements, whose the first element is the lowermost
-     * element from the stack which is not LEVEL
-     */
-    private ImmutableList<TypeSchemeTerm> popLevel() {
-        ImmutableList<TypeSchemeTerm> result = ImmutableSLList.<TypeSchemeTerm>nil();
-    
-        Object o = stack.pop();
-        while(o != LEVEL) {
-            verbose("Level-popping: " + o);
-            result = result.prepend((TypeSchemeTerm) o);
-            o = stack.pop();
-        }
-        
-        return result;
-    }
-
-
     private boolean haveCommonSupertype(KeYJavaType kjt1, KeYJavaType kjt2) {
         JavaInfo javaInfo = services.getJavaInfo();
         
@@ -296,72 +303,8 @@ class TypeSchemeConstraintExtractor implements Visitor {
         
         return false;
     }
-
-
-    private boolean areInSameFamily(MethodReference mr1, MethodReference mr2) {
-        ExecutionContext ec = svInst.getExecutionContext();
-        
-        if(!mr1.getProgramElementName().equals(mr2.getProgramElementName())) {
-            return false;
-        }
-        
-        if(!haveCommonSupertype(mr1.determineStaticPrefixType(services, ec),
-                                mr2.determineStaticPrefixType(services, ec))) {
-            return false;                                        
-        }
-        
-        ImmutableList<KeYJavaType> sig1 = mr1.getMethodSignature(services, ec);
-        ImmutableList<KeYJavaType> sig2 = mr2.getMethodSignature(services, ec);
-        if(sig1.size() != sig2.size()) {
-            return false;
-        }
-        
-        Iterator<KeYJavaType> it1 = sig1.iterator();
-        Iterator<KeYJavaType> it2 = sig2.iterator();
-        while(it1.hasNext()) {
-            if(!haveCommonSupertype(it1.next(), it2.next())) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-
-    private ProgramVariable getFormalResultVar(MethodReference mr) {
-
-        for (Object o : formalResultVars.keySet()) {
-            MethodReference mr2 = (MethodReference) o;
-            if (areInSameFamily(mr, mr2)) {
-                return (ProgramVariable) formalResultVars.get(mr2);
-            }
-        }
     
-        KeYJavaType resultType
-                        = mr.getKeYJavaType(services,
-                                            svInst.getExecutionContext());
-        ProgramElementName resultName
-                        = new ProgramElementName("res_" + mr.getName());
-        ProgramVariable formalResultVar = new LocationVariable(resultName,
-                                                              resultType);
-        formalResultVars.put(mr, formalResultVar);
-
-        return formalResultVar;
-    }
     
-
-    /**
-     * Tells whether a method body statement describes a constructor invocation
-     * within an allocation (i.e. not this() or super())
-     */
-    private boolean isAllocationConstructorInvocation(MethodBodyStatement mbs) {
-        final ProgramMethod pm = mbs.getProgramMethod(services);
-        return (pm.name().toString().endsWith(ConstructorNormalformBuilder.
-                CONSTRUCTOR_NORMALFORM_IDENTIFIER) && 
-                mbs.getResultVariable() == null);
-    }
-
-
     /**
      * Tells whether a program method should actually have a (non-empty)
      * implementation, but it is not available to KeY.
@@ -378,69 +321,80 @@ class TypeSchemeConstraintExtractor implements Visitor {
                && pm.getBody().isEmpty()
                && !typeDecl.getFullName().equals("java.lang.Object"));
     }
-    
-    
-    /**
-     * Tells whether the current context is static or not.
-     */
-    private boolean contextIsStatic() {
-        ExecutionContext executionContext = svInst.getExecutionContext();
-        return (executionContext == null 
-                || !(executionContext.getRuntimeInstance()
-                     instanceof Expression));
-    }
 
 
     /**
-     * Replaces an expression by a simpler one with the same static type,
-     * so that it can be handled as a receiver or parameter by the
-     * ConstructorCall and MethodCall metaconstructs.
+     * Tells whether a method body statement describes a constructor invocation
+     * within an allocation (i.e. not this() or super())
      */
-    private ProgramVariable simplifyExpression(Expression expression) {
-        KeYJavaType staticKjt
-                = expression.getKeYJavaType(services,
-                                            svInst.getExecutionContext());
-        Debug.assertTrue(staticKjt != null);
-        return new LocationVariable(INVISIBLE_NAME, staticKjt);
+    private boolean isAllocationConstructorInvocation(MethodBodyStatement mbs) {
+        final ProgramMethod pm = mbs.getProgramMethod(services);
+        return (pm.name().toString().endsWith(ConstructorNormalformBuilder.
+                CONSTRUCTOR_NORMALFORM_IDENTIFIER) && 
+                mbs.getResultVariable() == null);
     }
 
 
-    private ImmutableArray<Expression> simplifyExpressions(
-						ImmutableArray<Expression> expressions) {
-	Expression[] result = new Expression[expressions.size()];
-	for(int i = 0; i < expressions.size(); i++) {
-	    result[i] = simplifyExpression(expressions.get(i));
-	}
-	return new ImmutableArray<Expression>(result);
+    public void performActionOnAbstractProgramElement(
+                                                    AbstractProgramElement x) {
+        failUnexpected(x);
     }
 
 
-    private New simplifyNew(New n) {
-        Debug.assertFalse(n.getReferencePrefix() instanceof Expression);
-	ImmutableArray<Expression> simpleArgs = simplifyExpressions(n.getArguments());
-	Expression[] simpleArgsArray = new Expression[simpleArgs.size()];
-	for(int i = 0; i < simpleArgs.size(); i++) {
-	    simpleArgsArray[i] = simpleArgs.get(i);
-	}
-	return new New(simpleArgsArray, 
-		       n.getTypeReference(), 
-		       n.getReferencePrefix());
+    public void performActionOnArrayDeclaration(ArrayDeclaration x) {
+        failUnexpected(x);
+    }
+    
+
+    public void performActionOnArrayInitializer(ArrayInitializer x) {
+        //nothing to do (handled in performActionOnNewArray() and
+        //performActionOnVariableSpecification())
     }
 
 
-    private MethodReference simplifyMethodReference(MethodReference mr) {
-        ReferencePrefix rp = mr.getReferencePrefix();
-	ReferencePrefix simpleRp = (rp instanceof ThisReference
-                                    || rp instanceof SuperReference
-                                    || rp instanceof ProgramVariable
-                                    || rp instanceof FieldReference
-                                    || !(rp instanceof Expression)
-                                    ? rp
-                                    : simplifyExpression((Expression) rp));
+    public void performActionOnArrayLengthReference(ArrayLengthReference x) {
+        performActionOnPrimitiveLiteral();
+    }
+    
+    
+    public void performActionOnArrayReference(ArrayReference x) {
+        if(!entering) {
+	    TypeSchemeTerm positionTerm = pop();
+            TypeSchemeTerm receiverTerm = pop();
+            
+            Expression arrayExpr = (Expression) x.getChildAt(0);
+            Sort arraySort
+                    = arrayExpr.getKeYJavaType(services,
+                                               svInst.getExecutionContext())
+                               .getSort();
 
-        return new MethodReference(simplifyExpressions(mr.getArguments()), 
-				   mr.getMethodName(), 
-				   simpleRp);
+	    TypeSchemeTerm referenceTerm
+                    = checker.checkArrayAccess(arraySort,
+                                               receiverTerm,
+                                               positionTerm);
+
+	    push(referenceTerm);
+        }
+    }
+
+
+    public void performActionOnAssert(Assert assert1) {        
+        //nothing to do        
+    }
+
+
+    public void performActionOnBinaryAnd(BinaryAnd x) {
+        performActionOnPrimitiveBinary();
+    }
+
+
+    public void performActionOnBinaryAndAssignment(BinaryAndAssignment x) {
+        performActionOnPrimitiveBinary();
+    }
+
+
+    public void performActionOnBinaryNot(BinaryNot x) {
+        performActionOnPrimitiveBinary();
     }
     
     
@@ -449,216 +403,71 @@ class TypeSchemeConstraintExtractor implements Visitor {
     //AST walking methods
     //-------------------------------------------------------------------------
     
-    private String addSpaces(String s) {
-        while(s.length() < 45) {
-             s += " ";
-        }
-        return s;
+    public void performActionOnBinaryOr(BinaryOr x) {
+        performActionOnPrimitiveBinary();
     }
     
     
-    private void walk(ProgramElement node) {
-        //debug output
-        String fullClassName = node.getClass().getName();
-        String className
-                = fullClassName.substring(fullClassName.lastIndexOf(".") + 1);
-        String enteringString
-                = addSpaces("Entering:   " + node) + "(" + className + ")";
-        String ascendingString
-                = addSpaces("Ascending:  " + node) + "(" + className + ")";
-        verbose(enteringString);
-    
-        //visit the node
-        adoptedChildren = null;
-        entering = true;
-        node.visit(this);
-        
-        //walk children (either the adopted or the normal ones)
-        if(adoptedChildren != null) {
-            ProgramElement[] ac = adoptedChildren.clone();
-            for (ProgramElement anAc : ac) {
-                walk(anAc);
-            }
-            verbose(ascendingString);
-        } else if(node instanceof NonTerminalProgramElement) {
-            NonTerminalProgramElement nonTerminalNode 
-                        = (NonTerminalProgramElement) node;
-            for(int i = 0; i < nonTerminalNode.getChildCount(); i++) {
-                walk(nonTerminalNode.getChildAt(i));
-            }
-            verbose(ascendingString);
-        }
-        
-        //visit the node again
-        entering = false;
-        node.visit(this);
+    public void performActionOnBinaryOrAssignment(BinaryOrAssignment x) {
+        performActionOnPrimitiveBinary();
     }
 
 
-    private void performActionOnPrimitiveLiteral() {
-        if(!entering) {
-            TypeSchemeTerm resultTerm = checker.checkPrimitiveLiteral();
-            push(resultTerm);
-        }
+    public void performActionOnBinaryXOr(BinaryXOr x) {
+        performActionOnPrimitiveBinary();
     }
 
 
-    private void performActionOnPrimitiveUnary() {
-        if(!entering) {
-            TypeSchemeTerm operandTerm = pop();
-            TypeSchemeTerm resultTerm
-                        = checker.checkPrimitiveUnary(operandTerm);
-            push(resultTerm);
-        }
+    public void performActionOnBinaryXOrAssignment(BinaryXOrAssignment x) {
+        performActionOnPrimitiveBinary();
     }
 
     
      
-    private void performActionOnPrimitiveBinary() {
-        if(!entering) {
-            TypeSchemeTerm operandTerm1 = pop();
-            TypeSchemeTerm operandTerm2 = pop();
-
-            TypeSchemeTerm resultTerm
-                        = checker.checkPrimitiveBinary(operandTerm1,
-                                                       operandTerm2);
-
-            push(resultTerm);
-        }
-    }
-
-      
-    public void performActionOnAbstractProgramElement(
-                                                    AbstractProgramElement x) {
-        failUnexpected(x);
-    }
-    
-   
-    public void performActionOnProgramElementName(ProgramElementName x) {
-        //nothing to do
-    }
-    
-    
-    public void performActionOnProgramVariable(ProgramVariable x) {
-        if(!entering) {
-            TypeSchemeTerm varTerm;
-            
-            if(x.isMember()) {
-                if(x.isStatic()) {
-                    varTerm = checker.checkStaticField(x);
-                } else {
-                    varTerm = checker.checkInstanceField(x);
-                }
-            } else {
-                if(contextIsStatic()) {
-                    varTerm = checker.checkStaticLocalVariable(x);
-                } else {
-                    varTerm = checker.checkInstanceLocalVariable(x);
-                }
-            }
-        
-            push(varTerm);
-        }
-    }
-    
-    public void performActionOnIProgramVariable(IProgramVariable x) {
-        if(x instanceof ProgramVariable){
-            performActionOnProgramVariable(( ProgramVariable)x);
-        }else{
-            failUnexpected(x);
-        }
-    }
-
-    
-    public void performActionOnSchemaVariable(SchemaVariable x) {
-        failUnexpected((ProgramSV) x);
-    }
-    
-    
-    public void performActionOnProgramMethod(ProgramMethod x) {
-        failUnexpected(x);
-    }
-
-    
-    public void performActionOnProgramMetaConstruct(ProgramMetaConstruct x) {
-        failUnexpected(x);
-    }
-
-    
-    public void performActionOnContextStatementBlock(ContextStatementBlock x) {
-        failUnexpected(x);
-    }
-
-    
-    public void performActionOnIntLiteral(IntLiteral x) {
-        performActionOnPrimitiveLiteral();
-    }
-
-    
     public void performActionOnBooleanLiteral(BooleanLiteral x) {
         performActionOnPrimitiveLiteral();
     }
 
+      
+    public void performActionOnBreak(Break x) {
+        //nothing to do
+    }
     
-    public void performActionOnStringLiteral(StringLiteral x) {
+   
+    public void performActionOnCase(Case x) {
+        //nothing to do
+    }
+    
+    
+    public void performActionOnCatch(Catch x) {
         if(!entering) {
-            TypeSchemeTerm stringLiteralTerm = checker.checkStringLiteral();
-            push(stringLiteralTerm);
+            TypeSchemeTerm excTerm = pop();
+            checker.checkCatch(excTerm);
         }
     }
-
     
-    public void performActionOnNullLiteral(NullLiteral x) {
-        if(!entering) {
-            TypeSchemeTerm nullTerm = checker.checkNull();
-            push(nullTerm);
-        }
-    }
-    
-         
-    public void performActionOnCharLiteral(CharLiteral x) {
-        performActionOnPrimitiveLiteral();
-    }
-
-     
-    public void performActionOnDoubleLiteral(DoubleLiteral x) {
-        performActionOnPrimitiveLiteral();
-    }
-
-     
-    public void performActionOnLongLiteral(LongLiteral x) {
-        performActionOnPrimitiveLiteral();
-    }
-
-    
-    public void performActionOnFloatLiteral(FloatLiteral x) {
-        performActionOnPrimitiveLiteral();
-    }
-
-     
-    public void performActionOnPackageSpecification(PackageSpecification x) {
+    public void performActionOnCatchAllStatement(CatchAllStatement x) {
         failUnexpected(x);
     }
 
     
-    public void performActionOnTypeReference(TypeReference x) {
-        //nothing to do
+    public void performActionOnCharLiteral(CharLiteral x) {
+        performActionOnPrimitiveLiteral();
+    }
+    
+    
+    public void performActionOnClassDeclaration(ClassDeclaration x) {
+        failUnexpected(x);
     }
 
     
-    public void performActionOnPackageReference(PackageReference x) {
-        //nothing to do
+    public void performActionOnClassInitializer(ClassInitializer x) {
+        failUnexpected(x);
     }
 
     
-    public void performActionOnThrows(Throws x) {
+    public void performActionOnComment(Comment x) {
         //nothing to do
-    }
-
-    
-    public void performActionOnArrayInitializer(ArrayInitializer x) {
-        //nothing to do (handled in performActionOnNewArray() and
-        //performActionOnVariableSpecification())
     }
 
     
@@ -667,22 +476,107 @@ class TypeSchemeConstraintExtractor implements Visitor {
     }
 
     
-    public void performActionOnArrayDeclaration(ArrayDeclaration x) {
+    public void performActionOnConditional(Conditional x) {
+        if(!entering) {
+            TypeSchemeTerm elseTerm = pop();
+            TypeSchemeTerm thenTerm = pop();
+            TypeSchemeTerm conditionTerm = pop();
+            
+            TypeSchemeTerm conditionalTerm
+                        = checker.checkConditional(conditionTerm,
+                                                   thenTerm,
+                                                   elseTerm);
+
+            push(conditionalTerm);
+        }
+    }
+
+    
+    public void performActionOnConstructorDeclaration(
+                                                ConstructorDeclaration x) {
         failUnexpected(x);
     }
 
     
-    public void performActionOnSuperArrayDeclaration(SuperArrayDeclaration x) {
+    public void performActionOnContextStatementBlock(ContextStatementBlock x) {
         failUnexpected(x);
+    }
+    
+         
+    public void performActionOnContinue(Continue x) {
+        //nothing to do
     }
 
      
-    public void performActionOnClassDeclaration(ClassDeclaration x) {
+    public void performActionOnCopyAssignment(CopyAssignment x) {
+        if(!entering) {
+            TypeSchemeTerm rhsTerm = pop();
+            TypeSchemeTerm lhsTerm = pop();
+               
+            TypeSchemeTerm assignmentTerm
+                        = checker.checkAssignment(lhsTerm, rhsTerm);
+        
+            push(assignmentTerm);
+        }
+    }
+
+     
+    public void performActionOnDefault(Default x) {
+        //nothing to do
+    }
+
+    
+    public void performActionOnDivide(Divide x) {
+        performActionOnPrimitiveBinary();
+    }
+
+     
+    public void performActionOnDivideAssignment(DivideAssignment x) {
+        performActionOnPrimitiveBinary();
+    }
+
+    
+    public void performActionOnDo(Do x) {
+        //nothing to do
+    }
+
+    
+    public void performActionOnDoubleLiteral(DoubleLiteral x) {
+        performActionOnPrimitiveLiteral();
+    }
+
+    
+    public void performActionOnElse(Else x) {
+        //nothing to do
+    }
+
+    
+    public void performActionOnEmptyStatement(EmptyStatement x) {
+        //nothing to do
+    }
+
+    
+    public void performActionOnEnhancedFor(EnhancedFor x) {
+        // nothing to do
+    }
+
+    
+    public void performActionOnEquals(Equals x) {
+        performActionOnPrimitiveBinary();
+    }
+
+    
+    public void performActionOnExactInstanceof(ExactInstanceof x) {
+        performActionOnPrimitiveUnary();
+    }
+
+     
+    public void performActionOnExecutionContext(ExecutionContext x) {
         failUnexpected(x);
     }
 
     
-    public void performActionOnInterfaceDeclaration(InterfaceDeclaration x) {
+    public void performActionOnExtends(Extends x) {
         failUnexpected(x);
     }
 
@@ -692,19 +586,34 @@ class TypeSchemeConstraintExtractor implements Visitor {
     }
 
     
-    public void performActionOnLocalVariableDeclaration(
-                                                LocalVariableDeclaration x) {
-        //nothing to do (initialisation handled in
-        //performActionOnVariableSpecification)
+    public void performActionOnFieldReference(FieldReference x) {
+        if(!entering) {
+            TypeSchemeTerm referenceTerm;
+                      
+            TypeSchemeTerm fieldTerm = pop();
+    
+            if(x.getProgramVariable().isStatic()) {
+                referenceTerm = checker.checkStaticFieldAccess(fieldTerm);
+            } else {
+                TypeSchemeTerm receiverTerm
+                                = (x.getReferencePrefix() == null
+                                   ? checker.checkThis()
+                                   : pop());
+                referenceTerm = checker.checkInstanceFieldAccess(receiverTerm,
+                                                                 fieldTerm);
+            }
+                
+            push(referenceTerm);
+        }
     }
 
     
-    public void performActionOnVariableDeclaration(VariableDeclaration x) {
+    public void performActionOnFieldSpecification(FieldSpecification x) {
         failUnexpected(x);
     }
 
     
-    public void performActionOnParameterDeclaration(ParameterDeclaration x) {
+    public void performActionOnFinally(Finally x) {
         //nothing to do
     }
     
@@ -712,81 +621,76 @@ class TypeSchemeConstraintExtractor implements Visitor {
         //nothing to do
     }*/
     
-    public void performActionOnMethodDeclaration(MethodDeclaration x) {
-        failUnexpected(x);
+    public void performActionOnFloatLiteral(FloatLiteral x) {
+        performActionOnPrimitiveLiteral();
     }
 
      
-    public void performActionOnClassInitializer(ClassInitializer x) {
-        failUnexpected(x);
-    }
-
-    
-    public void performActionOnStatementBlock(StatementBlock x) {
-        if(entering) {
-            pushLevel();
-        } else {
-            popLevel();
-        }
-    }
-    
-
-    public void performActionOnBreak(Break x) {
-        //nothing to do
-    }
-    
-    
-    public void performActionOnContinue(Continue x) {
-        //nothing to do
-    }
-    
-
-    public void performActionOnReturn(Return x) {
-        if(!entering) {
-            TypeSchemeTerm actualResultTerm = null;
-            if(contextFormalResultTerm != null) {
-                actualResultTerm = pop();
-            }
-            checker.checkReturn(actualResultTerm, contextFormalResultTerm);
-        }
-    }
-    
-
-    public void performActionOnThrow(Throw x) {
-        //nothing to do
-    }
-    
-
-    public void performActionOnDo(Do x) {
-        //nothing to do
-    }
-
-    
     public void performActionOnFor(For x) {
         //nothing to do
     }
-    
-    public void performActionOnEnhancedFor(EnhancedFor x) {
-        // nothing to do
-    }
-    
-    public void performActionOnWhile(While x) {
-        //nothing to do
-    }
 
     
+    public void performActionOnForUpdates(ForUpdates x) {
+        //nothing to do
+    }
+    
+
+    public void performActionOnGreaterOrEquals(GreaterOrEquals x) {
+        performActionOnPrimitiveBinary();
+    }
+    
+    
+    public void performActionOnGreaterThan(GreaterThan x) {
+        performActionOnPrimitiveBinary();
+    }
+    
+
+    public void performActionOnGuard(Guard x) {
+        //nothing to do
+    }
+    
+
     public void performActionOnIf(If x) {
         //nothing to do
     }
+    
 
-     
-    public void performActionOnSwitch(Switch x) {
-        //nothing to do
+    public void performActionOnImplements(Implements x) {
+        failUnexpected(x);
+    }
+
+    
+    public void performActionOnImplicitFieldSpecification(
+                                                ImplicitFieldSpecification x) {
+        failUnexpected(x);
+    }
+    
+    public void performActionOnImport(Import x) {
+        failUnexpected(x);
+    }
+    
+    public void performActionOnInstanceof(Instanceof x) {
+        performActionOnPrimitiveUnary();
+    }
+
+    
+    public void performActionOnInterfaceDeclaration(InterfaceDeclaration x) {
+        failUnexpected(x);
     }
 
      
-    public void performActionOnTry(Try x) {
-        //nothing to do
+    public void performActionOnIntLiteral(IntLiteral x) {
+        performActionOnPrimitiveLiteral();
+    }
+
+     
+    public void performActionOnIProgramVariable(IProgramVariable x) {
+        if(x instanceof ProgramVariable){
+            performActionOnProgramVariable(( ProgramVariable)x);
+        }else{
+            failUnexpected(x);
+        }
     }
 
     
@@ -795,7 +699,70 @@ class TypeSchemeConstraintExtractor implements Visitor {
     }
 
      
-    public void performActionOnMethodFrame(MethodFrame x) {
+    public void performActionOnLessOrEquals(LessOrEquals x) {
+        performActionOnPrimitiveBinary();
+    }
+
+    
+    public void performActionOnLessThan(LessThan x) {
+        performActionOnPrimitiveBinary();
+    }
+
+    
+    public void performActionOnLocalVariableDeclaration(
+                                                LocalVariableDeclaration x) {
+        //nothing to do (initialisation handled in
+        //performActionOnVariableSpecification)
+    }
+
+     
+    public void performActionOnLocationVariable(LocationVariable x) {
+        performActionOnProgramVariable(x);
+    }
+
+    
+    public void performActionOnLogicalAnd(LogicalAnd x) {
+        performActionOnPrimitiveBinary();
+    }
+
+    
+    public void performActionOnLogicalNot(LogicalNot x) {
+        performActionOnPrimitiveUnary();
+    }
+
+    
+    public void performActionOnLogicalOr(LogicalOr x) {
+        performActionOnPrimitiveBinary();
+    }
+
+    
+    public void performActionOnLongLiteral(LongLiteral x) {
+        performActionOnPrimitiveLiteral();
+    }
+
+     
+    public void performActionOnLoopInit(LoopInit x) {
+        //nothing to do
+    }
+
+    
+    public void performActionOnLoopInvariant(LoopInvariant x) {
+        //nothing to do
+    }
+    
+    
+    public void performActionOnMemoryAreaEC(MemoryAreaEC x) {
+        failUnexpected(x);
+	
+    }
+
+    
+    public void performActionOnMetaClassReference(MetaClassReference x) {
+        failUnexpected(x);
+    }
+
+    
+    public void performActionOnMethod(ProgramMethod x) {
         failUnexpected(x);
     }
 
@@ -889,7 +856,8 @@ class TypeSchemeConstraintExtractor implements Visitor {
                                 = x.getDesignatedContext();
                 final ExecutionContext executionContext 
                                 = new ExecutionContext(classContext, null,
-                                                       runtimeInstance);
+                                	runtimeInstance == null ? null : 
+                    			new RuntimeInstanceEC(runtimeInstance));
                                                        
                 //save context information
                 final SVInstantiations oldSvInst 
@@ -934,28 +902,512 @@ class TypeSchemeConstraintExtractor implements Visitor {
     }
 
     
-    public void performActionOnCatchAllStatement(CatchAllStatement x) {
+    public void performActionOnMethodDeclaration(MethodDeclaration x) {
+        failUnexpected(x);
+    }
+    
+    
+    public void performActionOnMethodFrame(MethodFrame x) {
+        failUnexpected(x);
+    }
+
+    
+    public void performActionOnMethodReference(MethodReference x) {
+        if(entering) {
+            //try to get the method's result type
+            final KeYJavaType resultType 
+                               = x.getKeYJavaType(services, 
+                                                  svInst.getExecutionContext());
+
+
+            //if the method is non-void, create a result variable and save
+            //it in an SVInstantiations as instantiation of some SV
+            final MethodReference simpleX = simplifyMethodReference(x);      
+            final ProgramVariable formalResultVar;
+            final SchemaVariable formalResultSV;
+            final SVInstantiations mySvInst;
+            if(resultType != null) {
+                formalResultVar = getFormalResultVar(simpleX);
+		formalResultSV
+                        = new NameSV(formalResultVar.getProgramElementName()
+                                     + "SV");
+		mySvInst = svInst.add(formalResultSV, formalResultVar);
+            } else {
+                formalResultVar = null;
+                formalResultSV = null;
+                mySvInst = svInst;
+            }
+
+            //let the MethodCall metaconstruct expand the method reference
+            final MethodCall mc = new MethodCall(formalResultSV, simpleX);
+            final ProgramElement expandedPe = mc.symbolicExecution(simpleX,
+                                                                   services, 
+                                                                   mySvInst);
+
+
+                                                                   
+            //descend into prefix, parameters and expansion instead of
+            //normal children
+            final ReferencePrefix rp = x.getReferencePrefix();
+	    final ImmutableArray<Expression> args = x.getArguments();
+            adoptedChildren = new ProgramElement[args.size() + 2];
+	    adoptedChildren[0] = (rp instanceof Expression
+                                  ? rp
+                                  : new ThisReference());
+	    for(int i = 0; i < args.size(); i++) {
+		adoptedChildren[i + 1] = args.get(i);
+	    }
+	    adoptedChildren[args.size() + 1] = expandedPe;
+
+            pushLevel();
+        } else {
+            //get rid of superfluous terms on the stack, but leave the topmost
+            //non-LEVEL element as potential result
+            ImmutableList<TypeSchemeTerm> resultTerms = popLevel();
+            if(resultTerms.size() > 0) {
+                push(resultTerms.head());
+            }
+        }
+    }
+
+    
+    public void performActionOnMinus(Minus x) {
+        performActionOnPrimitiveBinary();
+    }
+
+    
+    public void performActionOnMinusAssignment(MinusAssignment x) {
+        performActionOnPrimitiveBinary();
+    }
+
+    
+    public void performActionOnModifier(Modifier x) {
+        failUnexpected(x);
+    }
+
+    
+    public void performActionOnModulo(Modulo x) {
+        performActionOnPrimitiveBinary();
+    }
+
+    
+    public void performActionOnModuloAssignment(ModuloAssignment x) {
+        performActionOnPrimitiveBinary();
+    }
+
+    
+    public void performActionOnNegative(Negative x) {
+        performActionOnPrimitiveUnary();
+    }
+
+    
+    public void performActionOnNew(New x) {
+        if(entering) {
+            //get the new-object type
+            KeYJavaType newObjectType
+                              = x.getKeYJavaType(services, 
+                                                 svInst.getExecutionContext());
+            assert newObjectType != null;
+
+            //create a new-object variable and save it in an SVInstantiations
+            //as instantiation of some SV
+            ProgramElementName newObjectName
+                     = new ProgramElementName("new" + newObjectType.getSort()
+                                                                   .name());
+            ProgramVariable newObjectVar
+                        = new LocationVariable(newObjectName, newObjectType);
+            SchemaVariable newObjectSV = new NameSV(newObjectName + "SV");
+            SVInstantiations mySvInst = svInst.add(newObjectSV, newObjectVar);
+
+            //let the ConstructorCall metaconstruct expand the constructor 
+            //reference
+	    New simpleX = simplifyNew(x);
+            ConstructorCall cc = new ConstructorCall(newObjectSV, simpleX);
+            ProgramElement expandedPe = cc.symbolicExecution(simpleX,
+                                                             services,
+                                                             mySvInst);
+
+            //descend into prefix, parameters and expansion instead of
+            //normal children
+            final ImmutableArray<Expression> args = x.getArguments();
+            adoptedChildren = new ProgramElement[args.size() + 2];
+            adoptedChildren[0] = new ThisReference();
+            for(int i = 0; i < args.size(); i++) {
+                adoptedChildren[i + 1] = args.get(i);
+            }
+            adoptedChildren[args.size() + 1] = expandedPe;
+
+            pushLevel();
+        } else {
+            //get rid of superfluous terms on the stack, but leave the topmost
+            //non-LEVEL element as result
+            ImmutableList<TypeSchemeTerm> resultTerms = popLevel();
+            if(resultTerms.size() > 0) {
+                push(resultTerms.head());
+            }
+	}
+    }
+
+    
+    public void performActionOnNewArray(NewArray x) {
+        if(!entering) {
+	    ArrayInitializer ai = x.getArrayInitializer();
+	    TypeSchemeTerm sizeTerm = (ai == null ? pop() : null);
+
+	    TypeSchemeTerm arrayTerm
+                        = checker.checkArrayAllocation(sizeTerm);
+
+	    if(ai != null) {
+                Sort arraySort = x.getKeYJavaType().getSort();
+		TypeSchemeTerm referenceTerm
+				= checker.checkArrayAccess(arraySort,
+                                                           arrayTerm,
+                                                           null);
+		for(int i = 0; i < ai.getExpressionCount(); i++) {
+		    TypeSchemeTerm initTerm = pop();
+		    checker.checkAssignment(referenceTerm, initTerm);
+		}
+	    }
+		
+	    push(arrayTerm);
+	}
+    }
+
+    
+    public void performActionOnNotEquals(NotEquals x) {
+        performActionOnPrimitiveBinary();
+    }
+    
+
+    public void performActionOnNullLiteral(NullLiteral x) {
+        if(!entering) {
+            TypeSchemeTerm nullTerm = checker.checkNull();
+            push(nullTerm);
+        }
+    }
+
+    
+    public void performActionOnPackageReference(PackageReference x) {
+        //nothing to do
+    }
+
+    
+    public void performActionOnPackageSpecification(PackageSpecification x) {
+        failUnexpected(x);
+    }
+
+    
+    public void performActionOnParameterDeclaration(ParameterDeclaration x) {
+        //nothing to do
+    }
+
+    
+    public void performActionOnParenthesizedExpression(
+                                                    ParenthesizedExpression x) {
+        //nothing to do
+    }
+
+    
+    public void performActionOnPassiveExpression(PassiveExpression x) {
+        //nothing to do
+    }
+        
+    
+    public void performActionOnPlus(Plus x) {
+        performActionOnPrimitiveBinary();
+    }
+
+    
+    public void performActionOnPlusAssignment(PlusAssignment x) {
+        performActionOnPrimitiveBinary();
+    }
+
+    
+    public void performActionOnPositive(Positive x) {
+        performActionOnPrimitiveUnary();
+    }
+
+    
+    public void performActionOnPostDecrement(PostDecrement x) {
+        performActionOnPrimitiveUnary();
+    }
+
+    
+    public void performActionOnPostIncrement(PostIncrement x) {
+        performActionOnPrimitiveUnary();
+    }
+
+    
+    public void performActionOnPreDecrement(PreDecrement x) {
+        performActionOnPrimitiveUnary();
+    }
+
+    
+    public void performActionOnPreIncrement(PreIncrement x) {
+        performActionOnPrimitiveUnary();
+    }
+
+    
+    private void performActionOnPrimitiveBinary() {
+        if(!entering) {
+            TypeSchemeTerm operandTerm1 = pop();
+            TypeSchemeTerm operandTerm2 = pop();
+
+            TypeSchemeTerm resultTerm
+                        = checker.checkPrimitiveBinary(operandTerm1,
+                                                       operandTerm2);
+
+            push(resultTerm);
+        }
+    }
+
+    
+    private void performActionOnPrimitiveLiteral() {
+        if(!entering) {
+            TypeSchemeTerm resultTerm = checker.checkPrimitiveLiteral();
+            push(resultTerm);
+        }
+    }
+
+    
+    private void performActionOnPrimitiveUnary() {
+        if(!entering) {
+            TypeSchemeTerm operandTerm = pop();
+            TypeSchemeTerm resultTerm
+                        = checker.checkPrimitiveUnary(operandTerm);
+            push(resultTerm);
+        }
+    }
+
+    
+    public void performActionOnProgramConstant(ProgramConstant x) {
+        performActionOnProgramVariable(x);        
+    }
+
+    
+    public void performActionOnProgramElementName(ProgramElementName x) {
+        //nothing to do
+    }
+
+    
+    public void performActionOnProgramMetaConstruct(ProgramMetaConstruct x) {
         failUnexpected(x);
     }
 
      
+    public void performActionOnProgramMethod(ProgramMethod x) {
+        failUnexpected(x);
+    }
+
+    
+    public void performActionOnProgramSVProxy(ProgramSVProxy x) {
+        failUnexpected(x);
+    }
+
+    
+    public void performActionOnProgramSVSkolem(ProgramSVSkolem x) {
+        failUnexpected(x);
+    }
+
+     
+    public void performActionOnProgramVariable(ProgramVariable x) {
+        if(!entering) {
+            TypeSchemeTerm varTerm;
+            
+            if(x.isMember()) {
+                if(x.isStatic()) {
+                    varTerm = checker.checkStaticField(x);
+                } else {
+                    varTerm = checker.checkInstanceField(x);
+                }
+            } else {
+                if(contextIsStatic()) {
+                    varTerm = checker.checkStaticLocalVariable(x);
+                } else {
+                    varTerm = checker.checkInstanceLocalVariable(x);
+                }
+            }
+        
+            push(varTerm);
+        }
+    }
+
+    
+    public void performActionOnReturn(Return x) {
+        if(!entering) {
+            TypeSchemeTerm actualResultTerm = null;
+            if(contextFormalResultTerm != null) {
+                actualResultTerm = pop();
+            }
+            checker.checkReturn(actualResultTerm, contextFormalResultTerm);
+        }
+    }
+
+    
+    public void performActionOnRuntimeInstanceEC(RuntimeInstanceEC x) {
+        failUnexpected(x);
+	
+    }
+
+    
+    public void performActionOnSchematicFieldReference(
+                                                    SchematicFieldReference x) {
+        failUnexpected(x);
+    }
+
+     
+    public void performActionOnSchemaVariable(SchemaVariable x) {
+        failUnexpected((ProgramSV) x);
+    }
+
+    
+    public void performActionOnSetAssignment(SetAssignment x) {
+        assert false : "not implemented";
+    }
+
+    
+    public void performActionOnShiftLeft(ShiftLeft x) {
+        performActionOnPrimitiveBinary();
+    }
+
+    
+    public void performActionOnShiftLeftAssignment(ShiftLeftAssignment x) {
+        performActionOnPrimitiveBinary();
+    }
+
+    
+    public void performActionOnShiftRight(ShiftRight x) {
+        performActionOnPrimitiveBinary();
+    }
+
+     
+    public void performActionOnShiftRightAssignment(ShiftRightAssignment x) {
+        performActionOnPrimitiveBinary();
+    }
+    
+             
+    public void performActionOnStatementBlock(StatementBlock x) {
+        if(entering) {
+            pushLevel();
+        } else {
+            popLevel();
+        }
+    }
+
+    
+    public void performActionOnStringLiteral(StringLiteral x) {
+        if(!entering) {
+            TypeSchemeTerm stringLiteralTerm = checker.checkStringLiteral();
+            push(stringLiteralTerm);
+        }
+    }
+
+    
+    public void performActionOnSuperArrayDeclaration(SuperArrayDeclaration x) {
+        failUnexpected(x);
+    }
+
+    
+    public void performActionOnSuperConstructorReference(
+                                                SuperConstructorReference x) {
+        //never met, because ConstructorCall replaces it with
+        //ordinary MethodReference
+        failUnexpected(x); 
+    }
+
+    
+    public void performActionOnSuperReference(SuperReference x) {
+        if(!entering) {
+            TypeSchemeTerm superTerm = checker.checkSuper();
+            push(superTerm);
+        }
+    }
+
+    
+    public void performActionOnSwitch(Switch x) {
+        //nothing to do
+    }
+
+    
     public void performActionOnSynchronizedBlock(SynchronizedBlock x) {
         //nothing to do
     }
 
     
-    public void performActionOnImport(Import x) {
+    public void performActionOnThen(Then x) {
+        //nothing to do
+    }
+
+    
+    public void performActionOnThisConstructorReference(
+                                                ThisConstructorReference x) {
+        //never met, because ConstructorCall replaces it with
+        //ordinary MethodReference
         failUnexpected(x);
     }
 
     
-    public void performActionOnExtends(Extends x) {
+    public void performActionOnThisReference(ThisReference x) {
+        if(!entering) {
+            TypeSchemeTerm thisTerm = checker.checkThis();
+            push(thisTerm);
+        }
+    }
+
+    
+    public void performActionOnThrow(Throw x) {
+        //nothing to do
+    }
+
+    
+    public void performActionOnThrows(Throws x) {
+        //nothing to do
+    }
+    
+
+    public void performActionOnTimes(Times x) {
+        performActionOnPrimitiveBinary();
+    }
+
+    
+    public void performActionOnTimesAssignment(TimesAssignment x) {
+        performActionOnPrimitiveBinary();
+    }
+
+    
+    public void performActionOnTry(Try x) {
+        //nothing to do
+    }
+
+    
+    public void performActionOnTypeCast(TypeCast x) {
+        //nothing to do
+    }
+
+     
+    public void performActionOnTypeReference(TypeReference x) {
+        //nothing to do
+    }
+
+    
+    public void performActionOnUnsignedShiftRight(UnsignedShiftRight x) {
+        performActionOnPrimitiveBinary();
+    }
+
+    
+    public void performActionOnUnsignedShiftRightAssignment(
+                                            UnsignedShiftRightAssignment x) {
+        performActionOnPrimitiveBinary();
+    }
+
+    
+    public void performActionOnVariableDeclaration(VariableDeclaration x) {
         failUnexpected(x);
     }
 
     
-    public void performActionOnImplements(Implements x) {
-        failUnexpected(x);
+    public void performActionOnVariableReference(VariableReference x) {
+        //nothing to do
     }
 
     
@@ -1016,600 +1468,160 @@ class TypeSchemeConstraintExtractor implements Visitor {
         }
     }
 
-     
-    public void performActionOnFieldSpecification(FieldSpecification x) {
-        failUnexpected(x);
+    
+    public void performActionOnWhile(While x) {
+        //nothing to do
     }
 
     
-    public void performActionOnImplicitFieldSpecification(
-                                                ImplicitFieldSpecification x) {
-        failUnexpected(x);
-    }
-    
-    
-    public void performActionOnBinaryAnd(BinaryAnd x) {
-        performActionOnPrimitiveBinary();
-    }
-
-    
-    public void performActionOnBinaryAndAssignment(BinaryAndAssignment x) {
-        performActionOnPrimitiveBinary();
+    /**
+     * Pops a term off the stack.
+     */
+    private TypeSchemeTerm pop() {
+        verbose("Popping:    " + stack.peek());
+        if(stack.peek() == LEVEL) {
+            printStack();
+        }
+        return (TypeSchemeTerm) stack.pop();
     }
 
     
-    public void performActionOnBinaryOrAssignment(BinaryOrAssignment x) {
-        performActionOnPrimitiveBinary();
-    }
-
+    /**
+     * Pops all elements until the next LEVEL constant (inclusive) from the 
+     * stack.
+     * @return a list of the elements, whose the first element is the lowermost
+     * element from the stack which is not LEVEL
+     */
+    private ImmutableList<TypeSchemeTerm> popLevel() {
+        ImmutableList<TypeSchemeTerm> result = ImmutableSLList.<TypeSchemeTerm>nil();
     
-    public void performActionOnBinaryXOrAssignment(BinaryXOrAssignment x) {
-        performActionOnPrimitiveBinary();
-    }
-
-    
-    public void performActionOnCopyAssignment(CopyAssignment x) {
-        if(!entering) {
-            TypeSchemeTerm rhsTerm = pop();
-            TypeSchemeTerm lhsTerm = pop();
-               
-            TypeSchemeTerm assignmentTerm
-                        = checker.checkAssignment(lhsTerm, rhsTerm);
+        Object o = stack.pop();
+        while(o != LEVEL) {
+            verbose("Level-popping: " + o);
+            result = result.prepend((TypeSchemeTerm) o);
+            o = stack.pop();
+        }
         
-            push(assignmentTerm);
+        return result;
+    }
+
+    
+    private void printStack() {
+        verbose("Current stack:");
+        for (Object aStack : stack) {
+            verbose(aStack);
         }
-    }
-    
-    
-    public void performActionOnSetAssignment(SetAssignment x) {
-        assert false : "not implemented";
-    }
-
-    
-    public void performActionOnDivideAssignment(DivideAssignment x) {
-        performActionOnPrimitiveBinary();
-    }
-
-    
-    public void performActionOnMinusAssignment(MinusAssignment x) {
-        performActionOnPrimitiveBinary();
-    }
-
-    
-    public void performActionOnModuloAssignment(ModuloAssignment x) {
-        performActionOnPrimitiveBinary();
-    }
-
-    
-    public void performActionOnPlusAssignment(PlusAssignment x) {
-        performActionOnPrimitiveBinary();
-    }
-
-    
-    public void performActionOnPostDecrement(PostDecrement x) {
-        performActionOnPrimitiveUnary();
-    }
-
-    
-    public void performActionOnPostIncrement(PostIncrement x) {
-        performActionOnPrimitiveUnary();
-    }
-
-    
-    public void performActionOnPreDecrement(PreDecrement x) {
-        performActionOnPrimitiveUnary();
-    }
-
-    
-    public void performActionOnPreIncrement(PreIncrement x) {
-        performActionOnPrimitiveUnary();
-    }
-
-    
-    public void performActionOnShiftLeftAssignment(ShiftLeftAssignment x) {
-        performActionOnPrimitiveBinary();
-    }
-
-    
-    public void performActionOnShiftRightAssignment(ShiftRightAssignment x) {
-        performActionOnPrimitiveBinary();
-    }
-    
-
-    public void performActionOnTimesAssignment(TimesAssignment x) {
-        performActionOnPrimitiveBinary();
-    }
-
-    
-    public void performActionOnUnsignedShiftRightAssignment(
-                                            UnsignedShiftRightAssignment x) {
-        performActionOnPrimitiveBinary();
-    }
-
-    
-    public void performActionOnBinaryNot(BinaryNot x) {
-        performActionOnPrimitiveBinary();
-    }
-
-    
-    public void performActionOnBinaryOr(BinaryOr x) {
-        performActionOnPrimitiveBinary();
-    }
-
-    
-    public void performActionOnBinaryXOr(BinaryXOr x) {
-        performActionOnPrimitiveBinary();
-    }
-
-    
-    public void performActionOnConditional(Conditional x) {
-        if(!entering) {
-            TypeSchemeTerm elseTerm = pop();
-            TypeSchemeTerm thenTerm = pop();
-            TypeSchemeTerm conditionTerm = pop();
-            
-            TypeSchemeTerm conditionalTerm
-                        = checker.checkConditional(conditionTerm,
-                                                   thenTerm,
-                                                   elseTerm);
-
-            push(conditionalTerm);
-        }
-    }
-        
-    
-    public void performActionOnDivide(Divide x) {
-        performActionOnPrimitiveBinary();
-    }
-
-    
-    public void performActionOnEquals(Equals x) {
-        performActionOnPrimitiveBinary();
-    }
-
-    
-    public void performActionOnGreaterOrEquals(GreaterOrEquals x) {
-        performActionOnPrimitiveBinary();
-    }
-
-    
-    public void performActionOnGreaterThan(GreaterThan x) {
-        performActionOnPrimitiveBinary();
-    }
-
-    
-    public void performActionOnLessOrEquals(LessOrEquals x) {
-        performActionOnPrimitiveBinary();
-    }
-
-    
-    public void performActionOnLessThan(LessThan x) {
-        performActionOnPrimitiveBinary();
-    }
-
-    
-    public void performActionOnNotEquals(NotEquals x) {
-        performActionOnPrimitiveBinary();
-    }
-
-    
-    public void performActionOnNewArray(NewArray x) {
-        if(!entering) {
-	    ArrayInitializer ai = x.getArrayInitializer();
-	    TypeSchemeTerm sizeTerm = (ai == null ? pop() : null);
-
-	    TypeSchemeTerm arrayTerm
-                        = checker.checkArrayAllocation(sizeTerm);
-
-	    if(ai != null) {
-                Sort arraySort = x.getKeYJavaType().getSort();
-		TypeSchemeTerm referenceTerm
-				= checker.checkArrayAccess(arraySort,
-                                                           arrayTerm,
-                                                           null);
-		for(int i = 0; i < ai.getExpressionCount(); i++) {
-		    TypeSchemeTerm initTerm = pop();
-		    checker.checkAssignment(referenceTerm, initTerm);
-		}
-	    }
-		
-	    push(arrayTerm);
-	}
-    }
-
-    
-    public void performActionOnInstanceof(Instanceof x) {
-        performActionOnPrimitiveUnary();
-    }
-
-    
-    public void performActionOnExactInstanceof(ExactInstanceof x) {
-        performActionOnPrimitiveUnary();
-    }
-
-    
-    public void performActionOnNew(New x) {
-        if(entering) {
-            //get the new-object type
-            KeYJavaType newObjectType
-                              = x.getKeYJavaType(services, 
-                                                 svInst.getExecutionContext());
-            assert newObjectType != null;
-
-            //create a new-object variable and save it in an SVInstantiations
-            //as instantiation of some SV
-            ProgramElementName newObjectName
-                     = new ProgramElementName("new" + newObjectType.getSort()
-                                                                   .name());
-            ProgramVariable newObjectVar
-                        = new LocationVariable(newObjectName, newObjectType);
-            SchemaVariable newObjectSV = new NameSV(newObjectName + "SV");
-            SVInstantiations mySvInst = svInst.add(newObjectSV, newObjectVar);
-
-            //let the ConstructorCall metaconstruct expand the constructor 
-            //reference
-	    New simpleX = simplifyNew(x);
-            ConstructorCall cc = new ConstructorCall(newObjectSV, simpleX);
-            ProgramElement expandedPe = cc.symbolicExecution(simpleX,
-                                                             services,
-                                                             mySvInst);
-
-            //descend into prefix, parameters and expansion instead of
-            //normal children
-            final ImmutableArray<Expression> args = x.getArguments();
-            adoptedChildren = new ProgramElement[args.size() + 2];
-            adoptedChildren[0] = new ThisReference();
-            for(int i = 0; i < args.size(); i++) {
-                adoptedChildren[i + 1] = args.get(i);
-            }
-            adoptedChildren[args.size() + 1] = expandedPe;
-
-            pushLevel();
-        } else {
-            //get rid of superfluous terms on the stack, but leave the topmost
-            //non-LEVEL element as result
-            ImmutableList<TypeSchemeTerm> resultTerms = popLevel();
-            if(resultTerms.size() > 0) {
-                push(resultTerms.head());
-            }
-	}
-    }
-
-    
-    public void performActionOnTypeCast(TypeCast x) {
-        //nothing to do
-    }
-
-    
-    public void performActionOnLogicalAnd(LogicalAnd x) {
-        performActionOnPrimitiveBinary();
-    }
-
-     
-    public void performActionOnLogicalNot(LogicalNot x) {
-        performActionOnPrimitiveUnary();
-    }
-
-    
-    public void performActionOnLogicalOr(LogicalOr x) {
-        performActionOnPrimitiveBinary();
-    }
-
-    
-    public void performActionOnMinus(Minus x) {
-        performActionOnPrimitiveBinary();
-    }
-
-     
-    public void performActionOnModulo(Modulo x) {
-        performActionOnPrimitiveBinary();
-    }
-
-    
-    public void performActionOnNegative(Negative x) {
-        performActionOnPrimitiveUnary();
-    }
-
-    
-    public void performActionOnPlus(Plus x) {
-        performActionOnPrimitiveBinary();
-    }
-
-    
-    public void performActionOnPositive(Positive x) {
-        performActionOnPrimitiveUnary();
-    }
-
-     
-    public void performActionOnShiftLeft(ShiftLeft x) {
-        performActionOnPrimitiveBinary();
-    }
-
-    
-    public void performActionOnShiftRight(ShiftRight x) {
-        performActionOnPrimitiveBinary();
-    }
-
-    
-    public void performActionOnTimes(Times x) {
-        performActionOnPrimitiveBinary();
-    }
-
-    
-    public void performActionOnUnsignedShiftRight(UnsignedShiftRight x) {
-        performActionOnPrimitiveBinary();
-    }
-
-    
-    public void performActionOnArrayReference(ArrayReference x) {
-        if(!entering) {
-	    TypeSchemeTerm positionTerm = pop();
-            TypeSchemeTerm receiverTerm = pop();
-            
-            Expression arrayExpr = (Expression) x.getChildAt(0);
-            Sort arraySort
-                    = arrayExpr.getKeYJavaType(services,
-                                               svInst.getExecutionContext())
-                               .getSort();
-
-	    TypeSchemeTerm referenceTerm
-                    = checker.checkArrayAccess(arraySort,
-                                               receiverTerm,
-                                               positionTerm);
-
-	    push(referenceTerm);
-        }
-    }
-
-     
-    public void performActionOnMetaClassReference(MetaClassReference x) {
-        failUnexpected(x);
-    }
-    
-             
-    public void performActionOnMethodReference(MethodReference x) {
-        if(entering) {
-            //try to get the method's result type
-            final KeYJavaType resultType 
-                               = x.getKeYJavaType(services, 
-                                                  svInst.getExecutionContext());
-
-
-            //if the method is non-void, create a result variable and save
-            //it in an SVInstantiations as instantiation of some SV
-            final MethodReference simpleX = simplifyMethodReference(x);      
-            final ProgramVariable formalResultVar;
-            final SchemaVariable formalResultSV;
-            final SVInstantiations mySvInst;
-            if(resultType != null) {
-                formalResultVar = getFormalResultVar(simpleX);
-		formalResultSV
-                        = new NameSV(formalResultVar.getProgramElementName()
-                                     + "SV");
-		mySvInst = svInst.add(formalResultSV, formalResultVar);
-            } else {
-                formalResultVar = null;
-                formalResultSV = null;
-                mySvInst = svInst;
-            }
-
-            //let the MethodCall metaconstruct expand the method reference
-            final MethodCall mc = new MethodCall(formalResultSV, simpleX);
-            final ProgramElement expandedPe = mc.symbolicExecution(simpleX,
-                                                                   services, 
-                                                                   mySvInst);
-
-
-                                                                   
-            //descend into prefix, parameters and expansion instead of
-            //normal children
-            final ReferencePrefix rp = x.getReferencePrefix();
-	    final ImmutableArray<Expression> args = x.getArguments();
-            adoptedChildren = new ProgramElement[args.size() + 2];
-	    adoptedChildren[0] = (rp instanceof Expression
-                                  ? rp
-                                  : new ThisReference());
-	    for(int i = 0; i < args.size(); i++) {
-		adoptedChildren[i + 1] = args.get(i);
-	    }
-	    adoptedChildren[args.size() + 1] = expandedPe;
-
-            pushLevel();
-        } else {
-            //get rid of superfluous terms on the stack, but leave the topmost
-            //non-LEVEL element as potential result
-            ImmutableList<TypeSchemeTerm> resultTerms = popLevel();
-            if(resultTerms.size() > 0) {
-                push(resultTerms.head());
-            }
-        }
-    }
-
-    
-    public void performActionOnFieldReference(FieldReference x) {
-        if(!entering) {
-            TypeSchemeTerm referenceTerm;
-                      
-            TypeSchemeTerm fieldTerm = pop();
-    
-            if(x.getProgramVariable().isStatic()) {
-                referenceTerm = checker.checkStaticFieldAccess(fieldTerm);
-            } else {
-                TypeSchemeTerm receiverTerm
-                                = (x.getReferencePrefix() == null
-                                   ? checker.checkThis()
-                                   : pop());
-                referenceTerm = checker.checkInstanceFieldAccess(receiverTerm,
-                                                                 fieldTerm);
-            }
-                
-            push(referenceTerm);
-        }
-    }
-
-    
-    public void performActionOnSchematicFieldReference(
-                                                    SchematicFieldReference x) {
-        failUnexpected(x);
-    }
-
-    
-    public void performActionOnVariableReference(VariableReference x) {
-        //nothing to do
-    }
-
-    
-    public void performActionOnMethod(ProgramMethod x) {
-        failUnexpected(x);
-    }
-
-    
-    public void performActionOnSuperConstructorReference(
-                                                SuperConstructorReference x) {
-        //never met, because ConstructorCall replaces it with
-        //ordinary MethodReference
-        failUnexpected(x); 
-    }
-
-    
-    public void performActionOnExecutionContext(ExecutionContext x) {
-        failUnexpected(x);
-    }
-
-    
-    public void performActionOnConstructorDeclaration(
-                                                ConstructorDeclaration x) {
-        failUnexpected(x);
-    }
-
-    
-    public void performActionOnThisConstructorReference(
-                                                ThisConstructorReference x) {
-        //never met, because ConstructorCall replaces it with
-        //ordinary MethodReference
-        failUnexpected(x);
-    }
-
-    
-    public void performActionOnSuperReference(SuperReference x) {
-        if(!entering) {
-            TypeSchemeTerm superTerm = checker.checkSuper();
-            push(superTerm);
-        }
-    }
-
-    
-    public void performActionOnThisReference(ThisReference x) {
-        if(!entering) {
-            TypeSchemeTerm thisTerm = checker.checkThis();
-            push(thisTerm);
-        }
-    }
-
-    
-    public void performActionOnArrayLengthReference(ArrayLengthReference x) {
-        performActionOnPrimitiveLiteral();
-    }
-    
-
-    public void performActionOnThen(Then x) {
-        //nothing to do
-    }
-
-    
-    public void performActionOnElse(Else x) {
-        //nothing to do
-    }
-
-    
-    public void performActionOnCase(Case x) {
-        //nothing to do
-    }
-
-    
-    public void performActionOnCatch(Catch x) {
-        if(!entering) {
-            TypeSchemeTerm excTerm = pop();
-            checker.checkCatch(excTerm);
-        }
-    }
-
-     
-    public void performActionOnDefault(Default x) {
-        //nothing to do
-    }
-
-    
-    public void performActionOnFinally(Finally x) {
-        //nothing to do
-    }
-
-    
-    public void performActionOnModifier(Modifier x) {
-        failUnexpected(x);
-    }
-
-    
-    public void performActionOnEmptyStatement(EmptyStatement x) {
-        //nothing to do
-    }
-
-    
-    public void performActionOnComment(Comment x) {
-        //nothing to do
-    }
-
-    
-    public void performActionOnParenthesizedExpression(
-                                                    ParenthesizedExpression x) {
-        //nothing to do
-    }
-
-    
-    public void performActionOnPassiveExpression(PassiveExpression x) {
-        //nothing to do
-    }
-
-    
-    public void performActionOnForUpdates(ForUpdates x) {
-        //nothing to do
-    }
-
-    
-    public void performActionOnGuard(Guard x) {
-        //nothing to do
-    }
-
-    
-    public void performActionOnLoopInit(LoopInit x) {
-        //nothing to do
     }
   
-    public void performActionOnAssert(Assert assert1) {        
-        //nothing to do        
+    /**
+     * Pushes a term onto the stack.
+     */
+    private void push(TypeSchemeTerm term) {
+        Debug.assertTrue(term != null);
+        verbose("Pushing:    " + term);
+        stack.push(term);
     }
     
-    public void performActionOnProgramSVSkolem(ProgramSVSkolem x) {
-        failUnexpected(x);
+    /**
+     * Pushes the LEVEL constant onto the stack.
+     */
+    private void pushLevel() {
+        stack.push(LEVEL);
     }
     
 
-    public void performActionOnProgramSVProxy(ProgramSVProxy x) {
-        failUnexpected(x);
+    /**
+     * Replaces an expression by a simpler one with the same static type,
+     * so that it can be handled as a receiver or parameter by the
+     * ConstructorCall and MethodCall metaconstructs.
+     */
+    private ProgramVariable simplifyExpression(Expression expression) {
+        KeYJavaType staticKjt
+                = expression.getKeYJavaType(services,
+                                            svInst.getExecutionContext());
+        Debug.assertTrue(staticKjt != null);
+        return new LocationVariable(INVISIBLE_NAME, staticKjt);
     }
 
 
-    public void performActionOnLocationVariable(LocationVariable x) {
-        performActionOnProgramVariable(x);
+    private ImmutableArray<Expression> simplifyExpressions(
+						ImmutableArray<Expression> expressions) {
+	Expression[] result = new Expression[expressions.size()];
+	for(int i = 0; i < expressions.size(); i++) {
+	    result[i] = simplifyExpression(expressions.get(i));
+	}
+	return new ImmutableArray<Expression>(result);
     }
 
 
-    public void performActionOnProgramConstant(ProgramConstant x) {
-        performActionOnProgramVariable(x);        
+    private MethodReference simplifyMethodReference(MethodReference mr) {
+        ReferencePrefix rp = mr.getReferencePrefix();
+	ReferencePrefix simpleRp = (rp instanceof ThisReference
+                                    || rp instanceof SuperReference
+                                    || rp instanceof ProgramVariable
+                                    || rp instanceof FieldReference
+                                    || !(rp instanceof Expression)
+                                    ? rp
+                                    : simplifyExpression((Expression) rp));
+
+        return new MethodReference(simplifyExpressions(mr.getArguments()), 
+				   mr.getMethodName(), 
+				   simpleRp);
     }
 
 
-    public void performActionOnLoopInvariant(LoopInvariant x) {
-        //nothing to do
+    private New simplifyNew(New n) {
+        Debug.assertFalse(n.getReferencePrefix() instanceof Expression);
+	ImmutableArray<Expression> simpleArgs = simplifyExpressions(n.getArguments());
+	Expression[] simpleArgsArray = new Expression[simpleArgs.size()];
+	for(int i = 0; i < simpleArgs.size(); i++) {
+	    simpleArgsArray[i] = simpleArgs.get(i);
+	}
+	return new New(simpleArgsArray, 
+		       n.getTypeReference(), 
+		       n.getReferencePrefix());
+    }
+
+
+    private void verbose(Object o) {
+        //System.out.println(o);
+    }
+
+
+    private void walk(ProgramElement node) {
+        //debug output
+        String fullClassName = node.getClass().getName();
+        String className
+                = fullClassName.substring(fullClassName.lastIndexOf(".") + 1);
+        String enteringString
+                = addSpaces("Entering:   " + node) + "(" + className + ")";
+        String ascendingString
+                = addSpaces("Ascending:  " + node) + "(" + className + ")";
+        verbose(enteringString);
+    
+        //visit the node
+        adoptedChildren = null;
+        entering = true;
+        node.visit(this);
+        
+        //walk children (either the adopted or the normal ones)
+        if(adoptedChildren != null) {
+            ProgramElement[] ac = adoptedChildren.clone();
+            for (ProgramElement anAc : ac) {
+                walk(anAc);
+            }
+            verbose(ascendingString);
+        } else if(node instanceof NonTerminalProgramElement) {
+            NonTerminalProgramElement nonTerminalNode 
+                        = (NonTerminalProgramElement) node;
+            for(int i = 0; i < nonTerminalNode.getChildCount(); i++) {
+                walk(nonTerminalNode.getChildAt(i));
+            }
+            verbose(ascendingString);
+        }
+        
+        //visit the node again
+        entering = false;
+        node.visit(this);
     }    
 }

@@ -2470,14 +2470,14 @@ public class PrettyPrinter {
 	throws java.io.IOException {
 	write("source=");
 	writeElement(x.getTypeReference());
-	if (x.getMemoryArea() != null
+	if (x.getMemoryAreaAsRef() != null
 	        && (ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof RTSJProfile)) {
 	    write(",<currentMemoryArea>=");
-	    writeElement(x.getMemoryArea());
+	    writeElement(x.getMemoryAreaAsRef());
 	}
-        if (x.getRuntimeInstance() != null) {
+        if (x.getRuntimeInstanceAsRef() != null) {
             write(",this=");
-            writeElement(x.getRuntimeInstance());
+            writeElement(x.getRuntimeInstanceAsRef());
         }
     }
 

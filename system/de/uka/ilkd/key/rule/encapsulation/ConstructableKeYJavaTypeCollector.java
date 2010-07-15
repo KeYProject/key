@@ -127,98 +127,11 @@ public class ConstructableKeYJavaTypeCollector implements Visitor {
     }
     
     
-    /**
-     * Collects all KeYJavaTypes that can be constructed in the run of
-     * the given program
-     * @param root the program, typically a ProgramMethod
-     * @param svInst sv instantiations
-     * @return a list of KeYJavaType containing all the types which might
-     * be constructed.
-     */
-    public ImmutableList<KeYJavaType> collect(ProgramElement root, 
-                                     SVInstantiations svInst) {
-        //initialise members
-        formalResultVars.clear();
-        coveredMethods             = ImmutableSLList.<ProgramMethod>nil();
-        this.svInst                = svInst;
-        errorString                = null;
-        constructableKeYJavaTypes  = ImmutableSLList.<KeYJavaType>nil();
-
-
-        //walk the program, thereby collecting constructable types
-        walk(root);
-
-        //in case of failure, repeat the reason
-        // TODO: maybe an unexpectedNodeException would be more apropriate, or even just gracefully ignoring them?
-        if(errorString != null) {
-            verbose("Collecting constructable KeYJavaTypes failed:");
-            verbose(errorString);
+    private String addSpaces(String s) {
+        while(s.length() < 45) {
+             s += " ";
         }
-        
-        //return the constraints
-        return constructableKeYJavaTypes;
-    }
-
-
-    /**
-     * Returns a list of the methods which have been analysed in the last run 
-     * of extract().
-     */
-    public ImmutableList<ProgramMethod> getCoveredMethods() {
-        return coveredMethods;
-    }
-    
-    
-    
-    //-------------------------------------------------------------------------
-    //helper methods
-    //-------------------------------------------------------------------------
-    
-    private void verbose(Object o) {
-        //System.out.println(o);
-    }
-    
-
-    /**
-     * Marks the current run as failed. Ensures that the resulting constraints
-     * cannot be fulfilled.
-     */
-    private void fail(String s) {
-        verbose(s);
-        errorString = s;
-    }
-
-
-    private void failUnexpected(ProgramElement pe) {
-        fail("Encountered an unexpected type of program element: " + pe
-             + " (" + pe.getClass() + ")");
-    }
-
-
-    private boolean haveCommonSupertype(KeYJavaType kjt1, KeYJavaType kjt2) {
-        JavaInfo javaInfo = services.getJavaInfo();
-        
-        if(kjt1.equals(kjt2)) {
-            return true;
-        }
-        
-        if(kjt1.getSort() instanceof PrimitiveSort
-           || kjt2.getSort() instanceof PrimitiveSort) {
-            return false;
-        }
-        
-        ImmutableList<KeYJavaType> supertypes1 = javaInfo.getAllSupertypes(kjt1);
-        supertypes1 = supertypes1.prepend(kjt1);
-        ImmutableList<KeYJavaType> supertypes2 = javaInfo.getAllSupertypes(kjt2);
-        supertypes2 = supertypes2.prepend(kjt2);
-
-        for (KeYJavaType aSupertypes1 : supertypes1) {
-            if (supertypes2.contains(aSupertypes1)) {
-                return true;
-            }
-        }
-        
-        return false;
+        return s;
     }
 
 
@@ -250,6 +163,69 @@ public class ConstructableKeYJavaTypeCollector implements Visitor {
 
         return true;
     }
+    
+    
+    
+    //-------------------------------------------------------------------------
+    //helper methods
+    //-------------------------------------------------------------------------
+    
+    /**
+     * Collects all KeYJavaTypes that can be constructed in the run of
+     * the given program
+     * @param root the program, typically a ProgramMethod
+     * @param svInst sv instantiations
+     * @return a list of KeYJavaType containing all the types which might
+     * be constructed.
+     */
+    public ImmutableList<KeYJavaType> collect(ProgramElement root, 
+                                     SVInstantiations svInst) {
+        //initialise members
+        formalResultVars.clear();
+        coveredMethods             = ImmutableSLList.<ProgramMethod>nil();
+        this.svInst                = svInst;
+        errorString                = null;
+        constructableKeYJavaTypes  = ImmutableSLList.<KeYJavaType>nil();
+
+
+        //walk the program, thereby collecting constructable types
+        walk(root);
+
+        //in case of failure, repeat the reason
+        // TODO: maybe an unexpectedNodeException would be more apropriate, or even just gracefully ignoring them?
+        if(errorString != null) {
+            verbose("Collecting constructable KeYJavaTypes failed:");
+            verbose(errorString);
+        }
+        
+        //return the constraints
+        return constructableKeYJavaTypes;
+    }
+    
+
+    /**
+     * Marks the current run as failed. Ensures that the resulting constraints
+     * cannot be fulfilled.
+     */
+    private void fail(String s) {
+        verbose(s);
+        errorString = s;
+    }
+
+
+    private void failUnexpected(ProgramElement pe) {
+        fail("Encountered an unexpected type of program element: " + pe
+             + " (" + pe.getClass() + ")");
+    }
+
+
+    /**
+     * Returns a list of the methods which have been analysed in the last run 
+     * of extract().
+     */
+    public ImmutableList<ProgramMethod> getCoveredMethods() {
+        return coveredMethods;
+    }
 
 
     private ProgramVariable getFormalResultVar(MethodReference mr) {
@@ -272,6 +248,33 @@ public class ConstructableKeYJavaTypeCollector implements Visitor {
 
         return formalResultVar;
     }
+
+
+    private boolean haveCommonSupertype(KeYJavaType kjt1, KeYJavaType kjt2) {
+        JavaInfo javaInfo = services.getJavaInfo();
+        
+        if(kjt1.equals(kjt2)) {
+            return true;
+        }
+        
+        if(kjt1.getSort() instanceof PrimitiveSort
+           || kjt2.getSort() instanceof PrimitiveSort) {
+            return false;
+        }
+        
+        ImmutableList<KeYJavaType> supertypes1 = javaInfo.getAllSupertypes(kjt1);
+        supertypes1 = supertypes1.prepend(kjt1);
+        ImmutableList<KeYJavaType> supertypes2 = javaInfo.getAllSupertypes(kjt2);
+        supertypes2 = supertypes2.prepend(kjt2);
+
+        for (KeYJavaType aSupertypes1 : supertypes1) {
+            if (supertypes2.contains(aSupertypes1)) {
+                return true;
+            }
+        }
+        
+        return false;
+    }
     
 
     /**
@@ -292,55 +295,25 @@ public class ConstructableKeYJavaTypeCollector implements Visitor {
     }
     
     
-    /**
-     * Replaces an expression by a simpler one with the same static type,
-     * so that it can be handled as a receiver or parameter by the
-     * ConstructorCall and MethodCall metaconstructs.
-     */
-    private ProgramVariable simplifyExpression(Expression expression) {
-        KeYJavaType staticKjt
-                = expression.getKeYJavaType(services,
-                                            svInst.getExecutionContext());
-        Debug.assertTrue(staticKjt != null);
-        return new LocationVariable(INVISIBLE_NAME, staticKjt);
+    public void performActionOnAbstractProgramElement(
+                                                    AbstractProgramElement x) {
+        failUnexpected(x);
     }
 
 
-    private ImmutableArray<Expression> simplifyExpressions(ImmutableArray<Expression> expressions) {
-	Expression[] result = new Expression[expressions.size()];
-	for(int i = 0; i < expressions.size(); i++) {
-	    result[i] = simplifyExpression(expressions.get(i));
-	}
-	return new ImmutableArray<Expression>(result);
+    public void performActionOnArrayDeclaration(ArrayDeclaration x) {
+        failUnexpected(x);
     }
 
 
-    private New simplifyNew(New n) {
-        Debug.assertFalse(n.getReferencePrefix() instanceof Expression);
-	ImmutableArray<Expression> simpleArgs = simplifyExpressions(n.getArguments());
-	Expression[] simpleArgsArray = new Expression[simpleArgs.size()];
-	for(int i = 0; i < simpleArgs.size(); i++) {
-	    simpleArgsArray[i] = simpleArgs.get(i);
-	}
-	return new New(simpleArgsArray, 
-		       n.getTypeReference(), 
-		       n.getReferencePrefix());
+    public void performActionOnArrayInitializer(ArrayInitializer x) {
+        //nothing to do (handled in performActionOnNewArray() and
+        //performActionOnVariableSpecification())
     }
 
 
-    private MethodReference simplifyMethodReference(MethodReference mr) {
-        ReferencePrefix rp = mr.getReferencePrefix();
-	ReferencePrefix simpleRp = (rp instanceof ThisReference
-                                    || rp instanceof SuperReference
-                                    || rp instanceof ProgramVariable
-                                    || rp instanceof FieldReference
-                                    || !(rp instanceof Expression)
-                                    ? rp
-                                    : simplifyExpression((Expression) rp));
-
-        return new MethodReference(simplifyExpressions(mr.getArguments()), 
-				   mr.getMethodName(), 
-				   simpleRp);
+    public void performActionOnArrayLengthReference(ArrayLengthReference x) {
+        performActionOnPrimitiveLiteral();
     }
     
     
@@ -349,52 +322,357 @@ public class ConstructableKeYJavaTypeCollector implements Visitor {
     //AST walking methods
     //-------------------------------------------------------------------------
     
-    private String addSpaces(String s) {
-        while(s.length() < 45) {
-             s += " ";
-        }
-        return s;
+    public void performActionOnArrayReference(ArrayReference x) {
+        //nothing to do
     }
     
     
-    protected void walk(ProgramElement node) {
-        //debug output
-        String fullClassName = node.getClass().getName();
-        String className
-                = fullClassName.substring(fullClassName.lastIndexOf(".") + 1);
-        String enteringString
-                = addSpaces("Entering:   " + node) + "(" + className + ")";
-        String ascendingString
-                = addSpaces("Ascending:  " + node) + "(" + className + ")";
-        verbose(enteringString);
-    
-        //visit the node
-        adoptedChildren = null;
-        entering = true;
-        node.visit(this);
-        
-        //walk children (either the adopted or the normal ones)
-        if(adoptedChildren != null) {
-            ProgramElement[] ac = adoptedChildren.clone();
-            for (ProgramElement anAc : ac) {
-                walk(anAc);
-            }
-            verbose(ascendingString);
-        } else if(node instanceof NonTerminalProgramElement) {
-            NonTerminalProgramElement nonTerminalNode 
-                        = (NonTerminalProgramElement) node;
-            for(int i = 0; i < nonTerminalNode.getChildCount(); i++) {
-                walk(nonTerminalNode.getChildAt(i));
-            }
-            verbose(ascendingString);
-        }
-        
-        //visit the node again
-        entering = false;
-        node.visit(this);
+    public void performActionOnAssert(Assert assert1) {        
+        //nothing to do        
     }
 
 
+    public void performActionOnBinaryAnd(BinaryAnd x) {
+        performActionOnPrimitiveBinary();
+    }
+
+    
+    public void performActionOnBinaryAndAssignment(BinaryAndAssignment x) {
+        performActionOnPrimitiveBinary();
+    }
+
+    
+    public void performActionOnBinaryNot(BinaryNot x) {
+        performActionOnPrimitiveBinary();
+    }
+    
+
+    //-------------------------------------------------------------------------
+    // the rest of the visitor interface, which is not needed at all
+    //-------------------------------------------------------------------------
+    
+   public void performActionOnBinaryOr(BinaryOr x) {
+    performActionOnPrimitiveBinary();
+}
+
+
+    public void performActionOnBinaryOrAssignment(BinaryOrAssignment x) {
+        performActionOnPrimitiveBinary();
+    }
+
+    
+     
+    public void performActionOnBinaryXOr(BinaryXOr x) {
+        performActionOnPrimitiveBinary();
+    }
+
+      
+    public void performActionOnBinaryXOrAssignment(BinaryXOrAssignment x) {
+        performActionOnPrimitiveBinary();
+    }
+    
+   
+    public void performActionOnBooleanLiteral(BooleanLiteral x) {
+        performActionOnPrimitiveLiteral();
+    }
+    
+    
+    public void performActionOnBreak(Break x) {
+        //nothing to do
+    }
+    
+    public void performActionOnCase(Case x) {
+        //nothing to do
+    }
+
+    
+    public void performActionOnCatch(Catch x) {
+        //nothing to do
+    }
+    
+    
+    public void performActionOnCatchAllStatement(CatchAllStatement x) {
+        failUnexpected(x);
+    }
+
+    
+    public void performActionOnCharLiteral(CharLiteral x) {
+        performActionOnPrimitiveLiteral();
+    }
+
+    
+    public void performActionOnClassDeclaration(ClassDeclaration x) {
+        failUnexpected(x);
+    }
+
+    
+    public void performActionOnClassInitializer(ClassInitializer x) {
+        failUnexpected(x);
+    }
+
+    
+    public void performActionOnComment(Comment x) {
+        //nothing to do
+    }
+
+    
+    public void performActionOnCompilationUnit(CompilationUnit x) {
+        failUnexpected(x);
+    }
+
+    
+    public void performActionOnConditional(Conditional x) {
+        //nothing to do
+    }
+    
+         
+    public void performActionOnConstructorDeclaration(
+                                                ConstructorDeclaration x) {
+        failUnexpected(x);
+    }
+
+     
+    public void performActionOnContextStatementBlock(ContextStatementBlock x) {
+        failUnexpected(x);
+    }
+
+     
+    public void performActionOnContinue(Continue x) {
+        //nothing to do
+    }
+
+    
+    public void performActionOnCopyAssignment(CopyAssignment x) {
+        //nothing to do
+    }
+
+     
+    public void performActionOnDefault(Default x) {
+        //nothing to do
+    }
+
+    
+    public void performActionOnDivide(Divide x) {
+        performActionOnPrimitiveBinary();
+    }
+
+    
+    public void performActionOnDivideAssignment(DivideAssignment x) {
+        performActionOnPrimitiveBinary();
+    }
+
+    
+    public void performActionOnDo(Do x) {
+        //nothing to do
+    }
+
+    
+    public void performActionOnDoubleLiteral(DoubleLiteral x) {
+        performActionOnPrimitiveLiteral();
+    }
+
+    
+    public void performActionOnElse(Else x) {
+        //nothing to do
+    }
+
+    
+    public void performActionOnEmptyStatement(EmptyStatement x) {
+        //nothing to do
+    }
+
+    
+    public void performActionOnEnhancedFor(EnhancedFor x) {
+    	// nothing to do
+    	
+    }
+
+     
+    public void performActionOnEquals(Equals x) {
+        performActionOnPrimitiveBinary();
+    }
+
+    
+    public void performActionOnExactInstanceof(ExactInstanceof x) {
+        performActionOnPrimitiveUnary();
+    }
+
+    
+    public void performActionOnExecutionContext(ExecutionContext x) {
+        failUnexpected(x);
+    }
+
+    
+    public void performActionOnExtends(Extends x) {
+        failUnexpected(x);
+    }
+
+    
+    public void performActionOnFieldDeclaration(FieldDeclaration x) {
+        failUnexpected(x);
+    }
+
+    
+    public void performActionOnFieldReference(FieldReference x) {
+        //nothing to do
+    }
+
+    
+    public void performActionOnFieldSpecification(FieldSpecification x) {
+        failUnexpected(x);
+    }
+
+     
+    public void performActionOnFinally(Finally x) {
+        //nothing to do
+    }
+
+    
+    public void performActionOnFloatLiteral(FloatLiteral x) {
+        performActionOnPrimitiveLiteral();
+    }
+    
+
+    public void performActionOnFor(For x) {
+        //nothing to do
+    }
+    
+    
+    public void performActionOnForUpdates(ForUpdates x) {
+        //nothing to do
+    }
+    
+
+    public void performActionOnGreaterOrEquals(GreaterOrEquals x) {
+        performActionOnPrimitiveBinary();
+    }
+    
+
+    public void performActionOnGreaterThan(GreaterThan x) {
+        performActionOnPrimitiveBinary();
+    }
+    
+
+    public void performActionOnGuard(Guard x) {
+        //nothing to do
+    }
+
+    
+    public void performActionOnIf(If x) {
+        //nothing to do
+    }
+
+    
+    public void performActionOnImplements(Implements x) {
+        failUnexpected(x);
+    }
+
+    
+    public void performActionOnImplicitFieldSpecification(
+                                                ImplicitFieldSpecification x) {
+        failUnexpected(x);
+    }
+
+     
+    public void performActionOnImport(Import x) {
+        failUnexpected(x);
+    }
+
+     
+    public void performActionOnInstanceof(Instanceof x) {
+        performActionOnPrimitiveUnary();
+    }
+
+    
+    public void performActionOnInterfaceDeclaration(InterfaceDeclaration x) {
+        failUnexpected(x);
+    }
+
+     
+    public void performActionOnIntLiteral(IntLiteral x) {
+        performActionOnPrimitiveLiteral();
+    }
+
+
+    public void performActionOnIProgramVariable(IProgramVariable x) {
+        //nothing to do
+    }
+
+     
+    public void performActionOnLabeledStatement(LabeledStatement x) {
+        //nothing to do
+    }
+
+    
+    public void performActionOnLessOrEquals(LessOrEquals x) {
+        performActionOnPrimitiveBinary();
+    }
+
+    
+    public void performActionOnLessThan(LessThan x) {
+        performActionOnPrimitiveBinary();
+    }
+
+    
+    public void performActionOnLocalVariableDeclaration(
+                                                LocalVariableDeclaration x) {
+        //nothing to do (initialisation handled in
+        //performActionOnVariableSpecification)
+    }
+
+    
+    public void performActionOnLocationVariable(LocationVariable x) {
+        performActionOnProgramVariable(x);
+    }
+
+     
+    public void performActionOnLogicalAnd(LogicalAnd x) {
+        performActionOnPrimitiveBinary();
+    }
+
+    
+    public void performActionOnLogicalNot(LogicalNot x) {
+        performActionOnPrimitiveUnary();
+    }
+    
+    
+    public void performActionOnLogicalOr(LogicalOr x) {
+        performActionOnPrimitiveBinary();
+    }
+
+    
+    public void performActionOnLongLiteral(LongLiteral x) {
+        performActionOnPrimitiveLiteral();
+    }
+
+    
+    public void performActionOnLoopInit(LoopInit x) {
+        //nothing to do
+    }
+
+    
+    public void performActionOnLoopInvariant(LoopInvariant x) {
+    	// TODO resolve
+    	
+    }
+
+    
+    public void performActionOnMemoryAreaEC(MemoryAreaEC x) {
+            failUnexpected(x);
+        
+    }
+
+    
+    public void performActionOnMetaClassReference(MetaClassReference x) {
+        failUnexpected(x);
+    }
+
+    
+    public void performActionOnMethod(ProgramMethod x) {
+        failUnexpected(x);
+    }
+
+    
     /**
      * Recursively walks through the body of the encountered method
      */
@@ -426,8 +704,12 @@ public class ConstructableKeYJavaTypeCollector implements Visitor {
                                 = new TypeRef(pm.getContainerType());
                 final ReferencePrefix runtimeInstance 
                                 = x.getDesignatedContext();
+                
+                
+                
                 final ExecutionContext executionContext 
-		    = new ExecutionContext(classContext, null,runtimeInstance);
+		    = new ExecutionContext(classContext, null,runtimeInstance == null ? null : 
+			new RuntimeInstanceEC(runtimeInstance));
                                                        
                 //save context information
                 final SVInstantiations oldSvInst 
@@ -451,51 +733,13 @@ public class ConstructableKeYJavaTypeCollector implements Visitor {
     }
 
     
-    /**
-     * Collects the KeYJavaType, transforms the constructor into normal form
-     * and recursively walks it.
-     */
-    public void performActionOnNew(New x) {
-        if(entering) {
-            //get the new-object type
-            KeYJavaType newObjectType
-                              = x.getKeYJavaType(services, 
-                                                 svInst.getExecutionContext());
-            assert newObjectType != null;
+    public void performActionOnMethodDeclaration(MethodDeclaration x) {
+        failUnexpected(x);
+    }
 
-	    if( !constructableKeYJavaTypes.contains( newObjectType ) )
-		constructableKeYJavaTypes = constructableKeYJavaTypes.prepend( newObjectType );
-
-            //create a new-object variable and save it in an SVInstantiations
-            //as instantiation of some SV
-            ProgramElementName newObjectName
-                     = new ProgramElementName("new" + newObjectType.getSort()
-                                                                   .name());
-            ProgramVariable newObjectVar
-                        = new LocationVariable(newObjectName, newObjectType);
-            SchemaVariable newObjectSV = new NameSV(newObjectName + "SV");
-            SVInstantiations mySvInst = svInst.add(newObjectSV, newObjectVar);
-
-            //let the ConstructorCall metaconstruct expand the constructor 
-            //reference
-	    New simpleX = simplifyNew(x);
-            ConstructorCall cc = new ConstructorCall(newObjectSV, simpleX);
-            ProgramElement expandedPe = cc.symbolicExecution(simpleX,
-                                                             services,
-                                                             mySvInst);
-
-            //descend into prefix, parameters and expansion instead of
-            //normal children
-            final ImmutableArray<Expression> args = x.getArguments();
-            adoptedChildren = new ProgramElement[args.size() + 2];
-            adoptedChildren[0] = new ThisReference();
-            for(int i = 0; i < args.size(); i++) {
-                adoptedChildren[i + 1] = args.get(i);
-            }
-            adoptedChildren[args.size() + 1] = expandedPe;
-
-        } else {
-	}
+    
+    public void performActionOnMethodFrame(MethodFrame x) {
+        failUnexpected(x);
     }
 
     
@@ -552,323 +796,9 @@ public class ConstructableKeYJavaTypeCollector implements Visitor {
             adoptedChildren[args.size() + 1] = expandedPe;
         }
     }
-    
-
-    //-------------------------------------------------------------------------
-    // the rest of the visitor interface, which is not needed at all
-    //-------------------------------------------------------------------------
-    
-   private void performActionOnPrimitiveLiteral() {
-        //nothing to do
-    }
-
-
-    private void performActionOnPrimitiveUnary() {
-        //nothing to do
-    }
 
     
-     
-    private void performActionOnPrimitiveBinary() {
-        //nothing to do
-    }
-
-      
-    public void performActionOnAbstractProgramElement(
-                                                    AbstractProgramElement x) {
-        failUnexpected(x);
-    }
-    
-   
-    public void performActionOnProgramElementName(ProgramElementName x) {
-        //nothing to do
-    }
-    
-    
-    public void performActionOnProgramVariable(ProgramVariable x) {
-        //nothing to do
-    }
-    
-    public void performActionOnIProgramVariable(IProgramVariable x) {
-        //nothing to do
-    }
-
-    
-    public void performActionOnSchemaVariable(SchemaVariable x) {
-        failUnexpected((ProgramSV) x);
-    }
-    
-    
-    public void performActionOnProgramMethod(ProgramMethod x) {
-        failUnexpected(x);
-    }
-
-    
-    public void performActionOnProgramMetaConstruct(ProgramMetaConstruct x) {
-        failUnexpected(x);
-    }
-
-    
-    public void performActionOnContextStatementBlock(ContextStatementBlock x) {
-        failUnexpected(x);
-    }
-
-    
-    public void performActionOnIntLiteral(IntLiteral x) {
-        performActionOnPrimitiveLiteral();
-    }
-
-    
-    public void performActionOnBooleanLiteral(BooleanLiteral x) {
-        performActionOnPrimitiveLiteral();
-    }
-
-    
-    public void performActionOnStringLiteral(StringLiteral x) {
-        //nothing to do
-    }
-
-    
-    public void performActionOnNullLiteral(NullLiteral x) {
-        //nothing to do
-    }
-    
-         
-    public void performActionOnCharLiteral(CharLiteral x) {
-        performActionOnPrimitiveLiteral();
-    }
-
-     
-    public void performActionOnDoubleLiteral(DoubleLiteral x) {
-        performActionOnPrimitiveLiteral();
-    }
-
-     
-    public void performActionOnLongLiteral(LongLiteral x) {
-        performActionOnPrimitiveLiteral();
-    }
-
-    
-    public void performActionOnFloatLiteral(FloatLiteral x) {
-        performActionOnPrimitiveLiteral();
-    }
-
-     
-    public void performActionOnPackageSpecification(PackageSpecification x) {
-        failUnexpected(x);
-    }
-
-    
-    public void performActionOnTypeReference(TypeReference x) {
-        //nothing to do
-    }
-
-    
-    public void performActionOnPackageReference(PackageReference x) {
-        //nothing to do
-    }
-
-    
-    public void performActionOnThrows(Throws x) {
-        //nothing to do
-    }
-
-    
-    public void performActionOnArrayInitializer(ArrayInitializer x) {
-        //nothing to do (handled in performActionOnNewArray() and
-        //performActionOnVariableSpecification())
-    }
-
-    
-    public void performActionOnCompilationUnit(CompilationUnit x) {
-        failUnexpected(x);
-    }
-
-    
-    public void performActionOnArrayDeclaration(ArrayDeclaration x) {
-        failUnexpected(x);
-    }
-
-    
-    public void performActionOnSuperArrayDeclaration(SuperArrayDeclaration x) {
-        failUnexpected(x);
-    }
-
-     
-    public void performActionOnClassDeclaration(ClassDeclaration x) {
-        failUnexpected(x);
-    }
-
-    
-    public void performActionOnInterfaceDeclaration(InterfaceDeclaration x) {
-        failUnexpected(x);
-    }
-
-    
-    public void performActionOnFieldDeclaration(FieldDeclaration x) {
-        failUnexpected(x);
-    }
-
-    
-    public void performActionOnLocalVariableDeclaration(
-                                                LocalVariableDeclaration x) {
-        //nothing to do (initialisation handled in
-        //performActionOnVariableSpecification)
-    }
-
-    
-    public void performActionOnVariableDeclaration(VariableDeclaration x) {
-        failUnexpected(x);
-    }
-
-    
-    public void performActionOnParameterDeclaration(ParameterDeclaration x) {
-        //nothing to do
-    }
-
-    
-    public void performActionOnMethodDeclaration(MethodDeclaration x) {
-        failUnexpected(x);
-    }
-
-     
-    public void performActionOnClassInitializer(ClassInitializer x) {
-        failUnexpected(x);
-    }
-
-    
-    public void performActionOnStatementBlock(StatementBlock x) {
-        //nothing to do
-    }
-    
-
-    public void performActionOnBreak(Break x) {
-        //nothing to do
-    }
-    
-    
-    public void performActionOnContinue(Continue x) {
-        //nothing to do
-    }
-    
-
-    public void performActionOnReturn(Return x) {
-        //nothing to do
-    }
-    
-
-    public void performActionOnThrow(Throw x) {
-        //nothing to do
-    }
-    
-
-    public void performActionOnDo(Do x) {
-        //nothing to do
-    }
-
-    
-    public void performActionOnFor(For x) {
-        //nothing to do
-    }
-
-    
-    public void performActionOnWhile(While x) {
-        //nothing to do
-    }
-
-    
-    public void performActionOnIf(If x) {
-        //nothing to do
-    }
-
-     
-    public void performActionOnSwitch(Switch x) {
-        //nothing to do
-    }
-
-     
-    public void performActionOnTry(Try x) {
-        //nothing to do
-    }
-
-    
-    public void performActionOnLabeledStatement(LabeledStatement x) {
-        //nothing to do
-    }
-
-     
-    public void performActionOnMethodFrame(MethodFrame x) {
-        failUnexpected(x);
-    }
-
-
-    public void performActionOnCatchAllStatement(CatchAllStatement x) {
-        failUnexpected(x);
-    }
-
-     
-    public void performActionOnSynchronizedBlock(SynchronizedBlock x) {
-        //nothing to do
-    }
-
-    
-    public void performActionOnImport(Import x) {
-        failUnexpected(x);
-    }
-
-    
-    public void performActionOnExtends(Extends x) {
-        failUnexpected(x);
-    }
-
-    
-    public void performActionOnImplements(Implements x) {
-        failUnexpected(x);
-    }
-
-    
-    public void performActionOnVariableSpecification(VariableSpecification x) {
-        //nothing to do
-    }
-
-     
-    public void performActionOnFieldSpecification(FieldSpecification x) {
-        failUnexpected(x);
-    }
-
-    
-    public void performActionOnImplicitFieldSpecification(
-                                                ImplicitFieldSpecification x) {
-        failUnexpected(x);
-    }
-    
-    
-    public void performActionOnBinaryAnd(BinaryAnd x) {
-        performActionOnPrimitiveBinary();
-    }
-
-    
-    public void performActionOnBinaryAndAssignment(BinaryAndAssignment x) {
-        performActionOnPrimitiveBinary();
-    }
-
-    
-    public void performActionOnBinaryOrAssignment(BinaryOrAssignment x) {
-        performActionOnPrimitiveBinary();
-    }
-
-    
-    public void performActionOnBinaryXOrAssignment(BinaryXOrAssignment x) {
-        performActionOnPrimitiveBinary();
-    }
-
-    
-    public void performActionOnCopyAssignment(CopyAssignment x) {
-        //nothing to do
-    }
-
-    
-    public void performActionOnDivideAssignment(DivideAssignment x) {
+    public void performActionOnMinus(Minus x) {
         performActionOnPrimitiveBinary();
     }
 
@@ -878,13 +808,127 @@ public class ConstructableKeYJavaTypeCollector implements Visitor {
     }
 
     
+    public void performActionOnModifier(Modifier x) {
+        failUnexpected(x);
+    }
+
+    
+    public void performActionOnModulo(Modulo x) {
+        performActionOnPrimitiveBinary();
+    }
+    
+
     public void performActionOnModuloAssignment(ModuloAssignment x) {
+        performActionOnPrimitiveBinary();
+    }
+
+    
+    public void performActionOnNegative(Negative x) {
+        performActionOnPrimitiveUnary();
+    }
+
+    
+    /**
+     * Collects the KeYJavaType, transforms the constructor into normal form
+     * and recursively walks it.
+     */
+    public void performActionOnNew(New x) {
+        if(entering) {
+            //get the new-object type
+            KeYJavaType newObjectType
+                              = x.getKeYJavaType(services, 
+                                                 svInst.getExecutionContext());
+            assert newObjectType != null;
+
+	    if( !constructableKeYJavaTypes.contains( newObjectType ) )
+		constructableKeYJavaTypes = constructableKeYJavaTypes.prepend( newObjectType );
+
+            //create a new-object variable and save it in an SVInstantiations
+            //as instantiation of some SV
+            ProgramElementName newObjectName
+                     = new ProgramElementName("new" + newObjectType.getSort()
+                                                                   .name());
+            ProgramVariable newObjectVar
+                        = new LocationVariable(newObjectName, newObjectType);
+            SchemaVariable newObjectSV = new NameSV(newObjectName + "SV");
+            SVInstantiations mySvInst = svInst.add(newObjectSV, newObjectVar);
+
+            //let the ConstructorCall metaconstruct expand the constructor 
+            //reference
+	    New simpleX = simplifyNew(x);
+            ConstructorCall cc = new ConstructorCall(newObjectSV, simpleX);
+            ProgramElement expandedPe = cc.symbolicExecution(simpleX,
+                                                             services,
+                                                             mySvInst);
+
+            //descend into prefix, parameters and expansion instead of
+            //normal children
+            final ImmutableArray<Expression> args = x.getArguments();
+            adoptedChildren = new ProgramElement[args.size() + 2];
+            adoptedChildren[0] = new ThisReference();
+            for(int i = 0; i < args.size(); i++) {
+                adoptedChildren[i + 1] = args.get(i);
+            }
+            adoptedChildren[args.size() + 1] = expandedPe;
+
+        } else {
+	}
+    }
+
+    
+    public void performActionOnNewArray(NewArray x) {
+        //nothing to do
+    }
+
+    
+    public void performActionOnNotEquals(NotEquals x) {
+        performActionOnPrimitiveBinary();
+    }
+
+    
+    public void performActionOnNullLiteral(NullLiteral x) {
+        //nothing to do
+    }
+        
+    
+    public void performActionOnPackageReference(PackageReference x) {
+        //nothing to do
+    }
+
+    
+    public void performActionOnPackageSpecification(PackageSpecification x) {
+        failUnexpected(x);
+    }
+
+    
+    public void performActionOnParameterDeclaration(ParameterDeclaration x) {
+        //nothing to do
+    }
+
+    
+    public void performActionOnParenthesizedExpression(
+                                                    ParenthesizedExpression x) {
+        //nothing to do
+    }
+
+    
+    public void performActionOnPassiveExpression(PassiveExpression x) {
+        //nothing to do
+    }
+
+    
+    public void performActionOnPlus(Plus x) {
         performActionOnPrimitiveBinary();
     }
 
     
     public void performActionOnPlusAssignment(PlusAssignment x) {
         performActionOnPrimitiveBinary();
+    }
+
+    
+    public void performActionOnPositive(Positive x) {
+        performActionOnPrimitiveUnary();
     }
 
     
@@ -907,144 +951,90 @@ public class ConstructableKeYJavaTypeCollector implements Visitor {
         performActionOnPrimitiveUnary();
     }
 
+     
+    private void performActionOnPrimitiveBinary() {
+        //nothing to do
+    }
+
+    
+    private void performActionOnPrimitiveLiteral() {
+            //nothing to do
+        }
+
+    
+    private void performActionOnPrimitiveUnary() {
+        //nothing to do
+    }
+
+     
+    public void performActionOnProgramConstant(ProgramConstant x) {
+        performActionOnProgramVariable(x);        
+    }
+
+    
+    public void performActionOnProgramElementName(ProgramElementName x) {
+        //nothing to do
+    }
+
+    
+    public void performActionOnProgramMetaConstruct(ProgramMetaConstruct x) {
+        failUnexpected(x);
+    }
+
+    
+    public void performActionOnProgramMethod(ProgramMethod x) {
+        failUnexpected(x);
+    }
+
+     
+    public void performActionOnProgramSVProxy(ProgramSVProxy x) {
+        failUnexpected(x);
+    }
+
+    
+    public void performActionOnProgramSVSkolem(ProgramSVSkolem x) {
+        failUnexpected(x);
+    }
+
+    
+    public void performActionOnProgramVariable(ProgramVariable x) {
+        //nothing to do
+    }
+
+    
+    public void performActionOnReturn(Return x) {
+        //nothing to do
+    }
+
+    
+    public void performActionOnRuntimeInstanceEC(RuntimeInstanceEC x) {
+            failUnexpected(x);	    
+    }
+
+     
+    public void performActionOnSchematicFieldReference(
+                                                    SchematicFieldReference x) {
+        failUnexpected(x);
+    }
+
+    
+    public void performActionOnSchemaVariable(SchemaVariable x) {
+        failUnexpected((ProgramSV) x);
+    }
+
+    
+    public void performActionOnSetAssignment(SetAssignment x) {
+    	// TODO resolve
+    	
+    }
+
+    
+    public void performActionOnShiftLeft(ShiftLeft x) {
+        performActionOnPrimitiveBinary();
+    }
+
     
     public void performActionOnShiftLeftAssignment(ShiftLeftAssignment x) {
-        performActionOnPrimitiveBinary();
-    }
-
-    
-    public void performActionOnShiftRightAssignment(ShiftRightAssignment x) {
-        performActionOnPrimitiveBinary();
-    }
-    
-
-    public void performActionOnTimesAssignment(TimesAssignment x) {
-        performActionOnPrimitiveBinary();
-    }
-
-    
-    public void performActionOnUnsignedShiftRightAssignment(
-                                            UnsignedShiftRightAssignment x) {
-        performActionOnPrimitiveBinary();
-    }
-
-    
-    public void performActionOnBinaryNot(BinaryNot x) {
-        performActionOnPrimitiveBinary();
-    }
-
-    
-    public void performActionOnBinaryOr(BinaryOr x) {
-        performActionOnPrimitiveBinary();
-    }
-
-    
-    public void performActionOnBinaryXOr(BinaryXOr x) {
-        performActionOnPrimitiveBinary();
-    }
-
-    
-    public void performActionOnConditional(Conditional x) {
-        //nothing to do
-    }
-        
-    
-    public void performActionOnDivide(Divide x) {
-        performActionOnPrimitiveBinary();
-    }
-
-    
-    public void performActionOnEquals(Equals x) {
-        performActionOnPrimitiveBinary();
-    }
-
-    
-    public void performActionOnGreaterOrEquals(GreaterOrEquals x) {
-        performActionOnPrimitiveBinary();
-    }
-
-    
-    public void performActionOnGreaterThan(GreaterThan x) {
-        performActionOnPrimitiveBinary();
-    }
-
-    
-    public void performActionOnLessOrEquals(LessOrEquals x) {
-        performActionOnPrimitiveBinary();
-    }
-
-    
-    public void performActionOnLessThan(LessThan x) {
-        performActionOnPrimitiveBinary();
-    }
-
-    
-    public void performActionOnNotEquals(NotEquals x) {
-        performActionOnPrimitiveBinary();
-    }
-
-    
-    public void performActionOnNewArray(NewArray x) {
-        //nothing to do
-    }
-
-    
-    public void performActionOnInstanceof(Instanceof x) {
-        performActionOnPrimitiveUnary();
-    }
-
-    
-    public void performActionOnExactInstanceof(ExactInstanceof x) {
-        performActionOnPrimitiveUnary();
-    }
-
-    
-    public void performActionOnTypeCast(TypeCast x) {
-        //nothing to do
-    }
-
-    
-    public void performActionOnLogicalAnd(LogicalAnd x) {
-        performActionOnPrimitiveBinary();
-    }
-
-     
-    public void performActionOnLogicalNot(LogicalNot x) {
-        performActionOnPrimitiveUnary();
-    }
-
-    
-    public void performActionOnLogicalOr(LogicalOr x) {
-        performActionOnPrimitiveBinary();
-    }
-
-    
-    public void performActionOnMinus(Minus x) {
-        performActionOnPrimitiveBinary();
-    }
-
-     
-    public void performActionOnModulo(Modulo x) {
-        performActionOnPrimitiveBinary();
-    }
-
-    
-    public void performActionOnNegative(Negative x) {
-        performActionOnPrimitiveUnary();
-    }
-
-    
-    public void performActionOnPlus(Plus x) {
-        performActionOnPrimitiveBinary();
-    }
-
-    
-    public void performActionOnPositive(Positive x) {
-        performActionOnPrimitiveUnary();
-    }
-
-     
-    public void performActionOnShiftLeft(ShiftLeft x) {
         performActionOnPrimitiveBinary();
     }
 
@@ -1054,43 +1044,22 @@ public class ConstructableKeYJavaTypeCollector implements Visitor {
     }
 
     
-    public void performActionOnTimes(Times x) {
+    public void performActionOnShiftRightAssignment(ShiftRightAssignment x) {
         performActionOnPrimitiveBinary();
     }
 
     
-    public void performActionOnUnsignedShiftRight(UnsignedShiftRight x) {
-        performActionOnPrimitiveBinary();
-    }
-
-    
-    public void performActionOnArrayReference(ArrayReference x) {
-        //nothing to do
-    }
-
-     
-    public void performActionOnMetaClassReference(MetaClassReference x) {
-        failUnexpected(x);
-    }
-
-    
-    public void performActionOnFieldReference(FieldReference x) {
+    public void performActionOnStatementBlock(StatementBlock x) {
         //nothing to do
     }
 
     
-    public void performActionOnSchematicFieldReference(
-                                                    SchematicFieldReference x) {
-        failUnexpected(x);
-    }
-
-    
-    public void performActionOnVariableReference(VariableReference x) {
+    public void performActionOnStringLiteral(StringLiteral x) {
         //nothing to do
     }
 
     
-    public void performActionOnMethod(ProgramMethod x) {
+    public void performActionOnSuperArrayDeclaration(SuperArrayDeclaration x) {
         failUnexpected(x);
     }
 
@@ -1103,14 +1072,23 @@ public class ConstructableKeYJavaTypeCollector implements Visitor {
     }
 
     
-    public void performActionOnExecutionContext(ExecutionContext x) {
-        failUnexpected(x);
+    public void performActionOnSuperReference(SuperReference x) {
+        //nothing to do
+    }
+    
+
+    public void performActionOnSwitch(Switch x) {
+        //nothing to do
     }
 
     
-    public void performActionOnConstructorDeclaration(
-                                                ConstructorDeclaration x) {
-        failUnexpected(x);
+    public void performActionOnSynchronizedBlock(SynchronizedBlock x) {
+        //nothing to do
+    }
+
+    
+    public void performActionOnThen(Then x) {
+        //nothing to do
     }
 
     
@@ -1121,132 +1099,169 @@ public class ConstructableKeYJavaTypeCollector implements Visitor {
         failUnexpected(x);
     }
 
-    
-    public void performActionOnSuperReference(SuperReference x) {
-        //nothing to do
-    }
-
-    
+     
     public void performActionOnThisReference(ThisReference x) {
         //nothing to do
     }
 
     
-    public void performActionOnArrayLengthReference(ArrayLengthReference x) {
-        performActionOnPrimitiveLiteral();
-    }
-    
-
-    public void performActionOnThen(Then x) {
+    public void performActionOnThrow(Throw x) {
         //nothing to do
     }
 
     
-    public void performActionOnElse(Else x) {
+    public void performActionOnThrows(Throws x) {
         //nothing to do
     }
 
     
-    public void performActionOnCase(Case x) {
+    public void performActionOnTimes(Times x) {
+        performActionOnPrimitiveBinary();
+    }
+
+    
+    public void performActionOnTimesAssignment(TimesAssignment x) {
+        performActionOnPrimitiveBinary();
+    }
+
+    
+    public void performActionOnTry(Try x) {
         //nothing to do
     }
 
     
-    public void performActionOnCatch(Catch x) {
-        //nothing to do
-    }
-
-     
-    public void performActionOnDefault(Default x) {
+    public void performActionOnTypeCast(TypeCast x) {
         //nothing to do
     }
 
     
-    public void performActionOnFinally(Finally x) {
+    public void performActionOnTypeReference(TypeReference x) {
         //nothing to do
     }
 
     
-    public void performActionOnModifier(Modifier x) {
-        failUnexpected(x);
+    public void performActionOnUnsignedShiftRight(UnsignedShiftRight x) {
+        performActionOnPrimitiveBinary();
     }
 
     
-    public void performActionOnEmptyStatement(EmptyStatement x) {
-        //nothing to do
-    }
-
-    
-    public void performActionOnComment(Comment x) {
-        //nothing to do
-    }
-
-    
-    public void performActionOnParenthesizedExpression(
-                                                    ParenthesizedExpression x) {
-        //nothing to do
-    }
-
-    
-    public void performActionOnPassiveExpression(PassiveExpression x) {
-        //nothing to do
-    }
-
-    
-    public void performActionOnForUpdates(ForUpdates x) {
-        //nothing to do
-    }
-
-    
-    public void performActionOnGuard(Guard x) {
-        //nothing to do
-    }
-
-    
-    public void performActionOnLoopInit(LoopInit x) {
-        //nothing to do
+    public void performActionOnUnsignedShiftRightAssignment(
+                                            UnsignedShiftRightAssignment x) {
+        performActionOnPrimitiveBinary();
     }
   
-    public void performActionOnAssert(Assert assert1) {        
-        //nothing to do        
-    }
-    
-    public void performActionOnProgramSVSkolem(ProgramSVSkolem x) {
+    public void performActionOnVariableDeclaration(VariableDeclaration x) {
         failUnexpected(x);
     }
     
+    public void performActionOnVariableReference(VariableReference x) {
+        //nothing to do
+    }
+    
 
-    public void performActionOnProgramSVProxy(ProgramSVProxy x) {
-        failUnexpected(x);
+    public void performActionOnVariableSpecification(VariableSpecification x) {
+        //nothing to do
     }
 
 
-    public void performActionOnLocationVariable(LocationVariable x) {
-        performActionOnProgramVariable(x);
+    public void performActionOnWhile(While x) {
+        //nothing to do
     }
 
 
-    public void performActionOnProgramConstant(ProgramConstant x) {
-        performActionOnProgramVariable(x);        
+    /**
+     * Replaces an expression by a simpler one with the same static type,
+     * so that it can be handled as a receiver or parameter by the
+     * ConstructorCall and MethodCall metaconstructs.
+     */
+    private ProgramVariable simplifyExpression(Expression expression) {
+        KeYJavaType staticKjt
+                = expression.getKeYJavaType(services,
+                                            svInst.getExecutionContext());
+        Debug.assertTrue(staticKjt != null);
+        return new LocationVariable(INVISIBLE_NAME, staticKjt);
     }
 
 
-	public void performActionOnEnhancedFor(EnhancedFor x) {
-		// nothing to do
-		
-	}
+	private ImmutableArray<Expression> simplifyExpressions(ImmutableArray<Expression> expressions) {
+        Expression[] result = new Expression[expressions.size()];
+        for(int i = 0; i < expressions.size(); i++) {
+            result[i] = simplifyExpression(expressions.get(i));
+        }
+        return new ImmutableArray<Expression>(result);
+        }
 
 
-	public void performActionOnLoopInvariant(LoopInvariant x) {
-		// TODO resolve
-		
-	}
+	private MethodReference simplifyMethodReference(MethodReference mr) {
+            ReferencePrefix rp = mr.getReferencePrefix();
+        ReferencePrefix simpleRp = (rp instanceof ThisReference
+                                        || rp instanceof SuperReference
+                                        || rp instanceof ProgramVariable
+                                        || rp instanceof FieldReference
+                                        || !(rp instanceof Expression)
+                                        ? rp
+                                        : simplifyExpression((Expression) rp));
+
+            return new MethodReference(simplifyExpressions(mr.getArguments()), 
+        			   mr.getMethodName(), 
+        			   simpleRp);
+        }
 
 
-	public void performActionOnSetAssignment(SetAssignment x) {
-		// TODO resolve
-		
-	}
+	private New simplifyNew(New n) {
+            Debug.assertFalse(n.getReferencePrefix() instanceof Expression);
+        ImmutableArray<Expression> simpleArgs = simplifyExpressions(n.getArguments());
+        Expression[] simpleArgsArray = new Expression[simpleArgs.size()];
+        for(int i = 0; i < simpleArgs.size(); i++) {
+            simpleArgsArray[i] = simpleArgs.get(i);
+        }
+        return new New(simpleArgsArray, 
+        	       n.getTypeReference(), 
+        	       n.getReferencePrefix());
+        }
+
+
+	private void verbose(Object o) {
+            //System.out.println(o);
+        }
+
+
+	protected void walk(ProgramElement node) {
+            //debug output
+            String fullClassName = node.getClass().getName();
+            String className
+                    = fullClassName.substring(fullClassName.lastIndexOf(".") + 1);
+            String enteringString
+                    = addSpaces("Entering:   " + node) + "(" + className + ")";
+            String ascendingString
+                    = addSpaces("Ascending:  " + node) + "(" + className + ")";
+            verbose(enteringString);
+        
+            //visit the node
+            adoptedChildren = null;
+            entering = true;
+            node.visit(this);
+            
+            //walk children (either the adopted or the normal ones)
+            if(adoptedChildren != null) {
+                ProgramElement[] ac = adoptedChildren.clone();
+                for (ProgramElement anAc : ac) {
+                    walk(anAc);
+                }
+                verbose(ascendingString);
+            } else if(node instanceof NonTerminalProgramElement) {
+                NonTerminalProgramElement nonTerminalNode 
+                            = (NonTerminalProgramElement) node;
+                for(int i = 0; i < nonTerminalNode.getChildCount(); i++) {
+                    walk(nonTerminalNode.getChildAt(i));
+                }
+                verbose(ascendingString);
+            }
+            
+            //visit the node again
+            entering = false;
+            node.visit(this);
+        }
 
 
   

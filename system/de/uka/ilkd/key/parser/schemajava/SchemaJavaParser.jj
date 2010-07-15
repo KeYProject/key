@@ -2019,13 +2019,20 @@ ExecutionContext ExecutionContext() :
 {
     ExecutionContext ctxt = null;
     TypeSVWrapper tr = null;
-    ExpressionSVWrapper instance = null;
+    ExpressionSVWrapper runtimeInstance = null;
     ExpressionSVWrapper memoryArea = null;
 }
 {
-    tr = TypeSV() "(" ( ( memoryArea = ExpressionSV() (","  instance = ExpressionSV() )? ) | instance = ExpressionSV() )? ")"  
+    tr = TypeSV() "(" 
+    
+ (
+   ("<currentMemoryArea>=" memoryArea = ExpressionSV() ("," "this=" runtimeInstance = ExpressionSV())?) 
+   |  "this=" runtimeInstance = ExpressionSV()
+  )?
+    
+    ")"  
     {
-	return new ExecutionContext(tr, memoryArea, instance);
+	return new ExecutionContext(tr, memoryArea, runtimeInstance);
     } 
 } 
 

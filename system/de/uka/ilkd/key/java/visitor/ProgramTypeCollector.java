@@ -10,7 +10,6 @@
 package de.uka.ilkd.key.java.visitor;
 
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
 
 import de.uka.ilkd.key.collection.ImmutableList;
@@ -94,7 +93,7 @@ public class ProgramTypeCollector extends JavaASTVisitor {
 	    if (referencePre instanceof Expression) {
 		currentType = services.getTypeConverter().getKeYJavaType
 		    ((Expression) referencePre,
-		     new ExecutionContext(new TypeRef(type), null, self));
+		     new ExecutionContext(new TypeRef(type), null, new RuntimeInstanceEC(self)));
 		currentSelf = new LocationVariable
 		    (new ProgramElementName("x_" + 
 					    referencePre.toString()),
@@ -109,7 +108,7 @@ public class ProgramTypeCollector extends JavaASTVisitor {
 		 currentMR.getMethodSignature
 		 (services,
 		  new ExecutionContext(new TypeRef(currentType), 
-		          null, currentSelf)));
+		          null, new RuntimeInstanceEC(currentSelf))));
 
         for (KeYJavaType imp : imps) {
             currentType = imp;
@@ -120,7 +119,7 @@ public class ProgramTypeCollector extends JavaASTVisitor {
                                     currentMR.getMethodName().toString(),
                                     currentMR.getMethodSignature(services,
                                             new ExecutionContext(new TypeRef(currentType), null,
-                                                            currentSelf)),
+                                        	    new RuntimeInstanceEC(currentSelf))),
                                     currentSelf.getKeYJavaType());
             //System.out.println("pm: " + currentPM);
 
@@ -172,7 +171,8 @@ public class ProgramTypeCollector extends JavaASTVisitor {
 	    final KeYJavaType expressionType = 
 		services.getTypeConverter().getKeYJavaType
 		( (Expression)x, 
-		  new ExecutionContext(new TypeRef(type), null, self));
+		  new ExecutionContext(new TypeRef(type), null, 
+			  new RuntimeInstanceEC(self)));
 	    Debug.assertTrue(expressionType != null, 
 			     "Could not determine type of " + x);
 	    result.add(expressionType);

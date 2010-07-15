@@ -9,10 +9,7 @@
 //
 package de.uka.ilkd.key.java.reference;
 
-import de.uka.ilkd.key.java.JavaNonTerminalProgramElement;
-import de.uka.ilkd.key.java.PrettyPrinter;
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.Reference;
+import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.ExtList;
@@ -29,12 +26,12 @@ public class ExecutionContext
     /**
      * the reference to the active object
      */
-    protected final ReferencePrefix runtimeInstance;
+    protected final RuntimeInstanceEC runtimeInstance;
     
     /**
      * the current memory area
      */
-    protected final ReferencePrefix memoryArea;
+    protected final MemoryAreaEC memoryArea;
     
     
     /**
@@ -47,8 +44,8 @@ public class ExecutionContext
      * is currently active/executed
      */
     public ExecutionContext(TypeReference classContext, 
-            ReferencePrefix memoryArea,
-            ReferencePrefix runtimeInstance) {
+	    MemoryAreaEC memoryArea,
+            RuntimeInstanceEC runtimeInstance) {
         if (classContext == null) Debug.printStackTrace();
         this.classContext = classContext;
         this.memoryArea = memoryArea;       
@@ -67,21 +64,8 @@ public class ExecutionContext
 
 	children.remove(this.classContext);
 	
-	ReferencePrefix one = (ReferencePrefix) children.removeFirstOccurrence(
-                ReferencePrefix.class);         
-        ReferencePrefix two = (ReferencePrefix) children.removeFirstOccurrence(
-                ReferencePrefix.class);
-        
-                
-        if (two == null) {
-            this.memoryArea = null;
-            this.runtimeInstance = one;            
-        } else {
-            this.memoryArea = one;
-            this.runtimeInstance = two;                        
-        }
-        
-        assert (memoryArea == null || runtimeInstance != null);
+	this.memoryArea = (MemoryAreaEC) children.removeFirstOccurrence(MemoryAreaEC.class);         
+        this.runtimeInstance  = (RuntimeInstanceEC) children.removeFirstOccurrence(RuntimeInstanceEC.class);
     }
 
 
@@ -134,12 +118,21 @@ public class ExecutionContext
      * returns the runtime instance object
      * @return the runtime instance object
      */
-    public ReferencePrefix getRuntimeInstance() {
+    public RuntimeInstanceEC getRuntimeInstance() {
 	return runtimeInstance;
     }
     
-    public ReferencePrefix getMemoryArea() {
+    public ReferencePrefix getRuntimeInstanceAsRef() {
+	return runtimeInstance == null ? null : runtimeInstance.getReferencePrefix();
+    }
+
+   
+    public MemoryAreaEC getMemoryArea() {
         return memoryArea;
+    }
+    
+    public ReferencePrefix getMemoryAreaAsRef() {
+	return memoryArea == null ? null : memoryArea.getReferencePrefix();
     }
     
     /** calls the corresponding method of a visitor in order to
@@ -157,5 +150,7 @@ public class ExecutionContext
     public String toString() {	
         return "Context: " + classContext + " MemoryArea: " + memoryArea + " Instance: "+runtimeInstance;
     }
+
+ 
     
 }

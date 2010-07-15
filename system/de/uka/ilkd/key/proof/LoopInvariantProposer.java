@@ -14,16 +14,6 @@ import java.io.IOException;
 import java.util.Iterator;
 import java.util.Map;
 
-import de.uka.ilkd.key.java.*;
-import de.uka.ilkd.key.java.reference.*;
-import de.uka.ilkd.key.java.statement.LoopStatement;
-import de.uka.ilkd.key.java.statement.MethodFrame;
-import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
-import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.pp.*;
-import de.uka.ilkd.key.proof.init.*;
-import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
@@ -35,16 +25,13 @@ import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
-import de.uka.ilkd.key.logic.LocationDescriptor;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.IUpdateOperator;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.ProgramPrinter;
+import de.uka.ilkd.key.proof.init.ProblemInitializer;
+import de.uka.ilkd.key.proof.init.RTSJProfile;
 import de.uka.ilkd.key.rule.PosTacletApp;
 import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.rule.Taclet;
@@ -52,7 +39,6 @@ import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.speclang.LocationDescriptorSet;
 import de.uka.ilkd.key.speclang.LoopInvariant;
 import de.uka.ilkd.key.speclang.LoopPredicateSet;
-import de.uka.ilkd.key.speclang.LocationDescriptorSet;
 
 
 public class LoopInvariantProposer implements InstantiationProposer {
@@ -133,7 +119,7 @@ public class LoopInvariantProposer implements InstantiationProposer {
      */
     public Term getInnermostSelfTerm(Term term, Services services) {
         ExecutionContext ec = getInnermostExecutionContext(term, services);
-        ReferencePrefix rp = ec.getRuntimeInstance();
+        ReferencePrefix rp = ec.getRuntimeInstanceAsRef();
         if(!(rp instanceof TypeReference) && rp != null) {
             return services.getTypeConverter()
                              .convertToLogicElement(rp);
@@ -143,7 +129,8 @@ public class LoopInvariantProposer implements InstantiationProposer {
     
     public Term getInnermostMemoryArea(Term term, Services services) {
         ExecutionContext ec = getInnermostExecutionContext(term, services);
-        return ec.getMemoryArea() == null ? null : services.getTypeConverter().convertToLogicElement(ec.getMemoryArea());
+        return ec.getMemoryAreaAsRef() == null ? null : 
+            services.getTypeConverter().convertToLogicElement(ec.getMemoryAreaAsRef());
     }
     
     public ExecutionContext getInnermostExecutionContext(Term term, Services services) {

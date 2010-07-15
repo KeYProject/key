@@ -125,6 +125,7 @@ public class JavaProfile extends AbstractProfile {
         ChoiceSettings cs = settings.getChoiceSettings();
         HashMap<String, String> dcs = cs.getDefaultChoices();
         dcs.put("rtsj", "rtsj:off");
+        dcs.put("memory", "memory:off");
         cs.setDefaultChoices(dcs);
     }
 

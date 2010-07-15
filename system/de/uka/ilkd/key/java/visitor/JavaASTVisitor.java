@@ -355,6 +355,10 @@ public abstract class JavaASTVisitor extends JavaASTWalker
 	doDefaultAction(x);
     }
  
+    public void performActionOnMemoryAreaEC(MemoryAreaEC x) {
+	doDefaultAction(x);
+    }
+    
     public void performActionOnMetaClassReference(MetaClassReference x) {
 	doDefaultAction(x);
     }
@@ -505,6 +509,10 @@ public abstract class JavaASTVisitor extends JavaASTWalker
     }
  
     public void performActionOnReturn(Return x) {
+	doDefaultAction(x);
+    }
+    
+    public void performActionOnRuntimeInstanceEC(RuntimeInstanceEC x) {
 	doDefaultAction(x);
     }
     

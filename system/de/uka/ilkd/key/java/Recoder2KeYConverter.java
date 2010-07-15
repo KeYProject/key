@@ -1769,8 +1769,10 @@ public class Recoder2KeYConverter {
         final recoder.java.reference.ReferencePrefix mem = arg.getMemoryArea();
         final recoder.java.reference.ReferencePrefix runtime = arg.getRuntimeInstance();
 	return new ExecutionContext((TypeReference)convert(tr), 
-		(ReferencePrefix)(mem != null ? convert((recoder.java.JavaProgramElement) mem) : null),
-		(ReferencePrefix)(runtime != null ? convert((recoder.java.JavaProgramElement) runtime) : null));
+		(mem != null ? 
+			new MemoryAreaEC((ReferencePrefix) convert((recoder.java.JavaProgramElement) mem)) : null),
+		(runtime != null ? 
+			new RuntimeInstanceEC((ReferencePrefix) convert((recoder.java.JavaProgramElement) runtime)) : null));
     }
 
     public ThisConstructorReference convert(recoder.java.reference.ThisConstructorReference arg) {

@@ -59,7 +59,7 @@ public class ArraySize extends AbstractMetaOperator {
         ProgramVariable consumed = services.getJavaInfo().getAttribute("consumed", 
                 services.getJavaInfo().getKeYJavaTypeByClassName("javax.realtime.MemoryArea"));
         Term heapSpaceTerm = tf.createAttributeTerm(consumed, 
-        	services.getTypeConverter().convertToLogicElement(svInst.getExecutionContext().getMemoryArea(), 
+        	services.getTypeConverter().convertToLogicElement(svInst.getExecutionContext().getMemoryAreaAsRef(), 
         		svInst.getExecutionContext()));
         Function sizeFunc;
         String baseType = ((ArrayType) na.getKeYJavaType().getJavaType()).

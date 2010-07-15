@@ -207,10 +207,10 @@ public class MethodCall extends ProgramMetaConstruct {
         
 	ReferencePrefix refPrefix = methRef.getReferencePrefix();
 	if (refPrefix == null) {
-	    if (execContext.getRuntimeInstance() == null) {
+	    if (execContext.getRuntimeInstanceAsRef() == null) {
 		refPrefix = execContext.getTypeReference();
 	    } else {
-		refPrefix = execContext.getRuntimeInstance();
+		refPrefix = execContext.getRuntimeInstanceAsRef();
 	    }
 	}
 	
@@ -239,7 +239,7 @@ public class MethodCall extends ProgramMetaConstruct {
 	    final FieldReference fieldContext = (FieldReference) newContext;
             if (fieldContext.referencesOwnInstanceField())
 	        newContext = fieldContext.setReferencePrefix
-		    (execContext.getRuntimeInstance());
+		    (execContext.getRuntimeInstance().getReferencePrefix());
 	}
 	
 	VariableSpecification[] paramSpecs = createParamSpecs(services);
@@ -262,7 +262,7 @@ public class MethodCall extends ProgramMetaConstruct {
 	    ProgramMethod superMethod = getSuperMethod(execContext,
 						       methRef, services);
 	    result = new MethodBodyStatement
-		(superMethod, execContext.getRuntimeInstance(), pvar,
+		(superMethod, execContext.getRuntimeInstance().getReferencePrefix(), pvar,
 		 arguments, scope);
 	} else {    // Instance invocation mode
 	    if (pm.isPrivate()) { // private methods are bound statically

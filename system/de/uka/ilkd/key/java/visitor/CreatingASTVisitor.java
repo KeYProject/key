@@ -119,6 +119,15 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
         //do nothing
     }
 
+    
+    public void performActionOnMemoryAreaEC(MemoryAreaEC x) {
+        DefaultAction def = new DefaultAction(x) {
+            ProgramElement createNewElement(ExtList changeList) {
+                return new MemoryAreaEC(changeList);
+            }
+        };
+        def.doAction(x);
+    }
 
     // eee
     public void performActionOnWhile(While x) {
@@ -568,6 +577,15 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
         DefaultAction def = new DefaultAction(x) {
             ProgramElement createNewElement(ExtList changeList) {
                 return new Return(changeList);
+            }
+        };
+        def.doAction(x);
+    }
+    
+    public void performActionOnRuntimeInstanceEC(RuntimeInstanceEC x) {
+        DefaultAction def = new DefaultAction(x) {
+            ProgramElement createNewElement(ExtList changeList) {
+                return new RuntimeInstanceEC(changeList);
             }
         };
         def.doAction(x);

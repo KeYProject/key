@@ -268,7 +268,7 @@ public class TypeConverter extends TermBuilder {
 	        KeYJavaType kjt = tr.getKeYJavaType();
 	        return findThisForSortExact(kjt.getSort(), ec);
 	    }
-	    return convertToLogicElement(ec.getRuntimeInstance());
+	    return convertToLogicElement(ec.getRuntimeInstanceAsRef());
 	} /*else if (prefix instanceof CurrentMemoryAreaReference) {   
             return convertToLogicElement(ec.getMemoryArea());
         } */else {            
@@ -280,14 +280,14 @@ public class TypeConverter extends TermBuilder {
     }
     
     public Term findThisForSortExact(Sort s, ExecutionContext ec){
-        ProgramElement pe = ec.getRuntimeInstance();
+        ProgramElement pe = ec.getRuntimeInstanceAsRef();
         if(pe == null) return null;
         Term inst = convertToLogicElement(pe, ec);
         return findThisForSort(s, inst, ec.getTypeReference().getKeYJavaType(), true);
     }
     
     public Term findThisForSort(Sort s, ExecutionContext ec){
-        ProgramElement pe = ec.getRuntimeInstance();
+        ProgramElement pe = ec.getRuntimeInstanceAsRef();
         if(pe == null) return null;
         Term inst = convertToLogicElement(pe, ec);
         return findThisForSort(s, inst, ec.getTypeReference().getKeYJavaType(), false);
@@ -313,7 +313,7 @@ public class TypeConverter extends TermBuilder {
 	final ProgramVariable var = fr.getProgramVariable();
 	if("javax.realtime.MemoryArea::currentMemoryArea".
 	               equals(fr.getName().toString())){
-	    return convertToLogicElement(ec.getMemoryArea());
+	    return convertToLogicElement(ec.getMemoryAreaAsRef());
 	} else if (var.isStatic()) {
 	    return var(var);
 	} else if (prefix == null) {

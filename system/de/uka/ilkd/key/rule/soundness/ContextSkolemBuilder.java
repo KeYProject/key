@@ -11,16 +11,23 @@
 
 package de.uka.ilkd.key.rule.soundness;
 
-import de.uka.ilkd.key.gui.configuration.ProofSettings;
-import de.uka.ilkd.key.java.*;
-import de.uka.ilkd.key.java.abstraction.*;
-import de.uka.ilkd.key.java.declaration.*;
-import de.uka.ilkd.key.java.reference.*;
-
 import java.util.Iterator;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.Statement;
+import de.uka.ilkd.key.java.StatementBlock;
+import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.abstraction.PrimitiveType;
+import de.uka.ilkd.key.java.abstraction.Type;
+import de.uka.ilkd.key.java.declaration.Modifier;
+import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
+import de.uka.ilkd.key.java.declaration.VariableSpecification;
+import de.uka.ilkd.key.java.reference.ExecutionContext;
+import de.uka.ilkd.key.java.reference.RuntimeInstanceEC;
+import de.uka.ilkd.key.java.reference.TypeRef;
+import de.uka.ilkd.key.java.reference.VariableReference;
 import de.uka.ilkd.key.java.statement.*;
 import de.uka.ilkd.key.logic.Constraint;
 import de.uka.ilkd.key.logic.PosInProgram;
@@ -268,9 +275,10 @@ public class ContextSkolemBuilder extends AbstractSkolemBuilder {
 	ProgramElementName refName = new ProgramElementName ( "ref" );
 	ProgramVariable    refVar  = new LocationVariable
 	    ( refName, getJavaInfo ().getJavaLangObject () );
-	VariableReference  ref     = new VariableReference  ( refVar );
+	VariableReference  ref     = new VariableReference  ( refVar );	
 	ExecutionContext  context = new ExecutionContext
-	    ( new TypeRef ( getJavaInfo ().getJavaLangObject () ), null, ref);
+	    ( new TypeRef ( getJavaInfo ().getJavaLangObject () ), null, 
+		    new RuntimeInstanceEC(ref));
 	return context;
     }
 
