@@ -36,6 +36,7 @@ public class JavaDefaultUsedSpecificationDialog extends
 	        .getProof().getSettings().getProfile()
 	        : ProofSettings.DEFAULT_SETTINGS.getProfile()).getPOProvider();
 
+		
 	// create "EnsuresPost" button
 	ensuresPostButton = new JButton("EnsuresPost");
 	ensuresPostButton.setPreferredSize(largeButtonDim);

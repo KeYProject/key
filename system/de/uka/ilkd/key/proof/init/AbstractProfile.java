@@ -22,11 +22,10 @@ import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.gui.smt.DecisionProcedureSettings;
 import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.proof.DefaultGoalChooserBuilder;
-import de.uka.ilkd.key.proof.DepthFirstGoalChooserBuilder;
-import de.uka.ilkd.key.proof.GoalChooserBuilder;
-import de.uka.ilkd.key.proof.RuleSource;
+import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.mgt.AxiomJustification;
+import de.uka.ilkd.key.proof.mgt.DefaultProofCorrectnessMgt;
+import de.uka.ilkd.key.proof.mgt.ProofCorrectnessMgt;
 import de.uka.ilkd.key.proof.mgt.RuleJustification;
 import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.strategy.*;
@@ -219,4 +218,9 @@ public abstract class AbstractProfile implements Profile {
      public String getInternalClasslistFilename() {
 	 return "JAVALANG.TXT";
      }
+     
+     public ProofCorrectnessMgt createLocalProofCorrectnessMgt(Proof proof) {
+	 return new DefaultProofCorrectnessMgt(proof);
+     }
+
 }

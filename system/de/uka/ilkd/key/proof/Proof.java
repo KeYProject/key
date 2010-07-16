@@ -182,7 +182,7 @@ public class Proof implements Named {
 
         this ( new Name ( name ), services, settings );
 
-	localMgt = new DefaultProofCorrectnessMgt(this);
+	localMgt = settings.getProfile().createLocalProofCorrectnessMgt(this);
 
         Node rootNode = new Node(this, problem);
         setRoot(rootNode);
@@ -227,7 +227,7 @@ public class Proof implements Named {
 	Goal firstGoal = new Goal(rootNode, 
             new RuleAppIndex(new TacletAppIndex(ic.createTacletIndex()),
 	    new BuiltInRuleAppIndex(ic.createBuiltInRuleIndex())));
-	localMgt = new DefaultProofCorrectnessMgt(this);
+	localMgt = ic.getProfile().createLocalProofCorrectnessMgt(this);
 	openGoals = openGoals.prepend(firstGoal);
         setNamespaces(ic.namespaces());       
     }
