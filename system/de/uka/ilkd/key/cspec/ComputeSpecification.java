@@ -31,7 +31,7 @@ import de.uka.ilkd.key.util.Debug;
  * program. It contains algorithms for and controls the computation of specifications.
  * <h3>Internals</h3>
  * Usually, specification construction process is started by invoking {@link
- * de.uka.ilkd.key.proof.init.SpecExtPO} to construct the
+ * de.uka.ilkd.key.proof.init.proofobligation.SpecExtPO} to construct the
  * specification computation proof obligation. Finally, the whole
  * system relies on the functionality of this class to
  * {@link #createSpecificationComputationTerm(JavaBlock,Namespace) construct the

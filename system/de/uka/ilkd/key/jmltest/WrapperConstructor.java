@@ -46,7 +46,7 @@ import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.init.SpecExtPO;
+import de.uka.ilkd.key.proof.init.proofobligation.SpecExtPO;
 import de.uka.ilkd.key.rule.updatesimplifier.AssignmentPair;
 import de.uka.ilkd.key.rule.updatesimplifier.QuanAssignmentPairLazy;
 import de.uka.ilkd.key.rule.updatesimplifier.Update;

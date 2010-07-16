@@ -8,7 +8,7 @@
 //
 //
 
-package de.uka.ilkd.key.proof.init;
+package de.uka.ilkd.key.proof.init.proofobligation;
 
 import java.util.Map;
 
@@ -16,6 +16,9 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.proof.init.InitConfig;
+import de.uka.ilkd.key.proof.init.ProofInputException;
+import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.speclang.ClassInvariant;
 
 
@@ -37,7 +40,7 @@ public class PreservesInvPO extends EnsuresPO {
     }
 
 
-    public PreservesInvPO(InitConfig initConfig,
+    PreservesInvPO(InitConfig initConfig,
 	    		  ProgramMethod programMethod,
                           ImmutableSet<ClassInvariant> assumedInvs,
                           ImmutableSet<ClassInvariant> ensuredInvs) {

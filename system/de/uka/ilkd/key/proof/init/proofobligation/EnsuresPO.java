@@ -8,14 +8,8 @@
 //
 //
 
-package de.uka.ilkd.key.proof.init;
+package de.uka.ilkd.key.proof.init.proofobligation;
 
-import java.util.*;
-
-import de.uka.ilkd.key.gui.configuration.ProofSettings;
-import de.uka.ilkd.key.java.*;
-import de.uka.ilkd.key.java.abstraction.*;
-import de.uka.ilkd.key.java.declaration.*;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -34,9 +28,15 @@ import de.uka.ilkd.key.java.expression.operator.New;
 import de.uka.ilkd.key.java.recoderext.ConstructorNormalformBuilder;
 import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
 import de.uka.ilkd.key.java.reference.TypeReference;
-import de.uka.ilkd.key.java.statement.*;
+import de.uka.ilkd.key.java.statement.Branch;
+import de.uka.ilkd.key.java.statement.Catch;
+import de.uka.ilkd.key.java.statement.MethodBodyStatement;
+import de.uka.ilkd.key.java.statement.Try;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.proof.init.InitConfig;
+import de.uka.ilkd.key.proof.init.ModStrategy;
+import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.mgt.AxiomJustification;
 import de.uka.ilkd.key.rule.NoFindTacletBuilder;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
@@ -69,7 +69,7 @@ public abstract class EnsuresPO extends AbstractPO {
     //constructors
     //-------------------------------------------------------------------------
 
-    public EnsuresPO(InitConfig initConfig,
+     EnsuresPO(InitConfig initConfig,
 	    	     String name,
 		     ProgramMethod programMethod,
 		     Modality modality,

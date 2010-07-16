@@ -17,7 +17,6 @@ import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
-import java.util.Iterator;
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
@@ -26,9 +25,14 @@ import javax.swing.event.ListSelectionListener;
 
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.init.*;
+import de.uka.ilkd.key.proof.init.InitConfig;
+import de.uka.ilkd.key.proof.init.ProblemInitializer;
+import de.uka.ilkd.key.proof.init.ProofInputException;
+import de.uka.ilkd.key.proof.init.ProofOblInput;
+import de.uka.ilkd.key.proof.init.proofobligation.DefaultPOProvider;
 import de.uka.ilkd.key.proof.mgt.ContractWithInvs;
 import de.uka.ilkd.key.speclang.OperationContract;
 
@@ -147,6 +151,10 @@ public class UsedSpecificationsDialog extends JDialog {
         Dimension extraLargeButtonDim = new Dimension(170, 27);
         getContentPane().add(buttonPanel);
         
+        
+        final DefaultPOProvider poProvider = (services.getProof() != null ? 
+        	services.getProof().getSettings().getProfile() : ProofSettings.DEFAULT_SETTINGS.getProfile()).getPOProvider();
+        
         //create "EnsuresPost" button
         ensuresPostButton = new JButton("EnsuresPost");
         ensuresPostButton.setPreferredSize(largeButtonDim);
@@ -159,7 +167,7 @@ public class UsedSpecificationsDialog extends JDialog {
                                                           .getSelectedProof()
                                                           .env()
                                                           .getInitConfig();
-                ProofOblInput po = new EnsuresPostPO(initConfig, 
+                ProofOblInput po = poProvider.createEnsuresPostPO(initConfig, 
                                                      cwi.contract, 
                                                      cwi.assumedInvs);
                 findOrStartProof(initConfig, po);
@@ -182,7 +190,7 @@ public class UsedSpecificationsDialog extends JDialog {
                                                           .env()
                                                           .getInitConfig();
                 ProofOblInput po 
-                    = new PreservesInvPO(initConfig, 
+                    = poProvider.createPreservesInvPO(initConfig, 
                                          cwi.contract.getProgramMethod(),
                                          cwi.assumedInvs,
                                          cwi.ensuredInvs);
@@ -206,7 +214,7 @@ public class UsedSpecificationsDialog extends JDialog {
                                                           .env()
                                                           .getInitConfig();
                 ProofOblInput po
-                    = new RespectsModifiesPO(initConfig, 
+                    = poProvider.createRespectsModifiesPO(initConfig, 
                                              cwi.contract, 
                                              cwi.assumedInvs);
                 findOrStartProof(initConfig, po);
@@ -288,11 +296,14 @@ public class UsedSpecificationsDialog extends JDialog {
                                                   .getSelectedProof()
                                                   .env()
                                                   .getInitConfig();
+        
+        DefaultPOProvider poProvider = initConfig.getProfile().getPOProvider();
+        
         ContractWithInvs cwi 
             = (ContractWithInvs) contractAppList.getSelectedValue();
         
         //ensuresPost
-        ProofOblInput ensuresPostPO = new EnsuresPostPO(initConfig, 
+        ProofOblInput ensuresPostPO = poProvider.createEnsuresPostPO(initConfig, 
                                                         cwi.contract, 
                                                         cwi.assumedInvs);
         Proof ensuresPostProof = findPreferablyClosedProof(ensuresPostPO);
@@ -310,7 +321,7 @@ public class UsedSpecificationsDialog extends JDialog {
 
         //preservesInv
         ProofOblInput preservesInvPO 
-            = new PreservesInvPO(initConfig, 
+            = poProvider.createPreservesInvPO(initConfig, 
                                  cwi.contract.getProgramMethod(), 
                                  cwi.assumedInvs,
                                  cwi.ensuredInvs);
@@ -329,7 +340,7 @@ public class UsedSpecificationsDialog extends JDialog {
         
         //respectsModifies
         ProofOblInput respectsModifiesPO 
-            = new RespectsModifiesPO(initConfig, 
+            = poProvider.createRespectsModifiesPO(initConfig, 
                                      cwi.contract, 
                                      cwi.assumedInvs);
         Proof respectsModifiesProof = findPreferablyClosedProof(respectsModifiesPO);

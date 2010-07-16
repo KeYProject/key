@@ -9,6 +9,7 @@
 package de.uka.ilkd.key.proof.init;
 
 import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.proof.init.proofobligation.DefaultPOProvider;
 import de.uka.ilkd.key.strategy.FOLStrategy;
 import de.uka.ilkd.key.strategy.StrategyFactory;
 
@@ -32,4 +33,9 @@ public class PureFOLProfile extends AbstractProfile {
     public StrategyFactory getDefaultStrategyFactory() {
         return DEFAULT;
     }
+
+    public DefaultPOProvider getPOProvider() {
+	return new DefaultPOProvider();
+    }
+
 }

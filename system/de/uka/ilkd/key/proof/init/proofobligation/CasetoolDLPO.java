@@ -7,8 +7,9 @@
 // See LICENSE.TXT for details.
 //
 //
-package de.uka.ilkd.key.proof.init;
+package de.uka.ilkd.key.proof.init.proofobligation;
 
+import de.uka.ilkd.key.proof.init.KeYUserProblemFile;
 import de.uka.ilkd.key.speclang.ocl.ModelClass;
 
 

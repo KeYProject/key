@@ -8,7 +8,7 @@
 //
 //
 
-package de.uka.ilkd.key.proof.init;
+package de.uka.ilkd.key.proof.init.proofobligation;
 
 import java.util.Iterator;
 import java.util.Map;
@@ -17,6 +17,10 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.proof.init.InitConfig;
+import de.uka.ilkd.key.proof.init.ModStrategy;
+import de.uka.ilkd.key.proof.init.ProofInputException;
+import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.speclang.OperationContract;
 
 
@@ -33,7 +37,7 @@ public class BehaviouralSubtypingOpPO extends AbstractPO {
     //constructors
     //-------------------------------------------------------------------------
 
-    public BehaviouralSubtypingOpPO(InitConfig initConfig,
+    BehaviouralSubtypingOpPO(InitConfig initConfig,
 	    			    KeYJavaType subKJT,
                                     KeYJavaType superKJT,
                                     Map<OperationContract, OperationContract> contractPairs) {

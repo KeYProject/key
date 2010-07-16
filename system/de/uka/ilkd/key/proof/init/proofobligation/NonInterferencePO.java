@@ -7,7 +7,7 @@
 // See LICENSE.TXT for details.
 //
 //
-package de.uka.ilkd.key.proof.init;
+package de.uka.ilkd.key.proof.init.proofobligation;
 
 import java.util.Enumeration;
 import java.util.Iterator;
@@ -31,6 +31,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
+import de.uka.ilkd.key.proof.init.*;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.util.ExtList;

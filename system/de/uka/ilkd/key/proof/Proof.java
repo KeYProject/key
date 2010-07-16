@@ -23,7 +23,7 @@ import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.Profile;
-import de.uka.ilkd.key.proof.init.SpecExtPO;
+import de.uka.ilkd.key.proof.init.proofobligation.SpecExtPO;
 import de.uka.ilkd.key.proof.mgt.BasicTask;
 import de.uka.ilkd.key.proof.mgt.DefaultProofCorrectnessMgt;
 import de.uka.ilkd.key.proof.mgt.ProofCorrectnessMgt;

@@ -19,6 +19,10 @@ import de.uka.ilkd.key.gui.RuleAppListener;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.init.*;
+import de.uka.ilkd.key.proof.init.proofobligation.DefaultPOProvider;
+import de.uka.ilkd.key.proof.init.proofobligation.EnsuresPostPO;
+import de.uka.ilkd.key.proof.init.proofobligation.PreservesInvPO;
+import de.uka.ilkd.key.proof.init.proofobligation.RespectsModifiesPO;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.speclang.OperationContract;
 
@@ -131,6 +135,10 @@ public class DefaultProofCorrectnessMgt implements ProofCorrectnessMgt {
             return;
         }
 	
+        //which PO provider
+        DefaultPOProvider poProvider = proof.getSettings().getProfile().getPOProvider();
+        
+        
         //used, but yet unproven specifications?
         for (RuleApp cachedRuleApp : cachedRuleApps) {
             RuleApp ruleApp = cachedRuleApp;
@@ -144,20 +152,20 @@ public class DefaultProofCorrectnessMgt implements ProofCorrectnessMgt {
 
                     InitConfig initConfig = proof.env().getInitConfig();
                     ProofOblInput ensuresPostPO
-                            = new EnsuresPostPO(initConfig,
+                            = poProvider.createEnsuresPostPO(initConfig,
                             atomicContract,
                             cwi.assumedInvs);
                     ImmutableSet<Proof> ensuresPostProofs
                             = specRepos.getProofs(ensuresPostPO);
                     ProofOblInput preservesInvPO
-                            = new PreservesInvPO(initConfig,
+                            = poProvider.createPreservesInvPO(initConfig,
                             atomicContract.getProgramMethod(),
                             cwi.assumedInvs,
                             cwi.ensuredInvs);
                     ImmutableSet<Proof> preservesInvProofs
                             = specRepos.getProofs(preservesInvPO);
                     ProofOblInput respectsModifiesPO
-                            = new RespectsModifiesPO(initConfig,
+                            = poProvider.createRespectsModifiesPO(initConfig,
                             atomicContract,
                             cwi.assumedInvs);
                     ImmutableSet<Proof> respectsModifiesProofs

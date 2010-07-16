@@ -8,7 +8,7 @@
 //
 //
 
-package de.uka.ilkd.key.proof.init;
+package de.uka.ilkd.key.proof.init.proofobligation;
 
 import java.util.Map;
 
@@ -19,6 +19,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.proof.init.*;
 import de.uka.ilkd.key.speclang.ClassInvariant;
 import de.uka.ilkd.key.speclang.OperationContract;
 
@@ -30,7 +31,7 @@ public class EnsuresPostPO extends EnsuresPO {
     
     protected final OperationContract contract;
     
-    public EnsuresPostPO(InitConfig initConfig, 
+    EnsuresPostPO(InitConfig initConfig, 
                          String name,
                          OperationContract contract,
                          ImmutableSet<ClassInvariant> assumedInvs) {
@@ -44,7 +45,7 @@ public class EnsuresPostPO extends EnsuresPO {
     }
 
 
-    public EnsuresPostPO(InitConfig initConfig, OperationContract contract,
+    EnsuresPostPO(InitConfig initConfig, OperationContract contract,
             ImmutableSet<ClassInvariant> assumedInvs) {
         this(initConfig,
              "EnsuresPost ("

@@ -18,9 +18,9 @@ package de.uka.ilkd.key.proof.mgt;
 
 import de.uka.ilkd.key.gui.Main;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.init.NonInterferencePO;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.proof.init.ProofInputException;
+import de.uka.ilkd.key.proof.init.proofobligation.NonInterferencePO;
 
 public class NonInterferenceCheck {
 

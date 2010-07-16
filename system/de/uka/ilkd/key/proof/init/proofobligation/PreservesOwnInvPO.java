@@ -8,9 +8,10 @@
 //
 //
 
-package de.uka.ilkd.key.proof.init;
+package de.uka.ilkd.key.proof.init.proofobligation;
 
 import de.uka.ilkd.key.logic.op.ProgramMethod;
+import de.uka.ilkd.key.proof.init.InitConfig;
 
 
 /**

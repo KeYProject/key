@@ -8,11 +8,14 @@
 //
 //
 
-package de.uka.ilkd.key.proof.init;
+package de.uka.ilkd.key.proof.init.proofobligation;
 
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.LogicVariable;
+import de.uka.ilkd.key.proof.init.InitConfig;
+import de.uka.ilkd.key.proof.init.ModStrategy;
+import de.uka.ilkd.key.proof.init.ProofInputException;
 
 
 
@@ -30,7 +33,7 @@ public class BehaviouralSubtypingInvPO extends AbstractPO {
     //constructors
     //-------------------------------------------------------------------------
 
-    public BehaviouralSubtypingInvPO(InitConfig initConfig,
+    BehaviouralSubtypingInvPO(InitConfig initConfig,
 	    			     KeYJavaType subKJT,
                                      KeYJavaType superKJT) {
         super(initConfig,

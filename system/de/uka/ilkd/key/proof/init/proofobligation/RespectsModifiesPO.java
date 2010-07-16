@@ -8,7 +8,7 @@
 //
 //
 
-package de.uka.ilkd.key.proof.init;
+package de.uka.ilkd.key.proof.init.proofobligation;
 
 import java.util.Map;
 
@@ -19,6 +19,9 @@ import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.proof.init.InitConfig;
+import de.uka.ilkd.key.proof.init.ProofInputException;
+import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.speclang.ClassInvariant;
 import de.uka.ilkd.key.speclang.OperationContract;
 
@@ -33,7 +36,7 @@ public class RespectsModifiesPO extends EnsuresPO {
     private Term updateAnonMethodTerm = null;
 
 
-    public RespectsModifiesPO(InitConfig initConfig,
+    RespectsModifiesPO(InitConfig initConfig,
 	    		      OperationContract contract,
                               ImmutableSet<ClassInvariant> assumedInvs) {
         super(initConfig,

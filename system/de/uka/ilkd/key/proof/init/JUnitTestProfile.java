@@ -10,6 +10,7 @@ package de.uka.ilkd.key.proof.init;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.proof.init.proofobligation.DefaultPOProvider;
 import de.uka.ilkd.key.proof.mgt.ComplexRuleJustification;
 import de.uka.ilkd.key.proof.mgt.ComplexRuleJustificationBySpec;
 import de.uka.ilkd.key.proof.mgt.RuleJustification;
@@ -98,6 +99,8 @@ public class JUnitTestProfile extends AbstractProfile {
 	 return "JAVALANGTESTGEN.TXT";
     }
 
-
+    public DefaultPOProvider getPOProvider() {
+	return new DefaultPOProvider();
+    }
 
 }

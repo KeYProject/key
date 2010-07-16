@@ -8,9 +8,8 @@
 //
 //
 
-package de.uka.ilkd.key.proof.init;
+package de.uka.ilkd.key.proof.init.proofobligation;
 
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -24,6 +23,9 @@ import de.uka.ilkd.key.logic.op.AnonymousUpdate;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+import de.uka.ilkd.key.proof.init.InitConfig;
+import de.uka.ilkd.key.proof.init.ModStrategy;
+import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.rule.UpdateSimplifier;
 import de.uka.ilkd.key.rule.updatesimplifier.Update;
 import de.uka.ilkd.key.speclang.ClassInvariant;
@@ -42,7 +44,7 @@ public class CorrectDependsPO extends AbstractPO {
     //constructors
     //-------------------------------------------------------------------------
 
-    public CorrectDependsPO(InitConfig initConfig,
+    CorrectDependsPO(InitConfig initConfig,
 	    		    ImmutableSet<LocationDescriptor> dependsClause,
                             ClassInvariant inv) {
         super(initConfig,

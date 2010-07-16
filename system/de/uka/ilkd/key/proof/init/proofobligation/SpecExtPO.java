@@ -8,7 +8,7 @@
 //
 //
 
-package de.uka.ilkd.key.proof.init;
+package de.uka.ilkd.key.proof.init.proofobligation;
 
 import java.util.Map;
 
@@ -20,6 +20,8 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
+import de.uka.ilkd.key.proof.init.InitConfig;
+import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.speclang.ClassInvariant;
 import de.uka.ilkd.key.speclang.OperationContract;
 
@@ -42,12 +44,12 @@ public class SpecExtPO extends EnsuresPostPO {
 
     private ProgramVariable excVar;
 
-    public SpecExtPO(InitConfig initConfig, OperationContract contract,
+     SpecExtPO(InitConfig initConfig, OperationContract contract,
             ImmutableSet<ClassInvariant> assumedInvs) {
         super(initConfig, "ExtractSpec", contract, assumedInvs);
     }
 
-    public SpecExtPO(InitConfig initConfig, OperationContract contract,
+     SpecExtPO(InitConfig initConfig, OperationContract contract,
             ImmutableSet<ClassInvariant> assumedInvs, ProgramMethod pm) {
         this(initConfig, contract, assumedInvs);
     }

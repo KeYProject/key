@@ -14,7 +14,7 @@ import javax.swing.JOptionPane;
 
 import de.uka.ilkd.key.gui.*;
 import de.uka.ilkd.key.proof.ProofEvent;
-import de.uka.ilkd.key.proof.init.SpecExtPO;
+import de.uka.ilkd.key.proof.init.proofobligation.SpecExtPO;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 
 /**
