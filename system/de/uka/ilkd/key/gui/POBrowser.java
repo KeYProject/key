@@ -62,6 +62,7 @@ public class POBrowser extends JDialog {
 	this.services = initConfig.getServices();
 	this.javaInfo = initConfig.getServices().getJavaInfo();
 	this.specRepos = initConfig.getServices().getSpecificationRepository();
+	this.poProvider = initConfig.getProfile().getPOProvider();
 
 	// create class tree
 	classTree = new ClassTree(true, true, null, defaultPm, services);
