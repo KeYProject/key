@@ -10,6 +10,7 @@
 
 package de.uka.ilkd.key.gui;
 
+import java.awt.*;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
@@ -18,12 +19,9 @@ import java.awt.dnd.DropTargetAdapter;
 import java.awt.dnd.DropTargetDropEvent;
 import java.awt.dnd.DropTargetListener;
 import java.awt.event.*;
-import java.awt.*;
 import java.io.*;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -35,21 +33,20 @@ import javax.swing.text.JTextComponent;
 
 import org.apache.log4j.Logger;
 
-import de.uka.ilkd.key.gui.assistant.*;
 import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.gui.assistant.ProofAssistant;
+import de.uka.ilkd.key.gui.assistant.ProofAssistantAI;
+import de.uka.ilkd.key.gui.assistant.ProofAssistantController;
 import de.uka.ilkd.key.gui.configuration.*;
 import de.uka.ilkd.key.gui.nodeviews.NonGoalInfoView;
 import de.uka.ilkd.key.gui.nodeviews.SequentView;
 import de.uka.ilkd.key.gui.notification.NotificationManager;
-import de.uka.ilkd.key.gui.notification.events.*;
+import de.uka.ilkd.key.gui.notification.events.ExitKeYEvent;
+import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
+import de.uka.ilkd.key.gui.notification.events.GeneralInformationEvent;
+import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 import de.uka.ilkd.key.gui.prooftree.ProofTreeView;
-import de.uka.ilkd.key.gui.smt.ComplexButton;
-import de.uka.ilkd.key.gui.smt.SettingsDialog;
-import de.uka.ilkd.key.gui.smt.DecisionProcedureSettings;
-import de.uka.ilkd.key.gui.smt.RuleLauncher;
-import de.uka.ilkd.key.gui.smt.SMTResultsAndBugDetectionDialog;
-import de.uka.ilkd.key.gui.smt.TacletTranslationSelection;
-import de.uka.ilkd.key.gui.smt.TemporarySettings;
+import de.uka.ilkd.key.gui.smt.*;
 import de.uka.ilkd.key.java.NonTerminalProgramElement;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Statement;
@@ -60,7 +57,9 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.pp.*;
 import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.init.*;
-import de.uka.ilkd.key.proof.mgt.*;
+import de.uka.ilkd.key.proof.mgt.BasicTask;
+import de.uka.ilkd.key.proof.mgt.NonInterferenceCheck;
+import de.uka.ilkd.key.proof.mgt.TaskTreeNode;
 import de.uka.ilkd.key.proof.reuse.ReusePoint;
 import de.uka.ilkd.key.smt.SMTRule;
 import de.uka.ilkd.key.strategy.VBTStrategy;
@@ -1398,7 +1397,7 @@ public class Main extends JFrame implements IMain {
         JMenuItem methodContractsItem = new JMenuItem("Show Used Specifications...");
         methodContractsItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                new UsedSpecificationsDialog(
+                new JavaDefaultUsedSpecificationDialog(
                              mediator.getServices(), 
                              mediator.getSelectedProof()
                                      .getBasicTask()
