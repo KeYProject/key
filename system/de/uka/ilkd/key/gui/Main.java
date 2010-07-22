@@ -61,6 +61,7 @@ import de.uka.ilkd.key.proof.mgt.BasicTask;
 import de.uka.ilkd.key.proof.mgt.NonInterferenceCheck;
 import de.uka.ilkd.key.proof.mgt.TaskTreeNode;
 import de.uka.ilkd.key.proof.reuse.ReusePoint;
+import de.uka.ilkd.key.rtsj.proof.init.RTSJProfile;
 import de.uka.ilkd.key.smt.SMTRule;
 import de.uka.ilkd.key.strategy.VBTStrategy;
 import de.uka.ilkd.key.unittest.UnitTestBuilder;

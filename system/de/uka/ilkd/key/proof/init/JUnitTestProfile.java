@@ -46,7 +46,7 @@ public class JUnitTestProfile extends AbstractProfile {
     }
 
     protected UseOperationContractRule getContractRule() {
-        return UseOperationContractRule.INSTANCE;
+        return UseOperationContractRule.INSTANCE_NORMAL;
     }
 
     protected UpdateSimplificationRule getUpdateSimplificationRule() {

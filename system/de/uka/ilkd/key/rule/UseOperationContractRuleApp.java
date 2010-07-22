@@ -25,10 +25,11 @@ public class UseOperationContractRuleApp extends BuiltInRuleApp {
 
     private final ContractWithInvs instantiation;
     
-    public UseOperationContractRuleApp(PosInOccurrence pio,
+    public UseOperationContractRuleApp(BuiltInRule contractRule,
+	    			       PosInOccurrence pio,
                                        Constraint userConstraint,
                                        ContractWithInvs instantiation) {
-        super(UseOperationContractRule.INSTANCE, pio, userConstraint);
+        super(contractRule, pio, userConstraint);
         this.instantiation = instantiation;
     }   
     

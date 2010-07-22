@@ -220,7 +220,7 @@ public class ProofSaver {
                                           appliedRuleApp.posInOccurrence()));
         tree.append(newNames2Proof(node));
 
-        if (appliedRuleApp.rule() instanceof UseOperationContractRule) {
+        if (appliedRuleApp.rule() instanceof AbstractUseOperationContractRule) {
             RuleJustificationBySpec ruleJusti = (RuleJustificationBySpec) 
                             proof.env().getJustifInfo()
                                        .getJustification(appliedRuleApp, 

@@ -9,7 +9,6 @@
 package de.uka.ilkd.key.proof.init;
 
 import java.util.Collection;
-import java.util.LinkedList;
 
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableList;
@@ -26,7 +25,6 @@ import de.uka.ilkd.key.proof.mgt.ProofCorrectnessMgt;
 import de.uka.ilkd.key.proof.mgt.RuleJustification;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.Rule;
-import de.uka.ilkd.key.smt.AbstractSMTSolver;
 import de.uka.ilkd.key.smt.SMTRule;
 import de.uka.ilkd.key.strategy.StrategyFactory;
 
@@ -89,22 +87,11 @@ public abstract class AbstractProfile implements Profile {
 
     protected ImmutableList<BuiltInRule> initBuiltInRules() {
         ImmutableList<BuiltInRule> builtInRules = ImmutableSLList.<BuiltInRule>nil();
-	LinkedList<AbstractSMTSolver> solverList = new LinkedList<AbstractSMTSolver>();
-
-
-	
-	
 	Collection<SMTRule> rules = DecisionProcedureSettings.getInstance().getSMTRules();
         
 	for(SMTRule rule : rules){
 	    builtInRules = builtInRules.prepend(rule);  
 	}
-	
-        
-        
-     
-        
-        
         
         return builtInRules;
     }

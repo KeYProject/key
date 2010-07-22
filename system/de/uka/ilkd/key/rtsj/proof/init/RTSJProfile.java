@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.proof.init;
+package de.uka.ilkd.key.rtsj.proof.init;
 
 import java.util.HashMap;
 
@@ -6,8 +6,11 @@ import de.uka.ilkd.key.gui.IMain;
 import de.uka.ilkd.key.gui.POBrowser;
 import de.uka.ilkd.key.gui.configuration.ChoiceSettings;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
+import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.init.proofobligation.DefaultPOProvider;
 import de.uka.ilkd.key.rtsj.proof.init.proofobligation.RTSJPOProvider;
+import de.uka.ilkd.key.rtsj.rule.UseOperationContractRuleRTSJ;
+import de.uka.ilkd.key.rule.AbstractUseOperationContractRule;
 
 public class RTSJProfile extends JavaProfile {
 
@@ -47,6 +50,11 @@ public class RTSJProfile extends JavaProfile {
     
     public boolean memoryConsumption(){
     	return memory;
+    }
+    
+    public AbstractUseOperationContractRule getContractRule() {
+        return memory ? UseOperationContractRuleRTSJ.INSTANCE_RTSJ_MEM :
+            UseOperationContractRuleRTSJ.INSTANCE_RTSJ_MEM;
     }
     
     /**

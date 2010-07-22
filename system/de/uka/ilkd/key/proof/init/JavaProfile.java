@@ -17,7 +17,6 @@ import de.uka.ilkd.key.gui.IMain;
 import de.uka.ilkd.key.gui.POBrowser;
 import de.uka.ilkd.key.gui.configuration.ChoiceSettings;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
-import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.proof.GoalChooserBuilder;
 import de.uka.ilkd.key.proof.init.proofobligation.DefaultPOProvider;
 import de.uka.ilkd.key.proof.mgt.ComplexRuleJustification;
@@ -62,8 +61,8 @@ public class JavaProfile extends AbstractProfile {
         return set;
     }
 
-    protected UseOperationContractRule getContractRule() {
-        return UseOperationContractRule.INSTANCE;
+    public AbstractUseOperationContractRule getContractRule() {
+        return UseOperationContractRule.INSTANCE_NORMAL;
     }
 
     protected UpdateSimplificationRule getUpdateSimplificationRule() {
