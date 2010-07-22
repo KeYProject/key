@@ -33,8 +33,6 @@ public class RTSJPOProvider extends DefaultPOProvider {
 	return pos;
     }
     
-    
-
     public ProofOblInput createRespectsWorkingSpacePO(InitConfig initConfig,
 	    OperationContract contract, ImmutableSet<ClassInvariant> assumedInvs) {
 	return new RespectsWorkingSpacePO(initConfig, contract, assumedInvs);
@@ -59,6 +57,12 @@ public class RTSJPOProvider extends DefaultPOProvider {
     public ImmutableList<String> getRequiredCorrectnessProofObligationsForOperationContracts() {
 	ImmutableList<String> requiredOperationCorrectnessPOs = 
 	    super.getRequiredCorrectnessProofObligationsForOperationContracts();
+
+	if (memoryConsumptionAware) {
+	    requiredOperationCorrectnessPOs = 
+		requiredOperationCorrectnessPOs.append(RESPECTS_WORKING_SPACE);
+	}
+	
 	return requiredOperationCorrectnessPOs;
     }
 
@@ -70,5 +74,4 @@ public class RTSJPOProvider extends DefaultPOProvider {
 	    return super.createOperationContractPOByName(poName, cwi, initConfig);
 	}
     }
-
 }
