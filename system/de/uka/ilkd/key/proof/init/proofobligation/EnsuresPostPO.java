@@ -11,13 +11,9 @@
 package de.uka.ilkd.key.proof.init.proofobligation;
 
 
-import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
-import de.uka.ilkd.key.gui.configuration.ProofSettings;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.proof.init.*;
+import de.uka.ilkd.key.proof.init.InitConfig;
+import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.speclang.ClassInvariant;
 import de.uka.ilkd.key.speclang.OperationContract;
 
@@ -48,49 +44,7 @@ public class EnsuresPostPO extends AbstractEnsuresPostPO {
              contract,
              assumedInvs);
     }
-    
-    protected Term buildGeneralMemoryAssumption(ProgramVariable selfVar,
-            ImmutableList<ProgramVariable> paramVars) 
-        throws ProofInputException {
-	if(!(ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof RTSJProfile)){
-	    return TB.tt();
-	}
-
-        Term result = TB.tt();
-        Term t_mem = null;
-
-	final ProgramVariable stack = services.getJavaInfo().getAttribute(
-					     "stack", "javax.realtime.MemoryArea");
-	ProgramVariable initialMemoryArea = services.getJavaInfo().getDefaultMemoryArea();
-	t_mem = TB.var(initialMemoryArea);
-	result = TB.and(result, TB.not(TB.equals(TB.dot(t_mem,stack), TB.NULL(services))));
-	    
-	Term initialMemCreatedAndNotNullTerm
-	    = CreatedAttributeTermFactory.INSTANCE.createCreatedAndNotNullTerm(services, t_mem);
-	result = TB.and(result, initialMemCreatedAndNotNullTerm);
-	        
         
-        
-        if(ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof RTSJProfile &&
-		 ((RTSJProfile) ProofSettings.DEFAULT_SETTINGS.getProfile()).memoryConsumption() &&
-		 contract.getWorkingSpace(selfVar, toPV(paramVars), services)!=null){
-            final ProgramVariable size = services.getJavaInfo().getAttribute(
-                    "size", "javax.realtime.MemoryArea");
-            final ProgramVariable consumed = services.getJavaInfo().getAttribute(
-                    "consumed", "javax.realtime.MemoryArea");
-            
-            Function add = services.getTypeConverter().getIntegerLDT().getAdd();            
-            Function leq = services.getTypeConverter().getIntegerLDT().getLessOrEquals();
-            
-            Term workingSpace = contract.getWorkingSpace(selfVar, toPV(paramVars), services);
-            result = TB.and(result, TB.func(leq, TB.func(add, TB.dot(t_mem,consumed), 
-                    workingSpace), TB.dot(t_mem, size)));
-        }
-                
-        return result;
-    }
-    
-    
     public boolean implies(ProofOblInput po) {
         if(!(po instanceof EnsuresPostPO)) {
             return false;

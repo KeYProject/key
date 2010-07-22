@@ -33,6 +33,11 @@ public class RTSJPOProvider extends DefaultPOProvider {
 	return pos;
     }
     
+    public ProofOblInput createEnsuresPostPO(InitConfig initConfig,
+	    OperationContract contract, ImmutableSet<ClassInvariant> assumedInvs) {
+	return new EnsuresPostPO(initConfig, contract, assumedInvs);
+    }
+    
     public ProofOblInput createRespectsWorkingSpacePO(InitConfig initConfig,
 	    OperationContract contract, ImmutableSet<ClassInvariant> assumedInvs) {
 	return new RespectsWorkingSpacePO(initConfig, contract, assumedInvs);
