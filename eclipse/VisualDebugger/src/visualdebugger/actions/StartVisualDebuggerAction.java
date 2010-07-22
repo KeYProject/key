@@ -667,9 +667,10 @@ public class StartVisualDebuggerAction implements IObjectActionDelegate {
             final OperationContract contract = operationContracts.iterator().next();            	             
 
             //create and start the PO
-            return new EnsuresPostPO(initConfig, 
-                    contract, 
-                    assumedInvariants);
+            return initConfig.getProfile().getPOProvider().
+            	createEnsuresPostPO(initConfig, 
+            		contract, 
+            		assumedInvariants);
     }
 }
 
