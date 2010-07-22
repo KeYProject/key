@@ -1,9 +1,8 @@
-package de.uka.ilkd.key.proof.init.proofobligation;
+package de.uka.ilkd.key.rtsj.proof.init.proofobligation;
 
 import java.util.Map;
 
 import de.uka.ilkd.key.collection.*;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.init.InitConfig;
@@ -12,8 +11,6 @@ import de.uka.ilkd.key.speclang.ClassInvariant;
 import de.uka.ilkd.key.speclang.OperationContract;
 
 public class RespectsWorkingSpacePO extends EnsuresPostPO {
-
-    private final OperationContract contract;
     
     RespectsWorkingSpacePO(InitConfig initConfig,
                          OperationContract contract, 
@@ -22,7 +19,6 @@ public class RespectsWorkingSpacePO extends EnsuresPostPO {
               "RespectsWorkingSpace", 
               contract,
               assumedInvs);
-        this.contract = contract;
     }
     
     @Override

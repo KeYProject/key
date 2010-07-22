@@ -345,7 +345,7 @@ public class TaskTree extends JPanel {
 
 	public void actionPerformed(ActionEvent e) {
 	    if (e.getSource() == mcList) {
-                new JavaDefaultUsedSpecificationDialog(
+                new UsedSpecificationsDialog(
                             mediator.getServices(), 
                             invokedNode.getUsedSpecs());
 	    } else if (e.getSource() == removeTask) {

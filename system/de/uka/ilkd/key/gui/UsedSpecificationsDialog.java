@@ -17,6 +17,7 @@ import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.util.ArrayList;
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
@@ -24,17 +25,20 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
+import de.uka.ilkd.key.proof.init.proofobligation.DefaultPOProvider;
 import de.uka.ilkd.key.proof.mgt.ContractWithInvs;
 import de.uka.ilkd.key.speclang.OperationContract;
 
-public abstract class UsedSpecificationsDialog extends JDialog {
+public class UsedSpecificationsDialog extends JDialog {
 
     protected static final ImageIcon keyIcon = IconFactory.keyHole(20, 20);
     protected static final ImageIcon keyAlmostClosedIcon = IconFactory
@@ -45,6 +49,7 @@ public abstract class UsedSpecificationsDialog extends JDialog {
     private final Services services;
     protected final JList contractAppList;
     private JButton cancelButton;
+    private ArrayList<POButtonAction> poButtonActions;
 
     // -------------------------------------------------------------------------
     // constructors
@@ -199,10 +204,103 @@ public abstract class UsedSpecificationsDialog extends JDialog {
 	}
     }
 
-    protected abstract void updatePOButtons();
-
-    protected abstract void createPOButtonPanel(Services services,
-	    ImmutableSet<ContractWithInvs> atomicContractApps,
+    protected void createPOButtonPanel(Services services,
+	    final ImmutableSet<ContractWithInvs> atomicContractApps,
 	    JPanel buttonPanel, Dimension largeButtonDim,
-	    Dimension extraLargeButtonDim);
+	    Dimension extraLargeButtonDim) {
+	poButtonActions = new ArrayList<POButtonAction>();
+
+	final DefaultPOProvider poProvider = (services.getProof() != null ? services
+	        .getProof().getSettings().getProfile()
+	        : ProofSettings.DEFAULT_SETTINGS.getProfile()).getPOProvider();
+
+	final ImmutableList<String> poNames = poProvider
+	        .getRequiredCorrectnessProofObligationsForOperationContracts();
+
+	for (final String poName : poNames) {
+
+	    final JButton poButton = new JButton(poName);
+	    poButton.setPreferredSize(largeButtonDim);
+	    poButton.setMinimumSize(largeButtonDim);
+
+	    poButtonActions.add(new POButtonAction(atomicContractApps, poName,
+		    poProvider));
+	    poButton.setAction(poButtonActions.get(poButtonActions.size() - 1));
+
+	    buttonPanel.add(poButton);
+
+	}
+
+	// disable PO buttons if no specifications
+	if (atomicContractApps.size() != 0) {
+	    updatePOButtons();
+	}
+    }
+
+    protected void updatePOButtons() {
+	for (POButtonAction action : poButtonActions) {
+	    action.update();
+	}
+    }
+
+    private final class POButtonAction extends AbstractAction {
+	private final ImmutableSet<ContractWithInvs> atomicContractApps;
+	private final String poName;
+	private final DefaultPOProvider poProvider;
+
+	private POButtonAction(
+	        ImmutableSet<ContractWithInvs> atomicContractApps,
+	        String poName, DefaultPOProvider poProvider) {
+
+	    super(poName);
+
+	    this.atomicContractApps = atomicContractApps;
+	    this.poName = poName;
+	    this.poProvider = poProvider;
+
+	    setEnabled(atomicContractApps.size() != 0);
+	}
+
+	public void actionPerformed(ActionEvent e) {
+	    ContractWithInvs cwi = (ContractWithInvs) contractAppList
+		    .getSelectedValue();
+	    InitConfig initConfig = Main.getInstance().mediator()
+		    .getSelectedProof().env().getInitConfig();
+	    ProofOblInput po = poProvider.createOperationContractPOByName(
+		    poName, cwi, initConfig);
+
+	    assert po != null;
+
+	    findOrStartProof(initConfig, po);
+
+	    setVisible(false);
+	    dispose();
+	}
+
+	public void update() {
+	    InitConfig initConfig = Main.getInstance().mediator()
+		    .getSelectedProof().env().getInitConfig();
+
+	    ContractWithInvs cwi = (ContractWithInvs) contractAppList
+		    .getSelectedValue();
+
+	    ProofOblInput po = poProvider.createOperationContractPOByName(
+		    poName, cwi, initConfig);
+
+	    assert po != null;
+
+	    Proof poProof = findPreferablyClosedProof(po);
+	    if (poProof == null) {
+		putValue(Action.LARGE_ICON_KEY, null);
+	    } else if (poProof.mgt().getStatus().getProofOpen()) {
+		putValue(Action.LARGE_ICON_KEY, keyIcon);
+	    } else if (poProof.mgt().getStatus().getProofClosedButLemmasLeft()) {
+		putValue(Action.LARGE_ICON_KEY, keyAlmostClosedIcon);
+	    } else {
+		assert poProof.mgt().getStatus().getProofClosed();
+		putValue(Action.LARGE_ICON_KEY, keyClosedIcon);
+	    }
+	}
+    }
+
 }

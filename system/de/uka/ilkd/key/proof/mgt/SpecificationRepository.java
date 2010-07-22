@@ -30,8 +30,8 @@ import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.JavaModel;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
+import de.uka.ilkd.key.proof.init.proofobligation.AbstractEnsuresPostPO;
 import de.uka.ilkd.key.proof.init.proofobligation.EnsuresPO;
-import de.uka.ilkd.key.proof.init.proofobligation.EnsuresPostPO;
 import de.uka.ilkd.key.proof.init.proofobligation.PreservesInvPO;
 import de.uka.ilkd.key.speclang.ClassInvariant;
 import de.uka.ilkd.key.speclang.LoopInvariant;
@@ -499,8 +499,8 @@ public class SpecificationRepository {
             ImmutableSet<Proof> sop = entry.getValue();
 	    if(po instanceof EnsuresPO) {
 		ProgramMethod pm = ((EnsuresPO)po).getProgramMethod();
-	        if(po instanceof EnsuresPostPO) {
-                    gra.addEdge(((EnsuresPostPO)po).getContract(), po);
+	        if(po instanceof AbstractEnsuresPostPO) {
+                    gra.addEdge(((AbstractEnsuresPostPO)po).getContract(), po);
 	        }
 	        if(po instanceof PreservesInvPO) {
                     ImmutableSet<ClassInvariant> invs = 

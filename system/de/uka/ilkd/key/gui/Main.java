@@ -1397,7 +1397,7 @@ public class Main extends JFrame implements IMain {
         JMenuItem methodContractsItem = new JMenuItem("Show Used Specifications...");
         methodContractsItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                new JavaDefaultUsedSpecificationDialog(
+                new UsedSpecificationsDialog(
                              mediator.getServices(), 
                              mediator.getSelectedProof()
                                      .getBasicTask()

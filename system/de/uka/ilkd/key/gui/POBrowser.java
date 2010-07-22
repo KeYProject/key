@@ -29,7 +29,6 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
-import de.uka.ilkd.key.proof.init.proofobligation.BehaviouralSubtypingInvPO;
 import de.uka.ilkd.key.proof.init.proofobligation.DefaultPOProvider;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 
@@ -37,8 +36,8 @@ public class POBrowser extends JDialog {
 
     private static POBrowser instance;
 
-    private InitConfig initConfig;
-    private Services services;
+    protected InitConfig initConfig;
+    protected Services services;
     private JavaInfo javaInfo;
     private SpecificationRepository specRepos;
 
@@ -47,7 +46,7 @@ public class POBrowser extends JDialog {
     private JButton startButton;
     private JButton cancelButton;
 
-    private DefaultPOProvider poProvider;
+    protected DefaultPOProvider poProvider;
 
     private ProofOblInput po;
 
@@ -55,13 +54,13 @@ public class POBrowser extends JDialog {
     // constructors
     // -------------------------------------------------------------------------
 
-    private POBrowser(InitConfig initConfig, String title,
+    public POBrowser(InitConfig initConfig, String title,
 	    ProgramMethod defaultPm) {
 	super(Main.getInstance(), title, true);
 	this.initConfig = initConfig;
 	this.services = initConfig.getServices();
-	this.javaInfo = initConfig.getServices().getJavaInfo();
-	this.specRepos = initConfig.getServices().getSpecificationRepository();
+	this.javaInfo = services.getJavaInfo();
+	this.specRepos = services.getSpecificationRepository();
 	this.poProvider = initConfig.getProfile().getPOProvider();
 
 	// create class tree
@@ -199,8 +198,13 @@ public class POBrowser extends JDialog {
 		// ============================================
 	    }
 
-	    instance = new POBrowser(initConfig, "Proof Obligation Browser",
-		    defaultPm);
+	    try {
+	        instance = initConfig.getProfile().getPOBrowserClass().getConstructor(InitConfig.class, 
+	            String.class, ProgramMethod.class).newInstance(initConfig, "Proof Obligation Browser",
+	            defaultPm);
+            } catch (Exception e) {
+        	throw (RuntimeException)new RuntimeException("No Proof-Obligation Browser available.").initCause(e);
+            }
 	}
 	instance.po = null;
 	instance.setVisible(true);
@@ -289,9 +293,9 @@ public class POBrowser extends JDialog {
 	return createPO(selectedEntry, poString);
     }
 
-    private ProofOblInput createPO(ClassTree.Entry selectedEntry,
+    protected ProofOblInput createPO(ClassTree.Entry selectedEntry,
 	    String poString) {
-	if (poString.equals("BehaviouralSubtypingInv")) {
+	if (poString.equals(DefaultPOProvider.BEHAVIOURAL_SUBTYPING_INV)) {
 	    assert selectedEntry.kjt != null;
 	    return createBehaviouralSubtypingInvPO(selectedEntry.kjt);
 	} else if (poString.equals("BehaviouralSubtypingOp")) {
@@ -300,28 +304,25 @@ public class POBrowser extends JDialog {
 	} else if (poString.equals("BehaviouralSubtypingOpPair")) {
 	    assert selectedEntry.pm != null;
 	    return createBehaviouralSubtypingOpPairPO(selectedEntry.pm);
-	} else if (poString.equals("StrongOperationContract")) {
+	} else if (poString.equals(DefaultPOProvider.STRONG_OPERATION_CONTRACT)) {
 	    assert selectedEntry.pm != null;
 	    return createStrongOperationContractPO(selectedEntry.pm);
-	} else if (poString.equals("PreservesInv")) {
+	} else if (poString.equals(DefaultPOProvider.PRESERVES_INV)) {
 	    assert selectedEntry.pm != null;
 	    return createPreservesInvPO(selectedEntry.pm);
-	} else if (poString.equals("PreservesOwnInv")) {
+	} else if (poString.equals(DefaultPOProvider.PRESERVES_OWN_INV)) {
 	    assert selectedEntry.pm != null;
 	    return createPreservesOwnInvPO(selectedEntry.pm);
-	} else if (poString.equals("EnsuresPost")) {
+	} else if (poString.equals(DefaultPOProvider.ENSURES_POST)) {
 	    assert selectedEntry.pm != null;
 	    return createEnsuresPostPO(selectedEntry.pm);
-	} else if (poString.equals("RespectsWorkingSpace")) {
-	    assert selectedEntry.pm != null;
-	    return createRespectsWorkingSpacePO(selectedEntry.pm);
-	} else if (poString.equals("RespectsModifies")) {
+	}  else if (poString.equals(DefaultPOProvider.RESPECTS_MODIFIES)) {
 	    assert selectedEntry.pm != null;
 	    return createRespectsModifiesPO(selectedEntry.pm);
-	} else if (poString.equals("PreservesGuard")) {
+	} else if (poString.equals(DefaultPOProvider.PRESERVES_GUARD)) {
 	    assert selectedEntry.pm != null;
 	    return createPreservesGuardPO(selectedEntry.pm);
-	} else if (poString.equals("SpecificationExtraction")) {
+	} else if (poString.equals(DefaultPOProvider.SPECIFICATION_EXTRACTION)) {
 	    assert selectedEntry.pm != null;
 	    return createSpecExtPO(selectedEntry.pm);
 	} else
@@ -380,17 +381,6 @@ public class POBrowser extends JDialog {
 	if (cc.wasSuccessful()) {
 	    return poProvider.createEnsuresPostPO(initConfig, cc.getContract(),
 		    cc.getAssumedInvs());
-	} else {
-	    return null;
-	}
-    }
-
-    private ProofOblInput createRespectsWorkingSpacePO(ProgramMethod pm) {
-	ContractConfigurator cc = new ContractConfigurator(this, services, pm,
-	        null, true, false, true, false);
-	if (cc.wasSuccessful()) {
-	    return poProvider.createRespectsWorkingSpacePO(initConfig,
-		    cc.getContract(), cc.getAssumedInvs());
 	} else {
 	    return null;
 	}

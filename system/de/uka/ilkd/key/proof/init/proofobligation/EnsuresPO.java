@@ -69,7 +69,7 @@ public abstract class EnsuresPO extends AbstractPO {
     //constructors
     //-------------------------------------------------------------------------
 
-     EnsuresPO(InitConfig initConfig,
+     protected EnsuresPO(InitConfig initConfig,
 	    	     String name,
 		     ProgramMethod programMethod,
 		     Modality modality,

@@ -3,8 +3,11 @@ package de.uka.ilkd.key.proof.init;
 import java.util.HashMap;
 
 import de.uka.ilkd.key.gui.IMain;
+import de.uka.ilkd.key.gui.POBrowser;
 import de.uka.ilkd.key.gui.configuration.ChoiceSettings;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
+import de.uka.ilkd.key.proof.init.proofobligation.DefaultPOProvider;
+import de.uka.ilkd.key.rtsj.proof.init.proofobligation.RTSJPOProvider;
 
 public class RTSJProfile extends JavaProfile {
 
@@ -61,4 +64,13 @@ public class RTSJProfile extends JavaProfile {
     public String getInternalClasslistFilename() {
 	 return "JAVALANGRTSJ.TXT";
     }
+    
+    public DefaultPOProvider getPOProvider() {
+	return new RTSJPOProvider(memory);
+    }
+    
+    public Class<? extends POBrowser> getPOBrowserClass() {
+	return de.uka.ilkd.key.rtsj.gui.POBrowserRTSJ.class;
+    }
+
 }

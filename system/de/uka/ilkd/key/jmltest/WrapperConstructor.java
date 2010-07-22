@@ -78,7 +78,7 @@ public class WrapperConstructor extends Thread {
     public WrapperConstructor(final JMLTestFileCreator jmltfc, final Proof proof) {
 	this.jmltfc = jmltfc;
 	this.proof = proof;
-	po = proof.getPO();
+	po = (SpecExtPO) proof.getPO();
 	pm = po.getProgramMethod();
 	className = pm.getContainerType().getName();
 	jmlEx = new JMLExport(po, proof.getServices());

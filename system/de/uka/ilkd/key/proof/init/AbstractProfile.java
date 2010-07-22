@@ -8,17 +8,14 @@
 
 package de.uka.ilkd.key.proof.init;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.LinkedList;
 
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
-import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.IMain;
-import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.gui.smt.DecisionProcedureSettings;
 import de.uka.ilkd.key.logic.Name;
@@ -27,10 +24,11 @@ import de.uka.ilkd.key.proof.mgt.AxiomJustification;
 import de.uka.ilkd.key.proof.mgt.DefaultProofCorrectnessMgt;
 import de.uka.ilkd.key.proof.mgt.ProofCorrectnessMgt;
 import de.uka.ilkd.key.proof.mgt.RuleJustification;
-import de.uka.ilkd.key.rule.*;
-import de.uka.ilkd.key.strategy.*;
-import de.uka.ilkd.key.util.ProgressMonitor;
-import de.uka.ilkd.key.smt.*;
+import de.uka.ilkd.key.rule.BuiltInRule;
+import de.uka.ilkd.key.rule.Rule;
+import de.uka.ilkd.key.smt.AbstractSMTSolver;
+import de.uka.ilkd.key.smt.SMTRule;
+import de.uka.ilkd.key.strategy.StrategyFactory;
 
 public abstract class AbstractProfile implements Profile {
 

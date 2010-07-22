@@ -10,14 +10,12 @@
 
 package de.uka.ilkd.key.proof.init.proofobligation;
 
-import java.util.Map;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.init.*;
 import de.uka.ilkd.key.speclang.ClassInvariant;
@@ -27,25 +25,21 @@ import de.uka.ilkd.key.speclang.OperationContract;
 /**
  * The "EnsuresPost" proof obligation.
  */
-public class EnsuresPostPO extends EnsuresPO {
+public class EnsuresPostPO extends AbstractEnsuresPostPO {
     
-    protected final OperationContract contract;
-    
-    EnsuresPostPO(InitConfig initConfig, 
+    public EnsuresPostPO(InitConfig initConfig, 
                          String name,
                          OperationContract contract,
                          ImmutableSet<ClassInvariant> assumedInvs) {
         super(initConfig,
               name,
-              contract.getProgramMethod(),
-              contract.getModality(),
+              contract,
               assumedInvs,
               true);
-        this.contract = contract;
     }
 
 
-    EnsuresPostPO(InitConfig initConfig, OperationContract contract,
+    public EnsuresPostPO(InitConfig initConfig, OperationContract contract,
             ImmutableSet<ClassInvariant> assumedInvs) {
         this(initConfig,
              "EnsuresPost ("
@@ -97,34 +91,6 @@ public class EnsuresPostPO extends EnsuresPO {
     }
     
     
-    protected Term getPreTerm(ProgramVariable selfVar,
-                              ImmutableList<ProgramVariable> paramVars,
-                              ProgramVariable resultVar,
-                              ProgramVariable exceptionVar,
-                              Map<Operator, Function/*atPre*/> atPreFunctions)
-            throws ProofInputException {
-        Term result = translatePre(contract, selfVar, toPV(paramVars));
-        return result;
-    }
-
-
-    protected Term getPostTerm(ProgramVariable selfVar,
-                               ImmutableList<ProgramVariable> paramVars,
-                               ProgramVariable resultVar,
-                               ProgramVariable exceptionVar,
-                               Map<Operator, Function/*atPre*/> atPreFunctions)
-            throws ProofInputException {
-        Term result = translatePost(contract,
-                                    selfVar,
-                                    toPV(paramVars),
-                                    resultVar,
-                                    exceptionVar,
-                                    atPreFunctions);
-
-        return result;
-    }
-
-
     public boolean implies(ProofOblInput po) {
         if(!(po instanceof EnsuresPostPO)) {
             return false;
@@ -148,10 +114,5 @@ public class EnsuresPostPO extends EnsuresPO {
 
     public int hashCode() {
         return super.hashCode() + contract.hashCode();
-    }
-    
-
-    public OperationContract getContract() {
-        return contract;
     }
 }

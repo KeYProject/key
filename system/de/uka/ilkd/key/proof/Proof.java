@@ -23,6 +23,7 @@ import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.Profile;
+import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.init.proofobligation.SpecExtPO;
 import de.uka.ilkd.key.proof.mgt.BasicTask;
 import de.uka.ilkd.key.proof.mgt.DefaultProofCorrectnessMgt;
@@ -112,7 +113,7 @@ public class Proof implements Named {
     
     private Strategy activeStrategy;
 //    implemented by mbender for jmltest
-    private SpecExtPO specExtPO;
+    private ProofOblInput specExtPO;
     
     /** This field stores counter examples (in some format) or notes that 
      * nodes are proved or falsifiable (and therefore not provable)  or 
@@ -890,7 +891,7 @@ public class Proof implements Named {
      * @param specExtPO
      *                The Specification Extraction Proof Obligation to be set
      */
-    public void setPO(SpecExtPO specExtPO) {
+    public void setPO(ProofOblInput specExtPO) {
         this.specExtPO = specExtPO;
     }
 
@@ -899,7 +900,7 @@ public class Proof implements Named {
      * 
      * @return The Specification Extraction Proof Obligation used for this proof
      */
-    public SpecExtPO getPO() {
+    public ProofOblInput getPO() {
         return specExtPO;
     }
 

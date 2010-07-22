@@ -8,8 +8,10 @@
 package de.uka.ilkd.key.proof.init;
 
 import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.gui.POBrowser;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.proof.GoalChooserBuilder;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.proofobligation.DefaultPOProvider;
@@ -117,4 +119,6 @@ public interface Profile {
     DefaultPOProvider getPOProvider();
 
     ProofCorrectnessMgt createLocalProofCorrectnessMgt(Proof proof);
+
+    Class<? extends POBrowser> getPOBrowserClass();
 }

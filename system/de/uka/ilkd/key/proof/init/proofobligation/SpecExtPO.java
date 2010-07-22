@@ -22,6 +22,8 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofInputException;
+import de.uka.ilkd.key.proof.init.ProofOblInput;
+import de.uka.ilkd.key.rtsj.proof.init.proofobligation.EnsuresPostPO;
 import de.uka.ilkd.key.speclang.ClassInvariant;
 import de.uka.ilkd.key.speclang.OperationContract;
 
@@ -32,7 +34,7 @@ import de.uka.ilkd.key.speclang.OperationContract;
  * @author mbender@uni-koblenz.de
  *
  */
-public class SpecExtPO extends EnsuresPostPO {
+public class SpecExtPO extends AbstractEnsuresPostPO {
 
     private ImmutableList<ProgramVariable> params;
 
@@ -46,7 +48,8 @@ public class SpecExtPO extends EnsuresPostPO {
 
      SpecExtPO(InitConfig initConfig, OperationContract contract,
             ImmutableSet<ClassInvariant> assumedInvs) {
-        super(initConfig, "ExtractSpec", contract, assumedInvs);
+        super(initConfig, "ExtractSpec (" + contract.getProgramMethod() + ", "
+	        + contract.getDisplayName() + ")", contract, assumedInvs, true);
     }
 
      SpecExtPO(InitConfig initConfig, OperationContract contract,
@@ -93,4 +96,25 @@ public class SpecExtPO extends EnsuresPostPO {
         return excVar;
     }
 
+    public boolean implies(ProofOblInput po) {
+	if (!(po instanceof EnsuresPostPO)) {
+	    return false;
+	}
+	EnsuresPostPO epPO = (EnsuresPostPO) po;
+	return specRepos.splitContract(epPO.contract).subset(
+	        specRepos.splitContract(contract))
+	        && assumedInvs.subset(epPO.assumedInvs);
+    }
+
+    public boolean equals(Object o) {
+	if (!(o instanceof SpecExtPO)) {
+	    return false;
+	}
+	SpecExtPO po = (SpecExtPO) o;
+	return super.equals(po) && contract.equals(po.contract);
+    }
+
+    public int hashCode() {
+	return 13*this.getClass().hashCode() + super.hashCode() + contract.hashCode();
+    }    
 }

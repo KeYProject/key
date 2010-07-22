@@ -14,8 +14,10 @@ import java.util.HashMap;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.IMain;
+import de.uka.ilkd.key.gui.POBrowser;
 import de.uka.ilkd.key.gui.configuration.ChoiceSettings;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
+import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.proof.GoalChooserBuilder;
 import de.uka.ilkd.key.proof.init.proofobligation.DefaultPOProvider;
 import de.uka.ilkd.key.proof.mgt.ComplexRuleJustification;
@@ -126,6 +128,10 @@ public class JavaProfile extends AbstractProfile {
 
     public DefaultPOProvider getPOProvider() {
 	return new DefaultPOProvider();
+    }
+
+    public Class<? extends POBrowser> getPOBrowserClass() {
+	return POBrowser.class;
     }
 
 
