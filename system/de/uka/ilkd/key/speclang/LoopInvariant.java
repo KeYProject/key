@@ -84,20 +84,6 @@ public interface LoopInvariant {
             /*inout*/Map<Operator, Function/* (atPre)*/> atPreFunctions,
             Services services);
     
-    /**
-     * Returns the working space term for the constructed scope. 
-     */
-    public Term getWorkingSpaceConstructed(Term selfTerm, 
-            /*inout*/Map<Operator, Function/* (atPre)*/> atPreFunctions,
-            Services services);
-    
-    /**
-     * Returns the working space term for the reentrant scope. 
-     */
-    public Term getWorkingSpaceReentrant(Term selfTerm, 
-            /*inout*/Map<Operator, Function/* (atPre)*/> atPreFunctions,
-            Services services);
-    
     public Term getParametrizedWorkingSpaceTerms(Term selfTerm, 
             /*inout*/Map<Operator, Function/* (atPre)*/> atPreFunctions,
             Services services);

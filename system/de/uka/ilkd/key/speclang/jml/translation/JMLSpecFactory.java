@@ -857,8 +857,6 @@ public class JMLSpecFactory {
                                      variant,
                                      parametrizedWS,
                                      workingSpaceLocal,
-                                     workingSpaceConstructed,
-                                     workingSpaceReentrant,
                                      selfTerm,
                                      atPreFunctions,
                                      true);

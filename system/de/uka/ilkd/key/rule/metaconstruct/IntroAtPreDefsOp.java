@@ -119,10 +119,7 @@ public class IntroAtPreDefsOp extends AbstractMetaOperator {
                     = mem ? inv.getWorkingSpace(selfTerm, atPreFunctions, services) : null;
                 Term newParametrizedWS
                     = mem ? inv.getParametrizedWorkingSpaceTerms(selfTerm, atPreFunctions, services) : null;
-                Term newWorkingSpaceConstructed
-                    = mem ? inv.getWorkingSpaceConstructed(selfTerm, atPreFunctions, services) : null;
-                Term newWorkingSpaceReentrant
-                    = mem ? inv.getWorkingSpaceReentrant(selfTerm, atPreFunctions, services) : null;
+               
                 boolean newPredicateHeuristicsAllowed
                     = inv.getPredicateHeuristicsAllowed();
                 
@@ -134,8 +131,6 @@ public class IntroAtPreDefsOp extends AbstractMetaOperator {
                                             newVariant, 
                                             newParametrizedWS,
                                             newWorkingSpace,
-                                            newWorkingSpaceConstructed,
-                                            newWorkingSpaceReentrant,
                                             selfTerm,
                                             atPreFunctions,
                                             newPredicateHeuristicsAllowed);
