@@ -708,6 +708,22 @@ public abstract class AbstractTacletTranslator implements TacletTranslator,
 			            genericTable[c], genericTable[c2],
 			            TypeComparisionCondition.IS_SUBTYPE) && !instTable[index]
 			            .extendsTrans(instTable[index2]))
+			    || (conditions.containsComparisionCondition(
+			            genericTable[c], genericTable[c2],
+			            TypeComparisionCondition.IS_SUBTYPE) && !instTable[index2]
+			            .extendsTrans(instTable[index]))
+			    || (conditions.containsComparisionCondition(
+			            genericTable[c], genericTable[c2],
+			            TypeComparisionCondition.NOT_IS_SUBTYPE) && instTable[index]
+			            .extendsTrans(instTable[index2]))
+			    || (conditions.containsComparisionCondition(
+			            genericTable[c], genericTable[c2],
+			            TypeComparisionCondition.NOT_IS_SUBTYPE) && instTable[index2]
+			            .extendsTrans(instTable[index]))
+			    || (genericTable[c].extendsTrans(genericTable[c2]) && 
+				!instTable[index].extendsTrans(instTable[index2]))
+			    || (genericTable[c2].extendsTrans(genericTable[c]) && 
+				!instTable[index2].extendsTrans(instTable[index]))
 
 		    ) {
 			referenceTable[r][0] = -1;

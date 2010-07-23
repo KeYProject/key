@@ -213,7 +213,7 @@ class InnerPanel extends TreePanel {
     private static final long serialVersionUID = 1L;
     private JLabel title = new JLabel();
     private JRadioButton radioAll = new JRadioButton("all");
-    private JRadioButton radioNothing = new JRadioButton("nothing");
+    private JRadioButton radioNothing = new JRadioButton("none");
     private JRadioButton radioUser = new JRadioButton("custom");
     private TreeNode currentNode = null;
     private ButtonGroup buttonGroup = new ButtonGroup();

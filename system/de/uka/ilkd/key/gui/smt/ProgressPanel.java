@@ -70,7 +70,7 @@ class ProgressPanel implements SMTProgressMonitor {
 	private int currentGoal =0;
 	private long time = System.currentTimeMillis();
 	private int dots =0;
-	
+	private MakesProgress process;
 	
 
 	
@@ -79,6 +79,7 @@ class ProgressPanel implements SMTProgressMonitor {
 	public ProgressPanel(MakesProgress process, JComponent parent, ProgressDialog dialog, Collection<Goal> goals){
 	    	this.parent = parent;
 	    	this.dialog = dialog;
+	    	this.process = process;
 	    	int i=0;
 	    	for(Goal goal : goals){
 	    	    this.goals.add(new InternGoal(goal,i));
@@ -379,9 +380,10 @@ class ProgressPanel implements SMTProgressMonitor {
         }
 
 
-        public void exceptionOccurred(String s,Exception e) {
+        public void exceptionOccurred(String str,Exception e) {
             if(!dialog.getStopRunning()){
-        	ErrorMessages.showBugMessage(ProgressDialog.INSTANCE, s, e);
+        	ErrorDialog.INSTANCE.showDialog("Error while executing " +
+        		process.getTitle(), str, e);
             }
             
             

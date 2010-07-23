@@ -619,7 +619,7 @@ public class SMTRule  extends ProcessLauncher implements BuiltInRule{
 		 throw new RuntimeException(e.getException());
 	     }else{
 		
-	     monitor.exceptionOccurred("Error while executing " + process.getTitle()+"."
+	     monitor.exceptionOccurred(e.getException().getMessage()
 		     ,e.getException());
 	        showTimeStatus(monitor,launch.usedTime(),launcher.getMaxTime(), Status.EXCEPTION);
 	     }

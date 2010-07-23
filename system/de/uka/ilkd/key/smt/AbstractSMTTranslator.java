@@ -499,7 +499,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 		}
 	    
 		for (int i = firstIndex+1; i < qVar.size() && firstIndex > -1; i++) {
-		    if (isSomeIntegerSort(sorts.get(i))){
+		    if (!isSomeIntegerSort(sorts.get(i))){
 			StringBuffer temp = getTypePredicate(sorts.get(i), qVar.get(i));
 			toReturn = this.translateLogicalAnd(toReturn, temp);
 		    }
