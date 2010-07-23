@@ -21,6 +21,8 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.AbstractSort;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.rtsj.logic.op.WorkingSpaceNonRigidOp;
+import de.uka.ilkd.key.rtsj.logic.op.WorkingSpaceRigidOp;
 import de.uka.ilkd.key.rule.UpdatePair;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.LRUCache;

@@ -22,9 +22,6 @@ import de.uka.ilkd.key.collection.ImmutableArray;
 
 public interface ConstructorReference extends MemberReference, Statement {
 
-    ProgramElement getScope();
-
-
    /**
      *      Get arguments.
      *      @return the array wrapper of the argument expressions .

@@ -119,6 +119,15 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
         //do nothing
     }
 
+    
+    public void performActionOnMemoryAreaEC(MemoryAreaEC x) {
+        DefaultAction def = new DefaultAction(x) {
+            ProgramElement createNewElement(ExtList changeList) {
+                return new MemoryAreaEC(changeList);
+            }
+        };
+        def.doAction(x);
+    }
 
     // eee
     public void performActionOnWhile(While x) {
@@ -271,8 +280,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
             }
             changeList.remove(rp);
             MethodName name = (MethodName) changeList.get(MethodName.class);
-            MethodReference mr = new MethodReference(changeList, name, rp, pi, 
-                    x.getScope()!=null ? x.getScope() : null);
+            MethodReference mr = new MethodReference(changeList, name, rp, pi);
             addChild(mr);
             changed();
         } else {
@@ -569,6 +577,15 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
         DefaultAction def = new DefaultAction(x) {
             ProgramElement createNewElement(ExtList changeList) {
                 return new Return(changeList);
+            }
+        };
+        def.doAction(x);
+    }
+    
+    public void performActionOnRuntimeInstanceEC(RuntimeInstanceEC x) {
+        DefaultAction def = new DefaultAction(x) {
+            ProgramElement createNewElement(ExtList changeList) {
+                return new RuntimeInstanceEC(changeList);
             }
         };
         def.doAction(x);
@@ -968,8 +985,8 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
 
     public void performActionOnExecutionContext(ExecutionContext x) {
         DefaultAction def = new DefaultAction(x) {
-            ProgramElement createNewElement(ExtList changeList) {
-                return new ExecutionContext(changeList);
+            ProgramElement createNewElement(ExtList changeList) {        	
+        	return new ExecutionContext(changeList);
             }
         };
         def.doAction(x);

@@ -11,22 +11,19 @@ package de.uka.ilkd.key.proof.init;
 
 import java.util.HashMap;
 
-import de.uka.ilkd.key.gui.IMain;
-import de.uka.ilkd.key.gui.configuration.ChoiceSettings;
-import de.uka.ilkd.key.gui.configuration.ProofSettings;
-
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.IMain;
+import de.uka.ilkd.key.gui.POBrowser;
+import de.uka.ilkd.key.gui.configuration.ChoiceSettings;
+import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.proof.GoalChooserBuilder;
+import de.uka.ilkd.key.proof.init.proofobligation.DefaultPOProvider;
 import de.uka.ilkd.key.proof.mgt.ComplexRuleJustification;
 import de.uka.ilkd.key.proof.mgt.ComplexRuleJustificationBySpec;
 import de.uka.ilkd.key.proof.mgt.RuleJustification;
-import de.uka.ilkd.key.rule.BuiltInRule;
-import de.uka.ilkd.key.rule.Rule;
-import de.uka.ilkd.key.rule.UpdateSimplificationRule;
-import de.uka.ilkd.key.rule.UseOperationContractRule;
-import de.uka.ilkd.key.rule.UseWorkingSpaceContractRule;
+import de.uka.ilkd.key.rtsj.rule.UseWorkingSpaceContractRule;
+import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.strategy.FOLStrategy;
 import de.uka.ilkd.key.strategy.JavaCardDLStrategy;
 import de.uka.ilkd.key.strategy.StrategyFactory;
@@ -65,8 +62,8 @@ public class JavaProfile extends AbstractProfile {
         return set;
     }
 
-    protected UseOperationContractRule getContractRule() {
-        return UseOperationContractRule.INSTANCE;
+    public AbstractUseOperationContractRule getContractRule() {
+        return UseOperationContractRule.INSTANCE_NORMAL;
     }
 
     protected UpdateSimplificationRule getUpdateSimplificationRule() {
@@ -125,8 +122,16 @@ public class JavaProfile extends AbstractProfile {
         ChoiceSettings cs = settings.getChoiceSettings();
         HashMap<String, String> dcs = cs.getDefaultChoices();
         dcs.put("rtsj", "rtsj:off");
-        dcs.put("perc", "perc:off");
+        dcs.put("memory", "memory:off");
         cs.setDefaultChoices(dcs);
+    }
+
+    public DefaultPOProvider getPOProvider() {
+	return new DefaultPOProvider();
+    }
+
+    public Class<? extends POBrowser> getPOBrowserClass() {
+	return POBrowser.class;
     }
 
 

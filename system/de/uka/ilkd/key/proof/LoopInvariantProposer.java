@@ -14,16 +14,6 @@ import java.io.IOException;
 import java.util.Iterator;
 import java.util.Map;
 
-import de.uka.ilkd.key.java.*;
-import de.uka.ilkd.key.java.reference.*;
-import de.uka.ilkd.key.java.statement.LoopStatement;
-import de.uka.ilkd.key.java.statement.MethodFrame;
-import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
-import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.pp.*;
-import de.uka.ilkd.key.proof.init.*;
-import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
@@ -35,16 +25,13 @@ import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
-import de.uka.ilkd.key.logic.LocationDescriptor;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.IUpdateOperator;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.ProgramPrinter;
+import de.uka.ilkd.key.proof.init.ProblemInitializer;
+import de.uka.ilkd.key.rtsj.proof.init.RTSJProfile;
 import de.uka.ilkd.key.rule.PosTacletApp;
 import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.rule.Taclet;
@@ -52,7 +39,6 @@ import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.speclang.LocationDescriptorSet;
 import de.uka.ilkd.key.speclang.LoopInvariant;
 import de.uka.ilkd.key.speclang.LoopPredicateSet;
-import de.uka.ilkd.key.speclang.LocationDescriptorSet;
 
 
 public class LoopInvariantProposer implements InstantiationProposer {
@@ -133,7 +119,7 @@ public class LoopInvariantProposer implements InstantiationProposer {
      */
     public Term getInnermostSelfTerm(Term term, Services services) {
         ExecutionContext ec = getInnermostExecutionContext(term, services);
-        ReferencePrefix rp = ec.getRuntimeInstance();
+        ReferencePrefix rp = ec.getRuntimeInstanceAsRef();
         if(!(rp instanceof TypeReference) && rp != null) {
             return services.getTypeConverter()
                              .convertToLogicElement(rp);
@@ -143,7 +129,8 @@ public class LoopInvariantProposer implements InstantiationProposer {
     
     public Term getInnermostMemoryArea(Term term, Services services) {
         ExecutionContext ec = getInnermostExecutionContext(term, services);
-        return services.getTypeConverter().convertToLogicElement(ec.getMemoryArea());
+        return ec.getMemoryAreaAsRef() == null ? null : 
+            services.getTypeConverter().convertToLogicElement(ec.getMemoryAreaAsRef());
     }
     
     public ExecutionContext getInnermostExecutionContext(Term term, Services services) {
@@ -201,7 +188,11 @@ public class LoopInvariantProposer implements InstantiationProposer {
             final Term selfTerm = getInnermostSelfTerm(pos.subTerm(), services);
             final Map<Operator, Function> atPreFunctions = inv.getInternalAtPreFunctions();
             final String varName = var.name().toString();
+
+            final boolean mem = services.getProof().getSettings().getProfile() instanceof RTSJProfile;
+
             Term mTerm = getInnermostMemoryArea(pos.subTerm(), services);
+            
             if (varName.equals("inv")) {
                 assert var.isFormulaSV();
                 inst = inv.getInvariant(selfTerm, mTerm, atPreFunctions, services);
@@ -213,8 +204,8 @@ public class LoopInvariantProposer implements InstantiationProposer {
                 assert var.isListSV();
                 assert var.matchType() == LocationDescriptor.class;
                 LocationDescriptorSet locs = inv.getModifies(selfTerm, atPreFunctions, services);
-                if(services.getProof().getSettings().getProfile() instanceof RTSJProfile ||
-                        services.getProof().getSettings().getProfile() instanceof PercProfile){
+		
+                if (mem) {
                     Term mCons = TermBuilder.DF.dot(mTerm, services.getJavaInfo().getAttribute(
                             "consumed", "javax.realtime.MemoryArea"));
                     LocationDescriptor cons = new BasicLocationDescriptor(mCons);
@@ -233,12 +224,6 @@ public class LoopInvariantProposer implements InstantiationProposer {
 	    } else if(varName.equals("wsOneIt")
                     && inv.getWorkingSpace(selfTerm, atPreFunctions, services) != null) {
                 inst = inv.getWorkingSpace(selfTerm, atPreFunctions, services);
-            } else if(varName.equals("wsOneItCons")
-                    && inv.getWorkingSpaceConstructed(selfTerm, atPreFunctions, services) != null) {
-                inst = inv.getWorkingSpaceConstructed(selfTerm, atPreFunctions, services);
-            } else if(varName.equals("wsOneItReent")
-                    && inv.getWorkingSpaceReentrant(selfTerm, atPreFunctions, services) != null) {
-                inst = inv.getWorkingSpaceReentrant(selfTerm, atPreFunctions, services);
             } else if(varName.equals("heapSpace")){
                 inst = TermBuilder.DF.var((ProgramVariable)
                         services.getNamespaces().programVariables().

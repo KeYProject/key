@@ -751,7 +751,7 @@ public class Recoder2KeY implements JavaReader {
      *            a list of compilation units, not null.
      */
 
-    private void transformModel(List<recoder.java.CompilationUnit> cUnits) {
+    protected void transformModel(List<recoder.java.CompilationUnit> cUnits) {
 
         RecoderModelTransformer.TransformerCache cache = new RecoderModelTransformer.TransformerCache(cUnits);
         

@@ -9,19 +9,12 @@
 
 package de.uka.ilkd.key.rule.metaconstruct;
 
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import de.uka.ilkd.key.java.*;
-import de.uka.ilkd.key.java.reference.*;
-import de.uka.ilkd.key.java.statement.*;
-import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
-import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
@@ -37,7 +30,9 @@ import de.uka.ilkd.key.logic.UpdateFactory;
 import de.uka.ilkd.key.logic.op.AbstractMetaOperator;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.AtPreFactory;
+import de.uka.ilkd.key.rtsj.proof.init.RTSJProfile;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.updatesimplifier.Update;
 import de.uka.ilkd.key.speclang.LocationDescriptorSet;
@@ -87,14 +82,15 @@ public class IntroAtPreDefsOp extends AbstractMetaOperator {
         //determine "self"
         Term selfTerm;
         ExecutionContext ec = (ExecutionContext) frame.getExecutionContext();
-        ReferencePrefix rp = ec.getRuntimeInstance();
+        ReferencePrefix rp = ec.getRuntimeInstanceAsRef();
         if(rp == null || rp instanceof TypeReference) {
             selfTerm = null;
         } else {
             selfTerm = services.getTypeConverter().convertToLogicElement(rp);
         }
         
-        Term memoryArea = services.getTypeConverter().convertToLogicElement(ec.getMemoryArea());
+        Term memoryArea = ec.getMemoryAreaAsRef() == null ? null : 
+            services.getTypeConverter().convertToLogicElement(ec.getMemoryAreaAsRef());
 
         //collect atPre-functions, update loop invariants
         Map<Operator, Function /*atPre*/> atPreFunctions = 
@@ -108,6 +104,9 @@ public class IntroAtPreDefsOp extends AbstractMetaOperator {
                     selfTerm = null;
                 }
 
+                boolean mem = (ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof RTSJProfile);
+
+                
                 Term newInvariant 
                     = inv.getInvariant(selfTerm, memoryArea, atPreFunctions, services);
                 LoopPredicateSet newPredicates
@@ -117,13 +116,10 @@ public class IntroAtPreDefsOp extends AbstractMetaOperator {
                 Term newVariant
                     = inv.getVariant(selfTerm, atPreFunctions, services);
                 Term newWorkingSpace
-                    = inv.getWorkingSpace(selfTerm, atPreFunctions, services);
+                    = mem ? inv.getWorkingSpace(selfTerm, atPreFunctions, services) : null;
                 Term newParametrizedWS
-                    = inv.getParametrizedWorkingSpaceTerms(selfTerm, atPreFunctions, services);
-                Term newWorkingSpaceConstructed
-                    = inv.getWorkingSpaceConstructed(selfTerm, atPreFunctions, services);
-                Term newWorkingSpaceReentrant
-                    = inv.getWorkingSpaceReentrant(selfTerm, atPreFunctions, services);
+                    = mem ? inv.getParametrizedWorkingSpaceTerms(selfTerm, atPreFunctions, services) : null;
+               
                 boolean newPredicateHeuristicsAllowed
                     = inv.getPredicateHeuristicsAllowed();
                 
@@ -135,8 +131,6 @@ public class IntroAtPreDefsOp extends AbstractMetaOperator {
                                             newVariant, 
                                             newParametrizedWS,
                                             newWorkingSpace,
-                                            newWorkingSpaceConstructed,
-                                            newWorkingSpaceReentrant,
                                             selfTerm,
                                             atPreFunctions,
                                             newPredicateHeuristicsAllowed);

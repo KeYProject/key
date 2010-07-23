@@ -11,12 +11,10 @@
 
 package de.uka.ilkd.key.java.recoderext;
 
-import java.io.IOException;
-
 import recoder.java.*;
 import recoder.java.reference.*;
 import recoder.java.statement.JavaStatement;
-import recoder.list.generic.*;
+import recoder.list.generic.ASTList;
 
 
 /**
@@ -36,7 +34,6 @@ public class MethodBodyStatement extends JavaStatement implements
     private Identifier methodName;
     private ReferencePrefix methodReferencePrefix;
     private ASTList<Expression> arguments;
-    private Identifier scope;
     
     /**
      *      Construct a method body shortcut
@@ -100,17 +97,12 @@ public class MethodBodyStatement extends JavaStatement implements
         this.methodName = methRef.getIdentifier();
         this.methodReferencePrefix = methRef.getReferencePrefix();
         this.arguments = methRef.getArguments();
-        this.scope = methRef.getScope();
     }
 
     public NonTerminalProgramElement getASTParent() {
 	return astParent;
     }
-    
-    public Identifier getScope(){
-        return scope;
-    }
-
+   
     public StatementContainer getStatementContainer() {
 	return astParent;
     }

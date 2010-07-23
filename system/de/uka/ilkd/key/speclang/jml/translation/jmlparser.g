@@ -38,8 +38,8 @@ header {
     import de.uka.ilkd.key.proof.AtPreFactory;
     import de.uka.ilkd.key.proof.OpReplacer;
     import de.uka.ilkd.key.proof.init.CreatedAttributeTermFactory;
-    import de.uka.ilkd.key.proof.init.PercProfile;
-    import de.uka.ilkd.key.proof.init.RTSJProfile;
+    import de.uka.ilkd.key.rtsj.proof.init.RTSJProfile;
+    import de.uka.ilkd.key.rtsj.logic.op.*;
     import de.uka.ilkd.key.speclang.FormulaWithAxioms;
     import de.uka.ilkd.key.speclang.PositionedString;
     import de.uka.ilkd.key.speclang.SignatureVariablesFactory;
@@ -620,10 +620,7 @@ options {
 		= javaInfo.getAttribute("objectTimesFinalized", 
                                         javaInfo.getJavaLangObject());
                                         
-    LocationVariable dma = javaInfo.getDefaultMemoryArea();
-    
-    ProgramVariable consumed
-		= javaInfo.getAttribute("consumed", "javax.realtime.MemoryArea");
+    	
 		
 	//create logic variable, guard
         Sort integerSort 
@@ -664,6 +661,11 @@ options {
 	if((ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof RTSJProfile) && 
                 		((RTSJProfile) ProofSettings.DEFAULT_SETTINGS.getProfile()).memoryConsumption()){
 		//initialMemoryArea.consumed
+		LocationVariable dma = javaInfo.getDefaultMemoryArea();
+    
+    		ProgramVariable consumed
+		= javaInfo.getAttribute("consumed", "javax.realtime.MemoryArea");
+		
 		Term cons = tb.dot(tb.var(dma), consumed);
 		BasicLocationDescriptor cld
 			= new BasicLocationDescriptor(cons);
@@ -1914,15 +1916,9 @@ jmlprimary returns [JMLExpression result=null] throws SLTranslationException
 	            		int size = determineElementSize(typ, d);
     	    	    	t = createArraySizeTerm(size, dimTerms);
         			}else{
-        				if(ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof PercProfile){
-        					// no concrete object sizes for PERC
-    	    				ProgramVariable s = javaInfo.getAttribute(ImplicitFieldAdder.IMPLICIT_EXACT_SIZE,	typ);
-    						t = tb.var(s);
-        				}else{
-        					int size = services.getJavaInfo().getSizeInBytes(typ);
-	        				IntLiteral sizeLit = new IntLiteral(size+"");
-            				t = services.getTypeConverter().convertToLogicElement(sizeLit);
-        				}
+        				int size = services.getJavaInfo().getSizeInBytes(typ);
+	        			IntLiteral sizeLit = new IntLiteral(size+"");
+            				t = services.getTypeConverter().convertToLogicElement(sizeLit);        				
         			}
             		result = new JMLExpression(t);
         		}
@@ -2085,14 +2081,6 @@ jmlprimary returns [JMLExpression result=null] throws SLTranslationException
 		tb.TRUE(services));
 	    result = new JMLExpression(resTerm);
 	} 
-	|   REENTRANT_SCOPE LPAREN t=specexpression RPAREN
-	{
-		Term resTerm = tb.dot(t, javaInfo.getAttribute(
-    				ImplicitFieldAdder.IMPLICIT_REENTRANT_SCOPE, 
-    				javaInfo.getJavaLangObject()));
-    	result = new JMLExpression(resTerm);			
-	}
-		
 	
     |   INVARIANT_FOR LPAREN t=specexpression RPAREN 
 	{

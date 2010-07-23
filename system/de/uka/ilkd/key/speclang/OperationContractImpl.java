@@ -39,9 +39,6 @@ public final class OperationContractImpl implements OperationContract {
     private final FormulaWithAxioms originalPre;
     private final FormulaWithAxioms originalWorkingSpacePost;
     private final Term originalWorkingSpace;
-    private final Term originalConstructedWorkingSpace;
-    private final Term originalReentrantWorkingSpace;
-    private final Term originalCallerWorkingSpace;
     private final FormulaWithAxioms originalPost;
     private final ImmutableSet<LocationDescriptor> originalModifies;
     private final ParsableVariable originalSelfVar;
@@ -78,10 +75,7 @@ public final class OperationContractImpl implements OperationContract {
             		         FormulaWithAxioms post,
                                  FormulaWithAxioms workingSpacePost,
             		         ImmutableSet<LocationDescriptor> modifies,
-                                 Term workingSpace,
-                                 Term constructedWorkingSpace,
-                                 Term reentrantWorkingSpace,
-                                 Term callerWorkingSpace,
+                                 Term workingSpace,                                 
             		         ParsableVariable selfVar,
             		         ImmutableList<ParsableVariable> paramVars,
             		         ParsableVariable resultVar,
@@ -107,10 +101,7 @@ public final class OperationContractImpl implements OperationContract {
         this.modality                 = modality;
 	this.originalPre              = pre;
 	this.originalPost             = post;
-        this.originalWorkingSpace     = workingSpace;
-        this.originalConstructedWorkingSpace     = constructedWorkingSpace;
-        this.originalReentrantWorkingSpace     = reentrantWorkingSpace;
-        this.originalCallerWorkingSpace     = callerWorkingSpace;
+        this.originalWorkingSpace     = workingSpace;       
         this.originalWorkingSpacePost = workingSpacePost;
 	this.originalModifies         = modifies;
 	this.originalSelfVar          = selfVar;
@@ -211,7 +202,7 @@ public final class OperationContractImpl implements OperationContract {
 	    while(it1.hasNext()) {
 		ParsableVariable originalParamVar = it1.next();
 		ParsableVariable paramVar         = it2.next();
-		assert originalParamVar.sort().equals(paramVar.sort());
+		assert originalParamVar.sort().equals(paramVar.sort()) : originalParamVar.sort() + " does not equal " + paramVar.sort();
 		result.put(originalParamVar, paramVar);
 	    }
 	}
@@ -389,72 +380,7 @@ public final class OperationContractImpl implements OperationContract {
         OpReplacer or = new OpReplacer(replaceMap);
         return or.replace(originalWorkingSpace);
     }
-    
-    public Term getCallerWorkingSpace(ParsableVariable selfVar, 
-            ImmutableList<ParsableVariable> paramVars,
-            Services services) {
-        assert (selfVar == null) == (originalSelfVar == null);
-        assert paramVars != null;
-        assert paramVars.size() == originalParamVars.size();
-        assert services != null;
-        Map<Operator, Operator> replaceMap = getReplaceMap(selfVar, 
-                paramVars, 
-                null, 
-                null,
-                null, 
-                services);
-        OpReplacer or = new OpReplacer(replaceMap);
-        return or.replace(originalCallerWorkingSpace);
-    }
-    
-    public Term getReentrantWorkingSpace(ParsableVariable selfVar, 
-            ImmutableList<ParsableVariable> paramVars,
-            Services services) {
-        assert (selfVar == null) == (originalSelfVar == null);
-        assert paramVars != null;
-        assert paramVars.size() == originalParamVars.size();
-        assert services != null;
-        Map<Operator, Operator> replaceMap = getReplaceMap(selfVar, 
-                paramVars, 
-                null, 
-                null,
-                null, 
-                services);
-        OpReplacer or = new OpReplacer(replaceMap);
-        return or.replace(originalReentrantWorkingSpace);
-    }
-    
-    public Term getConstructedWorkingSpace(Term self, 
-            ImmutableList<Term> params,
-            Services services){
-        assert (self == null) == (originalSelfVar == null);
-        assert params != null;
-        assert params.size() == originalParamVars.size();
-        assert services != null;
-        Map<Term, Term> replaceMap = getReplaceMap(self, 
-                params, 
-                services);
-        OpReplacer or = new OpReplacer(replaceMap);
-        return or.replace(originalConstructedWorkingSpace);
-    }
-    
-    public Term getConstructedWorkingSpace(ParsableVariable selfVar, 
-                    ImmutableList<ParsableVariable> paramVars,
-                    Services services) {
-        assert (selfVar == null) == (originalSelfVar == null);
-        assert paramVars != null;
-        assert paramVars.size() == originalParamVars.size();
-        assert services != null;
-        Map<Operator, Operator> replaceMap = getReplaceMap(selfVar, 
-                paramVars, 
-                null, 
-                null,
-                null, 
-                services);
-        OpReplacer or = new OpReplacer(replaceMap);
-        return or.replace(originalConstructedWorkingSpace);
-    }
-
+   
     
     public FormulaWithAxioms getPost(ParsableVariable selfVar, 
                                      ImmutableList<ParsableVariable> paramVars, 
@@ -642,10 +568,7 @@ public final class OperationContractImpl implements OperationContract {
                                          post,
 					 wsPost,
                                          modifies,
-					 ws,
-					 null,
-					 null,
-					 null,
+					 ws,					 
                                          originalSelfVar,
                                          originalParamVars,
                                          originalResultVar,
@@ -663,10 +586,7 @@ public final class OperationContractImpl implements OperationContract {
                 			 originalPost,
 					 originalWorkingSpacePost,
                 			 originalModifies,
-					 originalWorkingSpace,
-					 originalConstructedWorkingSpace,
-					 originalReentrantWorkingSpace,
-					 originalCallerWorkingSpace,
+					 originalWorkingSpace,					 
                 			 originalSelfVar,
                 			 originalParamVars,
                 			 originalResultVar,
@@ -705,9 +625,6 @@ public final class OperationContractImpl implements OperationContract {
 					 originalWorkingSpacePost,
 		 			 originalModifies,
 					 originalWorkingSpace,
-					 originalConstructedWorkingSpace,
-					 originalReentrantWorkingSpace,
-					 originalCallerWorkingSpace,
 		 			 originalSelfVar,
 		 			 originalParamVars,
 		 			 originalResultVar,

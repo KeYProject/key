@@ -28,7 +28,7 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.op.NonRigidHeapDependentFunction;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.proof.init.RTSJProfile;
+import de.uka.ilkd.key.rtsj.proof.init.RTSJProfile;
 import de.uka.ilkd.key.speclang.*;
 import de.uka.ilkd.key.speclang.jml.pretranslation.*;
 import de.uka.ilkd.key.speclang.jml.translation.JMLSpecFactory;

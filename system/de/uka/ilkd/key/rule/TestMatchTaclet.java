@@ -24,6 +24,7 @@ import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
+import de.uka.ilkd.key.java.reference.RuntimeInstanceEC;
 import de.uka.ilkd.key.java.reference.TypeRef;
 import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.logic.*;
@@ -621,8 +622,8 @@ public class TestMatchTaclet extends TestCase {
 	    (new TypeRef(new KeYJavaType
 		(PrimitiveType.JAVA_BYTE, 
 		 new PrimitiveSort(new Name("byte")))), null,
-	     new LocationVariable(new ProgramElementName("testVar"),
-				 new PrimitiveSort(new Name("testSort"))));
+	     new RuntimeInstanceEC(new LocationVariable(new ProgramElementName("testVar"),
+				 new PrimitiveSort(new Name("testSort")))));
 	MethodFrame mframe = new MethodFrame(null, ec, prg);
 	match = tf.createDiamondTerm
 	    (JavaBlock.createJavaBlock(new StatementBlock(mframe)), 

@@ -7,6 +7,8 @@
 // See LICENSE.TXT for details.
 package de.uka.ilkd.key.rule.metaconstruct;
 
+import java.lang.reflect.InvocationTargetException;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
@@ -22,8 +24,11 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
  */
 public class CreateInReachableStatePO extends AbstractMetaOperator {
 
-    public CreateInReachableStatePO() {
-        super(new Name("#createInReachableStatePO"), 1);
+    private final Class<? extends AbstractInReachableStatePOBuilder> poBuilder;
+
+    public CreateInReachableStatePO(String name, Class<? extends AbstractInReachableStatePOBuilder> builder) {
+        super(new Name(name), 1);
+        this.poBuilder = builder;
     }
     
     public Sort sort(Term[] term) {
@@ -31,7 +36,28 @@ public class CreateInReachableStatePO extends AbstractMetaOperator {
     }
        
     public Term calculate(Term term, SVInstantiations svInst, Services services) {   
-        final InReachableStatePOBuilder po = new InReachableStatePOBuilder(services);
+	AbstractInReachableStatePOBuilder po;
+        try {
+	    po = poBuilder.getConstructor(Services.class).newInstance(services);
+        } catch (IllegalArgumentException e) {
+	    e.printStackTrace();
+	    throw e;
+        } catch (SecurityException e) {
+	    e.printStackTrace();
+	    throw e;
+        } catch (InstantiationException e) {
+	    e.printStackTrace();
+	    throw (RuntimeException)new RuntimeException().initCause(e);
+        } catch (IllegalAccessException e) {
+	    e.printStackTrace();
+	    throw (RuntimeException)new RuntimeException().initCause(e);
+        } catch (InvocationTargetException e) {
+	    e.printStackTrace();
+	    throw (RuntimeException)new RuntimeException().initCause(e);
+        } catch (NoSuchMethodException e) {
+	    e.printStackTrace();
+	    throw (RuntimeException)new RuntimeException().initCause(e);
+        }
       
         return po.generatePO(term.sub(0));       
     }

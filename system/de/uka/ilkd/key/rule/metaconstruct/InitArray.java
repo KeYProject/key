@@ -101,8 +101,7 @@ public abstract class InitArray extends ProgramMetaConstruct {
 			      arrayType,
 			      null,
 			      ((NewArray)p_creationExpression)
-			      .getDimensions (),
-                              ((NewArray)p_creationExpression).getScope());
+			      .getDimensions ());
     }
 
 

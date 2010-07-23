@@ -11,7 +11,6 @@ package de.uka.ilkd.key.java;
 
 
 import java.util.HashMap;
-import java.util.Iterator;
 
 import recoder.service.ConstantEvaluator;
 import de.uka.ilkd.key.collection.ImmutableArray;
@@ -51,11 +50,11 @@ public class TypeConverter extends TermBuilder {
     private IntegerDomainLDT integerDomainLDT;
     private FloatLDT floatLDT;
     private DoubleLDT doubleLDT;
+    private StringLDT stringLDT;
+    private StringConverter stringConverter = new StringConverter(); //TODO replace with stringLDT when library problem solved
 
     private ImmutableList<LDT> models = ImmutableSLList.<LDT>nil();
 
-    
-    public static StringConverter stringConverter =new StringConverter();
     
 
     TypeConverter(Services s){
@@ -88,7 +87,9 @@ public class TypeConverter extends TermBuilder {
             this.floatLDT = (FloatLDT)ldt;
         } else if (ldt instanceof DoubleLDT) {
             this.doubleLDT = (DoubleLDT)ldt;
-        }
+        } else if (ldt instanceof StringLDT) {
+	    this.stringLDT = (StringLDT)ldt;
+	}
 
         this.models = this.models.prepend(ldt);
         Debug.out("Initialize LDTs: ", ldt);
@@ -190,9 +191,12 @@ public class TypeConverter extends TermBuilder {
         return  charLDT;
     }
     
-
     public BooleanLDT getBooleanLDT() {
 	return booleanLDT;
+    }
+
+    public StringLDT getStringLDT() {
+	return stringLDT;
     }
     
     private final HashMap<String, Term> mcrMap = new HashMap<String, Term>(10);
@@ -264,7 +268,7 @@ public class TypeConverter extends TermBuilder {
 	        KeYJavaType kjt = tr.getKeYJavaType();
 	        return findThisForSortExact(kjt.getSort(), ec);
 	    }
-	    return convertToLogicElement(ec.getRuntimeInstance());
+	    return convertToLogicElement(ec.getRuntimeInstanceAsRef());
 	} /*else if (prefix instanceof CurrentMemoryAreaReference) {   
             return convertToLogicElement(ec.getMemoryArea());
         } */else {            
@@ -276,14 +280,14 @@ public class TypeConverter extends TermBuilder {
     }
     
     public Term findThisForSortExact(Sort s, ExecutionContext ec){
-        ProgramElement pe = ec.getRuntimeInstance();
+        ProgramElement pe = ec.getRuntimeInstanceAsRef();
         if(pe == null) return null;
         Term inst = convertToLogicElement(pe, ec);
         return findThisForSort(s, inst, ec.getTypeReference().getKeYJavaType(), true);
     }
     
     public Term findThisForSort(Sort s, ExecutionContext ec){
-        ProgramElement pe = ec.getRuntimeInstance();
+        ProgramElement pe = ec.getRuntimeInstanceAsRef();
         if(pe == null) return null;
         Term inst = convertToLogicElement(pe, ec);
         return findThisForSort(s, inst, ec.getTypeReference().getKeYJavaType(), false);
@@ -309,14 +313,8 @@ public class TypeConverter extends TermBuilder {
 	final ProgramVariable var = fr.getProgramVariable();
 	if("javax.realtime.MemoryArea::currentMemoryArea".
 	               equals(fr.getName().toString())){
-	    return convertToLogicElement(ec.getMemoryArea());
-	}else if("javax.realtime.MemoryArea::callerScope".
-                       equals(fr.getName().toString())){
-            return convertToLogicElement(ec.getCallerMemoryArea());
-        }else if("javax.realtime.MemoryArea::constructedScope".
-                       equals(fr.getName().toString())){
-            return convertToLogicElement(ec.getConstructedMemoryArea());
-        }else if (var.isStatic()) {
+	    return convertToLogicElement(ec.getMemoryAreaAsRef());
+	} else if (var.isStatic()) {
 	    return var(var);
 	} else if (prefix == null) {
 	    if (var.isMember()) {
@@ -442,7 +440,8 @@ public class TypeConverter extends TermBuilder {
         } else if (lit instanceof LongLiteral) {
             return intLDT.translateLiteral(lit);
         } else if (lit instanceof StringLiteral) {
-            return stringConverter.translateLiteral(lit,intLDT,services);
+	    return stringConverter.translateLiteral(lit,charLDT,services);
+	    //	    return stringLDT.translateLiteral(lit);
         } else if (lit instanceof FloatLiteral) {
             return floatLDT.translateLiteral(lit);
         } else if (lit instanceof DoubleLiteral) {
@@ -501,9 +500,12 @@ public class TypeConverter extends TermBuilder {
                         t2 == PrimitiveType.JAVA_INT||
                         t2 == PrimitiveType.JAVA_CHAR||
                         t2 == PrimitiveType.JAVA_LONG)) 
-            return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_LONG);		    
-        throw new RuntimeException("Could not determine promoted type "+
-                "of "+t1+" and "+t2);
+            return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_LONG);
+	/*KeYJavaType strType = services.getJavaInfo().getTypeByName("java.lang.String");
+	if (t1 == strType.getJavaType() || t2 == strType.getJavaType())
+	return strType;*/
+	throw new RuntimeException("Could not determine promoted type "+
+	  "of "+t1+" and "+t2);
     }
 
 

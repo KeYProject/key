@@ -8,9 +8,14 @@
 package de.uka.ilkd.key.proof.init;
 
 import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.gui.POBrowser;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.proof.GoalChooserBuilder;
+import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.init.proofobligation.DefaultPOProvider;
+import de.uka.ilkd.key.proof.mgt.ProofCorrectnessMgt;
 import de.uka.ilkd.key.proof.mgt.RuleJustification;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.strategy.StrategyFactory;
@@ -98,9 +103,22 @@ public interface Profile {
      */
     void updateSettings(ProofSettings settings);
 
+    
+    /**
+     * returns the file name of the internal class directory relative to JavaRedux
+     * @return the file name of the internal class directory relative to JavaRedux
+     */
+    String getInternalClassDirectory();
+	
     /**
      * returns the file name of the internal class list
      * @return the file name of the internal class list
      */
     String getInternalClasslistFilename();
+
+    DefaultPOProvider getPOProvider();
+
+    ProofCorrectnessMgt createLocalProofCorrectnessMgt(Proof proof);
+
+    Class<? extends POBrowser> getPOBrowserClass();
 }

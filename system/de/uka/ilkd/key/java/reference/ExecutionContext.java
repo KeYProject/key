@@ -9,10 +9,7 @@
 //
 package de.uka.ilkd.key.java.reference;
 
-import de.uka.ilkd.key.java.JavaNonTerminalProgramElement;
-import de.uka.ilkd.key.java.PrettyPrinter;
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.Reference;
+import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.ExtList;
@@ -29,22 +26,13 @@ public class ExecutionContext
     /**
      * the reference to the active object
      */
-    protected final ReferencePrefix runtimeInstance;
+    protected final RuntimeInstanceEC runtimeInstance;
     
     /**
      * the current memory area
      */
-    protected final ReferencePrefix memoryArea;
+    protected final MemoryAreaEC memoryArea;
     
-    /**
-     * PERC Pico specific: the memory area for creating the returned object in
-     */
-    protected final ReferencePrefix callerMemoryArea;
-    
-    /**
-     * PERC Pico specific: the constructed memory area
-     */
-    protected final ReferencePrefix constructedMemoryArea;
     
     /**
      * creates an execution context reference
@@ -56,35 +44,12 @@ public class ExecutionContext
      * is currently active/executed
      */
     public ExecutionContext(TypeReference classContext, 
-            ReferencePrefix memoryArea,
-            ReferencePrefix runtimeInstance) {
-        this(classContext, memoryArea, runtimeInstance, null, null); 
-    }
-    
-   
-    /**
-     * creates an execution context reference
-     * @param classContext the TypeReference refering to the next enclosing
-     * class 
-     * @param memoryArea the memory area used for allocation within this execution
-     * context
-     * @param runtimeInstance a ReferencePrefix to the object that
-     * is currently active/executed
-     * @param callerMemoryArea the memory area used for allocation of the returned
-     * object (PERC Pico)
-     * @param constructedMemoryArea the constructed scope (PERC Pico)
-     */
-    public ExecutionContext(TypeReference classContext, 
-            ReferencePrefix memoryArea,
-            ReferencePrefix runtimeInstance,
-            ReferencePrefix callerMemoryArea,
-            ReferencePrefix constructedMemoryArea) {
+	    MemoryAreaEC memoryArea,
+            RuntimeInstanceEC runtimeInstance) {
         if (classContext == null) Debug.printStackTrace();
         this.classContext = classContext;
+        this.memoryArea = memoryArea;       
         this.runtimeInstance = runtimeInstance;
-        this.memoryArea = memoryArea;
-        this.callerMemoryArea = callerMemoryArea; 
-        this.constructedMemoryArea = constructedMemoryArea; 
     }
     
     /**
@@ -98,14 +63,9 @@ public class ExecutionContext
 	    { System.out.println("||||"+children); Debug.printStackTrace(); }
 
 	children.remove(this.classContext);
-        this.memoryArea = (ReferencePrefix) children.removeFirstOccurrence(
-                ReferencePrefix.class); 
-        this.callerMemoryArea = (ReferencePrefix) children.removeFirstOccurrence(
-                ReferencePrefix.class); 
-        this.constructedMemoryArea = (ReferencePrefix) children.removeFirstOccurrence(
-                ReferencePrefix.class); 
-        this.runtimeInstance = (ReferencePrefix) children.removeFirstOccurrence(
-                ReferencePrefix.class);
+	
+	this.memoryArea = (MemoryAreaEC) children.removeFirstOccurrence(MemoryAreaEC.class);         
+        this.runtimeInstance  = (RuntimeInstanceEC) children.removeFirstOccurrence(RuntimeInstanceEC.class);
     }
 
 
@@ -118,9 +78,7 @@ public class ExecutionContext
 	int count = 0;
 	if (classContext != null) count++;
         if (memoryArea != null) count++;
-        if (runtimeInstance != null) count++;
-        if (constructedMemoryArea != null) count++;
-        if (callerMemoryArea != null) count++;
+        if (runtimeInstance != null) count++;       
 	return count;
     }
 
@@ -141,14 +99,6 @@ public class ExecutionContext
 	    if (index == 0) return memoryArea;
 	    index--;
 	}
-        if (callerMemoryArea != null) {
-            if (index == 0) return callerMemoryArea;
-            index--;
-        }
-        if (constructedMemoryArea != null) {
-            if (index == 0) return constructedMemoryArea;
-            index--;
-        }
         if (runtimeInstance != null) {
             if (index == 0) return runtimeInstance;
             index--;
@@ -168,22 +118,23 @@ public class ExecutionContext
      * returns the runtime instance object
      * @return the runtime instance object
      */
-    public ReferencePrefix getRuntimeInstance() {
+    public RuntimeInstanceEC getRuntimeInstance() {
 	return runtimeInstance;
     }
     
-    public ReferencePrefix getMemoryArea() {
+    public ReferencePrefix getRuntimeInstanceAsRef() {
+	return runtimeInstance == null ? null : runtimeInstance.getReferencePrefix();
+    }
+
+   
+    public MemoryAreaEC getMemoryArea() {
         return memoryArea;
     }
     
-    public ReferencePrefix getConstructedMemoryArea() {
-        return constructedMemoryArea;
+    public ReferencePrefix getMemoryAreaAsRef() {
+	return memoryArea == null ? null : memoryArea.getReferencePrefix();
     }
     
-    public ReferencePrefix getCallerMemoryArea() {
-        return callerMemoryArea;
-    }
-
     /** calls the corresponding method of a visitor in order to
      * perform some action/transformation on this element
      * @param v the Visitor
@@ -196,11 +147,10 @@ public class ExecutionContext
         p.printExecutionContext(this);
     }
 
-    public String toString() {
-        return "Context: "+classContext+" MemoryArea: "+memoryArea+
-        " CallerMemoryArea: "+callerMemoryArea+
-        " ConstructedMemoryArea: "+constructedMemoryArea+
-        " Instance: "+runtimeInstance;
+    public String toString() {	
+        return "Context: " + classContext + " MemoryArea: " + memoryArea + " Instance: "+runtimeInstance;
     }
+
+ 
     
 }

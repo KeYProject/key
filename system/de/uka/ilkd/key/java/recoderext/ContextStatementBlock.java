@@ -38,11 +38,8 @@ public class ContextStatementBlock
      Statement block.
      */
     public ContextStatementBlock(TypeSVWrapper tr, ExpressionSVWrapper memoryArea,
-            ExpressionSVWrapper runtime,
-            ExpressionSVWrapper callerMemoryArea,
-            ExpressionSVWrapper constructedMemoryArea) {
-	this(tr != null ? new ExecutionContext(tr, memoryArea, runtime, 
-                callerMemoryArea, constructedMemoryArea) : null);
+            ExpressionSVWrapper runtime) {
+	this(tr != null ? new ExecutionContext(tr, memoryArea, runtime) : null);
     }
 
     /**
@@ -63,8 +60,7 @@ public class ContextStatementBlock
                 ExpressionSVWrapper constructedMemoryArea){
 	super(block);
 	if (tr != null) {
-	    this.ec = new ExecutionContext(tr, memoryArea, runtime, 
-                    callerMemoryArea, constructedMemoryArea);
+	    this.ec = new ExecutionContext(tr, memoryArea, runtime);
 	} else {
 	    this.ec = null;
 	}

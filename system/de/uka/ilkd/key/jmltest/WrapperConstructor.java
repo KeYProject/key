@@ -46,7 +46,7 @@ import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.init.SpecExtPO;
+import de.uka.ilkd.key.proof.init.proofobligation.SpecExtPO;
 import de.uka.ilkd.key.rule.updatesimplifier.AssignmentPair;
 import de.uka.ilkd.key.rule.updatesimplifier.QuanAssignmentPairLazy;
 import de.uka.ilkd.key.rule.updatesimplifier.Update;
@@ -78,7 +78,7 @@ public class WrapperConstructor extends Thread {
     public WrapperConstructor(final JMLTestFileCreator jmltfc, final Proof proof) {
 	this.jmltfc = jmltfc;
 	this.proof = proof;
-	po = proof.getPO();
+	po = (SpecExtPO) proof.getPO();
 	pm = po.getProgramMethod();
 	className = pm.getContainerType().getName();
 	jmlEx = new JMLExport(po, proof.getServices());

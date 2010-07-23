@@ -411,8 +411,8 @@ public class ProofJavaProgramFactory extends JavaProgramFactory {
     
     public MethodReferenceWrapper createMethodReferenceWrapper(ReferencePrefix accessPath, 
             Identifier name, ASTList<Expression> args, 
-            ASTList<TypeArgumentDeclaration> typeArgs, Identifier scope){
-        return new MethodReferenceWrapper(accessPath, name, args, typeArgs, scope);
+            ASTList<TypeArgumentDeclaration> typeArgs){
+        return new MethodReferenceWrapper(accessPath, name, args, typeArgs);
     }
 
     /**

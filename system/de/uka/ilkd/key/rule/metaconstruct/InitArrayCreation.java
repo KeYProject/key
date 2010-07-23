@@ -148,8 +148,7 @@ public class InitArrayCreation extends InitArray {
 					 KeYJavaType arrayType,
 					 ProgramVariable[] dimensions,
 					 Services services,
-                                         ImmutableArray<Expression> args,
-                                         ProgramElement scope) {
+                                         ImmutableArray<Expression> args) {
 	TypeReference baseTypeRef =
 	    ((ArrayType)arrayType.getJavaType()).getBaseType();
 	KeYJavaType baseType = baseTypeRef.getKeYJavaType();
@@ -160,8 +159,7 @@ public class InitArrayCreation extends InitArray {
                     new MethodReference
                     (new ImmutableArray<Expression>(dimensions[0]),
                             new ProgramElementName(createArrayName),
-                            new TypeRef(arrayType),
-                            scope)));
+                            new TypeRef(arrayType))));
         }else{
             Expression[] dim = new Expression[1];
             dim[0] = dimensions[0];
@@ -244,7 +242,7 @@ public class InitArrayCreation extends InitArray {
  	final KeYJavaType arrayType = na.getKeYJavaType(services);
 
 	createNDimensionalArray(bodyStmnts, newObject, arrayType, 
-				dimensions, services, na.getArguments(), na.getScope());
+				dimensions, services, na.getArguments());
 
  	return new StatementBlock(bodyStmnts.toArray
 				  (new Statement[bodyStmnts.size()]));

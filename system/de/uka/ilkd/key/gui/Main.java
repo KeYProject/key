@@ -10,6 +10,7 @@
 
 package de.uka.ilkd.key.gui;
 
+import java.awt.*;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
@@ -18,12 +19,9 @@ import java.awt.dnd.DropTargetAdapter;
 import java.awt.dnd.DropTargetDropEvent;
 import java.awt.dnd.DropTargetListener;
 import java.awt.event.*;
-import java.awt.*;
 import java.io.*;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -35,21 +33,20 @@ import javax.swing.text.JTextComponent;
 
 import org.apache.log4j.Logger;
 
-import de.uka.ilkd.key.gui.assistant.*;
 import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.gui.assistant.ProofAssistant;
+import de.uka.ilkd.key.gui.assistant.ProofAssistantAI;
+import de.uka.ilkd.key.gui.assistant.ProofAssistantController;
 import de.uka.ilkd.key.gui.configuration.*;
 import de.uka.ilkd.key.gui.nodeviews.NonGoalInfoView;
 import de.uka.ilkd.key.gui.nodeviews.SequentView;
 import de.uka.ilkd.key.gui.notification.NotificationManager;
-import de.uka.ilkd.key.gui.notification.events.*;
+import de.uka.ilkd.key.gui.notification.events.ExitKeYEvent;
+import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
+import de.uka.ilkd.key.gui.notification.events.GeneralInformationEvent;
+import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 import de.uka.ilkd.key.gui.prooftree.ProofTreeView;
-import de.uka.ilkd.key.gui.smt.ComplexButton;
-import de.uka.ilkd.key.gui.smt.SettingsDialog;
-import de.uka.ilkd.key.gui.smt.DecisionProcedureSettings;
-import de.uka.ilkd.key.gui.smt.RuleLauncher;
-import de.uka.ilkd.key.gui.smt.SMTResultsAndBugDetectionDialog;
-import de.uka.ilkd.key.gui.smt.TacletTranslationSelection;
-import de.uka.ilkd.key.gui.smt.TemporarySettings;
+import de.uka.ilkd.key.gui.smt.*;
 import de.uka.ilkd.key.java.NonTerminalProgramElement;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Statement;
@@ -60,8 +57,11 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.pp.*;
 import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.init.*;
-import de.uka.ilkd.key.proof.mgt.*;
+import de.uka.ilkd.key.proof.mgt.BasicTask;
+import de.uka.ilkd.key.proof.mgt.NonInterferenceCheck;
+import de.uka.ilkd.key.proof.mgt.TaskTreeNode;
 import de.uka.ilkd.key.proof.reuse.ReusePoint;
+import de.uka.ilkd.key.rtsj.proof.init.RTSJProfile;
 import de.uka.ilkd.key.smt.SMTRule;
 import de.uka.ilkd.key.strategy.VBTStrategy;
 import de.uka.ilkd.key.unittest.UnitTestBuilder;
@@ -1441,6 +1441,16 @@ public class Main extends JFrame implements IMain {
         });
         registerAtMenu(proof, statisticsInfo);
         
+        JMenuItem keyMgtItem = 
+	    new JMenuItem("Show Dependencies (key-mgt.ps)");
+        keyMgtItem.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                mediator.getServices().getSpecificationRepository().
+		    drawGraph(mediator.getProof());
+            }});
+        registerAtMenu(proof, keyMgtItem);
+
+
         final JMenuItem typeHierInfo = new JMenuItem("Show Known Types");
         typeHierInfo.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -2669,10 +2679,7 @@ public class Main extends JFrame implements IMain {
 			index++;
 		    }
 		    ProofSettings.DEFAULT_SETTINGS.setProfile(new RTSJProfile(memory));
-		} else if (opt[index].equals("PERC")) {
-                    ProofSettings.DEFAULT_SETTINGS.setProfile(new PercProfile());
-                    System.out.println("PERC Pico extensions enabled");
-                } else if (opt[index].equals("DEPTHFIRST")) {		
+		} else if (opt[index].equals("DEPTHFIRST")) {		
 		    System.out.println("DepthFirst GoalChooser ...");
 		    Profile p = ProofSettings.DEFAULT_SETTINGS.getProfile();
 		    p.setSelectedGoalChooserBuilder(DepthFirstGoalChooserBuilder.NAME);  
@@ -2716,6 +2723,7 @@ public class Main extends JFrame implements IMain {
 			if(loopBound>=0)System.out.println("Bounded loop unwinding. Unwinding bound:"+loopBound);
 			index++;
 		    }
+		    		    
 		    if(mode==1||mode==2){
 			ProofSettings.DEFAULT_SETTINGS.setProfile(
 								  new JavaTestGenerationProfile(null,loop,loopBound));
@@ -2794,7 +2802,6 @@ public class Main extends JFrame implements IMain {
         System.out.println("  auto	          : start prove procedure after initialisation");
         System.out.println("  testing         : starts the prover with a simple test generation oriented user interface");
 	System.out.println(" rtsj [memory] : enables rtsj extensions (optional argument memory for enabling extensions for reasoning over memory consumption)");
-	//	System.out.println(" perc : enables PERC Pico extensions");
         System.out.println("  print_statistics <filename>" );
         System.out.println("                  : in auto mode, output nr. of rule applications and time spent");
         System.out.println("  fol             : use FOL profile (no program or update rules)");

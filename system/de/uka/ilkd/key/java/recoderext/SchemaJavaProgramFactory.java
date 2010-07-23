@@ -101,24 +101,24 @@ public class SchemaJavaProgramFactory extends JavaProgramFactory {
             ExpressionSVWrapper runtime,
             ExpressionSVWrapper callerMemoryArea,
             ExpressionSVWrapper constructedMemoryArea) {
-	return new ContextStatementBlock(typeRef, memoryArea, runtime, callerMemoryArea, constructedMemoryArea);
+	return new ContextStatementBlock(typeRef, memoryArea, runtime);
     }
     
     public MethodReferenceWrapper createMethodReferenceWrapper(ReferencePrefix accessPath, 
             Identifier name, ASTList<Expression> args, 
-            ASTList<TypeArgumentDeclaration> typeArgs, Identifier scope){
-        return new MethodReferenceWrapper(accessPath, name, args, typeArgs, scope);
+            ASTList<TypeArgumentDeclaration> typeArgs){
+        return new MethodReferenceWrapper(accessPath, name, args, typeArgs);
     }
     
     public MethodReferenceWrapper createMethodReferenceWrapper(ReferencePrefix accessPath, 
-            Identifier name, ASTList<Expression> args, Identifier scope){
-        return new MethodReferenceWrapper(accessPath, name, args, scope);
+            Identifier name, ASTList<Expression> args){
+        return new MethodReferenceWrapper(accessPath, name, args);
     }
     
     public ContextStatementBlock createContextStatementBlock(TypeSVWrapper typeRef,
             ExpressionSVWrapper memoryArea,
             ExpressionSVWrapper runtime) {
-        return new ContextStatementBlock(typeRef, memoryArea, runtime, null, null);
+        return new ContextStatementBlock(typeRef, memoryArea, runtime);
     }
 
     public ContextStatementBlock createContextStatementBlock(ExecutionContext ec) {

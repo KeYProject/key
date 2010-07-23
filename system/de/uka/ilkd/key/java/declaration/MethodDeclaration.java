@@ -361,18 +361,6 @@ public class MethodDeclaration
         return false;
     }
     
-    public boolean externallyConstructedScope(){
-        return isAnnotatedWith("@ExternallyConstructedScope");
-    }
-    
-    public boolean noLocalScope(){
-        return isAnnotatedWith("@NoLocalScope");
-    }
-    
-    public boolean callerAllocatedResult(){
-        return isAnnotatedWith("@CallerAllocatedResult");
-    }
-
     /**
      * Test whether the declaration is private.
      */

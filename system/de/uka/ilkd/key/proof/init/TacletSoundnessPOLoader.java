@@ -17,6 +17,7 @@ import javax.swing.JOptionPane;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.gui.*;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.init.proofobligation.TacletSoundnessPO;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 
 /**

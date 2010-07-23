@@ -17,15 +17,21 @@ import de.uka.ilkd.key.collection.*;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.declaration.*;
-import de.uka.ilkd.key.java.statement.*;
+import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
+import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
+import de.uka.ilkd.key.java.declaration.VariableSpecification;
+import de.uka.ilkd.key.java.statement.BranchStatement;
+import de.uka.ilkd.key.java.statement.For;
+import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.proof.init.PercProfile;
-import de.uka.ilkd.key.proof.init.RTSJProfile;
+import de.uka.ilkd.key.rtsj.proof.init.RTSJProfile;
 import de.uka.ilkd.key.speclang.*;
-import de.uka.ilkd.key.speclang.jml.pretranslation.*;
+import de.uka.ilkd.key.speclang.jml.pretranslation.Behavior;
+import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLClassInv;
+import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLLoopSpec;
+import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 
 
@@ -236,8 +242,7 @@ public class JMLSpecFactory {
         Term imCons=null;
         FormulaWithAxioms wsPost = new FormulaWithAxioms(TB.tt());
         if((ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof RTSJProfile) && 
-        		((RTSJProfile) ProofSettings.DEFAULT_SETTINGS.getProfile()).memoryConsumption() ||
-        		(ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof PercProfile)){
+        		((RTSJProfile) ProofSettings.DEFAULT_SETTINGS.getProfile()).memoryConsumption()) {
 	        ProgramVariable initialMemoryArea = services.getJavaInfo().
 	        getDefaultMemoryArea();
 	        Term imTerm = TB.var(initialMemoryArea);
@@ -339,8 +344,7 @@ public class JMLSpecFactory {
                 assignable = assignable.union(translated);        
             }
             if(assignable.size()!=0 && ((ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof RTSJProfile) && 
-            		((RTSJProfile) ProofSettings.DEFAULT_SETTINGS.getProfile()).memoryConsumption() ||
-            		(ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof PercProfile))){
+            		((RTSJProfile) ProofSettings.DEFAULT_SETTINGS.getProfile()).memoryConsumption())){
                 assignable = assignable.add(new BasicLocationDescriptor(imCons));
             }
         }
@@ -442,10 +446,7 @@ public class JMLSpecFactory {
                                             post,
                                             wsPost,
                                             assignable,
-                                            workingSpace,
-                                            constructedWorkingSpace,
-                                            reentrantWorkingSpace,
-                                            callerWorkingSpace,
+                                            workingSpace,                                            
                                             selfVar,
                                             paramVars,
                                             resultVar,
@@ -462,10 +463,7 @@ public class JMLSpecFactory {
                                             post,
                                             wsPost,
                                             assignable,
-                                            workingSpace,
-                                            constructedWorkingSpace,
-                                            reentrantWorkingSpace,
-                                            callerWorkingSpace,
+                                            workingSpace,                                            
                                             selfVar,
                                             paramVars,
                                             resultVar,
@@ -486,10 +484,7 @@ public class JMLSpecFactory {
                                             post,
                                             wsPost,
                                             assignable,
-                                            workingSpace,
-                                            constructedWorkingSpace,
-                                            reentrantWorkingSpace,
-                                            callerWorkingSpace,
+                                            workingSpace,                                           
                                             selfVar,
                                             paramVars,
                                             resultVar,
@@ -504,10 +499,7 @@ public class JMLSpecFactory {
                                             post,
                                             wsPost,
                                             assignable,
-                                            workingSpace,
-                                            constructedWorkingSpace,
-                                            reentrantWorkingSpace,
-                                            callerWorkingSpace,
+                                            workingSpace,                                           
                                             selfVar,
                                             paramVars,
                                             resultVar,
@@ -558,14 +550,24 @@ public class JMLSpecFactory {
         Sort sort = kjt.getSort();
         ParsableVariable selfVar = new LogicVariable(new Name("self"), sort);
         
+        
         //translate expression
-        FormulaWithAxioms inv = translator.translateExpression(originalInv,
+        FormulaWithAxioms inv;
+        try{
+         inv = translator.translateExpression(originalInv,
                                                                kjt,
                                                                selfVar,
                                                                null,
                                                                null,
                                                                null,
                                                                null);        
+        } catch (SLTranslationException sle) {
+            throw sle;
+        } catch (Exception e) {                   
+            throw new SLTranslationException("Unexpected error when translating invariant of class " 
+        	    + kjt.getFullName() + "\nInvariant to parse: " + originalInv  + "\nError:" + e, originalInv.fileName, 
+        	    originalInv.pos);
+        }
         //create invariant
         String name = getInvName();
         return new ClassInvariantImpl(name,
@@ -855,8 +857,6 @@ public class JMLSpecFactory {
                                      variant,
                                      parametrizedWS,
                                      workingSpaceLocal,
-                                     workingSpaceConstructed,
-                                     workingSpaceReentrant,
                                      selfTerm,
                                      atPreFunctions,
                                      true);

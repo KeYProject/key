@@ -29,6 +29,8 @@ header {
   import de.uka.ilkd.key.proof.*;
   import de.uka.ilkd.key.proof.init.*;
 
+  import de.uka.ilkd.key.rtsj.logic.op.*;
+
   import de.uka.ilkd.key.rule.*;
   import de.uka.ilkd.key.rule.conditions.*;
   import de.uka.ilkd.key.rule.metaconstruct.*;

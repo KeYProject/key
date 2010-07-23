@@ -10,7 +10,6 @@
 
 package de.uka.ilkd.key.speclang;
 
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -19,7 +18,9 @@ import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.visitor.Visitor;
-import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.LocationDescriptor;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.proof.AtPreFactory;
@@ -33,9 +34,7 @@ public class LoopInvariantImpl implements LoopInvariant {
     
     private final LoopStatement loop;
     private final Term originalInvariant;
-    private final Term originalWorkingSpaceLocal;
-    private final Term originalWorkingSpaceReentrant;
-    private final Term originalWorkingSpaceConstructed;
+    private final Term originalWorkingSpaceLocal;   
     private final Term originalParametrizedWorkingSpaceTerms;
     private final LoopPredicateSet originalPredicates;
     private final LocationDescriptorSet originalModifies;
@@ -68,8 +67,6 @@ public class LoopInvariantImpl implements LoopInvariant {
                              Term variant, 
                              Term parametrizedWorkingSpaceTerms,
                              Term workingSpaceLocal,
-                             Term workingSpaceConstructed,
-                             Term workingSpaceReentrant,
                              Term selfTerm,
                              /*in*/ Map<Operator, Function /*(atPre)*/> atPreFunctions,
                              boolean predicateHeuristicsAllowed) {
@@ -82,9 +79,7 @@ public class LoopInvariantImpl implements LoopInvariant {
         this.originalPredicates         = predicates;
         this.originalVariant            = variant;
         this.originalParametrizedWorkingSpaceTerms = parametrizedWorkingSpaceTerms;
-        this.originalWorkingSpaceLocal  = workingSpaceLocal;
-        this.originalWorkingSpaceConstructed = workingSpaceConstructed;
-        this.originalWorkingSpaceReentrant = workingSpaceReentrant;
+        this.originalWorkingSpaceLocal  = workingSpaceLocal;      
         this.originalModifies           = modifies;
         this.originalSelfTerm           = selfTerm;   
         this.predicateHeuristicsAllowed = predicateHeuristicsAllowed;
@@ -102,8 +97,6 @@ public class LoopInvariantImpl implements LoopInvariant {
              new LoopPredicateSet(DefaultImmutableSet.<Term>nil()), 
              new LocationDescriptorSet(DefaultImmutableSet.<LocationDescriptor>nil()), 
              null, 
-             null,
-             null,
              null,
              null,
              selfTerm,
@@ -286,25 +279,6 @@ public class LoopInvariantImpl implements LoopInvariant {
         return or.replace(originalParametrizedWorkingSpaceTerms);
     }
     
-    public Term getWorkingSpaceConstructed(Term selfTerm, 
-            /*inout*/ Map <Operator, Function/* (atPre)*/> atPreFunctions,
-            Services services){
-        assert (selfTerm == null) == (originalSelfTerm == null);
-        Map replaceMap = 
-            getReplaceMap(selfTerm, null, atPreFunctions, services);
-        OpReplacer or = new OpReplacer(replaceMap);
-        return or.replace(originalWorkingSpaceConstructed);   
-    }
-    
-    public Term getWorkingSpaceReentrant(Term selfTerm, 
-            /*inout*/ Map <Operator, Function/* (atPre)*/> atPreFunctions,
-            Services services){
-        assert (selfTerm == null) == (originalSelfTerm == null);
-        Map replaceMap = 
-            getReplaceMap(selfTerm, null, atPreFunctions, services);
-        OpReplacer or = new OpReplacer(replaceMap);
-        return or.replace(originalWorkingSpaceReentrant);   
-    }
     
     public boolean getPredicateHeuristicsAllowed() {
         return predicateHeuristicsAllowed;
@@ -332,8 +306,6 @@ public class LoopInvariantImpl implements LoopInvariant {
                                      originalVariant,
                                      originalParametrizedWorkingSpaceTerms,
                                      originalWorkingSpaceLocal,
-                                     originalWorkingSpaceConstructed,
-                                     originalWorkingSpaceReentrant,
                                      originalSelfTerm,
                                      originalAtPreFunctions,
                                      predicateHeuristicsAllowed);
@@ -355,8 +327,6 @@ public class LoopInvariantImpl implements LoopInvariant {
                                      originalVariant,
                                      originalParametrizedWorkingSpaceTerms,
                                      originalWorkingSpaceLocal,
-                                     originalWorkingSpaceConstructed,
-                                     originalWorkingSpaceReentrant,
                                      originalSelfTerm,
                                      originalAtPreFunctions,
                                      predicateHeuristicsAllowed);
@@ -378,8 +348,6 @@ public class LoopInvariantImpl implements LoopInvariant {
                                      originalVariant,
                                      originalParametrizedWorkingSpaceTerms,
                                      originalWorkingSpaceLocal,
-                                     originalWorkingSpaceConstructed,
-                                     originalWorkingSpaceReentrant,
                                      originalSelfTerm,
                                      originalAtPreFunctions,
                                      predicateHeuristicsAllowed);
@@ -395,8 +363,6 @@ public class LoopInvariantImpl implements LoopInvariant {
                                      originalVariant,
                                      originalParametrizedWorkingSpaceTerms,
                                      originalWorkingSpaceLocal,
-                                     originalWorkingSpaceConstructed,
-                                     originalWorkingSpaceReentrant,
                                      originalSelfTerm,
                                      originalAtPreFunctions,
                                      predicateHeuristicsAllowed);

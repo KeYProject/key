@@ -523,7 +523,10 @@ public class ProblemLoader implements Runnable {
                         .getConstraint();
         
         if (currContract!=null) {
-            ourApp = new UseOperationContractRuleApp(pos, 
+            // basically profile should be extended to have their own problem loader
+            assert profile instanceof JavaProfile;
+            ourApp = new UseOperationContractRuleApp(((JavaProfile)profile).getContractRule(),
+        	    				     pos, 
                                                      userConstraint, 
                                                      currContract);
             currContract=null;

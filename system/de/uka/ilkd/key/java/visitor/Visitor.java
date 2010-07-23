@@ -315,4 +315,8 @@ public interface Visitor {
     void performActionOnLocationVariable(LocationVariable variable); 
     
     void performActionOnLoopInvariant(LoopInvariant x);
+
+    void performActionOnMemoryAreaEC(MemoryAreaEC memoryAreaEC);
+
+    void performActionOnRuntimeInstanceEC(RuntimeInstanceEC runtimeInstanceEC);
 }

@@ -142,7 +142,7 @@ export PATH
 
 
 $JAVA $JAVA_OPTIONS $keysysprops \
--ea:de.uka.ilkd.key... -Xms64m -Xmx512m \
+-ea:de.uka.ilkd.key... -Xms64m -Xmx2048m \
 -Dkey.home=$KEY_HOME \
 -Dkey.simplify.logdir=$KEY_SIMPLIFY_LOG_DIR \
 -Dkey.ics.logdir=$KEY_ICS_LOG_DIR \

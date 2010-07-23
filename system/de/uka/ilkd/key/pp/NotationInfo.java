@@ -34,8 +34,9 @@ import de.uka.ilkd.key.logic.op.QuanUpdateOperator;
 import de.uka.ilkd.key.logic.op.ShadowArrayOp;
 import de.uka.ilkd.key.logic.op.ShadowAttributeOp;
 import de.uka.ilkd.key.logic.op.SortedSchemaVariable;
-import de.uka.ilkd.key.logic.op.WorkingSpaceRigidOp;
 import de.uka.ilkd.key.util.Service;
+import de.uka.ilkd.key.pp.CharListNotation;
+import de.uka.ilkd.key.rtsj.logic.op.WorkingSpaceRigidOp;
 
 
 /** 
@@ -228,6 +229,11 @@ public class NotationInfo {
 		new Notation.NRFunctionWithDependenciesNotation());               
 	tbl.put(ModalOperatorSV.class, new Notation.ModalSVNotation(60, 60));
 	tbl.put(SortedSchemaVariable.class, new Notation.SortedSchemaVariableNotation());
+
+	//FIXME quick and dirty to print concat applications as infix "+". Better add Function instances to map...
+	tbl.put("concat", new Notation.Infix("+",120,130,130));
+	tbl.put("cons", new CharListNotation());
+	tbl.put("empty", new Notation.Constant("\"\"",140));
     }
 
     public AbbrevMap getAbbrevMap(){
@@ -249,7 +255,6 @@ public class NotationInfo {
 		createCharLitNotation(integerLDT.getCharSymbol());
 	    }
 	}
-	createStringLitNotation(de.uka.ilkd.key.java.TypeConverter.stringConverter.getStringSymbol(),null);
 
 	//For OCL Simplification
 	if (tbl.containsKey(op.name().toString())) {
@@ -311,14 +316,6 @@ public class NotationInfo {
     public void createCharLitNotation(Operator op) {
 	tbl.put(op, new Notation.CharLiteral());
     }
-
-
-    public void createStringLitNotation(Operator op, Operator eps) {
-	Notation.StringLiteral stringLiteral =  new Notation.StringLiteral();
-	tbl.put(op, stringLiteral);
-	tbl.put(eps, stringLiteral);
-    }
-
 
     /** 
      * Used for OCL Simplification.

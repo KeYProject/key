@@ -21,6 +21,7 @@ import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.ldt.LDT;
 import de.uka.ilkd.key.logic.sort.PrimitiveSort;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.rtsj.rule.metaconstruct.*;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.metaconstruct.*;
@@ -49,8 +50,6 @@ public abstract class AbstractMetaOperator extends Op implements MetaOperator {
     
     public static final AbstractMetaOperator META_MEMORY_AREA = new MetaMemoryArea();
     
-    public static final AbstractMetaOperator META_REENTRANT_SCOPE = new MetaReentrantScope();
-    
     public static final AbstractMetaOperator META_NEXT_TO_CREATE = new MetaNextToCreate();
 
     public static final AbstractMetaOperator META_ARRAY_SIZE = new ArraySize();
@@ -60,17 +59,7 @@ public abstract class AbstractMetaOperator extends Op implements MetaOperator {
     public static final AbstractMetaOperator META_HEAP_SPACE = new HeapSpace();
     
     public static final AbstractMetaOperator META_NEXT_TO_CREATE_STACK = new MetaNextToCreateStack();
-    
-    public static final AbstractMetaOperator META_NO_LOCAL_SCOPE = new NoLocalScope();
-    
-    public static final AbstractMetaOperator META_AT_LOCAL_SCOPE = new AtLocalScope();
-    
-    public static final AbstractMetaOperator META_CALLER_ALLOC_RESULT_CONTEXT = new CallerAllocResContext();
-    
-    public static final AbstractMetaOperator META_EXACT_SIZE_SCOPE = new ExactSizeScope();
-    
-    public static final AbstractMetaOperator META_AT_REENTRANT_SCOPE = new AtReentrantScope();
-    
+        
     public static final AbstractMetaOperator META_CONSUMED_AT_PRE = new ConsumedAtPre();
     
     public static final AbstractMetaOperator META_WS_AT_PRE = new WSAtPre();
@@ -78,16 +67,12 @@ public abstract class AbstractMetaOperator extends Op implements MetaOperator {
     public static final AbstractMetaOperator META_CONSUMED_LOOP_UPDATE = new ConsumedLoopUpdate();
     
     public static final AbstractMetaOperator META_CONSUMED_LOOP_INVARIANT = new ConsumedLoopInvariants();
-    
-    public static final AbstractMetaOperator META_EXTERNALLY_CONSTRUCTED_SCOPE = new ExternallyConstructedScope();
-    
+        
     public static final AbstractMetaOperator META_STACK_AT_INDEX = new StackAtIndex();
     
     public static final AbstractMetaOperator META_UPDATE_SCOPE = new UpdateScope();
     
     public static final AbstractMetaOperator META_UNIQUE_ANON_UPDATE = new UniqueAnonUpdate(); 
-    
-    public static final AbstractMetaOperator META_STACK_FOR_CONSTRUCTED_SCOPE = new StackForConstructedScope();
     
     public static final AbstractMetaOperator META_CALCULATE_ARRAY_SIZE = 
         new CalculateArraySize();
@@ -97,12 +82,6 @@ public abstract class AbstractMetaOperator extends Op implements MetaOperator {
     
     public static final AbstractMetaOperator META_BC_ARRAY_SIZE = 
         new BestCaseArraySize();
-    
-    public static final AbstractMetaOperator META_LOCAL_SCOPE_SPEC = 
-        new LocalScopeSpec();
-    
-    public static final AbstractMetaOperator META_CONSTRUCTED_SCOPE_SPEC = 
-        new ConstructedScopeSpec();
     
     public static final AbstractMetaOperator META_PRECONDITION_FOR_WS = 
         new PreconditionForWS();
@@ -191,8 +170,11 @@ public abstract class AbstractMetaOperator extends Op implements MetaOperator {
     public static final AbstractMetaOperator DIVIDE_LCR_MONOMIALS = new DivideLCRMonomials ();
 
     public static final AbstractMetaOperator CREATE_IN_REACHABLE_STATE_PO = 
-        new CreateInReachableStatePO ();
-    
+        new CreateInReachableStatePO ("#createInReachableStatePO", InReachableStatePOBuilder.class);
+
+    public static final AbstractMetaOperator CREATE_IN_REACHABLE_STATE_PO_RTSJ = 
+        new CreateInReachableStatePO("#createInReachableStateRTSJPO", InReachableStateRTSJPOBuilder.class);
+
     public static final AbstractMetaOperator INTRODUCE_ATPRE_DEFINITIONS = new IntroAtPreDefsOp();
     
     public static final AbstractMetaOperator AT_PRE_EQUATIONS = new AtPreEquations();

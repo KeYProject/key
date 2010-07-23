@@ -14,10 +14,6 @@
 
 java/lang/Object.java
 
-#commented PERC Pico extensions as they are currently not parseable with recoder
-#com/percpico/util/sc/ExternallyConstructedScope.java
-#com/percpico/util/sc/NoLocalScope.java
-#com/percpico/util/sc/CallerAllocatedResult.java
 java/lang/annotation/Annotation.java
 java/lang/ArithmeticException.java
 java/lang/ArrayIndexOutOfBoundsException.java
@@ -57,16 +53,3 @@ java/util/Map.java
 java/util/Set.java
 java/io/IOException.java
 java/io/Serializable.java
-javax/realtime/IllegalAssignmentError.java
-javax/realtime/ImmortalMemory.java
-javax/realtime/InaccessibleAreaException.java
-javax/realtime/LTMemory.java
-javax/realtime/MemoryArea.java
-javax/realtime/MemoryStack.java
-javax/realtime/PhysicalMemoryArea.java
-javax/realtime/RealtimeSystem.java
-javax/realtime/SizeEstimator.java
-javax/realtime/ScopedMemory.java
-javax/realtime/ScopedCycleException.java
-javax/realtime/ThrowBoundaryError.java
-javax/realtime/VTMemory.java

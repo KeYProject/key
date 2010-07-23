@@ -237,7 +237,7 @@ public class VariableNameTracker {
     private void updateSelfVar(MethodFrame mf) {
         ExecutionContext executionContext = (ExecutionContext) mf.getExecutionContext();
         // the execution context might be null for static methods
-        selfVar = executionContext.getRuntimeInstance();
+        selfVar = executionContext.getRuntimeInstanceAsRef();
         // if the execution context was null, we push a null element and create 
         // skip update later on
         selfVarStack.push(selfVar);

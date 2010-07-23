@@ -134,7 +134,7 @@ public class MethodBodyStatement extends JavaNonTerminalProgramElement
         checkOnlyProgramVarsAsArguments(args);
         this.methodReference = new MethodReference(args, 
                                                    method.getProgramElementName(), 
-                                                   newContext, scope);
+                                                   newContext);
 
     }
 

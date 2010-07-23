@@ -27,7 +27,7 @@ import de.uka.ilkd.key.java.recoderext.ConstructorNormalformBuilder;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
 
 
-class ClassTree extends JTree {
+public class ClassTree extends JTree {
     
     private static final String INIT_NAME 
         =  ConstructorNormalformBuilder.CONSTRUCTOR_NORMALFORM_IDENTIFIER;
@@ -196,6 +196,7 @@ class ClassTree extends JTree {
     private static DefaultMutableTreeNode createTree(boolean addOperations,
 	    					     boolean skipLibraryClasses,
 	    					     Services services) {
+
 	//get all classes
 	final Set<KeYJavaType> kjts 
 		= services.getJavaInfo().getAllKeYJavaTypes();
@@ -305,7 +306,7 @@ class ClassTree extends JTree {
     //inner classes
     //-------------------------------------------------------------------------    
     
-    static class Entry {
+    public static class Entry {
         public final String string;
         public KeYJavaType kjt = null;
         public ProgramMethod pm = null;

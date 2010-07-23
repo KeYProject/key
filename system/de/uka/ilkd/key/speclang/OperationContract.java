@@ -105,22 +105,6 @@ public interface OperationContract {
                 ImmutableList<ParsableVariable> paramVars,
                 Services services);
     
-    public Term getCallerWorkingSpace(ParsableVariable selfVar, 
-            ImmutableList<ParsableVariable> paramVars,
-            Services services);
-    
-    public Term getReentrantWorkingSpace(ParsableVariable selfVar, 
-            ImmutableList<ParsableVariable> paramVars,
-            Services services);
-    
-    public Term getConstructedWorkingSpace(Term self, 
-            ImmutableList<Term> params,
-            Services services);
-
-    public Term getConstructedWorkingSpace(ParsableVariable selfVar, 
-            ImmutableList<ParsableVariable> paramVars,
-            Services services);
-    
     public FormulaWithAxioms getWorkingSpacePost(ParsableVariable selfVar, 
             ImmutableList<ParsableVariable> paramVars, 
             ParsableVariable resultVar, 
