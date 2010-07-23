@@ -101,9 +101,8 @@ public class LoopInvariantProposer implements InstantiationProposer {
         if(taclet == null) {
             return true;
         }
-        Iterator<RuleSet> it = taclet.ruleSets();
-        while(it.hasNext()) {
-            if(it.next().name().toString().equals("loop_invariant_proposal")) {
+        for (RuleSet rs : taclet.getRuleSets()) {
+            if(rs.name().toString().equals("loop_invariant_proposal")) {
                 return true;
             }
         }

@@ -46,13 +46,16 @@ public class RuleSetDispatchFeature implements Feature {
         if ( ! ( app instanceof TacletApp ) ) return LongRuleAppCost.ZERO_COST;
 
         RuleAppCost res = LongRuleAppCost.ZERO_COST;
-        final Iterator<RuleSet> it = ( (TacletApp)app ).taclet ().ruleSets ();
-        while ( !( res instanceof TopRuleAppCost ) && it.hasNext () ) {
-            final Feature partialF = rulesetToFeature.get ( it.next () );
-            if ( partialF != null )
-                    res = res.add ( partialF.compute ( app, pos, goal ) );
-        }
+        for (RuleSet rs : ( (TacletApp)app ).taclet ().getRuleSets ()) {
+            final Feature partialF = rulesetToFeature.get ( rs );
+            if ( partialF != null ) {
+        	res = res.add ( partialF.compute ( app, pos, goal ) );
+                if ( res instanceof TopRuleAppCost ) {
+                    break;
+                }
 
+            }       
+        }
         return res;
     }
 

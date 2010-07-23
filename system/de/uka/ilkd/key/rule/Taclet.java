@@ -991,11 +991,6 @@ public abstract class Taclet implements Rule, Named {
 	return choices;
     }
 
-    /** returns an iterator over the rule sets. */
-    public Iterator<RuleSet> ruleSets() {
-	return ruleSets.iterator();
-    } 
-
     public ImmutableList<RuleSet> getRuleSets() {
 	return ruleSets;
     }
@@ -1618,7 +1613,7 @@ public abstract class Taclet implements Rule, Named {
     }
 
     StringBuffer toStringRuleSets(StringBuffer sb) {
-	Iterator<RuleSet> itRS=ruleSets();
+	final Iterator<RuleSet> itRS=getRuleSets().iterator();
 	if (itRS.hasNext()) {
 	    sb=sb.append("\\heuristics(");
 	    while (itRS.hasNext()) {

@@ -145,9 +145,7 @@ public class RuleExportModel {
     private void addRuleSets ( TacletModelInfo tinfo ) {
     	final Taclet t = tinfo.getTaclet ();
     	// handle regular rule sets
-        final Iterator<RuleSet> it = t.ruleSets();
-        while ( it.hasNext() ) {
-            final RuleSet rs = it.next ();
+        for (RuleSet rs : t.getRuleSets()) {
             RuleSetModelInfo rsinfo = (RuleSetModelInfo) ruleSet2info.get ( rs );
             if ( rsinfo == null ) {
                 rsinfo = new RuleSetModelInfo(rs);

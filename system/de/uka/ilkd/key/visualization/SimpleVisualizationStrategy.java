@@ -1633,15 +1633,12 @@ public class SimpleVisualizationStrategy implements VisualizationStrategy {
 	    }
         }
     }
-
     
     private boolean tacletWithLabel(Node n, String ruleSet) {
         if (n.getAppliedRuleApp() instanceof TacletApp) {
             final Name ruleSetName = new Name(ruleSet); 
-            final Iterator<RuleSet> rs =  ((TacletApp) n.getAppliedRuleApp()).taclet().ruleSets();
-    
-            while (rs.hasNext()) {
-                if (rs.next().name().equals(ruleSetName)) {
+            for (RuleSet rs : ((TacletApp) n.getAppliedRuleApp()).taclet().getRuleSets()) {
+                if (rs.name().equals(ruleSetName)) {
                     return true;
                 }
             }
