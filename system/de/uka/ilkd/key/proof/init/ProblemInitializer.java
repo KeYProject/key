@@ -367,13 +367,13 @@ public class ProblemInitializer {
      */
     private void populateNamespaces(Proof proof) {
 	NamespaceSet namespaces = proof.getNamespaces();
-        heapSpace = 
-            new LocationVariable((new ProgramElementName(heapSpaceName)),
-                    lastBaseConfig.getServices().getJavaInfo().
-                    getKeYJavaType("int"));
-	namespaces.programVariables().add(heapSpace);
-//	namespaces.programVariables().add(proof.getServices().
-//	        getJavaInfo().getDefaultMemoryArea());
+	if (ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof RTSJProfile) {
+	    heapSpace = 
+		new LocationVariable((new ProgramElementName(heapSpaceName)),
+			lastBaseConfig.getServices().getJavaInfo().
+			getKeYJavaType("int"));        
+	    namespaces.programVariables().add(heapSpace);
+	}
         for (Object o : proof.root().sequent()) {
             ConstrainedFormula cf = (ConstrainedFormula) o;
             populateNamespaces(cf.formula(), namespaces);
@@ -499,7 +499,7 @@ public class ProblemInitializer {
         }
 
         if (ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof RTSJProfile) {
-            if(heapSpace==null){
+            if(heapSpace == null){
         	heapSpace = 
         	    new LocationVariable((new ProgramElementName(heapSpaceName)),
         		    lastBaseConfig.getServices().getJavaInfo().

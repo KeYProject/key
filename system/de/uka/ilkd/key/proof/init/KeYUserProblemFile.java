@@ -191,21 +191,6 @@ public class KeYUserProblemFile extends KeYFile implements ProofOblInput{
                              .equals(file.file().getAbsolutePath());
     }
 
-/*    private IList<Type> getInnerClasses(TypeDeclaration td){
-        IList<Type> result = ImmSLList.<Type>nil();
-        for(int i=0; i<td.getTypeDeclarationCount(); i++){
-            if (td.getTypeDeclarationAt(i) instanceof InterfaceDeclaration
-                    || td.getTypeDeclarationAt(i) instanceof ClassDeclaration) {
-                result = result.append(td.getTypeDeclarationAt(i));
-                result = result.append(getInnerClasses(td.getTypeDeclarationAt(i)));
-            result = result.append(ji.getKeYJavaType("javax.realtime.MemoryStack")
-                    .getJavaType());    
-            result = result.append(ji.getKeYJavaType("javax.realtime.ScopedMemory")
-                    .getJavaType()); 
-            }      
-    }*/
-
-
     public int hashCode() {
         return file.file().getAbsolutePath().hashCode();
     }

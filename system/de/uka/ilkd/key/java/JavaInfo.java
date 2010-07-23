@@ -1064,11 +1064,20 @@ public class JavaInfo {
     
     private void fillCommonTypesCache() {
         if (commonTypesCacheValid) return;
-        final String[] fullNames = {"java.lang.Object", 
-                "java.lang.Cloneable", "java.io.Serializable",
-                "javax.realtime.MemoryArea",
-                "javax.realtime.ScopedMemory",
-                "javax.realtime.ImmortalMemory"};
+        
+        
+        final String[] fullNames;
+        
+        if (ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof RTSJProfile) {
+            fullNames = new String[] {"java.lang.Object", 
+                    "java.lang.Cloneable", "java.io.Serializable",
+                    "javax.realtime.MemoryArea",
+                    "javax.realtime.ScopedMemory",
+                    "javax.realtime.ImmortalMemory"};
+        } else {
+            fullNames = new String[] {"java.lang.Object", 
+                    "java.lang.Cloneable", "java.io.Serializable"};            
+        }
         
         for (int i = 0; i<fullNames.length; i++) {
             commonTypes[i] = getKeYJavaTypeByClassName(fullNames[i]);            
@@ -1111,6 +1120,8 @@ public class JavaInfo {
      * returns the KeYJavaType for class <tt>java.realtime.MemoryArea</tt>
      */
     public KeYJavaType getJavaxRealtimeMemoryArea() {
+	assert ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof RTSJProfile;
+	
         if (commonTypes[3] == null) {
             commonTypes[3] = getKeYJavaTypeByClassName("javax.realtime.MemoryArea");
         }
@@ -1121,6 +1132,7 @@ public class JavaInfo {
      * returns the KeYJavaType for class <tt>java.realtime.ScopedMemory</tt>
      */
     public KeYJavaType getJavaxRealtimeScopedMemory() {
+	assert ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof RTSJProfile;
         if (commonTypes[4] == null) {
             commonTypes[4] = getKeYJavaTypeByClassName("javax.realtime.ScopedMemory");
         }
@@ -1131,6 +1143,7 @@ public class JavaInfo {
      * returns the KeYJavaType for class <tt>java.realtime.ImmortalMemory</tt>
      */
     public KeYJavaType getJavaxRealtimeImmortalMemory() {
+	assert ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof RTSJProfile;
         if (commonTypes[5] == null) {
             commonTypes[5] = getKeYJavaTypeByClassName("javax.realtime.ImmortalMemory");
         }
