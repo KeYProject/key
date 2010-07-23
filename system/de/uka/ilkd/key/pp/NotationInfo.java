@@ -34,9 +34,9 @@ import de.uka.ilkd.key.logic.op.QuanUpdateOperator;
 import de.uka.ilkd.key.logic.op.ShadowArrayOp;
 import de.uka.ilkd.key.logic.op.ShadowAttributeOp;
 import de.uka.ilkd.key.logic.op.SortedSchemaVariable;
-import de.uka.ilkd.key.logic.op.WorkingSpaceRigidOp;
 import de.uka.ilkd.key.util.Service;
 import de.uka.ilkd.key.pp.CharListNotation;
+import de.uka.ilkd.key.rtsj.logic.op.WorkingSpaceRigidOp;
 
 
 /** 

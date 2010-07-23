@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.rule.metaconstruct;
+package de.uka.ilkd.key.rtsj.rule.metaconstruct;
 
 import java.util.HashMap;
 import java.util.Iterator;

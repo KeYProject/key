@@ -22,6 +22,7 @@ import de.uka.ilkd.key.proof.init.proofobligation.DefaultPOProvider;
 import de.uka.ilkd.key.proof.mgt.ComplexRuleJustification;
 import de.uka.ilkd.key.proof.mgt.ComplexRuleJustificationBySpec;
 import de.uka.ilkd.key.proof.mgt.RuleJustification;
+import de.uka.ilkd.key.rtsj.rule.UseWorkingSpaceContractRule;
 import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.strategy.FOLStrategy;
 import de.uka.ilkd.key.strategy.JavaCardDLStrategy;

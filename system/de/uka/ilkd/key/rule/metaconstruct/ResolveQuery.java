@@ -85,14 +85,14 @@ public class ResolveQuery extends AbstractMetaOperator {
 	return new ImmutableArray<QuantifiableVariable>(qva);
     }
 
-    private ProgramVariable createPV(String name, Sort s, Services services) {       
-        return createPV(name, services.getJavaInfo().getKeYJavaType(s), services);
+    private ProgramVariable createPV(String pvName, Sort s, Services services) {       
+        return createPV(pvName, services.getJavaInfo().getKeYJavaType(s), services);
     }
 
-    private ProgramVariable createPV(String name, KeYJavaType kjt, Services services) {
+    private ProgramVariable createPV(String pvName, KeYJavaType kjt, Services services) {
        
         final ProgramElementName pvname 
-            = services.getVariableNamer().getTemporaryNameProposal(name);
+            = services.getVariableNamer().getTemporaryNameProposal(pvName);
         
         return new LocationVariable(pvname, kjt);
     }

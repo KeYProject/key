@@ -1,7 +1,10 @@
-package de.uka.ilkd.key.logic.op;
+package de.uka.ilkd.key.rtsj.logic.op;
 
 import de.uka.ilkd.key.collection.*;
 import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.op.IWorkingSpaceOp;
+import de.uka.ilkd.key.logic.op.NonRigidFunction;
+import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.logic.sort.Sort;
 
 public class WorkingSpaceNonRigidOp extends NonRigidFunction implements IWorkingSpaceOp{

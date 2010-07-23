@@ -1,9 +1,11 @@
-package de.uka.ilkd.key.rule.metaconstruct;
+package de.uka.ilkd.key.rtsj.rule.metaconstruct;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.rtsj.logic.op.WorkingSpaceNonRigidOp;
+import de.uka.ilkd.key.rtsj.logic.op.WorkingSpaceRigidOp;
 import de.uka.ilkd.key.rule.UpdateSimplifier;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.updatesimplifier.Update;

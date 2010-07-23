@@ -39,6 +39,7 @@ header {
     import de.uka.ilkd.key.proof.OpReplacer;
     import de.uka.ilkd.key.proof.init.CreatedAttributeTermFactory;
     import de.uka.ilkd.key.rtsj.proof.init.RTSJProfile;
+    import de.uka.ilkd.key.rtsj.logic.op.*;
     import de.uka.ilkd.key.speclang.FormulaWithAxioms;
     import de.uka.ilkd.key.speclang.PositionedString;
     import de.uka.ilkd.key.speclang.SignatureVariablesFactory;

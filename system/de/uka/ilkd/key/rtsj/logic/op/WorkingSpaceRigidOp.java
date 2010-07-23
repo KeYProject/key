@@ -1,10 +1,13 @@
-package de.uka.ilkd.key.logic.op;
+package de.uka.ilkd.key.rtsj.logic.op;
 
 import java.util.*;
 
 import de.uka.ilkd.key.collection.*;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.op.IWorkingSpaceOp;
+import de.uka.ilkd.key.logic.op.ProgramMethod;
+import de.uka.ilkd.key.logic.op.RigidFunction;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.proof.ProofSaver;

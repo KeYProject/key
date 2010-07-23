@@ -3,6 +3,8 @@ package de.uka.ilkd.key.rule.conditions;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.rtsj.logic.op.WorkingSpaceNonRigidOp;
+import de.uka.ilkd.key.rtsj.logic.op.WorkingSpaceRigidOp;
 import de.uka.ilkd.key.rule.VariableConditionAdapter;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 

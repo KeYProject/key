@@ -1,11 +1,11 @@
-package de.uka.ilkd.key.rule.metaconstruct;
+package de.uka.ilkd.key.rtsj.rule.metaconstruct;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.AbstractMetaOperator;
-import de.uka.ilkd.key.logic.op.WorkingSpaceRigidOp;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.rtsj.logic.op.WorkingSpaceRigidOp;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 public class PreconditionForWS extends AbstractMetaOperator {

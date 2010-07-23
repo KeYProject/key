@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.rule.metaconstruct;
+package de.uka.ilkd.key.rtsj.rule.metaconstruct;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;

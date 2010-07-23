@@ -14,8 +14,8 @@ import de.uka.ilkd.key.collection.*;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IWorkingSpaceOp;
-import de.uka.ilkd.key.logic.op.WorkingSpaceRigidOp;
 import de.uka.ilkd.key.proof.ProofSaver;
+import de.uka.ilkd.key.rtsj.logic.op.WorkingSpaceRigidOp;
 import de.uka.ilkd.key.speclang.OperationContract;
 
 public class WorkingSpaceContractDialog extends JDialog {

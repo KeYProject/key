@@ -21,7 +21,7 @@ import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.ldt.LDT;
 import de.uka.ilkd.key.logic.sort.PrimitiveSort;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.rtsj.rule.metaconstruct.InReachableStateRTSJPOBuilder;
+import de.uka.ilkd.key.rtsj.rule.metaconstruct.*;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.metaconstruct.*;

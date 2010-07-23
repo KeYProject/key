@@ -13,31 +13,17 @@
 package de.uka.ilkd.key.rule.metaconstruct;
 
 import java.util.HashMap;
-import java.util.Stack;
-
-import org.apache.log4j.Logger;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.*;
-import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
-import de.uka.ilkd.key.java.expression.ExpressionStatement;
-import de.uka.ilkd.key.java.expression.literal.BooleanLiteral;
 import de.uka.ilkd.key.java.expression.literal.IntLiteral;
-import de.uka.ilkd.key.java.expression.operator.CopyAssignment;
-import de.uka.ilkd.key.java.expression.operator.SetAssignment;
 import de.uka.ilkd.key.java.recoderext.TestGenerationModelTransformer;
-import de.uka.ilkd.key.java.reference.IExecutionContext;
-import de.uka.ilkd.key.java.reference.MethodName;
 import de.uka.ilkd.key.java.reference.MethodReference;
 import de.uka.ilkd.key.java.reference.TypeRef;
 import de.uka.ilkd.key.java.statement.*;
-import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
 import de.uka.ilkd.key.java.visitor.ProgVarReplaceVisitor;
 import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.op.IProgramVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
-import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.ExtList;
 
 /** @author gladisch;
