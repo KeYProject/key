@@ -63,13 +63,14 @@ class JavaReduxFileCollection implements FileCollection {
      */
     public JavaReduxFileCollection() throws IOException {
 
-	resourceLocation = JAVA_SRC_DIR
-	        + "/"
-	        + ProofSettings.DEFAULT_SETTINGS.getProfile()
-	                .getInternalClassDirectory();
 
-	String resourceString = resourceLocation
-	        + "/"
+	resourceLocation = JAVA_SRC_DIR;
+	
+	if (!ProofSettings.DEFAULT_SETTINGS.getProfile().getInternalClassDirectory().isEmpty()) { 
+	    resourceLocation += "/" + ProofSettings.DEFAULT_SETTINGS.getProfile()
+	                .getInternalClassDirectory();
+	}
+	String resourceString = resourceLocation + "/"	        
 	        + ProofSettings.DEFAULT_SETTINGS.getProfile()
 	                .getInternalClasslistFilename();
 
