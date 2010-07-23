@@ -12,6 +12,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.core.*;
 import org.eclipse.jdt.internal.junit.buildpath.JUnitContainerInitializer;
+import org.eclipse.jdt.junit.JUnitCore;
 import org.eclipse.jdt.launching.JavaRuntime;
 
 import de.uka.ilkd.key.collection.ImmutableList;
@@ -149,7 +150,25 @@ public class VBTBuilder {
             cpe= JavaCore.newSourceEntry(projectPath);
             addToClasspath(javaProject,cpe);
             
-            IPath junitPath = new Path(JUnitContainerInitializer.JUNIT_CONTAINER_ID+"/3");
+            // to keep support for eclipse previous to 3.6
+            IPath junitPath;
+                       
+            try {
+        	if (JUnitCore.class.getField("JUNIT3_CONTAINER_PATH") != null) {
+        	    junitPath=(IPath) JUnitCore.class.getField("JUNIT3_CONTAINER_PATH").get(null);
+        	} else {
+        	    junitPath=(IPath) JUnitContainerInitializer.class.getField("JUNIT3_PATH").get(null);        
+        	}
+            } catch (SecurityException e) {
+        	throw (RuntimeException) new RuntimeException("No test generation possible (missing JUnit package)").initCause(e);
+            } catch (IllegalArgumentException e) {
+        	throw (RuntimeException) new RuntimeException("No test generation possible (missing JUnit package)").initCause(e);
+            } catch (NoSuchFieldException e) {
+        	throw (RuntimeException) new RuntimeException("No test generation possible (missing JUnit package)").initCause(e);
+            } catch (IllegalAccessException e) {
+        	throw (RuntimeException) new RuntimeException("No test generation possible (missing JUnit package)").initCause(e);
+            }
+                        
             ClasspathContainerInitializer initializer = 	
         	JavaCore.getClasspathContainerInitializer(junitPath.segment(0));
             initializer.initialize(junitPath,javaProject);
