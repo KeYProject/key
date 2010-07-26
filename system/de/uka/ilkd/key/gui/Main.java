@@ -1040,7 +1040,7 @@ public class Main extends JFrame implements IMain {
 	    	= POBrowser.showInstance(mediator.getProof().env().getInitConfig());
 	    ProofOblInput po = poBrowser.getAndClearPO();
 	    if(po != null) {
-		ProblemInitializer pi = new ProblemInitializer(this);
+		ProblemInitializer pi = mediator.getProfile().createProblemInitializer(this);
 		try {
 		    pi.startProver(mediator.getProof().env(), po);
 		} catch(ProofInputException e)  {

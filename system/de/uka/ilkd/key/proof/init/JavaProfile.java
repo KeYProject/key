@@ -134,5 +134,5 @@ public class JavaProfile extends AbstractProfile {
 	return POBrowser.class;
     }
 
-
+  
 }

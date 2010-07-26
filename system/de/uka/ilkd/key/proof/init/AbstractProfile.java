@@ -207,5 +207,8 @@ public abstract class AbstractProfile implements Profile {
      public ProofCorrectnessMgt createLocalProofCorrectnessMgt(Proof proof) {
 	 return new DefaultProofCorrectnessMgt(proof);
      }
-
+     
+     public ProblemInitializer createProblemInitializer(IMain main) {
+	 return new ProblemInitializer(main);
+     }
 }

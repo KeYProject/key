@@ -37,7 +37,8 @@ public class NonInterferenceCheck {
     public void run() {
         ProofEnvironment env = proof1.env();
         NonInterferencePO nipo = new NonInterferencePO(env,proof1,proof2);
-        ProblemInitializer pi = new ProblemInitializer(Main.getInstance());
+        ProblemInitializer pi = proof1.getSettings().getProfile().
+        	createProblemInitializer(Main.getInstance());
         try {
             pi.startProver(env, nipo);
         } catch(ProofInputException e) {

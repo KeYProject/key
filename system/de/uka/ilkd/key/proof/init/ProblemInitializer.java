@@ -24,15 +24,16 @@ import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.CompilationUnit;
 import de.uka.ilkd.key.java.Recoder2KeY;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.ConstrainedFormula;
+import de.uka.ilkd.key.logic.Named;
+import de.uka.ilkd.key.logic.NamespaceSet;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.logic.sort.SortDefiningSymbols;
 import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.mgt.*;
-import de.uka.ilkd.key.rtsj.proof.init.RTSJProfile;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.UpdateSimplifier;
@@ -51,9 +52,6 @@ public class ProblemInitializer {
 
     private final ProgressMonitor pm;
 
-    private ProgramVariable heapSpace;
-    public static final String heapSpaceName = "heapSpace";
-
     private final HashSet<EnvInput> alreadyParsed = new LinkedHashSet<EnvInput>();
 
 
@@ -61,6 +59,10 @@ public class ProblemInitializer {
     //constructors
     //-------------------------------------------------------------------------
 
+    /**
+     * do not create an instance via the public constructor use @link {@link Profile#createProblemInitializer(IMain)}
+     * instead 
+     */
     public ProblemInitializer(IMain main) {
         this.main       = main;
         this.pm         = main == null ? null : main.getProgressMonitor();
@@ -71,6 +73,9 @@ public class ProblemInitializer {
     }
 
 
+    /**
+     * ONLY for JUnit tests
+     */
     public ProblemInitializer(Profile profile) {
 	assert profile != null;
 	this.main       = null;
@@ -322,7 +327,7 @@ public class ProblemInitializer {
     }
 
 
-    private void readEnvInput(EnvInput envInput,
+    protected void readEnvInput(EnvInput envInput,
 			      InitConfig initConfig)
     		throws ProofInputException {
 	if(alreadyParsed.add(envInput)){
@@ -367,13 +372,6 @@ public class ProblemInitializer {
      */
     private void populateNamespaces(Proof proof) {
 	NamespaceSet namespaces = proof.getNamespaces();
-	if (ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof RTSJProfile) {
-	    heapSpace = 
-		new LocationVariable((new ProgramElementName(heapSpaceName)),
-			lastBaseConfig.getServices().getJavaInfo().
-			getKeYJavaType("int"));        
-	    namespaces.programVariables().add(heapSpace);
-	}
         for (Object o : proof.root().sequent()) {
             ConstrainedFormula cf = (ConstrainedFormula) o;
             populateNamespaces(cf.formula(), namespaces);
@@ -498,27 +496,8 @@ public class ProblemInitializer {
             }
         }
 
-        if (ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof RTSJProfile) {
-            if(heapSpace == null){
-        	heapSpace = 
-        	    new LocationVariable((new ProgramElementName(heapSpaceName)),
-        		    lastBaseConfig.getServices().getJavaInfo().
-        		    getKeYJavaType("int"));
-            }
-            initConfig.namespaces().programVariables().add(heapSpace);  
-            //        initConfig.namespaces().programVariables().add(initConfig.getServices().
-            //                getJavaInfo().getDefaultMemoryArea());  
-        }
-        
 	//read envInput
 	readEnvInput(envInput, initConfig);
-	
-        if (ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof RTSJProfile) {
-            initConfig.namespaces().programVariables().add(initConfig.getServices().
-        	    getJavaInfo().getDefaultMemoryArea()); 
-            initConfig.namespaces().programVariables().add(initConfig.getServices().
-        	    getJavaInfo().getImmortalMemoryArea());
-        }
 	
         // read in libraries as includes
         readIncludes(envInput, initConfig);

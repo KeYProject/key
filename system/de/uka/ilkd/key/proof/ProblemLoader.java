@@ -221,7 +221,7 @@ public class ProblemLoader implements Runnable {
            try{
                if (!keepProblem) {
         	   EnvInput envInput = createEnvInput(file);
-        	   init = new ProblemInitializer(main); 
+        	   init = profile.createProblemInitializer(main); 
         	   InitConfig initConfig = init.prepare(envInput);
         	   
         	   if(envInput instanceof ProofOblInput

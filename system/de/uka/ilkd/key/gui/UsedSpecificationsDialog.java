@@ -30,10 +30,7 @@ import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.init.InitConfig;
-import de.uka.ilkd.key.proof.init.ProblemInitializer;
-import de.uka.ilkd.key.proof.init.ProofInputException;
-import de.uka.ilkd.key.proof.init.ProofOblInput;
+import de.uka.ilkd.key.proof.init.*;
 import de.uka.ilkd.key.proof.init.proofobligation.DefaultPOProvider;
 import de.uka.ilkd.key.proof.mgt.ContractWithInvs;
 import de.uka.ilkd.key.speclang.OperationContract;
@@ -193,7 +190,8 @@ public class UsedSpecificationsDialog extends JDialog {
     protected void findOrStartProof(InitConfig initConfig, ProofOblInput po) {
 	Proof proof = findPreferablyClosedProof(po);
 	if (proof == null) {
-	    ProblemInitializer pi = new ProblemInitializer(Main.getInstance());
+	    ProblemInitializer pi = getProfile(initConfig.getServices()).
+	    	createProblemInitializer(Main.getInstance());
 	    try {
 		pi.startProver(initConfig, po);
 	    } catch (ProofInputException exc) {
@@ -210,9 +208,7 @@ public class UsedSpecificationsDialog extends JDialog {
 	    Dimension extraLargeButtonDim) {
 	poButtonActions = new ArrayList<POButtonAction>();
 
-	final DefaultPOProvider poProvider = (services.getProof() != null ? services
-	        .getProof().getSettings().getProfile()
-	        : ProofSettings.DEFAULT_SETTINGS.getProfile()).getPOProvider();
+	final DefaultPOProvider poProvider = getProfile(services).getPOProvider();
 
 	final ImmutableList<String> poNames = poProvider
 	        .getRequiredCorrectnessProofObligationsForOperationContracts();
@@ -235,6 +231,12 @@ public class UsedSpecificationsDialog extends JDialog {
 	if (atomicContractApps.size() != 0) {
 	    updatePOButtons();
 	}
+    }
+
+    protected Profile getProfile(Services services) {
+	return (services.getProof() != null ? services
+	        .getProof().getSettings().getProfile()
+	        : ProofSettings.DEFAULT_SETTINGS.getProfile());
     }
 
     protected void updatePOButtons() {

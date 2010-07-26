@@ -6,7 +6,9 @@ import de.uka.ilkd.key.gui.IMain;
 import de.uka.ilkd.key.gui.POBrowser;
 import de.uka.ilkd.key.gui.configuration.ChoiceSettings;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
+import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.proof.init.JavaProfile;
+import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.proof.init.proofobligation.DefaultPOProvider;
 import de.uka.ilkd.key.rtsj.proof.init.proofobligation.RTSJPOProvider;
 import de.uka.ilkd.key.rtsj.rule.UseOperationContractRuleRTSJ;
@@ -14,6 +16,7 @@ import de.uka.ilkd.key.rule.AbstractUseOperationContractRule;
 
 public class RTSJProfile extends JavaProfile {
 
+    public static final Name HEAP_SPACE_NAME = new Name("heapSpace");
 	/**
 	 *  determines whether memory consumption is taken into account in proofs or not
 	 */
@@ -81,4 +84,8 @@ public class RTSJProfile extends JavaProfile {
 	return de.uka.ilkd.key.rtsj.gui.POBrowserRTSJ.class;
     }
 
+    public ProblemInitializer createProblemInitializer(IMain main) {
+	 return new RTSJProblemInitializer(main);
+    }
+    
 }

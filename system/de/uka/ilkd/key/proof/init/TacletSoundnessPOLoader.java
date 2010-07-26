@@ -83,7 +83,8 @@ public class TacletSoundnessPOLoader implements Runnable {
         try {
 	    ProofEnvironment env = mediator.getSelectedProof().env();
             prob.setInitConfig(env.getInitConfig());
-	    ProblemInitializer pi = new ProblemInitializer(Main.getInstance());
+	    ProblemInitializer pi = 
+		mediator.getProfile().createProblemInitializer(Main.getInstance());
 	    pi.startProver(env, prob);
         } catch ( Throwable e ) {
 	    mediator.getExceptionHandler().reportException(e);

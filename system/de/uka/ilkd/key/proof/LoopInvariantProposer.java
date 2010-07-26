@@ -209,24 +209,24 @@ public class LoopInvariantProposer implements InstantiationProposer {
                             "consumed", "javax.realtime.MemoryArea"));
                     LocationDescriptor cons = new BasicLocationDescriptor(mCons);
                     LocationDescriptor heap = new BasicLocationDescriptor(
-                            TermBuilder.DF.var((ProgramVariable)
-                            services.getNamespaces().programVariables().
-                            lookup(new Name(ProblemInitializer.heapSpaceName))));
+                            TermBuilder.DF.func((Function)
+                            services.getNamespaces().functions().
+                            lookup(RTSJProfile.HEAP_SPACE_NAME)));
                     locs = new LocationDescriptorSet(locs.asSet().add(heap).add(cons));
                 }
                 inst = locs;
-            } else if(varName.equals("ws")){ 
-                inst = inv.getParametrizedWorkingSpaceTerms(selfTerm, atPreFunctions, services);
             } else if(varName.equals("variant")) {
                 assert var.isTermSV();
                 inst = inv.getVariant(selfTerm, atPreFunctions, services);
-	    } else if(varName.equals("wsOneIt")
+	    } else if(varName.equals("ws")){ 
+                inst = inv.getParametrizedWorkingSpaceTerms(selfTerm, atPreFunctions, services);
+            } else if(varName.equals("wsOneIt")
                     && inv.getWorkingSpace(selfTerm, atPreFunctions, services) != null) {
                 inst = inv.getWorkingSpace(selfTerm, atPreFunctions, services);
-            } else if(varName.equals("heapSpace")){
-                inst = TermBuilder.DF.var((ProgramVariable)
-                        services.getNamespaces().programVariables().
-                        lookup(new Name(ProblemInitializer.heapSpaceName)));
+            } else if (varName.equals("heapSpace")){
+                inst = TermBuilder.DF.func((Function)
+                        services.getNamespaces().functions().
+                        lookup(RTSJProfile.HEAP_SPACE_NAME));
             }
         }
         

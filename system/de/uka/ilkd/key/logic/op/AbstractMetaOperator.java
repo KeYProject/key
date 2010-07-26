@@ -55,9 +55,7 @@ public abstract class AbstractMetaOperator extends Op implements MetaOperator {
     public static final AbstractMetaOperator META_ARRAY_SIZE = new ArraySize();
     
     public static final AbstractMetaOperator META_OBJECT_SIZE = new ObjectSize();
-    
-    public static final AbstractMetaOperator META_HEAP_SPACE = new HeapSpace();
-    
+        
     public static final AbstractMetaOperator META_NEXT_TO_CREATE_STACK = new MetaNextToCreateStack();
         
     public static final AbstractMetaOperator META_CONSUMED_AT_PRE = new ConsumedAtPre();
