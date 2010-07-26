@@ -17,6 +17,7 @@ public class RTSJProblemInitializer extends ProblemInitializer {
     protected void readEnvInput(EnvInput envInput,
 	      InitConfig initConfig)
 	throws ProofInputException {
+	super.readEnvInput(envInput, initConfig);
 	Namespace progVars = initConfig.namespaces().programVariables();
 	ProgramVariable defMem = initConfig.getServices().getJavaInfo().getDefaultMemoryArea();
 	ProgramVariable immortalMem = initConfig.getServices().getJavaInfo().getImmortalMemoryArea();            
@@ -26,7 +27,6 @@ public class RTSJProblemInitializer extends ProblemInitializer {
 	if (progVars.lookup(immortalMem.name()) == null) {
 	    progVars.add(immortalMem);
 	}
-	super.readEnvInput(envInput, initConfig);
     }
 
 }
