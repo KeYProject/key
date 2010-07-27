@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.rule.conditions;
+package de.uka.ilkd.key.rtsj.rule.conditions;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;

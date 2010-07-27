@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.rule.conditions;
+package de.uka.ilkd.key.rtsj.rule.conditions;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.reference.FieldReference;
@@ -9,7 +9,7 @@ import de.uka.ilkd.key.rtsj.java.RTSJInfo;
 import de.uka.ilkd.key.rule.VariableConditionAdapter;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
-public class ScopeStackCondition extends VariableConditionAdapter {
+public class ParentScopeCondition extends VariableConditionAdapter {
 
     private SchemaVariable var;
     private boolean neg;
@@ -17,7 +17,7 @@ public class ScopeStackCondition extends VariableConditionAdapter {
     /**
      * @param var the SchemaVariable to be checked
      */
-    public ScopeStackCondition(SchemaVariable var, boolean neg) {
+    public ParentScopeCondition(SchemaVariable var, boolean neg) {
         this.var = var; 
         this.neg = neg;
     }
@@ -35,9 +35,9 @@ public class ScopeStackCondition extends VariableConditionAdapter {
         }else{
             return true;
         }
-        boolean result = (pv.name().toString().indexOf(("stack"))!=-1);
-        if(pv.getContainerType()!=null && result){
-            result = pv.getContainerType().getSort().extendsTrans(
+        boolean result = (pv.name().toString().indexOf(("parent"))!=-1);
+        if(pv.getContainerType()!=null){
+            result &= pv.getContainerType().getSort().extendsTrans(
                     ((RTSJInfo) services.getJavaInfo()).getJavaxRealtimeMemoryArea().getSort());
         }else{
             return true;
@@ -46,9 +46,7 @@ public class ScopeStackCondition extends VariableConditionAdapter {
     }
     
     public String toString () {
-        return (neg ? "\\not " : "") + "\\stack(" + var + ")";
+        return (neg ? "\\not " : "") + "\\parentScope(" + var + ")";
     }
     
 }
-
-
