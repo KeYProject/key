@@ -12,6 +12,7 @@ package de.uka.ilkd.key.java;
 
 import java.util.HashMap;
 
+import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.recoderext.KeYCrossReferenceServiceConfiguration;
 import de.uka.ilkd.key.java.recoderext.SchemaCrossReferenceServiceConfiguration;
 import de.uka.ilkd.key.logic.InnerVariableNamer;
@@ -23,6 +24,8 @@ import de.uka.ilkd.key.proof.NameRecorder;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
+import de.uka.ilkd.key.rtsj.java.RTSJInfo;
+import de.uka.ilkd.key.rtsj.proof.init.RTSJProfile;
 import de.uka.ilkd.key.speclang.ocl.UMLInfo;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.KeYExceptionHandler;
@@ -105,12 +108,12 @@ public class Services{
 	}else{
 	    this.exceptionHandler = exceptionHandler;
 	}
-        javainfo = new JavaInfo
-        (new KeYProgModelInfo(typeconverter, this.exceptionHandler), this);
-
+	javainfo = 
+	    createProgramInfo(new KeYProgModelInfo(typeconverter, this.exceptionHandler));	    
         nameRecorder = new NameRecorder();
     }
 
+    // ONLY for tests
     public Services(){
 	this((KeYExceptionHandler) null);
     }
@@ -120,23 +123,22 @@ public class Services{
 	cee = new ConstantExpressionEvaluator(this);
 	typeconverter = new TypeConverter(this);
 	//	exceptionHandler = new KeYRecoderExcHandler();
-	javainfo = new JavaInfo
-	    (new KeYProgModelInfo(crsc, rec2key, typeconverter), this);
+	javainfo = 
+	    createProgramInfo(new KeYProgModelInfo(crsc, rec2key, typeconverter));
         nameRecorder = new NameRecorder();
     }
 
-
-     /** THIS CONSTRUCTOR IS ONLY FOR TESTS!
-      * creates a Services object that contains the given JavaInfo object, a
-      * type converter is created
-      * @param ji the JavaInfo to use
-      */
-     public Services(JavaInfo ji){
-         javainfo = ji;
-         typeconverter = new TypeConverter(this);	 
-	 exceptionHandler = new KeYRecoderExcHandler();
-     }
-
+    
+    // HACK: CREATE RTSJServices, make Services creation profile dependent and
+    // remove that ugly static check
+    protected JavaInfo createProgramInfo(KeYProgModelInfo kpm) {
+	if (ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof RTSJProfile) {
+	    return new RTSJInfo(kpm, this);
+	} else {
+	    return new JavaInfo(kpm, this);
+	}
+    }
+    
     public KeYExceptionHandler getExceptionHandler(){
 	return exceptionHandler;
     }

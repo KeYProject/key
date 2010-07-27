@@ -22,6 +22,7 @@ import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.ArraySort;
 import de.uka.ilkd.key.logic.sort.ObjectSort;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.rtsj.java.RTSJInfo;
 import de.uka.ilkd.key.rtsj.proof.init.RTSJProfile;
 import de.uka.ilkd.key.rule.metaconstruct.AbstractInReachableStatePOBuilder;
 import de.uka.ilkd.key.rule.updatesimplifier.AssignmentPair;
@@ -40,15 +41,17 @@ public class InReachableStateRTSJPOBuilder extends
     private final ProgramVariable ma;
     private final ProgramVariable stack;
     private final ProgramVariable parent;
-
+    private final RTSJInfo rtsjInfo;
+    
     public InReachableStateRTSJPOBuilder(Services services) {
 	super(services);
 
 	assert ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof RTSJProfile;
-	this.stack = services.getJavaInfo().getAttribute("stack",
-		services.getJavaInfo().getJavaxRealtimeMemoryArea());
+	rtsjInfo = (RTSJInfo) services.getJavaInfo();
+	this.stack = rtsjInfo.getAttribute("stack",
+		rtsjInfo.getJavaxRealtimeMemoryArea());
 	this.parent = services.getJavaInfo().getAttribute("parent",
-		services.getJavaInfo().getJavaxRealtimeMemoryArea());
+		rtsjInfo.getJavaxRealtimeMemoryArea());
 	this.ma = services.getJavaInfo().getAttribute(
 		ImplicitFieldAdder.IMPLICIT_MEMORY_AREA,
 		services.getJavaInfo().getJavaLangObject());
@@ -102,8 +105,7 @@ public class InReachableStateRTSJPOBuilder extends
 
 	result = and(result, newObjectRefsLegal(update, containerType));
 
-	if (containerType.extendsTrans(services.getJavaInfo()
-		.getJavaxRealtimeMemoryArea().getSort())
+	if (containerType.extendsTrans(rtsjInfo.getJavaxRealtimeMemoryArea().getSort())
 		&& !ax[0]) {
 	    scopeAllocInOuterScope(update);
 	    ax[0] = true;
@@ -138,8 +140,8 @@ public class InReachableStateRTSJPOBuilder extends
      *         in one of its inner scopes
      */
     private Term scopeAllocInOuterScope(Update update) {
-	final LogicVariable m = new LogicVariable(new Name("m"), services
-	        .getJavaInfo().getJavaxRealtimeMemoryArea().getSort());
+	final LogicVariable m = new LogicVariable(new Name("m"), 
+		rtsjInfo.getJavaxRealtimeMemoryArea().getSort());
 	final Term m_created = equals(dot(var(m), created), TRUE);
 	return update(
 	        update,
@@ -152,8 +154,7 @@ public class InReachableStateRTSJPOBuilder extends
 	                                        .getJavaInfo()
 	                                        .getAttribute(
 	                                                "instance",
-	                                                services.getJavaInfo()
-	                                                        .getJavaxRealtimeImmortalMemory()))))));
+	                                                rtsjInfo.getJavaxRealtimeImmortalMemory()))))));
     }
 
     /**
@@ -163,10 +164,10 @@ public class InReachableStateRTSJPOBuilder extends
      *         at most one created scope.
      */
     private Term stackInjective(Update update) {
-	final LogicVariable a = new LogicVariable(new Name("a"), services
-	        .getJavaInfo().getJavaxRealtimeMemoryArea().getSort());
-	final LogicVariable b = new LogicVariable(new Name("b"), services
-	        .getJavaInfo().getJavaxRealtimeMemoryArea().getSort());
+	final LogicVariable a = new LogicVariable(new Name("a"),
+		rtsjInfo.getJavaxRealtimeMemoryArea().getSort());
+	final LogicVariable b = new LogicVariable(new Name("b"), 
+		rtsjInfo.getJavaxRealtimeMemoryArea().getSort());
 	final Term a_created = equals(dot(var(a), created), TRUE);
 	final Term b_created = equals(dot(var(b), created), TRUE);
 	final Term a_stackNotNull = not(equals(dot(var(a), stack),

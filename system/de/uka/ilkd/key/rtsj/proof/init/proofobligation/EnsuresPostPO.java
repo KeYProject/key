@@ -17,6 +17,7 @@ import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.init.*;
 import de.uka.ilkd.key.proof.init.proofobligation.AbstractEnsuresPostPO;
+import de.uka.ilkd.key.rtsj.java.RTSJInfo;
 import de.uka.ilkd.key.rtsj.proof.init.RTSJProfile;
 import de.uka.ilkd.key.speclang.ClassInvariant;
 import de.uka.ilkd.key.speclang.OperationContract;
@@ -47,8 +48,8 @@ public class EnsuresPostPO extends AbstractEnsuresPostPO {
 
 	final ProgramVariable stack = services.getJavaInfo().getAttribute(
 	        "stack", "javax.realtime.MemoryArea");
-	ProgramVariable initialMemoryArea = services.getJavaInfo()
-	        .getDefaultMemoryArea();
+	ProgramVariable initialMemoryArea = 
+	    ((RTSJInfo) services.getJavaInfo()).getDefaultMemoryArea();
 	Term t_mem = TB.var(initialMemoryArea);
 	result = TB.and(result,
 	        TB.not(TB.equals(TB.dot(t_mem, stack), TB.NULL(services))));

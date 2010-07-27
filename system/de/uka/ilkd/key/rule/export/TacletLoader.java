@@ -14,6 +14,7 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.NamespaceSet;
@@ -39,7 +40,7 @@ public class TacletLoader {
     private HashMap<String, ImmutableSet<Taclet>> file2taclets;
     
     public TacletLoader() {
-        initConfig = new InitConfig();
+        initConfig = new InitConfig(new Services(), null);
         alreadyParsed = new HashSet<String>();
         
         file2taclets = new HashMap<String, ImmutableSet<Taclet>>();
@@ -90,7 +91,7 @@ public class TacletLoader {
         Iterator it = in.getLDTIncludes().iterator();
         int i = 0;
         if(initConfig == null){
-            initConfig = new InitConfig();
+            initConfig = new InitConfig(new Services(), null);
         }
         while(it.hasNext()){
             final String name = (String) it.next();

@@ -98,12 +98,6 @@ public class InitConfig {
             getChoiceSettings().getDefaultChoices();
     }
 
-
-    public InitConfig() {
-        this(new Services(), null);
-    }
-
-
     //-------------------------------------------------------------------------
     //internal methods
     //-------------------------------------------------------------------------

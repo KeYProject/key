@@ -29,6 +29,7 @@ import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.NullSort;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.rtsj.java.RTSJInfo;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 public class ResolveQuery extends AbstractMetaOperator {
@@ -137,7 +138,7 @@ public class ResolveQuery extends AbstractMetaOperator {
             
             final ExecutionContext ec; 
             if (pm.getContainerType() != null) {
-        	final ReferencePrefix mem = services.getJavaInfo().getDefaultMemoryArea();        	
+        	final ReferencePrefix mem = ((RTSJInfo) services.getJavaInfo()).getDefaultMemoryArea();        	
                 ec = new ExecutionContext(new TypeRef(pm.getContainerType()), 
                         mem == null ? null : new MemoryAreaEC(mem), null);
             } else {

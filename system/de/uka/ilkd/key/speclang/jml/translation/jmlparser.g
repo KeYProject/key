@@ -658,13 +658,15 @@ options {
 		= new BasicLocationDescriptor(guardFma, transientTerm);
 	result = result.add(transientLd);
 	
-	if((ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof RTSJProfile) && 
+	if ((ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof RTSJProfile) && 
                 		((RTSJProfile) ProofSettings.DEFAULT_SETTINGS.getProfile()).memoryConsumption()){
 		//initialMemoryArea.consumed
-		LocationVariable dma = javaInfo.getDefaultMemoryArea();
+		de.uka.ilkd.key.rtsj.java.RTSJInfo rtsjInfo =
+		    (de.uka.ilkd.key.rtsj.java.RTSJInfo) javaInfo;  
+		LocationVariable dma = rtsjInfo.getDefaultMemoryArea();
     
     		ProgramVariable consumed
-		= javaInfo.getAttribute("consumed", "javax.realtime.MemoryArea");
+		= rtsjInfo.getAttribute("consumed", "javax.realtime.MemoryArea");
 		
 		Term cons = tb.dot(tb.var(dma), consumed);
 		BasicLocationDescriptor cld
@@ -1895,9 +1897,15 @@ jmlprimary returns [JMLExpression result=null] throws SLTranslationException
 	} 
     |   CURRENT_MEMORY_AREA
     	{
-    		ProgramVariable v = javaInfo.getDefaultMemoryArea();
+    	    if (ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof RTSJProfile) {    	     
+    	        de.uka.ilkd.key.rtsj.java.RTSJInfo rtsjInfo =
+		    (de.uka.ilkd.key.rtsj.java.RTSJInfo) javaInfo;      	        
+    		ProgramVariable v = rtsjInfo.getDefaultMemoryArea();
     		t = tb.var(v);
     		result = new JMLExpression(t);
+	     } else {
+	     	raiseError("\\currentMemoryArea not support in standard Java profile, use RTSJ profile instead.");
+	     }
     	}
     |   SPACE // \\space(t): the space an object of exact type t consumes
     	LPAREN (

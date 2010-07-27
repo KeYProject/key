@@ -25,6 +25,7 @@ import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.proof.AtPreFactory;
 import de.uka.ilkd.key.proof.OpReplacer;
+import de.uka.ilkd.key.rtsj.java.RTSJInfo;
 
 
 /**
@@ -127,8 +128,8 @@ public class LoopInvariantImpl implements LoopInvariant {
         
         //memory area
         if(memoryArea != null) {
-            assert memoryArea.sort().extendsTrans(services.getJavaInfo().getDefaultMemoryArea().sort());
-            result.put(tb.var(services.getJavaInfo().getDefaultMemoryArea()), memoryArea);
+            assert memoryArea.sort().extendsTrans(((RTSJInfo) services.getJavaInfo()).getDefaultMemoryArea().sort());
+            result.put(tb.var(((RTSJInfo) services.getJavaInfo()).getDefaultMemoryArea()), memoryArea);
         }
         
         //-parameters and other local variables are always kept up to

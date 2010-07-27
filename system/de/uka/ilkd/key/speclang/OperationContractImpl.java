@@ -10,9 +10,13 @@
 
 package de.uka.ilkd.key.speclang;
 
-import java.util.*;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
-import de.uka.ilkd.key.collection.*;
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
@@ -20,6 +24,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.AtPreFactory;
 import de.uka.ilkd.key.proof.OpReplacer;
+import de.uka.ilkd.key.rtsj.java.RTSJInfo;
 
 
 /**
@@ -160,8 +165,8 @@ public final class OperationContractImpl implements OperationContract {
         
         //memory area
         if(memoryArea != null) {
-            assert memoryArea.sort().extendsTrans(services.getJavaInfo().getDefaultMemoryArea().sort());
-            result.put(tb.var(services.getJavaInfo().getDefaultMemoryArea()), memoryArea);
+            assert memoryArea.sort().extendsTrans(((RTSJInfo) services.getJavaInfo()).getDefaultMemoryArea().sort());
+            result.put(tb.var(((RTSJInfo) services.getJavaInfo()).getDefaultMemoryArea()), memoryArea);
         }
     
         //parameters

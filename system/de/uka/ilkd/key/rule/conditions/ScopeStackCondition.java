@@ -2,7 +2,10 @@ package de.uka.ilkd.key.rule.conditions;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.reference.FieldReference;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.SVSubstitute;
+import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.rtsj.java.RTSJInfo;
 import de.uka.ilkd.key.rule.VariableConditionAdapter;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
@@ -35,7 +38,7 @@ public class ScopeStackCondition extends VariableConditionAdapter {
         boolean result = (pv.name().toString().indexOf(("stack"))!=-1);
         if(pv.getContainerType()!=null && result){
             result = pv.getContainerType().getSort().extendsTrans(
-                    services.getJavaInfo().getJavaxRealtimeMemoryArea().getSort());
+                    ((RTSJInfo) services.getJavaInfo()).getJavaxRealtimeMemoryArea().getSort());
         }else{
             return true;
         }

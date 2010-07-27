@@ -7,6 +7,7 @@ import de.uka.ilkd.key.proof.init.EnvInput;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.proof.init.ProofInputException;
+import de.uka.ilkd.key.rtsj.java.RTSJInfo;
 
 public class RTSJProblemInitializer extends ProblemInitializer {
 
@@ -19,8 +20,8 @@ public class RTSJProblemInitializer extends ProblemInitializer {
 	throws ProofInputException {
 	super.readEnvInput(envInput, initConfig);
 	Namespace progVars = initConfig.namespaces().programVariables();
-	ProgramVariable defMem = initConfig.getServices().getJavaInfo().getDefaultMemoryArea();
-	ProgramVariable immortalMem = initConfig.getServices().getJavaInfo().getImmortalMemoryArea();            
+	ProgramVariable defMem = ((RTSJInfo) initConfig.getServices().getJavaInfo()).getDefaultMemoryArea();
+	ProgramVariable immortalMem = ((RTSJInfo) initConfig.getServices().getJavaInfo()).getImmortalMemoryArea();            
 	if (progVars.lookup(defMem.name()) == null) {
 	    progVars.add(defMem);
 	}
