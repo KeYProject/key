@@ -39,13 +39,11 @@ public class RTSJInfo extends JavaInfo {
     protected void fillCommonTypesCache() {
 	if (commonTypesCacheValid) return;
 
-
-	final String[] fullNames;              
-
-	fullNames = new String[] {"java.lang.Object", 
-		"java.lang.Cloneable", "java.io.Serializable"};            
-
-
+	final String[] fullNames = new String[] { "java.lang.Object",
+	        "java.lang.Cloneable", "java.io.Serializable",
+	        "javax.realtime.MemoryArea", "javax.realtime.ScopedMemory",
+	        "javax.realtime.ImmortalMemory" };
+	
 	for (int i = 0; i<fullNames.length; i++) {
 	    commonTypes[i] = getKeYJavaTypeByClassName(fullNames[i]);            
 	}
