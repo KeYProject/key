@@ -37,15 +37,16 @@ public class LibrariesSettings implements Settings {
     *  in the libaries settings*/
    private boolean emptyProperties=true;
    
-   private static String[] standardLibs= {"stringRules.key", "deprecatedRules.key", "acc.key"};
+   private static String[][] standardLibs= { {"stringContracts.key", "on"}, {"deprecatedRules.key", "off"}, {"acc.key", "off"}};
    
    public LibrariesSettings() {
        /*adds the standard libraries to libToSel, maybe they will be
          replaced by readSettings  */
-       for (String standardLib : standardLibs) {
+       for (String[] standardLib : standardLibs) {
            KeYResourceManager.getManager().copyIfNotExists(Proof.class,
-                   "rules/libraries/" + standardLib, LIBRARIES_PATH + standardLib);
-           libToSel.put(LIBRARIES_PATH + standardLib, Boolean.FALSE);
+                   "rules/libraries/" + standardLib[0], LIBRARIES_PATH + standardLib[0]);
+           libToSel.put(LIBRARIES_PATH + standardLib[0], 
+        	   	"on".equals(standardLib[1]) ? Boolean.TRUE : Boolean.FALSE);
        }     
    }
    
