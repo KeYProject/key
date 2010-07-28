@@ -563,7 +563,6 @@ public final class JMLTransformer extends RecoderModelTransformer {
              tdc.walk(unit);
              HashSet<TypeDeclaration> typeDeclarations = tdc.result();               
              for(TypeDeclaration td : typeDeclarations) { 
-                 System.out.println("Focus on:" + td.getFullName());
                  //collect pre-existing operations
                  List<? extends Constructor> constructorList 
                      = td.getConstructors();
