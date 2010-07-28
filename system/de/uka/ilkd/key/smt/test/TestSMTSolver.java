@@ -219,9 +219,6 @@ public abstract class TestSMTSolver extends TestCommons {
      */
     private SMTSolverResult checkFile(String filepath) throws IOException {
 	ProofAggregate p;
-        
-  
-  
        
         if(!proofs.containsKey(filepath)){
             File file =  new File(filepath);

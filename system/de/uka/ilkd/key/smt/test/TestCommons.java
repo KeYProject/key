@@ -15,6 +15,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 
 import junit.framework.TestCase;
+import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.init.InitConfig;
@@ -46,7 +47,7 @@ class TestCommons extends TestCase {
     static protected Profile profile = init();
     
     static Profile init(){
-	Profile p = new JavaProfile();
+	Profile p = new JavaProfile();	
 	return p;
     }
     

@@ -37,7 +37,10 @@ public class LibrariesSettings implements Settings {
     *  in the libaries settings*/
    private boolean emptyProperties=true;
    
-   private static String[][] standardLibs= { {"stringContracts.key", "on"}, {"deprecatedRules.key", "off"}, {"acc.key", "off"}};
+   private static String[][] standardLibs= { 
+       {"stringContracts.key", "on"}, 
+       {"deprecatedRules.key", "off"}, 
+       {"acc.key", "off"}};
    
    public LibrariesSettings() {
        /*adds the standard libraries to libToSel, maybe they will be
@@ -64,9 +67,10 @@ public class LibrariesSettings implements Settings {
             while (st.hasMoreTokens()) {
                 String token = st.nextToken().trim();
                 int sepIndex = token.lastIndexOf("-"); 
-                if ((sepIndex > 0) && (sepIndex < token.length()-1))
+                if ((sepIndex > 0) && (sepIndex < token.length()-1)) {
                     libToSel.put(token.substring(0,sepIndex).trim(),
                             Boolean.valueOf(token.substring(sepIndex + 1).trim()));
+                }
             }
         } else emptyProperties=true;
     }

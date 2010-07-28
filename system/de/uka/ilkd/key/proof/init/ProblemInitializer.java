@@ -491,8 +491,10 @@ public class ProblemInitializer {
         for(Entry<String, Boolean> entry : libraries.entrySet()) {
             final String fileName = entry.getKey();
             final Boolean  sel    = entry.getValue();
-            if (sel != null && sel.booleanValue()) {
-                in.put(fileName, RuleSource.initRuleFile(new File(fileName)));
+            if (!(profile instanceof JUnitTestProfile)) { // not testing KeY
+        	if (sel != null && sel.booleanValue()) {
+        	    in.put(fileName, RuleSource.initRuleFile(new File(fileName)));
+        	}
             }
         }
 
