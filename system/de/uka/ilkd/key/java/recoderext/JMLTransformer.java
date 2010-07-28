@@ -11,6 +11,7 @@
 package de.uka.ilkd.key.java.recoderext;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 
@@ -23,6 +24,7 @@ import recoder.java.SourceElement.Position;
 import recoder.java.declaration.*;
 import recoder.java.expression.operator.CopyAssignment;
 import recoder.java.statement.EmptyStatement;
+import recoder.kit.ProblemReport;
 import recoder.list.generic.ASTArrayList;
 import recoder.list.generic.ASTList;
 import de.uka.ilkd.key.collection.ImmutableList;
@@ -46,6 +48,10 @@ public class JMLTransformer extends RecoderModelTransformer {
                                                          "static"});    
     
     private static ImmutableSet<PositionedString> warnings;
+
+    private HashMap<TypeDeclaration, List<Method>> typeDeclaration2Methods;
+
+    private HashMap<TypeDeclaration, List<? extends Constructor>> typeDeclaration2Constructores;
     
 
     /**
@@ -65,6 +71,8 @@ public class JMLTransformer extends RecoderModelTransformer {
                           TransformerCache cache) {
         super(services, cache);
         warnings = DefaultImmutableSet.<PositionedString>nil();
+        typeDeclaration2Constructores = new HashMap<TypeDeclaration, List<? extends Constructor>>();
+        typeDeclaration2Methods = new HashMap<TypeDeclaration, List<Method>>();
     }
 
    
@@ -217,7 +225,7 @@ public class JMLTransformer extends RecoderModelTransformer {
         //prepend Java modifiers
         PositionedString declWithMods = prependJavaMods(decl.getMods(), 
                                                         decl.getDecl());
-        
+                
         //only handle ghost fields
         //(model fields are handled later in JMLSpecExtractor)
         if(!decl.getMods().contains("ghost")) {
@@ -244,6 +252,16 @@ public class JMLTransformer extends RecoderModelTransformer {
                 ghostDecl 
                     = services.getProgramFactory()
                               .parseFieldDeclaration(declWithMods.text);
+
+                if(decl.getMods().contains("instance")) {
+                    ghostDecl = new FieldDeclaration((FieldDeclaration)ghostDecl) {
+                	@Override
+                	public boolean isStatic() {
+                	    return false;
+                	}
+                    };
+                }       
+                
                 updatePositionInformation(ghostDecl, declWithMods.pos);
                 
                 //set comments: the original list of comments with the declaration, 
@@ -510,6 +528,40 @@ public class JMLTransformer extends RecoderModelTransformer {
     }
     
     
+    public ProblemReport analyze() {
+	 for(int i = 0, m = getUnits().size(); i < m; i++) {
+             CompilationUnit unit = getUnits().get(i);
+             
+             //copy comments of compilation unit to primary type declaration
+             if(unit.getComments() != null 
+                     && unit.getTypeDeclarationCount() > 0) {
+                 TypeDeclaration td = unit.getPrimaryTypeDeclaration();
+                 ASTList<Comment> tdComments = new ASTArrayList<Comment>(); 
+                 tdComments.addAll(unit.getComments().deepClone());
+                 td.setComments(tdComments);
+             }
+             
+             //iterate over all type declarations of the compilation unit
+             TypeDeclarationCollector tdc = new TypeDeclarationCollector();
+             tdc.walk(unit);
+             HashSet<TypeDeclaration> typeDeclarations = tdc.result();               
+             for(TypeDeclaration td : typeDeclarations) { 
+                 System.out.println("Focus on:" + td.getFullName());
+                 //collect pre-existing operations
+                 List<? extends Constructor> constructorList 
+                     = td.getConstructors();
+                 List<Method> methodList = td.getMethods();
+                 
+                 typeDeclaration2Constructores.put(td, constructorList);
+                 typeDeclaration2Methods.put(td, methodList);
+                 
+             }
+	 }
+	 
+	 setProblemReport(NO_PROBLEM);
+	 return NO_PROBLEM;	
+    }
+    
     public void makeExplicit() {
         //abort if JML is disabled
         if(!ProofSettings.DEFAULT_SETTINGS.getGeneralSettings().useJML()) {
@@ -534,11 +586,12 @@ public class JMLTransformer extends RecoderModelTransformer {
                 TypeDeclarationCollector tdc = new TypeDeclarationCollector();
                 tdc.walk(unit);
                 HashSet<TypeDeclaration> typeDeclarations = tdc.result();               
-                for(TypeDeclaration td : typeDeclarations) {                    
+                for(TypeDeclaration td : typeDeclarations) { 
                     //collect pre-existing operations
                     List<? extends Constructor> constructorList 
-                        = td.getConstructors();
-                    List<Method> methodList = td.getMethods();
+                        = typeDeclaration2Constructores.get(td);
+                    List<Method> methodList = 
+                	typeDeclaration2Methods.get(td);
                     
                     // fix mu: units carry an artificial file name.
                     // use getOriginalDataLocation instead
