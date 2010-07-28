@@ -586,41 +586,41 @@ public class Goal  {
 	while (leavesIt.hasNext()) {
 	    Node n = leavesIt.next();
 
-        for (final Goal g : goalList) {
-            if (g.node() == n && g != this) {
-                goalList = goalList.removeFirst(g);
-            }
-        }
+	    for (final Goal g : goalList) {
+		if (g.node() == n && g != this) {
+		    goalList = goalList.removeFirst(g);
+		}
+	    }
 	}
 
-	//	ruleAppIndex.tacletIndex().setTaclets(parent.getNoPosTacletApps());
+	// ruleAppIndex.tacletIndex().setTaclets(parent.getNoPosTacletApps());
 
-        removeTaclets();
+	removeTaclets();
 	setGlobalProgVars(parent.getGlobalProgVars());
 
-	parent.cutChildrenSinks ();
-	if (node.proof().env()!=null) { // do not break everything
-	                                // because of ProofMgt
+	parent.cutChildrenSinks();
+	if (node.proof().env() != null) { // do not break everything
+		                          // because of ProofMgt
 	    node.proof().mgt().ruleUnApplied(parent.getAppliedRuleApp());
 	}
 
-	Iterator<Node> siblings=parent.childrenIterator();
-	Node[] sibls=new Node[parent.childrenCount()];
-	int i=0;
+	Iterator<Node> siblings = parent.childrenIterator();
+	Node[] sibls = new Node[parent.childrenCount()];
+	int i = 0;
 	while (siblings.hasNext()) {
-	    sibls[i]=siblings.next(); 
+	    sibls[i] = siblings.next();
 	    i++;
 	}
 
-	for (i=0; i<sibls.length; i++) {
+	for (i = 0; i < sibls.length; i++) {
 	    sibls[i].remove();
 	}
 
 	setNode(parent);
-	removeAppliedRuleApp ();
-        
-        updateRuleAppIndex();
-        
+	removeAppliedRuleApp();
+
+	updateRuleAppIndex();
+
 	return goalList;
     }
 

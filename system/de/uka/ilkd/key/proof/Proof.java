@@ -24,9 +24,7 @@ import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
-import de.uka.ilkd.key.proof.init.proofobligation.SpecExtPO;
 import de.uka.ilkd.key.proof.mgt.BasicTask;
-import de.uka.ilkd.key.proof.mgt.DefaultProofCorrectnessMgt;
 import de.uka.ilkd.key.proof.mgt.ProofCorrectnessMgt;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.rule.UpdateSimplifier;
@@ -912,7 +910,7 @@ public class Proof implements Named {
     }
     /**This method is meant to be invoked by {@code Node.setSMTandFPData()}
      * Be aware that this method fires events to listeners and may therefore have other side-effects.
-     * @see {@code nodeToSMTandFPData}
+     * @see Proof#nodeToSMTandFPData
      * @author gladisch */
     public  void addSMTandFPData(Node n, Object data){
 	synchronized(nodeToSMTandFPDataLock()){

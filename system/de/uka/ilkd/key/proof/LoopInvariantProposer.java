@@ -11,7 +11,6 @@
 package de.uka.ilkd.key.proof;
 
 import java.io.IOException;
-import java.util.Iterator;
 import java.util.Map;
 
 import de.uka.ilkd.key.collection.ImmutableList;
@@ -26,11 +25,13 @@ import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
 import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.IUpdateOperator;
+import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.ProgramPrinter;
-import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.rtsj.proof.init.RTSJProfile;
 import de.uka.ilkd.key.rule.PosTacletApp;
 import de.uka.ilkd.key.rule.RuleSet;
@@ -143,6 +144,7 @@ public class LoopInvariantProposer implements InstantiationProposer {
                 
         //fetch "self" from innermost method-frame
         ExecutionContext result = new JavaASTVisitor(pe, services) {
+            @SuppressWarnings("hiding")
             private ExecutionContext result;
             private boolean done = false;
             protected void doDefaultAction(SourceElement node) {

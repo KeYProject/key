@@ -271,13 +271,13 @@ public class LogicPrinter {
      * PresentationFeatures or abbreviations have changed.
      * @param seq The Sequent to be reprinted
      * @param filter The SequentPrintFilter for seq
-     * @param lineWidth the max. number of character to put on one line
+     * @param newLineWidth the max. number of character to put on one line
      *   (the actual taken linewidth is the max of
      *   {@link LogicPrinter#DEFAULT_LINE_WIDTH} and the given value
      */
     public void update(Sequent seq, SequentPrintFilter filter,
-            int lineWidth) {
-        setLineWidth(lineWidth);
+            int newLineWidth) {
+        setLineWidth(newLineWidth);
         reset();
         printSequent(seq, filter);
     }
@@ -1714,6 +1714,7 @@ public class LogicPrinter {
                     for (int i = 0; i < phi.arity(); i++) {
                         ta[i] = phi.sub(i);
                     }
+                    @SuppressWarnings("unchecked")
                     ImmutableArray<QuantifiableVariable>[] aa = new ImmutableArray[phi.arity()];
                     for (int i = 0; i < phi.arity(); i++) {
                         aa[i] = phi.varsBoundHere(i);

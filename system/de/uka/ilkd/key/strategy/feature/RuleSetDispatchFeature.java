@@ -12,7 +12,6 @@
 package de.uka.ilkd.key.strategy.feature;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
