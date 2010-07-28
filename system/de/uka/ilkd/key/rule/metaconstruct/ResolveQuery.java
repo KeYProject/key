@@ -138,9 +138,13 @@ public class ResolveQuery extends AbstractMetaOperator {
             
             final ExecutionContext ec; 
             if (pm.getContainerType() != null) {
-        	final ReferencePrefix mem = ((RTSJInfo) services.getJavaInfo()).getDefaultMemoryArea();        	
-                ec = new ExecutionContext(new TypeRef(pm.getContainerType()), 
-                        mem == null ? null : new MemoryAreaEC(mem), null);
+        	if (services.getJavaInfo() instanceof RTSJInfo) {
+        	    final ReferencePrefix mem = ((RTSJInfo) services.getJavaInfo()).getDefaultMemoryArea();
+                    ec = new ExecutionContext(new TypeRef(pm.getContainerType()), 
+                            mem == null ? null : new MemoryAreaEC(mem), null);
+        	} else {
+        	    ec = new ExecutionContext(new TypeRef(pm.getContainerType()), null, null);
+        	}
             } else {
                 ec = services.getJavaInfo().getDefaultExecutionContext();
             }
