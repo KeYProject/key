@@ -58,10 +58,7 @@ public  class StringConverter {
 	for (int i = charArray.length-2; i>=1; i--) {
 	    result = TermFactory.DEFAULT.createFunctionTerm(cons,
 							    charLDT.translateLiteral(new CharLiteral(charArray[i])),result);
-	}
-	
-	result = TermBuilder.DF.func((TermSymbol) serv.getNamespaces().functions().lookup(StringLDT.POOL_NAME), result);
-
+	}		
 
 	return result;
     }

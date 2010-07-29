@@ -101,7 +101,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
             methodSpecF = methodSpecFeature(inftyConst());
         } else throw new RuntimeException("Unexpected strategy property "+
             methProp);
-        
+                
         return SumFeature.createSum ( new Feature [] {
               AutomatedRuleFeature.INSTANCE,
 //              splitF,
@@ -146,6 +146,9 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 
         bindRuleSet ( d, "javaIntegerSemantics", -5000 );
             
+        bindRuleSet ( d, "stringNormalisation1", -5000 );
+
+        
         setupSplitting ( d );
 
         bindRuleSet ( d, "test_gen", inftyConst () );

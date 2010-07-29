@@ -241,11 +241,11 @@ public abstract class ProgramSVSort extends PrimitiveSort {
     public static final ProgramSVSort EXPLICITVARIABLE
 	= new ExplicitProgramVariableSort();
 
-    public static final ProgramSVSort CONSTANTVARIABLE
-	= new ConstantProgramVariableSort();
+    public static final ProgramSVSort CONSTANT_PRIMITIVE_TYPE_VARIABLE
+	= new ConstantProgramVariableSort(new Name("ConstantPrimitiveTypeVariable"), false);
 
     public static final ProgramSVSort CONSTANT_STRING_VARIABLE
-	= new ConstantProgramVariableSort(new Name("ConstantStringVariable"), new Name("java.lang.String"));
+	= new ConstantProgramVariableSort(new Name("ConstantStringVariable"), true);
 
     
     // implict field match
@@ -1277,21 +1277,18 @@ public abstract class ProgramSVSort extends PrimitiveSort {
     private static class ConstantProgramVariableSort 
 	extends ProgramSVSort {
 
-	private Name type;
+	private final Name type = new Name("java.lang.String");
+	private final boolean isString;
 
-	public ConstantProgramVariableSort() {
-	    this(new Name("ConstantVariable"), null);	  
-	}
-
-	public ConstantProgramVariableSort(Name svSortName, Name type) {
+	public ConstantProgramVariableSort(Name svSortName, boolean string) {
 	    super(svSortName);
-	    this.type = type;
+	    isString = string;
 	}
 
 	
 	public boolean canStandFor(Term t) {	   
 	    return t.op () instanceof ProgramConstant && 
-	    	(type == null || t.sort().name().equals(type));
+	    	isString == t.sort().name().equals(type);
 	}
 
 	protected boolean canStandFor(ProgramElement pe,
