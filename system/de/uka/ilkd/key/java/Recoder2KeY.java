@@ -772,6 +772,7 @@ public class Recoder2KeY implements JavaReader {
                 new JVMIsTransientMethodBuilder(servConf, cache),
                 new LocalClassTransformation(servConf, cache),
                 new TestGenerationModelTransformer(servConf, cache),
+                new ConstantStringExpressionEvaluator(servConf, cache)
         };
 
         final ChangeHistory cHistory = servConf.getChangeHistory();
@@ -1030,6 +1031,12 @@ public class Recoder2KeY implements JavaReader {
             servConf.getChangeHistory().attached(bl);
             servConf.getChangeHistory().attached(context.getCompilationUnitContext());
             servConf.getChangeHistory().updateModel();
+        
+            // normalise constant string expressions
+            List<CompilationUnit> cunits = new ArrayList<CompilationUnit>();
+            cunits.add(context.getCompilationUnitContext());
+            RecoderModelTransformer.TransformerCache cache = new RecoderModelTransformer.TransformerCache(cunits);
+            new ConstantStringExpressionEvaluator(servConf, cache).execute();
         } catch (de.uka.ilkd.key.util.ExceptionHandlerException e) {
             if (e.getCause() != null) {
                 reportError(e.getCause().getMessage(), e.getCause());

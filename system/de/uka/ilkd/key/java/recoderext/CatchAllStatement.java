@@ -171,13 +171,17 @@ public class CatchAllStatement extends JavaStatement implements
 
     //don't think we need it
     public void accept(SourceVisitor v) {
-	throw new IllegalStateException("Not implemented in "
-					+"CatchAllStatement");
+	if (v instanceof SourceVisitorExtended) {
+	    ((SourceVisitorExtended)v).visitCatchAll(this);
+	} else {
+	    throw new IllegalStateException("Method 'accept' not implemented in "
+		    +"CatchAllStatement");
+	}
     }
 
     //don't think we need it
     public CatchAllStatement deepClone() {
-	throw new IllegalStateException("Not implemented in "
+	throw new IllegalStateException("Method 'deepClone' not implemented in "
 					+"CatchAllStatement");
     }    
 

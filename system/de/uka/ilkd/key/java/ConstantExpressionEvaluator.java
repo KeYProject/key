@@ -42,7 +42,7 @@ public class ConstantExpressionEvaluator {
 	    isCompileTimeConstant(parseExpression(expr));
 	
     }
-
+    
     public boolean isCompileTimeConstant(Expression expr, 
 					 ConstantEvaluator.EvaluationResult result) {	
 	return getRecoderConstantEvaluator().

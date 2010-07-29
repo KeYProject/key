@@ -270,7 +270,7 @@ public abstract class RecoderModelTransformer extends TwoPassTransformation {
         }
     }
     
-    protected class FinalOuterVarsCollector extends SourceVisitor{
+    protected class FinalOuterVarsCollector extends SourceVisitorExtended {
         
         HashMap<ClassType, List<Variable>> lc2fv;
         
@@ -311,7 +311,7 @@ public abstract class RecoderModelTransformer extends TwoPassTransformation {
         
     }
     
-    private static class ClassDeclarationCollector extends SourceVisitor{
+    private static class ClassDeclarationCollector extends SourceVisitorExtended {
         
         HashSet<ClassDeclaration> result = new HashSet<ClassDeclaration>();
         
