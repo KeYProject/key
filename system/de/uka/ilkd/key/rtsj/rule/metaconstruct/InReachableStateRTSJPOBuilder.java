@@ -123,9 +123,9 @@ public class InReachableStateRTSJPOBuilder extends
 
 
     protected Term validateArrayElementUpdate(final Update update,
-	    final AssignmentPair pair, final Location loc, Term result) {
+	    final AssignmentPair pair, final Location loc) {
 	final ArraySort arraySort = (ArraySort) ((ArrayOp) loc).arraySort();
-	return and(super.validateArrayElementUpdate(update, pair, loc, result), 
+	return and(super.validateArrayElementUpdate(update, pair, loc), 
 		arraySlotOuterRef(update, arraySort));
     }
 

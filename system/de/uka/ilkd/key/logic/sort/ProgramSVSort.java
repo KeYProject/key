@@ -584,16 +584,16 @@ public abstract class ProgramSVSort extends PrimitiveSort {
 	}
 	
 	protected boolean canStandFor(ProgramElement pe,
-				      Services services) {
+		Services services) {
 	    if (pe instanceof Negative) {
- 		return ((Negative)pe).getChildAt(0) instanceof Literal;
- 	    }	   
+		return ((Negative)pe).getChildAt(0) instanceof Literal;
+	    }	   
 
 	    if (pe instanceof StringLiteral)
 		return false;
 
 	    if (pe instanceof Literal) {
-				return true;
+		return true;
 	    }
 	    if (pe instanceof Instanceof) {
 		ProgramElement v = ((Instanceof) pe).getChildAt(0);

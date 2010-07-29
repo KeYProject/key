@@ -30,6 +30,10 @@ import de.uka.ilkd.key.java.ConvertException;
  */
 public class StringLDT extends LDT {
 
+    public static final Name POOL_NAME = new Name("pool");
+
+    public static final Name CONTENT_NAME = new Name("content");
+
     /** the CharLDT used for translation of StringLiterals */
     CharLDT charLDT;
 

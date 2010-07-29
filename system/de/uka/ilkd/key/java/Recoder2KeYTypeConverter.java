@@ -9,7 +9,6 @@
 
 package de.uka.ilkd.key.java;
 
-import java.util.Iterator;
 import java.util.List;
 
 import recoder.ServiceConfiguration;
@@ -17,7 +16,10 @@ import recoder.service.NameInfo;
 import de.uka.ilkd.key.collection.*;
 import de.uka.ilkd.key.java.abstraction.*;
 import de.uka.ilkd.key.java.declaration.*;
-import de.uka.ilkd.key.java.declaration.modifier.*;
+import de.uka.ilkd.key.java.declaration.modifier.Final;
+import de.uka.ilkd.key.java.declaration.modifier.Private;
+import de.uka.ilkd.key.java.declaration.modifier.Public;
+import de.uka.ilkd.key.java.declaration.modifier.Static;
 import de.uka.ilkd.key.java.expression.literal.NullLiteral;
 import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
 import de.uka.ilkd.key.java.reference.TypeRef;

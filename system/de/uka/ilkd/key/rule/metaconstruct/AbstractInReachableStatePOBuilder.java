@@ -15,6 +15,7 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.UpdateFactory;
+import de.uka.ilkd.key.logic.ldt.StringLDT;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.*;
 import de.uka.ilkd.key.rule.UpdateSimplifier;
@@ -169,8 +170,25 @@ public abstract class AbstractInReachableStatePOBuilder extends TermBuilder {
         	final ArraySort arraySort = (ArraySort) ((ArrayOp) loc).arraySort();
         	final Sort elementSort = arraySort.elementSort();
         	if (elementSort instanceof ObjectSort) {
-        	    result = validateArrayElementUpdate(update, pair, loc, result);
+        	    result = validateArrayElementUpdate(update, pair, loc);
         	}
+            } else if (loc.name().equals(StringLDT.POOL_NAME)) {
+        	// Update pool(lit):=v
+        	
+        	Function content = (Function) services.getNamespaces().functions().lookup(StringLDT.CONTENT_NAME);
+        	
+        	assert content != null;
+        	
+        	// v = null | v.<created>=true
+        	result = or(equals(pair.value(), NULL(services)),
+        		equals(dot(pair.value(), created), TRUE));
+        	
+        	//v != null -> content(v) = lit
+        	result = and(result, 
+                	//v != null -> content(v) = lit
+        			imp(not(equals(pair.value(), NULL(services))),
+        				equals(func(content, pair.value()),
+        					pair.locationAsTerm().sub(0))));
             }
             if (result != null) {
                 // take care of quantified updates
@@ -226,7 +244,7 @@ public abstract class AbstractInReachableStatePOBuilder extends TermBuilder {
     }
 
     protected Term validateArrayElementUpdate(final Update update,
-	    final AssignmentPair pair, final Location loc, Term result) {
+	    final AssignmentPair pair, final Location loc) {
 	final LogicVariable[] vPre = atPre(pair);
 	final Term[] tPre = var(vPre);
 	final Term preAx = preAx(tPre, pair.locationSubs());
@@ -234,7 +252,7 @@ public abstract class AbstractInReachableStatePOBuilder extends TermBuilder {
 	// a@pre[i@pre]
 	final Term atPreArrayTerm = array((ArrayOp) loc, tPre);
 
-	result =
+	Term result =
 	    update(update, and(imp(equals(
 		    dot(tPre[0], created), TRUE),
 		    createdOrNull(atPreArrayTerm)),
