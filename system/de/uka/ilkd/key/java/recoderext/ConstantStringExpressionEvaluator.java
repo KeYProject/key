@@ -32,11 +32,11 @@ public class ConstantStringExpressionEvaluator extends RecoderModelTransformer {
 			    new StringLiteral("\"" + res.getString() + "\""));
 		    continue;
 		}
-
-		if (pe instanceof NonTerminalProgramElement) {
-		    evaluateConstantStringExpressions((NonTerminalProgramElement) pe);
-		}
 	    }
+
+	    if (pe instanceof NonTerminalProgramElement) {
+		evaluateConstantStringExpressions((NonTerminalProgramElement) pe);
+	    }	   
 	}
     }
 
