@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.java.recoderext;
 
 import recoder.CrossReferenceServiceConfiguration;
+import recoder.abstraction.Type;
 import recoder.java.Expression;
 import recoder.java.NonTerminalProgramElement;
 import recoder.java.ProgramElement;
@@ -25,18 +26,27 @@ public class ConstantStringExpressionEvaluator extends RecoderModelTransformer {
 
 		ConstantEvaluator.EvaluationResult res = new ConstantEvaluator.EvaluationResult();
 
-		if (!(pe instanceof NullLiteral)
-		        && cee.isCompileTimeConstant((Expression) pe, res)
-		        && res.getTypeCode() == ConstantEvaluator.STRING_TYPE) {
-		    replace(pe,
-			    new StringLiteral("\"" + res.getString() + "\""));
-		    continue;
+		Type expType = services.getSourceInfo().getType((Expression) pe);
+
+		if (!(pe instanceof NullLiteral) && expType != null
+		        && expType.getFullName().equals("java.lang.String")) {
+		    boolean isCTC = false;
+		    try {
+			isCTC = cee.isCompileTimeConstant((Expression) pe, res);			
+		    } catch (java.lang.ArithmeticException t) {
+			//
+		    }
+		    if (isCTC && res.getTypeCode() == ConstantEvaluator.STRING_TYPE) {
+			replace(pe, new StringLiteral("\"" + res.getString()
+			        + "\""));
+			continue;
+		    }
 		}
 	    }
 
 	    if (pe instanceof NonTerminalProgramElement) {
 		evaluateConstantStringExpressions((NonTerminalProgramElement) pe);
-	    }	   
+	    }
 	}
     }
 

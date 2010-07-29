@@ -1138,9 +1138,12 @@ public class Recoder2KeYConverter {
             recoder.service.ConstantEvaluator ce = new recoder.service.DefaultConstantEvaluator(
                     getServiceConfiguration());
             recoder.service.ConstantEvaluator.EvaluationResult er = new recoder.service.ConstantEvaluator.EvaluationResult();
-
-            if (ce.isCompileTimeConstant(init, er))
-                return getLiteralFor(er);
+        	
+            try {
+        	if (ce.isCompileTimeConstant(init, er))
+        	    return getLiteralFor(er);
+            } catch (java.lang.ArithmeticException t) {
+            }
         }
 
         return null;

@@ -99,7 +99,13 @@ public class ClassPreparationMethodBuilder
     		return result;
     	}
     	recoder.service.ConstantEvaluator ce = services.getConstantEvaluator(); 
-    	result = ce.isCompileTimeConstant(spec.getInitializer()); 
+    	
+    	try {
+    	    result = ce.isCompileTimeConstant(spec.getInitializer()); 
+    	} catch (java.lang.ArithmeticException t) {
+    	    result = false;
+    	}
+    	
     	return result;
     }
 
