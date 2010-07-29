@@ -290,12 +290,20 @@ public class LexPathOrdering implements TermOrdering {
             intFunctionNames.add("neglit");
         }
 
+        private final Set<String> stringFunctionNames = new HashSet<String> ();
+        {
+            intFunctionNames.add("empty");
+            intFunctionNames.add("cons");
+            intFunctionNames.add("C");
+        }
+
+        
         protected Integer getWeight(Operator p_op) {
             final String opStr = p_op.name ().toString ();
 
-            if ( intFunctionNames.contains ( opStr ) )
+            if ( intFunctionNames.contains ( opStr ) || stringFunctionNames.contains ( opStr ) )
                 return new Integer ( 0 );
-
+            
             if ( opStr.equals ( "neg" ) ) return new Integer ( 1 );
             if ( p_op.name ().equals ( AbstractIntegerLDT.CHAR_ID_NAME ) )
                 return new Integer ( 1 );
