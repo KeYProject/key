@@ -12,36 +12,36 @@ import recoder.service.ConstantEvaluator;
 public class ConstantStringExpressionEvaluator extends RecoderModelTransformer {
 
     public ConstantStringExpressionEvaluator(
-            CrossReferenceServiceConfiguration services, TransformerCache cache) {
+	    CrossReferenceServiceConfiguration services, TransformerCache cache) {
 	super(services, cache);
     }
 
     private void evaluateConstantStringExpressions(NonTerminalProgramElement td) {
-	for (int i = 0; i<td.getChildCount(); i++) {
+	for (int i = 0; i < td.getChildCount(); i++) {
 	    ProgramElement pe = td.getChildAt(i);
 
-
-	    if (pe instanceof Expression) {		
+	    if (pe instanceof Expression) {
 		ConstantEvaluator cee = services.getConstantEvaluator();
 
-		ConstantEvaluator.EvaluationResult res = 
-		    new ConstantEvaluator.EvaluationResult();
-			
-		if (!(pe instanceof NullLiteral) && cee.isCompileTimeConstant((Expression)pe, res) &&  
-		    res.getTypeCode() == ConstantEvaluator.STRING_TYPE) {
-		    replace(pe, new StringLiteral("\""+res.getString()+"\""));
+		ConstantEvaluator.EvaluationResult res = new ConstantEvaluator.EvaluationResult();
+
+		if (!(pe instanceof NullLiteral)
+		        && cee.isCompileTimeConstant((Expression) pe, res)
+		        && res.getTypeCode() == ConstantEvaluator.STRING_TYPE) {
+		    replace(pe,
+			    new StringLiteral("\"" + res.getString() + "\""));
 		    continue;
-		} 
+		}
+
+		if (pe instanceof NonTerminalProgramElement) {
+		    evaluateConstantStringExpressions((NonTerminalProgramElement) pe);
+		}
 	    }
-	    
-	    if (pe instanceof NonTerminalProgramElement){
-		evaluateConstantStringExpressions((NonTerminalProgramElement) pe);
-	    }
-	}	
+	}
     }
-    
+
     @Override
-    protected void makeExplicit(TypeDeclaration td) {	    
+    protected void makeExplicit(TypeDeclaration td) {
 	evaluateConstantStringExpressions(td);
     }
 
