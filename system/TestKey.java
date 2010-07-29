@@ -38,7 +38,7 @@ public class TestKey extends TestCase {
 	de.uka.ilkd.key.rule.TestUpdateSimplifier.class,
  	de.uka.ilkd.key.rule.inst.TestGenericSortInstantiations.class,
   	de.uka.ilkd.key.rule.metaconstruct.TestProgramMetaConstructs.class,
- 	de.uka.ilkd.key.rule.soundness.TestProofObligationCreation.class
+  	de.uka.ilkd.key.rule.soundness.TestProofObligationCreation.class
      };
 
 

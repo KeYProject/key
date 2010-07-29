@@ -18,6 +18,9 @@ package de.uka.ilkd.key.util;
 
 import java.io.*;
 import java.net.URL;
+import java.nio.channels.Channels;
+import java.nio.channels.FileChannel;
+import java.nio.channels.ReadableByteChannel;
 
 import javax.swing.ImageIcon;
 
@@ -174,6 +177,8 @@ public class KeYResourceManager {
 	// copying the resource to the target if targetfile 
 	// does not exist yet
 	boolean result = false;
+	ReadableByteChannel sourceStream = null;
+	FileChannel targetStream  = null;
 	try{
 	    File targetFile = new File(targetLocation);
 	    if (overwrite || !targetFile.exists()){
@@ -184,23 +189,36 @@ public class KeYResourceManager {
 		targetFile.createNewFile();	    
 		targetFile.deleteOnExit();
 		
-		InputStream sourceStream = resourceURL.openStream();
-		FileOutputStream targetStream = 
-		    new FileOutputStream (targetFile);  
+		sourceStream = Channels.newChannel(resourceURL.openStream());		
+		targetStream = new FileOutputStream (targetFile).getChannel();  
 		
-		int copyItem;
-		copyItem = sourceStream.read();
-		while (copyItem > -1){
-		    targetStream.write(copyItem);
-		    copyItem = sourceStream.read();
+		long actualTransferredByte = targetStream.transferFrom(sourceStream, 0, Long.MAX_VALUE);
+		if (actualTransferredByte < 0 || actualTransferredByte == Long.MAX_VALUE) {
+		    throw new RuntimeException("File " + resourcename + " too big.");
 		}
-		sourceStream.close();
-		targetStream.close();
 	    }
 	} catch(Exception e) {
 	    System.err.println("KeYError: " + e);
 	    return false;
-	}	
+	} finally {	    
+	    if (sourceStream != null) {
+		try {
+	            sourceStream.close();
+                } catch (IOException e) {
+        	    System.err.println("KeYError: " + e);
+        	    result = false;
+                }
+	    }
+	    if (targetStream != null) {
+		try {
+		    targetStream.close();
+                } catch (IOException e) {
+        	    System.err.println("KeYError: " + e);
+        	    result = false;
+                }
+	    }
+	}
+	
 	return result;
     }
 
