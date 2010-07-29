@@ -149,17 +149,22 @@ public class KeYResourceManager {
 				    String targetLocation) {
 	return copyIfNotExists(o.getClass(),resourcename,targetLocation);
     }
-
+    
     public boolean copyIfNotExists(Class cl, String resourcename, 
-				   String targetLocation) {
+		   String targetLocation) {
+	return copy(cl, resourcename, targetLocation, false);
+    }
+
+    public boolean copy(Class cl, String resourcename, 
+			String targetLocation, boolean overwrite) {
 	URL resourceURL = cl.getResource(resourcename);
 
         Debug.out("Load Resource:"+resourcename+" of class "+cl);
 	
         if (resourceURL == null && cl.getSuperclass() != null) {
-	    return  copyIfNotExists(cl.getSuperclass(),
-				    resourcename,
-				    targetLocation);
+	    return  copy(cl.getSuperclass(),
+			 resourcename,
+			 targetLocation, overwrite);
 	} else if (resourceURL == null && cl.getSuperclass() == null) {
 	    // error message Resource not found
 	    System.out.println("No resource "+ resourcename + " found");
@@ -171,7 +176,7 @@ public class KeYResourceManager {
 	boolean result = false;
 	try{
 	    File targetFile = new File(targetLocation);
-	    if (!targetFile.exists()){
+	    if (overwrite || !targetFile.exists()){
 		result = true;
 		if (targetFile.getParentFile() != null) {
 		    targetFile.getParentFile().mkdirs();

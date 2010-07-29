@@ -46,8 +46,8 @@ public class LibrariesSettings implements Settings {
        /*adds the standard libraries to libToSel, maybe they will be
          replaced by readSettings  */
        for (String[] standardLib : standardLibs) {
-           KeYResourceManager.getManager().copyIfNotExists(Proof.class,
-                   "rules/libraries/" + standardLib[0], LIBRARIES_PATH + standardLib[0]);
+           KeYResourceManager.getManager().copy(Proof.class,
+                   "rules/libraries/" + standardLib[0], LIBRARIES_PATH + standardLib[0], true);
            libToSel.put(LIBRARIES_PATH + standardLib[0], 
         	   	"on".equals(standardLib[1]) ? Boolean.TRUE : Boolean.FALSE);
        }     
