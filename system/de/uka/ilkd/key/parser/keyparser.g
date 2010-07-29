@@ -3127,6 +3127,7 @@ term130 returns [Term a = null]
     // what then? This here is specific to OCL, isn't it?
     |   literal:STRING_LITERAL
         {
+           /* OCL simplification currently deactivated
             String s = literal.getText(); 
             Name name = new Name(s);
             TermSymbol stringLit = (TermSymbol)functions().lookup(name);
@@ -3136,6 +3137,9 @@ term130 returns [Term a = null]
                 addFunction((Function)stringLit);
             }
             a = tf.createFunctionTerm(stringLit);
+            */
+            
+            a = getServices().getTypeConverter().convertToLogicElement(new de.uka.ilkd.key.java.expression.literal.StringLiteral(literal.getText()));
         }
    ; exception
         catch [TermCreationException ex] {

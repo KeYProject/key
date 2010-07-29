@@ -806,7 +806,7 @@ public abstract class Notation {
          * The standard concrete syntax for the string literal indicator `cat'
          * or `epsilon'.
          */
-    static class StringLiteral extends Notation {
+    public static class StringLiteral extends Notation {
 
 	public StringLiteral() {
 	    super(1000);
