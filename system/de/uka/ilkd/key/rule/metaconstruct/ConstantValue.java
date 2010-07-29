@@ -51,9 +51,10 @@ public class ConstantValue extends AbstractMetaOperator {
 
 	if ( op instanceof ProgramConstant ) {
 	    Literal lit = ((ProgramConstant)op).getCompileTimeConstant ();
+	    	    
 	    if ( lit != null )
 		term = services.getTypeConverter ()
-		    .convertToLogicElement ( lit );
+		    .convertToLogicElement ( lit );	    	   
 	}
 
 	return term;

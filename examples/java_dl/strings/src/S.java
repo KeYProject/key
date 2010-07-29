@@ -1,9 +1,39 @@
 public class S {
 
-    public void m () {
-	String s1 = "a";
-	String s2 = "a" + 2;
+    public final static String ONE = "ONE";
+    public final static String TWO = "TWO";
+
+    public static void start () {
+	String cpOne = new String(ONE);
+	String cpTwo = new String(TWO);
+	String cpThree = new String("THREE");
+
+	if (check(ONE, ONE) != 0) {
+	    throw new RuntimeException();
+	}
+	if (check(ONE, TWO) != -1) {
+	    throw new RuntimeException();
+	}
+	if (check(ONE, cpOne) != 1) {
+	    throw new RuntimeException();
+	}	
     }
+
+
+    public static int check(String fst, String snd) {
+
+        if (fst == snd) {
+	    return 0;
+	}
+
+	if (fst.equals(snd)) {
+	    return 1;
+	}
+
+	return -1;
+    }
+
+
 
 
 }

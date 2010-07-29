@@ -422,7 +422,7 @@ public class Recoder2KeYConverter {
         case recoder.service.ConstantEvaluator.STRING_TYPE:
             if (p_er.getString() == null)
                 return NullLiteral.NULL;
-            return new StringLiteral(p_er.getString());
+            return new StringLiteral("\""+p_er.getString()+"\"");
         default:
             throw new ConvertException("Don't know how to handle type "
                     + p_er.getTypeCode() + " of " + p_er);

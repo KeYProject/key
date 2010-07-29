@@ -85,7 +85,8 @@ public class AttributeOp extends AccessOp {
      */
     public boolean validTopLevel(Term term) {
 	if (((AttributeOp)term.op()).attribute() instanceof SchemaVariable ||
-	    term.sub(0).op() instanceof SchemaVariable) {
+	    term.sub(0).op() instanceof SchemaVariable ||
+	    term.sub(0).sort() == AbstractMetaOperator.METASORT) {
 	    return true;
 	} else if (term.arity() != arity()) {
 	    return false;

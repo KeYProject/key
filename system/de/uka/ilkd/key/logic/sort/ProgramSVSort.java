@@ -244,6 +244,10 @@ public abstract class ProgramSVSort extends PrimitiveSort {
     public static final ProgramSVSort CONSTANTVARIABLE
 	= new ConstantProgramVariableSort();
 
+    public static final ProgramSVSort CONSTANT_STRING_VARIABLE
+	= new ConstantProgramVariableSort(new Name("ConstantStringVariable"), new Name("java.lang.String"));
+
+    
     // implict field match
     public static final ProgramSVSort IMPLICITREFERENCE
 	= new ImplicitFieldReferenceSort();
@@ -1273,12 +1277,21 @@ public abstract class ProgramSVSort extends PrimitiveSort {
     private static class ConstantProgramVariableSort 
 	extends ProgramSVSort {
 
+	private Name type;
+
 	public ConstantProgramVariableSort() {
-	    super(new Name("ConstantVariable"));
+	    this(new Name("ConstantVariable"), null);	  
 	}
 
+	public ConstantProgramVariableSort(Name svSortName, Name type) {
+	    super(svSortName);
+	    this.type = type;
+	}
+
+	
 	public boolean canStandFor(Term t) {	   
-	    return t.op () instanceof ProgramConstant;
+	    return t.op () instanceof ProgramConstant && 
+	    	(type == null || t.sort().name().equals(type));
 	}
 
 	protected boolean canStandFor(ProgramElement pe,
