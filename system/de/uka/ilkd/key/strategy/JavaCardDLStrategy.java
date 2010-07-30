@@ -146,7 +146,9 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 
         bindRuleSet ( d, "javaIntegerSemantics", -5000 );
             
-        bindRuleSet ( d, "stringNormalisation1", -5000 );
+        bindRuleSet ( d, "stringNormalisation1", 
+        	SumFeature.createSum ( new Feature[] {
+        		NonDuplicateAppFeature.INSTANCE, longConst(-100) } ));
 
         
         setupSplitting ( d );
