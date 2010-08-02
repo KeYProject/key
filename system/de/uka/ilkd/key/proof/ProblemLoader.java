@@ -249,13 +249,13 @@ public class ProblemLoader implements Runnable {
                children = currNode.childrenIterator(); // --"--
                iconfig = proof.env().getInitConfig();
 
-               CountingBufferedInputStream cinp = null;
+               CountingBufferedReader cinp = null;
                try {
                    if (!keepProblem) {
                        init.tryReadProof(this, po);
                    } else {
                        setStatusLine("Loading proof", (int)file.length());
-                       cinp = new CountingBufferedInputStream(
+                       cinp = new CountingBufferedReader(
                                    new FileInputStream(file),
                                    pm,
                                    (int)file.length()/100);

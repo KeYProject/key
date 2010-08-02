@@ -17,7 +17,7 @@ import de.uka.ilkd.key.parser.KeYLexer;
 import de.uka.ilkd.key.parser.KeYParser;
 import de.uka.ilkd.key.parser.ParserConfig;
 import de.uka.ilkd.key.parser.ParserMode;
-import de.uka.ilkd.key.proof.CountingBufferedInputStream;
+import de.uka.ilkd.key.proof.CountingBufferedReader;
 import de.uka.ilkd.key.proof.RuleSource;
 
 /**
@@ -41,9 +41,9 @@ public class KeYFileForTests extends KeYFile {
 	if (initConfig==null) {
 	    throw new IllegalStateException("KeYFile: InitConfig not set.");
 	}
-	CountingBufferedInputStream cinp = null;
+	CountingBufferedReader cinp = null;
 	try {
-	    cinp = new CountingBufferedInputStream
+	    cinp = new CountingBufferedReader
 		    (getNewStream(),monitor,getNumberOfChars()/100);
 	    final ParserConfig pc =
 		new ParserConfig(initConfig.getServices().copy(),

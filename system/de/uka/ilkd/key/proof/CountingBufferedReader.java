@@ -14,19 +14,19 @@ import java.io.*;
 
 import de.uka.ilkd.key.util.ProgressMonitor;
 
-public class CountingBufferedInputStream extends BufferedReader {
+public class CountingBufferedReader extends BufferedReader {
 
     private int chars;
     private int step=0;
     private ProgressMonitor monitor=ProgressMonitor.Empty.getInstance();
 
-    public CountingBufferedInputStream(InputStream in) {
+    public CountingBufferedReader(InputStream in) {
 	super(new InputStreamReader(in));
 	chars = 0;
 	step  = 1;
     }
 
-    public CountingBufferedInputStream(InputStream in, 
+    public CountingBufferedReader(InputStream in, 
 				       ProgressMonitor monitor, 
 				       int step) {
 	this(in);
@@ -35,14 +35,14 @@ public class CountingBufferedInputStream extends BufferedReader {
 	chars=0;
     }
 
-    public CountingBufferedInputStream(InputStream in, 
+    public CountingBufferedReader(InputStream in, 
 				       ProgressMonitor monitor, 
 				       int step, int alreadyRead) {
 	this(in, monitor, step);
 	chars = alreadyRead;
     }
 
-    public CountingBufferedInputStream(InputStream in, int size, int step) {
+    public CountingBufferedReader(InputStream in, int size, int step) {
 	super(new InputStreamReader(in), size);
 	this.step=(step == 0 ? 1 : step);
 	chars=0;
