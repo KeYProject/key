@@ -10,13 +10,16 @@
 
 package de.uka.ilkd.key.strategy;
 
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.ldt.IntegerLDT;
+import de.uka.ilkd.key.logic.ldt.StringLDT;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.pp.Notation.StringLiteral;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.UseOperationContractRuleFilter;
@@ -146,10 +149,8 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 
         bindRuleSet ( d, "javaIntegerSemantics", -5000 );
             
-        bindRuleSet ( d, "stringNormalisation1", 
-        	SumFeature.createSum ( new Feature[] {
-        		NonDuplicateAppFeature.INSTANCE, longConst(-100) } ));
-
+       
+        setUpStringNormalisation ( d, p_proof.getServices() );
         
         setupSplitting ( d );
 
@@ -363,6 +364,44 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         setupInstantiationWithoutRetry ( d, p_proof );
         
         return d;
+    }
+
+    private void setUpStringNormalisation (RuleSetDispatchFeature d, Services services) {
+    
+	// translates an integer into its string representation
+	bindRuleSet ( d, "integerToString", -10000);
+	
+	
+	// do not convert char to int when inside a string function
+	   // feature used to recognize if one is inside a string literal
+        final Function cons = (Function) services.getNamespaces().functions().lookup(StringLDT.CONS);
+        final Function charAt = (Function) services.getNamespaces().functions().lookup(StringLDT.CHAR_AT);
+        final Function indexOf = (Function) services.getNamespaces().functions().lookup(StringLDT.INDEX_OF);
+        final Function lastIndexOf = (Function) services.getNamespaces().functions().lookup(StringLDT.LAST_INDEX_OF);
+	
+	TermFeature keepChar = or ( 
+		or ( OperatorTF.create( cons ), OperatorTF.create( charAt ), OperatorTF.create(  indexOf ) ), 
+		OperatorTF.create( lastIndexOf ));
+        
+	bindRuleSet ( d, "charLiteral_to_intLiteral",
+		ifZero ( isBelow ( keepChar), inftyConst() ) ); 
+	
+	
+	// establish normalform 
+	// 
+	bindRuleSet ( d, "stringNormalisationReduce", 
+        	SumFeature.createSum ( new Feature[] {
+        		NonDuplicateAppFeature.INSTANCE, longConst(-400) } ));
+
+	bindRuleSet ( d, "stringNormalisation1", 
+        	SumFeature.createSum ( new Feature[] {
+        		NonDuplicateAppFeature.INSTANCE, longConst(-200) } ));
+
+	bindRuleSet ( d, "stringAddFacts", 
+        	SumFeature.createSum ( new Feature[] {
+        		NonDuplicateAppModPositionFeature.INSTANCE, longConst(-100) } ));
+
+    
     }
 
     private void setupReplaceKnown(RuleSetDispatchFeature d) {
@@ -2163,8 +2202,8 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
     }
 
     private class FormulaTermFeatures {
-
-        public FormulaTermFeatures () {
+        
+	public FormulaTermFeatures () {
             forF = extendsTrans ( Sort.FORMULA );
             
             orF = op ( Op.OR );
@@ -2227,6 +2266,8 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                                          longTermConst ( 200 ) ) ),
                                 rec ( any (), longTermConst ( 1 ) ) );
 //            directCutAllowed = add ( tf.intInEquation, notContainsQuery );
+                     
+            
         }
 
         final TermFeature forF;

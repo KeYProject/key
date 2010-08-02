@@ -34,6 +34,17 @@ public class StringLDT extends LDT {
 
     public static final Name CONTENT_NAME = new Name("content");
 
+    public static final Name CONS = new Name("cons");
+    
+    public static final Name EMPTY = new Name("empty");
+
+    public static final Name CHAR_AT = new Name("charAt");
+
+    public static final Name INDEX_OF = new Name("indexOf");
+
+    public static final Name LAST_INDEX_OF = new Name("lastIndexOf");
+
+    
     /** the CharLDT used for translation of StringLiterals */
     CharLDT charLDT;
 
@@ -46,8 +57,8 @@ public class StringLDT extends LDT {
 	// instead of null should be: services.getJavaInfo().getTypeByName("java.lang.String").getJavaType();
 	// but getTypeName yields null!
 	this.charLDT = charLDT;
-	cons  = addFunction (functions, "cons");
-	empty = addFunction (functions, "empty");
+	cons  = addFunction (functions, CONS.toString());
+	empty = addFunction (functions, EMPTY.toString());
     }
 
     /**
