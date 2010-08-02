@@ -37,12 +37,12 @@ import de.uka.ilkd.key.util.Debug;
     */
 public class SmtLibTranslatorWeaker extends SmtLibTranslator {
 
-    /** @see {@link SmtLibTranslatorWeaker} (Description of the class) */
+    /** {@link SmtLibTranslatorWeaker} (Description of the class) */
     public SmtLibTranslatorWeaker(Sequent sequent, Services services) {
 	super(sequent, services);
     }
 
-    /** @see {@link SmtLibTranslatorWeaker} (Description of the class) */
+    /** {@link SmtLibTranslatorWeaker} (Description of the class) */
     public SmtLibTranslatorWeaker(Services s) {
 	super(s);
     }

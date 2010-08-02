@@ -44,18 +44,20 @@ public class NotDeclException extends antlr.SemanticException {
     
     /**
      * Returns a clean error message (no line number/column information)
+     * @deprecated
      */
+    @Deprecated
     public String getErrorMessage ()
     {
-	String errmsg = cat + "\n\t" + undeclared_symbol + "\n";
-	return errmsg + "not declared "+addtl;
+	return getMessage();
     }
 
     /**
      * Returns a clean error message (no line number/column information)
      */
     public String getMessage () {
-	return getErrorMessage();
+	String errmsg = cat + "\n\t" + undeclared_symbol + "\n";
+	return errmsg + "not declared "+addtl;
     }
     
     /**
@@ -63,6 +65,6 @@ public class NotDeclException extends antlr.SemanticException {
      */
     public String toString() {
 	return getFilename()+"("+this.getLine()+", "+this.getColumn()+"): "
-	    +getErrorMessage();
+	    +getMessage();
     }
 }

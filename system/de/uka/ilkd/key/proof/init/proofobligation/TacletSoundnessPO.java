@@ -14,15 +14,14 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Iterator;
 
-import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.Main;
 import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
@@ -30,6 +29,7 @@ import de.uka.ilkd.key.proof.init.*;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.rule.TacletBuilder;
 import de.uka.ilkd.key.rule.soundness.POBuilder;
 import de.uka.ilkd.key.rule.soundness.POSelectionDialog;
 import de.uka.ilkd.key.rule.soundness.SVSkolemFunction;
@@ -85,7 +85,7 @@ implements ProofOblInput{
         // ensure that only the new taclets of the lemma file are presented to
         // the user
         initConfig.setTaclets ( DefaultImmutableSet.<Taclet>nil() );
-        initConfig.setTaclet2Builder ( new HashMap () );
+        initConfig.setTaclet2Builder ( new HashMap<Taclet, TacletBuilder> () );
 
         ImmutableSet<Taclet> newTaclets=null;
         try {

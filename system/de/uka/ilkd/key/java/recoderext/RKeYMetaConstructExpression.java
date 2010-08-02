@@ -93,6 +93,7 @@ public class RKeYMetaConstructExpression extends Literal
 	return -1;
     }
 
+    @Deprecated
     public int getIndexOfChild(int posCode) {
 	if (posCode==getChildPositionCode(child)) {
 	    return 0;

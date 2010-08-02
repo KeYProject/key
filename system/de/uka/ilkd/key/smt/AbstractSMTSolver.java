@@ -18,8 +18,6 @@ import java.util.LinkedList;
 
 import org.apache.log4j.Logger;
 
-import de.uka.ilkd.key.collection.DefaultImmutableSet;
-import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.Main;
 import de.uka.ilkd.key.gui.configuration.PathConfig;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
@@ -203,7 +201,7 @@ public abstract class AbstractSMTSolver extends AbstractProcess implements SMTSo
         path = path.replaceAll("%d", date);
         path = path.replaceAll("%s", this.getTitle());
         path = path.replaceAll("%t", time);
-        path = path.replaceAll("%i", Integer.toString(this.getNextFileID()));
+        path = path.replaceAll("%i", Integer.toString(AbstractSMTSolver.getNextFileID()));
         return path;
     }
 
@@ -364,23 +362,15 @@ public abstract class AbstractSMTSolver extends AbstractProcess implements SMTSo
 		path = finalizePath(path);
 		translation.storeToFile(path);
 	    }
-
 	}
     }
     
     private void instantiateTaclets(SMTTranslator trans) throws IllegalFormulaException{
-	ImmutableSet<Taclet> emptySet = DefaultImmutableSet.nil();
-	if(!ProofSettings.DEFAULT_SETTINGS.getTacletTranslationSettings().isUsingTaclets() || !useTaclets ){
-	    trans.setTacletsForAssumptions(new LinkedList<Taclet>());
-	   
-	}else{
+	if (!ProofSettings.DEFAULT_SETTINGS.getTacletTranslationSettings().isUsingTaclets() || !useTaclets ){
+	    trans.setTacletsForAssumptions(new LinkedList<Taclet>());	   
+	} else {
 	    trans.setTacletsForAssumptions(getTaclets());
 	}
-	
-	
-	 
-	
-	
     }
     
     public void setTacletsForTest(Collection<Taclet> set){
@@ -389,10 +379,7 @@ public abstract class AbstractSMTSolver extends AbstractProcess implements SMTSo
     
     public void prepareSolver(LinkedList<InternResult> terms, Services services, Collection<Taclet> taclets) {
 	init();
-	
 	session = new SolverSession(terms, services, taclets);
-
-        
     }
     
     

@@ -547,7 +547,7 @@ options {
             }
             File path=new File(getFilename().substring(start,end+1)+filename);
             try{ 
-                source = RuleSource.initRuleFile(path.toURL()); 
+                source = RuleSource.initRuleFile(path.toURI().toURL()); 
             }catch(java.net.MalformedURLException e){
                 System.err.println("Exception due to malformed URL of file "+
                                    filename+"\n " +e);
