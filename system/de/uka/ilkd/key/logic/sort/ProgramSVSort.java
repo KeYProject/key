@@ -179,6 +179,7 @@ public abstract class ProgramSVSort extends PrimitiveSort {
 			 PrimitiveType.JAVA_SHORT,
 			 PrimitiveType.JAVA_INT,
 			 PrimitiveType.JAVA_LONG});
+
     
     public static final ProgramSVSort SIMPLEANYNUMBERTYPEEXPRESSION 
 	= new SimpleExpressionSpecialPrimitiveTypeSort
@@ -210,11 +211,18 @@ public abstract class ProgramSVSort extends PrimitiveSort {
 			 PrimitiveType.JAVA_SHORT,
 			 PrimitiveType.JAVA_INT});
 
+    public static final ProgramSVSort SIMPLEJAVABOOLEANEXPRESSION 
+	= new SimpleExpressionSpecialPrimitiveTypeSort
+	("SimpleJavaBooleanExpression", new
+	 PrimitiveType[]{PrimitiveType.JAVA_BOOLEAN});
+
     public static final ProgramSVSort SIMPLESTRINGEXPRESSION
-	= new SimpleExpressionStringSort
-	("SimpleStringExpression");
+	= new SimpleExpressionStringSort("SimpleStringExpression");
+    
+    public static final ProgramSVSort SIMPLENONSTRINGOBJECTEXPRESSION
+	= new SimpleExpressionNonStringObjectSort("SimpleNonStringObjectExpression");
 
-
+    
 
     //--------------- Specials that can be get rid of perhaps--------------
 
@@ -1071,6 +1079,36 @@ public abstract class ProgramSVSort extends PrimitiveSort {
 		Namespace ns = services.getNamespaces().sorts();
 		Sort stringSort = (Sort)ns.lookup(new Name("java.lang.String"));
 		return ((ProgramVariable)check).getKeYJavaType().getSort().equals(stringSort);
+	    }
+	    return false;
+	}
+    }
+    
+    /**
+     * This sort represents a type of program schema variables that match
+     * on string literals and string variables.
+     */
+    public static class SimpleExpressionNonStringObjectSort 
+	extends SimpleExpressionSort{
+
+	public SimpleExpressionNonStringObjectSort(String name) {
+	    super(new Name(name));
+	}
+
+	/* Will only match on String variables */
+	public boolean canStandFor(ProgramElement check, 
+				   ExecutionContext ec,
+				   Services services) {
+	    if (!super.canStandFor(check, ec, services)) {
+		return false;
+	    }
+	    //String Literal has SideEffects, but SimpleExpressionSort will not match
+	    //if (check instanceof StringLiteral) return false;
+	    if (check instanceof ProgramVariable) {
+		Namespace ns = services.getNamespaces().sorts();
+		Sort stringSort = (Sort)ns.lookup(new Name("java.lang.String"));
+		return stringSort instanceof ObjectSort && 
+		 !((ProgramVariable)check).getKeYJavaType().getSort().equals(stringSort);
 	    }
 	    return false;
 	}

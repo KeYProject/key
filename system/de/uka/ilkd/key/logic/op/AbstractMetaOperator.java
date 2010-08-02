@@ -18,6 +18,7 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermFactory;
+import de.uka.ilkd.key.logic.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.ldt.LDT;
 import de.uka.ilkd.key.logic.sort.PrimitiveSort;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -244,12 +245,10 @@ public abstract class AbstractMetaOperator extends Op implements MetaOperator {
       	String result = "";
 	boolean neg = false;
 	Operator top = term.op();
-	LDT intModel = services.getTypeConverter().getIntegerLDT();	    
-	Namespace intFunctions = intModel.functions();
-	Operator numbers = (Operator)intFunctions.lookup(new Name("Z"));
-	Operator base = (Operator)intFunctions.lookup(new Name("#"));
-	Operator minus =(Operator) intFunctions.lookup(new Name("neglit"));
-	
+	IntegerLDT intModel = services.getTypeConverter().getIntegerLDT();	    
+	Operator numbers = intModel.getNumberSymbol();
+	Operator base    = intModel.getNumberTerminator();
+	Operator minus   = intModel.getNegativeNumberSign();
 	// check whether term is really a "literal"
 	if (!top.name().equals(numbers.name())){
 	    Debug.out("abstractmetaoperator: Cannot convert to number:", term);

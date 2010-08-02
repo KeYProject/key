@@ -385,7 +385,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 		OperatorTF.create( lastIndexOf ));
         
 	bindRuleSet ( d, "charLiteral_to_intLiteral",
-		ifZero ( isBelow ( keepChar ), inftyConst () ) ); 
+		ifZero ( isBelow ( keepChar ), inftyConst (), longConst (-100) ) ); 
 	
 	
 	// establish normalform 
