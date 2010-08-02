@@ -775,6 +775,7 @@ public class Recoder2KeY implements JavaReader {
                 new ConstantStringExpressionEvaluator(servConf, cache)
         };
 
+        
         final ChangeHistory cHistory = servConf.getChangeHistory();
         for (RecoderModelTransformer aTransformer : transformer) {
             if (Debug.ENABLE_DEBUG) {
@@ -794,7 +795,6 @@ public class Recoder2KeY implements JavaReader {
         for (recoder.java.CompilationUnit cu : cUnits) {
             cu.setDataLocation(cu.getOriginalDataLocation());
         }
-        
     }
 
     // ----- methods dealing with blocks.
@@ -1035,7 +1035,7 @@ public class Recoder2KeY implements JavaReader {
             // normalise constant string expressions
             List<CompilationUnit> cunits = new ArrayList<CompilationUnit>();
             cunits.add(context.getCompilationUnitContext());
-            RecoderModelTransformer.TransformerCache cache = new RecoderModelTransformer.TransformerCache(cunits);
+            final RecoderModelTransformer.TransformerCache cache = new RecoderModelTransformer.TransformerCache(cunits);
             new ConstantStringExpressionEvaluator(servConf, cache).execute();
         } catch (de.uka.ilkd.key.util.ExceptionHandlerException e) {
             if (e.getCause() != null) {
