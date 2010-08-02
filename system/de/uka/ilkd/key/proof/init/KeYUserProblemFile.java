@@ -88,6 +88,8 @@ public class KeYUserProblemFile extends KeYFile implements ProofOblInput{
             throw new ProofInputException(e);
         } catch (FileNotFoundException fnfe) {
             throw new ProofInputException(fnfe);
+        } finally {
+            close();
         }
     }
 
@@ -145,7 +147,7 @@ public class KeYUserProblemFile extends KeYFile implements ProofOblInput{
             throw new ProofInputException(e);
         } catch (FileNotFoundException fnfe) {
             throw new ProofInputException(fnfe);
-        }
+        } 
     }
 
 
@@ -178,9 +180,11 @@ public class KeYUserProblemFile extends KeYFile implements ProofOblInput{
             lastParser.proof(prl);
         } catch(antlr.ANTLRException e) {
             throw new ProofInputException(e);
+        } finally {
+            lastParser = null;
+            close();
         }
     }
-
 
     public boolean equals(Object o){
         if(!(o instanceof KeYUserProblemFile)) {

@@ -10,7 +10,6 @@
 package de.uka.ilkd.key.proof.init;
 
 import java.io.File;
-import java.util.Iterator;
 import java.util.List;
 
 import de.uka.ilkd.key.collection.ImmutableList;

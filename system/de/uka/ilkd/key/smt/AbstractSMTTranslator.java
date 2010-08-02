@@ -41,7 +41,6 @@ import de.uka.ilkd.key.logic.op.NonRigidFunction;
 import de.uka.ilkd.key.logic.op.Op;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.QuanUpdateOperator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SortDependingSymbol;
 import de.uka.ilkd.key.logic.sort.Sort;

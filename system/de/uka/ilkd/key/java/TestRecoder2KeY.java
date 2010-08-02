@@ -10,8 +10,10 @@
 
 package de.uka.ilkd.key.java;
 
+import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.Reader;
 
 import junit.framework.TestCase;
 import de.uka.ilkd.key.collection.ImmutableList;
@@ -107,7 +109,7 @@ public class TestRecoder2KeY extends TestCase {
 
     /** removes blanks and line feeds from a given string*/
     private static String removeBlanks(String s) {
-	StringBuffer sb=new StringBuffer();
+	StringBuilder sb=new StringBuilder();
 	for (int i=0; i<s.length(); i++) {
 	    if (!(s.charAt(i)==(' ')) && !(s.charAt(i)==('\n')))
 		sb.append(s.charAt(i));
@@ -184,12 +186,20 @@ public class TestRecoder2KeY extends TestCase {
     public void xtestFileInput() {
 	char[] ch=new char[100000];
 	int n=0;
+	Reader fr = null;
 	try {
-	    FileReader fr=new FileReader
-		("de/uka/ilkd/key/java/Recoder2KeY.java");
+	    fr = new BufferedReader(new FileReader
+		("de/uka/ilkd/key/java/Recoder2KeY.java"));
 	    n=fr.read(ch);
 	} catch (IOException e) {
 	    System.err.println("Recoder2KeY.java not found");
+	} finally {
+	    if (fr != null) {
+		try {
+	            fr.close();
+                } catch (IOException e) {
+                }
+	    }
 	}
 	String inputString=new String(ch,0,n);
 	testClass(inputString);

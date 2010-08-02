@@ -754,8 +754,9 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
         private static void createListFor(Taclet taclet) {
             java.util.List<List<String>> instList = new LinkedList<List<String>>();
             java.util.List<String> instantiations = new LinkedList<String>();
+            BufferedReader br = null;
             try {
-                BufferedReader br = new BufferedReader(new FileReader(
+                br = new BufferedReader(new FileReader(
                         INSTANTIATION_DIR + File.separator
                                 + taclet.name().toString()));
                 String line = br.readLine();
@@ -786,8 +787,14 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
                 if (sb.length() > 0) {
                     instantiations.add(sb.toString());
                 }
-                br.close();
             } catch (IOException e) {
+            } finally {
+                if (br != null) {
+                    try {
+	                br.close();
+                    } catch (IOException e) {
+                    }        	
+                }
             }
             if (instantiations.size() > 0) {
                 instList.add(instantiations);
@@ -800,8 +807,9 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
             TacletInstantiationsTableModel tableModel = model.tableModel();
             int start = model.tacletApp().instantiations().size();
             java.util.List<List<String>> instList = getInstantiationListsFor(taclet);
+            BufferedWriter bw = null;
             try {
-                BufferedWriter bw = new BufferedWriter(new FileWriter(
+                bw = new BufferedWriter(new FileWriter(
                         INSTANTIATION_DIR + File.separator
                                 + taclet.name().toString()));
                 StringBuffer sb = new StringBuffer();
@@ -832,8 +840,14 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
                         }
                     }
                 }
-                bw.close();
             } catch (IOException e) {
+            } finally {
+                if (bw != null) {
+                    try {
+	                bw.close();
+                    } catch (IOException e) {
+                    }        	
+                }
             }
             hm.put(taclet.name().toString(), null);
         }

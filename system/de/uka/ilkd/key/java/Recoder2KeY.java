@@ -10,20 +10,8 @@
 
 package de.uka.ilkd.key.java;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
+import java.io.*;
+import java.util.*;
 
 import org.apache.log4j.Logger;
 
@@ -338,13 +326,19 @@ public class Recoder2KeY implements JavaReader {
         parseSpecialClasses();
         try {
             for (String filename : cUnitStrings) {
-                CompilationUnit cu;
+                final CompilationUnit cu;
+                Reader fr = null;
                 try {
-                    cu = servConf.getProgramFactory().parseCompilationUnit(new FileReader(filename));
+                    fr = new BufferedReader(new FileReader(filename));
+                    cu = servConf.getProgramFactory().parseCompilationUnit(fr);
                 } catch (Exception e) {
                     throw (ParseException) 
                        new ParseException("Error in file " + 
                                filename + ": " + e.getMessage()).initCause(e); 
+                } finally {
+                    if (fr != null) {
+                	fr.close();
+                    }
                 }
                 cu.setDataLocation(new DataFileLocation(filename));
                 cUnits.add(cu);
@@ -398,11 +392,13 @@ public class Recoder2KeY implements JavaReader {
         parseSpecialClasses();
         List<recoder.java.CompilationUnit> cUnits = new ArrayList<recoder.java.CompilationUnit>();
         int current = 0;
+        Reader sr = null;
         try {
             for (int i = 0; i < cUnitStrings.length; i++) {
                 current = i;
                 Debug.out("Reading " + trim(cUnitStrings[i]));
-                cUnits.add(servConf.getProgramFactory().parseCompilationUnit(new StringReader(cUnitStrings[i])));
+                    sr = new BufferedReader(new StringReader(cUnitStrings[i]));                
+                    cUnits.add(servConf.getProgramFactory().parseCompilationUnit(sr));
             }
             // run cross referencer
             final ChangeHistory changeHistory = servConf.getChangeHistory();
@@ -427,6 +423,15 @@ public class Recoder2KeY implements JavaReader {
                 reportError(pe.getCause().getMessage(), pe.getCause());
             } else {
                 reportError(pe.getMessage(), pe);
+            }
+        } finally {
+            if (sr != null) {
+            	try {
+	            sr.close();
+                } catch (IOException e) {
+                    reportError("IOError reading java program " + 
+                	    cUnitStrings[current] + ". May be file not found or missing permissions.", e);
+                }
             }
         }
         return cUnits;
@@ -505,7 +510,12 @@ public class Recoder2KeY implements JavaReader {
     	        ConvertException e2 = new ConvertException("While parsing "+loc+"\n"+ex.getMessage());
                 e2.initCause(ex);
                 throw e2;
+            } finally {
+        	if (f != null) {
+        	    f.close();
+        	}
             }
+            
             
             if (Debug.ENABLE_DEBUG) {
                 Debug.out("parsed: " + loc);
@@ -558,16 +568,21 @@ public class Recoder2KeY implements JavaReader {
         for (FileCollection fc : sources) {
             FileCollection.Walker walker = fc.createWalker(".jml");
             while(walker.step()) {
-                try {
+        	Reader f = null;
+        	try {
                     currentDataLocation = walker.getCurrentDataLocation();
                     InputStream is = walker.openCurrent();
-                    Reader f = new BufferedReader(new InputStreamReader(is));
+                    f = new BufferedReader(new InputStreamReader(is));
                     recoder.java.CompilationUnit rcu = pf.parseCompilationUnit(f);
                     rcu.setDataLocation(currentDataLocation);
                     removeCodeFromClasses(rcu, false);
                     rcuList.add(rcu);
                 } catch(Exception ex) {
                     throw new ConvertException("Error while loading: " + walker.getCurrentDataLocation(), ex);
+                } finally {
+                    if (f != null) {
+                	f.close();
+                    }
                 }
             }
         }
@@ -576,16 +591,21 @@ public class Recoder2KeY implements JavaReader {
         for (FileCollection fc : sources) {
             FileCollection.Walker walker = fc.createWalker(".java");
             while(walker.step()) {
-                try {
+        	Reader f = null;
+        	try {
                     currentDataLocation = walker.getCurrentDataLocation();
                     InputStream is = walker.openCurrent();
-                    Reader f = new BufferedReader(new InputStreamReader(is));
+                    f = new BufferedReader(new InputStreamReader(is));
                     recoder.java.CompilationUnit rcu = pf.parseCompilationUnit(f);
                     rcu.setDataLocation(currentDataLocation);
                     removeCodeFromClasses(rcu, true);
                     rcuList.add(rcu);
                 } catch(Exception ex) {
                     throw new ConvertException("Error while loading: " + walker.getCurrentDataLocation(), ex);
+                } finally {
+                    if (f != null) {
+                	f.close();
+                    }
                 }
             }
         }
@@ -596,13 +616,18 @@ public class Recoder2KeY implements JavaReader {
         for (FileCollection fc : sources) {
             FileCollection.Walker walker = fc.createWalker(".class");
             while(walker.step()) {
-                try {
+        	InputStream is = null;
+        	try {
                     currentDataLocation = walker.getCurrentDataLocation();
-                    InputStream is = walker.openCurrent();
+                    is = new BufferedInputStream(walker.openCurrent());
                     ClassFile cf = parser.parseClassFile(is);
                     manager.addClassFile(cf, currentDataLocation);
                 } catch(Exception ex) {
                     throw new ConvertException("Error while loading: " + walker.getCurrentDataLocation(), ex);
+                } finally {
+                    if (is != null) {
+                	is.close();
+                    }
                 }
             }
         }
@@ -756,7 +781,7 @@ public class Recoder2KeY implements JavaReader {
         RecoderModelTransformer.TransformerCache cache = new RecoderModelTransformer.TransformerCache(cUnits);
         
         ConstructorNormalformBuilder cnb; 
-
+                
         RecoderModelTransformer[] transformer = new RecoderModelTransformer[] {
                 new EnumClassBuilder(servConf, cache),
                 new JMLTransformer(servConf, cache),
@@ -1021,8 +1046,10 @@ public class Recoder2KeY implements JavaReader {
     recoder.java.StatementBlock recoderBlock(String block, Context context) {
         recoder.java.StatementBlock bl = null;
         parseSpecialClasses();
+        Reader sr = null;
         try {
-            bl = servConf.getProgramFactory().parseStatementBlock(new StringReader(block));
+            sr = new BufferedReader(new StringReader(block));
+            bl = servConf.getProgramFactory().parseStatementBlock(sr);
             bl.makeAllParentRolesValid();
             embedMethod(embedBlock(bl), context);
             context.getCompilationUnitContext().makeParentRoleValid();
@@ -1073,6 +1100,13 @@ public class Recoder2KeY implements JavaReader {
             reportError("Recoder parser threw exception in block:\n" + block + "\n Probably a misspelled identifier name.", e);
         } catch (Exception e) {
             reportError(e.getMessage(), e);
+        } finally {
+            if (sr != null) {
+        	try {
+	            sr.close();
+                } catch (IOException e) {
+                }
+            }
         }
         return bl;
     }

@@ -248,13 +248,14 @@ public class ProblemLoader implements Runnable {
                currNode = proof.root(); // initialize loader
                children = currNode.childrenIterator(); // --"--
                iconfig = proof.env().getInitConfig();
+
+               CountingBufferedInputStream cinp = null;
                try {
                    if (!keepProblem) {
                        init.tryReadProof(this, po);
                    } else {
                        setStatusLine("Loading proof", (int)file.length());
-                       CountingBufferedInputStream cinp =
-                           new CountingBufferedInputStream(
+                       cinp = new CountingBufferedInputStream(
                                    new FileInputStream(file),
                                    pm,
                                    (int)file.length()/100);
@@ -268,7 +269,10 @@ public class ProblemLoader implements Runnable {
                        parser.proofBody(this);
                    }
                } finally {
-                    if (constraints.size() > 0) {
+        	   if (cinp != null) {
+        	       cinp.close();
+        	   }
+        	   if (constraints.size() > 0) {
                         Term left, right;
                         for (PairOfString p : constraints) {
                             left = parseTerm(p.left, proof);
@@ -750,8 +754,10 @@ public class ProblemLoader implements Runnable {
             new Namespace(),
             targetGoal.getVariableNamespace(varNS));
         Services services = p.getServices();
+        StringReader sr = null;
         try{
-            result = (new KeYParser(ParserMode.TERM,new KeYLexer(new StringReader(value),
+            sr = new StringReader(value);
+            result = (new KeYParser(ParserMode.TERM,new KeYLexer(sr,
                                              services.getExceptionHandler()),
                                 null, TermFactory.DEFAULT, null, services,
                                 nss, new AbbrevMap())).
@@ -760,7 +766,11 @@ public class ProblemLoader implements Runnable {
             throw new RuntimeException("Cannot parse location list "+value, re);
         } catch (antlr.TokenStreamException tse) {
             throw new RuntimeException("Cannot parse location list "+value, tse);
-        }
+        } finally {
+            if (sr != null) {
+        	sr.close();
+            }
+        }        
         return result;
     }
 

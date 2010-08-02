@@ -9,10 +9,7 @@
 //
 package de.uka.ilkd.key.proof.init;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -128,10 +125,12 @@ public class KeYFile implements EnvInput {
             if (file.isDirectory()) {
                 return null;
             }
+            BufferedInputStream is = null ;
             try {
+        	is = new BufferedInputStream(getNewStream());
                 KeYParser problemParser
                     = new KeYParser(ParserMode.PROBLEM,
-                                    new KeYLexer(getNewStream(), null),
+                                    new KeYLexer(is, null),
                                     file.toString());
                 settings = new ProofSettings(ProofSettings.DEFAULT_SETTINGS);
                 settings.setProfile(ProofSettings.DEFAULT_SETTINGS.getProfile());
@@ -142,6 +141,12 @@ public class KeYFile implements EnvInput {
                 throw new ProofInputException(fnfe);
             } catch (de.uka.ilkd.key.util.ExceptionHandlerException ehe) {
                 throw new ProofInputException(ehe.getCause().getMessage());
+            } finally {
+        	try {
+	            is.close();
+                } catch (IOException e) {
+                    throw new ProofInputException(e);
+                }
             }
         }
         return settings;
@@ -445,7 +450,7 @@ public class KeYFile implements EnvInput {
 
 	try {
 	    final CountingBufferedInputStream cinp = new CountingBufferedInputStream
-            (getNewStream(),monitor,getNumberOfChars()/100);
+            (getNewStream(), monitor,getNumberOfChars()/100);
             KeYParser problemParser
                 = new KeYParser(ParserMode.PROBLEM,
                                 new KeYLexer(cinp,
@@ -504,5 +509,9 @@ public class KeYFile implements EnvInput {
             return -1;
         }
 	return externalForm.hashCode();
+    }
+    
+    public void finalize() {
+	close();
     }
 }

@@ -11,6 +11,7 @@ package de.uka.ilkd.key.proof.init;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 
 import de.uka.ilkd.key.parser.KeYLexer;
 import de.uka.ilkd.key.parser.KeYParser;
@@ -40,9 +41,9 @@ public class KeYFileForTests extends KeYFile {
 	if (initConfig==null) {
 	    throw new IllegalStateException("KeYFile: InitConfig not set.");
 	}
+	CountingBufferedInputStream cinp = null;
 	try {
-	    final CountingBufferedInputStream cinp =
-		new CountingBufferedInputStream
+	    cinp = new CountingBufferedInputStream
 		    (getNewStream(),monitor,getNumberOfChars()/100);
 	    final ParserConfig pc =
 		new ParserConfig(initConfig.getServices().copy(),
@@ -57,6 +58,14 @@ public class KeYFileForTests extends KeYFile {
 	    throw new ProofInputException(e);
 	} catch (FileNotFoundException ioe) {
             throw new ProofInputException(ioe);
+        } finally {
+            if (cinp != null) {
+        	try {
+	            cinp.close();
+                } catch (IOException ioe) {
+                    throw new ProofInputException(ioe);
+                }
+            }
         }
     }
 

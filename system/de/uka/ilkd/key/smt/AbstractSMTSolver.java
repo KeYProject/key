@@ -11,13 +11,7 @@
 package de.uka.ilkd.key.smt;
 
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.LinkedList;
@@ -179,7 +173,7 @@ public abstract class AbstractSMTSolver extends AbstractProcess implements SMTSo
 	
 	// write the content out to the created file
 	//final BufferedWriter out = new BufferedWriter(new FileWriter(smtFile));
-	final FileWriter out = new FileWriter(smtFile);
+	final Writer out = new BufferedWriter(new FileWriter(smtFile));
 	out.write(text);
 	out.close();
 

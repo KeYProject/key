@@ -11,7 +11,6 @@
 package de.uka.ilkd.key.speclang.jml;
 
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
-import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.collection.*;
 import de.uka.ilkd.key.java.Comment;
 import de.uka.ilkd.key.java.Position;
