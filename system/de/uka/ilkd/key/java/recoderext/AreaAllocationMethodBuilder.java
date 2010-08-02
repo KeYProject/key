@@ -1,11 +1,14 @@
 package de.uka.ilkd.key.java.recoderext;
 
+import de.uka.ilkd.key.gui.configuration.ProofSettings;
+import de.uka.ilkd.key.rtsj.proof.init.RTSJProfile;
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.java.Identifier;
 import recoder.java.declaration.*;
 import recoder.java.declaration.modifier.Public;
 import recoder.java.declaration.modifier.Static;
 import recoder.java.reference.TypeReference;
+import recoder.kit.ProblemReport;
 import recoder.list.generic.ASTArrayList;
 import recoder.list.generic.ASTList;
 
@@ -51,6 +54,14 @@ public class AreaAllocationMethodBuilder extends RecoderModelTransformer {
                     td.getMembers().size());
         }
 
+    }
+    
+    public ProblemReport execute() {
+	if (ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof RTSJProfile) {
+	    return super.execute();
+	} else {
+	    return IDENTITY;
+	}
     }
     
 }

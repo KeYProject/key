@@ -25,6 +25,7 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.rtsj.proof.init.RTSJProfile;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.Debug;
 
@@ -120,21 +121,27 @@ public class ConstructorCall extends ProgramMetaConstruct {
 	
         //   the assignment statements + the method body statement + <allocateArea> for memory areas  
         Statement[] stmnts;
-        KeYJavaType typePhysicalMemoryArea = null;
-        try {
-            typePhysicalMemoryArea = services.getJavaInfo().getKeYJavaType("javax.realtime.PhysicalMemoryArea");
-        }catch(RuntimeException ex) {
-            // somebody is using non standard libraries
-        }
-	if(typePhysicalMemoryArea != null && classType == typePhysicalMemoryArea){
-	    stmnts = new Statement[evaluatedArgs.size() + 2];
-	    stmnts[stmnts.length-2] = new MethodReference(new ImmutableArray<Expression>(argumentVariables[0]),
-	            new ProgramElementName(AreaAllocationMethodBuilder.IMPLICIT_AREA_ALLOCATE), 
-	            constructorReference.getTypeReference());
-	}else{
+
+        if (services.getProof().getSettings().getProfile() instanceof RTSJProfile) {
+            KeYJavaType typePhysicalMemoryArea = null;
+            try {
+        	typePhysicalMemoryArea = services.getJavaInfo().getKeYJavaType("javax.realtime.PhysicalMemoryArea");
+            }catch(RuntimeException ex) {
+        	// somebody is using non standard libraries
+            }
+            if(typePhysicalMemoryArea != null && classType == typePhysicalMemoryArea){
+        	stmnts = new Statement[evaluatedArgs.size() + 2];
+        	stmnts[stmnts.length-2] = new MethodReference(new ImmutableArray<Expression>(argumentVariables[0]),
+        		new ProgramElementName(AreaAllocationMethodBuilder.IMPLICIT_AREA_ALLOCATE), 
+        		constructorReference.getTypeReference());
+            } else {
+                stmnts = new Statement[evaluatedArgs.size() + 1];	    
+            }
+	} else {
             stmnts = new Statement[evaluatedArgs.size() + 1];	    
 	}
-	stmnts[stmnts.length-1] = mbs; 
+	
+        stmnts[stmnts.length-1] = mbs; 
 	
 	for (int i = 0, sz=evaluatedArgs.size(); i<sz; i++) {
 	    stmnts[i] = evaluatedArgs.get(i);
