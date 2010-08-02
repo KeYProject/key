@@ -240,7 +240,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                              longConst ( 200 ), longConst ( -100 ) ) ) );
                 
         
-        bindRuleSet (d, "simplify_prog_subset",	longConst(-9000));
+        bindRuleSet (d, "simplify_prog_subset",	longConst(-6000));
         bindRuleSet (d, "modal_tautology",	longConst(-10000));
         
         // features influenced by the strategy options
@@ -313,7 +313,8 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                 add ( NonDuplicateAppModPositionFeature.INSTANCE,
                         longConst ( -1000 ) ) );
 
-        bindRuleSet ( d, "inReachableStateExpandAntec", -200 );
+        bindRuleSet ( d, "inReachableStateExpandAntec", add ( NonDuplicateAppModPositionFeature.INSTANCE,
+                longConst ( -200 ) ) );
 
         bindRuleSet ( d, "inReachableStateExpandRewrite",
 		      add ( not ( TopLevelFindFeature.ANTEC ),
@@ -384,18 +385,18 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 		OperatorTF.create( lastIndexOf ));
         
 	bindRuleSet ( d, "charLiteral_to_intLiteral",
-		ifZero ( isBelow ( keepChar), inftyConst() ) ); 
+		ifZero ( isBelow ( keepChar ), inftyConst () ) ); 
 	
 	
 	// establish normalform 
-	// 
+	
 	bindRuleSet ( d, "stringNormalisationReduce", 
         	SumFeature.createSum ( new Feature[] {
-        		NonDuplicateAppFeature.INSTANCE, longConst(-400) } ));
+        		EqNonDuplicateAppFeature.INSTANCE, longConst(-400) } ));
 
 	bindRuleSet ( d, "stringNormalisation1", 
         	SumFeature.createSum ( new Feature[] {
-        		NonDuplicateAppFeature.INSTANCE, longConst(-200) } ));
+        		EqNonDuplicateAppFeature.INSTANCE, longConst(-200) } ));
 
 	bindRuleSet ( d, "stringAddFacts", 
         	SumFeature.createSum ( new Feature[] {
