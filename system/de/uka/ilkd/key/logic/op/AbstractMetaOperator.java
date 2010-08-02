@@ -15,11 +15,9 @@ import java.util.HashMap;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.ldt.IntegerLDT;
-import de.uka.ilkd.key.logic.ldt.LDT;
 import de.uka.ilkd.key.logic.sort.PrimitiveSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rtsj.rule.metaconstruct.*;
@@ -242,37 +240,41 @@ public abstract class AbstractMetaOperator extends Op implements MetaOperator {
      *  in decimal representation
      */
     public static String convertToDecimalString(Term term, Services services) {
-      	String result = "";
+      	StringBuilder result = new StringBuilder();
 	boolean neg = false;
+	
 	Operator top = term.op();
 	IntegerLDT intModel = services.getTypeConverter().getIntegerLDT();	    
-	Operator numbers = intModel.getNumberSymbol();
-	Operator base    = intModel.getNumberTerminator();
-	Operator minus   = intModel.getNegativeNumberSign();
+	final Operator numbers = intModel.getNumberSymbol();
+	final Operator base    = intModel.getNumberTerminator();
+	final Operator minus   = intModel.getNegativeNumberSign();
 	// check whether term is really a "literal"
-	if (!top.name().equals(numbers.name())){
+	
+	if (top != numbers) {
 	    Debug.out("abstractmetaoperator: Cannot convert to number:", term);
 	    throw (new NumberFormatException());
 	}
+	
 	term = term.sub(0);
 	top = term.op();
 
-	while (top.name().equals(minus.name())){
+	while (top == minus) {
 	    neg=!neg;
 	    term = term.sub(0);
 	    top = term.op();
 	}
 
-	while (! top.name().equals(base.name())){
-	    result = top.name()+result;
+	while (top != base) {
+	    result.insert(0, top.name());
 	    term = term.sub(0);
 	    top = term.op();
 	}
 	
-	if (neg)
-	    return "-"+result;
-	else
-	    return result;
+	if (neg) {
+	    result.insert(0,"-");
+	}
+	
+	return result.toString();
     }
     
     public MetaOperator getParamMetaOperator(String param) {
