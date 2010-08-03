@@ -31,6 +31,8 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.PrimitiveSort;
+import de.uka.ilkd.key.rtsj.proof.init.RTSJProfile;
+import de.uka.ilkd.key.rtsj.rule.metaconstruct.ConstructorCallRTSJ;
 import de.uka.ilkd.key.rule.AbstractProgramElement;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.metaconstruct.ConstructorCall;
@@ -856,8 +858,19 @@ public class ConstructableKeYJavaTypeCollector implements Visitor {
             //let the ConstructorCall metaconstruct expand the constructor 
             //reference
 	    New simpleX = simplifyNew(x);
-            ConstructorCall cc = new ConstructorCall(newObjectSV, simpleX);
-            ProgramElement expandedPe = cc.symbolicExecution(simpleX,
+            
+	    ConstructorCall cc;
+	    
+	    // ugly; we need a meta construct factory that can be replaced ...
+	    if (services.getProof().getSettings().getProfile() instanceof RTSJProfile) {
+		cc = 
+		    new ConstructorCall(newObjectSV, simpleX);
+	    } else {
+		cc = 
+		    new ConstructorCallRTSJ(newObjectSV, simpleX);		
+	    }
+		
+	    ProgramElement expandedPe = cc.symbolicExecution(simpleX,
                                                              services,
                                                              mySvInst);
 

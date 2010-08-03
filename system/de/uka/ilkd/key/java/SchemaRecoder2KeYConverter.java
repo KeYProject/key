@@ -26,6 +26,7 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
+import de.uka.ilkd.key.rtsj.rule.metaconstruct.ConstructorCallRTSJ;
 import de.uka.ilkd.key.rule.metaconstruct.*;
 import de.uka.ilkd.key.util.ExtList;
 
@@ -125,6 +126,9 @@ public class SchemaRecoder2KeYConverter extends Recoder2KeYConverter {
             return new EvaluateArgs((Expression) list.get(Expression.class));
         } else if ("#constructor-call".equals(mcName)) {
             return new ConstructorCall(mc.getFirstSV().getSV(),
+                    (Expression) list.get(Expression.class));
+        } else if ("#constructor-call-rtsj".equals(mcName)) {
+            return new ConstructorCallRTSJ(mc.getFirstSV().getSV(),
                     (Expression) list.get(Expression.class));
         } else if ("#special-constructor-call".equals(mcName)) {
             return new SpecialConstructorCall((Expression) list

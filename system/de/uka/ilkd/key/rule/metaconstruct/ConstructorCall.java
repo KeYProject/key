@@ -10,22 +10,21 @@
 package de.uka.ilkd.key.rule.metaconstruct;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
 import de.uka.ilkd.key.java.expression.operator.New;
-import de.uka.ilkd.key.java.recoderext.AreaAllocationMethodBuilder;
 import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.java.reference.MethodReference;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.op.ProgramMethod;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.rtsj.proof.init.RTSJProfile;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.Debug;
 
@@ -45,13 +44,23 @@ public class ConstructorCall extends ProgramMetaConstruct {
     
     private final SchemaVariable newObjectSV;
 
+    
+    /** 
+     * creates the metaconstruct
+     */
+    protected ConstructorCall(Name name, 
+	    SchemaVariable newObjectSV,
+	    ProgramElement consRef) {
+	super(name, consRef);
+	this.newObjectSV = newObjectSV;
+    }
+    
     /** 
      * creates the metaconstruct
      */
     public ConstructorCall(SchemaVariable newObjectSV,
 			   ProgramElement consRef) {
-	super(new Name("constructor-call"), consRef);
-	this.newObjectSV = newObjectSV;
+	this(new Name("constructor-call"), newObjectSV, consRef);
     }
 
     /** 
@@ -69,18 +78,31 @@ public class ConstructorCall extends ProgramMetaConstruct {
     public ProgramElement symbolicExecution
 	(ProgramElement pe, Services services, SVInstantiations svInst) {
 
-	New constructorReference = (New) pe;
-	ProgramVariable newObject = 
-	    (ProgramVariable) svInst.getInstantiation(newObjectSV);
-	KeYJavaType classType = constructorReference.getTypeReference().getKeYJavaType();		
-
-	final ExecutionContext ec = svInst.getExecutionContext();	
+	final New constructorReference = (New) pe;	
+	final KeYJavaType classType = constructorReference.getTypeReference().getKeYJavaType();			
     
 	if (!(classType.getJavaType() instanceof ClassDeclaration)) {
 	    // no implementation available
 	    return pe;
 	}
 	
+	final List<Statement> stmnts = constructorCallSequence(constructorReference,
+                classType, svInst, services);
+    
+	return new StatementBlock(stmnts.toArray(new Statement[stmnts.size()]));
+    	
+    }
+
+    /**
+     * returns a sequence of statements modelling the Java constructor call semantics explicitly 
+     */
+    protected List<Statement> constructorCallSequence(
+            final New constructorReference, final KeYJavaType classType,
+            SVInstantiations svInst, Services services) {
+	
+	final ProgramVariable newObject = 
+	    (ProgramVariable) svInst.getInstantiation(newObjectSV);
+	final ExecutionContext ec = svInst.getExecutionContext();	
 	final ImmutableArray<Expression> arguments = 
 	    constructorReference.getArguments();
 	
@@ -99,7 +121,7 @@ public class ConstructorCall extends ProgramMetaConstruct {
 	                services, ec);	  
 	}
         
-	if(j==1){
+	if ( j == 1 ) {
             Sort s = services.getJavaInfo().getAttribute(ImplicitFieldAdder.IMPLICIT_ENCLOSING_THIS, classType).sort();
 	    Expression enclosingThis = (Expression) (constructorReference.getReferencePrefix() instanceof Expression?
 	            constructorReference.getReferencePrefix() :
@@ -109,6 +131,7 @@ public class ConstructorCall extends ProgramMetaConstruct {
 	        EvaluateArgs.evaluate(enclosingThis, evaluatedArgs, 
 	                        services, ec);    
 	}
+	
 	ProgramMethod method = services.getJavaInfo().
 	  getProgramMethod(classType, NORMALFORM_IDENTIFIER,
               argumentVariables, ec.
@@ -120,35 +143,15 @@ public class ConstructorCall extends ProgramMetaConstruct {
                new ImmutableArray<Expression>(argumentVariables)); 
 	
         //   the assignment statements + the method body statement + <allocateArea> for memory areas  
-        Statement[] stmnts;
+	final ArrayList<Statement> stmnts = new ArrayList<Statement>();
 
-        if (services.getProof().getSettings().getProfile() instanceof RTSJProfile) {
-            KeYJavaType typePhysicalMemoryArea = null;
-            try {
-        	typePhysicalMemoryArea = services.getJavaInfo().getKeYJavaType("javax.realtime.PhysicalMemoryArea");
-            }catch(RuntimeException ex) {
-        	// somebody is using non standard libraries
-            }
-            if(typePhysicalMemoryArea != null && classType == typePhysicalMemoryArea){
-        	stmnts = new Statement[evaluatedArgs.size() + 2];
-        	stmnts[stmnts.length-2] = new MethodReference(new ImmutableArray<Expression>(argumentVariables[0]),
-        		new ProgramElementName(AreaAllocationMethodBuilder.IMPLICIT_AREA_ALLOCATE), 
-        		constructorReference.getTypeReference());
-            } else {
-                stmnts = new Statement[evaluatedArgs.size() + 1];	    
-            }
-	} else {
-            stmnts = new Statement[evaluatedArgs.size() + 1];	    
-	}
-	
-        stmnts[stmnts.length-1] = mbs; 
-	
 	for (int i = 0, sz=evaluatedArgs.size(); i<sz; i++) {
-	    stmnts[i] = evaluatedArgs.get(i);
-	}
-    
-	return new StatementBlock(stmnts);
-    	
+	    stmnts.add(evaluatedArgs.get(i));
+	}               
+
+        stmnts.add(mbs); 
+	
+	return stmnts;
     }
 
 }

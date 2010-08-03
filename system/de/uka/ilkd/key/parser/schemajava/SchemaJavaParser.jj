@@ -4286,6 +4286,20 @@ RKeYMetaConstruct KeYMetaConstructStatement() :
 	   )
 	  |  
 	  (
+	   "#constructor-call-rtsj" "("	
+	   sv = VariableSV() "," consRef = ExpressionSV() 	
+	   ")" ";" 
+	      {
+		  result = factory.createRKeYMetaConstruct();
+		  setPrefixInfo(result);
+		  result.setChild((Statement)consRef);
+		  result.setSV(sv);
+		  result.setName("#constructor-call-rtsj");
+		  return result;
+	      }
+	   )
+	  |  
+	  (
 	   "#special-constructor-call" "(" consRef = ExpressionSV() ")" ";" 
 	      {
 		  result = factory.createRKeYMetaConstruct();
