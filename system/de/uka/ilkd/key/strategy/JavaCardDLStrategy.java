@@ -408,6 +408,9 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 	bindRuleSet ( d, "stringReduceHigh", SumFeature.createSum ( new Feature[] {
 		longConst ( -5000 ), NonDuplicateAppModPositionFeature.INSTANCE }));
 
+	bindRuleSet ( d, "stringReduceHighTerminating", SumFeature.createSum ( new Feature[] {
+		longConst ( -5000 ) }));
+
 	
     }
 
