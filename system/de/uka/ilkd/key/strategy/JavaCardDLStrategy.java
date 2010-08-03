@@ -392,15 +392,15 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 	
 	bindRuleSet ( d, "stringNormalisationReduce", 
         	SumFeature.createSum ( new Feature[] {
-        		EqNonDuplicateAppFeature.INSTANCE, longConst(-400) } ));
+        		EqNonDuplicateAppFeature.INSTANCE, longConst(100) } ));
 
 	bindRuleSet ( d, "stringNormalisation1", 
         	SumFeature.createSum ( new Feature[] {
-        		EqNonDuplicateAppFeature.INSTANCE, longConst(-200) } ));
+        		EqNonDuplicateAppFeature.INSTANCE, longConst(300) } ));
 
 	bindRuleSet ( d, "stringAddFacts", 
         	SumFeature.createSum ( new Feature[] {
-        		NonDuplicateAppModPositionFeature.INSTANCE, longConst(-100) } ));
+        		NonDuplicateAppModPositionFeature.INSTANCE, longConst(0) } ));
 
     
     }
