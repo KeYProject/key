@@ -18,6 +18,10 @@ public class RTSJInfo extends JavaInfo {
     private LocationVariable defaultMemoryArea;
     private LocationVariable immortalMemoryArea;
 
+    {
+	commonTypes = new KeYJavaType[6];
+    }
+    
     public RTSJInfo(KeYProgModelInfo kpmi, Services s) {
 	super(kpmi, s);
     }
