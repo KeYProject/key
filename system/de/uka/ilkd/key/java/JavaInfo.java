@@ -86,7 +86,7 @@ public class JavaInfo {
      *    java.lang.Object, java.lang.Clonable, java.io.Serializable
      * in </em>in this order</em>
      */
-    protected KeYJavaType[] commonTypes = new KeYJavaType[6];
+    protected KeYJavaType[] commonTypes = new KeYJavaType[3];
 
     //some caches for the getKeYJavaType methods.
     private HashMap<Sort, KeYJavaType> sort2KJTCache = null;
@@ -129,8 +129,8 @@ public class JavaInfo {
     
     /** the name of the class used as default execution context */
     protected static final String DEFAULT_EXECUTION_CONTEXT_CLASS = "<Default>";
-
-	
+    
+    
     /**
      * creates a new JavaInfo object by giving a KeYProgModelInfo to access
      * the Recoder SourceInfo and using the given {@link Services} object.
