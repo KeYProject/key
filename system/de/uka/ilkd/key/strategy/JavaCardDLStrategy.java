@@ -375,6 +375,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 	
 	// do not convert char to int when inside a string function
 	   // feature used to recognize if one is inside a string literal
+        final Function empty = (Function) services.getNamespaces().functions().lookup(StringLDT.EMPTY);
         final Function cons = (Function) services.getNamespaces().functions().lookup(StringLDT.CONS);
         final Function charAt = (Function) services.getNamespaces().functions().lookup(StringLDT.CHAR_AT);
         final Function indexOf = (Function) services.getNamespaces().functions().lookup(StringLDT.INDEX_OF);
@@ -392,7 +393,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 
 /*	equalityStrings;
 	integerToString;
-	stringLengthReduce: one occurrence, always, very high;
+	stringsLengthReduce: one occurrence, always, very high;
 	
 	stringDiffIfFind: does what it says ;
 	stringMoveReplaceInside: always, high, danger of non term, 2 occurrences ;
@@ -409,9 +410,55 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 	stringsLengthInvariantNoLiteral: check 'str' if literal;
 	stringsReduceConcat: always, high;
 	stringsReduceOrMoveOutsideConca: 2 occ, alwys, non term danger,;
-	stringsReduceReplace" always, very high;
+	stringsReduceReplace" always, high;
 	stringsReduceSubstring: always, high, danger of non term.;
+
 */
+	
+	// tf below only for test
+	TermFeature isLiteral = or( op (empty), op ( cons ) );
+	
+	bindRuleSet ( d, "stringsConcatNotBothLiterals",		
+		ifZero ( MatchedIfFeature.INSTANCE,
+		ifZero ( add ( 
+			  applyTF ( instOf("leftStr"), isLiteral ),
+			  applyTF ( instOf("rightStr"), isLiteral ) ), 
+			inftyConst() ), inftyConst() ) ) ;
+
+	bindRuleSet ( d, "stringsLengthInvariantNoLiteral",		
+		ifZero ( applyTF ( instOf("str"), isLiteral ) , 
+			inftyConst() ) ) ;
+
+	
+	bindRuleSet ( d, "stringsLengthReduce", 
+		ifZero ( applyTF ( instOf ("str"), op (empty) ),
+		inftyConst(), longConst (-8000) ));
+	
+	bindRuleSet ( d, "stringsConcatAssoc",  longConst (-8000) );
+
+	bindRuleSet ( d, "stringsReduceReplace", longConst (100) );
+
+	bindRuleSet ( d, "stringsReduceConcat", longConst (100) );
+	
+	bindRuleSet (d, "stringsReduceSubstring", 
+			ifZero (EqNonDuplicateAppFeature.INSTANCE,
+				longConst( 400 ), inftyConst()));
+
+	bindRuleSet (d, "stringsReduceOrMoveOutsideConcat", 
+		ifZero (EqNonDuplicateAppFeature.INSTANCE,
+			longConst( 800 ), inftyConst()));
+	
+	bindRuleSet (d, "stringMoveReplaceInside", 
+		ifZero (EqNonDuplicateAppFeature.INSTANCE,
+			longConst( 400 ), inftyConst()));
+
+	bindRuleSet ( d, "stringsLengthInvariant", longConst (100) );
+	
+	bindRuleSet(d, "stringDiffIfFind", 
+		ifZero ( MatchedIfFeature.INSTANCE,
+                DiffFindAndIfFeature.INSTANCE ) );
+	
+	// old
 	
 	bindRuleSet ( d, "stringNormalisationReduce", 
         	SumFeature.createSum ( new Feature[] {
@@ -425,10 +472,9 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 		NonDuplicateAppModPositionFeature.INSTANCE, longConst(0) } ) );
 
 	bindRuleSet ( d, "stringReduceHigh", SumFeature.createSum ( new Feature[] {ifZero ( not ( isBelow ( ff.atom ) ), inftyConst() ),  
-		ScaleFeature.createScaled (FindDepthFeature.INSTANCE, 400), NonDuplicateAppModPositionFeature.INSTANCE, longConst ( -5000 ) }));
+		ScaleFeature.createScaled (FindDepthFeature.INSTANCE, 400), EqNonDuplicateAppFeature.INSTANCE, longConst ( -5000 ) }));
 
-	bindRuleSet(d, "stringDiffIfFind", ifZero ( MatchedIfFeature.INSTANCE,
-                        DiffFindAndIfFeature.INSTANCE ) );
+	
 	
 	bindRuleSet ( d, "stringReduceHighTerminating", SumFeature.createSum ( new Feature[] {
 		longConst ( -6000 ) }));
@@ -2074,7 +2120,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
     
     private class ArithTermFeatures {
 
-        public ArithTermFeatures (IntegerLDT numbers){
+	public ArithTermFeatures (IntegerLDT numbers){
             Z = numbers.getNumberSymbol ();
 
             add = numbers.getAdd();
@@ -2231,6 +2277,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         
         final TermFeature notContainsProduct;
         final TermFeature notContainsDivMod;
+
     }
 
     private class FormulaTermFeatures {
