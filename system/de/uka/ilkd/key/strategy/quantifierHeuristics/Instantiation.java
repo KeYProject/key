@@ -8,7 +8,6 @@
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 import de.uka.ilkd.key.collection.ImmutableMap;

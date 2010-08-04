@@ -389,6 +389,29 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 	
 	
 	// establish normalform 
+
+/*	equalityStrings;
+	integerToString;
+	stringLengthReduce: one occurrence, always, very high;
+	
+	stringDiffIfFind: does what it says ;
+	stringMoveReplaceInside: always, high, danger of non term, 2 occurrences ;
+	
+	stringNormalisation1;
+	stringNormalisationReduce;
+	stringReduceHigh;
+	stringReduceHighTerminating;
+	
+	stringsConcatAssoc: one occurrence, always, very high;
+
+	stringsConcatNotBothLiterals: checks  'leftStr', 'rightStr' for literal ;
+	stringsLengthInvariant: one occ., always, medium;
+	stringsLengthInvariantNoLiteral: check 'str' if literal;
+	stringsReduceConcat: always, high;
+	stringsReduceOrMoveOutsideConca: 2 occ, alwys, non term danger,;
+	stringsReduceReplace" always, very high;
+	stringsReduceSubstring: always, high, danger of non term.;
+*/
 	
 	bindRuleSet ( d, "stringNormalisationReduce", 
         	SumFeature.createSum ( new Feature[] {
@@ -398,16 +421,15 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         	SumFeature.createSum ( new Feature[] {
         		EqNonDuplicateAppFeature.INSTANCE, longConst(300) } ));
 
-	bindRuleSet ( d, "stringAddFacts", 
-        	SumFeature.createSum ( new Feature[] {
-        		NonDuplicateAppModPositionFeature.INSTANCE, longConst(0) } ));
-
 	bindRuleSet ( d, "equalityStrings", SumFeature.createSum ( new Feature[] {
 		NonDuplicateAppModPositionFeature.INSTANCE, longConst(0) } ) );
 
-	bindRuleSet ( d, "stringReduceHigh", SumFeature.createSum ( new Feature[] {
-		EqNonDuplicateAppFeature.INSTANCE, longConst ( -5000 ) }));
+	bindRuleSet ( d, "stringReduceHigh", SumFeature.createSum ( new Feature[] {ifZero ( not ( isBelow ( ff.atom ) ), inftyConst() ),  
+		ScaleFeature.createScaled (FindDepthFeature.INSTANCE, 400), NonDuplicateAppModPositionFeature.INSTANCE, longConst ( -5000 ) }));
 
+	bindRuleSet(d, "stringDiffIfFind", ifZero ( MatchedIfFeature.INSTANCE,
+                        DiffFindAndIfFeature.INSTANCE ) );
+	
 	bindRuleSet ( d, "stringReduceHighTerminating", SumFeature.createSum ( new Feature[] {
 		longConst ( -6000 ) }));
 
