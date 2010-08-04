@@ -441,8 +441,9 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 	bindRuleSet ( d, "stringsReduceConcat", longConst (100) );
 	
 	bindRuleSet (d, "stringsReduceSubstring", 
-			ifZero (EqNonDuplicateAppFeature.INSTANCE,
-				longConst( 400 ), inftyConst()));
+	        add(ifZero(EqNonDuplicateAppFeature.INSTANCE, longConst(400),
+	                inftyConst()), ScaleFeature.createScaled(
+	                FindDepthFeature.INSTANCE, 400)));
 
 	bindRuleSet (d, "stringsReduceOrMoveOutsideConcat", 
 		ifZero (EqNonDuplicateAppFeature.INSTANCE,
