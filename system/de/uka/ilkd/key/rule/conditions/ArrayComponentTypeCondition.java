@@ -31,6 +31,8 @@ public final class ArrayComponentTypeCondition
 
     private final SchemaVariable var;
     private final boolean checkReferenceType;
+    
+    
 
     /**
      * creates an instance of this condition checking if array var has reference
@@ -44,6 +46,10 @@ public final class ArrayComponentTypeCondition
             			       boolean checkReferenceType) {
 	this.var = var;	
 	this.checkReferenceType = checkReferenceType;
+    }
+    
+    public boolean isCheckReferenceType(){
+	return checkReferenceType;
     }
 
     

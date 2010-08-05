@@ -30,6 +30,13 @@ public final class AbstractOrInterfaceType extends VariableConditionAdapter {
         this.negated = negation;
     }
     
+    public boolean isNegated(){
+	return negated;
+    }
+    
+    public TypeResolver getTypeResolver(){
+	return resolver;
+    }
     
     @Override
     public boolean check(SchemaVariable var, 

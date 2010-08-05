@@ -50,6 +50,8 @@ public class IconFactory {
 	getImage("images/toolbar/decisionProcedureICS.png");
     private static Image decisionProcedureSimplify = 
 	getImage("images/toolbar/decisionProcedureSimplify.png");
+    private static Image decisionProcedureConfigArrow = 
+	    getImage("images/toolbar/decProcArrow.png");
 
     private static Image junit = getImage("images/toolbar/junit_logo.png");
     private static Image jml   = getImage("images/toolbar/jml.png");
@@ -121,6 +123,10 @@ public class IconFactory {
 
     public static ImageIcon selectStrategyArrow(int size) {
         return scaleIcon(autoModeConfigArrow, size / 2, size);
+    }
+    
+    public static ImageIcon selectDecProcArrow(int size) {
+        return scaleIcon(decisionProcedureConfigArrow, size / 2, size);
     }
 
     public static ImageIcon simplifyLogo(int size) {

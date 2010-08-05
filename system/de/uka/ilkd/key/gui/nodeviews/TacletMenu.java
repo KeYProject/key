@@ -22,6 +22,7 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.Main;
+import de.uka.ilkd.key.gui.smt.RuleLauncher;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.FormulaSV;
@@ -32,9 +33,8 @@ import de.uka.ilkd.key.pp.AbbrevException;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.rule.*;
-import de.uka.ilkd.key.smt.DecProcRunner;
 import de.uka.ilkd.key.smt.SMTRule;
-import de.uka.ilkd.key.smt.SMTRuleMulti;
+
 
 /**
  *  This class creates a menu with Taclets as entries. The invoker has
@@ -347,12 +347,11 @@ class TacletMenu extends JMenu {
 		    .selectedTaclet(((TacletMenuItem) e.getSource()).connectedTo(), 
 				    pos);
             } else if (e.getSource() instanceof BuiltInRuleMenuItem) {
-        	if (((BuiltInRuleMenuItem) e.getSource()).connectedTo() instanceof SMTRule ||
-        	    ((BuiltInRuleMenuItem) e.getSource()).connectedTo() instanceof SMTRuleMulti) {
-        	    new DecProcRunner(Main.getInstance()
-        		, Main.getInstance().mediator().getProof()
-        		, Main.getInstance().mediator().getProof().getUserConstraint().getConstraint()
-        		, ((BuiltInRuleMenuItem) e.getSource()).connectedTo()).start();
+        	if (((BuiltInRuleMenuItem) e.getSource()).connectedTo() instanceof SMTRule) {
+        	    SMTRule rule = (SMTRule) ((BuiltInRuleMenuItem) e.getSource()).connectedTo();
+        	    RuleLauncher.INSTANCE.start(rule, Main.getInstance().mediator().getSelectedGoal(),
+        		    Main.getInstance().mediator().getProof().getUserConstraint().getConstraint(),true);
+      
         	} else {
                         mediator.selectedBuiltInRule
                     (((BuiltInRuleMenuItem) e.getSource()).connectedTo(), 

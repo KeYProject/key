@@ -43,6 +43,18 @@ public final class TypeCondition extends VariableConditionAdapter {
         this.nonNull = nonNull;
     }
     
+    public TypeResolver getResolver(){
+	return resolver;
+    }
+    
+    public boolean getIsReference(){
+	return isReference;
+    }
+    
+    public boolean getNonNull(){
+	return nonNull;
+    }
+    
     
     @Override
     public boolean check(SchemaVariable p_var, 

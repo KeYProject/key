@@ -71,6 +71,10 @@ public abstract class TypeResolver {
             this.gs = gs;
         }
 
+        public GenericSort getGenericSort(){
+            return gs;
+        }
+        
         @Override
         public boolean isComplete(SchemaVariable sv, SVSubstitute instCandidate, 
                 SVInstantiations instMap, Services services) {            
@@ -106,6 +110,10 @@ public abstract class TypeResolver {
         @Override
         public Sort resolveSort(SchemaVariable sv, SVSubstitute instCandidate, 
                 SVInstantiations instMap, Services services) {
+            return s;
+        }
+        
+        public Sort getSort(){
             return s;
         }
         

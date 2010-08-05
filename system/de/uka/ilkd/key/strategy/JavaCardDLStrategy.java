@@ -23,7 +23,7 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.SetRuleFilter;
 import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.smt.SMTRule;
-import de.uka.ilkd.key.smt.SMTRuleMulti;
+
 import de.uka.ilkd.key.strategy.feature.*;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.*;
 import de.uka.ilkd.key.strategy.termProjection.*;
@@ -136,7 +136,6 @@ public final class JavaCardDLStrategy extends AbstractFeatureStrategy {
         final Feature pullOutConditionalsF = pullOutConditionalsFeature(longConst(-10001));        
         
         final Feature smtF = smtFeature(inftyConst());
-	final Feature smtMultiF = smtMultiFeature(inftyConst());
 
         return SumFeature.createSum ( new Feature [] {
               AutomatedRuleFeature.INSTANCE,
@@ -148,7 +147,6 @@ public final class JavaCardDLStrategy extends AbstractFeatureStrategy {
               oneStepSimplificationF,
               pullOutConditionalsF,
               smtF, 
-              smtMultiF,
               methodSpecF, 
               depSpecF,
               loopInvF,
@@ -185,10 +183,10 @@ public final class JavaCardDLStrategy extends AbstractFeatureStrategy {
         return ConditionalFeature.createConditional(filter, cost);        
     }       
     
-    private Feature smtMultiFeature(Feature cost) {
-	ClassRuleFilter filter = new ClassRuleFilter(SMTRuleMulti.class);
-        return ConditionalFeature.createConditional(filter, cost);        
-    }       
+  //  private Feature smtMultiFeature(Feature cost) {
+	//ClassRuleFilter filter = new ClassRuleFilter(SMTRuleMulti.class);
+     //   return ConditionalFeature.createConditional(filter, cost);        
+   //}       
 
     
     

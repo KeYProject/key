@@ -58,7 +58,19 @@ public final class TypeComparisonCondition extends VariableConditionAdapter {
 	this.mode = mode;
     }
     
+    public TypeResolver getFirstResolver(){
+	return fst;
+    }
+    
+    public TypeResolver getSecondResolver(){
+	return snd;
+    }
+    
 
+    public Mode getMode(){
+	return mode;
+    }
+    
     @Override
     public boolean check(SchemaVariable var, 
 			 SVSubstitute subst, 

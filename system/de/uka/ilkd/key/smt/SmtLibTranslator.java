@@ -1,11 +1,15 @@
 package de.uka.ilkd.key.smt;
 
 import java.util.ArrayList;
+import java.util.Collection;
 
 import org.apache.log4j.Logger;
 
+import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.sort.Sort;
 
 public class SmtLibTranslator extends AbstractSMTTranslator {
 
@@ -57,6 +61,8 @@ public class SmtLibTranslator extends AbstractSMTTranslator {
 
     private static StringBuffer TERMIFTHENELSE = new StringBuffer("ite");
     
+    private static StringBuffer DISTINCT = new StringBuffer("distinct");
+    
     /**
      * Just a constructor which starts the conversion to Simplify syntax.
      * The result can be fetched with
@@ -103,11 +109,12 @@ public class SmtLibTranslator extends AbstractSMTTranslator {
 	String [] commentPredicate = new String[2];
 	commentPredicate[ContextualBlock.PREDICATE_FORMULA] = "\n\n:notes \"Predicates used in formula:\"";
 	commentPredicate[ContextualBlock.PREDICATE_TYPE]    = "\n\n:notes \"Types expressed by predicates:\"";
-	String [] commentAssumption = new String[4];
+	String [] commentAssumption = new String[5];
 	commentAssumption[ContextualBlock.ASSUMPTION_DUMMY_IMPLEMENTATION] = "\n\n:notes \"Assumptions for dummy variables:\"";
 	commentAssumption[ContextualBlock.ASSUMPTION_FUNCTION_DEFINTION] = "\n\n:notes \"Assumptions for function definitions:\""; 
 	commentAssumption[ContextualBlock.ASSUMPTION_SORT_PREDICATES] = "\n\n:notes \"Assumptions for sort predicates:\"";
 	commentAssumption[ContextualBlock.ASSUMPTION_TYPE_HIERARCHY] = "\n\n:notes \"Assumptions for type hierarchy:\"";
+	commentAssumption[ContextualBlock.ASSUMPTION_TACLET_TRANSLATION]= "\n\n:notes \"Assumptions for taclets:\"";
 	
 	//add the logic definition
 	toReturn.append("\n:logic AUFLIA");
@@ -358,15 +365,16 @@ public class SmtLibTranslator extends AbstractSMTTranslator {
 
     @Override
     protected StringBuffer translateIntegerValue(long val) {
-	StringBuffer arg;
-	if (val < 0) {
-	    arg = translateIntegerValue(val * (-1));
-	    arg = translateIntegerUnaryMinus(arg);
-	} else {
-	    arg = new StringBuffer(Long.toString(val));
+	
+	StringBuffer arg =  new StringBuffer(Long.toString(val));
+	
+	if(val < 0){
+	   // delete the minus sign. 
+	   arg = new StringBuffer(arg.substring(1, arg.length()));  
+	   arg = translateIntegerUnaryMinus(arg);
 	}
-
-	return arg;
+	
+	return arg;	
     }
 
     @Override
@@ -517,6 +525,93 @@ public class SmtLibTranslator extends AbstractSMTTranslator {
     protected StringBuffer translatePredicateName(StringBuffer name) {
 	return makeUnique(name);
     }
+    
+    
+    private boolean haveSameArgs(ImmutableArray<Sort> list1, ImmutableArray<Sort> list2){
+	if(list1.size() == list2.size())
+	for(int i=0; i < list1.size(); i++){
+	    if(!list1.get(i).equals(list2.get(i))){
+		return false;
+	    }
+	}
+	return true;
+    }
+    
+    private boolean haveSameSortSignature(FunctionWrapper fw1, FunctionWrapper fw2){
+	Function f1 = fw1.getFunction();
+	Function f2 = fw2.getFunction();
+	if(!fw1.getName().equals(fw2.getName()) && 
+	   f1.sort().equals(f2.sort()) &&
+	   haveSameArgs(f1.argSorts(),f2.argSorts())){
+	   return true;
+	}
+	return false;
+    }
+    
+    private StringBuffer getQuantifiedVariable(int pos){
+	return new StringBuffer("?n"+pos);
+    }
+    
+    private ArrayList<StringBuffer> getQuantifiedVariables(int count, int start){
+	ArrayList<StringBuffer> list = new ArrayList<StringBuffer>();
+	for(int i=0; i < count; i++){
+	    list.add(getQuantifiedVariable(i+start));
+	}
+	return list;
+    }
+    
+
+   
+    protected StringBuffer buildDistinct(FunctionWrapper [] fw){
+	int start =0;
+	ArrayList<StringBuffer> temp []=  new ArrayList[fw.length];
+	
+	
+	StringBuffer rightSide = new StringBuffer();
+	rightSide.append("( "+ DISTINCT + " ");
+	for(int i=0; i < fw.length; i++){
+		temp[i] = getQuantifiedVariables(fw[i].getFunction().arity(),start);
+		start += fw[i].getFunction().arity();
+		rightSide.append(buildFunction(fw[i].getName(),temp[i])+" ");
+    
+	}
+	
+	rightSide.append(")");
+	
+	for(int j=0; j < fw.length; j++){
+	    for(int i=0; i < fw[j].getFunction().arity(); i++){
+		      Sort sort = fw[j].getFunction().argSorts().get(i);
+		      rightSide = translateLogicalAll(temp[j].get(i),usedDisplaySort.get(sort),rightSide);
+		     
+		 }
+		   
+	}
+	
+	
+	return rightSide;
+	
+    }
+    protected StringBuffer translateUniqueness(FunctionWrapper function,
+            Collection<FunctionWrapper> distinct) throws IllegalFormulaException {
+	if(!function.getFunction().isUnique()){
+	    return null;
+	}
+	function.setUsedForUnique(true);
+	
+	StringBuffer result = translateLogicalTrue();
+	for(FunctionWrapper fw : distinct){
+	    if(!fw.isUsedForUnique() &&
+	        fw.getFunction().isUnique()){
+		FunctionWrapper array [] = {function, fw};
+	       result = translateLogicalAnd(result, buildDistinct(array));
+		
+		
+	    }
+	}
+	return result;
+    }
+    
+
 
     private StringBuffer buildFunction(StringBuffer name,
 	    ArrayList<StringBuffer> args) {
@@ -550,6 +645,8 @@ public class SmtLibTranslator extends AbstractSMTTranslator {
 	return template;
     }
     
+    
+    
     private StringBuffer makeUnique(StringBuffer name) {
 	StringBuffer toReturn = new StringBuffer(name);
 	
@@ -581,7 +678,12 @@ public class SmtLibTranslator extends AbstractSMTTranslator {
 	toReplace.add("\\");
 	replacement.add("_");
 	
+	toReplace.add("$");
+	replacement.add("_dollar_");
+	
 	toReturn = this.removeIllegalChars(toReturn, toReplace, replacement);
+	// names are must not begin with special characters
+	toReturn = (new StringBuffer()).append("a").append(toReturn);
 	
 	toReturn.append("_").append(counter);
 	counter++;
