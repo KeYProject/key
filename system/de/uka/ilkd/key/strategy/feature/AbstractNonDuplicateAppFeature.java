@@ -123,8 +123,9 @@ public abstract class AbstractNonDuplicateAppFeature extends BinaryTacletAppFeat
 
         while ( it.hasNext () ) {
             final ImmutableMapEntry<SchemaVariable,InstantiationEntry> entry0 = it.next ();
-
-            if ( entry0.key ().isNameSV () || entry0.key ().isSkolemTermSV () )
+            
+            if ( entry0.key ().isNameSV () || entry0.key ().isSkolemTermSV () 
+        	    || entry0.key().isVariableSV() )
                 continue;
                 
             final InstantiationEntry instEntry1 = insts1.get ( entry0.key () );
