@@ -38,14 +38,17 @@ public class StringSet {
 		ensures \result == false;
 	  @*/
 	public boolean insert (String /*@ nullable @*/ s) {
-		if (s == null || s.hashCode() % size >= size) {
+	    if (s==null) return false;
+	    int hash = s.hashCode();
+	    hash = (hash < 0 ? (hash == Integer.MIN_VALUE ? Integer.MAX_VALUE : -hash) : hash); 
+		if (hash % size >= size) {
 			return false;
 		} else {
-			if (elements[s.hashCode() % size] == null) {
-				elements[s.hashCode() % size] = s;
+			if (elements[hash % size] == null) {
+				elements[hash % size] = s;
 				return true;
 			} else {
-				return elements[s.hashCode() % size].equals(s);
+				return elements[hash % size].equals(s);
 			}
 		}
 	}
@@ -63,10 +66,13 @@ public class StringSet {
 		ensures \result == false;
 	  @*/
 	public boolean contains (String /*@ nullable @*/ s) {
-		if (s == null || s.hashCode() % size >= size) {
+	    if (s==null) return false;
+	    int hash = s.hashCode();
+	    hash = hash < 0 ? (hash == Integer.MIN_VALUE ? Integer.MAX_VALUE : -hash) : hash; 
+		if (hash % size >= size) {
 			return false;
-		} else {
-			return s.equals(elements[s.hashCode() % size]);
+		} else { 
+		    return s.equals(elements[hash % size]);
 		}
 	}
 		
