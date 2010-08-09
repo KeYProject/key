@@ -75,7 +75,7 @@ public class FindTacletAppContainer extends TacletAppContainer {
     /**
      * @return true iff a subformula that contains the find position stored by
      * this object has been altered since the creation of this object or if a 
-     * preceeding update has changed
+     * preceding update has changed
      */
     private boolean subformulaOrPreceedingUpdateHasChanged ( Goal p_goal ) {
     	ImmutableList<FormulaChangeInfo> infoList =

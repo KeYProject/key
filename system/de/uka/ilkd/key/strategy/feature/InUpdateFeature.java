@@ -13,7 +13,6 @@ import de.uka.ilkd.key.logic.op.QuanUpdateOperator;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.visualdebugger.VisualDebugger;
 
 
 public class InUpdateFeature extends BinaryFeature {

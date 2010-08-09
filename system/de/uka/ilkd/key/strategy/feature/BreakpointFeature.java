@@ -7,8 +7,6 @@
 // See LICENSE.TXT for details.
 package de.uka.ilkd.key.strategy.feature;
 
-import java.util.Iterator;
-
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;

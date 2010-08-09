@@ -16,7 +16,6 @@ import java.util.LinkedList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.TacletIndex;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.smt.SMTSolverResult.ThreeValuedTruth;
 

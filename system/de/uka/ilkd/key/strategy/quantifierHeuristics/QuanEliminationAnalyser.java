@@ -11,8 +11,6 @@
 
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
-import java.util.Iterator;
-
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Op;

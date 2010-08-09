@@ -11,8 +11,6 @@
 
 package de.uka.ilkd.key.strategy.feature;
 
-import java.util.Iterator;
-
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.op.SchemaVariable;

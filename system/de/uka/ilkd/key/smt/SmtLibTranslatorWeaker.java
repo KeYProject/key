@@ -1,19 +1,10 @@
 package de.uka.ilkd.key.smt;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Vector;
 
-import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.Metavariable;
-import de.uka.ilkd.key.logic.op.Op;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.util.Debug;
 
 /** This class behaves almost the same as {@code SmtLibTranslator} but it semantically weakens the 
  * the output formula (a little bit) because otherwise the SMT solvers are not able to find models,

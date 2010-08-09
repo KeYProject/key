@@ -10,8 +10,6 @@
 
 package de.uka.ilkd.key.smt;
 
-import de.uka.ilkd.key.java.Services;
-
 
 public final class YicesSolver extends AbstractSMTSolver {
 

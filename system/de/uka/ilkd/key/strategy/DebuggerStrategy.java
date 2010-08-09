@@ -10,7 +10,6 @@
 
 package de.uka.ilkd.key.strategy;
 
-import java.util.Iterator;
 import java.util.List;
 
 import de.uka.ilkd.key.collection.ImmutableList;

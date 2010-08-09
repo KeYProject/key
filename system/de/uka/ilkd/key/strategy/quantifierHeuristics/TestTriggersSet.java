@@ -22,9 +22,6 @@ import de.uka.ilkd.key.rule.TacletForTests;
 public class TestTriggersSet extends TestCase {
 
 	private Proof proof;
-
-	private TermFactory tf = TermFactory.DEFAULT;
-	private TermBuilder tb = TermBuilder.DF;
     
 	private Namespace variables = new Namespace();
 
