@@ -53,6 +53,7 @@
 ./java_dl/arrayMax.key
 ./java_dl/arrayUpdateSimp.key
 ./java_dl/attributes.key
+./java_dl/binarysearch.key
 ./java_dl/break.key
 ./java_dl/char.key
 ./java_dl/compileTimeConstants.key
