@@ -11,12 +11,12 @@
 package de.uka.ilkd.key.strategy;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.StringConverter;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.ldt.IntegerLDT;
-import de.uka.ilkd.key.logic.ldt.StringLDT;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
@@ -374,17 +374,13 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 	
 	// do not convert char to int when inside a string function
 	   // feature used to recognize if one is inside a string literal
-        final Function empty = (Function) services.getNamespaces().functions().lookup(StringLDT.EMPTY);
-        final Function cons = (Function) services.getNamespaces().functions().lookup(StringLDT.CONS);
-        final Function charAt = (Function) services.getNamespaces().functions().lookup(StringLDT.CHAR_AT);
-        final Function indexOf = (Function) services.getNamespaces().functions().lookup(StringLDT.INDEX_OF);
-        final Function lastIndexOf = (Function) services.getNamespaces().functions().lookup(StringLDT.LAST_INDEX_OF);
+        final StringConverter sc = services.getTypeConverter().getStringConverter();
 	
-	TermFeature keepChar = or ( 
-		or ( OperatorTF.create( cons ), OperatorTF.create( charAt ), OperatorTF.create(  indexOf ) ), 
-		OperatorTF.create( lastIndexOf ));
+        final TermFeature keepChar = or ( 
+		or ( OperatorTF.create( sc.cons() ), OperatorTF.create( sc.charAt() ), OperatorTF.create(  sc.indexOf() ) ), 
+		OperatorTF.create( sc.lastIndexOf() ));
         
-	TermFeature emptyF = OperatorTF.create( empty );
+	final TermFeature emptyF = OperatorTF.create( sc.empty() );
 	
 	bindRuleSet ( d, "charLiteral_to_intLiteral",
 		ifZero ( isBelow ( keepChar ), inftyConst (), longConst (-100) ) ); 
@@ -393,7 +389,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 	// establish normalform 
 
 	// tf below only for test
-	final TermFeature stringLiteral = or( op (empty), op ( cons ) );
+	final TermFeature stringLiteral = or( op (sc.empty()), op ( sc.cons() ) );
 
 	Feature belowModOpPenality = ifZero  ( isBelow ( ff.modalOperator ),
 		  longConst ( 500 ) );	

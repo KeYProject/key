@@ -50,15 +50,17 @@ public class TypeConverter extends TermBuilder {
     private IntegerDomainLDT integerDomainLDT;
     private FloatLDT floatLDT;
     private DoubleLDT doubleLDT;
-    private StringLDT stringLDT;
-    private StringConverter stringConverter = new StringConverter(); //TODO replace with stringLDT when library problem solved
-
+    
+    
+    private StringConverter stringConverter;
     private ImmutableList<LDT> models = ImmutableSLList.<LDT>nil();
 
     
 
     TypeConverter(Services s){
         services = s;       
+        stringConverter = new StringConverter(s); //TODO replace with stringLDT 
+
     }
 
     /**
@@ -87,9 +89,7 @@ public class TypeConverter extends TermBuilder {
             this.floatLDT = (FloatLDT)ldt;
         } else if (ldt instanceof DoubleLDT) {
             this.doubleLDT = (DoubleLDT)ldt;
-        } else if (ldt instanceof StringLDT) {
-	    this.stringLDT = (StringLDT)ldt;
-	}
+        } 
 
         this.models = this.models.prepend(ldt);
         Debug.out("Initialize LDTs: ", ldt);
@@ -193,10 +193,6 @@ public class TypeConverter extends TermBuilder {
     
     public BooleanLDT getBooleanLDT() {
 	return booleanLDT;
-    }
-
-    public StringLDT getStringLDT() {
-	return stringLDT;
     }
     
     private final HashMap<String, Term> mcrMap = new HashMap<String, Term>(10);
@@ -440,8 +436,7 @@ public class TypeConverter extends TermBuilder {
         } else if (lit instanceof LongLiteral) {
             return intLDT.translateLiteral(lit);
         } else if (lit instanceof StringLiteral) {
-	    return stringConverter.translateLiteral(lit,charLDT,services);
-	    //	    return stringLDT.translateLiteral(lit);
+	    return stringConverter.translateLiteral(lit, charLDT, services);
         } else if (lit instanceof FloatLiteral) {
             return floatLDT.translateLiteral(lit);
         } else if (lit instanceof DoubleLiteral) {
@@ -948,10 +943,14 @@ public class TypeConverter extends TermBuilder {
 	    t == PrimitiveType.JAVA_BOOLEAN;
     }
 
-    public TypeConverter copy(Services services) {
-	final TypeConverter tc = new TypeConverter(services);
+    public TypeConverter copy(Services s) {
+	final TypeConverter tc = new TypeConverter(s);
 	tc.init(models);
 	return tc;
+    }
+
+    public StringConverter getStringConverter() {
+	return stringConverter;
     }
  
 }

@@ -54,7 +54,7 @@ public abstract class LDT {
      */
     protected final Type type;
     
-    protected HashMap keyJavaType = new HashMap();
+    protected HashMap<Type, KeYJavaType> keyJavaType = new HashMap<Type, KeYJavaType>();
 
     /**
      * creates a new LDT complete with the target sort of the language
@@ -117,7 +117,7 @@ public abstract class LDT {
      * @return the KeYJavaType the the given type t
      */
     public KeYJavaType getKeYJavaType(Type t) {
-	return (KeYJavaType)keyJavaType.get(t);
+	return keyJavaType.get(t);
     }
 
     /** returns the basic functions of the model

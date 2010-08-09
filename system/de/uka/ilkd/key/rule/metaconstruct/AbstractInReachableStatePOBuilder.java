@@ -15,7 +15,6 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.UpdateFactory;
-import de.uka.ilkd.key.logic.ldt.StringLDT;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.*;
 import de.uka.ilkd.key.rule.UpdateSimplifier;
@@ -172,10 +171,10 @@ public abstract class AbstractInReachableStatePOBuilder extends TermBuilder {
         	if (elementSort instanceof ObjectSort) {
         	    result = validateArrayElementUpdate(update, pair, loc);
         	}
-            } else if (loc.name().equals(StringLDT.POOL_NAME)) {
+            } else if (loc == services.getTypeConverter().getStringConverter().pool()) {
         	// Update pool(lit):=v
         	
-        	Function content = (Function) services.getNamespaces().functions().lookup(StringLDT.CONTENT_NAME);
+        	Function content = services.getTypeConverter().getStringConverter().content();
         	
         	assert content != null;
         	
