@@ -1737,9 +1737,10 @@ javaliteral returns [Term result=null] throws SLTranslationException
 	    raiseNotSupported("string literals");
 	}
     |
-	CHAR_LITERAL 
+	c:CHAR_LITERAL 
 	{
-	    raiseNotSupported("character literals");
+	   return tb.charTerm(services, c.getText());
+	    
 	}
     ;
 

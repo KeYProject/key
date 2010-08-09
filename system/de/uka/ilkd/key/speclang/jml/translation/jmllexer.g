@@ -224,7 +224,13 @@ DIGITS
 ;
 
 CHAR_LITERAL:
-        '\'' //not completed
+        '\'' 
+                ((' '..'&') |
+                 ('('..'[') |
+                 (']'..'~') |
+                 ('\\' ('\'' | '\\' | 'n' | 'r' | 't' | 'b' | 'f' | '"' | 'u' HEXNUMERAL ))
+                )
+      '\''
     ;
 
 STRING_LITERAL
