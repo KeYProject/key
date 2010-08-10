@@ -32,7 +32,7 @@ class Substitution {
 
     private final TermBuilder tb = TermBuilder.DF;
     
-    private ImmutableMap<QuantifiableVariable,Term> varMap;
+    private final ImmutableMap<QuantifiableVariable,Term> varMap;
     
     public Substitution(ImmutableMap<QuantifiableVariable,Term> map){
         varMap = map;

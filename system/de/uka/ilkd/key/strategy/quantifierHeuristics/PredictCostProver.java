@@ -46,9 +46,14 @@ class PredictCostProver {
     public static long computerInstanceCost(Substitution sub, Term matrix,
 	    ImmutableSet<Term> assertList, Services services) {
 
-	final PredictCostProver prover = new PredictCostProver(sub
-		.applyWithoutCasts(matrix), assertList, services);
-	return prover.cost();
+	if (!sub.isGround()) {
+	    // non-ground substitutions not supported yet
+	    return -1;
+	} else {
+	    final PredictCostProver prover = new PredictCostProver(sub
+		    .applyWithoutCasts(matrix), assertList, services);
+	    return prover.cost();
+	}
     }
 
     // init context

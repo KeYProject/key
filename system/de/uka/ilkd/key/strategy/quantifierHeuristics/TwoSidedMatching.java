@@ -43,14 +43,27 @@ class TwoSidedMatching {
             ReplacerOfQuanVariablesWithMetavariables.createSubstitutionForVars ( targetTerm );
         this.triggerSubstWithMVs =
             trigger.getTriggerSetThisBelongsTo().getReplacementWithMVs ();
-        this.targetWithMVs =
-            targetSubstWithMVs.apply ( TriggerUtils.discardQuantifiers ( targetTerm ) );
-        this.triggerWithMVs =
-            triggerSubstWithMVs.apply ( trigger.getTriggerTerm () );
+        
+        if (targetSubstWithMVs.isGround()) {
+            this.targetWithMVs =
+        	targetSubstWithMVs.apply ( TriggerUtils.discardQuantifiers ( targetTerm ) );
+        } else {
+            this.targetWithMVs = null;            
+        }
+        if (triggerSubstWithMVs.isGround()) {
+            this.triggerWithMVs =
+        	triggerSubstWithMVs.apply ( trigger.getTriggerTerm () );
+        } else {
+            this.triggerWithMVs = null;            
+        }
     }
     
     ImmutableSet<Substitution> getSubstitutions(Services services) {
-        return getAllSubstitutions ( targetWithMVs, services );
+        if (triggerWithMVs == null || targetWithMVs == null) {
+            // non ground subs not supported yet
+            return DefaultImmutableSet.<Substitution>nil();
+        }
+	return getAllSubstitutions ( targetWithMVs, services );
     }
     
     private ImmutableSet<Substitution> getAllSubstitutions(Term target, Services services) {
