@@ -1,11 +1,11 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (c) 2003 Andre Platzer. All Rights Reserved.
+//
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
-//
+
 /** 
  * (#)$RCSfile$ 1.1 2003-02-10 Andre Platzer
  *
