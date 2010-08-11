@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -15,12 +15,12 @@ import java.util.HashMap;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermFactory;
-import de.uka.ilkd.key.logic.ldt.LDT;
+import de.uka.ilkd.key.logic.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.sort.PrimitiveSort;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.rtsj.rule.metaconstruct.*;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.metaconstruct.*;
@@ -42,11 +42,49 @@ public abstract class AbstractMetaOperator extends Op implements MetaOperator {
     public static final AbstractMetaOperator META_LENGTH = new MetaLength();
 
     public static final AbstractMetaOperator META_ATTRIBUTE = new MetaAttribute();
+    
+    public static final AbstractMetaOperator META_INSTANCE = new MetaInstance();
 
     public static final AbstractMetaOperator META_CREATED = new MetaCreated();
     
+    public static final AbstractMetaOperator META_MEMORY_AREA = new MetaMemoryArea();
+    
     public static final AbstractMetaOperator META_NEXT_TO_CREATE = new MetaNextToCreate();
 
+    public static final AbstractMetaOperator META_ARRAY_SIZE = new ArraySize();
+    
+    public static final AbstractMetaOperator META_OBJECT_SIZE = new ObjectSize();
+        
+    public static final AbstractMetaOperator META_NEXT_TO_CREATE_STACK = new MetaNextToCreateStack();
+        
+    public static final AbstractMetaOperator META_CONSUMED_AT_PRE = new ConsumedAtPre();
+    
+    public static final AbstractMetaOperator META_WS_AT_PRE = new WSAtPre();
+    
+    public static final AbstractMetaOperator META_CONSUMED_LOOP_UPDATE = new ConsumedLoopUpdate();
+    
+    public static final AbstractMetaOperator META_CONSUMED_LOOP_INVARIANT = new ConsumedLoopInvariants();
+        
+    public static final AbstractMetaOperator META_STACK_AT_INDEX = new StackAtIndex();
+    
+    public static final AbstractMetaOperator META_UPDATE_SCOPE = new UpdateScope();
+    
+    public static final AbstractMetaOperator META_UNIQUE_ANON_UPDATE = new UniqueAnonUpdate(); 
+    
+    public static final AbstractMetaOperator META_CALCULATE_ARRAY_SIZE = 
+        new CalculateArraySize();
+    
+    public static final AbstractMetaOperator META_WC_ARRAY_SIZE = 
+        new WorstCaseArraySize();
+    
+    public static final AbstractMetaOperator META_BC_ARRAY_SIZE = 
+        new BestCaseArraySize();
+    
+    public static final AbstractMetaOperator META_PRECONDITION_FOR_WS = 
+        new PreconditionForWS();
+    
+    public static final AbstractMetaOperator META_PRE_VALID_IN_STATE_OF_WS = 
+        new PreValidInStateOfWS();
 
     public static final AbstractMetaOperator META_TRAINITIALIZED = new MetaTraInitialized();
 
@@ -129,8 +167,11 @@ public abstract class AbstractMetaOperator extends Op implements MetaOperator {
     public static final AbstractMetaOperator DIVIDE_LCR_MONOMIALS = new DivideLCRMonomials ();
 
     public static final AbstractMetaOperator CREATE_IN_REACHABLE_STATE_PO = 
-        new CreateInReachableStatePO ();
-    
+        new CreateInReachableStatePO ("#createInReachableStatePO", InReachableStatePOBuilder.class);
+
+    public static final AbstractMetaOperator CREATE_IN_REACHABLE_STATE_PO_RTSJ = 
+        new CreateInReachableStatePO("#createInReachableStateRTSJPO", InReachableStateRTSJPOBuilder.class);
+
     public static final AbstractMetaOperator INTRODUCE_ATPRE_DEFINITIONS = new IntroAtPreDefsOp();
     
     public static final AbstractMetaOperator AT_PRE_EQUATIONS = new AtPreEquations();
@@ -199,39 +240,41 @@ public abstract class AbstractMetaOperator extends Op implements MetaOperator {
      *  in decimal representation
      */
     public static String convertToDecimalString(Term term, Services services) {
-      	String result = "";
+      	StringBuilder result = new StringBuilder();
 	boolean neg = false;
-	Operator top = term.op();
-	LDT intModel = services.getTypeConverter().getIntegerLDT();	    
-	Namespace intFunctions = intModel.functions();
-	Operator numbers = (Operator)intFunctions.lookup(new Name("Z"));
-	Operator base = (Operator)intFunctions.lookup(new Name("#"));
-	Operator minus =(Operator) intFunctions.lookup(new Name("neglit"));
 	
+	Operator top = term.op();
+	IntegerLDT intModel = services.getTypeConverter().getIntegerLDT();	    
+	final Operator numbers = intModel.getNumberSymbol();
+	final Operator base    = intModel.getNumberTerminator();
+	final Operator minus   = intModel.getNegativeNumberSign();
 	// check whether term is really a "literal"
-	if (!top.name().equals(numbers.name())){
+	
+	if (top != numbers) {
 	    Debug.out("abstractmetaoperator: Cannot convert to number:", term);
 	    throw (new NumberFormatException());
 	}
+	
 	term = term.sub(0);
 	top = term.op();
 
-	while (top.name().equals(minus.name())){
+	while (top == minus) {
 	    neg=!neg;
 	    term = term.sub(0);
 	    top = term.op();
 	}
 
-	while (! top.name().equals(base.name())){
-	    result = top.name()+result;
+	while (top != base) {
+	    result.insert(0, top.name());
 	    term = term.sub(0);
 	    top = term.op();
 	}
 	
-	if (neg)
-	    return "-"+result;
-	else
-	    return result;
+	if (neg) {
+	    result.insert(0,"-");
+	}
+	
+	return result.toString();
     }
     
     public MetaOperator getParamMetaOperator(String param) {

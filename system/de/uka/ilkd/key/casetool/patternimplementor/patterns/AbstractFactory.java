@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -105,18 +105,18 @@ public class AbstractFactory implements AbstractPatternImplementor {
         //SourceCode classes = new SourceCode();
         SourceCode source = new SourceCode();
 
-        for (int j = 0; j < cps.length; j++) {
+        for (String[] cp : cps) {
             //Property cp = (Property)concreteProducts.elementAt(j);
-            for (int i = 0; i < Math.min(ap.length, cps[j].length); i++) {
+            for (int i = 0; i < Math.min(ap.length, cp.length); i++) {
                 //SourceCode source = new SourceCode();
-                source.beginClass(cps[j][i]);
+                source.beginClass(cp[i]);
                 source.add("/**");
                 source.add(constraintMechanism.getConstraints(" * ",
-                        "ConcreteProduct", cps[j][i]));
+                        "ConcreteProduct", cp[i]));
                 source.add(" */");
 
-                source.add("public class " + cps[j][i] + " extends " + ap[i] +
-                    " {");
+                source.add("public class " + cp[i] + " extends " + ap[i] +
+                        " {");
                 source.add("}");
 
                 //classes.add(source);
@@ -133,14 +133,14 @@ public class AbstractFactory implements AbstractPatternImplementor {
         //SourceCode classes = new SourceCode();
         SourceCode source = new SourceCode();
 
-        for (int i = 0; i < ap.length; i++) {
+        for (String anAp : ap) {
             //SourceCode source = new SourceCode();
-            source.beginClass(ap[i]);
+            source.beginClass(anAp);
             source.add("/**");
             source.add(constraintMechanism.getConstraints(" * ",
-                    "AbstractProduct", ap[i]));
+                    "AbstractProduct", anAp));
             source.add(" */");
-            source.add("public class " + ap[i] + " {");
+            source.add("public class " + anAp + " {");
             source.add("}");
 
             //classes.add(source);
@@ -164,13 +164,12 @@ public class AbstractFactory implements AbstractPatternImplementor {
         source.add(" */");
         source.add("public abstract class " + af + " {");
 
-        for (int i = 0; i < ap.length; i++) {
-            String tmp = ap[i];
+        for (String tmp : ap) {
             source.add("\t/**");
             source.add(constraintMechanism.getConstraints("\t * ",
-                    "AbstractFactory::createProduct", af + "::" + ap[i]));
+                    "AbstractFactory::createProduct", af + "::" + tmp));
             source.add("\t */");
-            source.add("\tpublic abstract " + ap[i] + " Create" + tmp + "();");
+            source.add("\tpublic abstract " + tmp + " Create" + tmp + "();");
         }
 
         source.add("}");

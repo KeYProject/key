@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -235,8 +235,8 @@ public class UpdateFactory {
     
     public Update quantify (QuantifiableVariable[] vars, Update update) {
         Update res = update;
-        for (int i = 0; i < vars.length; i++) {
-            res = quantify (vars[i], res);
+        for (QuantifiableVariable var : vars) {
+            res = quantify(var, res);
         }
         return res;
     }

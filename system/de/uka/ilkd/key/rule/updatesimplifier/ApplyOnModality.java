@@ -1,10 +1,11 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
+//
 //
 /*
  * Created on 16.12.2004
@@ -104,7 +105,7 @@ public class ApplyOnModality extends AbstractUpdateRule {
      * @return true if the given location is protected
      */
     private boolean protectedLocation(Location loc, 
-            HashSet<? extends Object> protectedProgVars) {
+            HashSet<?> protectedProgVars) {
         // currently it would be safe to comment the PROTECTED_HEAP part out as 
         // heap locations are generally not thrown away. But in principle one can think
         // of a more finegrained control

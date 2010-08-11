@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -14,6 +14,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Enumeration;
+import java.util.List;
+import java.util.ArrayList;
 import java.util.NoSuchElementException;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
@@ -39,7 +41,8 @@ public class ZipFileCollection implements FileCollection {
         this.file = file;
     }
 
-    public Walker createWalker(String extension) throws IOException {
+
+    public Walker createWalker(String[] extensions) throws IOException {
         if(zipFile == null)
             try {
                 zipFile = new ZipFile(file);
@@ -48,19 +51,25 @@ public class ZipFileCollection implements FileCollection {
                 iox.initCause(ex);
                 throw iox;
             }
-        return new Walker(extension.toLowerCase());
+        return new Walker(extensions);
     }
-    
+
+    public Walker createWalker(String extension) throws IOException {
+        return createWalker(new String[] { extension });
+    }
 
     class Walker implements FileCollection.Walker {
 
         private Enumeration<? extends ZipEntry> enumeration;
         private ZipEntry currentEntry;
-        private String extension;
+        private List<String> extensions;
 
-        public Walker(String extension) {
+        public Walker(String[] extensions) {
             this.enumeration = zipFile.entries();
-            this.extension = extension;
+            this.extensions = new ArrayList<String>();
+            for(String extension : extensions) {
+              this.extensions.add(extension.toLowerCase());
+            }
         }
 
         public String getCurrentName() {
@@ -81,8 +90,12 @@ public class ZipFileCollection implements FileCollection {
             currentEntry = null;
             while(enumeration.hasMoreElements() && currentEntry == null) {
                 currentEntry = enumeration.nextElement();
-                if(extension != null && !currentEntry.getName().toLowerCase().endsWith(extension))
-                    currentEntry = null;
+                for(String extension : extensions) {
+                  if(extension != null && !currentEntry.getName().toLowerCase().endsWith(extension))
+                     currentEntry = null;
+                  else
+                     break;
+                }
             }
             return currentEntry != null;
         }

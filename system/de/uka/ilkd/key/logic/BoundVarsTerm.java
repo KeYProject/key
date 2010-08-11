@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -51,11 +51,11 @@ class BoundVarsTerm extends Term {
 	this.subTerm = new ImmutableArray<Term>(subTerm);
 	this.boundVars = boundVars;
 	int max_depth = -1;
-	for (int i = 0; i < subTerm.length; i++) {
-	    if (subTerm[i].depth() > max_depth) {
-		max_depth = subTerm[i].depth();	
-	    }
-	}
+        for (Term aSubTerm : subTerm) {
+            if (aSubTerm.depth() > max_depth) {
+                max_depth = aSubTerm.depth();
+            }
+        }
 	depth = max_depth + 1;
 
     }  

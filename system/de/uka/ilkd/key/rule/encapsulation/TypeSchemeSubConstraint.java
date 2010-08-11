@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -11,7 +11,6 @@
 package de.uka.ilkd.key.rule.encapsulation;
 
 import de.uka.ilkd.key.collection.ImmutableSet;
-
 
 class TypeSchemeSubConstraint implements TypeSchemeConstraint {
     private TypeSchemeTerm term1, term2;

@@ -9,6 +9,7 @@
 \title{Inductive Proof of a simple while loop}
 \author{Andreas Roth\footnote{originally dated to April 4, 2003. Adapted for newer KeY versions by Mattias Ulbrich}}
 \date{last update: June 26, 2008}
+
 \maketitle
 
 \section*{Proof obligation}
@@ -34,8 +35,8 @@ Induction over $\java{il}$.
   \item Arithmetic treatment: Basic
   \item Quantifier treatment: None
   \item intRules:arithmenticSemanticsIgnoringOF (the proof is done
-    over the mathematical integers, not the java integers with limited
-    range)
+   over the mathematical integers, not the java integers with limited
+   range)
   \end{enumerate}
 
 \item Select taclet \textsf{int\_induction} (available on sequent

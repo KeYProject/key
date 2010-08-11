@@ -1,10 +1,12 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
+//
+//
 package de.uka.ilkd.key.visualization;
 
 import java.util.Arrays;
@@ -40,10 +42,10 @@ public class VisualizationModel {
      */    
     public ExecutionTraceModel[] getInterestingExecutionTraces() {
         LinkedList result = new LinkedList();
-        for (int i = 0; i < traces.length; i++) {
-            if ((traces[i].getFirstContextTraceElement()!=TraceElement.END)&&
-                    traces[i].getType() == ExecutionTraceModel.TYPE1) {
-                result.add(traces[i]);
+        for (ExecutionTraceModel trace : traces) {
+            if ((trace.getFirstContextTraceElement() != TraceElement.END) &&
+                    trace.getType() == ExecutionTraceModel.TYPE1) {
+                result.add(trace);
             }
         }
         ExecutionTraceModel[] exTraceModels = new ExecutionTraceModel[result

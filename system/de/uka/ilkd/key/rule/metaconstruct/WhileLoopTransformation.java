@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -41,7 +41,7 @@ import de.uka.ilkd.key.util.ExtList;
  */
 public class WhileLoopTransformation extends JavaASTVisitor {
 
-    protected static final Boolean CHANGED = new Boolean(true);
+    protected static final Boolean CHANGED = Boolean.TRUE;
     /** the replacement element */
     protected ProgramElement replacement;
     /** break outerlabel */

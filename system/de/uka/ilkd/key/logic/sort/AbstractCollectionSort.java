@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -48,6 +48,6 @@ public abstract class AbstractCollectionSort
      * @return the sorts of the predecessors of this sort
      */
     public ImmutableSet<Sort> extendsSorts() {
-	return DefaultImmutableSet.<Sort>nil();
+	return DefaultImmutableSet.nil();
     }
 }

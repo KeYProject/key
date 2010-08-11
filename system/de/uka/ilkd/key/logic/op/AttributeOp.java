@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -71,7 +71,7 @@ public class AttributeOp extends AccessOp {
 	super(new Name("." + attribute.name().toString()));
 	this.attribute = attribute;
 	this.sort = attribute  instanceof ProgramSV ? 
-	    ((ProgramSV)attribute).sort() : ((ProgramVariable)attribute).sort();
+	    attribute.sort() : attribute.sort();
     }
 
     /**
@@ -85,7 +85,8 @@ public class AttributeOp extends AccessOp {
      */
     public boolean validTopLevel(Term term) {
 	if (((AttributeOp)term.op()).attribute() instanceof SchemaVariable ||
-	    term.sub(0).op() instanceof SchemaVariable) {
+	    term.sub(0).op() instanceof SchemaVariable ||
+	    term.sub(0).sort() == AbstractMetaOperator.METASORT) {
 	    return true;
 	} else if (term.arity() != arity()) {
 	    return false;
@@ -130,7 +131,7 @@ public class AttributeOp extends AccessOp {
      * @return the KeYJavaType of this access operator
      */
     public KeYJavaType getKeYJavaType(Term t) {
-	return ((ProgramVariable)attribute).getKeYJavaType();
+	return attribute.getKeYJavaType();
     }
 
     /**

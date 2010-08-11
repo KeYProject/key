@@ -1,3 +1,10 @@
+// This file is part of KeY - Integrated Deductive Software Design
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General Public License. 
+// See LICENSE.TXT for details.
 package de.uka.ilkd.key.collection;
 
 import java.util.Iterator;
@@ -43,7 +50,7 @@ public class DefaultImmutableSet<T> implements ImmutableSet<T> {
      * PRECONDITION: elementList has no duplicates
      * @param elementList IList<T> contains all elements of the new Set
      */
-    protected DefaultImmutableSet(ImmutableList<T> elementList) {
+    private DefaultImmutableSet(ImmutableList<T> elementList) {
 	this.elementList=elementList;
     }
 
@@ -160,7 +167,7 @@ public class DefaultImmutableSet<T> implements ImmutableSet<T> {
 	Iterator<T> it=this.iterator();
 	StringBuffer str=new StringBuffer("{");
 	while (it.hasNext()) {
-	    str.append(""+it.next());
+	    str.append(it.next());
 	    if (it.hasNext()) {
 		str.append(",");
 	    }

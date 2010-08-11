@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -265,7 +265,7 @@ public class CvsRunner {
     
     private String print(String[] arr) {
         StringBuffer s = new StringBuffer(300);
-        for (int i=0; i<arr.length; i++) s.append(arr[i]);
+        for (String anArr : arr) s.append(anArr);
         return s.toString();
     }
     

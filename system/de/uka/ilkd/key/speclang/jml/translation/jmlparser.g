@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -18,13 +18,17 @@ header {
     
     import de.uka.ilkd.key.collection.*;
 
+	import de.uka.ilkd.key.gui.configuration.ProofSettings;
     import de.uka.ilkd.key.java.JavaInfo;
     import de.uka.ilkd.key.java.Position;
     import de.uka.ilkd.key.java.Services;
     import de.uka.ilkd.key.java.abstraction.*;
     import de.uka.ilkd.key.java.declaration.ArrayDeclaration;
     import de.uka.ilkd.key.java.declaration.ClassDeclaration;
+    import de.uka.ilkd.key.java.declaration.TypeDeclaration;
+    import de.uka.ilkd.key.java.declaration.VariableDeclaration;
     import de.uka.ilkd.key.java.expression.literal.BooleanLiteral;
+    import de.uka.ilkd.key.java.expression.literal.IntLiteral;
     import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
     import de.uka.ilkd.key.logic.*;
     import de.uka.ilkd.key.logic.ldt.LDT;
@@ -34,15 +38,17 @@ header {
     import de.uka.ilkd.key.proof.AtPreFactory;
     import de.uka.ilkd.key.proof.OpReplacer;
     import de.uka.ilkd.key.proof.init.CreatedAttributeTermFactory;
+    import de.uka.ilkd.key.rtsj.proof.init.RTSJProfile;
+    import de.uka.ilkd.key.rtsj.logic.op.*;
     import de.uka.ilkd.key.speclang.FormulaWithAxioms;
     import de.uka.ilkd.key.speclang.PositionedString;
+    import de.uka.ilkd.key.speclang.SignatureVariablesFactory;
     import de.uka.ilkd.key.speclang.translation.*;
     import de.uka.ilkd.key.util.Debug;
 
     import java.lang.RuntimeException;
     import java.math.BigInteger;
-    import java.util.Map;
-    import java.util.LinkedHashMap;
+    import java.util.*;
 }
 
 class KeYJMLParser extends Parser;
@@ -62,6 +68,8 @@ options {
 
     private static Sort boolSort;
     private static Term trueLitTerm;
+    
+    private KeYJavaType specInClass;
 
     private ParsableVariable selfVar;
     private ImmutableList<ParsableVariable> paramVars;
@@ -110,6 +118,7 @@ options {
 						      specInClass,
 						      selfVar,
 						      this.excManager);
+	this.specInClass = specInClass;
 
 	// initialize namespaces
 	resolverManager.pushLocalVariablesNamespace();
@@ -286,7 +295,42 @@ options {
 	}
 	return result;
     }
-
+    
+    private int determineElementSize(KeYJavaType kjt, int dim){
+        if(dim>0){
+            return 4;
+        }
+        String baseType = kjt.getSort().toString();
+        if(baseType.equals("jbyte") || baseType.equals("boolean")){
+            return 1;
+        }else if(baseType.equals("jshort") || baseType.equals("jchar")){
+            return 2;
+        }else if(baseType.equals("jlong")){
+            return 8;
+        }else{
+            return 4;
+        }
+    }
+    
+    private Term createArraySizeTerm(int size, ImmutableList<Term> l){
+        Term elSize = l.tail().isEmpty() ?
+        services.getTypeConverter().convertToLogicElement(
+            new IntLiteral(""+size)) :
+        services.getTypeConverter().convertToLogicElement(
+            new IntLiteral("4"));
+        Function arraySize = 
+            (Function) services.getNamespaces().functions().lookup(new Name("arraySize"));
+        Function mul = (Function) services.getNamespaces().functions().lookup(new Name("mul"));
+        Function add = (Function) services.getNamespaces().functions().lookup(new Name("add"));
+        Term headSize = tb.func(arraySize, elSize, l.head());
+        if(l.tail().isEmpty()){
+            return headSize;
+        }else{
+            return tb.func(add, headSize, 
+                tb.func(mul, l.head(), 
+                    createArraySizeTerm(size,l.tail())));
+        }
+    }
 
     /**
      * Extracts the sorts from an array of terms as an array.
@@ -303,7 +347,7 @@ options {
      * Converts a term so that all of its non-rigid operators refer to the pre-state.
      * Creates and saves new atPreFunctions when necessary.
      */
-    private Term convertToOld(Term term) {
+    public Term convertToOld(Term term) {
 	assert atPreFunctions != null;
 	Operator newOp;
 	if(term.op() instanceof NonRigid && term.op() != selfVar) {
@@ -575,8 +619,10 @@ options {
 	ProgramVariable objectTimesFinalizedAttribute
 		= javaInfo.getAttribute("objectTimesFinalized", 
                                         javaInfo.getJavaLangObject());
-        
-        //create logic variable, guard
+                                        
+    	
+		
+	//create logic variable, guard
         Sort integerSort 
         	= services.getTypeConverter().getIntegerLDT().targetSort();
         LogicVariable lv 
@@ -611,6 +657,22 @@ options {
 	BasicLocationDescriptor transientLd
 		= new BasicLocationDescriptor(guardFma, transientTerm);
 	result = result.add(transientLd);
+	
+	if ((ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof RTSJProfile) && 
+                		((RTSJProfile) ProofSettings.DEFAULT_SETTINGS.getProfile()).memoryConsumption()){
+		//initialMemoryArea.consumed
+		de.uka.ilkd.key.rtsj.java.RTSJInfo rtsjInfo =
+		    (de.uka.ilkd.key.rtsj.java.RTSJInfo) javaInfo;  
+		LocationVariable dma = rtsjInfo.getDefaultMemoryArea();
+    
+    		ProgramVariable consumed
+		= rtsjInfo.getAttribute("consumed", "javax.realtime.MemoryArea");
+		
+		Term cons = tb.dot(tb.var(dma), consumed);
+		BasicLocationDescriptor cld
+			= new BasicLocationDescriptor(cons);
+		result = result.add(cld);
+	}
 	
 	//objectTimesFinalized (a ghost field in java.lang.Object)
 	if(objectTimesFinalizedAttribute != null) {
@@ -651,6 +713,20 @@ options {
 		= new BasicLocationDescriptor(guardFma, lengthTerm);
 	    result = result.add(lengthLd);
 	    
+	    //fields of java.lang.Object
+	    
+	    ClassDeclaration cd = (ClassDeclaration) javaInfo.getJavaLangObject().getJavaType();
+	    ImmutableList<Field> fields = javaInfo.getAllFields(cd);
+	    for(Field f:fields) {
+            ProgramVariable pv = (ProgramVariable) f.getProgramVariable();
+            if(!pv.isStatic()) {
+            	Term fieldTerm = tb.dot(objectTerm, pv);
+                BasicLocationDescriptor fieldLd 
+                            = new BasicLocationDescriptor(guardFma, fieldTerm);
+                result = result.add(fieldLd);
+            }
+        }
+    	    
 	    //slots
 	    LogicVariable idxLv 
 	    	= new LogicVariable(new Name("idx"), integerSort);
@@ -1661,9 +1737,10 @@ javaliteral returns [Term result=null] throws SLTranslationException
 	    raiseNotSupported("string literals");
 	}
     |
-	CHAR_LITERAL 
+	c:CHAR_LITERAL 
 	{
-	    raiseNotSupported("character literals");
+	   return tb.charTerm(services, c.getText());
+	    
 	}
     ;
 
@@ -1704,9 +1781,14 @@ decimalnumeral returns [Term result=null] throws SLTranslationException
 
 jmlprimary returns [JMLExpression result=null] throws SLTranslationException
 {
-    Term t;
+    Term t=null, o1=null, o2=null, pre=null, dimTerm;
+    ImmutableList<Term> dimTerms = ImmutableSLList.<Term>nil();
     ImmutableList<Term> sl;
     KeYJavaType typ;
+    ProgramMethod method;
+    LinkedList<LocationVariable> args=null;
+    TermFactory tf = tb.tf();
+    int d = 0;
 }
 :
 	RESULT
@@ -1814,20 +1896,174 @@ jmlprimary returns [JMLExpression result=null] throws SLTranslationException
 	{
 	    raiseNotSupported("\\duration");
 	} 
-	
-    |   SPACE LPAREN t=specexpression RPAREN
-	{
-	    raiseNotSupported("\\space");
-	} 
-	
+    |   CURRENT_MEMORY_AREA
+    	{
+    	    if (ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof RTSJProfile) {    	     
+    	        de.uka.ilkd.key.rtsj.java.RTSJInfo rtsjInfo =
+		    (de.uka.ilkd.key.rtsj.java.RTSJInfo) javaInfo;      	        
+    		ProgramVariable v = rtsjInfo.getDefaultMemoryArea();
+    		t = tb.var(v);
+    		result = new JMLExpression(t);
+	     } else {
+	     	raiseError("\\currentMemoryArea not support in standard Java profile, use RTSJ profile instead.");
+	     }
+    	}
+    |   SPACE // \\space(t): the space an object of exact type t consumes
+    	LPAREN (
+    		(type) => 
+    		(	typ = type 
+            	(
+            		LBRACKET
+            			( 
+            				RBRACKET {d++;}
+            			|
+            				dimTerm=expression {dimTerms=dimTerms.append(dimTerm);} RBRACKET
+          	  			)
+            	)*
+         	    {
+        			if(d!=0 || !dimTerms.isEmpty()){
+	            		int size = determineElementSize(typ, d);
+    	    	    	t = createArraySizeTerm(size, dimTerms);
+        			}else{
+        				int size = services.getJavaInfo().getSizeInBytes(typ);
+	        			IntLiteral sizeLit = new IntLiteral(size+"");
+            				t = services.getTypeConverter().convertToLogicElement(sizeLit);        				
+        			}
+            		result = new JMLExpression(t);
+        		}
+            )
+            |
+       			t=expression
+				{
+					Function f = (Function) services.getNamespaces().functions().lookup(new Name("maxSpace"));
+					result = new JMLExpression(tb.func(f, t));
+				}
+            )
+    	RPAREN
+
+    |   MAX_SPACE 
+    	// \max_space(t): the space an object of static type t consumes at most
+        // \max_space(o): the space an object o consumes
+        // o instanceof t ==> \max_space(o) <= \max_space(t)
+        // t2<:t1 ==> \max_space(t2)<=\max_space(t1)
+    	LPAREN
+    		(
+				(type) => typ = type 
+    			{
+    				ProgramVariable s = javaInfo.getAttribute(ImplicitFieldAdder.IMPLICIT_SIZE,	typ);
+    				result = new JMLExpression(tb.var(s));
+				}
+			|				
+				t=expression
+				{
+					Function f = (Function) services.getNamespaces().functions().lookup(new Name("maxSpace"));
+					result = new JMLExpression(tb.func(f, t));
+				}
+			)
+    	RPAREN
     |   WORKINGSPACE LPAREN t=expression RPAREN
-	{
-	    raiseNotSupported("\\working_space");
-	} 
+        {
+            if(!(t.op() instanceof ProgramMethod)){
+            	raiseNotSupported("Only method calls are allowed in \\working_space");
+            }
+            ProgramMethod pm = (ProgramMethod) t.op();
+            Term[] argTerms = new Term[t.arity()];
+            for(int i=0; i<t.arity(); i++){
+            	argTerms[i] = t.sub(i);	
+            }
+            t = tb.tf().createWorkingSpaceNonRigidTerm(pm, 
+                (Sort) services.getNamespaces().sorts().lookup(new Name("int")), argTerms);
+            services.getNamespaces().functions().add(t.op());
+            result = new JMLExpression(t);
+        }
+    |   RIGIDWORKINGSPACE {args=new LinkedList<LocationVariable>();}
+        LPAREN method = methodsignature[args] 
+        {
+            resolverManager.pushLocalVariablesNamespace();
+            Iterator it = args.iterator();
+            while(it.hasNext()){
+                resolverManager.putIntoTopLocalVariablesNamespace((ParsableVariable) it.next());
+            }
+            TypeDeclaration cld = 
+                (TypeDeclaration) method.getContainerType().getJavaType();
+        }
+        (COMMA (o1 = expression)?)
+        (COMMA pre = expression)?
+        RPAREN
+        {
+            if(pre==null){
+                pre = tb.tt();
+            }   
+            ProgramVariable local_self;    
+            Term t_self=null;
+            if(!method.isStatic()){
+                t_self = o1;
+                //adds self!=null && self.<created> == true or 
+                //self.<classInitialized> == true to the precondition
+                if(!(method.getMethodDeclaration() instanceof Constructor)){
+                    pre = tb.and(pre, tb.not(tb.equals(t_self, tb.NULL(services))));
+                    pre = tb.and(pre, tb.equals(tb.dot(t_self, javaInfo.getAttribute(ImplicitFieldAdder.IMPLICIT_CREATED, 
+					javaInfo.getJavaLangObject())), tb.TRUE(services)));
+                }
+            }
+            
+            Term[] argTerms = new Term[args.size()+(method.isStatic() ? 0 : 1)];
+            int i=0;
+            if(!method.isStatic()){
+            	argTerms[i++] = t_self;
+            }
+            Iterator<LocationVariable> it = args.iterator();
+            while(it.hasNext()){
+          		argTerms[i++] = tb.var(it.next());
+            }
+            Term methodTerm = tb.tf().createFunctionTerm(method, argTerms);
+            
+            WorkingSpaceRigidOp op = (WorkingSpaceRigidOp) services.getNamespaces().functions().lookup(
+                new Name(WorkingSpaceRigidOp.makeName(methodTerm, pre, services)));
+            if(op==null){
+                t = tf.createWorkingSpaceTerm(methodTerm, pre, 
+                    (Sort) services.getNamespaces().sorts().lookup(new Name("int")), services);
+                services.getNamespaces().functions().add(t.op());
+            }else{
+                t = tf.createWorkingSpaceTerm(op);
+            }
+            resolverManager.popLocalVariablesNamespace();
+            result = new JMLExpression(t);
+        } 
+	|  	IN_OUTER_SCOPE LPAREN o1 = specexpression COMMA o2 = specexpression RPAREN
+        {
+            TermSymbol ios = (TermSymbol) services.getNamespaces().functions().lookup(new Name("outerScope"));
+            ProgramVariable ma = javaInfo.getAttribute(ImplicitFieldAdder.IMPLICIT_MEMORY_AREA, javaInfo.getJavaLangObject());
+      	  	ProgramVariable stack = javaInfo.getAttribute("stack", ma.getKeYJavaType());
+            t = tb.func(ios, tb.dot(tb.dot(o1, ma), stack), tb.dot(tb.dot(o2, ma), stack));
+            result = new JMLExpression(t);
+        }
+    |   OUTER_SCOPE LPAREN o1 = specexpression COMMA o2 = specexpression RPAREN
+        {
+            TermSymbol ios = (TermSymbol) services.getNamespaces().functions().lookup(new Name("outerScope"));
+            ProgramVariable ma = javaInfo.getAttribute(ImplicitFieldAdder.IMPLICIT_MEMORY_AREA, javaInfo.getJavaLangObject());
+      	  	ProgramVariable stack = javaInfo.getAttribute("stack", ma.getKeYJavaType());
+            t = tb.func(ios, tb.dot(o1, stack), tb.dot(o2, stack));
+            result = new JMLExpression(t);
+        }
+    |   IN_IMMORTAL_MEMORY LPAREN t = expression RPAREN 
+    	{
+    		TermSymbol im = (TermSymbol) services.getNamespaces().functions().lookup(new Name("immortal"));
+    		ProgramVariable ma = javaInfo.getAttribute(ImplicitFieldAdder.IMPLICIT_MEMORY_AREA, javaInfo.getJavaLangObject());
+    		ProgramVariable stack = javaInfo.getAttribute("stack", ma.getKeYJavaType());
+    		t = tb.dot(tb.dot(t, ma), stack);
+    		t = tb.func(im, t);
+    		result = new JMLExpression(t);
+    	}
+    |   MEMORY_AREA LPAREN t = expression RPAREN
+    	{
+    		t = tb.dot(t, javaInfo.getAttribute(ImplicitFieldAdder.IMPLICIT_MEMORY_AREA, javaInfo.getJavaLangObject()));
+    		result = new JMLExpression(t);
+    	}
 	
     |   TYPEOF LPAREN t=specexpression RPAREN
 	{
-	    result = new JMLExpression(services.getTypeConverter().getKeYJavaType(t),t);
+	    result = new JMLExpression(services.getTypeConverter().getKeYJavaType(t), t);
 	} 
 	
     |   ELEMTYPE LPAREN t=specexpression RPAREN 
@@ -1882,11 +2118,66 @@ jmlprimary returns [JMLExpression result=null] throws SLTranslationException
 	{
 	    result = new JMLExpression(t);
 	}
-    |   OBJECT_CREATION LPAREN typ=referencetype RPAREN
+    |   OBJECT_CREATION LPAREN typ=typespec RPAREN
     	{
     	    result = new JMLExpression(getObjectCreationFma(typ));
     	}
 ;
+
+methodsignature[LinkedList args] returns [ProgramMethod pm=null] throws SLTranslationException
+{
+    String prefix=null;
+    String methodName=null;
+    KeYJavaType kjt, classType=null;
+    ImmutableList<KeYJavaType> sig = ImmutableSLList.<KeYJavaType>nil();
+    String argName=null;
+}:
+        prefix=name
+        {
+            int i = prefix.lastIndexOf(".");
+            if(i==-1){
+                classType = specInClass;
+                methodName = prefix;
+            }else{
+                classType = javaInfo.getKeYJavaType(prefix.substring(0,i));
+                methodName = prefix.substring(i);
+            }
+        }
+        LPAREN
+        (
+            kjt=type (argName=name)?
+            {
+                sig = sig.append(kjt);
+                if(argName!=null){
+                    args.add(new LocationVariable(new ProgramElementName(
+                                argName),
+                            kjt));
+                    argName = null;
+                }
+            }
+            (
+                COMMA
+                kjt=type (argName=name)?
+                {
+                    sig = sig.append(kjt);
+                    if(argName!=null){
+                        args.add(new LocationVariable(new ProgramElementName(
+                                    argName),
+                                kjt));
+                        argName = null;
+                    }
+                }
+            )*
+        )?
+        RPAREN
+        {
+            pm = javaInfo.getProgramMethod(classType,
+                methodName, sig, classType);
+        }
+    ;
+
+
+
 
 specquantifiedexpression returns [Term result = null] throws SLTranslationException
 {
@@ -2075,8 +2366,11 @@ typespec returns [KeYJavaType t = null] throws SLTranslationException
 	if(t == null && dim > 0) {
 	    //try to create missing array type
 	      try {
-	    javaInfo.readJavaBlock("{" + fullName + " k;}");
+	    JavaBlock jb=javaInfo.readJavaBlock("{" + fullName + " k;}");
 	    t = javaInfo.getKeYJavaType(fullName);
+	/*	t = ((VariableDeclaration) 
+                    ((StatementBlock) jb.program()).getChildAt(0)).
+                        getTypeReference().getKeYJavaType();*/
 	    } catch (Exception e) {
 	    t = null;
 		}

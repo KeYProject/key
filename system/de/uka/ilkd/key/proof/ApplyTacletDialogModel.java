@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -215,11 +215,11 @@ public class ApplyTacletDialogModel {
     
     
     private void informListenerAboutModelChange() {
-	for (int i = 0; i < listeners.size(); i++) {
-	    if (listeners.get(i) != null) {
-		((ModelChangeListener)listeners.get(i)).modelChanged(changeEvent);
-	    }
-	}
+        for (Object listener : listeners) {
+            if (listener != null) {
+                ((ModelChangeListener) listener).modelChanged(changeEvent);
+            }
+        }
     }
 
     /** sets the manual if-input */

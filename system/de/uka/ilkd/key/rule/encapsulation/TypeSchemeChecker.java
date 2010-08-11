@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -81,11 +81,10 @@ class TypeSchemeChecker {
                                                 ImmutableList<TypeSchemeConstraint> c) {
         ImmutableList<TypeSchemeConstraint> result
                         = ImmutableSLList.<TypeSchemeConstraint>nil();
-                        
-        Iterator<TypeSchemeConstraint> it = c.iterator();
-        while(it.hasNext()) {
-            TypeSchemeConstraint constraint = it.next();
-            if(constraint.getFreeVars().size() > 0 || !constraint.evaluate()) {
+
+        for (TypeSchemeConstraint aC : c) {
+            TypeSchemeConstraint constraint = aC;
+            if (constraint.getFreeVars().size() > 0 || !constraint.evaluate()) {
                 result = result.prepend(constraint);
             }
         }

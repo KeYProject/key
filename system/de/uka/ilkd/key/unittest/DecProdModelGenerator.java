@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -9,8 +9,11 @@ package de.uka.ilkd.key.unittest;
 
 import java.util.Set;
 
-public interface DecProdModelGenerator{
+public abstract class DecProdModelGenerator{
 
-    public Set<Model> createModels();
+    /** Stop model generation as soon as possible even if no model was created. (Otherwise this thread will be stopped)*/
+    public volatile boolean  terminateAsSoonAsPossible=false;
+
+    public Set<Model> createModels(){return null;}
 
 }

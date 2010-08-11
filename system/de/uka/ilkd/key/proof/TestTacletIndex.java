@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -90,10 +90,9 @@ public class TestTacletIndex extends TestCase{
 
 
     private boolean isRuleIn(ImmutableList<? extends TacletApp> l, TacletApp rule) {
-	Iterator<? extends TacletApp> it=l.iterator();
-	while(it.hasNext()) {
-	    if (it.next().taclet()==rule.taclet()) return true;
-	}
+        for (TacletApp aL : l) {
+            if (aL.taclet() == rule.taclet()) return true;
+        }
 	return false;
     }
 

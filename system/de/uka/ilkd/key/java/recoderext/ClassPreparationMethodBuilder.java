@@ -1,10 +1,11 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
+//
 //
 // This file is part of KeY - Integrated Deductive Software Design
 // Copyright (C) 2001-2004 Universitaet Karlsruhe, Germany
@@ -98,7 +99,13 @@ public class ClassPreparationMethodBuilder
     		return result;
     	}
     	recoder.service.ConstantEvaluator ce = services.getConstantEvaluator(); 
-    	result = ce.isCompileTimeConstant(spec.getInitializer()); 
+    	
+    	try {
+    	    result = ce.isCompileTimeConstant(spec.getInitializer()); 
+    	} catch (java.lang.ArithmeticException t) {
+    	    result = false;
+    	}
+    	
     	return result;
     }
 
@@ -118,23 +125,22 @@ public class ClassPreparationMethodBuilder
 
 	List<FieldSpecification> fields = typeDeclaration.getFieldsInScope();
 
-	for (int i = 0; i < fields.size(); i++) {
-	    FieldSpecification spec = fields.get(i);
-	    if (spec.isStatic() && !isConstantField(spec)) {
-		Identifier ident = spec.getIdentifier();
-		if (ident instanceof ImplicitIdentifier) {	    
-		    result.add(new CopyAssignment
-		            (new PassiveExpression
-		                    (new FieldReference(ident.deepClone())), 
-		                            getDefaultValue(spec.getType())));		    
-		} else {
-		   result.add(new CopyAssignment
-			(new PassiveExpression
-			 (new FieldReference(ident.deepClone())), 
-			 getDefaultValue(spec.getType())));
-		}
-	    }
-	}
+        for (FieldSpecification spec : fields) {
+            if (spec.isStatic() && !isConstantField(spec)) {
+                Identifier ident = spec.getIdentifier();
+                if (ident instanceof ImplicitIdentifier) {
+                    result.add(new CopyAssignment
+                            (new PassiveExpression
+                                    (new FieldReference(ident.deepClone())),
+                                    getDefaultValue(spec.getType())));
+                } else {
+                    result.add(new CopyAssignment
+                            (new PassiveExpression
+                                    (new FieldReference(ident.deepClone())),
+                                    getDefaultValue(spec.getType())));
+                }
+            }
+        }
 
 	result.add
 	    (new CopyAssignment

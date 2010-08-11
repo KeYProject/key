@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -40,7 +40,7 @@ public class PosTacletApp extends TacletApp {
     /** stores the information where the Taclet is to be applied. This means where
      * the find section of the taclet matches
      */
-    private PosInOccurrence pos;
+    private final PosInOccurrence pos;
 
     /** creates a PosTacletApp for the given taclet 
      * and a position information and CHECKS variable conditions as well as it
@@ -391,8 +391,11 @@ public class PosTacletApp extends TacletApp {
     }
 
     public boolean equals(Object o) {
-	return super.equals(o) 
-	    && ((PosTacletApp)o).posInOccurrence().equals(posInOccurrence());
+        if (o instanceof PosTacletApp) {
+	        return super.equals(o)
+	            && ((PosTacletApp)o).posInOccurrence().equals(posInOccurrence());
+        }
+        return false;
     }
     
     public int hashCode(){

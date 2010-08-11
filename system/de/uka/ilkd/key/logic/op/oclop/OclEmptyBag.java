@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -46,11 +46,8 @@ public class OclEmptyBag extends TermSymbol {
      * subterms that are suitable for this function.
      */
     public boolean validTopLevel(Term term){
-	if (term.arity()!=arity()) {
-	    return false;
-	}
-	
-        return true;
+        return term.arity() == arity();
+
     }
 
     public Sort sort(Term[] subTerm) {

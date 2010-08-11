@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -789,23 +789,21 @@ public class EqualityConstraint implements Constraint {
         Term               checkForCycle = term;
         
         while ( true ) {
-            final Iterator<Metavariable> it =
-                                checkForCycle.metaVars ().iterator ();
-            while ( it.hasNext () ) {
-                final Metavariable termMV = it.next ();
-                if ( !body.contains ( termMV ) ) {
-                    final Term termMVterm = getInstantiationIfExisting ( termMV );
-                    if ( termMVterm != null ) {
-                        if ( termMVterm.metaVars ().contains ( mv ) )
-                                return true;
+            for (Metavariable metavariable : checkForCycle.metaVars()) {
+                final Metavariable termMV = metavariable;
+                if (!body.contains(termMV)) {
+                    final Term termMVterm = getInstantiationIfExisting(termMV);
+                    if (termMVterm != null) {
+                        if (termMVterm.metaVars().contains(mv))
+                            return true;
                     } else {
-                        if ( map.containsKey ( termMV ) )
-                                fringe = fringe.prepend ( map.get ( termMV ) );
+                        if (map.containsKey(termMV))
+                            fringe = fringe.prepend(map.get(termMV));
                     }
-                    
-                    if ( termMV == mv ) return true;
 
-                    body = body.prepend ( termMV );
+                    if (termMV == mv) return true;
+
+                    body = body.prepend(termMV);
                 }
             }
 
@@ -817,18 +815,17 @@ public class EqualityConstraint implements Constraint {
     }
 
     private boolean hasCycleByInst (Metavariable mv, Term term) {
-        final Iterator<Metavariable> it = term.metaVars ().iterator ();
-        
-        while ( it.hasNext () ) {
-            final Metavariable termMV = it.next ();
-            if ( termMV == mv ) return true;
-            final Term termMVterm = getInstantiationIfExisting ( termMV );
-            if ( termMVterm != null ) {
-                if ( termMVterm.metaVars ().contains ( mv ) ) return true;
+
+        for (Metavariable metavariable : term.metaVars()) {
+            final Metavariable termMV = metavariable;
+            if (termMV == mv) return true;
+            final Term termMVterm = getInstantiationIfExisting(termMV);
+            if (termMVterm != null) {
+                if (termMVterm.metaVars().contains(mv)) return true;
             } else {
-                if ( map.containsKey ( termMV )
-                        && hasCycle ( mv, getDirectInstantiation ( termMV ) ) )
-                        return true;
+                if (map.containsKey(termMV)
+                        && hasCycle(mv, getDirectInstantiation(termMV)))
+                    return true;
             }
         }
 

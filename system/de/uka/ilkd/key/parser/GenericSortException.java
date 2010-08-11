@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -43,11 +43,12 @@ public class GenericSortException extends antlr.SemanticException {
 
     /**
      * Returns a clean error message (no line number/column information)
+     * @deprecated
      */
+    @Deprecated
     public String getErrorMessage ()
     {
-	String errmsg = cat+"\n  "+sort+"\n";
-	return errmsg + reason;
+	return getMessage();
     }
 
     /**
@@ -55,7 +56,8 @@ public class GenericSortException extends antlr.SemanticException {
      */
     public String getMessage ()
     {
-	return getErrorMessage();
+	String errmsg = cat+"\n  "+sort+"\n";
+	return errmsg + reason;
     }
     
     /**
@@ -63,6 +65,6 @@ public class GenericSortException extends antlr.SemanticException {
      */
     public String toString() {
 	return filename+"("+this.getLine()+", "+this.getColumn()+"): "
-	    +getErrorMessage();
+	    +getMessage();
     }
 }

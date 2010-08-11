@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -237,7 +237,7 @@ public class VariableNameTracker {
     private void updateSelfVar(MethodFrame mf) {
         ExecutionContext executionContext = (ExecutionContext) mf.getExecutionContext();
         // the execution context might be null for static methods
-        selfVar = executionContext.getRuntimeInstance();
+        selfVar = executionContext.getRuntimeInstanceAsRef();
         // if the execution context was null, we push a null element and create 
         // skip update later on
         selfVarStack.push(selfVar);
@@ -253,16 +253,14 @@ public class VariableNameTracker {
 
         ImmutableList<RenamingTable> allRenamings = ImmutableSLList.<RenamingTable>nil();
 
-        Iterator<Node> it = branch.iterator();
-        while (it.hasNext()) {
-            Node currentNode = it.next();
+        for (Node aBranch : branch) {
+            Node currentNode = aBranch;
             ImmutableList<RenamingTable> renamingTables = currentNode.getRenamingTable();
             if (renamingTables != null && renamingTables.size() > 0) {
                 System.out.println("found renaming @node: " + currentNode.serialNr());
-                Iterator<RenamingTable> i = renamingTables.iterator();
 
-                while (i.hasNext()) {
-                    RenamingTable next = i.next();
+                for (RenamingTable renamingTable : renamingTables) {
+                    RenamingTable next = renamingTable;
                     System.out.println(next); //TODO remove
                     allRenamings = allRenamings.append(next);
                 }
@@ -297,13 +295,12 @@ public class VariableNameTracker {
             LocationVariable initiallyRenamedVar = initialRenamings.get(k);
             nameMap.put(originalVar, initiallyRenamedVar);
             System.out.println("created initial mapping");
-            Iterator<RenamingTable> i = collectAllRenamings().iterator();
 
-            while (i.hasNext()) {
-                RenamingTable renaming = i.next();
+            for (RenamingTable renamingTable : collectAllRenamings()) {
+                RenamingTable renaming = renamingTable;
 
                 SourceElement renamedVariable = renaming
-                .getRenaming(initiallyRenamedVar);
+                        .getRenaming(initiallyRenamedVar);
 
                 if (renamedVariable != null) {
                     // replace entry with the most actual one

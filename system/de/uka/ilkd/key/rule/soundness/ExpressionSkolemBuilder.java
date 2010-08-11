@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -70,10 +70,8 @@ public class ExpressionSkolemBuilder extends StatementExpressionSkolemBuilder {
     }
 
     private Iterator<SkolemSet>
-	createSkolemExpressionSVs(ImmutableList<SchemaVariable> p_svs) {    
-	Iterator<SchemaVariable> it = p_svs.iterator ();
-	while ( it.hasNext () )
-	    createSkolemExpressionSV ( it.next () );
+	createSkolemExpressionSVs(ImmutableList<SchemaVariable> p_svs) {
+        for (SchemaVariable p_sv : p_svs) createSkolemExpressionSV(p_sv);
     
 	return toIterator
 	    ( getOriginalSkolemSet ()

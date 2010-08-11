@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -13,8 +13,9 @@ import java.io.*;
 import java.net.URL;
 import java.util.Properties;
 
-import de.uka.ilkd.key.gui.DecisionProcedureSettings;
 import de.uka.ilkd.key.gui.GUIEvent;
+import de.uka.ilkd.key.gui.smt.DecisionProcedureSettings;
+import de.uka.ilkd.key.gui.smt.TacletTranslationSettings;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.util.Debug;
@@ -73,11 +74,12 @@ public class ProofSettings {
 	    new ChoiceSettings(),
 	    DecisionProcedureSettings.getInstance(),
 	    new ViewSettings(),
-            new LibrariesSettings()
+            new LibrariesSettings(),
+            TacletTranslationSettings.getInstance()
 	};
-	for (int i = 0; i < settings.length; i++) { 
-	    settings[i].addSettingsListener(listener);
-	}        
+        for (Settings setting : settings) {
+            setting.addSettingsListener(listener);
+        }
     }
     
     /* copy constructor - substitutes .clone() in classes implementing Settings */
@@ -87,8 +89,8 @@ public class ProofSettings {
         Properties result = new Properties();
         Settings[] s = toCopy.settings;
 
-        for (int i = 0; i < s.length; i++) {
-            s[i].writeSettings(result);
+        for (Settings value : s) {
+            value.writeSettings(result);
         }
         
         for (int i = settings.length - 1; i >= 0; i--) {
@@ -109,8 +111,8 @@ public class ProofSettings {
     
     public void setProfile(Profile profile) {
         this.profile = profile;
-        profile.updateSettings(this);
         ensureInitialized();
+        profile.updateSettings(this);
     }
 
     public Profile getProfile() {                
@@ -128,9 +130,9 @@ public class ProofSettings {
     public void settingsToStream(Settings[] s,OutputStream out) {
     try {
         Properties result = new Properties();
-	    for (int i = 0; i < s.length; i++) {
-	    s[i].writeSettings(result);
-	    }
+        for (Settings value : s) {
+            value.writeSettings(result);
+        }
 	    result.store(out, "Proof-Settings-Config-File");
 	} catch (IOException e){
 	    System.err.println("Warning: could not save proof-settings.");
@@ -244,6 +246,11 @@ public class ProofSettings {
     public DecisionProcedureSettings getDecisionProcedureSettings() {
 	ensureInitialized();
 	return (DecisionProcedureSettings) settings[4];
+    }
+    
+    public TacletTranslationSettings getTacletTranslationSettings(){
+	ensureInitialized();
+	return (TacletTranslationSettings) settings[7];
     }
 
     public SimultaneousUpdateSimplifierSettings 

@@ -1,12 +1,10 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License.
+// The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
-//
-//
 
 package de.uka.ilkd.key.proof.init;
 
@@ -60,16 +58,16 @@ public class CreatedAttributeTermFactory {
         //create conjunction of guard terms for all variables of a
         //non-primitive type
         Term guardConjunctionTerm = TB.tt();
-        for(int i = 0; i < vars.length; i++) {
-            if(!(vars[i].sort() instanceof PrimitiveSort) &&
-               !(vars[i].sort() instanceof AbstractCollectionSort)) {
-                Term variableTerm = TB.var(vars[i]);
+        for (LogicVariable var : vars) {
+            if (!(var.sort() instanceof PrimitiveSort) &&
+                    !(var.sort() instanceof AbstractCollectionSort)) {
+                Term variableTerm = TB.var(var);
                 Term guardTerm
                         = (nullForbidden
-                           ? createCreatedAndNotNullTerm(services, variableTerm)
-                           : createCreatedOrNullTerm(services, variableTerm));
+                        ? createCreatedAndNotNullTerm(services, variableTerm)
+                        : createCreatedOrNullTerm(services, variableTerm));
                 guardConjunctionTerm
-                       = TB.and(guardConjunctionTerm, guardTerm);
+                        = TB.and(guardConjunctionTerm, guardTerm);
             }
         }
 

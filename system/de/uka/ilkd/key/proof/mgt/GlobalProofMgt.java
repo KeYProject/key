@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -54,27 +54,30 @@ public class GlobalProofMgt {
 	if (setOfEnv==null || setOfEnv.size()==0) {
 	    return null;
 	} else {
-	    Object[] choice = new Object[setOfEnv.size()+1];
-	    System.arraycopy(setOfEnv.toArray(), 0, choice, 1, setOfEnv.size());
-	    choice[0] = "Open in new environment";
-	    Object o =(JOptionPane.showInputDialog
-		       (mediator.mainFrame(), 
-			"Java model and rule sets are suitable "
-			+"to already existing environment(s). \n"
-			+"Please select one or choose to open the problem "
-			+"in a new environment.\n"
-			+"Attention: Unless you open the problem in a "
-			+"new environment,\n"
-			+"sort, function, and rule declarations are ignored.", 
-			"Proof Environment",
-			JOptionPane.QUESTION_MESSAGE, null, 
-			choice, null));	
-	    if (o instanceof ProofEnvironment) {
-		return (ProofEnvironment)o;
-	    } else {
-		return null;
-	    }
+	    return setOfEnv.iterator().next();
 	}
+//	} else {
+//	    Object[] choice = new Object[setOfEnv.size()+1];
+//	    System.arraycopy(setOfEnv.toArray(), 0, choice, 1, setOfEnv.size());
+//	    choice[0] = "Open in new environment";
+//	    Object o =(JOptionPane.showInputDialog
+//		       (mediator.mainFrame(), 
+//			"Java model and rule sets are suitable "
+//			+"to already existing environment(s). \n"
+//			+"Please select one or choose to open the problem "
+//			+"in a new environment.\n"
+//			+"Attention: Unless you open the problem in a "
+//			+"new environment,\n"
+//			+"sort, function, and rule declarations are ignored.", 
+//			"Proof Environment",
+//			JOptionPane.QUESTION_MESSAGE, null, 
+//			choice, null));	
+//	    if (o instanceof ProofEnvironment) {
+//		return (ProofEnvironment)o;
+//	    } else {
+//		return null;
+//	    }
+//	}
     }
 
     public void registerProofEnvironment(ProofEnvironment env) {
@@ -144,34 +147,30 @@ public class GlobalProofMgt {
 
     private Proof[] lookupPrevious(Proof p) {
 	List<Proof> result = new LinkedList<Proof>();
-	Iterator<List<ProofEnvironment>> it = envKeyToEnv.values().iterator();
-	while (it.hasNext()) {
-	    List<ProofEnvironment> envList = it.next();
-	    Iterator<ProofEnvironment> envIt = envList.iterator();
-	    while (envIt.hasNext()) {
-		ProofEnvironment env = envIt.next();
-		Iterator<ProofAggregate> proofListIt = env.getProofs().iterator();
-		while (proofListIt.hasNext()) {
-		    ProofAggregate pl = proofListIt.next();
+        for (List<ProofEnvironment> proofEnvironments : envKeyToEnv.values()) {
+            List<ProofEnvironment> envList = proofEnvironments;
+            for (ProofEnvironment anEnvList : envList) {
+                ProofEnvironment env = anEnvList;
+                for (ProofAggregate proofAggregate : env.getProofs()) {
+                    ProofAggregate pl = proofAggregate;
                     Proof[] proofs = pl.getProofs();
-		    for (int i=0; i<proofs.length; i++) {
-			if (p != proofs[i] 
-			    && p.mgt().proofSimilarTo(proofs[i])) {			    
-                            result.add(proofs[i]);
-			}
-		    }
-		}
-	    }
-	}
-	return result.toArray(new Proof[0]);
+                    for (Proof proof : proofs) {
+                        if (p != proof
+                                && p.mgt().proofSimilarTo(proof)) {
+                            result.add(proof);
+                        }
+                    }
+                }
+            }
+        }
+	return result.toArray(new Proof[result.size()]);
     }
     
     
     public void removeEnv(ProofEnvironment env) {
         Set<Map.Entry<EnvKey,List<ProofEnvironment>>> entries = envKeyToEnv.entrySet();
-        Iterator<Map.Entry<EnvKey,List<ProofEnvironment>>> it = entries.iterator();
-        while (it.hasNext()) {
-            Map.Entry<EnvKey,List<ProofEnvironment>> entry = it.next();
+        for (Map.Entry<EnvKey, List<ProofEnvironment>> entry1 : entries) {
+            Map.Entry<EnvKey, List<ProofEnvironment>> entry = entry1;
             List<ProofEnvironment> l = entry.getValue();
             Iterator<ProofEnvironment> listIt = l.iterator();
             while (listIt.hasNext()) {

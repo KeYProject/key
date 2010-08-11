@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -55,8 +55,8 @@ public class ReferenceLister {
         SourceInfo si = sc.getSourceInfo();
 
         List<CompilationUnit> cus = sfr.getCompilationUnits();
-        for (int i = 0; i < cus.size(); i++) {
-            TreeWalker walker = new TreeWalker(cus.get(i));
+        for (CompilationUnit cu : cus) {
+            TreeWalker walker = new TreeWalker(cu);
             while (walker.next()) {
                 ProgramElement pe = walker.getProgramElement();
                 if (pe instanceof TypeReference) {
@@ -72,11 +72,11 @@ public class ReferenceLister {
 
     private static void handleDir(File dir) throws ParserException, IOException {
         File[] files = dir.listFiles();
-        for (int i = 0; i < files.length; i++) {
-            if (files[i].isDirectory())
-                handleDir(files[i]);
+        for (File file : files) {
+            if (file.isDirectory())
+                handleDir(file);
             else
-                readFile(files[i]);
+                readFile(file);
         }
     }
 

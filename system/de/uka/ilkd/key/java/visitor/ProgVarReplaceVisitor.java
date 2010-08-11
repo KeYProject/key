@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -154,7 +154,6 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
 	    doDefaultAction(pv);
 	}
     }
-
     
     private Term replaceVariablesInTerm(Term t){  
      	if(t==null) return null;
@@ -234,17 +233,16 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
     private Map /*Operator -> Function*/ replaceVariablesInMap(
                                         Map /*Operator -> Function*/ map) {
         Map result = new LinkedHashMap();
-        Iterator it = map.entrySet().iterator();
-        while(it.hasNext()) {
-            Map.Entry entry = (Map.Entry) it.next();
+        for (Object o : map.entrySet()) {
+            Map.Entry entry = (Map.Entry) o;
             Operator key = (Operator) entry.getKey();
             Function value = (Function) entry.getValue();
-            
+
             Operator newKey = (ProgramVariable) replaceMap.get(key);
-            if(newKey == null) {
+            if (newKey == null) {
                 newKey = key;
             }
-            
+
             result.put(newKey, value);
         }
         return result;
@@ -295,6 +293,17 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
                                                     atPreFunctions, 
                                                     services));
         
+        //working spaces
+        Term newWorkingSpaceLocal
+            = replaceVariablesInTerm(inv.getWorkingSpace(selfTerm, 
+                                                    atPreFunctions, 
+                                                    services));
+        
+        Term newParametrizedWS
+            = replaceVariablesInTerm(inv.getParametrizedWorkingSpaceTerms(selfTerm, 
+                    atPreFunctions, 
+                    services));
+        
         Term newSelfTerm = replaceVariablesInTerm(selfTerm); 
         Map newAtPreFunctions = replaceVariablesInMap(atPreFunctions);
         boolean newPredicateHeuristicsAllowed
@@ -306,6 +315,8 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
                                     new LoopPredicateSet(newPredicates),
                                     new LocationDescriptorSet(newModifies), 
                                     newVariant, 
+                                    newParametrizedWS,
+                                    newWorkingSpaceLocal,
                                     newSelfTerm,
                                     newAtPreFunctions,
                                     newPredicateHeuristicsAllowed);

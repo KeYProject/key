@@ -1,38 +1,29 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
-//This file is part of KeY - Integrated Deductive Software Design
-//Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
-//                      Universitaet Koblenz-Landau, Germany
-//                      Chalmers University of Technology, Sweden
-//
-//The KeY system is protected by the GNU General Public License. 
-//See LICENSE.TXT for details.
 //
 //
 
 package de.uka.ilkd.key.speclang.dl.translation;
 
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
+
+import de.uka.ilkd.key.java.*;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
-import de.uka.ilkd.key.java.Expression;
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.statement.CatchAllStatement;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.speclang.*;
 
@@ -247,20 +238,19 @@ public class DLSpecFactory {
         }
         
         //atPre-functions may not occur in modifier set
-        Iterator<LocationDescriptor> it = modifies.iterator();
-        while(it.hasNext()) {
-            LocationDescriptor loc = it.next();
-            if(loc instanceof BasicLocationDescriptor) {
+        for (LocationDescriptor modify : modifies) {
+            LocationDescriptor loc = modify;
+            if (loc instanceof BasicLocationDescriptor) {
                 BasicLocationDescriptor bloc = (BasicLocationDescriptor) loc;
                 Term formula = bloc.getFormula();
                 Term locTerm = bloc.getLocTerm();
-                forbiddenAtPreFunctions = new LinkedHashMap<Operator, Function>(); 
+                forbiddenAtPreFunctions = new LinkedHashMap<Operator, Function>();
                 forbiddenAtPreFunctions.putAll(extractAtPreFunctions(formula));
                 forbiddenAtPreFunctions.putAll(extractAtPreFunctions(locTerm));
-                if(!forbiddenAtPreFunctions.isEmpty()) {
+                if (!forbiddenAtPreFunctions.isEmpty()) {
                     throw new ProofInputException(
-                       "@pre-function not allowed in modifier set: " 
-                       + forbiddenAtPreFunctions.values().iterator().next());
+                            "@pre-function not allowed in modifier set: "
+                                    + forbiddenAtPreFunctions.values().iterator().next());
                 }
             }
         }
@@ -286,13 +276,38 @@ public class DLSpecFactory {
             }
         }
         
+        TermBuilder tb = TermBuilder.DF;
+        TermFactory tf = tb.tf();
+        
+        
+        Term[] argTerms = new Term[pm.getParameterDeclarationCount()+(pm.isStatic() ? 0 : 1)];
+        int j=0;
+        if(!pm.isStatic()){
+                argTerms[j++] = tb.var(selfVar);
+        }
+
+        for(int i=j; i<argTerms.length; i++){
+            argTerms[i] = tb.var((ProgramVariable) pm.getParameterDeclarationAt(i-j).
+                    getVariableSpecification().getProgramVariable());
+        }
+        
+        Term ws = tf.createWorkingSpaceNonRigidTerm(pm,
+            (Sort) services.getNamespaces().sorts().lookup(new Name("int")),
+            argTerms
+            );
+        FormulaWithAxioms wsPost = new FormulaWithAxioms(tb.tt(), new HashMap<Operator, Term>());
+        
+        services.getNamespaces().functions().add(ws.op());
+        
         return new OperationContractImpl(name, 
                                          displayName, 
                                          pm,
                                          modality,
                                          pre,
                                          post,
-                                         modifies,
+                                         wsPost,
+                                         modifies,                                        
+                                         ws,
                                          selfVar,
                                          paramVars,
                                          resultVar,

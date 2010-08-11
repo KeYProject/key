@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -81,5 +81,9 @@ public abstract class ProofTreeAdapter implements ProofTreeListener {
 	proofStructureChanged(e);
     }
 
-
+    /**If, e.g., an SMT Solver was applied to node/goal referenced in e, then 
+     * this event occurs in order to monitor, e.g. by a dialog, the result
+     * of the SMT solver. The data from the SMT solver can be accessed via.
+     * {@code Node.getCounterExData()}*/
+    public void smtDataUpdate(ProofTreeEvent e){}
 }

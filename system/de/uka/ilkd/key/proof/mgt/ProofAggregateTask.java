@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -64,8 +64,8 @@ public class ProofAggregateTask extends DefaultMutableTreeNode
     
     public void insertNode(TaskTreeModel model, MutableTreeNode parentNode) {
         model.insertNodeInto(this, parentNode, model.getChildCount(parentNode));
-        for (int i=0; i<proofs.length; i++) {
-            proofs[i].insertNode(model,this);
+        for (TaskTreeNode proof : proofs) {
+            proof.insertNode(model, this);
         }
     }
     

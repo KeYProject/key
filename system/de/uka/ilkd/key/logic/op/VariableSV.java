@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -65,7 +65,7 @@ class VariableSV extends SortedSchemaVariable {
         	getInstantiation(this);
         if (foundMapping == null) {            		
             return addInstantiation(subst, mc, services);
-        } else if (((QuantifiableVariable)foundMapping.op()) != subst.op()) {
+        } else if (foundMapping.op() != subst.op()) {
             return null; //FAILED;			    
         } 
         return mc;

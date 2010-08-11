@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -271,6 +271,8 @@ public interface Visitor {
      void performActionOnSuperReference(SuperReference x); 
 
      void performActionOnThisReference(ThisReference x); 
+     
+//     void performActionOnCurrentMemoryAreaReference(CurrentMemoryAreaReference x); 
 
      void performActionOnArrayLengthReference(ArrayLengthReference x); 
 
@@ -313,4 +315,8 @@ public interface Visitor {
     void performActionOnLocationVariable(LocationVariable variable); 
     
     void performActionOnLoopInvariant(LoopInvariant x);
+
+    void performActionOnMemoryAreaEC(MemoryAreaEC memoryAreaEC);
+
+    void performActionOnRuntimeInstanceEC(RuntimeInstanceEC runtimeInstanceEC);
 }

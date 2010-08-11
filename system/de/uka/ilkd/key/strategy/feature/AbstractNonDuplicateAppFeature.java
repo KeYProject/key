@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -70,7 +70,7 @@ public abstract class AbstractNonDuplicateAppFeature extends BinaryTacletAppFeat
         // compare the position of application
         if ( newPio != null ) {
             if ( ! ( cmp instanceof PosTacletApp ) ) return false;
-            final PosInOccurrence oldPio = ((PosTacletApp)cmp).posInOccurrence ();
+            final PosInOccurrence oldPio = cmp.posInOccurrence ();
             if ( !comparePio ( newApp, cmp, newPio, oldPio ) ) return false;
         }
 
@@ -117,14 +117,15 @@ public abstract class AbstractNonDuplicateAppFeature extends BinaryTacletAppFeat
     }
     
     private boolean subset(ImmutableMap<SchemaVariable,InstantiationEntry> insts0,
-                           ImmutableMap<SchemaVariable,InstantiationEntry> insts1) {
-        final Iterator<ImmutableMapEntry<SchemaVariable,InstantiationEntry>> it =
+                           ImmutableMap<SchemaVariable,InstantiationEntry> insts1) {	
+	final Iterator<ImmutableMapEntry<SchemaVariable,InstantiationEntry>> it =
             insts0.entryIterator ();
 
         while ( it.hasNext () ) {
             final ImmutableMapEntry<SchemaVariable,InstantiationEntry> entry0 = it.next ();
-
-            if ( entry0.key ().isNameSV () || entry0.key ().isSkolemTermSV () )
+            
+            if ( entry0.key ().isNameSV () || entry0.key ().isSkolemTermSV () 
+        	    || entry0.key().isVariableSV() )
                 continue;
                 
             final InstantiationEntry instEntry1 = insts1.get ( entry0.key () );

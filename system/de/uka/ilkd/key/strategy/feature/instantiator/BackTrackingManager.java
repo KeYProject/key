@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -87,7 +87,7 @@ public class BackTrackingManager {
             assert choices.size () > position;
             // phase where we have to "replay" choices that have already
             // been made
-            ( (CPBranch)chosenBranches.get ( position ) ).choose ();
+            chosenBranches.get ( position ).choose ();
         }
         
         ++position;
@@ -121,7 +121,7 @@ public class BackTrackingManager {
         position = 0;
 
         while ( !choices.isEmpty () ) {
-            final Iterator<CPBranch> chs = (Iterator<CPBranch>)choices.pop ();
+            final Iterator<CPBranch> chs = choices.pop ();
             chosenBranches.remove ( chosenBranches.size () - 1 );
 
             if ( chs.hasNext () ) {
@@ -201,7 +201,7 @@ public class BackTrackingManager {
     
     private RuleApp getOldRuleApp() {
         if ( chosenBranches.isEmpty () ) return initialApp;
-        final CPBranch branch = (CPBranch)chosenBranches.get ( position - 1 );
+        final CPBranch branch = chosenBranches.get ( position - 1 );
         if ( branch == null ) return null;
         return branch.getRuleAppForBranch ();
     }

@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -52,14 +52,19 @@ public class JavaTypeToSortCondition implements VariableCondition {
 
 
     public static boolean checkSortedSV(final SchemaVariable exprOrTypeSV) {
-        if ( !( exprOrTypeSV instanceof SortedSchemaVariable) && 
-                !exprOrTypeSV.isTermSV()) {
-            final Sort svSort = ( (SortedSchemaVariable)exprOrTypeSV ).sort ();
-            if ((svSort == ProgramSVSort.EXPRESSION || svSort == ProgramSVSort.TYPE) )  {
-                return false;
+        if ( exprOrTypeSV instanceof SortedSchemaVariable) {
+            if (exprOrTypeSV.isTermSV() || exprOrTypeSV.isSkolemTermSV()) {
+                return true;
             }
+            final Sort svSort = ( (SortedSchemaVariable)exprOrTypeSV ).sort ();
+            return svSort == ProgramSVSort.EXPRESSION ||
+                    svSort == ProgramSVSort.NONSIMPLEEXPRESSION ||
+                    svSort == ProgramSVSort.SIMPLEEXPRESSION ||
+                    svSort == ProgramSVSort.LEFTHANDSIDE ||
+                    svSort == ProgramSVSort.IMPLICITTRAINITIALIZED ||
+                    svSort == ProgramSVSort.TYPE;
         }
-        return true;
+        return false;
     }
   
     

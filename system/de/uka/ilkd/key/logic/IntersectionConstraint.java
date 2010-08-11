@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -273,10 +273,8 @@ public class IntersectionConstraint implements Constraint {
     public Constraint removeVariables ( ImmutableSet<Metavariable> mvs ) {
 	if ( mvs.iterator ().hasNext () ) {
 	    Constraint           res = Constraint.TOP;
-	    Iterator<Constraint> it  = subConstraints.iterator ();
-	
-	    while ( it.hasNext () )
-		res = intersect ( res, it.next ().removeVariables ( mvs ) );
+
+        for (Constraint subConstraint : subConstraints) res = intersect(res, subConstraint.removeVariables(mvs));
 
 	    return res;
 	}
@@ -305,11 +303,10 @@ public class IntersectionConstraint implements Constraint {
      * i.e. every instantiation satisfying "this" also satisfies "co".
      */
     public boolean isAsStrongAs ( Constraint co ) {
-	Iterator<Constraint> it = subConstraints.iterator ();
-	while ( it.hasNext () ) {
-	    if ( !it.next ().isAsStrongAs ( co ) )
-		return false;
-	}
+        for (Constraint subConstraint : subConstraints) {
+            if (!subConstraint.isAsStrongAs(co))
+                return false;
+        }
 	return true;
     }
 
@@ -319,12 +316,10 @@ public class IntersectionConstraint implements Constraint {
      */
     public boolean isAsWeakAs ( Constraint co ) {
 	if ( co instanceof IntersectionConstraint ) {
-	    Iterator<Constraint> it = 
-		((IntersectionConstraint)co).subConstraints.iterator ();
-	    while ( it.hasNext () ) {
-		if ( !isAsWeakAs ( it.next () ) )
-		    return false;
-	    }
+        for (Constraint subConstraint : ((IntersectionConstraint) co).subConstraints) {
+            if (!isAsWeakAs(subConstraint))
+                return false;
+        }
 	    return true;
 	} else
 	    return isAsWeakAsInteger ( co );
@@ -336,11 +331,10 @@ public class IntersectionConstraint implements Constraint {
     protected boolean isAsWeakAsInteger ( Constraint co ) {
 	// Under some assumptions this can be reduced to: one element
 	// of this intersection is weaker than "co"
-	Iterator<Constraint> it = subConstraints.iterator ();
-	while ( it.hasNext () ) {
-	    if ( it.next ().isAsWeakAs ( co ) )
-		return true;
-	}
+        for (Constraint subConstraint : subConstraints) {
+            if (subConstraint.isAsWeakAs(co))
+                return true;
+        }
 	return false;
     }
         

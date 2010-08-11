@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -292,6 +292,7 @@ public class ProofJavaParser {
          *  it is an explicit generic method invocation
          */
         ASTList<TypeArgumentDeclaration> typeArgs = null;
+        
     }
 
 
@@ -321,6 +322,7 @@ public class ProofJavaParser {
         static final int QUALIFIED_NAME   =  6;
         /** production was <pre>"@(" Expression ")"</pre> */
         static final int PASSIVE_EXPR =  7;    
+	static final int CURRENT_MEMORY_AREA = 8; 
     
         /** indicates the type of the result */
         int           type    = UNDEFINED;
@@ -478,6 +480,7 @@ TOKEN :
 | < WHILE: "while" >
 | < VARARGDENOTER: "..." >
 | < STRICTFP: "strictfp" >
+| < CURRENTMEMORYAREA: "<currentMemoryArea>" >
 }
 
 /* LITERALS */
@@ -2827,6 +2830,16 @@ Expression PrimaryExpression() :
           setPrefixInfo(tmpResult);
           setPostfixInfo(tmpResult);
           break;
+      case PrimaryPrefixReturnValue.CURRENT_MEMORY_AREA:
+    	  Identifier id = factory.createIdentifier("MemoryArea");    
+    	  setPrefixInfo(id);
+    	  setPostfixInfo(id);
+          tmpResult = factory.createUncollatedReferenceQualifier(id);
+	  id = factory.createIdentifier("currentMemoryArea");	
+          tmpResult = factory.createUncollatedReferenceQualifier(tmpResult,id);
+          setPrefixInfo(tmpResult);
+	  setPostfixInfo(tmpResult);
+          break;
       case PrimaryPrefixReturnValue.SUPER_MEMBER:
           tmpResult = prefix.name;
           break;
@@ -2937,7 +2950,7 @@ Expression PrimaryExpression() :
           // method call -determine the kind of method
           if (tmpResult instanceof UncollatedReferenceQualifier) {
               // this is a normal method call
-              tmpResult = factory.createMethodReference
+              tmpResult = factory.createMethodReferenceWrapper
               (((UncollatedReferenceQualifier)tmpResult).getReferencePrefix(),
                ((UncollatedReferenceQualifier)tmpResult).getIdentifier(),
                suffix.args, ((UncollatedReferenceQualifier)tmpResult).getTypeArguments());
@@ -2999,7 +3012,11 @@ PrimaryPrefixReturnValue PrimaryPrefix() :
       prefix.type = PrimaryPrefixReturnValue.THIS;
   }
 |
-  //[NonWildcardTypeArguments()]
+  "<currentMemoryArea>"
+  {
+      prefix.type = PrimaryPrefixReturnValue.CURRENT_MEMORY_AREA;   
+  }
+|
   "super" {
       supRef = factory.createSuperReference();
       setPrefixInfo(supRef);
@@ -3070,9 +3087,10 @@ PrimarySuffixReturnValue PrimarySuffix() :
     // reuses global suffix field
     Expression               expr;
     ASTList<Expression>    args;
-    Identifier               id;
+    Identifier               id=null;
     Literal                  lit;
     ASTList<TypeArgumentDeclaration> typeArgs;
+    UncollatedReferenceQualifier qn = null;
 }
 {
 (
@@ -3115,7 +3133,7 @@ PrimarySuffixReturnValue PrimarySuffix() :
       suffix.type = PrimarySuffixReturnValue.IDENTIFIER;
   }
 |
-  args = Arguments()
+  args = Arguments() 
   {
       suffix.type = PrimarySuffixReturnValue.ARGUMENTS;
       suffix.args = args;
@@ -3215,8 +3233,7 @@ ASTList<Expression> Arguments() :
       if (result != null)
       {
           checkConstruction(result);
-          
-          }
+      }
       return result;
   }
 }
@@ -3245,14 +3262,15 @@ TypeOperator AllocationExpression() :
     ASTList<MemberDeclaration> body = null;
     ClassDeclaration cd = null;
     NewArray na;
+    Identifier id=null;
     ASTList<TypeArgumentDeclaration> typeArgs;
 }
 {
 (
-  LOOKAHEAD(2)
+  LOOKAHEAD(4)
   "new" 
     {
-        na = factory.createNewArray();
+        na = factory.createNewArrayWrapper(id);
         setPrefixInfo(na);
     }
     tr = PrimitiveType()
@@ -3263,7 +3281,7 @@ TypeOperator AllocationExpression() :
 |
   "new"
   {
-      result = factory.createNew();
+      result = factory.createNewWrapper(id);
       setPrefixInfo(result);
   }
   qn = TypedName()
@@ -3290,7 +3308,7 @@ TypeOperator AllocationExpression() :
      }
    |
      {        
-        na = factory.createNewArray();
+        na = factory.createNewArrayWrapper(id);
         copyPrefixInfo(result, na);
         na.setTypeReference(qn.toTypeReference());
      }
@@ -3479,7 +3497,7 @@ MethodBodyStatement MethodBodyStatement() :
   Expression tmp;
   VariableReference resVar = null;
   UncollatedReferenceQualifier qn;
-  MethodReference methRef;
+  MethodReferenceWrapper methRef;
   MethodBodyStatement result;
 }
 {
@@ -3499,9 +3517,9 @@ MethodBodyStatement MethodBodyStatement() :
   ";"
   
   {
-    if (tmp instanceof MethodReference)
+    if (tmp instanceof MethodReferenceWrapper)
     {
-        methRef = (MethodReference)tmp;
+        methRef = (MethodReferenceWrapper)tmp;
     }
     else
     {
@@ -3518,17 +3536,20 @@ MethodBodyStatement MethodBodyStatement() :
 ExecutionContext ExecutionContext() :
 {
   TypeReference classContext;
-  Expression runtimeInstance = null;
+
+Expression initial = factory.createThisReference();
+  Expression runtimeInstance = null, memoryArea = initial;
 } 
 {
 
   "source="
   classContext = Type() 
+  [",<currentMemoryArea>=" memoryArea = Expression()]
   [ ",this=" runtimeInstance = Expression() ]
-
-  { return new ExecutionContext
-        (classContext, 
-        (ReferencePrefix)runtimeInstance);
+  
+  { 
+    return new ExecutionContext
+	(classContext, (ReferencePrefix)memoryArea, (ReferencePrefix)runtimeInstance);
   }
 }
 
@@ -4242,7 +4263,7 @@ ASTList<Statement> GeneralizedStatements() :
 AnnotationUseSpecification AnnotationUse() :
 {
 	TypeReference tr;	
-	AnnotationUseSpecification result = factory.createAnnotationUseSpecification();
+	AnnotationUseSpecification result = factory.createKeYAnnotationUseSpecification();
 	Expression ev = null;
 	ASTList<AnnotationElementValuePair> list = null;
 	AnnotationPropertyReference id;

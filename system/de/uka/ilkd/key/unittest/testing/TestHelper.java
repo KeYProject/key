@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -11,7 +11,6 @@ package de.uka.ilkd.key.unittest.testing;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.*;
@@ -65,7 +64,7 @@ public class TestHelper {
 	    + "examples" + File.separator + "_testcase" + File.separator
 	    + "testgen" + File.separator;
 
-    public TestHelper(String file, String name, boolean prove) {
+    public TestHelper(final String file, final String name, final boolean prove) {
 	// Init
 	this.file = PATH + file;
 	this.name = name;
@@ -75,17 +74,20 @@ public class TestHelper {
 	// Loading
 	medi.addAutoModeListener(createAMListener());
 	final Profile profil = (prove ? new JavaTestGenerationProfile(main)
-		: new JavaProfile(main));
+	        : new JavaProfile(main));
 	ProofSettings.DEFAULT_SETTINGS.setProfile(profil);
 	synchronized (semaphorLoad) {
 	    try {
 		main.loadCommandLineFile();
 		semaphorLoad.wait();
-	    } catch (InterruptedException e1) {
+	    } catch (final InterruptedException e1) {
 		e1.printStackTrace();
 	    }
 	}
 	proof = medi.getProof();
+	if(proof==null){
+	    throw new RuntimeException("KeY cannot load file:"+this.file);
+	}
 	// Proving
 	if (prove) {
 	    medi.setSimplifier(ProofSettings.DEFAULT_SETTINGS
@@ -97,7 +99,7 @@ public class TestHelper {
 		try {
 		    medi.startAutoMode();
 		    semaphorProof.wait();
-		} catch (InterruptedException e1) {
+		} catch (final InterruptedException e1) {
 		    e1.printStackTrace();
 		}
 	    }
@@ -127,9 +129,8 @@ public class TestHelper {
 
     public String methNames() {
 	String result = "";
-	Iterator<ProgramMethod> iter = pms.iterator();
-	while (iter.hasNext()) {
-	    result = result.concat(iter.next().toString());
+	for (final ProgramMethod pm : pms) {
+	    result = result.concat(pm.toString());
 	}
 	return result;
     }
@@ -143,7 +144,7 @@ public class TestHelper {
     }
 
     public int getNrOfMGS() {
-	return data.getMgs().size();
+	return data.getNrOfMgs();
     }
 
     public int getNrOfPV() {
@@ -155,7 +156,7 @@ public class TestHelper {
     }
 
     public int getNrOfPV2() {
-	return data.getPvs2().length;
+	return data.getPvs2().size();
     }
 
     public int getNrOfTestDat() {
@@ -203,7 +204,7 @@ public class TestHelper {
     }
 
     private boolean checkAbsMinTD() {
-	final ArrayList<HashMap<String, Expression>> data = combLocDat();
+	final ArrayList<HashMap<String, Expression>> cData = combLocDat();
 	boolean case1 = false;
 	boolean case2 = false;
 	boolean case3 = false;
@@ -211,7 +212,7 @@ public class TestHelper {
 	int a;
 	int b;
 
-	for (HashMap<String, Expression> map : data) {
+	for (final HashMap<String, Expression> map : cData) {
 	    a = Integer.parseInt(map.get("a").toString());
 	    b = Integer.parseInt(map.get("b").toString());
 	    if (a == 0) {
@@ -236,7 +237,7 @@ public class TestHelper {
 	int n1;
 	Expression n0e;
 	Expression n1e;
-	for (HashMap<String, Expression> map : combLocDat()) {
+	for (final HashMap<String, Expression> map : combLocDat()) {
 	    n0e = map.get("_n_0");
 	    n1e = map.get("_n_1");
 	    if (n0e != null) {
@@ -268,13 +269,13 @@ public class TestHelper {
 
     private String AbsMinWrongData() {
 	String result = "\nThe test data to test absMin is wrong.\nFollowing cases need to be covered"
-		+ "\n a==0 && b==0"
-		+ "\n a==0 && b>0"
-		+ "\n a<0 && b==0"
-		+ "\n a<0 && b<0" + "\nThe generated test data is as follows:";
+	        + "\n a==0 && b==0"
+	        + "\n a==0 && b>0"
+	        + "\n a<0 && b==0"
+	        + "\n a<0 && b<0" + "\nThe generated test data is as follows:";
 	int a;
 	int b;
-	for (HashMap<String, Expression> map : combLocDat()) {
+	for (final HashMap<String, Expression> map : combLocDat()) {
 	    a = Integer.parseInt(map.get("a").toString());
 	    b = Integer.parseInt(map.get("b").toString());
 	    result = result.concat("\na= " + a + "   b= " + b);
@@ -284,21 +285,21 @@ public class TestHelper {
     }
 
     private String BrLoopWrongData() {
-	String result = "\nThe test data to test BranchingLoop is wrong.\nThere must be at least one case where n is larger than 20"
-		+ "\nThe generated test data is as follows:\n" + combLocDat();
+	final String result = "\nThe test data to test BranchingLoop is wrong.\nThere must be at least one case where n is larger than 20"
+	        + "\nThe generated test data is as follows:\n" + combLocDat();
 	return result;
     }
 
     private ProverTaskListener createPTListener() {
 	return new ProverTaskListener() {
 
-	    public void taskStarted(String message, int size) {
+	    public void taskStarted(final String message, final int size) {
 	    }
 
-	    public void taskProgress(int position) {
+	    public void taskProgress(final int position) {
 	    }
 
-	    public void taskFinished(TaskFinishedInfo info) {
+	    public void taskFinished(final TaskFinishedInfo info) {
 		if (info.getSource() instanceof ProblemLoader) {
 		    synchronized (semaphorLoad) {
 			semaphorLoad.notifyAll();
@@ -312,7 +313,7 @@ public class TestHelper {
     private AutoModeListener createAMListener() {
 	return new AutoModeListener() {
 
-	    public void autoModeStopped(ProofEvent e) {
+	    public void autoModeStopped(final ProofEvent e) {
 		if (e.getSource() != null) {
 		    synchronized (semaphorProof) {
 			semaphorProof.notifyAll();
@@ -320,7 +321,7 @@ public class TestHelper {
 		}
 	    }
 
-	    public void autoModeStarted(ProofEvent e) {
+	    public void autoModeStarted(final ProofEvent e) {
 	    }
 	};
     }

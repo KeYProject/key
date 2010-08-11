@@ -1,17 +1,10 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
-// This file is part of KeY - Integrated Deductive Software Design
-//Copyright (C) 2001-2003 Universitaet Karlsruhe, Germany
-//                      and Chalmers University of Technology, Sweden
-//
-//The KeY system is protected by the GNU General Public License.
-//See LICENSE.TXT for details.
-//
 
 package de.uka.ilkd.key.rule.export;
 
@@ -73,11 +66,10 @@ public class RuleExportModel {
     
     private void addIntroducedTaclets ( TacletModelInfo tinfo, String filename ) {
         final Taclet t = tinfo.getTaclet ();
-        Iterator<TacletGoalTemplate> it = t.goalTemplates ().iterator();
-        while ( it.hasNext () ) {
-            final TacletGoalTemplate gt = it.next ();
-            
-            addTaclets ( gt.rules(), filename, tinfo );
+        for (TacletGoalTemplate tacletGoalTemplate : t.goalTemplates()) {
+            final TacletGoalTemplate gt = tacletGoalTemplate;
+
+            addTaclets(gt.rules(), filename, tinfo);
         }
     }
     
@@ -118,10 +110,9 @@ public class RuleExportModel {
 
     private void addOptions ( TacletModelInfo tinfo ) {
         final Taclet t = tinfo.getTaclet ();
-        final Iterator<Choice> it = t.getChoices().iterator();
-        while ( it.hasNext() ) {
-            final Choice c = it.next ();
-            OptionModelInfo opt = addOption ( c );
+        for (Choice choice : t.getChoices()) {
+            final Choice c = choice;
+            OptionModelInfo opt = addOption(c);
             opt.addTaclet(tinfo);
             tinfo.addOption(opt);
         }
@@ -154,9 +145,7 @@ public class RuleExportModel {
     private void addRuleSets ( TacletModelInfo tinfo ) {
     	final Taclet t = tinfo.getTaclet ();
     	// handle regular rule sets
-        final Iterator<RuleSet> it = t.ruleSets();
-        while ( it.hasNext() ) {
-            final RuleSet rs = it.next ();
+        for (RuleSet rs : t.getRuleSets()) {
             RuleSetModelInfo rsinfo = (RuleSetModelInfo) ruleSet2info.get ( rs );
             if ( rsinfo == null ) {
                 rsinfo = new RuleSetModelInfo(rs);
@@ -178,10 +167,9 @@ public class RuleExportModel {
 
     private void addTaclets ( ImmutableList<Taclet> tacletList, String filename,
             TacletModelInfo introducer ) {
-        final Iterator<Taclet> it = tacletList.iterator();
-        while ( it.hasNext() ) {
-            final Taclet t = it.next ();
-            addTaclet ( t, filename, introducer );
+        for (Taclet aTacletList : tacletList) {
+            final Taclet t = aTacletList;
+            addTaclet(t, filename, introducer);
         }
     }
     
@@ -245,10 +233,9 @@ public class RuleExportModel {
         }
         Arrays.sort( catArray );
         categories = ImmutableSLList.<CategoryModelInfo>nil().prepend ( catArray );
-        
-        Iterator<CategoryModelInfo> it = categories.iterator();
-        while ( it.hasNext () ) {
-            final CategoryModelInfo cat = it.next ();
+
+        for (CategoryModelInfo category : categories) {
+            final CategoryModelInfo cat = category;
             cat.setOptions(sortOptions(cat.getOptions()));
         }
     }
@@ -307,12 +294,11 @@ public class RuleExportModel {
      */
     private int countOccurences ( ImmutableList<TacletModelInfo> a, ImmutableList<TacletModelInfo> b ) {
         int result = 0;
-        
-        final Iterator<TacletModelInfo> it = a.iterator();
-        while ( it.hasNext () ) {
-            final TacletModelInfo t = it.next ();
-            
-            if ( b.contains ( t ) ) result++;
+
+        for (TacletModelInfo anA : a) {
+            final TacletModelInfo t = anA;
+
+            if (b.contains(t)) result++;
         }
         
         return result;

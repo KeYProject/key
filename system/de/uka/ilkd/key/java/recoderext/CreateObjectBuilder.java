@@ -1,21 +1,15 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
 //
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2004 Universitaet Karlsruhe, Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
 package de.uka.ilkd.key.java.recoderext;
 
-import java.util.*;
+import java.util.HashMap;
 
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.java.Expression;
@@ -25,9 +19,12 @@ import recoder.java.StatementBlock;
 import recoder.java.declaration.*;
 import recoder.java.declaration.modifier.Public;
 import recoder.java.declaration.modifier.Static;
-import recoder.java.reference.*;
+import recoder.java.reference.MethodReference;
+import recoder.java.reference.TypeReference;
+import recoder.java.reference.VariableReference;
 import recoder.java.statement.Return;
-import recoder.kit.*;
+import recoder.kit.ProblemReport;
+import recoder.kit.TypeKit;
 import recoder.list.generic.ASTArrayList;
 import recoder.list.generic.ASTList;
 
@@ -69,7 +66,7 @@ public class CreateObjectBuilder extends RecoderModelTransformer {
 	result.add(local);
 
 	final ASTList<Expression> arguments = new ASTArrayList<Expression>(0);
-       
+        
         result.add
             (assign(new VariableReference
                     (new Identifier(NEW_OBJECT_VAR_NAME)),
@@ -78,12 +75,12 @@ public class CreateObjectBuilder extends RecoderModelTransformer {
                          new ImplicitIdentifier
                          (InstanceAllocationMethodBuilder.IMPLICIT_INSTANCE_ALLOCATE),
                          arguments)));
-
-	MethodReference createRef = 
-	    (new MethodReference(new VariableReference
+                
+	MethodReferenceWrapper createRef = 
+	    new MethodReferenceWrapper(new VariableReference
 				 (new Identifier(NEW_OBJECT_VAR_NAME)), 
 				 new ImplicitIdentifier
-				 (CreateBuilder.IMPLICIT_CREATE)));
+				 (CreateBuilder.IMPLICIT_CREATE));
 	
 	// July 08 - mulbrich: wraps createRef into a method body statement to
 	// avoid unnecessary dynamic dispatch.
@@ -92,7 +89,7 @@ public class CreateObjectBuilder extends RecoderModelTransformer {
 	if(recoderClass.getIdentifier() == null) {
 	    // anonymous
 	    result.add
-        (new MethodReference(new VariableReference
+        (new MethodReferenceWrapper(new VariableReference
                              (new Identifier(NEW_OBJECT_VAR_NAME)),
                              new ImplicitIdentifier
                              (CreateBuilder.IMPLICIT_CREATE)));
@@ -134,7 +131,12 @@ public class CreateObjectBuilder extends RecoderModelTransformer {
     public MethodDeclaration createMethod(ClassDeclaration type) {
 	ASTList<DeclarationSpecifier> modifiers = new ASTArrayList<DeclarationSpecifier>(2);
 	modifiers.add(new Public());
-	modifiers.add(new Static());	
+	modifiers.add(new Static());
+        
+	//        modifiers.add(new KeYAnnotationUseSpecification(new TypeReference(
+	//                new Identifier("ExternallyConstructedScope"))));
+	//        modifiers.add(new KeYAnnotationUseSpecification(new TypeReference(
+	//                new Identifier("NoLocalScope"))));
 
 	MethodDeclaration md =  new MethodDeclaration
 	    (modifiers, 

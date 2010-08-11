@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -115,10 +115,9 @@ class OCLTranslator {
 	Namespace extendedProgVars
 		= originalProgVars.copy();
 	extendedProgVars.add(selfVar);
-	Iterator<ParsableVariable> it = paramVars.iterator();
-	while(it.hasNext()) {
-	    extendedProgVars.add(it.next());
-	}
+        for (ParsableVariable paramVar : paramVars) {
+            extendedProgVars.add(paramVar);
+        }
 	services.getNamespaces().setProgramVariables(extendedProgVars);
 	
 	//create parser

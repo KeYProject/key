@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -22,6 +22,8 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.Main;
+import de.uka.ilkd.key.gui.smt.ProgressDialog;
+import de.uka.ilkd.key.gui.smt.RuleLauncher;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
@@ -31,10 +33,9 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.pp.AbbrevException;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.pp.PosInSequent;
+import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.*;
-import de.uka.ilkd.key.smt.DecProcRunner;
 import de.uka.ilkd.key.smt.SMTRule;
-import de.uka.ilkd.key.smt.SMTRuleMulti;
 
 /**
  *  This class creates a menu with Taclets as entries. The invoker has
@@ -51,11 +52,14 @@ class TacletMenu extends JMenu {
     private TacletAppComparator comp = new TacletAppComparator();
     
     static Logger logger = Logger.getLogger(TacletMenu.class.getName());
+    private final Goal selectedGoal;
     
     /** 
      * creates empty menu 
      */
-    TacletMenu() {}
+    TacletMenu() {
+	selectedGoal = null;
+    }
 
 
     /** creates a new menu that displays all applicable rules at the given
@@ -68,6 +72,7 @@ class TacletMenu extends JMenu {
      * @param pos the PosInSequent
      */ 
     TacletMenu(SequentView sequentView,
+	    	final Goal selectedGoal,
 	       ImmutableList<TacletApp> findList, ImmutableList<TacletApp> rewriteList,
 	       ImmutableList<TacletApp> noFindList, ImmutableList<BuiltInRule> builtInList,
 	       PosInSequent pos) {
@@ -75,6 +80,7 @@ class TacletMenu extends JMenu {
 	this.sequentView = sequentView;
 	this.mediator = sequentView.mediator();
  	this.pos = pos;
+ 	this.selectedGoal = selectedGoal;
 	// delete RewriteTaclet from findList because they will be in
 	// the rewrite list and concatenate both lists
 	createTacletMenu(removeRewrites(findList).prepend(rewriteList),
@@ -89,14 +95,11 @@ class TacletMenu extends JMenu {
      */
     private ImmutableList<TacletApp> removeRewrites(ImmutableList<TacletApp> list) {
 	ImmutableList<TacletApp> result = ImmutableSLList.<TacletApp>nil();
-	Iterator<TacletApp> it = list.iterator();
 
-	while(it.hasNext()) {
-	    TacletApp tacletApp = it.next();
-	    Taclet taclet=tacletApp.taclet();
-	    result = (taclet instanceof RewriteTaclet ? result :
-		      result.prepend(tacletApp));
-	}
+        for (final TacletApp tacletApp : list) {
+            result = (tacletApp.taclet() instanceof RewriteTaclet ? result :
+                    result.prepend(tacletApp));
+        }
 	return result;
     }
 
@@ -144,11 +147,10 @@ class TacletMenu extends JMenu {
 				       MenuControl            control) {
 
 	if (!builtInList.isEmpty()) {
-	    addSeparator();	
-	    Iterator<BuiltInRule> it = builtInList.iterator();
-	    while (it.hasNext()) {
-		addBuiltInRuleItem(it.next(), control);
-	    }
+	    addSeparator();
+        for (BuiltInRule aBuiltInList : builtInList) {
+            addBuiltInRuleItem(aBuiltInList, control);
+        }
 	}
     }
 				      
@@ -193,7 +195,7 @@ class TacletMenu extends JMenu {
 
     private void createAbbrevSection(Term t, MenuControl control){
 	AbbrevMap scm = mediator.getNotationInfo().getAbbrevMap();
-	JMenuItem sc = null;
+	JMenuItem sc  ;
 	if(scm.containsTerm(t)){
 	    sc = new JMenuItem("Change abbreviation");
 	    sc.addActionListener(control);
@@ -264,9 +266,9 @@ class TacletMenu extends JMenu {
 
     /** adds array of TacletMenuItem to itself*/
     private void add(TacletMenuItem[] items) {
-	for (int i = 0; i < items.length; i++) {
-	    add((Component) items[i]);
-	}
+        for (TacletMenuItem item : items) {
+            add((Component) item);
+        }
     }
 
     /** creates new TacletMenuItems for each taclet in the list and set
@@ -347,12 +349,17 @@ class TacletMenu extends JMenu {
 		    .selectedTaclet(((TacletMenuItem) e.getSource()).connectedTo(), 
 				    pos);
             } else if (e.getSource() instanceof BuiltInRuleMenuItem) {
-        	if (((BuiltInRuleMenuItem) e.getSource()).connectedTo() instanceof SMTRule ||
-        	    ((BuiltInRuleMenuItem) e.getSource()).connectedTo() instanceof SMTRuleMulti) {
-        	    new DecProcRunner(Main.getInstance()
-        		, Main.getInstance().mediator().getProof()
+        	if (//((BuiltInRuleMenuItem) e.getSource()).connectedTo() instanceof SMTRule ||
+        	    //((BuiltInRuleMenuItem) e.getSource()).connectedTo() instanceof SMTRuleMulti||
+        	    ((BuiltInRuleMenuItem) e.getSource()).connectedTo() instanceof SMTRule) {
+        	    
+        	    SMTRule rule = (SMTRule) ((BuiltInRuleMenuItem) e.getSource()).connectedTo();
+        	    RuleLauncher.INSTANCE.start(rule, selectedGoal,
+        		    Main.getInstance().mediator().getProof().getUserConstraint().getConstraint(),true);
+        	   /* new DecProcRunner(Main.getInstance()
+        		, selectedGoal//Main.getInstance().mediator().getProof()
         		, Main.getInstance().mediator().getProof().getUserConstraint().getConstraint()
-        		, ((BuiltInRuleMenuItem) e.getSource()).connectedTo()).start();
+        		, ((BuiltInRuleMenuItem) e.getSource()).connectedTo()).start();*/
         	} else {
                         mediator.selectedBuiltInRule
                     (((BuiltInRuleMenuItem) e.getSource()).connectedTo(), 
@@ -506,18 +513,16 @@ class TacletMenu extends JMenu {
 	 */
 	private int measureGoalComplexity(ImmutableList<TacletGoalTemplate> l) {
 	    int result = 0;
-	    Iterator<TacletGoalTemplate> it = l.iterator();
-	    while (it.hasNext()) {
-		TacletGoalTemplate gt = it.next();
-		if (gt instanceof RewriteTacletGoalTemplate) {
-		    if (((RewriteTacletGoalTemplate)gt).replaceWith() != null) {
-			result += ((RewriteTacletGoalTemplate)gt).replaceWith().depth();
-		    }
-		} 
-		if (!gt.sequent().isEmpty()) {
-		    result += 10;
-		}
-	    }
+        for (final TacletGoalTemplate gt : l) {
+            if (gt instanceof RewriteTacletGoalTemplate) {
+                if (((RewriteTacletGoalTemplate) gt).replaceWith() != null) {
+                    result += ((RewriteTacletGoalTemplate) gt).replaceWith().depth();
+                }
+            }
+            if (!gt.sequent().isEmpty()) {
+                result += 10;
+            }
+        }
 	    return result;
 	}
 	

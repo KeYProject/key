@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -209,7 +209,7 @@ public class TestGenericSortInstantiations extends TestCase {
 
 	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs );
 	assertEquals ( "Instantiations should be equal",
-	               ((ImmutableMap<GenericSort,Sort>)DefaultImmutableMap.<GenericSort,Sort>nilMap())
+	               DefaultImmutableMap.<GenericSort,Sort>nilMap()
 	               .put ( G1, A4 ),
 	               gsi.getAllInstantiations () );
 
@@ -217,7 +217,7 @@ public class TestGenericSortInstantiations extends TestCase {
 	
 	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs );
 	assertEquals ( "Instantiations should be equal",
-	               ((ImmutableMap<GenericSort,Sort>)DefaultImmutableMap.<GenericSort,Sort>nilMap())
+	               DefaultImmutableMap.<GenericSort,Sort>nilMap()
 	               .put ( G1, A4 ),
 	               gsi.getAllInstantiations () );
 
@@ -227,7 +227,7 @@ public class TestGenericSortInstantiations extends TestCase {
 
 	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs );
 	assertEquals ( "Instantiations should be equal",
-	               ((ImmutableMap<GenericSort,Sort>)DefaultImmutableMap.<GenericSort,Sort>nilMap())
+	               DefaultImmutableMap.<GenericSort,Sort>nilMap()
 	               .put ( G1, A3 ),
 	               gsi.getAllInstantiations () );
 
@@ -235,7 +235,7 @@ public class TestGenericSortInstantiations extends TestCase {
 
 	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs );
 	assertEquals ( "Instantiations should be equal",
-	               ((ImmutableMap<GenericSort,Sort>)DefaultImmutableMap.<GenericSort,Sort>nilMap())
+	               DefaultImmutableMap.<GenericSort,Sort>nilMap()
 	               .put ( G1, A4 ),
 	               gsi.getAllInstantiations () );
 
@@ -254,7 +254,7 @@ public class TestGenericSortInstantiations extends TestCase {
 
 	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs );
 	assertEquals ( "Instantiations should be equal",
-	               ((ImmutableMap<GenericSort,Sort>)DefaultImmutableMap.<GenericSort,Sort>nilMap())
+	               DefaultImmutableMap.<GenericSort,Sort>nilMap()
 	               .put ( G1, B2 ),
 	               gsi.getAllInstantiations () );
     }
@@ -270,7 +270,7 @@ public class TestGenericSortInstantiations extends TestCase {
 	
 	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs );
 	assertEquals ( "Instantiations should be equal",
-	               ((ImmutableMap<GenericSort,Sort>)DefaultImmutableMap.<GenericSort,Sort>nilMap())
+	               DefaultImmutableMap.<GenericSort,Sort>nilMap()
 	               .put ( G1, A1 ).put ( G2, A2 ),
 	               gsi.getAllInstantiations () );
 
@@ -280,7 +280,7 @@ public class TestGenericSortInstantiations extends TestCase {
 
 	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs );
 	assertEquals ( "Instantiations should be equal",
-	               ((ImmutableMap<GenericSort,Sort>)DefaultImmutableMap.<GenericSort,Sort>nilMap())
+	               DefaultImmutableMap.<GenericSort,Sort>nilMap()
 	               .put ( G1, A1 ).put ( G2, B3 ),
 	               gsi.getAllInstantiations () );
 
@@ -292,7 +292,7 @@ public class TestGenericSortInstantiations extends TestCase {
 
 	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs );
 	assertEquals ( "Instantiations should be equal",
-	               ((ImmutableMap<GenericSort,Sort>)DefaultImmutableMap.<GenericSort,Sort>nilMap())
+	               DefaultImmutableMap.<GenericSort,Sort>nilMap()
 	               .put ( G1, A3 ).put ( G2, B4 ),
 	               gsi.getAllInstantiations () );
 
@@ -300,7 +300,7 @@ public class TestGenericSortInstantiations extends TestCase {
 
 	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs );
 	assertEquals ( "Instantiations should be equal",
-	               ((ImmutableMap<GenericSort,Sort>)DefaultImmutableMap.<GenericSort,Sort>nilMap())
+	               DefaultImmutableMap.<GenericSort,Sort>nilMap()
 	               .put ( G1, A3 ).put ( G2, B4 ).put ( G4, A5 ),
 	               gsi.getAllInstantiations () );
 
@@ -309,7 +309,7 @@ public class TestGenericSortInstantiations extends TestCase {
 
 	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs );
 	assertEquals ( "Instantiations should be equal",
-	               ((ImmutableMap<GenericSort,Sort>)DefaultImmutableMap.<GenericSort,Sort>nilMap())
+	               DefaultImmutableMap.<GenericSort,Sort>nilMap()
 	               .put ( G1, A4 ).put ( G2, B4 ).put ( G4, A4 ),
 	               gsi.getAllInstantiations () );
 
@@ -333,7 +333,7 @@ public class TestGenericSortInstantiations extends TestCase {
 	
 	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs );
 	assertEquals ( "Instantiations should be equal",
-	               ((ImmutableMap<GenericSort,Sort>)DefaultImmutableMap.<GenericSort,Sort>nilMap())
+	               DefaultImmutableMap.<GenericSort,Sort>nilMap()
 	               .put ( G1, A1 ).put ( G2, A2 ),
 	               gsi.getAllInstantiations () );
 
@@ -343,7 +343,7 @@ public class TestGenericSortInstantiations extends TestCase {
 
 	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs );
 	assertEquals ( "Instantiations should be equal",
-	               ((ImmutableMap<GenericSort,Sort>)DefaultImmutableMap.<GenericSort,Sort>nilMap())
+	               DefaultImmutableMap.<GenericSort,Sort>nilMap()
 	               .put ( G1, A1 ).put ( G2, D3 ),
 	               gsi.getAllInstantiations () );
 
@@ -355,7 +355,7 @@ public class TestGenericSortInstantiations extends TestCase {
 
 	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs );
 	assertEquals ( "Instantiations should be equal",
-	               ((ImmutableMap<GenericSort,Sort>)DefaultImmutableMap.<GenericSort,Sort>nilMap())
+	               DefaultImmutableMap.<GenericSort,Sort>nilMap()
 	               .put ( G1, A3 ).put ( G2, D4 ),
 	               gsi.getAllInstantiations () );
 
@@ -363,7 +363,7 @@ public class TestGenericSortInstantiations extends TestCase {
 
 	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs );
 	assertEquals ( "Instantiations should be equal",
-	               ((ImmutableMap<GenericSort,Sort>)DefaultImmutableMap.<GenericSort,Sort>nilMap())
+	               DefaultImmutableMap.<GenericSort,Sort>nilMap()
 	               .put ( G1, A3 ).put ( G2, D4 ).put ( G4, A5 ),
 	               gsi.getAllInstantiations () );
 
@@ -372,7 +372,7 @@ public class TestGenericSortInstantiations extends TestCase {
 
 	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs );
 	assertEquals ( "Instantiations should be equal",
-	               ((ImmutableMap<GenericSort,Sort>)DefaultImmutableMap.<GenericSort,Sort>nilMap())
+	               DefaultImmutableMap.<GenericSort,Sort>nilMap()
 	               .put ( G1, A4 ).put ( G2, D4 ).put ( G4, A4 ),
 	               gsi.getAllInstantiations () );
 
@@ -397,7 +397,7 @@ public class TestGenericSortInstantiations extends TestCase {
 
 	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs );
 	assertEquals ( "Instantiations should be equal",
-	               ((ImmutableMap<GenericSort,Sort>)DefaultImmutableMap.<GenericSort,Sort>nilMap())
+	               DefaultImmutableMap.<GenericSort,Sort>nilMap()
 	               .put ( G1, A1 ).put ( G2, A2 ).put ( G3, A3 ),
 	               gsi.getAllInstantiations () );
 
@@ -408,7 +408,7 @@ public class TestGenericSortInstantiations extends TestCase {
 
 	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs );
 	assertEquals ( "Instantiations should be equal",
-	               ((ImmutableMap<GenericSort,Sort>)DefaultImmutableMap.<GenericSort,Sort>nilMap())
+	               DefaultImmutableMap.<GenericSort,Sort>nilMap()
 	               .put ( G1, A5 ).put ( G2, A2 ).put ( G3, A3 ),
 	               gsi.getAllInstantiations () );
 
@@ -420,7 +420,7 @@ public class TestGenericSortInstantiations extends TestCase {
 
 	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs );
 	assertEquals ( "Instantiations should be equal",
-	               ((ImmutableMap<GenericSort,Sort>)DefaultImmutableMap.<GenericSort,Sort>nilMap())
+	               DefaultImmutableMap.<GenericSort,Sort>nilMap()
 	               .put ( G1, A1 ).put ( G2, A2 ).put ( G3, A3 ).put ( G4, A1 ),
 	               gsi.getAllInstantiations () );
 
@@ -442,7 +442,7 @@ public class TestGenericSortInstantiations extends TestCase {
 	
 	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs );
 	assertEquals ( "Instantiations should be equal",
-	               ((ImmutableMap<GenericSort,Sort>)DefaultImmutableMap.<GenericSort,Sort>nilMap())
+	               DefaultImmutableMap.<GenericSort,Sort>nilMap()
 	               .put ( G1, A3 ).put ( G2, B2 ).put ( G4, A5 ),
 	               gsi.getAllInstantiations () );
     }
@@ -457,7 +457,7 @@ public class TestGenericSortInstantiations extends TestCase {
 
 	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs );
 	assertEquals ( "Instantiations should be equal",
-	               ((ImmutableMap<GenericSort,Sort>)DefaultImmutableMap.<GenericSort,Sort>nilMap())
+	               DefaultImmutableMap.<GenericSort,Sort>nilMap()
 	               .put ( G1, A4 ),
 	               gsi.getAllInstantiations () );
 
@@ -465,7 +465,7 @@ public class TestGenericSortInstantiations extends TestCase {
 	
 	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs );
 	assertEquals ( "Instantiations should be equal",
-	               ((ImmutableMap<GenericSort,Sort>)DefaultImmutableMap.<GenericSort,Sort>nilMap())
+	               DefaultImmutableMap.<GenericSort,Sort>nilMap()
 	               .put ( G1, A4 ),
 	               gsi.getAllInstantiations () );
 
@@ -492,7 +492,7 @@ public class TestGenericSortInstantiations extends TestCase {
 
 	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs );
 	assertEquals ( "Instantiations should be equal",
-	               ((ImmutableMap<GenericSort,Sort>)DefaultImmutableMap.<GenericSort,Sort>nilMap())
+	               DefaultImmutableMap.<GenericSort,Sort>nilMap()
 	               .put ( H2, A3 ),
 	               gsi.getAllInstantiations () );
 
@@ -501,7 +501,7 @@ public class TestGenericSortInstantiations extends TestCase {
 
 	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs );
 	assertEquals ( "Instantiations should be equal",
-	               ((ImmutableMap<GenericSort,Sort>)DefaultImmutableMap.<GenericSort,Sort>nilMap())
+	               DefaultImmutableMap.<GenericSort,Sort>nilMap()
 	               .put ( H2, A3 ),
 	               gsi.getAllInstantiations () );
 
@@ -518,7 +518,7 @@ public class TestGenericSortInstantiations extends TestCase {
 
 	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs );
 	assertEquals ( "Instantiations should be equal",
-	               ((ImmutableMap<GenericSort,Sort>)DefaultImmutableMap.<GenericSort,Sort>nilMap())
+	               DefaultImmutableMap.<GenericSort,Sort>nilMap()
 	               .put ( H3, A1 ),
 	               gsi.getAllInstantiations () );
 
@@ -527,7 +527,7 @@ public class TestGenericSortInstantiations extends TestCase {
 
 	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs );
 	assertEquals ( "Instantiations should be equal",
-	               ((ImmutableMap<GenericSort,Sort>)DefaultImmutableMap.<GenericSort,Sort>nilMap())
+	               DefaultImmutableMap.<GenericSort,Sort>nilMap()
 	               .put ( H3, A1 ),
 	               gsi.getAllInstantiations () );
 
@@ -552,7 +552,7 @@ public class TestGenericSortInstantiations extends TestCase {
 
 	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs );
 	assertEquals ( "Instantiations should be equal",
-	               ((ImmutableMap<GenericSort,Sort>)DefaultImmutableMap.<GenericSort,Sort>nilMap())
+	               DefaultImmutableMap.<GenericSort,Sort>nilMap()
 	               .put ( H1, A4 ).put ( H2, A3 ),
 	               gsi.getAllInstantiations () );
 
@@ -571,7 +571,7 @@ public class TestGenericSortInstantiations extends TestCase {
 
 	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs );
 	assertEquals ( "Instantiations should be equal",
-	               ((ImmutableMap<GenericSort,Sort>)DefaultImmutableMap.<GenericSort,Sort>nilMap())
+	               DefaultImmutableMap.<GenericSort,Sort>nilMap()
 	               .put ( H1, A3 ).put ( H2, A3 ),
 	               gsi.getAllInstantiations () );
 
@@ -581,7 +581,7 @@ public class TestGenericSortInstantiations extends TestCase {
 
 	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs );
 	assertEquals ( "Instantiations should be equal",
-	               ((ImmutableMap<GenericSort,Sort>)DefaultImmutableMap.<GenericSort,Sort>nilMap())
+	               DefaultImmutableMap.<GenericSort,Sort>nilMap()
 	               .put ( H1, A3 ).put ( H3, A5 ),
 	               gsi.getAllInstantiations () );
 
@@ -616,7 +616,7 @@ public class TestGenericSortInstantiations extends TestCase {
 
 	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs );
 	assertEquals ( "Instantiations should be equal",
-	               ((ImmutableMap<GenericSort,Sort>)DefaultImmutableMap.<GenericSort,Sort>nilMap())
+	               DefaultImmutableMap.<GenericSort,Sort>nilMap()
 	               .put ( G1, A4 ).put ( G4, A4 ).put ( G3, A4 ),
 	               gsi.getAllInstantiations () );
 
@@ -624,7 +624,7 @@ public class TestGenericSortInstantiations extends TestCase {
 	
 	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs );
 	assertEquals ( "Instantiations should be equal",
-	               ((ImmutableMap<GenericSort,Sort>)DefaultImmutableMap.<GenericSort,Sort>nilMap())
+	               DefaultImmutableMap.<GenericSort,Sort>nilMap()
 	               .put ( G1, A4 ).put ( G4, A4 ).put ( G3, A4 ),
 	               gsi.getAllInstantiations () );
 
@@ -635,7 +635,7 @@ public class TestGenericSortInstantiations extends TestCase {
 
 	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs );
 	assertEquals ( "Instantiations should be equal",
-	               ((ImmutableMap<GenericSort,Sort>)DefaultImmutableMap.<GenericSort,Sort>nilMap())
+	               DefaultImmutableMap.<GenericSort,Sort>nilMap()
 	               .put ( G1, A5 ).put ( G2, A2 ).put ( G3, A3 ),
 	               gsi.getAllInstantiations () );
 
@@ -643,7 +643,7 @@ public class TestGenericSortInstantiations extends TestCase {
 
 	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs );
 	assertEquals ( "Instantiations should be equal",
-	               ((ImmutableMap<GenericSort,Sort>)DefaultImmutableMap.<GenericSort,Sort>nilMap())
+	               DefaultImmutableMap.<GenericSort,Sort>nilMap()
 	               .put ( G1, A5 ).put ( G2, A2 ).put ( G3, A3 ).put ( G4, A5 ),
 	               gsi.getAllInstantiations () );
 
@@ -652,7 +652,7 @@ public class TestGenericSortInstantiations extends TestCase {
 
 	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs );
 	assertEquals ( "Instantiations should be equal",
-	               ((ImmutableMap<GenericSort,Sort>)DefaultImmutableMap.<GenericSort,Sort>nilMap())
+	               DefaultImmutableMap.<GenericSort,Sort>nilMap()
 	               .put ( H3, A3 ),
 	               gsi.getAllInstantiations () );
 
@@ -668,7 +668,7 @@ public class TestGenericSortInstantiations extends TestCase {
 	
 	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs );
 	assertEquals ( "Instantiations should be equal",
-	               ((ImmutableMap<GenericSort,Sort>)DefaultImmutableMap.<GenericSort,Sort>nilMap())
+	               DefaultImmutableMap.<GenericSort,Sort>nilMap()
 	               .put ( G1, A1 ),
 	               gsi.getAllInstantiations () );
 
@@ -676,7 +676,7 @@ public class TestGenericSortInstantiations extends TestCase {
 
 	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs );
 	assertEquals ( "Instantiations should be equal",
-	               ((ImmutableMap<GenericSort,Sort>)DefaultImmutableMap.<GenericSort,Sort>nilMap())
+	               DefaultImmutableMap.<GenericSort,Sort>nilMap()
 	               .put ( G1, A3 ),
 	               gsi.getAllInstantiations () );
 
@@ -686,7 +686,7 @@ public class TestGenericSortInstantiations extends TestCase {
 	
 	gsi = GenericSortInstantiations.create ( sorts ( cs ), cs );
 	assertEquals ( "Instantiations should be equal",
-	               ((ImmutableMap<GenericSort,Sort>)DefaultImmutableMap.<GenericSort,Sort>nilMap())
+	               DefaultImmutableMap.<GenericSort,Sort>nilMap()
 	               .put ( G1, A1 ),
 	               gsi.getAllInstantiations () );
 

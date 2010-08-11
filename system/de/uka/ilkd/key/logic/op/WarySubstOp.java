@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -29,7 +29,6 @@ public class WarySubstOp extends SubstOp {
     public Term apply ( Term term ) {
 	QuantifiableVariable v=term.varsBoundHere(1).get(0);
 	WaryClashFreeSubst cfSubst = new WaryClashFreeSubst(v, term.sub(0));
-	Term res = cfSubst.apply(term.sub(1));
-	return res;	
+	return cfSubst.apply(term.sub(1));	
     }    
 }

@@ -1,5 +1,5 @@
 # This file is part of KeY - Integrated Deductive Software Design
-# Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
+# Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
 #                         Universitaet Koblenz-Landau, Germany
 #                         Chalmers University of Technology, Sweden
 #
@@ -14,6 +14,7 @@
 
 java/lang/Object.java
 
+java/lang/annotation/Annotation.java
 java/lang/ArithmeticException.java
 java/lang/ArrayIndexOutOfBoundsException.java
 java/lang/ArrayStoreException.java
@@ -36,9 +37,13 @@ java/lang/NegativeArraySizeException.java
 java/lang/NoClassDefFoundError.java
 java/lang/NullPointerException.java
 java/lang/NumberFormatException.java
+java/lang/VirtualMachineError.java
+java/lang/OutOfMemoryError.java
+java/lang/Runnable.java
 java/lang/RuntimeException.java
 java/lang/String.java
 java/lang/StringBuffer.java
+java/lang/Thread.java
 java/lang/Throwable.java
 java/util/Collection.java
 java/util/Iterator.java

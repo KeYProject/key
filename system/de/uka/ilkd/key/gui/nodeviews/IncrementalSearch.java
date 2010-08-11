@@ -1,10 +1,12 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
+//
+//
 package de.uka.ilkd.key.gui.nodeviews;
 
 import java.awt.Color;
@@ -75,8 +77,8 @@ public class IncrementalSearch implements KeyListener, FocusListener {
      */
     private boolean alreadyRegistered(JComponent comp) {
         KeyListener[] l = comp.getKeyListeners();
-        for (int i = 0; i < l.length; i++) {
-            if (l[i] instanceof IncrementalSearch) {
+        for (KeyListener aL : l) {
+            if (aL instanceof IncrementalSearch) {
                 return true;
             }
         }

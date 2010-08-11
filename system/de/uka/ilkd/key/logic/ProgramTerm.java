@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -88,7 +88,7 @@ class ProgramTerm extends Term {
 	    sb.append("\\[[").append(javaBlock).append("\\]] ");
 	} else {
 	    //	    sb.append("???Some Strange Modality???").append(javaBlock);
-	    sb.append("\\modality{"+op().name()).append("}").append(javaBlock).append("\\endmodality ");
+        sb.append("\\modality{").append(op().name()).append("}").append(javaBlock).append("\\endmodality ");
 	}
 	for(int i=0; i<subTerm.size(); i++)
            sb.append("(").append(subTerm.get(i)).append(")");

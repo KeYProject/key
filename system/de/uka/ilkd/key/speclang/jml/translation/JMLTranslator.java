@@ -1,17 +1,10 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
-//This file is part of KeY - Integrated Deductive Software Design
-//Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
-//                      Universitaet Koblenz-Landau, Germany
-//                      Chalmers University of Technology, Sweden
-//
-//The KeY system is protected by the GNU General Public License. 
-//See LICENSE.TXT for details.
 //
 //
 
@@ -25,11 +18,8 @@ import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.logic.LocationDescriptor;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.LogicVariable;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.ParsableVariable;
+import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.speclang.FormulaWithAxioms;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.translation.AxiomCollector;
@@ -76,7 +66,7 @@ class JMLTranslator {
     					       excVar,
                                                atPreFunctions);
     	
-    	FormulaWithAxioms result = null;
+    	FormulaWithAxioms result;
     	
 //    	System.out.println("JMLTranslator.translateExpression("+expr+")" + " in " + expr.fileName);
     	
@@ -87,7 +77,6 @@ class JMLTranslator {
     	
     	return result;
     }
-
     
     /**
      * Translates an expression as it occurs in JML signals-clauses, 
@@ -117,7 +106,7 @@ class JMLTranslator {
                                                excVar,
                                                atPreFunctions);
         
-        FormulaWithAxioms result = null;
+        FormulaWithAxioms result;
         
 //      System.out.println("JMLTranslator.translateSignalsExpression("+signalsExpr+") results: ");
 
@@ -151,7 +140,7 @@ class JMLTranslator {
                                                excVar,
                                                null);
         
-        FormulaWithAxioms result = null;
+        FormulaWithAxioms result;
         
 //          System.out.println("JMLTranslator.translateSignalsOnlyExpression("+signalsOnlyExpr+") results: ");
 
@@ -185,8 +174,8 @@ class JMLTranslator {
                                                null,
                                                null);
         
-        ImmutableSet<LocationDescriptor> result = DefaultImmutableSet.<LocationDescriptor>nil();
-        
+        ImmutableSet<LocationDescriptor> result;
+
 //      System.out.println("JMLTranslator.translateAssignableExpression("+assignableExpr+") results: ");
 
         result = parser.parseAssignable();
@@ -210,8 +199,8 @@ class JMLTranslator {
                                                null,
                                                null);
         
-        ImmutableList<LogicVariable> result = ImmutableSLList.<LogicVariable>nil();
-        
+        ImmutableList<LogicVariable> result;
+
 //      System.out.println("JMLTranslator.translateVariableDeclaration("+variableDecl+") results: ");
 
         result = parser.parseVariableDeclaration();

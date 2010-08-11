@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -55,8 +55,8 @@ public abstract class ProofAggregate {
 
     public void setProofEnv(ProofEnvironment env) {
         Proof[] proofs = getProofs();
-        for (int i=0; i<proofs.length; i++) {
-            proofs[i].setProofEnv(env);
+        for (Proof proof : proofs) {
+            proof.setProofEnv(env);
         }
     }
 

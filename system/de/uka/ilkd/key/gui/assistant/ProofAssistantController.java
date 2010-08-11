@@ -1,10 +1,11 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
+//
 //
 // This file is part of KeY - Integrated Deductive Software Design
 // Copyright (C) 2001-2004 Universitaet Karlsruhe, Germany
@@ -18,7 +19,7 @@ package de.uka.ilkd.key.gui.assistant;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.event.*;
-import java.util.LinkedList;
+import java.util.Arrays;import java.util.LinkedList;
 import java.util.List;
 
 import javax.swing.AbstractButton;
@@ -343,9 +344,7 @@ public class ProofAssistantController {
 	 */
 	private void init(Container container) {
  	    Component[] comps = container.getComponents();
- 	    for (int i = 0; i<comps.length; i++) {
-		components.add(comps[i]);
-	    }
+        components.addAll(Arrays.asList(comps));
 	}
 
 	/**

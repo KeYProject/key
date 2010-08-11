@@ -1,19 +1,10 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
-//This file is part of KeY - Integrated Deductive Software Design
-//Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
-//                      Universitaet Koblenz-Landau, Germany
-//                      Chalmers University of Technology, Sweden
-//
-//The KeY system is protected by the GNU General Public License. 
-//See LICENSE.TXT for details.
-//
-//
 
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
@@ -71,16 +62,15 @@ class ClausesGraph {
         do {
             changed = false;
 
-            final Iterator<Term> forIt = clauses.iterator ();
-            while ( forIt.hasNext () ) {
-                final Term formula = forIt.next ();
-                final ImmutableSet<Term> oldConnections = getConnections ( formula );
+            for (Term clause : clauses) {
+                final Term formula = clause;
+                final ImmutableSet<Term> oldConnections = getConnections(formula);
                 final ImmutableSet<Term> newConnections =
-                    getTransitiveConnections ( oldConnections );
+                        getTransitiveConnections(oldConnections);
 
-                if ( newConnections.size () > oldConnections.size () ) {
+                if (newConnections.size() > oldConnections.size()) {
                     changed = true;
-                    connections.put ( formula, newConnections );
+                    connections.put(formula, newConnections);
                 }
             }
 
@@ -88,9 +78,7 @@ class ClausesGraph {
     }
 
     private ImmutableSet<Term> getTransitiveConnections(ImmutableSet<Term> formulas) {
-        final Iterator<Term> termIt = formulas.iterator ();
-        while ( termIt.hasNext () )
-            formulas = formulas.union ( getConnections ( termIt.next () ) );
+        for (Term formula : formulas) formulas = formulas.union(getConnections(formula));
         return formulas;
     }
 
@@ -103,10 +91,9 @@ class ClausesGraph {
      */
     boolean connected(Term formula0, Term formula1) {
         final ImmutableSet<Term> subFormulas1 = computeClauses ( formula1 );
-        final Iterator<Term> it = computeClauses ( formula0 ).iterator ();
-        while ( it.hasNext () ) {
-            if ( intersect ( getConnections ( it.next () ),
-                             subFormulas1 )                .size () > 0 )
+        for (Term term : computeClauses(formula0)) {
+            if (intersect(getConnections(term),
+                    subFormulas1).size() > 0)
                 return true;
         }
         return false;
@@ -135,10 +122,9 @@ class ClausesGraph {
      * 
      */
     private void buildInitialGraph() {
-        final Iterator<Term> it = clauses.iterator ();
-        while ( it.hasNext () ) {
-            final Term clause = it.next ();
-            connections.put ( clause, directConnections ( clause ) );
+        for (Term clause1 : clauses) {
+            final Term clause = clause1;
+            connections.put(clause, directConnections(clause));
         }
     }
 
@@ -149,11 +135,10 @@ class ClausesGraph {
      */
     private ImmutableSet<Term> directConnections(Term formula) {
         ImmutableSet<Term> res = DefaultImmutableSet.<Term>nil();
-        final Iterator<Term> it = clauses.iterator ();
-        while ( it.hasNext () ) {
-            final Term clause = it.next ();
-            if ( directlyConnected ( clause, formula ) )
-                res = res.add ( clause );
+        for (Term clause1 : clauses) {
+            final Term clause = clause1;
+            if (directlyConnected(clause, formula))
+                res = res.add(clause);
         }
         return res;
     }
@@ -229,10 +214,9 @@ class ClausesGraph {
     private ImmutableSet<Term> intersect(ImmutableSet<Term> set0, ImmutableSet<Term> set1) {
         ImmutableSet<Term> res = DefaultImmutableSet.<Term>nil();
         if ( set0 == null || set1 == null ) return res;
-        final Iterator<Term> it = set0.iterator ();
-        while ( it.hasNext () ) {
-            final Term el = it.next ();
-            if ( set1.contains ( el ) ) res = res.add ( el );
+        for (Term aSet0 : set0) {
+            final Term el = aSet0;
+            if (set1.contains(el)) res = res.add(el);
         }
         return res;
     }

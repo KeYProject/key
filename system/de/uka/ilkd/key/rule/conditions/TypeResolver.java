@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -69,6 +69,8 @@ public abstract class TypeResolver {
         public String toString() {
             return gs.toString();
         }
+        
+        public GenericSort getGenericSort() {return gs;}
     }
     public static class ElementTypeResolverForSV extends TypeResolver {
 

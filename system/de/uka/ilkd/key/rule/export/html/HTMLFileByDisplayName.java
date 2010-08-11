@@ -1,17 +1,10 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
-//This file is part of KeY - Integrated Deductive Software Design 
-//Copyright (C) 2001-2003 Universitaet Karlsruhe, Germany
-//                      and Chalmers University of Technology, Sweden
-//
-//The KeY system is protected by the GNU General Public License.
-//See LICENSE.TXT for details.
-//
 
 package de.uka.ilkd.key.rule.export.html;
 
@@ -154,13 +147,12 @@ public class HTMLFileByDisplayName extends HTMLFile {
                     + " taclets with this display name.\n" );
         }
         out.append ( "<ol>\n" );
-        
-        final Iterator<TacletModelInfo> it = taclets.iterator ();
-        while ( it.hasNext () ) {
-            final TacletModelInfo t = it.next ();
-            
-            out.append( "<li>" );
-            writeTacletLink ( out, t, true );
+
+        for (TacletModelInfo taclet : taclets) {
+            final TacletModelInfo t = taclet;
+
+            out.append("<li>");
+            writeTacletLink(out, t, true);
             out.append("</li>\n");
         }
         

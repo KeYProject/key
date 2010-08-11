@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -56,7 +56,7 @@ public class LibrariesConfiguration extends JDialog {
         java.util.Arrays.sort(l,0,size);
 
         for(int j=0;j<size;j++){
-            s[j]= ((Boolean)libToSel.get(l[j])).booleanValue();
+            s[j]= libToSel.get(l[j]).booleanValue();
         }
         
         setMediator(mediator);

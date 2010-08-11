@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -33,7 +33,7 @@ import de.uka.ilkd.key.proof.Goal;
 public abstract class FindTaclet extends Taclet {
 
     /** contains the find term */
-    protected Term find;
+    protected final Term find;
 
     /** Set of schemavariables of the if and the (optional) find part */
     private ImmutableSet<SchemaVariable> ifFindVariables = null;
@@ -363,7 +363,7 @@ public abstract class FindTaclet extends Taclet {
     public ImmutableList<SchemaVariable> writeSet() {
 	Iterator<TacletGoalTemplate> it = goalTemplates().iterator();
 	ImmutableList<SchemaVariable> updateVar = ImmutableSLList.<SchemaVariable>nil(); 
-	Term replWith = null; 
+	Term replWith; 
 	
 	while (it.hasNext()){
 	    TacletGoalTemplate goalTemp = it.next();

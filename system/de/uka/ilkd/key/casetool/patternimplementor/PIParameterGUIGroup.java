@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -37,7 +37,7 @@ public class PIParameterGUIGroup extends PIParameterGUI {
         //System.out.println("GUI.updateGUI "+pip.getName());
         content.setVisible(false);
 
-        ((JPanel) content).removeAll();
+        content.removeAll();
         content.setBorder(BorderFactory.createTitledBorder(pip.getName()));
         this.add(content);
         content.setLayout(new BoxLayout(content, BoxLayout.Y_AXIS));

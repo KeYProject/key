@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -111,10 +111,9 @@ public class SimultaneousUpdateSimplifierSettings implements Settings {
     protected void fireSettingsChanged() {
 	updateSimplifier();
 
-	Iterator<SettingsListener> it = listenerList.iterator();
-	while (it.hasNext()) {
-	    it.next().settingsChanged(new GUIEvent(this));
-	}
+        for (SettingsListener aListenerList : listenerList) {
+            aListenerList.settingsChanged(new GUIEvent(this));
+        }
     }
 
     /** adds a listener to the settings object 

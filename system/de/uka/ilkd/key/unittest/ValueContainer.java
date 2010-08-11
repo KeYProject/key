@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -13,15 +13,15 @@ import de.uka.ilkd.key.java.Expression;
 
 public abstract class ValueContainer{
 
-    protected HashSet values;
+    protected HashSet<Object> values;
 
     public ValueContainer(Object v){
-	values = new HashSet();
+	values = new HashSet<Object>();
 	add(v);
     }
 
     public ValueContainer(Object o1, Object o2){
-	values = new HashSet();
+	values = new HashSet<Object>();
 	add(o1);
 	add(o2);
     }

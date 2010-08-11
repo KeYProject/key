@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -58,6 +58,17 @@ public class ContextStatementBlock extends StatementBlock {
 	this.executionContext = executionContext;
     }
 
+    public ContextStatementBlock(Statement s, 
+               IExecutionContext executionContext) {
+        super(s);
+        this.executionContext = executionContext;
+    }
+    
+    public ContextStatementBlock(Statement[] body, 
+               IExecutionContext executionContext) {
+        super(body);
+        this.executionContext = executionContext;
+    }
 
     public boolean requiresExplicitExecutionContextMatch() {
 	return executionContext != null;
@@ -318,10 +329,9 @@ public class ContextStatementBlock extends StatementBlock {
             for (int i = pos - 1; i>=0; i--) {
                 final ProgramPrefix prefixEl = prefix.getPrefixElementAt(i);                          
                 iterators[i] = prefixEl.getFirstActiveChildPos().iterator();               
-            }                    
-            
-            for (int i = 0; i<iterators.length; i++) {
-                final IntIterator it = iterators[i];
+            }
+
+            for (final IntIterator it : iterators) {
                 while (it.hasNext()) {
                     prefixEnd = prefixEnd.down(it.next());
                 }

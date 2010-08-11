@@ -1,12 +1,10 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License.
+// The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
-//
-//
 
 package de.uka.ilkd.key.proof.init;
 
@@ -17,6 +15,7 @@ import javax.swing.JOptionPane;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.gui.*;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.init.proofobligation.TacletSoundnessPO;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 
 /**
@@ -82,7 +81,8 @@ public class TacletSoundnessPOLoader implements Runnable {
         try {
 	    ProofEnvironment env = mediator.getSelectedProof().env();
             prob.setInitConfig(env.getInitConfig());
-	    ProblemInitializer pi = new ProblemInitializer(Main.getInstance());
+	    ProblemInitializer pi = 
+		mediator.getProfile().createProblemInitializer(Main.getInstance());
 	    pi.startProver(env, prob);
         } catch ( Throwable e ) {
 	    mediator.getExceptionHandler().reportException(e);

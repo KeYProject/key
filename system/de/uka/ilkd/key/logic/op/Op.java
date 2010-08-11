@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -151,7 +151,7 @@ public abstract class Op implements Operator {
      * @param str name of the modality to return
      */
     public static Modality getModality(String str) {
-	return (Modality)Modality.getNameMap().get(str);
+	return Modality.getNameMap().get(str);
     }
 
     /**

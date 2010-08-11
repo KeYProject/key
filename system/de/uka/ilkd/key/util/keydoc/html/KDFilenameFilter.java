@@ -1,10 +1,12 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
+//
+//
 package de.uka.ilkd.key.util.keydoc.html;
 
 import java.util.regex.*;
@@ -35,12 +37,12 @@ class KDFilenameFilter implements FilenameFilter {
     
     public boolean accept(File dir, String name) {
 	boolean ret=false;
-	
 
-	for (int i=0; i<patterns.length; i++) {
-	    m= patterns[i].matcher(name);
-	    ret= ret || m.matches();
-	}
+
+        for (Pattern pattern : patterns) {
+            m = pattern.matcher(name);
+            ret = ret || m.matches();
+        }
 	
 	return ret;
     }

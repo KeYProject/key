@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -61,7 +61,7 @@ public class ErrorMessages {
 		    while (!(cm instanceof Window)) {
 			cm=cm.getParent();
 		    }
-		    ((Window)cm).setVisible(false);
+		    cm.setVisible(false);
 		    ((Window)cm).dispose();
 		}
 	    };

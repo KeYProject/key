@@ -1,10 +1,12 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
+//
+//
 package de.uka.ilkd.key.logic.op;
 
 import java.util.Collections;
@@ -79,9 +81,8 @@ public class OperatorSV extends SchemaVariableAdapter {
      * the {@link Term} is valid.
      */
     public boolean validTopLevel(Term term){
-        if (term.arity() != this.arity()) return false;       
-        return true;
-    }   
+        return term.arity() == this.arity();       
+        }
     
     /** returns the arity of this operator */
     public int arity() {

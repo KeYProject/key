@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -32,7 +32,7 @@ class Substitution {
 
     private final TermBuilder tb = TermBuilder.DF;
     
-    private ImmutableMap<QuantifiableVariable,Term> varMap;
+    private final ImmutableMap<QuantifiableVariable,Term> varMap;
     
     public Substitution(ImmutableMap<QuantifiableVariable,Term> map){
         varMap = map;
@@ -47,9 +47,8 @@ class Substitution {
     }
     
     public boolean isTotalOn(ImmutableSet<QuantifiableVariable> vars) {
-        Iterator<QuantifiableVariable> it = vars.iterator ();
-        while ( it.hasNext () ) {
-            if ( !varMap.containsKey ( it.next () ) ) return false;
+        for (QuantifiableVariable var : vars) {
+            if (!varMap.containsKey(var)) return false;
         }
         return true;
     }

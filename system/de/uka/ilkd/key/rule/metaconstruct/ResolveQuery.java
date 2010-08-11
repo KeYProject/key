@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -8,6 +8,7 @@
 //
 //
 package de.uka.ilkd.key.rule.metaconstruct;
+
 
 import java.util.Iterator;
 
@@ -21,15 +22,14 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
 import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.expression.operator.CopyAssignment;
-import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.java.reference.MethodReference;
-import de.uka.ilkd.key.java.reference.TypeRef;
+import de.uka.ilkd.key.java.reference.*;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.NullSort;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.rtsj.java.RTSJInfo;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 public class ResolveQuery extends AbstractMetaOperator {
@@ -86,14 +86,14 @@ public class ResolveQuery extends AbstractMetaOperator {
 	return new ImmutableArray<QuantifiableVariable>(qva);
     }
 
-    private ProgramVariable createPV(String name, Sort s, Services services) {       
-        return createPV(name, services.getJavaInfo().getKeYJavaType(s), services);
+    private ProgramVariable createPV(String pvName, Sort s, Services services) {       
+        return createPV(pvName, services.getJavaInfo().getKeYJavaType(s), services);
     }
 
-    private ProgramVariable createPV(String name, KeYJavaType kjt, Services services) {
+    private ProgramVariable createPV(String pvName, KeYJavaType kjt, Services services) {
        
         final ProgramElementName pvname 
-            = services.getVariableNamer().getTemporaryNameProposal(name);
+            = services.getVariableNamer().getTemporaryNameProposal(pvName);
         
         return new LocationVariable(pvname, kjt);
     }
@@ -138,7 +138,13 @@ public class ResolveQuery extends AbstractMetaOperator {
             
             final ExecutionContext ec; 
             if (pm.getContainerType() != null) {
-                ec = new ExecutionContext(new TypeRef(pm.getContainerType()), null);
+        	if (services.getJavaInfo() instanceof RTSJInfo) {
+        	    final ReferencePrefix mem = ((RTSJInfo) services.getJavaInfo()).getDefaultMemoryArea();
+                    ec = new ExecutionContext(new TypeRef(pm.getContainerType()), 
+                            mem == null ? null : new MemoryAreaEC(mem), null);
+        	} else {
+        	    ec = new ExecutionContext(new TypeRef(pm.getContainerType()), null, null);
+        	}
             } else {
                 ec = services.getJavaInfo().getDefaultExecutionContext();
             }
@@ -193,11 +199,11 @@ public class ResolveQuery extends AbstractMetaOperator {
         String resultVarName = pm.getName();
         
         final String[] commonQueryPrefix = new String[]{"is", "has", "get"};
-        for (int i = 0; i<commonQueryPrefix.length; i++) {
-            if (resultVarName.startsWith(commonQueryPrefix[i])) {
-                if (resultVarName.length() > commonQueryPrefix[i].length()) {
+        for (String aCommonQueryPrefix : commonQueryPrefix) {
+            if (resultVarName.startsWith(aCommonQueryPrefix)) {
+                if (resultVarName.length() > aCommonQueryPrefix.length()) {
                     resultVarName = resultVarName.
-                        substring(commonQueryPrefix[i].length()).toLowerCase();                    
+                            substring(aCommonQueryPrefix.length()).toLowerCase();
                 }
                 break;
             }

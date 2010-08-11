@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -28,8 +28,7 @@ import recoder.io.PropertyNames;
 import recoder.java.*;
 import recoder.java.SourceElement.Position;
 import recoder.java.declaration.*;
-import recoder.java.reference.MethodReference;
-import recoder.java.reference.TypeReference;
+import recoder.java.reference.*;
 import recoder.list.generic.ASTArrayList;
 import recoder.list.generic.ASTList;
 import recoder.util.StringUtils;
@@ -121,6 +120,22 @@ public class ProofJavaProgramFactory extends JavaProgramFactory {
         }
         cml.add(c);
     }
+    
+    public NewWrapper createNewWrapper(Identifier scope){
+        return new NewWrapper(super.createNew(), scope);
+    }
+    
+    public NewArrayWrapper createNewArrayWrapper(Identifier scope){
+        return new NewArrayWrapper(super.createNewArray(), scope);
+    }
+    
+    public KeYAnnotationUseSpecification createKeYAnnotationUseSpecification(){
+        return new KeYAnnotationUseSpecification();
+    }
+    
+/*    public CurrentMemoryAreaReference createCurrentMemoryAreaReference(){
+        return new CurrentMemoryAreaReference();
+    }*/
 
     /**
        Perform post work on the created element. Creates parent links
@@ -390,8 +405,14 @@ public class ProofJavaProgramFactory extends JavaProgramFactory {
      */
     public MethodBodyStatement createMethodBodyStatement(TypeReference bodySource,
 							 Expression resVar,
-							 MethodReference methRef) {
+							 MethodReferenceWrapper methRef) {
 	return new MethodBodyStatement(bodySource, resVar, methRef);
+    }
+    
+    public MethodReferenceWrapper createMethodReferenceWrapper(ReferencePrefix accessPath, 
+            Identifier name, ASTList<Expression> args, 
+            ASTList<TypeArgumentDeclaration> typeArgs){
+        return new MethodReferenceWrapper(accessPath, name, args, typeArgs);
     }
 
     /**

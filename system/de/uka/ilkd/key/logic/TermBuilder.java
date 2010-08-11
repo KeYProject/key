@@ -1,17 +1,16 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
-package de.uka.ilkd.key.logic;
 
-import java.util.Iterator;
+package de.uka.ilkd.key.logic;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.expression.literal.IntLiteral;
+import de.uka.ilkd.key.logic.ldt.CharLDT;
 import de.uka.ilkd.key.logic.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -94,8 +93,8 @@ public class TermBuilder {
 
     public Term and(Term[] subTerms) {
         Term result = tt();
-        for (int i=0; i<subTerms.length; i++) {
-            result = and( result, subTerms[i]);
+        for (Term subTerm : subTerms) {
+            result = and(result, subTerm);
         }
 
         return result;
@@ -103,10 +102,9 @@ public class TermBuilder {
     
     public Term and(ImmutableList<Term> subTerms) {
 	Term result = tt();
-	Iterator<Term> it = subTerms.iterator();
-	while(it.hasNext()) {
-	    result = and(result, it.next());
-	}
+        for (Term subTerm : subTerms) {
+            result = and(result, subTerm);
+        }
 	return result;
     }
     
@@ -116,8 +114,8 @@ public class TermBuilder {
     
     public Term or(Term[] subTerms) {
         Term result = ff();
-        for (int i=0; i<subTerms.length; i++) {
-            result = or( result, subTerms[i]);
+        for (Term subTerm : subTerms) {
+            result = or(result, subTerm);
         }
 
         return result;
@@ -125,10 +123,9 @@ public class TermBuilder {
     
     public Term or(ImmutableList<Term> subTerms) {
 	Term result = ff();
-	Iterator<Term> it = subTerms.iterator();
-	while(it.hasNext()) {
-	    result = or(result, it.next());
-	}
+        for (Term subTerm : subTerms) {
+            result = or(result, subTerm);
+        }
 	return result;
     }
 
@@ -269,12 +266,20 @@ public class TermBuilder {
      * @return Term in Z-Notation representing the given number
      */
     public Term zTerm(Services services, String numberString){
-        Operator v;
+        Namespace funcNS = services.getNamespaces().functions();
+
+        Term t = toNumberNotation(numberString, funcNS);
+
+        t = func((Function) funcNS.lookup(new Name("Z")),t);
+        return t;
+    }
+
+    protected Term toNumberNotation(String numberString, Namespace funcNS) {
+	Operator v;
         Term t;
         boolean negate = false;
         int j = 0;
         
-        Namespace funcNS = services.getNamespaces().functions();
         
         if (numberString.substring(0,1).equals("-")) {
             negate = true;
@@ -292,11 +297,22 @@ public class TermBuilder {
             v=(Function) funcNS.lookup(new Name("neglit"));
             t = func((Function) v, t);
         }
-        v = (Function) funcNS.lookup(new Name("Z"));
-        t = func((Function)v,t);
-        return t;
+	return t;
     }
     
+    public Term charTerm(Services serv, String ch) {
+	CharLDT charLDT = serv.getTypeConverter().getCharLDT();
+	
+	int intVal;
+	if (ch.length()==3) {
+            intVal = (int)ch.charAt(1);
+        } else {
+            intVal = Integer.parseInt(ch.substring(3,ch.length()-1),16);
+        }
+	
+	return func(charLDT.getCharSymbol(), 
+		toNumberNotation(""+intVal, serv.getNamespaces().functions()));
+    }
     
     public Term inReachableState(Services services) {
         return func(services.getJavaInfo().getInReachableState());

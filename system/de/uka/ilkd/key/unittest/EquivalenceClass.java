@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -28,6 +28,7 @@ public class EquivalenceClass {
 
     private ImmutableSet<Term> members;
 
+    /** The keys of the hashmap are lower bounds or upper bounds to this hashmap. Initialized by {@code ModelGenerator.findBounds} */
     private HashMap<EquivalenceClass, Boolean> lb2ex, ub2ex;
 
     // This flag is used to avoid cycles, when it is checked if a concrete
@@ -79,10 +80,9 @@ public class EquivalenceClass {
     }
 
     public boolean isInt() {
-	for (Iterator<Term> it = members.iterator(); it.hasNext();) {
-	    Term t = it.next();
-	    return isInt(t.sort());
-	}
+        for (Term t : members) {
+            return isInt(t.sort());
+        }
 	return false;
     }
 
@@ -104,12 +104,11 @@ public class EquivalenceClass {
     }
 
     public boolean isBoolean() {
-	for (Iterator<Term> it = members.iterator(); it.hasNext();) {
-	    if (serv.getTypeConverter().getBooleanLDT().targetSort() == it
-		    .next().sort()) {
-		return true;
-	    }
-	}
+        for (Term member : members) {
+            if (serv.getTypeConverter().getBooleanLDT().targetSort() == member.sort()) {
+                return true;
+            }
+        }
 	return false;
     }
 
@@ -118,22 +117,20 @@ public class EquivalenceClass {
      */
     public ImmutableSet<Term> getLocations() {
 	ImmutableSet<Term> locations = DefaultImmutableSet.<Term>nil();
-	Iterator<Term> it = members.iterator();
-	while (it.hasNext()) {
-	    Term t = it.next();
-	    if (ModelGenerator.isLocation(t, serv)) {
-		locations = locations.add(t);
-	    }
-	}
+        for (Term member : members) {
+            Term t = member;
+            if (ModelGenerator.isLocation(t, serv)) {
+                locations = locations.add(t);
+            }
+        }
 	return locations;
     }
 
     public int hashCode() {
 	int result = 0;
-	Iterator<Term> it = members.iterator();
-	while (it.hasNext()) {
-	    result += it.next().toString().hashCode();
-	}
+        for (Term member : members) {
+            result += member.toString().hashCode();
+        }
 	return result;
     }
 
@@ -229,6 +226,7 @@ public class EquivalenceClass {
 	members = members.add(t);
     }
 
+    /**Add the elements from the equivalence class given as parameter to this equivalence class*/
     public void add(EquivalenceClass ec) {
 	members = members.union(ec.getMembers());
     }
@@ -362,26 +360,26 @@ public class EquivalenceClass {
 			|| getConcreteIntValue(term2class).longValue() < getMaximalConcreteLowerBound(term2class)) {
 		    return false;
 		}
-		Iterator<Term> itt = disjointRep.iterator();
-		while (itt.hasNext()) {
-		    EquivalenceClass ec = term2class.get(itt.next());
-		    Integer i = ec.getConcreteIntValue(term2class);
-		    if (i != null) {
-			if (iValue.longValue() == i.longValue()) {
-			    return false;
-			}
-		    }
-		}
+            for (Term aDisjointRep : disjointRep) {
+                EquivalenceClass ec = term2class.get(aDisjointRep);
+                Integer i = ec.getConcreteIntValue(term2class);
+                if (i != null) {
+                    if (iValue.longValue() == i.longValue()) {
+                        return false;
+                    }
+                }
+            }
 	    }
 	} else if (isBoolean() && getConcreteBooleanValue(term2class) != null) {
-	    Iterator<Term> itt = disjointRep.iterator();
-	    while (itt.hasNext()) {
-		EquivalenceClass ec = term2class.get(itt.next());
-		Boolean b = ec.getConcreteBooleanValue(term2class);
-		if (bValue == b) {
-		    return false;
-		}
-	    }
+        for (Term aDisjointRep : disjointRep) {
+            EquivalenceClass ec = term2class.get(aDisjointRep);
+            Boolean b = ec.getConcreteBooleanValue(term2class);
+            if (b != null) {
+                if (bValue == b) {
+                    return false;
+                }
+            }
+        }
 	}
 	return true;
     }
@@ -399,17 +397,16 @@ public class EquivalenceClass {
 	} else {
 	    visited = true;
 	}
-	Iterator<Term> it = disjointRep.iterator();
-	while (it.hasNext()) {
-	    Term t = it.next();
-	    EquivalenceClass ec = term2class.get(t);
-	    Boolean b = ec.getConcreteBooleanValue(term2class);
-	    if (b != null) {
-		visited = false;
-		bValue = bool(!b.booleanValue());
-		return bValue;
-	    }
-	}
+        for (Term aDisjointRep : disjointRep) {
+            Term t = aDisjointRep;
+            EquivalenceClass ec = term2class.get(t);
+            Boolean b = ec.getConcreteBooleanValue(term2class);
+            if (b != null) {
+                visited = false;
+                bValue = bool(!b.booleanValue());
+                return bValue;
+            }
+        }
 	visited = false;
 	return null;
     }
@@ -423,9 +420,10 @@ public class EquivalenceClass {
 	    return iValue;
 	}
 	Iterator<Term> it = members.iterator();
-	while (it.hasNext()) {
+	while (it.hasNext() && term2class!=null) {
 	    Term t = it.next();
 	    Operator op = t.op();
+	    //gladisch: What is going on here?
 	    if (op == serv.getTypeConverter().getIntLDT().getAdd()
 		    || op == serv.getTypeConverter().getLongLDT().getAdd()) {
 		Integer res = null;
@@ -470,41 +468,41 @@ public class EquivalenceClass {
 	// ...
     }
 
+    /**This value has a side-effect: it sets the fields iValue or bValue if possible */
     public boolean containsLiteral() {
-	Iterator<Term> it = members.iterator();
-	while (it.hasNext()) {
-	    Term t = it.next();
-	    if (isBoolean()) {
-		if (trueLit.equals(t)) {
-		    if (bValue == null)
-			bValue = boolTrue;
-		    return true;
-		} else if (falseLit.equals(t)) {
-		    if (bValue == null)
-			bValue = boolFalse;
-		    return true;
-		}
-	    }
-	    if (isInt()) {
-		try {
-		    ProgramElement pe = serv.getTypeConverter()
-			    .convertToProgramElement(t);
-		    boolean negative = false;
-		    if (pe instanceof Negative) {
-			pe = ((Negative) pe).getChildAt(0);
-		    }
-		    if (pe instanceof IntLiteral) {
-			if (iValue == null) {
-			    iValue = new Integer((negative ? "-" : "")
-				    + ((IntLiteral) pe).getValue());
-			}
-			return true;
-		    }
-		} catch (RuntimeException e) {
-		    // System.out.println(e);
-		}
-	    }
-	}
+        for (Term member : members) {
+            Term t = member;
+            if (isBoolean()) {
+                if (trueLit.equals(t)) {
+                    if (bValue == null)
+                        bValue = boolTrue;
+                    return true;
+                } else if (falseLit.equals(t)) {
+                    if (bValue == null)
+                        bValue = boolFalse;
+                    return true;
+                }
+            }
+            if (isInt()) {
+                try {
+                    ProgramElement pe = serv.getTypeConverter()
+                            .convertToProgramElement(t);
+                    boolean negative = false;
+                    if (pe instanceof Negative) {
+                        pe = ((Negative) pe).getChildAt(0);
+                    }
+                    if (pe instanceof IntLiteral) {
+                        if (iValue == null) {
+                            iValue = new Integer((negative ? "-" : "")
+                                    + ((IntLiteral) pe).getValue());
+                        }
+                        return true;
+                    }
+                } catch (RuntimeException e) {
+                    // System.out.println(e);
+                }
+            }
+        }
 	return false;
     }
 

@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -69,9 +69,7 @@ public class Polynomial {
         if ( c.signum () == 0 )
             return new Polynomial ( ImmutableSLList.<Monomial>nil(), BigInteger.ZERO );
         ImmutableList<Monomial> newParts = ImmutableSLList.<Monomial>nil();
-        final Iterator<Monomial> it = parts.iterator ();
-        while ( it.hasNext () )
-            newParts = newParts.prepend ( it.next ().multiply ( c ) );
+        for (Monomial part : parts) newParts = newParts.prepend(part.multiply(c));
 
         return new Polynomial ( newParts, constantPart.multiply ( c ) );
     }
@@ -81,9 +79,7 @@ public class Polynomial {
             return new Polynomial ( ImmutableSLList.<Monomial>nil(), BigInteger.ZERO );
         
         ImmutableList<Monomial> newParts = ImmutableSLList.<Monomial>nil();
-        final Iterator<Monomial> it = parts.iterator ();
-        while ( it.hasNext () )
-            newParts = newParts.prepend ( it.next ().multiply ( m ) );
+        for (Monomial part : parts) newParts = newParts.prepend(part.multiply(m));
 
         if ( m.getParts ().isEmpty () )
             return new Polynomial ( newParts,
@@ -101,9 +97,7 @@ public class Polynomial {
         final BigInteger newConst =
             getConstantTerm ().subtract ( p.getConstantTerm () );
         ImmutableList<Monomial> newParts = parts;
-        final Iterator<Monomial> it = p.getParts ().iterator ();
-        while ( it.hasNext () )
-            newParts = addPart ( newParts, it.next ().multiply ( MINUS_ONE ) );
+        for (Monomial monomial : p.getParts()) newParts = addPart(newParts, monomial.multiply(MINUS_ONE));
         return new Polynomial ( newParts, newConst );
     }
     
@@ -119,9 +113,7 @@ public class Polynomial {
         final BigInteger newConst =
             getConstantTerm ().add ( p.getConstantTerm () );
         ImmutableList<Monomial> newParts = parts;
-        final Iterator<Monomial> it = p.getParts ().iterator ();
-        while ( it.hasNext () )
-            newParts = addPart ( newParts, it.next () );
+        for (Monomial monomial : p.getParts()) newParts = addPart(newParts, monomial);
         return new Polynomial ( newParts, newConst );
     }
     
@@ -133,9 +125,7 @@ public class Polynomial {
      */
     public BigInteger coeffGcd() {
         BigInteger res = BigInteger.ZERO;
-        final Iterator<Monomial> it = parts.iterator ();
-        while ( it.hasNext () )
-            res = res.gcd ( it.next ().getCoefficient () );
+        for (Monomial part : parts) res = res.gcd(part.getCoefficient());
         return res;
     }
     
@@ -225,10 +215,8 @@ public class Polynomial {
     public String toString() {
         final StringBuffer res = new StringBuffer ();
         res.append ( constantPart );
-        
-        final Iterator<Monomial> it = parts.iterator ();
-        while ( it.hasNext () )
-            res.append ( " + " + it.next () );
+
+        for (Monomial part : parts) res.append(" + ").append(part);
 
         return res.toString ();        
     }

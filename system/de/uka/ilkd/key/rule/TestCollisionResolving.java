@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -200,7 +200,7 @@ public class TestCollisionResolving extends TestCase {
     }
     
     public void testVarNamespaceCreationWithPrefix() {
-        TacletApp app = (NoPosTacletApp) TacletForTests.getTaclet
+        TacletApp app = TacletForTests.getTaclet
         ("TestCollisionResolving_ns2");
         TacletApp app1=app.prepareUserInstantiation();
         assertSame(app, app1);
@@ -283,7 +283,7 @@ public class TestCollisionResolving extends TestCase {
 
     public void testNameConflictAfterInput() {
 
-	TacletApp app = (NoPosTacletApp) TacletForTests.getTaclet
+	TacletApp app = TacletForTests.getTaclet
 	    ("TestCollisionResolving_name_conflict2");
 	TacletApp app1=app.prepareUserInstantiation();
 	assertSame(app, app1);

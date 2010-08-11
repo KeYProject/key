@@ -1,26 +1,17 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
-//This file is part of KeY - Integrated Deductive Software Design
-//Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
-//Universitaet Koblenz-Landau, Germany
-//Chalmers University of Technology, Sweden
+//
+//
 
-//The KeY system is protected by the GNU General Public License. 
-//See LICENSE.TXT for details.
-
-/*
- * Created on 09.09.2004
- */
 /**
  * @author koenn
  *
  */
-
 package de.uka.ilkd.key.gui;
 
 import java.awt.BorderLayout;
@@ -37,7 +28,7 @@ import de.uka.ilkd.key.rule.Taclet;
 
 public class TacletView implements ActionListener{
 
-    private JFrame frame;
+    private JDialog frame;
     private JTextArea content;
     private JScrollPane scrollPane;
 
@@ -53,7 +44,9 @@ public class TacletView implements ActionListener{
 
     private TacletView(){
 
-        frame = new JFrame("Taclet View");	    	            
+        frame = new JDialog();
+        frame.setTitle("Taclet View");
+        frame.setLocationByPlatform(true);
 
         frame.getContentPane().setLayout(new BorderLayout());
 
@@ -85,12 +78,9 @@ public class TacletView implements ActionListener{
     public void actionPerformed(ActionEvent e){
         frame.setVisible(false);
     }
-
-    public void showTacletView(DefaultMutableTreeNode node){
-        Taclet tac = null;
-        if (node.getUserObject() instanceof Taclet) {
-            tac = (Taclet) node.getUserObject();        
-        } else return;
+    
+    public void showTacletView(Taclet tac, boolean modal){
+	frame.setModal(modal);
         scrollPane.setBorder(BorderFactory.createTitledBorder
                 (getDisplayName(tac)));
         content.setText(getTacletByName(tac));
@@ -101,14 +91,22 @@ public class TacletView implements ActionListener{
         frame.setVisible(true);	
     }
 
+    public void showTacletView(DefaultMutableTreeNode node){
+        Taclet tac  ;
+        if (node.getUserObject() instanceof Taclet) {
+            tac = (Taclet) node.getUserObject();        
+        } else return;
+        showTacletView(tac,false);
+
+    }
+
     private String getDisplayName(Taclet tac){
-        String title = tac.displayName();	   
-        return title;
+        return tac.displayName();
     }
 
 
     private String getTacletByName(Taclet tac){
-        String rule = "";
+        String rule  ;
         LogicPrinter lp = 
             new LogicPrinter(new ProgramPrinter(), new NotationInfo(), null, true);
         lp.printTaclet(tac);

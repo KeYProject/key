@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -8,9 +8,11 @@
 package de.uka.ilkd.key.java.recoderext;
 
 import recoder.CrossReferenceServiceConfiguration;
+import recoder.java.Identifier;
 import recoder.java.declaration.*;
 import recoder.java.declaration.modifier.Public;
 import recoder.java.declaration.modifier.Static;
+import recoder.java.reference.PackageReference;
 import recoder.java.reference.TypeReference;
 import recoder.list.generic.ASTArrayList;
 import recoder.list.generic.ASTList;
@@ -36,8 +38,8 @@ public class InstanceAllocationMethodBuilder extends RecoderModelTransformer {
         modifiers.add(new Public());
         modifiers.add(new Static());    
         
-        ASTArrayList<ParameterDeclaration> pdal = new ASTArrayList<ParameterDeclaration>(0);
-  
+        ASTArrayList<ParameterDeclaration> pdal = new ASTArrayList<ParameterDeclaration>(1);
+        
         MethodDeclaration md =  new MethodDeclaration
             (modifiers, 
              new TypeReference(getId(type)), 

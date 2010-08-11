@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -25,14 +25,14 @@ public class CogentTranslation{
 
     private Sequent sequent;
 //    private ConstrainedSet cs;
-    private HashMap array2pointer;
+    private HashMap<Term,String> array2pointer;
     private String arrayAxioms = "";
     private String boundaryAxioms = "";
     private int pointerCounter = 0;
 
     public CogentTranslation(Sequent sequent){
 	this.sequent = sequent;
-	array2pointer = new HashMap();
+	array2pointer = new HashMap<Term,String>();
 //	this.cs = cs;
     }
 

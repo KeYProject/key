@@ -1,34 +1,33 @@
-//This file is part of KeY - Integrated Deductive Software Design
-//Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
-//                    Universitaet Koblenz-Landau, Germany
-//                    Chalmers University of Technology, Sweden
+// This file is part of KeY - Integrated Deductive Software Design
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
 //
-//The KeY system is protected by the GNU General Public License. 
-//See LICENSE.TXT for details.
-//
-//
+// The KeY system is protected by the GNU General Public License. 
+// See LICENSE.TXT for details.
 
 package de.uka.ilkd.key.smt;
 
-import de.uka.ilkd.key.java.Services;
 
-
+/**Hint: In order to run Z3 on Linux or Mac use wine. 
+ * On {@link http://www4.in.tum.de/~boehmes/z3.html} you can find useful script for that. 
+ * Please not that you have to run "winetricks vcrun2008". */
 public final class Z3Solver extends AbstractSMTSolver {
 
+    public static final String name="Z3";
+
     public String name() {
-        return "Z3";
+        return name;
     }
     
-    
-    public SMTTranslator getTranslator(Services services) {
-	return new SmtLibTranslator(services);
-    }
     
     
     @Override
     protected String getExecutionCommand(String filename, String formula) {
 
-	String toReturn = "z3 -smt " + filename;
+	//String toReturn = "z3 -smt " + filename;
+	//The following is create a model if possible
+	String toReturn = "z3 -smt -m " + filename;
 	
 	return toReturn;
     }
@@ -38,18 +37,35 @@ public final class Z3Solver extends AbstractSMTSolver {
 	if (val == 0) {
 	    //no error occured
 	    if (text.contains("unsat")) {
-		return SMTSolverResult.createValidResult(text);
+		return SMTSolverResult.createValidResult(text,name());
 	    } else if (text.contains("sat")) {
-		return SMTSolverResult.createInvalidResult(text);
+		return SMTSolverResult.createInvalidResult(text,name());
 	    } else {
-		return SMTSolverResult.createUnknownResult(text);
+		return SMTSolverResult.createUnknownResult(text,name());
 	    }
-	} else if (val == 112 && text.contains("unknown")) {
+	} else if ((val == 112 && text.contains("unknown")) || val ==139) {
 	    //the result was unknown
-	    return SMTSolverResult.createUnknownResult(text);
+	    return SMTSolverResult.createUnknownResult(text,name());
 	} else {
 	    //something went wrong
-	    throw new IllegalArgumentException(error);
+	    throw new IllegalArgumentException("Code "+ val+": " + error);
 	}
+    }
+    
+
+    @Override
+    public String getInfo() {
+     
+        return "Z3 does not use quantifier elimination by default. This means for example that" +
+        	" the following problem cannot be solved automatically by default:\n\n"
+        	+"\\functions{\n"+
+        	 "\tint n;\n"+
+         	 "}\n\n"+
+                 "\\problem{\n"+
+         	   "\t((\\forall int x;(x<=0 | x >= n+1)) & n >= 1)->false\n"+
+    		 "}"+
+    		 "\n\n"+
+    		 "You can activate quantifier elimination by appending QUANT_FM=true to"+
+    		 " the execution command."; 
     }
 }

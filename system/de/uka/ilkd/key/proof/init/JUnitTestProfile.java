@@ -1,14 +1,17 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License.
+// The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
+
 package de.uka.ilkd.key.proof.init;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.gui.POBrowser;
+import de.uka.ilkd.key.proof.init.proofobligation.DefaultPOProvider;
 import de.uka.ilkd.key.proof.mgt.ComplexRuleJustification;
 import de.uka.ilkd.key.proof.mgt.ComplexRuleJustificationBySpec;
 import de.uka.ilkd.key.proof.mgt.RuleJustification;
@@ -43,7 +46,7 @@ public class JUnitTestProfile extends AbstractProfile {
     }
 
     protected UseOperationContractRule getContractRule() {
-        return UseOperationContractRule.INSTANCE;
+        return UseOperationContractRule.INSTANCE_NORMAL;
     }
 
     protected UpdateSimplificationRule getUpdateSimplificationRule() {
@@ -97,6 +100,13 @@ public class JUnitTestProfile extends AbstractProfile {
 	 return "JAVALANGTESTGEN.TXT";
     }
 
+    public DefaultPOProvider getPOProvider() {
+	return new DefaultPOProvider();
+    }
 
+
+    public Class<POBrowser> getPOBrowserClass() {
+	return POBrowser.class;
+    }
 
 }

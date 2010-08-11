@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -58,11 +58,8 @@ public class OclUnion extends TermSymbol {
 		&& collSort1.getCollectionKind() == CollectionSort.SEQUENCE)) {
 	    return false;
 	}
-	if (!collSort0.getElemSort().extendsTrans(collSort1.getElemSort())
-	    && !collSort1.getElemSort().extendsTrans(collSort0.getElemSort())) {
-	    return false;
-	}
-        return true;
+        return !(!collSort0.getElemSort().extendsTrans(collSort1.getElemSort())
+                && !collSort1.getElemSort().extendsTrans(collSort0.getElemSort()));
     }
     
     public Sort sort(Term[] subTerm) {

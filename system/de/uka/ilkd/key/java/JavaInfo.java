@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -58,7 +58,7 @@ public class JavaInfo {
         
         public boolean equals(Object o) {
             if (o instanceof CacheKey) {
-                final CacheKey snd = (CacheKey)o;                
+                final CacheKey snd = (CacheKey)o;               
                 return snd.o1.equals(o1) && snd.o2.equals(o2);
             } 
             return false;
@@ -71,8 +71,8 @@ public class JavaInfo {
     }
 
 
-    private Services services;
-    private KeYProgModelInfo  kpmi;
+    protected Services services;
+    protected KeYProgModelInfo  kpmi;
     private String javaSourcePath;
 
     /**
@@ -86,7 +86,7 @@ public class JavaInfo {
      *    java.lang.Object, java.lang.Clonable, java.io.Serializable
      * in </em>in this order</em>
      */
-    private KeYJavaType[] commonTypes = new KeYJavaType[3];
+    protected KeYJavaType[] commonTypes = new KeYJavaType[3];
 
     //some caches for the getKeYJavaType methods.
     private HashMap<Sort, KeYJavaType> sort2KJTCache = null;
@@ -113,14 +113,13 @@ public class JavaInfo {
      * {@link de.uka.ilkd.key.java.statement.MethodFrame}, which contains a 
      * valid execution context.
      */
-    private ExecutionContext defaultExecutionContext;
+    protected ExecutionContext defaultExecutionContext;
                 
-
     /**
      * a term with the constant 'null'
      */
     private Term nullConst=null;
-    private boolean commonTypesCacheValid;
+    protected boolean commonTypesCacheValid;
     
     /** caches the predicate used to express a lega java state */
     private Function legalHeapStructure;
@@ -129,19 +128,19 @@ public class JavaInfo {
     private ProgramVariable length;
     
     /** the name of the class used as default execution context */
-    static final String DEFAULT_EXECUTION_CONTEXT_CLASS = "<Default>";
-
-	
+    protected static final String DEFAULT_EXECUTION_CONTEXT_CLASS = "<Default>";
+    
+    
     /**
      * creates a new JavaInfo object by giving a KeYProgModelInfo to access
      * the Recoder SourceInfo and using the given {@link Services} object.
      */
-    JavaInfo(KeYProgModelInfo kpmi, Services s) {
+    protected JavaInfo(KeYProgModelInfo kpmi, Services s) {
 	this.kpmi 	= kpmi;
-	services	= s;	  	
+	services	= s;	 
     }
 
-    private JavaInfo(JavaInfo proto, Services s) {
+    protected JavaInfo(JavaInfo proto, Services s) {
 	this ( proto.getKeYProgModelInfo().copy(), s );
 	nullType  = proto.getNullType();
 	nullConst = proto.getNullConst();
@@ -342,6 +341,12 @@ public class JavaInfo {
 		sName2KJTCache = null;
 		return getTypeByClassName(className);
 	    }
+            // maybe a not yet known array type
+            if(className.endsWith("]")){
+                readJavaBlock("{" + className + " k;}");
+                result = getKeYJavaType(className);
+                if(result!=null) return result;
+            }
 	    Debug.out("javaInfo: type not found. Looked for:", className);
 	    throw new RuntimeException("TYPE NOT FOUND: " + className);
 	}
@@ -392,7 +397,7 @@ public class JavaInfo {
 	final Set<KeYJavaType> result  = new HashSet<KeYJavaType>();
         for (final Object o : kpmi.allElements()) {     
 	    if (o instanceof KeYJavaType) {		
-	        result.add((KeYJavaType) o);
+	        result.add((KeYJavaType)o);
 	    }
 	}
 	return result;
@@ -420,7 +425,7 @@ public class JavaInfo {
     public KeYJavaType getKeYJavaType(String fullName) {
         KeYJavaType result = getPrimitiveKeYJavaType(fullName);
         return (result == null ?
-            (KeYJavaType)getTypeByName(fullName) :
+            (KeYJavaType)getTypeByClassName(fullName) :
             result);
     }
 
@@ -455,7 +460,11 @@ public class JavaInfo {
 		 }
 	     }
 	 }	
-	 return sort2KJTCache.get(sort);
+	 KeYJavaType result = (KeYJavaType) sort2KJTCache.get(sort);
+         if(result==null && sort instanceof ArraySort){
+             result = getKeYJavaType(sort.name().toString());
+         }
+         return result;
      }
 
     /** returns the KeYJavaType of the expression if it can be
@@ -634,13 +643,12 @@ public class JavaInfo {
 	}
 	
 	if(result == null && ((ClassDeclaration) javaType).isAnonymousClass()){
-	    Iterator<Sort> sit = type.getSort().extendsSorts().iterator();
-	    while(sit.hasNext()){
-	        Sort s = sit.next();
-	        if(!((ClassType) getKeYJavaType(s).getJavaType()).isInterface()){
-	            return getKeYJavaType(s);
-	        }
-	    }
+        for (Sort sort : type.getSort().extendsSorts()) {
+            Sort s = sort;
+            if (!((ClassType) getKeYJavaType(s).getJavaType()).isInterface()) {
+                return getKeYJavaType(s);
+            }
+        }
 	}
 
 	if (result == null) {
@@ -811,14 +819,13 @@ public class JavaInfo {
      */
     private final ProgramVariable find(String programName, 
                                        ImmutableList<Field> fields) {
-	Iterator<Field> it = fields.iterator();
-	while (it.hasNext()) {
-	    Field field = it.next();
-	    if (programName.equals(field.getProgramName())) {
-		return (ProgramVariable)
-		    ((FieldSpecification)field).getProgramVariable();
-	    }
-	}
+        for (Field field1 : fields) {
+            Field field = field1;
+            if (programName.equals(field.getProgramName())) {
+                return (ProgramVariable)
+                        ((FieldSpecification) field).getProgramVariable();
+            }
+        }
 	return null;
     }
 
@@ -895,6 +902,15 @@ public class JavaInfo {
 	if (qualifiedClassName == null || qualifiedClassName.length() == 0) {
             throw new IllegalArgumentException("Missing qualified classname");
         }
+        KeYJavaType kjt = null;
+	try {
+	    kjt = getKeYJavaTypeByClassName(qualifiedClassName);
+	} catch (Exception e) {
+	    if (qualifiedClassName.endsWith("]")) {
+		readJavaBlock("{" + qualifiedClassName + " k;}");
+		kjt = getKeYJavaType(qualifiedClassName);
+	    }
+	}
         return getAttribute(programName, 
 			    getKeYJavaTypeByClassName(qualifiedClassName));
     }
@@ -908,26 +924,82 @@ public class JavaInfo {
     public ProgramVariable getAttribute(final String name,
 					KeYJavaType classType) {       
 	if (classType.getJavaType() instanceof ArrayDeclaration) {
-            ProgramVariable res = find(name, getFields
-                        (((ArrayDeclaration)classType.
-                                getJavaType()).getMembers()));
-            if (res==null) {               
+	    ProgramVariable res = find(name,
+		    getFields(((ArrayDeclaration) classType.getJavaType())
+		            .getMembers()));
+	    if (res == null) {
 		return getAttribute(name, getJavaLangObject());
-	    } 
-            return res;
+	    }
+	    return res;
 	} else {
-	    final ImmutableList<Field> list   = kpmi.getAllFieldsLocallyDeclaredIn(classType);
-	    final Iterator<Field> it = list.iterator();	   
-            while (it.hasNext()) {
-		final Field f = it.next();
-		if (f!=null && (f.getName().equals(name) || 
-		                f.getProgramName().equals(name))) {
-		    return (ProgramVariable)((VariableSpecification)f).
-                    getProgramVariable();
+	    final ImmutableList<Field> list = kpmi
+		    .getAllFieldsLocallyDeclaredIn(classType);
+	    for (Field aList : list) {
+		final Field f = aList;
+		if (f != null
+		        && (f.getName().equals(name) || f.getProgramName()
+		                .equals(name))) {
+		    return (ProgramVariable) ((VariableSpecification) f)
+			    .getProgramVariable();
 		}
 	    }
 	}
 	return null;
+    }
+
+    public int getSizeInBytes(KeYJavaType type){
+        if(type.getSort() instanceof ObjectSort){
+            int size = 8;
+            if(type.toString().indexOf("[")!=-1) return 0;
+            size += getSizeInBytesRec(type);
+            if(size % 8 == 0){
+                return size;
+            }else{
+                return (size/8+1)*8;
+            }
+        }else{
+            return getSizeInBytesForPrimitiveType(type);
+        }
+    }
+    
+    private int getSizeInBytesRec(KeYJavaType classType){
+        if(classType == getJavaLangObject() || classType == null) return 0;
+        int size = 0;
+        ImmutableList<Field> l = kpmi.getAllFieldsLocallyDeclaredIn(classType);
+        size += sizeInBytes(l);
+        size += getSizeInBytesRec(getSuperclass(classType));
+        return size;
+    }
+    
+    private int getSizeInBytesForPrimitiveType(KeYJavaType pType){
+        String name = pType.getSort().toString();
+        if(name.equals("jbyte") || name.equals("boolean")){
+            return 1;
+        }else if(name.equals("jshort") || name.equals("jchar")){
+            return 2;
+        }else if(name.equals("jlong")){
+            return 8;
+        }else{
+            return 4;
+        }
+    }
+    
+    private int sizeInBytes(ImmutableList<Field> l){
+        int size = 0;
+        while(!l.isEmpty()){
+            if(l.head() instanceof ImplicitFieldSpecification){
+                l = l.tail();
+                continue;
+            }
+            KeYJavaType fType = l.head().getProgramVariable().getKeYJavaType();
+            l = l.tail();
+            if(fType.getSort() instanceof ObjectSort){
+                size += 4;
+            }else{
+                size += getSizeInBytesForPrimitiveType(fType);
+            }
+        }
+        return size;
     }
 
     /**
@@ -981,32 +1053,32 @@ public class JavaInfo {
         
         hierarchie = hierarchie.prepend(kpmi.getAllSupertypes(type));        
         assert hierarchie.head() == type;
-        
-        
-        final Iterator<KeYJavaType> it = hierarchie.iterator();
-        while (it.hasNext()) {
-	    KeYJavaType st = it.next();
-	    if(st != null){
-		final ProgramVariable var = getAttribute(programName, st);
-		if (var != null) {
-		    result = result.prepend(var);
-		}            
-	    }
+
+
+        for (KeYJavaType aHierarchie : hierarchie) {
+            KeYJavaType st = aHierarchie;
+            if (st != null) {
+                final ProgramVariable var = getAttribute(programName, st);
+                if (var != null) {
+                    result = result.prepend(var);
+                }
+            }
         }
         
         return result;        
     }
     
     
-    private void fillCommonTypesCache() {
-        if (commonTypesCacheValid) return;
-        final String[] fullNames = {"java.lang.Object", 
-                "java.lang.Cloneable", "java.lang.Serializable"};
-        
-        for (int i = 0; i<fullNames.length; i++) {
-            commonTypes[i] = getKeYJavaTypeByClassName(fullNames[i]);            
-        }
-        commonTypesCacheValid = true;
+    protected void fillCommonTypesCache() {
+	if (commonTypesCacheValid) return;
+
+	final String[] fullNames = new String[] {"java.lang.Object", 
+		"java.lang.Cloneable", "java.io.Serializable"};
+
+	for (int i = 0; i<fullNames.length; i++) {
+	    commonTypes[i] = getKeYJavaTypeByClassName(fullNames[i]);            
+	}
+	commonTypesCacheValid = true;
     }
 
     /**
@@ -1039,8 +1111,6 @@ public class JavaInfo {
         }
         return commonTypes[2];
     }
-
-
     
     /**
      * returns the KeYJavaType for class java.lang.Object
@@ -1071,8 +1141,8 @@ public class JavaInfo {
         if (!commonTypesCacheValid) { 
             fillCommonTypesCache();
         }
-        for (int i = 0; i<commonTypes.length; i++) {
-            if (commonTypes[i].getSort() == sort) {
+        for (KeYJavaType commonType : commonTypes) {
+            if (commonType.getSort() == sort) {
                 return true;
             }
         }        
@@ -1104,13 +1174,12 @@ public class JavaInfo {
                 readJava("{}");                
             }
             final KeYJavaType kjt = 
-                getKeYJavaTypeByClassName(DEFAULT_EXECUTION_CONTEXT_CLASS);                     
+                getKeYJavaTypeByClassName(DEFAULT_EXECUTION_CONTEXT_CLASS);                            
             defaultExecutionContext = 
-                new ExecutionContext(new TypeRef(kjt), null);
+                new ExecutionContext(new TypeRef(kjt), null, null);
         }
         return defaultExecutionContext;
     }
-    
     
     /**
      * returns a term representing the null constant in logic
@@ -1139,10 +1208,8 @@ public class JavaInfo {
     public ImmutableList<KeYJavaType> getAllSupertypes(KeYJavaType type) {
         if (type.getJavaType() instanceof ArrayType) {
             ImmutableList<KeYJavaType> arraySupertypes = ImmutableSLList.<KeYJavaType>nil();
-            final Iterator<Sort> it = 
-                ((ArraySort)type.getSort()).extendsSorts().iterator();
-            while (it.hasNext()) {
-                arraySupertypes.append(getKeYJavaType(it.next()));
+            for (Sort sort : type.getSort().extendsSorts()) {
+                arraySupertypes.append(getKeYJavaType(sort));
             }
             return arraySupertypes;
         }
@@ -1203,10 +1270,8 @@ public class JavaInfo {
             final ImmutableList<KeYJavaType> l1 = getAllSubtypes(k1);                
             final ImmutableList<KeYJavaType> l2 = getAllSubtypes(k2);
 
-            final Iterator<KeYJavaType> it = l1.iterator();
-
-            while (it.hasNext()) {
-                final KeYJavaType next = it.next();
+            for (KeYJavaType aL1 : l1) {
+                final KeYJavaType next = aL1;
                 if (l2.contains(next)) {
                     result = result.prepend(next);
                 }

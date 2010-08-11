@@ -1,10 +1,11 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
+//
 //
 
 
@@ -51,11 +52,11 @@ public class ReuseFrontend {
          p.UniDiff();
          DiffParser.MarkerHint[] hints;
          hints = p.getMarkers();
-         for (int i=0; i<hints.length; i++) {
-            Logger.getLogger("key.proof.mgt").debug(
-	       "Markup hint: "+  hints[i].file+":"+ hints[i].line); 
-            recMark(source.root(), hints[i]);
-         }
+          for (DiffParser.MarkerHint hint : hints) {
+              Logger.getLogger("key.proof.mgt").debug(
+                      "Markup hint: " + hint.file + ":" + hint.line);
+              recMark(source.root(), hint);
+          }
          markRoot(source);
          
          return null;

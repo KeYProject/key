@@ -36,10 +36,14 @@ java/lang/NegativeArraySizeException.java
 java/lang/NoClassDefFoundError.java
 java/lang/NullPointerException.java
 java/lang/NumberFormatException.java
+java/lang/OutOfMemoryError.java
+java/lang/Runnable.java
 java/lang/RuntimeException.java
 java/lang/String.java
 java/lang/StringBuffer.java
+java/lang/Thread.java
 java/lang/Throwable.java
+java/lang/VirtualMachineError.java
 java/util/Collection.java
 java/util/Iterator.java
 java/util/List.java
@@ -48,7 +52,6 @@ java/util/Map.java
 java/util/Set.java
 java/io/IOException.java
 java/io/Serializable.java
-
 
 junit/framework/Test.java
 junit/framework/TestCase.java

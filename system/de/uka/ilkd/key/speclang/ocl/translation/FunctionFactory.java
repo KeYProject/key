@@ -1,17 +1,10 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
-//This file is part of KeY - Integrated Deductive Software Design
-//Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
-//                      Universitaet Koblenz-Landau, Germany
-//                      Chalmers University of Technology, Sweden
-//
-//The KeY system is protected by the GNU General Public License. 
-//See LICENSE.TXT for details.
 //
 //
 
@@ -439,8 +432,8 @@ class FunctionFactory {
      */
     public static Term buildAddTerm(Term[] subTerms) {
         Term result = tb.tt();
-        for (int i=0; i<subTerms.length; i++) {
-            result = tb.and( result, subTerms[i]);
+        for (Term subTerm : subTerms) {
+            result = tb.and(result, subTerm);
         }
         
         return result;

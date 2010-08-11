@@ -1,10 +1,11 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
+//
 //
 
 package de.uka.ilkd.key.util.install;
@@ -165,10 +166,10 @@ public abstract class KeYInstaller {
      */
 
     public void mkdirs ( ) {
-	for ( int i = 0; i < subdirs.length; i++ ) {
-	    File f = new File ( keyHome () + File.separatorChar + subdirs[i] );	    
-	    f.mkdirs();
-	}			
+        for (String subdir : subdirs) {
+            File f = new File(keyHome() + File.separatorChar + subdir);
+            f.mkdirs();
+        }
     }
     
 

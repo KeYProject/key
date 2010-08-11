@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -97,10 +97,7 @@ public class TacletPORule implements BuiltInRule {
 	Namespace    funcNs    = globalNss.functions ();
 
 	{
-	    Iterator<Named> it =
-		p_pob.getFunctions ().allElements ().iterator ();
-	    while ( it.hasNext () )
-		funcNs.add ( it.next () );
+        for (Named named : p_pob.getFunctions().allElements()) funcNs.add(named);
 	}
 
 	{

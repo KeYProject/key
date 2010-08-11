@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -26,6 +26,7 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
+import de.uka.ilkd.key.rtsj.rule.metaconstruct.ConstructorCallRTSJ;
 import de.uka.ilkd.key.rule.metaconstruct.*;
 import de.uka.ilkd.key.util.ExtList;
 
@@ -106,12 +107,12 @@ public class SchemaRecoder2KeYConverter extends Recoder2KeYConverter {
             ProgramSV[] svw = mc.getSV();
             ProgramSV execSV = null;
             ProgramSV returnSV = null;
-            for (int i = 0; i < svw.length; i++) {
-                if (svw[i].sort() == ProgramSVSort.VARIABLE) {
-                    returnSV = svw[i];
+            for (ProgramSV aSvw : svw) {
+                if (aSvw.sort() == ProgramSVSort.VARIABLE) {
+                    returnSV = aSvw;
                 }
-                if (svw[i].sort() == ProgramSVSort.EXECUTIONCONTEXT) {
-                    execSV = svw[i];
+                if (aSvw.sort() == ProgramSVSort.EXECUTIONCONTEXT) {
+                    execSV = aSvw;
                 }
             }
             if ("#method-call".equals(mcName)) {
@@ -125,6 +126,9 @@ public class SchemaRecoder2KeYConverter extends Recoder2KeYConverter {
             return new EvaluateArgs((Expression) list.get(Expression.class));
         } else if ("#constructor-call".equals(mcName)) {
             return new ConstructorCall(mc.getFirstSV().getSV(),
+                    (Expression) list.get(Expression.class));
+        } else if ("#constructor-call-rtsj".equals(mcName)) {
+            return new ConstructorCallRTSJ(mc.getFirstSV().getSV(),
                     (Expression) list.get(Expression.class));
         } else if ("#special-constructor-call".equals(mcName)) {
             return new SpecialConstructorCall((Expression) list
@@ -239,7 +243,10 @@ public class SchemaRecoder2KeYConverter extends Recoder2KeYConverter {
     public ExecutionContext convert(
             de.uka.ilkd.key.java.recoderext.ExecutionContext ec) {
         return new ExecutionContext((TypeReference) callConvert(ec.getTypeReference()), 
-				    ec.getRuntimeInstance()!=null? (ReferencePrefix)callConvert(ec.getRuntimeInstance()) : null);
+                                    ec.getMemoryArea() == null ? null :  
+                                	    new MemoryAreaEC((ReferencePrefix)callConvert(ec.getMemoryArea())),
+                                    ec.getRuntimeInstance() == null ? null :   
+                                	    new RuntimeInstanceEC((ReferencePrefix)callConvert(ec.getRuntimeInstance())));
     }
 
     // ----- Schema Variables
@@ -325,7 +332,7 @@ public class SchemaRecoder2KeYConverter extends Recoder2KeYConverter {
                     varspecs);
         } else {
             // otherwise use the default case
-            return (LocalVariableDeclaration) super.convert(lvd);
+            return super.convert(lvd);
         }
     }
 
@@ -366,14 +373,23 @@ public class SchemaRecoder2KeYConverter extends Recoder2KeYConverter {
         recoder.java.reference.PackageReference result = null;
         while (rp != null) {
             if (prefix == null) {
-                result = new recoder.java.reference.PackageReference(
-                        ((recoder.java.reference.UncollatedReferenceQualifier) rp)
-                        .getIdentifier());
+                if(rp instanceof recoder.java.reference.PackageReference){
+                    result = (recoder.java.reference.PackageReference) rp;
+                }else{
+                    result = new recoder.java.reference.PackageReference(
+                            ((recoder.java.reference.UncollatedReferenceQualifier) rp)
+                            .getIdentifier());
+                }
                 prefix = result;
             } else {
-                recoder.java.reference.PackageReference prefix2 = new recoder.java.reference.PackageReference(
-                        ((recoder.java.reference.UncollatedReferenceQualifier) rp)
-                        .getIdentifier());
+                recoder.java.reference.PackageReference prefix2;
+                if(rp instanceof recoder.java.reference.PackageReference){
+                    prefix2 = (recoder.java.reference.PackageReference) rp;
+                }else{
+                    prefix2 = new recoder.java.reference.PackageReference(
+                            ((recoder.java.reference.UncollatedReferenceQualifier) rp)
+                            .getIdentifier());
+                }
                 prefix.setReferencePrefix(prefix2);
                 prefix = prefix2;
             }
@@ -465,8 +481,8 @@ public class SchemaRecoder2KeYConverter extends Recoder2KeYConverter {
         for (int i = 0, sz = keyArgs.length; i < sz; i++) {
             keyArgs[i] = (Expression) callConvert(recoderArgs.get(i));
         }
-
-        return new MethodReference(new ImmutableArray<Expression>(keyArgs), name, prefix);
+        
+	return new MethodReference(new ImmutableArray<Expression>(keyArgs), name, prefix);
     }
 
     /**

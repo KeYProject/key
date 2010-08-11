@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -35,9 +35,9 @@ public class NameSV extends SchemaVariableAdapter {
 
         if (o instanceof NameSV) {
             if (toString() != null) {
-                return toString().equals(((NameSV) o).toString());
+                return toString().equals(o.toString());
             } else {
-                return ((NameSV) o).toString() == null;
+                return o.toString() == null;
             }
         } else {
             return false;

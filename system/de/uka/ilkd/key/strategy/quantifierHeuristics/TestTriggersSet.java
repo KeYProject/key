@@ -1,19 +1,10 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
-//This file is part of KeY - Integrated Deductive Software Design
-//Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
-//                      Universitaet Koblenz-Landau, Germany
-//                      Chalmers University of Technology, Sweden
-//
-//The KeY system is protected by the GNU General Public License. 
-//See LICENSE.TXT for details.
-//
-//
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
 import junit.framework.TestCase;
@@ -31,9 +22,6 @@ import de.uka.ilkd.key.rule.TacletForTests;
 public class TestTriggersSet extends TestCase {
 
 	private Proof proof;
-
-	private TermFactory tf = TermFactory.DEFAULT;
-	private TermBuilder tb = TermBuilder.DF;
     
 	private Namespace variables = new Namespace();
 

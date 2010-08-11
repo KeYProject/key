@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -64,10 +64,9 @@ public class SVInstantiationCP implements Feature {
 
     private SchemaVariable findSVWithName(TacletApp app) {
         final ImmutableSet<SchemaVariable> vars = app.uninstantiatedVars ();
-        final Iterator<SchemaVariable> it = vars.iterator ();
-        while ( it.hasNext () ) {
-            final SchemaVariable svt = it.next ();
-            if ( svt.name ().equals ( svToInstantiate ) ) return svt;
+        for (SchemaVariable var : vars) {
+            final SchemaVariable svt = var;
+            if (svt.name().equals(svToInstantiate)) return svt;
         }
         
         Debug.fail ( "Did not find schema variable "

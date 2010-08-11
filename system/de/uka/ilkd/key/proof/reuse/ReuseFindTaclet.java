@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -93,14 +93,13 @@ public class ReuseFindTaclet {
          } else {
              ifCandidates = ImmutableSLList.<TacletApp>nil().prepend(tentativeApp);
          }
-         
-         final Iterator<TacletApp> it = ifCandidates.iterator();
-         while (it.hasNext()) {
-             final ReusePoint p = blank.initialize(pos, it.next(), medi);
-             if ((p != null)){ // RuleApp can be transferred // && goodEnough!
-                reusePoints.add(p);
-             }
-         }
+
+       for (TacletApp ifCandidate : ifCandidates) {
+           final ReusePoint p = blank.initialize(pos, ifCandidate, medi);
+           if ((p != null)) { // RuleApp can be transferred // && goodEnough!
+               reusePoints.add(p);
+           }
+       }
    }
 
 

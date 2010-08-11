@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -146,12 +146,12 @@ public class PatternMechanism extends Observable implements
                 String[] files = directory.list();
 
                 //Class[] patterns = new Class[files.length];
-                for (int i = 0; i < files.length; i++) {
+                for (String file : files) {
                     //System.out.println("file : " + files[i]);
 
-                    if (files[i].endsWith(".class")) {
+                    if (file.endsWith(".class")) {
                         try {
-                            String tmp = files[i].substring(0, files[i]
+                            String tmp = file.substring(0, file
                                     .length() - 6);
                             tmp = packageUrl + ".patterns." + tmp;
                             //System.err.println(tmp);
@@ -159,21 +159,21 @@ public class PatternMechanism extends Observable implements
                             Class c = Class.forName(tmp);
                             Class[] interfaces = c.getInterfaces();
 
-                            for (int j = 0; j < interfaces.length; j++) {
-                                if (interfaces[j]
+                            for (Class anInterface : interfaces) {
+                                if (anInterface
                                         .equals(AbstractPatternImplementor.class /* .getName() */)) {
                                     the_patterns.add(c);
                                     //System.err.print(c.getName());
                                     //System.err
-				    //      .println("\t"
-				    //              + interfaces[j]
-				    //                      .equals(AbstractPatternImplementor.class));
+                                    //      .println("\t"
+                                    //              + interfaces[j]
+                                    //                      .equals(AbstractPatternImplementor.class));
                                 } else {
                                     //System.out.println(""+c.getName());
                                 }
                             }
                         } catch (Exception e) {
-                            System.err.println("Error with " + files[i]);
+                            System.err.println("Error with " + file);
                             e.printStackTrace();
                         }
                     }

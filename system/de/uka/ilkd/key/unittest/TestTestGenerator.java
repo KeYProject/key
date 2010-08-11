@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -123,7 +123,6 @@ public class TestTestGenerator extends TestCase {
     public void testBrLoopData() {
 	TestHelper brLoop = new TestHelper("branchingLoop.proof",
 		TestHelper.BRANCHING_LOOP_NAME, false);
-
 	assertTrue(
 		"\nTestCase failed because "
 			+ brLoop.getFName()
@@ -135,12 +134,7 @@ public class TestTestGenerator extends TestCase {
 	int sb = 2;
 	assertTrue(
 		"\nTestCase failed because "
-			+ brLoop.getFName()
-			+ " has "
-			+ is
-			+ "Open Goals instead of "
-			+ sb
-			+ "."
+			+ brLoop.getFName() + " has " + is + "Open Goals instead of " + sb + "."
 			+ "\nThis is not a poblem with TestGeneration but with something else.",
 		is == sb);
 

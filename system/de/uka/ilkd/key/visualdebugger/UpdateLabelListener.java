@@ -1,10 +1,12 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
+//
+//
 package de.uka.ilkd.key.visualdebugger;
 
 import java.util.HashMap;
@@ -129,10 +131,9 @@ public class UpdateLabelListener implements RuleAppListener {
         if (inst == null) {
             return l;
         }
-        Iterator<IfFormulaInstantiation> it = inst.iterator();
-        while (it.hasNext()) {
+        for (IfFormulaInstantiation anInst : inst) {
             // TODO case assume=find
-            IfFormulaInstantiation next = it.next();
+            IfFormulaInstantiation next = anInst;
             if (next instanceof IfFormulaInstSeq) {
                 IfFormulaInstSeq i = (IfFormulaInstSeq) next;
                 PosInOccurrence pio = new PosInOccurrence(i

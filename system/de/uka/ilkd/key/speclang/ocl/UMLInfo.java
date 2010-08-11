@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -38,20 +38,18 @@ public class UMLInfo {
     public ImmutableList<Association> getAssociations(KeYJavaType kjt) {
         assert kjt != null;
         ImmutableList<Association> result = ImmutableSLList.<Association>nil();
-        
-        Iterator<Association> it = allAssociations.iterator();
-        while(it.hasNext()) {
-            Association assoc = it.next();
-            
-            Iterator<AssociationEnd> it2 = assoc.getEnds().iterator();
-            while(it2.hasNext()) {
-                AssociationEnd end = it2.next();
+
+        for (Association allAssociation : allAssociations) {
+            Association assoc = allAssociation;
+
+            for (AssociationEnd associationEnd : assoc.getEnds()) {
+                AssociationEnd end = associationEnd;
                 String endClassName = end.getModelClass().getFullClassName();
-                KeYJavaType endKjt 
-                	= services.getJavaInfo()
-                	          .getKeYJavaTypeByClassName(endClassName);
-                
-                if(services.getJavaInfo().isSubtype(kjt, endKjt)) {
+                KeYJavaType endKjt
+                        = services.getJavaInfo()
+                        .getKeYJavaTypeByClassName(endClassName);
+
+                if (services.getJavaInfo().isSubtype(kjt, endKjt)) {
                     result = result.prepend(assoc);
                     break;
                 }
@@ -72,37 +70,35 @@ public class UMLInfo {
         
         //iterate over all associations for the desired class
         ImmutableList<Association> classAssocs = getAssociations(kjt);
-        Iterator<Association> it = classAssocs.iterator();
-        while(it.hasNext()) {
-            Association assoc = it.next();
-            
+        for (Association classAssoc : classAssocs) {
+            Association assoc = classAssoc;
+
             ImmutableList<AssociationEnd> ends = assoc.getEnds();
-            if(ends.size() != 2) {
+            if (ends.size() != 2) {
                 continue;
             }
 
             //identify possible "other side" ends
             JavaInfo javaInfo = services.getJavaInfo();
-            String end1ClassName 
-            	= ends.head().getModelClass().getFullClassName();
-            String end2ClassName 
-            	= ends.tail().head().getModelClass().getFullClassName();
+            String end1ClassName
+                    = ends.head().getModelClass().getFullClassName();
+            String end2ClassName
+                    = ends.tail().head().getModelClass().getFullClassName();
             KeYJavaType end1Kjt = javaInfo.getTypeByClassName(end1ClassName);
             KeYJavaType end2Kjt = javaInfo.getTypeByClassName(end2ClassName);
             ImmutableList<AssociationEnd> targetEnds = ImmutableSLList.<AssociationEnd>nil();
-            if(javaInfo.isSubtype(kjt, end1Kjt)) {
+            if (javaInfo.isSubtype(kjt, end1Kjt)) {
                 targetEnds = targetEnds.prepend(ends.tail().head());
             }
-            if(javaInfo.isSubtype(kjt, end2Kjt)) {
+            if (javaInfo.isSubtype(kjt, end2Kjt)) {
                 targetEnds = targetEnds.prepend(ends.head());
             }
             assert !targetEnds.isEmpty();
-            
+
             //check if one of those ends has the desired role name
-            Iterator<AssociationEnd> it2 = targetEnds.iterator();
-            while(it2.hasNext()) {
-                AssociationEnd end = it2.next();                
-                if(end.getRoleName().toString().equals(qualifier)) {
+            for (AssociationEnd targetEnd : targetEnds) {
+                AssociationEnd end = targetEnd;
+                if (end.getRoleName().toString().equals(qualifier)) {
                     result = result.prepend(assoc);
                     break;
                 }

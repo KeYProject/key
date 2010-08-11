@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -66,14 +66,11 @@ public class MeaningFormulaBuilder {
     private boolean isRewriteTacletWithRWorAdd () {
         if ( !isRewriteTaclet () ) return false;
         
-        if ( !( (RewriteTaclet)getTaclet () ).ifSequent ().isEmpty() )
+        if ( !getTaclet ().ifSequent ().isEmpty() )
             return true;
 
-        final Iterator<TacletGoalTemplate> it =
-            getTaclet ().goalTemplates ().iterator ();
-            
-        while ( it.hasNext () ) {
-            if ( !it.next().sequent ().isEmpty() ) return true;
+        for (TacletGoalTemplate tacletGoalTemplate : getTaclet().goalTemplates()) {
+            if (!tacletGoalTemplate.sequent().isEmpty()) return true;
         }
 
         return false;
@@ -98,11 +95,9 @@ public class MeaningFormulaBuilder {
 
     private Term createPremisses() {
         Term res = True ();
-    	final Iterator<TacletGoalTemplate> it =
-    	    getTaclet ().goalTemplates().iterator ();
-    	    
-    	while ( it.hasNext () )
-    	    res = And ( res, createMF ( it.next () ) );
+
+        for (TacletGoalTemplate tacletGoalTemplate : getTaclet().goalTemplates())
+            res = And(res, createMF(tacletGoalTemplate));
     	    
     	return res;
     }

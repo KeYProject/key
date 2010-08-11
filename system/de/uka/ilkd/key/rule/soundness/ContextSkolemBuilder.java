@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -25,6 +25,7 @@ import de.uka.ilkd.key.java.declaration.Modifier;
 import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
 import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
+import de.uka.ilkd.key.java.reference.RuntimeInstanceEC;
 import de.uka.ilkd.key.java.reference.TypeRef;
 import de.uka.ilkd.key.java.reference.VariableReference;
 import de.uka.ilkd.key.java.statement.*;
@@ -274,9 +275,10 @@ public class ContextSkolemBuilder extends AbstractSkolemBuilder {
 	ProgramElementName refName = new ProgramElementName ( "ref" );
 	ProgramVariable    refVar  = new LocationVariable
 	    ( refName, getJavaInfo ().getJavaLangObject () );
-	VariableReference  ref     = new VariableReference  ( refVar );
+	VariableReference  ref     = new VariableReference  ( refVar );	
 	ExecutionContext  context = new ExecutionContext
-	    ( new TypeRef ( getJavaInfo ().getJavaLangObject () ), ref );
+	    ( new TypeRef ( getJavaInfo ().getJavaLangObject () ), null, 
+		    new RuntimeInstanceEC(ref));
 	return context;
     }
 

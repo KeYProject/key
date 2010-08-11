@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -285,8 +285,6 @@ public class POBuilder {
     }
     
     private void copyNamespace(Namespace p_source, Namespace p_target) {
-	Iterator<Named> it = p_source.allElements ().iterator ();
-	while ( it.hasNext () )
-	    p_target.add ( it.next () );
+        for (Named named : p_source.allElements()) p_target.add(named);
     }
 }

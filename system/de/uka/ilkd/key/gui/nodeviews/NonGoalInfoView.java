@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -245,19 +245,17 @@ public class NonGoalInfoView extends JTextArea {
     private void highlightIfFormulas (TacletApp tapp)	 
 	throws BadLocationException {	 
 	final ImmutableList<IfFormulaInstantiation> ifs = tapp.ifFormulaInstantiations ();	 
-	if ( ifs == null ) return;	 
-	final Iterator<IfFormulaInstantiation> it = ifs.iterator ();	 
-	while ( it.hasNext () ) {	 
-	    final IfFormulaInstantiation inst2 = it.next ();	 
-	    if ( !( inst2 instanceof IfFormulaInstSeq ) ) continue;	 
-	    final IfFormulaInstSeq inst = (IfFormulaInstSeq)inst2;	 
-	    final PosInOccurrence pos =	 
-		new PosInOccurrence ( inst.getConstrainedFormula (),	 
-				      PosInTerm.TOP_LEVEL,	 
-				      inst.inAntec () );	 
-	    final Range r = highlightPos ( pos, IF_FORMULA_HIGHLIGHTER );	 
-	    makeRangeVisible ( r );	 
-	}	 
+	if ( ifs == null ) return;
+        for (final IfFormulaInstantiation inst2 : ifs) {
+            if (!(inst2 instanceof IfFormulaInstSeq)) continue;
+            final IfFormulaInstSeq inst = (IfFormulaInstSeq) inst2;
+            final PosInOccurrence pos =
+                    new PosInOccurrence(inst.getConstrainedFormula(),
+                            PosInTerm.TOP_LEVEL,
+                            inst.inAntec());
+            final Range r = highlightPos(pos, IF_FORMULA_HIGHLIGHTER);
+            makeRangeVisible(r);
+        }
     }	 
  	 
     /**	 

@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -54,7 +54,7 @@ public class Goal  {
     private Node node;
 
     /** all possible rule applications at this node are managed with this index */ 
-    private RuleAppIndex ruleAppIndex;
+    private final RuleAppIndex ruleAppIndex;
 
     /** list of all applied rule applications at this branch */
     private ImmutableList<RuleApp> appliedRuleApps = ImmutableSLList.<RuleApp>nil();
@@ -161,9 +161,8 @@ public class Goal  {
     
     public Namespace createGlobalProgVarNamespace() {
         final Namespace ns = new Namespace();
-        final Iterator<ProgramVariable> it = getGlobalProgVars().iterator();
-        while (it.hasNext()) {
-            ns.add(it.next());
+        for (ProgramVariable programVariable : getGlobalProgVars()) {
+            ns.add(programVariable);
         }
         return ns;
     }
@@ -228,11 +227,9 @@ public class Goal  {
     public void setGlobalProgVars(ImmutableSet<ProgramVariable> s) {
         ImmutableSet<ProgramVariable> globalProgVars = getGlobalProgVars();
         Namespace ns = proof().getNamespaces().programVariables();
-        Iterator<ProgramVariable> it = s.iterator();
-        while (it.hasNext()) {
-            ProgramVariable pv = it.next();
-            if (!globalProgVars.contains(pv)) {
-                ns.addSafely(pv);
+        for (ProgramVariable value : s) {
+            if (!globalProgVars.contains(value)) {
+                ns.addSafely(value);
             }
         }
 	node.setGlobalProgVars(s);
@@ -533,8 +530,8 @@ public class Goal  {
         if (n>0) {
 	    Iterator<Sink> itSinks = parent.reserveSinks ( n );
 	    BranchRestricter br;
-	    Node newNode = null;
-	    Goal newGoal = null;
+	    Node newNode;
+	    Goal newGoal;
 
 	    for (int i=0;i<n;i++) {
 		if (i==0) { // first new goal is this one 
@@ -588,45 +585,42 @@ public class Goal  {
 	final Iterator<Node> leavesIt = parent.leavesIterator();
 	while (leavesIt.hasNext()) {
 	    Node n = leavesIt.next();
-	 
-	    final Iterator<Goal> goalIt = goalList.iterator();
-	    while (goalIt.hasNext()) {
-		final Goal g = goalIt.next();
-	
-		if (g.node()==n && g!=this) {
-		    goalList=goalList.removeFirst(g);		   
+
+	    for (final Goal g : goalList) {
+		if (g.node() == n && g != this) {
+		    goalList = goalList.removeFirst(g);
 		}
 	    }
 	}
 
-	//	ruleAppIndex.tacletIndex().setTaclets(parent.getNoPosTacletApps());
+	// ruleAppIndex.tacletIndex().setTaclets(parent.getNoPosTacletApps());
 
-        removeTaclets();
+	removeTaclets();
 	setGlobalProgVars(parent.getGlobalProgVars());
 
-	parent.cutChildrenSinks ();
-	if (node.proof().env()!=null) { // do not break everything
-	                                // because of ProofMgt
+	parent.cutChildrenSinks();
+	if (node.proof().env() != null) { // do not break everything
+		                          // because of ProofMgt
 	    node.proof().mgt().ruleUnApplied(parent.getAppliedRuleApp());
 	}
 
-	Iterator<Node> siblings=parent.childrenIterator();
-	Node[] sibls=new Node[parent.childrenCount()];
-	int i=0;
+	Iterator<Node> siblings = parent.childrenIterator();
+	Node[] sibls = new Node[parent.childrenCount()];
+	int i = 0;
 	while (siblings.hasNext()) {
-	    sibls[i]=siblings.next(); 
+	    sibls[i] = siblings.next();
 	    i++;
 	}
 
-	for (i=0; i<sibls.length; i++) {
+	for (i = 0; i < sibls.length; i++) {
 	    sibls[i].remove();
 	}
 
 	setNode(parent);
-	removeAppliedRuleApp ();
-        
-        updateRuleAppIndex();
-        
+	removeAppliedRuleApp();
+
+	updateRuleAppIndex();
+
 	return goalList;
     }
 
@@ -635,9 +629,8 @@ public class Goal  {
     }
 
     private void removeTaclets() {
-    	final Iterator<NoPosTacletApp> it = node.getNoPosTacletApps().iterator();
-    	while ( it.hasNext () )
-           ruleAppIndex.removeNoPosTacletApp(it.next ());
+        for (NoPosTacletApp noPosTacletApp : node.getNoPosTacletApps())
+            ruleAppIndex.removeNoPosTacletApp(noPosTacletApp);
     }
 
     
@@ -661,10 +654,9 @@ public class Goal  {
     /** fires the event that a rule has been applied */
     protected void fireRuleApplied( ProofEvent p_e ) {
 	synchronized(ruleAppListenerList) {
-	    Iterator<RuleAppListener> it = ruleAppListenerList.iterator();
-	    while (it.hasNext()) {
-		it.next().ruleApplied(p_e);
-	    }
+        for (RuleAppListener aRuleAppListenerList : ruleAppListenerList) {
+            aRuleAppListenerList.ruleApplied(p_e);
+        }
 	}
     }    
     
@@ -685,12 +677,12 @@ public class Goal  {
                 proof.getServices());
 
         proof.getServices().saveNameRecorder(n);
-        
+
         if ( goalList == null ) {
             // this happens for the simplify decision procedure
             // we do nothing in this case
         } else if ( goalList.isEmpty() ) {
-            proof.closeGoal ( this, ruleApp.constraint () );           
+            proof.closeGoal ( this, ruleApp.constraint () );    
         } else {
             proof.replace ( this, goalList );
             if ( ruleApp instanceof TacletApp &&
@@ -698,6 +690,7 @@ public class Goal  {
                 // the first new goal is the one to be closed
                 proof.closeGoal ( goalList.head (), ruleApp.constraint () );
         }
+
 
         final RuleAppInfo ruleAppInfo = journal.getRuleAppInfo(p_ruleApp);
 
@@ -710,9 +703,8 @@ public class Goal  {
 
 
     public static void applyUpdateSimplifier( ImmutableList<Goal> goalList ) {
-        final Iterator<Goal> it = goalList.iterator();
-        while ( it.hasNext() ) {
-            it.next ().applyUpdateSimplifier();
+        for (Goal aGoalList : goalList) {
+            aGoalList.applyUpdateSimplifier();
         }
     }
     
@@ -726,22 +718,20 @@ public class Goal  {
 	    final Constraint userConstraint =
 	        proof().getUserConstraint ().getConstraint ();
 	    final BuiltInRule rule = UpdateSimplificationRule.INSTANCE;
-	    
-	    final Iterator<ConstrainedFormula> it = ( antec ? sequent().antecedent()
-	            : sequent().succedent()).iterator();
-	
-	    while ( it.hasNext () ) {
-	        final ConstrainedFormula cfma = it.next ();
-	        final PosInOccurrence pos = new PosInOccurrence(cfma,
-	                                                        PosInTerm.TOP_LEVEL,
-	                                                        antec );	
-	        if ( rule.isApplicable ( this, pos, userConstraint ) ) {
-	            BuiltInRuleApp app = new BuiltInRuleApp ( rule,
-	                                                      pos,
-	                                                      userConstraint );
-	            apply(app);
-	        }
-	    }
+
+        for (Object o : (antec ? sequent().antecedent()
+                : sequent().succedent())) {
+            final ConstrainedFormula cfma = (ConstrainedFormula) o;
+            final PosInOccurrence pos = new PosInOccurrence(cfma,
+                    PosInTerm.TOP_LEVEL,
+                    antec);
+            if (rule.isApplicable(this, pos, userConstraint)) {
+                BuiltInRuleApp app = new BuiltInRuleApp(rule,
+                        pos,
+                        userConstraint);
+                apply(app);
+            }
+        }
 	}
 
 
@@ -750,8 +740,7 @@ public class Goal  {
 
     /** toString */
     public String toString() {
-	String result = (node.sequent().prettyprint(proof().getServices()).toString());
-	return result;
+	return (node.sequent().prettyprint(proof().getServices()).toString());
     }
 
     /** make Taclet instantiations complete with regard to metavariables and

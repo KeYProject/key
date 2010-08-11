@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -54,7 +54,7 @@ class SubstitutionTerm extends Term {
 	
 	this.subs = new ImmutableArray<Term>(subs);
 	this.substVar  = new ImmutableArray<QuantifiableVariable>
-	    (new QuantifiableVariable[] {substVar});
+	    (substVar);
 	this.depth = 1+(subs[0].depth() > subs[1].depth() ? 
 			subs[0].depth() : subs[1].depth());
     }

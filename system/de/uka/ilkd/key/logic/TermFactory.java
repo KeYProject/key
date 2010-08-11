@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -15,11 +15,14 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Map;
 
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.AbstractSort;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.rtsj.logic.op.WorkingSpaceNonRigidOp;
+import de.uka.ilkd.key.rtsj.logic.op.WorkingSpaceRigidOp;
 import de.uka.ilkd.key.rule.UpdatePair;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.LRUCache;
@@ -167,12 +170,12 @@ public class TermFactory {
 	}
         final Term[] t1 = new Term[3];
         t1[0] = t;
-        
-        for(int i=0;i<index.length;i++){
-	    t1[1] = index[i];
-	    t1[2] = shadownum;
-	    t1[0] = OpTerm.createOpTerm(op, t1).checked();
-	}
+
+        for (Term anIndex : index) {
+            t1[1] = anIndex;
+            t1[2] = shadownum;
+            t1[0] = OpTerm.createOpTerm(op, t1).checked();
+        }
 	
         return t1[0];
     }
@@ -191,10 +194,9 @@ public class TermFactory {
 	    throw new IllegalArgumentException("null-Operator at TermFactory"); 
 	}
         Term array = t;
-        for(int i=0;i<index.length;i++){
-	    final Term idx = index[i];
-	    array = OpTerm.createBinaryOpTerm(op, array, idx).checked();
-	}
+        for (final Term idx : index) {
+            array = OpTerm.createBinaryOpTerm(op, array, idx).checked();
+        }
 	return array;
     }
 
@@ -682,7 +684,7 @@ public class TermFactory {
             return createAnonymousUpdateTerm
 	    ((AnonymousUpdate)op, subTerms[0]);
 	} else if (op instanceof Modality) {
-	    return createProgramTerm((Modality)op, javaBlock, subTerms[0]); 
+	    return createProgramTerm(op, javaBlock, subTerms[0]);
 	} else if (op instanceof AccessOp) {
 	    if (op instanceof ShadowAttributeOp) {
 		return createShadowAttributeTerm((ShadowAttributeOp)op, 
@@ -699,7 +701,11 @@ public class TermFactory {
 	    return createIfThenElseTerm ( subTerms[0], subTerms[1], subTerms[2] );
 	} else if (op instanceof MetaOperator) {
 	    return createMetaTerm((MetaOperator)op, subTerms);
-	} else {
+	} else if(op instanceof WorkingSpaceRigidOp){
+            return createWorkingSpaceTerm((WorkingSpaceRigidOp) op);  
+        } else if(op instanceof WorkingSpaceNonRigidOp){
+            return createWorkingSpaceNonRigidTerm((WorkingSpaceNonRigidOp) op, subTerms);  
+        } else {
 	    de.uka.ilkd.key.util.Debug.fail("Should never be"+
 					    " reached. Missing case for class", 
 					    op.getClass());
@@ -969,6 +975,30 @@ public class TermFactory {
         return varTerm;
     }
 
+    /**
+     * Creates a working_space term for the working space of method pm
+     * under precondition pre.
+     * @param mt
+     * @param pre
+     * @param sort the sort workingSpace
+     */
+    public Term createWorkingSpaceTerm(Term mt, Term pre, Sort sort, Services serv){
+        return createWorkingSpaceTerm(
+                new WorkingSpaceRigidOp(mt, sort, pre, serv)).checked();
+    }
+    
+    public Term createWorkingSpaceTerm(WorkingSpaceRigidOp op){
+        return OpTerm.createOpTerm(op, new Term[0]).checked();
+    }
+    
+    public Term createWorkingSpaceNonRigidTerm(ProgramMethod pm, Sort sort, Term[] args){
+        return createWorkingSpaceNonRigidTerm(
+                new WorkingSpaceNonRigidOp(pm, sort), args).checked();
+    }
+    
+    public Term createWorkingSpaceNonRigidTerm(WorkingSpaceNonRigidOp op, Term[] args){
+        return OpTerm.createOpTerm(op, args).checked();
+    }
 
     /**
      * creates an anonymous update applied to the given target term 

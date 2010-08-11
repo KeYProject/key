@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -179,7 +179,7 @@ public class KeYInstallerGUI extends KeYInstallerUI {
                             finish();
                             if (complete()) System.exit(0);
                         } catch(NotCompleteException nce) {
-                            ; // let the user take care of it
+                            // let the user take care of it
                         } finally {
                             installerFrame.setCursor(new java.awt.Cursor(
                                 java.awt.Cursor.DEFAULT_CURSOR));

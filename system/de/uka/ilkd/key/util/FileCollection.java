@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -53,6 +53,22 @@ public interface FileCollection {
      *                 during opening resources
      */
     public Walker createWalker(String extension) throws IOException;
+
+    /**
+     * create a {@link Walker} object that allows to iterate the file
+     * collection.
+     * 
+     * The search can be restricted to files with a certain extension. If this
+     * is not desired, one specifies null for the extension.
+     * 
+     * @param extensions
+     *                file extensions to be considered only. null if all files
+     *                are to be considered.
+     * @return a freshly created walker
+     * @throws IOException
+     *                 during opening resources
+     */
+    public Walker createWalker(String[] extensions) throws IOException;
 
     /**
      * A Walker allows to iterate (once and one way) through a FileCollection.

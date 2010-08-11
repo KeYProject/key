@@ -1,17 +1,11 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
-//This file is part of KeY - Integrated Deductive Software Design 
-//Copyright (C) 2001-2003 Universitaet Karlsruhe, Germany
-//                      and Chalmers University of Technology, Sweden
-//
-//The KeY system is protected by the GNU General Public License.
-//See LICENSE.TXT for details.
-//
+
 
 package de.uka.ilkd.key.rule.export.html;
 
@@ -103,12 +97,11 @@ public class HTMLFileByOption extends HTMLFile {
             final CategoryModelInfo cat = it.next ();
             out.append ( "<li>" + cat + "\n" );
             out.append ( "<ol>\n" );
-            
-            final Iterator<OptionModelInfo> it2 = cat.getOptions().iterator();
-            while ( it2.hasNext () ) {
-                final OptionModelInfo opt = it2.next ();
-                final HTMLLink link = getFragmentLink ( opt );
-                out.append ( "<li>" + link.toTag ( opt.name () ) + "</li>\n" );
+
+            for (OptionModelInfo optionModelInfo : cat.getOptions()) {
+                final OptionModelInfo opt = optionModelInfo;
+                final HTMLLink link = getFragmentLink(opt);
+                out.append("<li>" + link.toTag(opt.name()) + "</li>\n");
             }
             
             out.append ( "</ol>\n" );
@@ -163,13 +156,12 @@ public class HTMLFileByOption extends HTMLFile {
         out.append ( "</dl>\n" );
         
         out.append ( "<ol>\n" );
-        
-        final Iterator<TacletModelInfo> it = taclets.iterator ();
-        while ( it.hasNext () ) {
-            final TacletModelInfo t = it.next ();
-            
-            out.append( "<li>" );
-            writeTacletLink ( out, t, true );
+
+        for (TacletModelInfo taclet : taclets) {
+            final TacletModelInfo t = taclet;
+
+            out.append("<li>");
+            writeTacletLink(out, t, true);
             out.append("</li>\n");
         }
         
@@ -200,13 +192,12 @@ public class HTMLFileByOption extends HTMLFile {
         out.append ( "<table border=\"1\">\n" );
         out.append ( "<caption>Number of active taclets</caption>\n" );
         out.append ( "<thead>\n<tr>\n" );
-        final Iterator<CategoryModelInfo> it = categories.iterator();
-        while ( it.hasNext () ) {
-            final CategoryModelInfo cat = it.next ();
+        for (CategoryModelInfo category : categories) {
+            final CategoryModelInfo cat = category;
             options[n] = cat.getOptions().toArray(new OptionModelInfo[cat.getOptions().size()]);
             numChoices[n] = options[n].length;
             numCombinations *= numChoices[n];
-            out.append ( "<td>" + cat.name() + "</td>" );
+            out.append("<td>" + cat.name() + "</td>");
             n++;
         }
         

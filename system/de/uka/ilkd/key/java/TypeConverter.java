@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -11,7 +11,6 @@ package de.uka.ilkd.key.java;
 
 
 import java.util.HashMap;
-import java.util.Iterator;
 
 import recoder.service.ConstantEvaluator;
 import de.uka.ilkd.key.collection.ImmutableArray;
@@ -51,15 +50,17 @@ public class TypeConverter extends TermBuilder {
     private IntegerDomainLDT integerDomainLDT;
     private FloatLDT floatLDT;
     private DoubleLDT doubleLDT;
-
+    
+    
+    private StringConverter stringConverter;
     private ImmutableList<LDT> models = ImmutableSLList.<LDT>nil();
 
-    
-    public static StringConverter stringConverter =new StringConverter();
     
 
     TypeConverter(Services s){
         services = s;       
+        stringConverter = new StringConverter(s); //TODO replace with stringLDT 
+
     }
 
     /**
@@ -88,16 +89,15 @@ public class TypeConverter extends TermBuilder {
             this.floatLDT = (FloatLDT)ldt;
         } else if (ldt instanceof DoubleLDT) {
             this.doubleLDT = (DoubleLDT)ldt;
-        }
+        } 
 
         this.models = this.models.prepend(ldt);
         Debug.out("Initialize LDTs: ", ldt);
     }
     
     public void init(ImmutableList<LDT> ldts) {
-        Iterator<LDT> it = ldts.iterator();
-        while (it.hasNext()) {
-            init(it.next());
+        for (LDT ldt : ldts) {
+            init(ldt);
         }
     }
     
@@ -191,7 +191,6 @@ public class TypeConverter extends TermBuilder {
         return  charLDT;
     }
     
-
     public BooleanLDT getBooleanLDT() {
 	return booleanLDT;
     }
@@ -233,7 +232,7 @@ public class TypeConverter extends TermBuilder {
 	    Debug.out("typeconverter: no data type model "+
 		      "available to convert:", op, op.getClass());		
 	    throw new IllegalArgumentException("TypeConverter could not handle"
-					       +" this");
+					       +" this: "+op);
 	}
 	return func(responsibleLDT.getFunctionFor(op, services, ec), subs);
     }
@@ -265,8 +264,10 @@ public class TypeConverter extends TermBuilder {
 	        KeYJavaType kjt = tr.getKeYJavaType();
 	        return findThisForSortExact(kjt.getSort(), ec);
 	    }
-	    return convertToLogicElement(ec.getRuntimeInstance());
-	} else {            
+	    return convertToLogicElement(ec.getRuntimeInstanceAsRef());
+	} /*else if (prefix instanceof CurrentMemoryAreaReference) {   
+            return convertToLogicElement(ec.getMemoryArea());
+        } */else {            
 	    Debug.out("typeconverter: WARNING: unknown reference prefix:", 
 		      prefix, prefix == null ? null : prefix.getClass());
 	    throw new IllegalArgumentException("TypeConverter failed to convert "
@@ -275,14 +276,14 @@ public class TypeConverter extends TermBuilder {
     }
     
     public Term findThisForSortExact(Sort s, ExecutionContext ec){
-        ProgramElement pe = ec.getRuntimeInstance();
+        ProgramElement pe = ec.getRuntimeInstanceAsRef();
         if(pe == null) return null;
         Term inst = convertToLogicElement(pe, ec);
         return findThisForSort(s, inst, ec.getTypeReference().getKeYJavaType(), true);
     }
     
     public Term findThisForSort(Sort s, ExecutionContext ec){
-        ProgramElement pe = ec.getRuntimeInstance();
+        ProgramElement pe = ec.getRuntimeInstanceAsRef();
         if(pe == null) return null;
         Term inst = convertToLogicElement(pe, ec);
         return findThisForSort(s, inst, ec.getTypeReference().getKeYJavaType(), false);
@@ -306,7 +307,10 @@ public class TypeConverter extends TermBuilder {
 	Debug.out("TypeConverter: FieldReference: ",fr);
 	final ReferencePrefix prefix = fr.getReferencePrefix();
 	final ProgramVariable var = fr.getProgramVariable();
-	if (var.isStatic()) {
+	if("javax.realtime.MemoryArea::currentMemoryArea".
+	               equals(fr.getName().toString())){
+	    return convertToLogicElement(ec.getMemoryAreaAsRef());
+	} else if (var.isStatic()) {
 	    return var(var);
 	} else if (prefix == null) {
 	    if (var.isMember()) {
@@ -393,7 +397,9 @@ public class TypeConverter extends TermBuilder {
 	    }
 	} else if (pe instanceof ThisReference) {
 	    return convertReferencePrefix((ThisReference)pe, ec);
-	} else if (pe instanceof ParenthesizedExpression) {
+	} /*else if (pe instanceof CurrentMemoryAreaReference) {   
+            return convertToLogicElement(ec.getMemoryArea());
+        } */else if (pe instanceof ParenthesizedExpression) {
             return convertToLogicElement
                 (((ParenthesizedExpression)pe).getChildAt(0), ec);
         } else if (pe instanceof Instanceof) {
@@ -430,7 +436,7 @@ public class TypeConverter extends TermBuilder {
         } else if (lit instanceof LongLiteral) {
             return intLDT.translateLiteral(lit);
         } else if (lit instanceof StringLiteral) {
-            return stringConverter.translateLiteral(lit,intLDT,services);
+	    return stringConverter.translateLiteral(lit, charLDT, services);
         } else if (lit instanceof FloatLiteral) {
             return floatLDT.translateLiteral(lit);
         } else if (lit instanceof DoubleLiteral) {
@@ -489,9 +495,12 @@ public class TypeConverter extends TermBuilder {
                         t2 == PrimitiveType.JAVA_INT||
                         t2 == PrimitiveType.JAVA_CHAR||
                         t2 == PrimitiveType.JAVA_LONG)) 
-            return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_LONG);		    
-        throw new RuntimeException("Could not determine promoted type "+
-                "of "+t1+" and "+t2);
+            return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_LONG);
+	/*KeYJavaType strType = services.getJavaInfo().getTypeByName("java.lang.String");
+	if (t1 == strType.getJavaType() || t2 == strType.getJavaType())
+	return strType;*/
+	throw new RuntimeException("Could not determine promoted type "+
+	  "of "+t1+" and "+t2);
     }
 
 
@@ -594,7 +603,11 @@ public class TypeConverter extends TermBuilder {
 	    return services.getJavaInfo().getKeYJavaType(t.sort());
 	}
         
-        KeYJavaType result = services.getJavaInfo().getKeYJavaType(t.sort());        
+        KeYJavaType result = services.getJavaInfo().getKeYJavaType(t.sort());  
+        if (result == null) {
+            //HACK
+            result = services.getJavaInfo().getKeYJavaType(t.sort().toString()); 
+        }
         if (result == null) {
            result = getKeYJavaType(convertToProgramElement(t));
         }
@@ -930,10 +943,14 @@ public class TypeConverter extends TermBuilder {
 	    t == PrimitiveType.JAVA_BOOLEAN;
     }
 
-    public TypeConverter copy(Services services) {
-	final TypeConverter tc = new TypeConverter(services);
+    public TypeConverter copy(Services s) {
+	final TypeConverter tc = new TypeConverter(s);
 	tc.init(models);
 	return tc;
+    }
+
+    public StringConverter getStringConverter() {
+	return stringConverter;
     }
  
 }

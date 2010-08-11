@@ -1,19 +1,10 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General Public License.
-// See LICENSE.TXT for details.
-//
-//
 
 package de.uka.ilkd.key.proof;
 
@@ -230,7 +221,7 @@ public class ProblemLoader implements Runnable {
            try{
                if (!keepProblem) {
         	   EnvInput envInput = createEnvInput(file);
-        	   init = new ProblemInitializer(main); 
+        	   init = profile.createProblemInitializer(main); 
         	   InitConfig initConfig = init.prepare(envInput);
         	   
         	   if(envInput instanceof ProofOblInput
@@ -257,13 +248,14 @@ public class ProblemLoader implements Runnable {
                currNode = proof.root(); // initialize loader
                children = currNode.childrenIterator(); // --"--
                iconfig = proof.env().getInitConfig();
+
+               CountingBufferedReader cinp = null;
                try {
                    if (!keepProblem) {
                        init.tryReadProof(this, po);
                    } else {
                        setStatusLine("Loading proof", (int)file.length());
-                       CountingBufferedInputStream cinp =
-                           new CountingBufferedInputStream(
+                       cinp = new CountingBufferedReader(
                                    new FileInputStream(file),
                                    pm,
                                    (int)file.length()/100);
@@ -277,11 +269,12 @@ public class ProblemLoader implements Runnable {
                        parser.proofBody(this);
                    }
                } finally {
-                    if (constraints.size() > 0) {
+        	   if (cinp != null) {
+        	       cinp.close();
+        	   }
+        	   if (constraints.size() > 0) {
                         Term left, right;
-                        for (Iterator<PairOfString> it = constraints.iterator(); it
-                                .hasNext();) {
-                            PairOfString p = it.next();
+                        for (PairOfString p : constraints) {
                             left = parseTerm(p.left, proof);
                             right = parseTerm(p.right, proof);
 
@@ -456,8 +449,8 @@ public class ProblemLoader implements Runnable {
         case 'w' : //newnames
             final String[] newNames = s.split(",");
             ImmutableList<Name> l = ImmutableSLList.<Name>nil();
-            for (int in = 0; in < newNames.length; in++) {
-                l = l.append(new Name(newNames[in]));
+            for (String newName : newNames) {
+                l = l.append(new Name(newName));
             }
             proof.getServices().getNameRecorder().setProposals(l);
             break;
@@ -534,7 +527,10 @@ public class ProblemLoader implements Runnable {
                         .getConstraint();
         
         if (currContract!=null) {
-            ourApp = new UseOperationContractRuleApp(pos, 
+            // basically profile should be extended to have their own problem loader
+            assert profile instanceof JavaProfile;
+            ourApp = new UseOperationContractRuleApp(((JavaProfile)profile).getContractRule(),
+        	    				     pos, 
                                                      userConstraint, 
                                                      currContract);
             currContract=null;
@@ -758,8 +754,10 @@ public class ProblemLoader implements Runnable {
             new Namespace(),
             targetGoal.getVariableNamespace(varNS));
         Services services = p.getServices();
+        StringReader sr = null;
         try{
-            result = (new KeYParser(ParserMode.TERM,new KeYLexer(new StringReader(value),
+            sr = new StringReader(value);
+            result = (new KeYParser(ParserMode.TERM,new KeYLexer(sr,
                                              services.getExceptionHandler()),
                                 null, TermFactory.DEFAULT, null, services,
                                 nss, new AbbrevMap())).
@@ -768,7 +766,11 @@ public class ProblemLoader implements Runnable {
             throw new RuntimeException("Cannot parse location list "+value, re);
         } catch (antlr.TokenStreamException tse) {
             throw new RuntimeException("Cannot parse location list "+value, tse);
-        }
+        } finally {
+            if (sr != null) {
+        	sr.close();
+            }
+        }        
         return result;
     }
 
@@ -781,9 +783,8 @@ public class ProblemLoader implements Runnable {
 
 
     private SchemaVariable lookupName(ImmutableSet<SchemaVariable> set, String name) {
-        Iterator<SchemaVariable> it = set.iterator();
-        while (it.hasNext()) {
-            SchemaVariable v = it.next();
+        for (SchemaVariable aSet : set) {
+            SchemaVariable v = aSet;
             if (v.name().toString().equals(name)) return v;
         }
         return null; // handle this better!

@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -49,11 +49,9 @@ public class PrimitiveSort extends AbstractNonCollectionSort {
         if (!(sort instanceof PrimitiveSort)) {
             return false;
         }
-                             
-        final Iterator<Sort> it = extendsSorts().iterator();
-        while (it.hasNext()) {
-            final Sort s = it.next();
-            assert s!=null;
+
+        for (final Sort s : extendsSorts()) {
+            assert s != null;
             if (s == sort || s.extendsTrans(sort)) {
                 return true;
             }

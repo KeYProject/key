@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -71,14 +71,13 @@ public class ErrorHandler {
     public void printErrorsAndWarnings() {
 	
 	// print
-	Iterator it = errorStack.iterator();
-	while (it.hasNext()) {
-	    Exception ex = (Exception) it.next();
-	    if (ex instanceof WarningException) {		
-		System.out.println("Warning: " + ex.getMessage());
-	    } else 
-		System.out.println("Error: " + ex.getMessage());
-	}
+        for (Object anErrorStack : errorStack) {
+            Exception ex = (Exception) anErrorStack;
+            if (ex instanceof WarningException) {
+                System.out.println("Warning: " + ex.getMessage());
+            } else
+                System.out.println("Error: " + ex.getMessage());
+        }
 	
     }
 

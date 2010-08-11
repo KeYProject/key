@@ -1,10 +1,12 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
+//
+//
 package de.uka.ilkd.key.visualdebugger;
 
 import java.util.Iterator;
@@ -105,8 +107,8 @@ public class DebuggerPO implements ProofOblInput {
 
     private ImmutableList<Term> getTerms(ImmutableList<ConstrainedFormula> list) {
         ImmutableList<Term> result = ImmutableSLList.<Term>nil();
-        for (Iterator<ConstrainedFormula> it = list.iterator(); it.hasNext();) {
-            result = result.append(it.next().formula());
+        for (ConstrainedFormula aList : list) {
+            result = result.append(aList.formula());
         }
         return result;
     }
@@ -118,8 +120,7 @@ public class DebuggerPO implements ProofOblInput {
 
     private Term list2term(ImmutableList<Term> list) {
         Term result = null;
-        for (Iterator<Term> it = list.iterator(); it.hasNext();) {
-            Term t = it.next();
+        for (Term t : list) {
             t = TermFactory.DEFAULT.createJunctorTerm(Op.NOT, t);
             if (result == null)
                 result = t;
@@ -197,8 +198,7 @@ public class DebuggerPO implements ProofOblInput {
 
     public void setSpecFormula(ImmutableList<Term> specFormula) {
         Term result = null;
-        for (Iterator<Term> it = specFormula.iterator(); it.hasNext();) {
-            Term t = it.next();
+        for (Term t : specFormula) {
             t = TermFactory.DEFAULT.createJunctorTerm(Op.NOT, t);
             if (result == null)
                 result = t;
@@ -237,8 +237,7 @@ public class DebuggerPO implements ProofOblInput {
 
     public void setUp(Sequent precondition, ITNode n) {
         Sequent result = precondition;
-        for (Iterator<Term> it = n.getPc(true).iterator(); it.hasNext();) {
-            Term t = it.next();
+        for (Term t : n.getPc(true)) {
             if (t.op() == Op.NOT)
                 result = result.addFormula(
                         new ConstrainedFormula(t.sub(0), Constraint.BOTTOM),
@@ -254,8 +253,7 @@ public class DebuggerPO implements ProofOblInput {
 
     public void setUp(Sequent precondition, ITNode n, ImmutableSet<Term> indexConf) {
         this.setUp(precondition, n);
-        for (Iterator<Term> it = indexConf.iterator(); it.hasNext();) {
-            Term t = it.next();
+        for (Term t : indexConf) {
             if (t.op() == Op.NOT)
                 this.sequent = sequent.addFormula(
                         new ConstrainedFormula(t.sub(0), Constraint.BOTTOM),

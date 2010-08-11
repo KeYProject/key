@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -89,21 +89,21 @@ public class Observer implements AbstractPatternImplementor {
 
         SourceCode source = new SourceCode();
 
-	for (int i=0; i<concObsName.length; i++) {
-	    source.beginClass(concObsName[i]);
-	    source.add("/**");
-	    source.add(constraintMechanism.getConstraints(" * ",
-							  "ConcreteObserver", concObsName[i]));
-	    source.add(" */");
-	    source.add("public class " + concObsName[i] + " extends " + observerName + " {");
-	    source.add("\tpublic void update() {}");
-	    source.add("\t/**");
-	    source.add("\t * @supplierCardinality 0..1");
-	    source.add("\t * @supplierRole " + subjectAssName);
-	    source.add("\t */");
-	    source.add("\tprivate " + concSubjName + " lnk" + concSubjName + ";");
-	    source.add("}");
-	}
+        for (String aConcObsName : concObsName) {
+            source.beginClass(aConcObsName);
+            source.add("/**");
+            source.add(constraintMechanism.getConstraints(" * ",
+                    "ConcreteObserver", aConcObsName));
+            source.add(" */");
+            source.add("public class " + aConcObsName + " extends " + observerName + " {");
+            source.add("\tpublic void update() {}");
+            source.add("\t/**");
+            source.add("\t * @supplierCardinality 0..1");
+            source.add("\t * @supplierRole " + subjectAssName);
+            source.add("\t */");
+            source.add("\tprivate " + concSubjName + " lnk" + concSubjName + ";");
+            source.add("}");
+        }
 
         return source; //classes;
     }

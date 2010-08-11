@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -105,8 +105,34 @@ public final class SLEnvInput extends AbstractEnvInput {
     }
     
     
+    private ProgramMethod[] sortPMs(ProgramMethod[] pms) {
+        Arrays.sort(pms, new Comparator<ProgramMethod> () {
+            public int compare(ProgramMethod o1, ProgramMethod o2) {
+        	int res = o1.getFullName().compareTo(o2.getFullName());
+        	if(res == 0) {
+        	    res = o1.getParameterDeclarationCount() 
+        	          - o2.getParameterDeclarationCount();
+        	}
+        	if(res == 0) {
+        	    for(int i = 0, n = o1.getParameterDeclarationCount(); i < n; i++) {
+        		final KeYJavaType kjt1 = o1.getParameterType(i);
+        		final KeYJavaType kjt2 = o2.getParameterType(i);
+        		res = kjt1.getFullName().compareTo(kjt2.getFullName());
+        		if(res != 0) {
+        		    break;
+        		}
+        	    }
+        	}
+        	return res;
+            }
+        });
+        
+        return pms;
+    }    
+    
+    
     private void showWarningDialog(ImmutableSet<PositionedString> warnings) {
-        if(!Main.visible) {
+        if(!Main.isVisibleMode()) {
             return;
         }
                 
@@ -260,10 +286,12 @@ public final class SLEnvInput extends AbstractEnvInput {
             //class invariants
             specRepos.addClassInvariants(
                         specExtractor.extractClassInvariants(kjt));
-            
+
             //contracts, loop invariants
-            ImmutableList<ProgramMethod> pms 
-                = javaInfo.getAllProgramMethodsLocallyDeclared(kjt);
+            final ImmutableList<ProgramMethod> allPMs 
+        	= javaInfo.getAllProgramMethodsLocallyDeclared(kjt);
+            final ProgramMethod[] pms  //sort methods alphabetically
+        	= sortPMs(allPMs.toArray(new ProgramMethod[allPMs.size()]));            
             for(ProgramMethod pm : pms) {
                 //contracts
                 specRepos.addOperationContracts(
@@ -285,7 +313,11 @@ public final class SLEnvInput extends AbstractEnvInput {
             
             //constructor contracts (add implicit preconditions, 
             //move to <init> method)
-            ImmutableList<ProgramMethod> constructors = javaInfo.getConstructors(kjt);
+            final ImmutableList<ProgramMethod> allConstructors 
+            	= javaInfo.getConstructors(kjt);
+            final ProgramMethod[] constructors //sort constructors alphabetically
+            	= sortPMs(allConstructors.toArray(
+            			new ProgramMethod[allConstructors.size()]));
             for(ProgramMethod constructor : constructors) {
         	assert constructor.isConstructor();
         	ImmutableSet<OperationContract> contracts 

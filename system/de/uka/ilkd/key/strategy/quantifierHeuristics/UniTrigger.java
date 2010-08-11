@@ -1,19 +1,11 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
-//This file is part of KeY - Integrated Deductive Software Design
-//Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
-//                    Universitaet Koblenz-Landau, Germany
-//                    Chalmers University of Technology, Sweden
-//
-//The KeY system is protected by the GNU General Public License. 
-//See LICENSE.TXT for details.
-//
-//
+
 
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
@@ -54,9 +46,7 @@ class UniTrigger implements Trigger {
     public ImmutableSet<Substitution> getSubstitutionsFromTerms(ImmutableSet<Term> targetTerm, 
             Services services) {
         ImmutableSet<Substitution> allsubs = DefaultImmutableSet.<Substitution>nil();
-        final Iterator<Term> it = targetTerm.iterator ();
-        while ( it.hasNext () )
-            allsubs = allsubs.union ( getSubstitutionsFromTerm ( it.next (), services ) );
+        for (Term aTargetTerm : targetTerm) allsubs = allsubs.union(getSubstitutionsFromTerm(aTargetTerm, services));
         return allsubs;
     }
 
@@ -115,10 +105,9 @@ class UniTrigger implements Trigger {
         final ImmutableSet<Substitution> substs =
             BasicMatching.getSubstitutions ( candidate, searchTerm );
 
-        final Iterator<Substitution> it = substs.iterator ();
-        while ( it.hasNext () ) {
-            final Substitution subst = it.next ();
-            if ( containsLoop ( subst ) ) return false;
+        for (Substitution subst1 : substs) {
+            final Substitution subst = subst1;
+            if (containsLoop(subst)) return false;
         }
         return true;
     }
@@ -148,21 +137,19 @@ class UniTrigger implements Trigger {
         if ( checkForCycle.op () == var ) return false;
         
         while ( true ) {
-            final Iterator<QuantifiableVariable> it =
-                                checkForCycle.freeVars ().iterator ();
-            while ( it.hasNext () ) {
-                final QuantifiableVariable termVar = it.next ();
-                if ( !body.contains ( termVar ) ) {
-                    final Term termVarterm = varMap.get( termVar );
-                    if ( termVarterm != null ) {
-                        if ( termVarterm.freeVars ().contains ( var ) )
+            for (QuantifiableVariable quantifiableVariable : checkForCycle.freeVars()) {
+                final QuantifiableVariable termVar = quantifiableVariable;
+                if (!body.contains(termVar)) {
+                    final Term termVarterm = varMap.get(termVar);
+                    if (termVarterm != null) {
+                        if (termVarterm.freeVars().contains(var))
                             return true;
-                        fringe = fringe.prepend ( termVarterm );                        
+                        fringe = fringe.prepend(termVarterm);
                     }
-                    
-                    if ( termVar == var ) return true;
 
-                    body = body.prepend ( termVar );
+                    if (termVar == var) return true;
+
+                    body = body.prepend(termVar);
                 }
             }
 

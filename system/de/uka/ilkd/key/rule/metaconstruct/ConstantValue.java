@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -51,9 +51,10 @@ public class ConstantValue extends AbstractMetaOperator {
 
 	if ( op instanceof ProgramConstant ) {
 	    Literal lit = ((ProgramConstant)op).getCompileTimeConstant ();
+	    	    
 	    if ( lit != null )
 		term = services.getTypeConverter ()
-		    .convertToLogicElement ( lit );
+		    .convertToLogicElement ( lit );	    	   
 	}
 
 	return term;

@@ -1,10 +1,12 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
+//
+//
 package de.uka.ilkd.key.visualdebugger.statevisualisation;
 
 import java.util.*;
@@ -66,7 +68,6 @@ public class SymbolicObjectDiagram {
         final Function boolTRUE = bLDT.getTrueConst();
         final Function boolFALSE = bLDT.getFalseConst();
         
-        
         final Operator op = t.op();
         return op instanceof AttributeOp
                 && checkIndices(t, serv)
@@ -82,7 +83,7 @@ public class SymbolicObjectDiagram {
                 && boolTRUE != op
                 && boolFALSE != op
                 // TODO remove string comparison in next line
-                && op.name().toString().indexOf("undef(") == -1;
+                && op.name().toString().indexOf("undef(") == -1; 
     }
 
     private ImmutableList<Term> ante = ImmutableSLList.<Term>nil();
@@ -153,9 +154,8 @@ public class SymbolicObjectDiagram {
 
     private void addArrayEntry(LinkedList<SymbolicObject> objects, Term ref, Term index,
             Term con) {
-        final Iterator<SymbolicObject> it = objects.iterator();
-        while (it.hasNext()) {
-            SymbolicObject so = it.next();
+        for (SymbolicObject object : objects) {
+            SymbolicObject so = object;
             if (so.getTerms().contains(ref)) {
                 ((SymbolicArrayObject) so).addIndexConstraint(index, con);
             }
@@ -165,9 +165,8 @@ public class SymbolicObjectDiagram {
 
     private void addAttribute(LinkedList<SymbolicObject> objects, AttributeOp op, Term sub,
             Term cTerm) {
-        Iterator<SymbolicObject> it = objects.iterator();
-        while (it.hasNext()) {
-            SymbolicObject so = it.next();
+        for (SymbolicObject object : objects) {
+            SymbolicObject so = object;
             if (so.getTerms().contains(sub)) {
                 if (!((ProgramVariable) op.attribute()).isImplicit()
                         || VisualDebugger.showImpliciteAttr)
@@ -180,9 +179,8 @@ public class SymbolicObjectDiagram {
 
     private void addIndexReference(Term sub, Term index,
             SymbolicObject soReferenced, LinkedList<SymbolicObject> objects) {
-        Iterator<SymbolicObject> it = objects.iterator();
-        while (it.hasNext()) {
-            SymbolicObject so = it.next();
+        for (SymbolicObject object : objects) {
+            SymbolicObject so = object;
             if (so.getTerms().contains(sub)) {
                 ((SymbolicArrayObject) so).addAssociationFromIndex(index,
                         soReferenced);
@@ -192,9 +190,8 @@ public class SymbolicObjectDiagram {
 
     private void addReference(AttributeOp op, Term sub,
             SymbolicObject soReferenced, LinkedList<SymbolicObject> objects) {
-        Iterator<SymbolicObject> it = objects.iterator();
-        while (it.hasNext()) {
-            SymbolicObject so = it.next();
+        for (SymbolicObject object : objects) {
+            SymbolicObject so = object;
             if (so.getTerms().contains(sub)) {
                 if (op.attribute() instanceof ProgramVariable)
                     so.addAssociation(op.attribute(), soReferenced);
@@ -207,9 +204,8 @@ public class SymbolicObjectDiagram {
 
     private void addStaticAttribute(LinkedList<SymbolicObject> objects, ProgramVariable pv,
             ClassType ct, Term cTerm) {
-        Iterator<SymbolicObject> it = objects.iterator();
-        while (it.hasNext()) {
-            SymbolicObject so = it.next();
+        for (SymbolicObject object : objects) {
+            SymbolicObject so = object;
             if (so.isStatic() && so.getType().equals(ct)) {
                 if (!pv.isImplicit() || VisualDebugger.showImpliciteAttr)
                     so.addAttributeConstraint(pv, cTerm);
@@ -220,10 +216,9 @@ public class SymbolicObjectDiagram {
 
     private void addStaticReference(ProgramVariable op,
             SymbolicObject soReferenced, LinkedList<SymbolicObject> objects) {
-        Iterator<SymbolicObject> it = objects.iterator();
-        while (it.hasNext()) {
-            SymbolicObject so = it.next();
-            if (so.isStatic() 
+        for (SymbolicObject object : objects) {
+            SymbolicObject so = object;
+            if (so.isStatic()
                     && so.getType().equals(op.getContainerType().getJavaType()))
                 so.addAssociation(op, soReferenced);
 
@@ -295,9 +290,8 @@ public class SymbolicObjectDiagram {
                 } else {
                     ec = new EquClass(t.sub(0), t.sub(1));
                 }
-                Iterator<Term> ecIt = ec.getMembers().iterator();
-                while (ecIt.hasNext()) {
-                    term2class.put(ecIt.next(), ec);
+                for (Term term : ec.getMembers()) {
+                    term2class.put(term, ec);
                 }
             }
 
@@ -312,8 +306,7 @@ public class SymbolicObjectDiagram {
     private void createPostState(ImmutableList<Term> pre, ImmutableList<Term> post) {
         VisualDebugger.print("createPostState -----");
         Iterator<Term> pIt = post.iterator();
-        for (Iterator<Term> it = pre.iterator(); it.hasNext();) {
-            Term preTerm = it.next();
+        for (Term preTerm : pre) {
             Term postTerm = pIt.next();
             // System.out.println(preTerm+":="+postTerm);
             if (preTerm.op() instanceof AttributeOp) {
@@ -362,21 +355,21 @@ public class SymbolicObjectDiagram {
     private void createSymbolicObjects() {
         LinkedList<SymbolicObject> result = new LinkedList<SymbolicObject>();
         EquClass[] npClasses = getNonPrimitiveLocationEqvClasses();
-        for (int i = 0; i < npClasses.length; i++) {
-            KeYJavaType t = npClasses[i].getKeYJavaType();
-            if (!disjunct(npClasses[i].getMembers(), refInPC)) {
-                if (npClasses[i].isArray()) {
+        for (EquClass npClass : npClasses) {
+            KeYJavaType t = npClass.getKeYJavaType();
+            if (!disjunct(npClass.getMembers(), refInPC)) {
+                if (npClass.isArray()) {
                     SymbolicArrayObject sao = new SymbolicArrayObject(
-                            npClasses[i].getMembers(), (ClassType) t
+                            npClass.getMembers(), (ClassType) t
                                     .getJavaType(), serv);
                     sao
-                            .setPossibleIndexTermConfigurations(getPossibleIndexTerms(npClasses[i]
+                            .setPossibleIndexTermConfigurations(getPossibleIndexTerms(npClass
                                     .getMembers()));
                     sao.setIndexConfiguration(getPossibleIndexTermsForArray(sao
                             .getTerms(), indexTerms));
                     result.add(sao);
                 } else
-                    result.add(new SymbolicObject(npClasses[i].getMembers(),
+                    result.add(new SymbolicObject(npClass.getMembers(),
                             (ClassType) t.getJavaType(), serv));
 
             }
@@ -384,8 +377,8 @@ public class SymbolicObjectDiagram {
 
         // create static objects
         // System.out.println("Static Type "+);
-        for (Iterator<Type> it = this.getStaticClasses().iterator(); it.hasNext();) {
-            result.add(new SymbolicObject((ClassType) (it.next()), serv));
+        for (Type type : this.getStaticClasses()) {
+            result.add(new SymbolicObject((ClassType) (type), serv));
         }
 
         // create self object/ self static class, if not happened
@@ -394,7 +387,7 @@ public class SymbolicObjectDiagram {
             if (this.getStaticObject(ct, result) == null)
                 result.add(new SymbolicObject(ct, serv));
         } else {
-            final Term self = (Term) vd.getInputPV2term().get(
+            final Term self = vd.getInputPV2term().get(
                     (vd.getSelfTerm()));
             if (this.getObject(self, result) == null)
                 result.add(new SymbolicObject(self, (ClassType) serv
@@ -403,8 +396,7 @@ public class SymbolicObjectDiagram {
         }
 
         // create unknown objects
-        for (Iterator<Term> it = postTerms.iterator(); it.hasNext();) {
-            Term next = it.next();
+        for (Term next : postTerms) {
             if (this.referenceSort(next.sort())
                     && !VisualDebugger.containsImplicitAttr(next)) {
                 if (getObject(next, result) == null) {
@@ -418,43 +410,41 @@ public class SymbolicObjectDiagram {
         }
 
         // Compute Associations...
-        Iterator<SymbolicObject> it = result.iterator();
-        while (it.hasNext()) {
-            SymbolicObject so = it.next();
-            Iterator<Term> it2 = so.getTerms().iterator();
+        for (SymbolicObject aResult : result) {
+            SymbolicObject so = aResult;
             // SetOf<Term> result;
             // System.out.println("adding assos");
-            while (it2.hasNext()) {
+            for (Term term : so.getTerms()) {
 
-                Term t = it2.next();
+                Term t = term;
                 // System.out.println("ref" +t);
 
                 if (t.op() instanceof AttributeOp) {
                     Term sub = t.sub(0);
-                    AttributeOp op = (AttributeOp) t.op();                
+                    AttributeOp op = (AttributeOp) t.op();
                     if (refInPC.contains(t) || postTerms.contains(t)) // TODO
-                                                                        // ???//only
-                                                                        // assoc
-                                                                        // that
-                                                                        // are
-                                                                        // in
-                                                                        // the
-                                                                        // pc
+                        // ???//only
+                        // assoc
+                        // that
+                        // are
+                        // in
+                        // the
+                        // pc
                         addReference(op, sub, so, result);
                 } else if (t.op() instanceof ArrayOp) {
                     if (refInPC.contains(t) || postTerms.contains(t)) // TODO??
                         addIndexReference(t.sub(0), t.sub(1), so, result);
 
-                } else if (t.op() instanceof ProgramVariable && 
-                        ((ProgramVariable)t.op()).isMember()) {
+                } else if (t.op() instanceof ProgramVariable &&
+                        ((ProgramVariable) t.op()).isMember()) {
                     if (refInPC.contains(t) || postTerms.contains(t)) // TODO
-                                                                        // ???//only
-                                                                        // assoc
-                                                                        // that
-                                                                        // are
-                                                                        // in
-                                                                        // the
-                                                                        // pc
+                        // ???//only
+                        // assoc
+                        // that
+                        // are
+                        // in
+                        // the
+                        // pc
                         addStaticReference((ProgramVariable) t.op(), so, result);
 
                 }
@@ -462,13 +452,11 @@ public class SymbolicObjectDiagram {
             }
         }
 
-        for (Iterator<Term> it2 = pc.iterator(); it2.hasNext();) {
-            Term currentTerm = it2.next();
+        for (Term currentTerm : pc) {
             ImmutableSet<Term> locs = collectLocations2(currentTerm);
 
-            for (Iterator<Term> it3 = locs.iterator(); it3.hasNext();) {
+            for (Term t2 : locs) {
 
-                Term t2 = it3.next();
                 if (!referenceSort(t2.sort())) {
                     if (t2.op() instanceof AttributeOp) {
                         addAttribute(result, (AttributeOp) t2.op(), t2.sub(0),
@@ -498,9 +486,7 @@ public class SymbolicObjectDiagram {
     }
 
     private void createSymbolicObjectsForNewInstances(ImmutableList<Term> pre) {
-        for (Iterator<Term> it = pre.iterator(); it.hasNext();) {
-            Term next = it.next();
-
+        for (Term next : pre) {
             if (next.op() instanceof AttributeOp) {
                 Term sub = next.sub(0);
 
@@ -516,8 +502,8 @@ public class SymbolicObjectDiagram {
     }
 
     private boolean disjunct(ImmutableSet<Term> s1, ImmutableSet<Term> s2) {
-        for (Iterator<Term> it = s1.iterator(); it.hasNext();) {
-            if (s2.contains(it.next()))
+        for (Term aS1 : s1) {
+            if (s2.contains(aS1))
                 return false;
         }
         return true;
@@ -525,9 +511,8 @@ public class SymbolicObjectDiagram {
 
     private LinkedList<SymbolicObject> filterStaticObjects(LinkedList<SymbolicObject> objects) {
         LinkedList<SymbolicObject> result = new LinkedList<SymbolicObject>();
-        Iterator<SymbolicObject> it = objects.iterator();
-        while (it.hasNext()) {
-            final SymbolicObject so = it.next();
+        for (SymbolicObject object : objects) {
+            final SymbolicObject so = object;
             if (!so.isStatic())
                 result.add(so);
         }
@@ -535,9 +520,8 @@ public class SymbolicObjectDiagram {
     }
 
     private void findDisjointClasses() {
-        Iterator<Term> it = succ.iterator();
-        while (it.hasNext()) {
-            Term t = it.next();
+        for (Term aSucc : succ) {
+            Term t = aSucc;
             EquClass e0, e1;
             if (t.op() instanceof Equality /* &&!containsImplicitAttr(t) */) {
                 e0 = getEqvClass(t.sub(0));
@@ -551,8 +535,7 @@ public class SymbolicObjectDiagram {
     public ImmutableList<Term> getConstraints(Term toFind) {
         // Term pvTerm = TermFactory.DEFAULT.createVariableTerm(pv);
         ImmutableList<Term> result = ImmutableSLList.<Term>nil();
-        for (Iterator<Term> it = pc.iterator(); it.hasNext();) {
-            final Term t = it.next();
+        for (final Term t : pc) {
             OpCollector vis = new OpCollector();
             t.execPostOrder(vis);
 
@@ -582,24 +565,21 @@ public class SymbolicObjectDiagram {
         Object[] oa = (new HashSet<EquClass>(term2class.values())).toArray();
         EquClass[] temp = new EquClass[oa.length];
         int l = 0;
-        for (int i = 0; i < oa.length; i++) {
-            if (((EquClass) oa[i]).getLocations().size() > 0
-                    && (!((EquClass) oa[i]).isInt() && !((EquClass) oa[i])
-                            .isBoolean())) {
-                temp[l++] = (EquClass) oa[i];
+        for (Object anOa : oa) {
+            if (((EquClass) anOa).getLocations().size() > 0
+                    && (!((EquClass) anOa).isInt() && !((EquClass) anOa)
+                    .isBoolean())) {
+                temp[l++] = (EquClass) anOa;
             }
         }
         EquClass[] result = new EquClass[l];
-        for (int i = 0; i < l; i++) {
-            result[i] = temp[i];
-        }
+        System.arraycopy(temp, 0, result, 0, l);
         return result;
     }
 
     private SymbolicObject getObject(Term sub, LinkedList<SymbolicObject> objects) {
-        Iterator<SymbolicObject> it = objects.iterator();
-        while (it.hasNext()) {
-            final SymbolicObject so = it.next();
+        for (SymbolicObject object : objects) {
+            final SymbolicObject so = object;
             if (so.getTerms().contains(sub)) {
                 return so;
             }
@@ -634,22 +614,17 @@ public class SymbolicObjectDiagram {
     private LinkedList<ImmutableSet<Term>> getPossibleIndexTerms(ImmutableSet<Term> members) {
         LinkedList<ImmutableSet<Term>> result = new LinkedList<ImmutableSet<Term>>();
         if (possibleIndexTerms != null)
-            for (int i = 0; i < possibleIndexTerms.length; i++) {
-                ImmutableSet<Term> currentIndexTerms = possibleIndexTerms[i];
+            for (ImmutableSet<Term> currentIndexTerms : possibleIndexTerms) {
                 ImmutableSet<Term> locInd = DefaultImmutableSet.<Term>nil();
                 ImmutableSet<Term> res = DefaultImmutableSet.<Term>nil();
 
-                for (Iterator<Term> locIt = this.arrayLocations.iterator(); locIt
-                        .hasNext();) {
-                    Term t = locIt.next();
+                for (Term t : this.arrayLocations) {
                     if (members.contains(t.sub(0))) {
                         locInd = locInd.add(t.sub(1));
                     }
                 }
 
-                for (Iterator<Term> posIndexTermsIt = currentIndexTerms
-                        .iterator(); posIndexTermsIt.hasNext();) {
-                    final Term t = posIndexTermsIt.next();
+                for (final Term t : currentIndexTerms) {
                     final Term t2;
                     if (t.op() == Op.NOT)
                         t2 = t.sub(0);
@@ -672,17 +647,13 @@ public class SymbolicObjectDiagram {
 
         ImmutableSet<Term> currentIndexTerms = ic;
         ImmutableSet<Term> locInd = DefaultImmutableSet.<Term>nil();
-        for (Iterator<Term> locIt = this.arrayLocations.iterator(); locIt
-                .hasNext();) {
-            Term t = locIt.next();
+        for (Term t : this.arrayLocations) {
             if (members.contains(t.sub(0))) {
                 locInd = locInd.add(t.sub(1));
             }
         }
 
-        for (Iterator<Term> posIndexTermsIt = currentIndexTerms.iterator(); posIndexTermsIt
-                .hasNext();) {
-            final Term t = posIndexTermsIt.next();
+        for (final Term t : currentIndexTerms) {
             final Term t2;
             if (t.op() == Op.NOT)
                 t2 = t.sub(0);
@@ -702,8 +673,8 @@ public class SymbolicObjectDiagram {
     private ImmutableSet<Term> getReferences(ImmutableList<Term> terms) {
         // IList<Term> pc = itNode.getPc();
         ImmutableSet<Term> result = DefaultImmutableSet.<Term>nil();
-        for (Iterator<Term> it = terms.iterator(); it.hasNext();) {
-            result = result.union(getReferences2(it.next()));
+        for (Term term : terms) {
+            result = result.union(getReferences2(term));
         }
         return result;
     }
@@ -724,11 +695,10 @@ public class SymbolicObjectDiagram {
     private int getSerialNumber(ImmutableSet<Term> refs) {
         int current = -1;
 
-        for (Iterator<Term> it = refs.iterator(); it.hasNext();) {
-            final Term t = it.next();
+        for (final Term t : refs) {
             if (ref2ser.containsKey(t)
                     && ((current == -1) || ref2ser.get(t)
-                            .intValue() < current)) {
+                    .intValue() < current)) {
                 current = ref2ser.get(t).intValue();
             }
         }
@@ -738,8 +708,7 @@ public class SymbolicObjectDiagram {
 
     private Set<Type> getStaticClasses() {
         HashSet<Type> res = new HashSet<Type>();
-        for (Iterator<Term> it = this.pc.iterator(); it.hasNext();) {
-            Term t = it.next();
+        for (Term t : this.pc) {
             res.addAll(this.getStaticClasses(t));
 
         }
@@ -766,9 +735,8 @@ public class SymbolicObjectDiagram {
     }
 
     private SymbolicObject getStaticObject(ClassType ct, LinkedList<SymbolicObject> objects) {
-        final Iterator<SymbolicObject> it = objects.iterator();
-        while (it.hasNext()) {
-            final SymbolicObject so = it.next();
+        for (SymbolicObject object : objects) {
+            final SymbolicObject so = object;
             if (so.isStatic() && so.getType().equals(ct))
                 return so;
         }
@@ -838,8 +806,7 @@ public class SymbolicObjectDiagram {
                     .getNodeInfo().getVisualDebuggerState().getLabels();
             ImmutableList<Term> pc2 = getPc(labels);
             ImmutableSet<Term> refs = getReferences(pc2);
-            for (Iterator<Term> it = refs.iterator(); it.hasNext();) {
-                Term t = it.next();
+            for (Term t : refs) {
                 ref2ser.put(t, new Integer(n.getId()));
 
             }
@@ -849,9 +816,8 @@ public class SymbolicObjectDiagram {
         // references in post term
         int j = 0;
         if (postTerms != null)
-            for (Iterator<Term> it = postTerms.iterator(); it.hasNext();) {
+            for (Term t : postTerms) {
 
-                Term t = it.next();
                 // System.out.println("pt "+t);
                 if (referenceSort(t.sort())) {
                     if (!ref2ser.containsKey(t)) {
@@ -874,9 +840,8 @@ public class SymbolicObjectDiagram {
 
         // System.out.println("INPUT VALUES"+inputVal);
 
-        Iterator<SymbolicObject> it2 = objects.iterator();
-        while (it2.hasNext()) {
-            SymbolicObject so = it2.next();
+        for (SymbolicObject object : objects) {
+            SymbolicObject so = object;
             so.setId(getSerialNumber(so.getTerms()));
         }
 
@@ -888,9 +853,7 @@ public class SymbolicObjectDiagram {
 
         HashMap<ClassType, Integer> counters = new HashMap<ClassType, Integer>();
 
-        for (int i = 0; i < sos.length; i++) {
-            SymbolicObject so = sos[i];
-
+        for (SymbolicObject so : sos) {
             if (so.getId() == -1)
                 continue;
 
@@ -955,7 +918,7 @@ public class SymbolicObjectDiagram {
                 // vd.getSelfTerm() //TODO
                 // ProgramVariable val =
                 // (ProgramVariable)((Term)vd.getInputPV2term().get(self)).op();
-                Term val = ((Term) vd.getInputPV2term().get(self));
+                Term val = vd.getInputPV2term().get(self);
                 map.put(self.op(), val);
                 ProgVarReplacer pvr = new ProgVarReplacer(map,serv);
                 Term res = pvr.replace(t);
@@ -982,7 +945,7 @@ public class SymbolicObjectDiagram {
                 ProgramVariable next = (ProgramVariable) paraDecl
                         .get(i).getVariableSpecification()
                         .getProgramVariable();
-                Term val = (Term) values.get(TermFactory.DEFAULT
+                Term val = values.get(TermFactory.DEFAULT
                         .createVariableTerm(inputParaArray[i]));// TODO
                 so.addPara2Value(next, val);
                 paramDeclAsPVList = paramDeclAsPVList.append(next);
@@ -1093,9 +1056,8 @@ public class SymbolicObjectDiagram {
          */
         public ImmutableSet<Term> getLocations() {
             ImmutableSet<Term> locations = DefaultImmutableSet.<Term>nil();
-            Iterator<Term> it = members.iterator();
-            while (it.hasNext()) {
-                Term t = it.next();
+            for (Term member : members) {
+                Term t = member;
                 if (ModelGenerator.isLocation(t, serv)) {
                     locations = locations.add(t);
                 }
@@ -1108,8 +1070,7 @@ public class SymbolicObjectDiagram {
         }
 
         public boolean isArray() {
-            for (Iterator<Term> it = members.iterator(); it.hasNext();) {
-                Term t = it.next();
+            for (Term t : members) {
                 return isArraySort(t.sort());
             }
             return false;
@@ -1121,9 +1082,8 @@ public class SymbolicObjectDiagram {
         }
 
         public boolean isBoolean() {
-            for (Iterator<Term> it = members.iterator(); it.hasNext();) {
-                if (serv.getTypeConverter().getBooleanLDT().targetSort() == it
-                        .next().sort()) {
+            for (Term member : members) {
+                if (serv.getTypeConverter().getBooleanLDT().targetSort() == member.sort()) {
                     return true;
                 }
             }
@@ -1131,8 +1091,7 @@ public class SymbolicObjectDiagram {
         }
 
         public boolean isInt() {
-            for (Iterator<Term> it = members.iterator(); it.hasNext();) {
-                Term t = it.next();
+            for (Term t : members) {
                 return isInt(t.sort());
             }
             return false;

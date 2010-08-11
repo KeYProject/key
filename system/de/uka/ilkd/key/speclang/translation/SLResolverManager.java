@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -255,9 +255,8 @@ public abstract class SLResolverManager {
      * localVariableNamespace
      */
     public boolean needVarDeclaration(String name2BeResolved) {
-        Iterator<SLExpressionResolver> it = resolvers.iterator();
-        while(it.hasNext()) {
-            if (it.next().needVarDeclaration(name2BeResolved)) {
+        for (SLExpressionResolver resolver : resolvers) {
+            if (resolver.needVarDeclaration(name2BeResolved)) {
                 return true;
             }
         }

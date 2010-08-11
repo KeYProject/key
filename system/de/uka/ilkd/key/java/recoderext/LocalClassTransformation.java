@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -30,7 +30,7 @@ import recoder.kit.ProblemReport;
 import recoder.service.CrossReferenceSourceInfo;
 
 /**
- * Local (i.e. anonymous) classes may access variables from the creating context
+ * Local and anonymous classes may access variables from the creating context
  * if they are declared final and initialised.
  * 
  * This transformation searches for such final variables and replaces them by 
@@ -51,7 +51,7 @@ public class LocalClassTransformation extends RecoderModelTransformer {
     public ProblemReport analyze() {
          for (final ClassDeclaration cd : classDeclarations()) {
              if(cd.getName() == null || cd.getStatementContainer() !=null){
-                 (new FinalOuterVarsCollector()).walk(cd);
+        	 (new FinalOuterVarsCollector()).walk(cd);
              }
          }     
          return super.analyze();
@@ -66,10 +66,10 @@ public class LocalClassTransformation extends RecoderModelTransformer {
                 for (final VariableReference vr : si.getReferences(v)){
                     if (si.getContainingClassType(vr) !=
                         si.getContainingClassType((ProgramElement) v)){
-                        vr.getASTParent().replaceChild(
-                                vr, new FieldReference(new ThisReference(), 
-                                        new ImplicitIdentifier(ImplicitFieldAdder.FINAL_VAR_PREFIX+
-                                                v.getName())));
+			FieldReference fr = new FieldReference(new ThisReference(), 
+							       new ImplicitIdentifier(ImplicitFieldAdder.FINAL_VAR_PREFIX+
+										      v.getName()));
+                        vr.getASTParent().replaceChild(vr, fr);
                         td.makeAllParentRolesValid();
                     }
                 }

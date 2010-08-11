@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -10,7 +10,6 @@
 package de.uka.ilkd.key.java.visitor;
 
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
 
 import de.uka.ilkd.key.collection.ImmutableList;
@@ -94,7 +93,7 @@ public class ProgramTypeCollector extends JavaASTVisitor {
 	    if (referencePre instanceof Expression) {
 		currentType = services.getTypeConverter().getKeYJavaType
 		    ((Expression) referencePre,
-		     new ExecutionContext(new TypeRef(type), self));
+		     new ExecutionContext(new TypeRef(type), null, new RuntimeInstanceEC(self)));
 		currentSelf = new LocationVariable
 		    (new ProgramElementName("x_" + 
 					    referencePre.toString()),
@@ -109,64 +108,61 @@ public class ProgramTypeCollector extends JavaASTVisitor {
 		 currentMR.getMethodSignature
 		 (services,
 		  new ExecutionContext(new TypeRef(currentType), 
-				       currentSelf)));
+		          null, new RuntimeInstanceEC(currentSelf))));
 
-	    Iterator<KeYJavaType> impsIt = imps.iterator();
-	    while (impsIt.hasNext()) {
-		currentType = impsIt.next();
-		    
-		ProgramMethod currentPM =
-		    services.getJavaInfo().getProgramMethod
-		    (currentType,
-		     currentMR.getMethodName().toString(),
-		     currentMR.getMethodSignature(services,
-						  new ExecutionContext
-						  (new TypeRef(currentType),
-						   currentSelf)),
-		     currentSelf.getKeYJavaType());
-		//System.out.println("pm: " + currentPM);
-		    
-		if (!alreadyVisitedProgramMethods.contains(currentPM)) {
-		    alreadyVisitedProgramMethods.add(currentPM);
-		    //System.out.println("pm building new ptc: " + currentPM);
-		    if (services.getJavaInfo().getKeYJavaType
-			(currentPM.getContainerType()) != null) {
-			result.add
-			    (services.getJavaInfo().getKeYJavaType
-			     (currentPM.getContainerType()));
-		    }
-			
-		    ProgramTypeCollector mCollector = 
-			new ProgramTypeCollector
-			(currentPM, currentSelf, 
-			 currentType, services,
-			 alreadyVisitedProgramMethods);
-			
-		    mCollector.start();
-		    Iterator it = mCollector.getResult().iterator();
-		    while (it.hasNext()) {
-			result.add(it.next());
-		    }
-		}
-		    
-		// ACHTUNG: getProgramMethods ist unnoetig in der jetzigen Implementierung
-		// Allerdings ist keine Ueberpruefung ob ggf. eine programmethod mehrfach wiederholt wird
+        for (KeYJavaType imp : imps) {
+            currentType = imp;
 
-		/*
-		  it = mCollector.getProgramMethods().iterator();
+            ProgramMethod currentPM =
+                    services.getJavaInfo().getProgramMethod
+                            (currentType,
+                                    currentMR.getMethodName().toString(),
+                                    currentMR.getMethodSignature(services,
+                                            new ExecutionContext(new TypeRef(currentType), null,
+                                        	    new RuntimeInstanceEC(currentSelf))),
+                                    currentSelf.getKeYJavaType());
+            //System.out.println("pm: " + currentPM);
+
+            if (!alreadyVisitedProgramMethods.contains(currentPM)) {
+                alreadyVisitedProgramMethods.add(currentPM);
+                //System.out.println("pm building new ptc: " + currentPM);
+                if (services.getJavaInfo().getKeYJavaType
+                        (currentPM.getContainerType()) != null) {
+                    result.add
+                            (services.getJavaInfo().getKeYJavaType
+                                    (currentPM.getContainerType()));
+                }
+
+                ProgramTypeCollector mCollector =
+                        new ProgramTypeCollector
+                                (currentPM, currentSelf,
+                                        currentType, services,
+                                        alreadyVisitedProgramMethods);
+
+                mCollector.start();
+                for (Object o : mCollector.getResult()) {
+                    result.add(o);
+                }
+            }
+
+            // ACHTUNG: getProgramMethods ist unnoetig in der jetzigen Implementierung
+            // Allerdings ist keine Ueberpruefung ob ggf. eine programmethod mehrfach wiederholt wird
+
+            /*
+             it = mCollector.getProgramMethods().iterator();
 		      
-		  Set addToMethodRefs = mCollector.getMethodRefs();
-		  Iterator addToMethodRefsIt = addToMethodRefs.iterator();
-		  while (addToMethodRefsIt.hasNext()) {
-		  MethodReference mR = (MethodReference) addToMethodRefsIt.next();
-		  // only add those methodReferences which have not been visited
-		  // to the set of methodReferences which need to be visited
-		  if (!visitedMethodRefs.contains(mR)) {
-		  methodRefs.add(mR);
-		  }
-		  }
-		*/
-	    }
+             Set addToMethodRefs = mCollector.getMethodRefs();
+             Iterator addToMethodRefsIt = addToMethodRefs.iterator();
+             while (addToMethodRefsIt.hasNext()) {
+             MethodReference mR = (MethodReference) addToMethodRefsIt.next();
+             // only add those methodReferences which have not been visited
+             // to the set of methodReferences which need to be visited
+             if (!visitedMethodRefs.contains(mR)) {
+             methodRefs.add(mR);
+             }
+             }
+           */
+        }
 	}
     }
 
@@ -175,7 +171,8 @@ public class ProgramTypeCollector extends JavaASTVisitor {
 	    final KeYJavaType expressionType = 
 		services.getTypeConverter().getKeYJavaType
 		( (Expression)x, 
-		  new ExecutionContext(new TypeRef(type), self));
+		  new ExecutionContext(new TypeRef(type), null, 
+			  new RuntimeInstanceEC(self)));
 	    Debug.assertTrue(expressionType != null, 
 			     "Could not determine type of " + x);
 	    result.add(expressionType);

@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -14,8 +14,29 @@ import java.util.HashMap;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.ldt.IntegerLDT;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.op.AnonymousUpdate;
+import de.uka.ilkd.key.logic.op.ArrayOp;
+import de.uka.ilkd.key.logic.op.AttributeOp;
+import de.uka.ilkd.key.logic.op.CastFunctionSymbol;
+import de.uka.ilkd.key.logic.op.Equality;
+import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.LogicVariable;
+import de.uka.ilkd.key.logic.op.Metavariable;
+import de.uka.ilkd.key.logic.op.ModalOperatorSV;
+import de.uka.ilkd.key.logic.op.Modality;
+import de.uka.ilkd.key.logic.op.NRFunctionWithExplicitDependencies;
+import de.uka.ilkd.key.logic.op.Op;
+import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.op.ProgramConstant;
+import de.uka.ilkd.key.logic.op.ProgramMethod;
+import de.uka.ilkd.key.logic.op.QuanUpdateOperator;
+import de.uka.ilkd.key.logic.op.ShadowArrayOp;
+import de.uka.ilkd.key.logic.op.ShadowAttributeOp;
+import de.uka.ilkd.key.logic.op.SortedSchemaVariable;
 import de.uka.ilkd.key.util.Service;
+import de.uka.ilkd.key.pp.CharListNotation;
+import de.uka.ilkd.key.rtsj.logic.op.WorkingSpaceRigidOp;
 
 
 /** 
@@ -166,10 +187,10 @@ public class NotationInfo {
 	Modality modalities[] = {Op.DIATRC, Op.BOXTRC, Op.TOUTTRC,
 	                         Op.DIATRA, Op.BOXTRA, Op.TOUTTRA,
 				 Op.DIASUSP, Op.BOXSUSP, Op.TOUTSUSP};
-	for(int i=0; i<modalities.length;i++)
-	  tbl.put(modalities[i],
-	      new Notation.Modality("\\"+modalities[i].name().toString(),
-	                            "\\endmodality",60, 60));
+        for (Modality modality : modalities)
+            tbl.put(modality,
+                    new Notation.Modality("\\" + modality.name().toString(),
+                            "\\endmodality", 60, 60));
 	tbl.put(Op.IF_THEN_ELSE, new Notation.IfThenElse(130, "\\if"));
 	tbl.put(Op.IF_EX_THEN_ELSE, new Notation.IfThenElse(130, "\\ifEx"));
 
@@ -195,6 +216,7 @@ public class NotationInfo {
         tbl.put(ProgramConstant.class, new Notation.VariableNotation());
 	tbl.put(ProgramMethod.class, new Notation.ProgramMethod(121));
 	tbl.put(Equality.class, new Notation.Infix("=", 70, 80, 80)); 
+        tbl.put(WorkingSpaceRigidOp.class, new Notation.WorkingSpaceOp(121));
 	tbl.put(QuanUpdateOperator.class, new Notation.QuanUpdate());
 	tbl.put(AnonymousUpdate.class, new Notation.AnonymousUpdate());
 	tbl.put(ShadowAttributeOp.class, new Notation.ShadowAttribute(121,121));
@@ -207,6 +229,11 @@ public class NotationInfo {
 		new Notation.NRFunctionWithDependenciesNotation());               
 	tbl.put(ModalOperatorSV.class, new Notation.ModalSVNotation(60, 60));
 	tbl.put(SortedSchemaVariable.class, new Notation.SortedSchemaVariableNotation());
+
+	//FIXME quick and dirty to print concat applications as infix "+". Better add Function instances to map...
+	tbl.put("concat", new Notation.Infix("+",120,130,130));
+	tbl.put("cons", new CharListNotation());
+	tbl.put("empty", new Notation.Constant("\"\"",140));
     }
 
     public AbbrevMap getAbbrevMap(){
@@ -228,7 +255,6 @@ public class NotationInfo {
 		createCharLitNotation(integerLDT.getCharSymbol());
 	    }
 	}
-	createStringLitNotation(de.uka.ilkd.key.java.TypeConverter.stringConverter.getStringSymbol(),null);
 
 	//For OCL Simplification
 	if (tbl.containsKey(op.name().toString())) {
@@ -290,14 +316,6 @@ public class NotationInfo {
     public void createCharLitNotation(Operator op) {
 	tbl.put(op, new Notation.CharLiteral());
     }
-
-
-    public void createStringLitNotation(Operator op, Operator eps) {
-	Notation.StringLiteral stringLiteral =  new Notation.StringLiteral();
-	tbl.put(op, stringLiteral);
-	tbl.put(eps, stringLiteral);
-    }
-
 
     /** 
      * Used for OCL Simplification.

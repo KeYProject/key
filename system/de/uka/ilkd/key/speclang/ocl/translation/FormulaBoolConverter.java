@@ -1,17 +1,10 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
-//This file is part of KeY - Integrated Deductive Software Design
-//Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
-//                      Universitaet Koblenz-Landau, Germany
-//                      Chalmers University of Technology, Sweden
-//
-//The KeY system is protected by the GNU General Public License. 
-//See LICENSE.TXT for details.
 //
 //
 
@@ -153,10 +146,9 @@ class FormulaBoolConverter {
      */
     private ImmutableList<Term> convertFormulasToBoolHelper(ImmutableList<Term> list) {
         ImmutableList<Term> result = ImmutableSLList.<Term>nil();
-        
-        Iterator<Term> it = list.iterator();
-        while(it.hasNext()) {
-            result = result.append(convertFormulaToBool(it.next()));
+
+        for (Term aList : list) {
+            result = result.append(convertFormulaToBool(aList));
         }
         
         return result;
@@ -169,10 +161,9 @@ class FormulaBoolConverter {
      */
     public ImmutableList<Term> convertFormulasToBool(ImmutableList<OCLExpression> list) {
         ImmutableList<Term> result = ImmutableSLList.<Term>nil();
-        
-        Iterator<OCLExpression> it = list.iterator();
-        while(it.hasNext()) {
-            result = result.append(it.next().getTerm());
+
+        for (OCLExpression aList : list) {
+            result = result.append(aList.getTerm());
         }
         
         return convertFormulasToBoolHelper(result);

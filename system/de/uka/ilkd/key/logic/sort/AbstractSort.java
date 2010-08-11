@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -23,7 +23,7 @@ public abstract class AbstractSort implements Sort, SortDefiningSymbols {
     public static final Name OBJECT_REPOSITORY_NAME = new Name("<get>");
 
     /** name of the Sort */
-    protected Name name;
+    protected final Name name;
 
     /**
      * equality symbol for this sort
@@ -60,7 +60,7 @@ public abstract class AbstractSort implements Sort, SortDefiningSymbols {
             return true;
         }
         
-        if (!(sort instanceof ObjectSort || sort instanceof GenericSort)) {
+        if (!(sort instanceof ObjectSort)) {
             return false;
         }
                              
@@ -74,10 +74,8 @@ public abstract class AbstractSort implements Sort, SortDefiningSymbols {
                }
            }
            return true;
-       } else {           
-           final Iterator<Sort> it = extendsSorts().iterator();
-           while (it.hasNext()) {
-               final Sort s = it.next();
+       } else {
+           for (final Sort s : extendsSorts()) {
                assert s != null;
                if (s == sort || s.extendsTrans(sort)) {
                    return true;
@@ -179,9 +177,8 @@ public abstract class AbstractSort implements Sort, SortDefiningSymbols {
 
     
     protected void addSymbols(ImmutableList<SortDependingSymbol> p) {
-        final Iterator<SortDependingSymbol> it = p.iterator();        
-        while (it.hasNext()) {
-            final SortDependingSymbol s = it.next();
+        for (SortDependingSymbol aP : p) {
+            final SortDependingSymbol s = aP;
             definedSymbols = definedSymbols.put(s.getKind(), s);
         }
     }

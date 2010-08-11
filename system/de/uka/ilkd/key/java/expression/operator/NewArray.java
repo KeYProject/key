@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -45,6 +45,7 @@ public class NewArray extends TypeOperator
 
     protected final int dimensions;
 
+    
     /**
      *      Array initializer.
      */
@@ -61,8 +62,8 @@ public class NewArray extends TypeOperator
      *      New array.
      *      @param children an ExtList with the children of this node 
      * (remove the ArrayInitializer out of the list).
-     *      @param init the arrayInitializer 
-     *      @param dimensions an int value.
+     * @param init the arrayInitializer 
+     * @param dimensions an int value.
      */
 
     public NewArray(ExtList children, KeYJavaType keyJavaType, 
@@ -72,15 +73,15 @@ public class NewArray extends TypeOperator
         this.dimensions  = dimensions;
 	this.keyJavaType = keyJavaType;
     }
-
-
+    
+    
     /**
      *      New array.
      *      @param arguments an array of expressions describing the
      *        dimensions 
-     *      @param typeRef a reference to the arraytype
-     *      @param init the arrayInitializer 
-     *      @param dimensions an int value.
+     * @param typeRef a reference to the arraytype
+     * @param init the arrayInitializer 
+     * @param dimensions an int value.
      */
     public NewArray(Expression[] arguments, TypeReference typeRef, 
 		    KeYJavaType keyJavaType, ArrayInitializer init, 
@@ -97,7 +98,7 @@ public class NewArray extends TypeOperator
         }
         return this;
     }
-
+    
     /**
  *      Get arity.
  *      @return the int value.
@@ -252,5 +253,5 @@ public class NewArray extends TypeOperator
     public KeYJavaType getKeYJavaType() {
 	return keyJavaType;
     }
-
+    
 }

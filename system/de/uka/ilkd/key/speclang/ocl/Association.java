@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -55,9 +55,8 @@ public class Association {
         
         if(name == null) {
             name = "";
-            Iterator<AssociationEnd> it = ends.iterator();
-            while(it.hasNext()) {
-                name += it.next().getRoleName() + "_";
+            for (AssociationEnd end : ends) {
+                name += end.getRoleName() + "_";
             }
             name = name.substring(0, name.length() - 1);
         } 

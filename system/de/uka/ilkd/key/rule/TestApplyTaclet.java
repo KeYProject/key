@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -818,12 +818,11 @@ public class TestApplyTaclet extends TestCase{
 
 	assertTrue("Expected four rule applications.",rApplist.size()==4);
 
-	ImmutableList<TacletApp> appList = ImmutableSLList.<TacletApp>nil();	
-	Iterator<TacletApp> appIt = rApplist.iterator ();
-	while ( appIt.hasNext () )
-	    appList = appList.prepend
-		( appIt.next ().findIfFormulaInstantiations 
-                ( goal.sequent (), services, Constraint.BOTTOM ) );
+	ImmutableList<TacletApp> appList = ImmutableSLList.<TacletApp>nil();
+        for (TacletApp aRApplist : rApplist)
+            appList = appList.prepend
+                    (aRApplist.findIfFormulaInstantiations
+                            (goal.sequent(), services, Constraint.BOTTOM));
 
 	assertTrue("Expected one match.", appList.size()==1);
 	assertTrue("Rule App should be complete", appList.head().complete());

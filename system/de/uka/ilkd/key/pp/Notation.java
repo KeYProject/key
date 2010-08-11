@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -566,6 +566,21 @@ public abstract class Notation {
 	    }
 	}
     }
+    
+    static class WorkingSpaceOp extends Notation {
+        
+        protected WorkingSpaceOp(int priority) {
+            super(priority);
+        }
+        
+        public void print(Term t, LogicPrinter sp) throws IOException {
+            if (sp.getNotationInfo().getAbbrevMap().isEnabled(t)) {
+                sp.printTerm(t);
+            }else{
+                sp.printFunctionTerm(t.op().name().toString(), t);
+            }
+        }
+    }
 
     /**
          * The standard concrete syntax for attribute terms <code>o.a</code>.
@@ -774,7 +789,7 @@ public abstract class Notation {
 		return null;
 	    }
 
-	    return ("'" + new Character(charVal)).toString() + "'";
+	    return ("'" + new Character(charVal)) + "'";
 	}
 
 	public void print(Term t, LogicPrinter sp) throws IOException {
@@ -791,7 +806,7 @@ public abstract class Notation {
          * The standard concrete syntax for the string literal indicator `cat'
          * or `epsilon'.
          */
-    static class StringLiteral extends Notation {
+    public static class StringLiteral extends Notation {
 
 	public StringLiteral() {
 	    super(1000);

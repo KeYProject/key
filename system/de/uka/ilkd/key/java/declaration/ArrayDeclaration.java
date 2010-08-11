@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -206,7 +206,7 @@ public class ArrayDeclaration
 	}
 	if(javaBasetype instanceof ArrayDeclaration){
 	    return new ProgramElementName
-		("["+((ArrayType)javaBasetype).getFullName());	    
+		("["+ javaBasetype.getFullName());
 	} else if (javaBasetype instanceof TypeDeclaration) {
 	    return new ProgramElementName("[L"+javaBasetype.getFullName());
 	} else if (javaBasetype instanceof PrimitiveType) {
@@ -226,7 +226,7 @@ public class ArrayDeclaration
                         getAlternativeNameRepresentation());                
             } else {
                 if (baseType instanceof ClassType) {
-                    alt.append(((ClassType)baseType).getFullName());
+                    alt.append(baseType.getFullName());
                 } else {                   
                     alt.append(baseType.getName());
                 }

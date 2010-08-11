@@ -1,27 +1,20 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General Public License.
-// See LICENSE.TXT for details.
-//
+
 
 package de.uka.ilkd.key.rule.metaconstruct;
 
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
@@ -37,7 +30,9 @@ import de.uka.ilkd.key.logic.UpdateFactory;
 import de.uka.ilkd.key.logic.op.AbstractMetaOperator;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.AtPreFactory;
+import de.uka.ilkd.key.rtsj.proof.init.RTSJProfile;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.updatesimplifier.Update;
 import de.uka.ilkd.key.speclang.LocationDescriptorSet;
@@ -87,33 +82,44 @@ public class IntroAtPreDefsOp extends AbstractMetaOperator {
         //determine "self"
         Term selfTerm;
         ExecutionContext ec = (ExecutionContext) frame.getExecutionContext();
-        ReferencePrefix rp = ec.getRuntimeInstance();
+        ReferencePrefix rp = ec.getRuntimeInstanceAsRef();
         if(rp == null || rp instanceof TypeReference) {
             selfTerm = null;
         } else {
             selfTerm = services.getTypeConverter().convertToLogicElement(rp);
         }
+        
+        Term memoryArea = ec.getMemoryAreaAsRef() == null ? null : 
+            services.getTypeConverter().convertToLogicElement(ec.getMemoryAreaAsRef());
 
         //collect atPre-functions, update loop invariants
         Map<Operator, Function /*atPre*/> atPreFunctions = 
             new LinkedHashMap<Operator, Function>();
-        for(Iterator<LoopStatement> it = loops.iterator(); it.hasNext(); ) {
-            LoopStatement loop = it.next();
-            LoopInvariant inv 
-                = services.getSpecificationRepository().getLoopInvariant(loop);
-            if(inv != null) {
-                if(selfTerm != null && inv.getInternalSelfTerm() == null) {
+        for (LoopStatement loop : loops) {
+            LoopInvariant inv
+                    = services.getSpecificationRepository().getLoopInvariant(loop);
+            if (inv != null) {
+                if (selfTerm != null && inv.getInternalSelfTerm() == null) {
                     //we're calling a static method from an instance context
                     selfTerm = null;
                 }
+
+                boolean mem = (ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof RTSJProfile);
+
+                
                 Term newInvariant 
-                    = inv.getInvariant(selfTerm, atPreFunctions, services);
+                    = inv.getInvariant(selfTerm, memoryArea, atPreFunctions, services);
                 LoopPredicateSet newPredicates
                     = inv.getPredicates(selfTerm, atPreFunctions, services);
                 LocationDescriptorSet newModifies
-                    = inv.getModifies(selfTerm, atPreFunctions, services);
+                    = inv.getModifies(selfTerm, memoryArea, atPreFunctions, services);
                 Term newVariant
                     = inv.getVariant(selfTerm, atPreFunctions, services);
+                Term newWorkingSpace
+                    = mem ? inv.getWorkingSpace(selfTerm, atPreFunctions, services) : null;
+                Term newParametrizedWS
+                    = mem ? inv.getParametrizedWorkingSpaceTerms(selfTerm, atPreFunctions, services) : null;
+               
                 boolean newPredicateHeuristicsAllowed
                     = inv.getPredicateHeuristicsAllowed();
                 
@@ -123,6 +129,8 @@ public class IntroAtPreDefsOp extends AbstractMetaOperator {
                                             newPredicates,
                                             newModifies, 
                                             newVariant, 
+                                            newParametrizedWS,
+                                            newWorkingSpace,
                                             selfTerm,
                                             atPreFunctions,
                                             newPredicateHeuristicsAllowed);
@@ -137,4 +145,9 @@ public class IntroAtPreDefsOp extends AbstractMetaOperator {
             = APF.createAtPreDefinitions(atPreFunctions, services);
         return uf.apply(atPreUpdate, target);
     }
+    
+    public Sort sort(Term[] term) {
+        return Sort.FORMULA;
+    }
+    
 }

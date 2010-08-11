@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -194,10 +194,9 @@ public class TacletIndex  {
      * @param tacletAppList the NoPosTacletApps to be added
      */
     public void addTaclets(ImmutableSet<NoPosTacletApp> tacletAppList) {
-	Iterator<NoPosTacletApp> it = tacletAppList.iterator();		
-	while (it.hasNext()) {
-	    add(it.next());
-	}
+        for (NoPosTacletApp aTacletAppList : tacletAppList) {
+            add(aTacletAppList);
+        }
     }
 
     public static ImmutableSet<NoPosTacletApp> toNoPosTacletApp(ImmutableSet<Taclet> rule) {
@@ -246,10 +245,9 @@ public class TacletIndex  {
      * @param tacletAppList the NoPosTacletApps to be removed
      */
     public void removeTaclets(ImmutableSet<NoPosTacletApp> tacletAppList) {
-	Iterator<NoPosTacletApp> it = tacletAppList.iterator();
-	while (it.hasNext()) {
-	    remove(it.next());
-	}
+        for (NoPosTacletApp aTacletAppList : tacletAppList) {
+            remove(aTacletAppList);
+        }
     }
 
 
@@ -292,11 +290,10 @@ public class TacletIndex  {
     }
     
     private ImmutableSet<NoPosTacletApp> addToSet(ImmutableList<NoPosTacletApp> list,
-				       ImmutableSet<NoPosTacletApp> set) {	
-	Iterator<NoPosTacletApp> it = list.iterator();
-	while (it.hasNext()) {
-	    set = set.add(it.next());
-	}
+				       ImmutableSet<NoPosTacletApp> set) {
+        for (NoPosTacletApp aList : list) {
+            set = set.add(aList);
+        }
 	return set;
     }
 
@@ -304,22 +301,18 @@ public class TacletIndex  {
 
     public ImmutableSet<NoPosTacletApp> allNoPosTacletApps() {
 	ImmutableSet<NoPosTacletApp> tacletAppSet = DefaultImmutableSet.<NoPosTacletApp>nil();
-	Iterator<ImmutableList<NoPosTacletApp>> it0 = rwList.values().iterator();
-	while (it0.hasNext()) {
-	    tacletAppSet = addToSet(it0.next(), tacletAppSet);
-	}
-	Iterator<ImmutableList<NoPosTacletApp>> it1 = antecList.values().iterator();
-	while (it1.hasNext()) {
-	    tacletAppSet = addToSet(it1.next(), tacletAppSet);
-	}
-	Iterator<ImmutableList<NoPosTacletApp>> it2 = succList.values().iterator();
-	while (it2.hasNext()) {
-	    tacletAppSet = addToSet(it2.next(), tacletAppSet);
-	}
-	Iterator<NoPosTacletApp> it3 = noFindList.iterator();
-	while (it3.hasNext()) {
-	    tacletAppSet = tacletAppSet.add(it3.next());
-	}
+        for (ImmutableList<NoPosTacletApp> noPosTacletAppImmutableList2 : rwList.values()) {
+            tacletAppSet = addToSet(noPosTacletAppImmutableList2, tacletAppSet);
+        }
+        for (ImmutableList<NoPosTacletApp> noPosTacletAppImmutableList1 : antecList.values()) {
+            tacletAppSet = addToSet(noPosTacletAppImmutableList1, tacletAppSet);
+        }
+        for (ImmutableList<NoPosTacletApp> noPosTacletAppImmutableList : succList.values()) {
+            tacletAppSet = addToSet(noPosTacletAppImmutableList, tacletAppSet);
+        }
+        for (NoPosTacletApp aNoFindList : noFindList) {
+            tacletAppSet = tacletAppSet.add(aNoFindList);
+        }
 	return tacletAppSet;
     }
 
@@ -358,22 +351,21 @@ public class TacletIndex  {
 	if (taclets == null) {
 	    return result;
 	}
-        
-	final Iterator<NoPosTacletApp> it = taclets.iterator();
-	while (it.hasNext()) {
-	    final NoPosTacletApp tacletApp = it.next();
-	    
-	    if ( !p_filter.filter(tacletApp.taclet()) ) {
-	        continue;
-	    }
-	    
-	    final NoPosTacletApp newTacletApp =
-	        tacletApp.matchFind(pos, termConstraint, services, userConstraint);
 
-	    if (newTacletApp != null) {
-		result = result.prepend(newTacletApp);
-	    }
-	}
+        for (NoPosTacletApp taclet : taclets) {
+            final NoPosTacletApp tacletApp = taclet;
+
+            if (!p_filter.filter(tacletApp.taclet())) {
+                continue;
+            }
+
+            final NoPosTacletApp newTacletApp =
+                    tacletApp.matchFind(pos, termConstraint, services, userConstraint);
+
+            if (newTacletApp != null) {
+                result = result.prepend(newTacletApp);
+            }
+        }
 	return result;
     }
 
@@ -413,12 +405,11 @@ public class TacletIndex  {
 
 	if ( term.op () instanceof Metavariable ) {
 	    //%% HACK: just take any term operators
-	    final Iterator<Object> it = map.keySet().iterator();
-	    while ( it.hasNext () ) {
-	        final Object o = it.next ();
-	        if ( o instanceof Operator )
-	            result = result.prepend ( map.get ( o ) );
-            }
+        for (Object o1 : map.keySet()) {
+            final Object o = o1;
+            if (o instanceof Operator)
+                result = result.prepend(map.get(o));
+        }
 	}
     
 	if (term.op() instanceof IUpdateOperator) {
@@ -628,13 +619,12 @@ public class TacletIndex  {
      * @return the found NoPosTacletApp or null if no matching Taclet is there
      */
     public NoPosTacletApp lookup(Name name) {
-	Iterator<NoPosTacletApp> it=allNoPosTacletApps().iterator();
-	while (it.hasNext()) {
-	    NoPosTacletApp tacletApp=it.next();
-	    if (tacletApp.taclet().name().equals(name)) {
-		return tacletApp;
-	    }
-	}
+        for (NoPosTacletApp noPosTacletApp : allNoPosTacletApps()) {
+            NoPosTacletApp tacletApp = noPosTacletApp;
+            if (tacletApp.taclet().name().equals(name)) {
+                return tacletApp;
+            }
+        }
 	return null;
     }
 
@@ -656,10 +646,9 @@ public class TacletIndex  {
      */
     public ImmutableList<NoPosTacletApp> getPartialInstantiatedApps() {
         ImmutableList<NoPosTacletApp> result = 
-            ImmutableSLList.<NoPosTacletApp>nil(); 
-        final Iterator<NoPosTacletApp> it = partialInstantiatedRuleApps.iterator();
-        while (it.hasNext()) {
-            result = result.prepend(it.next());
+            ImmutableSLList.<NoPosTacletApp>nil();
+        for (NoPosTacletApp partialInstantiatedRuleApp : partialInstantiatedRuleApps) {
+            result = result.prepend(partialInstantiatedRuleApp);
         }
         return result;
     }
@@ -668,10 +657,10 @@ public class TacletIndex  {
     public String toString() {
 	StringBuffer sb=new StringBuffer();
 	sb.append("TacletIndex with applicable rules: ");
-	sb.append("ANTEC\n "+antecList);
-	sb.append("\nSUCC\n "+succList);
-	sb.append("\nREWRITE\n "+rwList);
-	sb.append("\nNOFIND\n "+noFindList);
+        sb.append("ANTEC\n ").append(antecList);
+        sb.append("\nSUCC\n ").append(succList);
+        sb.append("\nREWRITE\n ").append(rwList);
+        sb.append("\nNOFIND\n ").append(noFindList);
 	return sb.toString();
     }
 

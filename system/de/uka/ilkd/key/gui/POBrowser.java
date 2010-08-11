@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -13,7 +13,6 @@ package de.uka.ilkd.key.gui;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.*;
-import java.util.Iterator;
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
@@ -21,24 +20,24 @@ import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 
-import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
-import de.uka.ilkd.key.proof.init.*;
+import de.uka.ilkd.key.proof.init.InitConfig;
+import de.uka.ilkd.key.proof.init.ProofOblInput;
+import de.uka.ilkd.key.proof.init.proofobligation.DefaultPOProvider;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 
-
 public class POBrowser extends JDialog {
-    
+
     private static POBrowser instance;
 
-    private InitConfig initConfig;
-    private Services services;
+    protected InitConfig initConfig;
+    protected Services services;
     private JavaInfo javaInfo;
     private SpecificationRepository specRepos;
 
@@ -46,35 +45,35 @@ public class POBrowser extends JDialog {
     private JList poList;
     private JButton startButton;
     private JButton cancelButton;
-    
+
+    protected DefaultPOProvider poProvider;
+
     private ProofOblInput po;
-    
 
-    //-------------------------------------------------------------------------
-    //constructors
-    //-------------------------------------------------------------------------
+    // -------------------------------------------------------------------------
+    // constructors
+    // -------------------------------------------------------------------------
 
-    private POBrowser(InitConfig initConfig, 
-	    	      String title, 
-	    	      ProgramMethod defaultPm) {
+    public POBrowser(InitConfig initConfig, String title,
+	    ProgramMethod defaultPm) {
 	super(Main.getInstance(), title, true);
 	this.initConfig = initConfig;
-	this.services   = initConfig.getServices();
-	this.javaInfo   = initConfig.getServices().getJavaInfo();
-	this.specRepos  = initConfig.getServices().getSpecificationRepository();
+	this.services = initConfig.getServices();
+	this.javaInfo = services.getJavaInfo();
+	this.specRepos = services.getSpecificationRepository();
+	this.poProvider = initConfig.getProfile().getPOProvider();
 
-	//create class tree
+	// create class tree
 	classTree = new ClassTree(true, true, null, defaultPm, services);
 	classTree.addTreeSelectionListener(new TreeSelectionListener() {
 	    public void valueChanged(TreeSelectionEvent e) {
-		DefaultMutableTreeNode selectedNode 
-			= (DefaultMutableTreeNode) 
-				e.getPath().getLastPathComponent();
-		ClassTree.Entry entry 
-			= (ClassTree.Entry) selectedNode.getUserObject();
-		if(entry.kjt != null) {
+		DefaultMutableTreeNode selectedNode = (DefaultMutableTreeNode) e
+		        .getPath().getLastPathComponent();
+		ClassTree.Entry entry = (ClassTree.Entry) selectedNode
+		        .getUserObject();
+		if (entry.kjt != null) {
 		    showPOsFor(entry.kjt);
-		} else if(entry.pm != null) {
+		} else if (entry.pm != null) {
 		    showPOsFor(entry.pm);
 		} else {
 		    clearPOList();
@@ -82,23 +81,23 @@ public class POBrowser extends JDialog {
 	    }
 	});
 
-	//create PO list
+	// create PO list
 	poList = new JList();
 	poList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        poList.addMouseListener(new MouseAdapter() {
-            public void mouseClicked(MouseEvent e){                
-                if(e.getClickCount() == 2){
-                   startButton.doClick();
-                }
-            }
-        });
-        
-	//create list panel
+	poList.addMouseListener(new MouseAdapter() {
+	    public void mouseClicked(MouseEvent e) {
+		if (e.getClickCount() == 2) {
+		    startButton.doClick();
+		}
+	    }
+	});
+
+	// create list panel
 	JPanel listPanel = new JPanel();
 	listPanel.setLayout(new BoxLayout(listPanel, BoxLayout.X_AXIS));
 	getContentPane().add(listPanel);
 
-	//create class scroll pane
+	// create class scroll pane
 	JScrollPane classScrollPane = new JScrollPane(classTree);
 	classScrollPane.setBorder(new TitledBorder("Classes and Operations"));
 	Dimension classScrollPaneDim = new Dimension(400, 400);
@@ -106,7 +105,7 @@ public class POBrowser extends JDialog {
 	classScrollPane.setMinimumSize(classScrollPaneDim);
 	listPanel.add(classScrollPane);
 
-	//create PO scroll pane
+	// create PO scroll pane
 	JScrollPane poScrollPane = new JScrollPane(poList);
 	poScrollPane.setBorder(new TitledBorder("Proof Obligations"));
 	Dimension poScrollPaneDim = new Dimension(250, 400);
@@ -114,32 +113,31 @@ public class POBrowser extends JDialog {
 	poScrollPane.setMinimumSize(poScrollPaneDim);
 	listPanel.add(poScrollPane);
 
-	//create button panel
+	// create button panel
 	JPanel buttonPanel = new JPanel();
 	buttonPanel.setLayout(new FlowLayout(FlowLayout.RIGHT, 5, 5));
 	Dimension buttonDim = new Dimension(100, 27);
-        buttonPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 
-                                                 (int)buttonDim.getHeight() 
-                                                     + 10));
+	buttonPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE,
+	        (int) buttonDim.getHeight() + 10));
 	getContentPane().add(buttonPanel);
 
-	//create "start proof" button
+	// create "start proof" button
 	startButton = new JButton("Start Proof");
 	startButton.setPreferredSize(buttonDim);
 	startButton.setMinimumSize(buttonDim);
 	startButton.setEnabled(false);
 	startButton.addActionListener(new ActionListener() {
-	    public void actionPerformed(ActionEvent e) { 
-                po = createPO();
-                if(po != null) {
-                    setVisible(false);
-                }
+	    public void actionPerformed(ActionEvent e) {
+		po = createPO();
+		if (po != null) {
+		    setVisible(false);
+		}
 	    }
 	});
 	buttonPanel.add(startButton);
 	getRootPane().setDefaultButton(startButton);
 
-	//create "cancel" button
+	// create "cancel" button
 	cancelButton = new JButton("Cancel");
 	cancelButton.setPreferredSize(buttonDim);
 	cancelButton.setMinimumSize(buttonDim);
@@ -149,69 +147,69 @@ public class POBrowser extends JDialog {
 	    }
 	});
 	buttonPanel.add(cancelButton);
-        ActionListener escapeListener = new ActionListener() {
-            public void actionPerformed(ActionEvent event) {
-                if(event.getActionCommand().equals("ESC")) {
-                    cancelButton.doClick();
-                }
-            }
-        };
-        cancelButton.registerKeyboardAction(
-                            escapeListener,
-                            "ESC",
-                            KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
-                            JComponent.WHEN_IN_FOCUSED_WINDOW);
-        
-        //complete default selection
-        if(defaultPm != null) {
-            showPOsFor(defaultPm);
-        }
+	ActionListener escapeListener = new ActionListener() {
+	    public void actionPerformed(ActionEvent event) {
+		if (event.getActionCommand().equals("ESC")) {
+		    cancelButton.doClick();
+		}
+	    }
+	};
+	cancelButton.registerKeyboardAction(escapeListener, "ESC",
+	        KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
+	        JComponent.WHEN_IN_FOCUSED_WINDOW);
 
-	//show
-        getContentPane().setLayout(new BoxLayout(getContentPane(), 
-                                                 BoxLayout.Y_AXIS));	
+	// complete default selection
+	if (defaultPm != null) {
+	    showPOsFor(defaultPm);
+	}
+
+	// show
+	getContentPane().setLayout(
+	        new BoxLayout(getContentPane(), BoxLayout.Y_AXIS));
 	pack();
 	setLocation(70, 70);
     }
-    
-    
+
     /**
      * Shows the PO browser and preselects the passed method.
      */
-    public static POBrowser showInstance(InitConfig initConfig, 
-	    				 ProgramMethod defaultPm) {
-	if(instance == null
-           || instance.initConfig != initConfig
-           || !instance.initConfig.equals(initConfig)
-           || defaultPm != null) {
-            
-            if(instance != null){
-                instance.dispose();
-                
-                //============================================
-                // cumbersome but necessary code providing a workaround for a memory leak 
-                // in Java, see: http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6497929
-                instance.initConfig = null;
-                instance.services = null;
-                instance.javaInfo = null;
-                instance.specRepos = null;
-                instance.classTree = null;
-                instance.poList = null;
-                instance.startButton = null;
-                instance.cancelButton = null;
-                instance.po = null;
-                //============================================
+    public static POBrowser showInstance(InitConfig initConfig,
+	    ProgramMethod defaultPm) {
+	if (instance == null || instance.initConfig != initConfig
+	        || !instance.initConfig.equals(initConfig) || defaultPm != null) {
+
+	    if (instance != null) {
+		instance.dispose();
+
+		// ============================================
+		// cumbersome but necessary code providing a workaround for a
+		// memory leak
+		// in Java, see:
+		// http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6497929
+		instance.initConfig = null;
+		instance.services = null;
+		instance.javaInfo = null;
+		instance.specRepos = null;
+		instance.classTree = null;
+		instance.poList = null;
+		instance.startButton = null;
+		instance.cancelButton = null;
+		instance.po = null;
+		// ============================================
+	    }
+
+	    try {
+	        instance = initConfig.getProfile().getPOBrowserClass().getConstructor(InitConfig.class, 
+	            String.class, ProgramMethod.class).newInstance(initConfig, "Proof Obligation Browser",
+	            defaultPm);
+            } catch (Exception e) {
+        	throw (RuntimeException)new RuntimeException("No Proof-Obligation Browser available.").initCause(e);
             }
-            
-            instance = new POBrowser(initConfig, 
-            			     "Proof Obligation Browser", 
-            			     defaultPm);
-        }
-        instance.po = null;
-        instance.setVisible(true);
-        return instance;
+	}
+	instance.po = null;
+	instance.setVisible(true);
+	return instance;
     }
-    
 
     /**
      * Shows the PO browser.
@@ -220,97 +218,32 @@ public class POBrowser extends JDialog {
 	return showInstance(initConfig, null);
     }
 
-    
-    
-    //-------------------------------------------------------------------------
-    //internal methods
-    //-------------------------------------------------------------------------
-    
+    // -------------------------------------------------------------------------
+    // internal methods
+    // -------------------------------------------------------------------------
+
     private void showPOsFor(KeYJavaType kjt) {
-	ImmutableList<String> pos = ImmutableSLList.<String>nil();
+	ImmutableList<String> pos = poProvider.getPOsFor(specRepos, javaInfo,
+	        kjt);
 
-	//BehaviouralSubtypingInv
-	if(specRepos.getClassInvariants(kjt).size() > 0
-	   && javaInfo.getDirectSuperTypes(kjt).size() > 0) {
-	    pos = pos.append("BehaviouralSubtypingInv");
-	}
-
-/*        
-	//BehaviouralSubtypingOp
-	IList<ProgramMethod> pms = javaInfo.getAllProgramMethods(kjt);
-	Iterator<ProgramMethod> it = pms.iterator();
-	boolean foundContract = false;
-	while(it.hasNext()) {
-	    ProgramMethod pm = it.next();
-	    if(specRepos.getOperationContracts(pm).size() > 0) {
-		foundContract = true;
-		break;
-	    }
-	}
-	if(foundContract && javaInfo.getDirectSuperTypes(kjt).size() > 0) {
-	    pos = pos.append("BehaviouralSubtypingOp");
-	}	
-*/
-        
-	//show
+	// show
 	poList.setListData(pos.toArray(new String[pos.size()]));
-	if(pos.size() > 0) {
+	if (pos.size() > 0) {
 	    poList.setSelectedIndex(0);
 	    startButton.setEnabled(true);
 	} else {
 	    startButton.setEnabled(false);
 	}
     }
-    
-    
-    private void showPOsFor(ProgramMethod pm) {
-	ImmutableList<String> pos = ImmutableSLList.<String>nil();
 
-/*        
-	//BehaviouralSubtypingOpPair
-	if(specRepos.getOperationContracts(pm).size() > 0 
-	   && javaInfo.getDirectSuperTypes(pm.getContainerType()).size() > 0) {
-	    pos = pos.append("BehaviouralSubtypingOpPair");
-	}
-*/
-	
-	//StrongOperationContract
-	if(specRepos.getOperationContracts(pm).size() > 0) {
-	    pos = pos.append("StrongOperationContract");
-	}
-	
-	//PreservesInv
-	pos = pos.append("PreservesInv");
-	
-	//PreservesOwnInv
-	if(specRepos.getClassInvariants(pm.getContainerType()).size() > 0) {
-	    pos = pos.append("PreservesOwnInv");
-	}
-	
-	//EnsuresPost
-	if(specRepos.getOperationContracts(pm).size() > 0) {
-	    pos = pos.append("EnsuresPost");
-	}
-	
-	//RespectsModifies
-	if(specRepos.getOperationContracts(pm).size() > 0) {
-	    pos = pos.append("RespectsModifies");	    
-	}
-	
-	//implemented by mbender for jmltest
-	//Specification Extraction
-        if(specRepos.getOperationContracts(pm).size() > 0) {
-            pos = pos.append("SpecificationExtraction");
-        }
-	
-	//PreservesGuard
-	pos = pos.append("PreservesGuard");
-	
-	//show
+    private void showPOsFor(ProgramMethod pm) {
+	ImmutableList<String> pos = poProvider.getPOsFor(specRepos, pm);
+
+	// show
 	poList.setListData(pos.toArray(new String[pos.size()]));
-	if(pos.size() > 0) {
+	if (pos.size() > 0) {
 	    poList.setSelectedValue("EnsuresPost", true);
-	    if(poList.getSelectedIndex() == -1) {
+	    if (poList.getSelectedIndex() == -1) {
 		poList.setSelectedIndex(0);
 	    }
 	    startButton.setEnabled(true);
@@ -318,253 +251,198 @@ public class POBrowser extends JDialog {
 	    startButton.setEnabled(false);
 	}
     }
-    
-    
+
     private void clearPOList() {
 	poList.setListData(new Object[0]);
 	startButton.setEnabled(false);
-    }    
-    
-    
+    }
+
     /**
      * Lets the user select a supertype of subKJT in a dialog window.
      */
-    private KeYJavaType askUserForSupertype(KeYJavaType subKJT, 
-	    				    JavaInfo javaInfo) {
-	//collect supertypes
-	ImmutableSet<KeYJavaType> superKJTs = DefaultImmutableSet.<KeYJavaType>nil();
-	Iterator<KeYJavaType> it = javaInfo.getAllSupertypes(subKJT).iterator();
-	while(it.hasNext()) {
-	    superKJTs = superKJTs.add(it.next());
+    private KeYJavaType askUserForSupertype(KeYJavaType subKJT,
+	    JavaInfo javaInfo) {
+	// collect supertypes
+	ImmutableSet<KeYJavaType> superKJTs = DefaultImmutableSet
+	        .<KeYJavaType> nil();
+	for (KeYJavaType keYJavaType : javaInfo.getAllSupertypes(subKJT)) {
+	    superKJTs = superKJTs.add(keYJavaType);
 	}
-	
-	//ask user
-        ClassSelectionDialog dlg = new ClassSelectionDialog(
-        		"Please select a supertype",
-        		"Supertypes of " + subKJT.getName(),
-        		superKJTs,
-        		false);
-        if(!dlg.wasSuccessful()) {
-            return null;
-        }
-        
-        //return selection
-        ImmutableSet<KeYJavaType> selectedKJTs = dlg.getSelection();
-        if(selectedKJTs.size() == 0) {
-            return null;
-        } else {
-            return selectedKJTs.iterator().next();
-        }
+
+	// ask user
+	ClassSelectionDialog dlg = new ClassSelectionDialog(
+	        "Please select a supertype", "Supertypes of "
+	                + subKJT.getName(), superKJTs, false);
+	if (!dlg.wasSuccessful()) {
+	    return null;
+	}
+
+	// return selection
+	ImmutableSet<KeYJavaType> selectedKJTs = dlg.getSelection();
+	if (selectedKJTs.size() == 0) {
+	    return null;
+	} else {
+	    return selectedKJTs.iterator().next();
+	}
     }
-    
-    
+
     private ProofOblInput createPO() {
 	ClassTree.Entry selectedEntry = classTree.getSelectedEntry();
 	String poString = (String) poList.getSelectedValue();
-	
-	if (poString.equals("BehaviouralSubtypingInv")) {
-            assert selectedEntry.kjt != null;
-            return createBehaviouralSubtypingInvPO(selectedEntry.kjt);
-        } else if (poString.equals("BehaviouralSubtypingOp")) {
-            assert selectedEntry.kjt != null;
-            return createBehaviouralSubtypingOpPO(selectedEntry.kjt);
-        } else if (poString.equals("BehaviouralSubtypingOpPair")) {
-            assert selectedEntry.pm != null;
-            return createBehaviouralSubtypingOpPairPO(selectedEntry.pm);
-        } else if (poString.equals("StrongOperationContract")) {
-            assert selectedEntry.pm != null;
-            return createStrongOperationContractPO(selectedEntry.pm);
-        } else if (poString.equals("PreservesInv")) {
-            assert selectedEntry.pm != null;
-            return createPreservesInvPO(selectedEntry.pm);
-        } else if (poString.equals("PreservesOwnInv")) {
-            assert selectedEntry.pm != null;
-            return createPreservesOwnInvPO(selectedEntry.pm);
-        } else if (poString.equals("EnsuresPost")) {
-            assert selectedEntry.pm != null;
-            return createEnsuresPostPO(selectedEntry.pm);
-        } else if (poString.equals("RespectsModifies")) {
-            assert selectedEntry.pm != null;
-            return createRespectsModifiesPO(selectedEntry.pm);
-        } else if (poString.equals("PreservesGuard")) {
-            assert selectedEntry.pm != null;
-            return createPreservesGuardPO(selectedEntry.pm);
-        } else if (poString.equals("SpecificationExtraction")) {
-            assert selectedEntry.pm != null;
-            return createSpecExtPO(selectedEntry.pm);
-        } else
-            assert false;
-        return null;
+
+	return createPO(selectedEntry, poString);
     }
 
-    
+    protected ProofOblInput createPO(ClassTree.Entry selectedEntry,
+	    String poString) {
+	if (poString.equals(DefaultPOProvider.BEHAVIOURAL_SUBTYPING_INV)) {
+	    assert selectedEntry.kjt != null;
+	    return createBehaviouralSubtypingInvPO(selectedEntry.kjt);
+	} else if (poString.equals("BehaviouralSubtypingOp")) {
+	    assert selectedEntry.kjt != null;
+	    return createBehaviouralSubtypingOpPO(selectedEntry.kjt);
+	} else if (poString.equals("BehaviouralSubtypingOpPair")) {
+	    assert selectedEntry.pm != null;
+	    return createBehaviouralSubtypingOpPairPO(selectedEntry.pm);
+	} else if (poString.equals(DefaultPOProvider.STRONG_OPERATION_CONTRACT)) {
+	    assert selectedEntry.pm != null;
+	    return createStrongOperationContractPO(selectedEntry.pm);
+	} else if (poString.equals(DefaultPOProvider.PRESERVES_INV)) {
+	    assert selectedEntry.pm != null;
+	    return createPreservesInvPO(selectedEntry.pm);
+	} else if (poString.equals(DefaultPOProvider.PRESERVES_OWN_INV)) {
+	    assert selectedEntry.pm != null;
+	    return createPreservesOwnInvPO(selectedEntry.pm);
+	} else if (poString.equals(DefaultPOProvider.ENSURES_POST)) {
+	    assert selectedEntry.pm != null;
+	    return createEnsuresPostPO(selectedEntry.pm);
+	}  else if (poString.equals(DefaultPOProvider.RESPECTS_MODIFIES)) {
+	    assert selectedEntry.pm != null;
+	    return createRespectsModifiesPO(selectedEntry.pm);
+	} else if (poString.equals(DefaultPOProvider.PRESERVES_GUARD)) {
+	    assert selectedEntry.pm != null;
+	    return createPreservesGuardPO(selectedEntry.pm);
+	} else if (poString.equals(DefaultPOProvider.SPECIFICATION_EXTRACTION)) {
+	    assert selectedEntry.pm != null;
+	    return createSpecExtPO(selectedEntry.pm);
+	} else
+	    assert false;
+	return null;
+    }
+
     private ProofOblInput createBehaviouralSubtypingInvPO(KeYJavaType kjt) {
 	KeYJavaType superKJT = askUserForSupertype(kjt, javaInfo);
-	if(superKJT != null) {
-	    return new BehaviouralSubtypingInvPO(initConfig, 
-		         			 kjt, 
-		         			 superKJT);
+	if (superKJT != null) {
+	    return poProvider.createBehaviouralSubtypingInvPO(initConfig, kjt, superKJT);
 	} else {
 	    return null;
 	}
     }
 
-    
     private ProofOblInput createBehaviouralSubtypingOpPO(KeYJavaType kjt) {
 	assert false;
-	return null; //TODO    
+	return null; // TODO
     }
-    
-    
+
     private ProofOblInput createBehaviouralSubtypingOpPairPO(ProgramMethod pm) {
 	assert false;
-	return null; //TODO
+	return null; // TODO
     }
-    
-    
+
     private ProofOblInput createStrongOperationContractPO(ProgramMethod pm) {
-	ContractConfigurator cc = new ContractConfigurator(this,
-						           services,
-						           pm,
-						           null,
-						           true,
-						           false,
-						           true,
-						           true);
-	if(cc.wasSuccessful()) {
-	    return new StrongOperationContractPO(initConfig, 
-		    				 cc.getContract(), 
-		    				 cc.getAssumedInvs(), 
-		    				 cc.getEnsuredInvs());
+	ContractConfigurator cc = new ContractConfigurator(this, services, pm,
+	        null, true, false, true, true);
+	if (cc.wasSuccessful()) {
+	    return poProvider.createStrongOperationContractPO(initConfig,
+		    cc.getContract(), cc.getAssumedInvs(), cc.getEnsuredInvs());
 	} else {
 	    return null;
 	}
     }
- 
-    
+
     private ProofOblInput createPreservesInvPO(ProgramMethod pm) {
-	ContractConfigurator cc = new ContractConfigurator(this, 
-						           services, 
-						           pm, 
-						           null, 
-						           false,
-						           false,
-						           true, 
-						           true);
-	if(cc.wasSuccessful()) {
-	    return new PreservesInvPO(initConfig, 
-                                      pm, 
-                                      cc.getAssumedInvs(), 
-                                      cc.getEnsuredInvs());
+	ContractConfigurator cc = new ContractConfigurator(this, services, pm,
+	        null, false, false, true, true);
+	if (cc.wasSuccessful()) {
+	    return poProvider.createPreservesInvPO(initConfig, pm,
+		    cc.getAssumedInvs(), cc.getEnsuredInvs());
 	} else {
 	    return null;
 	}
     }
-    
-    
+
     private ProofOblInput createPreservesOwnInvPO(ProgramMethod pm) {
-	return new PreservesOwnInvPO(initConfig, pm);
+	return poProvider.createPreservesOwnInvPO(initConfig, pm);
     }
-    
-    
+
     private ProofOblInput createEnsuresPostPO(ProgramMethod pm) {
-	ContractConfigurator cc = new ContractConfigurator(this,
-						           services, 
-						           pm, 
-						           null, 
-						           true,
-						           true,
-						           true,
-						           false);
-	if(cc.wasSuccessful()) {
-	    return new EnsuresPostPO(initConfig, 
-                                     cc.getContract(), 
-                                     cc.getAssumedInvs());
+	ContractConfigurator cc = new ContractConfigurator(this, services, pm,
+	        null, true, true, true, false);
+	if (cc.wasSuccessful()) {
+	    return poProvider.createEnsuresPostPO(initConfig, cc.getContract(),
+		    cc.getAssumedInvs());
 	} else {
 	    return null;
 	}
     }
-    
-    
+
     private ProofOblInput createRespectsModifiesPO(ProgramMethod pm) {
-	ContractConfigurator cc = new ContractConfigurator(this,
-						           services,
-						           pm,
-						           null,
-						           true,
-						           false,
-						           true,
-						           false);
-	if(cc.wasSuccessful()) {
-	    return new RespectsModifiesPO(initConfig, 
-                                          cc.getContract(), 
-                                          cc.getAssumedInvs());
+	ContractConfigurator cc = new ContractConfigurator(this, services, pm,
+	        null, true, false, true, false);
+	if (cc.wasSuccessful()) {
+	    return poProvider.createRespectsModifiesPO(initConfig,
+		    cc.getContract(), cc.getAssumedInvs());
 	} else {
 	    return null;
 	}
     }
-    
-    
+
     private ProofOblInput createPreservesGuardPO(ProgramMethod pm) {
-        //let the user select the guarded invariants 
-        ClassInvariantSelectionDialog dlg = new ClassInvariantSelectionDialog(
-                                        "Please select the guarded invariants",
-                                        initConfig.getServices(), 
-                                        false, 
-                                        pm.getContainerType());
-        if(dlg.wasSuccessful()) {
-            //let the user select the guard classes
-            ImmutableSet<KeYJavaType> allKJTs = DefaultImmutableSet.<KeYJavaType>nil();
-            final Iterator<KeYJavaType> it = javaInfo.getAllKeYJavaTypes().iterator();
-            while(it.hasNext()) {
-        	allKJTs = allKJTs.add(it.next());
-            }
-            ClassSelectionDialog dlg2
-                    = new ClassSelectionDialog("Please select the guard",
-                                               "Available classes",
-                                               allKJTs,
-                                               pm.getContainerType(),
-                                               true);
-            if(dlg2.wasSuccessful()) {
-        	return new PreservesGuardPO(initConfig, 
-					    pm, 
-					    dlg.getSelection(),
-					    dlg2.getSelection());
-            } else {
-        	return null;
-            }
-        } else {
-            return null;
-        }
+	// let the user select the guarded invariants
+	ClassInvariantSelectionDialog dlg = new ClassInvariantSelectionDialog(
+	        "Please select the guarded invariants",
+	        initConfig.getServices(), false, pm.getContainerType());
+	if (dlg.wasSuccessful()) {
+	    // let the user select the guard classes
+	    ImmutableSet<KeYJavaType> allKJTs = DefaultImmutableSet
+		    .<KeYJavaType> nil();
+	    for (KeYJavaType keYJavaType : javaInfo.getAllKeYJavaTypes()) {
+		allKJTs = allKJTs.add(keYJavaType);
+	    }
+	    ClassSelectionDialog dlg2 = new ClassSelectionDialog(
+		    "Please select the guard", "Available classes", allKJTs,
+		    pm.getContainerType(), true);
+	    if (dlg2.wasSuccessful()) {
+		return poProvider.createPreservesGuardPO(initConfig, pm,
+		        dlg.getSelection(), dlg2.getSelection());
+	    } else {
+		return null;
+	    }
+	} else {
+	    return null;
+	}
     }
-    
-//    implemented by mbender for jmltest
+
+    // implemented by mbender for jmltest
     private ProofOblInput createSpecExtPO(ProgramMethod pm) {
-        ContractConfigurator cc = new ContractConfigurator(this,
-                                                           services, 
-                                                           pm, 
-                                                           null, 
-                                                           true,
-                                                           true,
-                                                           true,
-                                                           false);
-        if(cc.wasSuccessful()) {
-            return new SpecExtPO(initConfig, 
-                                     cc.getContract(), 
-                                     cc.getAssumedInvs(),pm);
-        } else {
-            return null;
-        }
+	ContractConfigurator cc = new ContractConfigurator(this, services, pm,
+	        null, true, true, true, false);
+	if (cc.wasSuccessful()) {
+	    return poProvider.createSpecExtPO(initConfig, cc.getContract(),
+		    cc.getAssumedInvs(), pm);
+	} else {
+	    return null;
+	}
     }
-    
-    
-    //-------------------------------------------------------------------------
-    //public interface
-    //-------------------------------------------------------------------------
-    
-    public ProofOblInput getAndClearPO(){
-        ProofOblInput result = po;
-        po = null; //to prevent memory leaks
-        return result;
+
+    // -------------------------------------------------------------------------
+    // public interface
+    // -------------------------------------------------------------------------
+
+    public ProofOblInput getAndClearPO() {
+	ProofOblInput result = po;
+	po = null; // to prevent memory leaks
+	return result;
     }
+
 }

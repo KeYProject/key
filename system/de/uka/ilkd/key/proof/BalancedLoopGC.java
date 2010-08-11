@@ -1,13 +1,11 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
 package de.uka.ilkd.key.proof;
-
-import java.util.Iterator;
 
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.RuleSet;
@@ -66,9 +64,8 @@ public class BalancedLoopGC extends DefaultGoalChooser {
     }
 
     protected boolean ruleSetCriterion(Taclet t, String ruleSetName){
-        Iterator<RuleSet> it = t.getRuleSets().iterator();
-        while(it.hasNext()){
-            if(it.next().name().toString().equals(ruleSetName)){
+        for (RuleSet ruleSet : t.getRuleSets()) {
+            if (ruleSet.name().toString().equals(ruleSetName)) {
                 return true;
             }
         }

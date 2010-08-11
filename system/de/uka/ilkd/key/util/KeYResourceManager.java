@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -18,6 +18,9 @@ package de.uka.ilkd.key.util;
 
 import java.io.*;
 import java.net.URL;
+import java.nio.channels.Channels;
+import java.nio.channels.FileChannel;
+import java.nio.channels.ReadableByteChannel;
 
 import javax.swing.ImageIcon;
 
@@ -149,17 +152,22 @@ public class KeYResourceManager {
 				    String targetLocation) {
 	return copyIfNotExists(o.getClass(),resourcename,targetLocation);
     }
-
+    
     public boolean copyIfNotExists(Class cl, String resourcename, 
-				   String targetLocation) {
+		   String targetLocation) {
+	return copy(cl, resourcename, targetLocation, false);
+    }
+
+    public boolean copy(Class cl, String resourcename, 
+			String targetLocation, boolean overwrite) {
 	URL resourceURL = cl.getResource(resourcename);
 
         Debug.out("Load Resource:"+resourcename+" of class "+cl);
 	
         if (resourceURL == null && cl.getSuperclass() != null) {
-	    return  copyIfNotExists(cl.getSuperclass(),
-				    resourcename,
-				    targetLocation);
+	    return  copy(cl.getSuperclass(),
+			 resourcename,
+			 targetLocation, overwrite);
 	} else if (resourceURL == null && cl.getSuperclass() == null) {
 	    // error message Resource not found
 	    System.out.println("No resource "+ resourcename + " found");
@@ -169,9 +177,11 @@ public class KeYResourceManager {
 	// copying the resource to the target if targetfile 
 	// does not exist yet
 	boolean result = false;
+	ReadableByteChannel sourceStream = null;
+	FileChannel targetStream  = null;
 	try{
 	    File targetFile = new File(targetLocation);
-	    if (!targetFile.exists()){
+	    if (overwrite || !targetFile.exists()){
 		result = true;
 		if (targetFile.getParentFile() != null) {
 		    targetFile.getParentFile().mkdirs();
@@ -179,23 +189,36 @@ public class KeYResourceManager {
 		targetFile.createNewFile();	    
 		targetFile.deleteOnExit();
 		
-		InputStream sourceStream = resourceURL.openStream();
-		FileOutputStream targetStream = 
-		    new FileOutputStream (targetFile);  
+		sourceStream = Channels.newChannel(resourceURL.openStream());		
+		targetStream = new FileOutputStream (targetFile).getChannel();  
 		
-		int copyItem;
-		copyItem = sourceStream.read();
-		while (copyItem > -1){
-		    targetStream.write(copyItem);
-		    copyItem = sourceStream.read();
+		long actualTransferredByte = targetStream.transferFrom(sourceStream, 0, Long.MAX_VALUE);
+		if (actualTransferredByte < 0 || actualTransferredByte == Long.MAX_VALUE) {
+		    throw new RuntimeException("File " + resourcename + " too big.");
 		}
-		sourceStream.close();
-		targetStream.close();
 	    }
 	} catch(Exception e) {
 	    System.err.println("KeYError: " + e);
 	    return false;
-	}	
+	} finally {	    
+	    if (sourceStream != null) {
+		try {
+	            sourceStream.close();
+                } catch (IOException e) {
+        	    System.err.println("KeYError: " + e);
+        	    result = false;
+                }
+	    }
+	    if (targetStream != null) {
+		try {
+		    targetStream.close();
+                } catch (IOException e) {
+        	    System.err.println("KeYError: " + e);
+        	    result = false;
+                }
+	    }
+	}
+	
 	return result;
     }
 

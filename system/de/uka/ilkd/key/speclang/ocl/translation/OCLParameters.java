@@ -1,17 +1,10 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
-//This file is part of KeY - Integrated Deductive Software Design
-//Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
-//                      Universitaet Koblenz-Landau, Germany
-//                      Chalmers University of Technology, Sweden
-//
-//The KeY system is protected by the GNU General Public License. 
-//See LICENSE.TXT for details.
 //
 //
 
@@ -43,11 +36,9 @@ class OCLParameters extends SLParameters {
     
     private static ImmutableList<SLExpression> convertToListOfSLExpression(ImmutableList<OCLExpression> list) {
         ImmutableList<SLExpression> result = ImmutableSLList.<SLExpression>nil();
-        
-        Iterator<OCLExpression> it = list.iterator();
-        
-        while(it.hasNext()) {
-            result = result.append(it.next());
+
+        for (OCLExpression aList : list) {
+            result = result.append(aList);
         }
         
         return result;
@@ -66,18 +57,16 @@ class OCLParameters extends SLParameters {
     
     public String toString() {
         String result = "(";
-        
-        Iterator<LogicVariable> it = declaredVars.iterator();
-        while(it.hasNext()) {
-            result += it.next() + ",";
+
+        for (LogicVariable declaredVar : declaredVars) {
+            result += declaredVar + ",";
         }
         if(!declaredVars.isEmpty()) {
             result = result.substring(0, result.length() - 1) + "|";
         }
-        
-        Iterator<OCLExpression> it2 = entities.iterator();
-        while(it2.hasNext()) {
-            result += it2.next() + ",";
+
+        for (OCLExpression entity : entities) {
+            result += entity + ",";
         }
         if(!entities.isEmpty()) {
             result = result.substring(0, result.length() - 1);

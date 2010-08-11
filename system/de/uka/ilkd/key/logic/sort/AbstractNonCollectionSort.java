@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -17,11 +17,11 @@ import de.uka.ilkd.key.logic.op.SortDependingSymbol;
 public abstract class AbstractNonCollectionSort extends AbstractSort implements
         NonCollectionSort {
 
-    protected AbstractCollectionSort setSort;
+    protected final AbstractCollectionSort setSort;
 
-    protected AbstractCollectionSort bagSort;
+    protected final AbstractCollectionSort bagSort;
 
-    protected AbstractCollectionSort sequenceSort;
+    protected final AbstractCollectionSort sequenceSort;
   
 
     /** creates a Sort (with a new equality symbol for this sort) */

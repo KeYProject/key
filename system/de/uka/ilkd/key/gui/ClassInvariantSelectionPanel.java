@@ -1,16 +1,9 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
 // The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General Public License.
 // See LICENSE.TXT for details.
 //
 //
@@ -35,9 +28,12 @@ import javax.swing.tree.DefaultTreeCellRenderer;
 
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
+import de.uka.ilkd.key.rtsj.proof.init.RTSJProfile;
 import de.uka.ilkd.key.speclang.ClassInvariant;
 
 
@@ -260,6 +256,11 @@ class ClassInvariantSelectionPanel extends JPanel {
         //set default selection
         if(selectDefaultInvs) {
             selectAllForClass(defaultClass);
+            Profile prof = services.getProof()!=null ? services.getProof().getSettings().getProfile() :
+                ProofSettings.DEFAULT_SETTINGS.getProfile();
+            if(prof instanceof RTSJProfile){
+                addAllRealtimeInvs();
+            }
         }
         updateInvList();
     }
@@ -315,9 +316,8 @@ class ClassInvariantSelectionPanel extends JPanel {
         ClassTree.Entry te = (ClassTree.Entry) node.getUserObject();
         if(te.kjt != null) {
             ImmutableSet<ClassInvariant> invs = getRelevantInvs(te.kjt);
-            Iterator<ClassInvariant> it = invs.iterator();
-            while(it.hasNext()) {
-                if(selectedInvs.contains(it.next())) {
+            for (ClassInvariant inv : invs) {
+                if (selectedInvs.contains(inv)) {
                     numSelectedMembers++;
                 }
             }
@@ -338,13 +338,13 @@ class ClassInvariantSelectionPanel extends JPanel {
         
         //update selection counters in tree
         Object[] nodes = classTree.getSelectionPath().getPath();
-        for(int i = 0; i < nodes.length; i++) {
-            DefaultMutableTreeNode node = (DefaultMutableTreeNode)(nodes[i]);
+        for (Object node1 : nodes) {
+            DefaultMutableTreeNode node = (DefaultMutableTreeNode) (node1);
             ClassTree.Entry te = (ClassTree.Entry) node.getUserObject();
             te.numSelectedMembers++;
-            assert te.numSelectedMembers > 0 
-                   && te.numSelectedMembers <= te.numMembers;
-            
+            assert te.numSelectedMembers > 0
+                    && te.numSelectedMembers <= te.numMembers;
+
         }
         classTree.repaint();
     }
@@ -361,12 +361,12 @@ class ClassInvariantSelectionPanel extends JPanel {
         
         //update selection counters in tree
         Object[] nodes = classTree.getSelectionPath().getPath();
-        for(int i = 0; i < nodes.length; i++) {
-            DefaultMutableTreeNode node = (DefaultMutableTreeNode)(nodes[i]);
+        for (Object node1 : nodes) {
+            DefaultMutableTreeNode node = (DefaultMutableTreeNode) (node1);
             ClassTree.Entry te = (ClassTree.Entry) node.getUserObject();
             te.numSelectedMembers--;
-            assert te.numSelectedMembers >= 0 
-                   && te.numSelectedMembers < te.numMembers;
+            assert te.numSelectedMembers >= 0
+                    && te.numSelectedMembers < te.numMembers;
         }
         classTree.repaint();
     }
@@ -388,10 +388,27 @@ class ClassInvariantSelectionPanel extends JPanel {
         //select all
         selectedInvs = DefaultImmutableSet.<ClassInvariant>nil();
 	final Set<KeYJavaType> kjts = services.getJavaInfo().getAllKeYJavaTypes();
-	final Iterator<KeYJavaType> it = kjts.iterator();
-        while (it.hasNext()) {
-            final KeYJavaType kjt = it.next();            
+        for (final KeYJavaType kjt : kjts) {
             selectedInvs = selectedInvs.union(getRelevantInvs(kjt));
+        }
+        
+        //update selection counters in tree
+        DefaultMutableTreeNode rootNode
+                = (DefaultMutableTreeNode) classTree.getModel().getRoot();
+        setSelectedInvCounters(rootNode);
+        classTree.repaint();
+    }
+    
+    private void addAllRealtimeInvs() {
+        //select all invariants in javax.realtime and for java.lang.Object.*
+        final Set<KeYJavaType> kjts = services.getJavaInfo().getAllKeYJavaTypes();
+        final Iterator<KeYJavaType> it = kjts.iterator();
+        while (it.hasNext()) {
+            final KeYJavaType kjt = it.next();     
+            if(kjt.getFullName().indexOf("javax.realtime")!=-1 || 
+                    kjt.getFullName().indexOf("java.lang.Object")!=-1){
+                selectedInvs = selectedInvs.union(getRelevantInvs(kjt));
+            }
         }
         
         //update selection counters in tree

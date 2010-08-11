@@ -1,12 +1,10 @@
-//This file is part of KeY - Integrated Deductive Software Design
-//Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
-//                    Universitaet Koblenz-Landau, Germany
-//                    Chalmers University of Technology, Sweden
+// This file is part of KeY - Integrated Deductive Software Design
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
 //
-//The KeY system is protected by the GNU General Public License. 
-//See LICENSE.TXT for details.
-//
-//
+// The KeY system is protected by the GNU General Public License. 
+// See LICENSE.TXT for details.
 
 package de.uka.ilkd.key.smt.test;
 
@@ -15,9 +13,12 @@ import java.io.FileWriter;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedList;
 
 import junit.framework.Assert;
 import junit.framework.TestCase;
+import de.uka.ilkd.key.gui.smt.DecisionProcedureSettings;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.smt.*;
@@ -30,7 +31,7 @@ public class TestSMTBenchmark extends TestCase implements FilenameFilter{
     private static String UNKNOWN = "unknown";
     private static String NOTAVAILABLE = "not installed";
     private static String ERROR = "error";
-    private int maxExecutionTime = 10;
+    private int maxExecutionTime = 100;
     
     public static final String folderPath = System.getProperty("key.home")
     + File.separator + "examples"
@@ -39,24 +40,24 @@ public class TestSMTBenchmark extends TestCase implements FilenameFilter{
     
     public void testBenchmarks() {
 	String[] files = this.collectFilenames();
-	ArrayList<SMTSolver> rules = getRules();
+	Collection<SMTRule> rules = getRules();
 	
-	ArrayList<ArrayList<Proof>> toProof = this.loadGoals(rules.size(), files);
+	ArrayList<ArrayList<Proof>> toProof = this.loadGoals(rules.size(), files,folderPath);
 	ArrayList<ArrayList<String>> results = new ArrayList<ArrayList<String>>();
 	System.out.println();
-	for (int i = 0; i < toProof.size(); i++) {
-	    results.add(proofOneGoal(toProof.get(i), rules));
-	}
+        for (ArrayList<Proof> aToProof : toProof) {
+            results.add(proofOneGoal(aToProof, rules));
+        }
 	this.printResults(files, rules, results);
     }
     
-    private void printResults(String[] sources, ArrayList<SMTSolver> solver, ArrayList<ArrayList<String>> results) {
+    private void printResults(String[] sources, Collection<SMTRule> rules, ArrayList<ArrayList<String>> results) {
 	String output = "";
 	//print header
 	output = "Problem\tFile\t";
-	for (int i = 0; i < solver.size(); i++) {
-	    output = output + solver.get(i).name() + "\t\t";
-	}
+        for (SMTRule rule : rules) {
+            output = output + rule.name() + "\t\t";
+        }
 	output = output + "\n";
 	
 	//print one line for each problem
@@ -70,54 +71,58 @@ public class TestSMTBenchmark extends TestCase implements FilenameFilter{
 	    }
 	    output = output + sources[i] + "\t";
 	    //print the results for the solver
-	    
-	    for (int j = 0; j < problemResults.size(); j++) {
-		output = output + problemResults.get(j) + "\t";
-	    }
+
+        for (String problemResult : problemResults) {
+            output = output + problemResult + "\t";
+        }
 	    output = output + "\n";
 	}
-	storeResults(output);
+	storeResults(output,folderPath + "smtBenchmarkResults.csv");
     }
     
-    private void storeResults(String result) {
+    protected void storeResults(String result, String file) {
 	FileWriter fw;
 	try {
-	    fw = new FileWriter(folderPath + "smtBenchmarkResults.csv");
+	    fw = new FileWriter(file);
 	    fw.write(result);
 	    fw.close();
 	} catch (IOException e) {
 	    System.out.println("Error while writing result file");
 	}
 	
+	
     }
     
-    private boolean hasProblem(ArrayList<String> results) {
+    protected boolean hasProblem(ArrayList<String> results) {
 	boolean hasValid = false;
 	boolean hasInvalid = false;
-	for (int i = 0; i < results.size(); i++) {
-	    if (results.get(i).equals(VALID)) {
-		hasValid = true;
-	    } else if (results.get(i).equals(INVALID)) {
-		hasInvalid = true;
-	    }
-	}
+        for (String result : results) {
+            if (result.equals(VALID)) {
+                hasValid = true;
+            } else if (result.equals(INVALID)) {
+                hasInvalid = true;
+            }
+        }
 	return hasValid && hasInvalid;
     }
     
-    private ArrayList<String> proofOneGoal(ArrayList<Proof> goals, ArrayList<SMTSolver> rules) {
+    protected ArrayList<String> proofOneGoal(ArrayList<Proof> goals, Collection<SMTRule> rules) {
 	ArrayList<String> toReturn = new ArrayList<String>();
-	for (int i = 0; i < goals.size(); i++) {
-	    System.out.print(".");
-	    SMTSolver s = rules.get(i);
+	int i=0; 
+	for(SMTRule rule : rules){
+	    
+	    System.out.print(".");	
 	    Proof p = goals.get(i);
-	    if (s.isInstalled(false)) {
+	    if (rule.isUsable()) {
 		try {
 		    long time = System.currentTimeMillis();		
-	    	    SMTSolverResult result = s.run(p.openGoals().iterator().next(), maxExecutionTime, p.getServices());
+		    rule.setMaxTime(maxExecutionTime);
+	    	    rule.start(p.openGoals().iterator().next(), p.getUserConstraint().getConstraint(),false);
+	    	    LinkedList<SMTSolverResult> list = rule.getResults();
 	    	    time = System.currentTimeMillis() - time;
 	    	    time = time / 100;
 	    	    toReturn.add("" + time/10 + "." + time%10);
-	    	    toReturn.add(this.translateResult(result));
+	    	    toReturn.add(this.translateResult(list.getFirst()));
 		} catch (Exception e) {
 		    toReturn.add(ERROR);
 		    toReturn.add(ERROR);
@@ -126,7 +131,7 @@ public class TestSMTBenchmark extends TestCase implements FilenameFilter{
 		toReturn.add(NOTAVAILABLE);
 		toReturn.add(NOTAVAILABLE);
 	    }
-	    
+	    i++;
 	    
 	}
 	return toReturn;
@@ -138,7 +143,7 @@ public class TestSMTBenchmark extends TestCase implements FilenameFilter{
 	    return VALID;
 	} else if (r.isValid() == SMTSolverResult.ThreeValuedTruth.UNKNOWN) {
 	    return UNKNOWN;
-	} else if (r.isValid() == SMTSolverResult.ThreeValuedTruth.FALSE) {
+	} else if (r.isValid() == SMTSolverResult.ThreeValuedTruth.FALSIFIABLE) {
 	    return INVALID;
 	} else {
 	    Assert.assertTrue(false);
@@ -146,12 +151,12 @@ public class TestSMTBenchmark extends TestCase implements FilenameFilter{
 	}
     }
     
-    private ArrayList<ArrayList<Proof>> loadGoals(int multiplicity, String[] sources) {
+    protected ArrayList<ArrayList<Proof>> loadGoals(int multiplicity, String[] sources, String folder) {
 	ArrayList<ArrayList<Proof>> toReturn = new ArrayList<ArrayList<Proof>>();
-	for (int i = 0; i < sources.length; i++) {
-	    String path = folderPath + sources[i];
-	    toReturn.add(getSingleGoal(path, multiplicity));
-	}
+        for (String source : sources) {
+            String path = folderPath + source;
+            toReturn.add(getSingleGoal(path, multiplicity));
+        }
 	return toReturn;
     }
     
@@ -178,13 +183,11 @@ public class TestSMTBenchmark extends TestCase implements FilenameFilter{
      * create all Solver, that should be tested
      * @return the Rules, that should be tested.
      */
-    private ArrayList<SMTSolver> getRules() {
-	ArrayList<SMTSolver> toReturn = new ArrayList<SMTSolver>();
-	toReturn.add(new SimplifySolver());
-	toReturn.add(new Z3Solver());
-	toReturn.add(new YicesSolver());
-	toReturn.add(new CVC3Solver());
-	return toReturn;
+    protected Collection<SMTRule> getRules() {
+	
+	return DecisionProcedureSettings.getInstance().getSMTRules();
+	
+	
     }
     
     private String[] collectFilenames() {
@@ -197,10 +200,6 @@ public class TestSMTBenchmark extends TestCase implements FilenameFilter{
     }
     
     public boolean accept(File f, String name) {
-	if (name.substring(name.length()-4, name.length()).equals(".key")) {
-	    return true;
-	} else {
-	    return false;
-	}
+        return name.substring(name.length() - 4, name.length()).equals(".key");
     }
 }

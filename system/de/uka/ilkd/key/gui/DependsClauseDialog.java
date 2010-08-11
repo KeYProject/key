@@ -1,16 +1,9 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
 // The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General Public License.
 // See LICENSE.TXT for details.
 //
 //
@@ -144,9 +137,8 @@ public class DependsClauseDialog extends JDialog {
             ImmutableSet<LocationDescriptor> locations = parser.location_list();
             
             //check for "*"-locations, which are not allowed here
-            Iterator<LocationDescriptor> it = locations.iterator();
-            while(it.hasNext()) {
-                if(it.next() instanceof EverythingLocationDescriptor) {
+            for (LocationDescriptor location : locations) {
+                if (location instanceof EverythingLocationDescriptor) {
                     throw new Exception(
                             "Please use a non-trivial depends clause.");
                 }

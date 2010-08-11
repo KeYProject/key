@@ -1,3 +1,11 @@
+// This file is part of KeY - Integrated Deductive Software Design
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General Public License. 
+// See LICENSE.TXT for details.
+
 package de.uka.ilkd.key.smt;
 
 import java.util.ArrayList;
@@ -103,12 +111,12 @@ public class SmtLibTranslator extends AbstractSMTTranslator {
 	String [] commentPredicate = new String[2];
 	commentPredicate[ContextualBlock.PREDICATE_FORMULA] = "\n\n:notes \"Predicates used in formula:\"";
 	commentPredicate[ContextualBlock.PREDICATE_TYPE]    = "\n\n:notes \"Types expressed by predicates:\"";
-	String [] commentAssumption = new String[4];
+	String [] commentAssumption = new String[5];
 	commentAssumption[ContextualBlock.ASSUMPTION_DUMMY_IMPLEMENTATION] = "\n\n:notes \"Assumptions for dummy variables:\"";
 	commentAssumption[ContextualBlock.ASSUMPTION_FUNCTION_DEFINTION] = "\n\n:notes \"Assumptions for function definitions:\""; 
 	commentAssumption[ContextualBlock.ASSUMPTION_SORT_PREDICATES] = "\n\n:notes \"Assumptions for sort predicates:\"";
 	commentAssumption[ContextualBlock.ASSUMPTION_TYPE_HIERARCHY] = "\n\n:notes \"Assumptions for type hierarchy:\"";
-	
+	commentAssumption[ContextualBlock.ASSUMPTION_TACLET_TRANSLATION] = "\n\n:notes \"Assumptions made of taclets:\"\n\n";
 	//add the logic definition
 	toReturn.append("\n:logic AUFLIA");
 	
@@ -192,9 +200,9 @@ public class SmtLibTranslator extends AbstractSMTTranslator {
 	ArrayList<StringBuffer> AssumptionsToRemove = new ArrayList<StringBuffer>();
 	    StringBuffer assump = new StringBuffer();	
 	
-	for(int k=0; k < commentAssumption.length; k++){
+	for(int k=0; k < assumptionBlocks.size(); k++){
 	    ContextualBlock block = assumptionBlocks.get(k);
-	
+	    	
 	    if (block.getStart() <= block.getEnd()) {
 		assump.append(commentAssumption[block.getType()]);
 	    	    for(int i=block.getStart(); i <= block.getEnd(); i++){
@@ -247,8 +255,7 @@ public class SmtLibTranslator extends AbstractSMTTranslator {
      *         declarations, Argument2 is the sort used for type predicates
      */
     protected StringBuffer translateSort(String name, boolean isIntVal) {
-	StringBuffer uniqueName = makeUnique(new StringBuffer(name));
-	return uniqueName;
+	return makeUnique(new StringBuffer(name));
     }
 
     @Override
@@ -358,15 +365,17 @@ public class SmtLibTranslator extends AbstractSMTTranslator {
 
     @Override
     protected StringBuffer translateIntegerValue(long val) {
-	StringBuffer arg;
-	if (val < 0) {
-	    arg = translateIntegerValue(val * (-1));
-	    arg = translateIntegerUnaryMinus(arg);
-	} else {
-	    arg = new StringBuffer(Long.toString(val));
+	
+	StringBuffer arg =  new StringBuffer(Long.toString(val));
+	
+	if(val < 0){
+	   // delete the minus sign. 
+	   arg = new StringBuffer(arg.substring(1, arg.length()));  
+	   arg = translateIntegerUnaryMinus(arg);
 	}
+	
+	return arg;	
 
-	return arg;
     }
 
     @Override
@@ -376,9 +385,7 @@ public class SmtLibTranslator extends AbstractSMTTranslator {
 
     @Override
     protected StringBuffer translateLogicalVar(StringBuffer name) {
-	StringBuffer toReturn = (new StringBuffer("?"))
-		.append(makeUnique(name));
-	return toReturn;
+	return new StringBuffer("?").append(makeUnique(name));
     }
 
     @Override
@@ -526,10 +533,10 @@ public class SmtLibTranslator extends AbstractSMTTranslator {
 	} else {
 	    toReturn.append("(");
 	    toReturn.append(name);
-	    for (int i = 0; i < args.size(); i++) {
-		toReturn.append(" ");
-		toReturn.append(args.get(i));
-	    }
+        for (StringBuffer arg : args) {
+            toReturn.append(" ");
+            toReturn.append(arg);
+        }
 	    toReturn.append(")");
 	}
 	return toReturn;
@@ -552,7 +559,7 @@ public class SmtLibTranslator extends AbstractSMTTranslator {
     
     private StringBuffer makeUnique(StringBuffer name) {
 	StringBuffer toReturn = new StringBuffer(name);
-	
+
 	//build the replacement pairs
 	ArrayList<String> toReplace = new ArrayList<String>();
 	ArrayList<String> replacement = new ArrayList<String>();
@@ -585,6 +592,14 @@ public class SmtLibTranslator extends AbstractSMTTranslator {
 	
 	toReturn.append("_").append(counter);
 	counter++;
+
+	//CVC3 does not accept identifiers to start with an underscore.
+	//This happens, e.g., when translating ".create(self)", because the leading "." becomes "_dot_"
+	//Removing leading underscores.
+	while(toReturn.charAt(0)=='_'){
+	    toReturn = new StringBuffer(toReturn.substring(1)); //inefficient, but should occur seldom
+	}
+
 	return toReturn;
     }
 

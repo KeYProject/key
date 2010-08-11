@@ -1,10 +1,11 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
+//
 //
 
 package de.uka.ilkd.key.logic;
@@ -154,10 +155,9 @@ public class Namespace implements java.io.Serializable {
 
     public Namespace extended(ImmutableList<Named> ext) {
 	Namespace res=new Namespace(this);
-	Iterator<Named> it=ext.iterator();
-	while (it.hasNext()) {
-	    res.add(it.next());
-	}
+        for (Named anExt : ext) {
+            res.add(anExt);
+        }
 	return res;
     }
 
@@ -188,9 +188,8 @@ public class Namespace implements java.io.Serializable {
             list = list.prepend(localSym);
         } else if (numLocalSyms > 1) {          
             if (symbols != null) {
-                Iterator<Named> it = symbols.values().iterator();
-                while (it.hasNext()) {
-                    Named named = it.next();
+                for (Named named1 : symbols.values()) {
+                    Named named = named1;
                     if (named != null) {
                         list = list.prepend(named);
                     }
@@ -223,18 +222,16 @@ public class Namespace implements java.io.Serializable {
     }
 
     public void add(Namespace source) {
-	Iterator<Named> it=source.elements().iterator();
-	while (it.hasNext()) {
-	    add(it.next());
-	}
+        for (Named named : source.elements()) {
+            add(named);
+        }
 	
     }
 
     public void add(ImmutableList<Named> l) {
-	Iterator<Named> it = l.iterator();
-	while (it.hasNext()) {
-	    add(it.next());
-	}
+        for (Named aL : l) {
+            add(aL);
+        }
     }
 
     public Namespace copy() {
@@ -245,10 +242,9 @@ public class Namespace implements java.io.Serializable {
 	    copy = new Namespace();
 	}
 	//%%%%make more efficient!!!
-	Iterator<Named> it=allElements().iterator();
-	while (it.hasNext()) {
-	    copy.add(it.next());
-	}
+        for (Named named : allElements()) {
+            copy.add(named);
+        }
 	return copy;
     }
     

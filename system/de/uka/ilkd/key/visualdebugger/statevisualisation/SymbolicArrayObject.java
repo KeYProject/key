@@ -1,10 +1,12 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
+//
+//
 package de.uka.ilkd.key.visualdebugger.statevisualisation;
 
 import java.util.*;
@@ -83,8 +85,8 @@ public class SymbolicArrayObject extends SymbolicObject {
         HashSet val = new HashSet(this.equClass2Repr.values());
         s.addAll(val);
 
-        for (Iterator it = s.iterator(); it.hasNext();) {
-            result = result.add((Term) it.next());
+        for (Object value : s) {
+            result = result.add((Term) value);
         }
         return result;
     }
@@ -92,8 +94,8 @@ public class SymbolicArrayObject extends SymbolicObject {
     public ImmutableSet<Term> getAllPostIndex() {
         ImmutableSet<Term> result = DefaultImmutableSet.<Term>nil();
         Set s = index2post.keySet();
-        for (Iterator it = s.iterator(); it.hasNext();) {
-            result = result.add((Term) it.next());
+        for (Object value : s) {
+            result = result.add((Term) value);
         }
         return result;
     }
@@ -135,8 +137,7 @@ public class SymbolicArrayObject extends SymbolicObject {
      */
     private Term getRepres(EquClass cl) {
         Term result = cl.getMembers().iterator().next();
-        for (Iterator<Term> it = cl.getMembers().iterator(); it.hasNext();) {
-            Term next = it.next();
+        for (Term next : cl.getMembers()) {
             if (isNumberLiteral(next)) {
                 result = next;
             }
@@ -167,10 +168,9 @@ public class SymbolicArrayObject extends SymbolicObject {
     public void setIndexConfiguration(ImmutableSet<Term> constraints) {
         indexTerm2EquClass = new HashMap();
         // s.i
-        Iterator<Term> it = constraints.iterator();
-        while (it.hasNext()) {
+        for (Term constraint : constraints) {
             EquClass ec = null;
-            Term t = it.next();
+            Term t = constraint;
             if (t.op() instanceof Equality /* && !containsImplicitAttr(t) */) {
                 if (indexTerm2EquClass.containsKey(t.sub(0))) {
                     ec = (EquClass) indexTerm2EquClass.get(t.sub(0));
@@ -185,9 +185,8 @@ public class SymbolicArrayObject extends SymbolicObject {
                 } else {
                     ec = new EquClass(t.sub(0), t.sub(1));
                 }
-                Iterator<Term> ecIt = ec.getMembers().iterator();
-                while (ecIt.hasNext()) {
-                    indexTerm2EquClass.put(ecIt.next(), ec);
+                for (Term term : ec.getMembers()) {
+                    indexTerm2EquClass.put(term, ec);
                 }
             } else {
                 if (!indexTerm2EquClass.containsKey(t.sub(0).sub(1))) {
@@ -204,15 +203,15 @@ public class SymbolicArrayObject extends SymbolicObject {
         }
 
         this.equClass2Repr = new HashMap();
-        for (Iterator it2 = this.indexTerm2EquClass.values().iterator(); it2
-                .hasNext();) {
+        for (Object o : this.indexTerm2EquClass.values()) {
 
-            EquClass cl = (EquClass) it2.next();
+            EquClass cl = (EquClass) o;
             this.equClass2Repr.put(cl, getRepres(cl));
             /*
              * System.out.println("AAAAAAAAAAA"); System.out.println("Class
              * "+cl.members ); System.out.println("Repr "+this.getRepres(cl));
-             */}
+             */
+        }
 
         this.indexConfiguration = constraints;
 

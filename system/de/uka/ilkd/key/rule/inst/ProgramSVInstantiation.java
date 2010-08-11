@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -80,13 +80,11 @@ public class ProgramSVInstantiation {
 					  JavaProgramElement prgElement) { 
 	ImmutableList<ProgramSVEntry> result = ImmutableSLList.<ProgramSVEntry>nil()
 	    .prepend(new ProgramSVEntry(sv, prgElement));
-	Iterator<ProgramSVEntry> it = list.iterator();	
-	while (it.hasNext()) {
-	    ProgramSVEntry entry = it.next();
-	    if (entry.key() != sv) {
-		result = result.prepend(entry);
-	    }
-	}
+        for (final ProgramSVEntry entry : list) {
+            if (entry.key() != sv) {
+                result = result.prepend(entry);
+            }
+        }
 	return new ProgramSVInstantiation(result);
     }    
 
@@ -94,13 +92,11 @@ public class ProgramSVInstantiation {
      * @return true iff the sv has been instantiated already 
      */
     public boolean isInstantiated(SchemaVariable sv) {
-	Iterator<ProgramSVEntry> it = list.iterator();	
-	while (it.hasNext()) {
-	    ProgramSVEntry entry = it.next();
-	    if (entry.key() == sv) {
-		return true;
-	    }
-	}
+        for (ProgramSVEntry entry : list) {
+            if (entry.key() == sv) {
+                return true;
+            }
+        }
 	return false;
     }
 
@@ -109,13 +105,11 @@ public class ProgramSVInstantiation {
      * instantiated with, null if no instantiation is stored
      */
     public JavaProgramElement getInstantiation(SchemaVariable sv) {
-	Iterator<ProgramSVEntry> it = list.iterator();	
-	while (it.hasNext()) {
-	    ProgramSVEntry entry = it.next();
-	    if (entry.key() == sv) {
-		return entry.value();
-	    }
-	}
+        for (ProgramSVEntry entry : list) {
+            if (entry.key() == sv) {
+                return entry.value();
+            }
+        }
 	return null;
     }
 
@@ -144,7 +138,7 @@ public class ProgramSVInstantiation {
      * listpings
      */ 
     public boolean equals(Object obj) {
-	ProgramSVInstantiation cmp = null;
+	ProgramSVInstantiation cmp;
 	if (!(obj instanceof ProgramSVInstantiation)) {
 	    return false;
 	} else {

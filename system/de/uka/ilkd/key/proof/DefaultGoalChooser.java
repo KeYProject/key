@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -84,15 +84,14 @@ public class DefaultGoalChooser implements IGoalChooser {
                 findMinimalSubtree ( currentSubtreeRoot );
             }
         } else {
-            final Iterator<Goal> it = p_goals.iterator ();
 
-            while ( it.hasNext () ) {
-                final Goal goal = it.next ();
-                
-                if ( goal.getClosureConstraint ().isSatisfiable () )
-                    goalList     = goalList    .prepend ( goal );
+            for (Goal p_goal : p_goals) {
+                final Goal goal = p_goal;
+
+                if (goal.getClosureConstraint().isSatisfiable())
+                    goalList = goalList.prepend(goal);
                 else
-                    selectedList = selectedList.prepend ( goal );
+                    selectedList = selectedList.prepend(goal);
             }
 
             allGoalsSatisfiable = selectedList.isEmpty ();
@@ -213,18 +212,17 @@ public class DefaultGoalChooser implements IGoalChooser {
     }
 
     protected ImmutableList<Goal> insertNewGoals (ImmutableList<Goal> newGoals, ImmutableList<Goal> prevGoalList) {
-        final Iterator<Goal> it = newGoals.iterator ();
-        
-        while ( it.hasNext () ) {
-            final Goal g = it.next ();
-            
-            if (proof.openGoals ().contains ( g )) {
-                if ( !allGoalsSatisfiable
-                        && g.getClosureConstraint ()
-                                .isSatisfiable () )
-                    goalList = goalList.prepend ( g );
+
+        for (Goal newGoal : newGoals) {
+            final Goal g = newGoal;
+
+            if (proof.openGoals().contains(g)) {
+                if (!allGoalsSatisfiable
+                        && g.getClosureConstraint()
+                        .isSatisfiable())
+                    goalList = goalList.prepend(g);
                 else
-                    prevGoalList = prevGoalList.prepend ( g );
+                    prevGoalList = prevGoalList.prepend(g);
             }
         }
         return prevGoalList;

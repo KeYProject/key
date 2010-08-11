@@ -1,3 +1,10 @@
+// This file is part of KeY - Integrated Deductive Software Design
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General Public License. 
+// See LICENSE.TXT for details.
 package de.uka.ilkd.key.collection;
 
 import java.lang.reflect.Array;
@@ -77,9 +84,9 @@ public class ImmutableArray<S> implements java.lang.Iterable<S>, java.io.Seriali
 
     public int hashCode() {
 	if (hashCode == -1) {
-	    for(int i = 0; i < content.length; i++) {
-		hashCode += 17 * content[i].hashCode();
-	    }
+        for (S aContent : content) {
+            hashCode += 17 * aContent.hashCode();
+        }
 	    if(hashCode == -1) {
 		hashCode = -2;
 	    }
@@ -114,7 +121,7 @@ public class ImmutableArray<S> implements java.lang.Iterable<S>, java.io.Seriali
 	StringBuilder sb = new StringBuilder();
 	sb.append("[");
 	for (int i = 0, sz = size(); i < sz; i++) {
-	    sb.append(""+content[i]);
+        sb.append(content[i]);
 	    if (i<sz-1) sb.append(",");
 	}
 	sb.append("]");

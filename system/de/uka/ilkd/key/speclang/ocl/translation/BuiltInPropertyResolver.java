@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -127,15 +127,13 @@ class BuiltInPropertyResolver extends SLExpressionResolver {
             }
             
             Term restrictions = trueTerm;
-            Iterator<LogicVariable> it 
-                    = declaredVars.iterator();
-            while(it.hasNext()) {
+            for (LogicVariable declaredVar : declaredVars) {
                 Term t = replaceVar(((OCLCollection) receiver.getCollection()).getPredVar(),
-                                    it.next(),
-                                    ((OCLCollection) receiver.getCollection()).getPredicativeRestriction());
+                        declaredVar,
+                        ((OCLCollection) receiver.getCollection()).getPredicativeRestriction());
                 restrictions = tf.createJunctorTermAndSimplify(Op.AND,
-                                                               restrictions,
-                                                               t);
+                        restrictions,
+                        t);
             }
             
             Term subTerm 

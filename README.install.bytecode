@@ -96,6 +96,15 @@ Optionally, KeY can make use of the following binaries:
 	Go to subdirectory bin and run 'startProver' (Windows: 'startProver.bat')
 
 
+(5) Start KeY in Test Generation Mode
+-------------------------------------
+
+	Run 'startProver unit' or if you wish a simpler GUI run 'startProver testing'
+	  (Windows: 'startProver.bat unit' or 'startProver.bat testing')
+	
+	The library objenesis.jar may be required to run the generated tests.
+
+
 -------------------------------
 
 If you encounter problems, please send a message to

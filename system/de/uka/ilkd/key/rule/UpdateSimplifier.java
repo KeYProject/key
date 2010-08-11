@@ -1,10 +1,11 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
+//
 //
 package de.uka.ilkd.key.rule;
 
@@ -60,7 +61,8 @@ public class UpdateSimplifier {
      */
     public UpdateSimplifier(boolean deletionEnabled, boolean eager) {
 	this.eager = eager;
-        ImmutableList<IUpdateRule> usRules = ImmutableSLList.<IUpdateRule>nil().    
+        ImmutableList<IUpdateRule> usRules = ImmutableSLList.<IUpdateRule>nil().
+        append(new ApplyOnWorkingSpaceNonRigid(this)).
         append(new ApplyOnAnonymousUpdate(this)).
         append(new ApplyAnonymousUpdateOnNonRigid(this)).
         append(new ApplyOnUpdate(this)).
@@ -90,16 +92,12 @@ public class UpdateSimplifier {
 
     
     public Term simplify(Update update, Term t, Services services) {
-	Term simplifiedTerm = t;
-	for (int i = 0; i<simplificationRules.length; i++) {	    
-	    if (simplificationRules[i].isApplicable(update, 
-	                                            simplifiedTerm)) {
-		return simplificationRules[i].apply(update, 
-						    simplifiedTerm, 
-						    services);		
-	    }
-	}
-	return simplifiedTerm;
+        for (IUpdateRule simplificationRule : simplificationRules) {
+            if (simplificationRule.isApplicable(update, t)) {
+                return simplificationRule.apply(update, t, services);
+            }
+        }
+	return t;
     }
 
     /**
@@ -122,9 +120,9 @@ public class UpdateSimplifier {
     public Term matchingCondition (Update update, 
 	    			   Term target, 
 	    			   Services services) {
-        for ( int i = 0; i < simplificationRules.length; i++ ) {
-            if ( simplificationRules[i].isApplicable ( update, target ) )
-                return simplificationRules[i].matchingCondition( update, target, services );
+        for (IUpdateRule simplificationRule : simplificationRules) {
+            if (simplificationRule.isApplicable(update, target))
+                return simplificationRule.matchingCondition(update, target, services);
         }
         Debug.fail("Don't know how to handle " + target);
         return null; // unreachable

@@ -1,19 +1,11 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License.
+// The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General Public License.
-// See LICENSE.TXT for details.
-//
-//
+
 package de.uka.ilkd.key.proof.init;
 
 import java.util.*;
@@ -105,12 +97,6 @@ public class InitConfig {
             getChoiceSettings().getDefaultChoices();
     }
 
-
-    public InitConfig() {
-        this(new Services(), null);
-    }
-
-
     //-------------------------------------------------------------------------
     //internal methods
     //-------------------------------------------------------------------------
@@ -119,13 +105,12 @@ public class InitConfig {
      * Helper for add().
      */
     private void addSorts (NamespaceSet ns, ModStrategy mod) {
-        final Iterator<Named> sortsIt = ns.sorts ().elements ().iterator ();
-        while ( sortsIt.hasNext () ) {
-            final Named named = sortsIt.next ();
-            if ( named instanceof GenericSort ) {
-                if ( mod.modifyGenericSorts () ) sortNS ().add ( named );
+        for (Named named1 : ns.sorts().elements()) {
+            final Named named = named1;
+            if (named instanceof GenericSort) {
+                if (mod.modifyGenericSorts()) sortNS().add(named);
             } else {
-                if ( mod.modifySorts () ) sortNS ().add ( named );
+                if (mod.modifySorts()) sortNS().add(named);
             }
         }
     }
@@ -250,15 +235,13 @@ public class InitConfig {
     public Taclet lookupActiveTaclet(Name name) {
 	if (quickTacletMap == null) {
             quickTacletMap = new HashMap<Name, Named>();
-            Iterator<Taclet> it = activatedTaclets().iterator();
-            while (it.hasNext())  {
-                Taclet t = it.next();
-                quickTacletMap.put(t.name(), t);
-                Iterator<Name> itOld = t.oldNames().iterator();
-                while (itOld.hasNext()) {
-                    quickTacletMap.put(itOld.next(), t);
-                }
+        for (Taclet taclet : activatedTaclets()) {
+            Taclet t = taclet;
+            quickTacletMap.put(t.name(), t);
+            for (Name name1 : t.oldNames()) {
+                quickTacletMap.put(name1, t);
             }
+        }
         }
 
         return (Taclet) quickTacletMap.get(name);
@@ -365,9 +348,8 @@ public class InitConfig {
 
 
     public void createNamespacesForActivatedChoices(){
-        Iterator<Choice> it = activatedChoices.iterator();
-        while(it.hasNext()){
-	    Choice c = it.next();
+        for (Choice activatedChoice : activatedChoices) {
+            Choice c = activatedChoice;
             funcNS().add(c.funcNS());
         }
     }
@@ -375,7 +357,7 @@ public class InitConfig {
 
     public ProofSettings mergedProofSettings() {
         ProofSettings defaultSettings = ProofSettings.DEFAULT_SETTINGS;
-        ProofAggregate someProof = null;
+        ProofAggregate someProof;
 	try {
             someProof = ((ProofAggregate)getProofEnv().getProofs().iterator().next());
 	}catch(NoSuchElementException ne){

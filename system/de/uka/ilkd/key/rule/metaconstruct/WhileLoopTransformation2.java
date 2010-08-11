@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -13,31 +13,17 @@
 package de.uka.ilkd.key.rule.metaconstruct;
 
 import java.util.HashMap;
-import java.util.Stack;
-
-import org.apache.log4j.Logger;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.*;
-import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
-import de.uka.ilkd.key.java.expression.ExpressionStatement;
-import de.uka.ilkd.key.java.expression.literal.BooleanLiteral;
 import de.uka.ilkd.key.java.expression.literal.IntLiteral;
-import de.uka.ilkd.key.java.expression.operator.CopyAssignment;
-import de.uka.ilkd.key.java.expression.operator.SetAssignment;
 import de.uka.ilkd.key.java.recoderext.TestGenerationModelTransformer;
-import de.uka.ilkd.key.java.reference.IExecutionContext;
-import de.uka.ilkd.key.java.reference.MethodName;
 import de.uka.ilkd.key.java.reference.MethodReference;
 import de.uka.ilkd.key.java.reference.TypeRef;
 import de.uka.ilkd.key.java.statement.*;
-import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
 import de.uka.ilkd.key.java.visitor.ProgVarReplaceVisitor;
 import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.op.IProgramVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
-import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.ExtList;
 
 /** @author gladisch;
@@ -51,7 +37,7 @@ import de.uka.ilkd.key.util.ExtList;
 public class WhileLoopTransformation2 extends WhileLoopTransformation {
 
     /** Global variable that determins how often to unwind the loop. */
-    public static int unwindings=2;
+    public static int unwindings=1;
 
 
     /** creates the WhileLoopTransformation for the transformation mode
@@ -122,7 +108,8 @@ public class WhileLoopTransformation2 extends WhileLoopTransformation {
                  if (_i<_j+1) break INNER_LABEL;
                  _j=_j+2;
                }
-               java.lang.Object.<loopAbstractionMethod>(hashCode);
+               if (_i<10)
+                  java.lang.Object.<loopAbstractionMethod>(hashCode);
              }
            }
             return 
@@ -153,6 +140,8 @@ public class WhileLoopTransformation2 extends WhileLoopTransformation {
 	    int hash = root().hashCode();
 	    ImmutableArray<Expression> args = new ImmutableArray<Expression>(new IntLiteral(""+hash));
 	    Statement res = new MethodReference(args, mn , typeRef);
+	    
+	    res = new If(guard, new Then(res));
 	    
 	    for(int i=0;i<unwindings;i++){
         	    /* 

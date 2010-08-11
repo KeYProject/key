@@ -1,17 +1,10 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
-//This file is part of KeY - Integrated Deductive Software Design
-//Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
-//                      Universitaet Koblenz-Landau, Germany
-//                      Chalmers University of Technology, Sweden
-//
-//The KeY system is protected by the GNU General Public License. 
-//See LICENSE.TXT for details.
 //
 //
 
@@ -106,21 +99,21 @@ public class OCLSpecExtractor implements SpecExtractor {
         ImmutableSet<OperationContract> result = DefaultImmutableSet.<OperationContract>nil();
 
         Comment[] comments = pm.getComments();
-        for(int i = 0; i < comments.length; i++) {
-            String originalPre = extractProperty(comments[i].getText(),
-                                                 "@preconditions");
-            String originalPost = extractProperty(comments[i].getText(),
-                                                  "@postconditions");
-            String originalModifies = extractProperty(comments[i].getText(),
-                                                      "@modifies");
-            if(originalPre != null 
-               || originalPost != null 
-               || originalModifies != null) {
-                ImmutableSet<OperationContract> contracts 
-                    = osf.createOCLOperationContracts(pm, 
-                                                      originalPre, 
-                                                      originalPost, 
-                                                      originalModifies);
+        for (Comment comment : comments) {
+            String originalPre = extractProperty(comment.getText(),
+                    "@preconditions");
+            String originalPost = extractProperty(comment.getText(),
+                    "@postconditions");
+            String originalModifies = extractProperty(comment.getText(),
+                    "@modifies");
+            if (originalPre != null
+                    || originalPost != null
+                    || originalModifies != null) {
+                ImmutableSet<OperationContract> contracts
+                        = osf.createOCLOperationContracts(pm,
+                        originalPre,
+                        originalPost,
+                        originalModifies);
                 result = result.union(contracts);
             }
         }
@@ -145,13 +138,13 @@ public class OCLSpecExtractor implements SpecExtractor {
         int numChildren = td.getChildCount();        
         for(int i = 0; i < numChildren; i++) {
             Comment[] comments = ((TypeDeclaration)kjt.getJavaType()).getChildAt(i).getComments();
-            for(int j = 0; j < comments.length; j++) {
-                String originalInv = extractProperty(comments[j].getText(), 
-                                                     "@invariants");
-                
-                if(originalInv != null) {
-                    ClassInvariant inv 
-                        = osf.createOCLClassInvariant(kjt, originalInv);
+            for (Comment comment : comments) {
+                String originalInv = extractProperty(comment.getText(),
+                        "@invariants");
+
+                if (originalInv != null) {
+                    ClassInvariant inv
+                            = osf.createOCLClassInvariant(kjt, originalInv);
                     result = result.add(inv);
                 }
             }

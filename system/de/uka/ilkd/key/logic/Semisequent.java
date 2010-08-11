@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -226,16 +226,15 @@ public class Semisequent implements Iterable<ConstrainedFormula> {
 
 	int pos = idx;	
 	ImmutableList<ConstrainedFormula> oldFormulas = sci.getFormulaList();
-	final Iterator<ConstrainedFormula> it = conForm.iterator();	
 
-	while (it.hasNext()) {	   
-	    sci = removeRedundanceHelp(pos, it.next(), sci);
-            
-	    if (sci.getFormulaList() != oldFormulas) {
-		pos = sci.getIndex() + 1;
-		oldFormulas = sci.getFormulaList();
-	    }
-	}	
+        for (ConstrainedFormula aConForm : conForm) {
+            sci = removeRedundanceHelp(pos, aConForm, sci);
+
+            if (sci.getFormulaList() != oldFormulas) {
+                pos = sci.getIndex() + 1;
+                oldFormulas = sci.getFormulaList();
+            }
+        }
 
 	return complete(sci);
     }

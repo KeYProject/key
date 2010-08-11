@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -54,7 +54,7 @@ public abstract class LDT {
      */
     protected final Type type;
     
-    protected HashMap keyJavaType = new HashMap();
+    protected HashMap<Type, KeYJavaType> keyJavaType = new HashMap<Type, KeYJavaType>();
 
     /**
      * creates a new LDT complete with the target sort of the language
@@ -90,7 +90,7 @@ public abstract class LDT {
     public Function addFunction(Namespace funcNS, String funcName) {
         final Function f = (Function)funcNS.lookup(new Name(funcName));
         if (f==null) {
-            throw new RuntimeException("IntegerLDT: Function " + funcName + " not found");
+            throw new RuntimeException("LDT: Function " + funcName + " not found");
         }
         addFunction(f);
         return f;
@@ -117,7 +117,7 @@ public abstract class LDT {
      * @return the KeYJavaType the the given type t
      */
     public KeYJavaType getKeYJavaType(Type t) {
-	return (KeYJavaType)keyJavaType.get(t);
+	return keyJavaType.get(t);
     }
 
     /** returns the basic functions of the model

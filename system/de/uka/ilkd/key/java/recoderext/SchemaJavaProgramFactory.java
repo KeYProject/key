@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -25,13 +25,10 @@ import recoder.convenience.TreeWalker;
 import recoder.java.*;
 import recoder.java.SourceElement.Position;
 import recoder.java.declaration.*;
-import recoder.java.reference.MethodReference;
-import recoder.java.reference.ReferencePrefix;
-import recoder.java.reference.TypeReference;
-import recoder.list.generic.*;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Named;
-import de.uka.ilkd.key.logic.Namespace;
+import recoder.java.reference.*;
+import recoder.list.generic.ASTArrayList;
+import recoder.list.generic.ASTList;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.SortedSchemaVariable;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
@@ -100,11 +97,31 @@ public class SchemaJavaProgramFactory extends JavaProgramFactory {
     }
 
     public ContextStatementBlock createContextStatementBlock(TypeSVWrapper typeRef,
-							     ExpressionSVWrapper var) {
-	return new ContextStatementBlock(typeRef, var);
+            ExpressionSVWrapper memoryArea,
+            ExpressionSVWrapper runtime,
+            ExpressionSVWrapper callerMemoryArea,
+            ExpressionSVWrapper constructedMemoryArea) {
+	return new ContextStatementBlock(typeRef, memoryArea, runtime);
+    }
+    
+    public MethodReferenceWrapper createMethodReferenceWrapper(ReferencePrefix accessPath, 
+            Identifier name, ASTList<Expression> args, 
+            ASTList<TypeArgumentDeclaration> typeArgs){
+        return new MethodReferenceWrapper(accessPath, name, args, typeArgs);
+    }
+    
+    public MethodReferenceWrapper createMethodReferenceWrapper(ReferencePrefix accessPath, 
+            Identifier name, ASTList<Expression> args){
+        return new MethodReferenceWrapper(accessPath, name, args);
+    }
+    
+    public ContextStatementBlock createContextStatementBlock(TypeSVWrapper typeRef,
+            ExpressionSVWrapper memoryArea,
+            ExpressionSVWrapper runtime) {
+        return new ContextStatementBlock(typeRef, memoryArea, runtime);
     }
 
-    public ContextStatementBlock createContextStatementBlock(ExecCtxtSVWrapper ec) {
+    public ContextStatementBlock createContextStatementBlock(ExecutionContext ec) {
 	return new ContextStatementBlock(ec);
     }
 

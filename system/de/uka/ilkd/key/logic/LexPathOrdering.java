@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -211,7 +211,7 @@ public class LexPathOrdering implements TermOrdering {
      *         completely messed up, but you get the idea
      */
     private int getSortDepth(Sort s) {
-        Integer res = (Integer)sortDepthCache.get ( s );
+        Integer res = sortDepthCache.get ( s );
         if ( res == null ) {
             res = new Integer ( getSortDepthHelp ( s ) );
             sortDepthCache.put ( s, res );
@@ -227,9 +227,7 @@ public class LexPathOrdering implements TermOrdering {
         if ( "int".equals ( sName ) ) res = 10000;
         if ( "boolean".equals ( sName ) ) res = 20000;
 
-        final Iterator<Sort> it = s.extendsSorts ().iterator ();
-        while ( it.hasNext () )
-            res = Math.max ( res, getSortDepth ( it.next () ) );
+        for (Sort sort : s.extendsSorts()) res = Math.max(res, getSortDepth(sort));
 
         return res + 1;
     }
@@ -292,12 +290,20 @@ public class LexPathOrdering implements TermOrdering {
             intFunctionNames.add("neglit");
         }
 
+        private final Set<String> stringFunctionNames = new HashSet<String> ();
+        {
+            intFunctionNames.add("empty");
+            intFunctionNames.add("cons");
+            intFunctionNames.add("C");
+        }
+
+        
         protected Integer getWeight(Operator p_op) {
             final String opStr = p_op.name ().toString ();
 
-            if ( intFunctionNames.contains ( opStr ) )
+            if ( intFunctionNames.contains ( opStr ) || stringFunctionNames.contains ( opStr ) )
                 return new Integer ( 0 );
-
+            
             if ( opStr.equals ( "neg" ) ) return new Integer ( 1 );
             if ( p_op.name ().equals ( AbstractIntegerLDT.CHAR_ID_NAME ) )
                 return new Integer ( 1 );

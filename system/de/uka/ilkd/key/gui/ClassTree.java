@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -27,7 +27,7 @@ import de.uka.ilkd.key.java.recoderext.ConstructorNormalformBuilder;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
 
 
-class ClassTree extends JTree {
+public class ClassTree extends JTree {
     
     private static final String INIT_NAME 
         =  ConstructorNormalformBuilder.CONSTRUCTOR_NORMALFORM_IDENTIFIER;
@@ -169,24 +169,22 @@ class ClassTree extends JTree {
             ImmutableList<ProgramMethod> pms 
             	= services.getJavaInfo()
                           .getAllProgramMethodsLocallyDeclared(kjt);
-            Iterator<ProgramMethod> it = pms.iterator();
-            while(it.hasNext()) {
-                ProgramMethod pm = it.next();
+            for (ProgramMethod pm : pms) {
                 if ((!pm.isImplicit() || pm.getName().equals(INIT_NAME))
                         && pm.getMethodDeclaration().getBody() != null) {
                     StringBuffer sb = new StringBuffer(pm.getName());
                     sb.append("(");
-                    for(int i = 0, n = pm.getParameterDeclarationCount(); 
-                        i < n; i++) {
-                        sb.append(pm.getParameterDeclarationAt(i) + ", ");
+                    for (int i = 0, n = pm.getParameterDeclarationCount();
+                         i < n; i++) {
+                        sb.append(pm.getParameterDeclarationAt(i)).append(", ");
                     }
-                    if(pm.getParameterDeclarationCount() > 0) {
+                    if (pm.getParameterDeclarationCount() > 0) {
                         sb.setLength(sb.length() - 2);
                     }
                     sb.append(")");
                     Entry te = new Entry(sb.toString());
-                    DefaultMutableTreeNode childNode 
-                    	= new DefaultMutableTreeNode(te);
+                    DefaultMutableTreeNode childNode
+                            = new DefaultMutableTreeNode(te);
                     te.pm = pm;
                     node.add(childNode);
                 }
@@ -198,6 +196,7 @@ class ClassTree extends JTree {
     private static DefaultMutableTreeNode createTree(boolean addOperations,
 	    					     boolean skipLibraryClasses,
 	    					     Services services) {
+
 	//get all classes
 	final Set<KeYJavaType> kjts 
 		= services.getJavaInfo().getAllKeYJavaTypes();
@@ -224,8 +223,8 @@ class ClassTree extends JTree {
         //build tree
         DefaultMutableTreeNode rootNode 
         	= new DefaultMutableTreeNode(new Entry(""));
-        for(int i = 0; i < kjtsarr.length; i++) {
-            insertIntoTree(rootNode, kjtsarr[i], addOperations, services);
+        for (KeYJavaType aKjtsarr : kjtsarr) {
+            insertIntoTree(rootNode, aKjtsarr, addOperations, services);
         }
         
         return rootNode;
@@ -307,7 +306,7 @@ class ClassTree extends JTree {
     //inner classes
     //-------------------------------------------------------------------------    
     
-    static class Entry {
+    public static class Entry {
         public final String string;
         public KeYJavaType kjt = null;
         public ProgramMethod pm = null;

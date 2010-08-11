@@ -1,3 +1,10 @@
+// This file is part of KeY - Integrated Deductive Software Design
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General Public License. 
+// See LICENSE.TXT for details.
 package de.uka.ilkd.key.java;
 
 import java.io.BufferedReader;
@@ -41,6 +48,12 @@ class JavaReduxFileCollection implements FileCollection {
     private static String JAVA_SRC_DIR = "JavaRedux";
 
     /**
+     * The resource location
+     */
+    private String resourceLocation;
+
+    
+    /**
      * This list stores all resources to be retrieved. It is fed by the
      * constructor.
      */
@@ -57,14 +70,20 @@ class JavaReduxFileCollection implements FileCollection {
      */
     public JavaReduxFileCollection() throws IOException {
 
-        String resourceString = JAVA_SRC_DIR
-                + "/"
-                + ProofSettings.DEFAULT_SETTINGS.getProfile()
-                        .getInternalClasslistFilename();
 
-        URL jlURL = KeYResourceManager.getManager().getResourceFile(
-                Recoder2KeY.class, resourceString);
+	resourceLocation = JAVA_SRC_DIR;
+	
+	if (!ProofSettings.DEFAULT_SETTINGS.getProfile().getInternalClassDirectory().isEmpty()) { 
+	    resourceLocation += "/" + ProofSettings.DEFAULT_SETTINGS.getProfile()
+	                .getInternalClassDirectory();
+	}
+	String resourceString = resourceLocation + "/"	        
+	        + ProofSettings.DEFAULT_SETTINGS.getProfile()
+	                .getInternalClasslistFilename();
 
+	URL jlURL = KeYResourceManager.getManager().getResourceFile(
+	        Recoder2KeY.class, resourceString);
+	
         if (jlURL == null) {
             throw new FileNotFoundException("Resource " + resourceString
                     + " cannot be opened.");
@@ -99,11 +118,26 @@ class JavaReduxFileCollection implements FileCollection {
 
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * This class only supports walker for a single file type: .java
+     */
+    public Walker createWalker(String[] extensions) throws IOException {
+        if (extensions == null || extensions.length < 1 || !".java".equals(extensions[0])) {
+            throw new IllegalStateException(
+                    "This collection can only list .java files");
+        }
+
+        return new Walker(resources.iterator());
+
+    }
+
     /*
      * The Class Walker wraps a string iterator and creates URL, streams and
      * DataLocation elements on demand.
      */
-    private static class Walker implements FileCollection.Walker {
+    private class Walker implements FileCollection.Walker {
 
         /**
          * The iterator to wrap, it iterates the resources to open.
@@ -147,7 +181,8 @@ class JavaReduxFileCollection implements FileCollection {
                 throw new NoSuchElementException();
 
             if (currentURL == null) {
-                throw new FileNotFoundException("cannot find " + JAVA_SRC_DIR
+                throw new FileNotFoundException("cannot find "  
+                	+ resourceLocation 
                         + "/" + current);
             }
 
@@ -165,8 +200,8 @@ class JavaReduxFileCollection implements FileCollection {
 
             // may be null!
             currentURL = KeYResourceManager.getManager().getResourceFile(
-                    Recoder2KeY.class, JAVA_SRC_DIR + "/" + current);
-
+                    Recoder2KeY.class, resourceLocation + "/" + current);
+            
             return true;
         }
 

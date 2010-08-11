@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -11,9 +11,9 @@
 
 package de.uka.ilkd.key.java.reference;
 
+import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.collection.ImmutableArray;
-import de.uka.ilkd.key.java.Expression;
-import de.uka.ilkd.key.java.Statement;
+
 
 /**
  *  Constructor reference.
@@ -22,10 +22,11 @@ import de.uka.ilkd.key.java.Statement;
 
 public interface ConstructorReference extends MemberReference, Statement {
 
-    /**
+   /**
      *      Get arguments.
      *      @return the array wrapper of the argument expressions .
      */
     ImmutableArray<Expression> getArguments();
+
 
 }

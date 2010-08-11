@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -16,6 +16,7 @@ import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.ConstrainedFormula;
+import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -31,7 +32,7 @@ import de.uka.ilkd.key.unittest.ModelGenerator;
 import de.uka.ilkd.key.unittest.simplify.ast.*;
 import de.uka.ilkd.key.util.ExtList;
 
-public class SimplifyModelGenerator implements DecProdModelGenerator {
+public class SimplifyModelGenerator extends DecProdModelGenerator {
 
     private Services serv;
 
@@ -56,7 +57,8 @@ public class SimplifyModelGenerator implements DecProdModelGenerator {
 
     private ImmutableList<String> placeHoldersForClasses = ImmutableSLList.<String>nil();
 
-    private SMTSolver simplify = new SimplifySolver();
+    private SMTSolver solver = new SimplifySolver();
+    private SMTRule smtRule = new SMTRule(new Name("SIMPLIFY"),solver);
 
     private static Term toFormula(Sequent s) {
 	TermBuilder tb = TermBuilder.DF;
@@ -82,24 +84,18 @@ public class SimplifyModelGenerator implements DecProdModelGenerator {
 	SMTSolverResult res = SMTSolverResult.NO_IDEA;
 
 	// Get a result for the Problem
-	try {
-	    res = simplify.run(toFormula(node.sequent()), 60, serv);
-	} catch (IOException ioe) {
-	    if (serv.getExceptionHandler() != null) {
-		serv.getExceptionHandler().reportException(ioe);
-	    } else {
-		RuntimeException re = new RuntimeException(ioe.getMessage());
-		re.initCause(ioe);
-		throw re;
-	    }
-	}
+	res = smtRule.run(toFormula(node.sequent()), 
+		           serv,serv.getProof().
+		           getUserConstraint().getConstraint(),null);
+
+	
 
 	initialCounterExample = res.text();
 	this.simplifyOutputs = new HashSet<String>();
 	string2class = new HashMap<String, EquivalenceClass>();
 	Iterator<Term> it = locations.iterator();
 
-	SMTTranslator st = simplify.getTranslator(serv);
+	SMTTranslator st = solver.getTranslator(serv);
 
 	// build the translated terms for each location
 	try {
@@ -183,72 +179,72 @@ public class SimplifyModelGenerator implements DecProdModelGenerator {
 	removeNegativeArrayIndices(c);
 	Equation[] eqs = c.getEquations();
 	if (eqs.length == c.arity()) {
-	    for (int i = 0; i < eqs.length; i++) {
-		de.uka.ilkd.key.unittest.simplify.ast.Term ft = eqs[i].sub(0);
-		EquivalenceClass ec = getEqvClass(ft);
-		if (ec != null && ec.getLocations().size() > 0
-			&& eqs[i].sub(1) instanceof NumberTerm) {
-		    model.setValue(ec, ((NumberTerm) eqs[i].sub(1)).getValue());
-		}
-	    }
+        for (Equation eq1 : eqs) {
+            de.uka.ilkd.key.unittest.simplify.ast.Term ft = eq1.sub(0);
+            EquivalenceClass ec = getEqvClass(ft);
+            if (ec != null && ec.getLocations().size() > 0
+                    && eq1.sub(1) instanceof NumberTerm) {
+                model.setValue(ec, ((NumberTerm) eq1.sub(1)).getValue());
+            }
+        }
 	    if (model.size() == intClasses.size()) {
 		models.add(model);
 	    } else {
-		for (int i = 0; i < eqs.length; i++) {
-		    // set a subterm to an arbitrary value an test if
-		    // the system of equations has a unique solution now.
-		    for (int j = 0; j < datCount; j++) {
-			Equation e = createEquationForSubTerm(eqs[i],
-				genericTestValues[j]);
-			if (e != null) {
-			    c.add(e);
-			    models.addAll(createModelsHelp(simplify(c), model
-				    .copy(), datCount));
-			    if (models.size() >= modelLimit) {
-				return models;
-			    }
-			    c.removeLast();
-			}
-		    }
-		}
+            for (Equation eq : eqs) {
+                // set a subterm to an arbitrary value an test if
+                // the system of equations has a unique solution now.
+                for (int j = 0; j < datCount; j++) {
+                    Equation e = createEquationForSubTerm(eq,
+                            genericTestValues[j]);
+                    if (e != null) {
+                        c.add(e);
+                        models.addAll(createModelsHelp(simplify(c), model
+                                .copy(), datCount));
+                        if (models.size() >= modelLimit) {
+                            return models;
+                        }
+                        c.removeLast();
+                    }
+                }
+            }
 	    }
 	} else {
 	    LessEq[] leqs = c.getLessEq();
-	    for (int i = 0; i < leqs.length; i++) {
-		for (int j = 0; j < datCount; j += 2) {
-		    c.add(lessEqToEq(leqs[i], genericTestValues[j]));
-		    models.addAll(createModelsHelp(simplify(c), model.copy(),
-			    datCount));
-		    if (models.size() >= modelLimit) {
-			return models;
-		    }
-		    c.removeLast();
-		}
-	    }
+        for (LessEq leq : leqs) {
+            for (int j = 0; j < datCount; j += 2) {
+                c.add(lessEqToEq(leq, genericTestValues[j]));
+                models.addAll(createModelsHelp(simplify(c), model.copy(),
+                        datCount));
+                if (models.size() >= modelLimit) {
+                    return models;
+                }
+                c.removeLast();
+            }
+        }
 	    Less[] les = c.getLess();
-	    for (int i = 0; i < les.length; i++) {
-		for (int j = 2; j < datCount; j += 2) {
-		    c.add(lessToEq(les[i], genericTestValues[j]));
-		    models.addAll(createModelsHelp(simplify(c), model.copy(),
-			    datCount));
-		    if (models.size() >= modelLimit) {
-			return models;
-		    }
-		    c.removeLast();
-		}
-	    }
+        for (Less le : les) {
+            for (int j = 2; j < datCount; j += 2) {
+                c.add(lessToEq(le, genericTestValues[j]));
+                models.addAll(createModelsHelp(simplify(c), model.copy(),
+                        datCount));
+                if (models.size() >= modelLimit) {
+                    return models;
+                }
+                c.removeLast();
+            }
+        }
 	    Inequation[] neq = c.getInequations();
-	    for (int i = 0; i < neq.length; i++) {
-		for (int j = 1; j < datCount; j++) {
-		    c.add(ineqToEq(neq[i], genericTestValues[j]));
-		    models.addAll(createModelsHelp(simplify(c), model.copy(),
-			    datCount));
-		    if (models.size() >= modelLimit) {
-			return models;
-		    }
-		    c.removeLast();
-		}
-	    }
+        for (Inequation aNeq : neq) {
+            for (int j = 1; j < datCount; j++) {
+                c.add(ineqToEq(aNeq, genericTestValues[j]));
+                models.addAll(createModelsHelp(simplify(c), model.copy(),
+                        datCount));
+                if (models.size() >= modelLimit) {
+                    return models;
+                }
+                c.removeLast();
+            }
+        }
 	}
 	return models;
     }
@@ -257,8 +253,9 @@ public class SimplifyModelGenerator implements DecProdModelGenerator {
 	try {
 	    // Term t = (new TermFactory()).createJunctorTerm(Op.NOT, c);
 	    // return this.simplify.run(t, 60, serv).text();
-	    return new SimplifySolver().run("(NOT " + c.toSimplify() + ")", 60,
-		    serv).text();
+	    return this.smtRule.run("(NOT " + c.toSimplify() + ")", serv, 
+		    serv.getProof().getUserConstraint().getConstraint()).text();
+
 	} catch (Exception e) {
 	    throw new RuntimeException(e);
 	}

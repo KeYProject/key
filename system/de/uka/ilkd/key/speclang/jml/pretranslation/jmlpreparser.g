@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -219,6 +219,9 @@ modifier returns [String result = null]:
     |   pro:PROTECTED           { result = pro.getText(); }
     |   pub:PUBLIC              { result = pub.getText(); }
     |   pur:PURE                { result = pur.getText(); }
+    |   scs:SCOPE_SAFE			{ result = scs.getText(); }
+    |   as:ARBITRARY_SCOPE		{ result = as.getText(); }
+    |   ast:ARBITRARY_SCOPE_THIS { result = ast.getText(); }
     |   spr:SPEC_PROTECTED      { result = spr.getText(); }
     |   spu:SPEC_PUBLIC         { result = spu.getText(); }
     |   sta:STATIC              { result = sta.getText(); }
@@ -523,10 +526,13 @@ simple_spec_body_clause[TextualJMLSpecCase sc, Behavior b]
 	|   ps=signals_clause        { sc.addSignals(ps); }
 	|   ps=signals_only_clause   { sc.addSignalsOnly(ps); }
 	|   ps=diverges_clause       { sc.addDiverges(ps); }
+	|   ps=working_space_clause  { sc.setWorkingSpace(ps);}
+	|   ps=constructed_working_space_clause  { sc.setConstructedWorkingSpace(ps);}
+	|   ps=reentrant_working_space_clause  { sc.setReentrantWorkingSpace(ps);}
+	|   ps=caller_working_space_clause  { sc.setCallerWorkingSpace(ps);}
 	|   ps=name_clause           { sc.addName(ps);}
 	|   captures_clause 
 	|   when_clause
-	|   working_space_clause
 	|   duration_clause
     )
     {
@@ -582,6 +588,30 @@ ensures_keyword
     |   ENSURES_RED
 ;
 
+
+working_space_clause returns [PositionedString result = null]
+	throws SLTranslationException
+:
+	working_space_keyword  result=expression
+;
+
+constructed_working_space_clause returns [PositionedString result = null]
+	throws SLTranslationException
+:
+	WORKING_SPACE_CONSTRUCTED result=expression
+;
+
+caller_working_space_clause returns [PositionedString result = null]
+	throws SLTranslationException
+:
+	WORKING_SPACE_CALLER result=expression
+;
+
+reentrant_working_space_clause returns [PositionedString result = null]
+	throws SLTranslationException
+:
+	WORKING_SPACE_REENTRANT result=expression
+;
 
 signals_clause 
 	returns [PositionedString result = null] 
@@ -679,22 +709,11 @@ when_keyword
 ;
 
 
-working_space_clause throws SLTranslationException
-{
-    PositionedString ps;
-}
-:
-    working_space_keyword ps=expression
-    {
-    	raiseNotSupported("working_space clauses");
-    }
-;
-
-
 working_space_keyword
 :
     	WORKING_SPACE 
     |   WORKING_SPACE_RED
+    |   WORKING_SPACE_LOCAL
 ;
 
 
@@ -983,6 +1002,10 @@ loop_specification[ImmutableList<String> mods]
         |   ps=loop_predicates      { ls.addPredicates(ps); }
         |   ps=assignable_clause    { ls.addAssignable(ps); }
         |   ps=variant_function     { ls.setVariant(ps); } 
+        |   ps=working_space_single_iteration_param { ls.addParametrizedWorkingspace(ps); } 
+        |   ps=working_space_single_iteration {ls.setWorkingSpaceLocal(ps);}
+        |   ps=working_space_single_iteration_constructed {ls.setWorkingSpaceConstructed(ps);}
+        |   ps=working_space_single_iteration_reentrant {ls.setWorkingSpaceReentrant(ps);}
     )+
 ;
 
@@ -991,6 +1014,28 @@ loop_invariant returns [PositionedString result = null]
 :
     maintaining_keyword result=expression
 ;
+
+working_space_single_iteration_param returns [PositionedString result = null]
+:
+	WORKING_SPACE_SINGLE_ITERATION_PARAM result=expression
+;
+
+working_space_single_iteration returns [PositionedString result = null]
+:
+	(WORKING_SPACE_SINGLE_ITERATION | WORKING_SPACE_SINGLE_ITERATION_LOCAL) result=expression
+;
+
+working_space_single_iteration_constructed returns [PositionedString result = null]
+:
+	WORKING_SPACE_SINGLE_ITERATION_CONSTRUCTED result=expression
+;
+
+
+working_space_single_iteration_reentrant returns [PositionedString result = null]
+:
+	WORKING_SPACE_SINGLE_ITERATION_REENTRANT  result=expression
+;
+
 
 
 maintaining_keyword 

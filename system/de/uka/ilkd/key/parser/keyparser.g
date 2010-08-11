@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -29,6 +29,9 @@ header {
   import de.uka.ilkd.key.proof.*;
   import de.uka.ilkd.key.proof.init.*;
 
+  import de.uka.ilkd.key.rtsj.logic.op.*;
+  import de.uka.ilkd.key.rtsj.rule.conditions.*;
+
   import de.uka.ilkd.key.rule.*;
   import de.uka.ilkd.key.rule.conditions.*;
   import de.uka.ilkd.key.rule.metaconstruct.*;
@@ -50,8 +53,7 @@ header {
   import de.uka.ilkd.key.java.StatementBlock;
   import de.uka.ilkd.key.java.declaration.VariableDeclaration;
   import de.uka.ilkd.key.java.recoderext.*;
-  import de.uka.ilkd.key.pp.AbbrevMap;
-  import de.uka.ilkd.key.pp.LogicPrinter;
+  import de.uka.ilkd.key.pp.*;
 }
 
 /** 
@@ -545,7 +547,7 @@ options {
             }
             File path=new File(getFilename().substring(start,end+1)+filename);
             try{ 
-                source = RuleSource.initRuleFile(path.toURL()); 
+                source = RuleSource.initRuleFile(path.toURI().toURL()); 
             }catch(java.net.MalformedURLException e){
                 System.err.println("Exception due to malformed URL of file "+
                                    filename+"\n " +e);
@@ -3116,6 +3118,8 @@ term130 returns [Term a = null]
     |   "false" { a = tf.createJunctorTerm(Op.FALSE); }
     |   a = ifThenElseTerm
     |   a = ifExThenElseTerm
+    |   a = workingspaceterm
+    |   a = workingspacenonrigidterm
     |   a = sum_or_product_term
     |   a = bounded_sum_term
     //Used for OCL Simplification.
@@ -3123,6 +3127,7 @@ term130 returns [Term a = null]
     // what then? This here is specific to OCL, isn't it?
     |   literal:STRING_LITERAL
         {
+           /* OCL simplification currently deactivated
             String s = literal.getText(); 
             Name name = new Name(s);
             TermSymbol stringLit = (TermSymbol)functions().lookup(name);
@@ -3132,6 +3137,9 @@ term130 returns [Term a = null]
                 addFunction((Function)stringLit);
             }
             a = tf.createFunctionTerm(stringLit);
+            */
+            
+            a = getServices().getTypeConverter().convertToLogicElement(new de.uka.ilkd.key.java.expression.literal.StringLiteral(literal.getText()));
         }
    ; exception
         catch [TermCreationException ex] {
@@ -3140,6 +3148,147 @@ term130 returns [Term a = null]
 			(ex.getMessage(), getFilename(), getLine(), getColumn()));
         }
 
+workingspaceterm returns [Term a=null]
+{
+    Sort s1,s2;
+    ImmutableList<KeYJavaType> sig = ImmutableSLList.<KeYJavaType>nil();
+    ImmutableList<Term> args = ImmutableSLList.<Term>nil();
+    KeYJavaType classType = null;
+    String methodName;
+    Term self=null;
+    Term pre;
+    HashSet progVars = new HashSet();
+    int argCount = 0;
+    ProgramMethod pm = null;
+}
+    :
+        WORKINGSPACE LBRACE 
+        
+        s2=any_sortId_check[true] (id0:IDENT)?
+        {
+        	LocationVariable selfVar = new LocationVariable(new ProgramElementName(id0.getText()), 
+            	getJavaInfo().getKeYJavaType(s2));
+        	progVars.add(selfVar);
+        	self = tf.createVariableTerm(selfVar);
+        }
+        RBRACE s1=any_sortId_check[true] 
+        {
+            classType = getJavaInfo().getKeYJavaType(s1);
+        }
+        DOUBLECOLON
+        methodName=simple_ident
+        LPAREN
+        (
+            s2=any_sortId_check[true] (id1:IDENT)?
+            {
+            	ProgramVariable p = new LocationVariable(new ProgramElementName(id1.getText()), 
+                  	getJavaInfo().getKeYJavaType(s2));
+                progVars.add(p);
+                args = args.append(tf.createVariableTerm(p));
+            }
+            (
+                COMMA
+                s2=any_sortId_check[true] (id2:IDENT)?
+                {
+	               	ProgramVariable p = new LocationVariable(new ProgramElementName(id2.getText()), 
+    	              	getJavaInfo().getKeYJavaType(s2));
+        	        progVars.add(p);
+            	    args = args.append(tf.createVariableTerm(p));
+                }
+            )*
+        )?
+        RPAREN
+        {
+            bindProgVars(progVars);
+        }
+        RBRACE
+        LBRACE pre=term RBRACE
+        {
+            unbindProgVars();
+            Term[] argTerms = args.toArray(AN_ARRAY_OF_TERMS);
+            Term methodTerm = getServices().getJavaInfo().getProgramMethodTerm
+                (null, methodName, argTerms, classType.getSort().toString());
+            WorkingSpaceRigidOp op = (WorkingSpaceRigidOp) functions().lookup(
+                new Name(WorkingSpaceRigidOp.makeName(methodTerm, pre, getServices())));
+            if(op==null){
+                a = tf.createWorkingSpaceTerm(methodTerm, pre, (Sort) sorts().lookup(
+                        new Name("int")), getServices());
+                functions().add(a.op());
+            }else{
+                a = tf.createWorkingSpaceTerm(op);
+            }
+        }
+    ;
+
+workingspacenonrigidterm returns [Term a=null]
+{
+    Sort s1,s2;
+    ImmutableList<KeYJavaType> sig = ImmutableSLList.<KeYJavaType>nil();
+    ImmutableList<Term> args = ImmutableSLList.<Term>nil();
+    KeYJavaType classType = null;
+    String methodName,s;
+    Term pre, t1, t2;
+    HashSet progVars = new HashSet();
+    int argCount = 0;
+    ProgramMethod pm = null;
+    String pvr = "{";
+    WorkingSpaceNonRigidOp op=null;
+}
+    :
+        WORKINGSPACENONRIGID LBRACE s1=any_sortId_check[true] 
+        {
+            classType = getJavaInfo().getKeYJavaType(s1);
+        }
+        DOUBLECOLON
+        methodName=simple_ident
+        RBRACE
+        LPAREN
+        (
+            s2=any_sortId_check[true] (id:IDENT)?
+            {
+                sig = sig.append(getJavaInfo().getKeYJavaType(s2));
+            }
+            (
+                COMMA
+                s2=any_sortId_check[true] (id2:IDENT)?
+                {
+                    sig = sig.append(getJavaInfo().getKeYJavaType(s2));
+                }
+            )*
+        )?
+        RPAREN
+        {
+            pm = getJavaInfo().getProgramMethod(classType,
+                methodName, sig, classType);
+            op = (WorkingSpaceNonRigidOp) functions().lookup(
+                    new Name(WorkingSpaceNonRigidOp.makeName(pm)));
+            System.out.println(op);
+        }
+        LPAREN
+        (
+            t1=term130
+            {
+                args = args.append(t1);
+            }
+            (
+                COMMA
+               	t1=term130
+            	{
+                	args = args.append(t1);
+            	}
+            )*
+        )?
+        RPAREN
+        {
+        	Term[] argArray = args.toArray(AN_ARRAY_OF_TERMS);
+        	if(op!=null){
+        		a = tf.createWorkingSpaceNonRigidTerm(op, argArray);
+        	}else{
+        		a = tf.createWorkingSpaceNonRigidTerm(pm, (Sort) sorts().lookup(
+                        new Name("int")), argArray);
+        	}
+        }
+    ;
 
 abbreviation returns [Term a=null]
 { 
@@ -3920,13 +4069,22 @@ termorseq returns [Object o]
 
 semisequent returns [Semisequent ss]
 { 
-    Term head = null;
-    ss = Semisequent.EMPTY_SEMISEQUENT; 
+    Term head = null, t=null;
+    ss = Semisequent.EMPTY_SEMISEQUENT;
+    ImmutableList<ConstrainedFormula> terms = ImmutableSLList.<ConstrainedFormula>nil();
 }
     :
         /* empty */ | 
-        head=term ( COMMA ss=semisequent ) ? 
-        { ss = ss.insertFirst(new ConstrainedFormula(head, Constraint.BOTTOM)).semisequent(); }
+        head=term 
+        {terms = terms.append(new ConstrainedFormula(head, Constraint.BOTTOM));} 
+        ( 
+        	COMMA t=term 
+        	{
+        		terms = terms.append(new ConstrainedFormula(t, Constraint.BOTTOM));
+        	}
+        )*
+        { ss = ss.insert(0, terms).semisequent(); }
+    //    { ss = ss.insertFirst(new ConstrainedFormula(head, Constraint.BOTTOM)).semisequent(); }
     ;
 
 varexplist[TacletBuilder b] : varexp[b] ( COMMA varexp[b] ) * ;
@@ -3942,6 +4100,9 @@ varexp[TacletBuilder b]
     | varcond_non_implicit[b] | varcond_non_implicit_query[b]
     | varcond_enum_const[b]
     | varcond_inReachableState[b] 
+    | varcond_equal_ws_op[b]
+    | varcond_ws_non_rigid_op[b]
+    | varcond_ws_op[b]
     | varcond_isupdated[b]    
     | varcond_sameheapdeppred[b]
   ) 
@@ -3952,7 +4113,11 @@ varexp[TacletBuilder b]
       | varcond_staticmethod[b,negated]  
       | varcond_referencearray[b, negated]
       | varcond_array[b, negated]
+      | varcond_memory_area[b, negated]
+      | varcond_parent_scope[b, negated]
+      | varcond_scope_stack[b, negated]
       | varcond_abstractOrInterface[b, negated]
+      | varcond_interface[b, negated]
       | varcond_static[b,negated] 
       | varcond_typecheck[b, negated]
       | varcond_localvariable[b, negated]
@@ -4077,6 +4242,37 @@ varcond_literal [TacletBuilder b]
    }
 ;
 
+varcond_equal_ws_op [TacletBuilder b]
+{
+  ParsableVariable x = null, y = null;
+}
+:
+    EQUALWORKINGSPACEOP LPAREN x=varId COMMA y=varId RPAREN {
+     b.addVariableCondition(new TestEqualWorkingSpaceOp(
+       (SchemaVariable) x, (SchemaVariable) y));          
+   }
+;
+
+varcond_ws_non_rigid_op [TacletBuilder b]
+{
+  ParsableVariable x = null;
+}
+:
+    TESTWORKINGSPACENONRIGIDOP LPAREN x=varId RPAREN {
+     b.addVariableCondition(new TestWorkingSpaceNonRigidOp(
+       (SchemaVariable) x));          
+   }
+;
+
+varcond_ws_op [TacletBuilder b]
+{
+  ParsableVariable x = null;
+}
+:
+    TESTWORKINGSPACEOP LPAREN x=varId RPAREN {
+     b.addVariableCondition(new TestWorkingSpaceOp((SchemaVariable) x));
+   }
+;
 
 
 varcond_hassort [TacletBuilder b]
@@ -4232,6 +4428,16 @@ varcond_abstractOrInterface [TacletBuilder b, boolean negated]
    }
 ;
 
+varcond_interface [TacletBuilder b, boolean negated]
+{
+  TypeResolver tr = null;
+}
+:
+   IS_INTERFACE LPAREN tr=type_resolver RPAREN {
+     b.addVariableCondition(new InterfaceType(tr, negated));
+   }
+;
+
 varcond_enum_const [TacletBuilder b]
 {
   ParsableVariable x = null;
@@ -4275,6 +4481,39 @@ varcond_isupdated [TacletBuilder b]
      	   b.addVariableCondition(new IsUpdatedVariableCondition((SchemaVariable) x));
         } 
 ;
+
+varcond_memory_area [TacletBuilder b, boolean negated]
+{
+  ParsableVariable x = null;
+}
+:
+   MEMORYAREA 
+	LPAREN x=varId RPAREN {
+     	   b.addVariableCondition(new MemoryAreaCondition((SchemaVariable) x, negated));
+        } 
+;
+
+varcond_parent_scope [TacletBuilder b, boolean negated]
+{
+  ParsableVariable x = null;
+}
+:
+   PARENTSCOPE
+	LPAREN x=varId RPAREN {
+     	   b.addVariableCondition(new ParentScopeCondition((SchemaVariable) x, negated));
+        } 
+;
+
+varcond_scope_stack [TacletBuilder b, boolean negated]
+{
+  ParsableVariable x = null;
+}
+:
+   SCOPESTACK
+	LPAREN x=varId RPAREN {
+     	   b.addVariableCondition(new ScopeStackCondition((SchemaVariable) x, negated));
+        } 
+    ;
 
 varcond_sameheapdeppred [TacletBuilder b]
 {

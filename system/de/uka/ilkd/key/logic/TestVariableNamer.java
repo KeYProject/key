@@ -1,10 +1,11 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
+//
 //
 // This file is part of KeY - Integrated Deductive Software Design
 // Copyright (C) 2001-2004 Universitaet Karlsruhe, Germany
@@ -120,12 +121,11 @@ public class TestVariableNamer extends TestCase {
 
 
     private boolean inGlobals(Goal goal, ProgramVariable globalVar) {
-    	Iterator<ProgramVariable> it = goal.getGlobalProgVars().iterator();
-	while(it.hasNext()) {
-	    if(it.next() == globalVar) {
-	    	return true;
-	    }
-	}
+        for (ProgramVariable programVariable : goal.getGlobalProgVars()) {
+            if (programVariable == globalVar) {
+                return true;
+            }
+        }
 	return false;
     }
     
@@ -154,20 +154,19 @@ public class TestVariableNamer extends TestCase {
 	ImmutableList<NoPosTacletApp> noPosTacletApps
 		= tacletIndex.getPartialInstantiatedApps();
 
-	Iterator<NoPosTacletApp> it = noPosTacletApps.iterator();
-	while(it.hasNext()) {
-	    SVInstantiations insts = it.next().instantiations();
-    	    Iterator<ImmutableMapEntry<SchemaVariable,InstantiationEntry>> it2;
-	    it2 = insts.pairIterator();
-	    while(it2.hasNext()) {
-	        ImmutableMapEntry<SchemaVariable,InstantiationEntry> e = it2.next();
-		Object inst = e.value().getInstantiation();
-		if(inst instanceof PostIncrement 
-		   && ((PostIncrement)inst).getFirstElement() == containedVar){
-		    return true;
-		}
-	    }
-	}
+        for (NoPosTacletApp noPosTacletApp : noPosTacletApps) {
+            SVInstantiations insts = noPosTacletApp.instantiations();
+            Iterator<ImmutableMapEntry<SchemaVariable, InstantiationEntry>> it2;
+            it2 = insts.pairIterator();
+            while (it2.hasNext()) {
+                ImmutableMapEntry<SchemaVariable, InstantiationEntry> e = it2.next();
+                Object inst = e.value().getInstantiation();
+                if (inst instanceof PostIncrement
+                        && ((PostIncrement) inst).getFirstElement() == containedVar) {
+                    return true;
+                }
+            }
+        }
 	
 	return false;
     }

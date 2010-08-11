@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -64,7 +64,7 @@ public class SyntacticalReplaceVisitor extends Visitor {
      */
     private final Stack<Object> subStack; //of Term (and Boolean)
     private final TermFactory tf = TermFactory.DEFAULT;
-    private final Boolean newMarker = new Boolean(true);
+    private final Boolean newMarker = Boolean.TRUE;
     
     /** used to indicate if variables have changed */
     private final BooleanContainer varsChanged = new BooleanContainer();
@@ -227,9 +227,7 @@ public class SyntacticalReplaceVisitor extends Visitor {
      * are returned by the method <code>iterator</code>
      */
     private void push (Collection<Object> store) {
-        final Iterator<Object> it = store.iterator ();
-        while ( it.hasNext () )
-            subStack.push ( it.next () );
+        for (Object aStore : store) subStack.push(aStore);
     }
 
     private void pushNew(Object t) {
@@ -245,9 +243,9 @@ public class SyntacticalReplaceVisitor extends Visitor {
 	final LinkedList<Object> store = new LinkedList<Object>();
 	popN ( posFromTop, store );
 
-	for (int i = 0; i<t.length; i++) {
-	    pushNew(t[i]);	
-	}
+        for (Object aT : t) {
+            pushNew(aT);
+        }
 
         push ( store );
     }
@@ -262,9 +260,9 @@ public class SyntacticalReplaceVisitor extends Visitor {
 	popN ( length, new LinkedList<Object> () );
 
 	// add new 
-	for (int i = 0; i<t.length; i++) {	    
-	    pushNew(t[i]);	
-	}
+        for (Object aT : t) {
+            pushNew(aT);
+        }
 
         push ( store );
     }
@@ -370,7 +368,7 @@ public class SyntacticalReplaceVisitor extends Visitor {
 	    } else {
                 if (originalOp instanceof ArrayOp) {
                     final int posInStack = op.arity() - op.locationSubtermsEnd(i);
-                    newOps[i] = (Location) instantiateArrayOperator((ArrayOp) originalOp, posInStack);
+                    newOps[i] = instantiateArrayOperator((ArrayOp) originalOp, posInStack);
                 } else {
                     newOps[i] = (Location) instantiateOperator(originalOp);
                 }
@@ -478,8 +476,8 @@ public class SyntacticalReplaceVisitor extends Visitor {
         // HACK
         String name = nrFunc.name().toString();
         name = name.substring(0, name.indexOf("[")+1);
-        for (int i = 0; i<locs.length; i++) {
-            name += locs[i].name();
+        for (Location loc : locs) {
+            name += loc.name();
             name += ";";
         }
         name += "]";
@@ -489,18 +487,20 @@ public class SyntacticalReplaceVisitor extends Visitor {
     
     private ImmutableArray<QuantifiableVariable>[] instantiateBoundVariables(Term visited) {
         boolean containsBoundVars = false;
+
         ImmutableArray<QuantifiableVariable>[] boundVars = 
             new ImmutableArray[visited.arity()];
 
         for (int i = 0, arity = visited.arity(); i < arity; i++) {
             final ImmutableArray<QuantifiableVariable> vBoundVars =
                 visited.varsBoundHere(i);
+           
         
             final QuantifiableVariable[] newVars = (vBoundVars.size() > 0)? 
                     new QuantifiableVariable[vBoundVars.size()]
                     : EMPTY_QUANTIFIABLE_VARS;
                     
-            for (int j = 0, size = vBoundVars.size(); j < size; j++) {                 
+            for (int j = 0, size = vBoundVars.size(); j < size; j++) {
                 containsBoundVars = true;
                 QuantifiableVariable boundVar = vBoundVars.get(j);
                 if (boundVar instanceof SchemaVariable) {

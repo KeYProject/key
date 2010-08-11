@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -137,11 +137,11 @@ public class ViewSelector extends JDialog {
 		return;
 	    }
 	    char[] upper = str.toCharArray();
-	    for (int i = 0; i < upper.length; i++) {
-		if (upper[i] < '0' || upper[i] > '9') {
-		    return;
-		} 
-	    }
+        for (char anUpper : upper) {
+            if (anUpper < '0' || anUpper > '9') {
+                return;
+            }
+        }
 	    super.insertString(offs, new String(upper), a);
 	}
 	

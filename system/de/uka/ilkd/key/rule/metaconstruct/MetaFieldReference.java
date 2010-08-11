@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -20,6 +20,7 @@ import de.uka.ilkd.key.logic.op.Location;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.RigidFunction;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.pp.Notation;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 /**
@@ -57,8 +58,8 @@ public class MetaFieldReference extends AbstractMetaOperator implements
             Term t = term.sub(0);
             Sort sort = t.sort();
             Term attrTerm = term.sub(1);
-            RigidFunction attrFct = (RigidFunction) attrTerm.op();
-            String attrName = attrFct.name().toString();
+
+            String attrName = Notation.StringLiteral.printStringTerm(attrTerm);
 
             // strip away the " "
             attrName = attrName.substring(1, attrName.length() - 1);

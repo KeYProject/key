@@ -1,13 +1,11 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
 package de.uka.ilkd.key.strategy.feature;
-
-import java.util.Iterator;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
@@ -36,11 +34,10 @@ public class BreakpointFeature extends BinaryFeature {
             if (app instanceof TacletApp) {
                 TacletApp tapp = (TacletApp) app;
                 if (bpManager.isNoEx())
-                    for(Iterator<RuleSet> it = tapp.taclet().getRuleSets().iterator();it.hasNext();){
-                        RuleSet next = it.next();
+                    for (RuleSet next : tapp.taclet().getRuleSets()) {
                         if (next.name().toString().startsWith("method_expand"))
                             return true;
-                }
+                    }
                 
                 SourceElementId id = VisualDebugger.getVisualDebugger().getProgramCounter(pos);
                 if(id!=null){

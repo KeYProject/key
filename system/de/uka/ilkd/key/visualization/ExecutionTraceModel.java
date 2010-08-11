@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -137,13 +137,12 @@ public class ExecutionTraceModel {
 		    MethodFrame.class);
 	    coll.start();
 	    ImmutableList<ProgramElement> l = coll.getNodes();
-	    Iterator<ProgramElement> it = l.iterator();
-	    while (it.hasNext()) {
-		MethodFrame mf = (MethodFrame) it.next();
-		if (mf.getProgramMethod() != null) {
-		    result = result.add(mf.getProgramMethod());
-		}
-	    }
+        for (ProgramElement aL : l) {
+            MethodFrame mf = (MethodFrame) aL;
+            if (mf.getProgramMethod() != null) {
+                result = result.add(mf.getProgramMethod());
+            }
+        }
 	    current = current.getNextInProof();
 	    // current = current.getNextExecuted();
 	}
@@ -256,9 +255,9 @@ public class ExecutionTraceModel {
 	if (cte instanceof ParentContextTraceElement) {
 	    ParentContextTraceElement pcte = (ParentContextTraceElement) cte;
 	    ContextTraceElement[] children = pcte.getChildren();
-	    for (int j = 0; j < children.length; j++) {
-		result += toStringTree(children[j], indention + "  ");
-	    }
+        for (ContextTraceElement aChildren : children) {
+            result += toStringTree(aChildren, indention + "  ");
+        }
 	}
 	return result;
     }

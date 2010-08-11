@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -99,12 +99,10 @@ public abstract class TacletAppContainer extends RuleAppContainer {
         if ( getTacletApp ().ifInstsComplete () ) {
             res = addInstances ( getTacletApp (), res, p_goal, p_strategy );            
         } else {
-            final Iterator<TacletApp> it =
-                incMatchIfFormulas ( p_goal ).iterator ();
-            while ( it.hasNext () ) {
-                final TacletApp app = it.next ();
-                res = addContainer ( app, res, p_goal, p_strategy );
-                res = addInstances ( app, res, p_goal, p_strategy );
+            for (TacletApp tacletApp : incMatchIfFormulas(p_goal)) {
+                final TacletApp app = tacletApp;
+                res = addContainer(app, res, p_goal, p_strategy);
+                res = addInstances(app, res, p_goal, p_strategy);
             }
         }
         
@@ -193,10 +191,9 @@ public abstract class TacletAppContainer extends RuleAppContainer {
     private boolean sufficientlyCompleteApp(TacletApp app) {
         final ImmutableSet<SchemaVariable> needed = app.neededUninstantiatedVars ();
         if ( needed.size () == 0 ) return true;
-        final Iterator<SchemaVariable> it = needed.iterator ();
-        while ( it.hasNext () ) {
-            final SchemaVariable sv = it.next ();
-            if ( sv.isSkolemTermSV () ) continue;
+        for (SchemaVariable aNeeded : needed) {
+            final SchemaVariable sv = aNeeded;
+            if (sv.isSkolemTermSV()) continue;
             return false;
         }
         return true;

@@ -1,12 +1,11 @@
-//This file is part of KeY - Integrated Deductive Software Design
-//Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
-//                    Universitaet Koblenz-Landau, Germany
-//                    Chalmers University of Technology, Sweden
+// This file is part of KeY - Integrated Deductive Software Design
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
 //
-//The KeY system is protected by the GNU General Public License. 
-//See LICENSE.TXT for details.
-//
-//
+// The KeY system is protected by the GNU General Public License. 
+// See LICENSE.TXT for details.
+
 
 package de.uka.ilkd.key.smt;
 
@@ -15,8 +14,10 @@ import de.uka.ilkd.key.java.Services;
 
 public final class SimplifySolver extends AbstractSMTSolver {
     
+    public static final String name="Simplify";
+
     public String name() {
-        return "Simplify";
+        return name;
     }
     
     
@@ -39,11 +40,11 @@ public final class SimplifySolver extends AbstractSMTSolver {
 	if (val == 0) {
 	    //no error occured
 	    if (meansValid(text)) {
-		return SMTSolverResult.createValidResult(text);
+		return SMTSolverResult.createValidResult(text,name());
 	    } else if (meansInvalid(text)) {
-		return SMTSolverResult.createInvalidResult(text);
+		return SMTSolverResult.createInvalidResult(text,name());
 	    } else {
-		return SMTSolverResult.createUnknownResult(text);
+		return SMTSolverResult.createUnknownResult(text,name());
 	    } 
 	} else {
 	    //error occured
@@ -86,6 +87,11 @@ public final class SimplifySolver extends AbstractSMTSolver {
 	    }
 	}
 	return toReturn;
+    }
+
+    @Override
+    public String getInfo() {
+       return "Simplify only supports integers within the interval [-2147483646,2147483646]=[-2^31+2,2^31-2].";
     }
     
 }

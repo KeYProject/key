@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -46,6 +46,7 @@ BSUM : "\\bsum";  //KeY extension, not official JML
 COLON : ":";
 COMMA : ",";
 CREATED : "\\created";
+CURRENT_MEMORY_AREA : "\\currentMemoryArea"; //KeY extension, not official JML
 DIV : "/";
 DOT : ".";
 DOTDOT : "..";
@@ -59,6 +60,8 @@ GEQ : ">=";
 GT : ">";
 IMPLIES : "==>";
 IMPLIESBACKWARD : "<==";
+IN_IMMORTAL_MEMORY : "\\inImmortalMemory"; //KeY extension, not official JML
+IN_OUTER_SCOPE : "\\inOuterScope"; //KeY extension, not official JML
 INCLUSIVEOR : "|";
 INTO : "\\into";
 INVARIANT_FOR : "\\invariant_for";
@@ -72,6 +75,8 @@ LOCKSET : "\\lockset";
 LOGICALAND : "&&";
 LOGICALOR : "||";
 LT : "<";
+MAX_SPACE : "\\max_space"; //KeY extension, not official JML
+MEMORY_AREA : "\\memoryArea"; //KeY extension, not official JML
 MINUS : "-";
 MOD : "%";
 MULT : "*";
@@ -85,6 +90,7 @@ NOWARN : "\\nowarn";
 OBJECT_CREATION: "\\object_creation"; //KeY extension, not official JML
 OLD : "\\old";
 OTHER : "\\other";
+OUTER_SCOPE : "\\outerScope"; //KeY extension, not official JML
 PLUS : "+";
 PRE : "\\pre";
 PRIVATEDATA : "\\private_data";
@@ -92,17 +98,19 @@ QUESTIONMARK : "?";
 RBRACE : "}";
 REACH : "\\reach";
 REAL : "\\real";
+REENTRANT_SCOPE : "\\reentrantScope"; //KeY extension, not official JML
 RESULT : "\\result";
+RIGIDWORKINGSPACE : "\\rigid_working_space"; //KeY extension, not official JML
 SAME : "\\same";
 SEMI : ";";
 SHIFTLEFT : "<<";
 SHIFTRIGHT : ">>";
 SPACE : "\\space";
+TYPEOF : "\\typeof";
+TYPE_SMALL : "\\type";
+TYPE : "\\TYPE";
 ST : "<:";
 SUCH_THAT : "\\such_that";
-TYPE : "\\TYPE";
-TYPE_SMALL : "\\type";
-TYPEOF : "\\typeof";
 UNSIGNEDSHIFTRIGHT : ">>>";
 WORKINGSPACE : "\\working_space";
 XOR : "^";
@@ -216,7 +224,13 @@ DIGITS
 ;
 
 CHAR_LITERAL:
-        '\'' //not completed
+        '\'' 
+                ((' '..'&') |
+                 ('('..'[') |
+                 (']'..'~') |
+                 ('\\' ('\'' | '\\' | 'n' | 'r' | 't' | 'b' | 'f' | '"' | 'u' HEXNUMERAL ))
+                )
+      '\''
     ;
 
 STRING_LITERAL

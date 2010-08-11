@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -27,9 +27,8 @@ class TypeSchemeAndConstraint implements TypeSchemeConstraint {
     
 
     public boolean evaluate() {
-        Iterator<TypeSchemeConstraint> it = constraints.iterator();
-        while(it.hasNext()) { 
-            if(!it.next().evaluate()) {
+        for (TypeSchemeConstraint constraint : constraints) {
+            if (!constraint.evaluate()) {
                 return false;
             }
         }
@@ -41,10 +40,9 @@ class TypeSchemeAndConstraint implements TypeSchemeConstraint {
     public ImmutableSet<TypeSchemeVariable> getFreeVars() {
         ImmutableSet<TypeSchemeVariable> result 
                         = DefaultImmutableSet.<TypeSchemeVariable>nil();
-        
-        Iterator<TypeSchemeConstraint> it = constraints.iterator();
-        while(it.hasNext()) {
-             result = result.union(it.next().getFreeVars());
+
+        for (TypeSchemeConstraint constraint : constraints) {
+            result = result.union(constraint.getFreeVars());
         }
         
         return result;
@@ -53,10 +51,9 @@ class TypeSchemeAndConstraint implements TypeSchemeConstraint {
     
     public String toString() {
         String result = "and(";
-        
-        Iterator<TypeSchemeConstraint> it = constraints.iterator();
-        while(it.hasNext()) {
-            result += it.next() + ", ";
+
+        for (TypeSchemeConstraint constraint : constraints) {
+            result += constraint + ", ";
         }
         
         if(constraints.size() > 0) {

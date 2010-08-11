@@ -1,13 +1,7 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
-// This file is part of KeY - Integrated Deductive Software Design 
-// Copyright (C) 2001-2003 Universitaet Karlsruhe, Germany
-//                         and Chalmers University of Technology, Sweden          
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
@@ -81,20 +75,30 @@ public class IfThenElse extends Op {
         Sort result = Sort.ANY;
         final ImmutableSet<Sort> set1 = s1.extendsSorts();
         final ImmutableSet<Sort> set2 = s2.extendsSorts();
-        
-        final Iterator<Sort> sort1It = set1.iterator();
-        while (sort1It.hasNext()) {
-            final Sort sort1 = sort1It.next();
+
+        for (final Sort sort1 : set1) {
             if (set2.contains(sort1)) {
                 if (result == Sort.ANY) {
                     result = sort1;
-                } else {
-                    // not uniquely determinable
-                    return Sort.ANY;
+                } else if(sort1.extendsTrans(result)){
+                    result = sort1;
                 }
-            } 
+            }
         }        
         return result;
+    }
+    
+    private ImmutableSet<Sort> transExtSorts(Sort sort){
+        ImmutableSet<Sort> ext = sort.extendsSorts();
+        ImmutableSet<Sort> oldExt;
+        do{
+            oldExt = ext;
+            Sort[] ea = ext.toArray(new Sort[ext.size()]);
+            for(Sort s:ea){
+                ext = ext.union(s.extendsSorts());
+            }
+        }while(!oldExt.equals(ext));
+        return ext;
     }
     
     public int arity () {

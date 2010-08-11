@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -284,20 +284,18 @@ public class SequentView extends JEditorPane implements Autoscroll {
     public void updateUpdateHighlights() {
         if (printer == null) return;
 
-        Iterator<Object> it = updateHighlights.iterator();
-
-        while (it.hasNext()) {
-            removeHighlight(it.next());
+        for (Object updateHighlight : updateHighlights) {
+            removeHighlight(updateHighlight);
         }
 
         updateHighlights.clear();
         Range[] ranges = printer.getPositionTable().getUpdateRanges();
 
         if (ranges != null) {
-            for (int i = 0; i < ranges.length; i++) {
+            for (Range range : ranges) {
                 Object tag = getColorHighlight(UPDATE_HIGHLIGHT_COLOR);
                 updateHighlights.addElement(tag);
-                paintHighlight(ranges[i], tag);
+                paintHighlight(range, tag);
             }
         }
     }

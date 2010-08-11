@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -363,7 +363,7 @@ public class SimplifyTranslation {
     private Term findDivITerm(Term t) {
 	if ((t.op().equals(integerLDT.getDiv()))) {
 	    return t;
-	} else if (!(t.op().name().toString().equals(
+	} else if (!(t.op().name().equals(
 		AbstractIntegerLDT.NUMBERS_NAME) || t.arity() == 0)) {
 	    Term res;
 	    for (int i = 0; i < t.arity(); i++) {
@@ -403,7 +403,7 @@ public class SimplifyTranslation {
 
     private Term replaceTerm(Term term, Term divTerm, Term newVar) {
 	if (term.arity() == 0
-		|| term.op().name().toString().equals(
+		|| term.op().name().equals(
 			AbstractIntegerLDT.NUMBERS_NAME)) {
 	    return term;
 	} else if (term.equals(divTerm)) {
@@ -483,6 +483,11 @@ public class SimplifyTranslation {
 	    Vector<QuantifiableVariable> quantifiedVars)
 	    throws SimplifyException {
 	Operator op = term.op();
+//	String response = op.toString();
+//	if(response.indexOf("jint")!=-1 || response.indexOf("jchar")!=-1 || response.indexOf("cast")!=-1){
+//	    System.out.println(response);
+//	}
+
 	if (op == Op.NOT) {
 	    return (translateSimpleTerm(term, NOT, quantifiedVars));
 	} else if (op == Op.AND) {
@@ -586,6 +591,9 @@ public class SimplifyTranslation {
 		    addPredicate(getUniqueVariableName(sort).toString(), 1);
 		}
 		return (new StringBuffer(res));
+	    } else if(op instanceof CastFunctionSymbol){
+		//assuming that a cast is an identity function.
+		return translate(term.sub(0), quantifiedVars);
 	    } else if (name.equals("byte_MIN") | name.equals("byte_MAX")
 		    | name.equals("byte_RANGE") | name.equals("byte_HALFRANGE")
 		    | name.equals("short_MIN") | name.equals("short_MAX")
@@ -598,11 +606,9 @@ public class SimplifyTranslation {
 		return (translateSimpleTerm(term, name, quantifiedVars));
 	    } else {
 		if (term.sort() == Sort.FORMULA) {
-		    addPredicate(getUniqueVariableName(op).toString(), op
-			    .arity());
+		    addPredicate(getUniqueVariableName(op).toString(), op.arity());
 		}
-		return (translateSimpleTerm(term, getUniqueVariableName(op)
-			.toString(), quantifiedVars));
+		return (translateSimpleTerm(term, getUniqueVariableName(op).toString(), quantifiedVars));
 	    }
 	} else if ((op instanceof Modality) || (op instanceof IUpdateOperator)
 	/* ||(op instanceof IfThenElse) */) {
@@ -721,14 +727,14 @@ public class SimplifyTranslation {
     private String produceClosure(StringBuffer s) {
 	StringBuffer tmp = new StringBuffer("(");
 	tmp.append(ALL).append(" (");
-	for (Iterator<Metavariable> i = usedGlobalMv.iterator(); i.hasNext();) {
-	    tmp.append(' ').append(getUniqueVariableName(i.next()));
-	}
+        for (Metavariable anUsedGlobalMv : usedGlobalMv) {
+            tmp.append(' ').append(getUniqueVariableName(anUsedGlobalMv));
+        }
 	tmp.append(")");
 	tmp.append("(").append(EX).append(" (");
-	for (Iterator<Metavariable> i = usedLocalMv.iterator(); i.hasNext();) {
-	    tmp.append(' ').append(getUniqueVariableName(i.next()));
-	}
+        for (Metavariable anUsedLocalMv : usedLocalMv) {
+            tmp.append(' ').append(getUniqueVariableName(anUsedLocalMv));
+        }
 	tmp.append(")\n ");
 	tmp.append(s);
 	tmp.append("\n))");
@@ -755,10 +761,12 @@ public class SimplifyTranslation {
 	    Operator op = t.op();
 	    if (!lightWeight || !(op instanceof Modality)
 		    && !(op instanceof IUpdateOperator)
-		    && !(op instanceof IfThenElse) && op != Op.ALL
+		    //&& !(op instanceof IfThenElse) //gladisch:14.11.2009 
+		    && op != Op.ALL
 		    && op != Op.EX) {
 		hb.append(pretranslate(t, new Vector<QuantifiableVariable>()));
 	    }
+
 	}
 	return hb;
     }

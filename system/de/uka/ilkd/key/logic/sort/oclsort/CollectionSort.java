@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -165,12 +165,11 @@ public class CollectionSort implements OclSort {
 	    if (((GenericSort)sort).getOneOf().size() == 0) {
 		return true;
 	    } else {
-		Iterator<Sort> iter = ((GenericSort)sort).getOneOf().iterator();
-		while (iter.hasNext()) {
-		    if (this.extendsTrans(iter.next())) {
-			return true;
-		    }
-		}
+            for (Sort sort1 : ((GenericSort) sort).getOneOf()) {
+                if (this.extendsTrans(sort1)) {
+                    return true;
+                }
+            }
 		return false;
 	    }
 	} else {
@@ -195,12 +194,8 @@ public class CollectionSort implements OclSort {
 	    return false;
 	}
 	CollectionSort cSort = (CollectionSort)obj;
-	if (this.collectionKind == cSort.collectionKind
-	    && this.elemSort == cSort.elemSort) {
-	    return true;
-	} else {
-	    return false;
-	}
+        return this.collectionKind == cSort.collectionKind
+                && this.elemSort == cSort.elemSort;
     }
 
     public int hashCode(){

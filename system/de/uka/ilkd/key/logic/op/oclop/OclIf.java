@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -49,11 +49,8 @@ public class OclIf extends TermSymbol {
 	if (term.sub(0).sort() != OclSort.BOOLEAN) {
 	    return false;
 	}
-	if (!(term.sub(1).sort().extendsTrans(term.sub(2).sort()))
-	    && !(term.sub(2).sort().extendsTrans(term.sub(1).sort()))) {
-	    return false;
-	}
-        return true;
+        return !(!(term.sub(1).sort().extendsTrans(term.sub(2).sort()))
+                && !(term.sub(2).sort().extendsTrans(term.sub(1).sort())));
     }
 
     public Sort sort(Term[] subTerm) {

@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -45,18 +45,16 @@ public class StatementSkolemBuilder
     }
 
     public Iterator<SkolemSet> build () {
-	Iterator<SchemaVariable> it =
-	    getOriginalSkolemSet ().getMissing ().iterator ();
 
-	while ( it.hasNext () ) {
-	    final SchemaVariable sv = it.next ();
+        for (SchemaVariable schemaVariable : getOriginalSkolemSet().getMissing()) {
+            final SchemaVariable sv = schemaVariable;
 
-	    if ( sv.isProgramSV () &&
-		 ((SortedSchemaVariable)sv).sort () ==
-		     ProgramSVSort.STATEMENT &&
-		 !isInstantiated ( sv ) )
-	        createSkolemStatementSV ( sv );
-	}
+            if (sv.isProgramSV() &&
+                    ((SortedSchemaVariable) sv).sort() ==
+                            ProgramSVSort.STATEMENT &&
+                    !isInstantiated(sv))
+                createSkolemStatementSV(sv);
+        }
 
 	return toIterator
 	    ( getOriginalSkolemSet ()

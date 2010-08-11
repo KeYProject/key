@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -65,10 +65,7 @@ public class OclIterate extends TermSymbol {
 	if (!initAccValueSort.extendsTrans(accVariableSort)) {
 	    return false;
 	}
-	if (!exprSort.extendsTrans(accVariableSort)) {
-	    return false;
-	}
-        return true;
+        return exprSort.extendsTrans(accVariableSort);
     }
 
     public Sort sort(Term[] subTerm) {

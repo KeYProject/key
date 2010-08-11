@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -10,14 +10,10 @@
 
 package de.uka.ilkd.key.proof;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 
-import de.uka.ilkd.key.collection.ImmutableArray;
-import de.uka.ilkd.key.collection.DefaultImmutableSet;
-import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.collection.*;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.speclang.FormulaWithAxioms;
@@ -112,6 +108,17 @@ public class OpReplacer {
         }
         return result;
     }
+    
+    /**
+     * Replaces in a list of terms.
+     */
+    public ImmutableList<Term> replace(ImmutableList<Term> terms) {
+        ImmutableList<Term> result = ImmutableSLList.<Term>nil();
+        for (final Term term : terms) {
+            result = result.append(replace(term));
+        }
+        return result;
+    }
 
     /**
      * Replaces in a location descriptor.
@@ -149,10 +156,9 @@ public class OpReplacer {
     public Map<Operator, Term> replace(/*in*/ Map<Operator, Term> map) {
         
         Map<Operator,Term> result = new HashMap<Operator, Term>();
-        
-        final Iterator<Map.Entry<Operator, Term>> it = map.entrySet().iterator();
-        while(it.hasNext()) {
-            final Map.Entry<Operator, Term> entry = it.next();
+
+        for (Object o : map.entrySet()) {
+            final Map.Entry<Operator, Term> entry = (Map.Entry<Operator, Term>) o;
             result.put(replace(entry.getKey()), replace(entry.getValue()));
         }        
         return result;

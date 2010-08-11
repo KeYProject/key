@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -53,14 +53,13 @@ public class ExecutionTraceModelForTesting extends ExecutionTraceModel {
                                                             MethodReference.class);
             coll.start();
             ImmutableList<ProgramElement> l = coll.getNodes();
-            Iterator<ProgramElement> it = l.iterator();
-            while(it.hasNext()){
-                MethodReference mr = (MethodReference) it.next();
+            for (ProgramElement aL : l) {
+                MethodReference mr = (MethodReference) aL;
                 //I'm not sure if this is the correct way to determine the ExecutionContext, but I couldn't find a better way.
                 ExecutionContext ec = serv.getJavaInfo().getDefaultExecutionContext();
-                KeYJavaType refPrefixType =getStaticPrefixType(mr.getReferencePrefix(), ec, serv);
+                KeYJavaType refPrefixType = getStaticPrefixType(mr.getReferencePrefix(), ec, serv);
                 ProgramMethod pm = mr.method(serv, refPrefixType, ec);
-                if(pm != null && !result.contains(pm)){
+                if (pm != null && !result.contains(pm)) {
                     result = result.add(pm);
                 }
             }
@@ -75,7 +74,7 @@ public class ExecutionTraceModelForTesting extends ExecutionTraceModel {
      * from key.rule.metaconstruct.MethodCall and extended.*/
     private KeYJavaType getStaticPrefixType(ReferencePrefix refPrefix,ExecutionContext execContext, Services services) {
         if (refPrefix==null || refPrefix instanceof ThisReference && 
-                ((ThisReference) refPrefix).getReferencePrefix()==null){ 
+                refPrefix.getReferencePrefix()==null){
             return execContext.getTypeReference().getKeYJavaType();
         } else if(refPrefix instanceof ThisReference){
             return ((TypeReference) ((ThisReference) refPrefix).getReferencePrefix()).getKeYJavaType();

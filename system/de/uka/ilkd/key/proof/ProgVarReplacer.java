@@ -1,10 +1,11 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
+//
 //
 // This file is part of KeY - Integrated Deductive Software Design
 // Copyright (C) 2001-2004 Universitaet Karlsruhe, Germany
@@ -40,7 +41,7 @@ public class ProgVarReplacer {
     /**
      * map specifying the replacements to be done
      */
-    private final Map map;
+    protected final Map map;
     
     
     /**
@@ -134,25 +135,24 @@ public class ProgVarReplacer {
 	appsToBeRemoved = DefaultImmutableSet.<NoPosTacletApp>nil();
 	appsToBeAdded   = DefaultImmutableSet.<NoPosTacletApp>nil();
 
-	Iterator<NoPosTacletApp> it = noPosTacletApps.iterator();
-	while(it.hasNext()) {
-	    NoPosTacletApp noPosTacletApp = it.next();
-	    SVInstantiations insts = noPosTacletApp.instantiations();
+        for (NoPosTacletApp noPosTacletApp1 : noPosTacletApps) {
+            NoPosTacletApp noPosTacletApp = noPosTacletApp1;
+            SVInstantiations insts = noPosTacletApp.instantiations();
 
-	    SVInstantiations newInsts = replace(insts);
+            SVInstantiations newInsts = replace(insts);
 
-	    if(newInsts != insts) {
-	    	NoPosTacletApp newNoPosTacletApp
-		 	= NoPosTacletApp.createNoPosTacletApp(
-				noPosTacletApp.taclet(),
-		    		newInsts,
-				noPosTacletApp.constraint(),
-				noPosTacletApp.newMetavariables(),
-				noPosTacletApp.ifFormulaInstantiations());
-		appsToBeRemoved = appsToBeRemoved.add(noPosTacletApp);
-		appsToBeAdded   = appsToBeAdded.add(newNoPosTacletApp);
-	    }
-	}
+            if (newInsts != insts) {
+                NoPosTacletApp newNoPosTacletApp
+                        = NoPosTacletApp.createNoPosTacletApp(
+                        noPosTacletApp.taclet(),
+                        newInsts,
+                        noPosTacletApp.constraint(),
+                        noPosTacletApp.newMetavariables(),
+                        noPosTacletApp.ifFormulaInstantiations());
+                appsToBeRemoved = appsToBeRemoved.add(noPosTacletApp);
+                appsToBeAdded = appsToBeAdded.add(newNoPosTacletApp);
+            }
+        }
 
 	tacletIndex.removeTaclets(appsToBeRemoved);
 	tacletIndex.addTaclets(appsToBeAdded);
@@ -408,5 +408,9 @@ public class ProgVarReplacer {
                                                                services);
 	pvrv.start();
 	return pvrv.result();
+    }
+
+    public String toString(){
+	return map.toString();
     }
 }

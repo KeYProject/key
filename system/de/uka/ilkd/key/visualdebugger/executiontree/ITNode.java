@@ -1,10 +1,12 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
+//
+//
 package de.uka.ilkd.key.visualdebugger.executiontree;
 
 import java.util.HashMap;
@@ -185,7 +187,7 @@ public class ITNode {
                     // for
                     // sep,
                     // eg.
-                    && node.getAppliedRuleApp().rule().displayName().toString()
+                    && node.getAppliedRuleApp().rule().displayName()
                             .equals("method_call_return"))
                 return true;
         }
@@ -417,7 +419,7 @@ public class ITNode {
     }
 
     public ITNode[] getChildren() {
-        return (ITNode[]) children.toArray(new ITNode[children.size()]);
+        return children.toArray(new ITNode[children.size()]);
     }
 
     public ProgramVariable getExpressionResultVar() {
@@ -481,8 +483,7 @@ public class ITNode {
         // remove implicit
         ImmutableList<Term> result = ImmutableSLList.<Term>nil();
 
-        for (Iterator<Term> it = pc.iterator(); it.hasNext();) {
-            final Term n = it.next();
+        for (final Term n : pc) {
             if (!VisualDebugger.containsImplicitAttr(n) || impl)
                 result = result.append(n);
 
@@ -608,9 +609,8 @@ public class ITNode {
     public String toString() {
         String result = "";
         result = result + " (( " + bc + " Node " + id + " ";
-        Iterator it = children.iterator();
-        while (it.hasNext()) {
-            result = result + it.next();
+        for (ITNode aChildren : children) {
+            result = result + aChildren;
         }
 
         result = result + " ))";

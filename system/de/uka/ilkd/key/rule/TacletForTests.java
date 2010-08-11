@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -164,8 +164,10 @@ public class TacletForTests {
 
     public static Term parseTerm(String termstr, Services services) {
 	if (termstr.equals("")) return null;
+	
+	StringReader br = null;
 	try {	    
-	    StringReader br   = new StringReader(termstr);
+	    br   = new StringReader(termstr);
 	    KeYParser parser = new KeYParser(ParserMode.TERM,
 	                                     new KeYLexer(br,null), 
 					     "No file. " +
@@ -181,14 +183,17 @@ public class TacletForTests {
 	    e.printStackTrace();
 	    System.exit(-1);
 	    return null;
+	} finally {
+	    if (br != null) br.close();
 	}
 	
     }
 
     public static Term parseTerm(String termstr, NamespaceSet set) {
 	if (termstr.equals("")) return null;
+	StringReader br = null;
 	try {	    
-	    StringReader br=new StringReader(termstr);
+	    br = new StringReader(termstr);
 	    KeYParser parser = new KeYParser(ParserMode.TERM,
 	                                     new KeYLexer(br,null), 
 					     "No file. " +
@@ -204,6 +209,8 @@ public class TacletForTests {
 	    System.err.println("Exception during parsing!");
 	    e.printStackTrace();
 	    return null;
+	} finally {
+	    if (br != null) br.close();
 	}
 	
     }

@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -9,8 +9,6 @@
 //
 
 package de.uka.ilkd.key.strategy.feature;
-
-import java.util.Iterator;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.Services;
@@ -41,12 +39,10 @@ public abstract class AbstractConstraintStrengthenFeature extends
         
         final ImmutableList<IfFormulaInstantiation> insts = app.ifFormulaInstantiations ();
         if ( insts == null ) return c;
-        
-        final Iterator<IfFormulaInstantiation> it = insts.iterator ();
-        //      TODO: c will be unsatifiable if intersection sorts are required 
+
+        //      TODO: c will be unsatifiable if intersection sorts are required
         // (is this intended)? or rather new Namespace() 
-        while ( it.hasNext () )
-            c = c.join ( it.next ().getConstrainedFormula ().constraint (), services );
+        for (IfFormulaInstantiation inst : insts) c = c.join(inst.getConstrainedFormula().constraint(), services);
         return c;
     }
     

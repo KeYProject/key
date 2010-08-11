@@ -1,43 +1,24 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
 //
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2004 Universitaet Karlsruhe, Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
 package de.uka.ilkd.key.java.recoderext;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.abstraction.ClassType;
 import recoder.abstraction.Field;
-import recoder.java.Identifier;
-import recoder.java.Statement;
-import recoder.java.StatementBlock;
-import recoder.java.declaration.ClassDeclaration;
-import recoder.java.declaration.DeclarationSpecifier;
-import recoder.java.declaration.FieldDeclaration;
-import recoder.java.declaration.FieldSpecification;
-import recoder.java.declaration.MethodDeclaration;
-import recoder.java.declaration.ParameterDeclaration;
-import recoder.java.declaration.TypeDeclaration;
+import recoder.java.*;
+import recoder.java.declaration.*;
 import recoder.java.declaration.modifier.Private;
 import recoder.java.declaration.modifier.Protected;
-import recoder.java.reference.MethodReference;
-import recoder.java.reference.ReferencePrefix;
-import recoder.java.reference.SuperReference;
-import recoder.java.reference.ThisReference;
+import recoder.java.reference.*;
 import recoder.kit.ProblemReport;
 import recoder.list.generic.ASTArrayList;
 import recoder.list.generic.ASTList;
@@ -145,20 +126,19 @@ public class PrepareObjectBuilder
 	    return new ASTArrayList<Statement>(0);
 	} 
 	ASTList<Statement> result = new ASTArrayList<Statement>(fields.size());
-	for (int i = 0; i<fields.size(); i++) {
-	    Field field = fields.get(i);
-	    if (!field.isStatic()) {		
-		Identifier fieldId;
-		if (field.getName().charAt(0) != '<') {
-		    fieldId = new Identifier(field.getName());
-		    result.add
-			(assign((attribute(new ThisReference(), fieldId)),
-				getDefaultValue
-				(services.
-				 getCrossReferenceSourceInfo().getType(field))));
-		}
-	    }
-	}
+        for (Field field : fields) {
+            if (!field.isStatic()) {
+                Identifier fieldId;
+                if (field.getName().charAt(0) != '<') {
+                    fieldId = new Identifier(field.getName());
+                    result.add
+                            (assign((attribute(new ThisReference(), fieldId)),
+                                    getDefaultValue
+                                            (services.
+                                                    getCrossReferenceSourceInfo().getType(field))));
+                }
+            }
+        }
 	
 	return result;
     }
@@ -177,8 +157,8 @@ public class PrepareObjectBuilder
 	    body.add((new MethodReference
 			 (new SuperReference(), 
 			  new ImplicitIdentifier(IMPLICIT_OBJECT_PREPARE))));
-	}
-	body.addAll(class2fields.get(classType));
+	    body.addAll(class2fields.get(classType));
+        }
 	return new StatementBlock(body);
     }
     
@@ -192,6 +172,10 @@ public class PrepareObjectBuilder
     public MethodDeclaration createMethod(TypeDeclaration type) {
 	ASTList<DeclarationSpecifier> modifiers = new ASTArrayList<DeclarationSpecifier>(1);
 	modifiers.add(new Protected());	
+	//	modifiers.add(new KeYAnnotationUseSpecification(new TypeReference(
+	//                new Identifier("ExternallyConstructedScope"))));
+	//        modifiers.add(new KeYAnnotationUseSpecification(new TypeReference(
+	//                new Identifier("NoLocalScope"))));
 	MethodDeclaration md =  new MethodDeclaration
 	    (modifiers, 
 	     null, 
@@ -213,6 +197,12 @@ public class PrepareObjectBuilder
     public MethodDeclaration createMethodPrepareEnter(TypeDeclaration type) {
 	ASTList<DeclarationSpecifier> modifiers = new ASTArrayList<DeclarationSpecifier>(1);
 	modifiers.add(new Private());	
+        
+	//        modifiers.add(new KeYAnnotationUseSpecification(new TypeReference(
+  	//              new Identifier("ExternallyConstructedScope"))));
+ 	//       modifiers.add(new KeYAnnotationUseSpecification(new TypeReference(
+ 	//               new Identifier("NoLocalScope"))));
+        
 	MethodDeclaration md =  new MethodDeclaration
 	    (modifiers, 
 	     null, 

@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -10,7 +10,6 @@
 package de.uka.ilkd.key.logic.sort;
 
 import java.util.HashMap;
-import java.util.Iterator;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
@@ -28,6 +27,7 @@ import de.uka.ilkd.key.java.expression.operator.Instanceof;
 import de.uka.ilkd.key.java.expression.operator.Negative;
 import de.uka.ilkd.key.java.expression.operator.New;
 import de.uka.ilkd.key.java.expression.operator.NewArray;
+import de.uka.ilkd.key.java.recoderext.AreaAllocationMethodBuilder;
 import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
 import de.uka.ilkd.key.java.recoderext.InstanceAllocationMethodBuilder;
 import de.uka.ilkd.key.java.recoderext.JVMIsTransientMethodBuilder;
@@ -43,7 +43,7 @@ public abstract class ProgramSVSort extends PrimitiveSort {
     // Keeps the mapping of ProgramSVSort names to
     // ProgramSVSort instances (helpful in parsing
     // schema variable declarations)
-    private static HashMap<Name, ProgramSVSort> name2sort = 
+    private static final HashMap<Name, ProgramSVSort> name2sort =
         new HashMap<Name, ProgramSVSort>(60);
 
     //----------- Types of Expression Program SVs ----------------------------
@@ -57,7 +57,9 @@ public abstract class ProgramSVSort extends PrimitiveSort {
 
     public static final ProgramSVSort STATICVARIABLE
 	= new StaticVariableSort();
-
+    
+    public static final ProgramSVSort LOCALVARIABLE
+        = new LocalVariableSort();
 
     public static final ProgramSVSort SIMPLEEXPRESSION 
 	= new SimpleExpressionSort();
@@ -83,9 +85,6 @@ public abstract class ProgramSVSort extends PrimitiveSort {
 
     
     //----------- Expressions with restrictions on kind of type -------------
-
-//    public static final ModelMethodSort MODELMETHOD
-//	= new ModelMethodSort();
 
     public static final NonSimpleMethodReferenceSort NONSIMPLEMETHODREFERENCE
 	= new NonSimpleMethodReferenceSort();
@@ -180,6 +179,7 @@ public abstract class ProgramSVSort extends PrimitiveSort {
 			 PrimitiveType.JAVA_SHORT,
 			 PrimitiveType.JAVA_INT,
 			 PrimitiveType.JAVA_LONG});
+
     
     public static final ProgramSVSort SIMPLEANYNUMBERTYPEEXPRESSION 
 	= new SimpleExpressionSpecialPrimitiveTypeSort
@@ -211,11 +211,18 @@ public abstract class ProgramSVSort extends PrimitiveSort {
 			 PrimitiveType.JAVA_SHORT,
 			 PrimitiveType.JAVA_INT});
 
+    public static final ProgramSVSort SIMPLEJAVABOOLEANEXPRESSION 
+	= new SimpleExpressionSpecialPrimitiveTypeSort
+	("SimpleJavaBooleanExpression", new
+	 PrimitiveType[]{PrimitiveType.JAVA_BOOLEAN});
+
     public static final ProgramSVSort SIMPLESTRINGEXPRESSION
-	= new SimpleExpressionStringSort
-	("SimpleStringExpression");
+	= new SimpleExpressionStringSort("SimpleStringExpression");
+    
+    public static final ProgramSVSort SIMPLENONSTRINGOBJECTEXPRESSION
+	= new SimpleExpressionNonStringObjectSort("SimpleNonStringObjectExpression");
 
-
+    
 
     //--------------- Specials that can be get rid of perhaps--------------
 
@@ -242,9 +249,13 @@ public abstract class ProgramSVSort extends PrimitiveSort {
     public static final ProgramSVSort EXPLICITVARIABLE
 	= new ExplicitProgramVariableSort();
 
-    public static final ProgramSVSort CONSTANTVARIABLE
-	= new ConstantProgramVariableSort();
+    public static final ProgramSVSort CONSTANT_PRIMITIVE_TYPE_VARIABLE
+	= new ConstantProgramVariableSort(new Name("ConstantPrimitiveTypeVariable"), false);
 
+    public static final ProgramSVSort CONSTANT_STRING_VARIABLE
+	= new ConstantProgramVariableSort(new Name("ConstantStringVariable"), true);
+
+    
     // implict field match
     public static final ProgramSVSort IMPLICITREFERENCE
 	= new ImplicitFieldReferenceSort();
@@ -257,7 +268,8 @@ public abstract class ProgramSVSort extends PrimitiveSort {
         }
     };
 
-    public static final ProgramSVSort LITERAL = new LiteralSort();
+    public static final ProgramSVSort NONSTRINGLITERAL = new NonStringLiteralSort();
+    public static final ProgramSVSort STRINGLITERAL = new StringLiteralSort();
 
     //--------------- Specials that match on certain names-----------------
     
@@ -288,6 +300,10 @@ public abstract class ProgramSVSort extends PrimitiveSort {
     public static final ProgramSVSort IMPLICITCREATED
         = new ImplicitFieldSort(new Name("ImplicitCreated"),
                                 ImplicitFieldAdder.IMPLICIT_CREATED, true);
+    
+    public static final ProgramSVSort IMPLICITSIZE
+    = new ImplicitFieldSort(new Name("ImplicitSize"),
+                            ImplicitFieldAdder.IMPLICIT_SIZE, true);
     
     public static final ProgramSVSort IMPLICITENLOSINGTHIS
     = new ImplicitFieldSort(new Name("ImplicitEnclosingThis"),
@@ -350,12 +366,19 @@ public abstract class ProgramSVSort extends PrimitiveSort {
         = new SpecificMethodNameSort(new ProgramElementName
                 (InstanceAllocationMethodBuilder.IMPLICIT_INSTANCE_ALLOCATE));
     
+    public static final ProgramSVSort PUSH
+    = new SpecificMethodNameSort(new ProgramElementName("push"));
+    
+    public static final ProgramSVSort DELETE
+    = new SpecificMethodNameSort(new ProgramElementName("delete"));
+    
+    public static final ProgramSVSort ALLOCATEAREA
+    = new SpecificMethodNameSort(new ProgramElementName
+            (AreaAllocationMethodBuilder.IMPLICIT_AREA_ALLOCATE));
+    
     public static final ProgramSVSort SEP //TODO
         = new SpecificMethodNameSort(new ProgramElementName("sep"));
 
-    public static final ProgramSVSort  DEBUGGERTYPEREF
-    = new  DebuggerTypeReferenceSort();
-    
     //---------------REFERENCE SORTS ------------------------
     public static final ProgramSVSort EXECUTIONCONTEXT = new ExecutionContextSort();
 
@@ -409,11 +432,8 @@ public abstract class ProgramSVSort extends PrimitiveSort {
 	}
 
 	public boolean canStandFor(Term t) {
-	    if (t.op() instanceof ProgramVariable) {
-		return true;
+        return t.op() instanceof ProgramVariable;
 	    }
-	    return false;
-	}
 
 	protected boolean canStandFor(ProgramElement pe,
 				      Services services) {
@@ -449,7 +469,6 @@ public abstract class ProgramSVSort extends PrimitiveSort {
 	    return false;
 	}
     }
-
 
     /**
      * This sort represents a type of program schema variables that match
@@ -534,6 +553,25 @@ public abstract class ProgramSVSort extends PrimitiveSort {
 
     }
     
+    private static class LocalVariableSort 
+        extends LeftHandSideSort {
+
+        public LocalVariableSort() {
+            super (new Name("LocalVariable"));
+        }
+
+        public boolean canStandFor(Term t) {       
+            return t.op() instanceof ProgramVariable &&
+            !((ProgramVariable)t.op()).isStatic();
+        }
+
+        protected boolean canStandFor(ProgramElement pe,
+                Services services) {
+            return pe instanceof ProgramVariable && !((ProgramVariable) pe).isStatic();
+        }
+
+    }
+    
 
 
     /**
@@ -560,13 +598,16 @@ public abstract class ProgramSVSort extends PrimitiveSort {
 	}
 	
 	protected boolean canStandFor(ProgramElement pe,
-				      Services services) {
+		Services services) {
 	    if (pe instanceof Negative) {
- 		return ((Negative)pe).getChildAt(0) instanceof Literal;
- 	    }	   
+		return ((Negative)pe).getChildAt(0) instanceof Literal;
+	    }	   
+
+	    if (pe instanceof StringLiteral)
+		return false;
 
 	    if (pe instanceof Literal) {
-				return true;
+		return true;
 	    }
 	    if (pe instanceof Instanceof) {
 		ProgramElement v = ((Instanceof) pe).getChildAt(0);
@@ -632,18 +673,41 @@ public abstract class ProgramSVSort extends PrimitiveSort {
 
     }
 
+    /**
+     * This sort represents a type of program schema variables that match
+     * only string literals, e.g. "abc"
+     */
+    private static class StringLiteralSort extends ProgramSVSort {
+	public StringLiteralSort() {
+	    super(new Name("StringLiteral"));
+	}
+
+	protected StringLiteralSort(Name n) {
+	    super(n);
+	}
+
+	// do not match a term
+	public boolean canStandFor(Term t) {
+	    return false;
+	}
+
+	protected boolean canStandFor(ProgramElement pe,
+				      Services services) {
+	    return (pe instanceof StringLiteral);
+	}
+    }
 
     /**
      * This sort represents a type of program schema variables that match
-     * only on literals
+     * only on non-string literals
      */
-    private static class LiteralSort extends ProgramSVSort {
+    private static class NonStringLiteralSort extends ProgramSVSort {
 
-	public LiteralSort() {
-	    super(new Name("Literal"));
+	public NonStringLiteralSort() {
+	    super(new Name("NonStringLiteral"));
 	}
 
-	protected LiteralSort(Name n) {
+	protected NonStringLiteralSort(Name n) {
 	    super(n);
 	}
 
@@ -654,7 +718,8 @@ public abstract class ProgramSVSort extends PrimitiveSort {
 	
 	protected boolean canStandFor(ProgramElement pe,
 				      Services services) {
-	    return (pe instanceof Literal);
+	    return (pe instanceof Literal
+		    && !(pe instanceof StringLiteral));
 	}
     }
 
@@ -894,27 +959,6 @@ public abstract class ProgramSVSort extends PrimitiveSort {
 	}
     }
     
-    
-    /**
-     * This sort represents a type of program schema variables that
-     * match only on type references.
-     */    
-    private static class DebuggerTypeReferenceSort extends ProgramSVSort {
-
-        public DebuggerTypeReferenceSort() {
-            super(new Name("DebuggerType"));
-        }
-
-        protected boolean canStandFor(ProgramElement check, Services services) {
-            if (check instanceof TypeReference){
-               TypeReference tr = (TypeReference)check;
-               System.out.println(tr.getReferencePrefix());
-                
-            } 
-            return false;
-        }
-    }
-
 
     /**
      * This sort represents a type of program schema variables that
@@ -969,7 +1013,7 @@ public abstract class ProgramSVSort extends PrimitiveSort {
      */
     private static class SpecificMethodNameSort extends MethodNameSort{
 
-        private ProgramElementName methodName; 
+        private final ProgramElementName methodName;
         
         public SpecificMethodNameSort(Name sortName, 
 				      ProgramElementName methodName) {
@@ -1024,17 +1068,49 @@ public abstract class ProgramSVSort extends PrimitiveSort {
 	    super(new Name(name));
 	}
 
+	/* Will only match on String variables */
 	public boolean canStandFor(ProgramElement check, 
 				   ExecutionContext ec,
 				   Services services) {
 	    if (!super.canStandFor(check, ec, services)) {
 		return false;
 	    }
-	    if (check instanceof StringLiteral) return true;
+	    //String Literal has SideEffects, but SimpleExpressionSort will not match
+	    //if (check instanceof StringLiteral) return false;
 	    if (check instanceof ProgramVariable) {
 		Namespace ns = services.getNamespaces().sorts();
 		Sort stringSort = (Sort)ns.lookup(new Name("java.lang.String"));
 		return ((ProgramVariable)check).getKeYJavaType().getSort().equals(stringSort);
+	    }
+	    return false;
+	}
+    }
+    
+    /**
+     * This sort represents a type of program schema variables that match
+     * on string literals and string variables.
+     */
+    public static class SimpleExpressionNonStringObjectSort 
+	extends SimpleExpressionSort{
+
+	public SimpleExpressionNonStringObjectSort(String name) {
+	    super(new Name(name));
+	}
+
+	/* Will only match on String variables */
+	public boolean canStandFor(ProgramElement check, 
+				   ExecutionContext ec,
+				   Services services) {
+	    if (!super.canStandFor(check, ec, services)) {
+		return false;
+	    }
+	    //String Literal has SideEffects, but SimpleExpressionSort will not match
+	    //if (check instanceof StringLiteral) return false;
+	    if (check instanceof ProgramVariable) {
+		Namespace ns = services.getNamespaces().sorts();
+		Sort stringSort = (Sort)ns.lookup(new Name("java.lang.String"));
+		return stringSort instanceof ObjectSort && 
+		 !((ProgramVariable)check).getKeYJavaType().getSort().equals(stringSort);
 	    }
 	    return false;
 	}
@@ -1067,9 +1143,9 @@ public abstract class ProgramSVSort extends PrimitiveSort {
 	    }
 	    final KeYJavaType kjt = getKeYJavaType(check, ec, services);
             if (kjt != null) {
-                final Type type = kjt.getJavaType();            
-                for (int i=0; i<allowed_types.length; i++){
-                    if (type == allowed_types[i])
+                final Type type = kjt.getJavaType();
+                for (PrimitiveType allowed_type : allowed_types) {
+                    if (type == allowed_type)
                         return true;
                 }
             }
@@ -1084,7 +1160,7 @@ public abstract class ProgramSVSort extends PrimitiveSort {
     private static class ExpressionSpecialPrimitiveTypeSort 
 	extends ExpressionSort{
 
-	private PrimitiveType[] allowed_types;
+	private final PrimitiveType[] allowed_types;
 
 	public ExpressionSpecialPrimitiveTypeSort
 	    (String name, PrimitiveType[] allowed_types) {
@@ -1103,11 +1179,11 @@ public abstract class ProgramSVSort extends PrimitiveSort {
             final KeYJavaType kjt = getKeYJavaType(check, ec, services);
 	    if (kjt != null) {
 	        final Type type = kjt.getJavaType();
-            
-	        for (int i=0; i<allowed_types.length; i++){
-	            if (type == allowed_types[i])
-	                return true;
-	        }
+
+            for (PrimitiveType allowed_type : allowed_types) {
+                if (type == allowed_type)
+                    return true;
+            }
             }
 	    return false;
 	}
@@ -1175,11 +1251,9 @@ public abstract class ProgramSVSort extends PrimitiveSort {
 
 	protected boolean canStandFor(ProgramElement pe,
 				      Services services) {
-	    if (pe instanceof VariableDeclaration &&
-		((VariableDeclaration)pe).getVariables().size() > 1) 
-		return true;	    
-	    return false;
-	}	
+        return pe instanceof VariableDeclaration &&
+                ((VariableDeclaration) pe).getVariables().size() > 1;
+	    }
 
     }
 
@@ -1191,15 +1265,12 @@ public abstract class ProgramSVSort extends PrimitiveSort {
 
 	protected boolean canStandFor(ProgramElement pe,
 				      Services services) {
-	    if (pe instanceof VariableDeclaration &&
-		((VariableDeclaration)pe).getVariables().size() == 1 &&
-		((VariableDeclaration)pe).getVariables().
-		get(0).getDimensions() > 0) {
-		return true;
-	    }
-		
-	    return false;
-	}	
+        return pe instanceof VariableDeclaration &&
+                ((VariableDeclaration) pe).getVariables().size() == 1 &&
+                ((VariableDeclaration) pe).getVariables().
+                        get(0).getDimensions() > 0;
+
+    }
 
     }
 
@@ -1246,12 +1317,18 @@ public abstract class ProgramSVSort extends PrimitiveSort {
     private static class ConstantProgramVariableSort 
 	extends ProgramSVSort {
 
-	public ConstantProgramVariableSort() {
-	    super(new Name("ConstantVariable"));
+	private final Name type = new Name("java.lang.String");
+	private final boolean isString;
+
+	public ConstantProgramVariableSort(Name svSortName, boolean string) {
+	    super(svSortName);
+	    isString = string;
 	}
 
+	
 	public boolean canStandFor(Term t) {	   
-	    return t.op () instanceof ProgramConstant;
+	    return t.op () instanceof ProgramConstant && 
+	    	isString == t.sort().name().equals(type);
 	}
 
 	protected boolean canStandFor(ProgramElement pe,
@@ -1340,7 +1417,7 @@ public abstract class ProgramSVSort extends PrimitiveSort {
 	extends NameMatchingSort {
 
 	private ImmutableList<Name> reverseSignature = ImmutableSLList.<Name>nil();
-	private String fullTypeName;
+	private final String fullTypeName;
 
 	public MethodNameReferenceSort(Name name,
 	                               String methodName, 
@@ -1374,20 +1451,18 @@ public abstract class ProgramSVSort extends PrimitiveSort {
 
 	private ImmutableList<Name> reverse(ImmutableList<Name> names) {
 	    ImmutableList<Name> result = ImmutableSLList.<Name>nil();
-	    Iterator<Name> it = names.iterator();
-	    while (it.hasNext()) {
-		result = result.append(it.next());
-	    }
+        for (Name name1 : names) {
+            result = result.append(name1);
+        }
 	    return result;
 	}
 
 	private ImmutableList<Type> createSignature(Services services) {
 	    ImmutableList<Type> result = ImmutableSLList.<Type>nil();
-	    Iterator<Name> ownSig = reverseSignature.iterator();
-	    while (ownSig.hasNext()) {
-		result = result.prepend(services.getJavaInfo()
-					.getKeYJavaType(""+ownSig.next()));
-	    }
+        for (Name aReverseSignature : reverseSignature) {
+            result = result.prepend(services.getJavaInfo()
+                    .getKeYJavaType("" + aReverseSignature));
+        }
 	    return result;
 	}
 
@@ -1441,11 +1516,8 @@ public abstract class ProgramSVSort extends PrimitiveSort {
 	    if (pe instanceof ProgramVariable) {
 		return super.allowed(pe, services);
 	    }
-	    if (pe instanceof ProgramSVProxy) {
- 		return true;
-	    }
-	    return false;
-	}
+        return pe instanceof ProgramSVProxy;
+    }
 
 
 	public boolean canStandFor(Term t) {
@@ -1563,24 +1635,20 @@ public abstract class ProgramSVSort extends PrimitiveSort {
     //-------------------helper methods ------------------------------------
     
     static boolean methodConstrReference(ProgramElement pe) {
-	return ((pe instanceof MethodReference)
-		|| (pe instanceof ConstructorReference)
-		|| (pe instanceof SpecialConstructorReference));
+	return (pe instanceof MethodReference)
+		|| (pe instanceof ConstructorReference);
     }
 
-    public ProgramElement getSVWithSort(ExtList l, Class alternative) {	
-	Iterator it=l.iterator();
-	while (it.hasNext()) {
-	    Object o=it.next();
-	    if (o instanceof SortedSchemaVariable
-		&& (((SortedSchemaVariable)o).sort()==this)) {
-		return (ProgramElement) o;
-	    }
-	    else if ((alternative.isInstance(o)) 
-		     && (! (o instanceof SchemaVariable))) {
-		return (ProgramElement) o;
-	    }
-	}
+    public ProgramElement getSVWithSort(ExtList l, Class alternative) {
+        for (final Object o : l) {
+            if (o instanceof SortedSchemaVariable
+                    && (((SortedSchemaVariable) o).sort() == this)) {
+                return (ProgramElement) o;
+            } else if ((alternative.isInstance(o))
+                    && (!(o instanceof SchemaVariable))) {
+                return (ProgramElement) o;
+            }
+        }
 	return null;
     }
 
@@ -1589,9 +1657,7 @@ public abstract class ProgramSVSort extends PrimitiveSort {
     }
 
     static boolean excludedMethodName(Name name) {
-        if(((MethodNameReferenceSort)JCMAKETRANSIENTARRAY).compareNames(name) >= 0)
-	    return true;
-	return false;
+        return ((MethodNameReferenceSort) JCMAKETRANSIENTARRAY).compareNames(name) >= 0;
     }
 
     static boolean implicit(ProgramElement pe) {

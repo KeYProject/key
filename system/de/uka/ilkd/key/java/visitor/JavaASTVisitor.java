@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -11,9 +11,7 @@
 package de.uka.ilkd.key.java.visitor;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.declaration.*;
-import de.uka.ilkd.key.java.expression.ArrayInitializer;
-import de.uka.ilkd.key.java.expression.ParenthesizedExpression;
-import de.uka.ilkd.key.java.expression.PassiveExpression;
+import de.uka.ilkd.key.java.expression.*;
 import de.uka.ilkd.key.java.expression.literal.*;
 import de.uka.ilkd.key.java.expression.operator.*;
 import de.uka.ilkd.key.java.reference.*;
@@ -148,6 +146,10 @@ public abstract class JavaASTVisitor extends JavaASTWalker
     public void performActionOnCharLiteral(CharLiteral x) {
 	doDefaultAction(x);
     }
+    
+  /*  public void performActionOnCurrentMemoryAreaReference(CurrentMemoryAreaReference x){
+        doDefaultAction(x);
+    }*/
  
     public void performActionOnClassDeclaration(ClassDeclaration x) {
 	doDefaultAction(x);
@@ -353,6 +355,10 @@ public abstract class JavaASTVisitor extends JavaASTWalker
 	doDefaultAction(x);
     }
  
+    public void performActionOnMemoryAreaEC(MemoryAreaEC x) {
+	doDefaultAction(x);
+    }
+    
     public void performActionOnMetaClassReference(MetaClassReference x) {
 	doDefaultAction(x);
     }
@@ -503,6 +509,10 @@ public abstract class JavaASTVisitor extends JavaASTWalker
     }
  
     public void performActionOnReturn(Return x) {
+	doDefaultAction(x);
+    }
+    
+    public void performActionOnRuntimeInstanceEC(RuntimeInstanceEC x) {
 	doDefaultAction(x);
     }
     

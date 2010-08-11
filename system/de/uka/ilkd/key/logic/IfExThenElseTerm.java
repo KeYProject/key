@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -36,9 +36,9 @@ class IfExThenElseTerm extends Term {
         this.subTerm = new ImmutableArray<Term> ( subs );
         
         int max_depth = -1;
-        for ( int i = 0; i < subs.length; i++ ) {
-            if ( subs[i].depth () > max_depth ) {
-                max_depth = subs[i].depth ();
+        for (Term sub : subs) {
+            if (sub.depth() > max_depth) {
+                max_depth = sub.depth();
             }
         }
         depth = max_depth + 1;

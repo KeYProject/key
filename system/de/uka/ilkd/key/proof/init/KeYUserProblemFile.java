@@ -1,12 +1,11 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License.
+// The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
-//
-//
+
 package de.uka.ilkd.key.proof.init;
 
 import java.io.File;
@@ -16,7 +15,7 @@ import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.parser.*;
-import de.uka.ilkd.key.proof.CountingBufferedInputStream;
+import de.uka.ilkd.key.proof.CountingBufferedReader;
 import de.uka.ilkd.key.proof.ProblemLoader;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
@@ -88,6 +87,8 @@ public class KeYUserProblemFile extends KeYFile implements ProofOblInput{
             throw new ProofInputException(e);
         } catch (FileNotFoundException fnfe) {
             throw new ProofInputException(fnfe);
+        } finally {
+            close();
         }
     }
 
@@ -98,8 +99,8 @@ public class KeYUserProblemFile extends KeYFile implements ProofOblInput{
         }
 
         try {
-            CountingBufferedInputStream cinp =
-                new CountingBufferedInputStream
+            CountingBufferedReader cinp =
+                new CountingBufferedReader
                     (getNewStream(),monitor,getNumberOfChars()/100);
             DeclPicker lexer = new DeclPicker(new KeYLexer(cinp,initConfig.getServices().getExceptionHandler()));
 
@@ -145,7 +146,7 @@ public class KeYUserProblemFile extends KeYFile implements ProofOblInput{
             throw new ProofInputException(e);
         } catch (FileNotFoundException fnfe) {
             throw new ProofInputException(fnfe);
-        }
+        } 
     }
 
 
@@ -178,9 +179,11 @@ public class KeYUserProblemFile extends KeYFile implements ProofOblInput{
             lastParser.proof(prl);
         } catch(antlr.ANTLRException e) {
             throw new ProofInputException(e);
+        } finally {
+            lastParser = null;
+            close();
         }
     }
-
 
     public boolean equals(Object o){
         if(!(o instanceof KeYUserProblemFile)) {
@@ -190,17 +193,6 @@ public class KeYUserProblemFile extends KeYFile implements ProofOblInput{
         return kf.file.file().getAbsolutePath()
                              .equals(file.file().getAbsolutePath());
     }
-
-/*    private IList<Type> getInnerClasses(TypeDeclaration td){
-        IList<Type> result = ImmSLList.<Type>nil();
-        for(int i=0; i<td.getTypeDeclarationCount(); i++){
-            if (td.getTypeDeclarationAt(i) instanceof InterfaceDeclaration
-                    || td.getTypeDeclarationAt(i) instanceof ClassDeclaration) {
-                result = result.append(td.getTypeDeclarationAt(i));
-                result = result.append(getInnerClasses(td.getTypeDeclarationAt(i)));
-            }
-    }*/
-
 
     public int hashCode() {
         return file.file().getAbsolutePath().hashCode();

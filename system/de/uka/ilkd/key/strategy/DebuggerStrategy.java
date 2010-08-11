@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -10,7 +10,6 @@
 
 package de.uka.ilkd.key.strategy;
 
-import java.util.Iterator;
 import java.util.List;
 
 import de.uka.ilkd.key.collection.ImmutableList;
@@ -79,7 +78,7 @@ public class DebuggerStrategy extends VBTStrategy {
     protected DebuggerStrategy(Proof p_proof, StrategyProperties props,
             List<WatchPoint> watchpoints) {
 
-        super(p_proof, props);
+        super(p_proof, props, 0);
 
         final boolean isSplittingAllowed = props.get(
                 VISUAL_DEBUGGER_SPLITTING_RULES_KEY).equals(
@@ -133,9 +132,8 @@ public class DebuggerStrategy extends VBTStrategy {
         final Feature inUpdateFeature = InUpdateFeature.create(
                 isSplittingAllowed, inUpdateAndAssumes, inInitPhase);
 
-        final Iterator<Named> it = h.iterator();
-        while (it.hasNext()) {
-            final String ruleSetName = it.next().name().toString();
+        for (Named aH : h) {
+            final String ruleSetName = aH.name().toString();
             bindRuleSet(d, ruleSetName, ifZero(inUpdateFeature, inftyConst(),
                     longConst(0)));
         }

@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -47,7 +47,7 @@ public class AttributeTermRep extends AbstractTermRepresentation {
      * 
      * @see de.uka.ilkd.key.unittest.AbstractTermRepresentation#getWriteRep()
      */
-    public Statement getWriteRep() {
+    public Statement getWriteRep(Term right) {
         final Expression l, r;
         l = tce.convertToProgramElement(readRep);
         r = tce.convertToProgramElement(right);

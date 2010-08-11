@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -100,10 +100,11 @@ public class MethodCallInfo {
             if(num==null)
                 num = 0;
             return set(contextClone, num +1);
-        };
-        public String toString(int indent){return "?";};
-    };
-    
+        }
+
+        public String toString(int indent){return "?";}
+    }
+
     public class IntCounter extends Counter<Object>{
         /**Counts how often a method is called. It does not distinguish between different contexts of invocation as it is just one integer. */
         int i;
@@ -112,7 +113,7 @@ public class MethodCallInfo {
             assert context==null;
             i = val;
             return i;
-        };
+        }
 
         /**Set context to null because this Counter is independent from the context of method invocation */
         public  Integer get(Object context){
@@ -133,11 +134,8 @@ public class MethodCallInfo {
             list=al;
         }
         public boolean hasNext() {
-            if(list.size()>pos+1){
-                return true;
+            return list.size() > pos + 1;
             }
-            return false;
-        }
         public Object next() {
             return list.get(++pos);
         }
@@ -181,7 +179,7 @@ public class MethodCallInfo {
                 i = val;
                 return i;
             }
-        };
+        }
 
         public  Integer get(Iterator context){
             if(context!=null && context.hasNext()){
@@ -212,7 +210,7 @@ public class MethodCallInfo {
                 i = i==null?1:i+1;
                 return i;
             }
-        };
+        }
 
         public String toString(int indent){
             String res="";

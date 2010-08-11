@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -29,11 +29,9 @@ public class SLParameters {
     
     
     public boolean isListOfTerm() {
-        
-        Iterator<SLExpression> it = parameters.iterator();
-        
-        while(it.hasNext()) {
-            if (!it.next().isTerm())
+
+        for (SLExpression parameter : parameters) {
+            if (!parameter.isTerm())
                 return false;
         }
         
@@ -43,10 +41,9 @@ public class SLParameters {
     public ImmutableList<KeYJavaType> getSignature(Services services) {
             
         ImmutableList<KeYJavaType> result = ImmutableSLList.<KeYJavaType>nil();
-        Iterator<SLExpression> it = parameters.iterator();
-        
-        while(it.hasNext()) {
-            result = result.append( it.next().getKeYJavaType(services.getJavaInfo()) );
+
+        for (SLExpression parameter : parameters) {
+            result = result.append(parameter.getKeYJavaType(services.getJavaInfo()));
         }
         
         return result;

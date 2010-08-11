@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -49,13 +49,13 @@ public class StaticProgramChecker
      * contains the types of all maximum subtrees of the AST that have
      * already been left
      */
-    private final Stack typeStack       = new Stack ();
+    private final Stack<Object> typeStack       = new Stack<Object> ();
 
     /**
      * The result types of all method frames that enclose the current
      * position within the AST
      */
-    private final Stack returnTypeStack = new Stack ();
+    private final Stack<KeYJavaType> returnTypeStack = new Stack<KeYJavaType> ();
 
     /**
      * Symbolic constant that is inserted in <code>typeStack</code>
@@ -760,6 +760,11 @@ public class StaticProgramChecker
     public void performActionOnLoopInit(LoopInit x)     {
 	doStandardStatement (x);
     }
+    
+    public void performActionOnMemoryAreaEC(MemoryAreaEC x)     {
+	ImmutableArray<KeYJavaType> types = popChildren ();
+	pushResult ( types.get(0) );
+    }
 
     public void performActionOnMethodFrame(MethodFrame x) {
 	performActionOnMethodFrame ( x, false );
@@ -881,7 +886,7 @@ public class StaticProgramChecker
 	Debug.assertFalse ( returnTypeStack.empty (),
                             "Cannot determine correct return type" );
 	
-	KeYJavaType frameType = (KeYJavaType)returnTypeStack.peek ();
+	KeYJavaType frameType = returnTypeStack.peek ();
 	
 	if ( x.getChildCount () == 0 ) {
 	    if ( frameType != VOID )
@@ -901,6 +906,11 @@ public class StaticProgramChecker
 	pushVoid ();
     }
 
+    public void performActionOnRuntimeInstanceEC(RuntimeInstanceEC x)     {
+	ImmutableArray<KeYJavaType> types = popChildren ();
+	pushResult ( types.get(0) );
+    }
+    
     public void performActionOnSchemaVariable(
 			    SchemaVariable x)     {
 	doSchemaVariable ( x );

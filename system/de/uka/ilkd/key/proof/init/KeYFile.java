@@ -1,18 +1,14 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License.
+// The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
-//
-//
+
 package de.uka.ilkd.key.proof.init;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,7 +23,7 @@ import de.uka.ilkd.key.parser.KeYLexer;
 import de.uka.ilkd.key.parser.KeYParser;
 import de.uka.ilkd.key.parser.ParserConfig;
 import de.uka.ilkd.key.parser.ParserMode;
-import de.uka.ilkd.key.proof.CountingBufferedInputStream;
+import de.uka.ilkd.key.proof.CountingBufferedReader;
 import de.uka.ilkd.key.proof.RuleSource;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.rule.Taclet;
@@ -128,10 +124,12 @@ public class KeYFile implements EnvInput {
             if (file.isDirectory()) {
                 return null;
             }
+            BufferedInputStream is = null ;
             try {
+        	is = new BufferedInputStream(getNewStream());
                 KeYParser problemParser
                     = new KeYParser(ParserMode.PROBLEM,
-                                    new KeYLexer(getNewStream(), null),
+                                    new KeYLexer(is, null),
                                     file.toString());
                 settings = new ProofSettings(ProofSettings.DEFAULT_SETTINGS);
                 settings.setProfile(ProofSettings.DEFAULT_SETTINGS.getProfile());
@@ -142,6 +140,12 @@ public class KeYFile implements EnvInput {
                 throw new ProofInputException(fnfe);
             } catch (de.uka.ilkd.key.util.ExceptionHandlerException ehe) {
                 throw new ProofInputException(ehe.getCause().getMessage());
+            } finally {
+        	try {
+	            is.close();
+                } catch (IOException e) {
+                    throw new ProofInputException(e);
+                }
             }
         }
         return settings;
@@ -340,8 +344,8 @@ public class KeYFile implements EnvInput {
         //read .key file
 	try {
             Debug.out("Reading KeY file", file);
-	    CountingBufferedInputStream cinp =
-		new CountingBufferedInputStream
+	    CountingBufferedReader cinp =
+		new CountingBufferedReader
 		    (getNewStream(),monitor,getNumberOfChars()/100);
 
 	    final NamespaceSet normal = initConfig.namespaces().copy();
@@ -444,8 +448,8 @@ public class KeYFile implements EnvInput {
 	    new ParserConfig(initConfig.getServices(), normal);
 
 	try {
-	    final CountingBufferedInputStream cinp = new CountingBufferedInputStream
-            (getNewStream(),monitor,getNumberOfChars()/100);
+	    final CountingBufferedReader cinp = new CountingBufferedReader
+            (getNewStream(), monitor,getNumberOfChars()/100);
             KeYParser problemParser
                 = new KeYParser(ParserMode.PROBLEM,
                                 new KeYLexer(cinp,
@@ -504,5 +508,9 @@ public class KeYFile implements EnvInput {
             return -1;
         }
 	return externalForm.hashCode();
+    }
+    
+    public void finalize() {
+	close();
     }
 }

@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -85,11 +85,10 @@ public class SLMethodResolver extends SLExpressionResolver {
             subs = new Term[parameters.getParameters().size()];
             i = 0;
         }
-        
-        Iterator<SLExpression> it = parameters.getParameters().iterator();
-        while(it.hasNext()) {
+
+        for (SLExpression slExpression : parameters.getParameters()) {
             //Remember: parameters.isLisOfTerm() is true!
-            subs[i++] = it.next().getTerm();
+            subs[i++] = slExpression.getTerm();
         }
         
         if (pm.getKeYJavaType() == null) {

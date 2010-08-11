@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -10,8 +10,6 @@
 
 
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
-
-import java.util.Iterator;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
@@ -84,9 +82,8 @@ public class QuanEliminationAnalyser {
     }
     
     private boolean hasDefinitionShape(Term t, boolean ex) {
-        final Iterator<QuantifiableVariable> it = t.freeVars ().iterator ();
-        while ( it.hasNext () ) {
-            if ( isDefinition ( t, it.next (), ex ) ) return true;
+        for (QuantifiableVariable quantifiableVariable : t.freeVars()) {
+            if (isDefinition(t, quantifiableVariable, ex)) return true;
         }
         return false;
     }

@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -220,8 +220,8 @@ public class ExpansionState
     */
     public boolean containsAllAncestors(Collection c)
     {
-        for (Iterator i = c.iterator(); i.hasNext();)
-            if (!containsAncestors((TreePath)i.next()))
+        for (Object aC : c)
+            if (!containsAncestors((TreePath) aC))
                 return false;
 
         return true;
@@ -364,8 +364,7 @@ public class ExpansionState
     */
     public static void expandAll(JTree tree, TreePath path)
     {
-        for (Iterator i = extremalPaths(tree.getModel(), path, new HashSet()).iterator(); i.hasNext();)
-            tree.expandPath((TreePath)i.next());
+        for (Object o : extremalPaths(tree.getModel(), path, new HashSet())) tree.expandPath((TreePath) o);
     }
 
 
@@ -503,8 +502,7 @@ public class ExpansionState
         {
             int maxLevel = 1; // always handle the root (doesn't really matter)
 
-            for (Iterator i = paths.iterator(); i.hasNext();)
-                maxLevel = Math.max(maxLevel, ((TreePath)i.next()).getPathCount());
+            for (Object path : paths) maxLevel = Math.max(maxLevel, ((TreePath) path).getPathCount());
 
             setPathsImpl(tree, data, new TreePath(root), maxLevel - 1, paths);
         }
@@ -599,8 +597,7 @@ public class ExpansionState
 
             Object[] children = e.getChildren();
 
-            for (int i = 0; i < children.length; i++)
-                removeDescendants(parent.pathByAddingChild(children[i]));
+            for (Object aChildren : children) removeDescendants(parent.pathByAddingChild(aChildren));
         }
 
         public void treeStructureChanged(TreeModelEvent e)

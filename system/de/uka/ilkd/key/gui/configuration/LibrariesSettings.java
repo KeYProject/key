@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -37,15 +37,19 @@ public class LibrariesSettings implements Settings {
     *  in the libaries settings*/
    private boolean emptyProperties=true;
    
-   private static String[] standardLibs= {"stringRules.key", "deprecatedRules.key", "acc.key"};
+   private static String[][] standardLibs= { 
+       {"stringContracts.key", "on"}, 
+       {"deprecatedRules.key", "off"}, 
+       {"acc.key", "off"}};
    
    public LibrariesSettings() {
        /*adds the standard libraries to libToSel, maybe they will be
-         replaced by readSettings  */ 
-       for (int i = 0; i < standardLibs.length; i++) {
-           KeYResourceManager.getManager().copyIfNotExists(Proof.class, 
-                   "rules/libraries/"+standardLibs[i], LIBRARIES_PATH + standardLibs[i]);
-           libToSel.put(LIBRARIES_PATH + standardLibs[i],new Boolean(false));
+         replaced by readSettings  */
+       for (String[] standardLib : standardLibs) {
+           KeYResourceManager.getManager().copy(Proof.class,
+                   "rules/libraries/" + standardLib[0], LIBRARIES_PATH + standardLib[0], true);
+           libToSel.put(LIBRARIES_PATH + standardLib[0], 
+        	   	"on".equals(standardLib[1]) ? Boolean.TRUE : Boolean.FALSE);
        }     
    }
    
@@ -63,9 +67,10 @@ public class LibrariesSettings implements Settings {
             while (st.hasMoreTokens()) {
                 String token = st.nextToken().trim();
                 int sepIndex = token.lastIndexOf("-"); 
-                if ((sepIndex > 0) && (sepIndex < token.length()-1))
+                if ((sepIndex > 0) && (sepIndex < token.length()-1)) {
                     libToSel.put(token.substring(0,sepIndex).trim(),
-                            new Boolean(token.substring(sepIndex+1).trim()));
+                            Boolean.valueOf(token.substring(sepIndex + 1).trim()));
+                }
             }
         } else emptyProperties=true;
     }
@@ -93,10 +98,9 @@ public class LibrariesSettings implements Settings {
      * changed to its registered listeners (not thread-safe)
      */
     protected void fireSettingsChanged() {
-        Iterator<SettingsListener> it = listenerList.iterator();
-	while (it.hasNext()) {
-	    it.next().settingsChanged(new GUIEvent(this));
-	}
+        for (SettingsListener aListenerList : listenerList) {
+            aListenerList.settingsChanged(new GUIEvent(this));
+        }
     }
 
     /** adds a listener to the settings object 

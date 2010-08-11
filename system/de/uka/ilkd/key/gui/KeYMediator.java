@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -23,6 +23,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 import javax.swing.event.EventListenerList;
 
+import de.uka.ilkd.key.bugdetection.BugDetector;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
@@ -289,9 +290,21 @@ public class KeYMediator {
     }
 
     public void testCaseConfirmation(String path){
-	JOptionPane.showMessageDialog(
-	    null, "A unittest was generated and written to "+path,
-	    "Unittest generated", JOptionPane.INFORMATION_MESSAGE);
+	TestExecutionDialog.addTest(path, null, null);
+	int n=JOptionPane.NO_OPTION;
+	if(Main.isVisibleMode() || Main.testStandalone){
+	n = JOptionPane.showConfirmDialog(
+		 Main.getInstance(),
+		"A unittest was generated and written to \n"+path+
+		"\nDo you want to compile and execute the test now?",
+		    "Unittest generated",
+		    JOptionPane.YES_NO_OPTION);
+	}
+	if(n==JOptionPane.YES_OPTION){
+	    TestExecutionDialog ted = TestExecutionDialog.getInstance(Main.getInstance());
+	    ted.setVisible(true);
+	}
+	
     }
     
     public void testCaseConfirmation(String path, int coverage){
@@ -308,6 +321,17 @@ public class KeYMediator {
 	    try {
 		testCaseConfirmation(
 		    testBuilder.createTestForNode(getSelectedNode()));
+	    } catch(Exception e){
+		new ExceptionDialog(mainFrame(), e);
+	    }
+	}
+    }
+
+    public void bugDetectionForSelectedNode(){
+	if (ensureProofLoaded()) {
+	    BugDetector bugDetector = new BugDetector();
+	    try {
+		bugDetector.run(getSelectedNode());
 	    } catch(Exception e){
 		new ExceptionDialog(mainFrame(), e);
 	    }
@@ -505,11 +529,9 @@ public class KeYMediator {
 	RuleApp app = set.iterator().next();
 	if (app != null && app.rule() == rule) {
 	    goal.apply(app);
-	    return;
-	}
+	    }
     }
      
-      
     /**
      * Apply a RuleApp and continue with update simplification or strategy
      * application according to current settings.
@@ -958,7 +980,7 @@ public class KeYMediator {
       final boolean b = fullStop;
       Runnable interfaceSignaller = new Runnable() {
          public void run() {
-	     if (mainFrame() instanceof JFrame) mainFrame().setCursor
+	     if (mainFrame() != null) mainFrame().setCursor
 		 (new java.awt.Cursor(java.awt.Cursor.WAIT_CURSOR));
             if (b) {
                interactiveProver.fireAutoModeStarted(
@@ -975,7 +997,7 @@ public class KeYMediator {
          public void run() {
             if ( b )
                interactiveProver.fireAutoModeStopped (new ProofEvent(getProof()));
-            if (mainFrame() instanceof JFrame) mainFrame().setCursor
+            if (mainFrame() != null) mainFrame().setCursor
 		(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
             if (getProof() != null)
                 keySelectionModel.fireSelectedProofChanged();

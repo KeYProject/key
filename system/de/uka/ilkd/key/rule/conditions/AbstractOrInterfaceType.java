@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -49,5 +49,8 @@ public class AbstractOrInterfaceType extends VariableConditionAdapter {
         String prefix = negated ? "\\not" : "";
         return prefix+"\\isAbstractOrInterface (" + resolver + ")";
     }
+    
+    public TypeResolver getTypeResolver(){return resolver;}
+    public boolean isNegated() {return negated;}
 
 }

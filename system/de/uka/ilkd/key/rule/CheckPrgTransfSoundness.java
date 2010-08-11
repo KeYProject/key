@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -196,13 +196,13 @@ public class CheckPrgTransfSoundness {
             allTacletsFile = File.createTempFile("allTaclets","tmp");
             PrintWriter out
                 = new PrintWriter(new BufferedWriter(new FileWriter(allTacletsFile)));
-            for (int i=0; i<ruleFiles.length; i++) {
+            for (String ruleFile : ruleFiles) {
                 //File f = new File(ruleFiles[i]);
                 File f = new File(KeYResourceManager.getManager().getResourceFile
-                                  (CheckPrgTransfSoundness.class,
-                                   ruleFiles[i]).getFile());
+                        (CheckPrgTransfSoundness.class,
+                                ruleFile).getFile());
                 BufferedReader r = new BufferedReader(new FileReader(f));
-                for (String jl = r.readLine();(jl != null); jl = r.readLine()) {
+                for (String jl = r.readLine(); (jl != null); jl = r.readLine()) {
                     if (!jl.startsWith("\\include")) out.println(jl);
                 }
             }
@@ -218,15 +218,13 @@ public class CheckPrgTransfSoundness {
             // schleife �ber alle elemente von currentRules
 
 
-            Iterator<Taclet> currentRulesIt = currentRules.iterator();
-            while (currentRulesIt.hasNext()) {
-                Taclet cT = (Taclet) currentRulesIt.next();
+            for (Taclet currentRule : currentRules) {
+                Taclet cT = currentRule;
 
-                Iterator<String> checkTacsNameIt = checkTacsName.iterator();
-                while (checkTacsNameIt.hasNext()) {
-                    String tacName = checkTacsNameIt.next();
+                for (String aCheckTacsName : checkTacsName) {
+                    String tacName = aCheckTacsName;
                     if (cT.name().toString().equals(tacName)) {
-                        rules=rules.add(cT);
+                        rules = rules.add(cT);
                     }
                 }
             }
@@ -352,9 +350,8 @@ public class CheckPrgTransfSoundness {
         // Creates a map with all the schema variables mapped to the no
         // restriction class.
         svToRestriction = new HashMap<SVSubstitute, Restriction>();
-        Iterator<SchemaVariable> listIt = list.iterator();
-        while (listIt.hasNext()) {
-            svToRestriction.put(listIt.next(), RESTRICTNONE);
+        for (SchemaVariable aList : list) {
+            svToRestriction.put(aList, RESTRICTNONE);
         }
 
         // going inside the statements, until terminalProgramElement
@@ -498,7 +495,7 @@ public class CheckPrgTransfSoundness {
             }
             else{
                 System.out.println("terminal found: " +
-                                   ((NonTerminalProgramElement) findStat)
+                                   findStat
                                    .getChildAt(countst));
                 System.out.println("this should not have happened, all "
                                    + "things we get by accessing "
@@ -1127,9 +1124,8 @@ public class CheckPrgTransfSoundness {
     // "addNewString"
     public static void createNewVarsAddString(Map<SchemaVariable, String> svToMaude) {
         addNewString = "";
-        Iterator<NewVarcond> newvarsIt = newvars.iterator();
-        while (newvarsIt.hasNext()) {
-            NewVarcond newVC =  newvarsIt.next();
+        for (NewVarcond newvar : newvars) {
+            NewVarcond newVC = newvar;
             SchemaVariable sv = newVC.getSchemaVariable();
             SchemaVariable svPeer = newVC.getPeerSchemaVariable();
             Sort svPeerSort = ((SortedSchemaVariable) svPeer).sort();
@@ -1137,57 +1133,54 @@ public class CheckPrgTransfSoundness {
 
             // New SV's name.
             String svName = sv.name().toString()
-                .substring(1,sv.name().toString().length());
+                    .substring(1, sv.name().toString().length());
             // Name of the SV which gives its type to the current new
             // SV.
             String svPeerName = svPeer.name().toString()
-                .substring(1,svPeer.name().toString().length());
+                    .substring(1, svPeer.name().toString().length());
 
             // Case for the new SV is stored in svToMaude.
             svToMaude.put(sv, svMaudeCase);
 
             // Depending on the case the add-String is extended.
             if (svMaudeCase == LOCALVARVAL
-                || svMaudeCase == ATTOBJWOTHISVAL
-                || svMaudeCase == ATTOBJWITHTHISVAL
-                || svMaudeCase == STATATTTYPEREFVAL
-                || svMaudeCase == STATATTOBJREFVAL
-                || svMaudeCase == LITERALVALUE
-                || svMaudeCase == EXPRESSIONVAL
-                || svMaudeCase == ATTRIBVAL) {
+                    || svMaudeCase == ATTOBJWOTHISVAL
+                    || svMaudeCase == ATTOBJWITHTHISVAL
+                    || svMaudeCase == STATATTTYPEREFVAL
+                    || svMaudeCase == STATATTOBJREFVAL
+                    || svMaudeCase == LITERALVALUE
+                    || svMaudeCase == EXPRESSIONVAL
+                    || svMaudeCase == ATTRIBVAL) {
                 addNewString = addNewString
-                    + createStringNewVarVal(svName);
-            }
-            else if (svMaudeCase == LOCALVARINT
-                     || svMaudeCase == ATTOBJWOTHISINT
-                     || svMaudeCase == ATTOBJWITHTHISINT
-                     || svMaudeCase == STATATTTYPEREFINT
-                     || svMaudeCase == STATATTOBJREFINT
-                     || svMaudeCase == LITERALINT
-                     || svMaudeCase == EXPRESSIONINT
-                     || svMaudeCase == ATTRIBINT) {
+                        + createStringNewVarVal(svName);
+            } else if (svMaudeCase == LOCALVARINT
+                    || svMaudeCase == ATTOBJWOTHISINT
+                    || svMaudeCase == ATTOBJWITHTHISINT
+                    || svMaudeCase == STATATTTYPEREFINT
+                    || svMaudeCase == STATATTOBJREFINT
+                    || svMaudeCase == LITERALINT
+                    || svMaudeCase == EXPRESSIONINT
+                    || svMaudeCase == ATTRIBINT) {
                 addNewString = addNewString
-                    + createStringNewVarInt(svName);
-            }
-            else if (svMaudeCase == LOCALVARBOOL
-                     || svMaudeCase == ATTOBJWOTHISBOOL
-                     || svMaudeCase == ATTOBJWITHTHISBOOL
-                     || svMaudeCase == STATATTTYPEREFBOOL
-                     || svMaudeCase == STATATTOBJREFBOOL
-                     || svMaudeCase == LITERALBOOL
-                     || svMaudeCase == EXPRESSIONBOOL
-                     || svMaudeCase == ATTRIBBOOL) {
+                        + createStringNewVarInt(svName);
+            } else if (svMaudeCase == LOCALVARBOOL
+                    || svMaudeCase == ATTOBJWOTHISBOOL
+                    || svMaudeCase == ATTOBJWITHTHISBOOL
+                    || svMaudeCase == STATATTTYPEREFBOOL
+                    || svMaudeCase == STATATTOBJREFBOOL
+                    || svMaudeCase == LITERALBOOL
+                    || svMaudeCase == EXPRESSIONBOOL
+                    || svMaudeCase == ATTRIBBOOL) {
                 addNewString = addNewString
-                    + createStringNewVarBool(svName);
-            }
-            else if (svMaudeCase == LOCALVARATT
-                     || svMaudeCase == ATTOBJWOTHISATT
-                     || svMaudeCase == ATTOBJWITHTHISATT
-                     || svMaudeCase == STATATTTYPEREFATT
-                     || svMaudeCase == STATATTOBJREFATT
-                     || svMaudeCase == EXPRESSIONATT) {
+                        + createStringNewVarBool(svName);
+            } else if (svMaudeCase == LOCALVARATT
+                    || svMaudeCase == ATTOBJWOTHISATT
+                    || svMaudeCase == ATTOBJWITHTHISATT
+                    || svMaudeCase == STATATTTYPEREFATT
+                    || svMaudeCase == STATATTOBJREFATT
+                    || svMaudeCase == EXPRESSIONATT) {
                 addNewString = addNewString
-                    + createStringNewVarAtt(svName, svPeerName);
+                        + createStringNewVarAtt(svName, svPeerName);
             }
         }
     }
@@ -1212,7 +1205,7 @@ public class CheckPrgTransfSoundness {
         // Transform every statement.
         for (int countStatements = 0;
              countStatements <
-                 ((NonTerminalProgramElement) findStatementBlock)
+                 findStatementBlock
                  .getChildCount();
              countStatements ++) {
 
@@ -1286,12 +1279,11 @@ public class CheckPrgTransfSoundness {
             // that sv is replaced in the code by
             // sv+"Name:TacletNewVarName" and it does not matter what
             // the type of the variable is!
-            Iterator<NewVarcond> newvarsIt = newvars.iterator();
-            while (newvarsIt.hasNext()) {
-                NewVarcond newVC = newvarsIt.next();
+            for (NewVarcond newvar : newvars) {
+                NewVarcond newVC = newvar;
                 SchemaVariable newSV = newVC.getSchemaVariable();
                 if (sv == newSV) {
-                    return svName+"Name:TacletNewVarName";
+                    return svName + "Name:TacletNewVarName";
                 }
             }
 
@@ -1593,12 +1585,11 @@ public class CheckPrgTransfSoundness {
             +"---- case for each SV: \n";
 
         Set<SchemaVariable> allSVs = svToMaude.keySet();
-        Iterator<SchemaVariable> allSVsIt = allSVs.iterator();
-        while (allSVsIt.hasNext()) {
-            SchemaVariable sv = allSVsIt.next();
+        for (SchemaVariable allSV : allSVs) {
+            SchemaVariable sv = allSV;
             String svCase = svToMaude.get(sv);
-            infoString = infoString + "---- SV: "+ sv +", Case:"
-                + svCase + " \n";
+            infoString = infoString + "---- SV: " + sv + ", Case:"
+                    + svCase + " \n";
         }
 
         try {
