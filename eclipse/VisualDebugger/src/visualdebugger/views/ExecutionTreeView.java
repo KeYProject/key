@@ -42,7 +42,7 @@ import visualdebugger.draw2d.*;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
-import de.uka.ilkd.key.gui.smt.RuleLauncher;
+import de.uka.ilkd.key.gui.smt.SMTRuleLauncher;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
@@ -1260,9 +1260,9 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
                 if (!vd.getMediator().ensureProofLoaded())
                     return;
                 
-                SMTRule r = ProofSettings.DEFAULT_SETTINGS.getDecisionProcedureSettings().getActiveSMTRule();
+                SMTRule r = ProofSettings.DEFAULT_SETTINGS.getSMTSettings().getActiveSMTRule();
                 final Proof proof = vd.getMediator().getProof();
-                RuleLauncher.INSTANCE.start(ProofSettings.DEFAULT_SETTINGS.getDecisionProcedureSettings().getActiveSMTRule(),
+                SMTRuleLauncher.INSTANCE.start(ProofSettings.DEFAULT_SETTINGS.getSMTSettings().getActiveSMTRule(),
                 	proof, proof.getUserConstraint().getConstraint(), true);
             }
 
