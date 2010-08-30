@@ -11,10 +11,11 @@ package de.uka.ilkd.key.smt;
 
 /**Hint: In order to run Z3 on Linux or Mac use wine. 
  * On {@link http://www4.in.tum.de/~boehmes/z3.html} you can find useful script for that. 
- * Please not that you have to run "winetricks vcrun2008". */
+ * Please note that you have to run "winetricks vcrun2008". 
+ */
 public final class Z3Solver extends AbstractSMTSolver {
 
-    public static final String name="Z3";
+    public static final String name = "Z3";
 
     public String name() {
         return name;
@@ -35,17 +36,17 @@ public final class Z3Solver extends AbstractSMTSolver {
     
     public SMTSolverResult interpretAnswer(String text, String error, int val) {
 	if (val == 0) {
-	    //no error occured
+	    //no error occurred
 	    if (text.contains("unsat")) {
-		return SMTSolverResult.createValidResult(text,name());
+		return SMTSolverResult.createValid(text,name());
 	    } else if (text.contains("sat")) {
-		return SMTSolverResult.createInvalidResult(text,name());
+		return SMTSolverResult.createInvalid(text,name());
 	    } else {
-		return SMTSolverResult.createUnknownResult(text,name());
+		return SMTSolverResult.createUnknown(text,name());
 	    }
-	} else if ((val == 112 && text.contains("unknown")) || val ==139) {
+	} else if ((val == 112 && text.contains("unknown")) || val == 139) {
 	    //the result was unknown
-	    return SMTSolverResult.createUnknownResult(text,name());
+	    return SMTSolverResult.createUnknown(text, name());
 	} else {
 	    //something went wrong
 	    throw new IllegalArgumentException("Code "+ val+": " + error);

@@ -226,7 +226,7 @@ public class SMTResultsAndBugDetectionDialog extends JFrame {
         	    SMTSolverResultWrap val = (SMTSolverResultWrap)tableModel.getValueAt(idx, i);
         	    if(val!=null){
         		sb.append("------------").append(val.r.solverName).append("----------\n").append(val.r).append("\n");
-                    	if(val.r.isValid() == SMTSolverResult.ThreeValuedTruth.FALSIFIABLE){
+                    	if(val.r.isValid() == SMTSolverResult.ThreeValuedTruth.FALSE){
                     	    falsifiable = true;
                     	}else if(val.r.isValid() == SMTSolverResult.ThreeValuedTruth.TRUE){
                     	    falsifiable = false;
@@ -453,7 +453,7 @@ public class SMTResultsAndBugDetectionDialog extends JFrame {
 	public synchronized void smtDataUpdate(ProofTreeEvent e){
 	    //System.out.println("counterExampleUpdate for node "+ e.getNode().serialNr());
 	    if(Main.batchMode || !Main.isVisibleMode()||
-		    !DecisionProcedureSettings.getInstance().getShowSMTResDialog()){
+		    !SMTSettings.getInstance().getShowSMTResDialog()){
 		return;
 	    }
 	    setVisible(true);
@@ -494,7 +494,7 @@ public class SMTResultsAndBugDetectionDialog extends JFrame {
 	
 	public String toString(){
 	    String result = "unknown";
-	    if(r.isValid() == ThreeValuedTruth.FALSIFIABLE){
+	    if(r.isValid() == ThreeValuedTruth.FALSE){
 		result = "unsolvable";
 	    }
 	    if(r.isValid() == ThreeValuedTruth.TRUE){

@@ -326,7 +326,7 @@ public class RuleAppIndex  {
      * returns a list of built-in rule applications applicable
      * for the given goal, user defined constraint and position
      */
-    public ImmutableList<RuleApp> getBuiltInRule(Goal g,
+    public ImmutableList<RuleApp> getBuiltInRules(Goal g,
 	    PosInOccurrence pos, Constraint userConstraint) {
 	 	 	
 	 return builtInRuleAppIndex().getBuiltInRule(g, pos, 

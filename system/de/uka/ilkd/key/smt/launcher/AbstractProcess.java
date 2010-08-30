@@ -163,9 +163,5 @@ abstract public class AbstractProcess implements  Process, MakesProgress
         public int getCurrentCycle(){
             return currentCycle;
         }
-        
-        
-
-	
 }
 

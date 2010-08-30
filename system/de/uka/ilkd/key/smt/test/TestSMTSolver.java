@@ -43,7 +43,7 @@ public abstract class TestSMTSolver extends TestCommons {
 	    solver.useTaclets(false);    
 	}
 	
-	ProofSettings.DEFAULT_SETTINGS.getDecisionProcedureSettings().setSaveFile(false);
+	ProofSettings.DEFAULT_SETTINGS.getSMTSettings().setSaveFile(false);
 	//System.gc();
     }
     
@@ -203,7 +203,7 @@ public abstract class TestSMTSolver extends TestCommons {
 	
 	//unknown is always allowed. But wrong answers are not allowed
 	if (isValid && result != null) {
-	    return result.isValid() != SMTSolverResult.ThreeValuedTruth.FALSIFIABLE; 
+	    return result.isValid() != SMTSolverResult.ThreeValuedTruth.FALSE; 
 	} else {
 	    return result.isValid() != SMTSolverResult.ThreeValuedTruth.TRUE;
 	}

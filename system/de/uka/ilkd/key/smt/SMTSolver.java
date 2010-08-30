@@ -18,12 +18,7 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.smt.SolverSession.InternResult;
 
 
-
-
-public interface SMTSolver extends de.uka.ilkd.key.smt.launcher.Process{
-    
-
-
+public interface SMTSolver extends de.uka.ilkd.key.smt.launcher.Process {
     
     /**
      * This solver's name.
@@ -82,6 +77,4 @@ public interface SMTSolver extends de.uka.ilkd.key.smt.launcher.Process{
     public void useTaclets(boolean b);
     
     public void prepareSolver(LinkedList<InternResult> goals, Services services, Collection<Taclet> taclets);
-    
-   
 }

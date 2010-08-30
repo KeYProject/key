@@ -41,22 +41,6 @@ import de.uka.ilkd.key.smt.launcher.ProcessLauncher;
 import de.uka.ilkd.key.smt.launcher.ProcessLauncherListener;
 
 
-/**
- * Applies the result of external provers to goals.  
- *
- */
-class BuiltInRuleAppSMT extends BuiltInRuleApp{
-    final SMTSolverResult result;
-    public BuiltInRuleAppSMT(BuiltInRule builtInRule, PosInOccurrence pio,
-            Constraint userConstraint, SMTSolverResult result) {
-	super(builtInRule, pio, userConstraint);
-	this.result = result;
-    }
-    public SMTSolverResult getResult(){return result;}
-    
-}
-
-
 
 /**
  *  Use this class to apply external provers to goals. Do not directly use
@@ -67,7 +51,7 @@ class BuiltInRuleAppSMT extends BuiltInRuleApp{
  *  You can decide whether the starting and monitoring (Boss) should be executed
  *  in a new thread or not.<br> Be aware of the fact that in both cases the solvers (workers)
  *  are executed in new threads.<br>
-    After executing the solvers their results are collected, 
+ *  After executing the solvers their results are collected, 
  *  which can be read by <code>getResults()</code> or can be applied to their 
  *  corresponding goals by <code>applyGoals()</code>.<br>
  *  2. run(...): Makes use of the 1.<br>
@@ -84,28 +68,26 @@ public class SMTRule  extends ProcessLauncher implements BuiltInRule{
 
     /**Used for consistency.*/
     public final static SMTRule EMPTY_RULE = new EmptyRule();
+    
     /**The solvers that are used by this rule.*/
     private Collection<SMTSolver> solvers = new LinkedList<SMTSolver>();
+    
     /**Important for applying the results to goals.*/
-    private Constraint 	           userConstraint = null;
+    private Constraint userConstraint = null;
+    
     /**The name of the rule. Important to identify rules while reading and   
      * writting the settings.*/
-    private Name 	           name;
+    private Name name;
+    
     /**
      * <code>true</code> if <code>solvers.size()>1</code>,
      *  otherwise <code>false</code> 
      */
-    private final boolean 	   multiRule;
+    private final boolean multiRule;
     
     private final boolean background;
     
 
-
-    
-    
-    
-    
-    
     public enum WaitingPolicy {STOP_FIRST,WAIT_FOR_ALL};
  
   
@@ -131,7 +113,6 @@ public class SMTRule  extends ProcessLauncher implements BuiltInRule{
      */
     public SMTRule(Name name, SMTSolver ... list){
 	this(name,list.length>1,false,list);
-	
     }
     
 
@@ -177,18 +158,15 @@ public class SMTRule  extends ProcessLauncher implements BuiltInRule{
 
 
 
-    public ImmutableList<Goal> apply(Goal goal, Services services,
-            RuleApp ruleApp) {
-	
-	assert ruleApp instanceof BuiltInRuleAppSMT;
-	
-	SMTSolverResult result = ((BuiltInRuleAppSMT)ruleApp).getResult();
-	
-	if (result.isValid() == SMTSolverResult.ThreeValuedTruth.TRUE) {
-	    return ImmutableSLList.<Goal>nil();
-	} else {
-	    return null;
-	}
+    public ImmutableList<Goal> apply(Goal goal, 
+	    			     Services services,
+	    			     RuleApp ruleApp) {
+	//XXX: somewhat contrary to the intention behind the "apply" method in interface "Rule",
+	//this method is currently called only *after* all the interesting stuff has happened:
+	//the solver has already been run, and it has been run successfully
+	//(see e.g. special handling in TacletMenu.java).
+	//Thus, we can simply return the empty list of goals here (i.e., close the proof branch) 
+	return ImmutableSLList.<Goal>nil();
     }
 
     
@@ -308,7 +286,6 @@ public class SMTRule  extends ProcessLauncher implements BuiltInRule{
 	startThread(internTerms,constraint,useThread,index,services,WaitingPolicy.WAIT_FOR_ALL);
     }
     
-    
 
     
     /**
@@ -402,8 +379,6 @@ public class SMTRule  extends ProcessLauncher implements BuiltInRule{
     }
     
     
-    
-    
     /**
      * Returns the title of the rule used by the GUI. 
      */
@@ -436,7 +411,6 @@ public class SMTRule  extends ProcessLauncher implements BuiltInRule{
     }
 
     public Name name() {
-	
 	return name;
     }
     
@@ -444,7 +418,7 @@ public class SMTRule  extends ProcessLauncher implements BuiltInRule{
      * @return returns the the title of the rule. Used by <code>ProgressDialog</code>.
      */
     public String getTitle(){
-	return  displayName();
+	return displayName();
     }
     
     
@@ -469,14 +443,14 @@ public class SMTRule  extends ProcessLauncher implements BuiltInRule{
 	}
 
 	for (final SolverSession.InternResult res : result) {
-	    final BuiltInRuleApp birApp = new BuiltInRuleAppSMT(this, null,
-		    userConstraint, res.getResult());
+	    final BuiltInRuleApp birApp 
+	    	= new BuiltInRuleApp(this, null, userConstraint);
 	    Goal goal = res.getGoal();
 
 	    if (goal != null) {
 
 		res.getGoal().node().addSMTandFPData(res.getResult());
-		if (!goal.proof().closed() &&goal.proof().openGoals().contains(goal)) {
+		if (!goal.proof().closed() && goal.proof().openGoals().contains(goal)) {
 
 		    if (res.getResult().isValid() == ThreeValuedTruth.TRUE) {
 
@@ -484,12 +458,8 @@ public class SMTRule  extends ProcessLauncher implements BuiltInRule{
 
 		    }
 		}
-
-	
 	    }
-
 	}
-
     }
     
     
@@ -566,7 +536,6 @@ public class SMTRule  extends ProcessLauncher implements BuiltInRule{
 
     @Override
     protected void publish(Event e) {
-
 	if(e.getType().equals(Event.Type.WORK_DONE)){
 	    for(ProcessLauncherListener l : listener){
 		l.workDone();
@@ -608,7 +577,7 @@ public class SMTRule  extends ProcessLauncher implements BuiltInRule{
 	
 	            monitor.setGoalProgress(solver.getSession().currentTerm().getGoal(), SolveType.SOLVABLE);
 	        }
-	        if(result.isValid() == SMTSolverResult.ThreeValuedTruth.FALSIFIABLE){
+	        if(result.isValid() == SMTSolverResult.ThreeValuedTruth.FALSE){
 	            monitor.setGoalProgress(solver.getSession().currentTerm().getGoal(), SolveType.UNSOLVABLE);  
 	        }
 	     break;
@@ -642,12 +611,7 @@ public class SMTRule  extends ProcessLauncher implements BuiltInRule{
 	 default:
 	     break;
 	 }
-	 
-	
     }
-    
-   
-
 }
 
 /**
@@ -687,24 +651,15 @@ class EmptyRule extends SMTRule{
     }
     
 
-    
-
     public String displayName() {
 	return "No prover available";
 
     }
 
     
-  
-    
- 
-    
     public void applyResults(){
     }
     
-
-
-
 
     @Override
     protected void publish(Event e) {

@@ -54,7 +54,7 @@ public class ContractWithInvs {
             = services.getSpecificationRepository();
         
         contract = specRepos.getOperationContractByName(contractName);
-        assert contract != null;
+        assert contract != null : "contract not found: " + contractName;
         
         ImmutableSet<ClassInvariant> tempAssumedInvs 
             = DefaultImmutableSet.<ClassInvariant>nil();

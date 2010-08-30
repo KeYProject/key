@@ -252,7 +252,7 @@ public class ReusePoint implements Comparable {
 
       } else if (templateApp instanceof BuiltInRuleApp) {
          Iterator<RuleApp> it = targetGoal.ruleAppIndex().
-            getBuiltInRule(targetGoal, targetPos, 
+            getBuiltInRules(targetGoal, targetPos, 
                medi.getUserConstraint().getConstraint()).iterator();
          RuleApp result = null;
          RuleApp tmp;

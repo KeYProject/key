@@ -206,10 +206,10 @@ public class Main extends JFrame implements IMain {
 
     
     /** external prover GUI elements */
-    private DPSettingsListener dpSettingsListener;
+    private SMTSettingsListener smtSettingsListener;
 
 
-    private ComplexButton decProcComponent;
+    private ComplexButton smtComponent;
 
 
     
@@ -236,13 +236,13 @@ public class Main extends JFrame implements IMain {
     
     private NotificationManager notificationManager;
 
-    /** The radio items shown in the decproc menu for the different available solver */
-    private ButtonGroup  decProcRadioItems = new ButtonGroup();
+    /** The radio items shown in the SMT menu for the different available solvers */
+    private ButtonGroup smtRadioItems = new ButtonGroup();
     
-    /** The menu for the decproc options */
-    public final JMenu decProcOptions = new JMenu("Decision Procedures...");
+    /** The menu for the SMT options */
+    public final JMenu smtOptions = new JMenu("SMT Solvers...");
     
-    public SMTResultsAndBugDetectionDialog decProcResDialog;
+    public SMTResultsAndBugDetectionDialog smtDialog;
     
     
     /**
@@ -269,7 +269,7 @@ public class Main extends JFrame implements IMain {
         layoutMain();
         initGoalList();
         initGUIProofTree();
-        decProcResDialog = SMTResultsAndBugDetectionDialog.getInstance(mediator);
+        smtDialog = SMTResultsAndBugDetectionDialog.getInstance(mediator);
         mediator.addKeYSelectionListener(TacletTranslationSelection.getSelectionListener());
         
         SwingUtilities.updateComponentTreeUI(this);
@@ -503,14 +503,9 @@ public class Main extends JFrame implements IMain {
         toolBar.addSeparator();                        
         toolBar.addSeparator();
         toolBar.addSeparator();
-        ComplexButton comp = createDecisionProcedureComponent();
+        ComplexButton comp = createSMTComponent();
         toolBar.add(comp.getActionComponent());
         toolBar.add(comp.getSelectionComponent());
-        //toolBar.add(createDecisionProcedureButton());
-        
-        
-        
-        //toolBar.add(createDecisionProcedureSelection());
       
         toolBar.addSeparator();
         
@@ -690,21 +685,21 @@ public class Main extends JFrame implements IMain {
     }
     
 
-    private ComplexButton createDecisionProcedureComponent(){
-	decProcComponent= new ComplexButton(TOOLBAR_ICON_SIZE);
-	decProcComponent.setEmptyItem("No prover available","<html>No prover is applicable for KeY.<br><br>If a prover is installed on your system," +
+    private ComplexButton createSMTComponent(){
+	smtComponent= new ComplexButton(TOOLBAR_ICON_SIZE);
+	smtComponent.setEmptyItem("No prover available","<html>No prover is applicable for KeY.<br><br>If a prover is installed on your system," +
 		"<br>please configure the KeY-System accordingly:\n" +
-		"<br>Options|Decision Procedures</html>");
+		"<br>Options|SMT Solvers</html>");
 
-	decProcComponent.setPrefix("Run ");
+	smtComponent.setPrefix("Run ");
 	
-	decProcComponent.addListener(new ChangeListener() {
+	smtComponent.addListener(new ChangeListener() {
 	    
 	    public void stateChanged(ChangeEvent e) {
 		ComplexButton but = (ComplexButton) e.getSource();
-		if(but.getSelectedItem() instanceof DPInvokeAction){
-		    DPInvokeAction action = (DPInvokeAction) but.getSelectedItem(); 
-		    DecisionProcedureSettings.getInstance().setActiveSMTRule(action.rule);
+		if(but.getSelectedItem() instanceof SMTInvokeAction){
+		    SMTInvokeAction action = (SMTInvokeAction) but.getSelectedItem(); 
+		    SMTSettings.getInstance().setActiveSMTRule(action.rule);
 		}
 	
 	    }
@@ -712,9 +707,9 @@ public class Main extends JFrame implements IMain {
 	
 
 
-	updateDecisionProcedureSelectMenu();
-	mediator.addKeYSelectionListener(new DPEnableControl());
-	return decProcComponent;
+	updateSMTSelectMenu();
+	mediator.addKeYSelectionListener(new SMTEnableControl());
+	return smtComponent;
     }
     
 
@@ -1515,11 +1510,11 @@ public class Main extends JFrame implements IMain {
         });
         registerAtMenu(options, librariesItem);
         
-        // decision procedures
-        createDecisionProcedureMenu(options);
+        // SMT solvers
+        createSMTMenu(options);
         
-	dpSettingsListener = 
-	    new DPSettingsListener(ProofSettings.DEFAULT_SETTINGS.getDecisionProcedureSettings());
+	smtSettingsListener = 
+	    new SMTSettingsListener(ProofSettings.DEFAULT_SETTINGS.getSMTSettings());
        
         
         
@@ -1623,18 +1618,18 @@ public class Main extends JFrame implements IMain {
     }
     
     /**
-     * update the selection menu for Decisionprocedures.
+     * update the selection menu for SMT solvers
      * Remove those, that are not installed anymore, add those, that got installed.
      */
-    public void updateDecisionProcedureSelectMenu() {
+    public void updateSMTSelectMenu() {
 	
 	Collection<SMTRule> rules = ProofSettings.DEFAULT_SETTINGS.
-	                               getDecisionProcedureSettings().getInstalledRules();
+	                               getSMTSettings().getInstalledRules();
 	
 	if(rules == null || rules.size() == 0){
-	    updateDPSelectionMenu();
+	    updateSMTSelectionMenu();
 	}else{
-	    updateDPSelectionMenu(rules);
+	    updateSMTSelectionMenu(rules);
 	}
 	
 
@@ -1642,12 +1637,12 @@ public class Main extends JFrame implements IMain {
 
     }
     
-   private void updateDPSelectionMenu(){
-       decProcComponent.setItems(null);
+   private void updateSMTSelectionMenu(){
+       smtComponent.setItems(null);
    }
    
-   private DPInvokeAction findAction(DPInvokeAction [] actions, SMTRule rule){
-       for(DPInvokeAction action : actions){
+   private SMTInvokeAction findAction(SMTInvokeAction [] actions, SMTRule rule){
+       for(SMTInvokeAction action : actions){
 	   if(action.rule.equals(rule)){
 	       return action;
 	   }
@@ -1655,71 +1650,61 @@ public class Main extends JFrame implements IMain {
        return null;
    }
    
-   private void updateDPSelectionMenu(Collection<SMTRule> rules){
-	DPInvokeAction actions[] = new DPInvokeAction[rules.size()];
+   private void updateSMTSelectionMenu(Collection<SMTRule> rules){
+       SMTInvokeAction actions[] = new SMTInvokeAction[rules.size()];
         
 	int i=0; 
 	for(SMTRule rule : rules){
-	    actions[i] = new DPInvokeAction(rule);
+	    actions[i] = new SMTInvokeAction(rule);
 	    i++;
 	}
 	
-	decProcComponent.setItems(actions);
+	smtComponent.setItems(actions);
             	
-	SMTRule active = ProofSettings.DEFAULT_SETTINGS.getDecisionProcedureSettings().getActiveSMTRule();
+	SMTRule active = ProofSettings.DEFAULT_SETTINGS.getSMTSettings().getActiveSMTRule();
 	 
-	DPInvokeAction activeAction = findAction(actions, active);
+	SMTInvokeAction activeAction = findAction(actions, active);
 	
 	boolean found = activeAction != null;
 	if(!found){
-	    Object item = decProcComponent.getTopItem();
-	    if(item instanceof DPInvokeAction){
-		active = ((DPInvokeAction)item).rule;
-		ProofSettings.DEFAULT_SETTINGS.getDecisionProcedureSettings().setActiveSMTRule(active);
+	    Object item = smtComponent.getTopItem();
+	    if(item instanceof SMTInvokeAction){
+		active = ((SMTInvokeAction)item).rule;
+		ProofSettings.DEFAULT_SETTINGS.getSMTSettings().setActiveSMTRule(active);
 	    }else{
 		activeAction = null;
 	    }
 
 	}
-	decProcComponent.setSelectedItem(activeAction); 
+	smtComponent.setSelectedItem(activeAction); 
    }
     
    private JMenuItem showSMTResDialog;
    
 
-
-    
     
     /**
      * creates a menu allowing to choose the external prover to be used
      * @return the menu with a list of all available provers that can be used
      */
-    private void createDecisionProcedureMenu(JMenu parent) {
-	/** menu for configuration of decision procedure */
+    private void createSMTMenu(JMenu parent) {
+	/** menu for configuration of SMT solvers */
         
-        final DecisionProcedureSettings dps = ProofSettings.DEFAULT_SETTINGS.getDecisionProcedureSettings();
-
-
-
+        final SMTSettings smts = ProofSettings.DEFAULT_SETTINGS.getSMTSettings();
 	
-	
-	JMenuItem item = new JMenuItem("Decision Procedures...");
+	JMenuItem item = new JMenuItem("SMT Solvers...");
 	item.addActionListener(new ActionListener() {
-		   public void actionPerformed(ActionEvent e) {
-		  
-		       SettingsDialog.INSTANCE.showDialog(TemporarySettings.getInstance(
-			       ProofSettings.DEFAULT_SETTINGS.getDecisionProcedureSettings(),
-			       ProofSettings.DEFAULT_SETTINGS.getTacletTranslationSettings()));
-		       
-		       
-		   }
-		});
-	registerAtMenu(parent, item);
-	
+	    public void actionPerformed(ActionEvent e) {
 
-	
-	
-    }    
+		SMTSettingsDialog.INSTANCE.showDialog(TemporarySettings.getInstance(
+			ProofSettings.DEFAULT_SETTINGS.getSMTSettings(),
+			ProofSettings.DEFAULT_SETTINGS.getTacletTranslationSettings()));
+
+
+	    }
+	});
+	registerAtMenu(parent, item);
+    }
     
     
     private JMenuItem setupSpeclangMenu() {
@@ -2124,11 +2109,11 @@ public class Main extends JFrame implements IMain {
         }
     }
     
-    private final class DPSettingsListener implements SettingsListener {	
-	private DecisionProcedureSettings settings;
+    private final class SMTSettingsListener implements SettingsListener {	
+	private SMTSettings settings;
 
-	public DPSettingsListener(DecisionProcedureSettings dps) {
-	    this.settings = dps;
+	public SMTSettingsListener(SMTSettings smts) {
+	    this.settings = smts;
 	    register();
 	}
 
@@ -2147,7 +2132,7 @@ public class Main extends JFrame implements IMain {
 	public void update() {	   
 	    
 	    if (settings != null) {
-		updateDecisionProcedureSelectMenu();
+		updateSMTSelectMenu();
 
 	    } else {
 		assert false;
@@ -2155,10 +2140,10 @@ public class Main extends JFrame implements IMain {
 	}
 
 	public void settingsChanged(GUIEvent e) {
-	    if (e.getSource() instanceof DecisionProcedureSettings) {
+	    if (e.getSource() instanceof SMTSettings) {
 		if (e.getSource() != settings) {
 		    unregister();
-		    settings = (DecisionProcedureSettings) e.getSource();		    
+		    settings = (SMTSettings) e.getSource();		    
 		    register();
 		}
 		update();
@@ -2412,8 +2397,8 @@ public class Main extends JFrame implements IMain {
                 userConstraint
                 .addConstraintTableListener ( constraintListener );
             setProofNodeDisplay();
-            dpSettingsListener.settingsChanged(new GUIEvent((proof != null ? 
-        	    proof.getSettings() : ProofSettings.DEFAULT_SETTINGS).getDecisionProcedureSettings()));
+            smtSettingsListener.settingsChanged(new GUIEvent((proof != null ? 
+        	    proof.getSettings() : ProofSettings.DEFAULT_SETTINGS).getSMTSettings()));
             makePrettyView();
         }
         
@@ -3118,27 +3103,23 @@ public class Main extends JFrame implements IMain {
     }
     
     
-    private final class DPEnableControl implements KeYSelectionListener{
+    private final class SMTEnableControl implements KeYSelectionListener{
 
 	private void enable(boolean b){
-	    decProcComponent.setEnabled(b);
+	    smtComponent.setEnabled(b);
 	}
 
         public void selectedProofChanged(KeYSelectionEvent e) {
-            
-	    if(e.getSource().getSelectedProof() != null){
-              	  enable(!e.getSource().getSelectedProof().closed());
-	       }else{
-		   enable(false);
-	       }
-    	
+            if(e.getSource().getSelectedProof() != null) {
+        	enable(!e.getSource().getSelectedProof().closed());
+            } else {
+        	enable(false);
+            }
         }
         
         public void selectedNodeChanged(KeYSelectionEvent e) {
             selectedProofChanged(e);
-    	
         }
-	
     }
     
     
@@ -3146,23 +3127,19 @@ public class Main extends JFrame implements IMain {
 
     
     /**
-     * This action is responsible for the invocation of a decision procedure.
+     * This action is responsible for the invocation of a SMT solver.
      * For example the toolbar button is paramtrized with an instance of this action
      */
-    private final class DPInvokeAction extends AbstractAction {
-
+    private final class SMTInvokeAction extends AbstractAction {
 	SMTRule rule;
 	
-	public DPInvokeAction(SMTRule rule) {
+	public SMTInvokeAction(SMTRule rule) {
 	    this.rule = rule;
 	    if (rule != SMTRule.EMPTY_RULE) {
 		putValue(SHORT_DESCRIPTION, "Invokes " + rule.displayName());
 	    } 
 	    
 	}
-	
-
-	
 	
 	public boolean isEnabled() {
 	    
@@ -3174,7 +3151,7 @@ public class Main extends JFrame implements IMain {
 	public void actionPerformed(ActionEvent e) {
 	    if (!mediator.ensureProofLoaded() || rule ==SMTRule.EMPTY_RULE) return;
 	    final Proof proof = mediator.getProof();
-	    RuleLauncher.INSTANCE.start(rule, proof,proof.getUserConstraint().getConstraint(),true);
+	    SMTRuleLauncher.INSTANCE.start(rule, proof,proof.getUserConstraint().getConstraint(),true);
 	}
 	
 	public String toString(){
@@ -3183,11 +3160,11 @@ public class Main extends JFrame implements IMain {
 
 	@Override
 	public boolean equals(Object obj) {
-	    if(!(obj instanceof DPInvokeAction)){
+	    if(!(obj instanceof SMTInvokeAction)){
 		return false;
 	    }
 	    
-	    return this.rule.equals(((DPInvokeAction)obj).rule);
+	    return this.rule.equals(((SMTInvokeAction)obj).rule);
 	}
     }
     
@@ -3571,12 +3548,9 @@ public class Main extends JFrame implements IMain {
                     main.selectChoices();
                 }});
             options.add(choiceItem);    
-
-            ButtonGroup decisionProcGroup = new ButtonGroup();
-     
-            JMenu decisionProcedureOption = new JMenu("Decision Procedure Config");     
-            setupDecisionProcedureGroup(decisionProcGroup, decisionProcedureOption);
-            options.add(decisionProcedureOption);
+    
+            JMenu smtOption = new JMenu("SMT Config");     
+            options.add(smtOption);
             
             final JRadioButtonMenuItem completeEx = 
                 new JRadioButtonMenuItem("Require Complete Execution", false);
@@ -3607,17 +3581,7 @@ public class Main extends JFrame implements IMain {
             return options;
         }
         
-        /**
-         * TODO: implement??
-         * @param decisionProcGroup
-         * @param decisionProcedureOption
-         */
-        private void setupDecisionProcedureGroup(ButtonGroup decisionProcGroup, 
-                JMenu decisionProcedureOption) {
-            
-            System.out.println("just test");
-        }    
-        
+       
        
         private final class AutoModeAction extends AbstractAction {
             
