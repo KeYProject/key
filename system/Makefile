@@ -506,3 +506,16 @@ eclipse-plug-in: dist
 	@cp  ../eclipse/ProofVisualization/ProofVisualization_*.jar $(BINARYPATH)$(PFX)casetool/eclipse/KeY_Feature/plugins
 	@cp  ../eclipse/org.key-project.core/org.key_project.core_* $(BINARYPATH)$(PFX)casetool/eclipse/KeY_Feature/plugins
 	@cp  ../eclipse/KeYExternalLibraries/KeYExternalLibraries_1* $(BINARYPATH)$(PFX)casetool/eclipse/KeY_Feature/plugins
+
+#mostly useful for creating the COST tool distribution
+localinst:
+	@echo "Do not forget to make jar first"
+	@mkdir -p /usr/lib/key
+	@cp -r ../bin /usr/lib/key
+	@mkdir -p /usr/lib/key/key-ext-jars
+	@cp $(KEY_LIB)/recoderKey.jar /usr/lib/key/key-ext-jars
+	@cp $(KEY_LIB)/antlr.jar /usr/lib/key/key-ext-jars
+	@cp $(KEY_LIB)/log4j.jar /usr/lib/key/key-ext-jars
+	@cp key.jar /usr/lib/key
+	@sed -i 's/system\/binary\//key.jar/g' /usr/lib/key/bin/*
+	@ln -sf /usr/lib/key/bin/runProver /usr/bin/
