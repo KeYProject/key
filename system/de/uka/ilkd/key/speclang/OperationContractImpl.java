@@ -670,8 +670,8 @@ public final class OperationContractImpl implements OperationContract {
                 + LogicPrinter.escapeHTML(post)
                 + "<br><b>modifies</b> "
                 + LogicPrinter.escapeHTML(locDesc)
-                + "<br><b>working space</b> "
-                + LogicPrinter.escapeHTML(ws)
+//                + "<br><b>working space</b> "
+//                + LogicPrinter.escapeHTML(ws)
                 + "<br><b>termination</b> "
                 + getModality()
                 + "</html>";

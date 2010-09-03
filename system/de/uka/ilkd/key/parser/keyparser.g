@@ -3047,6 +3047,7 @@ array_access_suffix [Term arrayReference] returns [Term result = arrayReference]
     Term rangeFrom = null;
     Term rangeTo   = null;     
     Sort arraySort = null;
+    boolean atPre = false;
 }
 	:
   	LBRACKET 
@@ -3061,7 +3062,21 @@ array_access_suffix [Term arrayReference] returns [Term result = arrayReference]
 	        ((DOTRANGE) => DOTRANGE rangeTo = logicTermReEntry
 		                 {rangeFrom = indexTerm;})?
     )
-    RBRACKET (AT LPAREN arraySort = any_sortId_check[true] RPAREN)? ( shadowNumber = transactionNumber )? 
+    RBRACKET 
+    (AT (
+           (LPAREN arraySort = any_sortId_check[true] RPAREN) 
+            | 
+            (id0:IDENT 
+              {
+                if(!id0.getText().equals("pre") || !(functions() instanceof AtPreNamespace)) { 
+                    semanticError("Unexpected: " + id0.getText()); 
+                }
+                atPre = true;
+              }
+            )
+        )
+    )? 
+    ( shadowNumber = transactionNumber )?
     {
        if (arraySort == null) {
        	if ( inSchemaMode() ) {
@@ -3094,11 +3109,21 @@ array_access_suffix [Term arrayReference] returns [Term result = arrayReference]
 		   						  guardTerm);
 		}
         if (shadowNumber != null) {
-            result = tf.createShadowArrayTerm
+            if(atPre) {
+            	semanticError("@pre for shadowed arrays not supported");
+            } else {
+                result = tf.createShadowArrayTerm
                       (ShadowArrayOp.getShadowArrayOp(arraySort), result, indexTerm, 
                        shadowNumber);
+            }
         } else {
-            result = tf.createArrayTerm(ArrayOp.getArrayOp(arraySort), result, indexTerm);
+            final ArrayOp aop = ArrayOp.getArrayOp(arraySort);
+            if(atPre) {
+                Function aopAtPre = ((AtPreNamespace)functions()).getArrayOpAtPre(aop);
+                result = tf.createFunctionTerm(aopAtPre, result, indexTerm);
+            } else {
+                result = tf.createArrayTerm(aop, result, indexTerm);
+            }
         }  
     }            
     ;exception
