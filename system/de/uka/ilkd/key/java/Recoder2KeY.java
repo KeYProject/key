@@ -896,7 +896,7 @@ public class Recoder2KeY implements JavaReader {
     }
 
     /**
-     * create a new context with a temproray name and make a list of variables
+     * create a new context with a temporary name and make a list of variables
      * visible from within. Use the default source info.
      * 
      * @param pvs
@@ -1156,7 +1156,7 @@ public class Recoder2KeY implements JavaReader {
         while (it.hasNext()) {
             Named n = it.next();
             if (n instanceof ProgramVariable) {
-                pvs = pvs.prepend((ProgramVariable) n);
+                pvs = pvs.append((ProgramVariable) n); //preserve the order (nested namespaces!) 
             }
         }
         return readBlock(s, createContext(pvs));

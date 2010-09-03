@@ -16,8 +16,12 @@ import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Set;
 
 import javax.swing.*;
@@ -30,12 +34,15 @@ import de.uka.ilkd.key.gui.Main;
 import de.uka.ilkd.key.gui.configuration.GeneralSettings;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.JavaInfo;
+import de.uka.ilkd.key.java.JavaReduxFileCollection;
 import de.uka.ilkd.key.java.ProgramElement;
+import de.uka.ilkd.key.java.Recoder2KeY;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.Field;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
 import de.uka.ilkd.key.java.declaration.InterfaceDeclaration;
+import de.uka.ilkd.key.java.declaration.TypeDeclaration;
 import de.uka.ilkd.key.java.recoderext.ConstructorNormalformBuilder;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.visitor.JavaASTCollector;
@@ -45,22 +52,28 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.proof.init.AbstractEnvInput;
-import de.uka.ilkd.key.proof.init.ModStrategy;
-import de.uka.ilkd.key.proof.init.ProofInputException;
+import de.uka.ilkd.key.proof.RuleSource;
+import de.uka.ilkd.key.proof.init.*;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.speclang.jml.JMLSpecExtractor;
 import de.uka.ilkd.key.speclang.ocl.OCLSpecExtractor;
+import de.uka.ilkd.key.util.KeYResourceManager;
 
 
 /** 
  * EnvInput for standalone specification language front ends.
  */
-public final class SLEnvInput extends AbstractEnvInput {
+public final class SLEnvInput implements EnvInput {
     
     private static final String INIT_NAME 
     	= ConstructorNormalformBuilder.CONSTRUCTOR_NORMALFORM_IDENTIFIER;
     private static final TermBuilder TB = TermBuilder.DF;
+    
+    private final String name;
+    private final String javaPath;
+    private final List<File> classPath;
+    private final File bootClassPath;
+    private InitConfig initConfig;    
     
         
     //-------------------------------------------------------------------------
@@ -82,9 +95,18 @@ public final class SLEnvInput extends AbstractEnvInput {
     }
     
     
+    public SLEnvInput(String javaPath,
+  	      	      List<File> classPath,
+  	      	      File bootClassPath) {
+	this.name          = getLanguage() + " specifications";
+	this.javaPath      = javaPath;
+	this.classPath     = classPath;
+	this.bootClassPath = bootClassPath;
+    }    
+    
+    
     public SLEnvInput(String javaPath) {
-        super(getLanguage() + " specifications", javaPath);
-        assert javaPath != null;
+        this(javaPath, null, null);
     }
     
 
@@ -94,7 +116,6 @@ public final class SLEnvInput extends AbstractEnvInput {
     //-------------------------------------------------------------------------
     
     private KeYJavaType[] sortKJTs(KeYJavaType[] kjts) {
-        
         Arrays.sort(kjts, new Comparator<KeYJavaType> () {
             public int compare(KeYJavaType o1, KeYJavaType o2) {
                 return o1.getFullName().compareTo(o2.getFullName());
@@ -335,16 +356,117 @@ public final class SLEnvInput extends AbstractEnvInput {
             showWarningDialog(warnings);
         }
     }
+    
+    
+    private void createDLLibrarySpecsHelper(Set<KeYJavaType> allKJTs,
+	                                    String path) 
+    		throws ProofInputException {
+        for(KeYJavaType kjt : allKJTs) {
+            if(kjt.getJavaType() instanceof TypeDeclaration
+               && ((TypeDeclaration)kjt.getJavaType()).isLibraryClass()) {
+                final String filePath
+                	= path + "/" + kjt.getFullName().replace(".", "/") + ".key";
+                RuleSource rs = null;
+                
+                //external or internal path?
+                if(filePath.startsWith("/")) {
+                    File file = new File(filePath);
+                    if(file.exists()) {
+                	rs = RuleSource.initRuleFile(file);
+                    }
+                } else {
+                    URL url = KeYResourceManager.getManager().getResourceFile(
+                				Recoder2KeY.class, 
+                				filePath);
+                    if(url != null) {
+                	rs = RuleSource.initRuleFile(url);
+                    }
+                }
+                
+                //rule source found? -> read
+                if(rs != null) {
+                    final KeYFile keyFile = new KeYFile(path, rs, null);
+                    keyFile.setInitConfig(initConfig);
+                    keyFile.read(ModStrategy.NO_VARS_FUNCS_GENSORTS);
+                }
+            }
+        }	
+    }
+    
+    
+    /** 
+     * For all library classes C, look for file C.key in same 
+     * directory; if found, read specifications from this file.
+     */
+    private void createDLLibrarySpecs() throws ProofInputException {
+        final Set<KeYJavaType> allKJTs 
+		= initConfig.getServices().getJavaInfo().getAllKeYJavaTypes();			
+	
+	//either boot class path or JavaRedux
+	if(bootClassPath != null) {
+	    createDLLibrarySpecsHelper(allKJTs, 
+		                       bootClassPath.getAbsolutePath());	    
+	} else {
+            String path = JavaReduxFileCollection.JAVA_SRC_DIR;
+            if (!initConfig.getProfile().getInternalClassDirectory().isEmpty()) { 
+        	path += "/" + initConfig.getProfile().getInternalClassDirectory();
+            }
+            createDLLibrarySpecsHelper(allKJTs, path);
+	}
+        
+        //if applicable: class path
+        if(classPath != null) {
+            for(File file : classPath) {
+        	createDLLibrarySpecsHelper(allKJTs, file.getAbsolutePath());
+            }
+        }
+    }
 
     
     
     //-------------------------------------------------------------------------
     //public interface
     //-------------------------------------------------------------------------
+    
+    public String name() {
+	return name;
+    }
+
+
+    public int getNumberOfChars() {
+	return 1;
+    }
+
+
+    public void setInitConfig(InitConfig initConfig) {
+	this.initConfig = initConfig;
+    }
+
+
+    public Includes readIncludes() throws ProofInputException {
+	return new Includes();
+    }
+
+
+    public String readJavaPath() throws ProofInputException {
+	return javaPath;
+    }
+
+
+    public List<File> readClassPath() throws ProofInputException {
+        return classPath;
+    }
+    
+    public File readBootClassPath() {
+        return bootClassPath;
+    }
+    
 
     public void read(ModStrategy mod) throws ProofInputException {
         if(initConfig == null) {
             throw new IllegalStateException("InitConfig not set.");
+        } else if(!initConfig.getProfile().parseSpecs()) {
+            return;
         }
         
         GeneralSettings gs 
@@ -355,5 +477,6 @@ public final class SLEnvInput extends AbstractEnvInput {
         if(gs.useOCL()) {
             createSpecs(new OCLSpecExtractor(initConfig.getServices()));
         }
+        createDLLibrarySpecs();
     }
 }

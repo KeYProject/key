@@ -47,7 +47,8 @@ public class JMLTransformer extends RecoderModelTransformer {
                                                          "public", 
                                                          "static"});    
     
-    private static ImmutableSet<PositionedString> warnings;
+    private static ImmutableSet<PositionedString> warnings 
+    	= DefaultImmutableSet.<PositionedString>nil();
 
     private HashMap<TypeDeclaration, List<Method>> typeDeclaration2Methods;
 

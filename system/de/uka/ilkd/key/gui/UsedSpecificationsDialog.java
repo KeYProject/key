@@ -52,19 +52,23 @@ public class UsedSpecificationsDialog extends JDialog {
     // constructors
     // -------------------------------------------------------------------------
 
-    protected UsedSpecificationsDialog(Services services,
-	    ImmutableSet<ContractWithInvs> contractApps) {
+    protected UsedSpecificationsDialog(
+	    	Services services,
+	    	ImmutableSet<ContractWithInvs> contractApps) {
 	super(Main.getInstance(), "Used Specifications", true);
 	this.services = services;
 
 	// break contract apps down to atomic contracts
-	ImmutableSet<ContractWithInvs> atomicContractApps = DefaultImmutableSet
-	        .<ContractWithInvs> nil();
+	ImmutableSet<ContractWithInvs> atomicContractApps 
+		= DefaultImmutableSet.<ContractWithInvs> nil();
 	for (ContractWithInvs cwi : contractApps) {
-	    for (OperationContract atomicContract : services
-		    .getSpecificationRepository().splitContract(cwi.contract)) {
-		ContractWithInvs atomicCwi = new ContractWithInvs(
-		        atomicContract, cwi.assumedInvs, cwi.ensuredInvs);
+	    for (OperationContract atomicContract : 
+			services.getSpecificationRepository()
+			        .splitContract(cwi.contract)) {
+		ContractWithInvs atomicCwi 
+			= new ContractWithInvs(atomicContract, 
+					       cwi.assumedInvs, 
+					       cwi.ensuredInvs);
 		atomicContractApps = atomicContractApps.add(atomicCwi);
 	    }
 	}
