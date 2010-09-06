@@ -15,6 +15,7 @@ import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.Namespace;
+import de.uka.ilkd.key.logic.op.ArrayOp;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.RigidFunction;
@@ -74,12 +75,24 @@ public class AtPreNamespace extends Namespace {
 
     /**
      */
-    private Named createAtPreFunction(Name name, Sort sort, ImmutableArray<Sort> argsort) {
+    private Function createAtPreFunction(Name name, Sort sort, ImmutableArray<Sort> argsort) {
         return new RigidFunction(name, sort, argsort);
     }
 
-    public Map getAtPreMapping() {
-        return atPreMapping;
-    }
+    
+    public Function getArrayOpAtPre(ArrayOp op) {
+	Function result = (Function) atPreMapping.get(op);
+	if(result == null) {
+            Sort[] argSorts = new Sort[] {op.arraySort(), 
+                    javaInfo.getServices().getTypeConverter()
+                                          .getIntegerLDT()
+                                          .targetSort()};
 
+	    result = createAtPreFunction(new Name(op.name().toString() + "@pre"),
+		                         op.sort(),
+		                         new ImmutableArray<Sort>(argSorts));
+	    atPreMapping.put(op, result);
+	}
+	return result;
+    }
 }

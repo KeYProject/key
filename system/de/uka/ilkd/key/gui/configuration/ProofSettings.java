@@ -74,7 +74,6 @@ public class ProofSettings {
 	    new ChoiceSettings(),
 	    SMTSettings.getInstance(),
 	    new ViewSettings(),
-            new LibrariesSettings(),
             TacletTranslationSettings.getInstance()
 	};
         for (Settings setting : settings) {
@@ -250,7 +249,7 @@ public class ProofSettings {
     
     public TacletTranslationSettings getTacletTranslationSettings(){
 	ensureInitialized();
-	return (TacletTranslationSettings) settings[7];
+	return (TacletTranslationSettings) settings[6];
     }
 
     public SimultaneousUpdateSimplifierSettings 
@@ -259,11 +258,6 @@ public class ProofSettings {
 	return (SimultaneousUpdateSimplifierSettings) settings[1];    
     }
     
-    public LibrariesSettings getLibrariesSettings() {
-        ensureInitialized();
-        return (LibrariesSettings) settings[6];    
-    }
-
     public GeneralSettings getGeneralSettings() {
 	ensureInitialized();
 	return (GeneralSettings) settings[2];

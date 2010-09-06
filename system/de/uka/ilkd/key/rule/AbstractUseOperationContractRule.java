@@ -334,11 +334,13 @@ public abstract class AbstractUseOperationContractRule implements BuiltInRule {
 	return true;
     }
 
-    protected void createJustification(Goal goal, RuleApp ruleApp,
-	    ContractWithInvs cwi) {
+    protected void createJustification(Goal goal, 
+	    			       RuleApp ruleApp,
+	    			       ContractWithInvs cwi) {
 	RuleJustificationBySpec just = new RuleJustificationBySpec(cwi);
-	ComplexRuleJustificationBySpec cjust = (ComplexRuleJustificationBySpec) goal
-	        .proof().env().getJustifInfo().getJustification(this);
+	ComplexRuleJustificationBySpec cjust 
+		= (ComplexRuleJustificationBySpec) 
+		    goal.proof().env().getJustifInfo().getJustification(this);
 	cjust.add(ruleApp, just);
     }
 

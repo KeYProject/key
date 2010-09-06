@@ -280,7 +280,5 @@ public class ArrayOp extends AccessOp implements SortDependingSymbol {
         
         return p!=null && p.getKind().equals(this.getKind());
     }
-
-   
 }
 

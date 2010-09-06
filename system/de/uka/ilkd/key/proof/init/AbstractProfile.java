@@ -211,4 +211,8 @@ public abstract class AbstractProfile implements Profile {
      public ProblemInitializer createProblemInitializer(IMain main) {
 	 return new ProblemInitializer(main);
      }
+     
+     public boolean parseSpecs() {
+	 return true;
+     }
 }

@@ -1612,7 +1612,8 @@ sort_decls
 
 one_sort_decl returns [ImmutableList<Sort> createdSorts = ImmutableSLList.<Sort>nil()] 
 {
-    boolean isObjectSort  = false;
+    boolean isObjectSort = false;
+    boolean isAbstractSort = false;
     boolean isGenericSort = false;
     boolean isSubSort = false;
     boolean isIntersectionSort = false;
@@ -1622,7 +1623,8 @@ one_sort_decl returns [ImmutableList<Sort> createdSorts = ImmutableSLList.<Sort>
     ImmutableList<String> sortIds = ImmutableSLList.<String>nil(); 
 } : 
         ( 
-          OBJECT  {isObjectSort =true;} sortIds = objectSortIdentifiers
+          OBJECT  {isObjectSort =true;} (ABSTRACT {isAbstractSort = true;})? sortIds = objectSortIdentifiers
+            ( EXTENDS sortExt = extends_sorts )?
         | GENERIC {isGenericSort=true;} sortIds = simple_ident_comma_list
             ( ONEOF sortOneOf = oneof_sorts )? 
             ( EXTENDS sortExt = extends_sorts )?
@@ -1648,12 +1650,13 @@ one_sort_decl returns [ImmutableList<Sort> createdSorts = ImmutableSLList.<Sort>
                             if (isObjectSort) {
                                 if (sort_name.toString().equals("java.lang.Object")) {
                                     if (sorts().lookup(new Name("java.lang.Object")) == null) {
-                                        s = new ClassInstanceSortImpl(sort_name, false);
+                                        s = new ClassInstanceSortImpl(sort_name, isAbstractSort);
+                                    } else {
+                                        s=(Sort)sorts().lookup(new Name("java.lang.Object"));
                                     }
-                                    s=(Sort)sorts().lookup(new Name("java.lang.Object"));
                                 } else {
                                     s = new ClassInstanceSortImpl(sort_name,
-                                        (Sort)sorts().lookup(new Name("java.lang.Object")), false);
+                                        (Sort)sorts().lookup(new Name("java.lang.Object")), isAbstractSort);
                                 }	
                             } else if (isGenericSort) {
                                 int i;
@@ -3044,6 +3047,7 @@ array_access_suffix [Term arrayReference] returns [Term result = arrayReference]
     Term rangeFrom = null;
     Term rangeTo   = null;     
     Sort arraySort = null;
+    boolean atPre = false;
 }
 	:
   	LBRACKET 
@@ -3058,7 +3062,21 @@ array_access_suffix [Term arrayReference] returns [Term result = arrayReference]
 	        ((DOTRANGE) => DOTRANGE rangeTo = logicTermReEntry
 		                 {rangeFrom = indexTerm;})?
     )
-    RBRACKET (AT LPAREN arraySort = any_sortId_check[true] RPAREN)? ( shadowNumber = transactionNumber )? 
+    RBRACKET 
+    (AT (
+           (LPAREN arraySort = any_sortId_check[true] RPAREN) 
+            | 
+            (id0:IDENT 
+              {
+                if(!id0.getText().equals("pre") || !(functions() instanceof AtPreNamespace)) { 
+                    semanticError("Unexpected: " + id0.getText()); 
+                }
+                atPre = true;
+              }
+            )
+        )
+    )? 
+    ( shadowNumber = transactionNumber )?
     {
        if (arraySort == null) {
        	if ( inSchemaMode() ) {
@@ -3091,11 +3109,21 @@ array_access_suffix [Term arrayReference] returns [Term result = arrayReference]
 		   						  guardTerm);
 		}
         if (shadowNumber != null) {
-            result = tf.createShadowArrayTerm
+            if(atPre) {
+            	semanticError("@pre for shadowed arrays not supported");
+            } else {
+                result = tf.createShadowArrayTerm
                       (ShadowArrayOp.getShadowArrayOp(arraySort), result, indexTerm, 
                        shadowNumber);
+            }
         } else {
-            result = tf.createArrayTerm(ArrayOp.getArrayOp(arraySort), result, indexTerm);
+            final ArrayOp aop = ArrayOp.getArrayOp(arraySort);
+            if(atPre) {
+                Function aopAtPre = ((AtPreNamespace)functions()).getArrayOpAtPre(aop);
+                result = tf.createFunctionTerm(aopAtPre, result, indexTerm);
+            } else {
+                result = tf.createArrayTerm(aop, result, indexTerm);
+            }
         }  
     }            
     ;exception

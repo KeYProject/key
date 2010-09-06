@@ -108,5 +108,10 @@ public class JUnitTestProfile extends AbstractProfile {
     public Class<POBrowser> getPOBrowserClass() {
 	return POBrowser.class;
     }
-
+    
+    
+    @Override
+    public boolean parseSpecs() {
+	return false;
+    }
 }
