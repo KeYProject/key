@@ -37,7 +37,8 @@ public class ComplexButton {
     private String prefix = "";
     private int iconSize;
     private Collection<ChangeListener> listeners = new LinkedList<ChangeListener>();
-    
+    // Is the menu showing?
+    private boolean showing;
 
     private int oldWidth;
 
@@ -162,11 +163,18 @@ public class ComplexButton {
 	        	return;
 	            }
 	            
-	            int width = Math.max(oldWidth,getSelectionComponent().getWidth()+getActionButton().getWidth());
-	            getMenu().setPopupSize(width,getMenu().getPreferredSize().height);
-	            
-	            getMenu().show(getActionButton(),0 ,getActionButton().getHeight());
-	            
+                    JPopupMenu menu = getMenu();
+                    if (showing) {
+                        showing = false;
+                        // the menu is already cleared by
+                        // clicking the button
+                    } else {
+	                int width = Math.max(oldWidth,
+                            getSelectionComponent().getWidth()+getActionButton().getWidth());
+	                menu.setPopupSize(width, menu.getPreferredSize().height);
+                        showing = true;
+	                menu.show(getActionButton(),0 ,getActionButton().getHeight());
+                    }
 	        }
 	    });
 	 
@@ -231,7 +239,7 @@ public class ComplexButton {
     
   
     
-    static public class EmptyAction extends AbstractAction{
+    public class EmptyAction extends AbstractAction{
 
 
         private static final long serialVersionUID = 1L;
@@ -266,8 +274,8 @@ public class ComplexButton {
 	}
 		
         public void actionPerformed(ActionEvent arg0) {
-	  	    
-        };
+	    showing = false;
+        }
     }
     
     
@@ -283,10 +291,8 @@ public class ComplexButton {
 	}
 
 	public void actionPerformed(ActionEvent e) {
-	    
+	    showing = false;
 	    setSelectedItem(content);
-	    
-
 	}
 	
 
