@@ -775,8 +775,10 @@ public class Main extends JFrame implements IMain {
         });
     }
     
-    private JButton createAutoModeButton() {
-        return new JButton(autoModeAction);
+    protected static JButton createAutoModeButton() {
+        JButton b = new JButton(autoModeAction);
+        b.putClientProperty("hideActionText", Boolean.TRUE);
+        return b;
     }
     
     private JComponent createOpenMostRecentFile() {
@@ -3599,7 +3601,6 @@ public class Main extends JFrame implements IMain {
                         !creatingTests);            
             }
             public AutoModeAction() {
-                putValue("hideActionText", Boolean.TRUE);
                 putValue(Action.SHORT_DESCRIPTION, AUTO_MODE_TEXT);
                 putValue(Action.SMALL_ICON, startLogo);
                 
