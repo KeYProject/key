@@ -31,7 +31,7 @@ class SolverSession {
      * 
      */
     public static class InternResult implements Cloneable {
-	private SMTSolverResult result = SMTSolverResult.createUnknownResult("", "");
+	private SMTSolverResult result = SMTSolverResult.createUnknown("", "");
 	
 	private Term            term;
 	private Goal 		goal;
@@ -112,7 +112,7 @@ class SolverSession {
 	
 	protected Object clone(SMTSolver solver)  {
 	    InternResult result = new InternResult(term , goal ,formula);
-	    result.result=SMTSolverResult.createUnknownResult("",solver.name());
+	    result.result=SMTSolverResult.createUnknown("",solver.name());
 	    return result;
 	}
 	

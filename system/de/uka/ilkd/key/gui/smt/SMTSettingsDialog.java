@@ -35,8 +35,8 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 
-public class SettingsDialog {
-    public final static SettingsDialog INSTANCE = new SettingsDialog();
+public class SMTSettingsDialog {
+    public final static SMTSettingsDialog INSTANCE = new SMTSettingsDialog();
     public final static Component EMPTY_LINE = createSeperator();
 
     Settings settings;
@@ -86,7 +86,7 @@ public class SettingsDialog {
 		    .getPreferredScrollableViewportSize().height;
 
 	    jDialog.setSize(new Dimension(left + right, (int) (1.25 * height)));
-	    jDialog.setTitle("Decision Procedure Settings");
+	    jDialog.setTitle("SMT Solver Settings");
 	    jDialog.setContentPane(getJContentPane());
 	    jDialog.setLocationByPlatform(true);
 	    getSplitPane().setDividerLocation(
@@ -267,7 +267,7 @@ public class SettingsDialog {
 
 		public void actionPerformed(ActionEvent e) {
 		    applyChanges();
-		    SettingsDialog.this.getJScrollPane1().repaint();
+		    SMTSettingsDialog.this.getJScrollPane1().repaint();
 		}
 	    });
 	}

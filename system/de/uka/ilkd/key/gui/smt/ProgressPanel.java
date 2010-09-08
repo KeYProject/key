@@ -71,7 +71,7 @@ class ProgressPanel implements SMTProgressMonitor {
 	private JPanel progressPanel = null;
 	private JProgressBar progressBar = null;
 	private JComponent  parent;
-	private ProgressDialog dialog;
+	private SMTProgressDialog dialog;
 	
 	private List<InternGoal> goals = Collections.synchronizedList(new LinkedList<InternGoal>()); 
 	private int currentGoal =0;
@@ -83,7 +83,7 @@ class ProgressPanel implements SMTProgressMonitor {
 	
 	
 	
-	public ProgressPanel(MakesProgress process, JComponent parent, ProgressDialog dialog, Collection<Goal> goals){
+	public ProgressPanel(MakesProgress process, JComponent parent, SMTProgressDialog dialog, Collection<Goal> goals){
 	    	this.parent = parent;
 	    	this.dialog = dialog;
 	    	this.process = process;

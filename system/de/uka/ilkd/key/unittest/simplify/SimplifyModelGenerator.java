@@ -25,6 +25,7 @@ import de.uka.ilkd.key.parser.simplify.SimplifyLexer;
 import de.uka.ilkd.key.parser.simplify.SimplifyParser;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.smt.*;
+import de.uka.ilkd.key.smt.SMTSolverResult.ThreeValuedTruth;
 import de.uka.ilkd.key.unittest.DecProdModelGenerator;
 import de.uka.ilkd.key.unittest.EquivalenceClass;
 import de.uka.ilkd.key.unittest.Model;
@@ -81,7 +82,7 @@ public class SimplifyModelGenerator extends DecProdModelGenerator {
 
 	// SMTSolver simplify = new SimplifySolver();
 
-	SMTSolverResult res = SMTSolverResult.NO_IDEA;
+	SMTSolverResult res = SMTSolverResult.createUnknown("", "?");
 
 	// Get a result for the Problem
 	res = smtRule.run(toFormula(node.sequent()), 

@@ -518,32 +518,32 @@ public class SimplifyTranslator extends AbstractSMTTranslator {
 	ArrayList<String> replacement = new ArrayList<String>();
 	
 	toReplace.add("[]");
-	replacement.add("_Array");
+	replacement.add("Array");
 	
 	toReplace.add("<");
-	replacement.add("_abo_");
+	replacement.add("abo_");
 	
 	toReplace.add(">");
-	replacement.add("_abc_");
+	replacement.add("abc_");
 	
 	toReplace.add("{");
-	replacement.add("_cbo_");
+	replacement.add("cbo_");
 	
 	toReplace.add("}");
-	replacement.add("_cbc_");
+	replacement.add("cbc_");
 	
 	toReplace.add(".");
-	replacement.add("_dot_");
+	replacement.add("dot_");
 	
 	toReplace.add(":");
-	replacement.add("_col_");
+	replacement.add("col_");
 	
 	toReplace.add("\\");
-	replacement.add("_");
+	replacement.add("slash_");
 	
 	toReturn = this.removeIllegalChars(toReturn, toReplace, replacement);
 	
-	toReturn.append("_").append(counter);
+	toReturn.append("counter_").append(counter);
 	counter++;
 	return toReturn;
     }

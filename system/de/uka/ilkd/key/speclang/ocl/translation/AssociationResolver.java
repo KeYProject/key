@@ -32,8 +32,10 @@ class AssociationResolver extends SLExpressionResolver {
     private final UMLInfo umlInfo;
     
     
-    public AssociationResolver(Services services, SLResolverManager man) {
-        super(services.getJavaInfo(), man);
+    public AssociationResolver(Services services, 
+	    		       SLResolverManager man,
+	    		       KeYJavaType specInClass) {
+        super(services.getJavaInfo(), man, specInClass);
         this.services = services;
         this.umlInfo  = services.getUMLInfo();
     }

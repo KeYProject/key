@@ -21,6 +21,7 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
+import javax.swing.Action;
 import javax.swing.event.EventListenerList;
 
 import de.uka.ilkd.key.bugdetection.BugDetector;
@@ -1127,6 +1128,17 @@ public class KeYMediator {
 	    setProof(e.getSource().getSelectedProof());
 	}
 	
+    }
+    
+    public void enableWhenProof(final Action a) {
+        a.setEnabled(getProof() != null);
+        addKeYSelectionListener(new KeYSelectionListener() {
+            public void selectedNodeChanged(KeYSelectionEvent e) {}
+            public void selectedProofChanged(KeYSelectionEvent e) {
+                a.setEnabled(
+                    e.getSource().getSelectedProof() != null);
+            }
+        });
     }
 
     /**

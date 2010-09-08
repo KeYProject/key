@@ -18,7 +18,7 @@ import java.util.LinkedList;
 
 import junit.framework.Assert;
 import junit.framework.TestCase;
-import de.uka.ilkd.key.gui.smt.DecisionProcedureSettings;
+import de.uka.ilkd.key.gui.smt.SMTSettings;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.smt.*;
@@ -143,7 +143,7 @@ public class TestSMTBenchmark extends TestCase implements FilenameFilter{
 	    return VALID;
 	} else if (r.isValid() == SMTSolverResult.ThreeValuedTruth.UNKNOWN) {
 	    return UNKNOWN;
-	} else if (r.isValid() == SMTSolverResult.ThreeValuedTruth.FALSIFIABLE) {
+	} else if (r.isValid() == SMTSolverResult.ThreeValuedTruth.FALSE) {
 	    return INVALID;
 	} else {
 	    Assert.assertTrue(false);
@@ -185,7 +185,7 @@ public class TestSMTBenchmark extends TestCase implements FilenameFilter{
      */
     protected Collection<SMTRule> getRules() {
 	
-	return DecisionProcedureSettings.getInstance().getSMTRules();
+	return SMTSettings.getInstance().getSMTRules();
 	
 	
     }

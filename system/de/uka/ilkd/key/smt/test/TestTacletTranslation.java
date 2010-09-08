@@ -201,7 +201,7 @@ public class TestTacletTranslation extends TestCommons {
 		// SMTSolverResult.ThreeValuedTruth.UNKNOWN && solvable);
 		assertFalse(
 		        "type 2: " + error,
-		        result.isValid() == SMTSolverResult.ThreeValuedTruth.FALSIFIABLE
+		        result.isValid() == SMTSolverResult.ThreeValuedTruth.FALSE
 		                && solvable);
 		assertFalse(
 		        "type 3: " + error,

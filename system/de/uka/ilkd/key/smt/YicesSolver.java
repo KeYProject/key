@@ -43,11 +43,11 @@ public final class YicesSolver extends AbstractSMTSolver {
 //		return SMTSolverResult.createUnknownResult(input);
 //	    }
 	    if (input.startsWith("unsat\n")) {
-		return SMTSolverResult.createValidResult(input,name());
+		return SMTSolverResult.createValid(input,name());
 	    } else if (input.startsWith("sat\n")) {
-		return SMTSolverResult.createInvalidResult(input,name());
+		return SMTSolverResult.createInvalid(input,name());
 	    } else {
-		return SMTSolverResult.createUnknownResult(input,name());
+		return SMTSolverResult.createUnknown(input,name());
 	    }
 
 	} else {

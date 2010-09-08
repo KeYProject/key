@@ -40,11 +40,11 @@ public final class SimplifySolver extends AbstractSMTSolver {
 	if (val == 0) {
 	    //no error occured
 	    if (meansValid(text)) {
-		return SMTSolverResult.createValidResult(text,name());
+		return SMTSolverResult.createValid(text,name());
 	    } else if (meansInvalid(text)) {
-		return SMTSolverResult.createInvalidResult(text,name());
+		return SMTSolverResult.createInvalid(text,name());
 	    } else {
-		return SMTSolverResult.createUnknownResult(text,name());
+		return SMTSolverResult.createUnknown(text,name());
 	    } 
 	} else {
 	    //error occured

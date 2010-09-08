@@ -1395,6 +1395,12 @@ public abstract class Taclet implements Rule, Named {
 	for (final SchemaVariable sv : pvs) {
 	    ProgramVariable inst
 		= (ProgramVariable)matchCond.getInstantiations ().getInstantiation(sv);
+	    //if the goal already contains the variable to be added 
+	    //(not just a variable with the same name), then there is nothing to do
+	    if(goal.getGlobalProgVars().contains(inst)) {
+		continue;
+	    }
+	    
 	    final VariableNamer vn = services.getVariableNamer();
 	    inst = vn.rename(inst, goal, posOfFind);
             final RenamingTable rt = 

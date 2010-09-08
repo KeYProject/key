@@ -62,7 +62,7 @@ public class RuleSource {
         URL u = KeYResourceManager.getManager().
             getResourceFile(RuleSource.class, "rules/" + filename);
         if (u == null) {
-            // a more specific exception type woul probably be better
+            // a more specific exception type would probably be better
             throw new RuntimeException("Could not find rule file "+filename);
         }
 	return new RuleSource(u);

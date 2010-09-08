@@ -76,7 +76,8 @@ public class BasicTask extends DefaultMutableTreeNode implements TaskTreeNode{
      *  that were used in the associated proof.
      */
     public ImmutableSet<ContractWithInvs> getUsedSpecs() {
-        ImmutableSet<ContractWithInvs> result = DefaultImmutableSet.<ContractWithInvs>nil();
+        ImmutableSet<ContractWithInvs> result 
+        	= DefaultImmutableSet.<ContractWithInvs>nil();
         for (RuleApp ruleApp : proof().mgt().getNonAxiomApps()) {
             RuleApp r = ruleApp;
             RuleJustification rj = proof().mgt().getJustification(r);

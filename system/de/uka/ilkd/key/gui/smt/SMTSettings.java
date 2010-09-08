@@ -17,11 +17,9 @@ import de.uka.ilkd.key.gui.configuration.Settings;
 import de.uka.ilkd.key.gui.configuration.SettingsListener;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.proof.init.Profile;
-import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.smt.AbstractSMTSolver;
 import de.uka.ilkd.key.smt.CVC3Solver;
 import de.uka.ilkd.key.smt.SMTRule;
-import de.uka.ilkd.key.smt.SMTSolver;
 import de.uka.ilkd.key.smt.SimplifySolver;
 import de.uka.ilkd.key.smt.YicesSolver;
 import de.uka.ilkd.key.smt.Z3Solver;
@@ -29,7 +27,7 @@ import de.uka.ilkd.key.smt.Z3Solver;
 /** This class encapsulates the information which 
  *  decision procedure should be used.
  */
-public class DecisionProcedureSettings implements Settings {
+public class SMTSettings implements Settings {
     
    
     /** String used in the Settings to store the active rule */
@@ -58,16 +56,16 @@ public class DecisionProcedureSettings implements Settings {
     
 
     
-    private LinkedList<SMTRule> smtRules = new LinkedList<SMTRule>();
+    private final LinkedList<SMTRule> smtRules = new LinkedList<SMTRule>();
     
-    public final static int    PROGRESS_MODE_USER = 0;
-    public final static int    PROGRESS_MODE_CLOSE = 1;
-    public final static int    PROGRESS_MODE_CLOSE_FIRST = 2;
+    public final static int PROGRESS_MODE_USER = 0;
+    public final static int PROGRESS_MODE_CLOSE = 1;
+    public final static int PROGRESS_MODE_CLOSE_FIRST = 2;
    
     
     
     
-    private static Collection<AbstractSMTSolver>  solvers = new LinkedList<AbstractSMTSolver>();
+    private static Collection<AbstractSMTSolver> solvers = new LinkedList<AbstractSMTSolver>();
     
     /** the currently active rule */    
     private SMTRule activeSMTRule = SMTRule.EMPTY_RULE;
@@ -75,11 +73,9 @@ public class DecisionProcedureSettings implements Settings {
     /** the value of the timeout in tenth of seconds.*/
     private int timeout = 60;
     
-    private static DecisionProcedureSettings instance;
+    private static SMTSettings instance;
     
     private static String EXECSTR = "[DecisionProcedure]Exec";
-    /** mapping of rule name (key) to execution string (value) */
-    private HashMap<String, String> execCommands = new HashMap<String, String>();
     
     /** the string separating different solver-command values. */
     private static final String execSeperator1 = ":"; 
@@ -131,7 +127,7 @@ public class DecisionProcedureSettings implements Settings {
     /**
      * This is a singleton.
      */
-    private DecisionProcedureSettings() {
+    private SMTSettings() {
 	super();
     }
     
@@ -149,7 +145,6 @@ public class DecisionProcedureSettings implements Settings {
      * @return the found SMTRule or <code>null</code> 
      */
     public SMTRule findRuleByName(String name){
-	
 	for(SMTRule rule : getSMTRules()){
 	    if(rule.name().toString().equals(name)){
 		return rule;
@@ -177,14 +172,12 @@ public class DecisionProcedureSettings implements Settings {
      * changed to its registered listeners (not thread-safe)
      */
     protected void fireSettingsChanged() {
-	
         for (SettingsListener aListenerList : listenerList) {
             aListenerList.settingsChanged(new GUIEvent(this));
         }
         if(Main.instance != null){
-            Main.instance.updateDecisionProcedureSelectMenu();
+            Main.instance.updateSMTSelectMenu();
         }
-      
     }
     
 
@@ -195,7 +188,6 @@ public class DecisionProcedureSettings implements Settings {
 
     
     private void setSolversAndRules(){
-	
 	AbstractSMTSolver z3 = new Z3Solver();
 	AbstractSMTSolver simplify = new SimplifySolver();
 	AbstractSMTSolver yices = new YicesSolver();
@@ -212,17 +204,14 @@ public class DecisionProcedureSettings implements Settings {
 	smtRules.add(new SMTRule(new Name("MULTIPLE_PROVERS"),z3,simplify,yices,cvc3));
 	
 	//solvers = s;
-	
     }
     
     public final Collection<AbstractSMTSolver> getSolvers(){
-	
 	return solvers;
     }
     
     
     public Collection<SMTRule> getSMTRules(){
-
 	return smtRules;
     }
     
@@ -269,10 +258,6 @@ public class DecisionProcedureSettings implements Settings {
      * represents the stored settings
      */
     public void readSettings(Properties props) {
-	
-
-	
-	
 	String timeoutstring = props.getProperty(TIMEOUT);
 	if (timeoutstring != null) {
 	    int curr = Integer.parseInt(timeoutstring);
@@ -322,7 +307,6 @@ public class DecisionProcedureSettings implements Settings {
 	if(!activeSMTRule.isUsable()){
 	    this.activeSMTRule = SMTRule.EMPTY_RULE;
 	}
-
     }
     
 
@@ -355,8 +339,6 @@ public class DecisionProcedureSettings implements Settings {
      */
     private void readMultProversString()
     {
-	
-	
 	if(multProversSettings != null){
 	    String[] valuepairs = multProversSettings.split(multSeparator1);
 	    for(String s : valuepairs){
@@ -366,10 +348,6 @@ public class DecisionProcedureSettings implements Settings {
 		    if(solver != null){
 			solver.useForMultipleRule(vals[1].equals("true"));
 		    }
-			
-			
-			
-		   
 		}
 	    }
 	}
@@ -424,9 +402,7 @@ public class DecisionProcedureSettings implements Settings {
      * @param command the command to use
      */
     public void setExecutionCommand(AbstractSMTSolver s, String command) {
-	
 	s.setExecutionCommand(command);
-	
     }
     
     /**
@@ -439,16 +415,9 @@ public class DecisionProcedureSettings implements Settings {
     }
     
 
-
-
-    
-
-
-    
     public boolean getMultipleUse(AbstractSMTSolver solver){
 	return solver.useForMultipleRule();
     }
-    
     
     
     
@@ -540,15 +509,6 @@ public class DecisionProcedureSettings implements Settings {
 	return this.showSMTResDialog;
     }
     
-    /**
-     * true, if the argument should be used for test
-     * TODO implement?
-     */
-    public boolean useRuleForTest(int arg) {
-	return true;
-    }
-
-    
     
     /** implements the method required by the Settings interface. The
      * settings are written to the given Properties object. Only entries of the form 
@@ -585,28 +545,17 @@ public class DecisionProcedureSettings implements Settings {
         props.setProperty(PROGRESS_DIALOG_MODE,Integer.toString(progressDialogMode));
 
         props.setProperty(SAVEFILE_PATH,this.file);
-        
-        
-        
-
        
         this.writeExecutionString(props);
         this.writeMultipleProversString(props);
     }
 
-    public static DecisionProcedureSettings getInstance() {
+    public static SMTSettings getInstance() {
 	if (instance == null) {
-	    instance = new DecisionProcedureSettings();
+	    instance = new SMTSettings();
 	    instance.setSolversAndRules();
 	}
 	
 	return instance;
     }
-
-
-
-
-
- 
-
 }

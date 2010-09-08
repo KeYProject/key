@@ -302,7 +302,7 @@ public class InteractiveProver {
 						 Constraint   userConstraint) {
 	ImmutableList<BuiltInRule> rules = ImmutableSLList.<BuiltInRule>nil();
 
-        for (RuleApp ruleApp : getInteractiveRuleAppIndex().getBuiltInRule
+        for (RuleApp ruleApp : getInteractiveRuleAppIndex().getBuiltInRules
                 (focusedGoal, pos, userConstraint)) {
             BuiltInRule r = (BuiltInRule) ruleApp.rule();
             if (!rules.contains(r)) {
@@ -341,7 +341,7 @@ public class InteractiveProver {
 	ImmutableSet<RuleApp> result = DefaultImmutableSet.<RuleApp>nil();
 
         for (final RuleApp app : getInteractiveRuleAppIndex().
-                getBuiltInRule(focusedGoal,
+                getBuiltInRules(focusedGoal,
                         pos,
                         userConstraint)) {
             if (app.rule() == rule) {

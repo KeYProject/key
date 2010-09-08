@@ -22,7 +22,11 @@ public class RuleJustificationBySpec implements RuleJustification {
     
     
     public boolean isAxiomJustification() {
-        return false;
+	//contracts for stubs are considered axioms
+	//XXX: The observed state semantics allows choosing any set of invariants
+	//when applying the contract. But not all may be preserved by a method
+	//present only as a stub!
+        return spec.contract.getProgramMethod().getBody() == null;
     }
     
     

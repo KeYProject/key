@@ -14,7 +14,7 @@ import java.net.URL;
 import java.util.Properties;
 
 import de.uka.ilkd.key.gui.GUIEvent;
-import de.uka.ilkd.key.gui.smt.DecisionProcedureSettings;
+import de.uka.ilkd.key.gui.smt.SMTSettings;
 import de.uka.ilkd.key.gui.smt.TacletTranslationSettings;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.init.Profile;
@@ -72,9 +72,8 @@ public class ProofSettings {
 	    new SimultaneousUpdateSimplifierSettings(),
             new GeneralSettings(),
 	    new ChoiceSettings(),
-	    DecisionProcedureSettings.getInstance(),
+	    SMTSettings.getInstance(),
 	    new ViewSettings(),
-            new LibrariesSettings(),
             TacletTranslationSettings.getInstance()
 	};
         for (Settings setting : settings) {
@@ -243,14 +242,14 @@ public class ProofSettings {
     /** returns the DecisionProcedureSettings object
      * @return the DecisionProcedureSettings object
      */
-    public DecisionProcedureSettings getDecisionProcedureSettings() {
+    public SMTSettings getSMTSettings() {
 	ensureInitialized();
-	return (DecisionProcedureSettings) settings[4];
+	return (SMTSettings) settings[4];
     }
     
     public TacletTranslationSettings getTacletTranslationSettings(){
 	ensureInitialized();
-	return (TacletTranslationSettings) settings[7];
+	return (TacletTranslationSettings) settings[6];
     }
 
     public SimultaneousUpdateSimplifierSettings 
@@ -259,11 +258,6 @@ public class ProofSettings {
 	return (SimultaneousUpdateSimplifierSettings) settings[1];    
     }
     
-    public LibrariesSettings getLibrariesSettings() {
-        ensureInitialized();
-        return (LibrariesSettings) settings[6];    
-    }
-
     public GeneralSettings getGeneralSettings() {
 	ensureInitialized();
 	return (GeneralSettings) settings[2];

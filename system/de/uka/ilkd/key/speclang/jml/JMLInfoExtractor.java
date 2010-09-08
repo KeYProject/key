@@ -18,7 +18,7 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.*;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
 
-class JMLInfoExtractor {
+public class JMLInfoExtractor {
 
     // Information about Fields...
     
@@ -206,12 +206,12 @@ class JMLInfoExtractor {
         return hasJMLModifier((ClassDeclaration) kjt.getJavaType(), "scopeSafe");
     }
     
-    private static boolean hasJMLModifier(ClassDeclaration cd, String mod){
+    public static boolean hasJMLModifier(ClassDeclaration cd, String mod){
         ImmutableList<Comment> coms = ImmutableSLList.<Comment>nil();
         ImmutableArray<Modifier> mods = cd.getModifiers();
         for (int i=0; i < mods.size(); i++) {
             coms = coms.prepend(mods.get(i).getComments());
-        }  
+        } 
         for (Comment c : coms) {
             if (checkFor(mod, c.getText()))
                 return true;
@@ -219,7 +219,23 @@ class JMLInfoExtractor {
         return false;
     }
     
-    private static boolean hasJMLModifier(ProgramMethod pm, String mod){
+    public static boolean hasJMLModifier(FieldDeclaration fd, String mod){
+        ImmutableList<Comment> coms 
+        	= ImmutableSLList.<Comment>nil().prepend(fd.getComments());
+        for(Modifier m : fd.getModifiers()) {
+            coms = coms.prepend(m.getComments());
+        } 
+        coms = coms.prepend(fd.getTypeReference().getComments());
+        
+        for(Comment c : coms) {
+            if(checkFor(mod, c.getText())) {
+                return true;
+            }
+        }
+        return false;
+    }    
+    
+    public static boolean hasJMLModifier(ProgramMethod pm, String mod){
         ImmutableList<Comment> coms = ImmutableSLList.<Comment>nil();
         MethodDeclaration method = pm.getMethodDeclaration();
         

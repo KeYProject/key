@@ -124,4 +124,6 @@ public interface Profile {
     Class<? extends POBrowser> getPOBrowserClass();
 
     ProblemInitializer createProblemInitializer(IMain main);
+    
+    boolean parseSpecs();
 }

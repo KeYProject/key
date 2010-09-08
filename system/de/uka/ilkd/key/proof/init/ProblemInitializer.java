@@ -10,7 +10,6 @@ package de.uka.ilkd.key.proof.init;
 
 import java.io.File;
 import java.util.*;
-import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 
@@ -19,7 +18,6 @@ import recoder.io.ProjectSettings;
 import de.uka.ilkd.key.gui.IMain;
 import de.uka.ilkd.key.gui.MethodCallInfo;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
-import de.uka.ilkd.key.java.CompilationUnit;
 import de.uka.ilkd.key.java.Recoder2KeY;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.ConstrainedFormula;
@@ -215,21 +213,20 @@ public class ProblemInitializer {
 	    // mu(2008-jan-28): if the directory is not readable for the current user
 	    // list is set to null, which results in a NullPointerException.
 	    if(list != null) {
-            for (String aList : list) {
-                String fullName = cfile.getPath() + File.separator + aList;
-                File n = new File(fullName);
-                if (n.isDirectory()) {
-                    v.addAll(getClasses(fullName));
-                } else if (aList.endsWith(".java")) {
-                    v.add(fullName);
-                }
-            }
+		for (String aList : list) {
+		    String fullName = cfile.getPath() + File.separator + aList;
+		    File n = new File(fullName);
+		    if (n.isDirectory()) {
+			v.addAll(getClasses(fullName));
+		    } else if (aList.endsWith(".java")) {
+			v.add(fullName);
+		    }
+		}
 	    }
 	    return v;
 	} else {
 	   throw new ProofInputException("Java model path "+f+" not found.");
 	}
-
     }
 
 
@@ -276,14 +273,27 @@ public class ProblemInitializer {
      */
     private void readJava(EnvInput envInput, InitConfig initConfig)
     		throws ProofInputException {
+	//this method must only be called once per init config
+	assert !initConfig.getServices()
+        		  .getJavaInfo()
+        		  .rec2key()
+        		  .parsedSpecial();
+	assert initConfig.getProofEnv().getJavaModel() == null;	
+	
+	//read Java source and classpath settings	
 	envInput.setInitConfig(initConfig);
 	String javaPath = envInput.readJavaPath();
 	List<File> classPath = envInput.readClassPath();
 	File bootClassPath = envInput.readBootClassPath();
 
-	if(javaPath != null) {
+	//create Recoder2KeY, set classpath
+	final Recoder2KeY r2k = new Recoder2KeY(initConfig.getServices(), 
+                                                initConfig.namespaces());
+	r2k.setClassPath(bootClassPath, classPath);	
+
+        reportStatus("Reading Java model");
+	if(javaPath != null && javaPath.length() > 0) {
     	    //read Java
-            reportStatus("Reading Java model");
             ProjectSettings settings =
                 initConfig.getServices().getJavaInfo().getKeYProgModelInfo()
                 	  .getServConf().getProjectSettings();
@@ -292,36 +302,21 @@ public class ProblemInitializer {
             if(searchPathList.find(javaPath) == null) {
                 searchPathList.add(javaPath);
             }
-            Recoder2KeY r2k = new Recoder2KeY(initConfig.getServices(),
-                                              initConfig.namespaces());
-            r2k.setClassPath(bootClassPath, classPath);
-            //r2k.setKeYFile(envInput.)
-            if (javaPath.length() == 0) {
-                r2k.parseSpecialClasses();
-                JavaModel jm = initConfig.getProofEnv().getJavaModel();
-                if(jm==null){ /*This condition is bug fix. After loading java files a model is setup.
-                	However if later a .key file is loaded, then the existing model may be
-                	overwritten by NO_MODEL. This check prevents this problem. The described situation
-                	may occur when using e.g. TacletLibraries from the Options menu.*/
-                    initConfig.getProofEnv().setJavaModel(JavaModel.NO_MODEL);
-                }
-            } else {
-                String[] cus = getClasses(javaPath).toArray(new String[]{});
-                CompilationUnit[] compUnits = r2k.readCompilationUnitsAsFiles(cus);
-                initConfig.getServices().getJavaInfo().setJavaSourcePath(javaPath);
+            String[] cus = getClasses(javaPath).toArray(new String[]{});
+            r2k.readCompilationUnitsAsFiles(cus);
 
-                //checkin Java model to CVS
-                reportStatus("Checking Java model");
-                JavaModel jmodel = getJavaModel(javaPath);
-                initConfig.getProofEnv().setJavaModel(jmodel);
-            }
+            initConfig.getServices().getJavaInfo().setJavaSourcePath(javaPath);
 
-            reportReady();
-
-            setUpSorts(initConfig);
+            //checkin Java model to CVS
+            reportStatus("Checking Java model");
+            JavaModel jmodel = getJavaModel(javaPath);
+            initConfig.getProofEnv().setJavaModel(jmodel);
 	} else {
-	    initConfig.getProofEnv().setJavaModel(JavaModel.NO_MODEL);
+             r2k.parseSpecialClasses();
+             initConfig.getProofEnv().setJavaModel(JavaModel.NO_MODEL);
 	}
+	
+        setUpSorts(initConfig);
     }
 
 
@@ -332,16 +327,12 @@ public class ProblemInitializer {
 	    //read includes
 	    readIncludes(envInput, initConfig);
 
-            //read Java
-            if (!(envInput instanceof LDTInput)) readJava(envInput, initConfig);
-
 	    //read envInput itself
-	    reportStatus("Reading "+envInput.name(),
+	    reportStatus("Reading " + envInput.name(),
 		    	 envInput.getNumberOfChars());
 //	    System.out.println("Reading envInput: " + envInput.name());
 	    envInput.setInitConfig(initConfig);
 	    envInput.read(ModStrategy.NO_VARS_GENSORTS);//envInput.read(ModStrategy.NO_VARS_FUNCS_GENSORTS);
-	    reportReady();
 
 	    setUpSorts(initConfig);
 	}
@@ -427,7 +418,6 @@ public class ProblemInitializer {
         reportStatus("Registering rules");
         initConfig.getProofEnv().registerRules(initConfig.getTaclets(),
         				       AxiomJustification.INSTANCE);
-	reportReady();
 
 	Proof[] proofs = pl.getProofs();
         for (Proof proof : proofs) {
@@ -439,7 +429,8 @@ public class ProblemInitializer {
 	if (main != null) {
             main.addProblem(pl);
         }
-	GlobalProofMgt.getInstance().tryReuse(pl);
+        //Previously, proof reuse was triggered automatically - VK
+        //GlobalProofMgt.getInstance().tryReuse(pl);
     }
 
 
@@ -476,32 +467,16 @@ public class ProblemInitializer {
         for (BuiltInRule builtInRule : profile.getStandardRules().getStandardBuiltInRules()) {
             final Rule r = builtInRule;
             initConfig.getProofEnv().registerRule(r,
-                    profile.getJustification(r));
+                    				  profile.getJustification(r));
         }
+        
+	//read Java
+        readJava(envInput, initConfig);        
 
         //read envInput
         readEnvInput(envInput, initConfig);
 
-        // add includes for libraries
-        HashMap<String,Boolean> libraries
-        = envInput.readLibrariesSettings().getLibraries();
-        final Includes in = envInput.readIncludes();
-        for(Entry<String, Boolean> entry : libraries.entrySet()) {
-            final String fileName = entry.getKey();
-            final Boolean  sel    = entry.getValue();
-            if (!(profile instanceof JUnitTestProfile)) { // not testing KeY
-        	if (sel != null && sel.booleanValue()) {
-        	    in.put(fileName, RuleSource.initRuleFile(new File(fileName)));
-        	}
-            }
-        }
-
-	//read envInput
-	readEnvInput(envInput, initConfig);
-	
-        // read in libraries as includes
-        readIncludes(envInput, initConfig);
-
+        reportReady();
 	startInterface();
 	return initConfig;
     }
@@ -516,12 +491,14 @@ public class ProblemInitializer {
             initConfig = determineEnvironment(po, initConfig);
 
             //read problem
-    	    reportStatus("Loading problem \""+po.name()+"\"");
+    	    reportStatus("Loading problem \"" + po.name() + "\"");
     	    po.readProblem(ModStrategy.NO_FUNCS);
-    	    reportReady();
 
     	    //final work
     	    setUpProofHelper(po, initConfig);
+    	    
+    	    //done
+    	    reportReady();
         } catch (ProofInputException e) {
             reportStatus(po.name() + " failed");
             throw e;

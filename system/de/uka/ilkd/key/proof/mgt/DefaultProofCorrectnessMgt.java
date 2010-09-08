@@ -176,7 +176,7 @@ public class DefaultProofCorrectnessMgt implements ProofCorrectnessMgt {
                         = ((RuleJustificationBySpec) ruleJusti).getSpec();
                 for (OperationContract atomicContract
                         : proof.getServices().getSpecificationRepository()
-                        .splitContract(cwi.contract)) {
+                        	             .splitContract(cwi.contract)) {
     
                     InitConfig initConfig = proof.env().getInitConfig();
                     

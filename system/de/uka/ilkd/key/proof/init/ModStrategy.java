@@ -97,6 +97,4 @@ public class ModStrategy {
     public boolean modifyJavaInfo() {
 	return true;
     }
-
-
 }

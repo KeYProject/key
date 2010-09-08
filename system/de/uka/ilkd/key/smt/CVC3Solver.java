@@ -36,11 +36,11 @@ public class CVC3Solver extends AbstractSMTSolver {
 	if (val == 0) {
 	    //normal termination, no error
 	    if (text.startsWith("unsat\n")) {
-		return SMTSolverResult.createValidResult(text,name());
+		return SMTSolverResult.createValid(text,name());
 	    } else if (text.startsWith("sat\n")) {
-		return SMTSolverResult.createInvalidResult(text,name());
+		return SMTSolverResult.createInvalid(text,name());
 	    } else {
-		return SMTSolverResult.createUnknownResult(text,name());
+		return SMTSolverResult.createUnknown(text,name());
 	    }
 	} else {
 	    //error termination

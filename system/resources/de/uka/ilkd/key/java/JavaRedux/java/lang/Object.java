@@ -2,7 +2,7 @@ package java.lang;
 
 public class Object {  
 
-
+    
     /*@ public normal_behavior
       @   assignable \nothing;
       @*/
