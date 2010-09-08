@@ -12,8 +12,14 @@ package de.uka.ilkd.key.speclang.jml.translation;
 
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.declaration.FieldDeclaration;
+import de.uka.ilkd.key.java.declaration.MemberDeclaration;
+import de.uka.ilkd.key.java.declaration.modifier.Protected;
+import de.uka.ilkd.key.java.declaration.modifier.Public;
+import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.ParsableVariable;
+import de.uka.ilkd.key.speclang.jml.JMLInfoExtractor;
 import de.uka.ilkd.key.speclang.translation.*;
 import de.uka.ilkd.key.util.Debug;
 
@@ -25,9 +31,9 @@ class JMLResolverManager extends SLResolverManager {
                               ParsableVariable selfVar,
                               SLTranslationExceptionManager eManager) {
         super(eManager, specInClass, selfVar, false);
-        addResolver(new SLAttributeResolver(javaInfo, this));
-        addResolver(new SLMethodResolver(javaInfo, this));
-        addResolver(new SLTypeResolver(javaInfo, this));        
+        addResolver(new SLAttributeResolver(javaInfo, this, specInClass));
+        addResolver(new SLMethodResolver(javaInfo, this, specInClass));
+        addResolver(new SLTypeResolver(javaInfo, this, specInClass));        
     }
 
     
@@ -46,4 +52,18 @@ class JMLResolverManager extends SLResolverManager {
         Debug.fail();
         return null;
     }
+    
+    
+    
+    public VisibilityModifier getSpecVisibility(MemberDeclaration md) {
+	if(JMLInfoExtractor.hasJMLModifier((FieldDeclaration)md, 
+		                           "spec_public")) {
+	    return new Public();
+	} else if(JMLInfoExtractor.hasJMLModifier((FieldDeclaration)md, 
+		                                  "spec_protected")) {
+	    return new Protected();
+	} else {
+	    return null;
+	}
+    }    
 }

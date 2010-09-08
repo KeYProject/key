@@ -713,7 +713,7 @@ public class JavaInfo {
      * @param classDecl the ClassDeclaration whose attributes shall be collected
      * @return all attributes declared in class <tt>cl</tt> 
      */
-    public ImmutableList<Field> getAllFields(ClassDeclaration classDecl) {
+    public ImmutableList<Field> getAllFields(TypeDeclaration classDecl) {
 	return filterLocalDeclaredFields(classDecl, Filter.TRUE);
     }
 
@@ -738,7 +738,7 @@ public class JavaInfo {
      * @return all attributes declared in class <tt>cl</tt> satisfying the 
      * given filter 
      */
-    private ImmutableList<Field> filterLocalDeclaredFields(ClassDeclaration classDecl,
+    private ImmutableList<Field> filterLocalDeclaredFields(TypeDeclaration classDecl,
             Filter filter) {
         ImmutableList<Field> fields = ImmutableSLList.<Field>nil();
         final ImmutableArray<MemberDeclaration> members = classDecl.getMembers();

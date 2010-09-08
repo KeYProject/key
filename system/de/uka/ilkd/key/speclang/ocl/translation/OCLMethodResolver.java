@@ -29,8 +29,11 @@ class OCLMethodResolver extends SLExpressionResolver {
     private final Services services;
     private final FormulaBoolConverter fbc;
     
-    public OCLMethodResolver(Services services, FormulaBoolConverter fbc, SLResolverManager man) {
-        super(services.getJavaInfo(),man);
+    public OCLMethodResolver(Services services, 
+	    		     FormulaBoolConverter fbc, 
+	    		     SLResolverManager man,
+	    		     KeYJavaType specInClass) {
+        super(services.getJavaInfo(), man, specInClass);
         this.services = services;
         this.fbc      = fbc;
     }

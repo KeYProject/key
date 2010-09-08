@@ -258,7 +258,7 @@ my %erroneous;
 #   }
 # }
 
-print "\n$correct/$counter prover runs according to spec. $errors errors occured.\n";
+print "\n$correct/$counter prover runs according to spec. $errors errors occurred.\n";
 my $text = &produceResultText;
 if ($text) {
   print $text;

@@ -158,6 +158,4 @@ public class FieldSpecification extends VariableSpecification
     public void visit(Visitor v) {
 	v.performActionOnFieldSpecification(this);
     }
-
-
 }

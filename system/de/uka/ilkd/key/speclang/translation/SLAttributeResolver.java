@@ -5,10 +5,16 @@
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
+
 package de.uka.ilkd.key.speclang.translation;
 
+import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.declaration.FieldDeclaration;
+import de.uka.ilkd.key.java.declaration.FieldSpecification;
+import de.uka.ilkd.key.java.declaration.MemberDeclaration;
+import de.uka.ilkd.key.java.declaration.TypeDeclaration;
 import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
@@ -18,43 +24,88 @@ import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.NonRigidHeapDependentFunction;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 
+
 public class SLAttributeResolver extends SLExpressionResolver {
 
-    private static TermBuilder tb = TermBuilder.DF;
+    private static final TermBuilder tb = TermBuilder.DF;
 
     
-    public SLAttributeResolver(JavaInfo javaInfo, SLResolverManager manager) {
-        super(javaInfo, manager);
+    public SLAttributeResolver(JavaInfo javaInfo, 
+	    		        SLResolverManager manager,
+	    		        KeYJavaType specInClass) {
+        super(javaInfo, manager, specInClass);
     }
     
-    protected SLExpression doResolving(SLExpression receiver, String name,
-            SLParameters parameters) throws SLTranslationException {
+    
+    private ProgramVariable lookupVisibleAttribute(String name, 
+	    					   KeYJavaType containingType) {
+	final TypeDeclaration td 
+		= (TypeDeclaration) containingType.getJavaType();
 
+	//lookup locally
+	for(MemberDeclaration md : td.getMembers()) {
+	    if(md instanceof FieldDeclaration 
+	       && isVisible(md, containingType)) {
+		for(FieldSpecification fs 
+			 : ((FieldDeclaration)md).getFieldSpecifications()) {
+		    if(fs.getProgramName().equals(name)) {
+			return (ProgramVariable) fs.getProgramVariable();
+		    }
+		}
+	    }
+	}
+		
+	//recursively lookup in supertypes
+	ImmutableList<KeYJavaType> sups = td.getSupertypes();
+	if(sups.isEmpty() 
+           && !containingType.equals(javaInfo.getJavaLangObject())) {
+	    sups = sups.prepend(javaInfo.getJavaLangObject());
+	}
+	for(KeYJavaType sup : sups) {
+	    final ProgramVariable res = lookupVisibleAttribute(name, sup);
+	    if(res != null) {
+		return res;
+	    }
+	}
+	
+	//not found
+	return null;
+    }
+    
+    
+    protected SLExpression doResolving(SLExpression receiver, 
+	    			       String name,
+	    			       SLParameters parameters) 
+    						throws SLTranslationException {
         if (parameters != null) {
             return null;
         }
+        
         Term recTerm = receiver.getTerm();        
-        ProgramVariable attribute=null;
+        ProgramVariable attribute = null;
         try {
             //try as fully qualified name
             attribute = javaInfo.getAttribute(name);
         } catch(IllegalArgumentException e){
             //try as short name and in enclosing classes
             KeYJavaType containingType = receiver.getKeYJavaType(javaInfo);
-            while(attribute==null){
-                attribute = javaInfo.lookupVisibleAttribute(name, containingType);
-                if(attribute==null){
-                    attribute = javaInfo.lookupVisibleAttribute(
-                            ImplicitFieldAdder.FINAL_VAR_PREFIX+name, containingType);
+            while(attribute == null) {
+                attribute = lookupVisibleAttribute(name, containingType);
+                if(attribute == null) {
+                    attribute = lookupVisibleAttribute(
+                            ImplicitFieldAdder.FINAL_VAR_PREFIX + name, 
+                            containingType);
                 }
-                ProgramVariable et = javaInfo.getAttribute(
-                        ImplicitFieldAdder.IMPLICIT_ENCLOSING_THIS, containingType);
-                if(et!=null && attribute==null){
+                final ProgramVariable et 
+                	= javaInfo.getAttribute(
+                		ImplicitFieldAdder.IMPLICIT_ENCLOSING_THIS, 
+                		containingType);
+                if(et != null && attribute == null) {
                     containingType = et.getKeYJavaType();
-                    if(recTerm!=null){
+                    if(recTerm != null) {
                         recTerm = tb.dot(recTerm, et);
                     }
-                }else{
+                } else {
                     break;
                 }
             }
@@ -91,7 +142,6 @@ public class SLAttributeResolver extends SLExpressionResolver {
         }
     
         return null;
-
     }
 
     public boolean canHandleReceiver(SLExpression receiver) {
@@ -101,5 +151,4 @@ public class SLAttributeResolver extends SLExpressionResolver {
     public boolean needVarDeclaration(String name) {
         return false;
     }
-
 }

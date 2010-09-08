@@ -27,12 +27,12 @@ class OCLResolverManager extends SLResolverManager {
                               SLTranslationExceptionManager eManager) {
         super(eManager, specInClass, selfVar, true);
         JavaInfo javaInfo = services.getJavaInfo();
-        addResolver(new SLAttributeResolver(javaInfo, this));
-        addResolver(new SLMethodResolver(javaInfo, this));
-        addResolver(new SLTypeResolver(javaInfo, this));        
-        addResolver(new OCLAttributeResolver(services, this));
-        addResolver(new OCLMethodResolver(services, fbc, this));
-        addResolver(new BuiltInPropertyResolver(services, excVar, this));
+        addResolver(new SLAttributeResolver(javaInfo, this, specInClass));
+        addResolver(new SLMethodResolver(javaInfo, this, specInClass));
+        addResolver(new SLTypeResolver(javaInfo, this, specInClass));        
+        addResolver(new OCLAttributeResolver(services, this, specInClass));
+        addResolver(new OCLMethodResolver(services, fbc, this, specInClass));
+        addResolver(new BuiltInPropertyResolver(services, excVar, this, specInClass));
         // AssociationResolver does not work without Together! (needs UMLInfo)
         //addResolver(new AssociationResolver(services, this));
     }
