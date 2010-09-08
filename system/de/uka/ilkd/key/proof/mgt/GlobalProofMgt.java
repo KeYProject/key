@@ -103,7 +103,7 @@ public class GlobalProofMgt {
 
     public void tryReuse(Proof proof) {
         Proof[] prevs = lookupPrevious(proof);
-        if (prevs.length>0 && !Main.testStandalone) {
+        if (prevs.length>0) {
 	    String[] prevNames = new String[prevs.length];
 	    for (int i=0; i<prevNames.length; i++) {
 		prevNames[i]="From "+prevs[i].env().description();
@@ -119,6 +119,8 @@ public class GlobalProofMgt {
 		while (!pname.equals(prevNames[i])) i++;
 		tryReuse(proof, prevs[i]);
 	    }
+        } else {
+	    mediator.popupWarning("No previous attempt found.", "Oops...");
         }
     }
 

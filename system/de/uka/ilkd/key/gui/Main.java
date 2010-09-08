@@ -57,9 +57,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.pp.*;
 import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.init.*;
-import de.uka.ilkd.key.proof.mgt.BasicTask;
-import de.uka.ilkd.key.proof.mgt.NonInterferenceCheck;
-import de.uka.ilkd.key.proof.mgt.TaskTreeNode;
+import de.uka.ilkd.key.proof.mgt.*;
 import de.uka.ilkd.key.proof.reuse.ReusePoint;
 import de.uka.ilkd.key.rtsj.proof.init.RTSJProfile;
 import de.uka.ilkd.key.smt.SMTRule;
@@ -1372,6 +1370,14 @@ public class Main extends JFrame implements IMain {
 
 	JMenuItem close = new JMenuItem(new AbandonTask());
 	registerAtMenu(proof, close);	
+
+	final Action reuse = new AbstractAction("Reuse previous attempt") {
+            public void actionPerformed(ActionEvent e) {
+                GlobalProofMgt.getInstance().tryReuse(mediator.getProof());
+            }
+        };
+        mediator.enableWhenProof(reuse);
+	registerAtMenu(proof, new JMenuItem(reuse));
         
 	addSeparator(proof);
 	
@@ -1820,37 +1826,20 @@ public class Main extends JFrame implements IMain {
         tools.add(testItem);
         
      // implemented by mbender for jmltest
-        final JMenuItem createWrapper = new JMenuItem("Create JML-Wrapper");
-        
-        createWrapper.setAccelerator(KeyStroke.getKeyStroke
-                (KeyEvent.VK_J, 
-                	Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-
-        createWrapper.setEnabled(mediator.getProof() != null);
-
-        mediator.addKeYSelectionListener(new KeYSelectionListener() {
-            /** focused node has changed */
-            public void selectedNodeChanged(KeYSelectionEvent e) {
+        final Action createWrapper = new AbstractAction("Create JML-Wrapper") {
+            {
+                putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(
+                    KeyEvent.VK_J, 
+                    Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
             }
-
-            /**
-             * the selected proof has changed. Enable or disable action
-             * depending whether a proof is available or not
-             */
-            public void selectedProofChanged(KeYSelectionEvent e) {
-                createWrapper
-                        .setEnabled(e.getSource().getSelectedProof() != null);
-            }
-        });
-
-        createWrapper.addActionListener(new ActionListener() {
-
             public void actionPerformed(ActionEvent e) {
                 JMLTestFileCreator jmltfc = new JMLTestFileCreator();
                 jmltfc.createWrapper();
             }
-        });
-        tools.add(createWrapper);
+        };
+
+        mediator.enableWhenProof(createWrapper);
+        tools.add(new JMenuItem(createWrapper));
         
         return tools;
     }
@@ -2196,21 +2185,7 @@ public class Main extends JFrame implements IMain {
             putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_S,  
         	    Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
             
-            setEnabled(mediator.getProof() != null);
-            
-            mediator.addKeYSelectionListener(new KeYSelectionListener() {
-                /** focused node has changed */
-                public void selectedNodeChanged(KeYSelectionEvent e) {
-                }
-                
-                /**
-                 * the selected proof has changed. Enable or disable action depending whether a proof is
-                 * available or not
-                 */ 
-                public void selectedProofChanged(KeYSelectionEvent e) {
-                    setEnabled(e.getSource().getSelectedProof() != null);
-                }
-            });
+            mediator.enableWhenProof(this);
         }
         
         public void actionPerformed(ActionEvent e) {
@@ -2910,20 +2885,7 @@ public class Main extends JFrame implements IMain {
             putValue(Action.SHORT_DESCRIPTION, "Create JUnit test cases from proof.");
             putValue(Action.SMALL_ICON, icon);            
             
-            setEnabled(mediator.getSelectedProof() != null);
-            
-            mediator.addKeYSelectionListener(new KeYSelectionListener() {
-                /** focused node has changed */
-                public void selectedNodeChanged(KeYSelectionEvent e) {}
-                
-                /**
-                 * the selected proof has changed. Enable or disable action depending whether a
-                 * proof is available or not
-                 */ 
-                public void selectedProofChanged(KeYSelectionEvent e) {
-                    setEnabled(e.getSource().getSelectedProof() != null);
-                }
-            });             
+            mediator.enableWhenProof(this);
         }
         
         public void actionPerformed(ActionEvent e) {
@@ -3088,23 +3050,15 @@ public class Main extends JFrame implements IMain {
     
     private final class SMTEnableControl implements KeYSelectionListener{
 
-	private void enable(boolean b){
-	    smtComponent.setEnabled(b);
-	}
-
         public void selectedProofChanged(KeYSelectionEvent e) {
-            if(e.getSource().getSelectedProof() != null) {
-        	enable(!e.getSource().getSelectedProof().closed());
-            } else {
-        	enable(false);
-            }
+            Proof p = e.getSource().getSelectedProof();
+	    smtComponent.setEnabled(p!=null && !p.closed());
         }
         
         public void selectedNodeChanged(KeYSelectionEvent e) {
             selectedProofChanged(e);
         }
     }
-    
     
     
 
@@ -3162,21 +3116,7 @@ public class Main extends JFrame implements IMain {
 		    getKeyStroke(KeyEvent.VK_W, 
 			    Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 	    
-	    setEnabled(mediator.getProof() != null);
-            
-            mediator.addKeYSelectionListener(new KeYSelectionListener() {
-                /** focused node has changed */
-                public void selectedNodeChanged(KeYSelectionEvent e) {
-                }
-                
-                /**
-                 * the selected proof has changed. Enable or disable action depending whether a proof is
-                 * available or not
-                 */ 
-                public void selectedProofChanged(KeYSelectionEvent e) {
-                    setEnabled(e.getSource().getSelectedProof() != null);
-                }
-            });
+            mediator.enableWhenProof(this);
 	}
 			      
 	public void actionPerformed(ActionEvent e) {

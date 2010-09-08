@@ -429,7 +429,8 @@ public class ProblemInitializer {
 	if (main != null) {
             main.addProblem(pl);
         }
-//	GlobalProofMgt.getInstance().tryReuse(pl);
+        //Previously, proof reuse was triggered automatically - VK
+        //GlobalProofMgt.getInstance().tryReuse(pl);
     }
 
 
