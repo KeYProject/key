@@ -309,7 +309,12 @@ public class SMTProgressDialog extends JDialog implements ProcessLauncherListene
 		public void actionPerformed(ActionEvent e) {
 		    stopRunning = true;
 		    rule.stop();
-
+                    int mode = SMTSettings.getInstance().
+                        getProgressDialogMode();
+	            if ((mode == SMTSettings.PROGRESS_MODE_CLOSE ||
+		            mode == SMTSettings.PROGRESS_MODE_CLOSE_FIRST)){
+	                setVisible(false);
+                    }
 		}
 	    });
 	}
@@ -334,7 +339,6 @@ public class SMTProgressDialog extends JDialog implements ProcessLauncherListene
 	int mode = SMTSettings.getInstance().getProgressDialogMode();
 	if((mode == SMTSettings.PROGRESS_MODE_CLOSE ||
 		mode == SMTSettings.PROGRESS_MODE_CLOSE_FIRST)){
-	    setVisible(false);
             KeYMediator.invokeAndWait(new Runnable() {
                 public void run() {applyAndClose();}
             });

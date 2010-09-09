@@ -45,22 +45,32 @@ public class SMTRuleLauncher {
      * @param goal 
      * @param constraint
      */
-    public void start(SMTRule rule, Goal goal, Constraint constraint, boolean useOwnThread){
+    public void start(SMTRule rule, 
+                      Goal goal,
+                      Constraint constraint, 
+                      boolean useOwnThread){
 	if(!rule.isUsable()){
 	    return;
 	}
 	LinkedList<Goal> goals = new LinkedList<Goal>();
 	rule.setMaxTime(SMTSettings.getInstance().getTimeout()*100);
 	goals.add(goal);
+	if(useOwnThread){
+	    SMTProgressDialog.INSTANCE.prepare(
+                rule.getInstalledSolvers(),goals,rule);
+	}
 	rule.start(goal,constraint,useOwnThread,getApplyPolicy());
 	if(useOwnThread){
-	    startProgressDialog(rule,goals);    
+	    SMTProgressDialog.INSTANCE.showDialog();
 	}
 
     }
     
 
-    public void start(SMTRule rule, Proof proof, Constraint constraint, boolean useOwnThread){
+    public void start(SMTRule rule,
+                      Proof proof, 
+                      Constraint constraint, 
+                      boolean useOwnThread){
 	if(!rule.isUsable()){
 	    return;
 	}
@@ -70,15 +80,15 @@ public class SMTRuleLauncher {
 	    goals.add(goal);
 	}
 
+	if(useOwnThread){
+	    SMTProgressDialog.INSTANCE.prepare(
+                rule.getInstalledSolvers(),goals,rule);
+	}
 	rule.start(goals,proof,constraint,useOwnThread,getApplyPolicy());
 	if(useOwnThread){
-	    startProgressDialog(rule,goals);
+	    SMTProgressDialog.INSTANCE.showDialog();
 	}
     }
 
 
-    private void startProgressDialog(SMTRule rule, Collection<Goal> goals){
-	SMTProgressDialog.INSTANCE.prepare(rule.getInstalledSolvers(),goals,rule);
-	SMTProgressDialog.INSTANCE.showDialog();
-    }
 }

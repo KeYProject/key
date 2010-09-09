@@ -89,6 +89,14 @@ public class Event {
 	public Exception getException(){
 	    return exception;
 	}
+        
+        public String toString() {
+            return ""+type+"\n  "+
+                "launcher: "+launcher+"\n  "+
+                "launch: "+launch+"\n  "+
+                "userObject: "+userObject+"\n  "+
+                "exception: "+exception;
+        }
 
 	
 }
