@@ -125,7 +125,6 @@ tokens {
 	BOOTCLASSPATH="\\bootclasspath";
 	NODEFAULTCLASSES="\\noDefaultClasses";
 	JAVASOURCE="\\javaSource";
-        NOJAVAMODEL ="\\noJavaModel";
         WITHOPTIONS="\\withOptions";
         OPTIONSDECL="\\optionsDecl";
 	KEYSETTINGS = "\\settings";

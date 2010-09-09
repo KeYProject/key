@@ -4962,8 +4962,6 @@ javaSource returns [ImmutableList<String> ids = ImmutableSLList.<String>nil()]
   String s = null;
 }
 :
-   (NOJAVAMODEL SEMI{ return null; } )
-   |
    (JAVASOURCE 
       s = oneJavaSource { ids = ids.append(s); }
       (COMMA s = oneJavaSource { ids = ids.append(s); })*
