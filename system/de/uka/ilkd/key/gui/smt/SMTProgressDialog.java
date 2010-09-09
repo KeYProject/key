@@ -32,6 +32,7 @@ import javax.swing.JTextArea;
 import javax.swing.ListCellRenderer;
 
 import de.uka.ilkd.key.gui.IconFactory;
+import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.smt.SMTRule;
 import de.uka.ilkd.key.smt.SMTSolver;
@@ -95,21 +96,6 @@ public class SMTProgressDialog extends JDialog implements ProcessLauncherListene
 	setLocationByPlatform(true);
 
 	this.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-	this.addWindowListener(new WindowAdapter() {
-	    @Override
-	    public void windowClosing(WindowEvent e) {
-		setVisible(false);
-		rule.stop();
-	    }
-
-	    @Override
-	    public void windowDeactivated(WindowEvent e) {
-		if(applyResults){
-		    rule.applyResults();
-		    applyResults = false;
-		}
-	    }
-	});
 
 	setLayout(new BorderLayout());
 	setTitle("Progress of SMT solvers");
@@ -134,6 +120,14 @@ public class SMTProgressDialog extends JDialog implements ProcessLauncherListene
     }
 
     public void showDialog(){
+        if (SMTSettings.getInstance().getProgressDialogMode() == 
+            SMTSettings.PROGRESS_MODE_USER) {
+	    getCancelButton().setEnabled(true);
+	    getOkButton().setEnabled(true);
+        } else {
+	    getCancelButton().setEnabled(false);
+	    getOkButton().setEnabled(false);
+        }
 	setVisible(true);
 
     }
@@ -336,11 +330,14 @@ public class SMTProgressDialog extends JDialog implements ProcessLauncherListene
     // the following mechanism is introduced.
     public void workDone() {
 	getStopButton().setEnabled(false);
+        applyResults = true;
 	int mode = SMTSettings.getInstance().getProgressDialogMode();
 	if((mode == SMTSettings.PROGRESS_MODE_CLOSE ||
 		mode == SMTSettings.PROGRESS_MODE_CLOSE_FIRST)){
-	    applyResults = true;
 	    setVisible(false);
+            KeYMediator.invokeAndWait(new Runnable() {
+                public void run() {applyAndClose();}
+            });
 
 	}
 	repaint();

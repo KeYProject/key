@@ -9,6 +9,7 @@
 package de.uka.ilkd.key.smt;
 
 import java.util.Collection;
+import java.util.Set;
 import java.util.HashSet;
 import java.util.LinkedList;
 
@@ -339,7 +340,7 @@ public class SMTRule  extends ProcessLauncher implements BuiltInRule{
     public SMTSolverResult run(Term term , Services services, Constraint constraint,
 	    TacletIndex tacletIndex){
 	start(term,services,constraint,false, tacletIndex);
-	return this.getResults().getFirst();
+	return getFirstResult();
     }
     
     /**
@@ -353,7 +354,7 @@ public class SMTRule  extends ProcessLauncher implements BuiltInRule{
      */
     public SMTSolverResult run(Goal goal, Services services, Constraint constraint){
 	start(goal,constraint,false,WaitingPolicy.WAIT_FOR_ALL);
-	return this.getResults().getFirst();
+	return getFirstResult();
     }
     
 
@@ -375,7 +376,7 @@ public class SMTRule  extends ProcessLauncher implements BuiltInRule{
 	    return null;
 	}
 	start(formula,services,constraint,false);
-	return this.getResults().getFirst();
+	return getFirstResult();
     }
     
     
@@ -429,20 +430,12 @@ public class SMTRule  extends ProcessLauncher implements BuiltInRule{
      */
     public void applyResults() {
 
-	LinkedList<SolverSession.InternResult> result = new LinkedList<SolverSession.InternResult>();
-	for (SMTSolver solver : getInstalledSolvers()) {
-	    // if( !solver.running()){
-	    AbstractSMTSolver s = (AbstractSMTSolver) solver;
-
-	    result.addAll(s.getSession().getResults());
-	    // }
-
-	}
-	if (result.size() == 0) {
+	Set<SolverSession.InternResult> results = getInternResults();
+	if (results.size() == 0) {
 	    return;
 	}
 
-	for (final SolverSession.InternResult res : result) {
+	for (final SolverSession.InternResult res : results) {
 	    final BuiltInRuleApp birApp 
 	    	= new BuiltInRuleApp(this, null, userConstraint);
 	    Goal goal = res.getGoal();
@@ -468,8 +461,9 @@ public class SMTRule  extends ProcessLauncher implements BuiltInRule{
      * If the rule consists of multiple provers: The method does not merge the results in a semantic way,
      * but add them all to the returned list.
      */
-    public LinkedList<SMTSolverResult> getResults(){
-	HashSet<SolverSession.InternResult> result = new HashSet<SolverSession.InternResult>();
+    public Set<SolverSession.InternResult> getInternResults(){
+	Set<SolverSession.InternResult> result = 
+            new HashSet<SolverSession.InternResult>();
 	
 	for(SMTSolver solver : getInstalledSolvers()){
 	    AbstractSMTSolver s = (AbstractSMTSolver) solver;
@@ -477,14 +471,14 @@ public class SMTRule  extends ProcessLauncher implements BuiltInRule{
 	    result.addAll(s.getSession().getResults());
 	  
 	}
-	LinkedList<SMTSolverResult> toReturn = new LinkedList<SMTSolverResult>();
-	
-	for(SolverSession.InternResult res  : result ){
-	    toReturn.add(res.getResult());
-	}
-	return toReturn;
+	return result;
 	
     }
+    
+    public SMTSolverResult getFirstResult() {
+        return getInternResults().iterator().next().getResult();
+    }
+    
     
     public String toString(){
 	return displayName();
@@ -511,7 +505,7 @@ public class SMTRule  extends ProcessLauncher implements BuiltInRule{
 	    text = "Interrupted by exception after " + ts;
 	    break;
 	case NORMAL:
-	    text = "Stopped after "+ ts;
+	    text = "Finished after "+ ts;
 	    break;
 	    
 	case RUNNING:
