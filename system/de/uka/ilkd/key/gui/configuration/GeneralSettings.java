@@ -123,14 +123,6 @@ public class GeneralSettings implements Settings {
     }
 
     
-    public void setDnDDirectionSensitivity(boolean b) {
-        if (dndDirectionSensitive != b) {
-          dndDirectionSensitive = b;
-          fireSettingsChanged();
-        }
-    }
-
-    
     public void setUseJML(boolean b) {
         if (useJML != b) {
             useJML = b;

@@ -733,12 +733,13 @@ public class ProofTreeView extends JPanel {
 	private JCheckBoxMenuItem hideClosedSubtrees = 
 		new JCheckBoxMenuItem("Hide Closed Subtrees");
 	private JMenuItem search = new JMenuItem("Search");
-	private JMenuItem goalBack    = new JMenuItem("Prune Proof");
+	private JMenuItem prune    = new JMenuItem("Prune Proof");
 	private JMenuItem runStrategy = new JMenuItem("Apply Strategy",
 	    IconFactory.autoModeStartLogo(10));
-        private JMenuItem mark        = new JMenuItem("Mark for Re-Use");
-        private JMenuItem visualize   = new JMenuItem("Visualize");
-        private JMenuItem test        = new JMenuItem("Create Test For Node");
+        private JMenuItem mark        = new JMenuItem("Mark Node for Re-Use");
+        private JMenuItem visualize   = 
+            new JMenuItem("Visualize Execution Path");
+        private JMenuItem test        = new JMenuItem("Create Unit Test For Node");
         private JMenuItem bugdetection= new JMenuItem("Bug Detection");
         private JMenuItem change      = new JMenuItem("Change This Node");
 
@@ -764,6 +765,25 @@ public class ProofTreeView extends JPanel {
 	}
 
 	private void create() {
+	    this.add(runStrategy);
+	    runStrategy.addActionListener(this);
+	    runStrategy.setEnabled(false);
+	    if (proof != null) runStrategy.setEnabled(true);
+
+	    this.add(prune);
+	    if (branch != path) {
+		prune.addActionListener(this);
+		prune.setEnabled(false);
+		if (proof != null) {
+		    if (proof.isGoal(invokedNode) || 
+		        proof.getSubtreeGoals(invokedNode).size()>0) {
+		        prune.setEnabled(true);
+		    }
+		}
+	    }
+	    this.add(new JSeparator());
+
+
 	    this.add(expandAll);
 	    expandAll.addActionListener(this);
 	    this.add(expandAllBelow);
@@ -799,45 +819,31 @@ public class ProofTreeView extends JPanel {
 	    this.add(new SetGoalsBelowEnableStatus(false));
 	    // enable goals
 	    this.add(new SetGoalsBelowEnableStatus(true));
-	    this.add(new JSeparator());
-	    this.add(goalBack);
+
+
 	    if (branch != path) {
-		goalBack.addActionListener(this);
-		goalBack.setEnabled(false);
-	    }
-	    this.add(runStrategy);
-	    runStrategy.addActionListener(this);
-	    runStrategy.setEnabled(false);
-	    if (proof != null) {
-		//if (proof.getActiveStrategy() != null) {
-		runStrategy.setEnabled(true);
-		//}
-	    }
-	    if (branch != path) {
-		this.add(visualize);
+                this.add(new JSeparator());
+                JMenu more = new JMenu("More");
+                this.add(more);
+
+		more.add(visualize);
 		visualize.addActionListener(this);
 		visualize.setEnabled(true);
-		this.add(test);
+		more.add(test);
 		test.addActionListener(this);
 		test.setEnabled(true);
-		this.add(bugdetection);
+		more.add(bugdetection);
 		bugdetection.addActionListener(this);
 		bugdetection.setEnabled(true);
-		if (proof != null) {
-		    if (proof.isGoal(invokedNode) || 
-		        proof.getSubtreeGoals(invokedNode).size()>0) {
-		        goalBack.setEnabled(true);
-		    }
-		}
-	        this.add(change);
+	        more.add(change);
 	        change.addActionListener(this);
-	        this.add(mark);
+	        more.add(mark);
 	        mark.addActionListener(this);
 	    }
 	}
 
 	public void actionPerformed(ActionEvent e) {
-	    if (e.getSource() == goalBack) {
+	    if (e.getSource() == prune) {
 		delegateModel.setAttentive(false);
 		mediator().setBack(invokedNode);
 		delegateModel.updateTree ( null );
