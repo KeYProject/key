@@ -38,6 +38,7 @@ import de.uka.ilkd.key.gui.assistant.ProofAssistant;
 import de.uka.ilkd.key.gui.assistant.ProofAssistantAI;
 import de.uka.ilkd.key.gui.assistant.ProofAssistantController;
 import de.uka.ilkd.key.gui.configuration.*;
+import de.uka.ilkd.key.gui.nodeviews.IncrementalSearch;
 import de.uka.ilkd.key.gui.nodeviews.NonGoalInfoView;
 import de.uka.ilkd.key.gui.nodeviews.SequentView;
 import de.uka.ilkd.key.gui.notification.NotificationManager;
@@ -1350,8 +1351,22 @@ public class Main extends JFrame implements IMain {
 			// + ")");
 		}});
 	registerAtMenu(view, tacletOptionsView);
+
+/* needs more tweaking, as it brings up search even when no goal in sight
+	addSeparator(view);
         
-        
+	final Action search = new AbstractAction("Find") {
+            {
+                putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('/'));
+            }
+            public void actionPerformed(ActionEvent e) {
+                sequentView.requestFocus();
+                new IncrementalSearch(sequentView);
+            }
+        };
+        mediator.enableWhenProof(search);
+	registerAtMenu(view, new JMenuItem(search));
+*/      
         return view; 
     }
         
@@ -1705,27 +1720,26 @@ public class Main extends JFrame implements IMain {
     private JMenuItem setupDebuggingOptionsMenu() {
         JMenu result = new JMenu("Debug");
 
-        JMenuItem pretty = new JCheckBoxMenuItem("Use pretty syntax");
-        pretty.setToolTipText("If ticked, infix notations are used.");
-        pretty.setSelected(PresentationFeatures.ENABLED);
+        JMenuItem pretty = new JCheckBoxMenuItem("Disable Infix Notations");
+        pretty.setSelected(!PresentationFeatures.ENABLED);
 	pretty.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                PresentationFeatures.ENABLED=((JCheckBoxMenuItem)e.getSource()).
+                PresentationFeatures.ENABLED=!((JCheckBoxMenuItem)e.getSource()).
 	            isSelected();
                 makePrettyView();
             }});
         result.add(pretty);
 
         // minimize interaction
-        final boolean stupidMode = 
+        final boolean tacletFilter = 
             ProofSettings.DEFAULT_SETTINGS.getGeneralSettings().stupidMode();
         final JMenuItem stupidModeOption = new
-            JCheckBoxMenuItem("Minimize Interaction", stupidMode);
-        mediator.setStupidMode(stupidMode);
+            JCheckBoxMenuItem("Disable Taclet Filter", !tacletFilter);
+        mediator.setStupidMode(!tacletFilter);
         
         stupidModeOption.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                boolean b = ((JCheckBoxMenuItem) e.getSource()).isSelected();
+                boolean b = !((JCheckBoxMenuItem) e.getSource()).isSelected();
                 mediator().setStupidMode(b);
                 ProofSettings.DEFAULT_SETTINGS.
                 getGeneralSettings().setStupidMode(b);

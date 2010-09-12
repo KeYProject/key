@@ -224,12 +224,6 @@ public class SMTSettingsDialog {
 	    gridBagConstraints11.anchor = GridBagConstraints.SOUTHEAST;
 	    gridBagConstraints11.weightx = 0.0;
 	    gridBagConstraints11.gridy = 1;
-	    GridBagConstraints gridBagConstraints10 = new GridBagConstraints();
-	    gridBagConstraints10.gridx = 1;
-	    gridBagConstraints10.insets = new Insets(0, 5, 5, 0);
-	    gridBagConstraints10.anchor = GridBagConstraints.SOUTHEAST;
-	    gridBagConstraints10.weightx = 0.0;
-	    gridBagConstraints10.gridy = 1;
 	    GridBagConstraints gridBagConstraints9 = new GridBagConstraints();
 	    gridBagConstraints9.fill = GridBagConstraints.BOTH;
 	    gridBagConstraints9.gridy = 0;
@@ -246,33 +240,13 @@ public class SMTSettingsDialog {
 	    gridBagConstraints8.gridy = 1;
 	    panel = new JPanel();
 	    panel.setLayout(new GridBagLayout());
-	    panel.add(getApplyButton(), gridBagConstraints8);
+	    panel.add(getOkButton(), gridBagConstraints8);
 	    panel.add(getSplitPane(), gridBagConstraints9);
-	    panel.add(getOkButton(), gridBagConstraints10);
 	    panel.add(getCancelButton(), gridBagConstraints11);
 	}
 	return panel;
     }
 
-    /**
-     * This method initializes applyButton
-     * 
-     * @return javax.swing.JButton
-     */
-    private JButton getApplyButton() {
-	if (applyButton == null) {
-	    applyButton = new JButton();
-	    applyButton.setText("Apply");
-	    applyButton.addActionListener(new ActionListener() {
-
-		public void actionPerformed(ActionEvent e) {
-		    applyChanges();
-		    SMTSettingsDialog.this.getJScrollPane1().repaint();
-		}
-	    });
-	}
-	return applyButton;
-    }
 
     /**
      * This method initializes okButton
