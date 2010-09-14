@@ -145,9 +145,6 @@ public final class NotationInfo {
 	tbl.put(Equality.EQV,new Notation.Infix("<->",20,20,30));
 	tbl.put(Quantifier.ALL,new Notation.Quantifier("\\forall", 60, 60));
 	tbl.put(Quantifier.EX, new Notation.Quantifier("\\exists", 60, 60));
-	tbl.put(NumericalQuantifier.SUM, new Notation.NumericalQuantifier("\\sum", 60, 60, 70));
-	tbl.put(BoundedNumericalQuantifier.BSUM, new Notation.BoundedNumericalQuantifier("\\bSum", 60, 60, 70));
-	tbl.put(NumericalQuantifier.PRODUCT, new Notation.NumericalQuantifier("\\product", 60, 60, 70));
 	tbl.put(Modality.DIA,new Notation.ModalityNotation("\\<","\\>", 60, 60));
 	tbl.put(Modality.BOX,new Notation.ModalityNotation("\\[","\\]", 60, 60));
 	tbl.put(IfThenElse.IF_THEN_ELSE, new Notation.IfThenElse(130, "\\if"));

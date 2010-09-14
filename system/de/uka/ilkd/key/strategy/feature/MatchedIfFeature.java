@@ -18,7 +18,7 @@ import de.uka.ilkd.key.rule.TacletApp;
  * Binary features that returns zero iff the if-formulas of a Taclet are
  * instantiated or the Taclet does not have any if-formulas.
  */
-public class MatchedIfFeature extends BinaryTacletAppFeature {
+public final class MatchedIfFeature extends BinaryTacletAppFeature {
     
     public static final Feature INSTANCE = new MatchedIfFeature (); 
 

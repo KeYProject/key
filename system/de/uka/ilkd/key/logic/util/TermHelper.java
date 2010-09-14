@@ -60,8 +60,6 @@ public class TermHelper {
         final Sort newMaxSort;
         if (op instanceof SortedOperator) {
             newMaxSort = ((SortedOperator)op).argSort(i);
-        } else if (op instanceof BoundedNumericalQuantifier) {
-            newMaxSort = ((BoundedNumericalQuantifier)op).argSort(i);
         } else {                        
             newMaxSort = maxSortDefault;
         }

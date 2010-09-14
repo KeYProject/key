@@ -21,7 +21,7 @@ public final class UpdateApplication extends AbstractOperator {
     	= new UpdateApplication();
 
 
-    private UpdateApplication () {
+    private UpdateApplication() {
         super(new Name("update-application" ), 2, false);
     }
 

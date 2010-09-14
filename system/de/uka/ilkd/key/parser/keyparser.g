@@ -2828,56 +2828,6 @@ abbreviation returns [Term a=null]
         )
     ;
 
-/*XXX
-sum_or_product_term returns [Term result=null]
-{
-    Term cond, t;
-    NumericalQuantifier op=null;
-    ImmutableList<QuantifiableVariable> index = null;
-    Namespace orig = variables();   
-}
-    :
-        (
-            SUM {op = NumericalQuantifier.SUM;}
-        |
-            PRODUCT {op = NumericalQuantifier.PRODUCT;}
-        )
-        index=bound_variables
-        LPAREN
-        cond=term 
-        SEMI t=term 
-        {
-            unbindVars(orig);
-            result = tf.createNumericalQuantifierTerm(op, cond, t, 
-                new ImmutableArray<QuantifiableVariable>(index.toArray()));
-        }
-        RPAREN
-    ;
-    
-bounded_sum_term returns [Term result=null]
-{
-    Term a, b, t;
-    BoundedNumericalQuantifier op=null;
-    ImmutableList<QuantifiableVariable> index = null;
-    Namespace orig = variables();     
-}
-    :
-        BSUM {op = BoundedNumericalQuantifier.BSUM;}
-        index=bound_variables
-        LPAREN
-        a=term 
-        SEMI
-        b=term 
-        SEMI
-        t=term 
-        {
-            unbindVars(orig);
-            result = tf.createBoundedNumericalQuantifierTerm(op, a, b, t, 
-                new ImmutableArray<QuantifiableVariable>(index.toArray()));
-        }
-        RPAREN
-    ;
-*/
 
 ifThenElseTerm returns [Term result = null]
 {

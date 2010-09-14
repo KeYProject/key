@@ -385,7 +385,8 @@ public final class JavaCardDLStrategy extends AbstractFeatureStrategy {
             add ( ifZero ( MatchedIfFeature.INSTANCE,
                            DiffFindAndIfFeature.INSTANCE ),
                   longConst ( -5000 ),
-                  ScaleFeature.createScaled ( CountMaxDPathFeature.INSTANCE, 10.0 ) );
+                  add(DiffFindAndReplacewithFeature.INSTANCE,
+                      ScaleFeature.createScaled ( CountMaxDPathFeature.INSTANCE, 10.0 ) ));
 
         bindRuleSet ( d, "replace_known_left", commonF );
         bindRuleSet ( d, "replace_known_right",

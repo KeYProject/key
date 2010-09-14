@@ -1914,12 +1914,19 @@ bsumterm returns [SLExpression result=null] throws SLTranslationException
         (
             a=expression SEMI  b=expression SEMI result=expression
         )
-        {/*XXX
-            LogicVariable lv = (LogicVariable) decls.head();
-            result = TermFactory.DEFAULT.createBoundedNumericalQuantifierTerm(BoundedNumericalQuantifier.BSUM, 
-                        a, b, result, new ImmutableArray<QuantifiableVariable>(lv));
-            resolverManager.popLocalVariablesNamespace();*/
-            assert false : "not implemented";
+        {
+            if(!decls.first.getJavaType().equals(PrimitiveType.JAVA_INT)) {
+                raiseError("bounded sum variable must be of type int");
+            } else if(decls.second.size() != 1) {
+                raiseError("bounded sum must declare exactly one variable");
+            }
+            LogicVariable lv = (LogicVariable) decls.second.head();
+            Function bsum = intLDT.getBsum();
+            Term t = TB.func(bsum, 
+                             new Term[]{a.getTerm(), b.getTerm(), result.getTerm()},
+                             new ImmutableArray<QuantifiableVariable>(lv));
+	    result = new SLExpression(t);
+            resolverManager.popLocalVariablesNamespace();
         }
         RPAREN
 ; exception

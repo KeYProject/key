@@ -85,21 +85,17 @@ public final class TermFactory {
     }
     
     
-    public Term createTerm(Operator op, 
-	    		   Term[] subs) {
+    public Term createTerm(Operator op, Term[] subs) {
 	return createTerm(op, subs, null, null);
     }
     
     
-    public Term createTerm(Operator op, 
-	    		   Term sub) {
+    public Term createTerm(Operator op, Term sub) {
 	return createTerm(op, new ImmutableArray<Term>(sub), null, null);
     }    
     
     
-    public Term createTerm(Operator op, 
-	    		   Term sub1,
-	    		   Term sub2) {
+    public Term createTerm(Operator op, Term sub1, Term sub2) {
 	return createTerm(op, new Term[]{sub1, sub2}, null, null);
     }    
     

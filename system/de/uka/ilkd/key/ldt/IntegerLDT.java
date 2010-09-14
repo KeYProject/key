@@ -46,17 +46,18 @@ public final class IntegerLDT extends LDT {
     //(explanations see there)
     private final Function sharp;
     private final Function numberSymbol[] = new Function[10];
+    private final Function neglit;    
     private final Function numbers;
-    private final Function negativeNumber;
     private final Function charID;
-    private final Function plus;
-    private final Function negative;
-    private final Function minus;
-    private final Function times;
-    private final Function divide;
-    private final Function modulo;
-    private final Function jDivide;
-    private final Function jModulo;
+    private final Function add;
+    private final Function neg;
+    private final Function sub;
+    private final Function mul;
+    private final Function div;
+    private final Function mod;
+    private final Function bsum;
+    private final Function jdiv;
+    private final Function jmod;
     private final Function unaryMinusJint;
     private final Function unaryMinusJlong;
     private final Function addJint;
@@ -138,21 +139,22 @@ public final class IntegerLDT extends LDT {
 
         //initialise caches for function symbols from integerHeader.key 
         sharp               = addFunction(services, "#");
-        for (int i = 0; i < 10; i++) {
-            numberSymbol[i] = addFunction(services, ""+i);
-        }        
+        for(int i = 0; i < 10; i++) {
+            numberSymbol[i] = addFunction(services, "" + i);
+        }
+        neglit              = addFunction(services, NEGATIVE_LITERAL_STRING);        
         numbers             = addFunction(services, NUMBERS_NAME.toString());
         assert sharp.sort() == numbers.argSort(0);
-        negativeNumber      = addFunction(services, NEGATIVE_LITERAL_STRING);
         charID              = addFunction(services, CHAR_ID_NAME.toString());
-        plus                = addFunction(services, "add");
-        negative            = addFunction(services, "neg");
-        minus               = addFunction(services, "sub");
-        times               = addFunction(services, "mul");
-        divide              = addFunction(services, "div");
-        modulo              = addFunction(services, "mod");
-        jDivide             = addFunction(services, "jdiv");
-        jModulo             = addFunction(services, "jmod");                  
+        add                 = addFunction(services, "add");
+        neg                 = addFunction(services, "neg");
+        sub                 = addFunction(services, "sub");
+        mul                 = addFunction(services, "mul");
+        div                 = addFunction(services, "div");
+        mod                 = addFunction(services, "mod");
+        bsum                = addFunction(services, "bsum");
+        jdiv                = addFunction(services, "jdiv");
+        jmod                = addFunction(services, "jmod");                  
         unaryMinusJint      = addFunction(services, "unaryMinusJint");
         unaryMinusJlong     = addFunction(services, "unaryMinusJlong");
         addJint             = addFunction(services, "addJint");
@@ -225,7 +227,7 @@ public final class IntegerLDT extends LDT {
         inLong              = addFunction(services, "inLong");
         inChar              = addFunction(services, "inChar");
 
-        // cache often used constants       
+        //cache often used constants       
         zero = translateLiteral(new IntLiteral(0));
         one = translateLiteral(new IntLiteral(1));        
     }
@@ -236,7 +238,7 @@ public final class IntegerLDT extends LDT {
     //-------------------------------------------------------------------------
     
     private boolean isNumberLiteral(Function f) {
-        char c=f.name().toString().charAt(0);
+        char c = f.name().toString().charAt(0);
         return (c-'0'>=0) && (c-'0'<=9);
     }
 
@@ -258,16 +260,16 @@ public final class IntegerLDT extends LDT {
         }
         
         return numberSymbol[number];
+    }
+    
+    
+    public Function getNegativeNumberSign() {
+        return neglit;
     }    
     
     
     public Function getNumberSymbol() {
         return numbers;
-    }
-    
-    
-    public Function getNegativeNumberSign() {
-        return negativeNumber;
     }
     
     
@@ -277,36 +279,40 @@ public final class IntegerLDT extends LDT {
     
     
     public Function getAdd() {
-        return plus;
-    }
-    
-    
-    public Function getSub() {
-        return minus;
-    }
-    
-    
-    public Function getMul() {
-        return times;
-    }
-    
-    
-    public Function getDiv() {
-        return divide;
-    }
-    
-    
-    public Function getMod() {
-        return modulo;
+        return add;
     }
     
     
     public Function getNeg() {
-        return negative;
+        return neg;
+    }    
+    
+    
+    public Function getSub() {
+        return sub;
     }
     
     
-
+    public Function getMul() {
+        return mul;
+    }
+    
+    
+    public Function getDiv() {
+        return div;
+    }
+    
+    
+    public Function getMod() {
+        return mod;
+    }
+    
+    
+    public Function getBsum() {
+	return bsum;
+    }
+    
+    
     public Function getLessThan() {
         return lessThan;
     }
@@ -536,7 +542,7 @@ public final class IntegerLDT extends LDT {
             result = TermBuilder.DF.func(numberSymbol[int_ch[i]-'0'], result);
         }
         if (minusFlag) {
-            result = TermBuilder.DF.func(negativeNumber, result);
+            result = TermBuilder.DF.func(neglit, result);
         }
         result = TermBuilder.DF.func(identifier, result);
 
@@ -634,7 +640,7 @@ public final class IntegerLDT extends LDT {
      * @return the function symbol used to represent integer division
      */
     public Function getJDivision() {
-        return jDivide;
+        return jdiv;
     }
     
     /**
@@ -643,7 +649,7 @@ public final class IntegerLDT extends LDT {
      * @return the function symbol used to represent the integer modulo operation 
      */
     public Function getArithModulo() {        
-        return modulo;
+        return mod;
     }
 
     /**
@@ -652,7 +658,7 @@ public final class IntegerLDT extends LDT {
      * @return the function symbol used to represent the integer modulo operation 
      */
     public Function getJModulo() {        
-        return jModulo;
+        return jmod;
     }
 
     /** returns a function mapping an arithmetic integer to its Java long representation */ 
@@ -953,5 +959,4 @@ public final class IntegerLDT extends LDT {
     public Term one() {	
 	return one;
     }
-
 } 

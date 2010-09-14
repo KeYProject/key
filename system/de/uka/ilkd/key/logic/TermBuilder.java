@@ -748,7 +748,7 @@ public final class TermBuilder {
      * @param numberString String representing an integer
      * @return Term in Z-Notation representing the given number
      */
-    public Term zTerm(Services services, String numberString){
+    public Term zTerm(Services services, String numberString) {
         Operator v;
         Term t;
         boolean negate = false;
