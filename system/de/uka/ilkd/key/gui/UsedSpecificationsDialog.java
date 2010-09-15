@@ -55,7 +55,7 @@ public class UsedSpecificationsDialog extends JDialog {
     protected UsedSpecificationsDialog(
 	    	Services services,
 	    	ImmutableSet<ContractWithInvs> contractApps) {
-	super(Main.getInstance(), "Used Specifications", true);
+	super(Main.getInstance(), "Specifications Used in the Proof", true);
 	this.services = services;
 
 	// break contract apps down to atomic contracts
@@ -136,6 +136,7 @@ public class UsedSpecificationsDialog extends JDialog {
 	Dimension largeButtonDim = new Dimension(145, 27);
 	Dimension extraLargeButtonDim = new Dimension(170, 27);
 	getContentPane().add(buttonPanel);
+        buttonPanel.add(new JLabel("Prove that selected spec: "));
 
 	createPOButtonPanel(services, atomicContractApps, buttonPanel,
 	        largeButtonDim, extraLargeButtonDim);

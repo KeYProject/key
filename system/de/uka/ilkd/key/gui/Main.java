@@ -428,7 +428,7 @@ public class Main extends JFrame implements IMain {
 	if (pane instanceof JScrollPane) {
 	    ((JScrollPane) pane).getViewport().setBackground(Color.white);
         }
-	pane.setMinimumSize(new java.awt.Dimension(150,0));
+	pane.setMinimumSize(new Dimension(150,0));
     }
     
     /** adds a new tab */
@@ -604,13 +604,13 @@ public class Main extends JFrame implements IMain {
         
         tabbedPane.addTab("Rules", null, new JScrollPane(ruleView), "All available rules");
         tabbedPane.setSelectedIndex(0);
-        tabbedPane.setPreferredSize(new java.awt.Dimension(250, 440));
+        tabbedPane.setPreferredSize(new Dimension(250, 440));
         tabbedPane.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).getParent().
         	remove(KeyStroke.getKeyStroke(KeyEvent.VK_UP, ActionEvent.CTRL_MASK));
         tabbedPane.getInputMap(JComponent.WHEN_FOCUSED).getParent().
         	remove(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, ActionEvent.CTRL_MASK));
         
-        proofListView.setPreferredSize(new java.awt.Dimension(250, 100));
+        proofListView.setPreferredSize(new Dimension(250, 100));
         paintEmptyViewComponent(proofListView, "Tasks");
         
         final DropTargetListener fileOpener = new DropTargetAdapter() {
@@ -774,10 +774,14 @@ public class Main extends JFrame implements IMain {
         });
     }
     
-    protected static JButton createAutoModeButton() {
+    protected static JComponent createAutoModeButton() {
         JButton b = new JButton(autoModeAction);
         b.putClientProperty("hideActionText", Boolean.TRUE);
-        return b;
+        //the following rigmarole is to make the button slightly wider
+        JPanel p = new JPanel();
+        p.setLayout(new GridBagLayout());
+        p.add(b);
+        return p;
     }
     
     private JComponent createOpenMostRecentFile() {
@@ -1212,8 +1216,8 @@ public class Main extends JFrame implements IMain {
 	if (clipBoardTextArea == null) {
 	    clipBoardTextArea = new java.awt.TextArea(
 		    "",10,10,java.awt.TextArea.SCROLLBARS_NONE) {
-		public java.awt.Dimension getMaximumSize() {
-		    return new java.awt.Dimension(0,0);
+		public Dimension getMaximumSize() {
+		    return new Dimension(0,0);
 		}
 	    };
 	}
@@ -3304,7 +3308,7 @@ public class Main extends JFrame implements IMain {
             setLocation(70, 70);
             addWindowListener(new UnitTestGeneratorGuiListener());
             pack();     
-            java.awt.Dimension d = getSize();
+            Dimension d = getSize();
             d.setSize(400, (int) d.getHeight()+3);
             setSize(d);
             setVisible(true);
