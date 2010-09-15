@@ -153,4 +153,9 @@ public class PackageReference extends JavaNonTerminalProgramElement
 	              && prefix != null  
 	              && pr.prefix.equals(prefix));
     }
+
+
+    public String toString() {
+        return (prefix != null ? prefix.toString() + "." : "") + getName();
+    }
 }

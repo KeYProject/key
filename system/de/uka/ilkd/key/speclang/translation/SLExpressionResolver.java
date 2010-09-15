@@ -35,17 +35,37 @@ public abstract class SLExpressionResolver {
         this.manager = manager;
         this.specInClass = specInClass;
     }
+
+
+    /**
+     * Cuts off names of enclosing classes from a "package reference"
+     */
+    private String trimPackageRef(String ref) {
+        if(ref == null || javaInfo.isPackage(ref)) {
+	    return ref;
+        }
+	
+        int i = ref.lastIndexOf(".");
+        if(i < 0) { 
+            return null;
+        } else {
+	    return trimPackageRef(ref.substring(0, i));
+        }
+    }
     
     
     private boolean areInSamePackage(KeYJavaType kjt1, KeYJavaType kjt2) {
 	final PackageReference p1 = kjt1.createPackagePrefix();
 	final PackageReference p2 = kjt2.createPackagePrefix();
-	if(p1 == null) {
-	    return p2 == null;
-	} else if(p2 == null) {
+        final String ps1 = trimPackageRef(p1 == null ? null : p1.toString());
+        final String ps2 = trimPackageRef(p2 == null ? null : p2.toString());
+
+	if(ps1 == null) {
+	    return ps2 == null;
+	} else if(ps2 == null) {
 	    return false;
 	} else {
-	    return p1.equals(p2);
+	    return ps1.equals(ps2);
 	}
     }    
     
@@ -78,7 +98,7 @@ public abstract class SLExpressionResolver {
 	           || areInSamePackage(specInClass, containingType);
 	} else if(mod instanceof Private) {
 	    return specInClass.equals(containingType);
-	} else {
+	} else { 
 	    return areInSamePackage(specInClass, containingType);
 	}	
     }
