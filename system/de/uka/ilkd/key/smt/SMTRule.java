@@ -87,9 +87,11 @@ public class SMTRule  extends ProcessLauncher implements BuiltInRule{
     private final boolean multiRule;
     
     private final boolean background;
-    
 
     public enum WaitingPolicy {STOP_FIRST,WAIT_FOR_ALL};
+    
+    /** Latest status update to the user */
+    private String lastStatus = "";
  
   
     public void init(){
@@ -428,12 +430,15 @@ public class SMTRule  extends ProcessLauncher implements BuiltInRule{
      * If you use an own thread for this rule (see <code>start(...)<code>), you
      * must call this method after executing the external provers.
      */
-    public void applyResults() {
+    public String applyResults() {
 
 	Set<SolverSession.InternResult> results = getInternResults();
 	if (results.size() == 0) {
-	    return;
+	    return "";
 	}
+        
+        Proof p = results.iterator().next().getGoal().proof(); // ufff
+        int nrOfGoalsBefore = p.openGoals().size();
 
 	for (final SolverSession.InternResult res : results) {
 	    final BuiltInRuleApp birApp 
@@ -453,6 +458,16 @@ public class SMTRule  extends ProcessLauncher implements BuiltInRule{
 		}
 	    }
 	}
+        int nrOfGoalsAfter = p.openGoals().size();
+        return lastStatus+": "+goalsMessage(nrOfGoalsBefore, nrOfGoalsAfter);
+    }
+    
+    private String goalsMessage(int before, int after) {
+        int closed = before - after;
+        String message = " Closed " + closed + " goal";
+        if ( closed != 1 ) message += "s";             
+        message += ", " + after + " remaining"; 
+        return message;
     }
     
     
@@ -495,11 +510,10 @@ public class SMTRule  extends ProcessLauncher implements BuiltInRule{
 	return ((double)temp)/Math.pow(10, digits);
     }
     
-    private void showTimeStatus(SMTProgressMonitor mon, long time, long maxTime,  
-	    Status interrupt){
+    public String timeStatus(long time, long maxTime, Status interrupt) {
 	String text="";
 	double t = cut(((double)time)/1000,1);
-	String ts = t+ " sec.";
+	String ts = t+ " s";
 	switch(interrupt){
 	case EXCEPTION:
 	    text = "Interrupted by exception after " + ts;
@@ -518,12 +532,16 @@ public class SMTRule  extends ProcessLauncher implements BuiltInRule{
 	case USER_INTERRUPTION:
 	    text = "Interrupted by user after "+ ts;
 	    break;
-	
 	}
-	if(interrupt!= Status.RUNNING){
-	    mon.setFinished();
-	}
-	mon.setTimeProgress(text, getCurrentProgress(time, maxTime));
+        return text;
+    }
+    
+    private void showTimeStatus(SMTProgressMonitor mon, 
+                                long time, long maxTime,  
+                                Status interrupt) {
+	if (interrupt!= Status.RUNNING) mon.setFinished();
+        lastStatus = timeStatus(time, maxTime, interrupt);
+	mon.setTimeProgress(lastStatus, getCurrentProgress(time, maxTime));
     }
     
  
@@ -651,7 +669,8 @@ class EmptyRule extends SMTRule{
     }
 
     
-    public void applyResults(){
+    public String applyResults(){
+        return "";
     }
     
 

@@ -33,6 +33,7 @@ import javax.swing.ListCellRenderer;
 
 import de.uka.ilkd.key.gui.IconFactory;
 import de.uka.ilkd.key.gui.KeYMediator;
+import de.uka.ilkd.key.gui.Main;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.smt.SMTRule;
 import de.uka.ilkd.key.smt.SMTSolver;
@@ -325,7 +326,8 @@ public class SMTProgressDialog extends JDialog implements ProcessLauncherListene
 	stopRunning = true;
 	setVisible(false);	
 	rule.stop();	    	
-	rule.applyResults();
+	String msg = rule.applyResults();
+        Main.getInstance().setStatusLine(msg);
     }
 
 

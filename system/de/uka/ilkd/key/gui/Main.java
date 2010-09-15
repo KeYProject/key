@@ -2407,7 +2407,7 @@ public class Main extends JFrame implements IMain {
         if ( appliedRules != 0 ) {
             message = "Strategy: Applied " + appliedRules + " rule";
             if ( appliedRules != 1 ) message += "s";
-            message += " (" + timeString + " sec), ";
+            message += " (" + timeString + " s), ";
             message += " closed " + closedGoals + " goal";
             if ( closed != 1 ) message += "s";             
             message += ", " + displayedOpenGoalNumber ();
