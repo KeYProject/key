@@ -1726,8 +1726,8 @@ public class Main extends JFrame implements IMain {
 
         JMenuItem pretty = new JCheckBoxMenuItem("Disable Infix Notations");
         pretty.setSelected(!PresentationFeatures.ENABLED);
-	pretty.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
+	pretty.addChangeListener(new ChangeListener() {
+	    public void stateChanged(ChangeEvent e) {
                 PresentationFeatures.ENABLED=!((JCheckBoxMenuItem)e.getSource()).
 	            isSelected();
                 makePrettyView();
@@ -1736,18 +1736,21 @@ public class Main extends JFrame implements IMain {
 
         // minimize interaction
         final boolean tacletFilter = 
-            ProofSettings.DEFAULT_SETTINGS.getGeneralSettings().stupidMode();
+            ProofSettings.DEFAULT_SETTINGS.getGeneralSettings().tacletFilter();
         final JMenuItem stupidModeOption = new
             JCheckBoxMenuItem("Disable Taclet Filter", !tacletFilter);
-        mediator.setStupidMode(!tacletFilter);
+        mediator.setStupidMode(tacletFilter);
         
-        stupidModeOption.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
+        stupidModeOption.addChangeListener(new ChangeListener() {
+	    public void stateChanged(ChangeEvent e) {        	
                 boolean b = !((JCheckBoxMenuItem) e.getSource()).isSelected();
                 mediator().setStupidMode(b);
                 ProofSettings.DEFAULT_SETTINGS.
-                getGeneralSettings().setStupidMode(b);
+                getGeneralSettings().setTacletFilter(b);
             }});
+        
+        
+                
         result.add(stupidModeOption);
         
         JMenuItem showSettings = new JMenuItem("Show settings");
@@ -1757,6 +1760,10 @@ public class Main extends JFrame implements IMain {
             }
         });
         result.add(showSettings);
+        
+        
+        
+        
 
         return result;
     }
