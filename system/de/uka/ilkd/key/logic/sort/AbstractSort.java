@@ -113,16 +113,6 @@ public abstract class AbstractSort implements Sort {
     
     
     @Override
-    public final SortDependingFunction getObjectRepository(Services services) {
-	SortDependingFunction result
-	    = SortDependingFunction.getFirstInstance(OBJECT_REPOSITORY_NAME, services)
-                                   .getInstanceFor(this, services);
-	assert result.getSortDependingOn() == this && result.sort() == this;
-	return result;
-    }         
-
-    
-    @Override
     public final String toString() {
         return name.toString();
     }

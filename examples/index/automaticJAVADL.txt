@@ -77,6 +77,7 @@
 ./heap/simple/operation_contracts.key
 ./heap/simple/select_store.key
 ./heap/simple/selection_sort.key
+./heap/simple/seq.key
 ./heap/SmansEtAl/ArrayList_add.key
 ./heap/SmansEtAl/ArrayList_ArrayList.key
 ./heap/SmansEtAl/ArrayList_footprint.key

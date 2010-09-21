@@ -132,8 +132,9 @@ public class LDTInput implements EnvInput {
         ImmutableList<LDT> ldts = ImmutableSLList.<LDT>nil()
                         	.prepend(new IntegerLDT(services))
                         	.prepend(new BooleanLDT(services))
-                        	.prepend(new SetLDT(services))
-                        	.prepend(new HeapLDT(services));
+                        	.prepend(new LocSetLDT(services))
+                        	.prepend(new HeapLDT(services))
+                        	.prepend(new SeqLDT(services));
         initConfig.getServices().getTypeConverter().init(ldts);
     }
   

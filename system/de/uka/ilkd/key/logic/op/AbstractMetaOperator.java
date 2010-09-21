@@ -87,9 +87,6 @@ public abstract class AbstractMetaOperator extends AbstractSortedOperator
 
     public static final AbstractMetaOperator DIVIDE_LCR_MONOMIALS = new DivideLCRMonomials ();
 
-    public static final AbstractMetaOperator CREATE_IN_REACHABLE_STATE_PO = 
-        new CreateInReachableStatePO ();
-    
     public static final AbstractMetaOperator INTRODUCE_ATPRE_DEFINITIONS = new IntroAtPreDefsOp();
     
     public static final AbstractMetaOperator MEMBER_PV_TO_FIELD = new MemberPVToField();

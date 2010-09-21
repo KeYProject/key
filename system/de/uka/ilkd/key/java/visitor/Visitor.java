@@ -62,7 +62,7 @@ public interface Visitor {
     void performActionOnBooleanLiteral(BooleanLiteral x);
     
     void performActionOnEmptySetLiteral(EmptySetLiteral x);
-    
+        
     void performActionOnSingleton(Singleton x);    
     
     void performActionOnSetUnion(SetUnion x);
@@ -72,6 +72,14 @@ public interface Visitor {
     void performActionOnSetMinus(SetMinus x);
     
     void performActionOnAllFields(AllFields x);
+    
+    void performActionOnEmptySeqLiteral(EmptySeqLiteral x);
+    
+    void performActionOnSeqSingleton(SeqSingleton x);
+    
+    void performActionOnSeqConcat(SeqConcat x);
+    
+    void performActionOnSeqSub(SeqSub x);
 
     void performActionOnStringLiteral(StringLiteral x); 
 

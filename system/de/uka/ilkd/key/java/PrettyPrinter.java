@@ -988,6 +988,49 @@ public class PrettyPrinter {
         writeElement(0, x.getChildAt(0));
         write(")");
         printFooter(x);
+    }
+    
+    public void printEmptySeqLiteral(EmptySeqLiteral x) throws java.io.IOException {
+        printHeader(x);
+        writeInternalIndentation(x);
+        write("\\seq_empty");
+        printFooter(x);
+    }
+    
+    public void printSeqSingleton(de.uka.ilkd.key.java.expression.operator.SeqSingleton x) throws java.io.IOException {
+        printHeader(x);
+        writeInternalIndentation(x);
+        writeToken(0, "\\seq_singleton", x);
+        write("(");
+        writeElement(0, x.getChildAt(0));
+        write(")");
+        printFooter(x);
+    } 
+    
+    public void printSeqConcat(de.uka.ilkd.key.java.expression.operator.SeqConcat x) throws java.io.IOException {
+        printHeader(x);
+        writeInternalIndentation(x);
+        writeToken(0, "\\seq_concat", x);
+        write("(");
+        writeElement(0, x.getChildAt(0));
+        write(",");
+        writeElement(0, x.getChildAt(1));
+        write(")");
+        printFooter(x);
+    }    
+    
+    public void printSeqSub(de.uka.ilkd.key.java.expression.operator.SeqSub x) throws java.io.IOException {
+        printHeader(x);
+        writeInternalIndentation(x);
+        writeToken(0, "\\seq_sub", x);
+        write("(");
+        writeElement(0, x.getChildAt(0));
+        write(",");
+        writeElement(0, x.getChildAt(1));
+        write(",");
+        writeElement(0, x.getChildAt(2));
+        write(")");
+        printFooter(x);
     }        
 
     public void printStringLiteral(StringLiteral x) throws java.io.IOException {

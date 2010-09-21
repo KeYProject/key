@@ -10,11 +10,7 @@
 package de.uka.ilkd.key.java;
 
 
-import java.util.HashMap;
-import java.util.Iterator;
-
 import recoder.service.ConstantEvaluator;
-import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.abstraction.*;
@@ -42,8 +38,9 @@ public final class TypeConverter {
       
     private IntegerLDT integerLDT;
     private BooleanLDT booleanLDT;
-    private SetLDT setLDT;
+    private LocSetLDT locSetLDT;
     private HeapLDT heapLDT;
+    private SeqLDT seqLDT;
     private FloatLDT floatLDT;
     private DoubleLDT doubleLDT;
     
@@ -65,10 +62,12 @@ public final class TypeConverter {
             this.integerLDT = (IntegerLDT)ldt;
         } else if (ldt instanceof BooleanLDT) {
             this.booleanLDT = (BooleanLDT)ldt;
-        } else if (ldt instanceof SetLDT) {
-            this.setLDT = (SetLDT) ldt;
+        } else if (ldt instanceof LocSetLDT) {
+            this.locSetLDT = (LocSetLDT) ldt;
         } else if (ldt instanceof HeapLDT) {
-            this.heapLDT = (HeapLDT)ldt;
+            this.heapLDT = (HeapLDT) ldt;
+        } else if (ldt instanceof SeqLDT) {
+            this.seqLDT = (SeqLDT) ldt;
         } else if (ldt instanceof FloatLDT ) {
             this.floatLDT = (FloatLDT)ldt;
         } else if (ldt instanceof DoubleLDT) {
@@ -117,8 +116,8 @@ public final class TypeConverter {
     }
 
  
-    public SetLDT getSetLDT() {
-	return setLDT;
+    public LocSetLDT getLocSetLDT() {
+	return locSetLDT;
     }
 
     
@@ -126,16 +125,18 @@ public final class TypeConverter {
 	return heapLDT;
     }
     
+    
+    public SeqLDT getSeqLDT() {
+	return seqLDT;
+    }
+    
 
     private Term translateOperator
 	(de.uka.ilkd.key.java.expression.Operator op, ExecutionContext ec) {
 
 	final Term[] subs  = new Term[op.getArity()];
-	if (op.getArity() >= 1) {
-	    subs[0] = convertToLogicElement(op.getExpressionAt(0), ec);
-	}
-	if (op.getArity() == 2) {
-	    subs[1] = convertToLogicElement(op.getExpressionAt(1), ec);	  
+	for(int i = 0, n = op.getArity(); i < n; i++) {
+	    subs[i] = convertToLogicElement(op.getExpressionAt(i), ec);
 	}
 	
 	//hack: convert object singleton to location singleton
@@ -150,8 +151,16 @@ public final class TypeConverter {
 	    responsibleLDT = integerLDT;
 	} else if (booleanLDT.isResponsible(op, subs, services, ec)) {
 	    responsibleLDT = booleanLDT;
-	} else if (setLDT.isResponsible(op, subs, services, ec)) {
-	    responsibleLDT = setLDT;
+	} else if (locSetLDT.isResponsible(op, subs, services, ec)) {
+	    responsibleLDT = locSetLDT;
+	} else if(seqLDT.isResponsible(op, subs, services, ec)) {
+	    responsibleLDT = seqLDT;
+	} else if(op instanceof Equals) {
+	    assert subs.length == 2;
+	    return TB.equals(subs[0], subs[1]);
+	} else if(op instanceof Conditional) {
+	    assert subs.length == 3;
+	    return TB.ife(subs[0], subs[1], subs[2]);
 	} else {
 	    Debug.out("typeconverter: no data type model "+
 		      "available to convert:", op, op.getClass());		
@@ -381,7 +390,9 @@ public final class TypeConverter {
         } else if (lit instanceof StringLiteral) {
             return stringConverter.translateLiteral(lit,integerLDT,services);
         } else if (lit instanceof EmptySetLiteral) {
-            return setLDT.translateLiteral(lit);
+            return locSetLDT.translateLiteral(lit);
+        } else if (lit instanceof EmptySeqLiteral) {
+            return seqLDT.translateLiteral(lit);            
         } else {
             Debug.fail("Unknown literal type", lit);                 
             return null;
@@ -439,8 +450,10 @@ public final class TypeConverter {
                         t2 == PrimitiveType.JAVA_CHAR||
                         t2 == PrimitiveType.JAVA_LONG)) 
             return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_LONG);
-        if (t1 == PrimitiveType.JAVA_SET && t2 == PrimitiveType.JAVA_SET) 
-            return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_SET);
+        if (t1 == PrimitiveType.JAVA_LOCSET && t2 == PrimitiveType.JAVA_LOCSET) 
+            return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_LOCSET);
+        if (t1 == PrimitiveType.JAVA_SEQ && t2 == PrimitiveType.JAVA_SEQ) 
+            return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_SEQ);        
         throw new RuntimeException("Could not determine promoted type "+
                 "of "+t1+" and "+t2);
     }
@@ -459,8 +472,10 @@ public final class TypeConverter {
 	    return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_INT);
 	if (t1 == PrimitiveType.JAVA_LONG)
 	    return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_LONG);
-	if (t1 == PrimitiveType.JAVA_SET) 
-	    return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_SET);
+	if (t1 == PrimitiveType.JAVA_LOCSET) 
+	    return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_LOCSET);
+	if (t1 == PrimitiveType.JAVA_SEQ) 
+	    return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_SEQ);	
 	throw new RuntimeException("Could not determine promoted type "+
 				   "of "+type1);
     }

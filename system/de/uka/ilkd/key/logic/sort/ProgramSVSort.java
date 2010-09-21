@@ -488,7 +488,10 @@ public abstract class ProgramSVSort extends AbstractSort {
 		|| pe instanceof Singleton		    
 		|| pe instanceof Intersect 
 		|| pe instanceof SetMinus
-		|| pe instanceof AllFields) {
+		|| pe instanceof AllFields
+		|| pe instanceof SeqSingleton
+		|| pe instanceof SeqConcat
+		|| pe instanceof SeqSub) {
 		return true;
 	    }
 	    

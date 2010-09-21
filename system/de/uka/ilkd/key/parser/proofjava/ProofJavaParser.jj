@@ -1942,6 +1942,7 @@ TypeReference PrimitiveType() :
   | "float"
   | "double"
   | "\\locset"
+  | "\\seq"
   )
   {
     Identifier id = factory.createIdentifier(token.image);
@@ -2262,7 +2263,7 @@ Expression Expression() :
  */
 {
     Expression result;
-    Expression expr;
+    Expression expr, expr2;
     Assignment op;
     ASTList<Expression> leftRight = new ASTArrayList<Expression>();
 }
@@ -2307,7 +2308,26 @@ Expression Expression() :
     {
         result = new AllFields(expr);
         setPrefixInfo(result);
-    }    
+    }
+    |
+    "\\seq_singleton" "(" expr = Expression() ")"
+    {
+        result = new SeqSingleton(expr);
+        setPrefixInfo(result);
+    }
+    |
+    "\\seq_concat" "(" expr = Expression() "," result = Expression() ")"
+    {
+        result = new SeqConcat(expr, result);
+        setPrefixInfo(result);
+    }
+    |
+    "\\seq_sub" "(" expr = Expression() "," expr2 = Expression() "," result = Expression() ")"
+    {
+        result = new SeqSub(expr, expr2, result);
+        setPrefixInfo(result);
+    }
+
   )
   {
       checkConstruction(result);
@@ -3195,6 +3215,7 @@ Literal Literal() :
 | result = BooleanLiteral()
 | result = NullLiteral()
 | result = EmptySetLiteral()
+| result = EmptySeqLiteral()
 
 )
   { 
@@ -3248,6 +3269,20 @@ EmptySetLiteral EmptySetLiteral() :
       return result;
   }
 }
+
+EmptySeqLiteral EmptySeqLiteral() :
+{
+    EmptySeqLiteral result;
+}
+{
+  "\\seq_empty"
+  {
+      result = EmptySeqLiteral.INSTANCE;
+      setPrefixInfo(result);
+      return result;
+  }
+}
+
 
 ASTList<Expression> Arguments() :
 {

@@ -65,10 +65,4 @@ public interface Sort extends Named {
      * returns the exactinstanceof symbol of this Sort
      */
     SortDependingFunction getExactInstanceofSymbol(Services services);
-    
-
-    /**
-     * returns the object repository of this sort
-     */    
-    SortDependingFunction getObjectRepository(Services services);        
 }

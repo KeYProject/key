@@ -26,7 +26,7 @@ import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.visitor.CreatingASTVisitor;
 import de.uka.ilkd.key.java.visitor.JavaASTCollector;
 import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
-import de.uka.ilkd.key.ldt.SetLDT;
+import de.uka.ilkd.key.ldt.LocSetLDT;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -87,7 +87,7 @@ public class InvInferenceTools {
     
     
     public ImmutableSet<Term> unionToSet(Term s, Services services) {
-	final SetLDT setLDT = services.getTypeConverter().getSetLDT();
+	final LocSetLDT setLDT = services.getTypeConverter().getLocSetLDT();
 	assert s.sort().equals(setLDT.targetSort());
 	final Function union = setLDT.getUnion();
 	ImmutableSet<Term> result = DefaultImmutableSet.<Term>nil();

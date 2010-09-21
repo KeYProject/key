@@ -198,7 +198,7 @@ public final class RepresentsAxiom implements ClassAxiom {
 			          : originalSelfVar.sort(), 
 			        usedObservers);
 	if(usedObservers.contains(target)) {
-	    return null;
+	    //return null;
 	}
 
 	//create schema variables

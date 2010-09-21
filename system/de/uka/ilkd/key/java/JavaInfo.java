@@ -395,8 +395,10 @@ public final class JavaInfo {
 		sort = (Sort) sorts.lookup(FloatLDT.NAME);
 	    } else if(type == PrimitiveType.JAVA_DOUBLE) {
 		sort = (Sort) sorts.lookup(DoubleLDT.NAME);
-	    } else if(type == PrimitiveType.JAVA_SET) {
-		sort = services.getTypeConverter().getSetLDT().targetSort();
+	    } else if(type == PrimitiveType.JAVA_LOCSET) {
+		sort = services.getTypeConverter().getLocSetLDT().targetSort();
+	    } else if(type == PrimitiveType.JAVA_SEQ) {
+		sort = services.getTypeConverter().getSeqLDT().targetSort();
 	    } else {
 		assert false : "unexpected primitive type: " + type;
 	    	sort = null;

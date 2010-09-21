@@ -16,7 +16,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.TypeConverter;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.IntegerLDT;
-import de.uka.ilkd.key.ldt.SetLDT;
+import de.uka.ilkd.key.ldt.LocSetLDT;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 
@@ -195,7 +195,7 @@ public final class NotationInfo {
 	tbl.put(heapLDT.getLength(), new Notation.LengthNotation());
 	
 	//set operators
-	SetLDT setLDT = services.getTypeConverter().getSetLDT();
+	LocSetLDT setLDT = services.getTypeConverter().getLocSetLDT();
 	tbl.put(setLDT.getEmpty(), new Notation.Constant("{}", 130));
 	tbl.put(setLDT.getSingleton(), new Notation.SingletonNotation());
 	tbl.put(setLDT.getUnion(), new Notation.Infix("\\cup", 130, 0, 0));

@@ -21,7 +21,7 @@ import de.uka.ilkd.key.java.TypeConverter;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.IntegerLDT;
-import de.uka.ilkd.key.ldt.SetLDT;
+import de.uka.ilkd.key.ldt.LocSetLDT;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.ArraySort;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -784,24 +784,24 @@ public final class TermBuilder {
     //-------------------------------------------------------------------------
     
     public Term empty(Services services) {
-	return func(services.getTypeConverter().getSetLDT().getEmpty());
+	return func(services.getTypeConverter().getLocSetLDT().getEmpty());
     }
     
     
     public Term allLocs(Services services) {
-	return func(services.getTypeConverter().getSetLDT().getAllLocs());
+	return func(services.getTypeConverter().getLocSetLDT().getAllLocs());
     }    
     
     
     public Term singleton(Services services, Term o, Term f) {
-	return func(services.getTypeConverter().getSetLDT().getSingleton(), 
+	return func(services.getTypeConverter().getLocSetLDT().getSingleton(), 
 		    o, 
 		    f);
     }
     
     
     public Term union(Services services, Term s1, Term s2) {
-	final SetLDT ldt = services.getTypeConverter().getSetLDT();
+	final LocSetLDT ldt = services.getTypeConverter().getLocSetLDT();
 	if(s1.op() == ldt.getEmpty()) {
 	    return s2;
 	} else if(s2.op() == ldt.getEmpty()) {
@@ -813,7 +813,7 @@ public final class TermBuilder {
     
     
     public Term intersect(Services services, Term s1, Term s2) {
-	final SetLDT ldt = services.getTypeConverter().getSetLDT();
+	final LocSetLDT ldt = services.getTypeConverter().getLocSetLDT();
 	if(s1.op() == ldt.getEmpty() || s2.op() == ldt.getEmpty()) {
 	    return empty(services);
 	} else {
@@ -823,7 +823,7 @@ public final class TermBuilder {
     
     
     public Term setMinus(Services services, Term s1, Term s2) {
-	final SetLDT ldt = services.getTypeConverter().getSetLDT();
+	final LocSetLDT ldt = services.getTypeConverter().getLocSetLDT();
 	if(s1.op() == ldt.getEmpty() || s2.op() == ldt.getEmpty()) {
 	    return s1;
 	} else {
@@ -835,7 +835,7 @@ public final class TermBuilder {
     public Term infiniteUnion(Services services, 
 	                      QuantifiableVariable[] qvs, 
 	                      Term s) {
-	final SetLDT ldt = services.getTypeConverter().getSetLDT();
+	final LocSetLDT ldt = services.getTypeConverter().getLocSetLDT();
 	return tf.createTerm(ldt.getInfiniteUnion(), 
 		             new Term[]{s}, 
 		             new ImmutableArray<QuantifiableVariable>(qvs), 
@@ -874,28 +874,28 @@ public final class TermBuilder {
     
     
     public Term allFields(Services services, Term o) {
-	return func(services.getTypeConverter().getSetLDT().getAllFields(), o);
+	return func(services.getTypeConverter().getLocSetLDT().getAllFields(), o);
     }
     
     
     public Term allObjects(Services services, Term f) {
-	return func(services.getTypeConverter().getSetLDT().getAllObjects(), f);
+	return func(services.getTypeConverter().getLocSetLDT().getAllObjects(), f);
     }
     
     
     public Term arrayRange(Services services, Term o, Term lower, Term upper) {
-	return func(services.getTypeConverter().getSetLDT().getArrayRange(), 
+	return func(services.getTypeConverter().getLocSetLDT().getArrayRange(), 
 		    new Term[]{o, lower, upper});
     }        
     
     
     public Term freshLocs(Services services, Term h) {
-	return func(services.getTypeConverter().getSetLDT().getFreshLocs(), h);
+	return func(services.getTypeConverter().getLocSetLDT().getFreshLocs(), h);
     }    
     
     
     public Term elementOf(Services services, Term o, Term f, Term s) {
-	final SetLDT ldt = services.getTypeConverter().getSetLDT();
+	final LocSetLDT ldt = services.getTypeConverter().getLocSetLDT();
 	if(s.op() == ldt.getEmpty()) {
 	    return ff();
 	} else {
@@ -905,7 +905,7 @@ public final class TermBuilder {
     
     
     public Term subset(Services services, Term s1, Term s2) {
-	final SetLDT ldt = services.getTypeConverter().getSetLDT();
+	final LocSetLDT ldt = services.getTypeConverter().getLocSetLDT();
 	if(s1.op() == ldt.getEmpty()) {
 	    return tt();
 	} else {
@@ -915,7 +915,7 @@ public final class TermBuilder {
     
     
     public Term disjoint(Services services, Term s1, Term s2) {
-	final SetLDT ldt = services.getTypeConverter().getSetLDT();
+	final LocSetLDT ldt = services.getTypeConverter().getLocSetLDT();
 	if(s1.op() == ldt.getEmpty() || s2.op() == ldt.getEmpty()) {
 	    return tt();
 	} else {
@@ -925,7 +925,7 @@ public final class TermBuilder {
     
     
     public Term createdInHeap(Services services, Term s, Term h) {
-	final SetLDT ldt = services.getTypeConverter().getSetLDT();
+	final LocSetLDT ldt = services.getTypeConverter().getLocSetLDT();
 	if(s.op() == ldt.getEmpty()) {
 	    return tt();
 	} else {
@@ -1161,7 +1161,7 @@ public final class TermBuilder {
 	    		       KeYJavaType kjt) {
 	assert t.sort().extendsTrans(kjt.getSort());
 	final IntegerLDT intLDT = services.getTypeConverter().getIntegerLDT();
-	final SetLDT setLDT = services.getTypeConverter().getSetLDT();
+	final LocSetLDT setLDT = services.getTypeConverter().getLocSetLDT();
 	if(t.sort().extendsTrans(services.getJavaInfo().objectSort())) {
 	    return or(created(services, h, t), equals(t, NULL(services)));
 	} else if(t.sort().equals(setLDT.targetSort())) {
@@ -1268,4 +1268,44 @@ public final class TermBuilder {
 		    new Term[]{h, s, o1, o2, n});
     }    
     
+    
+    //-------------------------------------------------------------------------
+    //sequence operators    
+    //-------------------------------------------------------------------------
+    
+    public Term seqGet(Services services, Sort asSort, Term s, Term idx) {
+	return func(services.getTypeConverter().getSeqLDT().getSeqGet(asSort, 
+		    						      services), 
+		    s,
+		    idx);
+    }
+    
+    
+    public Term seqLen(Services services, Term s) {
+	return func(services.getTypeConverter().getSeqLDT().getSeqLen(), s);
+    }
+    
+    
+    public Term seqEmpty(Services services) {
+	return func(services.getTypeConverter().getSeqLDT().getSeqEmpty());
+    }
+    
+    
+    public Term seqSingleton(Services services, Term x) {
+	return func(services.getTypeConverter().getSeqLDT().getSeqSingleton(), 
+		    x);
+    }
+    
+    
+    public Term seqConcat(Services services, Term s, Term s2) {
+	return func(services.getTypeConverter().getSeqLDT().getSeqConcat(), 
+		    s, 
+		    s2);
+    }
+    
+    
+    public Term seqSub(Services services, Term s, Term from, Term to) {
+	return func(services.getTypeConverter().getSeqLDT().getSeqSub(), 
+		    new Term[]{s, from, to});
+    }
 }

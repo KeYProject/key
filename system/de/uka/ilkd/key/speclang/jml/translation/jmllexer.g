@@ -110,7 +110,7 @@ UNSIGNEDSHIFTRIGHT : ">>>";
 WORKINGSPACE : "\\working_space";
 XOR : "^";
 
-SET : "\\locset";
+LOCSET : "\\locset";
 EMPTYSET : "\\empty";
 SINGLETON : "\\singleton";
 UNION : "\\set_union";
@@ -121,6 +121,12 @@ UNIONINF: "\\infinite_union";
 DISJOINT : "\\disjoint";
 SUBSET : "\\subset";
 NEWELEMSFRESH : "\\new_elems_fresh";
+
+SEQ : "\\seq";
+SEQEMPTY : "\\seq_empty";
+SEQSINGLETON : "\\seq_singleton";
+SEQCONCAT : "\\seq_concat";
+SEQSUB : "\\seq_sub";
 
 LT_DISPATCH
      :

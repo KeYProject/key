@@ -23,8 +23,9 @@ class JMLResolverManager extends SLResolverManager {
                               ParsableVariable selfVar,
                               SLTranslationExceptionManager eManager) {
         super(eManager, specInClass, selfVar, false);
-        addResolver(new SLAttributeResolver(javaInfo, this));
+        addResolver(new JMLBuiltInPropertyResolver(javaInfo, this));
+        addResolver(new SLAttributeResolver(javaInfo, this));        
         addResolver(new SLMethodResolver(javaInfo, this));
-        addResolver(new SLTypeResolver(javaInfo, this));        
+        addResolver(new SLTypeResolver(javaInfo, this));
     }
 }

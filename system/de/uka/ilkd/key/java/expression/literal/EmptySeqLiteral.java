@@ -9,48 +9,43 @@
 //
 
 
-package de.uka.ilkd.key.java.expression.operator;
+package de.uka.ilkd.key.java.expression.literal;
 
+import de.uka.ilkd.key.java.NameAbstractionTable;
 import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
-import de.uka.ilkd.key.java.expression.Operator;
-import de.uka.ilkd.key.java.reference.ExecutionContext;
+import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.visitor.Visitor;
-import de.uka.ilkd.key.util.ExtList;
-
-public class AllFields extends Operator {
-
-    public AllFields(ExtList children) {
-        super(children);
-    }
 
 
-    public int getPrecedence() {
-        return 0;
-    }
 
+public class EmptySeqLiteral extends Literal {
 
-    public int getNotation() {
-        return PREFIX;
+    public static final EmptySeqLiteral INSTANCE = new EmptySeqLiteral();
+    
+    private EmptySeqLiteral() {}   
+    
+    
+    @Override
+    public boolean equalsModRenaming(SourceElement o, 
+                                     NameAbstractionTable nat) {
+	return o == this;
     }
 
 
     public void visit(Visitor v) {
-	v.performActionOnAllFields(this);
+	v.performActionOnEmptySeqLiteral(this);
     }
 
-    
     public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
-        p.printAllFields(this);
+        p.printEmptySeqLiteral(this);
     }
 
-    public int getArity() {
-        return 1;
-    }
 
-    public KeYJavaType getKeYJavaType(Services javaServ, ExecutionContext ec) {
-	return javaServ.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_LOCSET);
-    }    
+    public KeYJavaType getKeYJavaType(Services javaServ) {
+	return javaServ.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_SEQ);
+    }
 }

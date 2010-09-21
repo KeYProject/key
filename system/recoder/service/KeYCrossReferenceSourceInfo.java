@@ -78,8 +78,9 @@ public class KeYCrossReferenceSourceInfo
 	    removeChangeHistoryListener(this);
 	cfg.getChangeHistory().addChangeHistoryListener(this);
 	
-	//XXX
+	//HEAP
 	name2primitiveType.put("\\locset", new PrimitiveType("\\locset", this));
+	name2primitiveType.put("\\seq", new PrimitiveType("\\seq", this));
     }
 
     /**

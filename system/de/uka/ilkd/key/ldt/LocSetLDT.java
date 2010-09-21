@@ -24,7 +24,7 @@ import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.util.ExtList;
 
 
-public final class SetLDT extends LDT {
+public final class LocSetLDT extends LDT {
     
     public static final Name NAME = new Name("LocSet");    
        
@@ -45,7 +45,7 @@ public final class SetLDT extends LDT {
     private final Function createdInHeap;    
     
     
-    public SetLDT(Services services) {
+    public LocSetLDT(Services services) {
 	super(NAME, services);
         empty	         = addFunction(services, "empty");
         allLocs          = addFunction(services, "allLocs");

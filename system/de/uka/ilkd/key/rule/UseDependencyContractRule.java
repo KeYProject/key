@@ -22,7 +22,7 @@ import de.uka.ilkd.key.gui.Main;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.ldt.HeapLDT;
-import de.uka.ilkd.key.ldt.SetLDT;
+import de.uka.ilkd.key.ldt.LocSetLDT;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.NullSort;
@@ -148,12 +148,12 @@ public final class UseDependencyContractRule implements BuiltInRule {
 	    				     Sequent seq, 
 	    				     Services services) {
 	final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
-	final SetLDT setLDT   = services.getTypeConverter().getSetLDT();
+	final LocSetLDT locSetLDT = services.getTypeConverter().getLocSetLDT();
 	final Term heapTerm = heapPos.subTerm();
 	final Operator op = heapTerm.op();
 	assert heapTerm.sort().equals(heapLDT.targetSort());
 	if(heapTerm.op() == heapLDT.getAnon()
-	   && heapTerm.sub(1).op().equals(setLDT.getEmpty())) {
+	   && heapTerm.sub(1).op().equals(locSetLDT.getEmpty())) {
 	    return heapPos;
 	} else if(op.arity() == 0) {
 	    final Pair<Term,PosInOccurrence> def 
@@ -496,8 +496,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
 	    			     Services services,
 	    			     RuleApp ruleApp) {		
 	//collect information
-	final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
-	final SetLDT setLDT   = services.getTypeConverter().getSetLDT();
+	final LocSetLDT locSetLDT = services.getTypeConverter().getLocSetLDT();
 	final PosInOccurrence pio = ruleApp.posInOccurrence();	
         final Term focus = pio.subTerm();
         final ObserverFunction target = (ObserverFunction) focus.op();
@@ -551,7 +550,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
         final Term cutFormula = TB.and(new Term[]{freePre, pre, disjoint});
         
         //bail out if obviously not helpful
-        if(!baseHeapAndChangedLocs.second.op().equals(setLDT.getEmpty())) {
+        if(!baseHeapAndChangedLocs.second.op().equals(locSetLDT.getEmpty())) {
             final ImmutableSet<Term> changed 
             	= addEqualDefs(IIT.unionToSet(baseHeapAndChangedLocs.second, 
             				      services), 

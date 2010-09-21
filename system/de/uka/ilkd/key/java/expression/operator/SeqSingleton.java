@@ -20,9 +20,9 @@ import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.util.ExtList;
 
-public class AllFields extends Operator {
+public class SeqSingleton extends Operator {
 
-    public AllFields(ExtList children) {
+    public SeqSingleton(ExtList children) {
         super(children);
     }
 
@@ -38,12 +38,12 @@ public class AllFields extends Operator {
 
 
     public void visit(Visitor v) {
-	v.performActionOnAllFields(this);
+	v.performActionOnSeqSingleton(this);
     }
 
     
     public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
-        p.printAllFields(this);
+        p.printSeqSingleton(this);
     }
 
     public int getArity() {
@@ -51,6 +51,6 @@ public class AllFields extends Operator {
     }
 
     public KeYJavaType getKeYJavaType(Services javaServ, ExecutionContext ec) {
-	return javaServ.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_LOCSET);
+	return javaServ.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_SEQ);
     }    
 }

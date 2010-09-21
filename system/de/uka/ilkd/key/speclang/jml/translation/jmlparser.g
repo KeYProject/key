@@ -53,7 +53,7 @@ options {
     private JavaInfo javaInfo;
     private IntegerLDT intLDT;
     private HeapLDT heapLDT;
-    private SetLDT setLDT;
+    private LocSetLDT locSetLDT;
     private BooleanLDT booleanLDT;
     private SLTranslationExceptionManager excManager;
 
@@ -88,7 +88,7 @@ options {
 	this.javaInfo       = services.getJavaInfo();
 	this.intLDT         = services.getTypeConverter().getIntegerLDT();
 	this.heapLDT        = services.getTypeConverter().getHeapLDT();
-	this.setLDT         = services.getTypeConverter().getSetLDT();
+	this.locSetLDT      = services.getTypeConverter().getLocSetLDT();
 	this.booleanLDT     = services.getTypeConverter().getBooleanLDT();
 	this.excManager     = new SLTranslationExceptionManager(this,
 				    				fileName, 
@@ -474,11 +474,11 @@ options {
     
     
     private Term getFields(Term t) throws SLTranslationException {
-        if(t.op().equals(setLDT.getUnion())) {
+        if(t.op().equals(locSetLDT.getUnion())) {
             final Term sub0 = getFields(t.sub(0));
             final Term sub1 = getFields(t.sub(1));
             return TB.union(services, sub0, sub1);
-        } else if(t.op().equals(setLDT.getSingleton())) {
+        } else if(t.op().equals(locSetLDT.getSingleton())) {
 	    return TB.allObjects(services, t.sub(1));
         } else {
             raiseError("Inacceptable field expression: " + t);
@@ -533,7 +533,7 @@ storerefexpression returns [Term result = null] throws SLTranslationException
 :
     expr=expression 
     {
- 	    if(expr.isTerm() && expr.getTerm().sort().equals(setLDT.targetSort())) {
+ 	    if(expr.isTerm() && expr.getTerm().sort().equals(locSetLDT.targetSort())) {
 	    	result = expr.getTerm();
 	    } else if(expr.isTerm() && heapLDT.getSortOfSelect(expr.getTerm().op()) != null) {
 	        final Term objTerm = expr.getTerm().sub(1);
@@ -567,30 +567,50 @@ specarrayrefexpr[SLExpression receiver, String fullyQualifiedName, Token lbrack]
 	} else if(receiver.isType()) {
 	    raiseError("Error in array expression: \"" + fullyQualifiedName +
 		    "\" is a type.", lbrack);
-	} else if(!(receiver.getType().getJavaType() instanceof ArrayType)) {
+	} else if(!(receiver.getType().getJavaType() instanceof ArrayType
+	            || receiver.getType().getJavaType().equals(PrimitiveType.JAVA_SEQ))) {
 	    raiseError("Cannot access " + receiver.getTerm() + " as an array.");
 	}
     
-	if (rangeFrom == null) {
-	    // We have a star. A star includes all components of an array even
-	    // those out of bounds. This makes proving easier.	    
-	    Term t = TB.allFields(services, receiver.getTerm());
-	    result = new SLExpression(t);
-	} else if (rangeTo != null) {
-	    // We have "rangeFrom .. rangeTo"
-	    Term t = TB.arrayRange(services, 
-	    			   receiver.getTerm(), 
-	    			   rangeFrom.getTerm(), 
-	    			   rangeTo.getTerm());
-	    result = new SLExpression(t);
+    	//arrays
+    	if(receiver.getType().getJavaType() instanceof ArrayType) {
+	    if (rangeFrom == null) {
+	        // We have a star. A star includes all components of an array even
+	        // those out of bounds. This makes proving easier.	    
+	        Term t = TB.allFields(services, receiver.getTerm());
+    	        result = new SLExpression(t);
+	    } else if (rangeTo != null) {
+	        // We have "rangeFrom .. rangeTo"
+	        Term t = TB.arrayRange(services, 
+	    			       receiver.getTerm(), 
+	    			       rangeFrom.getTerm(), 
+	    			       rangeTo.getTerm());
+	        result = new SLExpression(t);
+	    } else {
+	        // We have a regular array access
+	        Term t = TB.dotArr(services, 
+	    		           receiver.getTerm(),
+	    	    	           rangeFrom.getTerm());
+	        ArrayType arrayType = (ArrayType) receiver.getType().getJavaType();
+	        KeYJavaType elementType = arrayType.getBaseType().getKeYJavaType();	    		       
+                result = new SLExpression(t, elementType);
+	    }
+	    
+	//sequences	
 	} else {
-	    // We have a regular array access
-	    Term t = TB.dotArr(services, 
-	    		       receiver.getTerm(),
-	    		       rangeFrom.getTerm());
-	    ArrayType arrayType = (ArrayType) receiver.getType().getJavaType();
-	    KeYJavaType elementType = arrayType.getBaseType().getKeYJavaType();	    		       
-            result = new SLExpression(t, elementType);
+	    if(rangeTo != null) {
+	        Term t = TB.seqSub(services, 
+	                           receiver.getTerm(), 
+	                           rangeFrom.getTerm(), 
+	                           rangeTo.getTerm());
+	        result = new SLExpression(t);
+	    } else {
+	    	Term t = TB.seqGet(services, 
+	    			   Sort.ANY,
+	    		           receiver.getTerm(), 
+	    		           rangeFrom.getTerm());
+	        result = new SLExpression(t);
+	    }	
 	}
     }
     ;exception
@@ -675,7 +695,7 @@ representsclause returns [Pair<ObserverFunction,Term> result=null] throws SLTran
         }
     } 
     (
-        {!lhs.getTerm().sort().equals(setLDT.targetSort())}?    
+        {!lhs.getTerm().sort().equals(locSetLDT.targetSort())}?    
         (
             (LARROW | EQUAL_SINGLE) rhs=expression
             {
@@ -690,7 +710,7 @@ representsclause returns [Pair<ObserverFunction,Term> result=null] throws SLTran
             }
         ) 
         |
-        {lhs.getTerm().sort().equals(setLDT.targetSort())}?        
+        {lhs.getTerm().sort().equals(locSetLDT.targetSort())}?        
         (
             (LARROW | EQUAL_SINGLE) t=storereflist
             {
@@ -1327,9 +1347,9 @@ postfixexpr returns [SLExpression result=null] throws SLTranslationException
 	    {
 	        if (expr != null && expr.getType() == null) {
 	            raiseError("SLExpression without a type: " + expr);
-	        } else if (expr != null && expr.getType().getJavaType() instanceof PrimitiveType) {
+	        }/* else if (expr != null && expr.getType().getJavaType() instanceof PrimitiveType) {
 		    raiseError("Cannot build postfix expression from primitive type.");
-		}	    		
+		}*/	    		
 	    }
 	    expr=primarysuffix[expr, fullyQualifiedName]
 	    {	    
@@ -1424,7 +1444,7 @@ primarysuffix[SLExpression receiver, String fullyQualifiedName]
          DOT MULT
          {
 	     result = new SLExpression(TB.allFields(services, receiver.getTerm()),
-	                               javaInfo.getPrimitiveKeYJavaType(PrimitiveType.JAVA_SET));
+	                               javaInfo.getPrimitiveKeYJavaType(PrimitiveType.JAVA_LOCSET));
          }
 	
 )	
@@ -1593,7 +1613,7 @@ jmlprimary returns [SLExpression result=null] throws SLTranslationException
 	                                           expr.getTerm(),
 	                                           TB.func(heapLDT.getCreated())),
 	                                 TB.FALSE(services)));
-	        } else if(expr.getTerm().sort().extendsTrans(setLDT.targetSort())) {
+	        } else if(expr.getTerm().sort().extendsTrans(locSetLDT.targetSort())) {
 	            t = TB.and(t, TB.subset(services, 
 	                                    expr.getTerm(), 
 	                                    TB.freshLocs(services, heapAtPre)));
@@ -1649,7 +1669,7 @@ jmlprimary returns [SLExpression result=null] throws SLTranslationException
 	    	                      	     o2,
 	    	                      	     TB.var(fieldLV));
 	    
-	    result = new SLExpression(locSet, javaInfo.getPrimitiveKeYJavaType(PrimitiveType.JAVA_SET));
+	    result = new SLExpression(locSet, javaInfo.getPrimitiveKeYJavaType(PrimitiveType.JAVA_LOCSET));
 	} 	
 	
     |   DURATION LPAREN result=expression RPAREN 
@@ -1722,12 +1742,12 @@ jmlprimary returns [SLExpression result=null] throws SLTranslationException
     |   EMPTYSET
         {
             result = new SLExpression(TB.empty(services),
-                                      javaInfo.getPrimitiveKeYJavaType(PrimitiveType.JAVA_SET));
+                                      javaInfo.getPrimitiveKeYJavaType(PrimitiveType.JAVA_LOCSET));
         }
         
     |   SINGLETON LPAREN t=storeref RPAREN
         {
-            if(!t.op().equals(setLDT.getSingleton())) {
+            if(!t.op().equals(locSetLDT.getSingleton())) {
             	if(heapLDT.getSortOfSelect(t.op()) != null) {
 	            final Term objTerm = t.sub(1);
 	            final Term fieldTerm = t.sub(2);
@@ -1736,25 +1756,25 @@ jmlprimary returns [SLExpression result=null] throws SLTranslationException
                     raiseError("Not a singleton: " + t);
                 }
             }
-            result = new SLExpression(t, javaInfo.getPrimitiveKeYJavaType(PrimitiveType.JAVA_SET));
+            result = new SLExpression(t, javaInfo.getPrimitiveKeYJavaType(PrimitiveType.JAVA_LOCSET));
         }
         
     |   UNION LPAREN t=storeref COMMA t2 = storeref RPAREN
         {
             result = new SLExpression(TB.union(services, t, t2),
-                                      javaInfo.getPrimitiveKeYJavaType(PrimitiveType.JAVA_SET));
+                                      javaInfo.getPrimitiveKeYJavaType(PrimitiveType.JAVA_LOCSET));
         }
         
     |   INTERSECT LPAREN t=storeref COMMA t2=storeref RPAREN
         {
             result = new SLExpression(TB.intersect(services, t, t2),
-                                      javaInfo.getPrimitiveKeYJavaType(PrimitiveType.JAVA_SET));
+                                      javaInfo.getPrimitiveKeYJavaType(PrimitiveType.JAVA_LOCSET));
         }         
 
     |   SETMINUS LPAREN t=storeref COMMA t2=storeref RPAREN
         {
             result = new SLExpression(TB.setMinus(services, t, t2),
-                                      javaInfo.getPrimitiveKeYJavaType(PrimitiveType.JAVA_SET));
+                                      javaInfo.getPrimitiveKeYJavaType(PrimitiveType.JAVA_LOCSET));
         } 
         
     |   ALLFIELDS LPAREN e1=expression RPAREN
@@ -1763,7 +1783,7 @@ jmlprimary returns [SLExpression result=null] throws SLTranslationException
                 raiseError("Invalid argument to \\allFields: " + e1);
             }
             result = new SLExpression(TB.allFields(services, e1.getTerm()),
-                                      javaInfo.getPrimitiveKeYJavaType(PrimitiveType.JAVA_SET));
+                                      javaInfo.getPrimitiveKeYJavaType(PrimitiveType.JAVA_LOCSET));
         }        
         
     |   UNIONINF 
@@ -1780,7 +1800,7 @@ jmlprimary returns [SLExpression result=null] throws SLTranslationException
 	    result = new SLExpression(TB.infiniteUnion(services,
 	                                               declVars.second.toArray(new QuantifiableVariable[declVars.second.size()]),
 	                                               t),
-	                              javaInfo.getPrimitiveKeYJavaType(PrimitiveType.JAVA_SET));        
+	                              javaInfo.getPrimitiveKeYJavaType(PrimitiveType.JAVA_LOCSET));        
         }        
 
     |   DISJOINT LPAREN t=storeref COMMA t2=storeref RPAREN
@@ -1803,6 +1823,26 @@ jmlprimary returns [SLExpression result=null] throws SLTranslationException
                                                          	      heapAtPre))));
                                                         
         }
+        
+    |   SEQEMPTY
+        {
+            result = new SLExpression(TB.seqEmpty(services));
+        }
+    
+    |   SEQSINGLETON LPAREN e1=expression RPAREN
+        {
+            result = new SLExpression(TB.seqSingleton(services, e1.getTerm()));
+        }    
+    
+    |   SEQCONCAT LPAREN e1=expression COMMA e2=expression RPAREN
+        {
+            result = new SLExpression(TB.seqConcat(services, e1.getTerm(), e2.getTerm()));
+        }    
+    
+    |   SEQSUB LPAREN e1=expression COMMA e2=expression COMMA e3=expression RPAREN
+        {
+            result = new SLExpression(TB.seqSub(services, e1.getTerm(), e2.getTerm(), e3.getTerm()));
+        }         
 
     |   LPAREN result=expression RPAREN
 ;
@@ -2064,10 +2104,14 @@ builtintype returns [KeYJavaType type = null] throws SLTranslationException
 	    {
 		raiseNotSupported("\\real");
 	    } 
-        |   SET
+        |   LOCSET
             {
-                type = javaInfo.getKeYJavaType(PrimitiveType.JAVA_SET);
+                type = javaInfo.getKeYJavaType(PrimitiveType.JAVA_LOCSET);
             }
+        |   SEQ
+            {
+                type = javaInfo.getKeYJavaType(PrimitiveType.JAVA_SEQ);
+            }            
 	)
 	
 ;

@@ -683,6 +683,28 @@ public class Recoder2KeYConverter {
         ExtList children = collectChildren(e);	
 	return new AllFields(children);
     }
+    
+    
+    public EmptySeqLiteral convert(de.uka.ilkd.key.java.recoderext.EmptySeqLiteral e) {
+	return EmptySeqLiteral.INSTANCE;
+    }    
+    
+    public SeqSingleton convert(de.uka.ilkd.key.java.recoderext.SeqSingleton e) {
+        ExtList children = collectChildren(e);	
+	return new SeqSingleton(children);
+    }
+    
+    public SeqConcat convert(de.uka.ilkd.key.java.recoderext.SeqConcat e) {
+        ExtList children = collectChildren(e);	
+	return new SeqConcat(children);
+    }
+    
+    public SeqSub convert(de.uka.ilkd.key.java.recoderext.SeqSub e) {
+        ExtList children = collectChildren(e);	
+	return new SeqSub(children);
+    }    
+    
+    
 
     /** convert a recoder StringLiteral to a KeY StringLiteral */
     public StringLiteral convert(
