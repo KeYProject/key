@@ -346,9 +346,13 @@ public class MethodReference extends JavaNonTerminalProgramElement
     }
 
     public KeYJavaType getKeYJavaType(Services services, 
-				      ExecutionContext ec) {	
-	return method(services, 
-	        determineStaticPrefixType(services, ec), ec).getKeYJavaType();
+				      ExecutionContext ec) {
+	ProgramMethod meth = method(services, 
+	        determineStaticPrefixType(services, ec), ec);
+	if(meth == null){
+	    return ec.getTypeReference().getKeYJavaType();
+	}
+	return meth.getKeYJavaType();
 		      
     }
 
