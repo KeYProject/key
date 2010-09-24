@@ -44,8 +44,9 @@ class Node {
     public /*@pure@*/ int search() {
 	Node jj = this;
 	int i = 0;
-	/*@ loop_invariant (jj == null && i == seq.length
-	  @                 || jj != null && jj.\inv && jj.seq == seq[i..seq.length])
+	/*@ loop_invariant 0 <= i && i <= seq.length
+	  @                && (jj == null && i == seq.length
+	  @                    || jj != null && jj.\inv && jj.seq == seq[i..seq.length])
 	  @                && (\forall int x; 0 <= x && x < i; seq[x] != 0);
 	  @ assignable \nothing;
 	  @ decreases seq.length - i;

@@ -32,7 +32,7 @@ import de.uka.ilkd.key.proof.mgt.ComplexRuleJustificationBySpec;
 import de.uka.ilkd.key.proof.mgt.RuleJustificationBySpec;
 import de.uka.ilkd.key.rule.inst.ContextStatementBlockInstantiation;
 import de.uka.ilkd.key.speclang.OperationContract;
-import de.uka.ilkd.key.util.InvInferenceTools;
+import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.Triple;
 
@@ -47,8 +47,6 @@ public final class UseOperationContractRule implements BuiltInRule {
 
     private static final Name NAME = new Name("Use Operation Contract");
     private static final TermBuilder TB = TermBuilder.DF;
-    private static final InvInferenceTools IIT 
-    	= InvInferenceTools.INSTANCE;
     
     private Term lastFocusTerm;
     private Instantiation lastInstantiation;   
@@ -73,7 +71,7 @@ public final class UseOperationContractRule implements BuiltInRule {
 	final Expression actualResult;
         final MethodOrConstructorReference mr;
         
-        final SourceElement activeStatement = IIT.getActiveStatement(jb);
+        final SourceElement activeStatement = MiscTools.getActiveStatement(jb);
         //active statement must be method reference or assignment with
         //method reference
         if(activeStatement instanceof MethodReference) {
@@ -271,8 +269,8 @@ public final class UseOperationContractRule implements BuiltInRule {
       
         //arguments of method call must be simple expressions
 	final ExecutionContext ec 
-		= IIT.getInnermostExecutionContext(progPost.javaBlock(), 
-						   services); 	        
+		= MiscTools.getInnermostExecutionContext(progPost.javaBlock(), 
+						   	 services); 	        
         for(Expression arg : methodCall.second.getArguments()) {
             if(!ProgramSVSort.SIMPLEEXPRESSION
         	             .canStandFor(arg, ec, services)) {

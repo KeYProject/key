@@ -100,32 +100,12 @@ public final class OperationContractPO extends AbstractPO
         for(ProgramVariable paramVar : paramVars) {
             paramsOK = TB.and(paramsOK, TB.reachableValue(services, paramVar));
         }
-        
-        //class axioms
-        final ImmutableSet<ClassAxiom> axioms 
-        	= specRepos.getClassAxioms(selfKJT);
-        Term axiomTerm = TB.tt();
-        for(ClassAxiom ax : axioms) {            
-            ImmutableSet<Taclet> axiomTaclets = ax.getAxiomAsTaclet(services);            
-            if(axiomTaclets != null) {
-        	for(Taclet axiomTaclet : axiomTaclets) {
-            	    taclets = taclets.add(NoPosTacletApp.createNoPosTacletApp(
-            							axiomTaclet));
-            	    initConfig.getProofEnv()
-            	              .registerRule(axiomTaclet,
-            	        	            AxiomJustification.INSTANCE);
-        	}
-            } else {
-        	axiomTerm = TB.and(axiomTerm, ax.getAxiom(services));
-            }
-        }
-        
+                
         return TB.and(new Term[]{TB.wellFormedHeap(services), 
         	       		 selfNotNull,
         	       		 selfCreated,
         	       		 selfExactType,
-        	       		 paramsOK,
-        	       		 axiomTerm});
+        	       		 paramsOK});
     }
     
     
@@ -273,10 +253,10 @@ public final class OperationContractPO extends AbstractPO
                                                exceptionVar,
                                                heapAtPreVar,
                                                post);
-        
+                
         //save in field
         poTerms = new Term[]{TB.imp(pre, progPost)};
-        poTaclets = new ImmutableSet[]{taclets};        
+        poTaclets = new ImmutableSet[]{collectClassAxioms(contract.getKJT())};               
     }
     
     

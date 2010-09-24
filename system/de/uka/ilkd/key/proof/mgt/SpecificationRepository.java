@@ -14,10 +14,10 @@ import java.util.*;
 
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.ClassType;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
 import de.uka.ilkd.key.java.declaration.modifier.Private;
@@ -25,12 +25,22 @@ import de.uka.ilkd.key.java.declaration.modifier.Protected;
 import de.uka.ilkd.key.java.declaration.modifier.Public;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.java.statement.LoopStatement;
+import de.uka.ilkd.key.logic.ConstrainedFormula;
+import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.ProgramElementName;
+import de.uka.ilkd.key.logic.Semisequent;
+import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ContractPO;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
+import de.uka.ilkd.key.rule.RewriteTacletBuilder;
+import de.uka.ilkd.key.rule.RewriteTacletGoalTemplate;
+import de.uka.ilkd.key.rule.RuleSet;
+import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.speclang.*;
 import de.uka.ilkd.key.util.Pair;
 
@@ -56,6 +66,12 @@ public final class SpecificationRepository {
                 = new LinkedHashMap<ProofOblInput,ImmutableSet<Proof>>();
     private final Map<LoopStatement,LoopInvariant> loopInvs
                 = new LinkedHashMap<LoopStatement,LoopInvariant>();
+    private final Map<ObserverFunction,ObserverFunction> unlimitedToLimited
+    		= new LinkedHashMap<ObserverFunction,ObserverFunction>();
+    private final Map<ObserverFunction,ObserverFunction> limitedToUnlimited
+		= new LinkedHashMap<ObserverFunction,ObserverFunction>();
+    private final Map<ObserverFunction,ImmutableSet<Taclet>> unlimitedToLimitTaclets
+		= new LinkedHashMap<ObserverFunction,ImmutableSet<Taclet>>();
     private final Services services;
     
     private int contractCounter = 0;
@@ -80,7 +96,7 @@ public final class SpecificationRepository {
 	assert obs != null;
 	assert kjt != null;
 	if(!(obs instanceof ProgramMethod) || obs.getContainerType().equals(kjt)) {
-	    return obs;
+	    return unlimitObs(obs);
 	}
 	final ProgramMethod pm = (ProgramMethod) obs;
 	if(pm.isConstructor()) {
@@ -235,6 +251,76 @@ public final class SpecificationRepository {
 	}
 	return result;
     }
+    
+    
+    private static Taclet getLimitedToUnlimitedTaclet(
+	    				ObserverFunction limited, 
+	    				ObserverFunction unlimited) {
+	assert limited.arity() == unlimited.arity();
+	
+	//create schema terms
+	final Term[] subs = new Term[limited.arity()]; 
+	for(int i = 0; i < subs.length; i++) {
+	    final SchemaVariable argSV 
+	    	= SchemaVariableFactory.createTermSV(new Name("t" + i), 
+	    					     limited.argSort(i), 
+	    					     false, 
+	    					     false);
+	    subs[i] = TB.var(argSV);
+	}
+	final Term limitedTerm = TB.func(limited, subs);
+	final Term unlimitedTerm = TB.func(unlimited, subs);	
+	
+	//create taclet
+	final RewriteTacletBuilder tacletBuilder = new RewriteTacletBuilder();
+	tacletBuilder.setFind(limitedTerm);
+	tacletBuilder.addTacletGoalTemplate
+	    (new RewriteTacletGoalTemplate(Sequent.EMPTY_SEQUENT,
+					   ImmutableSLList.<Taclet>nil(),
+					   unlimitedTerm));
+	tacletBuilder.setName(new Name("unlimit " + unlimited.name()));
+	
+	return tacletBuilder.getTaclet();
+    }
+    
+    
+    private static Taclet getUnlimitedToLimitedTaclet(
+					ObserverFunction limited, 
+					ObserverFunction unlimited) {
+	assert limited.arity() == unlimited.arity();
+	
+	//create schema terms
+	final Term[] subs = new Term[limited.arity()]; 
+	for(int i = 0; i < subs.length; i++) {
+	    final SchemaVariable argSV 
+	    	= SchemaVariableFactory.createTermSV(new Name("t" + i), 
+	    					     limited.argSort(i), 
+	    					     false, 
+	    					     false);
+	    subs[i] = TB.var(argSV);
+	}
+	final Term limitedTerm = TB.func(limited, subs);
+	final Term unlimitedTerm = TB.func(unlimited, subs);
+	
+	//create taclet
+	final RewriteTacletBuilder tacletBuilder = new RewriteTacletBuilder();
+	tacletBuilder.setFind(TB.func(unlimited, subs));
+	final ConstrainedFormula cf 
+		= new ConstrainedFormula(TB.equals(limitedTerm, unlimitedTerm));
+	final Sequent addedSeq 
+		= Sequent.createAnteSequent(Semisequent.EMPTY_SEMISEQUENT
+			                               .insertFirst(cf)
+			                               .semisequent());
+	tacletBuilder.addTacletGoalTemplate
+	    (new RewriteTacletGoalTemplate(addedSeq,
+					   ImmutableSLList.<Taclet>nil(),
+					   TB.func(unlimited, subs)));
+	tacletBuilder.setName(new Name("limit " + unlimited.name()));
+	tacletBuilder.addRuleSet(new RuleSet(new Name("inReachableStateImplication")));	
+	
+	return tacletBuilder.getTaclet();
+    }
+    
     
     
     
@@ -739,5 +825,55 @@ public final class SpecificationRepository {
 		assert false : "unexpected spec: " + spec;
 	    }
 	}
+    }
+    
+    
+    public Pair<ObserverFunction,ImmutableSet<Taclet>> limitObs(
+	    					ObserverFunction obs) {
+	assert limitedToUnlimited.get(obs) == null 
+	       : " observer is already limited: " + obs;
+	if(obs.getClass() != ObserverFunction.class) {
+	    return null;
+	}
+	
+	ObserverFunction limited = unlimitedToLimited.get(obs);
+	ImmutableSet<Taclet> taclets = unlimitedToLimitTaclets.get(obs);
+	
+	if(limited == null) {
+	    final String baseName
+	    	= ((ProgramElementName)obs.name()).getProgramName() + "$lmtd";
+	    final Sort heapSort
+	    	= services.getTypeConverter().getHeapLDT().targetSort();
+	    limited = new ObserverFunction(baseName,
+		    			   obs.sort(),
+		    			   obs.getType(),
+		    			   heapSort,	
+		    			   obs.getContainerType(),
+		    			   obs.isStatic(),
+		    			   obs.getParamTypes());
+	    unlimitedToLimited.put(obs, limited);
+	    limitedToUnlimited.put(limited, obs);
+	    
+	    assert taclets == null;	    
+	    taclets = DefaultImmutableSet
+	    			.<Taclet>nil()
+	                        .add(getLimitedToUnlimitedTaclet(limited, obs))
+	    			.add(getUnlimitedToLimitedTaclet(limited, obs));
+	    unlimitedToLimitTaclets.put(obs, taclets);
+	}
+	
+	assert limited != null;
+	assert taclets != null;
+	return new Pair<ObserverFunction,ImmutableSet<Taclet>>(limited, 
+							       taclets);
+    }
+    
+    
+    public ObserverFunction unlimitObs(ObserverFunction obs) {
+	ObserverFunction result = limitedToUnlimited.get(obs);
+	if(result == null) {
+	    result = obs;
+	}
+	return result;
     }
 }

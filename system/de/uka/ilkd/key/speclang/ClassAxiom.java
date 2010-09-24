@@ -14,9 +14,10 @@ import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.util.Pair;
 
 
 public interface ClassAxiom extends SpecificationElement {
@@ -43,12 +44,18 @@ public interface ClassAxiom extends SpecificationElement {
     public VisibilityModifier getVisibility();
     
     /**
-     * The axiom as a formula.
+     * Returns the pairs (kjt, obs) for which there is an occurrence of
+     * o.obs in the axiom, where kjt is the type of o (excluding the
+     * defining occurrence of the axiom target). 
      */
-    public Term getAxiom(Services services);
+    public ImmutableSet<Pair<Sort, ObserverFunction>> getUsedObservers(
+	    						Services services);
     
     /**
-     * The axiom as taclet(s).
+     * The axiom as one or many taclets, where the non-defining occurrences of
+     * the passed observers are replaced by their "limited" counterparts.
      */
-    public ImmutableSet<Taclet> getAxiomAsTaclet(Services services);
+    public ImmutableSet<Taclet> getTaclets(
+	    		ImmutableSet<Pair<Sort, ObserverFunction>> toLimit,
+	    		Services services);    
 }

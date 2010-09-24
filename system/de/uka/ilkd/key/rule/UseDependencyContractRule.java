@@ -31,7 +31,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.mgt.ComplexRuleJustificationBySpec;
 import de.uka.ilkd.key.proof.mgt.RuleJustificationBySpec;
 import de.uka.ilkd.key.speclang.Contract;
-import de.uka.ilkd.key.util.InvInferenceTools;
+import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
 
 
@@ -42,7 +42,6 @@ public final class UseDependencyContractRule implements BuiltInRule {
 
     private static final Name NAME = new Name("Use Dependency Contract");
     private static final TermBuilder TB = TermBuilder.DF;
-    private static final InvInferenceTools IIT = InvInferenceTools.INSTANCE;
     
             
 
@@ -552,7 +551,8 @@ public final class UseDependencyContractRule implements BuiltInRule {
         //bail out if obviously not helpful
         if(!baseHeapAndChangedLocs.second.op().equals(locSetLDT.getEmpty())) {
             final ImmutableSet<Term> changed 
-            	= addEqualDefs(IIT.unionToSet(baseHeapAndChangedLocs.second, 
+            	= addEqualDefs(MiscTools.unionToSet(
+            				      baseHeapAndChangedLocs.second, 
             				      services), 
             				      goal);
             if(changed.contains(dep)) {

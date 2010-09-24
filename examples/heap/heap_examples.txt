@@ -18,3 +18,9 @@
 * SmansEtAl: The examples from the paper "An Automatic Verifier for Java-like
   Programs Based on Dynamic Frames" by Jan Smans, Bart Jacobs, Frank Piessens
   and Wolfram Schulte.
+  
+* vacid0_*: Challenges from the paper "VACID-0: Verification of Ample 
+  Correctness of Invariants of Data-structures, Edition 0" by Rustan Leino and 
+  Michal Moskal
+  
+* vstte10_*: Challenges from the software verification competition at VSTTE'10

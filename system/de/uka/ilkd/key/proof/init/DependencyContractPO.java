@@ -29,10 +29,7 @@ public final class DependencyContractPO extends AbstractPO
                                         implements ContractPO {
     
     private final Contract contract;
-    
-    private ImmutableSet<NoPosTacletApp> taclets 
-    	= DefaultImmutableSet.<NoPosTacletApp>nil();
-       
+           
     
     //-------------------------------------------------------------------------
     //constructors
@@ -85,36 +82,15 @@ public final class DependencyContractPO extends AbstractPO
             paramsOK = TB.and(paramsOK, TB.reachableValue(services, paramVar));
         }             
              
-        //class axioms
-        final ImmutableSet<ClassAxiom> axioms 
-        	= specRepos.getClassAxioms(selfKJT);
-        Term axiomTerm = TB.tt();
-        for(ClassAxiom ax : axioms) {
-            ImmutableSet<Taclet> axiomTaclets = ax.getAxiomAsTaclet(services);
-            if(axiomTaclets != null) {
-        	for(Taclet axiomTaclet : axiomTaclets) {
-        	    taclets = taclets.add(NoPosTacletApp.createNoPosTacletApp(
-                						axiomTaclet));
-        	    initConfig.getProofEnv()
-                	      .registerRule(axiomTaclet,
-                	         	    AxiomJustification.INSTANCE);
-        	}
-            } else {
-        	axiomTerm = TB.and(axiomTerm, ax.getAxiom(services));
-            }
-        } 
-        
         return TB.and(new Term[]{TB.wellFormedHeap(services), 
         			 TB.wellFormed(services, anonHeap),
         	       		 selfNotNull,
         	       		 selfCreated,
         	       		 selfExactType,
-        	       		 paramsOK,
-        	       		 axiomTerm});        
+        	       		 paramsOK});        
     }    
     
-    		
-
+    
     
     //-------------------------------------------------------------------------
     //public interface
@@ -181,10 +157,10 @@ public final class DependencyContractPO extends AbstractPO
 	final Term po = TB.imp(pre,
                                TB.equals(targetTerm, 
                         	         TB.apply(update, targetTerm)));
-
+	
         //save in field
         poTerms = new Term[]{po};
-        poTaclets = new ImmutableSet[]{taclets};        
+        poTaclets = new ImmutableSet[]{collectClassAxioms(contract.getKJT())};               
     }
     
     

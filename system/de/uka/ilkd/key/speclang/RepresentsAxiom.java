@@ -11,9 +11,7 @@
 package de.uka.ilkd.key.speclang;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableSLList;
@@ -31,6 +29,8 @@ import de.uka.ilkd.key.rule.RewriteTacletBuilder;
 import de.uka.ilkd.key.rule.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.util.MiscTools;
+import de.uka.ilkd.key.util.Pair;
 
 
 public final class RepresentsAxiom implements ClassAxiom {
@@ -38,8 +38,8 @@ public final class RepresentsAxiom implements ClassAxiom {
     private static final TermBuilder TB = TermBuilder.DF;
     
     private final String name;
-    private final ObserverFunction target;    
-    private final KeYJavaType kjt;        
+    private final ObserverFunction target;
+    private final KeYJavaType kjt;
     private final VisibilityModifier visibility;
     private final Term originalRep;
     private final ProgramVariable originalSelfVar;
@@ -64,6 +64,14 @@ public final class RepresentsAxiom implements ClassAxiom {
     }
     
     
+    private boolean isFunctional() {
+	return originalRep.op() instanceof Equality
+	       && originalRep.sub(0).op() == target
+	       && (target.isStatic() 
+		   || originalRep.sub(0).sub(1).op().equals(originalSelfVar));
+    }
+    
+    
     private Term getAxiom(ParsableVariable heapVar, 
 	    		  ParsableVariable selfVar,
 	    		  Services services) {
@@ -79,25 +87,44 @@ public final class RepresentsAxiom implements ClassAxiom {
     }
     
     
-    private void collectObserversForSort(
-	    			Term t, 
-	    			Sort receiverSort,
-	    			/*@out@*/Set<ObserverFunction> result) {
+    public static Pair<Term, ImmutableSet<Taclet>> limitTerm(
+	    		Term t, 
+	    		ImmutableSet<Pair<Sort, ObserverFunction>> toLimit, 
+	    		Services services) {
+	ImmutableSet<Taclet> taclets = DefaultImmutableSet.nil();
+	
+	//recurse to subterms
+	Term[] subs = new Term[t.arity()];
+	for(int i = 0; i < subs.length; i++) {
+	     Pair<Term,ImmutableSet<Taclet>> pair 
+	     	= limitTerm(t.sub(i), toLimit, services);
+	     subs[i] = pair.first;
+	     taclets = taclets.union(pair.second);
+	}
+	
+	//top level operator
+	Operator newOp = t.op();
 	if(t.op() instanceof ObserverFunction) {
-	    ObserverFunction obs = (ObserverFunction)t.op();
-	    if(obs.isStatic() 
-	       && obs.getContainerType().getSort().equals(receiverSort)) {
-		result.add(obs);
-	    } else if(!obs.isStatic() && t.sub(1).sort().equals(receiverSort)) {
-		result.add(obs);
+	    final ObserverFunction obs = (ObserverFunction) t.op();
+	    for(Pair<Sort, ObserverFunction> pair : toLimit) {
+		if(pair.second.equals(t.op())
+	           && (obs.isStatic() 
+	               || t.sub(1).sort().extendsTrans(pair.first))) {
+		    Pair<ObserverFunction,ImmutableSet<Taclet>> limited
+		    	= services.getSpecificationRepository().limitObs(obs); 
+		    newOp = limited.first;
+		    taclets = taclets.union(limited.second);
+		}
 	    }
 	}
-	for(Term sub : t.subs()) {
-	    collectObserversForSort(sub, receiverSort, result);
-	}
-    }
+	
+	//reassemble, return
+	final Term term 
+		= TB.tf().createTerm(newOp, subs, t.boundVars(), t.javaBlock());
+	return new Pair<Term,ImmutableSet<Taclet>>(term, taclets);
+    }    
     
-
+    
     @Override
     public String getName() {
 	return name;
@@ -122,35 +149,39 @@ public final class RepresentsAxiom implements ClassAxiom {
     }
 
     
-    @Override
-    public Term getAxiom(Services services) {
-	//instantiate axiom with logical variables
+    public Taclet getRelationalTaclet(Services services) {
+	//create schema variables
 	final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
-	final LogicVariable heapLV
-	      = new LogicVariable(new Name("h"), heapLDT.targetSort());
-	final LogicVariable selfLV
-	      = target.isStatic()
-	        ? null
-	        : new LogicVariable(originalSelfVar.name(), 
-	    			    originalSelfVar.sort());
-	final Term varAxiom = getAxiom(heapLV, selfLV, services);
+	final SchemaVariable heapSV 
+		= SchemaVariableFactory.createTermSV(new Name("h"), 
+						     heapLDT.targetSort(), 
+						     false, 
+						     false);
+	final SchemaVariable selfSV
+		= target.isStatic()
+		  ? null
+	          : SchemaVariableFactory.createTermSV(originalSelfVar.name(), 
+						       kjt.getSort());
+	
+	//instantiate axiom with schema variables
+	final Term schemaAxiom = getAxiom(heapSV, selfSV, services);
 	
 	//prepare exactInstance guard
 	final Term exactInstance 
 		= target.isStatic() 
 		  ? TB.tt() 
-	          : TB.exactInstance(services, kjt.getSort(), TB.var(selfLV));
+	          : TB.exactInstance(services, kjt.getSort(), TB.var(selfSV));
 		  
         //prepare satisfiability guard
         final Term targetTerm 
         	= target.isStatic()
-		  ? TB.func(target, TB.var(heapLV))
-		  : TB.func(target, TB.var(heapLV), TB.var(selfLV));
+		  ? TB.func(target, TB.var(heapSV))
+		  : TB.func(target, TB.var(heapSV), TB.var(selfSV));
         final Term axiomSatisfiable;
 	if(target.sort() == Sort.FORMULA) {
 	    axiomSatisfiable 
-	    	= TB.or(OpReplacer.replace(targetTerm, TB.tt(), varAxiom),
-		        OpReplacer.replace(targetTerm, TB.ff(), varAxiom));
+	    	= TB.or(OpReplacer.replace(targetTerm, TB.tt(), schemaAxiom),
+		        OpReplacer.replace(targetTerm, TB.ff(), schemaAxiom));
 	} else {
 	    final LogicVariable targetLV
 	    	= new LogicVariable(
@@ -158,49 +189,56 @@ public final class RepresentsAxiom implements ClassAxiom {
 		    target.sort());
 	    final Term targetLVReachable
 	    	= TB.reachableValue(services, 
-		    	      	    TB.var(heapLV), 
+		    	      	    TB.var(heapSV), 
 		    	      	    TB.var(targetLV), 
 		    	      	    target.getType());
 	    axiomSatisfiable = TB.ex(targetLV, 
 		    		     TB.and(targetLVReachable,
 		    			    OpReplacer.replace(targetTerm, 
 			    		  	               TB.var(targetLV), 
-			    		  	               varAxiom)));
+			    		  	               schemaAxiom)));
 	}
         	
 	//assemble formula
 	final Term guardedAxiom 
-		= TB.imp(TB.and(exactInstance, axiomSatisfiable), varAxiom); 
-	final Term quantifiedAxiom 
-		= target.isStatic() 
-		  ? guardedAxiom 
-	          : TB.all(selfLV, guardedAxiom);
-	return TB.all(heapLV, quantifiedAxiom);
+		= TB.imp(TB.and(exactInstance, axiomSatisfiable), schemaAxiom);
+	final ConstrainedFormula guardedAxiomCf 
+		= new ConstrainedFormula(guardedAxiom);
+	
+	//create taclet
+	final RewriteTacletBuilder tacletBuilder = new RewriteTacletBuilder();
+	final Term findTerm = target.isStatic() 
+	                      ? TB.func(target, TB.var(heapSV)) 
+	                      : TB.func(target, TB.var(heapSV), TB.var(selfSV));
+	tacletBuilder.setFind(findTerm);
+	final Sequent addedSeq 
+		= Sequent.createAnteSequent(
+				Semisequent.EMPTY_SEMISEQUENT
+		                           .insertFirst(guardedAxiomCf)
+		                           .semisequent());	
+	tacletBuilder.addTacletGoalTemplate
+	    (new RewriteTacletGoalTemplate(addedSeq,
+					   ImmutableSLList.<Taclet>nil(),
+					   findTerm));
+	tacletBuilder.setName(new Name(name));
+	tacletBuilder.addRuleSet(
+			new RuleSet(new Name("inReachableStateImplication")));
+	
+	return tacletBuilder.getTaclet();
     }
     
     
     @Override
-    public ImmutableSet<Taclet> getAxiomAsTaclet(Services services) {
-	//abort if axiom not equational
-	if(!(originalRep.op() instanceof Equality
-	     && originalRep.sub(0).op() == target
-	     && (target.isStatic() 
-		 || originalRep.sub(0).sub(1).op().equals(originalSelfVar)))) {
-	    return null;
+    public ImmutableSet<Taclet> getTaclets(
+	    		ImmutableSet<Pair<Sort, ObserverFunction>> toLimit,
+	    		Services services) {
+	//escape if axiom not functional
+	if(!isFunctional()) {
+	    return DefaultImmutableSet.<Taclet>nil()
+	                              .add(getRelationalTaclet(services));
 	}
+	ImmutableSet<Taclet> result = DefaultImmutableSet.nil();
 	
-	//abort if axiom is obviously recursive (TODO: catch mutual recursion)
-	final Set<ObserverFunction> usedObservers 
-		= new HashSet<ObserverFunction>();
-	collectObserversForSort(originalRep.sub(1), 
-			        target.isStatic() 
-			          ? target.getContainerType().getSort() 
-			          : originalSelfVar.sort(), 
-			        usedObservers);
-	if(usedObservers.contains(target)) {
-	    //return null;
-	}
-
 	//create schema variables
 	final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
 	final SchemaVariable heapSV 
@@ -220,6 +258,12 @@ public final class RepresentsAxiom implements ClassAxiom {
 	final Term schemaLhs = schemaAxiom.sub(0);
 	final Term schemaRhs = schemaAxiom.sub(1);
 	
+	//limit observers
+	final Pair<Term, ImmutableSet<Taclet>> limited 
+		= limitTerm(schemaRhs, toLimit, services);
+	final Term limitedRhs = limited.first;
+	result = result.union(limited.second);
+		
 	//create if sequent
 	final Sequent ifSeq;
 	if(target.isStatic()) {
@@ -239,7 +283,7 @@ public final class RepresentsAxiom implements ClassAxiom {
 	tacletBuilder.addTacletGoalTemplate
 	    (new RewriteTacletGoalTemplate(Sequent.EMPTY_SEQUENT,
 					   ImmutableSLList.<Taclet>nil(),
-					   schemaRhs));
+					   limitedRhs));
 	if(!target.isStatic()) {
 	    tacletBuilder.setIfSequent(ifSeq);
 	}
@@ -295,9 +339,21 @@ public final class RepresentsAxiom implements ClassAxiom {
 	tacletBuilder.goalTemplates().tail().head().setName("Use Axiom");
 	tacletBuilder.goalTemplates().head().setName("Show Axiom Satisfiability");
 	tacletBuilder.setStateRestriction(RewriteTaclet.SAME_UPDATE_LEVEL);
+	result = result.add(tacletBuilder.getTaclet());
 	
 	//return
-	return DefaultImmutableSet.<Taclet>nil().add(tacletBuilder.getTaclet());
+	return result;
+    }
+    
+    
+    @Override
+    public ImmutableSet<Pair<Sort, ObserverFunction>> getUsedObservers(
+	    						Services services) {
+	if(!isFunctional()) {
+	    return DefaultImmutableSet.nil();
+	} else {
+	    return MiscTools.collectObservers(originalRep.sub(1));
+	}
     }    
     
     

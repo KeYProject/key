@@ -35,7 +35,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.metaconstruct.WhileInvRule;
 import de.uka.ilkd.key.speclang.LoopInvariant;
-import de.uka.ilkd.key.util.InvInferenceTools;
+import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
 
 
@@ -45,7 +45,6 @@ public final class WhileInvariantRule implements BuiltInRule {
 
     private static final Name NAME = new Name("Loop Invariant");
     private static final TermBuilder TB = TermBuilder.DF;
-    private static final InvInferenceTools IIT = InvInferenceTools.INSTANCE;
 
     private Term lastFocusTerm;
     private Instantiation lastInstantiation;
@@ -89,7 +88,7 @@ public final class WhileInvariantRule implements BuiltInRule {
 
 	//active statement must be while loop
 	SourceElement activeStatement 
-		= IIT.getActiveStatement(progPost.javaBlock());
+		= MiscTools.getActiveStatement(progPost.javaBlock());
 	if(!(activeStatement instanceof While)) {
 	    return null;
 	}
@@ -111,10 +110,12 @@ public final class WhileInvariantRule implements BuiltInRule {
 
 	//collect self, execution context
 	final MethodFrame innermostMethodFrame 
-		= IIT.getInnermostMethodFrame(progPost.javaBlock(), services);
+		= MiscTools.getInnermostMethodFrame(progPost.javaBlock(), 
+						    services);
 	final Term selfTerm = innermostMethodFrame == null
 	                      ? null
-	                      : IIT.getSelfTerm(innermostMethodFrame, services);
+	                      : MiscTools.getSelfTerm(innermostMethodFrame, 
+	                	      		      services);
 	final ExecutionContext innermostExecutionContext 
 		= innermostMethodFrame == null 
 		  ? null
@@ -215,9 +216,9 @@ public final class WhileInvariantRule implements BuiltInRule {
 	//collect input and output local variables, 
 	//prepare reachableIn and reachableOut
 	final ImmutableSet<ProgramVariable> localIns 
-		= IIT.getLocalIns(inst.loop, services);
+		= MiscTools.getLocalIns(inst.loop, services);
 	final ImmutableSet<ProgramVariable> localOuts 
-		= IIT.getLocalOuts(inst.loop, services);
+		= MiscTools.getLocalOuts(inst.loop, services);
 	Term reachableIn = TB.tt();
 	for(ProgramVariable pv : localIns) {
 	    reachableIn = TB.and(reachableIn, 
@@ -391,9 +392,10 @@ public final class WhileInvariantRule implements BuiltInRule {
 	useGoal.addFormula(new ConstrainedFormula(uAnonInv), true, false);
 
 	Term restPsi = TB.prog(dia ? Modality.DIA : Modality.BOX,
-		              IIT.removeActiveStatement(inst.progPost.javaBlock(), 
-							services), 
-                              inst.progPost.sub(0));
+			       MiscTools.removeActiveStatement(
+				       	inst.progPost.javaBlock(), 
+					services), 
+                               inst.progPost.sub(0));
 	Term guardFalseRestPsi = TB.box(guardJb, 
 					TB.imp(guardFalseTerm, restPsi));
 	useGoal.changeFormula(new ConstrainedFormula(TB.applySequential(

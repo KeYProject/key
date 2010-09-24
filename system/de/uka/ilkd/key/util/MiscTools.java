@@ -24,7 +24,6 @@ import de.uka.ilkd.key.java.statement.LabeledStatement;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.visitor.CreatingASTVisitor;
-import de.uka.ilkd.key.java.visitor.JavaASTCollector;
 import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
 import de.uka.ilkd.key.ldt.LocSetLDT;
 import de.uka.ilkd.key.logic.*;
@@ -39,13 +38,11 @@ import de.uka.ilkd.key.rule.*;
  * Collection of some common, stateless functionality. Stolen from
  * the weissInvariants side branch.
  */
-public class InvInferenceTools {
-    
-    public static final InvInferenceTools INSTANCE = new InvInferenceTools();
-    
+public final class MiscTools {
+       
     private static final TermBuilder TB = TermBuilder.DF;
     
-    private InvInferenceTools() {}
+    private MiscTools() {}
     
     
     //-------------------------------------------------------------------------
@@ -55,7 +52,7 @@ public class InvInferenceTools {
     /**
      * Removes universal quantifiers from a formula.
      */
-    public Term open(Term formula) {
+    public static Term open(Term formula) {
 	assert formula.sort() == Sort.FORMULA;
 	if(formula.op() == Quantifier.ALL) {
 	    return open(formula.sub(0)); 
@@ -68,7 +65,7 @@ public class InvInferenceTools {
     /**
      * Returns the set of elementary conjuncts of the passed formula.
      */
-    public ImmutableSet<Term> toSet(Term formula) {
+    public static ImmutableSet<Term> toSet(Term formula) {
 	assert formula.sort().equals(Sort.FORMULA);
 	ImmutableSet<Term> result = DefaultImmutableSet.<Term>nil();
         ImmutableList<Term> workingList 
@@ -86,7 +83,7 @@ public class InvInferenceTools {
     }
     
     
-    public ImmutableSet<Term> unionToSet(Term s, Services services) {
+    public static ImmutableSet<Term> unionToSet(Term s, Services services) {
 	final LocSetLDT setLDT = services.getTypeConverter().getLocSetLDT();
 	assert s.sort().equals(setLDT.targetSort());
 	final Function union = setLDT.getUnion();
@@ -108,7 +105,7 @@ public class InvInferenceTools {
     /**
      * Conjoins the formulas in the passed set.
      */
-    public Term toFormula(ImmutableSet<Term> set) {
+    public static Term toFormula(ImmutableSet<Term> set) {
 	Term result = TB.tt();
 	for(Term term : set) {
 	    result = TB.and(result, term);
@@ -120,7 +117,7 @@ public class InvInferenceTools {
     /**
      * Returns the active statement of the passed a java block.
      */
-    public SourceElement getActiveStatement(JavaBlock jb) {
+    public static SourceElement getActiveStatement(JavaBlock jb) {
 	assert jb.program() != null;
 	
         SourceElement result = jb.program().getFirstElement();
@@ -140,7 +137,8 @@ public class InvInferenceTools {
     /**
      * Returns the passed java block without its active statement.
      */
-    public JavaBlock removeActiveStatement(JavaBlock jb, Services services) {
+    public static JavaBlock removeActiveStatement(JavaBlock jb, 
+	    					  Services services) {
         assert jb.program() != null;
         final SourceElement activeStatement = getActiveStatement(jb);
         Statement newProg = (Statement)
@@ -175,8 +173,8 @@ public class InvInferenceTools {
     /**
      * Returns the innermost method frame of the passed java block
      */
-    public MethodFrame getInnermostMethodFrame(JavaBlock jb, 
-	    				       Services services) { 
+    public static MethodFrame getInnermostMethodFrame(JavaBlock jb, 
+	    				       	      Services services) { 
         final ProgramElement pe = jb.program();
         final MethodFrame result = new JavaASTVisitor(pe, services) {
             private MethodFrame res;
@@ -198,8 +196,9 @@ public class InvInferenceTools {
     }
     
     
-    public ExecutionContext getInnermostExecutionContext(JavaBlock jb, 
-	    						 Services services) {
+    public static ExecutionContext getInnermostExecutionContext(
+	    						JavaBlock jb, 
+	    						Services services) {
 	final MethodFrame frame = getInnermostMethodFrame(jb, services);
 	return frame == null 
                ? null
@@ -211,7 +210,7 @@ public class InvInferenceTools {
      * Returns the receiver term of the passed method frame, or null if
      * the frame belongs to a static method.
      */
-    public Term getSelfTerm(MethodFrame mf, Services services) {
+    public static Term getSelfTerm(MethodFrame mf, Services services) {
 	ExecutionContext ec = (ExecutionContext) mf.getExecutionContext();
 	ReferencePrefix rp = ec.getRuntimeInstance();
 	if(!(rp instanceof TypeReference) && rp != null) {
@@ -225,7 +224,7 @@ public class InvInferenceTools {
     /**
      * Removes all formulas from the passed goal.
      */
-    public void clearGoal(Goal goal) {
+    public static void clearGoal(Goal goal) {
 	for(ConstrainedFormula cf : goal.sequent().antecedent()) {
             PosInOccurrence pio = new PosInOccurrence(cf, 
                                                       PosInTerm.TOP_LEVEL, 
@@ -244,7 +243,7 @@ public class InvInferenceTools {
     /**
      * Tells whether the passed rule belongs to the specified rule set. 
      */
-    public boolean belongsTo(Rule rule, String ruleSetName) {	
+    public static boolean belongsTo(Rule rule, String ruleSetName) {	
         if(rule instanceof Taclet) {
     	    if(ruleSetName.endsWith("*")) {
     		ruleSetName 
@@ -269,7 +268,7 @@ public class InvInferenceTools {
     /**
      * Tells whether the passed rule belongs to one of the specified rule sets.
      */
-    public boolean belongsTo(Rule rule, String[] ruleSetNames) {
+    public static boolean belongsTo(Rule rule, String[] ruleSetNames) {
         for(int i = 0; i < ruleSetNames.length; i++) {
             if(belongsTo(rule, ruleSetNames[i])) {
                 return true;
@@ -283,7 +282,7 @@ public class InvInferenceTools {
      * Tells whether the passed rule is one of those specified by the second
      * argument.
      */
-    public boolean isOneOf(Rule rule, String[] ruleNames) {
+    public static boolean isOneOf(Rule rule, String[] ruleNames) {
 	String s = rule.name().toString();
 	for(int i = 0; i < ruleNames.length; i++) {
 	    if(s.equals(ruleNames[i])) {
@@ -297,7 +296,7 @@ public class InvInferenceTools {
     /**
      * Removes leading updates from the passed term.
      */
-    public Term goBelowUpdates(Term term) {
+    public static Term goBelowUpdates(Term term) {
         while(term.op() instanceof UpdateApplication) {
             term = UpdateApplication.getTarget(term);
         }        
@@ -308,7 +307,7 @@ public class InvInferenceTools {
     /**
      * Removes leading updates from the passed term.
      */
-    public Pair<ImmutableList<Term>,Term> goBelowUpdates2(Term term) {
+    public static Pair<ImmutableList<Term>,Term> goBelowUpdates2(Term term) {
 	ImmutableList<Term> updates = ImmutableSLList.<Term>nil();
         while(term.op() instanceof UpdateApplication) {
             updates = updates.append(UpdateApplication.getUpdate(term));
@@ -322,7 +321,7 @@ public class InvInferenceTools {
      * Returns the entry node for the innermost loop of the symbolic 
      * execution state given by the passed node.
      */
-    public Node getEntryNodeForInnermostLoop(Node node) {
+    public static Node getEntryNodeForInnermostLoop(Node node) {
         ImmutableList<LoopStatement> leftLoops 
             = ImmutableSLList.<LoopStatement>nil();
         for(Node n = node.parent(); n != null; n = n.parent()) {
@@ -362,7 +361,7 @@ public class InvInferenceTools {
      * Returns the entry node for the passed loop and the symbolic execution
      * state given by the passed node.
      */
-    public Node getEntryNodeForLoop(Node node, LoopStatement loop) {
+    public static Node getEntryNodeForLoop(Node node, LoopStatement loop) {
         for(Node n = node.parent(); n != null; n = n.parent()) {            
             RuleApp app = n.getAppliedRuleApp();
             Rule rule = app.rule();
@@ -391,7 +390,8 @@ public class InvInferenceTools {
     /**
      * Tells whether the passed sets of location symbols are disjoint.
      */
-    public boolean areDisjoint(ImmutableSet<UpdateableOperator> set1, ImmutableSet<UpdateableOperator> set2) {
+    public static boolean areDisjoint(ImmutableSet<UpdateableOperator> set1, 
+	    			      ImmutableSet<UpdateableOperator> set2) {
 	for(UpdateableOperator loc : set1) {
             if(set2.contains(loc)) {
                 return false;
@@ -401,19 +401,38 @@ public class InvInferenceTools {
     }
     
     
-    public ImmutableSet<ProgramVariable> getLocalIns(ProgramElement pe, 
-	    					     Services services) {
+    public static ImmutableSet<ProgramVariable> getLocalIns(ProgramElement pe, 
+	    					     	    Services services) {
 	final ReadPVCollector rpvc = new ReadPVCollector(pe, services);
 	rpvc.start();
 	return rpvc.result();
     }    
     
     
-    public ImmutableSet<ProgramVariable> getLocalOuts(ProgramElement pe, 
-	    			                      Services services) {
+    public static ImmutableSet<ProgramVariable> getLocalOuts(
+	    					ProgramElement pe, 
+	    			                Services services) {
 	final WrittenPVCollector wpvc = new WrittenPVCollector(pe, services);
 	wpvc.start();
 	return wpvc.result();
+    }
+    
+    
+    public static ImmutableSet<Pair<Sort,ObserverFunction>> 
+    						collectObservers(Term t) {
+	ImmutableSet<Pair<Sort, ObserverFunction>> result 
+		= DefaultImmutableSet.nil();
+	if(t.op() instanceof ObserverFunction) {
+	    final ObserverFunction obs = (ObserverFunction)t.op();
+	    final Sort s = obs.isStatic() 
+	             	   ? obs.getContainerType().getSort() 
+	                   : t.sub(1).sort();
+	    result = result.add(new Pair<Sort,ObserverFunction>(s, obs));	    
+	}
+	for(Term sub : t.subs()) {
+	    result = result.union(collectObservers(sub));
+	}
+	return result;
     }
     
     

@@ -21,7 +21,9 @@ import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.*;
+import de.uka.ilkd.key.util.Pair;
 
 
 public final class QueryAxiom implements ClassAxiom {
@@ -65,16 +67,12 @@ public final class QueryAxiom implements ClassAxiom {
     public VisibilityModifier getVisibility() {
 	return new Private();
     }
-    
-        
-    @Override
-    public Term getAxiom(Services services) {
-	throw new UnsupportedOperationException();
-    }
-    
+
     
     @Override
-    public ImmutableSet<Taclet> getAxiomAsTaclet(Services services) {
+    public ImmutableSet<Taclet> getTaclets(
+	    		ImmutableSet<Pair<Sort, ObserverFunction>> toLimit, 
+	    		Services services) {
 	final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
 	
 	//create schema variables
@@ -218,6 +216,13 @@ public final class QueryAxiom implements ClassAxiom {
 	
 	return DefaultImmutableSet.<Taclet>nil().add(tacletBuilder.getTaclet());
     }    
+    
+    
+    @Override
+    public ImmutableSet<Pair<Sort, ObserverFunction>> getUsedObservers(
+	    						Services services) {
+	return DefaultImmutableSet.nil();
+    }
     
     
     @Override

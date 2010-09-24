@@ -83,6 +83,8 @@ public final class DefaultProofCorrectnessMgt implements ProofCorrectnessMgt {
     @Override    
     public boolean contractApplicableFor(KeYJavaType kjt,
 	                                 ObserverFunction target) {
+	target = specRepos.unlimitObs(target);
+	
         //get the target which is being verified in the passed goal
         final ObserverFunction targetUnderVerification 
             = specRepos.getTargetOfProof(proof);

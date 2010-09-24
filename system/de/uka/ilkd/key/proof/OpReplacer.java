@@ -59,6 +59,15 @@ public class OpReplacer {
     }    
     
     
+    
+    public static Term replace(Operator toReplace, Operator with, Term in) {
+	Map<Operator,Operator> map = new HashMap<Operator,Operator>();
+	map.put(toReplace, with);
+	OpReplacer or = new OpReplacer(map);
+	return or.replace(in);
+    }    
+    
+    
     /**
      * Replaces in an operator.
      */

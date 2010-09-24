@@ -17,13 +17,18 @@ import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.*;
+import de.uka.ilkd.key.proof.mgt.AxiomJustification;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
+import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.speclang.ClassAxiom;
+import de.uka.ilkd.key.util.Pair;
 
 
 
@@ -62,6 +67,105 @@ public abstract class AbstractPO implements ProofOblInput {
         this.specRepos  = initConfig.getServices().getSpecificationRepository();
         this.name       = name;
     }
+    
+    
+    
+    //-------------------------------------------------------------------------
+    //methods for use in subclasses
+    //-------------------------------------------------------------------------
+    
+    private ImmutableSet<ClassAxiom> getAxiomsForObserver(
+	    				Pair<Sort, ObserverFunction> usedObs,
+	    				ImmutableSet<ClassAxiom> axioms) {
+	for(ClassAxiom axiom : axioms) {
+	    if(!(axiom.getTarget().equals(usedObs.second) 
+		 && usedObs.first.extendsTrans(axiom.getKJT().getSort()))) {
+		axioms = axioms.remove(axiom);
+	    }
+	}
+	return axioms;
+    }
+    
+    
+    private boolean reach(Pair<Sort, ObserverFunction> from, 
+	    		  Pair<Sort, ObserverFunction> to, 
+	    	 	  ImmutableSet<ClassAxiom> axioms) {
+	ImmutableSet<Pair<Sort, ObserverFunction>> reached
+		= DefaultImmutableSet.nil();	
+	ImmutableSet<Pair<Sort, ObserverFunction>> newlyReached
+		= DefaultImmutableSet.<Pair<Sort, ObserverFunction>>nil()
+		                     .add(from);
+	
+	while(!newlyReached.isEmpty()) {
+	    for(Pair<Sort, ObserverFunction> node : newlyReached) {
+		newlyReached = newlyReached.remove(node);
+		reached = reached.add(node);
+		final ImmutableSet<ClassAxiom> nodeAxioms 
+			= getAxiomsForObserver(node, axioms);
+		for(ClassAxiom nodeAxiom : nodeAxioms) {
+		    final ImmutableSet<Pair<Sort,ObserverFunction>> nextNodes
+		    	= nodeAxiom.getUsedObservers(services);
+		    for(Pair<Sort,ObserverFunction> nextNode : nextNodes) {
+			if(nextNode.equals(to)) {
+			    return true;
+			} else if(!reached.contains(nextNode)) {
+			    newlyReached = newlyReached.add(nextNode);
+			}
+		    }
+		}
+	    }
+	}
+	
+	return false;
+    }
+    
+    
+    private ImmutableSet<Pair<Sort, ObserverFunction>> 
+    				getSCC(ClassAxiom startAxiom,
+    				       ImmutableSet<ClassAxiom> axioms) {
+	//TODO: make more efficient	
+	final Pair<Sort, ObserverFunction> start 
+	    = new Pair<Sort, ObserverFunction>(startAxiom.getKJT().getSort(), 
+					       startAxiom.getTarget());
+	ImmutableSet<Pair<Sort, ObserverFunction>> result 
+		= DefaultImmutableSet.nil();
+	for(ClassAxiom nodeAxiom : axioms) {
+	    final Pair<Sort, ObserverFunction> node 
+	    	= new Pair<Sort, ObserverFunction>(nodeAxiom.getKJT().getSort(), 
+	    					   nodeAxiom.getTarget());
+	    if(reach(start, node, axioms) && reach(node, start, axioms)) {
+		result = result.add(node);
+	    }
+	}
+	return result;
+    }
+    
+        
+    protected final ImmutableSet<NoPosTacletApp> collectClassAxioms(
+	    						KeYJavaType selfKJT) {
+	ImmutableSet<NoPosTacletApp> result = DefaultImmutableSet.nil();
+	final ImmutableSet<ClassAxiom> axioms 
+		= specRepos.getClassAxioms(selfKJT);
+	
+	for(ClassAxiom axiom : axioms) {
+	    final ImmutableSet<Pair<Sort, ObserverFunction>> scc 
+	    	= getSCC(axiom, axioms);
+//	    for(Pair<Sort, ObserverFunction> sccAx : scc) {
+//		System.out.println("in scc of " + axiom.getName() + ": " + sccAx);
+//	    }
+	    for(Taclet axiomTaclet : axiom.getTaclets(scc, services)) {
+		assert axiomTaclet != null 
+		       : "class axiom returned null taclet: " + axiom.getName();
+		result = result.add(NoPosTacletApp.createNoPosTacletApp(
+				   				axiomTaclet));
+		initConfig.getProofEnv()
+			  .registerRule(axiomTaclet, 
+				  	AxiomJustification.INSTANCE);
+	    }	    
+	}
+
+	return result;
+    }    
 
     
     //-------------------------------------------------------------------------

@@ -19,12 +19,14 @@ import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.rule.AntecTacletBuilder;
-import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletGoalTemplate;
+import de.uka.ilkd.key.util.MiscTools;
+import de.uka.ilkd.key.util.Pair;
 
 
 public final class PartialInvAxiom implements ClassAxiom {
@@ -67,35 +69,9 @@ public final class PartialInvAxiom implements ClassAxiom {
     
     
     @Override
-    public Term getAxiom(Services services) {
-	//instantiate axiom with logical variables
-	final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
-	final LogicVariable heapLV
-	      = new LogicVariable(new Name("h"), heapLDT.targetSort());
-	final LogicVariable selfLV
-	      = target.isStatic()
-	        ? null
-	        : new LogicVariable(new Name("self"), 
-	    			    inv.getKJT().getSort());
-	final Term varAxiom 
-		= OpReplacer.replace(TB.heap(services), 
-				     TB.var(heapLV), 
-				     inv.getInv(selfLV, services));
-        	
-	//assemble formula
-	final Term guardedAxiom 
-		= TB.imp(TB.inv(services, TB.var(heapLV), TB.var(selfLV)), 
-			 varAxiom); 
-	final Term quantifiedAxiom 
-		= target.isStatic() 
-		  ? guardedAxiom 
-	          : TB.all(selfLV, guardedAxiom);
-	return TB.all(heapLV, quantifiedAxiom);
-    }
-    
-    
-    @Override
-    public ImmutableSet<Taclet> getAxiomAsTaclet(Services services) {
+    public ImmutableSet<Taclet> getTaclets(
+	    		ImmutableSet<Pair<Sort, ObserverFunction>> toLimit,
+	    		Services services) {
 	ImmutableSet<Taclet> result = DefaultImmutableSet.<Taclet>nil();
 	
 	for(int i = 0; i < 2; i++) {
@@ -121,9 +97,15 @@ public final class PartialInvAxiom implements ClassAxiom {
 	    	= OpReplacer.replace(TB.heap(services), 
 	    			     TB.var(heapSV), 
 	    			     inv.getInv(selfSV, services));
-
+	    
+	    //limit observers
+	    final Pair<Term, ImmutableSet<Taclet>> limited 
+	    	= RepresentsAxiom.limitTerm(schemaAxiom, toLimit, services);
+	    final Term limitedAxiom = limited.first;
+	    result = result.union(limited.second);
+	    
 	    //create added sequent
-	    final ConstrainedFormula addedCf = new ConstrainedFormula(schemaAxiom);	    
+	    final ConstrainedFormula addedCf = new ConstrainedFormula(limitedAxiom);	    
 	    final Semisequent addedSemiSeq 
 	    	= Semisequent.EMPTY_SEMISEQUENT.insertFirst(addedCf) 
 	    	                               .semisequent();
@@ -166,6 +148,15 @@ public final class PartialInvAxiom implements ClassAxiom {
 	
 	//return
 	return result;
+    }
+    
+    
+    @Override
+    public ImmutableSet<Pair<Sort, ObserverFunction>> getUsedObservers(
+	    						Services services) {
+	final ProgramVariable dummySelfVar 
+		= TB.selfVar(services, inv.getKJT(), false);
+	return MiscTools.collectObservers(inv.getInv(dummySelfVar, services));
     }
     
     

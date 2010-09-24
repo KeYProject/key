@@ -117,6 +117,8 @@
 ./heap/vacid0_sparse_array/SparseArray_inv.key
 ./heap/vacid0_sparse_array/SparseArray_SparseArray.key
 ./heap/vstte10_1/SumAndMax_sumAndMax.key
+./heap/vstte10_3/Node_cons.key
+./heap/vstte10_3/Node_search.key
 ./standard_key/arith/binomial1.key
 ./standard_key/arith/binomial2.key
 ./standard_key/arith/check_jdiv.key
