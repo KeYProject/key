@@ -1,8 +1,6 @@
 		*********************************
 		* KeY Source Code Installation  * 
-		*        Version 1.5.x         *
-		*        Nightly Builds        *
-                *     (Development Version)    *
+		*        Version 1.6.0         *
 		********************************
 
 (1) Requirements: 
@@ -21,8 +19,7 @@ Needed additional Libraries:
 	log4j.jar
 
 Optionally, KeY can make use of the following binaries:
-	ESC Java's decision procedure 'Simplify'
-        SMT-LIB provers: bindings exist currently for Yices, CVCLite, CVC3 and SVC
+	SMT Solvers: bindings exist currently for Z3, Simplify, Yices and CVC3
               (export to SMT input file possible)        
 
 
@@ -58,7 +55,7 @@ Optionally, KeY can make use of the following binaries:
                      or (bash)     export KEY_LIB=~/key_lib                  
                      or (Windows)  set KEY_LIB=<path to libraries>
 
-	4) Optional: Install Simplify and/or SMT-LIB provers.
+	4) Optional: Install Simplify and/or other SMT solvers.
 
            If you download Simplify not from the KeY-website but
            elsewhere (e.g. as part of ESC/Java), follow the intallation 
@@ -80,8 +77,7 @@ Optionally, KeY can make use of the following binaries:
        
                 export PATH=$PATH:~/simplify
 
-          (analog procedure for SMT-LIB provers)
-
+          (analog procedure for other solvers)
 
 	5) Change to the subdirectory ./system
 
@@ -109,7 +105,7 @@ Optionally, KeY can make use of the following binaries:
 		../bin/runProver
 
 
-(5) Start KeY in Test Generation Mode
+(5) Alternatively to (4): Start KeY in Test Generation Mode
 -------------------------------------
 
 	Run 'startProver unit' or if you wish a simpler GUI run 'startProver testing'
