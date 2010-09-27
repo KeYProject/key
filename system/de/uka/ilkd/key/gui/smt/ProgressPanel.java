@@ -256,8 +256,9 @@ class ProgressPanel implements SMTProgressMonitor {
 	}
 	
 	private String goalName(int number, SolveType type){
-	    String temp =number+". Goal";
-	    temp += number-1 == currentGoal ? ": "+getDotString() : number-1>currentGoal ? "" : ": ";
+	    String temp = ""+number;
+	    temp += (number-1 == currentGoal) ? ": "+getDotString() : 
+                ((number-1>currentGoal) ? "" : ": ");
 	    return temp;
 	}
 	
@@ -273,7 +274,7 @@ class ProgressPanel implements SMTProgressMonitor {
 	
 	public int necessaryPanelWidth(int numberOfGoals){
 	    
-	    int w1 = getStringWidth("10. Goal: unsolvable")
+	    int w1 = getStringWidth("10: unsolvable")
 		               * numberOfGoals;
 	    int w2 = getStringWidth(jLabel.getText());
 	    return w1+w2;

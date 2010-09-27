@@ -140,7 +140,7 @@ public class SpecificationRepository {
         ProgramMethod pm = contract.getProgramMethod();
         String name = contract.getName();
         assert contractsByName.get(name) == null 
-               : "Tried to add a contract with a non-unique name!";
+               : "Tried to add a contract with a non-unique name: " + name;
         assert !name.contains(CONTRACT_COMBINATION_MARKER)
                : "Tried to add a contract with a name containing the reserved" 
                   + " character " + CONTRACT_COMBINATION_MARKER + "!";

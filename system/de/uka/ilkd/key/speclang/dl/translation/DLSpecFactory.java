@@ -23,6 +23,7 @@ import de.uka.ilkd.key.java.statement.CatchAllStatement;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.sort.ArraySort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.speclang.*;
@@ -136,16 +137,22 @@ public class DLSpecFactory {
             assert op instanceof Function;
             
             //retrieve operator corresponding to the atPre function
-            Name normalName 
-                = new Name(nameString.substring(0, nameString.length() - 4));
-            Operator normalOp = (Operator) services.getNamespaces()
-                                                   .lookup(normalName);
-            if(normalOp == null) {
-                ProgramVariable attrPV 
-                        = services.getJavaInfo()
-                                  .getAttribute(normalName.toString());
-                assert attrPV != null;
-                normalOp = AttributeOp.getAttributeOp(attrPV);
+            Operator normalOp;
+            if(op.arity() == 2
+               && ((Function)op).argSort(0) instanceof ArraySort) {
+        	normalOp = ArrayOp.getArrayOp(((Function)op).argSort(0));
+            } else {
+                final Name normalName 
+                   = new Name(nameString.substring(0, nameString.length() - 4));        	
+        	normalOp = (Operator) services.getNamespaces()
+                                              .lookup(normalName);
+        	if(normalOp == null) {
+        	    ProgramVariable attrPV 
+        	    	= services.getJavaInfo()
+        	    	          .getAttribute(normalName.toString());
+        	    assert attrPV != null;
+        	    normalOp = AttributeOp.getAttributeOp(attrPV);
+        	}
             }
             assert normalOp != null;
             

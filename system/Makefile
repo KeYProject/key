@@ -45,6 +45,10 @@ endif
 
 GIT_REPOS_AVAILABLE=$(wildcard ../.git/objects)
 
+ifeq "$(GIT_REPOS_AVAILABLE)" ""
+  GIT=""
+endif
+
 SHA1=ownVersion
 
 ifeq "$(KEY_VERSION_SHORT)" "" 
@@ -52,7 +56,6 @@ ifeq "$(KEY_VERSION_SHORT)" ""
 endif
 
 ifneq "$(GIT)" "" 
- ifneq "$(GIT_REPOS_AVAILABLE)" ""
    SHA1:=$(shell $(GIT) show | grep commit)
    SHA1:=$(wordlist 2,2,$(SHA1))
    ifeq "$(KEY_VERSION_SHORT)" "0.0.0" 
@@ -60,7 +63,6 @@ ifneq "$(GIT)" ""
      KEY_VERSION_SHORT:=$(wordlist 1,1,$(KEY_VERSION_SHORT))
      KEY_VERSION_SHORT:=1.5.$(KEY_VERSION_SHORT)
    endif
- endif
 endif
 
 ifeq "$(KEY_VERSION_LONG)" ""
@@ -308,6 +310,8 @@ endif
 javaFiles: 
 ifneq ("$(GIT)","")
 	@$(GIT) ls-files | grep "\.java" | grep -v "aspects" | grep -v "gjava" | grep -v "\.java\." | grep -v "resources/" | sort > javaFiles
+else
+	@find de/ -name \*\.java  | grep -v "aspects" | grep -v "gjava" | grep -v "\.java\." | grep -v "resources/" | sort > javaFiles
 endif
 
 argfile.normal: javaFiles

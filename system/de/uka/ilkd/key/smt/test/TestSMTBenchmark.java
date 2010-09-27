@@ -118,11 +118,10 @@ public class TestSMTBenchmark extends TestCase implements FilenameFilter{
 		    long time = System.currentTimeMillis();		
 		    rule.setMaxTime(maxExecutionTime);
 	    	    rule.start(p.openGoals().iterator().next(), p.getUserConstraint().getConstraint(),false);
-	    	    LinkedList<SMTSolverResult> list = rule.getResults();
 	    	    time = System.currentTimeMillis() - time;
 	    	    time = time / 100;
 	    	    toReturn.add("" + time/10 + "." + time%10);
-	    	    toReturn.add(this.translateResult(list.getFirst()));
+	    	    toReturn.add(this.translateResult(rule.getFirstResult()));
 		} catch (Exception e) {
 		    toReturn.add(ERROR);
 		    toReturn.add(ERROR);

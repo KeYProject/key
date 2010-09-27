@@ -14,6 +14,7 @@ import java.util.Map;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -46,8 +47,11 @@ class BuiltInPropertyResolver extends SLExpressionResolver {
     
     private ParsableVariable excVar;
     
-    public BuiltInPropertyResolver(Services services, ParsableVariable excVar, SLResolverManager man) {
-        super(services.getJavaInfo(), man);
+    public BuiltInPropertyResolver(Services services, 
+	    			   ParsableVariable excVar, 
+	    			   SLResolverManager man,
+	    			   KeYJavaType specInClass) {
+        super(services.getJavaInfo(), man, specInClass);
         this.services = services;
         this.excVar   = excVar;
     }

@@ -39,6 +39,7 @@ tokens {
         EXTENDS = "\\extends";
         ONEOF = "\\oneof";
 	OBJECT = "\\object";
+	ABSTRACT = "\\abstract";
 
         // Keywords used in schema variable declarations
 	SCHEMAVARIABLES = "\\schemaVariables";
@@ -124,7 +125,6 @@ tokens {
 	BOOTCLASSPATH="\\bootclasspath";
 	NODEFAULTCLASSES="\\noDefaultClasses";
 	JAVASOURCE="\\javaSource";
-        NOJAVAMODEL ="\\noJavaModel";
         WITHOPTIONS="\\withOptions";
         OPTIONSDECL="\\optionsDecl";
 	KEYSETTINGS = "\\settings";

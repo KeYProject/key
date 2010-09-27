@@ -14,7 +14,6 @@ import java.util.List;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
-import de.uka.ilkd.key.gui.configuration.LibrariesSettings;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.recoderext.RecoderModelTransformer;
@@ -27,7 +26,6 @@ import de.uka.ilkd.key.proof.CountingBufferedReader;
 import de.uka.ilkd.key.proof.RuleSource;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.speclang.SLEnvInput;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.ProgressMonitor;
 
@@ -140,13 +138,7 @@ public class KeYFile implements EnvInput {
                 throw new ProofInputException(fnfe);
             } catch (de.uka.ilkd.key.util.ExceptionHandlerException ehe) {
                 throw new ProofInputException(ehe.getCause().getMessage());
-            } finally {
-        	try {
-	            is.close();
-                } catch (IOException e) {
-                    throw new ProofInputException(e);
-                }
-            }
+            } 
         }
         return settings;
     }
@@ -229,25 +221,6 @@ public class KeYFile implements EnvInput {
         return includes;
     }
 
-
-    public LibrariesSettings readLibrariesSettings() throws ProofInputException {
-        if (initConfig==null) {
-            throw new IllegalStateException("KeYFile: InitConfig not set.");
-        }
-
-        if (settings == null) {
-            getPreferences();
-        }
-
-        LibrariesSettings result;
-        if (settings == null || settings.getLibrariesSettings().emptyProperties()) {
-            result = ProofSettings.DEFAULT_SETTINGS.getLibrariesSettings();
-        } else {
-            result = settings.getLibrariesSettings();
-        }
-
-        return result;
-    }
     
     public File readBootClassPath() {
         if(!javaPathAlreadyParsed)
@@ -385,14 +358,6 @@ public class KeYFile implements EnvInput {
 	} catch (FileNotFoundException fnfe) {
 	    throw new ProofInputException(fnfe);
         }
-
-        //read in-code specifications
-        readJavaPath();
-        if(javaPath != null && !javaPath.equals("")) {
-            SLEnvInput slEnvInput = new SLEnvInput(javaPath);
-            slEnvInput.setInitConfig(initConfig);
-            slEnvInput.read(mod);
-        }
     }
 
 
@@ -510,7 +475,4 @@ public class KeYFile implements EnvInput {
 	return externalForm.hashCode();
     }
     
-    public void finalize() {
-	close();
-    }
 }

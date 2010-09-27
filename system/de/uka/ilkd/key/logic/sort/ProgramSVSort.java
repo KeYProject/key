@@ -333,6 +333,8 @@ public abstract class ProgramSVSort extends PrimitiveSort {
 				      ImmutableSLList.<Name>nil().append
 				      (new Name("byte")).append(new Name("short")));
 
+    public static final ProgramSVSort ARRAYCOPY
+	= new SpecificMethodNameSort(new ProgramElementName("arraycopy"));
     public static final ProgramSVSort JCARRAYCOPY
 	= new SpecificMethodNameSort(new ProgramElementName("jvmArrayCopy"));
     public static final ProgramSVSort JCARRAYCOPYNONATOMIC

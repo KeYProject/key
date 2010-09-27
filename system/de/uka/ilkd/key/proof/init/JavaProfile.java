@@ -98,8 +98,9 @@ public class JavaProfile extends AbstractProfile {
      * @return justification for the given rule
      */
     public RuleJustification getJustification(Rule r) {
-        return r == getContractRule() ? new ComplexRuleJustificationBySpec() :
-            super.getJustification(r);
+        return r == getContractRule() 
+               ? new ComplexRuleJustificationBySpec() 
+               : super.getJustification(r);
     }
 
 
@@ -133,6 +134,4 @@ public class JavaProfile extends AbstractProfile {
     public Class<? extends POBrowser> getPOBrowserClass() {
 	return POBrowser.class;
     }
-
-  
 }

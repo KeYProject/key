@@ -9,6 +9,7 @@
 package de.uka.ilkd.key.smt;
 
 import java.util.Collection;
+import java.util.Set;
 import java.util.HashSet;
 import java.util.LinkedList;
 
@@ -86,9 +87,11 @@ public class SMTRule  extends ProcessLauncher implements BuiltInRule{
     private final boolean multiRule;
     
     private final boolean background;
-    
 
     public enum WaitingPolicy {STOP_FIRST,WAIT_FOR_ALL};
+    
+    /** Latest status update to the user */
+    private String lastStatus = "";
  
   
     public void init(){
@@ -339,7 +342,7 @@ public class SMTRule  extends ProcessLauncher implements BuiltInRule{
     public SMTSolverResult run(Term term , Services services, Constraint constraint,
 	    TacletIndex tacletIndex){
 	start(term,services,constraint,false, tacletIndex);
-	return this.getResults().getFirst();
+	return getFirstResult();
     }
     
     /**
@@ -353,7 +356,7 @@ public class SMTRule  extends ProcessLauncher implements BuiltInRule{
      */
     public SMTSolverResult run(Goal goal, Services services, Constraint constraint){
 	start(goal,constraint,false,WaitingPolicy.WAIT_FOR_ALL);
-	return this.getResults().getFirst();
+	return getFirstResult();
     }
     
 
@@ -375,7 +378,7 @@ public class SMTRule  extends ProcessLauncher implements BuiltInRule{
 	    return null;
 	}
 	start(formula,services,constraint,false);
-	return this.getResults().getFirst();
+	return getFirstResult();
     }
     
     
@@ -427,22 +430,17 @@ public class SMTRule  extends ProcessLauncher implements BuiltInRule{
      * If you use an own thread for this rule (see <code>start(...)<code>), you
      * must call this method after executing the external provers.
      */
-    public void applyResults() {
+    public String applyResults() {
 
-	LinkedList<SolverSession.InternResult> result = new LinkedList<SolverSession.InternResult>();
-	for (SMTSolver solver : getInstalledSolvers()) {
-	    // if( !solver.running()){
-	    AbstractSMTSolver s = (AbstractSMTSolver) solver;
-
-	    result.addAll(s.getSession().getResults());
-	    // }
-
+	Set<SolverSession.InternResult> results = getInternResults();
+	if (results.size() == 0) {
+	    return "";
 	}
-	if (result.size() == 0) {
-	    return;
-	}
+        
+        Proof p = results.iterator().next().getGoal().proof(); // ufff
+        int nrOfGoalsBefore = p.openGoals().size();
 
-	for (final SolverSession.InternResult res : result) {
+	for (final SolverSession.InternResult res : results) {
 	    final BuiltInRuleApp birApp 
 	    	= new BuiltInRuleApp(this, null, userConstraint);
 	    Goal goal = res.getGoal();
@@ -460,6 +458,16 @@ public class SMTRule  extends ProcessLauncher implements BuiltInRule{
 		}
 	    }
 	}
+        int nrOfGoalsAfter = p.openGoals().size();
+        return lastStatus+": "+goalsMessage(nrOfGoalsBefore, nrOfGoalsAfter);
+    }
+    
+    private String goalsMessage(int before, int after) {
+        int closed = before - after;
+        String message = " Closed " + closed + " goal";
+        if ( closed != 1 ) message += "s";             
+        message += ", " + after + " remaining"; 
+        return message;
     }
     
     
@@ -468,8 +476,9 @@ public class SMTRule  extends ProcessLauncher implements BuiltInRule{
      * If the rule consists of multiple provers: The method does not merge the results in a semantic way,
      * but add them all to the returned list.
      */
-    public LinkedList<SMTSolverResult> getResults(){
-	HashSet<SolverSession.InternResult> result = new HashSet<SolverSession.InternResult>();
+    public Set<SolverSession.InternResult> getInternResults(){
+	Set<SolverSession.InternResult> result = 
+            new HashSet<SolverSession.InternResult>();
 	
 	for(SMTSolver solver : getInstalledSolvers()){
 	    AbstractSMTSolver s = (AbstractSMTSolver) solver;
@@ -477,14 +486,14 @@ public class SMTRule  extends ProcessLauncher implements BuiltInRule{
 	    result.addAll(s.getSession().getResults());
 	  
 	}
-	LinkedList<SMTSolverResult> toReturn = new LinkedList<SMTSolverResult>();
-	
-	for(SolverSession.InternResult res  : result ){
-	    toReturn.add(res.getResult());
-	}
-	return toReturn;
+	return result;
 	
     }
+    
+    public SMTSolverResult getFirstResult() {
+        return getInternResults().iterator().next().getResult();
+    }
+    
     
     public String toString(){
 	return displayName();
@@ -501,17 +510,16 @@ public class SMTRule  extends ProcessLauncher implements BuiltInRule{
 	return ((double)temp)/Math.pow(10, digits);
     }
     
-    private void showTimeStatus(SMTProgressMonitor mon, long time, long maxTime,  
-	    Status interrupt){
+    public String timeStatus(long time, long maxTime, Status interrupt) {
 	String text="";
 	double t = cut(((double)time)/1000,1);
-	String ts = t+ " sec.";
+	String ts = t+ " s";
 	switch(interrupt){
 	case EXCEPTION:
 	    text = "Interrupted by exception after " + ts;
 	    break;
 	case NORMAL:
-	    text = "Stopped after "+ ts;
+	    text = "Finished after "+ ts;
 	    break;
 	    
 	case RUNNING:
@@ -524,12 +532,16 @@ public class SMTRule  extends ProcessLauncher implements BuiltInRule{
 	case USER_INTERRUPTION:
 	    text = "Interrupted by user after "+ ts;
 	    break;
-	
 	}
-	if(interrupt!= Status.RUNNING){
-	    mon.setFinished();
-	}
-	mon.setTimeProgress(text, getCurrentProgress(time, maxTime));
+        return text;
+    }
+    
+    private void showTimeStatus(SMTProgressMonitor mon, 
+                                long time, long maxTime,  
+                                Status interrupt) {
+	if (interrupt!= Status.RUNNING) mon.setFinished();
+        lastStatus = timeStatus(time, maxTime, interrupt);
+	mon.setTimeProgress(lastStatus, getCurrentProgress(time, maxTime));
     }
     
  
@@ -657,7 +669,8 @@ class EmptyRule extends SMTRule{
     }
 
     
-    public void applyResults(){
+    public String applyResults(){
+        return "";
     }
     
 

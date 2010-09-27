@@ -14,7 +14,6 @@ import java.util.List;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.gui.IMain;
-import de.uka.ilkd.key.gui.configuration.LibrariesSettings;
 import de.uka.ilkd.key.java.recoderext.RecoderModelTransformer;
 import de.uka.ilkd.key.logic.Choice;
 import de.uka.ilkd.key.logic.Named;
@@ -81,12 +80,6 @@ public class LDTInput implements EnvInput {
             result.putAll(keyFile.readIncludes());
         }
 	return result;
-    }
-
-
-    public LibrariesSettings readLibrariesSettings()
-    		throws ProofInputException {
-	return new LibrariesSettings();
     }
 
 

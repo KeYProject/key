@@ -170,7 +170,7 @@ public class TemporarySettings extends Settings {
 	    }
 
 	    DefaultMutableTreeNode tacletOptions = new DefaultMutableTreeNode();
-	    tacletOptions.setUserObject(new ContentItem("Taclets",
+	    tacletOptions.setUserObject(new ContentItem("Taclet Translation",
 		    buildModel("Taclets", getTacletOptionsData())));
 
 	    DefaultMutableTreeNode tacletSelection = new DefaultMutableTreeNode();
@@ -226,10 +226,10 @@ public class TemporarySettings extends Settings {
 
 		    public void eventChange() {}
 		    public String getInfo(){
-			return "There are two ways to make supported provers applicable for KeY:\n" +
-				"1. Specify the absolute path of the prover in the field below.\n"+
-				"2. Change the enviroment variable $PATH of your system, so that it " +
-				"refers to the installed prover.";
+			return "There are two ways to make supported solvers usable in KeY:\n" +
+				"1. Specify the absolute path of the solver in the field below.\n"+
+				"2. Change the  $PATH enviroment variable of your system, so that it " +
+				"contains the installed solver.";
 		    }
 	            
 	        },
@@ -269,18 +269,18 @@ public class TemporarySettings extends Settings {
 
 	
                     public boolean prepareValues() {
-		        setTitle("Use this prover for the rule 'multiple provers'.");
+		        setTitle("Use this solver for the rule 'multiple solvers'.");
 		        setSelected(((TemporarySolverSettings) getUserObject()).useForMulitpleProvers);
 	                return true;
                     }
 
                     public String getInfo(){
-                	return "All provers for which this option is activated" +
-                		" are executed concurrently when the rule 'multiple provers'"+
+                	return "All solvers for which this option is activated" +
+                		" are executed concurrently when the rule 'multiple solvers'"+
                 		" is applied.\n\n"+
-                		"This option must be activated for at least two provers to"+
+                		"This option must be activated for at least two solvers to"+
                 		" enable the rule"+
-                		" 'multiple provers'.";
+                		" 'multiple solvers'.";
                     }
 	
 	        },
@@ -333,9 +333,7 @@ public class TemporarySettings extends Settings {
 	    @Override
 	    public String getInfo() {
 		return "If you activate this option, a dialog " +
-		"will pop up showing results after executing the solvers.\n"+
-		"This dialog may help you to relate the results to the corresponding\n" +
-		"goals.";
+		"showing detailed results will pop up after executing the solvers.";
 	    }
 	},
 
@@ -392,7 +390,7 @@ public class TemporarySettings extends Settings {
 	new TableSaveToFile() {
 
 	    public boolean prepareValues() {
-		setTitle("Store translation to file:");
+		setTitle("Store goal translations to file:");
 		setFolder(folder);
 		setActivated(storeToFile);
 		//enable(storeToFile);
@@ -449,11 +447,11 @@ public class TemporarySettings extends Settings {
 			"can decide whether he wants to accept the results.\n" +
 			"\n" +
 			"2. Option: The progress dialog is closed once the " +
-			"external provers have done their work or the time limit " +
+			"external solvers have done their work or the time limit " +
 			"has been exceeded.\n"+
 			"\n"+
 			"3. Option: The progress dialog is closed once the first " +
-			"external prover has successfully solved all given goals " +
+			"external solver has successfully solved all given goals " +
 			"or the time limit has been exceeded.";
 	    }
       
@@ -482,7 +480,8 @@ public class TemporarySettings extends Settings {
             }
             
             public String getInfo() {
-        	return "Timeout for the external solvers in seconds. Fractions of a second are allowed.\n" +
+        	return "Timeout for the external solvers in seconds (for all goals together). "+
+                       "Fractions of a second are allowed.\n" +
         		"Example: 6.5";
             };
 
@@ -504,7 +503,7 @@ public class TemporarySettings extends Settings {
 		        setFolder(tacletFolder);
 		        setActivated(storeTacletsToFile);
 		        //enable(storeTacletsToFile);
-		        setTitle("Store taclet translation to file:");
+		        setTitle("Store taclet translations to file:");
 		        return true;
 		    }
 

@@ -555,13 +555,13 @@ public class JMLSpecFactory {
         //translate expression
         FormulaWithAxioms inv;
         try{
-         inv = translator.translateExpression(originalInv,
-                                                               kjt,
-                                                               selfVar,
-                                                               null,
-                                                               null,
-                                                               null,
-                                                               null);        
+            inv = translator.translateExpression(originalInv,
+        	    				 kjt,
+                                                 selfVar,
+                                                 null,
+                                                 null,
+                                                 null,
+                                                 null);        
         } catch (SLTranslationException sle) {
             throw sle;
         } catch (Exception e) {                   

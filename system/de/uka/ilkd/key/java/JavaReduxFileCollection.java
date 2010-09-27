@@ -39,13 +39,13 @@ import de.uka.ilkd.key.util.KeYResourceManager;
  * 
  * @author mulbrich
  */
-class JavaReduxFileCollection implements FileCollection {
+public class JavaReduxFileCollection implements FileCollection {
 
     /**
      * The location where the libraries to be parsed can be found. It will be
      * used as a resource path relative to the path of the package.
      */
-    private static String JAVA_SRC_DIR = "JavaRedux";
+    public static final String JAVA_SRC_DIR = "JavaRedux";
 
     /**
      * The resource location

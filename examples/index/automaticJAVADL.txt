@@ -142,7 +142,6 @@
 ./quantifiers/triggers0.key
 ./regularExpressions/example1.key
 ./regularExpressions/example2.key
-./regularExpressions/example3.key
 ./staticInitialisation/cascadeStaticInitialisation.key
 ./staticInitialisation/constantFieldIsNoActiveUse.key
 ./staticInitialisation/erroneousClassImpliesErroneousSubclass.key
@@ -153,7 +152,6 @@
 ./staticInitialisation/staticInitialisersAreNonSimple.key
 ./strings/charAt0.key
 ./strings/charAt1.key
-./strings/concat0.key
 ./strings/concat1.key
 ./strings/deriveLength1.key
 ./strings/emptyStringLengthZero.key

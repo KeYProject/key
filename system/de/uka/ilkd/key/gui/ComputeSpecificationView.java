@@ -72,6 +72,30 @@ public class ComputeSpecificationView {
 	ButtonGroup prestateRememberGroup = new ButtonGroup();
 	JMenu rememberMenu = new JMenu("Specification Extraction");
 
+	JMenuItem extractSpecification = new JMenuItem("Extract Specification");
+
+	extractSpecification.addActionListener(new ActionListener() {
+		public void actionPerformed(ActionEvent e) {
+                    final KeYMediator mediator = Main.getInstance().mediator();
+		    if (mediator.ensureProofLoaded()) {
+			//@internal we don't want to block UI just
+			//because we are about to calculate a lot of
+			//things, now. Also the interactive prover
+			//might want to run during the execution of
+			//ComputeSpecification
+			new Thread(new Runnable() {
+				public void run() {
+				    show(mediator);
+				}
+			    }).start();
+		    }
+		}
+	    });
+
+	rememberMenu.add(extractSpecification);
+	rememberMenu.add(new JSeparator());
+
+
 	rememberMenu.add(createRadioButton_Prestate(prestateRememberGroup,
 						    "Prestate Remember Equations",
 						    ComputeSpecification.PRESTATE_REMEMBER_EQUATIONS));

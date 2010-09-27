@@ -5,9 +5,8 @@
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
-package de.uka.ilkd.key.speclang.translation;
 
-import java.util.Iterator;
+package de.uka.ilkd.key.speclang.translation;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.JavaInfo;
@@ -22,8 +21,10 @@ public class SLMethodResolver extends SLExpressionResolver {
 
     private TermBuilder tb = TermBuilder.DF;
     
-    public SLMethodResolver(JavaInfo javaInfo, SLResolverManager manager) {
-        super(javaInfo, manager);
+    public SLMethodResolver(JavaInfo javaInfo, 
+	    		    SLResolverManager manager,
+	    		    KeYJavaType specInClass) {
+        super(javaInfo, manager, specInClass);
     }
 
     protected SLExpression doResolving(SLExpression receiver,

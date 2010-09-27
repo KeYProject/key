@@ -548,7 +548,7 @@ public class StrategySelectionView extends JPanel {
             }
         });
         
-        JButton go = new JButton(Main.autoModeAction);
+        JComponent go = Main.createAutoModeButton();
 
         
         JCheckBox resumeAutoMode = createResumeAutoModeCheckBox();

@@ -19,6 +19,7 @@ import de.uka.ilkd.key.proof.CountingBufferedReader;
 import de.uka.ilkd.key.proof.ProblemLoader;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
+import de.uka.ilkd.key.speclang.SLEnvInput;
 import de.uka.ilkd.key.util.ProgressMonitor;
 
 
@@ -87,9 +88,19 @@ public class KeYUserProblemFile extends KeYFile implements ProofOblInput{
             throw new ProofInputException(e);
         } catch (FileNotFoundException fnfe) {
             throw new ProofInputException(fnfe);
-        } finally {
-            close();
-        }
+        } 
+    }
+    
+    
+    public void read(ModStrategy mod) throws ProofInputException {
+	super.read(mod);
+	
+        //read in-code specifications
+        SLEnvInput slEnvInput = new SLEnvInput(readJavaPath(), 
+        				       readClassPath(), 
+        				       readBootClassPath());
+        slEnvInput.setInitConfig(initConfig);
+        slEnvInput.read(mod);
     }
 
 

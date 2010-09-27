@@ -185,7 +185,7 @@ public class TestTacletTranslation extends TestCommons {
 		try {
 		    rule.setMaxTime(3000);
 		    rule.start(g, proof.getUserConstraint().getConstraint(), false);
-		    result = rule.getResults().getFirst();
+		    result = rule.getFirstResult();
 		} catch (Exception e) {
 		    e.printStackTrace();
 		    assertTrue("Error while executing the solver: " + error

@@ -14,8 +14,10 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 
 public class SLTypeResolver extends SLExpressionResolver {
 
-    public SLTypeResolver(JavaInfo javaInfo, SLResolverManager manager) {
-        super(javaInfo, manager);
+    public SLTypeResolver(JavaInfo javaInfo, 
+	    		  SLResolverManager manager,
+	    		  KeYJavaType specInClass) {
+        super(javaInfo, manager, specInClass);
     }
 
     protected boolean canHandleReceiver(SLExpression receiver) {
@@ -56,5 +58,4 @@ public class SLTypeResolver extends SLExpressionResolver {
     public boolean needVarDeclaration(String name) {
         return false;
     }
-
 }

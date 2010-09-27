@@ -30,8 +30,10 @@ class OCLAttributeResolver extends SLExpressionResolver {
     private static final TermFactory tf = TermFactory.DEFAULT;
     private final Services services;
     
-    public OCLAttributeResolver(Services services, SLResolverManager manager) {
-        super(services.getJavaInfo(), manager);
+    public OCLAttributeResolver(Services services, 
+	    			SLResolverManager manager,
+	    			KeYJavaType specInClass) {
+        super(services.getJavaInfo(), manager, specInClass);
         this.services = services;
     }    
     
@@ -58,7 +60,6 @@ class OCLAttributeResolver extends SLExpressionResolver {
         ProgramVariable attribute;
         
         try{
-        
             //try as fully qualified name
             attribute = javaInfo.getAttribute(name);
         } catch(IllegalArgumentException e){

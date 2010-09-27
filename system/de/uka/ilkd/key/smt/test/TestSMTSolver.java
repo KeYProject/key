@@ -78,6 +78,9 @@ public abstract class TestSMTSolver extends TestCommons {
 	if (!toolNotInstalledChecked()) {    
 	    isinstalled = this.getSolver().isUsable();
 	    setToolNotInstalledChecked(true);
+	    if(!isinstalled) {
+		System.out.println("Warning: " + getSolver() + " not installed, tests skipped.");	    
+	    }
 	}
 	
 	return !isinstalled;
@@ -231,13 +234,11 @@ public abstract class TestSMTSolver extends TestCommons {
 	Proof proof = p.getProofs()[0];	    
 	Assert.assertTrue(proof.openGoals().size() == 1);		
 	Goal g = proof.openGoals().iterator().next();
-
 	
 	rule.setMaxTime(2000);
 	rule.start(g, proof.getUserConstraint().getConstraint(),false);
-	LinkedList<SMTSolverResult> toReturn = rule.getResults();
 	
-	return toReturn.getFirst();
+	return rule.getFirstResult();
     }
     
 }

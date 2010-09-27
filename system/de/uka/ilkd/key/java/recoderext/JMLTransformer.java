@@ -47,7 +47,8 @@ public class JMLTransformer extends RecoderModelTransformer {
                                                          "public", 
                                                          "static"});    
     
-    private static ImmutableSet<PositionedString> warnings;
+    private static ImmutableSet<PositionedString> warnings 
+    	= DefaultImmutableSet.<PositionedString>nil();
 
     private HashMap<TypeDeclaration, List<Method>> typeDeclaration2Methods;
 
@@ -530,14 +531,42 @@ public class JMLTransformer extends RecoderModelTransformer {
     
     public ProblemReport analyze() {
 	 for(int i = 0, m = getUnits().size(); i < m; i++) {
-             CompilationUnit unit = getUnits().get(i);
+             final CompilationUnit unit = getUnits().get(i);
              
-             //copy comments of compilation unit to primary type declaration
-             if(unit.getComments() != null 
-                     && unit.getTypeDeclarationCount() > 0) {
-                 TypeDeclaration td = unit.getPrimaryTypeDeclaration();
-                 ASTList<Comment> tdComments = new ASTArrayList<Comment>(); 
-                 tdComments.addAll(unit.getComments().deepClone());
+             //move comments of type declarations to previous type declaration
+             //(because RecodeR attaches comments appearing at the end of a type 
+             // declaration to the next one; for example, in a unit with the 
+             // text 
+             //     class A {
+             //        //@ invariant true;
+             //     }
+             //     class B {}
+             // the invariant will appear as a comment of B. We move it to A 
+             // here.)
+             for(int j = 1; j < unit.getTypeDeclarationCount(); j++) {
+        	 TypeDeclaration td1 = unit.getTypeDeclarationAt(j - 1);
+        	 TypeDeclaration td2 = unit.getTypeDeclarationAt(j);
+        	 td1.setComments(td2.getComments());
+             }
+             
+             //copy comments of compilation unit to last type declaration 
+             //(because RecodeR attaches comments appearing at the end of the 
+             // last type declaration to the unit; for example, in a unit with 
+             // the text 
+             //     class A {}
+             //     class B {
+             //        //@ invariant true;    
+	     //     }
+             // the invariant will appear as a comment of the unit. We move it 
+             // to B here.)
+             if(unit.getTypeDeclarationCount() > 0) {
+                 TypeDeclaration td 
+                 	= unit.getTypeDeclarationAt(
+                 			unit.getTypeDeclarationCount() - 1);
+                 ASTList<Comment> tdComments = new ASTArrayList<Comment>();
+                 if(unit.getComments() != null) {
+                     tdComments.addAll(unit.getComments().deepClone());
+                 }
                  td.setComments(tdComments);
              }
              
@@ -561,6 +590,7 @@ public class JMLTransformer extends RecoderModelTransformer {
 	 return NO_PROBLEM;	
     }
     
+    
     public void makeExplicit() {
         //abort if JML is disabled
         if(!ProofSettings.DEFAULT_SETTINGS.getGeneralSettings().useJML()) {
@@ -571,16 +601,7 @@ public class JMLTransformer extends RecoderModelTransformer {
             //iterate over all compilation units
             for(int i = 0, m = getUnits().size(); i < m; i++) {
                 CompilationUnit unit = getUnits().get(i);
-                
-                //copy comments of compilation unit to primary type declaration
-                if(unit.getComments() != null 
-                        && unit.getTypeDeclarationCount() > 0) {
-                    TypeDeclaration td = unit.getPrimaryTypeDeclaration();
-                    ASTList<Comment> tdComments = new ASTArrayList<Comment>(); 
-                    tdComments.addAll(unit.getComments().deepClone());
-                    td.setComments(tdComments);
-                }
-                
+                                
                 //iterate over all type declarations of the compilation unit
                 TypeDeclarationCollector tdc = new TypeDeclarationCollector();
                 tdc.walk(unit);

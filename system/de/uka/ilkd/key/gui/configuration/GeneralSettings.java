@@ -9,7 +9,6 @@
 //
 package de.uka.ilkd.key.gui.configuration;
 
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Properties;
 
@@ -23,7 +22,7 @@ import de.uka.ilkd.key.gui.GUIEvent;
 public class GeneralSettings implements Settings {
 
 
-    private static final String STUPID_MODE_KEY = "[General]StupidMode";
+    private static final String TACLET_FILTER = "[General]StupidMode";
     private static final String PROOF_ASSISTANT_MODE_KEY = "[General]ProofAssistant";
 
     private static final String SOUND_NOTIFICATION_KEY = "[General]SoundNotification";
@@ -38,7 +37,7 @@ public class GeneralSettings implements Settings {
     public static boolean disableSpecs = false;
     
     /** minimize interaction is on by default */
-    private boolean stupidMode = true;
+    private boolean tacletFilter = true;
 
     /** proof assistant is on by default */
     private boolean proofAssistantMode = true;
@@ -63,8 +62,8 @@ public class GeneralSettings implements Settings {
 
 
     // getter
-    public boolean stupidMode() {
-	return stupidMode;
+    public boolean tacletFilter() {
+	return tacletFilter;
     }
 
     
@@ -99,9 +98,9 @@ public class GeneralSettings implements Settings {
     
 
     // setter
-    public void setStupidMode(boolean b) {
-        if (stupidMode != b) {
-          stupidMode = b;
+    public void setTacletFilter(boolean b) {
+        if (tacletFilter != b) {
+          tacletFilter = b;
           fireSettingsChanged();
         }
     }
@@ -153,9 +152,9 @@ public class GeneralSettings implements Settings {
      * represents the stored settings
      */
     public void readSettings(Properties props) {
-	String val = props.getProperty(STUPID_MODE_KEY);
+	String val = props.getProperty(TACLET_FILTER);
 	if (val != null) {
-	    stupidMode = Boolean.valueOf(val).booleanValue();
+	    tacletFilter = Boolean.valueOf(val).booleanValue();
 	}
 
 	val = props.getProperty(PROOF_ASSISTANT_MODE_KEY);
@@ -191,7 +190,7 @@ public class GeneralSettings implements Settings {
      * @param props the Properties object where to write the settings as (key, value) pair
      */
     public void writeSettings(Properties props) {
-	props.setProperty(STUPID_MODE_KEY, "" + stupidMode);
+	props.setProperty(TACLET_FILTER, "" + tacletFilter);
 	props.setProperty(PROOF_ASSISTANT_MODE_KEY, "" + proofAssistantMode);
         props.setProperty(SOUND_NOTIFICATION_KEY, "" + soundNotification);
         props.setProperty(DND_DIRECTION_SENSITIVE_KEY, "" + dndDirectionSensitive);

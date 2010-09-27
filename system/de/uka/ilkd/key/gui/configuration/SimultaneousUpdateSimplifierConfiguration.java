@@ -91,10 +91,10 @@ public class SimultaneousUpdateSimplifierConfiguration extends JDialog {
     /** lays out the configuration dialog */
     public void layoutSimutanUpdatesimplifier() {	
 	JPanel checkBoxPanel = new JPanel(new GridLayout(2,1));
-	checkBoxPanel.setBorder(new TitledBorder("Current Configuration"));
+	checkBoxPanel.setBorder(new TitledBorder("Configuration"));
 
 	
-	JCheckBox delete_effectless_cb = new JCheckBox("Delete effectless updates",
+	JCheckBox delete_effectless_cb = new JCheckBox("Delete Effectless Updates",
 						   deleteEffectlessUpdates()); 
 	delete_effectless_cb.addItemListener( new ItemListener() {
 		public void itemStateChanged(ItemEvent ce) {
@@ -107,7 +107,7 @@ public class SimultaneousUpdateSimplifierConfiguration extends JDialog {
 	checkBoxPanel.add(delete_effectless_cb);
 
 
-	JCheckBox eagerModeCheckbox = new JCheckBox("One Pass Simplification",
+	JCheckBox eagerModeCheckbox = new JCheckBox("One-Pass Simplification",
 						    eagerMode()); 
 	eagerModeCheckbox.addItemListener( new ItemListener() {
 		public void itemStateChanged(ItemEvent ce) {

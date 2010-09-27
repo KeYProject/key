@@ -293,7 +293,7 @@ public final class UsedTaclets {
 	
 	DefaultMutableTreeNode root = new DefaultMutableTreeNode(rootItem);
 
-	DefaultMutableTreeNode node1 = newNode(root, "proof independent",Category.PROOF_INDEPENDENT);
+	DefaultMutableTreeNode node1 = newNode(root, "proof-independent",Category.PROOF_INDEPENDENT);
 
 	DefaultMutableTreeNode node2 = newNode(node1, "boolean rules",Category.BOOLEAN_RULES);
 	addTaclet(node2, "boolean_equal_2");
@@ -375,7 +375,7 @@ public final class UsedTaclets {
 	addTaclet(node5, "translateJavaBitwiseXOrInt");
 	addTaclet(node5, "translateJavaBitwiseXOrLong");
 
-	DefaultMutableTreeNode node6 = newNode(root, "proof dependent",Category.PROOF_DEPENDENT);
+	DefaultMutableTreeNode node6 = newNode(root, "proof-dependent",Category.PROOF_DEPENDENT);
 
 	DefaultMutableTreeNode node7 = newNode(node6, "cast operator",Category.CAST_OPERATOR);
 	addTaclet(node7, "castDel",1);

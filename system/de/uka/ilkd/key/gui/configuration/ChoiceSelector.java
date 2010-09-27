@@ -40,7 +40,7 @@ public class ChoiceSelector extends JDialog {
     /** creates a new ChoiceSelector, using the <code>ChoiceSettings</code>
      * from <code>settings</code> */
     public ChoiceSelector(ChoiceSettings settings) {  
-	super(new JFrame(), "Select Default Choices", true);
+	super(new JFrame(), "Taclet Base Configuration", true);
        	this.settings = settings;
 	category2DefaultChoice = settings.getDefaultChoices();
 	if(category2DefaultChoice.isEmpty()){
@@ -95,7 +95,7 @@ public class ChoiceSelector extends JDialog {
 	    JScrollPane(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED, 
 			ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 	choiceScrollPane.getViewport().setView(choiceList);
-	choiceScrollPane.setBorder(new TitledBorder("Default Option"));
+	choiceScrollPane.setBorder(new TitledBorder("Choice"));
 
 	JButton ok = new JButton("OK");
 	ok.addActionListener(new ActionListener() {
@@ -105,7 +105,7 @@ public class ChoiceSelector extends JDialog {
 			    (ChoiceSelector.this,
 			     "Your changes will become effective when "+
 			     "the next problem is loaded.\n", 
-			     "Taclet Option Settings", 
+			     "Taclet Options", 
 			     JOptionPane.DEFAULT_OPTION,
 			     JOptionPane.QUESTION_MESSAGE, null,
 			     new Object[]{"OK", "Cancel"}, "OK");

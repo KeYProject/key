@@ -52,19 +52,23 @@ public class UsedSpecificationsDialog extends JDialog {
     // constructors
     // -------------------------------------------------------------------------
 
-    protected UsedSpecificationsDialog(Services services,
-	    ImmutableSet<ContractWithInvs> contractApps) {
-	super(Main.getInstance(), "Used Specifications", true);
+    protected UsedSpecificationsDialog(
+	    	Services services,
+	    	ImmutableSet<ContractWithInvs> contractApps) {
+	super(Main.getInstance(), "Specifications Used in the Proof", true);
 	this.services = services;
 
 	// break contract apps down to atomic contracts
-	ImmutableSet<ContractWithInvs> atomicContractApps = DefaultImmutableSet
-	        .<ContractWithInvs> nil();
+	ImmutableSet<ContractWithInvs> atomicContractApps 
+		= DefaultImmutableSet.<ContractWithInvs> nil();
 	for (ContractWithInvs cwi : contractApps) {
-	    for (OperationContract atomicContract : services
-		    .getSpecificationRepository().splitContract(cwi.contract)) {
-		ContractWithInvs atomicCwi = new ContractWithInvs(
-		        atomicContract, cwi.assumedInvs, cwi.ensuredInvs);
+	    for (OperationContract atomicContract : 
+			services.getSpecificationRepository()
+			        .splitContract(cwi.contract)) {
+		ContractWithInvs atomicCwi 
+			= new ContractWithInvs(atomicContract, 
+					       cwi.assumedInvs, 
+					       cwi.ensuredInvs);
 		atomicContractApps = atomicContractApps.add(atomicCwi);
 	    }
 	}
@@ -132,6 +136,7 @@ public class UsedSpecificationsDialog extends JDialog {
 	Dimension largeButtonDim = new Dimension(145, 27);
 	Dimension extraLargeButtonDim = new Dimension(170, 27);
 	getContentPane().add(buttonPanel);
+        buttonPanel.add(new JLabel("Prove that selected spec: "));
 
 	createPOButtonPanel(services, atomicContractApps, buttonPanel,
 	        largeButtonDim, extraLargeButtonDim);
