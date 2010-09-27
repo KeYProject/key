@@ -138,13 +138,7 @@ public class KeYFile implements EnvInput {
                 throw new ProofInputException(fnfe);
             } catch (de.uka.ilkd.key.util.ExceptionHandlerException ehe) {
                 throw new ProofInputException(ehe.getCause().getMessage());
-            } finally {
-        	try {
-	            is.close();
-                } catch (IOException e) {
-                    throw new ProofInputException(e);
-                }
-            }
+            } 
         }
         return settings;
     }
@@ -481,7 +475,4 @@ public class KeYFile implements EnvInput {
 	return externalForm.hashCode();
     }
     
-    public void finalize() {
-	close();
-    }
 }

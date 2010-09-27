@@ -88,9 +88,7 @@ public class KeYUserProblemFile extends KeYFile implements ProofOblInput{
             throw new ProofInputException(e);
         } catch (FileNotFoundException fnfe) {
             throw new ProofInputException(fnfe);
-        } finally {
-            close();
-        }
+        } 
     }
     
     
