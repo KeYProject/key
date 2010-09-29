@@ -99,8 +99,8 @@ public class KeYResourceManager {
     /**
      * Creates an icon from an image contained in a resource.
      * The resource is fist search using the package name of the calling Object
-     * and if it is not found there the packagename of its superclass is used
-     * recusrivly.
+     * and if it is not found there the package name of its superclass is used
+     * recursively.
      * @param o the Object reference to the calling object
      * @param filename String the name of the file to search (only relative
      * pathname to the path of the calling class)
@@ -114,13 +114,13 @@ public class KeYResourceManager {
      * Creates an icon from an image contained in a resource.
      * The resource is fist search using the package name of the given class
      * and if the resource is not found the packagename of its superclass is used
-     * recursivly.
+     * recursively.
      * @param cl the Class the resource is looked for
      * @param filename String the name of the file to search  (only relative
      * pathname to the path of the calling class)
      * @return the newly created image
      */
-    public ImageIcon createImageIcon(Class cl, String filename) {
+    public ImageIcon createImageIcon(Class<?> cl, String filename) {
 	URL iconURL = cl.getResource(filename);
 	Debug.out("Load Resource:" + filename + " of class "+cl);
 	if (iconURL == null && cl.getSuperclass() != null) {
