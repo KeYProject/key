@@ -992,6 +992,21 @@ public class Main extends JFrame implements IMain {
                     JOptionPane.INFORMATION_MESSAGE);
         }
     }
+   
+    private void showUsedSpecifications() {
+	Proof currentProof = mediator.getProof();
+        if(currentProof == null) {
+            mediator.notify(new GeneralInformationEvent("No Specifications available.",
+                    "If you wish to see the used specifications "
+                    + "for a proof you have to load one first"));
+        } else {
+            new UsedSpecificationsDialog(
+                         mediator.getServices(), 
+                         mediator.getSelectedProof()
+                                 .getBasicTask()
+                                 .getUsedSpecs());
+        }
+    }
     
     protected void showTypeHierarchy() {
         Proof currentProof = mediator.getProof();
@@ -1408,12 +1423,12 @@ public class Main extends JFrame implements IMain {
         JMenuItem methodContractsItem = new JMenuItem("Show Used Specifications...");
         methodContractsItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                new UsedSpecificationsDialog(
-                             mediator.getServices(), 
-                             mediator.getSelectedProof()
-                                     .getBasicTask()
-                                     .getUsedSpecs());
-            }});
+                showUsedSpecifications();
+            }
+        });
+
+
+	 
         registerAtMenu(proof, methodContractsItem);
 
         final JMenuItem statisticsInfo = new JMenuItem("Show Proof Statistics");
