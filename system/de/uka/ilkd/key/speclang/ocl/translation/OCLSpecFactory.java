@@ -171,14 +171,16 @@ public class OCLSpecFactory {
         TermBuilder tb = TermBuilder.DF;
         TermFactory tf = tb.tf();
         
-        Term[] argTerms = new Term[programMethod.getParameterDeclarationCount()+(programMethod.isStatic() ? 0 : 1)];
+        boolean staticMethod = programMethod.isStatic();
+        Term[] argTerms = new Term[programMethod.getParameterDeclarationCount()+(staticMethod ? 0 : 1)];
         int i=0;
-        if(!programMethod.isStatic()){
-                argTerms[0] = tb.var(selfVar);
+        if(!staticMethod){
+           argTerms[0] = tb.var(selfVar);
+           i++;
         }
 
         for(; i<argTerms.length; i++){
-            argTerms[i] = tb.var((ProgramVariable) programMethod.getParameterDeclarationAt(i).
+            argTerms[i] = tb.var((ProgramVariable) programMethod.getParameterDeclarationAt(i - (staticMethod ? 0 : 1)).
                     getVariableSpecification().getProgramVariable());
         }
         
