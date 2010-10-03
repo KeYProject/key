@@ -596,11 +596,23 @@ public class Main extends JFrame implements IMain {
         
         addTab("Goals", openGoalsView, "The currently open goals");
         
-        tabbedPane.addTab("User Constraint", null, userConstraintView,
-        "Currently chosen metavariable instantiations");
-        
-        tabbedPane.addTab("Proof Search Strategy", null, strategySelectionView,
-        "Select strategy for automated proof search");
+        String laf = UIManager.getLookAndFeel().getClass()+"";
+        if (laf.contains("Aqua")) {
+            // Apple uses scrolling (not multiple rows) for overlong tab
+            // lists. Let the Apple user scroll less for important tabs.
+            tabbedPane.addTab("Proof Search Strategy", null, strategySelectionView,
+            "Select strategy for automated proof search");
+
+            tabbedPane.addTab("User Constraint", null, userConstraintView,
+            "Currently chosen metavariable instantiations");
+        } else {
+            // This arrangement looks better on other platforms
+            tabbedPane.addTab("User Constraint", null, userConstraintView,
+            "Currently chosen metavariable instantiations");
+
+            tabbedPane.addTab("Proof Search Strategy", null, strategySelectionView,
+            "Select strategy for automated proof search");
+        }
         
         tabbedPane.addTab("Rules", null, new JScrollPane(ruleView), "All available rules");
         tabbedPane.setSelectedIndex(0);
