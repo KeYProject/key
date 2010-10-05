@@ -9,7 +9,6 @@
 //
 package de.uka.ilkd.key.java.visitor;
 
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 

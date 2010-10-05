@@ -24,7 +24,6 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.ProgVarReplacer;
-import de.uka.ilkd.key.rule.soundness.TermProgramVariableCollector;
 
 
 public class InnerVariableNamer extends VariableNamer {
@@ -115,7 +114,7 @@ public class InnerVariableNamer extends VariableNamer {
         
         if (!newname.equals(name)) {        
             newvar = new LocationVariable(newname,
-                    var.getKeYJavaType());
+                    			  var.getKeYJavaType());
             map.put(var, newvar);
             renamingHistory = map;
             //execute renaming

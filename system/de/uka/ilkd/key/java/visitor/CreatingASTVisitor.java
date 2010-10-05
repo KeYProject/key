@@ -151,6 +151,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
             changed();
         } else {
             doDefaultAction(x);
+            performActionOnLoopInvariant(x, x);            
         }
     }
 
