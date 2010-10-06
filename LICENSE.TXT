@@ -1,11 +1,11 @@
        KeY - INTEGRATED DEDUCTIVE SOFTWARE DESIGN 
             
-       Copyright (C) 2001-2009 Universitaet Karlsruhe (TH), Germany 
+       Copyright (C) 2001-2010 Karlsruhe Institue of Technology, Germany 
                                Universitaet Koblenz-Landau, Germany
                                Chalmers University of Technology, Sweden
 
 
-       Universitaet Karlsruhe (TH)
+       Karlsruhe Institue of Technology
        Institut fuer Theoretische Informatik
        Am Fasanengarten 5
        D-76131 Karlsruhe

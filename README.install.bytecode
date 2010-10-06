@@ -1,6 +1,6 @@
 		********************************
 		* KeY Byte Code Installation   * 
-		*        Version 1.5.x         *
+		*        Version 1.7.x         *
 		*        Nightly Builds        *
                 *     (Development Version)    *
 		********************************
@@ -19,7 +19,6 @@ Needed additional Libraries:
 	antlr.jar Version >= 2.7.2: parser generator
 	recoderKey.jar
                  a transformation framework for java patched by the KeY group
-	log4j.jar
 
 Optionally, KeY can make use of the following binaries:
 	ESC Java's decision procedure 'Simplify'
