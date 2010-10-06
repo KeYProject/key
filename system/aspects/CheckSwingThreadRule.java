@@ -1,17 +1,17 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2003 Universitaet Karlsruhe, Germany
-//                         and Chalmers University of Technology, Sweden          
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
 //
-
+//
 package aspects;
 
 import java.awt.*;
 import java.util.*;
 import javax.swing.JComponent;
-import org.apache.log4j.Logger;
 
 /** An aspect that tries to detect violations of the Swing
  * Single-Thread Rule.  It seems that the rule also applies to methods
@@ -23,8 +23,6 @@ import org.apache.log4j.Logger;
  * level to see anything.
  */
 public aspect CheckSwingThreadRule extends KeYAspect {
-
-    private Logger aspectLogger = Logger.getLogger("key.aspects");
 
     pointcut threadSafeCalls()
         : call(void JComponent.revalidate())
@@ -59,12 +57,14 @@ public aspect CheckSwingThreadRule extends KeYAspect {
 		+ thisJoinPointStaticPart.getSourceLocation()
 		+ "\nThread: " + Thread.currentThread();
 	    if (t instanceof Component) {
-		aspectLogger.error("Violation: Swing view method called"
+		Debug.log4jerror("Violation: Swing view method called"
 				   +" from nonAWT thread for visible object\n"
-				   + info);
+				   + info,
+				   "key.aspects");
 	    } else {
-		aspectLogger.warn("Possible Violation: Model method" 
-				  + " called from nonAWT thread\n"+info);
+		Debug.log4jwarn("Possible Violation: Model method" 
+				  + " called from nonAWT thread\n"+info,
+				  "key.aspects");
 	    }
 	}
 

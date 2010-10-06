@@ -12,8 +12,6 @@ package de.uka.ilkd.key.rule.soundness;
 
 import java.util.Stack;
 
-import org.apache.log4j.Logger;
-
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.ArrayType;
@@ -78,8 +76,6 @@ public class StaticProgramChecker
      * arities of nodes, etc.
      */
     private final KeYJavaType LEVEL   = new KeYJavaType ();
-
-    private final Logger logger = Logger.getLogger ( "key.taclet_soundness" );
 
     public StaticProgramChecker ( ProgramElement p_root,
 				  Services       p_services ) {
@@ -1119,7 +1115,8 @@ public class StaticProgramChecker
 	    if ( o == LEVEL )
 	    	break;
 	    else
-	    	logger.warn ( "Superfluous element on type stack: " + o );
+	    	Debug.log4jWarn ( "Superfluous element on type stack: " + o,
+	    			  "key.taclet_soundness");
 	}
     }    
 
@@ -1133,17 +1130,18 @@ public class StaticProgramChecker
     }
 
     private void printTypeStack () {
-        logger.debug ( "StaticProgramChecker, current type stack:" );
-        logger.debug ( "[ " );
+        Debug.log4jDebug ( "StaticProgramChecker, current type stack:",
+        		   "key.taclet_soundness");
+        Debug.log4jDebug ( "[ ", "key.taclet_soundness" );
         if ( typeStack.size () != 0 ) {
             int i = 0;
             while ( true ) {
-                logger.debug ( typeStack.get ( i ) );
+                Debug.log4jDebug ( typeStack.get ( i ).toString(), "key.taclet_soundness" );
                 if ( ++i == typeStack.size () ) break;
-                logger.debug ( ", " );
+                Debug.log4jDebug ( ", ", "key.taclet_soundness" );
             }
         }
-        logger.debug ( " ]" );
+        Debug.log4jDebug ( " ]", "key.taclet_soundness" );
     }
 
     /**

@@ -28,8 +28,6 @@ import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableCellRenderer;
 
-import org.apache.log4j.Logger;
-
 import de.uka.ilkd.key.logic.Constraint;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.parser.ParserException;
@@ -436,7 +434,6 @@ public class UserConstraintView extends JPanel {
             left = parseTerm ( p_left );
         } catch ( ParserException e ) {
             setErrorStatus ( e, "left" );
-            Logger.getLogger ( UserConstraintView.class.getName () ).info ( e );
             displayError ( e, newEqLeftText );
             return false;
         }
@@ -445,7 +442,6 @@ public class UserConstraintView extends JPanel {
             right = parseTerm ( p_right );
 	} catch ( ParserException e ) {
             setErrorStatus ( e, "right" );
-            Logger.getLogger ( UserConstraintView.class.getName () ).info ( e );
             displayError ( e, newEqRightText );
             return false;
         }

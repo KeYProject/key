@@ -16,7 +16,6 @@ set keyclasspath=%KEY_HOME%\system\key.jar
 
 if not exist "%KEY_LIB%\antlr.jar" (goto MISSING_LIBRARY ) else (set keyclasspath=%keyclasspath%;%KEY_LIB%\antlr.jar)
 if not exist "%KEY_LIB%\recoderKey.jar" (goto MISSING_LIBRARY ) else (set keyclasspath=%keyclasspath%;%KEY_LIB%\recoderKey.jar)
-if not exist "%KEY_LIB%\log4j.jar" (goto MISSING_LIBRARY ) else (set keyclasspath=%keyclasspath%;%KEY_LIB%\log4j.jar)
 set keysysprops=""
 
 

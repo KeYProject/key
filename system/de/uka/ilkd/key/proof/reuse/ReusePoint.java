@@ -15,8 +15,6 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Vector;
 
-import org.apache.log4j.Logger;
-
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.gui.KeYMediator;
@@ -28,6 +26,7 @@ import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.rule.inst.*;
+import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.ExtList;
 
 public class ReusePoint implements Comparable {
@@ -42,9 +41,6 @@ public class ReusePoint implements Comparable {
    private boolean goalLocalRule = false;
    
    private String s = "";
-
-   private static Logger reuseLogger = Logger.getLogger("key.proof.reuse");
-   
    
    private ReusePoint(ReusePoint other) {
       this.templateNode = other.templateNode;
@@ -162,8 +158,9 @@ public class ReusePoint implements Comparable {
             String text = "";
             if (sv.isVariableSV()) {
                 Object o = insts.getInstantiation(svTemplate);
-                reuseLogger.info(result.rule().name()+
-                    ": Copying instantiation of "+ o + " for "+ sv);
+                Debug.log4jInfo(result.rule().name()+
+                    ": Copying instantiation of "+ o + " for "+ sv,
+                    "key.proof.reuse");
 
                 if (o == null) {
                     text = 
@@ -198,8 +195,9 @@ public class ReusePoint implements Comparable {
             InstantiationEntry o = insts.getInstantiationEntry(svTemplate);
             
             if (result != null) {
-                reuseLogger.info(result.rule().name()+
-                        ": Copying instantiation of "+ o + " for "+ sv);
+                Debug.log4jInfo(result.rule().name()+
+                        ": Copying instantiation of "+ o + " for "+ sv,
+                        "key.proof.reuse");
             }
                                
             String text = "";
@@ -319,10 +317,10 @@ public class ReusePoint implements Comparable {
       c1.start();
       c2.start();
       DiffMyers d = new DiffMyers(c1.result(), c2.result());
-      reuseLogger.debug(c1.result());
-      reuseLogger.debug(c2.result());
+      Debug.log4jDebug(c1.result().toString(), "key.proof.reuse");
+      Debug.log4jDebug(c2.result().toString(), "key.proof.reuse");
       DiffMyers.change diff = d.diff_2();
-      reuseLogger.debug(diff);
+      Debug.log4jDebug(diff.toString(), "key.proof.reuse");
       if (diff != null) return diff.diminishingPenalty(); else return 0;
    }
    
@@ -347,11 +345,11 @@ public class ReusePoint implements Comparable {
       Hashtable yDiamonds = new Hashtable(5);
       createReuseSignature(x, xsig, xDiamonds);
       createReuseSignature(y, ysig, yDiamonds);
-      reuseLogger.debug(xsig);
-      reuseLogger.debug(ysig);
+      Debug.log4jDebug(xsig.toString(), "key.proof.reuse");
+      Debug.log4jDebug(ysig.toString(), "key.proof.reuse");
       DiffMyers d = new DiffMyers(xsig, ysig);
       DiffMyers.change diff = d.diff_2();
-      reuseLogger.debug(diff);
+      Debug.log4jDebug(diff.toString(), "key.proof.reuse");
       if (diff != null) thisScore = diff.uniformPenalty(); else thisScore = 0;
 
       DiffMyers.mapping map = d.getMapping();
@@ -359,14 +357,14 @@ public class ReusePoint implements Comparable {
          int from = map.from();
          int to = map.to();
          if (xsig.elementAt(from).equals("diamond")) {
-            reuseLogger.debug("diamond "+from+"<->"+to);
+            Debug.log4jDebug("diamond "+from+"<->"+to, "key.proof.reuse");
             Term d1 = (Term) xDiamonds.get(new Integer(from));
             Term d2 = (Term) yDiamonds.get(new Integer(to));
             int diamondScore = diffJava(d1.executableJavaBlock().program(),
                                         d2.executableJavaBlock().program()) / 4;
 //            System.err.println(d1);
 //            System.err.println(d2);
-            reuseLogger.debug("Diamond correspondence penalty "+ diamondScore);
+            Debug.log4jDebug("Diamond correspondence penalty "+ diamondScore, "key.proof.reuse");
             thisScore += diamondScore;
             
          }
@@ -384,28 +382,28 @@ public class ReusePoint implements Comparable {
      
       DiffMyers d = new DiffMyers(x,y);
       DiffMyers.change diff = d.diff_2();
-      reuseLogger.debug(diff);
+      Debug.log4jDebug(diff.toString(), "key.proof.reuse");
       if (diff != null) thisScore = diff.uniformPenalty(); else thisScore = 0;
       return thisScore;
    }
 
 
    void compareNoFind() {
-      reuseLogger.info("*-");
+      Debug.log4jInfo("*-", "key.proof.reuse");
 //System.err.println("Comparing terms "+x+"<->"+y);
       int localScore;
       localScore = scoreConnectNoFind(templateNode, targetGoal.node());
 //      localScore += scoreConnectSemiseq();
-      reuseLogger.info("Connectivity reward "+localScore);
+      Debug.log4jInfo("Connectivity reward "+localScore, "key.proof.reuse");
       score += localScore;
       s = s + "Connectivity: "+localScore+"\n";
 
       localScore = scoreSiblingNr(templateNode, targetGoal.node());
-      reuseLogger.info("Sibling order penalty "+localScore);
+      Debug.log4jInfo("Sibling order penalty "+localScore, "key.proof.reuse");
       score += localScore;
       s = s + "Sibling order penalty: "+localScore+"\n";
 
-      reuseLogger.info("Total score "+score);
+      Debug.log4jInfo("Total score "+score, "key.proof.reuse");
       s = s + "-------\n";
       s = s + "Total score: "+score+"\n";
       s = s + "Reuse source: "+ templateNode.serialNr()+"\n";
@@ -414,7 +412,7 @@ public class ReusePoint implements Comparable {
 
    
    void compare(Term x, Term y) {
-      reuseLogger.info("* "+getApp().rule().name());
+      Debug.log4jInfo("* "+getApp().rule().name(), "key.proof.reuse");
 //System.err.println("Comparing terms "+x+"<->"+y);
       int localScore;
       JavaBlock jx = x.executableJavaBlock();
@@ -423,32 +421,32 @@ public class ReusePoint implements Comparable {
          
          // not a symbolic execution rule
          localScore = scoreLogicalFindEqualsMod(x,y);
-         reuseLogger.info("By equalsModRenaming on find "+localScore);
+         Debug.log4jInfo("By equalsModRenaming on find "+localScore, "key.proof.reuse");
          score += localScore;
          s = s + "By equalsModRenaming on find "+localScore+"\n";
 
          localScore = diffLogical(
             templateApp.posInOccurrence().constrainedFormula().formula(),
             targetPos.constrainedFormula().formula());
-         reuseLogger.info("By diff on complete formulae "+localScore);
+         Debug.log4jInfo("By diff on complete formulae "+localScore, "key.proof.reuse");
          score += localScore;
          s = s + "By diff on complete formulae "+localScore+"\n";
 
          localScore = diffPosInTerm(templateApp.posInOccurrence().posInTerm(),
                                     targetPos.posInTerm());
-         reuseLogger.info("By diff on PosInTerm "+localScore);
+         Debug.log4jInfo("By diff on PosInTerm "+localScore, "key.proof.reuse");
          score += localScore;
          s = s + "By diff on PosInTerm "+localScore+"\n";
 
       } else { // program similarity
          if (jy.size()>1) {
              localScore = diffJava(jx.program(), jy.program());
-             reuseLogger.info("Scored java diff "+localScore);
+             Debug.log4jInfo("Scored java diff "+localScore, "key.proof.reuse");
              score += localScore;
              s = s + "Program similarity "+localScore+"\n";
          } else { // small program -- look at whole formula
              localScore = diffLogical(x, y);
-             reuseLogger.info("Scored whole formula (small program) "+localScore);
+             Debug.log4jInfo("Scored whole formula (small program) "+localScore, "key.proof.reuse");
              score += localScore;
              s = s + "By whole formula (small program) "+localScore+"\n";
          }
@@ -456,16 +454,16 @@ public class ReusePoint implements Comparable {
 
       localScore = scoreConnect(templateNode, targetGoal.node());
 //      localScore += scoreConnectSemiseq();
-      reuseLogger.info("Connectivity reward "+localScore);
+      Debug.log4jInfo("Connectivity reward "+localScore, "key.proof.reuse");
       score += localScore;
       s = s + "Connectivity: "+localScore+"\n";
 
       localScore = scoreSiblingNr(templateNode, targetGoal.node());
-      reuseLogger.info("Sibling order penalty "+localScore);
+      Debug.log4jInfo("Sibling order penalty "+localScore, "key.proof.reuse");
       score += localScore;
       s = s + "Sibling order penalty: "+localScore+"\n";
 
-      reuseLogger.info("Total score "+score);
+      Debug.log4jInfo("Total score "+score, "key.proof.reuse");
       s = s + "-------\n";
       s = s + "Total score: "+score+"\n";
       s = s + "Reuse source: "+ templateNode.serialNr()+"\n";
@@ -560,8 +558,8 @@ public class ReusePoint implements Comparable {
    // not used currently
    int twoOpAboveFind() {
       int thisScore = 0;
-      reuseLogger.debug(targetPos.posInTerm());
-      reuseLogger.debug(templateApp.posInOccurrence().posInTerm());
+      Debug.log4jDebug(targetPos.posInTerm().toString(), "key.proof.reuse");
+      Debug.log4jDebug(templateApp.posInOccurrence().posInTerm().toString(), "key.proof.reuse");
 
       // the interface is worth improving...
       if (targetPos.up().subTerm().op() !=
@@ -571,7 +569,7 @@ public class ReusePoint implements Comparable {
           templateApp.posInOccurrence().up().up().subTerm().op())
          thisScore = -35;
 
-      reuseLogger.info("By two operators above "+thisScore);
+      Debug.log4jInfo("By two operators above "+thisScore, "key.proof.reuse");
       return thisScore;
    }
    

@@ -76,7 +76,7 @@ export PATH
 # KeY CLASSPATH
 #
 
-key_ext_jars="antlr.jar recoderKey.jar junit.jar log4j.jar"
+key_ext_jars="antlr.jar recoderKey.jar junit.jar"
 
 keyclasspath="$KEY_HOME/system/binary/"
 

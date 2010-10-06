@@ -16,8 +16,6 @@ import java.io.Writer;
 import java.util.HashMap;
 import java.util.LinkedList;
 
-import org.apache.log4j.Logger;
-
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.abstraction.Type;
@@ -78,7 +76,6 @@ public class PrettyPrinter {
     protected boolean endAlreadyMarked = false;
     protected Object firstStatement = null;
     protected SVInstantiations instantiations = SVInstantiations.EMPTY_SVINSTANTIATIONS;
-    static Logger logger = Logger.getLogger(PrettyPrinter.class.getName());
 
     /** creates a new PrettyPrinter */
     public PrettyPrinter(Writer o) {
@@ -2662,7 +2659,8 @@ public class PrettyPrinter {
     			} else if (o instanceof ImmutableArray/*<ProgramElement>*/) {
     				writeBlockList((ImmutableArray<ProgramElement>)o);
     			} else {
-    				logger.warn("No PrettyPrinting available for " + o.getClass().getName());
+    				Debug.log4jWarn("No PrettyPrinting available for " + o.getClass().getName(),
+    						PrettyPrinter.class.getName());
     			}
     		}
     		if (!noSemicolons) {

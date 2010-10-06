@@ -15,8 +15,6 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Stack;
 
-import org.apache.log4j.Logger;
-
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
@@ -31,6 +29,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.ExtList;
 
 
@@ -44,8 +43,6 @@ public class SVPrefixCollector extends TacletVisitor {
 
     private SVTypeInfos svTypeInfos;
     private final Services    services;
-
-    private final Logger logger = Logger.getLogger ( "key.taclet_soundness" );
 
 
     public SVPrefixCollector ( SVTypeInfos p_svTypeInfos,
@@ -418,19 +415,20 @@ public class SVPrefixCollector extends TacletVisitor {
 	private void prefixWarning ( SchemaVariable  x,
 				     ImmutableList<Statement> p_old,
 				     ImmutableList<Statement> p_new ) {
-	    logger.error ( "*** Warning: Prefixes of schema variable " + x
-                    + " differ ***: " );
-            logger.error ( "        Old Prefix: " + p_old );
-            logger.error ( "        New Prefix: " + p_new );
+	    Debug.log4jError ( "*** Warning: Prefixes of schema variable " + x
+                                 + " differ ***: ",
+                               "key.taclet_soundness");
+            Debug.log4jError ( "        Old Prefix: " + p_old, "key.taclet_soundness" );
+            Debug.log4jError ( "        New Prefix: " + p_new, "key.taclet_soundness" );
 	}
 
 	private void prefixWarning ( SchemaVariable         x,
 				     ImmutableList<IProgramVariable> p_old,
 				     ImmutableSet<IProgramVariable>  p_new ) {
-	    logger.error ( "*** Warning: Prefixes of schema variable " + x
-                    + " differ ***: " );
-            logger.error ( "        Old Prefix: " + p_old );
-            logger.error ( "        New Prefix: " + p_new );
+	    Debug.log4jError ( "*** Warning: Prefixes of schema variable " + x
+                    + " differ ***: ", "key.taclet_soundness" );
+            Debug.log4jError ( "        Old Prefix: " + p_old, "key.taclet_soundness" );
+            Debug.log4jError ( "        New Prefix: " + p_new, "key.taclet_soundness" );
 	}
 
 	// only because the equals-methods of jump statement do not

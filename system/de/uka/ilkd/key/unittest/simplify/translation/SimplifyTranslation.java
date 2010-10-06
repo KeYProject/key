@@ -11,8 +11,6 @@ package de.uka.ilkd.key.unittest.simplify.translation;
 
 import java.util.*;
 
-import org.apache.log4j.Logger;
-
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
@@ -144,9 +142,6 @@ public class SimplifyTranslation {
 
     private static final int SUCCEDENT = 1;
 
-    static Logger nogger = Logger
-	    .getLogger(SimplifyTranslation.class.getName());
-
     private HashMap<Term, StringBuffer> cacheForUninterpretedSymbols;
 
     private ImmutableList<String> sortAxioms = ImmutableSLList.<String>nil();
@@ -168,9 +163,6 @@ public class SimplifyTranslation {
     private AbstractIntegerLDT integerLDT;
 
     private static long counter = 0;
-
-    static Logger logger = Logger
-	    .getLogger(SimplifyTranslation.class.getName());
 
     final TermFactory tf = TermFactory.DEFAULT;
 
@@ -202,9 +194,9 @@ public class SimplifyTranslation {
 	cacheForUninterpretedSymbols = new HashMap<Term, StringBuffer>();
 	StringBuffer hb = translate(sequent, lightWeight);
 	text = predicate.toString() + produceClosure(hb);
-	logger.info("SimplifyTranslation:\n" + text);
+	Debug.log4jInfo("SimplifyTranslation:\n" + text, SimplifyTranslation.class.getName());
 	if (notes.length() > 0) {
-	    logger.info(notes);
+	    Debug.log4jInfo(notes.toString(), SimplifyTranslation.class.getName());
 	}
     }
 
@@ -702,15 +694,15 @@ public class SimplifyTranslation {
     }
 
     private StringBuffer opNotKnownWarning(Term term) throws SimplifyException {
-	logger
-		.warn("Warning: unknown operator while translating into Simplify "
+	Debug.log4jWarn("Warning: unknown operator while translating into Simplify "
 			+ "syntax. Translation to Simplify will be stopped here.\n"
 			+ "opClass="
 			+ term.op().getClass().getName()
 			+ ", opName="
 			+ term.op().name()
 			+ ", sort="
-			+ term.sort().name());
+			+ term.sort().name(),
+			SimplifyTranslation.class.getName());
 	throw new SimplifyException(term.op().name() + " not known by Simplify");
     }
 
@@ -839,11 +831,10 @@ public class SimplifyTranslation {
 	    Vector<QuantifiableVariable> quantifiedVars)
 	    throws SimplifyException {
 	StringBuffer hb = new StringBuffer();
-	if (logger.isDebugEnabled()) {
-	    logger.debug("opClass=" + term.op().getClass().getName()
-		    + ", opName=" + term.op().name() + ", sort="
-		    + term.sort().name());
-	}
+	Debug.log4jDebug("opClass=" + term.op().getClass().getName()
+		+ ", opName=" + term.op().name() + ", sort="
+		+ term.sort().name(),
+		SimplifyTranslation.class.getName());
 
 	hb.append(getUniqueVariableName(term.op()));
 	Debug.assertTrue(term.varsBoundHere(0).size() == 0);

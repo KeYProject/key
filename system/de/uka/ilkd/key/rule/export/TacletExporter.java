@@ -44,8 +44,6 @@ public class TacletExporter {
     }
     
     public static void main ( String[] args ) {
-	Main.configureLogger();
-	
         final TacletLoader loader = new TacletLoader();
         final TacletExporter exporter = new TacletExporter();
         

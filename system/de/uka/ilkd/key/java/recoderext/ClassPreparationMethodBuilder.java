@@ -6,20 +6,11 @@
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
 //
-//
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2004 Universitaet Karlsruhe, Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
+
 package de.uka.ilkd.key.java.recoderext;
 
 import java.util.HashMap;
 import java.util.List;
-
-import org.apache.log4j.Logger;
 
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.java.CompilationUnit;
@@ -50,8 +41,6 @@ import de.uka.ilkd.key.util.Debug;
  */
 public class ClassPreparationMethodBuilder 
     extends RecoderModelTransformer {
-
-	static Logger logger = Logger.getLogger(ClassPreparationMethodBuilder.class.getName());
 	
     public static final String 
 	CLASS_PREPARE_IDENTIFIER = "<clprepare>";
@@ -91,9 +80,7 @@ public class ClassPreparationMethodBuilder
      * constant fields is due to binary compatibility reasons.
      */
     private boolean isConstantField(FieldSpecification spec) {
-    	if (logger.isDebugEnabled()) {
-    		logger.debug("now at " + spec.getFullName());
-    	}
+	Debug.log4jDebug("now at " + spec.getFullName(), ClassPreparationMethodBuilder.class.getName());
     	boolean result = spec.isStatic() && spec.isFinal();
     	if (!result) {
     		return result;

@@ -12,8 +12,6 @@ package de.uka.ilkd.key.rule.soundness;
 
 import java.util.Iterator;
 
-import org.apache.log4j.Logger;
-
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.gui.Main;
 import de.uka.ilkd.key.java.Services;
@@ -24,6 +22,7 @@ import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.TacletApp;
+import de.uka.ilkd.key.util.Debug;
 
 /**
  * This class is actually not used; taclet po are created through the methods of
@@ -54,8 +53,6 @@ public class TacletPORule implements BuiltInRule {
     public ImmutableList<Goal> apply(Goal     goal, 
 			    Services services, 
 			    RuleApp  ruleApp) {
-        final Logger logger = Logger.getLogger ( "key.taclet_soundness" );
-
         final TacletIndex tacletIndex =
 	    goal.ruleAppIndex ().tacletIndex ();
 
@@ -68,7 +65,7 @@ public class TacletPORule implements BuiltInRule {
 
 	// TODO: well, we have to find a better way to cope with null 
         
-        logger.debug ( "Selected taclet: " + app );
+        Debug.log4jDebug ( "Selected taclet: " + app, "key.taclet_soundness" );
 
 	//	StaticChecker sc = new StaticChecker ( services );
 	//	sc.visit ( app.taclet (), false );
@@ -85,7 +82,7 @@ public class TacletPORule implements BuiltInRule {
 
 	updateNamespaces ( newGoals.head (), pob );
 
-        logger.debug ( "Resulting PO: " + app );
+        Debug.log4jDebug ( "Resulting PO: " + app, "key.taclet_soundness" );
 
 	return newGoals;
     }

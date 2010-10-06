@@ -12,8 +12,6 @@ package de.uka.ilkd.key.gui;
 
 import java.util.Iterator;
 
-import org.apache.log4j.Logger;
-
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.pp.AbbrevException;
@@ -22,6 +20,7 @@ import de.uka.ilkd.key.proof.proofevent.RuleAppInfo;
 import de.uka.ilkd.key.rule.NewDependingOn;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.TacletApp;
+import de.uka.ilkd.key.util.Debug;
 
 /**
  * Listen for rule applications, add abbreviations of skolem functions
@@ -64,9 +63,9 @@ public class SkolemAbbreviator implements RuleAppListener {
             final String abbrev = p_t.op ().name ().toString ();
             mediator.getNotationInfo ().getAbbrevMap ().put ( p_t, abbrev, true );
         } catch ( AbbrevException e ) {
-            final Logger logger = Logger.getLogger ( SkolemAbbreviator.class.getName () );
-            logger.warn ( "Error occurred when trying to add "
-                          + "abbreviation of skolem symbol:\n" + e );
+            Debug.log4jWarn ( "Error occurred when trying to add "
+                          + "abbreviation of skolem symbol:\n" + e,
+                             SkolemAbbreviator.class.getName ());
         }
     }
 

@@ -5,6 +5,7 @@
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
+
 package de.uka.ilkd.key.gui.nodeviews;
 
 import java.io.StringWriter;
@@ -17,6 +18,7 @@ import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.ProgramPrinter;
 import de.uka.ilkd.key.rule.TacletApp;
+import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.pp.WriterBackend;
 
 /** 
@@ -57,18 +59,17 @@ class DefaultTacletMenuItem extends JMenuItem implements TacletMenuItem {
     	}
         }
         if (nlcount > ProofSettings.DEFAULT_SETTINGS.getViewSettings().getMaxTooltipLines()) { 
-    	if (TacletMenu.logger.isDebugEnabled()) {
-    	    TacletMenu.logger.debug("No SchemaVariable instantiation printed, linecount is " 
+    	    Debug.log4jDebug("No SchemaVariable instantiation printed, linecount is " 
     			 + nlcount + " > " 
     			 + ProofSettings.DEFAULT_SETTINGS.
-    			 getViewSettings().getMaxTooltipLines());
-    	}
-    	taclet_sb = new StringBuffer();
-    	w = new StringWriter();
-    	backend = new WriterBackend(w, 68);
-    	tp = new LogicPrinter
+    			 getViewSettings().getMaxTooltipLines(),
+    			 TacletMenu.class.getName());
+    	    taclet_sb = new StringBuffer();
+    	    w = new StringWriter();
+    	    backend = new WriterBackend(w, 68);
+    	    tp = new LogicPrinter
     	    (new ProgramPrinter(w), notationInfo, backend, null, true);
-    	tp.printTaclet(connectedTo.taclet());
+    	    tp.printTaclet(connectedTo.taclet());
 
         }
 

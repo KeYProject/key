@@ -12,8 +12,6 @@
  */
 package de.uka.ilkd.key.logic;
 
-import org.apache.log4j.Logger;
-
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.reference.MethodName;
 import de.uka.ilkd.key.java.reference.ReferenceSuffix;
@@ -28,9 +26,6 @@ public class ProgramElementName extends Name
     private final String shortName;
     private final NameCreationInfo creationInfo;
     private final Comment[] comments;
-
-    static Logger logger = Logger.getLogger(ProgramElementName.class.getName());
-
 
     /** create a new name
      * @param name the String with the name of the program element
@@ -72,8 +67,8 @@ public class ProgramElementName extends Name
 
     public ProgramElementName(String n, String q) {
 	super(q + "::" + n);
-	if ((q != "") & logger.isDebugEnabled()) {
-	    logger.debug(q + "::" + n);
+	if ((q != "")) {
+	    Debug.log4jDebug(q + "::" + n, ProgramElementName.class.getName());
 	}
 	assert q!=null && q.length() > 0 : "Tried to create qualified name with missing qualifier";
 

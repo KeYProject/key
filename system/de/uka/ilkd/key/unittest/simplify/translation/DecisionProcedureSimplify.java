@@ -13,14 +13,13 @@ package de.uka.ilkd.key.unittest.simplify.translation;
 import java.io.*;
 import java.util.Calendar;
 
-import org.apache.log4j.Logger;
-
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Constraint;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.ProgramPrinter;
 import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.util.Debug;
 
 /**
  * This class invokes the decision procedure "Simplify" which is part of
@@ -39,9 +38,6 @@ public class DecisionProcedureSimplify {
     private final Services services;
 
     private final Node node;
-
-    static Logger logger = Logger.getLogger(DecisionProcedureSimplify.class
-	    .getName());
 
     public DecisionProcedureSimplify(Node node, Constraint userConstraint,
 	    Services services) {
@@ -150,14 +146,14 @@ public class DecisionProcedureSimplify {
 	    String response = execute(st.getText());
 
 	    // read the output from the command
-	    logger.info("Here is what Simplify has to say:\n");
-	    logger.info(response);
+	    Debug.log4jInfo("Here is what Simplify has to say:\n", DecisionProcedureSimplify.class.getName());
+	    Debug.log4jInfo(response, DecisionProcedureSimplify.class.getName());
 
 	    // This part is responsible for logging
 	    String logdir = System.getProperty("key.simplify.logdir");
 	    if (logdir == null || logdir.trim().length() == 0) {
-		logger
-			.warn("$KEY_SIMPLIFY_LOG_DIR is empty or non-existent. Logging (of proofs, not with log4j) of Simplify disabled.");
+		Debug.log4jWarn("$KEY_SIMPLIFY_LOG_DIR is empty or non-existent. Logging (of proofs, not with log4j) of Simplify disabled.",
+				 DecisionProcedureSimplify.class.getName());
 	    } else {
 		try {
 		    String logFileName = "simplify-log_"
@@ -174,13 +170,15 @@ public class DecisionProcedureSimplify {
 		    logfile.println(response);
 		    logfile.close();
 		} catch (IOException ioe) {
-		    logger.error("error while trying to log:\n" + ioe);
+		    Debug.log4jError("error while trying to log:\n" + ioe,
+			    	     DecisionProcedureSimplify.class.getName());
 		}
 	    }
 	    // End of logging part
 
 	    if (response.indexOf("Valid.") > 0) {
-		logger.info("Simplify has decided and found the formula to be valid.");
+		Debug.log4jInfo("Simplify has decided and found the formula to be valid.",
+				DecisionProcedureSimplify.class.getName());
 		return new DecisionProcedureResult(true, response, st);
 	    } else {
 		return new DecisionProcedureResult(false, response, st);

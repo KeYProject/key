@@ -23,8 +23,6 @@ import javax.swing.event.MouseInputAdapter;
 import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
 
-import org.apache.log4j.Logger;
-
 import de.uka.ilkd.key.gui.IMain;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -44,9 +42,6 @@ import de.uka.ilkd.key.pp.PosInSequent;
 class SequentViewListener extends MouseInputAdapter 
     implements KeyListener  {  
 	
-    
-    static Logger logger = Logger.getLogger(SequentViewListener.class.getName());
-
     private KeYMediator mediator;
     private SequentView seqView;
 

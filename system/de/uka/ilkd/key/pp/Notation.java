@@ -13,8 +13,6 @@ package de.uka.ilkd.key.pp;
 import java.io.IOException;
 import java.util.Iterator;
 
-import org.apache.log4j.Logger;
-
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.logic.ProgramElementName;
@@ -648,8 +646,6 @@ public abstract class Notation {
     }
 
     public static class SortedSchemaVariableNotation extends VariableNotation {
-	static Logger logger = Logger.getLogger(Notation.class.getName());
-
 	public void print(Term t, LogicPrinter sp) throws IOException {
 	    // logger.debug("SSV: " + t+ " [" + t.op() + "]");
 	    Debug.assertTrue(t.op() instanceof SchemaVariable);

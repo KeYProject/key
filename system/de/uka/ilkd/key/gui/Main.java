@@ -31,8 +31,6 @@ import javax.swing.border.TitledBorder;
 import javax.swing.event.*;
 import javax.swing.text.JTextComponent;
 
-import org.apache.log4j.Logger;
-
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.gui.assistant.ProofAssistant;
 import de.uka.ilkd.key.gui.assistant.ProofAssistantAI;
@@ -91,10 +89,7 @@ public class Main extends JFrame implements IMain {
     
     /** size of the tool bar icons */
     private static final int TOOLBAR_ICON_SIZE = 15;
-    
-    /** Name of the config file controlling logging with log4j */
-    private static final String LOGGER_CONFIGURATION = PathConfig.KEY_CONFIG_DIR + File.separator + "logger.props";
-    
+        
     static {
         // @xxx preliminary: better store along with other settings.
         PresentationFeatures.ENABLED = true;
@@ -345,16 +340,7 @@ public class Main extends JFrame implements IMain {
         standalone = b;
     }
     
-    
-    public static void configureLogger() {
-        if ((new File(LOGGER_CONFIGURATION)).exists())
-            org.apache.log4j.PropertyConfigurator.configureAndWatch(LOGGER_CONFIGURATION, 1500);
-        else {
-            org.apache.log4j.BasicConfigurator.configure();
-            Logger.getRootLogger().setLevel(org.apache.log4j.Level.ERROR);            
-        }
-    }
-    
+       
     public String getInternalVersion() {
         return INTERNAL_VERSION;
     }
@@ -2334,9 +2320,7 @@ public class Main extends JFrame implements IMain {
     
     class MainProofListener implements AutoModeListener, KeYSelectionListener,
     	SettingsListener {	
-        
-        Logger logger = Logger.getLogger("key.threading");
-        
+                
         Proof proof = null;
         
         
@@ -2383,7 +2367,7 @@ public class Main extends JFrame implements IMain {
          * invoked if automatic execution has started
          */
         public synchronized void autoModeStarted(ProofEvent e) {
-            logger.warn("Automode started");
+            Debug.log4jWarn("Automode started", "key.threading");
             disableCurrentGoalView = true;
             mediator().removeKeYSelectionListener(proofListener);
             freezeExceptAutoModeButton();
@@ -2393,10 +2377,7 @@ public class Main extends JFrame implements IMain {
          * invoked if automatic execution has stopped
          */
         public synchronized void autoModeStopped(ProofEvent e) {
-            logger.warn("Automode stopped");
-            if (logger.isDebugEnabled()) {
-                logger.debug("From " + Debug.stackTrace());
-            }
+            Debug.log4jDebug("From " + Debug.stackTrace(), "key.threading");
             unfreezeExceptAutoModeButton();
             disableCurrentGoalView = false;
             setProofNodeDisplay();
@@ -3292,7 +3273,6 @@ public class Main extends JFrame implements IMain {
         // does no harm on non macs
         System.setProperty("apple.laf.useScreenMenuBar","true"); 
         
-        configureLogger();
         Main.evaluateOptions(args);        
  	Main key = getInstance(isVisibleMode());   
  	key.loadCommandLineFile();

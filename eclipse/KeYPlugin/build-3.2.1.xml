@@ -19,7 +19,6 @@
 		<pathelement path="../KeYExternalLibraries/antlr.jar" />
 		<pathelement path="../KeYExternalLibraries/javacc.jar" />
 		<pathelement path="../KeYExternalLibraries/junit.jar" />
-		<pathelement path="../KeYExternalLibraries/log4j.jar" />
 		<pathelement path="../KeYExternalLibraries/recoderKey.jar" />
 		<pathelement path="../org.key-project.core/key.jar" />
 		<pathelement location="${eclipse_home}/plugins/org.eclipse.core.runtime_3.2.0.v20060603.jar" />
@@ -127,7 +126,7 @@
 		<mkdir dir="${destination.temp.folder}/KeYPlugin_${env.KEY_VERSION_SHORT}" />
 		<copy file="${build.result.folder}/KeYPluginsrc.zip" todir="${destination.temp.folder}/KeYPlugin_${env.KEY_VERSION_SHORT}" failonerror="true" overwrite="false" />
 		<copy todir="${destination.temp.folder}/KeYPlugin_${env.KEY_VERSION_SHORT}" failonerror="true" overwrite="false">
-			<fileset dir="${basedir}" includes="src/,jars/antlr.jar,jars/javacc.jar,jars/junit.jar,jars/log4j.jar,jars/recoderKey.jar,plugin.xml,README,META-INF/,key-small.png" />
+			<fileset dir="${basedir}" includes="src/,jars/antlr.jar,jars/javacc.jar,jars/junit.jar,jars/recoderKey.jar,plugin.xml,README,META-INF/,key-small.png" />
 		</copy>
 	</target>
 

@@ -17,7 +17,6 @@ Needed additional Libraries:
 	antlr.jar Version >= 2.7.2: parser generator
 	recoderKey.jar
                  a transformation framework for java patched by the KeY group
-	log4j.jar
 
 Optionally, KeY can make use of the following binaries:
 	SMT Solvers: bindings exist currently for Z3, Simplify, Yices and CVC3

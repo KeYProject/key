@@ -14,16 +14,14 @@ import java.util.*;
 
 import javax.swing.JOptionPane;
 
-import org.apache.log4j.Logger;
-
 import de.uka.ilkd.key.gui.KeYMediator;
-import de.uka.ilkd.key.gui.Main;
 import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
 import de.uka.ilkd.key.proof.JavaModel;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.reuse.ReuseFrontend;
+import de.uka.ilkd.key.util.Debug;
 
 public class GlobalProofMgt {
 
@@ -33,8 +31,6 @@ public class GlobalProofMgt {
         new HashMap<EnvKey, List<ProofEnvironment>>();
 
     private KeYMediator mediator;
-
-    private Logger mgtLogger = Logger.getLogger("key.proof.mgt");
 
     public static GlobalProofMgt getInstance() {
 	return INSTANCE;
@@ -137,7 +133,7 @@ public class GlobalProofMgt {
 				   proof.getJavaModel().getModelTag());
 		error = f.markup(prev, diff);
 	    } catch(CvsException cvse) {
-		mgtLogger.error("Diffing models in CVS failed: "+cvse);
+		Debug.log4jError("Diffing models in CVS failed: "+cvse, "key.proof.mgt");
 	    }
 	} else f.markRoot(prev);
 	
