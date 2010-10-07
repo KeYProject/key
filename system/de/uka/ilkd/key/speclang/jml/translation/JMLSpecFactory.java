@@ -188,10 +188,8 @@ public class JMLSpecFactory {
                                 ImmutableList<PositionedString> originalEnsures,
                                 ImmutableList<PositionedString> originalSignals,
                                 ImmutableList<PositionedString> originalSignalsOnly,
-                                ImmutableList<PositionedString> originalDiverges,                               PositionedString originalWorkingSpace,
-                                PositionedString originalConstructedWorkingSpace,
-                                PositionedString originalCallerWorkingSpace,
-	PositionedString originalReentrantWorkingSpace,
+                                ImmutableList<PositionedString> originalDiverges,                               
+                                PositionedString originalWorkingSpace,
                                 ImmutableList<ParsableVariable> paramVars) 
             throws SLTranslationException {
         assert programMethod != null;
@@ -285,49 +283,7 @@ public class JMLSpecFactory {
                 paramVars, 
                 resultVar, 
                 excVar,
-                atPreFunctions).getFormula();
-             
-        
-        
-        if(originalConstructedWorkingSpace==null){
-            originalConstructedWorkingSpace = new PositionedString("0;");
-        }
-        Term constructedWorkingSpace = null;
-        constructedWorkingSpace = translator.translateExpression(
-                        originalConstructedWorkingSpace,
-                        programMethod.getContainerType(),
-                        selfVar, 
-                        paramVars, 
-                        resultVar, 
-                        excVar,
-                        atPreFunctions).getFormula();
-        
-        Term callerWorkingSpace = null;
-        if(originalCallerWorkingSpace==null){
-            originalCallerWorkingSpace = new PositionedString("0;");
-        }
-        callerWorkingSpace = translator.translateExpression(
-                        originalCallerWorkingSpace,
-                        programMethod.getContainerType(),
-                        selfVar, 
-                        paramVars, 
-                        resultVar, 
-                        excVar,
-                        atPreFunctions).getFormula();
-        
-        Term reentrantWorkingSpace = null;
-        if(originalReentrantWorkingSpace==null){
-            originalReentrantWorkingSpace = new PositionedString("0;");
-        }
-        reentrantWorkingSpace = translator.translateExpression(
-                        originalReentrantWorkingSpace,
-                        programMethod.getContainerType(),
-                        selfVar, 
-                        paramVars, 
-                        resultVar, 
-                        excVar,
-                        atPreFunctions).getFormula();
-         
+                atPreFunctions).getFormula();        
         
         //translate assignable
         ImmutableSet<LocationDescriptor> assignable;
@@ -528,10 +484,7 @@ public class JMLSpecFactory {
                                     textualSpecCase.getSignals(),
                                     textualSpecCase.getSignalsOnly(),
                                     textualSpecCase.getDiverges(),
-                                    textualSpecCase.getWorkingSpace(),
-                                    textualSpecCase.getConstructedWorkingSpace(),
-                                    textualSpecCase.getCallerWorkingSpace(),
-                                    textualSpecCase.getReentrantWorkingSpace(),
+                                    textualSpecCase.getWorkingSpace(),                                    
                                     paramVars);
     }
 
@@ -606,10 +559,7 @@ public class JMLSpecFactory {
                                            originalEnsures,
                                            originalSignals,
                                            originalSignalsOnly,
-                                           originalDiverges,
-					   null,
-                                           null,
-                                           null,
+                                           originalDiverges,					   
                                            null,
                                            null);
     }
