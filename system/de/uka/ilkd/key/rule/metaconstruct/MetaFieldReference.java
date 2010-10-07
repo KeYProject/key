@@ -9,8 +9,6 @@
 //
 package de.uka.ilkd.key.rule.metaconstruct;
 
-import org.apache.log4j.Logger;
-
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Name;
@@ -18,10 +16,10 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.AbstractMetaOperator;
 import de.uka.ilkd.key.logic.op.Location;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.RigidFunction;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.pp.Notation;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+import de.uka.ilkd.key.util.Debug;
 
 /**
  * At present, field references cannot be applied to schema variables. This
@@ -38,9 +36,6 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
  */
 public class MetaFieldReference extends AbstractMetaOperator implements
         Location {
-
-    private static final Logger logger =
-            Logger.getLogger(MetaFieldReference.class);
 
     public MetaFieldReference() {
         super(new Name("#fieldref"), 2);
@@ -72,8 +67,8 @@ public class MetaFieldReference extends AbstractMetaOperator implements
 
             return termFactory.createAttributeTerm(attr, t);
         } catch (Exception e) {
-            logger.error("calculating #fiedref failed", e);
-            logger.debug(term.toString());
+            Debug.log4jError("calculating #fiedref failed" + e, MetaFieldReference.class.getName());
+            Debug.log4jDebug(term.toString(), MetaFieldReference.class.getName());
             throw new RuntimeException("calculating #fieldref failed", e);
         }
     }

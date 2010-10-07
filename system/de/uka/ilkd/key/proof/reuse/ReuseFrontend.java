@@ -14,12 +14,11 @@ package de.uka.ilkd.key.proof.reuse;
 import java.io.*;
 import java.util.Iterator;
 
-import org.apache.log4j.Logger;
-
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.parser.diffparser.*;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.util.Debug;
 
 public class ReuseFrontend {
 
@@ -53,8 +52,9 @@ public class ReuseFrontend {
          DiffParser.MarkerHint[] hints;
          hints = p.getMarkers();
           for (DiffParser.MarkerHint hint : hints) {
-              Logger.getLogger("key.proof.mgt").debug(
-                      "Markup hint: " + hint.file + ":" + hint.line);
+              Debug.log4jDebug(
+                      "Markup hint: " + hint.file + ":" + hint.line,
+                      "key.proof.mgt");
               recMark(source.root(), hint);
           }
          markRoot(source);

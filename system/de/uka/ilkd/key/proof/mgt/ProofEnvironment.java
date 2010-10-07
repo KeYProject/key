@@ -14,8 +14,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
-
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
@@ -28,6 +26,7 @@ import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.util.Debug;
 
 /** The unique environment a proof is performed in. The environment
  * consists of a java model, specifications, and a set of justified
@@ -43,8 +42,6 @@ public class ProofEnvironment {
     private final InitConfig initConfig; 
     private Set<ProofAggregate> proofs = new HashSet<ProofAggregate>(); //of ProofList
     private int number=0;
-
-    private Logger mgtLogger = Logger.getLogger("key.proof.mgt");
 
     /** constructs a proof environment with the given initial
      * configuration of the proofs contained in the environment.
@@ -209,7 +206,7 @@ public class ProofEnvironment {
 				   pe.getJavaModel().getModelTag(), 
 				   getJavaModel().getModelTag());
 	    } catch(CvsException cvse) {
-		mgtLogger.error("Diffing models in CVS failed: "+cvse);
+		Debug.log4jError("Diffing models in CVS failed: "+cvse, "key.proof.mgt");
 	    }
 	}
 	return diff;

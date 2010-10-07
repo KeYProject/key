@@ -13,8 +13,6 @@ package de.uka.ilkd.key.rule.soundness;
 
 import java.util.Iterator;
 
-import org.apache.log4j.Logger;
-
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Services;
@@ -25,6 +23,7 @@ import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.Op;
 import de.uka.ilkd.key.rule.SyntacticalReplaceVisitor;
 import de.uka.ilkd.key.rule.TacletApp;
+import de.uka.ilkd.key.util.Debug;
 
 
 public class POBuilder {
@@ -44,10 +43,6 @@ public class POBuilder {
     private RawProgramVariablePrefixes rpvp;
 
     private boolean                    contextFitting;
-
-    private final Logger               logger          =
-                    Logger.getLogger ( "key.taclet_soundness" );
-    
 
     public POBuilder ( TacletApp p_app,
 		       Services  p_services ) {
@@ -181,14 +176,14 @@ public class POBuilder {
     	    new MeaningFormulaBuilder ( getTacletApp() );
 
 	meaningTerm = b.build ();
-	logger.debug("Meaning formula: " + meaningTerm);
+	Debug.log4jDebug("Meaning formula: " + meaningTerm, "key.taclet_soundness");
     }
 
     private void addPOPart ( SkolemSet p_skolemSet ) {
 	contextFitting = true;
 	++numberOfPOParts;
 
-	logger.debug("addPOPart() with " + p_skolemSet.getInstantiations ());
+	Debug.log4jDebug("addPOPart() with " + p_skolemSet.getInstantiations (), "key.taclet_soundness");
         addPOPart(createPOPart(p_skolemSet));
 
         copyNamespace(p_skolemSet.getFunctions (), functions);
@@ -221,12 +216,15 @@ public class POBuilder {
 	jsp  = c.getJumpStatementPrefixes   ();
 	rpvp = c.getRawProgramVariablePrefixes ();
 	p_ss = p_ss.setSVTypeInfos ( c.getSVTypeInfos () );
-	logger.debug ( "Free schema variables: "
-                + rpvp.getFreeSchemaVariables () );
-        logger.debug ( "Bound schema variables: "
-                + rpvp.getBoundSchemaVariables () );
-        logger.debug ( "Free program variables: "
-                + rpvp.getFreeProgramVariables () );
+	Debug.log4jDebug ( "Free schema variables: "
+                + rpvp.getFreeSchemaVariables (),
+                "key.taclet_soundness");
+        Debug.log4jDebug ( "Bound schema variables: "
+                + rpvp.getBoundSchemaVariables (),
+                "key.taclet_soundness");
+        Debug.log4jDebug ( "Free program variables: "
+                + rpvp.getFreeProgramVariables (),
+                "key.taclet_soundness");
 
         return p_ss;
     }
@@ -234,7 +232,8 @@ public class POBuilder {
     private void instantiatePrefixes(final SkolemSet ss) {
 	pvp = getRawProgramVariablePrefixes ()
 	    .instantiate ( ss.getInstantiations () );
-	logger.debug ( "instantiatePrefixes() with " + ss.getInstantiations () );
+	Debug.log4jDebug ( "instantiatePrefixes() with " + ss.getInstantiations (),
+			   "key.taclet_soundness");
     }
 
     public Namespace getFunctions () {

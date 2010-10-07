@@ -11,8 +11,6 @@ package de.uka.ilkd.key.proof.init;
 import java.io.File;
 import java.util.*;
 
-import org.apache.log4j.Logger;
-
 import recoder.io.PathList;
 import recoder.io.ProjectSettings;
 import de.uka.ilkd.key.gui.IMain;
@@ -33,6 +31,7 @@ import de.uka.ilkd.key.proof.mgt.*;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.UpdateSimplifier;
+import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.ProgressMonitor;
 
 
@@ -260,7 +259,7 @@ public class ProblemInitializer {
 		}
 	    }catch(CvsException cvse) {
 		// leave already created new Java model
-		Logger.getLogger("key.proof.mgt").error("Dumping Model into CVS failed: "+cvse);
+		Debug.log4jError("Dumping Model into CVS failed: "+cvse, "key.proof.mgt");
 	    }
 	}
 	lastModel = jModel;

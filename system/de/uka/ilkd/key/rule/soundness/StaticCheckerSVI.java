@@ -12,8 +12,6 @@ package de.uka.ilkd.key.rule.soundness;
 
 import java.util.Iterator;
 
-import org.apache.log4j.Logger;
-
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Services;
@@ -91,8 +89,8 @@ public class StaticCheckerSVI extends StaticChecker {
 					IProgramVariable     p_pv,
 					Services             p_services ) {
 
-        Logger.getLogger ( "key.taclet_soundness" ).debug ( "isValidType() with "
-                + p_pv );
+        Debug.log4jDebug ( "isValidType() with " + p_pv,
+        		   "key.taclet_soundness");
 
 	try {
 	    StaticCheckerSVI sc =

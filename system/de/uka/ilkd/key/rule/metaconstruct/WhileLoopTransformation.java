@@ -15,8 +15,6 @@ package de.uka.ilkd.key.rule.metaconstruct;
 import java.util.HashMap;
 import java.util.Stack;
 
-import org.apache.log4j.Logger;
-
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
@@ -570,7 +568,7 @@ public class WhileLoopTransformation extends JavaASTVisitor {
         ExtList changeList = (ExtList)stack.peek();
         if (replaceBreakWithNoLabel == 0) {
             // the outermost loop
-            Logger.getRootLogger().error("Enhanced for loops may not be toplevel in WhileLoopTransformation");
+            Debug.log4jError("Enhanced for loops may not be toplevel in WhileLoopTransformation", null);
             doDefaultAction(x);
         } else {
             if (changeList.getFirst() == CHANGED) {

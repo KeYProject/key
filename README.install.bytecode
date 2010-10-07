@@ -21,8 +21,7 @@ Needed additional Libraries:
                  a transformation framework for java patched by the KeY group
 
 Optionally, KeY can make use of the following binaries:
-	ESC Java's decision procedure 'Simplify'
-        SMT-LIB provers: bindings exist currently for Yices, CVCLite, CVC3 and SVC
+	SMT Solvers: bindings exist currently for Z3, Simplify, Yices and CVC3
               (export to SMT input file possible)        
 
 
@@ -62,7 +61,7 @@ Optionally, KeY can make use of the following binaries:
 
 	5) Follow the instructions of the wizard.
 
-	6) Optional: Install Simplify and/or SMT-LIB provers.
+	6) Optional: Install Simplify and/or other SMT solvers.
 
            If you download Simplify not from the KeY-website but
            elsewhere (e.g. as part of ESC/Java), follow the intallation 
@@ -84,7 +83,7 @@ Optionally, KeY can make use of the following binaries:
        
                 export PATH=$PATH:~/simplify
 
-          (analog procedure for SMT-LIB provers)
+          (analog procedure for other solvers)
 
 
 (4) Start KeY 
@@ -95,7 +94,7 @@ Optionally, KeY can make use of the following binaries:
 	Go to subdirectory bin and run 'startProver' (Windows: 'startProver.bat')
 
 
-(5) Start KeY in Test Generation Mode
+(5) Alternatively to (4): Start KeY in Test Generation Mode
 -------------------------------------
 
 	Run 'startProver unit' or if you wish a simpler GUI run 'startProver testing'

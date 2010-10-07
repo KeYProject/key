@@ -13,8 +13,6 @@ package de.uka.ilkd.key.rule.soundness;
 
 import java.util.Iterator;
 
-import org.apache.log4j.Logger;
-
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.Services;
@@ -23,6 +21,7 @@ import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.SortedSchemaVariable;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
+import de.uka.ilkd.key.util.Debug;
 
 
 
@@ -64,8 +63,8 @@ public class StatementSkolemBuilder
     }
 
     private void createSkolemStatementSV ( SchemaVariable p_sv ) {
-	Logger.getLogger ( "key.taclet_soundness" )
-	        .debug ( "createSkolemStatementSV() with " + p_sv );
+	Debug.log4jDebug ( "createSkolemStatementSV() with " + p_sv,
+			   "key.taclet_soundness");
 
 	final StatementSymbolArgBuilder b =
 	    new StatementSymbolArgBuilder ( p_sv );	

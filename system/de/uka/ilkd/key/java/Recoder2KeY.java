@@ -13,8 +13,6 @@ package de.uka.ilkd.key.java;
 import java.io.*;
 import java.util.*;
 
-import org.apache.log4j.Logger;
-
 import recoder.ParserException;
 import recoder.ProgramFactory;
 import recoder.bytecode.ByteCodeParser;
@@ -130,8 +128,6 @@ public class Recoder2KeY implements JavaReader {
      * defined. For those classe types a dummy stub is created at parse time.
      */
     private Collection<? extends CompilationUnit> dynamicallyCreatedCompilationUnits;
-
-    private Logger logger = Logger.getLogger(Recoder2KeY.class);
 
     /**
      * create a new Recoder2KeY transformation object.
@@ -664,7 +660,8 @@ public class Recoder2KeY implements JavaReader {
             if (pe instanceof MethodDeclaration) {
                 MethodDeclaration methDecl = (MethodDeclaration) pe;
                 if(!allowed && methDecl.getBody() != null) {
-                    logger.warn("Method body ("+methDecl.getName()+") should not be allowed: "+rcu.getDataLocation());
+                    Debug.log4jWarn("Method body ("+methDecl.getName()+") should not be allowed: "+rcu.getDataLocation(),
+                	            Recoder2KeY.class.getName());
                 }
                 methDecl.setBody(null);
             }
@@ -672,14 +669,16 @@ public class Recoder2KeY implements JavaReader {
                 recoder.java.declaration.FieldSpecification fieldSpec = 
                     (recoder.java.declaration.FieldSpecification) pe;
                 if(!allowed && fieldSpec.getInitializer() != null) {
-                    logger.warn("Field initializer ("+fieldSpec.getName()+") should not be allowed: "+rcu.getDataLocation());
+                    Debug.log4jWarn("Field initializer ("+fieldSpec.getName()+") should not be allowed: "+rcu.getDataLocation(),
+                	    	    Recoder2KeY.class.getName());
                 }
                 fieldSpec.setInitializer(null);
             }
             if (pe instanceof ClassInitializer) {
                 ClassInitializer classInit = (ClassInitializer) pe;
                 if(!allowed && classInit.getBody() != null) {
-                    logger.warn("There should be no class initializers: "+rcu.getDataLocation());
+                    Debug.log4jWarn("There should be no class initializers: "+rcu.getDataLocation(),
+                	    	    Recoder2KeY.class.getName());
                 }
                 classInit.setBody(null);
             }

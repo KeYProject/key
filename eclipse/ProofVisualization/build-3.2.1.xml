@@ -64,7 +64,6 @@
 		<pathelement path="../KeYExternalLibraries/antlr.jar" />
 		<pathelement path="../KeYExternalLibraries/javacc.jar" />
 		<pathelement path="../KeYExternalLibraries/junit.jar" />
-		<pathelement path="../KeYExternalLibraries/log4j.jar" />
 		<pathelement path="../KeYExternalLibraries/recoderKey.jar" />
 		<pathelement path="../org.key-project.core/key.jar" />
         <pathelement location="../KeYPlugin"/>

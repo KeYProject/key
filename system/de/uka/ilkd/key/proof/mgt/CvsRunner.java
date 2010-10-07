@@ -23,8 +23,6 @@ package de.uka.ilkd.key.proof.mgt;
 
 import java.io.*;
 
-import org.apache.log4j.Logger;
-
 import de.uka.ilkd.key.gui.configuration.PathConfig;
 import de.uka.ilkd.key.util.Debug;
 
@@ -38,8 +36,6 @@ public class CvsRunner {
        File.separator;
 //    private static final String ROOT_OPT = "-d "+REP_ROOT;
 
-    private Logger mgtLogger = Logger.getLogger("key.proof.mgt");
-    
 
     /**
      * Dump the given string into a temporary file.
@@ -124,7 +120,7 @@ public class CvsRunner {
         if ( ecode != 0 ) {
             String msg = ( "Process exited with error code: " + ecode
                            + " error [" + proc.errorLog + "]" );
-            if ( debug ) mgtLogger.error ( msg );
+            if ( debug ) Debug.log4jError ( msg, "key.proof.mgt" );
             if ( ccode ) {               
                 throw new CvsException ( msg );
             }
@@ -148,7 +144,7 @@ public class CvsRunner {
             moduleName, vendorTag.replace(' ','_'), releaseTag};
 	// Run it:
 	try {
-	    mgtLogger.info("Executing "+print(command)+" in "+workingDir);
+	    Debug.log4jInfo("Executing "+print(command)+" in "+workingDir, "key.proof.mgt");
 	    return waitForCompletion
 	    ( new ProcessEnvironment ( Runtime.getRuntime ().exec ( command,
 	                                                            null,
@@ -187,7 +183,7 @@ public class CvsRunner {
         String s = "";
 	// Run it:
 	try {
-	    mgtLogger.info("Executing "+print(command));
+	    Debug.log4jInfo("Executing "+print(command), "key.proof.mgt");
 	    ProcessEnvironment proc =
 	        new ProcessEnvironment ( Runtime.getRuntime().exec(command, null, 
 	                      new File(System.getProperty("user.home"))) );
@@ -204,7 +200,7 @@ public class CvsRunner {
 	    ex.printStackTrace();
 	    throw new CvsException(ex.getMessage());
 	}
-        mgtLogger.debug("Diff:\n"+s);        
+        Debug.log4jDebug("Diff:\n"+s, "key.proof.mgt");        
         return s;
     }
 
@@ -226,7 +222,7 @@ public class CvsRunner {
                     String symStr = line.substring(1);
                     int colonPos = symStr.indexOf(':');
                     symStr = symStr.substring(0,colonPos).trim();
-                    mgtLogger.debug("CVS Symbols: "+ symStr );
+                    Debug.log4jDebug("CVS Symbols: "+ symStr, "key.proof.mgt" );
                 } else {
                     collectSymbols = false;
                 }
@@ -249,7 +245,7 @@ public class CvsRunner {
 	      String[] command = new String[] {
                   "cvs", "-d", REP_ROOT, "init"};
 	      // Run it:
-	          mgtLogger.info("Executing "+print(command));
+	          Debug.log4jInfo("Executing "+print(command), "key.proof.mgt");
 	          Process proc =  Runtime.getRuntime().exec(command);
 	          waitForCompletion(new ProcessEnvironment (proc), false);
            }

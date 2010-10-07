@@ -9,11 +9,8 @@
 //
 package de.uka.ilkd.key.gui.configuration;
 
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Properties;
-
-import org.apache.log4j.Logger;
 
 import de.uka.ilkd.key.gui.GUIEvent;
 
@@ -26,7 +23,6 @@ import de.uka.ilkd.key.gui.GUIEvent;
  * 3) wether intermediate proofsteps should be hidden in the proof tree view
  */
 public class ViewSettings implements Settings {
-	static Logger logger = Logger.getLogger(ViewSettings.class.getName());
     private static final String MAX_TOOLTIP_LINES_KEY = "[View]MaxTooltipLines";
     private static final String SHOW_WHOLE_TACLET = "[View]ShowWholeTaclet";
     private static final String FONT_INDEX = "[View]FontIndex";

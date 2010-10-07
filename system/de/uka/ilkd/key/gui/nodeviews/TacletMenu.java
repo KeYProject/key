@@ -16,13 +16,10 @@ import java.util.*;
 
 import javax.swing.*;
 
-import org.apache.log4j.Logger;
-
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.Main;
-import de.uka.ilkd.key.gui.smt.SMTProgressDialog;
 import de.uka.ilkd.key.gui.smt.SMTRuleLauncher;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.logic.*;
@@ -51,7 +48,6 @@ class TacletMenu extends JMenu {
 
     private TacletAppComparator comp = new TacletAppComparator();
     
-    static Logger logger = Logger.getLogger(TacletMenu.class.getName());
     private final Goal selectedGoal;
     
     /** 

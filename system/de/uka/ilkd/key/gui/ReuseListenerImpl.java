@@ -19,8 +19,6 @@ import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-import org.apache.log4j.Logger;
-
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
@@ -29,12 +27,12 @@ import de.uka.ilkd.key.proof.reuse.ReuseFindTaclet;
 import de.uka.ilkd.key.proof.reuse.ReusePoint;
 import de.uka.ilkd.key.proof.reuse.ReuseUpdateSimplificationRule;
 import de.uka.ilkd.key.rule.*;
+import de.uka.ilkd.key.util.Debug;
 
 
 public class ReuseListenerImpl implements ReuseListener, KeYSelectionListener {
 
    private KeYMediator medi;
-   private Logger reuseLogger = Logger.getLogger("key.proof.reuse");
    
    private List<ReusePoint> reusePoints;
    private ReusePoint best;
@@ -201,7 +199,7 @@ public class ReuseListenerImpl implements ReuseListener, KeYSelectionListener {
 
 
    public boolean reusePossible() {
-      reuseLogger.warn(">Possible applications detected: "+reusePoints.size());
+      Debug.log4jWarn(">Possible applications detected: "+reusePoints.size(), "key.proof.reuse");
       if (reusePoints.size() > 0) {
          best = highestScored(reusePoints);
          return !best.notGoodEnough();
@@ -212,15 +210,15 @@ public class ReuseListenerImpl implements ReuseListener, KeYSelectionListener {
 
    
    public ReusePoint getBestReusePoint() {
-       reuseLogger.info("############## RE-USING "+
-           best.getApp().rule().name()+" "+best.score());
+       Debug.log4jInfo("############## RE-USING "+
+           best.getApp().rule().name()+" "+best.score(), "key.proof.reuse");
        return best;
    }
    
    
    void analyzeCandidate(Node source, Goal target) {
-      reuseLogger.info("***** (next goal) candidate nodes in system: "+
-                       Node.reuseCandidatesNumber());
+      Debug.log4jInfo("***** (next goal) candidate nodes in system: "+
+                       Node.reuseCandidatesNumber(), "key.proof.reuse");
 //      reuseLogger.info("goal: "+target.node().sequent().toString()); //slow!
                        
       ReusePoint blank = new ReusePoint(source, target);
@@ -238,7 +236,7 @@ public class ReuseListenerImpl implements ReuseListener, KeYSelectionListener {
           updateSimpRuleLogic.applicableWhere(blank);
       } else {
           String ruleName = blank.getApp().rule().getClass().toString();
-          reuseLogger.error("Cannot re-use "+ruleName);
+          Debug.log4jError("Cannot re-use "+ruleName, "key.proof.reuse");
       }
 
    }

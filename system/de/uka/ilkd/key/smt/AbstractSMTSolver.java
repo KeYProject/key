@@ -14,8 +14,6 @@ import java.util.Calendar;
 import java.util.Collection;
 import java.util.LinkedList;
 
-import org.apache.log4j.Logger;
-
 import de.uka.ilkd.key.gui.Main;
 import de.uka.ilkd.key.gui.configuration.PathConfig;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
@@ -27,6 +25,7 @@ import de.uka.ilkd.key.smt.SMTSolverResult.ThreeValuedTruth;
 import de.uka.ilkd.key.smt.SolverSession.InternResult;
 import de.uka.ilkd.key.smt.launcher.AbstractProcess;
 import de.uka.ilkd.key.smt.taclettranslation.DefaultTacletSetTranslation;
+import de.uka.ilkd.key.util.Debug;
 
 
 public abstract class AbstractSMTSolver extends AbstractProcess implements SMTSolver {
@@ -39,8 +38,6 @@ public abstract class AbstractSMTSolver extends AbstractProcess implements SMTSo
 	return fileCounter;
     }
 
-    private static final Logger logger = Logger
-	    .getLogger(AbstractSMTSolver.class.getName());
 
     /**
      * The path for the file
@@ -226,7 +223,7 @@ public abstract class AbstractSMTSolver extends AbstractProcess implements SMTSo
 	    //store the translation to a file                                
 	    loc = this.storeToFile(formula);
 	} catch (IOException e) {
-	    logger.error("The file with the formula could not be written.", e);
+	    Debug.log4jError("The file with the formula could not be written." + e, AbstractSMTSolver.class.getName());
 	    final IOException io = new IOException("Could not create or write the input file " +
 		    "for the external prover. Received error message:\n" + e.getMessage());
 	    io.initCause(e);
@@ -249,10 +246,6 @@ public abstract class AbstractSMTSolver extends AbstractProcess implements SMTSo
 	saveTacletTranslation(trans);
 	
 	return translateToCommand(formula, services);
-	
-
-	
-    	
     }
     
 

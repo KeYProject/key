@@ -31,8 +31,6 @@ import javax.swing.border.TitledBorder;
 import javax.swing.event.*;
 import javax.swing.text.JTextComponent;
 
-import org.apache.log4j.Logger;
-
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.gui.assistant.ProofAssistant;
 import de.uka.ilkd.key.gui.assistant.ProofAssistantAI;
@@ -91,10 +89,7 @@ public class Main extends JFrame implements IMain {
     
     /** size of the tool bar icons */
     private static final int TOOLBAR_ICON_SIZE = 15;
-    
-    /** Name of the config file controlling logging with log4j */
-    private static final String LOGGER_CONFIGURATION = PathConfig.KEY_CONFIG_DIR + File.separator + "logger.props";
-    
+        
     static {
         // @xxx preliminary: better store along with other settings.
         PresentationFeatures.ENABLED = true;
@@ -345,16 +340,7 @@ public class Main extends JFrame implements IMain {
         standalone = b;
     }
     
-    
-    public static void configureLogger() {
-        if ((new File(LOGGER_CONFIGURATION)).exists())
-            org.apache.log4j.PropertyConfigurator.configureAndWatch(LOGGER_CONFIGURATION, 1500);
-        else {
-            org.apache.log4j.BasicConfigurator.configure();
-            Logger.getRootLogger().setLevel(org.apache.log4j.Level.ERROR);            
-        }
-    }
-    
+       
     public String getInternalVersion() {
         return INTERNAL_VERSION;
     }
@@ -596,11 +582,23 @@ public class Main extends JFrame implements IMain {
         
         addTab("Goals", openGoalsView, "The currently open goals");
         
-        tabbedPane.addTab("User Constraint", null, userConstraintView,
-        "Currently chosen metavariable instantiations");
-        
-        tabbedPane.addTab("Proof Search Strategy", null, strategySelectionView,
-        "Select strategy for automated proof search");
+        String laf = UIManager.getLookAndFeel().getClass()+"";
+        if (laf.contains("Aqua")) {
+            // Apple uses scrolling (not multiple rows) for overlong tab
+            // lists. Let the Apple user scroll less for important tabs.
+            tabbedPane.addTab("Proof Search Strategy", null, strategySelectionView,
+            "Select strategy for automated proof search");
+
+            tabbedPane.addTab("User Constraint", null, userConstraintView,
+            "Currently chosen metavariable instantiations");
+        } else {
+            // This arrangement looks better on other platforms
+            tabbedPane.addTab("User Constraint", null, userConstraintView,
+            "Currently chosen metavariable instantiations");
+
+            tabbedPane.addTab("Proof Search Strategy", null, strategySelectionView,
+            "Select strategy for automated proof search");
+        }
         
         tabbedPane.addTab("Rules", null, new JScrollPane(ruleView), "All available rules");
         tabbedPane.setSelectedIndex(0);
@@ -990,6 +988,21 @@ public class Main extends JFrame implements IMain {
             activeOptions.setEditable(false);
             JOptionPane.showMessageDialog(Main.this, activeOptions, "Active Taclet Options",
                     JOptionPane.INFORMATION_MESSAGE);
+        }
+    }
+   
+    private void showUsedSpecifications() {
+	Proof currentProof = mediator.getProof();
+        if(currentProof == null) {
+            mediator.notify(new GeneralInformationEvent("No Specifications available.",
+                    "If you wish to see the used specifications "
+                    + "for a proof you have to load one first"));
+        } else {
+            new UsedSpecificationsDialog(
+                         mediator.getServices(), 
+                         mediator.getSelectedProof()
+                                 .getBasicTask()
+                                 .getUsedSpecs());
         }
     }
     
@@ -1408,12 +1421,12 @@ public class Main extends JFrame implements IMain {
         JMenuItem methodContractsItem = new JMenuItem("Show Used Specifications...");
         methodContractsItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                new UsedSpecificationsDialog(
-                             mediator.getServices(), 
-                             mediator.getSelectedProof()
-                                     .getBasicTask()
-                                     .getUsedSpecs());
-            }});
+                showUsedSpecifications();
+            }
+        });
+
+
+	 
         registerAtMenu(proof, methodContractsItem);
 
         final JMenuItem statisticsInfo = new JMenuItem("Show Proof Statistics");
@@ -2307,9 +2320,7 @@ public class Main extends JFrame implements IMain {
     
     class MainProofListener implements AutoModeListener, KeYSelectionListener,
     	SettingsListener {	
-        
-        Logger logger = Logger.getLogger("key.threading");
-        
+                
         Proof proof = null;
         
         
@@ -2356,7 +2367,7 @@ public class Main extends JFrame implements IMain {
          * invoked if automatic execution has started
          */
         public synchronized void autoModeStarted(ProofEvent e) {
-            logger.warn("Automode started");
+            Debug.log4jWarn("Automode started", "key.threading");
             disableCurrentGoalView = true;
             mediator().removeKeYSelectionListener(proofListener);
             freezeExceptAutoModeButton();
@@ -2366,10 +2377,7 @@ public class Main extends JFrame implements IMain {
          * invoked if automatic execution has stopped
          */
         public synchronized void autoModeStopped(ProofEvent e) {
-            logger.warn("Automode stopped");
-            if (logger.isDebugEnabled()) {
-                logger.debug("From " + Debug.stackTrace());
-            }
+            Debug.log4jDebug("From " + Debug.stackTrace(), "key.threading");
             unfreezeExceptAutoModeButton();
             disableCurrentGoalView = false;
             setProofNodeDisplay();
@@ -3265,7 +3273,6 @@ public class Main extends JFrame implements IMain {
         // does no harm on non macs
         System.setProperty("apple.laf.useScreenMenuBar","true"); 
         
-        configureLogger();
         Main.evaluateOptions(args);        
  	Main key = getInstance(isVisibleMode());   
  	key.loadCommandLineFile();

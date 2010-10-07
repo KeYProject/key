@@ -1,5 +1,5 @@
 # This file is part of KeY - Integrated Deductive Software Design 
-# Copyright (C) 2001-2004 Universitaet Karlsruhe, Germany
+# Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 #                         Universitaet Koblenz-Landau, Germany
 #                         Chalmers University of Technology, Sweden 
 #
@@ -519,7 +519,6 @@ localinst:
 	@mkdir -p /usr/lib/key/key-ext-jars
 	@cp $(KEY_LIB)/recoderKey.jar /usr/lib/key/key-ext-jars
 	@cp $(KEY_LIB)/antlr.jar /usr/lib/key/key-ext-jars
-	@cp $(KEY_LIB)/log4j.jar /usr/lib/key/key-ext-jars
 	@cp key.jar /usr/lib/key
 	@sed -i 's/system\/binary\//key.jar/g' /usr/lib/key/bin/*
 	@ln -sf /usr/lib/key/bin/runProver /usr/bin/
