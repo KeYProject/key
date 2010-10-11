@@ -46,7 +46,7 @@ endif
 GIT_REPOS_AVAILABLE=$(wildcard ../.git/objects)
 
 ifeq "$(GIT_REPOS_AVAILABLE)" ""
-  GIT=""
+  GIT=
 endif
 
 SHA1=ownVersion
