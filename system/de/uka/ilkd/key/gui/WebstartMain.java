@@ -22,10 +22,7 @@ import de.uka.ilkd.key.gui.Main;
 
 public class WebstartMain {
     
-    //private static final String DEFAULT_EXAMPLE = "select_store.key";
-    private static final String DEFAULT_EXAMPLE = "list/src";
-
-    private static void delete(File f){
+    private static void delete(File f) {
 	if(f.isDirectory()) {
 	    for(File c : f.listFiles()) {
 		delete(c);
@@ -35,7 +32,7 @@ public class WebstartMain {
     } 
 
         
-    private static String setupExamples() {
+    private static File setupExamples() {
 	try {
 	    final File tempDir = File.createTempFile("keyheap-examples-", null);
 	    tempDir.delete();
@@ -89,7 +86,7 @@ public class WebstartMain {
 		}
 	    }
 
-	    return tempDir.getCanonicalPath();
+	    return tempDir;
 	} catch(IOException e) {
 	    return null;
 	}
@@ -97,12 +94,13 @@ public class WebstartMain {
     
     
     public static void main(String[] args) {
-	String path = setupExamples();
+	File examplesDir = setupExamples();
 
-	if(path != null) {
-	    String[] newArgs = new String[args.length + 1];
+	if(examplesDir != null) {
+	    String[] newArgs = new String[args.length + 2];
 	    System.arraycopy(args, 0, newArgs, 0, args.length);
-	    newArgs[args.length] = path + File.separator + DEFAULT_EXAMPLE;
+	    newArgs[args.length] = "EXAMPLES";
+	    newArgs[args.length + 1] = examplesDir.getAbsolutePath();
 	    args = newArgs;
 	}
 

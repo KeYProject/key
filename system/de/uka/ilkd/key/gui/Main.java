@@ -147,6 +147,9 @@ public final class Main extends JFrame implements IMain {
     /** action for opening a KeY file */
     public static OpenFile openFileAction;
     
+    /** action for opening an example */
+    public static OpenExample openExampleAction;    
+    
     /** action for opening the most recent KeY file */
     public static OpenMostRecentFile openMostRecentFileAction;
     
@@ -170,6 +173,7 @@ public final class Main extends JFrame implements IMain {
 
     public static String statisticsFile = null;
 
+    private static String examplesDir = null;
     
     
     /** undo the last proof step on the currently selected branch */
@@ -401,12 +405,13 @@ public final class Main extends JFrame implements IMain {
         setJMenuBar(new JMenuBar());
         setToolBar(new JToolBar("Proof Control"));
         
-        autoModeAction           = new AutoModeAction();
-        openFileAction           = new OpenFile();
-        openMostRecentFileAction = new OpenMostRecentFile();
-        editMostRecentFileAction = new EditMostRecentFile();
-        saveFileAction           = new SaveFile();
-        poBrowserAction          = new POBrowserAction();
+        autoModeAction            = new AutoModeAction();
+        openFileAction            = new OpenFile();
+        openExampleAction         = new OpenExample();
+        openMostRecentFileAction  = new OpenMostRecentFile();
+        editMostRecentFileAction  = new EditMostRecentFile();
+        saveFileAction            = new SaveFile();
+        poBrowserAction           = new POBrowserAction();
 
 	// ============================================================
 	// ==================  create empty views =====================
@@ -460,7 +465,7 @@ public final class Main extends JFrame implements IMain {
         toolBar.add(goalBackButton);
         toolBar.addSeparator();
                        
-        JToolBar fileOperations = new JToolBar("File Operations");
+        JToolBar fileOperations = new JToolBar("File Operations");        
         fileOperations.add(createOpenFile());
         fileOperations.add(createOpenMostRecentFile());
         fileOperations.add(createEditMostRecentFile());
@@ -581,6 +586,13 @@ public final class Main extends JFrame implements IMain {
         button.setText(null);
         return button;
     }
+    
+    private JComponent createOpenExample() {
+        final JButton button = new JButton();
+        button.setAction(openExampleAction);
+        button.setText(null);
+        return button;
+    }    
     
     private JComponent createOpenMostRecentFile() {
         final JButton button = new JButton();
@@ -1018,6 +1030,9 @@ public final class Main extends JFrame implements IMain {
         JMenu fileMenu = new JMenu("File");
         fileMenu.setMnemonic(KeyEvent.VK_F);
         
+        JMenuItem loadExample = new JMenuItem();
+        loadExample.setAction(openExampleAction);          
+        
         JMenuItem load = new JMenuItem();
         load.setAction(openFileAction);
         
@@ -1029,11 +1044,12 @@ public final class Main extends JFrame implements IMain {
         
         JMenuItem save = new JMenuItem();
         save.setAction(saveFileAction);
-        
+                       
+        registerAtMenu(fileMenu, loadExample);        
         registerAtMenu(fileMenu, load);
         registerAtMenu(fileMenu, loadRecent);
         registerAtMenu(fileMenu, edit);
-        registerAtMenu(fileMenu, save);
+        registerAtMenu(fileMenu, save);        
                 
         JMenuItem exit = new JMenuItem("Exit");
         exit.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Q, ActionEvent.CTRL_MASK));
@@ -1044,7 +1060,7 @@ public final class Main extends JFrame implements IMain {
         });
         
         addSeparator(fileMenu);
-        
+                
         recentFiles = new RecentFileMenu(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 loadProblem(new File(recentFiles.getAbsolutePath((JMenuItem) e.getSource())));
@@ -1688,7 +1704,8 @@ public final class Main extends JFrame implements IMain {
 	    }
 	}
     }
-
+    
+    
     
     /**
      * Opens a file dialog allowing to select the file to be loaded
@@ -1712,6 +1729,24 @@ public final class Main extends JFrame implements IMain {
             
         }
     }
+    
+
+    /**
+     * Opens a file dialog allowing to select the example to be loaded
+     */
+    private final class OpenExample extends AbstractAction {
+        public OpenExample() {
+            putValue(NAME, "Load Example...");
+            putValue(SHORT_DESCRIPTION, "Browse and load included examples.");
+        }
+        
+        public void actionPerformed(ActionEvent e) {
+            File file = ExampleChooser.showInstance(examplesDir);
+            if(file != null) {
+        	loadProblem(file);
+            }
+        }
+    }    
     
 
     /**
@@ -2256,11 +2291,13 @@ public final class Main extends JFrame implements IMain {
                     }
                     index++;                   
                     ProofSettings.DEFAULT_SETTINGS.getStrategySettings().setTimeout(timeout);
-        } else if (opt[index].equals("PRINT_STATISTICS")) {                     
-            if ( !( opt.length > index + 1 ) ) printUsageAndExit ();
-            statisticsFile = opt[index + 1];
-            ++index;
-        } else {
+		} else if (opt[index].equals("PRINT_STATISTICS")) {                     
+		    if ( !( opt.length > index + 1 ) ) printUsageAndExit ();
+		    statisticsFile = opt[++index];
+		} else if(opt[index].equals("EXAMPLES")) {
+		    if ( !( opt.length > index + 1 ) ) printUsageAndExit ();
+		    examplesDir = opt[++index];
+		} else {
 		    printUsageAndExit ();
 		}		
 	    }
@@ -2706,6 +2743,8 @@ public final class Main extends JFrame implements IMain {
     public void loadCommandLineFile() {
         if (fileNameOnStartUp != null) {
             loadProblem(new File(fileNameOnStartUp));
+        } else {
+            openExampleAction.actionPerformed(null);
         }
     }
     
