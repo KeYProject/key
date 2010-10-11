@@ -63,7 +63,7 @@ public class SparseArray {
 
     /*@ normal_behaviour
       @   requires 0 <= i && i < size;
-      @   //requires n == size ==> (idx[i] < n && back[idx[i]] == i);
+      @   requires n == size ==> (idx[i] < n && back[idx[i]] == i);//TODO: remove
       @   assignable footprint;
       @   ensures (\forall int x; 0 <= x && x < size && x != i; get(x) == \old(get(x)));
       @   ensures get(i) == v;
@@ -75,7 +75,4 @@ public class SparseArray {
 	    idx[i] = n; back[n] = i; n = n + 1;
 	}
     }
-    
-    //interactive proofs:
-    //-set (uncomment requires clause; switch off quantifier instantiation; use Simplify)
 }

@@ -1,5 +1,3 @@
-//WORK IN PROGRESS
-
 class Node {   
     private int head;
     private /*@nullable@*/ Node next;

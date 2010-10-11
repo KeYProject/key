@@ -38,6 +38,9 @@ import javax.swing.event.ListSelectionListener;
 
 public final class ExampleChooser extends JDialog {
     
+    private static final String KEY_FILE_NAME = "project.key";
+    private static final String README_NAME = "README.txt";
+    
     private static ExampleChooser instance;
     
     private final JList exampleList;  
@@ -72,7 +75,10 @@ public final class ExampleChooser extends JDialog {
         });
 	for(File example : examples) {
 	    if(example.isDirectory()) {
-		model.addElement(example);
+		final File keyfile = new File(example, KEY_FILE_NAME);
+		if(keyfile.isFile()) {
+		    model.addElement(example);
+		}
 	    }
 	}
 	exampleList = new JList();
@@ -171,6 +177,9 @@ public final class ExampleChooser extends JDialog {
     private static File lookForExamples() {
         final ClassLoader loader = ExampleChooser.class.getClassLoader();
         String path = loader.getResource(".").getPath();
+        if(path.startsWith("file:")) {
+            path = path.substring("file:".length());
+        }
         int i = path.lastIndexOf("/");
         while(i > 0) {
             path = path.substring(0, i);
@@ -187,8 +196,7 @@ public final class ExampleChooser extends JDialog {
     
     private void updateDescription() {
 	final File selectedExample = (File) exampleList.getSelectedValue();
-	final File readme = new File(selectedExample.getAbsolutePath() 
-				     + "/README.txt");
+	final File readme = new File(selectedExample, README_NAME);
 	if(readme.isFile()) {
 	    try {
 		final BufferedReader br 
@@ -239,7 +247,9 @@ public final class ExampleChooser extends JDialog {
 	
 	//return result
 	final File result = instance.success 
-        		    ? (File)instance.exampleList.getSelectedValue() 
+        		    ? new File((File)instance.exampleList
+        			                     .getSelectedValue(), 
+        			       KEY_FILE_NAME) 
         	            : null;	
 	return result;
     }

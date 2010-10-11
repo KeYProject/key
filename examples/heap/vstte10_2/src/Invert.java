@@ -23,7 +23,4 @@ class Invert {
            b[a[i]] = i;
        }
    }
-   
-   
-   //interactive proof: switch off quantifier instantiation; use Z3; instantiate double quantifier; use Z3   
 }

@@ -1,7 +1,5 @@
 public class ExampleClient {
-    
-    //proof has about 250'000 nodes
-    
+        
     /*@ normal_behaviour
       @   ensures \result == 0;
       @*/

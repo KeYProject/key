@@ -96,14 +96,4 @@ final class LinkedList implements List {
     public void concatenate(List l) {
 	//TODO
     }    
-    
-        
-    //interactive proofs:
-    //-footprint (apply reachDependenciesChangeHeapAtLocs)
-    //-\inv (apply reachDependenciesChangeHeapAtLocs)
-    
-    //not yet verified: 
-    //-add
-    //-contains
-    //-some depends clauses
 }

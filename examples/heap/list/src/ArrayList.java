@@ -174,9 +174,4 @@ public class ArrayList implements List {
 	    return arrayList.array[arrayPos - 1];
 	}
     }
-    
-    
-    //interactive proofs:
-    //-contains (obvious quantifier instantiation)
-    //-remove (manual quantifier instantiations; auto instantiation seems to run into a matching loop)
 }

@@ -159,8 +159,8 @@ public final class Main extends JFrame implements IMain {
     /** action for saving a proof (attempt) */
     public static SaveFile saveFileAction;
     
-    /** action for opening the PO browser */
-    public static POBrowserAction poBrowserAction;
+    /** action for opening the proof management dialog */
+    public static ProofManagementAction proofManagementAction;
     
 
     public static final String AUTO_MODE_TEXT = "Start/stop automated proof search";
@@ -411,7 +411,7 @@ public final class Main extends JFrame implements IMain {
         openMostRecentFileAction  = new OpenMostRecentFile();
         editMostRecentFileAction  = new EditMostRecentFile();
         saveFileAction            = new SaveFile();
-        poBrowserAction           = new POBrowserAction();
+        proofManagementAction     = new ProofManagementAction();
 
 	// ============================================================
 	// ==================  create empty views =====================
@@ -471,7 +471,7 @@ public final class Main extends JFrame implements IMain {
         fileOperations.add(createEditMostRecentFile());
         fileOperations.add(createSaveFile());        
         fileOperations.addSeparator();
-        fileOperations.add(createPOBrowserComponent());
+        fileOperations.add(createProofManagementComponent());
         
         goalView.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW ).put(
                 KeyStroke.getKeyStroke(KeyEvent.VK_C, ActionEvent.CTRL_MASK), 
@@ -615,9 +615,9 @@ public final class Main extends JFrame implements IMain {
         return button;
     }
 
-    private JComponent createPOBrowserComponent() {
+    private JComponent createProofManagementComponent() {
         final JButton button = new JButton();
-        button.setAction(poBrowserAction);
+        button.setAction(proofManagementAction);
         button.setText("Proof Management");
         return button;
     }
@@ -1044,13 +1044,10 @@ public final class Main extends JFrame implements IMain {
         
         JMenuItem save = new JMenuItem();
         save.setAction(saveFileAction);
-                       
-        registerAtMenu(fileMenu, loadExample);        
-        registerAtMenu(fileMenu, load);
-        registerAtMenu(fileMenu, loadRecent);
-        registerAtMenu(fileMenu, edit);
-        registerAtMenu(fileMenu, save);        
-                
+        
+        JMenuItem proofManagement = new JMenuItem();
+        proofManagement.setAction(proofManagementAction);        
+                                       
         JMenuItem exit = new JMenuItem("Exit");
         exit.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Q, ActionEvent.CTRL_MASK));
         exit.addActionListener(new ActionListener() {
@@ -1059,8 +1056,18 @@ public final class Main extends JFrame implements IMain {
             }
         });
         
+        registerAtMenu(fileMenu, loadExample);        
+        registerAtMenu(fileMenu, load);
+        registerAtMenu(fileMenu, loadRecent);
+        registerAtMenu(fileMenu, edit);
+        registerAtMenu(fileMenu, save);        
+        
         addSeparator(fileMenu);
-                
+        
+        registerAtMenu(fileMenu, proofManagement);
+        
+        addSeparator(fileMenu);
+        
         recentFiles = new RecentFileMenu(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 loadProblem(new File(recentFiles.getAbsolutePath((JMenuItem) e.getSource())));
@@ -1132,8 +1139,6 @@ public final class Main extends JFrame implements IMain {
 	
 	final JMenuItem tacletOptionsView = new JMenuItem(TACLET_OPTIONS_MENU_STRING);
 
-	tacletOptionsView.setAccelerator(KeyStroke.getKeyStroke
-			    (KeyEvent.VK_M, ActionEvent.CTRL_MASK));
 	tacletOptionsView.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
 		    selectMaxTooltipLines();
@@ -1712,7 +1717,7 @@ public final class Main extends JFrame implements IMain {
      */
     private final class OpenFile extends AbstractAction {
         public OpenFile() {
-            putValue(NAME, "Load ...");
+            putValue(NAME, "Load...");
             putValue(SMALL_ICON, IconFactory.openKeYFile(TOOLBAR_ICON_SIZE));
             putValue(SHORT_DESCRIPTION, "Browse and load problem or proof files.");
             putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_O, ActionEvent.CTRL_MASK));
@@ -1815,7 +1820,7 @@ public final class Main extends JFrame implements IMain {
     private final class SaveFile extends AbstractAction {
         
         public SaveFile() {
-            putValue(NAME, "Save ...");
+            putValue(NAME, "Save...");
             putValue(SMALL_ICON, IconFactory.saveFile(TOOLBAR_ICON_SIZE));
             putValue(SHORT_DESCRIPTION, "Save current proof.");
             putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_S, ActionEvent.CTRL_MASK));
@@ -1847,15 +1852,14 @@ public final class Main extends JFrame implements IMain {
     
     
     /**
-     * Shows the proof obligation browser.
+     * Shows the proof management dialog
      */
-    private final class POBrowserAction extends AbstractAction {
+    private final class ProofManagementAction extends AbstractAction {
         
-        public POBrowserAction() {
-            putValue(NAME, "PO Browser");
-            //putValue(SMALL_ICON, IconFactory.saveFile(TOOLBAR_ICON_SIZE));
-            putValue(SHORT_DESCRIPTION, "Proof Obligation Browser.");
-            putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_B, ActionEvent.CTRL_MASK));
+        public ProofManagementAction() {
+            putValue(NAME, "Proof Management...");
+            putValue(SHORT_DESCRIPTION, "Proof Management.");
+            putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_M, ActionEvent.CTRL_MASK));
             
             setEnabled(enabled());
             
@@ -2743,7 +2747,7 @@ public final class Main extends JFrame implements IMain {
     public void loadCommandLineFile() {
         if (fileNameOnStartUp != null) {
             loadProblem(new File(fileNameOnStartUp));
-        } else {
+        } else if(examplesDir != null) {
             openExampleAction.actionPerformed(null);
         }
     }
