@@ -10,6 +10,7 @@
 
 package de.uka.ilkd.key.proof.init;
 
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.speclang.Contract;
 
 
@@ -19,4 +20,6 @@ import de.uka.ilkd.key.speclang.Contract;
 public interface ContractPO extends ProofOblInput {
     
     public Contract getContract();
+    
+    public Term getMbyAtPre();
 }

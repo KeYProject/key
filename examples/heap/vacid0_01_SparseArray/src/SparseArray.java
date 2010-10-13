@@ -63,7 +63,7 @@ public class SparseArray {
 
     /*@ normal_behaviour
       @   requires 0 <= i && i < size;
-      @   requires n == size ==> (idx[i] < n && back[idx[i]] == i);//TODO: remove
+      @   //requires n == size ==> (idx[i] < n && back[idx[i]] == i);//"free requires"
       @   assignable footprint;
       @   ensures (\forall int x; 0 <= x && x < size && x != i; get(x) == \old(get(x)));
       @   ensures get(i) == v;

@@ -25,11 +25,9 @@ public interface OperationContract extends Contract {
     
     @Override
     public ProgramMethod getTarget();
-    
 
     @Override
     public OperationContract setID(int id);
-    
     
     @Override
     public OperationContract setTarget(KeYJavaType newKJT,

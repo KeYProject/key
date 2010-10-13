@@ -8,13 +8,14 @@ class Node {
     
     /*@ private invariant \subset(this.*, repr) && 1 <= seq.length && seq[0] == head;
       @ private invariant next == null ==> seq.length == 1;
-      @ private invariant next != null ==> \subset(next.repr, repr)
+      @ private invariant next != null ==> \subset(next.*, repr)
+      @                                    && \subset(next.repr, repr)
       @                                    && \disjoint(this.*, next.repr)
       @                                    && seq[1..seq.length] == next.seq
       @                                    && next.\inv;
       @*/
        
-    //@ accessible \inv: repr;
+    //@ accessible \inv: repr \measured_by seq.length;
 
 
     /*@ public normal_behaviour
@@ -28,7 +29,7 @@ class Node {
     	n.head = x;
     	n.next = tail;
     	//@ set n.seq = \seq_concat(\seq_singleton(x), tail == null ? \seq_empty : tail.seq);
-    	//@ set n.repr = \set_union(\all_fields(n), tail == null ? \empty : tail.repr);
+    	//@ set n.repr = \set_union(\all_fields(n), tail == null ? \empty : (\set_union(\all_fields(tail), tail.repr)));
     	return n;
     }
 

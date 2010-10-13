@@ -31,6 +31,7 @@ import de.uka.ilkd.key.proof.init.*;
 import de.uka.ilkd.key.proof.mgt.ProofStatus;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.speclang.Contract;
+import de.uka.ilkd.key.speclang.DependencyContract;
 import de.uka.ilkd.key.speclang.OperationContract;
 import de.uka.ilkd.key.util.Pair;
 
@@ -349,8 +350,10 @@ public final class ProofManagementDialog extends JDialog {
 	return contract == null
 	       ? null
 	       : contract instanceof OperationContract 
-	         ? new OperationContractPO(initConfig, (OperationContract)contract)
-	           : new DependencyContractPO(initConfig, contract);
+	         ? new OperationContractPO(initConfig, 
+	        	 		   (OperationContract)contract)
+	           : new DependencyContractPO(initConfig, 
+	        	   	              (DependencyContract)contract);
     }
     
     
@@ -464,9 +467,13 @@ public final class ProofManagementDialog extends JDialog {
 		for(Contract contract : contracts) {
 		    final ProofOblInput po;
 		    if(contract instanceof OperationContract) {
-			po = new OperationContractPO(initConfig, (OperationContract)contract);
+			po = new OperationContractPO(
+					initConfig, 
+					(OperationContract)contract);
 		    } else {
-			po = new DependencyContractPO(initConfig, contract);
+			po = new DependencyContractPO(
+					initConfig, 
+				        (DependencyContract)contract);
 		    }
 		    Proof proof = findPreferablyClosedProof(po);
 		    if(proof == null) {

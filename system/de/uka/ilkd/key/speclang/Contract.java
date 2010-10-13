@@ -43,11 +43,11 @@ public interface Contract extends SpecificationElement {
      * Returns the contracted function symbol.
      */
     public ObserverFunction getTarget();
-    
+        
     /**
-     * Tells whether the contract contains a dependency set.
+     * Tells whether the contract contains a measured_by clause.
      */
-    public boolean hasDep();
+    public boolean hasMby();
     
     /**
      * Returns the precondition of the contract.
@@ -64,17 +64,18 @@ public interface Contract extends SpecificationElement {
 	    	       ImmutableList<Term> paramTerms,
 	    	       Services services);    
     
+    
     /**
-     * Returns the dependency set of the contract.
+     * Returns the measured_by clause of the contract.
      */
-    public Term getDep(ProgramVariable selfVar,
+    public Term getMby(ProgramVariable selfVar,
 	               ImmutableList<ProgramVariable> paramVars,
 	               Services services);    
         
     /**
-     * Returns the dependency set of the contract.
+     * Returns the measured_by clause of the contract.
      */
-    public Term getDep(Term heapTerm,
+    public Term getMby(Term heapTerm,
 	               Term selfTerm,
 	               ImmutableList<Term> paramTerms,
 	               Services services);
@@ -90,7 +91,7 @@ public interface Contract extends SpecificationElement {
      */
     public Contract setTarget(KeYJavaType newKJT,
 	    	              ObserverFunction newTarget,
-	    		      Services services);
+	    		      Services services);        
             
     /**
      * Returns the contract in pretty HTML format.

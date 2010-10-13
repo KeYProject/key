@@ -5,30 +5,36 @@
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
+
 package de.uka.ilkd.key.proof;
+
+import de.uka.ilkd.key.proof.mgt.ProofStatus;
 
 public class SingleProof extends ProofAggregate {
 
-    private Proof proof;
+    private final Proof proof;
     
     public SingleProof(Proof p, String name) {
         super(name);
         this.proof = p;
     }
     
-    public void updateProofStatus() {
-        proof.mgt().updateProofStatus();
-        proofStatus = proof.mgt().getStatus();
+    @Override
+    public ProofStatus getStatus() {
+        return proof.mgt().getStatus();
     }
 
+    @Override
     public Proof[] getProofs() {
         return new Proof[]{proof};
     }
-    
+
+    @Override    
     public int size() {
         return 1;
     }
     
+    @Override    
     public ProofAggregate[] getChildren() {
         return new ProofAggregate[0];
     }

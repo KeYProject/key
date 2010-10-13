@@ -32,6 +32,7 @@ import de.uka.ilkd.key.speclang.*;
 import de.uka.ilkd.key.speclang.jml.pretranslation.*;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.util.Pair;
+import de.uka.ilkd.key.util.Triple;
 
 
 /**
@@ -140,6 +141,7 @@ public class JMLSpecFactory {
                                 Behavior originalBehavior,                              
                                 PositionedString customName,
                                 ImmutableList<PositionedString> originalRequires,
+                                ImmutableList<PositionedString> originalMeasuredBy,
                                 ImmutableList<PositionedString> originalAssignable,
                                 ImmutableList<PositionedString> originalAccessible,
                                 ImmutableList<PositionedString> originalEnsures,
@@ -150,6 +152,7 @@ public class JMLSpecFactory {
         assert pm != null;
         assert originalBehavior != null;
         assert originalRequires != null;
+        assert originalMeasuredBy != null;
         assert originalAssignable != null;
         assert originalEnsures != null;
         assert originalSignals != null;
@@ -179,6 +182,26 @@ public class JMLSpecFactory {
                     null,
                     null);
             requires = TB.and(requires, translated);        
+        }
+        
+        //translate measured_by
+        Term measuredBy;
+        if(originalMeasuredBy.isEmpty()) {
+            measuredBy = null;
+        } else {
+            measuredBy = TB.zero(services);
+            for(PositionedString expr : originalMeasuredBy) {
+                Term translated 
+                    = translator.translateExpression(
+                        expr,
+                        pm.getContainerType(),
+                        selfVar, 
+                        paramVars, 
+                        null, 
+                        null,
+                        null);
+                measuredBy = TB.add(services, measuredBy, translated);        
+            }
         }
 
         //translate assignable
@@ -305,9 +328,9 @@ public class JMLSpecFactory {
                                             pm,
                                             Modality.DIA,
                                             requires,
+                                            measuredBy,
                                             post,
                                             assignable,
-                                            null,//accessible,
                                             selfVar,
                                             paramVars,
                                             resultVar,
@@ -321,9 +344,9 @@ public class JMLSpecFactory {
                                             pm,
                                             Modality.BOX,
                                             requires,
+                                            measuredBy,
                                             post,
                                             assignable,
-                                            null,//accessible,
                                             selfVar,
                                             paramVars,
                                             resultVar,
@@ -337,9 +360,9 @@ public class JMLSpecFactory {
                                             pm,
                                             Modality.DIA,
                                             TB.and(requires, TB.not(diverges)),
+                                            measuredBy,
                                             post,
                                             assignable,
-                                            null,//accessible,
                                             selfVar,
                                             paramVars,
                                             resultVar,
@@ -351,9 +374,9 @@ public class JMLSpecFactory {
                                             pm,
                                             Modality.BOX,
                                             requires,
+                                            measuredBy,
                                             post,
                                             assignable,
-                                            null,//accessible,
                                             selfVar,
                                             paramVars,
                                             resultVar,
@@ -368,7 +391,8 @@ public class JMLSpecFactory {
             	= new DependencyContractImpl("JML accessible clause",
         				     pm.getContainerType(),
         				     pm,
-        				     requires,        	                          
+        				     requires,    
+        				     measuredBy,        				     
         				     accessible,
         				     selfVar,
         				     paramVars);
@@ -487,7 +511,7 @@ public class JMLSpecFactory {
         ProgramVariable selfVar = TB.selfVar(services, kjt, false);
         
         //translate expression
-        Pair<ObserverFunction,Term> dep 
+        Triple<ObserverFunction,Term,Term> dep 
         	= translator.translateDependsExpression(originalDep,
         					  	kjt,
         					  	selfVar);
@@ -499,7 +523,8 @@ public class JMLSpecFactory {
         return new DependencyContractImpl("JML depends clause",
         				  kjt,
         	                          dep.first,
-        				  TB.inv(services, TB.var(selfVar)),        	                          
+        				  TB.inv(services, TB.var(selfVar)),
+        	                          dep.third,       				  
         	                          dep.second,
         	                          selfVar,
         	                          paramVars);
@@ -522,6 +547,7 @@ public class JMLSpecFactory {
                                     textualSpecCase.getBehavior(),
                                     textualSpecCase.getName(),
                                     textualSpecCase.getRequires(),
+                                    textualSpecCase.getMeasuredBy(),
                                     textualSpecCase.getAssignable(),
                                     textualSpecCase.getAccessible(),
                                     textualSpecCase.getEnsures(),

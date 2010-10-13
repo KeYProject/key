@@ -525,6 +525,7 @@ simple_spec_body_clause[TextualJMLSpecCase sc, Behavior b]
 	|   ps=signals_clause        { sc.addSignals(ps); }
 	|   ps=signals_only_clause   { sc.addSignalsOnly(ps); }
 	|   ps=diverges_clause       { sc.addDiverges(ps); }
+	|   ps=measured_by_clause    { sc.addMeasuredBy(ps); }
 	|   ps=name_clause           { sc.addName(ps);}
 	|   captures_clause 
 	|   when_clause
@@ -582,6 +583,21 @@ accessible_keyword
 :
         ACCESSIBLE
     |   ACCESSIBLE_REDUNDANTLY
+;
+
+
+measured_by_clause 
+	returns [PositionedString result = null] 
+	throws SLTranslationException
+:
+    measured_by_keyword result=expression
+;
+
+
+measured_by_keyword
+:
+        MEASURED_BY
+    |   MEASURED_BY_REDUNDANTLY
 ;
 
 

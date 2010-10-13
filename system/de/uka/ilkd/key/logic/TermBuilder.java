@@ -778,6 +778,19 @@ public final class TermBuilder {
     }
     
     
+    public Term add(Services services, Term t1, Term t2) {
+        final IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();
+        final Term zero = integerLDT.zero();
+        if(t1.equals(zero)) {
+            return t2;
+        } else if(t2.equals(zero)) {
+            return t1;
+        } else {
+            return func(integerLDT.getAdd(), t1, t2);
+        }
+    }
+    
+    
     
     //-------------------------------------------------------------------------
     //location set operators    

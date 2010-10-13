@@ -32,6 +32,7 @@ import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.proof.init.*;
 import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.speclang.Contract;
+import de.uka.ilkd.key.speclang.DependencyContract;
 import de.uka.ilkd.key.speclang.OperationContract;
 import de.uka.ilkd.key.speclang.SLEnvInput;
 import de.uka.ilkd.key.util.ExceptionHandlerException;
@@ -237,7 +238,9 @@ public final class ProblemLoader implements Runnable {
         		       		initConfig, 
         		       		(OperationContract)contract);
         	   } else {
-        	       po = new DependencyContractPO(initConfig, contract);
+        	       po = new DependencyContractPO(
+        		       		initConfig, 
+        		       		(DependencyContract)contract);
         	   }
         	   
                } else { 

@@ -28,6 +28,7 @@ import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.OpReplacer;
+import de.uka.ilkd.key.proof.init.ContractPO;
 import de.uka.ilkd.key.proof.mgt.ComplexRuleJustificationBySpec;
 import de.uka.ilkd.key.proof.mgt.RuleJustificationBySpec;
 import de.uka.ilkd.key.rule.inst.ContextStatementBlockInstantiation;
@@ -317,8 +318,13 @@ public final class UseOperationContractRule implements BuiltInRule {
                                                 ProgramMethod pm,
                                                 KeYJavaType kjt,
                                                 Modality modality) {
-	final ImmutableSet<OperationContract> contracts
+	ImmutableSet<OperationContract> contracts
                 = getApplicableContracts(services, pm, kjt, modality);
+	for(OperationContract c : contracts) {
+	    if(!services.getProof().mgt().isContractApplicable(c)) {
+		contracts = contracts.remove(c);
+	    }
+	}
 	assert !contracts.isEmpty();
         if(Main.getInstance().mediator().autoMode()) {
             return services.getSpecificationRepository()
@@ -496,12 +502,12 @@ public final class UseOperationContractRule implements BuiltInRule {
 
         //applying a contract here must not create circular dependencies 
         //between proofs
-        if(!goal.proof().mgt().contractApplicableFor(inst.staticType, 
-        	                                     inst.pm)) {
-            return false;
+        for(OperationContract contract : contracts) {
+            if(goal.proof().mgt().isContractApplicable(contract)) {
+        	return true;
+            }
         }
-
-        return true;
+        return false;
     }
 
     
@@ -584,6 +590,12 @@ public final class UseOperationContractRule implements BuiltInRule {
         	                         contractSelf,
         	                         contractParams, 
         	                         services);
+        final Term mby = contract.hasMby() 
+                         ? contract.getMby(TB.heap(services), 
+                        	 	   contractSelf, 
+                        	 	   contractParams, 
+                        	 	   services) 
+                         : null;
         
         //split goal into three/four branches
         final ImmutableList<Goal> result;
@@ -657,10 +669,22 @@ public final class UseOperationContractRule implements BuiltInRule {
 	    reachableState = TB.and(reachableState,
 		                    TB.reachableValue(services, arg, argKJT));
 	}
+	final ContractPO po 
+		= services.getSpecificationRepository()
+		          .getPOForProof(goal.proof());
+	final Term mbyOk;	
+	if(po != null && po.getMbyAtPre() != null && mby != null) {
+	    mbyOk = TB.and(TB.leq(TB.zero(services), mby, services),
+		           TB.lt(mby, po.getMbyAtPre(), services));
+	} else {
+	    mbyOk = TB.tt();
+	}
         preGoal.changeFormula(new ConstrainedFormula(
         			TB.applySequential(new Term[]{inst.u, 
         						      heapAtPreUpdate}, 
-        	                                   TB.and(pre, reachableState))),
+        	                                   TB.and(new Term[]{pre, 
+        	                                	   	     reachableState, 
+        	                                	   	     mbyOk}))),
                               ruleApp.posInOccurrence());
        
         //create "Post" branch

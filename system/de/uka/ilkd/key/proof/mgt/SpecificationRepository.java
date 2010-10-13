@@ -575,7 +575,7 @@ public final class SpecificationRepository {
         return result;
     }
     
-        
+    
     /**
      * Registers the passed class invariant, and inherits it to all
      * subclasses.
@@ -706,6 +706,29 @@ public final class SpecificationRepository {
         return result;
     }
     
+    
+    /**
+     * Returns all proofs registered for the passed atomic contract, or for
+     * combined contracts including the passed atomic contract
+     */
+    public ImmutableSet<Proof> getProofs(Contract atomicContract) {
+        assert !atomicContract.getName().contains(CONTRACT_COMBINATION_MARKER)
+               : "Contract must be atomic";
+	
+        ImmutableSet<Proof> result = DefaultImmutableSet.<Proof>nil();
+        for(Map.Entry<ProofOblInput,ImmutableSet<Proof>> entry 
+               : proofs.entrySet()) {
+            final ProofOblInput po = entry.getKey();
+            if(po instanceof ContractPO) {
+        	final Contract poContract = ((ContractPO)po).getContract();
+        	if(splitContract(poContract).contains(atomicContract)) {
+        	    result = result.union(entry.getValue());
+        	}
+            }
+        }
+        return result;
+    }    
+    
 
     /**
      * Returns all proofs registered for the passed target and its overriding
@@ -750,18 +773,27 @@ public final class SpecificationRepository {
     
     
     /**
-     * Returns the target that the passed proof is about, or null.
+     * Returns the PO that the passed proof is about, or null.
      */
-    public ObserverFunction getTargetOfProof(Proof proof) {
+    public ContractPO getPOForProof(Proof proof) {
 	for(Map.Entry<ProofOblInput,ImmutableSet<Proof>> entry 
 		: proofs.entrySet()) {
 	    ProofOblInput po = entry.getKey();
             ImmutableSet<Proof> sop = entry.getValue();
             if(sop.contains(proof) && po instanceof ContractPO) {
-                return ((ContractPO)po).getContract().getTarget();
+                return (ContractPO)po;
             }
         }
         return null;
+    }    
+    
+    
+    /**
+     * Returns the target that the passed proof is about, or null.
+     */
+    public ObserverFunction getTargetOfProof(Proof proof) {
+	final ContractPO po = getPOForProof(proof);
+	return po == null ? null : po.getContract().getTarget();
     }
     
 

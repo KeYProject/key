@@ -15,11 +15,11 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.ObserverFunction;
-import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.util.Pair;
+import de.uka.ilkd.key.util.Triple;
 
 
 /**
@@ -49,24 +49,16 @@ final class JMLTranslator {
         assert expr != null;
         assert specInClass != null;
                 
-    	KeYJMLParser parser = new KeYJMLParser(expr,
-    					       services,
-                                               specInClass,
-    					       selfVar,
-    					       paramVars, 
-    					       resultVar, 
-    					       excVar,
-                                               heapAtPre);
+    	final KeYJMLParser parser = new KeYJMLParser(expr,
+    					       	     services,
+    					       	     specInClass,
+    					       	     selfVar,
+    					       	     paramVars, 
+    					       	     resultVar, 
+    					       	     excVar,
+    					       	     heapAtPre);
     	
-    	Term result = null;
-    	
-//    	System.out.println("JMLTranslator.translateExpression("+expr+")" + " in " + expr.fileName);
-    	
-    	result = parser.parseExpression();
-    	
-//    	System.out.println(result.getFormula().toString());
-//    	System.out.println();
-    	
+    	final Term result = parser.parseExpression();    	
     	return result;
     }
 
@@ -88,24 +80,15 @@ final class JMLTranslator {
                                 Term heapAtPre)
             throws SLTranslationException {
         
-        KeYJMLParser parser = new KeYJMLParser(signalsExpr,
-                                               services,
-                                               specInClass,
-                                               selfVar,
-                                               paramVars, 
-                                               resultVar, 
-                                               excVar,
-                                               heapAtPre);
-        
-        Term result = null;
-        
-//      System.out.println("JMLTranslator.translateSignalsExpression("+signalsExpr+") results: ");
-
-        result = parser.parseSignals();
-        
-//      System.out.println(result.getFormula().toString());
-//      System.out.println();
-        
+        final KeYJMLParser parser = new KeYJMLParser(signalsExpr,
+                                               	     services,
+                                               	     specInClass,
+                                               	     selfVar,
+                                               	     paramVars, 
+                                               	     resultVar, 
+                                               	     excVar,
+                                               	     heapAtPre);
+        final Term result = parser.parseSignals();
         return result;
     }
     
@@ -120,24 +103,16 @@ final class JMLTranslator {
 	    				ProgramVariable excVar)
             throws SLTranslationException {
 
-        KeYJMLParser parser = new KeYJMLParser(signalsOnlyExpr,
-                                               services,
-                                               specInClass,
-                                               null,
-                                               null, 
-                                               null, 
-                                               excVar,
-                                               null);
+        final KeYJMLParser parser = new KeYJMLParser(signalsOnlyExpr,
+                                               	     services,
+                                               	     specInClass,
+                                               	     null,
+                                               	     null, 
+                                               	     null, 
+                                               	     excVar,
+                                               	     null);
         
-        Term result = null;
-        
-//          System.out.println("JMLTranslator.translateSignalsOnlyExpression("+signalsOnlyExpr+") results: ");
-
-            result = parser.parseSignalsOnly();
-        
-//          System.out.println(result.getFormula().toString());
-//          System.out.println();
-        
+        final Term result = parser.parseSignalsOnly();
         return result;
     }
 
@@ -152,22 +127,16 @@ final class JMLTranslator {
                                         ImmutableList<ProgramVariable> paramVars)
             throws SLTranslationException {        
             
-        KeYJMLParser parser = new KeYJMLParser(assignableExpr,
-                                               services,
-                                               specInClass,
-                                               selfVar,
-                                               paramVars, 
-                                               null, 
-                                               null,
-                                               null);
+        final KeYJMLParser parser = new KeYJMLParser(assignableExpr,
+                                               	     services,
+                                               	     specInClass,
+                                               	     selfVar,
+                                               	     paramVars, 
+                                               	     null, 
+                                               	     null,
+                                               	     null);
         
-//      System.out.println("JMLTranslator.translateAssignableExpression("+assignableExpr+") results: ");
-
-        Term result = parser.parseAssignable();
-        
-//      System.out.println(result);
-//      System.out.println();
-        
+        final Term result = parser.parseAssignable();
         return result;
     }
     
@@ -181,22 +150,16 @@ final class JMLTranslator {
                                         ProgramVariable selfVar)
             throws SLTranslationException {        
             
-        KeYJMLParser parser = new KeYJMLParser(representsExpr,
-                                               services,
-                                               specInClass,
-                                               selfVar,
-                                               null, 
-                                               null, 
-                                               null,
-                                               null);
+        final KeYJMLParser parser = new KeYJMLParser(representsExpr,
+                                               	     services,
+                                               	     specInClass,
+                                               	     selfVar,
+                                               	     null, 
+                                               	     null, 
+                                               	     null,
+                                               	     null);
         
-//      System.out.println("JMLTranslator.translateRepresentsExpression("+representsExpr+") results: ");
-
-        Pair<ObserverFunction,Term> result = parser.parseRepresents();
-        
-//      System.out.println(result);
-//      System.out.println();
-        
+        final Pair<ObserverFunction,Term> result = parser.parseRepresents();
         return result;
     }    
     
@@ -204,48 +167,38 @@ final class JMLTranslator {
    /**
      * Translates an expression as it occurs in our custom class-level accessible clauses.
      */
-    public Pair<ObserverFunction,Term> translateDependsExpression(
+    public Triple<ObserverFunction,Term,Term> translateDependsExpression(
                                     	PositionedString accessibleExpr,
                                         KeYJavaType specInClass,
                                         ProgramVariable selfVar)
             throws SLTranslationException {        
             
-        KeYJMLParser parser = new KeYJMLParser(accessibleExpr,
-                                               services,
-                                               specInClass,
-                                               selfVar,
-                                               null, 
-                                               null, 
-                                               null,
-                                               null);
+        final KeYJMLParser parser = new KeYJMLParser(accessibleExpr,
+                                               	     services,
+                                               	     specInClass,
+                                               	     selfVar,
+                                               	     null, 
+                                               	     null, 
+                                               	     null,
+                                               	     null);
         
-//      System.out.println("JMLTranslator.translateDependsExpression("+representsExpr+") results: ");
-
-        Pair<ObserverFunction,Term> result = parser.parseDepends();
-        
-//      System.out.println(result);
-//      System.out.println();
-        
+        final Triple<ObserverFunction,Term,Term> result = parser.parseDepends();
         return result;
     }        
     
     
     public ImmutableList<ProgramVariable> translateVariableDeclaration(PositionedString variableDecl) 
             throws SLTranslationException {
-        KeYJMLParser parser = new KeYJMLParser(variableDecl,
-                                               services,
-                                               null,
-                                               null,
-                                               null,
-                                               null, 
-                                               null,
-                                               null);
+        final KeYJMLParser parser = new KeYJMLParser(variableDecl,
+                                               	     services,
+                                               	     null,
+                                               	     null,
+                                               	     null,
+                                               	     null, 
+                                               	     null,
+                                               	     null);
         
-        ImmutableList<ProgramVariable> result = parser.parseVariableDeclaration();
-        
-//      System.out.println(result);
-//      System.out.println();
-        
+        final ImmutableList<ProgramVariable> result = parser.parseVariableDeclaration();
         return result;
     }
 }

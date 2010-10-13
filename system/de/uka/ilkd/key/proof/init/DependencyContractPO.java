@@ -15,10 +15,8 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.proof.mgt.AxiomJustification;
-import de.uka.ilkd.key.rule.*;
-import de.uka.ilkd.key.speclang.ClassAxiom;
 import de.uka.ilkd.key.speclang.Contract;
+import de.uka.ilkd.key.speclang.DependencyContract;
 import de.uka.ilkd.key.speclang.OperationContract;
 
 
@@ -28,14 +26,16 @@ import de.uka.ilkd.key.speclang.OperationContract;
 public final class DependencyContractPO extends AbstractPO 
                                         implements ContractPO {
     
-    private final Contract contract;
+    private final DependencyContract contract;
+    private Term mbyAtPre;    
            
     
     //-------------------------------------------------------------------------
     //constructors
     //-------------------------------------------------------------------------
     
-    public DependencyContractPO(InitConfig initConfig, Contract contract) {
+    public DependencyContractPO(InitConfig initConfig, 
+	    			DependencyContract contract) {
     	super(initConfig, contract.getName());
     	this.contract = contract;
     	assert !(contract instanceof OperationContract);
@@ -80,14 +80,30 @@ public final class DependencyContractPO extends AbstractPO
         Term paramsOK = TB.tt();
         for(ProgramVariable paramVar : paramVars) {
             paramsOK = TB.and(paramsOK, TB.reachableValue(services, paramVar));
-        }             
+        }
+        
+        //initial value of measured_by clause
+        final Term mbyAtPreDef;
+        if(contract.hasMby()) {
+            final Function mbyAtPreFunc
+            	= new Function(new Name(TB.newName(services, "mbyAtPre")), 
+        		       services.getTypeConverter()
+        		               .getIntegerLDT()
+        		               .targetSort());
+            mbyAtPre = TB.func(mbyAtPreFunc);
+            final Term mby = contract.getMby(selfVar, paramVars, services);
+            mbyAtPreDef = TB.equals(mbyAtPre, mby);
+        } else {
+            mbyAtPreDef = TB.tt();
+        }        
              
         return TB.and(new Term[]{TB.wellFormedHeap(services), 
         			 TB.wellFormed(services, anonHeap),
         	       		 selfNotNull,
         	       		 selfCreated,
         	       		 selfExactType,
-        	       		 paramsOK});        
+        	       		 paramsOK,
+        	       		 mbyAtPreDef});        
     }    
     
     
@@ -177,6 +193,12 @@ public final class DependencyContractPO extends AbstractPO
     @Override
     public Contract getContract() {
         return contract;
+    }
+    
+    
+    @Override
+    public Term getMbyAtPre() {
+	return mbyAtPre;
     }
    
     

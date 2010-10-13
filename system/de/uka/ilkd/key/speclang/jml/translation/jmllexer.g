@@ -128,6 +128,9 @@ SEQSINGLETON : "\\seq_singleton";
 SEQCONCAT : "\\seq_concat";
 SEQSUB : "\\seq_sub";
 
+MEASURED_BY : "\\measured_by";
+
+
 LT_DISPATCH
      :
      ('<' (LETTER)+ '>') => IMPLICIT_IDENT {$setType(IDENT);}

@@ -21,6 +21,8 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
     private final Behavior behavior;
     private ImmutableList<PositionedString> requires     
             = ImmutableSLList.<PositionedString>nil();
+    private ImmutableList<PositionedString> measuredBy   
+    	    = ImmutableSLList.<PositionedString>nil();    
     private ImmutableList<PositionedString> assignable   
             = ImmutableSLList.<PositionedString>nil();
     private ImmutableList<PositionedString> accessible   
@@ -42,10 +44,12 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         this.behavior = behavior;
     }
     
+    
     public void addName(PositionedString n) {
 	this.name = n;
     }
 
+    
     public void addRequires(PositionedString ps) {
         requires = requires.append(ps);
     }
@@ -53,6 +57,16 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
 
     public void addRequires(ImmutableList<PositionedString> l) {
         requires = requires.append(l);
+    }
+    
+    
+    public void addMeasuredBy(PositionedString ps) {
+	measuredBy = measuredBy.append(ps);
+    }
+
+    
+    public void addMeasuredBy(ImmutableList<PositionedString> l) {
+	measuredBy = measuredBy.append(l);
     }
     
     
@@ -94,6 +108,11 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
     public ImmutableList<PositionedString> getRequires() {
         return requires;
     }
+    
+    
+    public ImmutableList<PositionedString> getMeasuredBy() {
+        return measuredBy;
+    } 
     
     
     public ImmutableList<PositionedString> getAssignable() {

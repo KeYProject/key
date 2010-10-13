@@ -28,9 +28,12 @@ import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.NullSort;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.init.ContractPO;
 import de.uka.ilkd.key.proof.mgt.ComplexRuleJustificationBySpec;
 import de.uka.ilkd.key.proof.mgt.RuleJustificationBySpec;
 import de.uka.ilkd.key.speclang.Contract;
+import de.uka.ilkd.key.speclang.DependencyContract;
+import de.uka.ilkd.key.speclang.OperationContract;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
 
@@ -412,7 +415,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
         	= services.getSpecificationRepository().getContracts(kjt, 
         							     target);
         for(Contract contract : result) {
-            if(!contract.hasDep()) {
+            if(!(contract instanceof DependencyContract)) {
         	result = result.remove(contract);
             }
         }
@@ -423,13 +426,13 @@ public final class UseDependencyContractRule implements BuiltInRule {
     /**
      * Chooses a contract to be applied. 
      */
-    private Contract configureContract(Services services, 
-                                       KeYJavaType kjt,
-                                       ObserverFunction target) {
+    private DependencyContract configureContract(Services services, 
+                                       	         KeYJavaType kjt,
+                                       	         ObserverFunction target) {
 	final ImmutableSet<Contract> contracts
                 = getApplicableContracts(services, kjt, target);
 	assert !contracts.isEmpty();
-	return contracts.iterator().next();//TODO
+	return (DependencyContract)contracts.iterator().next();//TODO
     }
     
         
@@ -482,11 +485,9 @@ public final class UseDependencyContractRule implements BuiltInRule {
         
         //applying a contract here must not create circular dependencies 
         //between proofs
-        if(!goal.proof().mgt().contractApplicableFor(kjt, target)) {
-            return false;
-        }
-        
-        return true;
+        return goal.proof()
+                   .mgt()
+                   .isContractApplicable(contracts.iterator().next());
     }
 
     
@@ -508,7 +509,8 @@ public final class UseDependencyContractRule implements BuiltInRule {
         	= target.isStatic() 
 		  ? target.getContainerType()
 	          : services.getJavaInfo().getKeYJavaType(selfTerm.sort());
-        final Contract contract = configureContract(services, kjt, target);
+        final DependencyContract contract 
+        	= configureContract(services, kjt, target);
         assert contract != null;
         final Pair<Term,Term> baseHeapAndChangedLocs 
         	= getBaseHeapAndChangedLocs(pio, 
@@ -519,7 +521,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
             return goal.split(1);
         }
         
-        //get precondition, dependency term
+        //get precondition, dependency term, measured_by
         Term freePre 
         	= TB.and(TB.wellFormed(services, baseHeapAndChangedLocs.first),
         		 TB.wellFormed(services, focus.sub(0)));
@@ -544,9 +546,28 @@ public final class UseDependencyContractRule implements BuiltInRule {
         				 selfTerm, 
         				 paramTerms, 
         				 services);
+        final Term mby = contract.hasMby() 
+        	         ? contract.getMby(baseHeapAndChangedLocs.first, 
+        	         	           selfTerm, 
+        	         	           paramTerms, 
+        	        	           services) 
+                         : null;        
+        
+        //prepare cut formula
         final Term disjoint 
         	= TB.disjoint(services, baseHeapAndChangedLocs.second, dep);
-        final Term cutFormula = TB.and(new Term[]{freePre, pre, disjoint});
+	final ContractPO po 
+		= services.getSpecificationRepository()
+			  .getPOForProof(goal.proof());        
+	final Term mbyOk;	
+	if(po != null && po.getMbyAtPre() != null && mby != null) {
+	    mbyOk = TB.and(TB.leq(TB.zero(services), mby, services),
+		           TB.lt(mby, po.getMbyAtPre(), services));
+	} else {
+	    mbyOk = TB.tt();
+	}        
+        final Term cutFormula 
+        	= TB.and(new Term[]{freePre, pre, disjoint, mbyOk});
         
         //bail out if obviously not helpful
         if(!baseHeapAndChangedLocs.second.op().equals(locSetLDT.getEmpty())) {

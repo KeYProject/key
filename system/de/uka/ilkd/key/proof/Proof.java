@@ -24,7 +24,6 @@ import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.mgt.BasicTask;
-import de.uka.ilkd.key.proof.mgt.DefaultProofCorrectnessMgt;
 import de.uka.ilkd.key.proof.mgt.ProofCorrectnessMgt;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.strategy.Strategy;
@@ -160,7 +159,7 @@ public class Proof implements Named {
 
         this ( new Name ( name ), services, settings );
 
-	localMgt = new DefaultProofCorrectnessMgt(this);
+	localMgt = new ProofCorrectnessMgt(this);
 
         Node rootNode = new Node(this, problem);
         setRoot(rootNode);
@@ -205,7 +204,7 @@ public class Proof implements Named {
 	Goal firstGoal = new Goal(rootNode, 
             new RuleAppIndex(new TacletAppIndex(ic.createTacletIndex()),
 	    new BuiltInRuleAppIndex(ic.createBuiltInRuleIndex())));
-	localMgt = new DefaultProofCorrectnessMgt(this);
+	localMgt = new ProofCorrectnessMgt(this);
 	openGoals = openGoals.prepend(firstGoal);
         setNamespaces(ic.namespaces());       
     }

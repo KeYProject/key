@@ -31,6 +31,7 @@ header {
     import de.uka.ilkd.key.speclang.PositionedString;
     import de.uka.ilkd.key.speclang.translation.*;
     import de.uka.ilkd.key.util.Pair;
+    import de.uka.ilkd.key.util.Triple;    
 
     import java.lang.RuntimeException;
     import java.math.BigInteger;
@@ -252,8 +253,8 @@ options {
     }    
     
     
-    public Pair<ObserverFunction,Term> parseDepends() throws SLTranslationException {
-    	Pair<ObserverFunction,Term> result = null;
+    public Triple<ObserverFunction,Term,Term> parseDepends() throws SLTranslationException {
+    	Triple<ObserverFunction,Term,Term> result = null;
 
 	this.currentlyParsing = true;
 	try {
@@ -730,22 +731,23 @@ representsclause returns [Pair<ObserverFunction,Term> result=null] throws SLTran
     ;
     
     
-dependsclause returns [Pair<ObserverFunction,Term> result=null] throws SLTranslationException
+dependsclause returns [Triple<ObserverFunction,Term,Term> result=null] throws SLTranslationException
 {
-    SLExpression lhs;
+    SLExpression lhs, mby = null;
     Term rhs;
 }
 :
-    lhs=expression COLON rhs=storereflist 
+    lhs=expression COLON rhs=storereflist (MEASURED_BY mby=expression)? SEMI
     {
         if(!lhs.isTerm() 
             || !(lhs.getTerm().op() instanceof ObserverFunction)
             || lhs.getTerm().sub(0).op() != heapLDT.getHeap()) {
             raiseError("Depends clause with unexpected lhs: " + lhs);
         }
-        result = new Pair<ObserverFunction,Term>(
+        result = new Triple<ObserverFunction,Term,Term>(
                              (ObserverFunction) lhs.getTerm().op(), 
-                             rhs);
+                             rhs,
+                             mby == null ? null : mby.getTerm());
     } 
     ;
     

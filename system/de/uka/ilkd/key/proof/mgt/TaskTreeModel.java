@@ -52,12 +52,22 @@ public class TaskTreeModel extends DefaultTreeModel {
 	    proofToTask.remove(allProofs[i]);
 	    p.decoupleFromEnv();
 	}
+	ProofEnvironment env = p.getProofEnv();
 	if (p.getParent().getChildCount()==1) { // remove env if p is single
-            GlobalProofMgt.getInstance().removeEnv(p.getProofEnv());
+            GlobalProofMgt.getInstance().removeEnv(env);
+            env = null;
 	    p = (TaskTreeNode) p.getParent();
 	}
 	removeNodeFromParent(p);
-	p.getProofEnv().updateProofStatus(); // this should be done by listeners
+	
+	if(env != null) {
+	    env.getProofs()
+	       .iterator()
+	       .next()
+	       .getProofs()[0]
+	       .mgt()
+	       .updateProofStatus();
+	}
     }
 
     private void updateProofToTask(TaskTreeNode p) {

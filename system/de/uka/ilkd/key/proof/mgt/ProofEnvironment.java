@@ -191,16 +191,6 @@ public class ProofEnvironment {
 	return "Env. with "+getJavaModel().description()+" #"+getNumber();
     }
 
-    public void updateProofStatus() {
-	Set<ProofAggregate> allProofs = getProofs();
-	Iterator<ProofAggregate> allProofsIt = allProofs.iterator();
-	ProofAggregate  pl = null;
-	while (allProofsIt.hasNext()) {
-	    pl = allProofsIt.next();
-	    pl.updateProofStatus();
-	}
-    }
-
     /** sets a number that distinguishes two proof environments
      * with equal java model and rule config from the user perspective
      */

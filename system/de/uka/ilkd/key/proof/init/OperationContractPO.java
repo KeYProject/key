@@ -33,9 +33,7 @@ import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.java.statement.Try;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.proof.mgt.AxiomJustification;
 import de.uka.ilkd.key.rule.*;
-import de.uka.ilkd.key.speclang.ClassAxiom;
 import de.uka.ilkd.key.speclang.OperationContract;
 
 
@@ -46,10 +44,8 @@ public final class OperationContractPO extends AbstractPO
                                        implements ContractPO {
     
     private final OperationContract contract;
+    private Term mbyAtPre;
     
-    private ImmutableSet<NoPosTacletApp> taclets 
-    	= DefaultImmutableSet.<NoPosTacletApp>nil();
-       
     
     //-------------------------------------------------------------------------
     //constructors
@@ -100,12 +96,28 @@ public final class OperationContractPO extends AbstractPO
         for(ProgramVariable paramVar : paramVars) {
             paramsOK = TB.and(paramsOK, TB.reachableValue(services, paramVar));
         }
-                
+        
+        //initial value of measured_by clause
+        final Term mbyAtPreDef;
+        if(contract.hasMby()) {
+            final Function mbyAtPreFunc
+            	= new Function(new Name(TB.newName(services, "mbyAtPre")), 
+        		       services.getTypeConverter()
+        		               .getIntegerLDT()
+        		               .targetSort());
+            mbyAtPre = TB.func(mbyAtPreFunc);
+            final Term mby = contract.getMby(selfVar, paramVars, services);
+            mbyAtPreDef = TB.equals(mbyAtPre, mby);
+        } else {
+            mbyAtPreDef = TB.tt();
+        }
+
         return TB.and(new Term[]{TB.wellFormedHeap(services), 
         	       		 selfNotNull,
         	       		 selfCreated,
         	       		 selfExactType,
-        	       		 paramsOK});
+        	       		 paramsOK,
+        	       		 mbyAtPreDef});
     }
     
     
@@ -274,6 +286,12 @@ public final class OperationContractPO extends AbstractPO
     @Override
     public OperationContract getContract() {
         return contract;
+    }
+    
+    
+    @Override
+    public Term getMbyAtPre() {
+	return mbyAtPre;
     }
     
     

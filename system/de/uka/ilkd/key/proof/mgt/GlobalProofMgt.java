@@ -39,31 +39,6 @@ public class GlobalProofMgt {
 	}
     }
 
-
-    private Proof[] lookupPrevious(Proof p) {
-	List<Proof> result = new LinkedList<Proof>();
-	Iterator<List<ProofEnvironment>> it = envKeyToEnv.values().iterator();
-	while (it.hasNext()) {
-	    List<ProofEnvironment> envList = it.next();
-	    Iterator<ProofEnvironment> envIt = envList.iterator();
-	    while (envIt.hasNext()) {
-		ProofEnvironment env = envIt.next();
-		Iterator<ProofAggregate> proofListIt = env.getProofs().iterator();
-		while (proofListIt.hasNext()) {
-		    ProofAggregate pl = proofListIt.next();
-                    Proof[] proofs = pl.getProofs();
-		    for (int i=0; i<proofs.length; i++) {
-			if (p != proofs[i] 
-			    && p.mgt().proofSimilarTo(proofs[i])) {			    
-                            result.add(proofs[i]);
-			}
-		    }
-		}
-	    }
-	}
-	return result.toArray(new Proof[0]);
-    }
-    
     
     public void removeEnv(ProofEnvironment env) {
         Set<Map.Entry<EnvKey,List<ProofEnvironment>>> entries = envKeyToEnv.entrySet();
