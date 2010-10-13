@@ -73,6 +73,7 @@ options {
     private final static int NORMAL_NONRIGID = 0;
     private final static int LOCATION_MODIFIER = 1;
     private final static int HEAP_DEPENDENT = 2;
+    private final static int LOCATION_NOHEAP_MODIFIER = 3;
 
     static HashMap<String, Character> prooflabel2tag = new HashMap<String, Character>(15);
     static {
@@ -2041,6 +2042,9 @@ pred_decl
                            case LOCATION_MODIFIER: 
                               semanticError("Modifier 'Location' not allowed for non-rigid predicates.");
                               break;
+                           case LOCATION_NOHEAP_MODIFIER: 
+                              semanticError("Modifier 'Location' not allowed for non-rigid predicates.");
+                              break;
                  	  case HEAP_DEPENDENT: p = new NonRigidHeapDependentFunction(predicate, Sort.FORMULA, argSorts);      
                  	      break;
                  	  default:
@@ -2085,6 +2089,8 @@ location_ident returns [int kind = NORMAL_NONRIGID]
        { 
           if ("Location".equals(id)) {
              kind = LOCATION_MODIFIER;
+          } else if ("LocationNoHeap".equals(id)) {
+             kind = LOCATION_NOHEAP_MODIFIER;
           } else if ("HeapDependent".equals(id)) {
              kind = HEAP_DEPENDENT;
           } else if (!"Location".equals(id)) {
@@ -2143,6 +2149,8 @@ func_decl
                            case NORMAL_NONRIGID: f = new NonRigidFunction(fct_name, retSort, argSorts);
                               break;
                            case LOCATION_MODIFIER: f = new NonRigidFunctionLocation(fct_name, retSort, argSorts, true);
+                              break;
+                           case LOCATION_NOHEAP_MODIFIER: f = new NonRigidFunctionLocation(fct_name, retSort, argSorts, false);
                               break;
                  	  case HEAP_DEPENDENT: f = new NonRigidHeapDependentFunction(fct_name, retSort, argSorts);      
                  	      break;

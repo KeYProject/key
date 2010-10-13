@@ -64,7 +64,8 @@ public class NonRigidFunctionLocation extends Function implements NonRigid, Loca
     
     
     public String proofToString() {
-        return "\\nonRigid[Location] " + super.proofToString();
+        return isHeap ? "\\nonRigid[Location] " + super.proofToString() :
+            "\\nonRigid[LocationNoHeap] " + super.proofToString();
     }
 
     /**
