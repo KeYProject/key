@@ -799,8 +799,12 @@ conditionalexpr returns [SLExpression result=null] throws SLTranslationException
 	(
 	    QUESTIONMARK a=conditionalexpr COLON b=conditionalexpr
 	    {
-		result = new SLExpression(TB.ife(convertToFormula(result.getTerm()), a.getTerm(), b.getTerm()),
-		                          a.getType());//XXX
+	    	Term ife = TB.ife(convertToFormula(result.getTerm()), a.getTerm(), b.getTerm());
+	    	if(a.getType() != null && a.getType().equals(b.getType())) {
+		    result = new SLExpression(ife, a.getType());
+		} else {
+		    result = new SLExpression(ife);
+		}
 	    }
 	)?
     ;

@@ -122,6 +122,7 @@
 ./heap/vstte10_03_LinkedList/Node_search.key
 ./heap/WeideEtAl_01_AddAndMultiply/AddAndMultiply_add.key
 ./heap/WeideEtAl_01_AddAndMultiply/AddAndMultiply_mul.key
+./heap/WeideEtAl_02_BinarySearch/BinarySearch_search.key
 ./standard_key/arith/binomial1.key
 ./standard_key/arith/binomial2.key
 ./standard_key/arith/check_jdiv.key
