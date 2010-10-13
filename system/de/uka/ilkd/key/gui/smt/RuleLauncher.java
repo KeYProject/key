@@ -34,8 +34,8 @@ public class RuleLauncher {
     	    
     	    public WaitingPolicy getApplyPolicy(){
     
-    		if(DecisionProcedureSettings.getInstance().getProgressDialogMode()
-    			== DecisionProcedureSettings.PROGRESS_MODE_CLOSE_FIRST)
+    		if(SMTSettings.getInstance().getProgressDialogMode()
+    			== SMTSettings.PROGRESS_MODE_CLOSE_FIRST)
     		return WaitingPolicy.STOP_FIRST;
     		return WaitingPolicy.WAIT_FOR_ALL;
     		
@@ -52,7 +52,7 @@ public class RuleLauncher {
     		    return;
     		}
     		LinkedList<Goal> goals = new LinkedList<Goal>();
-    		rule.setMaxTime(DecisionProcedureSettings.getInstance().getTimeout()*100);
+    		rule.setMaxTime(SMTSettings.getInstance().getTimeout()*100);
     		goals.add(goal);
        		rule.start(goal,constraint,useOwnThread,getApplyPolicy());
     		if(useOwnThread){
@@ -66,7 +66,7 @@ public class RuleLauncher {
     		    return;
     		}
     		LinkedList<Goal> goals = new LinkedList<Goal>();
-    		rule.setMaxTime(DecisionProcedureSettings.getInstance().getTimeout()*100);
+    		rule.setMaxTime(SMTSettings.getInstance().getTimeout()*100);
     		for (Goal goal : proof.openGoals()) {
     		     goals.add(goal);
     		}

@@ -345,9 +345,9 @@ public class ProgressDialog extends JDialog implements ProcessLauncherListener{
         // the following mechanism is introduced.
         public void workDone() {
             getStopButton().setEnabled(false);
-            int mode = DecisionProcedureSettings.getInstance().getProgressDialogMode();
-	    if((mode == DecisionProcedureSettings.PROGRESS_MODE_CLOSE ||
-	       mode == DecisionProcedureSettings.PROGRESS_MODE_CLOSE_FIRST)){
+            int mode = SMTSettings.getInstance().getProgressDialogMode();
+	    if((mode == SMTSettings.PROGRESS_MODE_CLOSE ||
+	       mode == SMTSettings.PROGRESS_MODE_CLOSE_FIRST)){
 		applyResults = true;
 		setVisible(false);
 		

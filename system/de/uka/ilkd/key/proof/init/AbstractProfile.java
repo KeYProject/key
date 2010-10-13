@@ -18,7 +18,7 @@ import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.IMain;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
-import de.uka.ilkd.key.gui.smt.DecisionProcedureSettings;
+import de.uka.ilkd.key.gui.smt.SMTSettings;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.proof.DefaultGoalChooserBuilder;
 import de.uka.ilkd.key.proof.DepthFirstGoalChooserBuilder;
@@ -95,7 +95,7 @@ public abstract class AbstractProfile implements Profile {
 
 	
 	
-	Collection<SMTRule> rules = DecisionProcedureSettings.getInstance().getSMTRules();
+	Collection<SMTRule> rules = SMTSettings.getInstance().getSMTRules();
         
 	for(SMTRule rule : rules){
 	    builtInRules = builtInRules.prepend(rule);  
@@ -199,7 +199,7 @@ public abstract class AbstractProfile implements Profile {
       * sets the given settings to some default depending on the profile
       */
      public void updateSettings(ProofSettings settings) {
-	 settings.getDecisionProcedureSettings().updateSMTRules(this);
+	 settings.getSMTSettings().updateSMTRules(this);
      }
 
      /**

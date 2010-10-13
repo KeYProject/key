@@ -27,7 +27,7 @@ import de.uka.ilkd.key.smt.Z3Solver;
 /** This class encapsulates the information which 
  *  decision procedure should be used.
  */
-public class DecisionProcedureSettings implements Settings {
+public class SMTSettings implements Settings {
     
    
     /** String used in the Settings to store the active rule */
@@ -71,7 +71,7 @@ public class DecisionProcedureSettings implements Settings {
     /** the value of the timeout in tenth of seconds.*/
     private int timeout = 60;
     
-    private static DecisionProcedureSettings instance;
+    private static SMTSettings instance;
     
     private static String EXECSTR = "[DecisionProcedure]Exec";
 
@@ -127,7 +127,7 @@ public class DecisionProcedureSettings implements Settings {
     /**
      * This is a singleton.
      */
-    private DecisionProcedureSettings() {
+    private SMTSettings() {
 	super();
     }
     
@@ -179,7 +179,7 @@ public class DecisionProcedureSettings implements Settings {
         }
 
         if(Main.instance != null){
-            Main.instance.updateDecisionProcedureSelectMenu();
+            Main.instance.updateSMTSelectMenu();
         }
       
     }
@@ -582,9 +582,9 @@ public class DecisionProcedureSettings implements Settings {
         this.writeMultipleProversString(props);
     }
 
-    public static DecisionProcedureSettings getInstance() {
+    public static SMTSettings getInstance() {
 	if (instance == null) {
-	    instance = new DecisionProcedureSettings();
+	    instance = new SMTSettings();
 	    instance.setSolversAndRules();
 	}
 	

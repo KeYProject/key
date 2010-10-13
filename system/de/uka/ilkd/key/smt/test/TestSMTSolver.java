@@ -37,7 +37,7 @@ public abstract class TestSMTSolver extends TestCommons {
 	    solver.useTaclets(false);    
 	}
 	
-	ProofSettings.DEFAULT_SETTINGS.getDecisionProcedureSettings().setSaveFile(false);
+	ProofSettings.DEFAULT_SETTINGS.getSMTSettings().setSaveFile(false);
 	//System.gc();
     }
     

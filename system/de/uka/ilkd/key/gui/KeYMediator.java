@@ -17,6 +17,7 @@ import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import javax.swing.Action;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
@@ -914,6 +915,18 @@ public class KeYMediator {
 	    setProof(e.getSource().getSelectedProof());
 	}	
     }
+    
+    public void enableWhenProof(final Action a) {
+        a.setEnabled(getProof() != null);
+        addKeYSelectionListener(new KeYSelectionListener() {
+            public void selectedNodeChanged(KeYSelectionEvent e) {}
+            public void selectedProofChanged(KeYSelectionEvent e) {
+                a.setEnabled(
+                    e.getSource().getSelectedProof() != null);
+            }
+        });
+    }
+    
 
     /**
      * takes a notification event and informs the notification

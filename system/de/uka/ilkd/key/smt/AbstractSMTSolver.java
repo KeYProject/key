@@ -111,7 +111,7 @@ public abstract class AbstractSMTSolver extends AbstractProcess implements SMTSo
     
     private String getFinalExecutionCommand(String filename, String formula) {
 	//get the Command from user settings
-	String toReturn = ProofSettings.DEFAULT_SETTINGS.getDecisionProcedureSettings().getExecutionCommand(this);
+	String toReturn = ProofSettings.DEFAULT_SETTINGS.getSMTSettings().getExecutionCommand(this);
 	if (toReturn == null || toReturn.length() == 0) {
 	    toReturn = this.getExecutionCommand(filename, formula);
 	} else {
@@ -177,9 +177,9 @@ public abstract class AbstractSMTSolver extends AbstractProcess implements SMTSo
 	out.close();
 
 	//store the text permanent to a file 
-	if (!this.inTestMode && ProofSettings.DEFAULT_SETTINGS.getDecisionProcedureSettings().getSaveFile() &&
+	if (!this.inTestMode && ProofSettings.DEFAULT_SETTINGS.getSMTSettings().getSaveFile() &&
 		Main.getInstance() != null) {
-	    String path = ProofSettings.DEFAULT_SETTINGS.getDecisionProcedureSettings().getSaveToFile();
+	    String path = ProofSettings.DEFAULT_SETTINGS.getSMTSettings().getSaveToFile();
 	    	path = finalizePath(path);
 		try {
 		    final BufferedWriter out2 = new BufferedWriter(new FileWriter(path));

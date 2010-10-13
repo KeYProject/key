@@ -54,7 +54,7 @@ class TemporarySolverSettings {
 public class TemporarySettings extends Settings {
     
     private static TemporarySettings settingsInstance = new TemporarySettings();
-    public static TemporarySettings getInstance(DecisionProcedureSettings dec, TacletTranslationSettings tac){
+    public static TemporarySettings getInstance(SMTSettings dec, TacletTranslationSettings tac){
 	settingsInstance.newSession(dec,tac);
 	return settingsInstance;
     }
@@ -62,7 +62,7 @@ public class TemporarySettings extends Settings {
     
     private static DefaultTreeModel contentModel;
     private ContentItem defaultItem = null;
-    public DecisionProcedureSettings decSettings;
+    public SMTSettings decSettings;
     public TacletTranslationSettings tacSettings;
     public boolean showResultsAfterExecuting = false;
     public boolean storeToFile = false;
@@ -81,11 +81,11 @@ public class TemporarySettings extends Settings {
     
     public String getProgressMode(int index){
 	switch(index){
-	case DecisionProcedureSettings.PROGRESS_MODE_USER:
+	case SMTSettings.PROGRESS_MODE_USER:
 	    return PROGRESS_MODE_USER;
-	case DecisionProcedureSettings.PROGRESS_MODE_CLOSE:
+	case SMTSettings.PROGRESS_MODE_CLOSE:
 	    return PROGRESS_MODE_CLOSE;
-	case DecisionProcedureSettings.PROGRESS_MODE_CLOSE_FIRST:
+	case SMTSettings.PROGRESS_MODE_CLOSE_FIRST:
 	    return PROGRESS_MODE_CLOSE_FIRST;
 	}
 	return "";
@@ -95,7 +95,7 @@ public class TemporarySettings extends Settings {
 	
     }
 
-    private void newSession(DecisionProcedureSettings settings,
+    private void newSession(SMTSettings settings,
 	    TacletTranslationSettings tacletSettings) {
 	showResultsAfterExecuting = settings.getShowSMTResDialog();
 	timeout = settings.getTimeout();
@@ -374,9 +374,9 @@ public class TemporarySettings extends Settings {
 	
 	
 	
-	 new TableComboBox(progressDialogMode,getProgressMode(DecisionProcedureSettings.PROGRESS_MODE_USER),
-	         getProgressMode(DecisionProcedureSettings.PROGRESS_MODE_CLOSE),
-	         getProgressMode(DecisionProcedureSettings.PROGRESS_MODE_CLOSE_FIRST)) {
+	 new TableComboBox(progressDialogMode,getProgressMode(SMTSettings.PROGRESS_MODE_USER),
+	         getProgressMode(SMTSettings.PROGRESS_MODE_CLOSE),
+	         getProgressMode(SMTSettings.PROGRESS_MODE_CLOSE_FIRST)) {
 
 	    public void eventChange() {
 		progressDialogMode = getSelectedItemIndex();

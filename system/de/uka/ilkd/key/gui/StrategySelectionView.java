@@ -815,13 +815,14 @@ public final class StrategySelectionView extends JPanel {
     
     
     private void refreshDefaultButton() {
-	defaultButton.setEnabled(maxSlider.getPos() != 10000
-		                 || !mediator.getSelectedProof()
-		                             .getActiveStrategy()
-		                 	     .name()
-		                 	     .toString()
-		                 	     .equals(JAVACARDDL_STRATEGY_NAME)
-		                 || !getProperties().isDefault());	
+	defaultButton.setEnabled(mediator.getSelectedProof() != null
+				 && (maxSlider.getPos() != 10000
+		                    || !mediator.getSelectedProof()
+		                                .getActiveStrategy()
+		                 	        .name()
+		                 	        .toString()
+		                 	        .equals(JAVACARDDL_STRATEGY_NAME)
+		                    || !getProperties().isDefault()));	
     }
     
 

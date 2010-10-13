@@ -15,6 +15,8 @@ import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -89,6 +91,13 @@ public final class ExampleChooser extends JDialog {
 			updateDescription();
 		    }
 		});	
+	exampleList.addMouseListener(new MouseAdapter() {
+	    public void mouseClicked(MouseEvent e){
+		if(e.getClickCount() == 2){
+		    loadButton.doClick();
+		}
+	    }
+	});	
 	final JScrollPane exampleScrollPane = new JScrollPane(exampleList);
 	exampleScrollPane.setBorder(new TitledBorder("Examples"));
 	final Dimension exampleListDim = new Dimension(500, 400);	
@@ -101,8 +110,9 @@ public final class ExampleChooser extends JDialog {
 	descriptionText.setEditable(false);
 	descriptionText.setLineWrap(true);
 	descriptionText.setWrapStyleWord(true);
-	final JScrollPane descriptionScrollPane = new JScrollPane(descriptionText);
-	descriptionScrollPane.setBorder(new TitledBorder("Description"));	
+	final JScrollPane descriptionScrollPane 
+		= new JScrollPane(descriptionText);
+	descriptionScrollPane.setBorder(new TitledBorder("Description"));
 	final Dimension descriptionLabelDim = new Dimension(500, 400);	
 	descriptionScrollPane.setPreferredSize(descriptionLabelDim);
 	descriptionScrollPane.setMinimumSize(descriptionLabelDim);	
@@ -209,6 +219,7 @@ public final class ExampleChooser extends JDialog {
 	            sb.append(ls);
 	        }
 	        descriptionText.setText(sb.toString());
+	        descriptionText.getCaret().setDot(0);
 	    } catch(IOException e) {
 		descriptionText.setText("Reading description from "
 			                 + "README file failed.");
