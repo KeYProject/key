@@ -120,6 +120,8 @@
 ./heap/vstte10_03_LinkedList/Node_cons.key
 ./heap/vstte10_03_LinkedList/Node_inv.key
 ./heap/vstte10_03_LinkedList/Node_search.key
+./heap/vstte10_04_Queens/Queens_isConsistent.key
+./heap/vstte10_04_Queens/Queens_nQueens.key
 ./heap/WeideEtAl_01_AddAndMultiply/AddAndMultiply_add.key
 ./heap/WeideEtAl_01_AddAndMultiply/AddAndMultiply_mul.key
 ./heap/WeideEtAl_02_BinarySearch/BinarySearch_search.key
