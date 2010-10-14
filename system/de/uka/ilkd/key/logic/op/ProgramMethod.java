@@ -123,7 +123,7 @@ public class ProgramMethod extends NonRigidFunction
      * @return the KeYJavaType of the <tt>i</tt>-th parameter
      */
     public KeYJavaType getParameterType(int i) {
-       return method.getParameterDeclarationAt(i).getTypeReference().getKeYJavaType(); 
+       return method.getParameterDeclarationAt(i).getVariableSpecification().getProgramVariable().getKeYJavaType(); 
     }
     
     public StatementBlock getBody() {
