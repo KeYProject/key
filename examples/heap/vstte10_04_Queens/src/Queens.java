@@ -88,10 +88,12 @@ class Queens {
 	  @   //uses j at column pos
 	  @   && (\forall int j; 0 <= j && j < i;
 	  @                      !(\exists \seq s; s.length == board.length;
-          @                                        (\forall int p, x; 0 <= x && x < p && p < s.length;  
-          @                                                           (int)s[x] != (int)s[p] 
-          @                                                            && (int)s[x] - (int)s[p] != p - x 
-          @                                                            && (int)s[p] - (int)s[x] != p - x)
+          @                                        (\forall int x; 0 <= x && x < s.length; 
+          @                                                        0 <= (int)s[x] && (int)s[x] < s.length)  
+          @                                        && (\forall int p, x; 0 <= x && x < p && p < s.length;  
+          @                                                              (int)s[x] != (int)s[p] 
+          @                                                               && (int)s[x] - (int)s[p] != p - x 
+          @                                                               && (int)s[p] - (int)s[x] != p - x)
           @                                        && (\forall int x; 0 <= x && x < pos; (int)s[x] == \old(board[x]))
           @                                        && (int)s[pos] == j));
           @
