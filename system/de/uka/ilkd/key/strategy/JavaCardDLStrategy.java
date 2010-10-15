@@ -330,8 +330,14 @@ public final class JavaCardDLStrategy extends AbstractFeatureStrategy {
         bindRuleSet ( d, "inReachableStateImplication",
                       add ( NonDuplicateAppModPositionFeature.INSTANCE,
                             longConst ( 100 ) ) );
+        
 
         bindRuleSet ( d, "type_hierarchy_def", -6500 );
+        
+        //limited (must have better prioerity than "classAxiom")
+        bindRuleSet ( d, "limitObserver",
+                      add ( NonDuplicateAppModPositionFeature.INSTANCE,
+                            longConst ( -200 ) ) );                
         
         //class axioms
         bindRuleSet ( d, "classAxiom", longConst(-150) );        
@@ -1871,7 +1877,9 @@ public final class JavaCardDLStrategy extends AbstractFeatureStrategy {
         bindRuleSet ( d, "inReachableStateImplication",
         	      NonDuplicateAppModPositionFeature.INSTANCE );
         
-
+        bindRuleSet ( d, "limitObserver",
+  	      NonDuplicateAppModPositionFeature.INSTANCE );        
+        
         setupQuantifierInstantiationApproval ( d );
         setupSplittingApproval ( d );
 

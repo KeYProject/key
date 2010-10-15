@@ -114,8 +114,10 @@ public final class PartialInvAxiom implements ClassAxiom {
 	    //create taclet
 	    final AntecTacletBuilder tacletBuilder = new AntecTacletBuilder();
 	    tacletBuilder.setFind(TB.inv(services, 
-		    		  TB.var(heapSV), 
-		    		  i == 0 ? TB.var(selfSV) : TB.var(eqSV)));
+		    		  	 TB.var(heapSV), 
+		    		  	 i == 0 
+		    		  	 ? TB.var(selfSV) 
+		    		         : TB.var(eqSV)));
 	    tacletBuilder.addTacletGoalTemplate(
 		    new TacletGoalTemplate(addedSeq,
 			    ImmutableSLList.<Taclet>nil()));

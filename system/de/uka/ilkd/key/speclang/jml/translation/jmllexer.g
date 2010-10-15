@@ -127,6 +127,7 @@ SEQEMPTY : "\\seq_empty";
 SEQSINGLETON : "\\seq_singleton";
 SEQCONCAT : "\\seq_concat";
 SEQSUB : "\\seq_sub";
+SEQREVERSE : "\\seq_reverse";
 
 MEASURED_BY : "\\measured_by";
 

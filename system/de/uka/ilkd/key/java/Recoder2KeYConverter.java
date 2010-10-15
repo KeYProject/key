@@ -704,7 +704,10 @@ public class Recoder2KeYConverter {
 	return new SeqSub(children);
     }    
     
-    
+    public SeqReverse convert(de.uka.ilkd.key.java.recoderext.SeqReverse e) {
+        ExtList children = collectChildren(e);	
+	return new SeqReverse(children);
+    }    
 
     /** convert a recoder StringLiteral to a KeY StringLiteral */
     public StringLiteral convert(

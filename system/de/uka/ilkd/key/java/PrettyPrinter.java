@@ -1031,7 +1031,17 @@ public class PrettyPrinter {
         writeElement(0, x.getChildAt(2));
         write(")");
         printFooter(x);
-    }        
+    }  
+    
+    public void printSeqReverse(de.uka.ilkd.key.java.expression.operator.SeqReverse x) throws java.io.IOException {
+        printHeader(x);
+        writeInternalIndentation(x);
+        writeToken(0, "\\seq_reverse", x);
+        write("(");
+        writeElement(0, x.getChildAt(0));
+        write(")");
+        printFooter(x);
+    }          
 
     public void printStringLiteral(StringLiteral x) throws java.io.IOException {
         printHeader(x);

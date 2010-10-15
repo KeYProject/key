@@ -15,32 +15,30 @@ import recoder.java.expression.Operator;
 import recoder.list.generic.ASTArrayList;
 
 
-public class SeqSub extends Operator {
+public class SeqReverse extends Operator {
 
-    public SeqSub(Expression e1, Expression e2, Expression e3) {
+    public SeqReverse(Expression e) {
 	children = new ASTArrayList<Expression>(getArity());
-	children.add(e1);
-	children.add(e2);
-	children.add(e3);
+	children.add(e);
 	makeParentRoleValid();
     }
 
 
-    protected SeqSub(SeqSub proto) {
+    protected SeqReverse(SeqReverse proto) {
 	super(proto);
 	makeParentRoleValid();
     }
     
 
     @Override    
-    public SeqSub deepClone() {
-	return new SeqSub(this);
+    public SeqReverse deepClone() {
+	return new SeqReverse(this);
     }
 
 
     @Override    
     public int getArity() {
-	return 3;
+	return 1;
     }
 
     
@@ -60,5 +58,4 @@ public class SeqSub extends Operator {
     public void accept(SourceVisitor v) {
 	
     }
-    
 }

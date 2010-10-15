@@ -2327,7 +2327,12 @@ Expression Expression() :
         result = new SeqSub(expr, expr2, result);
         setPrefixInfo(result);
     }
-
+    |
+    "\\seq_reverse" "(" expr = Expression() ")"
+    {
+        result = new SeqReverse(expr);
+        setPrefixInfo(result);
+    }
   )
   {
       checkConstruction(result);

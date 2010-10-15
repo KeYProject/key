@@ -80,6 +80,8 @@ public interface Visitor {
     void performActionOnSeqConcat(SeqConcat x);
     
     void performActionOnSeqSub(SeqSub x);
+    
+    void performActionOnSeqReverse(SeqReverse x);
 
     void performActionOnStringLiteral(StringLiteral x); 
 

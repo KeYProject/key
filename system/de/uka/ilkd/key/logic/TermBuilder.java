@@ -1321,4 +1321,9 @@ public final class TermBuilder {
 	return func(services.getTypeConverter().getSeqLDT().getSeqSub(), 
 		    new Term[]{s, from, to});
     }
+    
+    
+    public Term seqReverse(Services services, Term s) {
+	return func(services.getTypeConverter().getSeqLDT().getSeqReverse(), s);
+    }    
 }

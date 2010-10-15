@@ -1848,7 +1848,12 @@ jmlprimary returns [SLExpression result=null] throws SLTranslationException
     |   SEQSUB LPAREN e1=expression COMMA e2=expression COMMA e3=expression RPAREN
         {
             result = new SLExpression(TB.seqSub(services, e1.getTerm(), e2.getTerm(), e3.getTerm()));
-        }         
+        }
+        
+    |   SEQREVERSE LPAREN e1=expression RPAREN
+        {
+            result = new SLExpression(TB.seqReverse(services, e1.getTerm()));
+        }                         
 
     |   LPAREN result=expression RPAREN
 ;

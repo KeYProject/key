@@ -190,7 +190,12 @@ public abstract class JavaASTVisitor extends JavaASTWalker
     @Override
     public void performActionOnSeqSub(SeqSub x) {
 	doDefaultAction(x);
-    }            
+    }
+    
+    @Override
+    public void performActionOnSeqReverse(SeqReverse x) {
+	doDefaultAction(x);
+    }
     
     @Override
     public void performActionOnBreak(Break x) {

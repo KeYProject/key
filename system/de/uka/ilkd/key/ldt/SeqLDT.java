@@ -16,6 +16,7 @@ import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.expression.literal.EmptySeqLiteral;
 import de.uka.ilkd.key.java.expression.operator.SeqConcat;
+import de.uka.ilkd.key.java.expression.operator.SeqReverse;
 import de.uka.ilkd.key.java.expression.operator.SeqSingleton;
 import de.uka.ilkd.key.java.expression.operator.SeqSub;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
@@ -41,6 +42,7 @@ public final class SeqLDT extends LDT {
     private final Function seqSingleton;
     private final Function seqConcat;
     private final Function seqSub;
+    private final Function seqReverse;    
     
     
     public SeqLDT(Services services) {
@@ -51,6 +53,7 @@ public final class SeqLDT extends LDT {
         seqSingleton  = addFunction(services, "seqSingleton");
         seqConcat     = addFunction(services, "seqConcat");
         seqSub        = addFunction(services, "seqSub");
+        seqReverse    = addFunction(services, "seqReverse");        
     }
     
     
@@ -82,6 +85,11 @@ public final class SeqLDT extends LDT {
     public Function getSeqSub() {
 	return seqSub;
     }
+    
+    
+    public Function getSeqReverse() {
+	return seqReverse;
+    }
 
     
     @Override
@@ -110,7 +118,8 @@ public final class SeqLDT extends LDT {
 	    			 ExecutionContext ec) {
 	return op instanceof SeqSingleton
 	       || op instanceof SeqConcat
-	       || op instanceof SeqSub;
+	       || op instanceof SeqSub
+	       || op instanceof SeqReverse;
     }
 
 
@@ -131,6 +140,8 @@ public final class SeqLDT extends LDT {
 	    return seqConcat;
 	} else if(op instanceof SeqSub) {
 	    return seqSub;
+	} else if(op instanceof SeqReverse) {
+	    return seqReverse;
 	}
 	assert false;
 	return null;

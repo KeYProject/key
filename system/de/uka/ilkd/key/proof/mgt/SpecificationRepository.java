@@ -316,7 +316,7 @@ public final class SpecificationRepository {
 					   ImmutableSLList.<Taclet>nil(),
 					   TB.func(unlimited, subs)));
 	tacletBuilder.setName(new Name("limit " + unlimited.name()));
-	tacletBuilder.addRuleSet(new RuleSet(new Name("inReachableStateImplication")));	
+	tacletBuilder.addRuleSet(new RuleSet(new Name("limitObserver")));
 	
 	return tacletBuilder.getTaclet();
     }
