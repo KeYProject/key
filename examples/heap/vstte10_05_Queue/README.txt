@@ -8,5 +8,3 @@ Not yet verified:
 - AmortizedQueue's second constructor
 - AmortizedQueue::enqueue
 - AmortizedQueue::tail
-- LinkedList::concat
-- LinkedList::reverse

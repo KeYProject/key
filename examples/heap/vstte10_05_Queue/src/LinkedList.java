@@ -20,7 +20,7 @@ class LinkedList {
       @*/
     
     
-    //@ public accessible \inv: repr \measured_by length; 
+    //@ public accessible \inv: repr \measured_by seq.length; 
     
     
     /**
@@ -59,14 +59,14 @@ class LinkedList {
      * Constructs a linked list whose head is h and whose tail is "t"
      */
     /*@ public normal_behaviour
-      @   requires t.\inv && 0 < t.length; 
+      @   requires t.\inv && 0 < t.seq.length; 
       @   ensures seq == \seq_concat(\seq_singleton(h), t.seq);
       @   ensures repr == \set_union(\all_fields(this), t.repr);
       @*/
     /*@pure@*/ LinkedList(int h, LinkedList t) {
 	head = h;
 	tail = t;
-	length = t.length + 1;
+	length = t.length() + 1;
 	//@ set seq = \seq_concat(\seq_singleton(h), t.seq);
 	//@ set repr = \set_union(\all_fields(this), t.repr);
     }
@@ -79,7 +79,7 @@ class LinkedList {
     /*@ public normal_behaviour
       @   ensures \result.\inv;
       @   ensures \result.seq == \seq_concat(\seq_singleton(d), seq);
-      @   ensures \subset(\result.repr, \set_union(\all_fields(\result), repr));      
+      @   ensures \fresh(\set_minus(\result.repr, repr));      
       @*/
     public /*@pure@*/ LinkedList cons(int d) {
 	if(length == 0) {
@@ -102,10 +102,13 @@ class LinkedList {
       @   measured_by seq.length;
       @*/
     public /*@pure@*/ LinkedList concat(LinkedList end) {
-	if(tail != null) {
-	    end = tail.concat(end);
+	if(length == 0) {
+	    return end;
+	} else if(length == 1) {
+	    return end.cons(head);
+	} else {
+	    return tail.concat(end).cons(head);
 	}
-	return end.cons(head);
     }
     
     
@@ -119,7 +122,7 @@ class LinkedList {
       @   measured_by seq.length;
       @*/
     public /*@pure@*/ LinkedList reverse() {
-	if(tail == null) {
+	if(length <= 1) {
 	    return this;
 	} else {
 	    LinkedList r = tail.reverse();
@@ -141,7 +144,8 @@ class LinkedList {
     
     /*@ public normal_behaviour
       @   ensures seq.length <= 1 ==> \result == null;
-      @   ensures 2 <= seq.length ==> \result.seq == seq[1..seq.length]
+      @   ensures 2 <= seq.length ==> \result != null
+      @                                && \result.seq == seq[1..seq.length]
       @                                && \subset(\result.repr, repr);
       @*/
     public /*@pure nullable@*/ LinkedList tail() {

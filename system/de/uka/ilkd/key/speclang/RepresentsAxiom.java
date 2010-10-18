@@ -18,6 +18,8 @@ import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.abstraction.Type;
+import de.uka.ilkd.key.java.declaration.ClassDeclaration;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.*;
@@ -165,10 +167,13 @@ public final class RepresentsAxiom implements ClassAxiom {
 	
 	//instantiate axiom with schema variables
 	final Term schemaAxiom = getAxiom(heapSV, selfSV, services);
-	
+
 	//prepare exactInstance guard
+	final boolean finalClass 
+		= kjt.getJavaType() instanceof ClassDeclaration 
+	          && ((ClassDeclaration)kjt.getJavaType()).isFinal();
 	final Term exactInstance 
-		= target.isStatic() 
+		= target.isStatic() || finalClass
 		  ? TB.tt() 
 	          : TB.exactInstance(services, kjt.getSort(), TB.var(selfSV));
 		  
@@ -265,8 +270,11 @@ public final class RepresentsAxiom implements ClassAxiom {
 	result = result.union(limited.second);
 		
 	//create if sequent
+	final boolean finalClass 
+		= kjt.getJavaType() instanceof ClassDeclaration 
+		  && ((ClassDeclaration)kjt.getJavaType()).isFinal();
 	final Sequent ifSeq;
-	if(target.isStatic()) {
+	if(target.isStatic() || finalClass) {
 	    ifSeq = null;
 	} else {
 	    final Term ifFormula 
@@ -284,7 +292,7 @@ public final class RepresentsAxiom implements ClassAxiom {
 	    (new RewriteTacletGoalTemplate(Sequent.EMPTY_SEQUENT,
 					   ImmutableSLList.<Taclet>nil(),
 					   limitedRhs));
-	if(!target.isStatic()) {
+	if(ifSeq != null) {
 	    tacletBuilder.setIfSequent(ifSeq);
 	}
 	tacletBuilder.setName(new Name(name));

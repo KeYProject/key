@@ -326,22 +326,28 @@ public final class JavaCardDLStrategy extends AbstractFeatureStrategy {
                       ifZero ( implicitCastNecessary ( instOf ( "castedTerm" ) ),
                                longConst ( -5000 ), inftyConst () ) );
         
+       
+
+        bindRuleSet ( d, "type_hierarchy_def", -6500 );
+        
+        //partial inv axiom
+        bindRuleSet ( d, "partialInvAxiom",
+                      add ( NonDuplicateAppModPositionFeature.INSTANCE,
+                            longConst ( 10000 ) ) );                        
+        
         //inReachableState        
         bindRuleSet ( d, "inReachableStateImplication",
                       add ( NonDuplicateAppModPositionFeature.INSTANCE,
                             longConst ( 100 ) ) );
         
-
-        bindRuleSet ( d, "type_hierarchy_def", -6500 );
-        
-        //limited (must have better prioerity than "classAxiom")
-        bindRuleSet ( d, "limitObserver",
-                      add ( NonDuplicateAppModPositionFeature.INSTANCE,
-                            longConst ( -200 ) ) );                
-        
         //class axioms
         bindRuleSet ( d, "classAxiom", longConst(-150) );        
         
+        //limit observer (must have better priority than "classAxiom")
+        bindRuleSet ( d, "limitObserver",
+                      add ( NonDuplicateAppModPositionFeature.INSTANCE,
+                            longConst ( -200 ) ) );                
+                        
         if ( programsToRight )
             bindRuleSet ( d, "boxDiamondConv",
                           TopLevelFindFeature.ANTEC_WITH_UPDATE );
@@ -1878,7 +1884,10 @@ public final class JavaCardDLStrategy extends AbstractFeatureStrategy {
         	      NonDuplicateAppModPositionFeature.INSTANCE );
         
         bindRuleSet ( d, "limitObserver",
-  	      NonDuplicateAppModPositionFeature.INSTANCE );        
+  	      NonDuplicateAppModPositionFeature.INSTANCE );
+        
+        bindRuleSet ( d, "partialInvAxiom",
+    	      NonDuplicateAppModPositionFeature.INSTANCE );         
         
         setupQuantifierInstantiationApproval ( d );
         setupSplittingApproval ( d );

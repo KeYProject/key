@@ -124,8 +124,7 @@ public final class PartialInvAxiom implements ClassAxiom {
 	    tacletBuilder.setName(new Name("Partial inv axiom for " 
 		    			   + inv.getName()
 		    			   + (i == 0 ? "" : " EQ")));
-	    tacletBuilder.addRuleSet(
-		    	new RuleSet(new Name("inReachableStateImplication")));
+	    tacletBuilder.addRuleSet(new RuleSet(new Name("partialInvAxiom")));
 	    
 	    //\assumes(self = EQ ==>)
 	    if(i == 1) {

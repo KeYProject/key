@@ -1,6 +1,6 @@
 A list interface with iterators, an array list and a linked list implementation, a set class built on top of the list, and another client that uses the list. 
 
-Note that unlike the array list, the *linked* list is experimental and unfinished. Another (perhaps more promising) approach to dealing with linked lists can be found in the "vstte10_3_LinkedList" example. 
+Note that unlike the array list, the *linked* list is experimental and unfinished. Another (perhaps more promising) approach to dealing with linked lists can be found in the "vstte10_03_LinkedList" and "vstte10_05_Queue" examples. 
 
 Interactive proofs:
 - ArrayList::contains (obvious quantifier instantiation)

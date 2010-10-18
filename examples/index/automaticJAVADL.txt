@@ -122,6 +122,16 @@
 ./heap/vstte10_03_LinkedList/Node_search.key
 ./heap/vstte10_04_Queens/Queens_isConsistent.key
 ./heap/vstte10_04_Queens/Queens_nQueens.key
+./heap/vstte10_05_Queue/LinkedList_concat.key
+./heap/vstte10_05_Queue/LinkedList_cons.key
+./heap/vstte10_05_Queue/LinkedList_head.key
+./heap/vstte10_05_Queue/LinkedList_inv.key
+./heap/vstte10_05_Queue/LinkedList_length.key
+./heap/vstte10_05_Queue/LinkedList_LinkedList1.key
+./heap/vstte10_05_Queue/LinkedList_LinkedList2.key
+./heap/vstte10_05_Queue/LinkedList_LinkedList3.key
+./heap/vstte10_05_Queue/LinkedList_reverse.key
+./heap/vstte10_05_Queue/LinkedList_tail.key
 ./heap/WeideEtAl_01_AddAndMultiply/AddAndMultiply_add.key
 ./heap/WeideEtAl_01_AddAndMultiply/AddAndMultiply_mul.key
 ./heap/WeideEtAl_02_BinarySearch/BinarySearch_search.key

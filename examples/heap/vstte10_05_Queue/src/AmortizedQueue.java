@@ -17,7 +17,6 @@ public class AmortizedQueue {
       @ private invariant repr == \set_union(this.*, \set_union(front.repr, rear.repr));
       @*/
     
-    
     //@ public accessible \inv: repr;
     
     
@@ -44,8 +43,8 @@ public class AmortizedQueue {
      */
     /*@ public normal_behaviour
       @   requires f.\inv && r.\inv;
-      @   requires \disjoint(this.*, \set_union(f.repr, r.repr));
       @   ensures seq == \seq_concat(f.seq, \seq_reverse(r.seq));
+      @   ensures \fresh(\set_minus(repr, \set_union(f.repr, r.repr)));
       @*/
     public /*@pure@*/ AmortizedQueue(LinkedList f, LinkedList r) {
 	if(r.length() <= f.length()) {

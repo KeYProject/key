@@ -16,6 +16,10 @@ import java.util.Set;
 
 
 public final class StrategyProperties extends Properties {
+    
+    public final static String STOPMODE_OPTIONS_KEY = "STOPMODE_OPTIONS_KEY";
+    public final static String STOPMODE_DEFAULT = "STOPMODE_DEFAULT";
+    public final static String STOPMODE_NONCLOSE = "STOPMODE_NONCLOSE";    
 
     public final static String SPLITTING_OPTIONS_KEY = "SPLITTING_OPTIONS_KEY";
     public final static String SPLITTING_NORMAL = "SPLITTING_NORMAL";
@@ -47,10 +51,6 @@ public final class StrategyProperties extends Properties {
     public final static String QUANTIFIERS_NON_SPLITTING = "QUANTIFIERS_NON_SPLITTING";
     public final static String QUANTIFIERS_NON_SPLITTING_WITH_PROGS = "QUANTIFIERS_NON_SPLITTING_WITH_PROGS";
     public final static String QUANTIFIERS_INSTANTIATE = "QUANTIFIERS_INSTANTIATE";
-    
-    public final static String STOPMODE_OPTIONS_KEY = "STOPMODE_OPTIONS_KEY";
-    public final static String STOPMODE_DEFAULT = "STOPMODE_DEFAULT";
-    public final static String STOPMODE_NONCLOSE = "STOPMODE_NONCLOSE";
 
 
     public final static int USER_TACLETS_NUM = 3;
