@@ -143,13 +143,12 @@ class LinkedList {
     
     
     /*@ public normal_behaviour
-      @   ensures seq.length <= 1 ==> \result == null;
-      @   ensures 2 <= seq.length ==> \result != null
-      @                                && \result.seq == seq[1..seq.length]
-      @                                && \subset(\result.repr, repr);
+      @   ensures \result.\inv;
+      @   ensures \result.seq == seq[1..seq.length];
+      @   ensures \fresh(\set_minus(\result.repr, repr));
       @*/
-    public /*@pure nullable@*/ LinkedList tail() {
-	return tail;
+    public /*@pure@*/ LinkedList tail() {
+	return length <= 1 ? new LinkedList() : tail;
     }
     
     

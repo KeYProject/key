@@ -56,7 +56,7 @@ public class AmortizedQueue {
 	    rear = new LinkedList();
 	}
 	//@ set seq = \seq_concat(front.seq, \seq_reverse(rear.seq));
-	//@ set repr = \set_union(\all_fields(this), \set_union(front.repr, rear.repr));	
+	//@ set repr = \set_union(\all_fields(this), \set_union(front.repr, rear.repr));
     }
     
     
@@ -78,14 +78,12 @@ public class AmortizedQueue {
      */
     /*@ public normal_behaviour
       @   requires seq.length != 0;
-      @   ensures \result.\inv;      
+      @   ensures \result.\inv;
       @   ensures \result.seq == seq[1..seq.length];
+      @   ensures \fresh(\set_minus(\result.repr, repr));
       @*/
     public /*@pure@*/ AmortizedQueue tail() {
 	LinkedList t = front.tail();
-	if(t == null) {
-	    t = new LinkedList();
-	}
 	return new AmortizedQueue(t, rear);
     }
     
@@ -97,6 +95,7 @@ public class AmortizedQueue {
     /*@ public normal_behaviour
       @   ensures \result.\inv;
       @   ensures \result.seq == \seq_concat(seq, \seq_singleton(item));
+      @   ensures \fresh(\set_minus(\result.repr, repr));
       @*/
     public /*@pure@*/ AmortizedQueue enqueue(int item) {
 	LinkedList r = rear.cons(item);

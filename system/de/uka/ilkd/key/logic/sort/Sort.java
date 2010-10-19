@@ -24,7 +24,6 @@ public interface Sort extends Named {
     final Sort UPDATE   = new SortImpl(new Name("Update"));
     final Sort ANY      = new SortImpl(new Name("any"));    
     
-    final Name OBJECT_REPOSITORY_NAME = new Name("<get>");
     final Name CAST_NAME = new Name("cast");
     final Name INSTANCE_NAME = new Name("instance");
     final Name EXACT_INSTANCE_NAME = new Name("exactInstance");    
