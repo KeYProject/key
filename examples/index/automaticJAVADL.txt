@@ -124,7 +124,6 @@
 ./heap/vstte10_04_Queens/Queens_nQueens.key
 ./heap/vstte10_05_Queue/AmortizedQueue_AmortizedQueue.key
 ./heap/vstte10_05_Queue/AmortizedQueue_front.key
-./heap/vstte10_05_Queue/AmortizedQueue_inv.key
 ./heap/vstte10_05_Queue/LinkedList_concat.key
 ./heap/vstte10_05_Queue/LinkedList_cons.key
 ./heap/vstte10_05_Queue/LinkedList_head.key
