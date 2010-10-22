@@ -32,11 +32,11 @@ public class EclipseSignaturesHelper {
 		    determineJavaType(Signature.getElementType(eclipseSignature), surroundingType));
 	    // array type is <element type> ([])+, now create the []s
 
-	    for(int i=0; i<depth; i++)
+	    for(int i=0; i<depth; i++) {
 		type.append('['); type.append(']');
-		// this is probably much faster, than handling String-objects ?!
-		return type.toString();
-
+		// this is probably much faster, than handling String-objects ?!		
+	    }
+	    return type.toString();
 		// primitive types:
 	case Signature.C_BOOLEAN:
 	    return "boolean";
