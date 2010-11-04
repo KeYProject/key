@@ -21,7 +21,7 @@ import de.uka.ilkd.key.speclang.OperationContract;
 
 
 /**
- * The proof obligation for operation contracts. 
+ * The proof obligation for dependency contracts. 
  */
 public final class DependencyContractPO extends AbstractPO 
                                         implements ContractPO {

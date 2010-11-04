@@ -2,4 +2,4 @@ The second benchmark from the paper "Incremental Benchmarks for Software Verific
 
 Verify an operation that uses binary search to find a given entry in an array of entries that are in sorted order.
 
-The proof obligation is verifiable with user interaction.
+The proof obligation is verifiable without user interaction.
