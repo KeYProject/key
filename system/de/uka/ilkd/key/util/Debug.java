@@ -282,6 +282,27 @@ public final class Debug implements DebugMBean {
 	}
     }
 
+    /**
+     * an assertion failure is thrown if an iterable object is either null or
+     * contains the null element.
+     * 
+     * @param iterable
+     *            The iterable object to check
+     * @param message
+     *            String describes the failed assertion
+     */
+    public static final void assertDeepNonNull(Iterable<?> iterable, String message) {
+	if (ENABLE_ASSERTION) {
+	    if(iterable == null)
+		fail("Null pointer: " + message);
+	    for (Object object : iterable) {
+		if (object == null) {
+		    fail("Null element in collection:" + message);
+		}
+	    }
+	}
+    }
+
     public static final void assertFalse(boolean isNotOK, String message) {
 	assertTrue(!isNotOK, message);
     }
