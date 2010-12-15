@@ -25,11 +25,13 @@ import javax.swing.event.PopupMenuListener;
 
 import org.apache.log4j.Logger;
 
+import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.gui.IMain;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.pp.PosInSequent;
+import de.uka.ilkd.key.rule.BuiltInRule;
 
 
 
@@ -137,13 +139,18 @@ class SequentViewListener extends MouseInputAdapter
 				startFocussedAutoMode ( mousePos.getPosInOccurrence (),
 							mediator.getSelectedGoal () );
 			}
-		    } else {		    		    
-		    
+		    } else {		    		  
+			//done before collecting the taclets because initialising 
+			//built in rules may have side effects on the set of applicable
+			//taclets
+			final ImmutableList<BuiltInRule> builtInRules 
+				= mediator.getBuiltInRule(mousePos.getPosInOccurrence());
+			
 			menu = new TacletMenu(seqView,
 					      mediator.getFindTaclet(mousePos), 
 					      mediator.getRewriteTaclet(mousePos),
 					      mediator.getNoFindTaclet(),
-					      mediator.getBuiltInRule(mousePos.getPosInOccurrence()),
+					      builtInRules,
 					      mousePos);                               
 
 			setRefreshHighlightning(false);                    

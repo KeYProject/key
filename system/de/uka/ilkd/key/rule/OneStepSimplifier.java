@@ -126,7 +126,7 @@ public final class OneStepSimplifier implements BuiltInRule {
      */
     private void initIndices(Goal goal) {
 	if(goal.proof() != lastProof) {
-	    cache.clear();
+	    shutdownIndices();
 	    lastProof = goal.proof();	    
 	    appsTakenOver = DefaultImmutableSet.<NoPosTacletApp>nil();;	    
 	    indices = new TacletIndex[ruleSets.size()];
