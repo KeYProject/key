@@ -12,7 +12,6 @@ package de.uka.ilkd.key.rule;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -25,15 +24,12 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.TacletFilter;
 import de.uka.ilkd.key.proof.TacletIndex;
 import de.uka.ilkd.key.util.LRUCache;
-import de.uka.ilkd.key.util.Pair;
 
 
 public final class OneStepSimplifier implements BuiltInRule {
@@ -48,7 +44,10 @@ public final class OneStepSimplifier implements BuiltInRule {
     	= ImmutableSLList.<String>nil().append("concrete")
     	                               .append("simplify_literals")
     	                               .append("elimQuantifier")
-    	                               .append("simplify");
+    	                               .append("simplify")
+    	                               .append("simplify_enlarging");
+    private static final boolean[] bottomUp 
+    	= {false, false, false, false, true};
   
     private final Map<ConstrainedFormula, Instantiation> cache 
     		= new LRUCache<ConstrainedFormula, Instantiation>(1000);
@@ -73,12 +72,20 @@ public final class OneStepSimplifier implements BuiltInRule {
     //internal methods
     //-------------------------------------------------------------------------
     
-    private ImmutableSet<Taclet> tacletsForRuleSet(Goal goal, 
-	    				  String ruleSetName,
-	    				  ImmutableList<String> excludedRuleSetNames) {
+    /**
+     * Selects the taclets suitable for one step simplification out of the 
+     * given rule set (where taclets that also belong to one of the "excluded"
+     * rule sets are not considered). Removes these taclets from the goal's
+     * taclet index, remembers them in the "appsTakenOver" field so they can
+     * be restored later, and returns them.
+     */
+    private ImmutableSet<Taclet> tacletsForRuleSet(
+	    			Goal goal, 
+	    			String ruleSetName,
+	    			ImmutableList<String> excludedRuleSetNames) {
 	ImmutableSet<Taclet> result = DefaultImmutableSet.<Taclet>nil();
-	ImmutableSet<NoPosTacletApp> allApps = goal.ruleAppIndex().tacletIndex()
-	                                                 .allNoPosTacletApps();
+	ImmutableSet<NoPosTacletApp> allApps 
+		= goal.ruleAppIndex().tacletIndex().allNoPosTacletApps();
 	for(NoPosTacletApp app : allApps) {
 	    if(!(app.taclet() instanceof RewriteTaclet)
 	       || !app.taclet().hasReplaceWith()
@@ -113,8 +120,13 @@ public final class OneStepSimplifier implements BuiltInRule {
     }
     
     
+    /**
+     * If the rule is applied to a different proof than last time, then clear
+     * all caches and initialise the taclet indices.
+     */
     private void initIndices(Goal goal) {
 	if(goal.proof() != lastProof) {
+	    cache.clear();
 	    lastProof = goal.proof();	    
 	    appsTakenOver = DefaultImmutableSet.<NoPosTacletApp>nil();;	    
 	    indices = new TacletIndex[ruleSets.size()];
@@ -134,6 +146,10 @@ public final class OneStepSimplifier implements BuiltInRule {
     }
     
     
+    /**
+     * Deactivate one-step simplification: clear caches, restore taclets to
+     * the goals' taclet indices.
+     */
     private void shutdownIndices() {
 	if(lastProof != null) {
 	    for(Goal g : lastProof.openGoals()) {
@@ -151,15 +167,14 @@ public final class OneStepSimplifier implements BuiltInRule {
 	}
     }
     
-
-    private ConstrainedFormula simplifyPosOrSub(Services services,
-	    		     	  	        PosInOccurrence pos,
-	    		     	  	        int indexNr) {
-	final Term term = pos.subTerm();
-	if(notSimplifiableCaches[indexNr].get(term) != null) {
-	    return null;
-	}
-	
+    
+    /**
+     * Helper for simplifyPosOrSub. Performs a single step of simplification 
+     * locally at the given position using the given taclet index.
+     */
+    private ConstrainedFormula simplifyPos(Services services,
+	  	        		   PosInOccurrence pos,
+	  	        		   int indexNr) {
 	final ImmutableList<NoPosTacletApp> apps 
 		= indices[indexNr].getRewriteTaclet(pos, 
 						    Constraint.BOTTOM, 
@@ -181,20 +196,65 @@ public final class OneStepSimplifier implements BuiltInRule {
 	    ConstrainedFormula result = taclet.getRewriteResult(services, app);
 	    return result;
 	}
-	
-	for(int i = 0, n = term.arity(); i < n; i++) {
+	return null;
+    }
+    
+    
+    /**
+     * Helper for simplifyPosOrSub. Performs a single step of simplification 
+     * recursively at a subterm of the given position using the given taclet 
+     * index.
+     */    
+    private ConstrainedFormula simplifySub(Services services,
+		   			   PosInOccurrence pos,
+		   			   int indexNr) {
+	for(int i = 0, n = pos.subTerm().arity(); i < n; i++) {
 	    ConstrainedFormula result 
 	    	= simplifyPosOrSub(services, pos.down(i), indexNr);
 	    if(result != null) {
 		return result;
 	    }
-	}
-
-	notSimplifiableCaches[indexNr].put(term, term);
+	}	
 	return null;
     }
     
+
+    /**
+     * Performs a single step of simplification at the given position or its 
+     * subterms using the given taclet index.
+     */
+    private ConstrainedFormula simplifyPosOrSub(Services services,
+	    		     	  	        PosInOccurrence pos,
+	    		     	  	        int indexNr) {
+	final Term term = pos.subTerm();
+	if(notSimplifiableCaches[indexNr].get(term) != null) {
+	    return null;
+	}
+	
+	ConstrainedFormula result;
+	if(bottomUp[indexNr]) {
+	    result = simplifySub(services, pos, indexNr);
+	    if(result == null) {
+		result = simplifyPos(services, pos, indexNr);
+	    }
+	} else {
+	    result = simplifyPos(services, pos, indexNr);
+	    if(result == null) {
+		result = simplifySub(services, pos, indexNr);
+	    }
+	}
+	
+	if(result == null) {
+	    notSimplifiableCaches[indexNr].put(term, term);
+	}
+	
+	return result;
+    }
     
+    
+    /**
+     * Helper for replaceKnown (handles recursion).
+     */
     private Term replaceKnownHelper(Map<Term,PosInOccurrence> map, 
 	                            Term in,
 	                            /*out*/ List<PosInOccurrence> ifInsts) {
@@ -226,6 +286,12 @@ public final class OneStepSimplifier implements BuiltInRule {
     }
     
     
+    /**
+     * Simplifies the given constrained formula as far as possible using 
+     * the replace-known rules (hardcoded here). The context formulas available 
+     * for replace-known are passed in as "context". The positions of the
+     * actually used context formulas are passed out as "ifInsts". 
+     */
     private ConstrainedFormula replaceKnown(
 	    				Services services, 
 	                             	ConstrainedFormula cf,
@@ -245,25 +311,39 @@ public final class OneStepSimplifier implements BuiltInRule {
     }
     	   
     
+    /**
+     * Simplifies the passed constrained formula using a single taclet or 
+     * arbitrarily many replace-known steps.
+     */
     private ConstrainedFormula simplifyConstrainedFormula(
 	    				Services services,
 	    				ConstrainedFormula cf,
 	    				Map<Term,PosInOccurrence> context,
 	    				/*out*/ List<PosInOccurrence> ifInsts) {
+	ConstrainedFormula result 
+		= replaceKnown(services, cf, context, ifInsts);
+	if(result != null) {
+	    return result;
+	}
+	
 	for(int i = 0; i < indices.length; i++) {
 	    PosInOccurrence pos = new PosInOccurrence(cf,
 	    		              		      PosInTerm.TOP_LEVEL,
 	    		              		      true);
-	    ConstrainedFormula result = simplifyPosOrSub(services, pos, i);
+	    result = simplifyPosOrSub(services, pos, i);
 	    if(result != null) {
 		return result;
 	    }
 	}
 	
-	return replaceKnown(services, cf, context, ifInsts);
+	return null;
     }
     
     
+    /**
+     * Freshly computes the overall simplification result for the passed 
+     * constrained formula. 
+     */
     private Instantiation computeInstantiation(Services services,
 	    				       ConstrainedFormula cf,
 	    				       Sequent seq) {
@@ -282,13 +362,15 @@ public final class OneStepSimplifier implements BuiltInRule {
 		= new HashMap<Term,PosInOccurrence>();
 	for(ConstrainedFormula ante : seq.antecedent()) {
 	    if(!ante.equals(cf) && ante.formula().op() != Junctor.TRUE) {
-		context.put(ante.formula(), 
+		context.put(
+			ante.formula(), 
 			new PosInOccurrence(ante, PosInTerm.TOP_LEVEL, true));
 	    }
 	}
 	for(ConstrainedFormula succ : seq.succedent()) {
 	    if(!succ.equals(cf) && succ.formula().op() != Junctor.FALSE) {
-		context.put(succ.formula(), 
+		context.put(
+			succ.formula(), 
 			new PosInOccurrence(succ, PosInTerm.TOP_LEVEL, false));
 	    }
 	}
@@ -321,6 +403,10 @@ public final class OneStepSimplifier implements BuiltInRule {
     }
     
     
+    /**
+     * Determines the overall simplification result for the passed constrained
+     * formula. Uses cache to (re)compute this result only when necessary.
+     */
     private Instantiation getInstantiation(Services services, 
 	                                   ConstrainedFormula cf,
 	                                   Sequent seq) {

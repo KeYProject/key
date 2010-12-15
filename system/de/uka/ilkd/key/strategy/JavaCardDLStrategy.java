@@ -206,12 +206,13 @@ public final class JavaCardDLStrategy extends AbstractFeatureStrategy {
         final RuleSetDispatchFeature d = RuleSetDispatchFeature.create ();
             
         bindRuleSet ( d, "closure", -9000 );
-        bindRuleSet ( d, "concrete", -10000 );
         bindRuleSet ( d, "alpha", -7000 );
         bindRuleSet ( d, "delta", -6000 );
-            
         bindRuleSet ( d, "simplify_boolean", -200 );
-        bindRuleSet ( d, "simplify", -200 );
+        
+        bindRuleSet ( d, "concrete", -10000 );        
+        bindRuleSet ( d, "simplify", -200 );        
+        bindRuleSet ( d, "simplify_enlarging", -180 );        
         bindRuleSet ( d, "simplify_expression", -100 );
         bindRuleSet ( d, "executeIntegerAssignment", -100 );
 

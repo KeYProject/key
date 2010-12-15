@@ -348,6 +348,7 @@ public final class WhileInvariantRule implements BuiltInRule {
 		 	    					 anonHeap)), 
 		 	    true, 
 		 	    false);		
+
 	bodyGoal.addFormula(new ConstrainedFormula(uAnonInvVariantNonNeg), 
 			    true, 
 			    false);
