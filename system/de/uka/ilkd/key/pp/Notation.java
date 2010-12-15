@@ -134,24 +134,6 @@ public abstract class Notation {
     }
     
 
-    /**
-     * The standard concrete syntax for arrays.
-     */
-    public static final class ArrayNot extends Notation {
-	private final String[] arraySeparators;
-	private final int[] ass;
-
-	public ArrayNot(String[] arraySeparators, int prio, int[] ass) {
-	    super(prio);
-	    this.arraySeparators = arraySeparators;
-	    this.ass = ass;
-	}
-
-	public void print(Term t, LogicPrinter sp) throws IOException {
-	    sp.printArray(arraySeparators, t, ass);
-	}
-    }
-
     
     /**
      * The standard concrete syntax for quantifiers.
@@ -169,50 +151,6 @@ public abstract class Notation {
 	public void print(Term t, LogicPrinter sp) throws IOException {
 	    sp.printQuantifierTerm(name, t.varsBoundHere(0), t.sub(0), ass);
 	}
-
-    }
-    
-
-    /**
-     * The standard concrete syntax for numerical quantifiers.
-     */
-    public static final class NumericalQuantifier extends Notation {
-        private final String name;
-        private final int ass1, ass2;
-
-        public NumericalQuantifier(String name, int prio, int ass1, int ass2) {
-            super(prio);
-            this.name = name;
-            this.ass1 = ass1;
-            this.ass2 = ass2;
-        }
-
-        public void print(Term t, LogicPrinter sp) throws IOException {
-            sp.printNumericalQuantifierTerm(name, t.varsBoundHere(0), t.sub(0), 
-                        t.sub(1), ass1, ass2);
-        }
-
-    }       
-    
-
-    /**
-     * The standard concrete syntax for bounded numerical quantifiers.
-     */
-    public static final class BoundedNumericalQuantifier extends Notation {
-        private final String name;
-        private final  int ass1, ass2;
-
-        public BoundedNumericalQuantifier(String name, int prio, int ass1, int ass2) {
-            super(prio);
-            this.name = name;
-            this.ass1 = ass1;
-            this.ass2 = ass2;
-        }
-
-        public void print(Term t, LogicPrinter sp) throws IOException {
-            sp.printBoundedNumericalQuantifierTerm(name, t.varsBoundHere(2), t.sub(0), 
-                        t.sub(1), t.sub(2), ass1, ass2);
-        }
 
     }
     
