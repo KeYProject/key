@@ -110,12 +110,17 @@ public class StateVisualization {
             throw new RuntimeException("Program Pio not found in Sequent "
                     + itNode.getNode().sequent());
        
+
         simplifyUpdate();
         
         setUpProof(null, null);
 
         locations = vd.getLocations(programPio);
+
+
+        
         arrayIndexTerms = vd.getArrayIndex(programPio);
+
 
         // getRefsInPreState(locations);
         arrayLocations = vd.getArrayLocations(programPio);
@@ -128,6 +133,7 @@ public class StateVisualization {
 
         computeInstanceConfigurations();
         this.indexConfigurations = new ImmutableSet[this.instanceConfigurations.length][];
+                
         for (int i = 0; i < instanceConfigurations.length; i++) {
             setUpProof(instanceConfigurations[i], null);
             applyCuts(arrayIndexTerms);            
@@ -135,6 +141,7 @@ public class StateVisualization {
         }
 
         postValues = new ImmutableList[instanceConfigurations.length][];
+
         for (int i = 0; i < instanceConfigurations.length; i++) {
             postValues[i] = new ImmutableList[indexConfigurations[i].length];
             for (int j = 0; j < indexConfigurations[i].length; j++) {
@@ -231,7 +238,8 @@ public class StateVisualization {
     private synchronized void applyCutAndRun(ImmutableList<Goal> goals, Term inst) {
         if (goals.size() == 0) return;
 	int proofSteps = maxProofSteps / goals.size();
-        if (proofSteps < 1000) proofSteps = 1000;
+        if (proofSteps < 300) proofSteps = 300;
+	ps.setMaxSteps(maxProofSteps);
 	for (final Goal g : goals) {
             final NoPosTacletApp c = g.indexOfTaclets().lookup("cut");
             assert c != null;
@@ -244,14 +252,12 @@ public class StateVisualization {
             final ImmutableList<Goal> branches = g.apply(t2);
             ps.run(mediator.getProof().env(), branches);
         }
-	ps.setMaxSteps(maxProofSteps);
-        ps.run(mediator.getProof().env());
     }
 
     private void applyCuts(ImmutableSet<Term> terms) {
         Term[] t1 = terms.toArray(new Term[terms.size()]);
         Term[] t2 = terms.toArray(new Term[terms.size()]);
-
+        
         for (int i1 = 0; i1 < t1.length; i1++) {
             for (int i2 = i1; i2 < t2.length; i2++) {
                 if (!t1[i1].equals(t2[i2])) {
@@ -262,7 +268,9 @@ public class StateVisualization {
                     }
                 }
             }
-        }
+        }        
+        ps.setMaxSteps(maxProofSteps);
+        ps.run(mediator.getProof().env());
     }
 
     private void computeArrayConfigurations(int instanceConf) {
@@ -457,6 +465,7 @@ public class StateVisualization {
         mediator.getProof().
         setActiveStrategy(factory.create(mediator.getProof(), strategyProperties));
         
+        ps.setMaxSteps(600);
         ps.run(env);
         
         vd.setInitPhase(false);
