@@ -58,6 +58,10 @@ public class LabeledStatement extends JavaStatement
 
 	body=(Statement)children.get(Statement.class);
         prefixElementArray = computePrefix(body);
+        
+        // otherwise it will crash later
+        assert body != null;
+        assert name != null;
     }
 
     /**
