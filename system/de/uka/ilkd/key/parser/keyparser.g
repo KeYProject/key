@@ -1794,12 +1794,26 @@ pred_decl
 {
     Sort[] argSorts;    
     String pred_name;
+    Boolean[] whereToBind = null;
 }
     :
         pred_name = funcpred_name
+        
+        (
+	    whereToBind = where_to_bind
+	)?        
+        
+        
         argSorts = arg_sorts[!skip_predicates]
         {
             if (!skip_predicates) {
+            
+                if(whereToBind != null 
+	 	   && whereToBind.length != argSorts.length) {
+                    semanticError("Where-to-bind list must have same length "
+                                  + "as argument list");
+                }
+                 
                 Function p = null;            
             
             	int separatorIndex = pred_name.indexOf("::"); 
@@ -1821,7 +1835,9 @@ pred_decl
                 if(p == null) {	                        
                     p = new Function(new Name(pred_name), 
                     		     Sort.FORMULA, 
-                    		     argSorts);
+                    		     argSorts,
+                    		     whereToBind,
+                    		     false);
                 }
                 
 		if (lookup(p.name()) != null) {

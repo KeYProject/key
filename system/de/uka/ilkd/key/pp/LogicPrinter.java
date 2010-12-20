@@ -743,21 +743,6 @@ public final class LogicPrinter {
 	printTerm(cfma.formula());
     }
 
-    /**
-     * Pretty-prints a (shadowed) array expression
-     *
-     * @param arraySep usually a <code>[ </code> and a <code>] </code>
-     * @param t the array expression as a whole
-     * @param ass the associatives for the subterms
-     */
-    public void printArray(String[] arraySep, Term t, int[] ass)
-        throws java.io.IOException {
-        startTerm(t.arity());
-        for (int i = 0;  i<2; i++) {
-            maybeParens(t.sub(i), ass[i]);
-            layouter.print(arraySep[i]);
-        }
-    }
 
 
     /**
@@ -942,7 +927,10 @@ public final class LogicPrinter {
                 layouter.print("[");
                 
                 markStartSub();
+                startTerm(1);
+                markStartSub();
                 printTerm(fieldTerm.sub(0));
+                markEndSub();
                 markEndSub();
                 
                 layouter.print("]");
