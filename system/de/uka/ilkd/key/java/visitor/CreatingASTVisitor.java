@@ -428,6 +428,9 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
             if (x.getLabel() != null) {
                 l = (Label) changeList.removeFirst();
             }
+            // bugfix: create an empty statement if the label body was removed
+            if(changeList.get(Statement.class) == null)
+        	changeList.add(new EmptyStatement());
             addChild(new LabeledStatement(changeList, l, pi));
             changed();
         } else {
