@@ -142,10 +142,10 @@ doc: argfile
 ## didn't want to use perl ;)
 	@find de/ -name '*.java' | xargs grep -h "^package\|^overview" |\
 	cut -d" " -f2 | cut -d";" -f1 | sort | uniq | grep "^de.uka" | \
-	xargs $(JAVADOC) $(JAVADOC_OPTIONS) -source 1.5 -classpath $(CLASSPATH):$(GENERATED_SRC_PATH):$(BINARYPATH) \
+	xargs $(JAVADOC) $(JAVADOC_OPTIONS) -source 1.6 -classpath $(CLASSPATH):$(GENERATED_SRC_PATH):$(BINARYPATH) \
 	-sourcepath $(GENERATED_SRC_PATH):. -d doc \
 	-link http://recoder.sourceforge.net/doc/api \
-	-link http://java.sun.com/j2se/1.5.0/docs/api/ \
+	-link http://download.oracle.com/javase/6/docs/api/ \
 	-link http://www.antlr.org \
 	-windowtitle "KeY API Documentation" \
 	-doctitle "KeY API Documentation ($(KEY_VERSION_LONG))" \
