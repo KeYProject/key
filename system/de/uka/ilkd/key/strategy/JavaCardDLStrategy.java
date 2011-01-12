@@ -10,9 +10,9 @@
 
 package de.uka.ilkd.key.strategy;
 
+import de.uka.ilkd.key.ldt.CharListLDT;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.StringConverter;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
@@ -411,14 +411,16 @@ public final class JavaCardDLStrategy extends AbstractFeatureStrategy {
 	
 	
 	// do not convert char to int when inside a string function
-	   // feature used to recognize if one is inside a string literal
-        final StringConverter sc = services.getTypeConverter().getStringConverter();
+	// feature used to recognize if one is inside a string literal
+        final CharListLDT charListLDT = services.getTypeConverter().getCharListLDT();
 	
         final TermFeature keepChar = or ( 
-		or ( OperatorTF.create( sc.cons() ), OperatorTF.create( sc.charAt() ), OperatorTF.create(  sc.indexOf() ) ), 
-		OperatorTF.create( sc.lastIndexOf() ));
+		or ( OperatorTF.create( charListLDT.getStrCons() ), 
+		     OperatorTF.create( charListLDT.getStrCharAt() ), 
+		     OperatorTF.create(  charListLDT.getStrIndexOfChar() ) ), 
+		OperatorTF.create( charListLDT.getStrLastIndexOfChar() ));
         
-	final TermFeature emptyF = OperatorTF.create( sc.empty() );
+	final TermFeature emptyF = OperatorTF.create( charListLDT.getStrEmpty() );
 	
 	bindRuleSet ( d, "charLiteral_to_intLiteral",
 		ifZero ( isBelow ( keepChar ), inftyConst (), longConst (-100) ) ); 
@@ -427,7 +429,8 @@ public final class JavaCardDLStrategy extends AbstractFeatureStrategy {
 	// establish normalform 
 
 	// tf below only for test
-	final TermFeature stringLiteral = or( op (sc.empty()), op ( sc.cons() ) );
+	final TermFeature stringLiteral = or( op (charListLDT.getStrEmpty()), 
+		                              op ( charListLDT.getStrCons() ) );
 
 	Feature belowModOpPenality = ifZero  ( isBelow ( ff.modalOperator ),
 		  longConst ( 500 ) );	

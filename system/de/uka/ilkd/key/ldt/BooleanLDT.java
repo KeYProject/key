@@ -35,6 +35,10 @@ public final class BooleanLDT extends LDT {
     private final Function bool_false;
     private final Term term_bool_false;
     
+    
+    //-------------------------------------------------------------------------
+    //constructors
+    //-------------------------------------------------------------------------    
 
     public BooleanLDT(Services services) {
         super(NAME, services);
@@ -45,6 +49,10 @@ public final class BooleanLDT extends LDT {
 	term_bool_false = TermBuilder.DF.func(bool_false);
     }
     
+    
+    //-------------------------------------------------------------------------
+    //public interface
+    //-------------------------------------------------------------------------
     
     public Term getFalseTerm() {
         return term_bool_false;
@@ -101,7 +109,7 @@ public final class BooleanLDT extends LDT {
 
     
     @Override 
-    public Term translateLiteral(Literal lit) {
+    public Term translateLiteral(Literal lit, Services services) {
 	if (lit instanceof BooleanLiteral) {
 	    return (((BooleanLiteral)lit).getValue() ? 
 		    term_bool_true : term_bool_false);

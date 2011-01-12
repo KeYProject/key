@@ -17,7 +17,6 @@ import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.gui.IMain;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.*;
-import de.uka.ilkd.key.logic.Namespace;
 
 
 /** Represents the LDT .key files as a whole. Special treatment of these
@@ -134,7 +133,8 @@ public class LDTInput implements EnvInput {
                         	.prepend(new BooleanLDT(services))
                         	.prepend(new LocSetLDT(services))
                         	.prepend(new HeapLDT(services))
-                        	.prepend(new SeqLDT(services));
+                        	.prepend(new SeqLDT(services))
+                        	.prepend(new CharListLDT(services));
         initConfig.getServices().getTypeConverter().init(ldts);
     }
   

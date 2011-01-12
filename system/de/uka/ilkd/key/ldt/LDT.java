@@ -188,14 +188,14 @@ public abstract class LDT implements Named {
      * @return the Term that represents the given literal in its logic
      * form
      */ 
-    public abstract Term translateLiteral(Literal lit);
+    public abstract Term translateLiteral(Literal lit, Services services);
 
     /** returns the function symbol for the given operation 
      * @return  the function symbol for the given operation 
      */
     public abstract Function getFunctionFor(
 	    		de.uka.ilkd.key.java.expression.Operator op, 
-	    		Services serv, 
+	    		Services services, 
 	    		ExecutionContext ec);
 
     public abstract boolean hasLiteralFunction(Function f);

@@ -228,8 +228,8 @@ public final class IntegerLDT extends LDT {
         inChar              = addFunction(services, "inChar");
 
         //cache often used constants       
-        zero = translateLiteral(new IntLiteral(0));
-        one = translateLiteral(new IntLiteral(1));        
+        zero = translateLiteral(new IntLiteral(0), services);
+        one = translateLiteral(new IntLiteral(1), services);        
     }
     
     
@@ -472,8 +472,8 @@ public final class IntegerLDT extends LDT {
 
 
     @Override
-    public Term translateLiteral(Literal lit) {
-        int length=0;
+    public Term translateLiteral(Literal lit, Services services) {
+        int length = 0;
         boolean minusFlag = false;
         Debug.assertTrue(lit instanceof IntLiteral || 
                          lit instanceof LongLiteral ||

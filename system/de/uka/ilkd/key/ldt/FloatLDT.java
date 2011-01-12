@@ -63,7 +63,7 @@ public final class FloatLDT extends LDT {
 
     
     @Override 
-    public Term translateLiteral(Literal lit) {
+    public Term translateLiteral(Literal lit, Services services) {
 	return null;
     }
 

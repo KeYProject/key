@@ -29,7 +29,6 @@ import de.uka.ilkd.key.proof.CountingBufferedReader;
 import de.uka.ilkd.key.proof.RuleSource;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.speclang.SLEnvInput;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.ProgressMonitor;
 
@@ -325,15 +324,6 @@ public class KeYFile implements EnvInput {
 	} catch (FileNotFoundException fnfe) {
 	    throw new ProofInputException(fnfe);
         }
-        
-        //read in-code specifications
-	getPreferences();
-        readJavaPath();
-        if(javaPath != null && !javaPath.equals("")) {            
-            SLEnvInput slEnvInput = new SLEnvInput(javaPath);
-            slEnvInput.setInitConfig(initConfig);
-            slEnvInput.read();
-        }               
     }
 
     

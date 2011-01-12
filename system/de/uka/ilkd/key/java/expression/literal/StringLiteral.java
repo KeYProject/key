@@ -21,65 +21,49 @@ import de.uka.ilkd.key.java.reference.ReferencePrefix;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.util.ExtList;
 
-/**
- *  String literal.
- *  @author <TT>AutoDoc</TT>
- */
 
 public class StringLiteral extends Literal implements ReferencePrefix {
-
-    /**
- *      The value.
-     */
 
     protected final String value;
 
 
     /**
- *      String literal.
- *      @param value a string.
+     * String literal.
+     * @param value a string.
      */
-
     public StringLiteral(String value) {
         this.value=value;
     }
 
     /**
- *      String literal.
- *      @param children an ExtList with children(here:comments)
- *      @param value a string.
+     * String literal.
+     * @param children an ExtList with children(here:comments)
+     * @param value a string.
      */
-
     public StringLiteral(ExtList children, String value) {
 	super(children);
         this.value=value;
     }
 
 
-    /** tests if equals
-     */
-    public boolean equalsModRenaming(	SourceElement o, 
-										NameAbstractionTable nat){
-		if (!(o instanceof StringLiteral)) {
-		    return false;
-		}
-		return ((StringLiteral)o).getValue().equals(getValue()); 
+    public boolean equalsModRenaming(SourceElement o, 
+	    			     NameAbstractionTable nat) {
+	if (!(o instanceof StringLiteral)) {
+	    return false;
+	}
+	return ((StringLiteral)o).getValue().equals(getValue()); 
     }
     
-    public int hashCode(){
+    public int hashCode() {
     	int result = 17;
     	result = 37 * result + getValue().hashCode();
     	return result;
     }
     
-    public boolean equals(Object o){
+    public boolean equals(Object o) {
     	return super.equals(o);
     }
 
-    /**
- *      Get value.
- *      @return the string.
-     */
 
     public String getValue() {
         return value;
@@ -114,6 +98,4 @@ public class StringLiteral extends Literal implements ReferencePrefix {
     public KeYJavaType getKeYJavaType(Services javaServ) {
 	return javaServ.getJavaInfo().getKeYJavaType("java.lang.String");
     }
-
-
 }

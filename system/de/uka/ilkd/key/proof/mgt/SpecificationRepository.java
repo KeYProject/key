@@ -480,13 +480,14 @@ public final class SpecificationRepository {
         
         for(Pair<KeYJavaType,ObserverFunction> impl : impls) {
             contract = contract.setTarget(impl.first, impl.second, services);
-            assert contractsByName.get(contract.getName()) == null
-                   : "Tried to add a contract with a non-unique name!";
-            assert !contract.getName().contains(CONTRACT_COMBINATION_MARKER)
+            final String name = contract.getName();
+            assert contractsByName.get(name) == null
+                   : "Tried to add a contract with a non-unique name: " + name;
+            assert !name.contains(CONTRACT_COMBINATION_MARKER)
                    : "Tried to add a contract with a name containing the"
                      + " reserved character " 
                      + CONTRACT_COMBINATION_MARKER 
-                     + "!";
+                     + ": " + name;
             assert contract.id() != Contract.INVALID_ID
                    : "Tried to add a contract with an invalid id!";
             contracts.put(impl, 

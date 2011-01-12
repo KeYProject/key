@@ -173,7 +173,7 @@ public final class LocSetLDT extends LDT {
 
 
     @Override
-    public Term translateLiteral(Literal lit) {
+    public Term translateLiteral(Literal lit, Services services) {
 	assert lit instanceof EmptySetLiteral;
 	return TermBuilder.DF.func(empty);
     }

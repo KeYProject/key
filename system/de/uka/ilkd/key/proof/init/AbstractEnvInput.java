@@ -19,20 +19,27 @@ import java.util.List;
  */
 public abstract class AbstractEnvInput implements EnvInput {
 
-    private final String name;
-    private final String javaPath;
+    protected final String name;
+    protected final String javaPath;    
+    protected final List<File> classPath;
+    protected final File bootClassPath;
+    protected final Includes includes;    
+    
     protected InitConfig initConfig;
-
-    private Includes includes;
+    
 
     //-------------------------------------------------------------------------
     //constructors
     //-------------------------------------------------------------------------
 
     public AbstractEnvInput(String name,
-	    		    String javaPath) {
+	    		    String javaPath,
+	    		    List<File> classPath,
+	    		    File bootClassPath) {
 	this.name     = name;
 	this.javaPath = javaPath;
+	this.classPath = classPath;
+	this.bootClassPath = bootClassPath;
 	this.includes = new Includes();
     }
 
@@ -71,15 +78,14 @@ public abstract class AbstractEnvInput implements EnvInput {
 	return javaPath;
     }
 
-    // no class path elements here
+
     @Override
     public final List<File> readClassPath() throws ProofInputException {
-        return null;
+        return classPath;
     }
     
-    // no class path elements here
-    public File readBootClassPath() {
-        return null;
-    }
 
+    public File readBootClassPath() {
+        return bootClassPath;
+    }
 }

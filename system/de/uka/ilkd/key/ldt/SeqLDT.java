@@ -124,7 +124,7 @@ public final class SeqLDT extends LDT {
 
 
     @Override
-    public Term translateLiteral(Literal lit) {
+    public Term translateLiteral(Literal lit, Services services) {
 	assert lit instanceof EmptySeqLiteral;
 	return TermBuilder.DF.func(seqEmpty);
     }

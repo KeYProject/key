@@ -336,7 +336,7 @@ public final class HeapLDT extends LDT {
 
 
     @Override
-    public Term translateLiteral(Literal lit) {
+    public Term translateLiteral(Literal lit, Services services) {
 	assert false;
 	return null;
     }

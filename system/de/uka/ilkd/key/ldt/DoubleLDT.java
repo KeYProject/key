@@ -64,7 +64,7 @@ public final class DoubleLDT extends LDT {
 
     
     @Override 
-    public Term translateLiteral(Literal lit) {
+    public Term translateLiteral(Literal lit, Services services) {
 	return null;
     }
 

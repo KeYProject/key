@@ -43,15 +43,13 @@ public final class TypeConverter {
     private SeqLDT seqLDT;
     private FloatLDT floatLDT;
     private DoubleLDT doubleLDT;
+    private CharListLDT charListLDT;
     
-    
-    private StringConverter stringConverter;
     private ImmutableList<LDT> models = ImmutableSLList.<LDT>nil();
     
 
     TypeConverter(Services s){
         services = s;       
-        stringConverter = new StringConverter(s); //TODO replace with stringLDT 
     }
 
     
@@ -60,9 +58,9 @@ public final class TypeConverter {
      */
     public void init(LDT ldt) {	
         if (ldt instanceof IntegerLDT) {
-            this.integerLDT = (IntegerLDT)ldt;
+            this.integerLDT = (IntegerLDT) ldt;
         } else if (ldt instanceof BooleanLDT) {
-            this.booleanLDT = (BooleanLDT)ldt;
+            this.booleanLDT = (BooleanLDT) ldt;
         } else if (ldt instanceof LocSetLDT) {
             this.locSetLDT = (LocSetLDT) ldt;
         } else if (ldt instanceof HeapLDT) {
@@ -70,10 +68,12 @@ public final class TypeConverter {
         } else if (ldt instanceof SeqLDT) {
             this.seqLDT = (SeqLDT) ldt;
         } else if (ldt instanceof FloatLDT ) {
-            this.floatLDT = (FloatLDT)ldt;
+            this.floatLDT = (FloatLDT) ldt;
         } else if (ldt instanceof DoubleLDT) {
-            this.doubleLDT = (DoubleLDT)ldt;
-        } 
+            this.doubleLDT = (DoubleLDT) ldt;
+        } else if (ldt instanceof CharListLDT) {
+            this.charListLDT = (CharListLDT) ldt;
+        }
 
         this.models = this.models.prepend(ldt);
         Debug.out("Initialize LDTs: ", ldt);
@@ -131,6 +131,11 @@ public final class TypeConverter {
 	return seqLDT;
     }
     
+    
+    public CharListLDT getCharListLDT() {
+	return charListLDT;
+    }    
+    
 
     private Term translateOperator
 	(de.uka.ilkd.key.java.expression.Operator op, ExecutionContext ec) {
@@ -156,7 +161,9 @@ public final class TypeConverter {
 	    responsibleLDT = locSetLDT;
 	} else if(seqLDT.isResponsible(op, subs, services, ec)) {
 	    responsibleLDT = seqLDT;
-	} else if(op instanceof Equals) {
+	} else if(charListLDT.isResponsible(op, subs, services, ec)) {
+	    responsibleLDT = charListLDT;
+    	} else if(op instanceof Equals) {
 	    assert subs.length == 2;
 	    return TB.equals(subs[0], subs[1]);
 	} else if(op instanceof Conditional) {
@@ -334,10 +341,10 @@ public final class TypeConverter {
 	    String val = ((IntLiteral)((Negative)pe).getChildAt(0)).getValue();
 	    if (val.charAt(0)=='-') {
 		return integerLDT.translateLiteral
-		    (new IntLiteral(val.substring(1)));
+		    (new IntLiteral(val.substring(1)), services);
 	    } else {
 		return integerLDT.translateLiteral
-		    (new IntLiteral("-"+val));
+		    (new IntLiteral("-"+val), services);
 	    }
 	} else if (pe instanceof Negative 
 		   && ((Negative)pe).getChildAt(0) instanceof LongLiteral ) {
@@ -345,16 +352,14 @@ public final class TypeConverter {
 			  ((Negative)pe).getChildAt(0)).getValue();
 	    if (val.charAt(0)=='-') {
 		return integerLDT.translateLiteral
-		    (new LongLiteral(val.substring(1)));
+		    (new LongLiteral(val.substring(1)), services);
 	    } else {
 		return integerLDT.translateLiteral
-		    (new LongLiteral("-"+val));
+		    (new LongLiteral("-"+val), services);
 	    }
 	} else if (pe instanceof ThisReference) {
 	    return convertReferencePrefix((ThisReference)pe, ec);
-	} /*else if (pe instanceof CurrentMemoryAreaReference) {   
-            return convertToLogicElement(ec.getMemoryArea());
-        } */else if (pe instanceof ParenthesizedExpression) {
+	} else if (pe instanceof ParenthesizedExpression) {
             return convertToLogicElement
                 (((ParenthesizedExpression)pe).getChildAt(0), ec);
         } else if (pe instanceof Instanceof) {
@@ -381,21 +386,21 @@ public final class TypeConverter {
      */
     private Term convertLiteralExpression(Literal lit) {      
         if (lit instanceof BooleanLiteral) {   
-            return booleanLDT.translateLiteral(lit);
+            return booleanLDT.translateLiteral(lit, services);
         } else if (lit instanceof NullLiteral) {
             return TB.NULL(services);
         } else if (lit instanceof IntLiteral) {
-            return integerLDT.translateLiteral(lit);
+            return integerLDT.translateLiteral(lit, services);
         } else if (lit instanceof CharLiteral) {
-            return integerLDT.translateLiteral(lit);
+            return integerLDT.translateLiteral(lit, services);
         } else if (lit instanceof LongLiteral) {
-            return integerLDT.translateLiteral(lit);
+            return integerLDT.translateLiteral(lit, services);
         } else if (lit instanceof StringLiteral) {
-            return stringConverter.translateLiteral(lit,integerLDT,services);
+            return charListLDT.translateLiteral(lit, services);
         } else if (lit instanceof EmptySetLiteral) {
-            return locSetLDT.translateLiteral(lit);
+            return locSetLDT.translateLiteral(lit, services);
         } else if (lit instanceof EmptySeqLiteral) {
-            return seqLDT.translateLiteral(lit);            
+            return seqLDT.translateLiteral(lit, services);            
         } else {
             Debug.fail("Unknown literal type", lit);                 
             return null;
@@ -931,9 +936,5 @@ public final class TypeConverter {
 	final TypeConverter tc = new TypeConverter(services);
 	tc.init(models);
 	return tc;
-    }
-
-    public StringConverter getStringConverter() {
-	return stringConverter;
     }
 }

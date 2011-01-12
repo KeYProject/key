@@ -37,6 +37,7 @@ tokens {
 	GENERIC = "\\generic";
         EXTENDS = "\\extends";
         ONEOF = "\\oneof";
+	ABSTRACT = "\\abstract";        
 
         // Keywords used in schema variable declarations
 	SCHEMAVARIABLES = "\\schemaVariables";

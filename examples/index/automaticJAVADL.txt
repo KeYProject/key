@@ -292,4 +292,7 @@
 ./standard_key/staticInitialisation/staticInitialisersAreNonSimple.key
 ./standard_key/strings/charAt0.key
 ./standard_key/strings/charAt1.key
+./standard_key/strings/concat1.key
+./standard_key/strings/deriveLength1.key
+./standard_key/strings/emptyStringLengthZero.key
 ./_testcase/classpath/classpath.key

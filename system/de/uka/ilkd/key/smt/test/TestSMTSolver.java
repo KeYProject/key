@@ -72,6 +72,9 @@ public abstract class TestSMTSolver extends TestCommons {
 	if (!toolNotInstalledChecked()) {    
 	    isinstalled = this.getSolver().isUsable();
 	    setToolNotInstalledChecked(true);
+	    if(!isinstalled) {
+		System.out.println("Warning: " + getSolver() + " not installed, tests skipped.");
+	    }	    
 	}
 	
 	return !isinstalled;

@@ -177,7 +177,7 @@ public final class ProblemInitializer {
     private Vector<String> getClasses(String f) throws ProofInputException  {
 	File cfile = new File(f);
 	Vector<String> v=new Vector<String>();
-	if (cfile.isDirectory()) {
+	if(cfile.isDirectory()) {
 	    String[] list=cfile.list();
 	    // mu(2008-jan-28): if the directory is not readable for the current user
 	    // list is set to null, which results in a NullPointerException.
@@ -198,6 +198,7 @@ public final class ProblemInitializer {
 	}
 	
     }
+    
     
     /**
      * Helper for readJava().
@@ -222,6 +223,7 @@ public final class ProblemInitializer {
      */
     private void readJava(EnvInput envInput, InitConfig initConfig) 
     		throws ProofInputException {
+	//this method must only be called once per init config	
 	assert !initConfig.getServices()
 	                  .getJavaInfo()
 	                  .rec2key()
@@ -238,7 +240,6 @@ public final class ProblemInitializer {
 	final Recoder2KeY r2k = new Recoder2KeY(initConfig.getServices(), 
                                                 initConfig.namespaces());
 	r2k.setClassPath(bootClassPath, classPath);
-
 
 	if(javaPath != null) {
     	    //read Java	
@@ -262,6 +263,7 @@ public final class ProblemInitializer {
 	
         initConfig.getProofEnv().setJavaModel(getJavaModel(javaPath));
     }
+    
     
     /**
      * Removes all schema variables, all generic sorts and all sort

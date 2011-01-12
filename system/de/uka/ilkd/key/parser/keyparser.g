@@ -1462,6 +1462,7 @@ sort_decls
 
 one_sort_decl returns [ImmutableList<Sort> createdSorts = ImmutableSLList.<Sort>nil()] 
 {
+    boolean isAbstractSort = false;
     boolean isGenericSort = false;
     Sort[] sortExt=new Sort [0];
     Sort[] sortOneOf=new Sort [0];
@@ -1472,7 +1473,8 @@ one_sort_decl returns [ImmutableList<Sort> createdSorts = ImmutableSLList.<Sort>
          GENERIC {isGenericSort=true;} sortIds = simple_ident_comma_list
             ( ONEOF sortOneOf = oneof_sorts )? 
             ( EXTENDS sortExt = extends_sorts )?
-        | firstSort = simple_ident_dots { sortIds = sortIds.prepend(firstSort); }
+        | (ABSTRACT {isAbstractSort = true;})?
+          firstSort = simple_ident_dots { sortIds = sortIds.prepend(firstSort); }
           (
               (EXTENDS sortExt = extends_sorts ) 
             | ((COMMA) sortIds = simple_ident_comma_list { sortIds = sortIds.prepend(firstSort) ; } )
@@ -1511,7 +1513,7 @@ one_sort_decl returns [ImmutableList<Sort> createdSorts = ImmutableSLList.<Sort>
                                     ext = ext.add ( sortExt[i] );
                                 }
 
-                                s = new SortImpl(sort_name, ext);
+                                s = new SortImpl(sort_name, ext, isAbstractSort);
                             }
                             assert s != null;
                             sorts().add ( s ); 
@@ -2817,9 +2819,11 @@ term130 returns [Term a = null]
     |   TRUE  { a = tf.createTerm(Junctor.TRUE); }
     |   FALSE { a = tf.createTerm(Junctor.FALSE); }
     |   a = ifThenElseTerm
-    //|   a = sum_or_product_term
-    //|   a = bounded_sum_term
-   ; exception
+    |   literal:STRING_LITERAL
+        {
+            a = getServices().getTypeConverter().convertToLogicElement(new de.uka.ilkd.key.java.expression.literal.StringLiteral(literal.getText()));
+        }   
+    ; exception
         catch [TermCreationException ex] {
               keh.reportException
 		(new KeYSemanticException

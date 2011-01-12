@@ -13,7 +13,7 @@ package de.uka.ilkd.key.pp;
 import java.util.HashMap;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.TypeConverter;
+import de.uka.ilkd.key.ldt.CharListLDT;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.ldt.LocSetLDT;
@@ -167,39 +167,45 @@ public final class NotationInfo {
     
     private void addFancyNotations(Services services) {
 	//arithmetic operators
-	IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();	
-	if(integerLDT != null) {
-	    tbl.put(integerLDT.getNumberSymbol(), new Notation.NumLiteral());
-	    tbl.put(integerLDT.getCharSymbol(), new Notation.CharLiteral());
-	    tbl.put(integerLDT.getLessThan(), new Notation.Infix("<", 80, 90, 90));
-	    tbl.put(integerLDT.getGreaterThan(), new Notation.Infix("> ", 80, 90, 90));
-	    tbl.put(integerLDT.getLessOrEquals(), new Notation.Infix("<=", 80, 90, 90));
-	    tbl.put(integerLDT.getGreaterOrEquals(), new Notation.Infix(">=", 80, 90, 90));
-	    tbl.put(integerLDT.getSub(), new Notation.Infix("-", 90, 90, 91));
-	    tbl.put(integerLDT.getAdd(), new Notation.Infix("+", 90, 90, 91));
-	    tbl.put(integerLDT.getMul(), new Notation.Infix("*", 100, 100, 101));
-	    tbl.put(integerLDT.getDiv(), new Notation.Infix("/", 100, 100, 101));
-	    tbl.put(integerLDT.getMod(), new Notation.Infix("%", 100, 100, 101));
-	    tbl.put(integerLDT.getNeg(),new Notation.Prefix("-", 140, 130));
-	    tbl.put(integerLDT.getNegativeNumberSign(), new Notation.Prefix("-", 140, 130));
-	}
+	final IntegerLDT integerLDT 
+		= services.getTypeConverter().getIntegerLDT();	
+	tbl.put(integerLDT.getNumberSymbol(), new Notation.NumLiteral());
+	tbl.put(integerLDT.getCharSymbol(), new Notation.CharLiteral());
+	tbl.put(integerLDT.getLessThan(), new Notation.Infix("<", 80, 90, 90));
+	tbl.put(integerLDT.getGreaterThan(), new Notation.Infix("> ", 80, 90, 90));
+	tbl.put(integerLDT.getLessOrEquals(), new Notation.Infix("<=", 80, 90, 90));
+	tbl.put(integerLDT.getGreaterOrEquals(), new Notation.Infix(">=", 80, 90, 90));
+	tbl.put(integerLDT.getSub(), new Notation.Infix("-", 90, 90, 91));
+	tbl.put(integerLDT.getAdd(), new Notation.Infix("+", 90, 90, 91));
+	tbl.put(integerLDT.getMul(), new Notation.Infix("*", 100, 100, 101));
+	tbl.put(integerLDT.getDiv(), new Notation.Infix("/", 100, 100, 101));
+	tbl.put(integerLDT.getMod(), new Notation.Infix("%", 100, 100, 101));
+	tbl.put(integerLDT.getNeg(),new Notation.Prefix("-", 140, 130));
+	tbl.put(integerLDT.getNegativeNumberSign(), new Notation.Prefix("-", 140, 130));
         	
 	//heap operators
-	HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+	final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
 	tbl.put(HeapLDT.SELECT_NAME, new Notation.SelectNotation());
 	tbl.put(ObserverFunction.class, new Notation.ObserverNotation());
 	tbl.put(ProgramMethod.class, new Notation.ObserverNotation());
 	tbl.put(heapLDT.getLength(), new Notation.LengthNotation());
 	
 	//set operators
-	LocSetLDT setLDT = services.getTypeConverter().getLocSetLDT();
+	final LocSetLDT setLDT = services.getTypeConverter().getLocSetLDT();
 	tbl.put(setLDT.getEmpty(), new Notation.Constant("{}", 130));
 	tbl.put(setLDT.getSingleton(), new Notation.SingletonNotation());
 	tbl.put(setLDT.getUnion(), new Notation.Infix("\\cup", 130, 0, 0));
 	tbl.put(setLDT.getIntersect(), new Notation.Infix("\\cap", 130, 0, 0));
 	tbl.put(setLDT.getSetMinus(), new Notation.Infix("\\setMinus", 130, 0, 0));
 	tbl.put(setLDT.getElementOf(), new Notation.ElementOfNotation());	
-	tbl.put(setLDT.getSubset(), new Notation.Infix("\\subset", 130, 0, 0));	
+	tbl.put(setLDT.getSubset(), new Notation.Infix("\\subset", 130, 0, 0));
+	
+	//string operators
+	final CharListLDT charListLDT 
+		= services.getTypeConverter().getCharListLDT();
+	tbl.put(charListLDT.getStrConcat(), new Notation.Infix("+",120,130,130));
+	tbl.put(charListLDT.getStrCons(), new CharListNotation());
+	tbl.put(charListLDT.getStrEmpty(), new Notation.Constant("\"\"",140));
     }
     
 
