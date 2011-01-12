@@ -16,12 +16,10 @@
 </security> 
 <resources> 
 <j2se version="1.6+" initial-heap-size="128m" max-heap-size="1024m"/> 
-<j2se version="1.5+" initial-heap-size="128m" max-heap-size="1024m"/> 
 
 <jar href="key.jar"/> 
 <jar href="antlr.jar" /> 
 <jar href="recoderKey.jar" /> 
-<jar href="log4j.jar" /> 
 </resources> 
 
 <application-desc main-class="de.uka.ilkd.key.gui.WebstartMain"/> 
